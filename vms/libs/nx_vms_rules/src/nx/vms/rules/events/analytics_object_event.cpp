@@ -52,6 +52,17 @@ QString AnalyticsObjectEvent::cacheKey() const
     return m_objectTrackId.toSimpleString();
 }
 
+nx::analytics::taxonomy::AbstractObjectType* AnalyticsObjectEvent::objectTypeById(
+    common::SystemContext* context) const
+{
+    const auto camera =
+        context->resourcePool()->getResourceById<QnVirtualCameraResource>(cameraId());
+
+    return camera && camera->systemContext()
+        ? camera->systemContext()->analyticsTaxonomyState()->objectTypeById(m_objectTypeId)
+        : nullptr;
+}
+
 QVariantMap AnalyticsObjectEvent::details(common::SystemContext* context) const
 {
     auto result = AnalyticsEngineEvent::details(context);
@@ -62,7 +73,11 @@ QVariantMap AnalyticsObjectEvent::details(common::SystemContext* context) const
     utils::insertIfNotEmpty(result, utils::kAnalyticsObjectTypeDetailName, analyticsObjectCaption(context));
     result.insert(utils::kEmailTemplatePathDetailName, manifest().emailTemplatePath);
     utils::insertLevel(result, nx::vms::event::Level::common);
-    utils::insertIcon(result, nx::vms::rules::Icon::resource);
+    utils::insertIcon(result, nx::vms::rules::Icon::analyticsObject);
+
+    const auto objectType = objectTypeById(context);
+    utils::insertIfNotEmpty(
+        result, utils::kCustomIconDetailName, objectType ? objectType->icon() : QString());
     utils::insertClientAction(result, nx::vms::rules::ClientAction::previewCameraOnTime);
 
     return result;
@@ -70,13 +85,7 @@ QVariantMap AnalyticsObjectEvent::details(common::SystemContext* context) const
 
 QString AnalyticsObjectEvent::analyticsObjectCaption(common::SystemContext* context) const
 {
-    const auto camera =
-        context->resourcePool()->getResourceById<QnVirtualCameraResource>(cameraId());
-
-    const auto objectType = camera && camera->systemContext()
-        ? camera->systemContext()->analyticsTaxonomyState()->objectTypeById(m_objectTypeId)
-        : nullptr;
-
+    const auto objectType = objectTypeById(context);
     return objectType ? objectType->name() : tr("Object detected");
 }
 

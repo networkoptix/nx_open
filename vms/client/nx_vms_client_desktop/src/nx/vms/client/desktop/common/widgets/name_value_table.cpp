@@ -20,7 +20,7 @@
 #include <QtQuick/QQuickRenderTarget>
 #include <QtQuick/QQuickWindow>
 
-#if QT_VERSION >= QT_VERSION_CHECK(6,6,0)
+#if QT_VERSION >= QT_VERSION_CHECK(6, 6, 0)
     #include <rhi/qrhi.h>
 #else
     #include <QtGui/private/qrhi_p.h>
@@ -131,18 +131,23 @@ public:
     }
 
     void render(
-        NameValueTable* widget, const QVariantList& items, QSize& outSize, QPixmap& outPixmap)
+        NameValueTable* widget,
+        const QVariantList& items,
+        QSize& outSize,
+        QPixmap& outPixmap,
+        int maxRowCount = 0)
     {
         const QFont nameFont(widget->font());
         QFont valueFont(nameFont);
         valueFont.setWeight(QFont::Medium);
 
         rootItem->setWidth(widget->width());
+        rootItem->setProperty("maxRowCount", maxRowCount);
         rootItem->setProperty("items", items);
         rootItem->setProperty("nameFont", nameFont);
         rootItem->setProperty("valueFont", valueFont);
-        rootItem->setProperty("nameColor", widget->palette().color(QPalette::WindowText));
-        rootItem->setProperty("valueColor", widget->palette().color(QPalette::Light));
+        rootItem->setProperty("nameColor", widget->palette().color(QPalette::Light));
+        rootItem->setProperty("valueColor", widget->palette().color(QPalette::WindowText));
 
         invokeQmlMethod<void>(rootItem.get(), "forceLayout"); //< To finalize its size.
 
@@ -381,6 +386,7 @@ struct NameValueTable::Private
     QSize size;
 
     QVariantList flatItems;
+    int maxRowCount = 0;
 
     QPixmap pixmap;
     nx::utils::PendingOperation updateOp;
@@ -391,6 +397,15 @@ struct NameValueTable::Private
         updateOp.setIntervalMs(1);
         updateOp.setCallback([this]() { updateImage(); });
         updateOp.setFlags(nx::utils::PendingOperation::FireOnlyWhenIdle);
+    }
+
+    void setMaximumNumberOfRows(int numberOfRows)
+    {
+        if (maxRowCount == numberOfRows)
+            return;
+
+        maxRowCount = numberOfRows;
+        updateImage();
     }
 
     void setContent(const analytics::AttributeList& value)
@@ -413,7 +428,7 @@ struct NameValueTable::Private
         }
 
         const auto oldSize = size;
-        renderer->render(q, flatItems, size, pixmap);
+        renderer->render(q, flatItems, size, pixmap, maxRowCount);
         if (size != oldSize)
             q->updateGeometry();
     }
@@ -433,6 +448,11 @@ NameValueTable::~NameValueTable()
 analytics::AttributeList NameValueTable::content() const
 {
     return d->content;
+}
+
+void NameValueTable::setMaximumNumberOfRows(int maxNumberOfRows)
+{
+    d->setMaximumNumberOfRows(maxNumberOfRows);
 }
 
 void NameValueTable::setContent(const analytics::AttributeList& value)

@@ -21,8 +21,8 @@ Control
     property rect highlightRect: Qt.rect(0, 0, 0, 0)
     property bool showHighlightBorder: false
 
-    property color backgroundColor: ColorTheme.colors.dark6
-    property color borderColor: ColorTheme.colors.dark5
+    property color backgroundColor: ColorTheme.colors.dark7
+    property color borderColor: ColorTheme.colors.dark10
     property color highlightColor: ColorTheme.colors.brand_core
     property color foregroundColor: ColorTheme.colors.light16
 

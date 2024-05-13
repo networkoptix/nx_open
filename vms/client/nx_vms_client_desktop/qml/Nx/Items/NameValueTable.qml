@@ -15,6 +15,8 @@ Item
     property var items: []
     property var rawItems: []
 
+    // If positive, only maxRowCount rows will be visible.
+    property int maxRowCount: 0
     property alias rowSpacing: grid.rowSpacing
 
     property color nameColor: "gray"
@@ -43,6 +45,11 @@ Item
     function forceLayout()
     {
         grid.forceLayout()
+    }
+    
+    function rowsCount()
+    {
+        return control.items.length / 2;
     }
 
     onItemsChanged:
@@ -149,6 +156,12 @@ Item
 
                     readonly property bool isLabel: (index % 2) === 0
 
+                    visible:
+                    {
+                        const currentIndexOfRow = (index + 1) / 2
+                        return control.maxRowCount === 0 || currentIndexOfRow <= control.maxRowCount
+                    }
+
                     color: isLabel ? control.nameColor : control.valueColor
                     font: isLabel ? control.nameFont : control.valueFont
 
@@ -177,6 +190,16 @@ Item
                     }
                 }
             }
+        }
+
+        Text
+        {
+            visible: control.maxRowCount && rowsCount() >= control.maxRowCount
+            text: qsTr("+ %n more", "", rowsCount() - control.maxRowCount)
+            color: nameColor
+            lineHeight: LocalSettings.iniConfigValue("attributeTableLineHeightFactor")
+            font: control.nameFont
+            wrapMode: Text.Wrap
         }
 
         function updateColumnWidths()

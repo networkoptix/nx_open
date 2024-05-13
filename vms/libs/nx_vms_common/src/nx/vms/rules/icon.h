@@ -15,6 +15,7 @@ NX_REFLECTION_ENUM_CLASS(Icon,
     license,
     motion,
     resource,
-    custom)
+    custom,
+    analyticsObject)
 
 } // namespace nx::vms::rules

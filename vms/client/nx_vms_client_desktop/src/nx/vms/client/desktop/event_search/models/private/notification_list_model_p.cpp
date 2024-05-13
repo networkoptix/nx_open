@@ -10,6 +10,8 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_display_info.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/analytics/taxonomy/abstract_object_type.h>
+#include <nx/analytics/taxonomy/abstract_state_watcher.h>
 #include <nx/utils/metatypes.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/skin/color_theme.h>
@@ -942,9 +944,16 @@ QString NotificationListModel::Private::iconPath(const vms::event::AbstractActio
         case EventType::cameraInputEvent:
         case EventType::cameraIpConflictEvent:
         case EventType::analyticsSdkEvent:
-        case EventType::analyticsSdkObjectDetected:
             return eventIconPath(nx::vms::rules::Icon::resource, /*custom*/ {},
                 {system()->resourcePool()->getResourceById(params.eventResourceId)});
+        case EventType::analyticsSdkObjectDetected:
+        {
+            const auto state = q->system()->analyticsTaxonomyStateWatcher()->state();
+            const auto objectType =
+                state->objectTypeById(action->getRuntimeParams().getAnalyticsObjectTypeId());
+            return eventIconPath(
+                vms::rules::Icon::analyticsObject, objectType ? objectType->icon() : QString());
+        }
 
         case EventType::softwareTriggerEvent:
             return eventIconPath(nx::vms::rules::Icon::custom,

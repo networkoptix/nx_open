@@ -97,9 +97,13 @@ QString AbstractEventListModel::timestampText(microseconds timestamp) const
     const auto timeWatcher = system()->serverTimeWatcher();
     const QDateTime dateTime = timeWatcher->displayTime(timestampMs);
 
-    // For current day just display the time in system format.
+    // For current day display time in the format '<N> <Time> ago'.
     if (qnSyncTime->currentDateTime().date() == dateTime.date())
-        return nx::vms::time::toString(dateTime.time());
+    {
+        const milliseconds msecsAgo{
+            QDateTime::currentMSecsSinceEpoch() - dateTime.toMSecsSinceEpoch()};
+        return time::fromNow(duration_cast<seconds>(msecsAgo)).toUpper();
+    }
 
     // Display both date and time for all other days.
     return nx::vms::time::toString(dateTime, nx::vms::time::Format::dd_MM_yy_hh_mm_ss);

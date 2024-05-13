@@ -7,6 +7,8 @@
 #include "../data_macros.h"
 #include "analytics_engine_event.h"
 
+namespace nx::analytics::taxonomy { class AbstractObjectType; }
+
 namespace nx::vms::rules {
 
 class NX_VMS_RULES_API AnalyticsObjectEvent: public AnalyticsEngineEvent
@@ -40,6 +42,7 @@ public:
 private:
     QString analyticsObjectCaption(common::SystemContext* context) const;
     QString extendedCaption(common::SystemContext* context) const;
+    nx::analytics::taxonomy::AbstractObjectType* objectTypeById(common::SystemContext* context) const;
 };
 
 } // namespace nx::vms::rules

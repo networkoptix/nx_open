@@ -3,42 +3,38 @@
 #include "event_tile.h"
 #include "ui_event_tile.h"
 
-#include <QtCore/QCache>
+#include <chrono>
+#include <functional>
+
 #include <QtCore/QScopedPointer>
-#include <QtCore/QTimer>
 #include <QtCore/QUrl>
 #include <QtGui/QDesktopServices>
 #include <QtGui/QPainter>
-#include <QtGui/QTextDocument>
 
 #include <client/client_globals.h>
 #include <core/resource/resource.h>
 #include <finders/systems_finder.h>
-#include <nx/utils/log/log.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/common/widgets/close_button.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
-#include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/desktop/image_providers/resource_thumbnail_provider.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/skin/font_config.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/utils/widget_utils.h>
 #include <nx/vms/client/desktop/workbench/extensions/local_notifications_manager.h>
 #include <nx/vms/common/html/html.h>
-#include <nx/vms/common/system_settings.h>
 #include <ui/common/palette.h>
-#include <ui/widgets/common/elided_label.h>
-#include <utils/common/delayed.h>
 
-namespace nx::vms::client::desktop {
+#include "private/event_tile_p.h"
 
 using namespace nx::vms::common::html;
 using namespace std::chrono;
+
+namespace nx::vms::client::desktop {
 
 namespace {
 
@@ -46,22 +42,18 @@ namespace {
 static const milliseconds kPreviewReloadDelay = seconds(ini().rightPanelPreviewReloadDelay);
 
 static constexpr auto kRoundingRadius = 2;
-static constexpr int kTileTitleLineLimit = 2;
+
+static constexpr int kMaxNumberOfDisplayedAttributes = 4;
 
 static constexpr auto kTitleFontWeight = QFont::Medium;
 static constexpr auto kTimestampFontWeight = QFont::Normal;
 static constexpr auto kDescriptionFontWeight = QFont::Normal;
 static constexpr auto kResourceListFontWeight = QFont::Medium;
-static constexpr auto kAndMoreFontWeight = QFont::Normal; //< "...and n more"
 static constexpr auto kFooterFontWeight = QFont::Normal;
-
-static constexpr int kAndMoreTopMargin = 4; //< Above "...and n more"
 
 static constexpr int kProgressBarResolution = 1000;
 
 static constexpr int kSeparatorHeight = 6;
-
-static constexpr qsizetype kMaximumResourceListSize = 3; //< Before "...and n more"
 
 static constexpr int kMaximumPreviewHeightWithHeader = 135;
 static constexpr int kMaximumPreviewHeightWithoutHeader = 151;
@@ -84,300 +76,7 @@ static constexpr auto kDefaultReloadMode = AsyncImageWidget::ReloadMode::showPre
 constexpr auto kDotRadius = 8;
 constexpr auto kDotSpacing = 4;
 
-void setWidgetHolder(QWidget* widget, QWidget* newHolder)
-{
-    auto oldHolder = widget->parentWidget();
-    const bool wasHidden = widget->isHidden();
-    oldHolder->layout()->removeWidget(widget);
-    widget->setParent(newHolder);
-    newHolder->layout()->addWidget(widget);
-    widget->setHidden(wasHidden);
-}
-
-QString getSystemName(const QString& systemId)
-{
-    if (systemId.isEmpty())
-        return QString();
-
-    auto systemDescription = qnSystemsFinder->getSystem(systemId);
-    if (!NX_ASSERT(systemDescription))
-        return QString();
-
-    return systemDescription->name();
-}
-
-// For cloud notifications the system name must be displayed. The function returns the name of
-// a system different from the current one in the form required for display.
-QString getFormattedSystemNameIfNeeded(const QString& systemId)
-{
-    if (auto systemName = getSystemName(systemId); !systemName.isEmpty())
-        return systemName + " / ";
-
-    return QString();
-}
-
 } // namespace
-
-// ------------------------------------------------------------------------------------------------
-// EventTile::Private
-
-struct EventTile::Private
-{
-    EventTile* const q;
-    CloseButton* const closeButton;
-    WidgetAnchor* const closeButtonAnchor;
-    bool closeable = false;
-    std::unique_ptr<QAction> action; //< Button action.
-    std::unique_ptr<QAction> additionalAction;
-    QnElidedLabel* const progressLabel;
-    const QScopedPointer<QTimer> loadPreviewTimer;
-    bool automaticPreviewLoad = true;
-    bool isPreviewLoadNeeded = false;
-    bool forceNextPreviewUpdate = false;
-    std::optional<qreal> progressValue = 0.0;
-    bool isRead = false;
-    bool footerEnabled = true;
-    Style style = Style::standard;
-    bool highlighted = false;
-    QPalette defaultTitlePalette;
-    Qt::MouseButton clickButton = Qt::NoButton;
-    Qt::KeyboardModifiers clickModifiers;
-    QPoint clickPoint;
-    QString title;
-    QString iconPath;
-    QCache<int, QString> titleByWidth; //< key - width of nameLabel, value - trimmed title string
-    int currentWidth = 0;
-    bool previewEnabled = false;
-
-    Private(EventTile* q):
-        q(q),
-        closeButton(new CloseButton(q)),
-        closeButtonAnchor(anchorWidgetToParent(closeButton, Qt::RightEdge | Qt::TopEdge)),
-        progressLabel(new QnElidedLabel(q)),
-        loadPreviewTimer(new QTimer(q))
-    {
-        loadPreviewTimer->setSingleShot(true);
-        QObject::connect(loadPreviewTimer.get(), &QTimer::timeout, [this]() { requestPreview(); });
-    }
-
-    void setTitle(const QString& value)
-    {
-        if (title == value)
-            return;
-
-        title = value;
-        currentWidth = 0;
-        titleByWidth.clear();
-        titleByWidth.insert(0, new QString(value));
-
-        updateTitleForCurrentWidth();
-    }
-
-    void updateTitleForCurrentWidth()
-    {
-        const auto width = q->ui->nameLabel->width();
-        if (width == 0 || width == currentWidth)
-            return;
-
-        QString text;
-        if (const auto textPtr = titleByWidth.object(width))
-        {
-            text = *textPtr;
-        }
-        else
-        {
-            QTextDocument doc;
-            doc.setDefaultFont(q->ui->nameLabel->font());
-            doc.setHtml(toHtml(title));
-            doc.setTextWidth(width);
-            WidgetUtils::elideDocumentLines(&doc, kTileTitleLineLimit, true);
-            text = doc.toHtml();
-            titleByWidth.insert(width, new QString(text));
-        }
-
-        q->ui->nameLabel->setText(text);
-        currentWidth = width;
-    }
-
-    void handleHoverChanged(bool hovered)
-    {
-        if (qApp->activePopupWidget() || qApp->activeModalWidget())
-            return;
-        const auto showCloseButton = (hovered || q->progressBarVisible()) && closeable;
-        q->ui->timestampLabel->setHidden(showCloseButton || q->ui->timestampLabel->text().isEmpty());
-        closeButton->setVisible(showCloseButton);
-        updateBackgroundRole(hovered);
-
-        if (showCloseButton)
-            closeButton->raise();
-    }
-
-    void updateBackgroundRole(bool hovered)
-    {
-        q->setBackgroundRole(hovered ? QPalette::Midlight : QPalette::Window);
-    }
-
-    void updatePalette()
-    {
-        auto pal = q->palette();
-        const auto base = pal.color(QPalette::Base);
-
-        int lighterBy = highlighted ? 2 : 0;
-        if (style == Style::informer)
-            ++lighterBy;
-
-        pal.setColor(QPalette::Window, core::colorTheme()->lighter(base, lighterBy));
-        pal.setColor(QPalette::Midlight, core::colorTheme()->lighter(base, lighterBy + 1));
-        q->setPalette(pal);
-    }
-
-    void updateIcon()
-    {
-        // Icon label is always visible. It keeps column width fixed.
-
-        if (iconPath.isEmpty())
-        {
-            q->ui->iconLabel->setPixmap({});
-            return;
-        }
-
-        q->ui->iconLabel->setPixmap(qnSkin->colorizedPixmap(iconPath,
-            q->ui->iconLabel->maximumSize() * q->devicePixelRatio(),
-            q->titleColor(),
-            q->devicePixelRatio()));
-    }
-
-    void setResourceList(const QStringList& list, int andMore)
-    {
-        if (list.empty())
-        {
-            q->ui->resourceListHolder->hide();
-            q->ui->resourceListLabel->setText({});
-        }
-        else
-        {
-            QString text = list.join(kLineBreak);
-            if (andMore > 0)
-            {
-                text += nx::format("<p style='color: %1; font-size: %2px; font-weight: %3; margin-top: %4'>%5</p>")
-                    .args(
-                        q->palette().color(QPalette::WindowText).name(),
-                        fontConfig()->small().pixelSize(),
-                        (int) kAndMoreFontWeight,
-                        kAndMoreTopMargin,
-                        tr("...and %n more", "", andMore));
-            }
-
-            q->ui->resourceListLabel->setText(text);
-            q->ui->resourceListHolder->show();
-        }
-    }
-
-    bool isPreviewNeeded() const
-    {
-        return q->imageProvider() && q->previewEnabled();
-    }
-
-    bool isPreviewUpdateRequired() const
-    {
-        if (!isPreviewNeeded() || !NX_ASSERT(q->imageProvider()))
-            return false;
-
-        if (forceNextPreviewUpdate)
-            return true;
-
-        switch (q->imageProvider()->status())
-        {
-            case Qn::ThumbnailStatus::Invalid:
-            case Qn::ThumbnailStatus::NoData:
-                return true;
-
-            default:
-                return false;
-        }
-    }
-
-    void requestPreview()
-    {
-        if (!isPreviewUpdateRequired())
-            return;
-
-        NX_VERBOSE(this, "Requesting tile preview");
-        forceNextPreviewUpdate = false;
-
-        if (automaticPreviewLoad)
-        {
-            q->imageProvider()->loadAsync();
-        }
-        else
-        {
-            isPreviewLoadNeeded = true;
-            emit q->needsPreviewLoad();
-        }
-    }
-
-    void updatePreview(milliseconds delay = 0ms)
-    {
-        if (delay <= 0ms)
-        {
-            // Still must be delayed.
-            if (isPreviewUpdateRequired())
-                executeLater([this]() { requestPreview(); }, q);
-        }
-        else
-        {
-            if (isPreviewUpdateRequired())
-                loadPreviewTimer->start(delay);
-            else
-                loadPreviewTimer->stop();
-        }
-    }
-
-    void showDebugPreviewTimestamp()
-    {
-        auto provider = qobject_cast<ResourceThumbnailProvider*>(q->imageProvider());
-        if (provider)
-        {
-            q->ui->debugPreviewTimeLabel->setText(
-                nx::format("Preview: %2 us").arg(provider->timestamp().count()));
-            q->ui->debugPreviewTimeLabel->setVisible(
-                provider->status() == Qn::ThumbnailStatus::Loaded);
-        }
-        else
-        {
-            q->ui->debugPreviewTimeLabel->hide();
-            q->ui->debugPreviewTimeLabel->setText({});
-        }
-    }
-
-    void updatePreviewsVisibility()
-    {
-        if (previewEnabled)
-        {
-            if (q->ui->videoPreviewWidget->camera())
-            {
-                q->ui->videoPreviewWidget->show();
-                q->ui->imagePreviewWidget->hide();
-                q->ui->imagePreviewWidget->parentWidget()->show();
-                return;
-            }
-            else if (q->ui->imagePreviewWidget->imageProvider())
-            {
-                q->ui->videoPreviewWidget->hide();
-                q->ui->imagePreviewWidget->show();
-                q->ui->imagePreviewWidget->parentWidget()->show();
-                return;
-            }
-        }
-
-        q->ui->imagePreviewWidget->hide();
-        q->ui->videoPreviewWidget->hide();
-        q->ui->imagePreviewWidget->parentWidget()->hide();
-    }
-};
-
-// ------------------------------------------------------------------------------------------------
-// EventTile
 
 EventTile::EventTile(QWidget* parent):
     base_type(parent, Qt::FramelessWindowHint),
@@ -387,7 +86,7 @@ EventTile::EventTile(QWidget* parent):
     ui->setupUi(this);
     setAttribute(Qt::WA_Hover);
 
-    setPaletteColor(this, QPalette::Base, core::colorTheme()->color("dark7"));
+    setPaletteColor(this, QPalette::Base, core::colorTheme()->color("dark5"));
     setPaletteColor(this, QPalette::Light, core::colorTheme()->color("light10"));
     setPaletteColor(this, QPalette::WindowText, core::colorTheme()->color("light16"));
     setPaletteColor(this, QPalette::Text, core::colorTheme()->color("light4"));
@@ -403,17 +102,12 @@ EventTile::EventTile(QWidget* parent):
     ui->videoPreviewWidget->setMinimumHeight(kMaximumPreviewHeightWithHeader);
     ui->videoPreviewWidget->setMaximumHeight(kMaximumPreviewHeightWithHeader);
 
-    auto sizePolicy = ui->timestampLabel->sizePolicy();
-    sizePolicy.setRetainSizeWhenHidden(true);
-    ui->timestampLabel->setSizePolicy(sizePolicy);
-
     ui->descriptionLabel->hide();
     ui->debugPreviewTimeLabel->hide();
     ui->timestampLabel->hide();
     ui->actionHolder->hide();
     ui->attributeTable->hide();
     ui->footerLabel->hide();
-    ui->resourceListHolder->hide();
     ui->progressDescriptionLabel->hide();
     ui->narrowHolder->hide();
     ui->wideHolder->hide();
@@ -425,6 +119,9 @@ EventTile::EventTile(QWidget* parent):
     ui->imagePreviewWidget->setAutoScaleUp(true);
     ui->imagePreviewWidget->setReloadMode(kDefaultReloadMode);
     ui->imagePreviewWidget->setCropMode(AsyncImageWidget::CropMode::always);
+
+    setPaletteColor(ui->imagePreviewWidget, QPalette::Window, core::colorTheme()->color("dark7"));
+    setPaletteColor(ui->imagePreviewWidget, QPalette::WindowText, core::colorTheme()->color("dark16"));
 
     ui->nameLabel->setForegroundRole(QPalette::Light);
     ui->timestampLabel->setForegroundRole(QPalette::WindowText);
@@ -466,6 +163,7 @@ EventTile::EventTile(QWidget* parent):
     font.setPixelSize(fontConfig()->small().pixelSize());
     ui->attributeTable->setFont(font);
     ui->attributeTable->setProperty(style::Properties::kDontPolishFontProperty, true);
+    ui->attributeTable->setMaximumNumberOfRows(kMaxNumberOfDisplayedAttributes);
     ui->footerLabel->setFont(font);
     ui->footerLabel->setProperty(style::Properties::kDontPolishFontProperty, true);
 
@@ -480,8 +178,6 @@ EventTile::EventTile(QWidget* parent):
     ui->mainWidget->hide();
     d->updatePreviewsVisibility();
 
-    ui->secondaryTimestampHolder->hide();
-
     QFont progressLabelFont;
     progressLabelFont.setWeight(QFont::Medium);
 
@@ -492,6 +188,7 @@ EventTile::EventTile(QWidget* parent):
 
     ui->nameLabel->setText({});
     ui->descriptionLabel->setText({});
+    ui->resourceListLabel->setText({});
     ui->attributeTable->setContent({});
     ui->footerLabel->setText({});
     ui->timestampLabel->setText({});
@@ -520,6 +217,8 @@ EventTile::EventTile(QWidget* parent):
     connect(ui->descriptionLabel, &QLabel::linkActivated, this, activateLink);
 
     ui->nameLabel->installEventFilter(this);
+    ui->resourceListLabel->installEventFilter(this);
+    ui->descriptionLabel->installEventFilter(this);
 }
 
 EventTile::~EventTile()
@@ -528,8 +227,15 @@ EventTile::~EventTile()
 
 bool EventTile::eventFilter(QObject* object, QEvent* event)
 {
-    if (object == ui->nameLabel && event->type() == QEvent::Resize)
-        d->updateTitleForCurrentWidth();
+    if (event->type() == QEvent::Resize)
+    {
+        if (object == ui->nameLabel)
+            d->updateLabelForCurrentWidth(ui->nameLabel, d->titleLabelDescriptor);
+        if (object == ui->descriptionLabel)
+            d->updateLabelForCurrentWidth(ui->descriptionLabel, d->descriptionLabelDescriptor);
+        if (object == ui->resourceListLabel)
+            d->updateLabelForCurrentWidth(ui->resourceListLabel, d->resourceLabelDescriptor);
+    }
 
     return base_type::eventFilter(object, event);
 }
@@ -553,7 +259,7 @@ void EventTile::setCloseable(bool value)
         ui->progressBar->parentWidget()->setContentsMargins(parentMargins);
     }
 
-    d->handleHoverChanged(underMouse());
+    d->handleStateChanged(underMouse() ? Private::State::hoverOn : Private::State::hoverOff);
 }
 
 QString EventTile::title() const
@@ -593,7 +299,7 @@ QString EventTile::description() const
 
 void EventTile::setDescription(const QString& value)
 {
-    ui->descriptionLabel->setText(value);
+    d->setDescription(value);
     ui->descriptionLabel->setHidden(value.isEmpty());
     ui->progressDescriptionLabel->setText(value);
     ui->progressDescriptionLabel->setHidden(value.isEmpty());
@@ -602,32 +308,31 @@ void EventTile::setDescription(const QString& value)
 void EventTile::setResourceList(const QnResourceList& list, const QString& cloudSystemId)
 {
     QStringList items;
-    auto systemName = getFormattedSystemNameIfNeeded(cloudSystemId);
-    for (int i = 0; i < std::min(list.size(), kMaximumResourceListSize); ++i)
+    auto systemName = d->getFormattedSystemNameIfNeeded(cloudSystemId);
+    for (const auto& resource: list)
     {
-        NX_ASSERT(list[i]); //< Null resource pointer is an abnormal situation.
-        items.push_back(list[i]
-            ? bold(toHtmlEscaped(systemName + list[i]->getName()))
-            : toHtmlEscaped(systemName) + "?");
+        NX_ASSERT(resource, "Null resource pointer is an abnormal situation.");
+        items.push_back(resource ? toHtmlEscaped(systemName + resource->getName())
+                                 : toHtmlEscaped(systemName) + "?");
     }
 
     if (items.isEmpty() && !cloudSystemId.isEmpty())
-        items.push_back(bold(getSystemName(cloudSystemId)));
+        items.push_back(d->getSystemName(cloudSystemId));
 
-    d->setResourceList(items, qMax(list.size() - kMaximumResourceListSize, 0));
+    d->setResourceList(items);
 }
 
 void EventTile::setResourceList(const QStringList& list, const QString& cloudSystemId)
 {
-    auto systemName = getFormattedSystemNameIfNeeded(cloudSystemId);
-    QStringList items = list.mid(0, kMaximumResourceListSize);
+    auto systemName = d->getFormattedSystemNameIfNeeded(cloudSystemId);
+    QStringList items = list;
     for (auto& item: items)
         item = toHtml(systemName + item);
 
     if (items.isEmpty() && !cloudSystemId.isEmpty())
-        items.push_back(bold(getSystemName(cloudSystemId)));
+        items.push_back(d->getSystemName(cloudSystemId));
 
-    d->setResourceList(items, qMax(list.size() - kMaximumResourceListSize, 0));
+    d->setResourceList(items);
 }
 
 QString EventTile::footerText() const
@@ -660,7 +365,7 @@ QString EventTile::timestamp() const
 void EventTile::setTimestamp(const QString& value)
 {
     ui->timestampLabel->setText(value);
-    ui->timestampLabel->setHidden(value.isEmpty() || !d->closeButton->isHidden());
+    ui->timestampLabel->setHidden(value.isEmpty());
 }
 
 QString EventTile::iconPath() const
@@ -698,7 +403,7 @@ void EventTile::setImageProvider(ImageProvider* value, bool forceUpdate)
 
     d->isPreviewLoadNeeded = false;
     d->forceNextPreviewUpdate = forceUpdate;
-    d->updatePreview();
+    d->updatePreview(/*delay*/ 0ms);
 
     if (ini().showDebugTimeInformationInRibbon)
         d->showDebugPreviewTimestamp();
@@ -766,7 +471,7 @@ void EventTile::setAutomaticPreviewLoad(bool value)
 
     d->automaticPreviewLoad = value;
     d->isPreviewLoadNeeded = d->isPreviewLoadNeeded && !d->automaticPreviewLoad;
-    d->updatePreview();
+    d->updatePreview(/*delay*/ 0ms);
 }
 
 bool EventTile::isPreviewLoadNeeded() const
@@ -835,18 +540,25 @@ bool EventTile::event(QEvent* event)
     {
         case QEvent::Enter:
         case QEvent::HoverEnter:
-            d->handleHoverChanged(true);
+        {
+            d->handleStateChanged(Private::State::hoverOn);
             break;
+        }
 
         case QEvent::Leave:
         case QEvent::HoverLeave:
         case QEvent::Hide:
-            d->handleHoverChanged(false);
+        {
+            d->handleStateChanged(Private::State::hoverOff);
             break;
+        }
 
         case QEvent::Show:
-            d->handleHoverChanged(underMouse());
+        {
+            d->handleStateChanged(
+                underMouse() ? Private::State::hoverOn : Private::State::hoverOff);
             break;
+        }
 
         case QEvent::MouseButtonPress:
         {
@@ -856,6 +568,7 @@ bool EventTile::event(QEvent* event)
             d->clickButton = mouseEvent->button();
             d->clickModifiers = mouseEvent->modifiers();
             d->clickPoint = mouseEvent->pos();
+            d->handleStateChanged(Private::State::pressed);
             return true;
         }
 
@@ -865,6 +578,8 @@ bool EventTile::event(QEvent* event)
             if ((mouseEvent->button() == d->clickButton) && closeToStart(mouseEvent->pos()))
                 emit clicked(d->clickButton, mouseEvent->modifiers() & d->clickModifiers);
             d->clickButton = Qt::NoButton;
+            d->handleStateChanged(
+                underMouse() ? Private::State::hoverOn : Private::State::hoverOff);
             break;
         }
 
@@ -980,7 +695,7 @@ void EventTile::setPreviewEnabled(bool value)
 
     d->updatePreviewsVisibility();
 
-    d->updatePreview();
+    d->updatePreview(/*delay*/ 0ms);
 }
 
 bool EventTile::footerEnabled() const
@@ -1008,11 +723,10 @@ void EventTile::setHeaderEnabled(bool value)
     ui->iconLabel->setHidden(!value);
     ui->nameLabel->setHidden(!value);
 
+    ui->secondaryTimestampHolder->show();
+    // TODO: #vbutkevich unify layout for headerEnabled:true and false. VMS-52513
     if (value)
     {
-        setWidgetHolder(ui->timestampLabel, ui->primaryTimestampHolder);
-        ui->secondaryTimestampHolder->hide();
-        ui->primaryTimestampHolder->show();
         ui->imagePreviewWidget->setMaximumHeight(kMaximumPreviewHeightWithHeader);
         ui->videoPreviewWidget->setMinimumHeight(kMaximumPreviewHeightWithHeader);
         ui->videoPreviewWidget->setMaximumHeight(kMaximumPreviewHeightWithHeader);
@@ -1023,9 +737,6 @@ void EventTile::setHeaderEnabled(bool value)
     }
     else
     {
-        setWidgetHolder(ui->timestampLabel, ui->secondaryTimestampHolder);
-        ui->secondaryTimestampHolder->show();
-        ui->primaryTimestampHolder->hide();
         ui->imagePreviewWidget->setMaximumHeight(kMaximumPreviewHeightWithoutHeader);
         ui->videoPreviewWidget->setMinimumHeight(kMaximumPreviewHeightWithoutHeader);
         ui->videoPreviewWidget->setMaximumHeight(kMaximumPreviewHeightWithoutHeader);
@@ -1054,15 +765,15 @@ void EventTile::setMode(Mode value)
     switch (value)
     {
         case Mode::standard:
-            setWidgetHolder(ui->imagePreviewWidget, ui->narrowHolder);
-            setWidgetHolder(ui->videoPreviewWidget, ui->narrowHolder);
+            d->setWidgetHolder(ui->imagePreviewWidget, ui->narrowHolder);
+            d->setWidgetHolder(ui->videoPreviewWidget, ui->narrowHolder);
             ui->narrowHolder->setHidden(noPreview);
             ui->wideHolder->setHidden(true);
             break;
 
         case Mode::wide:
-            setWidgetHolder(ui->imagePreviewWidget, ui->wideHolder);
-            setWidgetHolder(ui->videoPreviewWidget, ui->wideHolder);
+            d->setWidgetHolder(ui->imagePreviewWidget, ui->wideHolder);
+            d->setWidgetHolder(ui->videoPreviewWidget, ui->wideHolder);
             ui->wideHolder->setHidden(noPreview);
             ui->narrowHolder->setHidden(false); //< There is a spacer child item.
             break;
@@ -1105,9 +816,9 @@ void EventTile::clear()
 {
     setCloseable(false);
     setIconPath({});
-    setTitle({});
+    d->clearLabel(ui->nameLabel, d->titleLabelDescriptor);
     setTitleColor({});
-    setDescription({});
+    d->clearLabel(ui->descriptionLabel, d->descriptionLabelDescriptor);
     setAttributeList({});
     setFooterText({});
     setTimestamp({});
@@ -1121,7 +832,7 @@ void EventTile::clear()
     setProgressValue(0.0);
     setProgressTitle({});
     setProgressFormat(QString());
-    setResourceList(QStringList(), QString());
+    d->clearLabel(ui->resourceListLabel, d->resourceLabelDescriptor);
     setToolTip({});
     setFixedSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
 }

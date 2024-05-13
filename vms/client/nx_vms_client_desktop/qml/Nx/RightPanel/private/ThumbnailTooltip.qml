@@ -25,6 +25,8 @@ Bubble
 
     property size maximumContentSize: Qt.size(600, 400) //< Some sensible default.
 
+    color: ColorTheme.colors.dark10
+
     contentItem: Item
     {
         implicitWidth: column.width
@@ -57,7 +59,7 @@ Bubble
                 readOnly: true
                 cursorVisible: false
                 wrapMode: Text.Wrap
-                color: ColorTheme.colors.brand_contrast
+                color: ColorTheme.colors.light16
                 textFormat: NxGlobals.mightBeHtml(toolTip.text) ? Qt.RichText : Qt.PlainText
                 text: toolTip.text
 
@@ -76,8 +78,8 @@ Bubble
                     ? thumbnail.width
                     : Math.min(implicitWidth, toolTip.maximumContentSize.width)
 
-                nameColor: ColorTheme.colors.light13
-                valueColor: ColorTheme.colors.light7
+                nameColor: ColorTheme.colors.light10
+                valueColor: ColorTheme.colors.light16
                 nameFont { pixelSize: FontConfig.small.pixelSize; weight: Font.Normal }
                 valueFont { pixelSize: FontConfig.small.pixelSize; weight: Font.Medium }
             }

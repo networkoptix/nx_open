@@ -115,17 +115,24 @@ QString extendedEventDescription(
     if (const auto it = eventDetails.find(utils::kSourceNameDetailName); it != eventDetails.end())
         extendedDescription << QString("Source: %1").arg(it->toString());
 
+    if (const auto it = eventDetails.find(kTriggerNameDetailName); it != eventDetails.end())
+        extendedDescription << QString("Trigger: %1").arg(it->toString());
+
     const utils::StringHelper stringHelper{context};
+    if (const auto it = eventDetails.find(kPluginIdDetailName); it != eventDetails.end())
+    {
+        extendedDescription
+            << QString("Plugin: %1").arg(stringHelper.plugin(it->value<nx::Uuid>()));
+    }
+
+    if (const auto it = eventDetails.find(kExtraCaptionDetailName); it != eventDetails.end())
+        extendedDescription << QString("Caption: %1").arg(it->toString());
+
     extendedDescription << stringHelper.timestamp(
         eventAggregator->initialEvent()->timestamp(), static_cast<int>(eventAggregator->count()));
 
-    if (const auto it = eventDetails.find(utils::kPluginIdDetailName); it != eventDetails.end())
-        extendedDescription << QString("Plugin: %1").arg(stringHelper.plugin(it->value<nx::Uuid>()));
 
-    if (const auto it = eventDetails.find(utils::kExtraCaptionDetailName);
-        it != eventDetails.end())
-        extendedDescription << QString("Caption: %1").arg(it->toString());
-
+    // TODO: #vbutkevich need to remove Reason, since it is duplicated in the kDetailingDetailName. But not for all events.
     if (const auto it = eventDetails.find(utils::kReasonDetailName); it != eventDetails.end())
     {
         QString reason;
