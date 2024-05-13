@@ -18,15 +18,15 @@ public:
     static auto interfaceId() { return makeId("nx::sdk::analytics::IObjectTrackBestShotPacket"); }
 
     /**
-     * @return Timestamp of the frame (in microseconds) the best shot belongs to, or, if such
-     *     timestamp is not available, some timestamp close as much as possible to the best shot
+     * @return Timestamp of the frame (in microseconds) the Best Shot belongs to, or, if such
+     *     timestamp is not available, some timestamp close as much as possible to the Best Shot
      *     moment. Must be a positive value.
      */
     virtual int64_t timestampUs() const override = 0;
 
     /** Called by trackId() */
     protected: virtual void getTrackId(Uuid* outValue) const = 0;
-    /** @return Id of the track the best shot belongs to. */
+    /** @return Id of the Track the Best Shot belongs to. */
     public: Uuid trackId() const { Uuid value; getTrackId(&value); return value; }
 
     /** Called by boundingBox() */
@@ -48,13 +48,13 @@ public:
     }
 
     /**
-     * @return HTTP or HTTPS URL of the image that should be used as the track best shot. Only
+     * @return HTTP or HTTPS URL of the image that should be used as the Track Best Shot. Only
      *     JPEG, PNG and TIFF images are supported.
      */
     virtual const char* imageUrl() const = 0;
 
     /**
-     * @return Pointer to the track best shot image data. Should return null if image URL is
+     * @return Pointer to the Track Best Shot image data. Must return null if an image URL is
      *     provided.
      */
     virtual const char* imageData() const = 0;
@@ -65,9 +65,9 @@ public:
     virtual int imageDataSize() const = 0;
 
     /**
-     * @return Format of the best shot image which is provided via imageData(). Can contain one of
+     * @return Format of the Best Shot image which is provided via imageData(). Can contain one of
      *     the following values: "image/jpeg", "image/png", "image/tiff" for JPEG, PNG and TIFF
-     *     images correspondingly. If no image data is provided should return null.
+     *     images correspondingly. If no image data is provided, must return null.
      */
     virtual const char* imageDataFormat() const = 0;
 
@@ -76,6 +76,7 @@ public:
     /**
      * Provides values of so-called Metadata Attributes - typically, some object or event
      * properties (e.g. age or color), represented as a name-value map.
+     *
      * @param index 0-based index of the attribute.
      * @return Item of an attribute array, or null if index is out of range.
      */

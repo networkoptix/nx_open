@@ -15,21 +15,21 @@ class ObjectTrackBestShotPacket: public RefCountable<IObjectTrackBestShotPacket>
 public:
     ObjectTrackBestShotPacket(Uuid trackId = Uuid(), int64_t timestampUs = -1, Rect boundingBox = Rect());
 
-    virtual Flags flags() const override;
     virtual int64_t timestampUs() const override;
-
+    virtual void getTrackId(Uuid* outValue) const override;
+    virtual void getBoundingBox(Rect* outValue) const override;
     virtual const char* imageUrl() const override;
     virtual const char* imageData() const override;
     virtual int imageDataSize() const override;
     virtual const char* imageDataFormat() const override;
+    virtual const IAttribute* getAttribute(int index) const override;
+    virtual int attributeCount() const override;
+    virtual Flags flags() const override;
 
     /** See IObjectTrackBestShotPacket0::trackId(). */
     void setTrackId(const Uuid& trackId);
 
-    /** See IObjectTrackBestShotPacket::flags(). */
-    void setFlags(Flags flags);
-
-    /** See IDataPacket::timestampUs(). */
+    /** See IObjectTrackBestShotPacket::timestampUs(). */
     void setTimestampUs(int64_t timestampUs);
 
     /** See IObjectTrackBestShotPacket0::boundingBox(). */
@@ -50,18 +50,11 @@ public:
      */
     void setImage(std::string imageDataFormat, std::vector<char> imageData);
 
-protected:
-    virtual const IAttribute* getAttribute(int index) const override;
-
-public:
-    virtual int attributeCount() const override;
-
     void addAttribute(Ptr<Attribute> attribute);
     void addAttributes(const std::vector<Ptr<Attribute>>& value);
 
-protected:
-    virtual void getTrackId(Uuid* outValue) const override;
-    virtual void getBoundingBox(Rect* outValue) const override;
+    /** See IObjectTrackBestShotPacket::flags(). */
+    void setFlags(Flags flags);
 
 private:
     Uuid m_trackId;

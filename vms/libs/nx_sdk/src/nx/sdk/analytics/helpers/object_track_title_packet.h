@@ -12,16 +12,22 @@ namespace nx::sdk::analytics {
 class ObjectTrackTitlePacket: public RefCountable<IObjectTrackTitlePacket>
 {
 public:
-    ObjectTrackTitlePacket(Uuid trackId = Uuid());
+    ObjectTrackTitlePacket(Uuid trackId = Uuid(), int64_t timestampUs = -1);
 
+    virtual int64_t timestampUs() const override;
+    virtual void getTrackId(Uuid* outValue) const override;
     virtual const char* text() const override;
     virtual const char* imageUrl() const override;
     virtual const char* imageData() const override;
     virtual int imageDataSize() const override;
     virtual const char* imageDataFormat() const override;
+    virtual Flags flags() const override;
 
     /** See IObjectTrackTitlePacket::trackId(). */
     void setTrackId(const Uuid& trackId);
+
+    /** See IObjectTrackTitlePacket::timestampUs(). */
+    void setTimestampUs(int64_t timestampUs);
 
     /** See IObjectTrackTitlePacket::text(). */
     void setText(std::string text);
@@ -41,11 +47,13 @@ public:
      */
     void setImage(std::string imageDataFormat, std::vector<char> imageData);
 
-protected:
-    virtual void getTrackId(Uuid* outValue) const override;
+    /** See IObjectTrackTitlePacket::flags(). */
+    void setFlags(Flags flags);
 
 private:
     Uuid m_trackId;
+    Flags m_flags = Flags::none;
+    int64_t m_timestampUs = -1;
     std::string m_text;
 
     std::string m_imageUrl;
