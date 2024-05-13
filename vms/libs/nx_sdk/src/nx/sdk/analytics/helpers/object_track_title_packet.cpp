@@ -9,10 +9,22 @@
 namespace nx::sdk::analytics {
 
 ObjectTrackTitlePacket::ObjectTrackTitlePacket(
-    Uuid trackId)
+    Uuid trackId,
+    int64_t timestampUs)
     :
-    m_trackId(trackId)
+    m_trackId(trackId),
+    m_timestampUs(timestampUs)
 {
+}
+
+ObjectTrackTitlePacket::Flags ObjectTrackTitlePacket::flags() const
+{
+    return m_flags;
+}
+
+int64_t ObjectTrackTitlePacket::timestampUs() const
+{
+    return m_timestampUs;
 }
 
 void ObjectTrackTitlePacket::getTrackId(Uuid* outValue) const
@@ -43,6 +55,16 @@ int ObjectTrackTitlePacket::imageDataSize() const
 const char* ObjectTrackTitlePacket::imageDataFormat() const
 {
     return m_imageDataFormat.c_str();
+}
+
+void ObjectTrackTitlePacket::setFlags(Flags flags)
+{
+    m_flags = flags;
+}
+
+void ObjectTrackTitlePacket::setTimestampUs(int64_t timestampUs)
+{
+    m_timestampUs = timestampUs;
 }
 
 void ObjectTrackTitlePacket::setTrackId(const Uuid& trackId)

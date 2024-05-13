@@ -15,13 +15,20 @@ class IObjectTrackTitlePacket: public Interface<IObjectTrackTitlePacket, IMetada
 public:
     static auto interfaceId() { return makeId("nx::sdk::analytics::IObjectTrackTitlePacket"); }
 
+    /**
+     * @return Timestamp of the frame (in microseconds) the Title Image and Text are associated
+     *     with, or some timestamp close as much as possible to this moment, or -1 if no such
+     *     information is available.
+     */
+    virtual int64_t timestampUs() const override = 0;
+
     /** Called by trackId() */
     protected: virtual void getTrackId(Uuid* outValue) const = 0;
     /** @return Id of the Object Track the Title belongs to. */
     public: Uuid trackId() const { Uuid value; getTrackId(&value); return value; }
 
     /**
-     * @return Title text.
+     * @return Title text. Can be empty, but not null.
      */
     virtual const char* text() const = 0;
 
@@ -32,7 +39,7 @@ public:
     virtual const char* imageUrl() const = 0;
 
     /**
-     * @return Pointer to the Track Title image data. Should return null if the image URL is
+     * @return Pointer to the Track Title image data. Must return null if an image URL is
      *     provided.
      */
     virtual const char* imageData() const = 0;
@@ -45,9 +52,11 @@ public:
     /**
      * @return Format of the Title image which is provided via imageData(). Can contain one of the
      *     following values: "image/jpeg", "image/png", "image/tiff" for JPEG, PNG and TIFF
-     *     images correspondingly. If no image data is provided, should return null.
+     *     images correspondingly. If no image data is provided, must return null.
      */
     virtual const char* imageDataFormat() const = 0;
+
+    virtual Flags flags() const = 0;
 };
 using IObjectTrackTitlePacket0 = IObjectTrackTitlePacket;
 
