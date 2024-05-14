@@ -51,6 +51,13 @@ bool isKnownAddressPage(QTabWidget* tabWidget)
     return tabWidget->currentIndex() == kKnownAddressPageIndex;
 }
 
+core::SvgIconColorer::ThemeSubstitutions kPlaceholderTheme = {
+    {QnIcon::Normal, {.primary = "dark10"}},
+};
+
+NX_DECLARE_COLORIZED_ICON(kAddingDevicesPlaceholderIcon,
+    "256x256/Outline/adding_devices_placeholder.svg", kPlaceholderTheme)
+
 } // namespace
 
 SortModel::SortModel(QObject* parent) : QSortFilterProxyModel(parent)
@@ -742,8 +749,7 @@ void DeviceAdditionDialog::updateResultsWidgetState()
 
     if (!m_currentSearch)
     {
-        const auto pixmap = qnSkin->pixmap(
-            "placeholders/adding_devices_placeholder.svg", true, QSize(128, 128));
+        const auto pixmap = qnSkin->icon(kAddingDevicesPlaceholderIcon).pixmap(QSize(128, 128));
         ui->placeholderLabel->setPixmap(qnSkin->maximumSizePixmap(pixmap));
     }
     else
