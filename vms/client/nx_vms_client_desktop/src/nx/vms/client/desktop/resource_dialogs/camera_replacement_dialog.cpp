@@ -50,8 +50,24 @@ static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kLight4Th
     {QIcon::Normal, {.primary = "light4"}},
 };
 
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kErrorTheme = {
+    {QIcon::Normal, {.primary = "red_l1"}},
+};
+
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kSuccessTheme = {
+    {QIcon::Normal, {.primary = "light10"}},
+};
+
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kWarningTheme = {
+    {QIcon::Normal, {.primary = "yellow_d"}},
+};
+
 NX_DECLARE_COLORIZED_ICON(kReloadIcon, "20x20/Outline/reload.svg", kIconSubstitutions)
 NX_DECLARE_COLORIZED_ICON(kCheckmarkIcon, "20x20/Outline/checkmark.svg", kLight4Theme)
+
+NX_DECLARE_COLORIZED_ICON(kErrorIcon, "20x20/Outline/error.svg", kErrorTheme)
+NX_DECLARE_COLORIZED_ICON(kSuccessIcon, "20x20/Outline/success.svg", kSuccessTheme)
+NX_DECLARE_COLORIZED_ICON(kWarningIcon, "20x20/Outline/warning.svg", kWarningTheme)
 
 bool showServersInTree(const QnWorkbenchContext* context)
 {
@@ -116,20 +132,20 @@ QLayout* createDataTransferReportItem(
         case DeviceReplacementInfo::Level::info:
             captionTextColor = core::colorTheme()->color("light10");
             descriptionTextColor = core::colorTheme()->color("light10");
-            iconPixmap = qnSkin->pixmap("camera_replacement/success.svg");
+            iconPixmap = qnSkin->icon(kSuccessIcon).pixmap(20, 20);
             break;
 
         case DeviceReplacementInfo::Level::warning:
             captionTextColor = core::colorTheme()->color("yellow_core");
             descriptionTextColor = core::colorTheme()->color("yellow_d2");
-            iconPixmap = qnSkin->pixmap("camera_replacement/warning.svg");
+            iconPixmap = qnSkin->icon(kWarningIcon).pixmap(20, 20);
             break;
 
         case DeviceReplacementInfo::Level::error:
         case DeviceReplacementInfo::Level::critical:
             captionTextColor = core::colorTheme()->color("red_l2");
             descriptionTextColor = core::colorTheme()->color("red_l1");
-            iconPixmap = qnSkin->pixmap("camera_replacement/error.svg");
+            iconPixmap = qnSkin->icon(kErrorIcon).pixmap(20, 20);
             break;
 
         default:
