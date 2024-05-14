@@ -16,10 +16,11 @@ Column
 
     property alias button: button
 
-    Image
+    ColoredImage
     {
         anchors.horizontalCenter: parent.horizontalCenter
-        source: "image://skin/placeholders/list_placeholder.svg"
+        sourcePath: "image://skin/64x64/Outline/nolist.svg"
+        primaryColor: "dark17"
         sourceSize: Qt.size(64, 64)
     }
 

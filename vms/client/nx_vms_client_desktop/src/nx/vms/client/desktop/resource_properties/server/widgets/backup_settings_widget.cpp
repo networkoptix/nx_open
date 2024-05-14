@@ -37,6 +37,13 @@ static constexpr auto kPlaceholderImageSize = QSize(128, 128);
 static constexpr int kPlaceholderTextPixelSize = 16;
 static constexpr auto kPlaceholderTextWeight = QFont::Light;
 
+nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kPlaceholderTheme = {
+    {QnIcon::Normal, {.primary = "dark17"}},
+};
+
+NX_DECLARE_COLORIZED_ICON(kBackupPlaceholderIcon,
+    "128x128/Outline/backup_placeholder.svg", kPlaceholderTheme)
+
 QFont placeholderMessageCaptionFont()
 {
     static constexpr auto kPlaceholderMessageCaptionFontSize = 16;
@@ -260,8 +267,7 @@ void BackupSettingsWidget::setupPlaceholders()
         core::colorTheme()->color("dark17"));
     ui->unconfiguredPlaceholderLabel->setFont(placeholderFont);
 
-    const auto pixmap = qnSkin->pixmap(
-        "placeholders/backup_placeholder.svg", true, kPlaceholderImageSize);
+    const auto pixmap = qnSkin->icon(kBackupPlaceholderIcon).pixmap(kPlaceholderImageSize);
     ui->unconfiguredPlaceholderImageLabel->setPixmap(qnSkin->maximumSizePixmap(pixmap));
 
     connect(ui->unconfiguredPlaceholderLabel, &QLabel::linkActivated,

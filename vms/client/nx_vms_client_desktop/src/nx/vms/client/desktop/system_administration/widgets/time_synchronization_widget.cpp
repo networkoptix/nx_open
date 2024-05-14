@@ -55,8 +55,8 @@ static const core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
 };
 
 NX_DECLARE_COLORIZED_ICON(kTimePlaceholder,
-    "placeholders/time_placeholder.svg",
-    kIconSubstitutions) // Todo: VMS-52281: wait for update from designers
+    "128x128/Outline/time_placeholder.svg",
+    kIconSubstitutions)
 
 } // namespace
 
