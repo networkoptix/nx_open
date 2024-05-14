@@ -14,10 +14,9 @@ class StatePicker: public DropdownTextPickerWidgetBase<vms::rules::StateField>
     Q_OBJECT
 
 public:
-    using DropdownTextPickerWidgetBase<vms::rules::StateField>::DropdownTextPickerWidgetBase;
+    StatePicker(vms::rules::StateField* field, SystemContext* context, ParamsWidget* parent);
 
 protected:
-    void onDescriptorSet() override;
     void updateUi() override;
     void onCurrentIndexChanged() override;
 };

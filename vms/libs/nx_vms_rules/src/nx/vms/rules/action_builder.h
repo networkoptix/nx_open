@@ -83,13 +83,13 @@ public:
 
     void connectSignals();
 
-    template<class T>
+    template<class T = Field>
     const T* fieldByName(const QString& name) const
     {
         return fieldByNameImpl<T>(name);
     }
 
-    template<class T>
+    template<class T = Field>
     T* fieldByName(const QString& name)
     {
         return fieldByNameImpl<T>(name);

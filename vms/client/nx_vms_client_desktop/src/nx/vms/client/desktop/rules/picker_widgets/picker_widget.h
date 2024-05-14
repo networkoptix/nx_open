@@ -33,28 +33,10 @@ class PickerWidget:
 public:
     PickerWidget(SystemContext* context, ParamsWidget* parent);
 
-    /** Sets field descriptor the picker customization is depends on. */
-    void setDescriptor(const vms::rules::FieldDescriptor& descriptor);
-
-    /** Returns field descriptor. Returns nullopt if the descriptor is not set. */
-    std::optional<vms::rules::FieldDescriptor> descriptor() const;
-
-    bool hasDescriptor() const;
-
     virtual void setReadOnly(bool value) = 0;
-
     virtual void updateUi() = 0;
 
     ParamsWidget* parentParamsWidget() const;
-
-protected:
-    /**
-     * Called when descriptor is set. Here derived classes must customize properties
-     * according to the fieldDescriptor.
-     */
-    virtual void onDescriptorSet() = 0;
-
-    std::optional<vms::rules::FieldDescriptor> m_fieldDescriptor;
 };
 
 } // namespace nx::vms::client::desktop::rules

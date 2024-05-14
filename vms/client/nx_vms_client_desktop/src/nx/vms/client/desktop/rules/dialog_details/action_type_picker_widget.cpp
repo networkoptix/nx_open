@@ -29,6 +29,9 @@ ActionTypePickerWidget::ActionTypePickerWidget(SystemContext* context, QWidget* 
         if (!vms::rules::utils::hasItemSupportedServer(servers, actionDescriptor))
             continue;
 
+        if (actionDescriptor.flags.testFlag(vms::rules::ItemFlag::system))
+            continue;
+
         ui->actionTypeComboBox->addItem(actionDescriptor.displayName, actionDescriptor.id);
     }
 

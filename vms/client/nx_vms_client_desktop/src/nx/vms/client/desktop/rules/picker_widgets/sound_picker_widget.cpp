@@ -16,9 +16,13 @@
 
 namespace nx::vms::client::desktop::rules {
 
-SoundPicker::SoundPicker(WindowContext* context, ParamsWidget* parent):
-    PlainFieldPickerWidget<vms::rules::SoundField>(context->system(), parent),
-    m_serverNotificationCache{context->system()->serverNotificationCache()}
+SoundPicker::SoundPicker(
+    vms::rules::SoundField* field,
+    SystemContext* context,
+    ParamsWidget* parent)
+    :
+    PlainFieldPickerWidget<vms::rules::SoundField>(field, context, parent),
+    m_serverNotificationCache{context->serverNotificationCache()}
 {
     auto contentLayout = new QHBoxLayout;
 
@@ -55,13 +59,13 @@ void SoundPicker::updateUi()
 {
     auto soundModel = m_serverNotificationCache->persistentGuiModel();
     QSignalBlocker blocker{m_comboBox};
-    m_comboBox->setCurrentIndex(soundModel->rowByFilename(theField()->value()));
+    m_comboBox->setCurrentIndex(soundModel->rowByFilename(m_field->value()));
 }
 
 void SoundPicker::onCurrentIndexChanged(int index)
 {
     auto soundModel = m_serverNotificationCache->persistentGuiModel();
-    theField()->setValue(soundModel->filenameByRow(index));
+    m_field->setValue(soundModel->filenameByRow(index));
 }
 
 void SoundPicker::onManageButtonClicked()
@@ -71,7 +75,7 @@ void SoundPicker::onManageButtonClicked()
         return;
 
     auto soundModel = m_serverNotificationCache->persistentGuiModel();
-    m_comboBox->setCurrentIndex(soundModel->rowByFilename(theField()->value()));
+    m_comboBox->setCurrentIndex(soundModel->rowByFilename(m_field->value()));
 }
 
 } // namespace nx::vms::client::desktop::rules

@@ -64,11 +64,6 @@ void ParamsWidget::setReadOnly(bool value)
         picker->setReadOnly(value);
 }
 
-std::optional<rules::FieldDescriptor> ParamsWidget::fieldDescriptor(const QString& fieldName) const
-{
-    return vms::rules::utils::fieldByName(fieldName, descriptor().value());
-}
-
 void ParamsWidget::setupLineEditsPlaceholderColor()
 {
     const auto lineEdits = findChildren<QLineEdit*>();

@@ -7,35 +7,35 @@
 
 #include <nx/vms/client/desktop/style/helper.h>
 
-#include "picker_widget_utils.h"
-#include "plain_picker_widget.h"
+#include "field_picker_widget.h"
 
 namespace nx::vms::client::desktop::rules {
 
 /** Used for types that could be represented as a boolean value. */
 template<typename F>
-class FlagPicker: public PlainFieldPickerWidget<F>
+class FlagPicker: public FieldPickerWidget<F, PickerWidget>
 {
-    using base = PlainFieldPickerWidget<F>;
-
 public:
-    FlagPicker(SystemContext* context, ParamsWidget* parent):
-        base(context, parent)
+    FlagPicker(F* field, SystemContext* context, ParamsWidget* parent):
+        FieldPickerWidget<F, PickerWidget>{field, context, parent}
     {
-        auto contentLayout = new QHBoxLayout;
-        contentLayout->setContentsMargins(0, 4, 0, 4);
-        contentLayout->setSpacing(style::Metrics::kDefaultLayoutSpacing.width());
+        auto mainLayout = new QHBoxLayout{this};
+        mainLayout->setSpacing(style::Metrics::kDefaultLayoutSpacing.width());
+        mainLayout->setContentsMargins(
+            style::Metrics::kDefaultTopLevelMargin,
+            4,
+            style::Metrics::kDefaultTopLevelMargin,
+            4);
 
-        contentLayout->addWidget(new QWidget);
+        mainLayout->addWidget(new QWidget);
 
         m_checkBox = new QCheckBox;
         m_checkBox->setSizePolicy(QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred));
-        contentLayout->addWidget(m_checkBox);
+        m_checkBox->setText(field->descriptor()->displayName);
+        mainLayout->addWidget(m_checkBox);
 
-        contentLayout->setStretch(0, 1);
-        contentLayout->setStretch(1, 5);
-
-        m_contentWidget->setLayout(contentLayout);
+        mainLayout->setStretch(0, 1);
+        mainLayout->setStretch(1, 5);
 
         connect(
             m_checkBox,
@@ -44,26 +44,26 @@ public:
             &FlagPicker<F>::onStateChanged);
     }
 
+    void setReadOnly(bool value) override
+    {
+        m_checkBox->setEnabled(!value);
+    }
+
 private:
-    BASE_COMMON_USINGS
+    using FieldPickerWidget<F, PickerWidget>::m_field;
+    using FieldPickerWidget<F, PickerWidget>::connect;
 
     QCheckBox* m_checkBox{nullptr};
 
-    virtual void onDescriptorSet() override
-    {
-        m_label->setVisible(false);
-        m_checkBox->setText(m_fieldDescriptor->displayName);
-    }
-
     void onStateChanged(int state)
     {
-        theField()->setValue(state == Qt::Checked);
+        m_field->setValue(state == Qt::Checked);
     }
 
     void updateUi() override
     {
         QSignalBlocker blocker{m_checkBox};
-        m_checkBox->setChecked(theField()->value());
+        m_checkBox->setChecked(m_field->value());
     }
 };
 

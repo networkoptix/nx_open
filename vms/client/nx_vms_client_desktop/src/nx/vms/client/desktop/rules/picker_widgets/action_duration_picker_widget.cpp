@@ -19,11 +19,11 @@ constexpr auto kFixedDurationIndex = 1;
 } // namespace
 
 ActionDurationPickerWidget::ActionDurationPickerWidget(
+    vms::rules::OptionalTimeField* field,
     SystemContext* context,
-    ParamsWidget* parent,
-    const vms::rules::ItemDescriptor& eventDescriptor)
+    ParamsWidget* parent)
     :
-    FieldPickerWidget<vms::rules::OptionalTimeField, PickerWidget>(context, parent)
+    FieldPickerWidget<vms::rules::OptionalTimeField, PickerWidget>(field, context, parent)
 {
     auto mainLayout = new QVBoxLayout{this};
     mainLayout->setSpacing(style::Metrics::kDefaultLayoutSpacing.height());
@@ -59,9 +59,11 @@ ActionDurationPickerWidget::ActionDurationPickerWidget(
         auto contentLayout = new QHBoxLayout{m_contentWidget};
         contentLayout->setSpacing(style::Metrics::kDefaultLayoutSpacing.width());
 
+        const auto eventDescriptor = parentParamsWidget()->eventDescriptor();
+
         const auto hasStateField = std::any_of(
-            eventDescriptor.fields.cbegin(),
-            eventDescriptor.fields.cend(),
+            eventDescriptor->fields.cbegin(),
+            eventDescriptor->fields.cend(),
             [](const auto& fieldDescriptor)
             {
                 return fieldDescriptor.fieldName == vms::rules::utils::kStateFieldName;
@@ -82,14 +84,14 @@ ActionDurationPickerWidget::ActionDurationPickerWidget(
             layout->setSpacing(style::Metrics::kDefaultLayoutSpacing.width());
 
             m_actionStartComboBox = new QComboBox;
-            if (eventDescriptor.flags.testFlag(vms::rules::ItemFlag::instant))
+            if (eventDescriptor->flags.testFlag(vms::rules::ItemFlag::instant))
             {
                 m_actionStartComboBox->addItem(
                     tr("Event Occurs"),
                     QVariant::fromValue(api::rules::State::instant));
             }
 
-            if (eventDescriptor.flags.testFlag(vms::rules::ItemFlag::prolonged))
+            if (eventDescriptor->flags.testFlag(vms::rules::ItemFlag::prolonged))
             {
                 m_actionStartComboBox->addItem(
                     tr("Event Starts"),
@@ -180,7 +182,7 @@ void ActionDurationPickerWidget::updateUi()
             m_actionStartComboBox->findData(QVariant::fromValue(stateField->value())));
     }
 
-    const auto duration = theField()->value();
+    const auto duration = m_field->value();
     const bool isZeroDuration = duration == std::chrono::microseconds::zero();
 
     m_durationTypeComboBox->setCurrentIndex(isZeroDuration
@@ -194,26 +196,17 @@ void ActionDurationPickerWidget::updateUi()
         std::chrono::duration_cast<std::chrono::seconds>(duration).count());
 }
 
-void ActionDurationPickerWidget::onDescriptorSet()
-{
-}
-
 void ActionDurationPickerWidget::onDurationTypeChanged()
 {
     if (m_durationTypeComboBox->currentIndex() == kDurationOfEventIndex)
-    {
-        theField()->setValue(std::chrono::seconds::zero());
-    }
+        m_field->setValue(std::chrono::seconds::zero());
     else
-    {
-        theField()->setValue(
-            m_fieldDescriptor->properties.value("default").value<std::chrono::seconds>());
-    }
+        m_field->setValue(m_field->properties().defaultValue);
 }
 
 void ActionDurationPickerWidget::onDurationValueChanged()
 {
-    theField()->setValue(std::chrono::seconds{m_timeDurationWidget->value()});
+    m_field->setValue(std::chrono::seconds{m_timeDurationWidget->value()});
 }
 
 void ActionDurationPickerWidget::onStateChanged()

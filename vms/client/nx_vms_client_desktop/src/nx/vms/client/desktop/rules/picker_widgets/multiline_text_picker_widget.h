@@ -7,11 +7,8 @@
 
 #include <nx/vms/rules/action_builder_fields/text_with_fields.h>
 
-#include "../utils/completer.h"
 #include "field_picker_widget.h"
-#include "picker_widget.h"
 #include "picker_widget_utils.h"
-#include "plain_picker_widget.h"
 
 namespace nx::vms::client::desktop::rules {
 
@@ -27,8 +24,8 @@ class MultilineTextPickerWidget: public PlainFieldPickerWidget<F>
     using base = PlainFieldPickerWidget<F>;
 
 public:
-    MultilineTextPickerWidget(SystemContext* context, ParamsWidget* parent):
-        base(context, parent)
+    MultilineTextPickerWidget(F* field, SystemContext* context, ParamsWidget* parent):
+        base(field, context, parent)
     {
         auto contentLayout = new QHBoxLayout;
 
@@ -37,6 +34,8 @@ public:
         contentLayout->addWidget(m_textEdit);
 
         m_contentWidget->setLayout(contentLayout);
+
+        m_textEdit->setPlaceholderText(field->descriptor()->description);
 
         connect(
             m_textEdit,
@@ -50,24 +49,18 @@ protected:
 
     BASE_COMMON_USINGS
 
-    virtual void onDescriptorSet() override
-    {
-        base::onDescriptorSet();
-        m_textEdit->setPlaceholderText(m_fieldDescriptor->description);
-    };
-
     virtual void updateUi() override
     {
-        if (m_textEdit->toPlainText() == theField()->text())
+        if (m_textEdit->toPlainText() == m_field->text())
             return;
 
         const QSignalBlocker blocker{m_textEdit};
-        m_textEdit->setPlainText(theField()->text());
+        m_textEdit->setPlainText(m_field->text());
     }
 
     void onTextChanged()
     {
-        theField()->setText(m_textEdit->toPlainText());
+        m_field->setText(m_textEdit->toPlainText());
     }
 };
 

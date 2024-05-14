@@ -24,7 +24,7 @@ protected:
 
     void updateUi() override
     {
-        const auto fieldValue = theField()->value();
+        const auto fieldValue = m_field->value();
         {
             QSignalBlocker blocker{m_comboBox};
             if (fieldValue.isEmpty())
@@ -38,17 +38,21 @@ protected:
     {
         const auto value = m_comboBox->currentText().trimmed();
         if (value != DropdownTextPickerWidgetStrings::autoValue())
-            theField()->setValue(value);
+            m_field->setValue(value);
         else
-            theField()->setValue({});
+            m_field->setValue({});
     }
 };
 
 class HttpContentTypePicker: public HttpParametersPickerBase<vms::rules::ContentTypeField>
 {
 public:
-    HttpContentTypePicker(SystemContext* context, ParamsWidget* parent):
-        HttpParametersPickerBase<vms::rules::ContentTypeField>(context, parent)
+    HttpContentTypePicker(
+        vms::rules::ContentTypeField* field,
+        SystemContext* context,
+        ParamsWidget* parent)
+        :
+        HttpParametersPickerBase<vms::rules::ContentTypeField>(field, context, parent)
     {
         QSignalBlocker blocker{m_comboBox};
         m_comboBox->addItem(DropdownTextPickerWidgetStrings::autoValue());
@@ -63,8 +67,12 @@ public:
 class HttpMethodPicker: public HttpParametersPickerBase<vms::rules::HttpMethodField>
 {
 public:
-    HttpMethodPicker(SystemContext* context, ParamsWidget* parent):
-        HttpParametersPickerBase<vms::rules::HttpMethodField>(context, parent)
+    HttpMethodPicker(
+        vms::rules::HttpMethodField* field,
+        SystemContext* context,
+        ParamsWidget* parent)
+        :
+        HttpParametersPickerBase<vms::rules::HttpMethodField>(field, context, parent)
     {
         QSignalBlocker blocker{m_comboBox};
         m_comboBox->addItem(DropdownTextPickerWidgetStrings::autoValue());

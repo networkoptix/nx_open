@@ -18,16 +18,13 @@ class ActionDurationPickerWidget:
 
 public:
     ActionDurationPickerWidget(
+        vms::rules::OptionalTimeField* field,
         SystemContext* context,
-        ParamsWidget* parent,
-        const vms::rules::ItemDescriptor& eventDescriptor);
+        ParamsWidget* parent);
     virtual ~ActionDurationPickerWidget() override;
 
     void setReadOnly(bool value) override;
     void updateUi() override;
-
-protected:
-    void onDescriptorSet() override;
 
 private:
     QComboBox* m_durationTypeComboBox{};

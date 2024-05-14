@@ -15,7 +15,7 @@ class PtzPresetPicker: public DropdownTextPickerWidgetBase<vms::rules::PtzPreset
     Q_OBJECT
 
 public:
-    PtzPresetPicker(SystemContext* context, ParamsWidget* parent);
+    PtzPresetPicker(vms::rules::PtzPresetField* field, SystemContext* context, ParamsWidget* parent);
 
 private:
     QnPtzControllerPtr m_ptzController;

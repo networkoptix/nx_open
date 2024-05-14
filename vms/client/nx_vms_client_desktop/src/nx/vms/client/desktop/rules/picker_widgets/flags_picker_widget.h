@@ -8,10 +8,9 @@
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/rules/event_filter_fields/analytics_event_level_field.h>
 
-#include "picker_widget.h"
+#include "field_picker_widget.h"
 #include "picker_widget_strings.h"
 #include "picker_widget_utils.h"
-#include "plain_picker_widget.h"
 
 namespace nx::vms::client::desktop::rules {
 
@@ -27,8 +26,8 @@ class FlagsPicker: public PlainFieldPickerWidget<F>
     using base = PlainFieldPickerWidget<F>;
 
 public:
-    FlagsPicker(SystemContext* context, ParamsWidget* parent):
-        base(context, parent)
+    FlagsPicker(F* field, SystemContext* context, ParamsWidget* parent):
+        base(field, context, parent)
     {
         auto flagsLayout = new QHBoxLayout;
         flagsLayout->setSpacing(style::Metrics::kDefaultLayoutSpacing.width());
@@ -64,12 +63,12 @@ private:
                 newValue.setFlag(flag);
         }
 
-        theField()->setValue(newValue);
+        m_field->setValue(newValue);
     }
 
     void updateUi() override
     {
-        const auto fieldValue = theField()->value();
+        const auto fieldValue = m_field->value();
         for (const auto& [checkBox, flag]: m_checkBoxes)
         {
             {

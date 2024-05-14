@@ -16,8 +16,12 @@
 
 namespace nx::vms::client::desktop::rules {
 
-PtzPresetPicker::PtzPresetPicker(SystemContext* context, ParamsWidget* parent):
-    DropdownTextPickerWidgetBase<vms::rules::PtzPresetField>(context, parent)
+PtzPresetPicker::PtzPresetPicker(
+    vms::rules::PtzPresetField* field,
+    SystemContext* context,
+    ParamsWidget* parent)
+    :
+    DropdownTextPickerWidgetBase<vms::rules::PtzPresetField>(field, context, parent)
 {
 }
 
@@ -67,7 +71,7 @@ void PtzPresetPicker::updateUi()
 
 void PtzPresetPicker::onCurrentIndexChanged()
 {
-    theField()->setValue(m_comboBox->currentData().toString());
+    m_field->setValue(m_comboBox->currentData().toString());
 }
 
 void PtzPresetPicker::updateComboBox()
@@ -78,7 +82,7 @@ void PtzPresetPicker::updateComboBox()
     for (const auto& preset: m_presets)
         m_comboBox->addItem(preset.name, preset.id);
 
-    m_comboBox->setCurrentIndex(m_comboBox->findData(theField()->value()));
+    m_comboBox->setCurrentIndex(m_comboBox->findData(m_field->value()));
 }
 
 } // namespace nx::vms::client::desktop::rules

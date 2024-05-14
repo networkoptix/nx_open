@@ -13,7 +13,11 @@
 
 namespace nx::vms::client::desktop::rules {
 
-TitledPickerWidget::TitledPickerWidget(SystemContext* context, ParamsWidget* parent):
+TitledPickerWidget::TitledPickerWidget(
+    const QString& displayName,
+    SystemContext* context,
+    ParamsWidget* parent)
+    :
     PickerWidget{context, parent}
 {
     auto mainLayout = new QVBoxLayout{this};
@@ -33,6 +37,7 @@ TitledPickerWidget::TitledPickerWidget(SystemContext* context, ParamsWidget* par
         font.setPixelSize(10);
         font.setWeight(QFont::Medium);
         m_title->setFont(font);
+        m_title->setText(displayName.toUpper());
 
         setPaletteColor(m_title, QPalette::WindowText, core::colorTheme()->color("light10"));
 
@@ -92,11 +97,6 @@ void TitledPickerWidget::setReadOnly(bool value)
 void TitledPickerWidget::onEnabledChanged(bool isEnabled)
 {
     m_contentWidget->setVisible(isEnabled);
-}
-
-void TitledPickerWidget::onDescriptorSet()
-{
-    m_title->setText(m_fieldDescriptor->displayName.toUpper());
 }
 
 void TitledPickerWidget::setValidity(const vms::rules::ValidationResult& validationResult)

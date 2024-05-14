@@ -29,9 +29,12 @@ constexpr auto kOneHundredPercent = 100;
 
 } // namespace
 
-VolumePicker::VolumePicker(WindowContext* context, ParamsWidget* parent):
-    PlainFieldPickerWidget<vms::rules::VolumeField>(context->system(), parent),
-    WindowContextAware(context)
+VolumePicker::VolumePicker(
+    vms::rules::VolumeField* field,
+    SystemContext* context,
+    ParamsWidget* parent)
+    :
+    PlainFieldPickerWidget<vms::rules::VolumeField>(field, context, parent)
 {
     auto contentLayout = new QHBoxLayout;
 
@@ -63,13 +66,13 @@ VolumePicker::VolumePicker(WindowContext* context, ParamsWidget* parent):
 void VolumePicker::updateUi()
 {
     QSignalBlocker blocker{m_volumeSlider};
-    m_volumeSlider->setValue(qRound(theField()->value() * kOneHundredPercent));
+    m_volumeSlider->setValue(qRound(m_field->value() * kOneHundredPercent));
 }
 
 void VolumePicker::onVolumeChanged()
 {
     const auto newValue = static_cast<float>(m_volumeSlider->value()) / kOneHundredPercent;
-    theField()->setValue(newValue);
+    m_field->setValue(newValue);
     if (m_inProgress)
         nx::audio::AudioDevice::instance()->setVolume(newValue);
 }
@@ -89,7 +92,7 @@ void VolumePicker::onTestButtonClicked()
             return;
 
         m_audioDeviceCachedVolume = nx::audio::AudioDevice::instance()->volume();
-        nx::audio::AudioDevice::instance()->setVolume(theField()->value());
+        nx::audio::AudioDevice::instance()->setVolume(m_field->value());
         if (AudioPlayer::sayTextAsync(text, this, [this] { onTextSaid(); }))
             m_testPushButton->setEnabled(false);
     }
@@ -110,7 +113,7 @@ void VolumePicker::onTestButtonClicked()
             return;
 
         m_audioDeviceCachedVolume = nx::audio::AudioDevice::instance()->volume();
-        nx::audio::AudioDevice::instance()->setVolume(theField()->value());
+        nx::audio::AudioDevice::instance()->setVolume(m_field->value());
         if (AudioPlayer::playFileAsync(filePath, this, [this] { onTextSaid(); }))
         {
             m_inProgress = true;

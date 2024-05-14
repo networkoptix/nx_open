@@ -9,8 +9,12 @@
 
 namespace nx::vms::client::desktop::rules {
 
-OptionalDurationPicker::OptionalDurationPicker(SystemContext* context, ParamsWidget* parent):
-     TitledFieldPickerWidget<vms::rules::OptionalTimeField>(context, parent)
+OptionalDurationPicker::OptionalDurationPicker(
+    vms::rules::OptionalTimeField* field,
+    SystemContext* context,
+    ParamsWidget* parent)
+    :
+    TitledFieldPickerWidget<vms::rules::OptionalTimeField>(field, context, parent)
 {
     auto mainLayout = new QHBoxLayout;
 
@@ -28,23 +32,10 @@ OptionalDurationPicker::OptionalDurationPicker(SystemContext* context, ParamsWid
 
     m_contentWidget->setLayout(mainLayout);
 
-    connect(
-        m_timeDurationWidget,
-        &TimeDurationWidget::valueChanged,
-        this,
-        [this]
-        {
-            theField()->setValue(std::chrono::seconds{m_timeDurationWidget->value()});
-        });
-}
-
-void OptionalDurationPicker::onDescriptorSet()
-{
-    TitledFieldPickerWidget<vms::rules::OptionalTimeField>::onDescriptorSet();
-
-    if (m_fieldDescriptor->fieldName == vms::rules::utils::kIntervalFieldName)
+    const auto fieldDescriptor = field->descriptor();
+    if (fieldDescriptor->fieldName == vms::rules::utils::kIntervalFieldName)
         m_label->setText(tr("Once in"));
-    else if (m_fieldDescriptor->fieldName == vms::rules::utils::kPlaybackTimeFieldName)
+    else if (fieldDescriptor->fieldName == vms::rules::utils::kPlaybackTimeFieldName)
         m_label->setText(tr("For"));
     else
         m_label->setText(tr("Value"));
@@ -53,21 +44,23 @@ void OptionalDurationPicker::onDescriptorSet()
     m_timeDurationWidget->addDurationSuffix(QnTimeStrings::Suffix::Hours);
     m_timeDurationWidget->addDurationSuffix(QnTimeStrings::Suffix::Days);
 
-    auto maxIt = m_fieldDescriptor->properties.constFind("max");
-    if (maxIt != m_fieldDescriptor->properties.constEnd())
-        m_timeDurationWidget->setMaximum(maxIt->template value<std::chrono::seconds>().count());
+    const auto fieldProperties = field->properties();
+    m_timeDurationWidget->setMaximum(fieldProperties.maximumValue.count());
+    m_timeDurationWidget->setMinimum(fieldProperties.minimumValue.count());
 
-    auto minIt = m_fieldDescriptor->properties.constFind("min");
-    m_timeDurationWidget->setMinimum(minIt == m_fieldDescriptor->properties.constEnd()
-        ? 0
-        : minIt->template value<std::chrono::seconds>().count());
+    connect(
+        m_timeDurationWidget,
+        &TimeDurationWidget::valueChanged,
+        this,
+        [this]
+        {
+            m_field->setValue(std::chrono::seconds{m_timeDurationWidget->value()});
+        });
 }
 
 void OptionalDurationPicker::updateUi()
 {
-    const auto field = theField();
-
-    if (m_fieldDescriptor->fieldName == vms::rules::utils::kIntervalFieldName)
+    if (m_field->descriptor()->fieldName == vms::rules::utils::kIntervalFieldName)
     {
         const auto durationField =
             getActionField<vms::rules::OptionalTimeField>(vms::rules::utils::kDurationFieldName);
@@ -82,24 +75,23 @@ void OptionalDurationPicker::updateUi()
     {
         QSignalBlocker blocker{m_timeDurationWidget};
         m_timeDurationWidget->setValue(
-            std::chrono::duration_cast<std::chrono::seconds>(field->value()).count());
+            std::chrono::duration_cast<std::chrono::seconds>(m_field->value()).count());
     }
 
-    setChecked(field->value() != vms::rules::OptionalTimeField::value_type::zero());
+    setChecked(m_field->value() != vms::rules::OptionalTimeField::value_type::zero());
 
     if (auto validator = fieldValidator())
-        setValidity(validator->validity(theField(), parentParamsWidget()->rule(), systemContext()));
+        setValidity(validator->validity(m_field, parentParamsWidget()->rule(), systemContext()));
 }
 
 void OptionalDurationPicker::onEnabledChanged(bool isEnabled)
 {
     TitledFieldPickerWidget<vms::rules::OptionalTimeField>::onEnabledChanged(isEnabled);
 
-    auto field = theField();
     if (isEnabled)
-        field->setValue(m_fieldDescriptor->properties.value("default").value<std::chrono::seconds>());
+        m_field->setValue(m_field->properties().defaultValue);
     else
-        field->setValue(vms::rules::OptionalTimeField::value_type::zero());
+        m_field->setValue(vms::rules::OptionalTimeField::value_type::zero());
 }
 
 } // namespace nx::vms::client::desktop::rules

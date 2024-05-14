@@ -32,10 +32,11 @@ class DropdownIdPickerWidgetBase: public PlainFieldPickerWidget<F>
     using base = PlainFieldPickerWidget<F>;
 
 public:
-    DropdownIdPickerWidgetBase(SystemContext* context, ParamsWidget* parent):
-        base(context, parent)
+    DropdownIdPickerWidgetBase(F* field, SystemContext* context, ParamsWidget* parent):
+        base(field, context, parent)
     {
         auto contentLayout = new QHBoxLayout;
+
         m_comboBox = new D;
         m_comboBox->setSizePolicy(QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred));
         contentLayout->addWidget(m_comboBox);
@@ -80,8 +81,13 @@ class AnalyticsEnginePicker:
     public DropdownIdPickerWidgetBase<vms::rules::AnalyticsEngineField, QnTreeComboBox>
 {
 public:
-    AnalyticsEnginePicker(SystemContext* context, ParamsWidget* parent):
-        DropdownIdPickerWidgetBase<vms::rules::AnalyticsEngineField, QnTreeComboBox>(context, parent),
+    AnalyticsEnginePicker(
+        vms::rules::AnalyticsEngineField* field,
+        SystemContext* context,
+        ParamsWidget* parent)
+        :
+        DropdownIdPickerWidgetBase<vms::rules::AnalyticsEngineField, QnTreeComboBox>(
+            field, context, parent),
         m_pluginDiagnosticEventModel{new ui::PluginDiagnosticEventModel(this)}
     {
         m_comboBox->setModel(m_pluginDiagnosticEventModel);
@@ -90,7 +96,7 @@ public:
 protected:
     void onCurrentIndexChanged() override
     {
-        theField()->setValue(
+        m_field->setValue(
             m_comboBox->currentData(ui::PluginDiagnosticEventModel::PluginIdRole).value<nx::Uuid>());
     }
 
@@ -104,7 +110,7 @@ protected:
 
         m_comboBox->setEnabled(m_pluginDiagnosticEventModel->isValid());
 
-        nx::Uuid pluginId = theField()->value();
+        nx::Uuid pluginId = m_field->value();
         if (pluginId.isNull())
         {
             pluginId = m_comboBox->itemData(
@@ -134,9 +140,19 @@ class AnalyticsEventTypePicker: public DropdownIdPickerWidgetBase<vms::rules::An
     Q_OBJECT
 
 public:
-    AnalyticsEventTypePicker(SystemContext* context, ParamsWidget* parent):
-        DropdownIdPickerWidgetBase<vms::rules::AnalyticsEventTypeField, QnTreeComboBox>(context, parent)
+    AnalyticsEventTypePicker(
+        vms::rules::AnalyticsEventTypeField* field,
+        SystemContext* context,
+        ParamsWidget* parent)
+        :
+        DropdownIdPickerWidgetBase<vms::rules::AnalyticsEventTypeField, QnTreeComboBox>(
+            field, context, parent)
     {
+        m_label->addHintLine(tr("Analytics events can be set up on a certain cameras."));
+        m_label->addHintLine(
+            tr("Choose cameras using the button above to see the list of supported events."));
+        setHelpTopic(m_label, HelpTopic::Id::EventsActions_VideoAnalytics);
+
         m_analyticsSdkEventModel = new ui::AnalyticsSdkEventModel(systemContext() ,this);
         auto sortModel = new QSortFilterProxyModel(this);
         sortModel->setDynamicSortFilter(true);
@@ -146,22 +162,11 @@ public:
     }
 
 protected:
-    void onDescriptorSet() override
-    {
-        DropdownIdPickerWidgetBase<vms::rules::AnalyticsEventTypeField,
-            QnTreeComboBox>::onDescriptorSet();
-
-        m_label->addHintLine(tr("Analytics events can be set up on a certain cameras."));
-        m_label->addHintLine(
-            tr("Choose cameras using the button above to see the list of supported events."));
-        setHelpTopic(m_label, HelpTopic::Id::EventsActions_VideoAnalytics);
-    }
-
     void onCurrentIndexChanged() override
     {
-        theField()->setEngineId(
+        m_field->setEngineId(
             m_comboBox->currentData(ui::AnalyticsSdkEventModel::EngineIdRole).value<nx::Uuid>());
-        theField()->setTypeId(
+        m_field->setTypeId(
             m_comboBox->currentData(ui::AnalyticsSdkEventModel::EventTypeIdRole).value<QString>());
     }
 
@@ -176,8 +181,8 @@ protected:
 
         m_comboBox->setEnabled(m_analyticsSdkEventModel->isValid());
 
-        auto engineId = theField()->engineId();
-        auto typeId = theField()->typeId();
+        auto engineId = m_field->engineId();
+        auto typeId = m_field->typeId();
 
         auto analyticsModel = m_comboBox->model();
 
@@ -231,21 +236,23 @@ public:
     using DropdownIdPickerWidgetBase<vms::rules::AnalyticsObjectTypeField,
         DetectableObjectTypeComboBox>::DropdownIdPickerWidgetBase;
 
-protected:
-    void onDescriptorSet() override
+    AnalyticsObjectTypePicker(
+        vms::rules::AnalyticsObjectTypeField* field,
+        SystemContext* context,
+        ParamsWidget* parent)
+        :
+        DropdownIdPickerWidgetBase<vms::rules::AnalyticsObjectTypeField, DetectableObjectTypeComboBox>{field, context, parent}
     {
-        DropdownIdPickerWidgetBase<vms::rules::AnalyticsObjectTypeField,
-            DetectableObjectTypeComboBox>::onDescriptorSet();
-
         m_label->addHintLine(tr("Analytics object detection can be set up on a certain cameras."));
         m_label->addHintLine(
             tr("Choose cameras using the button above to see the list of supported events."));
         setHelpTopic(m_label, HelpTopic::Id::EventsActions_VideoAnalytics);
     }
 
+protected:
     void onCurrentIndexChanged() override
     {
-        theField()->setValue(m_comboBox->selectedMainObjectTypeId());
+        m_field->setValue(m_comboBox->selectedMainObjectTypeId());
     }
 
     void updateUi()
@@ -255,7 +262,7 @@ protected:
         const auto ids = getCameras().ids();
         m_comboBox->setDevices(UuidSet{ids.begin(), ids.end()});
 
-        m_comboBox->setSelectedMainObjectTypeId(theField()->value());
+        m_comboBox->setSelectedMainObjectTypeId(m_field->value());
     }
 };
 

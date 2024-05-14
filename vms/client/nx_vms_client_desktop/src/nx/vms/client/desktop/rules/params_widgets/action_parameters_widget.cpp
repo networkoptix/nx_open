@@ -6,6 +6,7 @@
 
 #include <nx/vms/client/desktop/rules/picker_widgets/picker_factory.h>
 #include <nx/vms/client/desktop/style/helper.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/rules/action_builder_fields/optional_time_field.h>
 #include <nx/vms/rules/action_builder_fields/time_field.h>
 #include <nx/vms/rules/event_filter_fields/state_field.h>
@@ -52,10 +53,12 @@ void ActionParametersWidget::onRuleSet()
     bool isPreviousPlain{true};
     for (const auto& fieldDescriptor: action->fields)
     {
-        if (!fieldDescriptor.properties.value("visible", true).toBool())
+        const auto field = actionBuilder()->fieldByName(fieldDescriptor.fieldName);
+        const auto fieldProperties = field->properties();
+        if (!fieldProperties.visible)
             continue;
 
-        PickerWidget* picker = PickerFactory::createWidget(fieldDescriptor, windowContext(), this);
+        PickerWidget* picker = PickerFactory::createWidget(field, windowContext()->system(), this);
         if (picker == nullptr)
             continue;
 
@@ -109,13 +112,7 @@ void ActionParametersWidget::onActionDurationChanged() const
     if (isEventInstantOnly && durationField->value() == std::chrono::microseconds::zero())
     {
         // Zero duration does not have sense for instant only event.
-
-        const auto fieldDescriptor = this->fieldDescriptor(vms::rules::utils::kDurationFieldName);
-        if (!NX_ASSERT(fieldDescriptor))
-            return;
-
-        const auto defaultDuration =
-            fieldDescriptor->properties.value("default").value<std::chrono::seconds>();
+        const auto defaultDuration = durationField->properties().defaultValue;
 
         QSignalBlocker blocker{durationField};
         if (NX_ASSERT(
@@ -166,7 +163,6 @@ void ActionParametersWidget::onActionDurationChanged() const
             if (!timeField)
                 return;
 
-            const auto timeFieldDescriptor = fieldDescriptor(fieldName);
             if (durationField && durationField->value() != std::chrono::microseconds::zero())
             {
                 QSignalBlocker blocker{timeField};
@@ -180,19 +176,15 @@ void ActionParametersWidget::onActionDurationChanged() const
 
 PickerWidget* ActionParametersWidget::createStatePickerIfRequired()
 {
-    const auto eventManifest = eventDescriptor();
-
-    if (vms::rules::utils::isInstantOnly(eventManifest.value()))
+    if (vms::rules::utils::isInstantOnly(eventDescriptor().value()))
     {
         // If the event is only instant, thus user has only one option to choose, there is no sense
         // to show picker widget.
         return nullptr;
     }
 
-    const auto stateFieldDescriptor =
-        vms::rules::utils::fieldByName(vms::rules::utils::kStateFieldName, eventManifest.value());
-
-    if (!stateFieldDescriptor)
+    const auto stateField = eventFilter()->fieldByName(vms::rules::utils::kStateFieldName);
+    if (!stateField)
     {
         // State field is not added to the event manifest.
         return nullptr;
@@ -208,7 +200,7 @@ PickerWidget* ActionParametersWidget::createStatePickerIfRequired()
         return nullptr;
     }
 
-    return PickerFactory::createWidget(stateFieldDescriptor.value(), windowContext(), this);
+    return PickerFactory::createWidget(stateField, windowContext()->system(), this);
 }
 
 } // namespace nx::vms::client::desktop::rules

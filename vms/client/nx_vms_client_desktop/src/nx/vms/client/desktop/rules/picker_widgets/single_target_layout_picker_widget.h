@@ -14,7 +14,8 @@ class SingleTargetLayoutPicker:
     Q_OBJECT
 
 public:
-    SingleTargetLayoutPicker(SystemContext* systemContext, ParamsWidget* parent);
+    SingleTargetLayoutPicker(
+        vms::rules::LayoutField* field, SystemContext* systemContext, ParamsWidget* parent);
 
     void updateUi() override;
     void onSelectButtonClicked() override;

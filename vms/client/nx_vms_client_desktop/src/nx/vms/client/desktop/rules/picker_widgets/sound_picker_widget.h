@@ -18,7 +18,7 @@ class SoundPicker: public PlainFieldPickerWidget<vms::rules::SoundField>
     Q_OBJECT
 
 public:
-    SoundPicker(WindowContext* context, ParamsWidget* parent);
+    SoundPicker(vms::rules::SoundField* field, SystemContext* context, ParamsWidget* parent);
 
     void updateUi() override;
 

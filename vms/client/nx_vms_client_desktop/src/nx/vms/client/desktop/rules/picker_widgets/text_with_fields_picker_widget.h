@@ -12,7 +12,8 @@ class TextWithFieldsPicker: public MultilineTextPickerWidget<vms::rules::TextWit
 {
     using base = MultilineTextPickerWidget<vms::rules::TextWithFields>;
 public:
-    TextWithFieldsPicker(SystemContext* context, ParamsWidget* parent);
+    TextWithFieldsPicker(
+        vms::rules::TextWithFields* field, SystemContext* context, ParamsWidget* parent);
     virtual ~TextWithFieldsPicker() override;
 
     void updateUi() override;

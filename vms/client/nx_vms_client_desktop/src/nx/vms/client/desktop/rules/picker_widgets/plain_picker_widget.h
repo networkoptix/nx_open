@@ -15,7 +15,7 @@ class PlainPickerWidget: public PickerWidget
     Q_OBJECT
 
 public:
-    PlainPickerWidget(SystemContext* context, ParamsWidget* parent);
+    PlainPickerWidget(const QString& displayName, SystemContext* context, ParamsWidget* parent);
 
     void setReadOnly(bool value) override;
     virtual void setValidity(const vms::rules::ValidationResult& validationResult);
@@ -23,8 +23,6 @@ public:
 protected:
     WidgetWithHint<QnElidedLabel>* m_label{nullptr};
     QWidget* m_contentWidget{nullptr};
-
-    void onDescriptorSet() override;
 
 private:
     QLabel* m_alertLabel{nullptr};

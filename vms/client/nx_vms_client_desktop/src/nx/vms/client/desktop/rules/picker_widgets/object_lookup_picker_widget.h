@@ -19,10 +19,8 @@ class ObjectLookupPicker: public TitledFieldPickerWidget<vms::rules::ObjectLooku
     Q_OBJECT
 
 public:
-    ObjectLookupPicker(SystemContext* context, ParamsWidget* parent);
-
-protected:
-    void onDescriptorSet() override;
+    ObjectLookupPicker(
+        vms::rules::ObjectLookupField* field, SystemContext* context, ParamsWidget* parent);
 
 private:
     QComboBox* m_checkTypeComboBox{nullptr};

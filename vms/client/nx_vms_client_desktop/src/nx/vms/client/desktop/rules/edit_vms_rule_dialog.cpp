@@ -92,16 +92,9 @@ QSet<vms::rules::State> getAvailableStates(
     return availableEventStates & availableActionStates;
 }
 
-std::chrono::seconds getDefaultActionDuration(const vms::rules::ItemDescriptor& actionDescriptor)
+std::chrono::seconds getDefaultDuration(vms::rules::OptionalTimeField* optionalTimeField)
 {
-    const auto durationFieldDescriptor =
-        vms::rules::utils::fieldByName(vms::rules::utils::kDurationFieldName, actionDescriptor);
-    if (!durationFieldDescriptor)
-        return std::chrono::seconds::zero();
-
-    const auto defaultValue =
-        durationFieldDescriptor->properties.value("default").value<std::chrono::seconds>();
-
+    const auto defaultValue = optionalTimeField->properties().defaultValue;
     if (!NX_ASSERT(defaultValue != std::chrono::seconds::zero()))
     {
         constexpr auto kDefaultActionDuration = std::chrono::seconds{5};
@@ -149,7 +142,7 @@ void fixStateAndDuration(
                 else
                 {
                     stateField->setValue(State::none);
-                    durationField->setValue(getDefaultActionDuration(actionDescriptor.value()));
+                    durationField->setValue(getDefaultDuration(durationField));
                 }
             }
             else
@@ -161,7 +154,7 @@ void fixStateAndDuration(
                 else
                 {
                     stateField->setValue(*availableStates.cbegin());
-                    durationField->setValue(getDefaultActionDuration(actionDescriptor.value()));
+                    durationField->setValue(getDefaultDuration(durationField));
                 }
             }
         }
@@ -177,7 +170,7 @@ void fixStateAndDuration(
             && durationField->value() == std::chrono::microseconds::zero())
         {
             // Duration can not be zero for the instant event.
-            durationField->setValue(getDefaultActionDuration(actionDescriptor.value()));
+            durationField->setValue(getDefaultDuration(durationField));
         }
     }
 }

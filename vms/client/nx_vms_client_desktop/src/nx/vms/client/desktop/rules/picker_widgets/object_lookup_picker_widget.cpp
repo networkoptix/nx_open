@@ -22,8 +22,12 @@ namespace nx::vms::client::desktop::rules {
 
 using LookupCheckType = vms::rules::ObjectLookupCheckType;
 
-ObjectLookupPicker::ObjectLookupPicker(SystemContext* context, ParamsWidget* parent):
-    TitledFieldPickerWidget<vms::rules::ObjectLookupField>(context, parent)
+ObjectLookupPicker::ObjectLookupPicker(
+    vms::rules::ObjectLookupField* field,
+    SystemContext* context,
+    ParamsWidget* parent)
+    :
+    TitledFieldPickerWidget<vms::rules::ObjectLookupField>(field, context, parent)
 {
     setCheckBoxEnabled(false);
 
@@ -115,7 +119,7 @@ ObjectLookupPicker::ObjectLookupPicker(SystemContext* context, ParamsWidget* par
         this,
         [this]
         {
-            theField()->setCheckType(m_checkTypeComboBox->currentData().value<LookupCheckType>());
+            m_field->setCheckType(m_checkTypeComboBox->currentData().value<LookupCheckType>());
         });
 
     connect(
@@ -124,7 +128,7 @@ ObjectLookupPicker::ObjectLookupPicker(SystemContext* context, ParamsWidget* par
         this,
         [this](int index)
         {
-            theField()->setValue(m_lookupListComboBox->itemData(index).value<nx::Uuid>().toString());
+            m_field->setValue(m_lookupListComboBox->itemData(index).value<nx::Uuid>().toString());
         });
 
     connect(
@@ -133,32 +137,27 @@ ObjectLookupPicker::ObjectLookupPicker(SystemContext* context, ParamsWidget* par
         this,
         [this](const QString& text)
         {
-            theField()->setValue(text);
+            m_field->setValue(text);
         });
-}
-
-void ObjectLookupPicker::onDescriptorSet()
-{
-    TitledFieldPickerWidget<vms::rules::ObjectLookupField>::onDescriptorSet();
 }
 
 void ObjectLookupPicker::updateUi()
 {
     m_checkTypeComboBox->setCurrentIndex(
-        m_checkTypeComboBox->findData(QVariant::fromValue(theField()->checkType())));
+        m_checkTypeComboBox->findData(QVariant::fromValue(m_field->checkType())));
 
-    if (theField()->checkType() == LookupCheckType::hasAttributes)
+    if (m_field->checkType() == LookupCheckType::hasAttributes)
     {
-        if (nx::Uuid::isUuidString(theField()->value()))
-            theField()->setValue({});
+        if (nx::Uuid::isUuidString(m_field->value()))
+            m_field->setValue({});
 
         m_stackedWidget->setCurrentIndex(0);
-        m_lineEdit->setText(theField()->value());
+        m_lineEdit->setText(m_field->value());
     }
     else
     {
-        if (!nx::Uuid::isUuidString(theField()->value()))
-            theField()->setValue({});
+        if (!nx::Uuid::isUuidString(m_field->value()))
+            m_field->setValue({});
 
         const auto objectTypeField = getEventField<vms::rules::AnalyticsObjectTypeField>(
             vms::rules::utils::kObjectTypeIdFieldName);
@@ -174,7 +173,7 @@ void ObjectLookupPicker::updateUi()
         const auto matches = m_lookupListComboBox->model()->match(
             m_lookupListComboBox->model()->index(0, 0),
             LookupListsModel::LookupListIdRole,
-            QVariant::fromValue(nx::Uuid{theField()->value()}),
+            QVariant::fromValue(nx::Uuid{m_field->value()}),
             /*hits*/ 1,
             Qt::MatchExactly);
 

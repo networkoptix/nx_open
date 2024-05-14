@@ -16,8 +16,8 @@ class DropdownTextPickerWidgetBase: public PlainFieldPickerWidget<F>
     using base = PlainFieldPickerWidget<F>;
 
 public:
-    DropdownTextPickerWidgetBase(SystemContext* context, ParamsWidget* parent):
-        base(context, parent)
+    DropdownTextPickerWidgetBase(F* field, SystemContext* context, ParamsWidget* parent):
+        base(field, context, parent)
     {
         auto contentLayout = new QHBoxLayout;
         m_comboBox = new D;

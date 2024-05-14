@@ -21,7 +21,7 @@ public:
 protected:
     void onCurrentIndexChanged() override
     {
-        theField()->setValue(m_comboBox->currentData().toString());
+        m_field->setValue(m_comboBox->currentData().toString());
     }
 
 private:
@@ -93,7 +93,7 @@ private:
         for (const auto& cameraInput: totalInputs)
             m_comboBox->addItem(cameraInput.getName(), cameraInput.id);
 
-        const auto valueIndex = m_comboBox->findData(theField()->value());
+        const auto valueIndex = m_comboBox->findData(m_field->value());
         m_comboBox->setCurrentIndex(valueIndex != -1 ? valueIndex : 0);
     }
 };

@@ -62,12 +62,12 @@ void OutputPortPicker::updateUi()
     for (const auto& relayOutput: outputPorts)
         m_comboBox->addItem(relayOutput.getName(), relayOutput.id);
 
-    m_comboBox->setCurrentIndex(m_comboBox->findData(theField()->value()));
+    m_comboBox->setCurrentIndex(m_comboBox->findData(m_field->value()));
 }
 
 void OutputPortPicker::onCurrentIndexChanged()
 {
-    theField()->setValue(m_comboBox->currentData().toString());
+    m_field->setValue(m_comboBox->currentData().toString());
 }
 
 } // namespace nx::vms::client::desktop::rules

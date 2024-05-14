@@ -25,14 +25,21 @@ class DurationPicker: public PlainFieldPickerWidget<F>
     using base = PlainFieldPickerWidget<F>;
 
 public:
-    DurationPicker(SystemContext* context, ParamsWidget* parent):
-        base(context, parent)
+    DurationPicker(F* field, SystemContext* context, ParamsWidget* parent):
+        base(field, context, parent)
     {
         auto contentLayout = new QHBoxLayout;
 
         m_timeDurationWidget = new TimeDurationWidget;
         m_timeDurationWidget->setSizePolicy(
             QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred));
+        m_timeDurationWidget->addDurationSuffix(QnTimeStrings::Suffix::Minutes);
+        m_timeDurationWidget->addDurationSuffix(QnTimeStrings::Suffix::Hours);
+        m_timeDurationWidget->addDurationSuffix(QnTimeStrings::Suffix::Days);
+
+        const auto fieldProperties = field->properties();
+        m_timeDurationWidget->setMaximum(fieldProperties.maximumValue.count());
+        m_timeDurationWidget->setMinimum(fieldProperties.minimumValue.count());
 
         contentLayout->addWidget(m_timeDurationWidget);
 
@@ -47,31 +54,12 @@ public:
 
 protected:
     BASE_COMMON_USINGS
+
     TimeDurationWidget* m_timeDurationWidget{nullptr};
-
-    virtual void onDescriptorSet() override
-    {
-        base::onDescriptorSet();
-
-        m_timeDurationWidget->addDurationSuffix(QnTimeStrings::Suffix::Minutes);
-        m_timeDurationWidget->addDurationSuffix(QnTimeStrings::Suffix::Hours);
-        m_timeDurationWidget->addDurationSuffix(QnTimeStrings::Suffix::Days);
-
-        auto maxIt = m_fieldDescriptor->properties.constFind("max");
-        if (maxIt != m_fieldDescriptor->properties.constEnd())
-            m_timeDurationWidget->setMaximum(maxIt->template value<std::chrono::seconds>().count());
-
-        auto minIt = m_fieldDescriptor->properties.constFind("min");
-        m_timeDurationWidget->setMinimum(minIt == m_fieldDescriptor->properties.constEnd()
-            ? 0
-            : minIt->template value<std::chrono::seconds>().count());
-    }
 
     virtual void updateUi() override
     {
-        auto field = theField();
-
-        if (field->descriptor()->fieldName == vms::rules::utils::kRecordAfterFieldName)
+        if (m_field->descriptor()->fieldName == vms::rules::utils::kRecordAfterFieldName)
         {
             const auto durationField =
                 base::template getActionField<vms::rules::OptionalTimeField>(
@@ -86,13 +74,13 @@ protected:
 
         QSignalBlocker blocker{m_timeDurationWidget};
         m_timeDurationWidget->setValue(
-            std::chrono::duration_cast<std::chrono::seconds>(field->value()).count());
+            std::chrono::duration_cast<std::chrono::seconds>(m_field->value()).count());
     }
 
 private:
     void onValueChanged()
     {
-        theField()->setValue(std::chrono::seconds{m_timeDurationWidget->value()});
+        m_field->setValue(std::chrono::seconds{m_timeDurationWidget->value()});
     }
 };
 

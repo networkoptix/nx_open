@@ -20,8 +20,12 @@ namespace nx::vms::client::desktop::rules {
 
 using LookupCheckType = vms::rules::TextLookupCheckType;
 
-TextLookupPicker::TextLookupPicker(SystemContext* context, ParamsWidget* parent):
-    TitledFieldPickerWidget<vms::rules::TextLookupField>(context, parent)
+TextLookupPicker::TextLookupPicker(
+    vms::rules::TextLookupField* field,
+    SystemContext* context,
+    ParamsWidget* parent)
+    :
+    TitledFieldPickerWidget<vms::rules::TextLookupField>(field, context, parent)
 {
     setCheckBoxEnabled(false);
 
@@ -115,7 +119,7 @@ TextLookupPicker::TextLookupPicker(SystemContext* context, ParamsWidget* parent)
         this,
         [this]
         {
-            theField()->setCheckType(m_checkTypeComboBox->currentData().value<LookupCheckType>());
+            m_field->setCheckType(m_checkTypeComboBox->currentData().value<LookupCheckType>());
         });
 
     connect(
@@ -124,7 +128,7 @@ TextLookupPicker::TextLookupPicker(SystemContext* context, ParamsWidget* parent)
         this,
         [this](int index)
         {
-            theField()->setValue(m_lookupListComboBox->itemData(index).value<nx::Uuid>().toString());
+            m_field->setValue(m_lookupListComboBox->itemData(index).value<nx::Uuid>().toString());
         });
 
     connect(
@@ -133,33 +137,33 @@ TextLookupPicker::TextLookupPicker(SystemContext* context, ParamsWidget* parent)
         this,
         [this](const QString& text)
         {
-            theField()->setValue(text);
+            m_field->setValue(text);
         });
 }
 
 void TextLookupPicker::updateUi()
 {
     m_checkTypeComboBox->setCurrentIndex(
-        m_checkTypeComboBox->findData(QVariant::fromValue(theField()->checkType())));
-    switch (theField()->checkType())
+        m_checkTypeComboBox->findData(QVariant::fromValue(m_field->checkType())));
+    switch (m_field->checkType())
     {
         case LookupCheckType::containsKeywords:
         case LookupCheckType::doesNotContainKeywords:
-            if (nx::Uuid::isUuidString(theField()->value()))
-                theField()->setValue({});
+            if (nx::Uuid::isUuidString(m_field->value()))
+                m_field->setValue({});
 
             m_stackedWidget->setCurrentIndex(0);
-            m_lineEdit->setText(theField()->value());
+            m_lineEdit->setText(m_field->value());
             return;
         case LookupCheckType::inList:
         case LookupCheckType::notInList:
-            if (!nx::Uuid::isUuidString(theField()->value()))
-                theField()->setValue({});
+            if (!nx::Uuid::isUuidString(m_field->value()))
+                m_field->setValue({});
 
             const auto matches = m_lookupListComboBox->model()->match(
                 m_lookupListComboBox->model()->index(0, 0),
                 LookupListsModel::LookupListIdRole,
-                QVariant::fromValue(nx::Uuid{theField()->value()}),
+                QVariant::fromValue(nx::Uuid{m_field->value()}),
                 /*hits*/ 1,
                 Qt::MatchExactly);
 

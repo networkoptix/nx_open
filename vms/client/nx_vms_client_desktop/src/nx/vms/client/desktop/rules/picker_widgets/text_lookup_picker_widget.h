@@ -17,7 +17,8 @@ class TextLookupPicker: public TitledFieldPickerWidget<vms::rules::TextLookupFie
     Q_OBJECT
 
 public:
-    TextLookupPicker(SystemContext* context, ParamsWidget* parent);
+    TextLookupPicker(
+        vms::rules::TextLookupField* field, SystemContext* context, ParamsWidget* parent);
 
 private:
     QComboBox* m_checkTypeComboBox{nullptr};

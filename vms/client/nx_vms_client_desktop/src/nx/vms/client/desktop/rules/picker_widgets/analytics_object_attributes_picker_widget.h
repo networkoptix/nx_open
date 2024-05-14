@@ -17,14 +17,14 @@ class AnalyticsObjectAttributesPicker:
     Q_OBJECT
 
 public:
-    using OnelineTextPickerWidgetCommon<
-        vms::rules::AnalyticsObjectAttributesField>::OnelineTextPickerWidgetCommon;
-
-protected:
-    void onDescriptorSet() override
+    AnalyticsObjectAttributesPicker(
+        vms::rules::AnalyticsObjectAttributesField* field,
+        SystemContext* context,
+        ParamsWidget* parent)
+        :
+        OnelineTextPickerWidgetCommon<vms::rules::AnalyticsObjectAttributesField>{
+            field, context, parent}
     {
-        OnelineTextPickerWidgetCommon<vms::rules::AnalyticsObjectAttributesField>::onDescriptorSet();
-
         m_label->addHintLine(tr("Event will trigger only if there are matches any of attributes."));
         m_label->addHintLine(
             tr("You can see the names of the attributes and their values on the Objects tab."));

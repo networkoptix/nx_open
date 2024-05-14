@@ -16,16 +16,17 @@
 namespace nx::vms::client::desktop::rules {
 
 SingleTargetLayoutPicker::SingleTargetLayoutPicker(
+    vms::rules::LayoutField* field,
     SystemContext* systemContext,
     ParamsWidget* parent)
     :
-    ResourcePickerWidgetBase<vms::rules::LayoutField>(systemContext, parent)
+    ResourcePickerWidgetBase<vms::rules::LayoutField>(field, systemContext, parent)
 {
 }
 
 void SingleTargetLayoutPicker::updateUi()
 {
-    if (const auto layout = resourcePool()->getResourceById<QnLayoutResource>(theField()->value()))
+    if (const auto layout = resourcePool()->getResourceById<QnLayoutResource>(m_field->value()))
     {
         m_selectButton->setText(layout->getName());
         m_selectButton->setForegroundRole(QPalette::BrightText);
@@ -56,8 +57,8 @@ void SingleTargetLayoutPicker::onSelectButtonClicked()
     LayoutSelectionDialog::LocalLayoutSelection selectionMode = LayoutSelectionDialog::ModeFull;
 
     QSet<nx::Uuid> selection;
-    if (!theField()->value().isNull())
-        selection.insert(theField()->value());
+    if (!m_field->value().isNull())
+        selection.insert(m_field->value());
 
     QnResourceList localLayouts;
     QnUserResourceSet users;
@@ -125,7 +126,7 @@ void SingleTargetLayoutPicker::onSelectButtonClicked()
         return;
 
     const auto selectedLayouts = dialog.checkedLayouts();
-    theField()->setValue(selectedLayouts.empty() ? nx::Uuid{} : *selectedLayouts.begin());
+    m_field->setValue(selectedLayouts.empty() ? nx::Uuid{} : *selectedLayouts.begin());
 }
 
 } // namespace nx::vms::client::desktop::rules

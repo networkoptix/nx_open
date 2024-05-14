@@ -41,7 +41,7 @@ private:
         if (m_spinBox->value() == 0 && maxFps > 0)
         {
             m_spinBox->setValue(maxFps);
-            theField()->setValue(maxFps);
+            m_field->setValue(maxFps);
         }
 
         m_spinBox->setMinimum(maxFps > 0 ? 1 : 0);

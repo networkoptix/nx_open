@@ -15,7 +15,8 @@ class TargetUserPicker: public ResourcePickerWidgetBase<vms::rules::TargetUserFi
     Q_OBJECT
 
 public:
-    using ResourcePickerWidgetBase<vms::rules::TargetUserField>::ResourcePickerWidgetBase;
+    TargetUserPicker(
+        vms::rules::TargetUserField* field, SystemContext* context, ParamsWidget* parent);
 
 protected:
     void onSelectButtonClicked() override;
@@ -23,8 +24,6 @@ protected:
 
 private:
     std::unique_ptr<QnSubjectValidationPolicy> m_policy;
-
-    void createPolicy();
 };
 
 } // namespace nx::vms::client::desktop::rules
