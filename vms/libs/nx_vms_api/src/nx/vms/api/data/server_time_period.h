@@ -47,7 +47,7 @@ struct NX_VMS_API ServerTimePeriod
     /**%apidoc
      * Duration in milliseconds. Not presented for a video chunk that is currently being recorded.
      */
-    std::optional<std::chrono::milliseconds> durationMs{0};
+    std::optional<std::chrono::milliseconds> durationMs;
 
     static constexpr auto kMinTimeValue = std::chrono::milliseconds();
 
