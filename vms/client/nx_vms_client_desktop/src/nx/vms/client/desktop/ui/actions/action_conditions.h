@@ -688,6 +688,8 @@ ConditionWrapper canCopyBookmarksToClipboard();
 
 ConditionWrapper isDeviceAccessRelevant(nx::vms::api::AccessRights requiredAccessRights);
 
+ConditionWrapper isRemoteArchiveSynchronizationEnabled();
+
 /** Whether virtual camera upload is enabled. */
 ConditionWrapper virtualCameraUploadEnabled();
 

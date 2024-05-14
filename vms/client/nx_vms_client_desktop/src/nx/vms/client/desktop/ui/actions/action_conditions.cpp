@@ -44,6 +44,7 @@
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/desktop/cross_system/cross_system_layout_resource.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/joystick/settings/manager.h>
 #include <nx/vms/client/desktop/network/cloud_url_validator.h>
 #include <nx/vms/client/desktop/radass/radass_support.h>
@@ -2315,6 +2316,15 @@ ConditionWrapper isDeviceAccessRelevant(nx::vms::api::AccessRights requiredAcces
         [requiredAccessRights](const Parameters& /*parameters*/, QnWorkbenchContext* context)
         {
             return context->accessController()->isDeviceAccessRelevant(requiredAccessRights);
+        });
+}
+
+ConditionWrapper isRemoteArchiveSynchronizationEnabled()
+{
+    return new CustomBoolCondition(
+        [](const Parameters& /*parameters*/, QnWorkbenchContext* /*context*/)
+        {
+            return ini().enableRemoteArchiveSynchronization;
         });
 }
 
