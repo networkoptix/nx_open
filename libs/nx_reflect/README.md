@@ -2,8 +2,13 @@
 
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+[TOC]
+
 ## Introduction
-The library provides a way to iterate over instrumented structure fields at compile time.
+
+This library is a simple compile-time reflection API. For example, it provides a way to iterate
+over structure fields at compile-time.
+
 This is used to implement serialization formats like JSON. Example:
 
     #include <iostream>
@@ -18,11 +23,14 @@ This is used to implement serialization formats like JSON. Example:
         std::string text = "Forty-five";
     };
 
-    // Making the structure reflectable.
+    // In the absense of reflection support in C++ a type has to be "instrumented" to be available
+    // through the reflection API.
     NX_REFLECTION_INSTRUMENT(Foo, (number)(text));
 
     int main()
     {
+        // nx::reflect::json::serialize uses nx_reflect API to build JSON representation of the
+        // given structure.
         std::cout<<nx::reflect::json::serialize(Foo())<<std::endl;
         return 0;
     }
@@ -31,9 +39,8 @@ The program output:
 
     {"number":45,"text":"Forty-five"}
 
-- - -
 
-More generic example (enumerating structure's fields):
+## A more generic example (enumerating structure's fields)
 
     #include <algorithm>
     #include <iostream>
@@ -80,7 +87,8 @@ More generic example (enumerating structure's fields):
         FieldEnumerator fieldEnumerator;
         // FieldEnumerator::finish() return type is propagated here.
         const auto fieldNames = nx::reflect::visitAllFields<Foo>(fieldEnumerator);
-        std::for_each(fieldNames.begin(), fieldNames.end(), [](auto& name) { std::cout<<name<<std::endl; });
+        std::for_each(fieldNames.begin(), fieldNames.end(),
+            [](auto& name) { std::cout<<name<<std::endl; });
         return 0;
     }
 
@@ -89,9 +97,53 @@ The program output:
     number
     text
 
-## Instrumenting
-In different cases, different macros are used to instrument a type.
+## Implementation goals
 
+This library tends to achieve the following:
+
+### Not pay for what you don't use
+
+- Instrumentation should have no compile-time or runtime overhead when it is not used. Only when
+it is explicitly used (e.g., to serialize an object to JSON) it can consume compile- or run- time.
+- <nx/reflect/instrument.h> should seek to minimize dependencies to reduce compilation overhead.
+- Instrumentation macro generates template functions that are instantiated only when needed (e.g.,
+when serializing a structure into JSON), avoiding unnecessary symbol generation and compile time.
+
+### Decouple Instrumentation and Usage
+
+- *Single Instrumentation*: Types are instrumented once, irrespective of how they are used (e.g.,
+JSON, XML serialization). This ensures no changes in the instrumentation code are needed when new
+serialization formats are added.
+
+### Prefer Compile-Time Reflection
+
+The approach aligns with C++ reflection likely coming with C++26.<br/>
+Adhering to compile-time reflection principles and decoupling instrumentation from its
+applications will simplify migration to future C++26 reflection.<br/>
+The migration will likely involve updating serialization functions and removing
+NX_REFLECTION_INSTRUMENT macros, with minimal or no changes to existing code that uses nx_reflect.
+
+### Simplify public API where appropriate
+
+The C++ reflection is always complicated: it requires tricky macro and sophisticated template
+metaprogramming. As a result, when someone runs into a problem while using the reflection (a compile
+error), it is not easy to understand what is wrong.
+
+The following was considered to reduce the added complexity to some degree at least:
+
+- *Non-Conditional API*: Provide a single function or macro for each feature. Adding
+overloads/variants should be carefully considered.
+- *Minimal Macro Usage*: While macros enhance convenience, their use is minimized to avoid common
+pitfalls like hard-to-read code and debugging difficulties.
+- *Focused Implementation*: Separate instrumentation from its applications, ensuring each is
+minimalistic and straightforward.
+- *Single Entry Point*: Each serialization format should have one entry point (e.g.,
+`nx::reflect::json::serialize`), avoiding potential conflicts and reducing compilation time.
+
+
+## Instrumenting
+
+In different cases, a different macro is used to instrument a type.<br/>
 A non-template structure:
 
     #include <string>

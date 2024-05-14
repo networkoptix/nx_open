@@ -7,6 +7,11 @@
 
 namespace nx::reflect {
 
+/**
+ * The result of an attempt to deserialize a type from a string (e.g., JSON or urlencoded).
+ * Contains a flag indicating success or failure, an error description, and a fragment of the input
+ * where the error occurred so that it is easier to find an issue in the data.
+ */
 struct NX_REFLECT_API DeserializationResult
 {
     bool success = true;

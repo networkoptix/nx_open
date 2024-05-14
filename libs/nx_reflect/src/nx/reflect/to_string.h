@@ -116,6 +116,13 @@ void toString(const T& value, std::string* str)
 
 } // namespace detail
 
+/**
+ * Converts a value to a string by
+ * - invoking T::toString() if it exists,
+ * - invoking T::toStdString() if it exists,
+ * - invoking toString(T::toBase64()) if it exists,
+ * - converting enum to string if T is an instrumented enum type
+ */
 template<typename T>
 std::string toString(const T& value)
 {

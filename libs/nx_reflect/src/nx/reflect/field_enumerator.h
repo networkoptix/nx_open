@@ -22,6 +22,9 @@ struct Enumerator
 
 //-------------------------------------------------------------------------------------------------
 
+/**
+ * @return list of type's fields' names.
+ */
 template<typename T>
 static constexpr auto listFieldNames()
 {

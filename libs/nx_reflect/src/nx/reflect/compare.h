@@ -72,6 +72,11 @@ private:
 
 } // namespace detail
 
+/**
+ * Equally-compares two objects of the same type by iterating their members instrumented with
+ * nx::reflect. Compares with precision up to the 6th digit for floats and 12th digit for doubles.
+ * TODO: It makes sense to refactor this to 3way comparison.
+ */
 template<typename T>
 bool equals(const T& left, const T& right)
 {

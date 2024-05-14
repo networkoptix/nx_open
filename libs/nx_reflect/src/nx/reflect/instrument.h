@@ -13,7 +13,8 @@
 namespace nx::reflect {
 
 /**
- * Wraps a structure member-variable structure.
+ * Wraps a member-variable of a structure to provide a common programming interface for accessing
+ * structure properties.
  */
 template<typename Class, typename Field>
 class WrappedMemberVariableField
@@ -30,14 +31,17 @@ public:
     {
     }
 
+    // The name of the property set in the constructur. Can be different from the member-variable name.
     constexpr const char* name() const { return m_name; }
 
+    // Set the wrapped member-variable value of the object obj to arg.
     template<typename T>
     void set(Class* obj, T&& arg) const
     {
         obj->*m_fieldPtr = detail::forward<T>(arg);
     }
 
+    // Get the wrapped member-variable value from the object obj.
     auto get(const Class& obj) const
     {
         return obj.*m_fieldPtr;
@@ -53,7 +57,8 @@ private:
 //-------------------------------------------------------------------------------------------------
 
 /**
- * Wraps a class property represented by set and get member functions.
+ * Wraps a class property represented by set and get member functions to provide a common
+ * programming interface for accessing structure properties.
  */
 template<typename Getter, typename Setter>
 class WrappedProperty
@@ -64,11 +69,14 @@ public:
     WrappedProperty(Getter getter, Setter setter, const char* name):
         m_name(name), m_getter(getter), m_setter(setter) {}
 
+    // Get the name of the property set in the constructor.
     const char* name() const { return m_name; }
 
+    // Assign value arg to the wrapped property of obj by invoking the corresponding setter method.
     template<typename Class, typename Arg>
     void set(Class* obj, Arg&& arg) const { (obj->*m_setter)(detail::forward<Arg>(arg)); }
 
+    // Get wrapped property value of obj by invoking the corresponding getter method.
     template<typename Class>
     auto get(const Class& obj) const { return (obj.*m_getter)(); }
 
@@ -161,6 +169,9 @@ constexpr typename BaseOf<T>::Type* toBase(T*)
 
 } // namespace detail
 
+/**
+ * Visits all fields of the instrumented structure. Invokes `visit(const WrapperProperty&)`.
+ */
 template<typename Data, typename Visitor>
 constexpr auto visitAllFields(Visitor&& visit)
 {
@@ -182,7 +193,8 @@ constexpr DummyVisitor dummyVisitor;
 } // namespace detail
 
 /**
- * Checks whether the T is instrumented:
+ * Checks whether the T is instrumented by checking the presense of `nxReflectVisitAllFields(T*)`
+ * declaration. Usage example:
  * if constexpr (nx::reflect::IsInstrumented<Foo>::value) ...
  */
 template<typename T, typename = void>
@@ -216,8 +228,8 @@ constexpr bool IsInstrumentedV = IsInstrumented<U...>::value;
  * NX_REFLECTION_INSTRUMENT(Foo, (val)(str))
  * </code></pre>
  *
- * NOTE: If instrumented type has base_type alias that points to instrumented base,
- * that base fields will be reported.
+ * NOTE: If instrumented type has base_type type name that points to an instrumented base,
+ * then the base's fields will be reported while iterating.
  */
 #define NX_REFLECTION_INSTRUMENT(SELF, FIELDS) \
     template<typename Visitor, typename... Members> \
@@ -244,7 +256,7 @@ constexpr bool IsInstrumentedV = IsInstrumented<U...>::value;
  *
  * NOTE: Visiting can only be done on instantiated template type.
  * NOTE: If instrumented type has base_type alias that points to instrumented base,
- * that base fields will be reported.
+ * then the base's fields will be reported.
  */
 #define NX_REFLECTION_INSTRUMENT_TEMPLATE(SELF, FIELDS) \
     template<typename... Args, typename Visitor, typename... Members> \
@@ -279,7 +291,7 @@ constexpr bool IsInstrumentedV = IsInstrumented<U...>::value;
  * </code></pre>
  *
  * NOTE: If instrumented type has base_type alias that points to instrumented base,
- * that base fields will be reported.
+ * then the base's fields will be reported.
  */
 #define NX_REFLECTION_INSTRUMENT_GSN(SELF, FIELDS) \
     template<typename Visitor, typename... Members> \
