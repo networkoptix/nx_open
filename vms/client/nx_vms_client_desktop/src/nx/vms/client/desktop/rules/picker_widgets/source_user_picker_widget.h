@@ -16,10 +16,10 @@ class SourceUserPicker: public ResourcePickerWidgetBase<vms::rules::SourceUserFi
     Q_OBJECT
 
 public:
-    SourceUserPicker(SystemContext* context, ParamsWidget* parent);
+    SourceUserPicker(
+        vms::rules::SourceUserField* field, SystemContext* context, ParamsWidget* parent);
 
 protected:
-    void onDescriptorSet() override;
     void onSelectButtonClicked() override;
     void updateUi() override;
 

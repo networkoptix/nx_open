@@ -24,18 +24,17 @@ public:
 protected:
     void onSelectButtonClicked() override
     {
-        auto field = theField();
-        auto selectedLayouts = field->value();
+        auto selectedLayouts = m_field->value();
 
         if (!MultipleLayoutSelectionDialog::selectLayouts(selectedLayouts, this))
             return;
 
-        field->setValue(selectedLayouts);
+        m_field->setValue(selectedLayouts);
     }
 
     void updateUi() override
     {
-        const auto layouts = resourcePool()->getResourcesByIds<QnLayoutResource>(theField()->value());
+        const auto layouts = resourcePool()->getResourcesByIds<QnLayoutResource>(m_field->value());
 
         m_selectButton->setForegroundRole(
             !layouts.empty() ? QPalette::BrightText : QPalette::ButtonText);

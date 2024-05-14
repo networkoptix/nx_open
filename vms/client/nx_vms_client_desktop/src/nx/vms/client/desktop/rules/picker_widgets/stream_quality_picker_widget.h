@@ -12,8 +12,12 @@ namespace nx::vms::client::desktop::rules {
 class StreamQualityPicker: public DropdownTextPickerWidgetBase<vms::rules::StreamQualityField>
 {
 public:
-    StreamQualityPicker(SystemContext* context, ParamsWidget* parent):
-        DropdownTextPickerWidgetBase<vms::rules::StreamQualityField>(context, parent)
+    StreamQualityPicker(
+        vms::rules::StreamQualityField* field,
+        SystemContext* context,
+        ParamsWidget* parent)
+        :
+        DropdownTextPickerWidgetBase<vms::rules::StreamQualityField>(field, context, parent)
     {
         QSignalBlocker blocker{m_comboBox};
         using Quality = vms::api::StreamQuality;
@@ -25,12 +29,12 @@ protected:
     void updateUi() override
     {
         QSignalBlocker blocker{m_comboBox};
-        m_comboBox->setCurrentIndex(m_comboBox->findData(QVariant::fromValue(theField()->value())));
+        m_comboBox->setCurrentIndex(m_comboBox->findData(QVariant::fromValue(m_field->value())));
     }
 
     void onCurrentIndexChanged() override
     {
-        theField()->setValue(m_comboBox->currentData().value<vms::api::StreamQuality>());
+        m_field->setValue(m_comboBox->currentData().value<vms::api::StreamQuality>());
     }
 };
 

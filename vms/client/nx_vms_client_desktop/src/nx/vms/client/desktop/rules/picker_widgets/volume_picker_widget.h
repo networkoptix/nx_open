@@ -5,21 +5,18 @@
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QSlider>
 
-#include <nx/vms/client/desktop/window_context_aware.h>
 #include <nx/vms/rules/action_builder_fields/volume_field.h>
 
 #include "field_picker_widget.h"
 
 namespace nx::vms::client::desktop::rules {
 
-class VolumePicker:
-    public PlainFieldPickerWidget<vms::rules::VolumeField>,
-    public WindowContextAware
+class VolumePicker: public PlainFieldPickerWidget<vms::rules::VolumeField>
 {
     Q_OBJECT
 
 public:
-    VolumePicker(WindowContext* context, ParamsWidget* parent);
+    VolumePicker(vms::rules::VolumeField* field, SystemContext* context, ParamsWidget* parent);
 
 private:
     QSlider* m_volumeSlider = nullptr;

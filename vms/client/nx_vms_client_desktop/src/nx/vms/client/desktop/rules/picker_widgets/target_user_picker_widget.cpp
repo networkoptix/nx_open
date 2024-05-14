@@ -24,27 +24,70 @@
 
 namespace nx::vms::client::desktop::rules {
 
+TargetUserPicker::TargetUserPicker(
+    vms::rules::TargetUserField* field,
+    SystemContext* context,
+    ParamsWidget* parent)
+    :
+    ResourcePickerWidgetBase<vms::rules::TargetUserField>{field, context, parent}
+{
+    const auto validationPolicy = field->properties().validationPolicy;
+    const auto allowEmptySelection = field->properties().allowEmptySelection;
+
+    if (validationPolicy == vms::rules::kUserWithEmailValidationPolicy)
+    {
+        m_policy = std::make_unique<QnUserWithEmailValidationPolicy>(
+            systemContext(), allowEmptySelection);
+    }
+    else if (validationPolicy == vms::rules::kCloudUserValidationPolicy)
+    {
+        m_policy = std::make_unique<QnCloudUsersValidationPolicy>(
+            systemContext(), allowEmptySelection);
+    }
+    else if (validationPolicy == vms::rules::kBookmarkManagementValidationPolicy)
+    {
+        m_policy = std::make_unique<QnRequiredAccessRightPolicy>(
+            systemContext(), vms::api::AccessRight::manageBookmarks, allowEmptySelection);
+    }
+    else if (validationPolicy == vms::rules::kLayoutAccessValidationPolicy)
+    {
+        m_policy = std::make_unique<QnLayoutAccessValidationPolicy>(
+            systemContext(), allowEmptySelection);
+    }
+    else
+    {
+        m_policy = std::make_unique<QnDefaultSubjectValidationPolicy>(
+            systemContext(), allowEmptySelection);
+    }
+}
+
 void TargetUserPicker::onSelectButtonClicked()
 {
-    auto field = theField();
-
     ui::SubjectSelectionDialog dialog(this);
-    dialog.setValidationPolicy(m_policy.get());
-    dialog.setCheckedSubjects(field->ids());
-    dialog.setAllUsers(field->acceptAll());
+
+    bool isValidationPolicyRequired = true;
+    if (auto acknowledgeField =
+        getActionField<vms::rules::ActionFlagField>(vms::rules::utils::kAcknowledgeFieldName))
+    {
+        if (!acknowledgeField->value())
+            isValidationPolicyRequired = false;
+    }
+
+    if (isValidationPolicyRequired)
+        dialog.setValidationPolicy(m_policy.get());
+
+    dialog.setCheckedSubjects(m_field->ids());
+    dialog.setAllUsers(m_field->acceptAll());
 
     if (dialog.exec() != QDialog::Accepted)
         return;
 
-    field->setIds(dialog.checkedSubjects());
-    field->setAcceptAll(dialog.allUsers());
+    m_field->setIds(dialog.checkedSubjects());
+    m_field->setAcceptAll(dialog.allUsers());
 }
 
 void TargetUserPicker::updateUi()
 {
-    auto field = theField();
-    createPolicy();
-
     UserPickerHelperParameters helperParameters;
 
     if (const auto additionalRecipients =
@@ -63,8 +106,8 @@ void TargetUserPicker::updateUi()
 
     UserPickerHelper helper{
         systemContext(),
-        field->acceptAll(),
-        field->ids(),
+        m_field->acceptAll(),
+        m_field->ids(),
         m_policy.get(),
         /*isIntermediateStateValid*/ false,
         helperParameters};
@@ -73,40 +116,7 @@ void TargetUserPicker::updateUi()
     m_selectButton->setIcon(helper.icon());
 
     if (auto validator = fieldValidator())
-        setValidity(validator->validity(theField(), parentParamsWidget()->rule(), systemContext()));
-}
-
-void TargetUserPicker::createPolicy()
-{
-    const auto actionId = parentParamsWidget()->descriptor()->id;
-    if (actionId == vms::rules::utils::type<vms::rules::SendEmailAction>())
-    {
-        m_policy = std::make_unique<QnUserWithEmailValidationPolicy>(systemContext());
-    }
-    else if (actionId == vms::rules::utils::type<vms::rules::NotificationAction>())
-    {
-        auto acknowledgeField =
-            getActionField<vms::rules::ActionFlagField>(vms::rules::utils::kAcknowledgeFieldName);
-
-        if (acknowledgeField->value() == true)
-        {
-            m_policy = std::make_unique<QnRequiredAccessRightPolicy>(
-                systemContext(),
-                nx::vms::api::AccessRight::manageBookmarks);
-        }
-        else
-        {
-            m_policy = std::make_unique<QnDefaultSubjectValidationPolicy>(systemContext());
-        }
-    }
-    else if (actionId == vms::rules::utils::type<vms::rules::PushNotificationAction>())
-    {
-        m_policy = std::make_unique<QnCloudUsersValidationPolicy>(systemContext());
-    }
-    else
-    {
-        m_policy = std::make_unique<QnDefaultSubjectValidationPolicy>(systemContext());
-    }
+        setValidity(validator->validity(m_field, parentParamsWidget()->rule(), systemContext()));
 }
 
 } // namespace nx::vms::client::desktop::rules

@@ -9,7 +9,11 @@
 
 namespace nx::vms::client::desktop::rules {
 
-PlainPickerWidget::PlainPickerWidget(SystemContext* context, ParamsWidget* parent):
+PlainPickerWidget::PlainPickerWidget(
+    const QString& displayName,
+    SystemContext* context,
+    ParamsWidget* parent)
+    :
     PickerWidget{context, parent}
 {
     auto mainLayout = new QHBoxLayout{this};
@@ -25,6 +29,7 @@ PlainPickerWidget::PlainPickerWidget(SystemContext* context, ParamsWidget* paren
     m_label->setElideMode(Qt::ElideRight);
     m_label->setFixedHeight(28);
     m_label->setSizePolicy(QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred));
+    m_label->setText(displayName);
     mainLayout->addWidget(m_label);
     mainLayout->setAlignment(m_label, Qt::AlignTop);
 
@@ -58,11 +63,6 @@ void PlainPickerWidget::setValidity(const vms::rules::ValidationResult& validati
 
     if (!validationResult.description.isEmpty())
         m_alertLabel->setText(validationResult.description);
-}
-
-void PlainPickerWidget::onDescriptorSet()
-{
-    m_label->setText(m_fieldDescriptor->displayName);
 }
 
 } // namespace nx::vms::client::desktop::rules

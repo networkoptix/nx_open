@@ -6,6 +6,7 @@
 
 #include <nx/vms/client/desktop/rules/picker_widgets/picker_factory.h>
 #include <nx/vms/client/desktop/style/helper.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/rules/utils/field.h>
 #include <ui/workbench/workbench_context.h>
 
@@ -45,10 +46,12 @@ void EventParametersWidget::onRuleSet()
         if (fieldDescriptor.fieldName == vms::rules::utils::kStateFieldName)
             continue; //< State field is displayed by the action editor.
 
-        if (!fieldDescriptor.properties.value("visible", true).toBool())
+        const auto field = eventFilter()->fieldByName(fieldDescriptor.fieldName);
+        const auto fieldProperties = field->properties();
+        if (!fieldProperties.visible)
             continue;
 
-        PickerWidget* picker = PickerFactory::createWidget(fieldDescriptor, windowContext(), this);
+        PickerWidget* picker = PickerFactory::createWidget(field, windowContext()->system(), this);
         if (picker == nullptr)
             continue;
 

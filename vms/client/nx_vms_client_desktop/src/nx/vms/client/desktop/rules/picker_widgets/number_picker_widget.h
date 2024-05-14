@@ -7,8 +7,8 @@
 
 #include <nx/vms/rules/utils/field.h>
 
+#include "field_picker_widget.h"
 #include "picker_widget_utils.h"
-#include "plain_picker_widget.h"
 
 namespace nx::vms::client::desktop::rules {
 
@@ -18,8 +18,8 @@ class NumberPicker: public PlainFieldPickerWidget<F>
     using base = PlainFieldPickerWidget<F>;
 
 public:
-    NumberPicker(SystemContext* context, ParamsWidget* parent):
-        base(context, parent)
+    NumberPicker(F* field, SystemContext* context, ParamsWidget* parent):
+        base(field, context, parent)
     {
         auto contentLayout = new QHBoxLayout;
 
@@ -44,12 +44,12 @@ protected:
     void updateUi() override
     {
         QSignalBlocker blocker{m_spinBox};
-        m_spinBox->setValue(theField()->value());
+        m_spinBox->setValue(m_field->value());
     }
 
     void onValueChanged(int value)
     {
-        theField()->setValue(value);
+        m_field->setValue(value);
     }
 };
 

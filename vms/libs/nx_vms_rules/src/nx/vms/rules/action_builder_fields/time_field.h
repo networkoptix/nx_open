@@ -5,6 +5,8 @@
 #include <nx/utils/metatypes.h>
 
 #include "../base_fields/simple_type_field.h"
+#include "../common/time_field_properties.h"
+#include "../manifest.h"
 
 namespace nx::vms::rules {
 
@@ -23,6 +25,11 @@ class NX_VMS_RULES_API TimeField:
 
 public:
     using SimpleTypeActionField<std::chrono::microseconds, TimeField>::SimpleTypeActionField;
+
+    TimeFieldProperties properties() const
+    {
+        return TimeFieldProperties::fromVariantMap(descriptor()->properties);
+    }
 
 signals:
     void valueChanged();

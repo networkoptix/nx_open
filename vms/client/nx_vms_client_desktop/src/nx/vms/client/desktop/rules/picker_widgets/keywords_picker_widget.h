@@ -16,30 +16,31 @@ class KeywordsPicker: public OnelineTextPickerWidgetBase<vms::rules::KeywordsFie
     Q_OBJECT
 
 public:
-    using OnelineTextPickerWidgetBase<vms::rules::KeywordsField>::OnelineTextPickerWidgetBase;
-
-protected:
-    void onDescriptorSet() override
+    KeywordsPicker(
+        vms::rules::KeywordsField* field,
+        SystemContext* context,
+        ParamsWidget* parent)
+        :
+        OnelineTextPickerWidgetBase<vms::rules::KeywordsField>{field, context, parent}
     {
-        OnelineTextPickerWidgetBase<vms::rules::KeywordsField>::onDescriptorSet();
-
         m_label->addHintLine(tr(
             "Event will trigger only if there are matches in the source with any of the entered keywords."));
         m_label->addHintLine(tr("If the field is empty, event will always trigger."));
         setHelpTopic(m_label, HelpTopic::Id::EventsActions_Generic);
 
-        m_lineEdit->setPlaceholderText(m_fieldDescriptor->description);
+        m_lineEdit->setPlaceholderText(field->descriptor()->description);
     }
 
+protected:
     void updateUi() override
     {
         const QSignalBlocker blocker{m_lineEdit};
-        m_lineEdit->setText(theField()->string());
+        m_lineEdit->setText(m_field->string());
     }
 
     void onTextChanged(const QString& text) override
     {
-        theField()->setString(text);
+        m_field->setString(text);
     }
 };
 

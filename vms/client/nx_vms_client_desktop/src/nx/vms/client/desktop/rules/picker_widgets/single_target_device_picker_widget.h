@@ -25,8 +25,12 @@ class SingleTargetDevicePicker:
     public ResourcePickerWidgetBase<vms::rules::TargetSingleDeviceField>
 {
 public:
-    SingleTargetDevicePicker(SystemContext* context, ParamsWidget* parent):
-        ResourcePickerWidgetBase<vms::rules::TargetSingleDeviceField>(context, parent)
+    SingleTargetDevicePicker(
+        vms::rules::TargetSingleDeviceField* field,
+        SystemContext* context,
+        ParamsWidget* parent)
+        :
+        ResourcePickerWidgetBase<vms::rules::TargetSingleDeviceField>(field, context, parent)
     {
         if (!Policy::canUseSourceCamera())
             return;
@@ -34,6 +38,8 @@ public:
         auto contentLayout = qobject_cast<QVBoxLayout*>(m_contentWidget->layout());
 
         m_checkBox = new QCheckBox;
+        m_checkBox->setText(ResourcePickerWidgetStrings::useEventSourceString(
+            parentParamsWidget()->descriptor()->id));
 
         contentLayout->addWidget(m_checkBox);
 
@@ -49,37 +55,24 @@ private:
 
     void onSelectButtonClicked() override
     {
-        auto field = theField();
-        auto selectedCameras = UuidSet{field->id()};
+        auto selectedCameras = UuidSet{m_field->id()};
 
         if (!CameraSelectionDialog::selectCameras<Policy>(selectedCameras, this))
             return;
 
-        field->setId(*selectedCameras.begin());
-        field->setUseSource(false);
-    }
-
-    void onDescriptorSet() override
-    {
-        ResourcePickerWidgetBase<vms::rules::TargetSingleDeviceField>::onDescriptorSet();
-
-        if (Policy::canUseSourceCamera())
-        {
-            m_checkBox->setText(ResourcePickerWidgetStrings::useEventSourceString(
-                parentParamsWidget()->descriptor()->id));
-        }
+        m_field->setId(*selectedCameras.begin());
+        m_field->setUseSource(false);
     }
 
     void updateUi() override
     {
-        auto field = theField();
         const auto canUseSource = Policy::canUseSourceCamera();
         const auto hasSource = vms::rules::hasSourceCamera(*parentParamsWidget()->eventDescriptor());
-        const auto useSource = field->useSource();
+        const auto useSource = m_field->useSource();
 
         if (canUseSource && useSource && !hasSource)
         {
-            field->setUseSource(false);
+            m_field->setUseSource(false);
             return;
         }
 
@@ -95,7 +88,7 @@ private:
         else
         {
             const auto camera =
-                resourcePool()->template getResourceById<QnVirtualCameraResource>(field->id());
+                resourcePool()->template getResourceById<QnVirtualCameraResource>(m_field->id());
 
             m_selectButton->setText(Policy::getText({camera}));
             m_selectButton->setIcon(core::Skin::maximumSizePixmap(
@@ -119,12 +112,12 @@ private:
     {
         if (m_checkBox->isChecked())
         {
-            theField()->setUseSource(true);
-            theField()->setId({});
+            m_field->setUseSource(true);
+            m_field->setId({});
         }
         else
         {
-            theField()->setUseSource(false);
+            m_field->setUseSource(false);
         }
     }
 

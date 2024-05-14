@@ -32,8 +32,8 @@ class OnelineTextPickerWidgetBase: public PlainFieldPickerWidget<F>
     using base = PlainFieldPickerWidget<F>;
 
 public:
-    OnelineTextPickerWidgetBase(SystemContext* context, ParamsWidget* parent):
-        PlainFieldPickerWidget<F>(context, parent)
+    OnelineTextPickerWidgetBase(F* field, SystemContext* context, ParamsWidget* parent):
+        PlainFieldPickerWidget<F>(field, context, parent)
     {
         auto contentLayout = new QHBoxLayout;
 
@@ -64,8 +64,8 @@ class OnelineTextPickerWidgetCommon: public OnelineTextPickerWidgetBase<F>
     using base = OnelineTextPickerWidgetBase<F>;
 
 public:
-    OnelineTextPickerWidgetCommon(SystemContext* context, ParamsWidget* parent):
-        OnelineTextPickerWidgetBase<F>(context, parent)
+    OnelineTextPickerWidgetCommon(F* field, SystemContext* context, ParamsWidget* parent):
+        OnelineTextPickerWidgetBase<F>(field, context, parent)
     {
         if (std::is_same<F, vms::rules::PasswordField>())
             m_lineEdit->setEchoMode(QLineEdit::Password);
@@ -77,16 +77,16 @@ protected:
 
     void updateUi() override
     {
-        if (m_lineEdit->text() == theField()->value())
+        if (m_lineEdit->text() == m_field->value())
             return;
 
         const QSignalBlocker blocker{m_lineEdit};
-        m_lineEdit->setText(theField()->value());
+        m_lineEdit->setText(m_field->value());
     }
 
     void onTextChanged(const QString& text) override
     {
-        theField()->setValue(text);
+        m_field->setValue(text);
     }
 };
 

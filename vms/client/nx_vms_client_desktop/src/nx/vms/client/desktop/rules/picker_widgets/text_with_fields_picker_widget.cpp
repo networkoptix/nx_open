@@ -48,9 +48,6 @@ struct TextWithFieldsPicker::Private: public QObject
 
     void addFormattingToText(const vms::rules::TextWithFields::ParsedValues& parsedValues)
     {
-        if (!NX_ASSERT(q->theField()))
-            return;
-
         if (q->m_textEdit->toPlainText().isEmpty())
             return;
 
@@ -121,8 +118,12 @@ struct TextWithFieldsPicker::Private: public QObject
     }
 };
 
-TextWithFieldsPicker::TextWithFieldsPicker(SystemContext* context, ParamsWidget* parent):
-    base(context, parent),
+TextWithFieldsPicker::TextWithFieldsPicker(
+    vms::rules::TextWithFields* field,
+    SystemContext* context,
+    ParamsWidget* parent)
+    :
+    base(field, context, parent),
     d(new Private(this))
 {
     d->completer = new Completer{nullptr, m_textEdit, this};
@@ -134,13 +135,10 @@ TextWithFieldsPicker::~TextWithFieldsPicker()
 
 void TextWithFieldsPicker::updateUi()
 {
-    if (!theField())
-        return;
-
     const auto desc = getEventDescriptor();
     if (!d->connected && desc)
     {
-        connect(theField(),
+        connect(m_field,
             &nx::vms::rules::TextWithFields::parseFinished,
             d.get(),
             &TextWithFieldsPicker::Private::addFormattingToText);
@@ -150,7 +148,7 @@ void TextWithFieldsPicker::updateUi()
 
     base::updateUi();
     d->updateCompleterModel(desc);
-    theField()->parseText();
+    m_field->parseText();
 }
 
 } // namespace nx::vms::client::desktop::rules

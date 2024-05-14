@@ -16,12 +16,11 @@ class TitledPickerWidget: public PickerWidget
     Q_OBJECT
 
 public:
-    TitledPickerWidget(SystemContext* context, ParamsWidget* parent);
+    TitledPickerWidget(const QString& displayName, SystemContext* context, ParamsWidget* parent);
 
     void setCheckBoxEnabled(bool value);
     void setChecked(bool value);
     bool isChecked() const;
-
     void setReadOnly(bool value) override;
 
     virtual void setValidity(const vms::rules::ValidationResult& validationResult);
@@ -33,8 +32,6 @@ protected:
     QLabel* m_alertLabel{nullptr};
 
     virtual void onEnabledChanged(bool isEnabled);
-
-    void onDescriptorSet() override;
 };
 
 } // namespace nx::vms::client::desktop::rules

@@ -28,6 +28,9 @@ EventTypePickerWidget::EventTypePickerWidget(SystemContext* context, QWidget* pa
         if (!vms::rules::utils::hasItemSupportedServer(servers, eventDescriptor))
             continue;
 
+        if (eventDescriptor.flags.testFlag(vms::rules::ItemFlag::system))
+            continue;
+
         ui->eventTypeComboBox->addItem(eventDescriptor.displayName, eventDescriptor.id);
     }
 

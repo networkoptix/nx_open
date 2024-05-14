@@ -8,25 +8,20 @@
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/event_rules/subject_selection_dialog.h>
-#include <nx/vms/rules/events/soft_trigger_event.h>
-#include <nx/vms/rules/utils/type.h>
 #include <ui/widgets/select_resources_button.h>
 
 #include "../utils/user_picker_helper.h"
 
 namespace nx::vms::client::desktop::rules {
 
-SourceUserPicker::SourceUserPicker(SystemContext* context, ParamsWidget* parent):
-    ResourcePickerWidgetBase<vms::rules::SourceUserField>(context, parent)
+SourceUserPicker::SourceUserPicker(
+    vms::rules::SourceUserField* field,
+    SystemContext* context,
+    ParamsWidget* parent)
+    :
+    ResourcePickerWidgetBase<vms::rules::SourceUserField>(field, context, parent)
 {
-}
-
-void SourceUserPicker::onDescriptorSet()
-{
-    ResourcePickerWidgetBase<vms::rules::SourceUserField>::onDescriptorSet();
-
-    if (nx::vms::rules::utils::type<nx::vms::rules::SoftTriggerEvent>()
-        == parentParamsWidget()->descriptor()->id)
+    if (field->properties().validationPolicy == vms::rules::kUserInputValidationPolicy)
     {
         m_validationPolicy = std::make_unique<QnRequiredAccessRightPolicy>(
             systemContext(),
@@ -40,27 +35,24 @@ void SourceUserPicker::onDescriptorSet()
 
 void SourceUserPicker::onSelectButtonClicked()
 {
-    auto field = theField();
-
     ui::SubjectSelectionDialog dialog(this);
-    dialog.setCheckedSubjects(field->ids());
-    dialog.setAllUsers(field->acceptAll());
+    dialog.setCheckedSubjects(m_field->ids());
+    dialog.setAllUsers(m_field->acceptAll());
     dialog.setValidationPolicy(m_validationPolicy.get());
 
     if (dialog.exec() == QDialog::Rejected)
         return;
 
-    field->setAcceptAll(dialog.allUsers());
-    field->setIds(dialog.checkedSubjects());
+    m_field->setAcceptAll(dialog.allUsers());
+    m_field->setIds(dialog.checkedSubjects());
 }
 
 void SourceUserPicker::updateUi()
 {
-    auto field = theField();
     UserPickerHelper helper{
         systemContext(),
-        field->acceptAll(),
-        field->ids(),
+        m_field->acceptAll(),
+        m_field->ids(),
         m_validationPolicy.get(),
         /*isIntermediateStateValid*/ false};
 
@@ -68,7 +60,7 @@ void SourceUserPicker::updateUi()
     m_selectButton->setIcon(helper.icon());
 
     if (auto validator = fieldValidator())
-        setValidity(validator->validity(theField(), parentParamsWidget()->rule(), systemContext()));
+        setValidity(validator->validity(m_field, parentParamsWidget()->rule(), systemContext()));
 }
 
 } // namespace nx::vms::client::desktop::rules

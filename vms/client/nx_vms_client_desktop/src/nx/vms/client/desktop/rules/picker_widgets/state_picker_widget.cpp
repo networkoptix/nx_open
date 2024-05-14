@@ -6,9 +6,14 @@
 
 namespace nx::vms::client::desktop::rules {
 
-void StatePicker::onDescriptorSet()
+StatePicker::StatePicker(
+    vms::rules::StateField* field,
+    SystemContext* context,
+    ParamsWidget* parent)
+    :
+    DropdownTextPickerWidgetBase<vms::rules::StateField>{field, context, parent}
 {
-    QSignalBlocker blocker{m_comboBox};
+    m_label->setText({});
 
     const auto itemFlags = parentParamsWidget()->eventDescriptor()->flags;
     if (itemFlags.testFlag(vms::rules::ItemFlag::instant))
@@ -32,12 +37,12 @@ void StatePicker::onDescriptorSet()
 void StatePicker::updateUi()
 {
     QSignalBlocker blocker{m_comboBox};
-    m_comboBox->setCurrentIndex(m_comboBox->findData(QVariant::fromValue(theField()->value())));
+    m_comboBox->setCurrentIndex(m_comboBox->findData(QVariant::fromValue(m_field->value())));
 }
 
 void StatePicker::onCurrentIndexChanged()
 {
-    theField()->setValue(m_comboBox->currentData().value<api::rules::State>());
+    m_field->setValue(m_comboBox->currentData().value<api::rules::State>());
 }
 
 } // namespace nx::vms::client::desktop::rules

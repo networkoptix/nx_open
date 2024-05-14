@@ -40,12 +40,6 @@ public:
 protected:
     virtual void onRuleSet() = 0;
 
-    /**
-     * Returns field descriptor by the field name from the item descriptor set. If there is
-     * no such a field in the item descriptor returns nullopt.
-     */
-    std::optional<vms::rules::FieldDescriptor> fieldDescriptor(const QString& fieldName) const;
-
 private:
     void setupLineEditsPlaceholderColor();
 

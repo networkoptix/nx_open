@@ -17,9 +17,35 @@ class FieldPickerWidget: public P
     static_assert(std::is_base_of<PickerWidget, P>());
 
 public:
-    using P::P;
+    using field_type = F;
+
+    template<
+        typename BaseWidget = P,
+        typename std::enable_if_t<
+            std::is_same_v<BaseWidget, PlainPickerWidget>
+                || std::is_same_v<BaseWidget, TitledPickerWidget>, bool> = true>
+    FieldPickerWidget(F* field, SystemContext* context, ParamsWidget* parent)
+        :
+        P(field->descriptor()->displayName, context, parent),
+        m_field{field}
+    {
+        NX_ASSERT(m_field);
+    }
+
+    template<
+        typename BaseWidget = P,
+        typename std::enable_if_t<std::is_same_v<BaseWidget, PickerWidget>, bool> = true>
+    FieldPickerWidget(F* field, SystemContext* context, ParamsWidget* parent)
+        :
+        P(context, parent),
+        m_field{field}
+    {
+        NX_ASSERT(m_field);
+    }
 
 protected:
+    F* m_field{nullptr};
+
     template<typename T>
     T* getActionField(const QString& name) const
     {
@@ -42,29 +68,9 @@ protected:
         return P::parentParamsWidget()->actionDescriptor();
     }
 
-    F* theField() const
-    {
-        auto field = theFieldImpl<F>();
-        NX_ASSERT(field);
-        return field;
-    }
-
     vms::rules::FieldValidator* fieldValidator()
     {
-        return P::systemContext()->vmsRulesEngine()->fieldValidator(theField()->metatype());
-    }
-
-private:
-    template<typename T = F, typename std::enable_if<std::is_base_of<vms::rules::ActionBuilderField, T>::value, void>::type* = nullptr>
-    F* theFieldImpl() const
-    {
-        return getActionField<F>(P::m_fieldDescriptor->fieldName);
-    }
-
-    template<typename T = F, typename std::enable_if<std::is_base_of<vms::rules::EventFilterField, T>::value, void>::type* = nullptr>
-    F* theFieldImpl() const
-    {
-        return getEventField<F>(P::m_fieldDescriptor->fieldName);
+        return P::systemContext()->vmsRulesEngine()->fieldValidator(m_field->metatype());
     }
 };
 

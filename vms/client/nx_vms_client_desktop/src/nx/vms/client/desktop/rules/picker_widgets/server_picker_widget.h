@@ -31,13 +31,12 @@ protected:
 
     void onSelectButtonClicked() override
     {
-        auto field = theField();
-        auto selectedServers = field->ids();
+        auto selectedServers = m_field->ids();
 
         if (ServerSelectionDialog::selectServers(
             selectedServers, Policy::isServerValid, Policy::infoText(), this))
         {
-            field->setIds(selectedServers);
+            m_field->setIds(selectedServers);
             updateUi();
         }
     }
@@ -50,14 +49,14 @@ public:
     using ServerPickerWidgetBase<vms::rules::SourceServerField, Policy>::ServerPickerWidgetBase;
 
 protected:
-    using ServerPickerWidgetBase<vms::rules::SourceServerField, Policy>::theField;
+    using ServerPickerWidgetBase<vms::rules::SourceServerField, Policy>::m_field;
     using ServerPickerWidgetBase<vms::rules::SourceServerField, Policy>::m_selectButton;
     using ServerPickerWidgetBase<vms::rules::SourceServerField, Policy>::resourcePool;
 
     void updateUi() override
     {
         const auto resources =
-            resourcePool()->template getResourcesByIds<QnMediaServerResource>(theField()->ids());
+            resourcePool()->template getResourcesByIds<QnMediaServerResource>(m_field->ids());
 
         QIcon icon;
         if (resources.isEmpty())
@@ -90,31 +89,30 @@ public:
     using ServerPickerWidgetBase<vms::rules::TargetServerField, Policy>::ServerPickerWidgetBase;
 
 protected:
-    using ServerPickerWidgetBase<vms::rules::TargetServerField, Policy>::theField;
+    using ServerPickerWidgetBase<vms::rules::TargetServerField, Policy>::m_field;
     using ServerPickerWidgetBase<vms::rules::TargetServerField, Policy>::m_selectButton;
     using ServerPickerWidgetBase<vms::rules::TargetServerField, Policy>::resourcePool;
 
     void updateUi() override
     {
-        auto field = theField();
         const auto resources =
-            resourcePool()->template getResourcesByIds<QnMediaServerResource>(field->ids());
+            resourcePool()->template getResourcesByIds<QnMediaServerResource>(m_field->ids());
 
         QIcon icon;
         if (resources.isEmpty())
         {
             icon = icon = qnResIconCache->icon(QnResourceIconCache::Server);
-            m_selectButton->setText(field->useSource()
+            m_selectButton->setText(m_field->useSource()
                 ? ServerPickerStrings::sourceServerString(resources.size())
                 : ServerPickerStrings::selectServerString());
         }
         else
         {
-            m_selectButton->setText(field->useSource()
+            m_selectButton->setText(m_field->useSource()
                 ? ServerPickerStrings::sourceServerString(resources.size())
                 : ServerPickerStrings::multipleServersString(resources.size()));
 
-            icon = (resources.size() > 1 || field->useSource())
+            icon = (resources.size() > 1 || m_field->useSource())
                 ? qnResIconCache->icon(QnResourceIconCache::Servers)
                 : qnResIconCache->icon(QnResourceIconCache::Server);
         }

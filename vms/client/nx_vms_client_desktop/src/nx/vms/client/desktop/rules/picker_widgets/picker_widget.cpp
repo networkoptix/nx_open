@@ -18,23 +18,6 @@ PickerWidget::PickerWidget(SystemContext* context, ParamsWidget* parent):
 {
 }
 
-void PickerWidget::setDescriptor(const FieldDescriptor& descriptor)
-{
-    m_fieldDescriptor = descriptor;
-
-    onDescriptorSet();
-}
-
-std::optional<FieldDescriptor> PickerWidget::descriptor() const
-{
-    return m_fieldDescriptor;
-}
-
-bool PickerWidget::hasDescriptor() const
-{
-    return m_fieldDescriptor != std::nullopt;
-}
-
 ParamsWidget* PickerWidget::parentParamsWidget() const
 {
     return dynamic_cast<ParamsWidget*>(parent());

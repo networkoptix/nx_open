@@ -66,8 +66,13 @@ struct HttpAuthPicker::Private
     }
 };
 
-HttpAuthPicker::HttpAuthPicker(SystemContext* context, ParamsWidget* parent):
-    base(context, parent), d(new HttpAuthPicker::Private())
+HttpAuthPicker::HttpAuthPicker(
+    vms::rules::HttpAuthField* field,
+    SystemContext* context,
+    ParamsWidget* parent)
+    :
+    base(field, context, parent),
+    d(new HttpAuthPicker::Private())
 {
     auto mainLayout = new QVBoxLayout{this};
     d->comboBox = new QComboBox;
@@ -95,7 +100,7 @@ HttpAuthPicker::HttpAuthPicker(SystemContext* context, ParamsWidget* parent):
     d->comboBox->addItem(d->digestStr);
     d->comboBox->addItem(d->basicStr);
 
-    // All connectors, which can cause call of the `theField()`,
+    // All connectors, which can cause call of the `m_field`,
     // must be created after all object initializations to avoid segfault on uninitialized field.
     connect(d->comboBox,
         &QComboBox::currentIndexChanged,
@@ -112,17 +117,17 @@ HttpAuthPicker::~HttpAuthPicker()
 
 void HttpAuthPicker::onLoginChanged(const QString& text)
 {
-    theField()->setLogin(text.toStdString());
+    m_field->setLogin(text.toStdString());
 }
 
 void HttpAuthPicker::onPasswordChanged(const QString& text)
 {
-    theField()->setPassword(text.toStdString());
+    m_field->setPassword(text.toStdString());
 }
 
 void HttpAuthPicker::onTokenChanged(const QString& text)
 {
-    theField()->setToken(text.toStdString());
+    m_field->setToken(text.toStdString());
 }
 
 void HttpAuthPicker::updateUi()
@@ -132,7 +137,7 @@ void HttpAuthPicker::updateUi()
     QSignalBlocker blockerPassword{d->password};
     QSignalBlocker blockerToken{d->token};
 
-    const auto fieldValue = theField()->authType();
+    const auto fieldValue = m_field->authType();
     switch (fieldValue)
     {
         case nx::network::http::AuthType::authBearer:
@@ -152,20 +157,20 @@ void HttpAuthPicker::updateUi()
     d->loginPasswordGroup->setVisible(!isBearer);
     d->tokenGroup->setVisible(isBearer);
 
-    d->login->setText(QString::fromStdString(theField()->login()));
-    d->password->setText(QString::fromStdString(theField()->password()));
-    d->token->setText(QString::fromStdString(theField()->token()));
+    d->login->setText(QString::fromStdString(m_field->login()));
+    d->password->setText(QString::fromStdString(m_field->password()));
+    d->token->setText(QString::fromStdString(m_field->token()));
 }
 
 void HttpAuthPicker::onCurrentIndexChanged(int /*index*/)
 {
     const auto value = d->comboBox->currentText().trimmed();
     if (value == d->bearerStr)
-        theField()->setAuthType(nx::network::http::AuthType::authBearer);
+        m_field->setAuthType(nx::network::http::AuthType::authBearer);
     else if (value == d->basicStr)
-        theField()->setAuthType(nx::network::http::AuthType::authBasic);
+        m_field->setAuthType(nx::network::http::AuthType::authBasic);
     else //< Auto and digest type.
-        theField()->setAuthType(nx::network::http::AuthType::authDigest);
+        m_field->setAuthType(nx::network::http::AuthType::authDigest);
 
     const bool isBearer = value == d->bearerStr;
     d->loginPasswordGroup->setVisible(!isBearer);
@@ -175,10 +180,6 @@ void HttpAuthPicker::onCurrentIndexChanged(int /*index*/)
 void HttpAuthPicker::setReadOnly(bool value)
 {
     setEnabled(!value);
-}
-
-void HttpAuthPicker::onDescriptorSet()
-{
 }
 
 } // namespace nx::vms::client::desktop::rules

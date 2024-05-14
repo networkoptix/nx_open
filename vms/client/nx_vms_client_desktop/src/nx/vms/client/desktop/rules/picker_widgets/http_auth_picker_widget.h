@@ -15,14 +15,11 @@ class HttpAuthPicker: public FieldPickerWidget<vms::rules::HttpAuthField, Picker
     using base = FieldPickerWidget<vms::rules::HttpAuthField, PickerWidget>;
 
 public:
-    HttpAuthPicker(SystemContext* context, ParamsWidget* parent);
+    HttpAuthPicker(vms::rules::HttpAuthField* field, SystemContext* context, ParamsWidget* parent);
     virtual ~HttpAuthPicker() override;
 
     void setReadOnly(bool value) override;
     void updateUi() override;
-
-protected:
-    void onDescriptorSet() override;
 
 private:
     struct Private;
