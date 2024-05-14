@@ -2283,6 +2283,15 @@ ConditionWrapper isDeviceAccessRelevant(nx::vms::api::AccessRights requiredAcces
         });
 }
 
+ConditionWrapper isRemoteArchiveSynchronizationEnabled()
+{
+    return new CustomBoolCondition(
+        [](const Parameters& /*parameters*/, WindowContext* /*context*/)
+        {
+            return ini().enableRemoteArchiveSynchronization;
+        });
+}
+
 ConditionWrapper virtualCameraUploadEnabled()
 {
     return new VirtualCameraCondition(
