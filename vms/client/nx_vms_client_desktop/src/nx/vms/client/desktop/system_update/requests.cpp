@@ -60,7 +60,7 @@ static void patchUpdateInfoFromOldServer(common::update::Information& updateInfo
 
 UpdateContents getUpdateContents(
     rest::ServerConnectionPtr proxyConnection,
-    const utils::Url& url,
+    const nx::utils::Url& url,
     const common::update::UpdateInfoParams& params,
     const bool skipVersionEqualToCurrent)
 {

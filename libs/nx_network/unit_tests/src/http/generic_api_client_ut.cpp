@@ -41,7 +41,7 @@ class GenericApiClientChild:
 public:
     using base_type = http::GenericApiClient<>;
 
-    GenericApiClientChild(const utils::Url& baseApiUrl):
+    GenericApiClientChild(const nx::utils::Url& baseApiUrl):
         http::GenericApiClient<>(baseApiUrl, nx::network::ssl::kAcceptAnyCertificate)
     {}
 

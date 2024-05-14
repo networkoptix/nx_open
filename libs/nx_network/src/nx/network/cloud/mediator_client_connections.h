@@ -32,19 +32,19 @@ public:
 
     virtual void resolveDomain(
         nx::hpm::api::ResolveDomainRequest resolveData,
-        utils::MoveOnlyFunc<void(
+        nx::utils::MoveOnlyFunc<void(
             nx::hpm::api::ResultCode,
             nx::hpm::api::ResolveDomainResponse)> completionHandler) = 0;
 
     virtual void resolvePeer(
         nx::hpm::api::ResolvePeerRequest resolveData,
-        utils::MoveOnlyFunc<void(
+        nx::utils::MoveOnlyFunc<void(
             nx::hpm::api::ResultCode,
             nx::hpm::api::ResolvePeerResponse)> completionHandler) = 0;
 
     virtual void connect(
         nx::hpm::api::ConnectRequest connectData,
-        utils::MoveOnlyFunc<void(
+        nx::utils::MoveOnlyFunc<void(
             network::stun::TransportHeader /*stunTransportHeader*/,
             nx::hpm::api::ResultCode,
             nx::hpm::api::ConnectResponse)> completionHandler) = 0;
@@ -94,14 +94,14 @@ public:
     }
 
     template<typename Request>
-    void send(Request request, utils::MoveOnlyFunc<void(nx::hpm::api::ResultCode)> handler)
+    void send(Request request, nx::utils::MoveOnlyFunc<void(nx::hpm::api::ResultCode)> handler)
     {
         this->doRequest(std::move(request), std::move(handler));
     }
 
     virtual void resolveDomain(
         nx::hpm::api::ResolveDomainRequest resolveData,
-        utils::MoveOnlyFunc<void(
+        nx::utils::MoveOnlyFunc<void(
             nx::hpm::api::ResultCode,
             nx::hpm::api::ResolveDomainResponse)> completionHandler) override
     {
@@ -112,7 +112,7 @@ public:
 
     virtual void resolvePeer(
         nx::hpm::api::ResolvePeerRequest resolveData,
-        utils::MoveOnlyFunc<void(
+        nx::utils::MoveOnlyFunc<void(
             nx::hpm::api::ResultCode,
             nx::hpm::api::ResolvePeerResponse)> completionHandler) override
     {
@@ -123,7 +123,7 @@ public:
 
     virtual void connect(
         nx::hpm::api::ConnectRequest connectData,
-        utils::MoveOnlyFunc<void(
+        nx::utils::MoveOnlyFunc<void(
             network::stun::TransportHeader /*stunTransportHeader*/,
             nx::hpm::api::ResultCode,
             nx::hpm::api::ConnectResponse)> completionHandler) override

@@ -44,7 +44,7 @@ void AsyncClientWithHttpTunneling::bindToAioThread(
         m_httpTunnelingClient->bindToAioThread(aioThread);
 }
 
-void AsyncClientWithHttpTunneling::connect(const utils::Url& url, ConnectHandler handler)
+void AsyncClientWithHttpTunneling::connect(const nx::utils::Url& url, ConnectHandler handler)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     m_url = url;
@@ -196,7 +196,7 @@ void AsyncClientWithHttpTunneling::closeConnection(SystemError::ErrorCode reason
 
 void AsyncClientWithHttpTunneling::cancelHandlers(
     void* client,
-    utils::MoveOnlyFunc<void()> handler)
+    nx::utils::MoveOnlyFunc<void()> handler)
 {
     post(
         [this, client, handler = std::move(handler)]() mutable

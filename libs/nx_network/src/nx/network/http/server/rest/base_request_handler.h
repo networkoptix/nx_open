@@ -98,7 +98,7 @@ public:
 
     type operator()(const network::http::RequestContext& requestContext) const
     {
-        return nx::network::util::getHostName(requestContext, "Host");
+        return nx::network::utils::getHostName(requestContext, "Host");
     }
 };
 

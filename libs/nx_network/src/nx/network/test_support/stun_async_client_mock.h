@@ -61,7 +61,7 @@ public:
         requestHandler(std::move(request), std::move(handler));
     }
 
-    virtual void cancelHandlers(void*, utils::MoveOnlyFunc<void()> handler) override
+    virtual void cancelHandlers(void*, nx::utils::MoveOnlyFunc<void()> handler) override
     {
         handler();
     }

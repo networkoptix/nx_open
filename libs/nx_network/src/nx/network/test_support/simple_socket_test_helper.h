@@ -386,7 +386,7 @@ void socketTransferFragmentation(
 {
     // On localhost TCP connection small packets usually transferred entirely,
     // so that we expect the same behavior for all our stream sockets.
-    static const Buffer kMessage(utils::random::generate(100));
+    static const Buffer kMessage(nx::utils::random::generate(100));
     static const size_t kTestRuns = TestOptions::applyLoadMode<size_t>(5);
 
     auto server = serverMaker();

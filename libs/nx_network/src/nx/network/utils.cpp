@@ -2,7 +2,7 @@
 
 #include "utils.h"
 
-namespace nx::network::util {
+namespace nx::network::utils {
 
 std::optional<std::string> getHostName(
     const http::RequestContext& request, const std::string& hostHeader /* = "Host" */)
@@ -16,4 +16,4 @@ std::optional<std::string> getHostName(
     return headerIt->second.substr(0, colonIt);
 }
 
-} // namespace nx::network::util
+} // namespace nx::network::utils

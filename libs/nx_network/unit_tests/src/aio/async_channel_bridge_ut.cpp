@@ -148,9 +148,9 @@ protected:
 
 private:
     nx::Buffer m_originalData;
-    std::unique_ptr<utils::bstream::AbstractInput> m_leftSource;
+    std::unique_ptr<nx::utils::bstream::AbstractInput> m_leftSource;
     utils::bstream::test::NotifyingOutput m_leftDest;
-    std::unique_ptr<utils::bstream::AbstractInput> m_rightSource;
+    std::unique_ptr<nx::utils::bstream::AbstractInput> m_rightSource;
     utils::bstream::test::NotifyingOutput m_rightDest;
     std::unique_ptr<aio::AsyncChannelBridge> m_bridge;
     std::unique_ptr<AsyncChannel> m_leftFile;

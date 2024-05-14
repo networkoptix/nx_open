@@ -43,7 +43,7 @@ public:
     virtual network::aio::AbstractAioThread* getAioThread() const override;
     network:: SocketAddress getForeignAddress() const override;
     virtual void start(
-        utils::MoveOnlyFunc<void(SystemError::ErrorCode)> onStart = nullptr) override;
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> onStart = nullptr) override;
 
     // For tests.
     static void setPingTimeout(std::optional<std::chrono::milliseconds> pingTimeout);
@@ -58,7 +58,7 @@ private:
         PostBodySource(network::websocket::FrameType messageType, const nx::Buffer& data);
 
         using CompletionHandler =
-            utils::MoveOnlyFunc<void(SystemError::ErrorCode, nx::Buffer)>;
+            nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, nx::Buffer)>;
         virtual std::string mimeType() const override;
         virtual std::optional<uint64_t> contentLength() const override;
         virtual void readAsync(CompletionHandler completionHandler) override;
@@ -85,10 +85,10 @@ private:
     UserReadHandlerPair m_userReadHandlerPair;
     network::websocket::FrameType m_messageType;
     bool m_failed = false;
-    utils::Url m_url;
+    nx::utils::Url m_url;
     utils::InterruptionFlag m_destructionFlag;
     nx::String m_connectionGuid;
-    utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_onStartHandler;
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_onStartHandler;
     std::optional<std::chrono::milliseconds> m_pingTimeout;
     network::aio::Timer m_pingTimer;
     network::aio::Timer m_inactivityTimer;

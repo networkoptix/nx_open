@@ -695,7 +695,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         [] { return tr("Max thread count for remote archive synchronization (<=0 - auto, max 32)"); });
 
     d->customReleaseListUrlAdaptor = new QnLexicalResourcePropertyAdaptor<utils::Url>(
-        "customReleaseListUrl", utils::Url(), this,
+        "customReleaseListUrl", nx::utils::Url(), this,
         [] { return tr("Update releases.json file URL"); });
 
     d->targetUpdateInformationAdaptor = new QnLexicalResourcePropertyAdaptor<QByteArray>(

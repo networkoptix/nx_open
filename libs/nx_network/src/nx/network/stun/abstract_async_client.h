@@ -42,7 +42,7 @@ public:
     using IndicationHandler = std::function<void(Message)>;
     using ReconnectHandler = std::function<void()>;
     using OnConnectionClosedHandler = nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)>;
-    using RequestHandler = utils::MoveOnlyFunc<void(SystemError::ErrorCode, Message)>;
+    using RequestHandler = nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, Message)>;
     using TimerHandler = std::function<void()>;
 
     /**
@@ -119,7 +119,7 @@ public:
      * Cancels all handlers, passed with client.
      */
     virtual void cancelHandlers(
-        void* client, utils::MoveOnlyFunc<void()> handler) = 0;
+        void* client, nx::utils::MoveOnlyFunc<void()> handler) = 0;
 
     /**
      * If called in object's AIO thread then cancels immediately and without blocking.

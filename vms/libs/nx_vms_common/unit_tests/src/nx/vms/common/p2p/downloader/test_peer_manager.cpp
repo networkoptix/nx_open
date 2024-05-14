@@ -203,7 +203,7 @@ AbstractPeerManager::RequestContextPtr<QVector<QByteArray>> TestPeerManager::req
 AbstractPeerManager::RequestContextPtr<nx::Buffer> TestPeerManager::downloadChunk(
     const nx::Uuid& peerId,
     const QString& fileName,
-    const utils::Url &url,
+    const nx::utils::Url &url,
     int chunkIndex,
     int chunkSize,
     qint64 /*fileSize*/)
@@ -500,7 +500,7 @@ AbstractPeerManager::RequestContextPtr<QVector<QByteArray>> ProxyTestPeerManager
 AbstractPeerManager::RequestContextPtr<nx::Buffer> ProxyTestPeerManager::downloadChunk(
     const nx::Uuid& peerId,
     const QString& fileName,
-    const utils::Url &url,
+    const nx::utils::Url &url,
     int chunkIndex,
     int chunkSize,
     qint64 fileSize)

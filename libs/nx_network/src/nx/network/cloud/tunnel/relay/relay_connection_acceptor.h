@@ -28,7 +28,7 @@ class NX_NETWORK_API ReverseConnection:
 
 public:
     ReverseConnection(
-        const utils::Url& relayUrl,
+        const nx::utils::Url& relayUrl,
         std::optional<std::chrono::milliseconds> connectTimeout,
         std::optional<int> forcedHttpTunnelType);
 
@@ -108,7 +108,7 @@ class NX_NETWORK_API ConnectionAcceptor:
     using base_type = AbstractConnectionAcceptor;
 
 public:
-    ConnectionAcceptor(const utils::Url& relayUrl);
+    ConnectionAcceptor(const nx::utils::Url& relayUrl);
 
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
@@ -154,7 +154,7 @@ public:
     static ConnectionAcceptorFactory& instance();
 
 private:
-    std::unique_ptr<AbstractConnectionAcceptor> defaultFactoryFunc(const utils::Url &relayUrl);
+    std::unique_ptr<AbstractConnectionAcceptor> defaultFactoryFunc(const nx::utils::Url &relayUrl);
 };
 
 } // namespace nx::network::cloud::relay

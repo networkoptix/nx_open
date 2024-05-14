@@ -69,7 +69,7 @@ AbstractPeerManager::RequestContextPtr<QVector<QByteArray>> InternetOnlyPeerMana
 AbstractPeerManager::RequestContextPtr<nx::Buffer> InternetOnlyPeerManager::downloadChunk(
     const nx::Uuid& peerId,
     const QString& /*fileName*/,
-    const utils::Url& url,
+    const nx::utils::Url& url,
     int chunkIndex,
     int chunkSize,
     qint64 fileSize)

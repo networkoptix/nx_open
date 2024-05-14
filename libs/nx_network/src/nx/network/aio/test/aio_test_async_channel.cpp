@@ -8,8 +8,8 @@ namespace aio {
 namespace test {
 
 AsyncChannel::AsyncChannel(
-    utils::bstream::AbstractInput* input,
-    utils::bstream::AbstractOutput* output,
+    nx::utils::bstream::AbstractInput* input,
+    nx::utils::bstream::AbstractOutput* output,
     InputDepletionPolicy inputDepletionPolicy)
     :
     m_input(input),

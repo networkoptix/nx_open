@@ -34,7 +34,7 @@ protected:
  */
 inline int runTest(
     int argc, const char* argv[],
-    utils::test::InitFunction extraInit = nullptr,
+    nx::utils::test::InitFunction extraInit = nullptr,
     int socketGlobalsFlags = 0,
     int gtestRunFlags = 0)
 {
@@ -51,7 +51,7 @@ inline int runTest(
     for (const auto& arg: args)
         newArgv.push_back(arg.c_str());
 
-    return utils::test::runTest(
+    return nx::utils::test::runTest(
         newArgv.size(), newArgv.data(),
         [extraInit = std::move(extraInit), socketGlobalsFlags](
             const ArgumentParser& args)
@@ -65,7 +65,7 @@ inline int runTest(
             SocketGlobals::cloud().outgoingTunnelPool().assignOwnPeerId("ut", nx::Uuid::createUuid());
             cloud::OutgoingTunnelPool::ignoreOwnPeerIdChange();
 
-            utils::test::DeinitFunctions deinitFunctions;
+            nx::utils::test::DeinitFunctions deinitFunctions;
             if (extraInit)
                 deinitFunctions = extraInit(args);
 
@@ -89,7 +89,7 @@ inline int runTest(
 
 inline int runTest(
     int argc, char* argv[],
-    utils::test::InitFunction extraInit = nullptr,
+    nx::utils::test::InitFunction extraInit = nullptr,
     int socketGlobalsFlags = 0,
     int gtestRunFlags = 0)
 {

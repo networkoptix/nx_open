@@ -13,7 +13,7 @@ namespace bstream {
 namespace test {
 
 class NX_UTILS_API NotifyingOutput:
-    public utils::bstream::AbstractOutput
+    public nx::utils::bstream::AbstractOutput
 {
 public:
     virtual int write(const void* data, size_t count) override;

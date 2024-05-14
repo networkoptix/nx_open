@@ -41,7 +41,7 @@ class NX_NETWORK_API UdpClient:
     using BaseType = network::aio::BasicPollable;
 
 public:
-    typedef utils::MoveOnlyFunc<void(
+    typedef nx::utils::MoveOnlyFunc<void(
         SystemError::ErrorCode errorCode,
         Message response)> RequestCompletionHandler;
 

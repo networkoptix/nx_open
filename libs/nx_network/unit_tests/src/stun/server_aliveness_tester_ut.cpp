@@ -37,7 +37,7 @@ public:
 
     virtual void cancelHandlers(
         void* /*client*/,
-        utils::MoveOnlyFunc<void()> /*handler*/) override
+        nx::utils::MoveOnlyFunc<void()> /*handler*/) override
     {
     }
 

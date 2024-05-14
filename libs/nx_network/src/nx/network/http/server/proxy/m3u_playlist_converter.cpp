@@ -9,7 +9,7 @@ namespace nx::network::http::server::proxy {
 
 M3uPlaylistConverter::M3uPlaylistConverter(
     const AbstractUrlRewriter& urlRewriter,
-    const utils::Url& proxyHostUrl,
+    const nx::utils::Url& proxyHostUrl,
     const std::string& targetHost)
     :
     m_urlRewriter(urlRewriter),

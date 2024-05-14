@@ -150,7 +150,7 @@ void StreamTransformingAsyncChannel::processReadTask(ReadTask* task)
     const auto bufferSizeBak = task->buffer->size();
     task->buffer->resize(task->buffer->capacity());
     std::tie(sysErrorCode, bytesRead) = invokeConverter(
-        std::bind(&utils::bstream::Converter::read, m_converter,
+        std::bind(&nx::utils::bstream::Converter::read, m_converter,
             task->buffer->data() + bufferSizeBak,
             task->buffer->capacity() - bufferSizeBak));
     if (sysErrorCode == SystemError::wouldBlock)
@@ -182,7 +182,7 @@ void StreamTransformingAsyncChannel::processWriteTask(WriteTask* task)
     const auto rawWriteQueueSizeBak = m_rawWriteQueue.size();
 
     std::tie(sysErrorCode, bytesWritten) = invokeConverter(
-        std::bind(&utils::bstream::Converter::write, m_converter,
+        std::bind(&nx::utils::bstream::Converter::write, m_converter,
             task->buffer->data(),
             task->buffer->size()));
     if (sysErrorCode == SystemError::wouldBlock)

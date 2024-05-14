@@ -25,9 +25,9 @@ Credentials Credentials::parseColon(const QString& value, bool hidePassword)
     if (const auto colon = value.indexOf(':'); colon >= 0)
     {
         return {value.left(colon),
-            hidePassword ? utils::Url::kMaskedPassword : value.mid(colon + 1)};
+            hidePassword ? nx::utils::Url::kMaskedPassword : value.mid(colon + 1)};
     }
-    return {value, hidePassword ? utils::Url::kMaskedPassword : QString()};
+    return {value, hidePassword ? nx::utils::Url::kMaskedPassword : QString()};
 }
 
 bool Credentials::isEmpty() const

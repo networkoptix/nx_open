@@ -78,7 +78,7 @@ ClientFactory& ClientFactory::instance()
 
 std::vector<std::unique_ptr<BaseTunnelClient>> ClientFactory::defaultFactoryFunction(
     const std::string& tag,
-    const utils::Url& baseUrl,
+    const nx::utils::Url& baseUrl,
     std::optional<int> forcedTunnelType)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);

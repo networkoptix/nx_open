@@ -61,22 +61,22 @@ NxGlobalsObject::NxGlobalsObject(QObject* parent):
 
 utils::Url NxGlobalsObject::url(const QString& url) const
 {
-    return utils::Url(url);
+    return nx::utils::Url(url);
 }
 
 utils::Url NxGlobalsObject::url(const QUrl& url) const
 {
-    return utils::Url::fromQUrl(url);
+    return nx::utils::Url::fromQUrl(url);
 }
 
 nx::utils::Url NxGlobalsObject::urlFromUserInput(const QString& url) const
 {
-    return utils::Url::fromUserInput(url);
+    return nx::utils::Url::fromUserInput(url);
 }
 
 nx::utils::Url NxGlobalsObject::emptyUrl() const
 {
-    return utils::Url();
+    return nx::utils::Url();
 }
 
 QModelIndex NxGlobalsObject::invalidModelIndex() const

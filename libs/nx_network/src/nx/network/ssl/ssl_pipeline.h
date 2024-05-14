@@ -32,7 +32,7 @@ using VerifyCertificateChainCallback = nx::utils::MoveOnlyFunc<
  * NOTE: Not thread-safe.
  */
 class NX_NETWORK_API Pipeline:
-    public utils::bstream::Converter
+    public nx::utils::bstream::Converter
 {
 public:
     /**
@@ -56,9 +56,9 @@ public:
     /**
      * NOTE: SSL pipeline does not recover from any I/O error because openssl supports
      * retrying write only with the same data. That does not conform to
-     * utils::bstream::AbstractOutput.
+     * nx::utils::bstream::AbstractOutput.
      * So, even after wouldBlock write error, next write will always produce non-recoverable
-     * failure. Though, it conforms to utils::bstream::AbstractOutput.
+     * failure. Though, it conforms to nx::utils::bstream::AbstractOutput.
      */
     virtual int write(const void* data, size_t size) override;
     virtual int read(void* data, size_t size) override;

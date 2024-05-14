@@ -323,12 +323,12 @@ utils::MacAddress getMacByIP(const QHostAddress& ip, bool net)
         hr = SendARP(ipAddr, 0, pulMac, &ulLen);
 
         if (ulLen == 0)
-            return utils::MacAddress();
+            return nx::utils::MacAddress();
 
-        return utils::MacAddress::fromRawData((unsigned char*)pulMac);
+        return nx::utils::MacAddress::fromRawData((unsigned char*)pulMac);
     }
 
-    utils::MacAddress res;
+    nx::utils::MacAddress res;
 
     // from memory
     unsigned long ulSize = 0;
@@ -345,7 +345,7 @@ utils::MacAddress getMacByIP(const QHostAddress& ip, bool net)
             QString wip = QString::fromLatin1(inet_ntoa(addr)); // ### NLS support?
             if (wip == ip.toString())
             {
-                res = utils::MacAddress::fromRawData((unsigned char*)(mtb->table[i].bPhysAddr));
+                res = nx::utils::MacAddress::fromRawData((unsigned char*)(mtb->table[i].bPhysAddr));
                 break;
             }
         }
@@ -360,7 +360,7 @@ utils::MacAddress getMacByIP(const QHostAddress& ip, bool net)
 #if defined(Q_OS_IOS)
 utils::MacAddress getMacByIP(const QHostAddress& /*ip*/, bool /*net*/)
 {
-    return utils::MacAddress();
+    return nx::utils::MacAddress();
 }
 #else // defined(Q_OS_IOS)
 
@@ -382,18 +382,18 @@ utils::MacAddress getMacByIP(const QHostAddress& ip, bool /*net*/)
     if (sysctl(mib, 6, NULL, &needed, NULL, 0) < 0)
     {
         NX_ERROR(kLogTag, "sysctl: route-sysctl-estimate error");
-        return utils::MacAddress();
+        return nx::utils::MacAddress();
     }
 
     if ((buf = (char*)malloc(needed)) == NULL)
     {
-        return utils::MacAddress();
+        return nx::utils::MacAddress();
     }
 
     if (sysctl(mib, 6, buf, &needed, NULL, 0) < 0)
     {
         NX_ERROR(kLogTag, "actual retrieval of routing table failed");
-        return utils::MacAddress();
+        return nx::utils::MacAddress();
     }
 
     lim = buf + needed;
@@ -411,7 +411,7 @@ utils::MacAddress getMacByIP(const QHostAddress& ip, bool /*net*/)
             if (ip.toIPv4Address() == ntohl(sinarp->sin_addr.s_addr))
             {
                 free(buf);
-                return utils::MacAddress::fromRawData((unsigned char*)LLADDR(sdl));
+                return nx::utils::MacAddress::fromRawData((unsigned char*)LLADDR(sdl));
             }
         }
 
@@ -420,7 +420,7 @@ utils::MacAddress getMacByIP(const QHostAddress& ip, bool /*net*/)
 
     free(buf);
 
-    return utils::MacAddress();
+    return nx::utils::MacAddress();
 }
 
 #endif
@@ -433,7 +433,7 @@ utils::MacAddress getMacByIP(const QHostAddress& ip, bool /*net*/)
     const auto it = std::find_if(interfaceList.begin(), interfaceList.end(),
         [&ip](const auto& iface) { return iface.isHostBelongToIpv4Network(ip); });
     if (it == interfaceList.end())
-        return utils::MacAddress(); //< Can't proceed without interface name.
+        return nx::utils::MacAddress(); //< Can't proceed without interface name.
 
     arpreq req;
     memset(&req, 0, sizeof(req));
@@ -450,13 +450,13 @@ utils::MacAddress getMacByIP(const QHostAddress& ip, bool /*net*/)
             if (req.arp_flags & ATF_COM)
             {
                 auto rawData = (const unsigned char*) &req.arp_ha.sa_data[0];
-                return utils::MacAddress::fromRawData(rawData);
+                return nx::utils::MacAddress::fromRawData(rawData);
             }
         }
         close(s);
     }
 
-    return utils::MacAddress();
+    return nx::utils::MacAddress();
 }
 
 #endif
