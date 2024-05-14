@@ -176,6 +176,16 @@ T fromString(const std::string_view& str, T defaultValue, bool* ok = nullptr)
     return res ? val : defaultValue;
 }
 
+/**
+ * Converts str to T using the following methods (if present):
+ * bool fromString(const StringType&, T*);
+ * T T::fromString(const StringType&);
+ * T T::fromStdString(const StringType&);
+ * T T::fromBase64(const StringType&);
+ * `StringType` can be either `std::string` or `std::string_view`.
+ * @return true if the conversion was successful. Note that not every underlying conversion method
+ * provides result.
+ */
 template<typename T>
 bool fromString(const std::string_view& str, T* result)
 {

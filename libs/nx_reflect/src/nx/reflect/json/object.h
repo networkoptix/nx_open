@@ -11,12 +11,6 @@ namespace nx::reflect::json {
 
 namespace detail {
 
-/**
- * Regular JSON object.
- * It extends std::unordered_map by adding a way to use any reflectable type as value.
- * Note: inheriting std::unordered_map is needed to make the class reflectable since
- * NX_REFLECTION_INSTRUMENT macro requires a type with strictly defined fields.
- */
 class NX_REFLECT_API Object:
     public std::unordered_map<std::string, RawJsonText>
 {
@@ -49,6 +43,12 @@ public:
 
 } // namespace detail
 
+/**
+ * Regular JSON object.
+ * It extends std::unordered_map by adding a way to use any reflectable type as value.
+ * Note: inheriting std::unordered_map is needed to make the class reflectable since
+ * NX_REFLECTION_INSTRUMENT macro requires a type with strictly defined fields.
+ */
 using Object = detail::Object;
 
 } // namespace nx::reflect::json
