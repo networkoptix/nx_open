@@ -44,8 +44,9 @@ struct ObjectAction
     QString name;
 
     QList<QString> supportedObjectTypeIds;
+    /**%apidoc[opt] */
     QJsonObject parametersModel;
-
+    /**%apidoc[opt] */
     ObjectActionRequirements requirements;
 
     bool operator==(const ObjectAction& other) const = default;
