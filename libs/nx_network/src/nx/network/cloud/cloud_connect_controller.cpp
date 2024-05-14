@@ -177,7 +177,7 @@ void CloudConnectController::applySettings()
     if (!m_impl->settings.forcedMediatorUrl.empty())
     {
         mediatorConnector().mockupMediatorAddress({
-            utils::Url(m_impl->settings.forcedMediatorUrl),
+            nx::utils::Url(m_impl->settings.forcedMediatorUrl),
             url::getEndpoint(utils::Url(m_impl->settings.forcedMediatorUrl))});
     }
 

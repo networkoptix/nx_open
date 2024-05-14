@@ -1348,7 +1348,7 @@ Handle ServerConnection::getCameraCredentials(
                 {
                     success = QJson::deserialize(result, &resultObject)
                         && resultObject.credentials.has_value()
-                        && resultObject.credentials->password != utils::Url::kMaskedPassword;
+                        && resultObject.credentials->password != nx::utils::Url::kMaskedPassword;
                 }
 
                 QAuthenticator credentials;

@@ -37,14 +37,14 @@ void IncomingControlConnection::bindToAioThread(aio::AbstractAioThread* aioThrea
 }
 
 void IncomingControlConnection::setErrorHandler(
-    utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
 {
     NX_ASSERT(m_socket->isInSelfAioThread());
     m_errorHandler = std::move(handler);
 }
 
 void IncomingControlConnection::start(
-    utils::MoveOnlyFunc<void()> selectedHandler)
+    nx::utils::MoveOnlyFunc<void()> selectedHandler)
 {
     NX_ASSERT(m_socket->isInSelfAioThread());
     m_selectedHandler = std::move(selectedHandler);

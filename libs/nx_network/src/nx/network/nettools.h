@@ -95,9 +95,9 @@ NX_NETWORK_API QList<HostAddress> allLocalAddresses(AddressFilters filter);
  */
 NX_NETWORK_API void setInterfaceListFilter(const QList<QHostAddress>& ifList);
 
-NX_NETWORK_API utils::MacAddress getMacByIP(const QString& host, bool net = true);
+NX_NETWORK_API nx::utils::MacAddress getMacByIP(const QString& host, bool net = true);
 
-NX_NETWORK_API utils::MacAddress getMacByIP(const QHostAddress& ip, bool net = true);
+NX_NETWORK_API nx::utils::MacAddress getMacByIP(const QHostAddress& ip, bool net = true);
 
 // TODO: #akolesnikov Remove this method if favor of AddressResolver.
 NX_NETWORK_API QHostAddress resolveAddress(const QString& addr);

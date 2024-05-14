@@ -23,7 +23,7 @@ class NX_NETWORK_API OutgoingTunnelConnection:
 
 public:
     OutgoingTunnelConnection(
-        utils::Url relayUrl,
+        nx::utils::Url relayUrl,
         std::string relaySessionId,
         std::unique_ptr<nx::cloud::relay::api::AbstractClient> relayApiClient);
 

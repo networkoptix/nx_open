@@ -24,7 +24,7 @@ ClientFactory& ClientFactory::instance()
 }
 
 std::unique_ptr<AbstractClient> ClientFactory::defaultFactoryFunction(
-    const utils::Url& baseUrl,
+    const nx::utils::Url& baseUrl,
     std::optional<int> forcedHttpTunnelType)
 {
     return std::make_unique<ClientOverHttpTunnel>(baseUrl, forcedHttpTunnelType);

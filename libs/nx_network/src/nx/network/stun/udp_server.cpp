@@ -71,7 +71,7 @@ SocketAddress UdpServer::address() const
 void UdpServer::sendMessage(
     SocketAddress destinationEndpoint,
     const Message& message,
-    utils::MoveOnlyFunc<void(SystemError::ErrorCode)> completionHandler)
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> completionHandler)
 {
     m_messagePipeline.sendMessage(
         std::move(destinationEndpoint), message,

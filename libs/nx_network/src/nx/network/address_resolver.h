@@ -27,7 +27,7 @@ class NX_NETWORK_API AddressResolver:
 public:
     static constexpr auto kDnsCacheTimeout = std::chrono::seconds(10);
 
-    using ResolveHandler = utils::MoveOnlyFunc<void(
+    using ResolveHandler = nx::utils::MoveOnlyFunc<void(
         SystemError::ErrorCode, std::deque<AddressEntry>)>;
 
     AddressResolver();

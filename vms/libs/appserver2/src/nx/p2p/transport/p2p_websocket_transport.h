@@ -30,7 +30,7 @@ public:
     virtual void pleaseStopSync() override;
     virtual network::SocketAddress getForeignAddress() const override;
     virtual void start(
-        utils::MoveOnlyFunc<void(SystemError::ErrorCode)> onStart = nullptr) override;
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> onStart = nullptr) override;
 
     virtual QString lastErrorMessage() const override;
 private:

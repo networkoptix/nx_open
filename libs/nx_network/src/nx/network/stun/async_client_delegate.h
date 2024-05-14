@@ -47,7 +47,7 @@ public:
     virtual void closeConnection(SystemError::ErrorCode errorCode) override;
 
     virtual void cancelHandlers(
-        void* client, utils::MoveOnlyFunc<void()> handler) override;
+        void* client, nx::utils::MoveOnlyFunc<void()> handler) override;
 
     virtual void cancelHandlersSync(void* client) override;
 

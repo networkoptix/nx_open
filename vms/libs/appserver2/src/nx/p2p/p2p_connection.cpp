@@ -24,7 +24,7 @@ Connection::Connection(
     const nx::Uuid& remoteId,
     nx::vms::api::PeerType remotePeerType,
     const vms::api::PeerDataEx& localPeer,
-    const utils::Url &remotePeerUrl,
+    const nx::utils::Url &remotePeerUrl,
     std::unique_ptr<QObject> opaqueObject,
     ConnectionLockGuard connectionLockGuard,
     ValidateRemotePeerFunc validateRemotePeerFunc)

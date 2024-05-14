@@ -34,8 +34,8 @@ public:
     using IoState = std::tuple<SystemError::ErrorCode, size_t /*bytes*/>;
 
     AsyncChannel(
-        utils::bstream::AbstractInput* input,
-        utils::bstream::AbstractOutput* output,
+        nx::utils::bstream::AbstractInput* input,
+        nx::utils::bstream::AbstractOutput* output,
         InputDepletionPolicy inputDepletionPolicy);
     virtual ~AsyncChannel() override;
 
@@ -72,8 +72,8 @@ protected:
     virtual void cancelIoInAioThread(EventType eventType) override;
 
 private:
-    utils::bstream::AbstractInput* m_input;
-    utils::bstream::AbstractOutput* m_output;
+    nx::utils::bstream::AbstractInput* m_input;
+    nx::utils::bstream::AbstractOutput* m_output;
     InputDepletionPolicy m_inputDepletionPolicy;
     std::optional<IoState> m_readErrorState;
     std::optional<IoState> m_sendErrorState;

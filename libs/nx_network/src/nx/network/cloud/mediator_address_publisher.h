@@ -31,7 +31,7 @@ public:
 
     void updateAddresses(
         std::vector<SocketAddress> addresses,
-        utils::MoveOnlyFunc<void(nx::hpm::api::ResultCode)> updateHandler = nullptr);
+        nx::utils::MoveOnlyFunc<void(nx::hpm::api::ResultCode)> updateHandler = nullptr);
 
 private:
     void publishAddressesIfNeeded();
@@ -44,7 +44,7 @@ private:
     std::vector<SocketAddress> m_serverAddresses;
     std::vector<SocketAddress> m_publishedAddresses;
     std::unique_ptr<hpm::api::MediatorServerTcpConnection> m_mediatorConnection;
-    std::list<utils::MoveOnlyFunc<void(nx::hpm::api::ResultCode)>> m_updateHandlers;
+    std::list<nx::utils::MoveOnlyFunc<void(nx::hpm::api::ResultCode)>> m_updateHandlers;
     std::unique_ptr<aio::Timer> m_retryTimer;
     hpm::api::AbstractCloudSystemCredentialsProvider* m_cloudCredentialsProvider = nullptr;
 

@@ -35,7 +35,7 @@ public:
      * onGetRequestReceived() callback is fired.
      */
     virtual void start(
-        utils::MoveOnlyFunc<void(SystemError::ErrorCode)> onGetRequestReceived) override;
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> onGetRequestReceived) override;
 
     virtual void readSomeAsync(
         nx::Buffer* const buffer,
@@ -82,7 +82,7 @@ private:
     bool m_firstSend = true;
     network::aio::Timer m_pingTimer;
     network::aio::Timer m_inactivityTimer;
-    utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_onGetRequestReceived = nullptr;
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_onGetRequestReceived = nullptr;
     bool m_failed = false;
     utils::InterruptionFlag m_destructionFlag;
     UserReadHandlerPair m_userReadHandlerPair;

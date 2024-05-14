@@ -69,8 +69,8 @@ private:
     const std::chrono::milliseconds m_maxKeepAliveInterval;
 
     std::chrono::steady_clock::time_point m_lastKeepAliveTime;
-    utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_errorHandler;
-    utils::MoveOnlyFunc<void()> m_selectedHandler;
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_errorHandler;
+    nx::utils::MoveOnlyFunc<void()> m_selectedHandler;
 
     Buffer m_recvBuffer;
     Buffer m_sendBuffer;

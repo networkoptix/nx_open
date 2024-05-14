@@ -24,8 +24,8 @@ class Context;
 namespace detail {
 
 class NX_NETWORK_API StreamSocketToTwoWayPipelineAdapter:
-    public utils::bstream::AbstractInput,
-    public utils::bstream::AbstractOutput
+    public nx::utils::bstream::AbstractInput,
+    public nx::utils::bstream::AbstractOutput
 {
 public:
     StreamSocketToTwoWayPipelineAdapter(
@@ -153,7 +153,7 @@ private:
     std::unique_ptr<AbstractStreamSocket> m_delegate;
     std::unique_ptr<ssl::Pipeline> m_sslPipeline;
     std::unique_ptr<detail::StreamSocketToTwoWayPipelineAdapter> m_socketToPipelineAdapter;
-    utils::bstream::ProxyConverter m_proxyConverter;
+    nx::utils::bstream::ProxyConverter m_proxyConverter;
     nx::Buffer m_emptyBuffer;
     aio::Timer m_handshakeTimer;
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_handshakeHandler;

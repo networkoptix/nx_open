@@ -48,7 +48,7 @@ P2PHttpServerTransport::P2PHttpServerTransport(
 }
 
 void P2PHttpServerTransport::start(
-    utils::MoveOnlyFunc<void(SystemError::ErrorCode)> onGetRequestReceived)
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> onGetRequestReceived)
 {
     m_onGetRequestReceived = std::move(onGetRequestReceived);
     m_sendSocket->readSomeAsync(

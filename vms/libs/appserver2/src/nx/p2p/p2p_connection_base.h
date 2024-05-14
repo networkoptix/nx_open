@@ -150,7 +150,7 @@ public:
 
     QObject* opaqueObject();
 
-    virtual utils::Url remoteAddr() const override;
+    virtual nx::utils::Url remoteAddr() const override;
     void pleaseStopSync();
 
     virtual bool validateRemotePeerData(const vms::api::PeerDataEx& /*peer*/) const { return true; }

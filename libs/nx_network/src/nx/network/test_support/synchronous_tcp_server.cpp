@@ -118,7 +118,7 @@ void BasicSynchronousReceivingServer::processConnection(AbstractStreamSocket* co
 
 SynchronousReceivingServer::SynchronousReceivingServer(
     std::unique_ptr<AbstractStreamServerSocket> serverSocket,
-    utils::bstream::AbstractOutput* synchronousServerReceivedData)
+    nx::utils::bstream::AbstractOutput* synchronousServerReceivedData)
     :
     base_type(std::move(serverSocket)),
     m_synchronousServerReceivedData(synchronousServerReceivedData)

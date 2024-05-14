@@ -70,7 +70,7 @@ protected:
 //-------------------------------------------------------------------------------------------------
 
 /**
- * Reads socket and pushes all received data to utils::bstream::AbstractOutput.
+ * Reads socket and pushes all received data to nx::utils::bstream::AbstractOutput.
  */
 class NX_NETWORK_API SynchronousReceivingServer:
     public BasicSynchronousReceivingServer
@@ -80,7 +80,7 @@ class NX_NETWORK_API SynchronousReceivingServer:
 public:
     SynchronousReceivingServer(
         std::unique_ptr<AbstractStreamServerSocket> serverSocket,
-        utils::bstream::AbstractOutput* synchronousServerReceivedData);
+        nx::utils::bstream::AbstractOutput* synchronousServerReceivedData);
 
 protected:
     virtual void processDataReceived(
@@ -89,7 +89,7 @@ protected:
         int dataSize) override;
 
 private:
-    utils::bstream::AbstractOutput* m_synchronousServerReceivedData = nullptr;
+    nx::utils::bstream::AbstractOutput* m_synchronousServerReceivedData = nullptr;
 };
 
 //-------------------------------------------------------------------------------------------------

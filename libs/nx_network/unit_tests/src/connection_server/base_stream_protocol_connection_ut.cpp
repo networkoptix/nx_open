@@ -20,7 +20,7 @@ namespace nx::network::server::test {
 namespace {
 
 class DummyOutput:
-    public utils::bstream::AbstractOutput
+    public nx::utils::bstream::AbstractOutput
 {
 public:
     virtual int write(const void* /*data*/, size_t count) override

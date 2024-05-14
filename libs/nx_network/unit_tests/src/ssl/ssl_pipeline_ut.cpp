@@ -43,7 +43,7 @@ public:
     }
 
     void insertBetweenClientAndServer(
-        std::unique_ptr<utils::bstream::AbstractOutputConverter> stream)
+        std::unique_ptr<nx::utils::bstream::AbstractOutputConverter> stream)
     {
         m_betweenClientAndServer = std::move(stream);
 
@@ -109,9 +109,9 @@ public:
 private:
     utils::bstream::Pipe m_clientToServerPipeline;
     utils::bstream::Pipe m_serverToClientPipeline;
-    std::unique_ptr<utils::bstream::AbstractTwoWayConverter> m_clientPipeline;
-    std::unique_ptr<utils::bstream::AbstractTwoWayConverter> m_serverPipeline;
-    std::unique_ptr<utils::bstream::AbstractOutputConverter> m_betweenClientAndServer;
+    std::unique_ptr<nx::utils::bstream::AbstractTwoWayConverter> m_clientPipeline;
+    std::unique_ptr<nx::utils::bstream::AbstractTwoWayConverter> m_serverPipeline;
+    std::unique_ptr<nx::utils::bstream::AbstractOutputConverter> m_betweenClientAndServer;
     const int m_maxBytesToWrite;
     std::size_t m_clientToServerTotalBytesThrough;
     std::size_t m_serverToClientTotalBytesThrough;
@@ -121,7 +121,7 @@ private:
  * Invokes handler when pipelined wrapped writes any data to the output pipeline.
  */
 class NotifyingTwoWayPipelineWrapper:
-    public utils::bstream::AbstractTwoWayConverter
+    public nx::utils::bstream::AbstractTwoWayConverter
 {
 public:
     using DataWrittenEventHandler = nx::utils::MoveOnlyFunc<void(const void*, size_t)>;
@@ -174,7 +174,7 @@ private:
 };
 
 class FailingOutputStream:
-    public utils::bstream::AbstractOutputConverter
+    public nx::utils::bstream::AbstractOutputConverter
 {
 public:
     int write(const void* data, size_t count)

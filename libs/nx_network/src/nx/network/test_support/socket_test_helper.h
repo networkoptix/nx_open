@@ -279,7 +279,7 @@ public:
     size_t totalBytesSent() const;
     size_t totalBytesReceived() const;
     size_t totalIncompleteTasks() const;
-    const utils::ResultCounter<SystemError::ErrorCode>& results();
+    const nx::utils::ResultCounter<SystemError::ErrorCode>& results();
 
     void setSocketFactory(SocketFactoryFunc func);
     void setConfigureNewSocketFunc(ConfigureSocketFunc func);
@@ -303,7 +303,7 @@ private:
     size_t m_totalBytesSent;
     size_t m_totalBytesReceived;
     size_t m_totalIncompleteTasks;
-    utils::ResultCounter<SystemError::ErrorCode> m_results;
+    nx::utils::ResultCounter<SystemError::ErrorCode> m_results;
     size_t m_totalConnectionsEstablished;
     std::set<int> m_finishedConnectionsIDs;
     std::optional<SocketAddress> m_localAddress;

@@ -14,7 +14,7 @@ namespace aio {
 namespace test {
 
 class Converter:
-    public utils::bstream::Converter
+    public nx::utils::bstream::Converter
 {
 public:
     int write(const void* data, size_t count)

@@ -34,7 +34,7 @@ class NX_NETWORK_API DnsResolver
 {
 public:
     using RequestId = void*;
-    using Handler = utils::MoveOnlyFunc<void(SystemError::ErrorCode, std::deque<HostAddress>)>;
+    using Handler = nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, std::deque<HostAddress>)>;
 
     static constexpr int kDefaultResolveThreadCount = 4;
 

@@ -81,7 +81,7 @@ std::variant<T, FetchError> fetchJson(const nx::utils::Url& url)
 
 } // namespace
 
-FetchReleasesResult fetchReleasesInfo(const utils::Url& url)
+FetchReleasesResult fetchReleasesInfo(const nx::utils::Url& url)
 {
     return fetchJson<ReleasesInfo>(url);
 }
@@ -165,7 +165,7 @@ FetchPublicationInfoResult fetchPublicationInfo(
 }
 
 FetchPublicationInfoResult fetchLegacyPublicationInfo(
-    const nx::utils::SoftwareVersion& version, const utils::Url& urlPrefix)
+    const nx::utils::SoftwareVersion& version, const nx::utils::Url& urlPrefix)
 {
     // Legacy versions don't have full version in URLs.
     auto publicationUrlPath = urlPrefix.path() + nx::format("/%1/", version.build);

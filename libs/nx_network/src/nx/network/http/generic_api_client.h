@@ -59,7 +59,7 @@ class GenericApiClient:
     using ResultType = typename ApiResultCodeDescriptor::ResultCode;
 
 public:
-    GenericApiClient(const utils::Url& baseApiUrl, ssl::AdapterFunc adapterFunc);
+    GenericApiClient(const nx::utils::Url& baseApiUrl, ssl::AdapterFunc adapterFunc);
     ~GenericApiClient();
 
     virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) override;
@@ -137,7 +137,7 @@ protected:
 protected:
     virtual void stopWhileInAioThread() override;
 
-    const utils::Url& baseApiUrl() const;
+    const nx::utils::Url& baseApiUrl() const;
 
 private:
     struct Context
@@ -168,7 +168,7 @@ private:
     {
     };
 
-    const utils::Url m_baseApiUrl;
+    const nx::utils::Url m_baseApiUrl;
     ssl::AdapterFunc m_adapterFunc;
     std::map<network::aio::BasicPollable*, Context> m_activeRequests;
     nx::Mutex m_mutex;
@@ -246,7 +246,7 @@ public:
 
 template<HasResultCodeT ApiResultCodeDescriptor, typename Base>
 GenericApiClient<ApiResultCodeDescriptor, Base>::GenericApiClient(
-    const utils::Url& baseApiUrl,
+    const nx::utils::Url& baseApiUrl,
     ssl::AdapterFunc adapterFunc)
     :
     m_baseApiUrl(baseApiUrl),
@@ -432,7 +432,7 @@ auto GenericApiClient<ApiResultCodeDescriptor, Base>::makeSyncCall(InputArgs&&..
 }
 
 template<HasResultCodeT ApiResultCodeDescriptor, typename Base>
-const utils::Url& GenericApiClient<ApiResultCodeDescriptor, Base>::baseApiUrl() const
+const nx::utils::Url& GenericApiClient<ApiResultCodeDescriptor, Base>::baseApiUrl() const
 {
     return m_baseApiUrl;
 }

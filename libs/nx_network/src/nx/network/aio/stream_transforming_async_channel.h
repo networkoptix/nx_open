@@ -33,7 +33,7 @@ using UserIoHandler = IoCompletionHandler;
 
 /**
  * Delegates read/write calls to the wrapped AbstractAsyncChannel
- *   moving data through utils::bstream::Converter first.
+ *   moving data through nx::utils::bstream::Converter first.
  * WARNING: Converter MUST NOT generate wouldBlock error by itself before
  *   invoking underlying input/output. Otherwise, behavior is undefined.
  *   Effectively, that means conversion cannot change size of data.
@@ -124,8 +124,8 @@ private:
     BasicPollable m_sendScheduler;
     std::function<void(SystemError::ErrorCode, size_t)> m_userReadHandler;
     std::function<void(SystemError::ErrorCode, size_t)> m_userWriteHandler;
-    std::unique_ptr<utils::bstream::AbstractInput> m_inputPipeline;
-    std::unique_ptr<utils::bstream::AbstractOutput> m_outputPipeline;
+    std::unique_ptr<nx::utils::bstream::AbstractInput> m_inputPipeline;
+    std::unique_ptr<nx::utils::bstream::AbstractOutput> m_outputPipeline;
     std::deque<std::shared_ptr<UserTask>> m_userTaskQueue;
     nx::Buffer m_rawDataReadBuffer;
     std::deque<nx::Buffer> m_readRawData;

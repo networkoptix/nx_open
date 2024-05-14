@@ -26,7 +26,7 @@ public:
 
     virtual nx::utils::Url originalResourceUrlToProxyUrl(
         const nx::utils::Url& originalResourceUrl,
-        const utils::Url& proxyHostUrl,
+        const nx::utils::Url& proxyHostUrl,
         const std::string& targetHost) const = 0;
 };
 

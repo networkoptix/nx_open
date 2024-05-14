@@ -212,7 +212,7 @@ void MessageBus::stop()
 void MessageBus::addOutgoingConnectionToPeer(
     const nx::Uuid& peer,
     nx::vms::api::PeerType peerType,
-    const utils::Url &_url,
+    const nx::utils::Url &_url,
     std::optional<nx::network::http::Credentials> credentials,
     nx::network::ssl::AdapterFunc adapterFunc)
 {

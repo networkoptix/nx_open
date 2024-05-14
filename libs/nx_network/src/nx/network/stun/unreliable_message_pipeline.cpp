@@ -70,7 +70,7 @@ std::unique_ptr<AbstractDatagramSocket> DatagramPipeline::takeSocket()
 void DatagramPipeline::sendDatagram(
     SocketAddress destinationEndpoint,
     nx::Buffer datagram,
-    utils::MoveOnlyFunc<void(SystemError::ErrorCode, SocketAddress)> completionHandler)
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, SocketAddress)> completionHandler)
 {
     dispatch(
         [this, destinationEndpoint = std::move(destinationEndpoint),
@@ -176,7 +176,7 @@ void DatagramPipeline::messageSent(
 DatagramPipeline::OutgoingMessageContext::OutgoingMessageContext(
     SocketAddress _destinationEndpoint,
     nx::Buffer _serializedMessage,
-    utils::MoveOnlyFunc<void(SystemError::ErrorCode, SocketAddress)> _completionHandler)
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, SocketAddress)> _completionHandler)
     :
     destinationEndpoint(std::move(_destinationEndpoint)),
     serializedMessage(std::move(_serializedMessage)),

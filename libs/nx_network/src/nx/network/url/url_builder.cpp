@@ -16,7 +16,7 @@ nx::utils::Url Builder::toUrl() const
     return m_url;
 }
 
-Builder::operator utils::Url() const
+Builder::operator nx::utils::Url() const
 {
     return toUrl();
 }

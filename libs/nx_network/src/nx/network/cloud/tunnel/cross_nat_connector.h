@@ -56,7 +56,7 @@ public:
 
     void replaceOriginatingHostAddress(const std::string& address);
 
-    static utils::ResultCounter<nx::hpm::api::ResultCode>& mediatorResponseCounter();
+    static nx::utils::ResultCounter<nx::hpm::api::ResultCode>& mediatorResponseCounter();
 
 protected:
     virtual void stopWhileInAioThread() override;
