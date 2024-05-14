@@ -17,6 +17,8 @@ struct NX_VMS_API UserSessionSettings
     std::optional<std::chrono::seconds> remoteSessionUpdateS;
 
     std::optional<bool> useSessionLimitForCloud;
+
+    bool operator==(const UserSessionSettings&) const noexcept = default;
 };
 #define UserSessionSettings_Fields \
     (sessionLimitS) \
