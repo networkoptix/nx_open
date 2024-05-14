@@ -4031,12 +4031,12 @@ License Key: %2</source>
         <translation></translation>
     </message>
     <message>
-        <source>Displays IP addresses for cameras and servers and roles for users.</source>
+        <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
         <translation></translation>
     </message>
     <message>
-        <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
-        <translation></translation>
+        <source>Displays IP addresses for cameras and servers.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
