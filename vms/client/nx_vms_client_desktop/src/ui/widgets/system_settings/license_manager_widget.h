@@ -40,12 +40,22 @@ private:
     void updateButtons();
 
     void handleDownloadError();
-    void handleWidgetStateChange();
+
+    /**
+     * Activate the license provided by the licenseWidget. Returns true if the network request was
+     * successfully sent to the server.
+     */
+    bool activateLicense();
 
     void licenseDetailsRequested(const QModelIndex& index);
 
-private:
     QnLicensePool* licensePool() const;
+
+    /**
+     * Check whether manually created license can be activated. In case of errors the corresponding
+     * error message will be displayed and input fields will be cleared.
+     */
+    bool validateManualLicense(const QnLicensePtr& license);
 
     void showLicenseDetails(const QnLicensePtr& license);
 

@@ -79,15 +79,15 @@ QnLicenseWidget::QnLicenseWidget(QWidget* parent):
         [this]()
         {
             ui->activateLicenseButton->showIndicator();
-            setState(Waiting);
+            emit licenseActivationRequested();
         });
 
-    setAccentStyle(ui->activateLicenseButtonCopy);
-    connect(ui->activateLicenseButtonCopy, &QPushButton::clicked, this,
+    setAccentStyle(ui->activateLicenseManualButton);
+    connect(ui->activateLicenseManualButton, &QPushButton::clicked, this,
         [this]()
         {
-            ui->activateLicenseButtonCopy->showIndicator();
-            setState(Waiting);
+            ui->activateLicenseManualButton->showIndicator();
+            emit licenseActivationRequested();
         });
 
     connect(ui->activateFreeLicenseButton, &QPushButton::clicked, this,
@@ -95,7 +95,7 @@ QnLicenseWidget::QnLicenseWidget(QWidget* parent):
         {
             ui->activateFreeLicenseButton->showIndicator();
             setSerialKey(nx::branding::freeLicenseKey());
-            setState(Waiting);
+            emit licenseActivationRequested();
         });
 
     ClipboardButton::createInline(ui->hardwareIdEdit, ClipboardButton::StandardType::copy);
@@ -125,8 +125,6 @@ void QnLicenseWidget::setState(State state)
     m_state = state;
 
     updateControls();
-
-    emit stateChanged();
 }
 
 void QnLicenseWidget::clearManualActivationUserInput()
@@ -197,11 +195,11 @@ void QnLicenseWidget::updateControls()
             : !m_activationKey.isEmpty();
 
         ui->activateLicenseButton->setEnabled(canActivate);
-        ui->activateLicenseButtonCopy->setEnabled(canActivate);
+        ui->activateLicenseManualButton->setEnabled(canActivate);
 
         ui->activateLicenseButton->hideIndicator();
         ui->activateFreeLicenseButton->hideIndicator();
-        ui->activateLicenseButtonCopy->hideIndicator();
+        ui->activateLicenseManualButton->hideIndicator();
     }
     updateManualActivationLinkText();
 }
@@ -284,11 +282,15 @@ void QnLicenseWidget::keyPressEvent(QKeyEvent* event)
 
 void QnLicenseWidget::browseForLicenseFile()
 {
+    std::vector<QnCustomFileDialog::FileFilter> filters;
+    filters.push_back({tr("Text Files"), {"txt"}});
+    filters.push_back(QnCustomFileDialog::kAllFilesFilter);
+
     const auto fileName = QFileDialog::getOpenFileName(
         this,
         tr("Open License File"),
         QString(),
-        QnCustomFileDialog::createFilter(QnCustomFileDialog::kAllFilesFilter),
+        QnCustomFileDialog::createFilter(filters),
         nullptr,
         QnCustomFileDialog::fileDialogOptions());
 

@@ -48,7 +48,7 @@ public:
     void clearManualActivationUserInput();
 
 signals:
-    void stateChanged();
+    void licenseActivationRequested();
 
 protected:
     virtual void changeEvent(QEvent* event) override;
