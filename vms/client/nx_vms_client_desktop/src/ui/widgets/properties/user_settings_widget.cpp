@@ -459,6 +459,50 @@ bool QnUserSettingsWidget::canApplyChanges() const
     return true;
 }
 
+bool QnUserSettingsWidget::isCloudOnly() const {
+    return m_cloudOnly;
+}
+
+void QnUserSettingsWidget::setCloudOnly(bool cloudOnly) {
+    if (m_cloudOnly == cloudOnly)
+        return;
+
+    m_cloudOnly = cloudOnly;
+
+    if (m_cloudOnly) {
+        ui->userTypeComboBox->setCurrentIndex(kCloudIndex);
+        ui->userTypeComboBox->setEnabled(false);
+    } else {
+        ui->userTypeComboBox->setEnabled(true);
+    }
+}
+
+bool QnUserSettingsWidget::isCustomPermissionsEnabled() const {
+    return m_customPermissionsEnabled;
+}
+
+void QnUserSettingsWidget::setCustomPermissionsEnabled(bool customPermissionsEnabled) {
+    if (m_customPermissionsEnabled == customPermissionsEnabled)
+        return;
+
+    m_customPermissionsEnabled = customPermissionsEnabled;
+
+    ui->editRolesButton->setVisible(m_customPermissionsEnabled);
+
+    QnUserRolesModel::DisplayRoleFlags modelFlags;
+    if (customPermissionsEnabled) {
+        modelFlags = QnUserRolesModel::DefaultRoleFlags;
+    } else {
+        modelFlags = QnUserRolesModel::StandardRoleFlag | QnUserRolesModel::AssignableFlag | QnUserRolesModel::UserRoleFlag;
+    }
+    ui->roleComboBox->setModel(nullptr);
+    delete m_rolesModel;
+    m_rolesModel = new QnUserRolesModel(this, modelFlags);
+    ui->roleComboBox->setModel(m_rolesModel);
+    updateRoleComboBox();
+    // Ctor also connects to model signals, we don't care.
+}
+
 void QnUserSettingsWidget::setupInputFields()
 {
     ui->loginInputField->setTitle(tr("Login"));

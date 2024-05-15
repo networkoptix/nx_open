@@ -1028,6 +1028,8 @@ enum IDType
      */
     NewUserAction,
 
+    VxMultipleNewUsersAction,
+
     /**
      * Opens a webpage creation dialog.
      */

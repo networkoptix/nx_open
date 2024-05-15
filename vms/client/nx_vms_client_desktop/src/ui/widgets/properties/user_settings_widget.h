@@ -40,6 +40,12 @@ public:
 
     void updatePermissionsLabel(const QString& text);
 
+    bool isCloudOnly() const;
+    void setCloudOnly(bool cloudOnly);
+
+    bool isCustomPermissionsEnabled() const;
+    void setCustomPermissionsEnabled(bool customPermissionsEnabled);
+
 signals:
     void userTypeChanged(bool isCloud);
 
@@ -61,9 +67,11 @@ private:
 private:
     QScopedPointer<Ui::UserSettingsWidget> ui;
     QnUserSettingsModel* const m_model;
-    QnUserRolesModel* const m_rolesModel;
+    QnUserRolesModel* m_rolesModel;
     QList<nx::vms::client::desktop::InputField*> m_localInputFields;
     QList<nx::vms::client::desktop::InputField*> m_cloudInputFields;
     nx::vms::client::desktop::Aligner* const m_aligner;
     int m_lastUserTypeIndex;
+    bool m_cloudOnly = false;
+    bool m_customPermissionsEnabled = true;
 };
