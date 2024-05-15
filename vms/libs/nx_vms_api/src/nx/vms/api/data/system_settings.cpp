@@ -10,5 +10,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SaveableSystemSettings, (json), SaveableSystemS
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SystemSettings, (json), SystemSettings_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SaveableSiteSettings, (json), SaveableSiteSettings_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SiteSettings, (json), SiteSettings_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SystemSettingsFilter, (json), SystemSettingsFilter_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SiteSettingsFilter, (json), SiteSettingsFilter_Fields)
 
 } // namespace nx::vms::api

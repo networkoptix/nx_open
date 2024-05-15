@@ -28,6 +28,7 @@ struct BackupSettings;
 struct EmailSettings;
 struct LdapSettings;
 struct ResourceParamWithRefData;
+struct SaveableSystemSettings;
 struct SystemSettings;
 struct WatermarkSettings;
 struct PixelationSettings;
@@ -518,7 +519,9 @@ public:
     std::chrono::seconds cloudPollingInterval() const;
     void setCloudPollingInterval(std::chrono::seconds value);
 
+    void update(const nx::vms::api::SaveableSystemSettings& value);
     void update(const nx::vms::api::SystemSettings& value);
+    nx::vms::api::SystemSettings apiSettings() const;
 
     bool isAllowRegisteringIntegrationsEnabled() const;
     void setAllowRegisteringIntegrationsEnabled(bool value);
