@@ -3,9 +3,9 @@
 #include "proxy_handler.h"
 
 #include <nx/network/aio/stream_socket_connector.h>
+#include <nx/network/http/global_context.h>
 #include <nx/network/socket_factory.h>
 #include <nx/network/url/url_parse_helper.h>
-#include <nx/network/http/global_context.h>
 #include <nx/reflect/json.h>
 #include <nx/utils/log/log.h>
 
@@ -136,8 +136,9 @@ void AbstractProxyHandler::onCacheLookupFinished(std::unique_ptr<AbstractStreamS
     if (socket)
     {
         NX_VERBOSE(this, "Using cached connection");
-        socket->bindToAioThread(m_httpConnectionAioThread);
-        socket->post([this, socket = std::move(socket)]() mutable
+        AbstractStreamSocket* socketPtr = socket.get();
+        socketPtr->bindToAioThread(m_httpConnectionAioThread);
+        socketPtr->post([this, socket = std::move(socket)]() mutable
             {
                 proxyRequestToTarget(std::move(socket));
             });
