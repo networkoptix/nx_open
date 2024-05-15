@@ -3983,12 +3983,12 @@ Kunci Lisensi: %2</translation>
       <translation>Menetapkan waktu yang akan digunakan di klien (timeline, stempel waktu, dll.) ketika mesin klien dan server berada di zona waktu yang berbeda.</translation>
     </message>
     <message>
-      <source>Displays IP addresses for cameras and servers and roles for users.</source>
-      <translation>Menampilkan alamat IP untuk kamera dan server serta peran bagi pengguna.</translation>
-    </message>
-    <message>
       <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
       <translation>Durasi waktu setiap kamera pada layout akan ditampilkan jika Anda memulai Tur.</translation>
+    </message>
+    <message>
+      <source>Displays IP addresses for cameras and servers.</source>
+      <translation type="unfinished">Displays IP addresses for cameras and servers.</translation>
     </message>
   </context>
   <context>

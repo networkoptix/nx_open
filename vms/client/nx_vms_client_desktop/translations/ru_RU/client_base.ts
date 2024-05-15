@@ -4130,12 +4130,12 @@ License Key: %2</translation>
       <translation>Устанавливает время для использования в клиенте (временная шкала, временные метки и т. д.), когда клиентские и серверные машины находятся в разных часовых поясах.</translation>
     </message>
     <message>
-      <source>Displays IP addresses for cameras and servers and roles for users.</source>
-      <translation>Отображает IP-адреса для камер и серверов и роли для пользователей.</translation>
-    </message>
-    <message>
       <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
       <translation>Сколько времени каждая камера будет отображаться на раскладке при запуске тура.</translation>
+    </message>
+    <message>
+      <source>Displays IP addresses for cameras and servers.</source>
+      <translation>Отображает IP-адреса камер и серверов.</translation>
     </message>
   </context>
   <context>
@@ -7263,11 +7263,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Edit Settings</source>
-      <translation type="unfinished">Edit Settings</translation>
+      <translation>Изменение настроек</translation>
     </message>
     <message>
       <source>View Live</source>
-      <translation type="unfinished">View Live</translation>
+      <translation>Просмотр прямого эфира</translation>
     </message>
     <message>
       <source>Depending on the resource type it either allows user to modify device settings or to control video wall.</source>

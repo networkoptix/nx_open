@@ -2478,23 +2478,23 @@
     </message>
     <message numerus="yes">
       <source>Recording on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Opptak på %n kanaler ble stoppet på grunn av overforbruk av tjenesten.</numerusform>
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
+        <numerusform>Opptak på %n kanaler ble stoppet på grunn av overforbruk av tjenesten.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Sikkerhetskopiering av skylagring på %n -kanaler ble stoppet på grunn av overforbruk av tjenesten.</numerusform>
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
+        <numerusform>Sikkerhetskopiering av skylagring på %n -kanaler ble stoppet på grunn av overforbruk av tjenesten.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Bruk av betalte integreringstjenester på %n -kanaler ble stoppet på grunn av overforbruk av tjenesten.</numerusform>
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
+        <numerusform>Bruk av betalte integreringstjenester på %n -kanaler ble stoppet på grunn av overforbruk av tjenesten.</numerusform>
       </translation>
     </message>
     <message>

@@ -4032,12 +4032,12 @@ Lizenzschlüssel: %2</translation>
       <translation>Legt die Zeit fest, die im Client verwendet werden soll (Zeitleiste, Zeitstempel usw.), wenn sich Client- und Servercomputer in unterschiedlichen Zeitzonen befinden.</translation>
     </message>
     <message>
-      <source>Displays IP addresses for cameras and servers and roles for users.</source>
-      <translation>Zeigt IP-Adressen für Kameras und Server und Rollen für Benutzer an.</translation>
-    </message>
-    <message>
       <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
       <translation>Die Länge der Zeit, die jede Kamera im Layout angezeigt wird, wenn Sie eine Tour starten.</translation>
+    </message>
+    <message>
+      <source>Displays IP addresses for cameras and servers.</source>
+      <translation type="unfinished">Displays IP addresses for cameras and servers.</translation>
     </message>
   </context>
   <context>

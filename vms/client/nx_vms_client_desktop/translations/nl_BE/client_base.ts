@@ -4032,12 +4032,12 @@ License Key: %2</translation>
       <translation>Stelt de tijd in die moet worden gebruikt in de client (tijdlijn, tijdstempels, enz.) wanneer client- en servermachines zich in verschillende tijdzones bevinden.</translation>
     </message>
     <message>
-      <source>Displays IP addresses for cameras and servers and roles for users.</source>
-      <translation>Geeft IP-adressen weer voor camera's en servers en rechten voor gebruikers.</translation>
-    </message>
-    <message>
       <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
       <translation>Lengte van de weergave voor elke camera in de schermindeling als u een tour cyclus start.</translation>
+    </message>
+    <message>
+      <source>Displays IP addresses for cameras and servers.</source>
+      <translation type="unfinished">Displays IP addresses for cameras and servers.</translation>
     </message>
   </context>
   <context>

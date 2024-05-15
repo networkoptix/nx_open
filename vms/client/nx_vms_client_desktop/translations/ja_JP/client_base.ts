@@ -3983,12 +3983,12 @@ License Key: %2</source>
       <translation>クライアントとサーバーが異なるタイムゾーンにある場合に、クライアントで使用する時刻 (タイムライン、タイムスタンプなど) を設定します。</translation>
     </message>
     <message>
-      <source>Displays IP addresses for cameras and servers and roles for users.</source>
-      <translation>カメラやサーバーのIPアドレスおよびユーザーのロールを表示します。</translation>
-    </message>
-    <message>
       <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
       <translation>ツアー表示中のカメラ1台あたりの表示時間。</translation>
+    </message>
+    <message>
+      <source>Displays IP addresses for cameras and servers.</source>
+      <translation>カメラとサーバーの IP アドレスを表示します。</translation>
     </message>
   </context>
   <context>

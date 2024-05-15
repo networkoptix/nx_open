@@ -4032,12 +4032,12 @@ Lisensnøkkel: %2</translation>
       <translation>Stiller inn tiden som skal brukes i klienten (tidslinje, tidsstempler, etc.) når klient- og servermaskiner er i forskjellige tidssoner.</translation>
     </message>
     <message>
-      <source>Displays IP addresses for cameras and servers and roles for users.</source>
-      <translation>Viser IP-adresser for kameraer og servere og roller for brukere.</translation>
-    </message>
-    <message>
       <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
       <translation>Hvor lang tid hvert kamera på oppsettet vil vises hvis du starter en tur.</translation>
+    </message>
+    <message>
+      <source>Displays IP addresses for cameras and servers.</source>
+      <translation>Viser IP-adresser for kameraer og servere.</translation>
     </message>
   </context>
   <context>
@@ -7027,7 +7027,7 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>Edit Settings</source>
-      <translation type="unfinished">Edit Settings</translation>
+      <translation>Endre innstillinger</translation>
     </message>
     <message>
       <source>View Live</source>

@@ -4032,12 +4032,12 @@ Licensnyckel: %2</translation>
       <translation>Ställer in tiden att använda på klienten (tidslinje, tidsstämplar, etc.) när klienten och servern är i olika tidszoner.</translation>
     </message>
     <message>
-      <source>Displays IP addresses for cameras and servers and roles for users.</source>
-      <translation>Visar IP-adresser för kameror och servrar och roller för användare.</translation>
-    </message>
-    <message>
       <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
       <translation>Längd på tid varje kamera visas på en vy om du startar en tur.</translation>
+    </message>
+    <message>
+      <source>Displays IP addresses for cameras and servers.</source>
+      <translation type="unfinished">Displays IP addresses for cameras and servers.</translation>
     </message>
   </context>
   <context>

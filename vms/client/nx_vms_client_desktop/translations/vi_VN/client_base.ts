@@ -3983,12 +3983,12 @@ Khóa giấy phép: %2</translation>
       <translation>Đặt thời gian để sử dụng trong máy khách (dòng thời gian, dấu thời gian, vv) khi máy khách và máy chủ ở các múi giờ khác nhau.</translation>
     </message>
     <message>
-      <source>Displays IP addresses for cameras and servers and roles for users.</source>
-      <translation>Hiển thị địa chỉ IP cho camera và máy chủ và vai trò cho người dùng.</translation>
-    </message>
-    <message>
       <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
       <translation>Khoảng thời gian mỗi camera trên bố cục sẽ được hiển thị nếu bạn bắt đầu Tour.</translation>
+    </message>
+    <message>
+      <source>Displays IP addresses for cameras and servers.</source>
+      <translation type="unfinished">Displays IP addresses for cameras and servers.</translation>
     </message>
   </context>
   <context>

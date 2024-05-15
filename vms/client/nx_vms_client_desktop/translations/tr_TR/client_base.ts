@@ -4031,12 +4031,12 @@ License Key: %2</source>
       <translation>İstemci ve sunucu makineleri farklı saat dilimlerinde olduğunda istemcideki zamanı (zaman çizelgesi, zaman damgaları, vb.) Ayarlar.</translation>
     </message>
     <message>
-      <source>Displays IP addresses for cameras and servers and roles for users.</source>
-      <translation>Kameralar ve sunucular için IP adreslerini ve kullanıcılar için rolleri görüntüler.</translation>
-    </message>
-    <message>
       <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
       <translation>Bir Tur başlatırsanız, düzen üzerindeki her kameranın uzunluğu görüntülenir.</translation>
+    </message>
+    <message>
+      <source>Displays IP addresses for cameras and servers.</source>
+      <translation>Sunucu ve kameraların IP adreslerini görüntüler.</translation>
     </message>
   </context>
   <context>

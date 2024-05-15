@@ -4130,12 +4130,12 @@ License Key: %2</translation>
       <translation>קובע את הזמן לשימוש בלקוח (ציר זמן, חותמות זמן וכו ') כאשר מכונות הלקוח והשרת נמצאות באזורי זמן שונים.</translation>
     </message>
     <message>
-      <source>Displays IP addresses for cameras and servers and roles for users.</source>
-      <translation>מציג כתובות IP עבור מצלמות ושרתים ותפקידים עבור משתמשים.</translation>
-    </message>
-    <message>
       <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
       <translation>משך הזמן של כל מצלמה על פריסה יוצג אם תתחיל סיור.</translation>
+    </message>
+    <message>
+      <source>Displays IP addresses for cameras and servers.</source>
+      <translation type="unfinished">Displays IP addresses for cameras and servers.</translation>
     </message>
   </context>
   <context>

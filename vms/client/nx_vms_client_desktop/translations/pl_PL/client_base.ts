@@ -4130,12 +4130,12 @@ Klucz licencyjny: %2</translation>
       <translation>Ustawia czas, jaki ma być używany w kliencie (linia czasu, znaczniki czasu itp.) w sytuacji gdy komputery klienckie i serwerowe znajdują się w różnych strefach czasowych.</translation>
     </message>
     <message>
-      <source>Displays IP addresses for cameras and servers and roles for users.</source>
-      <translation>Wyświetla adresy IP kamer, serwerów i grupy użytkowników.</translation>
-    </message>
-    <message>
       <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
       <translation>Czas wyświetlania każdej z kamer w układzie po rozpoczęciu cyklu.</translation>
+    </message>
+    <message>
+      <source>Displays IP addresses for cameras and servers.</source>
+      <translation type="unfinished">Displays IP addresses for cameras and servers.</translation>
     </message>
   </context>
   <context>

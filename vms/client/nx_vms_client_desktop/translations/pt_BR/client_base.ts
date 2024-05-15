@@ -4032,12 +4032,12 @@ Chave de licença: %2</translation>
       <translation>Define o tempo a ser usado no cliente (linha do tempo, carimbos de data / hora, etc.) quando as máquinas cliente e servidor estão em fusos horários diferentes.</translation>
     </message>
     <message>
-      <source>Displays IP addresses for cameras and servers and roles for users.</source>
-      <translation>Exibe endereços IP para câmeras, servidores e funções para usuários.</translation>
-    </message>
-    <message>
       <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
       <translation>Período de tempo que cada câmera no layout será exibida se você iniciar um Tour.</translation>
+    </message>
+    <message>
+      <source>Displays IP addresses for cameras and servers.</source>
+      <translation type="unfinished">Displays IP addresses for cameras and servers.</translation>
     </message>
   </context>
   <context>
