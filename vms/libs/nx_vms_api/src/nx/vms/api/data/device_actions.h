@@ -183,7 +183,7 @@ struct DeviceFootageRequest
 
 #define DeviceFootageRequest_Fields \
     (id)(startTimeMs)(endTimeMs)(detailLevelMs)(keepSmallChunks)(preciseBounds)(maxCount) \
-    (storageLocation)(includeCloudData)(periodType)(motion)(analytics)
+    (storageLocation)(quality)(includeCloudData)(periodType)(motion)(analytics)
 QN_FUSION_DECLARE_FUNCTIONS(DeviceFootageRequest, (json), NX_VMS_API);
 
 struct DeviceDiagnosis
