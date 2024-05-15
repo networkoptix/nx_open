@@ -23,7 +23,7 @@ struct LookupListPreviewProcessor::Private
     int rowsNumber = 10;
     QString separator;
     QString filePath;
-    bool dataHasHeaderRow = false;
+    bool dataHasHeaderRow = true;
 };
 
 LookupListPreviewProcessor::LookupListPreviewProcessor(QObject* parent):
@@ -178,7 +178,7 @@ void LookupListPreviewProcessor::reset(LookupListImportEntriesModel* model)
 
     setFilePath({});
     setSeparator({});
-    setDataHasHeaderRow(false);
+    setDataHasHeaderRow(true);
     model->reset();
 }
 
