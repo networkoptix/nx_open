@@ -43,6 +43,15 @@ QString iconPath(QnResourceIconCache::Key iconKey)
     return "image://resource/" + QString::number(iconKey);
 }
 
+QnVirtualCameraResourceList getActualCameras(const QnResourcePool* resourcePool)
+{
+    return resourcePool->getResources<QnVirtualCameraResource>().filtered(
+        [](const QnVirtualCameraResourcePtr& resource)
+        {
+            return !resource->hasFlags(Qn::desktop_camera);
+        });
+}
+
 } // namespace
 
 RulesTableModel::RulesTableModel(QObject* parent):
@@ -294,7 +303,7 @@ QVariant RulesTableModel::sourceCameraData(const vms::rules::EventFilter* eventF
 
     const auto resourcePool = appContext()->currentSystemContext()->resourcePool();
     const auto resources = sourceCameraField->acceptAll()
-        ? resourcePool->getResources<QnVirtualCameraResource>()
+        ? getActualCameras(resourcePool)
         : resourcePool->getResourcesByIds<QnVirtualCameraResource>(sourceCameraField->ids());
 
     if (role == Qt::DisplayRole)
@@ -433,7 +442,7 @@ QVariant RulesTableModel::targetCameraData(const vms::rules::ActionBuilder* acti
         if (targetDeviceField->acceptAll())
         {
             acceptAll = true;
-            resources = resourcePool->getResources<QnVirtualCameraResource>();
+            resources = getActualCameras(resourcePool);
         }
         else
         {

@@ -59,7 +59,7 @@ protected:
     {
         auto resources =
             resourcePool()->template getResourcesByIds<QnVirtualCameraResource>(m_field->ids());
-
+        m_field->setAcceptAll(Policy::emptyListIsValid() && resources.empty());
         m_selectButton->setText(Policy::getText(resources, /*detailed*/ true));
         m_selectButton->setIcon(core::Skin::maximumSizePixmap(resources.size() == 1
                 ? qnResIconCache->icon(resources.first())
@@ -110,6 +110,9 @@ protected:
 
         const auto resources =
             resourcePool()->template getResourcesByIds<QnVirtualCameraResource>(m_field->ids());
+
+        m_field->setAcceptAll(
+            Policy::emptyListIsValid() && resources.empty() && !m_field->useSource());
 
         if (useSource)
         {
