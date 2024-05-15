@@ -239,7 +239,7 @@ struct Bookmark
     std::string name;
     std::string description;
     std::chrono::milliseconds timeout = std::chrono::milliseconds(-1);
-    std::chrono::milliseconds startTimestamp;
+    std::chrono::milliseconds startTimestamp{};
     std::chrono::milliseconds duration{};
     std::vector<std::string> tags;
     std::string deviceId;

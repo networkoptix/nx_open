@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <stdexcept>
+#include <cmath>
 
 namespace nx::sdk::cloud_storage {
 
@@ -54,9 +55,12 @@ public:
     RegionMatcher(const Rect& rect)
     {
         memset(m_mask, 0, kMotionGridWidth * kMotionGridHeight / 8);
-        m_maskStart = std::min<double>((rect.left() * kMotionGridHeight + rect.top()) / 128,
-            kMotionGridWidth * kMotionGridHeight / 128 - 1);
-        m_maskEnd = std::max<double>(((rect.right() - 1) * kMotionGridHeight + rect.bottom() - 1) / 128, m_maskEnd);
+        m_maskStart = std::round(
+            std::min<double>((rect.left() * kMotionGridHeight + rect.top()) / 128,
+                kMotionGridWidth * kMotionGridHeight / 128 - 1));
+        m_maskEnd = std::round(
+            std::max<double>(((rect.right() - 1) * kMotionGridHeight + rect.bottom() - 1) / 128,
+                m_maskEnd));
         for (int x = (int) rect.left(); x <= rect.right(); ++x)
         {
             for (int y = (int) rect.top(); y <= rect.bottom(); ++y)
@@ -482,7 +486,7 @@ std::vector<uint8_t> fromBase64(const std::string& data)
         [](char toDecode)
         {
             size_t i = (int)toDecode - 43;
-            if (i < 0 || i > sizeof(b64))
+            if (i < 0 || i >= sizeof(b64))
                 throw std::logic_error("Not b64 " + std::to_string(i));
 
             int8_t decoded = b64[i];
@@ -493,7 +497,7 @@ std::vector<uint8_t> fromBase64(const std::string& data)
         };
 
     std::vector<uint8_t> result;
-    result.reserve(data.size() * 0.8f);
+    result.reserve(std::round(data.size() * 0.8f));
     int8_t decoded = 0;
     while (true)
     {
