@@ -226,36 +226,6 @@ struct NX_VMS_API SettingsBase
     (statisticsReportLastTime) \
     (statisticsReportLastVersion)
 
-struct NX_VMS_API SaveableSystemSettings: SaveableSettingsBase, UserSessionSettings
-{
-    std::optional<QString> systemName;
-
-    bool operator==(const SaveableSystemSettings&) const = default;
-};
-#define SaveableSystemSettings_Fields \
-    SaveableSettingsBase_Fields \
-    UserSessionSettings_Fields \
-    (systemName)
-QN_FUSION_DECLARE_FUNCTIONS(SaveableSystemSettings, (json), NX_VMS_API)
-NX_REFLECTION_INSTRUMENT(SaveableSystemSettings, SaveableSystemSettings_Fields)
-NX_REFLECTION_TAG_TYPE(SaveableSystemSettings, jsonSerializeChronoDurationAsNumber)
-NX_REFLECTION_TAG_TYPE(SaveableSystemSettings, jsonSerializeInt64AsString)
-
-struct NX_VMS_API SystemSettings: SaveableSystemSettings, SettingsBase
-{
-    QString cloudSystemID;
-    nx::Uuid localSystemId;
-    bool system2faEnabled = false;
-
-    bool operator==(const SystemSettings&) const = default;
-};
-#define SystemSettings_Fields SaveableSystemSettings_Fields SettingsBase_Fields \
-    (cloudSystemID)(localSystemId)(system2faEnabled)
-QN_FUSION_DECLARE_FUNCTIONS(SystemSettings, (json), NX_VMS_API)
-NX_REFLECTION_INSTRUMENT(SystemSettings, SystemSettings_Fields)
-NX_REFLECTION_TAG_TYPE(SystemSettings, jsonSerializeChronoDurationAsNumber)
-NX_REFLECTION_TAG_TYPE(SystemSettings, jsonSerializeInt64AsString)
-
 struct NX_VMS_API SaveableSiteSettings: SaveableSettingsBase
 {
     std::optional<UserSessionSettings> userSessionSettings;
@@ -286,5 +256,172 @@ QN_FUSION_DECLARE_FUNCTIONS(SiteSettings, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(SiteSettings, SiteSettings_Fields)
 NX_REFLECTION_TAG_TYPE(SiteSettings, jsonSerializeChronoDurationAsNumber)
 NX_REFLECTION_TAG_TYPE(SiteSettings, jsonSerializeInt64AsString)
+
+struct NX_VMS_API SaveableSystemSettings: SaveableSettingsBase, UserSessionSettings
+{
+    std::optional<QString> systemName;
+
+    SaveableSystemSettings() = default;
+    bool operator==(const SaveableSystemSettings&) const = default;
+
+    SaveableSystemSettings(
+        SaveableSettingsBase saveableSettingsBase,
+        UserSessionSettings userSessionSettings = {},
+        std::optional<QString> systemName = {})
+        :
+        SaveableSettingsBase(std::move(saveableSettingsBase)),
+        UserSessionSettings(std::move(userSessionSettings)),
+        systemName(std::move(systemName))
+    {
+    }
+
+    SaveableSystemSettings(SaveableSiteSettings settings):
+        SaveableSettingsBase(std::move(settings)),
+        UserSessionSettings(
+            std::move(settings.userSessionSettings).value_or(UserSessionSettings{})),
+        systemName(std::move(settings.siteName))
+    {
+    }
+
+    operator SaveableSiteSettings() const
+    {
+        SaveableSiteSettings result;
+        static_cast<SaveableSettingsBase&>(result) = *this;
+        result.userSessionSettings = *this;
+        result.siteName = systemName;
+        return result;
+    }
+};
+#define SaveableSystemSettings_Fields \
+    SaveableSettingsBase_Fields \
+    UserSessionSettings_Fields \
+    (systemName)
+QN_FUSION_DECLARE_FUNCTIONS(SaveableSystemSettings, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(SaveableSystemSettings, SaveableSystemSettings_Fields)
+NX_REFLECTION_TAG_TYPE(SaveableSystemSettings, jsonSerializeChronoDurationAsNumber)
+NX_REFLECTION_TAG_TYPE(SaveableSystemSettings, jsonSerializeInt64AsString)
+
+struct NX_VMS_API SystemSettings: SaveableSystemSettings, SettingsBase
+{
+    QString cloudSystemID;
+    nx::Uuid localSystemId;
+    bool system2faEnabled = false;
+
+    SystemSettings() = default;
+    bool operator==(const SystemSettings&) const = default;
+
+    SystemSettings(SiteSettings settings):
+        SaveableSystemSettings(std::move(settings)),
+        SettingsBase(std::move(settings)),
+        cloudSystemID(std::move(settings.cloudId)),
+        localSystemId(std::move(settings.localId)),
+        system2faEnabled(settings.enabled2fa)
+    {
+    }
+
+    operator SiteSettings() const
+    {
+        SiteSettings result;
+        static_cast<SaveableSiteSettings&>(result) = *this;
+        static_cast<SettingsBase&>(result) = *this;
+        result.cloudId = cloudSystemID;
+        result.localId = localSystemId;
+        result.enabled2fa = system2faEnabled;
+        return result;
+    }
+};
+#define UnsaveableSystemSettings_Fields SettingsBase_Fields \
+    (cloudSystemID)(localSystemId)(system2faEnabled)
+#define SystemSettings_Fields SaveableSystemSettings_Fields UnsaveableSystemSettings_Fields
+QN_FUSION_DECLARE_FUNCTIONS(SystemSettings, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(SystemSettings, SystemSettings_Fields)
+NX_REFLECTION_TAG_TYPE(SystemSettings, jsonSerializeChronoDurationAsNumber)
+NX_REFLECTION_TAG_TYPE(SystemSettings, jsonSerializeInt64AsString)
+
+enum class SystemSettingName
+{
+    #ifndef Q_MOC_RUN
+        #define VALUE(R, DATA, ITEM) ITEM,
+        BOOST_PP_SEQ_FOR_EACH(VALUE, _, SystemSettings_Fields)
+        #undef VALUE
+    #endif // Q_MOC_RUN
+    sessionLimitMinutes,
+    none,
+};
+
+template<typename Visitor>
+constexpr auto nxReflectVisitAllEnumItems(SystemSettingName*, Visitor&& visitor)
+{
+    using Item = nx::reflect::enumeration::Item<SystemSettingName>;
+    using ItemValue = nx::reflect::enumeration::detail::ItemValue<SystemSettingName>;
+    const auto& itemName = nx::reflect::enumeration::detail::itemName;
+    return visitor(
+        Item{SystemSettingName::sessionLimitMinutes, "sessionLimitMinutes"},
+        Item{SystemSettingName::none, ""}
+        #ifndef Q_MOC_RUN
+            #define VALUE(R, ENUM, ITEM) , Item{ENUM::ITEM, itemName(BOOST_PP_STRINGIZE(ITEM))}
+            BOOST_PP_SEQ_FOR_EACH(VALUE, SystemSettingName, SystemSettings_Fields)
+            #undef VALUE
+        #endif // Q_MOC_RUN
+    );
+}
+
+struct SystemSettingsFilter
+{
+    SystemSettingName name = SystemSettingName::none;
+
+    SystemSettingsFilter() = default;
+    SystemSettingsFilter(QString id)
+    {
+        nx::reflect::enumeration::fromString(id.toStdString(), &name);
+    }
+
+    const SystemSettingsFilter& getId() const { return *this; }
+    void setId(SystemSettingsFilter filter) { this->name = filter.name; };
+};
+#define SystemSettingsFilter_Fields (name)
+QN_FUSION_DECLARE_FUNCTIONS(SystemSettingsFilter, (json), NX_VMS_API)
+
+enum class SiteSettingName
+{
+    #ifndef Q_MOC_RUN
+        #define VALUE(R, DATA, ITEM) ITEM,
+        BOOST_PP_SEQ_FOR_EACH(VALUE, _, SiteSettings_Fields)
+        #undef VALUE
+    #endif // Q_MOC_RUN
+    none,
+};
+
+template<typename Visitor>
+constexpr auto nxReflectVisitAllEnumItems(SiteSettingName*, Visitor&& visitor)
+{
+    using Item = nx::reflect::enumeration::Item<SiteSettingName>;
+    using ItemValue = nx::reflect::enumeration::detail::ItemValue<SiteSettingName>;
+    const auto& itemName = nx::reflect::enumeration::detail::itemName;
+    return visitor(Item{SiteSettingName::none, ""}
+        #ifndef Q_MOC_RUN
+            #define VALUE(R, ENUM, ITEM) , Item{ENUM::ITEM, itemName(BOOST_PP_STRINGIZE(ITEM))}
+            BOOST_PP_SEQ_FOR_EACH(VALUE, SiteSettingName, SiteSettings_Fields)
+            #undef VALUE
+        #endif // Q_MOC_RUN
+    );
+}
+
+struct SiteSettingsFilter
+{
+    // TODO: Add support for multiple names.
+    SiteSettingName name = SiteSettingName::none;
+
+    SiteSettingsFilter() = default;
+    SiteSettingsFilter(QString id)
+    {
+        nx::reflect::enumeration::fromString(id.toStdString(), &name);
+    }
+
+    const SiteSettingsFilter& getId() const { return *this; }
+    void setId(SiteSettingsFilter filter) { this->name = filter.name; };
+};
+#define SiteSettingsFilter_Fields (name)
+QN_FUSION_DECLARE_FUNCTIONS(SiteSettingsFilter, (json), NX_VMS_API)
 
 } // namespace nx::vms::api

@@ -90,10 +90,10 @@ struct SystemSettings::Private
     QnResourcePropertyAdaptor<bool>* timeSynchronizationEnabledAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* synchronizeTimeWithInternetAdaptor = nullptr;
     QnResourcePropertyAdaptor<nx::Uuid> *primaryTimeServerAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString>* masterCloudSyncAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString>* masterCloudSyncListAdaptor = nullptr;
     QnResourcePropertyAdaptor<int>* maxDifferenceBetweenSynchronizedAndInternetTimeAdaptor = nullptr;
-    QnResourcePropertyAdaptor<int>* maxDifferenceBetweenSynchronizedAndLocalTimeAdaptor = nullptr;
-    QnResourcePropertyAdaptor<int>* osTimeChangeCheckPeriodAdaptor = nullptr;
+    QnReflectLexicalResourcePropertyAdaptor<std::chrono::milliseconds>* maxDifferenceBetweenSynchronizedAndLocalTimeMsAdaptor = nullptr;
+    QnReflectLexicalResourcePropertyAdaptor<std::chrono::milliseconds>* osTimeChangeCheckPeriodMsAdaptor = nullptr;
     QnResourcePropertyAdaptor<int>* syncTimeExchangePeriodAdaptor = nullptr;
     QnResourcePropertyAdaptor<int>* syncTimeEpsilonAdaptor = nullptr;
     QnResourcePropertyAdaptor<nx::vms::api::BackupSettings>* backupSettingsAdaptor = nullptr;
@@ -117,16 +117,16 @@ struct SystemSettings::Private
 
     QnResourcePropertyAdaptor<nx::vms::api::LdapSettings>* ldapAdaptor = nullptr;
 
-    QnResourcePropertyAdaptor<int>* ec2AliveUpdateIntervalAdaptor = nullptr;
+    QnResourcePropertyAdaptor<int>* ec2AliveUpdateIntervalSecAdaptor = nullptr;
     /** seconds */
-    QnResourcePropertyAdaptor<int>* proxyConnectTimeoutAdaptor = nullptr;
+    QnResourcePropertyAdaptor<int>* proxyConnectTimeoutSecAdaptor = nullptr;
     QnResourcePropertyAdaptor<nx::vms::api::ProxyConnectionAccessPolicy>* proxyConnectionAccessPolicyAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* takeCameraOwnershipWithoutLock = nullptr;
 
     // set of cloud adaptors
     QnResourcePropertyAdaptor<QString>* cloudAccountNameAdaptor = nullptr;
     QnResourcePropertyAdaptor<nx::Uuid>* organizationIdAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString>* cloudSystemIdAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString>* cloudSystemIDAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* cloudAuthKeyAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* system2faEnabledAdaptor = nullptr;
 
@@ -139,27 +139,27 @@ struct SystemSettings::Private
     QnResourcePropertyAdaptor<QString>* cloudHostAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* crossdomainEnabledAdaptor = nullptr;
 
-    QnResourcePropertyAdaptor<int>* maxP2pQueueSizeBytes = nullptr;
-    QnResourcePropertyAdaptor<qint64>* maxP2pQueueSizeForAllClientsBytes = nullptr;
-    QnResourcePropertyAdaptor<int>* maxRecorderQueueSizeBytes = nullptr;
-    QnResourcePropertyAdaptor<int>* maxRecorderQueueSizePackets = nullptr;
+    QnResourcePropertyAdaptor<int>* maxP2pQueueSizeBytesAdaptor = nullptr;
+    QnResourcePropertyAdaptor<qint64>* maxP2pAllClientsSizeBytesAdaptor = nullptr;
+    QnResourcePropertyAdaptor<int>* maxRecordQueueSizeBytesAdaptor = nullptr;
+    QnResourcePropertyAdaptor<int>* maxRecordQueueSizeElementsAdaptor = nullptr;
 
-    QnResourcePropertyAdaptor<int>* maxHttpTranscodingSessions = nullptr;
+    QnResourcePropertyAdaptor<int>* maxHttpTranscodingSessionsAdaptor = nullptr;
 
-    QnResourcePropertyAdaptor<int>* maxRtpRetryCount = nullptr;
+    QnResourcePropertyAdaptor<int>* maxRtpRetryCountAdaptor = nullptr;
 
-    QnResourcePropertyAdaptor<int>* rtpFrameTimeoutMs = nullptr;
-    QnResourcePropertyAdaptor<int>* maxRtspConnectDuration = nullptr;
+    QnReflectLexicalResourcePropertyAdaptor<std::chrono::milliseconds>* rtpTimeoutMsAdaptor = nullptr;
+    QnResourcePropertyAdaptor<int>* maxRtspConnectDurationSecondsAdaptor = nullptr;
 
     QnResourcePropertyAdaptor<bool>* cloudConnectUdpHolePunchingEnabledAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* cloudConnectRelayingEnabledAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* cloudConnectRelayingOverSslForcedAdaptor = nullptr;
 
-    QnResourcePropertyAdaptor<bool>* edgeRecordingEnabledAdaptor = nullptr;
+    QnResourcePropertyAdaptor<bool>* enableEdgeRecordingAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* webSocketEnabledAdaptor = nullptr;
 
-    QnResourcePropertyAdaptor<int>* maxRemoteArchiveSynchronizationThreads = nullptr;
-    QnResourcePropertyAdaptor<int>* maxVirtualCameraArchiveSynchronizationThreads = nullptr;
+    QnResourcePropertyAdaptor<int>* maxRemoteArchiveSynchronizationThreadsAdaptor = nullptr;
+    QnResourcePropertyAdaptor<int>* maxVirtualCameraArchiveSynchronizationThreadsAdaptor = nullptr;
 
     QnResourcePropertyAdaptor<nx::utils::Url>* customReleaseListUrlAdaptor = nullptr;
     QnResourcePropertyAdaptor<QByteArray>* targetUpdateInformationAdaptor = nullptr;
@@ -172,30 +172,30 @@ struct SystemSettings::Private
     QnResourcePropertyAdaptor<nx::vms::api::WatermarkSettings>* watermarkSettingsAdaptor = nullptr;
 
     QnResourcePropertyAdaptor<nx::vms::api::PixelationSettings>*
-        pixelationSettingsAdapter = nullptr;
+        pixelationSettingsAdaptor = nullptr;
 
-    QnResourcePropertyAdaptor<int>* sessionTimeoutLimitSecondsAdaptor = nullptr;
-	QnResourcePropertyAdaptor<bool>* useSessionTimeoutLimitForCloudAdaptor = nullptr;
+    QnReflectLexicalResourcePropertyAdaptor<std::chrono::seconds>* sessionLimitSAdaptor = nullptr;
+	QnResourcePropertyAdaptor<bool>* useSessionLimitForCloudAdaptor = nullptr;
     QnResourcePropertyAdaptor<int>* sessionsLimitAdaptor = nullptr;
     QnResourcePropertyAdaptor<int>* sessionsLimitPerUserAdaptor = nullptr;
-    QnResourcePropertyAdaptor<int>* remoteSessionUpdateAdaptor = nullptr;
-    QnResourcePropertyAdaptor<int>* remoteSessionTimeoutAdaptor = nullptr;
+    QnReflectLexicalResourcePropertyAdaptor<std::chrono::seconds>* remoteSessionUpdateSAdaptor = nullptr;
+    QnReflectLexicalResourcePropertyAdaptor<std::chrono::seconds>* remoteSessionTimeoutSAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* defaultVideoCodecAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* defaultExportVideoCodecAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* lowQualityScreenVideoCodecAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* forceLiveCacheForPrimaryStreamAdaptor = nullptr;
     QnResourcePropertyAdaptor<nx::vms::api::MetadataStorageChangePolicy>* metadataStorageChangePolicyAdaptor = nullptr;
     QnResourcePropertyAdaptor<std::map<QString, int>>* specificFeaturesAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString>* licenseServerUrlAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString>* licenseServerAdaptor = nullptr;
     QnResourcePropertyAdaptor<nx::utils::Url>* resourceFileUriAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* cloudNotificationsLanguageAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* additionalLocalFsTypesAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* keepIoPortStateIntactOnInitializationAdaptor= nullptr;
     QnResourcePropertyAdaptor<int>* mediaBufferSizeKbAdaptor = nullptr;
-    QnResourcePropertyAdaptor<int>* mediaBufferSizeKbForAudioOnlyDeviceAdaptor = nullptr;
+    QnResourcePropertyAdaptor<int>* mediaBufferSizeForAudioOnlyDeviceKbAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* forceAnalyticsDbStoragePermissionsAdaptor = nullptr;
-    QnResourcePropertyAdaptor<int>* checkVideoStreamPeriodMsAdaptor = nullptr;
-    QnResourcePropertyAdaptor<bool>* useStorageEncryptionAdaptor = nullptr;
+    QnReflectLexicalResourcePropertyAdaptor<std::chrono::milliseconds>* checkVideoStreamPeriodMsAdaptor = nullptr;
+    QnResourcePropertyAdaptor<bool>* storageEncryptionAdaptor = nullptr;
     QnResourcePropertyAdaptor<QByteArray>* currentStorageEncryptionKeyAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* showServersInTreeForNonAdminsAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* serverHeaderAdaptor = nullptr;
@@ -207,7 +207,7 @@ struct SystemSettings::Private
     QnResourcePropertyAdaptor<bool>* insecureDeprecatedApiInUseEnabledAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* exposeServerEndpointsAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* showMouseTimelinePreviewAdaptor = nullptr;
-    QnResourcePropertyAdaptor<int>* cloudPollingIntervalAdaptor = nullptr;
+    QnReflectLexicalResourcePropertyAdaptor<std::chrono::seconds>* cloudPollingIntervalSAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* allowRegisteringIntegrationsAdaptor = nullptr;
 
     AdaptorList allAdaptors;
@@ -372,17 +372,17 @@ SystemSettings::AdaptorList SystemSettings::initConnectionAdaptors()
 {
     AdaptorList ec2Adaptors;
 
-    d->ec2AliveUpdateIntervalAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
+    d->ec2AliveUpdateIntervalSecAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         "ec2AliveUpdateIntervalSec", 60,
         [](auto v) { return v >= 1 && v <= 60 * 60; }, this,
         [] { return tr("Site alive update interval (seconds, 1s-1h)"); });
-    ec2Adaptors << d->ec2AliveUpdateIntervalAdaptor;
+    ec2Adaptors << d->ec2AliveUpdateIntervalSecAdaptor;
 
-    d->proxyConnectTimeoutAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
+    d->proxyConnectTimeoutSecAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         "proxyConnectTimeoutSec", 5,
         [](auto v) { return v >= 1 && v <= 60 * 60; }, this,
         [] { return tr("Proxy connection timeout (seconds, 1s-1h)"); });
-    ec2Adaptors << d->proxyConnectTimeoutAdaptor;
+    ec2Adaptors << d->proxyConnectTimeoutSecAdaptor;
 
     d->proxyConnectionAccessPolicyAdaptor =
         new QnReflectLexicalResourcePropertyAdaptor<nx::vms::api::ProxyConnectionAccessPolicy>(
@@ -430,21 +430,17 @@ SystemSettings::AdaptorList SystemSettings::initTimeSynchronizationAdaptors()
             [] { return tr("Max difference between local and source time (milliseconds)"); });
     timeSynchronizationAdaptors << d->maxDifferenceBetweenSynchronizedAndInternetTimeAdaptor;
 
-    d->maxDifferenceBetweenSynchronizedAndLocalTimeAdaptor =
-        new QnLexicalResourcePropertyAdaptor<int>(
-            "maxDifferenceBetweenSynchronizedAndLocalTimeMs",
-            duration_cast<milliseconds>(std::chrono::seconds(2)).count(),
-            this,
+    d->maxDifferenceBetweenSynchronizedAndLocalTimeMsAdaptor =
+        new QnReflectLexicalResourcePropertyAdaptor<std::chrono::milliseconds>(
+            "maxDifferenceBetweenSynchronizedAndLocalTimeMs", 2s, this,
             [] { return tr("Max difference between local and source time (milliseconds)"); });
-    timeSynchronizationAdaptors << d->maxDifferenceBetweenSynchronizedAndLocalTimeAdaptor;
+    timeSynchronizationAdaptors << d->maxDifferenceBetweenSynchronizedAndLocalTimeMsAdaptor;
 
-    d->osTimeChangeCheckPeriodAdaptor =
-        new QnLexicalResourcePropertyAdaptor<int>(
-            "osTimeChangeCheckPeriodMs",
-            duration_cast<milliseconds>(std::chrono::seconds(5)).count(),
-            this,
+    d->osTimeChangeCheckPeriodMsAdaptor =
+        new QnReflectLexicalResourcePropertyAdaptor<std::chrono::milliseconds>(
+            "osTimeChangeCheckPeriodMs", 5s, this,
             [] { return tr("OS time change check period"); });
-    timeSynchronizationAdaptors << d->osTimeChangeCheckPeriodAdaptor;
+    timeSynchronizationAdaptors << d->osTimeChangeCheckPeriodMsAdaptor;
 
     d->syncTimeExchangePeriodAdaptor =
         new QnLexicalResourcePropertyAdaptor<int>(
@@ -483,7 +479,7 @@ SystemSettings::AdaptorList SystemSettings::initCloudAdaptors()
     d->organizationIdAdaptor = new QnLexicalResourcePropertyAdaptor<nx::Uuid>(
         Names::organizationId, nx::Uuid(), this, [] { return tr("Organization Id"); });
 
-    d->cloudSystemIdAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
+    d->cloudSystemIDAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
         Names::cloudSystemID, QString(), this, [] { return tr("Cloud Site ID"); });
 
     d->cloudAuthKeyAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
@@ -492,7 +488,7 @@ SystemSettings::AdaptorList SystemSettings::initCloudAdaptors()
     d->system2faEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         Names::system2faEnabled, false, this, [] { return tr("Enable 2FA for the Site"); });
 
-    d->masterCloudSyncAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
+    d->masterCloudSyncListAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
         "masterCloudSyncList", QString(), this,
         [] { return tr("Semicolon-separated list of Servers designated to connect to the Cloud. "
             "Servers at the top of the list have higher priority. If the list is empty a Server "
@@ -503,10 +499,10 @@ SystemSettings::AdaptorList SystemSettings::initCloudAdaptors()
     result
         << d->cloudAccountNameAdaptor
         << d->organizationIdAdaptor
-        << d->cloudSystemIdAdaptor
+        << d->cloudSystemIDAdaptor
         << d->cloudAuthKeyAdaptor
         << d->system2faEnabledAdaptor
-        << d->masterCloudSyncAdaptor;
+        << d->masterCloudSyncListAdaptor;
 
     for (auto adaptor: result)
     {
@@ -526,7 +522,7 @@ SystemSettings::AdaptorList SystemSettings::initCloudAdaptors()
         Qt::QueuedConnection);
 
     connect(
-        d->cloudSystemIdAdaptor,
+        d->cloudSystemIDAdaptor,
         &QnAbstractResourcePropertyAdaptor::valueChanged,
         this,
         &SystemSettings::cloudCredentialsChanged,
@@ -632,42 +628,42 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         "sequentialFlirOnvifSearcherEnabled", false, this,
         [] { return tr("Enable sequential Flir ONVIF searcher"); });
 
-    d->maxP2pQueueSizeBytes = new QnLexicalResourcePropertyAdaptor<int>(
+    d->maxP2pQueueSizeBytesAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         "maxP2pQueueSizeBytes", 1024 * 1024 * 128,
         [](auto v) { return v >= 1024 * 1024 * 32 && v <= 1024 * 1024 * 512; }, this,
         [] { return tr("Max P2P queue size (bytes, 32-512MB)"); });
 
-    d->maxP2pQueueSizeForAllClientsBytes = new QnLexicalResourcePropertyAdaptor<qint64>(
+    d->maxP2pAllClientsSizeBytesAdaptor = new QnLexicalResourcePropertyAdaptor<qint64>(
         "maxP2pAllClientsSizeBytes", 1024 * 1024 * 128,
         [](auto v) { return v >= 1024 * 1024 * 32 && v <= 1024 * 1024 * 512; }, this,
         [] { return tr("Max P2P all clients size (bytes, 32-512MB)"); });
 
-    d->maxRecorderQueueSizeBytes = new QnLexicalResourcePropertyAdaptor<int>(
+    d->maxRecordQueueSizeBytesAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         "maxRecordQueueSizeBytes", 1024 * 1024 * 24,
         [](auto v) { return v >= 1024 * 1024 * 6 && v <= 1024 * 1024 * 96; }, this,
         [] { return tr("Max record queue size (bytes, 6-96MB)"); });
 
-    d->maxRecorderQueueSizePackets = new QnLexicalResourcePropertyAdaptor<int>(
+    d->maxRecordQueueSizeElementsAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         "maxRecordQueueSizeElements", 1000,
         [](auto v) { return v >= 250 && v <= 4000; }, this,
         [] { return tr("Max record queue size (elements, 250-4000)"); });
 
-    d->maxHttpTranscodingSessions = new QnLexicalResourcePropertyAdaptor<int>(
+    d->maxHttpTranscodingSessionsAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         Names::maxHttpTranscodingSessions, 2, this,
         [] { return tr(
             "Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 "
             "connections at once, then closes the first one. "
             "We recommend setting this parameter's value to 2 or more."); });
 
-    d->maxRtpRetryCount = new QnLexicalResourcePropertyAdaptor<int>(
+    d->maxRtpRetryCountAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         "maxRtpRetryCount", 6, this, [] { return tr(
             "Maximum number of consecutive RTP errors before the server reconnects the RTSP "
             "session."); });
 
-    d->rtpFrameTimeoutMs = new QnLexicalResourcePropertyAdaptor<int>(
-        "rtpTimeoutMs", 10'000, this, [] { return tr("RTP timeout (milliseconds)"); });
+    d->rtpTimeoutMsAdaptor = new QnReflectLexicalResourcePropertyAdaptor<std::chrono::milliseconds>(
+        "rtpTimeoutMs", 10s, this, [] { return tr("RTP timeout (milliseconds)"); });
 
-    d->maxRtspConnectDuration = new QnLexicalResourcePropertyAdaptor<int>(
+    d->maxRtspConnectDurationSecondsAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         "maxRtspConnectDurationSeconds", 0, this,
         [] { return tr("Max RTSP connection duration (seconds)"); });
 
@@ -683,13 +679,13 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         "cloudConnectRelayingOverSslForced", false, this,
         [] { return tr("Enforce SSL for cloud-connect relays"); });
 
-    d->edgeRecordingEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
+    d->enableEdgeRecordingAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         "enableEdgeRecording", true, this, [] { return tr("Enable recording on EDGE"); });
 
     d->webSocketEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         Names::webSocketEnabled, true, this, [] { return tr("Enable WebSocket for P2P"); });
 
-    d->maxRemoteArchiveSynchronizationThreads = new QnLexicalResourcePropertyAdaptor<int>(
+    d->maxRemoteArchiveSynchronizationThreadsAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         "maxRemoteArchiveSynchronizationThreads", -1,
         [](auto v) { return v >= -1 && v <= 32; }, this,
         [] { return tr("Max thread count for remote archive synchronization (<=0 - auto, max 32)"); });
@@ -713,7 +709,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         "clientUpdateSettings", api::ClientUpdateSettings{}, this,
         [] { return tr("Client update settings"); });
 
-    d->maxVirtualCameraArchiveSynchronizationThreads = new QnLexicalResourcePropertyAdaptor<int>(
+    d->maxVirtualCameraArchiveSynchronizationThreadsAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         "maxVirtualCameraArchiveSynchronizationThreads", -1, this,
         [] { return tr("Thread count limit for camera archive synchronization"); });
 
@@ -721,19 +717,18 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         "watermarkSettings", nx::vms::api::WatermarkSettings(), this,
         [] { return tr("Watermark settings"); });
 
-    d->pixelationSettingsAdapter =
+    d->pixelationSettingsAdaptor =
         new QnJsonResourcePropertyAdaptor<nx::vms::api::PixelationSettings>(
             "pixelationSettings", nx::vms::api::PixelationSettings{}, this,
             [] { return tr("Pixelation settings"); });
 
-    d->sessionTimeoutLimitSecondsAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
-        Names::sessionLimitS,
-        kDefaultSessionLimit.count(),
-        [](const int& value) { return value >= 0; },
+    d->sessionLimitSAdaptor = new QnReflectLexicalResourcePropertyAdaptor<std::chrono::seconds>(
+        Names::sessionLimitS, kDefaultSessionLimit,
+        [](const std::chrono::seconds& value) { return value >= 0s; },
         this,
         [] { return tr("Authorization Session token lifetime (seconds)"); });
 
-    d->useSessionTimeoutLimitForCloudAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
+    d->useSessionLimitForCloudAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         Names::useSessionLimitForCloud, false, this,
         [] { return tr("Apply session limit for Cloud tokens"); });
 
@@ -745,12 +740,14 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         Names::sessionsLimitPerUser, 5'000, [](const int& value) { return value >= 0; }, this,
         [] { return tr("Max session token count per user on single Server"); });
 
-    d->remoteSessionUpdateAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
-        Names::remoteSessionUpdateS, 10, [](const int& value) { return value > 0; }, this,
+    d->remoteSessionUpdateSAdaptor = new QnReflectLexicalResourcePropertyAdaptor<std::chrono::seconds>(
+        Names::remoteSessionUpdateS, 10s,
+        [](const std::chrono::seconds& value) { return value > 0s; }, this,
         [] { return tr("Update interval for remote session token cache (other Servers and Cloud)"); });
 
-    d->remoteSessionTimeoutAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
-        Names::remoteSessionTimeoutS, 6 /*hours*/ * 60 * 60, [](const int& value) { return value > 0; }, this,
+    d->remoteSessionTimeoutSAdaptor = new QnReflectLexicalResourcePropertyAdaptor<std::chrono::seconds>(
+        Names::remoteSessionTimeoutS, 6h,
+        [](const std::chrono::seconds& value) { return value > 0s; }, this,
         [] { return tr("Timeout for remote session token cache (other Servers and Cloud)"); });
 
     d->defaultVideoCodecAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
@@ -764,7 +761,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         "lowQualityScreenVideoCodec", "mpeg2video", this,
         [] { return tr("Low quality screen video codec"); });
 
-    d->licenseServerUrlAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
+    d->licenseServerAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
         Names::licenseServer, "https://licensing.vmsproxy.com", this,
         [] { return tr("License server"); });
 
@@ -823,7 +820,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         [](auto v) { return v >= 10 && v <= 4 * 1024; }, this,
         [] { return tr("Media buffer size (KB, 10KB-4MB)"); });
 
-    d->mediaBufferSizeKbForAudioOnlyDeviceAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
+    d->mediaBufferSizeForAudioOnlyDeviceKbAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         "mediaBufferSizeForAudioOnlyDeviceKb", 16,
         [](auto v) { return v >= 1 && v <= 1024; }, this,
         [] { return tr("Media buffer size for audio only devices (KB, 1KB-1MB)"); });
@@ -832,11 +829,11 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         "forceAnalyticsDbStoragePermissions", true,  this,
         [] { return tr("Force analytics DB storage mount point permissions in case of failure"); });
 
-    d->checkVideoStreamPeriodMsAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
-        "checkVideoStreamPeriodMs", 10'000, this,
+    d->checkVideoStreamPeriodMsAdaptor = new QnReflectLexicalResourcePropertyAdaptor<std::chrono::milliseconds>(
+        "checkVideoStreamPeriodMs", 10s, this,
         [] { return tr("Check video stream period (milliseconds)"); });
 
-    d->useStorageEncryptionAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
+    d->storageEncryptionAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         "storageEncryption", false, this, [] { return tr("Storage encryption enabled"); });
 
     d->currentStorageEncryptionKeyAdaptor = new QnLexicalResourcePropertyAdaptor<QByteArray>(
@@ -896,9 +893,9 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         Names::ldap, nx::vms::api::LdapSettings(), this,
         [] { return tr("LDAP settings"); });
 
-    d->cloudPollingIntervalAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
-        Names::cloudPollingIntervalS, 60,
-        [](const int& value) { return value >= 1 && value <= 600; }, // < [1s, 10m]
+    d->cloudPollingIntervalSAdaptor = new QnReflectLexicalResourcePropertyAdaptor<std::chrono::seconds>(
+        Names::cloudPollingIntervalS, 60s,
+        [](const std::chrono::seconds& value) { return value >= 1s && value <= 10min; },
         this,
         []
         {
@@ -1067,21 +1064,21 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         Qt::QueuedConnection);
 
     connect(
-        d->pixelationSettingsAdapter,
+        d->pixelationSettingsAdaptor,
         &QnAbstractResourcePropertyAdaptor::valueChanged,
         this,
         &SystemSettings::pixelationSettingsChanged,
         Qt::QueuedConnection);
 
     connect(
-        d->sessionTimeoutLimitSecondsAdaptor,
+        d->sessionLimitSAdaptor,
         &QnAbstractResourcePropertyAdaptor::valueChanged,
         this,
         &SystemSettings::sessionTimeoutChanged,
         Qt::QueuedConnection);
 
     connect(
-        d->useSessionTimeoutLimitForCloudAdaptor,
+        d->useSessionLimitForCloudAdaptor,
         &QnAbstractResourcePropertyAdaptor::valueChanged,
         this,
         &SystemSettings::sessionTimeoutChanged,
@@ -1102,21 +1099,21 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         Qt::DirectConnection);
 
     connect(
-        d->remoteSessionUpdateAdaptor,
+        d->remoteSessionUpdateSAdaptor,
         &QnAbstractResourcePropertyAdaptor::valueChanged,
         this,
         &SystemSettings::remoteSessionUpdateChanged,
         Qt::QueuedConnection);
 
     connect(
-        d->remoteSessionTimeoutAdaptor,
+        d->remoteSessionTimeoutSAdaptor,
         &QnAbstractResourcePropertyAdaptor::valueChanged,
         this,
         &SystemSettings::remoteSessionUpdateChanged,
         Qt::QueuedConnection);
 
     connect(
-        d->useStorageEncryptionAdaptor,
+        d->storageEncryptionAdaptor,
         &QnAbstractResourcePropertyAdaptor::valueChanged,
         this,
         &SystemSettings::useStorageEncryptionChanged,
@@ -1214,14 +1211,14 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         Qt::DirectConnection);
 
     connect(
-        d->masterCloudSyncAdaptor,
+        d->masterCloudSyncListAdaptor,
         &QnAbstractResourcePropertyAdaptor::valueChanged,
         this,
         &SystemSettings::masterCloudSyncChanged,
         Qt::QueuedConnection);
 
     connect(
-        d->cloudPollingIntervalAdaptor,
+        d->cloudPollingIntervalSAdaptor,
         &QnAbstractResourcePropertyAdaptor::valueChanged,
         this,
         &SystemSettings::cloudPollingIntervalChanged,
@@ -1265,42 +1262,42 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         << d->crossdomainEnabledAdaptor
         << d->arecontRtspEnabledAdaptor
         << d->sequentialFlirOnvifSearcherEnabledAdaptor
-        << d->maxP2pQueueSizeBytes
-        << d->maxP2pQueueSizeForAllClientsBytes
-        << d->maxRecorderQueueSizeBytes
-        << d->maxRecorderQueueSizePackets
-        << d->rtpFrameTimeoutMs
-        << d->maxRtspConnectDuration
+        << d->maxP2pQueueSizeBytesAdaptor
+        << d->maxP2pAllClientsSizeBytesAdaptor
+        << d->maxRecordQueueSizeBytesAdaptor
+        << d->maxRecordQueueSizeElementsAdaptor
+        << d->rtpTimeoutMsAdaptor
+        << d->maxRtspConnectDurationSecondsAdaptor
         << d->cloudConnectUdpHolePunchingEnabledAdaptor
         << d->cloudConnectRelayingEnabledAdaptor
         << d->cloudConnectRelayingOverSslForcedAdaptor
-        << d->edgeRecordingEnabledAdaptor
+        << d->enableEdgeRecordingAdaptor
         << d->webSocketEnabledAdaptor
-        << d->maxRemoteArchiveSynchronizationThreads
+        << d->maxRemoteArchiveSynchronizationThreadsAdaptor
         << d->customReleaseListUrlAdaptor
         << d->targetUpdateInformationAdaptor
         << d->installedUpdateInformationAdaptor
-        << d->maxVirtualCameraArchiveSynchronizationThreads
+        << d->maxVirtualCameraArchiveSynchronizationThreadsAdaptor
         << d->watermarkSettingsAdaptor
-        << d->pixelationSettingsAdapter
-        << d->sessionTimeoutLimitSecondsAdaptor
-        << d->useSessionTimeoutLimitForCloudAdaptor
+        << d->pixelationSettingsAdaptor
+        << d->sessionLimitSAdaptor
+        << d->useSessionLimitForCloudAdaptor
         << d->sessionsLimitAdaptor
         << d->sessionsLimitPerUserAdaptor
-        << d->remoteSessionUpdateAdaptor
-        << d->remoteSessionTimeoutAdaptor
+        << d->remoteSessionUpdateSAdaptor
+        << d->remoteSessionTimeoutSAdaptor
         << d->defaultVideoCodecAdaptor
         << d->defaultExportVideoCodecAdaptor
         << d->downloaderPeersAdaptor
         << d->clientUpdateSettingsAdaptor
         << d->lowQualityScreenVideoCodecAdaptor
-        << d->licenseServerUrlAdaptor
+        << d->licenseServerAdaptor
         << d->resourceFileUriAdaptor
-        << d->maxHttpTranscodingSessions
+        << d->maxHttpTranscodingSessionsAdaptor
         << d->maxEventLogRecordsAdaptor
         << d->forceLiveCacheForPrimaryStreamAdaptor
         << d->metadataStorageChangePolicyAdaptor
-        << d->maxRtpRetryCount
+        << d->maxRtpRetryCountAdaptor
         << d->targetPersistentUpdateStorageAdaptor
         << d->installedPersistentUpdateStorageAdaptor
         << d->specificFeaturesAdaptor
@@ -1308,10 +1305,10 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         << d->additionalLocalFsTypesAdaptor
         << d->keepIoPortStateIntactOnInitializationAdaptor
         << d->mediaBufferSizeKbAdaptor
-        << d->mediaBufferSizeKbForAudioOnlyDeviceAdaptor
+        << d->mediaBufferSizeForAudioOnlyDeviceKbAdaptor
         << d->forceAnalyticsDbStoragePermissionsAdaptor
         << d->checkVideoStreamPeriodMsAdaptor
-        << d->useStorageEncryptionAdaptor
+        << d->storageEncryptionAdaptor
         << d->currentStorageEncryptionKeyAdaptor
         << d->showServersInTreeForNonAdminsAdaptor
         << d->serverHeaderAdaptor
@@ -1320,7 +1317,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         << d->showMouseTimelinePreviewAdaptor
         << d->ldapAdaptor
         << d->exposeServerEndpointsAdaptor
-        << d->cloudPollingIntervalAdaptor
+        << d->cloudPollingIntervalSAdaptor
         << d->allowRegisteringIntegrationsAdaptor
     ;
 
@@ -1553,7 +1550,7 @@ bool SystemSettings::takeFromSettings(QSettings* settings, const QnResourcePtr& 
     changed |= d->statisticsReportUpdateDelayAdaptor->takeFromSettings(settings, "");
     changed |= d->statisticsReportServerApiAdaptor->takeFromSettings(settings, "");
     changed |= d->clientStatisticsSettingsUrlAdaptor->takeFromSettings(settings, "");
-    changed |= d->cloudSystemIdAdaptor->takeFromSettings(settings, "");
+    changed |= d->cloudSystemIDAdaptor->takeFromSettings(settings, "");
     changed |= d->cloudAuthKeyAdaptor->takeFromSettings(settings, "");
 
     if (!changed)
@@ -1718,12 +1715,12 @@ void SystemSettings::setMaxEventLogRecords(int value)
 
 std::chrono::seconds SystemSettings::aliveUpdateInterval() const
 {
-    return std::chrono::seconds(d->ec2AliveUpdateIntervalAdaptor->value());
+    return std::chrono::seconds(d->ec2AliveUpdateIntervalSecAdaptor->value());
 }
 
 void SystemSettings::setAliveUpdateInterval(std::chrono::seconds newInterval) const
 {
-    d->ec2AliveUpdateIntervalAdaptor->setValue(newInterval.count());
+    d->ec2AliveUpdateIntervalSecAdaptor->setValue(newInterval.count());
 }
 
 bool SystemSettings::isTimeSynchronizationEnabled() const
@@ -1755,17 +1752,17 @@ std::chrono::milliseconds SystemSettings::maxDifferenceBetweenSynchronizedAndInt
 std::chrono::milliseconds SystemSettings::maxDifferenceBetweenSynchronizedAndLocalTime() const
 {
     return std::chrono::milliseconds(
-        d->maxDifferenceBetweenSynchronizedAndLocalTimeAdaptor->value());
+        d->maxDifferenceBetweenSynchronizedAndLocalTimeMsAdaptor->value());
 }
 
 std::chrono::milliseconds SystemSettings::osTimeChangeCheckPeriod() const
 {
-    return std::chrono::milliseconds(d->osTimeChangeCheckPeriodAdaptor->value());
+    return d->osTimeChangeCheckPeriodMsAdaptor->value();
 }
 
 void SystemSettings::setOsTimeChangeCheckPeriod(std::chrono::milliseconds value)
 {
-    d->osTimeChangeCheckPeriodAdaptor->setValue(value.count());
+    d->osTimeChangeCheckPeriodMsAdaptor->setValue(value);
 }
 
 std::chrono::milliseconds SystemSettings::syncTimeExchangePeriod() const
@@ -1810,12 +1807,12 @@ void SystemSettings::setOrganizationId(const nx::Uuid& value)
 
 QString SystemSettings::cloudSystemId() const
 {
-    return d->cloudSystemIdAdaptor->value();
+    return d->cloudSystemIDAdaptor->value();
 }
 
 void SystemSettings::setCloudSystemId(const QString& value)
 {
-    d->cloudSystemIdAdaptor->setValue(value);
+    d->cloudSystemIDAdaptor->setValue(value);
 }
 
 QString SystemSettings::cloudAuthKey() const
@@ -1900,12 +1897,12 @@ void SystemSettings::setArecontRtspEnabled(bool newVal) const
 
 int SystemSettings::maxRtpRetryCount() const
 {
-    return d->maxRtpRetryCount->value();
+    return d->maxRtpRetryCountAdaptor->value();
 }
 
 void SystemSettings::setMaxRtpRetryCount(int newVal)
 {
-    d->maxRtpRetryCount->setValue(newVal);
+    d->maxRtpRetryCountAdaptor->setValue(newVal);
 }
 
 bool SystemSettings::sequentialFlirOnvifSearcherEnabled() const
@@ -1920,57 +1917,57 @@ void SystemSettings::setSequentialFlirOnvifSearcherEnabled(bool newVal)
 
 int SystemSettings::rtpFrameTimeoutMs() const
 {
-    return d->rtpFrameTimeoutMs->value();
+    return d->rtpTimeoutMsAdaptor->value().count();
 }
 
 void SystemSettings::setRtpFrameTimeoutMs(int newValue)
 {
-    d->rtpFrameTimeoutMs->setValue(newValue);
+    d->rtpTimeoutMsAdaptor->setValue(std::chrono::milliseconds(newValue));
 }
 
 std::chrono::seconds SystemSettings::maxRtspConnectDuration() const
 {
-    return std::chrono::seconds(d->maxRtspConnectDuration->value());
+    return std::chrono::seconds(d->maxRtspConnectDurationSecondsAdaptor->value());
 }
 
 void SystemSettings::setMaxRtspConnectDuration(std::chrono::seconds newValue)
 {
-    d->maxRtspConnectDuration->setValue(newValue.count());
+    d->maxRtspConnectDurationSecondsAdaptor->setValue(newValue.count());
 }
 
 int SystemSettings::maxP2pQueueSizeBytes() const
 {
-    return d->maxP2pQueueSizeBytes->value();
+    return d->maxP2pQueueSizeBytesAdaptor->value();
 }
 
 qint64 SystemSettings::maxP2pQueueSizeForAllClientsBytes() const
 {
-    return d->maxP2pQueueSizeForAllClientsBytes->value();
+    return d->maxP2pAllClientsSizeBytesAdaptor->value();
 }
 
 int SystemSettings::maxRecorderQueueSizeBytes() const
 {
-    return d->maxRecorderQueueSizeBytes->value();
+    return d->maxRecordQueueSizeBytesAdaptor->value();
 }
 
 int SystemSettings::maxHttpTranscodingSessions() const
 {
-    return d->maxHttpTranscodingSessions->value();
+    return d->maxHttpTranscodingSessionsAdaptor->value();
 }
 
 int SystemSettings::maxRecorderQueueSizePackets() const
 {
-    return d->maxRecorderQueueSizePackets->value();
+    return d->maxRecordQueueSizeElementsAdaptor->value();
 }
 
 bool SystemSettings::isEdgeRecordingEnabled() const
 {
-    return d->edgeRecordingEnabledAdaptor->value();
+    return d->enableEdgeRecordingAdaptor->value();
 }
 
 void SystemSettings::setEdgeRecordingEnabled(bool enabled)
 {
-    d->edgeRecordingEnabledAdaptor->setValue(enabled);
+    d->enableEdgeRecordingAdaptor->setValue(enabled);
 }
 
 nx::utils::Url SystemSettings::customReleaseListUrl() const
@@ -2057,27 +2054,27 @@ void SystemSettings::setClientUpdateSettings(const api::ClientUpdateSettings& se
 
 int SystemSettings::maxRemoteArchiveSynchronizationThreads() const
 {
-    return d->maxRemoteArchiveSynchronizationThreads->value();
+    return d->maxRemoteArchiveSynchronizationThreadsAdaptor->value();
 }
 
 void SystemSettings::setMaxRemoteArchiveSynchronizationThreads(int newValue)
 {
-    d->maxRemoteArchiveSynchronizationThreads->setValue(newValue);
+    d->maxRemoteArchiveSynchronizationThreadsAdaptor->setValue(newValue);
 }
 
 int SystemSettings::maxVirtualCameraArchiveSynchronizationThreads() const
 {
-    return d->maxVirtualCameraArchiveSynchronizationThreads->value();
+    return d->maxVirtualCameraArchiveSynchronizationThreadsAdaptor->value();
 }
 
 void SystemSettings::setMaxVirtualCameraArchiveSynchronizationThreads(int newValue)
 {
-    d->maxVirtualCameraArchiveSynchronizationThreads->setValue(newValue);
+    d->maxVirtualCameraArchiveSynchronizationThreadsAdaptor->setValue(newValue);
 }
 
 std::chrono::seconds SystemSettings::proxyConnectTimeout() const
 {
-    return std::chrono::seconds(d->proxyConnectTimeoutAdaptor->value());
+    return std::chrono::seconds(d->proxyConnectTimeoutSecAdaptor->value());
 }
 
 api::ProxyConnectionAccessPolicy SystemSettings::proxyConnectionAccessPolicy() const
@@ -2117,36 +2114,34 @@ void SystemSettings::setWatermarkSettings(const nx::vms::api::WatermarkSettings&
 
 nx::vms::api::PixelationSettings SystemSettings::pixelationSettings() const
 {
-    return d->pixelationSettingsAdapter->value();
+    return d->pixelationSettingsAdaptor->value();
 }
 
 void SystemSettings::setPixelationSettings(const nx::vms::api::PixelationSettings& settings)
 {
-    d->pixelationSettingsAdapter->setValue(settings);
+    d->pixelationSettingsAdaptor->setValue(settings);
 }
 
 std::optional<std::chrono::seconds> SystemSettings::sessionTimeoutLimit() const
 {
-    int seconds = d->sessionTimeoutLimitSecondsAdaptor->value();
-    return seconds > 0
-        ? std::optional<std::chrono::seconds>(seconds)
-        : std::nullopt;
+    if (auto seconds = d->sessionLimitSAdaptor->value(); seconds > 0s)
+        return seconds;
+    return {};
 }
 
 void SystemSettings::setSessionTimeoutLimit(std::optional<std::chrono::seconds> value)
 {
-    int seconds = value ? value->count() : 0;
-    d->sessionTimeoutLimitSecondsAdaptor->setValue(seconds);
+    d->sessionLimitSAdaptor->setValue(value.value_or(0s));
 }
 
 bool SystemSettings::useSessionTimeoutLimitForCloud() const
 {
-    return d->useSessionTimeoutLimitForCloudAdaptor->value();
+    return d->useSessionLimitForCloudAdaptor->value();
 }
 
 void SystemSettings::setUseSessionTimeoutLimitForCloud(bool value)
 {
-    d->useSessionTimeoutLimitForCloudAdaptor->setValue(value);
+    d->useSessionLimitForCloudAdaptor->setValue(value);
 }
 
 int SystemSettings::sessionsLimit() const
@@ -2171,22 +2166,22 @@ void SystemSettings::setSessionsLimitPerUser(int value)
 
 std::chrono::seconds SystemSettings::remoteSessionUpdate() const
 {
-    return std::chrono::seconds(d->remoteSessionUpdateAdaptor->value());
+    return d->remoteSessionUpdateSAdaptor->value();
 }
 
 void SystemSettings::setRemoteSessionUpdate(std::chrono::seconds value)
 {
-    d->remoteSessionUpdateAdaptor->setValue(value.count());
+    d->remoteSessionUpdateSAdaptor->setValue(value);
 }
 
 std::chrono::seconds SystemSettings::remoteSessionTimeout() const
 {
-    return std::chrono::seconds(d->remoteSessionTimeoutAdaptor->value());
+    return d->remoteSessionTimeoutSAdaptor->value();
 }
 
 void SystemSettings::setRemoteSessionTimeout(std::chrono::seconds value)
 {
-    d->remoteSessionTimeoutAdaptor->setValue(value.count());
+    d->remoteSessionTimeoutSAdaptor->setValue(value);
 }
 
 QString SystemSettings::defaultVideoCodec() const
@@ -2216,12 +2211,12 @@ QString SystemSettings::lowQualityScreenVideoCodec() const
 
 void SystemSettings::setLicenseServerUrl(const QString& value)
 {
-    d->licenseServerUrlAdaptor->setValue(value);
+    d->licenseServerAdaptor->setValue(value);
 }
 
 QString SystemSettings::licenseServerUrl() const
 {
-    return d->licenseServerUrlAdaptor->value();
+    return d->licenseServerAdaptor->value();
 }
 
 nx::utils::Url SystemSettings::resourceFileUri() const
@@ -2261,12 +2256,12 @@ void SystemSettings::setMediaBufferSizeKb(int value)
 
 int SystemSettings::mediaBufferSizeForAudioOnlyDeviceKb() const
 {
-    return d->mediaBufferSizeKbForAudioOnlyDeviceAdaptor->value();
+    return d->mediaBufferSizeForAudioOnlyDeviceKbAdaptor->value();
 }
 
 void SystemSettings::setMediaBufferSizeForAudioOnlyDeviceKb(int value)
 {
-    d->mediaBufferSizeKbForAudioOnlyDeviceAdaptor->setValue(value);
+    d->mediaBufferSizeForAudioOnlyDeviceKbAdaptor->setValue(value);
 }
 
 bool SystemSettings::forceAnalyticsDbStoragePermissions() const
@@ -2276,22 +2271,22 @@ bool SystemSettings::forceAnalyticsDbStoragePermissions() const
 
 std::chrono::milliseconds SystemSettings::checkVideoStreamPeriod() const
 {
-    return std::chrono::milliseconds(d->checkVideoStreamPeriodMsAdaptor->value());
+    return d->checkVideoStreamPeriodMsAdaptor->value();
 }
 
 void SystemSettings::setCheckVideoStreamPeriod(std::chrono::milliseconds value)
 {
-    d->checkVideoStreamPeriodMsAdaptor->setValue(value.count());
+    d->checkVideoStreamPeriodMsAdaptor->setValue(value);
 }
 
 bool SystemSettings::useStorageEncryption() const
 {
-    return d->useStorageEncryptionAdaptor->value();
+    return d->storageEncryptionAdaptor->value();
 }
 
 void SystemSettings::setUseStorageEncryption(bool value)
 {
-    d->useStorageEncryptionAdaptor->setValue(value);
+    d->storageEncryptionAdaptor->setValue(value);
 }
 
 QByteArray SystemSettings::currentStorageEncryptionKey() const
@@ -2444,7 +2439,7 @@ void SystemSettings::setSystem2faEnabled(bool value)
 std::vector<nx::Uuid> SystemSettings::masterCloudSyncList() const
 {
     std::vector<nx::Uuid> result;
-    for (const auto& value: d->masterCloudSyncAdaptor->value().split(";", Qt::SkipEmptyParts))
+    for (const auto& value: d->masterCloudSyncListAdaptor->value().split(";", Qt::SkipEmptyParts))
         result.push_back(nx::Uuid(value));
     return result;
 }
@@ -2454,7 +2449,7 @@ void SystemSettings::setMasterCloudSyncList(const std::vector<nx::Uuid>& idList)
     QStringList result;
     for (const auto& id: idList)
         result << id.toString();
-    d->masterCloudSyncAdaptor->setValue(result.join(";"));
+    d->masterCloudSyncListAdaptor->setValue(result.join(";"));
 }
 
 std::map<QString, int> SystemSettings::specificFeatures() const
@@ -2509,73 +2504,40 @@ void SystemSettings::enableInsecureDeprecatedApiInUse(bool value)
 
 std::chrono::seconds SystemSettings::cloudPollingInterval() const
 {
-    return std::chrono::seconds(d->cloudPollingIntervalAdaptor->value());
+    return d->cloudPollingIntervalSAdaptor->value();
 }
 
 void SystemSettings::setCloudPollingInterval(std::chrono::seconds period)
 {
-    d->cloudPollingIntervalAdaptor->setValue(period.count());
+    d->cloudPollingIntervalSAdaptor->setValue(period);
+}
+
+void SystemSettings::update(const api::SaveableSystemSettings& value)
+{
+    #define VALUE(R, STRUCT, ITEM) \
+        if (STRUCT.ITEM) \
+            d->BOOST_PP_CAT(ITEM, Adaptor)->setValue(*STRUCT.ITEM);
+    BOOST_PP_SEQ_FOR_EACH(VALUE, value, SaveableSystemSettings_Fields)
+    #undef VALUE
 }
 
 void SystemSettings::update(const api::SystemSettings& value)
 {
-    d->cloudAccountNameAdaptor->setValue(value.cloudAccountName);
-    d->organizationIdAdaptor->setValue(value.organizationId);
-    d->cloudSystemIdAdaptor->setValue(value.cloudSystemID);
-    d->organizationIdAdaptor->setValue(value.organizationId);
-    if (value.defaultExportVideoCodec)
-        d->defaultExportVideoCodecAdaptor->setValue(*value.defaultExportVideoCodec);
-    d->localSystemIdAdaptor->setValue(value.localSystemId);
-    if (value.systemName)
-        d->systemNameAdaptor->setValue(*value.systemName);
-    if (value.watermarkSettings)
-        d->watermarkSettingsAdaptor->setValue(*value.watermarkSettings);
-    if (value.webSocketEnabled)
-        d->webSocketEnabledAdaptor->setValue(*value.webSocketEnabled);
-    if (value.autoDiscoveryEnabled)
-        d->autoDiscoveryEnabledAdaptor->setValue(*value.autoDiscoveryEnabled);
-    if (value.cameraSettingsOptimization)
-        d->cameraSettingsOptimizationAdaptor->setValue(*value.cameraSettingsOptimization);
-    if (value.statisticsAllowed)
-        d->statisticsAllowedAdaptor->setValue(*value.statisticsAllowed);
-    if (value.cloudNotificationsLanguage)
-        d->cloudNotificationsLanguageAdaptor->setValue(*value.cloudNotificationsLanguage);
-    if (value.pixelationSettings)
-        d->pixelationSettingsAdapter->setValue(*value.pixelationSettings);
-    if (value.auditTrailEnabled)
-        d->auditTrailEnabledAdaptor->setValue(*value.auditTrailEnabled);
-    if (value.trafficEncryptionForced)
-        d->trafficEncryptionForcedAdaptor->setValue(*value.trafficEncryptionForced);
-    if (value.useHttpsOnlyForCameras)
-        d->useHttpsOnlyForCamerasAdaptor->setValue(*value.useHttpsOnlyForCameras);
-    if (value.videoTrafficEncryptionForced)
-        d->videoTrafficEncryptionForcedAdaptor->setValue(*value.videoTrafficEncryptionForced);
-    if (value.sessionLimitS)
-        d->sessionTimeoutLimitSecondsAdaptor->setValue(value.sessionLimitS->count());
-    if (value.useSessionLimitForCloud)
-        d->useSessionTimeoutLimitForCloudAdaptor->setValue(*value.useSessionLimitForCloud);
-    if (value.storageEncryption)
-        d->useStorageEncryptionAdaptor->setValue(*value.storageEncryption);
-    if (value.showServersInTreeForNonAdmins)
-        d->showServersInTreeForNonAdminsAdaptor->setValue(*value.showServersInTreeForNonAdmins);
-    if (value.updateNotificationsEnabled)
-        d->updateNotificationsEnabledAdaptor->setValue(*value.updateNotificationsEnabled);
-    if (value.emailSettings)
-        d->emailSettingsAdaptor->setValue(*value.emailSettings);
-    if (value.timeSynchronizationEnabled)
-        d->timeSynchronizationEnabledAdaptor->setValue(*value.timeSynchronizationEnabled);
-    if (value.primaryTimeServer)
-        d->primaryTimeServerAdaptor->setValue(*value.primaryTimeServer);
-    if (value.customReleaseListUrl)
-        d->customReleaseListUrlAdaptor->setValue(*value.customReleaseListUrl);
-    if (value.clientUpdateSettings)
-        d->clientUpdateSettingsAdaptor->setValue(*value.clientUpdateSettings);
-    if (value.backupSettings)
-        d->backupSettingsAdaptor->setValue(*value.backupSettings);
-    if (value.metadataStorageChangePolicy)
-        d->metadataStorageChangePolicyAdaptor->setValue(*value.metadataStorageChangePolicy);
-    if (value.allowRegisteringIntegrations)
-        d->allowRegisteringIntegrationsAdaptor->setValue(*value.allowRegisteringIntegrations);
+    #define VALUE(R, STRUCT, ITEM) d->BOOST_PP_CAT(ITEM, Adaptor)->setValue(STRUCT.ITEM);
+    BOOST_PP_SEQ_FOR_EACH(VALUE, value, UnsaveableSystemSettings_Fields)
+    #undef VALUE
+
+    const api::SaveableSystemSettings& base = value;
+    update(base);
+}
+
+api::SystemSettings SystemSettings::apiSettings() const
+{
+    api::SystemSettings result;
+    #define VALUE(R, RESULT, ITEM) RESULT.ITEM = d->BOOST_PP_CAT(ITEM, Adaptor)->value();
+    BOOST_PP_SEQ_FOR_EACH(VALUE, result, SystemSettings_Fields)
+    #undef VALUE
+    return result;
 }
 
 } // namespace nx::vms::common
