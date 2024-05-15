@@ -216,8 +216,14 @@ LicenseManagerWidget::LicenseManagerWidget(QWidget* parent):
     connect(ui->gridLicenses, &QTreeView::doubleClicked,
         this,   &LicenseManagerWidget::licenseDetailsRequested);
 
-    connect(ui->licenseWidget, &QnLicenseWidget::stateChanged, this,
-        &LicenseManagerWidget::handleWidgetStateChange);
+    connect(ui->licenseWidget, &QnLicenseWidget::licenseActivationRequested, this,
+        [this]()
+        {
+            ui->licenseWidget->setState(QnLicenseWidget::Waiting);
+            // Reset controls and indicators in case of license activation failure.
+            if (!activateLicense())
+                ui->licenseWidget->setState(QnLicenseWidget::Normal);
+        });
 
     auto updateLicensesIfNeeded =
         [this]
@@ -597,7 +603,6 @@ void LicenseManagerWidget::handleDownloadError()
     }
 
     ui->licenseWidget->setOnline(false);
-    ui->licenseWidget->setState(QnLicenseWidget::Normal);
 }
 
 void LicenseManagerWidget::licenseDetailsRequested(const QModelIndex& index)
@@ -606,13 +611,52 @@ void LicenseManagerWidget::licenseDetailsRequested(const QModelIndex& index)
         showLicenseDetails(index.data(QnLicenseListModel::LicenseRole).value<QnLicensePtr>());
 }
 
-void LicenseManagerWidget::handleWidgetStateChange()
+bool LicenseManagerWidget::validateManualLicense(const QnLicensePtr& license)
 {
-    if (ui->licenseWidget->state() != QnLicenseWidget::Waiting)
-        return;
+    const QnLicenseErrorCode errorCode =
+        m_validator->validate(license, Validator::VM_CanActivate);
 
+    switch (errorCode)
+    {
+        case QnLicenseErrorCode::NoError:
+            return true;
+
+        case QnLicenseErrorCode::Expired:
+        case QnLicenseErrorCode::TemporaryExpired:
+            ui->licenseWidget->clearManualActivationUserInput();
+            break;
+
+        case QnLicenseErrorCode::InvalidSignature:
+            LicenseActivationDialogs::invalidKeyFile(this);
+            break;
+
+        case QnLicenseErrorCode::InvalidHardwareID:
+            LicenseActivationDialogs::licenseAlreadyActivated(this, license->hardwareId());
+            break;
+
+        case QnLicenseErrorCode::InvalidBrand:
+        case QnLicenseErrorCode::InvalidType:
+        case QnLicenseErrorCode::FutureLicense:
+            LicenseActivationDialogs::licenseIsIncompatible(this);
+            break;
+
+        case QnLicenseErrorCode::TooManyLicensesPerSystem:
+            LicenseActivationDialogs::activationError(this, errorCode, license->type());
+            break;
+
+        default:
+            NX_ASSERT(false, "Unexpected error code %1", (int)errorCode);
+            break;
+    }
+
+    return false;
+}
+
+bool LicenseManagerWidget::activateLicense()
+{
     if (!NX_ASSERT(m_currentRequest == 0, "Request was already sent"))
-        return;
+        return false;
+
     auto sessionTokenHelper = systemContext()->restApiHelper()->getSessionTokenHelper();
     nx::vms::api::LicenseData body;
     body.licenseBlock = {};
@@ -623,56 +667,19 @@ void LicenseManagerWidget::handleWidgetStateChange()
     }
     else
     {
-        const QnLicensePtr license(new QnLicense(ui->licenseWidget->activationKey()));
-        const QnLicenseErrorCode errorCode =
-            m_validator->validate(license, Validator::VM_JustCreated);
+        const QByteArray licenseBlock = ui->licenseWidget->activationKey();
+        const QnLicensePtr license(new QnLicense(licenseBlock));
+        if (!validateManualLicense(license))
+            return false;
 
-        switch (errorCode)
-        {
-            case QnLicenseErrorCode::NoError:
-                body.key = license->key();
-                break;
-            case QnLicenseErrorCode::Expired:
-            case QnLicenseErrorCode::TemporaryExpired:
-                ui->licenseWidget->clearManualActivationUserInput();
-                break;
-            case QnLicenseErrorCode::InvalidSignature:
-                LicenseActivationDialogs::invalidKeyFile(this);
-                break;
-            case QnLicenseErrorCode::InvalidHardwareID:
-                LicenseActivationDialogs::licenseAlreadyActivated(this, license->hardwareId());
-                break;
-            case QnLicenseErrorCode::InvalidBrand:
-            case QnLicenseErrorCode::InvalidType:
-                LicenseActivationDialogs::licenseIsIncompatible(this);
-                break;
-            case QnLicenseErrorCode::TooManyLicensesPerSystem:
-                LicenseActivationDialogs::activationError(this, errorCode, license->type());
-                break;
-            default:
-                break;
-        }
-
-        if (body.key.isEmpty())
-        {
-            ui->licenseWidget->setState(QnLicenseWidget::Normal);
-            return;
-        }
+        body.key = license->key();
+        body.licenseBlock = licenseBlock;
     }
 
-    const auto isActivatedAlready = std::any_of(
-        m_licenses.cbegin(),
-        m_licenses.cend(),
-        [&body](const QnLicensePtr& license)
-        {
-            return license->key() == body.key;
-        });
-
-    if (isActivatedAlready)
+    if (licensePool()->findLicense(body.key))
     {
         LicenseActivationDialogs::licenseAlreadyActivatedHere(this);
-        ui->licenseWidget->setState(QnLicenseWidget::Normal);
-        return;
+        return false;
     }
 
     auto callback = nx::utils::guarded(this,
@@ -719,12 +726,10 @@ void LicenseManagerWidget::handleWidgetStateChange()
             ui->licenseWidget->setState(QnLicenseWidget::Normal);
         });
 
-    NX_VERBOSE(this,
-        "Activating license using VMS Server. License key: %1",
-        body.key);
 
     if (auto api = connectedServerApi(); NX_ASSERT(api, "Connection must be established"))
     {
+        NX_VERBOSE(this, "Activating license using VMS Server. License key: %1", body.key);
         m_currentRequest = api->putRest(
             sessionTokenHelper,
             QString("/rest/v2/licenses/%1").arg(body.key),
@@ -733,7 +738,14 @@ void LicenseManagerWidget::handleWidgetStateChange()
             callback,
             this
         );
+        const bool requestSent = (m_currentRequest != 0);
+        if (!requestSent)
+            LicenseActivationDialogs::networkError(this);
+
+        return requestSent;
     }
+
+    return false;
 }
 
 } // namespace nx::vms::client::desktop
