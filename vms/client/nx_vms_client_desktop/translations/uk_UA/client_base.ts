@@ -4130,12 +4130,12 @@ License Key: %2</translation>
       <translation>Встановлює час для використання в клієнті (часова шкала, часові мітки і т. д.), коли клієнтські і серверні машини перебувають в різних часових поясах.</translation>
     </message>
     <message>
-      <source>Displays IP addresses for cameras and servers and roles for users.</source>
-      <translation>Показує IP адреси для камер і серверів і ролі для користувачів.</translation>
-    </message>
-    <message>
       <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
       <translation>Скільки часу кожна камера буде відображатися на розкладці при запуску Туру.</translation>
+    </message>
+    <message>
+      <source>Displays IP addresses for cameras and servers.</source>
+      <translation type="unfinished">Displays IP addresses for cameras and servers.</translation>
     </message>
   </context>
   <context>

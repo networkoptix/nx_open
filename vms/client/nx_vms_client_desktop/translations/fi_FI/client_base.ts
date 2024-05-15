@@ -4032,12 +4032,12 @@ License Key: %2</translation>
       <translation>Asettaa Client-sovellukselle (aikajana, aikaleimat jne.) käytettävän ajan, kun Client-sovellus- ja palvelinkoneet ovat eri aikavyöhykkeillä.</translation>
     </message>
     <message>
-      <source>Displays IP addresses for cameras and servers and roles for users.</source>
-      <translation>Näyttää kameroiden ja palvelimien IP-osoitteet sekä käyttäjien roolit.</translation>
-    </message>
-    <message>
       <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
       <translation>Kameran esilläolon aika näytetään jokaisen kameran kohdalla, kun aloitat kierron.</translation>
+    </message>
+    <message>
+      <source>Displays IP addresses for cameras and servers.</source>
+      <translation type="unfinished">Displays IP addresses for cameras and servers.</translation>
     </message>
   </context>
   <context>

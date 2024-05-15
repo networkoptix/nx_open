@@ -3983,12 +3983,12 @@ License Key: %2</source>
       <translation>當客戶端和伺服器電腦處於不同時區時, 設定依循客戶端使用的時間 (時間表、時間戳記等)。</translation>
     </message>
     <message>
-      <source>Displays IP addresses for cameras and servers and roles for users.</source>
-      <translation>顯示額外資訊, 包含攝影機和伺服器的IP位址以及使用者所屬之角色</translation>
-    </message>
-    <message>
       <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
       <translation>當啟用巡航, 調整影像在螢幕上顯示的時間長度</translation>
+    </message>
+    <message>
+      <source>Displays IP addresses for cameras and servers.</source>
+      <translation type="unfinished">Displays IP addresses for cameras and servers.</translation>
     </message>
   </context>
   <context>
@@ -10632,7 +10632,7 @@ You can force it, but it may significantly increase CPU load.</source>
     <message>
       <source>%1 group</source>
       <comment>%1 will be substituted with a user group name</comment>
-      <translation type="unfinished">%1 group</translation>
+      <translation>%1 群組</translation>
     </message>
     <message numerus="yes">
       <source>%1 and %n more groups</source>
@@ -10741,7 +10741,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Suspended</source>
-      <translation type="unfinished">Suspended</translation>
+      <translation>已暫停</translation>
     </message>
     <message>
       <source>Shut down</source>
@@ -11250,7 +11250,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Access Link</source>
-      <translation type="unfinished">Access Link</translation>
+      <translation>登入連結</translation>
     </message>
     <message>
       <source>Invalid Link</source>
@@ -11803,7 +11803,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Apply changes?</source>
-      <translation type="unfinished">Apply changes?</translation>
+      <translation>套用變更？</translation>
     </message>
     <message>
       <source>Discard</source>
@@ -11843,7 +11843,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Terminate</source>
-      <translation type="unfinished">Terminate</translation>
+      <translation>終止</translation>
     </message>
     <message>
       <source>Terminate access link</source>
@@ -11880,7 +11880,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>New User</source>
-      <translation type="unfinished">New User</translation>
+      <translation>新使用者</translation>
     </message>
     <message>
       <source>User %1 has been successfully created!</source>
@@ -11888,12 +11888,12 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Obtaining Link...</source>
-      <translation type="unfinished">Obtaining Link...</translation>
+      <translation>正在取得連結...</translation>
     </message>
     <message>
       <source>Ensure that this computer is able to connect to the %1</source>
       <comment>%1 is the cloud name</comment>
-      <translation type="unfinished">Ensure that this computer is able to connect to the %1</translation>
+      <translation>確保此電腦能夠連接到 %1</translation>
     </message>
     <message>
       <source>in %1</source>
@@ -12017,7 +12017,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Integration</source>
-      <translation type="unfinished">Integration</translation>
+      <translation>整合</translation>
     </message>
     <message>
       <source>Web Page</source>
@@ -12279,7 +12279,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Web Pages &amp; Integrations</source>
-      <translation type="unfinished">Web Pages &amp; Integrations</translation>
+      <translation>網頁和整合</translation>
     </message>
   </context>
   <context>
@@ -12533,7 +12533,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>From</source>
-      <translation type="unfinished">From</translation>
+      <translation>從</translation>
     </message>
   </context>
   <context>
@@ -12544,7 +12544,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>For</source>
-      <translation type="unfinished">For</translation>
+      <translation>給</translation>
     </message>
     <message>
       <source>Value</source>
@@ -12699,7 +12699,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>From</source>
-      <translation type="unfinished">From</translation>
+      <translation>從</translation>
     </message>
   </context>
   <context>
@@ -12868,7 +12868,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Hotspots</source>
-      <translation type="unfinished">Hotspots</translation>
+      <translation>熱點</translation>
     </message>
     <message>
       <source>Toolbar</source>

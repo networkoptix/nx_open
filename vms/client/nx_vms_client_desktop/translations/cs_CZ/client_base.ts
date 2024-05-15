@@ -4130,12 +4130,12 @@ License Key: %2</translation>
       <translation>Nastavte čas použitý v klientovi (časová osa, časové značky atd.), pokud jsou klientský a serverový počítač v různých časových pásmech.</translation>
     </message>
     <message>
-      <source>Displays IP addresses for cameras and servers and roles for users.</source>
-      <translation>Zobrazit IP adresy kamer, serverů a role uživatelů.</translation>
-    </message>
-    <message>
       <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
       <translation>Délka času zobrazení každé kamery v rozložení bude zobrazena pokud zahájíte Trasu.</translation>
+    </message>
+    <message>
+      <source>Displays IP addresses for cameras and servers.</source>
+      <translation type="unfinished">Displays IP addresses for cameras and servers.</translation>
     </message>
   </context>
   <context>

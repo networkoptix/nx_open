@@ -4032,12 +4032,12 @@ License Key: %2</translation>
       <translation>Beállítja akliens oldalon használt időt (idővonal, időbélyegzők stb.), Ha a kliens- és szervergépek különböző időzónákban vannak.</translation>
     </message>
     <message>
-      <source>Displays IP addresses for cameras and servers and roles for users.</source>
-      <translation>Megjeleníti a kamerák és szerverek IP-címét és a felhasználókra vonatkozó szabályokat.</translation>
-    </message>
-    <message>
       <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
       <translation>Pásztázás funkció esetén minden kamerán megjelenik az addig eltelt idő.</translation>
+    </message>
+    <message>
+      <source>Displays IP addresses for cameras and servers.</source>
+      <translation type="unfinished">Displays IP addresses for cameras and servers.</translation>
     </message>
   </context>
   <context>

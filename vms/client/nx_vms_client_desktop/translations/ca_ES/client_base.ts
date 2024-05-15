@@ -4032,12 +4032,12 @@ License Key: %2</translation>
       <translation>Estableix l'hora que s'utilitza al client (línia de temps, marca horària, etc.) quan les màquines client i servidor estan en zones horàries diferents.</translation>
     </message>
     <message>
-      <source>Displays IP addresses for cameras and servers and roles for users.</source>
-      <translation>Mostra les adreces IP de les càmeres i els servidors i les funcions dels usuaris.</translation>
-    </message>
-    <message>
       <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
       <translation>Temps durant el qual es mostrarà cada càmera al disseny si inicieu un tour.</translation>
+    </message>
+    <message>
+      <source>Displays IP addresses for cameras and servers.</source>
+      <translation type="unfinished">Displays IP addresses for cameras and servers.</translation>
     </message>
   </context>
   <context>

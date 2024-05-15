@@ -3983,12 +3983,12 @@ License Key: %2</translation>
       <translation>ตั้งเวลาที่จะใช้ในไคลเอ็นต์ (ไทม์ไลน์ timestamps ฯลฯ) เมื่อเครื่องไคลเอ็นต์และเซิร์ฟเวอร์อยู่ในโซนเวลาที่ต่างกัน</translation>
     </message>
     <message>
-      <source>Displays IP addresses for cameras and servers and roles for users.</source>
-      <translation>แสดงที่อยู่ IP สำหรับกล้องและเซิร์ฟเวอร์และกลุ่มสำหรับผู้ใช้</translation>
-    </message>
-    <message>
       <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
       <translation>ระยะเวลาที่กล้องแต่ละรูปแบบจะปรากฏขึ้นหากคุณเริ่มทัวร์เค้าโครง</translation>
+    </message>
+    <message>
+      <source>Displays IP addresses for cameras and servers.</source>
+      <translation type="unfinished">Displays IP addresses for cameras and servers.</translation>
     </message>
   </context>
   <context>

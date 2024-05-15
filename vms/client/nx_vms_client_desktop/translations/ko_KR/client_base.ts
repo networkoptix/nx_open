@@ -3983,12 +3983,12 @@ License Key: %2</translation>
       <translation>클라이언트와 서버 시스템이 다른 시간대에 있을 때 클라이언트에서 사용할 시간 (타임라인, 타임스탬프 등)을 설정합니다.</translation>
     </message>
     <message>
-      <source>Displays IP addresses for cameras and servers and roles for users.</source>
-      <translation>카메라 및 서버의 IP 주소와 사용자의 역할을 표시합니다.</translation>
-    </message>
-    <message>
       <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
       <translation>투어 시작 시 레이아웃에 있는 각 카메라가 표시되는 시간입니다.</translation>
+    </message>
+    <message>
+      <source>Displays IP addresses for cameras and servers.</source>
+      <translation type="unfinished">Displays IP addresses for cameras and servers.</translation>
     </message>
   </context>
   <context>

@@ -4032,12 +4032,12 @@ Clé de licence : %2</translation>
       <translation>Définit l'heure à utiliser dans le client (chronologie, horodatages, etc.) lorsque les machines client et serveur se trouvent dans des fuseaux horaires différents.</translation>
     </message>
     <message>
-      <source>Displays IP addresses for cameras and servers and roles for users.</source>
-      <translation>Affiche les adresses IP pour les caméras, les serveurs et les rôles d'utilisateurs.</translation>
-    </message>
-    <message>
       <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
       <translation>Durée d'affichage de chaque caméra sur la mise en page, si vous démarrez un tour.</translation>
+    </message>
+    <message>
+      <source>Displays IP addresses for cameras and servers.</source>
+      <translation type="unfinished">Displays IP addresses for cameras and servers.</translation>
     </message>
   </context>
   <context>
