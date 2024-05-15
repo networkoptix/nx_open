@@ -6,14 +6,6 @@
 
 namespace Qn {
 
-/**
- * These roles are used in the BlueBox integration and should not be changed without an agreement.
- */
-static_assert(ItemGeometryRole == 288);
-static_assert(ItemImageDewarpingRole == 295);
-static_assert(ItemRotationRole == 297);
-static_assert(ItemFlipRole == 299);
-
 template<typename Visitor>
 constexpr auto nxReflectVisitAllEnumItems(ItemDataRole*, Visitor&& visitor)
 {

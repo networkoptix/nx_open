@@ -85,53 +85,156 @@ namespace Qn
         /** Whether item swithing is manual role for Showreel review layout. */
         ShowreelIsManualRole,
 
-        /* Layout-based. */
-        LayoutCellSpacingRole,                      /**< Role for layout's cell spacing. Value of type qreal. */
-        LayoutCellAspectRatioRole,                  /**< Role for layout's cell aspect ratio. Value of type qreal. */
-        LayoutMinimalBoundingRectRole = 279,        /**< Role for layout's minimal bounding rect. Value of type QRect. */
-        LayoutSyncStateRole,                        /**< Role for layout's stream synchronization state. Value of type QnStreamSynchronizationState. */
-        LayoutSearchStateRole,                      /**< Role for 'Preview Search' layout parameters. */
-        LayoutTimeLabelsRole,                       /**< Role for layout's time label display. Value of type bool. */
-        LayoutPermissionsRole,                      /**< Role for overriding layout's permissions. Value of type int (Qn::Permissions). */
-        LayoutSelectionRole,                        /**< Role for layout's selected items. Value of type QVector<nx::Uuid>. */
-        LayoutActiveItemRole,                       /**< Role for layout active item. Value of type nx::Uuid. */
-        LayoutWatermarkRole,                        /**< Role for layout watermark (when loaded from file). */
+//-------------------------------------------------------------------------------------------------
+        // Layout-based roles. Their numeric values must be kept intact to maintain external video
+        // wall integrations. Video Wall Control protocol uses these IDs to pass messages about
+        // corresponding layout item changes.
 
-        /* Item-based. */
-        ItemUuidRole,                               /**< Role for item's UUID. Value of type nx::Uuid. */
-        ItemGeometryRole,                           /**< Role for item's integer geometry. Value of type QRect. */
-        ItemGeometryDeltaRole,                      /**< Role for item's floating point geometry delta. Value of type QRectF. */
-        ItemCombinedGeometryRole,                   /**< Role for item's floating point combined geometry. Value of type QRectF. */
-        ItemPositionRole,                           /**< Role for item's floating point position. Value of type QPointF. */
-        ItemZoomRectRole,                           /**< Role for item's zoom window. Value of type QRectF. */
-        ItemZoomWindowRectangleVisibleRole,         /**< Role for item's flag which controls if zoom window rectangle should be visible for the corresponding zoom window. */
-        ItemImageEnhancementRole,                   /**< Role for item's image enhancement params. Value of type nx::vms::api::ImageCorrectionData. */
-        ItemImageDewarpingRole,                     /**< Role for item's image dewarping params. Value of type nx::vms::api::dewarping::ViewData. */
-        ItemFlagsRole,                              /**< Role for item's flags. Value of type int (Qn::ItemFlags). */
-        ItemRotationRole,                           /**< Role for item's rotation. Value of type qreal. */
-        ItemFrameDistinctionColorRole,              /**< Role for item's frame distinction color. Value of type QColor. */
-        ItemFlipRole,                               /**< Role for item's flip state. Value of type bool. */
-        ItemAspectRatioRole,                        /**< Role for item's aspect ratio. Value of type qreal. */
-        ItemDisplayInfoRole,                        /**< Role for item's info state. Value of type bool. */
-        ItemPtzControlRole,                         /**< Role for item's PTZ control state. Value of type bool. */
-        ItemDisplayAnalyticsObjectsRole,            /**< Role for item display analytics objects state. Value of type bool. */
-        ItemDisplayRoiRole,                         /**< Role for item display ROI state. Value of type bool. */
-        ItemPlaceholderRole,                        /**< Role for item's placeholder pixmap. Value of type QPixmap. */
-        ItemDisplayHotspotsRole,                    /**< Role for item's camera hotspots display state. Value of type bool. */
+        /** Cell spacing. Value of type qreal. */
+        LayoutCellSpacingRole = 276,
 
-        ItemTimeRole,                               /**< Role for item's playback position, in milliseconds. Value of type qint64. Default value is -1. */
-        ItemPausedRole,                             /**< Role for item's paused state. Value of type bool. */
-        ItemSpeedRole,                              /**< Role for item's playback speed. Value of type qreal. */
-        ItemSliderWindowRole,                       /**< Role for slider window that is displayed when the item is active. Value of type QnTimePeriod. */
-        ItemSliderSelectionRole,                    /**< Role for slider selection that is displayed when the items is active. Value of type QnTimePeriod. */
-        ItemCheckedButtonsRole,                     /**< Role for buttons that are checked in item's titlebar. Value of type int (Qn::WidgetButtons). */
-        ItemDisabledButtonsRole,                    /**< Role for buttons that are not to be displayed in item's titlebar. Value of type int (Qn::WidgetButtons). */
-        ItemHealthMonitoringButtonsRole,            /**< Role for buttons that are checked on each line of Health Monitoring widget. Value of type QnServerResourceWidget::HealthMonitoringButtons. */
-        ItemMotionSelectionRole,                    /**< Role for motion region selection. Value of type MotionSelection. */
-        ItemAnalyticsSelectionRole,                 /**< Role for analytics region selection. Value of type QRectF. */
-        ItemWebPageSavedStateDataRole,              /**< Role for saved web page state when user switches the layout. */
-        ItemSkipFocusOnAdditionRole,                /**< Role for skipping 'focused' state on addition. */
+        /** Cell aspect ratio. Value of type qreal. */
+        LayoutCellAspectRatioRole = 277,
 
+        // Role 278 is deleted.
+
+        /**< Minimal bounding rect. Value of type QRect. */
+        LayoutMinimalBoundingRectRole = 279,
+
+        /** Stream synchronization state. Value of type QnStreamSynchronizationState. */
+        LayoutSyncStateRole = 280,
+
+        /** 'Preview Search' layout parameters. */
+        LayoutSearchStateRole = 281,
+
+        /** Time label display. Value of type bool. */
+        LayoutTimeLabelsRole = 282,
+
+        /** Overriden layout's permissions. Value of type int (Qn::Permissions). */
+        LayoutPermissionsRole = 283,
+
+        /** Selected items. Value of type QVector<nx::Uuid>. */
+        LayoutSelectionRole = 284,
+
+        /** Active item. Value of type nx::Uuid. */
+        LayoutActiveItemRole = 285,
+
+        /** Watermark info (when loaded from file). */
+        LayoutWatermarkRole = 286,
+
+//-------------------------------------------------------------------------------------------------
+        // Item-based roles. Their numeric values must be kept intact to maintain external video
+        // wall integrations. Video Wall Control protocol uses these IDs to pass messages about
+        // corresponding layout item changes.
+
+        /** Id. Value of type nx::Uuid. */
+        ItemUuidRole = 287,
+
+        /** Integer geometry. Value of type QRect. */
+        ItemGeometryRole = 288,
+
+        /** Floating point geometry delta. Value of type QRectF. */
+        ItemGeometryDeltaRole = 289,
+
+        /** Floating point combined geometry. Value of type QRectF. */
+        ItemCombinedGeometryRole = 290,
+
+        /** Floating point position. Value of type QPointF. */
+        ItemPositionRole = 291,
+
+        /** Zoom window. Value of type QRectF. */
+        ItemZoomRectRole = 292,
+
+        /**
+         * Flag which controls whether zoom window rectangle should be visible for the
+         * corresponding zoom window. Value of type bool.
+         */
+        ItemZoomWindowRectangleVisibleRole = 293,
+
+        /** Image enhancement params. Value of type nx::vms::api::ImageCorrectionData. */
+        ItemImageEnhancementRole = 294,
+
+        /** Image dewarping params. Value of type nx::vms::api::dewarping::ViewData. */
+        ItemImageDewarpingRole = 295,
+
+        /** Flags. Value of type int (Qn::ItemFlags). */
+        ItemFlagsRole = 296,
+
+        /** Rotation. Value of type qreal. */
+        ItemRotationRole = 297,
+
+        /** Frame distinction color. Value of type QColor. */
+        ItemFrameDistinctionColorRole = 298,
+
+        /** Flip state. Value of type bool. */
+        ItemFlipRole = 299,
+
+        /** Aspect ratio. Value of type qreal. */
+        ItemAspectRatioRole,
+
+        /** Info state. Value of type bool. */
+        ItemDisplayInfoRole,
+
+        /** PTZ control state. Value of type bool. */
+        ItemPtzControlRole,
+
+        /** Display analytics objects state. Value of type bool. */
+        ItemDisplayAnalyticsObjectsRole,
+
+        /** Display ROI state. Value of type bool. */
+        ItemDisplayRoiRole,
+
+        /** Camera hotspots display state. Value of type bool. */
+        ItemDisplayHotspotsRole,
+
+        /** Placeholder pixmap. Value of type QPixmap. */
+        ItemPlaceholderRole,
+
+        /** Playback position, in milliseconds. Value of type qint64. Default value is -1. */
+        ItemTimeRole,
+
+        /** Paused state. Value of type bool. */
+        ItemPausedRole,
+
+        /** Playback speed. Value of type qreal. */
+        ItemSpeedRole,
+
+        /** Slider window that is displayed when the item is active. Value of type QnTimePeriod. */
+        ItemSliderWindowRole,
+
+        /**
+         * Slider selection that is displayed when the items is active. Value of type QnTimePeriod.
+         */
+        ItemSliderSelectionRole,
+
+        /** Buttons that are checked in item's titlebar. Value of type int (Qn::WidgetButtons). */
+        ItemCheckedButtonsRole,
+
+        /**
+         * Buttons that are not to be displayed in item's titlebar. Value of type
+         * int (Qn::WidgetButtons).
+         */
+        ItemDisabledButtonsRole,
+
+        /**
+         * Buttons that are checked on each line of Health Monitoring widget. Value of type
+         * QnServerResourceWidget::HealthMonitoringButtons.
+         */
+        ItemHealthMonitoringButtonsRole,
+
+        /** Motion region selection. Value of type MotionSelection. */
+        ItemMotionSelectionRole,
+
+        /** Analytics region selection. Value of type QRectF. */
+        ItemAnalyticsSelectionRole,
+
+        /** Saved web page state when user switches the layout. */
+        ItemWebPageSavedStateDataRole,
+
+        /** Skipping 'focused' state on addition. */
+        ItemSkipFocusOnAdditionRole,
+
+//-------------------------------------------------------------------------------------------------
         /* Ptz-based. */
         PtzPresetRole,                              /**< Role for PTZ preset. Value of type QnPtzPreset. */
         PtzTourRole,                                /**< Role for PTZ tour. Value of type QnPtzTour. */
