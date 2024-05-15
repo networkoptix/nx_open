@@ -209,12 +209,13 @@ absent. When running the scripts with `CMakeCache.txt` in the build directory pr
 perform the Build stage, and the script arguments are ignored (they are intended to be passed only
 to the Generation stage).
 
-ATTENTION: On **Windows**, you can use a regular `cmd` console, because `build.bat` calls the
-`vcvars64.bat` which comes with the Visual Studio and properly sets PATH and other environment
-variables to enable using the 64-bit compiler and linker. If you don't use `build.bat`, you may
-call `vcvars64.bat` from your console, or use the console available from the Start menu as `VS2022
-x64 Native Tools Command Prompt`. Do not use the Visual Studio Command Prompt available from the
+ATTENTION: On **Windows**, do not use the Visual Studio Command Prompt available from the
 Visual Studio main menu, because it sets up the environment for the 32-bit compiler and linker.
+You can use a regular `cmd` console, because `build.bat` calls the `vcvars64.bat` which comes
+with the Visual Studio and properly sets PATH and other environment variables to enable using
+the 64-bit compiler and linker. If you don't use `build.bat`, you **must** prepare
+the environment manually (e.g. by calling `vcvars64.bat` from your console), or use
+the console available from the Start menu as `x64 Native Tools Command Prompt for VS2022`.
 
 On Windows, the build can be performed from MinGW (Bit Bash) or **Cygwin** console, either by the
 `build.sh` script, or manually calling `cmake`, but the environment variables required by the
