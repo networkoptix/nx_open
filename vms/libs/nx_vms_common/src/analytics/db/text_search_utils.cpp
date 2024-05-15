@@ -149,7 +149,7 @@ bool TextMatcher::matchText(const QString& text) const
         if (condition.type != ConditionType::textMatch)
             continue;
         if (text.startsWith(condition.text, Qt::CaseInsensitive))
-            result |= (1 << i);
+            result |= (1ull << i);
     }
     return allConditionMatched(result);
 }
@@ -201,7 +201,7 @@ uint64_t TextMatcher::matchExactAttributes(
             ? std::none_of(attributes.begin(), attributes.end(), comparator)
             : std::any_of(attributes.begin(), attributes.end(), comparator);
         if (isMatched)
-            result |= (1 << i);
+            result |= (1ull << i);
     }
     return result;
 }
@@ -225,7 +225,7 @@ uint64_t TextMatcher::checkAttributesPresence(
             ? std::none_of(attributes.begin(), attributes.end(), comparator)
             : std::any_of(attributes.begin(), attributes.end(), comparator);
         if (isMatched)
-            result |= (1 << i);
+            result |= (1ull << i);
     }
     return result;
 }
@@ -245,12 +245,12 @@ uint64_t TextMatcher::matchAttributeValues(
                 continue;
             }
             if (wordMatchAnyOfAttributes(condition.text, attributes))
-                result |= (1 << i);
+                result |= (1ull << i);
         }
         else if (condition.type == ConditionType::numericRangeMatch)
         {
             if (rangeMatchAttributes(condition.range, condition.name, attributes))
-                result |= (1 << i);
+                result |= (1ull << i);
         }
     }
     return result;
