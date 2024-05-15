@@ -22,4 +22,4 @@ struct AddDeviceSearchAddress
 // Parse device addresses as required for the Add Device dialog.
 AddDeviceSearchAddress NX_VMS_CLIENT_DESKTOP_API parseDeviceAddress(const QString& address);
 
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::desktop::manual_device_addition
