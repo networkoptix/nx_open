@@ -74,9 +74,8 @@ private:
     void updateSelectedServerButtonVisibility();
     void handleSelectedServerChanged(const QnMediaServerResourcePtr& previous);
 
-    void handleStartAddressFieldTextChanged(const QString& value);
-    void handleStartAddressEditingFinished();
-    void handleEndAddressFieldTextChanged(const QString& value);
+    void handleAddressFieldTextChanged(const QString& value);
+    void handlePortValueChanged(int value);
 
     void showAdditionFailedDialog(const FakeResourceList& resources);
 
@@ -108,6 +107,9 @@ private:
     QScopedPointer<FoundDevicesModel> m_model;
     NewSortModel* m_sortModel = nullptr;
     bool m_addressEditing = false;
+
+    std::optional<int> portIndex;
+    std::optional<int> portLength;
 };
 
 } // namespace nx::vms::client::desktop

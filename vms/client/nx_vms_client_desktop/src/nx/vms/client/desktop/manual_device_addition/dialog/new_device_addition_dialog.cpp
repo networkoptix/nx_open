@@ -30,6 +30,7 @@
 #include <utils/common/delayed.h>
 #include <utils/common/event_processors.h>
 
+#include "private/add_device_address_parser.h"
 #include "private/found_devices_delegate.h"
 #include "private/found_devices_model.h"
 #include "private/manual_device_searcher.h"
@@ -132,6 +133,15 @@ void NewDeviceAdditionDialog::initializeControls()
     for (const auto& server: m_serversWatcher.servers())
         ui->selectServerMenuButton->addServer(server);
 
+    connect(ui->addressOrSubnetMaskEdit,
+        &InputField::textChanged,
+        this,
+        &NewDeviceAdditionDialog::handleAddressFieldTextChanged);
+    connect(ui->portSpinBox,
+        &QSpinBox::valueChanged,
+        this,
+        &NewDeviceAdditionDialog::handlePortValueChanged);
+
     ui->addressOrSubnetMaskEdit->setExternalControls(
         ui->addressOrSubnetMaskLabel, ui->addressOrSubnetMaskLabelHint);
     ui->addressOrSubnetMaskEdit->setUseWarningStyleForControl(false);
@@ -222,16 +232,38 @@ bool NewDeviceAdditionDialog::eventFilter(QObject* object, QEvent* event)
     return base_type::eventFilter(object, event);
 }
 
-void NewDeviceAdditionDialog::handleStartAddressFieldTextChanged(const QString& /*value*/)
+void NewDeviceAdditionDialog::handleAddressFieldTextChanged(const QString& value)
 {
+    using namespace nx::vms::client::desktop::manual_device_addition;
+
+    if (m_addressEditing)
+        return;
+
+    QScopedValueRollback<bool> rollback(m_addressEditing, true);
+
+    auto address = parseDeviceAddress(value);
+    portIndex = address.portIndex;
+    portLength = address.portLength;
+
+    if (address.port)
+        ui->portSpinBox->setValue(*address.port);
 }
 
-void NewDeviceAdditionDialog::handleStartAddressEditingFinished()
+void NewDeviceAdditionDialog::handlePortValueChanged(int value)
 {
-}
+    if (m_addressEditing)
+        return;
 
-void NewDeviceAdditionDialog::handleEndAddressFieldTextChanged(const QString& /*value*/)
-{
+    QScopedValueRollback<bool> rollback(m_addressEditing, true);
+
+    if (portIndex && portLength)
+    {
+        auto address = ui->addressOrSubnetMaskEdit->text();
+        auto port = QString::number(value);
+        address.replace(*portIndex, *portLength, port);
+        ui->addressOrSubnetMaskEdit->setText(address);
+        *portLength = port.size();
+    }
 }
 
 void NewDeviceAdditionDialog::handleTabClicked(int index)
