@@ -217,7 +217,7 @@
         </widget>
        </item>
        <item row="3" column="3">
-        <widget class="nx::vms::client::desktop::BusyIndicatorButton" name="activateLicenseButtonCopy">
+        <widget class="nx::vms::client::desktop::BusyIndicatorButton" name="activateLicenseManualButton">
          <property name="enabled">
           <bool>false</bool>
          </property>
