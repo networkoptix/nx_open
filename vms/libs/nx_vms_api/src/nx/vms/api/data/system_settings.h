@@ -81,7 +81,7 @@ struct SaveableSettingsBase
     std::optional<bool> insecureDeprecatedApiEnabled;
     std::optional<bool> insecureDeprecatedApiInUseEnabled;
     std::optional<PersistentUpdateStorage> installedPersistentUpdateStorage;
-    std::optional<QString> installedUpdateInformation;
+    std::optional<QByteArray> installedUpdateInformation;
     std::optional<bool> keepIoPortStateIntactOnInitialization;
     std::optional<QString> licenseServer;
     std::optional<QString> lowQualityScreenVideoCodec;
@@ -117,7 +117,7 @@ struct SaveableSettingsBase
     std::optional<int> syncTimeEpsilon; //< TODO: Make std::chrono.
     std::optional<int> syncTimeExchangePeriod; //< TODO: Make std::chrono.
     std::optional<PersistentUpdateStorage> targetPersistentUpdateStorage;
-    std::optional<QString> targetUpdateInformation;
+    std::optional<QByteArray> targetUpdateInformation;
     std::optional<bool> upnpPortMappingEnabled;
     std::optional<bool> useTextEmailFormat;
     std::optional<bool> useWindowsEmailLineFeed;
@@ -226,32 +226,83 @@ struct NX_VMS_API SettingsBase
     (statisticsReportLastTime) \
     (statisticsReportLastVersion)
 
-struct NX_VMS_API SaveableSiteSettings: SaveableSettingsBase
+#define SaveableSiteSettings_Fields SaveableSettingsBase_Fields \
+    (userSessionSettings)(siteName)
+#define UnsaveableSiteSettings_Fields SettingsBase_Fields \
+    (cloudId)(localId)(enabled2fa)
+#define SiteSettings_Fields SaveableSiteSettings_Fields UnsaveableSiteSettings_Fields
+enum class SiteSettingName
+{
+    #ifndef Q_MOC_RUN
+        #define VALUE(R, DATA, ITEM) ITEM,
+        BOOST_PP_SEQ_FOR_EACH(VALUE, _, SiteSettings_Fields)
+        #undef VALUE
+    #endif // Q_MOC_RUN
+    none,
+};
+
+template<typename Visitor>
+constexpr auto nxReflectVisitAllEnumItems(SiteSettingName*, Visitor&& visitor)
+{
+    using Item = nx::reflect::enumeration::Item<SiteSettingName>;
+    using ItemValue = nx::reflect::enumeration::detail::ItemValue<SiteSettingName>;
+    const auto& itemName = nx::reflect::enumeration::detail::itemName;
+    return visitor(Item{SiteSettingName::none, ""}
+        #ifndef Q_MOC_RUN
+            #define VALUE(R, ENUM, ITEM) , Item{ENUM::ITEM, itemName(BOOST_PP_STRINGIZE(ITEM))}
+            BOOST_PP_SEQ_FOR_EACH(VALUE, SiteSettingName, SiteSettings_Fields)
+            #undef VALUE
+        #endif // Q_MOC_RUN
+    );
+}
+
+struct SiteSettingsFilter
+{
+    // TODO: Add support for multiple names.
+    SiteSettingName name = SiteSettingName::none;
+
+    SiteSettingsFilter() = default;
+    bool operator==(const SiteSettingsFilter&) const = default;
+    SiteSettingsFilter(SiteSettingName id): name(id) {}
+
+    SiteSettingName getId() const { return name; }
+    void setId(SiteSettingName id) { name = id; };
+};
+#define SiteSettingsFilter_Fields (name)
+QN_FUSION_DECLARE_FUNCTIONS(SiteSettingsFilter, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(SiteSettingsFilter, SiteSettingsFilter_Fields)
+
+/**%apidoc
+ * %param[unused] name
+ */
+struct NX_VMS_API SaveableSiteSettings: SaveableSettingsBase, SiteSettingsFilter
 {
     std::optional<UserSessionSettings> userSessionSettings;
     std::optional<QString> siteName;
 
+    using SiteSettingsFilter::getId;
+    using SiteSettingsFilter::setId;
     bool operator==(const SaveableSiteSettings&) const = default;
 };
-#define SaveableSiteSettings_Fields \
-    SaveableSettingsBase_Fields \
-    (userSessionSettings) \
-    (siteName)
 QN_FUSION_DECLARE_FUNCTIONS(SaveableSiteSettings, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(SaveableSiteSettings, SaveableSiteSettings_Fields)
 NX_REFLECTION_TAG_TYPE(SaveableSiteSettings, jsonSerializeChronoDurationAsNumber)
 NX_REFLECTION_TAG_TYPE(SaveableSiteSettings, jsonSerializeInt64AsString)
 
-struct SiteSettings: SaveableSiteSettings, SettingsBase
+/**%apidoc
+ * %param[unused] emailSettings.password
+ */
+struct NX_VMS_API SiteSettings: SaveableSiteSettings, SettingsBase
 {
     QString cloudId;
     nx::Uuid localId;
     bool enabled2fa = false;
 
     bool operator==(const SiteSettings&) const = default;
+    size_t size() const { return 1u; }
+    bool empty() const { return false; }
+    QJsonValue front() const;
 };
-#define SiteSettings_Fields \
-    SaveableSiteSettings_Fields SettingsBase_Fields (cloudId)(localId)(enabled2fa)
 QN_FUSION_DECLARE_FUNCTIONS(SiteSettings, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(SiteSettings, SiteSettings_Fields)
 NX_REFLECTION_TAG_TYPE(SiteSettings, jsonSerializeChronoDurationAsNumber)
@@ -381,47 +432,6 @@ struct SystemSettingsFilter
 };
 #define SystemSettingsFilter_Fields (name)
 QN_FUSION_DECLARE_FUNCTIONS(SystemSettingsFilter, (json), NX_VMS_API)
-
-enum class SiteSettingName
-{
-    #ifndef Q_MOC_RUN
-        #define VALUE(R, DATA, ITEM) ITEM,
-        BOOST_PP_SEQ_FOR_EACH(VALUE, _, SiteSettings_Fields)
-        #undef VALUE
-    #endif // Q_MOC_RUN
-    none,
-};
-
-template<typename Visitor>
-constexpr auto nxReflectVisitAllEnumItems(SiteSettingName*, Visitor&& visitor)
-{
-    using Item = nx::reflect::enumeration::Item<SiteSettingName>;
-    using ItemValue = nx::reflect::enumeration::detail::ItemValue<SiteSettingName>;
-    const auto& itemName = nx::reflect::enumeration::detail::itemName;
-    return visitor(Item{SiteSettingName::none, ""}
-        #ifndef Q_MOC_RUN
-            #define VALUE(R, ENUM, ITEM) , Item{ENUM::ITEM, itemName(BOOST_PP_STRINGIZE(ITEM))}
-            BOOST_PP_SEQ_FOR_EACH(VALUE, SiteSettingName, SiteSettings_Fields)
-            #undef VALUE
-        #endif // Q_MOC_RUN
-    );
-}
-
-struct SiteSettingsFilter
-{
-    // TODO: Add support for multiple names.
-    SiteSettingName name = SiteSettingName::none;
-
-    SiteSettingsFilter() = default;
-    SiteSettingsFilter(QString id)
-    {
-        nx::reflect::enumeration::fromString(id.toStdString(), &name);
-    }
-
-    const SiteSettingsFilter& getId() const { return *this; }
-    void setId(SiteSettingsFilter filter) { this->name = filter.name; };
-};
-#define SiteSettingsFilter_Fields (name)
-QN_FUSION_DECLARE_FUNCTIONS(SiteSettingsFilter, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(SystemSettingsFilter, SystemSettingsFilter_Fields)
 
 } // namespace nx::vms::api

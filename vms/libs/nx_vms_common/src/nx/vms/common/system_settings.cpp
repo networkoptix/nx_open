@@ -2512,23 +2512,34 @@ void SystemSettings::setCloudPollingInterval(std::chrono::seconds period)
     d->cloudPollingIntervalSAdaptor->setValue(period);
 }
 
-void SystemSettings::update(const api::SaveableSystemSettings& value)
+SystemSettings::Errors SystemSettings::update(const api::SaveableSystemSettings& value)
 {
+    Errors errors;
     #define VALUE(R, STRUCT, ITEM) \
         if (STRUCT.ITEM) \
-            d->BOOST_PP_CAT(ITEM, Adaptor)->setValue(*STRUCT.ITEM);
+        { \
+            if (d->BOOST_PP_CAT(ITEM, Adaptor)->isValueValid(*STRUCT.ITEM)) \
+                d->BOOST_PP_CAT(ITEM, Adaptor)->setValue(*STRUCT.ITEM); \
+            else \
+                errors.emplace(api::SystemSettingName::ITEM); \
+        }
     BOOST_PP_SEQ_FOR_EACH(VALUE, value, SaveableSystemSettings_Fields)
     #undef VALUE
+    return errors;
 }
 
-void SystemSettings::update(const api::SystemSettings& value)
+SystemSettings::Errors SystemSettings::update(const api::SystemSettings& value)
 {
-    #define VALUE(R, STRUCT, ITEM) d->BOOST_PP_CAT(ITEM, Adaptor)->setValue(STRUCT.ITEM);
+    const api::SaveableSystemSettings& base = value;
+    auto errors = update(base);
+    #define VALUE(R, STRUCT, ITEM) \
+        if (d->BOOST_PP_CAT(ITEM, Adaptor)->isValueValid(STRUCT.ITEM)) \
+            d->BOOST_PP_CAT(ITEM, Adaptor)->setValue(STRUCT.ITEM); \
+        else \
+            errors.emplace(api::SystemSettingName::ITEM);
     BOOST_PP_SEQ_FOR_EACH(VALUE, value, UnsaveableSystemSettings_Fields)
     #undef VALUE
-
-    const api::SaveableSystemSettings& base = value;
-    update(base);
+    return errors;
 }
 
 api::SystemSettings SystemSettings::apiSettings() const
@@ -2537,6 +2548,24 @@ api::SystemSettings SystemSettings::apiSettings() const
     #define VALUE(R, RESULT, ITEM) RESULT.ITEM = d->BOOST_PP_CAT(ITEM, Adaptor)->value();
     BOOST_PP_SEQ_FOR_EACH(VALUE, result, SystemSettings_Fields)
     #undef VALUE
+    return result;
+}
+
+api::SystemSettings SystemSettings::apiSettings(const std::vector<api::SystemSettingName>& names) const
+{
+    api::SystemSettings result;
+    for (auto name: names)
+    {
+        switch (name)
+        {
+            #define VALUE(R, RESULT, ITEM) \
+                case api::SystemSettingName::ITEM: \
+                    RESULT.ITEM = d->BOOST_PP_CAT(ITEM, Adaptor)->value(); \
+                    break;
+            BOOST_PP_SEQ_FOR_EACH(VALUE, result, SystemSettings_Fields)
+            #undef VALUE
+        }
+    }
     return result;
 }
 
