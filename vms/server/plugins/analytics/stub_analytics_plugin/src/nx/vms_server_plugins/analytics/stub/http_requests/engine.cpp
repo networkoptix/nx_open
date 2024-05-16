@@ -65,8 +65,8 @@ R"json(
                     },
                     {
                         "type": "TextField",
-                        "name": ")json" + kHttpPathVar + R"json(",
-                        "caption": "HTTP endpoint path",
+                        "name": ")json" + kHttpUrlVar + R"json(",
+                        "caption": "HTTP endpoint path with optional query and fragment",
                         "defaultValue": "/rest/v4/site/settings"
                     },
                     {
