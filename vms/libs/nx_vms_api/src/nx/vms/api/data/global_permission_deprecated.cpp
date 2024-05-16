@@ -56,7 +56,10 @@ std::tuple<GlobalPermissions, std::vector<nx::Uuid>, std::map<nx::Uuid, AccessRi
         accessMap.emplace(kAllVideoWallsGroupId, AccessRight::edit);
 
     for (const auto& id: accessibleResources)
-        accessMap.emplace(id, accessRights);
+    {
+        if (id != nx::Uuid{})
+            accessMap.emplace(id, accessRights);
+    }
 
     GlobalPermissions newPermissions = GlobalPermission::none;
     if (permissions.testFlag(GlobalPermissionDeprecated::viewLogs))

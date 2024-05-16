@@ -20,6 +20,9 @@
 
 namespace nx::vms::api {
 
+const QString kUserFullName{"fullUserName"};
+const QString kCloudUserAuthenticationInfo{"cloudUserAuthenticationInfo"};
+
 struct NX_VMS_API ResourceData: IdData
 {
     using base_type = IdData;
