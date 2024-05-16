@@ -366,7 +366,7 @@ Item
                     color: ColorTheme.colors.light16
                     text: qsTr("You need to specify only user's email address.")
                         + "\n\n"
-                        + qsTr("The added site will quickly become visible to users with an"
+                        + qsTr("The added system will quickly become visible to users with an"
                         + " existing cloud account, while users without an existing cloud account"
                         + " will receive instructions by Email.")
                 }
