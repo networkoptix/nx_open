@@ -87,6 +87,9 @@ struct NX_NETWORK_API RequestContext
         Attrs attrs,
         http::Request request,
         std::unique_ptr<AbstractMsgBodySourceWithCache> body = nullptr);
+
+    // Returns traceContext->traceId if traceContext is set, otherwise returns empty string.
+    std::string traceId() const;
 };
 
 enum class MessageBodyDeliveryType

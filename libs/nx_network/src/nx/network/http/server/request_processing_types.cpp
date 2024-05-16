@@ -80,6 +80,11 @@ RequestContext::RequestContext(
 {
 }
 
+std::string RequestContext::traceId() const
+{
+    return traceContext ? traceContext->traceId : std::string();
+}
+
 //-------------------------------------------------------------------------------------------------
 
 RequestResult::RequestResult(StatusCode::Value statusCode):
