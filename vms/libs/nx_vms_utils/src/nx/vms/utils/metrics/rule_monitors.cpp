@@ -163,6 +163,12 @@ public:
         if (function() == "!=" || function() == "notEqual")
             return binaryOperation(1, 2, [](auto v1, auto v2) { return !isEqual(v1, v2); });
 
+        if (function() == "notNullAndNotEqual")
+        {
+            return binaryOperation(1, 2,
+                [](auto v1, auto v2) { return !v1.isNull() && !v2.isNull() && !isEqual(v1, v2); });
+        }
+
         if (function() == ">" || function() == "greaterThan")
             return numericOperation(1, 2, [](auto v1, auto v2) { return v1 > v2; });
 
@@ -270,6 +276,18 @@ public:
                 {
                     int count = 0;
                     forEach([&](auto v, auto) { if (v == expected()) count += 1; });
+                    return count;
+                });
+        }
+
+        if (function() == "countValuesNotEqual")
+        {
+            return durationOperation(
+                1, 2, Border::drop(),
+                [expected = value(3)](const auto& forEach)
+                {
+                    int count = 0;
+                    forEach([&](auto v, auto) { if (!v.isNull() && v != expected()) count += 1; });
                     return count;
                 });
         }
