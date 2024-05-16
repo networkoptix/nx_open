@@ -270,15 +270,15 @@ public:
 
     virtual void doSendHttpRequest(
         HttpDomainName requestDomain,
-        const char* path,
+        const char* url,
         const char* httpMethod,
         const char* mimeType,
         const char* requestBody,
         IHttpRequestCompletionHandler* callback) const override
     {
         NX_PRINT << "Making HTTP request with HttpDomainName = " << (int) requestDomain
-            << " path = " << path << ", httpMethod = " << httpMethod
-            << ", mimeType = " << mimeType << ", requestBody = " << requestBody;
+                 << ", url = " << url << ", httpMethod = " << httpMethod << ", mimeType = "
+                 << mimeType << ", requestBody = " << requestBody;
         callback->execute({new nx::sdk::String()});
     }
 

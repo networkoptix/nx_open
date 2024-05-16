@@ -101,7 +101,7 @@ public:
     /** Called by sendHttpRequest() */
     protected: virtual void doSendHttpRequest(
         HttpDomainName requestDomainName,
-        const char* path,
+        const char* url,
         const char* httpMethod,
         const char* mimeType,
         const char* requestBody,
@@ -110,18 +110,18 @@ public:
      * Allows to send asynchronous HTTP requests to the Cloud or VMS Server.
      * IHttpRequestCompletionHandler::execute() will be called later. An error or HTTP response will
      * be passed to this method as a parameter. HTTP response will consist of a status line, HTTP
-     * headers and a message body seperated by an empty line.
+     * headers and a message body separated by an empty line.
      */
     public: void sendHttpRequest(
         HttpDomainName requestDomainName,
-        const char* path,
+        const char* url,
         const char* httpMethod,
         const char* mimeType,
         const char* requestBody,
         Ptr<IHttpRequestCompletionHandler> callback) const
     {
         doSendHttpRequest(
-            requestDomainName, path, httpMethod, mimeType, requestBody, callback.get());
+            requestDomainName, url, httpMethod, mimeType, requestBody, callback.get());
     }
 };
 using IUtilityProvider4 = IUtilityProvider;

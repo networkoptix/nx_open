@@ -102,7 +102,7 @@ bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoPa
     auto handler =  nx::sdk::makePtr<RequestCompletionHandler>();
     m_engine->utilityProvider()->sendHttpRequest(
         m_requestContext.domain,
-        m_requestContext.path.c_str(),
+        m_requestContext.url.c_str(),
         m_requestContext.httpMethod.c_str(),
         m_requestContext.mimeType.c_str(),
         m_requestContext.requestBody.c_str(),
@@ -141,7 +141,7 @@ nx::sdk::Result<const nx::sdk::ISettingsResponse*> DeviceAgent::settingsReceived
     m_requestContext.httpMethod = nx::kit::utils::toUpper(settings[kHttpMethodVar]);
     m_requestContext.requestBody = settings[kHttpRequestBodyVar];
     m_requestContext.mimeType = settings[kHttpMimeTypeVar];
-    m_requestContext.path = settings[kHttpPathVar];
+    m_requestContext.url = settings[kHttpUrlVar];
 
     std::string timePeriodSeconds = settings[kHttpRequestTimePeriodSeconds];
     if (!timePeriodSeconds.empty())
