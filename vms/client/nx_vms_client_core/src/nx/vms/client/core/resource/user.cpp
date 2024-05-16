@@ -16,7 +16,6 @@ UserResource::UserResource(UserModelV1 data):
     setEnabled(data.isEnabled);
     setEmail(data.email);
     setFullName(data.fullName);
-    setAttributes(data.attributes);
 
     GlobalPermissions permissions;
     std::vector<nx::Uuid> groupIds;

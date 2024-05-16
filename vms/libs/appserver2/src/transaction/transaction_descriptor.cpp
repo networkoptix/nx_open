@@ -1779,7 +1779,7 @@ struct ModifyResourceParamAccess
             return Result();
 
         Qn::Permissions permissions = Qn::SavePermission;
-        if (param.name == Qn::USER_FULL_NAME)
+        if (param.name == api::kUserFullName)
             permissions |= Qn::WriteFullNamePermission;
 
         return accessManager->hasPermission(accessData, target, permissions)
