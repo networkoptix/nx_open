@@ -53,9 +53,6 @@ struct NX_VMS_API UserModelBase
     /**%apidoc[proprietary] External identification data (currently used for LDAP only). */
     std::optional<UserExternalIdModel> externalId;
 
-    /**%apidoc[readonly] */
-    UserAttributes attributes{};
-
     // The next fields are used by PATCH functionality to preserve the existing DB data.
     std::optional<QnLatin1Array> digest; /**<%apidoc[unused] */
     std::optional<QnLatin1Array> hash; /**<%apidoc[unused] */
@@ -78,7 +75,6 @@ struct NX_VMS_API UserModelBase
     (isEnabled) \
     (isHttpDigestEnabled) \
     (externalId) \
-    (attributes) \
     (password) \
     (digest) \
     (hash) \
@@ -192,6 +188,9 @@ struct NX_VMS_API UserModelV3: public UserModelBase, public ResourceWithParamete
      */
     std::optional<TemporaryToken> temporaryToken;
 
+    /**%apidoc[readonly] */
+    UserAttributes attributes;
+
     bool operator==(const UserModelV3& other) const = default;
 
     using DbReadTypes = std::tuple<UserData, ResourceParamWithRefDataList>;
@@ -207,7 +206,7 @@ struct NX_VMS_API UserModelV3: public UserModelBase, public ResourceWithParamete
 #define UserModelV3_Fields \
     UserModelBase_Fields \
     ResourceWithParameters_Fields \
-    (groupIds)(permissions)(resourceAccessRights)(temporaryToken)
+    (groupIds)(permissions)(resourceAccessRights)(temporaryToken)(attributes)
 
 QN_FUSION_DECLARE_FUNCTIONS(UserModelV3, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(UserModelV3, UserModelV3_Fields)

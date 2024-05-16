@@ -568,7 +568,7 @@ void fromResourceToApi(const QnUserResource& src, UserData& dst)
     dst.isEnabled = src.isEnabled();
     dst.permissions = src.getRawPermissions();
     if (auto context = src.systemContext())
-        dst.fullName = context->resourcePropertyDictionary()->value(dst.id, Qn::USER_FULL_NAME);
+        dst.fullName = context->resourcePropertyDictionary()->value(dst.id, kUserFullName);
 
     NX_MUTEX_LOCKER locker(&src.m_mutex);
     dst.parentId = src.m_parentId;
