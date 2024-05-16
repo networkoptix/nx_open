@@ -161,7 +161,7 @@ const SaveableSettingsBase kDefaultSettingsBase{
     .insecureDeprecatedApiEnabled = false,
     .insecureDeprecatedApiInUseEnabled = false,
     .installedPersistentUpdateStorage = PersistentUpdateStorage{},
-    .installedUpdateInformation = QString{},
+    .installedUpdateInformation = QByteArray{},
     .keepIoPortStateIntactOnInitialization = false,
     .licenseServer = QString{"https://licensing.vmsproxy.com"},
     .lowQualityScreenVideoCodec = QString{"mpeg2video"},
@@ -197,7 +197,7 @@ const SaveableSettingsBase kDefaultSettingsBase{
     .syncTimeEpsilon = 200,
     .syncTimeExchangePeriod = 600'000,
     .targetPersistentUpdateStorage = PersistentUpdateStorage{},
-    .targetUpdateInformation = QString{},
+    .targetUpdateInformation = QByteArray{},
     .upnpPortMappingEnabled = true,
     .useTextEmailFormat = false,
     .useWindowsEmailLineFeed = false

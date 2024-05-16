@@ -33,6 +33,7 @@ struct SystemSettings;
 struct WatermarkSettings;
 struct PixelationSettings;
 enum class ProxyConnectionAccessPolicy;
+enum class SystemSettingName;
 
 } // nx::vms::api
 
@@ -519,9 +520,12 @@ public:
     std::chrono::seconds cloudPollingInterval() const;
     void setCloudPollingInterval(std::chrono::seconds value);
 
-    void update(const nx::vms::api::SaveableSystemSettings& value);
-    void update(const nx::vms::api::SystemSettings& value);
+    using Errors = std::set<nx::vms::api::SystemSettingName>;
+    Errors update(const nx::vms::api::SaveableSystemSettings& value);
+    Errors update(const nx::vms::api::SystemSettings& value);
     nx::vms::api::SystemSettings apiSettings() const;
+    nx::vms::api::SystemSettings apiSettings(
+        const std::vector<nx::vms::api::SystemSettingName>& names) const;
 
     bool isAllowRegisteringIntegrationsEnabled() const;
     void setAllowRegisteringIntegrationsEnabled(bool value);
