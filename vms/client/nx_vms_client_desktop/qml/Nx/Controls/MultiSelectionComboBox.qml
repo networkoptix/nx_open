@@ -5,9 +5,9 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Effects
 
-import Nx
 import Nx.Controls
 import Nx.Core
+import Nx.Core.Controls
 
 import nx.vms.client.desktop
 

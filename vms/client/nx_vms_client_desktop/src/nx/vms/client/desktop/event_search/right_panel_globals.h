@@ -13,30 +13,17 @@ namespace RightPanel {
 Q_NAMESPACE
 Q_CLASSINFO("RegisterEnumClassesUnscoped", "false")
 
-enum class FetchDirection
+enum class Tab
 {
-    earlier,
-    later
+    invalid = -1,
+    resources,
+    motion,
+    bookmarks,
+    events,
+    analytics,
+    settings
 };
-Q_ENUM_NS(FetchDirection)
-
-enum class FetchResult
-{
-    complete, //< Successful. There's no more data to fetch.
-    incomplete, //< Successful. There's more data to fetch.
-    failed, //< Unsuccessful.
-    cancelled //< Cancelled.
-};
-Q_ENUM_NS(FetchResult)
-
-enum class CameraSelection
-{
-    all,
-    layout,
-    current,
-    custom
-};
-Q_ENUM_NS(CameraSelection)
+Q_ENUM_NS(Tab)
 
 enum class SystemSelection
 {
@@ -44,25 +31,6 @@ enum class SystemSelection
     current,
 };
 Q_ENUM_NS(SystemSelection)
-
-enum class TimeSelection
-{
-    anytime,
-    day,
-    week,
-    month,
-    selection
-};
-Q_ENUM_NS(TimeSelection)
-
-enum class PreviewState
-{
-    initial,
-    busy,
-    ready,
-    missing
-};
-Q_ENUM_NS(PreviewState)
 
 struct VmsEvent
 {
@@ -99,21 +67,6 @@ struct VmsEventGroup: public VmsEvent
 };
 
 void registerQmlType();
-
-inline size_t qHash(RightPanel::TimeSelection source)
-{
-    return size_t(source);
-}
-
-inline size_t qHash(RightPanel::CameraSelection source)
-{
-    return size_t(source);
-}
-
-inline uint qHash(RightPanel::SystemSelection source)
-{
-    return uint(source);
-}
 
 } // namespace RightPanel
 } // namespace nx::vms::client::desktop

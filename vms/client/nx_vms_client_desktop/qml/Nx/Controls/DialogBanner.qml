@@ -3,8 +3,9 @@
 import QtQuick
 import QtQuick.Layouts
 
-import Nx.Controls 1.0
-import Nx.Core 1.0
+import Nx.Controls
+import Nx.Core
+import Nx.Core.Controls
 
 Rectangle
 {

@@ -2,7 +2,7 @@
 
 import QtQuick
 
-import Nx
+import Nx.Core
 
 import nx.vms.client.desktop
 

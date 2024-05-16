@@ -226,12 +226,12 @@ bool LookupListEntriesModel::isValidValue(const QString& value, const QString& a
     return d->isValidValue(value, attributeName);
 }
 
-analytics::taxonomy::StateView* LookupListEntriesModel::taxonomy()
+core::analytics::taxonomy::StateView* LookupListEntriesModel::taxonomy()
 {
     return d->taxonomy;
 }
 
-void LookupListEntriesModel::setTaxonomy(analytics::taxonomy::StateView* taxonomy)
+void LookupListEntriesModel::setTaxonomy(core::analytics::taxonomy::StateView* taxonomy)
 {
     d->taxonomy = taxonomy;
     d->initAttributeFunctions();

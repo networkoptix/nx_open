@@ -8,6 +8,8 @@
 
 namespace nx::vms::client::desktop {
 
+using namespace nx::vms::client::core;
+
 InfoBanner::InfoBanner(QWidget* parent, Qt::WindowFlags f):
     base_type(parent, f)
 {

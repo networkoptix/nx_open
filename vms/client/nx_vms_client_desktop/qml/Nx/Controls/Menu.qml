@@ -4,7 +4,6 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Window
 
-import Nx
 import Nx.Controls
 import Nx.Core
 

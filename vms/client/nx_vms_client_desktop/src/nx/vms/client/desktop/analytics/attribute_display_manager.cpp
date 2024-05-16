@@ -2,10 +2,12 @@
 
 #include "attribute_display_manager.h"
 
-#include <nx/vms/client/desktop/analytics/analytics_filter_model.h>
-#include <nx/vms/client/desktop/analytics/taxonomy/attribute.h>
-#include <nx/vms/client/desktop/analytics/taxonomy/attribute_set.h>
-#include <nx/vms/client/desktop/analytics/taxonomy/object_type.h>
+#include <QtQml/QtQml>
+
+#include <nx/vms/client/core/analytics/analytics_filter_model.h>
+#include <nx/vms/client/core/analytics/taxonomy/attribute.h>
+#include <nx/vms/client/core/analytics/taxonomy/attribute_set.h>
+#include <nx/vms/client/core/analytics/taxonomy/object_type.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 
@@ -79,7 +81,7 @@ public:
         settingsProperty->setValue(attributes);
     }
 
-    QStringList attributesForObjectType(const ObjectType* objectType)
+    QStringList attributesForObjectType(const core::analytics::taxonomy::ObjectType* objectType) const
     {
         QStringList result;
 
@@ -119,7 +121,7 @@ public:
 
 public:
     decltype(LocalSettings::analyticsSearchTileVisibleAttributes)* const settingsProperty;
-    AnalyticsFilterModel* analyticsFilterModel = nullptr;
+    core::analytics::taxonomy::AnalyticsFilterModel* analyticsFilterModel = nullptr;
     const Mode mode = Mode::tileView;
 
     QSet<QString> visibleAttributes;
@@ -128,9 +130,22 @@ public:
     QMap<QString, QString> displayNameByAttribute;
 };
 
+void AttributeDisplayManager::registerQmlType()
+{
+    qmlRegisterType<taxonomy::AttributeDisplayManager>(
+        "nx.vms.client.desktop.analytics", 1, 0, "AttributeDisplayManager");
+
+    qmlRegisterSingletonType<details::Factory>(
+        "nx.vms.client.desktop", 1, 0, "AttributeDisplayManagerFactory",
+        [](QQmlEngine* /*qmlEngine*/, QJSEngine* /*jsEngine*/)
+        {
+            return new details::Factory();
+        });
+}
+
 AttributeDisplayManager::AttributeDisplayManager(
     Mode mode,
-    AnalyticsFilterModel* filterModel)
+    core::analytics::taxonomy::AnalyticsFilterModel* filterModel)
     :
     QObject(filterModel),
     d(new Private(mode, this))
@@ -143,7 +158,7 @@ AttributeDisplayManager::AttributeDisplayManager(
         {kObjectTypeAttributeName, tr("Object Type")},
     };
 
-    connect(d->analyticsFilterModel, &AnalyticsFilterModel::objectTypesChanged,
+    connect(d->analyticsFilterModel, &core::analytics::taxonomy::AnalyticsFilterModel::objectTypesChanged,
         d.get(), &Private::handleObjectTypesChanged);
 
     d->load();
@@ -238,7 +253,7 @@ void AttributeDisplayManager::placeAttributeBefore(
 QStringList AttributeDisplayManager::attributesForObjectType(
     const QStringList& objectTypeIds) const
 {
-    const ObjectType* objectType = d->analyticsFilterModel->findFilterObjectType(objectTypeIds);
+    const core::analytics::taxonomy::ObjectType* objectType = d->analyticsFilterModel->findFilterObjectType(objectTypeIds);
     if (!objectType)
         return {};
 
@@ -259,5 +274,16 @@ bool AttributeDisplayManager::isVisible(const QString& attribute) const
 {
     return d->visibleAttributes.contains(attribute);
 }
+
+namespace details {
+
+AttributeDisplayManager* Factory::create(
+    AttributeDisplayManager::Mode mode,
+    core::analytics::taxonomy::AnalyticsFilterModel* filterModel)
+{
+    return new AttributeDisplayManager(mode, filterModel);
+}
+
+} // namespace details
 
 } // namespace nx::vms::client::desktop::analytics::taxonomy

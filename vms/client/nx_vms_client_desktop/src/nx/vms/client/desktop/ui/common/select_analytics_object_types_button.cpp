@@ -3,7 +3,7 @@
 #include "select_analytics_object_types_button.h"
 
 #include <nx/vms/client/core/analytics/analytics_icon_manager.h>
-#include <nx/vms/client/desktop/analytics/analytics_taxonomy_manager.h>
+#include <nx/vms/client/core/analytics/analytics_taxonomy_manager.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/system_context.h>
 

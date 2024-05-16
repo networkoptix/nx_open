@@ -1,11 +1,11 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.11
-import QtQuick.Controls 2.4
+import QtQuick
+import QtQuick.Controls
 
-import Nx 1.0
-import Nx.Core 1.0
-import Nx.Controls 1.0 as Nx
+import Nx.Core
+import Nx.Core.Controls
+import Nx.Controls as Nx
 
 Item
 {
@@ -97,7 +97,7 @@ Item
 
         onClicked: tile.deleteSystem()
 
-        Nx.ColoredImage
+        ColoredImage
         {
             anchors.centerIn: parent
             width: 20
@@ -130,7 +130,7 @@ Item
 
         spacing: 8
 
-        Nx.ColoredImage
+        ColoredImage
         {
             width: 22
             height: 16
@@ -211,7 +211,7 @@ Item
             visible: tile.isFactorySystem && tile.online
         }
 
-        Nx.ColoredImage
+        ColoredImage
         {
             anchors.verticalCenter: anchorTag.verticalCenter
             width: 10

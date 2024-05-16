@@ -16,13 +16,13 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/math/math.h>
 #include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/core/image_providers/resource_thumbnail_provider.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/common/widgets/autoscaled_plain_text.h>
 #include <nx/vms/client/desktop/common/widgets/scalable_image_widget.h>
 #include <nx/vms/client/desktop/image_providers/layout_background_image_provider.h>
-#include <nx/vms/client/desktop/image_providers/resource_thumbnail_provider.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/style/helper.h>
@@ -54,8 +54,8 @@ bool hasExportPermission(const QnResourcePtr& resource)
 
 } // namespace
 
-using ResourceThumbnailProviderPtr = QSharedPointer<ResourceThumbnailProvider>;
-using ImageProviderPtr = QSharedPointer<ImageProvider>;
+using ResourceThumbnailProviderPtr = QSharedPointer<core::ResourceThumbnailProvider>;
+using ImageProviderPtr = QSharedPointer<core::ImageProvider>;
 
 struct LayoutThumbnailLoader::Private
 {
@@ -79,7 +79,7 @@ struct LayoutThumbnailLoader::Private
         // Image provider that deals with loading process
         ImageProviderPtr provider;
         // Last status for an item
-        Qn::ThumbnailStatus status;
+        core::ThumbnailStatus status;
         // Desired rotation for a tile.
         qreal rotation;
         // Output rectangle for the cell, that contains this resource
@@ -174,7 +174,7 @@ struct LayoutThumbnailLoader::Private
             --numLoading;
             if(numLoading == 0)
             {
-                status = Qn::ThumbnailStatus::Loaded;
+                status = core::ThumbnailStatus::Loaded;
                 NX_VERBOSE(this) << "LayoutThumbnailLoader(" << layoutName << ") is complete";
                 emit q->statusChanged(status);
             }
@@ -182,7 +182,7 @@ struct LayoutThumbnailLoader::Private
     }
 
     // Draws a pixmap for 'NoData' or 'Invalid' state.
-    void drawStatusPixmap(Qn::ThumbnailStatus status, const QnAspectRatio& aspectRatio,
+    void drawStatusPixmap(core::ThumbnailStatus status, const QnAspectRatio& aspectRatio,
         ItemPtr item)
     {
         qreal rotation = qMod(item->rotation, 180.0);
@@ -235,7 +235,7 @@ struct LayoutThumbnailLoader::Private
         finalizeOutputImage();
     }
 
-    void updateTileStatus(Qn::ThumbnailStatus status, const QnAspectRatio& aspectRatio,
+    void updateTileStatus(core::ThumbnailStatus status, const QnAspectRatio& aspectRatio,
         ItemPtr item)
     {
         bool loaderIsComplete = false;
@@ -246,24 +246,24 @@ struct LayoutThumbnailLoader::Private
 
         switch (status)
         {
-            case Qn::ThumbnailStatus::Loading:
+            case core::ThumbnailStatus::Loading:
                 break;
 
-            case Qn::ThumbnailStatus::Loaded:
+            case core::ThumbnailStatus::Loaded:
                 item->status = status;
                 loaderIsComplete = true;
                 break;
 
-            case Qn::ThumbnailStatus::Invalid:
-            case Qn::ThumbnailStatus::NoData:
+            case core::ThumbnailStatus::Invalid:
+            case core::ThumbnailStatus::NoData:
                 // We try not to change status if we had already 'Loaded
-                if(item->status != Qn::ThumbnailStatus::Loaded)
+                if(item->status != core::ThumbnailStatus::Loaded)
                     drawStatusPixmap(status, aspectRatio, item);
                 else
                     item->status = status;
                 loaderIsComplete = true;
                 break;
-            case Qn::ThumbnailStatus::Refreshing:
+            case core::ThumbnailStatus::Refreshing:
                 break;
         }
 
@@ -373,7 +373,7 @@ struct LayoutThumbnailLoader::Private
 
     // Generates a pixmap for 'NoData' or 'Invalid' state.
     QPixmap specialPixmap(
-        bool isOnline, bool exportAllowed, Qn::ThumbnailStatus status, const QSize& size) const
+        bool isOnline, bool exportAllowed, core::ThumbnailStatus status, const QSize& size) const
     {
         QPixmap pixmap(size * outputImage.devicePixelRatio());
         pixmap.setDevicePixelRatio(outputImage.devicePixelRatio());
@@ -387,12 +387,12 @@ struct LayoutThumbnailLoader::Private
 
         switch (status)
         {
-            case Qn::ThumbnailStatus::NoData:
+            case core::ThumbnailStatus::NoData:
                 noDataStatusWidget->resize(size);
                 noDataStatusWidget->render(&pixmap);
                 break;
 
-            case Qn::ThumbnailStatus::Invalid:
+            case core::ThumbnailStatus::Invalid:
                 nonCameraWidget->resize(size);
                 nonCameraWidget->render(&pixmap);
                 break;
@@ -433,7 +433,7 @@ struct LayoutThumbnailLoader::Private
     {
         items.clear();
         outputImage = QImage();
-        status = Qn::ThumbnailStatus::Invalid;
+        status = core::ThumbnailStatus::Invalid;
         numLoading = 0;
     }
 
@@ -444,7 +444,7 @@ struct LayoutThumbnailLoader::Private
     // We cut a part of outputImage and send it to clients.
     QImage outputRegion;
     // Output status of thumbnail loader.
-    Qn::ThumbnailStatus status = Qn::ThumbnailStatus::Invalid;
+    core::ThumbnailStatus status = core::ThumbnailStatus::Invalid;
     // Items to be loaded.
     QList<ItemPtr> items;
 
@@ -488,9 +488,9 @@ QImage LayoutThumbnailLoader::image() const
 {
     switch (d->status)
     {
-        case Qn::ThumbnailStatus::NoData:
-        case Qn::ThumbnailStatus::Invalid:
-        case Qn::ThumbnailStatus::Refreshing:
+        case core::ThumbnailStatus::NoData:
+        case core::ThumbnailStatus::Invalid:
+        case core::ThumbnailStatus::Refreshing:
             return QImage();
         default:
             return d->outputRegion;
@@ -502,7 +502,7 @@ QSize LayoutThumbnailLoader::sizeHint() const
     return d->outputRegion.size();
 }
 
-Qn::ThumbnailStatus LayoutThumbnailLoader::status() const
+core::ThumbnailStatus LayoutThumbnailLoader::status() const
 {
     return d->status;
 }
@@ -584,7 +584,7 @@ void LayoutThumbnailLoader::doLoadAsync()
 
     if (bounding.isEmpty())
     {
-        d->status = Qn::ThumbnailStatus::NoData;
+        d->status = core::ThumbnailStatus::NoData;
         // Dat proper event chain.
         emit sizeHintChanged(QSize());
         emit statusChanged(d->status);
@@ -627,7 +627,7 @@ void LayoutThumbnailLoader::doLoadAsync()
     else
         d->outputImage.fill(Qt::transparent);
 
-    d->status = Qn::ThumbnailStatus::Loading;
+    d->status = core::ThumbnailStatus::Loading;
 
     emit sizeHintChanged(d->outputImage.size());
     emit statusChanged(d->status);
@@ -652,9 +652,9 @@ void LayoutThumbnailLoader::doLoadAsync()
         // We expect that provider sends signals in a proper order
         // and it already has generated image.
         connect(item->provider.data(), &ImageProvider::statusChanged, this,
-            [this, item](Qn::ThumbnailStatus status)
+            [this, item](core::ThumbnailStatus status)
             {
-                if (status == Qn::ThumbnailStatus::Loaded)
+                if (status == core::ThumbnailStatus::Loaded)
                 {
                     d->drawBackground(item, item->provider->image());
                     d->notifyLoaderIsComplete();
@@ -704,13 +704,13 @@ void LayoutThumbnailLoader::doLoadAsync()
         request.roundMethod = d->roundMethod;
         request.tolerant = d->tolerant;
 
-        thumbnailItem->provider.reset(new ResourceThumbnailProvider(request));
+        thumbnailItem->provider.reset(new core::ResourceThumbnailProvider(request));
 
         const auto handleStatusChange =
-            [this, thumbnailItem, zoomRect](Qn::ThumbnailStatus status)
+            [this, thumbnailItem, zoomRect](core::ThumbnailStatus status)
             {
                 QnAspectRatio sourceAr(thumbnailItem->provider->sizeHint());
-                if (status == Qn::ThumbnailStatus::Loaded)
+                if (status == core::ThumbnailStatus::Loaded)
                 {
                     const auto sourceAr =
                         Geometry::aspectRatio(thumbnailItem->provider->sizeHint());
@@ -739,7 +739,7 @@ void LayoutThumbnailLoader::doLoadAsync()
             QMetaObject::invokeMethod(this,
                 [handleStatusChange]()
                 {
-                    handleStatusChange(Qn::ThumbnailStatus::NoData);
+                    handleStatusChange(core::ThumbnailStatus::NoData);
                 },
                 Qt::QueuedConnection);
         }
@@ -749,7 +749,7 @@ void LayoutThumbnailLoader::doLoadAsync()
     {
         // If there's nothing to load.
         // TODO: #dkargin I guess we should draw NoData here.
-        d->status = Qn::ThumbnailStatus::NoData;
+        d->status = core::ThumbnailStatus::NoData;
         emit statusChanged(d->status);
     }
 }

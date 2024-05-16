@@ -2,9 +2,13 @@
 
 #pragma once
 
+#include <QtCore/QMetaType>
+
 #include <nx/reflect/enum_instrument.h>
 
 namespace nx::vms::client::core::network::server_certificate {
+
+Q_NAMESPACE_EXPORT(NX_VMS_CLIENT_CORE_API)
 
 NX_REFLECTION_ENUM_CLASS(ValidationLevel,
     disabled,
@@ -12,4 +16,8 @@ NX_REFLECTION_ENUM_CLASS(ValidationLevel,
     strict
 )
 
+Q_ENUM_NS(ValidationLevel)
+
 } // namespace nx::vms::client::core::network::server_certificate
+
+Q_DECLARE_METATYPE(nx::vms::client::core::network::server_certificate::ValidationLevel)

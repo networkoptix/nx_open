@@ -5,7 +5,7 @@ import QtQuick 2.0
 import Nx.Controls 1.0
 
 import "private"
-import "private/utils.js" as Utils
+import "private/CoreUtils.js" as Utils
 import "../settings.js" as Settings
 
 /**
@@ -93,7 +93,7 @@ Item
     {
         for (let i = column.layoutItems.length - 1; i >= 0; --i)
         {
-            if (Utils.isItemFilled(column.layoutItems[i]))
+            if (CoreUtils.isItemFilled(column.children[i]))
                 return i
         }
         return -1

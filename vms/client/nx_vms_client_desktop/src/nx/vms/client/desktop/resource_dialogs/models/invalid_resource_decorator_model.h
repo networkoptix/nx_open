@@ -12,7 +12,7 @@ namespace nx::vms::client::desktop {
 
 /**
  * Proxy model which provides boolean type data by <tt>Qn::IsValidResourceRole</tt> role for each
- * leaf node of source model which provides valid resource pointer by <tt>Qn::ResourceRole</tt>
+ * leaf node of source model which provides valid resource pointer by <tt>core::ResourceRole</tt>
  * role. Used as source model for <tt>InvalidResourceFilterModel</tt>.
  */
 class InvalidResourceDecoratorModel: public QIdentityProxyModel

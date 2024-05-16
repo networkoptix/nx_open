@@ -155,7 +155,7 @@ void BackupSettingsPickerWidget::setupFromSelection(const QModelIndexList& index
         std::any_of(camerasIndexes.cbegin(), camerasIndexes.cend(),
             [](const QModelIndex& cameraIndex)
             {
-                const auto camera = cameraIndex.data(Qn::ResourceRole).value<QnResourcePtr>()
+                const auto camera = cameraIndex.data(core::ResourceRole).value<QnResourcePtr>()
                     .dynamicCast<QnVirtualCameraResource>();
                 return camera->hasDualStreaming();
             });

@@ -2,7 +2,6 @@
 
 import QtQuick 2.0
 
-import Nx 1.0
 import Nx.Core 1.0
 
 Rectangle
@@ -23,14 +22,14 @@ Rectangle
 
     readonly property point origin: Array.isArray(originJson)
         ? Qt.point(
-            Utils.getValue(originJson[0], defaultOrigin.x),
-            Utils.getValue(originJson[1], defaultOrigin.y))
+            CoreUtils.getValue(originJson[0], defaultOrigin.x),
+            CoreUtils.getValue(originJson[1], defaultOrigin.y))
         : defaultOrigin
 
     readonly property size size: Array.isArray(sizeJson)
         ? Qt.size(
-            Utils.getValue(sizeJson[0], defaultSize),
-            Utils.getValue(sizeJson[1], defaultSize))
+            CoreUtils.getValue(sizeJson[0], defaultSize),
+            CoreUtils.getValue(sizeJson[1], defaultSize))
         : Qt.size(defaultSize, defaultSize)
 
     x: origin.x * scaleX

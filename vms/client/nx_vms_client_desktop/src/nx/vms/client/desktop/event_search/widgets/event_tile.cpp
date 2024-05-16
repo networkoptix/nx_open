@@ -14,13 +14,16 @@
 #include <client/client_globals.h>
 #include <core/resource/resource.h>
 #include <finders/systems_finder.h>
+#include <nx/utils/log/log.h>
+#include <nx/vms/client/core/image_providers/resource_thumbnail_provider.h>
+#include <nx/vms/client/core/ini.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/common/widgets/close_button.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
-#include <nx/vms/client/desktop/image_providers/resource_thumbnail_provider.h>
+#include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/skin/font_config.h>
 #include <nx/vms/client/desktop/style/helper.h>
@@ -346,12 +349,12 @@ void EventTile::setFooterText(const QString& value)
     ui->footerLabel->setHidden(!d->footerEnabled || value.isEmpty());
 }
 
-analytics::AttributeList EventTile::attributeList() const
+core::analytics::AttributeList EventTile::attributeList() const
 {
     return ui->attributeTable->content();
 }
 
-void EventTile::setAttributeList(const analytics::AttributeList& value)
+void EventTile::setAttributeList(const core::analytics::AttributeList& value)
 {
     ui->attributeTable->setContent(value);
     ui->attributeTable->setHidden(!d->footerEnabled || value.empty());
@@ -382,12 +385,13 @@ void EventTile::setIconPath(const QString& value)
     d->updateIcon();
 }
 
-ImageProvider* EventTile::imageProvider() const
+core::ImageProvider* EventTile::imageProvider() const
 {
     return ui->imagePreviewWidget->imageProvider();
 }
 
-void EventTile::setImageProvider(ImageProvider* value, bool forceUpdate)
+
+void EventTile::setImageProvider(core::ImageProvider* value, bool forceUpdate)
 {
     if (imageProvider() == value && !forceUpdate)
         return;
@@ -405,22 +409,22 @@ void EventTile::setImageProvider(ImageProvider* value, bool forceUpdate)
     d->forceNextPreviewUpdate = forceUpdate;
     d->updatePreview(/*delay*/ 0ms);
 
-    if (ini().showDebugTimeInformationInRibbon)
+    if (core::ini().showDebugTimeInformationInEventSearchData)
         d->showDebugPreviewTimestamp();
 
     if (!imageProvider())
         return;
 
-    connect(imageProvider(), &ImageProvider::statusChanged, this,
-        [this](Qn::ThumbnailStatus status)
+    connect(imageProvider(), &core::ImageProvider::statusChanged, this,
+        [this](core::ThumbnailStatus status)
         {
-            if (status != Qn::ThumbnailStatus::Invalid)
+            if (status != core::ThumbnailStatus::Invalid)
                 d->isPreviewLoadNeeded = false;
 
-            if (status == Qn::ThumbnailStatus::NoData && kPreviewReloadDelay > 0s)
+            if (status == core::ThumbnailStatus::NoData && kPreviewReloadDelay > 0s)
                 d->updatePreview(kPreviewReloadDelay);
 
-            if (ini().showDebugTimeInformationInRibbon)
+            if (core::ini().showDebugTimeInformationInEventSearchData)
                 d->showDebugPreviewTimestamp();
         });
 }

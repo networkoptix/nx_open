@@ -8,14 +8,15 @@
 #include <analytics/common/object_metadata.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/impl_ptr.h>
-#include <nx/vms/client/desktop/analytics/analytics_attribute_helper.h>
+#include <nx/vms/client/core/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/desktop/common/utils/command_action.h>
 
 namespace Ui { class EventTile; }
 
+namespace nx::vms::client::core { class ImageProvider; }
+
 namespace nx::vms::client::desktop {
 
-class ImageProvider;
 class CloseButton;
 
 class EventTile: public QWidget
@@ -43,8 +44,8 @@ public:
     QString footerText() const;
     void setFooterText(const QString& value);
 
-    analytics::AttributeList attributeList() const;
-    void setAttributeList(const analytics::AttributeList& value);
+    core::analytics::AttributeList attributeList() const;
+    void setAttributeList(const core::analytics::AttributeList& value);
 
     QString timestamp() const;
     void setTimestamp(const QString& value);
@@ -53,8 +54,8 @@ public:
     void setIconPath(const QString& value);
 
     // Does not take ownership.
-    ImageProvider* imageProvider() const;
-    void setImageProvider(ImageProvider* value, bool forceUpdate);
+    core::ImageProvider* imageProvider() const;
+    void setImageProvider(core::ImageProvider* value, bool forceUpdate);
 
     void setVideoPreviewResource(const QnVirtualCameraResourcePtr& camera);
 

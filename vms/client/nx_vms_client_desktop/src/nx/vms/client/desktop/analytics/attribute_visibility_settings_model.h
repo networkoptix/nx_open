@@ -4,9 +4,11 @@
 
 #include <QtCore/QAbstractListModel>
 
-#include <nx/vms/client/desktop/analytics/attribute_display_manager.h>
+Q_MOC_INCLUDE("nx/vms/client/desktop/analytics/attribute_display_manager.h")
 
 namespace nx::vms::client::desktop::analytics::taxonomy {
+
+class AttributeDisplayManager;
 
 class AttributeVisibilitySettingsModel: public QAbstractListModel
 {
@@ -18,6 +20,8 @@ class AttributeVisibilitySettingsModel: public QAbstractListModel
         NOTIFY objectTypeIdsChanged)
 
 public:
+    static void registerQmlType();
+
     AttributeVisibilitySettingsModel();
 
     AttributeDisplayManager* attributeManager() const;

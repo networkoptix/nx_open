@@ -212,9 +212,9 @@ private:
     void at_workbenchLayout_zoomLinkAdded(QnWorkbenchItem* item, QnWorkbenchItem* zoomTargetItem);
     void at_workbenchLayout_zoomLinkRemoved(
         QnWorkbenchItem* item, QnWorkbenchItem* zoomTargetItem);
-    void at_workbenchLayout_dataChanged(Qn::ItemDataRole role);
+    void at_workbenchLayout_dataChanged(int role);
 
-    void at_workbenchLayoutItem_dataChanged(Qn::ItemDataRole role);
+    void at_workbenchLayoutItem_dataChanged(int role);
 
     void at_navigator_playingChanged();
     void at_navigator_speedChanged();

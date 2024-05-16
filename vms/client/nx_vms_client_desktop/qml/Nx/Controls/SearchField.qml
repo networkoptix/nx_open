@@ -3,9 +3,9 @@
 import QtQuick
 import QtQuick.Controls as QC2
 
-import Nx
 import Nx.Core
 import Nx.Controls
+import Nx.Core.Controls
 
 TextField
 {

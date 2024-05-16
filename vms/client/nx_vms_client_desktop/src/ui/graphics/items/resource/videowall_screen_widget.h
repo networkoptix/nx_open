@@ -39,7 +39,7 @@ protected:
     virtual QString calculateTitleText() const override;
     virtual Qn::ResourceStatusOverlay calculateStatusOverlay() const override;
 
-    virtual void atItemDataChanged(Qn::ItemDataRole role) override;
+    virtual void atItemDataChanged(int role) override;
 
     virtual int helpTopicAt(const QPointF& pos) const override;
 

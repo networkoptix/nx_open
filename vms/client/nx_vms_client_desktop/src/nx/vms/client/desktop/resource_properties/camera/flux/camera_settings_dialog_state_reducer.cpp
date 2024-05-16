@@ -27,7 +27,7 @@
 #include <nx/utils/math/fuzzy.h>
 #include <nx/vms/api/types/motion_types.h>
 #include <nx/vms/api/types/rtp_types.h>
-#include <nx/vms/client/desktop/analytics/analytics_settings_manager.h>
+#include <nx/vms/client/core/analytics/analytics_settings_manager.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/common/utils/camera_hotspots_support.h>
@@ -2707,7 +2707,7 @@ State CameraSettingsDialogStateReducer::resetExpertSettings(State state)
 }
 
 std::pair<bool, State> CameraSettingsDialogStateReducer::setAnalyticsEngines(
-    State state, const QList<AnalyticsEngineInfo>& value)
+    State state, const QList<core::AnalyticsEngineInfo>& value)
 {
     NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, nx::reflect::json::serialize(value));
 
@@ -2848,7 +2848,7 @@ std::pair<bool, State> CameraSettingsDialogStateReducer::setDeviceAgentSettingsV
     if (!activeElement.isEmpty())
     {
         bool loading = qnClientModule->analyticsSettingsManager()->activeSettingsChanged(
-            DeviceAgentId{state.singleCameraProperties.id, engineId},
+            core::DeviceAgentId{state.singleCameraProperties.id, engineId},
             activeElement,
             state.analytics.settingsByEngineId[engineId].model,
             values,
@@ -2867,7 +2867,7 @@ State CameraSettingsDialogStateReducer::refreshDeviceAgentSettings(
         return state;
 
     qnClientModule->analyticsSettingsManager()->refreshSettings(
-        DeviceAgentId{state.singleCameraProperties.id, engineId});
+        core::DeviceAgentId{state.singleCameraProperties.id, engineId});
 
     auto& settings = state.analytics.settingsByEngineId[engineId];
     settings.loading = true;
@@ -2879,7 +2879,7 @@ State CameraSettingsDialogStateReducer::refreshDeviceAgentSettings(
 std::pair<bool, State> CameraSettingsDialogStateReducer::resetDeviceAgentData(
     State state,
     const nx::Uuid& engineId,
-    const DeviceAgentData& data,
+    const core::DeviceAgentData& data,
     bool replaceUser)
 {
     auto& settings = state.analytics.settingsByEngineId[engineId];
@@ -2896,7 +2896,7 @@ std::pair<bool, State> CameraSettingsDialogStateReducer::resetDeviceAgentData(
     }
 
     settings.errors = data.errors;
-    settings.loading = data.status != DeviceAgentData::Status::ok;
+    settings.loading = data.status != core::DeviceAgentData::Status::ok;
 
     NX_TRACE(NX_SCOPE_TAG, "Device agent settings reset for %1, status is %2, loading: %3",
         engineId, (int)data.status, settings.loading);

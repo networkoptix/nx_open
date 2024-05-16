@@ -881,7 +881,7 @@ void QnWorkbenchVideoWallHandler::handleMessage(
             if (!item)
                 return;
 
-            Qn::ItemDataRole role = static_cast<Qn::ItemDataRole>(message[roleKey].toInt());
+            const int role = message[roleKey].toInt();
 
             switch (role)
             {
@@ -892,7 +892,7 @@ void QnWorkbenchVideoWallHandler::handleMessage(
                     NX_VERBOSE(this, "RECEIVER: Item %1 geometry changed to %2", uuid, data);
                     break;
                 }
-                case Qn::ItemZoomRectRole:
+                case core::ItemZoomRectRole:
                 {
                     QRectF data = QJson::deserialized<QRectF>(value);
                     item->setData(role, data);
@@ -1739,7 +1739,7 @@ void QnWorkbenchVideoWallHandler::at_renameAction_triggered()
     const auto parameters = menu()->currentParameters(sender());
 
     const auto nodeType = parameters.argument<NodeType>(Qn::NodeTypeRole, NodeType::resource);
-    QString name = parameters.argument<QString>(Qn::ResourceNameRole).trimmed();
+    QString name = parameters.argument<QString>(core::ResourceNameRole).trimmed();
 
     bool valid = false;
     switch (nodeType)
@@ -2792,7 +2792,7 @@ void QnWorkbenchVideoWallHandler::at_workbenchLayout_zoomLinkRemoved(
     NX_VERBOSE(this, "SENDER: zoom Link removed %1 %2", item->uuid(), zoomTargetItem->uuid());
 }
 
-void QnWorkbenchVideoWallHandler::at_workbenchLayout_dataChanged(Qn::ItemDataRole role)
+void QnWorkbenchVideoWallHandler::at_workbenchLayout_dataChanged(int role)
 {
     if (role == Qn::VideoWallItemGuidRole || role == Qn::VideoWallResourceRole)
     {
@@ -2802,12 +2802,12 @@ void QnWorkbenchVideoWallHandler::at_workbenchLayout_dataChanged(Qn::ItemDataRol
 }
 
 // Keep in sync with QnWorkbenchVideoWallHandler::handleMessage.
-void QnWorkbenchVideoWallHandler::at_workbenchLayoutItem_dataChanged(Qn::ItemDataRole role)
+void QnWorkbenchVideoWallHandler::at_workbenchLayoutItem_dataChanged(int role)
 {
     if (!m_controlMode.active)
         return;
 
-    static const QSet<Qn::ItemDataRole> kIgnoreOnLayoutChange =
+    static const QSet<int> kIgnoreOnLayoutChange =
         {Qn::ItemPausedRole, Qn::ItemSpeedRole, Qn::ItemPositionRole};
 
     if (display()->isChangingLayout() && kIgnoreOnLayoutChange.contains(role))
@@ -2849,7 +2849,7 @@ void QnWorkbenchVideoWallHandler::at_workbenchLayoutItem_dataChanged(Qn::ItemDat
             break;
         }
 
-        case Qn::ItemZoomRectRole:
+        case core::ItemZoomRectRole:
         {
             QRectF value = data.value<QRectF>();
             NX_VERBOSE(this, "SENDER: Item %1 %2 changed to %3",

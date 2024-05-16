@@ -19,7 +19,7 @@ QVariant FailoverPriorityDecoratorModel::data(const QModelIndex& index, int role
     if (role == ResourceDialogItemRole::FailoverPriorityRole)
     {
         const auto camera = index.siblingAtColumn(failover_priority_view::ResourceColumn)
-            .data(Qn::ResourceRole)
+            .data(core::ResourceRole)
             .value<QnResourcePtr>().dynamicCast<QnVirtualCameraResource>();
 
         if (camera.isNull())
@@ -50,7 +50,7 @@ void FailoverPriorityDecoratorModel::setFailoverPriorityOverride(
             continue;
         }
 
-        const auto cameraResource = index.data(Qn::ResourceRole).value<QnResourcePtr>()
+        const auto cameraResource = index.data(core::ResourceRole).value<QnResourcePtr>()
             .dynamicCast<QnVirtualCameraResource>();
 
         if (!cameraResource)

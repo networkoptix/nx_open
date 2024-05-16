@@ -77,6 +77,7 @@
 #include "private/style_private.h"
 
 using namespace nx::style;
+using namespace nx::vms::client::core;
 using nx::vms::client::core::Geometry;
 
 // Fix for Qt 5.6 bug: item views don't reset their dropIndicatorRect.

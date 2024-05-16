@@ -10,7 +10,7 @@
 #include <nx/core/transcoding/filters/timestamp_params.h>
 #include <nx/vms/api/data/dewarping_data.h>
 #include <nx/vms/api/data/image_correction_data.h>
-#include <nx/vms/client/desktop/image_providers/image_provider.h>
+#include <nx/vms/client/core/image_providers/image_provider.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <utils/common/aspect_ratio.h>
@@ -59,17 +59,17 @@ struct QnScreenshotParameters
 
 // TODO: #vkutin Use nx::vms::client::desktop::ProxyImageProvider instead.
 /* Proxy class, that starts loading instantly after base provider is set and notifies only once. */
-class QnScreenshotLoader: public nx::vms::client::desktop::ImageProvider {
+class QnScreenshotLoader: public nx::vms::client::core::ImageProvider {
     Q_OBJECT
 public:
     QnScreenshotLoader(const QnScreenshotParameters& parameters, QObject *parent = 0);
     virtual ~QnScreenshotLoader();
 
-    void setBaseProvider(nx::vms::client::desktop::ImageProvider* imageProvider);
+    void setBaseProvider(nx::vms::client::core::ImageProvider* imageProvider);
 
     virtual QImage image() const override;
     virtual QSize sizeHint() const override;
-    virtual Qn::ThumbnailStatus status() const override;
+    virtual nx::vms::client::core::ThumbnailStatus status() const override;
 
     QnScreenshotParameters parameters() const;
     void setParameters(const QnScreenshotParameters &parameters);
@@ -81,7 +81,7 @@ private slots:
     void at_imageLoaded(const QImage &image);
 
 private:
-    QScopedPointer<nx::vms::client::desktop::ImageProvider> m_baseProvider;
+    QScopedPointer<nx::vms::client::core::ImageProvider> m_baseProvider;
     QnScreenshotParameters m_parameters;
     bool m_isReady;
 };
@@ -100,7 +100,7 @@ public:
     QnWorkbenchScreenshotHandler(QObject *parent = nullptr);
 
 private:
-    nx::vms::client::desktop::ImageProvider* getLocalScreenshotProvider(QnMediaResourceWidget *widget,
+    nx::vms::client::core::ImageProvider* getLocalScreenshotProvider(QnMediaResourceWidget *widget,
         const QnScreenshotParameters &parameters, bool forced = false) const;
 
 private slots:

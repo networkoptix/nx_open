@@ -18,8 +18,8 @@
 #include <nx/api/mediaserver/image_request.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/utils/geometry.h>
+#include <nx/vms/client/core/image_providers/camera_thumbnail_provider.h>
 #include <nx/vms/client/desktop/camera_hotspots/camera_hotspots_display_utils.h>
-#include <nx/vms/client/desktop/image_providers/camera_thumbnail_provider.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/action_parameter_types.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -202,7 +202,7 @@ BubbleToolTip* CameraHotspotItem::Private::createTooltip() const
     tooltip->setText(tooltipText());
     tooltip->setTarget(tooltipGlobalPos());
 
-    const auto thumbnailProvider = new CameraThumbnailProvider(imageRequest, tooltip);
+    const auto thumbnailProvider = new core::CameraThumbnailProvider(imageRequest, tooltip);
     tooltip->setImageProvider(thumbnailProvider);
     thumbnailProvider->loadAsync();
 
@@ -283,7 +283,7 @@ void CameraHotspotItem::Private::openInNewTab()
 void CameraHotspotItem::Private::openItemInPlace()
 {
     auto parameters = menu::Parameters(mediaResourceWidget())
-        .withArgument(Qn::ResourceRole, hotspotCamera());
+        .withArgument(core::ResourceRole, hotspotCamera());
 
     if (!q->navigator()->syncEnabled()
         || q->workbench()->currentLayout()->items().size() == 1)

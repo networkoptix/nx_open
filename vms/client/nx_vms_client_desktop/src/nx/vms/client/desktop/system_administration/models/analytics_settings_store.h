@@ -12,7 +12,7 @@
 
 #include <api/server_rest_connection_fwd.h>
 #include <nx/utils/uuid.h>
-#include <nx/vms/client/desktop/analytics/analytics_engines_watcher.h>
+#include <nx/vms/client/core/analytics/analytics_engines_watcher.h>
 #include <nx/vms/client/desktop/common/utils/engine_license_summary_provider.h>
 #include <nx/vms/client/desktop/current_system_context_aware.h>
 #include <nx/vms/client/desktop/system_administration/models/api_integration_requests_model.h>
@@ -88,7 +88,7 @@ private:
     };
 
 private:
-    void addEngine(const nx::Uuid& engineId, const AnalyticsEngineInfo& engineInfo);
+    void addEngine(const nx::Uuid& engineId, const core::AnalyticsEngineInfo& engineInfo);
     void removeEngine(const nx::Uuid& engineId);
     void updateEngine(const nx::Uuid& engineId);
     void setErrors(const nx::Uuid& engineId, const QJsonObject& errors);
@@ -101,7 +101,7 @@ private:
 
 private:
     QPointer<QWidget> m_parent;
-    const QScopedPointer<AnalyticsEnginesWatcher> m_enginesWatcher;
+    const QScopedPointer<core::AnalyticsEnginesWatcher> m_enginesWatcher;
     QVariantList m_engines;
     bool m_hasChanges = false;
     bool m_settingsLoading = false;

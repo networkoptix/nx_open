@@ -5,8 +5,8 @@ import QtQuick.Controls
 import QtQuick.Window
 import QtQuick.Layouts
 
-import Nx
 import Nx.Core
+import Nx.Core.Controls
 import Nx.Controls
 import Nx.Models
 

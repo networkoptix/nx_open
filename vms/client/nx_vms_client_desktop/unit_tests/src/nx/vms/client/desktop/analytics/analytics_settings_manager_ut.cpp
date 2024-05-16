@@ -80,12 +80,12 @@ protected:
         base_type::TearDown();
     }
 
-    DeviceAgentId deviceAgentId() const
+    core::DeviceAgentId deviceAgentId() const
     {
         return *m_deviceAgentId;
     }
 
-    AnalyticsSettingsListenerPtr listener() const
+    core::AnalyticsSettingsListenerPtr listener() const
     {
         return m_listener;
     }
@@ -99,7 +99,7 @@ protected:
     {
         auto camera = addCamera();
         auto engine = addEngine();
-        m_deviceAgentId.reset(new DeviceAgentId{camera->getId(), engine->getId()});
+        m_deviceAgentId.reset(new core::DeviceAgentId{camera->getId(), engine->getId()});
         m_listener = manager()->getListener(deviceAgentId());
         m_notifier.reset(new ListenerNotifier(listener()));
     }
@@ -136,8 +136,8 @@ protected:
     }
 
 private:
-    QScopedPointer<DeviceAgentId> m_deviceAgentId;
-    AnalyticsSettingsListenerPtr m_listener;
+    QScopedPointer<core::DeviceAgentId> m_deviceAgentId;
+    core::AnalyticsSettingsListenerPtr m_listener;
     QScopedPointer<ListenerNotifier> m_notifier;
 };
 
@@ -152,14 +152,14 @@ TEST_F(AnalyticsSettingsManagerTest, statusUpdateOnEmptyReply)
     EXPECT_TRUE(requestWasSent());
 
     // Check listener is still waiting.
-    ASSERT_TRUE(listener()->data().status == DeviceAgentData::Status::loading);
+    ASSERT_TRUE(listener()->data().status == core::DeviceAgentData::Status::loading);
 
     // Emulate network response.
     whenDataReceived(kEmptyReply);
 
     // Check listener sent actual data notification.
     ASSERT_EQ(notifier()->counter, 1);
-    ASSERT_TRUE(listener()->data().status == DeviceAgentData::Status::ok);
+    ASSERT_TRUE(listener()->data().status == core::DeviceAgentData::Status::ok);
 }
 
 TEST_F(AnalyticsSettingsManagerTest, listenToExternalChanges)

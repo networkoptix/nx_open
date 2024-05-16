@@ -2,8 +2,8 @@
 
 import QtQuick
 
-import Nx
 import Nx.Core
+import Nx.Core.Controls
 import Nx.Controls
 
 Item

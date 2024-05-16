@@ -19,7 +19,6 @@ CheckListItem 1.0 CheckListItem.qml
 CheckBox 1.0 CheckBox.qml
 CheckBoxImage 1.0 CheckBoxImage.qml
 ClipboardCopyButton 1.0 ClipboardCopyButton.qml
-ColoredImage 1.0 ColoredImage.qml
 ComboBox 1.0 ComboBox.qml
 CompactTabButton 1.0 CompactTabButton.qml
 CompactMenu 1.0 CompactMenu.qml
@@ -55,7 +54,6 @@ MultiColumn 1.0 MultiColumn.qml
 MultiSelectionComboBox 1.0 MultiSelectionComboBox.qml
 NxCircle 1.0 NxCircle.qml
 NxCirclesPreloader 1.0 NxCirclesPreloader.qml
-NxDotPreloader 1.0 NxDotPreloader.qml
 NumberInput 1.0 NumberInput.qml
 Panel 1.0 Panel.qml
 Placeholder 1.0 Placeholder.qml
@@ -71,7 +69,6 @@ PromoPage 1.0 PromoPage.qml
 PromoPages 1.0 PromoPages.qml
 RadioButton 1.0 RadioButton.qml
 RadioButtonImage 1.0 RadioButtonImage.qml
-RectangularMask 1.0 RectangularMask.qml
 Resizer 1.0 Resizer.qml
 ScaleAdjuster 1.0 ScaleAdjuster.qml
 Scrollable 1.0 Scrollable.qml

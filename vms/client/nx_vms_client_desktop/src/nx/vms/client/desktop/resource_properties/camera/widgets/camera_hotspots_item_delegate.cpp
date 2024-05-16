@@ -246,7 +246,7 @@ void CameraHotspotsItemDelegate::initStyleOption(
     if (index.column() == CameraHotspotsItemModel::TargetColumn)
     {
         const auto cameraIdData = index.data(CameraHotspotsItemModel::HotspotCameraIdRole);
-        const auto cameraResourceData = index.data(Qn::ResourceRole);
+        const auto cameraResourceData = index.data(core::ResourceRole);
 
         if (!cameraIdData.isNull() && cameraResourceData.isNull()) //< Camera no more exists.
         {

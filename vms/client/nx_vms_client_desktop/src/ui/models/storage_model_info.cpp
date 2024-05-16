@@ -3,9 +3,9 @@
 #include "storage_model_info.h"
 
 #include <api/model/storage_status_reply.h>
-#include <core/resource/client_storage_resource.h>
 #include <nx/vms/api/data/storage_flags.h>
 #include <nx/vms/api/data/storage_space_data.h>
+#include <nx/vms/client/core/resource/client_storage_resource.h>
 
 QnStorageModelInfo::QnStorageModelInfo()
     : id()

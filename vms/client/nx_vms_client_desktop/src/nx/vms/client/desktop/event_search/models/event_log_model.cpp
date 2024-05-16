@@ -537,7 +537,7 @@ QVariant EventLogModel::data(const QModelIndex& index, int role) const
         case Qn::ItemMouseCursorRole:
             return mouseCursorData(column, data);
 
-        case Qn::ResourceRole:
+        case core::ResourceRole:
             return QVariant::fromValue<QnResourcePtr>(getResource(column, data));
 
         case Qn::DisplayHtmlRole:

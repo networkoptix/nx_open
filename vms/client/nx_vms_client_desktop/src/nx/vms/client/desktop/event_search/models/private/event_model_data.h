@@ -7,6 +7,8 @@
 #include <nx/vms/api/rules/event_log.h>
 #include <nx/vms/rules/rules_fwd.h>
 
+namespace nx::vms::client::core { class SystemContext; }
+
 namespace nx::vms::client::desktop {
 
 class SystemContext;
@@ -20,7 +22,7 @@ public:
 
     const nx::vms::api::rules::EventLogRecord& record() const;
 
-    nx::vms::rules::EventPtr event(SystemContext* context) const;
+    nx::vms::rules::EventPtr event(core::SystemContext* context) const;
     const QVariantMap& details(SystemContext* context) const;
     QString eventType() const;
 

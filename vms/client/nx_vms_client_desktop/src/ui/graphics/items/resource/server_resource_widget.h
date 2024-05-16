@@ -49,7 +49,7 @@ protected:
     virtual int calculateButtonsVisibility() const override;
     virtual Qn::ResourceStatusOverlay calculateStatusOverlay() const override;
 
-    virtual void atItemDataChanged(Qn::ItemDataRole role) override;
+    virtual void atItemDataChanged(int role) override;
 
     virtual void updateHud(bool animate) override;
 

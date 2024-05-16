@@ -34,6 +34,7 @@
 #include "resizing_instrument.h"
 #include "selection_item.h"
 
+using namespace nx::vms::client::core;
 using namespace nx::vms::client::desktop;
 using nx::vms::client::core::Geometry;
 
@@ -560,7 +561,7 @@ void ZoomWindowInstrument::registerWidget(QnMediaResourceWidget *widget)
     connect(widget, &QnResourceWidget::zoomRectChanged, this,
         [this, widget]() { updateWindowFromWidget(widget); });
     connect(widget->item(), &QnWorkbenchItem::dataChanged, this,
-        [this, guard = QPointer<QnMediaResourceWidget>(widget)](Qn::ItemDataRole role)
+        [this, guard = QPointer<QnMediaResourceWidget>(widget)](int role)
         {
             if (guard && role == Qn::ItemFrameDistinctionColorRole)
                 updateWindowFromWidget(guard.data());

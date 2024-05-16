@@ -3,8 +3,8 @@
 import QtQuick
 import QtQml
 
-import Nx
 import Nx.Core
+import Nx.Controls
 
 import nx.vms.client.core
 

@@ -4,6 +4,7 @@
 
 #include <QtCore/QCoreApplication>
 #include <QtQml/QQmlEngine>
+#include <QtQml/QQmlContext>
 #include <QtQml/private/qv4engine_p.h>
 
 #include <client_core/client_core_meta_types.h>
@@ -12,13 +13,17 @@
 #include <nx/branding_proxy.h>
 #include <nx/build_info_proxy.h>
 #include <nx/vms/client/core/analytics/analytics_icon_manager.h>
+#include <nx/vms/client/core/event_search/models/visible_item_data_decorator_model.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/network/local_network_interfaces_manager.h>
-#include <nx/vms/client/core/qml/qml_ownership.h>
+#include <nx/vms/client/core/resource/unified_resource_pool.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/font_config.h>
+#include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/thumbnails/thumbnail_image_provider.h>
+#include <nx/vms/client/core/qml/qml_ownership.h>
 #include <nx/vms/client/core/watchers/known_server_connections.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
 #include <nx/vms/discovery/manager.h>
@@ -93,11 +98,13 @@ struct ApplicationContext::Private
                 return withCppOwnership(buildInfoQmlProxy);
             });
 
-        qmlEngine = new QQmlEngine(q);
+        qmlEngine.reset(new QQmlEngine());
 
         const auto thumbnailProvider = new ThumbnailImageProvider();
         // QQmlEngine takes ownership of thumbnailProvider.
         qmlEngine->addImageProvider(ThumbnailImageProvider::id, thumbnailProvider);
+        qmlEngine->addImageProvider(core::VisibleItemDataDecoratorModel::PreviewProvider::id,
+            new core::VisibleItemDataDecoratorModel::PreviewProvider());
     }
 
     void initializeNetworkModules()
@@ -125,13 +132,16 @@ struct ApplicationContext::Private
     const ApplicationContext::Mode mode;
     const bool ignoreCustomization = false;
 
-    QQmlEngine* qmlEngine = nullptr;
+    std::unique_ptr<QQmlEngine> qmlEngine;
     std::unique_ptr<Settings> settings;
     std::unique_ptr<CloudStatusWatcher> cloudStatusWatcher;
     std::unique_ptr<QnSystemsFinder> systemsFinder;
     std::unique_ptr<nx::vms::discovery::Manager> moduleDiscoveryManager;
     std::unique_ptr<QnVoiceSpectrumAnalyzer> voiceSpectrumAnalyzer;
+    std::unique_ptr<Skin> skin;
     std::unique_ptr<ColorTheme> colorTheme;
+    std::vector<QPointer<SystemContext>> systemContexts;
+    std::unique_ptr<UnifiedResourcePool> unifiedResourcePool;
     std::unique_ptr<FontConfig> fontConfig;
     std::unique_ptr<LocalNetworkInterfacesManager> localNetworkInterfacesManager;
     std::unique_ptr<watchers::KnownServerConnections> knownServerConnectionsWatcher;
@@ -146,7 +156,8 @@ ApplicationContext::ApplicationContext(
     QObject* parent)
     :
     common::ApplicationContext(peerType, customCloudHost, parent),
-    d(new Private{.q = this, .mode = mode, .ignoreCustomization = ignoreCustomization})
+    d(new Private{.q = this, .mode = mode, .ignoreCustomization = ignoreCustomization,
+        .skin = std::make_unique<nx::vms::client::core::Skin>(QStringList{":/skin"})})
 {
     if (NX_ASSERT(!s_instance))
         s_instance = this;
@@ -158,6 +169,8 @@ ApplicationContext::ApplicationContext(
     d->initializeSettings();
     d->initializeQmlEngine();
 
+    d->colorTheme = std::make_unique<ColorTheme>();
+
     switch (mode)
     {
         case Mode::unitTests:
@@ -168,7 +181,7 @@ ApplicationContext::ApplicationContext(
         case Mode::desktopClient:
         case Mode::mobileClient:
             d->voiceSpectrumAnalyzer = std::make_unique<QnVoiceSpectrumAnalyzer>();
-            d->colorTheme = std::make_unique<ColorTheme>();
+            d->unifiedResourcePool = std::make_unique<UnifiedResourcePool>();
             d->localNetworkInterfacesManager = std::make_unique<LocalNetworkInterfacesManager>();
             d->knownServerConnectionsWatcher =
                 std::make_unique<watchers::KnownServerConnections>();
@@ -222,7 +235,7 @@ void ApplicationContext::initializeNetworkModules()
 
 QQmlEngine* ApplicationContext::qmlEngine() const
 {
-    return d->qmlEngine;
+    return d->qmlEngine.get();
 }
 
 CloudStatusWatcher* ApplicationContext::cloudStatusWatcher() const
@@ -260,9 +273,69 @@ FontConfig* ApplicationContext::fontConfig() const
     return d->fontConfig.get();
 }
 
+void ApplicationContext::resetEngine()
+{
+    d->qmlEngine->rootContext()->setContextObject(nullptr);
+    d->qmlEngine.reset();
+}
+
 watchers::KnownServerConnections* ApplicationContext::knownServerConnectionsWatcher() const
 {
     return d->knownServerConnectionsWatcher.get();
+}
+
+Skin* ApplicationContext::skin() const
+{
+    return d->skin.get();
+}
+
+ColorTheme* ApplicationContext::colorTheme() const
+{
+    return d->colorTheme.get();
+}
+
+UnifiedResourcePool* ApplicationContext::unifiedResourcePool() const
+{
+    return d->unifiedResourcePool.get();
+}
+
+SystemContext* ApplicationContext::currentSystemContext() const
+{
+    if (NX_ASSERT(!d->systemContexts.empty()))
+        return d->systemContexts.front();
+
+    return nullptr;
+}
+
+std::vector<SystemContext*> ApplicationContext::systemContexts() const
+{
+    std::vector<SystemContext*> result;
+    for (auto context: d->systemContexts)
+    {
+        if (NX_ASSERT(context))
+            result.push_back(context.data());
+    }
+    return result;
+}
+
+void ApplicationContext::addSystemContext(SystemContext* systemContext)
+{
+    d->systemContexts.push_back(systemContext);
+    emit systemContextAdded(systemContext);
+}
+
+void ApplicationContext::removeSystemContext(SystemContext* systemContext)
+{
+    auto iter = std::find(d->systemContexts.begin(), d->systemContexts.end(), systemContext);
+    if (NX_ASSERT(iter != d->systemContexts.end()))
+        d->systemContexts.erase(iter);
+    emit systemContextRemoved(systemContext);
+}
+
+void ApplicationContext::addMainContext(SystemContext* mainContext)
+{
+    NX_ASSERT(d->systemContexts.empty()); //< Main context should be first.
+    d->systemContexts.push_back(mainContext);
 }
 
 } // namespace nx::vms::client::core

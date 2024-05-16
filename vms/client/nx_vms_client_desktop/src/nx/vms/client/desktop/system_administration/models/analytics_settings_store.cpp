@@ -10,9 +10,11 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/assert.h>
+#include <nx/vms/client/core/analytics/analytics_engines_watcher.h>
 #include <nx/vms/client/core/qml/qml_ownership.h>
 #include <nx/vms/client/desktop/analytics/analytics_actions_helper.h>
-#include <nx/vms/client/desktop/analytics/analytics_engines_watcher.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/common/utils/engine_license_summary_provider.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/qml_property.h>
@@ -25,7 +27,7 @@ namespace nx::vms::client::desktop {
 
 namespace {
 
-bool isEngineVisible(const AnalyticsEngineInfo& info)
+bool isEngineVisible(const core::AnalyticsEngineInfo& info)
 {
     // Device-dependent plugins without settings must be hidden.
     if (!info.isDeviceDependent)
@@ -41,18 +43,18 @@ AnalyticsSettingsStore::AnalyticsSettingsStore(QWidget* parent):
     QObject(parent),
     CurrentSystemContextAware(parent),
     m_parent(parent),
-    m_enginesWatcher(new AnalyticsEnginesWatcher(system(), this))
+    m_enginesWatcher(new core::AnalyticsEnginesWatcher(system(), this))
 {
-    connect(m_enginesWatcher.get(), &AnalyticsEnginesWatcher::engineAdded,
+    connect(m_enginesWatcher.get(), &core::AnalyticsEnginesWatcher::engineAdded,
         this, &AnalyticsSettingsStore::addEngine);
 
-    connect(m_enginesWatcher.get(), &AnalyticsEnginesWatcher::engineRemoved,
+    connect(m_enginesWatcher.get(), &core::AnalyticsEnginesWatcher::engineRemoved,
         this, &AnalyticsSettingsStore::removeEngine);
 
-    connect(m_enginesWatcher.get(), &AnalyticsEnginesWatcher::engineUpdated,
+    connect(m_enginesWatcher.get(), &core::AnalyticsEnginesWatcher::engineUpdated,
         this, &AnalyticsSettingsStore::updateEngine);
 
-    connect(m_enginesWatcher.get(), &AnalyticsEnginesWatcher::engineSettingsModelChanged, this,
+    connect(m_enginesWatcher.get(), &core::AnalyticsEnginesWatcher::engineSettingsModelChanged, this,
         [this](const nx::Uuid& engineId)
         {
             if (engineId == m_currentEngineId)
@@ -115,7 +117,7 @@ QJsonObject AnalyticsSettingsStore::settingsModel(const nx::Uuid& engineId)
 }
 
 void AnalyticsSettingsStore::addEngine(
-    const nx::Uuid& /*engineId*/, const AnalyticsEngineInfo& engineInfo)
+    const nx::Uuid& /*engineId*/, const core::AnalyticsEngineInfo& engineInfo)
 {
     // Hide device-dependent engines without settings on the model level.
     if (!isEngineVisible(engineInfo))

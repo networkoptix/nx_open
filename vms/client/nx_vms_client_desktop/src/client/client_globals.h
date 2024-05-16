@@ -9,6 +9,7 @@
 
 #include <common/common_meta_types.h>
 #include <nx/reflect/enum_instrument.h>
+#include <nx/vms/client/core/client_core_globals.h>
 
 namespace Qn
 {
@@ -48,7 +49,7 @@ namespace Qn
     */
     enum ItemDataRole
     {
-        FirstItemDataRole = Qt::UserRole,
+        FirstItemDataRole = nx::vms::client::core::CoreItemDataRoleCount,
 
         /* Tree-based. */
         NodeTypeRole,                               /**< Role for node type, see <tt>ResourceTree::NodeType</tt>. */
@@ -59,15 +60,10 @@ namespace Qn
         ResourceTreeScopeRole,
 
         /* Resource-based. */
-        ResourceRole,                               /**< Role for QnResourcePtr. */
         UserResourceRole,                           /**< Role for QnUserResourcePtr. */
-        LayoutResourceRole,                         /**< Role for QnLayoutResourcePtr. */
-        MediaServerResourceRole,                    /**< Role for QnMediaServerResourcePtr. */
         VideoWallResourceRole,                      /**< Role for QnVideoWallResourcePtr */
 
-        ResourceNameRole,                           /**< Role for resource name. Value of type QString. */
         ResourceFlagsRole,                          /**< Role for resource flags. Value of type int (Qn::ResourceFlags). */
-        ResourceStatusRole,                         /**< Role for resource status. Value of type int (nx::vms::api::ResourceStatus). */
         ResourceIconKeyRole,                        /**< Role for resource custom icon key. Value of type int. */
 
         ResourceExtraStatusRole,                    /**< Custom resource status (recording, buggy, etc). Value of ResourceExtraStatus. */
@@ -85,7 +81,8 @@ namespace Qn
         /** Whether item swithing is manual role for Showreel review layout. */
         ShowreelIsManualRole,
 
-//-------------------------------------------------------------------------------------------------
+
+        //-------------------------------------------------------------------------------------------------
         // Layout-based roles. Their numeric values must be kept intact to maintain external video
         // wall integrations. Video Wall Control protocol uses these IDs to pass messages about
         // corresponding layout item changes.
@@ -96,7 +93,7 @@ namespace Qn
         /** Cell aspect ratio. Value of type qreal. */
         LayoutCellAspectRatioRole = 277,
 
-        // Role 278 is deleted.
+           // Role 278 is deleted.
 
         /**< Minimal bounding rect. Value of type QRect. */
         LayoutMinimalBoundingRectRole = 279,
@@ -141,9 +138,6 @@ namespace Qn
 
         /** Floating point position. Value of type QPointF. */
         ItemPositionRole = 291,
-
-        /** Zoom window. Value of type QRectF. */
-        ItemZoomRectRole = 292,
 
         /**
          * Flag which controls whether zoom window rectangle should be visible for the
@@ -298,10 +292,7 @@ namespace Qn
         /** Role for 'forced' flag. Used in DisconnectAction. */
         ForceRole,
 
-        CameraBookmarkRole,                         /**< Role for the selected camera bookmark (if any). Used in Edit/RemoveBookmarkAction */
         CameraBookmarkListRole,                     /**< Role for the list of bookmarks. Used in RemoveBookmarksAction */
-        BookmarkTagRole,                            /**< Role for bookmark tag. Used in OpenBookmarksSearchAction */
-        UuidRole,                                   /**< Role for target uuid. Used in LoadVideowallMatrixAction. */
         KeyboardModifiersRole,                      /**< Role for keyboard modifiers. Used in some Drop actions. */
 
         /* Others. */
@@ -353,32 +344,20 @@ namespace Qn
         ForceShowCamerasList,                       /**< Used for default password dialog. */
         ParentWidgetRole,                           /**< Used for dialog's parent widget. */
 
-        TimestampRole,                              /**< Role for timestamp in microseconds since epoch (std::chrono::microseconds). */
-        TimestampTextRole,                          /**< Role for timestamp text (QString). */
-        DescriptionTextRole,                        /**< Role for generic description text (QString). */
         AdditionalTextRole,                         /**< Role for additional description text (QString). */
-        AnalyticsAttributesRole,                    /**< Role for analytics attribute lists (QList<nx::vms::client::desktop::analytics::Attribute>). */
         RemovableRole,                              /**< An item is removable (bool). */
         CommandActionRole,                          /**< Command action (QSharedPointer<QAction>). */
         AdditionalActionRole,                       /**< Additional action (QSharedPointer<QAction>). */
         ResourceListRole,                           /**< Resource list (QnResourceList). */
         DisplayedResourceListRole,                  /**< Resource list displayed in a Right Panel tile (QnResourceList or QStringList). */
-        PreviewTimeRole,                            /**< Role for camera preview time in microseconds since epoch (std::chrono::microseconds). */
         TimeoutRole,                                /**< Role for timeout or lifetime in milliseconds (std::chrono::milliseconds). */
         BusyIndicatorVisibleRole,                   /**< Role for toggling busy indicator (bool). */
         ProgressValueRole,                          /**< Role for specifying progress value [0..1] (float). */
         ProgressFormatRole,                         /**< Role for specifying progress format, when null default is used: "%p%" (QString). */
-        DurationRole,                               /**< Role for duration in microseconds (std::chrono::microseconds). */
         NotificationLevelRole,                      /**< Role for notification level (QnNotificationLevel::Value). */
         CreateContextMenuRole,                      /**< Role for creating context menu (QSharedPointer<QMenu>). */
-        ForcePrecisePreviewRole,                    /**< Role for forcing precise preview frame (bool). */
-        PreviewStreamSelectionRole,                 /**< Role for camera preview stream (ImageRequest::StreamSelectionMode). */
-        ObjectTrackIdRole,                          /**< Role for camera preview stream (CameraImageRequest::objectTrackId). */
-        HasExternalBestShotRole,                    /**< Whether object detection track has an external best shot image (bool). */
         ForcePreviewLoaderRole,                     /**< Display loading indicator on tile preview. */
         ShowVideoPreviewRole,                       /**< Display camera video stream on tile preview. */
-
-        DecorationPathRole,                         /**< Role for icon path (QString). */
 
         SelectOnOpeningRole,                        /**< Role for single-selecting an item (or first of multiple items) added to current layout (bool). */
 
@@ -391,11 +370,6 @@ namespace Qn
 
         /** Enable advanced UI features (typically in settings dialogs). */
         AdvancedModeRole,
-
-        // Model notification roles. Do not necessarily pass any data but implement
-        // item-related view-to-model notifications via setData which can be proxied.
-        DefaultNotificationRole,                    /**< Role to perform default item action (no data). */
-        ActivateLinkRole,                           /**< Role to parse and follow hyperlink (QString). */
 
         // Additional roles for the resource tree. Placed at the end of the list for purpose
         // not to change enumeration values for BlueBox integration.
@@ -602,20 +576,11 @@ namespace Qn
         SpecialLayout /**< Special layout pane. */
     )
 
-    NX_REFLECTION_ENUM_CLASS(ThumbnailStatus,
-        Invalid,
-        Loading,
-        Loaded,
-        NoData,
-        Refreshing
-    )
-
     enum class ButtonAccent
     {
         NoAccent,
         Standard,
         Warning
     };
-
 
 } // namespace Qn

@@ -3,15 +3,15 @@
 #pragma once
 
 #include <nx/utils/impl_ptr.h>
-
-#include "abstract_event_list_model.h"
+#include <nx/vms/client/core/event_search/models/abstract_event_list_model.h>
+#include <nx/vms/client/desktop/window_context_aware.h>
 
 namespace nx::vms::client::desktop {
 
-class SystemHealthListModel: public AbstractEventListModel
+class SystemHealthListModel: public core::AbstractEventListModel, public WindowContextAware
 {
     Q_OBJECT
-    using base_type = AbstractEventListModel;
+    using base_type = core::AbstractEventListModel;
 
 public:
     explicit SystemHealthListModel(WindowContext* context, QObject* parent = nullptr);

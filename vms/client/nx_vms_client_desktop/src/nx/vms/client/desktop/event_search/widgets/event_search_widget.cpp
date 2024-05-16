@@ -23,7 +23,7 @@
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/icon.h>
 #include <nx/vms/client/core/skin/skin.h>
-#include <nx/vms/client/desktop/analytics/analytics_entities_tree.h>
+#include <nx/vms/client/core/analytics/analytics_entities_tree.h>
 #include <nx/vms/client/desktop/common/widgets/selectable_text_button.h>
 #include <nx/vms/client/desktop/event_search/models/event_search_list_model.h>
 #include <nx/vms/client/desktop/event_search/utils/common_object_search_setup.h>
@@ -150,12 +150,13 @@ EventSearchWidget::Private::Private(EventSearchWidget* q):
                 updateAnalyticsMenu();
         };
 
-    connect(m_eventModel, &AbstractSearchListModel::isOnlineChanged,
+    connect(m_eventModel, &core::AbstractSearchListModel::isOnlineChanged,
         this,
         updateAnalyticsMenuIfEventModelIsOnline);
 
-    connect(q->system()->analyticsEventsSearchTreeBuilder(),
-        &AnalyticsEventsSearchTreeBuilder::eventTypesTreeChanged,
+    const auto builder = q->system()->analyticsEventsSearchTreeBuilder();
+    connect(builder,
+        &core::AnalyticsEventsSearchTreeBuilder::eventTypesTreeChanged,
         this,
         updateAnalyticsMenuIfEventModelIsOnline);
 
@@ -168,7 +169,7 @@ EventSearchWidget::Private::Private(EventSearchWidget* q):
             NX_ASSERT(m_serverEventsSubmenuAction);
 
             const bool serverEventsVisible =
-                this->q->commonSetup()->cameraSelection() == RightPanel::CameraSelection::all;
+                this->q->commonSetup()->cameraSelection() == core::EventSearch::CameraSelection::all;
 
             m_serverEventsSubmenuAction->setEnabled(serverEventsVisible);
 
@@ -182,7 +183,7 @@ EventSearchWidget::Private::Private(EventSearchWidget* q):
     connect(q->system()->accessController(), &AccessController::globalPermissionsChanged,
         q, &EventSearchWidget::updateAllowance);
 
-    connect(q->model(), &AbstractSearchListModel::isOnlineChanged,
+    connect(q->model(), &core::AbstractSearchListModel::isOnlineChanged,
         q, &EventSearchWidget::updateAllowance);
 }
 
@@ -349,7 +350,7 @@ void EventSearchWidget::Private::updateAnalyticsMenu()
         [this, currentSelection, &currentSelectionStillAvailable]
         (auto addItemRecursive, auto parent, auto root) -> void
         {
-            using NodeType = AnalyticsEntitiesTreeBuilder::NodeType;
+            using NodeType = core::AnalyticsEntitiesTreeBuilder::NodeType;
 
             for (auto node: root->children)
             {

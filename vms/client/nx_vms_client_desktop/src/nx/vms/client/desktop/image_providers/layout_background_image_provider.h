@@ -4,14 +4,14 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include "image_provider.h"
+#include <nx/vms/client/core/image_providers/image_provider.h>
 
 namespace nx::vms::client::desktop {
 
-class LayoutBackgroundImageProvider: public ImageProvider
+class LayoutBackgroundImageProvider: public core::ImageProvider
 {
     Q_OBJECT
-    using base_type = ImageProvider;
+    using base_type = core::ImageProvider;
 
 public:
     explicit LayoutBackgroundImageProvider(const QnLayoutResourcePtr& layout,
@@ -21,7 +21,7 @@ public:
 
     virtual QImage image() const override;
     virtual QSize sizeHint() const override;
-    virtual Qn::ThumbnailStatus status() const override;
+    virtual core::ThumbnailStatus status() const override;
 
 protected:
     virtual void doLoadAsync() override;

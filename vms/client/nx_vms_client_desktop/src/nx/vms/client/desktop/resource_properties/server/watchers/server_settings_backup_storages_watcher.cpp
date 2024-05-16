@@ -12,7 +12,7 @@
 #include <nx/vms/client/desktop/resource_properties/server/flux/server_settings_dialog_store.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/saas/saas_utils.h>
-#include <server/server_storage_manager.h>
+#include <storage/server_storage_manager.h>
 
 namespace {
 

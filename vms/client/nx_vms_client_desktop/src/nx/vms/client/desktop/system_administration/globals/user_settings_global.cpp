@@ -73,6 +73,7 @@ PasswordStrengthData UserSettingsGlobal::passwordStrength(const QString& passwor
     result.text = info.text().toUpper();
     result.hint = info.hint();
 
+    using namespace nx::vms::client::core;
     switch (info.acceptance())
     {
         case nx::utils::PasswordAcceptance::Good:

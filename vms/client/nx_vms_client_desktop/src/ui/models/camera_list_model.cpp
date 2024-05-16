@@ -13,6 +13,7 @@
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_context.h>
 
+using namespace nx::vms::client::core;
 using namespace nx::vms::client::desktop;
 
 QnCameraListModel::QnCameraListModel(QObject* parent):
@@ -117,7 +118,7 @@ QVariant QnCameraListModel::data(const QModelIndex& index, int role) const
             }
             break;
 
-        case Qn::ResourceRole:
+        case ResourceRole:
             return QVariant::fromValue<QnResourcePtr>(camera);
 
         default:

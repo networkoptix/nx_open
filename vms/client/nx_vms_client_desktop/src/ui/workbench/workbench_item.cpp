@@ -15,6 +15,7 @@
 
 #include "workbench_layout.h"
 
+using namespace nx::vms::client;
 using namespace nx::vms::client::desktop;
 
 QnWorkbenchItem::QnWorkbenchItem(const QnResourcePtr& resource, const nx::Uuid& uuid, QObject* parent):
@@ -74,7 +75,7 @@ void QnWorkbenchItem::setLayout(QnWorkbenchLayout* value)
     if (m_layout)
     {
         connect(m_layout->resource().get(), &LayoutResource::itemDataChanged, this,
-            [this](const nx::Uuid& itemId, Qn::ItemDataRole role, const QVariant& /*value*/)
+            [this](const nx::Uuid& itemId, int role, const QVariant& /*value*/)
             {
                 if (itemId == m_uuid)
                     emit dataChanged(role);
@@ -267,7 +268,7 @@ void QnWorkbenchItem::setZoomRect(const QRectF &zoomRect)
     m_zoomRect = zoomRect;
 
     emit zoomRectChanged();
-    emit dataChanged(Qn::ItemZoomRectRole);
+    emit dataChanged(core::ItemZoomRectRole);
 }
 
 void QnWorkbenchItem::setImageEnhancement(const nx::vms::api::ImageCorrectionData& imageEnhancement)
@@ -409,7 +410,7 @@ void QnWorkbenchItem::setDisplayHotspots(bool value)
     emit dataChanged(Qn::ItemDisplayHotspotsRole);
 }
 
-QVariant QnWorkbenchItem::data(Qn::ItemDataRole role) const
+QVariant QnWorkbenchItem::data(int role) const
 {
     switch (role)
     {
@@ -421,7 +422,7 @@ QVariant QnWorkbenchItem::data(Qn::ItemDataRole role) const
             return geometryDelta();
         case Qn::ItemCombinedGeometryRole:
             return combinedGeometry();
-        case Qn::ItemZoomRectRole:
+        case core::ItemZoomRectRole:
             return zoomRect();
         case Qn::ItemImageEnhancementRole:
             return QVariant::fromValue<nx::vms::api::ImageCorrectionData>(imageEnhancement());
@@ -447,7 +448,7 @@ QVariant QnWorkbenchItem::data(Qn::ItemDataRole role) const
     return currentLayout->itemData(m_uuid, role);
 }
 
-void QnWorkbenchItem::setData(Qn::ItemDataRole role, const QVariant &value)
+void QnWorkbenchItem::setData(int role, const QVariant &value)
 {
     LayoutResourcePtr currentLayout;
     if (NX_ASSERT(layout()))
@@ -473,7 +474,7 @@ void QnWorkbenchItem::setData(Qn::ItemDataRole role, const QVariant &value)
             NX_ASSERT(value.canConvert<QRectF>());
             setCombinedGeometry(value.toRectF());
             break;
-        case Qn::ItemZoomRectRole:
+        case core::ItemZoomRectRole:
             NX_ASSERT(value.canConvert<QRectF>());
             setZoomRect(value.toRectF());
             break;

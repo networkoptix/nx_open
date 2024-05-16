@@ -3,7 +3,6 @@
 import QtQuick
 import QtQml
 
-import Nx
 import Nx.Core
 import Nx.Controls
 import Nx.Instruments

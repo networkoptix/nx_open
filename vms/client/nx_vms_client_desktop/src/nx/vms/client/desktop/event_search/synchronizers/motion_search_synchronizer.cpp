@@ -4,13 +4,13 @@
 
 #include <core/resource/camera_resource.h>
 #include <nx/utils/log/assert.h>
+#include <nx/vms/client/core/utils/video_cache.h>
 #include <nx/vms/client/desktop/event_search/models/simple_motion_search_list_model.h>
 #include <nx/vms/client/desktop/event_search/utils/common_object_search_setup.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/utils/video_cache.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/workbench/workbench_display.h>

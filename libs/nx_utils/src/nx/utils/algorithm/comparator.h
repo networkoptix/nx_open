@@ -35,7 +35,7 @@ public:
 
         const bool predResult = m_pred(leftValue, rightValue);
         return !predResult && ! m_pred(rightValue, leftValue) //< Means equal values.
-            ? m_nested(left, right)
+            ? static_cast<bool>(m_nested(left, right))
             : predResult;
     }
 

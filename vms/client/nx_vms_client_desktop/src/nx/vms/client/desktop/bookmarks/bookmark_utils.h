@@ -4,10 +4,14 @@
 
 #include <nx/utils/uuid.h>
 
+namespace nx::vms::common { struct CameraBookmark; }
+
 namespace nx::vms::client::desktop {
 
 class SystemContext;
 
-QString getBookmarkCreatorName(const nx::Uuid& creatorId, SystemContext* context);
+QString getVisibleBookmarkCreatorName(
+    const common::CameraBookmark& bookmark,
+    SystemContext* context);
 
 } // namespace nx::vms::client::desktop

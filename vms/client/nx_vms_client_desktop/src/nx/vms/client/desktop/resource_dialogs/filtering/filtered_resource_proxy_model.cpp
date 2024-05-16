@@ -29,7 +29,7 @@ bool FilteredResourceProxyModel::filterAcceptsRow(
         return true;
 
     const auto sourceIndex = sourceModel()->index(sourceRow, 0, sourceParent);
-    const auto resourceData = sourceIndex.data(Qn::ResourceRole);
+    const auto resourceData = sourceIndex.data(core::ResourceRole);
     if (resourceData.isValid())
     {
         const auto resource = resourceData.value<QnResourcePtr>();

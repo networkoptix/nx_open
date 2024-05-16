@@ -47,7 +47,7 @@ void detailsPanelUpdateFunction(const QModelIndex& index, ResourceDetailsWidget*
         : resourceIndex.data(Qt::DisplayRole).toString());
 
     detailsWidget->setThumbnailCameraResource(
-        resourceIndex.data(Qn::ResourceRole).value<QnResourcePtr>());
+        resourceIndex.data(nx::vms::client::core::ResourceRole).value<QnResourcePtr>());
 
     const auto infoMessageData = index.data(InfoMessageRole);
     if (!infoMessageData.isNull())

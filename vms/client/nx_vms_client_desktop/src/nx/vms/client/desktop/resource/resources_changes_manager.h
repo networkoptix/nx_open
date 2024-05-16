@@ -92,4 +92,4 @@ signals:
 
 } // namespace nx::vms::client::desktop
 
-#define qnResourcesChangesManager appContext()->resourcesChangesManager()
+#define qnResourcesChangesManager nx::vms::client::desktop::appContext()->resourcesChangesManager()

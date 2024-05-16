@@ -33,6 +33,7 @@
 
 #include "destruction_guard_item.h"
 
+using namespace nx::vms::client;
 using namespace nx::vms::client::desktop;
 
 class DropSurfaceItem: public QGraphicsObject
@@ -177,7 +178,7 @@ bool DropInstrument::dropEvent(QGraphicsItem* /*item*/, QGraphicsSceneDragDropEv
     if (!showreels.empty())
     {
         for (const auto& showreel: showreels)
-            delayedTriggerIfPossible(menu::ReviewShowreelAction, {Qn::UuidRole, showreel.id});
+            delayedTriggerIfPossible(menu::ReviewShowreelAction, {core::UuidRole, showreel.id});
 
         // If tour was opened, ignore other items.
         return true;

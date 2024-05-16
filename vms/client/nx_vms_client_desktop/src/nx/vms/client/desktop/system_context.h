@@ -9,14 +9,13 @@
 
 #include "system_context_aware.h" //< Forward declarations.
 
-class QnCameraBookmarksManager;
 class QnCameraDataManager;
 class QnMediaServerStatisticsManager;
-class QnServerStorageManager;
+
+namespace nx::vms::client::core { class AnalyticsEventsSearchTreeBuilder; }
 
 namespace nx::vms::client::desktop {
 
-class AnalyticsEventsSearchTreeBuilder;
 class DefaultPasswordCamerasWatcher;
 class OtherServersManager;
 class LayoutSnapshotManager;
@@ -26,19 +25,15 @@ class LogsManagementWatcher;
 class NonEditableUsersAndGroups;
 class RemoteSession;
 class RestApiHelper;
-class ShowreelStateManager;
 class ServerImageCache;
 class ServerNotificationCache;
-class ServerRuntimeEventConnector;
-class SystemInternetAccessWatcher;
+class ShowreelStateManager;
 class SystemHealthState;
 class SystemSpecificLocalSettings;
 class TrafficRelayUrlWatcher;
 class VideoCache;
 class VideoWallOnlineScreensWatcher;
 class VirtualCameraManager;
-
-namespace analytics { class TaxonomyManager; }
 
 class NX_VMS_CLIENT_DESKTOP_API SystemContext: public core::SystemContext
 {
@@ -74,24 +69,17 @@ public:
      */
     std::shared_ptr<RemoteSession> session() const;
 
-    AnalyticsEventsSearchTreeBuilder* analyticsEventsSearchTreeBuilder() const;
     VideoWallOnlineScreensWatcher* videoWallOnlineScreensWatcher() const;
     LdapStatusWatcher* ldapStatusWatcher() const;
     NonEditableUsersAndGroups* nonEditableUsersAndGroups() const;
-    ServerRuntimeEventConnector* serverRuntimeEventConnector() const;
-    QnServerStorageManager* serverStorageManager() const;
-    QnCameraBookmarksManager* cameraBookmarksManager() const;
     QnCameraDataManager* cameraDataManager() const;
     VirtualCameraManager* virtualCameraManager() const;
-    VideoCache* videoCache() const;
     LayoutSnapshotManager* layoutSnapshotManager() const;
     ShowreelStateManager* showreelStateManager() const;
     LogsManagementWatcher* logsManagementWatcher() const;
     QnMediaServerStatisticsManager* mediaServerStatisticsManager() const;
     SystemSpecificLocalSettings* localSettings() const;
     RestApiHelper* restApiHelper() const;
-    nx::Uuid localSystemId() const;
-    Q_INVOKABLE nx::vms::client::desktop::analytics::TaxonomyManager* taxonomyManager() const;
     OtherServersManager* otherServersManager() const;
     virtual nx::vms::common::SessionTokenHelperPtr getSessionTokenHelper() const override;
     DefaultPasswordCamerasWatcher* defaultPasswordCamerasWatcher() const;

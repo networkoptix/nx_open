@@ -4,10 +4,10 @@
 #include "ui_resource_details_widget.h"
 
 #include <core/resource/camera_resource.h>
+#include <nx/vms/client/core/image_providers/camera_thumbnail_manager.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/widgets/async_image_widget.h>
 #include <nx/vms/client/desktop/common/widgets/text_edit_label.h>
-#include <nx/vms/client/desktop/image_providers/camera_thumbnail_manager.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/skin/font_config.h>
 #include <nx/vms/client/desktop/style/helper.h>
@@ -90,7 +90,7 @@ QWidget* createWarningWidget(const QString& caption, const QString& message)
 ResourceDetailsWidget::ResourceDetailsWidget(QWidget* parent):
     base_type(parent),
     ui(new Ui::ResourceDetailsWidget),
-    m_cameraThumbnailManager(new CameraThumbnailManager)
+    m_cameraThumbnailManager(new core::CameraThumbnailManager)
 {
     ui->setupUi(this);
     setContentsMargins(nx::style::Metrics::kDefaultTopLevelMargins);

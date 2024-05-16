@@ -227,7 +227,7 @@ QVariant QnRecordingStatsModel::data(const QModelIndex &index, int role) const
 
             break;
         }
-        case Qn::ResourceRole: //< This is used by QnResourceItemDelegate to draw contents.
+        case nx::vms::client::core::ResourceRole: //< This is used by QnResourceItemDelegate to draw contents.
         {
             if (rowType == Normal)
             {

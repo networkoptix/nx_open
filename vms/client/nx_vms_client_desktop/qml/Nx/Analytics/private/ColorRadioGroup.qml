@@ -2,10 +2,9 @@
 
 import QtQuick 2.14
 
-import Nx 1.0
 import Nx.Core 1.0
 
-import nx.vms.client.desktop.analytics 1.0 as Analytics
+import nx.vms.client.core.analytics 1.0 as Analytics
 
 RadioGroup
 {
@@ -13,7 +12,7 @@ RadioGroup
 
     property Analytics.Attribute attribute
 
-    model: Utils.toArray(attribute && attribute.colorSet && attribute.colorSet.items)
+    model: CoreUtils.toArray(attribute && attribute.colorSet && attribute.colorSet.items)
 
     middleItemDelegate: Rectangle
     {

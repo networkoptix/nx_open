@@ -7,12 +7,13 @@
 #include <QtGui/QPalette>
 
 #include <client/client_globals.h>
-#include <core/resource/client_storage_resource.h>
+#include <core/resource/storage_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/storage_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/algorithm/index_of.h>
+#include <nx/vms/client/core/resource/client_storage_resource.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/common/html/html.h>
@@ -794,12 +795,8 @@ bool QnStorageListModel::storageIsActive(const QnStorageModelInfo& data) const
     if (!m_server)
         return false;
 
-    auto storageResource = m_server->getStorageByUrl(data.url).dynamicCast<QnClientStorageResource>();
-
-    if (!storageResource)
-        return false;
-
-    return storageResource->isActive();
+    const auto storage = m_server->getStorageByUrl(data.url).dynamicCast<QnClientStorageResource>();
+    return storage && storage->isActive();
 }
 
 bool QnStorageListModel::isStoragePoolInRebuild(const QnStorageModelInfo& storage) const

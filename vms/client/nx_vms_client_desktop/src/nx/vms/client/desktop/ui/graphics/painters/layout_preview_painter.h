@@ -34,7 +34,7 @@ public:
     void paint(QPainter* painter, const QRect& paintRect);
 
 private:
-    void at_updateThumbnailStatus(Qn::ThumbnailStatus status);
+    void at_updateThumbnailStatus(core::ThumbnailStatus status);
     void at_updateThumbnailImage(const QImage& image);
 
 private:

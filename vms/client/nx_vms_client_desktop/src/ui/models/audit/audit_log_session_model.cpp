@@ -5,7 +5,7 @@
 #include <client/client_globals.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 
-using namespace nx::vms::client::desktop;
+using namespace nx::vms::client::core;
 
 QnAuditLogMasterModel::QnAuditLogMasterModel(QObject *parent):
     QnAuditLogModel(parent),

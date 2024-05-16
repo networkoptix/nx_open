@@ -306,13 +306,13 @@ public:
      * @param role Role to get data for.
      * @return Data for the given role.
      */
-    QVariant data(Qn::ItemDataRole role) const;
+    QVariant data(int role) const;
 
     /**
      * @param role Role to set data for.
      * @param value New value for the given data role.
      */
-    void setData(Qn::ItemDataRole role, const QVariant& value);
+    void setData(int role, const QVariant& value);
 
     /**
      * Move all items to the center of the grid coordinates (relative position is not changed).
@@ -385,7 +385,7 @@ signals:
      *
      * @param role Role of the changed data.
      */
-    void dataChanged(Qn::ItemDataRole role);
+    void dataChanged(int role);
 
 protected:
     /**

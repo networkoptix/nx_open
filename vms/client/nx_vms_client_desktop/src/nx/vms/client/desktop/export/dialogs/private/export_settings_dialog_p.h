@@ -25,14 +25,17 @@
 class QWidget;
 class QnSingleThumbnailLoader;
 
+namespace nx::vms::client::core {
+class ResourceThumbnailProvider;
+class ProxyImageProvider;
+class ImageProvider;
+} // namespace nx::vms::client::core
+
 namespace nx::vms::client::desktop {
 
 class LayoutThumbnailLoader;
-class ProxyImageProvider;
 class TranscodingImageProcessor;
-class ResourceThumbnailProvider;
 class AsyncImageWidget;
-class ImageProvider;
 
 class ExportSettingsDialog::Private:
     public QObject,
@@ -112,17 +115,17 @@ private:
     // Applies filters to make media thumbnails look the same way as on real output
     QScopedPointer<TranscodingImageProcessor> m_mediaPreviewProcessor;
     // Image provider for media preview
-    std::unique_ptr<ImageProvider> m_mediaPreviewProvider;
+    std::unique_ptr<core::ImageProvider> m_mediaPreviewProvider;
     QPointer<nx::vms::client::desktop::AsyncImageWidget> m_mediaPreviewWidget;
 
     // This one provides raw image without any transforms
-    std::unique_ptr<ResourceThumbnailProvider> m_mediaRawImageProvider;
+    std::unique_ptr<core::ResourceThumbnailProvider> m_mediaRawImageProvider;
 
     // Layout group
 
     LayoutResourcePtr m_layout;
     // Image provider for layout preview
-    std::unique_ptr<ImageProvider> m_layoutPreviewProvider;
+    std::unique_ptr<core::ImageProvider> m_layoutPreviewProvider;
     QPointer<nx::vms::client::desktop::AsyncImageWidget> m_layoutPreviewWidget;
 
     static constexpr size_t overlayCount = size_t(ExportOverlayType::overlayCount);

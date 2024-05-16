@@ -9,9 +9,10 @@
 #include <nx/reflect/json/serializer.h>
 #include <nx/vms/client/desktop/analytics/taxonomy/test_support/test_resource_support_proxy.h>
 
+using namespace nx::vms::client::core::analytics::taxonomy;
 using namespace nx::vms::client::desktop::analytics::taxonomy;
-namespace nx::vms::client::desktop {
 
+namespace nx::vms::client::desktop {
 
 static std::map<QString, std::set<nx::Uuid>> toDescriptorAttributeSupportInfo(
     const InputData::AttributeSupportInfo& inputDataAttributeSupportInfo)

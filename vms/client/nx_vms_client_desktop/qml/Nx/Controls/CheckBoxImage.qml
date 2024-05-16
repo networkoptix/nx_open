@@ -3,6 +3,7 @@
 import QtQml
 
 import Nx.Core
+import Nx.Core.Controls
 
 import "private"
 

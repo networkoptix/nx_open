@@ -5,7 +5,6 @@ import QtQuick.Layouts 1.11
 import QtQuick.Shapes 1.14
 import Qt5Compat.GraphicalEffects
 
-import Nx 1.0
 import Nx.Core 1.0
 import Nx.Items 1.0
 import Nx.Controls 1.0

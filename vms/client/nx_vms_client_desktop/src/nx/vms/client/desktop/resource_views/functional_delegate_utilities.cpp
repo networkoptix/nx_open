@@ -25,7 +25,7 @@ QVariant resourceVersionAccessor(const QnResourcePtr& ptr, int role)
             case Qt::AccessibleTextRole:
             case Qt::AccessibleDescriptionRole:
                 return server->getVersion().toString();
-            case Qn::MediaServerResourceRole:
+            case core::MediaServerResourceRole:
                 return QVariant::fromValue<QnMediaServerResourcePtr>(server);
         }
     }
@@ -42,7 +42,7 @@ CustomizableItemDelegate* makeVersionStatusDelegate(QnWorkbenchContext* context,
     delegate->setCustomInitStyleOption(
         [latestMsVersion](QStyleOptionViewItem* item, const QModelIndex& index)
         {
-            auto ptr = index.data(Qn::MediaServerResourceRole).value<QnMediaServerResourcePtr>();
+            auto ptr = index.data(core::MediaServerResourceRole).value<QnMediaServerResourcePtr>();
             if (!ptr)
                 return;
 

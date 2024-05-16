@@ -50,7 +50,7 @@ bool ImportFromDeviceFilterModel::filterAcceptsRow(
     const QModelIndex sourceIndex = sourceModel()->index(sourceRow, 0, sourceParent);
 
     const auto resource = qvariant_cast<QnResourcePtr>(
-        sourceModel()->data(sourceIndex, Qn::ResourceRole));
+        sourceModel()->data(sourceIndex, core::ResourceRole));
     if (!NX_ASSERT(resource))
         return false;
 

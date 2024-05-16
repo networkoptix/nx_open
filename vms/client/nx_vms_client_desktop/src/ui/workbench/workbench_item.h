@@ -291,7 +291,7 @@ public:
      * \param role                      Role to get data for.
      * \returns                         Data for the given role.
      */
-    QVariant data(Qn::ItemDataRole role) const;
+    QVariant data(int role) const;
 
     /**
      * \param role                      Role to get data for.
@@ -313,7 +313,7 @@ public:
     }
 
     template<class T>
-    void setData(Qn::ItemDataRole role, const T &value)
+    void setData(int role, const T &value)
     {
         setData(role, QVariant::fromValue<T>(value));
     }
@@ -322,7 +322,7 @@ public:
      * \param role                      Role to set data for.
      * \param value                     New value for the given data role.
      */
-    void setData(Qn::ItemDataRole role, const QVariant &value);
+    void setData(int role, const QVariant &value);
 
     static void sortByGeometryAndName(QList<QnWorkbenchItem*>& items);
 
@@ -345,7 +345,7 @@ signals:
     void displayAnalyticsObjectsChanged();
     void displayRoiChanged();
     void displayHotspotsChanged();
-    void dataChanged(Qn::ItemDataRole role);
+    void dataChanged(int role);
 
 protected:
     void setGeometryInternal(const QRect &geometry);

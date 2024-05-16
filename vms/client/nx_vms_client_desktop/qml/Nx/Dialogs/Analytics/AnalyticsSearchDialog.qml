@@ -4,7 +4,6 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Window
 
-import Nx
 import Nx.Core
 import Nx.Analytics
 import Nx.Controls
@@ -13,7 +12,9 @@ import Nx.RightPanel
 
 import nx.vms.client.desktop
 import nx.vms.client.core
-import nx.vms.client.desktop.analytics as Analytics
+import nx.vms.client.core.analytics as Analytics
+import nx.vms.client.desktop.analytics
+
 
 import "metrics.js" as Metrics
 
@@ -210,7 +211,7 @@ Window
                     onFiltersReset:
                     {
                         analyticsFilters.clear()
-                        eventModel.commonSetup.cameraSelection = RightPanel.CameraSelection.layout
+                        eventModel.commonSetup.cameraSelection = EventSearch.CameraSelection.layout
                     }
                 }
             }
@@ -466,12 +467,12 @@ Window
                     id: eventModel
 
                     context: windowContext
-                    type: { return RightPanelModel.Type.analytics }
+                    type: { return EventSearch.SearchType.analytics }
                     active: true
                     attributeManager: d.tileViewAttributeManager
 
                     Component.onCompleted:
-                        commonSetup.cameraSelection = RightPanel.CameraSelection.layout
+                        commonSetup.cameraSelection = EventSearch.CameraSelection.layout
 
                     onAnalyticsSetupChanged:
                     {
@@ -696,13 +697,12 @@ Window
         property var analyticsFiltersByEngine: ({})
 
         property var filterModel: windowContext
-            ? windowContext.systemContext.taxonomyManager().createFilterModel(dialog)
+            ? windowContext.systemContext.taxonomyManager.createFilterModel(dialog)
             : emptyFilterModel
 
-        property Analytics.AttributeDisplayManager tileViewAttributeManager:
+        property AttributeDisplayManager tileViewAttributeManager:
             windowContext && eventModel.analyticsSetup
-            ? windowContext.systemContext.taxonomyManager().createAttributeManager(
-                Analytics.AttributeDisplayManager.Mode.tileView, filterModel)
+            ? AttributeDisplayManagerFactory.create(AttributeDisplayManager.Mode.tileView, filterModel)
             : null
 
         readonly property Analytics.Engine selectedAnalyticsEngine:
@@ -737,6 +737,9 @@ Window
 
             storeCurrentEngineFilterState()
 
+            if (!eventModel.analyticsSetup)
+                return
+
             eventModel.analyticsSetup.engine = selectedAnalyticsEngine
                 ? NxGlobals.uuid(selectedAnalyticsEngine.id)
                 : NxGlobals.uuid("")
@@ -757,8 +760,7 @@ Window
             target: eventModel.commonSetup
             function onSelectedCamerasChanged()
             {
-                d.filterModel.setSelectedDevices(
-                    eventModel.commonSetup.selectedCameras)
+                d.filterModel.selectedDevices = eventModel.commonSetup.selectedCameras
             }
         }
 

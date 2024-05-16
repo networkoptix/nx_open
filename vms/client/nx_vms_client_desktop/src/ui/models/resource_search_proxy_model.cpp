@@ -9,6 +9,7 @@
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/resource/search_helper.h>
 
+using namespace nx::vms::client::core;
 using namespace nx::vms::client::desktop;
 
 QnResourceSearchProxyModel::QnResourceSearchProxyModel(QObject* parent):
@@ -159,7 +160,7 @@ bool QnResourceSearchProxyModel::filterAcceptsRow(
             return true;
     }
 
-    if (auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>())
+    if (auto resource = index.data(ResourceRole).value<QnResourcePtr>())
         return isResourceMatchesQuery(resource, m_query);
     else if (!searchGroupNodes.contains(nodeType))
         return isRepresentationMatchesQuery(index, m_query);
@@ -175,7 +176,7 @@ bool QnResourceSearchProxyModel::isAcceptedIndex(
     if (isRejectedNodeType(nodeType, allowedNode))
         return false;
 
-    const auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+    const auto resource = index.data(ResourceRole).value<QnResourcePtr>();
     if (!resource)
         return true;
 

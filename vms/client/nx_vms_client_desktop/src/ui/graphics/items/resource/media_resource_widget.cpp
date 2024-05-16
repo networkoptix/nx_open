@@ -142,7 +142,7 @@
 using namespace std::chrono;
 
 using namespace nx::vms::client::desktop;
-using namespace nx::vms::client::desktop::analytics;
+using namespace nx::vms::client::core::analytics;
 using namespace nx::vms::api;
 
 namespace ptz = nx::vms::common::ptz;
@@ -572,7 +572,7 @@ void QnMediaResourceWidget::beforeDestroy()
 
 void QnMediaResourceWidget::handleItemDataChanged(
     const nx::Uuid& id,
-    Qn::ItemDataRole role,
+    int role,
     const QVariant& data)
 {
     if (id != m_itemId)
@@ -3288,7 +3288,7 @@ void QnMediaResourceWidget::setAnalyticsModeEnabled(bool enabled, bool animate)
     updateAnalyticsVisibility(animate);
 }
 
-void QnMediaResourceWidget::atItemDataChanged(Qn::ItemDataRole role)
+void QnMediaResourceWidget::atItemDataChanged(int role)
 {
     base_type::atItemDataChanged(role);
 

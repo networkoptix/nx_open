@@ -14,10 +14,12 @@
 #include <core/resource/camera_resource.h>
 #include <nx/utils/datetime.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/pending_operation.h>
+#include <nx/vms/client/core/resource/unified_resource_pool.h>
 #include <nx/vms/client/desktop/access/caching_access_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/resource/unified_resource_pool.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/common/bookmark/bookmark_helpers.h>
 #include <nx/vms/common/resource/bookmark_filter.h>
 #include <ui/graphics/items/controls/bookmarks_viewer.h>
 #include <ui/graphics/items/controls/time_slider.h>
@@ -25,7 +27,6 @@
 #include <ui/utils/bookmark_merge_helper.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_navigator.h>
-#include <utils/camera/bookmark_helpers.h>
 #include <utils/common/delayed.h>
 #include <utils/common/scoped_timer.h>
 
@@ -54,7 +55,7 @@ QnTimelineBookmarksWatcher::QnTimelineBookmarksWatcher(QObject* parent):
     m_filterWatcher(new QFutureWatcher<QnCameraBookmark>(this))
 {
     connect(appContext()->unifiedResourcePool(),
-        &UnifiedResourcePool::resourcesRemoved,
+        &nx::vms::client::core::UnifiedResourcePool::resourcesRemoved,
         this,
         &QnTimelineBookmarksWatcher::onResourcesRemoved);
 
@@ -131,7 +132,7 @@ QnTimelineBookmarksWatcher::QnTimelineBookmarksWatcher(QObject* parent):
                 auto bookmarks = query->cachedBookmarks();
                 const milliseconds timePoint = bookmarks.empty()
                     ? 0ms
-                    : bookmarks.last().startTimeMs;
+                    : bookmarks.back().startTimeMs;
 
                 NX_VERBOSE(this, "Updating query %1 tail from time %2", query->id(), timePoint);
                 query->systemContext()->cameraBookmarksManager()->sendQueryTailRequest(
@@ -158,11 +159,11 @@ QnCameraBookmarkList QnTimelineBookmarksWatcher::rawBookmarksAtPosition(
     qint64 positionMs) const
 {
     if (camera == m_currentCamera)
-        return helpers::bookmarksAtPosition(m_aggregation->bookmarkList(), positionMs);
+        return nx::vms::common::bookmarksAtPosition(m_aggregation->bookmarkList(), positionMs);
 
     const auto query = m_queriesCache->getQuery(camera);
     return query
-        ? helpers::bookmarksAtPosition(query->cachedBookmarks(), positionMs)
+        ? nx::vms::common::bookmarksAtPosition(query->cachedBookmarks(), positionMs)
         : QnCameraBookmarkList();
 }
 

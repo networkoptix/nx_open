@@ -101,7 +101,7 @@ CloudSystemStatusItem::CloudSystemStatusItem(const QString& systemId):
     const auto notifyChanged =
         [this]
         {
-            notifyDataChanged({Qt::DisplayRole, Qn::DecorationPathRole, Qn::FlattenedRole});
+            notifyDataChanged({Qt::DisplayRole, core::DecorationPathRole, Qn::FlattenedRole});
         };
 
     d->crossSystemContextConnection.reset(QObject::connect(
@@ -127,7 +127,7 @@ QVariant CloudSystemStatusItem::data(int role) const
         case Qt::ToolTipRole:
             return QString();
 
-        case Qn::DecorationPathRole:
+        case core::DecorationPathRole:
             return d->customIcon();
 
         case Qn::NodeTypeRole:

@@ -5,14 +5,14 @@
 #include <QtCore/QStringList>
 
 #include <nx/utils/impl_ptr.h>
-#include <nx/vms/client/desktop/analytics/analytics_attribute_helper.h>
+#include <nx/vms/client/core/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/desktop/common/widgets/async_image_widget.h>
 
 #include "bubble_tooltip.h"
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core { class ImageProvider; }
 
-class ImageProvider;
+namespace nx::vms::client::desktop {
 
 class ThumbnailTooltip: public BubbleToolTip
 {
@@ -25,11 +25,11 @@ public:
     QString text() const;
     void setText(const QString& text);
 
-    void setImageProvider(nx::vms::client::desktop::ImageProvider* value);
+    void setImageProvider(core::ImageProvider* value);
     void setHighlightRect(const QRectF& rect);
 
-    const analytics::AttributeList& attributes() const;
-    void setAttributes(const analytics::AttributeList& value);
+    const core::analytics::AttributeList& attributes() const;
+    void setAttributes(const core::analytics::AttributeList& value);
 
     void setMaximumContentSize(const QSize& size);
     void adjustMaximumContentSize(const QModelIndex &index);

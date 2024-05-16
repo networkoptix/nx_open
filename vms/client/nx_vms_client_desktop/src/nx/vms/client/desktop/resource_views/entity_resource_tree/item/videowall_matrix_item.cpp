@@ -41,7 +41,7 @@ QVariant VideoWallMatrixItem::data(int role) const
         case Qn::NodeTypeRole:
             return QVariant::fromValue(ResourceTree::NodeType::videoWallMatrix);
 
-        case Qn::UuidRole:
+        case core::UuidRole:
         case Qn::ItemUuidRole:
             return QVariant::fromValue(m_matrix.uuid);
 

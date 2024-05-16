@@ -20,7 +20,7 @@ const nx::vms::api::rules::EventLogRecord& EventModelData::record() const
     return m_record;
 }
 
-nx::vms::rules::EventPtr EventModelData::event(SystemContext* context) const
+nx::vms::rules::EventPtr EventModelData::event(core::SystemContext* context) const
 {
     if (!m_event)
         m_event = context->vmsRulesEngine()->buildEvent(m_record.eventData);

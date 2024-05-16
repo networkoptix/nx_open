@@ -10,9 +10,9 @@
 
 namespace Ui { class ResourceDetailsWidget; }
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core { class CameraThumbnailManager; }
 
-class CameraThumbnailManager;
+namespace nx::vms::client::desktop {
 
 class ResourceDetailsWidget: public Panel
 {
@@ -57,7 +57,7 @@ public:
 
 private:
     const std::unique_ptr<Ui::ResourceDetailsWidget> ui;
-    const std::unique_ptr<CameraThumbnailManager> m_cameraThumbnailManager;
+    const std::unique_ptr<core::CameraThumbnailManager> m_cameraThumbnailManager;
 };
 
 } // namespace nx::vms::client::desktop

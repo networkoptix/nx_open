@@ -525,6 +525,12 @@ void ActionHandler::addToLayout(
         return;
     }
 
+    if (!menu()->canTrigger(menu::OpenInLayoutAction, menu::Parameters(resource)
+        .withArgument(core::LayoutResourceRole, layout)))
+    {
+        return;
+    }
+
     // Force cloud resource descriptor for cloud layouts.
     LayoutItemData data = layoutItemFromResource(resource,
         /*forceCloud*/ layout->hasFlags(Qn::cross_system));
@@ -923,7 +929,7 @@ void ActionHandler::at_openInLayoutAction_triggered()
 {
     const auto parameters = menu()->currentParameters(sender());
 
-    LayoutResourcePtr layout = parameters.argument<LayoutResourcePtr>(Qn::LayoutResourceRole);
+    LayoutResourcePtr layout = parameters.argument<LayoutResourcePtr>(core::LayoutResourceRole);
     if (!NX_ASSERT(layout))
         return;
 
@@ -1156,7 +1162,8 @@ void ActionHandler::replaceLayoutItemActionTriggered()
     if (layoutItemIndex.isNull())
         return;
 
-    const auto camera = actionParams.argument(Qn::ResourceRole).value<QnVirtualCameraResourcePtr>();
+    const auto camera = actionParams.argument(
+        core::ResourceRole).value<QnVirtualCameraResourcePtr>();
     if (!camera)
         return;
 
@@ -1221,7 +1228,7 @@ void ActionHandler::at_openInCurrentLayoutAction_triggered()
             workbench()->windowContext()->streamSynchronizer()->state());
     }
 
-    parameters.setArgument(Qn::LayoutResourceRole, currentLayout->resource());
+    parameters.setArgument(core::LayoutResourceRole, currentLayout->resource());
     menu()->trigger(menu::OpenInLayoutAction, parameters);
 }
 
@@ -1284,7 +1291,7 @@ void ActionHandler::at_reviewShowreelInNewWindowAction_triggered()
 
     // For now place method here until openNewWindow code would be shared.
     const auto parameters = menu()->currentParameters(sender());
-    auto id = parameters.argument<nx::Uuid>(Qn::UuidRole);
+    auto id = parameters.argument<nx::Uuid>(core::UuidRole);
 
     MimeData data;
     data.setEntities({id});
@@ -1594,7 +1601,7 @@ void ActionHandler::at_moveCameraAction_triggered() {
 
     QnResourceList resources = parameters.resources();
     QnMediaServerResourcePtr server =
-        parameters.argument<QnMediaServerResourcePtr>(Qn::MediaServerResourceRole);
+        parameters.argument<QnMediaServerResourcePtr>(core::MediaServerResourceRole);
 
     if (!server)
         return;
@@ -1767,7 +1774,7 @@ void ActionHandler::at_jumpToTimeAction_triggered()
         return;
 
     const auto parameters = menu()->currentParameters(sender());
-    if (!parameters.hasArgument(Qn::TimestampRole))
+    if (!parameters.hasArgument(core::TimestampRole))
     {
         NX_ASSERT(false, "Timestamp must be specified");
         return;
@@ -1775,7 +1782,7 @@ void ActionHandler::at_jumpToTimeAction_triggered()
 
     using namespace std::chrono;
 
-    const auto value = parameters.argument(Qn::TimestampRole);
+    const auto value = parameters.argument(core::TimestampRole);
     if (!value.canConvert<microseconds>())
     {
         NX_ASSERT(false, "Unsupported timestamp value type");
@@ -2020,8 +2027,8 @@ void ActionHandler::at_openBookmarksSearchAction_triggered()
     // If time window is specified then set it
     const auto nowMs = qnSyncTime->currentMSecsSinceEpoch();
 
-    const auto filterText = (parameters.hasArgument(Qn::BookmarkTagRole)
-        ? parameters.argument(Qn::BookmarkTagRole).toString() : QString());
+    const auto filterText = (parameters.hasArgument(core::BookmarkTagRole)
+        ? parameters.argument(core::BookmarkTagRole).toString() : QString());
 
     const auto endTimeMs = nowMs;
     const auto startTimeMs = nowMs - kOneWeekOffsetMs;
@@ -2601,7 +2608,7 @@ void ActionHandler::at_renameAction_triggered()
             return;
     }
 
-    QString name = parameters.argument<QString>(Qn::ResourceNameRole).trimmed();
+    QString name = parameters.argument<QString>(core::ResourceNameRole).trimmed();
     QString oldName = nodeType == NodeType::recorder
         ? camera->getUserDefinedGroupName()
         : resource->getName();
@@ -2835,7 +2842,7 @@ void ActionHandler::at_createZoomWindowAction_triggered() {
     if (!widget)
         return;
 
-    QRectF rect = params.argument<QRectF>(Qn::ItemZoomRectRole, QRectF(0.25, 0.25, 0.5, 0.5));
+    QRectF rect = params.argument<QRectF>(core::ItemZoomRectRole, QRectF(0.25, 0.25, 0.5, 0.5));
     AddToLayoutParams addParams;
     addParams.position = widget->item()->combinedGeometry().center();
     addParams.zoomWindow = rect;

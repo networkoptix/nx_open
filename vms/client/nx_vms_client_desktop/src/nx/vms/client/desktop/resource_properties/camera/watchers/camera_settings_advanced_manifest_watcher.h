@@ -7,11 +7,12 @@
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/impl_ptr.h>
 
+namespace nx::vms::client::core { class ServerRuntimeEventConnector; }
+
 namespace nx::vms::client::desktop {
 
 class CameraSettingsDialogStore;
 class CameraAdvancedParametersManifestManager;
-class ServerRuntimeEventConnector;
 
 /**
  * Asynchronously loads advanced settings manifest into the store and refreshes it when camera is
@@ -25,7 +26,7 @@ class CameraSettingsAdvancedManifestWatcher: public QObject
 public:
     explicit CameraSettingsAdvancedManifestWatcher(
         CameraAdvancedParametersManifestManager* manager,
-        ServerRuntimeEventConnector* serverRuntimeEventConnector,
+        core::ServerRuntimeEventConnector* serverRuntimeEventConnector,
         CameraSettingsDialogStore* store,
         QObject* parent = nullptr);
     virtual ~CameraSettingsAdvancedManifestWatcher() override;

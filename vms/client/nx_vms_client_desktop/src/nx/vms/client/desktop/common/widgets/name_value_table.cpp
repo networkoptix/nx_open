@@ -30,6 +30,7 @@
 #include <nx/utils/pending_operation.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/string.h>
+#include <nx/vms/client/core/event_search/models/abstract_attributed_event_model.h>
 #include <nx/vms/client/core/utils/qml_helpers.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
@@ -292,7 +293,7 @@ private:
         renderControl(new RenderControl()),
         quickWindow(new QQuickWindow(renderControl.get())),
         rootComponent(new QQmlComponent(appContext()->qmlEngine(),
-            QUrl("Nx/Items/NameValueTable.qml"),
+            QUrl("Nx/Core/Controls/NameValueTable.qml"),
             QQmlComponent::CompilationMode::PreferSynchronous)),
         rootItem(qobject_cast<QQuickItem*>(rootComponent->create()))
     {
@@ -382,7 +383,7 @@ struct NameValueTable::Private
         ? (SharedOffscreenRenderer*) nullptr
         : SharedOffscreenRenderer::instance();
 
-    analytics::AttributeList content;
+    core::analytics::AttributeList content;
     QSize size;
 
     QVariantList flatItems;
@@ -408,13 +409,13 @@ struct NameValueTable::Private
         updateImage();
     }
 
-    void setContent(const analytics::AttributeList& value)
+    void setContent(const core::analytics::AttributeList& value)
     {
         if (content == value)
             return;
 
         content = value;
-        flatItems = RightPanelModelsAdapter::flattenAttributeList(content);
+        flatItems = AbstractAttributedEventModel::flattenAttributeList(content);
         updateImage();
     }
 
@@ -445,7 +446,7 @@ NameValueTable::~NameValueTable()
     // Required here for forward-declared scoped pointer destruction.
 }
 
-analytics::AttributeList NameValueTable::content() const
+core::analytics::AttributeList NameValueTable::content() const
 {
     return d->content;
 }
@@ -455,7 +456,7 @@ void NameValueTable::setMaximumNumberOfRows(int maxNumberOfRows)
     d->setMaximumNumberOfRows(maxNumberOfRows);
 }
 
-void NameValueTable::setContent(const analytics::AttributeList& value)
+void NameValueTable::setContent(const core::analytics::AttributeList& value)
 {
     d->setContent(value);
 }

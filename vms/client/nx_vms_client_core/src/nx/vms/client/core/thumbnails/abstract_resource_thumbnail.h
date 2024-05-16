@@ -67,6 +67,7 @@ public:
      */
     QnResourcePtr resource() const;
     void setResource(const QnResourcePtr& value);
+
     /**
      * These accessors are to be used from QML code (via "resource" property).
      */

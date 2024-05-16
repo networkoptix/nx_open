@@ -107,7 +107,7 @@ QVariant RoleListModel::data(const QModelIndex& index, int role) const
     if (!m_roleValidator && !m_userValidator)
         return QVariant::fromValue(QValidator::Acceptable);
 
-    const auto roleId = index.data(Qn::UuidRole).value<nx::Uuid>();
+    const auto roleId = index.data(core::UuidRole).value<nx::Uuid>();
     const auto iter = m_validationStates.find(roleId);
 
     if (iter != m_validationStates.end())
@@ -352,7 +352,7 @@ bool UserListModel::isIndirectlyChecked(const QModelIndex& index) const
 QnUserResourcePtr UserListModel::getUser(const QModelIndex& index)
 {
     return index.sibling(index.row(), NameColumn)
-        .data(Qn::ResourceRole).value<QnResourcePtr>().dynamicCast<QnUserResource>();
+        .data(core::ResourceRole).value<QnResourcePtr>().dynamicCast<QnUserResource>();
 }
 
 void UserListModel::setUserValidator(UserValidator userValidator)
@@ -409,7 +409,7 @@ void GroupListDelegate::initStyleOption(QStyleOptionViewItem* option,
     base_type::initStyleOption(option, index);
     if (index.column() == QnUserRolesModel::NameColumn)
     {
-        const auto roleId = index.data(Qn::UuidRole).value<nx::Uuid>();
+        const auto roleId = index.data(core::UuidRole).value<nx::Uuid>();
         const auto role = userGroupManager()->find(roleId).value_or(api::UserGroupData{});
         QString iconPath;
         const auto validationState =
@@ -431,7 +431,7 @@ void GroupListDelegate::initStyleOption(QStyleOptionViewItem* option,
 void GroupListDelegate::getDisplayInfo(const QModelIndex& index,
     QString& baseName, QString& extInfo) const
 {
-    const auto roleId = index.data(Qn::UuidRole).value<nx::Uuid>();
+    const auto roleId = index.data(core::UuidRole).value<nx::Uuid>();
     const int usersInRole = countEnabledUsers(
         systemContext()->accessSubjectHierarchy()->usersInGroups({roleId}));
     baseName = userGroupManager()->find(roleId).value_or(api::UserGroupData{}).name;

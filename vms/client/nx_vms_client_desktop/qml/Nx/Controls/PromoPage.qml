@@ -3,7 +3,6 @@
 import QtQuick
 import QtQuick.Layouts
 
-import Nx
 import Nx.Core
 import nx.vms.client.core
 import nx.vms.client.desktop

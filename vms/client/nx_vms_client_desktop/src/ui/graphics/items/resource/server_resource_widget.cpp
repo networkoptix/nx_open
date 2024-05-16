@@ -767,7 +767,7 @@ void QnServerResourceWidget::updateCheckedHealthMonitoringButtons()
     setCheckedHealthMonitoringButtons(savedCheckedHealthMonitoringButtons());
 }
 
-void QnServerResourceWidget::atItemDataChanged(Qn::ItemDataRole role)
+void QnServerResourceWidget::atItemDataChanged(int role)
 {
     base_type::atItemDataChanged(role);
     if (role != Qn::ItemHealthMonitoringButtonsRole)

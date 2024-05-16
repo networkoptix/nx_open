@@ -12,7 +12,8 @@
 #include <nx/utils/scoped_model_operations.h>
 #include <nx/vms/api/data/storage_scan_info.h>
 #include <nx/vms/api/data/storage_space_reply.h>
-#include <server/server_storage_manager_fwd.h>
+#include <storage/server_storage_manager_fwd.h>
+
 #include <ui/models/storage_model_info.h>
 #include <ui/workbench/workbench_context_aware.h>
 

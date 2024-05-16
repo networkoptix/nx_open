@@ -117,7 +117,7 @@ QVariant MainTreeResourceItemDecorator::data(int role) const
         const auto flags = m_sourceItem->data(Qn::ResourceFlagsRole).value<Qn::ResourceFlags>();
         if (flags.testFlag(Qn::server))
         {
-            const auto resource = m_sourceItem->data(Qn::ResourceRole).value<QnResourcePtr>();
+            const auto resource = m_sourceItem->data(core::ResourceRole).value<QnResourcePtr>();
             const auto overridenIcon = resource->isOnline()
                 ? QnResourceIconCache::HealthMonitor | QnResourceIconCache::Online
                 : QnResourceIconCache::HealthMonitor | QnResourceIconCache::Offline;
@@ -132,7 +132,7 @@ Qt::ItemFlags MainTreeResourceItemDecorator::flags() const
 {
     auto result = m_sourceItem->flags();
 
-    const auto resource = m_sourceItem->data(Qn::ResourceRole).value<QnResourcePtr>();
+    const auto resource = m_sourceItem->data(core::ResourceRole).value<QnResourcePtr>();
     if (!NX_ASSERT(!resource.isNull(), "Resource node expected"))
         return result;
 

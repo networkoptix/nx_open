@@ -154,7 +154,7 @@ LayoutResource::DataHash LayoutResource::data() const
 
 void LayoutResource::setData(const DataHash& data)
 {
-    QSet<Qn::ItemDataRole> updatedRoles;
+    QSet<int> updatedRoles;
 
     {
         NX_MUTEX_LOCKER locker(&m_mutex);
@@ -167,7 +167,7 @@ void LayoutResource::setData(const DataHash& data)
         emit dataChanged(role);
 }
 
-QVariant LayoutResource::data(Qn::ItemDataRole role) const
+QVariant LayoutResource::data(int role) const
 {
     NX_MUTEX_LOCKER locker(&m_mutex);
 
@@ -177,7 +177,7 @@ QVariant LayoutResource::data(Qn::ItemDataRole role) const
         : QVariant();
 }
 
-void LayoutResource::setData(Qn::ItemDataRole role, const QVariant &value)
+void LayoutResource::setData(int role, const QVariant &value)
 {
     {
         NX_MUTEX_LOCKER locker(&m_mutex);
@@ -186,13 +186,13 @@ void LayoutResource::setData(Qn::ItemDataRole role, const QVariant &value)
     emit dataChanged(role);
 }
 
-QVariant LayoutResource::itemData(const nx::Uuid& id, Qn::ItemDataRole role) const
+QVariant LayoutResource::itemData(const nx::Uuid& id, int role) const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     return m_itemData.value(id).value(role);
 }
 
-void LayoutResource::setItemData(const nx::Uuid& id, Qn::ItemDataRole role, const QVariant& data)
+void LayoutResource::setItemData(const nx::Uuid& id, int role, const QVariant& data)
 {
     bool notify = false;
     {
@@ -246,7 +246,7 @@ bool LayoutResource::isCrossSystem() const
 
 bool LayoutResource::setItemDataUnderLock(
     const nx::Uuid& id,
-    Qn::ItemDataRole role,
+    int role,
     const QVariant& data)
 {
     const QVariant& oldData = m_itemData.value(id).value(role);

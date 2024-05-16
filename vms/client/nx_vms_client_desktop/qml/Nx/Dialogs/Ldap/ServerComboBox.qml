@@ -4,9 +4,9 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
-import Nx 1.0
-import Nx.Core 1.0
-import Nx.Controls 1.0
+import Nx.Core
+import Nx.Core.Controls
+import Nx.Controls
 
 import nx.vms.client.desktop 1.0
 

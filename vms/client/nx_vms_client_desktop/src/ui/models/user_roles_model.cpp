@@ -12,11 +12,11 @@
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/string.h>
 #include <nx/vms/api/data/user_group_data.h>
-#include <ui/models/private/user_roles_model_p.h>
-#include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_context_aware.h>
+#include <nx/vms/client/core/event_search/event_search_globals.h>
 
 #include "private/user_roles_model_p.h"
+
+using namespace nx::vms::client::core;
 
 QnUserRolesModel::QnUserRolesModel(QObject* parent, DisplayRoleFlags flags):
     base_type(parent),
@@ -126,7 +126,7 @@ QVariant QnUserRolesModel::data(const QModelIndex& index, int role) const
                 : QVariant();
 
         // Role uuid (for custom roles).
-        case Qn::UuidRole:
+        case UuidRole:
             return QVariant::fromValue(d->id(index.row()));
 
         // Role permissions (for built-in roles).

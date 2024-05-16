@@ -5,7 +5,6 @@ import QtQuick.Layouts
 import QtQuick.Controls
 import QtQuick.Templates as T
 
-import Nx
 import Nx.Core
 
 import nx.vms.client.desktop

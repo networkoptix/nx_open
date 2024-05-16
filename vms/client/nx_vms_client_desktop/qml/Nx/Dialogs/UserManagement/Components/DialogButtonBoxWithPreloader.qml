@@ -4,6 +4,7 @@ import QtQuick
 import QtQuick.Controls
 
 import Nx.Controls
+import Nx.Core.Controls
 
 DialogButtonBox
 {

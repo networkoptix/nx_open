@@ -166,7 +166,7 @@ public:
     static State generateLogicalId(State state);
     static State resetExpertSettings(State state);
     static std::pair<bool, State> setAnalyticsEngines(
-        State state, const QList<AnalyticsEngineInfo>& value);
+        State state, const QList<core::AnalyticsEngineInfo>& value);
     static State handleOverusedEngines(State state, const QSet<nx::Uuid>& overusedEngines);
     static std::pair<bool, State> setCurrentAnalyticsEngineId(State state, const nx::Uuid& value);
 
@@ -194,7 +194,7 @@ public:
     static std::pair<bool, State> resetDeviceAgentData(
         State state,
         const nx::Uuid& engineId,
-        const DeviceAgentData& values,
+        const core::DeviceAgentData& values,
         bool replaceUser = false);
 
     static State setVirtualCameraIgnoreTimeZone(State state, bool value);

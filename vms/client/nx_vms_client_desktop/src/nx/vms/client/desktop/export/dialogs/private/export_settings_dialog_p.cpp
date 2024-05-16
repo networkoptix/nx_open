@@ -15,11 +15,11 @@
 #include <nx/core/transcoding/filters/timestamp_filter.h>
 #include <nx/utils/file_system.h>
 #include <nx/utils/log/assert.h>
+#include <nx/vms/client/core/image_providers/resource_thumbnail_provider.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/widgets/async_image_widget.h>
 #include <nx/vms/client/desktop/image_providers/layout_thumbnail_loader.h>
 #include <nx/vms/client/desktop/image_providers/proxy_image_provider.h>
-#include <nx/vms/client/desktop/image_providers/resource_thumbnail_provider.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/settings/message_bar_settings.h>
@@ -147,7 +147,7 @@ void ExportSettingsDialog::Private::refreshMediaPreview()
         request.aspectRatio = nx::api::ImageRequest::AspectRatio::source;
         request.streamSelectionMode = api::ThumbnailFilter::StreamSelectionMode::forcedPrimary;
 
-        m_mediaRawImageProvider.reset(new ResourceThumbnailProvider(request, this));
+        m_mediaRawImageProvider.reset(new core::ResourceThumbnailProvider(request, this));
     }
 
     // Initializing a wrapper, that will provide image, processed by m_mediaPreviewProcessor.
@@ -157,7 +157,7 @@ void ExportSettingsDialog::Private::refreshMediaPreview()
             new ProxyImageProvider(m_mediaRawImageProvider.get()));
         provider->setImageProcessor(m_mediaPreviewProcessor.data());
         m_mediaPreviewProvider = std::move(provider);
-        connect(m_mediaPreviewProvider.get(), &ImageProvider::sizeHintChanged, this,
+        connect(m_mediaPreviewProvider.get(), &core::ImageProvider::sizeHintChanged, this,
             dispatchTo(Reducer::setFrameSize));
     }
 

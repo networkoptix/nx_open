@@ -6,7 +6,6 @@ import QtQuick.Layouts
 import QtQml.Models
 import Qt.labs.qmlmodels
 
-import Nx
 import Nx.Controls
 import Nx.JoystickInvestigationWizard
 

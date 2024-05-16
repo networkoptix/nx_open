@@ -4,8 +4,7 @@
 
 #include <nx/vms/client/core/network/remote_connection_aware.h>
 #include <nx/vms/client/core/resource/camera.h>
-
-#include "client_resource_fwd.h"
+#include <nx/vms/client/core/resource/resource_fwd.h>
 
 class QnArchiveStreamReader;
 

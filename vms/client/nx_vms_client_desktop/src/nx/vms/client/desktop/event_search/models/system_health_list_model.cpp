@@ -9,8 +9,11 @@
 #include <nx/utils/metatypes.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/settings/show_once_settings.h>
+#include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <ui/common/notification_levels.h>
 #include <utils/common/delayed.h>
+#include <ui/workbench/workbench_context.h>
 
 #include "private/system_health_list_model_p.h"
 
@@ -27,7 +30,8 @@ constexpr int kMaxInvalidScheduleTooltipWidth = 320;
 using MessageType = nx::vms::common::system_health::MessageType;
 
 SystemHealthListModel::SystemHealthListModel(WindowContext* context, QObject* parent):
-    base_type(context, parent),
+    base_type(context->system(), parent),
+    WindowContextAware(context),
     d(new Private(this))
 {
 }
@@ -51,13 +55,13 @@ QVariant SystemHealthListModel::data(const QModelIndex& index, int role) const
         case Qt::DisplayRole:
             return d->text(index.row());
 
-        case Qn::TimestampRole:
+        case core::TimestampRole:
             return d->timestamp(index.row());
 
-        case Qn::DecorationPathRole:
+        case core::DecorationPathRole:
             return d->decorationPath(index.row());
 
-        case Qn::ResourceListRole:
+        case core::ResourceListRole:
             return QVariant::fromValue(d->displayedResourceList(index.row()));
 
         case Qt::ToolTipRole:
@@ -97,7 +101,7 @@ QVariant SystemHealthListModel::data(const QModelIndex& index, int role) const
             }
             break;
 
-        case Qn::PreviewTimeRole:
+        case core::PreviewTimeRole:
             if (d->messageType(index.row()) == MessageType::cameraRecordingScheduleIsInvalid)
                 return QVariant(); //< No preview
 

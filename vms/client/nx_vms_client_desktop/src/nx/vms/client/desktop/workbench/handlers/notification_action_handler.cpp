@@ -28,6 +28,7 @@
 #include <nx/vms/client/desktop/utils/server_notification_cache.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
+#include <nx/vms/common/bookmark/bookmark_helpers.h>
 #include <nx/vms/event/actions/common_action.h>
 #include <nx/vms/event/events/abstract_event.h>
 #include <nx/vms/rules/actions/show_notification_action.h>
@@ -41,7 +42,6 @@
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_state_manager.h>
-#include <utils/camera/bookmark_helpers.h>
 #include <utils/common/synctime.h>
 #include <utils/email/email.h>
 #include <utils/media/audio_player.h>
@@ -50,11 +50,14 @@ namespace nx::vms::client::desktop {
 
 using namespace std::chrono;
 
+using namespace nx;
+using namespace nx::vms::client;
+using namespace nx::vms::client::desktop;
 using namespace nx::vms::event;
 
 namespace {
 
-QString toString(vms::event::AbstractActionPtr action)
+QString toString(AbstractActionPtr action)
 {
     return nx::format(
         "{actionType: %1, toggleState: %2, receivedFromRemoteHost: %3, resources: %4, params: %5, "
@@ -100,14 +103,14 @@ NotificationActionHandler::NotificationActionHandler(
 
     connect(this, &NotificationActionHandler::notificationAdded,
         this,
-        [this](const nx::vms::event::AbstractActionPtr& action)
+        [this](const AbstractActionPtr& action)
         {
             NX_VERBOSE(this, "A notification is added: %1", toString(action));
         });
 
     connect(this, &NotificationActionHandler::notificationRemoved,
         this,
-        [this](const nx::vms::event::AbstractActionPtr& action)
+        [this](const AbstractActionPtr& action)
         {
             NX_VERBOSE(this, "A notification is removed: %1", toString(action));
         });
@@ -121,7 +124,7 @@ void NotificationActionHandler::handleAcknowledgeEventAction()
 {
     const auto actionParams = menu()->currentParameters(sender());
     const auto businessAction =
-        actionParams.argument<vms::event::AbstractActionPtr>(Qn::ActionDataRole);
+        actionParams.argument<AbstractActionPtr>(Qn::ActionDataRole);
     const auto camera = actionParams.resource().dynamicCast<QnVirtualCameraResource>();
 
     const auto creationCallback =
@@ -161,14 +164,14 @@ void NotificationActionHandler::handleAcknowledgeEventAction()
         return;
     }
 
-    auto bookmark = helpers::bookmarkFromAction(businessAction, camera);
+    auto bookmark = nx::vms::common::bookmarkFromAction(businessAction, camera);
     if (!bookmark.isValid())
         return;
 
     const QScopedPointer<QnCameraBookmarkDialog> bookmarksDialog(
         new QnCameraBookmarkDialog(true, mainWindowWidget()));
 
-    bookmark.description = QString(); //< Force user to fill description out.
+    bookmark.description = {}; //< Force user to fill description out.
     bookmarksDialog->loadData(bookmark);
     if (bookmarksDialog->exec() != QDialog::Accepted)
         return;
@@ -180,7 +183,7 @@ void NotificationActionHandler::handleAcknowledgeEventAction()
     bookmark.creatorId = currentUserId;
     bookmark.creationTimeStampMs = milliseconds(currentTimeMs);
 
-    auto systemContext = SystemContext::fromResource(camera);
+    const auto systemContext = nx::vms::client::desktop::SystemContext::fromResource(camera);
     systemContext->cameraBookmarksManager()->addAcknowledge(
         bookmark,
         businessAction->getRuleId(),
@@ -227,7 +230,7 @@ void NotificationActionHandler::handleFullscreenCameraAction(
 
             using namespace menu;
             menu()->triggerIfPossible(JumpToTimeAction,
-                Parameters().withArgument(Qn::TimestampRole, navigationTime));
+                Parameters().withArgument(nx::vms::client::core::TimestampRole, navigationTime));
         }
     }
 }
@@ -388,7 +391,7 @@ void NotificationActionHandler::at_businessActionReceived(
         return;
     }
 
-    if (!vms::event::hasAccessToSource(action->getRuntimeParams(), user))
+    if (!hasAccessToSource(action->getRuntimeParams(), user))
     {
         NX_VERBOSE(
             this, "User %1 has no access to the action's source", user->getName());

@@ -5,12 +5,12 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/core/image_providers/camera_thumbnail_manager.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/common/widgets/autoscaled_plain_text.h>
 #include <nx/vms/client/desktop/common/widgets/busy_indicator.h>
-#include <nx/vms/client/desktop/image_providers/camera_thumbnail_manager.h>
 #include <nx/vms/client/desktop/image_providers/layout_thumbnail_loader.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
 #include <nx/vms/client/desktop/style/helper.h>
@@ -64,9 +64,9 @@ void LayoutPreviewPainter::setLayout(const QnLayoutResourcePtr& layout)
                 nx::api::ImageRequest::kLatestThumbnail.count(),
                 /*skipExportPermissionCheck*/ true));
 
-        connect(m_layoutThumbnailProvider.get(), &ImageProvider::statusChanged,
+        connect(m_layoutThumbnailProvider.get(), &core::ImageProvider::statusChanged,
             this, &LayoutPreviewPainter::at_updateThumbnailStatus);
-        connect(m_layoutThumbnailProvider.get(), &ImageProvider::imageChanged,
+        connect(m_layoutThumbnailProvider.get(), &core::ImageProvider::imageChanged,
             this, &LayoutPreviewPainter::at_updateThumbnailImage);
 
         // If layout is modified while preview painter is already created, newly added cameras'
@@ -74,7 +74,7 @@ void LayoutPreviewPainter::setLayout(const QnLayoutResourcePtr& layout)
         for (const auto& resource: layoutResources(layout))
         {
             connect(resource.get(), &QnResource::statusChanged,
-                m_layoutThumbnailProvider.get(), &ImageProvider::loadAsync);
+                m_layoutThumbnailProvider.get(), &core::ImageProvider::loadAsync);
         }
 
         m_layoutThumbnailProvider->loadAsync();
@@ -97,13 +97,13 @@ void LayoutPreviewPainter::paint(QPainter* painter, const QRect& paintRect)
     }
     painter->fillRect(paintRect, kBackgroundColor);
 
-    Qn::ThumbnailStatus status = Qn::ThumbnailStatus::Invalid;
+    core::ThumbnailStatus status = core::ThumbnailStatus::Invalid;
     if (m_layoutThumbnailProvider)
         status = m_layoutThumbnailProvider->status();
 
     if (m_layout
         && !m_layoutThumbnail.isNull()
-        && (status == Qn::ThumbnailStatus::Loading || status == Qn::ThumbnailStatus::Loaded))
+        && (status == core::ThumbnailStatus::Loading || status == core::ThumbnailStatus::Loaded))
     {
         QSizeF paintSize = m_layoutThumbnail.size() / m_layoutThumbnail.devicePixelRatio();
         // Fitting thumbnail exactly to widget's rect.
@@ -120,15 +120,15 @@ void LayoutPreviewPainter::paint(QPainter* painter, const QRect& paintRect)
     Style::paintCosmeticFrame(painter, paintRect, kFrameColor, kFrameWidth, 0);
 }
 
-void LayoutPreviewPainter::at_updateThumbnailStatus(Qn::ThumbnailStatus status)
+void LayoutPreviewPainter::at_updateThumbnailStatus(core::ThumbnailStatus status)
 {
     switch (status)
     {
-    case Qn::ThumbnailStatus::Loaded:
+    case core::ThumbnailStatus::Loaded:
         m_overlayStatus = Qn::EmptyOverlay;
         break;
 
-    case Qn::ThumbnailStatus::Loading:
+    case core::ThumbnailStatus::Loading:
         m_overlayStatus = Qn::LoadingOverlay;
         break;
 

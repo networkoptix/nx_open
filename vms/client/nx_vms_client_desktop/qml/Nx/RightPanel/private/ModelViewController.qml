@@ -2,10 +2,10 @@
 
 import QtQuick 2.14
 
-import Nx 1.0
 import Nx.Core 1.0
 
 import nx.vms.client.desktop 1.0
+import nx.vms.client.core 1.0
 
 import ".."
 
@@ -26,18 +26,18 @@ NxObject
         function onAtYEndChanged()
         {
             if (view.atYEnd)
-                controller.requestFetchIfNeeded()
+                d.fetchBottom()
         }
 
         function onAtYBeginningChanged()
         {
             if (view.atYBeginning)
-                controller.requestFetchIfNeeded()
+                d.fetchTop()
         }
 
         function onVisibleChanged()
         {
-            controller.requestFetchIfNeeded()
+            d.updateData()
 
             if (view.model)
                 view.model.setLivePaused(!visible)
@@ -73,26 +73,20 @@ NxObject
 
         function onDataNeeded()
         {
-            controller.requestFetchIfNeeded(/*immediately*/ true)
+            d.updateData();
         }
 
-        function onLiveAboutToBeCommitted()
-        {
-            console.debug(loggingCategory, `${view.objectName}: live data is about to be committed`)
-            controller.updateFetchDirection()
-        }
-
-        function onFetchCommitStarted(direction)
+        function onFetchCommitStarted(request)
         {
             function directionName(direction)
             {
-                return direction === RightPanel.FetchDirection.earlier ? "earlier" : "later"
+                return direction === EventSearch.FetchDirection.older ? "earlier" : "later"
             }
 
             console.debug(loggingCategory,
-                `${view.objectName}: fetch commit started, direction=${directionName(direction)}`)
+                `${view.objectName}: fetch commit started, direction=${directionName(request.direction)}`)
 
-            d.savedTopmostIndex = direction === RightPanel.FetchDirection.later
+            d.savedTopmostIndex = request.direction === EventSearch.FetchDirection.newer
                 ? NxGlobals.toPersistent(view.model.index(0, 0, NxGlobals.invalidModelIndex()))
                 : NxGlobals.invalidModelIndex()
         }
@@ -110,44 +104,22 @@ NxObject
             d.savedTopmostIndex = NxGlobals.invalidModelIndex()
         }
 
-        function onAsyncFetchStarted(direction)
+        function onAsyncFetchStarted(request)
         {
-            if (direction === RightPanel.FetchDirection.earlier)
+            if (request.direction === EventSearch.FetchDirection.older)
                 bottomPreloader.visible = true
             else
                 topPreloader.visible = true
         }
     }
 
-    function updateFetchDirection()
-    {
-        if (!view || !view.model)
-            return false
-
-        if (view.atYEnd || count === 0)
-        {
-            view.model.setFetchDirection(RightPanel.FetchDirection.earlier)
-            return true
-        }
-
-        if (view.atYBeginning)
-        {
-            view.model.setFetchDirection(RightPanel.FetchDirection.later)
-            return true
-        }
-
-        // Neither at the beginning nor at the end.
-        view.model.setFetchDirection(RightPanel.FetchDirection.earlier)
-        return false
-    }
-
-    function requestFetchIfNeeded(immediately)
+    function requestUpdateIfNeeded(request, immediately)
     {
         if (d.fixupInProgress)
             return
 
-        if (view && view.visible && !view.model.fetchInProgress() && updateFetchDirection())
-            view.model.requestFetch(!!immediately)
+        if (view && view.visible && !view.model.fetchInProgress())
+            view.model.fetchData(request, !!immediately)
     }
 
     TilePreloader
@@ -187,6 +159,37 @@ NxObject
         property var savedTopmostIndex: NxGlobals.invalidModelIndex()
         property real savedHeaderHeight: 0
         property bool fixupInProgress: false
+
+        function fetchTop()
+        {
+            controller.requestUpdateIfNeeded(
+                EventSearchUtils.fetchRequest(EventSearch.FetchDirection.newer,
+                    view.model.requestForDirection(EventSearch.FetchDirection.newer)))
+        }
+
+        function fetchBottom()
+        {
+            controller.requestUpdateIfNeeded(
+                view.model.requestForDirection(EventSearch.FetchDirection.older))
+        }
+
+        function updateData()
+        {
+            if (view.atYEnd)
+            {
+                d.fetchBottom()
+            }
+            else if (view.atYBeginning)
+            {
+                d.fetchTop()
+            }
+            else
+            {
+                controller.requestUpdateIfNeeded(
+                    EventSearchUtils.fetchRequest(EventSearch.FetchDirection.older,
+                        view.currentCentralPointUs()))
+            }
+        }
     }
 
     PlaceholderParameters

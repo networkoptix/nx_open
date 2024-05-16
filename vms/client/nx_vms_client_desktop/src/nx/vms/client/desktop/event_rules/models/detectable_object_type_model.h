@@ -6,9 +6,9 @@
 
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/scoped_model_operations.h>
-#include <nx/vms/client/desktop/analytics/analytics_filter_model.h>
+#include <nx/vms/client/core/analytics/analytics_filter_model.h>
 
-Q_MOC_INCLUDE("nx/vms/client/desktop/analytics/analytics_filter_model.h")
+Q_MOC_INCLUDE("nx/vms/client/core/analytics/analytics_filter_model.h")
 
 namespace nx::analytics::taxonomy { class AbstractEngine; }
 
@@ -22,14 +22,15 @@ namespace analytics { class TaxonomyManager; }
 class DetectableObjectTypeModel: public ScopedModelOperations<QAbstractItemModel>
 {
     Q_OBJECT
-    Q_PROPERTY(nx::vms::client::desktop::analytics::taxonomy::AnalyticsFilterModel*
+    Q_PROPERTY(nx::vms::client::core::analytics::taxonomy::AnalyticsFilterModel*
         sourceModel READ sourceModel CONSTANT)
 
     using base_type = ScopedModelOperations<QAbstractItemModel>;
+    using TaxonomyManager = nx::vms::client::core::analytics::TaxonomyManager;
 
 public:
     explicit DetectableObjectTypeModel(
-        analytics::taxonomy::AnalyticsFilterModel* filterModel,
+        core::analytics::taxonomy::AnalyticsFilterModel* filterModel,
         QObject* parent = nullptr);
     virtual ~DetectableObjectTypeModel() override;
 
@@ -45,7 +46,7 @@ public:
     void setLiveTypesExcluded(bool value);
     void setEngine(nx::analytics::taxonomy::AbstractEngine* value);
 
-    analytics::taxonomy::AnalyticsFilterModel* sourceModel() const;
+    core::analytics::taxonomy::AnalyticsFilterModel* sourceModel() const;
 
     enum Roles
     {
@@ -59,4 +60,4 @@ private:
     nx::utils::ImplPtr<Private> d;
 };
 
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core

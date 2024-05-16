@@ -921,7 +921,7 @@ TEST_F(ResourceTreeModelTest, cameraNodeProvidesResource)
     const auto cameraIndex = uniqueMatchingIndex(kUniqueCameraNameCondition);
 
     // And that node provides pointer to the camera resource.
-    ASSERT_TRUE(dataMatch(Qn::ResourceRole, QVariant::fromValue<QnResourcePtr>(camera))(
+    ASSERT_TRUE(dataMatch(core::ResourceRole, QVariant::fromValue<QnResourcePtr>(camera))(
         cameraIndex));
 }
 

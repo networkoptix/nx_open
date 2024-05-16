@@ -105,13 +105,13 @@ QVariant ResourceItem::data(int role) const
         case Qn::ResourceIconKeyRole:
             return resourceIconKeyData();
 
-        case Qn::ResourceRole:
+        case core::ResourceRole:
             return QVariant::fromValue(m_resource);
 
         case Qn::ResourceFlagsRole:
             return QVariant::fromValue(m_resource->flags());
 
-        case Qn::ResourceStatusRole:
+        case core::ResourceStatusRole:
             return resourceStatusData();
 
         case Qn::ResourceExtraStatusRole:
@@ -183,7 +183,7 @@ QVariant ResourceItem::resourceStatusData() const
         [this]
         {
             m_connectionsGuard.add(resource()->connect(resource(), &QnResource::statusChanged,
-                [this] { discardCache(m_statusCache, {Qn::ResourceStatusRole}); }));
+                [this] { discardCache(m_statusCache, {core::ResourceStatusRole}); }));
         };
 
     std::call_once(m_statusFlag, initNotifications);

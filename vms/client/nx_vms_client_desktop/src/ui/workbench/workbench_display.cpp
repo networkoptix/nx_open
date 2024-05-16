@@ -2339,7 +2339,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged()
     fitInView(/*animate*/ false);
 }
 
-void QnWorkbenchDisplay::at_item_dataChanged(Qn::ItemDataRole role)
+void QnWorkbenchDisplay::at_item_dataChanged(int role)
 {
     const auto item = static_cast<QnWorkbenchItem*>(sender());
 

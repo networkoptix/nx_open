@@ -3,6 +3,7 @@
 import QtQuick
 
 import Nx.Core
+import Nx.Core.Controls
 import Nx.Controls
 
 TextField
