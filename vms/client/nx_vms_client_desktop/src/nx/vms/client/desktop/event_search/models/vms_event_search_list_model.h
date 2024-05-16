@@ -4,11 +4,16 @@
 
 #include <QStringList>
 
-#include <nx/vms/client/desktop/event_search/models/abstract_async_search_list_model.h>
+#include <nx/utils/impl_ptr.h>
+#include <nx/vms/client/core/event_search/models/abstract_async_search_list_model.h>
+
+class QnWorkbenchContext;
 
 namespace nx::vms::client::desktop {
 
-class VmsEventSearchListModel: public AbstractAsyncSearchListModel
+class WindowContext;
+
+class VmsEventSearchListModel: public core::AbstractAsyncSearchListModel
 {
     Q_OBJECT
     using base_type = AbstractAsyncSearchListModel;
@@ -21,7 +26,7 @@ class VmsEventSearchListModel: public AbstractAsyncSearchListModel
 
 public:
     explicit VmsEventSearchListModel(WindowContext* context, QObject* parent = nullptr);
-    virtual ~VmsEventSearchListModel() override = default;
+    virtual ~VmsEventSearchListModel() override;
 
     QString selectedEventType() const;
     void setSelectedEventType(const QString& value);
@@ -36,13 +41,25 @@ public:
     virtual bool isConstrained() const override;
     virtual bool hasAccessRights() const override;
 
+public:
+    virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+
+    virtual QVariant data(const QModelIndex& index, int role) const override;
+
+protected:
+    virtual bool requestFetch(
+        const core::FetchRequest& request,
+        const FetchCompletionHandler& completionHandler) override;
+
+    virtual void clearData() override;
+
 signals:
     void selectedEventTypeChanged();
     void selectedSubTypeChanged();
 
 private:
-    class Private;
-    Private* const d;
+    struct Private;
+    nx::utils::ImplPtr<Private> d;
 };
 
 } // namespace nx::vms::client::desktop

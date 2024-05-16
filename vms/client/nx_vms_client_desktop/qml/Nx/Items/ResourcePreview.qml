@@ -3,8 +3,8 @@
 import QtQuick
 import Qt5Compat.GraphicalEffects
 
-import Nx
 import Nx.Core
+import Nx.Core.Controls
 import Nx.Controls
 
 import nx.vms.client.core

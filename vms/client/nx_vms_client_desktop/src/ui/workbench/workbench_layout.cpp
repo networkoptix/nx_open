@@ -894,12 +894,12 @@ QIcon QnWorkbenchLayout::calculateIcon() const
     return d->resource->data(Qn::LayoutIconRole).value<QIcon>();
 }
 
-QVariant QnWorkbenchLayout::data(Qn::ItemDataRole role) const
+QVariant QnWorkbenchLayout::data(int role) const
 {
     return d->resource->data(role);
 }
 
-void QnWorkbenchLayout::setData(Qn::ItemDataRole role, const QVariant& value)
+void QnWorkbenchLayout::setData(int role, const QVariant& value)
 {
     d->resource->setData(role, value);
 }

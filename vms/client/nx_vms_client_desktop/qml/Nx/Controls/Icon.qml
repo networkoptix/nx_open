@@ -2,6 +2,7 @@
 
 import Nx.Controls
 import Nx.Core
+import Nx.Core.Controls
 
 ColoredImage
 {

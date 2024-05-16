@@ -3,7 +3,6 @@
 import QtQuick 2.10
 import QtQml 2.3
 import nx.vms.client.core 1.0
-import Nx 1.0
 import Nx.Core 1.0
 import Nx.Controls 1.0
 import Qt.labs.platform 1.0

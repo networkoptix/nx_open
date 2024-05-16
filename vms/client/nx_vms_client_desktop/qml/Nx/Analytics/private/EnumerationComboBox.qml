@@ -2,11 +2,10 @@
 
 import QtQuick 2.14
 
-import Nx 1.0
 import Nx.Core 1.0
 import Nx.Controls 1.0
 
-import nx.vms.client.desktop.analytics 1.0 as Analytics
+import nx.vms.client.core.analytics 1.0 as Analytics
 
 ComboBox
 {
@@ -18,7 +17,7 @@ ComboBox
 
     editable: true
     currentIndex: -1
-    model: Utils.toArray(attribute && attribute.enumeration && attribute.enumeration.items)
+    model: CoreUtils.toArray(attribute && attribute.enumeration && attribute.enumeration.items)
 
     onSelectedValueChanged:
     {

@@ -7,12 +7,12 @@
 
 #include <finders/systems_finder.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/client/core/image_providers/resource_thumbnail_provider.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/utils/command_action.h>
 #include <nx/vms/client/desktop/common/widgets/close_button.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
-#include <nx/vms/client/desktop/image_providers/resource_thumbnail_provider.h>
 #include <nx/vms/client/desktop/utils/widget_utils.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/system_settings.h>
@@ -244,8 +244,8 @@ bool EventTile::Private::isPreviewUpdateRequired() const
 
     switch (q->imageProvider()->status())
     {
-        case Qn::ThumbnailStatus::Invalid:
-        case Qn::ThumbnailStatus::NoData:
+        case core::ThumbnailStatus::Invalid:
+        case core::ThumbnailStatus::NoData:
             return true;
 
         default:
@@ -291,13 +291,13 @@ void EventTile::Private::updatePreview(std::chrono::milliseconds delay)
 
 void EventTile::Private::showDebugPreviewTimestamp()
 {
-    auto provider = qobject_cast<ResourceThumbnailProvider*>(q->imageProvider());
+    auto provider = qobject_cast<core::ResourceThumbnailProvider*>(q->imageProvider());
     if (provider)
     {
         q->ui->debugPreviewTimeLabel->setText(
             nx::format("Preview: %2 us").arg(provider->timestamp().count()));
         q->ui->debugPreviewTimeLabel->setVisible(
-            provider->status() == Qn::ThumbnailStatus::Loaded);
+            provider->status() == core::ThumbnailStatus::Loaded);
     }
     else
     {

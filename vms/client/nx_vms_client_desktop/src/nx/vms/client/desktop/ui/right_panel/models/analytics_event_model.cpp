@@ -12,14 +12,14 @@ namespace nx::vms::client::desktop {
 
 class AnalyticsEventModel::Private
 {
-    using NodePtr = AnalyticsEntitiesTreeBuilder::NodePtr;
-    using Node = AnalyticsEntitiesTreeBuilder::Node;
+    using NodePtr = core::AnalyticsEntitiesTreeBuilder::NodePtr;
+    using Node = core::AnalyticsEntitiesTreeBuilder::Node;
 
     AnalyticsEventModel* const q;
     NodePtr rootNode;
 
 public:
-    Private(AnalyticsEventModel* q, AnalyticsEventsSearchTreeBuilder* builder): q(q)
+    Private(AnalyticsEventModel* q, core::AnalyticsEventsSearchTreeBuilder* builder): q(q)
     {
         const auto updateModelOperation =
             [this, builder]
@@ -36,7 +36,7 @@ public:
 
         connect(
             builder,
-            &AnalyticsEventsSearchTreeBuilder::eventTypesTreeChanged,
+            &core::AnalyticsEventsSearchTreeBuilder::eventTypesTreeChanged,
             q,
             updateModelOperation);
 
@@ -55,7 +55,7 @@ public:
 };
 
 AnalyticsEventModel::AnalyticsEventModel(
-    AnalyticsEventsSearchTreeBuilder* builder,
+    core::AnalyticsEventsSearchTreeBuilder* builder,
     QObject* parent)
     :
     base_type(parent),
@@ -120,7 +120,7 @@ QVariant AnalyticsEventModel::data(const QModelIndex& index, int role) const
         case IdRole:
             return node->entityId;
         case EnabledRole:
-            return node->nodeType == AnalyticsEntitiesTreeBuilder::NodeType::eventType;
+            return node->nodeType == core::AnalyticsEntitiesTreeBuilder::NodeType::eventType;
         default:
             return {};
     }

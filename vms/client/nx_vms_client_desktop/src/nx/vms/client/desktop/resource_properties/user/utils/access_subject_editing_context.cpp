@@ -93,7 +93,7 @@ void fetchChildResourcesRecursively(const QModelIndex& parentIndex, QSet<QnResou
     for (int row = 0; row < rowCount; ++row)
     {
         const auto child = model->index(row, 0, parentIndex);
-        const auto resource = child.data(Qn::ResourceRole).value<QnResourcePtr>();
+        const auto resource = child.data(core::ResourceRole).value<QnResourcePtr>();
         if (resource)
             resources.insert(resource);
 
@@ -111,7 +111,7 @@ ResourceAccessTarget accessTarget(const QModelIndex& resourceTreeModelIndex)
             return ResourceAccessTarget(AccessSubjectEditingContext::specialResourceGroup(nodeType));
     }
 
-    const auto resource = resourceTreeModelIndex.data(Qn::ResourceRole).value<QnResourcePtr>();
+    const auto resource = resourceTreeModelIndex.data(core::ResourceRole).value<QnResourcePtr>();
     return ResourceAccessTarget(resource);
 }
 
@@ -902,7 +902,7 @@ QnResourceList AccessSubjectEditingContext::selectionLayouts(
                 });
         }
 
-        if (const auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>())
+        if (const auto resource = index.data(core::ResourceRole).value<QnResourcePtr>())
         {
             if (const auto layout = resource.objectCast<QnLayoutResource>())
                 result.push_back(layout);
@@ -1007,7 +1007,7 @@ ResourceAccessTreeItem AccessSubjectEditingContext::resourceAccessTreeItemInfo(
     if (!resourceTreeModelIndex.isValid())
         return {};
 
-    const auto resource = resourceTreeModelIndex.data(Qn::ResourceRole).value<QnResourcePtr>();
+    const auto resource = resourceTreeModelIndex.data(core::ResourceRole).value<QnResourcePtr>();
 
     if (resource)
     {

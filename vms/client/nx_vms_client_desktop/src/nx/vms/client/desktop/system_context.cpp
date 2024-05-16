@@ -5,17 +5,42 @@
 #include <QtQml/QQmlEngine> //< For registering types.
 
 #include <api/runtime_info_manager.h>
+#include <camera/camera_data_manager.h>
 #include <client/client_message_processor.h>
 #include <client/client_runtime_settings.h>
 #include <core/resource/resource.h>
 #include <nx/branding.h>
+#include <nx/vms/client/core/analytics/analytics_entities_tree.h>
+#include <nx/vms/client/core/analytics/analytics_taxonomy_manager.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/qml/qml_ownership.h>
 #include <nx/vms/client/desktop/access/access_controller.h>
 #include <nx/vms/client/desktop/access/caching_access_controller.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/intercom/intercom_manager.h>
+#include <nx/vms/client/desktop/other_servers/other_servers_manager.h>
+#include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
+#include <nx/vms/client/desktop/resource/local_resources_initializer.h>
+#include <nx/vms/client/desktop/resource/rest_api_helper.h>
+#include <nx/vms/client/desktop/settings/system_specific_local_settings.h>
+#include <nx/vms/client/desktop/showreel/showreel_state_manager.h>
+#include <nx/vms/client/desktop/statistics/statistics_sender.h>
+#include <nx/vms/client/desktop/system_administration/watchers/logs_management_watcher.h>
+#include <nx/vms/client/desktop/system_administration/watchers/non_editable_users_and_groups.h>
+#include <nx/vms/client/desktop/system_administration/watchers/traffic_relay_url_watcher.h>
+#include <nx/vms/client/desktop/system_health/default_password_cameras_watcher.h>
+#include <nx/vms/client/desktop/system_health/system_health_state.h>
+#include <nx/vms/client/desktop/system_logon/logic/delayed_data_loader.h>
 #include <nx/vms/client/desktop/system_logon/logic/remote_session.h>
-#include <nx/vms/common/private/system_context_data_p.h>
+#include <nx/vms/client/desktop/utils/ldap_status_watcher.h>
+#include <nx/vms/client/desktop/utils/local_file_cache.h>
+#include <nx/vms/client/desktop/utils/server_image_cache.h>
+#include <nx/vms/client/desktop/utils/server_notification_cache.h>
+#include <nx/vms/client/desktop/utils/server_remote_access_watcher.h>
+#include <nx/vms/client/desktop/videowall/desktop_camera_initializer.h>
+#include <nx/vms/client/desktop/videowall/videowall_online_screens_watcher.h>
+#include <nx/vms/client/desktop/virtual_camera/virtual_camera_manager.h>
+#include <storage/server_storage_manager.h>
 
 #include "application_context.h"
 #include "private/system_context_data_p.h"
@@ -59,14 +84,11 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
             runtimeInfoManager()->updateLocalItem(createLocalRuntimeInfo(this));
             d->videoWallOnlineScreensWatcher = std::make_unique<VideoWallOnlineScreensWatcher>(
                 this);
-            d->serverRuntimeEventConnector = std::make_unique<ServerRuntimeEventConnector>();
+
             // Depends on ServerRuntimeEventConnector.
-            d->serverStorageManager = std::make_unique<QnServerStorageManager>(this);
-            d->cameraBookmarksManager = std::make_unique<QnCameraBookmarksManager>(this);
             d->cameraDataManager = std::make_unique<QnCameraDataManager>(this);
             d->statisticsSender = std::make_unique<StatisticsSender>(this);
             d->virtualCameraManager = std::make_unique<VirtualCameraManager>(this);
-            d->videoCache = std::make_unique<VideoCache>(this);
             // LocalResourcesInitializer must be created before LayoutSnapshotManager to avoid
             // modifying layouts after they are opened.
             d->localResourcesInitializer = std::make_unique<LocalResourcesInitializer>(this);
@@ -78,7 +100,6 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
             d->localSettings = std::make_unique<SystemSpecificLocalSettings>(this);
             d->restApiHelper = std::make_unique<RestApiHelper>(this);
             d->delayedDataLoader = std::make_unique<DelayedDataLoader>(this);
-            d->taxonomyManager = std::make_unique<analytics::TaxonomyManager>(this);
             d->ldapStatusWatcher = std::make_unique<LdapStatusWatcher>(this);
             d->nonEditableUsersAndGroups = std::make_unique<NonEditableUsersAndGroups>(this);
             d->defaultPasswordCamerasWatcher = std::make_unique<DefaultPasswordCamerasWatcher>(
@@ -91,9 +112,7 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
             break;
 
         case Mode::crossSystem:
-            d->cameraBookmarksManager = std::make_unique<QnCameraBookmarksManager>(this);
             d->cameraDataManager = std::make_unique<QnCameraDataManager>(this);
-            d->videoCache = std::make_unique<VideoCache>(this);
             d->mediaServerStatisticsManager = std::make_unique<QnMediaServerStatisticsManager>(
                 this);
             break;
@@ -143,11 +162,6 @@ std::shared_ptr<RemoteSession> SystemContext::session() const
     return std::dynamic_pointer_cast<RemoteSession>(base_type::session());
 }
 
-AnalyticsEventsSearchTreeBuilder* SystemContext::analyticsEventsSearchTreeBuilder() const
-{
-    return d->analyticsEventsSearchTreeBuilder.get();
-}
-
 VideoWallOnlineScreensWatcher* SystemContext::videoWallOnlineScreensWatcher() const
 {
     return d->videoWallOnlineScreensWatcher.get();
@@ -163,21 +177,6 @@ NonEditableUsersAndGroups* SystemContext::nonEditableUsersAndGroups() const
     return d->nonEditableUsersAndGroups.get();
 }
 
-ServerRuntimeEventConnector* SystemContext::serverRuntimeEventConnector() const
-{
-    return d->serverRuntimeEventConnector.get();
-}
-
-QnServerStorageManager* SystemContext::serverStorageManager() const
-{
-    return d->serverStorageManager.get();
-}
-
-QnCameraBookmarksManager* SystemContext::cameraBookmarksManager() const
-{
-    return d->cameraBookmarksManager.get();
-}
-
 QnCameraDataManager* SystemContext::cameraDataManager() const
 {
     return d->cameraDataManager.get();
@@ -186,11 +185,6 @@ QnCameraDataManager* SystemContext::cameraDataManager() const
 VirtualCameraManager* SystemContext::virtualCameraManager() const
 {
     return d->virtualCameraManager.get();
-}
-
-VideoCache* SystemContext::videoCache() const
-{
-    return d->videoCache.get();
 }
 
 LayoutSnapshotManager* SystemContext::layoutSnapshotManager() const
@@ -221,18 +215,6 @@ SystemSpecificLocalSettings* SystemContext::localSettings() const
 RestApiHelper* SystemContext::restApiHelper() const
 {
     return d->restApiHelper.get();
-}
-
-nx::Uuid SystemContext::localSystemId() const
-{
-    const auto& currentConnection = connection();
-    return currentConnection ? currentConnection->moduleInformation().localSystemId : nx::Uuid();
-}
-
-analytics::TaxonomyManager* SystemContext::taxonomyManager() const
-{
-    // TODO: #sivanov Replace with Q_PROPERTY.
-    return core::withCppOwnership(d->taxonomyManager.get());
 }
 
 OtherServersManager* SystemContext::otherServersManager() const
@@ -279,8 +261,7 @@ void SystemContext::setMessageProcessor(QnCommonMessageProcessor* messageProcess
 {
     base_type::setMessageProcessor(messageProcessor);
 
-    const auto mode = common::SystemContext::d->mode;
-    if (mode != Mode::client)
+    if (mode() != Mode::client)
         return;
 
     auto clientMessageProcessor = qobject_cast<QnClientMessageProcessor*>(messageProcessor);
@@ -288,11 +269,9 @@ void SystemContext::setMessageProcessor(QnCommonMessageProcessor* messageProcess
         return;
 
     d->otherServersManager->setMessageProcessor(clientMessageProcessor);
-    d->serverRuntimeEventConnector->setMessageProcessor(clientMessageProcessor);
     d->logsManagementWatcher->setMessageProcessor(clientMessageProcessor);
     d->serverNotificationCache->setMessageProcessor(clientMessageProcessor);
     d->intercomManager = std::make_unique<IntercomManager>(this);
-    d->analyticsEventsSearchTreeBuilder = std::make_unique<AnalyticsEventsSearchTreeBuilder>(this);
     d->systemHealthState = std::make_unique<SystemHealthState>(this);
 
     // Desktop camera must work in the normal mode only.

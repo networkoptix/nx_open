@@ -9,10 +9,10 @@
 #include <QtGui/QColor>
 
 #include <nx/reflect/json/deserializer.h>
-#include <nx/vms/client/desktop/analytics/taxonomy/attribute_set.h>
-#include <nx/vms/client/desktop/analytics/taxonomy/color_set.h>
-#include <nx/vms/client/desktop/analytics/taxonomy/enumeration.h>
-#include <nx/vms/client/desktop/analytics/taxonomy/object_type.h>
+#include <nx/vms/client/core/analytics/taxonomy/attribute_set.h>
+#include <nx/vms/client/core/analytics/taxonomy/color_set.h>
+#include <nx/vms/client/core/analytics/taxonomy/enumeration.h>
+#include <nx/vms/client/core/analytics/taxonomy/object_type.h>
 #include <utils/common/hash.h>
 
 namespace nx::vms::client::desktop {
@@ -97,7 +97,7 @@ bool LookupListEntriesModel::Private::booleanValidator(const QString& value)
 
 void LookupListEntriesModel::Private::initAttributeFunctions()
 {
-    using namespace analytics::taxonomy;
+    using namespace nx::vms::client::core::analytics::taxonomy;
 
     if (!taxonomy)
         return;
@@ -106,7 +106,8 @@ void LookupListEntriesModel::Private::initAttributeFunctions()
     if (!data)
         return;
 
-    const ObjectType* objectType = taxonomy->objectTypeById(data->rawData().objectTypeId);
+    const ObjectType* objectType =
+        taxonomy->objectTypeById(data->rawData().objectTypeId);
 
     if (objectType == nullptr)
         return;

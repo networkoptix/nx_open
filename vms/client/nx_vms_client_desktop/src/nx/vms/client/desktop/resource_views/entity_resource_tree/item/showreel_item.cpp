@@ -38,7 +38,7 @@ QVariant ShowreelItem::data(int role) const
         case Qn::NodeTypeRole:
             return QVariant::fromValue(ResourceTree::NodeType::showreel);
 
-        case Qn::UuidRole:
+        case core::UuidRole:
             return QVariant::fromValue(m_showreel.id);
 
         case Qn::HelpTopicIdRole:

@@ -4,21 +4,21 @@
 
 #include <nx/reflect/to_string.h>
 #include <nx/utils/std/algorithm.h>
-#include <nx/vms/client/desktop/analytics/analytics_entities_tree.h>
+#include <nx/vms/client/core/analytics/analytics_entities_tree.h>
 
 namespace nx::vms::client::desktop {
 
-void PrintTo(AnalyticsEntitiesTreeBuilder::NodeType nodeType, ::std::ostream* os)
+void PrintTo(core::AnalyticsEntitiesTreeBuilder::NodeType nodeType, ::std::ostream* os)
 {
     *os << nx::reflect::toString(nodeType);
 }
 
 namespace test {
 
-using Node = AnalyticsEntitiesTreeBuilder::Node;
-using NodeFilter = AnalyticsEntitiesTreeBuilder::NodeFilter;
-using NodeType = AnalyticsEntitiesTreeBuilder::NodeType;
-using NodePtr = AnalyticsEntitiesTreeBuilder::NodePtr;
+using Node = core::AnalyticsEntitiesTreeBuilder::Node;
+using NodeFilter = core::AnalyticsEntitiesTreeBuilder::NodeFilter;
+using NodeType = core::AnalyticsEntitiesTreeBuilder::NodeType;
+using NodePtr = core::AnalyticsEntitiesTreeBuilder::NodePtr;
 
 /** Helper class to display tree differences in console. */
 struct TreeComparator
@@ -116,17 +116,17 @@ protected:
 
     void whenCleanupTree()
     {
-        m_targetTree = AnalyticsEntitiesTreeBuilder::cleanupTree(m_sourceTree);
+        m_targetTree = core::AnalyticsEntitiesTreeBuilder::cleanupTree(m_sourceTree);
     }
 
     void whenFilterTreeExclusive(NodeFilter excludeNode)
     {
-        m_targetTree = AnalyticsEntitiesTreeBuilder::filterTreeExclusive(m_sourceTree, excludeNode);
+        m_targetTree = core::AnalyticsEntitiesTreeBuilder::filterTreeExclusive(m_sourceTree, excludeNode);
     }
 
     void whenFilterTreeInclusive(NodeFilter includeNode)
     {
-        m_targetTree = AnalyticsEntitiesTreeBuilder::filterTreeInclusive(m_sourceTree, includeNode);
+        m_targetTree = core::AnalyticsEntitiesTreeBuilder::filterTreeInclusive(m_sourceTree, includeNode);
     }
 
     void expectTree(NodePtr expectedTree)

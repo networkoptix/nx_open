@@ -71,7 +71,7 @@ private:
     void at_videoWall_itemChanged(const QnVideoWallResourcePtr& videoWall,
         const QnVideoWallItem& item);
 
-    void at_updateThumbnailStatus(Qn::ThumbnailStatus status);
+    void at_updateThumbnailStatus(nx::vms::client::core::ThumbnailStatus status);
 
     void initInfoOverlay();
 

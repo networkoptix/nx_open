@@ -132,7 +132,7 @@ bool isBackupSupported(const QModelIndex& index)
 
     const auto resourceIndex = index.siblingAtColumn(ResourceColumn);
 
-    return isBackupSupported(resourceIndex.data(Qn::ResourceRole).value<QnResourcePtr>()
+    return isBackupSupported(resourceIndex.data(core::ResourceRole).value<QnResourcePtr>()
         .dynamicCast<QnVirtualCameraResource>());
 }
 

@@ -4,8 +4,8 @@
 
 #include <QtCore/QUrl>
 
-#include <nx/vms/client/desktop/analytics/analytics_taxonomy_manager.h>
-#include <nx/vms/client/desktop/analytics/taxonomy/state_view.h>
+#include <nx/vms/client/core/analytics/analytics_taxonomy_manager.h>
+#include <nx/vms/client/core/analytics/taxonomy/state_view.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/system_context.h>
 
@@ -19,7 +19,7 @@ void LookupListEditDialog::registerQmlTypes()
 }
 
 LookupListEditDialog::LookupListEditDialog(SystemContext* systemContext,
-    analytics::taxonomy::StateView* taxonomy,
+    core::analytics::taxonomy::StateView* taxonomy,
     LookupListModel* sourceModel,
     QWidget* parent):
     base_type(appContext()->qmlEngine(),

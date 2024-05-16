@@ -2,9 +2,9 @@
 
 import QtQuick
 
-import Nx
 import Nx.Common
 import Nx.Core
+import Nx.Core.Controls
 import Nx.Controls
 import Nx.Items
 

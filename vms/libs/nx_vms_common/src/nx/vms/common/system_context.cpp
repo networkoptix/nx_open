@@ -284,4 +284,9 @@ QnCameraNamesWatcher* SystemContext::cameraNamesWatcher() const
     return d->cameraNamesWatcher.get();
 }
 
+SystemContext::Mode SystemContext::mode() const
+{
+    return d->mode;
+}
+
 } // namespace nx::vms::common

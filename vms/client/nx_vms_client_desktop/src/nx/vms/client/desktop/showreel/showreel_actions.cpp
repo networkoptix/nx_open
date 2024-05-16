@@ -27,7 +27,7 @@ namespace
 
 nx::Uuid showreelId(const Parameters& parameters)
 {
-    return parameters.argument(Qn::UuidRole).value<nx::Uuid>();
+    return parameters.argument(core::UuidRole).value<nx::Uuid>();
 }
 
 bool showreelIsRunning(WindowContext* context)

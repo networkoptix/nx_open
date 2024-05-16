@@ -4,6 +4,7 @@ import QtQuick
 
 import Nx.Controls
 
+import nx.vms.client.core
 import nx.vms.client.desktop
 
 SelectableTextButton
@@ -13,25 +14,25 @@ SelectableTextButton
     property CommonObjectSearchSetup setup
 
     selectable: false
-    accented: setup && setup.timeSelection === RightPanel.TimeSelection.selection
+    accented: setup && setup.timeSelection === EventSearch.TimeSelection.selection
     icon.source: "image://skin/20x20/Outline/calendar.svg"
     text: setup ? actionNames[setup.timeSelection] : ""
 
     readonly property var actionNames:
     {
         let result = {}
-        result[RightPanel.TimeSelection.anytime] = qsTr("Any time")
-        result[RightPanel.TimeSelection.day] = qsTr("Last day")
-        result[RightPanel.TimeSelection.week] = qsTr("Last 7 days")
-        result[RightPanel.TimeSelection.month] = qsTr("Last 30 days")
-        result[RightPanel.TimeSelection.selection] = qsTr("Selected on Timeline")
+        result[EventSearch.TimeSelection.anytime] = qsTr("Any time")
+        result[EventSearch.TimeSelection.day] = qsTr("Last day")
+        result[EventSearch.TimeSelection.week] = qsTr("Last 7 days")
+        result[EventSearch.TimeSelection.month] = qsTr("Last 30 days")
+        result[EventSearch.TimeSelection.selection] = qsTr("Selected on Timeline")
         return result
     }
 
     function updateState()
     {
         timeSelector.setState(
-            !setup || setup.timeSelection === RightPanel.TimeSelection.anytime
+            !setup || setup.timeSelection === EventSearch.TimeSelection.anytime
                 ? SelectableTextButton.State.Deactivated
                 : SelectableTextButton.State.Unselected)
     }
@@ -61,11 +62,11 @@ SelectableTextButton
 
         component MenuAction: Action { text: timeSelector.actionNames[data] }
 
-        MenuAction { data: RightPanel.TimeSelection.day }
-        MenuAction { data: RightPanel.TimeSelection.week }
-        MenuAction { data: RightPanel.TimeSelection.month }
+        MenuAction { data: EventSearch.TimeSelection.day }
+        MenuAction { data: EventSearch.TimeSelection.week }
+        MenuAction { data: EventSearch.TimeSelection.month }
         CompactMenuSeparator {}
-        MenuAction { id: defaultTimeSelection; data: RightPanel.TimeSelection.anytime }
+        MenuAction { id: defaultTimeSelection; data: EventSearch.TimeSelection.anytime }
 
         onTriggered: (action) =>
         {

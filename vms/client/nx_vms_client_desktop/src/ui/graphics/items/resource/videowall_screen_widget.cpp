@@ -15,11 +15,11 @@
 #include <core/resource/videowall_item_index.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/core/image_providers/camera_thumbnail_manager.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
-#include <nx/vms/client/desktop/image_providers/camera_thumbnail_manager.h>
 #include <nx/vms/client/desktop/videowall/utils.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/common/palette.h>
@@ -248,7 +248,7 @@ void QnVideowallScreenWidget::at_videoWall_itemChanged(const QnVideoWallResource
     update();
 }
 
-void QnVideowallScreenWidget::atItemDataChanged(Qn::ItemDataRole role)
+void QnVideowallScreenWidget::atItemDataChanged(int role)
 {
     base_type::atItemDataChanged(role);
     if (role != Qn::VideoWallItemIndicesRole)

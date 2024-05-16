@@ -14,7 +14,7 @@ struct CameraBookmark;
 struct CameraBookmarkSearchFilter;
 struct CameraBookmarkTag;
 
-using CameraBookmarkList = QVector<CameraBookmark>;
+using CameraBookmarkList = std::vector<CameraBookmark>;
 using MultiServerCameraBookmarkList = std::vector<CameraBookmarkList>;
 using CameraBookmarkTags = QSet<QString>;
 using CameraBookmarkTagList = QVector<CameraBookmarkTag>;

@@ -5,6 +5,11 @@
 #include <type_traits>
 
 #include <QtCore/QAbstractItemModel>
+#include <QtCore/QAbstractListModel>
+#include <QtCore/QAbstractTableModel>
+#include <QtCore/QAbstractProxyModel>
+#include <QtCore/QIdentityProxyModel>
+#include <QtCore/QSortFilterProxyModel>
 
 #include <nx/utils/log/assert.h>
 #include <nx/utils/scope_guard.h>
@@ -18,7 +23,6 @@ class ScopedModelOperations: public BaseModel
 public:
     using BaseModel::BaseModel;
 
-protected:
     class ScopedReset: public nx::utils::SharedGuard
     {
         using base_type = nx::utils::SharedGuard;
@@ -169,3 +173,10 @@ protected:
         }
     };
 };
+
+template class NX_UTILS_API ScopedModelOperations<QAbstractItemModel>;
+template class NX_UTILS_API ScopedModelOperations<QAbstractListModel>;
+template class NX_UTILS_API ScopedModelOperations<QAbstractTableModel>;
+template class NX_UTILS_API ScopedModelOperations<QAbstractProxyModel>;
+template class NX_UTILS_API ScopedModelOperations<QIdentityProxyModel>;
+template class NX_UTILS_API ScopedModelOperations<QSortFilterProxyModel>;

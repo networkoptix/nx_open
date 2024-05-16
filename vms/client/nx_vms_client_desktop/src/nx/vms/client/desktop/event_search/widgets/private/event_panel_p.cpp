@@ -17,6 +17,7 @@
 #include <nx/api/mediaserver/image_request.h>
 #include <nx/utils/metatypes.h>
 #include <nx/utils/range_adapters.h>
+#include <nx/vms/client/core/image_providers/camera_thumbnail_provider.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/widgets/animated_compact_tab_widget.h>
@@ -36,7 +37,6 @@
 #include <nx/vms/client/desktop/event_search/widgets/private/notification_bell_widget_p.h>
 #include <nx/vms/client/desktop/event_search/widgets/simple_motion_search_widget.h>
 #include <nx/vms/client/desktop/event_search/widgets/vms_event_search_widget.h>
-#include <nx/vms/client/desktop/image_providers/camera_thumbnail_provider.h>
 #include <nx/vms/client/desktop/image_providers/multi_image_provider.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
@@ -618,7 +618,7 @@ void EventPanel::Private::at_eventTileHovered(const QModelIndex& index, EventTil
 std::unique_ptr<MultiImageProvider> EventPanel::Private::multiImageProvider(
     const QModelIndex& index) const
 {
-    const auto previewTimeData = index.data(Qn::PreviewTimeRole);
+    const auto previewTimeData = index.data(core::PreviewTimeRole);
     if (previewTimeData.isNull())
         return {};
 
@@ -629,7 +629,7 @@ std::unique_ptr<MultiImageProvider> EventPanel::Private::multiImageProvider(
         ? Qn::ViewFootagePermission
         : Qn::ViewLivePermission;
 
-    const auto cameras = index.data(Qn::ResourceListRole).value<QnResourceList>()
+    const auto cameras = index.data(core::ResourceListRole).value<QnResourceList>()
         .filtered<QnVirtualCameraResource>(
             [this, requiredPermission](const QnVirtualCameraResourcePtr& camera)
             {
@@ -646,8 +646,8 @@ std::unique_ptr<MultiImageProvider> EventPanel::Private::multiImageProvider(
     if (cameras.size() < 2)
         return {};
 
-    const bool precisePreview = index.data(Qn::ForcePrecisePreviewRole).toBool();
-    const auto streamSelectionMode = index.data(Qn::PreviewStreamSelectionRole)
+    const bool precisePreview = index.data(core::ForcePrecisePreviewRole).toBool();
+    const auto streamSelectionMode = index.data(core::PreviewStreamSelectionRole)
         .value<nx::api::CameraImageRequest::StreamSelectionMode>();
 
     MultiImageProvider::Providers providers;
@@ -669,7 +669,7 @@ std::unique_ptr<MultiImageProvider> EventPanel::Private::multiImageProvider(
             break;
 
         request.camera = camera;
-        providers.emplace_back(new CameraThumbnailProvider(request));
+        providers.emplace_back(new core::CameraThumbnailProvider(request));
     }
 
     return std::make_unique<MultiImageProvider>(

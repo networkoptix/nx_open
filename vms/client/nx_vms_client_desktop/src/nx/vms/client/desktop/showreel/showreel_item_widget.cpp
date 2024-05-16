@@ -15,9 +15,9 @@
 #include <core/resource/media_resource.h>
 #include <nx/utils/string.h>
 #include <nx/utils/unicode_chars.h>
+#include <nx/vms/client/core/image_providers/camera_thumbnail_manager.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
-#include <nx/vms/client/desktop/image_providers/camera_thumbnail_manager.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
@@ -207,7 +207,7 @@ void ShowreelItemWidget::initOverlay()
     orderLabel->setAlignment(Qt::AlignVCenter);
     orderLabel->setFont(orderFont);
     auto updateOrder =
-        [this, orderLabel](Qn::ItemDataRole role)
+        [this, orderLabel](int role)
         {
             if (role != Qn::ShowreelItemOrderRole)
                 return;
@@ -289,7 +289,7 @@ void ShowreelItemWidget::initOverlay()
     connect(layoutResource().get(),
         &LayoutResource::itemDataChanged,
         this,
-        [this, delayEdit](const nx::Uuid& id, Qn::ItemDataRole role, const QVariant& data)
+        [this, delayEdit](const nx::Uuid& id, int role, const QVariant& data)
         {
             if (m_updating || role != Qn::ShowreelItemDelayMsRole || id != item()->uuid())
                 return;

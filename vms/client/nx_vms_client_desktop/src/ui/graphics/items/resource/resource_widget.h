@@ -393,7 +393,7 @@ protected:
     void registerButtonStatisticsAlias(QnImageButtonWidget* button, const QString& alias);
     QnImageButtonWidget* createStatisticAwareButton(const QString& alias);
 
-    virtual void atItemDataChanged(Qn::ItemDataRole role);
+    virtual void atItemDataChanged(int role);
 
     float defaultAspectRatio() const;
 

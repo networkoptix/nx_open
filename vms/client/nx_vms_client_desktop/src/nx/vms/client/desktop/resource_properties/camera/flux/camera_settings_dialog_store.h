@@ -188,7 +188,7 @@ public:
 
     Q_INVOKABLE QnResource* resource() const;
     Q_INVOKABLE QVariantList analyticsEngines() const;
-    void setAnalyticsEngines(const QList<AnalyticsEngineInfo>& value);
+    void setAnalyticsEngines(const QList<core::AnalyticsEngineInfo>& value);
     Q_INVOKABLE QVariantList userEnabledAnalyticsEngines() const;
     void setUserEnabledAnalyticsEngines(const QSet<nx::Uuid>& value);
     Q_INVOKABLE nx::Uuid currentAnalyticsEngineId() const;
@@ -212,7 +212,7 @@ public:
 
     Q_INVOKABLE void refreshDeviceAgentSettings(const nx::Uuid& engineId);
     void resetDeviceAgentData(
-        const nx::Uuid& engineId, const DeviceAgentData& data, bool resetUser = true);
+        const nx::Uuid& engineId, const core::DeviceAgentData& data, bool resetUser = true);
     Q_INVOKABLE QJsonObject deviceAgentSettingsErrors(const nx::Uuid& engineId) const;
 
     Q_INVOKABLE bool dualStreamingEnabled() const;

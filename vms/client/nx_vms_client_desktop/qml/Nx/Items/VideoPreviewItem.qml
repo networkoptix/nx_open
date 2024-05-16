@@ -4,6 +4,7 @@ import QtQuick
 
 import Nx.Common
 import Nx.Items
+import Nx.Core.Items
 
 import nx.vms.client.core
 import nx.vms.client.desktop

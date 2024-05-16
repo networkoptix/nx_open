@@ -2,8 +2,8 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/vms/client/desktop/analytics/taxonomy/state_view.h>
-#include <nx/vms/client/desktop/analytics/taxonomy/state_view_builder.h>
+#include <nx/vms/client/core/analytics/taxonomy/state_view.h>
+#include <nx/vms/client/core/analytics/taxonomy/state_view_builder.h>
 
 using nx::analytics::taxonomy::AbstractResourceSupportProxy;
 namespace nx::vms::client::desktop {
@@ -33,10 +33,10 @@ public:
     TaxonomyBasedTest();
     static void SetUpTestSuite();
     static void TearDownTestSuite();
-    analytics::taxonomy::StateView* stateView();
+    core::analytics::taxonomy::StateView* stateView();
 
 private:
-    std::unique_ptr<analytics::taxonomy::StateViewBuilder> m_stateViewBuilder;
+    std::unique_ptr<core::analytics::taxonomy::StateViewBuilder> m_stateViewBuilder;
     static inline std::unique_ptr<TestData> s_inputData = nullptr;
 };
 } // namespace nx::vms::client::desktop

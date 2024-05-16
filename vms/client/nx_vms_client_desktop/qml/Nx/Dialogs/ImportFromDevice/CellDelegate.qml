@@ -6,8 +6,8 @@ import QtQuick.Controls.impl as T
 import QtQuick.Layouts
 import QtQml
 
-import Nx
 import Nx.Controls
+import Nx.Core.Controls
 
 import nx.vms.client.desktop
 

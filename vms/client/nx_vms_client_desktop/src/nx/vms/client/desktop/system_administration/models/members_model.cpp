@@ -603,7 +603,7 @@ QHash<int, QByteArray> MembersModel::roleNames() const
     QHash<int, QByteArray> roles = base_type::roleNames();
     roles[Qt::DisplayRole] = "text";
     roles[DescriptionRole] = "description";
-    roles[Qn::DecorationPathRole] = "decorationPath";
+    roles[core::DecorationPathRole] = "decorationPath";
     roles[IdRole] = "id";
     roles[IsUserRole] = "isUser";
     roles[OffsetRole] = "offset";
@@ -824,7 +824,7 @@ QVariant MembersModel::data(const QModelIndex& index, int role) const
                 return systemContext()->nonEditableUsersAndGroups()->tooltip(id);
             return {};
 
-        case Qn::DecorationPathRole:
+        case core::DecorationPathRole:
         {
             if (index.data(MembersModel::IsPredefined).toBool())
                 return "20x20/Solid/group_default.svg";

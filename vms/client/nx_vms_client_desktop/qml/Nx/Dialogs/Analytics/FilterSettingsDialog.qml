@@ -4,9 +4,9 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Window
 
-import Nx
 import Nx.Controls
 import Nx.Core
+import Nx.Core.Controls
 import Nx.Dialogs
 import Nx.RightPanel
 

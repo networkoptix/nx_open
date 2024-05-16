@@ -29,6 +29,7 @@ public:
     QnBookmarkMergeHelper();
     ~QnBookmarkMergeHelper();
 
+    void setBookmarks(const QList<QnCameraBookmark> &bookmarks);
     void setBookmarks(const QnCameraBookmarkList &bookmarks);
 
     QnTimelineBookmarkItemList bookmarks(milliseconds msecsPerDp = milliseconds(0)) const;

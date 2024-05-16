@@ -7,16 +7,16 @@
 #include <api/helpers/thumbnail_request_data.h>
 #include <core/resource/resource_fwd.h>
 
-#include "image_provider.h"
+#include <nx/vms/client/core/image_providers/image_provider.h>
 
 namespace nx::core { struct Watermark; }
 
 namespace nx::vms::client::desktop {
 
-class LayoutThumbnailLoader: public ImageProvider
+class LayoutThumbnailLoader: public core::ImageProvider
 {
     Q_OBJECT
-    using base_type = ImageProvider;
+    using base_type = core::ImageProvider;
 
 public:
     explicit LayoutThumbnailLoader(
@@ -30,7 +30,7 @@ public:
 
     virtual QImage image() const override;
     virtual QSize sizeHint() const override;
-    virtual Qn::ThumbnailStatus status() const override;
+    virtual core::ThumbnailStatus status() const override;
 
     QnLayoutResourcePtr layout() const;
 

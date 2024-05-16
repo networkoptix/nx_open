@@ -3,8 +3,8 @@
 #pragma once
 
 #include <common/common_globals.h>
-#include <core/resource/client_resource_fwd.h>
 #include <nx/utils/crypt/encryptable.h>
+#include <nx/vms/client/core/resource/resource_fwd.h>
 #include <nx/vms/client/desktop/export/data/nov_metadata.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 

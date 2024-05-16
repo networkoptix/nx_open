@@ -4,16 +4,16 @@
 
 #include <client/client_message_processor.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <network/system_helpers.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/scoped_connections.h>
 #include <nx/vms/api/data/module_information.h>
-#include <nx/vms/client/desktop/other_servers/other_servers_manager.h>
-#include <nx/vms/client/desktop/resource/server.h>
+#include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/resource/server.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
-
 
 #include <nx/network/http/http_types.h>
 #include <nx/network/url/url_builder.h>

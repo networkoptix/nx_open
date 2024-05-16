@@ -14,8 +14,8 @@
 #include <nx/reflect/json.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/api/data/lookup_list_data.h>
-#include <nx/vms/client/desktop/analytics/analytics_taxonomy_manager.h>
-#include <nx/vms/client/desktop/analytics/taxonomy/state_view.h>
+#include <nx/vms/client/core/analytics/analytics_taxonomy_manager.h>
+#include <nx/vms/client/core/analytics/taxonomy/state_view.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/debug_utils/utils/debug_custom_actions.h>
 #include <nx/vms/client/desktop/lookup_lists/lookup_list_edit_dialog.h>

@@ -5,12 +5,12 @@
 #include <chrono>
 
 #include <nx/utils/impl_ptr.h>
+#include <nx/vms/client/desktop/event_search/widgets/abstract_search_widget.h>
 
-#include "abstract_search_widget.h"
+namespace nx::vms::client::core { class AnalyticsSearchSetup; }
 
 namespace nx::vms::client::desktop {
 
-class AnalyticsSearchSetup;
 
 class AnalyticsSearchWidget: public AbstractSearchWidget
 {
@@ -23,7 +23,7 @@ public:
 
     virtual void resetFilters() override;
 
-    AnalyticsSearchSetup* analyticsSetup() const;
+    core::AnalyticsSearchSetup* analyticsSetup() const;
 
 private:
     virtual QString placeholderText(bool constrained) const override;

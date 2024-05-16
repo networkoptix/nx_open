@@ -1,11 +1,11 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.14
-import QtQuick.Controls 2.14
+import QtQuick
+import QtQuick.Controls
 
-import Nx 1.0
-import Nx.Controls 1.0
-import Nx.Core 1.0
+import Nx.Controls
+import Nx.Core
+import Nx.Core.Controls
 
 FocusScope
 {
@@ -209,9 +209,9 @@ FocusScope
 
             validator.locale = NxGlobals.numericInputLocale()
 
-            validator.bottom = Qt.binding(() => Utils.getValue(control.minimum, validator.lowest))
+            validator.bottom = Qt.binding(() => CoreUtils.getValue(control.minimum, validator.lowest))
 
-            validator.top = Qt.binding(() => Utils.getValue(control.maximum, validator.highest))
+            validator.top = Qt.binding(() => CoreUtils.getValue(control.maximum, validator.highest))
         }
     }
 

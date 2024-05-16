@@ -350,10 +350,12 @@ CloudStatusWatcher::Private::Private(CloudStatusWatcher* parent):
 
     m_tokenUpdater = std::make_unique<CloudSessionTokenUpdater>(this);
 
-    connect(m_tokenUpdater.get(),
-        &CloudSessionTokenUpdater::sessionTokenExpiring,
-        this,
-        &CloudStatusWatcher::Private::issueAccessToken);
+    connect(m_tokenUpdater.get(), &CloudSessionTokenUpdater::sessionTokenExpiring, this,
+        [this]()
+        {
+            if (q->status() != CloudStatusWatcher::Status::LoggedOut)
+                issueAccessToken();
+        });
 }
 
 bool CloudStatusWatcher::Private::cloudIsEnabled() const

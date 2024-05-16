@@ -3,7 +3,6 @@
 import QtQuick
 import QtQuick.Controls
 
-import Nx
 import Nx.Controls
 
 import nx.vms.client.core

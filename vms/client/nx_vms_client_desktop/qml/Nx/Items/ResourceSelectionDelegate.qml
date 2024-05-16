@@ -2,10 +2,10 @@
 
 import QtQuick
 
-import Nx
 import Nx.Common
 import Nx.Controls
 import Nx.Core
+import Nx.Core.Controls
 
 import nx.vms.client.core
 import nx.vms.client.desktop

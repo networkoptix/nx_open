@@ -3,8 +3,8 @@
 import QtQuick
 import QtQuick.Layouts
 
-import Nx
 import Nx.Core
+import Nx.Core.Controls
 import Nx.Controls
 
 import nx.vms.client.core
@@ -50,7 +50,7 @@ TileBase
                 visible: !!text
                 font { pixelSize: FontConfig.small.pixelSize; weight: Font.Normal }
 
-                text: (model && model.timestamp) || ""
+                text: (model && model.textTimestamp) || ""
             }
         }
 

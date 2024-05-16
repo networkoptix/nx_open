@@ -5,12 +5,12 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/guarded_callback.h>
+#include <nx/vms/client/core/resource/unified_resource_pool.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/jsapi/detail/resources_structures.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
-#include <nx/vms/client/desktop/resource/unified_resource_pool.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/window_context_aware.h>

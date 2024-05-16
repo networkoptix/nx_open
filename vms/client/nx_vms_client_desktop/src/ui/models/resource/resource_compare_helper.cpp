@@ -6,9 +6,9 @@
 #include <QtCore/QCollator>
 
 #include <client/client_globals.h>
-
+#include <core/resource/layout_resource.h>
+#include <nx/vms/client/core/client_core_globals.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
-
 
 namespace {
 
@@ -26,7 +26,7 @@ int localFlagsOrder(Qn::ResourceFlags flags)
 
 QnResourcePtr getResource(const QModelIndex& index)
 {
-    return index.data(Qn::ResourceRole).value<QnResourcePtr>();
+    return index.data(nx::vms::client::core::ResourceRole).value<QnResourcePtr>();
 }
 
 } // namespace

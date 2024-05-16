@@ -4,7 +4,6 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
-import Nx
 import Nx.Core
 import Nx.Controls
 
@@ -21,8 +20,8 @@ Column
     property alias limitToCurrentCamera: cameraSelector.limitToCurrentCamera
 
     property int defaultCameraSelection: limitToCurrentCamera
-        ? RightPanel.CameraSelection.current
-        : RightPanel.CameraSelection.layout
+        ? EventSearch.CameraSelection.current
+        : EventSearch.CameraSelection.layout
 
     property alias filtersColumn: filtersColumn
 

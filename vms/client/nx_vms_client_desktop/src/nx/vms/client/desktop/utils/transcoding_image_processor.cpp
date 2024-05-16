@@ -12,7 +12,7 @@ namespace nx::vms::client::desktop {
 class TranscodingImageProcessor::Private
 {
 public:
-    const core::transcoding::FilterChain& filters() const
+    const nx::core::transcoding::FilterChain& filters() const
     {
         return m_filters;
     }
@@ -27,12 +27,12 @@ public:
             return;
         }
 
-        m_filters = core::transcoding::FilterChain(
+        m_filters = nx::core::transcoding::FilterChain(
             settings, resource->getDewarpingParams(), resource->getVideoLayout());
         m_sourceSize = QSize();
     }
 
-    core::transcoding::FilterChain ensureFilters(const QSize& sourceSize)
+    nx::core::transcoding::FilterChain ensureFilters(const QSize& sourceSize)
     {
         if (m_sourceSize != sourceSize)
         {
@@ -51,7 +51,7 @@ public:
     }
 
 private:
-    core::transcoding::FilterChain m_filters;
+    nx::core::transcoding::FilterChain m_filters;
 
     QSize m_sourceSize;
 };
@@ -67,7 +67,7 @@ TranscodingImageProcessor::~TranscodingImageProcessor()
 }
 
 void TranscodingImageProcessor::setTranscodingSettings(
-    const core::transcoding::Settings& settings,
+    const nx::core::transcoding::Settings& settings,
     const QnMediaResourcePtr& resource)
 {
     d->setSettings(settings, resource);

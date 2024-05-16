@@ -9,11 +9,12 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/scoped_connections.h>
+#include <nx/vms/client/core/event_search/models/abstract_attributed_event_model.h>
+#include <nx/vms/client/core/image_providers/camera_thumbnail_provider.h>
+#include <nx/vms/client/core/image_providers/image_provider.h>
 #include <nx/vms/client/core/thumbnails/generic_image_store.h>
 #include <nx/vms/client/core/thumbnails/thumbnail_image_provider.h>
 #include <nx/vms/client/desktop/event_search/right_panel_globals.h>
-#include <nx/vms/client/desktop/image_providers/camera_thumbnail_provider.h>
-#include <nx/vms/client/desktop/image_providers/image_provider.h>
 #include <nx/vms/client/desktop/ui/right_panel/models/right_panel_models_adapter.h>
 #include <nx/vms/client/desktop/utils/qml_property.h>
 
@@ -38,7 +39,7 @@ struct ThumbnailTooltip::Private
     const QmlProperty<QVariantList> attributes{q->widget(), "attributes"};
 
     QString previewImageId;
-    analytics::AttributeList sourceAttributes;
+    core::analytics::AttributeList sourceAttributes;
     QRectF desiredHighlightRect;
     bool forceNoHighlight = false;
 
@@ -92,29 +93,29 @@ struct ThumbnailTooltip::Private
         thumbnailHighlightRect = forceNoHighlight ? QRectF() : desiredHighlightRect;
     }
 
-    RightPanel::PreviewState calculatePreviewState() const
+    EventSearch::PreviewState calculatePreviewState() const
     {
         if (!imageProvider)
-            return RightPanel::PreviewState::initial;
+            return EventSearch::PreviewState::initial;
 
         switch (imageProvider->status())
         {
-            case Qn::ThumbnailStatus::Invalid:
-                return RightPanel::PreviewState::initial;
+            case ThumbnailStatus::Invalid:
+                return EventSearch::PreviewState::initial;
 
-            case Qn::ThumbnailStatus::Loading:
-            case Qn::ThumbnailStatus::Refreshing:
-                return RightPanel::PreviewState::busy;
+            case ThumbnailStatus::Loading:
+            case ThumbnailStatus::Refreshing:
+                return EventSearch::PreviewState::busy;
 
-            case Qn::ThumbnailStatus::Loaded:
-                return RightPanel::PreviewState::ready;
+            case ThumbnailStatus::Loaded:
+                return EventSearch::PreviewState::ready;
 
-            case Qn::ThumbnailStatus::NoData:
-                return RightPanel::PreviewState::missing;
+            case ThumbnailStatus::NoData:
+                return EventSearch::PreviewState::missing;
         }
 
         NX_ASSERT(false, "Should never get here");
-        return RightPanel::PreviewState::initial;
+        return EventSearch::PreviewState::initial;
     }
 
     GenericImageStore* imageStore()
@@ -202,18 +203,18 @@ void ThumbnailTooltip::setHighlightRect(const QRectF& rect)
     d->updateHighlightRect();
 }
 
-const analytics::AttributeList& ThumbnailTooltip::attributes() const
+const core::analytics::AttributeList& ThumbnailTooltip::attributes() const
 {
     return d->sourceAttributes;
 }
 
-void ThumbnailTooltip::setAttributes(const analytics::AttributeList& value)
+void ThumbnailTooltip::setAttributes(const core::analytics::AttributeList& value)
 {
     if (d->sourceAttributes == value)
         return;
 
     d->sourceAttributes = value;
-    d->attributes = RightPanelModelsAdapter::flattenAttributeList(d->sourceAttributes);
+    d->attributes = AbstractAttributedEventModel::flattenAttributeList(d->sourceAttributes);
 }
 
 } // namespace nx::vms::client::desktop

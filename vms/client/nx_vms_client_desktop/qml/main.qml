@@ -4,15 +4,14 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
-import nx.vms.client.desktop
-
-import Nx
 import Nx.Core
 import Nx.Controls
 import Nx.Debug
 import Nx.Items
 import Nx.Layout
 import Nx.RightPanel
+
+import nx.vms.client.desktop
 
 Control
 {

@@ -3,7 +3,6 @@
 import QtQuick 2.14
 import QtQuick.Controls 2.14
 
-import Nx 1.0
 import Nx.Core 1.0
 
 import ".."

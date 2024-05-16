@@ -60,8 +60,8 @@ ShowreelActionsHandler::ShowreelActionsHandler(QObject* parent):
                 usedNames, tr("Showreel"), tr("Showreel %1"));
             system()->showreelManager()->addOrUpdateShowreel(showreel);
             saveShowreelToServer(showreel);
-            menu()->trigger(menu::SelectNewItemAction, {Qn::UuidRole, showreel.id});
-            menu()->trigger(menu::ReviewShowreelAction, {Qn::UuidRole, showreel.id});
+            menu()->trigger(menu::SelectNewItemAction, {core::UuidRole, showreel.id});
+            menu()->trigger(menu::ReviewShowreelAction, {core::UuidRole, showreel.id});
         });
 
     connect(action(menu::MakeShowreelAction), &QAction::triggered, this,
@@ -78,14 +78,14 @@ ShowreelActionsHandler::ShowreelActionsHandler(QObject* parent):
         [this]()
         {
             const auto parameters = menu()->currentParameters(sender());
-            auto id = parameters.argument<nx::Uuid>(Qn::UuidRole);
+            auto id = parameters.argument<nx::Uuid>(core::UuidRole);
             auto showreel = system()->showreelManager()->showreel(id);
             if (!showreel.isValid())
                 return;
 
             const auto userId = system()->user()->getId();
 
-            const QString name = parameters.argument<QString>(Qn::ResourceNameRole).trimmed();
+            const QString name = parameters.argument<QString>(core::ResourceNameRole).trimmed();
 
             // Ask to override showreel with the same name (if any). Create local copy to avoid crash.
             const auto showreels = system()->showreelManager()->showreels();
@@ -116,7 +116,7 @@ ShowreelActionsHandler::ShowreelActionsHandler(QObject* parent):
         [this]()
         {
             const auto parameters = menu()->currentParameters(sender());
-            auto id = parameters.argument<nx::Uuid>(Qn::UuidRole);
+            auto id = parameters.argument<nx::Uuid>(core::UuidRole);
             NX_ASSERT(!id.isNull());
 
             const auto showreel = system()->showreelManager()->showreel(id);
@@ -140,7 +140,7 @@ ShowreelActionsHandler::ShowreelActionsHandler(QObject* parent):
         [this](bool toggled)
         {
             const auto parameters = menu()->currentParameters(sender());
-            auto id = parameters.argument<nx::Uuid>(Qn::UuidRole);
+            auto id = parameters.argument<nx::Uuid>(core::UuidRole);
 
             if (!toggled)
             {
@@ -191,7 +191,7 @@ ShowreelActionsHandler::ShowreelActionsHandler(QObject* parent):
         [this]
         {
             const auto parameters = menu()->currentParameters(sender());
-            auto id = parameters.argument<nx::Uuid>(Qn::UuidRole);
+            auto id = parameters.argument<nx::Uuid>(core::UuidRole);
             auto showreel = system()->showreelManager()->showreel(id);
             if (!showreel.isValid())
                 return;

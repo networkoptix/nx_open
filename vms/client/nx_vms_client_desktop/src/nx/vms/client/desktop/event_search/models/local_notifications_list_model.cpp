@@ -104,9 +104,9 @@ LocalNotificationsListModel::LocalNotificationsListModel(WindowContext* context,
     connect(manager, &workbench::LocalNotificationsManager::titleChanged,
         this, changed({Qt::DisplayRole}));
     connect(manager, &workbench::LocalNotificationsManager::descriptionChanged,
-        this, changed({Qn::DescriptionTextRole}));
+        this, changed({core::DescriptionTextRole}));
     connect(manager, &workbench::LocalNotificationsManager::iconPathChanged,
-        this, changed({Qt::DecorationRole, Qn::DecorationPathRole}));
+        this, changed({Qt::DecorationRole, core::DecorationPathRole}));
     connect(manager, &workbench::LocalNotificationsManager::cancellableChanged,
         this, changed({Qn::RemovableRole, Qn::TimeoutRole}));
     connect(manager, &workbench::LocalNotificationsManager::actionChanged,
@@ -152,7 +152,7 @@ QVariant LocalNotificationsListModel::data(const QModelIndex& index, int role) c
             return QVariant();
         }
 
-        case Qn::DescriptionTextRole:
+        case core::DescriptionTextRole:
             return manager->description(notificationId);
 
         case Qn::RemovableRole:
@@ -178,7 +178,7 @@ QVariant LocalNotificationsListModel::data(const QModelIndex& index, int role) c
             return QVariant();
         }
 
-        case Qn::DecorationPathRole:
+        case core::DecorationPathRole:
         {
             if (const auto path = manager->iconPath(notificationId); !path.isEmpty())
                 return path;
@@ -233,7 +233,7 @@ bool LocalNotificationsListModel::setData(const QModelIndex& index, const QVaria
 {
     if (!index.isValid() || index.model() != this || index.column() != 0
         || index.row() < 0 || index.row() >= rowCount()
-        || role != Qn::DefaultNotificationRole)
+        || role != core::DefaultNotificationRole)
     {
         return false;
     }

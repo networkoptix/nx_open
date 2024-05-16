@@ -3,15 +3,15 @@
 #pragma once
 
 #include <core/ptz/ptz_constants.h>
-#include <core/resource/client_resource_fwd.h>
 #include <nx/utils/elapsed_timer.h>
 #include <nx/vms/api/types/resource_types.h>
 #include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/core/analytics/analytics_taxonomy_manager.h>
 #include <nx/vms/client/core/camera/iomodule/io_module_monitor.h>
 #include <nx/vms/client/core/media/abstract_analytics_metadata_provider.h>
 #include <nx/vms/client/core/media/abstract_metadata_consumer_owner.h>
 #include <nx/vms/client/core/media/abstract_motion_metadata_provider.h>
-#include <nx/vms/client/desktop/analytics/analytics_taxonomy_manager.h>
+#include <nx/vms/client/core/resource/resource_fwd.h>
 #include <nx/vms/client/desktop/camera/camera_fwd.h>
 #include <nx/vms/license/usage_helper.h>
 
@@ -67,7 +67,7 @@ public:
     mutable nx::utils::ElapsedTimer traceFpsTimer;
     mutable QString currentDetailsText;
 
-    const QPointer<nx::vms::client::desktop::analytics::TaxonomyManager> taxonomyManager;
+    const QPointer<nx::vms::client::core::analytics::TaxonomyManager> taxonomyManager;
 
 public:
     explicit MediaResourceWidgetPrivate(

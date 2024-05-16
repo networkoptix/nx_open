@@ -23,11 +23,12 @@ class QLabel;
 class QStackedWidget;
 class QTimer;
 
+namespace nx::vms::client::core { class ImageProvider; }
+
 namespace nx::vms::client::desktop {
 
 class BusyIndicatorWidget;
 class AutoscaledPlainText;
-class ImageProvider;
 
 /**
  * The widget shows image that it receives from ImageProvider.
@@ -42,8 +43,8 @@ public:
     explicit AsyncImageWidget(QWidget* parent = nullptr);
     virtual ~AsyncImageWidget() override;
 
-    ImageProvider* imageProvider() const;
-    void setImageProvider(ImageProvider* provider);
+    core::ImageProvider* imageProvider() const;
+    void setImageProvider(core::ImageProvider* provider);
 
     BusyIndicatorWidget* busyIndicator() const;
 
@@ -123,7 +124,7 @@ private:
     // Sets both sizeHint() and m_preview image based on current state.
     void updateCache();
 
-    void updateThumbnailStatus(Qn::ThumbnailStatus status);
+    void updateThumbnailStatus(core::ThumbnailStatus status);
 
     void setLoadingIndicationVisible(bool visible);
 
@@ -137,7 +138,7 @@ private:
     BusyIndicatorWidget* const m_indicator = nullptr;
     QPixmap m_preview;
     QImage m_previewImage;
-    QPointer<ImageProvider> m_imageProvider;
+    QPointer<core::ImageProvider> m_imageProvider;
     QPalette::ColorRole m_borderRole = QPalette::Shadow;
     QRectF m_highlightRect;
     CropMode m_cropMode = CropMode::never;
@@ -146,7 +147,7 @@ private:
     // Should the widget enlarge image up to size of the widget
     bool m_autoScaleUp = false;
     ReloadMode m_reloadMode = ReloadMode::showLoadingIndicator;
-    Qn::ThumbnailStatus m_previousStatus = Qn::ThumbnailStatus::Invalid;
+    core::ThumbnailStatus m_previousStatus = core::ThumbnailStatus::Invalid;
     // Show placeholder if not empty.
     QString m_placeholderText;
     bool m_applyBlurEffect = false;

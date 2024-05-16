@@ -36,7 +36,7 @@ Qt::ItemFlags CloudCrossSystemCameraDecorator::flags() const
 {
     auto result = m_sourceItem->flags();
 
-    const auto resource = m_sourceItem->data(Qn::ResourceRole).value<QnResourcePtr>();
+    const auto resource = m_sourceItem->data(core::ResourceRole).value<QnResourcePtr>();
     if (!NX_ASSERT(!resource.isNull(), "Resource node expected"))
         return result;
 

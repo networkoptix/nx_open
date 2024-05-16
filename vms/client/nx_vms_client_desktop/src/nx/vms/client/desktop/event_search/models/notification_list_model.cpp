@@ -17,7 +17,7 @@ QString getStatisticsAlias(const QString& postfix)
 {
     static const auto kNotificationWidgetAlias = lit("notification_widget");
     return lit("%1_%2").arg(kNotificationWidgetAlias, postfix);
-};
+}
 
 } // namespace
 

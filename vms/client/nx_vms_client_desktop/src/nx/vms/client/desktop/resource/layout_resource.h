@@ -21,7 +21,7 @@ class NX_VMS_CLIENT_DESKTOP_API LayoutResource: public QnLayoutResource
     Q_OBJECT
 
 public:
-    using DataHash = QHash<Qn::ItemDataRole, QVariant>;
+    using DataHash = QHash<int, QVariant>;
     using ItemsRemapHash = QHash<nx::Uuid, nx::Uuid>;
 
     static qreal cellSpacingValue(Qn::CellSpacing spacing);
@@ -77,16 +77,16 @@ public:
     void setData(const DataHash& data);
 
     /** Runtime layout data. */
-    QVariant data(Qn::ItemDataRole role) const;
+    QVariant data(int role) const;
 
     /** Set runtime layout data. */
-    void setData(Qn::ItemDataRole role, const QVariant &value);
+    void setData(int role, const QVariant &value);
 
     /** Runtime data per item. */
-    QVariant itemData(const nx::Uuid& id, Qn::ItemDataRole role) const;
+    QVariant itemData(const nx::Uuid& id, int role) const;
 
     /** Store runtime data. Emits itemDataChanged if data differs from existing. */
-    void setItemData(const nx::Uuid& id, Qn::ItemDataRole role, const QVariant& data);
+    void setItemData(const nx::Uuid& id, int role, const QVariant& data);
 
     /** Remove all runtime data for the given item. Does not emit signals. */
     void cleanupItemData(const nx::Uuid& id);
@@ -132,8 +132,8 @@ public:
     virtual QnLayoutResourcePtr storedLayout() const override;
 
 signals:
-    void dataChanged(Qn::ItemDataRole role);
-    void itemDataChanged(const nx::Uuid& id, Qn::ItemDataRole role, const QVariant& data);
+    void dataChanged(int role);
+    void itemDataChanged(const nx::Uuid& id, int role, const QVariant& data);
     void layoutTypeChanged(const LayoutResourcePtr& resource);
 
 protected:
@@ -145,7 +145,7 @@ protected:
 
 private:
     /** @return Whether data value was changed. */
-    bool setItemDataUnderLock(const nx::Uuid& id, Qn::ItemDataRole role, const QVariant& data);
+    bool setItemDataUnderLock(const nx::Uuid& id, int role, const QVariant& data);
 
     LayoutType calculateLayoutType() const;
     void setLayoutType(LayoutType value);

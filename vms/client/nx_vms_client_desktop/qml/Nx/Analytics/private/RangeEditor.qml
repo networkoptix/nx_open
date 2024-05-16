@@ -4,11 +4,10 @@ import QtQuick 2.14
 import QtQuick.Controls 2.14
 import QtQuick.Layouts 1.14
 
-import Nx 1.0
 import Nx.Controls 1.0
 import Nx.Core 1.0
 
-import nx.vms.client.desktop.analytics 1.0 as Analytics
+import nx.vms.client.core.analytics 1.0 as Analytics
 
 FocusScope
 {
@@ -67,7 +66,7 @@ FocusScope
             color: ColorTheme.brightText
             placeholderTextColor: ColorTheme.windowText
             placeholderText: selectedValue
-                ? Utils.getValue(minimum, /*negative infinity*/ "-\u221E")
+                ? CoreUtils.getValue(minimum, /*negative infinity*/ "-\u221E")
                 : qsTr("from")
 
             Layout.fillWidth: true
@@ -96,7 +95,7 @@ FocusScope
             color: ColorTheme.brightText
             placeholderTextColor: ColorTheme.windowText
             placeholderText: selectedValue
-                ? Utils.getValue(maximum, /*infinity*/ "\u221E")
+                ? CoreUtils.getValue(maximum, /*infinity*/ "\u221E")
                 : qsTr("to")
 
             Layout.fillWidth: true
@@ -143,16 +142,16 @@ FocusScope
             }
             else
             {
-                const textFrom = Utils.getValue(selectedValues[0], fromInput.placeholderText)
-                const textTo = Utils.getValue(selectedValues[1], toInput.placeholderText)
+                const textFrom = CoreUtils.getValue(selectedValues[0], fromInput.placeholderText)
+                const textTo = CoreUtils.getValue(selectedValues[1], toInput.placeholderText)
                 const ellipsis = "\u2026"
                 selectedText = `${textFrom}${ellipsis}${textTo}`
 
-                const from = Utils.getValue(selectedValues[0],
-                    Utils.getValue(attribute && attribute.minValue, "-inf"))
+                const from = CoreUtils.getValue(selectedValues[0],
+                    CoreUtils.getValue(attribute && attribute.minValue, "-inf"))
 
-                const to = Utils.getValue(selectedValues[1],
-                    Utils.getValue(attribute && attribute.maxValue, "inf"))
+                const to = CoreUtils.getValue(selectedValues[1],
+                    CoreUtils.getValue(attribute && attribute.maxValue, "inf"))
 
                 selectedValue = `${from}...${to}`
             }

@@ -7,15 +7,15 @@
 
 #include <nx/utils/test_support/test_options.h>
 #include <nx/vms/api/data/lookup_list_data.h>
-#include <nx/vms/client/desktop/analytics/taxonomy/object_type.h>
-#include <nx/vms/client/desktop/analytics/taxonomy/state_view.h>
+#include <nx/vms/client/core/analytics/taxonomy/object_type.h>
+#include <nx/vms/client/core/analytics/taxonomy/state_view.h>
 #include <nx/vms/client/desktop/lookup_lists/lookup_list_export_processor.h>
 #include <nx/vms/client/desktop/lookup_lists/lookup_list_model.h>
 #include <nx/vms/client/desktop/lookup_lists/lookup_list_preview_processor.h>
 
 #include "taxonomy_based_ut.h"
 
-using namespace nx::vms::client::desktop::analytics::taxonomy;
+using namespace nx::vms::client::core::analytics::taxonomy;
 using namespace nx::vms::api;
 namespace nx::vms::client::desktop {
 class LookupListTests: public TaxonomyBasedTest

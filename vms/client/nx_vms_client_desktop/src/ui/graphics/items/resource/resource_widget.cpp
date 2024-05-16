@@ -193,7 +193,7 @@ QnResourceWidget::QnResourceWidget(
         &LayoutResource::itemDataChanged,
         this,
         [this, itemId = item->uuid()](
-            const nx::Uuid& id, Qn::ItemDataRole role, const QVariant& /*data*/)
+            const nx::Uuid& id, int role, const QVariant& /*data*/)
         {
             if (id != itemId)
                 return;
@@ -1404,7 +1404,7 @@ void QnResourceWidget::optionsChangedNotify(Options changedFlags)
     updateButtonsVisibility();
 }
 
-void QnResourceWidget::atItemDataChanged(Qn::ItemDataRole role)
+void QnResourceWidget::atItemDataChanged(int role)
 {
     if (role != Qn::ItemCheckedButtonsRole)
         return;

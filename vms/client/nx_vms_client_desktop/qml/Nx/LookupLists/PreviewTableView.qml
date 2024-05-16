@@ -3,7 +3,6 @@
 import QtQml
 import QtQuick as CoreItems
 
-import Nx
 import Nx.Core
 import Nx.Controls
 import Nx.Models

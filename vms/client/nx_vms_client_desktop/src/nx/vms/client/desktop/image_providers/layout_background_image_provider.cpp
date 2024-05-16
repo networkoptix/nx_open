@@ -77,14 +77,14 @@ QSize LayoutBackgroundImageProvider::sizeHint() const
     return d->sizeHint();
 }
 
-Qn::ThumbnailStatus LayoutBackgroundImageProvider::status() const
+core::ThumbnailStatus LayoutBackgroundImageProvider::status() const
 {
     if (d->cache.isNull())
-        return Qn::ThumbnailStatus::Invalid;
+        return core::ThumbnailStatus::Invalid;
 
     return d->image.isNull()
-        ? Qn::ThumbnailStatus::Loading
-        : Qn::ThumbnailStatus::Loaded;
+        ? core::ThumbnailStatus::Loading
+        : core::ThumbnailStatus::Loaded;
 }
 
 void LayoutBackgroundImageProvider::doLoadAsync()

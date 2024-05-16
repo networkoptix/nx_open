@@ -27,6 +27,7 @@
 #include <nx/utils/scoped_connections.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/utils/geometry.h>
+#include <nx/vms/client/core/utils/video_cache.h>
 #include <nx/vms/client/desktop/common/utils/custom_painted.h>
 #include <nx/vms/client/desktop/common/utils/progress_state.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
@@ -34,7 +35,6 @@
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/style/private/style_private.h>
-#include <nx/vms/client/desktop/utils/video_cache.h>
 #include <nx/vms/client/desktop/utils/widget_utils.h>
 #include <nx/vms/client/desktop/workbench/extensions/local_notifications_manager.h>
 #include <nx/vms/client/desktop/workbench/workbench_animations.h>
@@ -110,7 +110,7 @@ int maxSimultaneousPreviewLoads(const QnMediaServerResourcePtr& server)
         1, EventRibbon::kSimultaneousPreviewLoadsLimit);
 }
 
-QnMediaServerResourcePtr previewServer(const ResourceThumbnailProvider* provider)
+QnMediaServerResourcePtr previewServer(const core::ResourceThumbnailProvider* provider)
 {
     const auto resource = provider->resource();
     return resource
@@ -287,7 +287,7 @@ void EventRibbon::Private::updateTile(int index)
         ? EventTile::Style::informer
         : EventTile::Style::standard);
 
-    QString tileDescription = modelIndex.data(Qn::DescriptionTextRole).toString();
+    QString tileDescription = modelIndex.data(core::DescriptionTextRole).toString();
 
     // Limit the number of lines inside tile description.
     // Empty description should remain empty, without any invisible html.
@@ -317,7 +317,7 @@ void EventRibbon::Private::updateTile(int index)
             widget->setProgressTitle(modelIndex.data(Qt::DisplayRole).toString());
             widget->setProgressFormat(modelIndex.data(Qn::ProgressFormatRole).toString());
             widget->setDescription(tileDescription);
-            widget->setToolTip(modelIndex.data(Qn::DescriptionTextRole).toString());
+            widget->setToolTip(modelIndex.data(core::DescriptionTextRole).toString());
             widget->setCloseable(modelIndex.data(Qn::RemovableRole).toBool());
             return;
         }
@@ -332,12 +332,12 @@ void EventRibbon::Private::updateTile(int index)
     widget->setProgressBarVisible(false);
     widget->setTitle(title);
     widget->setTitleColor(modelIndex.data(Qt::ForegroundRole).value<QColor>());
-    widget->setIconPath(modelIndex.data(Qn::DecorationPathRole).value<QString>());
-    widget->setTimestamp(modelIndex.data(Qn::TimestampTextRole).toString());
+    widget->setIconPath(modelIndex.data(core::DecorationPathRole).value<QString>());
+    widget->setTimestamp(modelIndex.data(core::TimestampTextRole).toString());
     widget->setDescription(tileDescription);
     widget->setFooterText(modelIndex.data(Qn::AdditionalTextRole).toString());
-    widget->setAttributeList(modelIndex.data(Qn::AnalyticsAttributesRole)
-        .value<analytics::AttributeList>());
+    widget->setAttributeList(modelIndex.data(core::AnalyticsAttributesRole)
+        .value<core::analytics::AttributeList>());
     widget->setToolTip(modelIndex.data(Qt::ToolTipRole).toString());
     widget->setCloseable(modelIndex.data(Qn::RemovableRole).toBool());
     widget->setAction(modelIndex.data(Qn::CommandActionRole).value<CommandActionPtr>());
@@ -347,7 +347,7 @@ void EventRibbon::Private::updateTile(int index)
 
     setHelpTopic(widget, modelIndex.data(Qn::HelpTopicIdRole).toInt());
 
-    const auto resourceList = modelIndex.data(Qn::DisplayedResourceListRole);
+    const auto resourceList = modelIndex.data(core::DisplayedResourceListRole);
     const auto cloudSystemId = modelIndex.data(Qn::CloudSystemIdRole).toString();
     if (resourceList.isValid())
     {
@@ -377,7 +377,7 @@ void EventRibbon::Private::updateTilePreview(int index)
 
     const auto modelIndex = m_model->index(index);
 
-    const auto previewResource = modelIndex.data(Qn::ResourceRole).value<QnResourcePtr>();
+    const auto previewResource = modelIndex.data(core::ResourceRole).value<QnResourcePtr>();
     const auto mediaResource = previewResource.dynamicCast<QnMediaResource>();
     if (!mediaResource)
         return;
@@ -407,20 +407,21 @@ void EventRibbon::Private::updateTilePreview(int index)
         : kAlternativeThumbnailWidth;
 
     const auto previewTimeMs = duration_cast<milliseconds>(
-        modelIndex.data(Qn::PreviewTimeRole).value<microseconds>());
+        modelIndex.data(core::PreviewTimeRole).value<microseconds>());
 
     const auto rotation = mediaResource->forcedRotation().value_or(0);
     const auto previewCropRect = nx::vms::client::core::Geometry::rotatedRelativeRectangle(
-        modelIndex.data(Qn::ItemZoomRectRole).value<QRectF>(), -rotation / 90);
+        modelIndex.data(core::ItemZoomRectRole).value<QRectF>(), -rotation / 90);
 
     const auto thumbnailWidth = previewCropRect.isEmpty()
         ? defaultThumbnailWidth
         : qMin<int>(defaultThumbnailWidth / previewCropRect.width(), kMaximumThumbnailWidth);
 
     const bool precisePreview = !previewCropRect.isEmpty()
-        || modelIndex.data(Qn::ForcePrecisePreviewRole).toBool();
+        || modelIndex.data(core::ForcePrecisePreviewRole).toBool();
 
-    const auto objectTrackId = modelIndex.data(Qn::ObjectTrackIdRole).value<nx::Uuid>();
+    const auto objectTrackId = modelIndex.data(
+		core::ObjectTrackIdRole).value<nx::Uuid>();
 
     nx::api::ResourceImageRequest request;
     request.resource = previewResource;
@@ -433,7 +434,7 @@ void EventRibbon::Private::updateTilePreview(int index)
     request.roundMethod = precisePreview
         ? nx::api::ImageRequest::RoundMethod::precise
         : nx::api::ImageRequest::RoundMethod::iFrameAfter;
-    request.streamSelectionMode = modelIndex.data(Qn::PreviewStreamSelectionRole)
+    request.streamSelectionMode = modelIndex.data(core::PreviewStreamSelectionRole)
         .value<nx::api::ImageRequest::StreamSelectionMode>();
     request.objectTrackId = objectTrackId;
 
@@ -459,32 +460,32 @@ void EventRibbon::Private::updateTilePreview(int index)
         imagePreviewProvider->setRequestData(request);
     }
     imagePreviewProvider->setProperty(kBypassVideoCachePropertyName,
-        modelIndex.data(Qn::HasExternalBestShotRole).toBool());
+        modelIndex.data(core::HasExternalBestShotRole).toBool());
 
     widget->setPlaceholder({});
     widget->setImageProvider(imagePreviewProvider.get(), forceUpdate);
     widget->setPreviewHighlightRect(previewCropRect);
 }
 
-ResourceThumbnailProvider* EventRibbon::Private::createPreviewProvider(
+core::ResourceThumbnailProvider* EventRibbon::Private::createPreviewProvider(
     const nx::api::ResourceImageRequest& request)
 {
-    auto provider = new ResourceThumbnailProvider(request);
+    auto provider = new core::ResourceThumbnailProvider(request);
 
     connect(provider, &QObject::destroyed, this,
         [this, provider]() { handleLoadingEnded(provider); },
         Qt::QueuedConnection);
 
-    connect(provider, &ImageProvider::statusChanged, this,
-        [this, provider](Qn::ThumbnailStatus status)
+    connect(provider, &core::ImageProvider::statusChanged, this,
+        [this, provider](core::ThumbnailStatus status)
         {
             if (provider == m_providerLoadingFromCache)
                 return;
 
             switch (status)
             {
-                case Qn::ThumbnailStatus::Loading:
-                case Qn::ThumbnailStatus::Refreshing:
+                case core::ThumbnailStatus::Loading:
+                case core::ThumbnailStatus::Refreshing:
                 {
                     const QSharedPointer<QTimer> timeoutTimer(new QTimer(),
                         [](QTimer* timer)
@@ -523,7 +524,7 @@ ResourceThumbnailProvider* EventRibbon::Private::createPreviewProvider(
     return provider;
 }
 
-void EventRibbon::Private::handleLoadingEnded(ResourceThumbnailProvider* provider)
+void EventRibbon::Private::handleLoadingEnded(core::ResourceThumbnailProvider* provider)
 {
     const auto previewData = m_loadingByProvider.find(provider);
     if (previewData == m_loadingByProvider.end())
@@ -542,7 +543,8 @@ void EventRibbon::Private::handleLoadingEnded(ResourceThumbnailProvider* provide
     loadNextPreview();
 }
 
-bool EventRibbon::Private::isNextPreviewLoadAllowed(const ResourceThumbnailProvider* provider) const
+bool EventRibbon::Private::isNextPreviewLoadAllowed(
+    const core::ResourceThumbnailProvider* provider) const
 {
     if (!NX_ASSERT(provider))
         return false;
@@ -1135,18 +1137,18 @@ void EventRibbon::Private::updateHighlightedTiles()
                 return false;
 
             const auto modelIndex = m_model->index(index);
-            const auto timestamp = modelIndex.data(Qn::TimestampRole).value<microseconds>();
+            const auto timestamp = modelIndex.data(core::TimestampRole).value<microseconds>();
             if (timestamp <= 0us)
                 return false;
 
-            const auto duration = modelIndex.data(Qn::DurationRole).value<microseconds>();
+            const auto duration = modelIndex.data(core::DurationRole).value<microseconds>();
             if (duration <= 0us)
                 return false;
 
             const auto isHighlightedResource =
                 [this](const QnResourcePtr& res) { return m_highlightedResources.contains(res); };
 
-            const auto resources = modelIndex.data(Qn::ResourceListRole).value<QnResourceList>();
+            const auto resources = modelIndex.data(core::ResourceListRole).value<QnResourceList>();
             if (std::none_of(resources.cbegin(), resources.cend(), isHighlightedResource))
                 return false;
 
@@ -1634,7 +1636,7 @@ void EventRibbon::Private::loadNextPreview()
 
         if (!tile->preview->property(kBypassVideoCachePropertyName).toBool())
         {
-            QScopedValueRollback<ResourceThumbnailProvider*> loadingFromCacheGuard(
+            QScopedValueRollback<core::ResourceThumbnailProvider*> loadingFromCacheGuard(
                 m_providerLoadingFromCache, tile->preview.get());
 
             if (tile->preview->tryLoad())

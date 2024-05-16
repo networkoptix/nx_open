@@ -3,9 +3,9 @@
 import QtQuick
 import QtQuick.Layouts
 
-import Nx
 import Nx.Core
 import Nx.Controls
+import Nx.Core.Controls
 
 ColumnLayout
 {

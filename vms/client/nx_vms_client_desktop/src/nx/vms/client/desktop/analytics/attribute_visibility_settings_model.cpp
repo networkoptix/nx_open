@@ -5,11 +5,18 @@
 #include <QtCore/QIODevice>
 #include <QtCore/QMimeData>
 #include <QtCore/QScopedValueRollback>
+#include <QtQml/QtQml>
 
-#include <nx/vms/client/desktop/analytics/analytics_filter_model.h>
+#include <nx/vms/client/core/analytics/analytics_filter_model.h>
 #include <nx/vms/client/desktop/analytics/attribute_display_manager.h>
 
 namespace nx::vms::client::desktop::analytics::taxonomy {
+
+void AttributeVisibilitySettingsModel::registerQmlType()
+{
+    qmlRegisterType<taxonomy::AttributeVisibilitySettingsModel>(
+        "nx.vms.client.desktop.analytics", 1, 0, "AttributeVisibilitySettingsModel");
+}
 
 AttributeVisibilitySettingsModel::AttributeVisibilitySettingsModel()
 {

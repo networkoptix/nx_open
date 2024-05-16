@@ -3,8 +3,8 @@
 import QtQuick
 import QtQml.Models
 
-import Nx
 import Nx.Core
+import Nx.Core.Controls
 import Nx.Controls
 
 import nx.vms.client.desktop
@@ -78,7 +78,7 @@ FocusScope
     property alias highlight: listView.highlight
 
     property int autoExpandDelayMs:
-        Utils.getValue(LocalSettings.iniConfigValue("autoExpandDelayMs"), -1)
+        CoreUtils.getValue(LocalSettings.iniConfigValue("autoExpandDelayMs"), -1)
 
     property int maximumDragIndicatorLines: 10
     property real maximumDragIndicatorWidth: 640

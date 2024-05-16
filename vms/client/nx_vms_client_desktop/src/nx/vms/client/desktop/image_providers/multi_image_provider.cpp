@@ -105,15 +105,15 @@ QSize MultiImageProvider::sizeHint() const
     return Geometry::bounded(m_providers.front()->sizeHint(), kMaxSize, Qt::KeepAspectRatio).toSize();
 }
 
-Qn::ThumbnailStatus MultiImageProvider::status() const
+core::ThumbnailStatus MultiImageProvider::status() const
 {
     // TODO: #sivanov Improve logic, handle statusChanged.
     for (const auto& provider: m_providers)
     {
-        if (provider->status() == Qn::ThumbnailStatus::Loaded)
-            return Qn::ThumbnailStatus::Loaded;
+        if (provider->status() == core::ThumbnailStatus::Loaded)
+            return core::ThumbnailStatus::Loaded;
     }
-    return Qn::ThumbnailStatus::Loading;
+    return core::ThumbnailStatus::Loading;
 }
 
 void MultiImageProvider::doLoadAsync()

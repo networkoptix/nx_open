@@ -54,6 +54,7 @@ NX_DECLARE_COLORIZED_ICON(kReloadIcon, "20x20/Outline/reload.svg", kLight16Subst
 
 } // namespace
 
+using namespace nx::vms::client::core;
 using namespace nx::vms::client::desktop;
 
 QnSearchBookmarksDialogPrivate::QnSearchBookmarksDialogPrivate(
@@ -266,7 +267,7 @@ bool QnSearchBookmarksDialogPrivate::fillActionParameters(menu::Parameters &para
         if (!index.isValid())
             return QnCameraBookmark();
 
-        const auto bookmark = m_model->data(index, Qn::CameraBookmarkRole).value<QnCameraBookmark>();
+        const auto bookmark = m_model->data(index, CameraBookmarkRole).value<QnCameraBookmark>();
         if (!bookmark.isValid())
             return QnCameraBookmark();
 
@@ -310,12 +311,12 @@ bool QnSearchBookmarksDialogPrivate::fillActionParameters(menu::Parameters &para
             continue;
 
         bookmarkIds << bookmark.guid;
-        bookmarks << bookmark;
+        bookmarks.push_back(bookmark);
         if (auto camera = availableCameraById(bookmark.cameraId))
             resourcesList << camera;
     }
     params.setResources(resourcesList);
-    if (bookmarks.isEmpty())
+    if (bookmarks.empty())
         return false;
     else
         params.setArgument(Qn::CameraBookmarkListRole, bookmarks);
@@ -323,12 +324,12 @@ bool QnSearchBookmarksDialogPrivate::fillActionParameters(menu::Parameters &para
     if (bookmarks.size() != 1)
         return true;
 
-    QnCameraBookmark currentBookmark = bookmarks.first();
+    QnCameraBookmark currentBookmark = bookmarks.front();
     /* User should not be able to export or open invalid bookmark. */
     if (!currentBookmark.isValid())
         return true;
 
-    params.setArgument(Qn::CameraBookmarkRole, currentBookmark);
+    params.setArgument(CameraBookmarkRole, currentBookmark);
     window = QnTimePeriod(currentBookmark.startTimeMs, currentBookmark.durationMs);
     params.setArgument(Qn::TimePeriodRole, window);
     params.setArgument(Qn::ItemTimeRole, window.startTimeMs);

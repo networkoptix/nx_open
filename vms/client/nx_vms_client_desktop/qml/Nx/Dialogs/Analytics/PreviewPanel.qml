@@ -3,8 +3,9 @@
 import QtQuick
 import QtQuick.Layouts
 
-import Nx
 import Nx.Core
+import Nx.Core.Controls
+import Nx.Core.Items
 import Nx.Controls
 import Nx.Items
 import Nx.RightPanel
@@ -124,6 +125,7 @@ Rectangle
         {
             id: intervalPreview
 
+
             anchors.top: parent.top
             anchors.left: parent.left
             anchors.right: parent.right
@@ -187,10 +189,10 @@ Rectangle
                 function updateState()
                 {
                     const loadingOrMissing = previewPanel.selectedItem
-                        && intervalPreview.previewState !== RightPanel.PreviewState.ready
+                        && intervalPreview.previewState !== EventSearch.PreviewState.ready
 
                     preloader.running = loadingOrMissing
-                        && intervalPreview.previewState !== RightPanel.PreviewState.missing
+                        && intervalPreview.previewState !== EventSearch.PreviewState.missing
 
                     visible = loadingOrMissing
                 }
@@ -277,7 +279,9 @@ Rectangle
                 color: ColorTheme.colors.light16
                 anchors.right: parent.right
                 font.pixelSize: FontConfig.xLarge.pixelSize
-                text: previewPanel.selectedItem ? previewPanel.selectedItem.timestamp.split(" ", 2).pop() : ""
+                text: previewPanel.selectedItem
+                    ? previewPanel.selectedItem.timestamp.split(" ", 2).pop()
+					: ""
             }
 
             Text
@@ -357,7 +361,7 @@ Rectangle
                     width: nameValueScrollView.contentWidth
 
                     copyable: true
-
+                    copyIconPath: "image://skin/20x20/Outline/to_search.svg"
                     nameColor: ColorTheme.colors.light16
                     valueColor: ColorTheme.colors.light10
                     nameFont { pixelSize: FontConfig.normal.pixelSize; weight: Font.Normal }

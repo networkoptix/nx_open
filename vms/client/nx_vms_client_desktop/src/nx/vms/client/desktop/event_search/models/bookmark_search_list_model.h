@@ -2,31 +2,19 @@
 
 #pragma once
 
-#include <nx/vms/client/desktop/event_search/models/abstract_async_search_list_model.h>
+#include <nx/vms/client/core/event_search/models/bookmark_search_list_model.h>
 
 namespace nx::vms::client::desktop {
 
-class BookmarkSearchListModel: public AbstractAsyncSearchListModel
+class NX_VMS_CLIENT_DESKTOP_API BookmarkSearchListModel: public core::BookmarkSearchListModel
 {
     Q_OBJECT
-    using base_type = AbstractAsyncSearchListModel;
+    using base_type = core::BookmarkSearchListModel;
 
 public:
-    explicit BookmarkSearchListModel(WindowContext* context, QObject* parent = nullptr);
-    virtual ~BookmarkSearchListModel() override = default;
+    using base_type::base_type;
 
-    virtual TextFilterSetup* textFilter() const override;
-
-    // Clients do not receive any live updates from the server, therefore time periods of interest
-    // must be periodically polled for updates by calling this method.
-    void dynamicUpdate(const QnTimePeriod& period);
-
-    virtual bool isConstrained() const override;
-    virtual bool hasAccessRights() const override;
-
-private:
-    class Private;
-    Private* const d;
+    virtual QVariant data(const QModelIndex& index, int role) const override;
 };
 
 } // namespace nx::vms::client::desktop

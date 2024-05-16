@@ -6,7 +6,6 @@ import QtQuick.Layouts
 import QtQml
 import Qt.labs.qmlmodels
 
-import Nx
 import Nx.Core
 import Nx.Controls
 import Nx.Dialogs

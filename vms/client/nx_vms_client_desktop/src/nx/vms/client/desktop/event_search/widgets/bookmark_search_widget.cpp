@@ -17,6 +17,7 @@
 #include <nx/vms/client/desktop/event_search/utils/common_object_search_setup.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_ribbon.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <utils/common/event_processors.h>
@@ -42,10 +43,10 @@ struct BookmarkSearchWidget::Private
 public: //< Overrides 'private:' in macro above.
     BookmarkSearchListModel* const model;
 
-    nx::utils::ElapsedTimer sinceLastRequest;
-    nx::utils::ElapsedTimer sinceViewUpdated;
+    nx::utils::ElapsedTimer sinceLastRequest = {};
+    nx::utils::ElapsedTimer sinceViewUpdated = {};
 
-    nx::utils::ScopedConnections connections;
+    nx::utils::ScopedConnections connections = {};
 
     // Request bookmarks in the visible range to check if something is to be added in between.
     void updateVisiblePeriod(BookmarkSearchWidget* q)
@@ -54,52 +55,21 @@ public: //< Overrides 'private:' in macro above.
             && sinceLastRequest.hasExpired(kVisiblePeriodUpdateInterval)
             && sinceViewUpdated.hasExpired(kDelayAfterViewUpdate))
         {
-            const auto range = q->view()->visibleRange();
-            QnTimePeriod period;
-
-            if (range.isEmpty() || range.upper() >= q->view()->count())
-            {
-                period.setStartTime(0ms);
-            }
-            else
-            {
-                period.setStartTime(duration_cast<milliseconds>(model->index(range.upper() - 1)
-                    .data(Qn::TimestampRole).value<microseconds>()));
-            }
-
-            if (range.isEmpty() || range.lower() == 0)
-            {
-                period.durationMs = QnTimePeriod::kInfiniteDuration;
-            }
-            else
-            {
-                const auto endTime = duration_cast<milliseconds>(model->index(range.lower())
-                    .data(Qn::TimestampRole).value<microseconds>());
-
-                if (endTime <= 0ms)
-                    period.durationMs = QnTimePeriod::kInfiniteDuration;
-                else // All visible bookmarks can have the same start time, so adding offset.
-                    period.setEndTime(endTime + 1ms);
-            }
-
-            NX_ASSERT(period.isValid());
-            if (!period.isValid())
-                return;
 
             sinceLastRequest.restart();
-            model->dynamicUpdate(period);
+            model->dynamicUpdate(q->currentCentralPointMs().count());
         }
     }
 };
 
 BookmarkSearchWidget::BookmarkSearchWidget(WindowContext* context, QWidget* parent):
-    base_type(context, new BookmarkSearchListModel(context), parent),
+    base_type(context, new BookmarkSearchListModel(context->system()), parent),
     d(new Private{qobject_cast<BookmarkSearchListModel*>(model())})
 {
     NX_CRITICAL(d->model);
 
     setPlaceholderPixmap(qnSkin->pixmap("left_panel/placeholders/bookmarks.svg"));
-    commonSetup()->setCameraSelection(RightPanel::CameraSelection::layout);
+    commonSetup()->setCameraSelection(core::EventSearch::CameraSelection::layout);
 
     // Track remote bookmark changes by polling.
     QPointer<QTimer> updateTimer = new QTimer(this);
@@ -119,7 +89,7 @@ BookmarkSearchWidget::BookmarkSearchWidget(WindowContext* context, QWidget* pare
     // Signals that can potentially be emitted during this widget destruction must be
     // disconnected in ~Private, so store the connections in d->connections.
 
-    d->connections << connect(model(), &AbstractSearchListModel::isOnlineChanged,
+    d->connections << connect(model(), &core::AbstractSearchListModel::isOnlineChanged,
         this, &BookmarkSearchWidget::updateAllowance);
 
     d->connections << connect(view(), &EventRibbon::visibleRangeChanged, this,
@@ -134,7 +104,7 @@ BookmarkSearchWidget::~BookmarkSearchWidget()
 void BookmarkSearchWidget::resetFilters()
 {
     base_type::resetFilters();
-    commonSetup()->setCameraSelection(RightPanel::CameraSelection::layout);
+    commonSetup()->setCameraSelection(core::EventSearch::CameraSelection::layout);
 }
 
 QString BookmarkSearchWidget::placeholderText(bool /*constrained*/) const

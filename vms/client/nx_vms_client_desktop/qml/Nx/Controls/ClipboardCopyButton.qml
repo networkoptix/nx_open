@@ -3,9 +3,9 @@
 import QtQuick
 import QtQuick.Window
 
-import Nx
 import Nx.Controls
 import Nx.Core
+import Nx.Core.Controls
 
 import nx.vms.client.desktop
 

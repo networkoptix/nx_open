@@ -5,6 +5,7 @@
 #include <QtCore/QObject>
 
 #include <nx/utils/impl_ptr.h>
+#include <nx/utils/log/assert.h>
 #include <nx/utils/uuid.h>
 
 #include "system_context_aware.h" //< Forward declarations.
@@ -81,6 +82,16 @@ public:
      */
     SystemContext(Mode mode, nx::Uuid peerId, QObject* parent = nullptr);
     virtual ~SystemContext();
+
+    template<typename Target>
+    Target* as()
+    {
+        if (const auto result = qobject_cast<Target*>(this))
+            return result;
+
+        NX_ASSERT(false, "Can't cast system context.");
+        return nullptr;
+    }
 
     /**
      * Id of the current peer in the Message Bus. It is persistent and is not changed between the
@@ -251,7 +262,9 @@ public:
 protected:
     virtual void setMessageProcessor(QnCommonMessageProcessor* messageProcessor);
 
-protected:
+    Mode mode() const;
+
+private:
     struct Private;
     nx::utils::ImplPtr<Private> d;
 };

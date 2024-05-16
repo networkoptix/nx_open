@@ -3,7 +3,7 @@
 #include "resource_factory.h"
 
 #include <core/resource/client_camera.h>
-#include <core/resource/client_storage_resource.h>
+#include <nx/vms/client/core/resource/client_storage_resource.h>
 #include <nx/vms/api/data/analytics_data.h>
 #include <nx/vms/api/data/media_server_data.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>

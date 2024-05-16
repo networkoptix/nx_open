@@ -32,12 +32,12 @@ QSize ProxyImageProvider::sizeHint() const
     return m_sizeHint;
 }
 
-Qn::ThumbnailStatus ProxyImageProvider::status() const
+core::ThumbnailStatus ProxyImageProvider::status() const
 {
     return m_status;
 }
 
-ImageProvider* ProxyImageProvider::sourceProvider() const
+core::ImageProvider* ProxyImageProvider::sourceProvider() const
 {
     return m_sourceProvider;
 }
@@ -70,7 +70,7 @@ void ProxyImageProvider::setSourceProvider(ImageProvider* sourceProvider)
     }
     else
     {
-        setStatus(Qn::ThumbnailStatus::Invalid);
+        setStatus(core::ThumbnailStatus::Invalid);
         setSizeHint(QSize());
         setImage(QImage());
     }
@@ -112,7 +112,7 @@ void ProxyImageProvider::doLoadAsync()
         m_sourceProvider->loadAsync();
 }
 
-void ProxyImageProvider::setStatus(Qn::ThumbnailStatus status)
+void ProxyImageProvider::setStatus(core::ThumbnailStatus status)
 {
     if (m_status == status)
         return;

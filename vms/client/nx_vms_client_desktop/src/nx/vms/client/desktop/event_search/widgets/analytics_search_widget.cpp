@@ -45,23 +45,27 @@
 #include <nx/vms/client/core/skin/icon.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/utils/qml_helpers.h>
-#include <nx/vms/client/desktop/analytics/analytics_taxonomy_manager.h>
-#include <nx/vms/client/desktop/analytics/taxonomy/object_type.h>
+#include <nx/vms/client/core/analytics/analytics_icon_manager.h>
+#include <nx/vms/client/core/analytics/analytics_taxonomy_manager.h>
+#include <nx/vms/client/core/analytics/taxonomy/object_type.h>
+#include <nx/vms/client/core/event_search/utils/analytics_search_setup.h>
 #include <nx/vms/client/desktop/common/dialogs/web_view_dialog.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/common/widgets/item_model_menu.h>
 #include <nx/vms/client/desktop/common/widgets/selectable_text_button.h>
 #include <nx/vms/client/desktop/event_rules/models/detectable_object_type_model.h>
 #include <nx/vms/client/desktop/event_search/models/analytics_search_list_model.h>
-#include <nx/vms/client/desktop/event_search/utils/analytics_search_setup.h>
 #include <nx/vms/client/desktop/event_search/utils/common_object_search_setup.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_ribbon.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/qml_property.h>
 #include <nx/vms/client/desktop/utils/widget_utils.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <ui/dialogs/common/message_box.h>
+#include <ui/workbench/workbench_context.h>
 #include <utils/common/event_processors.h>
 
 namespace nx::vms::client::desktop {
@@ -78,8 +82,8 @@ NX_DECLARE_COLORIZED_ICON(kFrameIcon, "20x20/Outline/frame.svg", kThemeSubstitut
 NX_DECLARE_COLORIZED_ICON(kPluginsIcon, "20x20/Outline/plugins.svg", kThemeSubstitutions)
 using namespace std::chrono;
 using namespace nx::analytics::taxonomy;
-using namespace nx::vms::client::desktop::analytics;
-using namespace analytics::taxonomy;
+using namespace nx::vms::client::core::analytics;
+using namespace core::analytics::taxonomy;
 
 using nx::vms::client::core::AccessController;
 
@@ -98,7 +102,7 @@ public:
     void updateTaxonomyIfNeeded();
     std::vector<AbstractEngine*> engines() const;
 
-    AnalyticsSearchSetup* analyticsSetup() const { return m_analyticsSetup.get(); }
+    core::AnalyticsSearchSetup* analyticsSetup() const { return m_analyticsSetup.get(); }
 
 public:
     const QPointer<TaxonomyManager> taxonomyManager;
@@ -128,7 +132,8 @@ private:
 
 private:
     AnalyticsSearchListModel* const m_model = qobject_cast<AnalyticsSearchListModel*>(q->model());
-    std::unique_ptr<AnalyticsSearchSetup> m_analyticsSetup{new AnalyticsSearchSetup(m_model)};
+    std::unique_ptr<core::AnalyticsSearchSetup> m_analyticsSetup{
+        new core::AnalyticsSearchSetup(m_model)};
     SelectableTextButton* const m_areaSelectionButton;
     SelectableTextButton* const m_engineSelectionButton;
     SelectableTextButton* const m_typeSelectionButton;
@@ -145,23 +150,23 @@ private:
 // AnalyticsSearchWidget
 
 AnalyticsSearchWidget::AnalyticsSearchWidget(WindowContext* context, QWidget* parent):
-    base_type(context, new AnalyticsSearchListModel(context), parent),
+    base_type(context, new AnalyticsSearchListModel(context->system()), parent),
     d(new Private(this))
 {
     setRelevantControls(Control::defaults | Control::footersToggler);
     setPlaceholderPixmap(qnSkin->pixmap("left_panel/placeholders/objects.svg"));
-    commonSetup()->setCameraSelection(RightPanel::CameraSelection::layout);
+    commonSetup()->setCameraSelection(core::EventSearch::CameraSelection::layout);
 
     addSearchAction(action(menu::OpenAdvancedSearchDialog));
     setSearchDelay(milliseconds(ini().analyticsSearchRequestDelayMs));
 
-    connect(model(), &AbstractSearchListModel::isOnlineChanged, this,
+    connect(model(), &core::AbstractSearchListModel::isOnlineChanged, this,
         &AnalyticsSearchWidget::updateAllowance);
 
     connect(action(menu::ObjectSearchModeAction), &QAction::toggled, this,
         [this](bool on)
         {
-            if (!on && commonSetup()->cameraSelection() == RightPanel::CameraSelection::current)
+            if (!on && commonSetup()->cameraSelection() == core::EventSearch::CameraSelection::current)
                 resetFilters();
         });
 
@@ -176,11 +181,11 @@ AnalyticsSearchWidget::~AnalyticsSearchWidget()
 void AnalyticsSearchWidget::resetFilters()
 {
     base_type::resetFilters();
-    commonSetup()->setCameraSelection(RightPanel::CameraSelection::layout);
+    commonSetup()->setCameraSelection(core::EventSearch::CameraSelection::layout);
     d->resetFilters();
 }
 
-AnalyticsSearchSetup* AnalyticsSearchWidget::analyticsSetup() const
+core::AnalyticsSearchSetup* AnalyticsSearchWidget::analyticsSetup() const
 {
     return d->analyticsSetup();
 }
@@ -217,7 +222,7 @@ AnalyticsSearchWidget::Private::Private(AnalyticsSearchWidget* q):
     m_areaSelectionButton(q->createCustomFilterButton()),
     m_engineSelectionButton(q->createCustomFilterButton()),
     m_typeSelectionButton(q->createCustomFilterButton()),
-    m_filterModel(new analytics::taxonomy::AnalyticsFilterModel(taxonomyManager, this)),
+    m_filterModel(new AnalyticsFilterModel(taxonomyManager, this)),
     m_objectTypeModel(new DetectableObjectTypeModel(m_filterModel, this)),
     m_engineMenu(q->createDropdownMenu()),
     m_objectTypeMenu(new ItemModelMenu(q))
@@ -250,20 +255,22 @@ AnalyticsSearchWidget::Private::Private(AnalyticsSearchWidget* q):
     setupAreaSelection();
     setupDeviceSelection();
 
-    connect(analyticsSetup(), &AnalyticsSearchSetup::attributeFiltersChanged,
+    connect(analyticsSetup(), &core::AnalyticsSearchSetup::attributeFiltersChanged,
         this, &Private::updateTypeButton);
 
     connect(m_filterModel, &AnalyticsFilterModel::objectTypesChanged,
         this, &Private::updateTypeButton);
 
-    connect(analyticsSetup(), &AnalyticsSearchSetup::ensureVisibleRequested,
+    connect(analyticsSetup(), &core::AnalyticsSearchSetup::ensureVisibleRequested,
         this, &Private::ensureVisibleAndFetchIfNeeded);
 
     connect(m_model, &AnalyticsSearchListModel::pluginActionRequested,
         q->view(), &EventRibbon::pluginActionRequested);
+    connect(m_filterModel, &AnalyticsFilterModel::enginesChanged,
+        q, &AnalyticsSearchWidget::updateAllowance);
 
-    connect(m_model, &AnalyticsSearchListModel::fetchFinished, this,
-        [this](RightPanel::FetchResult result)
+    connect(m_model, &core::AnalyticsSearchListModel::fetchFinished, this,
+        [this](core::EventSearch::FetchResult result)
         {
             if (!m_ensureVisibleRequest)
                 return;
@@ -271,8 +278,8 @@ AnalyticsSearchWidget::Private::Private(AnalyticsSearchWidget* q):
             const auto request = *m_ensureVisibleRequest;
             m_ensureVisibleRequest = std::nullopt;
 
-            if (result != RightPanel::FetchResult::cancelled
-                && result != RightPanel::FetchResult::failed)
+            if (result != core::EventSearch::FetchResult::cancelled
+                && result != core::EventSearch::FetchResult::failed)
             {
                 ensureVisible(request.first, request.second);
             }
@@ -299,7 +306,7 @@ void AnalyticsSearchWidget::Private::setupEngineSelection()
                 m_analyticsSetup->setEngine({});
         });
 
-    connect(m_analyticsSetup.get(), &AnalyticsSearchSetup::engineChanged, this,
+    connect(m_analyticsSetup.get(), &core::AnalyticsSearchSetup::engineChanged, this,
         [this]()
         {
             const auto engine = engineById(m_analyticsSetup->engine());
@@ -339,7 +346,7 @@ void AnalyticsSearchWidget::Private::setupTypeSelection()
                 m_analyticsSetup->setObjectTypes({});
         });
 
-    connect(m_analyticsSetup.get(), &AnalyticsSearchSetup::objectTypesChanged,
+    connect(m_analyticsSetup.get(), &core::AnalyticsSearchSetup::objectTypesChanged,
         this, &Private::updateTypeButton);
 }
 
@@ -443,17 +450,17 @@ void AnalyticsSearchWidget::Private::setupAreaSelection()
     connect(m_areaSelectionButton, &SelectableTextButton::clicked, this,
         [this]()
         {
-            q->commonSetup()->setCameraSelection(RightPanel::CameraSelection::current);
+            q->commonSetup()->setCameraSelection(core::EventSearch::CameraSelection::current);
             m_analyticsSetup->setAreaSelectionActive(true);
         });
 
-    connect(m_analyticsSetup.get(), &AnalyticsSearchSetup::areaEnabledChanged,
+    connect(m_analyticsSetup.get(), &core::AnalyticsSearchSetup::areaEnabledChanged,
         this, &Private::updateAreaButtonAppearance);
 
-    connect(m_analyticsSetup.get(), &AnalyticsSearchSetup::areaChanged,
+    connect(m_analyticsSetup.get(), &core::AnalyticsSearchSetup::areaChanged,
         this, &Private::updateAreaButtonAppearance);
 
-    connect(m_analyticsSetup.get(), &AnalyticsSearchSetup::areaSelectionActiveChanged,
+    connect(m_analyticsSetup.get(), &core::AnalyticsSearchSetup::areaSelectionActiveChanged,
         this, &Private::updateAreaButtonAppearance);
 }
 
@@ -529,7 +536,7 @@ void AnalyticsSearchWidget::Private::ensureVisibleAndFetchIfNeeded(
 
     m_model->cancelFetch();
     m_ensureVisibleRequest = std::make_pair(timestamp, trackId);
-    m_model->fetchWindow(proposedTimeWindow);
+    m_model->fetchData({core::EventSearch::FetchDirection::newer, timestamp});
 }
 
 bool AnalyticsSearchWidget::Private::ensureVisible(milliseconds timestamp, const nx::Uuid& trackId)
@@ -538,7 +545,7 @@ bool AnalyticsSearchWidget::Private::ensureVisible(milliseconds timestamp, const
     for (int row = range.first; row < range.second; ++row)
     {
         const auto currentIndex = m_model->index(row);
-        if (currentIndex.data(Qn::ObjectTrackIdRole).value<nx::Uuid>() == trackId)
+        if (currentIndex.data(core::ObjectTrackIdRole).value<nx::Uuid>() == trackId)
         {
             q->view()->ensureVisible(row);
             return true;

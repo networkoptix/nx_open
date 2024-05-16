@@ -5,6 +5,7 @@ import QtQuick
 import Nx
 import Nx.Controls
 
+import nx.vms.client.core
 import nx.vms.client.desktop
 
 import "private"

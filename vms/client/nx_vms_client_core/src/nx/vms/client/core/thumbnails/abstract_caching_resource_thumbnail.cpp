@@ -68,4 +68,5 @@ QString AbstractCachingResourceThumbnail::thumbnailId() const
     return nx::format("%1:%2").args(resourceId, maximumSize());
 }
 
+
 } // namespace nx::vms::client::core

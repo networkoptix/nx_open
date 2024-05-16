@@ -11,20 +11,22 @@
 #include <nx/reflect/json/deserializer.h>
 #include <nx/reflect/json/serializer.h>
 #include <nx/vms/api/analytics/descriptors.h>
-#include <nx/vms/client/desktop/analytics/taxonomy/abstract_state_view_filter.h>
-#include <nx/vms/client/desktop/analytics/taxonomy/attribute.h>
-#include <nx/vms/client/desktop/analytics/taxonomy/attribute_condition_state_view_filter.h>
-#include <nx/vms/client/desktop/analytics/taxonomy/attribute_set.h>
-#include <nx/vms/client/desktop/analytics/taxonomy/color_set.h>
-#include <nx/vms/client/desktop/analytics/taxonomy/enumeration.h>
-#include <nx/vms/client/desktop/analytics/taxonomy/object_type.h>
-#include <nx/vms/client/desktop/analytics/taxonomy/state_view.h>
-#include <nx/vms/client/desktop/analytics/taxonomy/state_view_builder.h>
+#include <nx/vms/client/core/analytics/taxonomy/abstract_state_view_filter.h>
+#include <nx/vms/client/core/analytics/taxonomy/attribute.h>
+#include <nx/vms/client/core/analytics/taxonomy/attribute_condition_state_view_filter.h>
+#include <nx/vms/client/core/analytics/taxonomy/attribute_set.h>
+#include <nx/vms/client/core/analytics/taxonomy/color_set.h>
+#include <nx/vms/client/core/analytics/taxonomy/enumeration.h>
+#include <nx/vms/client/core/analytics/taxonomy/object_type.h>
+#include <nx/vms/client/core/analytics/taxonomy/state_view.h>
+#include <nx/vms/client/core/analytics/taxonomy/state_view_builder.h>
 #include <nx/vms/client/desktop/analytics/taxonomy/test_support/test_resource_support_proxy.h>
 
 using nx::analytics::taxonomy::AbstractResourceSupportProxy;
 
 namespace nx::vms::client::desktop::analytics::taxonomy {
+
+using namespace nx::vms::client::core::analytics::taxonomy;
 
 struct ExpectedColorItem
 {

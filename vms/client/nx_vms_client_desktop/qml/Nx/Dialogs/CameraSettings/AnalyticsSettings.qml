@@ -3,7 +3,6 @@
 import QtQuick
 import QtQuick.Layouts
 
-import Nx
 import Nx.Common
 import Nx.Controls
 import Nx.Controls.NavigationMenu

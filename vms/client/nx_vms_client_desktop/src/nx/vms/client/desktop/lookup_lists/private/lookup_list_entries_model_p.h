@@ -17,7 +17,7 @@ public:
     std::optional<std::vector<int>> rowsIndexesToShow;
     QMap<QString, Validator> validatorByAttributeName;
     std::map<QString, Formatter> formatterByAttributeName;
-    analytics::taxonomy::StateView* taxonomy;
+    core::analytics::taxonomy::StateView* taxonomy;
 
     void initAttributeFunctions();
     static bool intValidator(const QString& value);

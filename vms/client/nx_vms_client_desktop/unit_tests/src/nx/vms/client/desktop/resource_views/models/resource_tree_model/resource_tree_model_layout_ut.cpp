@@ -8,8 +8,9 @@
 #include <core/resource/videowall_matrix.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/api/data/user_group_data.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
@@ -223,7 +224,7 @@ TEST_F(ResourceTreeModelTest, layoutProvidesResource)
     const auto layoutIndex = uniqueMatchingIndex(kUniqueLayoutNameCondition);
 
     // And that node provides pointer to the layout resource.
-    ASSERT_TRUE(dataMatch(Qn::ResourceRole, QVariant::fromValue<QnResourcePtr>(layout))(
+    ASSERT_TRUE(dataMatch(core::ResourceRole, QVariant::fromValue<QnResourcePtr>(layout))(
         layoutIndex));
 }
 

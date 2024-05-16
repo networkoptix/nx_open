@@ -76,7 +76,7 @@ private:
     /** Calculate items from the review layout. */
     bool fillShowreelItems(nx::vms::api::ShowreelItemDataList* items);
 
-    void handleItemDataChanged(const nx::Uuid& id, Qn::ItemDataRole role, const QVariant& data);
+    void handleItemDataChanged(const nx::Uuid& id, int role, const QVariant& data);
 
 // Actions handlers
 private:

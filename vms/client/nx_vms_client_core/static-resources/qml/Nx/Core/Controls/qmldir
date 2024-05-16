@@ -1,0 +1,11 @@
+module Nx.Core.Controls
+
+ScalableContentHolder 1.0 ScalableContentHolder.qml
+RefreshIndicator 1.0 RefreshIndicator.qml
+SpinnerBusyIndicator 1.0 SpinnerBusyIndicator.qml
+NameValueTable 1.0 NameValueTable.qml
+IconImage 1.0 IconImage.qml
+NxDotPreloader 1.0 NxDotPreloader.qml
+Preview 1.0 Preview.qml
+RectangularMask 1.0 RectangularMask.qml
+ColoredImage 1.0 ColoredImage.qml

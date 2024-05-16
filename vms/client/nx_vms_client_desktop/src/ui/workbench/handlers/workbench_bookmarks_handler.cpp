@@ -43,6 +43,7 @@
 
 using std::chrono::microseconds;
 
+using namespace nx::vms::client::core;
 using namespace nx::vms::client::desktop;
 
 struct QnWorkbenchBookmarksHandler::Private
@@ -72,7 +73,7 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = nu
         [this](const QnCameraBookmark &bookmark) -> menu::Parameters
         {
             return navigator()->currentParameters(menu::TimelineScope)
-                .withArgument(Qn::CameraBookmarkRole, bookmark);
+                .withArgument(CameraBookmarkRole, bookmark);
         };
 
     const QPointer<QnBookmarksViewer> bookmarksViewer(navigator()->timeSlider()->bookmarksViewer());
@@ -124,7 +125,7 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = nu
         {
             statisticsModule()->controls()->registerClick("bookmark_tooltip_tag");
             menu()->triggerIfPossible(menu::OpenBookmarksSearchAction,
-                menu::Parameters().withArgument(Qn::BookmarkTagRole, tag));
+                menu::Parameters().withArgument(BookmarkTagRole, tag));
         });
 }
 
@@ -163,7 +164,8 @@ void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered()
     if (!bookmark.isValid())
         return;
 
-    SystemContext::fromResource(camera)->cameraBookmarksManager()->addCameraBookmark(bookmark);
+    const auto context = nx::vms::client::core::SystemContext::fromResource(camera);
+    context->cameraBookmarksManager()->addCameraBookmark(bookmark);
 
     action(menu::BookmarksModeAction)->setChecked(true);
 }
@@ -176,7 +178,7 @@ void QnWorkbenchBookmarksHandler::at_editCameraBookmarkAction_triggered()
     if (!camera || !camera->systemContext())
         return;
 
-    QnCameraBookmark bookmark = parameters.argument<QnCameraBookmark>(Qn::CameraBookmarkRole);
+    QnCameraBookmark bookmark = parameters.argument<QnCameraBookmark>(CameraBookmarkRole);
 
     QnMediaServerResourcePtr server = cameraHistoryPool()->getMediaServerOnTime(camera,
         bookmark.startTimeMs.count());
@@ -195,7 +197,8 @@ void QnWorkbenchBookmarksHandler::at_editCameraBookmarkAction_triggered()
         return;
     dialog->submitData(bookmark);
 
-    SystemContext::fromResource(camera)->cameraBookmarksManager()->updateCameraBookmark(bookmark);
+    const auto context = nx::vms::client::core::SystemContext::fromResource(camera);
+    context->cameraBookmarksManager()->updateCameraBookmark(bookmark);
 }
 
 void QnWorkbenchBookmarksHandler::at_removeCameraBookmarkAction_triggered()
@@ -206,7 +209,7 @@ void QnWorkbenchBookmarksHandler::at_removeCameraBookmarkAction_triggered()
     if (!camera || !camera->systemContext())
         return;
 
-    QnCameraBookmark bookmark = parameters.argument<QnCameraBookmark>(Qn::CameraBookmarkRole);
+    QnCameraBookmark bookmark = parameters.argument<QnCameraBookmark>(CameraBookmarkRole);
 
     QnMessageBox dialog(QnMessageBoxIcon::Question,
         tr("Delete bookmark?"), bookmark.name.trimmed(),
@@ -218,8 +221,8 @@ void QnWorkbenchBookmarksHandler::at_removeCameraBookmarkAction_triggered()
     if (dialog.exec() == QDialogButtonBox::Cancel)
         return;
 
-    SystemContext::fromResource(camera)->cameraBookmarksManager()->deleteCameraBookmark(
-        bookmark.guid);
+    const auto context = nx::vms::client::core::SystemContext::fromResource(camera);
+    context->cameraBookmarksManager()->deleteCameraBookmark(bookmark.guid);
 }
 
 void QnWorkbenchBookmarksHandler::at_removeBookmarksAction_triggered()
@@ -227,7 +230,7 @@ void QnWorkbenchBookmarksHandler::at_removeBookmarksAction_triggered()
     const auto parameters = menu()->currentParameters(sender());
 
     QnCameraBookmarkList bookmarks = parameters.argument<QnCameraBookmarkList>(Qn::CameraBookmarkListRole);
-    if (bookmarks.isEmpty())
+    if (bookmarks.empty())
         return;
 
     const auto parent = utils::extractParentWidget(parameters, mainWindowWidget());
@@ -242,7 +245,8 @@ void QnWorkbenchBookmarksHandler::at_removeBookmarksAction_triggered()
         return;
 
     // FIXME: #sivanov Actual system context probably should be linked to the bookmarks.
-    auto bookmarksManager = appContext()->currentSystemContext()->cameraBookmarksManager();
+    const auto context = nx::vms::client::desktop::appContext()->currentSystemContext();
+    const auto bookmarksManager = context->cameraBookmarksManager();
     for (const auto& bookmark: bookmarks)
         bookmarksManager->deleteCameraBookmark(bookmark.guid);
 }

@@ -155,7 +155,7 @@ namespace nx::vms::client::core {
 class SvgIconColorerTest: public testing::Test
 {
 public:
-    std::unique_ptr<SvgIconColorer> m_colorer;
+    std::unique_ptr<core::SvgIconColorer> m_colorer;
 
 protected:
     // virtual void SetUp() will be called before each test is run.
@@ -188,7 +188,7 @@ protected:
     }
 
 private:
-    std::unique_ptr<ColorTheme> m_colorTheme;
+    std::unique_ptr<core::ColorTheme> m_colorTheme;
 };
 
 TEST_F(SvgIconColorerTest, checkNormalIcon)

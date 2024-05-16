@@ -8,13 +8,13 @@
 #include <nx/analytics/taxonomy/abstract_state_watcher.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/range_adapters.h>
-#include <nx/vms/client/desktop/analytics/analytics_filter_model.h>
-#include <nx/vms/client/desktop/analytics/taxonomy/object_type.h>
+#include <nx/vms/client/core/analytics/analytics_filter_model.h>
+#include <nx/vms/client/core/analytics/taxonomy/object_type.h>
 
 namespace nx::vms::client::desktop {
 
 using namespace nx::analytics::taxonomy;
-using namespace nx::vms::client::desktop::analytics::taxonomy;
+using namespace nx::vms::client::core::analytics::taxonomy;
 
 class DetectableObjectTypeModel::Private
 {
@@ -25,7 +25,7 @@ public:
         int indexInParent = -1;
     };
 
-    Private(DetectableObjectTypeModel* q, analytics::taxonomy::AnalyticsFilterModel* filterModel):
+    Private(DetectableObjectTypeModel* q, core::analytics::taxonomy::AnalyticsFilterModel* filterModel):
         q(q),
         filterModel(filterModel)
     {
@@ -70,7 +70,7 @@ public:
 };
 
 DetectableObjectTypeModel::DetectableObjectTypeModel(
-    analytics::taxonomy::AnalyticsFilterModel* filterModel,
+    core::analytics::taxonomy::AnalyticsFilterModel* filterModel,
     QObject* parent)
     :
     base_type(parent),

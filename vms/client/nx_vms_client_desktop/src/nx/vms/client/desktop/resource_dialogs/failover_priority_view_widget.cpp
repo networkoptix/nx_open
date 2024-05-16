@@ -67,7 +67,7 @@ FailoverPriorityViewWidget::FailoverPriorityViewWidget(QWidget* parent):
             if (const auto parentIndex = index.parent(); parentIndex.isValid())
             {
                 const auto parentResource =
-                    parentIndex.data(Qn::ResourceRole).value<QnResourcePtr>();
+                    parentIndex.data(core::ResourceRole).value<QnResourcePtr>();
                 if (parentResource && parentResource->hasFlags(Qn::server))
                     return true;
             }

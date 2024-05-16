@@ -3,9 +3,8 @@
 import QtQuick
 import QtQuick.Controls
 
-import Nx
 import Nx.Core
-import Nx.Controls as Nx
+import Nx.Core.Controls
 
 import nx.vms.client.core
 import nx.vms.client.core
@@ -31,7 +30,7 @@ Button
 
     contentItem: Item
     {
-        Nx.ColoredImage
+        ColoredImage
         {
             id: stateIcon
 

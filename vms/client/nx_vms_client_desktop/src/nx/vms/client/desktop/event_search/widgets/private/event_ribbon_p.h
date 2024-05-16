@@ -21,8 +21,8 @@
 #include <nx/utils/pending_operation.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/scoped_connections.h>
-#include <nx/vms/client/desktop/common/utils/volatile_unique_ptr.h>
-#include <nx/vms/client/desktop/image_providers/resource_thumbnail_provider.h>
+#include <nx/vms/client/core/common/utils/volatile_unique_ptr.h>
+#include <nx/vms/client/core/image_providers/resource_thumbnail_provider.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <ui/common/notification_levels.h>
 
@@ -124,10 +124,11 @@ private:
 
     void closeExpiredTiles();
 
-    ResourceThumbnailProvider* createPreviewProvider(const nx::api::ResourceImageRequest& request);
+    core::ResourceThumbnailProvider* createPreviewProvider(
+        const nx::api::ResourceImageRequest& request);
     void loadNextPreview();
-    bool isNextPreviewLoadAllowed(const ResourceThumbnailProvider* provider) const;
-    void handleLoadingEnded(ResourceThumbnailProvider* provider); //< Provider may be destroying.
+    bool isNextPreviewLoadAllowed(const core::ResourceThumbnailProvider* provider) const;
+    void handleLoadingEnded(core::ResourceThumbnailProvider* provider); //< Provider may be destroying.
 
     int scrollValue() const;
     int totalTopMargin() const; //< Top margin and viewport header.
@@ -150,7 +151,7 @@ private:
     using Importance = QnNotificationLevel::Value;
     static constexpr int kApproximateTileHeight = 48;
 
-    using AnimationPtr = VolatileUniquePtr<QVariantAnimation>;
+    using AnimationPtr = core::VolatileUniquePtr<QVariantAnimation>;
 
     struct Tile
     {
@@ -158,7 +159,7 @@ private:
         int position = 0; //< Positions start from 0, without top margin & viewport header.
         Importance importance = Importance();
         bool animated = false;
-        std::unique_ptr<ResourceThumbnailProvider> preview;
+        std::unique_ptr<core::ResourceThumbnailProvider> preview;
         std::unique_ptr<EventTile> widget;
         bool dummy = false; //< Whether the tile doesn't contain payload (e.g. separator).
 
@@ -234,9 +235,9 @@ private:
         int loadingCounter = 0;
     };
 
-    QHash<ResourceThumbnailProvider*, PreviewLoadData> m_loadingByProvider;
+    QHash<core::ResourceThumbnailProvider*, PreviewLoadData> m_loadingByProvider;
     QHash<QnMediaServerResourcePtr, ServerLoadData> m_loadingByServer;
-    ResourceThumbnailProvider* m_providerLoadingFromCache = nullptr;
+    core::ResourceThumbnailProvider* m_providerLoadingFromCache = nullptr;
     nx::utils::ImplPtr<nx::utils::PendingOperation> m_layoutUpdate;
     const std::unique_ptr<QObject> m_hoverWatcher;
 };

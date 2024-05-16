@@ -3,9 +3,9 @@
 import QtQuick
 import QtQuick.Controls
 
-import Nx
 import Nx.Controls
 import Nx.Core
+import Nx.Core.Items
 import Nx.Items
 
 import nx.vms.client.core

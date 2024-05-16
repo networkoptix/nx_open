@@ -27,7 +27,7 @@
 #include <ui/models/resource/resource_list_model.h>
 #include <ui/models/server_addresses_model.h>
 #include <utils/common/event_processors.h>
-
+using namespace nx::vms::client::core;
 using namespace nx::vms::client::desktop;
 
 namespace {
@@ -533,7 +533,8 @@ void QnRoutingManagementWidget::at_serversView_currentIndexChanged(const QModelI
 
     updateFromModel();
 
-    QnMediaServerResourcePtr server = current.data(Qn::ResourceRole).value<QnResourcePtr>().dynamicCast<QnMediaServerResource>();
+    QnMediaServerResourcePtr server =
+        current.data(ResourceRole).value<QnResourcePtr>().dynamicCast<QnMediaServerResource>();
     if (server == m_server)
         return;
 

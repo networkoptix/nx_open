@@ -13,14 +13,14 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/math/math.h>
+#include <nx/vms/client/core/image_providers/camera_thumbnail_manager.h>
+#include <nx/vms/client/core/image_providers/camera_thumbnail_provider.h>
+#include <nx/vms/client/core/image_providers/image_provider.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/common/widgets/autoscaled_plain_text.h>
 #include <nx/vms/client/desktop/common/widgets/busy_indicator.h>
-#include <nx/vms/client/desktop/image_providers/camera_thumbnail_manager.h>
-#include <nx/vms/client/desktop/image_providers/camera_thumbnail_provider.h>
-#include <nx/vms/client/desktop/image_providers/image_provider.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <ui/common/palette.h>
@@ -104,12 +104,12 @@ AsyncImageWidget::~AsyncImageWidget()
 {
 }
 
-ImageProvider* AsyncImageWidget::imageProvider() const
+core::ImageProvider* AsyncImageWidget::imageProvider() const
 {
     return m_imageProvider.data();
 }
 
-void AsyncImageWidget::setImageProvider(ImageProvider* provider)
+void AsyncImageWidget::setImageProvider(core::ImageProvider* provider)
 {
     if (m_imageProvider == provider)
         return;
@@ -118,29 +118,31 @@ void AsyncImageWidget::setImageProvider(ImageProvider* provider)
         m_imageProvider->disconnect(this);
 
     m_imageProvider = provider;
-    m_previousStatus = Qn::ThumbnailStatus::Invalid;
+    m_previousStatus = core::ThumbnailStatus::Invalid;
 
     if (m_imageProvider)
     {
-        connect(m_imageProvider, &ImageProvider::imageChanged, this,
+        connect(m_imageProvider, &core::ImageProvider::imageChanged, this,
             &AsyncImageWidget::updateCache);
 
-        connect(m_imageProvider, &ImageProvider::statusChanged, this,
+        connect(m_imageProvider, &core::ImageProvider::statusChanged, this,
             &AsyncImageWidget::updateThumbnailStatus);
 
-        connect(m_imageProvider, &ImageProvider::sizeHintChanged, this,
+        connect(m_imageProvider, &core::ImageProvider::sizeHintChanged, this,
             &AsyncImageWidget::updateCache);
 
         connect(m_imageProvider, &QObject::destroyed, this,
             [this]
             {
                 updateCache();
-                updateThumbnailStatus(Qn::ThumbnailStatus::Invalid);
+                updateThumbnailStatus(core::ThumbnailStatus::Invalid);
             });
     }
 
     updateCache();
-    updateThumbnailStatus(m_imageProvider ? m_imageProvider->status() : Qn::ThumbnailStatus::Invalid);
+    updateThumbnailStatus(m_imageProvider
+        ? m_imageProvider->status()
+        : core::ThumbnailStatus::Invalid);
     invalidateGeometry();
 }
 
@@ -503,7 +505,7 @@ void AsyncImageWidget::updateCache()
         m_preview = QPixmap::fromImage(m_previewImage);
 
     m_forceNoCrop = QnLexical::deserialized<bool>(
-        m_previewImage.text(CameraThumbnailProvider::kFrameFromPluginKey));
+        m_previewImage.text(core::CameraThumbnailProvider::kFrameFromPluginKey));
 
     // Update geometry if we got new sizeHint value (probably due to new image).
     const QSize oldSizeHint = m_cachedSizeHint;
@@ -514,7 +516,7 @@ void AsyncImageWidget::updateCache()
     update();
 }
 
-void AsyncImageWidget::updateThumbnailStatus(Qn::ThumbnailStatus status)
+void AsyncImageWidget::updateThumbnailStatus(core::ThumbnailStatus status)
 {
     if (m_forceLoadingIndicator)
     {
@@ -530,25 +532,25 @@ void AsyncImageWidget::updateThumbnailStatus(Qn::ThumbnailStatus status)
     {
         switch (status)
         {
-            case Qn::ThumbnailStatus::Loaded:
+            case core::ThumbnailStatus::Loaded:
                 setLoadingIndicationVisible(false);
                 m_placeholder->hide();
                 break;
 
-            case Qn::ThumbnailStatus::Loading:
+            case core::ThumbnailStatus::Loading:
                 setLoadingIndicationVisible(true);
                 m_placeholder->hide();
                 break;
 
-            case Qn::ThumbnailStatus::Refreshing:
+            case core::ThumbnailStatus::Refreshing:
                 break;
 
-            case Qn::ThumbnailStatus::Invalid:
+            case core::ThumbnailStatus::Invalid:
                 setLoadingIndicationVisible(kShowLoadingIndicationInInitialState);
                 m_placeholder->hide();
                 break;
 
-            case Qn::ThumbnailStatus::NoData:
+            case core::ThumbnailStatus::NoData:
                 setLoadingIndicationVisible(false);
                 m_placeholder->show();
                 break;

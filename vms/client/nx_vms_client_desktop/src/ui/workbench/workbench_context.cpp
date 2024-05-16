@@ -8,6 +8,7 @@
 #include <client/client_runtime_settings.h>
 #include <core/resource/user_resource.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/client/core/thumbnails/resource_id_thumbnail.h>
 #include <nx/vms/client/core/thumbnails/thumbnail_cache.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/desktop/access/caching_access_controller.h>
@@ -24,7 +25,6 @@
 #include <nx/vms/client/desktop/system_update/server_update_tool.h>
 #include <nx/vms/client/desktop/system_update/workbench_update_watcher.h>
 #include <nx/vms/client/desktop/thumbnails/live_camera_thumbnail.h>
-#include <nx/vms/client/desktop/thumbnails/resource_id_thumbnail.h>
 #include <nx/vms/client/desktop/workbench/extensions/local_notifications_manager.h>
 #include <nx/vms/client/desktop/workbench/managers/settings_dialog_manager.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
@@ -55,7 +55,7 @@ QnWorkbenchContext::QnWorkbenchContext(
         [this](const QnUserResourcePtr& user)
         {
             LiveCameraThumbnail::thumbnailCache()->clear();
-            ResourceIdentificationThumbnail::thumbnailCache()->clear();
+            nx::vms::client::core::ResourceIdentificationThumbnail::thumbnailCache()->clear();
             emit userChanged(user);
         });
 

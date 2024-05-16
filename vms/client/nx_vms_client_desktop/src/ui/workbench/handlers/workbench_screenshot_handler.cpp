@@ -22,12 +22,12 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/core/transcoding/filters/legacy_transcoding_settings.h>
 #include <nx/utils/string.h>
+#include <nx/vms/client/core/image_providers/camera_thumbnail_provider.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/dialogs/progress_dialog.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
-#include <nx/vms/client/desktop/image_providers/camera_thumbnail_provider.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
@@ -43,6 +43,8 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
 
+using nx::vms::client::core::ImageProvider;
+using nx::vms::client::core::ThumbnailStatus;
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::api;
 
@@ -194,10 +196,10 @@ QSize QnScreenshotLoader::sizeHint() const
     return m_baseProvider->sizeHint();
 }
 
-Qn::ThumbnailStatus QnScreenshotLoader::status() const
+ThumbnailStatus QnScreenshotLoader::status() const
 {
     if (!m_baseProvider)
-        return Qn::ThumbnailStatus::Invalid;
+        return ThumbnailStatus::Invalid;
     return m_baseProvider->status();
 }
 
@@ -270,7 +272,7 @@ ImageProvider* QnWorkbenchScreenshotHandler::getLocalScreenshotProvider(QnMediaR
     if (screenshot.isNull())
         return nullptr;
 
-    return new BasicImageProvider(screenshot);
+    return new nx::vms::client::core::BasicImageProvider(screenshot);
 }
 
 void QnWorkbenchScreenshotHandler::takeDebugScreenshotsSet(QnMediaResourceWidget *widget) {
@@ -749,7 +751,7 @@ void QnWorkbenchScreenshotHandler::takeScreenshot(QnMediaResourceWidget *widget,
 
             request.timestampMs = localParameters.utcTimestamp;
 
-            imageProvider = new nx::vms::client::desktop::CameraThumbnailProvider(request);
+            imageProvider = new nx::vms::client::core::CameraThumbnailProvider(request);
         }
         else
             imageProvider = getLocalScreenshotProvider(widget, localParameters, true);

@@ -8,7 +8,7 @@
 
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/api/data/lookup_list_data.h>
-#include <nx/vms/client/desktop/analytics/taxonomy/state_view.h>
+#include <nx/vms/client/core/analytics/taxonomy/state_view.h>
 
 #include "lookup_list_model.h"
 
@@ -27,7 +27,7 @@ class NX_VMS_CLIENT_DESKTOP_API LookupListEntriesModel: public QAbstractTableMod
         READ rowCount
         NOTIFY rowCountChanged);
 
-    Q_PROPERTY(analytics::taxonomy::StateView* taxonomy
+    Q_PROPERTY(core::analytics::taxonomy::StateView* taxonomy
         READ taxonomy
         WRITE setTaxonomy
         NOTIFY taxonomyChanged)
@@ -69,8 +69,8 @@ public:
     bool isValidValue(const QString& value, const QString& attributeName);
     Q_INVOKABLE void setFilter(const QString& searchText);
 
-    Q_INVOKABLE analytics::taxonomy::StateView* taxonomy();
-    Q_INVOKABLE void setTaxonomy(analytics::taxonomy::StateView* taxonomy);
+    Q_INVOKABLE core::analytics::taxonomy::StateView* taxonomy();
+    Q_INVOKABLE void setTaxonomy(core::analytics::taxonomy::StateView* taxonomy);
     int columnPosOfAttribute(const QString& attributeName);
 
     Q_INVOKABLE void removeIncorrectEntries();

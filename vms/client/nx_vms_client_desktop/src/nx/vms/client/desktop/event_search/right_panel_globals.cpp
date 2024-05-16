@@ -30,9 +30,6 @@ void registerQmlType()
     qmlRegisterUncreatableType<VmsEventGroup>("nx.vms.client.desktop", 1, 0,
         "VmsEventGroup", "Cannot create VmsEventGroup");
 
-    qRegisterMetaType<FetchDirection>();
-    qRegisterMetaType<FetchResult>();
-    qRegisterMetaType<PreviewState>();
     qRegisterMetaType<VmsEvent>();
     qRegisterMetaType<VmsEventGroup>();
     qRegisterMetaType<nx::vms::api::EventType>();

@@ -10,9 +10,10 @@
 
 #include "abstract_search_synchronizer.h"
 
+namespace nx::vms::client::core { class AnalyticsSearchSetup; }
+
 namespace nx::vms::client::desktop {
 
-class AnalyticsSearchSetup;
 class CommonObjectSearchSetup;
 class WindowContext;
 
@@ -28,7 +29,7 @@ public:
     AnalyticsSearchSynchronizer(
         WindowContext* windowContext,
         CommonObjectSearchSetup* commonSetup,
-        AnalyticsSearchSetup* analyticsSetup,
+        core::AnalyticsSearchSetup* analyticsSetup,
         QObject* parent = nullptr);
 
     virtual ~AnalyticsSearchSynchronizer() override;
@@ -57,7 +58,7 @@ private:
 
 private:
     const QPointer<CommonObjectSearchSetup> m_commonSetup;
-    const QPointer<AnalyticsSearchSetup> m_analyticsSetup;
+    const QPointer<core::AnalyticsSearchSetup> m_analyticsSetup;
     nx::utils::ScopedConnections m_activeMediaWidgetConnections;
     bool m_areaSelectionActive = false;
     bool m_updating = false;

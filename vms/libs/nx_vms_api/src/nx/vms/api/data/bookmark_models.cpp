@@ -75,6 +75,20 @@ nx::Uuid BookmarkIdV3::serverId() const
     return serverIdFromCombined(id);
 }
 
+bool BookmarkV1::operator==(const BookmarkV1& other) const
+{
+    return static_cast<const BookmarkBase&>(*this) == static_cast<const BookmarkBase&>(other)
+        && static_cast<const BookmarkIdV1&>(*this) == static_cast<const BookmarkIdV1&>(other)
+        && serverId == other.serverId;
+}
+
+bool BookmarkV3::operator==(const BookmarkV3& other) const
+{
+    return (const BookmarkBase&) *this == (const BookmarkBase&) other
+        && (const BookmarkIdV3&) *this == (const BookmarkIdV3&) other
+        && *share == *other.share;
+}
+
 std::chrono::milliseconds BookmarkProtection::getSyncTime(const QString& protection)
 {
     const auto p = findIdSeparator(protection, ':');

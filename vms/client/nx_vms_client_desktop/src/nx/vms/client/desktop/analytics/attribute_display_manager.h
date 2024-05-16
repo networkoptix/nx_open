@@ -2,13 +2,13 @@
 
 #pragma once
 
-#include <memory>
-
 #include <QtCore/QObject>
 
-namespace nx::vms::client::desktop::analytics::taxonomy {
+#include <nx/utils/impl_ptr.h>
 
-class AnalyticsFilterModel;
+namespace nx::vms::client::core::analytics::taxonomy { class AnalyticsFilterModel; }
+
+namespace nx::vms::client::desktop::analytics::taxonomy {
 
 class AttributeDisplayManager: public QObject
 {
@@ -21,10 +21,13 @@ class AttributeDisplayManager: public QObject
     Q_PROPERTY(QStringList attributes READ attributes NOTIFY attributesChanged)
 
 public:
-    enum class Mode { tileView, tableView };
+    static void registerQmlType();
+
+        enum class Mode { tileView, tableView };
     Q_ENUM(Mode)
 
-    AttributeDisplayManager(Mode mode, AnalyticsFilterModel* filterModel);
+    AttributeDisplayManager(Mode mode,
+        core::analytics::taxonomy:: AnalyticsFilterModel* filterModel);
     virtual ~AttributeDisplayManager() override;
 
     QStringList attributes() const;
@@ -55,7 +58,21 @@ signals:
 
 private:
     class Private;
-    std::unique_ptr<Private> d;
+    nx::utils::ImplPtr <Private> d;
 };
+
+namespace details {
+
+class Factory: public QObject
+{
+    Q_OBJECT
+
+public:
+    Q_INVOKABLE AttributeDisplayManager* create(
+        AttributeDisplayManager::Mode mode,
+        nx::vms::client::core::analytics::taxonomy::AnalyticsFilterModel* filterModel);
+};
+
+} // namespace details
 
 } // namespace nx::vms::client::desktop::analytics::taxonomy

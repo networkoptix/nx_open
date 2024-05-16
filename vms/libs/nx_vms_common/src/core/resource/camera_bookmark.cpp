@@ -5,12 +5,12 @@
 #include <QtCore/QMap>
 #include <QtCore5Compat/QLinkedList>
 
-#include <core/resource/bookmark_sort.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/algorithm/merge_sorted_lists.h>
+#include <nx/vms/common/bookmark/bookmark_helpers.h>
+#include <nx/vms/common/bookmark/bookmark_sort.h>
 #include <nx/vms/common/resource/bookmark_filter.h>
 #include <nx/vms/common/system_context.h>
-#include <utils/camera/bookmark_helpers.h>
 #include <utils/camera/camera_names_watcher.h>
 #include <utils/common/synctime.h>
 
@@ -43,7 +43,7 @@ CameraBookmarkList createListFromIters(const ItersLinkedList& iters)
     for (auto it: iters)
         result.push_back(*it);
     return result;
-};
+}
 
 CameraBookmarkList getSparseByIters(ItersLinkedList& bookmarkIters, int limit)
 {
@@ -213,7 +213,7 @@ CameraBookmarkList CameraBookmark::mergeCameraBookmarks(SystemContext* systemCon
     if (limit <= 0)
         return {};
 
-    const auto pred = ::createBookmarkSortPredicate(sortOrder.column,
+    const auto pred = createBookmarkSortPredicate(sortOrder.column,
         sortOrder.order,
         systemContext ? systemContext->resourcePool() : nullptr); //< For unit test flexibility.
 
@@ -424,9 +424,9 @@ QVariantList bookmarkListToVariantList(const CameraBookmarkList& bookmarks)
 
 CameraBookmarkList variantListToBookmarkList(const QVariantList& list)
 {
-    CameraBookmarkList result;
-    for (const auto& v: list)
-        result << v.value<CameraBookmark>();
+    QnCameraBookmarkList result;
+    for  (const auto& v : list)
+        result.push_back(v.value<QnCameraBookmark>());
     return result;
 }
 

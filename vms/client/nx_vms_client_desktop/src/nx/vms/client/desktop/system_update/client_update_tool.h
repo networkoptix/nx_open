@@ -15,7 +15,10 @@
 
 namespace nx::vms::applauncher::api { enum class ResultType; }
 
-namespace nx::vms::client::core { struct LogonData; }
+namespace nx::vms::client::core {
+struct LogonData;
+class SystemContext;
+} // namespace nx::vms::client::core
 
 namespace nx::vms::common { class AbstractCertificateVerifier; }
 
@@ -43,7 +46,7 @@ class ClientUpdateTool:
     using PeerManagerPtr = nx::vms::common::p2p::downloader::AbstractPeerManager*;
 
 public:
-    ClientUpdateTool(SystemContext* systemContext, QObject* parent = nullptr);
+    ClientUpdateTool(core::SystemContext* systemContext, QObject* parent = nullptr);
     virtual ~ClientUpdateTool() override;
 
     using Error = std::variant<nx::vms::common::update::Status::ErrorCode, QString>;

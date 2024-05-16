@@ -70,7 +70,7 @@ public:
 
     /**
      * @param updateFunction Function wrapper which will be called whenever hovered tree view item
-     *     index changed. Default implementation sets resource acquired by the Qn::ResourceRole
+     *     index changed. Default implementation sets resource acquired by the core::ResourceRole
      *     from the sibling of hovered index at column 0 to the details panel camera preview, and
      *     text acquired by the Qt::DisplayRole from the same index to the details panel caption
      *     label. If null function wrapper will be passed as parameter, default implementation

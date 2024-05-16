@@ -12,6 +12,7 @@
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/common/bookmark/bookmark_helpers.h>
 #include <nx/vms/common/html/html.h>
 #include <ui/graphics/items/overlays/scrollable_text_items_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -20,11 +21,11 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_navigator.h>
-#include <utils/camera/bookmark_helpers.h>
 #include <utils/common/scoped_timer.h>
 #include <utils/common/synctime.h>
 
 using namespace std::chrono;
+using namespace nx::vms::client::core;
 using namespace nx::vms::client::desktop;
 
 namespace
@@ -178,7 +179,8 @@ QnWorkbenchItemBookmarksWatcher::WidgetData::WidgetData(
     m_posMs(DATETIME_INVALID),
     m_bookmarks(),
     m_bookmarksAtPos(),
-    m_query(SystemContext::fromResource(camera)->cameraBookmarksManager()->createQuery())
+    m_query(nx::vms::client::desktop::SystemContext::fromResource(camera)->
+        cameraBookmarksManager()->createQuery())
 {
     m_query->setFilter(kInitialFilter);
     m_query->setCamera(camera->getId());
@@ -226,7 +228,8 @@ void QnWorkbenchItemBookmarksWatcher::WidgetData::updateQueryFilter()
     if (m_posMs == DATETIME_INVALID)
         return;
 
-    const auto newWindow = helpers::extendTimeWindow(m_posMs, m_posMs, kLeftOffset, kRightOffset);
+    using namespace nx::vms::common;
+    const auto newWindow = extendTimeWindow(m_posMs, m_posMs, kLeftOffset, kRightOffset);
 
     bool nearLive = m_posMs + kRightOffset >= qnSyncTime->currentMSecsSinceEpoch();
     const auto minWindowChange = nearLive
@@ -234,7 +237,7 @@ void QnWorkbenchItemBookmarksWatcher::WidgetData::updateQueryFilter()
         : kMinWindowChangeInArchiveMs;
 
     auto filter = m_query->filter();
-    const bool changed = helpers::isTimeWindowChanged(
+    const bool changed = isTimeWindowChanged(
         milliseconds(newWindow.startTimeMs),
         milliseconds(newWindow.endTimeMs()),
         filter.startTimeMs,
@@ -293,7 +296,7 @@ void QnWorkbenchItemBookmarksWatcher::WidgetData::sendBookmarksToOverlay()
         if (!filter.checkBookmark(bookmark))
             continue;
 
-        bookmarksToDisplay << bookmark;
+        bookmarksToDisplay.push_back(bookmark);
         if (bookmarksToDisplay.size() >= kBookmarksDisplayLimit)
             break;
     }

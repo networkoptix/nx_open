@@ -3,7 +3,6 @@
 import QtQuick
 import QtQuick.Controls
 
-import Nx
 import Nx.Core
 import Nx.Controls
 import Nx.Items
@@ -43,6 +42,10 @@ Control
         IntervalPreview
         {
             id: intervalPreview
+
+            loopDelayMs: CoreSettings.iniConfigValue("intervalPreviewLoopDelayMs")
+            durationMs: CoreSettings.iniConfigValue("intervalPreviewDurationMs")
+            speedFactor: CoreSettings.iniConfigValue("intervalPreviewSpeedFactor")
 
             anchors.fill: parent
             active: true

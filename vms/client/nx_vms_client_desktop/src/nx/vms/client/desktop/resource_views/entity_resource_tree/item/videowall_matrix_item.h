@@ -18,9 +18,9 @@ public:
 
     /**
      * Implements AbstractItem::data().
-     * @todo Qn::UuidRole is alias for Qn::ItemUuidRole and will be removed.
+     * @todo core::UuidRole is alias for Qn::ItemUuidRole and will be removed.
      * @param role From set of roles: Qt::DisplayRole, Qt::ToolTipRole, Qt::EditRole,
-     *     Qn::ResourceIconKeyRole, Qn::NodeTypeRole, Qn::UuidRole, Qn::ItemUuidRole,
+     *     Qn::ResourceIconKeyRole, Qn::NodeTypeRole, core::UuidRole, Qn::ItemUuidRole,
      *     Qn::HelpTopicIdRole.
      * @returns Data relevant to the one of the roles listed above, a null QVariant otherwise.
      */

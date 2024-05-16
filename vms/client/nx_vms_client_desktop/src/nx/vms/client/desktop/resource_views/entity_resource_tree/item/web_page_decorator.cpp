@@ -32,11 +32,11 @@ WebPageDecorator::WebPageDecorator(
             [this, webPage](const QUrl& webPageUrl)
             {
                 if (webPage->getUrl() == webPageUrl.toString())
-                    notifyDataChanged({Qn::DecorationPathRole});
+                    notifyDataChanged({core::DecorationPathRole});
             });
 
         connect(webPage.get(), &QnWebPageResource::urlChanged,
-            this, [this] { notifyDataChanged({Qn::DecorationPathRole}); });
+            this, [this] { notifyDataChanged({core::DecorationPathRole}); });
     }
 }
 
@@ -44,7 +44,7 @@ QVariant WebPageDecorator::data(int role) const
 {
     switch (role)
     {
-        case Qn::DecorationPathRole:
+        case core::DecorationPathRole:
         {
             const auto webPage = getWebPage();
             if (!NX_ASSERT(webPage))
@@ -81,7 +81,7 @@ Qt::ItemFlags WebPageDecorator::flags() const
 {
     auto result = m_sourceItem->flags();
 
-    const auto resource = m_sourceItem->data(Qn::ResourceRole).value<QnResourcePtr>();
+    const auto resource = m_sourceItem->data(core::ResourceRole).value<QnResourcePtr>();
     if (!NX_ASSERT(!resource.isNull(), "Resource node expected"))
         return result;
 
@@ -94,7 +94,7 @@ Qt::ItemFlags WebPageDecorator::flags() const
 
 QnWebPageResourcePtr WebPageDecorator::getWebPage() const
 {
-    const auto resource = m_sourceItem->data(Qn::ResourceRole).value<QnResourcePtr>();
+    const auto resource = m_sourceItem->data(core::ResourceRole).value<QnResourcePtr>();
     return resource.dynamicCast<QnWebPageResource>();
 }
 

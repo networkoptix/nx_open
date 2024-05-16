@@ -7,7 +7,7 @@
 #include <client/client_globals.h>
 #include <nx/utils/scoped_connections.h>
 
-#include "image_provider.h"
+#include <nx/vms/client/core/image_providers/image_provider.h>
 
 namespace nx::vms::client::desktop {
 
@@ -17,22 +17,22 @@ class AbstractImageProcessor;
  * This image provider takes input from another ImageProvider
  * and calls AbstractImageProcessor to produce output image
  */
-class ProxyImageProvider: public ImageProvider
+class ProxyImageProvider: public core::ImageProvider
 {
     Q_OBJECT
-    using base_type = ImageProvider;
+    using base_type = core::ImageProvider;
 
 public:
     explicit ProxyImageProvider(QObject* parent = nullptr);
-    explicit ProxyImageProvider(ImageProvider* sourceProvider, QObject* parent = nullptr);
+    explicit ProxyImageProvider(core::ImageProvider* sourceProvider, QObject* parent = nullptr);
     virtual ~ProxyImageProvider() override;
 
     virtual QImage image() const override;
     virtual QSize sizeHint() const override;
-    virtual Qn::ThumbnailStatus status() const override;
+    virtual core::ThumbnailStatus status() const override;
 
-    ImageProvider* sourceProvider() const;
-    void setSourceProvider(ImageProvider* sourceProvider); //< Does not take ownership.
+    core::ImageProvider* sourceProvider() const;
+    void setSourceProvider(core::ImageProvider* sourceProvider); //< Does not take ownership.
 
     AbstractImageProcessor* imageProcessor() const;
     void setImageProcessor(AbstractImageProcessor* imageProcessor); //< Does not take ownership.
@@ -43,7 +43,7 @@ protected:
     virtual void doLoadAsync() override;
 
 private:
-    void setStatus(Qn::ThumbnailStatus status);
+    void setStatus(core::ThumbnailStatus status);
     void setSizeHint(const QSize& sizeHint);
     void setImage(const QImage& image);
     void setSourceSizeHint(const QSize& sourceSizeHint);
@@ -58,7 +58,7 @@ private:
     nx::utils::ScopedConnections m_imageProcessorConnections;
 
     QImage m_image;
-    Qn::ThumbnailStatus m_status = Qn::ThumbnailStatus::Invalid;
+    core::ThumbnailStatus m_status = core::ThumbnailStatus::Invalid;
     QSize m_sizeHint;
 };
 

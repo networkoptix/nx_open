@@ -2,6 +2,7 @@
 
 import QtQuick
 
+import Nx.Core.Items
 import Nx.Items
 import Nx.Motion
 

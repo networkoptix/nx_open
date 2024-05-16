@@ -1355,7 +1355,7 @@ void QnWorkbenchController::at_zoomRectChanged(QnMediaResourceWidget* widget, co
 void QnWorkbenchController::at_zoomRectCreated(QnMediaResourceWidget* widget, const QColor& color, const QRectF& zoomRect)
 {
     menu()->trigger(menu::CreateZoomWindowAction, menu::Parameters(widget)
-        .withArgument(Qn::ItemZoomRectRole, zoomRect)
+        .withArgument(core::ItemZoomRectRole, zoomRect)
         .withArgument(Qn::ItemFrameDistinctionColorRole, color));
     widget->setCheckedButtons(widget->checkedButtons() & ~Qn::ZoomWindowButton);
 }
