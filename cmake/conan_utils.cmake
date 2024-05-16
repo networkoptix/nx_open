@@ -16,7 +16,9 @@ endif()
 set(conanUpdateMode ${default_conan_update_mode} CACHE STRING
     "One of: default, force, min, avoid. See run_conan.cmake.in for details.")
 
-set(installSystemRequirementsDoc "Allow installation of system requirements by Conan.")
+string(CONCAT installSystemRequirementsDoc
+    "Allow installation of system requirements by Conan. "
+    "This option does only work in an interactive shell.")
 option(installSystemRequirements ${installSystemRequirementsDoc} OFF)
 # Due to security reasons `installSystemRequirements` should be reset to OFF after every CMake run.
 cmake_language(DEFER
@@ -128,17 +130,11 @@ function(nx_run_conan)
     nx_configure_file(${open_source_root}/cmake/run_conan.cmake.in ${run_conan_script} @ONLY)
 
     if(runConanAutomatically OR NOT EXISTS ${CMAKE_BINARY_DIR}/conan_paths.cmake)
-        if(installSystemRequirements)
-            set(temporary_args
-                "-c tools.system.package_manager:mode=install"
-                "-c tools.system.package_manager:sudo=True"
-            )
-            string(JOIN ";" temporary_args ${temporary_args})
-            set(ENV{NX_TEMPORARY_CONAN_ARGS} "${temporary_args}")
-        endif()
-
         nx_execute_process_or_fail(
-            COMMAND ${CMAKE_COMMAND} -DconanUpdateMode=${conanUpdateMode} -P ${run_conan_script}
+            COMMAND ${CMAKE_COMMAND}
+                -DinstallSystemRequirements=${installSystemRequirements}
+                -DconanUpdateMode=${conanUpdateMode}
+                -P ${run_conan_script}
             ERROR_MESSAGE "Conan execution failed."
         )
     else()

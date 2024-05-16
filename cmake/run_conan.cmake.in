@@ -23,9 +23,27 @@ set(CMAKE_BINARY_DIR "@CMAKE_BINARY_DIR@")
 #     in developer builds.
 set(conanUpdateMode "default" CACHE INTERNAL "") #< CACHE makes it possible to use `-D`.
 
+set(installSystemRequirements "OFF" CACHE INTERNAL "")
+
 set(conanNxRemote "@conanNxRemote@")
 set(conanLockExportDir "@distribution_output_dir@")
-set(conanFlags @flags@ $ENV{NX_TEMPORARY_CONAN_ARGS})
+set(conanFlags @flags@)
+
+if(installSystemRequirements)
+    set(conanFlags
+        ${conanFlags}
+         "-c tools.system.package_manager:mode=install"
+         "-c tools.system.package_manager:sudo=True")
+    set(ENV{CONAN_SYSREQUIRES_SUDO} "True")
+    set(ENV{CONAN_SYSREQUIRES_MODE} "enabled")
+else()
+    set(conanFlags
+        ${conanFlags}
+         "-c tools.system.package_manager:mode=check"
+         "-c tools.system.package_manager:sudo=False")
+    set(ENV{CONAN_SYSREQUIRES_SUDO} "False")
+    set(ENV{CONAN_SYSREQUIRES_MODE} "verify")
+endif()
 
 set(supported_update_modes default avoid min force)
 if(NOT conanUpdateMode IN_LIST supported_update_modes)
