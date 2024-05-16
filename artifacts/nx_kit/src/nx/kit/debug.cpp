@@ -159,7 +159,7 @@ void printHexDump(
         return;
     }
 
-    s += "\n{\n";
+    s += "\n{";
     int count = size;
     const char* p = bytes;
     while (count > 0)
