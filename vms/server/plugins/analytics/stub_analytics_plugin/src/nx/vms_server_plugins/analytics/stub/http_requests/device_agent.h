@@ -34,7 +34,7 @@ private:
     {
         nx::sdk::IUtilityProvider4::HttpDomainName domain =
             nx::sdk::IUtilityProvider4::HttpDomainName::vms;
-        std::string path = "/rest/v4/site/settings";
+        std::string url = "/rest/v4/site/settings";
         std::string httpMethod = "GET";
         std::string mimeType;
         std::string requestBody;
