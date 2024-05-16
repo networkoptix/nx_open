@@ -256,7 +256,6 @@ const QString kReRequestOnvifRecordingEventsIfAllEventsHaveSameTime(
 namespace Qn
 {
 
-const QString USER_FULL_NAME("fullUserName");
 const QString kResourceDataParamName("resource_data.json");
 
 } // namespace Qn

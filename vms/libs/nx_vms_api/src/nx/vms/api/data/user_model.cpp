@@ -44,7 +44,6 @@ UserDataEx UserModelBase::toUserData() &&
         user.password = std::move(*password);
     if (externalId)
         user.externalId = std::move(*externalId);
-    user.attributes = attributes;
     if (!isHttpDigestEnabled && user.type != UserType::cloud)
         user.digest = UserData::kHttpIsDisabledStub;
     if (isHttpDigestEnabled && user.digest == UserData::kHttpIsDisabledStub)
@@ -65,8 +64,6 @@ UserModelBase UserModelBase::fromUserData(UserData&& baseData)
     model.isEnabled = std::move(baseData.isEnabled);
     if (!baseData.externalId.dn.isEmpty())
         model.externalId = std::move(baseData.externalId);
-    if (baseData.attributes != UserAttributes{})
-        model.attributes = std::move(baseData.attributes);
     model.digest = std::move(baseData.digest);
     model.hash = std::move(baseData.hash);
     model.cryptSha512Hash = std::move(baseData.cryptSha512Hash);
@@ -132,6 +129,7 @@ UserModelV3::DbUpdateTypes UserModelV3::toDbTypes() &&
     user.groupIds = std::move(groupIds);
     user.permissions = std::move(permissions);
     user.resourceAccessRights = std::move(resourceAccessRights);
+    user.attributes = std::move(attributes);
     if (user.type == UserType::temporaryLocal && NX_ASSERT(temporaryToken))
     {
         QnJsonContext context;
@@ -156,6 +154,7 @@ std::vector<UserModelV3> UserModelV3::fromDbTypes(DbListTypes data)
 
         model.groupIds = std::move(baseData.groupIds);
         model.permissions = std::move(baseData.permissions);
+        model.attributes = std::move(baseData.attributes);
         if (!baseData.resourceAccessRights.empty())
             model.resourceAccessRights = std::move(baseData.resourceAccessRights);
 
@@ -173,7 +172,10 @@ std::vector<UserModelV3> UserModelV3::fromDbTypes(DbListTypes data)
         if (auto f = parameters.find(model.id); f != parameters.cend())
         {
             for (ResourceParamData& r: f->second)
-                static_cast<ResourceWithParameters&>(model).setFromParameter(r);
+            {
+                if (r.name != kUserFullName && r.name != kCloudUserAuthenticationInfo)
+                    static_cast<ResourceWithParameters&>(model).setFromParameter(r);
+            }
 
             parameters.erase(f);
         }

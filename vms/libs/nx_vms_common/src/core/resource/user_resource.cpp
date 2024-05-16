@@ -574,7 +574,7 @@ QString QnUserResource::fullName() const
 {
     QString result;
     if (auto context = systemContext())
-        result = context->resourcePropertyDictionary()->value(getId(), Qn::USER_FULL_NAME);
+        result = context->resourcePropertyDictionary()->value(getId(), kUserFullName);
 
     NX_MUTEX_LOCKER locker(&m_mutex);
     return result.isNull() ? m_fullName : result;
@@ -767,7 +767,7 @@ void QnUserResource::updateInternal(const QnResourcePtr& source, NotifierList& n
     }
 }
 
-void QnUserResource::atPropertyChanged(const QnResourcePtr& self, const QString& key)
+void QnUserResource::atPropertyChanged(const QnResourcePtr&, const QString& key)
 {
     if (key == ResourcePropertyKey::User::kUserSettings)
     {
