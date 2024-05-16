@@ -3940,6 +3940,10 @@ License Key: %2</source>
         <comment>%1 will be substituted by a list of contacts</comment>
         <translation></translation>
     </message>
+    <message>
+        <source>Text Files</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnLocalSettingsDialog</name>
