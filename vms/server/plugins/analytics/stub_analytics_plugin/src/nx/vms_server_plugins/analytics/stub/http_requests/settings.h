@@ -9,7 +9,7 @@ namespace nx::vms_server_plugins::analytics::stub::http_requests {
 extern const std::string kHttpDomainVar;
 extern const std::string kHttpVmsDomain;
 extern const std::string kHttpCloudDomain;
-extern const std::string kHttpPathVar;
+extern const std::string kHttpUrlVar;
 extern const std::string kHttpMethodVar;
 extern const std::string kHttpMimeTypeVar;
 extern const std::string kHttpRequestBodyVar;
