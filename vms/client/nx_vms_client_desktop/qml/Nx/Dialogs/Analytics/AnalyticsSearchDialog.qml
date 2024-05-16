@@ -420,7 +420,7 @@ Window
 
                         TileOverlayButton
                         {
-                            icon.source: "image://skin/advanced_search_dialog/show_on_layout.svg"
+                            icon.source: "image://skin/20x20/Solid/show_on_layout.svg"
                             accent: true
 
                             onClicked:

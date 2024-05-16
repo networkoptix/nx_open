@@ -46,7 +46,7 @@ Item
     {
         grid.forceLayout()
     }
-    
+
     function rowsCount()
     {
         return control.items.length / 2;
@@ -95,7 +95,7 @@ Item
                     && gridMouseArea.mouseX > gridMouseArea.width - kCopyWidth
 
                 primaryColor: pressed ? pressedColor : (hovered ? hoveredColor : mainColor)
-                sourcePath: "image://skin/advanced_search_dialog/tosearch.svg"
+                sourcePath: "image://skin/20x20/Outline/to_search.svg"
                 sourceSize: Qt.size(width, height)
             }
         }

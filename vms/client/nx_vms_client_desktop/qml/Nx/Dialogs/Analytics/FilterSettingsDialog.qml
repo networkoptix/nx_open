@@ -136,7 +136,7 @@ Dialog
 
                             enabled: itemFlags & Qt.ItemIsDragEnabled
 
-                            sourcePath: "image://skin/advanced_search_dialog/icon_drag.svg"
+                            sourcePath: "image://skin/20x20/Outline/drag.svg"
                             primaryColor: enabled ? "light10" : "dark13"
 
                             MouseArea
