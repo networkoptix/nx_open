@@ -3892,6 +3892,10 @@ License Key: %2</source>
       <comment>%1 will be substituted by a list of contacts</comment>
       <translation>請將授權碼及硬體 ID提供給您的所在地區/授權支援(%1), 以取得離線授權.</translation>
     </message>
+    <message>
+      <source>Text Files</source>
+      <translation type="unfinished">Text Files</translation>
+    </message>
   </context>
   <context>
     <name>QnLocalSettingsDialog</name>

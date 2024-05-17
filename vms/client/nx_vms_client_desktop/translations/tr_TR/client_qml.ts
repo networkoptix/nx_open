@@ -2452,10 +2452,6 @@ Nesneyi takip etmek için Alt + Tıklama tuşlarına basın</translation>
       <translation>Yalnızca kullanıcı e-posta adresini belirtmeniz gerekir.</translation>
     </message>
     <message>
-      <source>If user already has an account, he will see this system and will be able to log in to it. If not, we&apos;ll send an invitation to this address and user will see this system right after he creates an account.</source>
-      <translation>Kullanıcının halihazırda bir hesabı varsa bu sistemi görecek ve giriş yapabilecektir. Değilse bu adrese bir davet gönderilecek ve kullanıcı hesap oluşturduktan hemen sonra bu sistemi görecektir.</translation>
-    </message>
-    <message>
       <source>Permission Groups</source>
       <translation>İzin Grupları</translation>
     </message>
@@ -2474,6 +2470,10 @@ Nesneyi takip etmek için Alt + Tıklama tuşlarına basın</translation>
     <message>
       <source>Passwords do not match</source>
       <translation>Parolalar eşleşmiyor</translation>
+    </message>
+    <message>
+      <source>The added site will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</source>
+      <translation>Eklenen site, mevcut bir bulut hesabına sahip kullanıcılara hızlı bir şekilde görünür hale gelecek, mevcut bir bulut hesabı olmayan kullanıcılar ise talimatları E-postayla alacak.</translation>
     </message>
   </context>
   <context>

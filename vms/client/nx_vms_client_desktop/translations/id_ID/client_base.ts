@@ -3892,6 +3892,10 @@ Kunci Lisensi: %2</translation>
       <comment>%1 will be substituted by a list of contacts</comment>
       <translation>Silakan kirim Kunci Lisensi dan ID Hardware yang diberikan ke dukungan Regional / Lisensi Anda (%1) untuk mendapatkan file Kunci Aktivasi.</translation>
     </message>
+    <message>
+      <source>Text Files</source>
+      <translation type="unfinished">Text Files</translation>
+    </message>
   </context>
   <context>
     <name>QnLocalSettingsDialog</name>

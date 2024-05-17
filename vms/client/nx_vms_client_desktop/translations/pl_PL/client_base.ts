@@ -4039,6 +4039,10 @@ Klucz licencyjny: %2</translation>
       <comment>%1 will be substituted by a list of contacts</comment>
       <translation>Prosimy o wysłanie dostarczonego klucza licencyjnego i identyfikatora sprzętu do wsparcia regionalnego / licencyjnego (%1) w celu uzyskania pliku klucza aktywacyjnego.</translation>
     </message>
+    <message>
+      <source>Text Files</source>
+      <translation type="unfinished">Text Files</translation>
+    </message>
   </context>
   <context>
     <name>QnLocalSettingsDialog</name>

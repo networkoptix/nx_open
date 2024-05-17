@@ -3941,6 +3941,10 @@ License Key: %2</translation>
       <comment>%1 will be substituted by a list of contacts</comment>
       <translation>Kérjük, küldje el a mellékelt licenckulcsot és hardver-azonosítót a regionális / licenc támogatáshoz (%1), hogy megkapja az Aktiváló kulcs fájlt.</translation>
     </message>
+    <message>
+      <source>Text Files</source>
+      <translation type="unfinished">Text Files</translation>
+    </message>
   </context>
   <context>
     <name>QnLocalSettingsDialog</name>

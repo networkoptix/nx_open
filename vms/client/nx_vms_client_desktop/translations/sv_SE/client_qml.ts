@@ -2455,10 +2455,6 @@ Tryck på Alt + Klicka för att följa objektet</translation>
       <translation>Du måste ange endast användare&apos;s e-postadress.</translation>
     </message>
     <message>
-      <source>If user already has an account, he will see this system and will be able to log in to it. If not, we&apos;ll send an invitation to this address and user will see this system right after he creates an account.</source>
-      <translation>Om användaren redan har ett konto kommer han att se detta system och kommer att kunna logga in på det. Om inte, kommer vi&apos;skicka en inbjudan till denna adress och användaren kommer att se detta system direkt efter att han skapar ett konto.</translation>
-    </message>
-    <message>
       <source>Permission Groups</source>
       <translation>Behörighetsgrupper</translation>
     </message>
@@ -2477,6 +2473,10 @@ Tryck på Alt + Klicka för att följa objektet</translation>
     <message>
       <source>Passwords do not match</source>
       <translation>Lösenorden matchar inte</translation>
+    </message>
+    <message>
+      <source>The added site will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</source>
+      <translation type="unfinished">The added site will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</translation>
     </message>
   </context>
   <context>

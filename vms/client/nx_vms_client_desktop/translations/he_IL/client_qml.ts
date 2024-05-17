@@ -2483,10 +2483,6 @@ Press Alt + Click to follow object</translation>
       <translation type="unfinished">You need to specify only user&apos;s email address.</translation>
     </message>
     <message>
-      <source>If user already has an account, he will see this system and will be able to log in to it. If not, we&apos;ll send an invitation to this address and user will see this system right after he creates an account.</source>
-      <translation type="unfinished">If user already has an account, he will see this system and will be able to log in to it. If not, we&apos;ll send an invitation to this address and user will see this system right after he creates an account.</translation>
-    </message>
-    <message>
       <source>Permission Groups</source>
       <translation type="unfinished">Permission Groups</translation>
     </message>
@@ -2505,6 +2501,10 @@ Press Alt + Click to follow object</translation>
     <message>
       <source>Passwords do not match</source>
       <translation>הסיסמהות אינן תואמות</translation>
+    </message>
+    <message>
+      <source>The added site will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</source>
+      <translation type="unfinished">The added site will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</translation>
     </message>
   </context>
   <context>

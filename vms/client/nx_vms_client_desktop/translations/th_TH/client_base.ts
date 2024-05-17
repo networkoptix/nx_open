@@ -3892,6 +3892,10 @@ License Key: %2</translation>
       <comment>%1 will be substituted by a list of contacts</comment>
       <translation>โปรดส่งรหัสสิทธิ์ใช้งานและรหัสฮาร์ดแวร์ไปยังฝ่ายสนับสนุนภูมิภาค / สิทธิ์ใช้งานของคุณเพื่อรับไฟล์รหัสเปิดใช้งาน (%1)</translation>
     </message>
+    <message>
+      <source>Text Files</source>
+      <translation type="unfinished">Text Files</translation>
+    </message>
   </context>
   <context>
     <name>QnLocalSettingsDialog</name>

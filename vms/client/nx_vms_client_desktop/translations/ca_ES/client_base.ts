@@ -3941,6 +3941,10 @@ License Key: %2</translation>
       <comment>%1 will be substituted by a list of contacts</comment>
       <translation>Envieu la clau de llicència i l'ID de maquinari proporcionats al servei de suport regional o de llicències (%1) per obtenir un arxiu de clau d'activació.</translation>
     </message>
+    <message>
+      <source>Text Files</source>
+      <translation type="unfinished">Text Files</translation>
+    </message>
   </context>
   <context>
     <name>QnLocalSettingsDialog</name>

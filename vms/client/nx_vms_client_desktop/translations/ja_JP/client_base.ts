@@ -3892,6 +3892,10 @@ License Key: %2</source>
       <comment>%1 will be substituted by a list of contacts</comment>
       <translation>ライセンスファイルを取得するには、ライセンスキーとハードウェアIDを地域/ライセンスサポート (%1) までご連絡ください。</translation>
     </message>
+    <message>
+      <source>Text Files</source>
+      <translation>テキストファイル</translation>
+    </message>
   </context>
   <context>
     <name>QnLocalSettingsDialog</name>

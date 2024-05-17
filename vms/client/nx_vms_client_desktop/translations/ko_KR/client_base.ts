@@ -3892,6 +3892,10 @@ License Key: %2</translation>
       <comment>%1 will be substituted by a list of contacts</comment>
       <translation>인증키 파일을 얻으려면 제공된 라이선스 키와 하드웨어 ID를 지역 / 라이센스 지원 부서(%1) 로 보내십시오.</translation>
     </message>
+    <message>
+      <source>Text Files</source>
+      <translation type="unfinished">Text Files</translation>
+    </message>
   </context>
   <context>
     <name>QnLocalSettingsDialog</name>

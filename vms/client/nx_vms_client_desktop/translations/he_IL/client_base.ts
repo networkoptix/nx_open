@@ -4039,6 +4039,10 @@ License Key: %2</translation>
       <comment>%1 will be substituted by a list of contacts</comment>
       <translation>אנא שלח את מספר הרישיון ואת מזהה החומרה שסופקו לשירות הלקוחות (%1) בכדי להשיג קובץ רישיון להפעלה ידנית.</translation>
     </message>
+    <message>
+      <source>Text Files</source>
+      <translation type="unfinished">Text Files</translation>
+    </message>
   </context>
   <context>
     <name>QnLocalSettingsDialog</name>

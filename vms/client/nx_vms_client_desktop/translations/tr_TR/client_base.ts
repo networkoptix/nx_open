@@ -3940,6 +3940,10 @@ License Key: %2</source>
       <comment>%1 will be substituted by a list of contacts</comment>
       <translation>Bir Etkinleştirme Anahtarı dosyası edinmek için lütfen verilen Lisans Anahtarı ve Donanım Kimliğini Bölgesel / Lisans desteğinize (%1) gönderin.</translation>
     </message>
+    <message>
+      <source>Text Files</source>
+      <translation>Metin Dosyaları</translation>
+    </message>
   </context>
   <context>
     <name>QnLocalSettingsDialog</name>

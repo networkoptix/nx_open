@@ -3941,6 +3941,10 @@ License Key: %2</translation>
       <comment>%1 will be substituted by a list of contacts</comment>
       <translation>Stuur de geleverde licentiesleutel en hardware-ID naar uw lokale leverancier (%1) om een activatiebestand te verkrijgen.</translation>
     </message>
+    <message>
+      <source>Text Files</source>
+      <translation type="unfinished">Text Files</translation>
+    </message>
   </context>
   <context>
     <name>QnLocalSettingsDialog</name>
