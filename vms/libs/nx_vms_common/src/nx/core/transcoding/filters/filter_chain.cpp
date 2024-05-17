@@ -49,6 +49,7 @@ void FilterChain::prepare(const QSize& srcFrameResolution, const QSize& resoluti
     if (isPanoramicCamera)
         push_back(QnAbstractImageFilterPtr(new QnTiledImageFilter(m_layout)));
 
+    createPixelationImageFilter();
     prepareZoomWindowFilter();
     prepareDewarpingFilter();
     prepareImageEnhancementFilter();
@@ -67,6 +68,7 @@ void FilterChain::prepareForImage(const QSize& fullImageResolution, const QSize&
     if (!isImageTranscodingRequired(fullImageResolution, resolutionLimit))
         return;
 
+    createPixelationImageFilter();
     prepareImageArFilter(fullImageResolution);
     prepareZoomWindowFilter();
     prepareDewarpingFilter();
@@ -282,6 +284,15 @@ void FilterChain::createScaleImageFilter(const QSize& dstSize)
     else
     {
         scaleFilter->setOutputImageSize(dstSize);
+    }
+}
+
+void FilterChain::createPixelationImageFilter()
+{
+    if (m_settings.pixelationSettings)
+    {
+        push_front(QnAbstractImageFilterPtr(
+            new PixelationImageFilter(*m_settings.pixelationSettings)));
     }
 }
 
