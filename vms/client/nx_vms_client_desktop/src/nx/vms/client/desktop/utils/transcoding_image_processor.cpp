@@ -97,7 +97,7 @@ QImage TranscodingImageProcessor::process(const QImage& sourceImage) const
         return sourceImage;
 
     QSharedPointer<CLVideoDecoderOutput> frame(new CLVideoDecoderOutput(sourceImage));
-    frame = filters.apply(frame);
+    frame = filters.apply(frame, /*metadata*/ {});
     return frame ? frame->toImage() : QImage();
 }
 

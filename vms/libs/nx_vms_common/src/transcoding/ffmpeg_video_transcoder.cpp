@@ -351,7 +351,7 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
         }
     }
 
-    decodedFrame = m_filters.apply(decodedFrame);
+    decodedFrame = m_filters.apply(decodedFrame, /*metadata*/ {});
     if (!decodedFrame)
     {
         NX_ERROR(this, "Failed to process filter chain for video frame");

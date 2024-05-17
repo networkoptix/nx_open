@@ -11,7 +11,9 @@ WatermarkImageFilter::WatermarkImageFilter(const Watermark& watermark): m_waterm
 {
 }
 
-CLVideoDecoderOutputPtr WatermarkImageFilter::updateImage(const CLVideoDecoderOutputPtr& frame)
+CLVideoDecoderOutputPtr WatermarkImageFilter::updateImage(
+    const CLVideoDecoderOutputPtr& frame,
+    const QnAbstractCompressedMetadataPtr& metadata)
 {
     const auto frameSize = QSize(frame->width, frame->height);
     if (frameSize != m_lastFrameSize)
@@ -20,7 +22,7 @@ CLVideoDecoderOutputPtr WatermarkImageFilter::updateImage(const CLVideoDecoderOu
         m_lastFrameSize = frameSize;
     }
 
-    return PaintImageFilter::updateImage(frame);
+    return PaintImageFilter::updateImage(frame, metadata);
 }
 
 } // namespace nx::core::transcoding

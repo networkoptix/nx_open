@@ -14,7 +14,9 @@ QnScaleImageFilter::QnScaleImageFilter(
 {
 }
 
-CLVideoDecoderOutputPtr QnScaleImageFilter::updateImage(const CLVideoDecoderOutputPtr& frame)
+CLVideoDecoderOutputPtr QnScaleImageFilter::updateImage(
+    const CLVideoDecoderOutputPtr& frame,
+    const QnAbstractCompressedMetadataPtr&)
 {
     auto result = frame->scaled(m_size, m_format);
     if (!result)

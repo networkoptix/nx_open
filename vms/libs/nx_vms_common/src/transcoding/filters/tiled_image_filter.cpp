@@ -12,7 +12,9 @@ QnTiledImageFilter::QnTiledImageFilter(const QnConstResourceVideoLayoutPtr& vide
 {
 }
 
-CLVideoDecoderOutputPtr QnTiledImageFilter::updateImage(const CLVideoDecoderOutputPtr& frame)
+CLVideoDecoderOutputPtr QnTiledImageFilter::updateImage(
+    const CLVideoDecoderOutputPtr& frame,
+    const QnAbstractCompressedMetadataPtr& metadata)
 {
     if (m_layout->size().width() == 1 && m_layout->size().height() == 1)
         return frame;
@@ -42,7 +44,7 @@ CLVideoDecoderOutputPtr QnTiledImageFilter::updateImage(const CLVideoDecoderOutp
     const auto pos = m_layout->position(frame->channel);
     const QRect rect(pos.x() * m_size.width(), pos.y() * m_size.height(),
         m_size.width(), m_size.height());
-    auto croppedFrame = QnCropImageFilter(rect).updateImage(m_tiledFrame);
+    auto croppedFrame = QnCropImageFilter(rect).updateImage(m_tiledFrame, metadata);
     croppedFrame->copyFrom(frame.data());
 
     // Make sure overlays will be painter on frame copy, not on the combined frame itself.

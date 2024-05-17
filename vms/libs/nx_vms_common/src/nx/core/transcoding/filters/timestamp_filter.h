@@ -22,7 +22,10 @@ public:
     TimestampFilter(const core::transcoding::TimestampOverlaySettings& params);
     virtual ~TimestampFilter();
 
-    virtual CLVideoDecoderOutputPtr updateImage(const CLVideoDecoderOutputPtr& frame) override;
+    virtual CLVideoDecoderOutputPtr updateImage(
+        const CLVideoDecoderOutputPtr& frame,
+        const QnAbstractCompressedMetadataPtr& metadata) override;
+
     virtual QSize updatedResolution(const QSize& sourceSize) override;
 
     static QString timestampTextUtc(

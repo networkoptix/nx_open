@@ -27,14 +27,14 @@ public:
     void thenScalingSuccessful(const QSize& size)
     {
         QnScaleImageFilter filter(size);
-        CLVideoDecoderOutputPtr frame = filter.updateImage(m_frame);
+        CLVideoDecoderOutputPtr frame = filter.updateImage(m_frame, /*metadata*/ {});
         ASSERT_EQ(frame->size(), size);
     }
 
     void thenScalingFailed(const QSize& size)
     {
         QnScaleImageFilter filter(size);
-        const auto result = filter.updateImage(m_frame);
+        const auto result = filter.updateImage(m_frame, /*metadata*/ {});
         ASSERT_TRUE((bool) result);
         ASSERT_EQ(result->size(), m_frame->size());
     }
