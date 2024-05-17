@@ -124,7 +124,6 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(
     m_footageUpToDate.test_and_set();
     m_currentServerUpToDate.test_and_set();
     m_rtpDataBuffer = new quint8[kMaxRtpBufferSize];
-    m_flags |= Flag_SlowSource;
     m_flags |= Flag_CanProcessNegativeSpeed;
     m_flags |= Flag_CanProcessMediaStep;
     m_flags |= Flag_CanSendMetadata;
