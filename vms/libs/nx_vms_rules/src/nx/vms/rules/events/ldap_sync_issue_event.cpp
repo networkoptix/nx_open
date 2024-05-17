@@ -2,6 +2,9 @@
 
 #include "ldap_sync_issue_event.h"
 
+#include <nx/vms/rules/icon.h>
+#include <nx/vms/rules/utils/event_details.h>
+
 #include "../utils/type.h"
 
 namespace nx::vms::rules {
@@ -19,6 +22,8 @@ QString LdapSyncIssueEvent::resourceKey() const
 QVariantMap LdapSyncIssueEvent::details(common::SystemContext* context) const
 {
     auto result = BasicEvent::details(context);
+    utils::insertLevel(result, nx::vms::event::Level::important);
+    utils::insertIcon(result, nx::vms::rules::Icon::networkIssue);
     return result;
 }
 

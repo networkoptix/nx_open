@@ -11,11 +11,17 @@ NX_REFLECTION_ENUM_CLASS(Icon,
     none,
     server,
     storage,
-    connection,
+    networkIssue,
     license,
     motion,
     resource,
-    custom,
-    analyticsObject)
+    inputSignal,
+    generic,
+    pluginDiagnostic,
+    fanError,
+    cloudOffline,
+    analyticsEvent,
+    analyticsObjectDetected,
+    softTrigger)
 
 } // namespace nx::vms::rules
