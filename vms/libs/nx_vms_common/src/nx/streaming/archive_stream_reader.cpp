@@ -325,9 +325,6 @@ bool QnArchiveStreamReader::init()
 
     // Alloc common resources
 
-    if (m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_SlowSource)
-        emit slowSourceHint();
-
     return true;
 }
 

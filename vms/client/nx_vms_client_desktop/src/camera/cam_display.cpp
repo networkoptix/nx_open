@@ -95,12 +95,9 @@ static void updateActivity()
 
 // A lot of small audio packets in Blu-ray HD audio codecs. So, previous size 7 is not enough.
 static const int CL_MAX_DISPLAY_QUEUE_SIZE = 20;
-static const int CL_MAX_DISPLAY_QUEUE_FOR_SLOW_SOURCE_SIZE = 30;
-
+static const int CL_MAX_DISPLAY_QUEUE_SIZE_LIVE = 60;
 static const int DEFAULT_AUDIO_BUFF_SIZE = 1000 * 4;
-
-static const int REALTIME_AUDIO_BUFFER_SIZE = 750; // at ms, max buffer
-
+static const int REALTIME_AUDIO_BUFFER_SIZE = 1500; // at ms, max buffer
 static const qint64 MIN_VIDEO_DETECT_JUMP_INTERVAL = 300 * 1000; // 300ms
 //static const qint64 MIN_AUDIO_DETECT_JUMP_INTERVAL = MIN_VIDEO_DETECT_JUMP_INTERVAL + AUDIO_BUFF_SIZE*1000;
 //static const int MAX_VALID_SLEEP_TIME = 1000*1000*5;
@@ -179,7 +176,6 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
     if (resource && resource->toResource()->hasFlags(Qn::still_image))
         m_isStillImage = true;
 
-    m_storedMaxQueueSize = m_dataQueue.maxSize();
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
     {
         m_display[i] = 0;
@@ -471,14 +467,6 @@ qint64 QnCamDisplay::doSmartSleep(const qint64 needToSleep, float speed)
         return m_delay.terminatedSleep(needToSleep, maxSleepTime);
     else
         return m_delay.sleep(needToSleep, maxSleepTime);
-}
-
-int QnCamDisplay::maxDataQueueSize(QueueSizeType type) const
-{
-    if (type == QueueSizeType::slowStream)
-        return CL_MAX_DISPLAY_QUEUE_FOR_SLOW_SOURCE_SIZE;
-
-    return CL_MAX_DISPLAY_QUEUE_SIZE;
 }
 
 bool QnCamDisplay::useRealTimeHurryUp() const
@@ -1141,14 +1129,12 @@ void QnCamDisplay::processNewSpeed(float speed)
         NX_VERBOSE(this, "Unblock time value after speed changed");
         unblockTimeValue();
     }
-    if (qAbs(speed) > 1.0) {
-        m_storedMaxQueueSize = m_dataQueue.maxSize();
-        m_dataQueue.setMaxSize(maxDataQueueSize(QueueSizeType::normalStream));
+    if (qAbs(speed) > 1.0)
+    {
         m_delay.setMaxOverdraft(-1);
     }
     else
     {
-        m_dataQueue.setMaxSize(m_storedMaxQueueSize);
         m_delay.setMaxOverdraft(DEFAULT_DELAY_OVERDRAFT);
         m_delay.afterdelay();
     }
@@ -1184,6 +1170,12 @@ void QnCamDisplay::putData(const QnAbstractDataPacketPtr& data)
             return;
         }
     }
+
+    auto mediaData = std::dynamic_pointer_cast<QnAbstractMediaData>(data);
+    if (mediaData && mediaData->isLive())
+        m_dataQueue.setMaxSize(CL_MAX_DISPLAY_QUEUE_SIZE_LIVE);
+    else
+        m_dataQueue.setMaxSize(CL_MAX_DISPLAY_QUEUE_SIZE);
 
     QnCompressedVideoDataPtr video = std::dynamic_pointer_cast<QnCompressedVideoData>(data);
     if (video)
@@ -1979,11 +1971,6 @@ void QnCamDisplay::onRealTimeStreamHint(bool value)
     emit liveMode(m_isRealTimeSource);
     if (m_isRealTimeSource && m_speed > 1)
         m_speed = 1.0f;
-}
-
-void QnCamDisplay::onSlowSourceHint()
-{
-    m_dataQueue.setMaxSize(maxDataQueueSize(QueueSizeType::slowStream));
 }
 
 qint64 QnCamDisplay::getDisplayedMax() const

@@ -69,7 +69,6 @@ public:
 
     enum Flag
     {
-        Flag_SlowSource = 1,
         Flag_CanProcessNegativeSpeed = 2,   // flag inform that delegate is going to process negative speed. If flag is not set, ArchiveReader is going to process negative speed
         Flag_CanProcessMediaStep = 4,       // flag inform that delegate is going to process media step itself.
         Flag_CanSendMetadata     = 8,       // supply metadata in the stream: motion, analytics e.t.c
