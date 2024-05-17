@@ -62,7 +62,7 @@ QVariantMap SoftTriggerEvent::details(common::SystemContext* context) const
     result.insert(utils::kEmailTemplatePathDetailName, manifest().emailTemplatePath);
 
     utils::insertLevel(result, nx::vms::event::Level::common);
-    utils::insertIcon(result, nx::vms::rules::Icon::custom);
+    utils::insertIcon(result, nx::vms::rules::Icon::softTrigger);
     utils::insertIfNotEmpty(result, utils::kCustomIconDetailName, triggerIcon());
     utils::insertClientAction(result, nx::vms::rules::ClientAction::previewCameraOnTime);
 

@@ -14,9 +14,9 @@
 #include <nx/analytics/taxonomy/abstract_state_watcher.h>
 #include <nx/utils/metatypes.h>
 #include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/core/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
-#include <nx/vms/client/core/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
@@ -932,13 +932,7 @@ QString NotificationListModel::Private::iconPath(const vms::event::AbstractActio
     const auto& params = action->getRuntimeParams();
 
     if (params.eventType >= EventType::userDefinedEvent)
-    {
-        const auto sourceResources = event::sourceResources(params, system()->resourcePool());
-        if (sourceResources && !sourceResources->isEmpty())
-            return qnResIconCache->iconPath(sourceResources->first());
-
-        return "events/alert_20.svg";
-    }
+        return "16x16/Outline/generic.svg";
 
     switch (params.eventType)
     {
@@ -953,11 +947,11 @@ QString NotificationListModel::Private::iconPath(const vms::event::AbstractActio
             const auto objectType =
                 state->objectTypeById(action->getRuntimeParams().getAnalyticsObjectTypeId());
             return eventIconPath(
-                vms::rules::Icon::analyticsObject, objectType ? objectType->icon() : QString());
+                vms::rules::Icon::analyticsObjectDetected, objectType ? objectType->icon() : QString());
         }
 
         case EventType::softwareTriggerEvent:
-            return eventIconPath(nx::vms::rules::Icon::custom,
+            return eventIconPath(nx::vms::rules::Icon::softTrigger,
                 action->getRuntimeParams().description);
 
         case EventType::cameraMotionEvent:
@@ -968,7 +962,7 @@ QString NotificationListModel::Private::iconPath(const vms::event::AbstractActio
 
         case EventType::cameraDisconnectEvent:
         case EventType::networkIssueEvent:
-            return eventIconPath(nx::vms::rules::Icon::connection);
+            return eventIconPath(nx::vms::rules::Icon::networkIssue);
 
         case EventType::serverStartEvent:
         case EventType::serverFailureEvent:
@@ -982,7 +976,7 @@ QString NotificationListModel::Private::iconPath(const vms::event::AbstractActio
             return eventIconPath(nx::vms::rules::Icon::license);
 
         case EventType::pluginDiagnosticEvent:
-            return eventIconPath(nx::vms::rules::Icon::alert);
+            return eventIconPath(nx::vms::rules::Icon::pluginDiagnostic);
 
         default:
             return {};

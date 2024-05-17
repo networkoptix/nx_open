@@ -58,6 +58,7 @@ QVariantMap PluginDiagnosticEvent::details(common::SystemContext* context) const
 
     utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
     utils::insertLevel(result, calculateLevel(level()));
+    utils::insertIcon(result, nx::vms::rules::Icon::pluginDiagnostic);
 
     return result;
 }

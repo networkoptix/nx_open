@@ -47,7 +47,7 @@ QVariantMap DeviceIpConflictEvent::details(common::SystemContext* context) const
     utils::insertIfNotEmpty(result, utils::kNameDetailName, name(context));
     result.insert(utils::kEmailTemplatePathDetailName, manifest(context).emailTemplatePath);
     utils::insertLevel(result, nx::vms::event::Level::important);
-    utils::insertIcon(result, nx::vms::rules::Icon::connection);
+    utils::insertIcon(result, nx::vms::rules::Icon::resource);
     utils::insertClientAction(result, nx::vms::rules::ClientAction::browseUrl);
     utils::insertIfNotEmpty(result, utils::kUrlDetailName, m_ipAddress);
 

@@ -60,8 +60,7 @@ QString GenericEvent::extendedCaption() const
 
 Icon GenericEvent::icon() const
 {
-    // The custom icon is not set, because default analytics object icon should be used.
-    return Icon::analyticsObject;
+    return Icon::generic;
 }
 
 const ItemDescriptor& GenericEvent::manifest()
