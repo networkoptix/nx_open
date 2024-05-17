@@ -2,15 +2,15 @@
 
 #include "translation_overlay.h"
 
-#include "translation_overlay_item.h"
-
-#include <QCoreApplication>
+#include <QtCore/QCoreApplication>
 #include <QtCore/QThread>
 
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log_main.h>
 
-namespace nx::vms::utils {
+#include "translation_overlay_item.h"
+
+namespace nx::i18n {
 
 TranslationOverlay::TranslationOverlay(Translation&& translation, QObject* parent):
     QObject(parent),
@@ -147,4 +147,4 @@ void TranslationOverlay::handleTranslatorsUnderMutex()
     }
 }
 
-} // namespace nx::vms::utils
+} // namespace nx::i18n

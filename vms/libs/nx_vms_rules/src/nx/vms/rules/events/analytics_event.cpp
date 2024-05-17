@@ -10,9 +10,9 @@
 #include "../event_filter_fields/analytics_event_type_field.h"
 #include "../event_filter_fields/source_camera_field.h"
 #include "../event_filter_fields/text_lookup_field.h"
+#include "../strings.h"
 #include "../utils/event_details.h"
 #include "../utils/field.h"
-#include "../utils/string_helper.h"
 #include "../utils/type.h"
 
 namespace nx::vms::rules {
@@ -90,7 +90,7 @@ QString AnalyticsEvent::analyticsEventCaption(common::SystemContext* context) co
 
 QString AnalyticsEvent::extendedCaption(common::SystemContext* context) const
 {
-    const auto resourceName = utils::StringHelper(context).resource(cameraId(), Qn::RI_WithUrl);
+    const auto resourceName = Strings::resource(context, cameraId(), Qn::RI_WithUrl);
     const auto eventCaption = analyticsEventCaption(context);
 
     return tr("%1 at %2", "Analytics Event at some camera")
@@ -102,15 +102,23 @@ const ItemDescriptor& AnalyticsEvent::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<AnalyticsEvent>(),
-        .displayName = tr("Analytics Event"),
-        .description = "",
+        .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Analytics Event")),
+        .description = {},
         .flags = {ItemFlag::prolonged},
         .fields = {
-            utils::makeStateFieldDescriptor(tr("Begin When")),
-            makeFieldDescriptor<SourceCameraField>(utils::kCameraIdFieldName, tr("Occurs at")),
-            makeFieldDescriptor<AnalyticsEventTypeField>(utils::kEventTypeIdFieldName, tr("Of Type")),
-            makeFieldDescriptor<TextLookupField>(utils::kCaptionFieldName, tr("And Caption")),
-            makeFieldDescriptor<TextLookupField>(utils::kDescriptionFieldName, tr("And Description")),
+            utils::makeStateFieldDescriptor(Strings::beginWhen()),
+            makeFieldDescriptor<SourceCameraField>(
+                utils::kCameraIdFieldName,
+                Strings::occursAt()),
+            makeFieldDescriptor<AnalyticsEventTypeField>(
+                utils::kEventTypeIdFieldName,
+                Strings::ofType()),
+            makeFieldDescriptor<TextLookupField>(
+                utils::kCaptionFieldName,
+                Strings::andCaption()),
+            makeFieldDescriptor<TextLookupField>(
+                utils::kDescriptionFieldName,
+                Strings::andDescription()),
             // TODO: #amalov Consider adding following fields in 5.1+.
             // makeFieldDescriptor<AnalyticsObjectAttributesField>("attributes", tr("Attributes")),
         },

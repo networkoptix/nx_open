@@ -2,6 +2,7 @@
 
 #include "write_to_log_action.h"
 
+#include "../strings.h"
 #include "../utils/field.h"
 #include "../utils/type.h"
 
@@ -11,11 +12,11 @@ const ItemDescriptor& WriteToLogAction::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<WriteToLogAction>(),
-        .displayName = tr("Write to Log"),
+        .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Write to Log")),
         .executionTargets = ExecutionTarget::servers,
         .targetServers = TargetServers::currentServer,
         .fields = {
-            utils::makeIntervalFieldDescriptor(tr("Interval of Action")),
+            utils::makeIntervalFieldDescriptor(Strings::intervalOfAction()),
         }
     };
     return kDescriptor;

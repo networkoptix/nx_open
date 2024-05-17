@@ -24,9 +24,9 @@
 #include <nx/vms/rules/actions/show_on_alarm_layout_action.h>
 #include <nx/vms/rules/engine.h>
 #include <nx/vms/rules/ini.h>
+#include <nx/vms/rules/strings.h>
 #include <nx/vms/rules/utils/action.h>
 #include <nx/vms/rules/utils/field.h>
-#include <nx/vms/rules/utils/string_helper.h>
 #include <nx/vms/rules/utils/type.h>
 #include <ui/dialogs/camera_bookmark_dialog.h>
 #include <ui/dialogs/common/session_aware_dialog.h>

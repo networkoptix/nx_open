@@ -26,12 +26,11 @@ static const auto resourceA = nx::Uuid("00000000-0000-0000-0001-00000000000A");
 static const auto resourceB = nx::Uuid("00000000-0000-0000-0001-00000000000B");
 static const auto resourceC = nx::Uuid("00000000-0000-0000-0001-00000000000C");
 
-class ProlongedActionsTest: public ::testing::Test
+class ProlongedActionsTest: public EngineBasedTest
 {
 protected:
     virtual void SetUp() override
     {
-        engine = std::make_unique<Engine>(std::make_unique<TestRouter>());
         plugin = std::make_unique<TestPlugin>(engine.get());
 
         engine->addEventConnector(&connector);
@@ -60,7 +59,6 @@ protected:
     virtual void TearDown() override
     {
         plugin.reset();
-        engine.reset();
     }
 
     void whenTestEventFired(State state, nx::Uuid cameraId = resourceA)
@@ -99,13 +97,9 @@ protected:
         EXPECT_EQ(lastAction()->m_deviceIds, UuidList{resourceId});
     }
 
-    std::unique_ptr<Engine> engine;
     std::unique_ptr<Plugin> plugin;
     TestEventConnector connector;
     TestActionExecutor executor;
-
-private:
-    QnSyncTime syncTime;
 };
 
 TEST_F(ProlongedActionsTest, sanity)

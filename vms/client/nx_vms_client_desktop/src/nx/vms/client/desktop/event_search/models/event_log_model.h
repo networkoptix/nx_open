@@ -10,8 +10,6 @@
 #include <nx/vms/api/rules/event_log_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
 
-namespace nx::vms::rules::utils { class StringHelper; }
-
 namespace nx::vms::client::desktop {
 
 class EventLogModelData;
@@ -84,7 +82,6 @@ private:
     QList<Column> m_columns;
     QBrush m_linkBrush;
     std::unique_ptr<DataIndex> m_index;
-    std::unique_ptr<nx::vms::rules::utils::StringHelper> m_stringHelper;
 };
 
 } // namespace nx::vms::client::desktop

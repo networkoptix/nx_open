@@ -10,7 +10,7 @@
 
 #include "preloaded_translation_reference.h"
 
-namespace nx::vms::utils {
+namespace nx::i18n {
 
 using namespace std::chrono;
 
@@ -20,7 +20,7 @@ class TranslationManager;
  * Stores information about temporary Qt-specific locale used for all translatable strings
  * in the current thread. When this object is destroyed, the original locale is restored.
  */
-class NX_VMS_UTILS_API ScopedLocale
+class NX_UTILS_API ScopedLocale
 {
     friend TranslationManager;
 
@@ -36,4 +36,4 @@ private:
 
 using ScopedLocalePtr = std::unique_ptr<ScopedLocale>;
 
-} // namespace nx::vms::utils
+} // namespace nx::i18n

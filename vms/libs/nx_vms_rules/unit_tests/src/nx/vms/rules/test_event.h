@@ -27,10 +27,12 @@ public:
     {
         return ItemDescriptor{
             .id = utils::type<SimpleEvent>(),
-            .displayName = "Test event",
+            .displayName = TranslatableString("Test event"),
             .flags = {ItemFlag::instant, ItemFlag::prolonged},
             .fields = {
-                makeFieldDescriptor<SourceCameraField>(utils::kCameraIdFieldName, "Camera id"),
+                makeFieldDescriptor<SourceCameraField>(
+                    utils::kCameraIdFieldName,
+                    TranslatableString("Camera id")),
             }
         };
     }
@@ -70,7 +72,7 @@ public:
     {
         return ItemDescriptor{
             .id = utils::type<TestEvent>(),
-            .displayName = "Test event with permissions",
+            .displayName = TranslatableString("Test event with permissions"),
             .flags = {ItemFlag::instant, ItemFlag::prolonged},
             .resources = {
                 {"cameraId", {ResourceType::device, Qn::ViewContentPermission}},
@@ -144,10 +146,13 @@ public:
     {
         return ItemDescriptor{
             .id = utils::type<TestEventWithState>(),
-            .displayName = "Test event with state",
+            .displayName = TranslatableString("Test event with state"),
             .flags = {ItemFlag::prolonged},
             .fields = {
-                makeFieldDescriptor<StateField>(utils::kStateFieldName, "State field", {})
+                makeFieldDescriptor<StateField>(
+                    utils::kStateFieldName,
+                    TranslatableString("State field"),
+                    {})
             }
         };
     }

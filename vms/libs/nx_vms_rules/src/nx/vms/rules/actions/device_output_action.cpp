@@ -5,6 +5,7 @@
 #include "../action_builder_fields/optional_time_field.h"
 #include "../action_builder_fields/output_port_field.h"
 #include "../action_builder_fields/target_device_field.h"
+#include "../strings.h"
 #include "../utils/field.h"
 #include "../utils/type.h"
 
@@ -21,16 +22,20 @@ const ItemDescriptor& DeviceOutputAction::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<DeviceOutputAction>(),
-        .displayName = tr("Device Output"),
+        .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Device Output")),
         .flags = ItemFlag::prolonged,
         .executionTargets = ExecutionTarget::servers,
         .targetServers = TargetServers::resourceOwner,
         .fields = {
-            makeFieldDescriptor<TargetDeviceField>(utils::kDeviceIdsFieldName, tr("At")),
-            makeFieldDescriptor<OutputPortField>("outputPortId", tr("Output ID")),
+            makeFieldDescriptor<TargetDeviceField>(
+                utils::kDeviceIdsFieldName,
+                Strings::at()),
+            makeFieldDescriptor<OutputPortField>(
+                "outputPortId",
+                NX_DYNAMIC_TRANSLATABLE(tr("Output ID"))),
             utils::makeTimeFieldDescriptor<OptionalTimeField>(
                 utils::kDurationFieldName,
-                tr("Duration"),
+                Strings::duration(),
                 {},
                 TimeFieldProperties{
                     .value = 1s,

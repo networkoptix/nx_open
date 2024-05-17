@@ -5,9 +5,9 @@
 #include <nx/utils/range_adapters.h>
 
 #include "../group.h"
+#include "../strings.h"
 #include "../utils/event_details.h"
 #include "../utils/field.h"
-#include "../utils/string_helper.h"
 #include "../utils/type.h"
 
 namespace nx::vms::rules {
@@ -65,7 +65,7 @@ QStringList ServerConflictEvent::detailing() const
 
 QString ServerConflictEvent::extendedCaption(common::SystemContext* context) const
 {
-    const auto resourceName = utils::StringHelper(context).resource(serverId(), Qn::RI_WithUrl);
+    const auto resourceName = Strings::resource(context, serverId(), Qn::RI_WithUrl);
     return tr("Server \"%1\" Conflict").arg(resourceName);
 }
 
@@ -74,7 +74,7 @@ const ItemDescriptor& ServerConflictEvent::manifest()
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<ServerConflictEvent>(),
         .groupId = kServerIssueEventGroup,
-        .displayName = tr("Server Conflict"),
+        .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Server Conflict")),
         .resources = {{utils::kServerIdFieldName, {ResourceType::server}}},
         .readPermissions = GlobalPermission::powerUser,
         .emailTemplatePath = ":/email_templates/mediaserver_conflict.mustache"

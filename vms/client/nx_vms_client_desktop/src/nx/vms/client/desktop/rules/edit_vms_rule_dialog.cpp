@@ -26,7 +26,6 @@
 #include <nx/vms/rules/engine.h>
 #include <nx/vms/rules/event_filter.h>
 #include <nx/vms/rules/event_filter_fields/state_field.h>
-#include <nx/vms/rules/events/debug_event.h>
 #include <nx/vms/rules/utils/api.h>
 #include <nx/vms/rules/utils/common.h>
 #include <nx/vms/rules/utils/field.h>

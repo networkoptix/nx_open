@@ -12,7 +12,6 @@
 #include <client/client_runtime_settings.h>
 #include <nx/build_info.h>
 #include <nx/utils/log/log.h>
-#include <nx/vms/api/rules/rule.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/director/director.h>
 #include <nx/vms/client/desktop/ini.h>
@@ -23,12 +22,6 @@
 #include <nx/vms/client/desktop/testkit/testkit.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/event/actions/common_action.h>
-#include <nx/vms/rules/action_builder_fields/substitution.h>
-#include <nx/vms/rules/actions/show_notification_action.h>
-#include <nx/vms/rules/engine.h>
-#include <nx/vms/rules/event_connector.h>
-#include <nx/vms/rules/event_filter_fields/keywords_field.h>
-#include <nx/vms/rules/events/debug_event.h>
 #include <ui/dialogs/common/dialog.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/synctime.h>
@@ -51,33 +44,6 @@
 #if defined Q_OS_MAC
     #include "../dialogs/virtual_joystick_dialog_mac.h"
 #endif
-
-namespace {
-
-using namespace nx::vms::rules;
-
-class DebugEventConnector: public EventConnector
-{
-public:
-    void atInc()
-    {
-        emit event(EventPtr(new DebugEvent(
-            "Increment",
-            qnRuntime->debugCounter(),
-            qnSyncTime->currentTimePoint())));
-    }
-    void atDec()
-    {
-        emit event(EventPtr(new DebugEvent(
-            "Decrement",
-            qnRuntime->debugCounter(),
-            qnSyncTime->currentTimePoint())));
-    }
-};
-
-std::unique_ptr<DebugEventConnector> s_debugEventConnector;
-
-} // namespace
 
 namespace nx::vms::client::desktop {
 
@@ -202,7 +168,6 @@ DebugActionsHandler::DebugActionsHandler(WindowContext* windowContext, QObject *
 
 DebugActionsHandler::~DebugActionsHandler()
 {
-    s_debugEventConnector.reset();
 }
 
 void DebugActionsHandler::registerDebugCounterActions()
@@ -212,10 +177,6 @@ void DebugActionsHandler::registerDebugCounterActions()
 
     connect(action(menu::DebugDecrementCounterAction), &QAction::triggered, this,
         &DebugActionsHandler::at_debugDecrementCounterAction_triggered);
-
-    s_debugEventConnector = std::make_unique<DebugEventConnector>();
-    system()->vmsRulesEngine()->addEventConnector(
-        s_debugEventConnector.get());
 
     registerDebugAction(
         "Debug counter ++",
@@ -270,7 +231,6 @@ void DebugActionsHandler::enableSecurityForPowerUsers(bool value)
 void DebugActionsHandler::at_debugIncrementCounterAction_triggered()
 {
     qnRuntime->setDebugCounter(qnRuntime->debugCounter() + 1);
-    s_debugEventConnector->atInc();
     NX_INFO(this,
         "+++++++++++++++++++++++++++++++++++++ %1 +++++++++++++++++++++++++++++++++++++",
         qnRuntime->debugCounter());
@@ -279,7 +239,6 @@ void DebugActionsHandler::at_debugIncrementCounterAction_triggered()
 void DebugActionsHandler::at_debugDecrementCounterAction_triggered()
 {
     qnRuntime->setDebugCounter(qnRuntime->debugCounter() - 1);
-    s_debugEventConnector->atDec();
     NX_INFO(this,
         "------------------------------------- %1 -------------------------------------",
         qnRuntime->debugCounter());

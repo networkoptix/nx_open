@@ -9,9 +9,9 @@
 #include <nx/vms/common/system_context.h>
 
 #include "../group.h"
+#include "../strings.h"
 #include "../utils/event_details.h"
 #include "../utils/field.h"
-#include "../utils/string_helper.h"
 #include "../utils/type.h"
 
 namespace nx::vms::rules {
@@ -49,7 +49,7 @@ QVariantMap LicenseIssueEvent::details(common::SystemContext* context) const
 
 QString LicenseIssueEvent::extendedCaption(common::SystemContext* context) const
 {
-    const auto resourceName = utils::StringHelper(context).resource(serverId(), Qn::RI_WithUrl);
+    const auto resourceName = Strings::resource(context, serverId(), Qn::RI_WithUrl);
     return tr("Server \"%1\" has a license problem").arg(resourceName);
 }
 
@@ -58,7 +58,7 @@ const ItemDescriptor& LicenseIssueEvent::manifest()
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<LicenseIssueEvent>(),
         .groupId = kServerIssueEventGroup,
-        .displayName = tr("License Issue"),
+        .displayName = NX_DYNAMIC_TRANSLATABLE(tr("License Issue")),
         .resources = {
             {utils::kDeviceIdsFieldName, {ResourceType::device, Qn::ViewContentPermission}},
             {utils::kServerIdFieldName, {ResourceType::server}}},
@@ -87,9 +87,8 @@ QStringList LicenseIssueEvent::reason(nx::vms::common::SystemContext* context) c
             tr("Not enough licenses. Recording has been disabled on the following I/O modules:")),
         disabledCameras);
 
-    const auto stringHelper = utils::StringHelper(context);
-    for(const auto& camera: disabledCameras)
-        result << stringHelper.resource(camera);
+    for (const auto& camera: disabledCameras)
+        result << Strings::resource(camera);
 
     return result;
 }

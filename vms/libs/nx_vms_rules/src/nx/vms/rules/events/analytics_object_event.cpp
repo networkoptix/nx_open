@@ -10,9 +10,9 @@
 #include "../event_filter_fields/analytics_object_type_field.h"
 #include "../event_filter_fields/object_lookup_field.h"
 #include "../event_filter_fields/source_camera_field.h"
+#include "../strings.h"
 #include "../utils/event_details.h"
 #include "../utils/field.h"
-#include "../utils/string_helper.h"
 #include "../utils/type.h"
 
 namespace nx::vms::rules {
@@ -91,7 +91,7 @@ QString AnalyticsObjectEvent::analyticsObjectCaption(common::SystemContext* cont
 
 QString AnalyticsObjectEvent::extendedCaption(common::SystemContext* context) const
 {
-    const auto resourceName = utils::StringHelper(context).resource(cameraId(), Qn::RI_WithUrl);
+    const auto resourceName = Strings::resource(context, cameraId(), Qn::RI_WithUrl);
     const auto objectCaption = analyticsObjectCaption(context);
 
     return tr("%1 at camera '%2'", " is detected")
@@ -105,12 +105,18 @@ const ItemDescriptor& AnalyticsObjectEvent::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<AnalyticsObjectEvent>(),
-        .displayName = tr("Analytics Object Detected"),
+        .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Analytics Object Detected")),
         .description = {},
         .fields = {
-            makeFieldDescriptor<SourceCameraField>(utils::kCameraIdFieldName, tr("Occurs At")),
-            makeFieldDescriptor<AnalyticsObjectTypeField>(utils::kObjectTypeIdFieldName, tr("Of Type")),
-            makeFieldDescriptor<ObjectLookupField>(utils::kAttributesFieldName, tr("And Object")),
+            makeFieldDescriptor<SourceCameraField>(
+                utils::kCameraIdFieldName,
+                Strings::occursAt()),
+            makeFieldDescriptor<AnalyticsObjectTypeField>(
+                utils::kObjectTypeIdFieldName,
+                Strings::ofType()),
+            makeFieldDescriptor<ObjectLookupField>(
+                utils::kAttributesFieldName,
+                NX_DYNAMIC_TRANSLATABLE(tr("And Object"))),
         },
         .resources = {
             {utils::kCameraIdFieldName, {ResourceType::device, Qn::ViewContentPermission}},

@@ -272,7 +272,7 @@ QVariant RulesTableModel::stateColumnData(const ConstRulePtr& rule, int role) co
 QVariant RulesTableModel::eventColumnData(const ConstRulePtr& rule, int role) const
 {
     if (role == Qt::DisplayRole)
-        return m_engine->eventDescriptor(rule->eventFilters().first()->eventType())->displayName;
+        return m_engine->eventDescriptor(rule->eventFilters().first()->eventType())->displayName();
 
     return {};
 }
@@ -400,7 +400,7 @@ QVariant RulesTableModel::sourceServerData(const vms::rules::EventFilter* eventF
 QVariant RulesTableModel::actionColumnData(const ConstRulePtr& rule, int role) const
 {
     if (role == Qt::DisplayRole)
-        return m_engine->actionDescriptor(rule->actionBuilders().first()->actionType())->displayName;
+        return m_engine->actionDescriptor(rule->actionBuilders().first()->actionType())->displayName();
 
     return {};
 }

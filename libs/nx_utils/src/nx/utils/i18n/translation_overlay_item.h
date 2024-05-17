@@ -7,7 +7,7 @@
 
 #include <nx/utils/thread/mutex.h>
 
-namespace nx::vms::utils {
+namespace nx::i18n {
 
 /**
  * TranslationOverlayItem is an overload QTranslator, which processes strings only when called
@@ -35,4 +35,4 @@ private:
     mutable nx::ReadWriteLock m_lock;
 };
 
-} //namespace nx::vms::utils
+} // namespace nx::i18n

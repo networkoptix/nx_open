@@ -2,9 +2,9 @@
 
 #include "preloaded_translation_reference.h"
 
-#include <nx/vms/utils/translation/translation_manager.h>
+#include "translation_manager.h"
 
-namespace nx::vms::utils {
+namespace nx::i18n {
 
 PreloadedTranslationReference::PreloadedTranslationReference()
 {
@@ -62,4 +62,4 @@ QPointer<TranslationManager> PreloadedTranslationReference::manager() const
     return m_manager;
 }
 
-} // namespace nx::vms::utils
+} // namespace nx::i18n

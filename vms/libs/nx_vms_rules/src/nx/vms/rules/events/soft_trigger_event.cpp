@@ -7,9 +7,9 @@
 #include "../event_filter_fields/source_camera_field.h"
 #include "../event_filter_fields/source_user_field.h"
 #include "../event_filter_fields/unique_id_field.h"
+#include "../strings.h"
 #include "../utils/event_details.h"
 #include "../utils/field.h"
-#include "../utils/string_helper.h"
 #include "../utils/type.h"
 
 namespace nx::vms::rules {
@@ -88,25 +88,26 @@ QString SoftTriggerEvent::extendedCaption(common::SystemContext* context) const
 {
     return tr("Soft Trigger %1 at %2")
         .arg(trigger())
-        .arg(utils::StringHelper(context).resource(cameraId(), Qn::RI_WithUrl));
+        .arg(Strings::resource(context, cameraId(), Qn::RI_WithUrl));
 }
 
 const ItemDescriptor& SoftTriggerEvent::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<SoftTriggerEvent>(),
-        .displayName = tr("Soft Trigger"),
+        .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Soft Trigger")),
         .flags = {ItemFlag::instant, ItemFlag::prolonged},
         .fields = {
-            makeFieldDescriptor<UniqueIdField>("triggerId", "Invisible"),
+            makeFieldDescriptor<UniqueIdField>("triggerId",
+                NX_DYNAMIC_TRANSLATABLE(tr("Invisible"))),
             makeFieldDescriptor<SourceCameraField>(
                 utils::kCameraIdFieldName,
-                tr("Occurs at"),
+                Strings::occursAt(),
                 {},
                 {{"acceptAll", true}}),
             makeFieldDescriptor<SourceUserField>(
                 utils::kUserIdFieldName,
-                tr("By"),
+                NX_DYNAMIC_TRANSLATABLE(tr("By")),
                 {},
                 ResourceFilterFieldProperties{
                     .acceptAll = false,
@@ -114,8 +115,10 @@ const ItemDescriptor& SoftTriggerEvent::manifest()
                     .allowEmptySelection = false,
                     .validationPolicy = kUserInputValidationPolicy
                 }.toVariantMap()),
-            makeFieldDescriptor<CustomizableTextField>("triggerName", tr("Name")),
-            makeFieldDescriptor<CustomizableIconField>("triggerIcon", tr("Icon")),
+            makeFieldDescriptor<CustomizableTextField>("triggerName",
+                NX_DYNAMIC_TRANSLATABLE(tr("Name"))),
+            makeFieldDescriptor<CustomizableIconField>("triggerIcon",
+                NX_DYNAMIC_TRANSLATABLE(tr("Icon"))),
         },
         .resources = {
             {utils::kCameraIdFieldName, {ResourceType::device, Qn::ViewContentPermission}},

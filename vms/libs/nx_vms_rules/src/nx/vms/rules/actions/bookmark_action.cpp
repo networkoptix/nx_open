@@ -6,6 +6,7 @@
 #include "../action_builder_fields/target_device_field.h"
 #include "../action_builder_fields/text_field.h"
 #include "../action_builder_fields/time_field.h"
+#include "../strings.h"
 #include "../utils/event_details.h"
 #include "../utils/field.h"
 #include "../utils/type.h"
@@ -18,16 +19,18 @@ const ItemDescriptor& BookmarkAction::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<BookmarkAction>(),
-        .displayName = tr("Create Bookmark"),
+        .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Create Bookmark")),
         .flags = ItemFlag::prolonged,
         .executionTargets = ExecutionTarget::servers,
         .targetServers = TargetServers::resourceOwner,
         .fields = {
-            makeFieldDescriptor<TargetDeviceField>(utils::kDeviceIdsFieldName, tr("At")),
+            makeFieldDescriptor<TargetDeviceField>(
+                utils::kDeviceIdsFieldName,
+                Strings::at()),
             utils::makeTimeFieldDescriptor<OptionalTimeField>(
                 utils::kDurationFieldName,
-                tr("Duration"),
-                {},
+                Strings::duration(),
+                /*description*/ {},
                 TimeFieldProperties{
                     .value = 5s,
                     .defaultValue = 5s,
@@ -35,7 +38,7 @@ const ItemDescriptor& BookmarkAction::manifest()
                     .minimumValue = 5s}.toVariantMap()),
             utils::makeTimeFieldDescriptor<TimeField>(
                 vms::rules::utils::kRecordBeforeFieldName,
-                tr("Pre-recording"),
+                Strings::preRecording(),
                 {},
                 TimeFieldProperties{
                     .value = 1s,
@@ -43,17 +46,23 @@ const ItemDescriptor& BookmarkAction::manifest()
                     .minimumValue = 0s}.toVariantMap()),
             utils::makeTimeFieldDescriptor<TimeField>(
                 vms::rules::utils::kRecordAfterFieldName,
-                tr("Post-recording"),
+                Strings::postRecording(),
                 {},
                 TimeFieldProperties{
                     .value = 0s,
                     .maximumValue = 600s,
                     .minimumValue = 0s}.toVariantMap()),
-            makeFieldDescriptor<ActionTextField>("tags", tr("Add Tags")),
+            makeFieldDescriptor<ActionTextField>(
+                utils::kTagsFieldName,
+                NX_DYNAMIC_TRANSLATABLE(tr("Add Tags"))),
 
             // TODO: #amalov Use Qn::ResouceInfoLevel::RI_WithUrl & AttrSerializePolicy::singleLine
-            utils::makeExtractDetailFieldDescriptor("name", utils::kExtendedCaptionDetailName),
-            utils::makeExtractDetailFieldDescriptor("description", utils::kDetailingDetailName),
+            utils::makeExtractDetailFieldDescriptor(
+                utils::kNameFieldName,
+                utils::kExtendedCaptionDetailName),
+            utils::makeExtractDetailFieldDescriptor(
+                utils::kDescriptionFieldName,
+                utils::kDetailingDetailName),
         },
         .resources = {{utils::kDeviceIdsFieldName, {ResourceType::device, {}, {}, FieldFlag::target}}},
     };

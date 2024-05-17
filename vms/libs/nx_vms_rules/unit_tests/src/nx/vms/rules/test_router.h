@@ -3,6 +3,7 @@
 #pragma once
 
 #include <nx/vms/common/system_context.h>
+#include <nx/vms/common/test_support/test_context.h>
 #include <nx/vms/rules/engine.h>
 #include <nx/vms/rules/router.h>
 #include <nx/vms/rules/rule.h>
@@ -20,10 +21,7 @@ public:
         const EventPtr& event,
         const std::vector<ConstRulePtr>& triggeredRules) override
     {
-        for (const auto& rule: triggeredRules)
-        {
-            emit eventReceived(event, triggeredRules);
-        }
+        emit eventReceived(event, triggeredRules);
     }
 
     virtual void routeAction(const ActionPtr& action) override
@@ -38,16 +36,16 @@ public:
     }
 };
 
-/** May be used for test fixture inheritance. */
-struct TestEngineHolder
+struct EngineBasedTest: public common::test::ContextBasedTest
 {
     QnSyncTime syncTime;
     std::unique_ptr<Engine> engine;
 
-    explicit TestEngineHolder(nx::vms::common::SystemContext* context):
-        engine(std::make_unique<Engine>(std::make_unique<TestRouter>()))
+    EngineBasedTest():
+        engine(std::make_unique<Engine>(
+            systemContext(),
+            std::make_unique<TestRouter>()))
     {
-        context->setVmsRulesEngine(engine.get());
     }
 };
 

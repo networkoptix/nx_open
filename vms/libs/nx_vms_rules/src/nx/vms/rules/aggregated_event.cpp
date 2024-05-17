@@ -10,8 +10,8 @@
 #include <nx/utils/log/assert.h>
 #include <nx/vms/time/formatter.h>
 
+#include "strings.h"
 #include "utils/event_details.h"
-#include "utils/string_helper.h"
 
 namespace nx::vms::rules {
 
@@ -59,7 +59,7 @@ QVariantMap AggregatedEvent::details(common::SystemContext* context) const
 
     if (count > 1)
     {
-        const auto eventName = utils::StringHelper(context).eventName(initialEvent()->type());
+        const auto eventName = Strings::eventName(context, initialEvent()->type());
         eventDetails[utils::kExtendedCaptionDetailName] =
             tr("Multiple %1 events have occurred").arg(eventName);
     }

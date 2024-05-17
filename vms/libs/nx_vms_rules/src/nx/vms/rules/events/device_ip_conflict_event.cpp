@@ -10,9 +10,9 @@
 #include <nx/vms/common/system_context.h>
 
 #include "../group.h"
+#include "../strings.h"
 #include "../utils/event_details.h"
 #include "../utils/field.h"
-#include "../utils/string_helper.h"
 #include "../utils/type.h"
 
 namespace nx::vms::rules {
@@ -45,7 +45,7 @@ QVariantMap DeviceIpConflictEvent::details(common::SystemContext* context) const
     utils::insertIfNotEmpty(result, utils::kDetailingDetailName, detailing());
     utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
     utils::insertIfNotEmpty(result, utils::kNameDetailName, name(context));
-    result.insert(utils::kEmailTemplatePathDetailName, manifest().emailTemplatePath);
+    result.insert(utils::kEmailTemplatePathDetailName, manifest(context).emailTemplatePath);
     utils::insertLevel(result, nx::vms::event::Level::important);
     utils::insertIcon(result, nx::vms::rules::Icon::connection);
     utils::insertClientAction(result, nx::vms::rules::ClientAction::browseUrl);
@@ -76,14 +76,14 @@ QStringList DeviceIpConflictEvent::detailing() const
 
 QString DeviceIpConflictEvent::extendedCaption(common::SystemContext* context) const
 {
-    const auto resourceName = utils::StringHelper(context).resource(serverId(), Qn::RI_WithUrl);
+    const auto resourceName = Strings::resource(context, serverId(), Qn::RI_WithUrl);
     return QnDeviceDependentStrings::getDefaultNameFromSet(
         context->resourcePool(),
         tr("Device IP Conflict at %1", "Device IP Conflict at <server_name>"),
         tr("Camera IP Conflict at %1", "Camera IP Conflict at <server_name>")).arg(resourceName);
 }
 
-QString DeviceIpConflictEvent::name(common::SystemContext* context) const
+QString DeviceIpConflictEvent::name(common::SystemContext* context)
 {
     // TODO: #amalov The number of devices in translation should be corrected in 5.1+
     return QnDeviceDependentStrings::getDefaultNameFromSet(context->resourcePool(),
@@ -91,12 +91,21 @@ QString DeviceIpConflictEvent::name(common::SystemContext* context) const
         tr("Camera IP Conflict", "", 1));
 }
 
-const ItemDescriptor& DeviceIpConflictEvent::manifest()
+const ItemDescriptor& DeviceIpConflictEvent::manifest(common::SystemContext* context)
 {
+    auto getDisplayName =
+        [context = QPointer<common::SystemContext>(context)]
+        {
+            if (!context)
+                return QString();
+
+            return DeviceIpConflictEvent::name(context);
+        };
+
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<DeviceIpConflictEvent>(),
         .groupId = kDeviceIssueEventGroup,
-        .displayName = tr("Device IP Conflict"),
+        .displayName = TranslatableString(getDisplayName),
         .resources = {
             {utils::kDeviceIdsFieldName, {ResourceType::device, Qn::WritePermission}},
             {utils::kServerIdFieldName, {ResourceType::server}}},

@@ -14,8 +14,8 @@ namespace nx::vms::rules {
 template<class T>
 FieldDescriptor makeFieldDescriptor(
     const QString& fieldName,
-    const QString& displayName,
-    const QString& description = {},
+    const TranslatableString& displayName,
+    const TranslatableString& description = {},
     const QVariantMap& properties = {})
 {
     return FieldDescriptor{
@@ -34,15 +34,19 @@ static constexpr auto kAttributesFieldName = "attributes";
 static constexpr auto kCameraIdFieldName = "cameraId";
 static constexpr auto kCaptionFieldName = "caption";
 static constexpr auto kDescriptionFieldName = "description";
+static constexpr auto kDetailingFieldName = "detailing";
 static constexpr auto kDeviceIdsFieldName = "deviceIds";
 static constexpr auto kDurationFieldName = "duration";
 static constexpr auto kEmailsFieldName = "emails";
 static constexpr auto kEventTypeIdFieldName = "eventTypeId";
 static constexpr auto kEngineIdFieldName = "engineId";
+static constexpr auto kExtendedCaptionFieldName = "extendedCaption";
 static constexpr auto kIdFieldName = "id";
 static constexpr auto kIntervalFieldName = "interval";
 static constexpr auto kLayoutIdFieldName = "layoutId";
 static constexpr auto kLayoutIdsFieldName = "layoutIds";
+static constexpr auto kMessageFieldName = "message";
+static constexpr auto kNameFieldName = "name";
 static constexpr auto kObjectTypeIdFieldName = "objectTypeId";
 static constexpr auto kOmitLoggingFieldName = "omitLogging";
 static constexpr auto kPlaybackTimeFieldName = "playbackTime";
@@ -53,15 +57,19 @@ static constexpr auto kServerIdsFieldName = "serverIds";
 static constexpr auto kSoundFieldName = "sound";
 static constexpr auto kSourceFieldName = "source";
 static constexpr auto kStateFieldName = "state";
+static constexpr auto kTagsFieldName = "tags";
 static constexpr auto kTextFieldName = "text";
+static constexpr auto kTooltipFieldName = "tooltip";
+static constexpr auto kUrlFieldName = "url";
 static constexpr auto kUsersFieldName = "users";
 static constexpr auto kUserIdFieldName = "userId";
+static constexpr auto kVolumeFieldName = "volume";
 
 template <class T>
 FieldDescriptor makeTimeFieldDescriptor(
     const QString& fieldName,
-    const QString& displayName,
-    const QString& description = {},
+    const TranslatableString& displayName,
+    const TranslatableString& description = {},
     const QVariantMap& properties = {})
 {
     return makeFieldDescriptor<T>(
@@ -72,16 +80,16 @@ FieldDescriptor makeTimeFieldDescriptor(
 }
 
 NX_VMS_RULES_API FieldDescriptor makeIntervalFieldDescriptor(
-    const QString& displayName,
-    const QString& description = {});
+    const TranslatableString& displayName,
+    const TranslatableString& description = {});
 
 FieldDescriptor makePlaybackFieldDescriptor(
-    const QString& displayName,
-    const QString& description = {});
+    const TranslatableString& displayName,
+    const TranslatableString& description = {});
 
 FieldDescriptor makeStateFieldDescriptor(
-    const QString& displayName,
-    const QString& description = {},
+    const TranslatableString& displayName,
+    const TranslatableString& description = {},
     vms::rules::State defaultState = vms::rules::State::started);
 
 FieldDescriptor makeExtractDetailFieldDescriptor(
@@ -94,8 +102,8 @@ FieldDescriptor makeTextFormatterFieldDescriptor(
 
 FieldDescriptor makeActionFlagFieldDescriptor(
     const QString& fieldName,
-    const QString& displayName,
-    const QString& description = {},
+    const TranslatableString& displayName,
+    const TranslatableString& description = {},
     bool defaultValue = false);
 
 template <class T, class E>

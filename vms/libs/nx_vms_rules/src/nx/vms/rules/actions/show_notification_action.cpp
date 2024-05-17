@@ -9,9 +9,9 @@
 #include "../action_builder_fields/flag_field.h"
 #include "../action_builder_fields/target_user_field.h"
 #include "../action_builder_fields/text_with_fields.h"
+#include "../strings.h"
 #include "../utils/event_details.h"
 #include "../utils/field.h"
-#include "../utils/string_helper.h"
 #include "../utils/type.h"
 
 namespace nx::vms::rules {
@@ -20,13 +20,13 @@ const ItemDescriptor& NotificationAction::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<NotificationAction>(),
-        .displayName = tr("Show Desktop Notification"),
-        .description = "",
+        .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Show Desktop Notification")),
+        .description = {},
         .executionTargets = {ExecutionTarget::clients, ExecutionTarget::cloud},
         .fields = {
             makeFieldDescriptor<TargetUserField>(
                 utils::kUsersFieldName,
-                tr("To"),
+                Strings::to(),
                 {},
                 ResourceFilterFieldProperties{
                     .acceptAll = false,
@@ -34,32 +34,58 @@ const ItemDescriptor& NotificationAction::manifest()
                     .allowEmptySelection = false,
                     .validationPolicy = kBookmarkManagementValidationPolicy
                 }.toVariantMap()),
-            makeFieldDescriptor<ActionFlagField>(utils::kAcknowledgeFieldName, tr("Force Acknowledgement")),
-            utils::makeIntervalFieldDescriptor(tr("Interval of Action")),
+            makeFieldDescriptor<ActionFlagField>(utils::kAcknowledgeFieldName,
+                NX_DYNAMIC_TRANSLATABLE(tr("Force Acknowledgement"))),
+            utils::makeIntervalFieldDescriptor(Strings::intervalOfAction()),
 
-            makeFieldDescriptor<TextWithFields>("caption", tr("Caption"), QString(),
+            makeFieldDescriptor<TextWithFields>(
+                utils::kCaptionFieldName,
+                NX_DYNAMIC_TRANSLATABLE(tr("Caption")),
+                /*description*/ {},
                 {
                     { "text", "{@EventCaption}" },
                     { "visible", false }
                 }),
-            makeFieldDescriptor<TextWithFields>("description", tr("Description"), QString(),
+            makeFieldDescriptor<TextWithFields>(
+                utils::kDescriptionFieldName,
+                NX_DYNAMIC_TRANSLATABLE(tr("Description")),
+                /*description*/ {},
                 {
                     { "text", "{@EventDescription}" },
                     { "visible", false }
                 }),
-            makeFieldDescriptor<TextWithFields>("tooltip", tr("Tooltip"), QString(),
+            makeFieldDescriptor<TextWithFields>(
+                utils::kTooltipFieldName,
+                NX_DYNAMIC_TRANSLATABLE(tr("Tooltip")),
+                /*description*/ {},
                 {
                     { "text", "{@ExtendedEventDescription}" },
                     { "visible", false }
                 }),
-            makeFieldDescriptor<EventDevicesField>(utils::kDeviceIdsFieldName, "Event devices"),
-            utils::makeExtractDetailFieldDescriptor("sourceName", utils::kSourceNameDetailName),
-            utils::makeExtractDetailFieldDescriptor("level", utils::kLevelDetailName),
-            utils::makeExtractDetailFieldDescriptor("icon", utils::kIconDetailName),
-            utils::makeExtractDetailFieldDescriptor("customIcon", utils::kCustomIconDetailName),
-            utils::makeExtractDetailFieldDescriptor("clientAction", utils::kClientActionDetailName),
-            utils::makeExtractDetailFieldDescriptor("url", utils::kUrlDetailName),
-            utils::makeExtractDetailFieldDescriptor("extendedCaption", utils::kExtendedCaptionDetailName),
+            makeFieldDescriptor<EventDevicesField>(
+                utils::kDeviceIdsFieldName,
+                Strings::eventDevices()),
+            utils::makeExtractDetailFieldDescriptor(
+                "sourceName",
+                utils::kSourceNameDetailName),
+            utils::makeExtractDetailFieldDescriptor(
+                "level",
+                utils::kLevelDetailName),
+            utils::makeExtractDetailFieldDescriptor(
+                "icon",
+                utils::kIconDetailName),
+            utils::makeExtractDetailFieldDescriptor(
+                "customIcon",
+                utils::kCustomIconDetailName),
+            utils::makeExtractDetailFieldDescriptor(
+                "clientAction",
+                utils::kClientActionDetailName),
+            utils::makeExtractDetailFieldDescriptor(
+                utils::kUrlFieldName,
+                utils::kUrlDetailName),
+            utils::makeExtractDetailFieldDescriptor(
+                utils::kExtendedCaptionFieldName,
+                utils::kExtendedCaptionDetailName),
         },
         .resources = {
             {utils::kDeviceIdsFieldName, {ResourceType::device}},
@@ -72,8 +98,7 @@ const ItemDescriptor& NotificationAction::manifest()
 QVariantMap NotificationAction::details(common::SystemContext* context) const
 {
     auto result = BasicAction::details(context);
-    result.insert(utils::kDestinationDetailName, utils::StringHelper(context).subjects(users()));
-
+    result.insert(utils::kDestinationDetailName, Strings::subjects(context, users()));
     return result;
 }
 

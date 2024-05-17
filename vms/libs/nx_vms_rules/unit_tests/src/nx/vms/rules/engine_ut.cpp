@@ -42,6 +42,10 @@ const QString kTestActionFieldId = "nx.events.field.test";
 const FieldDescriptor kTestEventFieldDescriptor{.id = kTestEventFieldId};
 const FieldDescriptor kTestActionFiledDescriptor{.id = kTestActionFieldId};
 
+const TranslatableString kDisplayName("Display Name");
+const TranslatableString kEventName("Event Name");
+const TranslatableString kActionName("Action Name");
+
 api::Rule makeEmptyRuleData()
 {
     return {{nx::Uuid::createUuid()}};
@@ -49,20 +53,9 @@ api::Rule makeEmptyRuleData()
 
 } // namespace
 
-class EngineTest: public ::testing::Test
+class EngineTest: public EngineBasedTest
 {
 protected:
-    virtual void SetUp() override
-    {
-        engine = std::make_unique<Engine>(std::make_unique<TestRouter>());
-    }
-
-    virtual void TearDown() override
-    {
-        engine.reset();
-    }
-
-
     template<class Event, class Action>
     std::unique_ptr<Rule> makeRule(
         const Engine::EventConstructor& eventConstructor,
@@ -82,8 +75,6 @@ protected:
         return rule;
     }
 
-    QnSyncTime syncTime;
-    std::unique_ptr<Engine> engine;
     Engine::EventConstructor testEventConstructor = [] { return new TestEvent; };
     Engine::ActionConstructor testActionConstructor = [] { return new TestAction; };
     Engine::EventFieldConstructor testEventFieldConstructor =
@@ -144,21 +135,10 @@ TEST_F(EngineTest, invalidConstructorMustNotBeRegistered)
 
 TEST_F(EngineTest, descriptionWithoutIdMustNotBeRegistered)
 {
-    ItemDescriptor descriptorWithoutId {.displayName = "Name"};
+    ItemDescriptor descriptorWithoutId {.displayName = kDisplayName};
 
     ASSERT_FALSE(engine->registerEvent(descriptorWithoutId, testEventConstructor));
     ASSERT_FALSE(engine->registerAction(descriptorWithoutId, testActionConstructor));
-
-    ASSERT_TRUE(engine->events().empty());
-    ASSERT_TRUE(engine->actions().empty());
-}
-
-TEST_F(EngineTest, descriptionWithoutNameMustNotBeRegistered)
-{
-    ItemDescriptor descriptorWithoutName {.id = "nx.descriptor.id"};
-
-    ASSERT_FALSE(engine->registerEvent(descriptorWithoutName, testEventConstructor));
-    ASSERT_FALSE(engine->registerAction(descriptorWithoutName, testActionConstructor));
 
     ASSERT_TRUE(engine->events().empty());
     ASSERT_TRUE(engine->actions().empty());
@@ -168,8 +148,8 @@ TEST_F(EngineTest, validDescriptorMustBeRegistered)
 {
     ItemDescriptor eventDescriptor{
         .id = kTestEventId,
-        .displayName = "Event Name",
-        .description = "Event Description"};
+        .displayName = kEventName,
+        .description = TranslatableString("Event Description")};
 
     ASSERT_TRUE(engine->registerEvent(eventDescriptor, testEventConstructor));
 
@@ -181,8 +161,8 @@ TEST_F(EngineTest, validDescriptorMustBeRegistered)
 
     ItemDescriptor actionDescriptor{
         .id = kTestActionId,
-        .displayName = "Action Name",
-        .description = "Action Description"};
+        .displayName = kActionName,
+        .description = TranslatableString("Action Description")};
 
     ASSERT_TRUE(engine->registerAction(actionDescriptor, testActionConstructor));
 
@@ -199,13 +179,13 @@ TEST_F(EngineTest, descriptorMustNotBeRegisteredIfSomeOfTheFieldsNotRegistered)
 
     ItemDescriptor descriptorWithNotRegisteredField{
         .id = eventId,
-        .displayName = "Display Name",
-        .description = "Description",
+        .displayName = kDisplayName,
+        .description = {},
         .fields = {
             FieldDescriptor {
                 .id = "nx.field.test",
                 .fieldName = "testField",
-                .displayName = "Test Field",
+                .displayName = kDisplayName,
             }
         }};
 
@@ -239,13 +219,13 @@ TEST_F(EngineTest, eventFilterBuiltWithCorrectType)
 
     ItemDescriptor eventDescriptor{
         .id = kTestEventId,
-        .displayName = "Event Name",
-        .description = "Event Description",
+        .displayName = kEventName,
+        .description = {},
         .fields = {
             FieldDescriptor {
                 .id = kTestEventFieldId,
                 .fieldName = testFieldName,
-                .displayName = "Test Field",
+                .displayName = kDisplayName,
             }
         }};
 
@@ -276,10 +256,10 @@ TEST_F(EngineTest, manifestFieldNamesShouldBeUnique)
     const QString eventId = "nx.events.test";
     ItemDescriptor eventDescriptor{
         .id = eventId,
-        .displayName = "Test Name",
+        .displayName = kDisplayName,
         .fields = {
-            makeFieldDescriptor<TestEventField>("testField", "Test Field"),
-            makeFieldDescriptor<TestEventField>("testField", "Test Field"),
+            makeFieldDescriptor<TestEventField>("testField", kDisplayName),
+            makeFieldDescriptor<TestEventField>("testField", kDisplayName),
         }
     };
 
@@ -311,13 +291,13 @@ TEST_F(EngineTest, actionBuilderBuiltWithCorrectTypeAndCorrectFields)
 
     ItemDescriptor actionDescriptor{
         .id = kTestActionId,
-        .displayName = "Action Name",
-        .description = "Action Description",
+        .displayName = kActionName,
+        .description = {},
         .fields = {
             FieldDescriptor {
                 .id = kTestActionFieldId,
                 .fieldName = fieldName,
-                .displayName = "Test Field",
+                .displayName = kDisplayName,
             }
         }};
 
@@ -423,10 +403,10 @@ TEST_F(EngineTest, defaultFieldBuiltForAbsentInManifest)
     const QString eventType = "nx.events.test";
     ItemDescriptor eventDescriptor{
         .id = eventType,
-        .displayName = "Test Name",
+        .displayName = kDisplayName,
         .fields = {
-            makeFieldDescriptor<TestEventField>("testField1", "Test Field 1"),
-            makeFieldDescriptor<TestEventField>("testField2", "Test Field 2"),
+            makeFieldDescriptor<TestEventField>("testField1", kDisplayName),
+            makeFieldDescriptor<TestEventField>("testField2", kDisplayName),
         }
     };
     engine->registerEvent(eventDescriptor, testEventConstructor);
@@ -439,10 +419,10 @@ TEST_F(EngineTest, defaultFieldBuiltForAbsentInManifest)
     const QString actionType = "nx.actions.test";
     ItemDescriptor actionDescriptor{
         .id = actionType,
-        .displayName = "Test Name",
+        .displayName = kDisplayName,
         .fields = {
-            makeFieldDescriptor<TestActionField>("testField1", "Test Field 1"),
-            makeFieldDescriptor<TestActionField>("testField2", "Test Field 2"),
+            makeFieldDescriptor<TestActionField>("testField1", kDisplayName),
+            makeFieldDescriptor<TestActionField>("testField2", kDisplayName),
         }
     };
     engine->registerAction(actionDescriptor, testActionConstructor);
@@ -490,28 +470,37 @@ TEST_F(EngineTest, onlyValidProlongedActionRegistered)
 
     ItemDescriptor withoutFields{
         .id = "nx.actions.withoutFields",
-        .displayName = "Test Name",
+        .displayName = kDisplayName,
         .flags = ItemFlag::prolonged,
     };
     ASSERT_TRUE(engine->registerAction(withoutFields, testActionConstructor));
 
     ItemDescriptor withIntervalField{
         .id = "nx.actions.withIntervalField",
-        .displayName = "Test Name",
+        .displayName = kDisplayName,
         .flags = ItemFlag::prolonged,
         .fields = {
-            makeFieldDescriptor<OptionalTimeField>(utils::kIntervalFieldName, "Interval", {})
+            makeFieldDescriptor<OptionalTimeField>(
+                utils::kIntervalFieldName,
+                TranslatableString("Interval"),
+                {})
         }
     };
     ASSERT_FALSE(engine->registerAction(withIntervalField, testActionConstructor));
 
     ItemDescriptor withIntervalAndDurationFields{
         .id = "nx.actions.withIntervalAndDurationFields",
-        .displayName = "Test Name",
+        .displayName = kDisplayName,
         .flags = ItemFlag::prolonged,
         .fields = {
-            makeFieldDescriptor<OptionalTimeField>(utils::kIntervalFieldName, "Interval", {}),
-            makeFieldDescriptor<OptionalTimeField>(utils::kDurationFieldName, "Duration", {})
+            makeFieldDescriptor<OptionalTimeField>(
+                utils::kIntervalFieldName,
+                TranslatableString("Interval"),
+                {}),
+            makeFieldDescriptor<OptionalTimeField>(
+                utils::kDurationFieldName,
+                TranslatableString("Duration"),
+                {})
         }
     };
     ASSERT_TRUE(engine->registerAction(withIntervalAndDurationFields, testActionConstructor));

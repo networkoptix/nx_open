@@ -1,8 +1,8 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include <gtest/gtest.h>
-
 #include <future>
+
+#include <gtest/gtest.h>
 
 #include <nx/vms/rules/engine.h>
 #include <nx/vms/rules/event_connector.h>
@@ -11,6 +11,10 @@
 #include "test_router.h"
 
 namespace nx::vms::rules::test {
+
+class EventConnectorTest: public EngineBasedTest
+{
+};
 
 class TestEventConnector: public nx::vms::rules::EventConnector
 {
@@ -26,9 +30,8 @@ public:
     }
 };
 
-TEST(EventConnector, eventSignals)
+TEST_F(EventConnectorTest, eventSignals)
 {
-   auto engine = std::make_unique<Engine>(std::make_unique<TestRouter>());
    engine->registerEvent(TestEvent::manifest(), [] { return new TestEvent(); });
 
    auto connector = std::make_unique<TestEventConnector>();

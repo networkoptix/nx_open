@@ -25,3 +25,12 @@ void serialize(QnJsonContext* ctx, const ItemDescriptor& value, QJsonValue* targ
 }
 
 } // namespace nx::vms::rules
+
+namespace nx {
+
+void serialize(QnJsonContext* ctx, const TranslatableString& value, QJsonValue* target)
+{
+    serialize(ctx, QString(value), target);
+}
+
+} // namespace nx

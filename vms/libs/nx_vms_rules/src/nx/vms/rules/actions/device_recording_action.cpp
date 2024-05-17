@@ -7,6 +7,7 @@
 #include "../action_builder_fields/stream_quality_field.h"
 #include "../action_builder_fields/target_device_field.h"
 #include "../action_builder_fields/time_field.h"
+#include "../strings.h"
 #include "../utils/field.h"
 #include "../utils/type.h"
 
@@ -18,17 +19,23 @@ const ItemDescriptor& DeviceRecordingAction::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<DeviceRecordingAction>(),
-        .displayName = tr("Camera Recording"),
+        .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Camera Recording")),
         .flags = ItemFlag::prolonged,
         .executionTargets = ExecutionTarget::servers,
         .targetServers = TargetServers::resourceOwner,
         .fields = {
-            makeFieldDescriptor<TargetDeviceField>(utils::kDeviceIdsFieldName, tr("On")),
-            makeFieldDescriptor<StreamQualityField>("quality", tr("Quality")),
-            makeFieldDescriptor<FpsField>("fps", tr("FPS")),
+            makeFieldDescriptor<TargetDeviceField>(
+                utils::kDeviceIdsFieldName,
+                NX_DYNAMIC_TRANSLATABLE(tr("On"))),
+            makeFieldDescriptor<StreamQualityField>(
+                "quality",
+                NX_DYNAMIC_TRANSLATABLE(tr("Quality"))),
+            makeFieldDescriptor<FpsField>(
+                "fps",
+                NX_DYNAMIC_TRANSLATABLE(tr("FPS"))),
             utils::makeTimeFieldDescriptor<OptionalTimeField>(
                 utils::kDurationFieldName,
-                tr("Duration"),
+                Strings::duration(),
                 {},
                 TimeFieldProperties{
                     .value = 5s,
@@ -37,7 +44,7 @@ const ItemDescriptor& DeviceRecordingAction::manifest()
                     .minimumValue = 1s}.toVariantMap()),
             utils::makeTimeFieldDescriptor<TimeField>(
                 vms::rules::utils::kRecordBeforeFieldName,
-                tr("Pre-recording"),
+                Strings::preRecording(),
                 {},
                 TimeFieldProperties{
                     .value = 1s,
@@ -45,13 +52,13 @@ const ItemDescriptor& DeviceRecordingAction::manifest()
                     .minimumValue = 0s}.toVariantMap()),
             utils::makeTimeFieldDescriptor<TimeField>(
                 vms::rules::utils::kRecordAfterFieldName,
-                tr("Post-recording"),
+                Strings::postRecording(),
                 {},
                 TimeFieldProperties{
                     .value = 0s,
                     .maximumValue = 600s,
                     .minimumValue = 0s}.toVariantMap()),
-            utils::makeIntervalFieldDescriptor(tr("Interval of Action")),
+            utils::makeIntervalFieldDescriptor(Strings::intervalOfAction()),
         },
         .resources = {{utils::kDeviceIdsFieldName, {ResourceType::device, {}, {}, FieldFlag::target}}},
     };

@@ -5,9 +5,9 @@
 #include <nx/utils/metatypes.h>
 
 #include "../event_filter_fields/source_camera_field.h"
+#include "../strings.h"
 #include "../utils/event_details.h"
 #include "../utils/field.h"
-#include "../utils/string_helper.h"
 #include "../utils/type.h"
 
 namespace nx::vms::rules {
@@ -32,7 +32,7 @@ QVariantMap MotionEvent::details(common::SystemContext* context) const
 
 QString MotionEvent::extendedCaption(common::SystemContext* context) const
 {
-    const auto resourceName = utils::StringHelper(context).resource(cameraId(), Qn::RI_WithUrl);
+    const auto resourceName = Strings::resource(context, cameraId(), Qn::RI_WithUrl);
     return tr("Motion on %1").arg(resourceName);
 }
 
@@ -40,13 +40,13 @@ const ItemDescriptor& MotionEvent::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<MotionEvent>(),
-        .displayName = tr("Motion on Camera"),
+        .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Motion on Camera")),
         .flags = ItemFlag::prolonged,
         .fields = {
-            utils::makeStateFieldDescriptor(tr("Begin When")),
+            utils::makeStateFieldDescriptor(Strings::beginWhen()),
             makeFieldDescriptor<SourceCameraField>(
                 utils::kCameraIdFieldName,
-                tr("Occurs at"),
+                Strings::occursAt(),
                 {},
                 {{"acceptAll", true}}),
         },

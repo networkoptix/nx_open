@@ -4,11 +4,11 @@
 
 #include <client/client_meta_types.h>
 #include <client_core/client_core_meta_types.h>
+#include <nx/utils/external_resources.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/test_support/test_context.h>
-#include <nx/vms/utils/external_resources.h>
 
-using namespace nx::vms::utils;
+using namespace nx::utils;
 
 namespace nx::vms::client::desktop {
 namespace test {

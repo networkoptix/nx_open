@@ -7,11 +7,11 @@
 #include <QtGui/QIcon>
 #include <QtXml/QDomElement>
 
+#include <nx/utils/external_resources.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/icon.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/skin/svg_icon_colorer.h>
-#include <nx/vms/utils/external_resources.h>
 
 namespace {
 
@@ -161,7 +161,7 @@ protected:
     // virtual void SetUp() will be called before each test is run.
     virtual void SetUp() override
     {
-        nx::vms::utils::registerExternalResource("client_core_external.dat");
+        nx::utils::registerExternalResource("client_core_external.dat");
 
         static const QMap<QIcon::Mode, SvgIconColorer::ThemeColorsRemapData> themeSubstitutions = {
             {QIcon::Normal, { .primary = "light10"}},
@@ -184,7 +184,7 @@ protected:
     {
         m_colorTheme.reset();
 
-        ASSERT_TRUE(nx::vms::utils::unregisterExternalResource("client_core_external.dat"));
+        ASSERT_TRUE(nx::utils::unregisterExternalResource("client_core_external.dat"));
     }
 
 private:

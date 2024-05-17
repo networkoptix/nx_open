@@ -6,8 +6,6 @@
 #include <QtCore/QString>
 #include <QtGui/QIcon>
 
-#include <nx/vms/utils/translation/translation.h>
-
 namespace nx::vms::client::desktop {
 
 struct TranslationInfo

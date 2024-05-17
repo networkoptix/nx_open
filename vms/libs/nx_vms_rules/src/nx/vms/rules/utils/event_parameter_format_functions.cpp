@@ -16,10 +16,10 @@
 #include <nx/vms/rules/aggregated_event.h>
 #include <nx/vms/rules/engine.h>
 #include <nx/vms/rules/events/builtin_events.h>
+#include <nx/vms/rules/strings.h>
 #include <nx/vms/rules/utils/event.h>
 #include <nx/vms/rules/utils/event_details.h>
 #include <nx/vms/rules/utils/field.h>
-#include <nx/vms/rules/utils/string_helper.h>
 #include <nx/vms/rules/utils/type.h>
 
 namespace {
@@ -118,18 +118,18 @@ QString extendedEventDescription(
     if (const auto it = eventDetails.find(kTriggerNameDetailName); it != eventDetails.end())
         extendedDescription << QString("Trigger: %1").arg(it->toString());
 
-    const utils::StringHelper stringHelper{context};
     if (const auto it = eventDetails.find(kPluginIdDetailName); it != eventDetails.end())
     {
-        extendedDescription
-            << QString("Plugin: %1").arg(stringHelper.plugin(it->value<nx::Uuid>()));
+        extendedDescription << QString("Plugin: %1")
+            .arg(Strings::plugin(context, it->value<nx::Uuid>()));
     }
 
     if (const auto it = eventDetails.find(kExtraCaptionDetailName); it != eventDetails.end())
         extendedDescription << QString("Caption: %1").arg(it->toString());
 
-    extendedDescription << stringHelper.timestamp(
-        eventAggregator->initialEvent()->timestamp(), static_cast<int>(eventAggregator->count()));
+    extendedDescription << Strings::timestamp(
+        eventAggregator->initialEvent()->timestamp(),
+        static_cast<int>(eventAggregator->count()));
 
 
     // TODO: #vbutkevich need to remove Reason, since it is duplicated in the kDetailingDetailName. But not for all events.

@@ -10,6 +10,7 @@
 #include "../action_builder_fields/email_message_field.h"
 #include "../action_builder_fields/target_user_field.h"
 #include "../action_builder_fields/text_field.h"
+#include "../strings.h"
 #include "../utils/event_details.h"
 #include "../utils/field.h"
 #include "../utils/resource.h"
@@ -21,16 +22,16 @@ const ItemDescriptor& SendEmailAction::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<SendEmailAction>(),
-        .displayName = tr("Send Email"),
-        .description = "",
+        .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Send Email")),
+        .description = {},
         .flags = {ItemFlag::instant, ItemFlag::aggregationByTypeSupported, ItemFlag::omitLogging},
         .executionTargets = ExecutionTarget::servers,
         .targetServers = TargetServers::serverWithPublicIp,
         .fields = {
             makeFieldDescriptor<TargetUserField>(
                 utils::kUsersFieldName,
-                tr("To"),
-                {},
+                Strings::to(),
+                /*description*/ {},
                 ResourceFilterFieldProperties{
                     .acceptAll = false,
                     .ids = nx::utils::toQSet(vms::api::kAllPowerUserGroupIds),
@@ -38,13 +39,14 @@ const ItemDescriptor& SendEmailAction::manifest()
                     .validationPolicy = kUserWithEmailValidationPolicy
                 }.toVariantMap()),
             makeFieldDescriptor<ActionTextField>(
-                utils::kEmailsFieldName, tr("Additional Recipients")),
+                utils::kEmailsFieldName,
+                NX_DYNAMIC_TRANSLATABLE(tr("Additional Recipients"))),
             makeFieldDescriptor<EmailMessageField>(
-                "message",
-                tr("Email Message"),
+                utils::kMessageFieldName,
+                NX_DYNAMIC_TRANSLATABLE(tr("Email Message")),
                 {},
                 FieldProperties{.visible = false}.toVariantMap()),
-            utils::makeIntervalFieldDescriptor(tr("Interval of Action")),
+            utils::makeIntervalFieldDescriptor(Strings::intervalOfAction()),
         }
     };
     return kDescriptor;

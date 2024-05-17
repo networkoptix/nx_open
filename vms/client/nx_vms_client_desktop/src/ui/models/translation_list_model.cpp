@@ -5,16 +5,16 @@
 #include <QtCore/QCoreApplication>
 
 #include <client/client_globals.h>
+#include <nx/utils/i18n/scoped_locale.h>
+#include <nx/utils/i18n/translation_manager.h>
 #include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/utils/translation/scoped_locale.h>
-#include <nx/vms/utils/translation/translation_manager.h>
 
 using namespace nx::vms::client::desktop;
 
 QnTranslationListModel::QnTranslationListModel(QObject* parent):
     base_type(parent)
 {
-    using namespace nx::vms::utils;
+    using namespace nx::i18n;
     TranslationManager* translationManager = appContext()->translationManager();
     for (const Translation& translation: translationManager->translations())
     {

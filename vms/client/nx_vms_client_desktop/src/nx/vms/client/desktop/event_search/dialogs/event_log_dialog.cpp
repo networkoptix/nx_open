@@ -42,7 +42,7 @@
 #include <nx/vms/rules/engine.h>
 #include <nx/vms/rules/events/analytics_event.h>
 #include <nx/vms/rules/group.h>
-#include <nx/vms/rules/utils/string_helper.h>
+#include <nx/vms/rules/strings.h>
 #include <nx/vms/rules/utils/type.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/utils/table_export_helper.h>
@@ -274,8 +274,6 @@ EventLogDialog::~EventLogDialog()
 
 QStandardItem* EventLogDialog::createEventTree(const Group& group)
 {
-    const auto stringHelper = rules::utils::StringHelper(systemContext());
-
     auto item = new QStandardItem(group.name);
     item->setData(QString::fromStdString(group.id), EventTypeRole);
 
@@ -283,7 +281,7 @@ QStandardItem* EventLogDialog::createEventTree(const Group& group)
 
     for (const auto& eventType: group.items)
     {
-        auto eventItem = new QStandardItem(stringHelper.eventName(eventType));
+        auto eventItem = new QStandardItem(rules::Strings::eventName(systemContext(), eventType));
         eventItem->setData(eventType, EventTypeRole);
         item->appendRow(eventItem);
 
@@ -439,8 +437,6 @@ void EventLogDialog::initEventsModel()
 
 void EventLogDialog::initActionsModel()
 {
-    const auto stringHelper = rules::utils::StringHelper(systemContext());
-
     QStandardItem* anyActionItem = new QStandardItem(tr("Any Action"));
     anyActionItem->setData(QString(), ActionTypeRole);
     anyActionItem->setData(false, ProlongedActionRole);
@@ -450,7 +446,8 @@ void EventLogDialog::initActionsModel()
 
     for (const auto& actionDesc: systemContext()->vmsRulesEngine()->actions())
     {
-        QStandardItem* item = new QStandardItem(stringHelper.actionName(actionDesc.id));
+        QStandardItem* item = new QStandardItem(
+            rules::Strings::actionName(systemContext(), actionDesc.id));
         item->setData(actionDesc.id, ActionTypeRole);
         item->setData(actionDesc.flags.testFlag(ItemFlag::prolonged), ProlongedActionRole);
 

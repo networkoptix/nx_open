@@ -4,13 +4,13 @@
 
 #include <QtCore/QFileInfo>
 
-#include <nx/vms/utils/external_resources.h>
+#include <nx/utils/external_resources.h>
 #include <nx/vms/client/core/analytics/analytics_icon_manager.h>
 
 namespace nx::vms::client::desktop {
 namespace test {
 
-using namespace nx::vms::utils;
+using namespace nx::utils;
 
 class AnalyticsIconManagerTest: public testing::Test
 {

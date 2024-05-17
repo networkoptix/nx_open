@@ -1,15 +1,15 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include <gtest/gtest.h>
-
 #include <memory>
+
+#include <gtest/gtest.h>
 
 #include <QtGui/QPixmap>
 #include <QtGui/QPixmapCache>
 
+#include <nx/utils/external_resources.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/svg_loader.h>
-#include <nx/vms/utils/external_resources.h>
 
 #include "image_test_fixture.h"
 
@@ -21,7 +21,7 @@ class SvgLoaderTest: public ImageTestFixture
 public:
     SvgLoaderTest()
     {
-        nx::vms::utils::registerExternalResource("client_core_external.dat");
+        nx::utils::registerExternalResource("client_core_external.dat");
     }
 
     virtual void SetUp() override

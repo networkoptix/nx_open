@@ -4,6 +4,7 @@
 
 #include "../action_builder_fields/target_layout_field.h"
 #include "../action_builder_fields/target_user_field.h"
+#include "../strings.h"
 #include "../utils/field.h"
 #include "../utils/type.h"
 
@@ -13,14 +14,14 @@ const ItemDescriptor& ExitFullscreenAction::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<ExitFullscreenAction>(),
-        .displayName = tr("Exit Fullscreen"),
+        .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Exit Fullscreen")),
         .flags = ItemFlag::instant,
         .executionTargets = ExecutionTarget::clients,
         .fields = {
             makeFieldDescriptor<TargetUserField>(
                 utils::kUsersFieldName,
-                tr("To"),
-                {},
+                Strings::to(),
+                /*description*/ {},
                 ResourceFilterFieldProperties{
                     .visible = false,
                     .acceptAll = true,
@@ -28,7 +29,8 @@ const ItemDescriptor& ExitFullscreenAction::manifest()
                     .allowEmptySelection = false,
                     .validationPolicy = {}
                 }.toVariantMap()),
-            makeFieldDescriptor<TargetLayoutField>(utils::kLayoutIdsFieldName, tr("On Layout")),
+            makeFieldDescriptor<TargetLayoutField>(utils::kLayoutIdsFieldName,
+                Strings::onLayout()),
         },
         .resources = {{utils::kLayoutIdsFieldName, {ResourceType::layout}}},
     };

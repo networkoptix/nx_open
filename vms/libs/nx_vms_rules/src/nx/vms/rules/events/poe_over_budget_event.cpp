@@ -6,9 +6,9 @@
 
 #include "../event_filter_fields/source_server_field.h"
 #include "../group.h"
+#include "../strings.h"
 #include "../utils/event_details.h"
 #include "../utils/field.h"
-#include "../utils/string_helper.h"
 #include "../utils/type.h"
 
 namespace nx::vms::rules {
@@ -78,7 +78,7 @@ QString PoeOverBudgetEvent::description() const
 
 QString PoeOverBudgetEvent::extendedCaption(common::SystemContext* context) const
 {
-    const auto resourceName = utils::StringHelper(context).resource(m_serverId, Qn::RI_WithUrl);
+    const auto resourceName = Strings::resource(context, m_serverId, Qn::RI_WithUrl);
     return tr("PoE over budget at %1").arg(resourceName);
 }
 
@@ -97,11 +97,13 @@ const ItemDescriptor& PoeOverBudgetEvent::manifest()
         .id = utils::type<PoeOverBudgetEvent>(),
 
         .groupId = kServerIssueEventGroup,
-        .displayName = tr("PoE Over Budget"),
+        .displayName = NX_DYNAMIC_TRANSLATABLE(tr("PoE Over Budget")),
         .flags = ItemFlag::prolonged,
         .fields = {
-            utils::makeStateFieldDescriptor(tr("Begin When")),
-            makeFieldDescriptor<SourceServerField>(utils::kServerIdFieldName, tr("Server")),
+            utils::makeStateFieldDescriptor(Strings::beginWhen()),
+            makeFieldDescriptor<SourceServerField>(
+                utils::kServerIdFieldName,
+                NX_DYNAMIC_TRANSLATABLE(tr("Server"))),
         },
         .resources = {{utils::kServerIdFieldName, {ResourceType::server}}},
         .readPermissions = GlobalPermission::powerUser,

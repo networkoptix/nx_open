@@ -1,11 +1,10 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include <gtest/gtest.h>
-
 #include <chrono>
 
-#include <nx/vms/utils/translation/translation_manager.h>
+#include <gtest/gtest.h>
 
+#include <nx/utils/i18n/translation_manager.h>
 #include <nx/vms/text/human_readable.h>
 
 namespace nx::vms::text {
@@ -28,7 +27,7 @@ class HumanReadableTest: public ::testing::Test
 protected:
     virtual void SetUp() override
     {
-        nx::vms::utils::TranslationManager translationManager;
+        nx::i18n::TranslationManager translationManager;
         const bool loaded = translationManager.installTranslation(kLocale);
         ASSERT_TRUE(loaded);
     }

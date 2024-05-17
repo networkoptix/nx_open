@@ -3,9 +3,9 @@
 #include "server_failure_event.h"
 
 #include "../group.h"
+#include "../strings.h"
 #include "../utils/event_details.h"
 #include "../utils/field.h"
-#include "../utils/string_helper.h"
 #include "../utils/type.h"
 
 namespace nx::vms::rules {
@@ -43,7 +43,7 @@ QVariantMap ServerFailureEvent::details(common::SystemContext* context) const
 
 QString ServerFailureEvent::extendedCaption(common::SystemContext* context) const
 {
-    const auto resourceName = utils::StringHelper(context).resource(serverId(), Qn::RI_WithUrl);
+    const auto resourceName = Strings::resource(context, serverId(), Qn::RI_WithUrl);
     return tr("Server \"%1\" Failure").arg(resourceName);
 }
 
@@ -77,7 +77,7 @@ const ItemDescriptor& ServerFailureEvent::manifest()
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<ServerFailureEvent>(),
         .groupId = kServerIssueEventGroup,
-        .displayName = tr("Server Failure"),
+        .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Server Failure")),
         .resources = {{utils::kServerIdFieldName, {ResourceType::server}}},
         .readPermissions = GlobalPermission::powerUser,
         .emailTemplatePath = ":/email_templates/mediaserver_failure.mustache"

@@ -5,7 +5,7 @@
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/rules/engine.h>
 #include <nx/vms/rules/manifest.h>
-#include <nx/vms/rules/utils/string_helper.h>
+#include <nx/vms/rules/strings.h>
 
 namespace nx::vms::client::desktop {
 

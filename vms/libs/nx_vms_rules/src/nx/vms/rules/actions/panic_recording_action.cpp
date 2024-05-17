@@ -4,6 +4,7 @@
 
 #include "../action_builder_fields/optional_time_field.h"
 #include "../manifest.h"
+#include "../strings.h"
 #include "../utils/field.h"
 #include "../utils/type.h"
 
@@ -15,23 +16,23 @@ const ItemDescriptor& PanicRecordingAction::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<PanicRecordingAction>(),
-        .displayName = tr("Panic Recording"),
-        .description = tr("Panic Recording mode switches recording settings for all cameras"
-            " to maximum FPS and quality."),
+        .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Panic Recording")),
+        .description = NX_DYNAMIC_TRANSLATABLE(tr("Panic Recording mode switches recording "
+            "settings for all cameras to maximum FPS and quality.")),
         .flags = ItemFlag::prolonged,
         .executionTargets = ExecutionTarget::servers,
         .targetServers = TargetServers::currentServer,
         .fields = {
             utils::makeTimeFieldDescriptor<OptionalTimeField>(
                     utils::kDurationFieldName,
-                    tr("Duration"),
+                    Strings::duration(),
                     {},
                     TimeFieldProperties{
                         .value = 5s,
                         .defaultValue = 5s,
                         .maximumValue = 9999h,
                         .minimumValue = 1s}.toVariantMap()),
-            utils::makeIntervalFieldDescriptor(tr("Interval of Action"))
+            utils::makeIntervalFieldDescriptor(Strings::intervalOfAction()),
         },
     };
     return kDescriptor;

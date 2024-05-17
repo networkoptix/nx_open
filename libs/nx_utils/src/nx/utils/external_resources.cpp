@@ -3,6 +3,7 @@
 #include "external_resources.h"
 
 #include <algorithm>
+
 #include <QtCore/QCoreApplication>
 #include <QtCore/QResource>
 
@@ -10,7 +11,7 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/thread/mutex.h>
 
-namespace nx::vms::utils {
+namespace nx::utils {
 
 static QSet<QString> g_registeredDirectories;
 
@@ -81,4 +82,4 @@ bool registerExternalResourceDirectory(const QString& directory)
         });
 }
 
-} // namespace nx::vms::utils
+} // namespace nx::utils

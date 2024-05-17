@@ -4,9 +4,9 @@
 
 #include "../event_filter_fields/source_server_field.h"
 #include "../group.h"
+#include "../strings.h"
 #include "../utils/event_details.h"
 #include "../utils/field.h"
-#include "../utils/string_helper.h"
 #include "../utils/type.h"
 
 namespace nx::vms::rules {
@@ -36,7 +36,7 @@ QVariantMap FanErrorEvent::details(common::SystemContext* context) const
 
 QString FanErrorEvent::extendedCaption(common::SystemContext* context) const
 {
-    const auto resourceName = utils::StringHelper(context).resource(m_serverId, Qn::RI_WithUrl);
+    const auto resourceName = Strings::resource(context, m_serverId, Qn::RI_WithUrl);
     return tr("Fan error at %1").arg(resourceName);
 }
 
@@ -45,9 +45,11 @@ const ItemDescriptor& FanErrorEvent::manifest()
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<FanErrorEvent>(),
         .groupId = kServerIssueEventGroup,
-        .displayName = tr("Fan Failure"),
+        .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Fan Failure")),
         .fields = {
-            makeFieldDescriptor<SourceServerField>(utils::kServerIdFieldName, tr("At")),
+            makeFieldDescriptor<SourceServerField>(
+                utils::kServerIdFieldName,
+                Strings::at()),
         },
         .resources = {{utils::kServerIdFieldName, {ResourceType::server}}},
         .readPermissions = GlobalPermission::powerUser,

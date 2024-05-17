@@ -8,14 +8,15 @@
 #include <QtCore/QThread>
 
 #include <nx/fusion/serialization/json.h>
+#include <nx/utils/i18n/scoped_locale.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/qobject.h>
 #include <nx/vms/api/rules/rule.h>
+#include <nx/vms/common/system_context.h>
 #include <nx/vms/common/utils/schedule.h>
 #include <nx/vms/rules/ini.h>
 #include <nx/vms/rules/utils/action.h>
 #include <nx/vms/rules/utils/event.h>
-#include <nx/vms/utils/translation/scoped_locale.h>
 #include <utils/common/delayed.h>
 #include <utils/common/synctime.h>
 
@@ -44,7 +45,7 @@ namespace {
 
 bool isDescriptorValid(const ItemDescriptor& descriptor)
 {
-    if (descriptor.id.isEmpty() || descriptor.displayName.isEmpty())
+    if (descriptor.id.isEmpty())
         return false;
 
     std::set<QString> uniqueFields;
@@ -70,12 +71,19 @@ size_t qHash(const vms::rules::ActionPtr& action)
 
 } // namespace
 
-Engine::Engine(std::unique_ptr<Router> router, QObject* parent):
+Engine::Engine(
+    common::SystemContext* systemContext,
+    std::unique_ptr<Router> router,
+    QObject* parent)
+    :
     QObject(parent),
+    SystemContextAware(systemContext),
     m_router(std::move(router)),
     m_ruleMutex(nx::Mutex::Recursive),
     m_aggregationTimer(new QTimer(this))
 {
+    systemContext->setVmsRulesEngine(this);
+
     const QString rulesVersion(ini().rulesEngine);
     m_enabled = (rulesVersion == "new" || rulesVersion == "both");
     m_oldEngineEnabled = (rulesVersion != "new");
@@ -330,7 +338,7 @@ Group Engine::eventGroups() const
     for (const auto& descriptor: m_eventDescriptors)
         eventByGroup[descriptor.groupId].push_back(descriptor.id);
 
-    auto result = defaultEventGroups();
+    auto result = defaultEventGroups(systemContext());
 
     auto visitor =
         [&eventByGroup](Group& group, auto visitor)->void
@@ -900,7 +908,7 @@ void Engine::processAcceptedEvent(const EventPtr& event, const ConstRulePtr& rul
 
     for (const auto builder: rule->actionBuilders())
     {
-        nx::vms::utils::ScopedLocalePtr scopedLocale;
+        nx::i18n::ScopedLocalePtr scopedLocale;
 
         if (auto executor = m_executors.value(builder->actionType()))
             scopedLocale = executor->translateAction(builder->actionType());

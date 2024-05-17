@@ -4,7 +4,6 @@
 
 #include <nx/utils/qobject.h>
 #include <nx/utils/range_adapters.h>
-#include <nx/vms/common/test_support/test_context.h>
 #include <nx/vms/rules/action_builder.h>
 #include <nx/vms/rules/action_builder_fields/builtin_fields.h>
 #include <nx/vms/rules/actions/builtin_actions.h>
@@ -23,12 +22,11 @@
 namespace nx::vms::rules::test {
 
 class BuiltinTypesTest:
-    public common::test::ContextBasedTest,
-    public TestEngineHolder,
+    public EngineBasedTest,
     public Plugin
 {
 public:
-    BuiltinTypesTest(): TestEngineHolder(context()->systemContext())
+    BuiltinTypesTest()
     {
         initialize(engine.get());
     }
@@ -48,14 +46,14 @@ public:
     }
 
     template<class T>
-    void testManifestValidity()
+    void testManifestValidity(auto... args)
     {
-        const auto& manifest = T::manifest();
+        const auto& manifest = T::manifest(args...);
         const auto& meta = T::staticMetaObject;
         QSet<QString> fieldNames;
 
         EXPECT_FALSE(manifest.id.isEmpty());
-        EXPECT_FALSE(manifest.displayName.isEmpty());
+        EXPECT_FALSE(manifest.displayName.value().isEmpty());
         EXPECT_TRUE(manifest.flags.testFlag(ItemFlag::instant)
             || manifest.flags.testFlag(ItemFlag::prolonged));
 
@@ -81,9 +79,9 @@ public:
     }
 
     template<class T>
-    void testResourceDescriptors()
+    void testResourceDescriptors(auto... args)
     {
-        const auto& manifest = T::manifest();
+        const auto& manifest = T::manifest(args...);
         const auto& meta = T::staticMetaObject;
 
         static const auto resProps = QSet<QString>{
@@ -113,9 +111,9 @@ public:
     }
 
     template<class T>
-    void testPermissionsValidity()
+    void testPermissionsValidity(auto... args)
     {
-        const auto& manifest = T::manifest();
+        const auto& manifest = T::manifest(args...);
         const auto& meta = T::staticMetaObject;
         static const auto propTypes =
             std::set{qMetaTypeId<nx::Uuid>(), qMetaTypeId<UuidList>(), qMetaTypeId<UuidSet>()};
@@ -156,8 +154,8 @@ public:
 
     }
 
-    template<class T, class... Args>
-    void testActionFieldRegistration(Args... args)
+    template<class T>
+    void testActionFieldRegistration(auto... args)
     {
         SCOPED_TRACE(fieldMetatype<T>().toStdString());
 
@@ -166,8 +164,8 @@ public:
             [args...](const FieldDescriptor* descriptor){ return new T(args..., descriptor); }));
     }
 
-    template<class T, class... Args>
-    void testEventFieldRegistration(Args... args)
+    template<class T>
+    void testEventFieldRegistration(auto... args)
     {
         SCOPED_TRACE(fieldMetatype<T>().toStdString());
 
@@ -183,17 +181,17 @@ public:
     }
 
     template<class T>
-    void testEventRegistration()
+    void testEventRegistration(auto... args)
     {
-        const auto& manifest = T::manifest();
+        const auto& manifest = T::manifest(args...);
         SCOPED_TRACE(nx::format("Event id: %1", manifest.id).toStdString());
-
-        testManifestValidity<T>();
-        testResourceDescriptors<T>();
-        testPermissionsValidity<T>();
+        testManifestValidity<T>(args...);
+        testResourceDescriptors<T>(args...);
+        testPermissionsValidity<T>(args...);
 
         SCOPED_TRACE(nx::format("Group id: %1", manifest.groupId).toStdString());
-        EXPECT_TRUE(testGroupValidity(manifest.groupId, defaultEventGroups()));
+        EXPECT_TRUE(testGroupValidity(manifest.groupId,
+            defaultEventGroups(engine->systemContext())));
 
         // Check if all fields are registered.
         for (const auto& field : manifest.fields)
@@ -202,7 +200,7 @@ public:
             EXPECT_TRUE(engine->isEventFieldRegistered(field.id));
         }
 
-        ASSERT_TRUE(registerEvent<T>());
+        ASSERT_TRUE(registerEvent<T>(args...));
 
         const auto filter = engine->buildEventFilter(manifest.id);
         EXPECT_TRUE(filter);
@@ -288,10 +286,9 @@ TEST_F(BuiltinTypesTest, BuiltinEvents)
     testEventRegistration<AnalyticsEvent>();
     testEventRegistration<AnalyticsObjectEvent>();
     testEventRegistration<BackupFinishedEvent>();
-    testEventRegistration<CameraInputEvent>();
-    testEventRegistration<DebugEvent>();
-    testEventRegistration<DeviceDisconnectedEvent>();
-    testEventRegistration<DeviceIpConflictEvent>();
+    testEventRegistration<CameraInputEvent>(systemContext());
+    testEventRegistration<DeviceDisconnectedEvent>(systemContext());
+    testEventRegistration<DeviceIpConflictEvent>(systemContext());
     testEventRegistration<FanErrorEvent>();
     testEventRegistration<GenericEvent>();
     testEventRegistration<LicenseIssueEvent>();

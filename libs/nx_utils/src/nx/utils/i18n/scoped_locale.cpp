@@ -2,9 +2,9 @@
 
 #include "scoped_locale.h"
 
-#include "translation_manager.h"
-
 #include <nx/utils/log/log.h>
+
+#include "translation_manager.h"
 
 namespace {
 
@@ -12,7 +12,7 @@ const QString kDefaultAppLanguage = "default app language";
 
 } // namespace
 
-namespace nx::vms::utils {
+namespace nx::i18n {
 
 ScopedLocale::ScopedLocale(
     const PreloadedTranslationReference& translation,
@@ -23,7 +23,7 @@ ScopedLocale::ScopedLocale(
 {
     if (const auto& manager = m_translationRef.manager())
     {
-        m_oldLocale = manager->getCurrentThreadTranslationLocale();
+        m_oldLocale = TranslationManager::getCurrentThreadLocale();
         if (!manager->setCurrentThreadTranslationLocale(m_newLocale, maxWaitTime))
             m_newLocale.clear(); //< We use it for safety check in destructor.
 
@@ -36,7 +36,7 @@ ScopedLocale::~ScopedLocale()
 {
     if (const auto& manager = m_translationRef.manager())
     {
-        const auto curLocale = manager->getCurrentThreadTranslationLocale();
+        const auto curLocale = TranslationManager::getCurrentThreadLocale();
         NX_ASSERT(
             curLocale == m_newLocale,
             "Locale scopes aren't nested: current locale (%1) does not match expected value (%2)",
@@ -48,4 +48,4 @@ ScopedLocale::~ScopedLocale()
     }
 }
 
-} // namespace nx::vms::utils
+} // namespace nx::i18n

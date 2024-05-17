@@ -74,9 +74,19 @@ protected:
     }
 
     template<class E>
-    bool registerEvent(const Engine::EventConstructor& constructor = [] { return new E(); }) const
+    bool registerEvent(
+        const Engine::EventConstructor& constructor = []{ return new E(); }) const
     {
         const auto& manifest = E::manifest();
+        return m_engine->registerEvent(manifest, constructor);
+    }
+
+    template<class E>
+    bool registerEvent(
+        common::SystemContext* systemContext,
+        const Engine::EventConstructor& constructor = []{ return new E(); }) const
+    {
+        const auto& manifest = E::manifest(systemContext);
         return m_engine->registerEvent(manifest, constructor);
     }
 

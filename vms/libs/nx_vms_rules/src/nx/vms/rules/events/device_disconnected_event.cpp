@@ -9,9 +9,9 @@
 
 #include "../event_filter_fields/source_camera_field.h"
 #include "../group.h"
+#include "../strings.h"
 #include "../utils/event_details.h"
 #include "../utils/field.h"
-#include "../utils/string_helper.h"
 #include "../utils/type.h"
 
 namespace nx::vms::rules {
@@ -42,7 +42,7 @@ QVariantMap DeviceDisconnectedEvent::details(common::SystemContext* context) con
     utils::insertIfNotEmpty(result, utils::kCaptionDetailName, caption(context));
     utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
     utils::insertIfNotEmpty(result, utils::kNameDetailName, name(context));
-    result.insert(utils::kEmailTemplatePathDetailName, manifest().emailTemplatePath);
+    result.insert(utils::kEmailTemplatePathDetailName, manifest(context).emailTemplatePath);
     utils::insertIcon(result, nx::vms::rules::Icon::connection);
     utils::insertLevel(result, nx::vms::event::Level::critical);
     utils::insertClientAction(result, nx::vms::rules::ClientAction::cameraSettings);
@@ -65,8 +65,9 @@ QString DeviceDisconnectedEvent::caption(common::SystemContext* context) const
 
 QString DeviceDisconnectedEvent::extendedCaption(common::SystemContext* context) const
 {
-    const auto camera = context->resourcePool()->getResourceById<QnVirtualCameraResource>(m_cameraId);
-    const auto resourceName = utils::StringHelper(context).resource(m_cameraId, Qn::RI_WithUrl);
+    const auto camera = context->resourcePool()->getResourceById<QnVirtualCameraResource>(
+        m_cameraId);
+    const auto resourceName = Strings::resource(camera, Qn::RI_WithUrl);
 
     return QnDeviceDependentStrings::getNameFromSet(
         context->resourcePool(),
@@ -77,28 +78,48 @@ QString DeviceDisconnectedEvent::extendedCaption(common::SystemContext* context)
         camera).arg(resourceName);
 }
 
-QString DeviceDisconnectedEvent::name(common::SystemContext* context) const
+QString DeviceDisconnectedEvent::name(common::SystemContext* context)
 {
-    // TODO: #amalov The number of devices in translation should be corrected in 5.1+
     return QnDeviceDependentStrings::getDefaultNameFromSet(
         context->resourcePool(),
-        tr("Device Disconnected", "", 1),
-        tr("Camera Disconnected", "", 1));
+        tr("Device Disconnected"),
+        tr("Camera Disconnected"));
 }
 
-const ItemDescriptor& DeviceDisconnectedEvent::manifest()
+const ItemDescriptor& DeviceDisconnectedEvent::manifest(common::SystemContext* context)
 {
+    auto getDisplayName =
+        [context = QPointer<common::SystemContext>(context)]
+        {
+            if (!context)
+                return QString();
+
+            return DeviceDisconnectedEvent::name(context);
+        };
+
+    auto getSourceName =
+        [context = QPointer<common::SystemContext>(context)]
+        {
+            if (!context)
+                return QString();
+
+            return QnDeviceDependentStrings::getDefaultNameFromSet(
+                context->resourcePool(),
+                tr("Device"),
+                tr("Camera"));
+        };
+
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<DeviceDisconnectedEvent>(),
         .groupId = kDeviceIssueEventGroup,
-        .displayName = tr("Device Disconnected"),
-        .description = "",
+        .displayName = TranslatableString(getDisplayName),
+        .description = {},
         .flags = {ItemFlag::instant, ItemFlag::aggregationByTypeSupported},
         .fields = {
             makeFieldDescriptor<SourceCameraField>(
                 utils::kCameraIdFieldName,
-                tr("Device"),
-                {},
+                TranslatableString(getSourceName),
+                /*description*/ {},
                 {{"acceptAll", true}}),
         },
         .resources = {
