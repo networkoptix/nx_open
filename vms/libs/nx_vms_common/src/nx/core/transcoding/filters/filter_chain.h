@@ -59,7 +59,9 @@ public:
     void reset();
 
     QSize apply(const QSize& resolution) const;
-    CLVideoDecoderOutputPtr apply(const CLVideoDecoderOutputPtr& source) const;
+    CLVideoDecoderOutputPtr apply(
+        const CLVideoDecoderOutputPtr& source,
+        const QnAbstractCompressedMetadataPtr& metadata) const;
 
     void addLegacyFilter(QnAbstractImageFilterPtr filter);
 

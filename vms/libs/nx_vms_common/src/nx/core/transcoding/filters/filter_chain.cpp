@@ -3,20 +3,18 @@
 #include "filter_chain.h"
 
 #include <core/resource/media_resource.h>
-
-#include <transcoding/filters/scale_image_filter.h>
-#include <transcoding/filters/tiled_image_filter.h>
-#include <transcoding/filters/crop_image_filter.h>
-#include <transcoding/filters/dewarping_image_filter.h>
-#include <transcoding/filters/contrast_image_filter.h>
-#include <transcoding/filters/rotate_image_filter.h>
 #include <nx/core/transcoding/filters/paint_image_filter.h>
 #include <nx/core/transcoding/filters/timestamp_filter.h>
 #include <nx/core/transcoding/filters/watermark_filter.h>
-
-#include <transcoding/transcoder.h>
-
 #include <nx/utils/log/assert.h>
+#include <transcoding/filters/contrast_image_filter.h>
+#include <transcoding/filters/crop_image_filter.h>
+#include <transcoding/filters/dewarping_image_filter.h>
+#include <nx/core/transcoding/filters/pixelation_image_filter.h>
+#include <transcoding/filters/rotate_image_filter.h>
+#include <transcoding/filters/scale_image_filter.h>
+#include <transcoding/filters/tiled_image_filter.h>
+#include <transcoding/transcoder.h>
 
 namespace {
 
@@ -152,7 +150,9 @@ QSize FilterChain::apply(const QSize& resolution) const
     return result;
 }
 
-CLVideoDecoderOutputPtr FilterChain::apply(const CLVideoDecoderOutputPtr& source) const
+CLVideoDecoderOutputPtr FilterChain::apply(
+    const CLVideoDecoderOutputPtr& source,
+    const QnAbstractCompressedMetadataPtr& metadata) const
 {
     if (empty() || !source)
         return source;
@@ -163,7 +163,7 @@ CLVideoDecoderOutputPtr FilterChain::apply(const CLVideoDecoderOutputPtr& source
     result->copyFrom(source.get());
 
     for (auto filter: *this)
-        result = filter->updateImage(result);
+        result = filter->updateImage(result, metadata);
 
     return result;
 }

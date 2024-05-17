@@ -9,6 +9,9 @@
 class CLVideoDecoderOutput;
 using CLVideoDecoderOutputPtr = QSharedPointer<CLVideoDecoderOutput>;
 
+struct QnAbstractCompressedMetadata;
+using QnAbstractCompressedMetadataPtr = std::shared_ptr<QnAbstractCompressedMetadata>;
+
 // todo: simplify ffmpegVideoTranscoder and perform crop scale operations as filters
 
 /**
@@ -32,14 +35,17 @@ public:
     /**
      * Update video image.
      *
-     * \param frame image to update
+     * @param frame Frame image to update.
+     * @param metadata Frame metadata.
      */
-    virtual CLVideoDecoderOutputPtr updateImage(const CLVideoDecoderOutputPtr& frame) = 0;
+    virtual CLVideoDecoderOutputPtr updateImage(
+        const CLVideoDecoderOutputPtr& frame,
+        const QnAbstractCompressedMetadataPtr& metadata) = 0;
 
     /**
      * Update video size.
      *
-     * \param srcSize input image size. Function should return output image size
+     * @param srcSize input image size. Function should return output image size
      */
     virtual QSize updatedResolution(const QSize& srcSize) = 0;
 };

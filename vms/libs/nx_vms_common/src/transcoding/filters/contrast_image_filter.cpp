@@ -27,7 +27,9 @@ bool QnContrastImageFilter::isFormatSupported(CLVideoDecoderOutput* frame) const
     // TODO: C fallback routine.
 #endif
 
-CLVideoDecoderOutputPtr QnContrastImageFilter::updateImage(const CLVideoDecoderOutputPtr& srcFrame)
+CLVideoDecoderOutputPtr QnContrastImageFilter::updateImage(
+    const CLVideoDecoderOutputPtr& srcFrame,
+    const QnAbstractCompressedMetadataPtr&)
 {
     const CLVideoDecoderOutputPtr& frame = srcFrame;
 

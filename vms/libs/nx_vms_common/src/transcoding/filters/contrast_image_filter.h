@@ -11,7 +11,11 @@ class QnContrastImageFilter: public QnAbstractImageFilter
 {
 public:
     QnContrastImageFilter(const nx::vms::api::ImageCorrectionData& params);
-    CLVideoDecoderOutputPtr updateImage(const CLVideoDecoderOutputPtr& frame) override;
+
+    virtual CLVideoDecoderOutputPtr updateImage(
+        const CLVideoDecoderOutputPtr& frame,
+        const QnAbstractCompressedMetadataPtr& metadata) override;
+
     virtual QSize updatedResolution(const QSize& srcSize) override { return srcSize; }
 private:
     bool isFormatSupported(CLVideoDecoderOutput* frame) const;

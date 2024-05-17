@@ -22,7 +22,10 @@ public:
     PaintImageFilter();
     virtual ~PaintImageFilter();
 
-    virtual CLVideoDecoderOutputPtr updateImage(const CLVideoDecoderOutputPtr& frame) override;
+    virtual CLVideoDecoderOutputPtr updateImage(
+        const CLVideoDecoderOutputPtr& frame,
+        const QnAbstractCompressedMetadataPtr& metadata) override;
+
     virtual QSize updatedResolution(const QSize& sourceSize) override;
 
     void setImage(

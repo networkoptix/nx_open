@@ -321,7 +321,7 @@ QImage QnCamDisplay::getScreenshot(const QnLegacyTranscodingSettings& imageProce
             {
                 filters.prepare(QSize(frame->width, frame->height));
             }
-            frame = filters.apply(frame);
+            frame = filters.apply(frame, /*metadata*/ {});
         }
     }
     return frame ? frame->toImage() : QImage();

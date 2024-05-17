@@ -638,7 +638,7 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
             QSharedPointer<CLVideoDecoderOutput> frame(new CLVideoDecoderOutput(result));
             // TODO: #sivanov Looks like pts is not needed actually as kLatestThumbnail is handled.
             frame->pts = parameters.sharedParameters.timestampParams.timestamp.count() * 1000;
-            frame = filters.apply(frame);
+            frame = filters.apply(frame, /*metadata*/ {});
             result = frame ? frame->toImage() : QImage();
         }
     }
