@@ -12,6 +12,7 @@
 #include <nx/core/watermark/watermark.h>
 #include <nx/vms/api/data/dewarping_data.h>
 #include <nx/vms/api/data/image_correction_data.h>
+#include <nx/vms/api/data/pixelation_settings.h>
 #include <utils/common/aspect_ratio.h>
 
 #include "../timestamp_format.h"
@@ -57,6 +58,8 @@ struct Settings
 
     // Watermark; sometimes it behaves different from other overlays.
     Watermark watermark;
+
+    std::optional<nx::vms::api::PixelationSettings> pixelationSettings;
 
     QVector<OverlaySettingsPtr> overlays;
 

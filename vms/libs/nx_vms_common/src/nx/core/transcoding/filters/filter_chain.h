@@ -76,6 +76,7 @@ private:
     void prepareWatermarkFilter();
     void prepareDownscaleFilter(const QSize& srcFrameResolution, const QSize& resolutionLimit);
     void createScaleImageFilter(const QSize& dstSize);
+    void createPixelationImageFilter();
 
 private:
     bool m_ready = false;
