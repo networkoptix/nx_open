@@ -154,7 +154,6 @@ public slots:
     void onSkippingFrames(qint64 time);
     void onJumpOccurred(qint64 time);
     void onRealTimeStreamHint(bool value);
-    void onSlowSourceHint();
     void onReaderPaused();
     void onReaderResumed();
     void onPrevFrameOccurred();
@@ -210,12 +209,7 @@ private:
     void processSkippingFramesTime();
     qint64 doSmartSleep(const qint64 needToSleep, float speed);
 
-    enum class QueueSizeType
-    {
-        normalStream,
-        slowStream
-    };
-    int maxDataQueueSize(QueueSizeType type) const;
+    int maxDataQueueSize(bool live) const;
 
     static qint64 initialLiveBufferMkSecs();
     static qint64 maximumLiveBufferMkSecs();
@@ -275,7 +269,6 @@ protected:
     bool m_singleShotQuantProcessed;
     qint64 m_jumpTime;
     AudioFormat m_playingFormat;
-    int m_storedMaxQueueSize;
     QnAbstractVideoDecoder::DecodeMode m_lightCpuMode;
     QnVideoStreamDisplay::FrameDisplayStatus m_lastFrameDisplayed;
     bool m_realTimeHurryUp;

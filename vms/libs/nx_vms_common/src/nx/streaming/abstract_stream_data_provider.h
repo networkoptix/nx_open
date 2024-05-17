@@ -51,7 +51,6 @@ public:
     virtual void startIfNotRunning() { start(); }
 
 signals:
-    void slowSourceHint();
     void videoLayoutChanged();
 
 protected:
