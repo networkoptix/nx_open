@@ -8,6 +8,7 @@
 #include "../action_builder_fields/target_device_field.h"
 #include "../action_builder_fields/target_user_field.h"
 #include "../action_builder_fields/text_with_fields.h"
+#include "../strings.h"
 #include "../utils/event_details.h"
 #include "../utils/field.h"
 #include "../utils/type.h"
@@ -20,25 +21,29 @@ const ItemDescriptor& TextOverlayAction::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<TextOverlayAction>(),
-        .displayName = tr("Show Text Overlay"),
+        .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Show Text Overlay")),
         .flags = ItemFlag::prolonged,
         .executionTargets = ExecutionTarget::clients,
         .fields = {
-            makeFieldDescriptor<TargetDeviceField>(utils::kDeviceIdsFieldName, tr("At")),
+            makeFieldDescriptor<TargetDeviceField>(
+                utils::kDeviceIdsFieldName,
+                Strings::at()),
             utils::makeTimeFieldDescriptor<OptionalTimeField>(
                 utils::kDurationFieldName,
-                tr("Fixed Duration"),
-                {},
+                Strings::fixedDuration(),
+                /*description*/ {},
                 TimeFieldProperties{
                     .value = 5s,
                     .maximumValue = 30s,
                     .minimumValue = 5s}.toVariantMap()),
-            makeFieldDescriptor<TextWithFields>("text", tr("Custom Text")),
+            makeFieldDescriptor<TextWithFields>(
+                utils::kTextFieldName,
+                NX_DYNAMIC_TRANSLATABLE(tr("Custom Text"))),
 
             makeFieldDescriptor<TargetUserField>(
                 utils::kUsersFieldName,
-                tr("Show To"),
-                {},
+                NX_DYNAMIC_TRANSLATABLE(tr("Show To")),
+                /*description*/ {},
                 ResourceFilterFieldProperties{
                     .visible = false,
                     .acceptAll = true,
@@ -47,8 +52,12 @@ const ItemDescriptor& TextOverlayAction::manifest()
                     .validationPolicy = {}
                 }.toVariantMap()),
             // TODO: #amalov Use Qn::ResouceInfoLevel::RI_WithUrl & AttrSerializePolicy::singleLine
-            utils::makeExtractDetailFieldDescriptor("extendedCaption", utils::kExtendedCaptionDetailName),
-            utils::makeExtractDetailFieldDescriptor("detailing", utils::kDetailingDetailName),
+            utils::makeExtractDetailFieldDescriptor(
+                utils::kExtendedCaptionFieldName,
+                utils::kExtendedCaptionDetailName),
+            utils::makeExtractDetailFieldDescriptor(
+                utils::kDetailingFieldName,
+                utils::kDetailingDetailName),
         },
         .resources = {{utils::kDeviceIdsFieldName, {ResourceType::device}}},
     };

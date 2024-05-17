@@ -6,9 +6,9 @@
 
 #include <QtCore/QDirIterator>
 
+#include <nx/utils/external_resources.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
-#include <nx/vms/utils/external_resources.h>
 
 namespace nx::vms::client::desktop {
 namespace test {
@@ -19,8 +19,8 @@ public:
     ColorizedIconsTest()
     {
         // TODO: Perhaps we should just register all resources once in the main().
-        nx::vms::utils::registerExternalResource("client_external.dat");
-        nx::vms::utils::registerExternalResource("client_core_external.dat");
+        nx::utils::registerExternalResource("client_external.dat");
+        nx::utils::registerExternalResource("client_core_external.dat");
 
         // Initialize ColorTheme.
         m_colorTheme = std::make_unique<core::ColorTheme>();
@@ -45,8 +45,8 @@ public:
 
     virtual ~ColorizedIconsTest()
     {
-        nx::vms::utils::unregisterExternalResource("client_core_external.dat");
-        nx::vms::utils::unregisterExternalResource("client_external.dat");
+        nx::utils::unregisterExternalResource("client_core_external.dat");
+        nx::utils::unregisterExternalResource("client_external.dat");
     }
 
 public:

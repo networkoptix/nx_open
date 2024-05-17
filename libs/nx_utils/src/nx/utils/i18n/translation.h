@@ -5,7 +5,7 @@
 #include <QtCore/QString>
 #include <QtCore/QStringList>
 
-namespace nx::vms::utils {
+namespace nx::i18n {
 
 struct Translation
 {
@@ -18,4 +18,4 @@ struct Translation
     QString toString() const;
 };
 
-} // namespace nx::vms::utils
+} // namespace nx::i18n

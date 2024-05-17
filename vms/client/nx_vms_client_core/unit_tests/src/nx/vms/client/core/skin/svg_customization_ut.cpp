@@ -6,10 +6,10 @@
 #include <QtGui/QPainter>
 #include <QtSvg/QSvgRenderer>
 
+#include <nx/utils/external_resources.h>
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/skin/color_substitutions.h>
 #include <nx/vms/client/core/skin/svg_customization.h>
-#include <nx/vms/utils/external_resources.h>
 
 #include "image_test_fixture.h"
 

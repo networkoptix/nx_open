@@ -21,7 +21,7 @@ public:
     {
         return ItemDescriptor{
             .id = utils::type<TestAction>(),
-            .displayName = "Test action",
+            .displayName = TranslatableString("Test action"),
         };
     }
 };
@@ -38,10 +38,12 @@ public:
     {
         return ItemDescriptor{
             .id = utils::type<TestProlongedAction>(),
-            .displayName = "Test prolonged action",
+            .displayName = TranslatableString("Test prolonged action"),
             .flags = ItemFlag::prolonged,
             .fields = {
-                makeFieldDescriptor<TargetDeviceField>(utils::kDeviceIdsFieldName, "Cameras")},
+                makeFieldDescriptor<TargetDeviceField>(
+                    utils::kDeviceIdsFieldName,
+                    TranslatableString("Cameras"))},
         };
     }
 
@@ -62,10 +64,11 @@ public:
     {
         return ItemDescriptor{
             .id = utils::type<TestActionWithInterval>(),
-            .displayName = "Test action with interval",
+            .displayName = TranslatableString("Test action with interval"),
             .flags = ItemFlag::instant,
             .fields = {
-                utils::makeIntervalFieldDescriptor("Throttle")},
+                utils::makeIntervalFieldDescriptor(TranslatableString("Throttle"))
+            },
         };
     }
 
@@ -88,11 +91,14 @@ public:
     {
         return ItemDescriptor{
             .id = utils::type<TestActionWithTargetUsers>(),
-            .displayName = "Test action with users",
+            .displayName = TranslatableString("Test action with users"),
             .flags = ItemFlag::instant,
             .executionTargets = {ExecutionTarget::clients},
             .fields = {
-                makeFieldDescriptor<TargetUserField>(utils::kUsersFieldName, "Users")},
+                makeFieldDescriptor<TargetUserField>(
+                    utils::kUsersFieldName,
+                    TranslatableString("Users"))
+            },
         };
     }
 
@@ -112,13 +118,19 @@ public:
     {
         return ItemDescriptor{
             .id = utils::type<TestActionWithPermissions>(),
-            .displayName = "Test action with permissions",
+            .displayName = TranslatableString("Test action with permissions"),
             .flags = ItemFlag::instant,
             .executionTargets = {ExecutionTarget::clients},
             .fields = {
-                makeFieldDescriptor<TargetUserField>(utils::kUsersFieldName, "Users"),
+                makeFieldDescriptor<TargetUserField>(
+                    utils::kUsersFieldName,
+                    TranslatableString("Users")),
                 makeFieldDescriptor<TargetDeviceField>(
-                    utils::kDeviceIdsFieldName, "Devices", {}, {{"useSource", true}})},
+                    utils::kDeviceIdsFieldName,
+                    TranslatableString("Devices"),
+                    {},
+                    {{"useSource", true}})
+            },
             .resources = {
                 {utils::kCameraIdFieldName, {ResourceType::device, Qn::WritePermission}},
                 {utils::kDeviceIdsFieldName, {ResourceType::device, Qn::WritePermission}}},
@@ -139,11 +151,14 @@ public:
     {
         return ItemDescriptor{
             .id = utils::type<TestActionForUserAndServer>(),
-            .displayName = "Test action for user & server",
+            .displayName = TranslatableString("Test action for user & server"),
             .flags = {ItemFlag::instant},
             .executionTargets = {ExecutionTarget::clients, ExecutionTarget::servers},
             .fields = {
-                makeFieldDescriptor<TargetUserField>(utils::kUsersFieldName, "Users")},
+                makeFieldDescriptor<TargetUserField>(
+                    utils::kUsersFieldName,
+                    TranslatableString("Users"))
+            },
         };
     }
 
@@ -164,10 +179,12 @@ public:
     {
         return ItemDescriptor{
             .id = utils::type<TestActionWithTextWithFields>(),
-            .displayName = "Test action for text with fields",
+            .displayName = TranslatableString("Test action for text with fields"),
             .flags = {ItemFlag::prolonged},
             .fields = {
-                makeFieldDescriptor<TextWithFields>(kFieldName, tr("Text with fields"))
+                makeFieldDescriptor<TextWithFields>(
+                    kFieldName,
+                    TranslatableString("Text with fields"))
             }
         };
     }

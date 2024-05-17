@@ -4,7 +4,7 @@
 
 #include <QtCore/QThread>
 
-namespace nx::vms::utils {
+namespace nx::i18n {
 
 TranslationOverlayItem::TranslationOverlayItem(QObject* parent):
     QTranslator(parent)
@@ -40,4 +40,4 @@ QString TranslationOverlayItem::translate(
         : QString();
 }
 
-} //namespace nx::vms::utils
+} // namespace nx::i18n

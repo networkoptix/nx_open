@@ -2,10 +2,7 @@
 
 #include "network_issue_event.h"
 
-#include <nx/fusion/model_functions.h>
-
 #include <core/resource/resource.h>
-
 #include <nx/fusion/model_functions.h>
 
 namespace nx {

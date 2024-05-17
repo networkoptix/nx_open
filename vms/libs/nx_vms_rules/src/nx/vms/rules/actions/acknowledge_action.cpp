@@ -14,7 +14,7 @@ const ItemDescriptor& AcknowledgeAction::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<AcknowledgeAction>(),
-        .displayName = tr("Acknowledge"),
+        .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Acknowledge")),
         .flags = {ItemFlag::instant, ItemFlag::system},
         .executionTargets = {ExecutionTarget::clients, ExecutionTarget::servers},
         .targetServers = TargetServers::currentServer,

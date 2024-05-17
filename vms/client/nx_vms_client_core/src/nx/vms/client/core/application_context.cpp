@@ -12,6 +12,7 @@
 #include <finders/systems_finder.h>
 #include <nx/branding_proxy.h>
 #include <nx/build_info_proxy.h>
+#include <nx/utils/external_resources.h>
 #include <nx/vms/client/core/analytics/analytics_icon_manager.h>
 #include <nx/vms/client/core/event_search/models/visible_item_data_decorator_model.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
@@ -27,7 +28,6 @@
 #include <nx/vms/client/core/watchers/known_server_connections.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
 #include <nx/vms/discovery/manager.h>
-#include <nx/vms/utils/external_resources.h>
 #include <utils/media/voice_spectrum_analyzer.h>
 
 extern "C" {
@@ -61,9 +61,9 @@ namespace nx::vms::client::core {
 void initializeExternalResources(const QString& customExternalResourceFile)
 {
     if (!customExternalResourceFile.isEmpty())
-        nx::vms::utils::registerExternalResource(customExternalResourceFile);
-    nx::vms::utils::registerExternalResource("client_core_external.dat");
-    nx::vms::utils::registerExternalResource("bytedance_iconpark.dat",
+        nx::utils::registerExternalResource(customExternalResourceFile);
+    nx::utils::registerExternalResource("client_core_external.dat");
+    nx::utils::registerExternalResource("bytedance_iconpark.dat",
         analytics::IconManager::librariesRoot() + "bytedance.iconpark/");
 }
 

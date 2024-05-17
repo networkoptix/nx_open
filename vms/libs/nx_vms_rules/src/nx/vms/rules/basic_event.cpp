@@ -11,9 +11,9 @@
 #include <nx/vms/rules/utils/event.h>
 
 #include "engine.h"
+#include "strings.h"
 #include "utils/event_details.h"
 #include "utils/field.h"
-#include "utils/string_helper.h"
 #include "utils/type.h"
 
 namespace nx::vms::rules {
@@ -84,7 +84,7 @@ QVariantMap BasicEvent::details(common::SystemContext* context) const
         utils::insertIfNotEmpty(
             result,
             utils::kSourceNameDetailName,
-            utils::StringHelper(context).resource(source));
+            Strings::resource(context, source));
     }
 
     return result;
@@ -92,7 +92,7 @@ QVariantMap BasicEvent::details(common::SystemContext* context) const
 
 QString BasicEvent::name(common::SystemContext* context) const
 {
-    return utils::StringHelper(context).eventName(type());
+    return Strings::eventName(context, type());
 }
 
 QString BasicEvent::extendedCaption(common::SystemContext* context) const

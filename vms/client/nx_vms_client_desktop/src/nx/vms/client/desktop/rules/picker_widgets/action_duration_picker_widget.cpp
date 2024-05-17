@@ -6,6 +6,7 @@
 
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/rules/event_filter_fields/state_field.h>
+#include <nx/vms/rules/strings.h>
 #include <nx/vms/rules/utils/field.h>
 #include <ui/common/read_only.h>
 
@@ -74,7 +75,7 @@ ActionDurationPickerWidget::ActionDurationPickerWidget(
             auto actionStartLabel = new QnElidedLabel;
             actionStartLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
             actionStartLabel->setElideMode(Qt::ElideRight);
-            actionStartLabel->setText(tr("Begin When"));
+            actionStartLabel->setText(vms::rules::Strings::beginWhen().value());
 
             contentLayout->addWidget(actionStartLabel);
 

@@ -5,6 +5,7 @@
 #include "../event_filter_fields/customizable_flag_field.h"
 #include "../event_filter_fields/dummy_field.h"
 #include "../event_filter_fields/text_lookup_field.h"
+#include "../strings.h"
 #include "../utils/event_details.h"
 #include "../utils/field.h"
 #include "../utils/type.h"
@@ -67,16 +68,29 @@ const ItemDescriptor& GenericEvent::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<GenericEvent>(),
-        .displayName = tr("Generic Event"),
+        .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Generic Event")),
         .flags = {ItemFlag::instant, ItemFlag::prolonged},
         .fields = {
-            utils::makeStateFieldDescriptor(tr("State"), {}, State::instant),
-            makeFieldDescriptor<TextLookupField>(utils::kSourceFieldName, tr("And Source")),
-            makeFieldDescriptor<TextLookupField>(utils::kCaptionFieldName, tr("And Caption")),
-            makeFieldDescriptor<TextLookupField>(utils::kDescriptionFieldName, tr("And Description")),
-            makeFieldDescriptor<CustomizableFlagField>(utils::kOmitLoggingFieldName, tr("Omit logging")),
+            utils::makeStateFieldDescriptor(
+                Strings::state(),
+                {},
+                State::instant),
+            makeFieldDescriptor<TextLookupField>(
+                utils::kSourceFieldName,
+                NX_DYNAMIC_TRANSLATABLE(tr("And Source"))),
+            makeFieldDescriptor<TextLookupField>(
+                utils::kCaptionFieldName,
+                Strings::andCaption()),
+            makeFieldDescriptor<TextLookupField>(
+                utils::kDescriptionFieldName,
+                Strings::andDescription()),
+            makeFieldDescriptor<CustomizableFlagField>(
+                utils::kOmitLoggingFieldName,
+                NX_DYNAMIC_TRANSLATABLE(tr("Omit logging"))),
 
-            makeFieldDescriptor<DummyField>(utils::kDeviceIdsFieldName, utils::kDeviceIdsFieldName)
+            makeFieldDescriptor<DummyField>(
+                utils::kDeviceIdsFieldName,
+                /*displayName*/{})
         },
         .resources = {
             {utils::kServerIdFieldName,

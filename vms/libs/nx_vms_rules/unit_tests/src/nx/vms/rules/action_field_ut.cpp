@@ -7,7 +7,6 @@
 #include <QtCore/QString>
 
 #include <nx/vms/api/rules/rule.h>
-#include <nx/vms/common/test_support/test_context.h>
 #include <nx/vms/rules/action_builder.h>
 #include <nx/vms/rules/action_builder_fields/builtin_fields.h>
 #include <nx/vms/rules/action_executor.h>
@@ -71,8 +70,7 @@ struct FormatResult
 };
 
 class ActionFieldTest:
-    public common::test::ContextBasedTest,
-    public TestEngineHolder,
+    public EngineBasedTest,
     public ::testing::WithParamInterface<FormatResult>
 {
 public:
@@ -89,7 +87,7 @@ public:
     const QString kAttributeLicensePlateNumber = QStringLiteral("OUTATIME");
     const FieldDescriptor kDummyDescriptor;
 
-    ActionFieldTest(): TestEngineHolder(context()->systemContext())
+    ActionFieldTest()
     {
         engine->registerEvent(TestEvent::manifest(), []{ return new TestEvent(); });
     }

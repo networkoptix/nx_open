@@ -25,14 +25,15 @@ Initializer::~Initializer()
 
 void Initializer::registerEvents() const
 {
+    auto context = systemContext();
+
     // Register built-in events.
     registerEvent<AnalyticsEvent>();
     registerEvent<AnalyticsObjectEvent>();
     registerEvent<BackupFinishedEvent>();
-    registerEvent<CameraInputEvent>();
-    registerEvent<DeviceDisconnectedEvent>();
-    registerEvent<DeviceIpConflictEvent>();
-    registerEvent<DebugEvent>();
+    registerEvent<CameraInputEvent>(context);
+    registerEvent<DeviceDisconnectedEvent>(context);
+    registerEvent<DeviceIpConflictEvent>(context);
     registerEvent<FanErrorEvent>();
     registerEvent<GenericEvent>();
     registerEvent<LdapSyncIssueEvent>();

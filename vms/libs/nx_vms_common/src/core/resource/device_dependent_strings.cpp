@@ -6,9 +6,9 @@
 
 #include <QtCore/QCoreApplication>
 
-#include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/resource.h>
 #include <core/resource_management/resource_pool.h>
 
 namespace
@@ -32,27 +32,6 @@ public:
     static QString numericDevices(int count, bool capitalize)
     {
         return capitalize ? tr("%n Devices", "", count) : tr("%n devices", "", count);
-    }
-
-    static QString defaultCameras(bool plural, bool capitalize)
-    {
-        if (plural)
-            return capitalize ? tr("Cameras") : tr("cameras");
-        return capitalize ? tr("Camera") : tr("camera");
-    }
-
-    static QString defaultIoModules(bool plural, bool capitalize)
-    {
-        if (plural)
-            return capitalize ? tr("I/O Modules") : tr("I/O modules");
-        return capitalize ? tr("I/O Module") : tr("I/O module");
-    }
-
-    static QString defaultDevices(bool plural, bool capitalize)
-    {
-        if (plural)
-            return capitalize ? tr("Devices") : tr("devices");
-        return capitalize ? tr("Device") : tr("device");
     }
 };
 

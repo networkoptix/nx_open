@@ -5,19 +5,19 @@
 #include <QtCore/QDir>
 #include <QtCore/QString>
 
-namespace nx::vms::utils {
+namespace nx::utils {
 
-NX_VMS_UTILS_API QDir externalResourcesDirectory();
+NX_UTILS_API QDir externalResourcesDirectory();
 
-NX_VMS_UTILS_API bool registerExternalResource(
+NX_UTILS_API bool registerExternalResource(
     const QString& filename, const QString& mapRoot = QString());
 
-NX_VMS_UTILS_API bool unregisterExternalResource(
+NX_UTILS_API bool unregisterExternalResource(
     const QString& filename, const QString& mapRoot = QString());
 
 /**
  * Registers all files in the given directory.
  */
-NX_VMS_UTILS_API bool registerExternalResourceDirectory(const QString& directory);
+NX_UTILS_API bool registerExternalResourceDirectory(const QString& directory);
 
-} // namespace nx::vms::utils
+} // namespace nx::utils

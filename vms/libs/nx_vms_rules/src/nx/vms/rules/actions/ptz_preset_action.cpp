@@ -5,6 +5,7 @@
 #include "../action_builder_fields/ptz_preset_field.h"
 #include "../action_builder_fields/target_single_device_field.h"
 #include "../action_builder_fields/target_user_field.h"
+#include "../strings.h"
 #include "../utils/field.h"
 #include "../utils/type.h"
 
@@ -14,18 +15,22 @@ const ItemDescriptor& PtzPresetAction::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<PtzPresetAction>(),
-        .displayName = tr("Execute PTZ Preset"),
+        .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Execute PTZ Preset")),
         .flags = {ItemFlag::instant},
         .executionTargets = {ExecutionTarget::servers},
         .targetServers = TargetServers::resourceOwner,
         .fields = {
-            makeFieldDescriptor<TargetSingleDeviceField>(utils::kCameraIdFieldName, tr("At")),
-            makeFieldDescriptor<PtzPresetField>("presetId", tr("PTZ Preset")),
-            utils::makeIntervalFieldDescriptor(tr("Interval of Action")),
+            makeFieldDescriptor<TargetSingleDeviceField>(
+                utils::kCameraIdFieldName,
+                Strings::at()),
+            makeFieldDescriptor<PtzPresetField>(
+                "presetId",
+                NX_DYNAMIC_TRANSLATABLE(tr("PTZ Preset"))),
+            utils::makeIntervalFieldDescriptor(Strings::intervalOfAction()),
             makeFieldDescriptor<TargetUserField>(
                 utils::kUsersFieldName,
-                tr("Execute to users"),
-                {},
+                NX_DYNAMIC_TRANSLATABLE(tr("Execute to users")),
+                /*description*/ {},
                 ResourceFilterFieldProperties{
                     .visible = false,
                     .acceptAll = true,

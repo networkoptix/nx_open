@@ -7,9 +7,9 @@
 #include <nx/vms/rules/event_filter_fields/source_camera_field.h>
 #include <nx/vms/rules/event_filter_fields/text_lookup_field.h>
 
+#include "../strings.h"
 #include "../utils/event_details.h"
 #include "../utils/field.h"
-#include "../utils/string_helper.h"
 #include "../utils/type.h"
 
 namespace nx::vms::rules {
@@ -69,7 +69,7 @@ QString PluginDiagnosticEvent::eventCaption() const
 
 QString PluginDiagnosticEvent::extendedCaption(common::SystemContext* context) const
 {
-    const auto resourceName = utils::StringHelper(context).resource(cameraId(), Qn::RI_WithUrl);
+    const auto resourceName = Strings::resource(context, cameraId(), Qn::RI_WithUrl);
     return nx::format("%1 - %2", resourceName, eventCaption());
 }
 
@@ -77,18 +77,22 @@ const ItemDescriptor& PluginDiagnosticEvent::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<PluginDiagnosticEvent>(),
-        .displayName = tr("Plugin Diagnostic Event"),
+        .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Plugin Diagnostic Event")),
         .description = {},
         .fields = {
             makeFieldDescriptor<SourceCameraField>(
                 utils::kCameraIdFieldName,
-                tr("Occurs at"),
+                Strings::occursAt(),
                 {},
                 {{"acceptAll", false}}),
-            makeFieldDescriptor<AnalyticsEngineField>("engineId", tr("For Plugin")),
-            makeFieldDescriptor<TextLookupField>(utils::kCaptionFieldName, tr("And Caption")),
-            makeFieldDescriptor<TextLookupField>(utils::kDescriptionFieldName, tr("And Description")),
-            makeFieldDescriptor<AnalyticsEventLevelField>("level", tr("And Level Is")),
+            makeFieldDescriptor<AnalyticsEngineField>("engineId",
+                NX_DYNAMIC_TRANSLATABLE(tr("For Plugin"))),
+            makeFieldDescriptor<TextLookupField>(utils::kCaptionFieldName,
+                Strings::andCaption()),
+            makeFieldDescriptor<TextLookupField>(utils::kDescriptionFieldName,
+                Strings::andDescription()),
+            makeFieldDescriptor<AnalyticsEventLevelField>("level",
+                NX_DYNAMIC_TRANSLATABLE(tr("And Level Is"))),
         },
         .resources = {
             {utils::kCameraIdFieldName, {ResourceType::device, Qn::ViewContentPermission}},

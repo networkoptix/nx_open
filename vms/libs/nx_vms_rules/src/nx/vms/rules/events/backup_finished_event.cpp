@@ -3,9 +3,9 @@
 #include "backup_finished_event.h"
 
 #include "../group.h"
+#include "../strings.h"
 #include "../utils/event_details.h"
 #include "../utils/field.h"
-#include "../utils/string_helper.h"
 #include "../utils/type.h"
 
 namespace nx::vms::rules {
@@ -30,7 +30,7 @@ QVariantMap BackupFinishedEvent::details(common::SystemContext* context) const
 
 QString BackupFinishedEvent::extendedCaption(common::SystemContext* context) const
 {
-    const auto resourceName = utils::StringHelper(context).resource(serverId(), Qn::RI_WithUrl);
+    const auto resourceName = Strings::resource(context, serverId(), Qn::RI_WithUrl);
     return tr("Server \"%1\" has finished an archive backup").arg(resourceName);
 }
 
@@ -39,7 +39,7 @@ const ItemDescriptor& BackupFinishedEvent::manifest()
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<BackupFinishedEvent>(),
         .groupId = kServerIssueEventGroup,
-        .displayName = tr("Backup Finished"),
+        .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Backup Finished")),
         .flags = {ItemFlag::instant, ItemFlag::deprecated},
         .resources = {{utils::kServerIdFieldName, {ResourceType::server}}},
         .readPermissions = GlobalPermission::powerUser,

@@ -23,12 +23,12 @@ public:
     virtual QString resourceKey() const override;
     virtual QVariantMap details(common::SystemContext* context) const override;
 
-    static const ItemDescriptor& manifest();
+    static const ItemDescriptor& manifest(common::SystemContext* context);
 
 private:
     QString caption(common::SystemContext* context) const;
     QString extendedCaption(common::SystemContext* context) const;
-    QString name(common::SystemContext* context) const;
+    static QString name(common::SystemContext* context);
 };
 
 } // namespace nx::vms::rules

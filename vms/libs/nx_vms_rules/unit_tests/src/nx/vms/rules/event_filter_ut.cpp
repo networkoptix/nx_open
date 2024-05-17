@@ -23,12 +23,11 @@ const FieldDescriptor kDummyDescriptor;
 
 } // namespace
 
-class EventFilterTest: public ::testing::Test
+class EventFilterTest: public EngineBasedTest
 {
 protected:
     virtual void SetUp() override
     {
-        engine = std::make_unique<Engine>(std::make_unique<TestRouter>());
         mockRule = std::make_unique<Rule>(nx::Uuid(), engine.get());
 
         filter = std::make_unique<EventFilter>(nx::Uuid::createUuid(), "nx.events.generic");
@@ -60,7 +59,6 @@ protected:
             UuidList({nx::Uuid::createUuid()}));
     }
 
-    std::unique_ptr <Engine> engine;
     std::unique_ptr<Rule> mockRule;
     std::unique_ptr<EventFilter> filter;
 

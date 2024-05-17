@@ -4,7 +4,7 @@
 
 #include <QtCore/QObject>
 
-#include <nx/vms/utils/translation/scoped_locale.h>
+#include <nx/utils/i18n/scoped_locale.h>
 
 #include "rules_fwd.h"
 
@@ -25,7 +25,7 @@ public:
         QObject(parent)
     {}
 
-    virtual nx::vms::utils::ScopedLocalePtr translateAction(const QString& /*actionType*/)
+    virtual nx::i18n::ScopedLocalePtr translateAction(const QString& /*actionType*/)
     {
         return {};
     };

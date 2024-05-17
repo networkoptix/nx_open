@@ -9,28 +9,28 @@
 
 #include <nx/build_info.h>
 #include <nx/utils/elapsed_timer.h>
+#include <nx/utils/external_resources.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
-#include <nx/vms/utils/external_resources.h>
 
-#include "translation_overlay.h"
-#include "scoped_locale.h"
 #include "preloaded_translation_reference.h"
+#include "scoped_locale.h"
+#include "translation_overlay.h"
 
 namespace {
 
 static const QString kSearchPath(":/translations");
+thread_local QString sCurrentThreadLocale;
 
 } // namespace
 
-namespace nx::vms::utils {
+namespace nx::i18n {
 
 struct TranslationManager::Private
 {
     const QList<Translation> translations{loadTranslations()};
 
     mutable nx::Mutex mutex;
-    QHash<Qt::HANDLE, QString> threadLocales;
     QHash<QString, QSharedPointer<TranslationOverlay>> overlays;
     std::atomic<bool> assertOnOverlayInstallationFailure = false;
     std::atomic<bool> isLoadTranslationsEnabled = true;
@@ -44,12 +44,6 @@ struct TranslationManager::Private
             return std::nullopt;
 
         return *iter;
-    }
-
-    void uninstallUnusedOverlays()
-    {
-        for (auto& overlay: overlays)
-            overlay->uninstallIfUnused();
     }
 
 private:
@@ -70,7 +64,7 @@ private:
 
     QList<Translation> loadTranslations()
     {
-        registerExternalResourceDirectory("translations");
+        utils::registerExternalResourceDirectory("translations");
         QList<Translation> result;
 
         QDir dir(kSearchPath);
@@ -92,6 +86,21 @@ TranslationManager::TranslationManager(QObject *parent):
 
 TranslationManager::~TranslationManager()
 {
+}
+
+QString TranslationManager::getCurrentThreadLocale()
+{
+    return sCurrentThreadLocale;
+}
+
+void TranslationManager::setCurrentThreadLocale(QString locale)
+{
+    sCurrentThreadLocale = locale;
+}
+
+void TranslationManager::eraseCurrentThreadLocale()
+{
+    sCurrentThreadLocale = {};
 }
 
 QList<Translation> TranslationManager::translations() const
@@ -120,9 +129,9 @@ void TranslationManager::installTranslation(const Translation& translation)
 
     for (const QString& file: translation.filePaths)
     {
-        QScopedPointer<QTranslator> translator(new QTranslator(qApp));
+        auto translator = std::make_unique<QTranslator>(qApp);
         if (translator->load(file))
-            qApp->installTranslator(translator.take());
+            qApp->installTranslator(translator.release());
     }
 }
 
@@ -202,12 +211,6 @@ std::unique_ptr<ScopedLocale> TranslationManager::installScopedLocale(
     return std::make_unique<ScopedLocale>(PreloadedTranslationReference(), 0ms);
 }
 
-QString TranslationManager::getCurrentThreadTranslationLocale() const
-{
-    NX_MUTEX_LOCKER lock(&d->mutex);
-    return d->threadLocales.value(QThread::currentThreadId());
-}
-
 void TranslationManager::setLoadTranslationsEnabled(bool value)
 {
     d->isLoadTranslationsEnabled = value;
@@ -223,12 +226,12 @@ bool TranslationManager::setCurrentThreadTranslationLocale(
     std::chrono::milliseconds maxWaitTime)
 {
     NX_MUTEX_LOCKER lock(&d->mutex);
-    Qt::HANDLE id = QThread::currentThreadId();
-    const auto& curLocale = d->threadLocales.value(id);
+    const auto curLocale = getCurrentThreadLocale();
 
     if (locale == curLocale)
         return true;
 
+    Qt::HANDLE id = QThread::currentThreadId();
     if (!curLocale.isEmpty())
     {
         // We have overlayed locale for the given thread already. Disable the existing translators.
@@ -260,7 +263,7 @@ bool TranslationManager::setCurrentThreadTranslationLocale(
                 overlay->addThreadContext(id);
 
                 // Store the new locale of the thread.
-                d->threadLocales[id] = locale;
+                setCurrentThreadLocale(locale);
 
                 // Done.
                 return true;
@@ -268,12 +271,12 @@ bool TranslationManager::setCurrentThreadTranslationLocale(
         }
 
         // Locale doesn't exist or can't be installed in time. Switch to the app default language.
-        d->threadLocales.remove(id);
+        eraseCurrentThreadLocale();
         return false;
     }
 
     // An empty locale. Switch to the app default language.
-    d->threadLocales.remove(id);
+    eraseCurrentThreadLocale();
     return true;
 }
 
@@ -304,4 +307,4 @@ void TranslationManager::removePreloadedTranslationReference(const QString& loca
     // Dereferenced translation data is not deleted, so it may be reused later.
 }
 
-} // namespace nx::vms::utils
+} // namespace nx::i18n

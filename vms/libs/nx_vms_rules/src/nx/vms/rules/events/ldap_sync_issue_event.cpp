@@ -26,10 +26,9 @@ const ItemDescriptor& LdapSyncIssueEvent::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<LdapSyncIssueEvent>(),
-        .displayName = tr("Ldap Sync Issue Event"),
-        .description = "",
-        .fields = {
-        },
+        .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Ldap Sync Issue Event")),
+        .description = {},
+        .fields = {},
         .emailTemplatePath = ":/email_templates/ldap_sync_issue.mustache"
     };
     return kDescriptor;

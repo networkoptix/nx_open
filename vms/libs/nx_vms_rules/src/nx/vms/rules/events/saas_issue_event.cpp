@@ -12,9 +12,9 @@
 #include <nx/vms/event/strings_helper.h>
 
 #include "../group.h"
+#include "../strings.h"
 #include "../utils/event_details.h"
 #include "../utils/field.h"
-#include "../utils/string_helper.h"
 #include "../utils/type.h"
 
 namespace nx::vms::rules {
@@ -94,7 +94,7 @@ const ItemDescriptor& SaasIssueEvent::manifest()
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<SaasIssueEvent>(),
         .groupId = kServerIssueEventGroup,
-        .displayName = tr("Services issue"),
+        .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Services issue")),
         .resources = {
             {utils::kDeviceIdsFieldName, {ResourceType::device, Qn::ViewContentPermission}},
             {utils::kServerIdFieldName, {ResourceType::server}}},

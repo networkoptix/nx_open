@@ -5,11 +5,11 @@
 #include <nx/utils/log/format.h>
 #include <nx/utils/log/to_string.h>
 
-namespace nx::vms::utils {
+namespace nx::i18n {
 
 QString Translation::toString() const
 {
     return NX_FMT("%1 %2", localeCode, containerString(filePaths));
 }
 
-} // namespace nx::vms::utils
+} // namespace nx::i18n

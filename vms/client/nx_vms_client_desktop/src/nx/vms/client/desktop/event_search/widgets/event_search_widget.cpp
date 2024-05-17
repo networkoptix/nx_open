@@ -36,6 +36,7 @@
 #include <nx/vms/event/event_fwd.h>
 #include <nx/vms/event/strings_helper.h>
 #include <nx/vms/rules/engine.h>
+#include <nx/vms/rules/strings.h>
 #include <ui/workbench/workbench_context.h>
 
 using namespace std::chrono;
@@ -201,12 +202,14 @@ void EventSearchWidget::Private::setupTypeSelection()
     auto eventFilterMenu = q->createDropdownMenu();
     auto analyticsEventsMenu = q->createDropdownMenu();
 
-    analyticsEventsMenu->setTitle(tr("Analytics events"));
+    analyticsEventsMenu->setTitle(rules::Strings::analyticsEvents());
 
     StringsHelper helper(q->system());
 
     auto defaultAction = addMenuAction(
-        eventFilterMenu, tr("Any event"), EventType::undefinedEvent);
+        eventFilterMenu,
+        rules::Strings::anyEvent(),
+        EventType::undefinedEvent);
 
     eventFilterMenu->addSeparator();
 
@@ -228,7 +231,8 @@ void EventSearchWidget::Private::setupTypeSelection()
 
     eventFilterMenu->addSeparator();
     q->addDeviceDependentAction(eventFilterMenu->addMenu(createDeviceIssuesMenu(eventFilterMenu)),
-        tr("Device issues"), tr("Camera issues"));
+        rules::Strings::deviceIssues_internal(),
+        rules::Strings::cameraIssues_internal());
 
     m_serverEventsSubmenuAction =
         eventFilterMenu->addMenu(createServerEventsMenu(eventFilterMenu));
@@ -288,8 +292,8 @@ QMenu* EventSearchWidget::Private::createDeviceIssuesMenu(QWidget* parent) const
 
     q->addDeviceDependentAction(
         addMenuAction(menu, QString(), vms::api::EventType::anyCameraEvent, QString(), true),
-        tr("Any device issue"),
-        tr("Any camera issue"));
+        rules::Strings::anyDeviceIssue_internal(),
+        rules::Strings::anyCameraIssue_internal());
 
     menu->addSeparator();
 
@@ -308,9 +312,9 @@ QMenu* EventSearchWidget::Private::createServerEventsMenu(QWidget* parent) const
     menu->setProperty(style::Properties::kMenuAsDropdown, true);
     menu->setWindowFlags(menu->windowFlags() | Qt::BypassGraphicsProxyWidget);
 
-    menu->setTitle(tr("Server events"));
+    menu->setTitle(rules::Strings::serverEvents());
 
-    addMenuAction(menu, tr("Any server event"), EventType::anyServerEvent);
+    addMenuAction(menu, rules::Strings::anyServerEvent(), EventType::anyServerEvent);
     menu->addSeparator();
 
     const auto supportedEventTypes = allEvents({
@@ -397,7 +401,7 @@ void EventSearchWidget::Private::updateAnalyticsMenu()
         {
             addMenuAction(
                 analyticsMenu,
-                tr("Any analytics event"),
+                rules::Strings::anyAnalyticsEvent(),
                 EventType::analyticsSdkEvent,
                 {});
 

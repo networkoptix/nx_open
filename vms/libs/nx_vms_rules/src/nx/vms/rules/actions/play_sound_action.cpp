@@ -6,6 +6,7 @@
 #include "../action_builder_fields/target_device_field.h"
 #include "../action_builder_fields/target_user_field.h"
 #include "../action_builder_fields/volume_field.h"
+#include "../strings.h"
 #include "../utils/field.h"
 #include "../utils/type.h"
 
@@ -15,16 +16,18 @@ const ItemDescriptor& PlaySoundAction::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<PlaySoundAction>(),
-        .displayName = tr("Play Sound"),
+        .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Play Sound")),
         .flags = {ItemFlag::instant},
         .executionTargets = {ExecutionTarget::clients, ExecutionTarget::servers},
         .targetServers = TargetServers::resourceOwner,
         .fields = {
             makeFieldDescriptor<SoundField>(utils::kSoundFieldName, {}),
-            makeFieldDescriptor<TargetDeviceField>(utils::kDeviceIdsFieldName, tr("At")),
+            makeFieldDescriptor<TargetDeviceField>(
+                utils::kDeviceIdsFieldName,
+                Strings::at()),
             makeFieldDescriptor<TargetUserField>(
                 utils::kUsersFieldName,
-                tr("To Users"),
+                NX_DYNAMIC_TRANSLATABLE(tr("To Users")),
                 {},
                 ResourceFilterFieldProperties{
                     .acceptAll = false,
@@ -32,8 +35,10 @@ const ItemDescriptor& PlaySoundAction::manifest()
                     .allowEmptySelection = true,
                     .validationPolicy = {}
                 }.toVariantMap()),
-            makeFieldDescriptor<VolumeField>("volume", tr("Volume")),
-            utils::makeIntervalFieldDescriptor(tr("Interval of Action")),
+            makeFieldDescriptor<VolumeField>(
+                utils::kVolumeFieldName,
+                Strings::volume()),
+            utils::makeIntervalFieldDescriptor(Strings::intervalOfAction()),
         },
         .resources = {{utils::kDeviceIdsFieldName, {ResourceType::device, {}, {}, FieldFlag::target}}},
     };

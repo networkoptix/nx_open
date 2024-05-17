@@ -9,6 +9,7 @@
 #include "../action_builder_fields/target_user_field.h"
 #include "../action_builder_fields/text_with_fields.h"
 #include "../action_builder_fields/volume_field.h"
+#include "../strings.h"
 #include "../utils/field.h"
 #include "../utils/type.h"
 
@@ -18,27 +19,33 @@ const ItemDescriptor& SpeakAction::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<SpeakAction>(),
-        .displayName = tr("Speak"),
+        .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Speak")),
         .flags = {ItemFlag::instant},
         .executionTargets = {ExecutionTarget::clients, ExecutionTarget::servers},
         .targetServers = TargetServers::resourceOwner,
         .fields = {
-            makeFieldDescriptor<TextWithFields>(utils::kTextFieldName, tr("Text")),
-            makeFieldDescriptor<TargetDeviceField>(utils::kDeviceIdsFieldName, tr("At Device")),
+            makeFieldDescriptor<TextWithFields>(utils::kTextFieldName,
+                NX_DYNAMIC_TRANSLATABLE(tr("Text"))),
+            makeFieldDescriptor<TargetDeviceField>(utils::kDeviceIdsFieldName,
+                NX_DYNAMIC_TRANSLATABLE(tr("At Device"))),
             makeFieldDescriptor<TargetUserField>(
                 utils::kUsersFieldName,
-                tr("To users"),
-                {},
+                NX_DYNAMIC_TRANSLATABLE(tr("To users")),
+                /*description*/ {},
                 ResourceFilterFieldProperties{
                     .acceptAll = false,
                     .ids = nx::utils::toQSet(vms::api::kAllPowerUserGroupIds),
                     .allowEmptySelection = true,
                     .validationPolicy = {}
                 }.toVariantMap()),
-            makeFieldDescriptor<VolumeField>("volume", tr("Volume")),
-            utils::makeIntervalFieldDescriptor(tr("Interval of Action")),
+            makeFieldDescriptor<VolumeField>(
+                utils::kVolumeFieldName,
+                Strings::volume()),
+            utils::makeIntervalFieldDescriptor(Strings::intervalOfAction()),
         },
-        .resources = {{utils::kDeviceIdsFieldName, {ResourceType::device, {}, {}, FieldFlag::target}}},
+        .resources = {
+            {utils::kDeviceIdsFieldName, {ResourceType::device, {}, {}, FieldFlag::target}}
+        },
     };
     return kDescriptor;
 }

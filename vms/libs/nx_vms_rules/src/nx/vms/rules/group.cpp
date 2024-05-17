@@ -2,18 +2,9 @@
 
 #include "group.h"
 
-#include <QCoreApplication>
+#include "strings.h"
 
 namespace nx::vms::rules {
-
-namespace {
-
-class GroupStrings
-{
-    Q_DECLARE_TR_FUNCTIONS(GroupStrings)
-};
-
-} // namespace
 
 const Group* Group::findGroup(const std::string& id) const
 {
@@ -29,19 +20,19 @@ const Group* Group::findGroup(const std::string& id) const
     return nullptr;
 }
 
-Group defaultEventGroups()
+Group defaultEventGroups(common::SystemContext* context)
 {
     return Group{
         .id = {},
-        .name = GroupStrings::tr("Any event"),
+        .name = Strings::anyEvent(),
         .groups = {
             {
                 .id = kDeviceIssueEventGroup,
-                .name = GroupStrings::tr("Any camera issue"),
+                .name = Strings::anyDeviceIssue(context),
             },
             {
                 .id = kServerIssueEventGroup,
-                .name = GroupStrings::tr("Any server issue"),
+                .name = Strings::anyServerEvent(),
             },
 
         },

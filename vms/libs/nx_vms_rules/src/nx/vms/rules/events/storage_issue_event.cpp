@@ -3,9 +3,9 @@
 #include "storage_issue_event.h"
 
 #include "../group.h"
+#include "../strings.h"
 #include "../utils/event_details.h"
 #include "../utils/field.h"
-#include "../utils/string_helper.h"
 #include "../utils/type.h"
 
 namespace nx::vms::rules {
@@ -45,7 +45,7 @@ QString StorageIssueEvent::resourceKey() const
 
 QString StorageIssueEvent::extendedCaption(common::SystemContext* context) const
 {
-    const auto resourceName = utils::StringHelper(context).resource(serverId(), Qn::RI_WithUrl);
+    const auto resourceName = Strings::resource(context, serverId(), Qn::RI_WithUrl);
     return tr("Storage Issue at %1").arg(resourceName);
 }
 
@@ -109,7 +109,7 @@ const ItemDescriptor& StorageIssueEvent::manifest()
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<StorageIssueEvent>(),
         .groupId = kServerIssueEventGroup,
-        .displayName = tr("Storage Issue"),
+        .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Storage Issue")),
         .resources = {{utils::kServerIdFieldName, {ResourceType::server}}},
         .readPermissions = GlobalPermission::powerUser,
         .emailTemplatePath = ":/email_templates/storage_failure.mustache"

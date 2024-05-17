@@ -12,6 +12,7 @@
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/enum_instrument.h>
 #include <nx/utils/latin1_array.h>
+#include <nx/utils/translatable_string.h>
 #include <nx/vms/api/types/access_rights_types.h>
 #include <nx/vms/api/types/resource_types.h>
 
@@ -106,10 +107,10 @@ struct FieldDescriptor
     QString fieldName;
 
     /**%apidoc Field display name. */
-    QString displayName;
+    nx::TranslatableString displayName;
 
     /**%apidoc[opt] Field description to show hint to the user. */
-    QString description;
+    nx::TranslatableString description;
 
     /**%apidoc[opt]:object Optional properties corresponding to the actual field id. */
     QVariantMap properties; //< TODO: #mmalofeev should properties required for the field initialisation be separated from the supportive properties?
@@ -129,10 +130,10 @@ struct ItemDescriptor
     std::string groupId;
 
     /**%apidoc Display name. */
-    QString displayName;
+    nx::TranslatableString displayName;
 
     /**%apidoc[opt] Item description, to show hint to the user. */
-    QString description;
+    nx::TranslatableString description;
 
     /**%apidoc Item flags. */
     ItemFlags flags = ItemFlag::instant;
@@ -171,3 +172,11 @@ NX_VMS_RULES_API void serialize(
     QnJsonContext* ctx, const ItemDescriptor& value, QJsonValue* target);
 
 } // namespace nx::vms::rules
+
+// This is a temporary solution while we are forced to use nx_fusion.
+namespace nx {
+
+NX_VMS_RULES_API void serialize(QnJsonContext* ctx, const TranslatableString& value,
+    QJsonValue* target);
+
+} // namespace nx

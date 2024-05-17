@@ -8,9 +8,9 @@
 #include <nx/vms/common/system_context.h>
 
 #include "../group.h"
+#include "../strings.h"
 #include "../utils/event_details.h"
 #include "../utils/field.h"
-#include "../utils/string_helper.h"
 #include "../utils/type.h"
 
 namespace nx::vms::rules {
@@ -58,7 +58,7 @@ QVariantMap NetworkIssueEvent::details(common::SystemContext* context) const
 
 QString NetworkIssueEvent::extendedCaption(common::SystemContext* context) const
 {
-    const auto resourceName = utils::StringHelper(context).resource(cameraId(), Qn::RI_WithUrl);
+    const auto resourceName = Strings::resource(context, cameraId(), Qn::RI_WithUrl);
     return tr("Network Issue at %1").arg(resourceName);
 }
 
@@ -144,7 +144,7 @@ const ItemDescriptor& NetworkIssueEvent::manifest()
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<NetworkIssueEvent>(),
         .groupId = kDeviceIssueEventGroup,
-        .displayName = tr("Network Issue"),
+        .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Network Issue")),
         .flags = {ItemFlag::instant, ItemFlag::aggregationByTypeSupported},
         .resources = {
             {utils::kCameraIdFieldName, { ResourceType::device, Qn::ViewContentPermission}}},

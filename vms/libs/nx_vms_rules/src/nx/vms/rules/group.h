@@ -7,6 +7,8 @@
 
 #include <QtCore/QStringList>
 
+namespace nx::vms::common { class SystemContext; }
+
 namespace nx::vms::rules {
 
 constexpr auto kDeviceIssueEventGroup = "nx.events.group.deviceIssue";
@@ -24,6 +26,6 @@ struct NX_VMS_RULES_API Group
     const Group* findGroup(const std::string& id) const;
 };
 
-NX_VMS_RULES_API Group defaultEventGroups();
+NX_VMS_RULES_API Group defaultEventGroups(common::SystemContext* context);
 
 } // namespace nx::vms::rules

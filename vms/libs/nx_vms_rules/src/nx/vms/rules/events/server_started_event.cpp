@@ -3,9 +3,9 @@
 #include "server_started_event.h"
 
 #include "../group.h"
+#include "../strings.h"
 #include "../utils/event_details.h"
 #include "../utils/field.h"
-#include "../utils/string_helper.h"
 #include "../utils/type.h"
 
 namespace nx::vms::rules {
@@ -36,7 +36,7 @@ QVariantMap ServerStartedEvent::details(common::SystemContext* context) const
 
 QString ServerStartedEvent::extendedCaption(common::SystemContext* context) const
 {
-    const auto resourceName = utils::StringHelper(context).resource(m_serverId, Qn::RI_WithUrl);
+    const auto resourceName = Strings::resource(context, m_serverId, Qn::RI_WithUrl);
     return tr("Server \"%1\" Started").arg(resourceName);
 }
 
@@ -45,7 +45,7 @@ const ItemDescriptor& ServerStartedEvent::manifest()
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<ServerStartedEvent>(),
         .groupId = kServerIssueEventGroup,
-        .displayName = tr("Server Started"),
+        .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Server Started")),
         .resources = {{utils::kServerIdFieldName, {ResourceType::server}}},
         .readPermissions = GlobalPermission::powerUser,
         .emailTemplatePath = ":/email_templates/mediaserver_started.mustache"

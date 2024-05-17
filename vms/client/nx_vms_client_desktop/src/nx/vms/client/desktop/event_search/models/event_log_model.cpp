@@ -27,10 +27,10 @@
 #include <nx/vms/rules/aggregated_event.h>
 #include <nx/vms/rules/basic_action.h>
 #include <nx/vms/rules/engine.h>
+#include <nx/vms/rules/strings.h>
 #include <nx/vms/rules/utils/common.h>
 #include <nx/vms/rules/utils/event_details.h>
 #include <nx/vms/rules/utils/field.h>
-#include <nx/vms/rules/utils/string_helper.h>
 #include <nx/vms/time/formatter.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/synctime.h>
@@ -193,8 +193,7 @@ EventLogModel::EventLogModel(SystemContext* systemContext, QObject* parent):
     base_type(parent),
     SystemContextAware(systemContext),
     m_linkBrush(QPalette().link()),
-    m_index(std::make_unique<DataIndex>(this)),
-    m_stringHelper(std::make_unique<rules::utils::StringHelper>(systemContext))
+    m_index(std::make_unique<DataIndex>(this))
 {
 }
 
@@ -338,7 +337,7 @@ QVariant EventLogModel::iconData(Column column, const EventLogModelData& data) c
 QString EventLogModel::getResourceName(const QnResourcePtr& resource) const
 {
     const auto infoLevel = appContext()->localSettings()->resourceInfoLevel();
-    return m_stringHelper->resource(resource, infoLevel);
+    return rules::Strings::resource(resource, infoLevel);
 }
 
 QString EventLogModel::textData(Column column, const EventLogModelData& data) const
@@ -366,7 +365,7 @@ QString EventLogModel::textData(Column column, const EventLogModelData& data) co
             return result;
         }
         case ActionColumn:
-            return m_stringHelper->actionName(data.actionType());
+            return rules::Strings::actionName(systemContext(), data.actionType());
 
         case ActionCameraColumn:
         {
@@ -443,7 +442,8 @@ QString EventLogModel::motionUrl(Column column, const EventLogModelData& data) c
     if (column != DescriptionColumn || !hasVideoLink(data))
         return {};
 
-    const auto device = getResource(EventCameraColumn, data);
+    const auto device = getResource(EventCameraColumn, data)
+        .dynamicCast<QnVirtualCameraResource>();
     if (!device)
         return {};
 
@@ -451,10 +451,10 @@ QString EventLogModel::motionUrl(Column column, const EventLogModelData& data) c
     if (auto connection = this->connection(); NX_ASSERT(connection))
         connectionAddress = connection->address();
 
-    return m_stringHelper->urlForCamera(
-        device->getId(),
+    return rules::Strings::urlForCamera(
+        device,
         duration_cast<milliseconds>(data.event(systemContext())->timestamp()),
-        nx::vms::rules::utils::StringHelper::publicIp, //< Not used on the client side anyway.
+        rules::Strings::publicIp, //< Not used on the client side anyway.
         connectionAddress);
 }
 

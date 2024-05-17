@@ -12,7 +12,7 @@
 #include <QtWidgets/QWidget>
 
 #include <nx/build_info.h>
-#include <nx/vms/utils/external_resources.h>
+#include <nx/utils/external_resources.h>
 
 #include "help_dialog.h"
 #include "help_topic_accessor.h"
@@ -55,7 +55,7 @@ void HelpHandler::openHelpTopic(HelpTopic::Id topic)
 
 QUrl HelpHandler::urlForTopic(HelpTopic::Id topic)
 {
-    const auto helpRoot = nx::vms::utils::externalResourcesDirectory().absolutePath() + "/help/";
+    const auto helpRoot = nx::utils::externalResourcesDirectory().absolutePath() + "/help/";
     QString filePath = helpRoot + HelpTopic::relativeUrlForTopic(topic);
     if (QFile::exists(filePath))
         return QUrl::fromLocalFile(filePath);

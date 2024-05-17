@@ -33,7 +33,7 @@
 #include <nx/vms/rules/group.h>
 #include <nx/vms/rules/ini.h>
 #include <nx/vms/rules/manifest.h>
-#include <nx/vms/rules/utils/string_helper.h>
+#include <nx/vms/rules/strings.h>
 #include <nx/vms/rules/utils/type.h>
 #include <ui/workbench/workbench_context.h>
 
@@ -203,14 +203,12 @@ void VmsEventSearchWidget::Private::setupTypeSelection()
 
 QMenu* VmsEventSearchWidget::Private::createEventGroupMenu(const Group& group)
 {
-    // TODO: #amalov Device dependent headers.
-    static const auto groupHeaders = QMap<std::string, QString>{
-        {"", tr("Any event")},
-        {kDeviceIssueEventGroup, tr("Camera issues")},
-        {kServerIssueEventGroup, tr("Server events")},
+    const auto groupHeaders = QMap<std::string, QString>{
+        {"", rules::Strings::anyEvent()},
+        {kDeviceIssueEventGroup, rules::Strings::deviceIssues(q->system())},
+        {kServerIssueEventGroup, rules::Strings::serverEvents()},
     };
 
-    const auto stringHelper = rules::utils::StringHelper(q->system());
     auto result = q->createDropdownMenu();
 
     addMenuAction(result, group.name, QString::fromStdString(group.id));
@@ -218,7 +216,10 @@ QMenu* VmsEventSearchWidget::Private::createEventGroupMenu(const Group& group)
 
     for (const auto& eventType: group.items)
     {
-        auto eventAction = addMenuAction(result, stringHelper.eventName(eventType), eventType);
+        auto eventAction = addMenuAction(
+            result,
+            rules::Strings::eventName(q->system(), eventType),
+            eventType);
 
         // Creating analytics events submenu for active event types.
         if (eventType == rules::utils::type<AnalyticsEvent>())
@@ -226,7 +227,7 @@ QMenu* VmsEventSearchWidget::Private::createEventGroupMenu(const Group& group)
             m_analyticsEventsSingleAction = eventAction;
 
             auto analyticsEventsMenu = q->createDropdownMenu();
-            analyticsEventsMenu->setTitle(tr("Analytics events"));
+            analyticsEventsMenu->setTitle(rules::Strings::analyticsEvents());
 
             m_analyticsEventsSubmenuAction = result->addMenu(analyticsEventsMenu);
             m_analyticsEventsSubmenuAction->setVisible(false);
@@ -366,7 +367,11 @@ void VmsEventSearchWidget::Private::updateAnalyticsMenu()
 
         if (!root->children.empty())
         {
-            addMenuAction(analyticsMenu, tr("Any analytics event"), kAnalyticsEventType, {});
+            addMenuAction(
+                analyticsMenu,
+                rules::Strings::anyAnalyticsEvent(),
+                kAnalyticsEventType,
+                {});
 
             analyticsMenu->addSeparator();
             addItemRecursive(analyticsMenu, root);

@@ -9,8 +9,8 @@
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/rules/engine.h>
 #include <nx/vms/rules/manifest.h>
+#include <nx/vms/rules/strings.h>
 #include <nx/vms/rules/utils/common.h>
-#include <nx/vms/rules/utils/string_helper.h>
 #include <ui/common/palette.h>
 
 namespace nx::vms::client::desktop::rules {
@@ -61,7 +61,7 @@ void ActionTypePickerWidget::setActionType(const QString& actionType)
     }
 
     ui->actionTypeComboBox->setPlaceholderText(
-        vms::rules::utils::StringHelper{systemContext()}.actionName(actionType));
+        vms::rules::Strings::actionName(systemContext(), actionType));
     ui->actionTypeComboBox->setCurrentIndex(-1);
 }
 

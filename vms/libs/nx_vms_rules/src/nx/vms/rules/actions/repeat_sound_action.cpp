@@ -7,6 +7,7 @@
 #include "../action_builder_fields/target_device_field.h"
 #include "../action_builder_fields/target_user_field.h"
 #include "../action_builder_fields/volume_field.h"
+#include "../strings.h"
 #include "../utils/event_details.h"
 #include "../utils/field.h"
 #include "../utils/type.h"
@@ -22,24 +23,29 @@ const ItemDescriptor& RepeatSoundAction::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<RepeatSoundAction>(),
-        .displayName = tr("Repeat Sound"),
+        .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Repeat Sound")),
         .flags = {ItemFlag::prolonged},
         .executionTargets = {ExecutionTarget::clients, ExecutionTarget::servers},
         .targetServers = TargetServers::resourceOwner,
         .fields = {
-            makeFieldDescriptor<SoundField>(utils::kSoundFieldName, tr("Sound")),
-            makeFieldDescriptor<TargetDeviceField>(utils::kDeviceIdsFieldName, tr("At")),
+            makeFieldDescriptor<SoundField>(utils::kSoundFieldName,
+                NX_DYNAMIC_TRANSLATABLE(tr("Sound"))),
+            makeFieldDescriptor<TargetDeviceField>(
+                utils::kDeviceIdsFieldName,
+                Strings::at()),
             makeFieldDescriptor<TargetUserField>(
                 utils::kUsersFieldName,
-                tr("To"),
-                {},
+                Strings::to(),
+                /*description*/ {},
                 ResourceFilterFieldProperties{
                     .acceptAll = false,
                     .ids = {},
                     .allowEmptySelection = true,
                     .validationPolicy = {}
                 }.toVariantMap()),
-            makeFieldDescriptor<VolumeField>("volume", tr("Volume")),
+            makeFieldDescriptor<VolumeField>(
+                utils::kVolumeFieldName,
+                Strings::volume()),
 
             utils::makeTextFormatterFieldDescriptor("caption", "{@EventCaption}"),
             utils::makeTextFormatterFieldDescriptor("description", "{@EventDescription}"),

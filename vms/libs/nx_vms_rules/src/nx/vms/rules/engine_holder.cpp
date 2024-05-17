@@ -21,7 +21,7 @@ EngineHolder::EngineHolder(
     bool separateThread)
     :
     m_builtinPlugin(std::move(plugin)),
-    m_engine(std::make_unique<Engine>(std::move(router)))
+    m_engine(std::make_unique<Engine>(context, std::move(router)))
 {
     m_builtinPlugin->initialize(m_engine.get());
 
@@ -33,8 +33,6 @@ EngineHolder::EngineHolder(
 
         m_engine->moveToThread(m_thread.get());
     }
-
-    context->setVmsRulesEngine(m_engine.get());
 }
 
 EngineHolder::~EngineHolder()

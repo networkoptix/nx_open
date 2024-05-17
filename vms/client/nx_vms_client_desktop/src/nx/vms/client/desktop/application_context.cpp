@@ -34,6 +34,8 @@
 #include <nx/network/cloud/mediator_connector.h>
 #include <nx/network/cloud/tunnel/outgoing_tunnel_pool.h>
 #include <nx/utils/crash_dump/systemexcept.h>
+#include <nx/utils/external_resources.h>
+#include <nx/utils/i18n/translation_manager.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/log_initializer.h>
@@ -85,8 +87,6 @@
 #include <nx/vms/client/desktop/utils/local_proxy_server.h>
 #include <nx/vms/client/desktop/utils/upload_manager.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
-#include <nx/vms/utils/external_resources.h>
-#include <nx/vms/utils/translation/translation_manager.h>
 #include <platform/platform_abstraction.h>
 #include <ui/workaround/qtbug_workaround.h>
 #include <utils/math/color_transformations.h>
@@ -208,7 +208,7 @@ void initDeveloperOptions(const QnStartupParameters& startupParameters)
 
 void initializeExternalResources()
 {
-    using namespace nx::vms::utils;
+    using namespace nx::utils;
 
     nx::vms::client::core::FontLoader::loadFonts(
         externalResourcesDirectory().absoluteFilePath("fonts"));
@@ -361,7 +361,7 @@ struct ApplicationContext::Private
     std::unique_ptr<QnPlatformAbstraction> platformAbstraction;
     std::unique_ptr<PerformanceMonitor> performanceMonitor;
 
-    std::unique_ptr<nx::vms::utils::TranslationManager> translationManager;
+    std::unique_ptr<nx::i18n::TranslationManager> translationManager;
     std::unique_ptr<ApplauncherGuard> applauncherGuard;
     std::unique_ptr<QnClientAutoRunWatcher> autoRunWatcher;
     std::unique_ptr<RadassController> radassController;
@@ -554,7 +554,7 @@ struct ApplicationContext::Private
 
     void initializeTranslations()
     {
-        translationManager = std::make_unique<nx::vms::utils::TranslationManager>();
+        translationManager = std::make_unique<nx::i18n::TranslationManager>();
         bool loaded = translationManager->installTranslation(localSettings->locale());
         if (!loaded)
             loaded = translationManager->installTranslation(nx::branding::defaultLocale());
@@ -934,7 +934,7 @@ session::SessionManager* ApplicationContext::sessionManager() const
     return d->sessionManager.get();
 }
 
-nx::vms::utils::TranslationManager* ApplicationContext::translationManager() const
+nx::i18n::TranslationManager* ApplicationContext::translationManager() const
 {
     return d->translationManager.get();
 }

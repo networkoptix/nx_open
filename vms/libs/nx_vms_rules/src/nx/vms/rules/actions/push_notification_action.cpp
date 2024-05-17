@@ -9,9 +9,9 @@
 #include "../action_builder_fields/flag_field.h"
 #include "../action_builder_fields/target_user_field.h"
 #include "../action_builder_fields/text_with_fields.h"
+#include "../strings.h"
 #include "../utils/event_details.h"
 #include "../utils/field.h"
-#include "../utils/string_helper.h"
 #include "../utils/type.h"
 
 namespace nx::vms::rules {
@@ -20,13 +20,13 @@ const ItemDescriptor& PushNotificationAction::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<PushNotificationAction>(),
-        .displayName = tr("Send Mobile Notification"),
+        .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Send Mobile Notification")),
         .executionTargets = ExecutionTarget::servers,
         .targetServers = TargetServers::serverWithPublicIp,
         .fields = {
             makeFieldDescriptor<TargetUserField>(
                 utils::kUsersFieldName,
-                tr("To"),
+                Strings::to(),
                 {},
                 ResourceFilterFieldProperties{
                     .visible = false,
@@ -35,18 +35,28 @@ const ItemDescriptor& PushNotificationAction::manifest()
                     .allowEmptySelection = false,
                     .validationPolicy = kCloudUserValidationPolicy
                 }.toVariantMap()),
-            makeFieldDescriptor<TextWithFields>("caption", tr("Header"), QString(),
+            makeFieldDescriptor<TextWithFields>(
+                utils::kCaptionFieldName,
+                NX_DYNAMIC_TRANSLATABLE(tr("Header")),
+                /*description*/ {},
                 {
                     { "text", "{@EventCaption}" }
                 }),
-            makeFieldDescriptor<TextWithFields>("description", tr("Body"), QString(),
+            makeFieldDescriptor<TextWithFields>(
+                utils::kDescriptionFieldName,
+                NX_DYNAMIC_TRANSLATABLE(tr("Body")),
+                /*description*/ {},
                 {
                     { "text", "{@EventDescription}" }
                 }),
-            makeFieldDescriptor<ActionFlagField>("addSource", tr("Add Source Device name to Body")),
-            utils::makeIntervalFieldDescriptor(tr("Interval of Action")),
-
-            makeFieldDescriptor<EventDevicesField>(utils::kDeviceIdsFieldName, "Event devices"),
+            makeFieldDescriptor<ActionFlagField>(
+                "addSource",
+                NX_DYNAMIC_TRANSLATABLE(tr("Add Source Device name to Body"))),
+            utils::makeIntervalFieldDescriptor(
+                Strings::intervalOfAction()),
+            makeFieldDescriptor<EventDevicesField>(
+                utils::kDeviceIdsFieldName,
+                Strings::eventDevices()),
             utils::makeExtractDetailFieldDescriptor("level", utils::kLevelDetailName),
         },
         .resources = {
@@ -60,8 +70,7 @@ const ItemDescriptor& PushNotificationAction::manifest()
 QVariantMap PushNotificationAction::details(common::SystemContext* context) const
 {
     auto result = BasicAction::details(context);
-    result.insert(utils::kDestinationDetailName, utils::StringHelper(context).subjects(users()));
-
+    result.insert(utils::kDestinationDetailName, Strings::subjects(context, users()));
     return result;
 }
 

@@ -4,6 +4,7 @@
 
 #include "../action_builder_fields/optional_time_field.h"
 #include "../action_builder_fields/target_server_field.h"
+#include "../strings.h"
 #include "../utils/field.h"
 #include "../utils/type.h"
 
@@ -15,22 +16,25 @@ const ItemDescriptor& BuzzerAction::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<BuzzerAction>(),
-        .displayName = tr("Buzzer"),
+        .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Buzzer")),
         .flags = ItemFlag::prolonged,
         .executionTargets = ExecutionTarget::servers,
         .targetServers = TargetServers::resourceOwner,
         .fields = {
-            makeFieldDescriptor<TargetServerField>(utils::kServerIdsFieldName, tr("At")),
+            makeFieldDescriptor<TargetServerField>(
+                utils::kServerIdsFieldName,
+                Strings::at()),
             utils::makeTimeFieldDescriptor<OptionalTimeField>(
                 utils::kDurationFieldName,
-                tr("Fixed duration"),
+                Strings::fixedDuration(),
                 {},
                 TimeFieldProperties{
                     .value = 1s,
                     .defaultValue = 1s,
                     .maximumValue = 24h,
                     .minimumValue = 1s}.toVariantMap()),
-            utils::makeIntervalFieldDescriptor(tr("Action Throttling")),
+            utils::makeIntervalFieldDescriptor(
+                NX_DYNAMIC_TRANSLATABLE(tr("Action Throttling"))),
         },
         .resources = {{utils::kServerIdsFieldName, {ResourceType::server, {}, {}, FieldFlag::target}}},
         .serverFlags = {api::ServerFlag::SF_HasBuzzer}

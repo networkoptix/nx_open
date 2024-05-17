@@ -13,7 +13,7 @@
 
 #include "translation.h"
 
-namespace nx::vms::utils {
+namespace nx::i18n {
 
 class TranslationOverlayItem;
 
@@ -37,8 +37,6 @@ public:
     void addThreadContext(const Qt::HANDLE& context);
     void removeThreadContext(const Qt::HANDLE& context);
 
-    void uninstallIfUnused();
-
 private:
     void handleTranslatorsUnderMutex();
 
@@ -53,4 +51,4 @@ private:
     std::atomic_bool m_installed = false;
 };
 
-} // namespace nx::vms::utils
+} // namespace nx::i18n

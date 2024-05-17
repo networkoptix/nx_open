@@ -68,6 +68,7 @@
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/event/events/abstract_event.h>
 #include <nx/vms/event/strings_helper.h>
+#include <nx/vms/rules/strings.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
@@ -713,28 +714,27 @@ QVector<RightPanel::VmsEventGroup> RightPanelModelsAdapter::eventGroups() const
     if (!d->context())
         return {};
 
-    nx::vms::event::StringsHelper helper(d->context()->system());
-    const auto resourcePool = d->context()->system()->resourcePool();
+    const auto systemContext = d->context()->system();
+    nx::vms::event::StringsHelper helper(systemContext);
 
     QVector<RightPanel::VmsEventGroup> result{
         RightPanel::VmsEventGroup{RightPanel::VmsEventGroup::Common,
             nx::vms::api::undefinedEvent,
             "", //< Name is unused.
-            tr("Any event")},
+            rules::Strings::anyEvent()
+        },
         RightPanel::VmsEventGroup{RightPanel::VmsEventGroup::DeviceIssues,
             nx::vms::api::anyCameraEvent,
-            QnDeviceDependentStrings::getDefaultNameFromSet(
-                resourcePool, tr("Device issues"), tr("Camera issues")),
-            QnDeviceDependentStrings::getDefaultNameFromSet(
-                resourcePool, tr("Any device issue"), tr("Any camera issue"))},
+            rules::Strings::deviceIssues(systemContext),
+            rules::Strings::anyDeviceIssue(systemContext)},
         RightPanel::VmsEventGroup{RightPanel::VmsEventGroup::Server,
             nx::vms::api::anyServerEvent,
-            tr("Server events"),
-            tr("Any server event")},
+            rules::Strings::serverEvents(),
+            rules::Strings::anyServerEvent()},
         RightPanel::VmsEventGroup{RightPanel::VmsEventGroup::Analytics,
             nx::vms::api::analyticsSdkEvent,
-            tr("Analytics events"),
-            tr("Any analytics event")}};
+            rules::Strings::analyticsEvents(),
+            rules::Strings::anyAnalyticsEvent()}};
 
     for (auto& group: result)
     {

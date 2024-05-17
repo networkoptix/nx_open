@@ -18,8 +18,8 @@ using namespace std::chrono_literals;
 namespace nx::vms::rules::utils {
 
 FieldDescriptor makeIntervalFieldDescriptor(
-    const QString& displayName,
-    const QString& description)
+    const TranslatableString& displayName,
+    const TranslatableString& description)
 {
     return makeTimeFieldDescriptor<OptionalTimeField>(
         kIntervalFieldName,
@@ -32,8 +32,8 @@ FieldDescriptor makeIntervalFieldDescriptor(
 }
 
 FieldDescriptor makePlaybackFieldDescriptor(
-    const QString& displayName,
-    const QString& description)
+    const TranslatableString& displayName,
+    const TranslatableString& description)
 {
     return makeTimeFieldDescriptor<OptionalTimeField>(
         kPlaybackTimeFieldName,
@@ -47,8 +47,8 @@ FieldDescriptor makePlaybackFieldDescriptor(
 }
 
 FieldDescriptor makeStateFieldDescriptor(
-    const QString& displayName,
-    const QString& description,
+    const TranslatableString& displayName,
+    const TranslatableString& description,
     vms::rules::State defaultState)
 {
     return makeFieldDescriptor<StateField>(
@@ -64,7 +64,7 @@ FieldDescriptor makeExtractDetailFieldDescriptor(
 {
     return makeFieldDescriptor<ExtractDetailField>(
         fieldName,
-        fieldName,
+        {},
         {},
         {{ "detailName", detailName }});
 }
@@ -75,15 +75,15 @@ FieldDescriptor makeTextFormatterFieldDescriptor(
 {
     return makeFieldDescriptor<TextFormatter>(
         fieldName,
-        fieldName,
+        {},
         {},
         {{ "text", formatString }});
 }
 
 FieldDescriptor makeActionFlagFieldDescriptor(
     const QString& fieldName,
-    const QString& displayName,
-    const QString& description,
+    const TranslatableString& displayName,
+    const TranslatableString& description,
     bool defaultValue)
 {
     return makeFieldDescriptor<ActionFlagField>(

@@ -11,7 +11,6 @@
 #include <core/resource_access/resource_access_subject.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/test_support/resource/camera_resource_stub.h>
-#include <nx/vms/common/test_support/test_context.h>
 #include <nx/vms/rules/action_builder.h>
 #include <nx/vms/rules/action_builder_fields/optional_time_field.h>
 #include <nx/vms/rules/action_builder_fields/target_device_field.h>
@@ -51,12 +50,12 @@ public:
 };
 
 class ActionBuilderTest:
-    public common::test::ContextBasedTest,
-    public TestEngineHolder,
+    public EngineBasedTest,
     public TestPlugin
 {
 public:
-    ActionBuilderTest() : TestEngineHolder(context()->systemContext()), TestPlugin(engine.get())
+    ActionBuilderTest():
+        TestPlugin(engine.get())
     {
         registerEvent<ServerStartedEvent>();
         registerEvent<ServerFailureEvent>();
@@ -65,7 +64,7 @@ public:
             fieldMetatype<TargetUserField>(),
             [this](const FieldDescriptor* descriptor)
             {
-                return new TargetUserField(context()->systemContext(), descriptor);
+                return new TargetUserField(systemContext(), descriptor);
             });
 
         registerAction<TestActionWithTargetUsers>();

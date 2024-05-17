@@ -12,7 +12,7 @@
 
 #include "translation.h"
 
-namespace nx::vms::utils {
+namespace nx::i18n {
 
 using namespace std::chrono_literals;
 
@@ -24,10 +24,8 @@ class ScopedLocale;
  * translation on an application level as well as separately for each thread.
  * Default QLocale is also updated when application-wide translation is set.
  */
-class NX_VMS_UTILS_API TranslationManager: public QObject
+class NX_UTILS_API TranslationManager: public QObject
 {
-    Q_OBJECT
-
     friend ScopedLocale;
     friend PreloadedTranslationReference;
 
@@ -103,12 +101,6 @@ public:
         const std::vector<QString>& preferredLocales,
         std::chrono::milliseconds maxWaitTime = defaultInstallTranslationTimeout());
 
-    /**
-     * Get current thread-level translation.
-     * @return Thread-level translation locale if it is set, empty string otherwise.
-     */
-    QString getCurrentThreadTranslationLocale() const;
-
     void setLoadTranslationsEnabled(bool value);
 
     /**
@@ -118,6 +110,12 @@ public:
      * since some integration tests could lock the main thread until the testing action is done.
      */
     void setAssertOnOverlayInstallationFailure(bool assert = true);
+
+    static QString getCurrentThreadLocale();
+
+protected:
+    static void setCurrentThreadLocale(QString locale);
+    static void eraseCurrentThreadLocale();
 
 private:
     /**
@@ -141,4 +139,4 @@ private:
     nx::utils::ImplPtr<Private> d;
 };
 
-} // namespace nx::vms::utils
+} // namespace nx::i18n

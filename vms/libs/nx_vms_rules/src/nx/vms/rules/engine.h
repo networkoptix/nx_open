@@ -17,6 +17,7 @@
 #include <nx/utils/time/timer_event_handler.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/rules/rules_fwd.h>
+#include <nx/vms/common/system_context_aware.h>
 
 #include "event_cache.h"
 #include "field_validator.h"
@@ -36,7 +37,9 @@ namespace api = ::nx::vms::api::rules;
  * Works as factory for actual filters for the selected event type.
  * Works as factory for actual action builders for the selected action type.
  */
-class NX_VMS_RULES_API Engine: public QObject
+class NX_VMS_RULES_API Engine:
+    public QObject,
+    public common::SystemContextAware
 {
     Q_OBJECT
 
@@ -53,7 +56,10 @@ public:
         std::function<ActionBuilderField*(const FieldDescriptor* descriptor)>;
 
 // Initialization and general info methods.
-    explicit Engine(std::unique_ptr<Router> router, QObject* parent = nullptr);
+    explicit Engine(
+        common::SystemContext* systemContext,
+        std::unique_ptr<Router> router,
+        QObject* parent = nullptr);
     ~Engine();
 
     void setId(nx::Uuid id);

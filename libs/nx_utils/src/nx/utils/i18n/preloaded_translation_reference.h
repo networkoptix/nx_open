@@ -5,11 +5,11 @@
 #include <QtCore/QPointer>
 #include <QtCore/QString>
 
-namespace nx::vms::utils {
+namespace nx::i18n {
 
 class TranslationManager;
 
-class NX_VMS_UTILS_API PreloadedTranslationReference
+class NX_UTILS_API PreloadedTranslationReference
 {
     friend TranslationManager;
 
@@ -31,4 +31,4 @@ private:
     QString m_locale;
 };
 
-} // namespace nx::vms::utils
+} // namespace nx::i18n

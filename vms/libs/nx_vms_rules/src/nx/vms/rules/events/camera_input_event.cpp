@@ -2,11 +2,14 @@
 
 #include "camera_input_event.h"
 
+#include <core/resource/device_dependent_strings.h>
+#include <nx/vms/common/system_context.h>
+
 #include "../event_filter_fields/input_port_field.h"
 #include "../event_filter_fields/source_camera_field.h"
+#include "../strings.h"
 #include "../utils/event_details.h"
 #include "../utils/field.h"
-#include "../utils/string_helper.h"
 #include "../utils/type.h"
 
 namespace nx::vms::rules {
@@ -43,7 +46,7 @@ QVariantMap CameraInputEvent::details(common::SystemContext* context) const
 
     utils::insertIfNotEmpty(result, utils::kDetailingDetailName, detailing());
     utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
-    result.insert(utils::kEmailTemplatePathDetailName, manifest().emailTemplatePath);
+    result.insert(utils::kEmailTemplatePathDetailName, manifest(context).emailTemplatePath);
     utils::insertLevel(result, nx::vms::event::Level::common);
     utils::insertIcon(result, nx::vms::rules::Icon::resource);
     utils::insertClientAction(result, nx::vms::rules::ClientAction::previewCamera);
@@ -58,24 +61,38 @@ QString CameraInputEvent::detailing() const
 
 QString CameraInputEvent::extendedCaption(common::SystemContext* context) const
 {
-    const auto resourceName = utils::StringHelper(context).resource(cameraId(), Qn::RI_WithUrl);
+    const auto resourceName = Strings::resource(context, cameraId(), Qn::RI_WithUrl);
     return tr("Input on %1").arg(resourceName);
 }
 
-const ItemDescriptor& CameraInputEvent::manifest()
+const ItemDescriptor& CameraInputEvent::manifest(common::SystemContext* context)
 {
+    auto getDisplayName =
+        [context = QPointer<common::SystemContext>(context)]
+        {
+            if (!context)
+                return QString();
+
+            return QnDeviceDependentStrings::getDefaultNameFromSet(
+                context->resourcePool(),
+                tr("Input Signal on Device"),
+                tr("Input Signal on Camera"));
+        };
+
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<CameraInputEvent>(),
-        .displayName = tr("Input Signal on Device"),
+        .displayName = TranslatableString(getDisplayName),
         .flags = ItemFlag::prolonged,
         .fields = {
-            utils::makeStateFieldDescriptor(tr("State")),
+            utils::makeStateFieldDescriptor(Strings::state()),
             makeFieldDescriptor<SourceCameraField>(
                 utils::kCameraIdFieldName,
-                tr("Occurs at"),
+                Strings::occursAt(),
                 {},
                 {{"acceptAll", true}}),
-            makeFieldDescriptor<InputPortField>("inputPortId", tr("With ID")),
+            makeFieldDescriptor<InputPortField>(
+                "inputPortId",
+                NX_DYNAMIC_TRANSLATABLE(tr("With ID"))),
         },
         .resources = {
             {utils::kCameraIdFieldName,

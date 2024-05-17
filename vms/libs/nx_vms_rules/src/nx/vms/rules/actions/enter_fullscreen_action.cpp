@@ -5,6 +5,7 @@
 #include "../action_builder_fields/target_layout_field.h"
 #include "../action_builder_fields/target_single_device_field.h"
 #include "../action_builder_fields/target_user_field.h"
+#include "../strings.h"
 #include "../utils/field.h"
 #include "../utils/type.h"
 
@@ -14,15 +15,16 @@ const ItemDescriptor& EnterFullscreenAction::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<EnterFullscreenAction>(),
-        .displayName = tr("Set to Fullscreen"),
+        .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Set to Fullscreen")),
         .flags = ItemFlag::instant,
         .executionTargets = ExecutionTarget::clients,
         .fields = {
-            makeFieldDescriptor<TargetSingleDeviceField>(utils::kCameraIdFieldName, tr("Camera")),
-            makeFieldDescriptor<TargetLayoutField>(utils::kLayoutIdsFieldName, tr("On Layout")),
-            makeFieldDescriptor<TargetUserField>(
-                utils::kUsersFieldName,
-                tr("Set for"),
+            makeFieldDescriptor<TargetSingleDeviceField>(utils::kCameraIdFieldName,
+                NX_DYNAMIC_TRANSLATABLE(tr("Camera"))),
+            makeFieldDescriptor<TargetLayoutField>(utils::kLayoutIdsFieldName,
+                Strings::onLayout()),
+            makeFieldDescriptor<TargetUserField>(utils::kUsersFieldName,
+                NX_DYNAMIC_TRANSLATABLE(tr("Set for")),
                 {},
                 ResourceFilterFieldProperties{
                     .visible = false,
@@ -31,7 +33,7 @@ const ItemDescriptor& EnterFullscreenAction::manifest()
                     .allowEmptySelection = false,
                     .validationPolicy = {}
                 }.toVariantMap()),
-            utils::makePlaybackFieldDescriptor(tr("Rewind")),
+            utils::makePlaybackFieldDescriptor(Strings::rewind()),
         },
         .resources = {
             {utils::kCameraIdFieldName, {ResourceType::device}},

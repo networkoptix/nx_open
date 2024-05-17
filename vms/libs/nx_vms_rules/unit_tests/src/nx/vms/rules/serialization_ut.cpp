@@ -18,9 +18,10 @@
 
 namespace nx::vms::rules::test {
 
-TEST(VmsRulesSerialization, EventField)
+class VmsRulesSerializationTest: public EngineBasedTest {};
+
+TEST_F(VmsRulesSerializationTest, EventField)
 {
-    auto engine = std::make_unique<nx::vms::rules::Engine>(std::make_unique<TestRouter>());
     auto plugin = std::make_unique<nx::vms::rules::test::TestPlugin>(engine.get());
 
     static const auto kEventType = "nx.vms_rules_serialization.event_field.test";
@@ -31,9 +32,11 @@ TEST(VmsRulesSerialization, EventField)
     engine->registerEvent(
         ItemDescriptor{
             .id = kEventType,
-            .displayName = "testField",
+            .displayName = TranslatableString("testField"),
             .fields = {
-                makeFieldDescriptor<TestEventField>(kFieldName, "Test")
+                makeFieldDescriptor<TestEventField>(
+                    kFieldName,
+                    TranslatableString("Test"))
             }
         },
         [](){ return new TestEvent; });

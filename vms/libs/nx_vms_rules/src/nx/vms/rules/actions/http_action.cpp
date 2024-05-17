@@ -7,6 +7,7 @@
 #include "../action_builder_fields/http_method_field.h"
 #include "../action_builder_fields/optional_time_field.h"
 #include "../action_builder_fields/text_with_fields.h"
+#include "../strings.h"
 #include "../utils/event_details.h"
 #include "../utils/field.h"
 #include "../utils/type.h"
@@ -19,19 +20,25 @@ const ItemDescriptor& HttpAction::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<HttpAction>(),
-        .displayName = tr("HTTP(S) Request"),
-        .description = "",
+        .displayName = NX_DYNAMIC_TRANSLATABLE(tr("HTTP(S) Request")),
+        .description = {},
         .executionTargets = ExecutionTarget::servers,
         .targetServers = TargetServers::currentServer,
         .fields = {
-            makeFieldDescriptor<TextWithFields>("url", tr("URL")),
-            makeFieldDescriptor<TextWithFields>("content", tr("Content")),
-            makeFieldDescriptor<ContentTypeField>("contentType", tr("Content type")),
-            makeFieldDescriptor<HttpMethodField>("method", tr("Method")),
-            makeFieldDescriptor<HttpAuthField>("auth", tr("HTTP authentication")),
+            makeFieldDescriptor<TextWithFields>("url",
+                NX_DYNAMIC_TRANSLATABLE(tr("URL"))),
+            makeFieldDescriptor<TextWithFields>("content",
+                NX_DYNAMIC_TRANSLATABLE(tr("Content"))),
+            makeFieldDescriptor<ContentTypeField>("contentType",
+                NX_DYNAMIC_TRANSLATABLE(tr("Content type"))),
+            makeFieldDescriptor<HttpMethodField>("method",
+                NX_DYNAMIC_TRANSLATABLE(tr("Method"))),
+            makeFieldDescriptor<HttpAuthField>("auth",
+                NX_DYNAMIC_TRANSLATABLE(tr("HTTP authentication"))),
+            // TODO: #sivanov Reuse makeIntervalFieldDescriptor instead.
             utils::makeTimeFieldDescriptor<OptionalTimeField>(
                 utils::kIntervalFieldName,
-                tr("Interval of Action"),
+                Strings::intervalOfAction(),
                 {},
                 TimeFieldProperties{
                     .value = 0s,
