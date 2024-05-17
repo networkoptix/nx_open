@@ -8,7 +8,7 @@ import Nx.Controls
 import Nx.Core
 
 import nx.vms.client.desktop
-import nx.vms.client.desktop.analytics as Analytics
+import nx.vms.client.core.analytics as Analytics
 
 Control
 {

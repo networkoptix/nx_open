@@ -8,8 +8,8 @@ import QtQml
 import Nx.Controls
 import Nx.Dialogs
 
+import nx.vms.client.core.analytics as Analytics
 import nx.vms.client.desktop
-import nx.vms.client.desktop.analytics as Analytics
 
 import "taxonomy_utils.js" as TaxonomyUtils
 
