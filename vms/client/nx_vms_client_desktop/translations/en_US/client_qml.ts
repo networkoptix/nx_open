@@ -2465,7 +2465,7 @@ Press Alt + Click to follow object</source>
         <translation></translation>
     </message>
     <message>
-        <source>The added site will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</source>
+        <source>The added system will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
