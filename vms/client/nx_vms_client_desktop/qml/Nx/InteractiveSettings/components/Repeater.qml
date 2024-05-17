@@ -1,11 +1,11 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.0
+import QtQuick
 
-import Nx.Controls 1.0
+import Nx.Controls
 
 import "private"
-import "private/CoreUtils.js" as Utils
+import "private/utils.js" as Utils
 import "../settings.js" as Settings
 
 /**
@@ -93,7 +93,7 @@ Item
     {
         for (let i = column.layoutItems.length - 1; i >= 0; --i)
         {
-            if (CoreUtils.isItemFilled(column.children[i]))
+            if (Utils.isItemFilled(column.children[i]))
                 return i
         }
         return -1

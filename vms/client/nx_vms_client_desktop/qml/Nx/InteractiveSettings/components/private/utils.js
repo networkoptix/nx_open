@@ -2,6 +2,8 @@
 
 function isItemFilled(item)
 {
+    if (!item)
+        return false
     if (item.hasOwnProperty("filled"))
         return item.filled
     if (item.hasOwnProperty("isFilled"))
