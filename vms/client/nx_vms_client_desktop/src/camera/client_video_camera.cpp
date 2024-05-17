@@ -45,8 +45,6 @@ QnClientVideoCamera::QnClientVideoCamera(const QnMediaResourcePtr &resource, QnA
                 &m_camdispay, &QnCamDisplay::onPrevFrameOccurred, Qt::DirectConnection);
             connect(archiveReader, &QnAbstractArchiveStreamReader::nextFrameOccurred,
                 &m_camdispay, &QnCamDisplay::onNextFrameOccurred, Qt::DirectConnection);
-            connect(archiveReader, &QnAbstractArchiveStreamReader::slowSourceHint,
-                &m_camdispay, &QnCamDisplay::onSlowSourceHint, Qt::DirectConnection);
             connect(archiveReader, &QnAbstractArchiveStreamReader::beforeJump,
                 &m_camdispay, &QnCamDisplay::onBeforeJump, Qt::DirectConnection);
             connect(archiveReader, &QnAbstractArchiveStreamReader::jumpOccurred,
