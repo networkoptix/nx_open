@@ -58,7 +58,7 @@ Item
 
         for (let i = 0; i < itemsToCheck.length; ++i)
         {
-            if (CoreUtils.isItemFilled(itemsToCheck[i]))
+            if (Utils.isItemFilled(itemsToCheck[i]))
             {
                 filled = true
                 return

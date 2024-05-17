@@ -671,8 +671,8 @@ Figure
             return defaultPos
 
         const pos = Qt.point(
-            Utils.getValue(positionJson[0], defaultPos.x),
-            Utils.getValue(positionJson[1], defaultPos.y))
+            CoreUtils.getValue(positionJson[0], defaultPos.x),
+            CoreUtils.getValue(positionJson[1], defaultPos.y))
 
         return (pos.x >= 0 && pos.x + size.width <= 1 && pos.y >= 0 && pos.y + size.height <= 1)
             ? pos
