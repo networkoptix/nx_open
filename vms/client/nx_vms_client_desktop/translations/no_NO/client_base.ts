@@ -3941,6 +3941,10 @@ Lisensnøkkel: %2</translation>
       <comment>%1 will be substituted by a list of contacts</comment>
       <translation>Send den medfølgende lisensnøkkelen og maskinvare-IDen til din regionale / lisenssupport (%1) for å få en aktiveringsnøkkel-fil.</translation>
     </message>
+    <message>
+      <source>Text Files</source>
+      <translation type="unfinished">Text Files</translation>
+    </message>
   </context>
   <context>
     <name>QnLocalSettingsDialog</name>

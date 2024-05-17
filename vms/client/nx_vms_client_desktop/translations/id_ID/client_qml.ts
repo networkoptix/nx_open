@@ -2441,10 +2441,6 @@ Tekan Alt + Klik untuk mengikuti objek</translation>
       <translation>Anda hanya perlu menentukan alamat email&apos;pengguna.</translation>
     </message>
     <message>
-      <source>If user already has an account, he will see this system and will be able to log in to it. If not, we&apos;ll send an invitation to this address and user will see this system right after he creates an account.</source>
-      <translation>Jika pengguna sudah memiliki akun, dia akan melihat sistem ini dan dapat masuk ke dalamnya. Jika tidak, kami&apos;akan mengirimkan undangan ke alamat ini dan pengguna akan melihat sistem ini segera setelah dia membuat akun.</translation>
-    </message>
-    <message>
       <source>Permission Groups</source>
       <translation>Perizinan Grup</translation>
     </message>
@@ -2463,6 +2459,10 @@ Tekan Alt + Klik untuk mengikuti objek</translation>
     <message>
       <source>Passwords do not match</source>
       <translation>Passwords do not match</translation>
+    </message>
+    <message>
+      <source>The added site will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</source>
+      <translation type="unfinished">The added site will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</translation>
     </message>
   </context>
   <context>

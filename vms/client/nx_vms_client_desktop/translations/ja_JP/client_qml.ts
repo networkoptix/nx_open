@@ -2443,10 +2443,6 @@ Alt + クリックを使用してください。</translation>
       <translation>ユーザーのメールアドレスのみを指定する必要があります。</translation>
     </message>
     <message>
-      <source>If user already has an account, he will see this system and will be able to log in to it. If not, we&apos;ll send an invitation to this address and user will see this system right after he creates an account.</source>
-      <translation>ユーザーがすでにアカウントを持っている場合、このシステムが表示され、ログインできるようになります。そうでない場合は、このアドレスに招待メールが送信され、ユーザーがアカウントを作成するとこのシステムが表示されます。</translation>
-    </message>
-    <message>
       <source>Permission Groups</source>
       <translation>権限グループ</translation>
     </message>
@@ -2465,6 +2461,10 @@ Alt + クリックを使用してください。</translation>
     <message>
       <source>Passwords do not match</source>
       <translation>パスワードが一致しません</translation>
+    </message>
+    <message>
+      <source>The added site will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</source>
+      <translation>追加されたサイトは、既存のクラウドアカウントを持つユーザーにはすぐに表示されます。クラウドアカウントを持たないユーザーには、電子メールで手順が送信されます。</translation>
     </message>
   </context>
   <context>

@@ -3941,6 +3941,10 @@ Clé de licence : %2</translation>
       <comment>%1 will be substituted by a list of contacts</comment>
       <translation>Veuillez envoyer la clé de licence fournie et l'ID matériel à votre support régional / licence (%1) pour obtenir un fichier de clé d'activation.</translation>
     </message>
+    <message>
+      <source>Text Files</source>
+      <translation type="unfinished">Text Files</translation>
+    </message>
   </context>
   <context>
     <name>QnLocalSettingsDialog</name>

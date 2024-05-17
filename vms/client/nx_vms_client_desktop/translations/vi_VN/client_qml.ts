@@ -2441,10 +2441,6 @@ Nhấn Alt + Click để theo dõi đối tượng</translation>
       <translation>Bạn cần chỉ định địa chỉ email của người dùng.</translation>
     </message>
     <message>
-      <source>If user already has an account, he will see this system and will be able to log in to it. If not, we&apos;ll send an invitation to this address and user will see this system right after he creates an account.</source>
-      <translation>Nếu người dùng đã có tài khoản, họ sẽ thấy hệ thống này và có thể đăng nhập. Nếu chưa, chúng tôi sẽ gửi lời mời đến địa chỉ này và người dùng sẽ thấy hệ thống ngay sau khi tạo tài khoản.</translation>
-    </message>
-    <message>
       <source>Permission Groups</source>
       <translation>Nhóm quyền</translation>
     </message>
@@ -2463,6 +2459,10 @@ Nhấn Alt + Click để theo dõi đối tượng</translation>
     <message>
       <source>Passwords do not match</source>
       <translation>Mật khẩu không trùng nhau</translation>
+    </message>
+    <message>
+      <source>The added site will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</source>
+      <translation type="unfinished">The added site will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</translation>
     </message>
   </context>
   <context>

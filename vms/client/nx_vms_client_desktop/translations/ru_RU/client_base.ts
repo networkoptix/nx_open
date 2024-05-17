@@ -4039,6 +4039,10 @@ License Key: %2</translation>
       <comment>%1 will be substituted by a list of contacts</comment>
       <translation>Пожалуйста, отправьте предоставленный лицензионный ключ и идентификатор оборудования в региональную / лицензионную службу поддержки (%1) для получения файла ключа активации.</translation>
     </message>
+    <message>
+      <source>Text Files</source>
+      <translation type="unfinished">Text Files</translation>
+    </message>
   </context>
   <context>
     <name>QnLocalSettingsDialog</name>

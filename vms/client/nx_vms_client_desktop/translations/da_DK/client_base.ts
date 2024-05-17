@@ -3941,6 +3941,10 @@ Licensnøgle: %2</translation>
       <comment>%1 will be substituted by a list of contacts</comment>
       <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</translation>
     </message>
+    <message>
+      <source>Text Files</source>
+      <translation type="unfinished">Text Files</translation>
+    </message>
   </context>
   <context>
     <name>QnLocalSettingsDialog</name>

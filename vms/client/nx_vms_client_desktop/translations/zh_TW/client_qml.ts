@@ -2439,10 +2439,6 @@ Press Alt + Click to follow object</translation>
       <translation>您只需指定使用者的電子郵件。</translation>
     </message>
     <message>
-      <source>If user already has an account, he will see this system and will be able to log in to it. If not, we&apos;ll send an invitation to this address and user will see this system right after he creates an account.</source>
-      <translation>如果使用者已經有帳號，他將可以看到此系統並登入。如果沒有，我們會寄邀請函到這個地址，使用者會在他建立帳號之後看到此系統。</translation>
-    </message>
-    <message>
       <source>Permission Groups</source>
       <translation>權限群組</translation>
     </message>
@@ -2461,6 +2457,10 @@ Press Alt + Click to follow object</translation>
     <message>
       <source>Passwords do not match</source>
       <translation>兩次密碼輸入不一致</translation>
+    </message>
+    <message>
+      <source>The added site will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</source>
+      <translation type="unfinished">The added site will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</translation>
     </message>
   </context>
   <context>

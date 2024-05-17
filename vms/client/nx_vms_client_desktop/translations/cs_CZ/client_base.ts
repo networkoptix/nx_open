@@ -4039,6 +4039,10 @@ License Key: %2</translation>
       <comment>%1 will be substituted by a list of contacts</comment>
       <translation>Zašlete prosím licenční klíč a ID hardwaru na vaši regionální / licenční podporu (%1) pro získání souboru s aktivačním klíčem.</translation>
     </message>
+    <message>
+      <source>Text Files</source>
+      <translation type="unfinished">Text Files</translation>
+    </message>
   </context>
   <context>
     <name>QnLocalSettingsDialog</name>

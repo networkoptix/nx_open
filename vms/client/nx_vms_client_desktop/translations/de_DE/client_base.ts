@@ -3941,6 +3941,10 @@ Lizenzschlüssel: %2</translation>
       <comment>%1 will be substituted by a list of contacts</comment>
       <translation>Bitte senden Sie den bereitgestellten Lizenzschlüssel und die Hardware-ID an Ihren Regional- / Lizenzsupport (%1), um eine Aktivierungsschlüsseldatei zu erhalten.</translation>
     </message>
+    <message>
+      <source>Text Files</source>
+      <translation type="unfinished">Text Files</translation>
+    </message>
   </context>
   <context>
     <name>QnLocalSettingsDialog</name>
