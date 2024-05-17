@@ -6,6 +6,7 @@ import QtQuick.Layouts
 import QtQml
 
 import Nx.Core
+import Nx.Core.Controls
 import Nx.Controls
 import Nx.Dialogs
 
@@ -18,7 +19,7 @@ Dialog
     id: control
 
     required property SystemContext systemContext
-    property Analytics.StateView taxonomy: systemContext.taxonomyManager().createStateView(control)
+    property Analytics.StateView taxonomy: systemContext.taxonomyManager.createStateView(control)
     // When comboBox is empty, currentValue is undefined. `??` used for suppressing warnings.
     property LookupListModel currentList: listComboBox.currentValue ?? null
     property var dialog: null

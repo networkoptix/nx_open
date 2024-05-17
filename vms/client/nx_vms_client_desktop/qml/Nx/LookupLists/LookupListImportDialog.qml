@@ -11,7 +11,7 @@ import Nx.Controls
 import Nx.Dialogs
 
 import nx.vms.client.desktop
-import nx.vms.client.desktop.analytics as Analytics
+import nx.vms.client.core.analytics as Analytics
 
 ModalDialog
 {
@@ -231,9 +231,9 @@ ModalDialog
             onClicked:
             {
                 importProcessor.importListEntries(
-                    previewProcessor.filePath, 
+                    previewProcessor.filePath,
                     previewProcessor.separator,
-                    previewProcessor.dataHasHeaderRow, 
+                    previewProcessor.dataHasHeaderRow,
                     importModel)
             }
         }
@@ -296,7 +296,7 @@ ModalDialog
         onRejected: importProcessor.cancelRunningTask()
         onDoneClicked: control.accept()
     }
-    
+
     FixLookupListImportDialog
     {
         id: fixLookupListImportDialog
