@@ -2489,8 +2489,8 @@ Press Alt + Click to follow object</translation>
       <translation type="unfinished">Passwords do not match</translation>
     </message>
     <message>
-      <source>The added site will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</source>
-      <translation type="unfinished">The added site will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</translation>
+      <source>The added system will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</source>
+      <translation type="unfinished">The added system will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</translation>
     </message>
   </context>
   <context>
