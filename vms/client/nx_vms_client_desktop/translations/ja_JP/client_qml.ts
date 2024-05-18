@@ -2463,8 +2463,8 @@ Alt + クリックを使用してください。</translation>
       <translation>パスワードが一致しません</translation>
     </message>
     <message>
-      <source>The added site will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</source>
-      <translation>追加されたサイトは、既存のクラウドアカウントを持つユーザーにはすぐに表示されます。クラウドアカウントを持たないユーザーには、電子メールで手順が送信されます。</translation>
+      <source>The added system will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</source>
+      <translation>追加されたシステムは、既存のクラウドアカウントを持つユーザーにはすぐに表示されます。クラウドアカウントを持たないユーザーには、電子メールで手順が送信されます。</translation>
     </message>
   </context>
   <context>

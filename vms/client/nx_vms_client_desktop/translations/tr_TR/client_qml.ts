@@ -2472,8 +2472,8 @@ Nesneyi takip etmek için Alt + Tıklama tuşlarına basın</translation>
       <translation>Parolalar eşleşmiyor</translation>
     </message>
     <message>
-      <source>The added site will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</source>
-      <translation>Eklenen site, mevcut bir bulut hesabına sahip kullanıcılara hızlı bir şekilde görünür hale gelecek, mevcut bir bulut hesabı olmayan kullanıcılar ise talimatları E-postayla alacak.</translation>
+      <source>The added system will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</source>
+      <translation>Eklenen sistem, mevcut bir bulut hesabına sahip kullanıcılara hızlı bir şekilde görünür hale gelecek, mevcut bir bulut hesabı olmayan kullanıcılar ise talimatları E-posta yoluyla alacak.</translation>
     </message>
   </context>
   <context>
