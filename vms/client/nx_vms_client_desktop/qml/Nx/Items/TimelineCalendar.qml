@@ -251,6 +251,7 @@ Control
                 maximumHour: DateUtils.areDatesEqual(visualSelectionEnd, range.end)
                     ? range.end.getHours() : 23
 
+                timePeriodType: daysSelector.timePeriodType
                 periodStorage: daysSelector.periodStorage
                 allCamerasPeriodStorage: daysSelector.allCamerasPeriodStorage
                 periodsVisible: daysSelector.periodsVisible
