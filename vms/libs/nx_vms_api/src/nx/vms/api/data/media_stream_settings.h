@@ -41,10 +41,10 @@ struct NX_VMS_API StreamSettings: MediaSettings
     StreamQuality quality = StreamQuality::normal;
 
     /**%apidoc[opt]
-     * If present, specifies the Archive stream end position. It is used only if the `positionUs`
+     * If present, specifies the Archive stream end position. It is used only if the `positionMs`
      * parameter is present.
      */
-    std::optional<std::chrono::microseconds> endPositionUs = std::nullopt;
+    std::optional<std::chrono::milliseconds> endPositionMs = std::nullopt;
 
     /**%apidoc[opt] Drop Late Frames. */
     std::optional<int> dropLateFrames = std::nullopt;
@@ -71,10 +71,10 @@ struct NX_VMS_API StreamSettings: MediaSettings
      */
     bool accurateSeek = false;
 
-    /**%apidoc[opt] Fragment length in seconds. Can be used for both live and archive streams -
-     * for archive streams effectively it's another way to specify `endPositionUs`.
+    /**%apidoc[opt] Fragment length in milliseconds. Can be used for both live and archive streams -
+     * for archive streams effectively it's another way to specify `endPositionMs`.
      */
-    std::optional<std::chrono::seconds> durationS = std::nullopt;
+    std::optional<std::chrono::milliseconds> durationMs = std::nullopt;
 
     /**%apidoc[opt] Add signature to exported media data, only mp4 and webm
      * formats are supported.
@@ -98,9 +98,9 @@ struct NX_VMS_API StreamSettings: MediaSettings
 
     static QByteArray getMimeType(const QString& format);
 };
-#define StreamSettings_Fields MediaSettings_Fields(format)(quality)(endPositionUs)\
+#define StreamSettings_Fields MediaSettings_Fields(format)(quality)(endPositionMs)\
     (dropLateFrames)(standFrameDuration)(realTimeOptimization)(audioOnly)(accurateSeek)\
-    (durationS)(signature)(utcTimestamps)(continuousTimestamps)(download)
+    (durationMs)(signature)(utcTimestamps)(continuousTimestamps)(download)
 QN_FUSION_DECLARE_FUNCTIONS(StreamSettings, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(StreamSettings, StreamSettings_Fields)
 
@@ -117,6 +117,9 @@ struct NX_VMS_API MediaStreamSettings: public StreamSettings
 QN_FUSION_DECLARE_FUNCTIONS(MediaStreamSettings, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(MediaStreamSettings, MediaStreamSettings_Fields)
 
+/**%apidoc
+ * %param[opt] durationMs Fragment length in milliseconds.
+ */
 struct NX_VMS_API BookmarkStreamSettings: public StreamSettings, public BookmarkProtection
 {
     /** Can be obtained from `/rest/v{4-}/devices/&ast;/bookmarks`. */
