@@ -44,7 +44,7 @@ bool MediaSettings::isValid() const
 
 bool MediaSettings::isLiveRequest() const
 {
-    return !positionUs;
+    return !positionMs;
 }
 
 } // namespace nx::vms::api

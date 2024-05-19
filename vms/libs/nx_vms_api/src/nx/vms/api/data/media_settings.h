@@ -37,7 +37,7 @@ struct NX_VMS_API MediaSettings
      * If present, specifies the Archive stream start position. Otherwise, the Live stream is
      * provided.
      */
-    std::optional<std::chrono::microseconds> positionUs = std::nullopt;
+    std::optional<std::chrono::milliseconds> positionMs = std::nullopt;
 
     /**%apidoc[opt]:string
      * The option will be applied only when the stream transcoding is turned on by some of other
@@ -109,7 +109,7 @@ struct NX_VMS_API MediaSettings
 
     bool isLiveRequest() const;
 };
-#define MediaSettings_Fields (stream)(positionUs)(resolution)(resolutionWhenTranscoding)\
+#define MediaSettings_Fields (stream)(positionMs)(resolution)(resolutionWhenTranscoding)\
     (rotation)(dewarping)(dewarpingXangle)(dewarpingYangle)(dewarpingFov)(dewarpingPanofactor)(zoom)
 QN_FUSION_DECLARE_FUNCTIONS(MediaSettings, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(MediaSettings, MediaSettings_Fields)
