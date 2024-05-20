@@ -19,11 +19,17 @@ const ItemDescriptor& EnterFullscreenAction::manifest()
         .flags = ItemFlag::instant,
         .executionTargets = ExecutionTarget::clients,
         .fields = {
-            makeFieldDescriptor<TargetSingleDeviceField>(utils::kCameraIdFieldName,
-                NX_DYNAMIC_TRANSLATABLE(tr("Camera"))),
+            makeFieldDescriptor<TargetSingleDeviceField>(
+                utils::kCameraIdFieldName,
+                NX_DYNAMIC_TRANSLATABLE(tr("Camera")),
+                {},
+                TargetSingleDeviceFieldProperties{
+                    .validationPolicy = kCameraFullScreenValidationPolicy
+                }.toVariantMap()),
             makeFieldDescriptor<TargetLayoutField>(utils::kLayoutIdsFieldName,
                 Strings::onLayout()),
-            makeFieldDescriptor<TargetUserField>(utils::kUsersFieldName,
+            makeFieldDescriptor<TargetUserField>(
+                utils::kUsersFieldName,
                 NX_DYNAMIC_TRANSLATABLE(tr("Set for")),
                 {},
                 ResourceFilterFieldProperties{

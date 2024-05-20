@@ -3,9 +3,13 @@
 #pragma once
 
 #include "../base_fields/resource_filter_field.h"
-#include "../data_macros.h"
 
 namespace nx::vms::rules {
+
+constexpr auto kBookmarkValidationPolicy = "bookmark";
+constexpr auto kCameraAudioTransmissionValidationPolicy = "cameraAudioTransmission";
+constexpr auto kCameraOutputValidationPolicy = "cameraOutput";
+constexpr auto kCameraRecordingValidationPolicy = "cameraRecording";
 
 /** Displayed as device selection button and "Use source" checkbox. */
 class NX_VMS_RULES_API TargetDeviceField: public ResourceFilterActionField

@@ -6,6 +6,7 @@
 #include <core/resource/resource.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/desktop/resource_dialogs/resource_selection_widget.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
 
 namespace Ui { class CameraSelectionDialog; }
@@ -72,14 +73,14 @@ public:
     {
         using resource_type = QnResource;
         static bool isResourceValid(const QnResourcePtr&) { return true; }
-        static QString getText(const QnResourceList&) { return QString(); }
+        static QString getText(SystemContext*, const QnResourceList&) { return {}; }
         static bool emptyListIsValid() { return true; }
         static bool multiChoiceListIsValid() { return true; }
         static bool showRecordingIndicator() { return false; }
     };
 
     template<typename ResourcePolicy>
-    static bool selectCameras(UuidSet& selectedCameras, QWidget* parent);
+    static bool selectCameras(SystemContext* context, UuidSet& selectedCameras, QWidget* parent);
 
 protected:
     virtual void showEvent(QShowEvent* event) override;
@@ -98,6 +99,7 @@ private:
 
 template<typename ResourcePolicy>
 bool CameraSelectionDialog::selectCameras(
+    SystemContext* context,
     UuidSet& selectedCameras,
     QWidget* parent)
 {
@@ -111,14 +113,14 @@ bool CameraSelectionDialog::selectCameras(
         };
 
     const auto alertTextProvider =
-        [](const QSet<QnResourcePtr>& resourcesSet)
+        [context](const QSet<QnResourcePtr>& resourcesSet)
         {
-            QnResourceList reourcesList;
+            QnResourceList resourcesList;
             std::copy(std::cbegin(resourcesSet), std::cend(resourcesSet),
-                std::back_inserter(reourcesList));
+                std::back_inserter(resourcesList));
 
-            const bool isValid = isResourcesListValid<ResourcePolicy>(reourcesList);
-            return isValid ? QString() : ResourcePolicy::getText(reourcesList);
+            const bool isValid = isResourcesListValid<ResourcePolicy>(resourcesList);
+            return isValid ? QString() : ResourcePolicy::getText(context, resourcesList);
         };
 
     CameraSelectionDialog dialog(ResourceFilter(), resourceValidator, alertTextProvider, parent);

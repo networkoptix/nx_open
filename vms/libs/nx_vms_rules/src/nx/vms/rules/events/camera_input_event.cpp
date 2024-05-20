@@ -89,7 +89,11 @@ const ItemDescriptor& CameraInputEvent::manifest(common::SystemContext* context)
                 utils::kCameraIdFieldName,
                 Strings::occursAt(),
                 {},
-                {{"acceptAll", true}}),
+                ResourceFilterFieldProperties{
+                    .acceptAll = true,
+                    .allowEmptySelection = true,
+                    .validationPolicy = kCameraInputValidationPolicy,
+                }.toVariantMap()),
             makeFieldDescriptor<InputPortField>(
                 "inputPortId",
                 NX_DYNAMIC_TRANSLATABLE(tr("With ID"))),

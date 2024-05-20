@@ -2,12 +2,11 @@
 
 #include "picker_factory.h"
 
-#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/rules/action_builder_fields/builtin_fields.h>
-#include <nx/vms/rules/actions/builtin_actions.h>
+#include <nx/vms/rules/camera_validation_policy.h>
 #include <nx/vms/rules/event_filter_fields/builtin_fields.h>
-#include <nx/vms/rules/events/builtin_events.h>
-#include <nx/vms/rules/utils/type.h>
+#include <nx/vms/rules/server_validation_policy.h>
+#include <nx/vms/rules/user_validation_policy.h>
 
 #include "action_duration_picker_widget.h"
 #include "analytics_object_attributes_picker_widget.h"
@@ -59,18 +58,19 @@ PickerWidget* createPickerImpl(
 PickerWidget* createSourceCameraPicker(
     vms::rules::Field* field, SystemContext* context, ParamsWidget* parent)
 {
-    const auto eventId = parent->descriptor()->id;
+    const auto sourceCameraField = dynamic_cast<vms::rules::SourceCameraField*>(field);
+    if (!NX_ASSERT(sourceCameraField, "SourceCameraField is expected here"))
+        return {};
 
-    if (eventId == vms::rules::utils::type<vms::rules::AnalyticsEvent>())
+    const auto validationPolicy = sourceCameraField->properties().validationPolicy;
+
+    if (validationPolicy == vms::rules::kCameraAnalyticsValidationPolicy)
         return createPickerImpl<SourceCameraPicker<QnCameraAnalyticsPolicy>>(field, context, parent);
 
-    if (eventId == vms::rules::utils::type<vms::rules::AnalyticsObjectEvent>())
-        return createPickerImpl<SourceCameraPicker<QnCameraAnalyticsPolicy>>(field, context, parent);
-
-    if (eventId == vms::rules::utils::type<vms::rules::CameraInputEvent>())
+    if (validationPolicy == vms::rules::kCameraInputValidationPolicy)
         return createPickerImpl<SourceCameraPicker<QnCameraInputPolicy>>(field ,context, parent);
 
-    if (eventId == vms::rules::utils::type<vms::rules::MotionEvent>())
+    if (validationPolicy == vms::rules::kCameraMotionValidationPolicy)
         return createPickerImpl<SourceCameraPicker<QnCameraMotionPolicy>>(field, context, parent);
 
     return createPickerImpl<SourceCameraPicker<QnAllowAnyCameraPolicy>>(field, context, parent);;
@@ -79,12 +79,16 @@ PickerWidget* createSourceCameraPicker(
 PickerWidget* createSourceServerPicker(
     vms::rules::Field* field, SystemContext* context, ParamsWidget* parent)
 {
-    const auto eventId = parent->descriptor()->id;
+    const auto sourceServerField = dynamic_cast<vms::rules::SourceServerField*>(field);
+    if (!NX_ASSERT(sourceServerField, "SourceServerField is expected here"))
+        return {};
 
-    if (eventId == vms::rules::utils::type<vms::rules::PoeOverBudgetEvent>())
+    const auto validationPolicy = sourceServerField->properties().validationPolicy;
+
+    if (validationPolicy == vms::rules::kHasPoeManagementValidationPolicy)
         return createPickerImpl<SourceServerPicker<QnPoeOverBudgetPolicy>>(field, context, parent);
 
-    if (eventId == vms::rules::utils::type<vms::rules::FanErrorEvent>())
+    if (validationPolicy == vms::rules::kHasFanMonitoringValidationPolicy)
         return createPickerImpl<SourceServerPicker<QnFanErrorPolicy>>(field, context, parent);
 
     NX_ASSERT(false, "Must not be here");
@@ -94,28 +98,25 @@ PickerWidget* createSourceServerPicker(
 PickerWidget* createTargetDevicePicker(
     vms::rules::Field* field, SystemContext* context, ParamsWidget* parent)
 {
-    const auto actionId = parent->descriptor()->id;
+    const auto targetDeviceField = dynamic_cast<vms::rules::TargetDeviceField*>(field);
+    if (!NX_ASSERT(targetDeviceField, "TargetDeviceField is expected here"))
+        return {};
 
-    if (actionId == vms::rules::utils::type<vms::rules::BookmarkAction>())
+    const auto validationPolicy = targetDeviceField->properties().validationPolicy;
+
+    if (validationPolicy == vms::rules::kBookmarkValidationPolicy)
         return createPickerImpl<TargetCameraPicker<QnBookmarkActionPolicy>>(field, context, parent);
 
-    if (actionId == vms::rules::utils::type<vms::rules::DeviceOutputAction>())
+    if (validationPolicy == vms::rules::kCameraOutputValidationPolicy)
         return createPickerImpl<TargetCameraPicker<QnCameraOutputPolicy>>(field, context, parent);
 
-    if (actionId == vms::rules::utils::type<vms::rules::DeviceRecordingAction>())
+    if (validationPolicy == vms::rules::kCameraRecordingValidationPolicy)
         return createPickerImpl<TargetCameraPicker<QnCameraRecordingPolicy>>(field, context, parent);
 
-    if (actionId == vms::rules::utils::type<vms::rules::PlaySoundAction>()
-        || actionId == vms::rules::utils::type<vms::rules::RepeatSoundAction>()
-        || actionId == vms::rules::utils::type<vms::rules::SpeakAction>())
-    {
+    if (validationPolicy == vms::rules::kCameraAudioTransmissionValidationPolicy)
         return createPickerImpl<TargetCameraPicker<QnCameraAudioTransmitPolicy>>(field, context, parent);
-    }
 
-    if (actionId == vms::rules::utils::type<vms::rules::PtzPresetAction>())
-        return createPickerImpl<TargetCameraPicker<QnExecPtzPresetPolicy>>(field, context, parent);
-
-    if (actionId == vms::rules::utils::type<vms::rules::ShowOnAlarmLayoutAction>())
+    if (!targetDeviceField->properties().allowEmptySelection)
         return createPickerImpl<TargetCameraPicker<QnRequireCameraPolicy>>(field ,context, parent);
 
     return createPickerImpl<TargetCameraPicker<QnAllowAnyCameraPolicy>>(field, context, parent);
@@ -124,7 +125,11 @@ PickerWidget* createTargetDevicePicker(
 PickerWidget* createTargetServerPicker(
     vms::rules::Field* field, SystemContext* context, ParamsWidget* parent)
 {
-    if (parent->descriptor()->id == vms::rules::utils::type<vms::rules::BuzzerAction>())
+    const auto targetServerField = dynamic_cast<vms::rules::TargetServerField*>(field);
+    if (!NX_ASSERT(targetServerField, "TargetServerField is expected here"))
+        return {};
+
+    if (targetServerField->properties().validationPolicy == vms::rules::kHasBuzzerValidationPolicy)
         return createPickerImpl<TargetServerPicker<QnBuzzerPolicy>>(field, context, parent);
 
     NX_ASSERT(false, "Must not be here");
@@ -134,12 +139,16 @@ PickerWidget* createTargetServerPicker(
 PickerWidget* createSingleTargetCameraPicker(
     vms::rules::Field* field, SystemContext* context, ParamsWidget* parent)
 {
-    const auto actionId = parent->descriptor()->id;
+    const auto targetSingleDeviceField = dynamic_cast<vms::rules::TargetSingleDeviceField*>(field);
+    if (!NX_ASSERT(targetSingleDeviceField, "TargetSingleDeviceField is expected here"))
+        return {};
 
-    if (actionId == vms::rules::utils::type<vms::rules::EnterFullscreenAction>())
+    const auto validationPolicy = targetSingleDeviceField->properties().validationPolicy;
+
+    if (validationPolicy == vms::rules::kCameraFullScreenValidationPolicy)
         return createPickerImpl<SingleTargetDevicePicker<QnFullscreenCameraPolicy>>(field, context, parent);
 
-    if (actionId == vms::rules::utils::type<vms::rules::PtzPresetAction>())
+    if (validationPolicy == vms::rules::kExecPtzValidationPolicy)
         return createPickerImpl<SingleTargetDevicePicker<QnExecPtzPresetPolicy>>(field, context, parent);
 
     NX_ASSERT(false, "Must not be here.");
@@ -151,8 +160,6 @@ PickerWidget* createOptionalDurationPicker(
     SystemContext* context,
     ParamsWidget* parent)
 {
-    // auto optionalTimeField = dynamic_cast<vms::rules::OptionalTimeField> vms::rules::OptionalTimeField
-
     if (field->descriptor()->fieldName == vms::rules::utils::kDurationFieldName)
     {
         const auto event = parent->eventDescriptor();

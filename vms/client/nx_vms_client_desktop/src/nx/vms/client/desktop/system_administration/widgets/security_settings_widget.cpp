@@ -428,7 +428,7 @@ void SecuritySettingsWidget::openPixelationConfigurationDialog()
 void SecuritySettingsWidget::openExcludeCameraSelectionDialog()
 {
     if (CameraSelectionDialog::selectCameras<CameraSelectionDialog::DummyPolicy>(
-        m_pixelationSettings.excludeCameraIds, this))
+        systemContext(), m_pixelationSettings.excludeCameraIds, this))
     {
         updatePixelationSettings();
         emit hasChangesChanged();

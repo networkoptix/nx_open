@@ -6,6 +6,9 @@
 
 namespace nx::vms::rules {
 
+constexpr auto kHasPoeManagementValidationPolicy = "hasPoeManagement";
+constexpr auto kHasFanMonitoringValidationPolicy = "hasFanMonitoring";
+
 class NX_VMS_RULES_API SourceServerField: public ResourceFilterEventField
 {
     Q_OBJECT

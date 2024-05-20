@@ -26,7 +26,11 @@ const ItemDescriptor& DeviceRecordingAction::manifest()
         .fields = {
             makeFieldDescriptor<TargetDeviceField>(
                 utils::kDeviceIdsFieldName,
-                NX_DYNAMIC_TRANSLATABLE(tr("On"))),
+                NX_DYNAMIC_TRANSLATABLE(tr("On")),
+                {},
+                ResourceFilterFieldProperties{
+                    .validationPolicy = kCameraRecordingValidationPolicy
+                }.toVariantMap()),
             makeFieldDescriptor<StreamQualityField>(
                 "quality",
                 NX_DYNAMIC_TRANSLATABLE(tr("Quality"))),

@@ -822,8 +822,9 @@ void QnEventLogDialog::at_mouseButtonRelease(QObject* sender, QEvent* event)
 void QnEventLogDialog::at_cameraButton_clicked()
 {
     auto cameraIds = getCameraList();
-    auto dialogAccepted = CameraSelectionDialog::selectCameras
-        <CameraSelectionDialog::DummyPolicy>(cameraIds, this);
+    auto dialogAccepted = CameraSelectionDialog::selectCameras<CameraSelectionDialog::DummyPolicy>(
+        systemContext(), cameraIds, this);
+
     if (dialogAccepted)
         setCameraList(cameraIds);
 }

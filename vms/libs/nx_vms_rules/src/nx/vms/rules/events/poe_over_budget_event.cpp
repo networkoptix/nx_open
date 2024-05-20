@@ -104,7 +104,11 @@ const ItemDescriptor& PoeOverBudgetEvent::manifest()
             utils::makeStateFieldDescriptor(Strings::beginWhen()),
             makeFieldDescriptor<SourceServerField>(
                 utils::kServerIdFieldName,
-                NX_DYNAMIC_TRANSLATABLE(tr("Server"))),
+                NX_DYNAMIC_TRANSLATABLE(tr("Server")),
+                {},
+                ResourceFilterFieldProperties{
+                    .validationPolicy = kHasPoeManagementValidationPolicy
+                }.toVariantMap()),
         },
         .resources = {{utils::kServerIdFieldName, {ResourceType::server}}},
         .readPermissions = GlobalPermission::powerUser,

@@ -27,7 +27,9 @@ const ItemDescriptor& TextOverlayAction::manifest()
         .fields = {
             makeFieldDescriptor<TargetDeviceField>(
                 utils::kDeviceIdsFieldName,
-                Strings::at()),
+                Strings::at(),
+                {},
+                ResourceFilterFieldProperties{}.toVariantMap()),
             utils::makeTimeFieldDescriptor<OptionalTimeField>(
                 utils::kDurationFieldName,
                 Strings::fixedDuration(),

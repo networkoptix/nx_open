@@ -57,7 +57,7 @@ private:
     {
         auto selectedCameras = UuidSet{m_field->id()};
 
-        if (!CameraSelectionDialog::selectCameras<Policy>(selectedCameras, this))
+        if (!CameraSelectionDialog::selectCameras<Policy>(systemContext(), selectedCameras, this))
             return;
 
         m_field->setId(*selectedCameras.begin());
@@ -66,6 +66,8 @@ private:
 
     void updateUi() override
     {
+        ResourcePickerWidgetBase<vms::rules::TargetSingleDeviceField>::updateUi();
+
         const auto canUseSource = Policy::canUseSourceCamera();
         const auto hasSource = vms::rules::hasSourceCamera(*parentParamsWidget()->eventDescriptor());
         const auto useSource = m_field->useSource();
@@ -90,7 +92,7 @@ private:
             const auto camera =
                 resourcePool()->template getResourceById<QnVirtualCameraResource>(m_field->id());
 
-            m_selectButton->setText(Policy::getText({camera}));
+            m_selectButton->setText(Policy::getText(systemContext(), {camera}));
             m_selectButton->setIcon(core::Skin::maximumSizePixmap(
                 icon(camera),
                 QIcon::Selected,

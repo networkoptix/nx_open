@@ -48,7 +48,11 @@ const ItemDescriptor& MotionEvent::manifest()
                 utils::kCameraIdFieldName,
                 Strings::occursAt(),
                 {},
-                {{"acceptAll", true}}),
+                ResourceFilterFieldProperties{
+                    .acceptAll = true,
+                    .allowEmptySelection = true,
+                    .validationPolicy = kCameraMotionValidationPolicy
+                }.toVariantMap()),
         },
         .resources = {
             {utils::kCameraIdFieldName, {ResourceType::device, Qn::ViewContentPermission}}},

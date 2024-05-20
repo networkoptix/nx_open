@@ -110,7 +110,11 @@ const ItemDescriptor& AnalyticsObjectEvent::manifest()
         .fields = {
             makeFieldDescriptor<SourceCameraField>(
                 utils::kCameraIdFieldName,
-                Strings::occursAt()),
+                Strings::occursAt(),
+                {},
+                ResourceFilterFieldProperties{
+                    .validationPolicy = kCameraAnalyticsValidationPolicy
+                }.toVariantMap()),
             makeFieldDescriptor<AnalyticsObjectTypeField>(
                 utils::kObjectTypeIdFieldName,
                 Strings::ofType()),

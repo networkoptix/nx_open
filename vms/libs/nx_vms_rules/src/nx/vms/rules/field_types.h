@@ -23,6 +23,11 @@ struct UuidSelection
     /** Accept/target all flag. */
     bool all = false;
 
+    bool isEmpty() const
+    {
+        return !all && ids.empty();
+    }
+
     bool operator==(const UuidSelection&) const = default;
 };
 

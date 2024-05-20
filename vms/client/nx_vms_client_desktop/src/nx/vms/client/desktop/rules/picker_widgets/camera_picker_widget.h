@@ -30,13 +30,13 @@ public:
 
 protected:
     BASE_COMMON_USINGS
-    using ResourcePickerWidgetBase<F>::updateUi;
+    using ResourcePickerWidgetBase<F>::systemContext;
 
     void onSelectButtonClicked() override
     {
         auto selectedCameras = m_field->ids();
 
-        if (CameraSelectionDialog::selectCameras<Policy>(selectedCameras, this))
+        if (CameraSelectionDialog::selectCameras<Policy>(systemContext(), selectedCameras, this))
         {
             m_field->setAcceptAll(Policy::emptyListIsValid() && selectedCameras.empty());
             m_field->setIds(selectedCameras);
@@ -54,13 +54,16 @@ protected:
     using CameraPickerWidgetBase<vms::rules::SourceCameraField, Policy>::m_selectButton;
     using CameraPickerWidgetBase<vms::rules::SourceCameraField, Policy>::m_field;
     using CameraPickerWidgetBase<vms::rules::SourceCameraField, Policy>::resourcePool;
+    using CameraPickerWidgetBase<vms::rules::SourceCameraField, Policy>::systemContext;
 
     void updateUi() override
     {
+        CameraPickerWidgetBase<vms::rules::SourceCameraField, Policy>::updateUi();
+
         auto resources =
             resourcePool()->template getResourcesByIds<QnVirtualCameraResource>(m_field->ids());
         m_field->setAcceptAll(Policy::emptyListIsValid() && resources.empty());
-        m_selectButton->setText(Policy::getText(resources, /*detailed*/ true));
+        m_selectButton->setText(Policy::getText(systemContext(), resources, /*detailed*/ true));
         m_selectButton->setIcon(core::Skin::maximumSizePixmap(resources.size() == 1
                 ? qnResIconCache->icon(resources.first())
                 : qnResIconCache->icon(QnResourceIconCache::Camera),
@@ -99,6 +102,8 @@ public:
 protected:
     void updateUi() override
     {
+        CameraPickerWidgetBase<vms::rules::TargetDeviceField, Policy>::updateUi();
+
         const auto useSource = m_field->useSource();
         const auto hasSource = vms::rules::hasSourceCamera(*parentParamsWidget()->eventDescriptor());
 
@@ -125,7 +130,7 @@ protected:
         }
         else
         {
-            m_selectButton->setText(Policy::getText(resources, /*detailed*/ true));
+            m_selectButton->setText(Policy::getText(systemContext(), resources, /*detailed*/ true));
 
             QIcon icon;
             if (resources.empty())
@@ -154,6 +159,7 @@ private:
     using CameraPickerWidgetBase<vms::rules::TargetDeviceField, Policy>::m_selectButton;
     using CameraPickerWidgetBase<vms::rules::TargetDeviceField, Policy>::connect;
     using CameraPickerWidgetBase<vms::rules::TargetDeviceField, Policy>::resourcePool;
+    using CameraPickerWidgetBase<vms::rules::TargetDeviceField, Policy>::systemContext;
     using CameraPickerWidgetBase<vms::rules::TargetDeviceField, Policy>::parentParamsWidget;
 
     QCheckBox* m_checkBox{nullptr};

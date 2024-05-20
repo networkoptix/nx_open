@@ -2,6 +2,8 @@
 
 #include "resource.h"
 
+#include <core/resource/camera_resource.h>
+#include <core/resource/media_server_resource.h>
 #include <nx/utils/qt_helpers.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
 
@@ -44,6 +46,24 @@ bool isUserSelected(
     };
 
     return false;
+}
+
+QnMediaServerResourceList servers(
+    const UuidSelection& selection,
+    const common::SystemContext* context)
+{
+    return selection.all
+        ? context->resourcePool()->getResources<QnMediaServerResource>()
+        : context->resourcePool()->getResourcesByIds<QnMediaServerResource>(selection.ids);
+}
+
+QnVirtualCameraResourceList cameras(
+    const UuidSelection& selection,
+    const common::SystemContext* context)
+{
+    return selection.all
+        ? context->resourcePool()->getResources<QnVirtualCameraResource>()
+        : context->resourcePool()->getResourcesByIds<QnVirtualCameraResource>(selection.ids);
 }
 
 UuidList getResourceIds(const QObject* entity, std::string_view fieldName)

@@ -22,7 +22,11 @@ const ItemDescriptor& PtzPresetAction::manifest()
         .fields = {
             makeFieldDescriptor<TargetSingleDeviceField>(
                 utils::kCameraIdFieldName,
-                Strings::at()),
+                Strings::at(),
+                {},
+                TargetSingleDeviceFieldProperties{
+                    .validationPolicy = kExecPtzValidationPolicy
+                }.toVariantMap()),
             makeFieldDescriptor<PtzPresetField>(
                 "presetId",
                 NX_DYNAMIC_TRANSLATABLE(tr("PTZ Preset"))),

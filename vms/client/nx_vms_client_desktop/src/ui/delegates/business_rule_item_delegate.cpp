@@ -25,6 +25,8 @@
 #include <nx/vms/client/desktop/utils/server_notification_cache.h>
 #include <nx/vms/event/action_parameters.h>
 #include <nx/vms/event/strings_helper.h>
+#include <nx/vms/rules/camera_validation_policy.h>
+#include <nx/vms/rules/server_validation_policy.h>
 #include <ui/delegates/resource_selection_dialog_delegate.h>
 #include <ui/delegates/select_cameras_delegate_editor_button.h>
 #include <ui/delegates/select_servers_delegate_editor_button.h>

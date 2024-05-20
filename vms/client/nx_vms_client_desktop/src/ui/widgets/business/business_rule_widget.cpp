@@ -31,6 +31,8 @@
 #include <nx/vms/client/desktop/ui/event_rules/subject_selection_dialog.h>
 #include <nx/vms/client/desktop/utils/mime_data.h>
 #include <nx/vms/common/system_settings.h>
+#include <nx/vms/rules/camera_validation_policy.h>
+#include <nx/vms/rules/server_validation_policy.h>
 #include <ui/delegates/resource_selection_dialog_delegate.h>
 #include <ui/widgets/business/aggregation_widget.h>
 #include <ui/widgets/business/business_action_widget_factory.h>
@@ -49,11 +51,12 @@ namespace {
 
 template<typename Policy>
 void updateEventCameras(
+    nx::vms::client::desktop::SystemContext* context,
     const QnBusinessRuleViewModelPtr model,
     QWidget* parent)
 {
     UuidSet selectedCameras = model->eventResources();
-    if (CameraSelectionDialog::selectCameras<Policy>(selectedCameras, parent))
+    if (CameraSelectionDialog::selectCameras<Policy>(context, selectedCameras, parent))
         model->setEventResources(selectedCameras);
 }
 
@@ -542,15 +545,15 @@ void QnBusinessRuleWidget::at_eventResourcesHolder_clicked()
     if (vms::event::requiresCameraResource(eventType))
     {
         if (eventType == EventType::cameraMotionEvent)
-            updateEventCameras<QnCameraMotionPolicy>(m_model, this);
+            updateEventCameras<QnCameraMotionPolicy>(systemContext(), m_model, this);
         else if (eventType == EventType::cameraInputEvent)
-            updateEventCameras<QnCameraInputPolicy>(m_model, this);
+            updateEventCameras<QnCameraInputPolicy>(systemContext(), m_model, this);
         else if (eventType == EventType::analyticsSdkEvent)
-            updateEventCameras<QnCameraAnalyticsPolicy>(m_model, this);
+            updateEventCameras<QnCameraAnalyticsPolicy>(systemContext(), m_model, this);
         else if (eventType == EventType::analyticsSdkObjectDetected)
-            updateEventCameras<QnCameraAnalyticsPolicy>(m_model, this);
+            updateEventCameras<QnCameraAnalyticsPolicy>(systemContext(), m_model, this);
         else
-            updateEventCameras<CameraSelectionDialog::DummyPolicy>(m_model, this);
+            updateEventCameras<CameraSelectionDialog::DummyPolicy>(systemContext(), m_model, this);
     }
     else if (vms::event::requiresServerResource(eventType))
     {
@@ -633,29 +636,29 @@ void QnBusinessRuleWidget::at_actionResourcesHolder_clicked()
         {
             case ActionType::cameraRecordingAction:
                 dialogAccepted = CameraSelectionDialog::selectCameras<QnCameraRecordingPolicy>(
-                    selectedCameras, this);
+                    systemContext(), selectedCameras, this);
                 break;
             case ActionType::bookmarkAction:
                 dialogAccepted = CameraSelectionDialog::selectCameras<QnBookmarkActionPolicy>(
-                    selectedCameras, this);
+                    systemContext(), selectedCameras, this);
                 break;
             case ActionType::cameraOutputAction:
                 dialogAccepted = CameraSelectionDialog::selectCameras<QnCameraOutputPolicy>(
-                    selectedCameras, this);
+                    systemContext(), selectedCameras, this);
                 break;
             case ActionType::executePtzPresetAction:
                 dialogAccepted = CameraSelectionDialog::selectCameras<QnExecPtzPresetPolicy>(
-                    selectedCameras, this);
+                    systemContext(), selectedCameras, this);
                 break;
             case ActionType::playSoundAction:
             case ActionType::playSoundOnceAction:
             case ActionType::sayTextAction:
                 dialogAccepted = CameraSelectionDialog::selectCameras<QnCameraAudioTransmitPolicy>(
-                    selectedCameras, this);
+                    systemContext(), selectedCameras, this);
                 break;
             default:
                 dialogAccepted = CameraSelectionDialog::selectCameras
-                    <CameraSelectionDialog::DummyPolicy>(selectedCameras, this);
+                    <CameraSelectionDialog::DummyPolicy>(systemContext(), selectedCameras, this);
                 break;
         }
 

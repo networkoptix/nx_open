@@ -29,7 +29,11 @@ const ItemDescriptor& DeviceOutputAction::manifest()
         .fields = {
             makeFieldDescriptor<TargetDeviceField>(
                 utils::kDeviceIdsFieldName,
-                Strings::at()),
+                Strings::at(),
+                {},
+                ResourceFilterFieldProperties{
+                    .validationPolicy = kCameraOutputValidationPolicy
+                }.toVariantMap()),
             makeFieldDescriptor<OutputPortField>(
                 "outputPortId",
                 NX_DYNAMIC_TRANSLATABLE(tr("Output ID"))),

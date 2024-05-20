@@ -24,7 +24,6 @@
 #include <nx/vms/event/action_parameters.h>
 #include <nx/vms/event/events/abstract_event.h>
 #include <nx/vms/event/strings_helper.h>
-#include <nx/vms/rules/validation_policy.h>
 
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::common;

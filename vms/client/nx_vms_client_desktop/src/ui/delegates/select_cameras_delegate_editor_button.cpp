@@ -11,7 +11,7 @@ QnSelectCamerasDialogButton::QnSelectCamerasDialogButton(QWidget* parent):
         [this](UuidSet& resources)
         {
             return CameraSelectionDialog::selectCameras<CameraSelectionDialog::DummyPolicy>(
-                resources, this);
+                appContext()->currentSystemContext(), resources, this);
         };
 }
 

@@ -50,7 +50,11 @@ const ItemDescriptor& FanErrorEvent::manifest()
         .fields = {
             makeFieldDescriptor<SourceServerField>(
                 utils::kServerIdFieldName,
-                Strings::at()),
+                Strings::at(),
+                {},
+                ResourceFilterFieldProperties{
+                    .validationPolicy = kHasFanMonitoringValidationPolicy
+                }.toVariantMap()),
         },
         .resources = {{utils::kServerIdFieldName, {ResourceType::server}}},
         .readPermissions = GlobalPermission::powerUser,

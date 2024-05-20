@@ -6,7 +6,6 @@
 #include <nx/vms/api/data/user_group_data.h>
 
 #include "../action_builder_fields/event_devices_field.h"
-#include "../action_builder_fields/event_id_field.h"
 #include "../action_builder_fields/target_device_field.h"
 #include "../action_builder_fields/target_user_field.h"
 #include "../strings.h"
@@ -23,7 +22,11 @@ const ItemDescriptor& ShowOnAlarmLayoutAction::manifest()
         .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Show on Alarm Layout")),
         .executionTargets = ExecutionTarget::clients,
         .fields = {
-            makeFieldDescriptor<TargetDeviceField>(utils::kDeviceIdsFieldName, {}),
+            makeFieldDescriptor<TargetDeviceField>(
+                utils::kDeviceIdsFieldName,
+                {},
+                {},
+                ResourceFilterFieldProperties{}.toVariantMap()),
             makeFieldDescriptor<TargetUserField>(utils::kUsersFieldName,
                 Strings::to(),
                 {},

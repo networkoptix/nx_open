@@ -23,7 +23,11 @@ const ItemDescriptor& BuzzerAction::manifest()
         .fields = {
             makeFieldDescriptor<TargetServerField>(
                 utils::kServerIdsFieldName,
-                Strings::at()),
+                Strings::at(),
+                {},
+                ResourceFilterFieldProperties{
+                    .validationPolicy = kHasBuzzerValidationPolicy
+                }.toVariantMap()),
             utils::makeTimeFieldDescriptor<OptionalTimeField>(
                 utils::kDurationFieldName,
                 Strings::fixedDuration(),

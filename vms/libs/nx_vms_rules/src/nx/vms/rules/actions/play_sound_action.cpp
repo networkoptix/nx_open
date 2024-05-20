@@ -24,7 +24,11 @@ const ItemDescriptor& PlaySoundAction::manifest()
             makeFieldDescriptor<SoundField>(utils::kSoundFieldName, {}),
             makeFieldDescriptor<TargetDeviceField>(
                 utils::kDeviceIdsFieldName,
-                Strings::at()),
+                Strings::at(),
+                {},
+                ResourceFilterFieldProperties{
+                    .validationPolicy = kCameraAudioTransmissionValidationPolicy
+                }.toVariantMap()),
             makeFieldDescriptor<TargetUserField>(
                 utils::kUsersFieldName,
                 NX_DYNAMIC_TRANSLATABLE(tr("To Users")),

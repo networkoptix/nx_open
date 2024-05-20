@@ -32,7 +32,11 @@ const ItemDescriptor& RepeatSoundAction::manifest()
                 NX_DYNAMIC_TRANSLATABLE(tr("Sound"))),
             makeFieldDescriptor<TargetDeviceField>(
                 utils::kDeviceIdsFieldName,
-                Strings::at()),
+                Strings::at(),
+                {},
+                ResourceFilterFieldProperties{
+                    .validationPolicy = kCameraAudioTransmissionValidationPolicy
+                }.toVariantMap()),
             makeFieldDescriptor<TargetUserField>(
                 utils::kUsersFieldName,
                 Strings::to(),

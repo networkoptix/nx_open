@@ -85,7 +85,10 @@ const ItemDescriptor& PluginDiagnosticEvent::manifest()
                 utils::kCameraIdFieldName,
                 Strings::occursAt(),
                 {},
-                {{"acceptAll", false}}),
+                ResourceFilterFieldProperties{
+                    .acceptAll = true,
+                    .allowEmptySelection = true
+                }.toVariantMap()),
             makeFieldDescriptor<AnalyticsEngineField>("engineId",
                 NX_DYNAMIC_TRANSLATABLE(tr("For Plugin"))),
             makeFieldDescriptor<TextLookupField>(utils::kCaptionFieldName,

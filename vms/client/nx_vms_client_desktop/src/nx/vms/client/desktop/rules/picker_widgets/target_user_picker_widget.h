@@ -4,7 +4,7 @@
 
 #include <business/business_resource_validation.h>
 #include <nx/vms/rules/action_builder_fields/target_user_field.h>
-#include <nx/vms/rules/validation_policy.h>
+#include <nx/vms/rules/user_validation_policy.h>
 
 #include "resource_picker_widget_base.h"
 

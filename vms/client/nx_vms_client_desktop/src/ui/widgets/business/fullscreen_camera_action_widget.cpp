@@ -5,7 +5,6 @@
 
 #include <QtCore/QScopedValueRollback>
 
-#include <business/business_resource_validation.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -16,6 +15,7 @@
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/event/action_parameters.h>
 #include <nx/vms/event/events/abstract_event.h>
+#include <nx/vms/rules/camera_validation_policy.h>
 
 using namespace nx::vms::client::desktop;
 using namespace std::chrono;
@@ -151,8 +151,11 @@ void QnFullscreenCameraActionWidget::openCameraSelectionDialog()
     QScopedValueRollback<bool> guard(m_updating, true);
 
     auto selectedCameras = FullscreenActionHelper::cameraIds(model().data());
-    if (!CameraSelectionDialog::selectCameras<QnFullscreenCameraPolicy>(selectedCameras, this))
+    if (!CameraSelectionDialog::selectCameras<QnFullscreenCameraPolicy>(
+        systemContext(), selectedCameras, this))
+    {
         return;
+    }
 
     model()->setActionResourcesRaw(
         FullscreenActionHelper::setCameraIds(model().data(), selectedCameras));
