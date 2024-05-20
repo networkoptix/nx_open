@@ -66,6 +66,10 @@ QnVirtualCameraResourceList sortedCameras(QnVirtualCameraResourceList cameraList
     return cameraList;
 }
 
+core::SvgIconColorer::ThemeSubstitutions kAlarmTheme = {{QnIcon::Normal, {.primary = "yellow_l"}}};
+
+NX_DECLARE_COLORIZED_ICON(kAlarmIcon, "20x20/Solid/alert2.svg", kAlarmTheme)
+
 } // namespace
 
 struct ActionKey
@@ -316,7 +320,7 @@ QnWorkbenchLayout* AlarmLayoutHandler::findOrCreateAlarmLayout()
         d->alarmLayout->setIdUnsafe(nx::Uuid::createUuid());
         d->alarmLayout->setName(tr("Alarms"));
         d->alarmLayout->setPredefinedCellSpacing(Qn::CellSpacing::Small);
-        d->alarmLayout->setData(Qn::LayoutIconRole, qnSkin->icon("layouts/alarm.png"));
+        d->alarmLayout->setData(Qn::LayoutIconRole, qnSkin->icon(kAlarmIcon));
         d->alarmLayout->setData(Qn::LayoutPermissionsRole,
             static_cast<int>(Qn::ReadPermission | Qn::WritePermission | Qn::AddRemoveItemsPermission));
     }
