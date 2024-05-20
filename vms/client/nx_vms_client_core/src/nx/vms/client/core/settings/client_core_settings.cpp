@@ -143,6 +143,25 @@ void Settings::setCloudAuthData(const CloudAuthData& authData)
         nx::network::http::BearerAuthToken(authData.refreshToken));
 }
 
+void Settings::setSystemAuthenticationCache(const QString& systemId, const std::string& cache)
+{
+    auto cacheData = systemAuthenticationCacheData();
+    if (cache.empty())
+        cacheData.erase(systemId);
+    else
+        cacheData[systemId] = cache;
+    systemAuthenticationCacheData = cacheData;
+}
+
+std::string Settings::systemAuthenticationCache(const QString& systemId)
+{
+    const auto cacheData = systemAuthenticationCacheData();
+    if (const auto it = cacheData.find(systemId); it != cacheData.end())
+        return it->second;
+
+    return {};
+}
+
 std::optional<nx::Uuid> Settings::preferredCloudServer(const QString& systemId)
 {
     const auto preferredServers = preferredCloudServers();

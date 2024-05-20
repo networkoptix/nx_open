@@ -52,6 +52,7 @@ public:
     // Order is important as we are listing users by the last usage time.
     using SerializableCredentialsList = std::vector<SerializableCredentials>;
     using SystemAuthenticationData = std::unordered_map<nx::Uuid, SerializableCredentialsList>;
+    using SystemAuthenticationCacheData = std::unordered_map<QString, std::string>;
 
     // System credentials by local system id.
     SecureProperty<SystemAuthenticationData> systemAuthenticationData{
@@ -67,6 +68,9 @@ public:
         this, "PreferredCloudServers"};
 
     SecureProperty<ConnectionData> lastConnection{this, "lastConnection"};
+
+    SecureProperty<SystemAuthenticationCacheData> systemAuthenticationCacheData{
+        this, "systemAuthenticationCacheData"};
 
     Property<DetectedObjectSettingsMap> detectedObjectSettings{this, "detectedObjectSettings"};
 
@@ -110,6 +114,9 @@ public:
 
     /** Adapter for the preferredCloudServers property. */
     void setPreferredCloudServer(const QString& systemId, const nx::Uuid& serverId);
+
+    void setSystemAuthenticationCache(const QString& systemId, const std::string& cache);
+    std::string systemAuthenticationCache(const QString& systemId);
 
     void storeRecentConnection(
         const nx::Uuid& localSystemId,
