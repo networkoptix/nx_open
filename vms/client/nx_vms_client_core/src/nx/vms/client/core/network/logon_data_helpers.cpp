@@ -160,6 +160,12 @@ std::optional<LogonData> cloudLogonData(const QnSystemDescriptionPtr& system)
     if (!NX_ASSERT(!url.host().isEmpty(), "Invalid system url %1", url))
         return std::nullopt;
 
+    if (result.expectedCloudSystemId)
+    {
+        result.authCacheData =
+            appContext()->coreSettings()->systemAuthenticationCache(*result.expectedCloudSystemId);
+    }
+
     result.address = nx::network::SocketAddress(url.host(), url.port());
     result.userType = nx::vms::api::UserType::cloud;
     return result;

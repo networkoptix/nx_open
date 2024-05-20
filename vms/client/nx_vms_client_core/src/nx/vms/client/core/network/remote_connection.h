@@ -60,6 +60,8 @@ public:
 
     const nx::vms::api::ModuleInformation& moduleInformation() const;
 
+    void updateModuleInformation(const nx::vms::api::ModuleInformation& moduleInformation);
+
     /** Id of the connection in the Audit Trail. */
     nx::Uuid auditId() const;
 

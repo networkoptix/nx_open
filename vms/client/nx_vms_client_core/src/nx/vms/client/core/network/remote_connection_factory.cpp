@@ -29,6 +29,7 @@
 #include "abstract_remote_connection_factory_requests.h"
 #include "certificate_verifier.h"
 #include "network_manager.h"
+#include "private/remote_connection_factory_cache.h"
 #include "remote_connection.h"
 #include "remote_connection_user_interaction_delegate.h"
 
@@ -1031,10 +1032,23 @@ struct RemoteConnectionFactory::Private
 
         logInitialInfo(context());
 
+        bool hasCachedData = false;
+        bool tokenExpired = true;
+        if (auto ctx = context())
+        {
+            using namespace std::chrono;
+
+            hasCachedData = !ctx->serversInfo.empty();
+            const microseconds nowTime = qnSyncTime->currentTimePoint();
+            const microseconds expirationTime = ctx->sessionTokenExpirationTime.value_or(0s);
+            tokenExpired = nowTime >= expirationTime;
+        }
+
         // Request cloud token asyncronously, as this request may go in parallel with Server api.
         // This requires to know System ID and version, so method will do nothing if we do not have
         // them yet.
-        requestCloudTokenIfPossible(context());
+        if (tokenExpired)
+            requestCloudTokenIfPossible(context());
 
         // If server version is not known, we should call api/moduleInformation first. Also send
         // this request for 4.2 and older systems as there is no other way to identify them.
@@ -1054,11 +1068,13 @@ struct RemoteConnectionFactory::Private
         if (systemSupportsRestApi(context()))
         {
             // GET /rest/v1/servers/*/info
-            getServersInfo(context());
+            if (!hasCachedData)
+                getServersInfo(context());
 
             // At this moment we definitely know System ID and version, so request token if not
             // done it yet.
-            requestCloudTokenIfPossible(context());
+            if (tokenExpired)
+                requestCloudTokenIfPossible(context());
 
             // GET /api/moduleInformation
             // Request actually will be sent for 5.0 multi-server Systems only as in 5.1 we can get
@@ -1102,9 +1118,14 @@ struct RemoteConnectionFactory::Private
 
         if (auto ctx = context(); ctx && ctx->isCloudConnection())
         {
-            processCloudToken(context()); // User Interaction (2FA if needed).
-            NX_DEBUG(this, "Login with Cloud Token.");
-            checkServerCloudConnection(context()); //< GET /rest/v1/login/sessions/current
+            if (tokenExpired)
+            {
+                processCloudToken(context()); // User Interaction (2FA if needed).
+                NX_DEBUG(this, "Login with Cloud Token.");
+
+                if (!hasCachedData)
+                    checkServerCloudConnection(context()); //< GET /rest/v1/login/sessions/current
+            }
         }
         else if (context())
         {
@@ -1200,27 +1221,61 @@ RemoteConnectionFactory::ProcessPtr RemoteConnectionFactory::connect(
     process->context->certificateCache = std::make_shared<CertificateCache>();
 
     process->future = std::async(std::launch::async,
-        [this, contextPtr = WeakContextPtr(process->context), callback]
+        [this, contextPtr = WeakContextPtr(process->context), callback,
+            logonData = std::move(logonData)]
         {
             nx::utils::setCurrentThreadName("RemoteConnectionFactoryThread");
 
+            bool useFastConnect = false;
+
+            if (auto context = contextPtr.lock(); !context->logonData.authCacheData.empty())
+                useFastConnect = RemoteConnectionFactoryCache::fillContext(context);
+
             d->connectToServerAsync(contextPtr);
+
+            if (useFastConnect)
+            {
+                bool retryConnection = false; //< Variable is required to unlock context shared ptr.
+
+                if (auto context = contextPtr.lock(); context && context->error())
+                {
+                    NX_DEBUG(this, "Connection error when using cached data: %1", context->error());
+                    RemoteConnectionFactoryCache::restoreContext(context, logonData);
+                    retryConnection = true;
+                }
+
+                if (retryConnection) //< Try again without cache.
+                {
+                    useFastConnect = false;
+                    d->connectToServerAsync(contextPtr);
+                }
+            }
 
             if (!contextPtr.lock())
                 return;
 
             QMetaObject::invokeMethod(
                 this,
-                [this, contextPtr, callback]()
+                [this, contextPtr, callback, useFastConnect]()
                 {
                     auto context = contextPtr.lock();
                     if (!context)
                         return;
 
                     if (context->error())
+                    {
+                        // We can no longer rely on cached information if the connection failed.
+                        RemoteConnectionFactoryCache::clearForCloudId(
+                            context->moduleInformation.cloudSystemId);
                         callback(*context->error());
+                    }
                     else
-                        callback(d->makeRemoteConnectionInstance(context));
+                    {
+                        auto connection = d->makeRemoteConnectionInstance(context);
+                        RemoteConnectionFactoryCache::startWatchingConnection(
+                            connection, context, useFastConnect);
+                        callback(connection);
+                    }
                 },
                 Qt::QueuedConnection);
         });

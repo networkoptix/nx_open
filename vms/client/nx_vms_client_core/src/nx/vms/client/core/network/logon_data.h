@@ -55,6 +55,21 @@ struct NX_VMS_CLIENT_CORE_API LogonData
      * Allow user interaction in the UI thread (like displaying dialog about certifcate mismatch).
      */
     bool userInteractionAllowed = true;
+
+    /**
+     * Cached json data for server connection and authentication.
+     */
+    std::string authCacheData;
+
+    /**
+     * Access token for the cloud connection.
+     */
+    std::string accessToken;
+
+    /**
+     * Token expiration time for the cloud connection.
+     */
+    std::chrono::milliseconds tokenExpiresAt = {};
 };
 
 } // namespace nx::vms::client::core
