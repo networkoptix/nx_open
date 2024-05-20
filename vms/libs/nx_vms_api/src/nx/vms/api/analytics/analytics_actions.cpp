@@ -1,6 +1,9 @@
 #include "analytics_actions.h"
 
 #include <nx/fusion/model_functions.h>
+#include <nx/reflect/instrument.h>
+#include <nx/utils/serialization/qjson.h>
+#include <nx/utils/serialization/qt_core_types.h>
 
 namespace nx::vms::api {
 
