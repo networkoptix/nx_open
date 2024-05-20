@@ -48,6 +48,12 @@ void pointize(const QRect& rect, QSet<QPoint>* points)
     }
 }
 
+nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kCloudLayoutTheme = {{QnIcon::Normal, {.primary = "light10"}}};
+nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kSearchTheme = {{QnIcon::Normal, {.primary = "light16"}}};
+
+NX_DECLARE_COLORIZED_ICON(kLayoutCloudIcon, "20x20/Solid/layout_cloud.svg", kCloudLayoutTheme)
+NX_DECLARE_COLORIZED_ICON(kSearchIcon, "20x20/Outline/search.svg", kSearchTheme)
+
 } // namespace
 
 struct QnWorkbenchLayout::Private
@@ -886,10 +892,10 @@ bool QnWorkbenchLayout::own(QnWorkbenchItem* item) const
 QIcon QnWorkbenchLayout::calculateIcon() const
 {
     if (d->resource->hasFlags(Qn::cross_system))
-        return qnSkin->icon("layouts/cloud_layout.svg");
+        return qnSkin->icon(kLayoutCloudIcon);
 
     if (d->resource->isPreviewSearchLayout())
-        return qnSkin->icon("layouts/search_20.svg");
+        return qnSkin->icon(kSearchIcon);
 
     return d->resource->data(Qn::LayoutIconRole).value<QIcon>();
 }
