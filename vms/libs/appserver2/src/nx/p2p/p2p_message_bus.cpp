@@ -1388,6 +1388,12 @@ nx::Uuid MessageBus::routeToPeerVia(
         return nx::Uuid();
     }
 
+    if (const auto& connection = m_connections.value(peerId))
+    {
+        *distance = 1;
+        return peerId;
+    }
+
     RoutingInfo via;
     *distance = m_peers->distanceTo(peerId, &via);
     return via.isEmpty() ? nx::Uuid() : via.begin().key().id;
@@ -1396,9 +1402,9 @@ nx::Uuid MessageBus::routeToPeerVia(
 int MessageBus::distanceToPeer(const nx::Uuid& peerId) const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
-    if (localPeer().id == peerId)
-        return 0;
-    return m_peers->distanceTo(peerId);
+    auto distance = std::numeric_limits<int>::max();
+    routeToPeerVia(peerId, &distance, /*knownPeerAddress*/ nullptr);
+    return distance;
 }
 
 ConnectionContext* MessageBus::context(const P2pConnectionPtr& connection)
