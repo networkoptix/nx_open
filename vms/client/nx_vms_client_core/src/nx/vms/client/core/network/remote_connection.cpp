@@ -152,7 +152,7 @@ private:
 struct RemoteConnection::Private
 {
     const nx::vms::api::PeerType peerType;
-    const nx::vms::api::ModuleInformation moduleInformation;
+    nx::vms::api::ModuleInformation moduleInformation;
     const nx::Uuid auditId;
     ConnectionInfo connectionInfo;
     std::optional<std::chrono::microseconds> sessionTokenExpirationTime;
@@ -261,6 +261,21 @@ const nx::vms::api::ModuleInformation& RemoteConnection::moduleInformation() con
 nx::Uuid RemoteConnection::auditId() const
 {
     return d->auditId;
+}
+
+void RemoteConnection::updateModuleInformation(
+    const nx::vms::api::ModuleInformation& moduleInformation)
+{
+    NX_ASSERT(d->moduleInformation.id == moduleInformation.id
+        && d->moduleInformation.localSystemId == moduleInformation.localSystemId
+        && d->moduleInformation.cloudSystemId == moduleInformation.cloudSystemId
+        && d->moduleInformation.customization == moduleInformation.customization
+        && d->moduleInformation.cloudHost == moduleInformation.cloudHost
+        && d->moduleInformation.cloudOwnerId == moduleInformation.cloudOwnerId
+        && d->moduleInformation.organizationId == moduleInformation.organizationId,
+        "Module information mismatch");
+
+    d->moduleInformation = moduleInformation;
 }
 
 ConnectionInfo RemoteConnection::connectionInfo() const
