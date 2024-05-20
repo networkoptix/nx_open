@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <nx/vms/rules/action_builder_fields/optional_time_field.h>
 #include <nx/vms/rules/action_builder_fields/target_device_field.h>
 #include <nx/vms/rules/action_builder_fields/target_user_field.h>
 #include <nx/vms/rules/action_builder_fields/text_with_fields.h>
@@ -32,6 +33,7 @@ class TestProlongedAction: public nx::vms::rules::BasicAction
     Q_CLASSINFO("type", "nx.actions.test.prolonged")
 
     Q_PROPERTY(UuidList deviceIds MEMBER m_deviceIds)
+    Q_PROPERTY(std::chrono::microseconds duration MEMBER m_duration)
 
 public:
     static ItemDescriptor manifest()
@@ -43,12 +45,16 @@ public:
             .fields = {
                 makeFieldDescriptor<TargetDeviceField>(
                     utils::kDeviceIdsFieldName,
-                    TranslatableString("Cameras"))},
+                    TranslatableString("Cameras")),
+                utils::makeTimeFieldDescriptor<OptionalTimeField>(
+                    utils::kDurationFieldName, nx::TranslatableString("Duration")),
+            },
         };
     }
 
 public:
     UuidList m_deviceIds;
+    std::chrono::microseconds m_duration;
 };
 
 class TestActionWithInterval: public nx::vms::rules::BasicAction

@@ -552,12 +552,14 @@ TEST_F(EngineTest, cacheTimeout)
 
 TEST_F(EngineTest, cacheState)
 {
+   auto plugin = TestPlugin(engine.get());
+
     engine->registerEventField(
         fieldMetatype<StateField>(),
         [](const FieldDescriptor* descriptor) { return new StateField{descriptor}; });
 
-    auto rule = makeRule<TestEventWithState, TestAction>(
-        []{ return new TestEventWithState{}; },
+    auto rule = makeRule<TestEventProlonged, TestAction>(
+        []{ return new TestEventProlonged{}; },
         testActionConstructor);
 
     auto stateField = rule->eventFilters().first()->fieldByName<StateField>(utils::kStateFieldName);
@@ -568,7 +570,7 @@ TEST_F(EngineTest, cacheState)
     rule->setId(nx::Uuid::createUuid());
     engine->updateRule(serialize(rule.get()));
 
-    auto event = TestEventWithStatePtr::create(std::chrono::microseconds::zero(), State::started);
+    auto event = TestEventProlongedPtr::create(std::chrono::microseconds::zero(), State::started);
 
     // Event state is cached.
     EXPECT_EQ(engine->processEvent(event), 2);
@@ -683,8 +685,8 @@ TEST_F(EngineTest, stopProlongedActionsIsEmittedWhenRuleIsDisabled)
         fieldMetatype<TargetDeviceField>(),
         [](const FieldDescriptor* descriptor) { return new TargetDeviceField{descriptor}; });
 
-    auto rule = makeRule<SimpleEvent, TestProlongedAction>(
-        [] { return new SimpleEvent; },
+    auto rule = makeRule<TestEventProlonged, TestProlongedAction>(
+        [] { return new TestEventProlonged; },
         [] { return new TestProlongedAction; });
 
     // Event filter accepts any camera.
@@ -701,7 +703,7 @@ TEST_F(EngineTest, stopProlongedActionsIsEmittedWhenRuleIsDisabled)
 
     engine->updateRule(serialize(rule.get()));
 
-    const auto event = SimpleEventPtr::create(syncTime.currentTimePoint(), State::started);
+    const auto event = TestEventProlongedPtr::create(syncTime.currentTimePoint(), State::started);
     const auto sourceCamera = Uuid::createUuid();
     event->m_cameraId = sourceCamera;
 

@@ -29,11 +29,16 @@ public:
             &MockActionBuilderEvents::onAction, Qt::DirectConnection);
     }
 
+    ActionPtr action(size_t i) { return m_actions[i]; };
+
 private:
     ActionBuilder* m_builder;
+    std::vector<ActionPtr> m_actions;
 
     void onAction(const ActionPtr& action)
     {
+        m_actions.push_back(action);
+
         actionReceived();
 
         if (const auto prop = action->property(utils::kUsersFieldName);

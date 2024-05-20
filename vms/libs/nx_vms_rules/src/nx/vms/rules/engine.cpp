@@ -1065,7 +1065,7 @@ void Engine::stopRunningAction(const ActionPtr& action)
     action->setState(State::stopped);
     action->setTimestamp(qnSyncTime->currentTimePoint());
 
-    processAction(action); //< TODO: #mmalofeev should it be written to the event log?
+    processAcceptedAction(action); //< TODO: #mmalofeev should it be written to the event log?
 }
 
 } // namespace nx::vms::rules

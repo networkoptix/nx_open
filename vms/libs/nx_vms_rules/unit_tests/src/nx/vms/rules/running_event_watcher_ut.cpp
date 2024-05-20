@@ -11,7 +11,7 @@ namespace nx::vms::rules::test {
 TEST(RunningEventWatcherTest, eventWatcherProperlyHandlesDifferentEventsWithTheSameResourceKey)
 {
     const auto startTime = std::chrono::microseconds{1};
-    auto simpleEvent = SimpleEventPtr::create(startTime, State::started);
+    auto simpleEvent = TestEventProlongedPtr::create(startTime, State::started);
     auto testEvent = TestEventPtr::create(startTime, State::started);
 
     const auto cameraId = nx::Uuid::createUuid();
