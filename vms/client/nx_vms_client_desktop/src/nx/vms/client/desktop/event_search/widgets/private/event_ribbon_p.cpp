@@ -55,6 +55,7 @@ using namespace std::chrono;
 namespace {
 
 static constexpr int kDefaultTileSpacing = 1;
+static constexpr int kDefaultDummyTileSpacing = 8;
 static constexpr int kScrollBarStep = 16;
 
 static constexpr int kDefaultThumbnailWidth = 214;
@@ -716,6 +717,10 @@ int EventRibbon::Private::calculatePosition(int index) const
         return 0;
 
     const auto& previousTile = m_tiles[index - 1];
+
+    if (previousTile->dummy)
+        return previousTile->position + kDefaultDummyTileSpacing;
+
     return previousTile->position + previousTile->animatedHeight() + kDefaultTileSpacing;
 }
 
@@ -1371,6 +1376,9 @@ void EventRibbon::Private::doUpdateView()
 
         if (!tile->widget)
             updateTile(index);
+
+        if (tile->dummy)
+            continue;
 
         tile->widget->setMode(mode);
         // Set geometry before show() to avoid visual artifacts.
