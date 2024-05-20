@@ -3,6 +3,7 @@
 import QtQuick
 
 import Nx.Controls
+import Nx.Core.Controls
 
 Item
 {
