@@ -1687,9 +1687,7 @@ void initialize(Manager* manager, Action* root)
 
     factory()
         .flags(Main | Tree | SingleTarget | ResourceTarget)
-        .text(ini().webPagesAndIntegrations
-            ? ContextMenu::tr("New")
-            : ContextMenu::tr("Add"))
+        .text(ContextMenu::tr("Add"))
         .condition(condition::hasFlags(Qn::remote_server, MatchMode::exactlyOne)
             && ConditionWrapper(new EdgeServerCondition(false))
             && !ConditionWrapper(new FakeServerCondition(true)));
