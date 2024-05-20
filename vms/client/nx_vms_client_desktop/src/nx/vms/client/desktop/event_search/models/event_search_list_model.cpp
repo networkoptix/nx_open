@@ -12,10 +12,12 @@
 #include <client/client_globals.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/analytics/taxonomy/abstract_state_watcher.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/event/actions/abstract_action.h>
 #include <nx/vms/event/strings_helper.h>
 #include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/core/analytics/analytics_icon_manager.h>
 #include <nx/vms/client/core/event_search/event_search_globals.h>
 #include <nx/vms/client/core/event_search/models/detail/multi_request_id_holder.h>
 #include <nx/vms/client/core/event_search/utils/event_search_item_helper.h>
@@ -59,63 +61,49 @@ struct Facade
     }
 };
 
-QString iconPath(const EventParameters& parameters)
+QString iconPath(const EventParameters& parameters, core::SystemContext* context)
 {
     switch (parameters.eventType)
     {
         case EventType::storageFailureEvent:
-            return "events/storage_red.png";
-
         case EventType::backupFinishedEvent:
-            return "events/storage_green.png";
+            return "events/storage_20.svg";
 
         case EventType::serverStartEvent:
-            return "events/server_20.svg";
-
         case EventType::serverFailureEvent:
         case EventType::serverCertificateError:
-            return "events/server_red.png";
-
         case EventType::serverConflictEvent:
-            return "events/server_yellow.png";
+            return "events/server_20.svg";
 
         case EventType::licenseIssueEvent:
-            return "events/license_red.png";
+            return "events/license_20.svg";
 
         case EventType::cameraDisconnectEvent:
-            return "events/connection_red.png";
-
-        case EventType::networkIssueEvent:
         case EventType::cameraIpConflictEvent:
-            return "events/connection_yellow.png";
+            return "events/connection_20.svg";
+
+        case EventType::ldapSyncIssueEvent:
+        case EventType::networkIssueEvent:
+        case EventType::pluginDiagnosticEvent:
+        case EventType::saasIssueEvent:
+            return "events/alert_20.svg";
 
         case EventType::softwareTriggerEvent:
-            return SoftwareTriggerPixmaps::pixmapsPath() + parameters.description + ".png";
-
-        case EventType::pluginDiagnosticEvent:
-        {
-            switch (QnNotificationLevel::valueOf(parameters))
-            {
-                case QnNotificationLevel::Value::CriticalNotification:
-                    return "events/alert_red.png";
-                case QnNotificationLevel::Value::ImportantNotification:
-                    return "events/alert_yellow.png";
-                default:
-                    return "events/alert_20.svg";
-            }
-        }
+            return SoftwareTriggerPixmaps::effectivePixmapPath(parameters.description);
 
         case EventType::cameraMotionEvent:
-            return "events/motion.svg";
-
-        // TODO: #vkutin Fill with actual pixmaps as soon as they're created.
+        // TODO: #spanasenko Fill with actual pixmaps as soon as they're created.
         case EventType::cameraInputEvent:
-            return "tree/camera.svg";
-
         case EventType::analyticsSdkEvent:
+            return "20x20/Solid/camera.svg";
         case EventType::analyticsSdkObjectDetected:
-            // TODO:
-            return {};
+        {
+            const auto objectTypeId = parameters.getAnalyticsObjectTypeId();
+            const auto objectType =
+                context->analyticsTaxonomyStateWatcher()->state()->objectTypeById(objectTypeId);
+            return core::analytics::IconManager::instance()->iconPath(
+                objectType ? objectType->icon() : QString());
+        }
 
         default:
             return {};
@@ -202,9 +190,14 @@ EventSearchListModel::Private::Private(EventSearchListModel* q):
 
 QString EventSearchListModel::Private::title(const EventParameters& parameters) const
 {
-    return parameters.eventType == EventType::analyticsSdkEvent
-        ? stringHelper->getAnalyticsSdkEventName(parameters)
-        : stringHelper->eventName(parameters.eventType);
+    switch (parameters.eventType)
+    {
+        case EventType::analyticsSdkEvent:
+            return stringHelper->getAnalyticsSdkEventName(parameters);
+
+        default:
+            return stringHelper->eventName(parameters.eventType);
+    }
 }
 
 QString EventSearchListModel::Private::description(const EventParameters& parameters) const
@@ -444,21 +437,7 @@ QVariant EventSearchListModel::data(const QModelIndex& index, int role) const
             return d->title(eventParams);
 
         case core::DecorationPathRole:
-            return iconPath(eventParams);
-
-        case Qt::DecorationRole:
-        {
-            if (eventParams.eventType == EventType::softwareTriggerEvent)
-            {
-                return QVariant::fromValue(SoftwareTriggerPixmaps::colorizedPixmap(
-                    eventParams.description, QPalette().light().color()));
-            }
-
-            if (const auto path = index.data(core::DecorationPathRole).toString(); !path.isEmpty())
-                return qnSkin->pixmap(path);
-
-            return {};
-        }
+            return iconPath(eventParams, systemContext());
 
         case Qt::ForegroundRole:
             return QVariant::fromValue(color(eventParams));
