@@ -1423,6 +1423,12 @@ nx::Uuid MessageBus::routeToPeerVia(
         return nx::Uuid();
     }
 
+    if (const auto& connection = m_connections.value(peerId))
+    {
+        *distance = 1;
+        return peerId;
+    }
+
     RoutingInfo via;
     *distance = m_peers->distanceTo(peerId, &via);
     return via.isEmpty() ? nx::Uuid() : via.begin().key().id;
@@ -1431,9 +1437,9 @@ nx::Uuid MessageBus::routeToPeerVia(
 int MessageBus::distanceToPeer(const nx::Uuid& peerId) const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
-    if (localPeer().id == peerId)
-        return 0;
-    return m_peers->distanceTo(peerId);
+    auto distance = std::numeric_limits<int>::max();
+    routeToPeerVia(peerId, &distance, /*knownPeerAddress*/ nullptr);
+    return distance;
 }
 
 ConnectionContext* MessageBus::context(const P2pConnectionPtr& connection)
@@ -1652,12 +1658,25 @@ bool MessageBus::sendUnicastTransaction(const QnTransaction<T>& tran, const vms:
     QMap<P2pConnectionPtr, TransportHeader> dstByConnection;
 
     // split dstPeers by connection
-    for (const auto& peer : dstPeers)
+    for (const auto& peer: dstPeers)
     {
         qint32 distance = kMaxDistance;
         auto dstPeer = routeToPeerVia(peer, &distance, /*address*/ nullptr);
         if (const auto& connection = m_connections.value(dstPeer))
+        {
             dstByConnection[connection].dstPeers.push_back(peer);
+        }
+        else if (nx::log::isToBeLogged(nx::log::Level::verbose))
+        {
+            std::vector<QString> connections;
+            for (const auto& connection: m_connections)
+                connections.push_back(peerName(connection->remotePeer().id));
+            NX_VERBOSE(this,
+                "Can't find route to send unicast transaction %1-->%2. Available direct connections: %3",
+                peerName(localPeer().id),
+                peerName(peer),
+                connections);
+        }
     }
     if (dstByConnection.empty())
         return false;
@@ -1670,6 +1689,7 @@ bool MessageBus::sendUnicastTransactionImpl(
     const QnTransaction<T>& tran,
     const QMap<P2pConnectionPtr, TransportHeader>& dstByConnection)
 {
+    bool result = false;
     for (auto itr = dstByConnection.begin(); itr != dstByConnection.end(); ++itr)
     {
         const auto& connection = itr.key();
@@ -1690,42 +1710,45 @@ bool MessageBus::sendUnicastTransactionImpl(
             }
             switch (connection->remotePeer().dataFormat)
             {
-            case Qn::SerializationFormat::json:
-                connection->sendTransaction(
-                    tran,
-                    m_jsonTranSerializer->serializedTransactionWithoutHeader(tran) + QByteArray("\r\n"));
-                return true;
-            case Qn::SerializationFormat::ubjson:
-                connection->sendTransaction(
-                    tran,
-                    m_ubjsonTranSerializer->serializedTransactionWithoutHeader(tran));
-                return true;
-            default:
-                NX_WARNING(this,
-                    nx::format("Client has requested data in an unsupported format %1")
-                    .arg(connection->remotePeer().dataFormat));
-                break;
+                case Qn::SerializationFormat::json:
+                    connection->sendTransaction(
+                        tran,
+                        m_jsonTranSerializer->serializedTransactionWithoutHeader(tran) + QByteArray("\r\n"));
+                    result = true;
+                    break;
+                case Qn::SerializationFormat::ubjson:
+                    connection->sendTransaction(
+                        tran,
+                        m_ubjsonTranSerializer->serializedTransactionWithoutHeader(tran));
+                    result = true;
+                    break;
+                default:
+                    NX_WARNING(this,
+                        nx::format("Client has requested data in an unsupported format %1")
+                        .arg(connection->remotePeer().dataFormat));
+                    break;
             }
         }
         else
         {
             switch (connection->remotePeer().dataFormat)
             {
-            case Qn::SerializationFormat::ubjson:
-                transportHeader.via.insert(localPeer().id);
-                connection->sendTransaction(
-                    tran,
-                    MessageType::pushImpersistentUnicastTransaction,
-                    m_ubjsonTranSerializer->serializedTransactionWithHeader(tran, transportHeader));
-                return true;
-            default:
-                NX_WARNING(this, nx::format("Server has requested data in an unsupported format %1")
-                    .arg(connection->remotePeer().dataFormat));
-                break;
+                case Qn::SerializationFormat::ubjson:
+                    transportHeader.via.insert(localPeer().id);
+                    connection->sendTransaction(
+                        tran,
+                        MessageType::pushImpersistentUnicastTransaction,
+                        m_ubjsonTranSerializer->serializedTransactionWithHeader(tran, transportHeader));
+                    result = true;
+                    break;
+                default:
+                    NX_WARNING(this, nx::format("Server has requested data in an unsupported format %1")
+                        .arg(connection->remotePeer().dataFormat));
+                    break;
             }
         }
     }
-    return false;
+    return result;
 }
 
 #define INSTANTIATE(unused1, unused2, T) \
