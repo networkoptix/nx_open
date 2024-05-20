@@ -44,12 +44,6 @@ struct GenericLockUpdateHistoryRecord<Key, void>
     Key key;
 };
 
-/**
- * Manages pool of Locker objects. Each Locker instance is identified by a key.
- * Lockers are kept in a LRU cache internally.
- * maxLockerCount constructor argument specifies the size of the cache.
- * NOTE: Thread safe.
- */
 template<typename Key, typename Locker, typename Settings, typename UpdateHistoryParams = void>
 class BaseAccessBlockerPool
 {
@@ -103,6 +97,12 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
+/**
+ * Manages pool of Locker objects. Each Locker instance is identified by a key.
+ * Lockers are kept in a LRU cache internally.
+ * maxLockerCount constructor argument specifies the size of the cache.
+ * NOTE: Thread safe.
+ */
 template<typename Key, typename Locker, typename Settings, typename UpdateHistoryParams = void>
 class AccessBlockerPool:
     public BaseAccessBlockerPool<Key, Locker, Settings, UpdateHistoryParams>
