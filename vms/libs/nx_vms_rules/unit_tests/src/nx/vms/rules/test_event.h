@@ -14,25 +14,26 @@
 
 namespace nx::vms::rules::test {
 
-// Simplest event without permissions.
-class SimpleEvent: public nx::vms::rules::BasicEvent
+// Instant test event with camera, no permissions.
+class TestEventInstant: public nx::vms::rules::BasicEvent
 {
     Q_OBJECT
-    Q_CLASSINFO("type", "nx.events.test")
+    Q_CLASSINFO("type", "nx.events.test.instant")
 
     Q_PROPERTY(nx::Uuid cameraId MEMBER m_cameraId)
-    Q_PROPERTY(UuidList deviceIds MEMBER m_deviceIds)
 public:
     static ItemDescriptor manifest()
     {
         return ItemDescriptor{
-            .id = utils::type<SimpleEvent>(),
+            .id = utils::type<TestEventInstant>(),
             .displayName = TranslatableString("Test event"),
-            .flags = {ItemFlag::instant, ItemFlag::prolonged},
+            .flags = {ItemFlag::instant},
             .fields = {
                 makeFieldDescriptor<SourceCameraField>(
                     utils::kCameraIdFieldName,
-                    TranslatableString("Camera id")),
+                    nx::TranslatableString("Camera id"),
+                    {},
+                    {{"acceptAll", true}}),
             }
         };
     }
@@ -44,9 +45,9 @@ public:
 
     using BasicEvent::BasicEvent;
     nx::Uuid m_cameraId;
-    UuidList m_deviceIds;
 };
 
+// Test event with permissions.
 class TestEvent: public nx::vms::rules::BasicEvent
 {
     using base_type = BasicEvent;
@@ -134,10 +135,12 @@ public:
     QString m_cacheKey;
 };
 
-class TestEventWithState : public nx::vms::rules::BasicEvent
+class TestEventProlonged : public nx::vms::rules::BasicEvent
 {
     Q_OBJECT
-    Q_CLASSINFO("type", "nx.events.test.withState")
+    Q_CLASSINFO("type", "nx.events.test.prolonged")
+
+    Q_PROPERTY(nx::Uuid cameraId MEMBER m_cameraId)
 
 public:
     using BasicEvent::BasicEvent;
@@ -145,26 +148,31 @@ public:
     static ItemDescriptor manifest()
     {
         return ItemDescriptor{
-            .id = utils::type<TestEventWithState>(),
-            .displayName = TranslatableString("Test event with state"),
+            .id = utils::type<TestEventProlonged>(),
+            .displayName = nx::TranslatableString("Test prolonged event"),
             .flags = {ItemFlag::prolonged},
             .fields = {
                 makeFieldDescriptor<StateField>(
-                    utils::kStateFieldName,
-                    TranslatableString("State field"),
-                    {})
+                    utils::kStateFieldName, nx::TranslatableString("State field")),
+                makeFieldDescriptor<SourceCameraField>(
+                    utils::kCameraIdFieldName,
+                    nx::TranslatableString("Camera id"),
+                    {},
+                    {{"acceptAll", true}}),
             }
         };
     }
 
     QString resourceKey() const override
     {
-        return {};
+        return m_cameraId.toSimpleString();
     }
+
+    nx::Uuid m_cameraId;
 };
 
-using SimpleEventPtr = QSharedPointer<SimpleEvent>;
+using TestEventInstantPtr = QSharedPointer<TestEventInstant>;
 using TestEventPtr = QSharedPointer<TestEvent>;
-using TestEventWithStatePtr = QSharedPointer<TestEventWithState>;
+using TestEventProlongedPtr = QSharedPointer<TestEventProlonged>;
 
 } // namespace nx::vms::rules::test

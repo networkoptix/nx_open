@@ -18,8 +18,6 @@
 #include <nx/vms/rules/aggregated_event.h>
 #include <nx/vms/rules/basic_action.h>
 #include <nx/vms/rules/basic_event.h>
-#include <nx/vms/rules/events/server_failure_event.h>
-#include <nx/vms/rules/events/server_started_event.h>
 #include <nx/vms/rules/rule.h>
 #include <nx/vms/rules/utils/common.h>
 #include <nx/vms/rules/utils/field.h>
@@ -33,6 +31,7 @@
 namespace nx::vms::rules::test {
 
 using namespace nx::vms::api;
+using namespace std::chrono;
 
 class TestActionBuilder: public ActionBuilder
 {
@@ -57,9 +56,6 @@ public:
     ActionBuilderTest():
         TestPlugin(engine.get())
     {
-        registerEvent<ServerStartedEvent>();
-        registerEvent<ServerFailureEvent>();
-
         m_engine->registerActionField(
             fieldMetatype<TargetUserField>(),
             [this](const FieldDescriptor* descriptor)
@@ -72,6 +68,14 @@ public:
         registerAction<TestActionForUserAndServer>();
 
         mockRule = std::make_unique<Rule>(nx::Uuid::createUuid(), engine.get());
+    }
+
+    std::unique_ptr<ActionBuilder> makeBuilder(const QString& type) const
+    {
+        auto builder = engine->buildActionBuilder(type);
+        NX_ASSERT(builder);
+        builder->setRule(mockRule.get());
+        return builder;
     }
 
     QSharedPointer<ActionBuilder> makeSimpleBuilder() const
@@ -167,43 +171,37 @@ public:
         builder->addField(utils::kDurationFieldName, std::move(durationField));
     }
 
-    SimpleEventPtr makeSimpleEvent() const
+    TestEventInstantPtr makeInstantEvent(nx::Uuid cameraId = {}) const
     {
-        return SimpleEventPtr::create(syncTime.currentTimePoint());
-    }
-
-    SimpleEventPtr makeSimpleEventWithCamera(nx::Uuid cameraId) const
-    {
-        auto event = makeSimpleEvent();
+        auto event = TestEventInstantPtr::create(syncTime.currentTimePoint());
         event->m_cameraId = cameraId;
         return event;
     }
 
-    SimpleEventPtr makeSimpleEventWithDevices(const UuidList& deviceIds) const
+    TestEventProlongedPtr makeProlongedEvent(State state) const
     {
-        auto event = makeSimpleEvent();
-        event->m_deviceIds = deviceIds;
-        return event;
+        return TestEventProlongedPtr::create(syncTime.currentTimePoint(), state);
     }
 
-    TestEventPtr makeTestEvent() const
+    TestEventInstantPtr makeSimpleEvent() const
     {
-        return TestEventPtr::create(syncTime.currentTimePoint());
+        return makeInstantEvent();
     }
 
-    TestEventPtr makeEventWithCameraId(const nx::Uuid& cameraId) const
+    TestEventPtr makeEventWithPermissions(nx::Uuid cameraId = {}) const
     {
-        auto event = makeTestEvent();
+        auto event = TestEventPtr::create(syncTime.currentTimePoint());
         event->m_cameraId = cameraId;
         return event;
     }
 
-    TestEventPtr makeEventWithDeviceIds(const UuidList& deviceIds) const
+    TestEventPtr makeEventWithPermissions(const UuidList& deviceIds) const
     {
-        auto event = makeTestEvent();
+        auto event = makeEventWithPermissions(nx::Uuid());
         event->m_deviceIds = deviceIds;
         return event;
     }
+
 protected:
     std::unique_ptr<Rule> mockRule;
     QnSyncTime syncTime;
@@ -318,7 +316,7 @@ TEST_F(ActionBuilderTest, builderProperlyHandleUserRoles)
     EXPECT_CALL(mock, targetedUsers(expectedSelection)).Times(1);
     EXPECT_CALL(mock, targetedCameraId(camera->getId())).Times(1);
 
-    builder->process(makeEventWithCameraId(camera->getId()));
+    builder->process(makeInstantEvent(camera->getId()));
 }
 
 TEST_F(ActionBuilderTest, builderWithTargetUsersWithoutAppropriateRightsProducedNoAction)
@@ -336,7 +334,7 @@ TEST_F(ActionBuilderTest, builderWithTargetUsersWithoutAppropriateRightsProduced
 
     EXPECT_CALL(mock, actionReceived()).Times(0);
 
-    builder->process(makeEventWithCameraId(camera->getId()));
+    builder->process(makeEventWithPermissions(camera->getId()));
 }
 
 TEST_F(ActionBuilderTest, builderWithTargetUsersProducedActionsOnlyForUsersWithAppropriateRights)
@@ -365,7 +363,7 @@ TEST_F(ActionBuilderTest, builderWithTargetUsersProducedActionsOnlyForUsersWithA
     EXPECT_CALL(mock, targetedUsers(expectedSelection)).Times(1);
     EXPECT_CALL(mock, targetedCameraId(camera->getId())).Times(1);
 
-    builder->process(makeEventWithCameraId(camera->getId()));
+    builder->process(makeEventWithPermissions(camera->getId()));
 }
 
 TEST_F(ActionBuilderTest, usersReceivedActionsWithAppropriateCameraId)
@@ -413,8 +411,8 @@ TEST_F(ActionBuilderTest, usersReceivedActionsWithAppropriateCameraId)
     EXPECT_CALL(mock, targetedCameraId(cameraOfUser2->getId())).Times(1);
 
     std::vector<EventPtr> aggregationInfoList{
-        makeEventWithCameraId(cameraOfUser1->getId()),
-        makeEventWithCameraId(cameraOfUser2->getId())};
+        makeEventWithPermissions(cameraOfUser1->getId()),
+        makeEventWithPermissions(cameraOfUser2->getId())};
 
     auto eventAggregator = AggregatedEventPtr::create(std::move(aggregationInfoList));
 
@@ -462,7 +460,7 @@ TEST_F(ActionBuilderTest, eventDevicesAreFiltered)
     EXPECT_CALL(mock, targetedDeviceIds(UuidList{cameraOfUser2->getId()})).Times(1);
 
     auto eventAggregator = AggregatedEventPtr::create(
-        makeEventWithDeviceIds({cameraOfUser1->getId(), cameraOfUser2->getId()}));
+        makeEventWithPermissions({cameraOfUser1->getId(), cameraOfUser2->getId()}));
 
     EXPECT_EQ(eventAggregator->count(), 1);
 
@@ -501,19 +499,18 @@ TEST_F(ActionBuilderTest, userWithoutPermissionsReceivesNoAction)
 
     EXPECT_CALL(mock, actionReceived()).Times(0);
 
-    auto eventAggregator = AggregatedEventPtr::create(makeTestEvent());
+    auto eventAggregator = AggregatedEventPtr::create(makeEventWithPermissions());
     builder->process(eventAggregator);
 }
 
 TEST_F(ActionBuilderTest, userEventFilterPropertyWorks)
 {
-    using nx::vms::event::EventType;
     using namespace std::chrono;
 
     auto user1 = addUser(kPowerUsersGroupId);
 
     auto settings = user1->settings();
-    settings.setWatchedEvents({EventType::serverStartEvent});
+    settings.eventFilter.insert(TestEventInstant::manifest().id.toStdString());
     user1->setSettings(settings);
 
     UuidSelection selection{.ids = {user1->getId()}};
@@ -523,10 +520,8 @@ TEST_F(ActionBuilderTest, userEventFilterPropertyWorks)
     EXPECT_CALL(mock, actionReceived()).Times(1);
     EXPECT_CALL(mock, targetedUsers(selection)).Times(1);
 
-    builder->process(AggregatedEventPtr::create(EventPtr(
-        new ServerStartedEvent(0ms, nx::Uuid()))));
-    builder->process(AggregatedEventPtr::create(EventPtr(
-        new ServerFailureEvent(0ms, nx::Uuid(), EventReason::none))));
+    builder->process(AggregatedEventPtr::create(makeInstantEvent()));
+    builder->process(AggregatedEventPtr::create(makeEventWithPermissions()));
 }
 
 TEST_F(ActionBuilderTest, actionPermissionGlobal)
@@ -573,7 +568,7 @@ TEST_F(ActionBuilderTest, actionPermissionSingleResource)
     EXPECT_CALL(mock, targetedUsers(expectedSelection1)).Times(1);
     EXPECT_CALL(mock, targetedCameraId(cameraOfUser1->getId())).Times(1);
 
-    auto eventAggregator = AggregatedEventPtr::create(makeSimpleEventWithCamera(cameraOfUser1->getId()));
+    auto eventAggregator = AggregatedEventPtr::create(makeInstantEvent(cameraOfUser1->getId()));
     builder->process(eventAggregator);
 }
 
@@ -655,9 +650,7 @@ TEST_F(ActionBuilderTest, clientAndServerAction)
         .ids = {user->getId()},
         .all = false};
 
-    auto builder = engine->buildActionBuilder(TestActionForUserAndServer::manifest().id);
-    builder->setRule(mockRule.get());
-
+    auto builder = makeBuilder(TestActionForUserAndServer::manifest().id);
     auto userField = builder->fieldByName<TargetUserField>(utils::kUsersFieldName);
     userField->setIds(selection.ids);
 
@@ -669,6 +662,50 @@ TEST_F(ActionBuilderTest, clientAndServerAction)
     EXPECT_CALL(mock, targetedUsers(UuidSelection())).Times(1);
 
     builder->process(makeSimpleEvent());
+}
+
+TEST_F(ActionBuilderTest, prolongedActionInheritEventState)
+{
+    auto builder = makeBuilder(TestProlongedAction::manifest().id);
+    MockActionBuilderEvents mock{builder.get()};
+
+    EXPECT_CALL(mock, actionReceived()).Times(2);
+
+    builder->process(makeProlongedEvent(State::started));
+    builder->process(makeProlongedEvent(State::stopped));
+
+    EXPECT_EQ(mock.action(0)->state(), State::started);
+    EXPECT_EQ(mock.action(1)->state(), State::stopped);
+}
+
+TEST_F(ActionBuilderTest, instantActionAlwaysInstant)
+{
+    auto builder = makeBuilder(TestAction::manifest().id);
+    MockActionBuilderEvents mock{builder.get()};
+
+    EXPECT_CALL(mock, actionReceived()).Times(2);
+
+    builder->process(makeProlongedEvent(State::started));
+    builder->process(makeProlongedEvent(State::stopped));
+
+    EXPECT_EQ(mock.action(0)->state(), State::instant);
+    EXPECT_EQ(mock.action(1)->state(), State::instant);
+}
+
+TEST_F(ActionBuilderTest, prolongedActionWithDurationIsInstant)
+{
+    auto builder = makeBuilder(TestProlongedAction::manifest().id);
+    MockActionBuilderEvents mock{builder.get()};
+
+    builder->fieldByName<OptionalTimeField>(utils::kDurationFieldName)->setValue(10s);
+
+    EXPECT_CALL(mock, actionReceived()).Times(2);
+
+    builder->process(makeProlongedEvent(State::started));
+    builder->process(makeProlongedEvent(State::stopped));
+
+    EXPECT_EQ(mock.action(0)->state(), State::instant);
+    EXPECT_EQ(mock.action(1)->state(), State::instant);
 }
 
 TEST_F(ActionBuilderTest, builderWithoutIntervalNotAggregatesEvents)
@@ -717,7 +754,7 @@ TEST_F(ActionBuilderTest, builderForProlongedActionWithIntervalDoesNotAggregateE
     // Action must be received on event start and stop.
     EXPECT_CALL(mock, actionReceived()).Times(2);
 
-    const auto prolongedEvent = SimpleEventPtr::create(syncTime.currentTimePoint(), State::started);
+    const auto prolongedEvent = TestEventProlongedPtr::create(syncTime.currentTimePoint(), State::started);
     builder->processEvent(prolongedEvent);
 
     prolongedEvent->setState(State::stopped);
@@ -736,7 +773,8 @@ TEST_F(ActionBuilderTest, builderWithIntervalAndFixedDurationAggregateEvents)
 
     EXPECT_CALL(mock, actionReceived()).Times(1);
 
-    const auto prolongedEvent = SimpleEventPtr::create(syncTime.currentTimePoint(), State::started);
+    const auto prolongedEvent =
+        TestEventProlongedPtr::create(syncTime.currentTimePoint(), State::started);
     builder->processEvent(prolongedEvent);
 
     // The following events with the State::started must be aggregated.
@@ -778,13 +816,13 @@ TEST_F(ActionBuilderTest, builderAggregatesDifferentTypesOfEventProperly)
 
     EXPECT_CALL(mock, actionReceived()).Times(4);
 
-    builder->processEvent(makeEventWithCameraId(camera1->getId()));
-    builder->processEvent(makeEventWithCameraId(camera1->getId()));
-    builder->processEvent(makeEventWithCameraId(camera1->getId()));
+    builder->processEvent(makeInstantEvent(camera1->getId()));
+    builder->processEvent(makeInstantEvent(camera1->getId()));
+    builder->processEvent(makeInstantEvent(camera1->getId()));
 
-    builder->processEvent(makeEventWithCameraId(camera2->getId()));
-    builder->processEvent(makeEventWithCameraId(camera2->getId()));
-    builder->processEvent(makeEventWithCameraId(camera2->getId()));
+    builder->processEvent(makeInstantEvent(camera2->getId()));
+    builder->processEvent(makeInstantEvent(camera2->getId()));
+    builder->processEvent(makeInstantEvent(camera2->getId()));
 
     std::this_thread::sleep_for(interval);
 

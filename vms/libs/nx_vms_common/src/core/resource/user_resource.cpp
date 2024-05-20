@@ -68,7 +68,12 @@ void UserSettings::setWatchedEvents(const QList<EventType>& events)
 
 bool UserSettings::isEventWatched(EventType eventType) const
 {
-    return !eventFilter.contains(convertToNewEvent(eventType).toStdString());
+    return isEventWatched(convertToNewEvent(eventType));
+}
+
+bool UserSettings::isEventWatched(const QString& eventType) const
+{
+    return !eventFilter.contains(eventType.toStdString());
 }
 
 QByteArray QnUserHash::toString(const Type& type)

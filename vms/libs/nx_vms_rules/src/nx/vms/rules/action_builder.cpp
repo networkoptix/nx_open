@@ -37,12 +37,6 @@ namespace nx::vms::rules {
 
 namespace {
 
-static const QSet<QString> kAllowedEvents = {
-    "nx.events.debug",
-    "nx.events.test",
-    "nx.events.test.permissions",
-};
-
 enum class FiltrationAction
 {
     Discard,
@@ -589,15 +583,11 @@ ActionBuilder::Actions ActionBuilder::buildActionsForTargetUsers(
     // appropriate rights to see the event details.
     for (const auto& user: targetUsersField->users())
     {
-        if (!kAllowedEvents.contains(aggregatedEvent->type()))
+        if (!user->settings().isEventWatched(aggregatedEvent->type()))
         {
-            if (!user->settings().isEventWatched(
-                nx::vms::event::convertToOldEvent(aggregatedEvent->type())))
-            {
-                NX_VERBOSE(this, "Event %1 is filtered by user %2",
-                    aggregatedEvent->type(), user->getName());
-                continue;
-            }
+            NX_VERBOSE(this, "Event %1 is filtered by user %2",
+                aggregatedEvent->type(), user->getName());
+            continue;
         }
 
         auto filteredAggregatedEvent = aggregatedEvent->filtered(
@@ -703,6 +693,9 @@ ActionPtr ActionBuilder::buildAction(const AggregatedEventPtr& aggregatedEvent)
             }
         }
     }
+
+    if (!isProlonged())
+        action->setState(State::instant);
 
     return action;
 }

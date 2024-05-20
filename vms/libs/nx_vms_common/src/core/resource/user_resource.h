@@ -35,6 +35,7 @@ struct NX_VMS_COMMON_API UserSettings
 
     bool operator == (const UserSettings& /*other*/) const = default;
     bool isEventWatched(nx::vms::api::EventType eventType) const;
+    bool isEventWatched(const QString& eventType) const;
     QList<nx::vms::api::EventType> watchedEvents() const;
     void setWatchedEvents(const QList<nx::vms::api::EventType>& events);
 };
