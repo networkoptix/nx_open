@@ -1,6 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "validation_policy.h"
+#include "user_validation_policy.h"
 
 #include <api/helpers/access_rights_helper.h>
 #include <core/resource/camera_resource.h>

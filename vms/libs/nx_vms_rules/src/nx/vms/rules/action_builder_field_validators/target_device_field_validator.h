@@ -6,7 +6,7 @@
 
 namespace nx::vms::rules {
 
-class SourceUserFieldValidator: public FieldValidator
+class TargetDeviceFieldValidator: public FieldValidator
 {
     Q_OBJECT
 

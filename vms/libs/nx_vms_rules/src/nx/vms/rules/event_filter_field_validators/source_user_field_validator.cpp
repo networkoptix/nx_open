@@ -4,7 +4,8 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/vms/rules/validation_policy.h>
+#include <nx/vms/api/types/access_rights_types.h>
+#include <nx/vms/rules/user_validation_policy.h>
 
 #include "../event_filter.h"
 #include "../event_filter_fields/source_camera_field.h"
@@ -63,9 +64,7 @@ ValidationResult SourceUserFieldValidator::validity(
             policy.calculateAlert(sourceUserField->acceptAll(), sourceUserField->ids())};
     }
 
-    const auto isSelectionEmpty =
-        !sourceUserField->acceptAll() && sourceUserField->ids().empty();
-    if (!sourceUserFieldProperties.allowEmptySelection && isSelectionEmpty)
+    if (!sourceUserFieldProperties.allowEmptySelection && sourceUserField->selection().isEmpty())
         return {QValidator::State::Invalid, tr("Select at least one user")};
 
     return {};

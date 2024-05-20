@@ -83,7 +83,7 @@ void CommonObjectSearchSetup::setContext(WindowContext* value)
 bool CommonObjectSearchSetup::selectCameras(UuidSet& selectedCameras)
 {
     return d->context && CameraSelectionDialog::selectCameras<CameraSelectionDialog::DummyPolicy>(
-               selectedCameras, d->context->mainWindowWidget());
+        d->context->system(), selectedCameras, d->context->mainWindowWidget());
 }
 
 QnVirtualCameraResourcePtr CommonObjectSearchSetup::currentResource() const

@@ -5,7 +5,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/vms/rules/validation_policy.h>
+#include <nx/vms/rules/user_validation_policy.h>
 
 #include "../action_builder.h"
 #include "../action_builder_fields/flag_field.h"
@@ -15,6 +15,7 @@
 #include "../event_filter_fields/source_camera_field.h"
 #include "../rule.h"
 #include "../utils/field.h"
+#include "../utils/resource.h"
 
 namespace nx::vms::rules {
 
@@ -68,16 +69,8 @@ ValidationResult TargetUserFieldValidator::validity(
                         vms::api::AccessRight::manageBookmarks,
                         targetUserFieldProperties.allowEmptySelection};
 
-                    QnVirtualCameraResourceList cameras;
-                    if (cameraField->acceptAll())
-                    {
-                        cameras = context->resourcePool()->getAllCameras();
-                    }
-                    else
-                    {
-                        cameras = context->resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
-                            cameraField->ids());
-                    }
+                    QnVirtualCameraResourceList cameras =
+                        utils::cameras(cameraField->selection(), context);
 
                     policy.setCameras(cameras);
 
@@ -124,9 +117,7 @@ ValidationResult TargetUserFieldValidator::validity(
         }
     }
 
-    const auto isSelectionEmpty =
-        !targetUserField->acceptAll() && targetUserField->ids().empty();
-    if (!targetUserFieldProperties.allowEmptySelection && isSelectionEmpty)
+    if (!targetUserFieldProperties.allowEmptySelection && targetUserField->selection().isEmpty())
         return {QValidator::State::Invalid, tr("Select at least one user")};
 
     return {};

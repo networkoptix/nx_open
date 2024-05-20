@@ -104,7 +104,10 @@ const ItemDescriptor& SoftTriggerEvent::manifest()
                 utils::kCameraIdFieldName,
                 Strings::occursAt(),
                 {},
-                {{"acceptAll", true}}),
+                ResourceFilterFieldProperties{
+                    .acceptAll = true,
+                    .allowEmptySelection = true
+                }.toVariantMap()),
             makeFieldDescriptor<SourceUserField>(
                 utils::kUserIdFieldName,
                 NX_DYNAMIC_TRANSLATABLE(tr("By")),

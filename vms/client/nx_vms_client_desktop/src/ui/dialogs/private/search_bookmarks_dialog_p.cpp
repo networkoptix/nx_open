@@ -434,7 +434,7 @@ void QnSearchBookmarksDialogPrivate::chooseCamera()
     }
 
     auto dialogAccepted = CameraSelectionDialog::selectCameras
-        <CameraSelectionDialog::DummyPolicy>(cameraIds, m_owner);
+        <CameraSelectionDialog::DummyPolicy>(systemContext(), cameraIds, m_owner);
 
     if (dialogAccepted)
     {

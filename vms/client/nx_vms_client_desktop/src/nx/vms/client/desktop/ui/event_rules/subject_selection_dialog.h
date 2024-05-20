@@ -12,7 +12,7 @@
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/desktop/common/utils/validators.h>
-#include <nx/vms/rules/validation_policy.h>
+#include <nx/vms/rules/user_validation_policy.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
 
 class QnUserRolesModel;

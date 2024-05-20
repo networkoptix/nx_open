@@ -6,7 +6,6 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/common/system_context.h>
 
-#include "../aggregated_event.h"
 #include "../utils/field.h"
 
 namespace nx::vms::rules {
@@ -53,6 +52,11 @@ QVariant TargetSingleDeviceField::build(const AggregatedEventPtr& event) const
     }
 
     return QVariant::fromValue(m_id);
+}
+
+TargetSingleDeviceFieldProperties TargetSingleDeviceField::properties() const
+{
+    return TargetSingleDeviceFieldProperties::fromVariantMap(descriptor()->properties);
 }
 
 } // namespace nx::vms::rules

@@ -78,6 +78,11 @@ public:
         }
     }
 
+    UuidSelection selection() const
+    {
+        return {m_ids, m_acceptAll};
+    }
+
     ResourceFilterFieldProperties properties() const
     {
         return ResourceFilterFieldProperties::fromVariantMap(

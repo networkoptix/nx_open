@@ -48,10 +48,18 @@ public:
 
 protected:
     BASE_COMMON_USINGS
+    using PlainFieldPickerWidget<F>::fieldValidator;
+    using PlainFieldPickerWidget<F>::systemContext;
 
     QPushButton* m_selectButton{nullptr};
 
     virtual void onSelectButtonClicked() = 0;
+
+    void updateUi() override
+    {
+        if (auto validator = fieldValidator())
+            setValidity(validator->validity(m_field, parentParamsWidget()->rule(), systemContext()));
+    }
 };
 
 } // namespace nx::vms::client::desktop::rules

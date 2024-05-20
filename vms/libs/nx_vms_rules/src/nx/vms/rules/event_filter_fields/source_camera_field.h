@@ -6,6 +6,10 @@
 
 namespace nx::vms::rules {
 
+constexpr auto kCameraAnalyticsValidationPolicy = "cameraAnalytics";
+constexpr auto kCameraInputValidationPolicy = "cameraInput";
+constexpr auto kCameraMotionValidationPolicy = "cameraMotion";
+
 class NX_VMS_RULES_API SourceCameraField: public ResourceFilterEventField
 {
     Q_OBJECT

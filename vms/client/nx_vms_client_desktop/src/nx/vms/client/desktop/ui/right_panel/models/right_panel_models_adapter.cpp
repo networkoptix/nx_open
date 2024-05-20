@@ -44,6 +44,7 @@
 #include <nx/vms/client/core/qml/qml_ownership.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/analytics/attribute_display_manager.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/command_action.h>
 #include <nx/vms/client/desktop/event_rules/models/detectable_object_type_model.h>
 #include <nx/vms/client/desktop/event_search/models/analytics_search_list_model.h>
@@ -547,8 +548,11 @@ void RightPanelModelsAdapter::addCameraToLayout()
     };
 
     UuidSet chosenIds;
-    if (!CameraSelectionDialog::selectCameras<Policy>(chosenIds, d->context()->mainWindowWidget()))
+    if (!CameraSelectionDialog::selectCameras<Policy>(
+        appContext()->currentSystemContext(), chosenIds, d->context()->mainWindowWidget()))
+    {
         return;
+    }
 
     const auto cameras = d->context()->system()->resourcePool()
         ->getResourcesByIds<QnVirtualCameraResource>(chosenIds);

@@ -120,7 +120,10 @@ const ItemDescriptor& DeviceDisconnectedEvent::manifest(common::SystemContext* c
                 utils::kCameraIdFieldName,
                 TranslatableString(getSourceName),
                 /*description*/ {},
-                {{"acceptAll", true}}),
+                ResourceFilterFieldProperties{
+                    .acceptAll = true,
+                    .allowEmptySelection = true
+                }.toVariantMap()),
         },
         .resources = {
             {utils::kCameraIdFieldName, {ResourceType::device, Qn::ViewContentPermission}}},

@@ -3,9 +3,10 @@
 #pragma once
 
 #include "../base_fields/resource_filter_field.h"
-#include "../data_macros.h"
 
 namespace nx::vms::rules {
+
+constexpr auto kHasBuzzerValidationPolicy = "hasBuzzer";
 
 /** Displayed as device selection button and "Use source" checkbox. */
 class NX_VMS_RULES_API TargetServerField: public ResourceFilterActionField

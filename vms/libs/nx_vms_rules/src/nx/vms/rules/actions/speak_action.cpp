@@ -26,8 +26,13 @@ const ItemDescriptor& SpeakAction::manifest()
         .fields = {
             makeFieldDescriptor<TextWithFields>(utils::kTextFieldName,
                 NX_DYNAMIC_TRANSLATABLE(tr("Text"))),
-            makeFieldDescriptor<TargetDeviceField>(utils::kDeviceIdsFieldName,
-                NX_DYNAMIC_TRANSLATABLE(tr("At Device"))),
+            makeFieldDescriptor<TargetDeviceField>(
+                utils::kDeviceIdsFieldName,
+                NX_DYNAMIC_TRANSLATABLE(tr("At Device")),
+                {},
+                ResourceFilterFieldProperties{
+                    .validationPolicy = kCameraAudioTransmissionValidationPolicy
+                }.toVariantMap()),
             makeFieldDescriptor<TargetUserField>(
                 utils::kUsersFieldName,
                 NX_DYNAMIC_TRANSLATABLE(tr("To users")),

@@ -819,7 +819,7 @@ void EventLogDialog::at_cameraButton_clicked()
 {
     auto cameraIds = eventDevices();
     auto dialogAccepted = CameraSelectionDialog::selectCameras
-        <CameraSelectionDialog::DummyPolicy>(cameraIds, this);
+        <CameraSelectionDialog::DummyPolicy>(systemContext(), cameraIds, this);
 
     if (dialogAccepted)
         setEventDevices(cameraIds);

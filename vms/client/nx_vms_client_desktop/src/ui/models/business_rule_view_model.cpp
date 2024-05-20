@@ -42,7 +42,8 @@
 #include <nx/vms/event/events/events.h>
 #include <nx/vms/event/rule.h>
 #include <nx/vms/event/strings_helper.h>
-#include <nx/vms/rules/validation_policy.h>
+#include <nx/vms/rules/camera_validation_policy.h>
+#include <nx/vms/rules/user_validation_policy.h>
 #include <nx/vms/text/human_readable.h>
 #include <ui/workbench/workbench_context.h>
 
@@ -1367,16 +1368,16 @@ QString QnBusinessRuleViewModel::getSourceText(bool detailed) const
 {
     QnResourceList resources = resourcePool()->getResourcesByIds(eventResources());
     if (m_eventType == EventType::cameraMotionEvent)
-        return QnCameraMotionPolicy::getText(resources, detailed);
+        return QnCameraMotionPolicy::getText(systemContext(), resources, detailed);
 
     if (m_eventType == EventType::cameraInputEvent)
-        return QnCameraInputPolicy::getText(resources, detailed);
+        return QnCameraInputPolicy::getText(systemContext(), resources, detailed);
 
     if (m_eventType == EventType::analyticsSdkEvent)
-        return QnCameraAnalyticsPolicy::getText(resources, detailed);
+        return QnCameraAnalyticsPolicy::getText(systemContext(), resources, detailed);
 
     if (m_eventType == EventType::analyticsSdkObjectDetected)
-        return QnCameraAnalyticsPolicy::getText(resources, detailed);
+        return QnCameraAnalyticsPolicy::getText(systemContext(), resources, detailed);
 
     if (!nx::vms::event::isResourceRequired(m_eventType))
         return braced(tr("Site"));
@@ -1447,20 +1448,20 @@ QString QnBusinessRuleViewModel::getTargetText(bool detailed) const
         case ActionType::bookmarkAction:
         case ActionType::cameraRecordingAction:
         {
-            return QnCameraRecordingPolicy::getText(resources, detailed);
+            return QnCameraRecordingPolicy::getText(systemContext(), resources, detailed);
         }
         case ActionType::cameraOutputAction:
         {
-            return QnCameraOutputPolicy::getText(resources, detailed);
+            return QnCameraOutputPolicy::getText(systemContext(), resources, detailed);
         }
 
         case ActionType::playSoundAction:
         case ActionType::playSoundOnceAction:
         case ActionType::sayTextAction:
-            return QnCameraAudioTransmitPolicy::getText(resources, detailed);
+            return QnCameraAudioTransmitPolicy::getText(systemContext(), resources, detailed);
 
         case ActionType::executePtzPresetAction:
-            return QnExecPtzPresetPolicy::getText(resources, detailed);
+            return QnExecPtzPresetPolicy::getText(systemContext(), resources, detailed);
 
         case ActionType::fullscreenCameraAction:
         {

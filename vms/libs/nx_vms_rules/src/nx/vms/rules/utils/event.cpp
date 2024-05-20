@@ -9,14 +9,8 @@ namespace nx::vms::rules {
 
 bool hasSourceCamera(const vms::rules::ItemDescriptor& eventDescriptor)
 {
-    return std::any_of(
-        eventDescriptor.fields.begin(),
-        eventDescriptor.fields.end(),
-        [](const vms::rules::FieldDescriptor& fieldDescriptor)
-        {
-            return fieldDescriptor.fieldName == vms::rules::utils::kDeviceIdsFieldName
-                || fieldDescriptor.fieldName == vms::rules::utils::kCameraIdFieldName;
-        });
+    return eventDescriptor.resources.contains(utils::kCameraIdFieldName)
+        || eventDescriptor.resources.contains(utils::kDeviceIdsFieldName);
 }
 
 bool hasSourceServer(const vms::rules::ItemDescriptor& eventDescriptor)

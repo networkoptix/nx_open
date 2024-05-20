@@ -27,7 +27,17 @@ public:
 protected:
     BASE_COMMON_USINGS
     using ResourcePickerWidgetBase<F>::m_selectButton;
-    using ResourcePickerWidgetBase<F>::updateUi;
+    using ResourcePickerWidgetBase<F>::fieldValidator;
+    using ResourcePickerWidgetBase<F>::systemContext;
+
+    void updateUi() override
+    {
+        if (auto validator = fieldValidator())
+        {
+            base::setValidity(
+                validator->validity(m_field, parentParamsWidget()->rule(), systemContext()));
+        }
+    }
 
     void onSelectButtonClicked() override
     {
@@ -55,6 +65,8 @@ protected:
 
     void updateUi() override
     {
+        ServerPickerWidgetBase<vms::rules::SourceServerField, Policy>::updateUi();
+
         const auto resources =
             resourcePool()->template getResourcesByIds<QnMediaServerResource>(m_field->ids());
 
@@ -95,6 +107,8 @@ protected:
 
     void updateUi() override
     {
+        ServerPickerWidgetBase<vms::rules::TargetServerField, Policy>::updateUi();
+
         const auto resources =
             resourcePool()->template getResourcesByIds<QnMediaServerResource>(m_field->ids());
 

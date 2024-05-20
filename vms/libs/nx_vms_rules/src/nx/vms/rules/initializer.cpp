@@ -9,7 +9,12 @@
 #include <nx/vms/rules/events/builtin_events.h>
 
 #include "action_builder_field_validators/optional_time_field_validator.h"
+#include "action_builder_field_validators/target_device_field_validator.h"
+#include "action_builder_field_validators/target_server_field_validator.h"
+#include "action_builder_field_validators/target_single_device_field_validator.h"
 #include "action_builder_field_validators/target_user_field_validator.h"
+#include "event_filter_field_validators/source_camera_field_validator.h"
+#include "event_filter_field_validators/source_server_field_validator.h"
 #include "event_filter_field_validators/source_user_field_validator.h"
 
 namespace nx::vms::rules {
@@ -185,10 +190,15 @@ void Initializer::registerFields() const
 void Initializer::registerFieldValidators() const
 {
     // Event field validators.
+    registerFieldValidator<SourceCameraField>(new SourceCameraFieldValidator);
+    registerFieldValidator<SourceServerField>(new SourceServerFieldValidator);
     registerFieldValidator<SourceUserField>(new SourceUserFieldValidator);
 
     // Action field validators.
     registerFieldValidator<OptionalTimeField>(new OptionalTimeFieldValidator);
+    registerFieldValidator<TargetDeviceField>(new TargetDeviceFieldValidator);
+    registerFieldValidator<TargetServerField>(new TargetServerFieldValidator);
+    registerFieldValidator<TargetSingleDeviceField>(new TargetSingleDeviceFieldValidator);
     registerFieldValidator<TargetUserField>(new TargetUserFieldValidator);
 }
 
