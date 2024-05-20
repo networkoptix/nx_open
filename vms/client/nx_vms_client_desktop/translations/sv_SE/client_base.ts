@@ -4041,7 +4041,7 @@ Licensnyckel: %2</translation>
     </message>
     <message>
       <source>Displays IP addresses for cameras and servers.</source>
-      <translation type="unfinished">Displays IP addresses for cameras and servers.</translation>
+      <translation>Visar IP-adresser för kameror och servrar.</translation>
     </message>
   </context>
   <context>
