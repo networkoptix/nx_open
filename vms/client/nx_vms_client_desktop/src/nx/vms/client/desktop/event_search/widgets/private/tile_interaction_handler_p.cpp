@@ -357,8 +357,8 @@ void TileInteractionHandler::executePluginAction(
     actionData.engineId = engineId;
     actionData.actionId = actionDescriptor->id;
     actionData.objectTrackId = track.id;
-    actionData.timestampUs = track.firstAppearanceTimeUs;
-    actionData.deviceId = camera->getId();
+    actionData.timestampUs = std::chrono::microseconds(track.firstAppearanceTimeUs);
+    actionData.deviceId = toString(camera->getId());
 
     if (!actionDescriptor->parametersModel.isEmpty())
     {

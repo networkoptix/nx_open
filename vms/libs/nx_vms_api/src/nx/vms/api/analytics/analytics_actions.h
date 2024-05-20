@@ -2,35 +2,43 @@
 
 #pragma once
 
-#include <QtCore/QJsonValue>
+#include <chrono>
+
 #include <QtCore/QString>
 
 #include <nx/fusion/model_functions_fwd.h>
-#include <nx/fusion/serialization/json_fwd.h>
-#include <nx/fusion/serialization/json_functions.h>
-#include <nx/reflect/instrument.h>
-#include <nx/reflect/json.h>
-#include <nx/utils/serialization/qjson.h>
-#include <nx/utils/serialization/qt_core_types.h>
 #include <nx/utils/uuid.h>
 
 namespace nx::vms::api {
 
 struct NX_VMS_API AnalyticsAction
 {
-    /** Id of an Engine which should handle the Action. */
+    /**%apidoc
+     * Id of an Engine which should handle the Action.
+     */
     nx::Uuid engineId;
 
     QString actionId;
 
-    /** Id of an Analytics Object Track to which the Action is applied. */
+    /**%apidoc
+     * Id of an Object Track to which the Action is applied.
+     */
     nx::Uuid objectTrackId;
 
-    nx::Uuid deviceId;
+    /**%apidoc
+     * Flexible id of a Device to which the Action is applied.
+     */
+    QString deviceId;
 
-    // todo: #skolesnik What kind of seconds is it?
-    qint64 timestampUs{};
+    /**%apidoc
+     * Timestamp of the video frame from which the Action was triggered, in microseconds.
+     * %example 0
+     */
+    std::chrono::microseconds timestampUs{};
 
+    /**%apidoc
+     * JSON object with key-value pairs containing values for the Action parameters described in the Engine manifest.
+     */
     std::map<QString, QString> parameters;
 
     static DeprecatedFieldNames const * getDeprecatedFieldNames();
