@@ -68,6 +68,8 @@ LayoutSelectionDialog::LayoutSelectionDialog(
     filterLocalLayouts->setFilterCaseSensitivity(Qt::CaseInsensitive);
     filterLocalLayouts->setFilterKeyColumn(QnResourceListModel::NameColumn);
     filterLocalLayouts->setSourceModel(m_localLayoutsModel);
+    filterLocalLayouts->setSortCaseSensitivity(Qt::CaseInsensitive);
+    filterLocalLayouts->sort(QnResourceListModel::NameColumn);
     ui->localTreeView->setModel(filterLocalLayouts.get());
 
     // Making a filtered model for shared layouts.
@@ -75,6 +77,8 @@ LayoutSelectionDialog::LayoutSelectionDialog(
     filterSharedLayouts->setFilterCaseSensitivity(Qt::CaseInsensitive);
     filterSharedLayouts->setFilterKeyColumn(QnResourceListModel::NameColumn);
     filterSharedLayouts->setSourceModel(m_sharedLayoutsModel);
+    filterSharedLayouts->setSortCaseSensitivity(Qt::CaseInsensitive);
+    filterSharedLayouts->sort(QnResourceListModel::NameColumn);
     ui->sharedTreeView->setModel(filterSharedLayouts.get());
 
     const auto setupTreeView =
