@@ -2476,7 +2476,7 @@ Tryck på Alt + Klicka för att följa objektet</translation>
     </message>
     <message>
       <source>The added system will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</source>
-      <translation type="unfinished">The added system will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</translation>
+      <translation>Det tillagda systemet kommer snabbt att bli synligt för användare med ett befintligt molnkonto, medan användare utan ett befintligt molnkonto kommer att få instruktioner via e-post.</translation>
     </message>
   </context>
   <context>
