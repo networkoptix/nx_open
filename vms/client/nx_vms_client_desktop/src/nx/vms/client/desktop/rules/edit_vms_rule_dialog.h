@@ -72,6 +72,8 @@ private:
     void onActionBuilderModified();
 
     void setHasChanges(bool hasChanges);
+
+    void showWarningIfRequired();
 };
 
 } // namespace nx::vms::client::desktop::rules
