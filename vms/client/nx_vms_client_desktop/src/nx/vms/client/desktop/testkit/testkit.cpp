@@ -398,6 +398,7 @@ void TestKit::dragAndDrop(QJSValue object, QJSValue parameters)
 
     const auto fromValue = parameters.property("from");
     const auto toValue = parameters.property("to");
+    const auto steps = parameters.property("steps").toNumber();
 
     QPoint from(fromValue.property("x").toNumber(), fromValue.property("y").toNumber());
     QPoint to(toValue.property("x").toNumber(), toValue.property("y").toNumber());
@@ -419,15 +420,15 @@ void TestKit::dragAndDrop(QJSValue object, QJSValue parameters)
     }
 
     auto doDragAndDrop =
-        [this, from, to, window]
+        [this, from, to, steps, window]
         {
             static constexpr auto kMouseInputDelay = std::chrono::milliseconds(150);
 
             QVector<QPoint> points;
 
             QPoint moveVector(to - from);
-            for (int i = 0; i <= 10; ++i)
-                points.push_back(from + moveVector * i / 10.0);
+            for (int i = 0; i <= steps; ++i)
+                points.push_back(from + moveVector * i / steps);
 
             utils::sendMouse(points.front(),
                 "move",
@@ -458,8 +459,6 @@ void TestKit::dragAndDrop(QJSValue object, QJSValue parameters)
                     Qt::KeyboardModifier::NoModifier,
                     window,
                     true);
-
-                std::this_thread::sleep_for(kMouseInputDelay);
             }
 
             utils::sendMouse(points.back(),
@@ -470,6 +469,7 @@ void TestKit::dragAndDrop(QJSValue object, QJSValue parameters)
                 window,
                 true);
 
+            std::this_thread::sleep_for(kMouseInputDelay);
             m_dragAndDropActive = false;
         };
 
@@ -531,6 +531,15 @@ QJSValue TestKit::pick(int x, int y)
     rectObject["height"] = rect.height();
     result["rect"] = rectObject;
 
+    return qjsEngine(this)->toScriptValue(result);
+}
+
+QJSValue TestKit::guiThreadStatus()
+{
+    QVariantMap result;
+    result.insert("status", bool(this->m_dragAndDropActive));
+    if (!this->m_dragAndDropActive)
+        ensureAsyncActionFinished();
     return qjsEngine(this)->toScriptValue(result);
 }
 

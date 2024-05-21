@@ -128,6 +128,9 @@ public:
     /** Returns visible element with the smallest size at specified screen coordinates. */
     Q_INVOKABLE QJSValue pick(int x, int y);
 
+    /** Returns status of GUI thread */
+    Q_INVOKABLE QJSValue guiThreadStatus();
+
     /** Enables hightlight for UI elements under cursor. */
     void setHighlightEnabled(bool enabled = true);
 
