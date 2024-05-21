@@ -71,7 +71,7 @@ struct NX_VMS_API StreamSettings: MediaSettings
      */
     bool accurateSeek = false;
 
-    /**%apidoc[opt] Fragment length in milliseconds. Can be used for both live and archive streams -
+    /**%apidoc[opt] Can be used for both live and archive streams -
      * for archive streams effectively it's another way to specify `endPositionMs`.
      */
     std::optional<std::chrono::milliseconds> durationMs = std::nullopt;
