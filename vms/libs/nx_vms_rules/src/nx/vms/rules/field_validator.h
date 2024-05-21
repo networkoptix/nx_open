@@ -18,6 +18,8 @@ struct ValidationResult
     QString description;
 
     bool isValid() const { return validity != QValidator::State::Invalid; }
+
+    bool operator==(QValidator::State state) const { return validity == state; };
 };
 
 /**

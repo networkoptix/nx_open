@@ -411,6 +411,7 @@ void EditVmsRuleDialog::setRule(std::shared_ptr<vms::rules::Rule> rule)
 
 void EditVmsRuleDialog::accept()
 {
+    showWarningIfRequired();
     done(QDialogButtonBox::Ok);
 }
 
@@ -423,6 +424,7 @@ void EditVmsRuleDialog::buttonBoxClicked(QDialogButtonBox::StandardButton button
 {
     if (button == QDialogButtonBox::StandardButton::Apply)
     {
+        showWarningIfRequired();
         emit accepted();
         setHasChanges(false);
         return;
@@ -637,6 +639,19 @@ void EditVmsRuleDialog::setHasChanges(bool hasChanges)
 
     m_hasChanges = hasChanges;
     emit hasChangesChanged();
+}
+
+void EditVmsRuleDialog::showWarningIfRequired()
+{
+    if (m_hasChanges && m_rule->validity(systemContext()) != QValidator::State::Acceptable)
+    {
+        QnMessageBox::warning(
+            this,
+            tr("The rule is not valid and may not work"),
+            /*extras*/ {},
+            QDialogButtonBox::Ok,
+            QDialogButtonBox::Ok);
+    }
 }
 
 } // namespace nx::vms::client::desktop::rules
