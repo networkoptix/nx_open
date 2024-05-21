@@ -95,10 +95,13 @@ HttpAuthPicker::HttpAuthPicker(
     mainLayout->addWidget(d->tokenGroup);
     d->tokenGroup->setVisible(false);
 
-    d->comboBox->addItem(DropdownTextPickerWidgetStrings::autoValue());
-    d->comboBox->addItem(d->bearerStr);
-    d->comboBox->addItem(d->digestStr);
-    d->comboBox->addItem(d->basicStr);
+    d->comboBox->addItem(DropdownTextPickerWidgetStrings::autoValue(),
+        QVariant::fromValue(nx::network::http::AuthType::authBasicAndDigest));
+    d->comboBox->addItem(
+        d->bearerStr, QVariant::fromValue(nx::network::http::AuthType::authBearer));
+    d->comboBox->addItem(
+        d->digestStr, QVariant::fromValue(nx::network::http::AuthType::authDigest));
+    d->comboBox->addItem(d->basicStr, QVariant::fromValue(nx::network::http::AuthType::authBasic));
 
     // All connectors, which can cause call of the `m_field`,
     // must be created after all object initializations to avoid segfault on uninitialized field.
@@ -164,15 +167,10 @@ void HttpAuthPicker::updateUi()
 
 void HttpAuthPicker::onCurrentIndexChanged(int /*index*/)
 {
-    const auto value = d->comboBox->currentText().trimmed();
-    if (value == d->bearerStr)
-        m_field->setAuthType(nx::network::http::AuthType::authBearer);
-    else if (value == d->basicStr)
-        m_field->setAuthType(nx::network::http::AuthType::authBasic);
-    else //< Auto and digest type.
-        m_field->setAuthType(nx::network::http::AuthType::authDigest);
+    const auto value = d->comboBox->currentData().value<nx::network::http::AuthType>();
+    m_field->setAuthType(value);
 
-    const bool isBearer = value == d->bearerStr;
+    const bool isBearer = value == nx::network::http::AuthType::authBearer;
     d->loginPasswordGroup->setVisible(!isBearer);
     d->tokenGroup->setVisible(isBearer);
 }
