@@ -3943,7 +3943,7 @@ Licensnyckel: %2</translation>
     </message>
     <message>
       <source>Text Files</source>
-      <translation type="unfinished">Text Files</translation>
+      <translation>Textfiler</translation>
     </message>
   </context>
   <context>
