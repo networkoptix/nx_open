@@ -65,7 +65,7 @@ Item
                 customization["secondary"] = item.secondaryColor
 
             if (item.tertiaryColor !== undefined)
-                customization["tertiary"] = item.tertiaryColor
+                customization["third"] = item.tertiaryColor
 
             let query = []
 

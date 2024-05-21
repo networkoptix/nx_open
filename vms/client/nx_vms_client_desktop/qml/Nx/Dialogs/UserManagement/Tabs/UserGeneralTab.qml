@@ -124,8 +124,9 @@ Item
                 }
 
                 sourceSize: Qt.size(width, height)
-		primaryColor: ColorTheme.colors.dark7
-		secondaryColor: ColorTheme.colors.light10
+                primaryColor: ColorTheme.colors.dark7
+                secondaryColor: ColorTheme.colors.light10
+                tertiaryColor: ColorTheme.colors.brand_core
             }
 
             EditableLabel
