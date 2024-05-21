@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" viewBox="0 0 32 32">
+  <g class="32x32/Solid/cursor_cross">
+    <g class="Secondary">
+      <path fill="#fff" fill-rule="evenodd" d="M15 15H6v3h9v9h3v-9h9v-3h-9V6h-3v9Zm1-8v9H7v1h9v9h1v-9h9v-1h-9V7h-1Z" clip-rule="evenodd"/>
+      <path fill="#000" d="M17 7h-1v9H7v1h9v9h1v-9h9v-1h-9V7Z"/>
+    </g>
+    <path fill="#000" fill-rule="evenodd" d="M17 7h-1v9H7v1h9v9h1v-9h9v-1h-9V7Z" class="Primary" clip-rule="evenodd"/>
+  </g>
+</svg>

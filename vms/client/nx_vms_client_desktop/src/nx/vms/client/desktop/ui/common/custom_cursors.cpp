@@ -12,6 +12,18 @@
 template<> nx::vms::client::desktop::CustomCursors*
     Singleton<nx::vms::client::desktop::CustomCursors>::s_instance = nullptr;
 
+namespace {
+
+nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kCursorCloseTheme = {
+    {QnIcon::Normal, {.primary = "dark1", .secondary = "light1"}}};
+nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kCursorMoveTheme = {
+    {QnIcon::Normal, {.primary = "light1", .secondary = "dark1"}}};
+
+NX_DECLARE_COLORIZED_ICON(kCrossIcon, "32x32/Solid/cursor_cross.svg", kCursorCloseTheme)
+NX_DECLARE_COLORIZED_ICON(kMoveIcon, "32x32/Solid/cursor_move.svg", kCursorMoveTheme)
+
+} // namespace
+
 namespace nx::vms::client::desktop {
 
 struct CustomCursors::Private
@@ -31,8 +43,8 @@ CustomCursors::Private& CustomCursors::staticData()
 
 CustomCursors::CustomCursors(core::Skin* skin)
 {
-    staticData().sizeAllCursor = QCursor{skin->pixmap("cursors/size_all.png")};
-    staticData().crossCursor = QCursor{skin->pixmap("cursors/cross.png")};
+    staticData().sizeAllCursor = QCursor{skin->icon(kMoveIcon).pixmap(32, 32)};
+    staticData().crossCursor = QCursor{skin->icon(kCrossIcon).pixmap(32, 32)};
 }
 
 void CustomCursors::registerQmlType()
