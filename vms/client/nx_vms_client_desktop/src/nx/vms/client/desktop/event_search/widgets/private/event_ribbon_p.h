@@ -127,7 +127,7 @@ private:
     core::ResourceThumbnailProvider* createPreviewProvider(
         const nx::api::ResourceImageRequest& request);
     void loadNextPreview();
-    bool isNextPreviewLoadAllowed(const core::ResourceThumbnailProvider* provider) const;
+    bool loadPreviewIfAllowed(core::ResourceThumbnailProvider* provider);
     void handleLoadingEnded(core::ResourceThumbnailProvider* provider); //< Provider may be destroying.
 
     int scrollValue() const;

@@ -42,8 +42,7 @@ public:
     std::unique_ptr<QAction> additionalAction;
     QnElidedLabel* const progressLabel;
     const QScopedPointer<QTimer> loadPreviewTimer;
-    bool automaticPreviewLoad = true;
-    bool isPreviewLoadNeeded = false;
+    bool isPreviewLoadNeeded = true;
     bool forceNextPreviewUpdate = false;
     std::optional<qreal> progressValue = 0.0;
     bool isRead = false;
