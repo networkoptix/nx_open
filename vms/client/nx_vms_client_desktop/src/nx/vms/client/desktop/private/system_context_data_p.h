@@ -24,7 +24,8 @@
 #include <nx/vms/client/desktop/utils/server_image_cache.h>
 #include <nx/vms/client/desktop/utils/server_notification_cache.h>
 #include <nx/vms/client/desktop/utils/server_remote_access_watcher.h>
-#include <nx/vms/client/desktop/videowall/desktop_camera_initializer.h>
+#include <nx/vms/client/desktop/videowall/desktop_camera_connection_controller.h>
+#include <nx/vms/client/desktop/videowall/desktop_camera_stub_controller.h>
 #include <nx/vms/client/desktop/videowall/videowall_online_screens_watcher.h>
 #include <nx/vms/client/desktop/virtual_camera/virtual_camera_manager.h>
 #include <storage/server_storage_manager.h>
@@ -53,7 +54,8 @@ struct SystemContext::Private
     std::unique_ptr<DelayedDataLoader> delayedDataLoader;
     std::unique_ptr<NonEditableUsersAndGroups> nonEditableUsersAndGroups;
     std::unique_ptr<DefaultPasswordCamerasWatcher> defaultPasswordCamerasWatcher;
-    std::unique_ptr<DesktopCameraInitializer> desktopCameraInitializer;
+    std::unique_ptr<DesktopCameraConnectionController> desktopCameraConnectionController;
+    std::unique_ptr<DesktopCameraStubController> desktopCameraStubController;
     std::unique_ptr<IntercomManager> intercomManager;
     std::unique_ptr<SystemHealthState> systemHealthState;
     std::unique_ptr<TrafficRelayUrlWatcher> trafficRelayUrlWatcher;

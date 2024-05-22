@@ -64,8 +64,8 @@ struct CloudCrossSystemContext::Private
             SystemContext::Mode::crossSystem,
             appContext()->peerId());
 
-       systemContext->resourceDataPool()->setExternalSource(
-           appContext()->currentSystemContext()->resourceDataPool());
+        systemContext->resourceDataPool()->setExternalSource(
+            appContext()->currentSystemContext()->resourceDataPool());
 
         appContext()->addSystemContext(systemContext.get());
 

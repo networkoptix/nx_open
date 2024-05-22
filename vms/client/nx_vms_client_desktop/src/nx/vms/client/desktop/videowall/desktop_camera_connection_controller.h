@@ -12,7 +12,7 @@ namespace nx::vms::client::desktop {
 /**
  * Maintains connection between desktop resource and a server we are currently connected to.
  */
-class DesktopCameraInitializer:
+class DesktopCameraConnectionController:
     public QObject,
     public SystemContextAware
 {
@@ -20,21 +20,27 @@ class DesktopCameraInitializer:
     using base_type = QObject;
 
 public:
-    DesktopCameraInitializer(SystemContext* systemContext, QObject* parent = nullptr);
-    virtual ~DesktopCameraInitializer();
-
-private:
-    void atResourcesAdded(const QnResourceList& resources);
-    void atResourcesRemoved(const QnResourceList& resources);
+    DesktopCameraConnectionController(SystemContext* systemContext, QObject* parent = nullptr);
+    virtual ~DesktopCameraConnectionController();
 
     /** Setup connection if available. */
     void initialize();
 
-    /** Drop connection. */
-    void deinitialize();
+    /** Drop and reset connection. */
+    void reinitialize();
+
+private:
+    void initializeImpl();
+
+    void rememberCamera();
+
+    void atResourcesRemoved(const QnResourceList& resources);
+    void atUserChanged(const QnUserResourcePtr& user);
+
+    void disconnectCamera();
 
     /** Update current server. */
-    void setServer(const QnMediaServerResourcePtr &server);
+    void setServer(const QnMediaServerResourcePtr& server);
 
 private:
     QnMediaServerResourcePtr m_server;

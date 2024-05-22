@@ -76,7 +76,12 @@ namespace Qn {
         foreigner = 1 << 17, /**< Belongs to other entity, e.g., camera on another server */
 
         // Client-only flag.
-        fake = 1 << 18, /**< Fake server (belonging to other system). / Intercom layout, while it is local / User */
+        /**
+         * Fake server (belonging to other system) / Intercom layout, while it is local / User /
+         * Desktop camera preloader (before it is updated by server, by creation real Desktop
+         * camera).
+         */
+        fake = 1 << 18,
 
         videowall = 1 << 19, /**< Videowall resource */
         desktop_camera = 1 << 20, /**< Desktop Camera resource */

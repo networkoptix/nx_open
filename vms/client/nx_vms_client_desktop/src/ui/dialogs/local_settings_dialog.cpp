@@ -16,6 +16,7 @@
 #include <nx/vms/client/desktop/settings/screen_recording_settings.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/videowall/desktop_camera_connection_controller.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/widgets/local_settings/advanced_settings_widget.h>
 #include <ui/widgets/local_settings/general_preferences_widget.h>
@@ -66,9 +67,9 @@ QnLocalSettingsDialog::QnLocalSettingsDialog(QWidget *parent):
         [this]
         {
             // Desktop camera will be reinitialized here. Actually this code must be removed as
-            // soon as 2-way audio is reimplemented, so method will be called only on "Push my
+            // soon as 2-way audio is reimplemented, so methods will be called only on "Push my
             // screen" action.
-            system()->initializeDesktopCamera();
+            system()->desktopCameraConnectionController()->reinitialize();
         };
 
     auto generalPageWidget = new QnGeneralPreferencesWidget(this);

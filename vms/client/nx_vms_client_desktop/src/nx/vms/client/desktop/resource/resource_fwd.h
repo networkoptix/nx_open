@@ -24,4 +24,9 @@ class CrossSystemLayoutResource;
 using CrossSystemLayoutResourcePtr = QnSharedResourcePointer<CrossSystemLayoutResource>;
 using CrossSystemLayoutResourceList = QnSharedResourcePointerList<CrossSystemLayoutResource>;
 
+class DesktopCameraPreloaderResource;
+using DesktopCameraPreloaderResourcePtr = QnSharedResourcePointer<DesktopCameraPreloaderResource>;
+using DesktopCameraPreloaderResourceList =
+    QnSharedResourcePointerList<DesktopCameraPreloaderResource>;
+
 } // namespace nx::vms::client::desktop

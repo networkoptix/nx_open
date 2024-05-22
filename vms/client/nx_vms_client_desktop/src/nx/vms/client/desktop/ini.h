@@ -191,6 +191,10 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
     NX_INI_INT(250, analyticsSearchRequestDelayMs,
         "[Dev] Analytics search request delay in milliseconds.");
 
+    // VMS-47602, VMS-36266
+    NX_INI_INT(false, enableDesktopCameraLazyInitialization,
+        "[Dev] Initialize desktop camera only on Push My Screen action.");
+
     // ---------------------------------------------------------------------------------------------
     // Design section
     // Flags here can be removed when designers approve the resulting approach.

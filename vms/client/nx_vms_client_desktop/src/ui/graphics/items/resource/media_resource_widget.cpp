@@ -2517,6 +2517,9 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
 
         if (!d->accessController()->hasPermissions(d->camera, calculateRequiredPermissions()))
             return Qn::AccessDeniedOverlay;
+
+        if (d->camera->hasFlags(Qn::fake | Qn::desktop_camera))
+            return Qn::LoadingOverlay;
     }
 
     // TODO: #sivanov This requires a lot of refactoring

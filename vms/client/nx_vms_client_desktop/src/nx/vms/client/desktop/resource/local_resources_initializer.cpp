@@ -35,7 +35,7 @@ void LocalResourcesInitializer::onResourcesAdded(const QnResourceList& resources
 
         for (auto& data: layout->getItems())
         {
-            if (isCrossSystemResource(data.resource))
+            if (isCrossSystemResource(data.resource) || isDesktopCameraResource(data.resource))
                 continue;
 
             QnResourcePtr resource = getResourceByDescriptor(data.resource);

@@ -41,6 +41,8 @@ public:
 
     /** Estimated update delivery date (in msecs since epoch). */
     Property<qint64> updateDeliveryDate{this, "updateDeliveryDate"};
+
+    Property<bool> desktopCameraWasUsedAtPreviousLogin{this, "desktopCameraWasUsedAtPreviousLogin"};
 };
 
 } // namespace nx::vms::client::desktop

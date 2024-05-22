@@ -17,6 +17,8 @@ namespace nx::vms::client::core { class AnalyticsEventsSearchTreeBuilder; }
 namespace nx::vms::client::desktop {
 
 class DefaultPasswordCamerasWatcher;
+class DesktopCameraConnectionController;
+class DesktopCameraStubController;
 class OtherServersManager;
 class LayoutSnapshotManager;
 class LdapStatusWatcher;
@@ -60,7 +62,13 @@ public:
      * is reimplemented, we should initialize camera as soon as possible.
      * TODO: #sivanov Fix QnLocalSettingsDialog also when it is done.
      */
-    void initializeDesktopCamera();
+    DesktopCameraConnectionController* desktopCameraConnectionController();
+
+    /**
+     * Is needed for QnWorkbenchVideoWallHandler, when it handles local Push my screen button action
+     * and creates DesktopCamera layout and initial DesktopCameraPreloaderResource.
+     */
+    DesktopCameraStubController* desktopCameraStubController();
 
     /**
      * Overload of the corresponding function from core context.

@@ -18,6 +18,8 @@ namespace {
 
 static const QString kCloudScheme = "cloud://";
 
+static const QString kDesktopCameraMark = "desktopCamera://";
+
 /** System Id placeholder for resources, not bound to any System (e.g. cloud layouts). */
 static const QString kGenericCloudSystemId = nx::Uuid().toSimpleString();
 
@@ -45,6 +47,12 @@ QString resourcePath(const QnResourcePtr& resource, bool forceCloud)
 
     if (const auto camera = resource.dynamicCast<CrossSystemCameraResource>())
         return resourcePath(camera->getId(), camera->systemId());
+
+    if (const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
+        camera && camera->hasFlags(Qn::desktop_camera))
+    {
+        return kDesktopCameraMark + camera->getPhysicalId();
+    }
 
     const auto systemContext = SystemContext::fromResource(resource);
     const bool belongsToOtherContext = (systemContext != appContext()->currentSystemContext());
@@ -132,6 +140,19 @@ QString crossSystemResourceSystemId(const nx::vms::common::ResourceDescriptor& d
     return descriptor.path.mid(
         kCloudScheme.length(),
         descriptor.path.indexOf('.') - kCloudScheme.length());
+}
+
+bool isDesktopCameraResource(const nx::vms::common::ResourceDescriptor& descriptor)
+{
+    return descriptor.path.startsWith(kDesktopCameraMark);
+}
+
+QString getDesktopCameraPhysicalId(const nx::vms::common::ResourceDescriptor& descriptor)
+{
+    if (!descriptor.path.startsWith(kDesktopCameraMark))
+        return {};
+
+    return descriptor.path.mid(kDesktopCameraMark.size());
 }
 
 } // namespace nx::vms::client::desktop

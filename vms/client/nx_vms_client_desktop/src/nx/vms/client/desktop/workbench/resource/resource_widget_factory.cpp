@@ -79,9 +79,11 @@ QnResourceWidget* ResourceWidgetFactory::createWidget(QnWorkbenchItem* item)
     if (resource->hasFlags(Qn::cross_system))
         return new QnCrossSystemCameraWidget(systemContext, windowContext, item);
 
-    QnClientCameraResourcePtr camera = resource.dynamicCast<QnClientCameraResource>();
-    if (itemIsIntercomLayout && camera && camera->isIntercom())
+    if (auto camera = resource.dynamicCast<QnClientCameraResource>();
+        itemIsIntercomLayout && camera && camera->isIntercom())
+    {
         return new IntercomResourceWidget(systemContext, windowContext, item);
+    }
 
     if (resource->hasFlags(Qn::media))
         return new QnMediaResourceWidget(systemContext, windowContext, item);
