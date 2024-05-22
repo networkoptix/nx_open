@@ -246,10 +246,7 @@ bool LocalNotificationsListModel::setData(const QModelIndex& index, const QVaria
 bool LocalNotificationsListModel::removeRows(int row, int count, const QModelIndex&)
 {
     for (int i = row; i < row + count; ++i)
-    {
-        workbenchContext()->instance<workbench::LocalNotificationsManager>()->cancel(
-            m_notifications[i]);
-    }
+        windowContext()->localNotificationsManager()->cancel(m_notifications[i]);
     return false;
 }
 
