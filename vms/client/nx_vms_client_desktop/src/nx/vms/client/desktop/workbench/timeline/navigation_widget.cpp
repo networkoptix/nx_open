@@ -44,12 +44,28 @@ bool paintButtonFunction(QPainter* painter, const QStyleOption* /*option*/, cons
     return true;
 };
 
-static const core::SvgIconColorer::ThemeSubstitutions kNavigationIconSubstitutions = {
+const core::SvgIconColorer::ThemeSubstitutions kNavigationIconSubstitutions = {
     {QIcon::Normal, {.primary = "light4", .secondary = "dark7"}},
     {QIcon::Active, {.primary = "light6", .secondary = "dark8"}},
     {QIcon::Disabled, {.primary = "light4", .secondary = "dark7", .alpha = 0.3}},
     {QnIcon::Pressed, {.primary = "light2", .secondary = "dark6"}},
 };
+
+NX_DECLARE_COLORIZED_ICON(
+    kJumpBackwardIcon, "32x32/Solid/rewind_backward.svg", kNavigationIconSubstitutions)
+NX_DECLARE_COLORIZED_ICON(
+    kStepBackwardIcon, "32x32/Solid/step_backward.svg", kNavigationIconSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kPlayPauseIcon,
+    "32x32/Solid/play.svg",
+    kNavigationIconSubstitutions,
+    "32x32/Solid/pause.svg",
+    kNavigationIconSubstitutions)
+NX_DECLARE_COLORIZED_ICON(
+    kStepForwardIcon, "32x32/Solid/step_forward.svg", kNavigationIconSubstitutions)
+NX_DECLARE_COLORIZED_ICON(
+    kJumpForwardIcon, "32x32/Solid/rewind_forward.svg", kNavigationIconSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kBackwadIcon, "32x32/Solid/backward.svg", kNavigationIconSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kForwardIcon, "32x32/Solid/forward.svg", kNavigationIconSubstitutions)
 
 } // namespace
 
@@ -69,16 +85,11 @@ NavigationWidget::NavigationWidget(WindowContext* context, QWidget* parent):
     installEventHandler({this}, {QEvent::Resize, QEvent::Move},
         this, &NavigationWidget::geometryChanged);
 
-    initButton(m_jumpBackwardButton, menu::JumpToStartAction,
-        "slider/navigation/rewind_backward_32.svg");
-    initButton(m_stepBackwardButton, menu::PreviousFrameAction,
-        "slider/navigation/step_backward_32.svg");
-    initButton(m_playButton, menu::PlayPauseAction,
-        "slider/navigation/play_32.svg", "slider/navigation/pause_32.svg");
-    initButton(m_stepForwardButton, menu::NextFrameAction,
-        "slider/navigation/step_forward_32.svg");
-    initButton(m_jumpForwardButton, menu::JumpToEndAction,
-        "slider/navigation/rewind_forward_32.svg");
+    initButton(m_jumpBackwardButton, menu::JumpToStartAction, kJumpBackwardIcon);
+    initButton(m_stepBackwardButton, menu::PreviousFrameAction, kStepBackwardIcon);
+    initButton(m_playButton, menu::PlayPauseAction, kPlayPauseIcon);
+    initButton(m_stepForwardButton, menu::NextFrameAction, kStepForwardIcon);
+    initButton(m_jumpForwardButton, menu::JumpToEndAction, kJumpForwardIcon);
 
     auto mainLayout = new QVBoxLayout();
     mainLayout->setSpacing(3);
@@ -190,16 +201,14 @@ void NavigationWidget::setTooltipsVisible(bool enabled)
 void NavigationWidget::initButton(
     CustomPaintedButton* button,
     menu::IDType actionType,
-    const QString& iconPath,
+    const nx::vms::client::core::ColorizedIconDeclaration& iconDecl,
     const QString& checkedIconPath)
 {
-    const bool isCheckable = !checkedIconPath.isEmpty();
+    const bool isCheckable = !iconDecl.checkedThemeSubstitutions().isEmpty();
     QAction* buttonAction = action(actionType);
 
     button->setCustomPaintFunction(paintButtonFunction);
-    button->setIcon(isCheckable
-        ? qnSkin->icon(iconPath, kNavigationIconSubstitutions, checkedIconPath)
-        : qnSkin->icon(iconPath, kNavigationIconSubstitutions));
+    button->setIcon(qnSkin->icon(iconDecl));
     button->setFixedSize({32, 32});
     button->setToolTip(buttonAction->toolTip());
     button->setCheckable(isCheckable);
@@ -230,15 +239,11 @@ void NavigationWidget::updatePlaybackButtonsIcons()
     updatePlaybackButtonsTooltips();
 
     m_stepBackwardButton->setIcon(playing
-        ? qnSkin->icon("slider/navigation/backward_32.svg",
-            kNavigationIconSubstitutions)
-        : qnSkin->icon("slider/navigation/step_backward_32.svg",
-            kNavigationIconSubstitutions));
+        ? qnSkin->icon(kBackwadIcon)
+        : qnSkin->icon(kStepBackwardIcon));
     m_stepForwardButton->setIcon(playing
-        ? qnSkin->icon("slider/navigation/forward_32.svg",
-            kNavigationIconSubstitutions)
-        : qnSkin->icon("slider/navigation/step_forward_32.svg",
-            kNavigationIconSubstitutions));
+        ? qnSkin->icon(kForwardIcon)
+        : qnSkin->icon(kStepForwardIcon));
 }
 
 void NavigationWidget::updatePlaybackButtonsEnabled()

@@ -139,6 +139,22 @@ const core::SvgIconColorer::IconSubstitutions kNavigationIconCheckedSubstitution
     }},
 };
 
+NX_DECLARE_COLORIZED_ICON(kMuteUnmuteIcon,
+    "24x20/Solid/mute.svg", kNavigationIconSubstitutions,
+    "24x20/Solid/unmute.svg", kNavigationIconCheckedSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kLiveButtonIcon,
+    "52x24/Solid/live.svg", kNavigationIconSubstitutions,
+    "52x24/Solid/live.svg", kNavigationIconCheckedSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kSyncButtonIcon,
+    "52x24/Solid/sync.svg", kNavigationIconSubstitutions,
+    "52x24/Solid/sync.svg", kNavigationIconCheckedSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kCalendarButtonIcon,
+    "52x24/Solid/calendar.svg", kNavigationIconSubstitutions,
+    "52x24/Solid/calendar.svg", kNavigationIconCheckedSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kThumbnailsButtonIcon,
+    "52x24/Solid/thumbnails.svg", kNavigationIconSubstitutions,
+    "52x24/Solid/thumbnails.svg", kNavigationIconCheckedSubstitutions)
+
 } // namespace
 
 ControlWidget::ControlWidget(WindowContext* context, QWidget* parent):
@@ -154,12 +170,9 @@ ControlWidget::ControlWidget(WindowContext* context, QWidget* parent):
     installEventHandler({this}, {QEvent::Resize, QEvent::Move},
         this, &ControlWidget::geometryChanged);
 
-    initButton(m_muteButton, menu::ToggleMuteAction,
-        "slider/buttons/sound_24.svg", "slider/buttons/unmute_24.svg");
+    initButton(m_muteButton, menu::ToggleMuteAction, kMuteUnmuteIcon, /*large*/ false);
 
-    initButton(m_liveButton, menu::JumpToLiveAction,
-        "slider/buttons/live_52x24.svg",
-        /*checkedIconPath*/ "",
+    initButton(m_liveButton, menu::JumpToLiveAction, kLiveButtonIcon, /*large*/ true,
         /*connectToAction*/ false);
     connect(m_liveButton, &QAbstractButton::clicked, this,
         [this]()
@@ -167,12 +180,9 @@ ControlWidget::ControlWidget(WindowContext* context, QWidget* parent):
             menu()->trigger(menu::JumpToLiveAction, navigator()->currentWidget());
         });
 
-    initButton(m_syncButton, menu::ToggleSyncAction,
-        "slider/buttons/sync_52x24.svg");
-    initButton(m_thumbnailsButton, menu::ToggleThumbnailsAction,
-        "slider/buttons/thumbnails_52x24.svg");
-    initButton(m_calendarButton, menu::ToggleCalendarAction,
-        "slider/buttons/calendar_52x24.svg");
+    initButton(m_syncButton, menu::ToggleSyncAction, kSyncButtonIcon);
+    initButton(m_thumbnailsButton, menu::ToggleThumbnailsAction, kThumbnailsButtonIcon);
+    initButton(m_calendarButton, menu::ToggleCalendarAction, kCalendarButtonIcon);
 
     statisticsModule()->controls()->registerSlider(
         "volume_slider",
@@ -283,25 +293,17 @@ void ControlWidget::setTooltipsVisible(bool enabled)
 void ControlWidget::initButton(
     CustomPaintedButton* button,
     menu::IDType actionType,
-    const QString& iconPath,
-    const QString& checkedIconPath,
+    const nx::vms::client::core::ColorizedIconDeclaration& iconDecl,
+    bool large,
     bool connectToAction)
 {
     QAction* buttonAction = action(actionType);
 
     button->setCustomPaintFunction(paintButtonFunction);
-    button->setIcon(!checkedIconPath.isEmpty()
-        ? qnSkin->icon(iconPath,
-            kNavigationIconSubstitutions,
-            checkedIconPath,
-            kNavigationIconCheckedSubstitutions)
-        : qnSkin->icon(iconPath,
-            kNavigationIconSubstitutions,
-            kNavigationIconCheckedSubstitutions));
+    button->setIcon(qnSkin->icon(iconDecl));
 
-    const bool smallIcon = !checkedIconPath.isEmpty();
     button->setObjectName(buttonAction->text());
-    button->setFixedSize(smallIcon ? QSize{24, 24} : QSize{52, 24} );
+    button->setFixedSize(large ? QSize{52, 24} : QSize{24, 24});
     button->setToolTip(buttonAction->toolTip());
     button->setCheckable(true);
 
