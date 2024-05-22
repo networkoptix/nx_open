@@ -463,21 +463,6 @@ void EventTile::setPreviewHighlightRect(const QRectF& relativeRect)
     ui->imagePreviewWidget->setHighlightRect(relativeRect);
 }
 
-bool EventTile::automaticPreviewLoad() const
-{
-    return d->automaticPreviewLoad;
-}
-
-void EventTile::setAutomaticPreviewLoad(bool value)
-{
-    if (d->automaticPreviewLoad == value)
-        return;
-
-    d->automaticPreviewLoad = value;
-    d->isPreviewLoadNeeded = d->isPreviewLoadNeeded && !d->automaticPreviewLoad;
-    d->updatePreview(/*delay*/ 0ms);
-}
-
 bool EventTile::isPreviewLoadNeeded() const
 {
     return d->isPreviewNeeded() && d->isPreviewLoadNeeded;

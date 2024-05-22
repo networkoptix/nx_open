@@ -260,16 +260,8 @@ void EventTile::Private::requestPreview()
 
     NX_VERBOSE(this, "Requesting tile preview");
     forceNextPreviewUpdate = false;
-
-    if (automaticPreviewLoad)
-    {
-        q->imageProvider()->loadAsync();
-    }
-    else
-    {
-        isPreviewLoadNeeded = true;
-        emit q->needsPreviewLoad();
-    }
+    isPreviewLoadNeeded = true;
+    emit q->needsPreviewLoad();
 }
 
 void EventTile::Private::updatePreview(std::chrono::milliseconds delay)

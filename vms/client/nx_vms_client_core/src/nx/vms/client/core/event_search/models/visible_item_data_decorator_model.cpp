@@ -160,24 +160,22 @@ struct VisibleItemDataDecoratorModel::Private
 
     QSet<QPersistentModelIndex> visibleItems;
 
-
     void handlePreviewLoadingEnded(ResourceThumbnailProvider* provider);
     void createPreviews(int first, int count);
     void updatePreviewProvider(int row);
     void requestPreview(int row);
     void loadNextPreview();
-    bool isNextPreviewLoadAllowed(const ResourceThumbnailProvider* provider) const;
+    void loadPreviewIfAllowed(int row);
     QString previewId(int row) const;
     qreal previewAspectRatio(int row) const;
     QRectF previewHighlightRect(int row) const;
     EventSearch::PreviewState previewState(int row) const;
 
     bool setVisible(const QModelIndex& index, bool value);
-
-
 };
 
-void VisibleItemDataDecoratorModel::Private::handlePreviewLoadingEnded(ResourceThumbnailProvider* provider)
+void VisibleItemDataDecoratorModel::Private::handlePreviewLoadingEnded(
+    ResourceThumbnailProvider* provider)
 {
     const auto previewData = loadingByProvider.find(provider);
     if (previewData == loadingByProvider.end())
@@ -275,27 +273,10 @@ void VisibleItemDataDecoratorModel::Private::updatePreviewProvider(int row)
                 if (provider == providerLoadingFromCache)
                     return;
 
-                switch (status)
+                if (status != ThumbnailStatus::Loading
+                    && status != ThumbnailStatus::Refreshing)
                 {
-                    case ThumbnailStatus::Loading:
-                    case ThumbnailStatus::Refreshing:
-                    {
-                        const auto server = previewServer(provider);
-                        loadingByProvider.insert(provider, {server, kPreviewLoadTimeout});
-
-                        auto& serverData = loadingByServer[server];
-                        ++serverData.loadingCounter;
-
-                        NX_ASSERT(serverData.loadingCounter
-                            <= maxSimultaneousPreviewLoads(settings, server));
-                        break;
-                    }
-
-                    default:
-                    {
-                        handlePreviewLoadingEnded(provider);
-                        break;
-                    }
+                    handlePreviewLoadingEnded(provider);
                 }
             });
     }
@@ -389,15 +370,7 @@ void VisibleItemDataDecoratorModel::Private::loadNextPreview()
             }
         }
 
-        if (!isNextPreviewLoadAllowed(provider))
-            continue;
-
-        NX_VERBOSE(q, "Requesting preview from server (timestamp=%1, objectTrackId=%2",
-            provider->requestData().timestampMs,
-            provider->requestData().objectTrackId);
-
-        requestPreview(row);
-        sinceLastPreviewRequest.restart();
+        loadPreviewIfAllowed(row);
     }
 
     if (awaitingReload
@@ -407,19 +380,36 @@ void VisibleItemDataDecoratorModel::Private::loadNextPreview()
     }
 }
 
-bool VisibleItemDataDecoratorModel::Private::isNextPreviewLoadAllowed(
-    const ResourceThumbnailProvider* provider) const
+void VisibleItemDataDecoratorModel::Private::loadPreviewIfAllowed(int row)
 {
+    const auto provider = previews[row].provider.get();
     if (!NX_ASSERT(provider))
-        return false;
+        return;
+
+    if (loadingByProvider.contains(provider)) //< Already loading.
+        return;
 
     const auto server = previewServer(provider);
-    const auto maxPreviewLoads = maxSimultaneousPreviewLoads(settings, server);
-    return (loadingByServer.value(server).loadingCounter < maxPreviewLoads)
-        && (settings.tilePreviewLoadIntervalMs <= 0ms
-            || sinceLastPreviewRequest.hasExpired(settings.tilePreviewLoadIntervalMs));
-}
+    const bool allowed =
+        loadingByServer.value(server).loadingCounter < maxSimultaneousPreviewLoads(settings, server)
+            && (settings.tilePreviewLoadIntervalMs <= 0ms
+                || sinceLastPreviewRequest.hasExpired(settings.tilePreviewLoadIntervalMs));
 
+    if (!allowed)
+        return;
+
+    NX_VERBOSE(this, "Requesting preview from server (timestamp=%1, objectTrackId=%2",
+        provider->requestData().timestampMs,
+        provider->requestData().objectTrackId);
+
+    loadingByProvider.insert(provider, {server, kPreviewLoadTimeout});
+
+    auto& serverData = loadingByServer[server];
+    ++serverData.loadingCounter;
+
+    requestPreview(row);
+    sinceLastPreviewRequest.restart();
+}
 
 QString VisibleItemDataDecoratorModel::Private::previewId(int row) const
 {

@@ -483,42 +483,10 @@ core::ResourceThumbnailProvider* EventRibbon::Private::createPreviewProvider(
             if (provider == m_providerLoadingFromCache)
                 return;
 
-            switch (status)
+            if (status != core::ThumbnailStatus::Loading
+                && status != core::ThumbnailStatus::Refreshing)
             {
-                case core::ThumbnailStatus::Loading:
-                case core::ThumbnailStatus::Refreshing:
-                {
-                    const QSharedPointer<QTimer> timeoutTimer(new QTimer(),
-                        [](QTimer* timer)
-                        {
-                            if (!timer) // TODO: #vkutin Remove these lines in 4.2
-                                return; // - they are totally not necessary.
-
-                            timer->stop();
-                            timer->deleteLater();
-                        });
-
-                    connect(timeoutTimer.get(), &QTimer::timeout, this,
-                        [this, provider]() { handleLoadingEnded(provider); });
-
-                    timeoutTimer->setSingleShot(true);
-                    timeoutTimer->start(kPreviewLoadTimeout);
-
-                    const auto server = previewServer(provider);
-                    m_loadingByProvider.insert(provider, {server, timeoutTimer});
-
-                    auto& serverData = m_loadingByServer[server];
-                    ++serverData.loadingCounter;
-
-                    NX_ASSERT(serverData.loadingCounter <= maxSimultaneousPreviewLoads(server));
-                    break;
-                }
-
-                default:
-                {
-                    handleLoadingEnded(provider);
-                    break;
-                }
+                handleLoadingEnded(provider);
             }
         });
 
@@ -544,18 +512,6 @@ void EventRibbon::Private::handleLoadingEnded(core::ResourceThumbnailProvider* p
     loadNextPreview();
 }
 
-bool EventRibbon::Private::isNextPreviewLoadAllowed(
-    const core::ResourceThumbnailProvider* provider) const
-{
-    if (!NX_ASSERT(provider))
-        return false;
-
-    const auto server = previewServer(provider);
-    return m_loadingByServer.value(server).loadingCounter < maxSimultaneousPreviewLoads(server)
-        && (kTilePreviewLoadInterval <= 0ms || m_sinceLastPreviewRequest.hasExpired(
-            kTilePreviewLoadInterval));
-}
-
 void EventRibbon::Private::ensureWidget(int index)
 {
     NX_CRITICAL(index >= 0 && index < count());
@@ -569,8 +525,6 @@ void EventRibbon::Private::ensureWidget(int index)
         widget.reset(new EventTile(m_viewport.get()));
         widget->setContextMenuPolicy(Qt::CustomContextMenu);
         widget->installEventFilter(this);
-
-        widget->setAutomaticPreviewLoad(false);
 
         connect(widget.get(), &EventTile::needsPreviewLoad,
             this, &Private::loadNextPreview);
@@ -1657,21 +1611,57 @@ void EventRibbon::Private::loadNextPreview()
             }
         }
 
-        if (isNextPreviewLoadAllowed(tile->preview.get()))
-        {
-            NX_VERBOSE(this, "Requesting preview from server (timestamp=%1, objectTrackId=%2",
-                tile->preview->requestData().timestampMs,
-                tile->preview->requestData().objectTrackId);
-
-            tile->preview->loadAsync();
-            m_sinceLastPreviewRequest.restart();
-        }
-        else if (m_loadingByProvider.empty())
+        if (!loadPreviewIfAllowed(tile->preview.get())
+            && m_loadingByProvider.empty())
         {
             m_previewLoad->requestOperation();
             break;
         }
     }
+}
+
+bool EventRibbon::Private::loadPreviewIfAllowed(core::ResourceThumbnailProvider* provider)
+{
+    if (!NX_ASSERT(provider))
+        return false;
+
+    if (m_loadingByProvider.contains(provider)) //< Already loading.
+        return false;
+
+    const auto server = previewServer(provider);
+    const bool allowed =
+        m_loadingByServer.value(server).loadingCounter < maxSimultaneousPreviewLoads(server)
+            && (kTilePreviewLoadInterval <= 0ms || m_sinceLastPreviewRequest.hasExpired(
+                kTilePreviewLoadInterval));
+
+    if (!allowed)
+        return false;
+
+    NX_VERBOSE(this, "Requesting preview from server (timestamp=%1, objectTrackId=%2",
+        provider->requestData().timestampMs,
+        provider->requestData().objectTrackId);
+
+    const QSharedPointer<QTimer> timeoutTimer(new QTimer(),
+        [](QTimer* timer) //< Shared pointer deleter.
+        {
+            timer->stop();
+            timer->deleteLater();
+        });
+
+    connect(timeoutTimer.get(), &QTimer::timeout, this,
+        [this, provider]() { handleLoadingEnded(provider); });
+
+    timeoutTimer->setSingleShot(true);
+    timeoutTimer->start(kPreviewLoadTimeout);
+
+    m_loadingByProvider.insert(provider, {server, timeoutTimer});
+
+    auto& serverData = m_loadingByServer[server];
+    ++serverData.loadingCounter;
+
+    provider->loadAsync();
+    m_sinceLastPreviewRequest.restart();
+    return true;
 }
 
 void EventRibbon::Private::ensureVisible(int row)
