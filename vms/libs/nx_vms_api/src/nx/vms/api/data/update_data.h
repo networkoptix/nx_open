@@ -82,8 +82,14 @@ NX_REFLECTION_ENUM_CLASS(PublicationType,
 
 struct NX_VMS_API ProductInfo
 {
+    /**%apidoc[opt] */
     UpdateComponent updateComponent{UpdateComponent::server};
+    /**%apidoc[opt] */
     PublicationType publicationType{PublicationType::release};
+    /**%apidoc[opt]
+     * If present, the Server makes an attempt to retrieve an update manifest for the specified
+     * version id from the dedicated updates server and return it as a result.
+     */
     std::string version{};
 
     /**%apidoc[opt] Integer version of the release
@@ -157,6 +163,14 @@ struct NX_VMS_API UpdateInformation
     int releaseDeliveryDays{0};
     std::string description;
     std::string eula;
+
+    /**%apidoc Map of update components to a list of possible update packages.
+     * Current possible values:
+     * "unknown": Component is not known.
+     * "client": Desktop Client.
+     * "customClient": Desktop Client with custom branding.
+     * "server": VMS Server.
+     */
     std::map<UpdateComponent, std::vector<UpdatePackage>> packages;
     std::string url;
 
@@ -193,7 +207,11 @@ NX_VMS_API_DECLARE_STRUCT_EX(InstallUpdateRequest, (json))
 
 struct NX_VMS_API FinishUpdateRequest
 {
-    bool ignorePendingPeers;
+    /**%apidoc[opt]
+     * Force an update process completion regardless of actual peer state.
+     * %example false
+     */
+    bool ignorePendingPeers{false};
 };
 #define FinishUpdateRequest_Fields (ignorePendingPeers)
 NX_VMS_API_DECLARE_STRUCT_EX(FinishUpdateRequest, (json))
