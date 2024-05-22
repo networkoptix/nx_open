@@ -13,6 +13,7 @@ struct NX_CODEC_API HEVCDecoderConfigurationRecord
     bool read(const uint8_t* data, int size);
     bool write(uint8_t* data, int size) const;
     int size() const;
+    static constexpr int kMinSize = 23;
 
     uint8_t  configurationVersion;
     uint8_t  general_profile_space;
