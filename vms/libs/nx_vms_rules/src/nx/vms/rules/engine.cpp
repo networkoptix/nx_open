@@ -920,7 +920,7 @@ void Engine::processAcceptedEvent(const EventPtr& event, const ConstRulePtr& rul
 void Engine::processAction(const ActionPtr& action) const
 {
     checkOwnThread();
-    NX_DEBUG(this, "Processing Action '%1' (state %2)", action->type(), action->state());
+    NX_DEBUG(this, "Routing action: %1, state: %2", action->type(), action->state());
 
     m_router->routeAction(action);
 }
