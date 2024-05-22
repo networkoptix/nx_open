@@ -20,7 +20,7 @@ int getNalSize(const uint8_t* ptr)
 /**
  * @param data data->context should not be null.
  */
-std::vector<nal::NalUnitInfo> readH264NALUsFromExtraData(
+std::vector<nal::NalUnitInfo> readNalUnitsFromExtraData(
     const uint8_t* extradata, int extradataSize)
 {
     std::vector<nal::NalUnitInfo> result;
@@ -63,9 +63,20 @@ std::vector<nal::NalUnitInfo> readH264NALUsFromExtraData(
     return result;
 }
 
-bool extractSps(const QnCompressedVideoData* videoData, SPSUnit& sps)
+bool isExtradataInMp4Format(const QnCompressedVideoData* data)
 {
-    auto nalUnits = decodeNalUnits(videoData);
+    return data->context &&
+        data->context->getExtradataSize() >= 7 &&
+        data->context->getExtradata()[0] == 1;
+}
+
+bool extractSps(const QnCompressedVideoData* data, SPSUnit& sps)
+{
+    std::vector<nal::NalUnitInfo> nalUnits;
+    if (isExtradataInMp4Format(data))
+        nalUnits = readNalUnitsFromExtraData(data->context->getExtradata(), data->context->getExtradataSize());
+    else
+        nalUnits = nal::findNalUnitsAnnexB((const uint8_t*)data->data(), data->dataSize());
 
     for (const auto& nalu: nalUnits)
     {
@@ -76,22 +87,6 @@ bool extractSps(const QnCompressedVideoData* videoData, SPSUnit& sps)
         }
     }
     return false;
-}
-
-bool isH264SeqHeaderInExtraData(const QnCompressedVideoData* data)
-{
-    return data->context &&
-        data->context->getExtradataSize() >= 7 &&
-        data->context->getExtradata()[0] == 1;
-}
-
-std::vector<nal::NalUnitInfo> decodeNalUnits(
-    const QnCompressedVideoData* data)
-{
-    if (isH264SeqHeaderInExtraData(data))
-        return readH264NALUsFromExtraData(data->context->getExtradata(), data->context->getExtradataSize());
-    else
-        return nal::findNalUnitsAnnexB((const uint8_t*)data->data(), data->dataSize());
 }
 
 std::vector<uint8_t> buildExtraDataAnnexB(const uint8_t* data, int32_t size)

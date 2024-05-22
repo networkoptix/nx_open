@@ -16,8 +16,6 @@ NX_MEDIA_CORE_API std::vector<uint8_t> buildExtraDataAnnexB(const uint8_t* data,
 NX_MEDIA_CORE_API std::vector<uint8_t> buildExtraDataMp4FromAnnexB(const uint8_t* data, int32_t size);
 NX_MEDIA_CORE_API std::vector<uint8_t> buildExtraDataMp4(const std::vector<nal::NalUnitInfo>& nalUnits);
 
-NX_MEDIA_CORE_API std::vector<nal::NalUnitInfo> decodeNalUnits(const QnCompressedVideoData* videoData);
-
 NX_MEDIA_CORE_API bool extractSps(const QnCompressedVideoData* videoData, SPSUnit& sps);
 
 } // namespace nx::media::h264
