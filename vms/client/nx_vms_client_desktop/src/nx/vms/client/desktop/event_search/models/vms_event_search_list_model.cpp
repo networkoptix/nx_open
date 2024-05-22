@@ -28,6 +28,7 @@
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/rules/aggregated_event.h>
 #include <nx/vms/rules/basic_event.h>
+#include <nx/vms/rules/engine.h>
 #include <nx/vms/rules/rules_fwd.h>
 #include <nx/vms/rules/utils/event_details.h>
 #include <nx/vms/rules/utils/field.h>
@@ -49,20 +50,19 @@ namespace {
 
 struct Facade
 {
-    using Type = EventModelData;
+    using Type = nx::vms::api::rules::EventLogRecord;
     using TimeType = milliseconds;
 
     static auto id(const Type& data)
     {
         // TODO: Add id field for the EventLogRecord structure and fill it with the database data.
         return nx::Uuid::fromArbitraryData(
-            QString::number(data.record().timestampMs.count())
-            + data.record().ruleId.toString());
+            QString::number(data.timestampMs.count()) + data.ruleId.toString());
     }
 
     static auto startTime(const Type& data)
     {
-        return duration_cast<milliseconds>(data.record().timestampMs);
+        return data.timestampMs;
     }
 
     static bool equal(const Type& /*left*/, const Type& /*right*/)
@@ -131,7 +131,7 @@ struct VmsEventSearchListModel::Private
 
     QStringList defaultEventTypes;
 
-    std::deque<EventModelData> data;
+    std::deque<nx::vms::api::rules::EventLogRecord> data;
 
     QTimer liveUpdateTimer;
     MultiRequestIdHolder multiRequestIdHolder;
@@ -298,7 +298,7 @@ bool VmsEventSearchListModel::Private::requestFetch(const core::FetchRequest& re
             [this, request](core::FetchedData<EventLogRecordList>&& fetched,
                 const OptionalTimePeriod& timePeriod)
         {
-          // Explicitly update fetched time window in case of live update
+            // Explicitly update fetched time window in case of live update
             q->setFetchedTimeWindow(timePeriod);
             updateEventSearchData<Facade>(q, this->data, fetched, request.direction);
         };
@@ -312,6 +312,7 @@ bool VmsEventSearchListModel::Private::requestFetch(const core::FetchRequest& re
             return;
         }
 
+        core::mergeOldData<Facade>(data, this->data, request.direction);
         auto fetched = core::makeFetchedData<Facade>(this->data, data, request);
         const auto ranges = fetched.ranges;
         const auto fetchedWindow = core::timeWindow<Facade>(fetched.data);
@@ -400,7 +401,8 @@ QVariant VmsEventSearchListModel::data(const QModelIndex& index, int role) const
     if (!NX_ASSERT(index.row() < static_cast<int>(d->data.size())))
         return {};
 
-    const auto& event = d->data[index.row()].event(systemContext());
+    const auto& event = systemContext()->vmsRulesEngine()->buildEvent(
+        d->data[index.row()].eventData);
     const auto& details = event->details(systemContext());
 
     switch (role)
@@ -506,6 +508,8 @@ void VmsEventSearchListModel::clearData()
 {
     d->multiRequestIdHolder.resetValue(MultiRequestIdHolder::Mode::fetch);
     d->multiRequestIdHolder.resetValue(MultiRequestIdHolder::Mode::dynamic);
+
+    ScopedModelOperations::ScopedReset reset(this);
     d->data.clear();
 }
 

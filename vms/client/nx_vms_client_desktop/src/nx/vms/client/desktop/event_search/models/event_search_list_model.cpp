@@ -50,9 +50,9 @@ struct Facade
         return microseconds(data.eventParams.eventTimestampUsec);
     }
 
-    static const auto& id(const Type& data)
+    static const auto id(const Type& data)
     {
-        return data.actionParams.actionId;
+        return nx::Uuid::fromArbitraryData(data.toString());
     }
 
     static bool equal(const Type& /*left*/, const Type& /*right*/)
@@ -325,7 +325,7 @@ bool EventSearchListModel::Private::requestFetch(const core::FetchRequest& reque
                  [this, request](core::FetchedData<ActionDataList>&& fetched,
                      const OptionalTimePeriod& timePeriod)
                 {
-                     // Explicitly update fetched time window in case of live update
+                    // Explicitly update fetched time window in case of live update
                     q->setFetchedTimeWindow(timePeriod);
                     updateEventSearchData<Facade>(q, this->data, fetched, request.direction);
                 };
@@ -339,6 +339,7 @@ bool EventSearchListModel::Private::requestFetch(const core::FetchRequest& reque
                 return;
             }
 
+            core::mergeOldData<Facade>(data, this->data, request.direction);
             auto fetched = core::makeFetchedData<Facade>(this->data, data, request);
             const auto ranges = fetched.ranges;
             const auto fetchedWindow = core::timeWindow<Facade>(fetched.data);
@@ -517,6 +518,8 @@ void EventSearchListModel::clearData()
 {
     d->multiRequestIdHolder.resetValue(MultiRequestIdHolder::Mode::fetch);
     d->multiRequestIdHolder.resetValue(MultiRequestIdHolder::Mode::dynamic);
+
+    ScopedModelOperations::ScopedReset reset(this);
     d->data.clear();
 }
 
