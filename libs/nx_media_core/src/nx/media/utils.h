@@ -12,7 +12,7 @@
 
 namespace nx::media {
 
-NX_MEDIA_CORE_API bool extractSps(
+NX_MEDIA_CORE_API bool extractSpsH265(
     const QnCompressedVideoData* videoData, hevc::SequenceParameterSet& sps);
 
 NX_MEDIA_CORE_API QSize getFrameSize(const QnCompressedVideoData* frame);
