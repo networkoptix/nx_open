@@ -33,6 +33,7 @@ MultiSelectionComboBox
         onModelReset: count = rowCount()
     }
 
+    listView.Layout.maximumHeight: 200
     listView.section.property: "groupSection"
     listView.section.delegate: Rectangle
     {
