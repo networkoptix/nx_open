@@ -20,7 +20,7 @@
 
 namespace {
 static constexpr qsizetype kMaximumResourceLineLimit = 1;
-static constexpr char kMultipleResourcesSeparator = '|';
+static constexpr char kMultipleResourcesSeparator = ',';
 static constexpr int kTileTitleLineLimit = 2;
 static constexpr int kTileDescriptionLineLimit = 4;
 } // namespace
