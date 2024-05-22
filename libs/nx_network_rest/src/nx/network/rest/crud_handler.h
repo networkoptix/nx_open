@@ -239,7 +239,7 @@ protected:
     template<typename Id>
     auto readById(Id id, const Request& request, ResponseAttributes* responseAttributes)
     {
-        auto list = call(&Derived::read, std::move(id), request, responseAttributes);
+        auto list = call(&Derived::read, id, request, responseAttributes);
         using ResultType = std::optional<std::decay_t<decltype(list.front())>>;
         if (list.empty())
             return ResultType(std::nullopt);
