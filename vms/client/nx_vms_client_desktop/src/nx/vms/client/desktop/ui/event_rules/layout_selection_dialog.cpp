@@ -13,6 +13,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/string.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/desktop/common/models/customizable_sort_filter_proxy_model.h>
 #include <nx/vms/client/desktop/common/utils/item_view_utils.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
@@ -63,21 +64,34 @@ LayoutSelectionDialog::LayoutSelectionDialog(
     m_sharedLayoutsModel->setHasCheckboxes(true);
     m_sharedLayoutsModel->setSinglePick(m_singlePick);
 
+    auto lessThanFunc =
+        [](const QModelIndex& left, const QModelIndex& right)
+        {
+            return nx::utils::naturalStringCompare(
+                left.data(Qt::DisplayRole).toString(),
+                right.data(Qt::DisplayRole).toString(),
+                Qt::CaseInsensitive) < 0;
+        };
+
     // Making a filtered model for local layouts.
-    auto filterLocalLayouts = std::make_shared<QSortFilterProxyModel>(m_localLayoutsModel);
+    auto filterLocalLayouts =
+        std::make_shared<CustomizableSortFilterProxyModel>(m_localLayoutsModel);
+
     filterLocalLayouts->setFilterCaseSensitivity(Qt::CaseInsensitive);
     filterLocalLayouts->setFilterKeyColumn(QnResourceListModel::NameColumn);
     filterLocalLayouts->setSourceModel(m_localLayoutsModel);
-    filterLocalLayouts->setSortCaseSensitivity(Qt::CaseInsensitive);
+    filterLocalLayouts->setCustomLessThan(lessThanFunc);
     filterLocalLayouts->sort(QnResourceListModel::NameColumn);
     ui->localTreeView->setModel(filterLocalLayouts.get());
 
     // Making a filtered model for shared layouts.
-    auto filterSharedLayouts = std::make_shared<QSortFilterProxyModel>(m_sharedLayoutsModel);
+    auto filterSharedLayouts =
+        std::make_shared<CustomizableSortFilterProxyModel>(m_sharedLayoutsModel);
+
     filterSharedLayouts->setFilterCaseSensitivity(Qt::CaseInsensitive);
     filterSharedLayouts->setFilterKeyColumn(QnResourceListModel::NameColumn);
     filterSharedLayouts->setSourceModel(m_sharedLayoutsModel);
-    filterSharedLayouts->setSortCaseSensitivity(Qt::CaseInsensitive);
+    filterSharedLayouts->setCustomLessThan(lessThanFunc);
     filterSharedLayouts->sort(QnResourceListModel::NameColumn);
     ui->sharedTreeView->setModel(filterSharedLayouts.get());
 
