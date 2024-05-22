@@ -22,6 +22,9 @@ void insertTail(
     const auto fetchedEnd = fetched.data.begin() + fetched.ranges.tail.offset
         + fetched.ranges.tail.length;
     const int count = std::distance(fetchedBegin, fetchedEnd);
+    if (count <= 0)
+        return;
+
     const int start = direction == EventSearch::FetchDirection::newer ? 0 : current.size();
     const typename Model::ScopedInsertRows insertRows(model, start, start + count - 1);
     current.insert(current.begin() + start, fetchedBegin, fetchedEnd);
@@ -41,24 +44,36 @@ void updateBody(
     OldDataContainer& old,
     FetchedData& fetched)
 {
-    auto fetchedBegin = fetched.data.begin() + fetched.ranges.body.offset;
-    auto fetchedEnd = fetched.data.begin() + fetched.ranges.body.offset
-        + fetched.ranges.body.length;
-
     const auto removeItems =
         [model, &old](auto begin, auto end)
         {
             const int start = std::distance(old.begin(), begin);
             const int count = std::distance(begin, end);
+            if (count <= 0)
+                return end;
+
             const typename Model::ScopedRemoveRows removeRows(model, start, start + count - 1);
             return old.erase(begin, end);
         };
+
+    if (fetched.data.empty())
+    {
+        removeItems(old.begin(), old.end());
+        return;
+    }
+
+    auto fetchedBegin = fetched.data.begin() + fetched.ranges.body.offset;
+    auto fetchedEnd = fetched.data.begin() + fetched.ranges.body.offset
+        + fetched.ranges.body.length;
 
     const auto insertItems =
         [model, &old](auto position, auto begin, auto end)
         {
             const int start = std::distance(old.begin(), position);
             const int count = std::distance(begin, end);
+            if (count <= 0)
+                return position;
+
             const typename Model::ScopedInsertRows insertRows(model, start, start + count - 1);
             return old.insert(position, begin, end) + count;
         };
