@@ -801,12 +801,18 @@ nx::network::rest::AuthSession QnTCPConnectionProcessor::authSession() const
     return authSession(d->accessRights);
 }
 
-nx::network::rest::AuthSession QnTCPConnectionProcessor::authSession(const nx::network::rest::UserAccessData& accessRights) const
+nx::network::rest::AuthSession QnTCPConnectionProcessor::authSession(
+    const nx::network::rest::UserAccessData& accessRights) const
 {
     Q_D(const QnTCPConnectionProcessor);
-    const auto& user = resourcePool()->getResourceById(accessRights.userId);
-    return nx::network::rest::AuthSession(
-        user ? user->getName() : QString(), d->request, d->socket->getForeignAddress().address);
+    const auto user = resourcePool()->getResourceById(accessRights.userId);
+    // TODO: Use a refresh token instead of an access token for the cloud users.
+    const auto token = accessRights.token();
+    return {
+        token.empty() ? nx::Uuid{} : nx::Uuid::fromArbitraryData(token),
+        user ? user->getName() : QString(),
+        d->request,
+        d->socket->getForeignAddress().address};
 }
 
 void QnTCPConnectionProcessor::sendErrorResponse(
