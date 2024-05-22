@@ -8,16 +8,41 @@
 #include <nx/codec/hevc/extradata.h>
 #include <nx/codec/hevc/hevc_common.h>
 #include <nx/codec/hevc/sequence_parameter_set.h>
+#include <nx/codec/hevc/hevc_decoder_configuration_record.h>
 #include <nx/codec/jpeg/jpeg_utils.h>
 #include <nx/media/h264_utils.h>
 #include <nx/media/mime_types.h>
+#include <nx/utils/log/log.h>
 
 namespace nx::media {
 
-bool extractSps(const QnCompressedVideoData* videoData, hevc::SequenceParameterSet& sps)
+bool isExtradataInMp4Format(const QnCompressedVideoData* data)
 {
-    // H.265 nal units have same format (unit delimiter) as H.264 nal units
-    auto nalUnits = nx::media::h264::decodeNalUnits(videoData); // TODO make another one for h265(in case of extradata format is differ).
+    return data->context &&
+        data->context->getExtradataSize() >= hevc::HEVCDecoderConfigurationRecord::kMinSize &&
+        data->context->getExtradata()[0] == 1; // configurationVersion
+}
+
+bool extractSpsH265(const QnCompressedVideoData* data, hevc::SequenceParameterSet& sps)
+{
+    std::vector<nal::NalUnitInfo> nalUnits;
+    if (isExtradataInMp4Format(data))
+    {
+        hevc::HEVCDecoderConfigurationRecord record;
+        if (!record.read(data->context->getExtradata(), data->context->getExtradataSize()))
+        {
+            NX_DEBUG(NX_SCOPE_TAG, "Failed to parse H265 extradata");
+            return false;
+        }
+        if (record.sps.empty())
+        {
+            NX_DEBUG(NX_SCOPE_TAG, "No SPS in extradata");
+            return false;
+        }
+        return parseNalUnit(record.sps[0].data(), record.sps[0].size(), sps);
+    }
+
+    nalUnits = nal::findNalUnitsAnnexB((const uint8_t*)data->data(), data->dataSize());
     for (const auto& nalu: nalUnits)
     {
         hevc::NalUnitHeader packetHeader;
@@ -48,7 +73,7 @@ QSize getFrameSize(const QnCompressedVideoData* frame)
         case AV_CODEC_ID_H265:
         {
             hevc::SequenceParameterSet sps;
-            if (extractSps(frame, sps))
+            if (extractSpsH265(frame, sps))
                 return QSize(sps.width, sps.height);
             return QSize();
         }
