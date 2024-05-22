@@ -48,7 +48,7 @@ private:
         const QJsonArray& list, nx::utils::MoveOnlyFunc<void(QJsonValue)> handler);
 
     void sendResponse(nx::vms::api::JsonRpcResponse jsonRpcResponse,
-        nx::utils::MoveOnlyFunc<void(QJsonValue)> handler);
+        const nx::utils::MoveOnlyFunc<void(QJsonValue)>& handler);
 
 private:
     RequestHandler m_handler;
