@@ -51,6 +51,7 @@
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
+#include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/resource/rest_api_helper.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
@@ -61,6 +62,8 @@
 #include <nx/vms/client/desktop/ui/messages/resources_messages.h>
 #include <nx/vms/client/desktop/ui/messages/videowall_messages.h>
 #include <nx/vms/client/desktop/ui/scene/widgets/scene_banners.h>
+#include <nx/vms/client/desktop/videowall/desktop_camera_connection_controller.h>
+#include <nx/vms/client/desktop/videowall/desktop_camera_stub_controller.h>
 #include <nx/vms/client/desktop/videowall/utils.h>
 #include <nx/vms/client/desktop/videowall/workbench_videowall_shortcut_helper.h>
 #include <nx/vms/client/desktop/window_context.h>
@@ -107,6 +110,7 @@ using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
 
 namespace {
+
 #define PARAM_KEY(KEY) const QLatin1String KEY##Key(BOOST_PP_STRINGIZE(KEY));
 PARAM_KEY(sequence)
 PARAM_KEY(pcUuid)
@@ -125,7 +129,6 @@ PARAM_KEY(items)
 
 static const QString kPositionUsecKey("position");
 static const QString kSilentKey("silent");
-
 
 QnVideoWallItemIndexList getIndices(
     const LayoutResourcePtr& layout,
@@ -1150,16 +1153,30 @@ bool QnWorkbenchVideoWallHandler::canStartControlMode(const nx::Uuid& layoutId) 
     return true;
 }
 
-void QnWorkbenchVideoWallHandler::showFailedToApplyChanges() const
-{
-    QnMessageBox::critical(mainWindowWidget(), tr("Failed to apply changes"));
-}
-
 void QnWorkbenchVideoWallHandler::showControlledByAnotherUserMessage() const
 {
     QnMessageBox::warning(mainWindowWidget(),
         tr("Screen is being controlled by another user"),
         tr("Control session cannot be started."));
+}
+
+void QnWorkbenchVideoWallHandler::showFailedToApplyChanges() const
+{
+    QnMessageBox::critical(mainWindowWidget(), tr("Failed to apply changes"));
+}
+
+QString QnWorkbenchVideoWallHandler::desktopCameraPhysicalId() const
+{
+    const auto user = context()->user();
+    if (!user)
+        return {};
+
+    return core::DesktopResource::calculateUniqueId(peerId(), user->getId());
+}
+
+nx::Uuid QnWorkbenchVideoWallHandler::desktopCameraLayoutId() const
+{
+    return nx::Uuid::fromArbitraryData(desktopCameraPhysicalId() + "layout");
 }
 
 void QnWorkbenchVideoWallHandler::setControlMode(bool active)
@@ -1962,7 +1979,7 @@ void QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered()
     if (!ResourceAccessManager::hasPermissions(targetIndex.videowall(), Qn::ReadWriteSavePermission))
         return;
 
-    /* Layout that is currently on the drop-target item. */
+    // Layout that is currently on the drop-target item.
     auto currentLayout = resourcePool()->getResourceById<LayoutResource>(targetIndex.item().layout);
 
     if (currentLayout && currentLayout->locked())
@@ -2108,25 +2125,61 @@ void QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered()
 
 void QnWorkbenchVideoWallHandler::at_pushMyScreenToVideowallAction_triggered()
 {
-    const auto user = context()->user();
-    if (!user)
-        return;
-
-    const auto desktopCameraId = core::DesktopResource::calculateUniqueId(peerId(), user->getId());
-
-    const auto desktopCamera = resourcePool()->getResourceByPhysicalId<QnVirtualCameraResource>(
-        desktopCameraId);
-    if (!desktopCamera || !desktopCamera->hasFlags(Qn::desktop_camera))
-        return;
-
     const auto parameters = menu()->currentParameters(sender());
     QnVideoWallItemIndexList videoWallItems = parameters.videoWallItems();
 
-    for (const auto& index: videoWallItems)
+    for (const QnVideoWallItemIndex& videoWallScreenIndex: videoWallItems)
     {
-        menu()->trigger(menu::DropOnVideoWallItemAction, menu::Parameters(desktopCamera)
-            .withArgument(Qn::VideoWallItemGuidRole, index.uuid()));
+        if (!videoWallScreenIndex.isValid())
+            continue;
+
+        if (!ResourceAccessManager::hasPermissions(
+            videoWallScreenIndex.videowall(), Qn::ReadWriteSavePermission))
+        {
+            continue;
+        }
+
+        // Layout that is currently on the drop-target item.
+        auto currentLayout = resourcePool()->getResourceById<LayoutResource>(
+            videoWallScreenIndex.item().layout);
+
+        if (currentLayout && currentLayout->locked())
+        {
+            SceneBanner::show(tr("Screen is locked and cannot be changed"));
+            continue;
+        }
+
+        auto desktopCamera =
+            resourcePool()->getResourceByPhysicalId<QnVirtualCameraResource>(
+                desktopCameraPhysicalId());
+
+        LayoutResourcePtr targetLayout;
+        if (desktopCamera
+            && desktopCamera->hasFlags(Qn::desktop_camera)
+            && !desktopCamera->hasFlags(Qn::fake))
+        {
+            targetLayout = constructLayout({desktopCamera});
+
+            NX_INFO(this, "Push my screen is handled. Already existing desktop camera is used.");
+        }
+        else
+        {
+            const auto localCameraStub =
+                systemContext()->desktopCameraStubController()->createLocalCameraStub(
+                    desktopCameraPhysicalId());
+
+            targetLayout = constructLayout({localCameraStub});
+
+            NX_INFO(this, "Push my screen is handled. New desktop camera is constructed.");
+        }
+
+        targetLayout->setParentId(videoWallScreenIndex.videowall()->getId());
+        targetLayout->setName(videoWallScreenIndex.item().name);
+        resourcePool()->addResource(targetLayout);
+        resetLayout(QnVideoWallItemIndexList() << videoWallScreenIndex, targetLayout);
     }
+
+    systemContext()->desktopCameraConnectionController()->initialize();
 }
 
 void QnWorkbenchVideoWallHandler::at_videowallSettingsAction_triggered()
@@ -2280,7 +2333,7 @@ void QnWorkbenchVideoWallHandler::at_radassAction_triggered()
     sendMessage(message);
 }
 
-void QnWorkbenchVideoWallHandler::at_resPool_resourceAdded(const QnResourcePtr &resource)
+void QnWorkbenchVideoWallHandler::at_resPool_resourceAdded(const QnResourcePtr& resource)
 {
     /* Exclude from pool all existing resources ids. */
     m_uuidPool->markAsUsed(resource->getId());

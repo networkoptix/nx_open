@@ -245,6 +245,8 @@ private:
 private:
     void showControlledByAnotherUserMessage() const;
     void showFailedToApplyChanges() const;
+    QString desktopCameraPhysicalId() const;
+    nx::Uuid desktopCameraLayoutId() const;
 
 private:
     typedef QHash<qint64, QnVideoWallControlMessage> StoredMessagesHash;

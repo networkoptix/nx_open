@@ -24,4 +24,10 @@ bool isCrossSystemResource(const nx::vms::common::ResourceDescriptor& descriptor
 /** Get System Id of the Cloud System this cross-system Resource belongs to. */
 QString crossSystemResourceSystemId(const nx::vms::common::ResourceDescriptor& descriptor);
 
+/** Desktop camera resource descriptor always contains specific path value. */
+bool isDesktopCameraResource(const nx::vms::common::ResourceDescriptor& descriptor);
+
+/** Desktop camera resource descriptor always contains physical id in its path. */
+QString getDesktopCameraPhysicalId(const nx::vms::common::ResourceDescriptor& descriptor);
+
 } // namespace nx::vms::client::desktop

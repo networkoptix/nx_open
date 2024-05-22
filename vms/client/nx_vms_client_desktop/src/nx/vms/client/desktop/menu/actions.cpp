@@ -255,8 +255,8 @@ void initialize(Manager* manager, Action* root)
         .flags(Tree | VideoWallReviewScene | SingleTarget | MultiTarget | VideoWallItemTarget)
         .text(ContextMenu::tr("Push my screen"))
         .requiredTargetPermissions(Qn::VideoWallResourceRole, Qn::ReadWriteSavePermission)
-        .condition(ConditionWrapper(new DesktopCameraCondition())
-            && !condition::selectedItemsContainLockedLayout());
+        .condition(!condition::selectedItemsContainLockedLayout()
+            && condition::screenRecordingSupported());
 
     factory(QueueAppRestartAction)
         .flags(NoTarget);
@@ -559,7 +559,7 @@ void initialize(Manager* manager, Action* root)
         .flags(Main)
         .separator();
 
-    if (nx::build_info::isWindows() && qnRuntime->isDesktopMode())
+    if (nx::build_info::isWindows())
     {
         factory(ToggleScreenRecordingAction)
             .flags(Main | GlobalHotkey)
@@ -568,10 +568,12 @@ void initialize(Manager* manager, Action* root)
             .toggledText(ContextMenu::tr("Stop Screen Recording"))
             .shortcut("Alt+R")
             .shortcut(Qt::Key_MediaRecord)
-            .shortcutContext(Qt::ApplicationShortcut);
+            .shortcutContext(Qt::ApplicationShortcut)
+            .condition(condition::screenRecordingSupported());
 
         factory()
             .flags(Main)
+            .mode(DesktopMode)
             .separator();
     }
 

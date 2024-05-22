@@ -481,12 +481,6 @@ public:
     virtual ActionVisibility check(const Parameters& parameters, WindowContext* context) override;
 };
 
-class DesktopCameraCondition: public Condition
-{
-public:
-    virtual ActionVisibility check(const Parameters& parameters, WindowContext* context) override;
-};
-
 class LightModeCondition: public Condition
 {
 public:
@@ -765,6 +759,8 @@ ConditionWrapper isWebPageOrIntegration();
  * Check if the Home tab is not active in multi-system mode.
  */
 ConditionWrapper homeTabIsNotActive(ActionVisibility defaultVisibility = InvisibleAction);
+
+ConditionWrapper screenRecordingSupported();
 
 } // namespace condition
 

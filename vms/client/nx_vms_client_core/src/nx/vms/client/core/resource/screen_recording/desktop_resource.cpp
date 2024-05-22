@@ -60,6 +60,8 @@ void DesktopResource::initializeConnection(
         systemContext()->peerId(),
         systemContext()->messageBusConnection()->credentials()));
     m_connection->start();
+
+    NX_DEBUG(this, "Desktop camera connection opened. User id: %1", userId);
 }
 
 void DesktopResource::disconnectFromServer()
@@ -68,6 +70,8 @@ void DesktopResource::disconnectFromServer()
         return;
 
     common::appContext()->longRunableCleanup()->cleanupAsync(std::move(m_connection));
+
+    NX_DEBUG(this, "Desktop camera connection closed");
 }
 
 AudioLayoutConstPtr DesktopResource::getAudioLayout(

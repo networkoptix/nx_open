@@ -1695,32 +1695,6 @@ ActionVisibility ResourceStatusCondition::check(const QnResourceList& resources,
     return found ? EnabledAction : InvisibleAction;
 }
 
-ActionVisibility DesktopCameraCondition::check(const Parameters& /*parameters*/,
-    WindowContext* context)
-{
-    const auto screenRecordingAction = context->menu()->action(menu::ToggleScreenRecordingAction);
-    if (screenRecordingAction)
-    {
-        const auto user = context->workbenchContext()->user();
-        if (!user)
-            return InvisibleAction;
-
-        const auto desktopCameraId = core::DesktopResource::calculateUniqueId(
-            context->workbenchContext()->peerId(), user->getId());
-
-        /* Do not check real pointer type to speed up check. */
-        const auto desktopCamera =
-            context->workbenchContext()->resourcePool()->getCameraByPhysicalId(desktopCameraId);
-        if (desktopCamera && desktopCamera->hasFlags(Qn::desktop_camera))
-            return EnabledAction;
-
-        return DisabledAction;
-    }
-
-    // Screen recording is not supported
-    return InvisibleAction;
-}
-
 ActionVisibility AutoStartAllowedCondition::check(const Parameters& /*parameters*/, WindowContext* /*context*/)
 {
     if (!nx::vms::utils::isAutoRunSupported())
@@ -2576,6 +2550,38 @@ ConditionWrapper homeTabIsNotActive(ActionVisibility defaultVisibility)
             return mainWindow->titleBarStateStore()->isHomeTabActive()
                 ? defaultVisibility
                 : EnabledAction;
+        });
+}
+
+ConditionWrapper screenRecordingSupported()
+{
+    return new CustomCondition(
+        [](const Parameters& /*params*/, WindowContext* context)
+        {
+            if (ini().enableDesktopCameraLazyInitialization)
+                return nx::build_info::isWindows() ? EnabledAction : InvisibleAction;
+
+            const auto screenRecordingAction = context->menu()->action(menu::ToggleScreenRecordingAction);
+            if (screenRecordingAction)
+            {
+                const auto user = context->workbenchContext()->user();
+                if (!user)
+                    return InvisibleAction;
+
+                const auto desktopCameraId = core::DesktopResource::calculateUniqueId(
+                    context->workbenchContext()->peerId(), user->getId());
+
+                /* Do not check real pointer type to speed up check. */
+                const auto desktopCamera =
+                    context->workbenchContext()->resourcePool()->getCameraByPhysicalId(desktopCameraId);
+                if (desktopCamera && desktopCamera->hasFlags(Qn::desktop_camera))
+                    return EnabledAction;
+
+                return DisabledAction;
+            }
+
+            // Screen recording is not supported
+            return InvisibleAction;
         });
 }
 

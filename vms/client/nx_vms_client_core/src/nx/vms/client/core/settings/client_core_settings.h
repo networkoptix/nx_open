@@ -17,11 +17,11 @@
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/core/network/cloud_auth_data.h>
 #include <nx/vms/client/core/network/server_certificate_validation_level.h>
-#include <nx/vms/client/core/settings/search_addresses_info.h>
-#include <nx/vms/client/core/settings/system_visibility_scope_info.h>
 #include <nx/vms/client/core/system_logon/connection_data.h>
 #include <nx/vms/client/core/watchers/known_server_connections.h>
 
+#include "search_addresses_info.h"
+#include "system_visibility_scope_info.h"
 #include "types/detected_object.h"
 
 namespace nx::vms::client::core {
@@ -56,7 +56,6 @@ public:
     // System credentials by local system id.
     SecureProperty<SystemAuthenticationData> systemAuthenticationData{
         this, "systemAuthenticationData"};
-
 
     SecureProperty<SerializableCredentials> cloudCredentials{
         this, "cloudCredentials"};
