@@ -39,6 +39,8 @@ AbstractButton
         implicitWidth: buttonText.x + buttonText.implicitWidth
         implicitHeight: Math.max(buttonIcon.height, buttonText.implicitHeight)
 
+        baselineOffset: buttonText.y + buttonText.baselineOffset
+
         ColoredImage
         {
             id: buttonIcon
