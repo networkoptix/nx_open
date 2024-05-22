@@ -19,7 +19,8 @@ Some field names have the same meaning through all the controls and can have som
 - `"type"` - Type of the setting. Must be one of the values enumerated here.
 - `"name"` - Unique id of the setting. Used when representing a Setting Value.
 - `"defaultValue"` - Default value of the control. Will be sent to the engine on applying changes.
-- `"visible"` - Visibility of the control (`true` by default).
+- `"visible"` - Visibility of the control (`true` by default). Note that the values of hidden
+    controls are present in the value set.
 - `"enabled"` - Enabled/disabled state of the control (`true` by default).
 
 Certain fields are supported by some of the controls.
