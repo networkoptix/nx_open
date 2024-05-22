@@ -338,11 +338,11 @@
         </item>
         <item row="8" column="0" colspan="3">
          <widget class="QWidget" name="resourceListHolder" native="true">
-          <property name="minimumSize">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
           </property>
           <layout class="QHBoxLayout" name="horizontalLayout_2">
            <property name="spacing">
