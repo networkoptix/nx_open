@@ -5,6 +5,7 @@
 #include <chrono>
 #include <utility>
 
+#include <nx/utils/uuid.h>
 #include <nx/vms/client/core/event_search/event_search_globals.h>
 #include <nx/vms/client/core/event_search/models/detail/predicate.h>
 #include <recording/time_period.h>
@@ -14,6 +15,55 @@
 namespace nx::vms::client::core {
 
 using namespace std::chrono;
+
+/**
+ * Merges old data (which can't be changed) and new one to one container. Removes intersected
+ * elements. Source container is always sorted in descending order.
+ */
+template<typename Facade,
+    typename NewDataContainer,
+    typename OldDataContainer>
+void mergeOldData(NewDataContainer& newData,
+    const OldDataContainer& oldData,
+    EventSearch::FetchDirection direction)
+{
+    using Predicate = event_search::detail::Predicate<Facade>;
+
+    if (oldData.empty())
+        return; // Nothing to merge.
+
+    const auto centralTimePoint = newData.empty()
+        ? typename Facade::TimeType(0)
+        : Facade::startTime(newData.front());
+
+    if (direction == EventSearch::FetchDirection::newer)
+        newData.insert(newData.begin(), oldData.rbegin(), oldData.rend());
+    else
+        newData.insert(newData.begin(), oldData.begin(), oldData.end());
+
+    if (newData.empty())
+        return;
+
+    const auto startIt = std::lower_bound(newData.begin(), newData.end(), centralTimePoint,
+        Predicate::lowerBound(direction));
+    const auto endIt = std::upper_bound(startIt, newData.end(), centralTimePoint,
+        Predicate::upperBound(direction));
+
+           // We don't expect a wide range to check here as it consists of items with one timestamp.
+    std::set<nx::Uuid> foundIds;
+    const auto removeStartIt = std::remove_if(startIt, endIt,
+        [&foundIds](const auto& item)
+        {
+            const auto id = Facade::id(item);
+            if (foundIds.find(id) != foundIds.end())
+                return true;
+
+            foundIds.insert(id);
+            return false;
+        });
+
+    newData.erase(removeStartIt, endIt);
+}
 
 /**
  * Helper function to get bounding time period for the fetched data.
