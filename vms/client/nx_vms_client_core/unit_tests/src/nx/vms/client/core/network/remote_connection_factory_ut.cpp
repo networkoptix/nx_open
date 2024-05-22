@@ -17,6 +17,7 @@
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_connection_factory.h>
 #include <nx/vms/client/core/network/server_certificate_validation_level.h>
+#include <nx/vms/client/core/test_support/unit_test_application.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
 #include <utils/common/synctime.h>
 
@@ -305,6 +306,9 @@ public:
     }
 
 public:
+    // RemoteConnectionFactory uses application secure settings for connection cache.
+    UnitTestApplication application;
+
     /** Storage for certificates which were actually used for connection. */
     std::unique_ptr<CertificateStorage> connectionCertificatesStorage;
 
