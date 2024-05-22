@@ -226,18 +226,16 @@ void QnNavigationItem::createZoomButton(
     auto button = new QnImageButtonWidget();
     button->setObjectName(QString("TimelineZoom%1Button").arg(zoomingName));
 
-    const auto fileName = QString("slider/buttons/zoom_%1.svg").arg(zoomingName.toLower());
+    const auto fileName = QString("32x32/Solid/zoom_%1.svg").arg(zoomingName.toLower());
 
-    const QColor background = "#1c2327";
-    const QColor foreground = "#698796";
-    const core::SvgIconColorer::IconSubstitutions substitutions = {
-        { QnIcon::Normal, {{background, "dark6"}, {foreground, "light16"}}},
-        { QnIcon::Active, {{background, "dark7"}, {foreground, "light16"}}},
-        { QnIcon::Pressed, {{background, "dark5"}, {foreground, "light16"}}},
-        { QnIcon::Disabled, {{background, "dark6"}, {foreground, "dark9"}}}
+    const core::SvgIconColorer::ThemeSubstitutions themeSubstitutions = {
+        {QnIcon::Normal, {.primary = "light16", .secondary = "dark6"}},
+        {QnIcon::Active, {.primary = "light16", .secondary = "dark7"}},
+        {QnIcon::Pressed, {.primary = "light16", .secondary = "dark5"}},
+        {QnIcon::Disabled, {.primary = "dark9", .secondary = "dark6"}}
     };
 
-    button->setIcon(qnSkin->icon(fileName, "", nullptr, substitutions));
+    button->setIcon(qnSkin->icon(fileName, themeSubstitutions));
     button->setPreferredSize(kZoomButtonSize);
     statisticsModule()->controls()->registerButton(
         statisticsName,

@@ -7,6 +7,8 @@
 #include <nx/vms/client/desktop/common/utils/custom_painted.h>
 #include <ui/workbench/workbench_context_aware.h>
 
+namespace nx::vms::client::core { class ColorizedIconDeclaration; }
+
 namespace nx::vms::client::desktop::workbench::timeline {
 
 class SpeedSlider;
@@ -32,7 +34,7 @@ private:
     void initButton(
         CustomPaintedButton* button,
         menu::IDType actionType,
-        const QString& iconPath,
+        const nx::vms::client::core::ColorizedIconDeclaration& iconDecl,
         const QString& checkedIconPath = "");
     void updatePlaybackButtonsIcons();
     void updatePlaybackButtonsEnabled();

@@ -57,14 +57,14 @@ Item
                 {
                     id: rewindBackwardButton
 
-                    icon.source: "image://skin/slider/navigation/rewind_backward_32.svg"
+                    icon.source: "image://skin/32x32/Solid/rewind_backward.svg"
                 }
 
                 NavigationButton
                 {
                     id: stepBackwardButton
 
-                    icon.source: "image://skin/slider/navigation/step_backward_32.svg"
+                    icon.source: "image://skin/32x32/Solid/step_backward.svg"
                     visible: !timeline.playing
                 }
 
@@ -72,7 +72,7 @@ Item
                 {
                     id: speedDownButton
 
-                    icon.source: "image://skin/slider/navigation/backward_32.svg"
+                    icon.source: "image://skin/32x32/Solid/backward.svg"
                     visible: timeline.playing
                 }
 
@@ -83,15 +83,15 @@ Item
                     checkable: true
 
                     icon.source: checked
-                        ? "image://skin/slider/navigation/pause_32.svg"
-                        : "image://skin/slider/navigation/play_32.svg"
+                        ? "image://skin/32x32/Solid/pause.svg"
+                        : "image://skin/32x32/Solid/play.svg"
                 }
 
                 NavigationButton
                 {
                     id: speedUpButton
 
-                    icon.source: "image://skin/slider/navigation/forward_32.svg"
+                    icon.source: "image://skin/32x32/Solid/forward.svg"
                     visible: timeline.playing
                 }
 
@@ -99,7 +99,7 @@ Item
                 {
                     id: stepForwardButton
 
-                    icon.source: "image://skin/slider/navigation/step_forward_32.svg"
+                    icon.source: "image://skin/32x32/Solid/step_forward.svg"
                     visible: !timeline.playing
                 }
 
@@ -107,7 +107,7 @@ Item
                 {
                     id: rewindForwardButton
 
-                    icon.source: "image://skin/slider/navigation/rewind_forward_32.svg"
+                    icon.source: "image://skin/32x32/Solid/rewind_forward.svg"
                 }
             }
 
