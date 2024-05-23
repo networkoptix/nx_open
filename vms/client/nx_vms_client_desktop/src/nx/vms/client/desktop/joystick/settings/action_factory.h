@@ -6,7 +6,6 @@
 #include <QtCore/QScopedPointer>
 
 #include <nx/utils/impl_ptr.h>
-#include <nx/vms/client/desktop/current_system_context_aware.h>
 #include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/menu/action_parameters.h>
 
@@ -17,9 +16,7 @@ namespace joystick {
 
 struct JoystickDescriptor;
 
-class ActionFactory:
-    public QObject,
-    public CurrentSystemContextAware
+class ActionFactory: public QObject
 {
     Q_OBJECT
 
