@@ -1007,7 +1007,7 @@ struct ModifyStorageAccess
 
         const auto existingResource = systemContext->resourcePool()->getResourceById(param.id);
         if (!hasSystemAccess(accessData)
-            && !validateResourceName(param, existingResource))
+            && !validateResourceNameOrEmpty(param, existingResource))
         {
 
             return invalidParameterError("name");
