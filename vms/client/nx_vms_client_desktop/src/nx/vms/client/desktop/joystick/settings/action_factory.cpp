@@ -10,6 +10,8 @@
 
 #include <api/helpers/layout_id_helper.h>
 #include <core/resource/layout_resource.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/system_context.h>
 
 #include "descriptors.h"
 
@@ -228,8 +230,12 @@ struct ActionFactory::Private
         {
             case OpenInNewTabAction:
             {
+                auto systemContext = appContext()->currentSystemContext();
+                if (!systemContext)
+                    return; //< Not connected to any system. It is a valid state.
+
                 const auto layoutPtr = nx::layout_id_helper::findLayoutByFlexibleId(
-                    q->resourcePool(),
+                    systemContext->resourcePool(),
                     action->param);
                 if (layoutPtr.isNull())
                     return;
