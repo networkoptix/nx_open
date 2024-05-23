@@ -112,8 +112,6 @@ void Device::processNewState(const State& newState)
         deviceStateChanged = true;
     }
 
-    NX_ASSERT(m_buttonStates.size() == newState.buttonStates.size());
-
     if (newState.buttonStates != m_buttonStates)
     {
         for (int i = 0; i < m_buttonStates.size() && i < newState.buttonStates.size(); ++i)
@@ -121,18 +119,19 @@ void Device::processNewState(const State& newState)
             if (m_buttonStates[i] == newState.buttonStates[i])
                 continue;
 
+            m_buttonStates[i] = newState.buttonStates[i];
+
             if (m_buttonStates[i])
-                emit buttonReleased(i);
-            else
                 emit buttonPressed(i);
+            else
+                emit buttonReleased(i);
         }
 
-        m_buttonStates = newState.buttonStates;
         deviceStateChanged = true;
     }
 
     if (deviceStateChanged)
-        emit stateChanged(newState.stickPosition, newState.buttonStates);
+        emit stateChanged(m_stickPosition, m_buttonStates);
 }
 
 void Device::pollData()
