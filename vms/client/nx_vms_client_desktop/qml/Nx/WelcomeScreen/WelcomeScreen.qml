@@ -476,6 +476,6 @@ Rectangle
         hoverEnabled: enabled
         acceptedButtons: Qt.LeftButton | Qt.RightButton
         onWheel: wheel.accepted = true
-        onClicked: mouse.accepted = true
+        onClicked: mouse => mouse.accepted = true
     }
 }
