@@ -1007,7 +1007,8 @@ QMenu* QnStorageConfigWidget::createStorageArchiveModeMenu(const QnStorageModelI
     const auto exclusiveAction = menu->addAction(tr("Exclusive"));
     exclusiveAction->setData(static_cast<int>(nx::vms::api::StorageArchiveMode::exclusive));
 
-    if (storageInfo.storageType != nx::reflect::toString(StorageType::local))
+    if (storageInfo.storageType != nx::reflect::toString(StorageType::local)
+        && storageInfo.storageType != nx::reflect::toString(StorageType::usb))
     {
         const auto sharedAction = menu->addAction(tr("Shared"));
         sharedAction->setData(static_cast<int>(nx::vms::api::StorageArchiveMode::shared));
