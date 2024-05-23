@@ -290,8 +290,7 @@ public:
         bool isDropdownColumn = index.column() == QnStorageListModel::StoragePoolColumn
             || index.column() == QnStorageListModel::StorageArchiveModeColumn;
 
-        bool isEditableDropdownItem = opt.state.testFlag(QStyle::State_Enabled)
-            && isDropdownColumn
+        bool isEditableDropdownItem = isDropdownColumn
             && index.flags().testFlag(Qt::ItemIsEditable);
 
         bool hovered = m_hoverTracker && m_hoverTracker->hoveredIndex() == index;
