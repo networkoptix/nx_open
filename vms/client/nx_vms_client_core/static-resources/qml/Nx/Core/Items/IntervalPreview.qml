@@ -40,6 +40,7 @@ Item
     readonly property real videoRotation: loader.item
         ? loader.item.content.defaultRotation
         : 0
+    readonly property MediaPlayer player: loader.item ? loader.item.content.mediaPlayer : null
     readonly property bool playing: loader.item ? loader.item.content.mediaPlayer.playing : false
     readonly property bool playingPlayerState: loader.item
         ? loader.item.content.mediaPlayer.playbackState == MediaPlayer.Playing
