@@ -58,8 +58,11 @@ void BaseCameraButtonController::Private::setupCamera()
 
     camera = newCamera;
 
-    const auto accessController = q->systemContext()->accessController();
-    accessNotifier = camera
+    AccessController* accessController = camera
+        ? q->systemContext()->accessController()
+        : nullptr;
+
+    accessNotifier = accessController
         ? accessController->createNotifier(camera)
         : AccessController::NotifierPtr{};
 
@@ -85,7 +88,7 @@ void BaseCameraButtonController::Private::setupCamera()
             q, updateHasRequiredPermissions);
     }
 
-    hasRequiredPermissions = camera
+    hasRequiredPermissions = accessController
         && ((accessController->permissions(camera) & requiredPermissions) == requiredPermissions);
 
     if (hasRequiredPermissions != hadRequiredPermissions)
