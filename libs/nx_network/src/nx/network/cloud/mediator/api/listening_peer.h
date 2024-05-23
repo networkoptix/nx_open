@@ -17,8 +17,10 @@ struct ListeningPeer
 {
     /**%apidoc Auto-detected endpoint of the peer. */
     std::string connectionEndpoint;
+
     /**%apidoc Endpoints reported by the peer. */
     std::vector<std::string> directTcpEndpoints;
+
     /**%apidoc Peer's uplink statistics as reported by the peer. */
     std::optional<nx::hpm::api::ConnectionSpeed> uplinkSpeed;
 };
@@ -27,7 +29,9 @@ struct ListeningPeer
 
 NX_REFLECTION_INSTRUMENT(ListeningPeer, ListeningPeer_Fields)
 
+/**%apidoc Dictionary of id to listening peer descriptor. */
 using ListeningPeersById = std::map<std::string /*peerId*/, ListeningPeer>;
+
 using ListeningPeersBySystem = std::map<std::string /*systemId*/, ListeningPeersById>;
 
 struct BoundClient

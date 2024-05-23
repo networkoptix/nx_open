@@ -46,14 +46,16 @@ void Server::registerRequestHandlers(
     const std::string& basePath,
     http::server::rest::MessageDispatcher* messageDispatcher)
 {
-    // NOTE: #akolesnikov The API docs assume that these functions are registered under
+    // NOTE: The API docs assume that these functions are registered under
     // /placeholder/maintenance/log prefix, which is usually true but not guaranteed.
 
     /**%apidoc GET /placeholder/maintenance/log/loggers
-     * Retrieves the list of the current Loggers.
-     * %caption Get Loggers
+     * Retrieves the list of the current loggers.
+     * This both loggers configured via configuration file or added via API. Loggers configured
+     * in the config cannot be modified via API.
+     * %caption Get loggers
      * %ingroup Maintenance
-     * %return List of the current Loggers.
+     * %return:{LoggerList} List of the current loggers.
      */
     messageDispatcher->registerRequestProcessorFunc(
         http::Method::get,
@@ -61,9 +63,10 @@ void Server::registerRequestHandlers(
         [this](auto&&... args) { serveGetLoggers(std::move(args)...); });
 
     /**%apidoc DELETE /placeholder/maintenance/log/loggers/{id}
-     * Deletes the specified Logger.
-     * %caption Delete Logger
-     * %param id Id of a Logger as reported by the .../loggers call.
+     * Deletes the logger identified by id. Only loggers added via API can be deleted. If logger
+     * was writing to a file, the file is not deleted.
+     * %caption Delete logger
+     * %param id Id of a logger as reported by the .../loggers call.
      * %ingroup Maintenance
      */
     messageDispatcher->registerRequestProcessorFunc(
@@ -72,22 +75,36 @@ void Server::registerRequestHandlers(
         [this](auto&&... args) { serveDeleteLogger(std::move(args)...); });
 
     /**%apidoc POST /placeholder/maintenance/log/loggers
-     * Adds a new Logger.
-     * %caption Add Logger
+     * Adds a new logger. On success, the logger will write to the file specified on the host
+     * filesystem.<br/>
+     * Note that logging can slow down the applcation significantly, especially, debug/verbose
+     * logging. So, consider logging carefully and delete loggers when they are not needed anymore.<br/>
+     * For short-term logging, consider using the log stream API.
+     * %caption Add logger
      * %ingroup Maintenance
+     * %struct Logger
+     * %return:{Logger} Created logger with id.
      */
     messageDispatcher->registerRequestProcessorFunc(
         http::Method::post,
         url::joinPath(basePath, kLoggers),
         [this](auto&&... args) { servePostLogger(std::move(args)...); });
 
-    /**%apidoc POST /placeholder/maintenance/log/stream
-     * Starts sending log messages that satisfy the given filter. The log stream is closed when the
-     * TCP connection is closed by the Client. The request requires that a filter is specified.
+    /**%apidoc GET /placeholder/maintenance/log/stream
+     * Starts streaming log messages that satisfy the given filter. The log stream is closed when
+     * the TCP connection is closed by the client. The request requires a filter to be specified.<br/>
+     * <br/>
+     * The parameters of the log stream are specified in the request URL query section. E.g.,
+     * <pre><code>
+     * .../log/stream?level=verbose[nx::cloud::relay],trace[nx::sql]"
+     * </code></pre>
+     * will print verbose messages from classes from the `nx::cloud::relay` namespace and trace
+     * messages from classes in the `nx::sql` namespace.
+     * <br/>
      * %caption Get log stream
      * %ingroup Maintenance
-     * %param level Example: "level[message_prefix]". E.g., "level=verbose[nx::cloud::relay]"
-     * %return Stream with the log messages in the text/plain format.
+     * %param level:string Query E.g., "verbose[nx::cloud::relay],trace[nx::sql]"
+     * %return Stream containing matched log messages in the text/plain format.
      */
     messageDispatcher->registerRequestProcessorFunc(
         http::Method::get,
@@ -230,13 +247,13 @@ void Server::serveGetStreamingLogger(
     completionHandler(std::move(result));
 }
 
-Loggers Server::mergeLoggers() const
+LoggerList Server::mergeLoggers() const
 {
-    Loggers allLoggersInfo;
+    LoggerList allLoggersInfo;
 
     if (auto mainLogger = m_loggerCollection->main())
     {
-        allLoggersInfo.loggers =
+        allLoggersInfo =
             splitAggregateLogger(
                 LoggerCollection::kInvalidId,
                 mainLogger.get(),
@@ -244,15 +261,15 @@ Loggers Server::mergeLoggers() const
     }
 
     auto allLoggers = removeDuplicates(m_loggerCollection->allLoggers());
-    for (const auto& context : allLoggers)
+    for (const auto& context: allLoggers)
     {
         auto aggregateLoggerInfo = splitAggregateLogger(
             context.id,
             context.logger.get(),
             m_loggerCollection->getEffectiveFilters(context.id));
 
-        allLoggersInfo.loggers.insert(
-            allLoggersInfo.loggers.end(),
+        allLoggersInfo.insert(
+            allLoggersInfo.end(),
             aggregateLoggerInfo.begin(),
             aggregateLoggerInfo.end());
     }

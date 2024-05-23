@@ -17,18 +17,18 @@ Client::~Client()
 }
 
 void Client::getConfiguration(
-    nx::utils::MoveOnlyFunc<void(ResultCode, Loggers)> completionHandler)
+    nx::utils::MoveOnlyFunc<void(ResultCode, LoggerList)> completionHandler)
 {
-    base_type::template makeAsyncCall<Loggers>(
+    base_type::template makeAsyncCall<LoggerList>(
         http::Method::get,
         kLoggers,
         {}, // query
         std::move(completionHandler));
 }
 
-std::tuple<Client::ResultCode, Loggers> Client::getConfiguration()
+std::tuple<Client::ResultCode, LoggerList> Client::getConfiguration()
 {
-    return base_type::template makeSyncCall<Loggers>(
+    return base_type::template makeSyncCall<LoggerList>(
         http::Method::get, kLoggers, nx::utils::UrlQuery());
 }
 

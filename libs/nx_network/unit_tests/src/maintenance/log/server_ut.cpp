@@ -184,7 +184,7 @@ protected:
         ASSERT_TRUE(messageBody);
 
         const auto [loggersReturnedByServer, result] =
-            nx::reflect::json::deserialize<Loggers>(*messageBody);
+            nx::reflect::json::deserialize<LoggerList>(*messageBody);
         ASSERT_TRUE(result.success);
 
         // NOTE: size can't be compared because the logging server may have its main logger set.
@@ -195,10 +195,10 @@ protected:
             [this, loggersReturnedByServer = loggersReturnedByServer](const Logger& logger) -> bool
             {
                 auto it = std::find_if(
-                    loggersReturnedByServer.loggers.begin(),
-                    loggersReturnedByServer.loggers.end(),
+                    loggersReturnedByServer.begin(),
+                    loggersReturnedByServer.end(),
                     [this, &logger](const Logger& a) { return loggersAreEqual(a, logger); });
-                return it != loggersReturnedByServer.loggers.end();
+                return it != loggersReturnedByServer.end();
             };
 
         for (std::size_t i = 0; i < m_loggersSavedFromPost.size(); ++i)

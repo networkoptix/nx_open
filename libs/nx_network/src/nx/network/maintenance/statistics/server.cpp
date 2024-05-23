@@ -22,6 +22,15 @@ void Server::registerRequestHandlers(
     const std::string& basePath,
     http::server::rest::MessageDispatcher* messageDispatcher)
 {
+    /**%apidoc GET /placeholder/maintenance/statistics/general
+     * Meant to provide some generic statistics metrics. E.g., service uptime.
+     * %deprecated This call was deprecated since services usually provide statistics
+     * themselves with `.../statistics/metrics/` API call.
+     *
+     * %caption Get some common statistics
+     * %ingroup Maintenance
+     * %return Various statistics metrics.
+     */
     messageDispatcher->registerRequestProcessorFunc(
         http::Method::get,
         url::joinPath(basePath, kGeneral),

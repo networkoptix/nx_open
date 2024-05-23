@@ -37,27 +37,42 @@ constexpr static const std::chrono::milliseconds
 /**
  * NOTE: All fields are optional for backward compatibility.
  */
-class NX_NETWORK_API ConnectionParameters:
-    public StunMessageAttributesData
+struct NX_NETWORK_API ConnectionParameters:
+    StunMessageAttributesData
 {
-public:
-    std::chrono::milliseconds rendezvousConnectTimeout;
-    std::chrono::milliseconds udpTunnelKeepAliveInterval;
-    /**
-     * UDP tunnel should be considered inactive if no keep-alive messages have been
-     *   received during rendezvousConnectTimeout*udpTunnelKeepAliveRetries period.
+    /**%apidoc Timeout for establishing a connect between peers using UDP hole punching. */
+    std::chrono::milliseconds rendezvousConnectTimeout = kRendezvousConnectTimeoutDefault;
+
+    std::chrono::milliseconds udpTunnelKeepAliveInterval = kUdpTunnelKeepAliveIntervalDefault;
+
+    /**%apidoc UDP tunnel should be considered inactive if no keep-alive messages have been
+     * received during rendezvousConnectTimeout*udpTunnelKeepAliveRetries period.
      */
-    int udpTunnelKeepAliveRetries;
-    std::chrono::seconds tunnelInactivityTimeout;
+    int udpTunnelKeepAliveRetries = kUdpTunnelKeepAliveRetriesDefault;
+
+    /**%apidoc A period specifying for how long a logical link between client and server should
+     * be preserved (by preserving UDP hole punching ports or server's relays).
+     */
+    std::chrono::seconds tunnelInactivityTimeout = kDefaultTunnelInactivityTimeout;
 
     nx::network::RetryPolicy tcpReverseRetryPolicy;
     nx::network::http::AsyncHttpClient::Timeouts tcpReverseHttpTimeouts;
 
-    std::chrono::milliseconds udpHolePunchingStartDelay;
-    std::chrono::milliseconds trafficRelayingStartDelay;
-    std::chrono::milliseconds directTcpConnectStartDelay;
+    /**%apidoc Delay the client should respect before doing UDP hole punching after receiving
+     * this response.
+     */
+    std::chrono::milliseconds udpHolePunchingStartDelay = kUdpHolePunchingStartDelayDefault;
 
-    ConnectionParameters();
+    /**%apidoc Delay the client should respect before doing connect via Cloud relay after receiving
+     * this response.
+     */
+    std::chrono::milliseconds trafficRelayingStartDelay = kTrafficRelayingStartDelayDefault;
+
+    /**%apidoc Delay the client should respect before connecting to the peer's public TCP
+     * endpoint(s) (if any).
+     */
+    std::chrono::milliseconds directTcpConnectStartDelay = kDirectTcpConnectStartDelayDefault;
+
     bool operator==(const ConnectionParameters& rhs) const;
 
     virtual void serializeAttributes(nx::network::stun::Message* const message) override;

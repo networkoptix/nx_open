@@ -6,17 +6,6 @@ namespace nx::hpm::api {
 
 using namespace nx::network;
 
-ConnectionParameters::ConnectionParameters():
-    rendezvousConnectTimeout(kRendezvousConnectTimeoutDefault),
-    udpTunnelKeepAliveInterval(kUdpTunnelKeepAliveIntervalDefault),
-    udpTunnelKeepAliveRetries(kUdpTunnelKeepAliveRetriesDefault),
-    tunnelInactivityTimeout(kDefaultTunnelInactivityTimeout),
-    udpHolePunchingStartDelay(kUdpHolePunchingStartDelayDefault),
-    trafficRelayingStartDelay(kTrafficRelayingStartDelayDefault),
-    directTcpConnectStartDelay(kDirectTcpConnectStartDelayDefault)
-{
-}
-
 bool ConnectionParameters::operator==(const ConnectionParameters& rhs) const
 {
     return rendezvousConnectTimeout == rhs.rendezvousConnectTimeout
