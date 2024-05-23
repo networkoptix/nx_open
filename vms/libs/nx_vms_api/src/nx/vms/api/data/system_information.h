@@ -40,19 +40,15 @@ struct NX_VMS_API SystemInformation
     /**%apidoc Presented if the System is bound to the Cloud and belongs to the Organization. */
     std::optional<nx::Uuid> organizationId;
 
-    /**%apidoc For local System only. */
     std::optional<std::vector<nx::Uuid>> servers;
 
-    /**%apidoc Amount of edge Servers in the System. */
+    /**%apidoc[opt] Amount of edge Servers in the System. */
     int edgeServerCount = 0;
 
-    /**%apidoc For local System only. */
     std::optional<std::vector<nx::Uuid>> devices;
 
-    /**%apidoc For remote Systems only. */
     std::optional<QString> endpoint; //< TODO: SocketAddress?
 
-    /**%apidoc For remote Systems only. */
     std::optional<SystemCompatibilityStatus> status;
 
     /**%apidoc[proprietary] Internal identification of LDAP connection. */
