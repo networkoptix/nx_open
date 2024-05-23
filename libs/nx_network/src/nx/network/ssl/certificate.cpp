@@ -12,13 +12,11 @@
 #include <QtCore/QDir>
 #include <QtNetwork/QSslCertificate>
 #include <QtNetwork/QSslConfiguration>
-#include <QtNetwork/QSslError>
 #include <QtNetwork/QSslKey>
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
 #include <nx/utils/std_string_utils.h>
-#include <nx/utils/string.h>
 #include <nx/utils/type_utils.h>
 
 #include "context.h"
@@ -87,6 +85,33 @@ std::string lastError()
         result += message;
     }
     return result;
+}
+
+void setErrorAndLog(std::string* errorMessage, std::string_view message)
+{
+    if (errorMessage)
+        *errorMessage = message;
+    NX_ERROR(typeid(nx::network::ssl::Certificate), message);
+}
+
+bool validateKey(EVP_PKEY* pkey, std::string* errorMessage)
+{
+    // Fail on invalid key ciphers.
+    auto keyType = EVP_PKEY_id(pkey);
+    if (keyType == EVP_PKEY_EC)
+    {
+        setErrorAndLog(errorMessage, "Invalid key cipher (ECDSA). Failing load.");
+        return false;
+    }
+
+    // Fail on invalid RSA lengths.
+    if (keyType == EVP_PKEY_RSA && RSA_bits(EVP_PKEY_get0_RSA(pkey)) == 16384)
+    {
+        setErrorAndLog(errorMessage, "Invalid RSA key length (16384). Failing load.");
+        return false;
+    }
+
+    return true;
 }
 
 } // namespace
@@ -769,21 +794,27 @@ const X509Certificate& Pem::certificate() const
 bool Pem::loadPrivateKey(const std::string& pem, std::string* errorMessage)
 {
     auto bio = utils::wrapUnique(
-        BIO_new_mem_buf(const_cast<void*>((const void*)pem.data()), pem.size()),
+        BIO_new_mem_buf(pem.data(), (int) pem.size()),
         &BIO_free);
-
-    m_pkey.reset(PEM_read_bio_PrivateKey(bio.get(), 0, 0, 0));
-    if (!m_pkey)
+    if (!bio)
     {
-        if (errorMessage)
-        {
-            nx::utils::buildString(
-                errorMessage, lastError(), " on reading private key from pem ", pem);
-        }
-        NX_DEBUG(this, "%1 on reading private key from pem %2", lastError(), pem);
+        setErrorAndLog(errorMessage, "Failed to create BIO for the private key.");
         return false;
     }
 
+    auto pkey = utils::wrapUnique(
+        PEM_read_bio_PrivateKey(bio.get(), nullptr, nullptr, nullptr),
+        &EVP_PKEY_free);
+    if (!pkey)
+    {
+        setErrorAndLog(errorMessage, "Failed to read private key from PEM.");
+        return false;
+    }
+
+    if (!validateKey(pkey.get(), errorMessage))
+        return false;
+
+    m_pkey = std::move(pkey);
     NX_VERBOSE(this, "PKEY is loaded (SSL init is complete)");
     return true;
 }

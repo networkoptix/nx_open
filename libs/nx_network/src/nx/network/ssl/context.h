@@ -72,13 +72,6 @@ public:
     bool configureVirtualHost(const std::string& hostnameRegex, const std::string& certDataPem);
 
     /**
-     * The result is equal to calls of configureVirtualHost for each host name regex taken from
-     * the DNS string of the certificate Subject Alternative Names and the certificate Subject
-     * Common Name.
-     */
-    bool configureVirtualHosts(const std::string& certDataPem);
-
-    /**
      * Removes virtual host previously configured, that matches hostnameRegex.
      * @return False if there is no virtual host to remove, true otherwise.
      */
