@@ -9,11 +9,9 @@
 
 #include <openssl/ssl.h>
 
-#include <nx/network/nx_network_ini.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/algorithm.h>
-#include <nx/utils/std/cpp14.h>
 #include <nx/utils/string.h>
 #include <nx/utils/type_utils.h>
 
@@ -98,7 +96,7 @@ bool Context::setDefaultCertificate(Pem pem, std::string* errorMessage)
         m_defaultServerContext = std::move(newDefaultContext);
     }
 
-    NX_INFO(this, "Default certificate set to %1", pem);
+    NX_INFO(this, "Default certificate set to %1", m_defaultServerPem);
 
     return true;
 }
@@ -134,43 +132,6 @@ bool Context::configureVirtualHost(
     return true;
 }
 
-bool Context::configureVirtualHosts(const std::string& certDataPem)
-{
-    auto sslContext = createServerContext();
-
-    X509Certificate x509;
-    if (!x509.parsePem(certDataPem, SSL_CTX_get_max_cert_list(sslContext.get())))
-    {
-        NX_DEBUG(this, "Unable to parse primary X.509 certificate:\n%1", certDataPem);
-        return false;
-    }
-
-    const auto hosts = x509.hosts();
-    if (hosts.empty())
-    {
-        NX_WARNING(this,
-            "Subject alternative names and subject common name of the certificate don't have any "
-            "host name");
-        NX_DEBUG(this, "Certificate:\n%1", certDataPem);
-        return false;
-    }
-
-    if (!x509.bindToContext(sslContext.get()))
-        return false;
-
-    if (!pKeyLoad(sslContext.get(), certDataPem))
-        return false;
-
-    NX_INFO(this, "Certificate %1 is loaded for host names %2", x509.toString(), hosts);
-
-    NX_MUTEX_LOCKER locker(&m_mutex);
-
-    for (const auto& host: hosts)
-        m_virtualHosts[host] = VirtualHostContext{std::regex(host), sslContext};
-
-    return true;
-}
-
 bool Context::removeVirtualHost(const std::string& hostnameRegex)
 {
     NX_MUTEX_LOCKER locker(&m_mutex);
@@ -185,13 +146,13 @@ Context* Context::instance()
     return Context_instance();
 }
 
-static constexpr int kDisableAllSslVerions =
+static constexpr int kDisableAllSslVersions =
     SSL_OP_NO_SSLv2 | SSL_OP_NO_SSLv3 |
     SSL_OP_NO_TLSv1 | SSL_OP_NO_TLSv1_1 | SSL_OP_NO_TLSv1_2 | SSL_OP_NO_TLSv1_3;
 
 bool Context::setAllowedServerVersions(const std::string& versionsStr)
 {
-    int disabledVersions = kDisableAllSslVerions;
+    int disabledVersions = kDisableAllSslVersions;
     std::vector<std::string> versions;
     nx::utils::split(
         versionsStr, '|',
@@ -233,7 +194,7 @@ bool Context::setAllowedServerVersions(const std::string& versionsStr)
         }
     }
 
-    if (disabledVersions == kDisableAllSslVerions)
+    if (disabledVersions == kDisableAllSslVersions)
     {
         NX_ASSERT(false, "Attempt to disable all SSL versions");
         return false;
