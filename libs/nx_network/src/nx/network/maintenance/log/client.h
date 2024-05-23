@@ -20,9 +20,9 @@ public:
     ~Client();
 
     void getConfiguration(
-        nx::utils::MoveOnlyFunc<void(ResultCode, Loggers)> completionHandler);
+        nx::utils::MoveOnlyFunc<void(ResultCode, LoggerList)> completionHandler);
 
-    std::tuple<ResultCode, Loggers> getConfiguration();
+    std::tuple<ResultCode, LoggerList> getConfiguration();
 };
 
 } // namespace nx::network::maintenance::log

@@ -150,6 +150,8 @@ struct Relay
 {
     nx::utils::Url url;
     int listeningPeerCount = 0;
+
+    /**%apidoc Last recorded timestamp of the server start. */
     std::chrono::system_clock::time_point timestamp;
 
     bool operator==(const Relay& rhs) const

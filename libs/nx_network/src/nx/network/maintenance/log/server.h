@@ -47,8 +47,9 @@ private:
         http::RequestContext requestContext,
         http::RequestProcessedHandler completionHandler);
 
-    Loggers mergeLoggers() const;
-    std::vector<Logger>splitAggregateLogger(
+    LoggerList mergeLoggers() const;
+
+    std::vector<Logger> splitAggregateLogger(
         int id,
         nx::log::AbstractLogger* logger,
         const std::set<nx::log::Filter>& effectiveFilters) const;
