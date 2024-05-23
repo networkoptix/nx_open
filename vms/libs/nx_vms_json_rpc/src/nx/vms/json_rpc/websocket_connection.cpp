@@ -64,12 +64,8 @@ WebSocketConnection::WebSocketConnection(
     m_socket(std::move(socket))
 {
     base_type::bindToAioThread(m_socket->getAioThread());
-    m_socket->executeInAioThreadSync(
-        [this]()
-        {
-            if (auto socket = m_socket->socket())
-                m_address = socket->getForeignAddress();
-        });
+    if (auto socket = m_socket->socket())
+        m_address = socket->getForeignAddress();
     if (requestHandler)
     {
         m_incomingProcessor = std::make_unique<IncomingProcessor>(
