@@ -105,7 +105,7 @@ bool HostAddress::operator==(const HostAddress& rhs) const
 {
     return isIpAddress() == rhs.isIpAddress()
         && toString() == rhs.toString()
-        && m_scopeId == rhs.m_scopeId;
+        && m_scopeId.value_or(0) == rhs.m_scopeId.value_or(0);
 }
 
 bool HostAddress::operator!=(const HostAddress& rhs) const
