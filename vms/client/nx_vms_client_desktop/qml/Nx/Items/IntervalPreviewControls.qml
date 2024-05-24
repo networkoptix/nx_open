@@ -224,6 +224,7 @@ Item
                 const filename = muted ? "unmute.svg" : "mute.svg"
                 return `image://skin/24x20/Solid/${filename}`
             }
+            icon.color: "light4"
 
             tooltipText: qsTr("Toggle Mute")
 
@@ -264,6 +265,7 @@ Item
                 enabled: controls.prevEnabled && buttons.enabled
 
                 icon.source: "image://skin/20x20/Solid/previous.svg"
+                icon.color: "light4"
                 tooltipText: qsTr("Previous Object")
 
                 onClicked:
@@ -277,6 +279,7 @@ Item
                 enabled: buttons.enabled && preview.isReady
 
                 icon.source: `image://skin/20x20/Solid/${preview.playing ? "pause" : "play"}.svg`
+                icon.color: "light4"
                 tooltipText: preview.playing ? qsTr("Pause") : qsTr("Play")
 
                 onClicked:
@@ -300,6 +303,7 @@ Item
                 enabled: controls.nextEnabled && buttons.enabled
 
                 icon.source: "image://skin/20x20/Solid/next.svg"
+                icon.color: "light4"
                 tooltipText: qsTr("Next Object")
 
                 onClicked:
@@ -314,6 +318,7 @@ Item
             enabled: buttons.enabled && preview.isReady
             anchors.right: parent.right
             icon.source: "image://skin/24x20/Solid/repeat.svg"
+            icon.color: "light4"
             icon.width: 24
 
             tooltipText: qsTr("Toggle Repeat")
