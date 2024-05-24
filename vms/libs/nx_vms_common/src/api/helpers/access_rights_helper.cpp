@@ -11,7 +11,7 @@ QString AccessRightHelper::name(api::AccessRight accessRight)
         case api::AccessRight::view:
             return tr("View Live");
         case api::AccessRight::audio:
-            return tr("Play Sound");
+            return tr("Play Audio");
         case api::AccessRight::viewArchive:
             return tr("View Archive");
         case api::AccessRight::exportArchive:
