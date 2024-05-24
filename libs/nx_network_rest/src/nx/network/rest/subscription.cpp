@@ -16,7 +16,7 @@ nx::utils::Guard SubscriptionHandler::addSubscription(
     NX_MUTEX_LOCKER lock(&m_mutex);
     if (m_subscribedIds.empty())
         m_guard = m_addMonitor();
-    m_subscribedIds[id].emplace(subscription.get());
+    m_subscribedIds[id].emplace(subscription);
     m_subscriptions.emplace(std::move(subscription), id);
     return guard;
 }
@@ -26,12 +26,18 @@ void SubscriptionHandler::notify(const QString& id, NotifyType notifyType, QJson
     NX_MUTEX_LOCKER lock(&m_mutex);
     if (auto it = m_subscribedIds.find(id); it != m_subscribedIds.end())
     {
+        auto callbackCopy = it->second;
+        lock.unlock();
         for (auto callback: it->second)
             (*callback)(id, notifyType, payload);
+        lock.relock();
     }
+
     if (auto it = m_subscribedIds.find(QString("*")); it != m_subscribedIds.end())
     {
-        for (auto callback: it->second)
+        auto callbackCopy = it->second;
+        lock.unlock();
+        for (auto callback: callbackCopy)
             (*callback)(id, notifyType, payload);
     }
 }
@@ -47,7 +53,7 @@ void SubscriptionHandler::removeSubscription(
         {
             if (auto it = m_subscribedIds.find(s->second); it != m_subscribedIds.end())
             {
-                it->second.erase(subscription.get());
+                it->second.erase(subscription);
                 if (it->second.empty())
                     m_subscribedIds.erase(it);
             }

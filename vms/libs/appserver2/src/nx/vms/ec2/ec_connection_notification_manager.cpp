@@ -60,7 +60,7 @@ nx::utils::Guard ECConnectionNotificationManager::addMonitor(
                 {
                     if (auto it = m_monitoredCommands.find(c); it != m_monitoredCommands.end())
                     {
-                        it->second.erase(monitor.get());
+                        it->second.erase(monitor);
                         if (it->second.empty())
                             m_monitoredCommands.erase(c);
                     }
@@ -70,7 +70,7 @@ nx::utils::Guard ECConnectionNotificationManager::addMonitor(
         }};
     NX_MUTEX_LOCKER lock(&m_mutex);
     for (auto c: commands)
-        m_monitoredCommands[c].insert(monitor.get());
+        m_monitoredCommands[c].insert(monitor);
     m_monitors.emplace(std::move(monitor), std::move(commands));
     return guard;
 }
@@ -81,7 +81,9 @@ void ECConnectionNotificationManager::callbackMonitors(const QnAbstractTransacti
     if (auto monitors = m_monitoredCommands.find(transaction.command);
         monitors != m_monitoredCommands.end())
     {
-        for (const auto& callback: monitors->second)
+        auto callbackCopy = monitors->second;
+        lock.unlock();
+        for (const auto& callback: callbackCopy)
             (*callback)(transaction);
     }
 }
