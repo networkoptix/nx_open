@@ -44,10 +44,11 @@ NX_VMS_COMMON_API QTimer* executeDelayedParented(
  */
 NX_VMS_COMMON_API QTimer* executeDelayedParented(Callback callback, QObject* parent);
 
-NX_VMS_COMMON_API void executeLater(Callback callback, QObject* parent = nullptr);
+NX_VMS_COMMON_API void executeLater(Callback callback, QObject* parent);
 
 NX_VMS_COMMON_API void executeLaterInThread(Callback callback, QThread* thread);
 
+/** Execute the callback immediately if the thread equals current. */
 NX_VMS_COMMON_API void executeInThread(QThread* thread, Callback callback);
 
 /** Executes specified function in the callee thread. */
