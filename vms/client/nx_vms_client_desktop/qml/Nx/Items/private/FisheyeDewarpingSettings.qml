@@ -6,6 +6,7 @@ import QtQuick.Layouts 1.11
 import Nx.Core 1.0
 import Nx.Items 1.0
 import Nx.Controls 1.0
+import Nx.Core.Controls
 
 import nx.vms.api 1.0
 import nx.vms.client.core 1.0
@@ -373,11 +374,12 @@ Item
                 Layout.alignment: Qt.AlignTop
 
                 Label { text: qsTr("Size"); Layout.alignment: Qt.AlignRight }
-                Image
+                ColoredImage
                 {
-                    source: "image://skin/fisheye/circle_small_24.svg"
+                    sourcePath: "image://skin/24x24/Outline/circle_small.svg"
                     sourceSize.width: 24
                     sourceSize.height: 24
+                    primaryColor: "light12"
                 }
 
                 Slider
@@ -406,19 +408,21 @@ Item
                     }
                 }
 
-                Image
+                ColoredImage
                 {
-                    source: "image://skin/fisheye/circle_big_24.svg"
+                    sourcePath: "image://skin/24x24/Outline/circle_big.svg"
                     sourceSize.width: 24
                     sourceSize.height: 24
+                    primaryColor: "light12"
                 }
 
                 Label { text: qsTr("X Offset"); Layout.alignment: Qt.AlignRight }
-                Image
+                ColoredImage
                 {
-                    source: "image://skin/fisheye/arrow_left_24.svg"
+                    sourcePath: "image://skin/24x24/Outline/arrow_left.svg"
                     sourceSize.width: 24
                     sourceSize.height: 24
+                    primaryColor: "light12"
                 }
 
                 Slider
@@ -447,19 +451,21 @@ Item
                     }
                 }
 
-                Image
+                ColoredImage
                 {
-                    source: "image://skin/fisheye/arrow_right_24.svg"
+                    sourcePath: "image://skin/24x24/Outline/arrow_right.svg"
                     sourceSize.width: 24
                     sourceSize.height: 24
+                    primaryColor: "light12"
                 }
 
                 Label { text: qsTr("Y Offset"); Layout.alignment: Qt.AlignRight }
-                Image
+                ColoredImage
                 {
-                    source: "image://skin/fisheye/arrow_down_24.svg"
+                    sourcePath: "image://skin/24x24/Outline/arrow_down.svg"
                     sourceSize.width: 24
                     sourceSize.height: 24
+                    primaryColor: "light12"
                 }
 
                 Slider
@@ -488,19 +494,21 @@ Item
                     }
                 }
 
-                Image
+                ColoredImage
                 {
-                    source: "image://skin/fisheye/arrow_up_24.svg"
+                    sourcePath: "image://skin/24x24/Outline/arrow_up.svg"
                     sourceSize.width: 24
                     sourceSize.height: 24
+                    primaryColor: "light12"
                 }
 
                 Label { text: qsTr("Ellipticity"); Layout.alignment: Qt.AlignRight }
-                Image
+                ColoredImage
                 {
-                    source: "image://skin/fisheye/ellipse_vertical_24.svg"
+                    sourcePath: "image://skin/24x24/Outline/ellipse_vertical.svg"
                     sourceSize.width: 24
                     sourceSize.height: 24
+                    primaryColor: "light12"
                 }
 
                 Slider
@@ -535,11 +543,12 @@ Item
                     }
                 }
 
-                Image
+                ColoredImage
                 {
-                    source: "image://skin/fisheye/ellipse_horizontal_24.svg"
+                    sourcePath: "image://skin/24x24/Outline/ellipse_horizontal.svg"
                     sourceSize.width: 24
                     sourceSize.height: 24
+                    primaryColor: "light12"
                 }
             }
         }
