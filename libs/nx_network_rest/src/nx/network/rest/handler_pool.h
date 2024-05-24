@@ -83,6 +83,9 @@ public:
 
     void executePostprocessFunction(const QString& path, const nx::network::http::Method& method);
 
+    void auditFailedRequest(
+        Handler* handler, const Request& request, const Response& response) const;
+
     auto createRegisterHandlerFunctor()
     {
         return

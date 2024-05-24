@@ -324,12 +324,22 @@ QJsonArray parameterNames(const QJsonValue& value)
 
 Request::operator audit::Record() const
 {
-    auto value = parseContent<QJsonValue>().value_or(QJsonValue{});
-    return audit::Record{userSession,
-        QJsonObject{
-            {"method", QString::fromStdString(method().toString())},
-            {"path", decodedPath()},
-            {"parameters", ini().auditOnlyParameterNames ? parameterNames(value) : value}}};
+    QJsonObject apiInfo{{"method", QString::fromStdString(method().toString())}, {"path", decodedPath()}};
+    auto parsedContent = parseContent<QJsonValue>();
+    if (!parsedContent)
+        return {userSession, apiInfo};
+
+    if (ini().auditOnlyParameterNames)
+    {
+        auto parameters = parameterNames(*parsedContent);
+        if (!parameters.isEmpty())
+            apiInfo["parameters"] = parameters;
+    }
+    else
+    {
+        apiInfo["parameters"] = *parsedContent;
+    }
+    return {userSession, apiInfo};
 }
 
 Request::SystemAccessGuard::SystemAccessGuard(UserAccessData* userAccessData):

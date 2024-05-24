@@ -163,6 +163,25 @@ void HandlerPool::executePostprocessFunction(
         it->second();
 }
 
+void HandlerPool::auditFailedRequest(
+    Handler* handler, const Request& request, const Response& response) const
+{
+    if (!NX_ASSERT(m_auditManager))
+        return;
+
+    if (!NX_ASSERT(!http::StatusCode::isSuccessCode(response.statusCode)))
+        return;
+
+    auto r = handler ? handler->prepareAuditRecord(request) : (audit::Record) request;
+    if (!r.apiInfo)
+        return;
+
+    QJsonObject object = r.apiInfo->toObject();
+    object["status"] = response.statusCode;
+    r.apiInfo = object;
+    m_auditManager->addAuditRecord(std::move(r));
+}
+
 std::vector<std::pair<QString, QString>> HandlerPool::findHandlerOverlaps(
     const Request& request) const
 {
