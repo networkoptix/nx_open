@@ -32,12 +32,12 @@ const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions HintButton::kIco
     {QIcon::Normal, {.primary = "dark14"}},
     {QIcon::Active, {.primary = "dark15"}}};
 
+NX_DECLARE_COLORIZED_ICON(kContextHintIcon, "16x16/Solid/help.svg", HintButton::kIconSubstitutions)
+
 HintButton::HintButton(QWidget* parent):
     base_type(parent),
-    m_regularPixmap(qnSkin->icon("buttons/context_hint_16.svg", kIconSubstitutions)
-        .pixmap(QSize(16,16))),
-    m_highlightedPixmap(qnSkin->icon("buttons/context_hint_16.svg", kIconSubstitutions)
-        .pixmap(QSize(16,16), QIcon::Mode::Active))
+    m_regularPixmap(qnSkin->icon(kContextHintIcon).pixmap(QSize(16,16))),
+    m_highlightedPixmap(qnSkin->icon(kContextHintIcon).pixmap(QSize(16,16), QIcon::Mode::Active))
 {
     const auto pixmapSizeScaled = m_regularPixmap.size() / m_regularPixmap.devicePixelRatioF();
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);

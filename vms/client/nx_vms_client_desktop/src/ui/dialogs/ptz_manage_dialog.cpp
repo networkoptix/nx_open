@@ -41,12 +41,16 @@ using namespace nx::vms::common::ptz;
 
 namespace {
 
-static const QColor kLight1Color = "#FFFFFF";
-static const QColor kLight10Color = "#A5B7C0";
-static const QColor kLight4Color = "#E1E7EA";
-static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
-    {QnIcon::Normal, {{kLight1Color, "light1"}, {kLight10Color, "light1"}, {kLight4Color, "light4"}}},
-};
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kLight1Theme =
+    {{QnIcon::Normal, {.primary = "light1"}}};
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kLight4Theme =
+    {{QnIcon::Normal, {.primary = "light4"}}};
+
+NX_DECLARE_COLORIZED_ICON(kOkIcon, "20x20/Outline/success.svg", kLight1Theme)
+NX_DECLARE_COLORIZED_ICON(kToPositionIcon, "20x20/Outline/to_position.svg", kLight1Theme)
+NX_DECLARE_COLORIZED_ICON(kAddIcon, "20x20/Outline/add.svg", kLight1Theme)
+NX_DECLARE_COLORIZED_ICON(kPlayIcon, "20x20/Outline/play.svg", kLight4Theme)
+NX_DECLARE_COLORIZED_ICON(kDeleteIcon, "20x20/Outline/delete.svg", kLight1Theme)
 
 } // namespace
 
@@ -150,23 +154,23 @@ QnPtzManageDialog::QnPtzManageDialog(QWidget *parent):
 
     //connect(m_adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged, this, &QnPtzManageDialog::updateHotkeys);
 
-    ui->savePositionButton->setIcon(qnSkin->icon("buttons/ok_20.svg", kIconSubstitutions));
+    ui->savePositionButton->setIcon(qnSkin->icon(kOkIcon));
     connect(ui->savePositionButton, &QPushButton::clicked, this,
         &QnPtzManageDialog::at_savePositionButton_clicked);
 
-    ui->goToPositionButton->setIcon(qnSkin->icon("buttons/to_position_20.svg", kIconSubstitutions));
+    ui->goToPositionButton->setIcon(qnSkin->icon(kToPositionIcon));
     connect(ui->goToPositionButton, &QPushButton::clicked, this,
         &QnPtzManageDialog::at_goToPositionButton_clicked);
 
-    ui->addTourButton->setIcon(qnSkin->icon("buttons/add_20x20_deprecated.svg", kIconSubstitutions));
+    ui->addTourButton->setIcon(qnSkin->icon(kAddIcon));
     connect(ui->addTourButton, &QPushButton::clicked, this,
         &QnPtzManageDialog::at_addTourButton_clicked);
 
-    ui->startTourButton->setIcon(qnSkin->icon("buttons/play_20.svg", kIconSubstitutions));
+    ui->startTourButton->setIcon(qnSkin->icon(kPlayIcon));
     connect(ui->startTourButton, &QPushButton::clicked, this,
         &QnPtzManageDialog::at_startTourButton_clicked);
 
-    ui->deleteButton->setIcon(qnSkin->icon("buttons/delete_20.svg", kIconSubstitutions));
+    ui->deleteButton->setIcon(qnSkin->icon(kDeleteIcon));
     connect(ui->deleteButton, &QPushButton::clicked, this,
         &QnPtzManageDialog::at_deleteButton_clicked);
 

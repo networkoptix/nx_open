@@ -38,7 +38,7 @@ Item
                 ColorImage
                 {
                     anchors.centerIn: parent
-                    source: "image://skin/buttons/ok_20.svg"
+                    source: "image://skin/20x20/Outline/success.svg"
                     color: checkColor
                     visible: parent.current
                 }

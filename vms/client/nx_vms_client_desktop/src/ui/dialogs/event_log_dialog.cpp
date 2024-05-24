@@ -64,9 +64,8 @@ namespace {
 
 constexpr int kUpdateDelayMs = 1000;
 
-static const QColor kLight12Color = "#91A7B2";
-static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
-    {QnIcon::Normal, {{kLight12Color, "light4"}}},
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kLight4Substitutions = {
+    {QnIcon::Normal, {.primary = "light4"}},
 };
 
 static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kLight16Substitutions = {
@@ -74,6 +73,7 @@ static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kLight16S
     {QIcon::Active, {.primary = "light17"}},
 };
 
+NX_DECLARE_COLORIZED_ICON(kEventRulesIcon, "20x20/Outline/event_rules.svg", kLight4Substitutions)
 NX_DECLARE_COLORIZED_ICON(kCloseIcon, "20x20/Outline/close_medium.svg", kLight16Substitutions)
 NX_DECLARE_COLORIZED_ICON(kReloadIcon, "20x20/Outline/reload.svg", kLight16Substitutions)
 
@@ -199,7 +199,7 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
         &QnEventLogDialog::reset);
 
     ui->refreshButton->setIcon(qnSkin->icon(kReloadIcon));
-    ui->eventRulesButton->setIcon(qnSkin->icon("buttons/event_rules_20.svg", kIconSubstitutions));
+    ui->eventRulesButton->setIcon(qnSkin->icon(kEventRulesIcon));
 
     SnappedScrollBar *scrollBar = new SnappedScrollBar(this);
     ui->gridEvents->setVerticalScrollBar(scrollBar->proxyScrollBar());

@@ -28,7 +28,7 @@ Control
             ? "dark15"
             : "dark14"
 
-        sourcePath: "image://skin/buttons/context_hint_16.svg"
+        sourcePath: "image://skin/16x16/Solid/help.svg"
         sourceSize: Qt.size(16, 16)
 
         baselineOffset: 12.5

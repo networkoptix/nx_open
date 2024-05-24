@@ -69,10 +69,11 @@ const core::SvgIconColorer::ThemeSubstitutions kTitleBarIconTheme = {
     { QnIcon::Error, {.primary = "red_l2"}},
 };
 
-static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kButtonsIconSubstitutions = {
-    {QnIcon::Normal, {{kLight4Color, "light4"}}},
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kButtonsIconTheme = {
+    {QnIcon::Normal, {.primary = "light4"}},
 };
 
+NX_DECLARE_COLORIZED_ICON(kPlayIcon, "20x20/Outline/play.svg", kButtonsIconTheme)
 NX_DECLARE_COLORIZED_ICON(kAddIcon, "20x20/Outline/add.svg", kTitleBarIconTheme);
 NX_DECLARE_COLORIZED_ICON(kArrowDownIcon,
     "16x16/Outline/arrow_down.svg",
@@ -1953,7 +1954,7 @@ void initialize(Manager* manager, Action* root)
         .mode(DesktopMode)
         .text(ShowreelTextFactory::tr("Start Showreel")) //< To be displayed on the button
         .accent(Qn::ButtonAccent::Standard)
-        .icon(qnSkin->icon("buttons/play_20.svg", kButtonsIconSubstitutions))
+        .icon(qnSkin->icon(kPlayIcon))
         .condition(
             condition::isShowreelReviewMode()
             && ConditionWrapper(new StartCurrentShowreelCondition())

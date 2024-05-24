@@ -13,10 +13,14 @@
 
 namespace {
 
-static const QColor kBasicColor = "#A5B7C0";
-static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
-    {QnIcon::Normal, {{kBasicColor, "light10"}}},
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kIconTheme = {
+    {QnIcon::Normal, {.primary = "light10"}},
 };
+
+NX_DECLARE_COLORIZED_ICON(kAddIcon, "20x20/Outline/add.svg", kIconTheme)
+NX_DECLARE_COLORIZED_ICON(kMinusIcon, "20x20/Outline/minus.svg", kIconTheme)
+NX_DECLARE_COLORIZED_ICON(kArrowUpIcon, "20x20/Outline/arrow_up.svg", kIconTheme)
+NX_DECLARE_COLORIZED_ICON(kArrowDownIcon, "20x20/Outline/arrow_down.svg", kIconTheme)
 
 } // namespace
 
@@ -40,19 +44,19 @@ QnPtzTourWidget::QnPtzTourWidget(QWidget *parent):
 
     connect(m_model, &QnPtzTourSpotsModel::spotsChanged, this, &QnPtzTourWidget::tourSpotsChanged);
 
-    ui->addSpotButton->setIcon(qnSkin->icon("buttons/add_20x20_deprecated.svg", kIconSubstitutions));
+    ui->addSpotButton->setIcon(qnSkin->icon(kAddIcon));
     connect(ui->addSpotButton, &QPushButton::clicked, this,
         &QnPtzTourWidget::at_addSpotButton_clicked);
 
-    ui->deleteSpotButton->setIcon(qnSkin->icon("buttons/minus_20x20_deprecated.svg", kIconSubstitutions));
+    ui->deleteSpotButton->setIcon(qnSkin->icon(kMinusIcon));
     connect(ui->deleteSpotButton, &QPushButton::clicked, this,
         &QnPtzTourWidget::at_deleteSpotButton_clicked);
 
-    ui->moveSpotUpButton->setIcon(qnSkin->icon("buttons/arrow_up_20.svg", kIconSubstitutions));
+    ui->moveSpotUpButton->setIcon(qnSkin->icon(kArrowUpIcon));
     connect(ui->moveSpotUpButton, &QPushButton::clicked, this,
         &QnPtzTourWidget::at_moveSpotUpButton_clicked);
 
-    ui->moveSpotDownButton->setIcon(qnSkin->icon("buttons/arrow_down_20.svg", kIconSubstitutions));
+    ui->moveSpotDownButton->setIcon(qnSkin->icon(kArrowDownIcon));
     connect(ui->moveSpotDownButton, &QPushButton::clicked, this,
         &QnPtzTourWidget::at_moveSpotDownButton_clicked);
 }

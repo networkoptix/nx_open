@@ -55,7 +55,7 @@ Item
 
             text: addButtonCaption || qsTr("Add")
             visible: visibleItemsCount < column.layoutItems.length
-            icon.source: "image://skin/buttons/add_20x20_deprecated.svg"
+            icon.source: "image://skin/20x20/Outline/add.svg"
 
             onClicked:
             {
@@ -70,7 +70,7 @@ Item
 
             text: deleteButtonCaption || qsTr("Delete")
             visible: visibleItemsCount > 1
-            icon.source: "image://skin/buttons/minus_20x20_deprecated.svg"
+            icon.source: "image://skin/20x20/Outline/minus.svg"
 
             onClicked:
             {
