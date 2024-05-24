@@ -80,9 +80,11 @@ void setActionResourcesHolderDisplayFromModel(
 }
 
 static const QColor klight16Color = "#698796";
-static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
-    {QnIcon::Normal, {{klight16Color, "light4"}}},
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kIconTheme = {
+    {QnIcon::Normal, {.primary = "light4"}},
 };
+
+NX_DECLARE_COLORIZED_ICON(kScheduleIcon, "20x20/Outline/schedule.svg", kIconTheme)
 
 } // namespace
 
@@ -99,7 +101,7 @@ QnBusinessRuleWidget::QnBusinessRuleWidget(QWidget* parent):
 {
     ui->setupUi(this);
 
-    ui->scheduleButton->setIcon(qnSkin->icon(lit("buttons/schedule_20.svg"), kIconSubstitutions));
+    ui->scheduleButton->setIcon(qnSkin->icon(kScheduleIcon));
     setHelpTopic(ui->scheduleButton, HelpTopic::Id::EventsActions_Schedule);
 
     ui->eventDefinitionGroupBox->installEventFilter(this);

@@ -49,13 +49,14 @@ Item
             implicitWidth: image.implicitWidth
             implicitHeight: image.implicitHeight
 
-            Image
+            ColoredImage
             {
                 id: image
 
                 anchors.centerIn: content
-                source: "image://skin/buttons/filter_16x16.svg"
+                sourcePath: "image://skin/16x16/Outline/filter.svg"
                 sourceSize: Qt.size(16, 16)
+                primaryColor: "light10"
             }
 
             Rectangle

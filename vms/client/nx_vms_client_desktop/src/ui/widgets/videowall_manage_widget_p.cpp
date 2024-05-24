@@ -62,10 +62,10 @@ int pixelRatio()
         : qApp->devicePixelRatio();
 }
 
-static const QColor kBasicColor = "#A5B7C0";
-static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
-    {QnIcon::Normal, {{kBasicColor, "light10"}}},
-};
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kIconTheme =
+    {{QnIcon::Normal, {.primary = "light10"}}};
+
+NX_DECLARE_COLORIZED_ICON(kAddIcon, "20x20/Outline/add.svg", kIconTheme)
 
 } // namespace
 
@@ -367,10 +367,7 @@ void QnVideowallManageWidgetPrivate::FreeSpaceItem::paint(
         return;
     base_type::paint(painter, process);
     if (!process.isRunning())
-        paintPixmap(painter,
-            bodyRect(),
-            qnSkin->icon("buttons/add_20x20_deprecated.svg", kIconSubstitutions)
-                .pixmap(QSize(20, 20)));
+        paintPixmap(painter, bodyRect(), qnSkin->icon(kAddIcon).pixmap(QSize(20, 20)));
 }
 
 QColor QnVideowallManageWidgetPrivate::FreeSpaceItem::baseColor() const

@@ -80,12 +80,12 @@ static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubst
     {QnIcon::Error, {{klight10Color, "red_l2"}}},
 };
 
-static const QColor kLight12Color = "#91A7B2";
-static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutionsLight12 = {
-    {QnIcon::Normal, {{kLight12Color, "light12"}}},
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kLight12Theme = {
+    {QnIcon::Normal, {.primary = "light12"}},
 };
 
 NX_DECLARE_COLORIZED_ICON(kReloadIcon, "20x20/Outline/reload.svg", kLight16Substitutions)
+NX_DECLARE_COLORIZED_ICON(kEventRulesIcon, "20x20/Outline/event_rules.svg", kLight12Theme)
 
 enum EventListRoles
 {
@@ -205,8 +205,7 @@ EventLogDialog::EventLogDialog(QWidget* parent):
     connect(ui->clearFilterButton, &QPushButton::clicked, this, &EventLogDialog::reset);
 
     ui->refreshButton->setIcon(qnSkin->icon(kReloadIcon));
-    ui->eventRulesButton->setIcon(
-        qnSkin->icon("buttons/event_rules_20.svg", kIconSubstitutionsLight12));
+    ui->eventRulesButton->setIcon(qnSkin->icon(kEventRulesIcon));
 
     auto scrollBar = new SnappedScrollBar(this);
     ui->gridEvents->setVerticalScrollBar(scrollBar->proxyScrollBar());

@@ -62,6 +62,10 @@ namespace {
 static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kButtonsIconSubstitutions =
     {{QnIcon::Normal, {.primary = "light1"}}};
 
+NX_DECLARE_COLORIZED_ICON(kEvenLogIcon, "20x20/Outline/event_log.svg", kButtonsIconSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kAddIcon, "20x20/Outline/add.svg", kButtonsIconSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kMinusIcon, "20x20/Outline/minus.svg", kButtonsIconSubstitutions)
+
 class SortRulesProxyModel:
     public QSortFilterProxyModel,
     public SystemContextAware
@@ -336,7 +340,7 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
 
     m_currentDetailsWidget = ui->detailsWidget;
 
-    ui->eventLogButton->setIcon(qnSkin->icon("buttons/event_log_20.svg", kButtonsIconSubstitutions));
+    ui->eventLogButton->setIcon(qnSkin->icon(kEvenLogIcon));
 
     createActions();
 
@@ -399,11 +403,11 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     connect(ui->buttonBox->button(QDialogButtonBox::Apply), &QPushButton::clicked, this,
         &QnBusinessRulesDialog::saveAll);
 
-    ui->addRuleButton->setIcon(qnSkin->icon("buttons/add_20x20.svg", kButtonsIconSubstitutions));
+    ui->addRuleButton->setIcon(qnSkin->icon(kAddIcon));
     connect(ui->addRuleButton, &QPushButton::clicked, this,
         &QnBusinessRulesDialog::at_newRuleButton_clicked);
 
-    ui->deleteRuleButton->setIcon(qnSkin->icon("buttons/minus_20x20.svg", kButtonsIconSubstitutions));
+    ui->deleteRuleButton->setIcon(qnSkin->icon(kMinusIcon));
     connect(ui->deleteRuleButton, &QPushButton::clicked, this,
         &QnBusinessRulesDialog::at_deleteButton_clicked);
 

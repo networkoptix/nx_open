@@ -56,7 +56,7 @@ Dialog
             Button
             {
                 text: qsTr("Add Rule")
-                icon.source: "image://skin/buttons/add_20x20_deprecated.svg"
+                icon.source: "image://skin/20x20/Outline/add.svg"
                 visible: !tableView.hasCheckedRows
                 onClicked:
                 {
@@ -241,7 +241,7 @@ Dialog
             TextButton
             {
                 text: qsTr("Event Log...")
-                icon.source: "image://skin/buttons/event_log_20_deprecated.svg"
+                icon.source: "image://skin/20x20/Outline/event_log.svg"
 
                 onClicked:
                 {

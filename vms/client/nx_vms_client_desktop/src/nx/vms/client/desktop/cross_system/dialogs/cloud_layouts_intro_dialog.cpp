@@ -20,6 +20,9 @@
 
 namespace nx::vms::client::desktop {
 
+NX_DECLARE_COLORIZED_ICON(
+    kContextHintIcon, "16x16/Solid/help.svg", HintButton::kIconSubstitutions)
+
 CloudLayoutsIntroDialog::CloudLayoutsIntroDialog(
     Mode mode,
     QWidget* parent,
@@ -40,9 +43,7 @@ CloudLayoutsIntroDialog::CloudLayoutsIntroDialog(
         "different Sites. Currently, only some features of regular layouts are available, but "
         "we will continue to expand the capabilities of %1 Layouts in future versions")
         .arg(nx::branding::shortCloudName()));
-    ui->helpIconLabel->setPixmap(
-        qnSkin->icon("buttons/context_hint_16.svg", HintButton::kIconSubstitutions)
-            .pixmap(QSize(16, 16)));
+    ui->helpIconLabel->setPixmap(qnSkin->icon(kContextHintIcon).pixmap(QSize(16, 16)));
     ui->helpLabel->setText(
         tr("Read more on the %1").arg(common::html::localLink(tr("help page"))));
     connect(ui->helpLabel, &QLabel::linkActivated,

@@ -34,12 +34,13 @@ namespace {
 static const auto kMaximumHotspotEditorHeight = 448;
 static constexpr auto kMinimumTableEditorHeight = 112;
 
-static const QColor kBasicColor = "#A5B7C0";
-static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
-    {QnIcon::Normal, {{kBasicColor, "light4"}}},
-    {QnIcon::Active, {{kBasicColor, "light3"}}},
-    {QnIcon::Selected, {{kBasicColor, "light5"}}},
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kIconTheme = {
+    {QnIcon::Normal, {.primary = "light4"}},
+    {QnIcon::Active, {.primary = "light3"}},
+    {QnIcon::Selected, {.primary = "light5"}}
 };
+
+NX_DECLARE_COLORIZED_ICON(kAddIcon, "20x20/Outline/add.svg", kIconTheme)
 
 } // namespace
 
@@ -92,7 +93,7 @@ void CameraHotspotsSettingsWidget::Private::setupUi() const
     ui->enableHotspotsCheckBox->setProperty(style::Properties::kCheckBoxAsButton, true);
     ui->enableHotspotsCheckBox->setForegroundRole(QPalette::ButtonText);
 
-    ui->addHotspotButton->setIcon(qnSkin->icon("buttons/add_20x20_deprecated.svg", kIconSubstitutions));
+    ui->addHotspotButton->setIcon(qnSkin->icon(kAddIcon));
 
     ui->hotspotsEditorWidget->setMaximumHeight(kMaximumHotspotEditorHeight);
 
