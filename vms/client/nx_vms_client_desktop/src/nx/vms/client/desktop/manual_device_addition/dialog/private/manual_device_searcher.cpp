@@ -307,7 +307,7 @@ void ManualDeviceSearcher::updateStatus()
             if (!success || (error && error->error != nx::network::rest::Result::NoError))
                 return;
 
-            NX_ASSERT(!m_searchProcessId.isNull());
+            NX_ASSERT(!m_searchProcessId.isEmpty());
 
             auto result = std::get_if<api::DeviceSearch>(&errorOrData);
             setStatus(result->status.value_or(

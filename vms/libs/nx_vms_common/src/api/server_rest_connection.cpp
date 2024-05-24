@@ -843,7 +843,7 @@ Handle ServerConnection::searchCamera(
 
 Handle ServerConnection::searchCameraStatus(
     const nx::Uuid& targetServerId,
-    const nx::Uuid& searchId,
+    const QString& searchId,
     nx::vms::common::SessionTokenHelperPtr helper,
     Result<ErrorOrData<nx::vms::api::DeviceSearch>>::type&& callback,
     QThread* targetThread)
@@ -865,7 +865,7 @@ Handle ServerConnection::searchCameraStatus(
 
 Handle ServerConnection::searchCameraStop(
     const nx::Uuid& targetServerId,
-    const nx::Uuid& searchId,
+    const QString& searchId,
     nx::vms::common::SessionTokenHelperPtr helper,
     Result<ErrorOrEmpty>::type callback,
     QThread* targetThread)

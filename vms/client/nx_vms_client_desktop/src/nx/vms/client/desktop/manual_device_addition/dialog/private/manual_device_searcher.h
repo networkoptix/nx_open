@@ -89,7 +89,7 @@ private:
     QString m_lastErrorText;
 
     QTimer m_updateProgressTimer;
-    nx::Uuid m_searchProcessId;
+    QString m_searchProcessId;
 
     using DevicesHash = QHash<QString, api::DeviceModelForSearch>;
     DevicesHash m_devices;

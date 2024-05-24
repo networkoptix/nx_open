@@ -41,11 +41,26 @@ struct NX_VMS_API DeviceSearchStatus
 QN_FUSION_DECLARE_FUNCTIONS(DeviceSearchStatus, (csv_record)(json)(ubjson)(xml), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(DeviceSearchStatus, DeviceSearchStatus_Fields)
 
-struct NX_VMS_API DeviceSearchBase
+struct NX_VMS_API DeviceSearchId
 {
     /**%apidoc[readonly] Id of the search to get the status. */
-    nx::Uuid id;
+    QString id;
 
+    DeviceSearchId(QString id = {}): id(std::move(id)) {}
+    nx::Uuid searchId() const;
+    nx::Uuid serverIdFromId() const;
+
+    QString getId() const { return id; }
+
+    void setIds(const nx::Uuid& searchId, const nx::Uuid& serverId);
+    const QString& toString() const { return id; }
+};
+#define DeviceSearchId_Fields (id)
+QN_FUSION_DECLARE_FUNCTIONS(DeviceSearchId, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(DeviceSearchId, DeviceSearchId_Fields)
+
+struct NX_VMS_API DeviceSearchBase: DeviceSearchId
+{
     /**%apidoc Target port to search Device(s) on. */
     std::optional<int> port;
 
@@ -70,11 +85,15 @@ struct NX_VMS_API DeviceSearchBase
     /**%apidoc Already found Devices. */
     std::optional<std::vector<DeviceModelForSearch>> devices;
 
-    nx::Uuid getId() const { return id; }
-    void setId(nx::Uuid value) { id = std::move(value); }
-    static_assert(nx::utils::isCreateModelV<DeviceSearchBase>);
+    /**%apidoc[opt]
+     * Id of the Server to perform search. The current Server is used
+     * if serverId is not specified.
+     */
+    nx::Uuid serverId;
+
+    void stripIdToLocal();
 };
-#define DeviceSearchBase_Fields (id)(port)(credentials)(mode)(status)(devices)
+#define DeviceSearchBase_Fields DeviceSearchId_Fields(port)(credentials)(mode)(status)(devices)(serverId)
 
 struct NX_VMS_API DeviceSearchIp
 {
