@@ -124,7 +124,7 @@ Item
                 }
 
                 sourceSize: Qt.size(width, height)
-                primaryColor: ColorTheme.colors.dark7
+                primaryColor: (control.userType == UserSettingsGlobal.CloudUser) ? ColorTheme.colors.light6 : ColorTheme.colors.dark7
                 secondaryColor: ColorTheme.colors.light10
                 tertiaryColor: ColorTheme.colors.brand_core
             }
