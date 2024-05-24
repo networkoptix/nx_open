@@ -28,8 +28,8 @@ AccessRightsList::AccessRightsList(QObject* parent):
                 AccessRightDescriptor{
                     .accessRight = AccessRight::audio,
                     .name = common::AccessRightHelper::name(AccessRight::audio),
-                    .description = common::html::bold(tr("Access Audio") + ".") + " " +
-                        tr("Allows users to access an audio stream from a Device. "
+                    .description = common::html::bold(tr("Play Audio") + ".") + " " +
+                        tr("Allows users to access an audio stream from a device. "
                             "Used in combination with View Live and/or View Archive."),
                     .icon = QUrl("24x20/Solid/audio.svg")},
                 AccessRightDescriptor{
