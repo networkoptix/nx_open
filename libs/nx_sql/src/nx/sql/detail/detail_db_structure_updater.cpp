@@ -126,6 +126,15 @@ void DbStructureUpdater::applyUpdate(
     }
 
     recordSuccessfulUpdate(queryContext, dbUpdate);
+
+    // Committing current changes.
+    if (!queryContext->connection()->commit())
+        throw Exception(queryContext->connection()->lastError());
+
+    // Starting new transaction since we want to leave the query context in the same state it was
+    // prior to this call.
+    if (!queryContext->connection()->begin())
+        throw Exception(queryContext->connection()->lastError());
 }
 
 bool DbStructureUpdater::execDbUpdate(

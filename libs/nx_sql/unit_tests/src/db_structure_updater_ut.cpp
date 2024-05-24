@@ -6,6 +6,7 @@
 #include <map>
 #include <string>
 
+#include <nx/sql/db_connection_factory.h>
 #include <nx/sql/db_structure_updater.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/algorithm.h>
@@ -29,6 +30,9 @@ class TestSqlQuery:
     using base_type = DelegateSqlQuery;
 
 public:
+    using CustomExecSqlFunc = nx::utils::MoveOnlyFunc<DBResult(
+        nx::sql::QueryContext*, const std::string& /*script*/)>;
+
     using base_type::base_type;
 
     virtual void prepare(const std::string_view& query) override
@@ -36,7 +40,7 @@ public:
         m_query = query;
 
         if (!m_customExecSqlFunc)
-            return base_type::prepare(query);
+            base_type::prepare(query);
     }
 
     virtual void exec() override
@@ -68,7 +72,12 @@ class TestDbConnection:
     using base_type = DelegateDbConnection;
 
 public:
-    using base_type::base_type;
+    TestDbConnection(const nx::sql::ConnectionOptions& dbConnectionOptions):
+        base_type(nullptr),
+        m_realConnection(dbConnectionOptions)
+    {
+        setDelegate(&m_realConnection);
+    }
 
     virtual std::unique_ptr<AbstractSqlQuery> createQuery() override
     {
@@ -76,9 +85,10 @@ public:
         if (m_customExecSqlFunc)
         {
             query->setCustomExecSqlFunc(
-                [this](auto&&... args)
+                [this](nx::sql::QueryContext*, std::string script)
                 {
-                    return m_customExecSqlFunc(std::forward<decltype(args)>(args)...);
+                    nx::sql::QueryContext queryContext(this, m_transaction.get());
+                    return m_customExecSqlFunc(&queryContext, script);
                 });
         }
 
@@ -92,9 +102,37 @@ public:
         return base_type::driverType();
     }
 
+    virtual bool begin()
+    {
+        // Limiting this test implementation to one transaction at a time.
+        auto transaction = std::make_unique<Transaction>(&m_realConnection);
+        if (transaction->begin() != nx::sql::DBResultCode::ok)
+            return false;
+
+        m_transaction = std::move(transaction);
+        return true;
+    }
+
+    virtual bool commit()
+    {
+        if (m_onCommit)
+            m_onCommit();
+        return m_transaction->commit() == nx::sql::DBResultCode::ok;
+    }
+
+    virtual bool rollback()
+    {
+        return m_transaction->rollback() == nx::sql::DBResultCode::ok;
+    }
+
     void setCustomExecSqlFunc(CustomExecSqlFunc func)
     {
         m_customExecSqlFunc = std::move(func);
+    }
+
+    void setOnCommit(nx::utils::MoveOnlyFunc<void()> func)
+    {
+        m_onCommit = std::move(func);
     }
 
     void setDriverType(std::optional<RdbmsDriverType> driverType)
@@ -105,6 +143,9 @@ public:
 private:
     CustomExecSqlFunc m_customExecSqlFunc;
     std::optional<RdbmsDriverType> m_driverType;
+    std::unique_ptr<Transaction> m_transaction;
+    QtDbConnection m_realConnection;
+    nx::utils::MoveOnlyFunc<void()> m_onCommit;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -126,39 +167,6 @@ public:
     virtual const ConnectionOptions& connectionOptions() const override
     {
         return m_connectionOptions;
-    }
-
-    //---------------------------------------------------------------------------------------------
-    // Asynchronous operations.
-
-    virtual void executeUpdate(
-        nx::utils::MoveOnlyFunc<DBResult(nx::sql::QueryContext*)> dbUpdateFunc,
-        nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler,
-        const std::string& queryAggregationKey) override
-    {
-        base_type::executeUpdate(
-            [this, dbUpdateFunc = std::move(dbUpdateFunc)](
-                nx::sql::QueryContext* queryContext)
-            {
-                auto connection =
-                    std::make_unique<TestDbConnection>(queryContext->connection());
-                if (m_customExecSqlFunc)
-                {
-                    connection->setCustomExecSqlFunc(
-                        [this](nx::sql::QueryContext* queryContext, const std::string& stmt)
-                        {
-                            return m_customExecSqlFunc(queryContext, stmt);
-                        });
-                }
-                connection->setDriverType(m_connectionOptions.driverType);
-
-                nx::sql::QueryContext replaced(
-                    connection.get(),
-                    queryContext->transaction());
-                return dbUpdateFunc(&replaced);
-            },
-            std::move(completionHandler),
-            queryAggregationKey);
     }
 
     //---------------------------------------------------------------------------------------------
@@ -198,16 +206,45 @@ class BasicDbStructureUpdaterTestSetup:
 public:
     BasicDbStructureUpdaterTestSetup()
     {
+        m_dbConnectionFactoryBak = DbConnectionFactory::instance().setCustomFunc(
+            [this](auto&&... args)
+            {
+                auto connection = std::make_unique<TestDbConnection>(
+                    std::forward<decltype(args)>(args)...);
+                connection->setCustomExecSqlFunc(
+                    [this](nx::sql::QueryContext* queryContext, const std::string& stmt)
+                    {
+                        return execSqlScript(queryContext, stmt);
+                    });
+                connection->setOnCommit([this]() { ++m_commitCounter; });
+                m_lastTestDbConnection = connection.get();
+
+                return connection;
+            });
+
         base_type::initializeDatabase();
 
         m_testAsyncSqlQueryExecutor = std::make_unique<TestAsyncSqlQueryExecutor>(
             &asyncSqlQueryExecutor());
-        m_testAsyncSqlQueryExecutor->setCustomExecSqlFunc(
-            [this](auto&&... args) { return execSqlScript(std::forward<decltype(args)>(args)...); });
+    }
+
+    ~BasicDbStructureUpdaterTestSetup()
+    {
+        DbConnectionFactory::instance().setCustomFunc(
+            std::exchange(m_dbConnectionFactoryBak, nullptr));
     }
 
 protected:
-    std::vector<std::string> m_executedScripts;
+    struct ExecutedScriptContext
+    {
+        std::string sqlText;
+        std::optional<nx::sql::DBResult> commitResult;
+        int commitSeq = -1;
+    };
+
+    std::list<ExecutedScriptContext> m_executedScripts;
+    std::atomic<int> m_commitCounter = 0;
+    TestDbConnection* m_lastTestDbConnection = nullptr;
 
     TestAsyncSqlQueryExecutor& testAsyncSqlQueryExecutor()
     {
@@ -215,15 +252,24 @@ protected:
     }
 
     virtual DBResult execSqlScript(
-        nx::sql::QueryContext* const /*queryContext*/,
+        nx::sql::QueryContext* const queryContext,
         const std::string& script)
     {
-        m_executedScripts.push_back(script);
+        m_executedScripts.push_back(ExecutedScriptContext{script, std::nullopt});
+
+        queryContext->transaction()->addOnTransactionCompletionHandler(
+            [this, it = std::prev(m_executedScripts.end())](nx::sql::DBResult result)
+            {
+                it->commitResult = result;
+                it->commitSeq = m_commitCounter;
+            });
+
         return DBResultCode::ok;
     }
 
 private:
     std::unique_ptr<TestAsyncSqlQueryExecutor> m_testAsyncSqlQueryExecutor;
+    DbConnectionFactory::Function m_dbConnectionFactoryBak;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -234,8 +280,7 @@ class DbStructureUpdater:
     using base_type = BasicDbStructureUpdaterTestSetup;
 
 public:
-    DbStructureUpdater():
-        m_updateResult(false)
+    DbStructureUpdater()
     {
         initializeDatabase();
 
@@ -257,18 +302,61 @@ protected:
 
     void registerDefaultUpdateScript(std::string script = std::string())
     {
-        registerUpdateScriptFor(RdbmsDriverType::unknown, std::move(script));
+        registerUpdateScript({RdbmsDriverType::unknown}, std::move(script));
+    }
+
+    void registerUpdateScript(
+        std::vector<RdbmsDriverType> dbTypes,
+        std::string script = std::string())
+    {
+        std::map<RdbmsDriverType, std::string> dbTypeToScript;
+        for (auto dbType: dbTypes)
+        {
+            auto typedScript = script.empty() ? toString(dbType) : script;
+            dbTypeToScript.emplace(dbType, typedScript);
+            m_registeredScripts.emplace(typedScript, dbType);
+        }
+
+        m_dbUpdater->addUpdateScript("script_id_" + script, dbTypeToScript);
+    }
+
+    std::vector<std::string> registerMultipleRandomUpdateScripts(int count)
+    {
+        std::vector<std::string> scripts;
+        for (int i = 0; i < count; ++i)
+        {
+            auto text = nx::format("script_%1", i).toStdString();
+            registerDefaultUpdateScript(text);
+            scripts.push_back(text);
+        }
+        return scripts;
     }
 
     void emulateConnectionToDb(RdbmsDriverType dbType)
     {
-        testAsyncSqlQueryExecutor().connectionOptions().driverType = dbType;
+        m_lastTestDbConnection->setDriverType(dbType);
     }
 
     void whenUpdateDb()
     {
         m_dbUpdater->addUpdateScript("1", m_dbTypeToScript);
         m_updateResult = m_dbUpdater->updateStructSync();
+    }
+
+    // Asserts if at least two from scripts were invoked under the same DB transaction.
+    void thenEachUpdateScriptIsAppliedUnderItsOwnDbTransaction(
+        const std::vector<std::string>& scripts)
+    {
+        std::set<int> commitSeqs;
+
+        for (const auto& executedScript: m_executedScripts)
+        {
+            if (!nx::utils::contains(scripts, executedScript.sqlText))
+                continue;
+
+            ASSERT_EQ(nx::sql::DBResultCode::ok, executedScript.commitResult);
+            ASSERT_TRUE(commitSeqs.insert(executedScript.commitSeq).second);
+        }
     }
 
     void assertDefaultScriptHasBeenInvoked()
@@ -282,7 +370,7 @@ protected:
 
         for (const auto& executedScript: m_executedScripts)
         {
-            const auto range = m_registeredScripts.equal_range(executedScript);
+            const auto range = m_registeredScripts.equal_range(executedScript.sqlText);
             bool scriptFitsForDbType = true;
             for (auto it = range.first; it != range.second; ++it)
             {
@@ -305,7 +393,9 @@ protected:
     void assertThereWasInvokationOf(const std::string& script)
     {
         ASSERT_TRUE(
-            std::find(m_executedScripts.cbegin(), m_executedScripts.cend(), script) !=
+            std::find_if(
+                m_executedScripts.cbegin(), m_executedScripts.cend(),
+                [script](const auto& val) { return val.sqlText == script; }) !=
             m_executedScripts.cend());
     }
 
@@ -313,7 +403,7 @@ private:
     std::unique_ptr<nx::sql::DbStructureUpdater> m_dbUpdater;
     std::multimap<std::string, RdbmsDriverType> m_registeredScripts;
     std::map<RdbmsDriverType, std::string> m_dbTypeToScript;
-    bool m_updateResult;
+    bool m_updateResult = false;
 
     void initializeDatabase()
     {
@@ -325,8 +415,7 @@ private:
 
 TEST_F(DbStructureUpdater, different_sql_scripts_for_different_dbms)
 {
-    registerUpdateScriptFor(RdbmsDriverType::mysql);
-    registerUpdateScriptFor(RdbmsDriverType::sqlite);
+    registerUpdateScript({RdbmsDriverType::mysql, RdbmsDriverType::sqlite});
     emulateConnectionToDb(RdbmsDriverType::mysql);
 
     whenUpdateDb();
@@ -335,8 +424,7 @@ TEST_F(DbStructureUpdater, different_sql_scripts_for_different_dbms)
 
 TEST_F(DbStructureUpdater, default_script_gets_called_if_no_dbms_specific_script_supplied)
 {
-    registerUpdateScriptFor(RdbmsDriverType::mysql);
-    registerDefaultUpdateScript();
+    registerUpdateScript({RdbmsDriverType::mysql, RdbmsDriverType::unknown});
     emulateConnectionToDb(RdbmsDriverType::oracle);
 
     whenUpdateDb();
@@ -345,8 +433,7 @@ TEST_F(DbStructureUpdater, default_script_gets_called_if_no_dbms_specific_script
 
 TEST_F(DbStructureUpdater, update_fails_if_no_suitable_script_found)
 {
-    registerUpdateScriptFor(RdbmsDriverType::mysql);
-    registerUpdateScriptFor(RdbmsDriverType::sqlite);
+    registerUpdateScript({RdbmsDriverType::mysql, RdbmsDriverType::sqlite});
     emulateConnectionToDb(RdbmsDriverType::oracle);
 
     whenUpdateDb();
@@ -360,8 +447,17 @@ TEST_F(DbStructureUpdater, proper_dialect_fix_is_applied)
 
     registerDefaultUpdateScript(initialScript);
     emulateConnectionToDb(RdbmsDriverType::sqlite);
+
     whenUpdateDb();
+
     assertThereWasInvokationOf(sqliteAdaptedScript);
+}
+
+TEST_F(DbStructureUpdater, each_update_is_applied_under_its_own_db_transaction)
+{
+    const auto scriptTexts = registerMultipleRandomUpdateScripts(3);
+    whenUpdateDb();
+    thenEachUpdateScriptIsAppliedUnderItsOwnDbTransaction(scriptTexts);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -422,8 +518,8 @@ protected:
     {
         for (const auto& expected: m_expectedScripts)
         {
-            ASSERT_TRUE(std::find(m_executedScripts.begin(), m_executedScripts.end(), expected)
-                != m_executedScripts.end());
+            ASSERT_GT(std::count_if(m_executedScripts.begin(), m_executedScripts.end(),
+                [&expected](const auto& v) { return v.sqlText == expected; }), 0);
         }
     }
 

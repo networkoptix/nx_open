@@ -8,6 +8,7 @@
 
 #include <QtSql/QSqlDatabase>
 
+#include <nx/utils/basic_factory.h>
 #include <nx/utils/type_utils.h>
 
 #include "query.h"
