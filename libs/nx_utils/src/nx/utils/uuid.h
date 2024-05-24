@@ -45,6 +45,7 @@ public:
     QByteArray toSimpleByteArray() const;
 
     std::string toStdString() const;
+
     /** @return GUID without braces. */
     std::string toSimpleStdString() const;
 
@@ -68,13 +69,15 @@ public:
 
     static Uuid fromRfc4122(const QByteArray& bytes);
     static Uuid fromHardwareId(const QString& hwid);
+
+    /** Constructs a ramdom Uuid. */
     static Uuid createUuid();
 
-    /** Construct Uuid from pool of id's. Pool is determined by base id and individual offset. */
+    /** Constructs a Uuid from pool of id's. Pool is determined by base id and individual offset. */
     static Uuid createUuidFromPool(const QUuid &baseId, uint offset);
 
     /**
-     * Construct Uuid from string representation.
+     * Constructs a Uuid from string representation.
      * If the string is not a valid UUID null Uuid will be returned.
      */
     static Uuid fromStringSafe(const QString& uuid);
@@ -83,7 +86,7 @@ public:
     static Uuid fromStringSafe(const std::string_view& uuid);
 
     /**
-     * Create fixed Uuid from any data. As a value of uuid the MD5 hash is taken so created uuids
+     * Creates a fixed Uuid from any data. As a value of uuid the MD5 hash is taken so created uuids
      * will be equal for equal strings given. Also there is a collision possibility.
      */
     static Uuid fromArbitraryData(const QByteArray& data);

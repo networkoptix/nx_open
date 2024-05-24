@@ -17,16 +17,16 @@ struct NX_VMS_API AnalyticsPluginData: ResourceData
     static const QString kResourceTypeName;
     static const nx::Uuid kResourceTypeId;
 };
-
 #define AnalyticsPluginData_Fields ResourceData_Fields
+NX_VMS_API_DECLARE_STRUCT_AND_LIST(AnalyticsPluginData)
 
 struct NX_VMS_API AnalyticsEngineData: ResourceData
 {
     static const QString kResourceTypeName;
     static const nx::Uuid kResourceTypeId;
 };
-
 #define AnalyticsEngineData_Fields ResourceData_Fields
+NX_VMS_API_DECLARE_STRUCT_AND_LIST(AnalyticsEngineData)
 
 /**%apidoc
  * Information about a Server Plugin and its dynamic library. If the Plugin object was not created
@@ -186,8 +186,8 @@ struct NX_VMS_API PluginInfo
      */
     QString instanceId;
 };
-
-#define PluginInfo_Fields (name) \
+#define PluginInfo_Fields \
+    (name) \
     (description) \
     (libName) \
     (libraryFilename) \
@@ -203,6 +203,7 @@ struct NX_VMS_API PluginInfo
     (nxSdkVersion) \
     (instanceIndex) \
     (instanceId)
+NX_VMS_API_DECLARE_STRUCT_AND_LIST(PluginInfo)
 
 /**%apidoc
  * Information about bound resources. For Analytics Plugins contains information about the
@@ -236,7 +237,6 @@ struct NX_VMS_API PluginResourceBindingInfo
      */
     int onlineBoundResourceCount = 0;
 };
-
 #define PluginResourceBindingInfo_Fields \
     (id) \
     (name) \
@@ -245,7 +245,7 @@ struct NX_VMS_API PluginResourceBindingInfo
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(PluginResourceBindingInfo)
 
 /**%apidoc Extended information about a Server Plugin. */
-struct NX_VMS_API PluginInfoEx: public PluginInfo
+struct NX_VMS_API PluginInfoEx: PluginInfo
 {
     PluginInfoEx() = default;
     PluginInfoEx(PluginInfo pluginInfo)
@@ -265,13 +265,8 @@ struct NX_VMS_API PluginInfoEx: public PluginInfo
      */
     std::vector<PluginResourceBindingInfo> resourceBindingInfo;
 };
-
 #define PluginInfoEx_Fields PluginInfo_Fields (resourceBindingInfo)
-
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(PluginInfoEx)
-NX_VMS_API_DECLARE_STRUCT_AND_LIST(AnalyticsPluginData)
-NX_VMS_API_DECLARE_STRUCT_AND_LIST(AnalyticsEngineData)
-NX_VMS_API_DECLARE_STRUCT_AND_LIST(PluginInfo)
 
 using ExtendedPluginInfoByServer = std::map<nx::Uuid, PluginInfoExList>;
 

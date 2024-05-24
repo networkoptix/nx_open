@@ -86,7 +86,7 @@ struct NX_VMS_API AnalyticsFilterBase
 
 struct NX_VMS_API AnalyticsFilter: AnalyticsFilterBase
 {
-    /**%apidoc:string Coordinates in range [0:1]. The format is `{x},{y},{width}x{height}`. */
+    /**%apidoc:string Coordinates in range [0..1]. The format is `{x},{y},{width}x{height}`. */
     std::optional<RectAsString> boundingBox;
 
     static DeprecatedFieldNames const* getDeprecatedFieldNames();
