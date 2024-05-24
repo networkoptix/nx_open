@@ -548,14 +548,14 @@ public:
 
     Handle searchCameraStatus(
         const nx::Uuid& targetServerId,
-        const nx::Uuid& searchId,
+        const QString& searchId,
         nx::vms::common::SessionTokenHelperPtr helper,
         Result<ErrorOrData<nx::vms::api::DeviceSearch>>::type&& callback,
         QThread* targetThread = nullptr);
 
     Handle searchCameraStop(
         const nx::Uuid& targetServerId,
-        const nx::Uuid& processUuid,
+        const QString& searchId,
         nx::vms::common::SessionTokenHelperPtr helper,
         Result<ErrorOrEmpty>::type callback,
         QThread* targetThread = nullptr);

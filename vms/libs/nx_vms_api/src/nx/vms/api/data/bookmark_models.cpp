@@ -7,20 +7,9 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/cryptographic_hash.h>
 
+#include "combined_id.h"
+
 namespace nx::vms::api {
-
-namespace {
-
-std::optional<int> findIdSeparator(const QString& id, char separator)
-{
-    const auto p = id.indexOf(separator);
-    if (p <= 0)
-        return std::nullopt;
-
-    return p;
-}
-
-} // namespace
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(BookmarkIdV1, (json), BookmarkIdV1_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(BookmarkIdV3, (json), BookmarkIdV3_Fields)
@@ -37,32 +26,17 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(BookmarkDescriptionRequest,
 
 nx::Uuid BookmarkIdV3::bookmarkIdFromCombined(const QString& id)
 {
-    if (id.isEmpty())
-        return {};
-
-    const auto p = findIdSeparator(id, '_');
-    if (!p)
-        return nx::Uuid::fromStringSafe(id);
-
-    return nx::Uuid::fromStringSafe(id.mid(0, *p));
+    return combined_id::localIdFromCombined(id);
 }
 
 nx::Uuid BookmarkIdV3::serverIdFromCombined(const QString& id)
 {
-    if (id.isEmpty())
-        return {};
-
-    const auto from = findIdSeparator(id, '_');
-    if (!from)
-        return {};
-
-    const auto to = findIdSeparator(id, '.');
-    return nx::Uuid::fromStringSafe(id.mid(*from + 1, to ? *to : -1));
+    return combined_id::serverIdFromCombined(id, '.');
 }
 
 void BookmarkIdV3::setIds(const nx::Uuid& bookmarkId, const nx::Uuid& serverId)
 {
-    id = bookmarkId.toSimpleString() + '_' + serverId.toSimpleString();
+    id = combined_id::combineId(bookmarkId, serverId);
 }
 
 nx::Uuid BookmarkIdV3::bookmarkId() const
@@ -91,7 +65,7 @@ bool BookmarkV3::operator==(const BookmarkV3& other) const
 
 std::chrono::milliseconds BookmarkProtection::getSyncTime(const QString& protection)
 {
-    const auto p = findIdSeparator(protection, ':');
+    const auto p = combined_id::findIdSeparator(protection, ':');
     if (!p)
         return {};
 
