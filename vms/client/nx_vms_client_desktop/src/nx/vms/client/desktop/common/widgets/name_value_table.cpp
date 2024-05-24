@@ -292,9 +292,8 @@ private:
         context(new QOpenGLContext()),
         renderControl(new RenderControl()),
         quickWindow(new QQuickWindow(renderControl.get())),
-        rootComponent(new QQmlComponent(appContext()->qmlEngine(),
-            QUrl("Nx/Core/Controls/NameValueTable.qml"),
-            QQmlComponent::CompilationMode::PreferSynchronous)),
+        rootComponent(new QQmlComponent(
+            appContext()->qmlEngine(), "Nx.Core.Controls", "NameValueTable")),
         rootItem(qobject_cast<QQuickItem*>(rootComponent->create()))
     {
         NX_CRITICAL(qApp && !qApp->closingDown());
