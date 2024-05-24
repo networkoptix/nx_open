@@ -2,15 +2,13 @@
 
 #include "delayed.h"
 
-#include <QtCore/QTimer>
-#include <QtCore/QThread>
-#include <QtCore/QEvent>
-#include <QtCore/QCoreApplication>
 #include <QtCore/QAbstractEventDispatcher>
+#include <QtCore/QThread>
+#include <QtCore/QTimer>
 
-#include <utils/common/event_loop.h>
-
+#include <nx/utils/async_handler_executor.h>
 #include <nx/utils/log/assert.h>
+#include <utils/common/event_loop.h>
 
 namespace
 {
@@ -72,6 +70,9 @@ QTimer* executeDelayedImpl(Callback callback, int delayMs, QThread* targetThread
 
 void executeLater(Callback callback, QObject* parent)
 {
+    if (!NX_ASSERT(parent) || !NX_ASSERT(callback))
+        return;
+
     QMetaObject::invokeMethod(parent, std::move(callback), Qt::QueuedConnection);
 }
 
@@ -103,14 +104,11 @@ QTimer* executeDelayedParented(Callback callback, QObject* parent)
 
 void executeInThread(QThread* thread, Callback callback)
 {
-    NX_ASSERT(thread);
-    NX_ASSERT(callback);
-
-    if (!callback)
+    if (!NX_ASSERT(thread) || !NX_ASSERT(callback))
         return;
 
     if (QThread::currentThread() == thread)
         callback();
     else
-        executeDelayedImpl(callback, 0, thread, nullptr);
+        nx::utils::AsyncHandlerExecutor(thread).submit(std::move(callback));
 }

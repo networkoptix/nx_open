@@ -8,7 +8,6 @@
 
 #include <QtCore/QThread>
 
-#include <nx/utils/async_handler_executor.h>
 #include <nx/utils/qobject.h>
 #include <nx/vms/api/rules/rule.h>
 #include <nx/vms/rules/action_builder.h>
@@ -18,6 +17,7 @@
 #include <nx/vms/rules/manifest.h>
 #include <nx/vms/rules/rule.h>
 #include <nx/vms/rules/utils/api.h>
+#include <utils/common/delayed.h>
 #include <utils/common/synctime.h>
 
 #include "mock_engine_events.h"
@@ -626,6 +626,7 @@ TEST_F(EngineTest, timerThread)
     engine->addEventConnector(&connector);
 
     QThread thread;
+    thread.setObjectName("Engine thread");
     thread.start();
     engine->moveToThread(&thread);
 
@@ -660,7 +661,8 @@ TEST_F(EngineTest, timerThread)
     // Timer will be stopped on rule removal in engine's thread.
     engine->removeRule(ruleId);
 
-    nx::utils::AsyncHandlerExecutor(&thread).submit(
+    executeInThread(
+        &thread,
         [this, &thread]
         {
             engine.reset();
