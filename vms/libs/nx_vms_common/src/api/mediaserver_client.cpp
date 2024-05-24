@@ -102,7 +102,7 @@ void MediaServerClient::setRequestTimeout(std::chrono::milliseconds timeout)
 void MediaServerClient::getUsers(
     std::function<void(ec2::ErrorCode, std::vector<nx::vms::api::UserModel>)> completionHandler)
 {
-    performAsyncCall(Method::get, "rest/v3/users", std::move(completionHandler));
+    performAsyncCall(Method::get, "rest/v4/users", std::move(completionHandler));
 }
 
 ec2::ErrorCode MediaServerClient::getUsers(std::vector<nx::vms::api::UserModel>* result)
@@ -118,7 +118,7 @@ void MediaServerClient::getUser(const nx::Uuid& id,
     std::function<void(ec2::ErrorCode, nx::vms::api::UserModel)> completionHandler)
 {
     performAsyncCall(
-        Method::get, "rest/v3/users/" + id.toSimpleStdString(), std::move(completionHandler));
+        Method::get, "rest/v4/users/" + id.toSimpleStdString(), std::move(completionHandler));
 }
 
 ec2::ErrorCode MediaServerClient::getUser(const nx::Uuid& id, nx::vms::api::UserModel* result)
@@ -139,7 +139,7 @@ void MediaServerClient::saveUser(
     QJsonValue serialized;
     QJson::serialize(&context, request, &serialized);
     performAsyncCall(Method::put,
-        "rest/v3/users/" + request.id.toSimpleStdString(), serialized, std::move(completionHandler));
+        "rest/v4/users/" + request.id.toSimpleStdString(), serialized, std::move(completionHandler));
 }
 
 ec2::ErrorCode MediaServerClient::saveUser(const nx::vms::api::UserModel& request)
@@ -155,7 +155,7 @@ void MediaServerClient::removeUser(
     const nx::Uuid& id, std::function<void(ec2::ErrorCode)> completionHandler)
 {
     performAsyncCall(
-        Method::delete_, "rest/v3/users/" + id.toSimpleStdString(), std::move(completionHandler));
+        Method::delete_, "rest/v4/users/" + id.toSimpleStdString(), std::move(completionHandler));
 }
 
 ec2::ErrorCode MediaServerClient::removeUser(const nx::Uuid& id)

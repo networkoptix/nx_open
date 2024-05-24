@@ -103,7 +103,7 @@ static nx::vms::api::JsonRpcRequest toJsonRpcRequest(
     int reqId)
 {
     return api::JsonRpcRequest{
-        .method = "rest.v3.users.delete",
+        .method = "rest.v4.users.delete",
         .params = paramsWithId(data.id),
         .id = reqId
     };
@@ -114,7 +114,7 @@ static nx::vms::api::JsonRpcRequest toJsonRpcRequest(
     int reqId)
 {
     return api::JsonRpcRequest{
-        .method = "rest.v3.userGroups.delete",
+        .method = "rest.v4.userGroups.delete",
         .params = paramsWithId(data.id),
         .id = reqId
     };
@@ -135,7 +135,7 @@ static nx::vms::api::JsonRpcRequest toJsonRpcRequest(
     };
 
     return api::JsonRpcRequest{
-        .method = "rest.v3.users.update",
+        .method = "rest.v4.users.update",
         .params = paramsWithId(data.id, params),
         .id = reqId
     };
@@ -154,7 +154,7 @@ static nx::vms::api::JsonRpcRequest toJsonRpcRequest(
     };
 
     return api::JsonRpcRequest{
-        .method = "rest.v3.userGroups.update",
+        .method = "rest.v4.userGroups.update",
         .params = paramsWithId(mod.id, params),
         .id = reqId
     };
@@ -173,7 +173,7 @@ static nx::vms::api::JsonRpcRequest toJsonRpcRequest(
     };
 
     return api::JsonRpcRequest{
-        .method = "rest.v3.users.update",
+        .method = "rest.v4.users.update",
         .params = paramsWithId(mod.id, params),
         .id = reqId
     };
@@ -197,7 +197,7 @@ static nx::vms::api::JsonRpcRequest toJsonRpcRequest(
         jsonObject.remove(JsonField(group, id).first);
 
     return api::JsonRpcRequest{
-        .method = "rest.v3.userGroups." + std::string(updateGroup.newGroup ? "create" : "update"),
+        .method = "rest.v4.userGroups." + std::string(updateGroup.newGroup ? "create" : "update"),
         .params = jsonObject,
         .id = reqId
     };
