@@ -2303,7 +2303,7 @@ Handle ServerConnection::saveUserAsync(
     auto request = prepareRequest(
         newUser ? nx::network::http::Method::put : nx::network::http::Method::patch,
         prepareUrl(
-            QString("/rest/v3/users/%1").arg(userData.getId().toString()),
+            QString("/rest/v4/users/%1").arg(userData.getId().toString()),
             /*params*/ {}),
         Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
         nx::reflect::json::serialize(userData));
@@ -2328,7 +2328,7 @@ Handle ServerConnection::saveUserAsync(
     auto request = prepareRequest(
         nx::network::http::Method::patch,
         prepareUrl(
-            QString("/rest/v3/users/%1").arg(id.toString()),
+            QString("/rest/v4/users/%1").arg(id.toString()),
             /*params*/ {}),
         Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
         nx::reflect::json::serialize(parameters));
@@ -2352,7 +2352,7 @@ Handle ServerConnection::removeUserAsync(
     auto request = prepareRequest(
         nx::network::http::Method::delete_,
         prepareUrl(
-            QString("/rest/v3/users/%1").arg(userId.toString()),
+            QString("/rest/v4/users/%1").arg(userId.toString()),
             /*params*/ {}));
 
     auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
@@ -2375,7 +2375,7 @@ Handle ServerConnection::saveGroupAsync(
     auto request = prepareRequest(
         newGroup ? nx::network::http::Method::put : nx::network::http::Method::patch,
         prepareUrl(
-            QString("/rest/v3/userGroups/%1").arg(groupData.id.toString()),
+            QString("/rest/v4/userGroups/%1").arg(groupData.id.toString()),
             /*params*/ {}),
         Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
         nx::reflect::json::serialize(groupData));
@@ -2399,7 +2399,7 @@ Handle ServerConnection::removeGroupAsync(
     auto request = prepareRequest(
         nx::network::http::Method::delete_,
         prepareUrl(
-            QString("/rest/v3/userGroups/%1").arg(groupId.toString()),
+            QString("/rest/v4/userGroups/%1").arg(groupId.toString()),
             /*params*/ {}));
 
     auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));

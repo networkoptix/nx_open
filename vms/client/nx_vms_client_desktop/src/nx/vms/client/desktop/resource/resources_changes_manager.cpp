@@ -123,7 +123,7 @@ void ResourcesChangesManager::deleteResource(const QnResourcePtr& resource,
     }
     else if (resource.dynamicCast<QnUserResource>())
     {
-        action = QString("/rest/v3/users/%1").arg(resource->getId().toString());
+        action = QString("/rest/v4/users/%1").arg(resource->getId().toString());
     }
     else if (resource.dynamicCast<QnLayoutResource>())
     {
