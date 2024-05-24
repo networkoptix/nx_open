@@ -10,6 +10,7 @@
 #include <nx/utils/uuid.h>
 
 #include "db_statistics_collector.h"
+#include "db_connection_factory.h"
 
 namespace nx::sql {
 
@@ -21,7 +22,7 @@ DbConnectionHolder::DbConnectionHolder(
     m_connection(std::move(connection))
 {
     if (!m_connection)
-        m_connection = std::make_unique<QtDbConnection>(connectionOptions);
+        m_connection = DbConnectionFactory::instance().create(connectionOptions);
 }
 
 DbConnectionHolder::~DbConnectionHolder()

@@ -166,9 +166,14 @@ public:
         return m_delegate->qtSqlConnection();
     }
 
-    virtual bool tableExist(const std::string_view& tableName)
+    virtual bool tableExist(const std::string_view& tableName) override
     {
         return m_delegate->tableExist(tableName);
+    }
+
+    void setDelegate(AbstractDbConnection* delegate)
+    {
+        m_delegate = delegate;
     }
 
 private:
