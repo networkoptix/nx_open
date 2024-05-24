@@ -21,13 +21,10 @@ namespace nx {
 namespace common {
 namespace metadata {
 
-/**%apidoc Analytics object attribute. */
+/**%apidoc Attribute of an analytics entity. */
 struct NX_VMS_COMMON_API Attribute
 {
-    /**%apidoc Attribute name. */
     QString name;
-
-    /**%apidoc Attribute value. */
     QString value;
 
     Attribute() = default;
@@ -200,7 +197,7 @@ NX_REFLECTION_INSTRUMENT(ObjectMetadata, ObjectMetadata_Fields)
 
 //-------------------------------------------------------------------------------------------------
 
-/**%apidoc Analytics metadata packet. */
+/**%apidoc Analytics metadata packet representing an Object on a given video frame. */
 struct NX_VMS_COMMON_API ObjectMetadataPacket
 {
     /**%apidoc Device id. */

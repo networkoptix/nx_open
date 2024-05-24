@@ -370,8 +370,7 @@ Response CrudHandler<Derived>::executeGet(const Request& request)
             params.remove(key);
 
         const auto defaultValueAction = extractDefaultValueAction(&params, request.apiVersion());
-        if (const auto id = idParam(request)
-            ;
+        if (const auto id = idParam(request);
             (id.value && id.isInPath) || m_idParamName.isEmpty())
         {
             const auto size = list.size();
