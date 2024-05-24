@@ -111,7 +111,7 @@ private:
     LookupListNotificationManager* m_lookupListManager;
 
     nx::Mutex m_mutex;
-    std::unordered_map<ApiCommand::Value, std::set<MonitorCallback*>> m_monitoredCommands;
+    std::unordered_map<ApiCommand::Value, std::set<std::shared_ptr<MonitorCallback>>> m_monitoredCommands;
     std::unordered_map<std::shared_ptr<MonitorCallback>, std::vector<ApiCommand::Value>>
         m_monitors;
 };

@@ -46,7 +46,7 @@ private:
     nx::Mutex m_mutex;
     nx::utils::Guard m_guard;
     std::unordered_map<std::shared_ptr<SubscriptionCallback>, QString> m_subscriptions;
-    std::unordered_map<QString, std::set<SubscriptionCallback*>> m_subscribedIds;
+    std::unordered_map<QString, std::set<std::shared_ptr<SubscriptionCallback>>> m_subscribedIds;
     AddMonitor m_addMonitor;
 };
 
