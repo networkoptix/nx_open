@@ -41,8 +41,11 @@ void HttpAuthField::setPassword(const std::string& password)
 {
     if (m_auth.credentials.password != password)
     {
-        m_auth.credentials.password = password;
+        m_auth.credentials.password = password.empty() ? std::optional<std::string>() : password;
         emit passwordChanged();
+
+        if (!password.empty())
+            setToken({});
     }
 }
 
@@ -55,8 +58,11 @@ void HttpAuthField::setToken(const std::string& token)
 {
     if (m_auth.credentials.token != token)
     {
-        m_auth.credentials.token = token;
+        m_auth.credentials.token = token.empty() ? std::optional<std::string>() : token;
         emit tokenChanged();
+
+        if (!token.empty())
+            setPassword({});
     }
 }
 
