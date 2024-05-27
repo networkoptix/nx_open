@@ -14,6 +14,7 @@
 #include "../event_filter.h"
 #include "../event_filter_fields/source_camera_field.h"
 #include "../rule.h"
+#include "../strings.h"
 #include "../utils/field.h"
 #include "../utils/resource.h"
 
@@ -41,11 +42,12 @@ ValidationResult TargetUserFieldValidator::validity(
 {
     auto targetUserField = dynamic_cast<const TargetUserField*>(field);
     if (!NX_ASSERT(targetUserField))
-        return {QValidator::State::Invalid, tr("Invalid field type is provided")};
+        return {QValidator::State::Invalid, Strings::invalidFieldType()};
 
     const auto targetUserFieldProperties = targetUserField->properties();
+    const auto userSelection = targetUserField->selection();
 
-    if (!targetUserFieldProperties.validationPolicy.isEmpty())
+    if (!userSelection.isEmpty() && !targetUserFieldProperties.validationPolicy.isEmpty())
     {
         if (targetUserFieldProperties.validationPolicy == kBookmarkManagementValidationPolicy)
         {
@@ -77,6 +79,8 @@ ValidationResult TargetUserFieldValidator::validity(
                     return getValidity(policy, targetUserField->acceptAll(), targetUserField->ids());
                 }
             }
+
+            return {};
         }
 
         if (targetUserFieldProperties.validationPolicy == kUserWithEmailValidationPolicy)
@@ -115,10 +119,12 @@ ValidationResult TargetUserFieldValidator::validity(
 
             return getValidity(policy, targetUserField->acceptAll(), targetUserField->ids());
         }
+
+        return {QValidator::State::Invalid, Strings::unexpectedPolicy()};
     }
 
-    if (!targetUserFieldProperties.allowEmptySelection && targetUserField->selection().isEmpty())
-        return {QValidator::State::Invalid, tr("Select at least one user")};
+    if (!targetUserFieldProperties.allowEmptySelection && userSelection.isEmpty())
+        return {QValidator::State::Invalid, Strings::selectUser()};
 
     return {};
 }

@@ -8,6 +8,7 @@
 
 #include "../action_builder_fields/target_server_field.h"
 #include "../manifest.h"
+#include "../strings.h"
 #include "../utils/resource.h"
 #include "../utils/validity.h"
 
@@ -18,7 +19,7 @@ ValidationResult TargetServerFieldValidator::validity(
 {
     auto targetServerField = dynamic_cast<const TargetServerField*>(field);
     if (!NX_ASSERT(targetServerField))
-        return {QValidator::State::Invalid, tr("Invalid field type is provided")};
+        return {QValidator::State::Invalid, Strings::invalidFieldType()};
 
     const auto serversSelection = targetServerField->selection();
     const auto targetServerFieldProperties = targetServerField->properties();
@@ -34,18 +35,14 @@ ValidationResult TargetServerFieldValidator::validity(
             if (serversValidity == QValidator::State::Acceptable)
                 return {};
 
-            return {
-                serversValidity,
-                serversValidity == QValidator::State::Intermediate
-                    ? tr("Not all servers are suitable")
-                    : tr("There are no suitable servers")};
+            return {serversValidity, Strings::noSuitableServers(serversValidity)};
         }
 
-        return {QValidator::State::Invalid, tr("Unexpected validation policy")};
+        return {QValidator::State::Invalid, Strings::unexpectedPolicy()};
     }
 
     if (!targetServerFieldProperties.allowEmptySelection && serversSelection.isEmpty())
-        return {QValidator::State::Invalid, tr("Select at least one server")};
+        return {QValidator::State::Invalid, Strings::selectServer()};
 
     return {};
 }

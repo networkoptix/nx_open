@@ -9,6 +9,7 @@
 #include "../engine.h"
 #include "../event_filter.h"
 #include "../rule.h"
+#include "../strings.h"
 #include "../utils/event.h"
 #include "../utils/resource.h"
 #include "../utils/validity.h"
@@ -20,7 +21,7 @@ ValidationResult TargetDeviceFieldValidator::validity(
 {
     auto targetDeviceField = dynamic_cast<const TargetDeviceField*>(field);
     if (!NX_ASSERT(targetDeviceField))
-        return {QValidator::State::Invalid, {tr("Invalid field type is provided")}};
+        return {QValidator::State::Invalid, {Strings::invalidFieldType()}};
 
     const auto eventDescriptor =
         rule->engine()->eventDescriptor(rule->eventFilters().front()->eventType());
@@ -50,18 +51,11 @@ ValidationResult TargetDeviceFieldValidator::validity(
         if (targetDeviceFieldProperties.validationPolicy == kCameraRecordingValidationPolicy)
             return utils::camerasValidity<QnCameraRecordingPolicy>(context, cameras);
 
-        return {QValidator::State::Invalid, tr("Unexpected validation policy")};
+        return {QValidator::State::Invalid, Strings::unexpectedPolicy()};
     }
 
     if (!targetDeviceFieldProperties.allowEmptySelection && !hasSelection)
-    {
-        return {
-            QValidator::State::Invalid,
-            QnDeviceDependentStrings::getDefaultNameFromSet(
-                context->resourcePool(),
-                tr("Select at least one device"),
-                tr("Select at least one camera"))};
-    }
+        return {QValidator::State::Invalid, Strings::selectCamera(context)};
 
     return {};
 }

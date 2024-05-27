@@ -268,7 +268,6 @@ TEST_F(BuiltinTypesTest, BuiltinEvents)
     testEventFieldRegistration<CustomizableFlagField>();
     testEventFieldRegistration<CustomizableIconField>();
     testEventFieldRegistration<CustomizableTextField>();
-    testEventFieldRegistration<DummyField>();
     testEventFieldRegistration<EventFlagField>();
     testEventFieldRegistration<EventTextField>();
     testEventFieldRegistration<ExpectedUuidField>();

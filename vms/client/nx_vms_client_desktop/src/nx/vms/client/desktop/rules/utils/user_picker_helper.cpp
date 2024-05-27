@@ -13,6 +13,7 @@
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
+#include <nx/vms/rules/strings.h>
 #include <nx/vms/rules/user_validation_policy.h>
 
 using namespace nx::vms::api;
@@ -88,7 +89,7 @@ QString UserPickerHelper::text() const
         return makeText(tr("All Users"), additional);
 
     if (m_users.empty() && m_groups.empty())
-        return m_parameters.additionalUsers == 0 ? tr("Select at least one user") : additional;
+        return m_parameters.additionalUsers == 0 ? vms::rules::Strings::selectUser() : additional;
 
     if (m_users.size() == 1 && m_groups.empty())
         return makeText(m_users.front()->getName(), additional);

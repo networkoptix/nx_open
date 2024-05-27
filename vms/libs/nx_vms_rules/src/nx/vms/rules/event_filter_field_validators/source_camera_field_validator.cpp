@@ -7,6 +7,7 @@
 
 #include "../event_filter_fields/source_camera_field.h"
 #include "../manifest.h"
+#include "../strings.h"
 #include "../utils/resource.h"
 #include "../utils/validity.h"
 
@@ -17,7 +18,7 @@ ValidationResult SourceCameraFieldValidator::validity(
 {
     auto sourceCameraField = dynamic_cast<const SourceCameraField*>(field);
     if (!NX_ASSERT(sourceCameraField))
-        return {QValidator::State::Invalid, {tr("Invalid field type is provided")}};
+        return {QValidator::State::Invalid, {Strings::invalidFieldType()}};
 
     const auto camerasSelection = sourceCameraField->selection();
     const auto sourceCameraFieldProperties = sourceCameraField->properties();
@@ -36,18 +37,11 @@ ValidationResult SourceCameraFieldValidator::validity(
         if (sourceCameraFieldProperties.validationPolicy == kCameraMotionValidationPolicy)
             return utils::camerasValidity<QnCameraMotionPolicy>(context, cameras);
 
-        return {QValidator::State::Invalid, tr("Unexpected validation policy")};
+        return {QValidator::State::Invalid, Strings::unexpectedPolicy()};
     }
 
     if (!sourceCameraFieldProperties.allowEmptySelection && camerasSelection.isEmpty())
-    {
-        return {
-            QValidator::State::Invalid,
-            QnDeviceDependentStrings::getDefaultNameFromSet(
-                context->resourcePool(),
-                tr("Select at least one device"),
-                tr("Select at least one camera"))};
-    }
+        return {QValidator::State::Invalid, Strings::selectCamera(context)};
 
     return {};
 }

@@ -101,7 +101,6 @@ void Initializer::registerFields() const
     registerEventField<CustomizableFlagField>();
     registerEventField<CustomizableIconField>();
     registerEventField<CustomizableTextField>();
-    registerEventField<DummyField>();
     registerEventField<EventFlagField>();
     registerEventField<EventTextField>();
     registerEventField<ExpectedUuidField>();

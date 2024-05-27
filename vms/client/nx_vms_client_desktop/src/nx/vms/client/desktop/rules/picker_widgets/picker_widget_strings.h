@@ -23,8 +23,6 @@ class ResourcePickerWidgetStrings
     Q_DECLARE_TR_FUNCTIONS(SourcePickerWidgetStrings)
 
 public:
-    static QString selectServer();
-    static QString selectUser();
     static QString selectDevice(QnCameraDeviceType deviceType);
     static QString useEventSourceString(const QString& actionType = {});
 };

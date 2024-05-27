@@ -3,7 +3,6 @@
 #include "generic_event.h"
 
 #include "../event_filter_fields/customizable_flag_field.h"
-#include "../event_filter_fields/dummy_field.h"
 #include "../event_filter_fields/text_lookup_field.h"
 #include "../strings.h"
 #include "../utils/event_details.h"
@@ -86,10 +85,6 @@ const ItemDescriptor& GenericEvent::manifest()
             makeFieldDescriptor<CustomizableFlagField>(
                 utils::kOmitLoggingFieldName,
                 NX_DYNAMIC_TRANSLATABLE(tr("Omit logging"))),
-
-            makeFieldDescriptor<DummyField>(
-                utils::kDeviceIdsFieldName,
-                /*displayName*/{})
         },
         .resources = {
             {utils::kServerIdFieldName,

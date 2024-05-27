@@ -20,16 +20,6 @@ QString CommonPickerWidgetStrings::testButtonDisplayText()
     return tr("Test");
 }
 
-QString ResourcePickerWidgetStrings::selectServer()
-{
-    return tr("Select at least one Server");
-}
-
-QString ResourcePickerWidgetStrings::selectUser()
-{
-    return tr("Select at least one user");
-}
-
 QString ResourcePickerWidgetStrings::selectDevice(QnCameraDeviceType deviceType)
 {
     static const QnCameraDeviceStringSet deviceStringSet{

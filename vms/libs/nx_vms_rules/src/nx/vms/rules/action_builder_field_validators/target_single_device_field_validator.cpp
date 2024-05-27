@@ -6,6 +6,7 @@
 #include <nx/vms/rules/camera_validation_policy.h>
 
 #include "../action_builder_fields/target_single_device_field.h"
+#include "../strings.h"
 #include "../utils/validity.h"
 
 namespace nx::vms::rules {
@@ -15,7 +16,7 @@ ValidationResult TargetSingleDeviceFieldValidator::validity(
 {
     auto targetSingleDeviceField = dynamic_cast<const TargetSingleDeviceField*>(field);
     if (!NX_ASSERT(targetSingleDeviceField))
-        return {QValidator::State::Invalid, {tr("Invalid field type is provided")}};
+        return {QValidator::State::Invalid, {Strings::invalidFieldType()}};
 
     const auto deviceId = targetSingleDeviceField->id();
     const bool hasSelection = !deviceId.isNull() || targetSingleDeviceField->useSource();
@@ -32,11 +33,15 @@ ValidationResult TargetSingleDeviceFieldValidator::validity(
         if (targetSingleDeviceFieldProperties.validationPolicy == kCameraFullScreenValidationPolicy)
             return utils::cameraValidity<QnFullscreenCameraPolicy>(context, device);
 
-        return {QValidator::State::Invalid, tr("Unexpected validation policy")};
+        return {QValidator::State::Invalid, Strings::unexpectedPolicy()};
     }
 
     if (!targetSingleDeviceFieldProperties.allowEmptySelection && !hasSelection)
-        return {QValidator::State::Invalid, tr("Select exactly one camera")};
+    {
+        return {
+            QValidator::State::Invalid,
+            Strings::selectCamera(context, /*allowMultipleSelection*/ false)};
+    }
 
     return {};
 }

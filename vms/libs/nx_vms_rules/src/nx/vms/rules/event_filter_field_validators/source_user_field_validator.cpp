@@ -11,6 +11,7 @@
 #include "../event_filter_fields/source_camera_field.h"
 #include "../event_filter_fields/source_user_field.h"
 #include "../rule.h"
+#include "../strings.h"
 #include "../utils/field.h"
 
 namespace nx::vms::rules {
@@ -20,7 +21,7 @@ ValidationResult SourceUserFieldValidator::validity(
 {
     auto sourceUserField = dynamic_cast<const SourceUserField*>(field);
     if (!NX_ASSERT(sourceUserField))
-        return {QValidator::State::Invalid, {tr("Invalid field type is provided")}};
+        return {QValidator::State::Invalid, {Strings::invalidFieldType()}};
 
     const auto sourceUserFieldProperties = sourceUserField->properties();
 
@@ -65,7 +66,7 @@ ValidationResult SourceUserFieldValidator::validity(
     }
 
     if (!sourceUserFieldProperties.allowEmptySelection && sourceUserField->selection().isEmpty())
-        return {QValidator::State::Invalid, tr("Select at least one user")};
+        return {QValidator::State::Invalid, Strings::selectUser()};
 
     return {};
 }
