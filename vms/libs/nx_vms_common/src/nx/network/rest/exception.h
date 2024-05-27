@@ -28,6 +28,7 @@ public:
     NX_REST_EXCEPTION_METHOD(forbidden)
     NX_REST_EXCEPTION_METHOD(conflict)
     NX_REST_EXCEPTION_METHOD(badRequest)
+    NX_REST_EXCEPTION_METHOD(notAllowed)
     NX_REST_EXCEPTION_METHOD(notImplemented)
     NX_REST_EXCEPTION_METHOD(notFound)
     NX_REST_EXCEPTION_METHOD(internalServerError)

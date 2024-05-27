@@ -119,6 +119,11 @@ public:
          * %caption 14
          */
         SessionRequired = 14,
+
+        /**%apidoc
+         * %caption 17
+         */
+        NotAllowed = 17,
     };
 
     static QString errorToString(Result::Error value);
@@ -141,6 +146,7 @@ public:
     static Result forbidden(std::optional<QString> customMessage = std::nullopt);
     static Result conflict(std::optional<QString> customMessage = std::nullopt);
     static Result badRequest(std::optional<QString> customMessage = std::nullopt);
+    static Result notAllowed(std::optional<QString> customMessage = std::nullopt);
     static Result notImplemented(std::optional<QString> customMessage = std::nullopt);
     static Result notFound(std::optional<QString> customMessage = std::nullopt);
     static Result internalServerError(std::optional<QString> customMessage = std::nullopt);
