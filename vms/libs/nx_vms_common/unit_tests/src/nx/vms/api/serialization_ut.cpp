@@ -79,6 +79,7 @@ TEST(QnAuditRecord, serialization)
     "errorString": "",
     "reply": [
         {
+            "serverId": "{00000000-0000-0000-0000-000000000000}",
             "eventType": "notDefined",
             "createdTimeS": 0,
             "authSession": {

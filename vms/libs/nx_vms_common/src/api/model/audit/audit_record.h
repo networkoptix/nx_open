@@ -12,6 +12,13 @@
 
 #include "audit_details.h"
 
+namespace nx::network::rest::json {
+
+template<typename T>
+QJsonValue defaultValue();
+
+} // namespace nx::network::rest::json
+
 namespace QnCollection { struct list_tag; }
 
 namespace QJsonDetail {
@@ -103,6 +110,8 @@ using QnLegacyAuditRecordRefList = QVector<QnLegacyAuditRecord*>;
 
 struct NX_VMS_COMMON_API QnAuditRecord
 {
+    nx::Uuid serverId;
+
     /**%apidoc Record type. */
     nx::vms::api::AuditRecordType eventType = nx::vms::api::AuditRecordType::notDefined;
 
@@ -161,6 +170,9 @@ struct NX_VMS_COMMON_API QnAuditRecord
 private:
     QnAuditRecord(): authSession{{{nx::Uuid{}}}} {}
 
+    template<typename T>
+    friend QJsonValue nx::network::rest::json::defaultValue();
+
     template<class Collection>
     friend void QJsonDetail::serialize_collection(QnJsonContext*, const Collection&, QJsonValue*);
 
@@ -168,7 +180,7 @@ private:
     friend bool QJsonDetail::deserialize_collection_element(
         QnJsonContext*, const QJsonValue&, Collection*, const Element*, const QnCollection::list_tag&);
 };
-#define QnAuditRecord_Fields (eventType)(createdTimeS)(authSession)(details)(apiInfo)
+#define QnAuditRecord_Fields (serverId)(eventType)(createdTimeS)(authSession)(details)(apiInfo)
 QN_FUSION_DECLARE_FUNCTIONS(QnAuditRecord, (ubjson)(json), NX_VMS_COMMON_API)
 NX_REFLECTION_INSTRUMENT(QnAuditRecord, QnAuditRecord_Fields)
 NX_REFLECTION_TAG_TYPE(QnAuditRecord, jsonSerializeChronoDurationAsNumber)
