@@ -31,7 +31,7 @@ Control
         {
             id: prevButton
 
-            icon.source: "image://skin/ptz/arrow_left_20.svg"
+            icon.source: "image://20x20/Outline/arrow_left.svg"
             color: pressed || hovered ? ColorTheme.colors.light4 : ColorTheme.colors.light9
             visible: !bar.isFirstPage
 
