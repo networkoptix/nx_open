@@ -2,7 +2,7 @@
 
 #include "process_utils.h"
 
-#include <QtCore/QProcess>
+#include <nx/utils/platform/process.h>
 
 #ifdef Q_OS_LINUX
 #include <unistd.h>
@@ -69,7 +69,7 @@ bool ProcessUtils::startProcessDetached(const QString &program, const QStringLis
     if(program.isEmpty())
         return false; /* This prevents a crash in QProcess::startDetached. */
 
-    return QProcess::startDetached(program, arguments, workingDirectory);
+    return nx::utils::startProcessDetached(program, arguments, workingDirectory);
 }
 
 void ProcessUtils::initialize() {}

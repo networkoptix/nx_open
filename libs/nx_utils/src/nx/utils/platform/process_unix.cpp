@@ -18,15 +18,13 @@ SystemError::ErrorCode killProcessByPid(qint64 pid)
         : SystemError::getLastOSErrorCode();
 }
 
-SystemError::ErrorCode startProcessDetached(
+bool startProcessDetached(
     const QString& executablePath,
     const QStringList& arguments,
     const QString& workingDirectory,
     qint64* pid)
 {
-    return QProcess::startDetached(executablePath, arguments, workingDirectory, pid)
-        ? SystemError::noError
-        : SystemError::fileNotFound; // TODO: #akolesnikov get proper error code.
+    return QProcess::startDetached(executablePath, arguments, workingDirectory, pid);
 }
 
 bool checkProcessExists(qint64 pid)
