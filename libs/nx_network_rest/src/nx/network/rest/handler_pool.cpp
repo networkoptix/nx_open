@@ -172,7 +172,11 @@ void HandlerPool::auditFailedRequest(
     if (!NX_ASSERT(!http::StatusCode::isSuccessCode(response.statusCode)))
         return;
 
-    auto r = handler ? handler->prepareAuditRecord(request) : (audit::Record) request;
+    auto r = handler
+        ? handler->prepareAuditRecord(request)
+        : Handler::isAuditableRequest(request)
+            ? (audit::Record) request
+            : audit::Record{request.userSession};
     if (!r.apiInfo)
         return;
 

@@ -115,6 +115,7 @@ public:
     virtual QString subscriptionId(const Request&) { return {}; }
     virtual void audit(const Request& request, const Response& response);
     virtual audit::Record prepareAuditRecord(const Request& request) const;
+    static bool isAuditableRequest(const Request& request);
 
 protected:
     std::atomic<bool> m_needStop = false;
