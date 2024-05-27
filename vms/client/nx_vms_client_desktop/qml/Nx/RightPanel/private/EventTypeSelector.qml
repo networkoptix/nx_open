@@ -29,7 +29,7 @@ SelectableTextButton
 
     selectable: false
 
-    icon.source: "image://skin/text_buttons/event_rules_20x20.svg"
+    icon.source: "image://skin/20x20/Outline/event_rules.svg"
 
     text:
     {

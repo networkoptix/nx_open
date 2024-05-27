@@ -78,8 +78,8 @@ Control
                 checked: true
 
                 icon.source: checked
-                    ? "image://skin/text_buttons/image_hide_20x20.svg"
-                    : "image://skin/text_buttons/image_20x20.svg"
+                    ? "image://skin/20x20/Outline/image_hide.svg"
+                    : "image://skin/20x20/Outline/image.svg"
 
                 color: ColorTheme.colors.light16
                 visible: control.showThumbnailsButton

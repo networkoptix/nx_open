@@ -178,7 +178,7 @@ Dialog
                 TextButton
                 {
                     text: qsTr("Speed up this update")
-                    icon.source: "image://skin/text_buttons/shopping_cart.svg"
+                    icon.source: "image://skin/20x20/Outline/shopping_cart.svg"
                     visible: advancedMode && !!autoClientUpdatesPanel.uiState.speedUpButton
 
                     onClicked:

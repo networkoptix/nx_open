@@ -17,7 +17,7 @@ SelectableTextButton
     selectable: false
     deactivatable: !limitToCurrentCamera
     accented: setup && setup.cameraSelection === EventSearch.CameraSelection.current
-    icon.source: "image://skin/text_buttons/camera_20.svg"
+    icon.source: "image://skin/20x20/Solid/camera.svg"
 
     readonly property var actionNames:
     {

@@ -17,7 +17,7 @@ SelectableTextButton
 
     selectable: false
 
-    icon.source: "image://skin/text_buttons/plugins.svg"
+    icon.source: "image://skin/20x20/Outline/plugins.svg"
 
     text:
     {
