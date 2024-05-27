@@ -22,9 +22,9 @@ NX_UTILS_API SystemError::ErrorCode killProcessByPid(qint64 pid);
  * @param arguments Program arguments.
  * @param workingDirectory If not empty, working directory is set to this path.
  * @param pid if not null, launched process pid is stored here.
- * @return Error code.
+ * @return Whether process was started succesfully.
  */
-NX_UTILS_API SystemError::ErrorCode startProcessDetached(
+NX_UTILS_API bool startProcessDetached(
     const QString& executablePath,
     const QStringList& arguments = QStringList(),
     const QString& workingDirectory = QString(),

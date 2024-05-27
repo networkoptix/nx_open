@@ -5,7 +5,6 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDir>
 #include <QtCore/QLockFile>
-#include <QtCore/QProcess>
 #include <QtCore/QStandardPaths>
 #include <QtCore/QThread>
 
@@ -20,6 +19,7 @@
 #include <nx/build_info.h>
 #include <nx/utils/file_system.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/platform/process.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/utils/platform/protocol_handler.h>
@@ -107,7 +107,8 @@ bool runMinilaucherInternal(const QStringList& args)
         }
         return false;
     }
-    else if (QProcess::startDetached(minilauncherPath, args)) /*< arguments are MUST here */
+    // Arguments are MUST here.
+    else if (nx::utils::startProcessDetached(minilauncherPath, args))
     {
         NX_INFO(typeid(SelfUpdater), "Minilauncher process started successfully.");
         return true;
@@ -933,8 +934,8 @@ void SelfUpdater::updateMinilauncherIconsOnWindows(bool hasAdminRights)
         // well documented and whose arguments differs from version to version, but at least
         // which does not require Explorer restart to work.
 
-        QProcess::startDetached("ie4uinit", {"-show"}); // Windows 10.
-        QProcess::startDetached("ie4uinit", {"-ClearIconCache"}); // Other versions.
+        nx::utils::startProcessDetached("ie4uinit", {"-show"}); // Windows 10.
+        nx::utils::startProcessDetached("ie4uinit", {"-ClearIconCache"}); // Other versions.
     }
 
     NX_VERBOSE(this, "Shortcut update finished");
