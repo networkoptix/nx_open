@@ -38,17 +38,18 @@ public:
 
     struct ValueDescriptor
     {
-        FieldType type;
+        FieldType type = FieldType::Text;
         QString value;
+        bool isValid = true;
         qsizetype start = 0;
         qsizetype length = 0;
     };
 
     using ParsedValues = QList<ValueDescriptor>;
 
+    const ParsedValues& parsedValues() const;
 signals:
     void textChanged();
-    void parseFinished(const ParsedValues & parsedValues);
 
 private:
     struct Private;

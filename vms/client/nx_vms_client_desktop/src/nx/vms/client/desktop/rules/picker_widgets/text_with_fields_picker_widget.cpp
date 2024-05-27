@@ -8,6 +8,7 @@
 #include <nx/vms/client/desktop/rules/model_view/event_parameters_model.h>
 #include <nx/vms/rules/event_filter_fields/analytics_object_type_field.h>
 #include <nx/vms/rules/event_filter_fields/state_field.h>
+#include <nx/vms/rules/field_validator.h>
 #include <nx/vms/rules/utils/event_parameter_helper.h>
 #include <nx/vms/rules/utils/field.h>
 
@@ -19,11 +20,17 @@ using namespace vms::rules::utils;
 
 struct TextWithFieldsPicker::Private: public QObject
 {
+    struct EventTrackableData
+    {
+        QString objectType;
+        QString eventId;
+        api::rules::State eventState = api::rules::State::none;
+        bool operator==(const EventTrackableData&) const = default;
+    };
+
     Completer* completer{nullptr};
-    bool connected = false;
     TextWithFieldsPicker* const q;
-    QString objectType;
-    api::rules::State eventState;
+    EventTrackableData currentEventData;
 
     Private(TextWithFieldsPicker* parent): q(parent){};
 
@@ -68,21 +75,12 @@ struct TextWithFieldsPicker::Private: public QObject
             cursor.setPosition(val.start);
             cursor.setPosition(val.start + val.length, QTextCursor::KeepAnchor);
 
-            const bool isCorrectValue = completer->containsElement(val.value);
-            cursor.setCharFormat(isCorrectValue ? correctCharFormat : incorrectCharFromat);
+            cursor.setCharFormat(val.isValid ? correctCharFormat : incorrectCharFromat);
         }
 
         // Resetting char format, to avoid overlapping of char format outside the selection.
         textCursor.setCharFormat({});
         q->m_textEdit->setTextCursor(textCursor);
-    }
-
-    void setCompleterModel(const vms::rules::ItemDescriptor& desc)
-    {
-        const auto model =
-            new EventParametersModel(EventParameterHelper::getVisibleEventParameters(
-                desc.id, q->common::SystemContextAware::systemContext(), objectType, eventState));
-        completer->setModel(model);
     }
 
     QString getObjectTypeFieldValue() const
@@ -99,22 +97,23 @@ struct TextWithFieldsPicker::Private: public QObject
         return stateField ? stateField->value() : api::rules::State::none;
     }
 
-    void updateCompleterModel(const std::optional<vms::rules::ItemDescriptor>& desc)
+    void updateCompleterModel(const vms::rules::ItemDescriptor& eventDesc)
     {
-        if (!desc)
+        EventTrackableData newData{.objectType = getObjectTypeFieldValue(),
+            .eventId = eventDesc.id,
+            .eventState = getStateFieldValue()};
+
+        if (currentEventData == newData)
             return;
 
-        const auto newObjectTypeValue = getObjectTypeFieldValue();
-        const auto newStateValue = getStateFieldValue();
+        currentEventData = newData;
 
-        // Updating completer model only if AnalyticsObjectType or Event State was changed.
-        if (newObjectTypeValue == objectType && newStateValue == eventState)
-            return;
-
-        objectType = newObjectTypeValue;
-        eventState = newStateValue;
-
-        setCompleterModel(desc.value());
+        const auto model = new EventParametersModel(
+            EventParameterHelper::getVisibleEventParameters(currentEventData.eventId,
+                q->common::SystemContextAware::systemContext(),
+                currentEventData.objectType,
+                currentEventData.eventState));
+        completer->setModel(model);
     }
 };
 
@@ -135,20 +134,27 @@ TextWithFieldsPicker::~TextWithFieldsPicker()
 
 void TextWithFieldsPicker::updateUi()
 {
-    const auto desc = getEventDescriptor();
-    if (!d->connected && desc)
-    {
-        connect(m_field,
-            &nx::vms::rules::TextWithFields::parseFinished,
-            d.get(),
-            &TextWithFieldsPicker::Private::addFormattingToText);
-        d->setCompleterModel(desc.value());
-        d->connected = true;
-    }
+    const auto eventDescriptor = getEventDescriptor();
+    if (!eventDescriptor)
+        return;
 
     base::updateUi();
-    d->updateCompleterModel(desc);
+    d->updateCompleterModel(eventDescriptor.value());
     m_field->parseText();
+    if (auto validator = fieldValidator())
+        setValidity(validator->validity(m_field, parentParamsWidget()->rule(), systemContext()));
+}
+
+void TextWithFieldsPicker::setValidity(const vms::rules::ValidationResult& validationResult)
+{
+    if (!NX_ASSERT(validationResult.additionalData
+        .canConvert<vms::rules::TextWithFields::ParsedValues>(), "Invalid input data"))
+    {
+        return;
+    }
+
+    d->addFormattingToText(
+        validationResult.additionalData.value<vms::rules::TextWithFields::ParsedValues>());
 }
 
 } // namespace nx::vms::client::desktop::rules

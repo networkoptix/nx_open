@@ -12,7 +12,7 @@ namespace nx::vms::rules::utils {
 class NX_VMS_RULES_API EventParameterHelper
 {
 public:
-    using EventParametersNames = QList<QString>;
+    using EventParametersNames = QSet<QString>;
 
     static QString addBrackets(const QString& text);
     static QString removeBrackets(QString text);

@@ -5,6 +5,7 @@
 #include <QtCore/QAbstractListModel>
 
 #include <nx/utils/impl_ptr.h>
+#include <nx/vms/rules/utils/event_parameter_helper.h>
 
 namespace nx::vms::client::desktop::rules {
 
@@ -12,7 +13,9 @@ class NX_VMS_CLIENT_DESKTOP_API EventParametersModel: public QAbstractListModel
 {
     Q_OBJECT
 public:
-    EventParametersModel(const QList<QString>& eventParameters, QObject* parent = nullptr);
+    EventParametersModel(
+        const vms::rules::utils::EventParameterHelper::EventParametersNames& eventParameters,
+        QObject* parent = nullptr);
     ~EventParametersModel();
 
     int rowCount(const QModelIndex& parent) const override;

@@ -16,6 +16,7 @@ struct ValidationResult
 {
     QValidator::State validity = QValidator::State::Acceptable;
     QString description;
+    QVariant additionalData; //< Additional data, which can be used in pickers.
 
     bool isValid() const { return validity != QValidator::State::Invalid; }
 

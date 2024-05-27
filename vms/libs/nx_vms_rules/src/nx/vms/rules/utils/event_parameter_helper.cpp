@@ -179,10 +179,10 @@ EventParameterHelper::EventParametersNames EventParameterHelper::getVisibleEvent
         if (!substitutionIsApplicable(desc, eventType, eventState, systemContext))
             continue;
 
-        result.push_back(key);
+        result.insert(key);
     }
-    auto attributes = getAttributesParameters(eventType, systemContext, objectTypeField);
-    return result + QList(attributes.begin(), attributes.end());
+
+    return result + getAttributesParameters(eventType, systemContext, objectTypeField);
 }
 
 QString EventParameterHelper::evaluateEventParameter(

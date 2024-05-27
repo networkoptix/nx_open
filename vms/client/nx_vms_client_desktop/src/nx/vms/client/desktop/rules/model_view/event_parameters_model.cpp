@@ -3,7 +3,6 @@
 #include "event_parameters_model.h"
 
 #include <nx/vms/client/desktop/rules/utils/separator.h>
-#include <nx/vms/rules/utils/event_parameter_helper.h>
 
 namespace {
 
@@ -75,9 +74,10 @@ struct EventParametersModel::Private
     }
 };
 
-EventParametersModel::EventParametersModel(const QList<QString>& eventParameters, QObject* parent):
+EventParametersModel::EventParametersModel(
+    const EventParameterHelper::EventParametersNames& eventParameters, QObject* parent):
     QAbstractListModel{parent},
-    d(new Private{.allElements = QSet(eventParameters.begin(), eventParameters.end()) })
+    d(new Private{.allElements = eventParameters })
 {
     d->groupEventParameters();
     d->defaultVisibleElements = d->visibleElements;

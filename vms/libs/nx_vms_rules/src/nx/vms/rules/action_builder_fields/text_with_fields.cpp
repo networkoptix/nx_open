@@ -13,7 +13,6 @@ namespace nx::vms::rules {
 struct TextWithFields::Private
 {
     QString text;
-    TextWithFields* const q;
     QList<ValueDescriptor> values;
 
     void parseText()
@@ -74,8 +73,6 @@ struct TextWithFields::Private
                 .start = start,
                 .length = text.size() - start};
         }
-
-        emit q->parseFinished(values);
     }
 };
 
@@ -85,7 +82,7 @@ TextWithFields::TextWithFields(
     :
     ActionBuilderField{descriptor},
     common::SystemContextAware(context),
-    d(new Private{.q = this})
+    d(new Private())
 {
 }
 
@@ -131,6 +128,11 @@ void TextWithFields::setText(const QString& text)
     d->text = text;
     emit textChanged();
     d->parseText();
+}
+
+const TextWithFields::ParsedValues& TextWithFields::parsedValues() const
+{
+    return d->values;
 }
 
 } // namespace nx::vms::rules
