@@ -75,7 +75,7 @@ void thenIsExpanded(const EventParametersModel& model)
             continue;
         }
         const auto data = model.data(model.index(r), Qt::DisplayRole);
-        visibleNames.push_back(data.toString());
+        visibleNames.insert(data.toString());
     }
 
     ASSERT_EQ(separatorNumber, 2);
