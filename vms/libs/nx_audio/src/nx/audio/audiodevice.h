@@ -5,11 +5,12 @@
 #include <QtCore/QList>
 #include <QtCore/QObject>
 
-#if defined(Q_OS_WINDOWS)
-    #include <AL/alc.h>
+#if defined(Q_OS_MAC) || defined(Q_OS_IOS)
+    using ALCdevice = struct ALCdevice_struct;
+    using ALCcontext = struct ALCcontext_struct;
 #else
-    typedef struct ALCdevice_struct ALCdevice;
-    typedef struct ALCcontext_struct ALCcontext;
+    struct ALCdevice;
+    struct ALCcontext;
 #endif
 
 namespace nx::media::audio { struct Format; }

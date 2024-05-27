@@ -20,8 +20,7 @@
 #include <nx/utils/log/log.h>
 
 #if defined(OPENAL_STATIC)
-    extern "C"
-    {
+    extern "C" {
     void alc_init(void);
     void alc_deinit(void);
     #pragma comment(lib, "winmm.lib")
@@ -38,18 +37,6 @@ namespace audio {
 
 namespace {
 
-// openal data from private header alMain.h
-// It's given from openAL version 1.17
-struct ALCdevice_struct
-{
-    uint refCnt;
-    ALCboolean Connected;
-    enum DeviceType {Playback,Capture, Loopback } Type;
-    ALuint       Frequency;
-    ALuint       UpdateSize;
-    ALuint       NumUpdates;
-};
-
 #if defined(Q_OS_WINDOWS)
     static LPALCREOPENDEVICESOFT alcReopenDeviceSOFT = nullptr;
 #endif
@@ -59,8 +46,7 @@ struct ALCdevice_struct
 #if defined(Q_OS_ANDROID)
     int AudioDevice::internalBufferInSamples(ALCdevice* device)
     {
-        const ALCdevice_struct* devicePriv = (const ALCdevice_struct*) device;
-        return devicePriv->UpdateSize;
+        return alcGetUpdateSize(device);
     }
 #endif
 
@@ -75,9 +61,8 @@ AudioDevice *AudioDevice::instance()
     {
         // Android opensl backend has quite big audio jitter and current position epsilon.
         // Update buffer to smaller size to reduce they. Default value is 1024
-        ALCdevice_struct* devicePriv = (ALCdevice_struct*) m_device;
         static const qint64 kOpenAlBufferSize = 512;
-        devicePriv->UpdateSize = kOpenAlBufferSize;
+        alcSetUpdateSize(m_device, kOpenAlBufferSize);
     }
 #endif
 
