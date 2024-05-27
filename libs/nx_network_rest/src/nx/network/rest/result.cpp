@@ -18,6 +18,7 @@ QString Result::errorToString(Result::Error value)
         case Result::BadRequest: return "badRequest";
         case Result::InternalServerError: return "internalServerError";
         case Result::Conflict: return "conflict";
+        case Result::NotAllowed: return "notAllowed";
         case Result::NotImplemented: return "notImplemented";
         case Result::NotFound: return "notFound";
         case Result::UnsupportedMediaType: return "unsupportedMediaType";
@@ -53,6 +54,9 @@ nx::network::http::StatusCode::Value Result::toHttpStatus(Error code)
 
         case Error::Conflict:
             return http::StatusCode::conflict;
+
+        case Error::NotAllowed:
+            return http::StatusCode::notAllowed;
 
         case Error::NotImplemented:
             return http::StatusCode::notImplemented;
@@ -96,6 +100,9 @@ Result::Error Result::errorFromHttpStatus(int status)
 
         case StatusCode::conflict:
             return Error::Conflict;
+
+        case StatusCode::notAllowed:
+            return Error::NotAllowed;
 
         case StatusCode::notImplemented:
             return Error::NotImplemented;
@@ -161,6 +168,12 @@ Result Result::badRequest(std::optional<QString> customMessage)
     return Result{
         BadRequest,
         customMessage ? *customMessage : tr("Bad request.",/*comment*/ "Generic HTTP response")};
+}
+
+Result Result::notAllowed(std::optional<QString> customMessage)
+{
+    return Result{NotAllowed,
+        customMessage ? *customMessage : tr("Not allowed.", /*comment*/ "Generic HTTP response")};
 }
 
 Result Result::notImplemented(std::optional<QString> customMessage)

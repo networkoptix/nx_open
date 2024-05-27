@@ -400,7 +400,7 @@ Response CrudHandler<Derived>::executeGet(const Request& request)
     }
     else
     {
-        return nx::network::http::StatusCode::notImplemented;
+        throw nx::network::rest::Exception::notAllowed("This endpoint does not allow GET");
     }
 }
 
@@ -457,7 +457,7 @@ Response CrudHandler<Derived>::executePost(const Request& request)
     }
     else
     {
-        return nx::network::http::StatusCode::notImplemented;
+        throw nx::network::rest::Exception::notAllowed("This endpoint does not allow POST");
     }
 }
 
@@ -486,7 +486,7 @@ Response CrudHandler<Derived>::executeDelete(const Request& request)
     }
     else
     {
-        return nx::network::http::StatusCode::notImplemented;
+        throw nx::network::rest::Exception::notAllowed("This endpoint does not allow DELETE");
     }
 }
 
@@ -504,9 +504,6 @@ Response CrudHandler<Derived>::executePut(const Request& request)
         ResponseAttributes responseAttributes;
         if (idParam(request).value || m_idParamName.isEmpty())
         {
-            auto id = model.getId();
-            if (id == decltype(id)())
-                throw Exception::missingParameter(m_idParamName);
             if constexpr (!std::is_same<Result, void>::value)
             {
                 const auto result =
@@ -525,12 +522,21 @@ Response CrudHandler<Derived>::executePut(const Request& request)
             }
             else
             {
-                call(&Derived::update, std::move(model), request, &responseAttributes);
                 if constexpr (DoesMethodExist_read<Derived>::value)
                 {
+                    auto id = model.getId();
+                    if (id == decltype(id)())
+                        throw Exception::missingParameter(m_idParamName);
+
+                    call(&Derived::update, std::move(model), request, &responseAttributes);
                     if (!m_features.testFlag(CrudFeature::fastUpdate))
                         return responseById(std::move(id), request, std::move(responseAttributes));
                 }
+                else
+                {
+                    call(&Derived::update, std::move(model), request, &responseAttributes);
+                }
+
                 return {responseAttributes.statusCode, std::move(responseAttributes.httpHeaders)};
             }
         }
@@ -558,7 +564,7 @@ Response CrudHandler<Derived>::executePut(const Request& request)
     }
     else
     {
-        return nx::network::http::StatusCode::notImplemented;
+        throw nx::network::rest::Exception::notAllowed("This endpoint does not allow PUT");
     }
 }
 
@@ -651,7 +657,7 @@ Response CrudHandler<Derived>::executePatch(const Request& request)
     }
     else
     {
-        return nx::network::http::StatusCode::notImplemented;
+        throw nx::network::rest::Exception::notAllowed("This endpoint does not allow PATCH");
     }
 }
 
