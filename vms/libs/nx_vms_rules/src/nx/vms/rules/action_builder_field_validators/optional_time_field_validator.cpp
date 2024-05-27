@@ -5,6 +5,7 @@
 #include <nx/utils/log/to_string.h>
 
 #include "../action_builder_fields/optional_time_field.h"
+#include "../strings.h"
 
 namespace nx::vms::rules {
 
@@ -13,7 +14,7 @@ ValidationResult OptionalTimeFieldValidator::validity(
 {
     auto optionalTimeField = dynamic_cast<const OptionalTimeField*>(field);
     if (!NX_ASSERT(optionalTimeField))
-        return {QValidator::State::Invalid, tr("Invalid field type is provided")};
+        return {QValidator::State::Invalid, Strings::invalidFieldType()};
 
     const auto timeFieldValue = optionalTimeField->value();
     if (optionalTimeField->value() == std::chrono::microseconds::zero())

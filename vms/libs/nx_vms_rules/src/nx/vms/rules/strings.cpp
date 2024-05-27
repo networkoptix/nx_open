@@ -299,6 +299,44 @@ QString Strings::anyServerEvent()
     return tr("Any server event");
 }
 
+QString Strings::invalidFieldType()
+{
+    return tr("Invalid field type is provided");
+}
+
+QString Strings::unexpectedPolicy()
+{
+    return tr("Unexpected validation policy");
+}
+
+QString Strings::selectServer()
+{
+    return tr("Select at least one Server");
+}
+
+QString Strings::selectUser()
+{
+    return tr("Select at least one user");
+}
+
+QString Strings::selectCamera(common::SystemContext* context, bool allowMultipleSelection)
+{
+    if (!allowMultipleSelection)
+        return tr("Select exactly one camera");
+
+    return QnDeviceDependentStrings::getDefaultNameFromSet(
+        context->resourcePool(),
+        tr("Select at least one device"),
+        tr("Select at least one camera"));
+}
+
+QString Strings::noSuitableServers(QValidator::State state)
+{
+    return state == QValidator::State::Intermediate
+        ? tr("Not all servers are suitable")
+        : tr("There are no suitable servers");
+}
+
 TranslatableString Strings::at()
 {
     return NX_DYNAMIC_TRANSLATABLE(tr("At"));

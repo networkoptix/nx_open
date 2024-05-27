@@ -6,6 +6,7 @@
 
 #include "../event_filter_fields/source_server_field.h"
 #include "../manifest.h"
+#include "../strings.h"
 #include "../utils/resource.h"
 #include "../utils/validity.h"
 
@@ -16,7 +17,7 @@ ValidationResult SourceServerFieldValidator::validity(
 {
     auto sourceServerField = dynamic_cast<const SourceServerField*>(field);
     if (!NX_ASSERT(sourceServerField))
-        return {QValidator::State::Invalid, {tr("Invalid field type is provided")}};
+        return {QValidator::State::Invalid, {Strings::invalidFieldType()}};
 
     const auto serversSelection = sourceServerField->selection();
     const auto sourceServerFieldProperties = sourceServerField->properties();
@@ -31,20 +32,16 @@ ValidationResult SourceServerFieldValidator::validity(
         else if (sourceServerFieldProperties.validationPolicy == kHasPoeManagementValidationPolicy)
             serversValidity = utils::serversValidity<QnPoeOverBudgetPolicy>(servers);
         else
-            return {QValidator::State::Invalid, tr("Unexpected validation policy")};
+            return {QValidator::State::Invalid, Strings::unexpectedPolicy()};
 
         if (serversValidity == QValidator::State::Acceptable)
             return {};
 
-        return {
-            serversValidity,
-            serversValidity == QValidator::State::Intermediate
-                ? tr("Not all servers are suitable")
-                : tr("There are no suitable servers")};
+        return {serversValidity, Strings::noSuitableServers(serversValidity)};
     }
 
     if (!sourceServerFieldProperties.allowEmptySelection && serversSelection.isEmpty())
-        return {QValidator::State::Invalid, tr("Select at least one server")};
+        return {QValidator::State::Invalid, Strings::selectServer()};
 
     return {};
 }

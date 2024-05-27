@@ -6,6 +6,7 @@
 #include <optional>
 
 #include <QtCore/QCoreApplication> //for Q_DECLARE_TR_FUNCTIONS
+#include <QtGui/QValidator>
 
 #include <common/common_globals.h>
 #include <core/resource/resource_fwd.h>
@@ -75,6 +76,13 @@ public:
     static QString anyDeviceIssue(common::SystemContext* context);
     static QString serverEvents();
     static QString anyServerEvent();
+
+    static QString invalidFieldType();
+    static QString unexpectedPolicy();
+    static QString selectServer();
+    static QString selectUser();
+    static QString selectCamera(common::SystemContext* context, bool allowMultipleSelection = true);
+    static QString noSuitableServers(QValidator::State state);
 
     static TranslatableString at();
     static TranslatableString to();

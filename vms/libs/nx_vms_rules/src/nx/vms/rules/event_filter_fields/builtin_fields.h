@@ -10,7 +10,6 @@
 #include "customizable_flag_field.h"
 #include "customizable_icon_field.h"
 #include "customizable_text_field.h"
-#include "dummy_field.h"
 #include "expected_uuid_field.h"
 #include "flag_field.h"
 #include "input_port_field.h"
