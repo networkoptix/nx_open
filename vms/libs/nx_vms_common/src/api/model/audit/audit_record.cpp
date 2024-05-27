@@ -177,7 +177,7 @@ constexpr auto visitAllConversions(Visitor&& visitor)
         Conversion<AuditRecordType::eventReset>{detailsToParams::nothing, paramsToDetails::nothing},
         Conversion<AuditRecordType::serverUpdate>{detailsToParams::resource, paramsToDetails::resource},
         Conversion<AuditRecordType::serverRemove>{detailsToParams::resource, paramsToDetails::resource},
-        Conversion<AuditRecordType::systemNameChanged>{detailsToParams::description, paramsToDetails::description},
+        Conversion<AuditRecordType::siteNameChanged>{detailsToParams::description, paramsToDetails::description},
         Conversion<AuditRecordType::settingsChange>{detailsToParams::description, paramsToDetails::description},
         Conversion<AuditRecordType::emailSettings>{detailsToParams::description, paramsToDetails::description},
         Conversion<AuditRecordType::mitmAttack>{
@@ -217,7 +217,7 @@ constexpr auto visitAllConversions(Visitor&& visitor)
             }},
         Conversion<AuditRecordType::cloudBind>{detailsToParams::cloud, paramsToDetails::cloud},
         Conversion<AuditRecordType::cloudUnbind>{detailsToParams::cloud, paramsToDetails::cloud},
-        Conversion<AuditRecordType::systemMerge>{detailsToParams::nothing, paramsToDetails::nothing},
+        Conversion<AuditRecordType::siteMerge>{detailsToParams::nothing, paramsToDetails::nothing},
         Conversion<AuditRecordType::databaseRestore>{detailsToParams::nothing, paramsToDetails::nothing}
     );
 }
