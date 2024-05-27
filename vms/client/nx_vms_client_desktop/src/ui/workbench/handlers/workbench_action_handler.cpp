@@ -2413,9 +2413,8 @@ void ActionHandler::at_pingAction_triggered()
         };
         for (const auto& terminal: terminals)
         {
-            const SystemError::ErrorCode result =
-                nx::utils::startProcessDetached(terminal, {"-e", "ping", host});
-            if (result == SystemError::noError)
+            const bool result = nx::utils::startProcessDetached(terminal, {"-e", "ping", host});
+            if (result)
             {
                 NX_DEBUG(this, "Ping %1 started in %2", host, terminal);
                 return;
