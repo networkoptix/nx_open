@@ -197,7 +197,7 @@ class NxOpenConan(ConanFile):
             if not self.isArm32:
                 self._os_deps_package = "os_deps_for_desktop_linux"
                 self.requires("os_deps_for_desktop_linux/ubuntu_bionic"
-                    "#5763a249358e5dc84fa08a8c15e65772")
+                    "#0efcda690cbe2353c8e96c47c8ee6784")
                 self.requires("legacy_os_deps_from_ubuntu_xenial/1.0"
                     "#f4d51fa07577df743eeb97ddad45c51b")
 
@@ -209,10 +209,8 @@ class NxOpenConan(ConanFile):
                 self.requires("flite/2.2" "#069d57cbc32aa09dcbae1c79e94e48ef")
                 self.requires("range-v3/0.11.0" "#8d874cb9cdd7b81806d624493b82f9c0")
 
-        if self.isLinux or self.isAndroid:
-            self.requires("openal/1.19.1" "#1047ec92368ace234da430098bffa65a")
-        elif self.isWindows:
-            self.requires("openal/1.23.1-ec2ffb" "#cefaa7b20e912b242b87f5c212427d81")
+        if self.isLinux or self.isWindows or self.isAndroid:
+            self.requires("openal/ec2ffbfa" "#6d256f06faa672d08655876857fd7c65")
 
         if self.isWindows:
             self.requires("directx/JUN2010" "#ca268f1b54e3874ad43524cd81447b01")

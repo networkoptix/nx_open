@@ -16,11 +16,9 @@ nx_add_target(nx_audio LIBRARY NO_API_MACROS
 if(APPLE)
     find_library(OpenAL_LIBRARY_NAME OpenAL REQUIRED)
     mark_as_advanced(OpenAL_LIBRARY_NAME)
-elseif(WINDOWS OR ANDROID)
+else()
     find_package(openal REQUIRED)
     set(OpenAL_LIBRARY_NAME openal::openal)
-else()
-    set(OpenAL_LIBRARY_NAME openal)
 endif()
 
 target_link_libraries(nx_audio PUBLIC ${OpenAL_LIBRARY_NAME})

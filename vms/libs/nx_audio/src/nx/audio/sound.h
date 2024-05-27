@@ -6,20 +6,19 @@
 #include <QtMultimedia/QAudio>
 #include <QtMultimedia/QAudioFormat>
 
-#if defined(Q_OS_WINDOWS)
-    #include <AL/alc.h>
-#endif
-
 #include <nx/media/audio/format.h>
 #include <nx/utils/safe_direct_connection.h>
 #include <nx/utils/thread/mutex.h>
 
 #include "high_resolution_elapsed_timer.h"
 
-class AudioDevice;
-#if !defined(Q_OS_WINDOWS)
-    typedef struct ALCdevice_struct ALCdevice;
+#if defined(Q_OS_MACOS) || defined(Q_OS_IOS)
+    using ALCdevice = struct ALCdevice_struct;
+#else
+    struct ALCdevice;
 #endif
+
+class AudioDevice;
 
 namespace nx {
 namespace audio {
