@@ -71,7 +71,7 @@ Item
                 visible: control.basicMode
 
                 text: qsTr("Pan and Tilt")
-                image: "image://skin/joystick_settings/panAndTilt.svg"
+                image: "image://skin/64x64/Outline/panAndTilt.svg"
 
                 value: control.model ? control.model.panAndTiltSensitivity : 0
 
@@ -91,7 +91,7 @@ Item
                 visible: control.basicMode && control.model && control.model.zoomIsEnabled
 
                 text: qsTr("Zoom In / Zoom Out")
-                image: "image://skin/joystick_settings/zoom.svg"
+                image: "image://skin/64x64/Outline/zoom.svg"
 
                 value: control.model ? control.model.zoomSensitivity : 0
 
@@ -113,7 +113,7 @@ Item
                 highlighted: panItem.highlighted
 
                 text: qsTr("Select Camera on Layout")
-                image: "image://skin/joystick_settings/panAndTilt.svg"
+                image: "image://skin/64x64/Outline/panAndTilt.svg"
             }
         }
 
