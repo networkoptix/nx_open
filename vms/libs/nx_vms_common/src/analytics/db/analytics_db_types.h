@@ -16,6 +16,7 @@
 #include <nx/utils/serialization/qt_core_types.h>
 #include <nx/utils/serialization/qt_geometry_reflect_json.h>
 #include <nx/utils/url_query.h>
+#include <nx/vms/api/data/analytics_data.h>
 #include <recording/time_period.h>
 
 #include "abstract_object_type_dictionary.h"
@@ -45,23 +46,8 @@ struct ObjectPosition
 QN_FUSION_DECLARE_FUNCTIONS(ObjectPosition, (json)(ubjson), NX_VMS_COMMON_API);
 NX_REFLECTION_INSTRUMENT(ObjectPosition, ObjectPosition_analytics_storage_Fields)
 
-struct NX_VMS_COMMON_API ObjectRegion
+struct NX_VMS_COMMON_API ObjectRegion: nx::vms::api::BaseObjectRegion
 {
-    /**%apidoc
-     * Roughly defines a region on a video frame where the Object(s) were detected, as an array of
-     * bytes encoded in base64.
-     * <br/>
-     * The region is represented as a grid of 32 rows and 44 columns, stored by columns. The grid
-     * coordinate system starts at the top left corner, the row index grows down and the column
-     * index grows right. This grid is represented as a contiguous array, each bit of which
-     * corresponds to the state of a particular cell of the grid (1 if the region includes the
-     * cell, 0 otherwise). The bit index for a cell with coordinates (column, row) can be
-     * calculated using the following formula: bitIndex = gridHeight * column + row.
-     * <br/>
-     * NOTE: This is the same binary format that is used by the VMS for motion detection metadata.
-     */
-    QByteArray boundingBoxGrid;
-
     void add(const QRectF& rect);
     void add(const ObjectRegion& region);
     bool intersect(const QRectF& rect) const;
@@ -72,7 +58,7 @@ struct NX_VMS_COMMON_API ObjectRegion
 
     bool operator==(const ObjectRegion& right) const;
 };
-#define ObjectRegion_analytics_storage_Fields (boundingBoxGrid)
+#define ObjectRegion_analytics_storage_Fields BaseObjectRegion_Fields
 QN_FUSION_DECLARE_FUNCTIONS(ObjectRegion, (json)(ubjson), NX_VMS_COMMON_API);
 NX_REFLECTION_INSTRUMENT(ObjectRegion, ObjectRegion_analytics_storage_Fields)
 
@@ -132,7 +118,7 @@ struct ObjectTrack
     /**%apidoc
      * Aggregated Attributes of all Object Metadata items in the Track. The aggregation rules are:
      * <ul>
-     * <li>For Attributes which values are detected to be numbers (either integer or fractional), 
+     * <li>For Attributes which values are detected to be numbers (either integer or fractional),
      *     all values are converted into a range represented as a string in the format:
      *     `<opening> <start_number> ... <end_number> <closing>`, where <opening>/<closing> are
      *     either `[`/`]` (inclusive) or `(`/`]` (exclusive).</li>
@@ -163,6 +149,8 @@ struct ObjectTrack
     (objectPosition)(bestShot)(analyticsEngineId)(storageId)
 QN_FUSION_DECLARE_FUNCTIONS(ObjectTrack, (json)(ubjson), NX_VMS_COMMON_API);
 NX_REFLECTION_INSTRUMENT(ObjectTrack, ObjectTrack_analytics_storage_Fields)
+
+// TODO: #mshevchenko Rename the old structs to Legacy...
 
 struct NX_VMS_COMMON_API ObjectTrackEx: public ObjectTrack
 {

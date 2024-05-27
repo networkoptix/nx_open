@@ -15,25 +15,19 @@
 #include <nx/reflect/enum_instrument.h>
 #include <nx/reflect/instrument.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/api/data/analytics_data.h>
 #include <nx/vms/api/types/motion_types.h>
 
 namespace nx {
 namespace common {
 namespace metadata {
 
-/**%apidoc Attribute of an analytics entity. */
-struct NX_VMS_COMMON_API Attribute
+/** Adds more serialization options needed for the Legacy API. */
+struct NX_VMS_COMMON_API Attribute: nx::vms::api::AnalyticsAttribute
 {
-    QString name;
-    QString value;
-
-    Attribute() = default;
-    Attribute(const QString& name, const QString& value):
-        name(name), value(value)
-    {
-    };
+    using AnalyticsAttribute::AnalyticsAttribute;
 };
-#define Attribute_Fields (name)(value)
+#define Attribute_Fields AnalyticsAttribute_Fields
 QN_FUSION_DECLARE_FUNCTIONS(Attribute, (json)(ubjson)(xml)(csv_record), NX_VMS_COMMON_API);
 
 NX_REFLECTION_INSTRUMENT(Attribute, Attribute_Fields)
