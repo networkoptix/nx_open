@@ -51,7 +51,7 @@ SearchPanel
             Layout.maximumWidth: objectsPanel.filtersColumn.width
 
             selectable: false
-            icon.source: "image://skin/text_buttons/frame_20x20_deprecated.svg"
+            icon.source: "image://skin/20x20/Outline/frame.svg"
             accented: analyticsSetup && analyticsSetup.areaSelectionActive
 
             desiredState: analyticsSetup
