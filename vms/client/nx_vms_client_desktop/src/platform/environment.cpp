@@ -11,6 +11,7 @@
 #include <QtGui/QDesktopServices>
 
 #include <nx/utils/string.h>
+#include <nx/utils/platform/process.h>
 #include <utils/mac_utils.h>
 
 #ifdef Q_OS_WIN
@@ -70,7 +71,7 @@ void QnEnvironment::showInGraphicalShell(const QString &path)
                 params << QLatin1String("/select,");
             params << QDir::toNativeSeparators(path);
         }
-        QProcess::startDetached(explorer, params);
+        nx::utils::startProcessDetached(explorer, params);
     }
     else
 #endif
