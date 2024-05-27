@@ -28,15 +28,17 @@ void Handler::audit(const Request& request, const Response&)
 
 audit::Record Handler::prepareAuditRecord(const Request& request) const
 {
-    if (request.method() == nx::network::http::Method::post
+    return isAuditableRequest(request)
+        ? (audit::Record) request
+        : audit::Record{request.userSession};
+}
+
+bool Handler::isAuditableRequest(const Request& request)
+{
+    return request.method() == nx::network::http::Method::post
         || request.method() == nx::network::http::Method::put
         || request.method() == nx::network::http::Method::patch
-        || request.method() == nx::network::http::Method::delete_)
-    {
-        return (audit::Record) request;
-    }
-
-    return audit::Record{request.userSession};
+        || request.method() == nx::network::http::Method::delete_;
 }
 
 Response Handler::executeAnyMethod(const Request& request)
