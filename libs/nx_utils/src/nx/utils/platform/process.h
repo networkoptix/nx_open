@@ -7,6 +7,8 @@
 
 #include <nx/utils/system_error.h>
 
+class QProcess;
+
 namespace nx::utils {
 
 /**
@@ -29,6 +31,21 @@ NX_UTILS_API bool startProcessDetached(
     const QStringList& arguments = QStringList(),
     const QString& workingDirectory = QString(),
     qint64* pid = nullptr);
+
+/**
+ * Start process.
+ * QProcess has several overload functions QProcess::start().
+ * Some of them aren't working on Windows.This wrapper helps to avoid this.
+ * @param executablePath Path to executable binary or shell script.
+ * @param arguments Program arguments.
+ * @param workingDirectory If not empty, working directory is set to this path.
+ * @return Unique pointer to QProcess that has been already started.
+ */
+NX_UTILS_API std::unique_ptr<QProcess> startProcess(
+    const QString& executablePath,
+    const QStringList& arguments = QStringList(),
+    const QString& workingDirectory = QString());
+
 
 NX_UTILS_API bool checkProcessExists(qint64 pid);
 
