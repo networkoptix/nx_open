@@ -1113,40 +1113,81 @@ void initialize(Manager* manager, Action* root)
             ConditionWrapper(new OpenInCurrentLayoutCondition())
             && !condition::isShowreelReviewMode());
 
-    factory(OpenInNewTabAction)
+    if (ini().newOpenInContextMenu)
+    {
+        factory()
+            .mode(DesktopMode)
+            .flags(Tree | Table | Scene | SingleTarget | MultiTarget | ResourceTarget
+                | LayoutItemTarget | WidgetTarget)
+            .text(ContextMenu::tr(
+                "Open in", /*comment*/ "The \"Open in\" menu, which has a submenu"));
+
+        factory.beginSubMenu();
+        {
+            factory(OpenInNewTabAction)
+                .mode(DesktopMode)
+                .flags(Tree | Table | Scene | SingleTarget | MultiTarget | ResourceTarget
+                    | LayoutItemTarget | WidgetTarget)
+                .text(ContextMenu::tr("New Tab", /*comment*/ "The \"Open in\" submenu item"))
+                .condition(new OpenInNewEntityCondition());
+
+            factory(OpenInNewWindowAction)
+                .mode(DesktopMode)
+                .flags(Tree | Table | Scene | SingleTarget | MultiTarget | ResourceTarget
+                    | LayoutItemTarget | WidgetTarget)
+                .text(ContextMenu::tr("New Window", /*comment*/ "The \"Open in\" submenu item"))
+                .condition(
+                    ConditionWrapper(new OpenInNewEntityCondition())
+                    && ConditionWrapper(new LightModeCondition(Qn::LightModeNoNewWindow))
+                );
+
+            factory(OpenInDedicatedWindowAction)
+                .mode(DesktopMode)
+                .flags(Tree | Scene | SingleTarget | MultiTarget | ResourceTarget | WidgetTarget)
+                .text(ContextMenu::tr(
+                    "Dedicated Window", /*comment*/ "The \"Open in\" submenu item"))
+                .condition(condition::isWebPageOrIntegration());
+        }
+        factory.endSubMenu();
+    }
+    else
+    {
+        factory(OpenInNewTabAction)
+            .mode(DesktopMode)
+            .flags(Tree | Table | Scene | SingleTarget | MultiTarget | ResourceTarget
+                | LayoutItemTarget | WidgetTarget)
+            .text(ContextMenu::tr("Open in New Tab"))
+            .conditionalText(ContextMenu::tr("Monitor in New Tab"),
+                condition::hasFlags(Qn::server, MatchMode::all))
+            .condition(new OpenInNewEntityCondition());
+
+        factory(OpenInNewWindowAction)
+            .mode(DesktopMode)
+            .flags(Tree | Table | Scene | SingleTarget | MultiTarget | ResourceTarget
+                | LayoutItemTarget | WidgetTarget)
+            .text(ContextMenu::tr("Open in New Window"))
+            .conditionalText(ContextMenu::tr("Monitor in New Window"),
+                condition::hasFlags(Qn::server, MatchMode::all))
+            .condition(
+                ConditionWrapper(new OpenInNewEntityCondition())
+                && ConditionWrapper(new LightModeCondition(Qn::LightModeNoNewWindow))
+            );
+
+        factory(OpenInDedicatedWindowAction)
+            .mode(DesktopMode)
+            .flags(Tree | Scene | SingleTarget | MultiTarget | ResourceTarget | WidgetTarget)
+            .text(ContextMenu::tr("Open in Dedicated Window"))
+            .condition(condition::isWebPageOrIntegration());
+    }
+
+    factory(OpenInAlarmLayoutAction)
         .mode(DesktopMode)
-        .flags(Tree | Table | Scene | SingleTarget | MultiTarget | ResourceTarget | LayoutItemTarget | WidgetTarget)
-        .text(ContextMenu::tr("Open in New Tab"))
-        .conditionalText(ContextMenu::tr("Monitor in New Tab"),
-            condition::hasFlags(Qn::server, MatchMode::all))
-        .condition(new OpenInNewEntityCondition());
+        .flags(SingleTarget | MultiTarget | ResourceTarget);
 
     factory(OpenIntercomLayoutAction)
         .mode(DesktopMode)
         .flags(SingleTarget | ResourceTarget)
         .condition(new OpenInNewEntityCondition());
-
-    factory(OpenInAlarmLayoutAction)
-        .mode(DesktopMode)
-        .flags(SingleTarget | MultiTarget | ResourceTarget)
-        .text(ContextMenu::tr("Open in Alarm Layout"));
-
-    factory(OpenInNewWindowAction)
-        .mode(DesktopMode)
-        .flags(Tree | Table | Scene | SingleTarget | MultiTarget | ResourceTarget | LayoutItemTarget | WidgetTarget)
-        .text(ContextMenu::tr("Open in New Window"))
-        .conditionalText(ContextMenu::tr("Monitor in New Window"),
-            condition::hasFlags(Qn::server, MatchMode::all))
-        .condition(
-            ConditionWrapper(new OpenInNewEntityCondition())
-            && ConditionWrapper(new LightModeCondition(Qn::LightModeNoNewWindow))
-        );
-
-    factory(OpenInDedicatedWindowAction)
-        .mode(DesktopMode)
-        .flags(Tree | Scene | SingleTarget | MultiTarget | ResourceTarget | WidgetTarget)
-        .text(ContextMenu::tr("Open in Dedicated Window"))
-        .condition(condition::isWebPageOrIntegration());
 
     factory(OpenCurrentLayoutInNewWindowAction)
         .flags(NoTarget)
@@ -1923,17 +1964,44 @@ void initialize(Manager* manager, Action* root)
 
 #pragma region Showreels
 
-    factory(ReviewShowreelAction)
-        .flags(Tree | NoTarget)
-        .mode(DesktopMode)
-        .text(ContextMenu::tr("Open in New Tab"))
-        .condition(condition::treeNodeType(ResourceTree::NodeType::showreel));
+    if (ini().newOpenInContextMenu)
+    {
+        factory()
+            .mode(DesktopMode)
+            .flags(Tree | NoTarget)
+            .text(ContextMenu::tr(
+                "Open in", /*comment*/ "The \"Open in\" menu, which has a submenu"));
 
-    factory(ReviewShowreelInNewWindowAction)
-        .flags(Tree | NoTarget)
-        .mode(DesktopMode)
-        .text(ContextMenu::tr("Open in New Window"))
-        .condition(condition::treeNodeType(ResourceTree::NodeType::showreel));
+        factory.beginSubMenu();
+        {
+            factory(ReviewShowreelAction)
+                .flags(Tree | NoTarget)
+                .mode(DesktopMode)
+                .text(ContextMenu::tr("New Tab", /*comment*/ "The \"Open in\" submenu item"))
+                .condition(condition::treeNodeType(ResourceTree::NodeType::showreel));
+
+            factory(ReviewShowreelInNewWindowAction)
+                .flags(Tree | NoTarget)
+                .mode(DesktopMode)
+                .text(ContextMenu::tr("New Window", /*comment*/ "The \"Open in\" submenu item"))
+                .condition(condition::treeNodeType(ResourceTree::NodeType::showreel));
+        }
+        factory.endSubMenu();
+    }
+    else
+    {
+        factory(ReviewShowreelAction)
+            .flags(Tree | NoTarget)
+            .mode(DesktopMode)
+            .text(ContextMenu::tr("Open in New Tab"))
+            .condition(condition::treeNodeType(ResourceTree::NodeType::showreel));
+
+        factory(ReviewShowreelInNewWindowAction)
+            .flags(Tree | NoTarget)
+            .mode(DesktopMode)
+            .text(ContextMenu::tr("Open in New Window"))
+            .condition(condition::treeNodeType(ResourceTree::NodeType::showreel));
+    }
 
     factory().flags(Tree).separator().condition(
         condition::treeNodeType(ResourceTree::NodeType::showreel));
