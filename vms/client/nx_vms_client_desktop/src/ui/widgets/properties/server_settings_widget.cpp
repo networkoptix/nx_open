@@ -12,7 +12,7 @@
 #include <QtWidgets/QSlider>
 #include <QtWidgets/QStyledItemDelegate>
 
-#include <api/model/audit/audit_record.h>
+#include <api/model/legacy_audit_record.h>
 #include <api/server_rest_connection.h>
 #include <camera/camera_data_manager.h>
 #include <client/client_globals.h>

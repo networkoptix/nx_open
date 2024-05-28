@@ -7,7 +7,7 @@
 #include <QtGui/QStandardItem>
 #include <QtWidgets/QDialog>
 
-#include <api/model/audit/audit_record.h>
+#include <api/model/legacy_audit_record.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/client/desktop/menu/actions.h>
 #include <ui/dialogs/common/session_aware_dialog.h>

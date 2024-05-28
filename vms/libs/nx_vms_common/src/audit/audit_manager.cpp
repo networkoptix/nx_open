@@ -2,12 +2,17 @@
 
 #include "audit_manager.h"
 
-#include <common/common_module.h>
-#include <nx/utils/datetime.h>
-#include <nx/utils/log/assert.h>
-#include <nx/vms/common/system_settings.h>
 #include <utils/common/synctime.h>
-#include <utils/common/util.h>
 
-QnAuditManager::~QnAuditManager()
-{}
+static std::optional<std::chrono::seconds> s_createdTimeForTests;
+
+std::chrono::seconds QnAuditManager::createdTime()
+{
+    return s_createdTimeForTests.value_or(
+        std::chrono::duration_cast<std::chrono::seconds>(qnSyncTime->currentTimePoint()));
+}
+
+void QnAuditManager::setCreatedTimeForTests(std::optional<std::chrono::seconds> value)
+{
+    s_createdTimeForTests = value;
+}

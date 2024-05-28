@@ -8,7 +8,6 @@
 #include <QtNetwork/QHostAddress>
 
 #include <api/model/api_ioport_data.h>
-#include <api/model/audit/audit_record.h>
 #include <api/model/backup_status_reply.h>
 #include <api/model/camera_diagnostics_reply.h>
 #include <api/model/configure_reply.h>
@@ -218,8 +217,6 @@ void QnCommonMetaTypes::initialize()
 
     qRegisterMetaType<QnIOPortData>();
     qRegisterMetaType<QnIOStateData>();
-    qRegisterMetaType<QnAuditRecord>();
-    qRegisterMetaType<QnAuditRecord*>();
 
     qRegisterMetaType<Qn::PanicMode>();
 
@@ -236,7 +233,6 @@ void QnCommonMetaTypes::initialize()
     qRegisterMetaType<ec2::AbstractECConnectionPtr>("AbstractECConnectionPtr");
 
     qRegisterMetaType<QnRecordingStatsReply>();
-    qRegisterMetaType<QnAuditRecordList>();
 
     qRegisterMetaType<QnOptionalBool>();
     qRegisterMetaType<QnIOPortData>();

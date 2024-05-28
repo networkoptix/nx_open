@@ -1,38 +1,43 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "audit_record.h"
+#include "legacy_audit_record.h"
 
 #include <nx/fusion/model_functions.h>
 #include <utils/common/synctime.h>
 
-template<nx::vms::api::AuditRecordType recordType>
+namespace {
+
+using namespace nx::vms::api;
+
+template<AuditRecordType recordType>
 struct Conversion
 {
-    static constexpr nx::vms::api::AuditRecordType type = recordType;
+    static constexpr AuditRecordType type = recordType;
 
     static constexpr auto verifyDetailsToParams =
-        [](auto F, const QnAuditRecord& record, QnLegacyAuditRecord& legacyRecord)
+        [](auto F, const AuditRecord& record, QnLegacyAuditRecord& legacyRecord)
         {
             return F(record, legacyRecord);
         };
 
     static constexpr auto verifyParamsToDetails =
-        [](auto F, const QnLegacyAuditRecord& legacyRecord, QnAuditRecord& record)
+        [](auto F, const QnLegacyAuditRecord& legacyRecord, AuditRecord& record)
         {
             F(legacyRecord, record);
 
-            const auto details = record.get<typename details::details_type<recordType, AllAuditDetails::mapping>::type>();
+            const auto details =
+                record.get<typename details::details_type<type, AllAuditDetails::mapping>::type>();
             NX_ASSERT(details);
         };
 
-    std::function<void(const QnAuditRecord&, QnLegacyAuditRecord&)> detailsToParams;
-    std::function<void(const QnLegacyAuditRecord&, QnAuditRecord&)> paramsToDetails;
+    std::function<void(const AuditRecord&, QnLegacyAuditRecord&)> detailsToParams;
+    std::function<void(const QnLegacyAuditRecord&, AuditRecord&)> paramsToDetails;
 };
 
 namespace detailsToParams {
 
 const auto session =
-    [](const QnAuditRecord& record, QnLegacyAuditRecord& legacyRecord)
+    [](const AuditRecord& record, QnLegacyAuditRecord& legacyRecord)
     {
         const auto details = record.get<SessionDetails>();
 
@@ -40,7 +45,7 @@ const auto session =
         legacyRecord.rangeEndSec = details->endS.count();
     };
 const auto playback =
-    [](const QnAuditRecord& record, QnLegacyAuditRecord& legacyRecord)
+    [](const AuditRecord& record, QnLegacyAuditRecord& legacyRecord)
     {
         const auto details = record.get<PlaybackDetails>();
 
@@ -58,7 +63,7 @@ const auto playback =
         legacyRecord.addParam("archiveExist", archiveExist);
     };
 const auto device =
-    [](const QnAuditRecord& record, QnLegacyAuditRecord& legacyRecord)
+    [](const AuditRecord& record, QnLegacyAuditRecord& legacyRecord)
     {
         const auto details = record.get<DeviceDetails>();
 
@@ -67,7 +72,7 @@ const auto device =
             legacyRecord.addParam("description", details->description.toLatin1());
     };
 const auto resource =
-    [](const QnAuditRecord& record, QnLegacyAuditRecord& legacyRecord)
+    [](const AuditRecord& record, QnLegacyAuditRecord& legacyRecord)
     {
         const auto details = record.get<ResourceDetails>();
 
@@ -76,7 +81,7 @@ const auto resource =
             legacyRecord.addParam("description", details->description.toLatin1());
     };
 const auto description =
-    [](const QnAuditRecord& record, QnLegacyAuditRecord& legacyRecord)
+    [](const AuditRecord& record, QnLegacyAuditRecord& legacyRecord)
     {
         const auto details = record.get<DescriptionDetails>();
 
@@ -84,12 +89,12 @@ const auto description =
             legacyRecord.addParam("description", details->description.toLatin1());
     };
 const auto cloud =
-    [](const QnAuditRecord& record, QnLegacyAuditRecord& legacyRecord)
+    [](const AuditRecord& record, QnLegacyAuditRecord& legacyRecord)
     {
         legacyRecord.addParam("userAgent", record.authSession.userAgent.toUtf8());
     };
 const auto nothing =
-    [](const QnAuditRecord& record, QnLegacyAuditRecord& legacyRecord)
+    [](const AuditRecord& record, QnLegacyAuditRecord& legacyRecord)
     {
         const auto details = record.get<std::nullptr_t>();
     };
@@ -99,13 +104,13 @@ const auto nothing =
 namespace paramsToDetails {
 
 const auto session =
-    [](const QnLegacyAuditRecord& legacyRecord, QnAuditRecord& record)
+    [](const QnLegacyAuditRecord& legacyRecord, AuditRecord& record)
     {
         record.details = SessionDetails{std::chrono::seconds(legacyRecord.rangeStartSec),
             std::chrono::seconds(legacyRecord.rangeEndSec)};
     };
 const auto playback =
-    [](const QnLegacyAuditRecord& legacyRecord, QnAuditRecord& record)
+    [](const QnLegacyAuditRecord& legacyRecord, AuditRecord& record)
     {
         const auto flags = QByteArray(legacyRecord.extractParam("archiveExist"));
         std::map<nx::Uuid, bool> archiveExists;
@@ -123,31 +128,31 @@ const auto playback =
             archiveExists};
     };
 const auto device =
-    [](const QnLegacyAuditRecord& legacyRecord, QnAuditRecord& record)
+    [](const QnLegacyAuditRecord& legacyRecord, AuditRecord& record)
     {
         record.details = DeviceDetails{{
             {legacyRecord.resources},
             {QByteArray(legacyRecord.extractParam("description"))}}};
     };
 const auto resource =
-    [](const QnLegacyAuditRecord& legacyRecord, QnAuditRecord& record)
+    [](const QnLegacyAuditRecord& legacyRecord, AuditRecord& record)
     {
         record.details = ResourceDetails{
             {legacyRecord.resources},
             {QByteArray(legacyRecord.extractParam("description"))}};
     };
 const auto description =
-    [](const QnLegacyAuditRecord& legacyRecord, QnAuditRecord& record)
+    [](const QnLegacyAuditRecord& legacyRecord, AuditRecord& record)
     {
         record.details = DescriptionDetails{QByteArray(legacyRecord.extractParam("description"))};
     };
 const auto cloud =
-    [](const QnLegacyAuditRecord& legacyRecord, QnAuditRecord& record)
+    [](const QnLegacyAuditRecord& legacyRecord, AuditRecord& record)
     {
         record.details = nullptr;
     };
 const auto nothing =
-    [](const QnLegacyAuditRecord& legacyRecord, QnAuditRecord& record)
+    [](const QnLegacyAuditRecord& legacyRecord, AuditRecord& record)
     {
         record.details = nullptr;
     };
@@ -157,7 +162,6 @@ const auto nothing =
 template<typename Visitor>
 constexpr auto visitAllConversions(Visitor&& visitor)
 {
-    using nx::vms::api::AuditRecordType;
     return visitor(
         Conversion<AuditRecordType::unauthorizedLogin>{detailsToParams::session, paramsToDetails::session},
         Conversion<AuditRecordType::login>{detailsToParams::session, paramsToDetails::session},
@@ -181,7 +185,7 @@ constexpr auto visitAllConversions(Visitor&& visitor)
         Conversion<AuditRecordType::settingsChange>{detailsToParams::description, paramsToDetails::description},
         Conversion<AuditRecordType::emailSettings>{detailsToParams::description, paramsToDetails::description},
         Conversion<AuditRecordType::mitmAttack>{
-            [](const QnAuditRecord& record, QnLegacyAuditRecord& legacyRecord)
+            [](const AuditRecord& record, QnLegacyAuditRecord& legacyRecord)
             {
                 const auto details = record.get<MitmDetails>();
 
@@ -194,7 +198,7 @@ constexpr auto visitAllConversions(Visitor&& visitor)
                 if (!details->url.isEmpty())
                     legacyRecord.addParam("url", details->url.toString().toLatin1());
             },
-            [](const QnLegacyAuditRecord& legacyRecord, QnAuditRecord& record)
+            [](const QnLegacyAuditRecord& legacyRecord, AuditRecord& record)
             {
                 record.details = MitmDetails{
                     nx::Uuid(QByteArray(legacyRecord.extractParam("serverId"))),
@@ -203,14 +207,14 @@ constexpr auto visitAllConversions(Visitor&& visitor)
                     nx::utils::Url(legacyRecord.extractParam("url"))};
             }},
         Conversion<AuditRecordType::updateInstall>{
-            [](const QnAuditRecord& record, QnLegacyAuditRecord& legacyRecord)
+            [](const AuditRecord& record, QnLegacyAuditRecord& legacyRecord)
             {
                 const auto details = record.get<UpdateDetails>();
 
                 if (!details->version.isNull())
                     legacyRecord.addParam("version", details->version.toString().toLatin1());
             },
-            [](const QnLegacyAuditRecord& legacyRecord, QnAuditRecord& record)
+            [](const QnLegacyAuditRecord& legacyRecord, AuditRecord& record)
             {
                 record.details = UpdateDetails{nx::utils::SoftwareVersion(
                     QByteArray(legacyRecord.extractParam("version")))};
@@ -223,11 +227,13 @@ constexpr auto visitAllConversions(Visitor&& visitor)
 }
 
 template<typename Func, typename... Args>
-auto switchByRecordType(nx::vms::api::AuditRecordType eventType, Func&& f, Args&&... args)
+auto switchByRecordType(AuditRecordType eventType, Func&& f, Args&&... args)
 {
     const auto success = (((eventType == args.type) && (f(std::forward<Args>(args)), true)) || ...);
     NX_ASSERT(success);
 }
+
+} // namespace
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     QnLegacyAuditRecord, (ubjson)(json)(sql_record), QnLegacyAuditRecord_Fields)
@@ -266,13 +272,13 @@ void QnLegacyAuditRecord::addParam(const QnLatin1Array& name, const QnLatin1Arra
     params.append(name).append('=').append(value);
 }
 
-QnLegacyAuditRecord::operator QnAuditRecord() const
+QnLegacyAuditRecord::operator AuditRecord() const
 {
     return visitAllConversions(
         [this](auto&&... items)
         {
-            QnAuditRecord record{{{authSession}}};
-            record.eventType = static_cast<nx::vms::api::AuditRecordType>(eventType);
+            AuditRecord record{{{authSession}}};
+            record.eventType = static_cast<AuditRecordType>(eventType);
             record.createdTimeS = std::chrono::seconds(createdTimeSec);
             switchByRecordType(record.eventType,
                 [this, &record](auto&& conversion)
@@ -284,86 +290,20 @@ QnLegacyAuditRecord::operator QnAuditRecord() const
         });
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    QnAuditRecord, (ubjson)(json), QnAuditRecord_Fields)
-
-QN_FUSION_ADAPT_CLASS(QnAuditRecordModel,
-    ((getter, &QnAuditRecordModel::eventType)(setter, &QnAuditRecordModel::eventType)(name, "eventType"))
-    ((getter, &QnAuditRecordModel::details)(setter, &QnAuditRecordModel::details)(name, "details"))
-    ((getter, &QnAuditRecordModel::createdTimeS)(setter, &QnAuditRecordModel::createdTimeS)(name, "createdTimeSec"))
-    ((getter, &QnAuditRecordModel::getRangeStartSec)(setter, &QnAuditRecordModel::setRangeStartSec)(name, "rangeStartSec"))
-    ((getter, &QnAuditRecordModel::getRangeEndSec)(setter, &QnAuditRecordModel::setRangeEndSec)(name, "rangeEndSec"))
-    ((getter, &QnAuditRecordModel::authSession)(setter, &QnAuditRecordModel::authSession)(name, "authSession"))
-    ((getter, &QnAuditRecordModel::apiInfo)(setter, &QnAuditRecordModel::apiInfo)(name, "apiInfo")))
-QN_FUSION_DEFINE_FUNCTIONS(QnAuditRecordModel, (sql_record))
-
-QnAuditRecordModel::QnAuditRecordModel(const QnAuditRecord& record)
-    :QnAuditRecord(record)
-{}
-
-void QnAuditRecordModel::setRangeStartSec(int value)
+QnLegacyAuditRecord::QnLegacyAuditRecord(nx::vms::api::AuditRecord auditRecord):
+    authSession(std::move(auditRecord.authSession))
 {
-    auto details = get<PeriodDetails>();
-    if (details)
-        details->startS = std::chrono::seconds(value);
-}
-
-void QnAuditRecordModel::setRangeEndSec(int value)
-{
-    auto details = get<PeriodDetails>();
-    if (details)
-        details->endS = std::chrono::seconds(value);
-}
-
-int QnAuditRecordModel::getRangeStartSec() const
-{
-    auto details = get<PeriodDetails>();
-    if (details)
-        return details->startS.count();
-    return 0;
-}
-
-int QnAuditRecordModel::getRangeEndSec() const
-{
-    auto details = get<PeriodDetails>();
-    if (details)
-        return details->endS.count();
-    return 0;
-}
-
-QnAuditRecord::operator QnLegacyAuditRecord() const
-{
-    return visitAllConversions(
-        [this](auto&&... items)
+    visitAllConversions(
+        [this, &auditRecord](auto&&... items)
         {
-            QnLegacyAuditRecord record(authSession);
-            record.eventType = static_cast<Qn::LegacyAuditRecordType>(eventType);
-            record.createdTimeSec = createdTimeS.count();
-            switchByRecordType(eventType,
-                [this, &record](auto&& conversion)
+            eventType = static_cast<Qn::LegacyAuditRecordType>(auditRecord.eventType);
+            createdTimeSec = auditRecord.createdTimeS.count();
+            switchByRecordType(
+                auditRecord.eventType,
+                [this, &auditRecord](auto&& conversion)
                 {
-                    conversion.verifyDetailsToParams(conversion.detailsToParams, *this, record);
+                    conversion.verifyDetailsToParams(conversion.detailsToParams, auditRecord, *this);
                 },
                 items...);
-            return record;
         });
 }
-
-static std::optional<std::chrono::seconds> s_createdTimeForTests;
-
-QnAuditRecord QnAuditRecord::prepareRecord(
-    nx::vms::api::AuditRecordType type, const nx::network::rest::audit::Record& auditRecord)
-{
-    QnAuditRecord result(auditRecord);
-    result.eventType = type;
-    result.createdTimeS = s_createdTimeForTests.value_or(
-        std::chrono::seconds(qnSyncTime->currentMSecsSinceEpoch() / 1000));
-    return result;
-}
-
-void QnAuditRecord::setCreatedTimeForTests(std::optional<std::chrono::seconds> value)
-{
-    s_createdTimeForTests = value;
-}
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(AuditLogFilter, (json), AuditLogFilter_Fields)

@@ -9,10 +9,10 @@
 #include <analytics/db/analytics_db_types.h>
 #include <api/helpers/request_helpers_fwd.h>
 #include <api/http_client_pool.h>
-#include <api/model/audit/audit_record.h>
 #include <api/model/camera_diagnostics_reply.h>
 #include <api/model/camera_list_reply.h>
 #include <api/model/getnonce_reply.h>
+#include <api/model/legacy_audit_record.h>
 #include <api/model/manual_camera_seach_reply.h>
 #include <api/model/storage_status_reply.h>
 #include <api/model/test_email_settings_reply.h>

@@ -8,6 +8,7 @@ nx_add_target(nx_vms_api LIBRARY
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/protocol_version.cpp"
     PUBLIC_LIBS
+        nx_network_rest
         nx_utils
         nx_fusion
     FOLDER common/libs

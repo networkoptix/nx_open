@@ -2,16 +2,15 @@
 
 #pragma once
 
-#include <api/model/audit/audit_details.h>
-#include <api/model/audit/audit_record.h>
 #include <nx/network/rest/audit.h>
+#include <nx/vms/api/data/audit.h>
 
 #include "audit_manager_fwd.h"
 
 class NX_VMS_COMMON_API QnAuditManager: public nx::network::rest::audit::Manager
 {
 public:
-    virtual ~QnAuditManager();
+    virtual ~QnAuditManager() = default;
 
     static const int MIN_PLAYBACK_TIME_TO_LOG = 1000 * 5;
     static const int AGGREGATION_TIME_MS = 1000 * 5;
@@ -31,23 +30,28 @@ public:
         std::map<QString, QString> settings) = 0;
 
     template <nx::vms::api::AuditRecordType type,
-        typename Details = typename details::details_type<type, AllAuditDetails::mapping>::type>
+        typename Details = typename nx::vms::api::details::details_type<type,
+            nx::vms::api::AllAuditDetails::mapping>::type>
     void addAuditRecord(const nx::network::rest::audit::Record& auditRecord, Details&& details = {})
     {
-        return addAuditRecord(
-            QnAuditRecord::prepareRecord<type>(auditRecord, std::forward<Details>(details)));
+        return addAuditRecord(nx::vms::api::AuditRecord::prepareRecord<type>(
+            auditRecord, createdTime(), std::forward<Details>(details)));
     }
 
     virtual void addAuditRecord(const nx::network::rest::audit::Record& auditRecord) override
     {
         return addAuditRecord(
-            QnAuditRecord::prepareRecord<nx::vms::api::AuditRecordType::notDefined>(auditRecord));
+            nx::vms::api::AuditRecord::prepareRecord<nx::vms::api::AuditRecordType::notDefined>(
+                auditRecord, createdTime()));
     }
 
-    virtual void addAuditRecord(const QnAuditRecord& record) = 0;
+    virtual void addAuditRecord(const nx::vms::api::AuditRecord& record) = 0;
     virtual void flushAuditRecords() = 0;
 
     virtual void at_connectionOpened(const nx::network::rest::audit::Record& auditRecord) = 0;
     virtual void at_connectionClosed(const nx::network::rest::audit::Record& auditRecord) = 0;
     virtual void stop() = 0;
+
+    static std::chrono::seconds createdTime();
+    static void setCreatedTimeForTests(std::optional<std::chrono::seconds> value);
 };
