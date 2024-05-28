@@ -345,5 +345,5 @@ QString QnAvCodecHelper::codecIdToString(AVCodecID codecId)
 
 AVCodecID QnAvCodecHelper::codecIdFromString(const QString& value)
 {
-    return kStringToCodecData.value(value.toLatin1());
+    return kStringToCodecData.value(value.toLatin1(), AV_CODEC_ID_NONE);
 }
