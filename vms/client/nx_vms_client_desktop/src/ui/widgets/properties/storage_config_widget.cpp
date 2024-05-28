@@ -64,7 +64,7 @@ static constexpr int kMaximumMismatchingArchiveModesMessageBoxWidth = 400;
 NX_REFLECTION_ENUM_CLASS(StorageType,
     ram,
     local,
-    usb,
+    removable,
     network,
     smb,
     cloud,
@@ -807,16 +807,22 @@ QnStorageConfigWidget::StorageConfigWarningFlags
 
         // TODO: Get rid of serialized literals, use PartitionType enum value instead.
 
-        // Storages status and configuratiom messages.
+        // Storages status and configuration messages.
         if (!storageInfo.isUsed)
             flags.setFlag(hasDisabledStorage);
 
-        if (storageInfo.isUsed && storageInfo.storageType == "usb")
-            flags.setFlag(hasUsbStorage);
+        if (storageInfo.isUsed &&
+            storageInfo.storageType == nx::reflect::toString(StorageType::removable))
+        {
+            flags.setFlag(hasRemovableStorage);
+        }
 
         // Cloud backup storage related flags.
-        if (storageInfo.isUsed && storageInfo.storageType == "cloud")
+        if (storageInfo.isUsed
+            && storageInfo.storageType == nx::reflect::toString(StorageType::cloud))
+        {
             flags.setFlag(cloudBackupStorageBeingEnabled);
+        }
 
         if (!storageInfo.isUsed && storageResource->isUsedForWriting() && storageResource->isBackup())
             flags.setFlag(backupStorageBeingReplacedByCloudStorage);
@@ -865,10 +871,11 @@ void QnStorageConfigWidget::updateWarnings()
                 .isEnabledProperty = &messageBarSettings()->storageConfigHasDisabledWarning
             });
     }
-    if (flags.testFlag(hasUsbStorage))
+    if (flags.testFlag(hasRemovableStorage))
     {
         messages.push_back(
             {
+                // TODO: #vbreus probably should be "Recording was enabled on the removable storage"
                 .text = tr("Recording was enabled on the USB storage"),
                 .level = BarDescription::BarLevel::Warning,
                 .isEnabledProperty = &messageBarSettings()->storageConfigUsbWarning
@@ -1007,7 +1014,7 @@ QMenu* QnStorageConfigWidget::createStorageArchiveModeMenu(const QnStorageModelI
     exclusiveAction->setData(static_cast<int>(nx::vms::api::StorageArchiveMode::exclusive));
 
     if (storageInfo.storageType != nx::reflect::toString(StorageType::local)
-        && storageInfo.storageType != nx::reflect::toString(StorageType::usb))
+        && storageInfo.storageType != nx::reflect::toString(StorageType::removable))
     {
         const auto sharedAction = menu->addAction(tr("Shared"));
         sharedAction->setData(static_cast<int>(nx::vms::api::StorageArchiveMode::shared));

@@ -285,8 +285,8 @@ QString QnStorageListModel::displayData(const QModelIndex& index, bool forcedTex
                 return tr("swap");
             if (storageData.storageType == "network")
                 return tr("network");
-            if (storageData.storageType == "usb")
-                return tr("usb");
+            if (storageData.storageType == "removable")
+                return tr("removable");
             if (storageData.storageType == "cloud")
                 return tr("cloud");
 

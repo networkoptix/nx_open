@@ -51,7 +51,7 @@ private:
         analyticsIsOnSystemDrive = 1,
         analyticsIsOnDisabledStorage = 1 << 1,
         hasDisabledStorage = 1 << 2,
-        hasUsbStorage = 1 << 3,
+        hasRemovableStorage = 1 << 3,
         cloudBackupStorageBeingEnabled = 1 << 4,
         backupStorageBeingReplacedByCloudStorage = 1 << 5,
     };
