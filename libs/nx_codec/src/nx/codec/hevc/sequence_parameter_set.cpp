@@ -86,7 +86,7 @@ bool SequenceParameterSet::read(const uint8_t* data, int size)
             pcm_sample_bit_depth_chroma_minus1 = reader.getBits(4);
             log2_min_pcm_luma_coding_block_size_minus3 = reader.getGolomb();
             log2_diff_max_min_pcm_luma_coding_block_size = reader.getGolomb();
-            pcm_loop_filter_disabled_flag = reader.getGolomb();
+            pcm_loop_filter_disabled_flag = reader.getBits(1);
         }
 
         num_short_term_ref_pic_sets = reader.getGolomb();
