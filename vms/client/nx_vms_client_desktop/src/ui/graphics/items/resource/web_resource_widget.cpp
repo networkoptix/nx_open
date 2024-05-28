@@ -137,6 +137,17 @@ QnWebResourceWidget::QnWebResourceWidget(
 
     controller->initClientApiSupport(this->item(), authCondition);
     controller->setLoadIcon(true);
+
+    const auto webPage = resource().dynamicCast<QnWebPageResource>();
+    if (!webPage->isOpenInWindow())
+    {
+        connect(webPage.get(), &QnWebPageResource::openInWindowChanged, this,
+            [this, webPage]()
+            {
+                if (webPage->isOpenInWindow())
+                    moveToDedicatedWindow();
+            });
+    }
 }
 
 QnWebResourceWidget::~QnWebResourceWidget()

@@ -15,51 +15,54 @@ enum WidgetButtons
     // Switch to fullscreen, web pages only.
     FullscreenButton = 1 << 1,
 
+    // Move to a dedicated window.
+    DedicatedWindowButton = 1 << 2,
+
     // Show info, actual for all widgets.
-    InfoButton = 1 << 2,
+    InfoButton = 1 << 3,
 
     // Rotate, actual for all widgets.
-    RotateButton = 1 << 3,
+    RotateButton = 1 << 4,
 
     //---------------------------------------------------------------------------------------------
     // Media Widget specific buttons.
 
-    HotspotsButton = 1 << 4,
-    PtzButton = 1 << 5,
-    FishEyeButton = 1 << 6,
-    ZoomWindowButton = 1 << 7,
-    IoModuleButton = 1 << 8,
-    ScreenshotButton = 1 << 9,
-    DbgScreenshotButton = 1 << 10,
-    MotionSearchButton = 1 << 11,
-    ObjectSearchButton = 1 << 12,
+    HotspotsButton = 1 << 5,
+    PtzButton = 1 << 6,
+    FishEyeButton = 1 << 7,
+    ZoomWindowButton = 1 << 8,
+    IoModuleButton = 1 << 9,
+    ScreenshotButton = 1 << 10,
+    DbgScreenshotButton = 1 << 11,
+    MotionSearchButton = 1 << 12,
+    ObjectSearchButton = 1 << 13,
 
     //---------------------------------------------------------------------------------------------
     // Server statistics specific buttons.
 
-    ShowLogButton = 1 << 13,
-    CheckIssuesButton = 1 << 14,
+    ShowLogButton = 1 << 14,
+    CheckIssuesButton = 1 << 15,
 
     //---------------------------------------------------------------------------------------------
     // Buttons for the left panel, sorting left-to-right.
 
     // Indicates if is zoomed item, actual for cameras.
-    ZoomStatusIconButton = 1 << 15,
+    ZoomStatusIconButton = 1 << 16,
 
     // Reload web page, web pages only.
-    ReloadPageButton = 1 << 16,
+    ReloadPageButton = 1 << 17,
 
     // Navigate back, web pages only.
-    BackButton = 1 << 17,
+    BackButton = 1 << 18,
 
     // Indicate if video stream is paused
-    PauseButton = 1 << 18,
+    PauseButton = 1 << 19,
 
     //---------------------------------------------------------------------------------------------
     // Buttons on the playback panel.
 
     // Status of the recording, actual for cameras.
-    RecordingStatusIconButton = 1 << 19,
+    RecordingStatusIconButton = 1 << 20,
 };
 
 } // namespace Qn

@@ -28,6 +28,7 @@
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/scene/resource_widget/overlays/playback_position_item.h>
@@ -394,6 +395,13 @@ void QnResourceWidget::createButtons()
     connect(closeButton, &QnImageButtonWidget::clicked, this, &QnResourceWidget::close,
         Qt::QueuedConnection);
 
+    auto dedicatedWindowButton = createStatisticAwareButton("res_widget_dedicated_window");
+    dedicatedWindowButton->setIcon(loadSvgIcon("24x24/Outline/dedicated_window.svg"));
+    dedicatedWindowButton->setToolTip(tr("Move to a dedicated window"));
+    dedicatedWindowButton->setObjectName("DedicatedWindowButton");
+    connect(dedicatedWindowButton, &QnImageButtonWidget::clicked,
+        this, &QnResourceWidget::moveToDedicatedWindow);
+
     auto infoButton = createStatisticAwareButton("res_widget_info");
     infoButton->setIcon(qnSkin->icon(kInfoIcon));
     infoButton->setCheckable(true);
@@ -435,6 +443,9 @@ void QnResourceWidget::createButtons()
             workbench()->setItem(Qn::ZoomedRole, newFullscreenItem);
         });
     rightButtonsBar->addButton(Qn::FullscreenButton, fullscreenButton);
+
+    rightButtonsBar->addButton(Qn::DedicatedWindowButton, dedicatedWindowButton);
+
     updateFullscreenButton();
 }
 
@@ -864,6 +875,12 @@ QString QnResourceWidget::toString() const
 
 }
 
+void QnResourceWidget::moveToDedicatedWindow()
+{
+    if (NX_ASSERT(menu()->triggerIfPossible(menu::OpenInDedicatedWindowAction, m_resource)))
+        close();
+}
+
 QSizeF QnResourceWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
 {
     QSizeF result;
@@ -1029,6 +1046,9 @@ int QnResourceWidget::calculateButtonsVisibility() const
 
     if (fullscreenMode)
         result |= Qn::FullscreenButton;
+
+    if (menu()->canTrigger(menu::OpenInDedicatedWindowAction, m_resource))
+        result |= Qn::DedicatedWindowButton;
 
     return result;
 }
