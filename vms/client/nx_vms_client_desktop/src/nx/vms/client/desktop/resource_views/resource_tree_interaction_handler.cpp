@@ -614,9 +614,9 @@ void ResourceTreeInteractionHandler::activateItem(const QModelIndex& index,
             }
 
             if (auto webPage = resource.dynamicCast<QnWebPageResource>();
-                webPage && webPage->isOpenInDialog())
+                webPage && webPage->isOpenInWindow())
             {
-                menu()->trigger(menu::OpenWebPageInNewDialog, webPage);
+                menu()->trigger(menu::OpenInDedicatedWindowAction, webPage);
                 return;
             }
 

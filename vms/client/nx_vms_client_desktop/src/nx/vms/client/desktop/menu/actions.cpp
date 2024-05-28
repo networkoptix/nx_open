@@ -1142,10 +1142,10 @@ void initialize(Manager* manager, Action* root)
             && ConditionWrapper(new LightModeCondition(Qn::LightModeNoNewWindow))
         );
 
-    factory(OpenWebPageInNewDialog)
+    factory(OpenInDedicatedWindowAction)
         .mode(DesktopMode)
         .flags(Tree | Scene | SingleTarget | MultiTarget | ResourceTarget | WidgetTarget)
-        .text(ContextMenu::tr("Open in New Dialog"))
+        .text(ContextMenu::tr("Open in Dedicated Window"))
         .condition(condition::isWebPageOrIntegration());
 
     factory(OpenCurrentLayoutInNewWindowAction)

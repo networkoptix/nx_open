@@ -22,6 +22,7 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
+#include <nx/vms/client/desktop/webpage/web_page_data_cache.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
 #include <ui/dialogs/webpage_dialog.h>
 
@@ -75,7 +76,7 @@ QnWorkbenchWebPageHandler::QnWorkbenchWebPageHandler(QObject* parent /*= nullptr
                 QDesktopServices::openUrl(QUrl::fromLocalFile(filePath));
         });
 
-    connect(action(menu::OpenWebPageInNewDialog), &QAction::triggered, this,
+    connect(action(menu::OpenInDedicatedWindowAction), &QAction::triggered, this,
         [this]()
         {
             menu::Parameters parameters = menu()->currentParameters(sender());
@@ -88,9 +89,9 @@ QnWorkbenchWebPageHandler::QnWorkbenchWebPageHandler(QObject* parent /*= nullptr
                 auto webDialog = new QnSessionAware<WebViewDialog>(
                     mainWindowWidget(), QDialogButtonBox::NoButton);
 
-                webDialog->setAttribute(Qt::WA_DeleteOnClose);
                 webDialog->setWindowFlag(Qt::Tool);
-                webDialog->setBaseSize(webPage->dialogSize());
+                webDialog->setAttribute(Qt::WA_DeleteOnClose);
+                webDialog->setAttribute(Qt::WA_MacAlwaysShowToolWindow);
                 webDialog->init(
                     webPage->getUrl(),
                     /*enableClientApi*/ webPage->getOptions().testFlag(
@@ -100,13 +101,45 @@ QnWorkbenchWebPageHandler::QnWorkbenchWebPageHandler(QObject* parent /*= nullptr
                     /*authenticator*/ nullptr,
                     /*checkCertificate*/ true);
 
+                auto updateSize =
+                    [webDialog, webPage]()
+                    {
+                        QRect geometry = webDialog->geometry();
+                        const QPoint center = geometry.center();
+                        geometry.setSize(webPage->dedicatedWindowSize());
+                        geometry.moveCenter(center);
+                        webDialog->setGeometry(geometry);
+                    };
+
+                connect(webPage.get(), &QnWebPageResource::openInWindowChanged,
+                    webDialog, updateSize);
+
                 connect(webDialog, &QDialog::finished, this, nx::utils::guarded(webPage.get(),
                     [webPage, webDialog](int /*result*/)
                     {
-                        webPage->setDialogSize(webDialog->size());
+                        if (webPage->isOpenInWindow())
+                        {
+                            webPage->setOpenInWindow(true, webDialog->size());
+                            qnResourcesChangesManager->saveWebPage(webPage);
+                        }
                     }));
 
                 webDialog->show();
+                updateSize();
+            }
+        });
+
+    connect(appContext()->webPageDataCache(), &WebPageDataCache::windowSizeChanged, this,
+        [this](const QUrl& webPageUrl, const QSize& size)
+        {
+            auto webPage =
+                resourcePool()->getResourceByUrl(
+                    webPageUrl.toString()).dynamicCast<QnWebPageResource>();
+
+            if (webPage->getOptions().testFlag(QnWebPageResource::Integration) && size.isValid())
+            {
+                webPage->setOpenInWindow(true, size);
+                qnResourcesChangesManager->saveWebPage(webPage);
             }
         });
 }
@@ -144,12 +177,15 @@ void QnWorkbenchWebPageHandler::addNewWebPage(nx::vms::api::WebPageSubtype subty
     webPage->setProxyDomainAllowList(dialog->proxyDomainAllowList());
     webPage->setCertificateCheckEnabled(dialog->isCertificateCheckEnabled());
     webPage->setRefreshInterval(dialog->refreshInterval());
-    webPage->setOpenInDialog(dialog->isOpenInDialog());
-    webPage->setDialogSize(dialog->openInDialogSize());
+    webPage->setOpenInWindow(dialog->isOpenInWindow());
 
     qnResourcesChangesManager->saveWebPage(webPage);
     menu()->trigger(menu::SelectNewItemAction, webPage);
-    menu()->trigger(menu::DropResourcesAction, webPage);
+
+    if (dialog->isOpenInWindow())
+        menu()->trigger(menu::OpenInDedicatedWindowAction, webPage);
+    else
+        menu()->trigger(menu::DropResourcesAction, webPage);
 }
 
 void QnWorkbenchWebPageHandler::editWebPage()
@@ -167,8 +203,7 @@ void QnWorkbenchWebPageHandler::editWebPage()
     const auto oldProxyDomainAllowList = webPage->proxyDomainAllowList();
     const auto oldCertCheck = webPage->isCertificateCheckEnabled();
     const auto oldRefreshInterval = webPage->refreshInterval();
-    const auto oldIsOpenInDialog = webPage->isOpenInDialog();
-    const auto oldDialogSize = webPage->dialogSize();
+    const auto oldIsOpenInWindow = webPage->isOpenInWindow();
 
     QScopedPointer<QnWebpageDialog> dialog(
         new QnWebpageDialog(systemContext(), mainWindowWidget(), QnWebpageDialog::EditPage));
@@ -180,8 +215,7 @@ void QnWorkbenchWebPageHandler::editWebPage()
     dialog->setProxyDomainAllowList(oldProxyDomainAllowList);
     dialog->setCertificateCheckEnabled(oldCertCheck);
     dialog->setRefreshInterval(oldRefreshInterval);
-    dialog->setOpenInDialog(oldIsOpenInDialog);
-    dialog->setOpenInDialogSize(oldDialogSize);
+    dialog->setOpenInWindow(oldIsOpenInWindow);
 
     dialog->setResourceId(webPage->getId());
 
@@ -195,8 +229,7 @@ void QnWorkbenchWebPageHandler::editWebPage()
     const auto proxyDomainAllowList = dialog->proxyDomainAllowList();
     const auto certCheck = dialog->isCertificateCheckEnabled();
     const auto refreshInterval = dialog->refreshInterval();
-    const auto isOpenInDialog = dialog->isOpenInDialog();
-    const auto dialogSize = dialog->openInDialogSize();
+    const auto isOpenInWindow = dialog->isOpenInWindow();
 
     if (oldName == name
         && oldUrl == url.toString()
@@ -205,8 +238,7 @@ void QnWorkbenchWebPageHandler::editWebPage()
         && proxyDomainAllowList == oldProxyDomainAllowList
         && oldCertCheck == certCheck
         && oldRefreshInterval == refreshInterval
-        && oldIsOpenInDialog == isOpenInDialog
-        && oldDialogSize == dialogSize)
+        && oldIsOpenInWindow == isOpenInWindow)
     {
         return;
     }
@@ -218,7 +250,7 @@ void QnWorkbenchWebPageHandler::editWebPage()
     webPage->setProxyDomainAllowList(proxyDomainAllowList);
     webPage->setCertificateCheckEnabled(certCheck);
     webPage->setRefreshInterval(refreshInterval);
-    webPage->setOpenInDialog(dialog->isOpenInDialog());
-    webPage->setDialogSize(dialog->openInDialogSize());
+    webPage->setOpenInWindow(isOpenInWindow);
+
     qnResourcesChangesManager->saveWebPage(webPage);
 }

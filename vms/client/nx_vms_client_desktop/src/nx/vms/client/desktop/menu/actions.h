@@ -594,9 +594,9 @@ enum IDType
     OpenInNewWindowAction,
 
     /**
-     * Opens selected web pages in a new dialog.
+     * Opens selected resource in a new dialog.
      */
-    OpenWebPageInNewDialog,
+    OpenInDedicatedWindowAction,
 
     /**
      * Opens given videowall in review mode.
