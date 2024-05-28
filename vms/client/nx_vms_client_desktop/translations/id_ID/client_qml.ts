@@ -2462,7 +2462,7 @@ Tekan Alt + Klik untuk mengikuti objek</translation>
     </message>
     <message>
       <source>The added system will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</source>
-      <translation type="unfinished">The added system will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</translation>
+      <translation>Sistem yang ditambahkan akan segera terlihat oleh pengguna dengan akun cloud yang sudah ada, sementara pengguna tanpa akun cloud akan menerima instruksi melalui Email.</translation>
     </message>
   </context>
   <context>

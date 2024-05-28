@@ -2476,7 +2476,7 @@ Trykk Alt + Klikk for å følge objektet</translation>
     </message>
     <message>
       <source>The added system will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</source>
-      <translation type="unfinished">The added system will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</translation>
+      <translation>Det tilførte systemet vil raskt bli synlig for brukere med en eksisterende skykonto, mens brukere uten eksisterende skykonto vil motta instruksjoner på e-post.</translation>
     </message>
   </context>
   <context>
