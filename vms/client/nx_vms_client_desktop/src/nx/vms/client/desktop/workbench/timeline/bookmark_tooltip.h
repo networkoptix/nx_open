@@ -8,6 +8,8 @@
 class QLayout;
 class QPushButton;
 
+namespace nx::vms::client::core { class ColorizedIconDeclaration; }
+
 namespace nx::vms::client::desktop::workbench::timeline {
 
 class BookmarkTooltip: public BaseTooltip
@@ -40,7 +42,7 @@ private:
     QWidget* createDescriptionLabel(const QString& text);
     QWidget* createTagButton(const QString& tag);
     QWidget* createInternalSeparator();
-    QPushButton* createButton(const char* iconName, const QString& toolTip);
+    QPushButton* createButton(const core::ColorizedIconDeclaration& iconName, const QString& toolTip);
     QLayout* createButtonsLayout(const QnCameraBookmark& bookmark);
 
 private:
