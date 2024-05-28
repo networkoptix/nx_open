@@ -55,6 +55,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ObjectTrackFilter,
 
     ObjectTrackTitle title;
     title.text = "Example Object Track title text.";
+    title.isImageAvailable = true;
     result.title = title;
 
     return result;
