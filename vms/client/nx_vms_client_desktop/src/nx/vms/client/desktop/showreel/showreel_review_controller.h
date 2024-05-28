@@ -63,12 +63,12 @@ private:
     void resetReviewLayout(const LayoutResourcePtr& layout,
         const nx::vms::api::ShowreelItemDataList& items);
 
-    void addItemToReviewLayout(
+    bool addItemToReviewLayout(
         const LayoutResourcePtr& layout,
         const nx::vms::api::ShowreelItemData& item,
         const QPointF& position,
         bool pinItem);
-    void addResourcesToReviewLayout(
+    bool addResourcesToReviewLayout(
         const LayoutResourcePtr& layout,
         const QnResourceList& resources,
         const QPointF& position);

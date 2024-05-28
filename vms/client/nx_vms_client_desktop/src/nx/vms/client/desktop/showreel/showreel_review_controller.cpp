@@ -447,14 +447,14 @@ void ShowreelReviewController::resetReviewLayout(
     updateButtons(layout);
 }
 
-void ShowreelReviewController::addItemToReviewLayout(
+bool ShowreelReviewController::addItemToReviewLayout(
     const LayoutResourcePtr& layout,
     const nx::vms::api::ShowreelItemData& item,
     const QPointF& position,
     bool pinItem)
 {
     if (layout->getItems().size() >= qnRuntime->maxSceneItems())
-        return;
+        return false;
 
     common::LayoutItemData itemData;
     itemData.uuid = nx::Uuid::createUuid();
@@ -466,29 +466,41 @@ void ShowreelReviewController::addItemToReviewLayout(
         Qn::ShowreelItemDelayMsRole,
         item.delayMs);
     layout->addItem(itemData);
+    return true;
 }
 
-void ShowreelReviewController::addResourcesToReviewLayout(
+bool ShowreelReviewController::addResourcesToReviewLayout(
     const LayoutResourcePtr& layout,
     const QnResourceList& resources,
     const QPointF& position)
 {
     NX_ASSERT(!m_updating);
     if (m_updating)
-        return;
+        return false;
 
     const auto resourceCanBeAddedToShowreel =
         [](const QnResourcePtr& resource)
         {
+            if (resource->hasFlags(Qn::cross_system))
+                return false;
+
             if (const auto layout = resource.dynamicCast<QnLayoutResource>())
                 return !layout::isEncrypted(layout);
 
             return QnResourceAccessFilter::isOpenableInLayout(resource);
         };
 
+    bool result = false;
     QScopedValueRollback<bool> guard(m_updating, true);
     for (const auto& resource: resources.filtered(resourceCanBeAddedToShowreel))
-        addItemToReviewLayout(layout, {resource->getId(), kDefaultDelayMs}, position, false);
+    {
+        result |= addItemToReviewLayout(
+            layout,
+            /*item*/ {resource->getId(), kDefaultDelayMs},
+            position,
+            /*pinItem*/ false);
+    }
+    return result;
 }
 
 bool ShowreelReviewController::fillShowreelItems(nx::vms::api::ShowreelItemDataList* items)
@@ -561,7 +573,9 @@ void ShowreelReviewController::at_dropResourcesAction_triggered()
     const auto reviewLayout = workbench()->currentLayoutResource();
     const auto parameters = menu()->currentParameters(sender());
     QPointF position = parameters.argument<QPointF>(Qn::ItemPositionRole);
-    addResourcesToReviewLayout(reviewLayout, parameters.resources(), position);
+    if (!addResourcesToReviewLayout(reviewLayout, parameters.resources(), position))
+        return;
+
     const auto showreel = systemContext()->showreelManager()->showreel(currentShowreelId());
     menu()->trigger(menu::SaveCurrentShowreelAction);
 }
