@@ -14,8 +14,6 @@
 
 namespace nx::vms::client::desktop {
 
-using CloudCrossSystemContextPtr = std::unique_ptr<CloudCrossSystemContext>;
-
 struct CloudCrossSystemManager::Private
 {
     std::map<QString, CloudCrossSystemContextPtr> cloudSystems;

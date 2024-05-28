@@ -24,12 +24,10 @@ using namespace nx::vms::client::desktop;
 struct QnCrossSystemCameraWidget::Private
 {
     CrossSystemCameraResourcePtr crossSystemCamera;
+    CloudCrossSystemContextPtr context;
 
     Qn::ResourceStatusOverlay calculateStatusOverlay() const
     {
-        const auto systemId = crossSystemCamera->systemId();
-        const auto context = appContext()->cloudCrossSystemManager()->systemContext(systemId);
-
         if (NX_ASSERT(context) && context->systemDescription()->isOnline())
         {
             const auto status = context->status();
@@ -54,7 +52,8 @@ QnCrossSystemCameraWidget::QnCrossSystemCameraWidget(
     d(new Private{QnMediaResourceWidget::resource().dynamicCast<CrossSystemCameraResource>()})
 {
     NX_ASSERT(d->crossSystemCamera);
-
+    const auto systemId = d->crossSystemCamera->systemId();
+    d->context.reset(appContext()->cloudCrossSystemManager()->systemContext(systemId));
     connect(
         statusOverlayController(),
         &QnStatusOverlayController::buttonClicked,
@@ -98,6 +97,9 @@ int QnCrossSystemCameraWidget::calculateButtonsVisibility() const
 
 Qn::ResourceStatusOverlay QnCrossSystemCameraWidget::calculateStatusOverlay() const
 {
+    if (NX_ASSERT(d->context) && d->context->needsCloudAuthorization())
+        return Qn::ResourceStatusOverlay::RestrictedOverlay;
+
     if (d->crossSystemCamera && d->crossSystemCamera->hasFlags(Qn::fake))
         return d->calculateStatusOverlay();
 
@@ -107,6 +109,9 @@ Qn::ResourceStatusOverlay QnCrossSystemCameraWidget::calculateStatusOverlay() co
 Qn::ResourceOverlayButton QnCrossSystemCameraWidget::calculateOverlayButton(
     Qn::ResourceStatusOverlay statusOverlay) const
 {
+    if (NX_ASSERT(d->context) && d->context->needsCloudAuthorization())
+        return Qn::ResourceOverlayButton::Authorize;
+
     if (statusOverlay == Qn::ResourceStatusOverlay::InformationRequiredOverlay)
         return Qn::ResourceOverlayButton::RequestInformation;
 
@@ -118,11 +123,10 @@ Qn::ResourceOverlayButton QnCrossSystemCameraWidget::calculateOverlayButton(
 
 QString QnCrossSystemCameraWidget::calculateTitleText() const
 {
-    const auto systemId = d->crossSystemCamera->systemId();
-    if (const auto context = appContext()->cloudCrossSystemManager()->systemContext(systemId))
+    if (d->context)
     {
         const auto resourceName = QnResourceWidget::resource()->getName();
-        const auto systemName = context->systemDescription()->name();
+        const auto systemName = d->context->systemDescription()->name();
         return QString("%1 / %2").arg(systemName, resourceName);
     }
 
