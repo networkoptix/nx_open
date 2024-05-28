@@ -3894,7 +3894,7 @@ Kunci Lisensi: %2</translation>
     </message>
     <message>
       <source>Text Files</source>
-      <translation type="unfinished">Text Files</translation>
+      <translation>File Teks</translation>
     </message>
   </context>
   <context>
@@ -3992,7 +3992,7 @@ Kunci Lisensi: %2</translation>
     </message>
     <message>
       <source>Displays IP addresses for cameras and servers.</source>
-      <translation type="unfinished">Displays IP addresses for cameras and servers.</translation>
+      <translation>Menampilkan alamat IP untuk kamera dan server.</translation>
     </message>
   </context>
   <context>

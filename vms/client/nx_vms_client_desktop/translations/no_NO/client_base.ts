@@ -3943,7 +3943,7 @@ Lisensnøkkel: %2</translation>
     </message>
     <message>
       <source>Text Files</source>
-      <translation type="unfinished">Text Files</translation>
+      <translation>Tekstfiler</translation>
     </message>
   </context>
   <context>
