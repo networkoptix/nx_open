@@ -316,7 +316,7 @@ void ClientUpdateManager::Private::notifyUserAboutSuccessfulInstallation()
             .arg(versionUrl, branding::vmsName()),
         /*cancellable*/ true);
     notificationsManager->setIconPath(
-        installationNotificationId, "events/update_complete.svg");
+        installationNotificationId, "40x40/Solid/update_complete.svg");
     notificationsManager->setProgress(
         installationNotificationId, ProgressState::completed);
     notificationsManager->setAction(installationNotificationId, restartAction);
@@ -347,7 +347,7 @@ void ClientUpdateManager::Private::notifyUserAboutClientAutoUpdate()
            "You can change this in the settings."),
         /*cancellable*/ true);
     notificationsManager->setIconPath(
-        autoUpdateFeatureNotificationId, "events/update_auto.svg");
+        autoUpdateFeatureNotificationId, "40x40/Solid/update_auto.svg");
     notificationsManager->setProgress(
         autoUpdateFeatureNotificationId, ProgressState::completed);
     notificationsManager->setAction(autoUpdateFeatureNotificationId, settingsAction);
@@ -389,7 +389,7 @@ void ClientUpdateManager::Private::showErrorNotification(const QString& message)
         notificationsManager->setTitle(errorNotificationId, message);
     }
 
-    notificationsManager->setIconPath(errorNotificationId, "events/alert_yellow.png");
+    notificationsManager->setIconPath(errorNotificationId, "20x20/Solid/alert2.svg?primary=yellow_l");
 }
 
 void ClientUpdateManager::Private::hideErrorNotification()

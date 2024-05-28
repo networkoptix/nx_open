@@ -18,7 +18,7 @@ Item
     {
         id: image
 
-        sourcePath: "image://skin/events/tabs/notifications.svg"
+        sourcePath: "image://skin/20x20/Solid/notification.svg"
         sourceSize: Qt.size(20, 20)
         primaryColor: "green_l2"
         name: "CallNotificationIcon"

@@ -41,7 +41,7 @@ Item
 
                 icon.source: animatedIcon.active
                     ? undefined
-                    : "image://skin/events/tabs/notifications.svg"
+                    : "image://skin/20x20/Solid/notification.svg"
 
                 icon.name: "RightPanel.Tabs.Notifications"
                 text: qsTr("Notifications")
@@ -96,7 +96,7 @@ Item
 
             button: RightPanelTabButton
             {
-                icon.source: "image://skin/events/tabs/motion.svg"
+                icon.source: "image://skin/20x20/Solid/motion.svg"
                 icon.name: "RightPanel.Tabs.Motion"
                 text: qsTr("Motion")
             }
@@ -119,7 +119,7 @@ Item
 
             button: RightPanelTabButton
             {
-                icon.source: "image://skin/events/tabs/bookmarks.svg"
+                icon.source: "image://skin/20x20/Solid/bookmark.svg"
                 icon.name: "RightPanel.Tabs.Bookmarks"
                 text: qsTr("Bookmarks")
             }
@@ -142,7 +142,7 @@ Item
 
             button: RightPanelTabButton
             {
-                icon.source: "image://skin/events/tabs/events.svg"
+                icon.source: "image://skin/20x20/Solid/event.svg"
                 icon.name: "RightPanel.Tabs.Events"
                 text: qsTr("Events")
             }
@@ -165,7 +165,7 @@ Item
 
             button: RightPanelTabButton
             {
-                icon.source: "image://skin/events/tabs/analytics.svg"
+                icon.source: "image://skin/20x20/Solid/object.svg"
                 icon.name: "RightPanel.Tabs.Objects"
                 text: qsTr("Objects")
             }

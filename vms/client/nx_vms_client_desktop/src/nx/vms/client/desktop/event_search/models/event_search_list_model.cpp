@@ -14,8 +14,6 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/analytics/taxonomy/abstract_state_watcher.h>
 #include <nx/utils/guarded_callback.h>
-#include <nx/vms/event/actions/abstract_action.h>
-#include <nx/vms/event/strings_helper.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/analytics/analytics_icon_manager.h>
 #include <nx/vms/client/core/event_search/event_search_globals.h>
@@ -29,6 +27,8 @@
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/common/html/html.h>
+#include <nx/vms/event/actions/abstract_action.h>
+#include <nx/vms/event/strings_helper.h>
 #include <ui/common/notification_levels.h>
 #include <utils/common/synctime.h>
 
@@ -66,34 +66,59 @@ QString iconPath(const EventParameters& parameters, core::SystemContext* context
     switch (parameters.eventType)
     {
         case EventType::storageFailureEvent:
+            return "16x16/Outline/storage.svg?primary=red";
+
         case EventType::backupFinishedEvent:
-            return "events/storage_20.svg";
+            return "16x16/Outline/storage.svg?primary=green";
 
         case EventType::serverStartEvent:
+            return "16x16/Outline/server.svg?primary=light10";
+
         case EventType::serverFailureEvent:
         case EventType::serverCertificateError:
+            return "16x16/Outline/server.svg?primary=red";
+
         case EventType::serverConflictEvent:
-            return "events/server_20.svg";
+            return "16x16/Outline/server.svg?primary=yellow_l";
 
         case EventType::licenseIssueEvent:
-            return "events/license_20.svg";
+            return "16x16/Outline/key.svg?primary=red";
 
         case EventType::cameraDisconnectEvent:
         case EventType::cameraIpConflictEvent:
-            return "events/connection_20.svg";
+        case EventType::networkIssueEvent:
+            return "16x16/Outline/network.svg?primary=red";
 
         case EventType::ldapSyncIssueEvent:
-        case EventType::networkIssueEvent:
-        case EventType::pluginDiagnosticEvent:
         case EventType::saasIssueEvent:
-            return "events/alert_20.svg";
+            return "20x20/Solid/alert2.svg?primary=light10";
 
         case EventType::softwareTriggerEvent:
             return SoftwareTriggerPixmaps::effectivePixmapPath(parameters.description);
 
+        case EventType::pluginDiagnosticEvent:
+        {
+            switch (QnNotificationLevel::valueOf(parameters))
+            {
+                case QnNotificationLevel::Value::CriticalNotification:
+                    return "20x20/Solid/alert2.svg?primary=red_l";
+                case QnNotificationLevel::Value::ImportantNotification:
+                    return "20x20/Solid/alert2.svg?primary=yellow_l";
+                default:
+                    return "20x20/Solid/alert2.svg?primary=light10";
+            }
+        }
+
         case EventType::cameraMotionEvent:
-        // TODO: #spanasenko Fill with actual pixmaps as soon as they're created.
+            return "16x16/Outline/motion.svg?primary=light10";
+
+        // TODO: #vkutin Fill with actual pixmaps as soon as they're created.
         case EventType::cameraInputEvent:
+            return "tree/camera.svg";
+
+        case EventType::userDefinedEvent:
+            return "16x16/Outline/generic.svg?primary=light10";
+
         case EventType::analyticsSdkEvent:
             return "20x20/Solid/camera.svg";
         case EventType::analyticsSdkObjectDetected:

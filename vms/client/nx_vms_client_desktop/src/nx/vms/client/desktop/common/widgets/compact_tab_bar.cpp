@@ -10,13 +10,12 @@
 #include <QtWidgets/QStyle>
 #include <QtWidgets/QToolTip>
 
+#include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/event_search/widgets/private/notification_bell_widget_p.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <ui/common/palette.h>
-
-#include <nx/utils/log/assert.h>
 
 namespace nx::vms::client::desktop {
 
@@ -28,6 +27,11 @@ static constexpr int kTabHeight = 32;
 static constexpr int kTabMargin = 8; //< Tab horizontal margin.
 static constexpr int kTabInnerSpacing = 4; //< Spacing between tab icon and text.
 static constexpr milliseconds kAnimationDuration = 200ms;
+
+nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kRedTheme = {
+    {QnIcon::Normal, {.primary = "red_l"}}};
+
+NX_DECLARE_COLORIZED_ICON(kRedIcon, "20x20/Solid/alert2.svg", kRedTheme)
 
 } // namespace
 
@@ -421,8 +425,7 @@ QIcon CompactTabBar::Private::tabIcon(int index) const
     if (result.isNull())
     {
         // Use placeholder icon.
-        static const QnIcon::Suffixes suffixes({{QIcon::Selected, QString()}});
-        result = qnSkin->icon("events/alert_red.png", QString(), &suffixes);
+        result = qnSkin->icon(kRedIcon);
     }
 
     return result;

@@ -61,6 +61,12 @@ private:
     const std::function<void(QWidget*)> m_receiver;
 };
 
+nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kLanguagesTheme = {
+    {QnIcon::Normal, {.primary = "light16"}}
+};
+
+NX_DECLARE_COLORIZED_ICON(kLanguagesIcon, "20x20/Outline/earth.svg", kLanguagesTheme)
+
 } // namespace
 
 namespace nx::vms::client::desktop {
@@ -87,7 +93,7 @@ PushNotificationBusinessActionWidget::PushNotificationBusinessActionWidget(
 
     setHelpTopic(this, HelpTopic::Id::EventsActions_SendMobileNotification);
 
-    ui->languageButton->setIcon(qnSkin->icon("events/push_language.svg"));
+    ui->languageButton->setIcon(qnSkin->icon(kLanguagesIcon));
     connect(ui->languageButton, &QPushButton::clicked, this,
         [this, context]
         {

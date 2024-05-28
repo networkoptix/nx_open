@@ -48,6 +48,10 @@ static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kTreeThem
     {QnIcon::Error, {.primary = "red_l2", .secondary = "red_l2"}},
     {QnIcon::Pressed, {.primary = "light4", .secondary = "light2"}}};
 
+const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kYellowTheme = {
+    {QnIcon::Normal, {.primary = "yellow_l",}}
+};
+
 NX_DECLARE_COLORIZED_ICON(kHasArchiveIcon, "20x20/Solid/archive.svg",\
     nx::vms::client::core::kEmptySubstitutions)
 NX_DECLARE_COLORIZED_ICON(kRecordOnIcon, "20x20/Solid/record_on.svg",\
@@ -69,6 +73,8 @@ NX_DECLARE_COLORIZED_ICON(kVirtualCamerasIcon, "20x20/Solid/virtual_camera.svg",
     kTreeThemeSubstitutions)
 NX_DECLARE_COLORIZED_ICON(kMultisensorIcon, "20x20/Solid/multisensor.svg",\
     kTreeThemeSubstitutions)
+
+NX_DECLARE_COLORIZED_ICON(kAlertYellowIcon, "20x20/Solid/alert2.svg", kYellowTheme)
 
 NX_DECLARE_COLORIZED_ICON(kClientIcon, "20x20/Solid/client.svg",\
     kTreeThemeSubstitutions)
@@ -312,7 +318,7 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent):
     m_cache.insert(Camera | Unauthorized, qnSkin->icon(kCameraUnauthorizedIcon));
     m_cache.insert(Camera | Incompatible, qnSkin->icon(kCameraWarningIcon));
     m_cache.insert(VirtualCamera, qnSkin->icon(kVirtualCamerasIcon));
-    m_cache.insert(CrossSystemStatus | Unauthorized, loadIcon("events/alert_yellow.png"));
+    m_cache.insert(CrossSystemStatus | Unauthorized, qnSkin->icon(kAlertYellowIcon));
     m_cache.insert(CrossSystemStatus | Control, loadIcon("legacy/loading.gif")); //< The Control uses to describe loading state.
     m_cache.insert(CrossSystemStatus | Offline, loadIcon("cloud/cloud_20_disabled.png"));
     m_cache.insert(IOModule, qnSkin->icon(kIOIcon));
@@ -328,7 +334,6 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent):
     m_paths.insert(Camera | Unauthorized, kCameraUnauthorizedIcon.iconPath());
     m_paths.insert(Camera | Incompatible, kCameraWarningIcon.iconPath());
     m_paths.insert(VirtualCamera, kVirtualCamerasIcon.iconPath());
-    m_paths.insert(CrossSystemStatus | Unauthorized, "events/alert_yellow.png");
     m_paths.insert(CrossSystemStatus | Control, "legacy/loading.gif"); //< The Control uses to describe loading state.
     m_paths.insert(CrossSystemStatus | Offline, "cloud/cloud_20_disabled.png");
     m_paths.insert(IOModule, kIOIcon.iconPath());

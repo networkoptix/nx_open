@@ -385,7 +385,7 @@ void NotificationListModel::Private::onRepeatSoundAction(
     {
         EventData eventData;
         eventData.level = QnNotificationLevel::convert(nx::vms::event::Level::common);
-        eventData.iconPath = "events/sound_20.svg";
+        eventData.iconPath = "20x20/Solid/sound.svg";
         eventData.sourceName = action->sourceName();
         fillEventData(system(), action.get(), eventData);
 
@@ -415,7 +415,7 @@ void NotificationListModel::Private::onAlarmLayoutAction(
     EventData eventData;
     eventData.lifetime = kDisplayTimeout;
     eventData.level = QnNotificationLevel::convert(nx::vms::event::Level::critical);
-    eventData.iconPath = "events/alarm_20.svg";
+    eventData.iconPath = "20x20/Solid/alarm.svg";
     eventData.sourceName = action->sourceName();
     eventData.previewCamera =
         system()->resourcePool()->getResourcesByIds<QnVirtualCameraResource>(action->eventDeviceIds())
@@ -914,20 +914,20 @@ QString NotificationListModel::Private::iconPath(const vms::event::AbstractActio
     {
         case QnNotificationLevel::Value::ImportantNotification:
         case QnNotificationLevel::Value::CriticalNotification:
-            return "events/alert_20.svg";
+            return "20x20/Solid/alert2.svg?primary=light10";
 
         case QnNotificationLevel::Value::SuccessNotification:
-            return "events/success_mark.svg";
+            return "20x20/Outline/checkmark.svg?primary=light10";
 
         default:
             break;
     }
 
     if (action->actionType() == ActionType::playSoundAction)
-        return "events/sound_20.svg";
+        return "20x20/Solid/sound.svg";
 
     if (action->actionType() == ActionType::showOnAlarmLayoutAction)
-        return "events/alarm_20.svg";
+        return "20x20/Solid/alarm.svg";
 
     const auto& params = action->getRuntimeParams();
 

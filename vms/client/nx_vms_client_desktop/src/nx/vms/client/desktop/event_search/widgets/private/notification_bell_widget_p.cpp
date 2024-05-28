@@ -18,10 +18,16 @@ namespace nx::vms::client::desktop {
 namespace {
 
 const core::SvgIconColorer::ThemeSubstitutions kTabIconSubstitutions = {
-    {QnIcon::Disabled, {.primary = "dark14"}},
-    {QnIcon::Selected, {.primary = "light4"}},
-    {QnIcon::Active, {.primary = "brand_core"}},
-    {QnIcon::Normal, {.primary = "light10"}}};
+    {QnIcon::Disabled, {.primary = "dark14", .secondary = "red_l"}},
+    {QnIcon::Selected, {.primary = "light4", .secondary = "red_l"}},
+    {QnIcon::Active, {.primary = "brand_core", .secondary = "red_l"}},
+    {QnIcon::Normal, {.primary = "light10", .secondary = "red_l"}}};
+
+const core::SvgIconColorer::ThemeSubstitutions kGreenIconTheme = {
+    {QnIcon::Normal, {.primary = "green_core", .secondary = "red_l"}}};
+
+NX_DECLARE_COLORIZED_ICON(kNotificationIcon, "20x20/Solid/notification.svg", kTabIconSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kNotificationsGreenIcon, "20x20/Solid/notification.svg", kGreenIconTheme)
 }
 
 NotificationBellWidget::NotificationBellWidget(QWidget* parent):
@@ -41,8 +47,8 @@ NotificationBellWidget::NotificationBellWidget(QWidget* parent):
             updateIconLabel();
         });
 
-    m_normalIcon = qnSkin->icon("events/tabs/notifications.svg", kTabIconSubstitutions);
-    m_rightIcon = qnSkin->icon("events/tabs/notifications_green.svg");
+    m_normalIcon = qnSkin->icon(kNotificationIcon);
+    m_rightIcon = qnSkin->icon(kNotificationsGreenIcon);
 
     setFixedSize(calculateSize());
 
