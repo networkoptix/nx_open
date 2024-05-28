@@ -14,9 +14,7 @@
 
 namespace nx::network::cloud {
 
-CloudStreamSocket::CloudStreamSocket(int ipVersion):
-    m_connectPromisePtr(nullptr),
-    m_ipVersion(ipVersion)
+CloudStreamSocket::CloudStreamSocket(int ipVersion): m_ipVersion(ipVersion)
 {
     SocketGlobals::instance().allocationAnalyzer().recordObjectCreation(this);
 
@@ -129,7 +127,7 @@ bool CloudStreamSocket::connect(const SocketAddress& addr, std::chrono::millisec
 
     std::promise<SystemError::ErrorCode> promise;
     {
-        SocketResultPrimisePtr expected = nullptr;
+        SocketResultPromisePtr expected = nullptr;
         if (!m_connectPromisePtr.compare_exchange_strong(expected, &promise))
         {
             NX_ASSERT(false, "Concurrent CloudStreamSocket::connect invocation. addr = %1", addr);
@@ -144,10 +142,9 @@ bool CloudStreamSocket::connect(const SocketAddress& addr, std::chrono::millisec
     {
         // NOTE: a concurrent thread may invoke shutdown or close setting the promise to signalled state.
         // So, making sure the promise is always set to the signalled state and waiting on it.
-        if (auto promisePtr = m_connectPromisePtr.exchange(nullptr); promisePtr)
+        if (auto promisePtr = m_connectPromisePtr.exchange(nullptr))
             promisePtr->set_value(SystemError::badDescriptor);
-        promise.get_future().wait();
-        SystemError::setLastErrorCode(SystemError::badDescriptor);
+        SystemError::setLastErrorCode(promise.get_future().get());
         return false;
     }
 

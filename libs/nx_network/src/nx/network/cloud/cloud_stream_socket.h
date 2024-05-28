@@ -81,7 +81,7 @@ protected:
     virtual void cancelIoInAioThread(aio::EventType eventType) override;
 
 private:
-    using SocketResultPrimisePtr = std::promise<SystemError::ErrorCode>*;
+    using SocketResultPromisePtr = std::promise<SystemError::ErrorCode>*;
 
     SystemError::ErrorCode applyRealNonBlockingMode(AbstractStreamSocket* streamSocket);
 
@@ -99,7 +99,7 @@ private:
     aio::Timer m_timer;
     aio::BasicPollable m_readIoBinder;
     aio::BasicPollable m_writeIoBinder;
-    std::atomic<SocketResultPrimisePtr> m_connectPromisePtr;
+    std::atomic<SocketResultPromisePtr> m_connectPromisePtr = nullptr;
     TunnelAttributes m_cloudTunnelAttributes;
     std::atomic<bool> m_isClosed = false;
 
