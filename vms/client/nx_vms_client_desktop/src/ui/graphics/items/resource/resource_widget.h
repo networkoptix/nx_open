@@ -310,6 +310,8 @@ public:
     /** Debug string representation. */
     QString toString() const;
 
+    void moveToDedicatedWindow();
+
 signals:
     void painted();
     void aspectRatioChanged();
