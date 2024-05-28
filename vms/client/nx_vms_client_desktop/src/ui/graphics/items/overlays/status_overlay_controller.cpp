@@ -7,6 +7,8 @@
 #include <nx/vms/client/core/skin/skin.h>
 #include <utils/common/scoped_value_rollback.h>
 
+#include "client/client_globals.h"
+
 namespace {
 
 static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kOfflineTheme = {{QIcon::Normal, {.primary = "red_core"}}};
@@ -270,6 +272,7 @@ QString QnStatusOverlayController::captionText(Qn::ResourceStatusOverlay overlay
         { Qn::CannotDecryptMediaOverlay, tr("ARCHIVE ENCRYPTED") },
         { Qn::InformationRequiredOverlay, tr("INFORMATION REQUIRED") },
         { Qn::SaasShutDown, tr("SITE SHUT DOWN") },
+        { Qn::RestrictedOverlay, tr("RESTRICTED") },
     };
     return extractValue(overlay, kCaptions);
 }
@@ -321,6 +324,7 @@ QString QnStatusOverlayController::statusIconPath(Qn::ResourceStatusOverlay over
         { Qn::CannotDecryptMediaOverlay, "item_placeholders/encrypted.svg" },
         { Qn::InformationRequiredOverlay, "item_placeholders/alert.png" },
         { Qn::SaasShutDown, "item_placeholders/offline.svg" }, //< TODO: #vbreus Change icon if needed.
+        { Qn::RestrictedOverlay, "item_placeholders/no_access.svg" },
     };
 
     return extractValue(overlay, kIconPaths);
@@ -371,6 +375,7 @@ QnStatusOverlayController::getButtonCaptions(const QnResourcePtr& resource)
     result.insert(toInt(Qn::ResourceOverlayButton::SetPassword), tr("Set for this Camera"));
     result.insert(toInt(Qn::ResourceOverlayButton::UnlockEncryptedArchive), tr("Unlock"));
     result.insert(toInt(Qn::ResourceOverlayButton::RequestInformation), tr("Provide"));
+    result.insert(toInt(Qn::ResourceOverlayButton::Authorize), tr("Authorize"));
 
     if (resource)
     {

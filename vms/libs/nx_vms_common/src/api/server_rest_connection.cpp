@@ -2412,6 +2412,17 @@ Handle ServerConnection::removeGroupAsync(
     return handle;
 }
 
+Handle ServerConnection::getCurrentSession(
+    Result<ErrorOrData<nx::vms::api::LoginSession>>::type callback,
+    QThread* targetThread)
+{
+    return executeGet(
+        "/rest/v4/login/sessions/current",
+        {},
+        std::move(callback),
+        targetThread);
+}
+
 Handle ServerConnection::loginAsync(
     const nx::vms::api::LoginSessionRequest& data,
     Result<ErrorOrData<nx::vms::api::LoginSession>>::type callback,

@@ -22,7 +22,7 @@ class CloudConnectionFactory;
   * Calls sessionTokenExpiring signal when token needs refreshment.
   * The parent should respond to signal and issue new token using provided methods.
   */
-class CloudSessionTokenUpdater: public QObject, public RemoteConnectionAware
+class NX_VMS_CLIENT_CORE_API CloudSessionTokenUpdater: public QObject
 {
     Q_OBJECT
 
