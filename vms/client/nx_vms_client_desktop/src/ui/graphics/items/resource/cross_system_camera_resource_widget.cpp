@@ -24,7 +24,7 @@ using namespace nx::vms::client::desktop;
 struct QnCrossSystemCameraWidget::Private
 {
     CrossSystemCameraResourcePtr crossSystemCamera;
-    CloudCrossSystemContextPtr context;
+    CloudCrossSystemContext* context;
 
     Qn::ResourceStatusOverlay calculateStatusOverlay() const
     {
@@ -53,7 +53,7 @@ QnCrossSystemCameraWidget::QnCrossSystemCameraWidget(
 {
     NX_ASSERT(d->crossSystemCamera);
     const auto systemId = d->crossSystemCamera->systemId();
-    d->context.reset(appContext()->cloudCrossSystemManager()->systemContext(systemId));
+    d->context = appContext()->cloudCrossSystemManager()->systemContext(systemId);
     connect(
         statusOverlayController(),
         &QnStatusOverlayController::buttonClicked,

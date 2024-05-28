@@ -189,7 +189,7 @@ struct CloudCrossSystemContextDataLoader::Private
         );
 
         return connection->getRawResult(
-            "/rest/v4/system/settings",
+            "/rest/v4/site/settings",
             {},
             callback,
             q->thread());
