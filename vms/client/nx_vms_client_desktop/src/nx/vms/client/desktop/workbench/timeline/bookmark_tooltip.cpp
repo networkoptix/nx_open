@@ -43,6 +43,16 @@ bool paintButtonFunction(QPainter* painter, const QStyleOption* /*option*/, cons
     return true;
 }
 
+const core::SvgIconColorer::ThemeSubstitutions kBookmarkTheme = {
+    {QnIcon::Normal, {.primary = "light4", .secondary="brand_d7"}}
+};
+
+NX_DECLARE_COLORIZED_ICON(kPlayIcon, "20x20/Solid/play.svg", kBookmarkTheme)
+NX_DECLARE_COLORIZED_ICON(kEditIcon, "20x20/Solid/edit.svg", kBookmarkTheme)
+NX_DECLARE_COLORIZED_ICON(kDownloadIcon, "20x20/Solid/download.svg", kBookmarkTheme)
+NX_DECLARE_COLORIZED_ICON(kDeleteIcon, "20x20/Solid/delete.svg", kBookmarkTheme)
+NX_DECLARE_COLORIZED_ICON(kSharedIcon, "30x30/Solid/bookmarks_shared.svg", kBookmarkTheme)
+
 } // namespace
 
 BookmarkTooltip::BookmarkTooltip(
@@ -101,7 +111,7 @@ BookmarkTooltip::BookmarkTooltip(
             titleLayout->addStretch();
             auto shareableLabel = new QLabel();
             shareableLabel->setPixmap(
-                qnSkin->icon("bookmark/tooltip/bookmarks_shared.svg").pixmap(30, 30));
+                qnSkin->icon(kSharedIcon).pixmap(30, 30));
             shareableLabel->setToolTip(tr("Shared by link"));
             titleLayout->addWidget(shareableLabel);
         }
@@ -260,13 +270,14 @@ QWidget* BookmarkTooltip::createInternalSeparator()
     return internalSeparator;
 }
 
-QPushButton* BookmarkTooltip::createButton(const char* iconName, const QString& toolTip)
+QPushButton* BookmarkTooltip::createButton(
+    const core::ColorizedIconDeclaration& iconDecl, const QString& toolTip)
 {
     enum { kSize = 30 };
 
     auto button = new CustomPainted<QPushButton>(this);
     button->setCustomPaintFunction(paintButtonFunction);
-    button->setIcon(qnSkin->icon(iconName));
+    button->setIcon(qnSkin->icon(iconDecl));
     button->setFixedSize(kSize, kSize);
     button->setToolTip(toolTip);
 
@@ -279,7 +290,7 @@ QLayout* BookmarkTooltip::createButtonsLayout(const QnCameraBookmark& bookmark)
     buttonLayout->setSpacing(0);
     buttonLayout->setContentsMargins(10, 10, 10, 10);
 
-    auto playButton = createButton("bookmark/tooltip/play.png", tr("Play bookmark from the beginning"));
+    auto playButton = createButton(kPlayIcon, tr("Play bookmark from the beginning"));
     playButton->setObjectName("BookmarkTooltipPlayButton");
     connect(playButton, &QPushButton::clicked, this,
         [this, bookmark]
@@ -290,7 +301,7 @@ QLayout* BookmarkTooltip::createButtonsLayout(const QnCameraBookmark& bookmark)
 
     if (!m_readOnly)
     {
-        auto editButton = createButton("bookmark/tooltip/edit.png", tr("Edit bookmark"));
+        auto editButton = createButton(kEditIcon, tr("Edit bookmark"));
         editButton->setObjectName("BookmarkTooltipEditButton");
         connect(editButton, &QPushButton::clicked, this,
             [this, bookmark]
@@ -300,7 +311,7 @@ QLayout* BookmarkTooltip::createButtonsLayout(const QnCameraBookmark& bookmark)
         buttonLayout->addWidget(editButton);
     }
 
-    m_exportButton = createButton("bookmark/tooltip/export.png", tr("Export bookmark"));
+    m_exportButton = createButton(kDownloadIcon, tr("Export bookmark"));
     m_exportButton->setObjectName("BookmarkTooltipExportButton");
     connect(m_exportButton, &QPushButton::clicked, this,
         [this, bookmark]
@@ -312,7 +323,7 @@ QLayout* BookmarkTooltip::createButtonsLayout(const QnCameraBookmark& bookmark)
 
     if (!m_readOnly)
     {
-        auto deleteButton = createButton("bookmark/tooltip/delete.png", tr("Delete bookmark"));
+        auto deleteButton = createButton(kDeleteIcon, tr("Delete bookmark"));
         deleteButton->setObjectName("BookmarkTooltipDeleteButton");
         connect(deleteButton, &QPushButton::clicked, this,
             [this, bookmark]
