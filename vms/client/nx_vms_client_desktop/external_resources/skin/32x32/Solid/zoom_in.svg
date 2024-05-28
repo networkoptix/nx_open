@@ -1,11 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" viewBox="0 0 32 32">
-  <g class="32x32/Solid/zoom_in">
+  <g class="32x32/Solid/zoom_in" clip-path="url(#a)">
     <path fill="#212A2F" d="M0 0h32v32H0z" class="Secondary"/>
-    <path fill="#ffffff" fill-rule="evenodd" d="M18 4h-4v10H4v4h10v10h4V18h10v-4H18V4Z" class="Primary" clip-rule="evenodd"/>
+    <path fill="#fff" fill-rule="evenodd" d="M18 4h-4v10H4v4h10v10h4V18h10v-4H18V4Z" class="Primary" clip-rule="evenodd"/>
   </g>
   <defs>
     <clipPath id="a" class="a">
-      <path fill="#ffffff" d="M0 0h32v32H0z"/>
+      <path fill="#fff" d="M0 0h32v32H0z"/>
     </clipPath>
   </defs>
 </svg>

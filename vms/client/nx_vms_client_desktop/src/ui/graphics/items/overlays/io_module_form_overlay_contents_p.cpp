@@ -40,10 +40,19 @@ static const auto kLayoutMargins = nx::style::Metrics::kDefaultTopLevelMargins;
 static const int kVerticalSpacing = nx::style::Metrics::kDefaultLayoutSpacing.height();
 static const int kHorizontalSpacing = nx::style::Metrics::kDefaultTopLevelMargin * 2;
 
-static const QColor kBasicColor = "#383838";
-static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIoIconSubstitutions = {
-    {QnIcon::Normal, {{kBasicColor, "dark8"}}},
+const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kIndicatorOffTheme = {
+    {QnIcon::Normal, {.primary = "dark8"}},
 };
+
+const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kIndicatorOnTheme = {
+    {QnIcon::Normal, {.primary = "green"}},
+};
+NX_DECLARE_COLORIZED_ICON(kIndicatorIcon,
+    "28x28/Solid/indicator_off.svg", kIndicatorOffTheme,
+    "28x28/Solid/indicator_on.svg", kIndicatorOnTheme)
+NX_DECLARE_COLORIZED_ICON(kButtonIndicatorIcon,
+    "24x24/Solid/button_indicator_off.svg", kIndicatorOffTheme,
+    "24x24/Solid/button_indicator_on.svg", kIndicatorOnTheme)
 
 /* Private file scope functions: */
 
@@ -171,8 +180,7 @@ void QnIoModuleFormOverlayContentsPrivate::InputPortItem::paint(QPainter* painte
     paintId(painter, idRect, false);
 
     auto margin = nx::style::Metrics::kStandardPadding + effectiveIdWidth();
-    auto icon =
-        qnSkin->icon("io/indicator_off_28.svg", kIoIconSubstitutions, "io/indicator_on_28.svg");
+    auto icon = qnSkin->icon(kIndicatorIcon);
     auto iconRect = QRectF(idRect.left() + margin, idRect.top(), kIndicatorWidth, idRect.height());
     auto iconState = isOn() ? QIcon::On : QIcon::Off;
     icon.paint(painter, iconRect.toRect(), Qt::AlignCenter, QIcon::Normal, iconState);
@@ -264,8 +272,7 @@ void QnIoModuleFormOverlayContentsPrivate::OutputPortItem::paint(QPainter* paint
     auto labelRect = buttonRect.adjusted(kButtonMargin, 0.0, -kIndicatorWidth, 0.0);
     paintLabel(painter, labelRect, Qt::AlignLeft);
 
-    auto icon = qnSkin->icon(
-        "io/button_indicator_off_24.svg", kIoIconSubstitutions, "io/button_indicator_on_24.svg");
+    auto icon = qnSkin->icon(kButtonIndicatorIcon);
     auto iconState = isOn() ? QIcon::On : QIcon::Off;
     auto iconRect = buttonRect;
     iconRect.setLeft(iconRect.right() - kIndicatorWidth);

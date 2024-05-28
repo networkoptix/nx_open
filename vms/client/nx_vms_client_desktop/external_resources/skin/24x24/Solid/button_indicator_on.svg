@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+  <g class="24x24/Solid/button_indicator_on" clip-path="url(#a)">
+    <g class="Secondary" filter="url(#b)">
+      <circle cx="12" cy="12" r="4" fill="#4FC627"/>
+    </g>
+    <circle cx="12.5" cy="12.5" r="3.5" fill="#4FC627" class="Primary"/>
+  </g>
+  <defs>
+    <clipPath id="a" class="a">
+      <path fill="#fff" d="M0 0h24v24H0z"/>
+    </clipPath>
+    <filter id="b" width="24" height="24" x="0" y="0" class="b" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse">
+      <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+      <feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+      <feGaussianBlur result="effect1_foregroundBlur_7429_86" stdDeviation="4"/>
+    </filter>
+  </defs>
+</svg>
