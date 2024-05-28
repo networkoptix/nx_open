@@ -124,7 +124,7 @@ void CallNotificationsListModel::Private::addNotification(
 
             eventData.actionId = menu::OpenIntercomLayoutAction;
             eventData.title = tr("Calling...");
-            eventData.iconPath = "events/call.svg";
+            eventData.iconPath = "16x16/Solid/phone.svg";
             const auto intercomLayoutId = nx::vms::common::calculateIntercomLayoutId(camera);
             eventData.actionParameters =
                 system()->resourcePool()->getResourceById(intercomLayoutId);
@@ -180,7 +180,7 @@ void CallNotificationsListModel::Private::addNotification(
             eventData.id = nx::Uuid::createUuid(); //< We have to show every missed call separately.
             eventData.actionId = menu::NoAction;
             eventData.title = tr("Missed Call");
-            eventData.iconPath = "events/missed_call.svg";
+            eventData.iconPath = "16x16/Solid/missed.svg";
             eventData.removable = true;
             break;
         }

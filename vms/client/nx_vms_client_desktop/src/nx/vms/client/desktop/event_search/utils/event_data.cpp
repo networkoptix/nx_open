@@ -17,7 +17,7 @@ namespace nx::vms::client::desktop {
 using nx::vms::rules::Icon;
 
 static const QMap<Icon, QString> kIconPaths = {
-    {Icon::alert, "events/alert_20.svg"}, //< TODO: #pprivalov Ask #dbatov if we still have this icon.
+    {Icon::alert, "16x16/Outline/image.svg"},
     {Icon::motion, "16x16/Outline/motion.svg"},
     {Icon::license, "16x16/Outline/key.svg"},
     {Icon::networkIssue, "16x16/Outline/network.svg"},

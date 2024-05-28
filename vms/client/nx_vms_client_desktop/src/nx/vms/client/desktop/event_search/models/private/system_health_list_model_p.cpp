@@ -780,10 +780,10 @@ QString SystemHealthListModel::Private::decorationPath(MessageType message)
     {
         case QnNotificationLevel::Value::CriticalNotification:
         case QnNotificationLevel::Value::ImportantNotification:
-            return "events/alert_20.svg";
+            return "20x20/Solid/alert2.svg?primary=light10";
 
         case QnNotificationLevel::Value::SuccessNotification:
-            return "events/success_mark.svg";
+            return "20x20/Outline/checkmark.svg?primary=light10";
 
         default:
             break;
@@ -795,17 +795,17 @@ QString SystemHealthListModel::Private::decorationPath(MessageType message)
         case MessageType::emailIsEmpty:
         case MessageType::usersEmailIsEmpty:
         case MessageType::emailSendError:
-            return "events/email_20.svg";
+            return "16x16/Outline/email.svg";
 
         case MessageType::noLicenses:
-            return "events/license_20.svg";
+            return "16x16/Outline/license.svg";
 
         case MessageType::backupStoragesNotConfigured:
         case MessageType::storagesNotConfigured:
         case MessageType::archiveRebuildFinished:
         case MessageType::archiveRebuildCanceled:
         case MessageType::metadataOnSystemStorage: //< TODO: #vbreus Probably should be changed to the 'analytics' icon.
-            return "events/storage_20.svg";
+            return "16x16/Outline/storage.svg";
 
         case MessageType::cloudPromo:
             return "cloud/cloud_20.png";

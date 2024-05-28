@@ -131,7 +131,7 @@ void TemporaryUserExpirationWatcher::updateNotification()
     else
         m_notification = m_notificationManager->add(notificationText, "", /*cancellable*/ true);
 
-    m_notificationManager->setIconPath(*m_notification, "events/stopwatch.svg");
+    m_notificationManager->setIconPath(*m_notification, "16x16/Outline/stopwatch.svg");
     auto currentLevel = m_notificationManager->level(*m_notification);
 
     if (duration_cast<std::chrono::hours>(timeLeft) >= kImportantNotificationTime)

@@ -25,11 +25,11 @@ QString levelDecorationPath(QnNotificationLevel::Value level)
     switch (level)
     {
         case QnNotificationLevel::Value::SuccessNotification:
-            return "events/success_mark.svg";
+            return "20x20/Outline/checkmark.svg";
 
         case QnNotificationLevel::Value::ImportantNotification:
         case QnNotificationLevel::Value::CriticalNotification:
-            return "events/alert_20.svg";
+            return "20x20/Solid/alert2.svg";
 
         default:
             return {};
@@ -39,10 +39,10 @@ QString levelDecorationPath(QnNotificationLevel::Value level)
 QString progressDecorationPath(ProgressState progress)
 {
     if (progress.isFailed())
-        return "events/alert_20.svg";
+        return "20x20/Solid/alert2.svg?primary=light10";
 
     if (progress.isCompleted())
-        return "events/success_mark.svg";
+        return "20x20/Outline/checkmark.svg?primary=light10";
 
     return {};
 }

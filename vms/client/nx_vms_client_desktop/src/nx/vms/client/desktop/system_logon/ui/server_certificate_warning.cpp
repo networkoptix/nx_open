@@ -117,7 +117,7 @@ ServerCertificateWarning::ServerCertificateWarning(
 
             auto serverIconLabel = new QLabel();
             serverIconLabel->setPixmap(qnSkin->colorizedPixmap(
-                "events/server_20.svg",
+                "20x20/Solid/server.svg",
                 QSize(20, 20) * qApp->devicePixelRatio(),
                 foregroundColor,
                 qApp->devicePixelRatio()));

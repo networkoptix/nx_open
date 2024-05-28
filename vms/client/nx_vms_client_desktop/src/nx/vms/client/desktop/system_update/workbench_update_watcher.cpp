@@ -69,7 +69,7 @@ WorkbenchUpdateWatcher::WorkbenchUpdateWatcher(WindowContext* windowContext, QOb
     m_checkLatestUpdateTimer(this),
     m_notifiedVersion(),
     m_updateAction(new CommandAction(tr("Updates"))),
-    m_skipAction(new CommandAction(tr("Skip Version"), "events/skip.svg")),
+    m_skipAction(new CommandAction(tr("Skip Version"), "20x20/Outline/skip.svg")),
     m_private(new Private())
 {
     m_private->notificationsManager = windowContext->localNotificationsManager();
@@ -353,7 +353,7 @@ void WorkbenchUpdateWatcher::notifyUserAboutWorkbenchUpdate(
             ? QnNotificationLevel::Value::ImportantNotification
             : QnNotificationLevel::Value::CommonNotification);
 
-    m_private->notificationsManager->setIconPath(updateNotificationId, "events/update_auto_1.svg");
+    m_private->notificationsManager->setIconPath(updateNotificationId, "16x16/Solid/update_auto.svg");
 
     m_private->notificationsManager->setAction(updateNotificationId, m_updateAction);
     m_private->notificationsManager->setAdditionalAction(updateNotificationId, m_skipAction);
