@@ -6,87 +6,73 @@
 #include <vector>
 
 #include <nx/network/http/http_types.h>
+#include <nx/reflect/enum_instrument.h>
 #include <nx/utils/thread/rw_lock.h>
 
 namespace nx::network::http {
 
-namespace AuthMethod {
-
-enum Value
-{
+NX_REFLECTION_ENUM_CLASS(AuthMethod,
     notDefined = 0,
+
+    /**%apidoc Authentication is not required. */
     noAuth = 1 << 0,
 
-    httpBasic = 1 << 1, //< Authentication method described in rfc2617.
+    /**%apidoc Authentication method described in RFC2617. */
+    httpBasic = 1 << 1,
+
+    /**%apidoc Authentication method described in RFC2617. */
     httpDigest = 1 << 2, //< Authentication method described in rfc2617.
-    httpBearer = 1 << 3, //< Authentication method described in rfc6750.
-    http = httpBasic | httpDigest | httpBearer,
 
-    cookie = 1 << 4, //< Based on authinfo cookie.
+    /**%apidoc Authentication method described in RFC6750. */
+    httpBearer = 1 << 3,
 
-    /**
-     * Authentication by url query parameters auth and proxy_auth.
+    /**%apidoc Authentication method based on authinfo cookie. */
+    cookie = 1 << 4,
+
+    /**%apidoc
+     * %deprecated Session authentication should be used instead.
+     * Authentication by URL query parameters auth and proxy_auth.
      * Params have the following format:
-     *     BASE64(UTF8(username) + ":" + MD5(UTF8(username) + ":" + realm + ":" + UTF8(password)))
-     * TODO: This method is too poor and deprecated, session authentication should be used instead.
+     * `BASE64(UTF8(username) + ":" + MD5(UTF8(username) + ":" + realm + ":" + UTF8(password)))`.
      */
     urlQueryDigest = 1 << 6,
+
+    /**%apidoc Authentication method based on authKey URL query parameter. */
     temporaryUrlQueryKey = 1 << 7,
 
-    /**
-     * X-Runtime-Guid header name.
-     */
+    /**%apidoc Authentication method based on X-Runtime-Guid header. */
     xRuntimeGuid = 1 << 8,
 
-    /**
-     * URL Query: _sessionToken
-     */
+    /**%apidoc Authentication method based on _sessionToken URL query parameter. */
     urlQuerySessionToken = 1 << 9,
 
-    /**
-     * URL Query: _ticket
-     */
+    /**%apidoc Authentication method based on _ticket URL query parameter. */
     urlQueryTicket = 1 << 10,
 
-    /**
-     * Normally all GET requests do not requires SCRF token, but we could not allow that, because of
-     * poorly designed requests changing information (including passwords).
-     * TODO: Remove this property as soon as all these requests are terminated.
+    /**%apidoc[proprietary]
+     * Normally all GET requests do not requires SCRF token, but we could not allow that, because
+     * of poorly designed legacy and deprecated requests that change information (including
+     * passwords). This authentication method will be removed as soon as all such request support
+     * is terminated.
      */
-    allowWithoutCsrf = 1 << 30,
-    urlQueryDigestWithoutCsrf = urlQueryDigest | allowWithoutCsrf,
+    allowWithoutCsrf = 1 << 30
+)
 
-    defaults = http | cookie | urlQueryDigest | xRuntimeGuid | urlQuerySessionToken | urlQueryTicket,
-};
+Q_DECLARE_FLAGS(AuthMethods, AuthMethod);
+Q_DECLARE_OPERATORS_FOR_FLAGS(AuthMethods);
 
-template<typename Visitor>
-constexpr auto nxReflectVisitAllEnumItems(Value*, Visitor&& visitor)
-{
-    using Item = nx::reflect::enumeration::Item<Value>;
-    return visitor(
-        Item{notDefined, "notDefined"},
-        Item{noAuth, "noAuth"},
-        Item{httpBasic, "httpBasic"},
-        Item{httpDigest, "httpDigest"},
-        Item{httpBearer, "httpBearer"},
-        Item{cookie, "cookie"},
-        Item{urlQueryDigest, "urlQueryDigest"},
-        Item{temporaryUrlQueryKey, "temporaryUrlQueryKey"},
-        Item{xRuntimeGuid, "xRuntimeGuid"},
-        Item{urlQuerySessionToken, "urlQuerySessionToken"},
-        Item{urlQueryTicket, "urlQueryTicket"},
-        Item{allowWithoutCsrf, "allowWithoutCsrf"}
-    );
-}
+constexpr AuthMethods httpAuthMethods =
+    AuthMethod::httpBasic | AuthMethod::httpDigest | AuthMethod::httpBearer;
 
-Q_DECLARE_FLAGS(Values, Value);
-Q_DECLARE_OPERATORS_FOR_FLAGS(Values);
-
-} // namespace AuthMethod
+constexpr AuthMethods defaultAuthMethods = httpAuthMethods
+    | AuthMethod::cookie
+    | AuthMethod::urlQueryDigest
+    | AuthMethod::xRuntimeGuid
+    | AuthMethod::urlQuerySessionToken
+    | AuthMethod::urlQueryTicket;
 
 /**
- * NOTE: By default, AuthMethod::http, AuthMethod::cookie and AuthMethod::videowall
- * authorization methods are allowed for every url.
+ * NOTE: By default, defaultAuthMethods are allowed for every url.
  */
 class NX_NETWORK_API AuthMethodRestrictionList
 {
@@ -99,27 +85,26 @@ public:
         std::optional<std::string> path;
     };
 
-    AuthMethodRestrictionList() = default;
-    AuthMethodRestrictionList(AuthMethod::Values allowedByDefault);
+    AuthMethodRestrictionList(AuthMethods allowedByDefault = defaultAuthMethods);
 
     /**
      * @return Bit mask of auth methods (AuthMethod::Value enumeration).
      */
-    AuthMethod::Values getAllowedAuthMethods(const nx::network::http::Request& request) const;
+    AuthMethods getAllowedAuthMethods(const nx::network::http::Request& request) const;
 
-    void allow(const Filter& filter, AuthMethod::Values authMethod);
+    void allow(const Filter& filter, AuthMethods authMethod);
 
     /**
      * Allow using path filter only.
      */
-    void allow(const std::string& pathMask, AuthMethod::Values method);
+    void allow(const std::string& pathMask, AuthMethods method);
 
-    void deny(const Filter& filter, AuthMethod::Values authMethod);
+    void deny(const Filter& filter, AuthMethods authMethod);
 
     /**
      * Deny using path filter only.
      */
-    void deny(const std::string& pathMask, AuthMethod::Values method);
+    void deny(const std::string& pathMask, AuthMethods method);
 
     void backupDeniedRulesForTests();
     void restoreDeniedRulesForTests();
@@ -129,14 +114,14 @@ private:
     {
         Filter filter;
         std::regex pathRegexp;
-        AuthMethod::Values methods;
+        AuthMethods methods;
 
-        Rule(const Filter& filter, AuthMethod::Values methods);
+        Rule(const Filter& filter, AuthMethods methods);
 
         bool matches(const Request& request) const;
     };
 
-    const AuthMethod::Values m_allowedByDefault = AuthMethod::defaults;
+    const AuthMethods m_allowedByDefault;
     mutable nx::ReadWriteLock m_mutex;
     std::vector<Rule> m_allowed;
     std::vector<Rule> m_denied;

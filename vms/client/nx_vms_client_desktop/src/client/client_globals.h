@@ -323,7 +323,7 @@ namespace Qn
 
         IOPortDataRole,                             /**< Return QnIOPortData object. Used in IOPortDataModel */
 
-        AuditRecordDataRole,                        /**< Return QnAuditRecord object */
+        AuditRecordDataRole,                        /**< Return QnLegacyAuditRecord object */
         ColumnDataRole,                             /**< convert index col count to column enumerator */
         DecorationHoveredRole,                      /**< Same as Qt::DecorationRole but for hovered item */
         AlternateColorRole,                         /**< Use alternate color in painting */

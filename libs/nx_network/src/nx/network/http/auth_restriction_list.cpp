@@ -7,17 +7,15 @@
 
 namespace nx::network::http {
 
-AuthMethodRestrictionList::AuthMethodRestrictionList(
-    AuthMethod::Values allowedByDefault)
-    :
+AuthMethodRestrictionList::AuthMethodRestrictionList(AuthMethods allowedByDefault):
     m_allowedByDefault(allowedByDefault)
 {
 }
 
-AuthMethod::Values AuthMethodRestrictionList::getAllowedAuthMethods(
+AuthMethods AuthMethodRestrictionList::getAllowedAuthMethods(
     const nx::network::http::Request& request) const
 {
-    AuthMethod::Values allowedMethods = m_allowedByDefault;
+    AuthMethods allowedMethods = m_allowedByDefault;
 
     NX_READ_LOCKER locker(&m_mutex);
 
@@ -41,7 +39,7 @@ AuthMethod::Values AuthMethodRestrictionList::getAllowedAuthMethods(
 
 void AuthMethodRestrictionList::allow(
     const Filter& filter,
-    AuthMethod::Values authMethod)
+    AuthMethods authMethod)
 {
     NX_WRITE_LOCKER locker(&m_mutex);
     m_allowed.emplace_back(filter, authMethod);
@@ -49,7 +47,7 @@ void AuthMethodRestrictionList::allow(
 
 void AuthMethodRestrictionList::allow(
     const std::string& pathMask,
-    AuthMethod::Values method)
+    AuthMethods method)
 {
     Filter filter;
     filter.path = pathMask;
@@ -58,7 +56,7 @@ void AuthMethodRestrictionList::allow(
 
 void AuthMethodRestrictionList::deny(
     const Filter& filter,
-    AuthMethod::Values authMethod)
+    AuthMethods authMethod)
 {
     NX_WRITE_LOCKER locker(&m_mutex);
     m_denied.emplace_back(filter, authMethod);
@@ -66,7 +64,7 @@ void AuthMethodRestrictionList::deny(
 
 void AuthMethodRestrictionList::deny(
     const std::string& pathMask,
-    AuthMethod::Values method)
+    AuthMethods method)
 {
     Filter filter;
     filter.path = pathMask;
@@ -87,12 +85,8 @@ void AuthMethodRestrictionList::restoreDeniedRulesForTests()
 
 //-------------------------------------------------------------------------------------------------
 
-AuthMethodRestrictionList::Rule::Rule(
-    const Filter& filter,
-    AuthMethod::Values methods)
-    :
-    filter(filter),
-    methods(methods)
+AuthMethodRestrictionList::Rule::Rule(const Filter& filter, AuthMethods methods):
+    filter(filter), methods(methods)
 {
     if (filter.path)
         pathRegexp = std::regex(filter.path->c_str());

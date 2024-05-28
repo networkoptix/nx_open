@@ -3,7 +3,10 @@
 #include "audit_details.h"
 
 #include <nx/fusion/model_functions.h>
-#include <nx/vms/api/data/software_version_serialization.h>
+
+#include "software_version_serialization.h"
+
+namespace nx::vms::api {
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SessionDetails, (ubjson)(json), SessionDetails_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(PlaybackDetails, (ubjson)(json), PlaybackDetails_Fields)
@@ -38,7 +41,7 @@ void serialize(const AllAuditDetails::type& data, QnUbjsonWriter<QByteArray>* st
     std::visit(
         [&](auto& details)
         {
-            if constexpr (std::is_same_v<decltype(details), std::nullptr_t>)
+            if constexpr (std::is_same_v<std::decay_t<decltype(details)>, std::nullptr_t>)
                 return;
             else
                 QnUbjson::serialize(details, stream);
@@ -87,3 +90,5 @@ bool deserialize(QnUbjsonReader<QByteArray>* stream, AllAuditDetails::type* targ
         },
         target);
 }
+
+} // namespace nx::vms::api

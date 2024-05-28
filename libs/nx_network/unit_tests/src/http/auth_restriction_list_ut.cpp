@@ -42,19 +42,19 @@ private:
     {
         m_restrictionList.allow(
             {std::nullopt, std::nullopt, "/customer/address"},
-            static_cast<AuthMethod::Values>(1));
+            static_cast<AuthMethod>(1));
 
         m_restrictionList.allow(
             {std::nullopt, std::nullopt, "/customer/address/.*"},
-            static_cast<AuthMethod::Values>(2));
+            static_cast<AuthMethod>(2));
 
         m_restrictionList.allow(
             {"HTTP", Method::options, ".*"},
-            static_cast<AuthMethod::Values>(4));
+            static_cast<AuthMethod>(4));
 
         m_restrictionList.allow(
             {"RTMP", std::nullopt, ".*"},
-            static_cast<AuthMethod::Values>(8));
+            static_cast<AuthMethod>(8));
     }
 
     http::Request prepareRequest(

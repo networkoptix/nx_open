@@ -3,7 +3,6 @@
 #include <gtest/gtest.h>
 
 #include <api/model/api_ioport_data.h>
-#include <api/model/audit/audit_record.h>
 #include <api/model/configure_system_data.h>
 #include <api/resource_property_adaptor.h>
 #include <nx/fusion/model_functions.h>
@@ -65,40 +64,6 @@ TEST(IOPortTypes, serialization)
     Qn::IOPortTypes data = Qn::PT_Input | Qn::PT_Output;
     QJson::serialize(data, &result);
     ASSERT_EQ(result, "\"Input|Output\"");
-}
-
-TEST(QnAuditRecord, serialization)
-{
-    QnAuditRecord record{{{nx::Uuid{}}}};
-    record.details = ResourceDetails{{{nx::Uuid()}}, {"detailed description"}};
-    nx::network::rest::JsonReflectResult<QnAuditRecordList> result;
-    result.reply.push_back(record);
-    const std::string expected = /*suppress newline*/ 1 + R"json(
-{
-    "error": "0",
-    "errorString": "",
-    "reply": [
-        {
-            "serverId": "{00000000-0000-0000-0000-000000000000}",
-            "eventType": "notDefined",
-            "createdTimeS": 0,
-            "authSession": {
-                "id": "{00000000-0000-0000-0000-000000000000}",
-                "userName": "",
-                "userHost": "",
-                "userAgent": ""
-            },
-            "details": {
-                "ids": [
-                    "{00000000-0000-0000-0000-000000000000}"
-                ],
-                "description": "detailed description"
-            }
-        }
-    ]
-})json";
-    ASSERT_EQ(
-        expected, nx::utils::formatJsonString(nx::reflect::json::serialize(result)).toStdString());
 }
 
 namespace {
