@@ -57,6 +57,7 @@ bool VideoUsabilityInformationParameters::read(
         def_disp_win_left_offset = reader.getGolomb();
         def_disp_win_right_offset = reader.getGolomb();
         def_disp_win_top_offset = reader.getGolomb();
+        def_disp_win_bottom_offset = reader.getGolomb();
     }
 
     vui_timing_info_present_flag = reader.getBits(1);
