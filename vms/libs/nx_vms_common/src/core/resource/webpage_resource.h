@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <QtCore/QSize>
+
 #include <core/resource/resource.h>
 
 // TODO: #sivanov Move to the corresponding library.
@@ -82,11 +84,10 @@ public:
     std::chrono::seconds refreshInterval() const;
     void setRefreshInterval(std::chrono::seconds interval);
 
-    bool isOpenInDialog() const;
-    void setOpenInDialog(bool value);
+    bool isOpenInWindow() const;
+    void setOpenInWindow(bool enabled, const QSize& size = {});
 
-    QSize dialogSize() const;
-    void setDialogSize(const QSize& size);
+    QSize dedicatedWindowSize() const;
 
     Options getOptions() const;
 
@@ -94,6 +95,7 @@ signals:
     void subtypeChanged(const QnWebPageResourcePtr& webPage);
     void proxyDomainAllowListChanged(const QnWebPageResourcePtr& webPage);
     void refreshIntervalChanged();
+    void openInWindowChanged();
 
 private:
     // This class must not store its status on server side

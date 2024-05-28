@@ -16,8 +16,17 @@ const QString kSubtypePropertyName = ResourcePropertyKey::WebPage::kSubtypeKey;
 const QString kProxyDomainAllowListPropertyName = "proxyDomainAllowList";
 const QString kCertificateCheckPropertyName = "certificateCheck";
 static const QString kRefreshIntervalPropertyName = "refreshIntervalS";
-static const QString kOpenInDialogPropertyName = "openInDialog";
-static const QString kDialogSizePropertyName = "dialogSize";
+
+struct DedicatedWindowSettings
+{
+    static const inline QString kPropertyName = "dedicatedWindowSettings";
+
+    bool enabled = false;
+    QSize size = {800, 600};
+
+    bool operator==(const DedicatedWindowSettings&) const = default;
+};
+NX_REFLECTION_INSTRUMENT(DedicatedWindowSettings, (enabled)(size))
 
 } // namespace
 
@@ -131,32 +140,32 @@ void QnWebPageResource::setRefreshInterval(seconds interval)
     setProperty(kRefreshIntervalPropertyName, QString::number(interval.count()));
 }
 
-bool QnWebPageResource::isOpenInDialog() const
+bool QnWebPageResource::isOpenInWindow() const
 {
-    auto [value, _] =
-        nx::reflect::json::deserialize<bool>(getProperty(kOpenInDialogPropertyName).toStdString());
+    auto [settings, _] = nx::reflect::json::deserialize<DedicatedWindowSettings>(
+        getProperty(DedicatedWindowSettings::kPropertyName).toStdString());
 
-    return value;
+    return settings.enabled;
 }
 
-void QnWebPageResource::setOpenInDialog(bool value)
+QSize QnWebPageResource::dedicatedWindowSize() const
 {
-    setProperty(
-        kOpenInDialogPropertyName, QString::fromStdString(nx::reflect::json::serialize(value)));
+    auto [settings, _] = nx::reflect::json::deserialize<DedicatedWindowSettings>(
+        getProperty(DedicatedWindowSettings::kPropertyName).toStdString());
+
+    return settings.size;
 }
 
-QSize QnWebPageResource::dialogSize() const
+void QnWebPageResource::setOpenInWindow(bool enabled, const QSize& size)
 {
-    auto [size, _] =
-        nx::reflect::json::deserialize<QSize>(getProperty(kDialogSizePropertyName).toStdString());
+    DedicatedWindowSettings settings{
+        .enabled = enabled,
+        .size = size.isEmpty() ? dedicatedWindowSize() : size};
 
-    return size;
-}
+    setProperty(DedicatedWindowSettings::kPropertyName,
+        QString::fromStdString(nx::reflect::json::serialize(settings)));
 
-void QnWebPageResource::setDialogSize(const QSize& size)
-{
-    setProperty(
-        kDialogSizePropertyName, QString::fromStdString(nx::reflect::json::serialize(size)));
+    emit openInWindowChanged();
 }
 
 QnWebPageResource::Options QnWebPageResource::getOptions() const

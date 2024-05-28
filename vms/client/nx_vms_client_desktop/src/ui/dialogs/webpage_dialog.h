@@ -57,11 +57,8 @@ public:
     bool isCertificateCheckEnabled() const;
     void setCertificateCheckEnabled(bool value);
 
-    bool isOpenInDialog() const;
-    void setOpenInDialog(bool value);
-
-    QSize openInDialogSize() const;
-    void setOpenInDialogSize(const QSize& size);
+    bool isOpenInWindow() const;
+    void setOpenInWindow(bool value);
 
     virtual void accept() override;
 
