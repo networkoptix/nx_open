@@ -105,6 +105,16 @@ QString iconPath(const EventParameters& parameters, core::SystemContext* context
                 objectType ? objectType->icon() : QString());
         }
 
+        case EventType::userDefinedEvent:
+        {
+            const auto sourceResources = event::sourceResources(parameters,
+                context->resourcePool());
+            if (sourceResources && !sourceResources->isEmpty())
+                return "20x20/Solid/camera.svg";
+
+            return "events/alert_20.svg";
+        }
+
         default:
             return {};
     }
@@ -194,6 +204,11 @@ QString EventSearchListModel::Private::title(const EventParameters& parameters) 
     {
         case EventType::analyticsSdkEvent:
             return stringHelper->getAnalyticsSdkEventName(parameters);
+
+        case EventType::userDefinedEvent:
+            return (parameters.caption.isEmpty())
+                ? stringHelper->eventName(parameters.eventType)
+                : parameters.caption;
 
         default:
             return stringHelper->eventName(parameters.eventType);
@@ -431,6 +446,7 @@ int EventSearchListModel::rowCount(const QModelIndex &parent) const
 QVariant EventSearchListModel::data(const QModelIndex& index, int role) const
 {
     const auto& eventParams = d->data[index.row()].eventParams;
+    const auto sourceResources = event::sourceResources(eventParams, resourcePool());
 
     switch (role)
     {
@@ -467,16 +483,14 @@ QVariant EventSearchListModel::data(const QModelIndex& index, int role) const
 
         case core::DisplayedResourceListRole:
         {
-            if (eventParams.eventResourceId.isNull() && !eventParams.resourceName.isEmpty())
+            if (!sourceResources && !eventParams.resourceName.isEmpty())
                 return QVariant::fromValue(QStringList({eventParams.resourceName}));
         }
         [[fallthrough]];
         case core::ResourceListRole:
         {
-            const auto resource =
-                systemContext()->resourcePool()->getResourceById(eventParams.eventResourceId);
-            if (resource)
-                return QVariant::fromValue(QnResourceList({resource}));
+            if (sourceResources)
+                return QVariant::fromValue(*sourceResources);
 
             if (role == core::DisplayedResourceListRole)
                 return {}; //< TODO: #vkutin Replace with <deleted camera> or <deleted server>.
@@ -487,10 +501,12 @@ QVariant EventSearchListModel::data(const QModelIndex& index, int role) const
         case core::ResourceRole: //< Resource for thumbnail preview only.
         {
             if (!hasPreview(eventParams.eventType))
-                return false;
+                return {};
 
-            return QVariant::fromValue<QnResourcePtr>(systemContext()->resourcePool()->
-                getResourceById<QnVirtualCameraResource>(eventParams.eventResourceId));
+            if (sourceResources && !sourceResources->isEmpty())
+                return QVariant::fromValue(sourceResources->first());
+
+            return {};
         }
 
         case Qn::HelpTopicIdRole:
