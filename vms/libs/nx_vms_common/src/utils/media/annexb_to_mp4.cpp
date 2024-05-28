@@ -116,7 +116,7 @@ QnCompressedVideoDataPtr AnnexbToMp4::process(const QnCompressedVideoData* frame
 
     if (isMp4Format(frame))
     {
-        NX_WARNING(this, "Failed to convert from AnnexB to MP4 format, format is MP4 already");
+        NX_VERBOSE(this, "Failed to convert from AnnexB to MP4 format, format is MP4 already");
         return nullptr;
     }
 
