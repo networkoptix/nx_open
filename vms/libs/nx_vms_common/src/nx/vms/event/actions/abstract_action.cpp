@@ -15,8 +15,10 @@ ActionFlags getFlags(ActionType actionType)
 {
     static const QMap<ActionType, ActionFlags> flags = {
         {ActionType::bookmarkAction, {ActionFlag::canUseSourceCamera}},
-        {ActionType::cameraOutputAction, {ActionFlag::canUseSourceCamera}},
-        {ActionType::cameraRecordingAction, {ActionFlag::canUseSourceCamera}},
+        {ActionType::cameraOutputAction, {ActionFlag::canUseSourceCamera
+            | ActionFlag::canProlongateInstantAction}},
+        {ActionType::cameraRecordingAction, {ActionFlag::canUseSourceCamera
+            | ActionFlag::canProlongateInstantAction}},
         {ActionType::fullscreenCameraAction, {ActionFlag::canUseSourceCamera}},
         {ActionType::playSoundAction, {ActionFlag::canUseSourceCamera}},
         {ActionType::playSoundOnceAction, {ActionFlag::canUseSourceCamera}},
@@ -141,6 +143,11 @@ bool requiresServerResource(ActionType actionType)
         default:
             return false;
     }
+}
+
+bool canProlongateInstantAction(ActionType actionType)
+{
+    return getFlags(actionType).testFlag(ActionFlag::canProlongateInstantAction);
 }
 
 bool hasToggleState(ActionType actionType)
