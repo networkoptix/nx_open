@@ -154,6 +154,7 @@ QVariant EventSearchListModel::Private::data(const QModelIndex& index, int role,
     bool& handled) const
 {
     const auto& eventParams = m_data[index.row()].eventParams;
+    const auto sourceResources = event::sourceResources(eventParams, q->resourcePool());
     handled = true;
 
     switch (role)
@@ -200,15 +201,14 @@ QVariant EventSearchListModel::Private::data(const QModelIndex& index, int role,
 
         case Qn::DisplayedResourceListRole:
         {
-            if (eventParams.eventResourceId.isNull() && !eventParams.resourceName.isEmpty())
+            if (!sourceResources && !eventParams.resourceName.isEmpty())
                 return QVariant::fromValue(QStringList({eventParams.resourceName}));
         }
         [[fallthrough]];
         case Qn::ResourceListRole:
         {
-            const auto resource = q->resourcePool()->getResourceById(eventParams.eventResourceId);
-            if (resource)
-                return QVariant::fromValue(QnResourceList({resource}));
+            if (sourceResources)
+                return QVariant::fromValue(*sourceResources);
 
             if (role == Qn::DisplayedResourceListRole)
                 return {}; //< TODO: #vkutin Replace with <deleted camera> or <deleted server>.
@@ -219,10 +219,12 @@ QVariant EventSearchListModel::Private::data(const QModelIndex& index, int role,
         case Qn::ResourceRole: //< Resource for thumbnail preview only.
         {
             if (!hasPreview(eventParams.eventType))
-                return false;
+                return {};
 
-            return QVariant::fromValue<QnResourcePtr>(q->resourcePool()->
-                getResourceById<QnVirtualCameraResource>(eventParams.eventResourceId));
+            if (sourceResources && !sourceResources->isEmpty())
+                return QVariant::fromValue(sourceResources->first());
+
+            return {};
         }
 
         case Qn::HelpTopicIdRole:
@@ -467,6 +469,11 @@ QString EventSearchListModel::Private::title(const vms::event::EventParameters& 
         case EventType::analyticsSdkEvent:
             return m_helper->getAnalyticsSdkEventName(parameters);
 
+        case EventType::userDefinedEvent:
+            return (parameters.caption.isEmpty())
+                ? m_helper->eventName(parameters.eventType)
+                : parameters.caption;
+
         default:
             return m_helper->eventName(parameters.eventType);
     }
@@ -480,7 +487,8 @@ QString EventSearchListModel::Private::description(
         .join(common::html::kLineBreak);
 }
 
-QString EventSearchListModel::Private::iconPath(const vms::event::EventParameters& parameters)
+QString EventSearchListModel::Private::iconPath(
+    const vms::event::EventParameters& parameters) const
 {
     switch (parameters.eventType)
     {
@@ -538,6 +546,15 @@ QString EventSearchListModel::Private::iconPath(const vms::event::EventParameter
 
         case EventType::ldapSyncIssueEvent:
             return "events/alert_yellow.png";
+
+        case EventType::userDefinedEvent:
+        {
+            const auto sourceResources = event::sourceResources(parameters, q->resourcePool());
+            if (sourceResources && !sourceResources->isEmpty())
+                return "tree/camera.svg";
+
+            return "events/alert_20.svg";
+        }
 
         default:
             return {};
