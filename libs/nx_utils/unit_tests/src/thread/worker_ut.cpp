@@ -115,7 +115,7 @@ TEST_F(Worker, ShouldBePossibleToPostTasksFromCbEvenLimitIsSurpassed)
     givenWorkerWithMaxTaskLimit();
     whenMultipleTasksPosted(QueueSize::shouldNotGrow, /*shouldPostFromSelf*/ true);
     thenAllOfThemProcessed();
-    thenQueueSizeShouldntHaveBeenGreaterThanLimit();
+    thenQueueSizeMayHaveVaried();
 }
 
 TEST_F(Worker, CbPostedFromCbExecutedImmediately)

@@ -18,106 +18,29 @@ namespace nx::utils {
 
 namespace detail { class Impl; }
 
-class NX_UTILS_API Worker
+class NX_UTILS_API Worker: public QnLongRunnable
 {
 public:
     using Task = nx::utils::MoveOnlyFunc<void()>;
     Worker(std::optional<size_t> maxTaskCount);
 
-    Worker(Worker&& other) = default;
-    Worker& operator=(Worker&& other) = default;
-
     ~Worker();
 
     void post(Task task);
     size_t size() const;
-    void stop();
 
 private:
-    std::unique_ptr<detail::Impl> m_impl;
-};
-
-namespace detail {
-
-class Impl: public QnLongRunnable
-{
-public:
-    Impl(std::optional<size_t> maxTaskCount): m_maxTaskCount(maxTaskCount)
-    {
-        auto startedFuture = m_startedPromise.get_future();
-        start();
-        startedFuture.wait();
-    }
-
-    void post(Worker::Task task)
-    {
-        if (m_workerThreadId == std::this_thread::get_id())
-        {
-            task();
-            return;
-        }
-
-        using namespace std::chrono;
-        while (m_maxTaskCount && m_tasks.size() > *m_maxTaskCount && !m_needStop)
-        {
-            NX_MUTEX_LOCKER lock(&m_mutex);
-            if (!m_reportOverflowTimer.isValid() || m_reportOverflowTimer.elapsed() > 30s)
-            {
-                NX_WARNING(this,
-                    "%1: Task queue overflow detected. %2 records in the queue",
-                    __func__, m_maxTaskCount);
-                m_reportOverflowTimer.restart();
-            }
-            m_overflowWaitCondition.wait(&m_mutex);
-        }
-
-        NX_MUTEX_LOCKER lock(&m_taskMutex);
-        if (m_needStop)
-            return;
-
-        m_tasks.push(std::move(task));
-    }
-
-    size_t size() const { return m_tasks.size(); }
+    virtual void pleaseStop() override;
+    virtual void run() override;
 
 private:
     SyncQueue<Worker::Task> m_tasks;
     nx::Mutex m_mutex;
-    nx::Mutex m_taskMutex;
     nx::WaitCondition m_overflowWaitCondition;
     const std::optional<size_t> m_maxTaskCount;
+    nx::utils::ElapsedTimer m_reportOverflowTimer;
     std::thread::id m_workerThreadId = std::thread::id();
     std::promise<void> m_startedPromise;
-    nx::utils::ElapsedTimer m_reportOverflowTimer;
-
-    virtual void pleaseStop() override
-    {
-        NX_MUTEX_LOCKER lock(&m_taskMutex);
-        m_needStop = true;
-        if (m_tasks.empty())
-            m_tasks.push([]() {});
-    }
-
-    virtual void run() override
-    {
-        m_workerThreadId = std::this_thread::get_id();
-        m_startedPromise.set_value();
-        while (true)
-        {
-            const auto task = m_tasks.pop();
-            task();
-            {
-                NX_MUTEX_LOCKER lock(&m_taskMutex);
-                if (m_needStop && m_tasks.empty())
-                    break;
-            }
-
-            NX_MUTEX_LOCKER lock(&m_mutex);
-            m_overflowWaitCondition.wakeOne();
-        }
-    }
 };
-
-} // namespace detail
 
 } // namespace nx::utils
