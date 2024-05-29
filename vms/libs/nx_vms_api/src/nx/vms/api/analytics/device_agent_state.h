@@ -9,7 +9,7 @@ namespace nx::vms::api::analytics {
 
 struct NX_VMS_API DeviceAgentState
 {
-    /**%apidoc:string
+    /**%apidoc[opt]:string
      * Device id (can be obtained from "id", "physicalId" or "logicalId" field via
      * `GET /rest/v{1-}/devices`) or MAC address (not supported for certain cameras).
      */
