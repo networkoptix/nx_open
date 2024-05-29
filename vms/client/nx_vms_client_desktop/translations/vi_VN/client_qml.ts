@@ -2462,7 +2462,7 @@ Nhấn Alt + Click để theo dõi đối tượng</translation>
     </message>
     <message>
       <source>The added system will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</source>
-      <translation type="unfinished">The added system will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</translation>
+      <translation>Hệ thống thêm vào sẽ nhanh chóng hiển thị với người dùng đang có tài khoản đám mây, còn người dùng chưa có tài khoản đám mây sẽ nhận được hướng dẫn qua Email.</translation>
     </message>
   </context>
   <context>
