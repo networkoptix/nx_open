@@ -79,7 +79,7 @@ bool CameraSettingsReadOnlyWatcher::calculateReadOnly() const
     if (nx::vms::common::saas::saasInitialized(systemContext()))
     {
         const auto serviceManager = systemContext()->saasServiceManager();
-        if (serviceManager->saasSuspended() || serviceManager->saasShutDown())
+        if (serviceManager->saasShutDown())
             return true;
     }
 
