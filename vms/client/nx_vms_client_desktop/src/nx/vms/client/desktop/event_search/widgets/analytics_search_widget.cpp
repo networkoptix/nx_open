@@ -119,8 +119,7 @@ private:
     void setupDeviceSelection();
 
     bool ensureVisible(milliseconds timestamp, const nx::Uuid& trackId);
-    void ensureVisibleAndFetchIfNeeded(
-        milliseconds timestamp, const nx::Uuid& trackId, const QnTimePeriod& proposedTimeWindow);
+    void ensureVisibleAndFetchIfNeeded(milliseconds timestamp, const nx::Uuid& trackId);
 
     AbstractEngine* engineById(const nx::Uuid& id) const;
 
@@ -526,12 +525,9 @@ QAction* AnalyticsSearchWidget::Private::addObjectMenuAction(
 }
 
 void AnalyticsSearchWidget::Private::ensureVisibleAndFetchIfNeeded(
-    milliseconds timestamp, const nx::Uuid& trackId, const QnTimePeriod& proposedTimeWindow)
+    milliseconds timestamp, const nx::Uuid& trackId)
 {
     if (ensureVisible(timestamp, trackId))
-        return;
-
-    if (!NX_ASSERT(proposedTimeWindow.contains(timestamp)))
         return;
 
     m_model->cancelFetch();

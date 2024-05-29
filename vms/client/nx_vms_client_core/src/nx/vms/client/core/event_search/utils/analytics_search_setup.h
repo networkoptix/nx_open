@@ -77,8 +77,7 @@ signals:
     void availableNewTracksChanged();
     void attributeFiltersChanged();
     void engineChanged();
-    void ensureVisibleRequested(std::chrono::milliseconds timestamp, const nx::Uuid& trackId,
-        const QnTimePeriod& proposedTimeWindow);
+    void ensureVisibleRequested(std::chrono::milliseconds timestamp, const nx::Uuid& trackId);
     void parametersChanged();
 
 private:

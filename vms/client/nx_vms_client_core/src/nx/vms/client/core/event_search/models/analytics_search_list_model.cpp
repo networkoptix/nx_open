@@ -1114,6 +1114,8 @@ void AnalyticsSearchListModel::commitAvailableNewTracks()
     for (auto& item: d->newTracks.items)
         d->data.insert(std::move(item), this);
 
+    setFetchedTimeWindow(timeWindow<Facade>(d->data.items));
+
     d->newTracks.clear();
 
     if (d->liveProcessingMode == LiveProcessingMode::manualAdd)

@@ -389,13 +389,12 @@ void AnalyticsSearchSynchronizer::setAreaSelectionActive(bool value)
     updateAllMediaResourceWidgetsAnalyticsMode();
 }
 
-void AnalyticsSearchSynchronizer::ensureVisible(milliseconds timestamp, const nx::Uuid& trackId,
-    const QnTimePeriod& proposedTimeWindow)
+void AnalyticsSearchSynchronizer::ensureVisible(milliseconds timestamp, const nx::Uuid& trackId)
 {
     for (auto instance: instances())
     {
         if (auto setup = instance->m_analyticsSetup)
-            emit setup->ensureVisibleRequested(timestamp, trackId, proposedTimeWindow);
+            emit setup->ensureVisibleRequested(timestamp, trackId);
     }
 }
 
