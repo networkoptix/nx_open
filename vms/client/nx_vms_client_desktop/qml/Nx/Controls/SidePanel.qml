@@ -75,8 +75,8 @@ Control
         icon.height: 40
 
         icon.source: sidePanel.opened
-            ? "image://skin/panel/slide_left_12x32.svg"
-            : "image://skin/panel/slide_right_12x32.svg"
+            ? "image://skin/12x32/Solid/panel_left.svg"
+            : "image://skin/12x32/Solid/panel_right.svg"
 
         primaryColor: down ? "light15" : (hovered ? "light17" : "light16")
         secondaryColor: down ? "dark7" : (hovered ? "dark9" : "dark8")
