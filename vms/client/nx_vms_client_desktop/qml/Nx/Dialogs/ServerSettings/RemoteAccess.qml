@@ -3,7 +3,6 @@
 import QtQuick
 import QtQuick.Layouts
 
-import Nx
 import Nx.Controls
 import Nx.Core
 import Nx.Core.Controls
