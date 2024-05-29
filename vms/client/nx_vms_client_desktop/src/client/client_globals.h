@@ -502,6 +502,7 @@ namespace Qn
         MismatchedCertificateOverlay,
         InformationRequiredOverlay,
         SaasShutDown,
+        RestrictedOverlay,
 
         OverlayCount
     };
@@ -515,6 +516,7 @@ namespace Qn
         Settings,
         SetPassword,
         UnlockEncryptedArchive,
+        Authorize,
 
         /** Provides information about required actions. */
         RequestInformation

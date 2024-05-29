@@ -46,6 +46,7 @@ public:
     nx::vms::api::CameraDataExList cameras() const;
     nx::vms::api::SystemSettings systemSettings() const;
     nx::vms::api::LicenseDataList licenses() const;
+    void requestData();
 
 signals:
     void ready();

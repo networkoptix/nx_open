@@ -322,7 +322,8 @@ void RemoteConnection::updateCredentials(
         d->connectionInfo.credentials = credentials;
         d->queryProcessor->updateCredentials(credentials);
         d->serverApi->updateCredentials(credentials);
-        d->messageBus->updateOutgoingConnection(d->moduleInformation.id, credentials);
+        if (d->messageBus)
+            d->messageBus->updateOutgoingConnection(d->moduleInformation.id, credentials);
         d->sessionTokenExpirationTime = sessionTokenExpirationTime;
     }
     emit credentialsChanged();
