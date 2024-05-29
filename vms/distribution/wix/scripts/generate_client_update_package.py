@@ -52,8 +52,14 @@ qt_binaries = [
 
 qt_plugins = [
     'imageformats/qgif.dll',
+    'imageformats/qicns.dll',
+    'imageformats/qico.dll',
     'imageformats/qjpeg.dll',
+    'imageformats/qsvg.dll',
+    'imageformats/qtga.dll',
     'imageformats/qtiff.dll',
+    'imageformats/qwbmp.dll',
+    'imageformats/qwebp.dll',
     'platforms/qwindows.dll',
     'tls/qopensslbackend.dll',
     'multimedia/windowsmediaplugin.dll']
