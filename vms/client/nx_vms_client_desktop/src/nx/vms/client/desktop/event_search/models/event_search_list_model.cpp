@@ -116,9 +116,6 @@ QString iconPath(const EventParameters& parameters, core::SystemContext* context
         case EventType::cameraInputEvent:
             return "tree/camera.svg";
 
-        case EventType::userDefinedEvent:
-            return "16x16/Outline/generic.svg?primary=light10";
-
         case EventType::analyticsSdkEvent:
             return "20x20/Solid/camera.svg";
         case EventType::analyticsSdkObjectDetected:
@@ -137,7 +134,7 @@ QString iconPath(const EventParameters& parameters, core::SystemContext* context
             if (sourceResources && !sourceResources->isEmpty())
                 return "20x20/Solid/camera.svg";
 
-            return "events/alert_20.svg";
+            return "16x16/Outline/generic.svg?primary=light10";
         }
 
         default:
