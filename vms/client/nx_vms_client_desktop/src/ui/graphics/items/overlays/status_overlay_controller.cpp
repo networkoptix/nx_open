@@ -1,12 +1,10 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-
 #include "status_overlay_controller.h"
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
 #include <nx/vms/client/desktop/style/skin.h>
-
 #include <utils/common/scoped_value_rollback.h>
 
 namespace {
@@ -270,6 +268,7 @@ QString QnStatusOverlayController::captionText(Qn::ResourceStatusOverlay overlay
         { Qn::OldFirmwareOverlay, tr("UNSUPPORTED FIRMWARE VERSION") },
         { Qn::CannotDecryptMediaOverlay, tr("ARCHIVE ENCRYPTED") },
         { Qn::InformationRequiredOverlay, tr("INFORMATION REQUIRED") },
+        { Qn::RestrictedOverlay, tr("RESTRICTED") },
     };
     return extractValue(overlay, kCaptions);
 }
@@ -320,6 +319,7 @@ QString QnStatusOverlayController::statusIconPath(Qn::ResourceStatusOverlay over
         { Qn::PasswordRequiredOverlay, "item_placeholders/alert.png" },
         { Qn::CannotDecryptMediaOverlay, "item_placeholders/encrypted.svg" },
         { Qn::InformationRequiredOverlay, "item_placeholders/alert.png" },
+        { Qn::RestrictedOverlay, "item_placeholders/no_access.svg" },
     };
 
     return extractValue(overlay, kIconPaths);
@@ -351,6 +351,7 @@ QnStatusOverlayController::getButtonCaptions(const QnResourcePtr& resource)
     result.insert(toInt(Qn::ResourceOverlayButton::SetPassword), tr("Set for this Camera"));
     result.insert(toInt(Qn::ResourceOverlayButton::UnlockEncryptedArchive), tr("Unlock"));
     result.insert(toInt(Qn::ResourceOverlayButton::RequestInformation), tr("Provide"));
+    result.insert(toInt(Qn::ResourceOverlayButton::Authorize), tr("Authorize"));
 
     if (resource)
     {

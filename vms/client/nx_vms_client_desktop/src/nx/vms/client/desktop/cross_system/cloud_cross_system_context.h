@@ -73,6 +73,9 @@ public:
 
     QnVirtualCameraResourcePtr createThumbCameraResource(const QnUuid& id, const QString& name);
 
+    bool needsCloudAuthorization();
+    void cloudAuthorize();
+
 signals:
     void statusChanged(Status oldStatus);
     void camerasAdded(const QnVirtualCameraResourceList& cameras);
@@ -84,5 +87,7 @@ private:
 };
 
 QString toString(CloudCrossSystemContext::Status status);
+
+using CloudCrossSystemContextPtr = std::shared_ptr<CloudCrossSystemContext>;
 
 } // namespace nx::vms::client::desktop

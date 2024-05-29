@@ -159,19 +159,16 @@ QnAbstractStreamDataProvider* QnClientCameraResource::createLiveDataProvider()
     connect(delegate, &QnRtspClientArchiveDelegate::dataDropped, this,
         &QnClientCameraResource::dataDropped);
 
-    if (auto session = context->session())
+    if (auto connection = context->connection())
     {
-        connect(session.get(),
-            &nx::vms::client::core::RemoteSession::credentialsChanged,
+        connect(connection.get(),
+            &nx::vms::client::core::RemoteConnection::credentialsChanged,
             delegate,
             [this, delegate,
-                sessionPtr = std::weak_ptr<nx::vms::client::core::RemoteSession>(session)]
+                connectionPtr = std::weak_ptr<nx::vms::client::core::RemoteConnection>(connection)]
             {
-                if (auto session = sessionPtr.lock())
-                {
-                    if (auto connection = session->connection())
-                        delegate->updateCredentials(connection->credentials());
-                }
+                if (auto connection = connectionPtr.lock())
+                    delegate->updateCredentials(connection->credentials());
             });
     }
 

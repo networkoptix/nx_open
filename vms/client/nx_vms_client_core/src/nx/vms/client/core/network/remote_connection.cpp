@@ -2,8 +2,9 @@
 
 #include "remote_connection.h"
 
-#include <api/server_rest_connection.h>
 #include <base_ec2_connection.h>
+
+#include <api/server_rest_connection.h>
 #include <common/common_module.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/p2p/p2p_message_bus.h>
@@ -314,7 +315,8 @@ void RemoteConnection::updateCredentials(
         d->connectionInfo.credentials = credentials;
         d->queryProcessor->updateCredentials(credentials);
         d->serverApi->updateCredentials(credentials);
-        d->messageBus->updateOutgoingConnection(d->moduleInformation.id, credentials);
+        if (d->messageBus)
+            d->messageBus->updateOutgoingConnection(d->moduleInformation.id, credentials);
         d->sessionTokenExpirationTime = sessionTokenExpirationTime;
     }
     emit credentialsChanged();

@@ -38,12 +38,15 @@ public:
         QObject* parent = nullptr);
     virtual ~CloudCrossSystemContextDataLoader() override;
 
+    void start(bool requestUser);
+
     nx::vms::api::UserModel user() const;
     nx::vms::api::ServerInformationList servers() const;
     nx::vms::api::ServerFootageDataList serverFootageData() const;
     nx::vms::api::CameraDataExList cameras() const;
     nx::vms::api::SystemSettings systemSettings() const;
     nx::vms::api::LicenseDataList licenses() const;
+    void requestData();
 
 signals:
     void ready();

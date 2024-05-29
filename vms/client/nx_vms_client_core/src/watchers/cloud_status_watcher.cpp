@@ -4,10 +4,10 @@
 
 #include <algorithm>
 
-#include <QtCore/QUrl>
 #include <QtCore/QPointer>
 #include <QtCore/QSettings>
 #include <QtCore/QTimer>
+#include <QtCore/QUrl>
 
 #include <client_core/client_core_settings.h>
 #include <helpers/system_helpers.h>
@@ -149,7 +149,9 @@ private:
     void resetCloudConnection();
     void updateConnection(bool initial);
     void issueAccessToken();
-    void onAccessTokenIssued(api::ResultCode result, api::IssueTokenResponse response);
+    void onAccessTokenIssued(api::ResultCode result,
+        api::IssueTokenResponse response,
+        const api::GrantType& grantType = api::GrantType::password);
     void validateAccessToken();
     void scheduleConnectionRetryIfNeeded();
 
@@ -555,7 +557,7 @@ void QnCloudStatusWatcherPrivate::updateConnection(bool initial)
 }
 
 void QnCloudStatusWatcherPrivate::onAccessTokenIssued(
-    api::ResultCode result, api::IssueTokenResponse response)
+    api::ResultCode result, api::IssueTokenResponse response, const api::GrantType& grantType)
 {
     NX_DEBUG(
         this,
@@ -568,8 +570,17 @@ void QnCloudStatusWatcherPrivate::onAccessTokenIssued(
 
     if (result != api::ResultCode::ok)
     {
-        updateStatusFromResultCode(result);
-        scheduleConnectionRetryIfNeeded();
+        if (grantType == api::GrantType::refreshToken
+            && (result == api::ResultCode::notAuthorized || result == api::ResultCode::badUsername))
+        {
+            m_authData = {};
+            setStatus(QnCloudStatusWatcher::LoggedOut, QnCloudStatusWatcher::InvalidPassword);
+        }
+        else
+        {
+            updateStatusFromResultCode(result);
+            scheduleConnectionRetryIfNeeded();
+        }
         return;
     }
 
@@ -604,12 +615,6 @@ void QnCloudStatusWatcherPrivate::onAccessTokenIssued(
 
 void QnCloudStatusWatcherPrivate::issueAccessToken()
 {
-    auto callback =
-        [this](api::ResultCode result, api::IssueTokenResponse response)
-        {
-            onAccessTokenIssued(result, std::move(response));
-        };
-
     if (!NX_ASSERT(cloudConnection))
         return;
 
@@ -629,6 +634,12 @@ void QnCloudStatusWatcherPrivate::issueAccessToken()
     {
         NX_ASSERT(false, "No authorization data.");
     }
+
+    auto callback =
+        [this, grant = request.grant_type](api::ResultCode result, api::IssueTokenResponse response)
+        {
+            onAccessTokenIssued(result, std::move(response), grant);
+        };
 
     m_tokenUpdater->issueToken(request, std::move(callback), this);
 }

@@ -700,6 +700,10 @@ public:
         LdapSettingsCallback&& callback,
         QThread* targetThread = nullptr);
 
+    Handle getCurrentSession(
+        Result<ErrorOrData<nx::vms::api::LoginSession>>::type callback,
+        QThread* targetThread);
+
     Handle loginAsync(
         const nx::vms::api::LoginSessionRequest& data,
         Result<ErrorOrData<nx::vms::api::LoginSession>>::type callback,
