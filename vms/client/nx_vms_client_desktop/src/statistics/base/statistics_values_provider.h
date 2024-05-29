@@ -14,5 +14,5 @@ public:
 
     virtual QnStatisticValuesHash values() const = 0;
 
-    virtual void reset() = 0;
+    virtual void reset() {};
 };
