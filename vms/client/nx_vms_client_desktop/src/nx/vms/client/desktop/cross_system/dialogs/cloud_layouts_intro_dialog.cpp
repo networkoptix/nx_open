@@ -20,8 +20,10 @@
 
 namespace nx::vms::client::desktop {
 
-NX_DECLARE_COLORIZED_ICON(
-    kContextHintIcon, "16x16/Solid/help.svg", HintButton::kIconSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kContextHintIcon, "16x16/Solid/help.svg", HintButton::kIconSubstitutions)
+core::SvgIconColorer::ThemeSubstitutions kFutureTheme = {
+    {QnIcon::Normal, {.primary = "yellow_d"}}};
+NX_DECLARE_COLORIZED_ICON(kFutureIcon, "16x16/Outline/future.svg", kFutureTheme)
 
 CloudLayoutsIntroDialog::CloudLayoutsIntroDialog(
     Mode mode,
@@ -33,8 +35,8 @@ CloudLayoutsIntroDialog::CloudLayoutsIntroDialog(
 {
     ui->setupUi(this);
     ui->imageLabel->setPixmap(qnSkin->pixmap("promo/cloud_layouts_intro.png"));
-    ui->availableActionsIconLabel->setPixmap(qnSkin->pixmap("promo/available.svg"));
-    ui->inFutureIconLabel->setPixmap(qnSkin->pixmap("promo/future.svg"));
+    ui->availableActionsIconLabel->setPixmap(qnSkin->pixmap("16x16/Outline/check.svg"));
+    ui->inFutureIconLabel->setPixmap(qnSkin->icon(kFutureIcon).pixmap(16, 16));
     ui->captionLabel->setText(tr(
         "Introducing %1 Layouts",
         "%1 is the short cloud name (like Cloud)").arg(nx::branding::shortCloudName()));
