@@ -89,117 +89,39 @@ R"json(
 )json";
 }
 
-bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoPacket)
-{
-    m_lastFrameTimestampUs = videoPacket->timestampUs();
-
-    Ptr<IObjectMetadataPacket> objectMetadataPacket = generateObjects();
-    pushMetadataPacket(objectMetadataPacket.releasePtr());
-
-    std::vector<Ptr<IObjectTrackBestShotPacket>> bestShotPackets = generateBestShots();
-    for (Ptr<IObjectTrackBestShotPacket>& bestShotPacket: bestShotPackets)
-        pushMetadataPacket(bestShotPacket.releasePtr());
-
-    std::vector<Ptr<IObjectTrackTitlePacket>> titlePackets = generateTitles();
-    for (Ptr<IObjectTrackTitlePacket>& titlePacket: titlePackets)
-        pushMetadataPacket(titlePacket.releasePtr());
-
-    return true;
-}
-
-void DeviceAgent::doSetNeededMetadataTypes(
-    nx::sdk::Result<void>* /*outValue*/,
-    const nx::sdk::analytics::IMetadataTypes* /*neededMetadataTypes*/)
-{
-}
-
-nx::sdk::Result<const nx::sdk::ISettingsResponse*> DeviceAgent::settingsReceived()
-{
-    std::map<std::string, std::string> settings = currentSettings();
-
-    m_bestShotGenerationCounterByTrackId.clear();
-
-    m_bestShotGenerationContext.policy = bestShotGenerationPolicyFromString(
-        settings[kBestShotGenerationPolicySetting]);
-
-    const std::string bestShotImagePath = settings[kBestShotImagePathSetting];
-    if (!bestShotImagePath.empty())
-    {
-        m_bestShotGenerationContext.imageData = loadFile(bestShotImagePath);
-        m_bestShotGenerationContext.imageDataFormat = imageFormatFromPath(bestShotImagePath);
-    }
-
-    m_bestShotGenerationContext.url = settings[kBestShotUrlSetting];
-
-    nx::kit::utils::fromString(
-        settings[kTopLeftXSetting],
-        &m_bestShotGenerationContext.fixedBestShotBoundingBox.x);
-
-    nx::kit::utils::fromString(
-        settings[kTopLeftYSetting],
-        &m_bestShotGenerationContext.fixedBestShotBoundingBox.y);
-
-    nx::kit::utils::fromString(
-        settings[kWidthSetting],
-        &m_bestShotGenerationContext.fixedBestShotBoundingBox.width);
-
-    nx::kit::utils::fromString(
-        settings[kHeightSetting],
-        &m_bestShotGenerationContext.fixedBestShotBoundingBox.height);
-
-    nx::kit::utils::fromString(
-        settings[kFrameNumberToGenerateBestShotSetting],
-        &m_bestShotGenerationContext.frameNumberToGenerateBestShot);
-
-    int objectCount = 0;
-    nx::kit::utils::fromString(settings[kObjectCountSetting], &objectCount);
-    m_trackContexts.clear();
-
-    for (int i = 0; i < objectCount; ++i)
-    {
-        TrackContext trackContext;
-        trackContext.trackId = UuidHelper::randomUuid();
-
-        m_bestShotGenerationCounterByTrackId[trackContext.trackId] =
-            m_bestShotGenerationContext.frameNumberToGenerateBestShot;
-
-        trackContext.boundingBox.height = std::min(
-            kMaxObjectHeight,
-            (1.0F - kDistanceBetweenObjects * objectCount) / objectCount);
-        trackContext.boundingBox.width = kObjectWidth;
-        trackContext.boundingBox.x = 0.0F;
-        trackContext.boundingBox.y = (i + 1) * kDistanceBetweenObjects
-            + i * trackContext.boundingBox.height;
-
-        m_trackContexts.push_back(std::move(trackContext));
-    }
-
-    m_titleGenerationContext.policy = titleGenerationPolicyFromString(
-        settings[kTitleGenerationPolicySetting]);
-
-    const std::string titleImagePath = settings[kTitleImagePathSetting];
-    if (!titleImagePath.empty())
-    {
-        m_titleGenerationContext.imageData = loadFile(titleImagePath);
-        m_titleGenerationContext.imageDataFormat = imageFormatFromPath(titleImagePath);
-    }
-
-    m_titleGenerationContext.url = settings[kTitleUrlSetting];
-
-    m_titleGenerationContext.text = settings[kTitleTextSetting];
-
-    if (m_titleGenerationContext.text.empty())
-        m_titleGenerationContext.text = "Default Title";
-
-    return nullptr;
-}
-
-Ptr<IObjectMetadataPacket> DeviceAgent::generateObjects()
+void DeviceAgent::generateTitleObject()
 {
     auto objectMetadataPacket = makePtr<ObjectMetadataPacket>();
     objectMetadataPacket->setTimestampUs(m_lastFrameTimestampUs);
 
-    for (TrackContext& trackContext: m_trackContexts)
+    for (TrackContext& trackContext: m_titleTrackContexts)
+    {
+        trackContext.boundingBox.x += 1.0F / kTrackLength;
+        if (trackContext.boundingBox.x + trackContext.boundingBox.width > 1.0F)
+        {
+            trackContext.trackId = UuidHelper::randomUuid();
+            trackContext.boundingBox.x = 0.0F;
+            m_titleGenerationCounterByTrackId[trackContext.trackId] =
+                m_titleGenerationContext.frameNumberToGenerateTitle;
+        }
+
+        auto objectMetadata = makePtr<ObjectMetadata>();
+        objectMetadata->setTypeId(kObjectTypeId);
+        objectMetadata->setTrackId(trackContext.trackId);
+        objectMetadata->setBoundingBox(trackContext.boundingBox);
+
+        objectMetadataPacket->addItem(objectMetadata.get());
+    }
+
+    pushMetadataPacket(objectMetadataPacket.releasePtr());
+}
+
+void DeviceAgent::generateBestShotObject()
+{
+    auto objectMetadataPacket = makePtr<ObjectMetadataPacket>();
+    objectMetadataPacket->setTimestampUs(m_lastFrameTimestampUs);
+
+    for (TrackContext& trackContext: m_bestShotTrackContexts)
     {
         trackContext.boundingBox.x += 1.0F / kTrackLength;
         if (trackContext.boundingBox.x + trackContext.boundingBox.width > 1.0F)
@@ -218,7 +140,177 @@ Ptr<IObjectMetadataPacket> DeviceAgent::generateObjects()
         objectMetadataPacket->addItem(objectMetadata.get());
     }
 
-    return objectMetadataPacket;
+    pushMetadataPacket(objectMetadataPacket.releasePtr());
+}
+
+void DeviceAgent::generateBestShotOrTitle()
+{
+    if (m_generateBestShotOrTitle)
+    {
+        generateBestShotObject();
+
+        std::vector<Ptr<IObjectTrackBestShotPacket>> bestShotPackets = generateBestShots();
+        for (Ptr<IObjectTrackBestShotPacket>& bestShotPacket: bestShotPackets)
+            pushMetadataPacket(bestShotPacket.releasePtr());
+    }
+    else
+    {
+        generateTitleObject();
+
+        std::vector<Ptr<IObjectTrackTitlePacket>> titlePackets = generateTitles();
+        for (Ptr<IObjectTrackTitlePacket>& titlePacket: titlePackets)
+            pushMetadataPacket(titlePacket.releasePtr());
+    }
+
+    m_generateBestShotOrTitle = !m_generateBestShotOrTitle;
+}
+
+bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoPacket)
+{
+    m_lastFrameTimestampUs = videoPacket->timestampUs();
+    generateBestShotOrTitle();
+    return true;
+}
+
+void DeviceAgent::doSetNeededMetadataTypes(
+    nx::sdk::Result<void>* /*outValue*/,
+    const nx::sdk::analytics::IMetadataTypes* /*neededMetadataTypes*/)
+{
+}
+
+void DeviceAgent::configureBestShots(std::map<std::string, std::string>& settings)
+{
+    m_bestShotGenerationCounterByTrackId.clear();
+
+    m_bestShotGenerationContext.policy = bestShotGenerationPolicyFromString(
+        settings[kBestShotGenerationPolicySetting]);
+
+    const std::string bestShotImagePath = settings[kBestShotImagePathSetting];
+    if (!bestShotImagePath.empty())
+    {
+        m_bestShotGenerationContext.imageData = loadFile(bestShotImagePath);
+        m_bestShotGenerationContext.imageDataFormat = imageFormatFromPath(bestShotImagePath);
+    }
+
+    m_bestShotGenerationContext.url = settings[kBestShotUrlSetting];
+
+    nx::kit::utils::fromString(
+        settings[kBestShotTopLeftXSetting],
+        &m_bestShotGenerationContext.fixedBestShotBoundingBox.x);
+
+    nx::kit::utils::fromString(
+        settings[kBestShotTopLeftYSetting],
+        &m_bestShotGenerationContext.fixedBestShotBoundingBox.y);
+
+    nx::kit::utils::fromString(
+        settings[kBestShotWidthSetting],
+        &m_bestShotGenerationContext.fixedBestShotBoundingBox.width);
+
+    nx::kit::utils::fromString(
+        settings[kBestShotHeightSetting],
+        &m_bestShotGenerationContext.fixedBestShotBoundingBox.height);
+
+    nx::kit::utils::fromString(
+        settings[kFrameNumberToGenerateBestShotSetting],
+        &m_bestShotGenerationContext.frameNumberToGenerateBestShot);
+
+    int bestShotObjectCount = 0;
+    nx::kit::utils::fromString(settings[kBestShotObjectCountSetting], &bestShotObjectCount);
+    m_bestShotTrackContexts.clear();
+
+    for (int i = 0; i < bestShotObjectCount; ++i)
+    {
+        TrackContext trackContext;
+        trackContext.trackId = UuidHelper::randomUuid();
+
+        m_bestShotGenerationCounterByTrackId[trackContext.trackId] =
+            m_bestShotGenerationContext.frameNumberToGenerateBestShot;
+
+        trackContext.boundingBox.height = std::min(
+            kMaxObjectHeight,
+            (1.0F - kDistanceBetweenObjects * bestShotObjectCount) / bestShotObjectCount);
+        trackContext.boundingBox.width = kObjectWidth;
+        trackContext.boundingBox.x = 0.0F;
+        trackContext.boundingBox.y = (i + 1) * kDistanceBetweenObjects
+            + i * trackContext.boundingBox.height;
+
+        m_bestShotTrackContexts.push_back(std::move(trackContext));
+    }
+}
+
+void DeviceAgent::configureTitles(std::map<std::string, std::string>& settings)
+{
+    m_titleGenerationCounterByTrackId.clear();
+
+    m_titleGenerationContext.policy = titleGenerationPolicyFromString(
+        settings[kTitleGenerationPolicySetting]);
+
+    const std::string titleImagePath = settings[kTitleImagePathSetting];
+    if (!titleImagePath.empty())
+    {
+        m_titleGenerationContext.imageData = loadFile(titleImagePath);
+        m_titleGenerationContext.imageDataFormat = imageFormatFromPath(titleImagePath);
+    }
+
+    m_titleGenerationContext.url = settings[kTitleUrlSetting];
+
+    nx::kit::utils::fromString(
+        settings[kTitleTopLeftXSetting],
+        &m_titleGenerationContext.fixedTitleBoundingBox.x);
+
+    nx::kit::utils::fromString(
+        settings[kTitleTopLeftYSetting],
+        &m_titleGenerationContext.fixedTitleBoundingBox.y);
+
+    nx::kit::utils::fromString(
+        settings[kTitleWidthSetting],
+        &m_titleGenerationContext.fixedTitleBoundingBox.width);
+
+    nx::kit::utils::fromString(
+        settings[kTitleHeightSetting],
+        &m_titleGenerationContext.fixedTitleBoundingBox.height);
+
+    nx::kit::utils::fromString(
+        settings[kFrameNumberToGenerateTitleSetting],
+        &m_titleGenerationContext.frameNumberToGenerateTitle);
+
+    int titleObjectCount = 0;
+    nx::kit::utils::fromString(settings[kTitleObjectCountSetting], &titleObjectCount);
+    m_titleTrackContexts.clear();
+
+    for (int i = 0; i < titleObjectCount; ++i)
+    {
+        TrackContext trackContext;
+        trackContext.trackId = UuidHelper::randomUuid();
+
+        m_titleGenerationCounterByTrackId[trackContext.trackId] =
+            m_titleGenerationContext.frameNumberToGenerateTitle;
+
+        trackContext.boundingBox.height = std::min(
+            kMaxObjectHeight,
+            (1.0F - kDistanceBetweenObjects * titleObjectCount) / titleObjectCount);
+        trackContext.boundingBox.width = kObjectWidth;
+        trackContext.boundingBox.x = 0.0F;
+        trackContext.boundingBox.y = (i + 1) * kDistanceBetweenObjects
+            + i * trackContext.boundingBox.height;
+
+        m_titleTrackContexts.push_back(std::move(trackContext));
+    }
+
+    m_titleGenerationContext.text = settings[kTitleTextSetting];
+
+    if (m_titleGenerationContext.text.empty())
+        m_titleGenerationContext.text = "Default Title";
+}
+
+nx::sdk::Result<const nx::sdk::ISettingsResponse*> DeviceAgent::settingsReceived()
+{
+    std::map<std::string, std::string> settings = currentSettings();
+
+    configureBestShots(settings);
+    configureTitles(settings);
+
+    return nullptr;
 }
 
 DeviceAgent::BestShotList DeviceAgent::generateBestShots()
@@ -256,24 +348,28 @@ DeviceAgent::TitleList DeviceAgent::generateTitles()
 {
     TitleList result;
 
-    for (const TrackContext& trackContext: m_trackContexts)
+    auto it = m_titleGenerationCounterByTrackId.begin();
+    while (it != m_titleGenerationCounterByTrackId.end())
     {
-        auto titlePacket = makePtr<ObjectTrackTitlePacket>(trackContext.trackId,
-            m_lastFrameTimestampUs);
+        const Uuid& trackId = it->first;
+        int& counter = it->second;
 
-        titlePacket->setText(m_titleGenerationContext.text);
-
-        if (m_titleGenerationContext.policy == TitleGenerationPolicy::url)
+        if (counter == 0)
         {
-            titlePacket->setImageUrl(m_titleGenerationContext.url);
-        }
-        else if (m_titleGenerationContext.policy == TitleGenerationPolicy::image)
-        {
-            titlePacket->setImageDataFormat(m_titleGenerationContext.imageDataFormat);
-            titlePacket->setImageData(m_titleGenerationContext.imageData);
-        }
+            if (m_titleGenerationContext.policy == TitleGenerationPolicy::fixed)
+                result.push_back(generateFixedTitle(trackId));
+            else if (m_titleGenerationContext.policy == TitleGenerationPolicy::url)
+                result.push_back(generateUrlTitle(trackId));
+            else if (m_titleGenerationContext.policy == TitleGenerationPolicy::image)
+                result.push_back(generateImageTitle(trackId));
 
-        result.push_back(titlePacket);
+            it = m_titleGenerationCounterByTrackId.erase(it);
+        }
+        else
+        {
+            --counter;
+            ++it;
+        }
     }
 
     return result;
@@ -308,6 +404,42 @@ Ptr<IObjectTrackBestShotPacket> DeviceAgent::generateImageBestShot(Uuid trackId)
     bestShotPacket->setImageData(m_bestShotGenerationContext.imageData);
 
     return bestShotPacket;
+}
+
+Ptr<IObjectTrackTitlePacket> DeviceAgent::generateFixedTitle(Uuid trackId)
+{
+    return makePtr<ObjectTrackTitlePacket>(
+        trackId,
+        m_lastFrameTimestampUs,
+        m_titleGenerationContext.fixedTitleBoundingBox,
+        m_titleGenerationContext.text);
+}
+
+Ptr<IObjectTrackTitlePacket> DeviceAgent::generateUrlTitle(Uuid trackId)
+{
+    auto titlePacket = makePtr<ObjectTrackTitlePacket>(
+        trackId,
+        m_lastFrameTimestampUs);
+
+    titlePacket->setText(m_titleGenerationContext.text);
+
+    titlePacket->setImageUrl(m_titleGenerationContext.url);
+
+    return titlePacket;
+}
+
+Ptr<IObjectTrackTitlePacket> DeviceAgent::generateImageTitle(Uuid trackId)
+{
+    auto titlePacket = makePtr<ObjectTrackTitlePacket>(
+        trackId,
+        m_lastFrameTimestampUs);
+
+    titlePacket->setText(m_titleGenerationContext.text);
+
+    titlePacket->setImageDataFormat(m_titleGenerationContext.imageDataFormat);
+    titlePacket->setImageData(m_titleGenerationContext.imageData);
+
+    return titlePacket;
 }
 
 } // namespace best_shots

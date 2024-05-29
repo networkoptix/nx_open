@@ -141,8 +141,11 @@ std::vector<Ptr<IMetadataPacket>> DeviceAgent::generateMetadata(
         }
         else if (object.entryType == Object::EntryType::title)
         {
-            auto titlePacket = makePtr<ObjectTrackTitlePacket>(object.trackId,
-                m_lastFrameTimestampUs);
+            auto titlePacket = makePtr<ObjectTrackTitlePacket>();
+            titlePacket->setTimestampUs(timestampUs);
+            titlePacket->setTrackId(object.trackId);
+            titlePacket->setBoundingBox(object.boundingBox);
+            titlePacket->setText(object.titleText);
 
             if (isHttpOrHttpsUrl(object.imageSource))
             {
@@ -157,8 +160,6 @@ std::vector<Ptr<IMetadataPacket>> DeviceAgent::generateMetadata(
                     titlePacket->setImageData(loadFile(object.imageSource));
                 }
             }
-
-            titlePacket->setText(object.titleText);
 
             objectTrackTitlePackets.push_back(std::move(titlePacket));
         }

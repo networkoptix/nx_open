@@ -12,10 +12,14 @@ namespace nx::sdk::analytics {
 class ObjectTrackTitlePacket: public RefCountable<IObjectTrackTitlePacket>
 {
 public:
-    ObjectTrackTitlePacket(Uuid trackId = Uuid(), int64_t timestampUs = -1);
+    ObjectTrackTitlePacket(Uuid trackId = Uuid(),
+        int64_t timestampUs = -1,
+        Rect boundingBox = Rect(),
+        const std::string& text = "");
 
     virtual int64_t timestampUs() const override;
     virtual void getTrackId(Uuid* outValue) const override;
+    virtual void getBoundingBox(Rect* outValue) const override;
     virtual const char* text() const override;
     virtual const char* imageUrl() const override;
     virtual const char* imageData() const override;
@@ -28,6 +32,9 @@ public:
 
     /** See IObjectTrackTitlePacket::timestampUs(). */
     void setTimestampUs(int64_t timestampUs);
+
+    /** See IObjectTrackTitlePacket::boundingBox(). */
+    void setBoundingBox(const Rect& boundingBox);
 
     /** See IObjectTrackTitlePacket::text(). */
     void setText(std::string text);
@@ -54,6 +61,7 @@ private:
     Uuid m_trackId;
     Flags m_flags = Flags::none;
     int64_t m_timestampUs = -1;
+    Rect m_boundingBox;
     std::string m_text;
 
     std::string m_imageUrl;

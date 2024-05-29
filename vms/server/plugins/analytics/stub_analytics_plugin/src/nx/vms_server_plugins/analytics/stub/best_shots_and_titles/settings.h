@@ -15,23 +15,32 @@ extern const std::string kFixedBoundingBoxBestShotGenerationPolicy;
 extern const std::string kUrlBestShotGenerationPolicy;
 extern const std::string kImageBestShotGenerationPolicy;
 
-extern const std::string kObjectCountSetting;
+extern const std::string kBestShotObjectCountSetting;
 extern const std::string kFrameNumberToGenerateBestShotSetting;
 
-extern const std::string kTopLeftXSetting;
-extern const std::string kTopLeftYSetting;
-extern const std::string kWidthSetting;
-extern const std::string kHeightSetting;
+extern const std::string kBestShotTopLeftXSetting;
+extern const std::string kBestShotTopLeftYSetting;
+extern const std::string kBestShotWidthSetting;
+extern const std::string kBestShotHeightSetting;
 
 extern const std::string kBestShotUrlSetting;
 extern const std::string kBestShotImagePathSetting;
 
-extern const  std::string kTitleGenerationPolicySetting;
-extern const  std::string kUrlTitleGenerationPolicy;
-extern const  std::string kImageTitleGenerationPolicy;
-extern const  std::string kTitleUrlSetting;
-extern const  std::string kTitleImagePathSetting;
-extern const  std::string kTitleTextSetting;
+extern const std::string kTitleGenerationPolicySetting;
+extern const std::string kUrlTitleGenerationPolicy;
+extern const std::string kImageTitleGenerationPolicy;
+extern const std::string kFixedBoundingBoxTitleGenerationPolicy;
+extern const std::string kTitleUrlSetting;
+extern const std::string kTitleImagePathSetting;
+extern const std::string kTitleTextSetting;
+
+extern const std::string kTitleTopLeftXSetting;
+extern const std::string kTitleTopLeftYSetting;
+extern const std::string kTitleWidthSetting;
+extern const std::string kTitleHeightSetting;
+
+extern const std::string kTitleObjectCountSetting;
+extern const std::string kFrameNumberToGenerateTitleSetting;
 
 } // namespace best_shots
 } // namespace stub
