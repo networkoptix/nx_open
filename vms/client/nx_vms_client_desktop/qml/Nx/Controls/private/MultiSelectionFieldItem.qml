@@ -69,6 +69,7 @@ Control
             Layout.alignment: Qt.AlignVCenter
 
             visible: removable
+            focusPolicy: Qt.NoFocus
 
             icon.source: "image://skin/20x20/Outline/cross_input.svg"
             icon.width: 20

@@ -44,7 +44,7 @@ Control
     }
 
     Keys.onSpacePressed: control.openPopup()
-    Keys.onTabPressed: control.nextItemInFocusChain().forceActiveFocus()
+    Keys.onTabPressed: control.nextItemInFocusChain().forceActiveFocus(Qt.TabFocusReason)
 
     FocusFrame
     {
@@ -240,6 +240,7 @@ Control
                     {
                         text: highlightMatchingText(model[textRole])
                         checked: model[checkedRole]
+                        onCheckedChanged: model[checkedRole] = checked
                         iconSource: model[decorationRole] ?? ""
                         current: listView.activeFocus && ListView.isCurrentItem
 
@@ -266,10 +267,14 @@ Control
                         Keys.onTabPressed:
                         {
                             popup.close()
-                            control.nextItemInFocusChain().forceActiveFocus()
+                            control.nextItemInFocusChain().forceActiveFocus(Qt.TabFocusReason)
                         }
 
-                        Keys.onSpacePressed: setChecked(!checked)
+                        Keys.onSpacePressed:
+                        {
+                            if (current)
+                                setChecked(!checked)
+                        }
                     }
                 }
 
@@ -292,7 +297,14 @@ Control
         onVisibleChanged:
         {
             if (searchField.visible)
+            {
                 searchField.forceActiveFocus()
+            }
+            else if (visible)
+            {
+                listView.currentIndex = -1
+                listView.forceActiveFocus()
+            }
         }
 
         onImplicitHeightChanged:

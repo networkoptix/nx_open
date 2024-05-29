@@ -90,7 +90,7 @@ Control
 
         onClicked:
         {
-            checked = !checked
+            checkBox.toggle()
             control.clicked()
         }
     }
