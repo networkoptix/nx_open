@@ -729,10 +729,8 @@ Item
                                     "Copied here means that a link is copied")
                                 enabled: control.enabled
                                 text: copied ? copiedText : copyLinkText
-                                // TODO: @pprivalov check the correctness of color,
-                                //  probably the entire element should be redesigned
                                 icon.source:
-                                    copied ? "image://skin/20x20/Outline/success.svg" : ""
+                                    copied ? "image://skin/20x20/Outline/success.svg?primary=light10" : ""
                                 icon.width: 20
                                 icon.height: 20
                                 Layout.preferredWidth:

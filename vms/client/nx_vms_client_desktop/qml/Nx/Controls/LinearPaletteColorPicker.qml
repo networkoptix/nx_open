@@ -3,6 +3,7 @@
 import QtQuick 2.0
 import QtQuick.Controls.impl 2.3
 
+import Nx.Core.Controls
 import Nx.Core 1.0
 
 Item
@@ -35,11 +36,11 @@ Item
                 radius: 2
                 color: modelData
 
-                ColorImage
+                ColoredImage
                 {
                     anchors.centerIn: parent
-                    source: "image://skin/20x20/Outline/success.svg"
-                    color: checkColor
+                    sourcePath: "image://skin/20x20/Outline/success.svg"
+                    primaryColor: checkColor
                     visible: parent.current
                 }
 
