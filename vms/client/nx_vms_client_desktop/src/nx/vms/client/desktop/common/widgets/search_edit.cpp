@@ -140,6 +140,28 @@ void HoverablePushButton::leaveEvent(QEvent* /*event*/)
         m_hoverCallback(false);
 }
 
+const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kSearchTheme= {
+    { QnIcon::Normal, { .primary = "light16" }},
+
+    { QnIcon::Selected, { .primary = "light15" }},
+
+        { QnIcon::Active, { .primary = "light17" }},
+    };
+
+const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kSearchSelectedTheme= {
+    { QnIcon::Normal, { .primary = "light1" }},
+
+    { QnIcon::Selected, { .primary = "light1" }},
+
+        { QnIcon::Active, { .primary = "light1" }},
+    };
+
+NX_DECLARE_COLORIZED_ICON(kSearchIcon, "32x32/Outline/search.svg", kSearchTheme)
+NX_DECLARE_COLORIZED_ICON(kSearchSelectedIcon, "32x32/Outline/search.svg", kSearchSelectedTheme)
+
+NX_DECLARE_COLORIZED_ICON(kSearchDropIcon, "24x20/Outline/search_drop.svg", kSearchTheme)
+NX_DECLARE_COLORIZED_ICON(kSearchDropSelectedIcon, "24x20/Outline/search_drop.svg", kSearchSelectedTheme)
+
 } //namespace
 
 namespace nx::vms::client::desktop {
@@ -307,46 +329,12 @@ void SearchEdit::setupMenuButton()
 
 void SearchEdit::updateMenuButtonIcon()
 {
-    // TODO: @pprivalov Remove this old fashioned color substitutions when figma plugin is ready
-    static const QColor kBasePrimaryColor = "#B8B8BD";
-    static const QColor kBackgroundColor = "#263137";
-
-    const core::SvgIconColorer::IconSubstitutions kSearchDropIconSubstitutions = {
-        { QnIcon::Normal, {
-            { kBasePrimaryColor, "light16"},
-            { kBackgroundColor, "dark8"}
-        }},
-        { QnIcon::Selected, { // Pressed
-            { kBasePrimaryColor, "light15"},
-            { kBackgroundColor, "dark7" },
-        }},
-        { QnIcon::Active, { // Hovered
-            { kBasePrimaryColor, "light17"},
-            { kBackgroundColor, "dark9" },
-        }},
-    };
-
-    const core::SvgIconColorer::IconSubstitutions kSearchDropSelectedIconSubstitutions = {
-        { QnIcon::Normal, {
-            { kBasePrimaryColor, "light1"},
-            { kBackgroundColor, "dark8"}
-        }},
-        { QnIcon::Selected, { // Pressed
-            { kBasePrimaryColor, "light1"},
-            { kBackgroundColor, "dark7" },
-        }},
-        { QnIcon::Active, { // Hovered
-            { kBasePrimaryColor, "light1"},
-            { kBackgroundColor, "dark9" },
-        }},
-    };
-
     const auto kIcon = isMenuEnabled()
-        ? qnSkin->icon("panel/search_drop_40x32.svg", kSearchDropIconSubstitutions)
-        : qnSkin->icon("panel/search.png");
+        ? qnSkin->icon(kSearchDropIcon)
+        : qnSkin->icon(kSearchIcon);
     const auto kSelectedIcon = isMenuEnabled()
-        ? qnSkin->icon("panel/search_drop_40x32.svg", kSearchDropSelectedIconSubstitutions)
-        : qnSkin->icon("panel/search_selected.png");
+        ? qnSkin->icon(kSearchDropSelectedIcon)
+        : qnSkin->icon(kSearchSelectedIcon);
 
     d->menuButton->setFixedSize(isMenuEnabled() ? QSize(40, 32) : QSize(32, 32));
     d->menuButton->setIcon(d->lineEdit->text().isEmpty() ? kIcon : kSelectedIcon);
