@@ -77,6 +77,7 @@ public:
         static bool emptyListIsValid() { return true; }
         static bool multiChoiceListIsValid() { return true; }
         static bool showRecordingIndicator() { return false; }
+        static bool showAllCamerasSwitch() { return false; }
     };
 
     template<typename ResourcePolicy>
@@ -125,6 +126,7 @@ bool CameraSelectionDialog::selectCameras(
 
     CameraSelectionDialog dialog(ResourceFilter(), resourceValidator, alertTextProvider, parent);
     dialog.resourceSelectionWidget()->setSelectedResourcesIds(selectedCameras);
+    dialog.setAllCamerasSwitchVisible(ResourcePolicy::showAllCamerasSwitch());
     dialog.resourceSelectionWidget()->setShowRecordingIndicator(
         ResourcePolicy::showRecordingIndicator());
 

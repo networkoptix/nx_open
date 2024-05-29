@@ -250,11 +250,6 @@ QString QnCameraAnalyticsPolicy::getText(
         context, cameras, detailed, tr("Analytics is not available for %1"), invalid);
 }
 
-bool QnFullscreenCameraPolicy::isResourceValid(const QnVirtualCameraResourcePtr& /*camera*/)
-{
-    return true;
-}
-
 QString QnFullscreenCameraPolicy::getText(
     nx::vms::common::SystemContext* context,
     const QnResourceList& resources,
