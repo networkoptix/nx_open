@@ -119,7 +119,10 @@ QByteArray substituteColors(
                 if (NX_ASSERT(themeSubstitutions[_class] != kInvalidColor,
                     "Color theme is missing for icon, %1 is not specified", _class))
                 {
-                    value = colorTheme()->color(themeSubstitutions[_class]);
+                    if (colorTheme()->hasColor(themeSubstitutions[_class]))
+                        value = colorTheme()->color(themeSubstitutions[_class]);
+                    else
+                        value = themeSubstitutions[_class];
                 }
                 else
                 {

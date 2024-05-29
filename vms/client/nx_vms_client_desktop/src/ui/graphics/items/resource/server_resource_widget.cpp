@@ -163,7 +163,6 @@ namespace {
     const int itemSpacing = 2;
 
     const char *legendKeyPropertyName = "_qn_legendKey";
-
 } // namespace
 
 // -------------------------------------------------------------------------- //
@@ -180,7 +179,15 @@ public:
     {
         setCheckable(true);
         setToolTip(m_text);
-        setIcon(qnSkin->icon("health_monitor/check.png"));
+        core::SvgIconColorer::ThemeSubstitutions checkTheme = {
+            {QnIcon::Normal, {.primary = m_color.toRgb().name().toLatin1()}},
+            {QIcon::Active, {.primary = m_color.toRgb().name().toLatin1()}},
+            {QnIcon::Disabled, {.primary = m_color.toRgb().name().toLatin1()}},
+            {QnIcon::Pressed, {.primary = m_color.toRgb().name().toLatin1()}},
+
+        };
+        setIcon(qnSkin->icon(
+            "12x12/Outline/checkbox_empty.svg", checkTheme, "12x12/Outline/checkbox_checked.svg"));
     }
 
     virtual ~LegendButtonWidget() {}
@@ -244,9 +251,6 @@ protected:
             QnScopedPainterPenRollback penRollback(painter,
                 QPen(core::colorTheme()->color("dark1"), 2));
             QnScopedPainterBrushRollback brushRollback(painter);
-
-            painter->setBrush(m_color);
-            painter->drawRoundedRect(imgRect, 4, 4);
 
             QFont font;
             font.setPixelSize(legendFontSize);
