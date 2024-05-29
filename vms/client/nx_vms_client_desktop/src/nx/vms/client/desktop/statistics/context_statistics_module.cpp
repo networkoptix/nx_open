@@ -13,12 +13,18 @@
 #include <ui/statistics/modules/session_restore_statistics_module.h>
 
 #include "context_statistics_module.h"
+#include "modules/build_info_statistics_module.h"
+#include "modules/os_statistics_module.h"
 
 namespace nx::vms::client::desktop {
 
 struct ContextStatisticsModule::Private
 {
     std::unique_ptr<QnStatisticsManager> manager;
+    std::unique_ptr<BuildInfoStatisticsModule> buildInfoModule =
+        std::make_unique<BuildInfoStatisticsModule>();
+    std::unique_ptr<OsStatisticsModule> osModule =
+        std::make_unique<OsStatisticsModule>();
     std::unique_ptr<QnCertificateStatisticsModule> certificatesModule;
     std::unique_ptr<QnControlsStatisticsModule> controlsModule;
     std::unique_ptr<QnGenericStatisticsModule> genericModule;
@@ -31,6 +37,9 @@ ContextStatisticsModule::ContextStatisticsModule():
     d->manager = std::make_unique<QnStatisticsManager>();
     d->manager->setClientId(appContext()->localSettings()->pcUuid());
     d->manager->setStorage(std::make_unique<QnStatisticsFileStorage>());
+
+    d->manager->registerStatisticsModule("os", d->osModule.get());
+    d->manager->registerStatisticsModule("build", d->buildInfoModule.get());
 
     d->genericModule = std::make_unique<QnGenericStatisticsModule>();
     d->manager->registerStatisticsModule("generic", d->genericModule.get());
