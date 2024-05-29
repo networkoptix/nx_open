@@ -11,6 +11,13 @@
 #include "abstract_search_widget.h"
 #include "placeholder_widget.h"
 
+namespace {
+nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kPlaceholdeTheme = {
+    {QnIcon::Normal, {.primary = "dark10"}}};
+
+NX_DECLARE_COLORIZED_ICON(kFutureIcon, "64x64/Outline/future.svg", kPlaceholdeTheme)
+
+}  // namespace
 namespace nx::vms::client::desktop {
 
 struct OverlappableSearchWidget::Private
@@ -30,7 +37,7 @@ OverlappableSearchWidget::OverlappableSearchWidget(
 
     d->stackedLayout->addWidget(d->searchWidget);
     d->stackedLayout->addWidget(PlaceholderWidget::create(
-        qnSkin->pixmap("misc/future.svg"),
+        qnSkin->icon(kFutureIcon).pixmap(64, 64),
         AbstractSearchWidget::makePlaceholderText(
             tr("Not supported"), tr("This tab will be available in future versions")),
         tr("Learn more"),

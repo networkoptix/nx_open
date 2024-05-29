@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="8" height="10" fill="none" viewBox="0 0 8 10">
+  <g class="8x10/Solid/pause_button" clip-path="url(#a)">
+    <path fill="#fff" fill-rule="evenodd" d="M3 0H0v10h3V0Zm5 0H5v10h3V0Z" class="Primary" clip-rule="evenodd"/>
+  </g>
+  <defs>
+    <clipPath id="a" class="a">
+      <path fill="#fff" d="M0 0h8v10H0z"/>
+    </clipPath>
+  </defs>
+</svg>

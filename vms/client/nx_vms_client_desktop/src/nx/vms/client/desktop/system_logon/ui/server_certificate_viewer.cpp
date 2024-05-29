@@ -51,6 +51,7 @@ static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kThemeSub
     {QIcon::Selected, {.primary = "light4"}},
 };
 
+NX_DECLARE_COLORIZED_ICON(kCertificateIcon, "20x20/Outline/certificate_text.svg", kThemeSubstitutions)
 } // namespace
 
 namespace nx::vms::client::desktop {
@@ -153,7 +154,7 @@ ServerCertificateViewer::ServerCertificateViewer(
     aligner->addWidgets({ui->issuedByTextLabel, ui->expiresTextLabel});
 
     ui->certificateIcon->setPixmap(
-        qnSkin->pixmap("misc/certificate.svg",
+        qnSkin->pixmap("Illustrations/certificate_90x124.svg",
         true,
         ui->certificateIcon->size()));
 
@@ -174,9 +175,9 @@ ServerCertificateViewer::ServerCertificateViewer(
     // Set up the warning banner.
     ui->warningBanner->init({.level = BarDescription::BarLevel::Error});
     pinCertificateButton = ui->warningBanner->addButton(
-        tr("Pin to this certificate"), "misc/pin_text_icon.svg");
+        tr("Pin to this certificate"), "20x20/Outline/pin.svg");
     viewPinnedButton = ui->warningBanner->addButton(
-        tr("View pinned certificate"), "misc/certificate_text_icon.svg");
+        tr("View pinned certificate"), "20x20/Outline/certificate_text.svg");
 
     // Due to layout flaws caused by QTreeWidgets, dialog size constraints should be set through
     // its child element.
@@ -243,7 +244,7 @@ void ServerCertificateViewer::setCertificateData(
     {
         const auto& cert = m_certificates[i];
         auto newItem = new QTreeWidgetItem(lastItem);
-        newItem->setIcon(0, qnSkin->icon("misc/certificate_icon.svg", kThemeSubstitutions));
+        newItem->setIcon(0, qnSkin->icon(kCertificateIcon));
         newItem->setText(0, name(cert.subject(), certificateDafaultName()));
         newItem->setData(0, Qt::UserRole, i); //< Store certificate index as UserRole data.
         lastItem = newItem;
