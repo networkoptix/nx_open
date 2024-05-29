@@ -16,6 +16,10 @@ StatePicker::StatePicker(
     m_label->setText({});
 
     const auto itemFlags = parentParamsWidget()->eventDescriptor()->flags;
+
+    m_comboBox->setCurrentIndex(-1);
+    m_comboBox->setPlaceholderText(tr("Select state"));
+
     if (itemFlags.testFlag(vms::rules::ItemFlag::instant))
     {
         m_comboBox->addItem(
@@ -42,7 +46,8 @@ void StatePicker::updateUi()
 
 void StatePicker::onCurrentIndexChanged()
 {
-    m_field->setValue(m_comboBox->currentData().value<api::rules::State>());
+    if (m_comboBox->currentIndex() != -1)
+        m_field->setValue(m_comboBox->currentData().value<api::rules::State>());
 }
 
 } // namespace nx::vms::client::desktop::rules
