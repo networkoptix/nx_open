@@ -61,7 +61,7 @@ public:
 
     Property<QString> locale{this, "locale", nx::branding::defaultLocale()};
 
-    Property<QString> logLevel{this, "logLevel"};
+    Property<QString> logLevel{this, "logLevel", "none"};
     Property<qint64> maxLogFileSizeB{this, nx::log::kMaxLogFileSizeSymbolicName,
         nx::log::kDefaultMaxLogFileSizeB};
     Property<qint64> maxLogVolumeSizeB{this, nx::log::kMaxLogVolumeSizeSymbolicName,
