@@ -50,8 +50,14 @@
                 Source="${QT_DIR}/plugins/imageformats"
                 Directory="imageformats">
             <Component><File Name="qgif.dll" KeyPath="yes" DiskId="3"/></Component>
+            <Component><File Name="qicns.dll" KeyPath="yes" DiskId="3"/></Component>
+            <Component><File Name="qico.dll" KeyPath="yes" DiskId="3"/></Component>
             <Component><File Name="qjpeg.dll" KeyPath="yes" DiskId="3"/></Component>
+            <Component><File Name="qsvg.dll" KeyPath="yes" DiskId="3"/></Component>
+            <Component><File Name="qtga.dll" KeyPath="yes" DiskId="3"/></Component>
             <Component><File Name="qtiff.dll" KeyPath="yes" DiskId="3"/></Component>
+            <Component><File Name="qwbmp.dll" KeyPath="yes" DiskId="3"/></Component>
+            <Component><File Name="qwebp.dll" KeyPath="yes" DiskId="3"/></Component>
         </ComponentGroup>
 
         <ComponentGroup
