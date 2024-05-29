@@ -244,14 +244,15 @@ class NxOpenConan(ConanFile):
 
     def finish_import(self):
         for dst, src in self.__imported_files.items():
-            if dst.exists() and dst.stat().st_mtime >= src.stat().st_mtime:
+            if dst.exists() and dst.stat().st_mtime == src.stat().st_mtime:
                 continue
 
             if not dst.parent.exists():
                 dst.parent.mkdir(parents=True)
 
             dst.unlink(missing_ok=True)
-            shutil.copyfile(src, dst, follow_symlinks=False)
+            self.output.info(f"Importing {src} -> {dst}")
+            shutil.copy2(src, dst, follow_symlinks=False)
 
         self.fixLibraryPermissions()
 
