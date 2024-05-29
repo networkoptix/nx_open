@@ -21,6 +21,7 @@ MultiSelectionComboBox
     checkedRole: "isParent"
     decorationRole: "decorationPath"
     placeholder.text: enabled ? qsTr("Select") : ("<" + qsTr("No groups") + ">")
+    closePopupWhenClicked: true
 
     model: AllowedParentsModel
     {

@@ -29,7 +29,7 @@ Control
     property alias placeholder: placeholder
     property alias maxRows: flow.rowLimit
     property var maxItems
-
+    property bool closePopupWhenClicked: false
     property alias listView: listView
 
     implicitWidth: 208
@@ -250,7 +250,11 @@ Control
                         width: listView.width
                             - (listView.scrollBar.visible ? listView.scrollBar.width : 0)
 
-                        onClicked: setChecked(checked)
+                        onClicked:
+                        {
+                            if (closePopupWhenClicked)
+                                popup.close()
+                        }
 
                         onYChanged:
                         {
