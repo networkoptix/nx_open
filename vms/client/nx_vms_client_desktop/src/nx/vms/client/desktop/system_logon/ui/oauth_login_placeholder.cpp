@@ -9,6 +9,15 @@
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <ui/common/palette.h>
 
+namespace {
+
+nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kUnavalableTheme = {
+    {QnIcon::Normal, {.primary = "light16", .secondary = "red_l"}}};
+
+NX_DECLARE_COLORIZED_ICON(
+    kCloudUnavailableIcon, "128x128/Outline/cloud_unavailable.svg", kUnavalableTheme)
+} // namespace
+
 namespace nx::vms::client::desktop {
 
 OauthLoginPlaceholder::OauthLoginPlaceholder(QWidget* parent):
@@ -17,7 +26,7 @@ OauthLoginPlaceholder::OauthLoginPlaceholder(QWidget* parent):
 {
     ui->setupUi(this);
 
-    ui->errorImageLabel->setPixmap(qnSkin->pixmap("misc/cloud_unavailable.svg"));
+    ui->errorImageLabel->setPixmap(qnSkin->icon(kCloudUnavailableIcon).pixmap(128, 128));
 
     auto errorFont = ui->errorTextLabel->font();
     errorFont.setPixelSize(24);

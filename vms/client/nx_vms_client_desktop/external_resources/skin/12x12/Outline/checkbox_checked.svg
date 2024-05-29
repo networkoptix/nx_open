@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="13" height="12" fill="none" viewBox="0 0 13 12">
+  <g class="12x12/Outline/checkbox_checked">
+    <path fill="#E1E7EA" fill-rule="evenodd" d="M1 0h8.782l-.977 1H1v10h10V7.338l1-1.023V11a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1V1a1 1 0 0 1 1-1Zm5.874 8.698 5.843-6-1.434-1.396-5.126 5.266L3.715 4.07l-1.43 1.398L5.443 8.7a1 1 0 0 0 1.431-.001Z" class="Primary" clip-rule="evenodd"/>
+  </g>
+</svg>

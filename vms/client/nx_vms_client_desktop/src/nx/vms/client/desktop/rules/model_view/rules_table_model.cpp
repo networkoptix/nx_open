@@ -260,7 +260,7 @@ QVariant RulesTableModel::stateColumnData(const ConstRulePtr& rule, int role) co
     if (role == Qt::DecorationRole)
     {
         if (!rule->enabled())
-            return "misc/disabled.svg";
+            return "20x20/Outline/block.svg?primary=light10";
 
         if (!rule->isValid() || !rule->validity(appContext()->currentSystemContext()).isValid())
             return "20x20/Solid/alert2.svg?primary=yellow_d";
