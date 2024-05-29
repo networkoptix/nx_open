@@ -368,6 +368,7 @@ private slots:
     void processEnableLicenseRequest();
     void processMoreLicensesRequest();
     void processEncryptedArchiveUnlockRequst();
+    void processCloudAuthorizationRequest();
     void at_renderWatcher_widgetChanged(QnResourceWidget* widget);
     void at_zoomRectChanged();
     void at_ptzController_changed(nx::vms::common::ptz::DataFields fields);

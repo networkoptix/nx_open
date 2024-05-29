@@ -77,7 +77,7 @@ void RemoteSession::Private::terminateServerSessionIfNeeded()
 void RemoteSession::Private::updateTokenExpirationTime()
 {
     connection->serverApi()->getRawResult(
-        "/rest/v1/login/sessions/current",
+        "/rest/v2/login/sessions/current",
         nx::network::rest::Params(),
         nx::utils::guarded(connection.get(),
             [connection = connection.get()](

@@ -808,6 +808,10 @@ public:
         const nx::Uuid& groupId,
         nx::vms::common::SessionTokenHelperPtr helper,
         Result<ErrorOrEmpty>::type&& callback,
+		QThread* targetThread);
+
+    Handle getCurrentSession(
+        Result<ErrorOrData<nx::vms::api::LoginSession>>::type callback,
         QThread* targetThread);
 
     Handle loginAsync(

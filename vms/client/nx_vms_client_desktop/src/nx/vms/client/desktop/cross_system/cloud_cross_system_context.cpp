@@ -19,19 +19,26 @@
 #include <nx/vms/api/data/media_server_data.h>
 #include <nx/vms/api/data/user_model.h>
 #include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/core/network/cloud_connection_factory.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/network/logon_data_helpers.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/resource/data_loaders/caching_camera_data_loader.h>
 #include <nx/vms/client/core/resource/user.h>
+#include <nx/vms/client/core/utils/cloud_session_token_updater.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/ui/actions/actions.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx_ec/data/api_conversion_functions.h>
+#include <ui/workbench/workbench_context.h>
 #include <utils/common/delayed.h>
+#include <utils/common/synctime.h>
 
 #include "cloud_cross_system_context_data_loader.h"
 #include "cloud_layouts_manager.h"
@@ -42,6 +49,7 @@
 namespace nx::vms::client::desktop {
 
 using namespace nx::network::http;
+using namespace nx::cloud::db::api;
 
 namespace {
 
@@ -158,6 +166,13 @@ struct CloudCrossSystemContext::Private
         }
 
         ensureConnection();
+
+        tokenUpdater = std::make_unique<core::CloudSessionTokenUpdater>(q);
+        connect(
+            tokenUpdater.get(),
+            &core::CloudSessionTokenUpdater::sessionTokenExpiring,
+            q,
+            [this]{ issueAccessToken(); });
     }
 
     ~Private()
@@ -181,6 +196,37 @@ struct CloudCrossSystemContext::Private
     std::unique_ptr<SystemContext> systemContext;
     core::UserResourcePtr user;
     CrossSystemServerResourcePtr server;
+    std::unique_ptr<core::CloudSessionTokenUpdater> tokenUpdater;
+    bool needsCloudAuthorization = false;
+
+    void updateTokenUpdater()
+    {
+        auto connection = systemContext->connection();
+        if (!connection)
+            return;
+
+        auto callback = nx::utils::guarded(
+            q,
+            [this](
+                bool /*success*/,
+                int /*handle*/,
+                rest::ErrorOrData<nx::vms::api::LoginSession> errorOrData)
+            {
+                if (auto session = std::get_if<nx::vms::api::LoginSession>(&errorOrData))
+                {
+                    tokenUpdater->onTokenUpdated(
+                        qnSyncTime->currentTimePoint() + session->expiresInS);
+                    needsCloudAuthorization = false;
+                }
+                else if (const auto error = std::get_if<nx::network::rest::Result>(&errorOrData))
+                {
+                    NX_VERBOSE(this, "Update token error: %1", error->error);
+                }
+            });
+
+        if (const auto api = connection->serverApi(); NX_ASSERT(api, "No Server connection"))
+            api->getCurrentSession(std::move(callback), QThread::currentThread());
+    }
 
     /**
      * Debug log representation.
@@ -313,6 +359,7 @@ struct CloudCrossSystemContext::Private
         dataLoader = std::make_unique<CloudCrossSystemContextDataLoader>(
             connection->serverApi(),
             QString::fromStdString(connection->credentials().username));
+
         QObject::connect(dataLoader.get(),
             &CloudCrossSystemContextDataLoader::ready,
             q,
@@ -326,10 +373,13 @@ struct CloudCrossSystemContext::Private
                         dataLoader->serverFootageData());
                     systemContext->globalSettings()->update(dataLoader->systemSettings());
                     systemContext->licensePool()->replaceLicenses(dataLoader->licenses());
+                    if (auto connection = systemContext->connection())
+                        updateTokenUpdater();
                 }
                 addCamerasToResourcePool(dataLoader->cameras());
                 updateStatus(Status::connected);
             });
+
         QObject::connect(dataLoader.get(),
             &CloudCrossSystemContextDataLoader::camerasUpdated,
             q,
@@ -337,7 +387,65 @@ struct CloudCrossSystemContext::Private
             {
                 addCamerasToResourcePool(dataLoader->cameras());
             });
+
+        QObject::connect(qnCloudStatusWatcher,
+            &nx::vms::client::core::CloudStatusWatcher::credentialsChanged,
+            q,
+            [this]()
+            {
+                if (needsCloudAuthorization)
+                    issueAccessToken();
+            });
+
         dataLoader->start(/*requestUser*/ !user);
+    }
+
+    void issueRefreshToken()
+    {
+        appContext()->mainWindowContext()->workbenchContext()->menu()->trigger(ui::action::LoginToCloud);
+    }
+
+    void issueAccessToken()
+    {
+        const QString cloudSystemId = systemContext->globalSettings()->cloudSystemId();
+        const auto remoteConnectionCredentials =
+            qnCloudStatusWatcher->remoteConnectionCredentials();
+
+        IssueTokenRequest request{
+            .grant_type = GrantType::refresh_token,
+            .client_id = core::CloudConnectionFactory::clientId(),
+            .scope = nx::format("cloudSystemId=%1", cloudSystemId).toStdString(),
+            .refresh_token = remoteConnectionCredentials.authToken.value
+        };
+
+        auto callback = nx::utils::guarded(
+            q,
+            [this](ResultCode result, IssueTokenResponse response)
+            {
+                if (result != ResultCode::ok)
+                {
+                    NX_VERBOSE(this, "Issue access token error result: %1", result);
+                    return;
+                }
+
+                if (response.error)
+                {
+                    NX_VERBOSE(this, "Issue access token error responce: %1", response.error);
+                    return;
+                }
+
+                auto connection = systemContext->connection();
+                if (!connection)
+                    return;
+
+                auto credentials = connection->credentials();
+                credentials.authToken = nx::network::http::BearerAuthToken(response.access_token);
+                connection->updateCredentials(credentials, response.expires_at);
+                updateTokenUpdater();
+                dataLoader->requestData();
+            });
+
+        tokenUpdater->issueToken(request, std::move(callback), q);
     }
 
     void addServersToResourcePool(nx::vms::api::ServerInformationList servers)
@@ -608,6 +716,17 @@ QnVirtualCameraResourcePtr CloudCrossSystemContext::createThumbCameraResource(
     const QString& name)
 {
     return d->createThumbCameraResource(id, name);
+}
+
+bool CloudCrossSystemContext::needsCloudAuthorization()
+{
+    return d->needsCloudAuthorization;
+}
+
+void CloudCrossSystemContext::cloudAuthorize()
+{
+    d->issueRefreshToken();
+    d->issueAccessToken();
 }
 
 QString toString(CloudCrossSystemContext::Status status)

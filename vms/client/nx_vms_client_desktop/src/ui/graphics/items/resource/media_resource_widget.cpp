@@ -64,6 +64,9 @@
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/painter_transform_scale_stripper.h>
+#include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
+#include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
+#include <nx/vms/client/desktop/cross_system/cross_system_camera_resource.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ini.h>
@@ -731,7 +734,7 @@ void QnMediaResourceWidget::initAnalyticsOverlays()
 void QnMediaResourceWidget::initStatusOverlayController()
 {
     if (!d->camera)
-         return;
+        return;
 
      const auto changeCameraPassword =
          [this](const QnVirtualCameraResourceList& cameras, bool forceShowCamerasList)
@@ -741,34 +744,38 @@ void QnMediaResourceWidget::initStatusOverlayController()
              menu()->trigger(action::ChangeDefaultCameraPasswordAction, parameters);
          };
 
-     const auto controller = statusOverlayController();
-     connect(controller, &QnStatusOverlayController::buttonClicked, this,
-         [this, changeCameraPassword](Qn::ResourceOverlayButton button)
-         {
-             switch (button)
-             {
-                 case Qn::ResourceOverlayButton::Diagnostics:
-                     processDiagnosticsRequest();
-                     break;
-                 case Qn::ResourceOverlayButton::EnableLicense:
-                     processEnableLicenseRequest();
-                     break;
-                 case Qn::ResourceOverlayButton::Settings:
-                     processSettingsRequest();
-                     break;
-                 case Qn::ResourceOverlayButton::MoreLicenses:
-                     processMoreLicensesRequest();
-                     break;
-                 case Qn::ResourceOverlayButton::SetPassword:
-                     changeCameraPassword(QnVirtualCameraResourceList() << d->camera, false);
-                     break;
-                 case Qn::ResourceOverlayButton::UnlockEncryptedArchive:
-                     processEncryptedArchiveUnlockRequst();
-                     break;
-                 default:
-                     break;
-             }
-         });
+    const auto controller = statusOverlayController();
+    connect(controller, &QnStatusOverlayController::buttonClicked, this,
+        [this, changeCameraPassword](Qn::ResourceOverlayButton button)
+        {
+            switch (button)
+            {
+                case Qn::ResourceOverlayButton::Diagnostics:
+                    processDiagnosticsRequest();
+                    break;
+                case Qn::ResourceOverlayButton::EnableLicense:
+                    processEnableLicenseRequest();
+                    break;
+                case Qn::ResourceOverlayButton::Settings:
+                    processSettingsRequest();
+                    break;
+                case Qn::ResourceOverlayButton::MoreLicenses:
+                    processMoreLicensesRequest();
+                    break;
+                case Qn::ResourceOverlayButton::SetPassword:
+                    changeCameraPassword(QnVirtualCameraResourceList() << d->camera, false);
+                    break;
+                case Qn::ResourceOverlayButton::UnlockEncryptedArchive:
+                    processEncryptedArchiveUnlockRequst();
+                    break;
+                case Qn::ResourceOverlayButton::Authorize:
+                    processCloudAuthorizationRequest();
+                    break;
+                default:
+                    NX_ASSERT("Unexpected button type");
+                    break;
+            }
+        });
 
      connect(controller, &QnStatusOverlayController::customButtonClicked, this,
          [this, changeCameraPassword]()
@@ -3101,6 +3108,15 @@ void QnMediaResourceWidget::processEncryptedArchiveUnlockRequst()
             new EncryptedArchivePasswordDialog(resource(), mainWindow()));
     }
     m_encryptedArchivePasswordDialog->showForEncryptionData(m_encryptedArchiveData);
+}
+
+void QnMediaResourceWidget::processCloudAuthorizationRequest()
+{
+    const auto camera = d->camera.dynamicCast<CrossSystemCameraResource>();
+    if (!camera)
+        return;
+
+    appContext()->cloudCrossSystemManager()->systemContext(camera->systemId())->cloudAuthorize();
 }
 
 void QnMediaResourceWidget::at_item_imageEnhancementChanged()

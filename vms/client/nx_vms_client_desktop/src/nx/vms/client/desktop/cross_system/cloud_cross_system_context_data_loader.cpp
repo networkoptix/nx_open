@@ -188,7 +188,7 @@ struct CloudCrossSystemContextDataLoader::Private
         );
 
         return connection->getRawResult(
-            "/rest/v1/system/settings",
+            "/rest/v2/system/settings",
             {},
             callback,
             q->thread());
@@ -340,8 +340,13 @@ void CloudCrossSystemContextDataLoader::start(bool requestUser)
 
     auto requestDataTimer = new QTimer(this);
     requestDataTimer->setInterval(kRequestDataRetryTimeout);
-    requestDataTimer->callOnTimeout([this]() {d->requestData(); });
+    requestDataTimer->callOnTimeout([this]() { requestData(); });
     requestDataTimer->start();
+    requestData();
+}
+
+void CloudCrossSystemContextDataLoader::requestData()
+{
     d->requestData();
 }
 
