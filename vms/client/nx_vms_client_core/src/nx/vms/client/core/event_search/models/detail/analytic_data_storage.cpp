@@ -2,6 +2,8 @@
 
 #include "analytic_data_storage.h"
 
+#include <nx/vms/client/core/event_search/models/analytics_search_list_model.h>
+
 #include "object_track_facade.h"
 
 namespace nx::vms::client::core::detail {
@@ -44,8 +46,7 @@ int AnalyticDataStorage::indexOf(const nx::Uuid& trackId) const
 
 int AnalyticDataStorage::insert(
     nx::analytics::db::ObjectTrack&& item,
-    std::function<void(int index)> notifyBeforeInsertion,
-    std::function<void()> notifyAfterInsertion)
+    AnalyticsSearchListModel* model)
 {
     const auto position = std::upper_bound(items.begin(), items.end(), item,
         [](const ObjectTrack& left, const ObjectTrack& right)
@@ -56,16 +57,10 @@ int AnalyticDataStorage::insert(
         });
 
     const int index = position - items.begin();
-
-    if (notifyBeforeInsertion)
-        notifyBeforeInsertion(index);
-
     idToTimestamp[item.id] = ObjectTrackFacade::startTime(item);
+
+    const AnalyticsSearchListModel::ScopedInsertRows insertGuard(model, index, index, !!model);
     items.insert(position, std::move(item));
-
-    if (notifyAfterInsertion)
-        notifyAfterInsertion();
-
     return index;
 }
 
@@ -81,6 +76,13 @@ void AnalyticDataStorage::clear()
 {
     items.clear();
     idToTimestamp.clear();
+}
+
+void AnalyticDataStorage::rebuild()
+{
+    idToTimestamp.clear();
+    for (const auto& item: items)
+        idToTimestamp[item.id] = ObjectTrackFacade::startTime(item);
 }
 
 } // namespace nx::vms::client::core::detail
