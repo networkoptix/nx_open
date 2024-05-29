@@ -3,7 +3,6 @@
 import QtQuick
 import QtQuick.Window
 
-import Nx
 import Nx.Controls
 import Nx.Core
 
