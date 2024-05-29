@@ -917,6 +917,7 @@ FetchedDataRanges AnalyticsSearchListModel::Private::applyFetchedData(
     // Explicitly update fetched time window in case of new tracks update.
     q->setFetchedTimeWindow(timeWindow<Facade>(data.items));
 
+    data.rebuild();
     return fetched.ranges;
 }
 
@@ -1109,13 +1110,10 @@ void AnalyticsSearchListModel::commitAvailableNewTracks()
         return;
 
     NX_VERBOSE(this, "Live update commit");
-    NX_ASSERT(detail::isSortedCorrectly<Facade>(d->newTracks.items,
-        sortOrderFromDirection(FetchDirection::newer)));
-    const auto centralPoint = d->data.items.empty()
-        ?  Facade::startTime(d->data.items.front())
-        : Facade::startTime(d->newTracks.items.front());
-    d->applyFetchedData(std::move(d->newTracks.items),
-        FetchRequest{.direction = FetchDirection::newer, .centralPointUs = centralPoint});
+
+    for (auto& item: d->newTracks.items)
+        d->data.insert(std::move(item), this);
+
     d->newTracks.clear();
 
     if (d->liveProcessingMode == LiveProcessingMode::manualAdd)

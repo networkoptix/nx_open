@@ -9,6 +9,8 @@
 #include <analytics/db/analytics_db_types.h>
 #include <nx/utils/uuid.h>
 
+namespace nx::vms::client::core { class AnalyticsSearchListModel; }
+
 namespace nx::vms::client::core::detail {
 
 struct AnalyticDataStorage
@@ -29,8 +31,9 @@ struct AnalyticDataStorage
     // This function handles single item insertion. It returns index of inserted item.
     // Block insertion is handled outside.
     int insert(nx::analytics::db::ObjectTrack&& item,
-        std::function<void(int index)> notifyBeforeInsertion = nullptr,
-        std::function<void()> notifyAfterInsertion = nullptr);
+        AnalyticsSearchListModel* model = nullptr);
+
+    void rebuild();
 };
 
 } // namespace nx::vms::client::core::detail

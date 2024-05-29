@@ -36,12 +36,13 @@ void mergeOldData(NewDataContainer& newData,
         ? typename Facade::TimeType(0)
         : Facade::startTime(newData.front());
 
+    const bool newDataWasEmpty = newData.empty();
     if (direction == EventSearch::FetchDirection::newer)
         newData.insert(newData.begin(), oldData.rbegin(), oldData.rend());
     else
         newData.insert(newData.begin(), oldData.begin(), oldData.end());
 
-    if (newData.empty())
+    if (newDataWasEmpty)
         return;
 
     const auto startIt = std::lower_bound(newData.begin(), newData.end(), centralTimePoint,
@@ -49,7 +50,8 @@ void mergeOldData(NewDataContainer& newData,
     const auto endIt = std::upper_bound(startIt, newData.end(), centralTimePoint,
         Predicate::upperBound(direction));
 
-           // We don't expect a wide range to check here as it consists of items with one timestamp.
+    // We don't expect a wide range to check here as it consists of items with one timestamp.
+    // Also we expect that the items are unchanged.
     std::set<nx::Uuid> foundIds;
     const auto removeStartIt = std::remove_if(startIt, endIt,
         [&foundIds](const auto& item)
