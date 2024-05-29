@@ -34,8 +34,7 @@ public:
 
     virtual ~AnalyticsSearchSynchronizer() override;
 
-    void ensureVisible(std::chrono::milliseconds timestamp, const nx::Uuid& trackId,
-        const QnTimePeriod& proposedTimeWindow);
+    void ensureVisible(std::chrono::milliseconds timestamp, const nx::Uuid& trackId);
 
 private:
     bool calculateMediaResourceWidgetAnalyticsEnabled(QnMediaResourceWidget* widget) const;

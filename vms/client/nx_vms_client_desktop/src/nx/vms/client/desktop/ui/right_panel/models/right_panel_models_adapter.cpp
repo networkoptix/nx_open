@@ -1478,8 +1478,11 @@ void RightPanelModelsAdapter::Private::ensureAnalyticsRowVisible(int row)
 
     const auto timestamp = index.data(core::TimestampRole).value<microseconds>();
     const auto trackId = index.data(core::ObjectTrackIdRole).value<nx::Uuid>();
-    if (const auto& timeWindow = m_analyticsSetup->model()->fetchedTimeWindow())
-        synchronizer->ensureVisible(duration_cast<milliseconds>(timestamp), trackId, *timeWindow);
+    if (auto timeWindow = m_analyticsSetup->model()->fetchedTimeWindow())
+    {
+        NX_ASSERT(timeWindow->startTime() <= timestamp && timestamp <= timeWindow->endTime());
+        synchronizer->ensureVisible(duration_cast<milliseconds>(timestamp), trackId);
+    }
 }
 
 void RightPanelModelsAdapter::Private::setUnreadTrackingEnabled(bool value)
