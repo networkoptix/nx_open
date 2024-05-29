@@ -21,6 +21,7 @@ public:
     static bool emptyListIsValid() { return true; }
     static bool multiChoiceListIsValid() { return true; }
     static bool showRecordingIndicator() { return false; }
+    static bool showAllCamerasSwitch() { return false; }
 };
 
 struct NX_VMS_COMMON_API QnRequireCameraPolicy
@@ -37,6 +38,7 @@ public:
     static bool emptyListIsValid() { return false; }
     static bool multiChoiceListIsValid() { return true; }
     static bool showRecordingIndicator() { return false; }
+    static bool showAllCamerasSwitch() { return false; }
 };
 
 class NX_VMS_COMMON_API QnCameraInputPolicy
@@ -53,6 +55,7 @@ public:
     static bool emptyListIsValid() { return true; }
     static bool multiChoiceListIsValid() { return true; }
     static bool showRecordingIndicator() { return false; }
+    static bool showAllCamerasSwitch() { return true; }
 };
 
 class NX_VMS_COMMON_API QnCameraOutputPolicy
@@ -69,6 +72,7 @@ public:
     static bool emptyListIsValid() { return false; }
     static bool multiChoiceListIsValid() { return true; }
     static bool showRecordingIndicator() { return false; }
+    static bool showAllCamerasSwitch() { return true; }
 };
 
 class NX_VMS_COMMON_API QnExecPtzPresetPolicy
@@ -86,6 +90,7 @@ public:
     static bool multiChoiceListIsValid() { return false; }
     static bool showRecordingIndicator() { return false; }
     static bool canUseSourceCamera() { return false; }
+    static bool showAllCamerasSwitch() { return true; }
 };
 
 class NX_VMS_COMMON_API QnCameraMotionPolicy
@@ -102,6 +107,7 @@ public:
     static bool emptyListIsValid() { return true; }
     static bool multiChoiceListIsValid() { return true; }
     static bool showRecordingIndicator() { return true; }
+    static bool showAllCamerasSwitch() { return true; }
 };
 
 class NX_VMS_COMMON_API QnCameraAudioTransmitPolicy
@@ -118,6 +124,7 @@ public:
     static bool emptyListIsValid() { return false; }
     static bool multiChoiceListIsValid() { return true; }
     static bool showRecordingIndicator() { return false; }
+    static bool showAllCamerasSwitch() { return true; }
 };
 
 class NX_VMS_COMMON_API QnCameraRecordingPolicy
@@ -134,6 +141,7 @@ public:
     static bool emptyListIsValid() { return false; }
     static bool multiChoiceListIsValid() { return true; }
     static bool showRecordingIndicator() { return true; }
+    static bool showAllCamerasSwitch() { return true; }
 };
 
 class NX_VMS_COMMON_API QnCameraAnalyticsPolicy
@@ -150,6 +158,7 @@ public:
     static bool emptyListIsValid() { return false; }
     static bool multiChoiceListIsValid() { return true; }
     static bool showRecordingIndicator() { return false; }
+    static bool showAllCamerasSwitch() { return true; }
 };
 
 using QnBookmarkActionPolicy = QnCameraRecordingPolicy;
@@ -160,7 +169,7 @@ class NX_VMS_COMMON_API QnFullscreenCameraPolicy
 
 public:
     typedef QnVirtualCameraResource resource_type;
-    static bool isResourceValid(const QnVirtualCameraResourcePtr &camera);
+    static bool isResourceValid(const QnVirtualCameraResourcePtr&) { return true; };
     static QString getText(
         nx::vms::common::SystemContext* context,
         const QnResourceList& resources,
@@ -169,4 +178,5 @@ public:
     static bool multiChoiceListIsValid() { return false; }
     static bool showRecordingIndicator() { return false; }
     static bool canUseSourceCamera() { return true; }
+    static bool showAllCamerasSwitch() { return false; }
 };
