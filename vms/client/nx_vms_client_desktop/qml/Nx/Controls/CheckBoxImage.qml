@@ -37,13 +37,13 @@ ColoredImage
         switch (checkState)
         {
             case Qt.Checked:
-                return "image://skin/theme/checkbox_checked.svg"
+                return "image://skin/12x12/Outline/checkbox_checked.svg"
 
             case Qt.Unchecked:
-                return "image://skin/theme/checkbox_unchecked.svg"
+                return "image://skin/12x12/Outline/checkbox_empty.svg"
 
             case Qt.PartiallyChecked:
-                return "image://skin/theme/checkbox_partially_checked.svg"
+                return "image://skin/12x12/Outline/checkbox_half_checked.svg"
 
             default:
                 console.assert(false, `Invalid check state ${checkState}`)
