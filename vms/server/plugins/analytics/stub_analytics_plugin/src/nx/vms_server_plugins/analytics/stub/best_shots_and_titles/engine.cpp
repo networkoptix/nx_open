@@ -35,6 +35,7 @@ std::string Engine::manifestString() const
 R"json(
 {
     "streamTypeFilter": "compressedVideo",
+    "capabilities": "noAutoBestShots",
     "deviceAgentSettingsModel":
     {
         "type": "Settings",
@@ -65,7 +66,7 @@ R"json(
                     },
                     {
                         "type": "SpinBox",
-                        "name": ")json" + kObjectCountSetting + R"json(",
+                        "name": ")json" + kBestShotObjectCountSetting + R"json(",
                         "caption": "Object count",
                         "minValue": 0,
                         "defaultValue": 1
@@ -87,7 +88,7 @@ R"json(
                     {
                         "type": "DoubleSpinBox",
                         "caption": "Horizontal shift",
-                        "name": ")json" + kTopLeftXSetting + R"json(",
+                        "name": ")json" + kBestShotTopLeftXSetting + R"json(",
                         "defaultValue": 0.0,
                         "minValue": 0.0,
                         "maxValue": 1.0
@@ -95,7 +96,7 @@ R"json(
                     {
                         "type": "DoubleSpinBox",
                         "caption": "Vertical shift",
-                        "name": ")json" + kTopLeftYSetting + R"json(",
+                        "name": ")json" + kBestShotTopLeftYSetting + R"json(",
                         "defaultValue": 0.0,
                         "minValue": 0.0,
                         "maxValue": 1.0
@@ -103,7 +104,7 @@ R"json(
                     {
                         "type": "DoubleSpinBox",
                         "caption": "Width",
-                        "name": ")json" + kWidthSetting + R"json(",
+                        "name": ")json" + kBestShotWidthSetting + R"json(",
                         "defaultValue": 0.2,
                         "minValue": 0.0,
                         "maxValue": 1.0
@@ -111,7 +112,7 @@ R"json(
                     {
                         "type": "DoubleSpinBox",
                         "caption": "Height",
-                        "name": ")json" + kHeightSetting + R"json(",
+                        "name": ")json" + kBestShotHeightSetting + R"json(",
                         "defaultValue": 0.2,
                         "minValue": 0.0,
                         "maxValue": 1.0
@@ -144,24 +145,80 @@ R"json(
             },
             {
                 "type": "GroupBox",
-                "caption": "General Track Title generation settings",
+                "caption": "General Object Track Title generation settings",
+                "defaultValue": ")json" + kFixedBoundingBoxTitleGenerationPolicy + R"json(",
                 "items":
                 [
                     {
                         "type": "ComboBox",
                         "name": ")json" + kTitleGenerationPolicySetting + R"json(",
                         "caption": "Track Title generation policy",
-                        "defaultValue": ")json" + kUrlTitleGenerationPolicy + R"json(",
+                        "defaultValue": ")json" + kFixedBoundingBoxTitleGenerationPolicy + R"json(",
                         "range":
                         [
+                            ")json" + kFixedBoundingBoxTitleGenerationPolicy + R"json(",
                             ")json" + kUrlTitleGenerationPolicy + R"json(",
                             ")json" + kImageTitleGenerationPolicy + R"json("
                         ],
                         "itemCaptions":
                         {
+                            ")json" + kFixedBoundingBoxTitleGenerationPolicy + R"json(": "Fixed bounding box",
                             ")json" + kUrlTitleGenerationPolicy + R"json(": "URL",
                             ")json" + kImageTitleGenerationPolicy + R"json(": "Image"
                         }
+                    },
+                    {
+                        "type": "SpinBox",
+                        "name": ")json" + kTitleObjectCountSetting + R"json(",
+                        "caption": "Object count",
+                        "minValue": 0,
+                        "defaultValue": 1
+                    },
+                    {
+                        "type": "SpinBox",
+                        "name": ")json" + kFrameNumberToGenerateTitleSetting + R"json(",
+                        "caption": "Frame number to generate Object Title",
+                        "minValue": 0,
+                        "defaultValue": 0
+                    }
+                ]
+            },
+            {
+                "type": "GroupBox",
+                "caption": "Fixed bounding box Object Title settings",
+                "items":
+                [
+                    {
+                        "type": "DoubleSpinBox",
+                        "caption": "Horizontal shift",
+                        "name": ")json" + kTitleTopLeftXSetting + R"json(",
+                        "defaultValue": 0.0,
+                        "minValue": 0.0,
+                        "maxValue": 1.0
+                    },
+                    {
+                        "type": "DoubleSpinBox",
+                        "caption": "Vertical shift",
+                        "name": ")json" + kTitleTopLeftYSetting + R"json(",
+                        "defaultValue": 0.0,
+                        "minValue": 0.0,
+                        "maxValue": 1.0
+                    },
+                    {
+                        "type": "DoubleSpinBox",
+                        "caption": "Width",
+                        "name": ")json" + kTitleWidthSetting + R"json(",
+                        "defaultValue": 0.2,
+                        "minValue": 0.0,
+                        "maxValue": 1.0
+                    },
+                    {
+                        "type": "DoubleSpinBox",
+                        "caption": "Height",
+                        "name": ")json" + kTitleHeightSetting + R"json(",
+                        "defaultValue": 0.2,
+                        "minValue": 0.0,
+                        "maxValue": 1.0
                     }
                 ]
             },

@@ -50,6 +50,7 @@ private:
 
     enum class TitleGenerationPolicy
     {
+        fixed,
         url,
         image,
     };
@@ -70,6 +71,7 @@ private:
     struct TitleGenerationConext
     {
         TitleGenerationPolicy policy;
+        int frameNumberToGenerateTitle = 0;
 
         std::string url;
 
@@ -77,6 +79,8 @@ private:
         std::vector<char> imageData;
 
         std::string text;
+
+        nx::sdk::analytics::Rect fixedTitleBoundingBox;
     };
 
 private:
@@ -95,18 +99,36 @@ private:
     nx::sdk::Ptr<nx::sdk::analytics::IObjectTrackBestShotPacket> generateImageBestShot(
         nx::sdk::Uuid trackId);
 
-    nx::sdk::Ptr<nx::sdk::analytics::IObjectMetadataPacket> generateObjects();
+    nx::sdk::Ptr<nx::sdk::analytics::IObjectTrackTitlePacket> generateFixedTitle(
+        nx::sdk::Uuid trackId);
+
+    nx::sdk::Ptr<nx::sdk::analytics::IObjectTrackTitlePacket> generateUrlTitle(
+        nx::sdk::Uuid trackId);
+
+    nx::sdk::Ptr<nx::sdk::analytics::IObjectTrackTitlePacket> generateImageTitle(
+        nx::sdk::Uuid trackId);
+
+    void generateBestShotOrTitle();
+    void generateBestShotObject();
+    void generateTitleObject();
+
+    void configureBestShots(std::map<std::string, std::string>& settings);
+    void configureTitles(std::map<std::string, std::string>& settings);
 
     static BestShotGenerationPolicy bestShotGenerationPolicyFromString(const std::string& str);
     static TitleGenerationPolicy titleGenerationPolicyFromString(const std::string& str);
 
 private:
-    std::vector<TrackContext> m_trackContexts;
+    std::vector<TrackContext> m_bestShotTrackContexts;
     BestShotGenerationContext m_bestShotGenerationContext;
+    std::map<nx::sdk::Uuid, int> m_bestShotGenerationCounterByTrackId;
+
+    std::vector<TrackContext> m_titleTrackContexts;
     TitleGenerationConext m_titleGenerationContext;
+    std::map<nx::sdk::Uuid, int> m_titleGenerationCounterByTrackId;
 
     int64_t m_lastFrameTimestampUs = 0;
-    std::map<nx::sdk::Uuid, int> m_bestShotGenerationCounterByTrackId;
+    bool m_generateBestShotOrTitle = true;
 };
 
 } // namespace best_shots

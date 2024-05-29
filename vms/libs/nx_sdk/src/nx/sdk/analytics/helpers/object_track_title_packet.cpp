@@ -10,10 +10,14 @@ namespace nx::sdk::analytics {
 
 ObjectTrackTitlePacket::ObjectTrackTitlePacket(
     Uuid trackId,
-    int64_t timestampUs)
+    int64_t timestampUs,
+    Rect boundingBox,
+    const std::string& text)
     :
     m_trackId(trackId),
-    m_timestampUs(timestampUs)
+    m_timestampUs(timestampUs),
+    m_boundingBox(boundingBox),
+    m_text(text)
 {
 }
 
@@ -25,6 +29,11 @@ ObjectTrackTitlePacket::Flags ObjectTrackTitlePacket::flags() const
 int64_t ObjectTrackTitlePacket::timestampUs() const
 {
     return m_timestampUs;
+}
+
+void ObjectTrackTitlePacket::getBoundingBox(Rect* outValue) const
+{
+    *outValue = m_boundingBox;
 }
 
 void ObjectTrackTitlePacket::getTrackId(Uuid* outValue) const
@@ -65,6 +74,11 @@ void ObjectTrackTitlePacket::setFlags(Flags flags)
 void ObjectTrackTitlePacket::setTimestampUs(int64_t timestampUs)
 {
     m_timestampUs = timestampUs;
+}
+
+void ObjectTrackTitlePacket::setBoundingBox(const Rect& boundingBox)
+{
+    m_boundingBox = boundingBox;
 }
 
 void ObjectTrackTitlePacket::setTrackId(const Uuid& trackId)

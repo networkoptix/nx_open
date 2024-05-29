@@ -236,21 +236,21 @@ class StreamEntryEncoder(json.JSONEncoder):
         result[self.TRACK_ID_KEY] = o.object_position.track_id
         result[self.FRAME_NUMBER_KEY] = o.frame_number
 
+        result[self.BOUNDING_BOX_KEY] = {}
+        result[self.BOUNDING_BOX_KEY][self.TOP_LEFT_X_KEY] = o.object_position.bounding_box.x
+        result[self.BOUNDING_BOX_KEY][self.TOP_LEFT_Y_KEY] = o.object_position.bounding_box.y
+        result[self.BOUNDING_BOX_KEY][self.WIDTH_KEY] = o.object_position.bounding_box.width
+        result[self.BOUNDING_BOX_KEY][self.HEIGHT_KEY] = o.object_position.bounding_box.height
+
         if o.entry_type == StreamEntry.TITLE_ENTRY_TYPE:
             result[self.ENTRY_TYPE_KEY] = StreamEntry.TITLE_ENTRY_TYPE
             result[self.IMAGE_SOURCE_KEY] = o.image_source
             result[self.TITLE_TEXT_KEY] = o.title_text
             return result # We don't need to fill anything else for Object Track Titles.
 
-
         result[self.TYPE_ID_KEY] = o.object_position.type_id
 
         result[self.ATTRIBUTES_KEY] = o.object_position.attributes
-        result[self.BOUNDING_BOX_KEY] = {}
-        result[self.BOUNDING_BOX_KEY][self.TOP_LEFT_X_KEY] = o.object_position.bounding_box.x
-        result[self.BOUNDING_BOX_KEY][self.TOP_LEFT_Y_KEY] = o.object_position.bounding_box.y
-        result[self.BOUNDING_BOX_KEY][self.WIDTH_KEY] = o.object_position.bounding_box.width
-        result[self.BOUNDING_BOX_KEY][self.HEIGHT_KEY] = o.object_position.bounding_box.height
 
         if o.entry_type == StreamEntry.BEST_SHOT_ENTRY_TYPE:
             result[self.IMAGE_SOURCE_KEY] = o.image_source
@@ -299,7 +299,7 @@ class RandomMovementGenerator(Generator):
         MAX_HEIGHT_KEY = 'maxHeight'
         ATTRIBUTES_KEY = 'attributes'
         BEST_SHOTS_KEY = 'bestShots'
-        OBJECT_TRACK_TITLE_KEY = 'objectTrackTitle'
+        OBJECT_TRACK_TITLES_KEY = 'objectTrackTitles'
         IMAGE_SOURCE_KEY = 'imageSource'
         TITLE_TEXT_KEY = 'titleText'
         FRAME_NUMBER_KEY = 'frameNumber'
@@ -333,7 +333,7 @@ class RandomMovementGenerator(Generator):
             self.attributes = (config.get(self.ATTRIBUTES_KEY)
                 if config.get(self.ATTRIBUTES_KEY) is not None else {})
             self.best_shots_by_frame_number = {}
-            self.title = None
+            self.titles_by_frame_number = {}
 
             best_shots = config.get(self.BEST_SHOTS_KEY)
             if isinstance(best_shots, collections.abc.Sequence):
@@ -346,12 +346,17 @@ class RandomMovementGenerator(Generator):
                     best_shot.image_source = entry.get(self.IMAGE_SOURCE_KEY)
                     self.best_shots_by_frame_number[frame_number] = best_shot
 
-            titleEntry = config.get(self.OBJECT_TRACK_TITLE_KEY)
-            if titleEntry is not None:
-                title = Title()
-                title.image_source = titleEntry.get(self.IMAGE_SOURCE_KEY)
-                title.title_text = titleEntry.get(self.TITLE_TEXT_KEY)
-                self.title = title
+            titles = config.get(self.OBJECT_TRACK_TITLES_KEY)
+            if isinstance(titles, collections.abc.Sequence):
+                for entry in titles:
+                    frame_number = entry.get(self.FRAME_NUMBER_KEY)
+                    if not isinstance(frame_number, int):
+                        continue
+                    title = Title()
+                    title.image_source = entry.get(self.IMAGE_SOURCE_KEY)
+                    title.title_text = entry.get(self.TITLE_TEXT_KEY)
+                    self.titles_by_frame_number[frame_number] = title
+
 
     def __init__(self, config: Dict, generator_id: int):
         self._config = self.Config(config)
@@ -400,6 +405,7 @@ class RandomMovementGenerator(Generator):
             return None
 
         best_shot = self._config.best_shots_by_frame_number.get(frame_number)
+
         stream_entry = StreamEntry(frame_number, object_context)
         stream_entry.entry_type = StreamEntry.BEST_SHOT_ENTRY_TYPE
         stream_entry.image_source = best_shot.image_source
@@ -409,17 +415,17 @@ class RandomMovementGenerator(Generator):
         return stream_entry
 
     def generate_title(self, frame_number: int, object_context: ObjectContext) -> StreamEntry:
-        title = self._config.title
-
-        if title is None:
+        if frame_number not in self._config.titles_by_frame_number:
             return None
+
+        title = self._config.titles_by_frame_number.get(frame_number)
 
         stream_entry = StreamEntry(frame_number, object_context)
         stream_entry.entry_type = StreamEntry.TITLE_ENTRY_TYPE
-        stream_entry.title_text = title.title_text
         stream_entry.image_source = title.image_source
-
         stream_entry.object_position = copy.deepcopy(object_context.object_position)
+
+        stream_entry.title_text = title.title_text
 
         return stream_entry
 

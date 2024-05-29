@@ -3,6 +3,7 @@
 #pragma once
 
 #include <nx/sdk/analytics/i_metadata_packet.h>
+#include <nx/sdk/analytics/rect.h>
 #include <nx/sdk/interface.h>
 
 namespace nx::sdk::analytics {
@@ -26,6 +27,14 @@ public:
     protected: virtual void getTrackId(Uuid* outValue) const = 0;
     /** @return Id of the Object Track the Title belongs to. */
     public: Uuid trackId() const { Uuid value; getTrackId(&value); return value; }
+
+    /** Called by boundingBox() */
+    protected: virtual void getBoundingBox(Rect* outValue) const = 0;
+    /**
+     * @return Bounding box of the Object Title, or an invalid rectangle (e.g. a default-constructed)
+     *     if the Object Title bounding box is unknown.
+     */
+    public: Rect boundingBox() const { Rect value; getBoundingBox(&value); return value; }
 
     /**
      * @return Title text. Can be empty, but not null.

@@ -14,13 +14,13 @@ const std::string kFixedBoundingBoxBestShotGenerationPolicy =
 const std::string kUrlBestShotGenerationPolicy = "urlBestShotGenerationPolicy";
 const std::string kImageBestShotGenerationPolicy = "imageBestShotGenerationPolicy";
 
-const std::string kObjectCountSetting = "objectCount";
+const std::string kBestShotObjectCountSetting = "bestShotObjectCount";
 const std::string kFrameNumberToGenerateBestShotSetting = "frameNumberToGenerateBestShot";
 
-const std::string kTopLeftXSetting = "topLeftX";
-const std::string kTopLeftYSetting = "topLeftY";
-const std::string kWidthSetting = "width";
-const std::string kHeightSetting = "height";
+const std::string kBestShotTopLeftXSetting = "bestShotTopLeftX";
+const std::string kBestShotTopLeftYSetting = "bestShotTopLeftY";
+const std::string kBestShotWidthSetting = "bestShotWidth";
+const std::string kBestShotHeightSetting = "bestShotHeight";
 
 const std::string kBestShotUrlSetting = "bestShotUrl";
 const std::string kBestShotImagePathSetting = "bestShotImage";
@@ -28,9 +28,20 @@ const std::string kBestShotImagePathSetting = "bestShotImage";
 const std::string kTitleGenerationPolicySetting = "titleGenerationPolicy";
 const std::string kUrlTitleGenerationPolicy = "urlTitleGenerationPolicy";
 const std::string kImageTitleGenerationPolicy = "imageTitleGenerationPolicy";
+const std::string kFixedBoundingBoxTitleGenerationPolicy =
+    "fixedBoundingBoxTitleGenerationPolicy";
+
 const std::string kTitleUrlSetting = "titleUrl";
 const std::string kTitleImagePathSetting = "titleImage";
 const std::string kTitleTextSetting = "titleText";
+
+const std::string kTitleTopLeftXSetting = "titleTopLeftX";
+const std::string kTitleTopLeftYSetting = "titleTopLeftY";
+const std::string kTitleWidthSetting = "titleWidth";
+const std::string kTitleHeightSetting = "titleHeight";
+
+const std::string kTitleObjectCountSetting = "titleObjectCount";
+const std::string kFrameNumberToGenerateTitleSetting = "frameNumberToGenerateTitle";
 
 } // namespace best_shots
 } // namespace stub

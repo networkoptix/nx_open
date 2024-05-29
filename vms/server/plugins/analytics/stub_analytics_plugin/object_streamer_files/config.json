@@ -29,7 +29,8 @@
                 "LicensePlate.State/Province": "77",
                 "LicensePlate.Country": "Russia"
             },
-            "bestShots": [
+            "bestShots":
+            [
                 {
                     "imageSource": "https://picsum.photos/200/300",
                     "frameNumber": 10,
@@ -44,11 +45,14 @@
                     }
                 }
             ],
-            "objectTrackTitle":
-            {
-                "imageSource": "https://picsum.photos/200/300",
-                "titleText": "Title Text 1"
-            }
+            "objectTrackTitles":
+            [
+                {
+                    "imageSource": "https://picsum.photos/200/300",
+                    "frameNumber": 10,
+                    "titleText": "Title Text 1"
+                }
+            ]
         },
         {
             "objectTypeId": "nx.base.Car",
@@ -58,7 +62,8 @@
             "minHeight": 0.2,
             "maxWidth": 0.4,
             "maxHeight": 0.4,
-            "attributes": {
+            "attributes":
+            {
                 "Color": "Green",
                 "Brand": "BMW",
                 "Model": "X5",
@@ -66,19 +71,23 @@
                 "LicensePlate.State/Province": "Texas",
                 "LicensePlate.Country": "USA"
             },
-            "bestShots": [
+            "bestShots":
+            [
                 {
                     "frameNumber": 250,
-                    "attributes": {
+                    "attributes":
+                    {
                         "Best Shot Type": "Bounding Box"
                     }
                 }
             ],
-            "objectTrackTitle":
-            {
-                "imageSource": "https://picsum.photos/200/300",
-                "titleText": "Title Text 2"
-            }
+            "objectTrackTitles":
+            [
+                {
+                    "frameNumber": 250,
+                    "titleText": "Title Text 2"
+                }
+            ]
         },
         {
             "objectTypeId": "nx.base.Car",
@@ -88,7 +97,8 @@
             "minHeight": 0.1,
             "maxWidth": 0.2,
             "maxHeight": 0.2,
-            "attributes": {
+            "attributes":
+            {
                 "Color": "Yellow",
                 "Brand": "Fiat",
                 "Model": "124 Spider",
@@ -105,7 +115,8 @@
             "minHeight": 0.4,
             "maxWidth": 0.25,
             "maxHeight": 0.4,
-            "attributes": {
+            "attributes":
+            {
                 "Color": "White",
                 "Brand": "Ford",
                 "Model": "F150",
@@ -121,7 +132,8 @@
             "minHeight": 0.1,
             "maxWidth": 0.5,
             "maxHeight": 0.5,
-            "attributes": {
+            "attributes":
+            {
                 "Color": "Blue",
                 "Brand": "Bogdan",
                 "Model": "A-092",
@@ -137,7 +149,8 @@
             "minHeight": 0.1,
             "maxWidth": 0.1,
             "maxHeight": 0.2,
-            "attributes": {
+            "attributes":
+            {
                 "Age": "32",
                 "Gender": "Woman",
                 "Body Shape": "Normal",
@@ -154,7 +167,8 @@
             "minHeight": 0.1,
             "maxWidth": 0.1,
             "maxHeight": 0.2,
-            "attributes": {
+            "attributes":
+            {
                 "Age": "39",
                 "Gender": "Man",
                 "Body Shape": "Normal",
@@ -167,7 +181,8 @@
             "objectTypeId": "stub.objectStreamer.custom.type.1",
             "movementPolicy": "random",
             "trackIdPolicy": "changeOncePerStreamCycle",
-            "attributes": {
+            "attributes":
+            {
                 "string attribute 1": "first string attribute",
                 "string attribute 2": "second string attribute",
                 "number attribute 1": "0.1",
