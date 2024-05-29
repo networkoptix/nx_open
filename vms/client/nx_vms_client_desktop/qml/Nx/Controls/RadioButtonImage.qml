@@ -35,7 +35,7 @@ ColoredImage
     sourcePath:
     {
         return checked
-            ? "theme/radiobutton_checked.png"
-            : "theme/radiobutton.png"
+            ? "image://skin/12x12/Outline/radio_checked.svg"
+            : "image://skin/12x12/Outline/radio_empty.svg"
     }
 }
