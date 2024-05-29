@@ -3894,7 +3894,7 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>Text Files</source>
-      <translation type="unfinished">Text Files</translation>
+      <translation>Tệp văn bản</translation>
     </message>
   </context>
   <context>
@@ -3992,7 +3992,7 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>Displays IP addresses for cameras and servers.</source>
-      <translation type="unfinished">Displays IP addresses for cameras and servers.</translation>
+      <translation>Hiển thị địa chỉ IP cho camera và máy chủ.</translation>
     </message>
   </context>
   <context>

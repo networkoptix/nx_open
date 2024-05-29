@@ -1569,7 +1569,7 @@
     </message>
     <message>
       <source>URI for resource_data.json automatic update</source>
-      <translation>URI cho cập nhật tự động resource_data.json</translation>
+      <translation>URL cho cập nhật tự động resource_data.json</translation>
     </message>
     <message>
       <source>Meta data storage change policy</source>
