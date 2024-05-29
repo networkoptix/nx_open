@@ -77,6 +77,7 @@ Item
                 sourceSize: Qt.size(width, height)
                 primaryColor: "dark7"
                 secondaryColor: "light10"
+                tertiaryColor: "light4"
             }
 
             EditableLabel
