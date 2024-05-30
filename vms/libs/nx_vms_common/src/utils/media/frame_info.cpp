@@ -16,6 +16,7 @@
 #include <nx/utils/math/math.h>
 #include <nx/utils/switch.h>
 #include <utils/color_space/yuvconvert.h>
+#include <utils/media/nx_image_ini.h>
 
 extern "C"
 {
@@ -479,7 +480,7 @@ bool CLVideoDecoderOutput::convertTo(const AVFrame* avFrame) const
         return false;
     }
 
-    if (convertUsingSimdIntrTo(avFrame))
+    if (nxImageIni().enableSseColorConvertion && convertUsingSimdIntrTo(avFrame))
         return true;
 
     return convertImageFormat(
