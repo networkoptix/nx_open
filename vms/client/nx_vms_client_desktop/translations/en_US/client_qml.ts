@@ -169,6 +169,29 @@
     </message>
 </context>
 <context>
+    <name>AnalyticsPanel</name>
+    <message>
+        <source>Select area</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Select some area on the video...</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>In selected area</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>No objects</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Try changing the filters or configure object detection in the camera plugin settings</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
     <name>AnalyticsSearchDialog</name>
     <message>
         <source>Advanced Object Search</source>
@@ -208,6 +231,10 @@
     <message>
         <source>new results</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -357,6 +384,17 @@ Select an Integration to begin configuring its parameters.</source>
     <message>
         <source>keep current value</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>BookmarksPanel</name>
+    <message>
+        <source>No bookmarks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a time span on the timeline and right-click the highlighted section to create a bookmark</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -554,7 +592,19 @@ Select an Integration to begin configuring its parameters.</source>
 <context>
     <name>CounterBlock</name>
     <message>
-        <source>Preview</source>
+        <source>Hide information</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Show information</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Hide thumbnails</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Show thumbnails</source>
         <translation></translation>
     </message>
 </context>
@@ -616,12 +666,42 @@ Select an Integration to begin configuring its parameters.</source>
         <translation></translation>
     </message>
     <message>
+        <source>Select type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Removing attributes will delete all associated data</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Select type</source>
+        <source>This list is associated with %1 Event Rules. Are you sure you want to delete it?</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Deleting the list will erase all the data inside it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete List?</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>EventTypeSelector</name>
+    <message>
+        <source>Analytics Event</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>EventsPanel</name>
+    <message>
+        <source>No events</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Try changing the filters or create an Event Rule</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -712,6 +792,13 @@ Select an Integration to begin configuring its parameters.</source>
     </message>
     <message>
         <source>Filters help control access to the site and synchronization by specifying which users and/or groups from the Base DN are allowed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>FilterSettingsDialog</name>
+    <message>
+        <source>Settings</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -986,14 +1073,6 @@ Select an Integration to begin configuring its parameters.</source>
     <name>GroupsComboBox</name>
     <message>
         <source>Select</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Search</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Nothing found</source>
         <translation></translation>
     </message>
     <message>
@@ -1347,19 +1426,19 @@ Select an Integration to begin configuring its parameters.</source>
         <source>No</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Present</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Absent</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>LookupListElementViewer</name>
     <message>
         <source>ANY</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Yes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>No</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1445,11 +1524,19 @@ Select an Integration to begin configuring its parameters.</source>
         <translation></translation>
     </message>
     <message>
+        <source>%1 selected:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Delete</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>No Entries</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New List...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1461,11 +1548,7 @@ Select an Integration to begin configuring its parameters.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>%1 selected:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>New List...</source>
+        <source>Export failed</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1478,6 +1561,36 @@ Select an Integration to begin configuring its parameters.</source>
     <message>
         <source>Select an area on the video to filter results</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>MotionPanel</name>
+    <message>
+        <source>Select a camera to see its motion events</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No motion detected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Try changing the filters or enable motion recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select Camera...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>MultiSelectionComboBox</name>
+    <message>
+        <source>Select</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Nothing found</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1511,6 +1624,17 @@ Select an Integration to begin configuring its parameters.</source>
     </message>
 </context>
 <context>
+    <name>NotificationsPanel</name>
+    <message>
+        <source>No new notifications</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Notifications Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ObjectEditor</name>
     <message>
         <source>Present</source>
@@ -1526,6 +1650,20 @@ Select an Integration to begin configuring its parameters.</source>
     <message>
         <source>Size Constraints</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>ObjectTypeSelector</name>
+    <message numerus="yes">
+        <source>with %n attributes</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Any type</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1695,6 +1833,35 @@ Select an Integration to begin configuring its parameters.</source>
     </message>
 </context>
 <context>
+    <name>PixelationIntensityDialog</name>
+    <message>
+        <source>Intensity</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>PixelationObjectSelectionDialog</name>
+    <message>
+        <source>Select Objects</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All Objects</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Objects</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>PluginSelector</name>
+    <message>
+        <source>Any plugin</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>Plugins</name>
     <message>
         <source>Plugins</source>
@@ -1747,13 +1914,6 @@ Select an Integration to begin configuring its parameters.</source>
             <numerusform>The maximum number of points has been reached (%n point).</numerusform>
             <numerusform>The maximum number of points has been reached (%n points).</numerusform>
         </translation>
-    </message>
-</context>
-<context>
-    <name>Preview</name>
-    <message>
-        <source>NO DATA</source>
-        <translation></translation>
     </message>
 </context>
 <context>
@@ -1896,6 +2056,45 @@ Press Alt + Click to follow object</source>
     <message>
         <source>Subtype</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>RemoteAccess</name>
+    <message>
+        <source>No services</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server is not configured for remote access feature</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Learn more</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connect %1 application to localhost:%2 to use Cloud Connect.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Local port</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error occurred</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Username</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Password</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2099,8 +2298,8 @@ Press Alt + Click to follow object</source>
         <translation></translation>
     </message>
     <message>
-        <source>Analytics</source>
-        <translation></translation>
+        <source>Objects</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2572,7 +2771,7 @@ Press Alt + Click to follow object</source>
         <translation></translation>
     </message>
     <message>
-        <source>If user already has an account, he will see this site and will be able to log in to it. If not, we&apos;ll send an invitation to this address and user will see this site right after he creates an account.</source>
+        <source>The added site will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2730,10 +2929,6 @@ Press Alt + Click to follow object</source>
 <context>
     <name>VmsRulesDialog</name>
     <message>
-        <source>Vms Rules</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Add Rule</source>
         <translation></translation>
     </message>
@@ -2756,6 +2951,10 @@ Press Alt + Click to follow object</source>
     <message>
         <source>Reset To Defaults...</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Event Rules</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>%1 selected:</source>

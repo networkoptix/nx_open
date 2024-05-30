@@ -1323,6 +1323,21 @@
     </message>
 </context>
 <context>
+    <name>FailoverWidget</name>
+    <message>
+        <source>Failover</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server Location ID:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failover Priority...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>FilenamePanel</name>
     <message>
         <source>Browse...</source>
@@ -1919,6 +1934,60 @@
     </message>
 </context>
 <context>
+    <name>NewDeviceAdditionDialog</name>
+    <message>
+        <source>Add Devices</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>to</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SELECT SERVER</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Address or Subnet Mask</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Port</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hint</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Login</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add all Devices</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Find Devices</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>
+              Enter address, subnet range or subnet mask, login and password
+              and click on the &quot;Search&quot; button
+          </source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>NewVirtualCameraDialog</name>
     <message>
         <source>New Virtual Camera...</source>
@@ -2438,10 +2507,6 @@
 <context>
     <name>SaasInfoWidget</name>
     <message>
-        <source>Services state</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>No services found</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2455,6 +2520,10 @@
     </message>
     <message>
         <source>Services Usage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Services state</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2586,6 +2655,42 @@
         <source>Display servers in tree for non-power users</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Video Redaction</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Configure...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Blur</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exclude Cameras</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Apply session duration to Cloud users</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remote Access Tool</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Administrators</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Available to</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Power users</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SendmailBusinessActionWidget</name>
@@ -2647,14 +2752,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Failover</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Failover Priority...</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Name</source>
         <translation></translation>
     </message>
@@ -2671,7 +2768,7 @@
         <translation></translation>
     </message>
     <message>
-        <source>Server Location ID:</source>
+        <source>Remote Access</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

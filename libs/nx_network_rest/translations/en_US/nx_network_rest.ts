@@ -70,6 +70,10 @@
         <source>Internal server error (%1). Please contact your Site administrator.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>The request is unauthorized due to an unknown error.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Result</name>
@@ -141,6 +145,11 @@
     </message>
     <message>
         <source>Resource no longer present on server.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not allowed.</source>
+        <comment>Generic HTTP response</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
