@@ -12,12 +12,11 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/std_helpers.h>
 #include <nx/vms/api/rules/event_log_fwd.h>
-#include <nx/vms/event/strings_helper.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/core/event_search/event_search_globals.h>
-#include <nx/vms/client/core/event_search/models/fetch_request.h>
 #include <nx/vms/client/core/event_search/models/detail/multi_request_id_holder.h>
+#include <nx/vms/client/core/event_search/models/fetch_request.h>
 #include <nx/vms/client/core/event_search/utils/event_search_item_helper.h>
 #include <nx/vms/client/core/utils/managed_camera_set.h>
 #include <nx/vms/client/desktop/event_search/models/private/event_model_data.h>
@@ -30,6 +29,7 @@
 #include <nx/vms/rules/basic_event.h>
 #include <nx/vms/rules/engine.h>
 #include <nx/vms/rules/rules_fwd.h>
+#include <nx/vms/rules/strings.h>
 #include <nx/vms/rules/utils/event_details.h>
 #include <nx/vms/rules/utils/field.h>
 #include <ui/common/notification_levels.h>
@@ -69,7 +69,6 @@ struct Facade
     {
         return false; //< Data is unchangable.
     }
-
 };
 
 bool hasPreview(const EventPtr& event)
@@ -80,8 +79,7 @@ bool hasPreview(const EventPtr& event)
 
 QString description(const QVariantMap& details)
 {
-    return details.value(rules::utils::kDetailingDetailName).toStringList()
-        .join(common::html::kLineBreak);
+    return nx::vms::rules::Strings::eventDetails(details).join(common::html::kLineBreak);
 }
 
 QColor color(const QVariantMap& details)
@@ -124,8 +122,6 @@ struct VmsEventSearchListModel::Private
 {
     VmsEventSearchListModel* const q;
 
-    const QScopedPointer<nx::vms::event::StringsHelper> helper;
-
     QString selectedEventType;
     QString selectedSubType;
 
@@ -152,8 +148,7 @@ struct VmsEventSearchListModel::Private
 };
 
 VmsEventSearchListModel::Private::Private(VmsEventSearchListModel* q):
-    q(q),
-    helper(new vms::event::StringsHelper(q->systemContext()))
+    q(q)
 {
 }
 

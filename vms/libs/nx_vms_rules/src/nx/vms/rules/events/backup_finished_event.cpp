@@ -19,6 +19,7 @@ QVariantMap BackupFinishedEvent::details(common::SystemContext* context) const
 {
     auto result = BasicEvent::details(context);
 
+    utils::insertIfNotEmpty(result, utils::kReasonDetailName, reasonDetail());
     utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
     result.insert(utils::kEmailTemplatePathDetailName, manifest().emailTemplatePath);
     utils::insertLevel(result, nx::vms::event::Level::success);
@@ -26,6 +27,14 @@ QVariantMap BackupFinishedEvent::details(common::SystemContext* context) const
     utils::insertClientAction(result, nx::vms::rules::ClientAction::serverSettings);
 
     return result;
+}
+
+QString BackupFinishedEvent::reasonDetail() const
+{
+    if (m_reason == nx::vms::api::EventReason::backupFailedSourceFileError)
+        return tr("Archive backup failed. Failed to backup file %1.").arg(m_reasonText);
+
+    return {};
 }
 
 QString BackupFinishedEvent::extendedCaption(common::SystemContext* context) const

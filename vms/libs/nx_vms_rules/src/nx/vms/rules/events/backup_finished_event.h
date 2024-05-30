@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <nx/vms/api/types/event_rule_types.h>
+
 #include "../basic_event.h"
 #include "../data_macros.h"
 
@@ -13,6 +15,8 @@ class NX_VMS_RULES_API BackupFinishedEvent: public BasicEvent
     Q_CLASSINFO("type", "nx.events.archiveBackupFinished")
 
     FIELD(nx::Uuid, serverId, setServerId)
+    FIELD(nx::vms::api::EventReason, reason, setReason)
+    FIELD(QString, reasonText, setReasonText)
 
 public:
     BackupFinishedEvent() = default;
@@ -24,6 +28,7 @@ public:
 
 private:
     QString extendedCaption(common::SystemContext* context) const;
+    QString reasonDetail() const;
 };
 
 } // namespace nx::vms::rules

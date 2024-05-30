@@ -47,15 +47,20 @@ QVariantMap PoeOverBudgetEvent::details(common::SystemContext* context) const
 {
     auto result = BasicEvent::details(context);
 
+    utils::insertIfNotEmpty(result, utils::kReasonDetailName, reason());
     utils::insertIfNotEmpty(result, utils::kDescriptionDetailName, description());
     utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
-    utils::insertIfNotEmpty(result, utils::kDetailingDetailName, detailing());
     result.insert(utils::kEmailTemplatePathDetailName, manifest().emailTemplatePath);
     utils::insertLevel(result, nx::vms::event::Level::critical);
     utils::insertClientAction(result, nx::vms::rules::ClientAction::poeSettings);
     utils::insertIcon(result, nx::vms::rules::Icon::networkIssue);
 
     return result;
+}
+
+QString PoeOverBudgetEvent::reason() const
+{
+    return tr("Power limit exceeded (%1)", "%1 is consumption").arg(overallConsumption());
 }
 
 QString PoeOverBudgetEvent::overallConsumption() const
@@ -81,15 +86,6 @@ QString PoeOverBudgetEvent::extendedCaption(common::SystemContext* context) cons
 {
     const auto resourceName = Strings::resource(context, m_serverId, Qn::RI_WithUrl);
     return tr("PoE over budget at %1").arg(resourceName);
-}
-
-QString PoeOverBudgetEvent::detailing() const
-{
-    const auto consumption = overallConsumption();
-    if (consumption.isEmpty())
-        return {};
-
-    return tr("Reason: Power limit exceeded (%1)", "%1 is consumption").arg(consumption);
 }
 
 const ItemDescriptor& PoeOverBudgetEvent::manifest()
