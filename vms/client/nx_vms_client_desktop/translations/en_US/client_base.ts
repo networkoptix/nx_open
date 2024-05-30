@@ -2,6 +2,104 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="en_US" sourcelanguage="en">
 <context>
+    <name>AbstractSearchWidget::Private</name>
+    <message>
+        <source>Hide information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hide thumbnails</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show thumbnails</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Last day</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Last 7 days</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Last 30 days</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Selected on Timeline</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Devices on layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cameras on layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Selected device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Selected camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose devices...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose cameras...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>none</source>
+        <comment>No currently selected camera</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n chosen devices</source>
+        <translation type="unfinished">
+            <numerusform>%n chosen device</numerusform>
+            <numerusform>%n chosen devices</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n chosen cameras</source>
+        <translation type="unfinished">
+            <numerusform>%n chosen camera</numerusform>
+            <numerusform>%n chosen cameras</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Chosen device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Chosen camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ActionDurationPickerWidget</name>
     <message>
         <source>For the duration of event</source>
@@ -9,10 +107,6 @@
     </message>
     <message>
         <source>Of fixed duration</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Begin When</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1240,45 +1334,6 @@
     </message>
 </context>
 <context>
-    <name>EventSearchWidget::Private</name>
-    <message>
-        <source>Server events</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Analytics events</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Any event</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Any device issue</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Any camera issue</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Any server event</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Device issues</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Camera issues</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Any analytics event</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>ExitFullscreenActionHelper</name>
     <message>
         <source>Select layout...</source>
@@ -2477,46 +2532,6 @@ License Key: %2</source>
     </message>
 </context>
 <context>
-    <name>QnBusinessResourceValidationStrings</name>
-    <message numerus="yes">
-        <source>%1 of %n devices</source>
-        <translation>
-            <numerusform>%1 device</numerusform>
-            <numerusform>%1 of %n devices</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%1 of %n cameras</source>
-        <translation>
-            <numerusform>%1 camera</numerusform>
-            <numerusform>%1 of %n cameras</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Select at least one device</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Select at least one camera</source>
-        <translation></translation>
-    </message>
-    <message numerus="yes">
-        <source>%1 of %n I/O modules</source>
-        <translation>
-            <numerusform>%1 I/O module</numerusform>
-            <numerusform>%1 of %n I/O modules</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Any Device</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Any Camera</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>QnBusinessRuleViewModel</name>
     <message>
         <source>Error: %1</source>
@@ -2733,43 +2748,11 @@ License Key: %2</source>
     </message>
 </context>
 <context>
-    <name>QnBuzzerPolicy</name>
-    <message>
-        <source>Servers that support buzzer</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>QnCamDisplay</name>
     <message>
         <source>%1 Running</source>
         <comment>%1 will be substituted with desktop client display name, e.g &apos;NX Witness Client&apos;</comment>
         <translation></translation>
-    </message>
-</context>
-<context>
-    <name>QnCameraAnalyticsPolicy</name>
-    <message>
-        <source>Analytics is not available for %1</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>QnCameraAudioTransmitPolicy</name>
-    <message>
-        <source>Select device</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Select camera</source>
-        <translation></translation>
-    </message>
-    <message numerus="yes">
-        <source>%1 does not support two-way audio</source>
-        <translation>
-            <numerusform>%1 does not support two-way audio</numerusform>
-            <numerusform>%1 do not support two-way audio</numerusform>
-        </translation>
     </message>
 </context>
 <context>
@@ -2848,16 +2831,6 @@ License Key: %2</source>
     <message>
         <source>automatic</source>
         <translation></translation>
-    </message>
-</context>
-<context>
-    <name>QnCameraInputPolicy</name>
-    <message numerus="yes">
-        <source>%1 have no input ports</source>
-        <translation>
-            <numerusform>%1 has no input ports.</numerusform>
-            <numerusform>%1 have no input ports.</numerusform>
-        </translation>
     </message>
 </context>
 <context>
@@ -2970,27 +2943,10 @@ License Key: %2</source>
     </message>
 </context>
 <context>
-    <name>QnCameraMotionPolicy</name>
-    <message>
-        <source>Recording or motion detection is disabled for %1</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>QnCameraOutputBusinessActionWidget</name>
     <message>
         <source>automatic</source>
         <translation></translation>
-    </message>
-</context>
-<context>
-    <name>QnCameraOutputPolicy</name>
-    <message numerus="yes">
-        <source>%1 have no output relays</source>
-        <translation>
-            <numerusform>%1 has no outport relays.</numerusform>
-            <numerusform>%1 have no outport relays.</numerusform>
-        </translation>
     </message>
 </context>
 <context>
@@ -3013,13 +2969,6 @@ License Key: %2</source>
     </message>
     <message>
         <source>Passwords do not match</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>QnCameraRecordingPolicy</name>
-    <message>
-        <source>Recording is disabled for %1</source>
         <translation></translation>
     </message>
 </context>
@@ -3097,7 +3046,7 @@ License Key: %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>All %1 users will be deleted from the system.</source>
+        <source>All %1 users will be deleted from the site.</source>
         <comment>%1 is the short cloud name (like Cloud)</comment>
         <translation type="unfinished"></translation>
     </message>
@@ -3196,17 +3145,6 @@ License Key: %2</source>
     <message>
         <source>Account Settings</source>
         <translation></translation>
-    </message>
-</context>
-<context>
-    <name>QnCloudUsersValidationPolicy</name>
-    <message numerus="yes">
-        <source>%n of %1 selected users are not %2 users and will not get mobile notifications.</source>
-        <comment>%2 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
-        <translation>
-            <numerusform>%n of %1 selected users is not %2 user and will not get mobile notifications.</numerusform>
-            <numerusform>%n of %1 selected users are not %2 users and will not get mobile notifications.</numerusform>
-        </translation>
     </message>
 </context>
 <context>
@@ -3573,24 +3511,6 @@ License Key: %2</source>
     </message>
 </context>
 <context>
-    <name>QnExecPtzPresetPolicy</name>
-    <message>
-        <source>Select exactly one camera</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>%1 has no PTZ presets</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>QnFanErrorPolicy</name>
-    <message>
-        <source>Servers that support fan diagnostic</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>QnFileMessages</name>
     <message>
         <source>Overwrite existing file?</source>
@@ -3609,13 +3529,6 @@ License Key: %2</source>
     </message>
     <message>
         <source>This camera is not currently on some of the selected layouts. Action will work if camera is added before action triggers.</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>QnFullscreenCameraPolicy</name>
-    <message>
-        <source>Select exactly one camera</source>
         <translation></translation>
     </message>
 </context>
@@ -3958,6 +3871,10 @@ License Key: %2</source>
         <comment>%1 will be substituted by a list of contacts</comment>
         <translation></translation>
     </message>
+    <message>
+        <source>Text Files</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnLocalSettingsDialog</name>
@@ -4049,12 +3966,12 @@ License Key: %2</source>
         <translation></translation>
     </message>
     <message>
-        <source>Displays IP addresses for cameras and servers and roles for users.</source>
+        <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
         <translation></translation>
     </message>
     <message>
-        <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
-        <translation></translation>
+        <source>Displays IP addresses for cameras and servers.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4235,13 +4152,6 @@ License Key: %2</source>
     </message>
 </context>
 <context>
-    <name>QnPoeOverBudgetPolicy</name>
-    <message>
-        <source>Servers that support PoE monitoring</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>QnPopupBusinessActionWidget</name>
     <message>
         <source>Notification will be shown until one of the users who see it creates bookmark with event description</source>
@@ -4250,6 +4160,18 @@ License Key: %2</source>
 </context>
 <context>
     <name>QnPopupSettingsWidget</name>
+    <message>
+        <source>Save user</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Enter your account password</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation></translation>
+    </message>
     <message>
         <source>These settings apply only to the site you are logged in. They will be removed in future versions.</source>
         <translation type="unfinished"></translation>
@@ -4479,54 +4401,6 @@ License Key: %2</source>
     <message>
         <source>Current Bitrate</source>
         <translation></translation>
-    </message>
-</context>
-<context>
-    <name>QnRequiredAccessRightPolicy</name>
-    <message>
-        <source>%1 user does not have %2 permission for some of selected cameras</source>
-        <comment>%1 is the name of the selected user, %2 is the permission name</comment>
-        <translation></translation>
-    </message>
-    <message numerus="yes">
-        <source>%n groups</source>
-        <translation>
-            <numerusform>%n group</numerusform>
-            <numerusform>%n groups</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n users</source>
-        <translation>
-            <numerusform>%n user</numerusform>
-            <numerusform>%n users</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>%1 and %2 do not have %3 permission for some of selected cameras</source>
-        <comment>%1 and %2 are the numbers of user groups and users in a correct numeric form (e.g. &apos;2 groups and 1 user&apos;), %3 is the permission name</comment>
-        <translation></translation>
-    </message>
-    <message numerus="yes">
-        <source>%n groups do not have %1 permission for some of selected cameras</source>
-        <comment>%1 is the permission name</comment>
-        <translation>
-            <numerusform>%n group does not have %1 permission for some of selected cameras</numerusform>
-            <numerusform>%n groups do not have %1 permission for some of selected cameras</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>%1 group does not have %2 permission for some of selected cameras</source>
-        <comment>%1 is the name of selected user group, %2 is the permission name</comment>
-        <translation></translation>
-    </message>
-    <message numerus="yes">
-        <source>%n users do not have %1 permission for some of selected cameras</source>
-        <comment>%1 is the permission name</comment>
-        <translation>
-            <numerusform>%n user does not have %1 permission for some of selected cameras</numerusform>
-            <numerusform>%n users do not have %1 permission for some of selected cameras</numerusform>
-        </translation>
     </message>
 </context>
 <context>
@@ -4852,41 +4726,13 @@ License Key: %2</source>
         <source>Backup</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Failover</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnServerSettingsWidget</name>
-    <message>
-        <source>At least two servers are required for this feature.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Max devices on this server:</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Max cameras on this server:</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>This server already has more than max devices</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>This server already has more than max cameras</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>To avoid issues adjust max number of devices</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>To avoid issues adjust max number of cameras</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Failover</source>
-        <translation></translation>
-    </message>
     <message numerus="yes">
         <source>Certificates</source>
         <translation>
@@ -4903,10 +4749,6 @@ License Key: %2</source>
     </message>
     <message>
         <source>Details</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Servers with failover enabled will automatically take cameras from offline Servers with the same Location ID.</source>
         <translation></translation>
     </message>
     <message>
@@ -5054,7 +4896,15 @@ License Key: %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>RESTRICTED</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Ask your site administrator to enter the encryption password to decrypt this archive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Authorize</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5206,18 +5056,6 @@ If you intended to move analytics data to another storage location, please conta
         <translation></translation>
     </message>
     <message>
-        <source>Exclusive</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Shared</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Isolated</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Choose a read-write policy to define how interact with storage directories.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5234,7 +5072,19 @@ If you intended to move analytics data to another storage location, please conta
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The System Servers have different read-write policies for the storage</source>
+        <source>Exclusive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Shared</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Isolated</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The Site Servers have different read-write policies for the storage</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5366,7 +5216,7 @@ If you intended to move analytics data to another storage location, please conta
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The storage has different read-write policies across various Servers in the System</source>
+        <source>The storage has different read-write policies across various Servers in the Site</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5817,42 +5667,6 @@ If you intended to move analytics data to another storage location, please conta
 </context>
 <context>
     <name>QnWebResourceWidget</name>
-    <message>
-        <source>Open this web page?</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Connect anyway</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>You try to open the
-%1
-but this web page presented an untrusted certificate auth.
-We recommend you not to open this web page. If you understand the risks, you can open the web page.</source>
-        <comment>%1 is the web page address</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Open this integration?</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Integration</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Web Page</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>You try to open the
-%1
-but this integration presented an untrusted certificate auth.
-We recommend you not to open this integration. If you understand the risks, you can open the integration.</source>
-        <comment>%1 is the integration address</comment>
-        <translation></translation>
-    </message>
     <message>
         <source>Integration settings...</source>
         <translation></translation>
@@ -6416,14 +6230,6 @@ We recommend you not to open this integration. If you understand the risks, you 
 <context>
     <name>SourcePickerWidgetStrings</name>
     <message>
-        <source>Select at least one Server</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Select at least one user</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Select at least one device</source>
         <translation></translation>
     </message>
@@ -6675,10 +6481,6 @@ We recommend you not to open this integration. If you understand the risks, you 
         <source>All Users</source>
         <translation></translation>
     </message>
-    <message>
-        <source>Select at least one user</source>
-        <translation></translation>
-    </message>
     <message numerus="yes">
         <source>%n Users</source>
         <translation>
@@ -6793,104 +6595,6 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
 </context>
 <context>
-    <name>nx::vms::client::desktop::AbstractSearchWidget::Private</name>
-    <message>
-        <source>Hide information</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Show information</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Hide thumbnails</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Show thumbnails</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Last day</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Last 7 days</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Last 30 days</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Selected on Timeline</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Any time</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>none</source>
-        <comment>No currently selected camera</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Devices on layout</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Cameras on layout</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Any device</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Any camera</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Selected device</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Selected camera</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Choose devices...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Choose cameras...</source>
-        <translation></translation>
-    </message>
-    <message numerus="yes">
-        <source>%n chosen devices</source>
-        <translation>
-            <numerusform>%n chosen device</numerusform>
-            <numerusform>%n chosen devices</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n chosen cameras</source>
-        <translation>
-            <numerusform>%n chosen camera</numerusform>
-            <numerusform>%n chosen cameras</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Chosen camera</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Chosen device</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>nx::vms::client::desktop::AccessRightsList</name>
     <message>
         <source>View Archive</source>
@@ -6909,18 +6613,6 @@ We recommend you not to open this integration. If you understand the risks, you 
         <translation></translation>
     </message>
     <message>
-        <source>User Input</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Edit Settings</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>View Live</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Depending on the resource type it either allows user to modify device settings or to control video wall.</source>
         <translation></translation>
     </message>
@@ -6933,15 +6625,23 @@ We recommend you not to open this integration. If you understand the risks, you 
         <translation></translation>
     </message>
     <message>
-        <source>Play Sound</source>
+        <source>View Live.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Access Audio</source>
+        <source>User Input.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Allows users to access an audio stream from a Device. Used in combination with View Live and/or View Archive.</source>
+        <source>Edit Settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play Audio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allows users to access an audio stream from a device. Used in combination with View Live and/or View Archive.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6971,21 +6671,13 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
 </context>
 <context>
-    <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
+    <name>nx::vms::client::desktop::AnalyticsSearchListModel</name>
     <message>
-        <source>deleted camera</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Unknown track</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Create New List by object</source>
+        <source>Add To List</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Add To List</source>
+        <source>Create New List by object</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7352,13 +7044,6 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
 </context>
 <context>
-    <name>nx::vms::client::desktop::BookmarkSearchListModel::Private</name>
-    <message>
-        <source>deleted camera</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>nx::vms::client::desktop::BookmarkSearchWidget</name>
     <message>
         <source>No bookmarks</source>
@@ -7385,6 +7070,10 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
         <source>Missed Call</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Open</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8193,6 +7882,11 @@ We recommend you not to open this integration. If you understand the risks, you 
         <translation></translation>
     </message>
     <message>
+        <source>Login to %1</source>
+        <comment>%1 is the cloud name (like Nx Cloud)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Are you sure you want to disconnect?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8658,11 +8352,15 @@ We recommend you not to open this integration. If you understand the risks, you 
 </context>
 <context>
     <name>nx::vms::client::desktop::EventTile</name>
+    <message>
+        <source>UNKNOWN</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message numerus="yes">
-        <source>...and %n more</source>
-        <translation>
-            <numerusform>...and %n more</numerusform>
-            <numerusform>...and %n more</numerusform>
+        <source> + %n</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
 </context>
@@ -8863,6 +8561,45 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
 </context>
 <context>
+    <name>nx::vms::client::desktop::FailoverWidget</name>
+    <message>
+        <source>Servers with failover enabled will automatically take cameras from offline Servers with the same Location ID.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failover</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Max devices on this server:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Max cameras on this server:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>At least two servers are required for this feature.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This server already has more than max devices</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This server already has more than max cameras</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To avoid issues adjust max number of devices</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To avoid issues adjust max number of cameras</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>nx::vms::client::desktop::FilenamePanel</name>
     <message>
         <source>Folder</source>
@@ -8956,6 +8693,10 @@ We recommend you not to open this integration. If you understand the risks, you 
         <source>Inherits %1 permission from</source>
         <comment>%1 will be substituted with a permission name</comment>
         <translation></translation>
+    </message>
+    <message>
+        <source>View video without redaction</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -9552,6 +9293,29 @@ Remember to return the Logging Level to its default setting after you have colle
         <source>Network request failed</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Object was added to the List</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::client::desktop::LookupListEntriesModel</name>
+    <message>
+        <source>Yes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Present</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Absent</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::LookupListExportProcessor</name>
@@ -9569,13 +9333,17 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
 </context>
 <context>
-    <name>nx::vms::client::desktop::LookupListPreviewProcessor</name>
+    <name>nx::vms::client::desktop::LookupListPreviewHelper</name>
     <message>
         <source>Import Lookup List</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Text files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All other text files</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -10108,6 +9876,86 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
 </context>
 <context>
+    <name>nx::vms::client::desktop::NewDeviceAdditionDialog</name>
+    <message>
+        <source>Possible formats:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server offline</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Searching for devices on the network is restricted to cameras that support HTTPS connections. This can be changed in %1 settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System Administration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device search failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Failed to add %n devices</source>
+        <translation type="unfinished">
+            <numerusform>Failed to add %n device</numerusform>
+            <numerusform>Failed to add %n devices</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Initializing scan...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scanning online hosts...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Checking host...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Finished</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Aborted</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Searching...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No devices found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All devices are already added</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n devices are being added. You can close this dialog or start a new search</source>
+        <translation type="unfinished">
+            <numerusform>%n devices is being added. You can close this dialog or start a new search</numerusform>
+            <numerusform>%n devices are being added. You can close this dialog or start a new search</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Add all Devices</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Add %n Devices</source>
+        <translation type="unfinished">
+            <numerusform>Add Device</numerusform>
+            <numerusform>Add %n Devices</numerusform>
+        </translation>
+    </message>
+</context>
+<context>
     <name>nx::vms::client::desktop::NoPermissionsOverlayWidget</name>
     <message>
         <source>You do not have permission to edit settings of this camera</source>
@@ -10137,8 +9985,8 @@ You can force motion detection, but it may lead to a substantial increase in CPU
         <translation></translation>
     </message>
     <message>
-        <source>LDAP Default group cannot be deleted as long as the system is connected to LDAP server</source>
-        <translation></translation>
+        <source>LDAP Default group cannot be deleted as long as the site is connected to LDAP server</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>User management for organization users is available only at the organization level, not the site level</source>
@@ -10193,10 +10041,6 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
         <source>Current Site</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>All Sites</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -10799,39 +10643,11 @@ You can force motion detection, but it may lead to a substantial increase in CPU
             <numerusform>%n objects</numerusform>
         </translation>
     </message>
-    <message>
-        <source>Analytic</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Generic</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Input Signal</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Soft Trigger</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Stream Issue</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Device Disconnect</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Device IP Conflict</source>
-        <translation></translation>
-    </message>
     <message numerus="yes">
-        <source>+%n values</source>
-        <translation>
-            <numerusform>+%n value</numerusform>
-            <numerusform>+%n values</numerusform>
+        <source>%n notifications</source>
+        <translation type="unfinished">
+            <numerusform>%n notification</numerusform>
+            <numerusform>%n notifications</numerusform>
         </translation>
     </message>
 </context>
@@ -11103,6 +10919,10 @@ You can still change quality and FPS directly on the camera.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Additional configuration might be required on the server machine.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>The encryption password will be required to restore the archive.
 Caution: This password cannot be reset. If you lose it, the archive will be unrecoverable.</source>
         <translation type="unfinished"></translation>
@@ -11113,6 +10933,24 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
         <source>Unlimited user session lifetime threatens overall Site security and may lead to performance degradation</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::client::desktop::SelectAnalyticsObjectTypesButton</name>
+    <message>
+        <source>No objects</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n objects selected</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>All objects</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -12300,26 +12138,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
 <context>
     <name>nx::vms::client::desktop::VmsEventSearchWidget</name>
     <message>
-        <source>Any event</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Camera issues</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Server events</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Analytics events</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Any analytics event</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>No events</source>
         <translation></translation>
     </message>
@@ -12333,6 +12151,45 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
             <numerusform>%n event</numerusform>
             <numerusform>%n events</numerusform>
         </translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::client::desktop::WebPageCertificateDialog</name>
+    <message>
+        <source>Open this integration?</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Open this web page?</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Integration</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Web Page</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>You try to open the
+%1
+but this integration presented an untrusted certificate auth.
+We recommend you not to open this integration. If you understand the risks, you can open the integration.</source>
+        <comment>%1 is the integration address</comment>
+        <translation></translation>
+    </message>
+    <message>
+        <source>You try to open the
+%1
+but this web page presented an untrusted certificate auth.
+We recommend you not to open this web page. If you understand the risks, you can open the web page.</source>
+        <comment>%1 is the web page address</comment>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Connect anyway</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -12456,6 +12313,25 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message>
         <source>%1 Version is available</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Skip Version</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::client::desktop::analytics::taxonomy::AttributeDisplayManager</name>
+    <message>
+        <source>Date/Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Object Type</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -12905,6 +12781,10 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
         <source>Incompatible event-action pair is choosen. Prolonged action without duration incompatible with the instant event</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>The rule is not valid and may not work</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::rules::HttpAuthPicker</name>
@@ -12957,6 +12837,10 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message>
         <source>From</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Select a list</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -13093,6 +12977,10 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
 <context>
     <name>nx::vms::client::desktop::rules::StatePicker</name>
     <message>
+        <source>Select state</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>When event occurs</source>
         <translation type="unfinished"></translation>
     </message>
@@ -13130,6 +13018,10 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message>
         <source>From</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Select a list</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -2,14 +2,38 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="en_US" sourcelanguage="en">
 <context>
-    <name>ApiErrorStrings</name>
+    <name>AccessRightHelper</name>
     <message>
-        <source>Invalid JSON content.</source>
-        <translation></translation>
+        <source>View Live</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Unsupported content type.</source>
-        <translation></translation>
+        <source>Play Audio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>View Archive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export Archive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>View Bookmarks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manage Bookmarks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User Input</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit Settings</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -28,69 +52,14 @@
     </message>
 </context>
 <context>
-    <name>AuthResultTranslations</name>
+    <name>BookmarkFacadeStrings</name>
     <message>
-        <source>The LDAP server is not accessible. Please try again later.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>%1 is not accessible yet. Please try again later.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>The user is locked out due to several failed attempts. Please try again later.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>The session key is invalid or expired.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>This user does not exist or is unable to login.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>More than one user with the same login are presented.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Unable to verify LDAP server SSL/TLS certificate.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>The ticket key is invalid or expired.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Wrong password</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>The password is expired. Please contact your Site administrator.</source>
+        <source>System Event</source>
+        <comment>Shows that the bookmark was created by a system event</comment>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>This user has been disabled by a Site administrator.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This authorization method is forbidden. Please contact your Site administrator.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Internal server error (%1). Please contact your Site administrator.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>BookmarkSort</name>
     <message>
         <source>Removed camera</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Site Event</source>
-        <comment>Shows that the bookmark was created by a Site event</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -225,6 +194,78 @@
     <message>
         <source>Members of this group can view Site Health Monitoring information and server processor load in real-time (Server Monitoring).</source>
         <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnBusinessResourceValidationStrings</name>
+    <message numerus="yes">
+        <source>%1 of %n devices</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 of %n cameras</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 of %n I/O modules</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Any Device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any Camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select at least one device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select at least one camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnBuzzerPolicy</name>
+    <message>
+        <source>Servers that support buzzer</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnCameraAnalyticsPolicy</name>
+    <message>
+        <source>Analytics is not available for %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnCameraAudioTransmitPolicy</name>
+    <message>
+        <source>Select device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 does not support two-way audio</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -455,10 +496,80 @@
     </message>
 </context>
 <context>
+    <name>QnCameraInputPolicy</name>
+    <message numerus="yes">
+        <source>%1 have no input ports</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+</context>
+<context>
+    <name>QnCameraMotionPolicy</name>
+    <message>
+        <source>Recording or motion detection is disabled for %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnCameraNamesWatcher</name>
     <message>
         <source>Removed camera</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>QnCameraOutputPolicy</name>
+    <message numerus="yes">
+        <source>%1 have no output relays</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+</context>
+<context>
+    <name>QnCameraRecordingPolicy</name>
+    <message>
+        <source>Recording is disabled for %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnCloudUsersValidationPolicy</name>
+    <message numerus="yes">
+        <source>%n of %1 selected users are not %2 users and will not get mobile notifications.</source>
+        <comment>%2 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+</context>
+<context>
+    <name>QnExecPtzPresetPolicy</name>
+    <message>
+        <source>Select exactly one camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 has no PTZ presets</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnFanErrorPolicy</name>
+    <message>
+        <source>Servers that support fan diagnostic</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnFullscreenCameraPolicy</name>
+    <message>
+        <source>Select exactly one camera</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -787,55 +898,62 @@
     </message>
 </context>
 <context>
+    <name>QnPoeOverBudgetPolicy</name>
+    <message>
+        <source>Servers that support PoE monitoring</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnRequiredAccessRightPolicy</name>
+    <message numerus="yes">
+        <source>%n groups</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n users</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>%1 and %2 do not have %3 permission for some of selected cameras</source>
+        <comment>%1 and %2 are the numbers of user groups and users in a correct numeric form (e.g. &apos;2 groups and 1 user&apos;), %3 is the permission name</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n groups do not have %1 permission for some of selected cameras</source>
+        <comment>%1 is the permission name</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>%1 group does not have %2 permission for some of selected cameras</source>
+        <comment>%1 is the name of selected user group, %2 is the permission name</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n users do not have %1 permission for some of selected cameras</source>
+        <comment>%1 is the permission name</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>%1 user does not have %2 permission for some of selected cameras</source>
+        <comment>%1 is the name of the selected user, %2 is the permission name</comment>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnResourceNameStrings</name>
-    <message>
-        <source>Cameras</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>cameras</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Camera</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>camera</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Devices</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>devices</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Device</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>device</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>I/O Modules</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>I/O modules</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>I/O Module</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>I/O module</source>
-        <translation></translation>
-    </message>
     <message numerus="yes">
         <source>%n Cameras</source>
         <translation>
@@ -1173,75 +1291,6 @@
     <message>
         <source>Multiple groups</source>
         <translation></translation>
-    </message>
-</context>
-<context>
-    <name>Result</name>
-    <message>
-        <source>Missing required parameter: %1.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Failed to process request.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Forbidden.</source>
-        <comment>Generic HTTP response</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Conflict.</source>
-        <comment>Generic HTTP response</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Bad request.</source>
-        <comment>Generic HTTP response</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Not implemented.</source>
-        <comment>Generic HTTP response</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Not found.</source>
-        <comment>Generic HTTP response</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Internal error.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Unsupported media type.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Service unavailable.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Unauthorized.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Session expired.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Invalid parameter `%1`: %2.</source>
-        <comment>%1 is name, %2 is value.</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Session authorization required.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Resource no longer present on server.</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1768,7 +1817,15 @@
         <translation></translation>
     </message>
     <message>
+        <source>HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility</source>
+        <translation></translation>
+    </message>
+    <message>
         <source>Site alive update interval (seconds, 1s-1h)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Proxy connection access policy</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1793,6 +1850,18 @@
     </message>
     <message>
         <source>Last slave Site merge ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pixelation settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Apply session limit for Cloud tokens</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable or disable the creation of new Integration registration requests</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2446,6 +2515,59 @@
     </message>
     <message>
         <source>Some LDAP users or groups were not found in the LDAP database.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Services Issue</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Server &quot;%1&quot; has license migration issue</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Service overuse</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>The following licenses were not migrated:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>License</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Camera</source>
+        <translation></translation>
+    </message>
+    <message numerus="yes">
+        <source>Recording on %n channels was stopped due to service overuse.</source>
+        <translation>
+            <numerusform>Recording on %n channel was stopped due to service overuse.</numerusform>
+            <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
+        <translation>
+            <numerusform>Cloud storage backup on %n channel was stopped due to service overuse.</numerusform>
+            <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
+        <translation>
+            <numerusform>Paid integration service usage on %n channel was stopped due to service overuse.</numerusform>
+            <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Failed to migrate licenses.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Skipped import of licenses. Another migration attempt will be automatically scheduled for later.</source>
         <translation></translation>
     </message>
     <message>

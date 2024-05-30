@@ -2,18 +2,190 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="en_US" sourcelanguage="en">
 <context>
-    <name>GroupStrings</name>
+    <name>Strings</name>
+    <message numerus="yes">
+        <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
+        <comment>%1 means time, %2 means date</comment>
+        <translation type="unfinished">
+            <numerusform>%n time: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+            <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>First occurrence: %1 on %2 (%n times total)</source>
+        <comment>%1 means time, %2 means date</comment>
+        <translation type="unfinished">
+            <numerusform>First occurrence: %1 on %2 (%n time total)</numerusform>
+            <numerusform>First occurrence: %1 on %2 (%n times total)</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Time: %1 on %2</source>
+        <comment>%1 means time, %2 means date</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All users</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n Removed subjects</source>
+        <translation type="unfinished">
+            <numerusform>%n Removed subject</numerusform>
+            <numerusform>%n Removed subjects</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Unknown event</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reason: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown action</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message>
         <source>Any event</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Analytics events</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any analytics event</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera issues</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device issues</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Any camera issue</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Any server issue</source>
-        <translation></translation>
+        <source>Any device issue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server events</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any server event</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid field type is provided</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unexpected validation policy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select at least one Server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select at least one user</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select exactly one camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select at least one device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select at least one camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not all servers are suitable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There are no suitable servers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>At</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Occurs At</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Begin When</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Duration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pre-Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Post-Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Interval of Action</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fixed duration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>State</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Volume</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rewind</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>On Layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Event Devices</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Of Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>And Caption</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>And Description</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -41,26 +213,6 @@
         <comment>Analytics Event at some camera</comment>
         <translation></translation>
     </message>
-    <message>
-        <source>Begin When</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Occurs at</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Of Type</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>And Caption</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>And Description</source>
-        <translation></translation>
-    </message>
 </context>
 <context>
     <name>nx::vms::rules::AnalyticsObjectEvent</name>
@@ -78,14 +230,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Occurs At</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Of Type</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>And Object</source>
         <translation></translation>
     </message>
@@ -100,6 +244,10 @@
         <source>Backup Finished</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Archive backup failed. Failed to backup file %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::rules::BasicEvent</name>
@@ -111,42 +259,18 @@
 <context>
     <name>nx::vms::rules::BookmarkAction</name>
     <message>
-        <source>Pre-recording</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Post-recording</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Create Bookmark</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>At</source>
         <translation></translation>
     </message>
     <message>
         <source>Add Tags</source>
         <translation></translation>
     </message>
-    <message>
-        <source>Duration</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>nx::vms::rules::BuzzerAction</name>
     <message>
         <source>Buzzer</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Fixed duration</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>At</source>
         <translation></translation>
     </message>
     <message>
@@ -165,35 +289,16 @@
         <translation></translation>
     </message>
     <message>
-        <source>State</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Input Signal on Device</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Occurs at</source>
         <translation></translation>
     </message>
     <message>
         <source>With ID</source>
         <translation></translation>
     </message>
-</context>
-<context>
-    <name>nx::vms::rules::DebugEvent</name>
     <message>
-        <source>Debug Event</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Action</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Value</source>
-        <translation></translation>
+        <source>Input Signal on Camera</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -222,23 +327,21 @@
         <source>I/O Module %1 was disconnected</source>
         <translation></translation>
     </message>
-    <message numerus="yes">
+    <message>
         <source>Device Disconnected</source>
-        <translation>
-            <numerusform>Device Disconnected</numerusform>
-            <numerusform>Devices Disconnected</numerusform>
-        </translation>
+        <translation type="unfinished">Device Disconnected</translation>
     </message>
-    <message numerus="yes">
+    <message>
         <source>Camera Disconnected</source>
-        <translation>
-            <numerusform>Camera Disconnected</numerusform>
-            <numerusform>Cameras Disconnected</numerusform>
-        </translation>
+        <translation type="unfinished">Camera Disconnected</translation>
     </message>
     <message>
         <source>Device</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Camera</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -286,14 +389,6 @@
         <source>Device Output</source>
         <translation></translation>
     </message>
-    <message>
-        <source>At</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Duration</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>nx::vms::rules::DeviceRecordingAction</name>
@@ -306,14 +401,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Pre-recording</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Post-recording</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Camera Recording</source>
         <translation></translation>
     </message>
@@ -321,23 +408,11 @@
         <source>On</source>
         <translation></translation>
     </message>
-    <message>
-        <source>Interval of Action</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Duration</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>nx::vms::rules::EnterFullscreenAction</name>
     <message>
         <source>Camera</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>On Layout</source>
         <translation></translation>
     </message>
     <message>
@@ -348,23 +423,11 @@
         <source>Set for</source>
         <translation></translation>
     </message>
-    <message>
-        <source>Rewind</source>
-        <translation></translation>
-    </message>
 </context>
 <context>
     <name>nx::vms::rules::ExitFullscreenAction</name>
     <message>
-        <source>On Layout</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Exit Fullscreen</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>To</source>
         <translation></translation>
     </message>
 </context>
@@ -376,10 +439,6 @@
     </message>
     <message>
         <source>Fan Failure</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>At</source>
         <translation></translation>
     </message>
 </context>
@@ -394,23 +453,11 @@
         <translation></translation>
     </message>
     <message>
-        <source>State</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Omit logging</source>
         <translation></translation>
     </message>
     <message>
         <source>And Source</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>And Caption</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>And Description</source>
         <translation></translation>
     </message>
 </context>
@@ -434,10 +481,6 @@
     </message>
     <message>
         <source>Method</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Interval of Action</source>
         <translation></translation>
     </message>
     <message>
@@ -483,14 +526,6 @@
     </message>
     <message>
         <source>Motion on Camera</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Begin When</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Occurs at</source>
         <translation></translation>
     </message>
 </context>
@@ -569,10 +604,6 @@
 <context>
     <name>nx::vms::rules::NotificationAction</name>
     <message>
-        <source>To</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Force Acknowledgement</source>
         <translation></translation>
     </message>
@@ -592,10 +623,6 @@
         <source>Show Desktop Notification</source>
         <translation></translation>
     </message>
-    <message>
-        <source>Interval of Action</source>
-        <translation></translation>
-    </message>
 </context>
 <context>
     <name>nx::vms::rules::OpenLayoutAction</name>
@@ -603,17 +630,16 @@
         <source>Open Layout</source>
         <translation></translation>
     </message>
+</context>
+<context>
+    <name>nx::vms::rules::OptionalTimeFieldValidator</name>
     <message>
-        <source>To</source>
-        <translation></translation>
+        <source>Value can not be less than %1</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Rewind</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Interval of Action</source>
-        <translation></translation>
+        <source>Value can not be more than %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -626,35 +652,15 @@
         <source>Panic Recording</source>
         <translation></translation>
     </message>
-    <message>
-        <source>Duration</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Interval of Action</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>nx::vms::rules::PlaySoundAction</name>
-    <message>
-        <source>Volume</source>
-        <translation></translation>
-    </message>
     <message>
         <source>Play Sound</source>
         <translation></translation>
     </message>
     <message>
-        <source>At</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>To Users</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Interval of Action</source>
         <translation></translation>
     </message>
 </context>
@@ -665,19 +671,7 @@
         <translation></translation>
     </message>
     <message>
-        <source>Occurs at</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>For Plugin</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>And Caption</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>And Description</source>
         <translation></translation>
     </message>
     <message>
@@ -696,11 +690,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Reason: Power limit exceeded (%1)</source>
-        <comment>%1 is consumption</comment>
-        <translation></translation>
-    </message>
-    <message>
         <source>Server</source>
         <translation></translation>
     </message>
@@ -709,8 +698,9 @@
         <translation></translation>
     </message>
     <message>
-        <source>Begin When</source>
-        <translation></translation>
+        <source>Power limit exceeded (%1)</source>
+        <comment>%1 is consumption</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -720,15 +710,7 @@
         <translation></translation>
     </message>
     <message>
-        <source>At</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>PTZ Preset</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Interval of Action</source>
         <translation></translation>
     </message>
     <message>
@@ -738,10 +720,6 @@
 </context>
 <context>
     <name>nx::vms::rules::PushNotificationAction</name>
-    <message>
-        <source>To</source>
-        <translation></translation>
-    </message>
     <message>
         <source>Header</source>
         <translation></translation>
@@ -758,10 +736,6 @@
         <source>Add Source Device name to Body</source>
         <translation></translation>
     </message>
-    <message>
-        <source>Interval of Action</source>
-        <translation></translation>
-    </message>
 </context>
 <context>
     <name>nx::vms::rules::RepeatSoundAction</name>
@@ -770,20 +744,59 @@
         <translation></translation>
     </message>
     <message>
-        <source>Volume</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Repeat Sound</source>
         <translation></translation>
     </message>
+</context>
+<context>
+    <name>nx::vms::rules::Rule</name>
     <message>
-        <source>At</source>
+        <source>`%1` field `%2` alert: %3</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::rules::SaasIssueEvent</name>
+    <message>
+        <source>License migration issue</source>
         <translation></translation>
     </message>
     <message>
-        <source>To</source>
+        <source>Recording services disabled</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Cloud storage services disabled</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Paid integration services disabled</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Services issue</source>
+        <translation></translation>
+    </message>
+    <message numerus="yes">
+        <source>Recording on %n channels was stopped due to service overuse.</source>
+        <translation>
+            <numerusform>Recording on %n channel was stopped due to service overuse.</numerusform>
+            <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
+        <translation>
+            <numerusform>Cloud storage backup on %n channel was stopped due to service overuse.</numerusform>
+            <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
+        <translation>
+            <numerusform>Paid integration service usage on %n channel was stopped due to service overuse.</numerusform>
+            <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -797,15 +810,7 @@
         <translation></translation>
     </message>
     <message>
-        <source>To</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Additional Recipients</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Interval of Action</source>
         <translation></translation>
     </message>
 </context>
@@ -886,14 +891,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>To</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Rewind</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Force Alarm Layout Opening</source>
         <translation></translation>
     </message>
@@ -925,22 +922,25 @@
         <translation></translation>
     </message>
     <message>
-        <source>Occurs at</source>
+        <source>By</source>
         <translation></translation>
     </message>
     <message>
-        <source>By</source>
-        <translation></translation>
+        <source>Invisible</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::rules::SourceUserFieldValidator</name>
+    <message>
+        <source>Source camera field must be provided for the given validation policy</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>nx::vms::rules::SpeakAction</name>
     <message>
         <source>Speak</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Volume</source>
         <translation></translation>
     </message>
     <message>
@@ -953,10 +953,6 @@
     </message>
     <message>
         <source>To users</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Interval of Action</source>
         <translation></translation>
     </message>
 </context>
@@ -1012,17 +1008,31 @@
     </message>
 </context>
 <context>
+    <name>nx::vms::rules::TargetDeviceFieldValidator</name>
+    <message>
+        <source>Failed to get event descriptor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Event does not have source camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::rules::TargetUserFieldValidator</name>
+    <message>
+        <source>Acknowledge field must be provided for the given validation policy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Layout field must be provided for the given validation policy</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>nx::vms::rules::TextOverlayAction</name>
     <message>
         <source>Show Text Overlay</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>At</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Fixed Duration</source>
         <translation></translation>
     </message>
     <message>
@@ -1030,61 +1040,29 @@
         <translation></translation>
     </message>
     <message>
-        <source>Show to</source>
-        <translation></translation>
+        <source>Show To</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::rules::TextWithFieldsValidator</name>
+    <message>
+        <source>Unacceptable typed of field</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Internal error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Incorrect event parameters: </source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>nx::vms::rules::WriteToLogAction</name>
     <message>
         <source>Write to Log</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Interval of Action</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>nx::vms::rules::utils::StringHelper</name>
-    <message numerus="yes">
-        <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
-        <comment>%1 means time, %2 means date</comment>
-        <translation>
-            <numerusform>%n time: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
-            <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>First occurrence: %1 on %2 (%n times total)</source>
-        <comment>%1 means time, %2 means date</comment>
-        <translation>
-            <numerusform>First occurrence: %1 on %2 (%n time total)</numerusform>
-            <numerusform>First occurrence: %1 on %2 (%n times total)</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Time: %1 on %2</source>
-        <comment>%1 means time, %2 means date</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>All users</source>
-        <translation></translation>
-    </message>
-    <message numerus="yes">
-        <source>%n Removed subjects</source>
-        <translation>
-            <numerusform>%n Removed subject</numerusform>
-            <numerusform>%n Removed subjects</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Unknown event</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Unknown action</source>
         <translation></translation>
     </message>
 </context>

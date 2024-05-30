@@ -142,11 +142,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Log in to %1 to log in to this system with %2 user</source>
-        <comment>%1 is the cloud name (like Nx Cloud), %2 is the short cloud name (like Cloud)</comment>
-        <translation></translation>
-    </message>
-    <message>
         <source>Too many login attempts. Try again in a minute.</source>
         <translation></translation>
     </message>
@@ -187,6 +182,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Log in to %1 to log in to this site with %2 user</source>
+        <comment>%1 is the cloud name (like Nx Cloud), %2 is the short cloud name (like Cloud)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Session duration limit can be changed by a site administrator.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -205,6 +205,34 @@
     </message>
     <message>
         <source>This user has been disabled by a site administrator.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::client::core::AbstractAttributedEventModel</name>
+    <message numerus="yes">
+        <source>+%n values</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::client::core::AnalyticsSearchListModel</name>
+    <message>
+        <source>Unknown track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>deleted camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::client::core::BookmarkSearchListModel</name>
+    <message>
+        <source>deleted camera</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -268,6 +296,37 @@
     </message>
 </context>
 <context>
+    <name>nx::vms::client::core::EventSearchUtils</name>
+    <message>
+        <source>Last day</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Last 7 days</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Last 30 days</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n Cameras</source>
+        <comment>%n is a number of cameras</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+</context>
+<context>
     <name>nx::vms::client::core::ExtendedOutputCameraButtonController</name>
     <message>
         <source>Heater</source>
@@ -299,14 +358,6 @@
 </context>
 <context>
     <name>nx::vms::client::core::TwoWayAudioCameraButtonController</name>
-    <message>
-        <source>Unmute</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Mute</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message>
         <source>Press and hold to speak</source>
         <translation type="unfinished"></translation>
