@@ -74,6 +74,13 @@ QSize placeholderSize(const QSize& requestedSize)
     }
 }
 
+SvgIconColorer::ThemeSubstitutions kPlaceholderTheme = {{QnIcon::Normal, {.primary = "dark8"}}};
+
+NX_DECLARE_COLORIZED_ICON(
+    kServerIcon, "400x400/Outline/videowall_server_placeholder.svg", kPlaceholderTheme)
+NX_DECLARE_COLORIZED_ICON(
+    kWebpageIcon, "400x400/Outline/videowall_webpage_placeholder.svg", kPlaceholderTheme)
+
 } // namespace
 
 using namespace std::chrono;
@@ -96,16 +103,15 @@ struct ResourceThumbnailProvider::Private
         const auto flags = resource->flags();
 
         if (flags.testFlag(Qn::server))
-            return {ProviderType::image, "item_placeholders/videowall_server_placeholder_400.svg"};
+            return {ProviderType::image, kServerIcon.iconPath()};
 
         if (flags.testFlag(Qn::web_page))
-            return {
-                ProviderType::image, "item_placeholders/videowall_webpage_placeholder_400.svg"};
+            return {ProviderType::image, kWebpageIcon.iconPath()};
 
         // Some cameras are actually provide only sound stream. So we draw sound icon for this.
         const auto mediaResource = resource.dynamicCast<QnMediaResource>();
         if (const bool useCustomSoundIcon = mediaResource && !mediaResource->hasVideo())
-            return {ProviderType::image, "item_placeholders/sound.png"};
+            return {ProviderType::image, "48x48/Outline/sound.svg"};
 
         if (resource.dynamicCast<QnVirtualCameraResource>())
             return {ProviderType::camera, {}};

@@ -262,8 +262,8 @@ QString QnStatusOverlayController::captionText(Qn::ResourceStatusOverlay overlay
         { Qn::OfflineOverlay, tr("OFFLINE") },
         { Qn::AnalogWithoutLicenseOverlay, kNotEnoughLicenses },
         { Qn::VideowallWithoutLicenseOverlay, kNotEnoughLicenses },
-        { Qn::ServerOfflineOverlay, tr("SERVER UNAVAILABLE") },
-        { Qn::ServerUnauthorizedOverlay, tr("NO ACCESS") },
+        { Qn::ServerOfflineOverlay, tr("OFFLINE") },
+        { Qn::ServerUnauthorizedOverlay, tr("UNAUTHORIZED") },
         { Qn::IoModuleDisabledOverlay, tr("DEVICE DISABLED") },
         { Qn::TooManyOpenedConnectionsOverlay, tr("TOO MANY CONNECTIONS") },
         { Qn::PasswordRequiredOverlay, tr("PASSWORD REQUIRED") },
@@ -308,23 +308,26 @@ QString QnStatusOverlayController::suggestionText(Qn::ResourceStatusOverlay over
 
 QString QnStatusOverlayController::statusIconPath(Qn::ResourceStatusOverlay overlay)
 {
-    static const auto kLicenceIconPath = lit("item_placeholders/license.png");
+    static const auto kLockIconPath = "48x48/Outline/lock.svg";
+    static const auto kRestrictIconPath = "48x48/Outline/restrict.svg";
+    static const auto kErrorIconPath = "48x48/Outline/error.svg";
+    static const auto kSoundIconPath = "48x48/Outline/sound.svg";
     static const IntStringHash kIconPaths
     {
-        { Qn::UnauthorizedOverlay, "item_placeholders/unauthorized.png" },
-        { Qn::AccessDeniedOverlay, "item_placeholders/no_access.svg" },
-        { Qn::NoExportPermissionOverlay, "item_placeholders/no_access.svg" },
-        { Qn::OfflineOverlay, "item_placeholders/offline.svg" },
-        { Qn::AnalogWithoutLicenseOverlay, kLicenceIconPath },
-        { Qn::VideowallWithoutLicenseOverlay, kLicenceIconPath },
-        { Qn::ServerUnauthorizedOverlay, "item_placeholders/no_access.svg" },
-        { Qn::IoModuleDisabledOverlay, "item_placeholders/disabled.png" },
-        { Qn::NoVideoDataOverlay, "item_placeholders/sound.png" },
-        { Qn::PasswordRequiredOverlay, "item_placeholders/alert.png" },
-        { Qn::CannotDecryptMediaOverlay, "item_placeholders/encrypted.svg" },
-        { Qn::InformationRequiredOverlay, "item_placeholders/alert.png" },
-        { Qn::SaasShutDown, "item_placeholders/offline.svg" }, //< TODO: #vbreus Change icon if needed.
-        { Qn::RestrictedOverlay, "item_placeholders/no_access.svg" },
+        {Qn::UnauthorizedOverlay, kLockIconPath},
+        {Qn::AccessDeniedOverlay, kRestrictIconPath},
+        {Qn::NoExportPermissionOverlay, kLockIconPath},
+        {Qn::OfflineOverlay, kErrorIconPath},
+        {Qn::AnalogWithoutLicenseOverlay, kLockIconPath},
+        {Qn::VideowallWithoutLicenseOverlay, kLockIconPath},
+        {Qn::ServerUnauthorizedOverlay, kLockIconPath},
+        {Qn::IoModuleDisabledOverlay, kErrorIconPath},
+        {Qn::NoVideoDataOverlay, kSoundIconPath},
+        {Qn::PasswordRequiredOverlay, kLockIconPath},
+        {Qn::CannotDecryptMediaOverlay, kLockIconPath},
+        {Qn::InformationRequiredOverlay, kRestrictIconPath},
+        {Qn::SaasShutDown, kErrorIconPath},
+        {Qn::RestrictedOverlay, kRestrictIconPath},
     };
 
     return extractValue(overlay, kIconPaths);
