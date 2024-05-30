@@ -63,6 +63,7 @@ static constexpr char kOauthLogoutPath[] = "/cdb/oauth2/user/self";
 static constexpr char kOauthStunTokenPath[] = "/cdb/oauth2/stun-token";
 static constexpr char kOauthJwksPath[] = "/cdb/oauth2/jwks";
 static constexpr char kOauthJwkByIdPath[] = "/cdb/oauth2/jwks/{kid}";
+static constexpr char kAccSecuritySettingsChangedEvents[] = "/cdb/oauth2/account_events";
 
 static constexpr char kTokenParam[] = "token";
 static constexpr char kClientIdParam[] = "clientId";

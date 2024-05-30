@@ -246,4 +246,41 @@ public:
 
 using Token = nx::network::jws::Token<ClaimSet>;
 
+struct GetAccSecuritySettingsChangedEventsRequest
+{
+    /**%apidoc The timestamp since which all password reset events should be returned.
+    * Seconds since the epoch, UTC.
+    */
+    std::chrono::seconds timestamp;
+};
+
+NX_REFLECTION_INSTRUMENT(GetAccSecuritySettingsChangedEventsRequest, (timestamp))
+
+NX_REFLECTION_ENUM_CLASS(AccSettingChanged,
+    enabled2Fa,
+    passwordChanged,
+    other);
+
+struct AccSecuritySettingsChangedEvent
+{
+    // Event timestamp, seconds since UTC
+    std::chrono::seconds ts;
+
+    // Account email
+    std::string email;
+
+    // Event type
+    AccSettingChanged eventType;
+
+    // If eventType == passwrodChanged contains the session which should remain active
+    // If eventType == enabled2Fa contains session which should be marked as 2fa verified
+    std::optional<std::string> validSession;
+};
+
+NX_REFLECTION_INSTRUMENT(AccSecuritySettingsChangedEvent, (ts)(email)(eventType)(validSession))
+
+using GetAccSecuritySettingsChangedEventsResponse = std::vector<AccSecuritySettingsChangedEvent>;
+
+
+
 } // namespace nx::cloud::db::api
