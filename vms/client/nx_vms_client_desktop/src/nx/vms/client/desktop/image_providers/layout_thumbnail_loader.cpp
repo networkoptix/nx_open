@@ -122,7 +122,7 @@ struct LayoutThumbnailLoader::Private
         auto offlineWidgetLayout = new QVBoxLayout(offlineWidget.get());
         offlineWidgetLayout->setSpacing(0);
         offlineWidgetLayout->setContentsMargins(6, 2, 6, 6);
-        auto noSignalImage = new ScalableImageWidget(":/skin/item_placeholders/offline.svg");
+        auto noSignalImage = new ScalableImageWidget("48x48/Outline/error.svg");
         offlineWidgetLayout->addWidget(noSignalImage, 3, Qt::AlignHCenter);
 
         auto noSignalText = new AutoscaledPlainText();
@@ -137,7 +137,7 @@ struct LayoutThumbnailLoader::Private
         noExportPermissionLayout->setSpacing(0);
         noExportPermissionLayout->setContentsMargins(6, 2, 6, 6);
         noExportPermissionLayout->addWidget(new ScalableImageWidget(
-            ":/skin/item_placeholders/no_access.svg"), 3, Qt::AlignHCenter);
+            "48x48/Outline/lock.svg"), 3, Qt::AlignHCenter);
 
         auto noExportPermissionText = new AutoscaledPlainText();
         noExportPermissionText->setText(tr("NO EXPORT PERMISSION"));
