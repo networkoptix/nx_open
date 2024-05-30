@@ -33,8 +33,6 @@ AbstractSearchWidget::AbstractSearchWidget(
     WindowContextAware(context),
     d(new Private(this, model))
 {
-    setRelevantControls(Control::defaults);
-
     auto listenPermissionsChanges =
         [this]()
         {

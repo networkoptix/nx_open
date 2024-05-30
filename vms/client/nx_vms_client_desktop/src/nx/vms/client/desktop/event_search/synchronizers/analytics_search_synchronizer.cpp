@@ -51,11 +51,10 @@ AnalyticsSearchSynchronizer::AnalyticsSearchSynchronizer(
     core::AnalyticsSearchSetup* analyticsSetup,
     QObject* parent)
     :
-    AbstractSearchSynchronizer(context, parent),
-    m_commonSetup(commonSetup),
+    AbstractSearchSynchronizer(context, commonSetup, parent),
     m_analyticsSetup(analyticsSetup)
 {
-    NX_CRITICAL(m_commonSetup && m_analyticsSetup);
+    NX_CRITICAL(m_analyticsSetup);
 
     instances().push_back(this);
 
@@ -157,7 +156,7 @@ AnalyticsSearchSynchronizer::AnalyticsSearchSynchronizer(
     connect(m_analyticsSetup, &core::AnalyticsSearchSetup::areaSelectionActiveChanged, this,
         [this]() { setAreaSelectionActive(m_analyticsSetup->areaSelectionActive()); });
 
-    connect(m_commonSetup, &CommonObjectSearchSetup::selectedCamerasChanged, this,
+    connect(commonSetup, &CommonObjectSearchSetup::selectedCamerasChanged, this,
         [this]()
         {
             updateCachedDevices();
@@ -219,7 +218,8 @@ AnalyticsSearchSynchronizer::AnalyticsSearchSynchronizer(
             if (on)
             {
                 setActive(true);
-                m_commonSetup->setCameraSelection(core::EventSearch::CameraSelection::current);
+                this->commonSetup()->setCameraSelection(
+                    core::EventSearch::CameraSelection::current);
 
                 if (!m_updating)
                     m_analyticsSetup->setAreaSelectionActive(true);
@@ -231,7 +231,7 @@ AnalyticsSearchSynchronizer::AnalyticsSearchSynchronizer(
             }
         });
 
-    connect(m_commonSetup, &CommonObjectSearchSetup::cameraSelectionChanged, this,
+    connect(commonSetup, &CommonObjectSearchSetup::cameraSelectionChanged, this,
         [this]()
         {
             const QScopedValueRollback updateGuard(m_updating, true);
@@ -263,7 +263,7 @@ void AnalyticsSearchSynchronizer::updateAreaSelection()
     const auto area = mediaWidget->analyticsFilterRect();
 
     if (area.isValid())
-        m_commonSetup->setCameraSelection(core::EventSearch::CameraSelection::current);
+        commonSetup()->setCameraSelection(core::EventSearch::CameraSelection::current);
 
     m_analyticsSetup->setArea(m_analyticsSetup->areaEnabled() ? area : QRectF());
 }
@@ -271,9 +271,9 @@ void AnalyticsSearchSynchronizer::updateAreaSelection()
 void AnalyticsSearchSynchronizer::updateCachedDevices()
 {
     std::map<SystemContext*, UuidSet> cachedDevicesByContext;
-    if (active() && m_commonSetup)
+    if (active() && commonSetup())
     {
-        for (const auto& camera: m_commonSetup->selectedCameras())
+        for (const auto& camera: commonSetup()->selectedCameras())
         {
             auto systemContext = SystemContext::fromResource(camera);
             cachedDevicesByContext[systemContext].insert(camera->getId());
@@ -285,7 +285,7 @@ void AnalyticsSearchSynchronizer::updateCachedDevices()
 
 void AnalyticsSearchSynchronizer::updateWorkbench()
 {
-    if (!active() || !m_commonSetup)
+    if (!active() || !commonSetup())
     {
         for (const auto widget: display()->widgets())
         {
@@ -299,12 +299,12 @@ void AnalyticsSearchSynchronizer::updateWorkbench()
 
     m_filter = {};
 
-    const auto cameraSetType = m_commonSetup->cameraSelection();
+    const auto cameraSetType = commonSetup()->cameraSelection();
 
     if (cameraSetType != core::EventSearch::CameraSelection::all
         && cameraSetType != core::EventSearch::CameraSelection::layout)
     {
-        for (const auto& camera: m_commonSetup->selectedCameras())
+        for (const auto& camera: commonSetup()->selectedCameras())
             m_filter.deviceIds.insert(camera->getId());
     }
 
@@ -323,7 +323,7 @@ void AnalyticsSearchSynchronizer::updateWorkbench()
     }
 
     const auto camera = navigator()->currentResource().dynamicCast<QnVirtualCameraResource>();
-    const bool relevant = camera && m_commonSetup->selectedCameras().contains(camera);
+    const bool relevant = camera && commonSetup()->selectedCameras().contains(camera);
     if (!relevant)
     {
         navigator()->setSelectedExtraContent(Qn::RecordingContent /*means none*/);
@@ -341,7 +341,7 @@ void AnalyticsSearchSynchronizer::updateWorkbench()
 void AnalyticsSearchSynchronizer::updateAction()
 {
     action(menu::ObjectSearchModeAction)->setChecked(active()
-        && m_commonSetup->cameraSelection() == core::EventSearch::CameraSelection::current);
+        && commonSetup()->cameraSelection() == core::EventSearch::CameraSelection::current);
 }
 
 void AnalyticsSearchSynchronizer::updateMediaResourceWidgetAnalyticsMode(
@@ -400,7 +400,7 @@ void AnalyticsSearchSynchronizer::ensureVisible(milliseconds timestamp, const nx
 
 void AnalyticsSearchSynchronizer::setupInstanceSynchronization()
 {
-    if (!NX_ASSERT(m_commonSetup && m_analyticsSetup))
+    if (!NX_ASSERT(commonSetup() && m_analyticsSetup))
         return;
 
     connect(this, &AnalyticsSearchSynchronizer::activeChanged, this,
@@ -410,35 +410,35 @@ void AnalyticsSearchSynchronizer::setupInstanceSynchronization()
                 instance->setActive(active());
         });
 
-    connect(m_commonSetup->textFilter(), &core::TextFilterSetup::textChanged, this,
+    connect(commonSetup()->textFilter(), &core::TextFilterSetup::textChanged, this,
         [this]()
         {
             for (auto instance: instancesToNotify())
-                instance->m_commonSetup->textFilter()->setText(m_commonSetup->textFilter()->text());
+                instance->commonSetup()->textFilter()->setText(commonSetup()->textFilter()->text());
         });
 
-    connect(m_commonSetup, &CommonObjectSearchSetup::timeSelectionChanged, this,
+    connect(commonSetup(), &CommonObjectSearchSetup::timeSelectionChanged, this,
         [this]()
         {
             for (auto instance: instancesToNotify())
-                instance->m_commonSetup->setTimeSelection(m_commonSetup->timeSelection());
+                instance->commonSetup()->setTimeSelection(commonSetup()->timeSelection());
         });
 
-    connect(m_commonSetup, &CommonObjectSearchSetup::cameraSelectionChanged, this,
+    connect(commonSetup(), &CommonObjectSearchSetup::cameraSelectionChanged, this,
         [this]()
         {
             for (auto instance: instancesToNotify())
-                instance->m_commonSetup->setCameraSelection(m_commonSetup->cameraSelection());
+                instance->commonSetup()->setCameraSelection(commonSetup()->cameraSelection());
         });
 
-    connect(m_commonSetup, &CommonObjectSearchSetup::selectedCamerasChanged, this,
+    connect(commonSetup(), &CommonObjectSearchSetup::selectedCamerasChanged, this,
         [this]()
         {
-            if (m_commonSetup->cameraSelection() != core::EventSearch::CameraSelection::custom)
+            if (commonSetup()->cameraSelection() != core::EventSearch::CameraSelection::custom)
                 return;
 
             for (auto instance: instancesToNotify())
-                instance->m_commonSetup->setSelectedCameras(m_commonSetup->selectedCameras());
+                instance->commonSetup()->setSelectedCameras(commonSetup()->selectedCameras());
         });
 
     connect(m_analyticsSetup, &core::AnalyticsSearchSetup::engineChanged, this,
@@ -488,12 +488,12 @@ void AnalyticsSearchSynchronizer::setupInstanceSynchronization()
     const auto master = instances()[0];
     setActive(master->active());
 
-    m_commonSetup->textFilter()->setText(master->m_commonSetup->textFilter()->text());
-    m_commonSetup->setTimeSelection(master->m_commonSetup->timeSelection());
-    m_commonSetup->setCameraSelection(master->m_commonSetup->cameraSelection());
+    commonSetup()->textFilter()->setText(master->commonSetup()->textFilter()->text());
+    commonSetup()->setTimeSelection(master->commonSetup()->timeSelection());
+    commonSetup()->setCameraSelection(master->commonSetup()->cameraSelection());
 
-    if (m_commonSetup->cameraSelection() == core::EventSearch::CameraSelection::custom)
-        m_commonSetup->setSelectedCameras(master->m_commonSetup->selectedCameras());
+    if (commonSetup()->cameraSelection() == core::EventSearch::CameraSelection::custom)
+        commonSetup()->setSelectedCameras(master->commonSetup()->selectedCameras());
 
     m_analyticsSetup->setEngine(master->m_analyticsSetup->engine());
     m_analyticsSetup->setObjectTypes(master->m_analyticsSetup->objectTypes());

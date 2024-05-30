@@ -119,6 +119,22 @@
            </property>
           </widget>
          </item>
+         <item alignment="Qt::AlignLeft">
+          <widget class="nx::vms::client::desktop::SelectableTextButton" name="cameraDisplayingButton">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string notr="true">&lt;camera filter display&gt;</string>
+           </property>
+           <property name="flat">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
         </layout>
        </widget>
       </item>

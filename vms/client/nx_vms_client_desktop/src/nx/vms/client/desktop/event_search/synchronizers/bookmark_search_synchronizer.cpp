@@ -21,26 +21,23 @@ namespace nx::vms::client::desktop {
 
 BookmarkSearchSynchronizer::BookmarkSearchSynchronizer(
     WindowContext* context,
-    CommonObjectSearchSetup* searchSetup,
+    CommonObjectSearchSetup* commonSetup,
     QObject* parent)
     :
-    AbstractSearchSynchronizer(context, parent),
-    m_searchSetup(searchSetup)
+    AbstractSearchSynchronizer(context, commonSetup, parent)
 {
-    NX_CRITICAL(m_searchSetup);
-
     connect(bookmarksAction(), &QAction::toggled, this, &BookmarkSearchSynchronizer::setActive);
 
     connect(this, &AbstractSearchSynchronizer::activeChanged,
         bookmarksAction(), &QAction::setChecked);
 
-    connect(m_searchSetup.data(), &CommonObjectSearchSetup::selectedCamerasChanged,
+    connect(commonSetup, &CommonObjectSearchSetup::selectedCamerasChanged,
         this, &BookmarkSearchSynchronizer::updateTimelineBookmarks);
 
     connect(navigator(), &QnWorkbenchNavigator::currentResourceChanged,
         this, &BookmarkSearchSynchronizer::updateTimelineBookmarks);
 
-    connect(m_searchSetup->textFilter(), &core::TextFilterSetup::textChanged,
+    connect(commonSetup->textFilter(), &core::TextFilterSetup::textChanged,
         this, &BookmarkSearchSynchronizer::updateTimelineBookmarks);
 }
 
@@ -51,20 +48,20 @@ QAction* BookmarkSearchSynchronizer::bookmarksAction() const
 
 void BookmarkSearchSynchronizer::updateTimelineBookmarks()
 {
-    if (!m_searchSetup)
+    if (!commonSetup())
         return;
 
     const auto camera = navigator()->currentResource().dynamicCast<QnVirtualCameraResource>();
 
-    const bool relevant = camera && m_searchSetup->selectedCameras().contains(camera);
+    const bool relevant = camera && commonSetup()->selectedCameras().contains(camera);
 
-    const auto cameraSetType = m_searchSetup->cameraSelection();
+    const auto cameraSetType = commonSetup()->cameraSelection();
     const auto cameras = cameraSetType == core::EventSearch::CameraSelection::current
-        ? m_searchSetup->selectedCameras()
+        ? commonSetup()->selectedCameras()
         : QnVirtualCameraResourceSet();
 
-    const auto filterText = NX_ASSERT(m_searchSetup->textFilter())
-        ? m_searchSetup->textFilter()->text()
+    const auto filterText = NX_ASSERT(commonSetup()->textFilter())
+        ? commonSetup()->textFilter()->text()
         : QString();
 
     if (auto watcher = workbenchContext()->instance<QnTimelineBookmarksWatcher>())

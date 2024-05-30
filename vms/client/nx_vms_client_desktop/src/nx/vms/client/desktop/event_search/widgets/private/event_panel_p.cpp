@@ -98,12 +98,6 @@ QRect globalGeometry(QWidget* widget)
         : QRect();
 }
 
-bool isCrossSystemLayout(const QnWorkbenchLayout* workbenchLayout)
-{
-    const auto layoutResource = workbenchLayout->resource();
-    return layoutResource && layoutResource->hasFlags(Qn::cross_system);
-}
-
 } // namespace
 
 class EventPanel::Private::StateDelegate: public ClientStateDelegate
@@ -193,10 +187,7 @@ EventPanel::Private::Private(EventPanel* q):
     compactTabBar->setCustomTabEnabledFunction(
         [this](int index)
         {
-            const bool isCurrentLayoutCrossSystem =
-                isCrossSystemLayout(workbench()->currentLayout());
-
-            if (isCurrentLayoutCrossSystem
+            if (workbench()->currentLayout()->resource()->isCrossSystem()
                 && (index == static_cast<int>(Tab::analytics)
                     || index == static_cast<int>(Tab::bookmarks)
                     || index == static_cast<int>(Tab::events)))
@@ -350,18 +341,23 @@ EventPanel::Private::Private(EventPanel* q):
         this,
         [this]
         {
-            const bool isCurrentLayoutCrossSystem
-                = isCrossSystemLayout(workbench()->currentLayout());
-
-            // Bookmarks, analytics and events are not supported for the cross systems at the moment.
-            const auto appearance = isCurrentLayoutCrossSystem
+            const auto appearance = workbench()->currentLayout()->resource()->isCrossSystem()
                 ? OverlappableSearchWidget::Appearance::overlay
                 : OverlappableSearchWidget::Appearance::searchWidget;
 
-            m_bookmarksTab->setAppearance(appearance);
+            m_bookmarksTab->setAppearance(
+                ini().allowCslBookmarkSearch
+                    ? OverlappableSearchWidget::Appearance::searchWidget
+                    : appearance);
+
+            m_analyticsTab->setAppearance(
+                ini().allowCslObjectSearch
+                    ? OverlappableSearchWidget::Appearance::searchWidget
+                    : appearance);
+
+            // Events are not supported for the cross systems at the moment.
             m_eventsTab->setAppearance(appearance);
             m_vmsEventsTab->setAppearance(appearance);
-            m_analyticsTab->setAppearance(appearance);
         });
 
     rebuildTabs();

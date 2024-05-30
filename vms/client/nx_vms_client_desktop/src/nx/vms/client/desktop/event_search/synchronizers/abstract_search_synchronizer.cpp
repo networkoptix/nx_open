@@ -3,6 +3,7 @@
 #include "abstract_search_synchronizer.h"
 
 #include <nx/utils/log/assert.h>
+#include <nx/vms/client/desktop/event_search/utils/common_object_search_setup.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/workbench/workbench_navigator.h>
 
@@ -10,11 +11,15 @@ namespace nx::vms::client::desktop {
 
 AbstractSearchSynchronizer::AbstractSearchSynchronizer(
     WindowContext* context,
+    CommonObjectSearchSetup* commonSetup,
     QObject* parent)
     :
     base_type(parent),
-    WindowContextAware(context)
+    WindowContextAware(context),
+    m_commonSetup(commonSetup)
 {
+    NX_CRITICAL(m_commonSetup);
+
     connect(navigator(), &QnWorkbenchNavigator::currentWidgetAboutToBeChanged, this,
         [this]() { emit mediaWidgetAboutToBeChanged(mediaWidget(), QPrivateSignal()); });
 
@@ -49,6 +54,11 @@ QnMediaResourceWidget* AbstractSearchSynchronizer::mediaWidget() const
 bool AbstractSearchSynchronizer::isMediaAccepted(QnMediaResourceWidget* widget) const
 {
     return widget != nullptr;
+}
+
+CommonObjectSearchSetup* AbstractSearchSynchronizer::commonSetup()
+{
+    return m_commonSetup;
 }
 
 void AbstractSearchSynchronizer::setTimeContentDisplayed(

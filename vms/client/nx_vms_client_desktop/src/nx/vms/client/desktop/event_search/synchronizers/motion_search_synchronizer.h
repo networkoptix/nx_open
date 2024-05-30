@@ -8,7 +8,6 @@
 
 namespace nx::vms::client::desktop {
 
-class CommonObjectSearchSetup;
 class SimpleMotionSearchListModel;
 
 /**
@@ -30,7 +29,6 @@ private:
     virtual bool isMediaAccepted(QnMediaResourceWidget* widget) const override;
 
 private:
-    const QPointer<CommonObjectSearchSetup> m_commonSetup;
     const QPointer<SimpleMotionSearchListModel> m_model;
     bool m_layoutChanging = false;
 };

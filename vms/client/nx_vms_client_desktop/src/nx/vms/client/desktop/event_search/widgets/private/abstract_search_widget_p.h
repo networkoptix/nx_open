@@ -58,6 +58,7 @@ public:
 
     Controls relevantControls() const;
     void setRelevantControls(Controls value);
+    void updateControlsVisibility();
 
     CommonObjectSearchSetup* commonSetup() const;
 
@@ -92,6 +93,8 @@ private:
     void setupPlaceholder();
     void setupTimeSelection();
     void setupCameraSelection();
+    void setupCameraDisplaying();
+    void updateCameraDisplaying();
 
     void tryFetchData();
 
@@ -146,6 +149,9 @@ private:
     std::optional<bool> m_isAllowed; //< std::optional for lazy initialization.
 
     QDateTime m_currentDate; //< Either client or server time, depending on the local settings.
+
+    Controls m_relevantControls = Control::defaults;
+    bool m_crossSystemLayoutMode = false;
 };
 
 } // namespace nx::vms::client::desktop

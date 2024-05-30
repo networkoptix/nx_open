@@ -393,7 +393,11 @@ VmsEventSearchWidget::VmsEventSearchWidget(WindowContext* context, QWidget* pare
     base_type(context, new VmsEventSearchListModel(context), parent),
     d(new Private(this))
 {
-    setRelevantControls(Control::cameraSelector | Control::timeSelector | Control::previewsToggler);
+    setRelevantControls(
+        Control::cameraSelector
+        | Control::cameraSelectionDisplay
+        | Control::timeSelector
+        | Control::previewsToggler);
     setPlaceholderPixmap(qnSkin->pixmap("left_panel/placeholders/events.svg"));
 }
 

@@ -33,9 +33,7 @@ static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kThemeSub
     {QnIcon::Pressed, {.primary = "light14"}},
 };
 
-NX_DECLARE_COLORIZED_ICON(kDeviceIcon, "20x20/Outline/device.svg", kThemeSubstitutions)
 NX_DECLARE_COLORIZED_ICON(kFrameIcon, "20x20/Outline/frame.svg", kThemeSubstitutions)
-NX_DECLARE_COLORIZED_ICON(kPlayIcon, "20x20/Outline/play.svg", kThemeSubstitutions)
 
 class SimpleMotionSearchWidget::Private: public QObject
 {
@@ -46,15 +44,10 @@ public:
     Private(SimpleMotionSearchWidget* q):
         q(q),
         m_model(qobject_cast<SimpleMotionSearchListModel*>(q->model())),
-        m_resourceButton(q->createCustomFilterButton()),
         m_areaButton(q->createCustomFilterButton())
     {
         NX_CRITICAL(m_model);
         q->view()->setHeadersEnabled(false);
-
-        setReadOnly(m_resourceButton, true);
-        m_resourceButton->setDeactivatable(false);
-        m_resourceButton->setAccented(true);
 
         setReadOnly(m_areaButton, true); //< Does not affect close button.
         m_areaButton->setAccented(true);
@@ -76,60 +69,12 @@ public:
                     ? SelectableTextButton::State::deactivated
                     : SelectableTextButton::State::unselected);
             });
-
-        connect(q->navigator(), &QnWorkbenchNavigator::currentResourceChanged, this,
-            &Private::updateResourceButton);
-
-        updateResourceButton();
     }
 
     SimpleMotionSearchListModel* model() const { return m_model; }
 
 private:
-    void updateResourceButton()
-    {
-        const auto resource = q->navigator()->currentResource();
-        const bool isMedia = (bool) resource.dynamicCast<QnMediaResource>();
-
-        const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
-        const bool isCamera = camera || !isMedia;
-
-        m_resourceButton->setIcon(isCamera
-            ? qnSkin->icon(kDeviceIcon)
-            : qnSkin->icon(kPlayIcon));
-
-        // TODO: #vkutin Think how to avoid code duplication with AbstractSearchWidget::Private.
-        if (resource)
-        {
-            const auto name = resource->getName();
-            if (isCamera)
-            {
-                const auto baseText = QnDeviceDependentStrings::getNameFromSet(
-                    q->system()->resourcePool(),
-                    QnCameraDeviceStringSet(tr("Selected device"), tr("Selected camera")),
-                    camera);
-
-                m_resourceButton->setText(
-                    QString("%1 %2 %3").arg(baseText, nx::UnicodeChars::kEnDash, name));
-            }
-            else
-            {
-                m_resourceButton->setText(
-                    QString("%1 %2 %3").arg(tr("Selected media"), nx::UnicodeChars::kEnDash, name));
-            }
-        }
-        else
-        {
-            m_resourceButton->setText(QString("%1 %2 %3").arg(
-                tr("Selected camera"),
-                nx::UnicodeChars::kEnDash,
-                tr("none", "No currently selected camera")));
-        }
-    }
-
-private:
     SimpleMotionSearchListModel* const m_model;
-    SelectableTextButton* const m_resourceButton;
     SelectableTextButton* const m_areaButton;
 };
 
@@ -137,7 +82,7 @@ SimpleMotionSearchWidget::SimpleMotionSearchWidget(WindowContext* context, QWidg
     base_type(context, new SimpleMotionSearchListModel(context), parent),
     d(new Private(this))
 {
-    setRelevantControls(Control::timeSelector | Control::previewsToggler);
+    setRelevantControls(Control::cameraSelectionDisplay | Control::timeSelector | Control::previewsToggler);
     setPlaceholderPixmap(qnSkin->pixmap("left_panel/placeholders/motion.svg"));
 
     connect(model(), &core::AbstractSearchListModel::isOnlineChanged, this,
