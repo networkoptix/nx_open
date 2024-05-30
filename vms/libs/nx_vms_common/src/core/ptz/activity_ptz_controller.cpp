@@ -5,6 +5,7 @@
 #include <api/resource_property_adaptor.h>
 #include <core/resource/resource.h>
 #include <core/resource_management/resource_properties.h>
+#include <nx/utils/qt_direct_connect.h>
 
 using namespace nx::core;
 
@@ -13,30 +14,37 @@ QnActivityPtzController::QnActivityPtzController(
     const QnPtzControllerPtr& baseController)
     :
     base_type(baseController),
-    m_mode(mode)
+    m_mode(mode),
+    m_adaptor(
+        new QnJsonResourcePropertyAdaptor<QnPtzObject>("ptzActiveObject", QnPtzObject(), this))
 {
-    m_adaptor = new QnJsonResourcePropertyAdaptor<QnPtzObject>(
-        "ptzActiveObject", QnPtzObject(), this);
-    connect(m_adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged, this,
-        [this]() { emit changed(DataField::activeObject); });
-
     /* Adaptor is thread-safe and works even without resource,
      * exactly what we need for local mode. */
     if (m_mode == Local)
         return;
 
-    m_adaptor->setResource(resource());
+    auto resource = this->resource();
+    if (!NX_ASSERT(resource))
+        return;
 
-    connect(m_adaptor, &QnAbstractResourcePropertyAdaptor::synchronizationNeeded, this,
-        [this](const QnResourcePtr& resource)
-        {
-            if (NX_ASSERT(resource))
-                resource->savePropertiesAsync();
-        });
-}
-
-QnActivityPtzController::~QnActivityPtzController()
-{
+    m_connections = {
+        nx::qtDirectConnect(resource.get(), &QnResource::propertyChanged,
+            [this](const auto&, const auto& key, const auto&, const auto& value)
+            {
+                if (key == m_adaptor->key())
+                    m_adaptor->loadValue(value);
+            }),
+        nx::qtDirectConnect(m_adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged,
+            [this](const QString& key, const QString& value)
+            {
+                if (auto r = this->resource(); NX_ASSERT(r) && r->setProperty(key, value))
+                {
+                    emit changed(DataField::activeObject);
+                    r->savePropertiesAsync();
+                }
+            })
+    };
+    m_adaptor->loadValue(resource->getProperty(m_adaptor->key()));
 }
 
 bool QnActivityPtzController::extends(Ptz::Capabilities capabilities)

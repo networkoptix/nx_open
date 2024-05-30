@@ -1746,18 +1746,15 @@ struct ModifyResourceParamAccess
         const auto accessManager = systemContext->resourceAccessManager();
         const auto hasPowerUserPermissions = accessManager->hasPowerUserPermissions(accessData);
 
-        // System properties are stored in resource unrelated places and should be handled
-        // differently.
         if (hasPowerUserPermissions)
         {
             // Null resource Id can not be handled by permissions engine, since there is no such resource.
             if (param.resourceId.isNull())
                 return Result();
 
-            // System settings are stored as admin user properties. Admin user is an owner and can not
-            // be modified by anyone else.
-            // TODO: Remove this check once global system settings are not admin properties.
-            if (param.resourceId == QnUserResource::kAdminGuid)
+            // Settings' resource id can not be handled by permissions engine, since there is no
+            // such resource.
+            if (param.resourceId == nx::vms::common::SystemSettings::kResourceId)
                 return Result();
         }
 

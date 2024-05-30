@@ -8,7 +8,6 @@
 #include <client/client_message_processor.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <storage/server_storage_manager.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/analytics/analytics_attribute_helper.h>
@@ -20,8 +19,10 @@
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/core/watchers/watermark_watcher.h>
+#include <nx/vms/common/system_settings.h>
 #include <nx/vms/rules/engine_holder.h>
 #include <nx/vms/rules/initializer.h>
+#include <storage/server_storage_manager.h>
 
 #include "private/system_context_data_p.h"
 
@@ -118,6 +119,8 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
                 emit userChanged(user);
             });
     }
+
+    globalSettings()->initialize();
 }
 
 SystemContext::~SystemContext()

@@ -3,7 +3,6 @@
 #include "abstract_transaction_transport.h"
 
 #include <nx/vms/api/types/connection_types.h>
-#include <nx/p2p/transaction_filter.h>
 
 using namespace nx::vms;
 

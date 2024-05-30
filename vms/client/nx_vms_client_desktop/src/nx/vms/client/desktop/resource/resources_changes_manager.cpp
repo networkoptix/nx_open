@@ -48,12 +48,12 @@ namespace nx::vms::client::desktop {
 namespace {
 
 template<class ResourcePtrType>
-QList<nx::Uuid> idListFromResList(const QList<ResourcePtrType>& resList)
+std::vector<nx::Uuid> idListFromResList(const QList<ResourcePtrType>& resList)
 {
-    QList<nx::Uuid> idList;
+    std::vector<nx::Uuid> idList;
     idList.reserve(resList.size());
     for (const ResourcePtrType& resPtr: resList)
-        idList.push_back(resPtr->getId());
+        idList.emplace_back(resPtr->getId());
     return idList;
 }
 
@@ -220,8 +220,7 @@ void ResourcesChangesManager::saveCamerasBatch(const QnVirtualCameraResourceList
     connection->getCameraManager(nx::network::rest::kSystemSession)->saveUserAttributes(changes, handler, this);
 
     // TODO: #sivanov Values are not rolled back in case of failure.
-    auto idList = idListFromResList(cameras);
-    systemContext->resourcePropertyDictionary()->saveParamsAsync(idList);
+    systemContext->resourcePropertyDictionary()->saveParamsAsync(idListFromResList(cameras));
 }
 
 void ResourcesChangesManager::saveCamerasCore(
