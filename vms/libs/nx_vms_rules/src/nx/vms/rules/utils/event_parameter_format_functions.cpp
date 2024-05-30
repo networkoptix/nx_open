@@ -115,9 +115,6 @@ QString extendedEventDescription(
     if (const auto it = eventDetails.find(utils::kSourceNameDetailName); it != eventDetails.end())
         extendedDescription << QString("Source: %1").arg(it->toString());
 
-    if (const auto it = eventDetails.find(kTriggerNameDetailName); it != eventDetails.end())
-        extendedDescription << QString("Trigger: %1").arg(it->toString());
-
     if (const auto it = eventDetails.find(kPluginIdDetailName); it != eventDetails.end())
     {
         extendedDescription << QString("Plugin: %1")
@@ -131,37 +128,7 @@ QString extendedEventDescription(
         eventAggregator->initialEvent()->timestamp(),
         static_cast<int>(eventAggregator->count()));
 
-
-    // TODO: #vbutkevich need to remove Reason, since it is duplicated in the kDetailingDetailName. But not for all events.
-    if (const auto it = eventDetails.find(utils::kReasonDetailName); it != eventDetails.end())
-    {
-        QString reason;
-
-        if (it->canConvert<QString>())
-        {
-            reason = QString("Reason: %1").arg(it->toString());
-        }
-        else
-        {
-            auto reasonValue = it->toStringList();
-            if (!reasonValue.empty())
-                reason = QString("Reason: %1").arg(reasonValue.takeFirst()); //< Reason text.
-
-            if (!reasonValue.empty())
-                reason += " " + reasonValue.join(", "); //< Affected devices.
-        }
-
-        if (!reason.isEmpty())
-            extendedDescription << reason;
-    }
-
-    if (const auto it = eventDetails.find(utils::kDetailingDetailName); it != eventDetails.end())
-    {
-        if (it->canConvert<QString>())
-            extendedDescription << it->toString();
-        else
-            extendedDescription << it->toStringList();
-    }
+    extendedDescription << Strings::eventDetails(eventDetails);
 
     return toStringList(extendedDescription).join(common::html::kLineBreak);
 }

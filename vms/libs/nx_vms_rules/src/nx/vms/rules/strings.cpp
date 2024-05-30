@@ -27,6 +27,7 @@
 #include "engine.h"
 #include "field_types.h"
 #include "manifest.h"
+#include "utils/event_details.h"
 
 namespace {
 
@@ -225,6 +226,21 @@ QString Strings::eventName(common::SystemContext* context, const QString& type)
     }
 
     return tr("Unknown event");
+}
+
+QStringList Strings::eventDetails(const QVariantMap& details)
+{
+    QStringList result;
+
+    if (auto reason = details.value(utils::kReasonDetailName).toStringList(); !reason.isEmpty())
+    {
+        reason.front() = tr("Reason: %1").arg(reason.front());
+        result << reason;
+    }
+
+    result << details.value(utils::kDetailingDetailName).toStringList();
+
+    return result;
 }
 
 QString Strings::actionName(common::SystemContext* context, const QString& type)

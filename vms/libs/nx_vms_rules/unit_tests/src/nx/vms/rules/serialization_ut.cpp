@@ -110,17 +110,28 @@ TEST(VmsRulesSerialization, Event)
     EXPECT_EQ(sourceEvent->conflicts, resultEvent->conflicts);
 }
 
-TEST(VmsRulesSerialization, VariantConversion)
+TEST(VmsRulesSerialization, VariantStringList)
 {
     {
         QString s = "s1";
         QVariant v = s;
 
         // String may be extracted as string list with single element.
-        ASSERT_TRUE(v.canConvert<QStringList>());
-        ASSERT_EQ(v.toStringList().size(), 1);
+        EXPECT_TRUE(v.canConvert<QStringList>());
+        EXPECT_EQ(v.toStringList().size(), 1);
         EXPECT_EQ(v.toStringList()[0], s);
     }
+    {
+        QVariant v;
+
+        // Empty variant may be extracted as empty string list.
+        EXPECT_FALSE(v.canConvert<QStringList>());
+        ASSERT_EQ(v.toStringList().size(), 0);
+    }
+}
+
+TEST(VmsRulesSerialization, VariantConversion)
+{
     {
         // Empty variant is null, but not valid.
         QVariant v;
@@ -138,6 +149,15 @@ TEST(VmsRulesSerialization, VariantConversion)
     {
         // Variant constructed from not null string is not null.
         QVariant v = QString("");
+        EXPECT_FALSE(v.isNull());
+        EXPECT_TRUE(v.isValid());
+    }
+    {
+        // Variant constructed from null string is not null.
+        QString s;
+        ASSERT_TRUE(s.isNull());
+
+        QVariant v = s;
         EXPECT_FALSE(v.isNull());
         EXPECT_TRUE(v.isValid());
     }
