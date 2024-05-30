@@ -37,10 +37,7 @@ const ItemDescriptor& PtzPresetAction::manifest()
                 /*description*/ {},
                 ResourceFilterFieldProperties{
                     .visible = false,
-                    .acceptAll = true,
-                    .ids = {},
-                    .allowEmptySelection = false,
-                    .validationPolicy = {}
+                    .acceptAll = true
                 }.toVariantMap()),
         },
         .resources = {{utils::kCameraIdFieldName, {ResourceType::device, {}, {}, FieldFlag::target}}},

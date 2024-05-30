@@ -2,12 +2,13 @@
 
 #include "source_server_field_validator.h"
 
+#include <core/resource/media_server_resource.h>
+#include <core/resource_management/resource_pool.h>
 #include <nx/vms/rules/server_validation_policy.h>
 
 #include "../event_filter_fields/source_server_field.h"
 #include "../manifest.h"
 #include "../strings.h"
-#include "../utils/resource.h"
 #include "../utils/validity.h"
 
 namespace nx::vms::rules {
@@ -19,12 +20,17 @@ ValidationResult SourceServerFieldValidator::validity(
     if (!NX_ASSERT(sourceServerField))
         return {QValidator::State::Invalid, {Strings::invalidFieldType()}};
 
-    const auto serversSelection = sourceServerField->selection();
     const auto sourceServerFieldProperties = sourceServerField->properties();
+    const bool isValidSelection =
+        !sourceServerField->ids().empty() || sourceServerFieldProperties.allowEmptySelection;
 
-    if (!serversSelection.isEmpty() && !sourceServerFieldProperties.validationPolicy.isEmpty())
+    if (!isValidSelection)
+        return {QValidator::State::Invalid, Strings::selectServer()};
+
+    if (!sourceServerFieldProperties.validationPolicy.isEmpty())
     {
-        QnMediaServerResourceList servers = utils::servers(serversSelection, context);
+        QnMediaServerResourceList servers =
+            context->resourcePool()->getResourcesByIds<QnMediaServerResource>(sourceServerField->ids());
 
         QValidator::State serversValidity{QValidator::State::Acceptable};
         if (sourceServerFieldProperties.validationPolicy == kHasFanMonitoringValidationPolicy)
@@ -39,9 +45,6 @@ ValidationResult SourceServerFieldValidator::validity(
 
         return {serversValidity, Strings::noSuitableServers(serversValidity)};
     }
-
-    if (!sourceServerFieldProperties.allowEmptySelection && serversSelection.isEmpty())
-        return {QValidator::State::Invalid, Strings::selectServer()};
 
     return {};
 }

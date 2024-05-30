@@ -25,4 +25,9 @@ void ResourceFilterActionField::setSelection(const UuidSelection& selection)
     setIds(selection.ids);
 }
 
+UuidSelection ResourceFilterActionField::selection() const
+{
+    return {ids(), acceptAll()};
+}
+
 } // namespace nx::vms::rules

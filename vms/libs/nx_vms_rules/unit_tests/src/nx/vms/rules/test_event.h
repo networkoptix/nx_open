@@ -158,7 +158,9 @@ public:
                     utils::kCameraIdFieldName,
                     nx::TranslatableString("Camera id"),
                     {},
-                    {{"acceptAll", true}}),
+                    ResourceFilterFieldProperties{
+                        .acceptAll = true
+                    }.toVariantMap()),
             }
         };
     }

@@ -79,14 +79,18 @@ UserPickerHelper::UserPickerHelper(
     }
 }
 
-QString UserPickerHelper::text() const
+QString UserPickerHelper::text(bool treatAllAsAny) const
 {
     const auto additional = m_parameters.additionalUsers == 0
         ? QString{}
         : tr("%n additional", "", m_parameters.additionalUsers);
 
     if (m_acceptAll)
-        return makeText(tr("All Users"), additional);
+    {
+        return makeText(
+            treatAllAsAny ? tr("Any User"): tr("All Users"),
+            additional);
+    }
 
     if (m_users.empty() && m_groups.empty())
         return m_parameters.additionalUsers == 0 ? vms::rules::Strings::selectUser() : additional;

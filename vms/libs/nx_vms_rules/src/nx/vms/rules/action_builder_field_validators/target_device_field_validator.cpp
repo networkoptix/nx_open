@@ -32,10 +32,15 @@ ValidationResult TargetDeviceFieldValidator::validity(
         return {QValidator::State::Invalid, {tr("Event does not have source camera")}};
 
     const auto devicesSelection = targetDeviceField->selection();
-    const bool hasSelection = targetDeviceField->useSource() || !devicesSelection.isEmpty();
     const auto targetDeviceFieldProperties = targetDeviceField->properties();
+    const bool isValidSelection = !devicesSelection.ids.empty()
+        || targetDeviceField->useSource()
+        || targetDeviceFieldProperties.allowEmptySelection;
 
-    if (!devicesSelection.isEmpty() && !targetDeviceFieldProperties.validationPolicy.isEmpty())
+    if (!isValidSelection)
+        return {QValidator::State::Invalid, Strings::selectCamera(context)};
+
+    if (!targetDeviceFieldProperties.validationPolicy.isEmpty())
     {
         const auto cameras = utils::cameras(devicesSelection, context);
 
@@ -53,9 +58,6 @@ ValidationResult TargetDeviceFieldValidator::validity(
 
         return {QValidator::State::Invalid, Strings::unexpectedPolicy()};
     }
-
-    if (!targetDeviceFieldProperties.allowEmptySelection && !hasSelection)
-        return {QValidator::State::Invalid, Strings::selectCamera(context)};
 
     return {};
 }

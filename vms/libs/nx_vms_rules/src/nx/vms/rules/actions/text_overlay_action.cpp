@@ -48,10 +48,7 @@ const ItemDescriptor& TextOverlayAction::manifest()
                 /*description*/ {},
                 ResourceFilterFieldProperties{
                     .visible = false,
-                    .acceptAll = true,
-                    .ids = {},
-                    .allowEmptySelection = false,
-                    .validationPolicy = {}
+                    .acceptAll = true
                 }.toVariantMap()),
             // TODO: #amalov Use Qn::ResouceInfoLevel::RI_WithUrl & AttrSerializePolicy::singleLine
             utils::makeExtractDetailFieldDescriptor(

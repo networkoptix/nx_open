@@ -38,10 +38,8 @@ const ItemDescriptor& SpeakAction::manifest()
                 NX_DYNAMIC_TRANSLATABLE(tr("To users")),
                 /*description*/ {},
                 ResourceFilterFieldProperties{
-                    .acceptAll = false,
                     .ids = nx::utils::toQSet(vms::api::kAllPowerUserGroupIds),
-                    .allowEmptySelection = true,
-                    .validationPolicy = {}
+                    .allowEmptySelection = true
                 }.toVariantMap()),
             makeFieldDescriptor<VolumeField>(
                 utils::kVolumeFieldName,

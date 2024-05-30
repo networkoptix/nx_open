@@ -45,9 +45,14 @@ ValidationResult TargetUserFieldValidator::validity(
         return {QValidator::State::Invalid, Strings::invalidFieldType()};
 
     const auto targetUserFieldProperties = targetUserField->properties();
-    const auto userSelection = targetUserField->selection();
+    const bool isValidSelection = targetUserField->acceptAll()
+        || !targetUserField->ids().empty()
+        || targetUserFieldProperties.allowEmptySelection;
 
-    if (!userSelection.isEmpty() && !targetUserFieldProperties.validationPolicy.isEmpty())
+    if (!isValidSelection)
+        return {QValidator::State::Invalid, Strings::selectUser()};
+
+    if (!targetUserFieldProperties.validationPolicy.isEmpty())
     {
         if (targetUserFieldProperties.validationPolicy == kBookmarkManagementValidationPolicy)
         {
@@ -64,26 +69,28 @@ ValidationResult TargetUserFieldValidator::validity(
             {
                 auto cameraField = rule->eventFilters().front()->fieldByName<SourceCameraField>(
                     utils::kCameraIdFieldName);
-                if (cameraField)
+                if (!NX_ASSERT(cameraField))
                 {
-                    QnRequiredAccessRightPolicy policy{
-                        context,
-                        vms::api::AccessRight::manageBookmarks,
-                        targetUserFieldProperties.allowEmptySelection};
-
-                    QnVirtualCameraResourceList cameras =
-                        utils::cameras(cameraField->selection(), context);
-
-                    policy.setCameras(cameras);
-
-                    return getValidity(policy, targetUserField->acceptAll(), targetUserField->ids());
+                    return {
+                        QValidator::State::Invalid,
+                        tr("SourceCameraField field must be provided for the given validation policy")};
                 }
+
+                QnRequiredAccessRightPolicy policy{
+                    context,
+                    vms::api::AccessRight::manageBookmarks,
+                    targetUserFieldProperties.allowEmptySelection};
+
+                QnVirtualCameraResourceList cameras =
+                    context->resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
+                        cameraField->ids());
+
+                policy.setCameras(cameras);
+
+                return getValidity(policy, targetUserField->acceptAll(), targetUserField->ids());
             }
-
-            return {};
         }
-
-        if (targetUserFieldProperties.validationPolicy == kUserWithEmailValidationPolicy)
+        else if (targetUserFieldProperties.validationPolicy == kUserWithEmailValidationPolicy)
         {
             // TODO: #mmalofeev check additional recipients.
             QnUserWithEmailValidationPolicy policy{
@@ -91,16 +98,14 @@ ValidationResult TargetUserFieldValidator::validity(
 
             return getValidity(policy, targetUserField->acceptAll(), targetUserField->ids());
         }
-
-        if (targetUserFieldProperties.validationPolicy == kCloudUserValidationPolicy)
+        else if (targetUserFieldProperties.validationPolicy == kCloudUserValidationPolicy)
         {
             QnCloudUsersValidationPolicy policy{
                 context, targetUserFieldProperties.allowEmptySelection};
 
             return getValidity(policy, targetUserField->acceptAll(), targetUserField->ids());
         }
-
-        if (targetUserFieldProperties.validationPolicy == kLayoutAccessValidationPolicy)
+        else if (targetUserFieldProperties.validationPolicy == kLayoutAccessValidationPolicy)
         {
             auto layoutField = rule->actionBuilders().front()->fieldByName<LayoutField>(
                 utils::kLayoutIdFieldName);
@@ -119,12 +124,11 @@ ValidationResult TargetUserFieldValidator::validity(
 
             return getValidity(policy, targetUserField->acceptAll(), targetUserField->ids());
         }
-
-        return {QValidator::State::Invalid, Strings::unexpectedPolicy()};
+        else
+        {
+            return {QValidator::State::Invalid, Strings::unexpectedPolicy()};
+        }
     }
-
-    if (!targetUserFieldProperties.allowEmptySelection && userSelection.isEmpty())
-        return {QValidator::State::Invalid, Strings::selectUser()};
 
     return {};
 }

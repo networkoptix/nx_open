@@ -29,9 +29,7 @@ const ItemDescriptor& NotificationAction::manifest()
                 Strings::to(),
                 {},
                 ResourceFilterFieldProperties{
-                    .acceptAll = false,
                     .ids = nx::utils::toQSet(vms::api::kAllPowerUserGroupIds),
-                    .allowEmptySelection = false,
                     .validationPolicy = kBookmarkManagementValidationPolicy
                 }.toVariantMap()),
             makeFieldDescriptor<ActionFlagField>(utils::kAcknowledgeFieldName,

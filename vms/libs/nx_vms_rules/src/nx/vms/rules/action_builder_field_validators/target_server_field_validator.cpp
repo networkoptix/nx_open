@@ -23,8 +23,13 @@ ValidationResult TargetServerFieldValidator::validity(
 
     const auto serversSelection = targetServerField->selection();
     const auto targetServerFieldProperties = targetServerField->properties();
+    const bool isValidSelection =
+        !serversSelection.ids.empty() || targetServerFieldProperties.allowEmptySelection;
 
-    if (!serversSelection.isEmpty() && !targetServerFieldProperties.validationPolicy.isEmpty())
+    if (!isValidSelection)
+        return {QValidator::State::Invalid, Strings::selectServer()};
+
+    if (!targetServerFieldProperties.validationPolicy.isEmpty())
     {
         if (targetServerFieldProperties.validationPolicy == kHasBuzzerValidationPolicy)
         {
@@ -40,9 +45,6 @@ ValidationResult TargetServerFieldValidator::validity(
 
         return {QValidator::State::Invalid, Strings::unexpectedPolicy()};
     }
-
-    if (!targetServerFieldProperties.allowEmptySelection && serversSelection.isEmpty())
-        return {QValidator::State::Invalid, Strings::selectServer()};
 
     return {};
 }

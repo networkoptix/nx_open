@@ -32,7 +32,6 @@ const ItemDescriptor& PushNotificationAction::manifest()
                     .visible = false,
                     .acceptAll = false,
                     .ids = nx::utils::toQSet(vms::api::kAllPowerUserGroupIds),
-                    .allowEmptySelection = false,
                     .validationPolicy = kCloudUserValidationPolicy
                 }.toVariantMap()),
             makeFieldDescriptor<TextWithFields>(

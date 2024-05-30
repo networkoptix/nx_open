@@ -30,7 +30,7 @@ public:
         bool isIntermediateStateValid = true,
         const UserPickerHelperParameters& parameters = {});
 
-    QString text() const;
+    QString text(bool treatAllAsAny = false) const;
     QIcon icon() const;
 
 private:
