@@ -377,7 +377,7 @@ struct NX_VMS_API ObjectTrackV3
 
     std::vector<AnalyticsAttribute> attributes;
 
-    BestShotV3 bestShot;
+    std::optional<BestShotV3> bestShot;
 
     std::optional<ObjectTrackTitle> title;
 
