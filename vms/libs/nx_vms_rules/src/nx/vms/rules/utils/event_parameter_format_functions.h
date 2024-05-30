@@ -31,7 +31,7 @@ QString deviceType(const AggregatedEventPtr& eventAggregator, common::SystemCont
 
 QString deviceName(const AggregatedEventPtr& eventAggregator, common::SystemContext* context);
 
-QString systemName(const AggregatedEventPtr& eventAggregator, common::SystemContext* context);
+QString siteName(const AggregatedEventPtr& eventAggregator, common::SystemContext* context);
 QString userName(const AggregatedEventPtr& eventAggregator, common::SystemContext* context);
 QString eventAttribute(const QString& attributeName, const AggregatedEventPtr& eventAggregator);
 QString serverName(const AggregatedEventPtr& eventAggregator, common::SystemContext* context);

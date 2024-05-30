@@ -5,15 +5,8 @@
 #include <QtCore/QCoreApplication>
 
 #include <core/resource/camera_bookmark.h>
-#include <core/resource/camera_resource.h>
-#include <core/resource/user_resource.h>
-#include <core/resource/resource_display_info.h>
-#include <core/resource_management/resource_pool.h>
+#include <core/resource/resource_fwd.h>
 #include <nx/vms/api/data/bookmark_models.h>
-
-#include "bookmark_helpers.h"
-
-namespace nx::vms::api {struct BookmarkBase; }
 
 namespace nx::vms::common {
 
@@ -24,6 +17,7 @@ struct NX_VMS_COMMON_API BookmarkFacadeStrings
 protected:
     static QString creatorName(const std::optional<nx::Uuid>& creatorId, QnResourcePool* pool);
     static QString cameraName(const nx::Uuid& deviceId, QnResourcePool* pool);
+    static QString siteEvent();
 };
 
 template<typename Bookmark>

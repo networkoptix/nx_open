@@ -13,20 +13,6 @@
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/bookmark/bookmark_facade.h>
 
-namespace {
-
-struct BookmarkUtilStrings
-{
-    Q_DECLARE_TR_FUNCTIONS(BookmarkUtilStrings)
-public:
-    static QString systemEvent()
-    {
-        return tr("Site Event", "Shows that the bookmark was created by a site event");
-    }
-};
-
-} // namespace
-
 namespace nx::vms::client::desktop {
 
 QString getVisibleBookmarkCreatorName(
@@ -40,7 +26,7 @@ QString getVisibleBookmarkCreatorName(
 
     if (bookmark.creatorId == QnCameraBookmark::systemUserId()
         || systemContext->resourceAccessManager()->hasPowerUserPermissions(currentUser)
-        || currentUser->getId() == bookmark. creatorId)
+        || currentUser->getId() == bookmark.creatorId)
     {
         return common::QnBookmarkFacade::creatorName(bookmark, systemContext->resourcePool());
     }

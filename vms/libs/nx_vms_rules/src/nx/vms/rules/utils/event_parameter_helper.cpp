@@ -126,7 +126,7 @@ const std::map<QString, SubstitutionDesc> kFormatFunctions = {
     {"device.ip", {&deviceIp, true, &deviceEvents}},
     {"device.mac", {&deviceMac, true, &deviceEvents}},
     {"device.type", {&deviceType}},
-    {"system.name", {&systemName}},
+    {"site.name", {&siteName}},
     {"server.name", {&serverName}},
     {"user.name", {&userName, true, &userEvents}},
     {"device.id", {&deviceId, false}},
