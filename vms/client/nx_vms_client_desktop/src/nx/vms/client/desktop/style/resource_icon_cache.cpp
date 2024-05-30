@@ -405,9 +405,16 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent):
         IconWithDescription value;
         const auto substitutions =
             flag.testFlag(Offline) ? kTreeThemeOfflineSubstitutions : kTreeThemeSubstitutions;
-        value.icon = loadIcon(path, substitutions);
-        value.iconDescription = nx::vms::client::core::ColorizedIconDeclaration(
-            "resource_icon_cache.cpp", path, substitutions);
+        if (path.endsWith(".gif"))
+        {
+            value.icon = qnSkin->icon(path);
+        }
+        else
+        {
+            value.icon = loadIcon(path, substitutions);
+            value.iconDescription = nx::vms::client::core::ColorizedIconDeclaration(
+                "resource_icon_cache.cpp", path, substitutions);
+        }
         m_cache.insert(flag, value);
     }
 }
