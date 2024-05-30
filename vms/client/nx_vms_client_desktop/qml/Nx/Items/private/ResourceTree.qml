@@ -210,6 +210,7 @@ TreeView
             id: delegateItem
 
             readonly property alias thumbnailSource: thumbnail
+            readonly property bool isSelected: currentIndex === modelIndex
 
             showExtraInfo: resourceTreeModel.extraInfoRequired
                 || resourceTreeModel.isExtraInfoForced(resource)
@@ -217,10 +218,15 @@ TreeView
 
             implicitHeight: isSeparator ? kSeparatorRowHeight : kRowHeight
 
+            function defaultState()
+            {
+                return isSelected ? ResourceTree.ItemState.selected : ResourceTree.ItemState.normal
+            }
+
             itemState:
             {
                 if (!resourceTree.scene || !model)
-                    return ResourceTree.ItemState.normal
+                    return defaultState()
 
                 switch (Number(model.nodeType))
                 {
@@ -234,7 +240,7 @@ TreeView
                             resourceTreeModel.parent(modelIndex), "resource")
 
                         if (!itemLayout || scene.currentLayout !== itemLayout)
-                            return ResourceTree.ItemState.normal
+                            return defaultState()
 
                         return scene.currentResource && scene.currentResource === model.resource
                             ? ResourceTree.ItemState.accented
@@ -248,7 +254,7 @@ TreeView
                     {
                         const resource = model.resource
                         if (!resource)
-                            return ResourceTree.ItemState.normal
+                            return defaultState()
 
                         if (scene.reviewedVideoWall === resource
                             || scene.controlledVideoWall === resource)
@@ -265,7 +271,7 @@ TreeView
                             return ResourceTree.ItemState.selected
                         }
 
-                        return ResourceTree.ItemState.normal
+                        return defaultState()
                     }
 
                     case ResourceTree.NodeType.recorder:
@@ -287,7 +293,7 @@ TreeView
                             hasSelectedChildren |= scene.resources.containsResource(childResource)
                         }
 
-                        return hasSelectedChildren
+                        return hasSelectedChildren || isSelected
                             ? ResourceTree.ItemState.selected
                             : ResourceTree.ItemState.normal
                     }
@@ -296,26 +302,26 @@ TreeView
                     {
                         if (!scene.controlledVideoWallItemId.isNull())
                         {
-                            return scene.controlledVideoWallItemId == model.uuid
+                            return scene.controlledVideoWallItemId == model.uuid || isSelected
                                 ? ResourceTree.ItemState.selected
                                 : ResourceTree.ItemState.normal
                         }
 
                         const videoWall = modelDataAccessor.getData(modelIndex.parent, "resource")
-                        return videoWall && videoWall === scene.reviewedVideoWall
+                        return videoWall && videoWall === scene.reviewedVideoWall || isSelected
                             ? ResourceTree.ItemState.selected
                             : ResourceTree.ItemState.normal
                     }
 
                     case ResourceTree.NodeType.layoutTour:
                     {
-                        return scene.reviewedShowreelId == model.uuid
+                        return scene.reviewedShowreelId == model.uuid || isSelected
                             ? ResourceTree.ItemState.selected
                             : ResourceTree.ItemState.normal
                     }
                 }
 
-                return ResourceTree.ItemState.normal
+                return defaultState()
             }
 
             ResourceIdentificationThumbnail

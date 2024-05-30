@@ -19,7 +19,7 @@ public:
     ResourceIconProvider(): QQuickImageProvider(ImageType::Pixmap) {}
 
     virtual QPixmap requestPixmap(
-        const QString& id, QSize* size, const QSize& requestedSize) override;
+        const QString& idAndParams, QSize* size, const QSize& requestedSize) override;
 };
 
 } // namespace nx::vms::client::desktop
