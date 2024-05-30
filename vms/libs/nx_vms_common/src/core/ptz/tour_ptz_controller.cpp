@@ -4,15 +4,13 @@
 
 #include <QtCore/QMetaObject>
 
-#include <nx/utils/thread/mutex.h>
-
+#include <api/resource_property_adaptor.h>
+#include <core/ptz/ptz_controller_pool.h>
+#include <core/ptz/tour_ptz_executor.h>
+#include <core/resource/resource.h>
 #include <nx/fusion/serialization/json_functions.h>
 #include <nx/utils/thread/long_runnable.h>
-
-#include <api/resource_property_adaptor.h>
-
-#include <core/ptz/tour_ptz_executor.h>
-#include <core/ptz/ptz_controller_pool.h>
+#include <nx/utils/thread/mutex.h>
 
 using namespace nx::core;
 
@@ -39,9 +37,19 @@ QnTourPtzController::QnTourPtzController(
     if (!baseController->hasCapabilities(Ptz::VirtualPtzCapability))
         m_executor->moveToThread(executorThread);
 
-    m_adaptor->setResource(baseController->resource());
     connect(m_adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged, this,
-        [this]{ emit changed(DataField::tours); }, Qt::QueuedConnection);
+        [this](const QString& key, const QString& value)
+        {
+            if (auto r = resource(); NX_ASSERT(r) && r->setProperty(key, value))
+            {
+                emit changed(DataField::tours);
+                r->savePropertiesAsync();
+            }
+        },
+        Qt::QueuedConnection);
+
+    if (auto resource = baseController->resource())
+        m_adaptor->loadValue(resource->getProperty(m_adaptor->key()));
 }
 
 QnTourPtzController::~QnTourPtzController()

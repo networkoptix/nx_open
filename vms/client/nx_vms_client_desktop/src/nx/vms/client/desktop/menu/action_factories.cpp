@@ -151,7 +151,8 @@ Factory::ActionList PtzPresetsToursFactory::newActions(const Parameters& paramet
         });
 
     HotkeysResourcePropertyAdaptor adaptor;
-    adaptor.setResource(widget->resource()->toResourcePtr());
+    if (auto resource = widget->resource()->toResourcePtr())
+        adaptor.loadValue(resource->getProperty(adaptor.key()));
     PresetIdByHotkey idByHotkey = adaptor.value();
 
     for (const auto& preset: presets)

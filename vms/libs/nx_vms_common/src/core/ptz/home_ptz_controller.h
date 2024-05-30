@@ -50,7 +50,7 @@ protected:
     virtual void restartExecutor();
 
 private:
-    void at_adaptor_valueChanged();
+    void at_adaptor_valueChanged(const QString& key, const QString& value);
 
 protected:
     QnResourcePropertyAdaptor<QnPtzObject>* m_adaptor;

@@ -7,11 +7,10 @@
 #include <QtCore/QCoreApplication>
 
 #include <api/resource_property_adaptor.h>
-
-#include <utils/common/invocation_event.h>
-
-#include <core/ptz/ptz_controller_pool.h>
 #include <core/ptz/home_ptz_executor.h>
+#include <core/ptz/ptz_controller_pool.h>
+#include <core/resource/resource.h>
+#include <utils/common/invocation_event.h>
 
 using namespace nx::core;
 
@@ -25,13 +24,13 @@ QnHomePtzController::QnHomePtzController(
     m_executor(new QnHomePtzExecutor(baseController))
 {
     NX_ASSERT(!baseController->hasCapabilities(Ptz::AsynchronousPtzCapability));
-    m_adaptor->setResource(baseController->resource());
     m_executor->moveToThread(executorThread);
 
     connect(m_adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged,
         this, &QnHomePtzController::at_adaptor_valueChanged);
 
-    at_adaptor_valueChanged();
+    if (auto resource = baseController->resource())
+        m_adaptor->loadValue(resource->getProperty(m_adaptor->key()));
     restartExecutor();
 }
 
@@ -135,14 +134,17 @@ void QnHomePtzController::restartExecutor()
     m_executor->restart();
 }
 
-void QnHomePtzController::at_adaptor_valueChanged()
+void QnHomePtzController::at_adaptor_valueChanged(const QString& key, const QString& value)
 {
-    // Only operational PTZ is supported now.
-    m_executor->setHomePosition(m_adaptor->value());
+    if (auto r = this->resource(); NX_ASSERT(r) && r->setProperty(key, value))
+    {
+        // Only operational PTZ is supported now.
+        m_executor->setHomePosition(m_adaptor->value());
 
-    /* Restart only if it's running right now. */
-    if(m_executor->isRunning())
-        restartExecutor();
+        /* Restart only if it's running right now. */
+        if (m_executor->isRunning())
+            restartExecutor();
 
-    emit changed(DataField::homeObject);
+        emit changed(DataField::homeObject);
+    }
 }

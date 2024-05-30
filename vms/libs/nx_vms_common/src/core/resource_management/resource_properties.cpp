@@ -2,11 +2,12 @@
 
 #include "resource_properties.h"
 
+#include <nx/utils/log/log.h>
 #include <nx/utils/qt_helpers.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/vms/common/system_context.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx_ec/managers/abstract_resource_manager.h>
-#include <nx/utils/log/log.h>
 
 QnResourcePropertyDictionary::QnResourcePropertyDictionary(
     nx::vms::common::SystemContext* context,
@@ -19,9 +20,21 @@ QnResourcePropertyDictionary::QnResourcePropertyDictionary(
 
 bool QnResourcePropertyDictionary::saveParams(const nx::Uuid& resourceId)
 {
+    std::map<int, std::shared_future<void>> futures;
+    auto guard = nx::utils::makeScopeGuard(
+        [&futures]()
+        {
+            for (const auto& f: futures)
+                f.second.wait();
+        });
     nx::vms::api::ResourceParamWithRefDataList params;
     {
-        NX_MUTEX_LOCKER lock( &m_mutex );
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        if (auto it = m_resourceSaveInProgress.find(resourceId);
+            it != m_resourceSaveInProgress.end())
+        {
+            futures = it->second;
+        }
         auto itr = m_modifiedItems.find(resourceId);
         if (itr == m_modifiedItems.end())
             return true;
@@ -60,49 +73,57 @@ void QnResourcePropertyDictionary::fromModifiedDataToSavedData(
     }
 }
 
-int QnResourcePropertyDictionary::saveData(const nx::vms::api::ResourceParamWithRefDataList&& data)
+int QnResourcePropertyDictionary::saveData(
+    std::vector<nx::Uuid> resourceIds, nx::vms::api::ResourceParamWithRefDataList data)
 {
     if (data.empty())
         return -1; // nothing to save
-    ec2::AbstractECConnectionPtr conn = messageBusConnection();
-    if (!conn)
+
+    ec2::AbstractECConnectionPtr connection = messageBusConnection();
+    if (!connection)
         return -1; // not connected to ec2
-    int requestId = conn->getResourceManager(nx::network::rest::kSystemSession)->save(
+
+    std::promise<void> promise;
+    std::shared_future<void> future{promise.get_future()};
+    int requestId = connection->getResourceManager(nx::network::rest::kSystemSession)->save(
         data,
-        [this](int requestId, ec2::ErrorCode errorCode)
+        [this, resourceIds, promise = std::move(promise)](int requestId, auto) mutable
         {
-            onRequestDone(requestId, errorCode);
-        },
-        this);
+            promise.set_value();
+            NX_MUTEX_LOCKER lock(&m_mutex);
+            for (const auto& id: resourceIds)
+            {
+                auto it = m_resourceSaveInProgress.find(id);
+                if (it == m_resourceSaveInProgress.end())
+                    continue;
+
+                it->second.erase(requestId);
+                if (it->second.empty())
+                    m_resourceSaveInProgress.erase(it);
+            }
+        });
+    for (auto id: resourceIds)
+        m_resourceSaveInProgress[id][requestId] = future;
     return requestId;
 }
 
 int QnResourcePropertyDictionary::saveParamsAsync(const nx::Uuid& resourceId)
 {
     nx::vms::api::ResourceParamWithRefDataList data;
-    {
-        NX_MUTEX_LOCKER lock( &m_mutex );
-        //TODO #rvasilenko is it correct to mark property as saved before it has been actually saved to ec?
-        fromModifiedDataToSavedData(resourceId, data);
-    }
-    return saveData(std::move(data));
+    NX_MUTEX_LOCKER lock( &m_mutex );
+    //TODO #rvasilenko is it correct to mark property as saved before it has been actually saved to ec?
+    fromModifiedDataToSavedData(resourceId, data);
+    return saveData({resourceId}, std::move(data));
 }
 
-int QnResourcePropertyDictionary::saveParamsAsync(const QList<nx::Uuid>& idList)
+int QnResourcePropertyDictionary::saveParamsAsync(std::vector<nx::Uuid> resourceIds)
 {
     nx::vms::api::ResourceParamWithRefDataList data;
-    {
-        NX_MUTEX_LOCKER lock( &m_mutex );
-        //TODO #rvasilenko is it correct to mark property as saved before it has been actually saved to ec?
-        for(const nx::Uuid& resourceId: idList)
-            fromModifiedDataToSavedData(resourceId, data);
-    }
-    return saveData(std::move(data));
-}
-
-void QnResourcePropertyDictionary::onRequestDone( int reqID, ec2::ErrorCode errorCode )
-{
-    emit asyncSaveDone(reqID, errorCode);
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    //TODO #rvasilenko is it correct to mark property as saved before it has been actually saved to ec?
+    for (const nx::Uuid& resourceId: resourceIds)
+        fromModifiedDataToSavedData(resourceId, data);
+    return saveData(std::move(resourceIds), std::move(data));
 }
 
 QString QnResourcePropertyDictionary::value(const nx::Uuid& resourceId, const QString& key) const
@@ -154,18 +175,21 @@ bool QnResourcePropertyDictionary::setValue(const nx::Uuid& resourceId, const QS
     const QString& value, bool markDirty)
 {
     NX_MUTEX_LOCKER lock( &m_mutex );
-    auto itr = m_items.find(resourceId);
-    if (itr == m_items.end())
-        itr = m_items.insert(resourceId, QnResourcePropertyList());
-
-    QnResourcePropertyList& properties = itr.value();
+    auto& properties = m_items[resourceId];
     auto itrValue = properties.find(key);
     if (itrValue == properties.end())
+    {
         properties.insert(key, value);
+    }
     else if (itrValue.value() != value)
-        itrValue.value() = value;
+    {
+        properties.erase(itrValue);
+        properties.insert(key, value);
+    }
     else
+    {
         return false; // nothing to change
+    }
     if (markDirty)
     {
         m_modifiedItems[resourceId][key] = value;

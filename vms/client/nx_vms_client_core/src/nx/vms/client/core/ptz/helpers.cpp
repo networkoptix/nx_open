@@ -2,8 +2,9 @@
 
 #include "helpers.h"
 
-#include <nx/utils/string.h>
 #include <core/ptz/abstract_ptz_controller.h>
+#include <core/resource/resource.h>
+#include <nx/utils/string.h>
 #include <nx/vms/client/core/ptz/hotkey_resource_property_adaptor.h>
 
 namespace nx::vms::client::core {
@@ -30,7 +31,8 @@ bool getSortedPresets(const QnPtzControllerPtr& controller, QnPtzPresetList& pre
 QnPtzPresetList sortedPresets(const QnResourcePtr& resource, QnPtzPresetList presets)
 {
     HotkeysResourcePropertyAdaptor adaptor;
-    adaptor.setResource(resource);
+    if (resource)
+        adaptor.loadValue(resource->getProperty(adaptor.key()));
 
     const auto presetIdHotkeyHash =
         [&adaptor]()

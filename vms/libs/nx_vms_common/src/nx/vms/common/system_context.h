@@ -204,7 +204,6 @@ public:
 
     /**
      * System settings, which do not depend on any Device or Server and are applied globally.
-     * Currently stored as Resource Properties for the `admin` User.
      */
     SystemSettings* globalSettings() const;
 
