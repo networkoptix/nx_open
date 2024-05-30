@@ -229,16 +229,25 @@ QIcon IconLoader::load(const QString& name,
 
     if (!m_iconByKey.contains(key))
     {
-        const bool isSvg = name.endsWith(".svg");
-        NX_ASSERT(isSvg || svgColorSubstitutions == SvgIconColorer::kDefaultIconSubstitutions,
-            "Color substitutions cannot be specified for non-SVG icons.");
+        if (name.endsWith(".gif"))
+        {
+            QIcon icon = loadPixmapIconInternal(qnSkin, name, checkedName, suffixes);
+            m_iconByKey.insert(key, icon);
+            m_cacheKeys.insert(icon.cacheKey());
+        }
+        else
+        {
+            const bool isSvg = name.endsWith(".svg");
+            NX_ASSERT(isSvg || svgColorSubstitutions == SvgIconColorer::kDefaultIconSubstitutions,
+                "Color substitutions cannot be specified for non-SVG icons.");
 
-        const QIcon icon = isSvg
-            ? loadSvgIconInternal(qnSkin, name, checkedName, svgColorSubstitutions, svgCheckedColorSubstitutions, themeSubstitutions, checkedThemeSubstitutions)
-            : loadPixmapIconInternal(qnSkin,  name, checkedName, suffixes);
+            const QIcon icon = isSvg
+                ? loadSvgIconInternal(qnSkin, name, checkedName, svgColorSubstitutions, svgCheckedColorSubstitutions, themeSubstitutions, checkedThemeSubstitutions)
+                : loadPixmapIconInternal(qnSkin,  name, checkedName, suffixes);
 
-        m_iconByKey.insert(key, icon);
-        m_cacheKeys.insert(icon.cacheKey());
+            m_iconByKey.insert(key, icon);
+            m_cacheKeys.insert(icon.cacheKey());
+        }
     }
 
     NX_ASSERT(m_iconByKey.contains(key));
