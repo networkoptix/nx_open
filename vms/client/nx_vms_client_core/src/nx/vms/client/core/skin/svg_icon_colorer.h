@@ -33,6 +33,11 @@ public:
             return lName == "primary" || lName == "secondary" || lName == "tertiary";
         }
 
+        static bool isValidColor(const QString& value)
+        {
+            return value != kInvalidColor;
+        }
+
         bool empty() const
         {
             return primary == kInvalidColor
@@ -50,6 +55,18 @@ public:
             if (lname == "tertiary")
                 return tertiary;
             return kInvalidColor;
+        }
+
+        QString& operator[](const QString& name)
+        {
+            NX_CRITICAL(contains(name));
+
+            auto lname = name.toLower();
+            if (lname == "primary")
+                return primary;
+            if (lname == "secondary")
+                return secondary;
+            return tertiary;
         }
 
         QString toString() const

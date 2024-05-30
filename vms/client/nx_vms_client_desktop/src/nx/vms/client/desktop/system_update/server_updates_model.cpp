@@ -111,7 +111,7 @@ QVariant ServerUpdatesModel::data(const QModelIndex& index, int role) const
             }
             else if (column == NameColumn && item->offline)
             {
-                return core::colorTheme()->color("dark11");
+                return qnResIconCache->iconColor(server);
             }
             break;
 

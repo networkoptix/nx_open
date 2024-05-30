@@ -334,7 +334,7 @@ QVariant RulesTableModel::sourceCameraData(const vms::rules::EventFilter* eventF
             return iconPath(QnResourceIconCache::Cameras);
 
         if (resources.empty())
-            iconPath(QnResourceIconCache::Camera);
+            return iconPath(QnResourceIconCache::Camera);
 
         if (resources.size() == 1)
             return iconPath(qnResIconCache->key(resources.first()));
@@ -383,7 +383,7 @@ QVariant RulesTableModel::sourceServerData(const vms::rules::EventFilter* eventF
             return iconPath(QnResourceIconCache::Servers);
 
         if (resources.empty())
-            iconPath(QnResourceIconCache::Server);
+            return iconPath(QnResourceIconCache::Server);
 
         if (resources.size() == 1)
             return iconPath(qnResIconCache->key(resources.first()));

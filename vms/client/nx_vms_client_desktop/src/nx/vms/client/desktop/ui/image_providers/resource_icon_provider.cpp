@@ -2,10 +2,12 @@
 
 #include "resource_icon_provider.h"
 
+#include <QtCore/QUrlQuery>
+
 #include <nx/utils/log/assert.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
-#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/ui/scene/models/resource_tree_model_adapter.h>
 
 namespace nx::vms::client::desktop {
@@ -34,20 +36,26 @@ QIcon::Mode iconMode(ResourceTree::ItemState itemState)
 } // namespace
 
 QPixmap ResourceIconProvider::requestPixmap(
-    const QString& id, QSize* /*size*/, const QSize& /*requestedSize*/)
+    const QString& idAndParams, QSize* /*size*/, const QSize& requestedSize)
 {
-    auto path = id.split("/", Qt::SkipEmptyParts);
-    const int key = path.empty() ? 0 : path.takeFirst().toInt();
-    if (key == 0)
+    const auto url = QUrl(idAndParams);
+    const auto urlQuery = QUrlQuery(url.query());
+    const auto queryItems = urlQuery.queryItems();
+
+    auto path = url.path().split("/", Qt::SkipEmptyParts);
+    const int keyInt = path.empty() ? 0 : path.takeFirst().toInt();
+    if (!NX_ASSERT(keyInt, "Incorrect id"))
         return {};
 
-    const auto state = path.empty()
-        ? ResourceTree::ItemState::normal
-        : ResourceTree::ItemState(path.takeFirst().toInt());
+    const auto mode = iconMode(path.empty() ? ResourceTree::ItemState::normal
+                                            : ResourceTree::ItemState(path.takeFirst().toInt()));
 
-    return core::Skin::maximumSizePixmap(
-        qnResIconCache->icon(QnResourceIconCache::Key(key)),
-        iconMode(state));
+    core::SvgIconColorer::ThemeSubstitutions overriddenColors;
+    for (const auto& queryValue: queryItems)
+        overriddenColors[mode][queryValue.first] = queryValue.second;
+
+    return qnResIconCache->iconPixmap(
+        QnResourceIconCache::Key(keyInt), requestedSize, overriddenColors, mode);
 }
 
 } // namespace nx::vms::client::desktop

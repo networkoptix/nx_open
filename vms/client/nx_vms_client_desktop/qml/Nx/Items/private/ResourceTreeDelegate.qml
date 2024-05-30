@@ -26,12 +26,12 @@ FocusScope
 
     property real availableWidth: width
     property bool isEditing: false
+    property bool isDisabledResource: resource && resource.status == API.ResourceStatus.offline
 
     focus: isEditing
 
     implicitHeight: 20 //< Some sensible default.
     implicitWidth: isSeparator ? 0 : contentRow.implicitWidth
-    opacity: (resource && resource.status == API.ResourceStatus.offline) ? 0.3 : 1 //< Offline resources must looks like disabled.
 
     Row
     {
@@ -287,7 +287,7 @@ FocusScope
             return path.startsWith("file:") ? path : ("qrc:/skin/" + path)
 
         return (model.iconKey && model.iconKey !== 0
-            && ("image://resource/" + model.iconKey + "/" + itemState)) || ""
+            && ("image://resource/" + model.iconKey + "/" + itemState + "?primary=" + iconColor)) || ""
     }
 
     property color mainTextColor:
@@ -299,7 +299,20 @@ FocusScope
             case ResourceTree.ItemState.selected:
                 return ColorTheme.colors.light4
             default:
-                return ColorTheme.colors.light10
+                return delegateItem.isDisabledResource ? ColorTheme.colors.dark17 : ColorTheme.colors.light10
+        }
+    }
+
+    property string iconColor:
+    {
+        switch (itemState)
+        {
+            case ResourceTree.ItemState.accented:
+                return "brand_core"
+            case ResourceTree.ItemState.selected:
+                return "light4"
+            default:
+                return delegateItem.isDisabledResource ? "dark17" : "light10"
         }
     }
 }

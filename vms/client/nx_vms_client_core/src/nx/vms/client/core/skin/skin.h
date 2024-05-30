@@ -28,6 +28,8 @@ class GenericPalette;
 class NX_VMS_CLIENT_CORE_API ColorizedIconDeclaration
 {
 public:
+    ColorizedIconDeclaration() = default;
+
     ColorizedIconDeclaration(
         const QString& sourceFile,
         const QString& iconPath,

@@ -7,6 +7,7 @@
 #include <QtGui/QIcon>
 
 #include <core/resource/resource_fwd.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_extra_status.h>
 
 /**
@@ -95,6 +96,18 @@ public:
     Q_DECLARE_FLAGS(Key, KeyPart)
     Q_FLAG(Key)
 
+
+    class IconWithDescription
+    {
+    public:
+        IconWithDescription() = default;
+        IconWithDescription(
+            const nx::vms::client::core::ColorizedIconDeclaration& iconDescription);
+
+        QIcon icon;
+        nx::vms::client::core::ColorizedIconDeclaration iconDescription;
+    };
+
     QnResourceIconCache(QObject* parent = nullptr);
 
     virtual ~QnResourceIconCache();
@@ -107,9 +120,15 @@ public:
      * @return
      */
     QIcon icon(Key key);
+    QPixmap iconPixmap(Key key,
+        const QSize& requestedSize,
+        const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions& svgColorSubstitutions,
+        QnIcon::Mode mode = QnIcon::Normal);
 
     QString iconPath(Key key) const;
     QString iconPath(const QnResourcePtr& resource) const;
+    QColor iconColor(Key key, QnIcon::Mode mode = QnIcon::Normal) const;
+    QColor iconColor(const QnResourcePtr& resource) const;
 
     static Key userKey(const QnUserResourcePtr& user);
 
@@ -120,8 +139,12 @@ public:
     static QIcon cameraRecordingStatusIcon(nx::vms::client::desktop::ResourceExtraStatus status);
 
 private:
-    QHash<Key, QString> m_paths;
-    QHash<Key, QIcon> m_cache;
+    QString iconPathFromLegacyIcons(Key key) const;
+    IconWithDescription searchIconOutsideCache(Key key);
+    IconWithDescription iconDescription(Key key);
+
+    QHash<Key, QString> m_legacyIconsPaths;
+    QHash<Key, IconWithDescription> m_cache;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnResourceIconCache::Key)
