@@ -75,7 +75,7 @@
     </message>
     <message>
       <source>The ticket key is invalid or expired.</source>
-      <translation type="unfinished">The ticket key is invalid or expired.</translation>
+      <translation>通訊金鑰無效或已過期</translation>
     </message>
     <message>
       <source>Wrong password</source>
@@ -732,23 +732,23 @@
     </message>
     <message>
       <source>Local Recording</source>
-      <translation type="unfinished">Local Recording</translation>
+      <translation>本地錄影</translation>
     </message>
     <message>
       <source>Local Recording service</source>
-      <translation type="unfinished">Local Recording service</translation>
+      <translation>本地錄影服務</translation>
     </message>
     <message numerus="yes">
       <source>%n Local Recording Services</source>
-      <translation type="unfinished">
-        <numerusform>%n Local Recording Services</numerusform>
+      <translation>
+        <numerusform>%n 本地錄影服務</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Local Recording Services</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Local Recording Services</numerusform>
+      <translation>
+        <numerusform>%n/%1  本地錄影服務</numerusform>
       </translation>
     </message>
   </context>
@@ -1116,7 +1116,7 @@
     </message>
     <message>
       <source>Multiple groups</source>
-      <translation type="unfinished">Multiple groups</translation>
+      <translation>多個群組</translation>
     </message>
   </context>
   <context>
@@ -1188,7 +1188,7 @@
     <name>ServiceTypeDisplayStringHelper</name>
     <message>
       <source>Local recording</source>
-      <translation type="unfinished">Local recording</translation>
+      <translation>本地錄影</translation>
     </message>
     <message>
       <source>Integration</source>
@@ -1697,7 +1697,7 @@
     </message>
     <message>
       <source>Authorization Session token lifetime (seconds)</source>
-      <translation type="unfinished">Authorization Session token lifetime (seconds)</translation>
+      <translation>工作階段授權Token生命週期（秒）</translation>
     </message>
     <message>
       <source>Semicolon-separated list of Servers designated to connect to the Cloud. Servers at the top of the list have higher priority. If the list is empty a Server for the Cloud connection is selected automatically.</source>
@@ -1722,11 +1722,11 @@
     </message>
     <message>
       <source>Organization Id</source>
-      <translation type="unfinished">Organization Id</translation>
+      <translation>組織 Id</translation>
     </message>
     <message>
       <source>Interval between the Cloud polling HTTP requests to synchronize the data.</source>
-      <translation type="unfinished">Interval between the Cloud polling HTTP requests to synchronize the data.</translation>
+      <translation>Cloud輪詢(polling)同步資料的間隔。</translation>
     </message>
     <message>
       <source>Local System ID, null means the System is not set up yet.</source>
@@ -1734,7 +1734,7 @@
     </message>
     <message>
       <source>HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility</source>
-      <translation type="unfinished">HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility</translation>
+      <translation>HTTP header：伺服器，支援的變數： $vmsName、 $vmsVersion、 $company、 $compatibility</translation>
     </message>
   </context>
   <context>
@@ -2382,15 +2382,15 @@
     </message>
     <message>
       <source>Services Issue</source>
-      <translation type="unfinished">Services Issue</translation>
+      <translation>服務問題</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; has license migration issue</source>
-      <translation type="unfinished">Server &quot;%1&quot; has license migration issue</translation>
+      <translation>伺服器 &quot;%1&quot; 有授權轉移的問題</translation>
     </message>
     <message>
       <source>Service overuse</source>
-      <translation type="unfinished">Service overuse</translation>
+      <translation>服務過度使用</translation>
     </message>
     <message>
       <source>The following licenses were not migrated:</source>

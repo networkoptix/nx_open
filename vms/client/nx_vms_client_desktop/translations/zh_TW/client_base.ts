@@ -1033,7 +1033,7 @@
     </message>
     <message>
       <source>Device...</source>
-      <translation>設備...</translation>
+      <translation>裝置...</translation>
     </message>
     <message>
       <source>Add User...</source>
@@ -1089,7 +1089,7 @@
     </message>
     <message>
       <source>Import From Devices...</source>
-      <translation>從設備匯入...</translation>
+      <translation>從裝置匯入...</translation>
     </message>
     <message>
       <source>User Manual...</source>
@@ -1936,27 +1936,27 @@ License Key: %2</source>
     </message>
     <message>
       <source>RHI backend</source>
-      <translation type="unfinished">RHI backend</translation>
+      <translation>RHI後端</translation>
     </message>
     <message>
       <source>RHI device</source>
-      <translation type="unfinished">RHI device</translation>
+      <translation>RHI裝置</translation>
     </message>
     <message>
       <source>RHI device ID</source>
-      <translation type="unfinished">RHI device ID</translation>
+      <translation>RHI裝置ID</translation>
     </message>
     <message>
       <source>RHI vendor ID</source>
-      <translation type="unfinished">RHI vendor ID</translation>
+      <translation>RHI 供應商 ID</translation>
     </message>
     <message>
       <source>RHI max texture size</source>
-      <translation type="unfinished">RHI max texture size</translation>
+      <translation>RHI 最大紋理尺寸</translation>
     </message>
     <message>
       <source>Graphics API</source>
-      <translation type="unfinished">Graphics API</translation>
+      <translation>圖形 API</translation>
     </message>
     <message>
       <source>Unable to get GPU information for %1</source>
@@ -2060,7 +2060,7 @@ License Key: %2</source>
     <name>QnAttachToVideowallDialog</name>
     <message>
       <source>System shut down. To attach to a Video Wall, the System should be in active state. %1</source>
-      <translation type="unfinished">System shut down. To attach to a Video Wall, the System should be in active state. %1</translation>
+      <translation>系統以停止。系通須處於活躍狀態才能連接到電視牆。%1</translation>
     </message>
   </context>
   <context>
@@ -2986,7 +2986,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Invalid current password</source>
-      <translation type="unfinished">Invalid current password</translation>
+      <translation>此密碼無效</translation>
     </message>
   </context>
   <context>
@@ -3894,7 +3894,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Text Files</source>
-      <translation type="unfinished">Text Files</translation>
+      <translation>文字檔</translation>
     </message>
   </context>
   <context>
@@ -3992,7 +3992,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Displays IP addresses for cameras and servers.</source>
-      <translation type="unfinished">Displays IP addresses for cameras and servers.</translation>
+      <translation>顯示攝影機和伺服器的 IP 位址。</translation>
     </message>
   </context>
   <context>
@@ -5140,11 +5140,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>If cloud storage is activated for backup, other backup storages will be deactivated and the &quot;All archive&quot; option for already configured devices will be changed to &quot;Motion, Object, Bookmarks&quot;</source>
-      <translation type="unfinished">If cloud storage is activated for backup, other backup storages will be deactivated and the &quot;All archive&quot; option for already configured devices will be changed to &quot;Motion, Object, Bookmarks&quot;</translation>
+      <translation>如果啟動雲端儲存進行備份，其他備份裝置將會被停用，已設定 &quot;所有存檔&quot; 的裝置將變更為 &quot;位移、物件、書籤&quot;</translation>
     </message>
     <message>
       <source>If cloud storage is activated for backup, the &quot;All archive&quot; option for already configured devices will be changed to &quot;Motion, Object, Bookmarks&quot;</source>
-      <translation type="unfinished">If cloud storage is activated for backup, the &quot;All archive&quot; option for already configured devices will be changed to &quot;Motion, Object, Bookmarks&quot;</translation>
+      <translation>如果啟動雲端儲存進行備份，已設定 &quot;所有存檔&quot; 的裝置將變更為 &quot;位移、物件、書籤&quot;</translation>
     </message>
   </context>
   <context>
@@ -5929,7 +5929,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Failed to open %n devices on the video wall:</source>
       <translation>
-        <numerusform>無法在電視牆上打開 %n 設備：</numerusform>
+        <numerusform>無法在電視牆上打開 %n 裝置：</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -6921,7 +6921,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Depending on the resource type it either allows user to modify device settings or to control video wall.</source>
-      <translation>根據資源類型，它允許使用者修改設備設定或控制電視牆。</translation>
+      <translation>根據資源類型，它允許使用者修改裝置設定或控制電視牆。</translation>
     </message>
     <message>
       <source>Allows users to access a resource and view live footage from a camera.</source>
@@ -7171,7 +7171,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%n suitable cloud storage services are required</source>
       <translation>
-        <numerusform>需要 %n 合適的雲端儲存服務</numerusform>
+        <numerusform>需要 %n 個合適的雲端儲存服務</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -7197,7 +7197,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%n suitable cloud storage services available</source>
       <translation>
-        <numerusform>%n 合適的雲端儲存服務可用</numerusform>
+        <numerusform>%n 個合適的雲端儲存服務可用</numerusform>
       </translation>
     </message>
     <message>
@@ -7210,7 +7210,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>&quot;All archive&quot; option was changed to &quot;Motion, Objects, Bookmarks&quot; due to cloud storage backup was enabled</source>
-      <translation type="unfinished">&quot;All archive&quot; option was changed to &quot;Motion, Objects, Bookmarks&quot; due to cloud storage backup was enabled</translation>
+      <translation>由於啟用了雲端備份，&quot;所有存檔&quot; 選項已更改為 &quot;位移、物件、書籤&quot; </translation>
     </message>
   </context>
   <context>
@@ -7283,7 +7283,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>To perform backup to a cloud storage, the System should be in active state. %1</source>
-      <translation type="unfinished">To perform backup to a cloud storage, the System should be in active state. %1</translation>
+      <translation>系統必須處於活躍狀態才能執行至雲端備份。 %1</translation>
     </message>
     <message>
       <source>System suspended. To make changes to backup configuration, the System should be in active state. %1</source>
@@ -7509,7 +7509,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Open Camera in place</source>
-      <translation type="unfinished">Open Camera in place</translation>
+      <translation>就地打開攝影機</translation>
     </message>
   </context>
   <context>
@@ -7528,7 +7528,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Place Hotspot</source>
-      <translation type="unfinished">Place Hotspot</translation>
+      <translation>放置熱點</translation>
     </message>
     <message>
       <source>NO DATA</source>
@@ -7555,7 +7555,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Color</source>
-      <translation type="unfinished">Color</translation>
+      <translation>顏色</translation>
     </message>
     <message>
       <source>Pointed</source>
@@ -7725,7 +7725,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>High minimum value can lead to archive length decrease on other devices</source>
-      <translation>過高的最小值可能會導致其它設備上的錄影天數減少</translation>
+      <translation>過高的最小值可能會導致其它裝置上的錄影天數減少</translation>
     </message>
     <message>
       <source>High minimum value can lead to archive length decrease on other cameras</source>
@@ -8175,7 +8175,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Enter access link to continue your session</source>
-      <translation>請輸訪問連結以繼續您的工作階段</translation>
+      <translation>請輸入登入連結以繼續您的工作階段</translation>
     </message>
     <message>
       <source>Your session has expired. Please sign in again with your link to continue.</source>
@@ -10280,7 +10280,7 @@ You can force it, but it may significantly increase CPU load.</source>
     <name>nx::vms::client::desktop::PlaybackPositionItem</name>
     <message>
       <source>video is paused</source>
-      <translation type="unfinished">video is paused</translation>
+      <translation>影片已暫停</translation>
     </message>
   </context>
   <context>
@@ -10415,11 +10415,11 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>An integration may interact with the Desktop Client and request access to the user session</source>
-      <translation type="unfinished">An integration may interact with the Desktop Client and request access to the user session</translation>
+      <translation>整合可以與桌面用戶端互動並請求存取使用者工作階段</translation>
     </message>
     <message>
       <source>Proxy this integration through the server</source>
-      <translation type="unfinished">Proxy this integration through the server</translation>
+      <translation>透過伺服器代理此整合</translation>
     </message>
     <message>
       <source>Proxy this web page through the server</source>
@@ -10427,7 +10427,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Allow opening this integration without SSL certificate checking</source>
-      <translation type="unfinished">Allow opening this integration without SSL certificate checking</translation>
+      <translation>允許在不檢查 SSL 憑證就開啟此整合</translation>
     </message>
     <message>
       <source>Allow opening this web page without SSL certificate checking</source>
@@ -10451,23 +10451,23 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>New Integration</source>
-      <translation type="unfinished">New Integration</translation>
+      <translation>新的整合</translation>
     </message>
     <message>
       <source>Edit Integration</source>
-      <translation type="unfinished">Edit Integration</translation>
+      <translation>編輯整合</translation>
     </message>
     <message>
       <source>New Proxied Integration</source>
-      <translation type="unfinished">New Proxied Integration</translation>
+      <translation>新的代理整合</translation>
     </message>
     <message>
       <source>Edit Proxied Integration</source>
-      <translation type="unfinished">Edit Proxied Integration</translation>
+      <translation>編輯代理整合</translation>
     </message>
     <message>
       <source>To allow the use of a client API, create a web integration instead. %1</source>
-      <translation type="unfinished">To allow the use of a client API, create a web integration instead. %1</translation>
+      <translation>改為建立一個網頁整合來使用用戶端API。%1</translation>
     </message>
     <message>
       <source>Learn more...</source>
@@ -10624,13 +10624,13 @@ You can force it, but it may significantly increase CPU load.</source>
     <message>
       <source>%1 video wall</source>
       <comment>%1 will be substituted with a video wall name</comment>
-      <translation type="unfinished">%1 video wall</translation>
+      <translation>%1 電視牆</translation>
     </message>
     <message numerus="yes">
       <source>%1 and %n more video walls</source>
       <comment>%1 will be substituted with a video wall name</comment>
-      <translation type="unfinished">
-        <numerusform>%1 and %n more video walls</numerusform>
+      <translation>
+        <numerusform>%1 和其他 %n 個電視牆</numerusform>
       </translation>
     </message>
     <message>
@@ -10974,11 +10974,11 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>Watermarks will be displayed over live, archive and exported videos for non-power users only. You and other power users will not see them.</source>
-      <translation type="unfinished">Watermarks will be displayed over live, archive and exported videos for non-power users only. You and other power users will not see them.</translation>
+      <translation>浮水印僅會顯示在非進階使用者的即時影像、錄影檔案和匯出的影像。你和其他進階使用者並不會看到。</translation>
     </message>
     <message>
       <source>Encrypting video traffic may significantly increase CPU usage</source>
-      <translation type="unfinished">Encrypting video traffic may significantly increase CPU usage</translation>
+      <translation>加密影像傳輸將會明顯提高CPU使用率。</translation>
     </message>
     <message>
       <source>Connection with cameras that do not support HTTPS will be lost</source>
@@ -11258,11 +11258,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Invalid Link</source>
-      <translation type="unfinished">Invalid Link</translation>
+      <translation>無效的連結</translation>
     </message>
     <message>
       <source>The provided link is not valid</source>
-      <translation type="unfinished">The provided link is not valid</translation>
+      <translation>提供的連結無效</translation>
     </message>
   </context>
   <context>
@@ -11413,7 +11413,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Add more services or fix overuse by stopping using services for some devices.</source>
-      <translation type="unfinished">Add more services or fix overuse by stopping using services for some devices.</translation>
+      <translation>增加更多服務或將某些裝置停用服務來解決過度使用問題。</translation>
     </message>
     <message>
       <source>If no action is taken, required number of services will be released automatically on %1.</source>
@@ -11656,11 +11656,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <name>nx::vms::client::desktop::UserGroupRequestChain</name>
     <message>
       <source>Invalid JSON</source>
-      <translation type="unfinished">Invalid JSON</translation>
+      <translation>無效的 JSON</translation>
     </message>
     <message>
       <source>Invalid request</source>
-      <translation type="unfinished">Invalid request</translation>
+      <translation>無效的請求</translation>
     </message>
     <message>
       <source>Method not found</source>
@@ -11668,7 +11668,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Invalid parameters</source>
-      <translation>參數錯誤</translation>
+      <translation>無效的參數</translation>
     </message>
     <message>
       <source>Internal error</source>
@@ -11680,35 +11680,35 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Invalid encoding</source>
-      <translation type="unfinished">Invalid encoding</translation>
+      <translation>無效的編碼</translation>
     </message>
     <message>
       <source>Invalid encoding charset</source>
-      <translation type="unfinished">Invalid encoding charset</translation>
+      <translation>無效的編碼字符集</translation>
     </message>
     <message>
       <source>Application Error</source>
-      <translation type="unfinished">Application Error</translation>
+      <translation>應用錯誤</translation>
     </message>
     <message>
       <source>System Error</source>
-      <translation type="unfinished">System Error</translation>
+      <translation>系統錯誤</translation>
     </message>
     <message>
       <source>Transport Error</source>
-      <translation type="unfinished">Transport Error</translation>
+      <translation>傳輸錯誤</translation>
     </message>
     <message>
       <source>Server error code %1</source>
-      <translation type="unfinished">Server error code %1</translation>
+      <translation>伺服器錯誤代碼 %1</translation>
     </message>
     <message>
       <source>Reserved error code %1</source>
-      <translation type="unfinished">Reserved error code %1</translation>
+      <translation>保留的錯誤代碼 %1</translation>
     </message>
     <message>
       <source>Unknown error code %1</source>
-      <translation type="unfinished">Unknown error code %1</translation>
+      <translation>未知的錯誤代碼 %1</translation>
     </message>
   </context>
   <context>
@@ -11744,15 +11744,15 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>LDAP server is offline. Users are not able to log in.</source>
-      <translation type="unfinished">LDAP server is offline. Users are not able to log in.</translation>
+      <translation>LDAP 伺服器離線。使用者無法登入。</translation>
     </message>
     <message>
       <source>User is not found in the LDAP database.</source>
-      <translation type="unfinished">User is not found in the LDAP database.</translation>
+      <translation>在 LDAP 資料庫中找不到使用者。</translation>
     </message>
     <message>
       <source>Temporary user</source>
-      <translation type="unfinished">Temporary user</translation>
+      <translation>臨時使用者</translation>
     </message>
     <message>
       <source>Full Name</source>
@@ -11760,7 +11760,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>There is already a user with the same login in the system. To avoid issues it is required for all users to have a unique login.</source>
-      <translation type="unfinished">There is already a user with the same login in the system. To avoid issues it is required for all users to have a unique login.</translation>
+      <translation>系統中已存在具有相同登入名稱的使用者。為了避免問題，所有使用者都需要唯一的登入名稱。</translation>
     </message>
   </context>
   <context>
@@ -11815,11 +11815,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Copy Access Link</source>
-      <translation type="unfinished">Copy Access Link</translation>
+      <translation>複製登入連結</translation>
     </message>
     <message>
       <source>Invalid current password</source>
-      <translation type="unfinished">Invalid current password</translation>
+      <translation>目前密碼無效</translation>
     </message>
     <message>
       <source>Email cannot be empty</source>
@@ -11831,19 +11831,19 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Only letters, numbers and symbols %1 are allowed</source>
-      <translation type="unfinished">Only letters, numbers and symbols %1 are allowed</translation>
+      <translation>僅允許輸入字母、數字與 %1 符號。</translation>
     </message>
     <message>
       <source>User with specified login already exists</source>
-      <translation type="unfinished">User with specified login already exists</translation>
+      <translation>具有指定登入名稱的使用者已存在</translation>
     </message>
     <message>
       <source>Are you sure you want to terminate access link?</source>
-      <translation type="unfinished">Are you sure you want to terminate access link?</translation>
+      <translation>您確定要終止登入連結嗎？</translation>
     </message>
     <message>
       <source>This will instantly remove an access to the system for this user</source>
-      <translation type="unfinished">This will instantly remove an access to the system for this user</translation>
+      <translation>這將立即移除該使用者對系統的登入權限</translation>
     </message>
     <message>
       <source>Terminate</source>
@@ -11851,11 +11851,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Terminate access link</source>
-      <translation type="unfinished">Terminate access link</translation>
+      <translation>終止登入連結</translation>
     </message>
     <message>
       <source>Create access link</source>
-      <translation type="unfinished">Create access link</translation>
+      <translation>建立登入連結</translation>
     </message>
     <message>
       <source>Create</source>
@@ -11863,24 +11863,24 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>New Link - %1</source>
-      <translation type="unfinished">New Link - %1</translation>
+      <translation>新連結 - %1</translation>
     </message>
     <message>
       <source>Access link has been successfully created!</source>
-      <translation type="unfinished">Access link has been successfully created!</translation>
+      <translation>登入連結已成功建立！</translation>
     </message>
     <message>
       <source>Granting broad permissions to the temporary user is not recommended. Some actions may not work.</source>
-      <translation type="unfinished">Granting broad permissions to the temporary user is not recommended. Some actions may not work.</translation>
+      <translation>不建議授予臨時使用者廣泛的權限。有些操作可能無法使用。</translation>
     </message>
     <message>
       <source>Granting broad permissions to the temporary user is not recommended.</source>
-      <translation type="unfinished">Granting broad permissions to the temporary user is not recommended.</translation>
+      <translation>不建議授予臨時使用者廣泛的權限。</translation>
     </message>
     <message>
       <source>and</source>
       <comment>Example: 1 month and 2 days</comment>
-      <translation type="unfinished">and</translation>
+      <translation>又</translation>
     </message>
     <message>
       <source>New User</source>
@@ -11888,7 +11888,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>User %1 has been successfully created!</source>
-      <translation type="unfinished">User %1 has been successfully created!</translation>
+      <translation>使用者 %1 已成功建立！</translation>
     </message>
     <message>
       <source>Obtaining Link...</source>
@@ -12013,7 +12013,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <name>nx::vms::client::desktop::WebPageCertificateDialog</name>
     <message>
       <source>Open this integration?</source>
-      <translation type="unfinished">Open this integration?</translation>
+      <translation>開啟這個整合？</translation>
     </message>
     <message>
       <source>Open this web page?</source>
@@ -12033,10 +12033,10 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
 but this integration presented an untrusted certificate auth.
 We recommend you not to open this integration. If you understand the risks, you can open the integration.</source>
       <comment>%1 is the integration address</comment>
-      <translation type="unfinished">You try to open the
+      <translation>您嘗試開啟
 %1
-but this integration presented an untrusted certificate auth.
-We recommend you not to open this integration. If you understand the risks, you can open the integration.</translation>
+但此整合服務提供了不受信任的憑證。
+我們建議您不要開啟此整合。如果您了解風險，您可以開啟整合。</translation>
     </message>
     <message>
       <source>You try to open the
@@ -12271,7 +12271,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Health Monitors</source>
-      <translation type="unfinished">Health Monitors</translation>
+      <translation>系統資源檢視器</translation>
     </message>
     <message>
       <source>Video Walls</source>
@@ -12305,11 +12305,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>All imported</source>
-      <translation type="unfinished">All imported</translation>
+      <translation>已全部匯入</translation>
     </message>
     <message>
       <source>In progress... (%1 left)</source>
-      <translation type="unfinished">In progress... (%1 left)</translation>
+      <translation>進行中...（剩餘%1）</translation>
     </message>
     <message>
       <source>Disabled</source>
@@ -12321,7 +12321,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Failed to import. Retry in 1 minute.</source>
-      <translation type="unfinished">Failed to import. Retry in 1 minute.</translation>
+      <translation>匯入失敗。 1 分鐘內重試。</translation>
     </message>
     <message>
       <source>Name</source>
@@ -12329,7 +12329,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Imported up to</source>
-      <translation type="unfinished">Imported up to</translation>
+      <translation>匯入達</translation>
     </message>
     <message>
       <source>Status</source>
@@ -12487,19 +12487,19 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>WHEN</source>
-      <translation type="unfinished">WHEN</translation>
+      <translation>當</translation>
     </message>
     <message>
       <source>EVENT</source>
-      <translation type="unfinished">EVENT</translation>
+      <translation>事件</translation>
     </message>
     <message>
       <source>DO</source>
-      <translation type="unfinished">DO</translation>
+      <translation>執行</translation>
     </message>
     <message>
       <source>ACTION</source>
-      <translation type="unfinished">ACTION</translation>
+      <translation>動作</translation>
     </message>
     <message>
       <source>Enabled</source>
@@ -12656,7 +12656,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Local layouts can only be shown to their owners</source>
-      <translation type="unfinished">Local layouts can only be shown to their owners</translation>
+      <translation>本機佈局只能顯示給其所有者</translation>
     </message>
   </context>
   <context>
@@ -12683,19 +12683,19 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::TextLookupPicker</name>
     <message>
       <source>Contains keywords</source>
-      <translation type="unfinished">Contains keywords</translation>
+      <translation>包含關鍵字</translation>
     </message>
     <message>
       <source>Does not contain keywords</source>
-      <translation type="unfinished">Does not contain keywords</translation>
+      <translation>不包含關鍵字</translation>
     </message>
     <message>
       <source>Contains list entries</source>
-      <translation type="unfinished">Contains list entries</translation>
+      <translation>包含清單項目</translation>
     </message>
     <message>
       <source>Does not contain list entries</source>
-      <translation type="unfinished">Does not contain list entries</translation>
+      <translation>不包含清單項目</translation>
     </message>
     <message>
       <source>Keywords separated by space</source>
@@ -12717,15 +12717,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::VmsRulesDialog</name>
     <message>
       <source>Delete rule error:</source>
-      <translation type="unfinished">Delete rule error:</translation>
+      <translation>刪除規則錯誤： </translation>
     </message>
     <message>
       <source>Save rule error:</source>
-      <translation type="unfinished">Save rule error:</translation>
+      <translation>儲存規則錯誤： </translation>
     </message>
     <message>
       <source>Reset to defaults error:</source>
-      <translation type="unfinished">Reset to defaults error:</translation>
+      <translation>還原預設值錯誤：</translation>
     </message>
   </context>
   <context>
@@ -12744,15 +12744,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Used</source>
-      <translation type="unfinished">Used</translation>
+      <translation>已使用</translation>
     </message>
     <message>
       <source>Number of devices using this service exceeds the available service quantity.</source>
-      <translation type="unfinished">Number of devices using this service exceeds the available service quantity.</translation>
+      <translation>使用該服務的裝置數量超過可用服務數量。</translation>
     </message>
     <message>
       <source>Please disable it for some devices or add more suitable services. Otherwise it will be done automatically on %1</source>
-      <translation type="unfinished">Please disable it for some devices or add more suitable services. Otherwise it will be done automatically on %1</translation>
+      <translation>請將某些裝置停用此服務或增加更多合適的服務。否則將會在 %1自動完成</translation>
     </message>
   </context>
   <context>
@@ -13184,15 +13184,15 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Not enough access rights</source>
-      <translation type="unfinished">Not enough access rights</translation>
+      <translation>存取權限不足</translation>
     </message>
     <message>
       <source>You do not have permissions to open this camera on the layout</source>
-      <translation type="unfinished">You do not have permissions to open this camera on the layout</translation>
+      <translation>您無權在佈局上開啟此攝影機</translation>
     </message>
     <message>
       <source>You do not have permissions to open some of selected cameras on the layout</source>
-      <translation type="unfinished">You do not have permissions to open some of selected cameras on the layout</translation>
+      <translation>您無權開啟佈局上選取的某些攝影機</translation>
     </message>
   </context>
   <context>
@@ -13402,7 +13402,7 @@ to view more bookmarks</source>
     <name>runApplication</name>
     <message>
       <source>Would you like to try switching to DirectX?</source>
-      <translation type="unfinished">Would you like to try switching to DirectX?</translation>
+      <translation>您想試試看切換到 DirectX 嗎？</translation>
     </message>
   </context>
 </TS>
