@@ -60,6 +60,15 @@ SqlFilterFieldEqual::SqlFilterFieldEqual(
 {
 }
 
+SqlFilterFieldNotEqual::SqlFilterFieldNotEqual(
+    const std::string& name,
+    const std::string& placeHolderName,
+    QVariant value)
+    :
+    SqlFilterField(name, placeHolderName, std::move(value), "<>")
+{
+}
+
 SqlFilterFieldGreaterOrEqual::SqlFilterFieldGreaterOrEqual(
     const std::string& name,
     const std::string& placeHolderName,

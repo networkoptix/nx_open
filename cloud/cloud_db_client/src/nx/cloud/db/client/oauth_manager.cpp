@@ -55,7 +55,7 @@ void OauthManager::legacyValidateToken(
 }
 
 void OauthManager::introspectToken(
-    const api::TokenIntrospectionRequest request,
+    const api::TokenIntrospectionRequest& request,
     nx::utils::MoveOnlyFunc<void(api::ResultCode, api::TokenIntrospectionResponse)> handler)
 {
     m_requestsExecutor->makeAsyncCall<api::TokenIntrospectionResponse>(
@@ -133,6 +133,19 @@ void OauthManager::getJwtPublicKeyByKid(
         nx::network::http::Method::get,
         nx::network::http::rest::substituteParameters(kOauthJwkByIdPath, {kid}),
         {}, //query
+        std::move(completionHandler));
+}
+
+void OauthManager::getAccSecuritySettingsChangedEvents(
+    const api::GetAccSecuritySettingsChangedEventsRequest& request,
+    nx::utils::MoveOnlyFunc<void(
+        api::ResultCode, api::GetAccSecuritySettingsChangedEventsResponse)> completionHandler)
+{
+    m_requestsExecutor->makeAsyncCall<api::GetAccSecuritySettingsChangedEventsResponse>(
+        nx::network::http::Method::post,
+        kAccSecuritySettingsChangedEvents,
+        {}, //query
+        request,
         std::move(completionHandler));
 }
 

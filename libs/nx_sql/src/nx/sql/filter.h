@@ -58,6 +58,16 @@ public:
         QVariant value);
 };
 
+class NX_SQL_API SqlFilterFieldNotEqual:
+    public SqlFilterField
+{
+public:
+    SqlFilterFieldNotEqual(
+        const std::string& name,
+        const std::string& placeHolderName,
+        QVariant value);
+};
+
 class NX_SQL_API SqlFilterFieldGreaterOrEqual:
     public SqlFilterField
 {

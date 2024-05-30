@@ -68,6 +68,13 @@ public:
         return m_connection->maintenanceManager();
     }
 
+    api::OauthManager* oauthManager()
+    {
+        if (!createConnectionIfNeeded())
+            return nullptr;
+        return m_connection->oauthManager();
+    }
+
     void setRequestTimeout(std::chrono::milliseconds timeout)
     {
         m_requestTimeout = timeout;
