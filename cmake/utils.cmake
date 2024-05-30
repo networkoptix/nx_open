@@ -575,15 +575,15 @@ function(nx_add_custom_command)
     endif()
 
     set(add_custom_command_args ${ARGS_UNPARSED_ARGUMENTS})
-    list(PREPEND add_custom_command_args OUTPUT ${ARGS_OUTPUT})
     list(PREPEND add_custom_command_args
         COMMAND ${CMAKE_COMMAND} -E remove_directory ${ARGS_BYPRODUCTS}
+        OUTPUT ${ARGS_OUTPUT}
     )
 
     list(APPEND add_custom_command_args
         BYPRODUCTS ${ARGS_BYPRODUCTS}
         COMMAND ${PYTHON_EXECUTABLE} "${open_build_utils_dir}/ninja/ninja_tool.py"
-            -d "${CMAKE_BINARY_DIR}"
+            --build-dir "${CMAKE_BINARY_DIR}"
             -e add_directories_to_known_files "${ARGS_BYPRODUCTS}"
     )
 

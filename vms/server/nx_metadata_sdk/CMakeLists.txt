@@ -109,7 +109,7 @@ endif()
 
 if(targetDevice STREQUAL "windows_x64")
     if(NOT openSourceBuild)
-        # Use MSVC 2017 compiler for non-open-source builds only.
+        # Use MSVC 2019 compiler for non-open-source builds only.
         set(compilingOptions "-Tv142")
     endif()
 else()
@@ -134,26 +134,6 @@ endif()
 
 # Command to be executed at the build phase.
 nx_add_custom_command(OUTPUT ${zip_file}
-    COMMAND ${CMAKE_COMMAND} -E make_directory ${logs_dir}
-    COMMAND ${CMAKE_COMMAND} -P ${copy_sdk_files_script} #< Create and populate sdk dir.
-
-    COMMAND ${CMAKE_COMMAND} -E echo
-        "  Building samples${sample_tests_message} - see ${sample_build_log}"
-    COMMAND ${CMAKE_COMMAND} -E chdir ${sdk_dir}
-        ${sample_build_script} ${sampleTestsTrigger} ${compilingOptions}
-        >${sample_build_log} 2>&1
-
-    COMMAND ${CMAKE_COMMAND} -E echo
-        "  Running Doxygen - see ${doxygen_log}"
-    COMMAND ${CMAKE_COMMAND} -E chdir ${sdk_dir} ${doxygen_executable} >${doxygen_log} 2>&1
-
-    COMMAND ${CMAKE_COMMAND} -E echo
-        "  Zipping SDK - see ${zip_log}"
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} #< Needed for zipping.
-    COMMAND ${CMAKE_COMMAND} -E tar cvf ${zip_file} --format=zip ${sdk_name} >${zip_log}
-
-    BYPRODUCTS "${sdk_build_dir}" "${sdk_dir}"
-
     DEPENDS
         ${copy_sdk_files_script}
         ${CMAKE_CURRENT_SOURCE_DIR}/files/${sample_build_script}
@@ -164,6 +144,26 @@ nx_add_custom_command(OUTPUT ${zip_file}
         ${copied_sample_1_files}
         ${copied_sample_2_files}
         ${copied_sample_unit_tests_files}
+    BYPRODUCTS "${sdk_build_dir}" "${sdk_dir}"
+
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${logs_dir}
+    COMMAND ${CMAKE_COMMAND} -P ${copy_sdk_files_script} #< Create and populate sdk dir.
+
+    COMMAND ${CMAKE_COMMAND} -E
+        echo "  Building samples${sample_tests_message} - see ${sample_build_log}"
+    COMMAND ${CMAKE_COMMAND} -E chdir ${sdk_dir}
+        ${sample_build_script} ${sampleTestsTrigger} ${compilingOptions}
+        >${sample_build_log} 2>&1
+
+    COMMAND ${CMAKE_COMMAND} -E
+        echo "  Running Doxygen - see ${doxygen_log}"
+    COMMAND ${CMAKE_COMMAND} -E chdir ${sdk_dir}
+        ${doxygen_executable} >${doxygen_log} 2>&1
+
+    COMMAND ${CMAKE_COMMAND} -E
+        echo "  Zipping SDK - see ${zip_log}"
+    COMMAND ${CMAKE_COMMAND} -E chdir ${CMAKE_CURRENT_BINARY_DIR}
+        ${CMAKE_COMMAND} -E tar cvf ${zip_file} --format=zip ${sdk_name} >${zip_log}
 )
 
 add_custom_target(nx_metadata_sdk ALL DEPENDS ${zip_file})
