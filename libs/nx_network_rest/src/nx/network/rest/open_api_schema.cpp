@@ -74,9 +74,12 @@ public:
                     continue;
 
                 const auto itemType = optString(itemSchema, "type", pathString(itemSchema));
+                //Do not process oneOf objects as fields can be erased mistakenly.
+                if (originType == QJsonValue::Object && itemType == "object")
+                    return false;
+
                 if ((itemType.isEmpty() && itemSchema.contains("oneOf"))
-                    || (originType == QJsonValue::Array && itemType == "array")
-                    || (originType == QJsonValue::Object && itemType == "object"))
+                    || (originType == QJsonValue::Array && itemType == "array"))
                 {
                     return (*this)(origin, itemSchema);
                 }

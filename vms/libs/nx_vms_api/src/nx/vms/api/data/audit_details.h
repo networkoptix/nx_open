@@ -34,6 +34,10 @@ struct NX_VMS_API IdDetails
 };
 #define IdDetails_Fields (ids)
 
+/**%apidoc
+ * Used when `eventType` equals to one of:<br/>`siteNameChanged`,<br/>`settingsChange`,<br/>
+ * `emailSettings`.
+ */
 struct NX_VMS_API DescriptionDetails
 {
     /**%apidoc Additional description of the Audit Record. */
@@ -44,6 +48,9 @@ struct NX_VMS_API DescriptionDetails
 QN_FUSION_DECLARE_FUNCTIONS(DescriptionDetails, (ubjson)(json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(DescriptionDetails, DescriptionDetails_Fields)
 
+/**%apidoc
+ * Used when `eventType` equals to one of:<br/>`login`,<br/>`unauthorizedLogin`.
+ */
 struct NX_VMS_API SessionDetails: PeriodDetails
 {
     nx::network::http::AuthMethod authMethod = nx::network::http::AuthMethod::notDefined;
@@ -53,6 +60,10 @@ struct NX_VMS_API SessionDetails: PeriodDetails
 QN_FUSION_DECLARE_FUNCTIONS(SessionDetails, (ubjson)(json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(SessionDetails, SessionDetails_Fields)
 
+/**%apidoc
+ * Used when `eventType` equals to one of:<br/>`deviceInsert`,<br/>`deviceUpdate`,<br/>`deviceRemove`.
+ * %param ids List of Device ids.
+ */
 struct NX_VMS_API PlaybackDetails: IdDetails, PeriodDetails
 {
     /**%apidoc
@@ -66,6 +77,11 @@ struct NX_VMS_API PlaybackDetails: IdDetails, PeriodDetails
 QN_FUSION_DECLARE_FUNCTIONS(PlaybackDetails, (ubjson)(json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(PlaybackDetails, PlaybackDetails_Fields)
 
+/**%apidoc
+ * Used when `eventType` equals to one of:<br/>`userUpdate`,<br/>`userRemove`,<br/>`serverUpdate`,
+ * <br/>`serverRemove`,<br/>`eventUpdate`,<br/>`eventRemove`,<br/>`storageInsert`,<br/>
+ * `storageUpdate`,<br/>`storageRemove`.
+ */
 struct NX_VMS_API ResourceDetails: IdDetails, DescriptionDetails
 {
     bool operator==(const ResourceDetails& other) const = default;
@@ -74,6 +90,10 @@ struct NX_VMS_API ResourceDetails: IdDetails, DescriptionDetails
 QN_FUSION_DECLARE_FUNCTIONS(ResourceDetails, (ubjson)(json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(ResourceDetails, ResourceDetails_Fields)
 
+/**%apidoc
+ * Used when `eventType` equals to one of:<br/>`viewLive`,<br/>`viewArchive`,<br/>`exportVideo`.
+ * %param ids List of Device ids.
+ */
 struct NX_VMS_API DeviceDetails: ResourceDetails
 {
     /**%apidoc List of Device MACs. */
@@ -84,6 +104,7 @@ struct NX_VMS_API DeviceDetails: ResourceDetails
 QN_FUSION_DECLARE_FUNCTIONS(DeviceDetails, (ubjson)(json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(DeviceDetails, DeviceDetails_Fields)
 
+/**%apidoc Used when `eventType` equals to `mitmAttack`. */
 struct NX_VMS_API MitmDetails
 {
     /**%apidoc Id of the compromised Server. */
@@ -100,9 +121,10 @@ struct NX_VMS_API MitmDetails
 QN_FUSION_DECLARE_FUNCTIONS(MitmDetails, (ubjson)(json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(MitmDetails, MitmDetails_Fields)
 
+/**%apidoc Used when `eventType` equals to `updateInstall`. */
 struct NX_VMS_API UpdateDetails
 {
-    /**%apidoc Version of the installed update. */
+    /**%apidoc:string Version of the installed update. */
     nx::utils::SoftwareVersion version;
     bool operator==(const UpdateDetails& other) const = default;
 };
@@ -202,9 +224,9 @@ namespace details
 using AllAuditDetails =
     details::audit_type_map_to_details<
         details::map<AuditRecordType::notDefined, std::nullptr_t>,
-        details::map<AuditRecordType::cameraInsert, DeviceDetails>,
-        details::map<AuditRecordType::cameraUpdate, DeviceDetails>,
-        details::map<AuditRecordType::cameraRemove, DeviceDetails>,
+        details::map<AuditRecordType::deviceInsert, DeviceDetails>,
+        details::map<AuditRecordType::deviceUpdate, DeviceDetails>,
+        details::map<AuditRecordType::deviceRemove, DeviceDetails>,
         details::map<AuditRecordType::viewLive, PlaybackDetails>,
         details::map<AuditRecordType::viewArchive, PlaybackDetails>,
         details::map<AuditRecordType::exportVideo, PlaybackDetails>,
