@@ -69,7 +69,7 @@ inline auto expandTupleIntoArgs(Func&& func, Tuple&& tuple)
 }
 
 /**
- * NOTE: Tuple elements are interated forward.
+ * NOTE: Tuple elements are iterated forward.
  */
 template<typename Func, typename... Args>
 void tuple_for_each(const std::tuple<Args...>& tuple, Func func)
