@@ -19,10 +19,19 @@ ValidationResult TargetSingleDeviceFieldValidator::validity(
         return {QValidator::State::Invalid, {Strings::invalidFieldType()}};
 
     const auto deviceId = targetSingleDeviceField->id();
-    const bool hasSelection = !deviceId.isNull() || targetSingleDeviceField->useSource();
     const auto targetSingleDeviceFieldProperties = targetSingleDeviceField->properties();
+    const bool isValidSelection = !deviceId.isNull()
+        || targetSingleDeviceField->useSource()
+        || targetSingleDeviceFieldProperties.allowEmptySelection;
 
-    if (hasSelection && !targetSingleDeviceFieldProperties.validationPolicy.isEmpty())
+    if (!isValidSelection)
+    {
+        return {
+            QValidator::State::Invalid,
+            Strings::selectCamera(context, /*allowMultipleSelection*/ false)};
+    }
+
+    if (!targetSingleDeviceFieldProperties.validationPolicy.isEmpty())
     {
         const auto device =
             context->resourcePool()->getResourceById<QnVirtualCameraResource>(deviceId);
@@ -34,13 +43,6 @@ ValidationResult TargetSingleDeviceFieldValidator::validity(
             return utils::cameraValidity<QnFullscreenCameraPolicy>(context, device);
 
         return {QValidator::State::Invalid, Strings::unexpectedPolicy()};
-    }
-
-    if (!targetSingleDeviceFieldProperties.allowEmptySelection && !hasSelection)
-    {
-        return {
-            QValidator::State::Invalid,
-            Strings::selectCamera(context, /*allowMultipleSelection*/ false)};
     }
 
     return {};

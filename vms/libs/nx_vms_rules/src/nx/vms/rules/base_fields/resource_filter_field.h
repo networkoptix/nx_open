@@ -78,11 +78,6 @@ public:
         }
     }
 
-    UuidSelection selection() const
-    {
-        return {m_ids, m_acceptAll};
-    }
-
     ResourceFilterFieldProperties properties() const
     {
         return ResourceFilterFieldProperties::fromVariantMap(
@@ -94,8 +89,8 @@ protected:
     ResourceFilterFieldBase() = default;
 
 private:
-    bool m_acceptAll = false;
     QSet<nx::Uuid> m_ids;
+    bool m_acceptAll = false;
 };
 
 class NX_VMS_RULES_API ResourceFilterEventField:
@@ -138,6 +133,7 @@ public:
     virtual QVariant build(const AggregatedEventPtr& eventAggregator) const override;
 
     void setSelection(const UuidSelection& selection);
+    UuidSelection selection() const;
 };
 
 } // namespace nx::vms::rules

@@ -34,10 +34,7 @@ const ItemDescriptor& EnterFullscreenAction::manifest()
                 {},
                 ResourceFilterFieldProperties{
                     .visible = false,
-                    .acceptAll = true,
-                    .ids = {},
-                    .allowEmptySelection = false,
-                    .validationPolicy = {}
+                    .acceptAll = true
                 }.toVariantMap()),
             utils::makePlaybackFieldDescriptor(Strings::rewind()),
         },

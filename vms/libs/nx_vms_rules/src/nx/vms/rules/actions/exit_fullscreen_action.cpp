@@ -24,10 +24,7 @@ const ItemDescriptor& ExitFullscreenAction::manifest()
                 /*description*/ {},
                 ResourceFilterFieldProperties{
                     .visible = false,
-                    .acceptAll = true,
-                    .ids = {},
-                    .allowEmptySelection = false,
-                    .validationPolicy = {}
+                    .acceptAll = true
                 }.toVariantMap()),
             makeFieldDescriptor<TargetLayoutField>(utils::kLayoutIdsFieldName,
                 Strings::onLayout()),

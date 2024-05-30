@@ -33,9 +33,7 @@ const ItemDescriptor& SendEmailAction::manifest()
                 Strings::to(),
                 /*description*/ {},
                 ResourceFilterFieldProperties{
-                    .acceptAll = false,
                     .ids = nx::utils::toQSet(vms::api::kAllPowerUserGroupIds),
-                    .allowEmptySelection = false,
                     .validationPolicy = kUserWithEmailValidationPolicy
                 }.toVariantMap()),
             makeFieldDescriptor<ActionTextField>(

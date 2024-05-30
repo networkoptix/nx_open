@@ -3,8 +3,42 @@
 #pragma once
 
 #include "../base_fields/simple_type_field.h"
+#include "../manifest.h"
 
 namespace nx::vms::rules {
+
+struct TargetLayoutFieldProperties
+{
+    /** Whether given field should be visible in the editor. */
+    bool visible{true};
+
+    /** Value for the the just created field's `value` property. */
+    UuidSet value;
+
+    bool allowEmptySelection{false};
+
+    QVariantMap toVariantMap() const
+    {
+        QVariantMap result;
+
+        result.insert("value", QVariant::fromValue(value));
+        result.insert("visible", visible);
+        result.insert("allowEmptySelection", allowEmptySelection);
+
+        return result;
+    }
+
+    static TargetLayoutFieldProperties fromVariantMap(const QVariantMap& properties)
+    {
+        TargetLayoutFieldProperties result;
+
+        result.value = properties.value("value").value<UuidSet>();
+        result.visible = properties.value("visible").toBool();
+        result.allowEmptySelection = properties.value("allowEmptySelection").toBool();
+
+        return result;
+    }
+};
 
 /** Stores selected layout ids. Displayed as a layout selection button. */
 class NX_VMS_RULES_API TargetLayoutField: public SimpleTypeActionField<UuidSet, TargetLayoutField>
@@ -16,6 +50,11 @@ class NX_VMS_RULES_API TargetLayoutField: public SimpleTypeActionField<UuidSet, 
 
 public:
     using SimpleTypeActionField<UuidSet, TargetLayoutField>::SimpleTypeActionField;
+
+    TargetLayoutFieldProperties properties() const
+    {
+        return TargetLayoutFieldProperties::fromVariantMap(descriptor()->properties);
+    }
 
 signals:
     void valueChanged();

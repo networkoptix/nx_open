@@ -67,13 +67,10 @@ protected:
         if (!NX_ASSERT(sourceCameraField))
             return {};
 
-        QnVirtualCameraResourceList cameras;
-
-        if (sourceCameraField->acceptAll())
-            return resourcePool()->getAllCameras();
-
-        return resourcePool()->template getResourcesByIds<QnVirtualCameraResource>(
-            sourceCameraField->ids());
+        return sourceCameraField->acceptAll()
+            ? QnVirtualCameraResourceList{}
+            : resourcePool()->template getResourcesByIds<QnVirtualCameraResource>(
+                sourceCameraField->ids());
     }
 };
 
@@ -100,7 +97,7 @@ protected:
             m_comboBox->currentData(ui::PluginDiagnosticEventModel::PluginIdRole).value<nx::Uuid>());
     }
 
-    void updateUi()
+    void updateUi() override
     {
         QSignalBlocker blocker{m_comboBox};
 
@@ -146,14 +143,14 @@ public:
         ParamsWidget* parent)
         :
         DropdownIdPickerWidgetBase<vms::rules::AnalyticsEventTypeField, QnTreeComboBox>(
-            field, context, parent)
+            field, context, parent),
+        m_analyticsSdkEventModel(new ui::AnalyticsSdkEventModel(systemContext(), this))
     {
         m_label->addHintLine(tr("Analytics events can be set up on a certain cameras."));
         m_label->addHintLine(
             tr("Choose cameras using the button above to see the list of supported events."));
         setHelpTopic(m_label, HelpTopic::Id::EventsActions_VideoAnalytics);
 
-        m_analyticsSdkEventModel = new ui::AnalyticsSdkEventModel(systemContext() ,this);
         auto sortModel = new QSortFilterProxyModel(this);
         sortModel->setDynamicSortFilter(true);
         sortModel->setSourceModel(m_analyticsSdkEventModel);
@@ -170,7 +167,7 @@ protected:
             m_comboBox->currentData(ui::AnalyticsSdkEventModel::EventTypeIdRole).value<QString>());
     }
 
-    void updateUi()
+    void updateUi() override
     {
         QSignalBlocker blocker{m_comboBox};
 
@@ -255,7 +252,7 @@ protected:
         m_field->setValue(m_comboBox->selectedMainObjectTypeId());
     }
 
-    void updateUi()
+    void updateUi() override
     {
         QSignalBlocker blocker{m_comboBox};
 

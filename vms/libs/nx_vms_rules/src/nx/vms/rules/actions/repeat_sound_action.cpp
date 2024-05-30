@@ -42,10 +42,7 @@ const ItemDescriptor& RepeatSoundAction::manifest()
                 Strings::to(),
                 /*description*/ {},
                 ResourceFilterFieldProperties{
-                    .acceptAll = false,
-                    .ids = {},
-                    .allowEmptySelection = true,
-                    .validationPolicy = {}
+                    .allowEmptySelection = true
                 }.toVariantMap()),
             makeFieldDescriptor<VolumeField>(
                 utils::kVolumeFieldName,

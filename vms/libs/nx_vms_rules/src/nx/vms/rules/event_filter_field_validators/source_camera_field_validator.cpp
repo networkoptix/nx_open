@@ -2,13 +2,14 @@
 
 #include "source_camera_field_validator.h"
 
+#include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
+#include <core/resource_management/resource_pool.h>
 #include <nx/vms/rules/camera_validation_policy.h>
 
 #include "../event_filter_fields/source_camera_field.h"
 #include "../manifest.h"
 #include "../strings.h"
-#include "../utils/resource.h"
 #include "../utils/validity.h"
 
 namespace nx::vms::rules {
@@ -20,12 +21,17 @@ ValidationResult SourceCameraFieldValidator::validity(
     if (!NX_ASSERT(sourceCameraField))
         return {QValidator::State::Invalid, {Strings::invalidFieldType()}};
 
-    const auto camerasSelection = sourceCameraField->selection();
     const auto sourceCameraFieldProperties = sourceCameraField->properties();
+    const bool isValidSelection =
+        !sourceCameraField->ids().empty() || sourceCameraFieldProperties.allowEmptySelection;
 
-    if (!camerasSelection.isEmpty() && !sourceCameraFieldProperties.validationPolicy.isEmpty())
+    if (!isValidSelection)
+        return {QValidator::State::Invalid, Strings::selectCamera(context)};
+
+    if (!sourceCameraFieldProperties.validationPolicy.isEmpty())
     {
-        auto cameras = utils::cameras(camerasSelection, context);
+        auto cameras = context->resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
+            sourceCameraField->ids());
 
         ValidationResult validationResult;
         if (sourceCameraFieldProperties.validationPolicy == kCameraAnalyticsValidationPolicy)
@@ -39,9 +45,6 @@ ValidationResult SourceCameraFieldValidator::validity(
 
         return {QValidator::State::Invalid, Strings::unexpectedPolicy()};
     }
-
-    if (!sourceCameraFieldProperties.allowEmptySelection && camerasSelection.isEmpty())
-        return {QValidator::State::Invalid, Strings::selectCamera(context)};
 
     return {};
 }

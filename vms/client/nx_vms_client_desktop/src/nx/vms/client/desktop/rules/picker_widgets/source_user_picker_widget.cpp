@@ -56,7 +56,7 @@ void SourceUserPicker::updateUi()
         m_validationPolicy.get(),
         /*isIntermediateStateValid*/ false};
 
-    m_selectButton->setText(helper.text());
+    m_selectButton->setText(helper.text(/*allIsAny*/ true));
     m_selectButton->setIcon(helper.icon());
 
     if (auto validator = fieldValidator())

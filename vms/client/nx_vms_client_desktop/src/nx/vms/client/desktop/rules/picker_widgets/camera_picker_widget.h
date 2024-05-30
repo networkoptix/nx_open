@@ -27,21 +27,6 @@ public:
         ResourcePickerWidgetBase<F>{field, context, parent}
     {
     }
-
-protected:
-    BASE_COMMON_USINGS
-    using ResourcePickerWidgetBase<F>::systemContext;
-
-    void onSelectButtonClicked() override
-    {
-        auto selectedCameras = m_field->ids();
-
-        if (CameraSelectionDialog::selectCameras<Policy>(systemContext(), selectedCameras, this))
-        {
-            m_field->setAcceptAll(Policy::emptyListIsValid() && selectedCameras.empty());
-            m_field->setIds(selectedCameras);
-        }
-    }
 };
 
 template<typename Policy>
@@ -56,13 +41,23 @@ protected:
     using CameraPickerWidgetBase<vms::rules::SourceCameraField, Policy>::resourcePool;
     using CameraPickerWidgetBase<vms::rules::SourceCameraField, Policy>::systemContext;
 
+    void onSelectButtonClicked() override
+    {
+        auto selectedCameras = m_field->ids();
+
+        if (CameraSelectionDialog::selectCameras<Policy>(systemContext(), selectedCameras, this))
+        {
+            m_field->setAcceptAll(Policy::emptyListIsValid() && selectedCameras.empty());
+            m_field->setIds(selectedCameras);
+        }
+    }
+
     void updateUi() override
     {
         CameraPickerWidgetBase<vms::rules::SourceCameraField, Policy>::updateUi();
 
-        auto resources =
+        const auto resources =
             resourcePool()->template getResourcesByIds<QnVirtualCameraResource>(m_field->ids());
-        m_field->setAcceptAll(Policy::emptyListIsValid() && resources.empty());
         m_selectButton->setText(Policy::getText(systemContext(), resources, /*detailed*/ true));
         m_selectButton->setIcon(core::Skin::maximumSizePixmap(resources.size() == 1
                 ? qnResIconCache->icon(resources.first())
@@ -100,6 +95,17 @@ public:
     }
 
 protected:
+    void onSelectButtonClicked() override
+    {
+        auto selectedCameras = m_field->ids();
+
+        if (CameraSelectionDialog::selectCameras<Policy>(systemContext(), selectedCameras, this))
+        {
+            m_field->setAcceptAll(Policy::emptyListIsValid() && selectedCameras.empty());
+            m_field->setIds(selectedCameras);
+        }
+    }
+
     void updateUi() override
     {
         CameraPickerWidgetBase<vms::rules::TargetDeviceField, Policy>::updateUi();

@@ -24,49 +24,55 @@ ValidationResult SourceUserFieldValidator::validity(
         return {QValidator::State::Invalid, {Strings::invalidFieldType()}};
 
     const auto sourceUserFieldProperties = sourceUserField->properties();
+    const bool isValidSelection = sourceUserField->acceptAll()
+        || !sourceUserField->ids().empty()
+        || sourceUserFieldProperties.allowEmptySelection;
 
-    if (sourceUserFieldProperties.validationPolicy == kUserInputValidationPolicy)
+    if (!isValidSelection)
+        return {QValidator::State::Invalid, Strings::selectUser()};
+
+    if (!sourceUserFieldProperties.validationPolicy.isEmpty())
     {
-        auto cameraField =
-            rule->eventFilters().front()->fieldByName<SourceCameraField>(utils::kCameraIdFieldName);
-        if (!NX_ASSERT(cameraField))
+        if (sourceUserFieldProperties.validationPolicy == kUserInputValidationPolicy)
         {
-            return {
-                QValidator::State::Invalid,
-                tr("Source camera field must be provided for the given validation policy")};
-        }
+            auto cameraField =
+                rule->eventFilters().front()->fieldByName<SourceCameraField>(utils::kCameraIdFieldName);
+            if (!NX_ASSERT(cameraField))
+            {
+                return {
+                    QValidator::State::Invalid,
+                    tr("Source camera field must be provided for the given validation policy")};
+            }
 
-        QnVirtualCameraResourceList cameras;
-        if (cameraField->acceptAll())
-        {
-            cameras = context->resourcePool()->getAllCameras();
+            const auto cameraIds = cameraField->ids();
+            if (!cameraIds.empty())
+            {
+                QnVirtualCameraResourceList cameras =
+                    context->resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
+                        cameraField->ids());
+
+                QnRequiredAccessRightPolicy policy{
+                    context,
+                    vms::api::AccessRight::userInput,
+                    sourceUserFieldProperties.allowEmptySelection};
+                policy.setCameras(cameras);
+
+                const auto validity =
+                    policy.validity(sourceUserField->acceptAll(), sourceUserField->ids());
+
+                if (validity == QValidator::State::Acceptable)
+                    return {};
+
+                return {
+                    validity,
+                    policy.calculateAlert(sourceUserField->acceptAll(), sourceUserField->ids())};
+            }
         }
         else
         {
-            cameras = context->resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
-                cameraField->ids());
+            return {QValidator::State::Invalid, Strings::unexpectedPolicy()};
         }
-
-        QnRequiredAccessRightPolicy policy{
-            context,
-            vms::api::AccessRight::userInput,
-            sourceUserFieldProperties.allowEmptySelection};
-
-        policy.setCameras(cameras);
-
-        const auto validity =
-            policy.validity(sourceUserField->acceptAll(), sourceUserField->ids());
-
-        if (validity == QValidator::State::Acceptable)
-            return {};
-
-        return {
-            validity,
-            policy.calculateAlert(sourceUserField->acceptAll(), sourceUserField->ids())};
     }
-
-    if (!sourceUserFieldProperties.allowEmptySelection && sourceUserField->selection().isEmpty())
-        return {QValidator::State::Invalid, Strings::selectUser()};
 
     return {};
 }

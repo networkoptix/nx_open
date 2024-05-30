@@ -113,9 +113,6 @@ const ItemDescriptor& SoftTriggerEvent::manifest()
                 NX_DYNAMIC_TRANSLATABLE(tr("By")),
                 {},
                 ResourceFilterFieldProperties{
-                    .acceptAll = false,
-                    .ids = {},
-                    .allowEmptySelection = false,
                     .validationPolicy = kUserInputValidationPolicy
                 }.toVariantMap()),
             makeFieldDescriptor<CustomizableTextField>("triggerName",

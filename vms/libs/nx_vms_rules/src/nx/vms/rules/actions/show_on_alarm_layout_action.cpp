@@ -31,10 +31,7 @@ const ItemDescriptor& ShowOnAlarmLayoutAction::manifest()
                 Strings::to(),
                 {},
                 ResourceFilterFieldProperties{
-                    .acceptAll = false,
-                    .ids = nx::utils::toQSet(vms::api::kAllPowerUserGroupIds),
-                    .allowEmptySelection = false,
-                    .validationPolicy = {}
+                    .ids = nx::utils::toQSet(vms::api::kAllPowerUserGroupIds)
                 }.toVariantMap()),
             utils::makePlaybackFieldDescriptor(Strings::rewind()),
             utils::makeActionFlagFieldDescriptor(

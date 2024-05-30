@@ -24,9 +24,6 @@ const ItemDescriptor& OpenLayoutAction::manifest()
                 Strings::to(),
                 {},
                 ResourceFilterFieldProperties{
-                    .acceptAll = false,
-                    .ids = {},
-                    .allowEmptySelection = false,
                     .validationPolicy = kLayoutAccessValidationPolicy
                 }.toVariantMap()),
             utils::makePlaybackFieldDescriptor(Strings::rewind()),
