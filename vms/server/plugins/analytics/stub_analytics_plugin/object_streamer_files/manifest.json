@@ -3,27 +3,27 @@
         "objectTypes": [
             {
                 "id": "stub.objectStreamer.custom.type.1",
-                "name": "Stub OS: Custom Type 1"
-            },
-            {
-                "id": "nx.base.Vehicle",
-                "name": "Nx Base Vehicle"
-            },
-            {
-                "id": "nx.base.Car",
-                "name": "Nx Base Car"
-            },
-            {
-                "id": "nx.base.Truck",
-                "name": "Nx Base Truck"
-            },
-            {
-                "id": "nx.base.Bus",
-                "name": "Nx Base Bus"
-            },
-            {
-                "id": "nx.base.Person",
-                "name": "Nx Base Person"
+                "name": "Stub OS: Custom Type 1",
+                "attributes": [
+                    {
+                        "name": "string attribute 1",
+                        "type": "String"
+                    },
+                    {
+                        "name": "string attribute 2",
+                        "type": "String"
+                    },
+                    {
+                        "name": "number attribute 1",
+                        "type": "Number",
+                        "subtype": "float"
+                    },
+                    {
+                        "name": "number attribute 2",
+                        "type": "Number",
+                        "subtype": "integer"
+                    }
+                ]
             }
         ]
     },
