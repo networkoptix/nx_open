@@ -5064,6 +5064,14 @@ License Key: %2</source>
         <source>SYSTEM SHUT DOWN</source>
         <translation></translation>
     </message>
+    <message>
+        <source>RESTRICTED</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Authorize</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnStorageAnalyticsWidget</name>
