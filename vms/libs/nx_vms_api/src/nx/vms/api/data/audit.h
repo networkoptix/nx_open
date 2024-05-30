@@ -77,8 +77,11 @@ struct NX_VMS_API AuditRecord
     /**%apidoc Information about the user whose actions created the record. */
     nx::network::rest::AuthSession authSession;
 
-    /**%apidoc:any Detailed information about what's happened. */
-    AllAuditDetails::type details = nullptr;
+    /**%apidoc
+     * Detailed information about what's happened.
+     * %// The `details` declaration below should be a single line for apidoctool processing.
+     */
+    std::variant<std::nullptr_t, DeviceDetails, PlaybackDetails, SessionDetails, ResourceDetails, DescriptionDetails, UpdateDetails, MitmDetails> details = nullptr;
 
     /**%apidoc[proprietary]
      * Internal audit information about API request.
