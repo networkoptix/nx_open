@@ -548,7 +548,7 @@ TEST_F(ActionFieldTest, TargetSingleDeviceTest)
 void containsParametersForAllEvents(
     const utils::EventParameterHelper::EventParametersNames& visibleElements)
 {
-    ASSERT_TRUE(visibleElements.contains("system.name"));
+    ASSERT_TRUE(visibleElements.contains("site.name"));
     ASSERT_TRUE(visibleElements.contains("server.name"));
     ASSERT_TRUE(visibleElements.contains("device.name"));
 }

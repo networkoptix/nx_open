@@ -228,7 +228,7 @@ QString deviceType(const AggregatedEventPtr& eventAggregator, common::SystemCont
     return {};
 }
 
-QString systemName(const AggregatedEventPtr& /*eventAggregator*/, common::SystemContext* context)
+QString siteName(const AggregatedEventPtr& /*eventAggregator*/, common::SystemContext* context)
 {
     return context->globalSettings()->systemName();
 }
