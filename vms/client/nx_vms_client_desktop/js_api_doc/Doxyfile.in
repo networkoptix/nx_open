@@ -32,7 +32,7 @@ PROJECT_LOGO           =
 # entered, it will be relative to the location where doxygen was started. If
 # left blank the current directory will be used.
 
-OUTPUT_DIRECTORY       = ${CMAKE_CURRENT_BINARY_DIR}
+OUTPUT_DIRECTORY       = @CMAKE_CURRENT_BINARY_DIR@
 
 # With the correct setting of option CASE_SENSE_NAMES doxygen will better be
 # able to match the capabilities of the underlying filesystem. In case the
@@ -70,7 +70,7 @@ HIDE_SCOPE_NAMES       = YES
 # DoxygenLayout.xml, doxygen will parse it automatically even if the LAYOUT_FILE
 # tag is left empty.
 
-LAYOUT_FILE            = ${CMAKE_CURRENT_SOURCE_DIR}/DoxygenLayout.xml
+LAYOUT_FILE            = @CMAKE_CURRENT_SOURCE_DIR@/DoxygenLayout.xml
 
 # The INPUT tag is used to specify the files and/or directories that contain
 # documented source files. You may enter file names like myfile.cpp or
@@ -78,7 +78,7 @@ LAYOUT_FILE            = ${CMAKE_CURRENT_SOURCE_DIR}/DoxygenLayout.xml
 # spaces. See also FILE_PATTERNS and EXTENSION_MAPPING
 # Note: If this tag is empty the current directory is searched.
 
-INPUT                  = ${CMAKE_SOURCE_DIR}/open/vms/client/nx_vms_client_desktop/src/nx/vms/client/desktop/jsapi
+INPUT                  = @DOXYGEN_SRC_DIR@
 
 # If the value of the INPUT tag contains directories, you can use the
 # FILE_PATTERNS tag to specify one or more wildcard patterns (like *.cpp and
@@ -138,7 +138,7 @@ EXCLUDE_SYMBOLS        = nxReflect*
 # need to set EXTENSION_MAPPING for the extension otherwise the files are not
 # properly processed by doxygen.
 
-INPUT_FILTER           = "${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/js_doxygen_filter.py"
+INPUT_FILTER = "@PYTHON_EXECUTABLE_FOR_DOXYGEN@ @CMAKE_CURRENT_SOURCE_DIR@/js_doxygen_filter.py"
 
 # If the USE_MDFILE_AS_MAINPAGE tag refers to the name of a markdown file that
 # is part of the input, its contents will be placed on the main page
@@ -184,7 +184,7 @@ MACRO_EXPANSION        = YES
 # RECURSIVE has no effect here.
 # This tag requires that the tag SEARCH_INCLUDES is set to YES.
 
-INCLUDE_PATH           = ${CMAKE_SOURCE_DIR}/open/libs/nx_reflect/src
+INCLUDE_PATH           = @CMAKE_SOURCE_DIR@/open/libs/nx_reflect/src
 
 # The PREDEFINED tag can be used to specify one or more macro names that are
 # defined before the preprocessor is started (similar to the -D option of e.g.

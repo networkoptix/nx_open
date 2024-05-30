@@ -32,7 +32,6 @@ if(MACOSX)
 endif()
 
 add_subdirectory(js_api_doc)
-get_target_property(js_api_documentation_zip_file js_api_documentation_zip LOCATION)
 
 set(nx_vms_client_desktop_external_resources_file ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/client_external.dat)
 nx_add_external_resources_target(nx_vms_client_desktop_external_resources
@@ -47,7 +46,7 @@ nx_add_external_resources_target(nx_vms_client_desktop_external_resources
         ${customization_dir}/icons/all/logo.png
         ${js_api_documentation_zip_file}
 )
-add_dependencies(nx_vms_client_desktop_external_resources js_api_documentation_zip)
+add_dependencies(nx_vms_client_desktop_external_resources js_api_documentation)
 
 # Place Roboto font into resources so it can be loaded by Qt WebEngine.
 set(client_font_roboto_regular ${CONAN_ROBOTO-FONTS_ROOT}/bin/fonts/Roboto-Regular.ttf)
