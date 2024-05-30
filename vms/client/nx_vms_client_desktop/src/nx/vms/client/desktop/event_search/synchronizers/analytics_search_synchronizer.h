@@ -14,7 +14,6 @@ namespace nx::vms::client::core { class AnalyticsSearchSetup; }
 
 namespace nx::vms::client::desktop {
 
-class CommonObjectSearchSetup;
 class WindowContext;
 
 /**
@@ -56,7 +55,6 @@ private:
     static QVector<AnalyticsSearchSynchronizer*>& instances();
 
 private:
-    const QPointer<CommonObjectSearchSetup> m_commonSetup;
     const QPointer<core::AnalyticsSearchSetup> m_analyticsSetup;
     nx::utils::ScopedConnections m_activeMediaWidgetConnections;
     bool m_areaSelectionActive = false;

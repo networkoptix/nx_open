@@ -12,6 +12,8 @@ class QnMediaResourceWidget;
 
 namespace nx::vms::client::desktop {
 
+class CommonObjectSearchSetup;
+
 /**
  * A base for utility classes to synchronize Right Panel state with Workbench state,
  * for example Motion tab with Motion Search on camera.
@@ -25,7 +27,10 @@ class AbstractSearchSynchronizer:
     using base_type = QObject;
 
 public:
-    AbstractSearchSynchronizer(WindowContext* context, QObject* parent = nullptr);
+    AbstractSearchSynchronizer(
+        WindowContext* context,
+        CommonObjectSearchSetup* commonSetup,
+        QObject* parent = nullptr);
     virtual ~AbstractSearchSynchronizer() override = default;
 
     bool active() const;
@@ -41,10 +46,12 @@ signals:
 protected:
     void setTimeContentDisplayed(Qn::TimePeriodContent content, bool displayed);
     virtual bool isMediaAccepted(QnMediaResourceWidget* widget) const;
+    CommonObjectSearchSetup* commonSetup();
 
 private:
     bool m_active = false;
     QPointer<QnMediaResourceWidget> m_mediaWidget;
+    const QPointer<CommonObjectSearchSetup> m_commonSetup;
 };
 
 } // namespace nx::vms::client::desktop

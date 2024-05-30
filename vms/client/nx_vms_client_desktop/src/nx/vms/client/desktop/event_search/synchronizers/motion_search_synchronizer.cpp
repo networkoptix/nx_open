@@ -25,11 +25,10 @@ MotionSearchSynchronizer::MotionSearchSynchronizer(
     SimpleMotionSearchListModel* model,
     QObject* parent)
     :
-    AbstractSearchSynchronizer(context, parent),
-    m_commonSetup(commonSetup),
+    AbstractSearchSynchronizer(context, commonSetup, parent),
     m_model(model)
 {
-    NX_CRITICAL(m_commonSetup && m_model);
+    NX_CRITICAL(m_model);
 
     const auto connectToDisplayWidget =
         [this](QnResourceWidget* widget)
@@ -92,7 +91,7 @@ MotionSearchSynchronizer::MotionSearchSynchronizer(
             updateActiveState(active());
         });
 
-    connect(m_commonSetup.data(), &CommonObjectSearchSetup::selectedCamerasChanged,
+    connect(commonSetup, &CommonObjectSearchSetup::selectedCamerasChanged,
         this, &MotionSearchSynchronizer::updateCachedDevices);
 
     connect(m_model.data(), &SimpleMotionSearchListModel::filterRegionsChanged, this,
@@ -114,9 +113,9 @@ void MotionSearchSynchronizer::updateAreaSelection()
 void MotionSearchSynchronizer::updateCachedDevices()
 {
     std::map<SystemContext*, UuidSet> cachedDevicesByContext;
-    if (active() && m_commonSetup)
+    if (active() && commonSetup())
     {
-        for (const auto& camera: m_commonSetup->selectedCameras())
+        for (const auto& camera: commonSetup()->selectedCameras())
         {
             auto systemContext = SystemContext::fromResource(camera);
             cachedDevicesByContext[systemContext].insert(camera->getId());

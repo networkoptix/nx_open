@@ -35,10 +35,12 @@
 #include <nx/vms/client/desktop/event_search/utils/common_object_search_setup.h>
 #include <nx/vms/client/desktop/event_search/widgets/placeholder_widget.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/common/palette.h>
+#include <ui/common/read_only.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
@@ -92,6 +94,7 @@ static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubst
 
 NX_DECLARE_COLORIZED_ICON(kCalendarIcon, "20x20/Outline/calendar.svg", kThemeSubstitutions)
 NX_DECLARE_COLORIZED_ICON(kDeviceIcon, "20x20/Outline/device.svg", kThemeSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kPlayIcon, "20x20/Outline/play.svg", kThemeSubstitutions)
 NX_DECLARE_COLORIZED_ICON(kCheckedEventLogIcon,
     "20x20/Outline/event_log.svg", kThemeSubstitutions,
     "20x20/Outline/event_log.svg", kCheckedThemeSubstitutions)
@@ -220,11 +223,15 @@ AbstractSearchWidget::Private::Private(
             });
     }
 
+    connect(q->navigator(), &QnWorkbenchNavigator::currentResourceChanged, this,
+        &Private::updateCameraDisplaying);
+
     setupModels();
     setupRibbon();
     setupPlaceholder();
     setupTimeSelection();
     setupCameraSelection();
+    setupCameraDisplaying();
 
     installEventHandler(q, {QEvent::Show, QEvent::Hide}, this,
         [this, q]()
@@ -243,6 +250,28 @@ AbstractSearchWidget::Private::Private(
     m_fetchDataOperation->setFlags(nx::utils::PendingOperation::FireOnlyWhenIdle);
     m_fetchDataOperation->setInterval(kQueuedFetchDataDelay);
     m_fetchDataOperation->setCallback([this]() { tryFetchData(); });
+
+    connect(
+        q->workbench(),
+        &Workbench::currentLayoutChanged,
+        this,
+        [this]()
+        {
+            if (!m_commonSetup)
+                return;
+
+            if (this->q->workbench()->currentLayout()->resource()->isCrossSystem())
+            {
+                m_commonSetup->setCameraSelection(
+                    nx::vms::client::core::EventSearch::CameraSelection::current);
+            }
+
+            m_crossSystemLayoutMode =
+                this->q->workbench()->currentLayout()->resource()->isCrossSystem();
+            updateControlsVisibility();
+        });
+
+    updateControlsVisibility();
 }
 
 AbstractSearchWidget::Private::~Private()
@@ -611,6 +640,57 @@ void AbstractSearchWidget::Private::setupCameraSelection()
         });
 }
 
+void AbstractSearchWidget::Private::setupCameraDisplaying()
+{
+    setReadOnly(ui->cameraDisplayingButton, true);
+
+    ui->cameraDisplayingButton->setDeactivatable(false);
+    ui->cameraDisplayingButton->setAccented(true);
+    ui->cameraDisplayingButton->setFlat(true);
+    ui->cameraDisplayingButton->setSelectable(false);
+    ui->cameraDisplayingButton->setFocusPolicy(Qt::NoFocus);
+
+    updateCameraDisplaying();
+}
+
+void AbstractSearchWidget::Private::updateCameraDisplaying()
+{
+    const auto resource = q->navigator()->currentResource();
+    const bool isMedia = (bool) resource.dynamicCast<QnMediaResource>();
+
+    const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
+    const bool isCamera = camera || !isMedia;
+
+    ui->cameraDisplayingButton->setIcon(qnSkin->icon(isCamera ? kDeviceIcon : kPlayIcon));
+
+    if (resource)
+    {
+        const auto name = resource->getName();
+        if (isCamera)
+        {
+            const auto baseText = QnDeviceDependentStrings::getNameFromSet(
+                q->system()->resourcePool(),
+                QnCameraDeviceStringSet(tr("Selected device"), tr("Selected camera")),
+                camera);
+
+            ui->cameraDisplayingButton->setText(
+                QString("%1 %2 %3").arg(baseText, nx::UnicodeChars::kEnDash, name));
+        }
+        else
+        {
+            ui->cameraDisplayingButton->setText(
+                QString("%1 %2 %3").arg(tr("Selected media"), nx::UnicodeChars::kEnDash, name));
+        }
+    }
+    else
+    {
+        ui->cameraDisplayingButton->setText(QString("%1 %2 %3").arg(
+            tr("Selected camera"),
+            nx::UnicodeChars::kEnDash,
+            tr("none", "No currently selected camera")));
+    }
+}
+
 QString AbstractSearchWidget::Private::currentDeviceText() const
 {
     const auto camera = m_commonSetup->singleCamera();
@@ -698,25 +778,38 @@ void AbstractSearchWidget::Private::goToLive()
 
 AbstractSearchWidget::Controls AbstractSearchWidget::Private::relevantControls() const
 {
-    Controls result;
-    result.setFlag(Control::cameraSelector, !ui->cameraSelectionButton->isHidden());
-    result.setFlag(Control::timeSelector, !ui->timeSelectionButton->isHidden());
-    result.setFlag(Control::freeTextFilter, !m_textFilterEdit->isHidden());
-    result.setFlag(Control::footersToggler, !m_toggleFootersButton->isHidden());
-    result.setFlag(Control::previewsToggler, !m_togglePreviewsButton->isHidden());
-    return result;
+    return m_relevantControls;
 }
 
 void AbstractSearchWidget::Private::setRelevantControls(Controls value)
 {
-    ui->cameraSelectionButton->setVisible(value.testFlag(Control::cameraSelector));
-    ui->timeSelectionButton->setVisible(value.testFlag(Control::timeSelector));
-    const bool hasTextSearch = value.testFlag(Control::freeTextFilter);
+    m_relevantControls = value;
+}
+
+void AbstractSearchWidget::Private::updateControlsVisibility()
+{
+    if (m_relevantControls.testFlags(Control::cameraSelector | Control::cameraSelectionDisplay))
+    {
+        ui->cameraSelectionButton->setVisible(
+            m_relevantControls.testFlag(Control::cameraSelector) && !m_crossSystemLayoutMode);
+        ui->cameraDisplayingButton->setVisible(
+            m_relevantControls.testFlag(Control::cameraSelectionDisplay) && m_crossSystemLayoutMode);
+    }
+    else // For SimpleMotionSearchWidget correct displaying.
+    {
+        ui->cameraSelectionButton->setVisible(
+            m_relevantControls.testFlag(Control::cameraSelector));
+        ui->cameraDisplayingButton->setVisible(
+            m_relevantControls.testFlag(Control::cameraSelectionDisplay));
+    }
+
+    ui->timeSelectionButton->setVisible(m_relevantControls.testFlag(Control::timeSelector));
+    const bool hasTextSearch = m_relevantControls.testFlag(Control::freeTextFilter);
     m_textFilterEdit->setVisible(hasTextSearch);
     ui->headerLayout->setContentsMargins(
         kHeaderSideMargin, hasTextSearch ? kTextSearchTopMargin : 0, kHeaderSideMargin, 0);
-    m_toggleFootersButton->setVisible(value.testFlag(Control::footersToggler));
-    m_togglePreviewsButton->setVisible(value.testFlag(Control::previewsToggler));
+    m_toggleFootersButton->setVisible(m_relevantControls.testFlag(Control::footersToggler));
+    m_togglePreviewsButton->setVisible(m_relevantControls.testFlag(Control::previewsToggler));
 }
 
 CommonObjectSearchSetup* AbstractSearchWidget::Private::commonSetup() const

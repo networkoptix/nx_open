@@ -61,12 +61,13 @@ public:
     enum class Control
     {
         cameraSelector = 0x01,
-        timeSelector = 0x02,
-        freeTextFilter = 0x04,
-        footersToggler = 0x08,
-        previewsToggler = 0x10,
+        cameraSelectionDisplay = 0x02,
+        timeSelector = 0x04,
+        freeTextFilter = 0x08,
+        footersToggler = 0x10,
+        previewsToggler = 0x20,
 
-        defaults = cameraSelector | timeSelector | freeTextFilter | previewsToggler,
+        defaults = cameraSelector | cameraSelectionDisplay | timeSelector | freeTextFilter | previewsToggler,
         all = defaults | footersToggler
     };
     Q_DECLARE_FLAGS(Controls, Control)

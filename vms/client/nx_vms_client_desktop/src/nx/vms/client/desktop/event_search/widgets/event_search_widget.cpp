@@ -425,7 +425,11 @@ EventSearchWidget::EventSearchWidget(WindowContext* context, QWidget* parent):
     base_type(context, new EventSearchListModel(context), parent),
     d(new Private(this))
 {
-    setRelevantControls(Control::cameraSelector | Control::timeSelector | Control::previewsToggler);
+    setRelevantControls(
+        Control::cameraSelector
+        | Control::cameraSelectionDisplay
+        | Control::timeSelector
+        | Control::previewsToggler);
     setPlaceholderPixmap(qnSkin->pixmap("left_panel/placeholders/events.svg"));
 }
 

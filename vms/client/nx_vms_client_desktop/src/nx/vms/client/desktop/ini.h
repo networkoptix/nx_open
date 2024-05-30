@@ -325,6 +325,14 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
     NX_INI_FLAG(false, objectPixelation,
         "[Feature] Enables Object Pixelation feature.");
 
+    // VMS-52885
+    NX_INI_FLAG(false, allowCslBookmarkSearch,
+        "[Feature] Enables Bookmarks search on Cross System Layouts.");
+
+    // VMS-52886, VMS-52888
+    NX_INI_FLAG(false, allowCslObjectSearch,
+        "[Feature] Enables Objects search on Cross System Layouts.");
+
     // ---------------------------------------------------------------------------------------------
     // Support section.
     // Flags here can be removed when support engineers decide whether to discard the flag or move
