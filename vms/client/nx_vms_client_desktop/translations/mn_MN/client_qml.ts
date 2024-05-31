@@ -423,7 +423,7 @@
     </message>
     <message>
       <source>none</source>
-      <translation type="unfinished">none</translation>
+      <translation>байхгүй</translation>
     </message>
     <message numerus="yes">
       <source>%n chosen devices</source>
@@ -452,7 +452,7 @@
     <name>ClosedTileItem</name>
     <message>
       <source>Offline</source>
-      <translation type="unfinished">Offline</translation>
+      <translation>Офлайн</translation>
     </message>
     <message>
       <source>Unreachable</source>
@@ -998,7 +998,7 @@
     </message>
     <message>
       <source>Nothing found</source>
-      <translation type="unfinished">Nothing found</translation>
+      <translation>Олдсонгүй</translation>
     </message>
     <message>
       <source>No groups</source>
@@ -1089,7 +1089,7 @@
     <name>IntegrationPanel</name>
     <message>
       <source>Version</source>
-      <translation type="unfinished">Version</translation>
+      <translation>Хувилбар</translation>
     </message>
     <message>
       <source>Vendor</source>
@@ -1478,7 +1478,7 @@
     <name>OpenedTileItem</name>
     <message>
       <source>Address</source>
-      <translation type="unfinished">Address</translation>
+      <translation>Хаяг</translation>
     </message>
     <message>
       <source>URL or Host:Port</source>
@@ -1873,7 +1873,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Nothing found</source>
-      <translation type="unfinished">Nothing found</translation>
+      <translation>Олдсонгүй</translation>
     </message>
     <message>
       <source>Drag video files or images to the client window, or add local media folder through the Local Settings dialog</source>
@@ -2298,7 +2298,7 @@ Press Alt + Click to follow object</translation>
     <name>TileGridPlaceholder</name>
     <message>
       <source>Nothing Found</source>
-      <translation type="unfinished">Nothing Found</translation>
+      <translation>Олдсонгүй</translation>
     </message>
     <message>
       <source>No Favorite Systems</source>

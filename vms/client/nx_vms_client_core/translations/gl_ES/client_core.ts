@@ -5,7 +5,7 @@
     <name>QnDirectSystemsFinder</name>
     <message>
       <source>System</source>
-      <translation type="unfinished">System</translation>
+      <translation>Sistema</translation>
     </message>
     <message>
       <source>System (%1)</source>
@@ -17,7 +17,7 @@
     <name>QnLocalSystemDescription</name>
     <message>
       <source>New Server</source>
-      <translation type="unfinished">New Server</translation>
+      <translation>Novo servidor</translation>
     </message>
   </context>
   <context>
@@ -36,11 +36,11 @@
     </message>
     <message>
       <source>Your System</source>
-      <translation type="unfinished">Your System</translation>
+      <translation>O teu sistema</translation>
     </message>
     <message>
       <source>New System</source>
-      <translation type="unfinished">New System</translation>
+      <translation>Novo sistema</translation>
     </message>
   </context>
   <context>
@@ -72,7 +72,7 @@
     <message>
       <source>Restore the connection to %1 and try again</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Restore the connection to %1 and try again</translation>
+      <translation>Restaura a conexión a %1 e téntao de novo, por favor</translation>
     </message>
     <message>
       <source>%1 user login is temporarily unavailable</source>
@@ -113,7 +113,7 @@
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation type="unfinished">Too many attempts. Try again in a minute.</translation>
+      <translation>Demasiados intentos. Téntao de novo nun minuto, por favor.</translation>
     </message>
     <message>
       <source>Compatibility mode for versions lower than %1 is not supported.</source>
@@ -138,7 +138,7 @@
     </message>
     <message>
       <source>Your session has expired</source>
-      <translation type="unfinished">Your session has expired</translation>
+      <translation>A túa sesión caducou</translation>
     </message>
     <message>
       <source>Please log in to %1 again.</source>
@@ -156,7 +156,7 @@
     </message>
     <message>
       <source>This user has been disabled by a system administrator.</source>
-      <translation type="unfinished">This user has been disabled by a system administrator.</translation>
+      <translation>Esta persoa usuaria foi desactivada por unha persoa administradora do sistema.</translation>
     </message>
     <message>
       <source>Too many login attempts. Try again in a minute.</source>
@@ -164,7 +164,7 @@
     </message>
     <message>
       <source>Two-factor authentication is required.</source>
-      <translation type="unfinished">Two-factor authentication is required.</translation>
+      <translation>A autenticación en dous pasos é obrigatoria.</translation>
     </message>
     <message>
       <source>You can enable two-factor authentication in your %1.</source>

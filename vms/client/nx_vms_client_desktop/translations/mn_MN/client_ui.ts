@@ -9,7 +9,7 @@
     </message>
     <message>
       <source>Information</source>
-      <translation type="unfinished">Information</translation>
+      <translation>Мэдээлэл</translation>
     </message>
     <message>
       <source>Credits</source>
@@ -1075,7 +1075,7 @@
     </message>
     <message>
       <source>Address</source>
-      <translation type="unfinished">Address</translation>
+      <translation>Хаяг</translation>
     </message>
     <message>
       <source>Hint</source>
@@ -1083,7 +1083,7 @@
     </message>
     <message>
       <source>Port</source>
-      <translation type="unfinished">Port</translation>
+      <translation>Порт</translation>
     </message>
     <message>
       <source>End IP</source>
@@ -1303,15 +1303,15 @@
     </message>
     <message>
       <source>Low</source>
-      <translation type="unfinished">Low</translation>
+      <translation>Бага</translation>
     </message>
     <message>
       <source>Medium</source>
-      <translation type="unfinished">Medium</translation>
+      <translation>Дунд</translation>
     </message>
     <message>
       <source>High</source>
-      <translation type="unfinished">High</translation>
+      <translation>Сайн</translation>
     </message>
     <message>
       <source>Select some devices to setup failover priority</source>
@@ -1333,7 +1333,7 @@
     <name>FilteredResourceViewWidget</name>
     <message>
       <source>Nothing found</source>
-      <translation type="unfinished">Nothing found</translation>
+      <translation>Олдсонгүй</translation>
     </message>
   </context>
   <context>
@@ -1486,7 +1486,7 @@
     <name>InfoOverlaySettingsWidget</name>
     <message>
       <source>Info</source>
-      <translation type="unfinished">Info</translation>
+      <translation>Мэдээлэл</translation>
     </message>
     <message>
       <source>Camera name</source>
@@ -1616,7 +1616,7 @@
     <name>LicenseNotificationDialog</name>
     <message>
       <source>Warning</source>
-      <translation type="unfinished">Warning</translation>
+      <translation>Анхааруулга</translation>
     </message>
     <message>
       <source>License issues:</source>
@@ -1708,7 +1708,7 @@
     </message>
     <message>
       <source>Port</source>
-      <translation type="unfinished">Port</translation>
+      <translation>Порт</translation>
     </message>
     <message>
       <source>Login</source>
@@ -1802,7 +1802,7 @@
     </message>
     <message>
       <source>Mode</source>
-      <translation type="unfinished">Mode</translation>
+      <translation>Горим</translation>
     </message>
     <message>
       <source>Intensity</source>
@@ -1833,11 +1833,11 @@
     <name>MergeSystemsDialog</name>
     <message>
       <source>Merge Systems...</source>
-      <translation type="unfinished">Merge Systems...</translation>
+      <translation>Системүүдийг нэгтгэх...</translation>
     </message>
     <message>
       <source>Server URL:</source>
-      <translation type="unfinished">Server URL:</translation>
+      <translation>Серверийн URL:</translation>
     </message>
     <message>
       <source>Password:</source>
@@ -2672,7 +2672,7 @@
     </message>
     <message>
       <source>Port</source>
-      <translation type="unfinished">Port</translation>
+      <translation>Порт</translation>
     </message>
     <message>
       <source>Autodetect built-in and USB webcams</source>

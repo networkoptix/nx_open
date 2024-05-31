@@ -4998,6 +4998,14 @@ License Key: %2</source>
       <source>SYSTEM SHUT DOWN</source>
       <translation>システムがシャットダウンしました</translation>
     </message>
+    <message>
+      <source>RESTRICTED</source>
+      <translation>制限あり</translation>
+    </message>
+    <message>
+      <source>Authorize</source>
+      <translation>認証</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageAnalyticsWidget</name>

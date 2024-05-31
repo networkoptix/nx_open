@@ -4998,6 +4998,14 @@ Kunci Lisensi: %2</translation>
       <source>SYSTEM SHUT DOWN</source>
       <translation>SISTEM DIMATIKAN</translation>
     </message>
+    <message>
+      <source>RESTRICTED</source>
+      <translation>TERBATAS</translation>
+    </message>
+    <message>
+      <source>Authorize</source>
+      <translation>Otorisasi</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageAnalyticsWidget</name>

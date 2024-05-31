@@ -4998,6 +4998,14 @@ License Key: %2</source>
       <source>SYSTEM SHUT DOWN</source>
       <translation>系統關閉</translation>
     </message>
+    <message>
+      <source>RESTRICTED</source>
+      <translation type="unfinished">RESTRICTED</translation>
+    </message>
+    <message>
+      <source>Authorize</source>
+      <translation type="unfinished">Authorize</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageAnalyticsWidget</name>
@@ -10148,7 +10156,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Local layouts can only be shown to their owners</source>
-      <translation type="unfinished">Local layouts can only be shown to their owners</translation>
+      <translation>本機佈局只能顯示給其所有者</translation>
     </message>
   </context>
   <context>
@@ -11429,7 +11437,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message>
       <source>and</source>
       <comment>Example: 1 month and 2 days</comment>
-      <translation type="unfinished">and</translation>
+      <translation>又</translation>
     </message>
     <message>
       <source>Your access to the System expires %1</source>

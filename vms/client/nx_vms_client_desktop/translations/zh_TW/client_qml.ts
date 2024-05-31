@@ -1421,7 +1421,7 @@
     <name>NewLinkDialog</name>
     <message>
       <source>New Link - %1</source>
-      <translation type="unfinished">New Link - %1</translation>
+      <translation>新連結 - %1</translation>
     </message>
     <message>
       <source>The previous link will be invalidated once a new one has been issued</source>
@@ -1895,7 +1895,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Health Monitors</source>
-      <translation type="unfinished">Health Monitors</translation>
+      <translation>系統資源檢視器</translation>
     </message>
     <message>
       <source>Video Walls</source>

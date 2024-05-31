@@ -5064,6 +5064,14 @@ License Key: %2</source>
       <source>SYSTEM SHUT DOWN</source>
       <translation>SİSTEM KAPATILDI</translation>
     </message>
+    <message>
+      <source>RESTRICTED</source>
+      <translation>SINIRLI</translation>
+    </message>
+    <message>
+      <source>Authorize</source>
+      <translation>Yetkilendir</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageAnalyticsWidget</name>

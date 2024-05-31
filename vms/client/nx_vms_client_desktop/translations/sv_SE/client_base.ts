@@ -5066,6 +5066,14 @@ Licensnyckel: %2</translation>
       <source>SYSTEM SHUT DOWN</source>
       <translation>SYSTEM STÄNGS NER</translation>
     </message>
+    <message>
+      <source>RESTRICTED</source>
+      <translation>BEGRÄNSAD</translation>
+    </message>
+    <message>
+      <source>Authorize</source>
+      <translation>Auktorisera</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageAnalyticsWidget</name>

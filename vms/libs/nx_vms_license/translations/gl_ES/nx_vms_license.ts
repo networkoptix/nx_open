@@ -89,7 +89,7 @@
     </message>
     <message>
       <source>Unknown error</source>
-      <translation type="unfinished">Unknown error</translation>
+      <translation>Erro descoñecido</translation>
     </message>
   </context>
 </TS>
