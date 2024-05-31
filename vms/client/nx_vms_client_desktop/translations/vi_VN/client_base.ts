@@ -4997,6 +4997,14 @@ Khóa giấy phép: %2</translation>
       <source>SYSTEM SHUT DOWN</source>
       <translation>HỆ THỐNG ĐÃ TẮT</translation>
     </message>
+    <message>
+      <source>RESTRICTED</source>
+      <translation type="unfinished">RESTRICTED</translation>
+    </message>
+    <message>
+      <source>Authorize</source>
+      <translation type="unfinished">Authorize</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageAnalyticsWidget</name>

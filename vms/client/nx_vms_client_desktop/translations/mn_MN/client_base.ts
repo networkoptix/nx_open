@@ -343,7 +343,7 @@
     </message>
     <message>
       <source>Merge Systems...</source>
-      <translation type="unfinished">Merge Systems...</translation>
+      <translation>Системүүдийг нэгтгэх...</translation>
     </message>
     <message>
       <source>About...</source>
@@ -647,7 +647,7 @@
     </message>
     <message>
       <source>None</source>
-      <translation type="unfinished">None</translation>
+      <translation>Байхгүй</translation>
     </message>
     <message>
       <source>Small</source>
@@ -655,7 +655,7 @@
     </message>
     <message>
       <source>Medium</source>
-      <translation type="unfinished">Medium</translation>
+      <translation>Дунд</translation>
     </message>
     <message>
       <source>Large</source>
@@ -1159,7 +1159,7 @@
     </message>
     <message>
       <source>None</source>
-      <translation type="unfinished">None</translation>
+      <translation>Байхгүй</translation>
     </message>
     <message>
       <source>automatic</source>
@@ -1300,15 +1300,15 @@
     <name>FlagsPickerWidgetStrings</name>
     <message>
       <source>Error</source>
-      <translation type="unfinished">Error</translation>
+      <translation>Алдаа</translation>
     </message>
     <message>
       <source>Warning</source>
-      <translation type="unfinished">Warning</translation>
+      <translation>Анхааруулга</translation>
     </message>
     <message>
       <source>Info</source>
-      <translation type="unfinished">Info</translation>
+      <translation>Мэдээлэл</translation>
     </message>
     <message>
       <source>Undefined</source>
@@ -1651,7 +1651,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Error</source>
-      <translation type="unfinished">Error</translation>
+      <translation>Алдаа</translation>
     </message>
     <message>
       <source>Set your email address or SMTP server</source>
@@ -1678,7 +1678,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Success</source>
-      <translation type="unfinished">Success</translation>
+      <translation>Амжилттай</translation>
     </message>
     <message>
       <source>Authentication failed</source>
@@ -2288,7 +2288,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>IP</source>
-      <translation type="unfinished">IP</translation>
+      <translation>IP</translation>
     </message>
     <message>
       <source>Activity</source>
@@ -3629,7 +3629,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>None</source>
-      <translation type="unfinished">None</translation>
+      <translation>Байхгүй</translation>
     </message>
     <message>
       <source>Auto (%1)</source>
@@ -3868,7 +3868,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Error</source>
-      <translation type="unfinished">Error</translation>
+      <translation>Алдаа</translation>
     </message>
     <message>
       <source>Server not found</source>
@@ -3907,7 +3907,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Channels</source>
-      <translation type="unfinished">Channels</translation>
+      <translation>Сувгууд</translation>
     </message>
     <message>
       <source>Not verified</source>
@@ -4302,7 +4302,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>None</source>
-      <translation type="unfinished">None</translation>
+      <translation>Байхгүй</translation>
     </message>
     <message numerus="yes">
       <source>This preset will be activated after %n minutes of inactivity</source>
@@ -4358,14 +4358,14 @@ License Key: %2</translation>
     </message>
     <message>
       <source>None</source>
-      <translation type="unfinished">None</translation>
+      <translation>Байхгүй</translation>
     </message>
   </context>
   <context>
     <name>QnPtzPresetHotkeyItemDelegate</name>
     <message>
       <source>None</source>
-      <translation type="unfinished">None</translation>
+      <translation>Байхгүй</translation>
     </message>
     <message>
       <source>Reassign</source>
@@ -4388,7 +4388,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Low</source>
-      <translation type="unfinished">Low</translation>
+      <translation>Бага</translation>
     </message>
     <message>
       <source>Normal</source>
@@ -4396,7 +4396,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>High</source>
-      <translation type="unfinished">High</translation>
+      <translation>Сайн</translation>
     </message>
     <message>
       <source>Highest</source>
@@ -4552,7 +4552,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Information</source>
-      <translation type="unfinished">Information</translation>
+      <translation>Мэдээлэл</translation>
     </message>
     <message>
       <source>Rotate</source>
@@ -4796,7 +4796,7 @@ License Key: %2</translation>
     <name>QnServerAddressesModel</name>
     <message>
       <source>Address</source>
-      <translation type="unfinished">Address</translation>
+      <translation>Хаяг</translation>
     </message>
   </context>
   <context>
@@ -5065,6 +5065,14 @@ License Key: %2</translation>
     <message>
       <source>SYSTEM SHUT DOWN</source>
       <translation type="unfinished">SYSTEM SHUT DOWN</translation>
+    </message>
+    <message>
+      <source>RESTRICTED</source>
+      <translation type="unfinished">RESTRICTED</translation>
+    </message>
+    <message>
+      <source>Authorize</source>
+      <translation type="unfinished">Authorize</translation>
     </message>
   </context>
   <context>
@@ -6530,7 +6538,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>none</source>
       <comment>No currently selected camera</comment>
-      <translation type="unfinished">none</translation>
+      <translation>байхгүй</translation>
     </message>
   </context>
   <context>
@@ -6600,19 +6608,19 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Low</source>
-      <translation type="unfinished">Low</translation>
+      <translation>Бага</translation>
     </message>
     <message>
       <source>Medium</source>
-      <translation type="unfinished">Medium</translation>
+      <translation>Дунд</translation>
     </message>
     <message>
       <source>High</source>
-      <translation type="unfinished">High</translation>
+      <translation>Сайн</translation>
     </message>
     <message>
       <source>Best</source>
-      <translation type="unfinished">Best</translation>
+      <translation>Хамгийн сайн</translation>
     </message>
     <message>
       <source>Preset</source>
@@ -6950,7 +6958,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>none</source>
       <comment>No currently selected camera</comment>
-      <translation type="unfinished">none</translation>
+      <translation>байхгүй</translation>
     </message>
     <message>
       <source>Devices on layout</source>
@@ -7241,7 +7249,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Motion detection is disabled</source>
-      <translation type="unfinished">Motion detection is disabled</translation>
+      <translation>Хөдөлгөөн мэдрэгч идэвхгүй болсон</translation>
     </message>
     <message>
       <source>No analytics plugins</source>
@@ -8413,7 +8421,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Success</source>
-      <translation type="unfinished">Success</translation>
+      <translation>Амжилттай</translation>
     </message>
     <message>
       <source>Test Failed</source>
@@ -8976,7 +8984,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Info</source>
-      <translation type="unfinished">Info</translation>
+      <translation>Мэдээлэл</translation>
     </message>
     <message>
       <source>AVI format is not recommended to export a recording with audio track.</source>
@@ -9003,15 +9011,15 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::FailoverPriorityColumnItemDelegate</name>
     <message>
       <source>Low</source>
-      <translation type="unfinished">Low</translation>
+      <translation>Бага</translation>
     </message>
     <message>
       <source>Medium</source>
-      <translation type="unfinished">Medium</translation>
+      <translation>Дунд</translation>
     </message>
     <message>
       <source>High</source>
-      <translation type="unfinished">High</translation>
+      <translation>Сайн</translation>
     </message>
     <message>
       <source>No Failover</source>
@@ -9068,7 +9076,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Address</source>
-      <translation type="unfinished">Address</translation>
+      <translation>Хаяг</translation>
     </message>
     <message numerus="yes">
       <source>%n new</source>
@@ -9207,7 +9215,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Error</source>
-      <translation type="unfinished">Error</translation>
+      <translation>Алдаа</translation>
     </message>
     <message>
       <source>Image cannot be loaded.</source>
@@ -9547,19 +9555,19 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>None</source>
-      <translation type="unfinished">None</translation>
+      <translation>Байхгүй</translation>
     </message>
     <message>
       <source>Error</source>
-      <translation type="unfinished">Error</translation>
+      <translation>Алдаа</translation>
     </message>
     <message>
       <source>Warning</source>
-      <translation type="unfinished">Warning</translation>
+      <translation>Анхааруулга</translation>
     </message>
     <message>
       <source>Info</source>
-      <translation type="unfinished">Info</translation>
+      <translation>Мэдээлэл</translation>
     </message>
     <message>
       <source>Debug</source>
@@ -9718,7 +9726,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Merge Systems</source>
-      <translation type="unfinished">Merge Systems</translation>
+      <translation>Системүүдийг нэгтгэх</translation>
     </message>
     <message>
       <source>Enter your account password to merge Systems</source>
@@ -10465,7 +10473,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Port</source>
-      <translation type="unfinished">Port</translation>
+      <translation>Порт</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -10641,11 +10649,11 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Low</source>
-      <translation type="unfinished">Low</translation>
+      <translation>Бага</translation>
     </message>
     <message>
       <source>High</source>
-      <translation type="unfinished">High</translation>
+      <translation>Сайн</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -10681,7 +10689,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Best</source>
-      <translation type="unfinished">Best</translation>
+      <translation>Хамгийн сайн</translation>
     </message>
     <message>
       <source>Average</source>
@@ -11284,7 +11292,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Version</source>
-      <translation type="unfinished">Version</translation>
+      <translation>Хувилбар</translation>
     </message>
     <message>
       <source>Vendor</source>
@@ -12095,7 +12103,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Version</source>
-      <translation type="unfinished">Version</translation>
+      <translation>Хувилбар</translation>
     </message>
     <message>
       <source>Invalid version.</source>
@@ -12503,7 +12511,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Error</source>
-      <translation type="unfinished">Error</translation>
+      <translation>Алдаа</translation>
     </message>
     <message>
       <source>Failed to import. Retry in 1 minute.</source>
@@ -13052,7 +13060,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::ui::action::ShowOnItemsFactory</name>
     <message>
       <source>Info</source>
-      <translation type="unfinished">Info</translation>
+      <translation>Мэдээлэл</translation>
     </message>
     <message>
       <source>Objects</source>

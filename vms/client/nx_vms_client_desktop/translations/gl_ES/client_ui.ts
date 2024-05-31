@@ -5,11 +5,11 @@
     <name>AboutDialog</name>
     <message>
       <source>About</source>
-      <translation type="unfinished">About</translation>
+      <translation>Acerca de</translation>
     </message>
     <message>
       <source>Information</source>
-      <translation type="unfinished">Information</translation>
+      <translation>Información</translation>
     </message>
     <message>
       <source>Credits</source>
@@ -21,7 +21,7 @@
     </message>
     <message>
       <source>Support</source>
-      <translation type="unfinished">Support</translation>
+      <translation>Axuda</translation>
     </message>
     <message>
       <source>System Servers</source>
@@ -29,7 +29,7 @@
     </message>
     <message>
       <source>Developer</source>
-      <translation type="unfinished">Developer</translation>
+      <translation>Programador</translation>
     </message>
     <message>
       <source>Open source libraries</source>
@@ -40,7 +40,7 @@
     <name>AdjustVideoDialog</name>
     <message>
       <source>Image Enhancement</source>
-      <translation type="unfinished">Image Enhancement</translation>
+      <translation>Mellora da imaxe</translation>
     </message>
     <message>
       <source>Enable image enhancement</source>
@@ -52,7 +52,7 @@
     </message>
     <message>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Auto</translation>
     </message>
     <message>
       <source>Black level</source>
@@ -111,19 +111,19 @@
     </message>
     <message>
       <source>Download</source>
-      <translation type="unfinished">Download</translation>
+      <translation>Descargar</translation>
     </message>
     <message>
       <source>Settings</source>
-      <translation type="unfinished">Settings</translation>
+      <translation>Configuración</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Cancelar</translation>
     </message>
     <message>
       <source>Done</source>
-      <translation type="unfinished">Done</translation>
+      <translation>Feito!</translation>
     </message>
     <message>
       <source>Open Files Folder</source>
@@ -183,7 +183,7 @@
     <name>ArchiveLengthWidget</name>
     <message>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Auto</translation>
     </message>
     <message>
       <source>Keep Archive For...</source>
@@ -209,7 +209,7 @@
     <name>AuditLogDialog</name>
     <message>
       <source>Refresh</source>
-      <translation type="unfinished">Refresh</translation>
+      <translation>Recargar</translation>
     </message>
     <message>
       <source>User actions</source>
@@ -253,7 +253,7 @@
     </message>
     <message>
       <source>Audit Trail</source>
-      <translation type="unfinished">Audit Trail</translation>
+      <translation>Pista de auditoría</translation>
     </message>
     <message>
       <source>Clear Filter</source>
@@ -269,7 +269,7 @@
     </message>
     <message>
       <source>Event Rules</source>
-      <translation type="unfinished">Event Rules</translation>
+      <translation>Regras do evento</translation>
     </message>
   </context>
   <context>
@@ -319,7 +319,7 @@
     </message>
     <message>
       <source>Refresh</source>
-      <translation type="unfinished">Refresh</translation>
+      <translation>Recargar</translation>
     </message>
     <message>
       <source>Skip Current Queue</source>
@@ -346,7 +346,7 @@
     </message>
     <message>
       <source>Tags:</source>
-      <translation type="unfinished">Tags:</translation>
+      <translation>Etiquetas:</translation>
     </message>
     <message>
       <source>Pre-recording:</source>
@@ -365,7 +365,7 @@
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Borrar</translation>
     </message>
     <message>
       <source>Area Width</source>
@@ -388,11 +388,11 @@
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nome</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation type="unfinished">Description</translation>
+      <translation>Descrición</translation>
     </message>
     <message>
       <source>Timeout</source>
@@ -400,7 +400,7 @@
     </message>
     <message>
       <source>Tags</source>
-      <translation type="unfinished">Tags</translation>
+      <translation>Etiquetas</translation>
     </message>
     <message>
       <source>List of tags divided by commas</source>
@@ -411,7 +411,7 @@
     <name>BookmarksLog</name>
     <message>
       <source>Refresh</source>
-      <translation type="unfinished">Refresh</translation>
+      <translation>Recargar</translation>
     </message>
     <message>
       <source>Bookmark Log</source>
@@ -434,7 +434,7 @@
     </message>
     <message>
       <source>Action</source>
-      <translation type="unfinished">Action</translation>
+      <translation>Acción</translation>
     </message>
     <message>
       <source>Comments:</source>
@@ -465,19 +465,19 @@
     <name>BusinessRulesDialog</name>
     <message>
       <source>Add</source>
-      <translation type="unfinished">Add</translation>
+      <translation>Engadir</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Borrar</translation>
     </message>
     <message>
       <source>Event Rules</source>
-      <translation type="unfinished">Event Rules</translation>
+      <translation>Regras do evento</translation>
     </message>
     <message>
       <source>Event Log...</source>
-      <translation type="unfinished">Event Log...</translation>
+      <translation>Rexistro de eventos...</translation>
     </message>
     <message>
       <source>Test</source>
@@ -503,7 +503,7 @@
     </message>
     <message>
       <source>Refresh</source>
-      <translation type="unfinished">Refresh</translation>
+      <translation>Recargar</translation>
     </message>
   </context>
   <context>
@@ -517,7 +517,7 @@
     <name>CameraExpertSettingsWidget</name>
     <message>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Auto</translation>
     </message>
     <message>
       <source>Restore Defaults</source>
@@ -541,7 +541,7 @@
     </message>
     <message>
       <source>Motion Detection</source>
-      <translation type="unfinished">Motion Detection</translation>
+      <translation>Detección de movemento</translation>
     </message>
     <message>
       <source>Media Streaming</source>
@@ -549,7 +549,7 @@
     </message>
     <message>
       <source>PTZ</source>
-      <translation type="unfinished">PTZ</translation>
+      <translation>PTZ</translation>
     </message>
     <message>
       <source>Generate</source>
@@ -557,7 +557,7 @@
     </message>
     <message>
       <source>Reset</source>
-      <translation type="unfinished">Reset</translation>
+      <translation>Restablecer</translation>
     </message>
     <message>
       <source>Logical ID</source>
@@ -684,22 +684,22 @@
     </message>
     <message>
       <source>Add</source>
-      <translation type="unfinished">Add</translation>
+      <translation>Engadir</translation>
     </message>
   </context>
   <context>
     <name>CameraInfoWidget</name>
     <message>
       <source>Model</source>
-      <translation type="unfinished">Model</translation>
+      <translation>Modelo</translation>
     </message>
     <message>
       <source>Vendor</source>
-      <translation type="unfinished">Vendor</translation>
+      <translation>Provedor</translation>
     </message>
     <message>
       <source>IP Address</source>
-      <translation type="unfinished">IP Address</translation>
+      <translation>Enderezo IP</translation>
     </message>
     <message>
       <source>Ping</source>
@@ -711,7 +711,7 @@
     </message>
     <message>
       <source>Camera ID</source>
-      <translation type="unfinished">Camera ID</translation>
+      <translation>ID da cámara</translation>
     </message>
     <message>
       <source>Web Page</source>
@@ -719,11 +719,11 @@
     </message>
     <message>
       <source>Primary Stream</source>
-      <translation type="unfinished">Primary Stream</translation>
+      <translation>Fluxo principal</translation>
     </message>
     <message>
       <source>Secondary Stream</source>
-      <translation type="unfinished">Secondary Stream</translation>
+      <translation>Fluxo secundario</translation>
     </message>
     <message>
       <source>MAC Address</source>
@@ -735,7 +735,7 @@
     </message>
     <message>
       <source>Event Log</source>
-      <translation type="unfinished">Event Log</translation>
+      <translation>Rexistro de eventos</translation>
     </message>
     <message>
       <source>Camera rules</source>
@@ -764,14 +764,14 @@
     <name>CameraListDialog</name>
     <message>
       <source>Add Device...</source>
-      <translation type="unfinished">Add Device...</translation>
+      <translation>Engadir dispositivo...</translation>
     </message>
   </context>
   <context>
     <name>CameraMotionSettingsWidget</name>
     <message>
       <source>Motion Detection</source>
-      <translation type="unfinished">Motion Detection</translation>
+      <translation>Detección de movemento</translation>
     </message>
     <message>
       <source>Sensitivity</source>
@@ -779,7 +779,7 @@
     </message>
     <message>
       <source>Reset</source>
-      <translation type="unfinished">Reset</translation>
+      <translation>Restablecer</translation>
     </message>
     <message>
       <source>in</source>
@@ -806,19 +806,19 @@
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nome</translation>
     </message>
     <message>
       <source>Back</source>
-      <translation type="unfinished">Back</translation>
+      <translation>Volver</translation>
     </message>
     <message>
       <source>Refresh</source>
-      <translation type="unfinished">Refresh</translation>
+      <translation>Recargar</translation>
     </message>
     <message>
       <source>Next</source>
-      <translation type="unfinished">Next</translation>
+      <translation>Seguinte</translation>
     </message>
     <message>
       <source>New Device</source>
@@ -829,7 +829,7 @@
     <name>CameraScheduleWidget</name>
     <message>
       <source>Recording</source>
-      <translation type="unfinished">Recording</translation>
+      <translation>Gravando</translation>
     </message>
     <message>
       <source>Activate License...</source>
@@ -852,7 +852,7 @@
     <name>CameraSelectionDialog</name>
     <message>
       <source>All Cameras</source>
-      <translation type="unfinished">All Cameras</translation>
+      <translation>Todas as cámaras</translation>
     </message>
     <message>
       <source>Select Cameras</source>
@@ -863,15 +863,15 @@
     <name>CameraSettingsGeneralTabWidget</name>
     <message>
       <source>Authentication</source>
-      <translation type="unfinished">Authentication</translation>
+      <translation>Autenticación</translation>
     </message>
     <message>
       <source>Edit Credentials</source>
-      <translation type="unfinished">Edit Credentials</translation>
+      <translation>Editar credenciais</translation>
     </message>
     <message>
       <source>Audio</source>
-      <translation type="unfinished">Audio</translation>
+      <translation>Audio</translation>
     </message>
     <message>
       <source>Enable audio</source>
@@ -904,14 +904,14 @@
     <name>ChangeUserPasswordDialog</name>
     <message>
       <source>Change password</source>
-      <translation type="unfinished">Change password</translation>
+      <translation>Cambiar contrasinal</translation>
     </message>
   </context>
   <context>
     <name>CloudLayoutsIntroDialog</name>
     <message>
       <source>BETA</source>
-      <translation type="unfinished">BETA</translation>
+      <translation>BETA</translation>
     </message>
     <message>
       <source>Available Actions</source>
@@ -927,7 +927,7 @@
     </message>
     <message>
       <source>PTZ</source>
-      <translation type="unfinished">PTZ</translation>
+      <translation>PTZ</translation>
     </message>
     <message>
       <source>Showreels</source>
@@ -943,7 +943,7 @@
     </message>
     <message>
       <source>Introducing Cloud Layouts</source>
-      <translation type="unfinished">Introducing Cloud Layouts</translation>
+      <translation>Presentación dos deseños de nube</translation>
     </message>
     <message>
       <source>Motion Search</source>
@@ -973,7 +973,7 @@
     <name>ConnectingToServerDialog</name>
     <message>
       <source>Connecting...</source>
-      <translation type="unfinished">Connecting...</translation>
+      <translation>Conectando...</translation>
     </message>
   </context>
   <context>
@@ -1048,7 +1048,7 @@
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Cancelar</translation>
     </message>
     <message>
       <source>Open Folder</source>
@@ -1059,7 +1059,7 @@
     <name>DeviceAdditionDialog</name>
     <message>
       <source>to</source>
-      <translation type="unfinished">to</translation>
+      <translation>para</translation>
     </message>
     <message>
       <source>SELECT SERVER</source>
@@ -1075,7 +1075,7 @@
     </message>
     <message>
       <source>Address</source>
-      <translation type="unfinished">Address</translation>
+      <translation>Enderezo</translation>
     </message>
     <message>
       <source>Hint</source>
@@ -1083,7 +1083,7 @@
     </message>
     <message>
       <source>Port</source>
-      <translation type="unfinished">Port</translation>
+      <translation>Porto</translation>
     </message>
     <message>
       <source>End IP</source>
@@ -1095,15 +1095,15 @@
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Contrasinal</translation>
     </message>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Acceder</translation>
     </message>
     <message>
       <source>Search</source>
-      <translation type="unfinished">Search</translation>
+      <translation>Buscar</translation>
     </message>
     <message>
       <source>Stop</source>
@@ -1119,7 +1119,7 @@
     </message>
     <message>
       <source>Default</source>
-      <translation type="unfinished">Default</translation>
+      <translation>Predeterminado</translation>
     </message>
   </context>
   <context>
@@ -1134,7 +1134,7 @@
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Contrasinal</translation>
     </message>
   </context>
   <context>
@@ -1156,7 +1156,7 @@
     <name>EventLogDialog</name>
     <message>
       <source>Event Log</source>
-      <translation type="unfinished">Event Log</translation>
+      <translation>Rexistro de eventos</translation>
     </message>
     <message>
       <source>Clear Filter</source>
@@ -1164,7 +1164,7 @@
     </message>
     <message>
       <source>Refresh</source>
-      <translation type="unfinished">Refresh</translation>
+      <translation>Recargar</translation>
     </message>
     <message>
       <source>All Servers are offline. Logs are not available.</source>
@@ -1172,7 +1172,7 @@
     </message>
     <message>
       <source>Event Rules...</source>
-      <translation type="unfinished">Event Rules...</translation>
+      <translation>Regras do evento...</translation>
     </message>
   </context>
   <context>
@@ -1183,7 +1183,7 @@
     </message>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Acceder</translation>
     </message>
     <message>
       <source>Password to authenticate (optional)</source>
@@ -1191,7 +1191,7 @@
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Contrasinal</translation>
     </message>
     <message>
       <source>HTTP(S) URL</source>
@@ -1218,7 +1218,7 @@
     <name>ExecPtzPresetBusinessActionWidget</name>
     <message>
       <source>PTZ preset:</source>
-      <translation type="unfinished">PTZ preset:</translation>
+      <translation>Preaxuste PTZ:</translation>
     </message>
   </context>
   <context>
@@ -1266,7 +1266,7 @@
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Contrasinal</translation>
     </message>
   </context>
   <context>
@@ -1303,15 +1303,15 @@
     </message>
     <message>
       <source>Low</source>
-      <translation type="unfinished">Low</translation>
+      <translation>Baixo</translation>
     </message>
     <message>
       <source>Medium</source>
-      <translation type="unfinished">Medium</translation>
+      <translation>Medio</translation>
     </message>
     <message>
       <source>High</source>
-      <translation type="unfinished">High</translation>
+      <translation>Alto</translation>
     </message>
     <message>
       <source>Select some devices to setup failover priority</source>
@@ -1333,7 +1333,7 @@
     <name>FilteredResourceViewWidget</name>
     <message>
       <source>Nothing found</source>
-      <translation type="unfinished">Nothing found</translation>
+      <translation>Non se atopou nada</translation>
     </message>
   </context>
   <context>
@@ -1344,14 +1344,14 @@
     </message>
     <message>
       <source>Camera</source>
-      <translation type="unfinished">Camera</translation>
+      <translation>Cámara</translation>
     </message>
   </context>
   <context>
     <name>GeneralPreferencesWidget</name>
     <message>
       <source>Misc</source>
-      <translation type="unfinished">Misc</translation>
+      <translation>Varios</translation>
     </message>
     <message>
       <source>Auto Pause Video</source>
@@ -1371,7 +1371,7 @@
     </message>
     <message>
       <source>Remove</source>
-      <translation type="unfinished">Remove</translation>
+      <translation>Eliminar</translation>
     </message>
     <message>
       <source>Local Media Folders</source>
@@ -1422,7 +1422,7 @@
     <name>GeneralSystemAdministrationWidget</name>
     <message>
       <source>System Settings</source>
-      <translation type="unfinished">System Settings</translation>
+      <translation>Configuración do sistema</translation>
     </message>
   </context>
   <context>
@@ -1444,15 +1444,15 @@
     <name>ImageOverlaySettingsWidget</name>
     <message>
       <source>Image</source>
-      <translation type="unfinished">Image</translation>
+      <translation>Imaxe</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Borrar</translation>
     </message>
     <message>
       <source>Size</source>
-      <translation type="unfinished">Size</translation>
+      <translation>Tamaño</translation>
     </message>
     <message>
       <source>Opacity</source>
@@ -1460,7 +1460,7 @@
     </message>
     <message>
       <source>Default</source>
-      <translation type="unfinished">Default</translation>
+      <translation>Predeterminado</translation>
     </message>
     <message>
       <source>Browse...</source>
@@ -1486,7 +1486,7 @@
     <name>InfoOverlaySettingsWidget</name>
     <message>
       <source>Info</source>
-      <translation type="unfinished">Info</translation>
+      <translation>Info</translation>
     </message>
     <message>
       <source>Camera name</source>
@@ -1502,7 +1502,7 @@
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Borrar</translation>
     </message>
   </context>
   <context>
@@ -1528,7 +1528,7 @@
     </message>
     <message>
       <source>Clear</source>
-      <translation type="unfinished">Clear</translation>
+      <translation>Borrar</translation>
     </message>
     <message>
       <source>View...</source>
@@ -1559,7 +1559,7 @@
     <name>LayoutGeneralSettingsWidget</name>
     <message>
       <source>Locked</source>
-      <translation type="unfinished">Locked</translation>
+      <translation>Bloqueado</translation>
     </message>
     <message>
       <source>Width</source>
@@ -1579,7 +1579,7 @@
     </message>
     <message>
       <source>Reset</source>
-      <translation type="unfinished">Reset</translation>
+      <translation>Restablecer</translation>
     </message>
     <message>
       <source>Minimum Grid Size</source>
@@ -1609,14 +1609,14 @@
     </message>
     <message>
       <source>Features</source>
-      <translation type="unfinished">Features</translation>
+      <translation>Características</translation>
     </message>
   </context>
   <context>
     <name>LicenseNotificationDialog</name>
     <message>
       <source>Warning</source>
-      <translation type="unfinished">Warning</translation>
+      <translation>Advertencia</translation>
     </message>
     <message>
       <source>License issues:</source>
@@ -1643,7 +1643,7 @@
     </message>
     <message>
       <source>Activate Free License</source>
-      <translation type="unfinished">Activate Free License</translation>
+      <translation>Activar a licenza gratuíta</translation>
     </message>
     <message>
       <source>Activate License</source>
@@ -1655,7 +1655,7 @@
     </message>
     <message>
       <source>License Key</source>
-      <translation type="unfinished">License Key</translation>
+      <translation>Clave de licenza</translation>
     </message>
     <message>
       <source>Invalid License Key</source>
@@ -1667,21 +1667,21 @@
     </message>
     <message>
       <source>Hardware ID</source>
-      <translation type="unfinished">Hardware ID</translation>
+      <translation>ID de hardware</translation>
     </message>
   </context>
   <context>
     <name>LocalSettingsDialog</name>
     <message>
       <source>Local Settings</source>
-      <translation type="unfinished">Local Settings</translation>
+      <translation>Configuración local</translation>
     </message>
   </context>
   <context>
     <name>LogSettingsDialog</name>
     <message>
       <source>Enable</source>
-      <translation type="unfinished">Enable</translation>
+      <translation>Activar</translation>
     </message>
     <message>
       <source>Logging Level</source>
@@ -1708,15 +1708,15 @@
     </message>
     <message>
       <source>Port</source>
-      <translation type="unfinished">Port</translation>
+      <translation>Porto</translation>
     </message>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Acceder</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Contrasinal</translation>
     </message>
     <message>
       <source>Test</source>
@@ -1739,11 +1739,11 @@
     <name>LogsManagementWidget</name>
     <message>
       <source>Download</source>
-      <translation type="unfinished">Download</translation>
+      <translation>Descargar</translation>
     </message>
     <message>
       <source>Settings</source>
-      <translation type="unfinished">Settings</translation>
+      <translation>Configuración</translation>
     </message>
     <message>
       <source>Reset to Default</source>
@@ -1751,15 +1751,15 @@
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Cancelar</translation>
     </message>
     <message>
       <source>Done</source>
-      <translation type="unfinished">Done</translation>
+      <translation>Feito!</translation>
     </message>
     <message>
       <source>Retry</source>
-      <translation type="unfinished">Retry</translation>
+      <translation>Tentar de novo</translation>
     </message>
     <message>
       <source>Download complete!</source>
@@ -1790,7 +1790,7 @@
     </message>
     <message>
       <source>Language</source>
-      <translation type="unfinished">Language</translation>
+      <translation>Idioma</translation>
     </message>
     <message>
       <source>Time Mode</source>
@@ -1798,11 +1798,11 @@
     </message>
     <message>
       <source>Image</source>
-      <translation type="unfinished">Image</translation>
+      <translation>Imaxe</translation>
     </message>
     <message>
       <source>Mode</source>
-      <translation type="unfinished">Mode</translation>
+      <translation>Modo</translation>
     </message>
     <message>
       <source>Intensity</source>
@@ -1833,27 +1833,27 @@
     <name>MergeSystemsDialog</name>
     <message>
       <source>Merge Systems...</source>
-      <translation type="unfinished">Merge Systems...</translation>
+      <translation>Fusionar sistemas...</translation>
     </message>
     <message>
       <source>Server URL:</source>
-      <translation type="unfinished">Server URL:</translation>
+      <translation>URL do servidor:</translation>
     </message>
     <message>
       <source>Password:</source>
-      <translation type="unfinished">Password:</translation>
+      <translation>Contrasinal:</translation>
     </message>
     <message>
       <source>Login:</source>
-      <translation type="unfinished">Login:</translation>
+      <translation>Acceder:</translation>
     </message>
     <message>
       <source>Check</source>
-      <translation type="unfinished">Check</translation>
+      <translation>Comprobar</translation>
     </message>
     <message>
       <source>Take system name and settings from:</source>
-      <translation type="unfinished">Take system name and settings from:</translation>
+      <translation>Toma o nome e a configuración do sistema de:</translation>
     </message>
     <message>
       <source>warn icon</source>
@@ -1872,7 +1872,7 @@
     </message>
     <message>
       <source>Download</source>
-      <translation type="unfinished">Download</translation>
+      <translation>Descargar</translation>
     </message>
     <message>
       <source>Browse</source>
@@ -1884,7 +1884,7 @@
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Cancelar</translation>
     </message>
     <message>
       <source>Link copied</source>
@@ -1912,7 +1912,7 @@
     </message>
     <message>
       <source>Try Again</source>
-      <translation type="unfinished">Try Again</translation>
+      <translation>Tentar de novo</translation>
     </message>
   </context>
   <context>
@@ -1937,14 +1937,14 @@
     <name>OauthLoginPlaceholder</name>
     <message>
       <source>Try Again</source>
-      <translation type="unfinished">Try Again</translation>
+      <translation>Tentar de novo</translation>
     </message>
   </context>
   <context>
     <name>OpenLayoutActionWidget</name>
     <message>
       <source>Layout</source>
-      <translation type="unfinished">Layout</translation>
+      <translation>Deseño</translation>
     </message>
     <message>
       <source>Show to</source>
@@ -1963,7 +1963,7 @@
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Contrasinal</translation>
     </message>
     <message>
       <source>Server Address</source>
@@ -1998,7 +1998,7 @@
     <name>PasswordDialog</name>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Contrasinal</translation>
     </message>
     <message>
       <source>Username</source>
@@ -2013,7 +2013,7 @@
     <name>PlaySoundBusinessActionWidget</name>
     <message>
       <source>Manage...</source>
-      <translation type="unfinished">Manage...</translation>
+      <translation>Xestionar...</translation>
     </message>
     <message>
       <source>Volume:</source>
@@ -2025,14 +2025,14 @@
     </message>
     <message>
       <source>Play to users</source>
-      <translation type="unfinished">Play to users</translation>
+      <translation>Reproducir para as persoas usuarias</translation>
     </message>
   </context>
   <context>
     <name>PluginDiagnosticEventWidget</name>
     <message>
       <source>Source:</source>
-      <translation type="unfinished">Source:</translation>
+      <translation>Fonte:</translation>
     </message>
     <message>
       <source>Caption contains:</source>
@@ -2048,7 +2048,7 @@
     </message>
     <message>
       <source>Level:</source>
-      <translation type="unfinished">Level:</translation>
+      <translation>Nivel:</translation>
     </message>
     <message>
       <source>ERROR</source>
@@ -2056,7 +2056,7 @@
     </message>
     <message>
       <source>WARNING</source>
-      <translation type="unfinished">WARNING</translation>
+      <translation>ADVERTENCIA</translation>
     </message>
     <message>
       <source>INFO</source>
@@ -2075,7 +2075,7 @@
     </message>
     <message>
       <source>to</source>
-      <translation type="unfinished">to</translation>
+      <translation>para</translation>
     </message>
   </context>
   <context>
@@ -2097,7 +2097,7 @@
     <name>PtzManageDialog</name>
     <message>
       <source>Save Current Position</source>
-      <translation type="unfinished">Save Current Position</translation>
+      <translation>Gardar posición actual</translation>
     </message>
     <message>
       <source>Go To Position</source>
@@ -2113,7 +2113,7 @@
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Borrar</translation>
     </message>
     <message>
       <source>Details</source>
@@ -2125,7 +2125,7 @@
     </message>
     <message>
       <source>Preview</source>
-      <translation type="unfinished">Preview</translation>
+      <translation>Vista previa</translation>
     </message>
     <message>
       <source>No preview available</source>
@@ -2144,7 +2144,7 @@
     </message>
     <message>
       <source>Name:</source>
-      <translation type="unfinished">Name:</translation>
+      <translation>Nome:</translation>
     </message>
     <message>
       <source>Hotkey:</source>
@@ -2155,7 +2155,7 @@
     <name>PushNotificationBusinessActionWidget</name>
     <message>
       <source>To</source>
-      <translation type="unfinished">To</translation>
+      <translation>Para</translation>
     </message>
     <message>
       <source>Language Settings</source>
@@ -2167,7 +2167,7 @@
     </message>
     <message>
       <source>Header</source>
-      <translation type="unfinished">Header</translation>
+      <translation>Cabeceira</translation>
     </message>
     <message>
       <source>Default notification title will be used if left empty</source>
@@ -2183,25 +2183,25 @@
     </message>
     <message>
       <source>Add source device name in body</source>
-      <translation type="unfinished">Add source device name in body</translation>
+      <translation>Engade o nome do dispositivo de orixe no corpo</translation>
     </message>
   </context>
   <context>
     <name>QnAttachToVideowallDialog</name>
     <message>
       <source>Attach to Video Wall...</source>
-      <translation type="unfinished">Attach to Video Wall...</translation>
+      <translation>Adxuntar ao muro de vídeo...</translation>
     </message>
     <message>
       <source>Preview</source>
-      <translation type="unfinished">Preview</translation>
+      <translation>Vista previa</translation>
     </message>
   </context>
   <context>
     <name>QnCameraBookmarkDialog</name>
     <message>
       <source>Bookmark</source>
-      <translation type="unfinished">Bookmark</translation>
+      <translation>Marcador</translation>
     </message>
   </context>
   <context>
@@ -2238,7 +2238,7 @@
     </message>
     <message>
       <source>Rename...</source>
-      <translation type="unfinished">Rename...</translation>
+      <translation>Renomear...</translation>
     </message>
     <message>
       <source>Delete...</source>
@@ -2253,11 +2253,11 @@
     </message>
     <message>
       <source>Remove</source>
-      <translation type="unfinished">Remove</translation>
+      <translation>Eliminar</translation>
     </message>
     <message>
       <source>Add</source>
-      <translation type="unfinished">Add</translation>
+      <translation>Engadir</translation>
     </message>
     <message>
       <source>Removing this connection option could lead to System malfunction.</source>
@@ -2268,14 +2268,14 @@
     <name>QnSystemAdministrationDialog</name>
     <message>
       <source>System Administration</source>
-      <translation type="unfinished">System Administration</translation>
+      <translation>Administración de sistemas</translation>
     </message>
   </context>
   <context>
     <name>QnVideowallSettingsDialog</name>
     <message>
       <source>Video Wall Settings</source>
-      <translation type="unfinished">Video Wall Settings</translation>
+      <translation>Axustes de Vídeo Wall / Muro</translation>
     </message>
     <message>
       <source>Launch video wall when Windows starts.</source>
@@ -2336,11 +2336,11 @@
     <name>RecordingBusinessActionWidget</name>
     <message>
       <source>Quality:</source>
-      <translation type="unfinished">Quality:</translation>
+      <translation>Calidade:</translation>
     </message>
     <message>
       <source>FPS</source>
-      <translation type="unfinished">FPS</translation>
+      <translation>FPS</translation>
     </message>
     <message>
       <source>s</source>
@@ -2371,11 +2371,11 @@
     </message>
     <message>
       <source>Source</source>
-      <translation type="unfinished">Source</translation>
+      <translation>Fonte</translation>
     </message>
     <message>
       <source>Resolution</source>
-      <translation type="unfinished">Resolution</translation>
+      <translation>Resolución</translation>
     </message>
     <message>
       <source>Recording Quality</source>
@@ -2413,15 +2413,15 @@
     <name>RepeatedPasswordDialog</name>
     <message>
       <source>Repeat Password</source>
-      <translation type="unfinished">Repeat Password</translation>
+      <translation>Repetir contrasinal</translation>
     </message>
     <message>
       <source>Passwords do not match</source>
-      <translation type="unfinished">Passwords do not match</translation>
+      <translation>Os contrasinais non coinciden</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Contrasinal</translation>
     </message>
   </context>
   <context>
@@ -2513,19 +2513,19 @@
     </message>
     <message>
       <source>FPS</source>
-      <translation type="unfinished">FPS</translation>
+      <translation>FPS</translation>
     </message>
     <message>
       <source>Quality</source>
-      <translation type="unfinished">Quality</translation>
+      <translation>Calidade</translation>
     </message>
     <message>
       <source>Motion</source>
-      <translation type="unfinished">Motion</translation>
+      <translation>Movemento</translation>
     </message>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>Obxectos</translation>
     </message>
     <message>
       <source>Motion &amp;&amp; Objects</source>
@@ -2536,7 +2536,7 @@
     <name>SecuritySettingsWidget</name>
     <message>
       <source>Enable audit trail</source>
-      <translation type="unfinished">Enable audit trail</translation>
+      <translation>Activar a pista de auditoría</translation>
     </message>
     <message>
       <source>Display watermark with username over video</source>
@@ -2548,7 +2548,7 @@
     </message>
     <message>
       <source>to</source>
-      <translation type="unfinished">to</translation>
+      <translation>para</translation>
     </message>
     <message>
       <source>Limit session duration</source>
@@ -2576,15 +2576,15 @@
     </message>
     <message>
       <source>Change Password...</source>
-      <translation type="unfinished">Change Password...</translation>
+      <translation>Cambiar contrasinal...</translation>
     </message>
     <message>
       <source>Force servers to accept only encrypted connections</source>
-      <translation type="unfinished">Force servers to accept only encrypted connections</translation>
+      <translation>Forzar que os servidores acepten só conexións cifradas</translation>
     </message>
     <message>
       <source>Encrypt video traffic to desktop and mobile clients</source>
-      <translation type="unfinished">Encrypt video traffic to desktop and mobile clients</translation>
+      <translation>Cifrar o tráfico de vídeo a clientes de escritorio e móbiles</translation>
     </message>
     <message>
       <source>Manage Users</source>
@@ -2614,11 +2614,11 @@
     </message>
     <message>
       <source>General</source>
-      <translation type="unfinished">General</translation>
+      <translation>Xeral</translation>
     </message>
     <message>
       <source>Issued by</source>
-      <translation type="unfinished">Issued by</translation>
+      <translation>Emitido por</translation>
     </message>
     <message>
       <source>Self-signed root certificate</source>
@@ -2626,7 +2626,7 @@
     </message>
     <message>
       <source>Expires</source>
-      <translation type="unfinished">Expires</translation>
+      <translation>Caduca</translation>
     </message>
     <message>
       <source>Certificate is expired</source>
@@ -2634,7 +2634,7 @@
     </message>
     <message>
       <source>Fingerprints</source>
-      <translation type="unfinished">Fingerprints</translation>
+      <translation>Pegadas</translation>
     </message>
     <message>
       <source>Details</source>
@@ -2664,15 +2664,15 @@
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nome</translation>
     </message>
     <message>
       <source>IP Address</source>
-      <translation type="unfinished">IP Address</translation>
+      <translation>Enderezo IP</translation>
     </message>
     <message>
       <source>Port</source>
-      <translation type="unfinished">Port</translation>
+      <translation>Porto</translation>
     </message>
     <message>
       <source>Autodetect built-in and USB webcams</source>
@@ -2687,11 +2687,11 @@
     <name>ShowOnAlarmLayoutActionWidget</name>
     <message>
       <source>for</source>
-      <translation type="unfinished">for</translation>
+      <translation>para</translation>
     </message>
     <message>
       <source>Force Alarm Layout opening</source>
-      <translation type="unfinished">Force Alarm Layout opening</translation>
+      <translation>Forzar a apertura do deseño da alarma</translation>
     </message>
   </context>
   <context>
@@ -2736,7 +2736,7 @@
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nome</translation>
     </message>
     <message>
       <source>Icon</source>
@@ -2770,15 +2770,15 @@
     <name>StorageConfigWidget</name>
     <message>
       <source>Add External Storage...</source>
-      <translation type="unfinished">Add External Storage...</translation>
+      <translation>Engadir almacenamento externo...</translation>
     </message>
     <message>
       <source>Storage Locations</source>
-      <translation type="unfinished">Storage Locations</translation>
+      <translation>Localizacións de almacenamento</translation>
     </message>
     <message>
       <source>Reindex Archive</source>
-      <translation type="unfinished">Reindex Archive</translation>
+      <translation>Reindexar Arquivo</translation>
     </message>
     <message>
       <source>Reindex Backup</source>
@@ -2789,14 +2789,14 @@
     <name>StorageRebuildWidget</name>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Cancelar</translation>
     </message>
   </context>
   <context>
     <name>StorageUrlDialog</name>
     <message>
       <source>Add External Storage...</source>
-      <translation type="unfinished">Add External Storage...</translation>
+      <translation>Engadir almacenamento externo...</translation>
     </message>
     <message>
       <source>Protocol:</source>
@@ -2804,15 +2804,15 @@
     </message>
     <message>
       <source>URL:</source>
-      <translation type="unfinished">URL:</translation>
+      <translation>URL:</translation>
     </message>
     <message>
       <source>Login:</source>
-      <translation type="unfinished">Login:</translation>
+      <translation>Acceder:</translation>
     </message>
     <message>
       <source>Password:</source>
-      <translation type="unfinished">Password:</translation>
+      <translation>Contrasinal:</translation>
     </message>
   </context>
   <context>
@@ -2838,7 +2838,7 @@
     <name>SystemSettingsWidget</name>
     <message>
       <source>(recommended)</source>
-      <translation type="unfinished">(recommended)</translation>
+      <translation>(recomendado)</translation>
     </message>
     <message>
       <source>Send anonymous usage and crash statistics to software developers</source>
@@ -2861,7 +2861,7 @@
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Borrar</translation>
     </message>
     <message>
       <source>Font Size</source>
@@ -2884,7 +2884,7 @@
     </message>
     <message>
       <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
+      <translation>Tempo VMS</translation>
     </message>
     <message>
       <source>Do not sync time among servers</source>
@@ -2907,7 +2907,7 @@
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Borrar</translation>
     </message>
   </context>
   <context>
@@ -2951,7 +2951,7 @@
     <name>VirtualCameraMotionWidget</name>
     <message>
       <source>Motion Detection</source>
-      <translation type="unfinished">Motion Detection</translation>
+      <translation>Detección de movemento</translation>
     </message>
     <message>
       <source>Detect motion</source>
@@ -2970,7 +2970,7 @@
     </message>
     <message>
       <source>Time</source>
-      <translation type="unfinished">Time</translation>
+      <translation>Tempo</translation>
     </message>
     <message>
       <source>Ignore timezone in uploaded files</source>
@@ -2981,7 +2981,7 @@
     <name>VirtualCameraUploadWidget</name>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Cancelar</translation>
     </message>
     <message>
       <source>Upload Footage</source>
@@ -3000,7 +3000,7 @@
     <name>WebpageDialog</name>
     <message>
       <source>General</source>
-      <translation type="unfinished">General</translation>
+      <translation>Xeral</translation>
     </message>
     <message>
       <source>SELECT SERVER</source>
@@ -3050,7 +3050,7 @@
     </message>
     <message>
       <source>Remove</source>
-      <translation type="unfinished">Remove</translation>
+      <translation>Eliminar</translation>
     </message>
     <message>
       <source>Details...</source>
@@ -3062,7 +3062,7 @@
     </message>
     <message>
       <source>New License</source>
-      <translation type="unfinished">New License</translation>
+      <translation>Nova licenza</translation>
     </message>
   </context>
   <context>

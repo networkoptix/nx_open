@@ -5066,6 +5066,14 @@ Lisensnøkkel: %2</translation>
       <source>SYSTEM SHUT DOWN</source>
       <translation type="unfinished">SYSTEM SHUT DOWN</translation>
     </message>
+    <message>
+      <source>RESTRICTED</source>
+      <translation>BEGRENSET</translation>
+    </message>
+    <message>
+      <source>Authorize</source>
+      <translation>Autorisere</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageAnalyticsWidget</name>
