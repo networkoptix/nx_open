@@ -107,6 +107,9 @@ const ItemDescriptor& AnalyticsEvent::manifest()
         .flags = {ItemFlag::prolonged},
         .fields = {
             utils::makeStateFieldDescriptor(Strings::beginWhen()),
+            makeFieldDescriptor<AnalyticsEventTypeField>(
+                utils::kEventTypeIdFieldName,
+                Strings::ofType()),
             makeFieldDescriptor<SourceCameraField>(
                 utils::kCameraIdFieldName,
                 Strings::occursAt(),
@@ -114,9 +117,6 @@ const ItemDescriptor& AnalyticsEvent::manifest()
                 ResourceFilterFieldProperties{
                     .validationPolicy = kCameraAnalyticsValidationPolicy
                 }.toVariantMap()),
-            makeFieldDescriptor<AnalyticsEventTypeField>(
-                utils::kEventTypeIdFieldName,
-                Strings::ofType()),
             makeFieldDescriptor<TextLookupField>(
                 utils::kCaptionFieldName,
                 Strings::andCaption()),

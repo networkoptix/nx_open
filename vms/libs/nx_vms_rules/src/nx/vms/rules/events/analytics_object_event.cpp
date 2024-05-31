@@ -108,6 +108,9 @@ const ItemDescriptor& AnalyticsObjectEvent::manifest()
         .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Analytics Object Detected")),
         .description = {},
         .fields = {
+            makeFieldDescriptor<AnalyticsObjectTypeField>(
+                utils::kObjectTypeIdFieldName,
+                Strings::ofType()),
             makeFieldDescriptor<SourceCameraField>(
                 utils::kCameraIdFieldName,
                 Strings::occursAt(),
@@ -115,9 +118,6 @@ const ItemDescriptor& AnalyticsObjectEvent::manifest()
                 ResourceFilterFieldProperties{
                     .validationPolicy = kCameraAnalyticsValidationPolicy
                 }.toVariantMap()),
-            makeFieldDescriptor<AnalyticsObjectTypeField>(
-                utils::kObjectTypeIdFieldName,
-                Strings::ofType()),
             makeFieldDescriptor<ObjectLookupField>(
                 utils::kAttributesFieldName,
                 NX_DYNAMIC_TRANSLATABLE(tr("And Object"))),

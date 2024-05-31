@@ -56,6 +56,11 @@ void PlainPickerWidget::setReadOnly(bool value)
     m_contentWidget->setEnabled(!value);
 }
 
+void PlainPickerWidget::setDisplayName(const QString& displayName)
+{
+    m_label->setText(displayName);
+}
+
 void PlainPickerWidget::setValidity(const vms::rules::ValidationResult& validationResult)
 {
     m_alertLabel->setVisible(validationResult.validity != QValidator::State::Acceptable

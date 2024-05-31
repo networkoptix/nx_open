@@ -18,6 +18,7 @@ public:
     PlainPickerWidget(const QString& displayName, SystemContext* context, ParamsWidget* parent);
 
     void setReadOnly(bool value) override;
+    void setDisplayName(const QString& displayName);
     virtual void setValidity(const vms::rules::ValidationResult& validationResult);
 
 protected:
