@@ -5145,6 +5145,14 @@ to %1</source>
       <source>ACCESS DENIED</source>
       <translation>アクセスが拒否されました</translation>
     </message>
+    <message>
+      <source>RESTRICTED</source>
+      <translation>制限あり</translation>
+    </message>
+    <message>
+      <source>Authorize</source>
+      <translation>認証</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageAnalyticsWidget</name>

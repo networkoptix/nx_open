@@ -310,7 +310,7 @@
     </message>
     <message>
       <source>Merge Systems...</source>
-      <translation type="unfinished">Merge Systems...</translation>
+      <translation>Системүүдийг нэгтгэх...</translation>
     </message>
     <message>
       <source>About...</source>
@@ -630,7 +630,7 @@
     </message>
     <message>
       <source>None</source>
-      <translation type="unfinished">None</translation>
+      <translation>Байхгүй</translation>
     </message>
     <message>
       <source>Small</source>
@@ -638,7 +638,7 @@
     </message>
     <message>
       <source>Medium</source>
-      <translation type="unfinished">Medium</translation>
+      <translation>Дунд</translation>
     </message>
     <message>
       <source>Large</source>
@@ -1510,7 +1510,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Error</source>
-      <translation type="unfinished">Error</translation>
+      <translation>Алдаа</translation>
     </message>
     <message>
       <source>Set your email address or SMTP server</source>
@@ -1537,7 +1537,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Success</source>
-      <translation type="unfinished">Success</translation>
+      <translation>Амжилттай</translation>
     </message>
     <message>
       <source>Connection timed out</source>
@@ -2111,7 +2111,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>IP</source>
-      <translation type="unfinished">IP</translation>
+      <translation>IP</translation>
     </message>
     <message>
       <source>Activity</source>
@@ -3598,7 +3598,7 @@ to %1</translation>
     </message>
     <message>
       <source>None</source>
-      <translation type="unfinished">None</translation>
+      <translation>Байхгүй</translation>
     </message>
     <message>
       <source>Auto (%1)</source>
@@ -3924,7 +3924,7 @@ to %1</translation>
     </message>
     <message>
       <source>Error</source>
-      <translation type="unfinished">Error</translation>
+      <translation>Алдаа</translation>
     </message>
     <message>
       <source>Server not found</source>
@@ -3963,7 +3963,7 @@ to %1</translation>
     </message>
     <message>
       <source>Channels</source>
-      <translation type="unfinished">Channels</translation>
+      <translation>Сувгууд</translation>
     </message>
   </context>
   <context>
@@ -4449,7 +4449,7 @@ to %1</translation>
     </message>
     <message>
       <source>None</source>
-      <translation type="unfinished">None</translation>
+      <translation>Байхгүй</translation>
     </message>
     <message numerus="yes">
       <source>This preset will be activated after %n minutes of inactivity</source>
@@ -4505,14 +4505,14 @@ to %1</translation>
     </message>
     <message>
       <source>None</source>
-      <translation type="unfinished">None</translation>
+      <translation>Байхгүй</translation>
     </message>
   </context>
   <context>
     <name>QnPtzPresetHotkeyItemDelegate</name>
     <message>
       <source>None</source>
-      <translation type="unfinished">None</translation>
+      <translation>Байхгүй</translation>
     </message>
     <message>
       <source>Reassign</source>
@@ -4535,7 +4535,7 @@ to %1</translation>
     </message>
     <message>
       <source>Low</source>
-      <translation type="unfinished">Low</translation>
+      <translation>Бага</translation>
     </message>
     <message>
       <source>Normal</source>
@@ -4543,7 +4543,7 @@ to %1</translation>
     </message>
     <message>
       <source>High</source>
-      <translation type="unfinished">High</translation>
+      <translation>Сайн</translation>
     </message>
     <message>
       <source>Highest</source>
@@ -4582,7 +4582,7 @@ to %1</translation>
     </message>
     <message>
       <source>Best</source>
-      <translation type="unfinished">Best</translation>
+      <translation>Хамгийн сайн</translation>
     </message>
     <message>
       <source>Average</source>
@@ -4725,7 +4725,7 @@ to %1</translation>
     </message>
     <message>
       <source>Information</source>
-      <translation type="unfinished">Information</translation>
+      <translation>Мэдээлэл</translation>
     </message>
     <message>
       <source>Rotate</source>
@@ -4939,7 +4939,7 @@ to %1</translation>
     <name>QnServerAddressesModel</name>
     <message>
       <source>Address</source>
-      <translation type="unfinished">Address</translation>
+      <translation>Хаяг</translation>
     </message>
   </context>
   <context>
@@ -5214,6 +5214,14 @@ to %1</translation>
     <message>
       <source>ACCESS DENIED</source>
       <translation type="unfinished">ACCESS DENIED</translation>
+    </message>
+    <message>
+      <source>RESTRICTED</source>
+      <translation type="unfinished">RESTRICTED</translation>
+    </message>
+    <message>
+      <source>Authorize</source>
+      <translation type="unfinished">Authorize</translation>
     </message>
   </context>
   <context>
@@ -6796,7 +6804,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>none</source>
       <comment>No currently selected camera</comment>
-      <translation type="unfinished">none</translation>
+      <translation>байхгүй</translation>
     </message>
   </context>
   <context>
@@ -6830,19 +6838,19 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Low</source>
-      <translation type="unfinished">Low</translation>
+      <translation>Бага</translation>
     </message>
     <message>
       <source>Medium</source>
-      <translation type="unfinished">Medium</translation>
+      <translation>Дунд</translation>
     </message>
     <message>
       <source>High</source>
-      <translation type="unfinished">High</translation>
+      <translation>Сайн</translation>
     </message>
     <message>
       <source>Best</source>
-      <translation type="unfinished">Best</translation>
+      <translation>Хамгийн сайн</translation>
     </message>
     <message>
       <source>Preset</source>
@@ -7011,7 +7019,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>none</source>
       <comment>No currently selected camera</comment>
-      <translation type="unfinished">none</translation>
+      <translation>байхгүй</translation>
     </message>
     <message>
       <source>Devices on layout</source>
@@ -7247,7 +7255,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Motion detection is disabled</source>
-      <translation type="unfinished">Motion detection is disabled</translation>
+      <translation>Хөдөлгөөн мэдрэгч идэвхгүй болсон</translation>
     </message>
     <message>
       <source>No analytics plugins</source>
@@ -8256,7 +8264,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Success</source>
-      <translation type="unfinished">Success</translation>
+      <translation>Амжилттай</translation>
     </message>
     <message>
       <source>Test Failed</source>
@@ -8663,7 +8671,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Info</source>
-      <translation type="unfinished">Info</translation>
+      <translation>Мэдээлэл</translation>
     </message>
     <message>
       <source>AVI format is not recommended to export a recording with audio track.</source>
@@ -8686,15 +8694,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::FailoverPriorityColumnItemDelegate</name>
     <message>
       <source>Low</source>
-      <translation type="unfinished">Low</translation>
+      <translation>Бага</translation>
     </message>
     <message>
       <source>Medium</source>
-      <translation type="unfinished">Medium</translation>
+      <translation>Дунд</translation>
     </message>
     <message>
       <source>High</source>
-      <translation type="unfinished">High</translation>
+      <translation>Сайн</translation>
     </message>
     <message>
       <source>No Failover</source>
@@ -8751,7 +8759,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Address</source>
-      <translation type="unfinished">Address</translation>
+      <translation>Хаяг</translation>
     </message>
     <message numerus="yes">
       <source>%n new</source>
@@ -8794,7 +8802,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Error</source>
-      <translation type="unfinished">Error</translation>
+      <translation>Алдаа</translation>
     </message>
     <message>
       <source>Image cannot be loaded.</source>
@@ -9016,19 +9024,19 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>None</source>
-      <translation type="unfinished">None</translation>
+      <translation>Байхгүй</translation>
     </message>
     <message>
       <source>Error</source>
-      <translation type="unfinished">Error</translation>
+      <translation>Алдаа</translation>
     </message>
     <message>
       <source>Warning</source>
-      <translation type="unfinished">Warning</translation>
+      <translation>Анхааруулга</translation>
     </message>
     <message>
       <source>Info</source>
-      <translation type="unfinished">Info</translation>
+      <translation>Мэдээлэл</translation>
     </message>
     <message>
       <source>Debug</source>
@@ -9168,7 +9176,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Merge Systems</source>
-      <translation type="unfinished">Merge Systems</translation>
+      <translation>Системүүдийг нэгтгэх</translation>
     </message>
     <message>
       <source>Enter your account password to merge Systems</source>
@@ -9873,7 +9881,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Port</source>
-      <translation type="unfinished">Port</translation>
+      <translation>Порт</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -9998,11 +10006,11 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Low</source>
-      <translation type="unfinished">Low</translation>
+      <translation>Бага</translation>
     </message>
     <message>
       <source>High</source>
-      <translation type="unfinished">High</translation>
+      <translation>Сайн</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -10349,11 +10357,11 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>minutes</source>
-      <translation type="unfinished">minutes</translation>
+      <translation>минут</translation>
     </message>
     <message>
       <source>hours</source>
-      <translation type="unfinished">hours</translation>
+      <translation>цаг</translation>
     </message>
     <message>
       <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
@@ -10512,7 +10520,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Version</source>
-      <translation type="unfinished">Version</translation>
+      <translation>Хувилбар</translation>
     </message>
     <message>
       <source>Vendor</source>
@@ -11090,7 +11098,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Version</source>
-      <translation type="unfinished">Version</translation>
+      <translation>Хувилбар</translation>
     </message>
     <message>
       <source>Invalid version.</source>
@@ -11506,7 +11514,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::rules::EventTypePickerWidget</name>
     <message>
       <source>None</source>
-      <translation type="unfinished">None</translation>
+      <translation>Байхгүй</translation>
     </message>
     <message>
       <source>Starts</source>
@@ -11704,7 +11712,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::ui::action::ShowOnItemsFactory</name>
     <message>
       <source>Info</source>
-      <translation type="unfinished">Info</translation>
+      <translation>Мэдээлэл</translation>
     </message>
     <message>
       <source>Objects</source>

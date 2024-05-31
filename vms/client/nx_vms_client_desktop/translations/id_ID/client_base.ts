@@ -5148,6 +5148,14 @@ to %1</translation>
       <source>ACCESS DENIED</source>
       <translation>AKSES DITOLAK</translation>
     </message>
+    <message>
+      <source>RESTRICTED</source>
+      <translation>TERBATAS</translation>
+    </message>
+    <message>
+      <source>Authorize</source>
+      <translation>Otorisasi</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageAnalyticsWidget</name>

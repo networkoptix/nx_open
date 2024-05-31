@@ -630,7 +630,7 @@
     </message>
     <message>
       <source>None</source>
-      <translation type="unfinished">None</translation>
+      <translation>Nada</translation>
     </message>
     <message>
       <source>Small</source>
@@ -638,7 +638,7 @@
     </message>
     <message>
       <source>Medium</source>
-      <translation type="unfinished">Medium</translation>
+      <translation>Medio</translation>
     </message>
     <message>
       <source>Large</source>
@@ -646,11 +646,11 @@
     </message>
     <message>
       <source>Settings</source>
-      <translation type="unfinished">Settings</translation>
+      <translation>Configuración</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Pechar</translation>
     </message>
     <message>
       <source>Close All But This</source>
@@ -778,7 +778,7 @@
     </message>
     <message>
       <source>Resolution...</source>
-      <translation type="unfinished">Resolution...</translation>
+      <translation>Resolución...</translation>
     </message>
     <message>
       <source>Cell Aspect Ratio...</source>
@@ -1079,7 +1079,7 @@
     <name>DropdownTextPickerWidgetStrings</name>
     <message>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Auto</translation>
     </message>
   </context>
   <context>
@@ -1372,7 +1372,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Please try again later.</source>
-      <translation type="unfinished">Please try again later.</translation>
+      <translation>Por favor, inténtao de novo máis tarde.</translation>
     </message>
     <message>
       <source>Cannot connect to the License Server</source>
@@ -1467,7 +1467,7 @@ License Key: %2</translation>
     <name>OauthLoginDialog</name>
     <message>
       <source>Connect to System</source>
-      <translation type="unfinished">Connect to System</translation>
+      <translation>Conectar ao sistema</translation>
     </message>
   </context>
   <context>
@@ -1486,7 +1486,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Check</source>
-      <translation type="unfinished">Check</translation>
+      <translation>Comprobar</translation>
     </message>
     <message>
       <source>Email is not valid.</source>
@@ -1502,7 +1502,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Active</source>
-      <translation type="unfinished">Active</translation>
+      <translation>Activar</translation>
     </message>
     <message>
       <source>Not configured</source>
@@ -1510,7 +1510,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Error</source>
-      <translation type="unfinished">Error</translation>
+      <translation>Erro</translation>
     </message>
     <message>
       <source>Set your email address or SMTP server</source>
@@ -1537,7 +1537,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Success</source>
-      <translation type="unfinished">Success</translation>
+      <translation>Éxito!</translation>
     </message>
     <message>
       <source>Connection timed out</source>
@@ -1549,7 +1549,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Unknown error</source>
-      <translation type="unfinished">Unknown error</translation>
+      <translation>Erro descoñecido</translation>
     </message>
     <message>
       <source>%1 users will start receiving emails immediately after you apply these settings</source>
@@ -1667,12 +1667,12 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Permissions</source>
-      <translation type="unfinished">Permissions</translation>
+      <translation>Permisos</translation>
     </message>
     <message>
       <source>All</source>
       <comment>This will be a part of &quot;All Cameras &amp; Resources&quot; or &quot;All Shared Layouts&quot;</comment>
-      <translation type="unfinished">All</translation>
+      <translation>Todo</translation>
     </message>
   </context>
   <context>
@@ -1806,7 +1806,7 @@ License Key: %2</translation>
     <name>QnAbstractPtzDialog</name>
     <message>
       <source>Loading...</source>
-      <translation type="unfinished">Loading...</translation>
+      <translation>Cargando...</translation>
     </message>
     <message>
       <source>Saving...</source>
@@ -1824,7 +1824,7 @@ License Key: %2</translation>
     <name>QnAdjustVideoDialog</name>
     <message>
       <source>Image Enhancement</source>
-      <translation type="unfinished">Image Enhancement</translation>
+      <translation>Mellora da imaxe</translation>
     </message>
     <message>
       <source>Image Enhancement - %1</source>
@@ -1847,15 +1847,15 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Disabled</source>
-      <translation type="unfinished">Disabled</translation>
+      <translation>Desactivado</translation>
     </message>
     <message>
       <source>Recommended</source>
-      <translation type="unfinished">Recommended</translation>
+      <translation>Recomendado</translation>
     </message>
     <message>
       <source>Strict</source>
-      <translation type="unfinished">Strict</translation>
+      <translation>Estrito</translation>
     </message>
     <message>
       <source>May lead to privacy issues</source>
@@ -1883,7 +1883,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Continue</source>
-      <translation type="unfinished">Continue</translation>
+      <translation>Continuar</translation>
     </message>
     <message>
       <source>On the first connection to the server, your confirmation will be requested to accept the certificate if it contains errors</source>
@@ -1937,7 +1937,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation type="unfinished">Select All</translation>
+      <translation>Seleccionar todo</translation>
     </message>
     <message>
       <source>Export selected records to a file</source>
@@ -1945,11 +1945,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Devices</source>
-      <translation type="unfinished">Devices</translation>
+      <translation>Dispositivos</translation>
     </message>
     <message>
       <source>Cameras</source>
-      <translation type="unfinished">Cameras</translation>
+      <translation>Cámaras</translation>
     </message>
     <message>
       <source>Device actions</source>
@@ -2039,7 +2039,7 @@ License Key: %2</translation>
     <name>QnAuditLogModel</name>
     <message>
       <source>Unknown</source>
-      <translation type="unfinished">Unknown</translation>
+      <translation>Descoñecido</translation>
     </message>
     <message>
       <source>Unsuccessful login</source>
@@ -2047,7 +2047,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Acceder</translation>
     </message>
     <message>
       <source>User updated</source>
@@ -2111,11 +2111,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>IP</source>
-      <translation type="unfinished">IP</translation>
+      <translation>IP</translation>
     </message>
     <message>
       <source>Activity</source>
-      <translation type="unfinished">Activity</translation>
+      <translation>Actividade</translation>
     </message>
     <message>
       <source>Date</source>
@@ -2123,11 +2123,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Time</source>
-      <translation type="unfinished">Time</translation>
+      <translation>Tempo</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation type="unfinished">Description</translation>
+      <translation>Descrición</translation>
     </message>
     <message>
       <source>Click to expand</source>
@@ -2349,7 +2349,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>N/A</source>
-      <translation type="unfinished">N/A</translation>
+      <translation>A / N</translation>
     </message>
     <message>
       <source>Every %1</source>
@@ -2357,7 +2357,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>System</source>
-      <translation type="unfinished">System</translation>
+      <translation>Sistema</translation>
     </message>
     <message>
       <source>Any Server</source>
@@ -2419,7 +2419,7 @@ License Key: %2</translation>
     <message>
       <source>to</source>
       <extracomment>&quot;to&quot; is from the sentence &quot;Send email _to_:&quot;</extracomment>
-      <translation type="unfinished">to</translation>
+      <translation>para</translation>
     </message>
     <message>
       <source>at</source>
@@ -2436,11 +2436,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Devices</source>
-      <translation type="unfinished">Devices</translation>
+      <translation>Dispositivos</translation>
     </message>
     <message>
       <source>Cameras</source>
-      <translation type="unfinished">Cameras</translation>
+      <translation>Cámaras</translation>
     </message>
     <message>
       <source>Any Device</source>
@@ -2467,7 +2467,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>&amp;Delete</source>
-      <translation type="unfinished">&amp;Delete</translation>
+      <translation>&amp;Borrar</translation>
     </message>
     <message>
       <source>&amp;Schedule...</source>
@@ -2526,11 +2526,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Source</source>
-      <translation type="unfinished">Source</translation>
+      <translation>Fonte</translation>
     </message>
     <message>
       <source>Action</source>
-      <translation type="unfinished">Action</translation>
+      <translation>Acción</translation>
     </message>
     <message>
       <source>Target</source>
@@ -2585,7 +2585,7 @@ License Key: %2</translation>
     <name>QnCameraDiagnosticsDialog</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>Ok</translation>
     </message>
     <message>
       <source>FAILED: %1</source>
@@ -2681,15 +2681,15 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation type="unfinished">Select All</translation>
+      <translation>Seleccionar todo</translation>
     </message>
     <message>
       <source>Devices List</source>
-      <translation type="unfinished">Devices List</translation>
+      <translation>Lista de dispositivos</translation>
     </message>
     <message>
       <source>Cameras List</source>
-      <translation type="unfinished">Cameras List</translation>
+      <translation>Lista de cámaras</translation>
     </message>
     <message numerus="yes">
       <source>%n devices found</source>
@@ -2739,19 +2739,19 @@ License Key: %2</translation>
     <name>QnCameraListModel</name>
     <message>
       <source>Recording</source>
-      <translation type="unfinished">Recording</translation>
+      <translation>Gravando</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nome</translation>
     </message>
     <message>
       <source>Vendor</source>
-      <translation type="unfinished">Vendor</translation>
+      <translation>Provedor</translation>
     </message>
     <message>
       <source>Model</source>
-      <translation type="unfinished">Model</translation>
+      <translation>Modelo</translation>
     </message>
     <message>
       <source>Firmware</source>
@@ -2767,7 +2767,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Server</source>
-      <translation type="unfinished">Server</translation>
+      <translation>Servidor</translation>
     </message>
     <message>
       <source>ID</source>
@@ -2806,15 +2806,15 @@ License Key: %2</translation>
     <name>QnCameraPasswordChangeDialog</name>
     <message>
       <source>New Password</source>
-      <translation type="unfinished">New Password</translation>
+      <translation>Novo contrasinal</translation>
     </message>
     <message>
       <source>Repeat Password</source>
-      <translation type="unfinished">Repeat Password</translation>
+      <translation>Repetir contrasinal</translation>
     </message>
     <message>
       <source>Passwords do not match.</source>
-      <translation type="unfinished">Passwords do not match.</translation>
+      <translation>Os contrasinais non coinciden.</translation>
     </message>
     <message>
       <source>Password should be at least 8 symbols long and contain different types of characters.</source>
@@ -2836,7 +2836,7 @@ License Key: %2</translation>
     <name>QnChangeUserPasswordDialog</name>
     <message>
       <source>New Password</source>
-      <translation type="unfinished">New Password</translation>
+      <translation>Novo contrasinal</translation>
     </message>
     <message>
       <source>Confirm Password</source>
@@ -2844,11 +2844,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Passwords do not match.</source>
-      <translation type="unfinished">Passwords do not match.</translation>
+      <translation>Os contrasinais non coinciden.</translation>
     </message>
     <message>
       <source>Current Password</source>
-      <translation type="unfinished">Current Password</translation>
+      <translation>Contrasinal actual</translation>
     </message>
     <message>
       <source>To modify your password please enter the existing one.</source>
@@ -2877,7 +2877,7 @@ devices</translation>
     <message>
       <source>Open %1 Portal</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Open %1 Portal</translation>
+      <translation>Abrir o portal %1</translation>
     </message>
     <message>
       <source>Connect System to %1...</source>
@@ -2910,7 +2910,7 @@ to %1</translation>
     </message>
     <message>
       <source>Disconnect</source>
-      <translation type="unfinished">Disconnect</translation>
+      <translation>Desconectar</translation>
     </message>
     <message>
       <source>System disconnected from %1</source>
@@ -2929,7 +2929,7 @@ to %1</translation>
     </message>
     <message>
       <source>You will be logged out.</source>
-      <translation type="unfinished">You will be logged out.</translation>
+      <translation>Pecharase a sesión.</translation>
     </message>
     <message>
       <source>System will be accessible through local network with a local administrator account.</source>
@@ -2937,7 +2937,7 @@ to %1</translation>
     </message>
     <message>
       <source>Continue</source>
-      <translation type="unfinished">Continue</translation>
+      <translation>Continuar</translation>
     </message>
     <message>
       <source>Cannot disconnect the System from %1</source>
@@ -2969,7 +2969,7 @@ to %1</translation>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation type="unfinished">Too many attempts. Try again in a minute.</translation>
+      <translation>Demasiados intentos. Téntao de novo nun minuto, por favor.</translation>
     </message>
     <message>
       <source>Network error. Please check your Internet connection and try again.</source>
@@ -3015,7 +3015,7 @@ to %1</translation>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation type="unfinished">Too many attempts. Try again in a minute.</translation>
+      <translation>Demasiados intentos. Téntao de novo nun minuto, por favor.</translation>
     </message>
   </context>
   <context>
@@ -3027,18 +3027,18 @@ to %1</translation>
     <message>
       <source>Cannot connect to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Cannot connect to %1</translation>
+      <translation>Non se pode conectar a %1</translation>
     </message>
     <message>
       <source>Connect to Server</source>
-      <translation type="unfinished">Connect to Server</translation>
+      <translation>Conectar ao servidor</translation>
     </message>
   </context>
   <context>
     <name>QnCloudUserPanelWidget</name>
     <message>
       <source>Account Settings</source>
-      <translation type="unfinished">Account Settings</translation>
+      <translation>Axustes de conta</translation>
     </message>
   </context>
   <context>
@@ -3082,7 +3082,7 @@ to %1</translation>
     </message>
     <message>
       <source>Restart</source>
-      <translation type="unfinished">Restart</translation>
+      <translation>Reiniciar</translation>
     </message>
     <message>
       <source>Failed to download and launch version %1</source>
@@ -3090,7 +3090,7 @@ to %1</translation>
     </message>
     <message>
       <source>Try Again</source>
-      <translation type="unfinished">Try Again</translation>
+      <translation>Tentar de novo</translation>
     </message>
     <message>
       <source>Failed to restart %1 in compatibility mode</source>
@@ -3223,7 +3223,7 @@ to %1</translation>
     </message>
     <message>
       <source>Create</source>
-      <translation type="unfinished">Create</translation>
+      <translation>Crear</translation>
     </message>
     <message>
       <source>Restore from Database Backup</source>
@@ -3235,7 +3235,7 @@ to %1</translation>
     </message>
     <message>
       <source>Restore</source>
-      <translation type="unfinished">Restore</translation>
+      <translation>Restaurar</translation>
     </message>
     <message>
       <source>Restore database?</source>
@@ -3271,30 +3271,30 @@ to %1</translation>
     </message>
     <message>
       <source>Disabled</source>
-      <translation type="unfinished">Disabled</translation>
+      <translation>Desactivado</translation>
     </message>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Acceder</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nome</translation>
     </message>
     <message>
       <source>Role</source>
-      <translation type="unfinished">Role</translation>
+      <translation>Rol</translation>
     </message>
   </context>
   <context>
     <name>QnDeprecatedUserListModelPrivate</name>
     <message>
       <source>Owner</source>
-      <translation type="unfinished">Owner</translation>
+      <translation>Propietario/a</translation>
     </message>
     <message>
       <source>Administrator</source>
-      <translation type="unfinished">Administrator</translation>
+      <translation>Administrador/a</translation>
     </message>
     <message>
       <source>View live video</source>
@@ -3329,7 +3329,7 @@ to %1</translation>
     <name>QnDeprecatedUserManagementWidget</name>
     <message>
       <source>Edit</source>
-      <translation type="unfinished">Edit</translation>
+      <translation>Editar</translation>
     </message>
     <message>
       <source>All users</source>
@@ -3402,7 +3402,7 @@ to %1</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation type="unfinished">Select All</translation>
+      <translation>Seleccionar todo</translation>
     </message>
     <message>
       <source>Clear Filter</source>
@@ -3438,7 +3438,7 @@ to %1</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation type="unfinished">Description</translation>
+      <translation>Descrición</translation>
     </message>
   </context>
   <context>
@@ -3457,11 +3457,11 @@ to %1</translation>
     </message>
     <message>
       <source>Source</source>
-      <translation type="unfinished">Source</translation>
+      <translation>Fonte</translation>
     </message>
     <message>
       <source>Action</source>
-      <translation type="unfinished">Action</translation>
+      <translation>Acción</translation>
     </message>
     <message>
       <source>Target</source>
@@ -3469,7 +3469,7 @@ to %1</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation type="unfinished">Description</translation>
+      <translation>Descrición</translation>
     </message>
     <message>
       <source>All users</source>
@@ -3496,9 +3496,9 @@ to %1</translation>
     </message>
     <message numerus="yes">
       <source>and %n more...</source>
-      <translation type="unfinished">
-        <numerusform>and %n more...</numerusform>
-        <numerusform>and %n more...</numerusform>
+      <translation>
+        <numerusform>e %n máis...</numerusform>
+        <numerusform>e %n máis...</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -3525,7 +3525,7 @@ to %1</translation>
     <name>QnExecHttpRequestActionWidget</name>
     <message>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Auto</translation>
     </message>
     <message>
       <source>Basic</source>
@@ -3598,7 +3598,7 @@ to %1</translation>
     </message>
     <message>
       <source>None</source>
-      <translation type="unfinished">None</translation>
+      <translation>Nada</translation>
     </message>
     <message>
       <source>Auto (%1)</source>
@@ -3621,19 +3621,19 @@ to %1</translation>
     </message>
     <message>
       <source>Event Rules</source>
-      <translation type="unfinished">Event Rules</translation>
+      <translation>Regras do evento</translation>
     </message>
     <message>
       <source>Event Log</source>
-      <translation type="unfinished">Event Log</translation>
+      <translation>Rexistro de eventos</translation>
     </message>
     <message>
       <source>Audit Trail</source>
-      <translation type="unfinished">Audit Trail</translation>
+      <translation>Pista de auditoría</translation>
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation type="unfinished">Bookmarks</translation>
+      <translation>Marcadores</translation>
     </message>
     <message>
       <source>Device List</source>
@@ -3671,7 +3671,7 @@ to %1</translation>
     <name>QnIOPortsViewModel</name>
     <message>
       <source>Type</source>
-      <translation type="unfinished">Type</translation>
+      <translation>Tipo</translation>
     </message>
     <message>
       <source>Default state</source>
@@ -3679,17 +3679,17 @@ to %1</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nome</translation>
     </message>
     <message>
       <source>Unknown</source>
       <comment>IO Port Type</comment>
-      <translation type="unfinished">Unknown</translation>
+      <translation>Descoñecido</translation>
     </message>
     <message>
       <source>Disabled</source>
       <comment>IO Port Type</comment>
-      <translation type="unfinished">Disabled</translation>
+      <translation>Desactivado</translation>
     </message>
     <message>
       <source>Input</source>
@@ -3704,7 +3704,7 @@ to %1</translation>
     <message>
       <source>Invalid</source>
       <comment>IO Port Type</comment>
-      <translation type="unfinished">Invalid</translation>
+      <translation>Non válido</translation>
     </message>
     <message>
       <source>Grounded circuit</source>
@@ -3807,11 +3807,11 @@ to %1</translation>
     <name>QnLdapUserListModel</name>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Acceder</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>Correo electronico</translation>
     </message>
     <message>
       <source>DN</source>
@@ -3819,7 +3819,7 @@ to %1</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nome</translation>
     </message>
   </context>
   <context>
@@ -3861,7 +3861,7 @@ to %1</translation>
     </message>
     <message>
       <source>License Key</source>
-      <translation type="unfinished">License Key</translation>
+      <translation>Clave de licenza</translation>
     </message>
     <message>
       <source>Locked to Hardware ID</source>
@@ -3873,7 +3873,7 @@ to %1</translation>
     </message>
     <message>
       <source>Features</source>
-      <translation type="unfinished">Features</translation>
+      <translation>Características</translation>
     </message>
     <message>
       <source>Screens Allowed</source>
@@ -3896,19 +3896,19 @@ to %1</translation>
     <name>QnLicenseListModel</name>
     <message>
       <source>Type</source>
-      <translation type="unfinished">Type</translation>
+      <translation>Tipo</translation>
     </message>
     <message>
       <source>License Key</source>
-      <translation type="unfinished">License Key</translation>
+      <translation>Clave de licenza</translation>
     </message>
     <message>
       <source>Status</source>
-      <translation type="unfinished">Status</translation>
+      <translation>Estado</translation>
     </message>
     <message>
       <source>Server</source>
-      <translation type="unfinished">Server</translation>
+      <translation>Servidor</translation>
     </message>
     <message>
       <source>Never</source>
@@ -3916,23 +3916,23 @@ to %1</translation>
     </message>
     <message>
       <source>Expired</source>
-      <translation type="unfinished">Expired</translation>
+      <translation>Caducado</translation>
     </message>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>Ok</translation>
     </message>
     <message>
       <source>Error</source>
-      <translation type="unfinished">Error</translation>
+      <translation>Erro</translation>
     </message>
     <message>
       <source>Server not found</source>
-      <translation type="unfinished">Server not found</translation>
+      <translation>Servidor non atopado</translation>
     </message>
     <message>
       <source>Expires</source>
-      <translation type="unfinished">Expires</translation>
+      <translation>Caduca</translation>
     </message>
     <message>
       <source>License is active</source>
@@ -3963,14 +3963,14 @@ to %1</translation>
     </message>
     <message>
       <source>Channels</source>
-      <translation type="unfinished">Channels</translation>
+      <translation>Canles</translation>
     </message>
   </context>
   <context>
     <name>QnLicenseManagerWidget</name>
     <message>
       <source>Export</source>
-      <translation type="unfinished">Export</translation>
+      <translation>Exportar</translation>
     </message>
     <message>
       <source>Export licenses to a file</source>
@@ -3985,7 +3985,7 @@ to %1</translation>
     </message>
     <message>
       <source>Remove</source>
-      <translation type="unfinished">Remove</translation>
+      <translation>Eliminar</translation>
     </message>
     <message>
       <source>Deactivate</source>
@@ -4058,7 +4058,7 @@ to %1</translation>
     <name>QnLocalSettingsDialog</name>
     <message>
       <source>General</source>
-      <translation type="unfinished">General</translation>
+      <translation>Xeral</translation>
     </message>
     <message>
       <source>Look and Feel</source>
@@ -4070,7 +4070,7 @@ to %1</translation>
     </message>
     <message>
       <source>Notifications</source>
-      <translation type="unfinished">Notifications</translation>
+      <translation>Notificacións</translation>
     </message>
     <message>
       <source>Advanced</source>
@@ -4160,11 +4160,11 @@ to %1</translation>
     <name>QnMediaResourceWidget</name>
     <message>
       <source>Screenshot</source>
-      <translation type="unfinished">Screenshot</translation>
+      <translation>Captura de pantalla</translation>
     </message>
     <message>
       <source>PTZ</source>
-      <translation type="unfinished">PTZ</translation>
+      <translation>PTZ</translation>
     </message>
     <message>
       <source>Dewarping</source>
@@ -4176,11 +4176,11 @@ to %1</translation>
     </message>
     <message>
       <source>Hi-Res</source>
-      <translation type="unfinished">Hi-Res</translation>
+      <translation>Hi-Res</translation>
     </message>
     <message>
       <source>LIVE</source>
-      <translation type="unfinished">LIVE</translation>
+      <translation>EN VIVO</translation>
     </message>
     <message>
       <source>%1 (Tour &quot;%2&quot; is active)</source>
@@ -4188,7 +4188,7 @@ to %1</translation>
     </message>
     <message>
       <source>Zoom Window</source>
-      <translation type="unfinished">Zoom Window</translation>
+      <translation>Ventá de zoom</translation>
     </message>
     <message>
       <source>I/O Module</source>
@@ -4196,16 +4196,16 @@ to %1</translation>
     </message>
     <message>
       <source>Lo-Res</source>
-      <translation type="unfinished">Lo-Res</translation>
+      <translation>Lo-Res</translation>
     </message>
     <message>
       <source>press and hold</source>
       <comment>Soft Trigger</comment>
-      <translation type="unfinished">press and hold</translation>
+      <translation>premer e manter</translation>
     </message>
     <message>
       <source>Disabled by schedule</source>
-      <translation type="unfinished">Disabled by schedule</translation>
+      <translation>Desactivado pola programación</translation>
     </message>
     <message numerus="yes">
       <source>Set for all %n Cameras</source>
@@ -4231,15 +4231,15 @@ to %1</translation>
     <name>QnMessageBox</name>
     <message>
       <source>Overwrite</source>
-      <translation type="unfinished">Overwrite</translation>
+      <translation>Sobrescribir</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Borrar</translation>
     </message>
     <message>
       <source>Reset</source>
-      <translation type="unfinished">Reset</translation>
+      <translation>Restablecer</translation>
     </message>
     <message>
       <source>Skip</source>
@@ -4247,7 +4247,7 @@ to %1</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Pechar</translation>
     </message>
     <message>
       <source>Stop</source>
@@ -4270,7 +4270,7 @@ to %1</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nome</translation>
     </message>
     <message>
       <source>Name cannot be empty</source>
@@ -4339,7 +4339,7 @@ to %1</translation>
     <name>QnPanTiltRotationCameraAdvancedParamWidget</name>
     <message>
       <source>Rotation</source>
-      <translation type="unfinished">Rotation</translation>
+      <translation>Rotación</translation>
     </message>
   </context>
   <context>
@@ -4425,7 +4425,7 @@ to %1</translation>
     <name>QnPtzManageModel</name>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nome</translation>
     </message>
     <message>
       <source>Hotkey</source>
@@ -4433,7 +4433,7 @@ to %1</translation>
     </message>
     <message>
       <source>Home</source>
-      <translation type="unfinished">Home</translation>
+      <translation>Inicio</translation>
     </message>
     <message>
       <source>Details</source>
@@ -4449,7 +4449,7 @@ to %1</translation>
     </message>
     <message>
       <source>None</source>
-      <translation type="unfinished">None</translation>
+      <translation>Nada</translation>
     </message>
     <message numerus="yes">
       <source>This preset will be activated after %n minutes of inactivity</source>
@@ -4505,14 +4505,14 @@ to %1</translation>
     </message>
     <message>
       <source>None</source>
-      <translation type="unfinished">None</translation>
+      <translation>Nada</translation>
     </message>
   </context>
   <context>
     <name>QnPtzPresetHotkeyItemDelegate</name>
     <message>
       <source>None</source>
-      <translation type="unfinished">None</translation>
+      <translation>Nada</translation>
     </message>
     <message>
       <source>Reassign</source>
@@ -4535,7 +4535,7 @@ to %1</translation>
     </message>
     <message>
       <source>Low</source>
-      <translation type="unfinished">Low</translation>
+      <translation>Baixo</translation>
     </message>
     <message>
       <source>Normal</source>
@@ -4543,7 +4543,7 @@ to %1</translation>
     </message>
     <message>
       <source>High</source>
-      <translation type="unfinished">High</translation>
+      <translation>Alto</translation>
     </message>
     <message>
       <source>Highest</source>
@@ -4567,7 +4567,7 @@ to %1</translation>
     </message>
     <message>
       <source>Invalid</source>
-      <translation type="unfinished">Invalid</translation>
+      <translation>Non válido</translation>
     </message>
   </context>
   <context>
@@ -4582,7 +4582,7 @@ to %1</translation>
     </message>
     <message>
       <source>Best</source>
-      <translation type="unfinished">Best</translation>
+      <translation>Mellor</translation>
     </message>
     <message>
       <source>Average</source>
@@ -4640,7 +4640,7 @@ to %1</translation>
     <name>QnRecordingStatsModel</name>
     <message>
       <source>Space</source>
-      <translation type="unfinished">Space</translation>
+      <translation>Espazo</translation>
     </message>
     <message>
       <source>Calendar Days</source>
@@ -4648,15 +4648,15 @@ to %1</translation>
     </message>
     <message>
       <source>%1 Mbps</source>
-      <translation type="unfinished">%1 Mbps</translation>
+      <translation>%1 Mbps</translation>
     </message>
     <message>
       <source>Device</source>
-      <translation type="unfinished">Device</translation>
+      <translation>Dispositivo</translation>
     </message>
     <message>
       <source>Camera</source>
-      <translation type="unfinished">Camera</translation>
+      <translation>Cámara</translation>
     </message>
     <message>
       <source>%1 TB</source>
@@ -4714,26 +4714,26 @@ to %1</translation>
     <name>QnResourceItemDelegate</name>
     <message>
       <source>Health Monitor</source>
-      <translation type="unfinished">Health Monitor</translation>
+      <translation>Monitor de Saúde</translation>
     </message>
   </context>
   <context>
     <name>QnResourceWidget</name>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Pechar</translation>
     </message>
     <message>
       <source>Information</source>
-      <translation type="unfinished">Information</translation>
+      <translation>Información</translation>
     </message>
     <message>
       <source>Rotate</source>
-      <translation type="unfinished">Rotate</translation>
+      <translation>Xirar/Rotar</translation>
     </message>
     <message>
       <source>Exit Fullscreen</source>
-      <translation type="unfinished">Exit Fullscreen</translation>
+      <translation>Saír da pantalla completa</translation>
     </message>
     <message>
       <source>Enter Fullscreen</source>
@@ -4748,15 +4748,15 @@ to %1</translation>
     </message>
     <message>
       <source>URL</source>
-      <translation type="unfinished">URL</translation>
+      <translation>URL</translation>
     </message>
     <message>
       <source>Server</source>
-      <translation type="unfinished">Server</translation>
+      <translation>Servidor</translation>
     </message>
     <message>
       <source>Invalid URL</source>
-      <translation type="unfinished">Invalid URL</translation>
+      <translation>URL non válido</translation>
     </message>
     <message>
       <source>URL already added</source>
@@ -4786,18 +4786,18 @@ to %1</translation>
     <name>QnSearchBookmarksDialogPrivate</name>
     <message>
       <source>No bookmarks</source>
-      <translation type="unfinished">No bookmarks</translation>
+      <translation>Sen marcadores</translation>
     </message>
     <message>
       <source>Search</source>
-      <translation type="unfinished">Search</translation>
+      <translation>Buscar</translation>
     </message>
   </context>
   <context>
     <name>QnSearchBookmarksModel</name>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nome</translation>
     </message>
     <message>
       <source>Start time</source>
@@ -4809,11 +4809,11 @@ to %1</translation>
     </message>
     <message>
       <source>Tags</source>
-      <translation type="unfinished">Tags</translation>
+      <translation>Etiquetas</translation>
     </message>
     <message>
       <source>Camera</source>
-      <translation type="unfinished">Camera</translation>
+      <translation>Cámara</translation>
     </message>
     <message>
       <source>Created</source>
@@ -4825,7 +4825,7 @@ to %1</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation type="unfinished">Description</translation>
+      <translation>Descrición</translation>
     </message>
   </context>
   <context>
@@ -4844,7 +4844,7 @@ to %1</translation>
     </message>
     <message>
       <source>All Cameras</source>
-      <translation type="unfinished">All Cameras</translation>
+      <translation>Todas as cámaras</translation>
     </message>
     <message>
       <source>Select devices...</source>
@@ -4863,7 +4863,7 @@ to %1</translation>
     </message>
     <message>
       <source>All Servers</source>
-      <translation type="unfinished">All Servers</translation>
+      <translation>Todos os servidores</translation>
     </message>
     <message>
       <source>Select Servers...</source>
@@ -4939,7 +4939,7 @@ to %1</translation>
     <name>QnServerAddressesModel</name>
     <message>
       <source>Address</source>
-      <translation type="unfinished">Address</translation>
+      <translation>Enderezo</translation>
     </message>
   </context>
   <context>
@@ -4961,7 +4961,7 @@ to %1</translation>
     <name>QnServerSettingsDialog</name>
     <message>
       <source>General</source>
-      <translation type="unfinished">General</translation>
+      <translation>Xeral</translation>
     </message>
     <message>
       <source>Storage Analytics</source>
@@ -4977,7 +4977,7 @@ to %1</translation>
     </message>
     <message>
       <source>Server Settings</source>
-      <translation type="unfinished">Server Settings</translation>
+      <translation>Axustes do servidor</translation>
     </message>
     <message>
       <source>Storage Management</source>
@@ -4989,7 +4989,7 @@ to %1</translation>
     </message>
     <message>
       <source>Server Web Page</source>
-      <translation type="unfinished">Server Web Page</translation>
+      <translation>Páxina web do servidor</translation>
     </message>
     <message>
       <source>Plugins</source>
@@ -5001,7 +5001,7 @@ to %1</translation>
     </message>
     <message>
       <source>Backup</source>
-      <translation type="unfinished">Backup</translation>
+      <translation>Copia de seguridade</translation>
     </message>
   </context>
   <context>
@@ -5121,7 +5121,7 @@ to %1</translation>
     </message>
     <message>
       <source>UNAUTHORIZED</source>
-      <translation type="unfinished">UNAUTHORIZED</translation>
+      <translation>NON AUTORIZADO</translation>
     </message>
     <message>
       <source>SERVER UNAVAILABLE</source>
@@ -5137,11 +5137,11 @@ to %1</translation>
     </message>
     <message>
       <source>Device Settings</source>
-      <translation type="unfinished">Device Settings</translation>
+      <translation>Axustes do dispositivo</translation>
     </message>
     <message>
       <source>Camera Settings</source>
-      <translation type="unfinished">Camera Settings</translation>
+      <translation>Axustes da cámara</translation>
     </message>
     <message>
       <source>I/O Module Settings</source>
@@ -5153,7 +5153,7 @@ to %1</translation>
     </message>
     <message>
       <source>Enable</source>
-      <translation type="unfinished">Enable</translation>
+      <translation>Activar</translation>
     </message>
     <message>
       <source>Activate License</source>
@@ -5173,7 +5173,7 @@ to %1</translation>
     </message>
     <message>
       <source>PASSWORD REQUIRED</source>
-      <translation type="unfinished">PASSWORD REQUIRED</translation>
+      <translation>CONTRASINAL OBRIGATORIO</translation>
     </message>
     <message>
       <source>Set for this Camera</source>
@@ -5189,7 +5189,7 @@ to %1</translation>
     </message>
     <message>
       <source>OFFLINE</source>
-      <translation type="unfinished">OFFLINE</translation>
+      <translation>DESCONECTADO</translation>
     </message>
     <message>
       <source>ARCHIVE ENCRYPTED</source>
@@ -5215,12 +5215,20 @@ to %1</translation>
       <source>ACCESS DENIED</source>
       <translation type="unfinished">ACCESS DENIED</translation>
     </message>
+    <message>
+      <source>RESTRICTED</source>
+      <translation type="unfinished">RESTRICTED</translation>
+    </message>
+    <message>
+      <source>Authorize</source>
+      <translation type="unfinished">Authorize</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageAnalyticsWidget</name>
     <message>
       <source>Select All</source>
-      <translation type="unfinished">Select All</translation>
+      <translation>Seleccionar todo</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
@@ -5232,7 +5240,7 @@ to %1</translation>
     </message>
     <message>
       <source>Refresh</source>
-      <translation type="unfinished">Refresh</translation>
+      <translation>Recargar</translation>
     </message>
     <message>
       <source>Export selected events to file</source>
@@ -5276,11 +5284,11 @@ to %1</translation>
     <name>QnStorageConfigWidget</name>
     <message>
       <source>Main</source>
-      <translation type="unfinished">Main</translation>
+      <translation>Principal</translation>
     </message>
     <message>
       <source>Backup</source>
-      <translation type="unfinished">Backup</translation>
+      <translation>Copia de seguridade</translation>
     </message>
     <message>
       <source>Depending on the total size of the archive, reindexing can take up to several hours.</source>
@@ -5316,19 +5324,19 @@ to %1</translation>
     </message>
     <message>
       <source>What to do with current analytics data?</source>
-      <translation type="unfinished">What to do with current analytics data?</translation>
+      <translation>Que facer cos datos de análise actuais?</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Borrar</translation>
     </message>
     <message>
       <source>Keep</source>
-      <translation type="unfinished">Keep</translation>
+      <translation>Gardar</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Cancelar</translation>
     </message>
     <message>
       <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
@@ -5349,11 +5357,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Remove</source>
-      <translation type="unfinished">Remove</translation>
+      <translation>Eliminar</translation>
     </message>
     <message>
       <source>Inaccessible</source>
-      <translation type="unfinished">Inaccessible</translation>
+      <translation>Inaccesible</translation>
     </message>
     <message>
       <source>%1 (Checking...)</source>
@@ -5369,15 +5377,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Loading...</source>
-      <translation type="unfinished">Loading...</translation>
+      <translation>Cargando...</translation>
     </message>
     <message>
       <source>Backup</source>
-      <translation type="unfinished">Backup</translation>
+      <translation>Copia de seguridade</translation>
     </message>
     <message>
       <source>Main</source>
-      <translation type="unfinished">Main</translation>
+      <translation>Principal</translation>
     </message>
     <message>
       <source>%1 GB</source>
@@ -5389,11 +5397,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Reserved</source>
-      <translation type="unfinished">Reserved</translation>
+      <translation>Reservado</translation>
     </message>
     <message>
       <source>local</source>
-      <translation type="unfinished">local</translation>
+      <translation>local</translation>
     </message>
     <message>
       <source>ram</source>
@@ -5467,11 +5475,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Invalid storage path</source>
-      <translation type="unfinished">Invalid storage path</translation>
+      <translation>Ruta de almacenamento non válida</translation>
     </message>
     <message>
       <source>Add this storage anyway?</source>
-      <translation type="unfinished">Add this storage anyway?</translation>
+      <translation>Queres engadir este almacenamento de todos os xeitos?</translation>
     </message>
     <message>
       <source>Storage path used by another server</source>
@@ -5479,7 +5487,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Add Storage</source>
-      <translation type="unfinished">Add Storage</translation>
+      <translation>Engadir almacenamento</translation>
     </message>
     <message>
       <source>It is not recommended to use one recording location for different servers.</source>
@@ -5494,15 +5502,15 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnSystemAdministrationDialog</name>
     <message>
       <source>General</source>
-      <translation type="unfinished">General</translation>
+      <translation>Xeral</translation>
     </message>
     <message>
       <source>Licenses</source>
-      <translation type="unfinished">Licenses</translation>
+      <translation>Licenzas</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>Correo electronico</translation>
     </message>
     <message>
       <source>Updates</source>
@@ -5510,15 +5518,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Users</source>
-      <translation type="unfinished">Users</translation>
+      <translation>Usuarias/os</translation>
     </message>
     <message>
       <source>Security</source>
-      <translation type="unfinished">Security</translation>
+      <translation>Seguridade</translation>
     </message>
     <message>
       <source>User Management</source>
-      <translation type="unfinished">User Management</translation>
+      <translation>Xestión de persoas usuarias</translation>
     </message>
     <message>
       <source>Time Sync</source>
@@ -5597,7 +5605,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Connect</source>
-      <translation type="unfinished">Connect</translation>
+      <translation>Conectar</translation>
     </message>
     <message>
       <source>Some users have not set their email addresses</source>
@@ -5687,7 +5695,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Analytics data can take up large amounts of space.</source>
-      <translation type="unfinished">Analytics data can take up large amounts of space.</translation>
+      <translation>Os datos da analítica poden ocupar moito espazo.</translation>
     </message>
     <message>
       <source>Remote archive synchronization is available</source>
@@ -5771,7 +5779,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Network error</source>
-      <translation type="unfinished">Network error</translation>
+      <translation>Erro de rede</translation>
     </message>
     <message>
       <source>Hold to Speak</source>
@@ -5782,19 +5790,19 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnUserProfileWidget</name>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Acceder</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nome</translation>
     </message>
     <message>
       <source>Role</source>
-      <translation type="unfinished">Role</translation>
+      <translation>Rol</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>Correo electronico</translation>
     </message>
     <message>
       <source>To enable digest authentication password reset is required</source>
@@ -5850,7 +5858,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Permissions</source>
-      <translation type="unfinished">Permissions</translation>
+      <translation>Permisos</translation>
     </message>
     <message>
       <source>Cameras &amp;&amp; Resources</source>
@@ -5858,7 +5866,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Layouts</source>
-      <translation type="unfinished">Layouts</translation>
+      <translation>Deseños</translation>
     </message>
     <message>
       <source>New Role</source>
@@ -5877,7 +5885,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Permissions</source>
-      <translation type="unfinished">Permissions</translation>
+      <translation>Permisos</translation>
     </message>
     <message>
       <source>Cameras &amp;&amp; Resources</source>
@@ -5885,11 +5893,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Layouts</source>
-      <translation type="unfinished">Layouts</translation>
+      <translation>Deseños</translation>
     </message>
     <message>
       <source>New User...</source>
-      <translation type="unfinished">New User...</translation>
+      <translation>Nova/o usuaria/o...</translation>
     </message>
     <message>
       <source>User Settings - %1 (readonly)</source>
@@ -5922,22 +5930,22 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Learn More</source>
-      <translation type="unfinished">Learn More</translation>
+      <translation>Saber máis</translation>
     </message>
   </context>
   <context>
     <name>QnUserSettingsWidget</name>
     <message>
       <source>Local</source>
-      <translation type="unfinished">Local</translation>
+      <translation>Local</translation>
     </message>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Acceder</translation>
     </message>
     <message>
       <source>Login cannot be empty.</source>
-      <translation type="unfinished">Login cannot be empty.</translation>
+      <translation>O inicio de sesión non pode estar baleiro.</translation>
     </message>
     <message>
       <source>User with specified login already exists.</source>
@@ -5949,11 +5957,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nome</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>Correo electronico</translation>
     </message>
     <message>
       <source>Email cannot be empty.</source>
@@ -5961,7 +5969,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Contrasinal</translation>
     </message>
     <message>
       <source>Confirm Password</source>
@@ -5969,7 +5977,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Passwords do not match.</source>
-      <translation type="unfinished">Passwords do not match.</translation>
+      <translation>Os contrasinais non coinciden.</translation>
     </message>
     <message>
       <source>%1 user with specified email already exists.</source>
@@ -6016,7 +6024,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Password cannot be empty.</source>
-      <translation type="unfinished">Password cannot be empty.</translation>
+      <translation>O contrasinal non pode estar baleiro.</translation>
     </message>
     <message>
       <source>Avoid leading and trailing spaces.</source>
@@ -6102,11 +6110,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>QnWorkbenchBookmarksHandler</name>
     <message>
       <source>Bookmark</source>
-      <translation type="unfinished">Bookmark</translation>
+      <translation>Marcador</translation>
     </message>
     <message>
       <source>Server offline</source>
-      <translation type="unfinished">Server offline</translation>
+      <translation>Servidor sen conexión</translation>
     </message>
     <message>
       <source>Bookmarks can only be edited on an online Server.</source>
@@ -6264,7 +6272,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>QnWorkbenchVideoWallHandler</name>
     <message>
       <source>Video Wall</source>
-      <translation type="unfinished">Video Wall</translation>
+      <translation>Video Wall / Muro</translation>
     </message>
     <message>
       <source>Video Wall %1</source>
@@ -6272,7 +6280,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>New Video Wall...</source>
-      <translation type="unfinished">New Video Wall...</translation>
+      <translation>Novo Vídeo Wall / Muro...</translation>
     </message>
     <message>
       <source>New Matrix %1</source>
@@ -6284,7 +6292,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Failed to apply changes</source>
-      <translation type="unfinished">Failed to apply changes</translation>
+      <translation>Erro ao aplicar os cambios</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n items?</source>
@@ -6295,7 +6303,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Stop Video Wall?</source>
-      <translation type="unfinished">Stop Video Wall?</translation>
+      <translation>Parar Video Wall / Muro?</translation>
     </message>
     <message>
       <source>To start it again, you should have physical access to its computer.</source>
@@ -6603,7 +6611,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Remove</source>
-      <translation type="unfinished">Remove</translation>
+      <translation>Eliminar</translation>
     </message>
     <message>
       <source>You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</source>
@@ -6725,11 +6733,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Move</source>
-      <translation type="unfinished">Move</translation>
+      <translation>Mover</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Cancelar</translation>
     </message>
     <message>
       <source>Virtual cameras, USB or web cameras cannot be moved between servers. These devices will remain on %1:</source>
@@ -6779,7 +6787,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>In selected area</source>
-      <translation type="unfinished">In selected area</translation>
+      <translation>Na zona seleccionada</translation>
     </message>
     <message>
       <source>Selected camera</source>
@@ -6796,7 +6804,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>none</source>
       <comment>No currently selected camera</comment>
-      <translation type="unfinished">none</translation>
+      <translation>nada</translation>
     </message>
   </context>
   <context>
@@ -6830,19 +6838,19 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Low</source>
-      <translation type="unfinished">Low</translation>
+      <translation>Baixo</translation>
     </message>
     <message>
       <source>Medium</source>
-      <translation type="unfinished">Medium</translation>
+      <translation>Medio</translation>
     </message>
     <message>
       <source>High</source>
-      <translation type="unfinished">High</translation>
+      <translation>Alto</translation>
     </message>
     <message>
       <source>Best</source>
-      <translation type="unfinished">Best</translation>
+      <translation>Mellor</translation>
     </message>
     <message>
       <source>Preset</source>
@@ -6908,11 +6916,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>UserListModel</name>
     <message>
       <source>Owner</source>
-      <translation type="unfinished">Owner</translation>
+      <translation>Propietario/a</translation>
     </message>
     <message>
       <source>Administrator</source>
-      <translation type="unfinished">Administrator</translation>
+      <translation>Administrador/a</translation>
     </message>
     <message>
       <source>View live video</source>
@@ -6955,11 +6963,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Pechar</translation>
     </message>
     <message>
       <source>Keep</source>
-      <translation type="unfinished">Keep</translation>
+      <translation>Gardar</translation>
     </message>
     <message>
       <source>Local files cannot be placed on Video Wall Screen attached to another computer</source>
@@ -6990,15 +6998,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Last day</source>
-      <translation type="unfinished">Last day</translation>
+      <translation>Último día</translation>
     </message>
     <message>
       <source>Last 7 days</source>
-      <translation type="unfinished">Last 7 days</translation>
+      <translation>Últimos 7 días</translation>
     </message>
     <message>
       <source>Last 30 days</source>
-      <translation type="unfinished">Last 30 days</translation>
+      <translation>Últimos 30 días</translation>
     </message>
     <message>
       <source>Selected on Timeline</source>
@@ -7006,12 +7014,12 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Any time</source>
-      <translation type="unfinished">Any time</translation>
+      <translation>En calquera momento</translation>
     </message>
     <message>
       <source>none</source>
       <comment>No currently selected camera</comment>
-      <translation type="unfinished">none</translation>
+      <translation>nada</translation>
     </message>
     <message>
       <source>Devices on layout</source>
@@ -7097,18 +7105,18 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>cámara eliminada</translation>
     </message>
     <message>
       <source>Unknown track</source>
-      <translation type="unfinished">Unknown track</translation>
+      <translation>Pista descoñecida</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AnalyticsSearchWidget</name>
     <message>
       <source>No objects</source>
-      <translation type="unfinished">No objects</translation>
+      <translation>Sen obxectos</translation>
     </message>
     <message numerus="yes">
       <source>%n objects</source>
@@ -7119,7 +7127,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
-      <translation type="unfinished">Try changing the filters or configure object detection in the camera plugin settings</translation>
+      <translation>Proba a cambiar os filtros ou configurar a detección de obxectos na configuración do plugin da cámara</translation>
     </message>
   </context>
   <context>
@@ -7130,7 +7138,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>DISABLED</source>
-      <translation type="unfinished">DISABLED</translation>
+      <translation>DESACTIVADO</translation>
     </message>
   </context>
   <context>
@@ -7247,7 +7255,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Motion detection is disabled</source>
-      <translation type="unfinished">Motion detection is disabled</translation>
+      <translation>Detección de movemento desactivada</translation>
     </message>
     <message>
       <source>No analytics plugins</source>
@@ -7255,7 +7263,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Cameras</source>
-      <translation type="unfinished">Cameras</translation>
+      <translation>Cámaras</translation>
     </message>
     <message>
       <source>What to backup</source>
@@ -7263,7 +7271,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Quality</source>
-      <translation type="unfinished">Quality</translation>
+      <translation>Calidade</translation>
     </message>
     <message>
       <source>Cannot be modified for new added cameras</source>
@@ -7279,7 +7287,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Not supported</source>
-      <translation type="unfinished">Not supported</translation>
+      <translation>Non é compatible</translation>
     </message>
     <message>
       <source>Backup is not supported for this device</source>
@@ -7298,7 +7306,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Quality</source>
-      <translation type="unfinished">Quality</translation>
+      <translation>Calidade</translation>
     </message>
     <message numerus="yes">
       <source>Set for %n selected devices</source>
@@ -7319,7 +7327,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::BackupSettingsWidget</name>
     <message>
       <source>Settings</source>
-      <translation type="unfinished">Settings</translation>
+      <translation>Configuración</translation>
     </message>
     <message>
       <source>Bandwidth Limit</source>
@@ -7402,14 +7410,14 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::BookmarkSearchListModel::Private</name>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>cámara eliminada</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BookmarkSearchWidget</name>
     <message>
       <source>No bookmarks</source>
-      <translation type="unfinished">No bookmarks</translation>
+      <translation>Sen marcadores</translation>
     </message>
     <message numerus="yes">
       <source>%n bookmarks</source>
@@ -7438,34 +7446,34 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::CameraButtonController</name>
     <message>
       <source>Heater</source>
-      <translation type="unfinished">Heater</translation>
+      <translation>Quentador</translation>
     </message>
     <message>
       <source>Wiper</source>
-      <translation type="unfinished">Wiper</translation>
+      <translation>Limpador</translation>
     </message>
     <message>
       <source>Mute</source>
-      <translation type="unfinished">Mute</translation>
+      <translation>Silenciar</translation>
     </message>
     <message>
       <source>Unmute</source>
-      <translation type="unfinished">Unmute</translation>
+      <translation>Cancelar silencio</translation>
     </message>
     <message>
       <source>Open Door</source>
-      <translation type="unfinished">Open Door</translation>
+      <translation>Porta aberta</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraCredentialsDialog</name>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Acceder</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Contrasinal</translation>
     </message>
   </context>
   <context>
@@ -7473,7 +7481,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Auto</source>
       <comment>Automatic RTP transport type</comment>
-      <translation type="unfinished">Auto</translation>
+      <translation>Auto</translation>
     </message>
     <message>
       <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
@@ -7528,17 +7536,17 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>default</source>
-      <translation type="unfinished">default</translation>
+      <translation>predeterminado</translation>
     </message>
     <message>
       <source>Auto</source>
       <comment>Automatic profile selection</comment>
-      <translation type="unfinished">Auto</translation>
+      <translation>Auto</translation>
     </message>
     <message>
       <source>Auto</source>
       <comment>Let server determine if Media2 should be used to fetch profiles</comment>
-      <translation type="unfinished">Auto</translation>
+      <translation>Auto</translation>
     </message>
     <message>
       <source>Video recorded on the internal camera&apos;s storage will be automatically uploaded to the main archive.</source>
@@ -7549,11 +7557,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::CameraInfoWidget</name>
     <message>
       <source>Device Rules</source>
-      <translation type="unfinished">Device Rules</translation>
+      <translation>Regras do dispositivo</translation>
     </message>
     <message>
       <source>Camera Rules</source>
-      <translation type="unfinished">Camera Rules</translation>
+      <translation>Regras da cámara</translation>
     </message>
     <message>
       <source>I/O Module Rules</source>
@@ -7606,11 +7614,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Primary Stream</source>
-      <translation type="unfinished">Primary Stream</translation>
+      <translation>Fluxo principal</translation>
     </message>
     <message>
       <source>Secondary Stream</source>
-      <translation type="unfinished">Secondary Stream</translation>
+      <translation>Fluxo secundario</translation>
     </message>
     <message>
       <source>Force Motion Detection</source>
@@ -7645,11 +7653,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Next</source>
-      <translation type="unfinished">Next</translation>
+      <translation>Seguinte</translation>
     </message>
     <message>
       <source>Finish</source>
-      <translation type="unfinished">Finish</translation>
+      <translation>Rematar</translation>
     </message>
     <message>
       <source>Camera for Replacement</source>
@@ -7720,7 +7728,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Show all cameras</source>
-      <translation type="unfinished">Show all cameras</translation>
+      <translation>Mostrar todas as cámaras</translation>
     </message>
     <message>
       <source>Select Devices</source>
@@ -7747,11 +7755,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::CameraSettingsDialog</name>
     <message>
       <source>General</source>
-      <translation type="unfinished">General</translation>
+      <translation>Xeral</translation>
     </message>
     <message>
       <source>Recording</source>
-      <translation type="unfinished">Recording</translation>
+      <translation>Gravando</translation>
     </message>
     <message>
       <source>I/O Ports</source>
@@ -7759,7 +7767,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Motion</source>
-      <translation type="unfinished">Motion</translation>
+      <translation>Movemento</translation>
     </message>
     <message>
       <source>Advanced</source>
@@ -7800,19 +7808,19 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Device Settings</source>
-      <translation type="unfinished">Device Settings</translation>
+      <translation>Axustes do dispositivo</translation>
     </message>
     <message>
       <source>Devices Settings</source>
-      <translation type="unfinished">Devices Settings</translation>
+      <translation>Axustes dos dispositivos</translation>
     </message>
     <message>
       <source>Camera Settings</source>
-      <translation type="unfinished">Camera Settings</translation>
+      <translation>Axustes da cámara</translation>
     </message>
     <message>
       <source>Cameras Settings</source>
-      <translation type="unfinished">Cameras Settings</translation>
+      <translation>Axustes das cámaras</translation>
     </message>
     <message>
       <source>I/O Module Settings</source>
@@ -7933,11 +7941,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::CameraStreamsDialog</name>
     <message>
       <source>Primary Stream</source>
-      <translation type="unfinished">Primary Stream</translation>
+      <translation>Fluxo principal</translation>
     </message>
     <message>
       <source>Secondary Stream</source>
-      <translation type="unfinished">Secondary Stream</translation>
+      <translation>Fluxo secundario</translation>
     </message>
     <message>
       <source>No secondary stream</source>
@@ -8047,7 +8055,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Copy</source>
       <comment>to Clipboard</comment>
-      <translation type="unfinished">Copy</translation>
+      <translation>Copiar</translation>
     </message>
     <message>
       <source>Copy to Clipboard</source>
@@ -8056,7 +8064,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Paste</source>
       <comment>from Clipboard</comment>
-      <translation type="unfinished">Paste</translation>
+      <translation>Pegar</translation>
     </message>
     <message>
       <source>Paste from Clipboard</source>
@@ -8065,7 +8073,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Copied</source>
       <comment>to Clipboard</comment>
-      <translation type="unfinished">Copied</translation>
+      <translation>Copiado</translation>
     </message>
     <message>
       <source>Pasted</source>
@@ -8085,11 +8093,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::CloudCrossSystemContext</name>
     <message>
       <source>Inaccessible</source>
-      <translation type="unfinished">Inaccessible</translation>
+      <translation>Inaccesible</translation>
     </message>
     <message>
       <source>Loading...</source>
-      <translation type="unfinished">Loading...</translation>
+      <translation>Cargando...</translation>
     </message>
     <message>
       <source>Click to Show Cameras</source>
@@ -8162,7 +8170,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>OK</source>
       <comment>Dialog button text.</comment>
-      <translation type="unfinished">OK</translation>
+      <translation>Ok</translation>
     </message>
   </context>
   <context>
@@ -8199,7 +8207,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Connect</source>
       <comment>Connect current System to cloud</comment>
-      <translation type="unfinished">Connect</translation>
+      <translation>Conectar</translation>
     </message>
     <message>
       <source>Internal error. Please try again later.</source>
@@ -8223,7 +8231,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Enter password...</source>
-      <translation type="unfinished">Enter password...</translation>
+      <translation>Introducir contrasinal...</translation>
     </message>
     <message>
       <source>Administrator password</source>
@@ -8248,7 +8256,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::ConnectionTestingDialog</name>
     <message>
       <source>Connect</source>
-      <translation type="unfinished">Connect</translation>
+      <translation>Conectar</translation>
     </message>
     <message>
       <source>Setup</source>
@@ -8256,7 +8264,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Success</source>
-      <translation type="unfinished">Success</translation>
+      <translation>Éxito!</translation>
     </message>
     <message>
       <source>Test Failed</source>
@@ -8268,7 +8276,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>New System</source>
-      <translation type="unfinished">New System</translation>
+      <translation>Novo sistema</translation>
     </message>
   </context>
   <context>
@@ -8340,7 +8348,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Server offline</source>
-      <translation type="unfinished">Server offline</translation>
+      <translation>Servidor sen conexión</translation>
     </message>
     <message>
       <source>Device search failed</source>
@@ -8359,7 +8367,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Search</source>
-      <translation type="unfinished">Search</translation>
+      <translation>Buscar</translation>
     </message>
     <message>
       <source>Initializing scan...</source>
@@ -8421,7 +8429,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>System Administration</source>
-      <translation type="unfinished">System Administration</translation>
+      <translation>Administración de sistemas</translation>
     </message>
   </context>
   <context>
@@ -8451,17 +8459,17 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Notifications</source>
       <comment>Notifications tab title</comment>
-      <translation type="unfinished">Notifications</translation>
+      <translation>Notificacións</translation>
     </message>
     <message>
       <source>Motion</source>
       <comment>Motion tab title</comment>
-      <translation type="unfinished">Motion</translation>
+      <translation>Movemento</translation>
     </message>
     <message>
       <source>Bookmarks</source>
       <comment>Bookmarks tab title</comment>
-      <translation type="unfinished">Bookmarks</translation>
+      <translation>Marcadores</translation>
     </message>
     <message>
       <source>Events</source>
@@ -8471,7 +8479,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Objects</source>
       <comment>Analytics tab title</comment>
-      <translation type="unfinished">Objects</translation>
+      <translation>Obxectos</translation>
     </message>
   </context>
   <context>
@@ -8503,9 +8511,9 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::EventTile</name>
     <message numerus="yes">
       <source>...and %n more</source>
-      <translation type="unfinished">
-        <numerusform>...and %n more</numerusform>
-        <numerusform>...and %n more</numerusform>
+      <translation>
+        <numerusform>...e %n máis</numerusform>
+        <numerusform>...e %n máis</numerusform>
       </translation>
     </message>
   </context>
@@ -8563,7 +8571,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::ExportSettingsDialog</name>
     <message>
       <source>Export</source>
-      <translation type="unfinished">Export</translation>
+      <translation>Exportar</translation>
     </message>
     <message>
       <source>Rapid Review</source>
@@ -8595,7 +8603,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Image</source>
-      <translation type="unfinished">Image</translation>
+      <translation>Imaxe</translation>
     </message>
     <message>
       <source>Add Text</source>
@@ -8663,7 +8671,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Info</source>
-      <translation type="unfinished">Info</translation>
+      <translation>Info</translation>
     </message>
     <message>
       <source>AVI format is not recommended to export a recording with audio track.</source>
@@ -8686,15 +8694,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::FailoverPriorityColumnItemDelegate</name>
     <message>
       <source>Low</source>
-      <translation type="unfinished">Low</translation>
+      <translation>Baixo</translation>
     </message>
     <message>
       <source>Medium</source>
-      <translation type="unfinished">Medium</translation>
+      <translation>Medio</translation>
     </message>
     <message>
       <source>High</source>
-      <translation type="unfinished">High</translation>
+      <translation>Alto</translation>
     </message>
     <message>
       <source>No Failover</source>
@@ -8705,11 +8713,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::FilenamePanel</name>
     <message>
       <source>Folder</source>
-      <translation type="unfinished">Folder</translation>
+      <translation>Cartafol</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nome</translation>
     </message>
     <message>
       <source>Name cannot be empty.</source>
@@ -8736,22 +8744,22 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Enable</source>
-      <translation type="unfinished">Enable</translation>
+      <translation>Activar</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::FoundDevicesModel</name>
     <message>
       <source>Brand</source>
-      <translation type="unfinished">Brand</translation>
+      <translation>Marca</translation>
     </message>
     <message>
       <source>Model</source>
-      <translation type="unfinished">Model</translation>
+      <translation>Modelo</translation>
     </message>
     <message>
       <source>Address</source>
-      <translation type="unfinished">Address</translation>
+      <translation>Enderezo</translation>
     </message>
     <message numerus="yes">
       <source>%n new</source>
@@ -8779,7 +8787,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::ImageControlWidget</name>
     <message>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Auto</translation>
     </message>
     <message>
       <source>%1 degrees</source>
@@ -8794,7 +8802,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Error</source>
-      <translation type="unfinished">Error</translation>
+      <translation>Erro</translation>
     </message>
     <message>
       <source>Image cannot be loaded.</source>
@@ -8832,13 +8840,13 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::IndirectAccessDecoratorModel</name>
     <message>
       <source>Access granted by:</source>
-      <translation type="unfinished">Access granted by:</translation>
+      <translation>Acceso concedido por:</translation>
     </message>
     <message numerus="yes">
       <source>and %n more</source>
-      <translation type="unfinished">
-        <numerusform>and %n more</numerusform>
-        <numerusform>and %n more</numerusform>
+      <translation>
+        <numerusform>e %n máis</numerusform>
+        <numerusform>e %n máis</numerusform>
       </translation>
     </message>
   </context>
@@ -8853,7 +8861,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::LabelSelectionManager</name>
     <message>
       <source>Copy</source>
-      <translation type="unfinished">Copy</translation>
+      <translation>Copiar</translation>
     </message>
     <message>
       <source>Copy Link Location</source>
@@ -8914,7 +8922,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::LayoutSettingsDialog</name>
     <message>
       <source>General</source>
-      <translation type="unfinished">General</translation>
+      <translation>Xeral</translation>
     </message>
     <message>
       <source>Background</source>
@@ -8933,11 +8941,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>DISABLED</source>
-      <translation type="unfinished">DISABLED</translation>
+      <translation>DESACTIVADO</translation>
     </message>
     <message>
       <source>OFFLINE</source>
-      <translation type="unfinished">OFFLINE</translation>
+      <translation>DESCONECTADO</translation>
     </message>
   </context>
   <context>
@@ -8993,7 +9001,7 @@ Remember to return the Logging Level to its default setting after you have colle
     <name>nx::vms::client::desktop::LoginDialog</name>
     <message>
       <source>Connect to Server...</source>
-      <translation type="unfinished">Connect to Server...</translation>
+      <translation>Conectar ao servidor...</translation>
     </message>
     <message>
       <source>Version %1</source>
@@ -9016,36 +9024,36 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>None</source>
-      <translation type="unfinished">None</translation>
+      <translation>Nada</translation>
     </message>
     <message>
       <source>Error</source>
-      <translation type="unfinished">Error</translation>
+      <translation>Erro</translation>
     </message>
     <message>
       <source>Warning</source>
-      <translation type="unfinished">Warning</translation>
+      <translation>Advertencia</translation>
     </message>
     <message>
       <source>Info</source>
-      <translation type="unfinished">Info</translation>
+      <translation>Info</translation>
     </message>
     <message>
       <source>Debug</source>
-      <translation type="unfinished">Debug</translation>
+      <translation>Depurar</translation>
     </message>
     <message>
       <source>Verbose</source>
-      <translation type="unfinished">Verbose</translation>
+      <translation>Demasiadas palabras</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::LogsManagementWatcher</name>
     <message numerus="yes">
       <source>... and %n more</source>
-      <translation type="unfinished">
-        <numerusform>... and %n more</numerusform>
-        <numerusform>... and %n more</numerusform>
+      <translation>
+        <numerusform>... e %n máis</numerusform>
+        <numerusform>... e %n máis</numerusform>
       </translation>
     </message>
     <message>
@@ -9100,7 +9108,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Apply</source>
-      <translation type="unfinished">Apply</translation>
+      <translation>Solicitar</translation>
     </message>
   </context>
   <context>
@@ -9118,7 +9126,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Server offline</source>
-      <translation type="unfinished">Server offline</translation>
+      <translation>Servidor sen conexión</translation>
     </message>
     <message>
       <source>Device address field must contain a valid URL, IP address, or RTSP link.</source>
@@ -9141,7 +9149,7 @@ Remember to return the Logging Level to its default setting after you have colle
     <name>nx::vms::client::desktop::MediaFileSettingsDialog</name>
     <message>
       <source>File Settings</source>
-      <translation type="unfinished">File Settings</translation>
+      <translation>Axustes de ficheiro</translation>
     </message>
   </context>
   <context>
@@ -9156,7 +9164,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>URL is invalid.</source>
-      <translation type="unfinished">URL is invalid.</translation>
+      <translation>O URL non é válido.</translation>
     </message>
     <message>
       <source>The login cannot be empty.</source>
@@ -9168,7 +9176,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Merge Systems</source>
-      <translation type="unfinished">Merge Systems</translation>
+      <translation>Sistemas de fusión</translation>
     </message>
     <message>
       <source>Enter your account password to merge Systems</source>
@@ -9181,7 +9189,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Merging Systems...</source>
-      <translation type="unfinished">Merging Systems...</translation>
+      <translation>Fusionando sistemas...</translation>
     </message>
     <message>
       <source>Use a specific hostname or IP address rather than %1.</source>
@@ -9216,7 +9224,7 @@ Remember to return the Logging Level to its default setting after you have colle
     <name>nx::vms::client::desktop::MergeSystemsTool</name>
     <message>
       <source>New System</source>
-      <translation type="unfinished">New System</translation>
+      <translation>Novo sistema</translation>
     </message>
     <message>
       <source>System was not found.</source>
@@ -9296,7 +9304,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation type="unfinished">Unknown error.</translation>
+      <translation>Erro descoñecido.</translation>
     </message>
     <message>
       <source>%1 systems have different owners. Merge is not allowed.</source>
@@ -9308,11 +9316,11 @@ Remember to return the Logging Level to its default setting after you have colle
     <name>nx::vms::client::desktop::MotionSearchListModel::Private</name>
     <message>
       <source>Motion</source>
-      <translation type="unfinished">Motion</translation>
+      <translation>Movemento</translation>
     </message>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>cámara eliminada</translation>
     </message>
     <message>
       <source>Bookmark it...</source>
@@ -9354,7 +9362,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     <name>nx::vms::client::desktop::MultiServerUpdatesWidget</name>
     <message>
       <source>Release notes</source>
-      <translation type="unfinished">Release notes</translation>
+      <translation>Notas da versión</translation>
     </message>
     <message>
       <source>Download in External Browser</source>
@@ -9470,7 +9478,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Try again</source>
-      <translation type="unfinished">Try again</translation>
+      <translation>Téntao de novo</translation>
     </message>
     <message>
       <source>Cancel Update</source>
@@ -9494,7 +9502,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>Ok</translation>
     </message>
     <message>
       <source>There was an error while installing updates:</source>
@@ -9510,7 +9518,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Cancelar</translation>
     </message>
     <message>
       <source>The latest version is already installed</source>
@@ -9534,7 +9542,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Download</source>
-      <translation type="unfinished">Download</translation>
+      <translation>Descargar</translation>
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
@@ -9678,7 +9686,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>All Systems</source>
-      <translation type="unfinished">All Systems</translation>
+      <translation>Todos os sistemas</translation>
     </message>
   </context>
   <context>
@@ -9686,7 +9694,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     <message>
       <source>Cannot connect to %1</source>
       <comment>%1 is the cloud name like Nx Cloud</comment>
-      <translation type="unfinished">Cannot connect to %1</translation>
+      <translation>Non se pode conectar a %1</translation>
     </message>
   </context>
   <context>
@@ -9727,7 +9735,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     <name>nx::vms::client::desktop::OverlappableSearchWidget</name>
     <message>
       <source>Not supported</source>
-      <translation type="unfinished">Not supported</translation>
+      <translation>Non é compatible</translation>
     </message>
     <message>
       <source>This tab will be available in future versions</source>
@@ -9809,7 +9817,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation type="unfinished">Unknown error.</translation>
+      <translation>Erro descoñecido.</translation>
     </message>
     <message>
       <source>Unexpected error code.</source>
@@ -9829,7 +9837,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Internal server error.</source>
-      <translation type="unfinished">Internal server error.</translation>
+      <translation>Erro interno do servidor.</translation>
     </message>
     <message>
       <source>This OS version is no longer supported.</source>
@@ -9856,7 +9864,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Connected</source>
-      <translation type="unfinished">Connected</translation>
+      <translation>Conectado</translation>
     </message>
     <message>
       <source>Powered</source>
@@ -9869,15 +9877,15 @@ You can force it, but it may significantly increase CPU load.</translation>
     <message>
       <source>Empty</source>
       <comment>In meaning &apos;There is no camera physically connected now&apos;</comment>
-      <translation type="unfinished">Empty</translation>
+      <translation>Baleiro</translation>
     </message>
     <message>
       <source>Port</source>
-      <translation type="unfinished">Port</translation>
+      <translation>Porto</translation>
     </message>
     <message>
       <source>Camera</source>
-      <translation type="unfinished">Camera</translation>
+      <translation>Cámara</translation>
     </message>
     <message>
       <source>Consumption</source>
@@ -9885,7 +9893,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Status</source>
-      <translation type="unfinished">Status</translation>
+      <translation>Estado</translation>
     </message>
     <message>
       <source>Power</source>
@@ -9943,11 +9951,11 @@ You can force it, but it may significantly increase CPU load.</translation>
     <name>nx::vms::client::desktop::QnWebpageDialog</name>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nome</translation>
     </message>
     <message>
       <source>URL</source>
-      <translation type="unfinished">URL</translation>
+      <translation>URL</translation>
     </message>
     <message>
       <source>URL cannot be empty.</source>
@@ -9963,11 +9971,11 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Add Proxied Web Page</source>
-      <translation type="unfinished">Add Proxied Web Page</translation>
+      <translation>Engadir páxina web proxy</translation>
     </message>
     <message>
       <source>Add Web Page</source>
-      <translation type="unfinished">Add Web Page</translation>
+      <translation>Engadir páxina web</translation>
     </message>
     <message>
       <source>Edit Proxied Web Page</source>
@@ -9994,19 +10002,19 @@ You can force it, but it may significantly increase CPU load.</translation>
     <name>nx::vms::client::desktop::RadassActionFactory</name>
     <message>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Auto</translation>
     </message>
     <message>
       <source>Low</source>
-      <translation type="unfinished">Low</translation>
+      <translation>Baixo</translation>
     </message>
     <message>
       <source>High</source>
-      <translation type="unfinished">High</translation>
+      <translation>Alto</translation>
     </message>
     <message>
       <source>Custom</source>
-      <translation type="unfinished">Custom</translation>
+      <translation>Personalizado</translation>
     </message>
   </context>
   <context>
@@ -10101,11 +10109,11 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>open all</source>
-      <translation type="unfinished">open all</translation>
+      <translation>abrir todo</translation>
     </message>
     <message>
       <source>Health Monitor</source>
-      <translation type="unfinished">Health Monitor</translation>
+      <translation>Monitor de Saúde</translation>
     </message>
   </context>
   <context>
@@ -10168,9 +10176,9 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message numerus="yes">
       <source>+%n values</source>
-      <translation type="unfinished">
-        <numerusform>+%n values</numerusform>
-        <numerusform>+%n values</numerusform>
+      <translation>
+        <numerusform>+%n valores</numerusform>
+        <numerusform>+%n valores</numerusform>
       </translation>
     </message>
   </context>
@@ -10178,7 +10186,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     <name>nx::vms::client::desktop::ScheduleGridWidget</name>
     <message>
       <source>All</source>
-      <translation type="unfinished">All</translation>
+      <translation>Todo</translation>
     </message>
   </context>
   <context>
@@ -10338,22 +10346,22 @@ You can still change quality and FPS directly on the camera.</translation>
     <name>nx::vms::client::desktop::SearchLineEdit</name>
     <message>
       <source>Search</source>
-      <translation type="unfinished">Search</translation>
+      <translation>Buscar</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::SecuritySettingsWidget</name>
     <message>
       <source>Tracks and logs all user actions.</source>
-      <translation type="unfinished">Tracks and logs all user actions.</translation>
+      <translation>Rastrexa e rexistra todas as accións do usuario.</translation>
     </message>
     <message>
       <source>minutes</source>
-      <translation type="unfinished">minutes</translation>
+      <translation>minutos</translation>
     </message>
     <message>
       <source>hours</source>
-      <translation type="unfinished">hours</translation>
+      <translation>horas</translation>
     </message>
     <message>
       <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
@@ -10379,15 +10387,15 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>Does not affect the connections established by server.</source>
-      <translation type="unfinished">Does not affect the connections established by server.</translation>
+      <translation>Non afecta ás conexións establecidas polo servidor.</translation>
     </message>
     <message>
       <source>Enables RTSP traffic encryption.</source>
-      <translation type="unfinished">Enables RTSP traffic encryption.</translation>
+      <translation>Activar o cifrado de tráfico RTSP.</translation>
     </message>
     <message>
       <source>days</source>
-      <translation type="unfinished">days</translation>
+      <translation>días</translation>
     </message>
     <message>
       <source>Local and LDAP users will be automatically logged out if their session exceeds the specified duration.</source>
@@ -10446,7 +10454,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>Pin</source>
-      <translation type="unfinished">Pin</translation>
+      <translation>Pin</translation>
     </message>
     <message>
       <source>The certificate is auto-generated and pinned to %1</source>
@@ -10487,16 +10495,16 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Continue</source>
-      <translation type="unfinished">Continue</translation>
+      <translation>Continuar</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerSelectionDialog</name>
     <message numerus="yes">
       <source>%n cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n cameras</numerusform>
-        <numerusform>%n cameras</numerusform>
+      <translation>
+        <numerusform>%n cámaras</numerusform>
+        <numerusform>%n cámaras</numerusform>
       </translation>
     </message>
     <message>
@@ -10512,11 +10520,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Version</source>
-      <translation type="unfinished">Version</translation>
+      <translation>Versión</translation>
     </message>
     <message>
       <source>Vendor</source>
-      <translation type="unfinished">Vendor</translation>
+      <translation>Provedor</translation>
     </message>
     <message>
       <source>no error</source>
@@ -10544,7 +10552,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>unknown error</source>
-      <translation type="unfinished">unknown error</translation>
+      <translation>erro descoñecido</translation>
     </message>
     <message>
       <source>Not loaded</source>
@@ -10560,7 +10568,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Status</source>
-      <translation type="unfinished">Status</translation>
+      <translation>Estado</translation>
     </message>
     <message>
       <source>plugin is optional and is not in the white list</source>
@@ -10587,7 +10595,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Installing...</source>
-      <translation type="unfinished">Installing...</translation>
+      <translation>Instalando...</translation>
     </message>
     <message>
       <source>Downloaded</source>
@@ -10606,7 +10614,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Network error.</source>
-      <translation type="unfinished">Network error.</translation>
+      <translation>Erro de rede.</translation>
     </message>
     <message>
       <source>Server error.</source>
@@ -10617,11 +10625,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::ServerUpdatesModel</name>
     <message>
       <source>Status</source>
-      <translation type="unfinished">Status</translation>
+      <translation>Estado</translation>
     </message>
     <message>
       <source>Message</source>
-      <translation type="unfinished">Message</translation>
+      <translation>Mensaxe</translation>
     </message>
     <message>
       <source>Store Update Files</source>
@@ -10644,22 +10652,22 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::SessionRefreshDialog</name>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Acceder</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Contrasinal</translation>
     </message>
     <message>
       <source>Unknown error</source>
-      <translation type="unfinished">Unknown error</translation>
+      <translation>Erro descoñecido</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::SimpleMotionSearchListModel</name>
     <message>
       <source>Motion</source>
-      <translation type="unfinished">Motion</translation>
+      <translation>Movemento</translation>
     </message>
     <message>
       <source>Bookmark it...</source>
@@ -10733,7 +10741,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Export</source>
-      <translation type="unfinished">Export</translation>
+      <translation>Exportar</translation>
     </message>
     <message>
       <source>On-device recordings were found</source>
@@ -10801,9 +10809,9 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::TileInteractionHandler</name>
     <message numerus="yes">
       <source>... and %n more</source>
-      <translation type="unfinished">
-        <numerusform>... and %n more</numerusform>
-        <numerusform>... and %n more</numerusform>
+      <translation>
+        <numerusform>... e %n máis</numerusform>
+        <numerusform>... e %n máis</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -10823,11 +10831,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nome</translation>
     </message>
     <message>
       <source>Camera</source>
-      <translation type="unfinished">Camera</translation>
+      <translation>Cámara</translation>
     </message>
     <message>
       <source>Start time</source>
@@ -10847,19 +10855,19 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Tags</source>
-      <translation type="unfinished">Tags</translation>
+      <translation>Etiquetas</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation type="unfinished">Description</translation>
+      <translation>Descrición</translation>
     </message>
     <message>
       <source>Open</source>
-      <translation type="unfinished">Open</translation>
+      <translation>Abrir</translation>
     </message>
     <message>
       <source>Open in New Tab</source>
-      <translation type="unfinished">Open in New Tab</translation>
+      <translation>Abrir nunha nova pestana</translation>
     </message>
     <message>
       <source>This action is not supported for notifications from other Systems</source>
@@ -10870,7 +10878,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::TimeSynchronizationServersModel</name>
     <message>
       <source>Server</source>
-      <translation type="unfinished">Server</translation>
+      <translation>Servidor</translation>
     </message>
     <message>
       <source>Time Zone</source>
@@ -10886,7 +10894,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
+      <translation>Tempo VMS</translation>
     </message>
   </context>
   <context>
@@ -10982,11 +10990,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nome</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation type="unfinished">Description</translation>
+      <translation>Descrición</translation>
     </message>
     <message>
       <source>Member of</source>
@@ -10994,14 +11002,14 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Permissions</source>
-      <translation type="unfinished">Permissions</translation>
+      <translation>Permisos</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::UserGroupsWidget</name>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Borrar</translation>
     </message>
   </context>
   <context>
@@ -11021,38 +11029,38 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Acceder</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nome</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>Correo electronico</translation>
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Grupos</translation>
     </message>
     <message>
       <source>Custom</source>
-      <translation type="unfinished">Custom</translation>
+      <translation>Personalizado</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::UserListWidget</name>
     <message>
       <source>Enable</source>
-      <translation type="unfinished">Enable</translation>
+      <translation>Activar</translation>
     </message>
     <message>
       <source>Disable</source>
-      <translation type="unfinished">Disable</translation>
+      <translation>Desactivar</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Borrar</translation>
     </message>
     <message>
       <source>Force Secure Authentication</source>
@@ -11071,15 +11079,15 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::UserManagementTabWidget</name>
     <message>
       <source>Users</source>
-      <translation type="unfinished">Users</translation>
+      <translation>Usuarias/os</translation>
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Grupos</translation>
     </message>
     <message>
       <source>LDAP</source>
-      <translation type="unfinished">LDAP</translation>
+      <translation>LDAP</translation>
     </message>
   </context>
   <context>
@@ -11090,7 +11098,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Version</source>
-      <translation type="unfinished">Version</translation>
+      <translation>Versión</translation>
     </message>
     <message>
       <source>Invalid version.</source>
@@ -11098,7 +11106,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Contrasinal</translation>
     </message>
     <message>
       <source>The password is incorrect.</source>
@@ -11129,7 +11137,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>(%1 of %2)</source>
       <comment>Uploaded and total number of files will be substituted</comment>
-      <translation type="unfinished">(%1 of %2)</translation>
+      <translation>(%1 de %2)</translation>
     </message>
     <message>
       <source>Finalizing %1...</source>
@@ -11198,7 +11206,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Minimize</source>
-      <translation type="unfinished">Minimize</translation>
+      <translation>Minimizar</translation>
     </message>
     <message>
       <source>Cannot write file</source>
@@ -11239,7 +11247,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Saving layout</source>
-      <translation type="unfinished">Saving layout</translation>
+      <translation>Gardando deseño</translation>
     </message>
     <message>
       <source>Stop Saving</source>
@@ -11270,7 +11278,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Release Notes</source>
-      <translation type="unfinished">Release Notes</translation>
+      <translation>Notas da versión</translation>
     </message>
     <message>
       <source>Major issues have been fixed. Update is strongly recommended.</source>
@@ -11293,15 +11301,15 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Motion</source>
-      <translation type="unfinished">Motion</translation>
+      <translation>Movemento</translation>
     </message>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>Obxectos</translation>
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation type="unfinished">Bookmarks</translation>
+      <translation>Marcadores</translation>
     </message>
     <message>
       <source>High-Res</source>
@@ -11320,29 +11328,29 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::detail::BaseInputField</name>
     <message>
       <source>multiple values</source>
-      <translation type="unfinished">multiple values</translation>
+      <translation>varios valores</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::entity_resource_tree::ResourceTreeEntityBuilder</name>
     <message>
       <source>New System</source>
-      <translation type="unfinished">New System</translation>
+      <translation>Novo sistema</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::entity_resource_tree::ResourceTreeItemFactory</name>
     <message>
       <source>Servers</source>
-      <translation type="unfinished">Servers</translation>
+      <translation>Servidores</translation>
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
-      <translation type="unfinished">Cameras &amp; Devices</translation>
+      <translation>Cámaras e Dispositivos</translation>
     </message>
     <message>
       <source>Layouts</source>
-      <translation type="unfinished">Layouts</translation>
+      <translation>Deseños</translation>
     </message>
     <message>
       <source>Showreels</source>
@@ -11350,15 +11358,15 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Web Pages</source>
-      <translation type="unfinished">Web Pages</translation>
+      <translation>Páxinas web</translation>
     </message>
     <message>
       <source>Users</source>
-      <translation type="unfinished">Users</translation>
+      <translation>Usuarias/os</translation>
     </message>
     <message>
       <source>Other Systems</source>
-      <translation type="unfinished">Other Systems</translation>
+      <translation>Outros Sistemas</translation>
     </message>
     <message>
       <source>Local Files</source>
@@ -11385,7 +11393,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::entity_resource_tree::resource_grouping::ResourceGroupingStrings</name>
     <message>
       <source>New Group</source>
-      <translation type="unfinished">New Group</translation>
+      <translation>Novo Grupo</translation>
     </message>
     <message>
       <source>New Group %1</source>
@@ -11442,7 +11450,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Open Layout</source>
-      <translation type="unfinished">Open Layout</translation>
+      <translation>Abrir deseño</translation>
     </message>
     <message>
       <source>Modifier</source>
@@ -11465,7 +11473,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Selected Layout</source>
-      <translation type="unfinished">Selected Layout</translation>
+      <translation>Deseño seleccionado</translation>
     </message>
   </context>
   <context>
@@ -11506,7 +11514,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::rules::EventTypePickerWidget</name>
     <message>
       <source>None</source>
-      <translation type="unfinished">None</translation>
+      <translation>Nada</translation>
     </message>
     <message>
       <source>Starts</source>
@@ -11540,7 +11548,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Failed to apply changes.</source>
-      <translation type="unfinished">Failed to apply changes.</translation>
+      <translation>Erro ao aplicar os cambios.</translation>
     </message>
     <message>
       <source>Failed to restore rules.</source>
@@ -11559,7 +11567,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Action</source>
-      <translation type="unfinished">Action</translation>
+      <translation>Acción</translation>
     </message>
   </context>
   <context>
@@ -11645,7 +11653,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Users</source>
-      <translation type="unfinished">Users</translation>
+      <translation>Usuarias/os</translation>
     </message>
     <message>
       <source>Custom Users</source>
@@ -11704,11 +11712,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::ui::action::ShowOnItemsFactory</name>
     <message>
       <source>Info</source>
-      <translation type="unfinished">Info</translation>
+      <translation>Info</translation>
     </message>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>Obxectos</translation>
     </message>
     <message>
       <source>Regions of Interest</source>
@@ -11719,7 +11727,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::ui::dialogs::LicenseDeactivationReason</name>
     <message>
       <source>Next</source>
-      <translation type="unfinished">Next</translation>
+      <translation>Seguinte</translation>
     </message>
     <message>
       <source>Name is necessary</source>
@@ -11731,11 +11739,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nome</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>Correo electronico</translation>
     </message>
     <message>
       <source>Reason for deactivation</source>
@@ -11837,7 +11845,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Move</source>
-      <translation type="unfinished">Move</translation>
+      <translation>Mover</translation>
     </message>
     <message>
       <source>Layout is locked and cannot be changed</source>
@@ -11944,7 +11952,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>Ok</translation>
     </message>
     <message>
       <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>
@@ -12063,7 +12071,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>New Layout</source>
-      <translation type="unfinished">New Layout</translation>
+      <translation>Novo deseño</translation>
     </message>
     <message>
       <source>Enter the name of the layout to create:</source>
@@ -12109,7 +12117,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Open Containing Folder</source>
-      <translation type="unfinished">Open Containing Folder</translation>
+      <translation>Abrir cartafol contedor</translation>
     </message>
     <message>
       <source>Stop file downloading?</source>

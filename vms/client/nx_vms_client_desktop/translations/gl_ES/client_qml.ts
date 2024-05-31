@@ -9,7 +9,7 @@
     </message>
     <message>
       <source>Notifications</source>
-      <translation type="unfinished">Notifications</translation>
+      <translation>Notificacións</translation>
     </message>
     <message>
       <source>Notify about available updates</source>
@@ -56,7 +56,7 @@
     </message>
     <message>
       <source>All</source>
-      <translation type="unfinished">All</translation>
+      <translation>Todo</translation>
     </message>
   </context>
   <context>
@@ -70,23 +70,23 @@
     <name>AnalyticsPanel</name>
     <message>
       <source>Select area</source>
-      <translation type="unfinished">Select area</translation>
+      <translation>Seleccionar zona</translation>
     </message>
     <message>
       <source>Select some area on the video...</source>
-      <translation type="unfinished">Select some area on the video...</translation>
+      <translation>Seleccionar algunha zona do vídeo...</translation>
     </message>
     <message>
       <source>In selected area</source>
-      <translation type="unfinished">In selected area</translation>
+      <translation>Na zona seleccionada</translation>
     </message>
     <message>
       <source>No objects</source>
-      <translation type="unfinished">No objects</translation>
+      <translation>Sen obxectos</translation>
     </message>
     <message>
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
-      <translation type="unfinished">Try changing the filters or configure object detection in the camera plugin settings</translation>
+      <translation>Proba a cambiar os filtros ou configurar a detección de obxectos na configuración do plugin da cámara</translation>
     </message>
     <message numerus="yes">
       <source>%n new results</source>
@@ -112,27 +112,27 @@
     </message>
     <message>
       <source>Select area</source>
-      <translation type="unfinished">Select area</translation>
+      <translation>Seleccionar zona</translation>
     </message>
     <message>
       <source>Select some area on the video...</source>
-      <translation type="unfinished">Select some area on the video...</translation>
+      <translation>Seleccionar algunha zona do vídeo...</translation>
     </message>
     <message>
       <source>In selected area</source>
-      <translation type="unfinished">In selected area</translation>
+      <translation>Na zona seleccionada</translation>
     </message>
     <message>
       <source>No objects</source>
-      <translation type="unfinished">No objects</translation>
+      <translation>Sen obxectos</translation>
     </message>
     <message>
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
-      <translation type="unfinished">Try changing the filters or configure object detection in the camera plugin settings</translation>
+      <translation>Proba a cambiar os filtros ou configurar a detección de obxectos na configuración do plugin da cámara</translation>
     </message>
     <message>
       <source>Any plugin</source>
-      <translation type="unfinished">Any plugin</translation>
+      <translation>Calquera plugin</translation>
     </message>
     <message numerus="yes">
       <source>%n new results</source>
@@ -180,11 +180,11 @@
     <name>BooleanRadioGroup</name>
     <message>
       <source>Yes</source>
-      <translation type="unfinished">Yes</translation>
+      <translation>Si</translation>
     </message>
     <message>
       <source>No</source>
-      <translation type="unfinished">No</translation>
+      <translation>Non</translation>
     </message>
   </context>
   <context>
@@ -237,7 +237,7 @@
     </message>
     <message>
       <source>none</source>
-      <translation type="unfinished">none</translation>
+      <translation>nada</translation>
     </message>
     <message numerus="yes">
       <source>%n chosen devices</source>
@@ -266,7 +266,7 @@
     <name>ClosedTileItem</name>
     <message>
       <source>Offline</source>
-      <translation type="unfinished">Offline</translation>
+      <translation>Sen conexión</translation>
     </message>
     <message>
       <source>Unreachable</source>
@@ -285,21 +285,21 @@
     <name>CloudTile</name>
     <message>
       <source>Log in to</source>
-      <translation type="unfinished">Log in to</translation>
+      <translation>Iniciar sesión en</translation>
     </message>
   </context>
   <context>
     <name>ConnectButton</name>
     <message>
       <source>Connect to Server</source>
-      <translation type="unfinished">Connect to Server</translation>
+      <translation>Conectar ao servidor</translation>
     </message>
   </context>
   <context>
     <name>ConnectTile</name>
     <message>
       <source>Connect to Server</source>
-      <translation type="unfinished">Connect to Server</translation>
+      <translation>Conectar ao servidor</translation>
     </message>
   </context>
   <context>
@@ -337,7 +337,7 @@
     </message>
     <message>
       <source>Preview</source>
-      <translation type="unfinished">Preview</translation>
+      <translation>Vista previa</translation>
     </message>
   </context>
   <context>
@@ -348,7 +348,7 @@
     </message>
     <message>
       <source>Fisheye</source>
-      <translation type="unfinished">Fisheye</translation>
+      <translation>Grande angular</translation>
     </message>
     <message>
       <source>360° Equirectangular</source>
@@ -375,7 +375,7 @@
     </message>
     <message>
       <source>Event Log</source>
-      <translation type="unfinished">Event Log</translation>
+      <translation>Rexistro de eventos</translation>
     </message>
   </context>
   <context>
@@ -397,15 +397,15 @@
     <name>FigureEditorDialog</name>
     <message>
       <source>Clear</source>
-      <translation type="unfinished">Clear</translation>
+      <translation>Borrar</translation>
     </message>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>Ok</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Cancelar</translation>
     </message>
   </context>
   <context>
@@ -479,7 +479,7 @@
     </message>
     <message>
       <source>Size</source>
-      <translation type="unfinished">Size</translation>
+      <translation>Tamaño</translation>
     </message>
     <message>
       <source>X Offset</source>
@@ -502,7 +502,7 @@
     <name>GlobalLoaderIndicator</name>
     <message>
       <source>Loading...</source>
-      <translation type="unfinished">Loading...</translation>
+      <translation>Cargando...</translation>
     </message>
   </context>
   <context>
@@ -524,11 +524,11 @@
     <name>InformationPanel</name>
     <message>
       <source>Version</source>
-      <translation type="unfinished">Version</translation>
+      <translation>Versión</translation>
     </message>
     <message>
       <source>Vendor</source>
-      <translation type="unfinished">Vendor</translation>
+      <translation>Provedor</translation>
     </message>
     <message>
       <source>Camera stream</source>
@@ -540,11 +540,11 @@
     </message>
     <message>
       <source>Refresh</source>
-      <translation type="unfinished">Refresh</translation>
+      <translation>Recargar</translation>
     </message>
     <message>
       <source>Refreshing...</source>
-      <translation type="unfinished">Refreshing...</translation>
+      <translation>Recargando...</translation>
     </message>
   </context>
   <context>
@@ -589,22 +589,22 @@
     <name>JoystickInvestigationWizard</name>
     <message>
       <source>Save</source>
-      <translation type="unfinished">Save</translation>
+      <translation>Gardar</translation>
     </message>
     <message>
       <source>Previous</source>
-      <translation type="unfinished">Previous</translation>
+      <translation>Anterior</translation>
     </message>
     <message>
       <source>Next</source>
-      <translation type="unfinished">Next</translation>
+      <translation>Seguinte</translation>
     </message>
   </context>
   <context>
     <name>JoystickSettingsDialog</name>
     <message>
       <source>Joystick Settings</source>
-      <translation type="unfinished">Joystick Settings</translation>
+      <translation>Configuración do joystick</translation>
     </message>
     <message>
       <source>joystick</source>
@@ -661,19 +661,19 @@
     </message>
     <message>
       <source>Cameras</source>
-      <translation type="unfinished">Cameras</translation>
+      <translation>Cámaras</translation>
     </message>
     <message>
       <source>Resources</source>
-      <translation type="unfinished">Resources</translation>
+      <translation>Recursos</translation>
     </message>
     <message>
       <source>Motion</source>
-      <translation type="unfinished">Motion</translation>
+      <translation>Movemento</translation>
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation type="unfinished">Bookmarks</translation>
+      <translation>Marcadores</translation>
     </message>
     <message>
       <source>Events</source>
@@ -681,11 +681,11 @@
     </message>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>Obxectos</translation>
     </message>
     <message>
       <source>Settings</source>
-      <translation type="unfinished">Settings</translation>
+      <translation>Configuración</translation>
     </message>
     <message>
       <source>Select a camera to see its motion events</source>
@@ -705,7 +705,7 @@
     </message>
     <message>
       <source>No bookmarks</source>
-      <translation type="unfinished">No bookmarks</translation>
+      <translation>Sen marcadores</translation>
     </message>
     <message>
       <source>Select a time span on the timeline and right-click the highlighted section to create a bookmark</source>
@@ -745,7 +745,7 @@
     <name>MotionAreaSelector</name>
     <message>
       <source>In selected area</source>
-      <translation type="unfinished">In selected area</translation>
+      <translation>Na zona seleccionada</translation>
     </message>
     <message>
       <source>Select an area on the video to filter results</source>
@@ -756,11 +756,11 @@
     <name>ObjectEditor</name>
     <message>
       <source>Present</source>
-      <translation type="unfinished">Present</translation>
+      <translation>Presente</translation>
     </message>
     <message>
       <source>Absent</source>
-      <translation type="unfinished">Absent</translation>
+      <translation>Ausente</translation>
     </message>
   </context>
   <context>
@@ -774,7 +774,7 @@
     <name>OpenedTileItem</name>
     <message>
       <source>Address</source>
-      <translation type="unfinished">Address</translation>
+      <translation>Enderezo</translation>
     </message>
     <message>
       <source>URL or Host:Port</source>
@@ -782,15 +782,15 @@
     </message>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Acceder</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Contrasinal</translation>
     </message>
     <message>
       <source>Connect</source>
-      <translation type="unfinished">Connect</translation>
+      <translation>Conectar</translation>
     </message>
     <message>
       <source>Remember me</source>
@@ -805,14 +805,14 @@
     </message>
     <message>
       <source>Server is offline</source>
-      <translation type="unfinished">Server is offline</translation>
+      <translation>O servidor está sen conexión</translation>
     </message>
   </context>
   <context>
     <name>PolyFigure</name>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Borrar</translation>
     </message>
   </context>
   <context>
@@ -870,11 +870,11 @@
     <name>PromoPageButtons</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>Ok</translation>
     </message>
     <message>
       <source>Next</source>
-      <translation type="unfinished">Next</translation>
+      <translation>Seguinte</translation>
     </message>
   </context>
   <context>
@@ -918,11 +918,11 @@ to activate PTZ</translation>
     <name>RangeEditor</name>
     <message>
       <source>from</source>
-      <translation type="unfinished">from</translation>
+      <translation>dende</translation>
     </message>
     <message>
       <source>to</source>
-      <translation type="unfinished">to</translation>
+      <translation>para</translation>
     </message>
   </context>
   <context>
@@ -933,18 +933,18 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>Subtype</source>
-      <translation type="unfinished">Subtype</translation>
+      <translation>Subtipo</translation>
     </message>
   </context>
   <context>
     <name>Repeater</name>
     <message>
       <source>Add</source>
-      <translation type="unfinished">Add</translation>
+      <translation>Engadir</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Borrar</translation>
     </message>
   </context>
   <context>
@@ -955,7 +955,7 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>Nothing found</source>
-      <translation type="unfinished">Nothing found</translation>
+      <translation>Non se atopou nada</translation>
     </message>
     <message>
       <source>Drag video files or images to the client window, or add local media folder through the Local Settings dialog</source>
@@ -970,9 +970,9 @@ to activate PTZ</translation>
     <name>ResourceList</name>
     <message numerus="yes">
       <source>...and %n more</source>
-      <translation type="unfinished">
-        <numerusform>...and %n more</numerusform>
-        <numerusform>...and %n more</numerusform>
+      <translation>
+        <numerusform>...e %n máis</numerusform>
+        <numerusform>...e %n máis</numerusform>
       </translation>
     </message>
   </context>
@@ -991,7 +991,7 @@ to activate PTZ</translation>
     <name>ResourceSearchPane</name>
     <message>
       <source>Search</source>
-      <translation type="unfinished">Search</translation>
+      <translation>Buscar</translation>
     </message>
     <message>
       <source>All Types</source>
@@ -999,15 +999,15 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>Servers</source>
-      <translation type="unfinished">Servers</translation>
+      <translation>Servidores</translation>
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
-      <translation type="unfinished">Cameras &amp; Devices</translation>
+      <translation>Cámaras e Dispositivos</translation>
     </message>
     <message>
       <source>Layouts</source>
-      <translation type="unfinished">Layouts</translation>
+      <translation>Deseños</translation>
     </message>
     <message>
       <source>Showreels</source>
@@ -1019,11 +1019,11 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>Web Pages</source>
-      <translation type="unfinished">Web Pages</translation>
+      <translation>Páxinas web</translation>
     </message>
     <message>
       <source>Users</source>
-      <translation type="unfinished">Users</translation>
+      <translation>Usuarias/os</translation>
     </message>
     <message>
       <source>Local Files</source>
@@ -1034,7 +1034,7 @@ to activate PTZ</translation>
     <name>ResourceToolTip</name>
     <message>
       <source>Cannot load preview</source>
-      <translation type="unfinished">Cannot load preview</translation>
+      <translation>Non se pode cargar a vista previa</translation>
     </message>
     <message>
       <source>Preview is outdated</source>
@@ -1045,15 +1045,15 @@ to activate PTZ</translation>
     <name>RightPanel</name>
     <message>
       <source>Notifications</source>
-      <translation type="unfinished">Notifications</translation>
+      <translation>Notificacións</translation>
     </message>
     <message>
       <source>Motion</source>
-      <translation type="unfinished">Motion</translation>
+      <translation>Movemento</translation>
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation type="unfinished">Bookmarks</translation>
+      <translation>Marcadores</translation>
     </message>
     <message>
       <source>Events</source>
@@ -1061,7 +1061,7 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>Analytics</source>
-      <translation type="unfinished">Analytics</translation>
+      <translation>Estatísticas</translation>
     </message>
   </context>
   <context>
@@ -1083,14 +1083,14 @@ to activate PTZ</translation>
     <name>SearchEdit</name>
     <message>
       <source>Search</source>
-      <translation type="unfinished">Search</translation>
+      <translation>Buscar</translation>
     </message>
   </context>
   <context>
     <name>SearchField</name>
     <message>
       <source>Search</source>
-      <translation type="unfinished">Search</translation>
+      <translation>Buscar</translation>
     </message>
   </context>
   <context>
@@ -1112,7 +1112,7 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Cancelar</translation>
     </message>
   </context>
   <context>
@@ -1160,7 +1160,7 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>Reset</source>
-      <translation type="unfinished">Reset</translation>
+      <translation>Restablecer</translation>
     </message>
   </context>
   <context>
@@ -1171,7 +1171,7 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>Enable</source>
-      <translation type="unfinished">Enable</translation>
+      <translation>Activar</translation>
     </message>
     <message>
       <source>Activate License</source>
@@ -1179,7 +1179,7 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>Camera Settings</source>
-      <translation type="unfinished">Camera Settings</translation>
+      <translation>Axustes da cámara</translation>
     </message>
     <message>
       <source>I/O Module Settings</source>
@@ -1187,7 +1187,7 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>Device Settings</source>
-      <translation type="unfinished">Device Settings</translation>
+      <translation>Axustes do dispositivo</translation>
     </message>
     <message>
       <source>Set for this Camera</source>
@@ -1202,7 +1202,7 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>No data</source>
-      <translation type="unfinished">No data</translation>
+      <translation>Sen datos</translation>
     </message>
     <message>
       <source>Unauthorized</source>
@@ -1218,7 +1218,7 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>Not enough licenses</source>
-      <translation type="unfinished">Not enough licenses</translation>
+      <translation>Non hai licenzas suficientes</translation>
     </message>
     <message>
       <source>Server unavailable</source>
@@ -1234,7 +1234,7 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>Too many connections</source>
-      <translation type="unfinished">Too many connections</translation>
+      <translation>Demasiadas conexións</translation>
     </message>
     <message>
       <source>Cannot decrypt media</source>
@@ -1242,15 +1242,15 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>Password required</source>
-      <translation type="unfinished">Password required</translation>
+      <translation>Contrasinal requirido</translation>
     </message>
     <message>
       <source>No live stream</source>
-      <translation type="unfinished">No live stream</translation>
+      <translation>Non hai emisión en directo</translation>
     </message>
     <message>
       <source>Unsupported firmware version</source>
-      <translation type="unfinished">Unsupported firmware version</translation>
+      <translation>Versión de firmware non compatible</translation>
     </message>
     <message>
       <source>Access denied</source>
@@ -1275,7 +1275,7 @@ to activate PTZ</translation>
     <name>TileGridPlaceholder</name>
     <message>
       <source>Nothing Found</source>
-      <translation type="unfinished">Nothing Found</translation>
+      <translation>Non se atopou</translation>
     </message>
     <message>
       <source>No Favorite Systems</source>
@@ -1298,7 +1298,7 @@ to activate PTZ</translation>
     <name>TileMenu</name>
     <message>
       <source>Edit</source>
-      <translation type="unfinished">Edit</translation>
+      <translation>Editar</translation>
     </message>
     <message>
       <source>Hide</source>
@@ -1310,7 +1310,7 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Borrar</translation>
     </message>
     <message>
       <source>Add to Favorites</source>
@@ -1325,19 +1325,19 @@ to activate PTZ</translation>
     <name>TimeSelector</name>
     <message>
       <source>Any time</source>
-      <translation type="unfinished">Any time</translation>
+      <translation>En calquera momento</translation>
     </message>
     <message>
       <source>Last day</source>
-      <translation type="unfinished">Last day</translation>
+      <translation>Último día</translation>
     </message>
     <message>
       <source>Last 7 days</source>
-      <translation type="unfinished">Last 7 days</translation>
+      <translation>Últimos 7 días</translation>
     </message>
     <message>
       <source>Last 30 days</source>
-      <translation type="unfinished">Last 30 days</translation>
+      <translation>Últimos 30 días</translation>
     </message>
     <message>
       <source>Selected on Timeline</source>
@@ -1348,9 +1348,9 @@ to activate PTZ</translation>
     <name>TreeView</name>
     <message numerus="yes">
       <source>... and %n more</source>
-      <translation type="unfinished">
-        <numerusform>... and %n more</numerusform>
-        <numerusform>... and %n more</numerusform>
+      <translation>
+        <numerusform>... e %n máis</numerusform>
+        <numerusform>... e %n máis</numerusform>
       </translation>
     </message>
   </context>
@@ -1362,7 +1362,7 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>All Systems</source>
-      <translation type="unfinished">All Systems</translation>
+      <translation>Todos os sistemas</translation>
     </message>
     <message>
       <source>Favorites</source>
@@ -1381,7 +1381,7 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>Support</source>
-      <translation type="unfinished">Support</translation>
+      <translation>Axuda</translation>
     </message>
     <message>
       <source>You do not have access to the %1. Please check your internet connection.</source>

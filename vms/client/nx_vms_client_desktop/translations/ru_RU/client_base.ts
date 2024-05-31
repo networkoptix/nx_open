@@ -5349,6 +5349,14 @@ to %1</source>
       <source>ACCESS DENIED</source>
       <translation>ДОСТУП ЗАПРЕЩЕН</translation>
     </message>
+    <message>
+      <source>RESTRICTED</source>
+      <translation type="unfinished">RESTRICTED</translation>
+    </message>
+    <message>
+      <source>Authorize</source>
+      <translation type="unfinished">Authorize</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageAnalyticsWidget</name>

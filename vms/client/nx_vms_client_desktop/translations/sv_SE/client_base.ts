@@ -5215,6 +5215,14 @@ till %1</translation>
       <source>ACCESS DENIED</source>
       <translation>ÅTKOMST NEKAD</translation>
     </message>
+    <message>
+      <source>RESTRICTED</source>
+      <translation>BEGRÄNSAD</translation>
+    </message>
+    <message>
+      <source>Authorize</source>
+      <translation>Auktorisera</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageAnalyticsWidget</name>
