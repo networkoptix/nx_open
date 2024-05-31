@@ -290,6 +290,7 @@ void AnalyticsSearchListModel::Private::advanceTrack(ObjectTrack& track,
 {
     using nx::common::metadata::AttributeEx;
     using nx::common::metadata::NumericRange;
+    using nx::analytics::taxonomy::AbstractAttribute;
 
     for (const auto& attribute: position.attributes)
     {
@@ -301,18 +302,27 @@ void AnalyticsSearchListModel::Private::advanceTrack(ObjectTrack& track,
 
         if (foundIt != track.attributes.end())
         {
-            AttributeEx numericAttribute(attribute);
-            if (std::holds_alternative<NumericRange>(numericAttribute.value))
+            const AbstractAttribute* taxonomyAttribute =
+                q->systemContext()->analyticsAttributeHelper()->findAttribute(
+                    attribute.name, {track.objectTypeId});
+
+            if (taxonomyAttribute && taxonomyAttribute->type() == AbstractAttribute::Type::number)
             {
-                const auto range = AttributeEx::parseRangeFromValue(foundIt->value);
-                if (range.from.has_value() && range.to.has_value())
+                AttributeEx numericAttribute(attribute);
+
+                if (std::holds_alternative<NumericRange>(numericAttribute.value))
                 {
-                    numericAttribute.addRange(range);
-                    *foundIt = {numericAttribute.name, numericAttribute.stringValue()};
-                    continue;
+                    const auto range = AttributeEx::parseRangeFromValue(foundIt->value);
+                    if (range.from.has_value() && range.to.has_value())
+                    {
+                        numericAttribute.addRange(range);
+                        foundIt->value = numericAttribute.stringValue();
+                        continue;
+                    }
                 }
             }
         }
+
         addAttributeIfNotExists(&track.attributes, attribute);
     }
 
