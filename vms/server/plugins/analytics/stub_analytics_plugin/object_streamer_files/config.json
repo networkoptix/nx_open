@@ -7,7 +7,27 @@
         [
             {
                 "id": "stub.objectStreamer.custom.type.1",
-                "name": "Stub OS: Custom Type 1"
+                "name": "Stub OS: Custom Type 1",
+                "attributes": [
+                    {
+                        "name": "string attribute 1",
+                        "type": "String"
+                    },
+                    {
+                        "name": "string attribute 2",
+                        "type": "String"
+                    },
+                    {
+                        "name": "number attribute 1",
+                        "type": "Number",
+                        "subtype": "float"
+                    },
+                    {
+                        "name": "number attribute 2",
+                        "type": "Number",
+                        "subtype": "integer"
+                    }
+                ]
             }
         ]
     },
@@ -25,9 +45,9 @@
                 "Color": "Red",
                 "Brand": "Lada",
                 "Model": "2106",
-                "LicensePlate.Number": "A001AA",
-                "LicensePlate.State/Province": "77",
-                "LicensePlate.Country": "Russia"
+                "License Plate.Number": "A001AA",
+                "License Plate.State/Province": "77",
+                "License Plate.Country": "Russia"
             },
             "bestShots":
             [
@@ -39,9 +59,9 @@
                         "Color": "Dark Red",
                         "Brand": "Mercedes",
                         "Model": "EQE",
-                        "LicensePlate.Number": "KEN560",
-                        "LicensePlate.State/Province": "05",
-                        "LicensePlate.Country": "Kazakhstan"
+                        "License Plate.Number": "KEN560",
+                        "License Plate.State/Province": "05",
+                        "License Plate.Country": "Kazakhstan"
                     }
                 }
             ],
@@ -67,9 +87,9 @@
                 "Color": "Green",
                 "Brand": "BMW",
                 "Model": "X5",
-                "LicensePlate.Number": "LHD 8448",
-                "LicensePlate.State/Province": "Texas",
-                "LicensePlate.Country": "USA"
+                "License Plate.Number": "LHD 8448",
+                "License Plate.State/Province": "Texas",
+                "License Plate.Country": "USA"
             },
             "bestShots":
             [
@@ -102,9 +122,9 @@
                 "Color": "Yellow",
                 "Brand": "Fiat",
                 "Model": "124 Spider",
-                "LicensePlate.Number": "BE 288AB",
-                "LicensePlate.State/Province": "Roma",
-                "LicensePlate.Country": "Italia"
+                "License Plate.Number": "BE 288AB",
+                "License Plate.State/Province": "Roma",
+                "License Plate.Country": "Italia"
             }
         },
         {
@@ -120,8 +140,8 @@
                 "Color": "White",
                 "Brand": "Ford",
                 "Model": "F150",
-                "LicensePlate.Number": "FW 2666",
-                "LicensePlate.Country": "Norway"
+                "License Plate.Number": "FW 2666",
+                "License Plate.Country": "Norway"
             }
         },
         {
@@ -137,8 +157,8 @@
                 "Color": "Blue",
                 "Brand": "Bogdan",
                 "Model": "A-092",
-                "LicensePlate.Number": "AH 2250 AB",
-                "LicensePlate.Country": "Ukraine"
+                "License Plate.Number": "AH 2250 AB",
+                "License Plate.Country": "Ukraine"
             }
         },
         {

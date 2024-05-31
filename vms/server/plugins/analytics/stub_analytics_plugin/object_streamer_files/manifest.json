@@ -31,63 +31,63 @@
         {
             "objectTypeId": "nx.base.Vehicle",
             "attributes": [
-                "Color",
                 "Brand",
-                "Model",
-                "LicensePlate.Number",
-                "LicensePlate.State/Province",
-                "LicensePlate.Country"
+                "Color",
+                "License Plate.Country",
+                "License Plate.Number",
+                "License Plate.State/Province",
+                "Model"
             ]
         },
         {
             "objectTypeId": "nx.base.Car",
             "attributes": [
-                "Color",
                 "Brand",
-                "Model",
-                "LicensePlate.Number",
-                "LicensePlate.State/Province",
-                "LicensePlate.Country"
+                "Color",
+                "License Plate.Country",
+                "License Plate.Number",
+                "License Plate.State/Province",
+                "Model"
             ]
         },
         {
             "objectTypeId": "nx.base.Truck",
             "attributes": [
-                "Color",
                 "Brand",
-                "Model",
-                "LicensePlate.Number",
-                "LicensePlate.Country"
+                "Color",
+                "License Plate.Country",
+                "License Plate.Number",
+                "Model"
             ]
         },
         {
             "objectTypeId": "nx.base.Bus",
             "attributes": [
-                "Color",
                 "Brand",
-                "Model",
-                "LicensePlate.Number",
-                "LicensePlate.Country"
+                "Color",
+                "License Plate.Country",
+                "License Plate.Number",
+                "Model"
             ]
         },
         {
             "objectTypeId": "nx.base.Person",
             "attributes": [
                 "Age",
-                "Gender",
                 "Body Shape",
+                "Bottom Clothing Color",
+                "Gender",
                 "Height",
-                "Top Clothing Color",
-                "Bottom Clothing Color"
+                "Top Clothing Color"
             ]
         },
         {
             "objectTypeId": "stub.objectStreamer.custom.type.1",
             "attributes": [
-                "string attribute 1",
-                "string attribute 2",
                 "number attribute 1",
-                "number attribute 2"
+                "number attribute 2",
+                "string attribute 1",
+                "string attribute 2"
             ]
         }
     ]
