@@ -802,20 +802,20 @@
     </message>
     <message>
       <source>I/O module</source>
-      <translation type="unfinished">I/O module</translation>
+      <translation>Módulo E/S (I/O)</translation>
     </message>
     <message numerus="yes">
       <source>%n Cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n Cameras</numerusform>
-        <numerusform>%n Cameras</numerusform>
+      <translation>
+        <numerusform>%n Cámaras</numerusform>
+        <numerusform>%n Cámaras</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n cameras</numerusform>
-        <numerusform>%n cameras</numerusform>
+      <translation>
+        <numerusform>%n cámaras</numerusform>
+        <numerusform>%n cámaras</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -920,7 +920,7 @@
     <message>
       <source>sec</source>
       <comment>Long suffix for displaying seconds</comment>
-      <translation type="unfinished">sec</translation>
+      <translation>seg</translation>
     </message>
     <message>
       <source>min</source>
@@ -1168,23 +1168,23 @@
     <name>nx::vms::event::StringsHelper</name>
     <message>
       <source>Bookmark</source>
-      <translation type="unfinished">Bookmark</translation>
+      <translation>Marcador</translation>
     </message>
     <message>
       <source>Panic recording</source>
-      <translation type="unfinished">Panic recording</translation>
+      <translation>Gravación de pánico</translation>
     </message>
     <message>
       <source>Write to log</source>
-      <translation type="unfinished">Write to log</translation>
+      <translation>Escribe para rexistrarte</translation>
     </message>
     <message>
       <source>Repeat sound</source>
-      <translation type="unfinished">Repeat sound</translation>
+      <translation>Repetir son</translation>
     </message>
     <message>
       <source>Play sound</source>
-      <translation type="unfinished">Play sound</translation>
+      <translation>Reproducir son</translation>
     </message>
     <message>
       <source>Speak</source>
@@ -1192,7 +1192,7 @@
     </message>
     <message>
       <source>Execute PTZ preset</source>
-      <translation type="unfinished">Execute PTZ preset</translation>
+      <translation>Executar PTZ predefinida</translation>
     </message>
     <message>
       <source>Show text overlay</source>
@@ -1212,7 +1212,7 @@
     </message>
     <message>
       <source>Camera output</source>
-      <translation type="unfinished">Camera output</translation>
+      <translation>Saída da cámara</translation>
     </message>
     <message>
       <source>Device recording</source>
@@ -1220,7 +1220,7 @@
     </message>
     <message>
       <source>Camera recording</source>
-      <translation type="unfinished">Camera recording</translation>
+      <translation>Gravación da cámara</translation>
     </message>
     <message>
       <source>Generic Event</source>
@@ -1597,15 +1597,15 @@
     </message>
     <message>
       <source>Set to fullscreen</source>
-      <translation type="unfinished">Set to fullscreen</translation>
+      <translation>Establecer a pantalla completa</translation>
     </message>
     <message>
       <source>Exit fullscreen</source>
-      <translation type="unfinished">Exit fullscreen</translation>
+      <translation>Saír da pantalla completa</translation>
     </message>
     <message>
       <source>Open layout</source>
-      <translation type="unfinished">Open layout</translation>
+      <translation>Abrir deseño</translation>
     </message>
     <message>
       <source>Failed to force using camera time, it lags too much, system time will be used</source>
@@ -1682,7 +1682,7 @@
     </message>
     <message>
       <source>Send mobile notification</source>
-      <translation type="unfinished">Send mobile notification</translation>
+      <translation>Enviar notificación ao móbil</translation>
     </message>
     <message>
       <source>Consumption</source>
