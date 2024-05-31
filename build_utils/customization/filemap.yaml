@@ -19,6 +19,7 @@ desktop: {
   email_logo.png: 'mediaserver_core/resources/skin/email_attachments/productLogo.png', # 272x80.
   webadmin_logo.png: 'mediaserver_core/resources/static/customization/webadmin_logo.png', # 142x40.
   webadmin_config.js: 'mediaserver_core/resources/static/customization/config.js',
+  channel_partner_service_key.pub: 'desktop/channel_partner_service_key.pub',
 
   windows: {
 
