@@ -93,7 +93,7 @@ Item
     {
         for (let i = column.layoutItems.length - 1; i >= 0; --i)
         {
-            if (Utils.isItemFilled(column.children[i]))
+            if (Utils.isItemFilled(column.layoutItems[i]))
                 return i
         }
         return -1
