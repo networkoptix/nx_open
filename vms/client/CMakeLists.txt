@@ -25,3 +25,7 @@ endif()
 if(withDesktopClient OR withTests)
     add_subdirectory(libvms_gateway_core)
 endif()
+
+if(withMobileClient)
+    add_subdirectory(../../../open_candidate/vms/client/mobile_client ${CMAKE_BINARY_DIR}/mobile_client)
+endif()
