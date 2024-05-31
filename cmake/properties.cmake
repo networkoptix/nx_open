@@ -87,7 +87,7 @@ else()
     set(installation_root "/opt/${customization.companyId}")
 endif()
 
-# Localization.
+# Localization.  See https://developer.crowdin.com/language-codes/ for the list of codes.
 set(translations
     en_US
     en_GB
@@ -98,6 +98,7 @@ set(translations
     ru_RU
     es_ES
     ca_ES
+    id_ID
     it_IT
     ja_JP
     ko_KR
