@@ -7,115 +7,104 @@ Script for generating custom stream files for the Object Streamer sub-plugin. Se
 full information.
 '''
 
+
 import argparse
 import collections
 import copy
+import dataclasses
 import json
 import math
 import random
 import uuid
 
-from abc import ABC, abstractmethod
-from pathlib import Path
-from typing import Dict, Sequence
 
+from abc import ABC, abstractmethod
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Dict, Optional, Sequence
+
+
+@dataclass
+class Attribute:
+    '''Analytics Taxonomy Attribute.'''
+
+    name: str
+    type: str
+    subtype: Optional[str] = None
+
+    def is_valid(self):
+        return self.name and self.type
+
+
+@dataclass
 class ObjectType:
     '''Analytics Taxonomy Object Type.'''
 
-    def __init__(self):
-        self.id = ''
-        self.name = ''
+    id: str
+    name: str
+    attributes: Sequence[Attribute] = ()
 
     def is_valid(self):
         '''Returns True if both id and name are non-empty, False otherwise.'''
         return self.id and self.name
 
 
+@dataclass
 class ObjectTypeSupportInfo:
     '''Information about supported attributes of an Object Type.'''
 
-    def __init__(self):
-        self.object_type_id = ''
-        self.attributes: Sequence[str] = []
+    objectTypeId: str
+    attributes: Sequence[str]
 
-class ObjectTypeSupportInfoEncoder(json.JSONEncoder):
-    '''JSON Encoder for ObjectTypeSupportInfo.'''
 
-    OBJECT_TYPE_ID_KEY = 'objectTypeId'
-    ATTRIBUTES_KEY = 'attributes'
+@dataclass
+class TypeLibrary:
+    '''Type Library section of the Device Agent Manifest. Only "objectTypes" part is available now.
+    '''
 
-    def default(self, o: ObjectTypeSupportInfo) -> Dict:
-        result = {}
-        result[self.OBJECT_TYPE_ID_KEY] = o.object_type_id
-        result[self.ATTRIBUTES_KEY] = o.attributes
-        return result
+    objectTypes: Sequence[ObjectType] = ()
 
-class ObjectTypeInfo:
-    '''Information needed for Device Agent Manifest generation.'''
+    @staticmethod
+    def from_json(json: Dict):
+        library = TypeLibrary([])
 
-    def __init__(self):
-        self.object_type = ObjectType()
-        self.object_type_support_info = ObjectTypeSupportInfo()
+        for template in json.get('objectTypes', []):
+            if isinstance(template, Dict):
+                object_type = ObjectType(**template)
 
+                object_type.attributes = []
+                for item in template.get('attributes', []):
+                    if isinstance(item, Dict):
+                        attribute = Attribute(**item)
+                        if attribute.is_valid():
+                            object_type.attributes.append(attribute)
+
+                if object_type.is_valid():
+                    library.objectTypes.append(object_type)
+
+        return library
+
+
+@dataclass
 class Manifest:
     '''Device Agent Manifest for Object Streamer sub-plugin.'''
 
-    class TypeLibrary:
-        '''Type Library section of the Device Agent Manifest. Only "objectTypes" part is available
-        now.
-        '''
+    typeLibrary: TypeLibrary
+    supportedTypes: Sequence[ObjectTypeSupportInfo] = ()
 
-        OBJECT_TYPES_KEY = 'objectTypes'
-        TYPE_ID_KEY = 'id'
-        TYPE_NAME_KEY = 'name'
-
-        def __init__(self, type_library: Dict = None):
-            self.object_types: Sequence[ObjectType] = []
-
-            if not type_library:
-                return
-            object_types = type_library.get(self.OBJECT_TYPES_KEY)
-            if not isinstance(object_types, Sequence):
-                return
-
-            for object_type_template in object_types:
-                if not isinstance(object_type_template, Dict):
-                    continue
-                object_type = ObjectType()
-                object_type.id = object_type_template.get(self.TYPE_ID_KEY)
-                object_type.name = object_type_template.get(self.TYPE_NAME_KEY)
-
-                if object_type.is_valid():
-                    self.object_types.append(object_type)
-
-    def __init__(self):
-        self.type_library = self.TypeLibrary()
-        self.supported_types: Sequence[ObjectTypeSupportInfo] = []
-
-class TypeLibraryEncoder(json.JSONEncoder):
-    '''JSON Encoder for Manifest.'''
-
-    OBJECT_TYPES_KEY = 'objectTypes'
-
-    def default(self, o: Manifest.TypeLibrary) -> Dict:
-        result = {}
-        result[self.OBJECT_TYPES_KEY] = [object_type.__dict__ for object_type in o.object_types]
-        return result
 
 class ManifestEncoder(json.JSONEncoder):
     '''JSON Encoder for Manifest.'''
 
-    TYPE_LIBRARY_KEY = 'typeLibrary'
-    SUPPORTED_TYPES_KEY = 'supportedTypes'
+    def default(self, object):
+        if dataclasses.is_dataclass(object):
+            return dataclasses.asdict(
+                object,
+                # This dict_factory strips `null` values from the resulting JSON.
+                dict_factory=lambda dict: {k: v for (k, v) in dict if v is not None})
 
-    def default(self, o: Manifest) -> Dict:
-        result = {}
-        result[self.TYPE_LIBRARY_KEY] = TypeLibraryEncoder().default(o.type_library)
-        result[self.SUPPORTED_TYPES_KEY] = [
-            ObjectTypeSupportInfoEncoder().default(object_type_support_info)
-                for object_type_support_info in o.supported_types]
+        return super().default(object)
 
-        return result
 
 class BoundingBox:
     '''Bounding box of an Object on a video frame.'''
@@ -150,6 +139,7 @@ class BoundingBox:
         '''Bottom bound of the bounding box.'''
         return self.y + self.height
 
+
 class ObjectPosition:
     '''Information about position of an Object on a certain video frame.'''
 
@@ -168,6 +158,7 @@ class ObjectPosition:
             self.bounding_box.top >= 0.0 and
             self.bounding_box.bottom <= 1.0)
 
+
 class ObjectMovementParameters:
     '''Movement parameters of an Object on a certain video frame.'''
 
@@ -177,6 +168,7 @@ class ObjectMovementParameters:
         self.direction: float = 0.0
         self.speed: float = self.DEFAULT_SPEED
 
+
 class ObjectContext:
     '''Full information about an Object on a certain video frame.'''
 
@@ -185,6 +177,7 @@ class ObjectContext:
         self.object_position = ObjectPosition()
         self.object_movement_parameters = ObjectMovementParameters()
 
+
 class BestShot:
     '''Information about Object Track Best Shot.'''
 
@@ -192,12 +185,14 @@ class BestShot:
         self.attributes = {}
         self.image_source = ''
 
+
 class Title:
     '''Information about Object Track Title Text and Title Image.'''
 
     def __init__(self):
         self.title_text = "Some text"
         self.image_source = ''
+
 
 class StreamEntry:
     '''Single entry of the stream file.'''
@@ -213,6 +208,7 @@ class StreamEntry:
         self.image_source = ''
         self.title_text = ''
         self.object_position = object_position
+
 
 class StreamEntryEncoder(json.JSONEncoder):
     '''JSON Encoder for StreamEntry.'''
@@ -258,6 +254,7 @@ class StreamEntryEncoder(json.JSONEncoder):
 
         return result
 
+
 class Generator(ABC):
     '''Abstract class for Object Track generators.'''
 
@@ -278,8 +275,9 @@ class Generator(ABC):
         '''Generates Object Track Title Text and Title Image.'''
 
     @abstractmethod
-    def object_type_info(self) -> ObjectTypeInfo:
+    def object_type_info(self) -> ObjectTypeSupportInfo:
         '''Returns information about Object Type of the current Object Track.'''
+
 
 class RandomMovementGenerator(Generator):
     ''' Generates object with a random trajectory, speed and initial coordinates.'''
@@ -429,20 +427,9 @@ class RandomMovementGenerator(Generator):
 
         return stream_entry
 
-    def object_type_info(self) -> ObjectTypeInfo:
-        '''Overrides Generator.object_type_info.'''
-        object_type_info = ObjectTypeInfo()
+    def object_type_info(self) -> ObjectTypeSupportInfo:
+        return ObjectTypeSupportInfo(self._config.object_type_id, set(self._config.attributes))
 
-        object_type = object_type_info.object_type
-        object_type.id = self._config.object_type_id
-
-        object_type_support_info = object_type_info.object_type_support_info
-        object_type_support_info.object_type_id = self._config.object_type_id
-
-        for attribute in self._config.attributes:
-            object_type_support_info.attributes.append(attribute)
-
-        return object_type_info
 
 class GenerationContext:
     '''Generation context of a single Object Track.'''
@@ -451,14 +438,13 @@ class GenerationContext:
         self.object_context = ObjectContext()
         self.track_generator: Generator = None
 
+
 class GenerationManager:
     '''Manager responsible for generation of the stream file and manifest with the given parameters.
     '''
 
     RANDOM_MOVEMENT_POLICY = 'random'
 
-    TYPE_LIBRARY_KEY = 'typeLibrary'
-    OBJECT_TYPE_LIBRARY_KEY = 'objectTypes'
     OBJECT_TEMPLATES_KEY = 'objectTemplates'
     MOVEMENT_POLICY_KEY = 'movementPolicy'
     OBJECT_COUNT_KEY = 'objectCount'
@@ -474,8 +460,7 @@ class GenerationManager:
             if config.get(self.STREAM_DURATION_IN_FRAMES_KEY) is not None else
                 self.DEFAULT_STREAM_DURATION_IN_FRAMES)
 
-        self.type_library = (Manifest.TypeLibrary(config.get(self.TYPE_LIBRARY_KEY)) or
-            Manifest.TypeLibrary())
+        self.type_library = TypeLibrary.from_json(config.get('typeLibrary', {}))
 
         context_count = (config.get(self.OBJECT_COUNT_KEY)
             if config.get(self.OBJECT_COUNT_KEY) is not None else self.DEFAULT_OBJECT_COUNT)
@@ -493,31 +478,19 @@ class GenerationManager:
 
     def generate_manifest(self) -> Manifest:
         '''Generates Device Agent Manifest for the Object Streamer sub-plugin.'''
-        manifest = Manifest()
-        manifest.type_library = copy.deepcopy(self.type_library)
+        manifest = Manifest(copy.deepcopy(self.type_library))
 
-        object_type_ids = set()
-        type_library_object_type_ids = set()
-
-        for object_type in manifest.type_library.object_types:
-            type_library_object_type_ids.add(object_type.id)
+        attributes_by_object_type = {}
 
         for context in self.generation_contexts:
-            object_type_info = context.track_generator.object_type_info()
-            if object_type_info.object_type.id in object_type_ids:
-                continue
+            info = context.track_generator.object_type_info()
+            attributes_by_object_type[info.objectTypeId] = \
+                attributes_by_object_type.get(info.objectTypeId, set()).union(info.attributes)
 
-            if not object_type_info.object_type.id in type_library_object_type_ids:
-                object_type = ObjectType()
-                object_type.id = object_type_info.object_type.id
+        manifest.supportedTypes = []
+        for type_id, attributes in attributes_by_object_type.items():
+            manifest.supportedTypes.append(ObjectTypeSupportInfo(type_id, sorted(attributes)))
 
-                if not object_type_info.object_type.name:
-                    object_type.name = self._make_object_type_name_from_id(object_type.id)
-                manifest.type_library.object_types.append(object_type)
-                type_library_object_type_ids.add(object_type.id)
-
-            object_type_ids.add(object_type_info.object_type.id)
-            manifest.supported_types.append(object_type_info.object_type_support_info)
         return manifest
 
     def generate_stream(self) -> Sequence[StreamEntry]:
@@ -576,6 +549,7 @@ class GenerationManager:
                 capitalized.append(word[0].upper() + word[1:])
         return ' '.join(capitalized)
 
+
 def parse_arguments():
     # pylint: disable=missing-function-docstring
     parser = argparse.ArgumentParser(
@@ -592,10 +566,12 @@ def parse_arguments():
         help='Disables formatting of the generated stream file')
     return parser.parse_args()
 
+
 def load_config(config_file: Path):
     # pylint: disable=missing-function-docstring
     with open(config_file, encoding='UTF-8') as config:
         return json.load(config)
+
 
 def main():
     # pylint: disable=missing-function-docstring
@@ -614,6 +590,7 @@ def main():
         separators = (",", ":") if args.compressed_stream else (",", ": ")
         json.dump(stream, stream_file, cls=StreamEntryEncoder, indent=indent, separators=separators)
         stream_file.write("\n")
+
 
 if __name__ == '__main__':
     main()
