@@ -43,6 +43,9 @@ public:
 
         contentLayout->addWidget(m_timeDurationWidget);
 
+        m_additionalText = new QLabel;
+        contentLayout->addWidget(m_additionalText);
+
         m_contentWidget->setLayout(contentLayout);
 
         connect(
@@ -56,21 +59,55 @@ protected:
     BASE_COMMON_USINGS
 
     TimeDurationWidget* m_timeDurationWidget{nullptr};
+    QLabel* m_additionalText{nullptr};
 
     virtual void updateUi() override
     {
-        if (m_field->descriptor()->fieldName == vms::rules::utils::kRecordAfterFieldName)
+        const auto durationField =
+            base::template getActionField<vms::rules::OptionalTimeField>(
+                vms::rules::utils::kDurationFieldName);
+
+        if (durationField)
         {
-            const auto durationField =
-                base::template getActionField<vms::rules::OptionalTimeField>(
-                    vms::rules::utils::kDurationFieldName);
-            if (durationField)
+            const bool isFixedDuration = durationField
+                && durationField->value() != vms::rules::OptionalTimeField::value_type::zero();
+
+            if (m_field->descriptor()->fieldName == vms::rules::utils::kRecordBeforeFieldName)
             {
+                base::setDisplayName(isFixedDuration
+                    ? TimeDurationWidget::tr(
+                        "Also include",
+                        /*comment*/ "Part of the text, action duration: "
+                        "Also include <time> Before Event Starts")
+                    : TimeDurationWidget::tr(
+                        "Begin",
+                        /*comment*/ "Part of the text, action duration: "
+                        "Begin <time> Before Event Starts"));
+
+                m_additionalText->setText(TimeDurationWidget::tr(
+                    "Before Event Starts",
+                    /*comment*/ "Part of the text, action duration: "
+                    "Begin <time> Before Event Starts"));
+            }
+
+            if (m_field->descriptor()->fieldName == vms::rules::utils::kRecordAfterFieldName)
+            {
+                base::setDisplayName(TimeDurationWidget::tr(
+                    "End",
+                    /*comment*/ "Part of the text, action duration: "
+                    "End <time> After Event Stops"));
+
+                m_additionalText->setText(TimeDurationWidget::tr(
+                    "After Event Stops",
+                    /*comment*/ "Part of the text, action duration: "
+                    "End <time> After Event Stops"));
+
                 // Post recording must not be visible when fixed duration is set.
-                this->setVisible(
-                    durationField->value() != vms::rules::OptionalTimeField::value_type::zero());
+                this->setVisible(!isFixedDuration);
             }
         }
+
+        m_additionalText->setVisible(!m_additionalText->text().isEmpty());
 
         QSignalBlocker blocker{m_timeDurationWidget};
         m_timeDurationWidget->setValue(
