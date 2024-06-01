@@ -342,15 +342,15 @@
     </message>
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
-      <translation>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</translation>
+      <translation>Pertama, coba aktifkan perekaman (jika mati) dan kurangi fps di pengaturan perangkat (error &quot;%1&quot;).</translation>
     </message>
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
-      <translation>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</translation>
+      <translation>Pertama, coba aktifkan perekaman (jika mati) dan kurangi fps di pengaturan kamera (error &quot;%1&quot;).</translation>
     </message>
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
-      <translation>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</translation>
+      <translation>Pertama, coba aktifkan perekaman (jika mati) dan kurangi fps di pengaturan modul I/O (error &quot;%1&quot;).</translation>
     </message>
     <message>
       <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
@@ -1053,7 +1053,7 @@
     <name>SystemHelpers</name>
     <message>
       <source>New System</source>
-      <translation>New System</translation>
+      <translation>Sistem Baru</translation>
     </message>
   </context>
   <context>
