@@ -498,7 +498,7 @@
     <name>GlobalLoaderIndicator</name>
     <message>
       <source>Loading...</source>
-      <translation>Loading...</translation>
+      <translation type="unfinished">Loading...</translation>
     </message>
   </context>
   <context>
@@ -776,15 +776,15 @@
     </message>
     <message>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation type="unfinished">Login</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation>Password</translation>
+      <translation type="unfinished">Password</translation>
     </message>
     <message>
       <source>Connect</source>
-      <translation>Connect</translation>
+      <translation type="unfinished">Connect</translation>
     </message>
     <message>
       <source>Remember me</source>
@@ -947,7 +947,7 @@ untuk mengaktifkan PTZ</translation>
     </message>
     <message>
       <source>Nothing found</source>
-      <translation>Nothing found</translation>
+      <translation type="unfinished">Nothing found</translation>
     </message>
     <message>
       <source>Drag video files or images to the client window, or add local media folder through the Local Settings dialog</source>
@@ -982,7 +982,7 @@ untuk mengaktifkan PTZ</translation>
     <name>ResourceSearchPane</name>
     <message>
       <source>Search</source>
-      <translation>Search</translation>
+      <translation type="unfinished">Search</translation>
     </message>
     <message>
       <source>All Types</source>
@@ -1074,14 +1074,14 @@ untuk mengaktifkan PTZ</translation>
     <name>SearchEdit</name>
     <message>
       <source>Search</source>
-      <translation>Search</translation>
+      <translation type="unfinished">Search</translation>
     </message>
   </context>
   <context>
     <name>SearchField</name>
     <message>
       <source>Search</source>
-      <translation>Search</translation>
+      <translation type="unfinished">Search</translation>
     </message>
   </context>
   <context>

@@ -1125,7 +1125,7 @@
     <name>SystemHelpers</name>
     <message>
       <source>New System</source>
-      <translation>New System</translation>
+      <translation type="unfinished">New System</translation>
     </message>
   </context>
   <context>
