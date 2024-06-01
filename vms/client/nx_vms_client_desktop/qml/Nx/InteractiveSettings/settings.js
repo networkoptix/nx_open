@@ -182,6 +182,9 @@ function getValues(rootItem)
     _processItemsRecursively(rootItem,
         function(item)
         {
+            if (!item.name)
+                return
+
             if (item.getValue !== undefined)
             {
                 try
