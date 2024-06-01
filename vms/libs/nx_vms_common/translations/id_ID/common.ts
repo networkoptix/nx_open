@@ -1319,7 +1319,7 @@
     <name>SystemHelpers</name>
     <message>
       <source>New System</source>
-      <translation>New System</translation>
+      <translation>Sistem Baru</translation>
     </message>
   </context>
   <context>
