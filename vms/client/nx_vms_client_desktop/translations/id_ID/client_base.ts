@@ -42,7 +42,7 @@
     <name>CameraDiagnostics::DiagnoseTool</name>
     <message>
       <source>No connection to Server %1.</source>
-      <translation>No connection to Server %1.</translation>
+      <translation type="unfinished">No connection to Server %1.</translation>
     </message>
   </context>
   <context>
@@ -87,7 +87,7 @@
     </message>
     <message>
       <source>Expires</source>
-      <translation>Expires</translation>
+      <translation type="unfinished">Expires</translation>
     </message>
   </context>
   <context>
@@ -95,29 +95,29 @@
     <message>
       <source>Copied</source>
       <comment>to Clipboard</comment>
-      <translation>Copied</translation>
+      <translation type="unfinished">Copied</translation>
     </message>
   </context>
   <context>
     <name>ComboBoxUtils</name>
     <message>
       <source>multiple values</source>
-      <translation>multiple values</translation>
+      <translation type="unfinished">multiple values</translation>
     </message>
   </context>
   <context>
     <name>CompatibilityVersionInstallationDialog</name>
     <message>
       <source>Installing version %1</source>
-      <translation>Installing version %1</translation>
+      <translation type="unfinished">Installing version %1</translation>
     </message>
     <message>
       <source>Installation failed</source>
-      <translation>Installation failed</translation>
+      <translation type="unfinished">Installation failed</translation>
     </message>
     <message>
       <source>Installation completed</source>
-      <translation>Installation completed</translation>
+      <translation type="unfinished">Installation completed</translation>
     </message>
     <message>
       <source>Getting update information from the server</source>
@@ -144,626 +144,626 @@
     <name>ContextMenu</name>
     <message>
       <source>Filter...</source>
-      <translation>Filter...</translation>
+      <translation type="unfinished">Filter...</translation>
     </message>
     <message>
       <source>Connect to System</source>
-      <translation>Connect to System</translation>
+      <translation type="unfinished">Connect to System</translation>
     </message>
     <message>
       <source>Help</source>
-      <translation>Help</translation>
+      <translation type="unfinished">Help</translation>
     </message>
     <message>
       <source>Event Log...</source>
-      <translation>Event Log...</translation>
+      <translation type="unfinished">Event Log...</translation>
     </message>
     <message>
       <source>Control Video Wall</source>
-      <translation>Control Video Wall</translation>
+      <translation type="unfinished">Control Video Wall</translation>
     </message>
     <message>
       <source>Push my screen</source>
-      <translation>Push my screen</translation>
+      <translation type="unfinished">Push my screen</translation>
     </message>
     <message>
       <source>Select Time Server</source>
-      <translation>Select Time Server</translation>
+      <translation type="unfinished">Select Time Server</translation>
     </message>
     <message>
       <source>Fit in View</source>
-      <translation>Fit in View</translation>
+      <translation type="unfinished">Fit in View</translation>
     </message>
     <message>
       <source>Main Menu</source>
-      <translation>Main Menu</translation>
+      <translation type="unfinished">Main Menu</translation>
     </message>
     <message>
       <source>Connect to Server...</source>
-      <translation>Connect to Server...</translation>
+      <translation type="unfinished">Connect to Server...</translation>
     </message>
     <message>
       <source>Disconnect from Server</source>
-      <translation>Disconnect from Server</translation>
+      <translation type="unfinished">Disconnect from Server</translation>
     </message>
     <message>
       <source>Browse Local Files</source>
-      <translation>Browse Local Files</translation>
+      <translation type="unfinished">Browse Local Files</translation>
     </message>
     <message>
       <source>Show Welcome Screen</source>
-      <translation>Show Welcome Screen</translation>
+      <translation type="unfinished">Show Welcome Screen</translation>
     </message>
     <message>
       <source>Window</source>
-      <translation>Window</translation>
+      <translation type="unfinished">Window</translation>
     </message>
     <message>
       <source>New Window</source>
-      <translation>New Window</translation>
+      <translation type="unfinished">New Window</translation>
     </message>
     <message>
       <source>User...</source>
-      <translation>User...</translation>
+      <translation type="unfinished">User...</translation>
     </message>
     <message>
       <source>Video Wall...</source>
-      <translation>Video Wall...</translation>
+      <translation type="unfinished">Video Wall...</translation>
     </message>
     <message>
       <source>Web Page...</source>
-      <translation>Web Page...</translation>
+      <translation type="unfinished">Web Page...</translation>
     </message>
     <message>
       <source>New Layout...</source>
-      <translation>New Layout...</translation>
+      <translation type="unfinished">New Layout...</translation>
     </message>
     <message>
       <source>Open Layout...</source>
-      <translation>Open Layout...</translation>
+      <translation type="unfinished">Open Layout...</translation>
     </message>
     <message>
       <source>Folder...</source>
-      <translation>Folder...</translation>
+      <translation type="unfinished">Folder...</translation>
     </message>
     <message>
       <source>Web Client...</source>
-      <translation>Web Client...</translation>
+      <translation type="unfinished">Web Client...</translation>
     </message>
     <message>
       <source>Open Web Client...</source>
-      <translation>Open Web Client...</translation>
+      <translation type="unfinished">Open Web Client...</translation>
     </message>
     <message>
       <source>Save Current Layout</source>
-      <translation>Save Current Layout</translation>
+      <translation type="unfinished">Save Current Layout</translation>
     </message>
     <message>
       <source>Save Current Layout As...</source>
-      <translation>Save Current Layout As...</translation>
+      <translation type="unfinished">Save Current Layout As...</translation>
     </message>
     <message>
       <source>Save Video Wall View</source>
-      <translation>Save Video Wall View</translation>
+      <translation type="unfinished">Save Video Wall View</translation>
     </message>
     <message>
       <source>Start Screen Recording</source>
-      <translation>Start Screen Recording</translation>
+      <translation type="unfinished">Start Screen Recording</translation>
     </message>
     <message>
       <source>Stop Screen Recording</source>
-      <translation>Stop Screen Recording</translation>
+      <translation type="unfinished">Stop Screen Recording</translation>
     </message>
     <message>
       <source>Stop current action</source>
-      <translation>Stop current action</translation>
+      <translation type="unfinished">Stop current action</translation>
     </message>
     <message>
       <source>Go to Fullscreen</source>
-      <translation>Go to Fullscreen</translation>
+      <translation type="unfinished">Go to Fullscreen</translation>
     </message>
     <message>
       <source>Exit Fullscreen</source>
-      <translation>Exit Fullscreen</translation>
+      <translation type="unfinished">Exit Fullscreen</translation>
     </message>
     <message>
       <source>Minimize</source>
-      <translation>Minimize</translation>
+      <translation type="unfinished">Minimize</translation>
     </message>
     <message>
       <source>Maximize</source>
-      <translation>Maximize</translation>
+      <translation type="unfinished">Maximize</translation>
     </message>
     <message>
       <source>Restore Down</source>
-      <translation>Restore Down</translation>
+      <translation type="unfinished">Restore Down</translation>
     </message>
     <message>
       <source>Open in Browser...</source>
-      <translation>Open in Browser...</translation>
+      <translation type="unfinished">Open in Browser...</translation>
     </message>
     <message>
       <source>System Administration...</source>
-      <translation>System Administration...</translation>
+      <translation type="unfinished">System Administration...</translation>
     </message>
     <message>
       <source>System Update...</source>
-      <translation>System Update...</translation>
+      <translation type="unfinished">System Update...</translation>
     </message>
     <message>
       <source>User Management...</source>
-      <translation>User Management...</translation>
+      <translation type="unfinished">User Management...</translation>
     </message>
     <message>
       <source>Local Settings...</source>
-      <translation>Local Settings...</translation>
+      <translation type="unfinished">Local Settings...</translation>
     </message>
     <message>
       <source>Audit Trail...</source>
-      <translation>Audit Trail...</translation>
+      <translation type="unfinished">Audit Trail...</translation>
     </message>
     <message>
       <source>Log in to %1...</source>
       <comment>Log in to Nx Cloud</comment>
-      <translation>Log in to %1...</translation>
+      <translation type="unfinished">Log in to %1...</translation>
     </message>
     <message>
       <source>Log out from %1</source>
       <comment>Log out from Nx Cloud</comment>
-      <translation>Log out from %1</translation>
+      <translation type="unfinished">Log out from %1</translation>
     </message>
     <message>
       <source>Open %1 Portal...</source>
       <comment>Open Nx Cloud Portal</comment>
-      <translation>Open %1 Portal...</translation>
+      <translation type="unfinished">Open %1 Portal...</translation>
     </message>
     <message>
       <source>Account Settings...</source>
-      <translation>Account Settings...</translation>
+      <translation type="unfinished">Account Settings...</translation>
     </message>
     <message>
       <source>Create Account...</source>
-      <translation>Create Account...</translation>
+      <translation type="unfinished">Create Account...</translation>
     </message>
     <message>
       <source>Event Rules...</source>
-      <translation>Event Rules...</translation>
+      <translation type="unfinished">Event Rules...</translation>
     </message>
     <message>
       <source>Devices List</source>
-      <translation>Devices List</translation>
+      <translation type="unfinished">Devices List</translation>
     </message>
     <message>
       <source>Cameras List</source>
-      <translation>Cameras List</translation>
+      <translation type="unfinished">Cameras List</translation>
     </message>
     <message>
       <source>Merge Systems...</source>
-      <translation>Merge Systems...</translation>
+      <translation type="unfinished">Merge Systems...</translation>
     </message>
     <message>
       <source>About...</source>
-      <translation>About...</translation>
+      <translation type="unfinished">About...</translation>
     </message>
     <message>
       <source>Exit</source>
-      <translation>Exit</translation>
+      <translation type="unfinished">Exit</translation>
     </message>
     <message>
       <source>Mark Selection Start</source>
-      <translation>Mark Selection Start</translation>
+      <translation type="unfinished">Mark Selection Start</translation>
     </message>
     <message>
       <source>Mark Selection End</source>
-      <translation>Mark Selection End</translation>
+      <translation type="unfinished">Mark Selection End</translation>
     </message>
     <message>
       <source>Clear Selection</source>
-      <translation>Clear Selection</translation>
+      <translation type="unfinished">Clear Selection</translation>
     </message>
     <message>
       <source>Zoom to Selection</source>
-      <translation>Zoom to Selection</translation>
+      <translation type="unfinished">Zoom to Selection</translation>
     </message>
     <message>
       <source>Add Bookmark...</source>
-      <translation>Add Bookmark...</translation>
+      <translation type="unfinished">Add Bookmark...</translation>
     </message>
     <message>
       <source>Edit Bookmark...</source>
-      <translation>Edit Bookmark...</translation>
+      <translation type="unfinished">Edit Bookmark...</translation>
     </message>
     <message>
       <source>Preview Search...</source>
-      <translation>Preview Search...</translation>
+      <translation type="unfinished">Preview Search...</translation>
     </message>
     <message>
       <source>Server...</source>
-      <translation>Server...</translation>
+      <translation type="unfinished">Server...</translation>
     </message>
     <message>
       <source>Open</source>
-      <translation>Open</translation>
+      <translation type="unfinished">Open</translation>
     </message>
     <message>
       <source>Monitor</source>
-      <translation>Monitor</translation>
+      <translation type="unfinished">Monitor</translation>
     </message>
     <message>
       <source>Open in New Tab</source>
-      <translation>Open in New Tab</translation>
+      <translation type="unfinished">Open in New Tab</translation>
     </message>
     <message>
       <source>Monitor in New Tab</source>
-      <translation>Monitor in New Tab</translation>
+      <translation type="unfinished">Monitor in New Tab</translation>
     </message>
     <message>
       <source>Open in Alarm Layout</source>
-      <translation>Open in Alarm Layout</translation>
+      <translation type="unfinished">Open in Alarm Layout</translation>
     </message>
     <message>
       <source>Open in New Window</source>
-      <translation>Open in New Window</translation>
+      <translation type="unfinished">Open in New Window</translation>
     </message>
     <message>
       <source>Monitor in New Window</source>
-      <translation>Monitor in New Window</translation>
+      <translation type="unfinished">Monitor in New Window</translation>
     </message>
     <message>
       <source>Open Video Wall</source>
-      <translation>Open Video Wall</translation>
+      <translation type="unfinished">Open Video Wall</translation>
     </message>
     <message>
       <source>Open Containing Folder</source>
-      <translation>Open Containing Folder</translation>
+      <translation type="unfinished">Open Containing Folder</translation>
     </message>
     <message>
       <source>Identify</source>
-      <translation>Identify</translation>
+      <translation type="unfinished">Identify</translation>
     </message>
     <message>
       <source>Attach to Video Wall...</source>
-      <translation>Attach to Video Wall...</translation>
+      <translation type="unfinished">Attach to Video Wall...</translation>
     </message>
     <message>
       <source>Switch to Video Wall mode...</source>
-      <translation>Switch to Video Wall mode...</translation>
+      <translation type="unfinished">Switch to Video Wall mode...</translation>
     </message>
     <message>
       <source>Save Video Wall</source>
-      <translation>Save Video Wall</translation>
+      <translation type="unfinished">Save Video Wall</translation>
     </message>
     <message>
       <source>Save Current Matrix</source>
-      <translation>Save Current Matrix</translation>
+      <translation type="unfinished">Save Current Matrix</translation>
     </message>
     <message>
       <source>Load Matrix</source>
-      <translation>Load Matrix</translation>
+      <translation type="unfinished">Load Matrix</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation>Delete</translation>
+      <translation type="unfinished">Delete</translation>
     </message>
     <message>
       <source>Stop Video Wall</source>
-      <translation>Stop Video Wall</translation>
+      <translation type="unfinished">Stop Video Wall</translation>
     </message>
     <message>
       <source>Clear Screen</source>
-      <translation>Clear Screen</translation>
+      <translation type="unfinished">Clear Screen</translation>
     </message>
     <message>
       <source>Save Layout</source>
-      <translation>Save Layout</translation>
+      <translation type="unfinished">Save Layout</translation>
     </message>
     <message>
       <source>Save Layout As...</source>
-      <translation>Save Layout As...</translation>
+      <translation type="unfinished">Save Layout As...</translation>
     </message>
     <message>
       <source>Maximize Item</source>
-      <translation>Maximize Item</translation>
+      <translation type="unfinished">Maximize Item</translation>
     </message>
     <message>
       <source>Restore Item</source>
-      <translation>Restore Item</translation>
+      <translation type="unfinished">Restore Item</translation>
     </message>
     <message>
       <source>Save Current Position...</source>
-      <translation>Save Current Position...</translation>
+      <translation type="unfinished">Save Current Position...</translation>
     </message>
     <message>
       <source>Manage...</source>
-      <translation>Manage...</translation>
+      <translation type="unfinished">Manage...</translation>
     </message>
     <message>
       <source>Show Motion/Smart Search</source>
-      <translation>Show Motion/Smart Search</translation>
+      <translation type="unfinished">Show Motion/Smart Search</translation>
     </message>
     <message>
       <source>Show Motion</source>
-      <translation>Show Motion</translation>
+      <translation type="unfinished">Show Motion</translation>
     </message>
     <message>
       <source>Hide Motion/Smart Search</source>
-      <translation>Hide Motion/Smart Search</translation>
+      <translation type="unfinished">Hide Motion/Smart Search</translation>
     </message>
     <message>
       <source>Hide Motion</source>
-      <translation>Hide Motion</translation>
+      <translation type="unfinished">Hide Motion</translation>
     </message>
     <message>
       <source>Clear Motion Selection</source>
-      <translation>Clear Motion Selection</translation>
+      <translation type="unfinished">Clear Motion Selection</translation>
     </message>
     <message>
       <source>Check File Watermark</source>
-      <translation>Check File Watermark</translation>
+      <translation type="unfinished">Check File Watermark</translation>
     </message>
     <message>
       <source>Image Enhancement...</source>
-      <translation>Image Enhancement...</translation>
+      <translation type="unfinished">Image Enhancement...</translation>
     </message>
     <message>
       <source>0 degrees</source>
-      <translation>0 degrees</translation>
+      <translation type="unfinished">0 degrees</translation>
     </message>
     <message>
       <source>90 degrees</source>
-      <translation>90 degrees</translation>
+      <translation type="unfinished">90 degrees</translation>
     </message>
     <message>
       <source>180 degrees</source>
-      <translation>180 degrees</translation>
+      <translation type="unfinished">180 degrees</translation>
     </message>
     <message>
       <source>270 degrees</source>
-      <translation>270 degrees</translation>
+      <translation type="unfinished">270 degrees</translation>
     </message>
     <message>
       <source>Remove from Layout</source>
-      <translation>Remove from Layout</translation>
+      <translation type="unfinished">Remove from Layout</translation>
     </message>
     <message>
       <source>Rename</source>
-      <translation>Rename</translation>
+      <translation type="unfinished">Rename</translation>
     </message>
     <message>
       <source>Delete from Disk</source>
-      <translation>Delete from Disk</translation>
+      <translation type="unfinished">Delete from Disk</translation>
     </message>
     <message>
       <source>Set as Layout Background</source>
-      <translation>Set as Layout Background</translation>
+      <translation type="unfinished">Set as Layout Background</translation>
     </message>
     <message>
       <source>User Settings...</source>
-      <translation>User Settings...</translation>
+      <translation type="unfinished">User Settings...</translation>
     </message>
     <message>
       <source>Check Device Issues...</source>
-      <translation>Check Device Issues...</translation>
+      <translation type="unfinished">Check Device Issues...</translation>
     </message>
     <message>
       <source>Check Devices Issues...</source>
-      <translation>Check Devices Issues...</translation>
+      <translation type="unfinished">Check Devices Issues...</translation>
     </message>
     <message>
       <source>Check Camera Issues...</source>
-      <translation>Check Camera Issues...</translation>
+      <translation type="unfinished">Check Camera Issues...</translation>
     </message>
     <message>
       <source>Check Cameras Issues...</source>
-      <translation>Check Cameras Issues...</translation>
+      <translation type="unfinished">Check Cameras Issues...</translation>
     </message>
     <message>
       <source>Check I/O Module Issues...</source>
-      <translation>Check I/O Module Issues...</translation>
+      <translation type="unfinished">Check I/O Module Issues...</translation>
     </message>
     <message>
       <source>Check I/O Modules Issues...</source>
-      <translation>Check I/O Modules Issues...</translation>
+      <translation type="unfinished">Check I/O Modules Issues...</translation>
     </message>
     <message>
       <source>Device Rules...</source>
-      <translation>Device Rules...</translation>
+      <translation type="unfinished">Device Rules...</translation>
     </message>
     <message>
       <source>Camera Rules...</source>
-      <translation>Camera Rules...</translation>
+      <translation type="unfinished">Camera Rules...</translation>
     </message>
     <message>
       <source>I/O Module Rules...</source>
-      <translation>I/O Module Rules...</translation>
+      <translation type="unfinished">I/O Module Rules...</translation>
     </message>
     <message>
       <source>Device Settings...</source>
-      <translation>Device Settings...</translation>
+      <translation type="unfinished">Device Settings...</translation>
     </message>
     <message>
       <source>Devices Settings...</source>
-      <translation>Devices Settings...</translation>
+      <translation type="unfinished">Devices Settings...</translation>
     </message>
     <message>
       <source>Camera Settings...</source>
-      <translation>Camera Settings...</translation>
+      <translation type="unfinished">Camera Settings...</translation>
     </message>
     <message>
       <source>Cameras Settings...</source>
-      <translation>Cameras Settings...</translation>
+      <translation type="unfinished">Cameras Settings...</translation>
     </message>
     <message>
       <source>I/O Module Settings...</source>
-      <translation>I/O Module Settings...</translation>
+      <translation type="unfinished">I/O Module Settings...</translation>
     </message>
     <message>
       <source>I/O Modules Settings...</source>
-      <translation>I/O Modules Settings...</translation>
+      <translation type="unfinished">I/O Modules Settings...</translation>
     </message>
     <message>
       <source>File Settings...</source>
-      <translation>File Settings...</translation>
+      <translation type="unfinished">File Settings...</translation>
     </message>
     <message>
       <source>Layout Settings...</source>
-      <translation>Layout Settings...</translation>
+      <translation type="unfinished">Layout Settings...</translation>
     </message>
     <message>
       <source>Video Wall Settings...</source>
-      <translation>Video Wall Settings...</translation>
+      <translation type="unfinished">Video Wall Settings...</translation>
     </message>
     <message>
       <source>Devices List by Server...</source>
-      <translation>Devices List by Server...</translation>
+      <translation type="unfinished">Devices List by Server...</translation>
     </message>
     <message>
       <source>Cameras List by Server...</source>
-      <translation>Cameras List by Server...</translation>
+      <translation type="unfinished">Cameras List by Server...</translation>
     </message>
     <message>
       <source>Server Logs...</source>
-      <translation>Server Logs...</translation>
+      <translation type="unfinished">Server Logs...</translation>
     </message>
     <message>
       <source>Server Diagnostics...</source>
-      <translation>Server Diagnostics...</translation>
+      <translation type="unfinished">Server Diagnostics...</translation>
     </message>
     <message>
       <source>Server Web Page...</source>
-      <translation>Server Web Page...</translation>
+      <translation type="unfinished">Server Web Page...</translation>
     </message>
     <message>
       <source>Server Settings...</source>
-      <translation>Server Settings...</translation>
+      <translation type="unfinished">Server Settings...</translation>
     </message>
     <message>
       <source>Merge to Currently Connected System...</source>
-      <translation>Merge to Currently Connected System...</translation>
+      <translation type="unfinished">Merge to Currently Connected System...</translation>
     </message>
     <message>
       <source>None</source>
-      <translation>None</translation>
+      <translation type="unfinished">None</translation>
     </message>
     <message>
       <source>Small</source>
-      <translation>Small</translation>
+      <translation type="unfinished">Small</translation>
     </message>
     <message>
       <source>Medium</source>
-      <translation>Medium</translation>
+      <translation type="unfinished">Medium</translation>
     </message>
     <message>
       <source>Large</source>
-      <translation>Large</translation>
+      <translation type="unfinished">Large</translation>
     </message>
     <message>
       <source>Settings</source>
-      <translation>Settings</translation>
+      <translation type="unfinished">Settings</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation>Close</translation>
+      <translation type="unfinished">Close</translation>
     </message>
     <message>
       <source>Close All But This</source>
-      <translation>Close All But This</translation>
+      <translation type="unfinished">Close All But This</translation>
     </message>
     <message>
       <source>Play</source>
-      <translation>Play</translation>
+      <translation type="unfinished">Play</translation>
     </message>
     <message>
       <source>Pause</source>
-      <translation>Pause</translation>
+      <translation type="unfinished">Pause</translation>
     </message>
     <message>
       <source>Previous Frame</source>
-      <translation>Previous Frame</translation>
+      <translation type="unfinished">Previous Frame</translation>
     </message>
     <message>
       <source>Next Frame</source>
-      <translation>Next Frame</translation>
+      <translation type="unfinished">Next Frame</translation>
     </message>
     <message>
       <source>To Start</source>
-      <translation>To Start</translation>
+      <translation type="unfinished">To Start</translation>
     </message>
     <message>
       <source>To End</source>
-      <translation>To End</translation>
+      <translation type="unfinished">To End</translation>
     </message>
     <message>
       <source>Volume Down</source>
-      <translation>Volume Down</translation>
+      <translation type="unfinished">Volume Down</translation>
     </message>
     <message>
       <source>Volume Up</source>
-      <translation>Volume Up</translation>
+      <translation type="unfinished">Volume Up</translation>
     </message>
     <message>
       <source>Toggle Mute</source>
-      <translation>Toggle Mute</translation>
+      <translation type="unfinished">Toggle Mute</translation>
     </message>
     <message>
       <source>Jump to Live</source>
-      <translation>Jump to Live</translation>
+      <translation type="unfinished">Jump to Live</translation>
     </message>
     <message>
       <source>Synchronize Streams</source>
-      <translation>Synchronize Streams</translation>
+      <translation type="unfinished">Synchronize Streams</translation>
     </message>
     <message>
       <source>Disable Stream Synchronization</source>
-      <translation>Disable Stream Synchronization</translation>
+      <translation type="unfinished">Disable Stream Synchronization</translation>
     </message>
     <message>
       <source>Show Bookmarks</source>
-      <translation>Show Bookmarks</translation>
+      <translation type="unfinished">Show Bookmarks</translation>
     </message>
     <message>
       <source>Hide Bookmarks</source>
-      <translation>Hide Bookmarks</translation>
+      <translation type="unfinished">Hide Bookmarks</translation>
     </message>
     <message>
       <source>Show Calendar</source>
-      <translation>Show Calendar</translation>
+      <translation type="unfinished">Show Calendar</translation>
     </message>
     <message>
       <source>Hide Calendar</source>
-      <translation>Hide Calendar</translation>
+      <translation type="unfinished">Hide Calendar</translation>
     </message>
     <message>
       <source>Show Title Bar</source>
-      <translation>Show Title Bar</translation>
+      <translation type="unfinished">Show Title Bar</translation>
     </message>
     <message>
       <source>Hide Title Bar</source>
-      <translation>Hide Title Bar</translation>
+      <translation type="unfinished">Hide Title Bar</translation>
     </message>
     <message>
       <source>Show Timeline</source>
-      <translation>Show Timeline</translation>
+      <translation type="unfinished">Show Timeline</translation>
     </message>
     <message>
       <source>Hide Timeline</source>
-      <translation>Hide Timeline</translation>
+      <translation type="unfinished">Hide Timeline</translation>
     </message>
     <message>
       <source>Bookmark Log...</source>
-      <translation>Bookmark Log...</translation>
+      <translation type="unfinished">Bookmark Log...</translation>
     </message>
     <message>
       <source>Showreel...</source>
-      <translation>Showreel...</translation>
+      <translation type="unfinished">Showreel...</translation>
     </message>
     <message>
       <source>Remove from Showreel</source>
-      <translation>Remove from Showreel</translation>
+      <translation type="unfinished">Remove from Showreel</translation>
     </message>
     <message>
       <source>Make Showreel</source>
-      <translation>Make Showreel</translation>
+      <translation type="unfinished">Make Showreel</translation>
     </message>
     <message>
       <source>Upload File...</source>
@@ -783,7 +783,7 @@
     </message>
     <message>
       <source>Export Bookmark...</source>
-      <translation>Export Bookmark...</translation>
+      <translation type="unfinished">Export Bookmark...</translation>
     </message>
     <message>
       <source>Resolution...</source>
@@ -827,19 +827,19 @@
     </message>
     <message>
       <source>Show Tree</source>
-      <translation>Show Tree</translation>
+      <translation type="unfinished">Show Tree</translation>
     </message>
     <message>
       <source>Hide Tree</source>
-      <translation>Hide Tree</translation>
+      <translation type="unfinished">Hide Tree</translation>
     </message>
     <message>
       <source>Show Notifications</source>
-      <translation>Show Notifications</translation>
+      <translation type="unfinished">Show Notifications</translation>
     </message>
     <message>
       <source>Hide Notifications</source>
-      <translation>Hide Notifications</translation>
+      <translation type="unfinished">Hide Notifications</translation>
     </message>
     <message>
       <source>Files...</source>
@@ -887,7 +887,7 @@
     </message>
     <message>
       <source>Connect to Another Server...</source>
-      <translation>Connect to Another Server...</translation>
+      <translation type="unfinished">Connect to Another Server...</translation>
     </message>
     <message>
       <source>New</source>
@@ -949,7 +949,7 @@
     </message>
     <message>
       <source>PTZ</source>
-      <translation>PTZ</translation>
+      <translation type="unfinished">PTZ</translation>
     </message>
     <message>
       <source>Rotate to</source>
@@ -1077,7 +1077,7 @@
     </message>
     <message>
       <source>New Layout</source>
-      <translation>New Layout</translation>
+      <translation type="unfinished">New Layout</translation>
     </message>
     <message>
       <source>New Welcome Screen</source>
@@ -1104,35 +1104,35 @@
     <name>Deactivator</name>
     <message>
       <source>Unknown error.</source>
-      <translation>Unknown error.</translation>
+      <translation type="unfinished">Unknown error.</translation>
     </message>
     <message>
       <source>License does not exist.</source>
-      <translation>License does not exist.</translation>
+      <translation type="unfinished">License does not exist.</translation>
     </message>
     <message>
       <source>License is disabled.</source>
-      <translation>License is disabled.</translation>
+      <translation type="unfinished">License is disabled.</translation>
     </message>
     <message>
       <source>License is inactive.</source>
-      <translation>License is inactive.</translation>
+      <translation type="unfinished">License is inactive.</translation>
     </message>
     <message>
       <source>Invalid license.</source>
-      <translation>Invalid license.</translation>
+      <translation type="unfinished">Invalid license.</translation>
     </message>
     <message>
       <source>License is trial.</source>
-      <translation>License is trial.</translation>
+      <translation type="unfinished">License is trial.</translation>
     </message>
     <message>
       <source>License is in pending deactivation state, but has not been deactivated yet.</source>
-      <translation>License is in pending deactivation state, but has not been deactivated yet.</translation>
+      <translation type="unfinished">License is in pending deactivation state, but has not been deactivated yet.</translation>
     </message>
     <message>
       <source>Number of deactivations exceeded limit for this license.</source>
-      <translation>Number of deactivations exceeded limit for this license.</translation>
+      <translation type="unfinished">Number of deactivations exceeded limit for this license.</translation>
     </message>
     <message>
       <source>Hardware ID of Server with this license does not match Hardware ID on which license was activated.</source>
@@ -1150,15 +1150,15 @@
     <name>DropdownTextPickerWidgetStrings</name>
     <message>
       <source>Auto</source>
-      <translation>Auto</translation>
+      <translation type="unfinished">Auto</translation>
     </message>
     <message>
       <source>None</source>
-      <translation>None</translation>
+      <translation type="unfinished">None</translation>
     </message>
     <message>
       <source>automatic</source>
-      <translation>automatic</translation>
+      <translation type="unfinished">automatic</translation>
     </message>
     <message>
       <source>Event Occurs</source>
@@ -1177,7 +1177,7 @@
     <name>DurationPickerWidgetStrings</name>
     <message>
       <source>Instant</source>
-      <translation>Instant</translation>
+      <translation type="unfinished">Instant</translation>
     </message>
     <message>
       <source>No more than once per</source>
@@ -1294,7 +1294,7 @@
     <name>FlagsPickerWidgetStrings</name>
     <message>
       <source>Error</source>
-      <translation>Error</translation>
+      <translation type="unfinished">Error</translation>
     </message>
     <message>
       <source>Warning</source>
@@ -1313,7 +1313,7 @@
     <name>FullscreenActionHelper</name>
     <message>
       <source>Source camera</source>
-      <translation>Source camera</translation>
+      <translation type="unfinished">Source camera</translation>
     </message>
     <message>
       <source>Select device...</source>
@@ -1372,11 +1372,11 @@
     <name>LicenseActivationDialogs</name>
     <message>
       <source>Incompatible license</source>
-      <translation>Incompatible license</translation>
+      <translation type="unfinished">Incompatible license</translation>
     </message>
     <message>
       <source>License you are trying to activate is incompatible with your software.</source>
-      <translation>License you are trying to activate is incompatible with your software.</translation>
+      <translation type="unfinished">License you are trying to activate is incompatible with your software.</translation>
     </message>
     <message>
       <source>To report the issue please contact %1.</source>
@@ -1384,7 +1384,7 @@
     </message>
     <message>
       <source>Failed to activate license</source>
-      <translation>Failed to activate license</translation>
+      <translation type="unfinished">Failed to activate license</translation>
     </message>
     <message>
       <source>Invalid data received.</source>
@@ -1392,23 +1392,23 @@
     </message>
     <message>
       <source>Database error occurred.</source>
-      <translation>Database error occurred.</translation>
+      <translation type="unfinished">Database error occurred.</translation>
     </message>
     <message>
       <source>Invalid License Key</source>
-      <translation>Invalid License Key</translation>
+      <translation type="unfinished">Invalid License Key</translation>
     </message>
     <message>
       <source>Please make sure it is entered correctly.</source>
-      <translation>Please make sure it is entered correctly.</translation>
+      <translation type="unfinished">Please make sure it is entered correctly.</translation>
     </message>
     <message>
       <source>Invalid activation key file</source>
-      <translation>Invalid activation key file</translation>
+      <translation type="unfinished">Invalid activation key file</translation>
     </message>
     <message>
       <source>Select a valid activation key file to continue.</source>
-      <translation>Select a valid activation key file to continue.</translation>
+      <translation type="unfinished">Select a valid activation key file to continue.</translation>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware ID %1</source>
@@ -1420,7 +1420,7 @@
     </message>
     <message>
       <source>License already activated on another server</source>
-      <translation>License already activated on another server</translation>
+      <translation type="unfinished">License already activated on another server</translation>
     </message>
     <message>
       <source>To activate License Key manually please contact %1.</source>
@@ -1428,11 +1428,11 @@
     </message>
     <message>
       <source>Network error</source>
-      <translation>Network error</translation>
+      <translation type="unfinished">Network error</translation>
     </message>
     <message>
       <source>License activated</source>
-      <translation>License activated</translation>
+      <translation type="unfinished">License activated</translation>
     </message>
     <message>
       <source>To report the issue please contact your Regional / License support:</source>
@@ -1448,7 +1448,7 @@
     </message>
     <message>
       <source>License Key</source>
-      <translation>License Key</translation>
+      <translation type="unfinished">License Key</translation>
     </message>
     <message>
       <source>Failed to activate free license</source>
@@ -1456,7 +1456,7 @@
     </message>
     <message>
       <source>Copied</source>
-      <translation>Copied</translation>
+      <translation type="unfinished">Copied</translation>
     </message>
     <message>
       <source>Hardware ID: %1
@@ -1485,25 +1485,25 @@ Kunci Lisensi: %2</translation>
     <name>LicenseDeactivationDialogs</name>
     <message numerus="yes">
       <source>Failed to deactivate %n licenses</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Failed to deactivate %n licenses</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 of %n licenses cannot be deactivated</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%1 of %n licenses cannot be deactivated</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Deactivate %n Other</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Deactivate %n Other</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cannot deactivate licenses</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Cannot deactivate licenses</numerusform>
       </translation>
     </message>
@@ -1513,23 +1513,23 @@ Kunci Lisensi: %2</translation>
     </message>
     <message>
       <source>Cannot connect to the License Server</source>
-      <translation>Cannot connect to the License Server</translation>
+      <translation type="unfinished">Cannot connect to the License Server</translation>
     </message>
     <message>
       <source>Please make sure your server has active Internet connection or check firewall settings.</source>
-      <translation>Please make sure your server has active Internet connection or check firewall settings.</translation>
+      <translation type="unfinished">Please make sure your server has active Internet connection or check firewall settings.</translation>
     </message>
     <message>
       <source>License Server error</source>
-      <translation>License Server error</translation>
+      <translation type="unfinished">License Server error</translation>
     </message>
     <message>
       <source>Failed to remove license from Server</source>
-      <translation>Failed to remove license from Server</translation>
+      <translation type="unfinished">Failed to remove license from Server</translation>
     </message>
     <message numerus="yes">
       <source>%n licenses deactivated</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n licenses deactivated</numerusform>
       </translation>
     </message>
@@ -1538,7 +1538,7 @@ Kunci Lisensi: %2</translation>
     <name>LicenseManagementMessagesPrivate</name>
     <message numerus="yes">
       <source>%n channels.</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n channels.</numerusform>
       </translation>
     </message>
@@ -1571,19 +1571,19 @@ Kunci Lisensi: %2</translation>
     <name>LocalFiles</name>
     <message>
       <source>Path &quot;%1&quot; is invalid. Please try another path.</source>
-      <translation>Path &quot;%1&quot; is invalid. Please try another path.</translation>
+      <translation type="unfinished">Path &quot;%1&quot; is invalid. Please try another path.</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; already exists. Please try another name.</source>
-      <translation>File &quot;%1&quot; already exists. Please try another name.</translation>
+      <translation type="unfinished">File &quot;%1&quot; already exists. Please try another name.</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; is used by another process.</source>
-      <translation>File &quot;%1&quot; is used by another process.</translation>
+      <translation type="unfinished">File &quot;%1&quot; is used by another process.</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; cannot be written. Please try another name.</source>
-      <translation>File &quot;%1&quot; cannot be written. Please try another name.</translation>
+      <translation type="unfinished">File &quot;%1&quot; cannot be written. Please try another name.</translation>
     </message>
     <message>
       <source>File name &quot;%1&quot; is reserved by operating system. Please try another name.</source>
@@ -1601,18 +1601,18 @@ Kunci Lisensi: %2</translation>
     <name>OauthLoginDialog</name>
     <message>
       <source>Connect to System</source>
-      <translation>Connect to System</translation>
+      <translation type="unfinished">Connect to System</translation>
     </message>
   </context>
   <context>
     <name>OutgoingMailSettingsWidget::Private</name>
     <message>
       <source>TLS</source>
-      <translation>TLS</translation>
+      <translation type="unfinished">TLS</translation>
     </message>
     <message>
       <source>SSL</source>
-      <translation>SSL</translation>
+      <translation type="unfinished">SSL</translation>
     </message>
     <message>
       <source>Check</source>
@@ -1624,7 +1624,7 @@ Kunci Lisensi: %2</translation>
     </message>
     <message>
       <source>Enter a short System description here.</source>
-      <translation>Enter a short System description here.</translation>
+      <translation type="unfinished">Enter a short System description here.</translation>
     </message>
     <message>
       <source>Active</source>
@@ -1636,7 +1636,7 @@ Kunci Lisensi: %2</translation>
     </message>
     <message>
       <source>Error</source>
-      <translation>Error</translation>
+      <translation type="unfinished">Error</translation>
     </message>
     <message>
       <source>Set your email address or SMTP server</source>
@@ -1663,11 +1663,11 @@ Kunci Lisensi: %2</translation>
     </message>
     <message>
       <source>Success</source>
-      <translation>Success</translation>
+      <translation type="unfinished">Success</translation>
     </message>
     <message>
       <source>Authentication failed</source>
-      <translation>Authentication failed</translation>
+      <translation type="unfinished">Authentication failed</translation>
     </message>
     <message>
       <source>Unknown error</source>
@@ -1723,15 +1723,15 @@ Kunci Lisensi: %2</translation>
     <name>PasswordInformation</name>
     <message>
       <source>Good</source>
-      <translation>Good</translation>
+      <translation type="unfinished">Good</translation>
     </message>
     <message>
       <source>Fair</source>
-      <translation>Fair</translation>
+      <translation type="unfinished">Fair</translation>
     </message>
     <message>
       <source>Weak</source>
-      <translation>Weak</translation>
+      <translation type="unfinished">Weak</translation>
     </message>
     <message numerus="yes">
       <source>Password should contain %n different combinations of either characters, symbols, or digits</source>
@@ -1741,7 +1741,7 @@ Kunci Lisensi: %2</translation>
     </message>
     <message>
       <source>Short</source>
-      <translation>Short</translation>
+      <translation type="unfinished">Short</translation>
     </message>
     <message>
       <source>Long</source>
@@ -1749,11 +1749,11 @@ Kunci Lisensi: %2</translation>
     </message>
     <message>
       <source>Common</source>
-      <translation>Common</translation>
+      <translation type="unfinished">Common</translation>
     </message>
     <message>
       <source>Incorrect</source>
-      <translation>Incorrect</translation>
+      <translation type="unfinished">Incorrect</translation>
     </message>
     <message>
       <source>Password should contain different types of symbols</source>
@@ -1800,31 +1800,31 @@ Kunci Lisensi: %2</translation>
     <name>Ptz</name>
     <message>
       <source>Cannot get the current position from camera &quot;%1&quot;</source>
-      <translation>Cannot get the current position from camera &quot;%1&quot;</translation>
+      <translation type="unfinished">Cannot get the current position from camera &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Please wait for the camera to go online.</source>
-      <translation>Please wait for the camera to go online.</translation>
+      <translation type="unfinished">Please wait for the camera to go online.</translation>
     </message>
     <message>
       <source>Failed to get current position</source>
-      <translation>Failed to get current position</translation>
+      <translation type="unfinished">Failed to get current position</translation>
     </message>
     <message>
       <source>Cannot set the current position for camera &quot;%1&quot;</source>
-      <translation>Cannot set the current position for camera &quot;%1&quot;</translation>
+      <translation type="unfinished">Cannot set the current position for camera &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Failed to set current position</source>
-      <translation>Failed to set current position</translation>
+      <translation type="unfinished">Failed to set current position</translation>
     </message>
     <message>
       <source>Preset used by some tours. Delete it anyway?</source>
-      <translation>Preset used by some tours. Delete it anyway?</translation>
+      <translation type="unfinished">Preset used by some tours. Delete it anyway?</translation>
     </message>
     <message>
       <source>These tours will become invalid.</source>
-      <translation>These tours will become invalid.</translation>
+      <translation type="unfinished">These tours will become invalid.</translation>
     </message>
   </context>
   <context>
@@ -1870,11 +1870,11 @@ Kunci Lisensi: %2</translation>
     </message>
     <message>
       <source>Focus Far</source>
-      <translation>Focus Far</translation>
+      <translation type="unfinished">Focus Far</translation>
     </message>
     <message>
       <source>Focus Near</source>
-      <translation>Focus Near</translation>
+      <translation type="unfinished">Focus Near</translation>
     </message>
     <message>
       <source>Auto Focus</source>
@@ -1896,27 +1896,27 @@ Kunci Lisensi: %2</translation>
     <name>QnAboutDialog</name>
     <message>
       <source>OpenGL version</source>
-      <translation>OpenGL version</translation>
+      <translation type="unfinished">OpenGL version</translation>
     </message>
     <message>
       <source>OpenGL renderer</source>
-      <translation>OpenGL renderer</translation>
+      <translation type="unfinished">OpenGL renderer</translation>
     </message>
     <message>
       <source>OpenGL vendor</source>
-      <translation>OpenGL vendor</translation>
+      <translation type="unfinished">OpenGL vendor</translation>
     </message>
     <message>
       <source>OpenGL max texture size</source>
-      <translation>OpenGL max texture size</translation>
+      <translation type="unfinished">OpenGL max texture size</translation>
     </message>
     <message>
       <source>%1 version %2 (%3).</source>
-      <translation>%1 version %2 (%3).</translation>
+      <translation type="unfinished">%1 version %2 (%3).</translation>
     </message>
     <message>
       <source>Built for %1-%2 with %3.</source>
-      <translation>Built for %1-%2 with %3.</translation>
+      <translation type="unfinished">Built for %1-%2 with %3.</translation>
     </message>
     <message>
       <source>Regional / License support</source>
@@ -1967,22 +1967,22 @@ Kunci Lisensi: %2</translation>
     <name>QnAbstractPtzDialog</name>
     <message>
       <source>Loading...</source>
-      <translation>Loading...</translation>
+      <translation type="unfinished">Loading...</translation>
     </message>
     <message>
       <source>Saving...</source>
-      <translation>Saving...</translation>
+      <translation type="unfinished">Saving...</translation>
     </message>
   </context>
   <context>
     <name>QnAdjustVideoDialog</name>
     <message>
       <source>Image Enhancement</source>
-      <translation>Image Enhancement</translation>
+      <translation type="unfinished">Image Enhancement</translation>
     </message>
     <message>
       <source>Image Enhancement - %1</source>
-      <translation>Image Enhancement - %1</translation>
+      <translation type="unfinished">Image Enhancement - %1</translation>
     </message>
   </context>
   <context>
@@ -2001,7 +2001,7 @@ Kunci Lisensi: %2</translation>
     </message>
     <message>
       <source>Disabled</source>
-      <translation>Disabled</translation>
+      <translation type="unfinished">Disabled</translation>
     </message>
     <message>
       <source>Recommended</source>
@@ -2067,108 +2067,108 @@ Kunci Lisensi: %2</translation>
     <name>QnAuditItemDelegate</name>
     <message>
       <source>Play</source>
-      <translation>Play</translation>
+      <translation type="unfinished">Play</translation>
     </message>
     <message>
       <source>User settings...</source>
-      <translation>User settings...</translation>
+      <translation type="unfinished">User settings...</translation>
     </message>
     <message>
       <source>Server settings...</source>
-      <translation>Server settings...</translation>
+      <translation type="unfinished">Server settings...</translation>
     </message>
     <message>
       <source>Camera settings...</source>
-      <translation>Camera settings...</translation>
+      <translation type="unfinished">Camera settings...</translation>
     </message>
   </context>
   <context>
     <name>QnAuditLogDialog</name>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation>Copy Selection to Clipboard</translation>
+      <translation type="unfinished">Copy Selection to Clipboard</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation>Export Selection to File...</translation>
+      <translation type="unfinished">Export Selection to File...</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation>Select All</translation>
+      <translation type="unfinished">Select All</translation>
     </message>
     <message>
       <source>Export selected records to a file</source>
-      <translation>Export selected records to a file</translation>
+      <translation type="unfinished">Export selected records to a file</translation>
     </message>
     <message>
       <source>Devices</source>
-      <translation>Devices</translation>
+      <translation type="unfinished">Devices</translation>
     </message>
     <message>
       <source>Cameras</source>
-      <translation>Cameras</translation>
+      <translation type="unfinished">Cameras</translation>
     </message>
     <message>
       <source>Device actions</source>
-      <translation>Device actions</translation>
+      <translation type="unfinished">Device actions</translation>
     </message>
     <message>
       <source>Camera actions</source>
-      <translation>Camera actions</translation>
+      <translation type="unfinished">Camera actions</translation>
     </message>
     <message>
       <source>No sessions</source>
-      <translation>No sessions</translation>
+      <translation type="unfinished">No sessions</translation>
     </message>
     <message>
       <source>No cameras</source>
-      <translation>No cameras</translation>
+      <translation type="unfinished">No cameras</translation>
     </message>
     <message>
       <source>Select sessions to see their details</source>
-      <translation>Select sessions to see their details</translation>
+      <translation type="unfinished">Select sessions to see their details</translation>
     </message>
     <message>
       <source>Select cameras to see their details</source>
-      <translation>Select cameras to see their details</translation>
+      <translation type="unfinished">Select cameras to see their details</translation>
     </message>
     <message>
       <source>No archive for this position</source>
-      <translation>No archive for this position</translation>
+      <translation type="unfinished">No archive for this position</translation>
     </message>
     <message numerus="yes">
       <source>These devices are removed from System</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>These devices are removed from System</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These cameras are removed from System</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>These cameras are removed from System</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These servers are removed from System</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>These servers are removed from System</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These users are removed from System</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>These users are removed from System</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These resources are removed from System</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>These resources are removed from System</numerusform>
       </translation>
     </message>
     <message>
       <source>Audit trail replay</source>
-      <translation>Audit trail replay</translation>
+      <translation type="unfinished">Audit trail replay</translation>
     </message>
     <message numerus="yes">
       <source>Details for %n sessions of %1</source>
@@ -2189,139 +2189,139 @@ Kunci Lisensi: %2</translation>
     <name>QnAuditLogModel</name>
     <message>
       <source>Unknown</source>
-      <translation>Unknown</translation>
+      <translation type="unfinished">Unknown</translation>
     </message>
     <message>
       <source>Unsuccessful login</source>
-      <translation>Unsuccessful login</translation>
+      <translation type="unfinished">Unsuccessful login</translation>
     </message>
     <message>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation type="unfinished">Login</translation>
     </message>
     <message>
       <source>User updated</source>
-      <translation>User updated</translation>
+      <translation type="unfinished">User updated</translation>
     </message>
     <message>
       <source>Watching live</source>
-      <translation>Watching live</translation>
+      <translation type="unfinished">Watching live</translation>
     </message>
     <message>
       <source>Watching archive</source>
-      <translation>Watching archive</translation>
+      <translation type="unfinished">Watching archive</translation>
     </message>
     <message>
       <source>Exporting video</source>
-      <translation>Exporting video</translation>
+      <translation type="unfinished">Exporting video</translation>
     </message>
     <message>
       <source>System name changed</source>
-      <translation>System name changed</translation>
+      <translation type="unfinished">System name changed</translation>
     </message>
     <message>
       <source>System merge</source>
-      <translation>System merge</translation>
+      <translation type="unfinished">System merge</translation>
     </message>
     <message>
       <source>General settings updated</source>
-      <translation>General settings updated</translation>
+      <translation type="unfinished">General settings updated</translation>
     </message>
     <message>
       <source>Server updated</source>
-      <translation>Server updated</translation>
+      <translation type="unfinished">Server updated</translation>
     </message>
     <message>
       <source>Server removed</source>
-      <translation>Server removed</translation>
+      <translation type="unfinished">Server removed</translation>
     </message>
     <message>
       <source>User removed</source>
-      <translation>User removed</translation>
+      <translation type="unfinished">User removed</translation>
     </message>
     <message>
       <source>Database restored</source>
-      <translation>Database restored</translation>
+      <translation type="unfinished">Database restored</translation>
     </message>
     <message>
       <source>Session begins</source>
-      <translation>Session begins</translation>
+      <translation type="unfinished">Session begins</translation>
     </message>
     <message>
       <source>Session ends</source>
-      <translation>Session ends</translation>
+      <translation type="unfinished">Session ends</translation>
     </message>
     <message>
       <source>Duration</source>
-      <translation>Duration</translation>
+      <translation type="unfinished">Duration</translation>
     </message>
     <message>
       <source>User</source>
-      <translation>User</translation>
+      <translation type="unfinished">User</translation>
     </message>
     <message>
       <source>IP</source>
-      <translation>IP</translation>
+      <translation type="unfinished">IP</translation>
     </message>
     <message>
       <source>Activity</source>
-      <translation>Activity</translation>
+      <translation type="unfinished">Activity</translation>
     </message>
     <message>
       <source>Date</source>
-      <translation>Date</translation>
+      <translation type="unfinished">Date</translation>
     </message>
     <message>
       <source>Time</source>
-      <translation>Time</translation>
+      <translation type="unfinished">Time</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation>Description</translation>
+      <translation type="unfinished">Description</translation>
     </message>
     <message>
       <source>Click to expand</source>
-      <translation>Click to expand</translation>
+      <translation type="unfinished">Click to expand</translation>
     </message>
     <message>
       <source>Device updated</source>
-      <translation>Device updated</translation>
+      <translation type="unfinished">Device updated</translation>
     </message>
     <message>
       <source>Camera updated</source>
-      <translation>Camera updated</translation>
+      <translation type="unfinished">Camera updated</translation>
     </message>
     <message>
       <source>Device added</source>
-      <translation>Device added</translation>
+      <translation type="unfinished">Device added</translation>
     </message>
     <message>
       <source>Camera added</source>
-      <translation>Camera added</translation>
+      <translation type="unfinished">Camera added</translation>
     </message>
     <message>
       <source>Device removed</source>
-      <translation>Device removed</translation>
+      <translation type="unfinished">Device removed</translation>
     </message>
     <message>
       <source>Camera removed</source>
-      <translation>Camera removed</translation>
+      <translation type="unfinished">Camera removed</translation>
     </message>
     <message>
       <source>Device name</source>
-      <translation>Device name</translation>
+      <translation type="unfinished">Device name</translation>
     </message>
     <message>
       <source>Camera name</source>
-      <translation>Camera name</translation>
+      <translation type="unfinished">Camera name</translation>
     </message>
     <message>
       <source>Email settings changed</source>
-      <translation>Email settings changed</translation>
+      <translation type="unfinished">Email settings changed</translation>
     </message>
     <message>
       <source>Filled circle mark means the archive is still available</source>
-      <translation>Filled circle mark means the archive is still available</translation>
+      <translation type="unfinished">Filled circle mark means the archive is still available</translation>
     </message>
     <message>
       <source>Update installed</source>
@@ -2390,7 +2390,7 @@ Kunci Lisensi: %2</translation>
     <name>QnBlinkingImageButtonWidget</name>
     <message numerus="yes">
       <source>You have %n notifications</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>You have %n notifications</numerusform>
       </translation>
     </message>
@@ -2399,27 +2399,27 @@ Kunci Lisensi: %2</translation>
     <name>QnBookmarkWidget</name>
     <message>
       <source>Do not lock archive</source>
-      <translation>Do not lock archive</translation>
+      <translation type="unfinished">Do not lock archive</translation>
     </message>
     <message>
       <source>1 month</source>
-      <translation>1 month</translation>
+      <translation type="unfinished">1 month</translation>
     </message>
     <message>
       <source>3 month</source>
-      <translation>3 month</translation>
+      <translation type="unfinished">3 month</translation>
     </message>
     <message>
       <source>6 month</source>
-      <translation>6 month</translation>
+      <translation type="unfinished">6 month</translation>
     </message>
     <message>
       <source>Name cannot be empty.</source>
-      <translation>Name cannot be empty.</translation>
+      <translation type="unfinished">Name cannot be empty.</translation>
     </message>
     <message>
       <source>Description cannot be empty</source>
-      <translation>Description cannot be empty</translation>
+      <translation type="unfinished">Description cannot be empty</translation>
     </message>
     <message>
       <source>Year</source>
@@ -2430,94 +2430,94 @@ Kunci Lisensi: %2</translation>
     <name>QnBusinessResourceValidationStrings</name>
     <message numerus="yes">
       <source>%1 of %n devices</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%1 of %n devices</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 of %n cameras</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%1 of %n cameras</numerusform>
       </translation>
     </message>
     <message>
       <source>Select at least one device</source>
-      <translation>Select at least one device</translation>
+      <translation type="unfinished">Select at least one device</translation>
     </message>
     <message>
       <source>Select at least one camera</source>
-      <translation>Select at least one camera</translation>
+      <translation type="unfinished">Select at least one camera</translation>
     </message>
     <message numerus="yes">
       <source>%1 of %n I/O modules</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%1 of %n I/O modules</numerusform>
       </translation>
     </message>
     <message>
       <source>Any Device</source>
-      <translation>Any Device</translation>
+      <translation type="unfinished">Any Device</translation>
     </message>
     <message>
       <source>Any Camera</source>
-      <translation>Any Camera</translation>
+      <translation type="unfinished">Any Camera</translation>
     </message>
   </context>
   <context>
     <name>QnBusinessRuleViewModel</name>
     <message>
       <source>Error: %1</source>
-      <translation>Error: %1</translation>
+      <translation type="unfinished">Error: %1</translation>
     </message>
     <message>
       <source>Instant</source>
-      <translation>Instant</translation>
+      <translation type="unfinished">Instant</translation>
     </message>
     <message>
       <source>Stops</source>
-      <translation>Stops</translation>
+      <translation type="unfinished">Stops</translation>
     </message>
     <message>
       <source>Starts</source>
-      <translation>Starts</translation>
+      <translation type="unfinished">Starts</translation>
     </message>
     <message>
       <source>Occurs</source>
-      <translation>Occurs</translation>
+      <translation type="unfinished">Occurs</translation>
     </message>
     <message>
       <source>N/A</source>
-      <translation>N/A</translation>
+      <translation type="unfinished">N/A</translation>
     </message>
     <message>
       <source>Every %1</source>
-      <translation>Every %1</translation>
+      <translation type="unfinished">Every %1</translation>
     </message>
     <message>
       <source>System</source>
-      <translation>System</translation>
+      <translation type="unfinished">System</translation>
     </message>
     <message>
       <source>Any Server</source>
-      <translation>Any Server</translation>
+      <translation type="unfinished">Any Server</translation>
     </message>
     <message>
       <source>Any Device</source>
-      <translation>Any Device</translation>
+      <translation type="unfinished">Any Device</translation>
     </message>
     <message>
       <source>Any Camera</source>
-      <translation>Any Camera</translation>
+      <translation type="unfinished">Any Camera</translation>
     </message>
     <message numerus="yes">
       <source>%n Servers</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n Servers</numerusform>
       </translation>
     </message>
     <message>
       <source>User</source>
-      <translation>User</translation>
+      <translation type="unfinished">User</translation>
     </message>
     <message>
       <source>Source Server</source>
@@ -2555,36 +2555,36 @@ Kunci Lisensi: %2</translation>
     <message>
       <source>to</source>
       <extracomment>&quot;to&quot; is from the sentence &quot;Send email _to_:&quot;</extracomment>
-      <translation>to</translation>
+      <translation type="unfinished">to</translation>
     </message>
     <message>
       <source>at</source>
       <extracomment>&quot;at&quot; is from the sentence &quot;Display the text _at_ these cameras&quot;</extracomment>
-      <translation>at</translation>
+      <translation type="unfinished">at</translation>
     </message>
     <message>
       <source>Select at least one device</source>
-      <translation>Select at least one device</translation>
+      <translation type="unfinished">Select at least one device</translation>
     </message>
     <message>
       <source>Select at least one camera</source>
-      <translation>Select at least one camera</translation>
+      <translation type="unfinished">Select at least one camera</translation>
     </message>
     <message>
       <source>Devices</source>
-      <translation>Devices</translation>
+      <translation type="unfinished">Devices</translation>
     </message>
     <message>
       <source>Cameras</source>
-      <translation>Cameras</translation>
+      <translation type="unfinished">Cameras</translation>
     </message>
     <message>
       <source>Any Device</source>
-      <translation>Any Device</translation>
+      <translation type="unfinished">Any Device</translation>
     </message>
     <message>
       <source>Any Camera</source>
-      <translation>Any Camera</translation>
+      <translation type="unfinished">Any Camera</translation>
     </message>
     <message>
       <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
@@ -2599,47 +2599,47 @@ Kunci Lisensi: %2</translation>
     <name>QnBusinessRulesDialog</name>
     <message>
       <source>&amp;New...</source>
-      <translation>&amp;New...</translation>
+      <translation type="unfinished">&amp;New...</translation>
     </message>
     <message>
       <source>&amp;Delete</source>
-      <translation>&amp;Delete</translation>
+      <translation type="unfinished">&amp;Delete</translation>
     </message>
     <message>
       <source>&amp;Schedule...</source>
-      <translation>&amp;Schedule...</translation>
+      <translation type="unfinished">&amp;Schedule...</translation>
     </message>
     <message>
       <source>Restore All Rules to Default</source>
-      <translation>Restore All Rules to Default</translation>
+      <translation type="unfinished">Restore All Rules to Default</translation>
     </message>
     <message>
       <source>No event rules</source>
-      <translation>No event rules</translation>
+      <translation type="unfinished">No event rules</translation>
     </message>
     <message>
       <source>Filter by devices...</source>
-      <translation>Filter by devices...</translation>
+      <translation type="unfinished">Filter by devices...</translation>
     </message>
     <message>
       <source>Filter by cameras...</source>
-      <translation>Filter by cameras...</translation>
+      <translation type="unfinished">Filter by cameras...</translation>
     </message>
     <message>
       <source>Failed to retrieve rules</source>
-      <translation>Failed to retrieve rules</translation>
+      <translation type="unfinished">Failed to retrieve rules</translation>
     </message>
     <message>
       <source>Failed to save rule</source>
-      <translation>Failed to save rule</translation>
+      <translation type="unfinished">Failed to save rule</translation>
     </message>
     <message>
       <source>This action cannot be undone.</source>
-      <translation>This action cannot be undone.</translation>
+      <translation type="unfinished">This action cannot be undone.</translation>
     </message>
     <message>
       <source>Restore all rules to default?</source>
-      <translation>Restore all rules to default?</translation>
+      <translation type="unfinished">Restore all rules to default?</translation>
     </message>
     <message>
       <source>Some rules are not valid and may not work</source>
@@ -2654,27 +2654,27 @@ Kunci Lisensi: %2</translation>
     <name>QnBusinessRulesViewModel</name>
     <message>
       <source>On</source>
-      <translation>On</translation>
+      <translation type="unfinished">On</translation>
     </message>
     <message>
       <source>Event</source>
-      <translation>Event</translation>
+      <translation type="unfinished">Event</translation>
     </message>
     <message>
       <source>Source</source>
-      <translation>Source</translation>
+      <translation type="unfinished">Source</translation>
     </message>
     <message>
       <source>Action</source>
-      <translation>Action</translation>
+      <translation type="unfinished">Action</translation>
     </message>
     <message>
       <source>Target</source>
-      <translation>Target</translation>
+      <translation type="unfinished">Target</translation>
     </message>
     <message>
       <source>Interval of Action</source>
-      <translation>Interval of Action</translation>
+      <translation type="unfinished">Interval of Action</translation>
     </message>
   </context>
   <context>
@@ -2703,15 +2703,15 @@ Kunci Lisensi: %2</translation>
     <name>QnCameraAudioTransmitPolicy</name>
     <message>
       <source>Select device</source>
-      <translation>Select device</translation>
+      <translation type="unfinished">Select device</translation>
     </message>
     <message>
       <source>Select camera</source>
-      <translation>Select camera</translation>
+      <translation type="unfinished">Select camera</translation>
     </message>
     <message numerus="yes">
       <source>%1 does not support two-way audio</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%1 does not support two-way audio</numerusform>
       </translation>
     </message>
@@ -2720,85 +2720,85 @@ Kunci Lisensi: %2</translation>
     <name>QnCameraDiagnosticsDialog</name>
     <message>
       <source>OK</source>
-      <translation>OK</translation>
+      <translation type="unfinished">OK</translation>
     </message>
     <message>
       <source>FAILED: %1</source>
-      <translation>FAILED: %1</translation>
+      <translation type="unfinished">FAILED: %1</translation>
     </message>
     <message>
       <source>Confirming server availability.</source>
-      <translation>Confirming server availability.</translation>
+      <translation type="unfinished">Confirming server availability.</translation>
     </message>
     <message>
       <source>Evaluating media stream for errors.</source>
-      <translation>Evaluating media stream for errors.</translation>
+      <translation type="unfinished">Evaluating media stream for errors.</translation>
     </message>
     <message>
       <source>Diagnostics for device %1</source>
-      <translation>Diagnostics for device %1</translation>
+      <translation type="unfinished">Diagnostics for device %1</translation>
     </message>
     <message>
       <source>Diagnostics for camera %1</source>
-      <translation>Diagnostics for camera %1</translation>
+      <translation type="unfinished">Diagnostics for camera %1</translation>
     </message>
     <message>
       <source>Device Diagnostics</source>
-      <translation>Device Diagnostics</translation>
+      <translation type="unfinished">Device Diagnostics</translation>
     </message>
     <message>
       <source>Camera Diagnostics</source>
-      <translation>Camera Diagnostics</translation>
+      <translation type="unfinished">Camera Diagnostics</translation>
     </message>
     <message>
       <source>Confirming device is accessible.</source>
-      <translation>Confirming device is accessible.</translation>
+      <translation type="unfinished">Confirming device is accessible.</translation>
     </message>
     <message>
       <source>Confirming camera is accessible.</source>
-      <translation>Confirming camera is accessible.</translation>
+      <translation type="unfinished">Confirming camera is accessible.</translation>
     </message>
     <message>
       <source>Confirming target device provides media stream.</source>
-      <translation>Confirming target device provides media stream.</translation>
+      <translation type="unfinished">Confirming target device provides media stream.</translation>
     </message>
     <message>
       <source>Confirming target camera provides media stream.</source>
-      <translation>Confirming target camera provides media stream.</translation>
+      <translation type="unfinished">Confirming target camera provides media stream.</translation>
     </message>
     <message>
       <source>Diagnostics for I/O module %1</source>
-      <translation>Diagnostics for I/O module %1</translation>
+      <translation type="unfinished">Diagnostics for I/O module %1</translation>
     </message>
     <message>
       <source>I/O Module Diagnostics</source>
-      <translation>I/O Module Diagnostics</translation>
+      <translation type="unfinished">I/O Module Diagnostics</translation>
     </message>
     <message>
       <source>Confirming I/O module is accessible.</source>
-      <translation>Confirming I/O module is accessible.</translation>
+      <translation type="unfinished">Confirming I/O module is accessible.</translation>
     </message>
     <message>
       <source>Confirming target I/O module provides media stream.</source>
-      <translation>Confirming target I/O module provides media stream.</translation>
+      <translation type="unfinished">Confirming target I/O module provides media stream.</translation>
     </message>
     <message>
       <source>Diagnostics complete</source>
-      <translation>Diagnostics complete</translation>
+      <translation type="unfinished">Diagnostics complete</translation>
     </message>
   </context>
   <context>
     <name>QnCameraInputBusinessEventWidget</name>
     <message>
       <source>automatic</source>
-      <translation>automatic</translation>
+      <translation type="unfinished">automatic</translation>
     </message>
   </context>
   <context>
     <name>QnCameraInputPolicy</name>
     <message numerus="yes">
       <source>%1 have no input ports</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%1 have no input ports</numerusform>
       </translation>
     </message>
@@ -2807,98 +2807,98 @@ Kunci Lisensi: %2</translation>
     <name>QnCameraListDialog</name>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation>Copy Selection to Clipboard</translation>
+      <translation type="unfinished">Copy Selection to Clipboard</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation>Export Selection to File...</translation>
+      <translation type="unfinished">Export Selection to File...</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation>Select All</translation>
+      <translation type="unfinished">Select All</translation>
     </message>
     <message>
       <source>Devices List</source>
-      <translation>Devices List</translation>
+      <translation type="unfinished">Devices List</translation>
     </message>
     <message>
       <source>Cameras List</source>
-      <translation>Cameras List</translation>
+      <translation type="unfinished">Cameras List</translation>
     </message>
     <message numerus="yes">
       <source>%n devices found</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n devices found</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras found</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n cameras found</numerusform>
       </translation>
     </message>
     <message>
       <source>Export selected devices to a file.</source>
-      <translation>Export selected devices to a file.</translation>
+      <translation type="unfinished">Export selected devices to a file.</translation>
     </message>
     <message>
       <source>Export selected cameras to a file.</source>
-      <translation>Export selected cameras to a file.</translation>
+      <translation type="unfinished">Export selected cameras to a file.</translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules found</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n I/O modules found</numerusform>
       </translation>
     </message>
     <message>
       <source>No cameras</source>
-      <translation>No cameras</translation>
+      <translation type="unfinished">No cameras</translation>
     </message>
     <message>
       <source>Devices List for %1</source>
       <comment>%1 will be substituted with a server name</comment>
-      <translation>Devices List for %1</translation>
+      <translation type="unfinished">Devices List for %1</translation>
     </message>
     <message>
       <source>Cameras List for %1</source>
       <comment>%1 will be substituted with a server name</comment>
-      <translation>Cameras List for %1</translation>
+      <translation type="unfinished">Cameras List for %1</translation>
     </message>
   </context>
   <context>
     <name>QnCameraListModel</name>
     <message>
       <source>Recording</source>
-      <translation>Recording</translation>
+      <translation type="unfinished">Recording</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation>Name</translation>
+      <translation type="unfinished">Name</translation>
     </message>
     <message>
       <source>Vendor</source>
-      <translation>Vendor</translation>
+      <translation type="unfinished">Vendor</translation>
     </message>
     <message>
       <source>Model</source>
-      <translation>Model</translation>
+      <translation type="unfinished">Model</translation>
     </message>
     <message>
       <source>Firmware</source>
-      <translation>Firmware</translation>
+      <translation type="unfinished">Firmware</translation>
     </message>
     <message>
       <source>IP/Name</source>
-      <translation>IP/Name</translation>
+      <translation type="unfinished">IP/Name</translation>
     </message>
     <message>
       <source>MAC address</source>
-      <translation>MAC address</translation>
+      <translation type="unfinished">MAC address</translation>
     </message>
     <message>
       <source>Server</source>
-      <translation>Server</translation>
+      <translation type="unfinished">Server</translation>
     </message>
     <message>
       <source>ID</source>
@@ -2913,21 +2913,21 @@ Kunci Lisensi: %2</translation>
     <name>QnCameraMotionPolicy</name>
     <message>
       <source>Recording or motion detection is disabled for %1</source>
-      <translation>Recording or motion detection is disabled for %1</translation>
+      <translation type="unfinished">Recording or motion detection is disabled for %1</translation>
     </message>
   </context>
   <context>
     <name>QnCameraOutputBusinessActionWidget</name>
     <message>
       <source>automatic</source>
-      <translation>automatic</translation>
+      <translation type="unfinished">automatic</translation>
     </message>
   </context>
   <context>
     <name>QnCameraOutputPolicy</name>
     <message numerus="yes">
       <source>%1 have no output relays</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%1 have no output relays</numerusform>
       </translation>
     </message>
@@ -2936,7 +2936,7 @@ Kunci Lisensi: %2</translation>
     <name>QnCameraPasswordChangeDialog</name>
     <message>
       <source>New Password</source>
-      <translation>New Password</translation>
+      <translation type="unfinished">New Password</translation>
     </message>
     <message>
       <source>Repeat Password</source>
@@ -2959,22 +2959,22 @@ Kunci Lisensi: %2</translation>
     <name>QnCameraRecordingPolicy</name>
     <message>
       <source>Recording is disabled for %1</source>
-      <translation>Recording is disabled for %1</translation>
+      <translation type="unfinished">Recording is disabled for %1</translation>
     </message>
   </context>
   <context>
     <name>QnChangeUserPasswordDialog</name>
     <message>
       <source>New Password</source>
-      <translation>New Password</translation>
+      <translation type="unfinished">New Password</translation>
     </message>
     <message>
       <source>Confirm Password</source>
-      <translation>Confirm Password</translation>
+      <translation type="unfinished">Confirm Password</translation>
     </message>
     <message>
       <source>Current Password</source>
-      <translation>Current Password</translation>
+      <translation type="unfinished">Current Password</translation>
     </message>
     <message>
       <source>Passwords do not match</source>
@@ -2994,17 +2994,17 @@ Kunci Lisensi: %2</translation>
     <message>
       <source>Disconnect System from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Disconnect System from %1</translation>
+      <translation type="unfinished">Disconnect System from %1</translation>
     </message>
     <message>
       <source>Open %1 Portal</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Open %1 Portal</translation>
+      <translation type="unfinished">Open %1 Portal</translation>
     </message>
     <message>
       <source>Connect System to %1...</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Connect System to %1...</translation>
+      <translation type="unfinished">Connect System to %1...</translation>
     </message>
     <message>
       <source>Enter your account password to disconnect System from %1</source>
@@ -3013,7 +3013,7 @@ Kunci Lisensi: %2</translation>
     </message>
     <message>
       <source>Disconnect</source>
-      <translation>Disconnect</translation>
+      <translation type="unfinished">Disconnect</translation>
     </message>
     <message>
       <source>System disconnected from %1</source>
@@ -3130,12 +3130,12 @@ Kunci Lisensi: %2</translation>
     <name>QnCloudStatusPanel</name>
     <message>
       <source>Logging in...</source>
-      <translation>Logging in...</translation>
+      <translation type="unfinished">Logging in...</translation>
     </message>
     <message>
       <source>Cannot connect to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Cannot connect to %1</translation>
+      <translation type="unfinished">Cannot connect to %1</translation>
     </message>
     <message>
       <source>Connect to Server</source>
@@ -3146,7 +3146,7 @@ Kunci Lisensi: %2</translation>
     <name>QnCloudUserPanelWidget</name>
     <message>
       <source>Account Settings</source>
-      <translation>Account Settings</translation>
+      <translation type="unfinished">Account Settings</translation>
     </message>
   </context>
   <context>
@@ -3163,65 +3163,65 @@ Kunci Lisensi: %2</translation>
     <name>QnConnectionDiagnosticsHelper</name>
     <message>
       <source>Please close the application and start it again using the shortcut in the start menu.</source>
-      <translation>Please close the application and start it again using the shortcut in the start menu.</translation>
+      <translation type="unfinished">Please close the application and start it again using the shortcut in the start menu.</translation>
     </message>
     <message>
       <source>Failed to connect to Server</source>
-      <translation>Failed to connect to Server</translation>
+      <translation type="unfinished">Failed to connect to Server</translation>
     </message>
     <message>
       <source>Client and Server have different versions</source>
-      <translation>Client and Server have different versions</translation>
+      <translation type="unfinished">Client and Server have different versions</translation>
     </message>
     <message>
       <source>Client - %1</source>
       <comment>%1 is version</comment>
-      <translation>Client - %1</translation>
+      <translation type="unfinished">Client - %1</translation>
     </message>
     <message>
       <source>Server - %1</source>
       <comment>%1 is version</comment>
-      <translation>Server - %1</translation>
+      <translation type="unfinished">Server - %1</translation>
     </message>
     <message>
       <source>Download Client version %1?</source>
-      <translation>Download Client version %1?</translation>
+      <translation type="unfinished">Download Client version %1?</translation>
     </message>
     <message>
       <source>Restart</source>
-      <translation>Restart</translation>
+      <translation type="unfinished">Restart</translation>
     </message>
     <message>
       <source>Failed to download and launch version %1</source>
-      <translation>Failed to download and launch version %1</translation>
+      <translation type="unfinished">Failed to download and launch version %1</translation>
     </message>
     <message>
       <source>Try Again</source>
-      <translation>Try Again</translation>
+      <translation type="unfinished">Try Again</translation>
     </message>
     <message>
       <source>Failed to restart %1 in compatibility mode</source>
-      <translation>Failed to restart %1 in compatibility mode</translation>
+      <translation type="unfinished">Failed to restart %1 in compatibility mode</translation>
     </message>
     <message>
       <source>Please close %1 and start it again using the shortcut in the start menu.</source>
-      <translation>Please close %1 and start it again using the shortcut in the start menu.</translation>
+      <translation type="unfinished">Please close %1 and start it again using the shortcut in the start menu.</translation>
     </message>
     <message>
       <source>You have to download another version of %1 to connect to this Server.</source>
-      <translation>You have to download another version of %1 to connect to this Server.</translation>
+      <translation type="unfinished">You have to download another version of %1 to connect to this Server.</translation>
     </message>
     <message>
       <source>You have to restart %1 in compatibility mode to connect to this Server.</source>
-      <translation>You have to restart %1 in compatibility mode to connect to this Server.</translation>
+      <translation type="unfinished">You have to restart %1 in compatibility mode to connect to this Server.</translation>
     </message>
     <message>
       <source>Restart %1 in compatibility mode?</source>
-      <translation>Restart %1 in compatibility mode?</translation>
+      <translation type="unfinished">Restart %1 in compatibility mode?</translation>
     </message>
     <message>
       <source>Failed to restart %1</source>
-      <translation>Failed to restart %1</translation>
+      <translation type="unfinished">Failed to restart %1</translation>
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
@@ -3298,35 +3298,35 @@ Kunci Lisensi: %2</translation>
     <name>QnDatabaseManagementWidget</name>
     <message>
       <source>Save Database Backup...</source>
-      <translation>Save Database Backup...</translation>
+      <translation type="unfinished">Save Database Backup...</translation>
     </message>
     <message>
       <source>Database backup is being downloaded from the server. Please wait.</source>
-      <translation>Database backup is being downloaded from the server. Please wait.</translation>
+      <translation type="unfinished">Database backup is being downloaded from the server. Please wait.</translation>
     </message>
     <message>
       <source>Open Database Backup...</source>
-      <translation>Open Database Backup...</translation>
+      <translation type="unfinished">Open Database Backup...</translation>
     </message>
     <message>
       <source>Database backup is being uploaded to the server. Please wait.</source>
-      <translation>Database backup is being uploaded to the server. Please wait.</translation>
+      <translation type="unfinished">Database backup is being uploaded to the server. Please wait.</translation>
     </message>
     <message>
       <source>Failed to back up database</source>
-      <translation>Failed to back up database</translation>
+      <translation type="unfinished">Failed to back up database</translation>
     </message>
     <message>
       <source>Database backed up to file</source>
-      <translation>Database backed up to file</translation>
+      <translation type="unfinished">Database backed up to file</translation>
     </message>
     <message>
       <source>Failed to open file</source>
-      <translation>Failed to open file</translation>
+      <translation type="unfinished">Failed to open file</translation>
     </message>
     <message>
       <source>Failed to restore database</source>
-      <translation>Failed to restore database</translation>
+      <translation type="unfinished">Failed to restore database</translation>
     </message>
     <message>
       <source>Database Backup Files</source>
@@ -3358,11 +3358,11 @@ Kunci Lisensi: %2</translation>
     </message>
     <message>
       <source>Restore database?</source>
-      <translation>Restore database?</translation>
+      <translation type="unfinished">Restore database?</translation>
     </message>
     <message>
       <source>System configuration will be restored from backup, Server application will be restarted.</source>
-      <translation>System configuration will be restored from backup, Server application will be restarted.</translation>
+      <translation type="unfinished">System configuration will be restored from backup, Server application will be restarted.</translation>
     </message>
     <message>
       <source>Database successfully restored. Server application will restart shortly.</source>
@@ -3380,35 +3380,35 @@ Kunci Lisensi: %2</translation>
     <name>QnEventLogDialog</name>
     <message>
       <source>Filter Similar Rows</source>
-      <translation>Filter Similar Rows</translation>
+      <translation type="unfinished">Filter Similar Rows</translation>
     </message>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation>Copy Selection to Clipboard</translation>
+      <translation type="unfinished">Copy Selection to Clipboard</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation>Export Selection to File...</translation>
+      <translation type="unfinished">Export Selection to File...</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation>Select All</translation>
+      <translation type="unfinished">Select All</translation>
     </message>
     <message>
       <source>Clear Filter</source>
-      <translation>Clear Filter</translation>
+      <translation type="unfinished">Clear Filter</translation>
     </message>
     <message>
       <source>Export selected events to file</source>
-      <translation>Export selected events to file</translation>
+      <translation type="unfinished">Export selected events to file</translation>
     </message>
     <message>
       <source>Any Action</source>
-      <translation>Any Action</translation>
+      <translation type="unfinished">Any Action</translation>
     </message>
     <message>
       <source>No events</source>
-      <translation>No events</translation>
+      <translation type="unfinished">No events</translation>
     </message>
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - %n events found</source>
@@ -3426,75 +3426,75 @@ Kunci Lisensi: %2</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation>Description</translation>
+      <translation type="unfinished">Description</translation>
     </message>
   </context>
   <context>
     <name>QnEventLogModel</name>
     <message>
       <source>Motion video</source>
-      <translation>Motion video</translation>
+      <translation type="unfinished">Motion video</translation>
     </message>
     <message>
       <source>Date/Time</source>
-      <translation>Date/Time</translation>
+      <translation type="unfinished">Date/Time</translation>
     </message>
     <message>
       <source>Event</source>
-      <translation>Event</translation>
+      <translation type="unfinished">Event</translation>
     </message>
     <message>
       <source>Source</source>
-      <translation>Source</translation>
+      <translation type="unfinished">Source</translation>
     </message>
     <message>
       <source>Action</source>
-      <translation>Action</translation>
+      <translation type="unfinished">Action</translation>
     </message>
     <message>
       <source>Target</source>
-      <translation>Target</translation>
+      <translation type="unfinished">Target</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation>Description</translation>
+      <translation type="unfinished">Description</translation>
     </message>
     <message>
       <source>All users</source>
-      <translation>All users</translation>
+      <translation type="unfinished">All users</translation>
     </message>
     <message numerus="yes">
       <source>%1 (%n times)</source>
       <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%1 (%n times)</numerusform>
       </translation>
     </message>
     <message>
       <source>Open camera</source>
-      <translation>Open camera</translation>
+      <translation type="unfinished">Open camera</translation>
     </message>
     <message numerus="yes">
       <source>and %n users more...</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>and %n users more...</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>and %n more...</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>and %n more...</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Removed subjects</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n Removed subjects</numerusform>
       </translation>
     </message>
     <message>
       <source>Subject removed</source>
-      <translation>Subject removed</translation>
+      <translation type="unfinished">Subject removed</translation>
     </message>
     <message numerus="yes">
       <source>%1 (%n cameras)</source>
@@ -3508,7 +3508,7 @@ Kunci Lisensi: %2</translation>
     <name>QnExecHttpRequestActionWidget</name>
     <message>
       <source>Auto</source>
-      <translation>Auto</translation>
+      <translation type="unfinished">Auto</translation>
     </message>
     <message>
       <source>Basic</source>
@@ -3519,11 +3519,11 @@ Kunci Lisensi: %2</translation>
     <name>QnExecPtzPresetPolicy</name>
     <message>
       <source>Select exactly one camera</source>
-      <translation>Select exactly one camera</translation>
+      <translation type="unfinished">Select exactly one camera</translation>
     </message>
     <message>
       <source>%1 has no PTZ presets</source>
-      <translation>%1 has no PTZ presets</translation>
+      <translation type="unfinished">%1 has no PTZ presets</translation>
     </message>
   </context>
   <context>
@@ -3537,11 +3537,11 @@ Kunci Lisensi: %2</translation>
     <name>QnFileMessages</name>
     <message>
       <source>Overwrite existing file?</source>
-      <translation>Overwrite existing file?</translation>
+      <translation type="unfinished">Overwrite existing file?</translation>
     </message>
     <message>
       <source>Failed to overwrite file</source>
-      <translation>Failed to overwrite file</translation>
+      <translation type="unfinished">Failed to overwrite file</translation>
     </message>
   </context>
   <context>
@@ -3559,29 +3559,29 @@ Kunci Lisensi: %2</translation>
     <name>QnFullscreenCameraPolicy</name>
     <message>
       <source>Select exactly one camera</source>
-      <translation>Select exactly one camera</translation>
+      <translation type="unfinished">Select exactly one camera</translation>
     </message>
   </context>
   <context>
     <name>QnGLCheckerInstrument</name>
     <message>
       <source>Video card drivers are outdated or not installed</source>
-      <translation>Video card drivers are outdated or not installed</translation>
+      <translation type="unfinished">Video card drivers are outdated or not installed</translation>
     </message>
     <message>
       <source>%1 may not work properly.</source>
-      <translation>%1 may not work properly.</translation>
+      <translation type="unfinished">%1 may not work properly.</translation>
     </message>
   </context>
   <context>
     <name>QnGeneralPreferencesWidget</name>
     <message>
       <source>Folder already added</source>
-      <translation>Folder already added</translation>
+      <translation type="unfinished">Folder already added</translation>
     </message>
     <message>
       <source>None</source>
-      <translation>None</translation>
+      <translation type="unfinished">None</translation>
     </message>
     <message>
       <source>Auto (%1)</source>
@@ -3596,131 +3596,131 @@ Kunci Lisensi: %2</translation>
     <name>QnGeneralSystemAdministrationWidget</name>
     <message>
       <source>Open Event Log</source>
-      <translation>Open Event Log</translation>
+      <translation type="unfinished">Open Event Log</translation>
     </message>
     <message>
       <source>Open Bookmarks List</source>
-      <translation>Open Bookmarks List</translation>
+      <translation type="unfinished">Open Bookmarks List</translation>
     </message>
     <message>
       <source>Event Rules</source>
-      <translation>Event Rules</translation>
+      <translation type="unfinished">Event Rules</translation>
     </message>
     <message>
       <source>Event Log</source>
-      <translation>Event Log</translation>
+      <translation type="unfinished">Event Log</translation>
     </message>
     <message>
       <source>Audit Trail</source>
-      <translation>Audit Trail</translation>
+      <translation type="unfinished">Audit Trail</translation>
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation>Bookmarks</translation>
+      <translation type="unfinished">Bookmarks</translation>
     </message>
     <message>
       <source>Device List</source>
-      <translation>Device List</translation>
+      <translation type="unfinished">Device List</translation>
     </message>
     <message>
       <source>Camera List</source>
-      <translation>Camera List</translation>
+      <translation type="unfinished">Camera List</translation>
     </message>
     <message>
       <source>Open Event Rules Management</source>
-      <translation>Open Event Rules Management</translation>
+      <translation type="unfinished">Open Event Rules Management</translation>
     </message>
     <message>
       <source>Open Audit Trail Log</source>
-      <translation>Open Audit Trail Log</translation>
+      <translation type="unfinished">Open Audit Trail Log</translation>
     </message>
     <message>
       <source>Open Device List</source>
-      <translation>Open Device List</translation>
+      <translation type="unfinished">Open Device List</translation>
     </message>
     <message>
       <source>Open Camera List</source>
-      <translation>Open Camera List</translation>
+      <translation type="unfinished">Open Camera List</translation>
     </message>
   </context>
   <context>
     <name>QnHistogramWidget</name>
     <message>
       <source>Gamma %1</source>
-      <translation>Gamma %1</translation>
+      <translation type="unfinished">Gamma %1</translation>
     </message>
   </context>
   <context>
     <name>QnIOPortsViewModel</name>
     <message>
       <source>Type</source>
-      <translation>Type</translation>
+      <translation type="unfinished">Type</translation>
     </message>
     <message>
       <source>Default state</source>
-      <translation>Default state</translation>
+      <translation type="unfinished">Default state</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation>Name</translation>
+      <translation type="unfinished">Name</translation>
     </message>
     <message>
       <source>Unknown</source>
       <comment>IO Port Type</comment>
-      <translation>Unknown</translation>
+      <translation type="unfinished">Unknown</translation>
     </message>
     <message>
       <source>Disabled</source>
       <comment>IO Port Type</comment>
-      <translation>Disabled</translation>
+      <translation type="unfinished">Disabled</translation>
     </message>
     <message>
       <source>Input</source>
       <comment>IO Port Type</comment>
-      <translation>Input</translation>
+      <translation type="unfinished">Input</translation>
     </message>
     <message>
       <source>Output</source>
       <comment>IO Port Type</comment>
-      <translation>Output</translation>
+      <translation type="unfinished">Output</translation>
     </message>
     <message>
       <source>Invalid</source>
       <comment>IO Port Type</comment>
-      <translation>Invalid</translation>
+      <translation type="unfinished">Invalid</translation>
     </message>
     <message>
       <source>Grounded circuit</source>
       <comment>IO Port State</comment>
-      <translation>Grounded circuit</translation>
+      <translation type="unfinished">Grounded circuit</translation>
     </message>
     <message>
       <source>Invalid state</source>
       <comment>IO Port State</comment>
-      <translation>Invalid state</translation>
+      <translation type="unfinished">Invalid state</translation>
     </message>
     <message>
       <source>On click</source>
-      <translation>On click</translation>
+      <translation type="unfinished">On click</translation>
     </message>
     <message>
       <source>Duration</source>
-      <translation>Duration</translation>
+      <translation type="unfinished">Duration</translation>
     </message>
     <message>
       <source>Open circuit</source>
       <comment>IO Port State</comment>
-      <translation>Open circuit</translation>
+      <translation type="unfinished">Open circuit</translation>
     </message>
     <message>
       <source>Toggle state</source>
       <comment>IO Output Port Action</comment>
-      <translation>Toggle state</translation>
+      <translation type="unfinished">Toggle state</translation>
     </message>
     <message>
       <source>Impulse</source>
       <comment>IO Output Port Action</comment>
-      <translation>Impulse</translation>
+      <translation type="unfinished">Impulse</translation>
     </message>
     <message>
       <source>ID</source>
@@ -3742,22 +3742,22 @@ Kunci Lisensi: %2</translation>
     <name>QnIoModuleOverlayWidgetPrivate</name>
     <message>
       <source>Failed to turn off I/O port %1</source>
-      <translation>Failed to turn off I/O port %1</translation>
+      <translation type="unfinished">Failed to turn off I/O port %1</translation>
     </message>
     <message>
       <source>Failed to turn on I/O port %1</source>
-      <translation>Failed to turn on I/O port %1</translation>
+      <translation type="unfinished">Failed to turn on I/O port %1</translation>
     </message>
   </context>
   <context>
     <name>QnLicenseDetailsDialog</name>
     <message>
       <source>License Type</source>
-      <translation>License Type</translation>
+      <translation type="unfinished">License Type</translation>
     </message>
     <message>
       <source>License Key</source>
-      <translation>License Key</translation>
+      <translation type="unfinished">License Key</translation>
     </message>
     <message>
       <source>Locked to Hardware ID</source>
@@ -3792,67 +3792,67 @@ Kunci Lisensi: %2</translation>
     <name>QnLicenseListModel</name>
     <message>
       <source>Type</source>
-      <translation>Type</translation>
+      <translation type="unfinished">Type</translation>
     </message>
     <message>
       <source>License Key</source>
-      <translation>License Key</translation>
+      <translation type="unfinished">License Key</translation>
     </message>
     <message>
       <source>Status</source>
-      <translation>Status</translation>
+      <translation type="unfinished">Status</translation>
     </message>
     <message>
       <source>Server</source>
-      <translation>Server</translation>
+      <translation type="unfinished">Server</translation>
     </message>
     <message>
       <source>Never</source>
-      <translation>Never</translation>
+      <translation type="unfinished">Never</translation>
     </message>
     <message>
       <source>Expired</source>
-      <translation>Expired</translation>
+      <translation type="unfinished">Expired</translation>
     </message>
     <message>
       <source>OK</source>
-      <translation>OK</translation>
+      <translation type="unfinished">OK</translation>
     </message>
     <message>
       <source>Error</source>
-      <translation>Error</translation>
+      <translation type="unfinished">Error</translation>
     </message>
     <message>
       <source>Server not found</source>
-      <translation>Server not found</translation>
+      <translation type="unfinished">Server not found</translation>
     </message>
     <message>
       <source>Expires</source>
-      <translation>Expires</translation>
+      <translation type="unfinished">Expires</translation>
     </message>
     <message>
       <source>License is active</source>
-      <translation>License is active</translation>
+      <translation type="unfinished">License is active</translation>
     </message>
     <message>
       <source>License is expired</source>
-      <translation>License is expired</translation>
+      <translation type="unfinished">License is expired</translation>
     </message>
     <message>
       <source>Expires soon</source>
-      <translation>Expires soon</translation>
+      <translation type="unfinished">Expires soon</translation>
     </message>
     <message>
       <source>License expires today</source>
-      <translation>License expires today</translation>
+      <translation type="unfinished">License expires today</translation>
     </message>
     <message>
       <source>License expires tomorrow</source>
-      <translation>License expires tomorrow</translation>
+      <translation type="unfinished">License expires tomorrow</translation>
     </message>
     <message numerus="yes">
       <source>License expires in %n days</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>License expires in %n days</numerusform>
       </translation>
     </message>
@@ -3869,15 +3869,15 @@ Kunci Lisensi: %2</translation>
     <name>QnLicenseWidget</name>
     <message>
       <source>Activate Trial License</source>
-      <translation>Activate Trial License</translation>
+      <translation type="unfinished">Activate Trial License</translation>
     </message>
     <message>
       <source>Open License File</source>
-      <translation>Open License File</translation>
+      <translation type="unfinished">Open License File</translation>
     </message>
     <message>
       <source>Failed to open file</source>
-      <translation>Failed to open file</translation>
+      <translation type="unfinished">Failed to open file</translation>
     </message>
     <message>
       <source>To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</source>
@@ -3901,39 +3901,39 @@ Kunci Lisensi: %2</translation>
     <name>QnLocalSettingsDialog</name>
     <message>
       <source>General</source>
-      <translation>General</translation>
+      <translation type="unfinished">General</translation>
     </message>
     <message>
       <source>Look and Feel</source>
-      <translation>Look and Feel</translation>
+      <translation type="unfinished">Look and Feel</translation>
     </message>
     <message>
       <source>Screen Recording</source>
-      <translation>Screen Recording</translation>
+      <translation type="unfinished">Screen Recording</translation>
     </message>
     <message>
       <source>Notifications</source>
-      <translation>Notifications</translation>
+      <translation type="unfinished">Notifications</translation>
     </message>
     <message>
       <source>Advanced</source>
-      <translation>Advanced</translation>
+      <translation type="unfinished">Advanced</translation>
     </message>
     <message>
       <source>Restart required</source>
-      <translation>Restart required</translation>
+      <translation type="unfinished">Restart required</translation>
     </message>
     <message>
       <source>Restart Now</source>
-      <translation>Restart Now</translation>
+      <translation type="unfinished">Restart Now</translation>
     </message>
     <message>
       <source>Restart Later</source>
-      <translation>Restart Later</translation>
+      <translation type="unfinished">Restart Later</translation>
     </message>
     <message>
       <source>Some changes will take effect only after %1 restart</source>
-      <translation>Some changes will take effect only after %1 restart</translation>
+      <translation type="unfinished">Some changes will take effect only after %1 restart</translation>
     </message>
     <message>
       <source>Settings are read-only. Please contact your system administrator. All changes will be lost after program exit.</source>
@@ -3944,43 +3944,43 @@ Kunci Lisensi: %2</translation>
     <name>QnLookAndFeelPreferencesWidget</name>
     <message>
       <source>Preparing Image...</source>
-      <translation>Preparing Image...</translation>
+      <translation type="unfinished">Preparing Image...</translation>
     </message>
     <message>
       <source>Please wait while image is being prepared...</source>
-      <translation>Please wait while image is being prepared...</translation>
+      <translation type="unfinished">Please wait while image is being prepared...</translation>
     </message>
     <message>
       <source>Server Time</source>
-      <translation>Server Time</translation>
+      <translation type="unfinished">Server Time</translation>
     </message>
     <message>
       <source>Client Time</source>
-      <translation>Client Time</translation>
+      <translation type="unfinished">Client Time</translation>
     </message>
     <message>
       <source>Stretch</source>
-      <translation>Stretch</translation>
+      <translation type="unfinished">Stretch</translation>
     </message>
     <message>
       <source>Fit</source>
-      <translation>Fit</translation>
+      <translation type="unfinished">Fit</translation>
     </message>
     <message>
       <source>Crop</source>
-      <translation>Crop</translation>
+      <translation type="unfinished">Crop</translation>
     </message>
     <message>
       <source>This option will not affect Recording Schedule. Recording Schedule is always based on Server Time.</source>
-      <translation>This option will not affect Recording Schedule. Recording Schedule is always based on Server Time.</translation>
+      <translation type="unfinished">This option will not affect Recording Schedule. Recording Schedule is always based on Server Time.</translation>
     </message>
     <message>
       <source>Select File...</source>
-      <translation>Select File...</translation>
+      <translation type="unfinished">Select File...</translation>
     </message>
     <message>
       <source>No image</source>
-      <translation>No image</translation>
+      <translation type="unfinished">No image</translation>
     </message>
     <message>
       <source>Sets the time to use in the client (timeline, timestamps, etc.) when client and server machines are in different time zones.</source>
@@ -3999,39 +3999,39 @@ Kunci Lisensi: %2</translation>
     <name>QnMediaResourceWidget</name>
     <message>
       <source>Screenshot</source>
-      <translation>Screenshot</translation>
+      <translation type="unfinished">Screenshot</translation>
     </message>
     <message>
       <source>PTZ</source>
-      <translation>PTZ</translation>
+      <translation type="unfinished">PTZ</translation>
     </message>
     <message>
       <source>Dewarping</source>
-      <translation>Dewarping</translation>
+      <translation type="unfinished">Dewarping</translation>
     </message>
     <message>
       <source>Create Zoom Window</source>
-      <translation>Create Zoom Window</translation>
+      <translation type="unfinished">Create Zoom Window</translation>
     </message>
     <message>
       <source>Hi-Res</source>
-      <translation>Hi-Res</translation>
+      <translation type="unfinished">Hi-Res</translation>
     </message>
     <message>
       <source>LIVE</source>
-      <translation>LIVE</translation>
+      <translation type="unfinished">LIVE</translation>
     </message>
     <message>
       <source>%1 (Tour &quot;%2&quot; is active)</source>
-      <translation>%1 (Tour &quot;%2&quot; is active)</translation>
+      <translation type="unfinished">%1 (Tour &quot;%2&quot; is active)</translation>
     </message>
     <message>
       <source>I/O Module</source>
-      <translation>I/O Module</translation>
+      <translation type="unfinished">I/O Module</translation>
     </message>
     <message>
       <source>Lo-Res</source>
-      <translation>Lo-Res</translation>
+      <translation type="unfinished">Lo-Res</translation>
     </message>
     <message numerus="yes">
       <source>Set for all %n Cameras</source>
@@ -4058,30 +4058,30 @@ Kunci Lisensi: %2</translation>
     <message>
       <source>press and hold</source>
       <comment>Soft Trigger</comment>
-      <translation>press and hold</translation>
+      <translation type="unfinished">press and hold</translation>
     </message>
     <message>
       <source>Disabled by schedule</source>
-      <translation>Disabled by schedule</translation>
+      <translation type="unfinished">Disabled by schedule</translation>
     </message>
   </context>
   <context>
     <name>QnMessageBox</name>
     <message>
       <source>Overwrite</source>
-      <translation>Overwrite</translation>
+      <translation type="unfinished">Overwrite</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation>Delete</translation>
+      <translation type="unfinished">Delete</translation>
     </message>
     <message>
       <source>Reset</source>
-      <translation>Reset</translation>
+      <translation type="unfinished">Reset</translation>
     </message>
     <message>
       <source>Skip</source>
-      <translation>Skip</translation>
+      <translation type="unfinished">Skip</translation>
     </message>
     <message>
       <source>Close</source>
@@ -4108,7 +4108,7 @@ Kunci Lisensi: %2</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation>Name</translation>
+      <translation type="unfinished">Name</translation>
     </message>
     <message>
       <source>Name cannot be empty</source>
@@ -4119,58 +4119,58 @@ Kunci Lisensi: %2</translation>
     <name>QnNotificationSoundManagerDialog</name>
     <message>
       <source>Clip sound up to %1 seconds</source>
-      <translation>Clip sound up to %1 seconds</translation>
+      <translation type="unfinished">Clip sound up to %1 seconds</translation>
     </message>
     <message>
       <source>Rename sound</source>
-      <translation>Rename sound</translation>
+      <translation type="unfinished">Rename sound</translation>
     </message>
     <message>
       <source>Custom title:</source>
-      <translation>Custom title:</translation>
+      <translation type="unfinished">Custom title:</translation>
     </message>
     <message>
       <source>Sound Files</source>
-      <translation>Sound Files</translation>
+      <translation type="unfinished">Sound Files</translation>
     </message>
     <message>
       <source>Select File...</source>
-      <translation>Select File...</translation>
+      <translation type="unfinished">Select File...</translation>
     </message>
     <message>
       <source>Enter New Title:</source>
-      <translation>Enter New Title:</translation>
+      <translation type="unfinished">Enter New Title:</translation>
     </message>
     <message>
       <source>Failed to add file</source>
-      <translation>Failed to add file</translation>
+      <translation type="unfinished">Failed to add file</translation>
     </message>
     <message>
       <source>Failed to set new title</source>
-      <translation>Failed to set new title</translation>
+      <translation type="unfinished">Failed to set new title</translation>
     </message>
     <message>
       <source>Delete sound?</source>
-      <translation>Delete sound?</translation>
+      <translation type="unfinished">Delete sound?</translation>
     </message>
   </context>
   <context>
     <name>QnNotificationSoundModel</name>
     <message>
       <source>Downloading sound list...</source>
-      <translation>Downloading sound list...</translation>
+      <translation type="unfinished">Downloading sound list...</translation>
     </message>
     <message>
       <source>No Sound</source>
-      <translation>No Sound</translation>
+      <translation type="unfinished">No Sound</translation>
     </message>
     <message>
       <source>Downloading sound...</source>
-      <translation>Downloading sound...</translation>
+      <translation type="unfinished">Downloading sound...</translation>
     </message>
     <message>
       <source>Uploading sound...</source>
-      <translation>Uploading sound...</translation>
+      <translation type="unfinished">Uploading sound...</translation>
     </message>
   </context>
   <context>
@@ -4191,7 +4191,7 @@ Kunci Lisensi: %2</translation>
     <name>QnPopupBusinessActionWidget</name>
     <message>
       <source>Notification will be shown until one of the users who see it creates bookmark with event description</source>
-      <translation>Notification will be shown until one of the users who see it creates bookmark with event description</translation>
+      <translation type="unfinished">Notification will be shown until one of the users who see it creates bookmark with event description</translation>
     </message>
   </context>
   <context>
@@ -4217,7 +4217,7 @@ Kunci Lisensi: %2</translation>
     <name>QnPtzManageDialog</name>
     <message>
       <source>Manage PTZ for %1...</source>
-      <translation>Manage PTZ for %1...</translation>
+      <translation type="unfinished">Manage PTZ for %1...</translation>
     </message>
     <message>
       <source>Apply changes before exiting?</source>
@@ -4228,67 +4228,67 @@ Kunci Lisensi: %2</translation>
     <name>QnPtzManageModel</name>
     <message>
       <source>Name</source>
-      <translation>Name</translation>
+      <translation type="unfinished">Name</translation>
     </message>
     <message>
       <source>Hotkey</source>
-      <translation>Hotkey</translation>
+      <translation type="unfinished">Hotkey</translation>
     </message>
     <message>
       <source>Home</source>
-      <translation>Home</translation>
+      <translation type="unfinished">Home</translation>
     </message>
     <message>
       <source>Details</source>
-      <translation>Details</translation>
+      <translation type="unfinished">Details</translation>
     </message>
     <message>
       <source>Tours</source>
-      <translation>Tours</translation>
+      <translation type="unfinished">Tours</translation>
     </message>
     <message>
       <source>Positions</source>
-      <translation>Positions</translation>
+      <translation type="unfinished">Positions</translation>
     </message>
     <message>
       <source>None</source>
-      <translation>None</translation>
+      <translation type="unfinished">None</translation>
     </message>
     <message numerus="yes">
       <source>This preset will be activated after %n minutes of inactivity</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>This preset will be activated after %n minutes of inactivity</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Tour has %n identical positions</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Tour has %n identical positions</numerusform>
       </translation>
     </message>
     <message>
       <source>less than a minute</source>
-      <translation>less than a minute</translation>
+      <translation type="unfinished">less than a minute</translation>
     </message>
     <message>
       <source>Invalid tour</source>
-      <translation>Invalid tour</translation>
+      <translation type="unfinished">Invalid tour</translation>
     </message>
     <message>
       <source>New Tour %1</source>
-      <translation>New Tour %1</translation>
+      <translation type="unfinished">New Tour %1</translation>
     </message>
     <message>
       <source>Saved Position %1</source>
-      <translation>Saved Position %1</translation>
+      <translation type="unfinished">Saved Position %1</translation>
     </message>
     <message>
       <source>Tour should contain at least 2 positions.</source>
-      <translation>Tour should contain at least 2 positions.</translation>
+      <translation type="unfinished">Tour should contain at least 2 positions.</translation>
     </message>
     <message>
       <source>Tour Time: %1.</source>
-      <translation>Tour Time: %1.</translation>
+      <translation type="unfinished">Tour Time: %1.</translation>
     </message>
     <message numerus="yes">
       <source>about %n minutes</source>
@@ -4301,99 +4301,99 @@ Kunci Lisensi: %2</translation>
     <name>QnPtzPresetDialog</name>
     <message>
       <source>Saved Position %1</source>
-      <translation>Saved Position %1</translation>
+      <translation type="unfinished">Saved Position %1</translation>
     </message>
     <message>
       <source>None</source>
-      <translation>None</translation>
+      <translation type="unfinished">None</translation>
     </message>
   </context>
   <context>
     <name>QnPtzPresetHotkeyItemDelegate</name>
     <message>
       <source>None</source>
-      <translation>None</translation>
+      <translation type="unfinished">None</translation>
     </message>
     <message>
       <source>Reassign</source>
-      <translation>Reassign</translation>
+      <translation type="unfinished">Reassign</translation>
     </message>
     <message>
       <source>Hotkey used by preset &quot;%1&quot;</source>
-      <translation>Hotkey used by preset &quot;%1&quot;</translation>
+      <translation type="unfinished">Hotkey used by preset &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Hotkey used by tour &quot;%1&quot;</source>
-      <translation>Hotkey used by tour &quot;%1&quot;</translation>
+      <translation type="unfinished">Hotkey used by tour &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
     <name>QnPtzTourSpotsModel</name>
     <message>
       <source>Lowest</source>
-      <translation>Lowest</translation>
+      <translation type="unfinished">Lowest</translation>
     </message>
     <message>
       <source>Low</source>
-      <translation>Low</translation>
+      <translation type="unfinished">Low</translation>
     </message>
     <message>
       <source>Normal</source>
-      <translation>Normal</translation>
+      <translation type="unfinished">Normal</translation>
     </message>
     <message>
       <source>High</source>
-      <translation>High</translation>
+      <translation type="unfinished">High</translation>
     </message>
     <message>
       <source>Highest</source>
-      <translation>Highest</translation>
+      <translation type="unfinished">Highest</translation>
     </message>
     <message>
       <source>Instant</source>
-      <translation>Instant</translation>
+      <translation type="unfinished">Instant</translation>
     </message>
     <message>
       <source>Position</source>
-      <translation>Position</translation>
+      <translation type="unfinished">Position</translation>
     </message>
     <message>
       <source>Stay Time</source>
-      <translation>Stay Time</translation>
+      <translation type="unfinished">Stay Time</translation>
     </message>
     <message>
       <source>Speed</source>
-      <translation>Speed</translation>
+      <translation type="unfinished">Speed</translation>
     </message>
     <message>
       <source>Invalid</source>
-      <translation>Invalid</translation>
+      <translation type="unfinished">Invalid</translation>
     </message>
   </context>
   <context>
     <name>QnRecordingStats</name>
     <message>
       <source>Cameras from other servers and removed cameras</source>
-      <translation>Cameras from other servers and removed cameras</translation>
+      <translation type="unfinished">Cameras from other servers and removed cameras</translation>
     </message>
     <message numerus="yes">
       <source>Total %1 %n devices</source>
       <comment>%1 is long dash, do not replace</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Total %1 %n devices</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Total %1 %n cameras</source>
       <comment>%1 is long dash, do not replace</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Total %1 %n cameras</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Total %1 %n I/O modules</source>
       <comment>%1 is long dash, do not replace</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Total %1 %n I/O modules</numerusform>
       </translation>
     </message>
@@ -4402,31 +4402,31 @@ Kunci Lisensi: %2</translation>
     <name>QnRecordingStatsModel</name>
     <message>
       <source>Space</source>
-      <translation>Space</translation>
+      <translation type="unfinished">Space</translation>
     </message>
     <message>
       <source>Calendar Days</source>
-      <translation>Calendar Days</translation>
+      <translation type="unfinished">Calendar Days</translation>
     </message>
     <message>
       <source>%1 Mbps</source>
-      <translation>%1 Mbps</translation>
+      <translation type="unfinished">%1 Mbps</translation>
     </message>
     <message>
       <source>Device</source>
-      <translation>Device</translation>
+      <translation type="unfinished">Device</translation>
     </message>
     <message>
       <source>Camera</source>
-      <translation>Camera</translation>
+      <translation type="unfinished">Camera</translation>
     </message>
     <message>
       <source>%1 TB</source>
-      <translation>%1 TB</translation>
+      <translation type="unfinished">%1 TB</translation>
     </message>
     <message>
       <source>%1 GB</source>
-      <translation>%1 GB</translation>
+      <translation type="unfinished">%1 GB</translation>
     </message>
     <message>
       <source>Current Bitrate</source>
@@ -4481,26 +4481,26 @@ Kunci Lisensi: %2</translation>
     <name>QnResourceItemDelegate</name>
     <message>
       <source>Health Monitor</source>
-      <translation>Health Monitor</translation>
+      <translation type="unfinished">Health Monitor</translation>
     </message>
   </context>
   <context>
     <name>QnResourceWidget</name>
     <message>
       <source>Close</source>
-      <translation>Close</translation>
+      <translation type="unfinished">Close</translation>
     </message>
     <message>
       <source>Information</source>
-      <translation>Information</translation>
+      <translation type="unfinished">Information</translation>
     </message>
     <message>
       <source>Rotate</source>
-      <translation>Rotate</translation>
+      <translation type="unfinished">Rotate</translation>
     </message>
     <message>
       <source>Exit Fullscreen</source>
-      <translation>Exit Fullscreen</translation>
+      <translation type="unfinished">Exit Fullscreen</translation>
     </message>
     <message>
       <source>Enter Fullscreen</source>
@@ -4508,30 +4508,30 @@ Kunci Lisensi: %2</translation>
     </message>
     <message>
       <source>Zoom Window</source>
-      <translation>Zoom Window</translation>
+      <translation type="unfinished">Zoom Window</translation>
     </message>
   </context>
   <context>
     <name>QnRoutingManagementWidget</name>
     <message>
       <source>Enter URL</source>
-      <translation>Enter URL</translation>
+      <translation type="unfinished">Enter URL</translation>
     </message>
     <message>
       <source>URL</source>
-      <translation>URL</translation>
+      <translation type="unfinished">URL</translation>
     </message>
     <message>
       <source>Server</source>
-      <translation>Server</translation>
+      <translation type="unfinished">Server</translation>
     </message>
     <message>
       <source>Invalid URL</source>
-      <translation>Invalid URL</translation>
+      <translation type="unfinished">Invalid URL</translation>
     </message>
     <message>
       <source>URL already added</source>
-      <translation>URL already added</translation>
+      <translation type="unfinished">URL already added</translation>
     </message>
   </context>
   <context>
@@ -4557,77 +4557,77 @@ Kunci Lisensi: %2</translation>
     <name>QnSearchBookmarksDialogPrivate</name>
     <message>
       <source>No bookmarks</source>
-      <translation>No bookmarks</translation>
+      <translation type="unfinished">No bookmarks</translation>
     </message>
     <message>
       <source>Search</source>
-      <translation>Search</translation>
+      <translation type="unfinished">Search</translation>
     </message>
     <message>
       <source>N/A</source>
-      <translation>N/A</translation>
+      <translation type="unfinished">N/A</translation>
     </message>
   </context>
   <context>
     <name>QnSearchBookmarksModel</name>
     <message>
       <source>Name</source>
-      <translation>Name</translation>
+      <translation type="unfinished">Name</translation>
     </message>
     <message>
       <source>Start time</source>
-      <translation>Start time</translation>
+      <translation type="unfinished">Start time</translation>
     </message>
     <message>
       <source>Length</source>
-      <translation>Length</translation>
+      <translation type="unfinished">Length</translation>
     </message>
     <message>
       <source>Tags</source>
-      <translation>Tags</translation>
+      <translation type="unfinished">Tags</translation>
     </message>
     <message>
       <source>Camera</source>
-      <translation>Camera</translation>
+      <translation type="unfinished">Camera</translation>
     </message>
     <message>
       <source>Created</source>
-      <translation>Created</translation>
+      <translation type="unfinished">Created</translation>
     </message>
     <message>
       <source>Creator</source>
-      <translation>Creator</translation>
+      <translation type="unfinished">Creator</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation>Description</translation>
+      <translation type="unfinished">Description</translation>
     </message>
   </context>
   <context>
     <name>QnSelectDevicesButton</name>
     <message>
       <source>Any Device</source>
-      <translation>Any Device</translation>
+      <translation type="unfinished">Any Device</translation>
     </message>
     <message>
       <source>Any Camera</source>
-      <translation>Any Camera</translation>
+      <translation type="unfinished">Any Camera</translation>
     </message>
     <message>
       <source>All Devices</source>
-      <translation>All Devices</translation>
+      <translation type="unfinished">All Devices</translation>
     </message>
     <message>
       <source>All Cameras</source>
-      <translation>All Cameras</translation>
+      <translation type="unfinished">All Cameras</translation>
     </message>
     <message>
       <source>Select devices...</source>
-      <translation>Select devices...</translation>
+      <translation type="unfinished">Select devices...</translation>
     </message>
     <message>
       <source>Select cameras...</source>
-      <translation>Select cameras...</translation>
+      <translation type="unfinished">Select cameras...</translation>
     </message>
   </context>
   <context>
@@ -4655,19 +4655,19 @@ Kunci Lisensi: %2</translation>
     <name>QnSelectServersButton</name>
     <message>
       <source>Any Server</source>
-      <translation>Any Server</translation>
+      <translation type="unfinished">Any Server</translation>
     </message>
     <message>
       <source>All Servers</source>
-      <translation>All Servers</translation>
+      <translation type="unfinished">All Servers</translation>
     </message>
     <message>
       <source>Select Servers...</source>
-      <translation>Select Servers...</translation>
+      <translation type="unfinished">Select Servers...</translation>
     </message>
     <message numerus="yes">
       <source>%n Servers</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n Servers</numerusform>
       </translation>
     </message>
@@ -4676,19 +4676,19 @@ Kunci Lisensi: %2</translation>
     <name>QnSelectUsersButton</name>
     <message>
       <source>Any User</source>
-      <translation>Any User</translation>
+      <translation type="unfinished">Any User</translation>
     </message>
     <message>
       <source>All Users</source>
-      <translation>All Users</translation>
+      <translation type="unfinished">All Users</translation>
     </message>
     <message>
       <source>Select Users...</source>
-      <translation>Select Users...</translation>
+      <translation type="unfinished">Select Users...</translation>
     </message>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n Users</numerusform>
       </translation>
     </message>
@@ -4697,90 +4697,90 @@ Kunci Lisensi: %2</translation>
     <name>QnSendEmailActionDelegate</name>
     <message numerus="yes">
       <source>%n additional</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n additional</numerusform>
       </translation>
     </message>
     <message>
       <source>User %1 has invalid email address</source>
-      <translation>User %1 has invalid email address</translation>
+      <translation type="unfinished">User %1 has invalid email address</translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 users have invalid email address</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n of %1 users have invalid email address</numerusform>
       </translation>
     </message>
     <message>
       <source>Invalid email address %1</source>
-      <translation>Invalid email address %1</translation>
+      <translation type="unfinished">Invalid email address %1</translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 additional email addresses are invalid</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n of %1 additional email addresses are invalid</numerusform>
       </translation>
     </message>
     <message>
       <source>Send email to %1</source>
-      <translation>Send email to %1</translation>
+      <translation type="unfinished">Send email to %1</translation>
     </message>
   </context>
   <context>
     <name>QnServerAddressesModel</name>
     <message>
       <source>Address</source>
-      <translation>Address</translation>
+      <translation type="unfinished">Address</translation>
     </message>
   </context>
   <context>
     <name>QnServerResourceWidget</name>
     <message>
       <source>Show Log</source>
-      <translation>Show Log</translation>
+      <translation type="unfinished">Show Log</translation>
     </message>
     <message>
       <source>Check Issues</source>
-      <translation>Check Issues</translation>
+      <translation type="unfinished">Check Issues</translation>
     </message>
     <message>
       <source>%1 (up %2)</source>
-      <translation>%1 (up %2)</translation>
+      <translation type="unfinished">%1 (up %2)</translation>
     </message>
   </context>
   <context>
     <name>QnServerSettingsDialog</name>
     <message>
       <source>General</source>
-      <translation>General</translation>
+      <translation type="unfinished">General</translation>
     </message>
     <message>
       <source>Storage Analytics</source>
-      <translation>Storage Analytics</translation>
+      <translation type="unfinished">Storage Analytics</translation>
     </message>
     <message>
       <source>Server Settings - %1 (readonly)</source>
-      <translation>Server Settings - %1 (readonly)</translation>
+      <translation type="unfinished">Server Settings - %1 (readonly)</translation>
     </message>
     <message>
       <source>Server Settings - %1</source>
-      <translation>Server Settings - %1</translation>
+      <translation type="unfinished">Server Settings - %1</translation>
     </message>
     <message>
       <source>Server Settings</source>
-      <translation>Server Settings</translation>
+      <translation type="unfinished">Server Settings</translation>
     </message>
     <message>
       <source>Storage Management</source>
-      <translation>Storage Management</translation>
+      <translation type="unfinished">Storage Management</translation>
     </message>
     <message>
       <source>Apply changes before switching to another server?</source>
-      <translation>Apply changes before switching to another server?</translation>
+      <translation type="unfinished">Apply changes before switching to another server?</translation>
     </message>
     <message>
       <source>Server Web Page</source>
-      <translation>Server Web Page</translation>
+      <translation type="unfinished">Server Web Page</translation>
     </message>
     <message>
       <source>Plugins</source>
@@ -4792,42 +4792,42 @@ Kunci Lisensi: %2</translation>
     </message>
     <message>
       <source>Backup</source>
-      <translation>Backup</translation>
+      <translation type="unfinished">Backup</translation>
     </message>
   </context>
   <context>
     <name>QnServerSettingsWidget</name>
     <message>
       <source>At least two servers are required for this feature.</source>
-      <translation>At least two servers are required for this feature.</translation>
+      <translation type="unfinished">At least two servers are required for this feature.</translation>
     </message>
     <message>
       <source>Max devices on this server:</source>
-      <translation>Max devices on this server:</translation>
+      <translation type="unfinished">Max devices on this server:</translation>
     </message>
     <message>
       <source>Max cameras on this server:</source>
-      <translation>Max cameras on this server:</translation>
+      <translation type="unfinished">Max cameras on this server:</translation>
     </message>
     <message>
       <source>This server already has more than max devices</source>
-      <translation>This server already has more than max devices</translation>
+      <translation type="unfinished">This server already has more than max devices</translation>
     </message>
     <message>
       <source>This server already has more than max cameras</source>
-      <translation>This server already has more than max cameras</translation>
+      <translation type="unfinished">This server already has more than max cameras</translation>
     </message>
     <message>
       <source>To avoid issues adjust max number of devices</source>
-      <translation>To avoid issues adjust max number of devices</translation>
+      <translation type="unfinished">To avoid issues adjust max number of devices</translation>
     </message>
     <message>
       <source>To avoid issues adjust max number of cameras</source>
-      <translation>To avoid issues adjust max number of cameras</translation>
+      <translation type="unfinished">To avoid issues adjust max number of cameras</translation>
     </message>
     <message>
       <source>Failover</source>
-      <translation>Failover</translation>
+      <translation type="unfinished">Failover</translation>
     </message>
     <message numerus="yes">
       <source>Certificates</source>
@@ -4843,7 +4843,7 @@ Kunci Lisensi: %2</translation>
     </message>
     <message>
       <source>Details</source>
-      <translation>Details</translation>
+      <translation type="unfinished">Details</translation>
     </message>
     <message>
       <source>Servers with failover enabled will automatically take cameras from offline Servers with the same Location ID.</source>
@@ -4869,7 +4869,7 @@ Kunci Lisensi: %2</translation>
 &lt;h4&gt;Headers (h1-h6)&lt;/h4&gt;Also different &lt;font color=&quot;red&quot;&gt;colors&lt;/font&gt; and &lt;font size=&quot;18&quot;&gt;sizes&lt;/font&gt; could be applied. Text could be &lt;s&gt;stricken&lt;/s&gt;, &lt;u&gt;underlined&lt;/u&gt;, &lt;b&gt;bold&lt;/b&gt; or &lt;i&gt;italic&lt;/i&gt;</source>
       <comment>Do not translate tags (text between &apos;&lt;&apos; and &apos;&gt;&apos; symbols. Do not remove &apos;
 &apos; sequence</comment>
-      <translation>Html tags could be used within custom text:
+      <translation type="unfinished">Html tags could be used within custom text:
 &lt;h4&gt;Headers (h1-h6)&lt;/h4&gt;Also different &lt;font color=&quot;red&quot;&gt;colors&lt;/font&gt; and &lt;font size=&quot;18&quot;&gt;sizes&lt;/font&gt; could be applied. Text could be &lt;s&gt;stricken&lt;/s&gt;, &lt;u&gt;underlined&lt;/u&gt;, &lt;b&gt;bold&lt;/b&gt; or &lt;i&gt;italic&lt;/i&gt;</translation>
     </message>
   </context>
@@ -4877,70 +4877,70 @@ Kunci Lisensi: %2</translation>
     <name>QnSignInfo</name>
     <message>
       <source>Analyzing: %1%</source>
-      <translation>Analyzing: %1%</translation>
+      <translation type="unfinished">Analyzing: %1%</translation>
     </message>
     <message>
       <source>Invalid watermark</source>
-      <translation>Invalid watermark</translation>
+      <translation type="unfinished">Invalid watermark</translation>
     </message>
     <message>
       <source>Watermark Not Found</source>
-      <translation>Watermark Not Found</translation>
+      <translation type="unfinished">Watermark Not Found</translation>
     </message>
     <message>
       <source>Watermark Matched</source>
-      <translation>Watermark Matched</translation>
+      <translation type="unfinished">Watermark Matched</translation>
     </message>
   </context>
   <context>
     <name>QnStatusOverlayController</name>
     <message>
       <source>NO DATA</source>
-      <translation>NO DATA</translation>
+      <translation type="unfinished">NO DATA</translation>
     </message>
     <message>
       <source>UNAUTHORIZED</source>
-      <translation>UNAUTHORIZED</translation>
+      <translation type="unfinished">UNAUTHORIZED</translation>
     </message>
     <message>
       <source>SERVER UNAVAILABLE</source>
-      <translation>SERVER UNAVAILABLE</translation>
+      <translation type="unfinished">SERVER UNAVAILABLE</translation>
     </message>
     <message>
       <source>NO ACCESS</source>
-      <translation>NO ACCESS</translation>
+      <translation type="unfinished">NO ACCESS</translation>
     </message>
     <message>
       <source>DEVICE DISABLED</source>
-      <translation>DEVICE DISABLED</translation>
+      <translation type="unfinished">DEVICE DISABLED</translation>
     </message>
     <message>
       <source>Device Settings</source>
-      <translation>Device Settings</translation>
+      <translation type="unfinished">Device Settings</translation>
     </message>
     <message>
       <source>Camera Settings</source>
-      <translation>Camera Settings</translation>
+      <translation type="unfinished">Camera Settings</translation>
     </message>
     <message>
       <source>I/O Module Settings</source>
-      <translation>I/O Module Settings</translation>
+      <translation type="unfinished">I/O Module Settings</translation>
     </message>
     <message>
       <source>Diagnostics</source>
-      <translation>Diagnostics</translation>
+      <translation type="unfinished">Diagnostics</translation>
     </message>
     <message>
       <source>Enable</source>
-      <translation>Enable</translation>
+      <translation type="unfinished">Enable</translation>
     </message>
     <message>
       <source>Activate License</source>
-      <translation>Activate License</translation>
+      <translation type="unfinished">Activate License</translation>
     </message>
     <message>
       <source>Please check authentication information</source>
-      <translation>Please check authentication information</translation>
+      <translation type="unfinished">Please check authentication information</translation>
     </message>
     <message>
       <source>NO LIVE STREAM</source>
@@ -5011,35 +5011,35 @@ Kunci Lisensi: %2</translation>
     <name>QnStorageAnalyticsWidget</name>
     <message>
       <source>Select All</source>
-      <translation>Select All</translation>
+      <translation type="unfinished">Select All</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation>Export Selection to File...</translation>
+      <translation type="unfinished">Export Selection to File...</translation>
     </message>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation>Copy Selection to Clipboard</translation>
+      <translation type="unfinished">Copy Selection to Clipboard</translation>
     </message>
     <message>
       <source>Refresh</source>
-      <translation>Refresh</translation>
+      <translation type="unfinished">Refresh</translation>
     </message>
     <message>
       <source>Export selected events to file</source>
-      <translation>Export selected events to file</translation>
+      <translation type="unfinished">Export selected events to file</translation>
     </message>
     <message numerus="yes">
       <source>%n TB</source>
       <comment>TB - terabytes</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n TB</numerusform>
       </translation>
     </message>
     <message>
       <source>TB</source>
       <comment>TB - terabytes</comment>
-      <translation>TB</translation>
+      <translation type="unfinished">TB</translation>
     </message>
     <message>
       <source>Last 5 minutes</source>
@@ -5066,39 +5066,39 @@ Kunci Lisensi: %2</translation>
     <name>QnStorageConfigWidget</name>
     <message>
       <source>Main</source>
-      <translation>Main</translation>
+      <translation type="unfinished">Main</translation>
     </message>
     <message>
       <source>Backup</source>
-      <translation>Backup</translation>
+      <translation type="unfinished">Backup</translation>
     </message>
     <message>
       <source>Depending on the total size of the archive, reindexing can take up to several hours.</source>
-      <translation>Depending on the total size of the archive, reindexing can take up to several hours.</translation>
+      <translation type="unfinished">Depending on the total size of the archive, reindexing can take up to several hours.</translation>
     </message>
     <message>
       <source>Reindexing is only necessary if your archive folders have been moved, renamed or deleted.</source>
-      <translation>Reindexing is only necessary if your archive folders have been moved, renamed or deleted.</translation>
+      <translation type="unfinished">Reindexing is only necessary if your archive folders have been moved, renamed or deleted.</translation>
     </message>
     <message>
       <source>You can cancel this operation at any moment without data loss.</source>
-      <translation>You can cancel this operation at any moment without data loss.</translation>
+      <translation type="unfinished">You can cancel this operation at any moment without data loss.</translation>
     </message>
     <message>
       <source>Continue anyway?</source>
-      <translation>Continue anyway?</translation>
+      <translation type="unfinished">Continue anyway?</translation>
     </message>
     <message>
       <source>Hard disk load will increase significantly</source>
-      <translation>Hard disk load will increase significantly</translation>
+      <translation type="unfinished">Hard disk load will increase significantly</translation>
     </message>
     <message>
       <source>Archive reindexing completed</source>
-      <translation>Archive reindexing completed</translation>
+      <translation type="unfinished">Archive reindexing completed</translation>
     </message>
     <message>
       <source>Backup reindexing completed</source>
-      <translation>Backup reindexing completed</translation>
+      <translation type="unfinished">Backup reindexing completed</translation>
     </message>
     <message>
       <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
@@ -5110,15 +5110,15 @@ Kunci Lisensi: %2</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation>Delete</translation>
+      <translation type="unfinished">Delete</translation>
     </message>
     <message>
       <source>Keep</source>
-      <translation>Keep</translation>
+      <translation type="unfinished">Keep</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation>Cancel</translation>
+      <translation type="unfinished">Cancel</translation>
     </message>
     <message>
       <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
@@ -5159,47 +5159,47 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <name>QnStorageListModel</name>
     <message>
       <source>Invalid storage</source>
-      <translation>Invalid storage</translation>
+      <translation type="unfinished">Invalid storage</translation>
     </message>
     <message>
       <source>Remove</source>
-      <translation>Remove</translation>
+      <translation type="unfinished">Remove</translation>
     </message>
     <message>
       <source>Inaccessible</source>
-      <translation>Inaccessible</translation>
+      <translation type="unfinished">Inaccessible</translation>
     </message>
     <message>
       <source>%1 (Checking...)</source>
-      <translation>%1 (Checking...)</translation>
+      <translation type="unfinished">%1 (Checking...)</translation>
     </message>
     <message>
       <source>%1 (Scanning... %2%)</source>
-      <translation>%1 (Scanning... %2%)</translation>
+      <translation type="unfinished">%1 (Scanning... %2%)</translation>
     </message>
     <message>
       <source>%1 (Rebuilding... %2%)</source>
-      <translation>%1 (Rebuilding... %2%)</translation>
+      <translation type="unfinished">%1 (Rebuilding... %2%)</translation>
     </message>
     <message>
       <source>Loading...</source>
-      <translation>Loading...</translation>
+      <translation type="unfinished">Loading...</translation>
     </message>
     <message>
       <source>Backup</source>
-      <translation>Backup</translation>
+      <translation type="unfinished">Backup</translation>
     </message>
     <message>
       <source>Main</source>
-      <translation>Main</translation>
+      <translation type="unfinished">Main</translation>
     </message>
     <message>
       <source>%1 GB</source>
-      <translation>%1 GB</translation>
+      <translation type="unfinished">%1 GB</translation>
     </message>
     <message>
       <source>Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</source>
-      <translation>Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</translation>
+      <translation type="unfinished">Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</translation>
     </message>
     <message>
       <source>Reserved</source>
@@ -5231,7 +5231,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>%1 TB</source>
-      <translation>%1 TB</translation>
+      <translation type="unfinished">%1 TB</translation>
     </message>
     <message>
       <source>smb</source>
@@ -5255,7 +5255,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Type</source>
-      <translation>Type</translation>
+      <translation type="unfinished">Type</translation>
     </message>
     <message>
       <source>Purpose</source>
@@ -5270,54 +5270,54 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <name>QnStorageRebuildWidget</name>
     <message>
       <source>Fast Backup Scan...</source>
-      <translation>Fast Backup Scan...</translation>
+      <translation type="unfinished">Fast Backup Scan...</translation>
     </message>
     <message>
       <source>Fast Archive Scan...</source>
-      <translation>Fast Archive Scan...</translation>
+      <translation type="unfinished">Fast Archive Scan...</translation>
     </message>
     <message>
       <source>Reindexing Backup...</source>
-      <translation>Reindexing Backup...</translation>
+      <translation type="unfinished">Reindexing Backup...</translation>
     </message>
     <message>
       <source>Reindexing Archive...</source>
-      <translation>Reindexing Archive...</translation>
+      <translation type="unfinished">Reindexing Archive...</translation>
     </message>
   </context>
   <context>
     <name>QnStorageUrlDialog</name>
     <message>
       <source>\\&lt;Computer Name&gt;\&lt;Folder&gt;</source>
-      <translation>\\&lt;Computer Name&gt;\&lt;Folder&gt;</translation>
+      <translation type="unfinished">\\&lt;Computer Name&gt;\&lt;Folder&gt;</translation>
     </message>
     <message>
       <source>Network Shared Resource</source>
-      <translation>Network Shared Resource</translation>
+      <translation type="unfinished">Network Shared Resource</translation>
     </message>
     <message>
       <source>Invalid credentials for external storage</source>
-      <translation>Invalid credentials for external storage</translation>
+      <translation type="unfinished">Invalid credentials for external storage</translation>
     </message>
     <message>
       <source>Invalid storage path</source>
-      <translation>Invalid storage path</translation>
+      <translation type="unfinished">Invalid storage path</translation>
     </message>
     <message>
       <source>Add this storage anyway?</source>
-      <translation>Add this storage anyway?</translation>
+      <translation type="unfinished">Add this storage anyway?</translation>
     </message>
     <message>
       <source>Storage path used by another server</source>
-      <translation>Storage path used by another server</translation>
+      <translation type="unfinished">Storage path used by another server</translation>
     </message>
     <message>
       <source>Add Storage</source>
-      <translation>Add Storage</translation>
+      <translation type="unfinished">Add Storage</translation>
     </message>
     <message>
       <source>It is not recommended to use one recording location for different servers.</source>
-      <translation>It is not recommended to use one recording location for different servers.</translation>
+      <translation type="unfinished">It is not recommended to use one recording location for different servers.</translation>
     </message>
     <message>
       <source>Storage is available but will not be writable because it is too small in comparison to the already present storages</source>
@@ -5328,19 +5328,19 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <name>QnSystemAdministrationDialog</name>
     <message>
       <source>General</source>
-      <translation>General</translation>
+      <translation type="unfinished">General</translation>
     </message>
     <message>
       <source>Licenses</source>
-      <translation>Licenses</translation>
+      <translation type="unfinished">Licenses</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation>Email</translation>
+      <translation type="unfinished">Email</translation>
     </message>
     <message>
       <source>Updates</source>
-      <translation>Updates</translation>
+      <translation type="unfinished">Updates</translation>
     </message>
     <message>
       <source>Security</source>
@@ -5364,7 +5364,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Advanced</source>
-      <translation>Advanced</translation>
+      <translation type="unfinished">Advanced</translation>
     </message>
     <message>
       <source>Integrations</source>
@@ -5383,83 +5383,83 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <name>QnSystemHealthStringsHelper</name>
     <message>
       <source>Email address is not set</source>
-      <translation>Email address is not set</translation>
+      <translation type="unfinished">Email address is not set</translation>
     </message>
     <message>
       <source>No licenses</source>
-      <translation>No licenses</translation>
+      <translation type="unfinished">No licenses</translation>
     </message>
     <message>
       <source>Email server is not set</source>
-      <translation>Email server is not set</translation>
+      <translation type="unfinished">Email server is not set</translation>
     </message>
     <message>
       <source>Storage is not configured</source>
-      <translation>Storage is not configured</translation>
+      <translation type="unfinished">Storage is not configured</translation>
     </message>
     <message>
       <source>Rebuilding archive index is completed</source>
-      <translation>Rebuilding archive index is completed</translation>
+      <translation type="unfinished">Rebuilding archive index is completed</translation>
     </message>
     <message>
       <source>Rebuilding archive index is canceled by user</source>
-      <translation>Rebuilding archive index is canceled by user</translation>
+      <translation type="unfinished">Rebuilding archive index is canceled by user</translation>
     </message>
     <message>
       <source>Email address is not set for user %1</source>
-      <translation>Email address is not set for user %1</translation>
+      <translation type="unfinished">Email address is not set for user %1</translation>
     </message>
     <message>
       <source>Email address is not set.</source>
-      <translation>Email address is not set.</translation>
+      <translation type="unfinished">Email address is not set.</translation>
     </message>
     <message>
       <source>Email server is not set.</source>
-      <translation>Email server is not set.</translation>
+      <translation type="unfinished">Email server is not set.</translation>
     </message>
     <message>
       <source>You have no licenses.</source>
-      <translation>You have no licenses.</translation>
+      <translation type="unfinished">You have no licenses.</translation>
     </message>
     <message>
       <source>You cannot record video from cameras.</source>
-      <translation>You cannot record video from cameras.</translation>
+      <translation type="unfinished">You cannot record video from cameras.</translation>
     </message>
     <message>
       <source>Rebuilding archive index is completed on the following Server:</source>
-      <translation>Rebuilding archive index is completed on the following Server:</translation>
+      <translation type="unfinished">Rebuilding archive index is completed on the following Server:</translation>
     </message>
     <message>
       <source>Rebuilding archive index is canceled by user on the following Server:</source>
-      <translation>Rebuilding archive index is canceled by user on the following Server:</translation>
+      <translation type="unfinished">Rebuilding archive index is canceled by user on the following Server:</translation>
     </message>
     <message>
       <source>Learn more</source>
-      <translation>Learn more</translation>
+      <translation type="unfinished">Learn more</translation>
     </message>
     <message>
       <source>Connect</source>
-      <translation>Connect</translation>
+      <translation type="unfinished">Connect</translation>
     </message>
     <message>
       <source>Some users have not set their email addresses</source>
-      <translation>Some users have not set their email addresses</translation>
+      <translation type="unfinished">Some users have not set their email addresses</translation>
     </message>
     <message>
       <source>You cannot receive System notifications by email.</source>
-      <translation>You cannot receive System notifications by email.</translation>
+      <translation type="unfinished">You cannot receive System notifications by email.</translation>
     </message>
     <message>
       <source>Some users have not set their email addresses.</source>
-      <translation>Some users have not set their email addresses.</translation>
+      <translation type="unfinished">Some users have not set their email addresses.</translation>
     </message>
     <message>
       <source>They cannot receive System notifications by email.</source>
-      <translation>They cannot receive System notifications by email.</translation>
+      <translation type="unfinished">They cannot receive System notifications by email.</translation>
     </message>
     <message>
       <source>Error while sending email</source>
-      <translation>Error while sending email</translation>
+      <translation type="unfinished">Error while sending email</translation>
     </message>
     <message>
       <source>Archive integrity problem detected</source>
@@ -5468,12 +5468,12 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <message>
       <source>Connect your System to %1 &amp;mdash; make it accessible from anywhere!</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Connect your System to %1 &amp;mdash; make it accessible from anywhere!</translation>
+      <translation type="unfinished">Connect your System to %1 &amp;mdash; make it accessible from anywhere!</translation>
     </message>
     <message>
       <source>Check out %1 &amp;mdash; connect to your System from anywhere!</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Check out %1 &amp;mdash; connect to your System from anywhere!</translation>
+      <translation type="unfinished">Check out %1 &amp;mdash; connect to your System from anywhere!</translation>
     </message>
     <message>
       <source>Some cameras require passwords to be set</source>
@@ -5552,11 +5552,11 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <name>QnSystemSettingsWidget</name>
     <message>
       <source>Allow System to optimize device settings</source>
-      <translation>Allow System to optimize device settings</translation>
+      <translation type="unfinished">Allow System to optimize device settings</translation>
     </message>
     <message>
       <source>Allow System to optimize camera settings</source>
-      <translation>Allow System to optimize camera settings</translation>
+      <translation type="unfinished">Allow System to optimize camera settings</translation>
     </message>
     <message>
       <source>Includes information about system, such as cameras models and firmware versions, number of servers, etc.</source>
@@ -5587,11 +5587,11 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <name>QnTableExportHelper</name>
     <message>
       <source>Close all programs which may use this file and try again</source>
-      <translation>Close all programs which may use this file and try again</translation>
+      <translation type="unfinished">Close all programs which may use this file and try again</translation>
     </message>
     <message>
       <source>File used by another process</source>
-      <translation>File used by another process</translation>
+      <translation type="unfinished">File used by another process</translation>
     </message>
     <message>
       <source>HTML file</source>
@@ -5606,26 +5606,26 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <name>QnTimeSlider</name>
     <message>
       <source>No thumbnails available</source>
-      <translation>No thumbnails available</translation>
+      <translation type="unfinished">No thumbnails available</translation>
     </message>
   </context>
   <context>
     <name>QnTwoWayAudioWidget::Private</name>
     <message>
       <source>Input device is not selected</source>
-      <translation>Input device is not selected</translation>
+      <translation type="unfinished">Input device is not selected</translation>
     </message>
     <message>
       <source>Streaming is not ready yet</source>
-      <translation>Streaming is not ready yet</translation>
+      <translation type="unfinished">Streaming is not ready yet</translation>
     </message>
     <message>
       <source>Network error</source>
-      <translation>Network error</translation>
+      <translation type="unfinished">Network error</translation>
     </message>
     <message>
       <source>Hold to Speak</source>
-      <translation>Hold to Speak</translation>
+      <translation type="unfinished">Hold to Speak</translation>
     </message>
   </context>
   <context>
@@ -5662,42 +5662,42 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <name>QnVideowallManageWidget</name>
     <message>
       <source>Screen</source>
-      <translation>Screen</translation>
+      <translation type="unfinished">Screen</translation>
     </message>
     <message>
       <source>Screen %1</source>
-      <translation>Screen %1</translation>
+      <translation type="unfinished">Screen %1</translation>
     </message>
   </context>
   <context>
     <name>QnVideowallManageWidgetPrivate</name>
     <message>
       <source>New Item</source>
-      <translation>New Item</translation>
+      <translation type="unfinished">New Item</translation>
     </message>
     <message>
       <source>Display %1</source>
-      <translation>Display %1</translation>
+      <translation type="unfinished">Display %1</translation>
     </message>
     <message>
       <source>Delete &quot;%1&quot;?</source>
-      <translation>Delete &quot;%1&quot;?</translation>
+      <translation type="unfinished">Delete &quot;%1&quot;?</translation>
     </message>
   </context>
   <context>
     <name>QnVideowallScreenWidget</name>
     <message>
       <source>PC %1</source>
-      <translation>PC %1</translation>
+      <translation type="unfinished">PC %1</translation>
     </message>
     <message>
       <source>PC %1 - Display %2</source>
-      <translation>PC %1 - Display %2</translation>
+      <translation type="unfinished">PC %1 - Display %2</translation>
     </message>
     <message numerus="yes">
       <source>PC %1 - Displays %2</source>
       <comment>%2 will be substituted by _list_ of displays</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>PC %1 - Displays %2</numerusform>
       </translation>
     </message>
@@ -5717,23 +5717,23 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <name>QnWorkbenchBookmarksHandler</name>
     <message>
       <source>Bookmark</source>
-      <translation>Bookmark</translation>
+      <translation type="unfinished">Bookmark</translation>
     </message>
     <message>
       <source>Server offline</source>
-      <translation>Server offline</translation>
+      <translation type="unfinished">Server offline</translation>
     </message>
     <message>
       <source>Bookmarks can only be edited on an online Server.</source>
-      <translation>Bookmarks can only be edited on an online Server.</translation>
+      <translation type="unfinished">Bookmarks can only be edited on an online Server.</translation>
     </message>
     <message>
       <source>Delete bookmark?</source>
-      <translation>Delete bookmark?</translation>
+      <translation type="unfinished">Delete bookmark?</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n bookmarks?</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Delete %n bookmarks?</numerusform>
       </translation>
     </message>
@@ -5779,17 +5779,17 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <name>QnWorkbenchResourcesChangesWatcher</name>
     <message numerus="yes">
       <source>The following %n items are not saved:</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>The following %n items are not saved:</numerusform>
       </translation>
     </message>
     <message>
       <source>Failed to save changes</source>
-      <translation>Failed to save changes</translation>
+      <translation type="unfinished">Failed to save changes</translation>
     </message>
     <message numerus="yes">
       <source>Failed to delete %n items:</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Failed to delete %n items:</numerusform>
       </translation>
     </message>
@@ -5798,23 +5798,23 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <name>QnWorkbenchScreenRecordingHandler</name>
     <message>
       <source>Screen capturing subsystem is not initialized yet. Please try again later.</source>
-      <translation>Screen capturing subsystem is not initialized yet. Please try again later.</translation>
+      <translation type="unfinished">Screen capturing subsystem is not initialized yet. Please try again later.</translation>
     </message>
     <message>
       <source>Recording in %1...</source>
-      <translation>Recording in %1...</translation>
+      <translation type="unfinished">Recording in %1...</translation>
     </message>
     <message>
       <source>Recorded Video</source>
-      <translation>Recorded Video</translation>
+      <translation type="unfinished">Recorded Video</translation>
     </message>
     <message>
       <source>Save Recording As...</source>
-      <translation>Save Recording As...</translation>
+      <translation type="unfinished">Save Recording As...</translation>
     </message>
     <message>
       <source>Failed to start recording</source>
-      <translation>Failed to start recording</translation>
+      <translation type="unfinished">Failed to start recording</translation>
     </message>
     <message>
       <source>AVI (Audio/Video Interleaved)</source>
@@ -5829,27 +5829,27 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <name>QnWorkbenchScreenshotHandler</name>
     <message>
       <source>Save Screenshot As...</source>
-      <translation>Save Screenshot As...</translation>
+      <translation type="unfinished">Save Screenshot As...</translation>
     </message>
     <message>
       <source>Timestamp:</source>
-      <translation>Timestamp:</translation>
+      <translation type="unfinished">Timestamp:</translation>
     </message>
     <message>
       <source>Saving %1</source>
-      <translation>Saving %1</translation>
+      <translation type="unfinished">Saving %1</translation>
     </message>
     <message>
       <source>Saving Screenshot...</source>
-      <translation>Saving Screenshot...</translation>
+      <translation type="unfinished">Saving Screenshot...</translation>
     </message>
     <message>
       <source>Failed to save screenshot</source>
-      <translation>Failed to save screenshot</translation>
+      <translation type="unfinished">Failed to save screenshot</translation>
     </message>
     <message>
       <source>Failed to take screenshot</source>
-      <translation>Failed to take screenshot</translation>
+      <translation type="unfinished">Failed to take screenshot</translation>
     </message>
     <message>
       <source>PNG Image</source>
@@ -5876,59 +5876,59 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <name>QnWorkbenchVideoWallHandler</name>
     <message>
       <source>Video Wall</source>
-      <translation>Video Wall</translation>
+      <translation type="unfinished">Video Wall</translation>
     </message>
     <message>
       <source>Video Wall %1</source>
-      <translation>Video Wall %1</translation>
+      <translation type="unfinished">Video Wall %1</translation>
     </message>
     <message>
       <source>New Video Wall...</source>
-      <translation>New Video Wall...</translation>
+      <translation type="unfinished">New Video Wall...</translation>
     </message>
     <message>
       <source>New Matrix %1</source>
-      <translation>New Matrix %1</translation>
+      <translation type="unfinished">New Matrix %1</translation>
     </message>
     <message>
       <source>To enable this feature, please activate a Video Wall license.</source>
-      <translation>To enable this feature, please activate a Video Wall license.</translation>
+      <translation type="unfinished">To enable this feature, please activate a Video Wall license.</translation>
     </message>
     <message>
       <source>Failed to apply changes</source>
-      <translation>Failed to apply changes</translation>
+      <translation type="unfinished">Failed to apply changes</translation>
     </message>
     <message>
       <source>Stop Video Wall?</source>
-      <translation>Stop Video Wall?</translation>
+      <translation type="unfinished">Stop Video Wall?</translation>
     </message>
     <message>
       <source>To start it again, you should have physical access to its computer.</source>
-      <translation>To start it again, you should have physical access to its computer.</translation>
+      <translation type="unfinished">To start it again, you should have physical access to its computer.</translation>
     </message>
     <message>
       <source>Stop</source>
-      <translation>Stop</translation>
+      <translation type="unfinished">Stop</translation>
     </message>
     <message>
       <source>More Video Wall licenses required</source>
-      <translation>More Video Wall licenses required</translation>
+      <translation type="unfinished">More Video Wall licenses required</translation>
     </message>
     <message>
       <source>Control session cannot be started.</source>
-      <translation>Control session cannot be started.</translation>
+      <translation type="unfinished">Control session cannot be started.</translation>
     </message>
     <message>
       <source>Cannot save empty matrix</source>
-      <translation>Cannot save empty matrix</translation>
+      <translation type="unfinished">Cannot save empty matrix</translation>
     </message>
     <message>
       <source>Screen is being controlled by another user</source>
-      <translation>Screen is being controlled by another user</translation>
+      <translation type="unfinished">Screen is being controlled by another user</translation>
     </message>
     <message>
       <source>Enter the name of Video Wall to create:</source>
-      <translation>Enter the name of Video Wall to create:</translation>
+      <translation type="unfinished">Enter the name of Video Wall to create:</translation>
     </message>
     <message>
       <source>Activate License...</source>
@@ -6135,103 +6135,103 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <name>Resources</name>
     <message>
       <source>There is another layout with the same name</source>
-      <translation>There is another layout with the same name</translation>
+      <translation type="unfinished">There is another layout with the same name</translation>
     </message>
     <message>
       <source>You do not have permission to overwrite it.</source>
-      <translation>You do not have permission to overwrite it.</translation>
+      <translation type="unfinished">You do not have permission to overwrite it.</translation>
     </message>
     <message>
       <source>Overwrite existing layout?</source>
-      <translation>Overwrite existing layout?</translation>
+      <translation type="unfinished">Overwrite existing layout?</translation>
     </message>
     <message>
       <source>There is another layout with the same name.</source>
-      <translation>There is another layout with the same name.</translation>
+      <translation type="unfinished">There is another layout with the same name.</translation>
     </message>
     <message>
       <source>Changes will affect other users</source>
-      <translation>Changes will affect other users</translation>
+      <translation type="unfinished">Changes will affect other users</translation>
     </message>
     <message>
       <source>This layout is shared with other users, so you change it for them too.</source>
-      <translation>This layout is shared with other users, so you change it for them too.</translation>
+      <translation type="unfinished">This layout is shared with other users, so you change it for them too.</translation>
     </message>
     <message numerus="yes">
       <source>Remove %n items from layout?</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Remove %n items from layout?</numerusform>
       </translation>
     </message>
     <message>
       <source>Remove</source>
-      <translation>Remove</translation>
+      <translation type="unfinished">Remove</translation>
     </message>
     <message>
       <source>You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</source>
-      <translation>You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</translation>
+      <translation type="unfinished">You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</translation>
     </message>
     <message>
       <source>You will lose access to following resources:</source>
-      <translation>You will lose access to following resources:</translation>
+      <translation type="unfinished">You will lose access to following resources:</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n devices?</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Delete %n devices?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n cameras?</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Delete %n cameras?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n I/O Modules?</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Delete %n I/O Modules?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n items?</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Delete %n items?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n of them are auto-discovered.</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n of them are auto-discovered.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras are auto-discovered.</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n cameras are auto-discovered.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules are auto-discovered.</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n I/O modules are auto-discovered.</numerusform>
       </translation>
     </message>
     <message>
       <source>They may be auto-discovered again after removing.</source>
-      <translation>They may be auto-discovered again after removing.</translation>
+      <translation type="unfinished">They may be auto-discovered again after removing.</translation>
     </message>
     <message>
       <source>Overwrite existing showreel?</source>
-      <translation>Overwrite existing showreel?</translation>
+      <translation type="unfinished">Overwrite existing showreel?</translation>
     </message>
     <message>
       <source>There is another showreel with the same name.</source>
-      <translation>There is another showreel with the same name.</translation>
+      <translation type="unfinished">There is another showreel with the same name.</translation>
     </message>
     <message numerus="yes">
       <source>Remove %n items from showreel?</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Remove %n items from showreel?</numerusform>
       </translation>
     </message>
@@ -6271,11 +6271,11 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Move</source>
-      <translation>Move</translation>
+      <translation type="unfinished">Move</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation>Cancel</translation>
+      <translation type="unfinished">Cancel</translation>
     </message>
     <message>
       <source>Virtual cameras, USB or web cameras cannot be moved between servers. These devices will remain on %1:</source>
@@ -6352,13 +6352,13 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <message numerus="yes">
       <source>Delete %n users?</source>
       <comment>Numerical form depends on users count</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Delete %n users?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n matrices?</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Delete %n matrices?</numerusform>
       </translation>
     </message>
@@ -6377,11 +6377,11 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <name>ServerPickerStrings</name>
     <message>
       <source>Any Server</source>
-      <translation>Any Server</translation>
+      <translation type="unfinished">Any Server</translation>
     </message>
     <message numerus="yes">
       <source>%n Servers</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n Servers</numerusform>
       </translation>
     </message>
@@ -6404,7 +6404,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <name>ShowreelTextFactory</name>
     <message>
       <source>Start Showreel</source>
-      <translation>Start Showreel</translation>
+      <translation type="unfinished">Start Showreel</translation>
     </message>
   </context>
   <context>
@@ -6447,11 +6447,11 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Select at least one device</source>
-      <translation>Select at least one device</translation>
+      <translation type="unfinished">Select at least one device</translation>
     </message>
     <message>
       <source>Select at least one camera</source>
-      <translation>Select at least one camera</translation>
+      <translation type="unfinished">Select at least one camera</translation>
     </message>
     <message>
       <source>Select at least one I/O module</source>
@@ -6459,7 +6459,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Test</source>
-      <translation>Test</translation>
+      <translation type="unfinished">Test</translation>
     </message>
     <message>
       <source>Also set on source camera</source>
@@ -6475,7 +6475,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Source camera</source>
-      <translation>Source camera</translation>
+      <translation type="unfinished">Source camera</translation>
     </message>
     <message>
       <source>Also play on source camera</source>
@@ -6498,23 +6498,23 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <name>StreamQualityStrings</name>
     <message>
       <source>Lowest</source>
-      <translation>Lowest</translation>
+      <translation type="unfinished">Lowest</translation>
     </message>
     <message>
       <source>Low</source>
-      <translation>Low</translation>
+      <translation type="unfinished">Low</translation>
     </message>
     <message>
       <source>Medium</source>
-      <translation>Medium</translation>
+      <translation type="unfinished">Medium</translation>
     </message>
     <message>
       <source>High</source>
-      <translation>High</translation>
+      <translation type="unfinished">High</translation>
     </message>
     <message>
       <source>Best</source>
-      <translation>Best</translation>
+      <translation type="unfinished">Best</translation>
     </message>
     <message>
       <source>Preset</source>
@@ -6580,7 +6580,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <name>UserGroupsWidget::Private</name>
     <message>
       <source>Delete</source>
-      <translation>Delete</translation>
+      <translation type="unfinished">Delete</translation>
     </message>
     <message>
       <source>No groups found</source>
@@ -6629,11 +6629,11 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <name>UserListWidget::Private</name>
     <message>
       <source>Delete</source>
-      <translation>Delete</translation>
+      <translation type="unfinished">Delete</translation>
     </message>
     <message>
       <source>All Users</source>
-      <translation>All Users</translation>
+      <translation type="unfinished">All Users</translation>
     </message>
     <message>
       <source>Users with Digest Authentication</source>
@@ -6649,7 +6649,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Edit</source>
-      <translation>Edit</translation>
+      <translation type="unfinished">Edit</translation>
     </message>
     <message>
       <source>Multiple users share the same login, causing login failures. To resolve this issue, either update the affected user logins or disable/delete duplicates.</source>
@@ -6688,7 +6688,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <name>UserPickerHelper</name>
     <message>
       <source>All Users</source>
-      <translation>All Users</translation>
+      <translation type="unfinished">All Users</translation>
     </message>
     <message>
       <source>Select at least one user</source>
@@ -6696,7 +6696,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n Users</numerusform>
       </translation>
     </message>
@@ -6708,7 +6708,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message numerus="yes">
       <source>%n additional</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n additional</numerusform>
       </translation>
     </message>
@@ -6717,27 +6717,27 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <name>Videowall</name>
     <message>
       <source>There is another video wall with the same name</source>
-      <translation>There is another video wall with the same name</translation>
+      <translation type="unfinished">There is another video wall with the same name</translation>
     </message>
     <message>
       <source>Close %1 before starting Video Wall?</source>
-      <translation>Close %1 before starting Video Wall?</translation>
+      <translation type="unfinished">Close %1 before starting Video Wall?</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation>Close</translation>
+      <translation type="unfinished">Close</translation>
     </message>
     <message>
       <source>Keep</source>
-      <translation>Keep</translation>
+      <translation type="unfinished">Keep</translation>
     </message>
     <message>
       <source>Local files cannot be placed on Video Wall Screen attached to another computer</source>
-      <translation>Local files cannot be placed on Video Wall Screen attached to another computer</translation>
+      <translation type="unfinished">Local files cannot be placed on Video Wall Screen attached to another computer</translation>
     </message>
     <message>
       <source>To display local files on Video Wall, please attach them using computer where Video Wall is hosted.</source>
-      <translation>To display local files on Video Wall, please attach them using computer where Video Wall is hosted.</translation>
+      <translation type="unfinished">To display local files on Video Wall, please attach them using computer where Video Wall is hosted.</translation>
     </message>
   </context>
   <context>
@@ -6763,7 +6763,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Exporting video</source>
-      <translation>Exporting video</translation>
+      <translation type="unfinished">Exporting video</translation>
     </message>
     <message>
       <source>Stop Saving</source>
@@ -6779,14 +6779,14 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Minimize</source>
-      <translation>Minimize</translation>
+      <translation type="unfinished">Minimize</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AbstractPreferencesDialog</name>
     <message>
       <source>OK</source>
-      <translation>OK</translation>
+      <translation type="unfinished">OK</translation>
     </message>
     <message>
       <source>Apply</source>
@@ -6794,11 +6794,11 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Unsaved changes:</source>
-      <translation>Unsaved changes:</translation>
+      <translation type="unfinished">Unsaved changes:</translation>
     </message>
     <message>
       <source>Save changes before exit?</source>
-      <translation>Save changes before exit?</translation>
+      <translation type="unfinished">Save changes before exit?</translation>
     </message>
   </context>
   <context>
@@ -6842,7 +6842,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <message>
       <source>none</source>
       <comment>No currently selected camera</comment>
-      <translation>none</translation>
+      <translation type="unfinished">none</translation>
     </message>
     <message>
       <source>Devices on layout</source>
@@ -6913,11 +6913,11 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Manage Bookmarks</source>
-      <translation>Manage Bookmarks</translation>
+      <translation type="unfinished">Manage Bookmarks</translation>
     </message>
     <message>
       <source>User Input</source>
-      <translation>User Input</translation>
+      <translation type="unfinished">User Input</translation>
     </message>
     <message>
       <source>Edit Settings</source>
@@ -6956,7 +6956,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <name>nx::vms::client::desktop::AccessibleMediaViewHeaderWidget</name>
     <message>
       <source>All Cameras &amp; Resources</source>
-      <translation>All Cameras &amp; Resources</translation>
+      <translation type="unfinished">All Cameras &amp; Resources</translation>
     </message>
   </context>
   <context>
@@ -6974,7 +6974,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <name>nx::vms::client::desktop::AlarmLayoutHandler</name>
     <message>
       <source>Alarms</source>
-      <translation>Alarms</translation>
+      <translation type="unfinished">Alarms</translation>
     </message>
   </context>
   <context>
@@ -7009,7 +7009,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <name>nx::vms::client::desktop::AsyncImageWidget</name>
     <message>
       <source>NO DATA</source>
-      <translation>NO DATA</translation>
+      <translation type="unfinished">NO DATA</translation>
     </message>
     <message>
       <source>DISABLED</source>
@@ -7138,7 +7138,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Cameras</source>
-      <translation>Cameras</translation>
+      <translation type="unfinished">Cameras</translation>
     </message>
     <message>
       <source>What to backup</source>
@@ -7253,7 +7253,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <name>nx::vms::client::desktop::BackupSettingsWidget</name>
     <message>
       <source>Settings</source>
-      <translation>Settings</translation>
+      <translation type="unfinished">Settings</translation>
     </message>
     <message>
       <source>Bandwidth Limit</source>
@@ -7265,7 +7265,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Storage Management</source>
-      <translation>Storage Management</translation>
+      <translation type="unfinished">Storage Management</translation>
     </message>
     <message>
       <source>To enable backup change &quot;Main&quot; to &quot;Backup&quot; from some of the storages in %1</source>
@@ -7314,7 +7314,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>This action cannot be undone.</source>
-      <translation>This action cannot be undone.</translation>
+      <translation type="unfinished">This action cannot be undone.</translation>
     </message>
     <message>
       <source>Applies only to the cameras connected to current server.</source>
@@ -7353,7 +7353,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <name>nx::vms::client::desktop::BookmarkSearchWidget</name>
     <message>
       <source>No bookmarks</source>
-      <translation>No bookmarks</translation>
+      <translation type="unfinished">No bookmarks</translation>
     </message>
     <message numerus="yes">
       <source>%n bookmarks</source>
@@ -7381,11 +7381,11 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <name>nx::vms::client::desktop::CameraAdvancedParamsWidget</name>
     <message>
       <source>Loading values...</source>
-      <translation>Loading values...</translation>
+      <translation type="unfinished">Loading values...</translation>
     </message>
     <message>
       <source>Applying changes...</source>
-      <translation>Applying changes...</translation>
+      <translation type="unfinished">Applying changes...</translation>
     </message>
     <message>
       <source>Force Motion Detection</source>
@@ -7419,11 +7419,11 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <name>nx::vms::client::desktop::CameraCredentialsDialog</name>
     <message>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation type="unfinished">Login</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation>Password</translation>
+      <translation type="unfinished">Password</translation>
     </message>
   </context>
   <context>
@@ -7431,7 +7431,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <message>
       <source>Auto</source>
       <comment>Automatic RTP transport type</comment>
-      <translation>Auto</translation>
+      <translation type="unfinished">Auto</translation>
     </message>
     <message>
       <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
@@ -7461,7 +7461,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Never</source>
-      <translation>Never</translation>
+      <translation type="unfinished">Never</translation>
     </message>
     <message>
       <source>Force Motion Detection</source>
@@ -7486,11 +7486,11 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <message>
       <source>Auto</source>
       <comment>Automatic profile selection</comment>
-      <translation>Auto</translation>
+      <translation type="unfinished">Auto</translation>
     </message>
     <message>
       <source>Auto</source>
-      <translation>Auto</translation>
+      <translation type="unfinished">Auto</translation>
     </message>
     <message>
       <source>Only camera or server offline periods after the first addition to the system will be imported automatically.</source>
@@ -7524,7 +7524,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <name>nx::vms::client::desktop::CameraHotspotsEditorWidget</name>
     <message>
       <source>Delete</source>
-      <translation>Delete</translation>
+      <translation type="unfinished">Delete</translation>
     </message>
     <message>
       <source>Select Camera...</source>
@@ -7540,11 +7540,11 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>NO DATA</source>
-      <translation>NO DATA</translation>
+      <translation type="unfinished">NO DATA</translation>
     </message>
     <message>
       <source>NO ACCESS</source>
-      <translation>NO ACCESS</translation>
+      <translation type="unfinished">NO ACCESS</translation>
     </message>
   </context>
   <context>
@@ -7555,11 +7555,11 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Delete</source>
-      <translation>Delete</translation>
+      <translation type="unfinished">Delete</translation>
     </message>
     <message>
       <source>Camera</source>
-      <translation>Camera</translation>
+      <translation type="unfinished">Camera</translation>
     </message>
     <message>
       <source>Color</source>
@@ -7610,7 +7610,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <name>nx::vms::client::desktop::CameraMotionSettingsWidget</name>
     <message>
       <source>Motion detection will work only when camera is being viewed. Enable recording to make it work all the time.</source>
-      <translation>Motion detection will work only when camera is being viewed. Enable recording to make it work all the time.</translation>
+      <translation type="unfinished">Motion detection will work only when camera is being viewed. Enable recording to make it work all the time.</translation>
     </message>
     <message>
       <source>Maximum number of motion detection rectangles for current camera is reached</source>
@@ -7626,19 +7626,19 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Reset motion regions to default?</source>
-      <translation>Reset motion regions to default?</translation>
+      <translation type="unfinished">Reset motion regions to default?</translation>
     </message>
     <message>
       <source>This action cannot be undone.</source>
-      <translation>This action cannot be undone.</translation>
+      <translation type="unfinished">This action cannot be undone.</translation>
     </message>
     <message>
       <source>Primary Stream</source>
-      <translation>Primary Stream</translation>
+      <translation type="unfinished">Primary Stream</translation>
     </message>
     <message>
       <source>Secondary Stream</source>
-      <translation>Secondary Stream</translation>
+      <translation type="unfinished">Secondary Stream</translation>
     </message>
     <message>
       <source>Force Motion Detection</source>
@@ -7673,7 +7673,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Next</source>
-      <translation>Next</translation>
+      <translation type="unfinished">Next</translation>
     </message>
     <message>
       <source>Finish</source>
@@ -7713,11 +7713,11 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <name>nx::vms::client::desktop::CameraScheduleWidget</name>
     <message>
       <source>Recording Schedule</source>
-      <translation>Recording Schedule</translation>
+      <translation type="unfinished">Recording Schedule</translation>
     </message>
     <message>
       <source>based on server time</source>
-      <translation>based on server time</translation>
+      <translation type="unfinished">based on server time</translation>
     </message>
     <message>
       <source>High pre-recording time will increase RAM utilization on the server</source>
@@ -7775,11 +7775,11 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <name>nx::vms::client::desktop::CameraSettingsDialog</name>
     <message>
       <source>General</source>
-      <translation>General</translation>
+      <translation type="unfinished">General</translation>
     </message>
     <message>
       <source>Recording</source>
-      <translation>Recording</translation>
+      <translation type="unfinished">Recording</translation>
     </message>
     <message>
       <source>I/O Ports</source>
@@ -7791,11 +7791,11 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Advanced</source>
-      <translation>Advanced</translation>
+      <translation type="unfinished">Advanced</translation>
     </message>
     <message>
       <source>Web Page</source>
-      <translation>Web Page</translation>
+      <translation type="unfinished">Web Page</translation>
     </message>
     <message>
       <source>Expert</source>
@@ -7803,53 +7803,53 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message numerus="yes">
       <source>Changes to the following %n devices are not saved:</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Changes to the following %n devices are not saved:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n cameras are not saved:</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Changes to the following %n cameras are not saved:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n I/O Modules are not saved:</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Changes to the following %n I/O Modules are not saved:</numerusform>
       </translation>
     </message>
     <message>
       <source>Apply changes before switching to another camera?</source>
-      <translation>Apply changes before switching to another camera?</translation>
+      <translation type="unfinished">Apply changes before switching to another camera?</translation>
     </message>
     <message>
       <source>Device Settings</source>
-      <translation>Device Settings</translation>
+      <translation type="unfinished">Device Settings</translation>
     </message>
     <message>
       <source>Devices Settings</source>
-      <translation>Devices Settings</translation>
+      <translation type="unfinished">Devices Settings</translation>
     </message>
     <message>
       <source>Camera Settings</source>
-      <translation>Camera Settings</translation>
+      <translation type="unfinished">Camera Settings</translation>
     </message>
     <message>
       <source>Cameras Settings</source>
-      <translation>Cameras Settings</translation>
+      <translation type="unfinished">Cameras Settings</translation>
     </message>
     <message>
       <source>I/O Module Settings</source>
-      <translation>I/O Module Settings</translation>
+      <translation type="unfinished">I/O Module Settings</translation>
     </message>
     <message>
       <source>I/O Modules Settings</source>
-      <translation>I/O Modules Settings</translation>
+      <translation type="unfinished">I/O Modules Settings</translation>
     </message>
     <message>
       <source>Dewarping</source>
-      <translation>Dewarping</translation>
+      <translation type="unfinished">Dewarping</translation>
     </message>
     <message>
       <source>Change invalid schedule to &quot;Record Always&quot;</source>
@@ -7943,11 +7943,11 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <name>nx::vms::client::desktop::CameraStreamsDialog</name>
     <message>
       <source>Primary Stream</source>
-      <translation>Primary Stream</translation>
+      <translation type="unfinished">Primary Stream</translation>
     </message>
     <message>
       <source>Secondary Stream</source>
-      <translation>Secondary Stream</translation>
+      <translation type="unfinished">Secondary Stream</translation>
     </message>
     <message>
       <source>No secondary stream</source>
@@ -8057,30 +8057,30 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <message>
       <source>Copy</source>
       <comment>to Clipboard</comment>
-      <translation>Copy</translation>
+      <translation type="unfinished">Copy</translation>
     </message>
     <message>
       <source>Copy to Clipboard</source>
-      <translation>Copy to Clipboard</translation>
+      <translation type="unfinished">Copy to Clipboard</translation>
     </message>
     <message>
       <source>Paste</source>
       <comment>from Clipboard</comment>
-      <translation>Paste</translation>
+      <translation type="unfinished">Paste</translation>
     </message>
     <message>
       <source>Paste from Clipboard</source>
-      <translation>Paste from Clipboard</translation>
+      <translation type="unfinished">Paste from Clipboard</translation>
     </message>
     <message>
       <source>Copied</source>
       <comment>to Clipboard</comment>
-      <translation>Copied</translation>
+      <translation type="unfinished">Copied</translation>
     </message>
     <message>
       <source>Pasted</source>
       <comment>from Clipboard</comment>
-      <translation>Pasted</translation>
+      <translation type="unfinished">Pasted</translation>
     </message>
   </context>
   <context>
@@ -8095,11 +8095,11 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <name>nx::vms::client::desktop::CloudCrossSystemContext</name>
     <message>
       <source>Inaccessible</source>
-      <translation>Inaccessible</translation>
+      <translation type="unfinished">Inaccessible</translation>
     </message>
     <message>
       <source>Loading...</source>
-      <translation>Loading...</translation>
+      <translation type="unfinished">Loading...</translation>
     </message>
     <message>
       <source>Click to Show Cameras</source>
@@ -8143,7 +8143,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <name>nx::vms::client::desktop::CommonMessageBar</name>
     <message>
       <source>Close</source>
-      <translation>Close</translation>
+      <translation type="unfinished">Close</translation>
     </message>
   </context>
   <context>
@@ -8154,7 +8154,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Could not connect to server. Video Wall will be closed.</source>
-      <translation>Could not connect to server. Video Wall will be closed.</translation>
+      <translation type="unfinished">Could not connect to server. Video Wall will be closed.</translation>
     </message>
     <message>
       <source>Could not connect to server. Application will be closed.</source>
@@ -8179,7 +8179,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <message>
       <source>OK</source>
       <comment>Dialog button text.</comment>
-      <translation>OK</translation>
+      <translation type="unfinished">OK</translation>
     </message>
     <message>
       <source>Enter access link to continue your session</source>
@@ -8203,12 +8203,12 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <message>
       <source>System connected to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>System connected to %1</translation>
+      <translation type="unfinished">System connected to %1</translation>
     </message>
     <message>
       <source>Failed to connect System to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Failed to connect System to %1</translation>
+      <translation type="unfinished">Failed to connect System to %1</translation>
     </message>
     <message>
       <source>Connect System to %1</source>
@@ -8228,7 +8228,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <message>
       <source>Connect</source>
       <comment>Connect current System to cloud</comment>
-      <translation>Connect</translation>
+      <translation type="unfinished">Connect</translation>
     </message>
     <message>
       <source>Internal error. Please try again later.</source>
@@ -8244,19 +8244,19 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <name>nx::vms::client::desktop::ConnectToCurrentSystemTool</name>
     <message>
       <source>Configuring Server</source>
-      <translation>Configuring Server</translation>
+      <translation type="unfinished">Configuring Server</translation>
     </message>
     <message>
       <source>Total amount of licenses will decrease</source>
-      <translation>Total amount of licenses will decrease</translation>
+      <translation type="unfinished">Total amount of licenses will decrease</translation>
     </message>
     <message>
       <source>Enter password...</source>
-      <translation>Enter password...</translation>
+      <translation type="unfinished">Enter password...</translation>
     </message>
     <message>
       <source>Administrator password</source>
-      <translation>Administrator password</translation>
+      <translation type="unfinished">Administrator password</translation>
     </message>
     <message>
       <source>Merge Server to the System</source>
@@ -8277,7 +8277,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <name>nx::vms::client::desktop::ConnectionTestingDialog</name>
     <message>
       <source>Connect</source>
-      <translation>Connect</translation>
+      <translation type="unfinished">Connect</translation>
     </message>
     <message>
       <source>Setup</source>
@@ -8285,34 +8285,34 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Success</source>
-      <translation>Success</translation>
+      <translation type="unfinished">Success</translation>
     </message>
     <message>
       <source>Test Failed</source>
-      <translation>Test Failed</translation>
+      <translation type="unfinished">Test Failed</translation>
     </message>
     <message>
       <source>Request timeout</source>
-      <translation>Request timeout</translation>
+      <translation type="unfinished">Request timeout</translation>
     </message>
     <message>
       <source>New System</source>
-      <translation>New System</translation>
+      <translation type="unfinished">New System</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CopyScheduleCameraSelectionDialog</name>
     <message>
       <source>Recording cannot be enabled for some cameras.</source>
-      <translation>Recording cannot be enabled for some cameras.</translation>
+      <translation type="unfinished">Recording cannot be enabled for some cameras.</translation>
     </message>
     <message>
       <source>Schedule settings are not compatible with some devices.</source>
-      <translation>Schedule settings are not compatible with some devices.</translation>
+      <translation type="unfinished">Schedule settings are not compatible with some devices.</translation>
     </message>
     <message>
       <source>Copy archive length settings</source>
-      <translation>Copy archive length settings</translation>
+      <translation type="unfinished">Copy archive length settings</translation>
     </message>
     <message>
       <source>Recording Schedule contains recording modes that are not supported by the selected cameras. Unsupported recording modes will be changed to &quot;Record Always&quot;.</source>
@@ -8342,11 +8342,11 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>View bookmarks</source>
-      <translation>View bookmarks</translation>
+      <translation type="unfinished">View bookmarks</translation>
     </message>
     <message>
       <source>Modify bookmarks</source>
-      <translation>Modify bookmarks</translation>
+      <translation type="unfinished">Modify bookmarks</translation>
     </message>
     <message>
       <source>User input</source>
@@ -8354,11 +8354,11 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Edit camera settings</source>
-      <translation>Edit camera settings</translation>
+      <translation type="unfinished">Edit camera settings</translation>
     </message>
     <message>
       <source>View event log</source>
-      <translation>View event log</translation>
+      <translation type="unfinished">View event log</translation>
     </message>
     <message>
       <source>View live</source>
@@ -8400,27 +8400,27 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Could not find video encoder %1.</source>
-      <translation>Could not find video encoder %1.</translation>
+      <translation type="unfinished">Could not find video encoder %1.</translation>
     </message>
     <message>
       <source>Screen width must be a multiple of 8.</source>
-      <translation>Screen width must be a multiple of 8.</translation>
+      <translation type="unfinished">Screen width must be a multiple of 8.</translation>
     </message>
     <message>
       <source>Could not initialize video encoder.</source>
-      <translation>Could not initialize video encoder.</translation>
+      <translation type="unfinished">Could not initialize video encoder.</translation>
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>Could not initialize audio encoder.</translation>
+      <translation type="unfinished">Could not initialize audio encoder.</translation>
     </message>
     <message>
       <source>Could not initialize audio device &quot;%1&quot;.</source>
-      <translation>Could not initialize audio device &quot;%1&quot;.</translation>
+      <translation type="unfinished">Could not initialize audio device &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Could not start primary audio device.</source>
-      <translation>Could not start primary audio device.</translation>
+      <translation type="unfinished">Could not start primary audio device.</translation>
     </message>
   </context>
   <context>
@@ -8439,19 +8439,19 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Examples:</source>
-      <translation>Examples:</translation>
+      <translation type="unfinished">Examples:</translation>
     </message>
     <message>
       <source>Server offline</source>
-      <translation>Server offline</translation>
+      <translation type="unfinished">Server offline</translation>
     </message>
     <message>
       <source>Device search failed</source>
-      <translation>Device search failed</translation>
+      <translation type="unfinished">Device search failed</translation>
     </message>
     <message numerus="yes">
       <source>Failed to add %n devices</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Failed to add %n devices</numerusform>
       </translation>
     </message>
@@ -8461,15 +8461,15 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Search</source>
-      <translation>Search</translation>
+      <translation type="unfinished">Search</translation>
     </message>
     <message>
       <source>Initializing scan...</source>
-      <translation>Initializing scan...</translation>
+      <translation type="unfinished">Initializing scan...</translation>
     </message>
     <message>
       <source>Scanning online hosts...</source>
-      <translation>Scanning online hosts...</translation>
+      <translation type="unfinished">Scanning online hosts...</translation>
     </message>
     <message>
       <source>Checking host...</source>
@@ -8489,7 +8489,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>No devices found</source>
-      <translation>No devices found</translation>
+      <translation type="unfinished">No devices found</translation>
     </message>
     <message>
       <source>All devices are already added</source>
@@ -8550,35 +8550,35 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <name>nx::vms::client::desktop::EventLogDialog</name>
     <message>
       <source>Filter Similar Rows</source>
-      <translation>Filter Similar Rows</translation>
+      <translation type="unfinished">Filter Similar Rows</translation>
     </message>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation>Copy Selection to Clipboard</translation>
+      <translation type="unfinished">Copy Selection to Clipboard</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation>Export Selection to File...</translation>
+      <translation type="unfinished">Export Selection to File...</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation>Select All</translation>
+      <translation type="unfinished">Select All</translation>
     </message>
     <message>
       <source>Clear Filter</source>
-      <translation>Clear Filter</translation>
+      <translation type="unfinished">Clear Filter</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation>Description</translation>
+      <translation type="unfinished">Description</translation>
     </message>
     <message>
       <source>No events</source>
-      <translation>No events</translation>
+      <translation type="unfinished">No events</translation>
     </message>
     <message>
       <source>Any Action</source>
-      <translation>Any Action</translation>
+      <translation type="unfinished">Any Action</translation>
     </message>
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - %n events found</source>
@@ -8596,34 +8596,34 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Export selected events to file</source>
-      <translation>Export selected events to file</translation>
+      <translation type="unfinished">Export selected events to file</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::EventLogModel</name>
     <message>
       <source>Date/Time</source>
-      <translation>Date/Time</translation>
+      <translation type="unfinished">Date/Time</translation>
     </message>
     <message>
       <source>Event</source>
-      <translation>Event</translation>
+      <translation type="unfinished">Event</translation>
     </message>
     <message>
       <source>Source</source>
-      <translation>Source</translation>
+      <translation type="unfinished">Source</translation>
     </message>
     <message>
       <source>Action</source>
-      <translation>Action</translation>
+      <translation type="unfinished">Action</translation>
     </message>
     <message>
       <source>Target</source>
-      <translation>Target</translation>
+      <translation type="unfinished">Target</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation>Description</translation>
+      <translation type="unfinished">Description</translation>
     </message>
   </context>
   <context>
@@ -8631,7 +8631,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <message>
       <source>Notifications</source>
       <comment>Notifications tab title</comment>
-      <translation>Notifications</translation>
+      <translation type="unfinished">Notifications</translation>
     </message>
     <message>
       <source>Motion</source>
@@ -8641,7 +8641,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <message>
       <source>Bookmarks</source>
       <comment>Bookmarks tab title</comment>
-      <translation>Bookmarks</translation>
+      <translation type="unfinished">Bookmarks</translation>
     </message>
     <message>
       <source>Events</source>
@@ -8665,7 +8665,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <name>nx::vms::client::desktop::EventSearchWidget</name>
     <message>
       <source>No events</source>
-      <translation>No events</translation>
+      <translation type="unfinished">No events</translation>
     </message>
     <message numerus="yes">
       <source>%n events</source>
@@ -8682,7 +8682,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <name>nx::vms::client::desktop::EventTile</name>
     <message numerus="yes">
       <source>...and %n more</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>...and %n more</numerusform>
       </translation>
     </message>
@@ -8741,7 +8741,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <name>nx::vms::client::desktop::ExportSettingsDialog</name>
     <message>
       <source>Export</source>
-      <translation>Export</translation>
+      <translation type="unfinished">Export</translation>
     </message>
     <message>
       <source>Rapid Review</source>
@@ -8805,7 +8805,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>exported</source>
-      <translation>exported</translation>
+      <translation type="unfinished">exported</translation>
     </message>
     <message>
       <source>Chosen settings require transcoding. It will increase CPU usage and may take significant time.</source>
@@ -8868,15 +8868,15 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <name>nx::vms::client::desktop::FailoverPriorityColumnItemDelegate</name>
     <message>
       <source>Low</source>
-      <translation>Low</translation>
+      <translation type="unfinished">Low</translation>
     </message>
     <message>
       <source>Medium</source>
-      <translation>Medium</translation>
+      <translation type="unfinished">Medium</translation>
     </message>
     <message>
       <source>High</source>
-      <translation>High</translation>
+      <translation type="unfinished">High</translation>
     </message>
     <message>
       <source>No Failover</source>
@@ -8891,11 +8891,11 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Name</source>
-      <translation>Name</translation>
+      <translation type="unfinished">Name</translation>
     </message>
     <message>
       <source>Name cannot be empty.</source>
-      <translation>Name cannot be empty.</translation>
+      <translation type="unfinished">Name cannot be empty.</translation>
     </message>
     <message>
       <source>Select Folder...</source>
@@ -8918,7 +8918,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Enable</source>
-      <translation>Enable</translation>
+      <translation type="unfinished">Enable</translation>
     </message>
   </context>
   <context>
@@ -8929,11 +8929,11 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Model</source>
-      <translation>Model</translation>
+      <translation type="unfinished">Model</translation>
     </message>
     <message>
       <source>Address</source>
-      <translation>Address</translation>
+      <translation type="unfinished">Address</translation>
     </message>
     <message numerus="yes">
       <source>%n new</source>
@@ -8952,7 +8952,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <name>nx::vms::client::desktop::GlobalPermissionsModel</name>
     <message>
       <source>View event log</source>
-      <translation>View event log</translation>
+      <translation type="unfinished">View event log</translation>
     </message>
     <message>
       <source>Generate events</source>
@@ -9012,7 +9012,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Failed to apply changes</source>
-      <translation>Failed to apply changes</translation>
+      <translation type="unfinished">Failed to apply changes</translation>
     </message>
     <message>
       <source>Delete groups</source>
@@ -9020,7 +9020,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Delete</source>
-      <translation>Delete</translation>
+      <translation type="unfinished">Delete</translation>
     </message>
     <message>
       <source>Group name cannot be empty</source>
@@ -9054,22 +9054,22 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <name>nx::vms::client::desktop::ImageControlWidget</name>
     <message>
       <source>Auto</source>
-      <translation>Auto</translation>
+      <translation type="unfinished">Auto</translation>
     </message>
     <message>
       <source>%1 degrees</source>
-      <translation>%1 degrees</translation>
+      <translation type="unfinished">%1 degrees</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ImageOverlaySettingsWidget</name>
     <message>
       <source>Select file...</source>
-      <translation>Select file...</translation>
+      <translation type="unfinished">Select file...</translation>
     </message>
     <message>
       <source>Error</source>
-      <translation>Error</translation>
+      <translation type="unfinished">Error</translation>
     </message>
     <message>
       <source>Image cannot be loaded.</source>
@@ -9080,23 +9080,23 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <name>nx::vms::client::desktop::IncompatibleServersActionHandler</name>
     <message>
       <source>Systems will be merged shortly</source>
-      <translation>Systems will be merged shortly</translation>
+      <translation type="unfinished">Systems will be merged shortly</translation>
     </message>
     <message>
       <source>Servers from the other System will appear in the resource tree.</source>
-      <translation>Servers from the other System will appear in the resource tree.</translation>
+      <translation type="unfinished">Servers from the other System will appear in the resource tree.</translation>
     </message>
     <message>
       <source>Connecting to the current System...</source>
-      <translation>Connecting to the current System...</translation>
+      <translation type="unfinished">Connecting to the current System...</translation>
     </message>
     <message>
       <source>Server will be connected to System shortly</source>
-      <translation>Server will be connected to System shortly</translation>
+      <translation type="unfinished">Server will be connected to System shortly</translation>
     </message>
     <message>
       <source>It will appear in the resource tree when the database synchronization is finished.</source>
-      <translation>It will appear in the resource tree when the database synchronization is finished.</translation>
+      <translation type="unfinished">It will appear in the resource tree when the database synchronization is finished.</translation>
     </message>
     <message>
       <source>Failed to merge %1 to our system.</source>
@@ -9107,7 +9107,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <name>nx::vms::client::desktop::LabelSelectionManager</name>
     <message>
       <source>Copy</source>
-      <translation>Copy</translation>
+      <translation type="unfinished">Copy</translation>
     </message>
     <message>
       <source>Copy Link Location</source>
@@ -9118,38 +9118,38 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <name>nx::vms::client::desktop::LayoutBackgroundSettingsWidget</name>
     <message>
       <source>cells</source>
-      <translation>cells</translation>
+      <translation type="unfinished">cells</translation>
     </message>
     <message>
       <source>No picture</source>
-      <translation>No picture</translation>
+      <translation type="unfinished">No picture</translation>
     </message>
     <message>
       <source>Error while loading picture</source>
-      <translation>Error while loading picture</translation>
+      <translation type="unfinished">Error while loading picture</translation>
     </message>
     <message>
       <source>Error while uploading picture</source>
-      <translation>Error while uploading picture</translation>
+      <translation type="unfinished">Error while uploading picture</translation>
     </message>
     <message>
       <source>Select file...</source>
-      <translation>Select file...</translation>
+      <translation type="unfinished">Select file...</translation>
     </message>
     <message>
       <source>Picture cannot be read</source>
-      <translation>Picture cannot be read</translation>
+      <translation type="unfinished">Picture cannot be read</translation>
     </message>
     <message>
       <source>Picture cannot be loaded</source>
-      <translation>Picture cannot be loaded</translation>
+      <translation type="unfinished">Picture cannot be loaded</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::LayoutGeneralSettingsWidget</name>
     <message>
       <source>cells</source>
-      <translation>cells</translation>
+      <translation type="unfinished">cells</translation>
     </message>
     <message>
       <source>Custom number that can be assigned to a layout for quick identification and access</source>
@@ -9164,7 +9164,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <name>nx::vms::client::desktop::LayoutSettingsDialog</name>
     <message>
       <source>General</source>
-      <translation>General</translation>
+      <translation type="unfinished">General</translation>
     </message>
     <message>
       <source>Background</source>
@@ -9175,7 +9175,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <name>nx::vms::client::desktop::LayoutThumbnailLoader</name>
     <message>
       <source>NO DATA</source>
-      <translation>NO DATA</translation>
+      <translation type="unfinished">NO DATA</translation>
     </message>
     <message>
       <source>NOT A CAMERA</source>
@@ -9206,7 +9206,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Disconnect</source>
-      <translation>Disconnect</translation>
+      <translation type="unfinished">Disconnect</translation>
     </message>
     <message>
       <source>Reset Settings</source>
@@ -9218,7 +9218,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Reset</source>
-      <translation>Reset</translation>
+      <translation type="unfinished">Reset</translation>
     </message>
     <message>
       <source>Connection failed</source>
@@ -9258,7 +9258,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Failed to apply changes</source>
-      <translation>Failed to apply changes</translation>
+      <translation type="unfinished">Failed to apply changes</translation>
     </message>
     <message>
       <source>LDAP</source>
@@ -9273,7 +9273,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <name>nx::vms::client::desktop::LicenseManagerWidget</name>
     <message numerus="yes">
       <source>%n channels.</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n channels.</numerusform>
       </translation>
     </message>
@@ -9283,7 +9283,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Export</source>
-      <translation>Export</translation>
+      <translation type="unfinished">Export</translation>
     </message>
     <message numerus="yes">
       <source>%1 are currently in use</source>
@@ -9307,21 +9307,21 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message numerus="yes">
       <source>Deactivate licenses?</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Deactivate licenses?</numerusform>
       </translation>
     </message>
     <message>
       <source>Deactivate</source>
-      <translation>Deactivate</translation>
+      <translation type="unfinished">Deactivate</translation>
     </message>
     <message>
       <source>Export licenses to a file</source>
-      <translation>Export licenses to a file</translation>
+      <translation type="unfinished">Export licenses to a file</translation>
     </message>
     <message>
       <source>Remove</source>
-      <translation>Remove</translation>
+      <translation type="unfinished">Remove</translation>
     </message>
   </context>
   <context>
@@ -9376,11 +9376,11 @@ Ingatlah untuk mengembalikan Level Logging ke pengaturan default setelah Anda me
     <name>nx::vms::client::desktop::LoginDialog</name>
     <message>
       <source>Connect to Server...</source>
-      <translation>Connect to Server...</translation>
+      <translation type="unfinished">Connect to Server...</translation>
     </message>
     <message>
       <source>Version %1</source>
-      <translation>Version %1</translation>
+      <translation type="unfinished">Version %1</translation>
     </message>
     <message>
       <source>The provided link is not valid or has expired</source>
@@ -9399,15 +9399,15 @@ Ingatlah untuk mengembalikan Level Logging ke pengaturan default setelah Anda me
     </message>
     <message>
       <source>Client</source>
-      <translation>Client</translation>
+      <translation type="unfinished">Client</translation>
     </message>
     <message>
       <source>None</source>
-      <translation>None</translation>
+      <translation type="unfinished">None</translation>
     </message>
     <message>
       <source>Error</source>
-      <translation>Error</translation>
+      <translation type="unfinished">Error</translation>
     </message>
     <message>
       <source>Warning</source>
@@ -9456,7 +9456,7 @@ Ingatlah untuk mengembalikan Level Logging ke pengaturan default setelah Anda me
     </message>
     <message numerus="yes">
       <source>%n Servers</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n Servers</numerusform>
       </translation>
     </message>
@@ -9521,19 +9521,19 @@ Ingatlah untuk mengembalikan Level Logging ke pengaturan default setelah Anda me
     </message>
     <message>
       <source>Server offline</source>
-      <translation>Server offline</translation>
+      <translation type="unfinished">Server offline</translation>
     </message>
     <message>
       <source>Device address field must contain a valid URL, IP address, or RTSP link.</source>
-      <translation>Device address field must contain a valid URL, IP address, or RTSP link.</translation>
+      <translation type="unfinished">Device address field must contain a valid URL, IP address, or RTSP link.</translation>
     </message>
     <message>
       <source>First address in range is greater than the last one.</source>
-      <translation>First address in range is greater than the last one.</translation>
+      <translation type="unfinished">First address in range is greater than the last one.</translation>
     </message>
     <message>
       <source>The specified IP address range has more than 255 addresses.</source>
-      <translation>The specified IP address range has more than 255 addresses.</translation>
+      <translation type="unfinished">The specified IP address range has more than 255 addresses.</translation>
     </message>
     <message>
       <source>Can not start the search process</source>
@@ -9551,23 +9551,23 @@ Ingatlah untuk mengembalikan Level Logging ke pengaturan default setelah Anda me
     <name>nx::vms::client::desktop::MergeSystemsDialog</name>
     <message>
       <source>You are about to merge the current System %1 with System</source>
-      <translation>You are about to merge the current System %1 with System</translation>
+      <translation type="unfinished">You are about to merge the current System %1 with System</translation>
     </message>
     <message>
       <source>%1 (current)</source>
-      <translation>%1 (current)</translation>
+      <translation type="unfinished">%1 (current)</translation>
     </message>
     <message>
       <source>URL is invalid.</source>
-      <translation>URL is invalid.</translation>
+      <translation type="unfinished">URL is invalid.</translation>
     </message>
     <message>
       <source>The login cannot be empty.</source>
-      <translation>The login cannot be empty.</translation>
+      <translation type="unfinished">The login cannot be empty.</translation>
     </message>
     <message>
       <source>Testing...</source>
-      <translation>Testing...</translation>
+      <translation type="unfinished">Testing...</translation>
     </message>
     <message>
       <source>Merge Systems</source>
@@ -9584,35 +9584,35 @@ Ingatlah untuk mengembalikan Level Logging ke pengaturan default setelah Anda me
     </message>
     <message>
       <source>Merging Systems...</source>
-      <translation>Merging Systems...</translation>
+      <translation type="unfinished">Merging Systems...</translation>
     </message>
     <message>
       <source>Use a specific hostname or IP address rather than %1.</source>
-      <translation>Use a specific hostname or IP address rather than %1.</translation>
+      <translation type="unfinished">Use a specific hostname or IP address rather than %1.</translation>
     </message>
     <message>
       <source>This is the current System URL.</source>
-      <translation>This is the current System URL.</translation>
+      <translation type="unfinished">This is the current System URL.</translation>
     </message>
     <message>
       <source>Merge with %1</source>
-      <translation>Merge with %1</translation>
+      <translation type="unfinished">Merge with %1</translation>
     </message>
     <message>
       <source>Servers from the other System will appear in the resource tree when the database synchronization is finished.</source>
-      <translation>Servers from the other System will appear in the resource tree when the database synchronization is finished.</translation>
+      <translation type="unfinished">Servers from the other System will appear in the resource tree when the database synchronization is finished.</translation>
     </message>
     <message>
       <source>You will be reconnected.</source>
-      <translation>You will be reconnected.</translation>
+      <translation type="unfinished">You will be reconnected.</translation>
     </message>
     <message>
       <source>Systems will be merged shortly</source>
-      <translation>Systems will be merged shortly</translation>
+      <translation type="unfinished">Systems will be merged shortly</translation>
     </message>
     <message>
       <source>Failed to merge Systems</source>
-      <translation>Failed to merge Systems</translation>
+      <translation type="unfinished">Failed to merge Systems</translation>
     </message>
     <message>
       <source>support</source>
@@ -9627,7 +9627,7 @@ Ingatlah untuk mengembalikan Level Logging ke pengaturan default setelah Anda me
     <name>nx::vms::client::desktop::MergeSystemsTool</name>
     <message>
       <source>New System</source>
-      <translation>New System</translation>
+      <translation type="unfinished">New System</translation>
     </message>
     <message>
       <source>System was not found.</source>
@@ -9707,7 +9707,7 @@ Ingatlah untuk mengembalikan Level Logging ke pengaturan default setelah Anda me
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation>Unknown error.</translation>
+      <translation type="unfinished">Unknown error.</translation>
     </message>
     <message>
       <source>%1 systems have different owners. Merge is not allowed.</source>
@@ -9750,15 +9750,15 @@ Anda dapat memaksanya, tetapi ini dapat meningkatkan beban CPU secara signifikan
     <name>nx::vms::client::desktop::MultiServerUpdatesWidget</name>
     <message>
       <source>Release notes</source>
-      <translation>Release notes</translation>
+      <translation type="unfinished">Release notes</translation>
     </message>
     <message>
       <source>Download in External Browser</source>
-      <translation>Download in External Browser</translation>
+      <translation type="unfinished">Download in External Browser</translation>
     </message>
     <message>
       <source>Copy Link to Clipboard</source>
-      <translation>Copy Link to Clipboard</translation>
+      <translation type="unfinished">Copy Link to Clipboard</translation>
     </message>
     <message>
       <source>You have already installed this version.</source>
@@ -9795,7 +9795,7 @@ Anda dapat memaksanya, tetapi ini dapat meningkatkan beban CPU secara signifikan
     <message>
       <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation>Incompatible %1 instance. To update disconnect System from %1 first.</translation>
+      <translation type="unfinished">Incompatible %1 instance. To update disconnect System from %1 first.</translation>
     </message>
     <message>
       <source>No update package available</source>
@@ -9803,7 +9803,7 @@ Anda dapat memaksanya, tetapi ini dapat meningkatkan beban CPU secara signifikan
     </message>
     <message>
       <source>Select Update File...</source>
-      <translation>Select Update File...</translation>
+      <translation type="unfinished">Select Update File...</translation>
     </message>
     <message>
       <source>Update Files</source>
@@ -9861,7 +9861,7 @@ Anda dapat memaksanya, tetapi ini dapat meningkatkan beban CPU secara signifikan
     </message>
     <message>
       <source>If the problem persists, please contact Customer Support.</source>
-      <translation>If the problem persists, please contact Customer Support.</translation>
+      <translation type="unfinished">If the problem persists, please contact Customer Support.</translation>
     </message>
     <message>
       <source>Try again</source>
@@ -9869,11 +9869,11 @@ Anda dapat memaksanya, tetapi ini dapat meningkatkan beban CPU secara signifikan
     </message>
     <message>
       <source>Cancel Update</source>
-      <translation>Cancel Update</translation>
+      <translation type="unfinished">Cancel Update</translation>
     </message>
     <message>
       <source>Update completed</source>
-      <translation>Update completed</translation>
+      <translation type="unfinished">Update completed</translation>
     </message>
     <message>
       <source>Update completed, but some components have failed an update</source>
@@ -9881,15 +9881,15 @@ Anda dapat memaksanya, tetapi ini dapat meningkatkan beban CPU secara signifikan
     </message>
     <message>
       <source>Please update %1 manually using an installation package.</source>
-      <translation>Please update %1 manually using an installation package.</translation>
+      <translation type="unfinished">Please update %1 manually using an installation package.</translation>
     </message>
     <message>
       <source>%1 will be restarted to the updated version.</source>
-      <translation>%1 will be restarted to the updated version.</translation>
+      <translation type="unfinished">%1 will be restarted to the updated version.</translation>
     </message>
     <message>
       <source>OK</source>
-      <translation>OK</translation>
+      <translation type="unfinished">OK</translation>
     </message>
     <message>
       <source>There was an error while installing updates:</source>
@@ -9897,7 +9897,7 @@ Anda dapat memaksanya, tetapi ini dapat meningkatkan beban CPU secara signifikan
     </message>
     <message>
       <source>Downloading updates...</source>
-      <translation>Downloading updates...</translation>
+      <translation type="unfinished">Downloading updates...</translation>
     </message>
     <message>
       <source>Finish Update</source>
@@ -9905,7 +9905,7 @@ Anda dapat memaksanya, tetapi ini dapat meningkatkan beban CPU secara signifikan
     </message>
     <message>
       <source>Cancel</source>
-      <translation>Cancel</translation>
+      <translation type="unfinished">Cancel</translation>
     </message>
     <message>
       <source>The latest version is already installed</source>
@@ -9929,7 +9929,7 @@ Anda dapat memaksanya, tetapi ini dapat meningkatkan beban CPU secara signifikan
     </message>
     <message>
       <source>Download</source>
-      <translation>Download</translation>
+      <translation type="unfinished">Download</translation>
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
@@ -9945,7 +9945,7 @@ Anda dapat memaksanya, tetapi ini dapat meningkatkan beban CPU secara signifikan
     </message>
     <message>
       <source>Update to Specific Build</source>
-      <translation>Update to Specific Build</translation>
+      <translation type="unfinished">Update to Specific Build</translation>
     </message>
     <message>
       <source>Downloading client package...</source>
@@ -9953,7 +9953,7 @@ Anda dapat memaksanya, tetapi ini dapat meningkatkan beban CPU secara signifikan
     </message>
     <message>
       <source>Installing updates...</source>
-      <translation>Installing updates...</translation>
+      <translation type="unfinished">Installing updates...</translation>
     </message>
     <message>
       <source>Installing client updates...</source>
@@ -9993,15 +9993,15 @@ Anda dapat memaksanya, tetapi ini dapat meningkatkan beban CPU secara signifikan
     </message>
     <message>
       <source>System update in process</source>
-      <translation>System update in process</translation>
+      <translation type="unfinished">System update in process</translation>
     </message>
     <message>
       <source>Continue in Background</source>
-      <translation>Continue in Background</translation>
+      <translation type="unfinished">Continue in Background</translation>
     </message>
     <message>
       <source>Latest Available Update</source>
-      <translation>Latest Available Update</translation>
+      <translation type="unfinished">Latest Available Update</translation>
     </message>
     <message>
       <source>Specific Build</source>
@@ -10085,11 +10085,11 @@ Anda dapat memaksanya, tetapi ini dapat meningkatkan beban CPU secara signifikan
     <name>nx::vms::client::desktop::NotificationListModel::Private</name>
     <message>
       <source>Alarm: %1</source>
-      <translation>Alarm: %1</translation>
+      <translation type="unfinished">Alarm: %1</translation>
     </message>
     <message>
       <source>Acknowledge</source>
-      <translation>Acknowledge</translation>
+      <translation type="unfinished">Acknowledge</translation>
     </message>
   </context>
   <context>
@@ -10122,7 +10122,7 @@ Anda dapat memaksanya, tetapi ini dapat meningkatkan beban CPU secara signifikan
     <message>
       <source>Cannot connect to %1</source>
       <comment>%1 is the cloud name like Nx Cloud</comment>
-      <translation>Cannot connect to %1</translation>
+      <translation type="unfinished">Cannot connect to %1</translation>
     </message>
   </context>
   <context>
@@ -10171,7 +10171,7 @@ Anda dapat memaksanya, tetapi ini dapat meningkatkan beban CPU secara signifikan
     </message>
     <message>
       <source>Learn more</source>
-      <translation>Learn more</translation>
+      <translation type="unfinished">Learn more</translation>
     </message>
   </context>
   <context>
@@ -10245,7 +10245,7 @@ Anda dapat memaksanya, tetapi ini dapat meningkatkan beban CPU secara signifikan
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation>Unknown error.</translation>
+      <translation type="unfinished">Unknown error.</translation>
     </message>
     <message>
       <source>Unexpected error code.</source>
@@ -10320,7 +10320,7 @@ Anda dapat memaksanya, tetapi ini dapat meningkatkan beban CPU secara signifikan
     </message>
     <message>
       <source>Camera</source>
-      <translation>Camera</translation>
+      <translation type="unfinished">Camera</translation>
     </message>
     <message>
       <source>Consumption</source>
@@ -10328,7 +10328,7 @@ Anda dapat memaksanya, tetapi ini dapat meningkatkan beban CPU secara signifikan
     </message>
     <message>
       <source>Status</source>
-      <translation>Status</translation>
+      <translation type="unfinished">Status</translation>
     </message>
     <message>
       <source>Power</source>
@@ -10391,23 +10391,23 @@ Anda dapat memaksanya, tetapi ini dapat meningkatkan beban CPU secara signifikan
     <name>nx::vms::client::desktop::QnWebpageDialog</name>
     <message>
       <source>Name</source>
-      <translation>Name</translation>
+      <translation type="unfinished">Name</translation>
     </message>
     <message>
       <source>URL</source>
-      <translation>URL</translation>
+      <translation type="unfinished">URL</translation>
     </message>
     <message>
       <source>URL cannot be empty.</source>
-      <translation>URL cannot be empty.</translation>
+      <translation type="unfinished">URL cannot be empty.</translation>
     </message>
     <message>
       <source>Wrong URL format.</source>
-      <translation>Wrong URL format.</translation>
+      <translation type="unfinished">Wrong URL format.</translation>
     </message>
     <message>
       <source>Web Page</source>
-      <translation>Web Page</translation>
+      <translation type="unfinished">Web Page</translation>
     </message>
     <message>
       <source>Turn on webpage proxy on &lt;b&gt;General&lt;/b&gt; tab.</source>
@@ -10447,7 +10447,7 @@ Anda dapat memaksanya, tetapi ini dapat meningkatkan beban CPU secara signifikan
     </message>
     <message>
       <source>Edit Web Page</source>
-      <translation>Edit Web Page</translation>
+      <translation type="unfinished">Edit Web Page</translation>
     </message>
     <message>
       <source>New Proxied Web Page</source>
@@ -10486,15 +10486,15 @@ Anda dapat memaksanya, tetapi ini dapat meningkatkan beban CPU secara signifikan
     <name>nx::vms::client::desktop::RadassActionFactory</name>
     <message>
       <source>Auto</source>
-      <translation>Auto</translation>
+      <translation type="unfinished">Auto</translation>
     </message>
     <message>
       <source>Low</source>
-      <translation>Low</translation>
+      <translation type="unfinished">Low</translation>
     </message>
     <message>
       <source>High</source>
-      <translation>High</translation>
+      <translation type="unfinished">High</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -10521,31 +10521,31 @@ Anda dapat memaksanya, tetapi ini dapat meningkatkan beban CPU secara signifikan
     <name>nx::vms::client::desktop::RecordingSettingsWidget</name>
     <message>
       <source>Screen %1 - %2x%3</source>
-      <translation>Screen %1 - %2x%3</translation>
+      <translation type="unfinished">Screen %1 - %2x%3</translation>
     </message>
     <message>
       <source>%1 (Primary)</source>
-      <translation>%1 (Primary)</translation>
+      <translation type="unfinished">%1 (Primary)</translation>
     </message>
     <message>
       <source>Best</source>
-      <translation>Best</translation>
+      <translation type="unfinished">Best</translation>
     </message>
     <message>
       <source>Average</source>
-      <translation>Average</translation>
+      <translation type="unfinished">Average</translation>
     </message>
     <message>
       <source>Performance</source>
-      <translation>Performance</translation>
+      <translation type="unfinished">Performance</translation>
     </message>
     <message>
       <source>Native</source>
-      <translation>Native</translation>
+      <translation type="unfinished">Native</translation>
     </message>
     <message>
       <source>Quarter Native</source>
-      <translation>Quarter Native</translation>
+      <translation type="unfinished">Quarter Native</translation>
     </message>
     <message>
       <source>Select Folder...</source>
@@ -10556,27 +10556,27 @@ Anda dapat memaksanya, tetapi ini dapat meningkatkan beban CPU secara signifikan
     <name>nx::vms::client::desktop::RecordingStatusHelper</name>
     <message>
       <source>Not recording</source>
-      <translation>Not recording</translation>
+      <translation type="unfinished">Not recording</translation>
     </message>
     <message>
       <source>Recording everything</source>
-      <translation>Recording everything</translation>
+      <translation type="unfinished">Recording everything</translation>
     </message>
     <message>
       <source>Recording motion only</source>
-      <translation>Recording motion only</translation>
+      <translation type="unfinished">Recording motion only</translation>
     </message>
     <message>
       <source>Recording motion and low quality</source>
-      <translation>Recording motion and low quality</translation>
+      <translation type="unfinished">Recording motion and low quality</translation>
     </message>
     <message>
       <source>Continuous</source>
-      <translation>Continuous</translation>
+      <translation type="unfinished">Continuous</translation>
     </message>
     <message>
       <source>Motion only</source>
-      <translation>Motion only</translation>
+      <translation type="unfinished">Motion only</translation>
     </message>
     <message>
       <source>Motion + Lo-Res</source>
@@ -10670,7 +10670,7 @@ Anda dapat memaksanya, tetapi ini dapat meningkatkan beban CPU secara signifikan
     </message>
     <message>
       <source>Health Monitor</source>
-      <translation>Health Monitor</translation>
+      <translation type="unfinished">Health Monitor</translation>
     </message>
   </context>
   <context>
@@ -10764,7 +10764,7 @@ Anda dapat memaksanya, tetapi ini dapat meningkatkan beban CPU secara signifikan
     <name>nx::vms::client::desktop::ScheduleGridWidget</name>
     <message>
       <source>All</source>
-      <translation>All</translation>
+      <translation type="unfinished">All</translation>
     </message>
   </context>
   <context>
@@ -10924,7 +10924,7 @@ Anda masih dapat mengubah kualitas dan FPS langsung di kamera.</translation>
     <name>nx::vms::client::desktop::SearchLineEdit</name>
     <message>
       <source>Search</source>
-      <translation>Search</translation>
+      <translation type="unfinished">Search</translation>
     </message>
   </context>
   <context>
@@ -11057,7 +11057,7 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
     <message>
       <source>OK</source>
-      <translation>OK</translation>
+      <translation type="unfinished">OK</translation>
     </message>
     <message>
       <source>Contact a user with Administrators permissions to resolve this issue.</source>
@@ -11097,7 +11097,7 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     <name>nx::vms::client::desktop::ServerListModel</name>
     <message>
       <source>Auto</source>
-      <translation>Auto</translation>
+      <translation type="unfinished">Auto</translation>
     </message>
   </context>
   <context>
@@ -11125,7 +11125,7 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
     <message>
       <source>Vendor</source>
-      <translation>Vendor</translation>
+      <translation type="unfinished">Vendor</translation>
     </message>
     <message>
       <source>no error</source>
@@ -11226,7 +11226,7 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     <name>nx::vms::client::desktop::ServerUpdatesModel</name>
     <message>
       <source>Status</source>
-      <translation>Status</translation>
+      <translation type="unfinished">Status</translation>
     </message>
     <message>
       <source>Message</source>
@@ -11238,7 +11238,7 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
     <message>
       <source>Client</source>
-      <translation>Client</translation>
+      <translation type="unfinished">Client</translation>
     </message>
     <message>
       <source>Component</source>
@@ -11253,11 +11253,11 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     <name>nx::vms::client::desktop::SessionRefreshDialog</name>
     <message>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation type="unfinished">Login</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation>Password</translation>
+      <translation type="unfinished">Password</translation>
     </message>
     <message>
       <source>Unknown error</source>
@@ -11280,29 +11280,29 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     <name>nx::vms::client::desktop::ShowreelActionsHandler</name>
     <message>
       <source>Showreel</source>
-      <translation>Showreel</translation>
+      <translation type="unfinished">Showreel</translation>
     </message>
     <message>
       <source>Showreel %1</source>
-      <translation>Showreel %1</translation>
+      <translation type="unfinished">Showreel %1</translation>
     </message>
     <message>
       <source>Delete Showreel %1?</source>
-      <translation>Delete Showreel %1?</translation>
+      <translation type="unfinished">Delete Showreel %1?</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ShowreelDropPlaceholder</name>
     <message>
       <source>Drag layout or camera here to add it to the showreel</source>
-      <translation>Drag layout or camera here to add it to the showreel</translation>
+      <translation type="unfinished">Drag layout or camera here to add it to the showreel</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ShowreelExecutor</name>
     <message>
       <source>Use keyboard arrows to switch layouts. To exit the showreel press Esc.</source>
-      <translation>Use keyboard arrows to switch layouts. To exit the showreel press Esc.</translation>
+      <translation type="unfinished">Use keyboard arrows to switch layouts. To exit the showreel press Esc.</translation>
     </message>
     <message>
       <source>Press Esc to stop the tour.</source>
@@ -11319,12 +11319,12 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     <message>
       <source>Display for</source>
       <comment>Time selector will follow</comment>
-      <translation>Display for</translation>
+      <translation type="unfinished">Display for</translation>
     </message>
     <message>
       <source>Display selected for</source>
       <comment>Time will follow</comment>
-      <translation>Display selected for</translation>
+      <translation type="unfinished">Display selected for</translation>
     </message>
   </context>
   <context>
@@ -11359,7 +11359,7 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     <name>nx::vms::client::desktop::SoftwareTriggerButton</name>
     <message>
       <source>Go to Live</source>
-      <translation>Go to Live</translation>
+      <translation type="unfinished">Go to Live</translation>
     </message>
   </context>
   <context>
@@ -11477,43 +11477,43 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
     <message>
       <source>Name</source>
-      <translation>Name</translation>
+      <translation type="unfinished">Name</translation>
     </message>
     <message>
       <source>Camera</source>
-      <translation>Camera</translation>
+      <translation type="unfinished">Camera</translation>
     </message>
     <message>
       <source>Start time</source>
-      <translation>Start time</translation>
+      <translation type="unfinished">Start time</translation>
     </message>
     <message>
       <source>Length</source>
-      <translation>Length</translation>
+      <translation type="unfinished">Length</translation>
     </message>
     <message>
       <source>Created</source>
-      <translation>Created</translation>
+      <translation type="unfinished">Created</translation>
     </message>
     <message>
       <source>Creator</source>
-      <translation>Creator</translation>
+      <translation type="unfinished">Creator</translation>
     </message>
     <message>
       <source>Tags</source>
-      <translation>Tags</translation>
+      <translation type="unfinished">Tags</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation>Description</translation>
+      <translation type="unfinished">Description</translation>
     </message>
     <message>
       <source>Open</source>
-      <translation>Open</translation>
+      <translation type="unfinished">Open</translation>
     </message>
     <message>
       <source>Open in New Tab</source>
-      <translation>Open in New Tab</translation>
+      <translation type="unfinished">Open in New Tab</translation>
     </message>
     <message>
       <source>This action is not supported for notifications from other Systems</source>
@@ -11524,7 +11524,7 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     <name>nx::vms::client::desktop::TimeSynchronizationServersModel</name>
     <message>
       <source>Server</source>
-      <translation>Server</translation>
+      <translation type="unfinished">Server</translation>
     </message>
     <message>
       <source>Time Zone</source>
@@ -11532,7 +11532,7 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
     <message>
       <source>Date</source>
-      <translation>Date</translation>
+      <translation type="unfinished">Date</translation>
     </message>
     <message>
       <source>Server OS Time</source>
@@ -11582,7 +11582,7 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
     <message>
       <source>Short</source>
-      <translation>Short</translation>
+      <translation type="unfinished">Short</translation>
     </message>
   </context>
   <context>
@@ -11636,11 +11636,11 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
     <message>
       <source>Name</source>
-      <translation>Name</translation>
+      <translation type="unfinished">Name</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation>Description</translation>
+      <translation type="unfinished">Description</translation>
     </message>
     <message>
       <source>Group is not found in the LDAP database.</source>
@@ -11726,7 +11726,7 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     <name>nx::vms::client::desktop::UserListModel</name>
     <message>
       <source>Local user</source>
-      <translation>Local user</translation>
+      <translation type="unfinished">Local user</translation>
     </message>
     <message>
       <source>%1 user</source>
@@ -11735,15 +11735,15 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
     <message>
       <source>LDAP user</source>
-      <translation>LDAP user</translation>
+      <translation type="unfinished">LDAP user</translation>
     </message>
     <message>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation type="unfinished">Login</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation>Email</translation>
+      <translation type="unfinished">Email</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -11778,7 +11778,7 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     <name>nx::vms::client::desktop::UserManagementTabWidget</name>
     <message>
       <source>Users</source>
-      <translation>Users</translation>
+      <translation type="unfinished">Users</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -11793,7 +11793,7 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     <name>nx::vms::client::desktop::UserSettingsDialog</name>
     <message>
       <source>To modify your password please enter the existing one.</source>
-      <translation>To modify your password please enter the existing one.</translation>
+      <translation type="unfinished">To modify your password please enter the existing one.</translation>
     </message>
     <message>
       <source>%1 user with specified email already exists.</source>
@@ -11814,7 +11814,7 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
     <message>
       <source>Failed to apply changes</source>
-      <translation>Failed to apply changes</translation>
+      <translation type="unfinished">Failed to apply changes</translation>
     </message>
     <message>
       <source>Apply changes?</source>
@@ -11932,11 +11932,11 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
     <message>
       <source>Password</source>
-      <translation>Password</translation>
+      <translation type="unfinished">Password</translation>
     </message>
     <message>
       <source>The password is incorrect.</source>
-      <translation>The password is incorrect.</translation>
+      <translation type="unfinished">The password is incorrect.</translation>
     </message>
   </context>
   <context>
@@ -12007,7 +12007,7 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
     <message>
       <source>No events</source>
-      <translation>No events</translation>
+      <translation type="unfinished">No events</translation>
     </message>
     <message>
       <source>Try changing the filters or create an Event Rule</source>
@@ -12036,7 +12036,7 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
     <message>
       <source>Web Page</source>
-      <translation>Web Page</translation>
+      <translation type="unfinished">Web Page</translation>
     </message>
     <message>
       <source>You try to open the
@@ -12125,7 +12125,7 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     </message>
     <message>
       <source>Export completed</source>
-      <translation>Export completed</translation>
+      <translation type="unfinished">Export completed</translation>
     </message>
     <message>
       <source>Export failed</source>
@@ -12141,11 +12141,11 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     </message>
     <message>
       <source>Local files not allowed for Multi-Video export</source>
-      <translation>Local files not allowed for Multi-Video export</translation>
+      <translation type="unfinished">Local files not allowed for Multi-Video export</translation>
     </message>
     <message>
       <source>Please remove all local files from the layout and try again.</source>
-      <translation>Please remove all local files from the layout and try again.</translation>
+      <translation type="unfinished">Please remove all local files from the layout and try again.</translation>
     </message>
     <message>
       <source>Starting export...</source>
@@ -12168,15 +12168,15 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     <name>nx::vms::client::desktop::WorkbenchUpdateWatcher</name>
     <message>
       <source>%1 version available</source>
-      <translation>%1 version available</translation>
+      <translation type="unfinished">%1 version available</translation>
     </message>
     <message>
       <source>Major issues have been fixed. Update is strongly recommended.</source>
-      <translation>Major issues have been fixed. Update is strongly recommended.</translation>
+      <translation type="unfinished">Major issues have been fixed. Update is strongly recommended.</translation>
     </message>
     <message>
       <source>Updates</source>
-      <translation>Updates</translation>
+      <translation type="unfinished">Updates</translation>
     </message>
     <message>
       <source>Release Notes...</source>
@@ -12203,7 +12203,7 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation>Bookmarks</translation>
+      <translation type="unfinished">Bookmarks</translation>
     </message>
     <message>
       <source>High-Res</source>
@@ -12222,21 +12222,21 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     <name>nx::vms::client::desktop::detail::BaseInputField</name>
     <message>
       <source>multiple values</source>
-      <translation>multiple values</translation>
+      <translation type="unfinished">multiple values</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::entity_resource_tree::ResourceTreeEntityBuilder</name>
     <message>
       <source>New System</source>
-      <translation>New System</translation>
+      <translation type="unfinished">New System</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::entity_resource_tree::ResourceTreeItemFactory</name>
     <message>
       <source>Servers</source>
-      <translation>Servers</translation>
+      <translation type="unfinished">Servers</translation>
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
@@ -12244,43 +12244,43 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     </message>
     <message>
       <source>Layouts</source>
-      <translation>Layouts</translation>
+      <translation type="unfinished">Layouts</translation>
     </message>
     <message>
       <source>Showreels</source>
-      <translation>Showreels</translation>
+      <translation type="unfinished">Showreels</translation>
     </message>
     <message>
       <source>Web Pages</source>
-      <translation>Web Pages</translation>
+      <translation type="unfinished">Web Pages</translation>
     </message>
     <message>
       <source>Users</source>
-      <translation>Users</translation>
+      <translation type="unfinished">Users</translation>
     </message>
     <message>
       <source>Other Systems</source>
-      <translation>Other Systems</translation>
+      <translation type="unfinished">Other Systems</translation>
     </message>
     <message>
       <source>Local Files</source>
-      <translation>Local Files</translation>
+      <translation type="unfinished">Local Files</translation>
     </message>
     <message>
       <source>All Cameras &amp; Resources</source>
-      <translation>All Cameras &amp; Resources</translation>
+      <translation type="unfinished">All Cameras &amp; Resources</translation>
     </message>
     <message>
       <source>All Shared Layouts</source>
-      <translation>All Shared Layouts</translation>
+      <translation type="unfinished">All Shared Layouts</translation>
     </message>
     <message>
       <source>Cameras &amp; Resources</source>
-      <translation>Cameras &amp; Resources</translation>
+      <translation type="unfinished">Cameras &amp; Resources</translation>
     </message>
     <message>
       <source>Shared Layouts</source>
-      <translation>Shared Layouts</translation>
+      <translation type="unfinished">Shared Layouts</translation>
     </message>
     <message>
       <source>Health Monitors</source>
@@ -12326,11 +12326,11 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     </message>
     <message>
       <source>Disabled</source>
-      <translation>Disabled</translation>
+      <translation type="unfinished">Disabled</translation>
     </message>
     <message>
       <source>Error</source>
-      <translation>Error</translation>
+      <translation type="unfinished">Error</translation>
     </message>
     <message>
       <source>Failed to import. Retry in 1 minute.</source>
@@ -12338,7 +12338,7 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     </message>
     <message>
       <source>Name</source>
-      <translation>Name</translation>
+      <translation type="unfinished">Name</translation>
     </message>
     <message>
       <source>Imported up to</source>
@@ -12346,7 +12346,7 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     </message>
     <message>
       <source>Status</source>
-      <translation>Status</translation>
+      <translation type="unfinished">Status</translation>
     </message>
   </context>
   <context>
@@ -12371,11 +12371,11 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     </message>
     <message>
       <source>Focus Near</source>
-      <translation>Focus Near</translation>
+      <translation type="unfinished">Focus Near</translation>
     </message>
     <message>
       <source>Focus Far</source>
-      <translation>Focus Far</translation>
+      <translation type="unfinished">Focus Far</translation>
     </message>
     <message>
       <source>Autofocus</source>
@@ -12496,7 +12496,7 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     </message>
     <message>
       <source>Delete</source>
-      <translation>Delete</translation>
+      <translation type="unfinished">Delete</translation>
     </message>
     <message>
       <source>WHEN</source>
@@ -12516,7 +12516,7 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     </message>
     <message>
       <source>Enabled</source>
-      <translation>Enabled</translation>
+      <translation type="unfinished">Enabled</translation>
     </message>
   </context>
   <context>
@@ -12572,19 +12572,19 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     <name>nx::vms::client::desktop::rules::RulesTableModel</name>
     <message>
       <source>Event</source>
-      <translation>Event</translation>
+      <translation type="unfinished">Event</translation>
     </message>
     <message>
       <source>Action</source>
-      <translation>Action</translation>
+      <translation type="unfinished">Action</translation>
     </message>
     <message>
       <source>Source</source>
-      <translation>Source</translation>
+      <translation type="unfinished">Source</translation>
     </message>
     <message>
       <source>Target</source>
-      <translation>Target</translation>
+      <translation type="unfinished">Target</translation>
     </message>
     <message>
       <source>Comment</source>
@@ -12592,11 +12592,11 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     </message>
     <message>
       <source>All Devices</source>
-      <translation>All Devices</translation>
+      <translation type="unfinished">All Devices</translation>
     </message>
     <message>
       <source>All Cameras</source>
-      <translation>All Cameras</translation>
+      <translation type="unfinished">All Cameras</translation>
     </message>
     <message>
       <source>No source</source>
@@ -12604,17 +12604,17 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     </message>
     <message>
       <source>All Servers</source>
-      <translation>All Servers</translation>
+      <translation type="unfinished">All Servers</translation>
     </message>
     <message numerus="yes">
       <source>%n Servers</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n Servers</numerusform>
       </translation>
     </message>
     <message>
       <source>Source camera</source>
-      <translation>Source camera</translation>
+      <translation type="unfinished">Source camera</translation>
     </message>
     <message numerus="yes">
       <source>Source and %n more Cameras</source>
@@ -12634,11 +12634,11 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     </message>
     <message>
       <source>All Users</source>
-      <translation>All Users</translation>
+      <translation type="unfinished">All Users</translation>
     </message>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n Users</numerusform>
       </translation>
     </message>
@@ -12654,7 +12654,7 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     </message>
     <message>
       <source>System</source>
-      <translation>System</translation>
+      <translation type="unfinished">System</translation>
     </message>
   </context>
   <context>
@@ -12745,11 +12745,11 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     <name>nx::vms::client::desktop::saas::ServicesUsageModel</name>
     <message>
       <source>Name</source>
-      <translation>Name</translation>
+      <translation type="unfinished">Name</translation>
     </message>
     <message>
       <source>Type</source>
-      <translation>Type</translation>
+      <translation type="unfinished">Type</translation>
     </message>
     <message>
       <source>Total</source>
@@ -12840,15 +12840,15 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     <name>nx::vms::client::desktop::ui::SubjectSelectionDialog</name>
     <message>
       <source>All Users</source>
-      <translation>All Users</translation>
+      <translation type="unfinished">All Users</translation>
     </message>
     <message>
       <source>Users</source>
-      <translation>Users</translation>
+      <translation type="unfinished">Users</translation>
     </message>
     <message>
       <source>Custom Users</source>
-      <translation>Custom Users</translation>
+      <translation type="unfinished">Custom Users</translation>
     </message>
     <message>
       <source>%1 users</source>
@@ -12861,12 +12861,12 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     <message>
       <source>%1 (active)</source>
       <comment>Template for active PTZ preset</comment>
-      <translation>%1 (active)</translation>
+      <translation type="unfinished">%1 (active)</translation>
     </message>
     <message>
       <source>%1 (active)</source>
       <comment>Template for active PTZ tour</comment>
-      <translation>%1 (active)</translation>
+      <translation type="unfinished">%1 (active)</translation>
     </message>
   </context>
   <context>
@@ -12896,73 +12896,73 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     <name>nx::vms::client::desktop::ui::action::ShowreelSettingsFactory</name>
     <message>
       <source>Switch with Hotkeys</source>
-      <translation>Switch with Hotkeys</translation>
+      <translation type="unfinished">Switch with Hotkeys</translation>
     </message>
     <message>
       <source>Switch on Timer</source>
-      <translation>Switch on Timer</translation>
+      <translation type="unfinished">Switch on Timer</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ui::action::ShowreelTextFactory</name>
     <message>
       <source>Stop Tour</source>
-      <translation>Stop Tour</translation>
+      <translation type="unfinished">Stop Tour</translation>
     </message>
     <message>
       <source>Stop Showreel</source>
-      <translation>Stop Showreel</translation>
+      <translation type="unfinished">Stop Showreel</translation>
     </message>
     <message>
       <source>Start Tour</source>
-      <translation>Start Tour</translation>
+      <translation type="unfinished">Start Tour</translation>
     </message>
     <message>
       <source>Start Showreel</source>
-      <translation>Start Showreel</translation>
+      <translation type="unfinished">Start Showreel</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ui::dialogs::LicenseDeactivationReason</name>
     <message>
       <source>Next</source>
-      <translation>Next</translation>
+      <translation type="unfinished">Next</translation>
     </message>
     <message>
       <source>Name is necessary</source>
-      <translation>Name is necessary</translation>
+      <translation type="unfinished">Name is necessary</translation>
     </message>
     <message>
       <source>Reason is necessary</source>
-      <translation>Reason is necessary</translation>
+      <translation type="unfinished">Reason is necessary</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation>Name</translation>
+      <translation type="unfinished">Name</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation>Email</translation>
+      <translation type="unfinished">Email</translation>
     </message>
     <message>
       <source>Reason for deactivation</source>
-      <translation>Reason for deactivation</translation>
+      <translation type="unfinished">Reason for deactivation</translation>
     </message>
     <message>
       <source>- Choose one -</source>
-      <translation>- Choose one -</translation>
+      <translation type="unfinished">- Choose one -</translation>
     </message>
     <message>
       <source>I am upgrading my machine</source>
-      <translation>I am upgrading my machine</translation>
+      <translation type="unfinished">I am upgrading my machine</translation>
     </message>
     <message>
       <source>I accidentally assigned the license to a wrong machine</source>
-      <translation>I accidentally assigned the license to a wrong machine</translation>
+      <translation type="unfinished">I accidentally assigned the license to a wrong machine</translation>
     </message>
     <message>
       <source>Other Reason</source>
-      <translation>Other Reason</translation>
+      <translation type="unfinished">Other Reason</translation>
     </message>
     <message>
       <source>Please complete the following for license deactivation</source>
@@ -12979,7 +12979,7 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     <name>nx::vms::client::desktop::ui::subject_selection_dialog_private::GroupListDelegate</name>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n Users</numerusform>
       </translation>
     </message>
@@ -12996,47 +12996,47 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     </message>
     <message numerus="yes">
       <source>Failed to move %n devices</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Failed to move %n devices</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Failed to move %n cameras</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Failed to move %n cameras</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Failed to move %n I/O Modules</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Failed to move %n I/O Modules</numerusform>
       </translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; is not responding.</source>
-      <translation>Server &quot;%1&quot; is not responding.</translation>
+      <translation type="unfinished">Server &quot;%1&quot; is not responding.</translation>
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</numerusform>
       </translation>
     </message>
     <message>
       <source>Move</source>
-      <translation>Move</translation>
+      <translation type="unfinished">Move</translation>
     </message>
     <message>
       <source>Layout is locked and cannot be changed</source>
@@ -13044,7 +13044,7 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     </message>
     <message>
       <source>Open File</source>
-      <translation>Open File</translation>
+      <translation type="unfinished">Open File</translation>
     </message>
     <message>
       <source>All Supported</source>
@@ -13052,61 +13052,61 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     </message>
     <message>
       <source>Too short period selected</source>
-      <translation>Too short period selected</translation>
+      <translation type="unfinished">Too short period selected</translation>
     </message>
     <message>
       <source>Cannot perform Preview Search. Please select a period of 15 seconds or longer.</source>
-      <translation>Cannot perform Preview Search. Please select a period of 15 seconds or longer.</translation>
+      <translation type="unfinished">Cannot perform Preview Search. Please select a period of 15 seconds or longer.</translation>
     </message>
     <message>
       <source>Preview Search for %1</source>
-      <translation>Preview Search for %1</translation>
+      <translation type="unfinished">Preview Search for %1</translation>
     </message>
     <message>
       <source>Confirm files deleting</source>
-      <translation>Confirm files deleting</translation>
+      <translation type="unfinished">Confirm files deleting</translation>
     </message>
     <message numerus="yes">
       <source>Are you sure you want to permanently delete these %n files?</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Are you sure you want to permanently delete these %n files?</numerusform>
       </translation>
     </message>
     <message>
       <source>There is another user with the same name</source>
-      <translation>There is another user with the same name</translation>
+      <translation type="unfinished">There is another user with the same name</translation>
     </message>
     <message>
       <source>Updating Background...</source>
-      <translation>Updating Background...</translation>
+      <translation type="unfinished">Updating Background...</translation>
     </message>
     <message>
       <source>Image processing may take a few moments. Please be patient.</source>
-      <translation>Image processing may take a few moments. Please be patient.</translation>
+      <translation type="unfinished">Image processing may take a few moments. Please be patient.</translation>
     </message>
     <message>
       <source>Failed to upload image</source>
-      <translation>Failed to upload image</translation>
+      <translation type="unfinished">Failed to upload image</translation>
     </message>
     <message>
       <source>Components of System have different versions:</source>
-      <translation>Components of System have different versions:</translation>
+      <translation type="unfinished">Components of System have different versions:</translation>
     </message>
     <message>
       <source>Please update all components to the version %1</source>
-      <translation>Please update all components to the version %1</translation>
+      <translation type="unfinished">Please update all components to the version %1</translation>
     </message>
     <message>
       <source>Update...</source>
-      <translation>Update...</translation>
+      <translation type="unfinished">Update...</translation>
     </message>
     <message>
       <source>Skip</source>
-      <translation>Skip</translation>
+      <translation type="unfinished">Skip</translation>
     </message>
     <message>
       <source>Beta version %1</source>
-      <translation>Beta version %1</translation>
+      <translation type="unfinished">Beta version %1</translation>
     </message>
     <message>
       <source>Please upgrade to a next available patch or release version once available.</source>
@@ -13114,7 +13114,7 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     </message>
     <message>
       <source>Failed to open server web page</source>
-      <translation>Failed to open server web page</translation>
+      <translation type="unfinished">Failed to open server web page</translation>
     </message>
     <message numerus="yes">
       <source>Failed to change password on %n cameras of %1</source>
@@ -13133,7 +13133,7 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     </message>
     <message>
       <source>OK</source>
-      <translation>OK</translation>
+      <translation type="unfinished">OK</translation>
     </message>
     <message>
       <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>
@@ -13212,19 +13212,19 @@ Anda dapat memilih lokasi penyimpanan lain di tab &quot;Manajemen Penyimpanan&qu
     <name>nx::vms::client::desktop::ui::workbench::LayoutsHandler</name>
     <message>
       <source>Save Layout As</source>
-      <translation>Save Layout As</translation>
+      <translation type="unfinished">Save Layout As</translation>
     </message>
     <message>
       <source>Enter Layout Name:</source>
-      <translation>Enter Layout Name:</translation>
+      <translation type="unfinished">Enter Layout Name:</translation>
     </message>
     <message>
       <source>New Layout</source>
-      <translation>New Layout</translation>
+      <translation type="unfinished">New Layout</translation>
     </message>
     <message>
       <source>Enter the name of the layout to create:</source>
-      <translation>Enter the name of the layout to create:</translation>
+      <translation type="unfinished">Enter the name of the layout to create:</translation>
     </message>
     <message>
       <source>Save Layout As Cloud</source>
@@ -13283,16 +13283,16 @@ Anda dapat memilih lokasi penyimpanan lain di tab &quot;Manajemen Penyimpanan&qu
       <source>Zoom timeline
 to view more bookmarks</source>
       <comment>It is highly recommended to split message in two lines</comment>
-      <translation>Zoom timeline
+      <translation type="unfinished">Zoom timeline
 to view more bookmarks</translation>
     </message>
     <message>
       <source>Play bookmark from the beginning</source>
-      <translation>Play bookmark from the beginning</translation>
+      <translation type="unfinished">Play bookmark from the beginning</translation>
     </message>
     <message>
       <source>Edit bookmark</source>
-      <translation>Edit bookmark</translation>
+      <translation type="unfinished">Edit bookmark</translation>
     </message>
     <message>
       <source>Export bookmark</source>
@@ -13300,7 +13300,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Delete bookmark</source>
-      <translation>Delete bookmark</translation>
+      <translation type="unfinished">Delete bookmark</translation>
     </message>
   </context>
   <context>
@@ -13314,35 +13314,35 @@ to view more bookmarks</translation>
     <name>nx::vms::client::desktop::workbench::timeline::NavigationWidget</name>
     <message>
       <source>Speed Down</source>
-      <translation>Speed Down</translation>
+      <translation type="unfinished">Speed Down</translation>
     </message>
     <message>
       <source>Previous Frame</source>
-      <translation>Previous Frame</translation>
+      <translation type="unfinished">Previous Frame</translation>
     </message>
     <message>
       <source>Speed Up</source>
-      <translation>Speed Up</translation>
+      <translation type="unfinished">Speed Up</translation>
     </message>
     <message>
       <source>Next Frame</source>
-      <translation>Next Frame</translation>
+      <translation type="unfinished">Next Frame</translation>
     </message>
     <message>
       <source>Previous Chunk</source>
-      <translation>Previous Chunk</translation>
+      <translation type="unfinished">Previous Chunk</translation>
     </message>
     <message>
       <source>To Start</source>
-      <translation>To Start</translation>
+      <translation type="unfinished">To Start</translation>
     </message>
     <message>
       <source>Next Chunk</source>
-      <translation>Next Chunk</translation>
+      <translation type="unfinished">Next Chunk</translation>
     </message>
     <message>
       <source>To End</source>
-      <translation>To End</translation>
+      <translation type="unfinished">To End</translation>
     </message>
     <message>
       <source>Rewind is not available for VMAX</source>
@@ -13353,18 +13353,18 @@ to view more bookmarks</translation>
     <name>nx::vms::client::desktop::workbench::timeline::SpeedSlider</name>
     <message>
       <source>%1x</source>
-      <translation>%1x</translation>
+      <translation type="unfinished">%1x</translation>
     </message>
     <message>
       <source>Paused</source>
-      <translation>Paused</translation>
+      <translation type="unfinished">Paused</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::workbench::timeline::VolumeSlider</name>
     <message>
       <source>Muted</source>
-      <translation>Muted</translation>
+      <translation type="unfinished">Muted</translation>
     </message>
   </context>
   <context>
