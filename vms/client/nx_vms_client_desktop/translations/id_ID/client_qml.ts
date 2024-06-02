@@ -393,7 +393,7 @@
     <name>FigureEditorDialog</name>
     <message>
       <source>Clear</source>
-      <translation>Clear</translation>
+      <translation>Hapus</translation>
     </message>
     <message>
       <source>OK</source>
@@ -401,7 +401,7 @@
     </message>
     <message>
       <source>Cancel</source>
-      <translation>Cancel</translation>
+      <translation>Batal</translation>
     </message>
   </context>
   <context>
@@ -498,7 +498,7 @@
     <name>GlobalLoaderIndicator</name>
     <message>
       <source>Loading...</source>
-      <translation type="unfinished">Loading...</translation>
+      <translation>Memuat...</translation>
     </message>
   </context>
   <context>
@@ -776,15 +776,15 @@
     </message>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Masuk</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Kata Sandi</translation>
     </message>
     <message>
       <source>Connect</source>
-      <translation type="unfinished">Connect</translation>
+      <translation>Koneksikan</translation>
     </message>
     <message>
       <source>Remember me</source>
@@ -799,14 +799,14 @@
     </message>
     <message>
       <source>Server is offline</source>
-      <translation>Server is offline</translation>
+      <translation>Server sedang offline</translation>
     </message>
   </context>
   <context>
     <name>PolyFigure</name>
     <message>
       <source>Delete</source>
-      <translation>Delete</translation>
+      <translation>Hapus</translation>
     </message>
   </context>
   <context>
@@ -932,11 +932,11 @@ untuk mengaktifkan PTZ</translation>
     <name>Repeater</name>
     <message>
       <source>Add</source>
-      <translation>Add</translation>
+      <translation>Tambah</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation>Delete</translation>
+      <translation>Hapus</translation>
     </message>
   </context>
   <context>
@@ -947,7 +947,7 @@ untuk mengaktifkan PTZ</translation>
     </message>
     <message>
       <source>Nothing found</source>
-      <translation type="unfinished">Nothing found</translation>
+      <translation>Tidak ada yang ditemukan</translation>
     </message>
     <message>
       <source>Drag video files or images to the client window, or add local media folder through the Local Settings dialog</source>
@@ -982,7 +982,7 @@ untuk mengaktifkan PTZ</translation>
     <name>ResourceSearchPane</name>
     <message>
       <source>Search</source>
-      <translation type="unfinished">Search</translation>
+      <translation>Cari</translation>
     </message>
     <message>
       <source>All Types</source>
@@ -1074,14 +1074,14 @@ untuk mengaktifkan PTZ</translation>
     <name>SearchEdit</name>
     <message>
       <source>Search</source>
-      <translation type="unfinished">Search</translation>
+      <translation>Cari</translation>
     </message>
   </context>
   <context>
     <name>SearchField</name>
     <message>
       <source>Search</source>
-      <translation type="unfinished">Search</translation>
+      <translation>Cari</translation>
     </message>
   </context>
   <context>
@@ -1103,7 +1103,7 @@ untuk mengaktifkan PTZ</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation>Cancel</translation>
+      <translation>Batal</translation>
     </message>
   </context>
   <context>
@@ -1300,7 +1300,7 @@ untuk mengaktifkan PTZ</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation>Delete</translation>
+      <translation>Hapus</translation>
     </message>
     <message>
       <source>Add to Favorites</source>

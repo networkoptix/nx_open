@@ -43,7 +43,7 @@
     <name>QAbstractSpinBox</name>
     <message>
       <source>&amp;Select All</source>
-      <translation>&amp;Select All</translation>
+      <translation>&amp;Pilih Semua</translation>
     </message>
     <message>
       <source>&amp;Step up</source>
@@ -82,19 +82,19 @@
     </message>
     <message>
       <source>Scroll Left</source>
-      <translation>Scroll Left</translation>
+      <translation>Scroll Kiri</translation>
     </message>
     <message>
       <source>Scroll Right</source>
-      <translation>Scroll Right</translation>
+      <translation>Scroll Kanan</translation>
     </message>
     <message>
       <source>Scroll Up</source>
-      <translation>Scroll Up</translation>
+      <translation>Scroll Atas</translation>
     </message>
     <message>
       <source>Scroll Down</source>
-      <translation>Scroll Down</translation>
+      <translation>Scroll Bawah</translation>
     </message>
     <message>
       <source>Previous Page</source>
@@ -180,7 +180,7 @@
     </message>
     <message>
       <source>About</source>
-      <translation>About</translation>
+      <translation>Tentang</translation>
     </message>
     <message>
       <source>Config</source>
@@ -192,7 +192,7 @@
     </message>
     <message>
       <source>Options</source>
-      <translation>Options</translation>
+      <translation>Opsi</translation>
     </message>
     <message>
       <source>Setting</source>
@@ -204,11 +204,11 @@
     </message>
     <message>
       <source>Quit</source>
-      <translation>Quit</translation>
+      <translation>Keluar</translation>
     </message>
     <message>
       <source>Exit</source>
-      <translation>Exit</translation>
+      <translation>Keluar</translation>
     </message>
     <message>
       <source>Cut</source>
@@ -216,15 +216,15 @@
     </message>
     <message>
       <source>Copy</source>
-      <translation>Copy</translation>
+      <translation>Salin</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation>Paste</translation>
+      <translation>Tempel</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation>Select All</translation>
+      <translation>Pilih Semua</translation>
     </message>
   </context>
   <context>
@@ -347,11 +347,11 @@ Tekan ESC untuk membatalkan</translation>
     <name>QDirModel</name>
     <message>
       <source>Name</source>
-      <translation>Name</translation>
+      <translation>Nama</translation>
     </message>
     <message>
       <source>Size</source>
-      <translation>Size</translation>
+      <translation>Ukuran</translation>
     </message>
     <message>
       <source>Kind</source>
@@ -361,7 +361,7 @@ Tekan ESC untuk membatalkan</translation>
     <message>
       <source>Type</source>
       <comment>All other platforms</comment>
-      <translation>Type</translation>
+      <translation>Tipe</translation>
     </message>
     <message>
       <source>Date Modified</source>
@@ -479,7 +479,7 @@ Tekan ESC untuk membatalkan</translation>
     </message>
     <message>
       <source>Open</source>
-      <translation>Open</translation>
+      <translation>Buka</translation>
     </message>
     <message>
       <source>Save As</source>
@@ -495,7 +495,7 @@ Tekan ESC untuk membatalkan</translation>
     </message>
     <message>
       <source>&amp;Open</source>
-      <translation>&amp;Open</translation>
+      <translation>&amp;Buka</translation>
     </message>
     <message>
       <source>&amp;Choose</source>
@@ -515,11 +515,11 @@ Tekan ESC untuk membatalkan</translation>
     </message>
     <message>
       <source>&amp;Rename</source>
-      <translation>&amp;Rename</translation>
+      <translation>&amp;Ganti nama</translation>
     </message>
     <message>
       <source>&amp;Delete</source>
-      <translation>&amp;Delete</translation>
+      <translation>&amp;Hapus</translation>
     </message>
     <message>
       <source>Show &amp;hidden files</source>
@@ -531,7 +531,7 @@ Tekan ESC untuk membatalkan</translation>
     </message>
     <message>
       <source>All files (*)</source>
-      <translation>All files (*)</translation>
+      <translation>Semua file (*)</translation>
     </message>
     <message>
       <source>Directories</source>
@@ -565,7 +565,7 @@ Harap verifikasi nama file yang diberikan benar.</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation>Delete</translation>
+      <translation>Hapus</translation>
     </message>
     <message>
       <source>&apos;%1&apos; is write protected.
@@ -587,7 +587,7 @@ Apakah Anda tetap ingin menghapusnya?</translation>
     </message>
     <message>
       <source>Remove</source>
-      <translation>Remove</translation>
+      <translation>Hapus</translation>
     </message>
     <message>
       <source>My Computer</source>
@@ -628,7 +628,7 @@ Apakah Anda tetap ingin menghapusnya?</translation>
     </message>
     <message>
       <source>Unknown</source>
-      <translation>Unknown</translation>
+      <translation>Tidak dikenal</translation>
     </message>
     <message>
       <source>Sidebar</source>
@@ -687,11 +687,11 @@ Apakah Anda tetap ingin menghapusnya?</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation>Name</translation>
+      <translation>Nama</translation>
     </message>
     <message>
       <source>Size</source>
-      <translation>Size</translation>
+      <translation>Ukuran</translation>
     </message>
     <message>
       <source>Kind</source>
@@ -701,7 +701,7 @@ Apakah Anda tetap ingin menghapusnya?</translation>
     <message>
       <source>Type</source>
       <comment>All other platforms</comment>
-      <translation>Type</translation>
+      <translation>Tipe</translation>
     </message>
     <message>
       <source>Date Modified</source>
@@ -732,11 +732,11 @@ Apakah Anda tetap ingin menghapusnya?</translation>
     </message>
     <message>
       <source>&amp;Cancel</source>
-      <translation>&amp;Cancel</translation>
+      <translation>&amp;Batal</translation>
     </message>
     <message>
       <source>&amp;Close</source>
-      <translation>&amp;Close</translation>
+      <translation>&amp;Tutup</translation>
     </message>
     <message>
       <source>Close without Saving</source>
@@ -771,7 +771,7 @@ Apakah Anda tetap ingin menghapusnya?</translation>
     </message>
     <message>
       <source>Unknown error</source>
-      <translation>Unknown error</translation>
+      <translation>Error tidak diketahui</translation>
     </message>
     <message>
       <source>file to open is a directory</source>
@@ -798,14 +798,14 @@ Apakah Anda tetap ingin menghapusnya?</translation>
     </message>
     <message>
       <source>Unknown error</source>
-      <translation>Unknown error</translation>
+      <translation>Error tidak diketahui</translation>
     </message>
   </context>
   <context>
     <name>QImageWriter</name>
     <message>
       <source>Unknown error</source>
-      <translation>Unknown error</translation>
+      <translation>Error tidak diketahui</translation>
     </message>
     <message>
       <source>Device is not set</source>
@@ -855,19 +855,19 @@ Apakah Anda tetap ingin menghapusnya?</translation>
     </message>
     <message>
       <source>&amp;Copy</source>
-      <translation>&amp;Copy</translation>
+      <translation>&amp;Salin</translation>
     </message>
     <message>
       <source>&amp;Paste</source>
-      <translation>&amp;Paste</translation>
+      <translation>&amp;Tempel</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation>Delete</translation>
+      <translation>Hapus</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation>Select All</translation>
+      <translation>Pilih Semua</translation>
     </message>
   </context>
   <context>
@@ -886,7 +886,7 @@ Apakah Anda tetap ingin menghapusnya?</translation>
     </message>
     <message>
       <source>Help</source>
-      <translation>Help</translation>
+      <translation>Bantuan</translation>
     </message>
   </context>
   <context>
@@ -905,7 +905,7 @@ Apakah Anda tetap ingin menghapusnya?</translation>
     </message>
     <message>
       <source>Open</source>
-      <translation>Open</translation>
+      <translation>Buka</translation>
     </message>
     <message>
       <source>&amp;Yes</source>
@@ -937,11 +937,11 @@ Apakah Anda tetap ingin menghapusnya?</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation>Close</translation>
+      <translation>Tutup</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation>Cancel</translation>
+      <translation>Batal</translation>
     </message>
     <message>
       <source>Discard</source>
@@ -949,7 +949,7 @@ Apakah Anda tetap ingin menghapusnya?</translation>
     </message>
     <message>
       <source>Help</source>
-      <translation>Help</translation>
+      <translation>Bantuan</translation>
     </message>
     <message>
       <source>Apply</source>
@@ -961,21 +961,21 @@ Apakah Anda tetap ingin menghapusnya?</translation>
     </message>
     <message>
       <source>Restore Defaults</source>
-      <translation>Restore Defaults</translation>
+      <translation>Kembali ke Default</translation>
     </message>
   </context>
   <context>
     <name>QProgressDialog</name>
     <message>
       <source>Cancel</source>
-      <translation>Cancel</translation>
+      <translation>Batal</translation>
     </message>
   </context>
   <context>
     <name>QQnxFileDialogHelper</name>
     <message>
       <source>All files (*.*)</source>
-      <translation>All files (*.*)</translation>
+      <translation>Semua file (*.*)</translation>
     </message>
   </context>
   <context>
@@ -1005,7 +1005,7 @@ Apakah Anda tetap ingin menghapusnya?</translation>
     </message>
     <message>
       <source>Top</source>
-      <translation>Top</translation>
+      <translation>Atas</translation>
     </message>
     <message>
       <source>Right edge</source>
@@ -1013,7 +1013,7 @@ Apakah Anda tetap ingin menghapusnya?</translation>
     </message>
     <message>
       <source>Bottom</source>
-      <translation>Bottom</translation>
+      <translation>Bawah</translation>
     </message>
     <message>
       <source>Page left</source>
@@ -1076,7 +1076,7 @@ Apakah Anda tetap ingin menghapusnya?</translation>
     </message>
     <message>
       <source>Pictures</source>
-      <translation>Pictures</translation>
+      <translation>Gambar</translation>
     </message>
     <message>
       <source>Temporary Directory</source>
@@ -1084,7 +1084,7 @@ Apakah Anda tetap ingin menghapusnya?</translation>
     </message>
     <message>
       <source>Home</source>
-      <translation>Home</translation>
+      <translation>Beranda</translation>
     </message>
     <message>
       <source>Application Data</source>
@@ -1127,11 +1127,11 @@ Apakah Anda tetap ingin menghapusnya?</translation>
     <name>QTabBar</name>
     <message>
       <source>Scroll Left</source>
-      <translation>Scroll Left</translation>
+      <translation>Scroll Kiri</translation>
     </message>
     <message>
       <source>Scroll Right</source>
-      <translation>Scroll Right</translation>
+      <translation>Scroll Kanan</translation>
     </message>
   </context>
   <context>
@@ -1157,7 +1157,7 @@ Apakah Anda tetap ingin menghapusnya?</translation>
     </message>
     <message>
       <source>&amp;Copy</source>
-      <translation>&amp;Copy</translation>
+      <translation>&amp;Salin</translation>
     </message>
     <message>
       <source>Copy &amp;Link Location</source>
@@ -1165,15 +1165,15 @@ Apakah Anda tetap ingin menghapusnya?</translation>
     </message>
     <message>
       <source>&amp;Paste</source>
-      <translation>&amp;Paste</translation>
+      <translation>&amp;Tempel</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation>Delete</translation>
+      <translation>Hapus</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation>Select All</translation>
+      <translation>Pilih Semua</translation>
     </message>
   </context>
 </TS>

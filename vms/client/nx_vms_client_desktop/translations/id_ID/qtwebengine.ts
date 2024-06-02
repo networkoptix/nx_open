@@ -104,7 +104,7 @@
     <name>QQuickWebEngineView</name>
     <message>
       <source>Stop</source>
-      <translation>Stop</translation>
+      <translation>Berhenti</translation>
     </message>
     <message>
       <source>Reload and Bypass Cache</source>
@@ -120,7 +120,7 @@
     </message>
     <message>
       <source>Toggle Mute</source>
-      <translation>Toggle Mute</translation>
+      <translation>Beralih ke Mute</translation>
     </message>
     <message>
       <source>Close Page</source>
@@ -183,7 +183,7 @@
     <name>QWebEnginePage</name>
     <message>
       <source>Stop</source>
-      <translation>Stop</translation>
+      <translation>Berhenti</translation>
     </message>
     <message>
       <source>Reload and Bypass Cache</source>
@@ -195,7 +195,7 @@
     </message>
     <message>
       <source>Toggle Mute</source>
-      <translation>Toggle Mute</translation>
+      <translation>Beralih ke Mute</translation>
     </message>
     <message>
       <source>Close Page</source>
@@ -302,11 +302,11 @@
     </message>
     <message>
       <source>Copy</source>
-      <translation>Copy</translation>
+      <translation>Salin</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation>Paste</translation>
+      <translation>Tempel</translation>
     </message>
     <message>
       <source>Undo</source>
@@ -318,7 +318,7 @@
     </message>
     <message>
       <source>Select all</source>
-      <translation>Select all</translation>
+      <translation>Pilih semua</translation>
     </message>
     <message>
       <source>Paste and match style</source>
