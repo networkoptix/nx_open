@@ -5,7 +5,7 @@
     <name>QnDirectSystemsFinder</name>
     <message>
       <source>System</source>
-      <translation>System</translation>
+      <translation>Sistem</translation>
     </message>
     <message>
       <source>System (%1)</source>
@@ -17,7 +17,7 @@
     <name>QnLocalSystemDescription</name>
     <message>
       <source>New Server</source>
-      <translation>New Server</translation>
+      <translation>Server Baru</translation>
     </message>
   </context>
   <context>
