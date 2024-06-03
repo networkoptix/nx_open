@@ -57,8 +57,11 @@ private:
     {
         auto selectedCameras = UuidSet{m_field->id()};
 
-        if (!CameraSelectionDialog::selectCameras<Policy>(systemContext(), selectedCameras, this))
+        if (!CameraSelectionDialog::selectCameras<Policy>(systemContext(), selectedCameras, this)
+            || selectedCameras.empty())
+        {
             return;
+        }
 
         m_field->setId(*selectedCameras.begin());
         m_field->setUseSource(false);
