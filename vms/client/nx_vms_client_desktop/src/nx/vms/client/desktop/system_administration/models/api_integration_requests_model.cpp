@@ -69,7 +69,26 @@ void ApiIntegrationRequestsModel::refresh()
                 if (!success)
                     return;
 
-                setRequests(QJsonDocument::fromJson(data).array());
+                auto [requests, ok] = nx::reflect::json::deserialize<
+                    std::vector<api::analytics::IntegrationRequestData>>(data.data());
+
+                if (!ok)
+                    return;
+
+                QJsonArray result;
+                for (const api::analytics::IntegrationRequestData& request: requests)
+                {
+                    result.push_back(QJsonObject{
+                        {"requestId", request.requestId.toString()},
+                        {"pinCode", request.pinCode},
+                        {"name", request.integrationManifest.name},
+                        {"description", request.integrationManifest.description},
+                        {"vendor", request.integrationManifest.vendor},
+                        {"version", request.integrationManifest.version},
+                    });
+                }
+
+                setRequests(result);
             }),
         thread());
 }
