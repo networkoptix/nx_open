@@ -17,8 +17,8 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/utils/string.h>
-#include <nx/vms/client/core/analytics/analytics_entities_tree.h>
 #include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/core/analytics/analytics_entities_tree.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/widgets/selectable_text_button.h>
@@ -65,6 +65,13 @@ static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kLight16T
 };
 
 NX_DECLARE_COLORIZED_ICON(kEventRulesIcon, "20x20/Outline/event_rules.svg", kLight16Theme)
+
+nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kPlaceholderTheme = {
+    {QnIcon::Normal, {.primary = "dark10"}}};
+
+NX_DECLARE_COLORIZED_ICON(
+    kEventsPlaceholderIcon, "64x64/Outline/events.svg", kPlaceholderTheme)
+
 } // namespace
 
 // ------------------------------------------------------------------------------------------------
@@ -398,7 +405,7 @@ VmsEventSearchWidget::VmsEventSearchWidget(WindowContext* context, QWidget* pare
         | Control::cameraSelectionDisplay
         | Control::timeSelector
         | Control::previewsToggler);
-    setPlaceholderPixmap(qnSkin->pixmap("left_panel/placeholders/events.svg"));
+    setPlaceholderPixmap(qnSkin->icon(kEventsPlaceholderIcon).pixmap(64, 64));
 }
 
 VmsEventSearchWidget::~VmsEventSearchWidget()

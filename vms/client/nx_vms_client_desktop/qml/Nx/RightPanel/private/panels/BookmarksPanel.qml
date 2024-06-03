@@ -14,7 +14,7 @@ SearchPanel
 
     placeholder
     {
-        icon: "image://skin/left_panel/placeholders/bookmarks.svg"
+        icon: "image://skin/64x64/Outline/nobookmarks.svg"
         title: qsTr("No bookmarks")
         description: qsTr("Select a time span on the timeline and right-click the "
             + "highlighted section to create a bookmark")

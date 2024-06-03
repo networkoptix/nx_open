@@ -63,7 +63,7 @@ Control
 
                 checkable: true
                 checked: true
-                icon.source: `image://skin/left_panel/${checked ? 'no' : ''}list.svg`
+                icon.source: checked ? "image://skin/20x20/Outline/no_list.svg" : "image://skin/20x20/Outline/event_log.svg"
 
                 color: ColorTheme.colors.light16
                 visible: control.showInformationButton

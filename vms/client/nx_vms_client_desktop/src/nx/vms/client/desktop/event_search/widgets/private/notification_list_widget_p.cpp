@@ -64,6 +64,12 @@ static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kIconSubs
 
 NX_DECLARE_COLORIZED_ICON(kSystemIcon, "20x20/Outline/system.svg", kIconSubstitutions)
 
+nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kPlaceholderTheme = {
+    {QnIcon::Normal, {.primary = "dark10"}}};
+
+NX_DECLARE_COLORIZED_ICON(
+    kNotificationPlaceholderIcon, "64x64/Outline/notification.svg", kPlaceholderTheme)
+
 } // namespace
 
 namespace nx::vms::client::desktop {
@@ -80,7 +86,7 @@ NotificationListWidget::Private::Private(NotificationListWidget* q):
     m_filterSystemsButton(new SelectableTextButton(q)),
     m_eventRibbon(new EventRibbon(m_ribbonContainer)),
     m_placeholder(PlaceholderWidget::create(
-        qnSkin->pixmap("left_panel/placeholders/notifications.svg"),
+        qnSkin->icon(kNotificationPlaceholderIcon).pixmap(64, 64),
         AbstractSearchWidget::makePlaceholderText(tr("No new notifications"), {}),
         tr("Notifications Settings"),
         [this] { menu()->trigger(menu::PreferencesNotificationTabAction); },

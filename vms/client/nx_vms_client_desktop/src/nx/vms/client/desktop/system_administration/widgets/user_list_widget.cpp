@@ -69,6 +69,12 @@ static const core::SvgIconColorer::ThemeSubstitutions kTextButtonColors = {
 NX_DECLARE_COLORIZED_ICON(kDeleteIcon, "20x20/Outline/delete.svg", kTextButtonColors)
 NX_DECLARE_COLORIZED_ICON(kEditIcon, "20x20/Outline/edit.svg", kTextButtonColors)
 
+nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kPlaceholderTheme = {
+    {QnIcon::Normal, {.primary = "dark10"}}};
+
+NX_DECLARE_COLORIZED_ICON(
+    kNotfoundIcon, "64x64/Outline/notfound.svg", kPlaceholderTheme)
+
 } // namespace
 
 // -----------------------------------------------------------------------------------------------
@@ -659,7 +665,7 @@ void UserListWidget::Private::setupPlaceholder()
 {
     ui->nothingFoundPlaceholder->setFixedWidth(180);
     const auto placeholderIcon = new QLabel(ui->nothingFoundPlaceholder);
-    placeholderIcon->setPixmap(qnSkin->pixmap("left_panel/placeholders/search.svg"));
+    placeholderIcon->setPixmap(qnSkin->icon(kNotfoundIcon).pixmap(64, 64));
 
     const auto placeholderText = new QLabel(ui->nothingFoundPlaceholder);
     placeholderText->setText(tr("No users found"));

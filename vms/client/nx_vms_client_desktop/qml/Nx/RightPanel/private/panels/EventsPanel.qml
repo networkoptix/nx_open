@@ -19,7 +19,7 @@ SearchPanel
 
     placeholder
     {
-        icon: "image://skin/left_panel/placeholders/events.svg"
+        icon: "image://skin/64x64/Outline/events.svg"
         title: qsTr("No events")
         description: qsTr("Try changing the filters or create an Event Rule")
     }

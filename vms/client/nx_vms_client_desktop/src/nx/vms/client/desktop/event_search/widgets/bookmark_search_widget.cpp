@@ -34,6 +34,12 @@ static constexpr milliseconds kVisiblePeriodUpdateInterval = 15s;
 static constexpr milliseconds kDelayAfterViewUpdate = 1s;
 static constexpr milliseconds kUpdateTimerResolution = 500ms;
 
+core::SvgIconColorer::ThemeSubstitutions kPlaceholderTheme = {
+    {QnIcon::Normal, {.primary = "dark10"}}};
+
+NX_DECLARE_COLORIZED_ICON(
+    kBookmarkPlaceholderIcon, "64x64/Outline/nobookmarks.svg", kPlaceholderTheme)
+
 } // namespace
 
 struct BookmarkSearchWidget::Private
@@ -68,7 +74,7 @@ BookmarkSearchWidget::BookmarkSearchWidget(WindowContext* context, QWidget* pare
 {
     NX_CRITICAL(d->model);
 
-    setPlaceholderPixmap(qnSkin->pixmap("left_panel/placeholders/bookmarks.svg"));
+    setPlaceholderPixmap(qnSkin->icon(kBookmarkPlaceholderIcon).pixmap(64, 64));
     commonSetup()->setCameraSelection(core::EventSearch::CameraSelection::layout);
 
     // Track remote bookmark changes by polling.

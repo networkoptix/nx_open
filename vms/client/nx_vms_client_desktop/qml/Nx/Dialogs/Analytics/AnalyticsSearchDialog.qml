@@ -365,7 +365,7 @@ Window
 
                 placeholder
                 {
-                    icon: "image://skin/left_panel/placeholders/objects.svg"
+                    icon: "image://skin/64x64/Outline/noobjects.svg"
                     title: qsTr("No objects")
                     description: qsTr("Try changing the filters or configure object detection "
                         + "in the camera plugin settings")

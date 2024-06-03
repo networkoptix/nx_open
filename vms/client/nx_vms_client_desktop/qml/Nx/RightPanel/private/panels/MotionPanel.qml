@@ -20,7 +20,7 @@ SearchPanel
 
     placeholder
     {
-        icon: "image://skin/left_panel/placeholders/motion.svg"
+        icon: "image://skin/64x64/Outline/motion.svg"
 
         title: placeholderAction.visible
             ? qsTr("Select a camera to see its motion events")
