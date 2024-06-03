@@ -1064,9 +1064,11 @@ UserSettingsDialogState UserSettingsDialog::createState(const QnUserResourcePtr&
         && user->isLdap()
         && status
         && status->state != api::LdapStatus::State::online;
+    const bool ldapSynced = status && status->timeSinceSyncS.has_value();
     d->ldapError = user->isLdap()
         && user->externalId().syncId != d->syncId
-        && !d->ldapOffline;
+        && !d->ldapOffline
+        && ldapSynced;
 
     state.linkEditable = accessController()->hasPowerUserPermissions()
         && permissions.testFlag(Qn::SavePermission);
