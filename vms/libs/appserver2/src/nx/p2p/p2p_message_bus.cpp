@@ -964,7 +964,7 @@ void MessageBus::sendTransactionImpl(
                 return;
             }
         }
-        else
+        else if (transportHeader.userIds.empty())
         {
             if (!context->isRemotePeerSubscribedTo(tran.peerID))
             {
@@ -1633,7 +1633,15 @@ void MessageBus::sendTransaction(const ec2::QnTransaction<T>& tran, const Transp
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     for (const auto& connection: m_connections)
+    {
+        if (!header.userIds.empty() && connection->remotePeer().isClient()
+            && !header.userIds.contains(connection.staticCast<Connection>()->userAccessData().userId))
+        {
+            continue;
+        }
+
         sendTransactionImpl(connection, tran, header);
+    }
 }
 
 template<class T>

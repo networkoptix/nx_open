@@ -405,6 +405,10 @@ QByteArray serializeTransportHeader(const TransportHeader& header)
     for (const auto& value : header.dstPeers)
         out.writeRawData(value.toRfc4122().data(), kGuidSize);
 
+    out << (quint32) header.userIds.size();
+    for (const auto& value: header.userIds)
+        out.writeRawData(value.toRfc4122().data(), kGuidSize);
+
     return result;
 }
 
@@ -442,6 +446,17 @@ TransportHeader deserializeTransportHeader(const QByteArray& response, int* byte
         if (in.readRawData(tmpBuffer.data(), tmpBuffer.size()) != kGuidSize)
             return result; //< Error
         result.dstPeers.push_back(nx::Uuid::fromRfc4122(tmpBuffer));
+        --size;
+    }
+
+    if (in.atEnd())
+        return result; //< error
+    in >> size;
+    while (!in.atEnd() && size > 0)
+    {
+        if (in.readRawData(tmpBuffer.data(), tmpBuffer.size()) != kGuidSize)
+            return result; //< Error
+        result.userIds.emplace(nx::Uuid::fromRfc4122(tmpBuffer));
         --size;
     }
 

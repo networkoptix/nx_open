@@ -165,8 +165,6 @@ protected:
 private:
     void sendAlivePeersMessage(const P2pConnectionPtr& connection = P2pConnectionPtr());
 
-    void doSubscribe(const QMap<vms::api::PersistentIdData, P2pConnectionPtr>& currentSubscription);
-
     bool handleResolvePeerNumberRequest(const P2pConnectionPtr& connection, const QByteArray& data);
     bool handleResolvePeerNumberResponse(const P2pConnectionPtr& connection, const QByteArray& data);
     bool handlePeersMessage(const P2pConnectionPtr& connection, const QByteArray& data);
