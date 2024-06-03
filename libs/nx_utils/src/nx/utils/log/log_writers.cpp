@@ -4,18 +4,20 @@
 
 #include <iostream>
 
+#include <quazip/quazip.h>
+#include <quazip/quazipfile.h>
+
 #include <QtCore/QDateTime>
 #include <QtCore/QDir>
 #include <QtCore/QFile>
 #include <QtCore/QRegularExpression>
 #include <QtCore/QTemporaryFile>
 
-#include <quazip/quazip.h>
-#include <quazip/quazipfile.h>
-
 #include <nx/reflect/enum_string_conversion.h>
+#include <nx/utils/nx_utils_ini.h>
 #include <nx/utils/scope_guard.h>
 
+#include "storage_info.h"
 #include "to_string.h"
 
 static constexpr int kBufferSize = 64 * 1024;
@@ -272,10 +274,13 @@ void File::rotateAndStartArchivingIfNeeded()
     int removedCount = 0;
     for (removedCount = 0; removedCount <= list.size() - kMaxLogRotation; removedCount++)
         dir.remove(list[removedCount]);
-    for ( ; totalVolumeSize() >= m_settings.maxVolumeSizeB && removedCount < list.size(); removedCount++)
+
+    const qint64 maxVolumeSizeB = calculateMaxVolumeSize();
+
+    for ( ; totalVolumeSize() >= maxVolumeSizeB && removedCount < list.size(); removedCount++)
         dir.remove(list[removedCount]);
 
-    if (totalVolumeSize() >= m_settings.maxVolumeSizeB)
+    if (totalVolumeSize() >= maxVolumeSizeB)
     {
         QFile::remove(getFileName());
         return;
@@ -505,6 +510,40 @@ qint64 File::totalVolumeSize()
     }
 
     return size;
+}
+
+qint64 File::bytesToRemoveByFreeSpaceLimit() const
+{
+    qint64 requiredSize = nx::utils::ini().logReservedVolumeSizeBytes();
+    int requiredPercent = std::clamp(nx::utils::ini().logReservedVolumePercentage, 0, 100);
+
+    // Avoid calling expensive getVolumeInfo if checks are disabled.
+    if (requiredSize <= 0 && requiredPercent <= 0)
+        return 0;
+
+    auto volumeInfoOpt = nx::log::detail::getVolumeInfo(m_fileInfo.dir().path());
+    if (!volumeInfoOpt)
+        return 0;
+
+    const auto [totalB, freeB] = *volumeInfoOpt;
+    qint64 requiredPercentSize = totalB * requiredPercent / 100;
+
+    qint64 reserveB = requiredPercentSize > 0 && requiredSize > 0
+            ? std::min(requiredSize, requiredPercentSize)
+            : std::max(requiredSize, requiredPercentSize);
+    return freeB > reserveB ? 0 : reserveB - freeB;
+}
+
+qint64 File::calculateMaxVolumeSize()
+{
+    if (auto bytesToRemove = bytesToRemoveByFreeSpaceLimit(); bytesToRemove > 0)
+    {
+        if (auto logsTotalSize = totalVolumeSize(); logsTotalSize >= bytesToRemove)
+            return std::min(m_settings.maxVolumeSizeB, logsTotalSize - bytesToRemove);
+        else
+            return 0; //There is not enough space even after we remove all logs.
+    }
+    return m_settings.maxVolumeSizeB;
 }
 
 void Buffer::write(Level /*level*/, const QString& message)
