@@ -110,6 +110,17 @@ void splitFormat(const QString &format, QString *left, QString *right)
     }
 }
 
+const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kLight1Theme = {
+    {QIcon::Normal, {.primary = "light1"}}
+};
+
+NX_DECLARE_COLORIZED_ICON(kZoomWindowIcon, "24x24/Outline/zoom_window.svg", kLight1Theme)
+NX_DECLARE_COLORIZED_ICON(kCloseIcon, "24x24/Outline/close.svg", kLight1Theme)
+NX_DECLARE_COLORIZED_ICON(kCollapseIcon, "24x24/Outline/collapse.svg", kLight1Theme)
+NX_DECLARE_COLORIZED_ICON(kExpandIcon, "24x24/Outline/expand.svg", kLight1Theme)
+NX_DECLARE_COLORIZED_ICON(kInfoIcon, "24x24/Outline/info.svg", kLight1Theme)
+NX_DECLARE_COLORIZED_ICON(kRotateIcon, "24x24/Outline/rotate.svg", kLight1Theme)
+
 } // anonymous namespace
 
 struct QnResourceWidget::Private
@@ -372,19 +383,19 @@ void QnResourceWidget::createButtons()
     iconButton->setVisible(false);
     iconButton->setAcceptedMouseButtons(Qt::NoButton);
     iconButton->setObjectName("ZoomStatusIconButton");
-    iconButton->setIcon(loadSvgIcon("item/zoom_window.svg"));
+    iconButton->setIcon(qnSkin->icon(kZoomWindowIcon));
     iconButton->setToolTip(tr("Zoom Window"));
     leftButtonsBar->addButton(Qn::ZoomStatusIconButton, iconButton);
 
     auto closeButton = createStatisticAwareButton("res_widget_close");
-    closeButton->setIcon(loadSvgIcon("item/close.svg"));
+    closeButton->setIcon(qnSkin->icon(kCloseIcon));
     closeButton->setToolTip(tooltipText(closeButtonTooltip(), QKeySequence{"Del"}));
     closeButton->setObjectName("CloseButton");
     connect(closeButton, &QnImageButtonWidget::clicked, this, &QnResourceWidget::close,
         Qt::QueuedConnection);
 
     auto infoButton = createStatisticAwareButton("res_widget_info");
-    infoButton->setIcon(loadSvgIcon("item/info.svg"));
+    infoButton->setIcon(qnSkin->icon(kInfoIcon));
     infoButton->setCheckable(true);
     infoButton->setChecked(item()->displayInfo());
     infoButton->setToolTip(tooltipText(infoButtonTooltip(), QKeySequence{"I"}));
@@ -392,7 +403,7 @@ void QnResourceWidget::createButtons()
     connect(infoButton, &QnImageButtonWidget::toggled, this, &QnResourceWidget::at_infoButton_toggled);
 
     auto rotateButton = createStatisticAwareButton("res_widget_rotate");
-    rotateButton->setIcon(loadSvgIcon("item/rotate.svg"));
+    rotateButton->setIcon(qnSkin->icon(kRotateIcon));
     rotateButton->setToolTip(tooltipText(tr("Rotate"), "Alt+drag"));
     rotateButton->setObjectName("RotateButton");
     setHelpTopic(rotateButton, HelpTopic::Id::MainWindow_MediaItem_Rotate);
@@ -433,8 +444,8 @@ void QnResourceWidget::updateFullscreenButton()
     const auto button = titleBar()->rightButtonsBar()->button(Qn::FullscreenButton);
 
     const auto newIcon = fullscreenMode
-        ? loadSvgIcon("item/exit_fullscreen.svg")
-        : loadSvgIcon("item/fullscreen.svg");
+        ? qnSkin->icon(kCollapseIcon)
+        : qnSkin->icon(kExpandIcon);
 
     button->setToolTip(fullscreenMode ? tr("Exit Fullscreen") : tr("Enter Fullscreen"));
     button->setIcon(newIcon);

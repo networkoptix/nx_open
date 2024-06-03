@@ -34,6 +34,7 @@
 #include <ui/common/speed_range.h>
 #include <ui/graphics/items/resource/button_ids.h>
 
+#include "nx/vms/client/core/skin/skin.h"
 #include "resource_widget.h"
 
 struct QnMetaDataV1;
@@ -444,7 +445,7 @@ private:
 
     using ButtonHandler = void (QnMediaResourceWidget::*)(bool checked);
     QAction* createActionAndButton(
-        const QString& iconName,
+        const nx::vms::client::core::ColorizedIconDeclaration& iconDecl,
         bool checked,
         const QKeySequence& shortcut,
         const QString& toolTip,

@@ -171,6 +171,10 @@ static const auto kUpdateDetailsInterval = 1s;
 
 static constexpr auto k360VRAspectRatio = 16.0 / 9.0;
 
+const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kLight1Theme = {
+    {QIcon::Normal, {.primary = "light1"}}
+};
+
 static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kArchiveTheme = {
     {QIcon::Normal, {.primary = "light10"}}
 };
@@ -182,6 +186,16 @@ static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kRecordin
 NX_DECLARE_COLORIZED_ICON(kArchiveIcon, "16x16/Solid/archive.svg", kArchiveTheme)
 NX_DECLARE_COLORIZED_ICON(kNotRecordingIcon, "16x16/Solid/notrecordingnow.svg", kRecordingTheme)
 NX_DECLARE_COLORIZED_ICON(kRecordingIcon, "16x16/Solid/recordingnow.svg", kRecordingTheme)
+
+NX_DECLARE_COLORIZED_ICON(kAreaZoomIcon, "24x24/Outline/area_zoom.svg", kLight1Theme)
+NX_DECLARE_COLORIZED_ICON(kPtzIcon, "24x24/Outline/ptz.svg", kLight1Theme)
+NX_DECLARE_COLORIZED_ICON(kFisheyeIcon, "24x24/Outline/fisheye.svg", kLight1Theme)
+NX_DECLARE_COLORIZED_ICON(kZoomWindowIcon, "24x24/Outline/zoom_window.svg", kLight1Theme)
+NX_DECLARE_COLORIZED_ICON(kMotionIcon, "24x24/Outline/motion.svg", kLight1Theme)
+NX_DECLARE_COLORIZED_ICON(kHotspotsIcon, "24x24/Outline/hotspots.svg", kLight1Theme)
+NX_DECLARE_COLORIZED_ICON(kIoIcon, "24x24/Outline/io.svg", kLight1Theme)
+NX_DECLARE_COLORIZED_ICON(kObjectIcon, "24x24/Outline/object.svg", kLight1Theme)
+NX_DECLARE_COLORIZED_ICON(kScreenshotIcon, "24x24/Outline/screenshot.svg", kLight1Theme)
 
 template<class Cont, class Item>
 bool contains(const Cont& cont, const Item& item)
@@ -938,7 +952,7 @@ void QnMediaResourceWidget::createButtons()
     if (d->camera && d->camera->isPtzRedirected())
     {
         createActionAndButton(
-            /* icon*/ "item/area_zoom.svg",
+            /* icon*/ kAreaZoomIcon,
             /* checked*/ false,
             /* shortcut*/ {},
             /* tooltip */ tr("Area Zoom"),
@@ -950,7 +964,7 @@ void QnMediaResourceWidget::createButtons()
     else
     {
         createActionAndButton(
-            /* icon*/ "item/ptz.svg",
+            /* icon*/ kPtzIcon,
             /* checked*/ false,
             /* shortcut*/ QKeySequence::fromString("P"),
             /* tooltip */ tr("PTZ"),
@@ -961,33 +975,33 @@ void QnMediaResourceWidget::createButtons()
     }
 
     createActionAndButton(
-        "item/fisheye.svg",
-        item()->dewarpingParams().enabled,
-        QKeySequence::fromString("D"),
-        tr("Dewarping"),
-        HelpTopic::Id::MainWindow_MediaItem_Dewarping,
-        Qn::FishEyeButton, "media_widget_fisheye",
-        &QnMediaResourceWidget::at_fishEyeButton_toggled);
+        /* icon*/ kFisheyeIcon,
+        /* checked*/ item()->dewarpingParams().enabled,
+        /* shortcut*/ QKeySequence::fromString("D"),
+        /* tooltip */ tr("Dewarping"),
+        /* help id */ HelpTopic::Id::MainWindow_MediaItem_Dewarping,
+        /* internal id */ Qn::FishEyeButton, "media_widget_fisheye",
+        /* handler */ &QnMediaResourceWidget::at_fishEyeButton_toggled);
 
     createActionAndButton(
-        "item/zoom_window.svg",
-        false,
-        QKeySequence::fromString("W"),
-        tr("Create Zoom Window"),
-        HelpTopic::Id::MainWindow_MediaItem_ZoomWindows,
-        Qn::ZoomWindowButton, "media_widget_zoom",
-        &QnMediaResourceWidget::setZoomWindowCreationModeEnabled);
+        /* icon*/ kZoomWindowIcon,
+        /* checked*/ false,
+        /* shortcut*/ QKeySequence::fromString("W"),
+        /* tooltip */ tr("Create Zoom Window"),
+        /* help id */ HelpTopic::Id::MainWindow_MediaItem_ZoomWindows,
+        /* internal id */ Qn::ZoomWindowButton, "media_widget_zoom",
+        /* handler */ &QnMediaResourceWidget::setZoomWindowCreationModeEnabled);
 
     if (canDisplayHotspots())
     {
         createActionAndButton(
-            "item/hotspots.svg",
-            item()->displayHotspots() && d->camera->cameraHotspotsEnabled(),
-            QKeySequence::fromString("H"),
-            tr("Hotspots"),
-            HelpTopic::Id::Empty,
-            Qn::HotspotsButton, "media_widget_hotspots",
-            &QnMediaResourceWidget::setHotspotsVisible);
+            /* icon*/ kHotspotsIcon,
+            /* checked*/ item()->displayHotspots() && d->camera->cameraHotspotsEnabled(),
+            /* shortcut*/ QKeySequence::fromString("H"),
+            /* tooltip */ tr("Hotspots"),
+            /* help id */ HelpTopic::Id::Empty,
+            /* internal id */ Qn::HotspotsButton, "media_widget_hotspots",
+            /* handler */ &QnMediaResourceWidget::setHotspotsVisible);
     }
 
     m_toggleImageEnhancementAction->setCheckable(true);
@@ -1001,7 +1015,7 @@ void QnMediaResourceWidget::createButtons()
 
     {
         auto ioModuleButton = createStatisticAwareButton("media_widget_io_module");
-        ioModuleButton->setIcon(qnSkin->icon("item/io.svg"));
+        ioModuleButton->setIcon(qnSkin->icon(kIoIcon));
         ioModuleButton->setCheckable(true);
         ioModuleButton->setChecked(false);
         ioModuleButton->setToolTip(tr("I/O Module"));
@@ -1011,7 +1025,7 @@ void QnMediaResourceWidget::createButtons()
     }
 
     auto screenshotButton = createStatisticAwareButton("media_widget_screenshot");
-    screenshotButton->setIcon(loadSvgIcon("item/screenshot.svg"));
+    screenshotButton->setIcon(qnSkin->icon(kScreenshotIcon));
     screenshotButton->setCheckable(false);
     screenshotButton->setToolTip(tooltipText(tr("Screenshot"), QKeySequence{"Alt+S"}));
     setHelpTopic(screenshotButton, HelpTopic::Id::MainWindow_MediaItem_Screenshot);
@@ -1024,7 +1038,7 @@ void QnMediaResourceWidget::createButtons()
     {
         auto debugScreenshotButton =
             createStatisticAwareButton("media_widget_debug_screenshot");
-        debugScreenshotButton->setIcon(loadSvgIcon("item/screenshot.svg"));
+        debugScreenshotButton->setIcon(qnSkin->icon(kScreenshotIcon));
         debugScreenshotButton->setCheckable(false);
         debugScreenshotButton->setToolTip("Debug set of screenshots");
         connect(debugScreenshotButton, &QnImageButtonWidget::clicked, this,
@@ -1037,14 +1051,13 @@ void QnMediaResourceWidget::createButtons()
     }
 
     const auto motionSearchLocalAction = createActionAndButton(
-        "item/motion.svg",
-        isMotionSearchModeEnabled(),
-        {},
-        tooltipText(tr("Motion Search"), "Alt+M"),
-        HelpTopic::Id::MainWindow_MediaItem_SmartSearch,
-        Qn::MotionSearchButton,
-        "media_widget_msearch",
-        /*executor*/ {});
+        /* icon*/ kMotionIcon,
+        /* checked*/ isMotionSearchModeEnabled(),
+        /* shortcut*/ {},
+        /* tooltip */ tooltipText(tr("Motion Search"), "Alt+M"),
+        /* help id */ HelpTopic::Id::MainWindow_MediaItem_SmartSearch,
+        /* internal id */ Qn::MotionSearchButton, "media_widget_msearch",
+        /* handler */ {});
 
     connect(motionSearchLocalAction, &QAction::toggled, this,
         [this](bool on)
@@ -1062,14 +1075,13 @@ void QnMediaResourceWidget::createButtons()
         });
 
     const auto objectSearchLocalAction = createActionAndButton(
-        "item/object.svg",
-        action(menu::ObjectSearchModeAction)->isChecked(),
-        {},
-        tooltipText(tr("Object Search"), "Alt+O"),
-        /*helpTopic*/ {},
-        Qn::ObjectSearchButton,
-        "media_widget_object_search",
-        /*executor*/ {});
+        /* icon*/ kObjectIcon,
+        /* checked*/ action(menu::ObjectSearchModeAction)->isChecked(),
+        /* shortcut*/ {},
+        /* tooltip */ tooltipText(tr("Object Search"), "Alt+O"),
+        /*help id*/ {},
+        /* internal id */ Qn::ObjectSearchButton, "media_widget_object_search",
+        /* handler */ {});
 
     // Here `action(menu::ObjectSearchModeAction)` is a global internal action that doesn't
     // check any conditions and has semantics of switching the Right Panel in or out of the
@@ -3389,7 +3401,8 @@ void QnMediaResourceWidget::updateWatermark()
     m_watermarkPainter->setWatermark(watermark);
 }
 
-QAction* QnMediaResourceWidget::createActionAndButton(const QString& iconName,
+QAction* QnMediaResourceWidget::createActionAndButton(
+    const nx::vms::client::core::ColorizedIconDeclaration& iconDecl,
     bool checked,
     const QKeySequence& shortcut,
     const QString& toolTip,
@@ -3399,7 +3412,7 @@ QAction* QnMediaResourceWidget::createActionAndButton(const QString& iconName,
     ButtonHandler executor)
 {
     auto action = new QAction(this);
-    action->setIcon(iconName.endsWith("svg") ? loadSvgIcon(iconName) : qnSkin->icon(iconName));
+    action->setIcon(qnSkin->icon(iconDecl));
     action->setCheckable(true);
     action->setChecked(checked);
     action->setShortcut(shortcut);

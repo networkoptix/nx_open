@@ -19,6 +19,12 @@
 
 constexpr int kAlpha = 76;
 
+namespace {
+nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kRewindTheme = {{QnIcon::Normal, {.primary = "light1"}}};
+
+NX_DECLARE_COLORIZED_ICON(kRewindIcon, "29x36/Solid/rewind_triangle.svg", kRewindTheme)
+}  // namespace
+
 namespace nx::vms::client::desktop {
 
 class RewindWidget::BackgroundWidget: public QGraphicsWidget
@@ -89,7 +95,7 @@ RewindWidget::RewindWidget(QGraphicsItem* parent, bool fastForward):
     setAcceptedMouseButtons(Qt::NoButton);
     {
         QSize size(nx::style::Metrics::kRewindArrowSize);
-        const auto ffIcon = qnSkin->icon("item/rewind_triangle.svg");
+        const auto ffIcon = qnSkin->icon(kRewindIcon);
         const auto iconPixmap = m_fastForward
             ? ffIcon.pixmap(size)
             : ffIcon.pixmap(size).transformed(QTransform().scale(-1, 1));

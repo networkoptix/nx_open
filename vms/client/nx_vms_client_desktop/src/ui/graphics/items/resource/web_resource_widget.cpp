@@ -41,6 +41,15 @@ namespace {
 
 const auto kDefaultWidgetMargins = QMargins(1, 36, 1, 1);
 
+const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kLight1Theme = {
+    {QIcon::Normal, {.primary = "light1"}}
+};
+
+NX_DECLARE_COLORIZED_ICON(kBackIcon, "24x24/Outline/back.svg", kLight1Theme)
+NX_DECLARE_COLORIZED_ICON(kRefreshAutoIcon, "24x24/Outline/refresh_auto.svg", kLight1Theme)
+NX_DECLARE_COLORIZED_ICON(kRefreshIcon, "24x24/Outline/refresh.svg", kLight1Theme)
+NX_DECLARE_COLORIZED_ICON(kLockDisabledIcon, "16x16/Outline/lock_disabled.svg", kLight1Theme)
+
 } // namespace
 
 QnWebResourceWidget::QnWebResourceWidget(
@@ -148,7 +157,7 @@ void QnWebResourceWidget::setupOverlays()
         auto buttonsBar = titleBar()->leftButtonsBar();
 
         auto backButton = createStatisticAwareButton(lit("web_widget_back"));
-        backButton->setIcon(loadSvgIcon("item/back.svg"));
+        backButton->setIcon(qnSkin->icon(kBackIcon));
         backButton->setObjectName("BackButton");
         connect(backButton, &QnImageButtonWidget::clicked, m_webEngineView.get(), &GraphicsWebEngineView::back);
         buttonsBar->addButton(Qn::BackButton, backButton);
@@ -173,9 +182,7 @@ void QnWebResourceWidget::setupOverlays()
             [webResource, reloadButton, this]()
             {
                 int value = webResource->refreshInterval().count();
-                reloadButton->setIcon(loadSvgIcon(value > 0
-                    ? "item/refresh_auto.svg"
-                    : "item/refresh.svg"));
+                reloadButton->setIcon(qnSkin->icon(value > 0 ? kRefreshAutoIcon : kRefreshIcon));
 
                 m_refreshTimer->setInterval(
                     duration_cast<milliseconds>(webResource->refreshInterval()));
@@ -321,7 +328,7 @@ QString QnWebResourceWidget::calculateDetailsText() const
 
 QPixmap QnWebResourceWidget::calculateDetailsIcon() const
 {
-    return m_validCertificate ? QPixmap() : qnSkin->pixmap("item/lock_disabled.svg");
+    return m_validCertificate ? QPixmap() : qnSkin->icon(kLockDisabledIcon).pixmap(16, 16);
 }
 
 nx::vms::client::desktop::GraphicsWebEngineView* QnWebResourceWidget::webView() const

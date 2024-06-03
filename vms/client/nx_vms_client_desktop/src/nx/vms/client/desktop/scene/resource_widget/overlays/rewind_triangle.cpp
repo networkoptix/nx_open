@@ -7,10 +7,17 @@
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/style/helper.h>
 
+namespace {
+nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kRewindTheme = {
+    {QnIcon::Normal, {.primary = "light1"}}};
+
+NX_DECLARE_COLORIZED_ICON(kRewindIcon, "29x36/Solid/rewind_triangle.svg", kRewindTheme)
+} // namespace
+
 RewindTriangle::RewindTriangle(bool fastForward, QGraphicsWidget* parent):
     QGraphicsWidget(parent)
 {
-    const auto ffIcon = qnSkin->icon("item/rewind_triangle.svg");
+    const auto ffIcon = qnSkin->icon(kRewindIcon);
     m_pixmap = fastForward
         ? ffIcon.pixmap(nx::style::Metrics::kRewindArrowSize)
         : ffIcon.pixmap(nx::style::Metrics::kRewindArrowSize)
