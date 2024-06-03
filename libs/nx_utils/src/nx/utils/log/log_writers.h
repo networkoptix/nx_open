@@ -98,6 +98,8 @@ private:
     bool isCurrentLimitReached(nx::Locker<nx::Mutex>* lock);
     void archive(QString fileName, QString archiveName);
     qint64 totalVolumeSize();
+    qint64 bytesToRemoveByFreeSpaceLimit() const;
+    qint64 calculateMaxVolumeSize();
 
 private:
     Settings m_settings;

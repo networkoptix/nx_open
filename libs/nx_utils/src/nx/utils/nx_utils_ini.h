@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <cstdint>
+
 #include <nx/kit/ini_config.h>
 
 namespace nx::utils {
@@ -55,6 +57,23 @@ struct NX_UTILS_API Ini: nx::kit::IniConfig
 
     NX_INI_INT(kLogLevelReducerWindowSizeS, logLevelReducerWindowSizeS,
         "Replace error and warning logs with debugs within this time.");
+
+    NX_INI_INT(1024, logReservedVolumeSizeMB,
+        "Clean up logs if the volume free space is less than this value.\n"
+        "If the value is bigger than the size determened by logReservedVolumePercentage\n"
+        "the latter will be used\n"
+        "If the value is zero then the check is disabled");
+
+    std::int64_t logReservedVolumeSizeBytes() const
+    {
+        return logReservedVolumeSizeMB > 0 ? logReservedVolumeSizeMB * 1024ll * 1024 : 0ll;
+    }
+
+    NX_INI_INT(3, logReservedVolumePercentage,
+        "Clean up logs if the volume free space is less than this value in percent.\n"
+        "If the size is bigger than the value of logReservedVolumeSizeMB\n"
+        "the latter will be used\n"
+        "If the value is zero then the check is disabled");
 
     NX_INI_FLOAT(1.0f, valueHistoryAgeDelimiter,
         "Reduces max age of all ValueHistory storage and requests.");

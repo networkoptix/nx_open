@@ -1,17 +1,18 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include <gtest/gtest.h>
-
-#include <nx/utils/log/log_writers.h>
-#include <nx/utils/random.h>
-#include <nx/utils/std/cpp14.h>
-#include <nx/utils/test_support/test_options.h>
+#include <quazip/quazip.h>
+#include <quazip/quazipfile.h>
 
 #include <QtCore/QDir>
 #include <QtCore/QFile>
 
-#include <quazip/quazip.h>
-#include <quazip/quazipfile.h>
+#include <nx/utils/log/log_writers.h>
+#include <nx/utils/log/storage_info.h>
+#include <nx/utils/nx_utils_ini.h>
+#include <nx/utils/random.h>
+#include <nx/utils/std/cpp14.h>
+#include <nx/utils/test_support/test_options.h>
 
 namespace nx::log::test {
 
@@ -88,8 +89,26 @@ public:
                 QString("*") + toQString(File::Extension::zip)
             },
             QDir::Files, QDir::Name);
-        for (auto log: logs)
+        for (const auto& log: logs)
             dir.remove(log);
+
+        nx::log::detail::setVolumeInfoGetter(nullptr);
+    }
+
+    qint64 bytesWritten()
+    {
+        qint64 total = 0;
+        auto dir = QFileInfo(m_basePath).dir();
+        const auto logs = dir.entryInfoList(
+            {
+                QString("*") + toQString(File::Extension::log),
+                QString("*") + toQString(File::Extension::zip)
+            },
+            QDir::Files, QDir::Name);
+        for (const auto& log: logs)
+            total += log.size();
+
+        return total;
     }
 
 private:
@@ -246,6 +265,101 @@ TEST_F(LogFile, RotationZipNoZip)
     checkFile({"dddddd", "aaaaaaaaa"}, "_004", File::Extension::zip);
     checkFile({"bbbbbbbbb", "ccccccccc"}, "_005", File::Extension::zip);
     checkFile({"ddddddddd", "111"});
+}
+
+TEST_F(LogFile, RotationByFreeSpace)
+{
+    static constexpr size_t kLogSize = 20;
+    static constexpr qint64 kMiB = 1024 * 1024;
+    static constexpr size_t kVolumeSize = 1024 * kMiB;
+    const auto kReservedFreeSpace = nx::utils::ini().logReservedVolumeSizeMB * kMiB;
+    const qint64 kTotalVolumeSize = 100 * 1024 * kMiB; // to make percentage limit bigger.
+
+    nx::log::detail::setVolumeInfoGetter(
+        [&](auto /*path*/) -> std::optional<nx::log::detail::VolumeInfo>
+        {
+            return std::make_tuple(kTotalVolumeSize, kReservedFreeSpace + 500 - bytesWritten());
+        }
+    );
+
+    {
+        auto w = makeWriter(kLogSize, kVolumeSize);
+        w->write(Level::undefined, "1234567890");
+    }
+    checkFile({"1234567890"});
+
+    {
+        auto w = makeWriter(kLogSize, kVolumeSize);
+        w->write(Level::undefined, "1234567890"); //< Overflow
+    }
+    checkFile({"1234567890", "1234567890"}, "_001", File::Extension::zip);
+    checkFile();
+
+    {
+        auto w = makeWriter(kLogSize, kVolumeSize);
+        w->write(Level::undefined, "xxx");
+        w->write(Level::undefined, "yyy");
+    }
+    checkFile({"1234567890", "1234567890"}, "_001", File::Extension::zip);
+    checkFile({"xxx", "yyy"});
+
+    {
+        auto w = makeWriter(kLogSize, kVolumeSize);
+        w->write(Level::undefined, "12345678901234567890"); // Overflow
+        w->write(Level::undefined, "1234567890");
+    }
+    checkFile({"1234567890", "1234567890"}, "_001", File::Extension::zip);
+    checkFile({"xxx", "yyy", "12345678901234567890"}, "_002", File::Extension::zip);
+    checkFile({"1234567890"});
+
+    {
+        auto w = makeWriter(kLogSize, kVolumeSize);
+        w->write(Level::undefined, "7777777777"); //< Overflow
+        w->write(Level::undefined, "a");
+        w->write(Level::undefined, "b");
+    }
+    checkFile({"1234567890", "1234567890"}, "_001", File::Extension::zip);
+    checkFile({"xxx", "yyy", "12345678901234567890"}, "_002", File::Extension::zip);
+    checkFile({"1234567890", "7777777777"}, "_003", File::Extension::zip);
+    checkFile({"a", "b"});
+
+    {
+        auto w = makeWriter(kLogSize, kVolumeSize);
+        w->write(Level::undefined, "12345678901234567890"); //< Overflow + Rotation
+    }
+    checkFile({"xxx", "yyy", "12345678901234567890"}, "_001", File::Extension::zip);
+    checkFile({"1234567890", "7777777777"}, "_002", File::Extension::zip);
+    checkFile({"a", "b", "12345678901234567890"}, "_003", File::Extension::zip);
+    checkFile();
+
+    {
+        auto w = makeWriter(kLogSize, kVolumeSize);
+        w->write(Level::undefined, "6666666666");
+        w->write(Level::undefined, "1234567890"); //< Overflow + Rotation
+        w->write(Level::undefined, "zzz");
+    }
+    checkFile({"1234567890", "7777777777"}, "_001", File::Extension::zip);
+    checkFile({"a", "b", "12345678901234567890"}, "_002", File::Extension::zip);
+    checkFile({"6666666666", "1234567890"}, "_003", File::Extension::zip);
+    checkFile({"zzz"});
+
+    // No free space, required count of bytes to remove is bigger than
+    // all written logs. All logs have to be removed.
+    nx::log::detail::setVolumeInfoGetter(
+        [&](auto /*path*/) -> std::optional<nx::log::detail::VolumeInfo>
+        {
+            return std::make_tuple(kTotalVolumeSize, 0);
+        }
+    );
+    {
+        auto w = makeWriter(kLogSize, kVolumeSize);
+        w->write(Level::undefined, "6666666666");
+        w->write(Level::undefined, "1234567890"); //< Overflow + Rotation
+    }
+    checkFile({}, "_001", File::Extension::zip);
+    checkFile({}, "_002", File::Extension::zip);
+    checkFile({}, "_003", File::Extension::zip);
+    checkFile();
 }
 
 } // namespace nx::log::test
