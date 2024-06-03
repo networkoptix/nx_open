@@ -41,14 +41,13 @@
 #include <nx/utils/string.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/analytics/analytics_icon_manager.h>
+#include <nx/vms/client/core/analytics/analytics_taxonomy_manager.h>
+#include <nx/vms/client/core/analytics/taxonomy/object_type.h>
+#include <nx/vms/client/core/event_search/utils/analytics_search_setup.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/icon.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/utils/qml_helpers.h>
-#include <nx/vms/client/core/analytics/analytics_icon_manager.h>
-#include <nx/vms/client/core/analytics/analytics_taxonomy_manager.h>
-#include <nx/vms/client/core/analytics/taxonomy/object_type.h>
-#include <nx/vms/client/core/event_search/utils/analytics_search_setup.h>
 #include <nx/vms/client/desktop/common/dialogs/web_view_dialog.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/common/widgets/item_model_menu.h>
@@ -58,7 +57,6 @@
 #include <nx/vms/client/desktop/event_search/utils/common_object_search_setup.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_ribbon.h>
 #include <nx/vms/client/desktop/ini.h>
-#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/qml_property.h>
@@ -80,6 +78,13 @@ static const core::SvgIconColorer::ThemeSubstitutions kThemeSubstitutions = {
 NX_DECLARE_COLORIZED_ICON(kDefaultAnalyticsIcon, "20x20/Outline/default.svg", kThemeSubstitutions)
 NX_DECLARE_COLORIZED_ICON(kFrameIcon, "20x20/Outline/frame.svg", kThemeSubstitutions)
 NX_DECLARE_COLORIZED_ICON(kPluginsIcon, "20x20/Outline/plugins.svg", kThemeSubstitutions)
+
+nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kNoObjectsTheme = {
+    {QnIcon::Normal, {.primary = "dark10"}}};
+
+NX_DECLARE_COLORIZED_ICON(
+    kObjectsPlaceholderIcon, "64x64/Outline/noobjects.svg", kNoObjectsTheme)
+
 using namespace std::chrono;
 using namespace nx::analytics::taxonomy;
 using namespace nx::vms::client::core::analytics;
@@ -153,7 +158,7 @@ AnalyticsSearchWidget::AnalyticsSearchWidget(WindowContext* context, QWidget* pa
     d(new Private(this))
 {
     setRelevantControls(Control::defaults | Control::footersToggler);
-    setPlaceholderPixmap(qnSkin->pixmap("left_panel/placeholders/objects.svg"));
+    setPlaceholderPixmap(qnSkin->icon(kObjectsPlaceholderIcon).pixmap(64, 64));
     commonSetup()->setCameraSelection(core::EventSearch::CameraSelection::layout);
 
     addSearchAction(action(menu::OpenAdvancedSearchDialog));

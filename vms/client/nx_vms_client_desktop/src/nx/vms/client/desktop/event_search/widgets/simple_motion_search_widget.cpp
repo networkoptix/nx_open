@@ -35,6 +35,12 @@ static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kThemeSub
 
 NX_DECLARE_COLORIZED_ICON(kFrameIcon, "20x20/Outline/frame.svg", kThemeSubstitutions)
 
+core::SvgIconColorer::ThemeSubstitutions kPlaceholderTheme = {
+    {QnIcon::Normal, {.primary = "dark10"}}};
+
+NX_DECLARE_COLORIZED_ICON(
+    kMotionPlaceholderIcon, "64x64/Outline/motion.svg", kPlaceholderTheme)
+
 class SimpleMotionSearchWidget::Private: public QObject
 {
     Q_DECLARE_TR_FUNCTIONS(SimpleMotionSearchWidget::Private)
@@ -83,7 +89,7 @@ SimpleMotionSearchWidget::SimpleMotionSearchWidget(WindowContext* context, QWidg
     d(new Private(this))
 {
     setRelevantControls(Control::cameraSelectionDisplay | Control::timeSelector | Control::previewsToggler);
-    setPlaceholderPixmap(qnSkin->pixmap("left_panel/placeholders/motion.svg"));
+    setPlaceholderPixmap(qnSkin->icon(kMotionPlaceholderIcon).pixmap(64, 64));
 
     connect(model(), &core::AbstractSearchListModel::isOnlineChanged, this,
         &SimpleMotionSearchWidget::updateAllowance);

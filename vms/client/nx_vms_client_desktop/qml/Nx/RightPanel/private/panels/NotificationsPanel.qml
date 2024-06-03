@@ -37,7 +37,7 @@ Item
 
         placeholder
         {
-            icon: "image://skin/left_panel/placeholders/notifications.svg"
+            icon: "image://skin/64x64/Outline/notification.svg"
 
             title: qsTr("No new notifications")
 
