@@ -20,11 +20,11 @@
     </message>
     <message>
       <source>empty</source>
-      <translation>empty</translation>
+      <translation>kosong</translation>
     </message>
     <message>
       <source>less than an hour</source>
-      <translation>less than an hour</translation>
+      <translation>kurang dari satu jam</translation>
     </message>
   </context>
   <context>
@@ -229,7 +229,7 @@
     </message>
     <message>
       <source>Server has been stopped.</source>
-      <translation>Server has been stopped.</translation>
+      <translation>Server telah dihentikan.</translation>
     </message>
     <message>
       <source>Media stream is opened but no media data was received.</source>
@@ -241,7 +241,7 @@
     </message>
     <message>
       <source>(unknown)</source>
-      <translation>(unknown)</translation>
+      <translation>(tidak dikenal)</translation>
     </message>
     <message>
       <source>Server %1 is not available.</source>
@@ -467,7 +467,7 @@
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>Could not initialize audio encoder.</translation>
+      <translation>Tidak dapat menginisialisasi enkoder audio.</translation>
     </message>
     <message>
       <source>Could not initialize audio decoder.</source>
@@ -529,7 +529,7 @@
     </message>
     <message>
       <source>Could not initialize video encoder.</source>
-      <translation>Could not initialize video encoder.</translation>
+      <translation>Tidak dapat menginisialisasi enkoder video.</translation>
     </message>
   </context>
   <context>
@@ -556,11 +556,11 @@
     </message>
     <message>
       <source>I/O Module</source>
-      <translation>I/O Module</translation>
+      <translation>Modul I/O</translation>
     </message>
     <message>
       <source>Start</source>
-      <translation>Start</translation>
+      <translation>Mulai</translation>
     </message>
     <message>
       <source>Analog Encoder</source>
@@ -600,7 +600,7 @@
     </message>
     <message>
       <source>Invalid</source>
-      <translation>Invalid</translation>
+      <translation>Tidak valid</translation>
     </message>
     <message>
       <source>Invalid Licenses</source>
@@ -612,7 +612,7 @@
     </message>
     <message>
       <source>Time</source>
-      <translation>Time</translation>
+      <translation>Waktu</translation>
     </message>
     <message>
       <source>Time Licenses</source>
@@ -833,35 +833,35 @@
     <name>QnResourceNameStrings</name>
     <message>
       <source>Cameras</source>
-      <translation>Cameras</translation>
+      <translation>Kamera</translation>
     </message>
     <message>
       <source>cameras</source>
-      <translation>cameras</translation>
+      <translation>kamera</translation>
     </message>
     <message>
       <source>Camera</source>
-      <translation>Camera</translation>
+      <translation>Kamera</translation>
     </message>
     <message>
       <source>camera</source>
-      <translation>camera</translation>
+      <translation>kamera</translation>
     </message>
     <message>
       <source>Devices</source>
-      <translation>Devices</translation>
+      <translation>Perangkat</translation>
     </message>
     <message>
       <source>devices</source>
-      <translation>devices</translation>
+      <translation>perangkat</translation>
     </message>
     <message>
       <source>Device</source>
-      <translation>Device</translation>
+      <translation>Perangkat</translation>
     </message>
     <message>
       <source>device</source>
-      <translation>device</translation>
+      <translation>perangkat</translation>
     </message>
     <message>
       <source>I/O Modules</source>
@@ -873,7 +873,7 @@
     </message>
     <message>
       <source>I/O Module</source>
-      <translation>I/O Module</translation>
+      <translation>Modul I/O</translation>
     </message>
     <message>
       <source>I/O module</source>
@@ -920,7 +920,7 @@
     <name>QnSignHelper</name>
     <message>
       <source>Unknown</source>
-      <translation>Unknown</translation>
+      <translation>Tidak dikenal</translation>
     </message>
     <message>
       <source>FREE License</source>
@@ -1032,14 +1032,14 @@
       <source>seconds</source>
       <comment>Full suffix for displaying seconds</comment>
       <translation>
-        <numerusform>seconds</numerusform>
+        <numerusform>detik</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>minutes</source>
       <comment>Full suffix for displaying minutes</comment>
       <translation>
-        <numerusform>minutes</numerusform>
+        <numerusform>menit</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -2150,11 +2150,11 @@
     </message>
     <message>
       <source>start</source>
-      <translation>start</translation>
+      <translation>mulai</translation>
     </message>
     <message>
       <source>stop</source>
-      <translation>stop</translation>
+      <translation>berhenti</translation>
     </message>
     <message>
       <source>While %1</source>
@@ -2171,12 +2171,12 @@
     <message numerus="yes">
       <source>%n Users</source>
       <translation>
-        <numerusform>%n Users</numerusform>
+        <numerusform>%n Pengguna</numerusform>
       </translation>
     </message>
     <message>
       <source>All Users</source>
-      <translation>All Users</translation>
+      <translation>Semua Pengguna</translation>
     </message>
     <message>
       <source>Select at least one user</source>
@@ -2209,7 +2209,7 @@
     <message>
       <source>%1 at %2</source>
       <comment>Analytics Event at some camera</comment>
-      <translation>%1 at %2</translation>
+      <translation>%1 pada %2</translation>
     </message>
     <message>
       <source>Storage Issue</source>
