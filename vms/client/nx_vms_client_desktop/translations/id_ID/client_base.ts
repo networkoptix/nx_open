@@ -6851,27 +6851,27 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     <name>Videowall</name>
     <message>
       <source>There is another video wall with the same name</source>
-      <translation type="unfinished">There is another video wall with the same name</translation>
+      <translation>Ada video wall lain dengan nama yang sama</translation>
     </message>
     <message>
       <source>Close %1 before starting Video Wall?</source>
-      <translation type="unfinished">Close %1 before starting Video Wall?</translation>
+      <translation>Tutup %1 sebelum memulai Video Wall?</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Tutup</translation>
     </message>
     <message>
       <source>Keep</source>
-      <translation type="unfinished">Keep</translation>
+      <translation>Tetap</translation>
     </message>
     <message>
       <source>Local files cannot be placed on Video Wall Screen attached to another computer</source>
-      <translation type="unfinished">Local files cannot be placed on Video Wall Screen attached to another computer</translation>
+      <translation>File lokal tidak dapat ditempatkan pada Video Wall Screen yang terpasang pada komputer lain</translation>
     </message>
     <message>
       <source>To display local files on Video Wall, please attach them using computer where Video Wall is hosted.</source>
-      <translation type="unfinished">To display local files on Video Wall, please attach them using computer where Video Wall is hosted.</translation>
+      <translation>Untuk menampilkan file lokal di Video Wall, harap lampirkan menggunakan komputer tempat Video Wall dihosting.</translation>
     </message>
   </context>
   <context>
@@ -6915,7 +6915,7 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     <message>
       <source>none</source>
       <comment>No currently selected camera</comment>
-      <translation type="unfinished">none</translation>
+      <translation>tidak ada</translation>
     </message>
     <message>
       <source>Devices on layout</source>
@@ -6974,7 +6974,7 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     <name>nx::vms::client::desktop::AccessibleMediaViewHeaderWidget</name>
     <message>
       <source>All Cameras &amp; Resources</source>
-      <translation type="unfinished">All Cameras &amp; Resources</translation>
+      <translation>Semua Kamera &amp; Resources</translation>
     </message>
   </context>
   <context>
@@ -6992,7 +6992,7 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     <name>nx::vms::client::desktop::AlarmLayoutHandler</name>
     <message>
       <source>Alarms</source>
-      <translation type="unfinished">Alarms</translation>
+      <translation>Alarm</translation>
     </message>
   </context>
   <context>
@@ -7027,7 +7027,7 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     <name>nx::vms::client::desktop::AsyncImageWidget</name>
     <message>
       <source>NO DATA</source>
-      <translation type="unfinished">NO DATA</translation>
+      <translation>TIDAK ADA DATA</translation>
     </message>
     <message>
       <source>DISABLED</source>
@@ -7156,7 +7156,7 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     </message>
     <message>
       <source>Cameras</source>
-      <translation type="unfinished">Cameras</translation>
+      <translation>Kamera</translation>
     </message>
     <message>
       <source>What to backup</source>
@@ -7219,7 +7219,7 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     <name>nx::vms::client::desktop::BackupSettingsWidget</name>
     <message>
       <source>Settings</source>
-      <translation type="unfinished">Settings</translation>
+      <translation>Pengaturan</translation>
     </message>
     <message>
       <source>Bandwidth Limit</source>
@@ -7243,7 +7243,7 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     </message>
     <message>
       <source>Storage Management</source>
-      <translation type="unfinished">Storage Management</translation>
+      <translation>Manajemen Penyimpanan</translation>
     </message>
     <message>
       <source>To enable backup change &quot;Main&quot; to &quot;Backup&quot; from some of the storages in %1</source>
@@ -7268,7 +7268,7 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     </message>
     <message>
       <source>This action cannot be undone.</source>
-      <translation type="unfinished">This action cannot be undone.</translation>
+      <translation>Aksi ini tidak bisa dibatalkan.</translation>
     </message>
     <message>
       <source>Applies only to the cameras connected to current server.</source>
@@ -7307,7 +7307,7 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     <name>nx::vms::client::desktop::BookmarkSearchWidget</name>
     <message>
       <source>No bookmarks</source>
-      <translation type="unfinished">No bookmarks</translation>
+      <translation>Tidak ada bookmark</translation>
     </message>
     <message numerus="yes">
       <source>%n bookmarks</source>
@@ -7324,11 +7324,11 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     <name>nx::vms::client::desktop::CameraAdvancedParamsWidget</name>
     <message>
       <source>Loading values...</source>
-      <translation type="unfinished">Loading values...</translation>
+      <translation>Memuat nilai...</translation>
     </message>
     <message>
       <source>Applying changes...</source>
-      <translation type="unfinished">Applying changes...</translation>
+      <translation>Menerapkan perubahan...</translation>
     </message>
   </context>
   <context>
@@ -7358,11 +7358,11 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     <name>nx::vms::client::desktop::CameraCredentialsDialog</name>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Masuk</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Kata Sandi</translation>
     </message>
   </context>
   <context>
@@ -7370,7 +7370,7 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     <message>
       <source>Auto</source>
       <comment>Automatic RTP transport type</comment>
-      <translation type="unfinished">Auto</translation>
+      <translation>Otomatis</translation>
     </message>
     <message>
       <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
@@ -7400,7 +7400,7 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     </message>
     <message>
       <source>Never</source>
-      <translation type="unfinished">Never</translation>
+      <translation>Tidak pernah</translation>
     </message>
     <message>
       <source>Force Motion Detection</source>
@@ -7429,12 +7429,12 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     <message>
       <source>Auto</source>
       <comment>Automatic profile selection</comment>
-      <translation type="unfinished">Auto</translation>
+      <translation>Otomatis</translation>
     </message>
     <message>
       <source>Auto</source>
       <comment>Let server determine if Media2 should be used to fetch profiles</comment>
-      <translation type="unfinished">Auto</translation>
+      <translation>Otomatis</translation>
     </message>
     <message>
       <source>Video recorded on the internal camera&apos;s storage will be automatically uploaded to the main archive.</source>
@@ -7477,7 +7477,7 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     <name>nx::vms::client::desktop::CameraMotionSettingsWidget</name>
     <message>
       <source>Motion detection will work only when camera is being viewed. Enable recording to make it work all the time.</source>
-      <translation type="unfinished">Motion detection will work only when camera is being viewed. Enable recording to make it work all the time.</translation>
+      <translation>Deteksi gerakan hanya akan berfungsi saat kamera sedang dilihat. Aktifkan perekaman agar berfungsi sepanjang waktu.</translation>
     </message>
     <message>
       <source>Maximum number of motion detection rectangles for current camera is reached</source>
@@ -7493,19 +7493,19 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     </message>
     <message>
       <source>Reset motion regions to default?</source>
-      <translation type="unfinished">Reset motion regions to default?</translation>
+      <translation>Reset area gerakan ke default?</translation>
     </message>
     <message>
       <source>This action cannot be undone.</source>
-      <translation type="unfinished">This action cannot be undone.</translation>
+      <translation>Aksi ini tidak bisa dibatalkan.</translation>
     </message>
     <message>
       <source>Primary Stream</source>
-      <translation type="unfinished">Primary Stream</translation>
+      <translation>Stream Primer</translation>
     </message>
     <message>
       <source>Secondary Stream</source>
-      <translation type="unfinished">Secondary Stream</translation>
+      <translation>Stream Sekunder</translation>
     </message>
     <message>
       <source>Force Motion Detection</source>
@@ -7540,11 +7540,11 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     </message>
     <message>
       <source>Next</source>
-      <translation type="unfinished">Next</translation>
+      <translation>Berikutnya</translation>
     </message>
     <message>
       <source>Finish</source>
-      <translation type="unfinished">Finish</translation>
+      <translation>Selesai</translation>
     </message>
     <message>
       <source>Camera for Replacement</source>
@@ -7580,19 +7580,19 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     <name>nx::vms::client::desktop::CameraScheduleWidget</name>
     <message>
       <source>Recording Schedule</source>
-      <translation type="unfinished">Recording Schedule</translation>
+      <translation>Jadwal Perekaman</translation>
     </message>
     <message>
       <source>based on server time</source>
-      <translation type="unfinished">based on server time</translation>
+      <translation>berdasarkan waktu server</translation>
     </message>
     <message>
       <source>Select areas on the schedule to apply chosen parameters to.</source>
-      <translation type="unfinished">Select areas on the schedule to apply chosen parameters to.</translation>
+      <translation>Pilih area pada jadwal untuk menerapkan parameter yang dipilih.</translation>
     </message>
     <message>
       <source>Set recording parameters and select areas on the schedule grid to apply them to.</source>
-      <translation type="unfinished">Set recording parameters and select areas on the schedule grid to apply them to.</translation>
+      <translation>Atur parameter perekaman dan pilih area pada grid jadwal untuk menerapkannya.</translation>
     </message>
     <message>
       <source>High minimum value can lead to archive length decrease on other devices.</source>
@@ -7642,11 +7642,11 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     <name>nx::vms::client::desktop::CameraSettingsDialog</name>
     <message>
       <source>General</source>
-      <translation type="unfinished">General</translation>
+      <translation>Umum</translation>
     </message>
     <message>
       <source>Recording</source>
-      <translation type="unfinished">Recording</translation>
+      <translation>Rekaman</translation>
     </message>
     <message>
       <source>I/O Ports</source>
@@ -7658,11 +7658,11 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     </message>
     <message>
       <source>Advanced</source>
-      <translation type="unfinished">Advanced</translation>
+      <translation>Advanced</translation>
     </message>
     <message>
       <source>Web Page</source>
-      <translation type="unfinished">Web Page</translation>
+      <translation>Halaman Web</translation>
     </message>
     <message>
       <source>Expert</source>
@@ -7670,53 +7670,53 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     </message>
     <message numerus="yes">
       <source>Changes to the following %n devices are not saved:</source>
-      <translation type="unfinished">
-        <numerusform>Changes to the following %n devices are not saved:</numerusform>
+      <translation>
+        <numerusform>Perubahan pada perangkat %n berikut tidak disimpan:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n cameras are not saved:</source>
-      <translation type="unfinished">
-        <numerusform>Changes to the following %n cameras are not saved:</numerusform>
+      <translation>
+        <numerusform>Perubahan pada %n kamera berikut tidak disimpan:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n I/O Modules are not saved:</source>
-      <translation type="unfinished">
-        <numerusform>Changes to the following %n I/O Modules are not saved:</numerusform>
+      <translation>
+        <numerusform>Perubahan pada %n Modul I/O berikut tidak disimpan:</numerusform>
       </translation>
     </message>
     <message>
       <source>Apply changes before switching to another camera?</source>
-      <translation type="unfinished">Apply changes before switching to another camera?</translation>
+      <translation>Terapkan perubahan sebelum beralih ke kamera lain?</translation>
     </message>
     <message>
       <source>Device Settings</source>
-      <translation type="unfinished">Device Settings</translation>
+      <translation>Pengaturan Perangkat</translation>
     </message>
     <message>
       <source>Devices Settings</source>
-      <translation type="unfinished">Devices Settings</translation>
+      <translation>Pengaturan Perangkat</translation>
     </message>
     <message>
       <source>Camera Settings</source>
-      <translation type="unfinished">Camera Settings</translation>
+      <translation>Pengaturan Kamera</translation>
     </message>
     <message>
       <source>Cameras Settings</source>
-      <translation type="unfinished">Cameras Settings</translation>
+      <translation>Pengaturan Kamera</translation>
     </message>
     <message>
       <source>I/O Module Settings</source>
-      <translation type="unfinished">I/O Module Settings</translation>
+      <translation>Pengaturan Modul I/O</translation>
     </message>
     <message>
       <source>I/O Modules Settings</source>
-      <translation type="unfinished">I/O Modules Settings</translation>
+      <translation>Pengaturan Modul I/O</translation>
     </message>
     <message>
       <source>Dewarping</source>
-      <translation type="unfinished">Dewarping</translation>
+      <translation>Dewarping</translation>
     </message>
     <message>
       <source>Change invalid schedule to &quot;Record Always&quot;</source>
@@ -7740,7 +7740,7 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     </message>
     <message>
       <source>Motion + Lo-Res</source>
-      <translation type="unfinished">Motion + Lo-Res</translation>
+      <translation>Gerakan + Resolusi Rendah</translation>
     </message>
     <message>
       <source>Objects + Lo-Res</source>
@@ -10378,7 +10378,7 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
     <message>
       <source>Vendor</source>
-      <translation type="unfinished">Vendor</translation>
+      <translation>Vendor</translation>
     </message>
     <message>
       <source>no error</source>
@@ -10406,7 +10406,7 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
     <message>
       <source>unknown error</source>
-      <translation type="unfinished">unknown error</translation>
+      <translation>error tidak diketahui</translation>
     </message>
     <message>
       <source>Not loaded</source>
@@ -10422,7 +10422,7 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
     <message>
       <source>Status</source>
-      <translation type="unfinished">Status</translation>
+      <translation>Status</translation>
     </message>
     <message>
       <source>plugin is optional and is not in the white list</source>
@@ -10468,7 +10468,7 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
     <message>
       <source>Network error.</source>
-      <translation type="unfinished">Network error.</translation>
+      <translation>Jaringan error.</translation>
     </message>
     <message>
       <source>Server error.</source>
@@ -10479,7 +10479,7 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     <name>nx::vms::client::desktop::ServerUpdatesModel</name>
     <message>
       <source>Status</source>
-      <translation type="unfinished">Status</translation>
+      <translation>Status</translation>
     </message>
     <message>
       <source>Message</source>
@@ -10491,7 +10491,7 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
     <message>
       <source>Client</source>
-      <translation type="unfinished">Client</translation>
+      <translation>Klien</translation>
     </message>
     <message>
       <source>Component</source>
@@ -10506,11 +10506,11 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     <name>nx::vms::client::desktop::SessionRefreshDialog</name>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Masuk</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Kata Sandi</translation>
     </message>
     <message>
       <source>Unknown error</source>
@@ -10549,7 +10549,7 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     <name>nx::vms::client::desktop::SoftwareTriggerButton</name>
     <message>
       <source>Go to Live</source>
-      <translation type="unfinished">Go to Live</translation>
+      <translation>Pergi ke Live</translation>
     </message>
   </context>
   <context>
@@ -10592,7 +10592,7 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
     <message>
       <source>Export</source>
-      <translation type="unfinished">Export</translation>
+      <translation>Ekspor</translation>
     </message>
     <message>
       <source>On-device recordings were found</source>
@@ -10677,43 +10677,43 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nama</translation>
     </message>
     <message>
       <source>Camera</source>
-      <translation type="unfinished">Camera</translation>
+      <translation>Kamera</translation>
     </message>
     <message>
       <source>Start time</source>
-      <translation type="unfinished">Start time</translation>
+      <translation>Waktu mulai</translation>
     </message>
     <message>
       <source>Length</source>
-      <translation type="unfinished">Length</translation>
+      <translation>Panjang</translation>
     </message>
     <message>
       <source>Created</source>
-      <translation type="unfinished">Created</translation>
+      <translation>Dibuat</translation>
     </message>
     <message>
       <source>Creator</source>
-      <translation type="unfinished">Creator</translation>
+      <translation>Pencipta</translation>
     </message>
     <message>
       <source>Tags</source>
-      <translation type="unfinished">Tags</translation>
+      <translation>Tag</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation type="unfinished">Description</translation>
+      <translation>Deskripsi</translation>
     </message>
     <message>
       <source>Open</source>
-      <translation type="unfinished">Open</translation>
+      <translation>Buka</translation>
     </message>
     <message>
       <source>Open in New Tab</source>
-      <translation type="unfinished">Open in New Tab</translation>
+      <translation>Buka di Tab Baru</translation>
     </message>
     <message>
       <source>This action is not supported for notifications from other Systems</source>
@@ -10724,7 +10724,7 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     <name>nx::vms::client::desktop::TimeSynchronizationServersModel</name>
     <message>
       <source>Server</source>
-      <translation type="unfinished">Server</translation>
+      <translation>Server</translation>
     </message>
     <message>
       <source>Time Zone</source>
@@ -10732,7 +10732,7 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
     <message>
       <source>Date</source>
-      <translation type="unfinished">Date</translation>
+      <translation>Tanggal</translation>
     </message>
     <message>
       <source>Server OS Time</source>
@@ -10782,7 +10782,7 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
     <message>
       <source>Short</source>
-      <translation type="unfinished">Short</translation>
+      <translation>Pendek</translation>
     </message>
   </context>
   <context>
@@ -10836,11 +10836,11 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nama</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation type="unfinished">Description</translation>
+      <translation>Deskripsi</translation>
     </message>
     <message>
       <source>Member of</source>
@@ -10848,21 +10848,21 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
     <message>
       <source>Permissions</source>
-      <translation type="unfinished">Permissions</translation>
+      <translation>Izin</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::UserGroupsWidget</name>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Hapus</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::UserListModel</name>
     <message>
       <source>Local user</source>
-      <translation type="unfinished">Local user</translation>
+      <translation>Pengguna lokal</translation>
     </message>
     <message>
       <source>%1 user</source>
@@ -10871,19 +10871,19 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
     <message>
       <source>LDAP user</source>
-      <translation type="unfinished">LDAP user</translation>
+      <translation>Pengguna LDAP</translation>
     </message>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Masuk</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nama</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>Email</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -10898,15 +10898,15 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     <name>nx::vms::client::desktop::UserListWidget</name>
     <message>
       <source>Enable</source>
-      <translation type="unfinished">Enable</translation>
+      <translation>Aktifkan</translation>
     </message>
     <message>
       <source>Disable</source>
-      <translation type="unfinished">Disable</translation>
+      <translation>Nonaktifkan</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Hapus</translation>
     </message>
     <message>
       <source>Force Secure Authentication</source>
@@ -10914,7 +10914,7 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
     <message>
       <source>All Users</source>
-      <translation type="unfinished">All Users</translation>
+      <translation>Semua Pengguna</translation>
     </message>
     <message>
       <source>Users with Digest Authentication</source>
@@ -10925,7 +10925,7 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     <name>nx::vms::client::desktop::UserManagementTabWidget</name>
     <message>
       <source>Users</source>
-      <translation type="unfinished">Users</translation>
+      <translation>Pengguna</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -10944,7 +10944,7 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
     <message>
       <source>Version</source>
-      <translation type="unfinished">Version</translation>
+      <translation>Versi</translation>
     </message>
     <message>
       <source>Invalid version.</source>
@@ -10952,11 +10952,11 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Kata Sandi</translation>
     </message>
     <message>
       <source>The password is incorrect.</source>
-      <translation type="unfinished">The password is incorrect.</translation>
+      <translation>Kata sandi salah.</translation>
     </message>
   </context>
   <context>
@@ -11043,7 +11043,7 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
     <message>
       <source>Exporting video</source>
-      <translation type="unfinished">Exporting video</translation>
+      <translation>Mengekspor video</translation>
     </message>
     <message>
       <source>Stop Export</source>
@@ -11051,7 +11051,7 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
     <message>
       <source>Minimize</source>
-      <translation type="unfinished">Minimize</translation>
+      <translation>Minimalkan</translation>
     </message>
     <message>
       <source>Cannot write file</source>
@@ -11064,7 +11064,7 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
     <message>
       <source>Export completed</source>
-      <translation type="unfinished">Export completed</translation>
+      <translation>Ekspor selesai</translation>
     </message>
     <message>
       <source>Export failed</source>
@@ -11080,11 +11080,11 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
     <message>
       <source>Local files not allowed for Multi-Video export</source>
-      <translation type="unfinished">Local files not allowed for Multi-Video export</translation>
+      <translation>File lokal tidak diperbolehkan untuk ekspor Multi-Video</translation>
     </message>
     <message>
       <source>Please remove all local files from the layout and try again.</source>
-      <translation type="unfinished">Please remove all local files from the layout and try again.</translation>
+      <translation>Mohon hapus semua file lokal dari layout dan coba lagi.</translation>
     </message>
     <message>
       <source>Starting export...</source>
@@ -11119,23 +11119,23 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     <name>nx::vms::client::desktop::WorkbenchUpdateWatcher</name>
     <message>
       <source>%1 version available</source>
-      <translation type="unfinished">%1 version available</translation>
+      <translation>%1 versi tersedia</translation>
     </message>
     <message>
       <source>Release Notes</source>
-      <translation type="unfinished">Release Notes</translation>
+      <translation>Catatan Rilis</translation>
     </message>
     <message>
       <source>Major issues have been fixed. Update is strongly recommended.</source>
-      <translation type="unfinished">Major issues have been fixed. Update is strongly recommended.</translation>
+      <translation>Isu mayor telah diperbaiki. Update sangat disarankan.</translation>
     </message>
     <message>
       <source>Update...</source>
-      <translation type="unfinished">Update...</translation>
+      <translation>Update...</translation>
     </message>
     <message>
       <source>Do not notify again about this update</source>
-      <translation type="unfinished">Do not notify again about this update</translation>
+      <translation>Jangan notifikasi lagi tentang update ini</translation>
     </message>
   </context>
   <context>
@@ -11154,7 +11154,7 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation type="unfinished">Bookmarks</translation>
+      <translation>Bookmark</translation>
     </message>
     <message>
       <source>High-Res</source>
@@ -11173,21 +11173,21 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     <name>nx::vms::client::desktop::detail::BaseInputField</name>
     <message>
       <source>multiple values</source>
-      <translation type="unfinished">multiple values</translation>
+      <translation>beberapa nilai</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::entity_resource_tree::ResourceTreeEntityBuilder</name>
     <message>
       <source>New System</source>
-      <translation type="unfinished">New System</translation>
+      <translation>Sistem Baru</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::entity_resource_tree::ResourceTreeItemFactory</name>
     <message>
       <source>Servers</source>
-      <translation type="unfinished">Servers</translation>
+      <translation>Server</translation>
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
@@ -11195,43 +11195,43 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
     <message>
       <source>Layouts</source>
-      <translation type="unfinished">Layouts</translation>
+      <translation>Layout</translation>
     </message>
     <message>
       <source>Showreels</source>
-      <translation type="unfinished">Showreels</translation>
+      <translation>Showreel</translation>
     </message>
     <message>
       <source>Web Pages</source>
-      <translation type="unfinished">Web Pages</translation>
+      <translation>Halaman Web</translation>
     </message>
     <message>
       <source>Users</source>
-      <translation type="unfinished">Users</translation>
+      <translation>Pengguna</translation>
     </message>
     <message>
       <source>Other Systems</source>
-      <translation type="unfinished">Other Systems</translation>
+      <translation>Sistem Lainnya</translation>
     </message>
     <message>
       <source>Local Files</source>
-      <translation type="unfinished">Local Files</translation>
+      <translation>File Lokal</translation>
     </message>
     <message>
       <source>All Cameras &amp; Resources</source>
-      <translation type="unfinished">All Cameras &amp; Resources</translation>
+      <translation>Semua Kamera &amp; Resources</translation>
     </message>
     <message>
       <source>All Shared Layouts</source>
-      <translation type="unfinished">All Shared Layouts</translation>
+      <translation>Semua Layout yang Dibagikan</translation>
     </message>
     <message>
       <source>Cameras &amp; Resources</source>
-      <translation type="unfinished">Cameras &amp; Resources</translation>
+      <translation>Kamera &amp; Resource</translation>
     </message>
     <message>
       <source>Shared Layouts</source>
-      <translation type="unfinished">Shared Layouts</translation>
+      <translation>Layout yang Dibagikan</translation>
     </message>
   </context>
   <context>
@@ -11267,11 +11267,11 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
     <message>
       <source>Focus Near</source>
-      <translation type="unfinished">Focus Near</translation>
+      <translation>Fokus Dekat</translation>
     </message>
     <message>
       <source>Focus Far</source>
-      <translation type="unfinished">Focus Far</translation>
+      <translation>Fokus Jauh</translation>
     </message>
     <message>
       <source>Autofocus</source>
@@ -11359,19 +11359,19 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     <name>nx::vms::client::desktop::rules::EventTypePickerWidget</name>
     <message>
       <source>None</source>
-      <translation type="unfinished">None</translation>
+      <translation>Tidak ada</translation>
     </message>
     <message>
       <source>Starts</source>
-      <translation type="unfinished">Starts</translation>
+      <translation>Mulai</translation>
     </message>
     <message>
       <source>Stops</source>
-      <translation type="unfinished">Stops</translation>
+      <translation>Berhenti</translation>
     </message>
     <message>
       <source>Instant</source>
-      <translation type="unfinished">Instant</translation>
+      <translation>Instan</translation>
     </message>
   </context>
   <context>
@@ -11385,11 +11385,11 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     <name>nx::vms::client::desktop::rules::RulesDialog</name>
     <message>
       <source>Restore all rules to default?</source>
-      <translation type="unfinished">Restore all rules to default?</translation>
+      <translation>Kembalikan semua aturan ke default?</translation>
     </message>
     <message>
       <source>This action cannot be undone.</source>
-      <translation type="unfinished">This action cannot be undone.</translation>
+      <translation>Aksi ini tidak bisa dibatalkan.</translation>
     </message>
     <message>
       <source>Failed to apply changes.</source>
@@ -11408,11 +11408,11 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     <name>nx::vms::client::desktop::rules::RulesTableModel</name>
     <message>
       <source>Event</source>
-      <translation type="unfinished">Event</translation>
+      <translation>Event</translation>
     </message>
     <message>
       <source>Action</source>
-      <translation type="unfinished">Action</translation>
+      <translation>Aksi</translation>
     </message>
   </context>
   <context>
@@ -11461,7 +11461,7 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     <name>nx::vms::client::desktop::ui::LayoutTourDropPlaceholder</name>
     <message>
       <source>Drag layout or camera here to add it to the showreel</source>
-      <translation type="unfinished">Drag layout or camera here to add it to the showreel</translation>
+      <translation>Geser layout atau kamera ke sini untuk menambahkannya ke showreel</translation>
     </message>
   </context>
   <context>
@@ -11494,15 +11494,15 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     <name>nx::vms::client::desktop::ui::SubjectSelectionDialog</name>
     <message>
       <source>All Users</source>
-      <translation type="unfinished">All Users</translation>
+      <translation>Semua Pengguna</translation>
     </message>
     <message>
       <source>Users</source>
-      <translation type="unfinished">Users</translation>
+      <translation>Pengguna</translation>
     </message>
     <message>
       <source>Custom Users</source>
-      <translation type="unfinished">Custom Users</translation>
+      <translation>Pengguna Kustom</translation>
     </message>
     <message>
       <source>%1 users</source>
@@ -11514,30 +11514,30 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     <name>nx::vms::client::desktop::ui::action::LayoutTourSettingsFactory</name>
     <message>
       <source>Switch with Hotkeys</source>
-      <translation type="unfinished">Switch with Hotkeys</translation>
+      <translation>Beralih dengan Tombol Pintas</translation>
     </message>
     <message>
       <source>Switch on Timer</source>
-      <translation type="unfinished">Switch on Timer</translation>
+      <translation>Aktifkan Pengatur Waktu</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ui::action::LayoutTourTextFactory</name>
     <message>
       <source>Stop Tour</source>
-      <translation type="unfinished">Stop Tour</translation>
+      <translation>Hentikan Tur</translation>
     </message>
     <message>
       <source>Stop Showreel</source>
-      <translation type="unfinished">Stop Showreel</translation>
+      <translation>Hentikan Showreel</translation>
     </message>
     <message>
       <source>Start Tour</source>
-      <translation type="unfinished">Start Tour</translation>
+      <translation>Mulai Tur</translation>
     </message>
     <message>
       <source>Start Showreel</source>
-      <translation type="unfinished">Start Showreel</translation>
+      <translation>Mulai Showreel</translation>
     </message>
   </context>
   <context>
@@ -11545,12 +11545,12 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     <message>
       <source>%1 (active)</source>
       <comment>Template for active PTZ preset</comment>
-      <translation type="unfinished">%1 (active)</translation>
+      <translation>%1 (aktif)</translation>
     </message>
     <message>
       <source>%1 (active)</source>
       <comment>Template for active PTZ tour</comment>
-      <translation type="unfinished">%1 (active)</translation>
+      <translation>%1 (aktif)</translation>
     </message>
   </context>
   <context>
@@ -11572,43 +11572,43 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     <name>nx::vms::client::desktop::ui::dialogs::LicenseDeactivationReason</name>
     <message>
       <source>Next</source>
-      <translation type="unfinished">Next</translation>
+      <translation>Berikutnya</translation>
     </message>
     <message>
       <source>Name is necessary</source>
-      <translation type="unfinished">Name is necessary</translation>
+      <translation>Nama diperlukan</translation>
     </message>
     <message>
       <source>Reason is necessary</source>
-      <translation type="unfinished">Reason is necessary</translation>
+      <translation>Alasan diperlukan</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nama</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>Email</translation>
     </message>
     <message>
       <source>Reason for deactivation</source>
-      <translation type="unfinished">Reason for deactivation</translation>
+      <translation>Alasan penonaktifan</translation>
     </message>
     <message>
       <source>- Choose one -</source>
-      <translation type="unfinished">- Choose one -</translation>
+      <translation>- Pilih satu -</translation>
     </message>
     <message>
       <source>I am upgrading my machine</source>
-      <translation type="unfinished">I am upgrading my machine</translation>
+      <translation>Saya sedang mengupgrade mesin saya</translation>
     </message>
     <message>
       <source>I accidentally assigned the license to a wrong machine</source>
-      <translation type="unfinished">I accidentally assigned the license to a wrong machine</translation>
+      <translation>Saya tidak sengaja menetapkan lisensi ke mesin yang salah</translation>
     </message>
     <message>
       <source>Other Reason</source>
-      <translation type="unfinished">Other Reason</translation>
+      <translation>Alasan Lainnya</translation>
     </message>
     <message>
       <source>Please complete the following for license deactivation</source>
@@ -11625,8 +11625,8 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     <name>nx::vms::client::desktop::ui::subject_selection_dialog_private::RoleListDelegate</name>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation type="unfinished">
-        <numerusform>%n Users</numerusform>
+      <translation>
+        <numerusform>%n Pengguna</numerusform>
       </translation>
     </message>
   </context>
@@ -11642,47 +11642,47 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
     <message numerus="yes">
       <source>Failed to move %n devices</source>
-      <translation type="unfinished">
-        <numerusform>Failed to move %n devices</numerusform>
+      <translation>
+        <numerusform>Gagal memindahkan %n perangkat</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Failed to move %n cameras</source>
-      <translation type="unfinished">
-        <numerusform>Failed to move %n cameras</numerusform>
+      <translation>
+        <numerusform>Gagal memindahkan %n kamera</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Failed to move %n I/O Modules</source>
-      <translation type="unfinished">
-        <numerusform>Failed to move %n I/O Modules</numerusform>
+      <translation>
+        <numerusform>Gagal memindahkan %n Modul I/O</numerusform>
       </translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; is not responding.</source>
-      <translation type="unfinished">Server &quot;%1&quot; is not responding.</translation>
+      <translation>Server &quot;%1&quot; tidak merespons.</translation>
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</source>
-      <translation type="unfinished">
-        <numerusform>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</numerusform>
+      <translation>
+        <numerusform>Server &quot;%1&quot; tidak dapat mengakses %n perangkat. Tetap memindahkannya?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</source>
-      <translation type="unfinished">
-        <numerusform>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</numerusform>
+      <translation>
+        <numerusform>Server &quot;%1&quot; tidak dapat mengakses %n kamera. Tetap memindahkannya?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</source>
-      <translation type="unfinished">
-        <numerusform>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</numerusform>
+      <translation>
+        <numerusform>Server &quot;%1&quot; tidak dapat mengakses %n modul I/O. Tetap memindahkannya?</numerusform>
       </translation>
     </message>
     <message>
       <source>Move</source>
-      <translation type="unfinished">Move</translation>
+      <translation>Pindah</translation>
     </message>
     <message>
       <source>Layout is locked and cannot be changed</source>
@@ -11690,7 +11690,7 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
     <message>
       <source>Open File</source>
-      <translation type="unfinished">Open File</translation>
+      <translation>Buka File</translation>
     </message>
     <message>
       <source>All Supported</source>
@@ -11698,69 +11698,69 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
     <message>
       <source>Too short period selected</source>
-      <translation type="unfinished">Too short period selected</translation>
+      <translation>Periode yang dipilih terlalu pendek</translation>
     </message>
     <message>
       <source>Cannot perform Preview Search. Please select a period of 15 seconds or longer.</source>
-      <translation type="unfinished">Cannot perform Preview Search. Please select a period of 15 seconds or longer.</translation>
+      <translation>Tidak dapat melakukan Preview Pencarian. Silakan pilih jangka waktu 15 detik atau lebih lama.</translation>
     </message>
     <message>
       <source>Preview Search for %1</source>
-      <translation type="unfinished">Preview Search for %1</translation>
+      <translation>Preview Pencarian untuk %1</translation>
     </message>
     <message>
       <source>Confirm files deleting</source>
-      <translation type="unfinished">Confirm files deleting</translation>
+      <translation>Konfirmasi penghapusan file</translation>
     </message>
     <message numerus="yes">
       <source>Are you sure you want to permanently delete these %n files?</source>
-      <translation type="unfinished">
-        <numerusform>Are you sure you want to permanently delete these %n files?</numerusform>
+      <translation>
+        <numerusform>Apakah Anda yakin ingin menghapus file %n ini secara permanen?</numerusform>
       </translation>
     </message>
     <message>
       <source>There is another user with the same name</source>
-      <translation type="unfinished">There is another user with the same name</translation>
+      <translation>Ada pengguna lain dengan nama yang sama</translation>
     </message>
     <message>
       <source>Updating Background...</source>
-      <translation type="unfinished">Updating Background...</translation>
+      <translation>Mengupdate Background...</translation>
     </message>
     <message>
       <source>Image processing may take a few moments. Please be patient.</source>
-      <translation type="unfinished">Image processing may take a few moments. Please be patient.</translation>
+      <translation>Pemrosesan image mungkin memerlukan waktu beberapa saat. Mohon bersabar.</translation>
     </message>
     <message>
       <source>Image too big</source>
-      <translation type="unfinished">Image too big</translation>
+      <translation>Image terlalu besar</translation>
     </message>
     <message>
       <source>Maximum size is %1 MB.</source>
-      <translation type="unfinished">Maximum size is %1 MB.</translation>
+      <translation>Ukuran maksimum adalah %1 MB.</translation>
     </message>
     <message>
       <source>Failed to upload image</source>
-      <translation type="unfinished">Failed to upload image</translation>
+      <translation>Gagal mengupload image</translation>
     </message>
     <message>
       <source>Components of System have different versions:</source>
-      <translation type="unfinished">Components of System have different versions:</translation>
+      <translation>Komponen Sistem memiliki versi yang berbeda:</translation>
     </message>
     <message>
       <source>Please update all components to the version %1</source>
-      <translation type="unfinished">Please update all components to the version %1</translation>
+      <translation>Mohon update semua komponen ke versi %1</translation>
     </message>
     <message>
       <source>Update...</source>
-      <translation type="unfinished">Update...</translation>
+      <translation>Mengupdate...</translation>
     </message>
     <message>
       <source>Skip</source>
-      <translation type="unfinished">Skip</translation>
+      <translation>Lewati</translation>
     </message>
     <message>
       <source>Beta version %1</source>
-      <translation type="unfinished">Beta version %1</translation>
+      <translation>Versi beta %1</translation>
     </message>
     <message>
       <source>Please upgrade to a next available patch or release version once available.</source>
@@ -11768,7 +11768,7 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
     <message>
       <source>Failed to open server web page</source>
-      <translation type="unfinished">Failed to open server web page</translation>
+      <translation>Gagal membuka halaman web server</translation>
     </message>
     <message numerus="yes">
       <source>Failed to change password on %n cameras of %1</source>
@@ -11787,7 +11787,7 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>
@@ -11854,7 +11854,7 @@ Anda dapat memilih lokasi penyimpanan lain di tab &quot;Manajemen Penyimpanan&qu
     <name>nx::vms::client::desktop::ui::workbench::LayoutTourExecutor</name>
     <message>
       <source>Use keyboard arrows to switch layouts. To exit the showreel press Esc.</source>
-      <translation type="unfinished">Use keyboard arrows to switch layouts. To exit the showreel press Esc.</translation>
+      <translation>Gunakan panah keyboard untuk berpindah layout. Untuk keluar dari showreel tekan Esc.</translation>
     </message>
     <message>
       <source>Press Esc to stop the tour.</source>
@@ -11871,50 +11871,50 @@ Anda dapat memilih lokasi penyimpanan lain di tab &quot;Manajemen Penyimpanan&qu
     <message>
       <source>Display for</source>
       <comment>Time selector will follow</comment>
-      <translation type="unfinished">Display for</translation>
+      <translation>Tampilan untuk</translation>
     </message>
     <message>
       <source>Display selected for</source>
       <comment>Time will follow</comment>
-      <translation type="unfinished">Display selected for</translation>
+      <translation>Tampilan dipilih untuk</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ui::workbench::LayoutToursHandler</name>
     <message>
       <source>Showreel</source>
-      <translation type="unfinished">Showreel</translation>
+      <translation>Showreel</translation>
     </message>
     <message>
       <source>Showreel %1</source>
-      <translation type="unfinished">Showreel %1</translation>
+      <translation>Showreel %1</translation>
     </message>
     <message>
       <source>Delete Showreel %1?</source>
-      <translation type="unfinished">Delete Showreel %1?</translation>
+      <translation>Hapus Showreel %1?</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ui::workbench::LayoutsHandler</name>
     <message>
       <source>Save Layout As</source>
-      <translation type="unfinished">Save Layout As</translation>
+      <translation>Simpan Layout Sebagai</translation>
     </message>
     <message>
       <source>Enter Layout Name:</source>
-      <translation type="unfinished">Enter Layout Name:</translation>
+      <translation>Masukkan Nama Layout:</translation>
     </message>
     <message>
       <source>New Layout</source>
-      <translation type="unfinished">New Layout</translation>
+      <translation>Layout Baru</translation>
     </message>
     <message>
       <source>Enter the name of the layout to create:</source>
-      <translation type="unfinished">Enter the name of the layout to create:</translation>
+      <translation>Masukkan nama layout yang akan dibuat:</translation>
     </message>
     <message>
       <source>New Layout %1</source>
-      <translation type="unfinished">New Layout %1</translation>
+      <translation>Layout Baru %1</translation>
     </message>
     <message>
       <source>Save Layout As Cloud</source>
@@ -11936,7 +11936,7 @@ Anda dapat memilih lokasi penyimpanan lain di tab &quot;Manajemen Penyimpanan&qu
     </message>
     <message>
       <source>Failed to overwrite file</source>
-      <translation type="unfinished">Failed to overwrite file</translation>
+      <translation>Gagal menimpa file</translation>
     </message>
     <message>
       <source>Failed to save file</source>
@@ -11952,7 +11952,7 @@ Anda dapat memilih lokasi penyimpanan lain di tab &quot;Manajemen Penyimpanan&qu
     </message>
     <message>
       <source>Open Containing Folder</source>
-      <translation type="unfinished">Open Containing Folder</translation>
+      <translation>Buka Folder Berisi</translation>
     </message>
     <message>
       <source>Stop file downloading?</source>
@@ -11973,16 +11973,16 @@ Anda dapat memilih lokasi penyimpanan lain di tab &quot;Manajemen Penyimpanan&qu
       <source>Zoom timeline
 to view more bookmarks</source>
       <comment>It is highly recommended to split message in two lines</comment>
-      <translation type="unfinished">Zoom timeline
-to view more bookmarks</translation>
+      <translation>Zoom timeline
+untuk melihat lebih banyak bookmark</translation>
     </message>
     <message>
       <source>Play bookmark from the beginning</source>
-      <translation type="unfinished">Play bookmark from the beginning</translation>
+      <translation>Putar bookmark dari awal</translation>
     </message>
     <message>
       <source>Edit bookmark</source>
-      <translation type="unfinished">Edit bookmark</translation>
+      <translation>Edit bookmark</translation>
     </message>
     <message>
       <source>Export bookmark</source>
@@ -11990,7 +11990,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Delete bookmark</source>
-      <translation type="unfinished">Delete bookmark</translation>
+      <translation>Hapus bookmark</translation>
     </message>
   </context>
   <context>
@@ -12004,35 +12004,35 @@ to view more bookmarks</translation>
     <name>nx::vms::client::desktop::workbench::timeline::NavigationWidget</name>
     <message>
       <source>Speed Down</source>
-      <translation type="unfinished">Speed Down</translation>
+      <translation>Kecepatan Turun</translation>
     </message>
     <message>
       <source>Previous Frame</source>
-      <translation type="unfinished">Previous Frame</translation>
+      <translation>Frame Sebelumnya</translation>
     </message>
     <message>
       <source>Speed Up</source>
-      <translation type="unfinished">Speed Up</translation>
+      <translation>Kecepatan Naik</translation>
     </message>
     <message>
       <source>Next Frame</source>
-      <translation type="unfinished">Next Frame</translation>
+      <translation>Frame Selanjutnya</translation>
     </message>
     <message>
       <source>Previous Chunk</source>
-      <translation type="unfinished">Previous Chunk</translation>
+      <translation>Bagian Sebelumnya</translation>
     </message>
     <message>
       <source>To Start</source>
-      <translation type="unfinished">To Start</translation>
+      <translation>Ke Permulaan</translation>
     </message>
     <message>
       <source>Next Chunk</source>
-      <translation type="unfinished">Next Chunk</translation>
+      <translation>Bagian berikutnya</translation>
     </message>
     <message>
       <source>To End</source>
-      <translation type="unfinished">To End</translation>
+      <translation>Ke Akhir</translation>
     </message>
     <message>
       <source>Rewind is not available for VMAX</source>
@@ -12043,18 +12043,18 @@ to view more bookmarks</translation>
     <name>nx::vms::client::desktop::workbench::timeline::SpeedSlider</name>
     <message>
       <source>%1x</source>
-      <translation type="unfinished">%1x</translation>
+      <translation>%1x</translation>
     </message>
     <message>
       <source>Paused</source>
-      <translation type="unfinished">Paused</translation>
+      <translation>Dipause</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::workbench::timeline::VolumeSlider</name>
     <message>
       <source>Muted</source>
-      <translation type="unfinished">Muted</translation>
+      <translation>Dimute</translation>
     </message>
   </context>
   <context>
