@@ -355,21 +355,6 @@ TEST_F(ActionFieldTest, EventDotNameAnalyticsEvent)
         field.build(AggregatedEventPtr::create(makeAnalyticsEvent())).toString());
 }
 
-TEST_F(ActionFieldTest, EventCaption)
-{
-    auto event = makeAnalyticsEvent();
-    TextWithFields field(systemContext(), &kDummyDescriptor);
-    auto eventAggregator = AggregatedEventPtr::create(event);
-
-    field.setText("{@EventCaption}");
-    EXPECT_EQ(AnalyticsEvent::manifest().displayName, field.build(eventAggregator).toString());
-
-    constexpr auto kEventCaption = "Test caption";
-    event->setProperty("caption", kEventCaption);
-
-    EXPECT_EQ(kEventCaption, field.build(eventAggregator).toString());
-}
-
 TEST_F(ActionFieldTest, EventDotCaption)
 {
     auto event = makeAnalyticsEvent();
@@ -383,21 +368,6 @@ TEST_F(ActionFieldTest, EventDotCaption)
     event->setProperty("caption", kEventCaption);
 
     EXPECT_EQ(kEventCaption, field.build(eventAggregator).toString());
-}
-
-TEST_F(ActionFieldTest, EventDescription)
-{
-    TextWithFields field(systemContext(), &kDummyDescriptor);
-    auto event = makeEvent();
-    auto eventAggregator = AggregatedEventPtr::create(event);
-
-    field.setText("{@EventDescription}");
-    EXPECT_EQ(TestEvent::manifest().description, field.build(eventAggregator).toString());
-
-    constexpr auto kEventDescription = "Test description override";
-    event->setProperty("description", kEventDescription);
-
-    EXPECT_EQ(kEventDescription, field.build(eventAggregator).toString());
 }
 
 TEST_F(ActionFieldTest, EventDotDescription)
@@ -431,7 +401,7 @@ TEST_F(ActionFieldTest, EventTooltip)
 {
     TextWithFields field(systemContext(), &kDummyDescriptor);
 
-    field.setText("{@ExtendedEventDescription}");
+    field.setText("{event.extendedDescription}");
 
     const auto tooltip = field.build(AggregatedEventPtr::create(makeEvent())).toString();
     EXPECT_NE(tooltip, field.text());

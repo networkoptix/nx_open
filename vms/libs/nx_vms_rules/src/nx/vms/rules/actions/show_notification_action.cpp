@@ -41,7 +41,7 @@ const ItemDescriptor& NotificationAction::manifest()
                 NX_DYNAMIC_TRANSLATABLE(tr("Caption")),
                 /*description*/ {},
                 {
-                    { "text", "{@EventCaption}" },
+                    { "text", "{event.caption}" },
                     { "visible", false }
                 }),
             makeFieldDescriptor<TextWithFields>(
@@ -49,7 +49,7 @@ const ItemDescriptor& NotificationAction::manifest()
                 NX_DYNAMIC_TRANSLATABLE(tr("Description")),
                 /*description*/ {},
                 {
-                    { "text", "{@EventDescription}" },
+                    { "text", "{event.description}" },
                     { "visible", false }
                 }),
             makeFieldDescriptor<TextWithFields>(
@@ -57,7 +57,7 @@ const ItemDescriptor& NotificationAction::manifest()
                 NX_DYNAMIC_TRANSLATABLE(tr("Tooltip")),
                 /*description*/ {},
                 {
-                    { "text", "{@ExtendedEventDescription}" },
+                    { "text", "{event.extendedDescription}" },
                     { "visible", false }
                 }),
             makeFieldDescriptor<EventDevicesField>(

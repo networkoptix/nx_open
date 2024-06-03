@@ -39,14 +39,14 @@ const ItemDescriptor& PushNotificationAction::manifest()
                 NX_DYNAMIC_TRANSLATABLE(tr("Header")),
                 /*description*/ {},
                 {
-                    { "text", "{@EventCaption}" }
+                    { "text", "{event.caption}" }
                 }),
             makeFieldDescriptor<TextWithFields>(
                 utils::kDescriptionFieldName,
                 NX_DYNAMIC_TRANSLATABLE(tr("Body")),
                 /*description*/ {},
                 {
-                    { "text", "{@EventDescription}" }
+                    { "text", "{event.description}" }
                 }),
             makeFieldDescriptor<ActionFlagField>(
                 "addSource",

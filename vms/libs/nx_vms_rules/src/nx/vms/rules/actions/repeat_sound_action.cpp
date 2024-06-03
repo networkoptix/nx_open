@@ -48,9 +48,9 @@ const ItemDescriptor& RepeatSoundAction::manifest()
                 utils::kVolumeFieldName,
                 Strings::volume()),
 
-            utils::makeTextFormatterFieldDescriptor("caption", "{@EventCaption}"),
-            utils::makeTextFormatterFieldDescriptor("description", "{@EventDescription}"),
-            utils::makeTextFormatterFieldDescriptor("tooltip", "{@ExtendedEventDescription}"),
+            utils::makeTextFormatterFieldDescriptor("caption", "{event.caption}"),
+            utils::makeTextFormatterFieldDescriptor("description", "{event.description}"),
+            utils::makeTextFormatterFieldDescriptor("tooltip", "{event.extendedDescription}"),
             utils::makeExtractDetailFieldDescriptor("sourceName", utils::kSourceNameDetailName),
         },
         .resources = {
