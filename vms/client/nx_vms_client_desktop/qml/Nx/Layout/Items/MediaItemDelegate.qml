@@ -73,43 +73,37 @@ ResourceItemDelegate
     [
         TitleBarButton
         {
-            icon.source: "image://skin/item/image_enhancement_24.svg"
+            icon.source: "image://skin/24x24/Outline/zoom_window.svg"
             checkable: true
         },
 
         TitleBarButton
         {
-            icon.source: "image://skin/item/zoom_window.svg"
+            icon.source: "image://skin/24x24/Outline/ptz.svg"
             checkable: true
         },
 
         TitleBarButton
         {
-            icon.source: "image://skin/item/ptz.svg"
-            checkable: true
-        },
-
-        TitleBarButton
-        {
-            icon.source: "image://skin/item/fisheye.svg"
+            icon.source: "image://skin/24x24/Outline/fisheye.svg"
             checkable: true
         },
 
         TitleBarButton
         {
             id: motionSearchButton
-            icon.source: "image://skin/item/motion.svg"
+            icon.source: "image://skin/24x24/Outline/motion.svg"
             checkable: true
         },
 
         TitleBarButton
         {
-            icon.source: "image://skin/item/screenshot.svg"
+            icon.source: "image://skin/24x24/Outline/screenshot.svg"
         },
 
         TitleBarButton
         {
-            icon.source: "image://skin/item/rotate.svg"
+            icon.source: "image://skin/24x24/Outline/rotate.svg"
 
             onPressed: resourceItem.rotationInstrument.start(mousePosition, this)
             onMousePositionChanged: resourceItem.rotationInstrument.move(mousePosition, this)
@@ -121,7 +115,7 @@ ResourceItemDelegate
         {
             id: infoButton
 
-            icon.source: "image://skin/item/info.svg"
+            icon.source: "image://skin/24x24/Outline/info.svg"
             checkable: true
 
             Binding
@@ -136,7 +130,7 @@ ResourceItemDelegate
 
         TitleBarButton
         {
-            icon.source: "image://skin/item/close.svg"
+            icon.source: "image://skin/24x24/Outline/close.svg"
             onClicked: layoutItemData.layout.removeItem(layoutItemData.itemId)
         }
     ]

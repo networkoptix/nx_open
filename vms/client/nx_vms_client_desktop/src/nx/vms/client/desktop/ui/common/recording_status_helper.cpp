@@ -219,72 +219,32 @@ QString RecordingStatusHelper::shortTooltip(const QnVirtualCameraResourcePtr& ca
 
 QString RecordingStatusHelper::qmlIconName(
     RecordingType recordingType,
-    RecordingMetadataTypes metadataTypes)
+    RecordingMetadataTypes /*metadataTypes*/)
 {
     switch (recordingType)
     {
-        case RecordingType::never:
-            return "qrc:/skin/item/recording_off.png";
         case RecordingType::always:
-            return "qrc:/skin/item/recording.png";
         case RecordingType::metadataOnly:
-            switch (metadataTypes)
-            {
-                case kMotionAndObjectsMetadataTypes:
-                    return "qrc:/skin/item/recording_motion_objects.png";
-                case kMotionMetadataTypes:
-                    return "qrc:/skin/item/recording_motion.png";
-                case kObjectsMetadataTypes:
-                    return "qrc:/skin/item/recording_objects.png";
-            }
-            break;
         case RecordingType::metadataAndLowQuality:
-            switch (metadataTypes)
-            {
-                case kMotionAndObjectsMetadataTypes:
-                    return "qrc:/skin/item/recording_motion_objects_lq.png";
-                case kMotionMetadataTypes:
-                    return "qrc:/skin/item/recording_motion_lq.png";
-                case kObjectsMetadataTypes:
-                    return "qrc:/skin/item/recording_objects_lq.png";
-            }
-            break;
+            return "image://skin/20x20/Solid/record_on.svg";
+        case RecordingType::never:
+            return "image://skin/20x20/Solid/archive.svg";
     }
     return QString();
 }
 
 QIcon RecordingStatusHelper::icon(
     RecordingType recordingType,
-    RecordingMetadataTypes metadataTypes)
+    RecordingMetadataTypes /*metadataTypes*/)
 {
     switch (recordingType)
     {
-        case RecordingType::never:
-            return qnSkin->icon("item/recording_off.png");
         case RecordingType::always:
-            return qnSkin->icon("item/recording.png");
         case RecordingType::metadataOnly:
-            switch (metadataTypes)
-            {
-                case kMotionAndObjectsMetadataTypes:
-                    return qnSkin->icon("item/recording_motion_objects.png");
-                case kMotionMetadataTypes:
-                    return qnSkin->icon("item/recording_motion.png");
-                case kObjectsMetadataTypes:
-                    return qnSkin->icon("item/recording_objects.png");
-            }
-            break;
         case RecordingType::metadataAndLowQuality:
-            switch (metadataTypes)
-            {
-                case kMotionAndObjectsMetadataTypes:
-                    return qnSkin->icon("item/recording_motion_objects_lq.png");
-                case kMotionMetadataTypes:
-                    return qnSkin->icon("item/recording_motion_lq.png");
-                case kObjectsMetadataTypes:
-                    return qnSkin->icon("item/recording_objects_lq.png");
-            }
-            break;
+            return qnSkin->icon("20x20/Solid/record_on.svg");
+        case RecordingType::never:
+            return qnSkin->icon("20x20/Solid/archive.svg");
     }
     return QIcon();
 }

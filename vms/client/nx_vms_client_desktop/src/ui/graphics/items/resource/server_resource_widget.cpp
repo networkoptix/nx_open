@@ -163,6 +163,14 @@ namespace {
     const int itemSpacing = 2;
 
     const char *legendKeyPropertyName = "_qn_legendKey";
+
+core::SvgIconColorer::ThemeSubstitutions kLight1Theme = {
+    {QIcon::Normal, {.primary = "light1"}}
+};
+
+NX_DECLARE_COLORIZED_ICON(kCheckIssuesIcon, "24x24/Outline/checkissues.svg", kLight1Theme)
+NX_DECLARE_COLORIZED_ICON(kLogIcon, "24x24/Outline/log.svg", kLight1Theme)
+
 } // namespace
 
 // -------------------------------------------------------------------------- //
@@ -688,7 +696,7 @@ bool QnServerResourceWidget::isLegendVisible() const {
 void QnServerResourceWidget::createButtons()
 {
     auto showLogButton = createStatisticAwareButton("server_widget_show_log");
-    showLogButton->setIcon(loadSvgIcon("item/log.svg"));
+    showLogButton->setIcon(qnSkin->icon(kLogIcon));
     showLogButton->setCheckable(false);
     showLogButton->setToolTip(tr("Show Log"));
     setHelpTopic(showLogButton, HelpTopic::Id::MainWindow_MonitoringItem_Log);
@@ -697,7 +705,7 @@ void QnServerResourceWidget::createButtons()
     titleBar()->rightButtonsBar()->addButton(Qn::ShowLogButton, showLogButton);
 
     auto checkIssuesButton = createStatisticAwareButton("server_widget_check_issues");
-    checkIssuesButton->setIcon(loadSvgIcon("item/checkissues.svg"));
+    checkIssuesButton->setIcon(qnSkin->icon(kCheckIssuesIcon));
     checkIssuesButton->setCheckable(false);
     checkIssuesButton->setToolTip(tr("Check Issues"));
     connect(checkIssuesButton, &QnImageButtonWidget::clicked, this,

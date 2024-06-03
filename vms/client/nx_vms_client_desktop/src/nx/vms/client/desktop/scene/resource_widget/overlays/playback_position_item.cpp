@@ -47,6 +47,9 @@ QColor kArchiveBackgroundColor()
     return value;
 }
 
+SvgIconColorer::ThemeSubstitutions kPauseTheme = {{QnIcon::Normal, {.primary = "light1"}}};
+
+NX_DECLARE_COLORIZED_ICON(kPauseIcon, "8x10/Solid/pause_button.svg", kPauseTheme)
 } // namespace
 
 namespace nx::vms::client::desktop {
@@ -66,7 +69,7 @@ PlaybackPositionItem::PlaybackPositionItem(WindowContext* windowContext, QGraphi
     pauseOptions.horPadding = 7;
     pauseOptions.fixedHeight = 22;
 
-    auto pauseIcon = qnSkin->icon("item/pause_button.svg");
+    auto pauseIcon = qnSkin->icon(kPauseIcon);
     m_pauseButton->setParent(this);
     m_pauseButton->setVisible(false);
     m_pauseButton->setAcceptedMouseButtons(Qt::NoButton);
