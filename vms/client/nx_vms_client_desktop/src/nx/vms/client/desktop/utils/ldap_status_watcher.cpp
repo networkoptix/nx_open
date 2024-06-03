@@ -5,18 +5,46 @@
 #include <api/server_rest_connection.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/common/system_settings.h>
 
 namespace nx::vms::client::desktop {
+
+namespace {
+
+static constexpr auto kLdapStatusRefreshInterval = std::chrono::minutes(1);
+
+} // namespace
 
 LdapStatusWatcher::LdapStatusWatcher(SystemContext* systemContext, QObject* parent):
     QObject(parent),
     SystemContextAware(systemContext)
 {
+    const auto enableTimerWhenLdapIsConfigured =
+        [this]()
+        {
+            const auto ldap = this->systemContext()->globalSettings()->ldap();
+            const bool hasConfig = !ldap.uri.isEmpty() || !ldap.adminDn.isEmpty()
+                || !ldap.filters.empty();
+
+            if (hasConfig)
+                m_refreshTimer.start();
+            else
+                m_refreshTimer.stop();
+        };
+
+    m_refreshTimer.setInterval(kLdapStatusRefreshInterval);
+    connect(&m_refreshTimer, &QTimer::timeout, this, &LdapStatusWatcher::refresh);
+
+    connect(systemContext->globalSettings(), &common::SystemSettings::ldapSettingsChanged, this,
+        enableTimerWhenLdapIsConfigured);
+
+    enableTimerWhenLdapIsConfigured();
 }
 
 LdapStatusWatcher::~LdapStatusWatcher()
 {
-    if (m_refreshHandle > 0)
+    if (auto api = connectedServerApi(); api && m_refreshHandle > 0)
         connectedServerApi()->cancelRequest(m_refreshHandle);
 }
 
@@ -68,7 +96,8 @@ void LdapStatusWatcher::refresh()
             emit refreshFinished();
         });
 
-    m_refreshHandle = connectedServerApi()->getLdapStatusAsync(statusCallback, thread());
+    if (auto api = connectedServerApi())
+        m_refreshHandle = connectedServerApi()->getLdapStatusAsync(statusCallback, thread());
 }
 
 void LdapStatusWatcher::setStatus(const api::LdapStatus& status)

@@ -163,6 +163,7 @@ class UserListModel::Private:
 
 public:
     QString syncId;
+    bool userSyncEnabled = false;
     boost::container::flat_set<QnUserResourcePtr> users;
     QSet<nx::Uuid> notFoundUsers;
     QSet<QnUserResourcePtr> checkedUsers;
@@ -170,12 +171,15 @@ public:
     QHash<QnUserResourcePtr, bool> digestChangedUsers;
 
     bool ldapServerOnline = false;
+    bool ldapServerSynced = false;
     qsizetype m_ldapUserCount = 0;
 
     Private(UserListModel* q):
         SystemContextAware(q->systemContext()),
         model(q),
-        syncId(globalSettings()->ldap().syncId())
+        syncId(globalSettings()->ldap().syncId()),
+        userSyncEnabled(
+            globalSettings()->ldap().continuousSync == api::LdapSyncMode::usersAndGroups)
     {
         connect(resourcePool(), &QnResourcePool::resourceAdded, this,
             [this](const QnResourcePtr& resource)
@@ -214,6 +218,8 @@ public:
             [this]()
             {
                 syncId = globalSettings()->ldap().syncId();
+                userSyncEnabled =
+                    globalSettings()->ldap().continuousSync == api::LdapSyncMode::usersAndGroups;
                 updateLdapUsersNotFound();
             });
 
@@ -221,7 +227,10 @@ public:
             [this, q]()
             {
                 if (const auto status = systemContext()->ldapStatusWatcher()->status())
+                {
                     ldapServerOnline = (status->state == api::LdapStatus::State::online);
+                    ldapServerSynced = status->timeSinceSyncS.has_value();
+                }
                 if (ldapServerOnline)
                 {
                     for (const auto& user: users)
@@ -320,7 +329,9 @@ bool UserListModel::Private::ldapUserNotFound(const QnUserResourcePtr& user) con
 {
     return user->userType() == api::UserType::ldap
         && user->externalId().syncId != syncId
-        && ldapServerOnline;
+        && ldapServerOnline
+        && ldapServerSynced
+        && userSyncEnabled;
 }
 
 Qt::CheckState UserListModel::Private::checkState() const
