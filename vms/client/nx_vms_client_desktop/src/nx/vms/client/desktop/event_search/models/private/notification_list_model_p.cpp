@@ -61,15 +61,6 @@ namespace {
 
 static const auto kDisplayTimeout = std::chrono::milliseconds(12500);
 
-static const QColor kLight12Color = "#91A7B2";
-static const QColor kLight10Color = "#A5B7C0";
-static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
-    {QnIcon::Normal, {{kLight12Color, "light12"}, {kLight10Color, "light10"}}},
-};
-
-NX_DECLARE_COLORIZED_ICON(kPaintedCameraIcon, "20x20/Solid/camera.svg", \
-    kIconSubstitutions)
-
 QPixmap toPixmap(const QIcon& icon)
 {
     return core::Skin::maximumSizePixmap(icon);
@@ -385,7 +376,7 @@ void NotificationListModel::Private::onRepeatSoundAction(
     {
         EventData eventData;
         eventData.level = QnNotificationLevel::convert(nx::vms::event::Level::common);
-        eventData.iconPath = "20x20/Solid/sound.svg";
+        eventData.iconPath = eventIconPath(nx::vms::rules::Icon::inputSignal);
         eventData.sourceName = action->sourceName();
         fillEventData(system(), action.get(), eventData);
 
@@ -415,7 +406,7 @@ void NotificationListModel::Private::onAlarmLayoutAction(
     EventData eventData;
     eventData.lifetime = kDisplayTimeout;
     eventData.level = QnNotificationLevel::convert(nx::vms::event::Level::critical);
-    eventData.iconPath = "20x20/Solid/alarm.svg";
+    eventData.iconPath = "16x16/Outline/soft_trigger.svg";
     eventData.sourceName = action->sourceName();
     eventData.previewCamera =
         system()->resourcePool()->getResourcesByIds<QnVirtualCameraResource>(action->eventDeviceIds())
@@ -774,7 +765,7 @@ void NotificationListModel::Private::setupAcknowledgeAction(EventData& eventData
 
     eventData.extraAction = CommandActionPtr(new CommandAction());
 
-    eventData.extraAction->setIconPath("20x20/Solid/bookmark.svg?primary=light4");
+    eventData.extraAction->setIconPath("20x20/Solid/bookmark.svg");
     eventData.extraAction->setText(tr("Acknowledge"));
 
     // TODO: #sivanov Fix hardcoded action parameters.
@@ -819,7 +810,7 @@ void NotificationListModel::Private::setupAcknowledgeAction(
     eventData.level = QnNotificationLevel::Value::CriticalNotification;
 
     eventData.extraAction = CommandActionPtr::create();
-    eventData.extraAction->setIconPath("20x20/Solid/bookmark.svg?primary=light4");
+    eventData.extraAction->setIconPath("20x20/Solid/bookmark.svg");
     eventData.extraAction->setText(tr("Acknowledge"));
 
     const auto actionHandler =
@@ -914,20 +905,20 @@ QString NotificationListModel::Private::iconPath(const vms::event::AbstractActio
     {
         case QnNotificationLevel::Value::ImportantNotification:
         case QnNotificationLevel::Value::CriticalNotification:
-            return "20x20/Solid/alert2.svg?primary=light10";
+            return "16x16/Outline/warning.svg";
 
         case QnNotificationLevel::Value::SuccessNotification:
-            return "20x20/Outline/checkmark.svg?primary=light10";
+            return "16x16/Outline/check.svg";
 
         default:
             break;
     }
 
     if (action->actionType() == ActionType::playSoundAction)
-        return "20x20/Solid/sound.svg";
+        return eventIconPath(nx::vms::rules::Icon::inputSignal);
 
     if (action->actionType() == ActionType::showOnAlarmLayoutAction)
-        return "20x20/Solid/alarm.svg";
+        return "16x16/Outline/soft_trigger.svg";
 
     const auto& params = action->getRuntimeParams();
 
@@ -938,8 +929,9 @@ QString NotificationListModel::Private::iconPath(const vms::event::AbstractActio
     {
         case EventType::cameraInputEvent:
         case EventType::cameraIpConflictEvent:
+            return eventIconPath(nx::vms::rules::Icon::resource);
         case EventType::analyticsSdkEvent:
-            return eventIconPath(nx::vms::rules::Icon::resource, /*custom*/ {},
+            return eventIconPath(nx::vms::rules::Icon::analyticsEvent, /*custom*/ {},
                 {system()->resourcePool()->getResourceById(params.eventResourceId)});
         case EventType::analyticsSdkObjectDetected:
         {
@@ -961,6 +953,7 @@ QString NotificationListModel::Private::iconPath(const vms::event::AbstractActio
             return eventIconPath(nx::vms::rules::Icon::storage);
 
         case EventType::cameraDisconnectEvent:
+            return eventIconPath(nx::vms::rules::Icon::resource);
         case EventType::networkIssueEvent:
             return eventIconPath(nx::vms::rules::Icon::networkIssue);
 

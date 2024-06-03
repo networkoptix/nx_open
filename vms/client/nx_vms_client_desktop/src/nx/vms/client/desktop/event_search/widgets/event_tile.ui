@@ -184,8 +184,8 @@
              </property>
              <property name="minimumSize">
               <size>
-               <width>20</width>
-               <height>20</height>
+               <width>16</width>
+               <height>16</height>
               </size>
              </property>
              <property name="maximumSize">
@@ -206,8 +206,8 @@
              </property>
              <property name="minimumSize">
               <size>
-               <width>20</width>
-               <height>20</height>
+               <width>16</width>
+               <height>16</height>
               </size>
              </property>
              <property name="maximumSize">
@@ -305,14 +305,14 @@
          <widget class="QLabel" name="iconLabel">
           <property name="minimumSize">
            <size>
-            <width>20</width>
-            <height>20</height>
+            <width>16</width>
+            <height>16</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>20</width>
-            <height>20</height>
+            <width>16</width>
+            <height>16</height>
            </size>
           </property>
           <property name="text">

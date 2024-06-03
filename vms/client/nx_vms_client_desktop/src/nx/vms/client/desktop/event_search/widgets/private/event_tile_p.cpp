@@ -168,10 +168,9 @@ void EventTile::Private::updateIcon()
         return;
     }
 
-    q->ui->iconLabel->setPixmap(qnSkin->colorizedPixmap(iconPath,
-        q->ui->iconLabel->maximumSize() * q->devicePixelRatio(),
-        q->titleColor(),
-        q->devicePixelRatio()));
+    core::SvgIconColorer::ThemeSubstitutions colorTheme =
+        {{QnIcon::Normal, {.primary = q->titleColor().toRgb().name().toLatin1()}}};
+    q->ui->iconLabel->setPixmap(qnSkin->icon(iconPath, colorTheme).pixmap(16, 16));
 }
 
 qreal EventTile::Private::getWidthOfText(const QString& text, const QLabel* label) const
