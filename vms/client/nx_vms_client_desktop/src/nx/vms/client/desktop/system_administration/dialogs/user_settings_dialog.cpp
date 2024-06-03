@@ -1216,9 +1216,11 @@ void UserSettingsDialog::saveState(const UserSettingsDialogState& state)
                         }
                         else if (originalState().allowInsecure && !state.allowInsecure)
                         {
-                            const auto password = sessionTokenHelper->password();
-                            if (NX_ASSERT(!password.isEmpty()))
-                                refreshToken(password);
+                            const auto credentials = systemContext()->connectionCredentials();
+                            NX_ASSERT(credentials.authToken.isPassword());
+                            const auto password = credentials.authToken.value;
+                            if (NX_ASSERT(!password.empty()))
+                                refreshToken(QString::fromStdString(password));
                         }
                     }
                 }
@@ -1238,7 +1240,7 @@ void UserSettingsDialog::refreshToken(const QString& password)
 
     auto callback = nx::utils::guarded(
         this,
-        [this](
+        [this, password = password.toStdString()](
             bool /*success*/,
             int handle,
             rest::ErrorOrData<nx::vms::api::LoginSession> errorOrData)
@@ -1253,7 +1255,10 @@ void UserSettingsDialog::refreshToken(const QString& password)
                 if (NX_ASSERT(!session->token.empty()))
                 {
                     auto credentials = connection()->credentials();
-                    credentials.authToken = nx::network::http::BearerAuthToken(session->token);
+                    if (systemContext()->userWatcher()->user()->shouldDigestAuthBeUsed())
+                        credentials.authToken = nx::network::http::PasswordAuthToken(password);
+                    else
+                        credentials.authToken = nx::network::http::BearerAuthToken(session->token);
 
                     auto tokenExpirationTime =
                         qnSyncTime->currentTimePoint() + session->expiresInS;
