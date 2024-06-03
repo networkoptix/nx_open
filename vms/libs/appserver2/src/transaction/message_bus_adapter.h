@@ -76,17 +76,14 @@ namespace ec2 {
 
     public:
         template<class T>
-        void sendTransaction(
-            const QnTransaction<T>& tran)
+        void sendTransaction(const QnTransaction<T>& tran, nx::p2p::TransportHeader header = {})
         {
-            if (auto p2pBus = dynamicCast<nx::p2p::MessageBus*>())
-                p2pBus->sendTransaction(tran);
+            if (auto p2pBus = dynamicCast<nx::p2p::MessageBus*>(); NX_CRITICAL(p2pBus))
+                p2pBus->sendTransaction(tran, std::move(header));
         }
 
         template<class T>
-        bool sendTransaction(
-            const QnTransaction<T>& tran,
-            const nx::vms::api::PeerSet& dstPeers)
+        bool sendTransaction(const QnTransaction<T>& tran, const nx::vms::api::PeerSet& dstPeers)
         {
             if (auto p2pBus = dynamicCast<nx::p2p::MessageBus*>())
                 return p2pBus->sendTransaction(tran, dstPeers);
@@ -94,9 +91,7 @@ namespace ec2 {
         }
 
         template<class T>
-        bool sendTransaction(
-            const QnTransaction<T>& tran,
-            const nx::Uuid& peer)
+        bool sendTransaction(const QnTransaction<T>& tran, const nx::Uuid& peer)
         {
             if (auto p2pBus = dynamicCast<nx::p2p::MessageBus*>())
                 return p2pBus->sendTransaction(tran, {peer});

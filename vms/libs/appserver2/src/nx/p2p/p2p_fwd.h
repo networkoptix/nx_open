@@ -80,8 +80,8 @@ struct TransportHeader
 {
     std::set<nx::Uuid> via;
     std::vector<nx::Uuid> dstPeers;
+    std::set<nx::Uuid> userIds;
 };
-#define TransportHeader_Fields (via)
 
 static const qint32 kMaxDistance = std::numeric_limits<qint32>::max();
 static const qint32 kMaxOnlineDistance = 16384;
