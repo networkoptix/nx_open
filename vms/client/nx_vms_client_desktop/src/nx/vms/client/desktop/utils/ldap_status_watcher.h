@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <QtCore/QTimer>
+
 #include <api/server_rest_connection_fwd.h>
 #include <nx/vms/api/data/ldap.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
@@ -33,6 +35,7 @@ private:
 private:
     std::optional<api::LdapStatus> m_status;
     rest::Handle m_refreshHandle = 0;
+    QTimer m_refreshTimer;
 };
 
 } // namespace nx::vms::client::desktop
