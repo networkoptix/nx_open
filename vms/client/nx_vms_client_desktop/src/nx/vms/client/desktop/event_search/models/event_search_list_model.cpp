@@ -66,58 +66,43 @@ QString iconPath(const EventParameters& parameters, core::SystemContext* context
     switch (parameters.eventType)
     {
         case EventType::storageFailureEvent:
-            return "16x16/Outline/storage.svg?primary=red";
+            return "16x16/Outline/storage.svg";
 
         case EventType::backupFinishedEvent:
-            return "16x16/Outline/storage.svg?primary=green";
+            return "16x16/Outline/storage.svg";
 
         case EventType::serverStartEvent:
-            return "16x16/Outline/server.svg?primary=light10";
-
         case EventType::serverFailureEvent:
         case EventType::serverCertificateError:
-            return "16x16/Outline/server.svg?primary=red";
-
         case EventType::serverConflictEvent:
-            return "16x16/Outline/server.svg?primary=yellow_l";
+            return "16x16/Outline/server.svg";
 
         case EventType::licenseIssueEvent:
-            return "16x16/Outline/key.svg?primary=red";
+            return "16x16/Outline/key.svg";
 
         case EventType::cameraDisconnectEvent:
         case EventType::cameraIpConflictEvent:
+            return "16x16/Outline/camera.svg";
         case EventType::networkIssueEvent:
-            return "16x16/Outline/network.svg?primary=red";
+            return "16x16/Outline/network.svg";
 
         case EventType::ldapSyncIssueEvent:
         case EventType::saasIssueEvent:
-            return "20x20/Solid/alert2.svg?primary=light10";
+            return "20x20/Solid/alert2.svg";
 
         case EventType::softwareTriggerEvent:
             return SoftwareTriggerPixmaps::effectivePixmapPath(parameters.description);
 
         case EventType::pluginDiagnosticEvent:
-        {
-            switch (QnNotificationLevel::valueOf(parameters))
-            {
-                case QnNotificationLevel::Value::CriticalNotification:
-                    return "20x20/Solid/alert2.svg?primary=red_l";
-                case QnNotificationLevel::Value::ImportantNotification:
-                    return "20x20/Solid/alert2.svg?primary=yellow_l";
-                default:
-                    return "20x20/Solid/alert2.svg?primary=light10";
-            }
-        }
+            return "16x16/Outline/plugin.svg";
 
         case EventType::cameraMotionEvent:
-            return "16x16/Outline/motion.svg?primary=light10";
+            return "16x16/Outline/motion.svg";
 
-        // TODO: #vkutin Fill with actual pixmaps as soon as they're created.
         case EventType::cameraInputEvent:
-            return "tree/camera.svg";
-
+            return "16x16/Outline/input_signal.svg";
         case EventType::analyticsSdkEvent:
-            return "20x20/Solid/camera.svg";
+            return "16x16/Outline/analytics.svg";
         case EventType::analyticsSdkObjectDetected:
         {
             const auto objectTypeId = parameters.getAnalyticsObjectTypeId();
@@ -132,9 +117,9 @@ QString iconPath(const EventParameters& parameters, core::SystemContext* context
             const auto sourceResources = event::sourceResources(parameters,
                 context->resourcePool());
             if (sourceResources && !sourceResources->isEmpty())
-                return "20x20/Solid/camera.svg";
+                return "16x16/Outline/camera.svg";
 
-            return "16x16/Outline/generic.svg?primary=light10";
+            return "16x16/Outline/generic.svg";
         }
 
         default:

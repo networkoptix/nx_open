@@ -39,10 +39,10 @@ QString levelDecorationPath(QnNotificationLevel::Value level)
 QString progressDecorationPath(ProgressState progress)
 {
     if (progress.isFailed())
-        return "20x20/Solid/alert2.svg?primary=light10";
+        return "20x20/Solid/alert2.svg";
 
     if (progress.isCompleted())
-        return "20x20/Outline/checkmark.svg?primary=light10";
+        return "20x20/Outline/checkmark.svg";
 
     return {};
 }

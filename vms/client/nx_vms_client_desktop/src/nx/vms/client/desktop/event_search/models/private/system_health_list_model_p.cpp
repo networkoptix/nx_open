@@ -780,10 +780,10 @@ QString SystemHealthListModel::Private::decorationPath(MessageType message)
     {
         case QnNotificationLevel::Value::CriticalNotification:
         case QnNotificationLevel::Value::ImportantNotification:
-            return "20x20/Solid/alert2.svg?primary=light10";
+            return "20x20/Solid/alert2.svg";
 
         case QnNotificationLevel::Value::SuccessNotification:
-            return "20x20/Outline/checkmark.svg?primary=light10";
+            return "20x20/Outline/checkmark.svg";
 
         default:
             break;
