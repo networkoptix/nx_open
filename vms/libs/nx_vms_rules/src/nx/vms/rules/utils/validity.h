@@ -14,24 +14,18 @@ namespace nx::vms::rules::utils {
 template <class ValidationPolicy>
 QValidator::State serversValidity(const QnMediaServerResourceList& servers)
 {
-    bool hasValid{false};
     bool hasInvalid{false};
 
     for (const auto& server: servers)
     {
-        if (ValidationPolicy::isServerValid(server))
-            hasValid = true;
-        else
+        if (!ValidationPolicy::isServerValid(server))
+        {
             hasInvalid = true;
-
-        if (hasValid && hasInvalid)
             break;
+        }
     }
 
-    if (!hasInvalid)
-        return QValidator::State::Acceptable;
-
-    return hasValid ? QValidator::State::Intermediate : QValidator::State::Invalid;
+    return hasInvalid ? QValidator::State::Intermediate : QValidator::State::Acceptable;
 }
 
 template <class ValidationPolicy>
@@ -39,25 +33,22 @@ ValidationResult camerasValidity(
     common::SystemContext* context,
     const QnVirtualCameraResourceList& cameras)
 {
-    bool hasValid{false};
     bool hasInvalid{false};
 
     for (const auto& camera: cameras)
     {
-        if (ValidationPolicy::isResourceValid(camera))
-            hasValid = true;
-        else
+        if (!ValidationPolicy::isResourceValid(camera))
+        {
             hasInvalid = true;
-
-        if (hasValid && hasInvalid)
             break;
+        }
     }
 
     if (!hasInvalid)
         return {};
 
     return {
-        hasValid ? QValidator::State::Intermediate : QValidator::State::Invalid,
+        QValidator::State::Intermediate,
         ValidationPolicy::getText(context, cameras)};
 }
 

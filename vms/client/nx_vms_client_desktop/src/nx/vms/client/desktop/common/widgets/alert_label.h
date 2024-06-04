@@ -17,7 +17,8 @@ class AlertLabel: public QWidget
 public:
     enum Type {
         info,
-        warning
+        warning,
+        error
     };
 
 public:

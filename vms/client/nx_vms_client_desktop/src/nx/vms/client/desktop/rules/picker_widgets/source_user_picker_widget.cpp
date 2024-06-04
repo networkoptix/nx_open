@@ -10,7 +10,8 @@
 #include <nx/vms/client/desktop/ui/event_rules/subject_selection_dialog.h>
 #include <ui/widgets/select_resources_button.h>
 
-#include "../utils/user_picker_helper.h"
+#include "../utils/icons.h"
+#include "../utils/strings.h"
 
 namespace nx::vms::client::desktop::rules {
 
@@ -49,18 +50,10 @@ void SourceUserPicker::onSelectButtonClicked()
 
 void SourceUserPicker::updateUi()
 {
-    UserPickerHelper helper{
-        systemContext(),
-        m_field->acceptAll(),
-        m_field->ids(),
-        m_validationPolicy.get(),
-        /*isIntermediateStateValid*/ false};
+    ResourcePickerWidgetBase<vms::rules::SourceUserField>::updateUi();
 
-    m_selectButton->setText(helper.text(/*allIsAny*/ true));
-    m_selectButton->setIcon(helper.icon());
-
-    if (auto validator = fieldValidator())
-        setValidity(validator->validity(m_field, parentParamsWidget()->rule(), systemContext()));
+    m_selectButton->setText(Strings::selectButtonText(systemContext(), m_field));
+    m_selectButton->setIcon(selectButtonIcon(systemContext(), m_field));
 }
 
 } // namespace nx::vms::client::desktop::rules

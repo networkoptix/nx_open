@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <nx/vms/client/desktop/common/widgets/alert_label.h>
 #include <nx/vms/client/desktop/common/widgets/widget_with_hint.h>
 #include <ui/widgets/common/elided_label.h>
 
@@ -19,14 +20,14 @@ public:
 
     void setReadOnly(bool value) override;
     void setDisplayName(const QString& displayName);
-    virtual void setValidity(const vms::rules::ValidationResult& validationResult);
+    void setValidity(const vms::rules::ValidationResult& validationResult) override;
 
 protected:
     WidgetWithHint<QnElidedLabel>* m_label{nullptr};
     QWidget* m_contentWidget{nullptr};
 
 private:
-    QLabel* m_alertLabel{nullptr};
+    AlertLabel* m_alertLabel{nullptr};
 };
 
 } // namespace nx::vms::client::desktop::rules

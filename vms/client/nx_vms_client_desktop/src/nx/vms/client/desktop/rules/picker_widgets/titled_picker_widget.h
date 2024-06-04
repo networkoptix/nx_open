@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <nx/vms/client/desktop/common/widgets/alert_label.h>
 #include <nx/vms/client/desktop/common/widgets/slide_switch.h>
 
 #include "picker_widget.h"
@@ -23,13 +24,13 @@ public:
     bool isChecked() const;
     void setReadOnly(bool value) override;
 
-    virtual void setValidity(const vms::rules::ValidationResult& validationResult);
+    void setValidity(const vms::rules::ValidationResult& validationResult) override;
 
 protected:
     QLabel* m_title{nullptr};
     SlideSwitch* m_enabledSwitch{nullptr};
     QWidget* m_contentWidget{nullptr};
-    QLabel* m_alertLabel{nullptr};
+    AlertLabel* m_alertLabel{nullptr};
 
     virtual void onEnabledChanged(bool isEnabled);
 };

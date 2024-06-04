@@ -5,7 +5,9 @@
 #include <QtWidgets/QLineEdit>
 
 #include <nx/vms/client/desktop/rules/picker_widgets/picker_widget.h>
+#include <nx/vms/rules/action_builder.h>
 #include <nx/vms/rules/engine.h>
+#include <nx/vms/rules/event_filter.h>
 #include <nx/vms/rules/utils/common.h>
 #include <ui/common/palette.h>
 

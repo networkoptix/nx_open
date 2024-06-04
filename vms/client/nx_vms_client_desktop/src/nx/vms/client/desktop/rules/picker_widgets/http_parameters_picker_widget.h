@@ -5,8 +5,8 @@
 #include <nx/vms/rules/action_builder_fields/content_type_field.h>
 #include <nx/vms/rules/action_builder_fields/http_method_field.h>
 
+#include "../utils/strings.h"
 #include "dropdown_text_picker_widget_base.h"
-#include "picker_widget_strings.h"
 
 namespace nx::vms::client::desktop::rules {
 
@@ -24,11 +24,13 @@ protected:
 
     void updateUi() override
     {
+        DropdownTextPickerWidgetBase<F>::updateUi();
+
         const auto fieldValue = m_field->value();
         {
             QSignalBlocker blocker{m_comboBox};
             if (fieldValue.isEmpty())
-                m_comboBox->setCurrentText(DropdownTextPickerWidgetStrings::autoValue());
+                m_comboBox->setCurrentText(Strings::autoValue());
             else
                 m_comboBox->setCurrentText(fieldValue);
         }
@@ -37,7 +39,7 @@ protected:
     void onCurrentIndexChanged() override
     {
         const auto value = m_comboBox->currentText().trimmed();
-        if (value != DropdownTextPickerWidgetStrings::autoValue())
+        if (value != Strings::autoValue())
             m_field->setValue(value);
         else
             m_field->setValue({});
@@ -55,7 +57,7 @@ public:
         HttpParametersPickerBase<vms::rules::ContentTypeField>(field, context, parent)
     {
         QSignalBlocker blocker{m_comboBox};
-        m_comboBox->addItem(DropdownTextPickerWidgetStrings::autoValue());
+        m_comboBox->addItem(Strings::autoValue());
         m_comboBox->addItem("text/plain");
         m_comboBox->addItem("text/html");
         m_comboBox->addItem("application/html");
@@ -75,7 +77,7 @@ public:
         HttpParametersPickerBase<vms::rules::HttpMethodField>(field, context, parent)
     {
         QSignalBlocker blocker{m_comboBox};
-        m_comboBox->addItem(DropdownTextPickerWidgetStrings::autoValue());
+        m_comboBox->addItem(Strings::autoValue());
         m_comboBox->addItem("GET");
         m_comboBox->addItem("POST");
         m_comboBox->addItem("PUT");

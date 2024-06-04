@@ -23,11 +23,14 @@
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/rules/action_builder.h>
 #include <nx/vms/rules/action_builder_fields/optional_time_field.h>
+#include <nx/vms/rules/action_builder_fields/target_device_field.h>
+#include <nx/vms/rules/action_builder_fields/target_single_device_field.h>
 #include <nx/vms/rules/engine.h>
 #include <nx/vms/rules/event_filter.h>
 #include <nx/vms/rules/event_filter_fields/state_field.h>
 #include <nx/vms/rules/utils/api.h>
 #include <nx/vms/rules/utils/common.h>
+#include <nx/vms/rules/utils/event.h>
 #include <nx/vms/rules/utils/field.h>
 #include <ui/common/palette.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
@@ -172,6 +175,31 @@ void fixStateAndDuration(
             durationField->setValue(getDefaultDuration(durationField));
         }
     }
+}
+
+void fixUseSource(
+    vms::rules::Engine* engine,
+    vms::rules::EventFilter* eventFilter,
+    vms::rules::ActionBuilder* actionBuilder)
+{
+    using namespace vms::rules;
+
+    const auto targetDeviceField =
+        actionBuilder->fieldByName<TargetDeviceField>(utils::kDeviceIdsFieldName);
+    const auto targetSingleDeviceField =
+        actionBuilder->fieldByName<TargetSingleDeviceField>(utils::kCameraIdFieldName);
+
+    if (!targetDeviceField && !targetSingleDeviceField)
+        return;
+
+    auto eventDescriptor = engine->eventDescriptor(eventFilter->eventType());
+    const auto hasSourceCamera = vms::rules::hasSourceCamera(eventDescriptor.value());
+
+    if (targetDeviceField && targetDeviceField->useSource() && !hasSourceCamera)
+        targetDeviceField->setUseSource(false);
+
+    if (targetSingleDeviceField && targetSingleDeviceField->useSource() && !hasSourceCamera)
+        targetSingleDeviceField->setUseSource(false);
 }
 
 QString indentedJson(const QByteArray& json)
@@ -561,6 +589,7 @@ void EditVmsRuleDialog::onActionTypeChanged(const QString& actionType)
     }
 
     fixStateAndDuration(engine, eventFilter, actionBuilder.get());
+    fixUseSource(engine, eventFilter, actionBuilder.get());
 
     if (!NX_ASSERT(
         vms::rules::utils::isCompatible(engine, eventFilter, actionBuilder.get()),
@@ -595,6 +624,7 @@ void EditVmsRuleDialog::onEventTypeChanged(const QString& eventType)
     }
 
     fixStateAndDuration(engine, eventFilter.get(), actionBuilder);
+    fixUseSource(engine, eventFilter.get(), actionBuilder);
 
     if (!NX_ASSERT(
         vms::rules::utils::isCompatible(engine, eventFilter.get(), actionBuilder),

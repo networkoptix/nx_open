@@ -37,12 +37,10 @@ PlainPickerWidget::PlainPickerWidget(
     m_contentWidget = new QWidget;
     contentLayout->addWidget(m_contentWidget);
 
-    m_alertLabel = new QLabel;
+    m_alertLabel = new AlertLabel{this};
     m_alertLabel->setSizePolicy(QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred));
     m_alertLabel->setVisible(false);
-    m_alertLabel->setWordWrap(true);
     setWarningStyle(m_alertLabel);
-    m_alertLabel->setTextFormat(Qt::TextFormat::RichText);
     contentLayout->addWidget(m_alertLabel);
 
     mainLayout->addLayout(contentLayout);
@@ -63,11 +61,19 @@ void PlainPickerWidget::setDisplayName(const QString& displayName)
 
 void PlainPickerWidget::setValidity(const vms::rules::ValidationResult& validationResult)
 {
-    m_alertLabel->setVisible(validationResult.validity != QValidator::State::Acceptable
-        && !validationResult.description.isEmpty());
+    if (validationResult.validity == QValidator::State::Acceptable
+        || validationResult.description.isEmpty())
+    {
+        m_alertLabel->setVisible(false);
+        m_alertLabel->setText({});
+        return;
+    }
 
-    if (!validationResult.description.isEmpty())
-        m_alertLabel->setText(validationResult.description);
+    m_alertLabel->setType(validationResult.validity == QValidator::State::Intermediate
+        ? AlertLabel::Type::warning
+        : AlertLabel::Type::error);
+    m_alertLabel->setText(validationResult.description);
+    m_alertLabel->setVisible(true);
 }
 
 } // namespace nx::vms::client::desktop::rules

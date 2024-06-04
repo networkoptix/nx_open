@@ -143,6 +143,8 @@ ObjectLookupPicker::ObjectLookupPicker(
 
 void ObjectLookupPicker::updateUi()
 {
+    TitledFieldPickerWidget<vms::rules::ObjectLookupField>::updateUi();
+
     m_checkTypeComboBox->setCurrentIndex(
         m_checkTypeComboBox->findData(QVariant::fromValue(m_field->checkType())));
 

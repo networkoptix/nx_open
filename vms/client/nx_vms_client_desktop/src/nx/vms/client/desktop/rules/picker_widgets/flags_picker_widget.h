@@ -8,8 +8,8 @@
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/rules/event_filter_fields/analytics_event_level_field.h>
 
+#include "../utils/strings.h"
 #include "field_picker_widget.h"
-#include "picker_widget_strings.h"
 #include "picker_widget_utils.h"
 
 namespace nx::vms::client::desktop::rules {
@@ -68,6 +68,8 @@ private:
 
     void updateUi() override
     {
+        PlainFieldPickerWidget<F>::updateUi();
+
         const auto fieldValue = m_field->value();
         for (const auto& [checkBox, flag]: m_checkBoxes)
         {
@@ -89,12 +91,9 @@ template<>
 std::map<api::EventLevel, QString> AnalyticsEventLevelPicker::getFlags() const
 {
     return {
-        {api::EventLevel::error,
-            FlagsPickerWidgetStrings::eventLevelDisplayString(api::EventLevel::error)},
-        {api::EventLevel::warning,
-            FlagsPickerWidgetStrings::eventLevelDisplayString(api::EventLevel::warning)},
-        {api::EventLevel::info,
-            FlagsPickerWidgetStrings::eventLevelDisplayString(api::EventLevel::info)},
+        {api::EventLevel::error, Strings::eventLevelDisplayString(api::EventLevel::error)},
+        {api::EventLevel::warning, Strings::eventLevelDisplayString(api::EventLevel::warning)},
+        {api::EventLevel::info, Strings::eventLevelDisplayString(api::EventLevel::info)},
     };
 }
 

@@ -99,6 +99,8 @@ protected:
 
     void updateUi() override
     {
+        DropdownIdPickerWidgetBase<vms::rules::AnalyticsEngineField, QnTreeComboBox>::updateUi();
+
         QSignalBlocker blocker{m_comboBox};
 
         m_pluginDiagnosticEventModel->filterByCameras(

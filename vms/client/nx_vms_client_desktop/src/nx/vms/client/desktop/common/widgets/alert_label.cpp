@@ -49,15 +49,24 @@ void AlertLabel::setType(Type type)
     {
         case Type::info:
             m_alertIcon->setPixmap(qnSkin->icon(kInfoIcon).pixmap(kInfoIconSize));
+            m_alertIcon->setVisible(true);
             setPaletteColor(m_alertText, QPalette::WindowText, core::colorTheme()->color("light4"));
             setPaletteColor(m_alertText, QPalette::Link, core::colorTheme()->color("light4"));
             setPaletteColor(m_alertText, QPalette::LinkVisited, core::colorTheme()->color("light1"));
             break;
         case Type::warning:
             m_alertIcon->setPixmap(qnSkin->icon(core::kAlertIcon).pixmap(core::kIconSize));
+            m_alertIcon->setVisible(true);
             setPaletteColor(m_alertText, QPalette::WindowText, core::colorTheme()->color("yellow_d1"));
             setPaletteColor(m_alertText, QPalette::Link, core::colorTheme()->color("yellow_d1"));
             setPaletteColor(m_alertText, QPalette::LinkVisited, core::colorTheme()->color("yellow_core"));
+            break;
+        case Type::error:
+            m_alertIcon->setPixmap({});
+            m_alertIcon->setVisible(false);
+            setPaletteColor(m_alertText, QPalette::WindowText, core::colorTheme()->color("red_l"));
+            setPaletteColor(m_alertText, QPalette::Link, core::colorTheme()->color("red_l"));
+            setPaletteColor(m_alertText, QPalette::LinkVisited, core::colorTheme()->color("red_core"));
             break;
     }
 }

@@ -3,7 +3,9 @@
 #pragma once
 
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/rules/action_builder.h>
 #include <nx/vms/rules/engine.h>
+#include <nx/vms/rules/event_filter.h>
 
 #include "plain_picker_widget.h"
 #include "titled_picker_widget.h"
@@ -46,6 +48,11 @@ public:
 protected:
     F* m_field{nullptr};
 
+    void updateUi() override
+    {
+        P::setValidity(fieldValidity());
+    }
+
     template<typename T>
     T* getActionField(const QString& name) const
     {
@@ -68,9 +75,17 @@ protected:
         return P::parentParamsWidget()->actionDescriptor();
     }
 
-    vms::rules::FieldValidator* fieldValidator()
+    vms::rules::FieldValidator* fieldValidator() const
     {
         return P::systemContext()->vmsRulesEngine()->fieldValidator(m_field->metatype());
+    }
+
+    vms::rules::ValidationResult fieldValidity() const
+    {
+        if (auto validator = fieldValidator())
+            return validator->validity(m_field, P::parentParamsWidget()->rule(), P::systemContext());
+
+        return {};
     }
 };
 

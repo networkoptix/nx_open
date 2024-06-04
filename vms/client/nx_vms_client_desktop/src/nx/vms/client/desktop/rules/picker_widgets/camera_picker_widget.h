@@ -12,7 +12,8 @@
 #include <nx/vms/rules/utils/field.h>
 
 #include "../params_widgets/params_widget.h"
-#include "picker_widget_strings.h"
+#include "../utils/icons.h"
+#include "../utils/strings.h"
 #include "resource_picker_widget_base.h"
 
 namespace nx::vms::client::desktop::rules {
@@ -38,8 +39,8 @@ public:
 protected:
     using CameraPickerWidgetBase<vms::rules::SourceCameraField, Policy>::m_selectButton;
     using CameraPickerWidgetBase<vms::rules::SourceCameraField, Policy>::m_field;
-    using CameraPickerWidgetBase<vms::rules::SourceCameraField, Policy>::resourcePool;
     using CameraPickerWidgetBase<vms::rules::SourceCameraField, Policy>::systemContext;
+    using CameraPickerWidgetBase<vms::rules::SourceCameraField, Policy>::fieldValidity;
 
     void onSelectButtonClicked() override
     {
@@ -56,15 +57,9 @@ protected:
     {
         CameraPickerWidgetBase<vms::rules::SourceCameraField, Policy>::updateUi();
 
-        const auto resources =
-            resourcePool()->template getResourcesByIds<QnVirtualCameraResource>(m_field->ids());
-        m_selectButton->setText(Policy::getText(systemContext(), resources, /*detailed*/ true));
-        m_selectButton->setIcon(core::Skin::maximumSizePixmap(resources.size() == 1
-                ? qnResIconCache->icon(resources.first())
-                : qnResIconCache->icon(QnResourceIconCache::Camera),
-            QIcon::Selected,
-            QIcon::Off,
-            /*correctDevicePixelRatio*/ false));
+        m_selectButton->setText(Strings::selectButtonText(systemContext(), m_field));
+        m_selectButton->setIcon(
+            selectButtonIcon(systemContext(), m_field, fieldValidity().validity));
     }
 };
 
@@ -82,8 +77,7 @@ public:
         auto contentLayout = qobject_cast<QVBoxLayout*>(m_contentWidget->layout());
 
         m_checkBox = new QCheckBox;
-        m_checkBox->setText(ResourcePickerWidgetStrings::useEventSourceString(
-            parentParamsWidget()->descriptor()->id));
+        m_checkBox->setText(Strings::useSourceCameraString(parentParamsWidget()->descriptor()->id));
 
         contentLayout->addWidget(m_checkBox);
 
@@ -110,53 +104,15 @@ protected:
     {
         CameraPickerWidgetBase<vms::rules::TargetDeviceField, Policy>::updateUi();
 
-        const auto useSource = m_field->useSource();
-        const auto hasSource = vms::rules::hasSourceCamera(*parentParamsWidget()->eventDescriptor());
+        m_selectButton->setText(Strings::selectButtonText(systemContext(), m_field));
+        m_selectButton->setIcon(
+            selectButtonIcon(systemContext(), m_field, fieldValidity().validity));
 
-        if (useSource && !hasSource)
-        {
-            m_field->setUseSource(false);
-            return;
-        }
-
-        const auto resources =
-            resourcePool()->template getResourcesByIds<QnVirtualCameraResource>(m_field->ids());
-
-        m_field->setAcceptAll(
-            Policy::emptyListIsValid() && resources.empty() && !m_field->useSource());
-
-        if (useSource)
-        {
-            m_selectButton->setText(CameraPickerStrings::sourceCameraString(resources.size()));
-            m_selectButton->setIcon(core::Skin::maximumSizePixmap(
-                qnResIconCache->icon(QnResourceIconCache::Camera),
-                QIcon::Selected,
-                QIcon::Off,
-                /*correctDevicePixelRatio*/ false));
-        }
-        else
-        {
-            m_selectButton->setText(Policy::getText(systemContext(), resources, /*detailed*/ true));
-
-            QIcon icon;
-            if (resources.empty())
-                icon = qnSkin->icon(core::kAlertIcon);
-            else if (resources.size() == 1)
-                icon = qnResIconCache->icon(resources.first());
-            else
-                icon = qnResIconCache->icon(QnResourceIconCache::Cameras);
-
-            m_selectButton->setIcon(core::Skin::maximumSizePixmap(
-                icon,
-                QIcon::Selected,
-                QIcon::Off,
-                /*correctDevicePixelRatio*/ false));
-        }
-
-        m_checkBox->setEnabled(hasSource);
+        m_checkBox->setEnabled(
+            vms::rules::hasSourceCamera(parentParamsWidget()->eventDescriptor().value()));
 
         QSignalBlocker blocker{m_checkBox};
-        m_checkBox->setChecked(useSource);
+        m_checkBox->setChecked(m_field->useSource());
     }
 
 private:
@@ -164,9 +120,9 @@ private:
     using CameraPickerWidgetBase<vms::rules::TargetDeviceField, Policy>::m_contentWidget;
     using CameraPickerWidgetBase<vms::rules::TargetDeviceField, Policy>::m_selectButton;
     using CameraPickerWidgetBase<vms::rules::TargetDeviceField, Policy>::connect;
-    using CameraPickerWidgetBase<vms::rules::TargetDeviceField, Policy>::resourcePool;
     using CameraPickerWidgetBase<vms::rules::TargetDeviceField, Policy>::systemContext;
     using CameraPickerWidgetBase<vms::rules::TargetDeviceField, Policy>::parentParamsWidget;
+    using CameraPickerWidgetBase<vms::rules::TargetDeviceField, Policy>::fieldValidity;
 
     QCheckBox* m_checkBox{nullptr};
 

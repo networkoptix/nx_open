@@ -41,6 +41,8 @@ protected:
 
     void updateUi() override
     {
+        DropdownTextPickerWidgetBase<vms::rules::CustomizableIconField, IconComboBox>::updateUi();
+
         QSignalBlocker blocker{m_comboBox};
         m_comboBox->setCurrentIcon(SoftwareTriggerPixmaps::effectivePixmapName(m_field->value()));
     }

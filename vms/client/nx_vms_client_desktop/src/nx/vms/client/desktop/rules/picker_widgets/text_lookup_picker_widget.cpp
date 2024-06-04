@@ -143,6 +143,8 @@ TextLookupPicker::TextLookupPicker(
 
 void TextLookupPicker::updateUi()
 {
+    TitledFieldPickerWidget<vms::rules::TextLookupField>::updateUi();
+
     m_checkTypeComboBox->setCurrentIndex(
         m_checkTypeComboBox->findData(QVariant::fromValue(m_field->checkType())));
     switch (m_field->checkType())

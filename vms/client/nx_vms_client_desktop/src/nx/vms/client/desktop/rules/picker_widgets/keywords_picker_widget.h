@@ -34,6 +34,8 @@ public:
 protected:
     void updateUi() override
     {
+        OnelineTextPickerWidgetBase<vms::rules::KeywordsField>::updateUi();
+
         const QSignalBlocker blocker{m_lineEdit};
         m_lineEdit->setText(m_field->string());
     }

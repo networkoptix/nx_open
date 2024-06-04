@@ -77,6 +77,8 @@ protected:
 
     void updateUi() override
     {
+        OnelineTextPickerWidgetBase<F>::updateUi();
+
         if (m_lineEdit->text() == m_field->value())
             return;
 
