@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" viewBox="0 0 32 32">
+  <g class="32x32/Outline/cloud">
+    <path fill="#698796" fill-rule="evenodd" d="M16 8.75a5.252 5.252 0 0 0-5.085 3.937l-.145.563H9.25a4.5 4.5 0 1 0 0 9H23.5a3.75 3.75 0 1 0 0-7.5h-2.25V14c0-2.9-2.35-5.25-5.25-5.25Zm-6.366 3a6.752 6.752 0 0 1 13.075 1.5h.791a5.25 5.25 0 1 1 0 10.5H9.25a6 6 0 0 1 0-12h.384Z" class="Primary" clip-rule="evenodd"/>
+  </g>
+</svg>
