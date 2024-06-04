@@ -96,7 +96,7 @@ struct PredefinedUserGroups::Private
         }
 
         if (groupId == kAdvancedViewersGroupId)
-            return GlobalPermission::viewLogs;
+            return GlobalPermission::viewLogs | GlobalPermission::generateEvents;
 
         if (groupId == kSystemHealthViewersGroupId)
             return GlobalPermission::viewMetrics;

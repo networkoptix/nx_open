@@ -64,8 +64,6 @@ std::tuple<GlobalPermissions, std::vector<nx::Uuid>, std::map<nx::Uuid, AccessRi
     GlobalPermissions newPermissions = GlobalPermission::none;
     if (permissions.testFlag(GlobalPermissionDeprecated::viewLogs))
         newPermissions |= GlobalPermission::viewLogs;
-    if (permissions.testFlag(GlobalPermissionDeprecated::userInput))
-        newPermissions |= GlobalPermission::generateEvents;
 
     return {newPermissions, std::move(groups), std::move(accessMap)};
 }
@@ -161,8 +159,6 @@ std::tuple<GlobalPermissionsDeprecated, std::optional<std::vector<nx::Uuid>>, bo
 
     if (permissions.testFlag(GlobalPermission::viewLogs))
         deprecatedPermissions |= GlobalPermissionDeprecated::viewLogs;
-    if (permissions.testFlag(GlobalPermission::generateEvents))
-        deprecatedPermissions |= GlobalPermissionDeprecated::userInput;
 
     if (noGroupInclusions || !UserDataDeprecated::permissionPresetToGroupId(deprecatedPermissions))
         deprecatedPermissions |= GlobalPermissionDeprecated::customUser;

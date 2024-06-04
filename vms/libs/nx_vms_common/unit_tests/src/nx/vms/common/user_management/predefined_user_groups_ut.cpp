@@ -77,7 +77,7 @@ TEST(PredefinedUserGroups, globalPermissions)
         | GlobalPermission::viewUnredactedVideo);
 
     EXPECT_EQ(PredefinedUserGroups::find(kAdvancedViewersGroupId)->permissions,
-        GlobalPermission::viewLogs);
+        GlobalPermission::viewLogs | GlobalPermission::generateEvents);
 
     EXPECT_EQ(PredefinedUserGroups::find(kViewersGroupId)->permissions,
         GlobalPermission::none);
