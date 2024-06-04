@@ -60,6 +60,8 @@ OptionalDurationPicker::OptionalDurationPicker(
 
 void OptionalDurationPicker::updateUi()
 {
+    TitledFieldPickerWidget<vms::rules::OptionalTimeField>::updateUi();
+
     if (m_field->descriptor()->fieldName == vms::rules::utils::kIntervalFieldName)
     {
         const auto durationField =
@@ -79,9 +81,6 @@ void OptionalDurationPicker::updateUi()
     }
 
     setChecked(m_field->value() != vms::rules::OptionalTimeField::value_type::zero());
-
-    if (auto validator = fieldValidator())
-        setValidity(validator->validity(m_field, parentParamsWidget()->rule(), systemContext()));
 }
 
 void OptionalDurationPicker::onEnabledChanged(bool isEnabled)

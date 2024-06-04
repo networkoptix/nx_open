@@ -6,8 +6,8 @@
 #include <nx/vms/rules/event_filter_fields/source_camera_field.h>
 #include <nx/vms/rules/utils/field.h>
 
+#include "../utils/strings.h"
 #include "dropdown_text_picker_widget_base.h"
-#include "picker_widget_strings.h"
 
 #pragma once
 
@@ -27,6 +27,8 @@ protected:
 private:
     void updateUi() override
     {
+        DropdownTextPickerWidgetBase<vms::rules::InputPortField>::updateUi();
+
         auto sourceCameraField =
             getEventField<vms::rules::SourceCameraField>(vms::rules::utils::kCameraIdFieldName);
 
@@ -36,7 +38,7 @@ private:
         QSignalBlocker blocker{m_comboBox};
         m_comboBox->clear();
 
-        m_comboBox->addItem(DropdownTextPickerWidgetStrings::autoValue(), QString());
+        m_comboBox->addItem(Strings::autoValue(), QString());
 
         QnVirtualCameraResourceList cameras;
         if (sourceCameraField->acceptAll())

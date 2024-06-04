@@ -63,6 +63,8 @@ protected:
 
     virtual void updateUi() override
     {
+        PlainFieldPickerWidget<F>::updateUi();
+
         const auto durationField =
             base::template getActionField<vms::rules::OptionalTimeField>(
                 vms::rules::utils::kDurationFieldName);

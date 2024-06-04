@@ -2,19 +2,9 @@
 
 #pragma once
 
-#include <optional>
-
-#include <QtCore/QPointer>
 #include <QtWidgets/QWidget>
 
-#include <nx/utils/log/assert.h>
-#include <nx/vms/rules/action_builder.h>
-#include <nx/vms/rules/action_builder_field.h>
-#include <nx/vms/rules/event_filter.h>
-#include <nx/vms/rules/event_filter_field.h>
-#include <nx/vms/rules/field_validator.h>
-#include <nx/vms/rules/manifest.h>
-#include <ui/workbench/workbench_context_aware.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
 
 #include "../params_widgets/params_widget.h"
 
@@ -37,6 +27,9 @@ public:
     virtual void updateUi() = 0;
 
     ParamsWidget* parentParamsWidget() const;
+
+protected:
+    virtual void setValidity(const vms::rules::ValidationResult& validationResult);
 };
 
 } // namespace nx::vms::client::desktop::rules

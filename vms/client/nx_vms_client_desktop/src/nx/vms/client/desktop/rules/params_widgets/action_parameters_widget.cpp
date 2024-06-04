@@ -7,8 +7,10 @@
 #include <nx/vms/client/desktop/rules/picker_widgets/picker_factory.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/window_context.h>
+#include <nx/vms/rules/action_builder.h>
 #include <nx/vms/rules/action_builder_fields/optional_time_field.h>
 #include <nx/vms/rules/action_builder_fields/time_field.h>
+#include <nx/vms/rules/event_filter.h>
 #include <nx/vms/rules/event_filter_fields/state_field.h>
 #include <nx/vms/rules/utils/common.h>
 #include <nx/vms/rules/utils/field.h>

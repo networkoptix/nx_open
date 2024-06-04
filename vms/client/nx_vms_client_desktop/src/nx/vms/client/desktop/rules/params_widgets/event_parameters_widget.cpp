@@ -7,6 +7,8 @@
 #include <nx/vms/client/desktop/rules/picker_widgets/picker_factory.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/window_context.h>
+#include <nx/vms/rules/event_filter.h>
+#include <nx/vms/rules/event_filter_field.h>
 #include <nx/vms/rules/utils/field.h>
 #include <ui/workbench/workbench_context.h>
 

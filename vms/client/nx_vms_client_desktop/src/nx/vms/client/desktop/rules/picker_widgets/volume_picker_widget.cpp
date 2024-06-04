@@ -19,8 +19,6 @@
 #include <ui/workbench/workbench_context.h>
 #include <utils/media/audio_player.h>
 
-#include "picker_widget_strings.h"
-
 namespace nx::vms::client::desktop::rules {
 
 namespace {
@@ -45,7 +43,7 @@ VolumePicker::VolumePicker(
     contentLayout->addWidget(m_volumeSlider);
 
     m_testPushButton = new QPushButton;
-    m_testPushButton->setText(CommonPickerWidgetStrings::testButtonDisplayText());
+    m_testPushButton->setText(tr("Test"));
     contentLayout->addWidget(m_testPushButton);
 
     m_contentWidget->setLayout(contentLayout);

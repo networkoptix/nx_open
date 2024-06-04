@@ -64,7 +64,7 @@ ValidationResult SourceUserFieldValidator::validity(
                     return {};
 
                 return {
-                    validity,
+                    QValidator::State::Intermediate,
                     policy.calculateAlert(sourceUserField->acceptAll(), sourceUserField->ids())};
             }
         }

@@ -62,6 +62,8 @@ private:
 
     void updateUi() override
     {
+        FieldPickerWidget<F, PickerWidget>::updateUi();
+
         QSignalBlocker blocker{m_checkBox};
         m_checkBox->setChecked(m_field->value());
     }

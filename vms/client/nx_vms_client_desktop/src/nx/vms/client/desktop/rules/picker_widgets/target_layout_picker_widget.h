@@ -10,6 +10,8 @@
 #include <nx/vms/rules/action_builder_fields/target_layout_field.h>
 #include <ui/widgets/select_resources_button.h>
 
+#include "../utils/icons.h"
+#include "../utils/strings.h"
 #include "resource_picker_widget_base.h"
 
 namespace nx::vms::client::desktop::rules {
@@ -34,38 +36,10 @@ protected:
 
     void updateUi() override
     {
-        const auto layouts = resourcePool()->getResourcesByIds<QnLayoutResource>(m_field->value());
+        ResourcePickerWidgetBase<vms::rules::TargetLayoutField>::updateUi();
 
-        m_selectButton->setForegroundRole(
-            !layouts.empty() ? QPalette::BrightText : QPalette::ButtonText);
-
-        m_selectButton->setText(buttonText(layouts));
-        m_selectButton->setIcon(buttonIcon(layouts));
-    }
-
-    QString buttonText(const QnSharedResourcePointerList<QnLayoutResource>& layouts) const
-    {
-        if (layouts.empty())
-            return tr("Select layout...");
-
-        if (layouts.size() == 1)
-            return layouts.first()->getName();
-
-        return tr("%n layouts", "", layouts.size());
-    }
-
-    QIcon buttonIcon(const QnSharedResourcePointerList<QnLayoutResource>& layouts) const
-    {
-        if (layouts.empty())
-            return qnSkin->icon(core::kAlertIcon);
-
-        return core::Skin::maximumSizePixmap(
-            layouts.size() > 1
-                ? qnResIconCache->icon(QnResourceIconCache::Layouts)
-                : qnResIconCache->icon(layouts.first()),
-            QIcon::Selected,
-            QIcon::Off,
-            /*correctDevicePixelRatio*/ false);
+        m_selectButton->setText(Strings::selectButtonText(systemContext(), m_field));
+        m_selectButton->setIcon(selectButtonIcon(systemContext(), m_field));
     }
 };
 

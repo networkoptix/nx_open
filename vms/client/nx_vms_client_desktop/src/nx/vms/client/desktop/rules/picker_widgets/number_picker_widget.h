@@ -43,6 +43,8 @@ protected:
 
     void updateUi() override
     {
+        PlainFieldPickerWidget<F>::updateUi();
+
         QSignalBlocker blocker{m_spinBox};
         m_spinBox->setValue(m_field->value());
     }

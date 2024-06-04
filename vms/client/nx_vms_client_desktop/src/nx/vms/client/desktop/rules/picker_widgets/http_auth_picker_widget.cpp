@@ -13,7 +13,7 @@
 #include <ui/dialogs/notification_sound_manager_dialog.h>
 #include <ui/workbench/workbench_context.h>
 
-#include "picker_widget_strings.h"
+#include "../utils/strings.h"
 
 namespace nx::vms::client::desktop::rules {
 
@@ -95,7 +95,7 @@ HttpAuthPicker::HttpAuthPicker(
     mainLayout->addWidget(d->tokenGroup);
     d->tokenGroup->setVisible(false);
 
-    d->comboBox->addItem(DropdownTextPickerWidgetStrings::autoValue(),
+    d->comboBox->addItem(Strings::autoValue(),
         QVariant::fromValue(nx::network::http::AuthType::authBasicAndDigest));
     d->comboBox->addItem(
         d->bearerStr, QVariant::fromValue(nx::network::http::AuthType::authBearer));
@@ -153,7 +153,7 @@ void HttpAuthPicker::updateUi()
             d->comboBox->setCurrentText(d->digestStr);
             break;
         default:
-            d->comboBox->setCurrentText(DropdownTextPickerWidgetStrings::autoValue());
+            d->comboBox->setCurrentText(Strings::autoValue());
     }
 
     const bool isBearer = fieldValue == nx::network::http::AuthType::authBearer;

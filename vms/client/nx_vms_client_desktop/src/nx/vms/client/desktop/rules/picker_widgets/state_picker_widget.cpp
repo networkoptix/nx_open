@@ -40,6 +40,8 @@ StatePicker::StatePicker(
 
 void StatePicker::updateUi()
 {
+    DropdownTextPickerWidgetBase<vms::rules::StateField>::updateUi();
+
     QSignalBlocker blocker{m_comboBox};
     m_comboBox->setCurrentIndex(m_comboBox->findData(QVariant::fromValue(m_field->value())));
 }

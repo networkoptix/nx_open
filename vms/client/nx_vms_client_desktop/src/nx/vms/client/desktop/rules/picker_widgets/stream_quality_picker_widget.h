@@ -28,6 +28,8 @@ public:
 protected:
     void updateUi() override
     {
+        DropdownTextPickerWidgetBase<vms::rules::StreamQualityField>::updateUi();
+
         QSignalBlocker blocker{m_comboBox};
         m_comboBox->setCurrentIndex(m_comboBox->findData(QVariant::fromValue(m_field->value())));
     }

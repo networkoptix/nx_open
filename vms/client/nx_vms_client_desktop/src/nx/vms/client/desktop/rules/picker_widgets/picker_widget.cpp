@@ -23,4 +23,8 @@ ParamsWidget* PickerWidget::parentParamsWidget() const
     return dynamic_cast<ParamsWidget*>(parent());
 }
 
+void PickerWidget::setValidity(const vms::rules::ValidationResult& /*validationResult*/)
+{
+}
+
 } // namespace nx::vms::client::desktop::rules

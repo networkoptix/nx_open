@@ -16,8 +16,11 @@ public:
         vms::rules::TextWithFields* field, SystemContext* context, ParamsWidget* parent);
     virtual ~TextWithFieldsPicker() override;
 
-    void setValidity(const vms::rules::ValidationResult& validationResult) override;
     void updateUi() override;
+
+protected:
+    void setValidity(const vms::rules::ValidationResult& validationResult) override;
+
 private:
     struct Private;
     nx::utils::ImplPtr<Private> d;

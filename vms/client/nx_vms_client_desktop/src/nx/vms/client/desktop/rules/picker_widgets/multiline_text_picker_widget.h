@@ -51,6 +51,8 @@ protected:
 
     virtual void updateUi() override
     {
+        PlainFieldPickerWidget<F>::updateUi();
+
         if (m_textEdit->toPlainText() == m_field->text())
             return;
 

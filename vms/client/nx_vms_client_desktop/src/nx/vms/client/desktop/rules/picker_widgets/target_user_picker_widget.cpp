@@ -20,7 +20,8 @@
 #include <nx/vms/rules/utils/type.h>
 #include <utils/email/email.h>
 
-#include "../utils/user_picker_helper.h"
+#include "../utils/icons.h"
+#include "../utils/strings.h"
 
 namespace nx::vms::client::desktop::rules {
 
@@ -88,35 +89,21 @@ void TargetUserPicker::onSelectButtonClicked()
 
 void TargetUserPicker::updateUi()
 {
-    UserPickerHelperParameters helperParameters;
+    ResourcePickerWidgetBase<vms::rules::TargetUserField>::updateUi();
 
+    int additionalCount{0};
     if (const auto additionalRecipients =
         getActionField<vms::rules::ActionTextField>(vms::rules::utils::kEmailsFieldName))
     {
         if (!additionalRecipients->value().isEmpty())
         {
             const auto emails = additionalRecipients->value().split(';', Qt::SkipEmptyParts);
-            helperParameters.additionalUsers = emails.size();
-            helperParameters.additionalValidUsers = std::count_if(
-                emails.cbegin(),
-                emails.cend(),
-                [](const QString& s) { return email::isValidAddress(s); });
+            additionalCount = static_cast<int>(emails.size());
         }
     }
 
-    UserPickerHelper helper{
-        systemContext(),
-        m_field->acceptAll(),
-        m_field->ids(),
-        m_policy.get(),
-        /*isIntermediateStateValid*/ false,
-        helperParameters};
-
-    m_selectButton->setText(helper.text());
-    m_selectButton->setIcon(helper.icon());
-
-    if (auto validator = fieldValidator())
-        setValidity(validator->validity(m_field, parentParamsWidget()->rule(), systemContext()));
+    m_selectButton->setText(Strings::selectButtonText(systemContext(), m_field, additionalCount));
+    m_selectButton->setIcon(selectButtonIcon(systemContext(), m_field, additionalCount));
 }
 
 } // namespace nx::vms::client::desktop::rules

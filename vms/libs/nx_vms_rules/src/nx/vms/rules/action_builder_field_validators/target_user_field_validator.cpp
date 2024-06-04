@@ -16,7 +16,6 @@
 #include "../rule.h"
 #include "../strings.h"
 #include "../utils/field.h"
-#include "../utils/resource.h"
 
 namespace nx::vms::rules {
 
@@ -30,7 +29,7 @@ ValidationResult getValidity(
         return {};
 
     return {
-        validity,
+        QValidator::State::Intermediate,
         policy.calculateAlert(acceptAll, subjects)
     };
 }

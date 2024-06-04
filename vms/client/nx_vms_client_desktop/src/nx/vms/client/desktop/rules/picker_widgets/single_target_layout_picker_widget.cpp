@@ -13,6 +13,9 @@
 #include <nx/vms/rules/utils/field.h>
 #include <ui/workbench/workbench_context.h>
 
+#include "../utils/icons.h"
+#include "../utils/strings.h"
+
 namespace nx::vms::client::desktop::rules {
 
 SingleTargetLayoutPicker::SingleTargetLayoutPicker(
@@ -26,28 +29,10 @@ SingleTargetLayoutPicker::SingleTargetLayoutPicker(
 
 void SingleTargetLayoutPicker::updateUi()
 {
-    if (const auto layout = resourcePool()->getResourceById<QnLayoutResource>(m_field->value()))
-    {
-        m_selectButton->setText(layout->getName());
-        m_selectButton->setForegroundRole(QPalette::BrightText);
+    ResourcePickerWidgetBase<vms::rules::LayoutField>::updateUi();
 
-        QnResourceIconCache::Key iconKey = QnResourceIconCache::Layout;
-        if (layout->isShared())
-            iconKey = QnResourceIconCache::SharedLayout;
-        else if (layout->locked())
-            iconKey = QnResourceIconCache::Layout | QnResourceIconCache::Locked;
-
-        m_selectButton->setIcon(
-            core::Skin::maximumSizePixmap(qnResIconCache->icon(iconKey), QnIcon::Selected));
-    }
-    else
-    {
-        m_selectButton->setText(tr("Select layout..."));
-        m_selectButton->setIcon(core::Skin::maximumSizePixmap(
-            qnResIconCache->icon(QnResourceIconCache::Layouts), QnIcon::Selected));
-        m_selectButton->setForegroundRole(QPalette::ButtonText);
-        resetStyle(m_selectButton);
-    }
+    m_selectButton->setText(Strings::selectButtonText(systemContext(), m_field));
+    m_selectButton->setIcon(selectButtonIcon(systemContext(), m_field));
 }
 
 void SingleTargetLayoutPicker::onSelectButtonClicked()

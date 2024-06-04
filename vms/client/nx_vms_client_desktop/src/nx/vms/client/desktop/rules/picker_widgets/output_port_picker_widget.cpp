@@ -8,7 +8,7 @@
 #include <nx/vms/rules/action_builder_fields/target_device_field.h>
 #include <nx/vms/rules/utils/field.h>
 
-#include "picker_widget_strings.h"
+#include "../utils/strings.h"
 
 namespace nx::vms::client::desktop::rules {
 
@@ -57,8 +57,7 @@ void OutputPortPicker::updateUi()
 
     const QSignalBlocker blocker{m_comboBox};
     m_comboBox->clear();
-    m_comboBox->addItem(
-        QString{"<%1>"}.arg(DropdownTextPickerWidgetStrings::automaticValue()), QString{});
+    m_comboBox->addItem(Strings::autoValue(), QString{});
     for (const auto& relayOutput: outputPorts)
         m_comboBox->addItem(relayOutput.getName(), relayOutput.id);
 
