@@ -27,7 +27,7 @@ ResourceItemDelegate
 
             checkable: true
         },
-c
+
         TitleBarButton
         {
             id: infoButton
