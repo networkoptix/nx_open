@@ -33,8 +33,8 @@ TEST(Permissions, BackwardCompatibility)
         {Old::customUser | Old::viewBookmarks, {{resourceId}}, false, {}},
         {Old::customUser | Old::manageBookmarks | Old::accessAllMedia, {}, false, {}},
         {Old::customUser | Old::manageBookmarks, {{resourceId}}, false, {}},
-        {Old::customUser | Old::userInput | Old::accessAllMedia, {}, false, {GlobalPermission::generateEvents}},
-        {Old::customUser | Old::userInput, {{resourceId}}, false, {GlobalPermission::generateEvents}},
+        {Old::customUser | Old::userInput | Old::accessAllMedia, {}, false, {}},
+        {Old::customUser | Old::userInput, {{resourceId}}, false, {}},
         {Old::customUser | Old::controlVideowall, {}, false, {}},
         {Old::accessAllMedia, {}, false, {}},
     };
@@ -63,7 +63,7 @@ TEST(Permissions, CasesNotPreservingBackwardCompatibility)
         {Old::exportArchive, {}, false, {}},
         {Old::viewBookmarks, {}, false, {}},
         {Old::manageBookmarks, {}, false, {}},
-        {Old::userInput, {}, false, {GlobalPermission::generateEvents}},
+        {Old::userInput, {}, false, {}},
     };
     for (const auto& origin: deprecatedPermissions)
     {
@@ -78,8 +78,6 @@ TEST(Permissions, CasesNotPreservingBackwardCompatibility)
             convertedBack.permissions, convertedBack.accessibleResources, convertedBack.isOwner) =
             extractFromResourceAccessRights(permissions, &groups, resourceAccessRights);
         PermissionsV1 expectedPermissions{Old::customUser};
-        if (origin.newPermissions.testFlag(GlobalPermission::generateEvents))
-            expectedPermissions.permissions |= Old::userInput;
         ASSERT_EQ(nx::reflect::json::serialize(expectedPermissions), nx::reflect::json::serialize(convertedBack));
     }
 }
