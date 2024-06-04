@@ -765,7 +765,7 @@ void NotificationListModel::Private::setupAcknowledgeAction(EventData& eventData
 
     eventData.extraAction = CommandActionPtr(new CommandAction());
 
-    eventData.extraAction->setIconPath("20x20/Solid/bookmark.svg");
+    eventData.extraAction->setIconPath("20x20/Solid/bookmark.svg?primary=light4");
     eventData.extraAction->setText(tr("Acknowledge"));
 
     // TODO: #sivanov Fix hardcoded action parameters.
@@ -810,7 +810,7 @@ void NotificationListModel::Private::setupAcknowledgeAction(
     eventData.level = QnNotificationLevel::Value::CriticalNotification;
 
     eventData.extraAction = CommandActionPtr::create();
-    eventData.extraAction->setIconPath("20x20/Solid/bookmark.svg");
+    eventData.extraAction->setIconPath("20x20/Solid/bookmark.svg?primary=light4");
     eventData.extraAction->setText(tr("Acknowledge"));
 
     const auto actionHandler =
