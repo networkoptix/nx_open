@@ -964,7 +964,7 @@ void MessageBus::sendTransactionImpl(
                 return;
             }
         }
-        else if (transportHeader.userIds.empty())
+        else
         {
             if (!context->isRemotePeerSubscribedTo(tran.peerID))
             {
