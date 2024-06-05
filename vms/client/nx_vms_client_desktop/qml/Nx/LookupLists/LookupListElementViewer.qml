@@ -58,7 +58,7 @@ Control
                 radius: 1
                 anchors.verticalCenter: parent.verticalCenter
                 border.color: ColorTheme.transparent(ColorTheme.colors.light1, 0.1)
-                color: Utils.getValue(value, "transparent")
+                color: CoreUtils.getValue(value, "transparent")
             }
         }
     }
