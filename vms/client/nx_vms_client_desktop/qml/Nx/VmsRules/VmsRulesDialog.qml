@@ -43,6 +43,8 @@ Dialog
 
     acceptShortcutEnabled: !tableView.selectionModel.hasSelection
 
+    onVisibleChanged: tableView.checkedRows = []
+
     Control
     {
         id: header

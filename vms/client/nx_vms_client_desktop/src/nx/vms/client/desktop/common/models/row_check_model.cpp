@@ -35,6 +35,22 @@ QList<int> RowCheckModel::checkedRows() const
     return result;
 }
 
+void RowCheckModel::setCheckedRows(const QList<int>& rows)
+{
+    m_checkedRows.clear();
+
+    for (int row: rows)
+    {
+        if (NX_ASSERT(hasIndex(row, /*column*/ 0)))
+            m_checkedRows.insert(QPersistentModelIndex(sourceModel()->index(row, /*column*/ 0)));
+    }
+
+    emit dataChanged(
+        index(/*row*/ 0, /*column*/ 0), index(rowCount() - 1, /*column*/ 0), {Qt::CheckStateRole});
+
+    emit checkedRowsChanged();
+}
+
 void RowCheckModel::setSourceModel(QAbstractItemModel* sourceModel)
 {
     beginResetModel();

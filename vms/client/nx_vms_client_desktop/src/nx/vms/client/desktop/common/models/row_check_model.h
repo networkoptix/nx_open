@@ -16,13 +16,15 @@ class NX_VMS_CLIENT_DESKTOP_API RowCheckModel: public QAbstractProxyModel
     Q_OBJECT
     using base_type = QAbstractProxyModel;
 
-    Q_PROPERTY(QList<int> checkedRows READ checkedRows NOTIFY checkedRowsChanged)
+    Q_PROPERTY(QList<int> checkedRows
+        READ checkedRows WRITE setCheckedRows NOTIFY checkedRowsChanged)
 
 public:
     explicit RowCheckModel(QObject* parent = nullptr);
     virtual ~RowCheckModel() override;
 
     QList<int> checkedRows() const;
+    void setCheckedRows(const QList<int>& rows);
 
     virtual void setSourceModel(QAbstractItemModel* sourceModel) override;
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
