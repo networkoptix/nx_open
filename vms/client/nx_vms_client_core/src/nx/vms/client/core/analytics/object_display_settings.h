@@ -7,12 +7,15 @@
 
 #include <analytics/common/object_metadata.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/client/core/settings/types/detected_object.h>
 
 namespace nx::vms::client::core {
 
 class NX_VMS_CLIENT_CORE_API ObjectDisplaySettings
 {
 public:
+    ObjectDisplaySettings();
+
     QColor objectColor(const QString& objectTypeId);
     QColor objectColor(const nx::common::metadata::ObjectMetadata& object);
 
@@ -23,7 +26,10 @@ protected:
     /**
      * Palette used for nx.sys.color attribute value; defined in [attributes.md](attributes.md).
      */
-    static const std::map</*name*/ std::string, /*hexRgb*/ std::string> kBoundingBoxPalette;
+    static const std::map</*name*/ QString, /*hexRgb*/ QString> kBoundingBoxPalette;
+
+private:
+    DetectedObjectSettingsMap m_settingsMap;
 };
 
 } // namespace nx::vms::client::core
