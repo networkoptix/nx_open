@@ -209,7 +209,10 @@ Column
                     }
                     else
                     {
-                        result[item.attribute.name] = item.selectedValue
+                        result[item.attribute.name] =
+                            (item.attribute.type === Analytics.Attribute.Type.enumeration)
+                                ? `^"${item.selectedValue}"\$`
+                                : item.selectedValue
                     }
 
                     return result

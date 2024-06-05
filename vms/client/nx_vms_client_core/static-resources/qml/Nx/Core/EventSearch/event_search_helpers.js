@@ -32,7 +32,7 @@ function attributeValuesFromFilters(stringList)
     //         -FOLLOWED BY-
     //    any number of whitespaces
 
-    const regex = /\s*("[^!=:"]+"|[^"!=:\s]+)\s*(!*=|:)\s*("[^"]+"|\S+)\s*$/
+    const regex = /\s*("[^!=:"]+"|[^"!=:\s]+)\s*(!?=|:)\s*\^?("[^"]+"|\S+)\$?\s*$/
     let attributeTree = {}
 
     for (let i = 0; i < stringList.length; ++i)
@@ -88,6 +88,9 @@ function attributeFiltersFromValues(values, parentName)
 {
     function quoteIfNeeded(text, quoteNumbers)
     {
+        if (text.startsWith("^") && text.endsWith("$"))
+            return text
+
         if (text.search(/\s/) >= 0)
             return `"${text}"`
 
