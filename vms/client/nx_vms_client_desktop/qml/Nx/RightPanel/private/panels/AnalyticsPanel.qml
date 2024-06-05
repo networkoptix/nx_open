@@ -29,7 +29,7 @@ SearchPanel
 
     placeholder
     {
-        icon: "image://skin/64x64/Outline/noobjects.svg"
+        icon: "image://skin/64x64/Outline/noobjects.svg?primary=dark17"
         title: qsTr("No objects")
         description: qsTr("Try changing the filters or configure object detection "
             + "in the camera plugin settings")
