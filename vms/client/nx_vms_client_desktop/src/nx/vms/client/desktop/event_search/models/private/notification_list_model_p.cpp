@@ -928,6 +928,7 @@ QString NotificationListModel::Private::iconPath(const vms::event::AbstractActio
     switch (params.eventType)
     {
         case EventType::cameraInputEvent:
+            return eventIconPath(nx::vms::rules::Icon::inputSignal);
         case EventType::cameraIpConflictEvent:
             return eventIconPath(nx::vms::rules::Icon::resource);
         case EventType::analyticsSdkEvent:
@@ -947,7 +948,7 @@ QString NotificationListModel::Private::iconPath(const vms::event::AbstractActio
                 action->getRuntimeParams().description);
 
         case EventType::cameraMotionEvent:
-            return eventIconPath(nx::vms::rules::Icon::resource);
+            return eventIconPath(nx::vms::rules::Icon::motion);
 
         case EventType::storageFailureEvent:
             return eventIconPath(nx::vms::rules::Icon::storage);
