@@ -712,6 +712,12 @@ const nx::utils::Url ChannelPartnerServer::reportUrl(const common::SystemSetting
     return baseUrl(settings) + NX_FMT("/cloud_systems/%1/system_usage_report/", systemId);
 }
 
+const nx::utils::Url ChannelPartnerServer::quantityReportUrl(const common::SystemSettings* settings)
+{
+    const auto systemId = settings->cloudSystemId();
+    return baseUrl(settings) + NX_FMT("/cloud_systems/%1/system_current_usage/", systemId);
+}
+
 const nx::utils::Url ChannelPartnerServer::saasServicesUrl(const common::SystemSettings* settings)
 {
     const auto systemId = settings->cloudSystemId();
