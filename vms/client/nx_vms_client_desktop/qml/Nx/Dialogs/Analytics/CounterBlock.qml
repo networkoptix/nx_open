@@ -5,8 +5,6 @@ import QtQuick.Controls
 
 import Nx.Core
 
-import "metrics.js" as Metrics
-
 Rectangle
 {
     id: control
@@ -16,10 +14,10 @@ Rectangle
 
     signal commitNewItemsRequested()
 
-    implicitHeight: displayedItemsText ? Metrics.kCounterBlockHeight : 0
-    implicitWidth: Math.max(
-        displayedItemsLabel.implicitWidth, availableItemsButton.implicitWidth, 70)
-    visible: !!displayedItemsText
+    implicitWidth:
+        Math.max(displayedItemsLabel.implicitWidth, availableItemsButton.implicitWidth, 70)
+    implicitHeight:
+        Math.max(availableItemsButton.implicitHeight, displayedItemsLabel.implicitHeight)
 
     readonly property bool hasAvailableItems: !!control.availableItemsText
 
@@ -75,7 +73,6 @@ Rectangle
             elide: Text.ElideRight
         }
 
-        onClicked:
-            control.commitNewItemsRequested()
+        onClicked: control.commitNewItemsRequested()
     }
 }

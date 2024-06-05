@@ -14,7 +14,7 @@ const kDefaultFilterColumnWidth = 200
 const kMinimumFilterColumnWidth = 188
 const kMaximumFilterColumnWidth = 480
 
-const kCounterBlockHeight = 48
+const kTopBarHeight = 56
 
 const kDefaultDialogWidth = 1170
 const kDefaultDialogHeight = 712
