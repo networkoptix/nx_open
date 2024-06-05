@@ -18,19 +18,24 @@ namespace nx::vms::client::core {
 // Cached data stored for each cloud system. Used to speedup connection process.
 struct NX_VMS_CLIENT_CORE_API RemoteConnectionContextData
 {
+    using Purpose = nx::vms::common::ServerCompatibilityValidator::Purpose;
+
     std::vector<nx::vms::api::ServerInformationV1> serversInfo;
     nx::Uuid expectedServerId;
+    Purpose purpose = Purpose::connect;
     std::string username;
+    nx::vms::api::UserType userType = nx::vms::api::UserType::local;
     std::string bearerTokenValue;
     std::chrono::microseconds sessionTokenExpirationTime{};
 };
-NX_REFLECTION_INSTRUMENT(RemoteConnectionContextData, (serversInfo)(expectedServerId)(username)(bearerTokenValue)(sessionTokenExpirationTime));
+NX_REFLECTION_INSTRUMENT(RemoteConnectionContextData, (serversInfo)(expectedServerId)(purpose)(username)(userType)(bearerTokenValue)(sessionTokenExpirationTime));
 
 namespace {
 
 void saveCacheInfo(
     RemoteConnectionPtr connection,
-    const std::vector<nx::vms::api::ServerInformationV1>& servers)
+    const std::vector<nx::vms::api::ServerInformationV1>& servers,
+    nx::vms::common::ServerCompatibilityValidator::Purpose purpose)
 {
     const auto cloudId = connection->moduleInformation().cloudSystemId;
 
@@ -52,7 +57,9 @@ void saveCacheInfo(
     connection->updateModuleInformation(serverIt->getModuleInformation());
     customData.expectedServerId = serverIt->id;
     customData.serversInfo = servers;
+    customData.purpose = purpose;
     customData.username = connection->credentials().username;
+    customData.userType = connection->userType();
     customData.bearerTokenValue = connection->credentials().authToken.value;
 
     if (connection->sessionTokenExpirationTime())
@@ -64,10 +71,12 @@ void saveCacheInfo(
 }
 
 // Request servers info and save it to the cache.
-void requestCacheInfoUpdate(RemoteConnectionPtr connection)
+void requestCacheInfoUpdate(
+    RemoteConnectionPtr connection,
+    nx::vms::common::ServerCompatibilityValidator::Purpose purpose)
 {
     connection->serverApi()->getServersInfo(
-        [connection](
+        [connection, purpose=purpose](
             bool success,
             rest::Handle /*handle*/,
             const rest::ErrorOrData<std::vector<nx::vms::api::ServerInformationV1>>& response)
@@ -79,7 +88,7 @@ void requestCacheInfoUpdate(RemoteConnectionPtr connection)
             if (!servers)
                 return;
 
-            saveCacheInfo(connection, *servers);
+            saveCacheInfo(connection, *servers, purpose);
         },
         nx::vms::client::core::appContext()->thread());
 }
@@ -96,6 +105,22 @@ bool RemoteConnectionFactoryCache::fillContext(
     if (!nx::reflect::json::deserialize(context->logonData.authCacheData, &customData))
     {
         NX_DEBUG(NX_SCOPE_TAG, "Failed to deserialize connection cache.");
+        return false;
+    }
+
+    if (customData.purpose != context->logonData.purpose)
+        return false;
+
+    if (const auto& username = context->logonData.credentials.username;
+        !username.empty() && username != customData.username)
+    {
+        NX_DEBUG(NX_SCOPE_TAG, "Cached user name mismatch.");
+        return false;
+    }
+
+    if (customData.userType != context->logonData.userType)
+    {
+        NX_DEBUG(NX_SCOPE_TAG, "Cached user type mismatch.");
         return false;
     }
 
@@ -189,6 +214,12 @@ void RemoteConnectionFactoryCache::startWatchingConnection(
 {
     using namespace std::chrono;
 
+    using Purpose = nx::vms::common::ServerCompatibilityValidator::Purpose;
+
+    // For now we only allow caching data when Purpose::connect is used.
+    if (context->logonData.purpose != Purpose::connect)
+        return;
+
     static constexpr auto kCacheUpdateInterval = 1min;
 
     // Setup cache update timer.
@@ -196,13 +227,14 @@ void RemoteConnectionFactoryCache::startWatchingConnection(
     updateTimer->setInterval(kCacheUpdateInterval);
 
     auto updateFunc =
-        [remoteConnection = std::weak_ptr<RemoteConnection>(connection)]()
+        [remoteConnection = std::weak_ptr<RemoteConnection>(connection),
+            purpose=context->logonData.purpose]()
         {
             auto connection = remoteConnection.lock();;
             if (!connection)
                 return;
 
-            requestCacheInfoUpdate(connection);
+            requestCacheInfoUpdate(connection, purpose);
         };
 
     QObject::connect(updateTimer.get(), &QTimer::timeout, updateFunc);
@@ -221,7 +253,7 @@ void RemoteConnectionFactoryCache::startWatchingConnection(
     if (usedFastConnect)
         updateFunc();
     else
-        saveCacheInfo(connection, context->serversInfo);
+        saveCacheInfo(connection, context->serversInfo, context->logonData.purpose);
 }
 
 } // namespace nx::vms::client::core
