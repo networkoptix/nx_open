@@ -213,7 +213,9 @@ struct Track
 
 QString objectDescription(const core::analytics::AttributeList& attributes)
 {
+    static constexpr qsizetype kExpectedNameAndValueLength = 30;
     QString result;
+    result.reserve(attributes.size() * kExpectedNameAndValueLength);
 
     for (const auto& group: attributes)
     {
@@ -334,9 +336,8 @@ ObjectInfo& WidgetAnalyticsController::Private::addOrUpdateObject(
     const QString title = objectType ? objectType->name() : QString();
 
     const auto visibleAttributes = settings->visibleAttributes(objectMetadata);
-    const Attributes sortedAttributes(visibleAttributes.cbegin(), visibleAttributes.cend());
     const QString description = objectDescription(systemContext()->analyticsAttributeHelper()->
-        preprocessAttributes(objectMetadata.typeId, sortedAttributes));
+        preprocessAttributes(objectMetadata.typeId, visibleAttributes));
 
     objectInfo.description = title;
     if (!title.isEmpty() && !description.isEmpty())
