@@ -150,6 +150,10 @@ struct VmsEventSearchListModel::Private
 VmsEventSearchListModel::Private::Private(VmsEventSearchListModel* q):
     q(q)
 {
+    static constexpr auto kLiveUpdateInterval = 15s;
+
+    liveUpdateTimer.callOnTimeout([this]{ fetchLive(); });
+    liveUpdateTimer.start(kLiveUpdateInterval);
 }
 
 void VmsEventSearchListModel::Private::fetchLive()
@@ -261,11 +265,17 @@ rest::Handle VmsEventSearchListModel::Private::getEvents(
     return api->eventLog(filter, std::move(internalCallback), q->thread());
 }
 
-bool VmsEventSearchListModel::Private::requestFetch(const core::FetchRequest& request,
+bool VmsEventSearchListModel::Private::requestFetch(
+    const core::FetchRequest& request,
     const FetchCompletionHandler& completionHandler,
     MultiRequestIdHolder::Mode requestMode)
 {
-    if (multiRequestIdHolder.value(requestMode))
+    const bool inProgress = multiRequestIdHolder.value(requestMode);
+
+    NX_VERBOSE(this, "Fetch request, dir: %1, center: %2, mode: %3, in progress: %4",
+        request.direction, request.centralPointUs, requestMode, inProgress);
+
+    if (inProgress)
         return false;
 
     const auto safeCompletionHandler =
@@ -286,7 +296,7 @@ bool VmsEventSearchListModel::Private::requestFetch(const core::FetchRequest& re
         if (requestMode == MultiRequestIdHolder::Mode::dynamic && !q->isLive())
             return;
 
-               // Ignore events later than current system time.
+        // Ignore events later than current system time.
         core::truncateRawData<Facade>(data, request.direction, qnSyncTime->value());
 
         const auto applyFetchedData =
@@ -301,7 +311,8 @@ bool VmsEventSearchListModel::Private::requestFetch(const core::FetchRequest& re
         if (!success)
         {
             applyFetchedData({}, QnTimePeriod{});
-            safeCompletionHandler(core::EventSearch::FetchResult::failed,
+            safeCompletionHandler(
+                core::EventSearch::FetchResult::failed,
                 core::FetchedDataRanges{},
                 QnTimePeriod{});
             return;

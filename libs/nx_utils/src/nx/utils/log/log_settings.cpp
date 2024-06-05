@@ -5,12 +5,12 @@
 #include <QtCore/QSettings>
 
 #include <nx/utils/deprecated_settings.h>
-#include <nx/utils/string.h>
 #include <nx/utils/std/filesystem.h>
+#include <nx/utils/string.h>
 #include <nx/utils/time.h>
 
-#include "format.h"
 #include "assert.h"
+#include "format.h"
 
 namespace nx::log {
 
@@ -138,6 +138,9 @@ Settings::Settings(QSettings* settings)
             }
 
             const Level level = levelFromString(levelKey);
+            if (level == Level::undefined)
+                continue;
+
             const QVariant& value = settings->value(levelKey);
 
             switch (value.typeId())
