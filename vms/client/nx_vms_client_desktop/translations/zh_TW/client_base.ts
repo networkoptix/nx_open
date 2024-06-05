@@ -6597,7 +6597,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%n existing LDAP groups are not found in the LDAP database.</source>
       <translation>
-        <numerusform>有%n 個現有 LDAP 群組在 LDAP 資料庫中找不到。</numerusform>
+        <numerusform>在 LDAP 資料庫中找不到%n 個現有 LDAP 群組。</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -6622,7 +6622,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Some groups have each other as both their parent and child members, or are part of such a circular reference chain. This can lead to incorrect calculations of permissions.</source>
-      <translation type="unfinished">Some groups have each other as both their parent and child members, or are part of such a circular reference chain. This can lead to incorrect calculations of permissions.</translation>
+      <translation>此群組有另一個群組同時為其父群組和子群組，或為這種循環繼承鏈的一部分。這可能會造成權限計算錯誤。</translation>
     </message>
   </context>
   <context>
@@ -6680,7 +6680,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%n existing LDAP users are not found in the LDAP database</source>
       <translation>
-        <numerusform>有%n 個現有 LDAP 使用者在 LDAP 資料庫中找不到。</numerusform>
+        <numerusform>在 LDAP 資料庫中找不到 %n 位現有 LDAP 使用者。</numerusform>
       </translation>
     </message>
   </context>
@@ -8966,8 +8966,8 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%1 and %n more groups</source>
       <comment>%1 will be substituted with a user group name</comment>
-      <translation type="unfinished">
-        <numerusform>%1 and %n more groups</numerusform>
+      <translation>
+        <numerusform>%1 和其他 %n 個群組</numerusform>
       </translation>
     </message>
     <message>
@@ -9198,7 +9198,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::LdapSettingsWidget</name>
     <message>
       <source>Disconnect LDAP server?</source>
-      <translation>結束LDAP伺服器的連線?</translation>
+      <translation>中斷LDAP伺服器連線?</translation>
     </message>
     <message>
       <source>All LDAP users and groups will be deleted from the system.&lt;br&gt;&lt;br&gt;LDAP settings will be also deleted.</source>
@@ -9222,7 +9222,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Connection failed</source>
-      <translation>連接失敗</translation>
+      <translation>連線失敗</translation>
     </message>
     <message>
       <source>Remove existing LDAP users and groups?</source>
@@ -9230,7 +9230,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Looks like you have changed LDAP server. It is recommended to remove all existing LDAP users and groups before importing users and groups from a new LDAP server.</source>
-      <translation>您似乎已更改 LDAP 伺服器。建議在從新 LDAP 伺服器匯入使用者和群組之前，先刪除所有現有的 LDAP 使用者和群組。</translation>
+      <translation>您似乎已更改 LDAP 伺服器。建議在從新 LDAP 伺服器匯入使用者和群組之前，先刪除全部現有的 LDAP 使用者和群組。</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -10066,19 +10066,19 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>You cannot modify a user with a non-unique login</source>
-      <translation type="unfinished">You cannot modify a user with a non-unique login</translation>
+      <translation>您無法修改登入名稱重複的使用者</translation>
     </message>
     <message>
       <source>You may not have permissions to modify certain members of this group, or it includes users with duplicate logins</source>
-      <translation type="unfinished">You may not have permissions to modify certain members of this group, or it includes users with duplicate logins</translation>
+      <translation>該群組可能有某些成員您無權修改，或該群組包含重複登入名稱的使用者</translation>
     </message>
     <message>
       <source>You do not have permissions to modify this group</source>
-      <translation type="unfinished">You do not have permissions to modify this group</translation>
+      <translation>您無權修改此群組</translation>
     </message>
     <message>
       <source>LDAP Default group cannot be deleted as long as the system is connected to LDAP server</source>
-      <translation type="unfinished">LDAP Default group cannot be deleted as long as the system is connected to LDAP server</translation>
+      <translation>只要系統連接到 LDAP 伺服器，就無法刪除LDAP 預設群組</translation>
     </message>
   </context>
   <context>
@@ -10649,8 +10649,8 @@ You can force it, but it may significantly increase CPU load.</source>
     <message numerus="yes">
       <source>%1 and %n more groups</source>
       <comment>%1 will be substituted with a user group name</comment>
-      <translation type="unfinished">
-        <numerusform>%1 and %n more groups</numerusform>
+      <translation>
+        <numerusform>%1 和其他 %n 個群組</numerusform>
       </translation>
     </message>
   </context>
@@ -11058,7 +11058,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Contact a user with Administrators permissions to resolve this issue.</source>
-      <translation type="unfinished">Contact a user with Administrators permissions to resolve this issue.</translation>
+      <translation>請聯絡有管理員權限的使用者來解決此問題。</translation>
     </message>
     <message>
       <source>Not Part Of Certificate</source>
@@ -11641,15 +11641,15 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Group is not found in the LDAP database.</source>
-      <translation type="unfinished">Group is not found in the LDAP database.</translation>
+      <translation>在 LDAP 資料庫中找不到群組。</translation>
     </message>
     <message>
       <source>There are multiple groups with this name in the system. To maintain a clear and organized structure, we suggest providing unique names for each group.</source>
-      <translation type="unfinished">There are multiple groups with this name in the system. To maintain a clear and organized structure, we suggest providing unique names for each group.</translation>
+      <translation>系統中有多個群組使用此名稱。我們建議爲每個群組設定獨特的名稱，來保持清楚且有組織的架構。</translation>
     </message>
     <message>
       <source>Group has another group as both its parent, and as a child member, or is a part of such circular reference chain. This can lead to an incorrect calculation of permissions.</source>
-      <translation type="unfinished">Group has another group as both its parent, and as a child member, or is a part of such circular reference chain. This can lead to an incorrect calculation of permissions.</translation>
+      <translation>此群組有另一個群組同時為其父群組和子群組，或為這種循環繼承鏈的一部分。這可能會造成權限計算錯誤。</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -11684,7 +11684,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Connection failure</source>
-      <translation type="unfinished">Connection failure</translation>
+      <translation>連線失敗</translation>
     </message>
     <message>
       <source>Invalid encoding</source>

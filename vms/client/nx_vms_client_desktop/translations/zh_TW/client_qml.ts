@@ -40,11 +40,11 @@
     </message>
     <message>
       <source>To enable digest authentication for LDAP users that are already added to the VMS database, you need to enable it directly in these users&apos; settings.</source>
-      <translation>若要為已新增至 VMS 資料庫的 LDAP 使用者啟用digest認證，您需要直接在這些使用者&apos; 設定中啟用它。</translation>
+      <translation>若要為已新增至 VMS 資料庫的 LDAP 使用者啟用digest認證，您需要直接在這些使用者的設定中啟用。</translation>
     </message>
     <message>
       <source>To disable digest authentication for LDAP users that are already added to the VMS database, you need to disable it directly in these users&apos; settings.</source>
-      <translation>若要為已新增至 VMS 資料庫的 LDAP 使用者啟用digest認證，您需要直接在這些使用者&apos; 設定中啟用它。</translation>
+      <translation>若要為已新增至 VMS 資料庫的 LDAP 使用者啟用digest認證，您需要直接在這些使用者的設定中啟用。</translation>
     </message>
     <message>
       <source>Allow insecure (digest) authentication for imported users</source>
@@ -538,7 +538,7 @@
     </message>
     <message>
       <source>To allow LDAP users to log in to %1, it is necessary to establish a connection between %1 and a corporate LDAP server.</source>
-      <translation>若要允許 LDAP 使用者登入 %1，需要建立 %1 和企業 LDAP 伺服器之間的連線。</translation>
+      <translation>若要允許 LDAP 使用者登入 %1，必須建立 %1 和企業 LDAP 伺服器之間的連線。</translation>
     </message>
   </context>
   <context>
@@ -705,7 +705,7 @@
     </message>
     <message>
       <source>Base DN</source>
-      <translation>Base DN</translation>
+      <translation>Base DN (基礎識別名稱)</translation>
     </message>
     <message>
       <source>Base DN cannot be empty</source>
@@ -721,11 +721,11 @@
     </message>
     <message>
       <source>Filters help control access to the system and synchronization by specifying which users and/or groups from the Base DN are allowed.</source>
-      <translation>過濾器透過允許特定的 Base DN 使用者和/或群組，來幫助控制系統的存取權和同步。</translation>
+      <translation>透過篩選條件允許Base DN 中特定的使用者和/或群組存取系統和同步。</translation>
     </message>
     <message>
       <source>Edit Search Base</source>
-      <translation type="unfinished">Edit Search Base</translation>
+      <translation>編輯搜尋基礎 (Search Base)</translation>
     </message>
   </context>
   <context>
@@ -946,11 +946,11 @@
     </message>
     <message>
       <source>When continuous sync with LDAP server is disabled, groups do not synchronize automatically. To update this group, initiate a manual sync.</source>
-      <translation type="unfinished">When continuous sync with LDAP server is disabled, groups do not synchronize automatically. To update this group, initiate a manual sync.</translation>
+      <translation>停用連續同步 LDAP 伺服器時，群組不會自動同步。要更新此群組，請執行手動同步。</translation>
     </message>
     <message>
       <source>This group is not found in the LDAP database.</source>
-      <translation type="unfinished">This group is not found in the LDAP database.</translation>
+      <translation>在LDAP資料庫找不到此群組。</translation>
     </message>
   </context>
   <context>
@@ -1236,15 +1236,15 @@
     </message>
     <message>
       <source>Please use care when altering LDAP settings. Incorrect configuration could disrupt system availability for a large number of users simultaneously.</source>
-      <translation>更改 LDAP 設定時請小心，不正確的設定可能使大量使用者至系統的連線同時被中斷。</translation>
+      <translation>更改 LDAP 設定時請小心，不正確的設定可能同時中斷大量使用者至系統的連線。</translation>
     </message>
     <message>
       <source>Connect your System to an LDAP server for easier user management</source>
-      <translation>將您的系統連接到 LDAP 伺服器來更簡單的管理使用者</translation>
+      <translation>將您的系統連接到 LDAP 伺服器來簡化使用者管理</translation>
     </message>
     <message>
       <source>Not configured yet</source>
-      <translation>未設定</translation>
+      <translation>尚未設定</translation>
     </message>
     <message>
       <source>Configure</source>
@@ -2353,7 +2353,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Time is unavailable due to DST changes</source>
-      <translation type="unfinished">Time is unavailable due to DST changes</translation>
+      <translation>由於日光節約時間更改，目前無法取得時間</translation>
     </message>
   </context>
   <context>
@@ -2460,7 +2460,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>The added system will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</source>
-      <translation type="unfinished">The added system will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</translation>
+      <translation>已擁有Cloud帳號的使用者將很快能看到新增的系統，而沒有Cloud帳號的使用者將透過電子郵件收到操作指示。</translation>
     </message>
   </context>
   <context>
@@ -2542,7 +2542,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>This user is not found in LDAP database and is not able to log in.</source>
-      <translation>在 LDAP 資料庫中找不到該使用者，因此無法登入。</translation>
+      <translation>該使用者在 LDAP 資料庫中找不到，因此無法登入。</translation>
     </message>
     <message>
       <source>Permission Groups</source>
@@ -2592,7 +2592,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>When continuous sync with LDAP server is disabled, user membership in groups does not synchronize automatically. To update this information, initiate a manual sync.</source>
-      <translation>當與 LDAP 伺服器的連續同步停用時，群組中使用者的成員資格不會自動同步。要更新此資訊，請發起手動同步。</translation>
+      <translation>當停用與 LDAP 伺服器的持續同步時，群組中使用者的成員資格不會自動同步。要更新此資訊，請執行手動同步。</translation>
     </message>
     <message>
       <source>This user’s login duplicates the login of another user. None of them is able to log in. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</source>
