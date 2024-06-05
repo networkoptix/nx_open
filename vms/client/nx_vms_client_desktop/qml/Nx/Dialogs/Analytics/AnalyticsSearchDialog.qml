@@ -288,11 +288,11 @@ Window
 
             RowLayout
             {
-                height: 48
+                Layout.minimumHeight: Metrics.kTopBarHeight
                 Layout.leftMargin: 8
                 Layout.rightMargin: 8
-                Layout.fillHeight: false
-                spacing: 4
+                spacing: 8
+
                 visible: !eventModel.placeholderRequired
 
                 CounterBlock
@@ -300,10 +300,12 @@ Window
                     id: counterBlock
 
                     Layout.alignment: Qt.AlignVCenter
+
                     property int availableNewTracks: eventModel.analyticsSetup
                         ? eventModel.analyticsSetup.availableNewTracks : 0
 
                     displayedItemsText: eventModel.itemCountText
+                    visible: !!displayedItemsText
 
                     availableItemsText:
                     {
@@ -365,11 +367,16 @@ Window
                     id: tileViewButton
 
                     Layout.alignment: Qt.AlignVCenter
+                    padding: 6
+                    radius: 4
+
                     checkable: true
                     checked: true
 
-                    icon.source: "image://skin/20x20/Outline/card_view.svg"
-                    icon.color: checked ? ColorTheme.colors.light4 : ColorTheme.colors.light16
+                    icon.source: checked
+                        ? "image://skin/20x20/Outline/table_view.svg"
+                        : "image://skin/20x20/Outline/card_view.svg"
+                    borderColor: ColorTheme.button
                 }
             }
 

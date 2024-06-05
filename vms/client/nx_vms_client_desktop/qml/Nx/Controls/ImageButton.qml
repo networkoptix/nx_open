@@ -19,6 +19,7 @@ AbstractButton
     property color backgroundColor: down || checked
         ? ColorTheme.transparent(ColorTheme.colors.dark1, 0.1)
         : (hovered ? ColorTheme.transparent(ColorTheme.windowText, 0.1) : "transparent")
+    property color borderColor: "transparent"
 
     property real radius: 2
 
@@ -35,6 +36,7 @@ AbstractButton
     {
         radius: button.radius
         color: button.backgroundColor
+        border.color: borderColor
     }
 
     contentItem: ColoredImage
