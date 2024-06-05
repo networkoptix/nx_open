@@ -11,8 +11,12 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/math/math.h>
 #include <nx/vms/client/core/system_context.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/menu/action_parameters.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/common/lookup_lists/lookup_list_manager.h>
 
 namespace nx::vms::client::desktop {
@@ -86,30 +90,23 @@ QSharedPointer<QMenu> AnalyticsSearchListModel::contextMenu(
             addMenu->addSeparator();
             for (const auto& list: lists)
             {
+                if (list.objectTypeId != track.objectTypeId)
+                    continue; //< We can add object only to list with same objectTypeId.
+
                 addMenu->addAction<std::function<void()>>(list.name,
-                    nx::utils::guarded(this,
-                        [&]()
-                        {
-                            auto lookupList = listManager->lookupList(list.id);
+                    [this, track, id = list.id]()
+                    {
+                        api::LookupListEntry entry;
+                        for(const auto& attribute: track.attributes)
+                            entry[attribute.name] = attribute.value;
 
-                            std::map<QString, QString> val;
-                            for (const auto& attribute: track.attributes)
-                            {
-                                for (const auto& name: lookupList.attributeNames)
-                                {
-                                    if (attribute.name == name)
-                                    {
-                                        val[name] = attribute.value;
-                                        continue;
-                                    }
-                                }
-                            }
-                            if (val.empty())
-                                return;
-
-                            lookupList.entries.push_back(val);
-                            listManager->addOrUpdate(lookupList);
-                        }));
+                        menu::Parameters parameters;
+                        parameters.setArguments({
+                            {Qn::LookupListEntryRole, QVariant::fromValue(entry)},
+                            {Qn::ItemUuidRole, QVariant::fromValue(id)}});
+                        appContext()->mainWindowContext()->menu()->triggerForced(
+                            menu::AddEntryToLookupListAction, parameters);
+                    });
             }
         }
     }
@@ -120,31 +117,16 @@ QSharedPointer<QMenu> AnalyticsSearchListModel::contextMenu(
     return menu;
 }
 
-void AnalyticsSearchListModel::addCreateNewListAction(QMenu* menu,
-    const nx::analytics::db::ObjectTrack& track) const
+void AnalyticsSearchListModel::addCreateNewListAction(
+    QMenu* menu, const nx::analytics::db::ObjectTrack& track) const
 {
-    menu->addAction<std::function<void()>>(tr("Create New List by object"),
-        nx::utils::guarded(this,
-            [&]()
-            {
-                std::vector<QString> attributeNames;
-                std::vector<std::map<QString, QString>> entries;
-                std::map<QString, QString> val;
-
-                for (const auto& attribute: track.attributes)
-                {
-                    attributeNames.push_back(attribute.name);
-                    val[attribute.name] = attribute.value;
-                }
-                entries.push_back(val);
-
-                nx::vms::api::LookupListData list{
-                    .name = track.objectTypeId, //< TODO: #pprivalov Add check for name duplication.
-                    .objectTypeId = track.objectTypeId,
-                    .attributeNames = attributeNames,
-                    .entries = entries};
-                systemContext()->lookupListManager()->addOrUpdate(list);
-            }));
+    menu->addAction<std::function<void()>>(tr("Create New List..."),
+        [id = track.objectTypeId, this]()
+        {
+            appContext()->mainWindowContext()->menu()->triggerForced(
+                menu::OpenEditLookupListsDialogAction,
+                menu::Parameters().withArgument(Qn::AnalyticsObjectTypeIdRole, id));
+        });
 }
 
 } // namespace nx::vms::client::desktop
