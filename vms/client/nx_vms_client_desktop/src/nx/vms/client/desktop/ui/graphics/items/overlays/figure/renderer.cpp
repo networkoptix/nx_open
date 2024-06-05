@@ -120,10 +120,12 @@ void Renderer::Private::ensureLineVao(QnGLShaderProgram* shader)
     if (lineVaoInitialized)
         return;
 
-    lineVertices.create();
+    if (!lineVertices.isCreated())
+        lineVertices.create();
     lineVertices.bind();
 
-    lineBuffer.create();
+    if (!lineBuffer.isCreated())
+        lineBuffer.create();
     lineBuffer.setUsagePattern(QOpenGLBuffer::DynamicDraw);
     lineBuffer.bind();
 
@@ -147,10 +149,12 @@ void Renderer::Private::ensureTriangleVao(QnGLShaderProgram* shader)
     if (triangleVaoInitialized)
         return;
 
-    triangleVertices.create();
+    if (!triangleVertices.isCreated())
+        triangleVertices.create();
     triangleVertices.bind();
 
-    trianglePosBuffer.create();
+    if (!trianglePosBuffer.isCreated())
+        trianglePosBuffer.create();
     trianglePosBuffer.setUsagePattern(QOpenGLBuffer::StaticDraw);
     trianglePosBuffer.bind();
 
