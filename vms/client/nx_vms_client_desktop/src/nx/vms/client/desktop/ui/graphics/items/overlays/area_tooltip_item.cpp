@@ -6,6 +6,7 @@
 
 #include <QtGui/QPainter>
 #include <QtWidgets/QGraphicsWidget>
+#include <QtWidgets/QWidget>
 
 #include <ui/workaround/sharp_pixmap_painting.h>
 #include <utils/common/scoped_painter_rollback.h>
@@ -145,6 +146,10 @@ public:
 
     QPixmap textPixmap;
     HighlightedAreaTextPainter textPainter;
+
+    QPixmap noBackGroundCache;
+    QPixmap backgroundCache;
+    QRectF arrowGeometry;
 };
 
 void AreaTooltipItem::Private::updateTextPixmap()
@@ -158,6 +163,8 @@ void AreaTooltipItem::Private::updateTextPixmap()
 void AreaTooltipItem::Private::invalidateTextPixmap()
 {
     textPixmap = QPixmap();
+    backgroundCache = {};
+    noBackGroundCache = {};
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -246,41 +253,89 @@ QRectF AreaTooltipItem::boundingRect() const
 void AreaTooltipItem::paint(
     QPainter* painter,
     const QStyleOptionGraphicsItem* /*option*/,
-    QWidget* /*widget*/)
+    QWidget* widget)
 {
     d->updateTextPixmap();
 
     if (d->textPixmap.isNull())
         return;
 
+    const PainterTransformScaleStripper scaleStripper(painter);
+    const auto mappedRect = scaleStripper.mapRect(boundingRect());
+
     if (d->backgroundColor.isValid())
     {
-        QnScopedPainterBrushRollback brushRollback(painter, d->backgroundColor);
-        QnScopedPainterPenRollback penRollback(painter, Qt::NoPen);
-        QnScopedPainterAntialiasingRollback(painter, true);
-
-        const PainterTransformScaleStripper scaleStripper(painter);
-
         const auto rect = scaleStripper.mapRect(
             Geometry::eroded(boundingRect(), kArrowSize.height()));
 
-        painter->drawRoundedRect(rect, kRoundingRadius, kRoundingRadius);
-
         const auto scale = parentWidget()->size();
-        const auto arrowPos = arrowPosition(
+        auto arrowPos = arrowPosition(
             rect,
             scaleStripper.mapRect(d->figure->boundingRect(scale).translated(-pos())));
 
-        if (arrowPos.edge != ArrowPosition::kNoEdge)
-            paintArrow(painter, arrowPos.geometry, static_cast<Qt::Edge>(arrowPos.edge));
-    }
+        arrowPos.geometry.translate(-mappedRect.topLeft());
 
-    paintPixmapSharp(
-        painter,
-        d->textPixmap,
-        QPointF(
-            kTooltipMargins.left() + kArrowSize.height(),
-            kTooltipMargins.top() + kArrowSize.height()));
+        const auto imageSize = (mappedRect.size() * widget->devicePixelRatio()).toSize();
+
+        if (imageSize != d->backgroundCache.size() || arrowPos.geometry != d->arrowGeometry)
+        {
+            d->arrowGeometry = arrowPos.geometry;
+
+            QImage image(imageSize, QImage::Format_RGBA8888_Premultiplied);
+            image.setDevicePixelRatio(widget->devicePixelRatio());
+            image.fill(Qt::transparent);
+
+            QPainter p(&image);
+            p.setPen(Qt::NoPen);
+            p.setBrush(d->backgroundColor);
+            p.drawRoundedRect(
+                QRectF(rect.topLeft() - mappedRect.topLeft(), rect.size()),
+                kRoundingRadius, kRoundingRadius);
+
+            if (arrowPos.edge != ArrowPosition::kNoEdge)
+                paintArrow(&p, arrowPos.geometry, static_cast<Qt::Edge>(arrowPos.edge));
+
+            paintPixmapSharp(
+                &p,
+                d->textPixmap,
+                QPointF(
+                    kTooltipMargins.left() + kArrowSize.height(),
+                    kTooltipMargins.top() + kArrowSize.height())
+                );
+
+            d->backgroundCache = QPixmap::fromImage(image);
+            d->noBackGroundCache = {};
+        }
+
+        paintPixmapSharp(painter, d->backgroundCache, mappedRect.topLeft());
+    }
+    else
+    {
+        // We need to generate cache image with the exact same size as background
+        // and render only text into it to avoid moving text on mouse hover.
+
+        const auto imageSize = (mappedRect.size() * widget->devicePixelRatio()).toSize();
+
+        if (d->noBackGroundCache.size() != imageSize)
+        {
+            QImage image(imageSize, QImage::Format_RGBA8888_Premultiplied);
+            image.setDevicePixelRatio(widget->devicePixelRatio());
+            image.fill(Qt::transparent);
+
+            QPainter p(&image);
+            paintPixmapSharp(
+                &p,
+                d->textPixmap,
+                QPointF(
+                    kTooltipMargins.left() + kArrowSize.height(),
+                    kTooltipMargins.top() + kArrowSize.height()));
+
+            d->noBackGroundCache = QPixmap::fromImage(image);
+            d->backgroundCache = {};
+        }
+
+        paintPixmapSharp(painter, d->noBackGroundCache, mappedRect.topLeft());
+    }
 }
 
 QMarginsF AreaTooltipItem::textMargins() const
