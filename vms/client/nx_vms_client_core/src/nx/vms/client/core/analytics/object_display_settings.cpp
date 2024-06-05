@@ -2,7 +2,7 @@
 
 #include "object_display_settings.h"
 
-#include <regex>
+#include <QtCore/QRegularExpression>
 
 #include <nx/analytics/analytics_attributes.h>
 #include <nx/kit/utils.h>
@@ -14,7 +14,7 @@
 
 namespace nx::vms::client::core {
 
-const std::map<std::string, std::string> ObjectDisplaySettings::kBoundingBoxPalette{
+const std::map<QString, QString> ObjectDisplaySettings::kBoundingBoxPalette{
     {"Magenta", "#E040FB"},
     {"Blue", "#536DFE"},
     {"Green", "#B2FF59"},
@@ -26,47 +26,55 @@ const std::map<std::string, std::string> ObjectDisplaySettings::kBoundingBoxPale
     {"White", "#FFFFFF"},
 };
 
+ObjectDisplaySettings::ObjectDisplaySettings()
+{
+    m_settingsMap = appContext()->coreSettings()->detectedObjectSettings();
+}
+
 QColor ObjectDisplaySettings::objectColor(const QString& objectTypeId)
 {
-    DetectedObjectSettingsMap settingsMap =
-        appContext()->coreSettings()->detectedObjectSettings();
-    auto& settings = settingsMap[objectTypeId];
-
-    if (!settings.color.isValid())
+    if (const auto settingsIt = m_settingsMap.find(objectTypeId);
+        settingsIt != m_settingsMap.end() && settingsIt->second.color.isValid())
     {
-        settings.color = nx::utils::random::choice(colorTheme()->colors("detectedObject"));
-        appContext()->coreSettings()->detectedObjectSettings = settingsMap;
+        return settingsIt->second.color;
     }
+
+    // Color not found - select random color and update settings.
+    m_settingsMap = appContext()->coreSettings()->detectedObjectSettings();
+    auto& settings = m_settingsMap[objectTypeId];
+    settings.color = nx::utils::random::choice(core::colorTheme()->colors("detectedObject"));
+    appContext()->coreSettings()->detectedObjectSettings = m_settingsMap;
+
     return settings.color;
 }
 
 QColor ObjectDisplaySettings::objectColor(const nx::common::metadata::ObjectMetadata& object)
 {
+    static const QRegularExpression kHexColorRe("#[A-Fa-f0-9]{6}");
+
     for (const auto& attribute: object.attributes)
     {
         if (attribute.name != "nx.sys.color")
             continue;
 
-        std::string value = attribute.value.toStdString();
+        const auto& value = attribute.value;
 
-        if (!std::regex_match(value, std::regex("#[A-Fa-f0-9]{6}")))
+        if (kHexColorRe.match(value).hasMatch())
+            return QColor(value);
+
+        const auto paletteEntry = kBoundingBoxPalette.find(value);
+
+        if (paletteEntry == kBoundingBoxPalette.end())
         {
-            const auto paletteEntry = kBoundingBoxPalette.find(value);
-
-            if (paletteEntry == kBoundingBoxPalette.end())
-            {
-                // The specified color is missing in the palette; ignore the attribute.
-                NX_DEBUG(this, "Analytics: Invalid nx.sys.color = %1 in ObjectMetadata %2%3",
-                    nx::kit::utils::toString(attribute.value),
-                    object.typeId,
-                    object.trackId);
-                break;
-            }
-
-            value = paletteEntry->second;
+            // The specified color is missing in the palette; ignore the attribute.
+            NX_DEBUG(this, "Analytics: Invalid nx.sys.color = %1 in ObjectMetadata %2%3",
+                nx::kit::utils::toString(attribute.value),
+                object.typeId,
+                object.trackId);
+            break;
         }
 
-        return QColor(QString::fromLatin1(value.c_str()));
+        return paletteEntry->second;
     }
 
     return objectColor(object.typeId);
