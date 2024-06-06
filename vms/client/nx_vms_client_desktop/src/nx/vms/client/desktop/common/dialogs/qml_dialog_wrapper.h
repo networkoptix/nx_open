@@ -93,7 +93,7 @@ signals:
 
 public slots:
     /** Open the wrapped dialog and wait until it's closed. */
-    bool exec(Qt::WindowModality modality = Qt::WindowModal);
+    bool exec(Qt::WindowModality modality = Qt::ApplicationModal);
 
     /** Open the wrapped dialog. */
     void open();
