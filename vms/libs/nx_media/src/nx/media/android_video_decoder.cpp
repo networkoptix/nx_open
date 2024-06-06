@@ -151,7 +151,7 @@ public:
     AndroidVideoDecoderPrivate(const RenderContextSynchronizerPtr& synchronizer):
         frameNumber(0),
         initialized(false),
-        javaDecoder("com/networkoptix/nxwitness/media/QnVideoDecoder"),
+        javaDecoder("com/nxvms/mobile/media/QnVideoDecoder"),
         synchronizer(synchronizer),
         program(nullptr)
     {
@@ -413,7 +413,7 @@ void AndroidVideoDecoderPrivate::addMaxResolutionIfNeeded(const AVCodecID codec)
     if (!maxResolutions.contains(codec))
     {
         QJniObject jCodecName = QJniObject::fromString(codecMimeType);
-        QJniObject javaDecoder("com/networkoptix/nxwitness/media/QnVideoDecoder");
+        QJniObject javaDecoder("com/nxvms/mobile/media/QnVideoDecoder");
         jint maxWidth = javaDecoder.callMethod<jint>(
             "maxDecoderWidth", "(Ljava/lang/String;)I", jCodecName.object<jstring>());
         jint maxHeight = javaDecoder.callMethod<jint>(
