@@ -8486,7 +8486,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>User input</source>
-      <translation type="unfinished">User input</translation>
+      <translation>Entrée utilisateur</translation>
     </message>
     <message>
       <source>Edit camera settings</source>
@@ -11154,7 +11154,7 @@ Attention : Ce mot de passe ne peut pas être réinitialisé. Si vous le perdez,
     </message>
     <message>
       <source>Watermarks will be displayed over live, archive and exported videos for non-power users only. You and other power users will not see them.</source>
-      <translation type="unfinished">Watermarks will be displayed over live, archive and exported videos for non-power users only. You and other power users will not see them.</translation>
+      <translation>Les filigranes seront affichés sur les vidéos en direct, archivées et exportées uniquement pour les utilisateurs non expérimentés. Vous et les autres utilisateurs expérimentés ne les verrez pas.</translation>
     </message>
     <message>
       <source>Encrypting video traffic may significantly increase CPU usage</source>

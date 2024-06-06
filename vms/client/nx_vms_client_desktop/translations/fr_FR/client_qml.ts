@@ -889,7 +889,7 @@
     <name>GroupEditDialog</name>
     <message>
       <source>Group - %1</source>
-      <translation type="unfinished">Group - %1</translation>
+      <translation>Groupe - %1</translation>
     </message>
     <message>
       <source>General</source>
@@ -905,11 +905,11 @@
     </message>
     <message>
       <source>Global Permissions</source>
-      <translation type="unfinished">Global Permissions</translation>
+      <translation>Permissions globales</translation>
     </message>
     <message>
       <source>Members</source>
-      <translation type="unfinished">Members</translation>
+      <translation>Membres</translation>
     </message>
   </context>
   <context>
@@ -932,7 +932,7 @@
     </message>
     <message>
       <source>Members</source>
-      <translation type="unfinished">Members</translation>
+      <translation>Membres</translation>
     </message>
     <message>
       <source>Users</source>
@@ -944,19 +944,19 @@
     </message>
     <message>
       <source>Another group with the same name exists in the system. It is recommended to assign unique names to the groups.</source>
-      <translation type="unfinished">Another group with the same name exists in the system. It is recommended to assign unique names to the groups.</translation>
+      <translation>Un autre groupe avec le même nom existe dans le système. Il est recommandé d'attribuer des noms uniques aux groupes.</translation>
     </message>
     <message>
       <source>The group has another group as both its parent, and as a child member, or is a part of such a circular reference chain. Resolve this chain to prevent incorrect calculation of permissions.</source>
-      <translation type="unfinished">The group has another group as both its parent, and as a child member, or is a part of such a circular reference chain. Resolve this chain to prevent incorrect calculation of permissions.</translation>
+      <translation>Le groupe a un autre groupe en tant que parent et en tant que membre enfant, ou fait partie d'une telle chaîne de référence circulaire. Résoudre cette chaîne pour éviter le calcul incorrect des permissions.</translation>
     </message>
     <message>
       <source>When continuous sync with LDAP server is disabled, groups do not synchronize automatically. To update this group, initiate a manual sync.</source>
-      <translation type="unfinished">When continuous sync with LDAP server is disabled, groups do not synchronize automatically. To update this group, initiate a manual sync.</translation>
+      <translation>Lorsque la synchronisation continue avec le serveur LDAP est désactivée, les groupes ne se synchronisent pas automatiquement. Pour mettre à jour ce groupe, lancez une synchronisation manuelle.</translation>
     </message>
     <message>
       <source>This group is not found in the LDAP database.</source>
-      <translation type="unfinished">This group is not found in the LDAP database.</translation>
+      <translation>Ce groupe est introuvable dans la base de données LDAP.</translation>
     </message>
   </context>
   <context>
@@ -971,19 +971,19 @@
     </message>
     <message>
       <source>No members</source>
-      <translation type="unfinished">No members</translation>
+      <translation>Aucun membre</translation>
     </message>
     <message>
       <source>Use controls on the left to add members</source>
-      <translation type="unfinished">Use controls on the left to add members</translation>
+      <translation>Utilisez les contrôles à gauche pour ajouter des membres</translation>
     </message>
     <message>
       <source>Members summary</source>
-      <translation type="unfinished">Members summary</translation>
+      <translation>Résumé des membres</translation>
     </message>
     <message>
       <source>Inherits membership in current group</source>
-      <translation type="unfinished">Inherits membership in current group</translation>
+      <translation>Hérite de l'appartenance au groupe actuel</translation>
     </message>
   </context>
   <context>
@@ -1002,7 +1002,7 @@
     </message>
     <message>
       <source>No groups</source>
-      <translation type="unfinished">No groups</translation>
+      <translation>Aucun groupe</translation>
     </message>
   </context>
   <context>
@@ -1017,7 +1017,7 @@
     <name>ImportFromDeviceDialog</name>
     <message>
       <source>Import From Devices</source>
-      <translation type="unfinished">Import From Devices</translation>
+      <translation>Importer depuis des appareils</translation>
     </message>
   </context>
   <context>
@@ -1042,26 +1042,26 @@
     <name>InsecureWarning</name>
     <message>
       <source>Account security is important. Do not enable this setting unless you have good reasons to do so.</source>
-      <translation type="unfinished">Account security is important. Do not enable this setting unless you have good reasons to do so.</translation>
+      <translation>La sécurité du compte est importante. N'activez pas ce paramètre à moins que vous n'ayez de bonnes raisons de le faire.</translation>
     </message>
   </context>
   <context>
     <name>IntegrationHeader</name>
     <message>
       <source>Insufficient services</source>
-      <translation type="unfinished">Insufficient services</translation>
+      <translation>Services insuffisants</translation>
     </message>
     <message numerus="yes">
       <source>%n suitable integration services are required to turn on the integration</source>
       <comment>Required integration count</comment>
-      <translation type="unfinished">
-        <numerusform>%n suitable integration services are required to turn on the integration</numerusform>
-        <numerusform>%n suitable integration services are required to turn on the integration</numerusform>
+      <translation>
+        <numerusform>%n service d'intégration adapté est nécessaire pour activer l'intégration</numerusform>
+        <numerusform>%n services d'intégration adaptés sont nécessaires pour activer l'intégration</numerusform>
       </translation>
     </message>
     <message>
       <source>0 suitable services available</source>
-      <translation type="unfinished">0 suitable services available</translation>
+      <translation>0 services adaptés disponibles</translation>
     </message>
     <message>
       <source>OFFLINE</source>
@@ -1073,7 +1073,7 @@
     </message>
     <message>
       <source>Services Required</source>
-      <translation type="unfinished">Services Required</translation>
+      <translation>Services Requis</translation>
     </message>
     <message>
       <source>Refreshing...</source>
@@ -1082,7 +1082,7 @@
     <message>
       <source>There are more cameras using this integration than available services. Please disable integration for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</source>
       <comment>%1 will be substituted by a date</comment>
-      <translation type="unfinished">There are more cameras using this integration than available services. Please disable integration for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</translation>
+      <translation>Il y a plus de caméras utilisant cette intégration que les services disponibles. Veuillez désactiver l’intégration de certaines caméras ou ajouter des services adaptés. Sinon, cela se fera automatiquement sur %1</translation>
     </message>
   </context>
   <context>
@@ -1207,7 +1207,7 @@
     <name>LdapSettings</name>
     <message>
       <source>ONLINE</source>
-      <translation type="unfinished">ONLINE</translation>
+      <translation>EN LIGNE</translation>
     </message>
     <message>
       <source>OFFLINE</source>
@@ -1223,7 +1223,7 @@
     </message>
     <message>
       <source>Last Sync</source>
-      <translation type="unfinished">Last Sync</translation>
+      <translation>Dernière synchronisation</translation>
     </message>
     <message>
       <source>Edit</source>
@@ -1231,7 +1231,7 @@
     </message>
     <message>
       <source>Advanced Settings</source>
-      <translation type="unfinished">Advanced Settings</translation>
+      <translation>Paramètres avancés</translation>
     </message>
     <message>
       <source>Disconnect</source>
@@ -1243,39 +1243,39 @@
     </message>
     <message>
       <source>Please use care when altering LDAP settings. Incorrect configuration could disrupt system availability for a large number of users simultaneously.</source>
-      <translation type="unfinished">Please use care when altering LDAP settings. Incorrect configuration could disrupt system availability for a large number of users simultaneously.</translation>
+      <translation>Veuillez faire preuve de prudence lorsque vous modifiez les paramètres LDAP. Une configuration incorrecte pourrait perturber la disponibilité du système pour un grand nombre d'utilisateurs simultanément.</translation>
     </message>
     <message>
       <source>Connect your System to an LDAP server for easier user management</source>
-      <translation type="unfinished">Connect your System to an LDAP server for easier user management</translation>
+      <translation>Connectez votre système à un serveur LDAP pour faciliter la gestion des utilisateurs</translation>
     </message>
     <message>
       <source>Not configured yet</source>
-      <translation type="unfinished">Not configured yet</translation>
+      <translation>Pas encore configuré</translation>
     </message>
     <message>
       <source>Configure</source>
-      <translation type="unfinished">Configure</translation>
+      <translation>Configurer</translation>
     </message>
     <message>
       <source>Continuous sync with LDAP server is disabled for this system. Updates to groups and users and groups membership will occur solely through manual synchronization.</source>
-      <translation type="unfinished">Continuous sync with LDAP server is disabled for this system. Updates to groups and users and groups membership will occur solely through manual synchronization.</translation>
+      <translation>La synchronisation continue avec le serveur LDAP est désactivée pour ce système. Les mises à jour vers les groupes et l'adhésion des utilisateurs et des groupes se feront uniquement par la synchronisation manuelle.</translation>
     </message>
     <message>
       <source>Search Bases</source>
-      <translation type="unfinished">Search Bases</translation>
+      <translation>Bases de recherche</translation>
     </message>
     <message>
       <source>Add Search Base</source>
-      <translation type="unfinished">Add Search Base</translation>
+      <translation>Ajouter la base de recherche</translation>
     </message>
     <message>
       <source>Specify at least one search base to synchronize users and groups</source>
-      <translation type="unfinished">Specify at least one search base to synchronize users and groups</translation>
+      <translation>Spécifiez au moins une base de recherche pour synchroniser les utilisateurs et les groupes</translation>
     </message>
     <message>
       <source>No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and search bases are configured correctly.</source>
-      <translation type="unfinished">No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and search bases are configured correctly.</translation>
+      <translation>Aucun utilisateur ou groupe ne correspond aux paramètres de synchronisation et ne sont ajoutés à la base de données du système. Assurez-vous que les paramètres du serveur LDAP et les bases de recherche sont configurés correctement.</translation>
     </message>
   </context>
   <context>
@@ -1370,7 +1370,7 @@
     <name>LookupListElementEditor</name>
     <message>
       <source>Any %1</source>
-      <translation type="unfinished">Any %1</translation>
+      <translation>N'importe quel %1</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -1385,14 +1385,14 @@
     <name>LookupListTableCellDelegate</name>
     <message>
       <source>ANY</source>
-      <translation type="unfinished">ANY</translation>
+      <translation>N'IMPORTE LEQUEL</translation>
     </message>
   </context>
   <context>
     <name>LookupListsDialog</name>
     <message>
       <source>Lookup Lists</source>
-      <translation type="unfinished">Lookup Lists</translation>
+      <translation>Listes de recherche</translation>
     </message>
     <message>
       <source>Add</source>
@@ -1408,7 +1408,7 @@
     </message>
     <message>
       <source>Create New...</source>
-      <translation type="unfinished">Create New...</translation>
+      <translation>Créer un nouveau...</translation>
     </message>
     <message>
       <source>Settings</source>
@@ -1430,11 +1430,11 @@
     <name>NewLinkDialog</name>
     <message>
       <source>New Link - %1</source>
-      <translation type="unfinished">New Link - %1</translation>
+      <translation>Nouveau lien - %1</translation>
     </message>
     <message>
       <source>The previous link will be invalidated once a new one has been issued</source>
-      <translation type="unfinished">The previous link will be invalidated once a new one has been issued</translation>
+      <translation>Le lien précédent sera invalidé une fois qu'un nouveau sera délivré</translation>
     </message>
     <message>
       <source>Create</source>
@@ -1445,15 +1445,15 @@
     <name>NoListsPage</name>
     <message>
       <source>No Lists</source>
-      <translation type="unfinished">No Lists</translation>
+      <translation>Aucune liste</translation>
     </message>
     <message>
       <source>You have not created any Lists yet. With lists you can store multiple values to use them in Event Rules. Create a new List to start adding entries.</source>
-      <translation type="unfinished">You have not created any Lists yet. With lists you can store multiple values to use them in Event Rules. Create a new List to start adding entries.</translation>
+      <translation>Vous n'avez pas encore créé de listes. Avec des listes, vous pouvez stocker plusieurs valeurs pour les utiliser dans les règles d'événement. Créer une nouvelle liste pour commencer à ajouter des entrées.</translation>
     </message>
     <message>
       <source>Create New...</source>
-      <translation type="unfinished">Create New...</translation>
+      <translation>Créer un nouveau...</translation>
     </message>
   </context>
   <context>
@@ -1505,7 +1505,7 @@
     <name>PanelBase</name>
     <message>
       <source>Approve</source>
-      <translation type="unfinished">Approve</translation>
+      <translation>Approuver</translation>
     </message>
     <message>
       <source>Reject</source>
@@ -1524,7 +1524,7 @@
     </message>
     <message>
       <source>No custom groups yet</source>
-      <translation type="unfinished">No custom groups yet</translation>
+      <translation>Aucun groupe personnalisé pour l'instant</translation>
     </message>
     <message>
       <source>No groups found</source>
@@ -1532,15 +1532,15 @@
     </message>
     <message>
       <source>Change search criteria or create a new group</source>
-      <translation type="unfinished">Change search criteria or create a new group</translation>
+      <translation>Modifier les critères de recherche ou créer un nouveau groupe</translation>
     </message>
     <message>
       <source>No groups</source>
-      <translation type="unfinished">No groups</translation>
+      <translation>Aucun groupe</translation>
     </message>
     <message>
       <source>Use controls on the left to add to a group</source>
-      <translation type="unfinished">Use controls on the left to add to a group</translation>
+      <translation>Utilisez les contrôles à gauche pour ajouter à un groupe</translation>
     </message>
     <message>
       <source>Member of</source>
@@ -1555,7 +1555,7 @@
     <message>
       <source>Built-in</source>
       <comment>Section name in a list of items: &apos;Built-in groups&apos;</comment>
-      <translation type="unfinished">Built-in</translation>
+      <translation>Intégré</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -1567,7 +1567,7 @@
     <name>PasswordChangeDialog</name>
     <message>
       <source>Change password - %1</source>
-      <translation type="unfinished">Change password - %1</translation>
+      <translation>Changer le mot de passe - %1</translation>
     </message>
     <message>
       <source>Login</source>
@@ -1594,14 +1594,14 @@
     <name>PermissionSummary</name>
     <message>
       <source>No custom permissions</source>
-      <translation type="unfinished">No custom permissions</translation>
+      <translation>Aucune autorisation personnalisée</translation>
     </message>
   </context>
   <context>
     <name>PermissionsTab</name>
     <message>
       <source>No resources found</source>
-      <translation type="unfinished">No resources found</translation>
+      <translation>Aucune ressource trouvée</translation>
     </message>
     <message>
       <source>Automatically add dependent permissions</source>

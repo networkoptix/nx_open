@@ -2592,7 +2592,7 @@
     </message>
     <message>
       <source>Display servers in tree for non-power users</source>
-      <translation>Afficher les serveurs dans l'arborescence pour les utilisateurs ne disposant pas d'une autorisation élevée</translation>
+      <translation>Afficher les serveurs dans l'arborescence pour les utilisateurs non expérimentés</translation>
     </message>
   </context>
   <context>
