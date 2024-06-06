@@ -106,6 +106,18 @@ bool userLessThan(const QModelIndex& left, const QModelIndex& right, int sortCol
     }
 }
 
+QStringList userGroupNamesSorted(const QnUserResourcePtr & user)
+{
+    if (!user || !user->systemContext())
+        return {};
+
+    return nx::vms::common::userGroupNames(user->systemContext(), user->groupIds(),
+        [](const auto& g1, const auto& g2)
+        {
+            return ComparableGroup(g1) < ComparableGroup(g2);
+        });
+}
+
 // .primary = light10, .secondary = light4
 static const core::SvgIconColorer::ThemeSubstitutions kEnabledUncheckedIconSubstitutions = {
     {QIcon::Normal, {.primary = "light10", .secondary = "light4"}},
@@ -553,7 +565,7 @@ QVariant UserListModel::data(const QModelIndex& index, int role) const
                 case EmailColumn:
                     return user->getEmail();
                 case UserGroupsColumn:
-                    return nx::vms::common::userGroupNames(user).join(", ");
+                    return userGroupNamesSorted(user).join(", ");
                 default:
                     break;
             }

@@ -4,7 +4,6 @@
 
 #include <algorithm>
 
-#include <QtCore/QCollator>
 #include <QtCore/QStringList>
 
 #include <client/client_globals.h>
@@ -18,13 +17,14 @@
 #include <nx/vms/client/core/skin/color_substitutions.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/desktop/system_administration/models/members_sort.h>
 #include <nx/vms/client/desktop/system_administration/watchers/non_editable_users_and_groups.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/ldap_status_watcher.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/common/user_management/predefined_user_groups.h>
-#include <nx/vms/common/user_management/user_group_manager.h>
+#include <nx/vms/common/user_management/user_management_helpers.h>
 
 namespace nx::vms::client::desktop {
 
@@ -107,28 +107,11 @@ struct UserGroupListModel::Private
 
     QStringList getParentGroupNames(const UserGroupData& group) const
     {
-        QStringList result;
-        for (const auto parentId: group.parentGroupIds)
-        {
-            if (const auto parentGroup = q->systemContext()->userGroupManager()->find(parentId))
-                result.push_back(parentGroup->name);
-        }
-
-        if (result.empty())
-            return result;
-
-        QCollator collator;
-        collator.setCaseSensitivity(Qt::CaseInsensitive);
-        collator.setNumericMode(true);
-
-        std::sort(result.begin(), result.end(),
-            [&collator](const QString& left, const QString& right)
+        return nx::vms::common::userGroupNames(q->systemContext(), group.parentGroupIds,
+            [](const auto& g1, const auto& g2)
             {
-                return collator(left, right);
+                return ComparableGroup(g1) < ComparableGroup(g2);
             });
-
-        result.erase(std::unique(result.begin(), result.end()), result.end());
-        return result;
     }
 
     QString getParentGroupNamesText(const UserGroupData& group) const
