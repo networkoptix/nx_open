@@ -148,7 +148,7 @@ void IncompatibleServersActionHandler::at_mergeSystemsAction_triggered()
             m_mergeDialog.clear();
         });
 
-    m_mergeDialog->open();
+    m_mergeDialog->exec();
 }
 
 void IncompatibleServersActionHandler::at_connectTool_canceled()
