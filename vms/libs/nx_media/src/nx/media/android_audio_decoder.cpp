@@ -64,7 +64,7 @@ class AndroidAudioDecoderPrivate: public QObject
 public:
     AndroidAudioDecoderPrivate():
         initialized(false),
-        javaDecoder("com/networkoptix/nxwitness/media/QnAudioDecoder")
+        javaDecoder("com/nxvms/mobile/media/QnAudioDecoder")
     {
         registerNativeMethods();
     }
@@ -142,7 +142,7 @@ AndroidAudioDecoder::~AndroidAudioDecoder()
 bool AndroidAudioDecoder::isDecoderCompatibleToPlatform()
 {
     return QJniObject::callStaticMethod<jboolean>(
-        "com/networkoptix/nxwitness/media/QnAudioDecoder",
+        "com/nxvms/mobile/media/QnAudioDecoder",
         "isDecoderCompatibleToPlatform");
 }
 
