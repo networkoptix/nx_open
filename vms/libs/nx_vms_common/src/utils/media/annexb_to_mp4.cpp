@@ -85,7 +85,10 @@ void AnnexbToMp4::updateCodecParameters(const QnCompressedVideoData* frame)
 {
     std::vector<uint8_t> extradata = buildExtraDataMp4(frame);
     if (extradata.empty())
+    {
+        NX_DEBUG(this, "Failed to build extradata");
         return;
+    }
 
     CodecParametersPtr context;
     if (frame->context)
@@ -102,7 +105,10 @@ void AnnexbToMp4::updateCodecParameters(const QnCompressedVideoData* frame)
 
     QSize streamResolution = nx::media::getFrameSize(frame);
     if (streamResolution.isEmpty())
+    {
+        NX_DEBUG(this, "Failed to get frame size");
         return;
+    }
 
     context->getAvCodecParameters()->width = streamResolution.width();
     context->getAvCodecParameters()->height = streamResolution.height();
