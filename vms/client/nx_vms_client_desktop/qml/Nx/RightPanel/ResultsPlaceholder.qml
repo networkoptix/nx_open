@@ -3,6 +3,7 @@
 import QtQuick
 
 import Nx.Core
+import Nx.Core.Controls
 import Nx.Controls
 
 import nx.vms.client.core
@@ -13,7 +14,7 @@ Item
     id: placeholder
 
     property bool shown: false
-    property alias icon: placeholderIcon.source
+    property alias icon: placeholderIcon.sourcePath
     property alias title: placeholderTitle.text
     property alias description: placeholderDescription.text
     property Action action: null
@@ -44,10 +45,11 @@ Item
             NumberAnimation { duration: 100 }
         }
 
-        Image
+        ColoredImage
         {
             id: placeholderIcon
 
+            primaryColor: ColorTheme.colors.dark17
             width: 64
             height: 64
             sourceSize: Qt.size(width, height)

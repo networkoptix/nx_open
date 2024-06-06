@@ -14,9 +14,7 @@
 #include <nx/utils/scoped_connections.h>
 #include <nx/vms/client/core/analytics/taxonomy/state_view_builder.h>
 
-namespace nx::vms::client::core::analytics {
-class TaxonomyManager;
-} // namespace nx::vms::client::core::analytics.
+namespace nx::vms::client::core::analytics { class TaxonomyManager; }
 
 namespace nx::vms::client::core::analytics::taxonomy {
 

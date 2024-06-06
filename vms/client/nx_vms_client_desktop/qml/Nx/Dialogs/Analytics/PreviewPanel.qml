@@ -125,7 +125,6 @@ Rectangle
         {
             id: intervalPreview
 
-
             anchors.top: parent.top
             anchors.left: parent.left
             anchors.right: parent.right
@@ -281,7 +280,7 @@ Rectangle
                 font.pixelSize: FontConfig.xLarge.pixelSize
                 text: previewPanel.selectedItem
                     ? previewPanel.selectedItem.timestamp.split(" ", 2).pop()
-					: ""
+                    : ""
             }
 
             Text

@@ -10,8 +10,8 @@
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/client/core/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/core/event_search/event_search_globals.h>
-#include <nx/vms/client/desktop/event_search/right_panel_globals.h>
 #include <nx/vms/client/core/event_search/models/fetch_request.h>
+#include <nx/vms/client/desktop/event_search/right_panel_globals.h>
 
 Q_MOC_INCLUDE("nx/vms/client/core/event_search/utils/analytics_search_setup.h")
 Q_MOC_INCLUDE("nx/vms/client/desktop/analytics/attribute_display_manager.h")
@@ -170,7 +170,9 @@ signals:
     void dataNeeded();
     void asyncFetchStarted(const nx::vms::client::core::FetchRequest& request);
     void fetchCommitStarted(const nx::vms::client::core::FetchRequest& request);
-    void fetchFinished();
+    void fetchFinished(core::EventSearch::FetchResult result,
+        int centralItemIndex,
+        const core::FetchRequest& request);
     void analyticsSetupChanged();
     void itemCountChanged();
     void isConstrainedChanged();
@@ -196,6 +198,7 @@ signals:
         QWidget* parent);
     void pluginActionRequested(const nx::Uuid& engineId, const QString& actionTypeId,
         const nx::analytics::db::ObjectTrack& track, const QnVirtualCameraResourcePtr& camera);
+    void livePausedChanged(bool isPaused);
 
 private:
     class Private;

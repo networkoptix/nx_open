@@ -1,15 +1,14 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.14
-import QtQuick.Controls 2.14
-import QtQuick.Window 2.14
-import QtQml 2.14
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Window
 
-import Nx.Core 1.0
-import Nx.Controls 1.0
+import Nx.Core
+import Nx.Controls
 
-import nx.vms.client.core 1.0
-import nx.vms.client.desktop 1.0
+import nx.vms.client.core
+import nx.vms.client.desktop
 
 import "private"
 
@@ -19,6 +18,7 @@ GridView
 
     property bool brief: false //< Only resource list and preview.
 
+    property alias controller: controller
     property alias placeholder: controller.placeholder
     property alias tileController: controller.tileController
     property alias standardTileInteraction: controller.standardTileInteraction

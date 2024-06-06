@@ -19,6 +19,7 @@ public:
     virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
     static QVariantList flattenAttributeList(const analytics::AttributeList& source);
+    static QString valuesText(const QStringList& values);
 };
 
 } // namespace nx::vms::client::core

@@ -19,10 +19,11 @@
 #include <nx/cloud/db/api/result_code.h>
 #include <nx/cloud/db/api/system_data.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/client/core/qml/qml_ownership.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/thumbnails/resource_id_thumbnail.h>
-#include <nx/vms/client/core/qml/qml_ownership.h>
 #include <nx/vms/client/desktop/access/screen_recording_watcher.h>
+#include <nx/vms/client/desktop/analytics/analytics_dialog_table_model.h>
 #include <nx/vms/client/desktop/analytics/attribute_display_manager.h>
 #include <nx/vms/client/desktop/analytics/attribute_visibility_settings_model.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -290,6 +291,7 @@ void QnClientMetaTypes::registerQmlTypes()
     CallAlarmManager::registerQmlType();
     analytics::taxonomy::AttributeVisibilitySettingsModel::registerQmlType();
     analytics::taxonomy::AttributeDisplayManager::registerQmlType();
+    analytics::taxonomy::AnalyticsDialogTableModel::registerQmlType();
 
     qmlRegisterType<FisheyeCalibrator>("nx.vms.client.desktop", 1, 0, "FisheyeCalibrator");
     qmlRegisterType<ConnectTilesProxyModel>("nx.vms.client.desktop", 1, 0, "ConnectTilesModel");

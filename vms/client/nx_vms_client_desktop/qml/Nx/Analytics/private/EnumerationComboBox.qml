@@ -21,7 +21,7 @@ ComboBox
 
     onSelectedValueChanged:
     {
-        editText = Utils.getValue(selectedValue, "")
+        editText = CoreUtils.getValue(selectedValue, "")
         currentIndex = find(editText)
     }
 

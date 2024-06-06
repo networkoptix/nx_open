@@ -38,10 +38,10 @@
 #include <nx/vms/client/core/event_search/utils/analytics_search_setup.h>
 #include <nx/vms/client/core/event_search/utils/text_filter_setup.h>
 #include <nx/vms/client/core/image_providers/resource_thumbnail_provider.h>
+#include <nx/vms/client/core/qml/qml_ownership.h>
 #include <nx/vms/client/core/thumbnails/abstract_caching_resource_thumbnail.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/core/utils/managed_camera_set.h>
-#include <nx/vms/client/core/qml/qml_ownership.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/analytics/attribute_display_manager.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -242,8 +242,6 @@ public:
 
     analytics::taxonomy::AttributeDisplayManager* attributeManager() const;
     void setAttributeManager(analytics::taxonomy::AttributeDisplayManager* value);
-
-    static QString valuesText(const QStringList& values);
 
     static void calculatePreviewRects(const QnResourcePtr& resource,
         const QRectF& highlightRect,
@@ -612,7 +610,7 @@ core::FetchRequest RightPanelModelsAdapter::requestForDirection(
     if (const auto model = d->searchModel())
         return model->requestForDirection(direction);
 
-    NX_ASSERT(false, "Maodel isn't set");
+    NX_ASSERT(false, "Model isn't set");
     return {};
 }
 
@@ -1200,6 +1198,9 @@ void RightPanelModelsAdapter::Private::recreateSourceModel()
                 << connect(asyncModel, &core::AbstractAsyncSearchListModel::asyncFetchStarted,
                     q, &RightPanelModelsAdapter::asyncFetchStarted);
         }
+
+        m_modelConnections << connect(model, &core::AbstractSearchListModel::livePausedChanged,
+            q, &RightPanelModelsAdapter::livePausedChanged);
     }
 
     updateSynchronizer();
