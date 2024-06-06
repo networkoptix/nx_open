@@ -76,6 +76,26 @@ bool allUserGroupsExist(SystemContext* systemContext, const IdList& groupIds)
         [manager](const auto& id) { return manager->contains(id); });
 }
 
+template<class IdList, class LessFunc>
+QStringList userGroupNames(
+    const SystemContext* systemContext,
+    const IdList& groupIds,
+    LessFunc lessFunc)
+{
+    if (!NX_ASSERT(systemContext))
+        return {};
+
+    auto groups = systemContext->userGroupManager()->getGroupsByIds(groupIds);
+
+    std::sort(groups.begin(), groups.end(), lessFunc);
+
+    QStringList result;
+    for (const auto& group: groups)
+        result.push_back(group.name);
+
+    return result;
+}
+
 template<class IdList>
 QStringList userGroupNames(const SystemContext* systemContext, const IdList& groupIds)
 {
