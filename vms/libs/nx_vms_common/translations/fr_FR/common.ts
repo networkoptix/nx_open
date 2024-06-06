@@ -204,11 +204,11 @@
     <message>
       <source>Members of this group have unlimited System privileges. Administrators can create and modify Power Users, merge Systems and connect or disconnect System to  %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Les membres de ce groupe ont des privilèges système illimités. Les administrateurs peuvent créer et modifier des utilisateurs d'énergie, fusionner des systèmes et connecter ou déconnecter le système à  %1.</translation>
+      <translation>Les membres de ce groupe ont des privilèges système illimités. Les administrateurs peuvent créer et modifier des utilisateurs expérimentés, fusionner des systèmes et connecter ou déconnecter le système à  %1.</translation>
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the System configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</source>
-      <translation>Les membres de ce groupe peuvent, en plus des autorisations accordées par le groupe Visionneurs avancés, contrôler la plupart de la configuration du système, mais ne sont pas autorisés à modifier les paramètres liés à l'administrateur, comme supprimer ou modifier leurs propres groupes et permissions, et ne peut pas créer ou modifier d'autres utilisateurs de puissance.</translation>
+      <translation>Les membres de ce groupe peuvent, en plus des autorisations accordées par le groupe Visionneurs avancés, contrôler la plupart de la configuration du système, mais ne sont pas autorisés à modifier les paramètres liés à l'administrateur, comme supprimer ou modifier leurs propres groupes et permissions, et ne peut pas créer ou modifier d'autres utilisateurs expérimentés</translation>
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Viewers group, see and activate PTZ positions and PTZ tours, use 2-way audio, operate I/O module buttons, create and edit bookmarks, and view the Event Log.</source>
