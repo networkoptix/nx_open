@@ -2,109 +2,80 @@
 
 import QtQuick
 import QtQuick.Controls
-import QtQuick.Layouts
 
 import Nx.Core
-import Nx.Controls
-
-import nx.vms.client.desktop
 
 import "metrics.js" as Metrics
 
-Control
+Rectangle
 {
     id: control
 
     property alias displayedItemsText: displayedItemsLabel.text
     property alias availableItemsText: availableItemsButton.text
 
-    readonly property int iconWidth: 20
-    readonly property int iconHeight: 20
-
     signal commitNewItemsRequested()
 
-    height: displayedItemsText ? Metrics.kCounterBlockHeight : 0
-    implicitWidth: Math.max(availableItemsButton.width, 70)
-        + leftPadding + rightPadding + row.spacing
+    implicitHeight: displayedItemsText ? Metrics.kCounterBlockHeight : 0
+    implicitWidth: Math.max(
+        displayedItemsLabel.implicitWidth, availableItemsButton.implicitWidth, 70)
     visible: !!displayedItemsText
 
-    leftPadding: 8
-    rightPadding: 8
+    readonly property bool hasAvailableItems: !!control.availableItemsText
 
-    topPadding: 12
-    bottomPadding: 12
+    color: ColorTheme.colors.dark3
 
-    contentItem: RowLayout
+    Text
     {
-        id: row
+        id: displayedItemsLabel
 
-        spacing: 4
+        anchors.fill: parent
+        leftPadding: 4
+        rightPadding: 4
+        verticalAlignment: Text.AlignVCenter
 
-        Item
-        {
-            id: counters
+        elide: Text.ElideRight
+        color: ColorTheme.mid
 
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            clip: true
-
-            readonly property bool hasAvailableItems: !!control.availableItemsText
-
-            Text
-            {
-                id: displayedItemsLabel
-
-                anchors.fill: parent
-                verticalAlignment: Text.AlignVCenter
-                elide: Text.ElideRight
-                color: ColorTheme.mid
-
-                visible: !counters.hasAvailableItems
-            }
-
-            AbstractButton
-            {
-                id: availableItemsButton
-
-                height: 24
-                y: (counters.height - height) / 2
-
-                leftPadding: 4
-                rightPadding: 4
-
-                visible: counters.hasAvailableItems
-
-                background: Rectangle
-                {
-                    id: availableItemsBackground
-
-                    color: availableItemsButton.hovered
-                        ? ColorTheme.colors.dark6
-                        : ColorTheme.colors.dark3
-
-                    border.color: availableItemsButton.hovered && !availableItemsButton.pressed
-                        ? ColorTheme.colors.light8
-                        : ColorTheme.colors.light10
-
-                    radius: 2
-                }
-
-                contentItem: Text
-                {
-                    text: availableItemsButton.text
-                    color: availableItemsBackground.border.color
-                    verticalAlignment: Text.AlignVCenter
-                    elide: Text.ElideRight
-                }
-
-                onClicked:
-                    control.commitNewItemsRequested()
-            }
-        }
+        visible: !hasAvailableItems
     }
 
-    background: Rectangle
+    AbstractButton
     {
-        color: ColorTheme.colors.dark3
+        id: availableItemsButton
+
+        height: 32
+        anchors.verticalCenter: parent.verticalCenter
+
+        leftPadding: 8
+        rightPadding: 8
+
+        visible: hasAvailableItems
+
+        background: Rectangle
+        {
+            id: availableItemsBackground
+
+            color: availableItemsButton.hovered
+                ? ColorTheme.colors.dark6
+                : ColorTheme.colors.dark3
+
+            border.color: availableItemsButton.hovered && !availableItemsButton.pressed
+                ? ColorTheme.colors.light8
+                : ColorTheme.colors.light10
+
+            radius: 4
+        }
+
+        contentItem: Text
+        {
+            text: availableItemsButton.text
+            color: availableItemsBackground.border.color
+            verticalAlignment: Text.AlignVCenter
+            elide: Text.ElideRight
+        }
+
+        onClicked:
+            control.commitNewItemsRequested()
     }
 }

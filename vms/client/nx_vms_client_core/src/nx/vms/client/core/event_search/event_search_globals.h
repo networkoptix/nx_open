@@ -4,65 +4,61 @@
 
 #include <QtCore/QMetaType>
 
+#include <nx/reflect/enum_instrument.h>
+
 namespace nx::vms::client::core {
 namespace EventSearch {
 
 Q_NAMESPACE_EXPORT(NX_VMS_CLIENT_CORE_API)
 Q_CLASSINFO("RegisterEnumClassesUnscoped", "false")
 
-enum class FetchDirection
-{
+NX_REFLECTION_ENUM_CLASS(FetchDirection,
     older,
     newer
-};
+);
 Q_ENUM_NS(FetchDirection)
 
-enum class FetchResult
-{
+NX_REFLECTION_ENUM_CLASS(FetchResult,
     complete, //< Successful. There's no more data to fetch.
     incomplete, //< Successful. There's more data to fetch.
     failed, //< Unsuccessful.
     cancelled //< Cancelled.
-};
+);
 Q_ENUM_NS(FetchResult)
 
-enum class CameraSelection
-{
+NX_REFLECTION_ENUM_CLASS(CameraSelection,
     all,
     layout,
     current,
     custom
-};
+);
 Q_ENUM_NS(CameraSelection)
 
-enum class TimeSelection
-{
+NX_REFLECTION_ENUM_CLASS(TimeSelection,
     anytime,
     day,
     week,
     month,
     selection
-};
+);
 Q_ENUM_NS(TimeSelection)
 
-enum class PreviewState
-{
+NX_REFLECTION_ENUM_CLASS(PreviewState,
     initial,
     busy,
     ready,
     missing
-};
+);
 Q_ENUM_NS(PreviewState)
 
-enum class SearchType
-{
+NX_REFLECTION_ENUM_CLASS(SearchType,
     invalid = -1,
     notifications,
     motion,
     bookmarks,
     events,
     analytics
-};
+);
 Q_ENUM_NS(SearchType)
 
 

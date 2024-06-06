@@ -10,7 +10,11 @@ namespace nx::vms::client::core::analytics::taxonomy { class AnalyticsFilterMode
 
 namespace nx::vms::client::desktop::analytics::taxonomy {
 
-class AttributeDisplayManager: public QObject
+static const QString kDateTimeAttributeName = "^/DATE_TIME/^";
+static const QString kCameraAttributeName = "^/CAMERA/^";
+static const QString kObjectTypeAttributeName = "^/OBJECT_TYPE/^";
+
+class NX_VMS_CLIENT_DESKTOP_API AttributeDisplayManager: public QObject
 {
     Q_OBJECT
 
@@ -27,12 +31,12 @@ public:
     Q_ENUM(Mode)
 
     AttributeDisplayManager(Mode mode,
-        core::analytics::taxonomy:: AnalyticsFilterModel* filterModel);
+        core::analytics::taxonomy::AnalyticsFilterModel* filterModel);
     virtual ~AttributeDisplayManager() override;
 
-    QStringList attributes() const;
+    virtual QStringList attributes() const;
     QStringList builtInAttributes() const;
-    QSet<QString> visibleAttributes() const;
+    virtual QSet<QString> visibleAttributes() const;
 
     QString displayName(const QString& attribute) const;
 
@@ -47,7 +51,7 @@ public:
 
     void placeAttributeBefore(const QString& attribute, const QString& anchorAttribute);
 
-    QStringList attributesForObjectType(const QStringList& objectTypeIds) const;
+    virtual QStringList attributesForObjectType(const QStringList& objectTypeIds) const;
 
 signals:
     void cameraVisibleChanged();

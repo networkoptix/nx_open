@@ -23,15 +23,15 @@
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/analytics/analytics_icon_manager.h>
 #include <nx/vms/client/core/client_core_globals.h>
-#include <nx/vms/client/core/event_search/utils/live_analytics_receiver.h>
 #include <nx/vms/client/core/event_search/utils/event_search_item_helper.h>
+#include <nx/vms/client/core/event_search/utils/live_analytics_receiver.h>
 #include <nx/vms/client/core/event_search/utils/text_filter_setup.h>
 #include <nx/vms/client/core/ini.h>
+#include <nx/vms/client/core/qml/qml_ownership.h>
 #include <nx/vms/client/core/resource/session_resources_signal_listener.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/utils/managed_camera_set.h>
-#include <nx/vms/client/core/qml/qml_ownership.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/text/human_readable.h>
 #include <storage/server_storage_manager.h>
@@ -1265,6 +1265,9 @@ bool AnalyticsSearchListModel::requestFetch(
     const FetchRequest& request,
     const FetchCompletionHandler& completionHandler)
 {
+    NX_VERBOSE(this, "requestFetch(): direction=`%1`, centralPoint=`%2`",
+        request.direction,
+        nx::utils::timestampToDebugString(request.centralPointUs.count() / 1000));
     if (!(d->data.empty()
             || (request.direction == FetchDirection::older
                 && request.centralPointUs == Facade::startTime(d->data.items.back()))

@@ -2,29 +2,29 @@
 
 #include "abstract_search_list_model.h"
 
-#include <QtQml/QtQml>
-
 #include <chrono>
+
+#include <QtQml/QtQml>
 
 #include <client/client_message_processor.h>
 #include <client_core/client_core_module.h>
 #include <common/common_meta_types.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
-#include <core/resource_access/resource_access_subject.h>
 #include <core/resource_access/resource_access_manager.h>
-#include <utils/common/synctime.h>
-#include <utils/common/delayed.h>
+#include <core/resource_access/resource_access_subject.h>
+#include <nx/utils/datetime.h>
+#include <nx/utils/guarded_callback.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/model_row_iterator.h>
 #include <nx/vms/client/core/client_core_globals.h>
 #include <nx/vms/client/core/event_search/models/abstract_search_list_model.h>
 #include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/utils/managed_camera_set.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
-#include <nx/utils/guarded_callback.h>
-#include <nx/utils/datetime.h>
-#include <nx/utils/log/log.h>
-#include <nx/utils/model_row_iterator.h>
+#include <utils/common/delayed.h>
+#include <utils/common/synctime.h>
 
 #include "fetched_data.h"
 
@@ -335,6 +335,9 @@ FetchRequest AbstractSearchListModel::requestForDirection(
                 : d->fetchedTimeWindow->endTime());
         }();
 
+    NX_VERBOSE(this, "requestForDirection(): direction=`%1`, centralPoint=`%2`",
+        direction,
+        nx::utils::timestampToDebugString(centralPointUs.count() / 1000));
     return {.direction = direction, .centralPointUs = centralPointUs};
 }
 

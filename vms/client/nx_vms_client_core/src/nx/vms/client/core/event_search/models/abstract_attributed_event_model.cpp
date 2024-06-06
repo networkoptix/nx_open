@@ -8,29 +8,6 @@
 
 namespace nx::vms::client::core {
 
-namespace {
-
-QString valuesText(const QStringList& values)
-{
-    // TODO: #vkutin Move this logic to the view side.
-    static constexpr int kMaxDisplayedGroupValues = 2; //< Before "(+n values)".
-
-    const int totalCount = values.size();
-    const QString displayedValues = nx::utils::strJoin(values.cbegin(),
-        values.cbegin() + std::min(totalCount, kMaxDisplayedGroupValues),
-        ", ");
-
-    const int remainder = totalCount - kMaxDisplayedGroupValues;
-    if (remainder <= 0)
-        return displayedValues;
-
-    return nx::format("%1 <font color=\"%3\">(%2)</font>", displayedValues,
-        AbstractAttributedEventModel::tr("+%n values", "", remainder),
-        colorTheme()->color("light16").name());
-}
-
-} // namespace
-
 QVariant AbstractAttributedEventModel::data(const QModelIndex& index, int role) const
 {
     switch (role)
@@ -77,6 +54,25 @@ QVariantList AbstractAttributedEventModel::flattenAttributeList(
     }
 
     return result;
+}
+
+QString AbstractAttributedEventModel::valuesText(const QStringList& values)
+{
+    // TODO: #vkutin Move this logic to the view side.
+    static constexpr int kMaxDisplayedGroupValues = 2; //< Before "(+n values)".
+
+    const int totalCount = values.size();
+    const QString displayedValues = nx::utils::strJoin(values.cbegin(),
+        values.cbegin() + std::min(totalCount, kMaxDisplayedGroupValues),
+        ", ");
+
+    const int valuesLeft = totalCount - kMaxDisplayedGroupValues;
+    if (valuesLeft <= 0)
+        return displayedValues;
+
+    return nx::format("%1 <font color=\"%3\">(%2)</font>", displayedValues,
+        tr("+%n values", "", valuesLeft),
+        colorTheme()->color("light16").name());
 }
 
 } // namespace nx::vms::client::core

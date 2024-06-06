@@ -13,9 +13,6 @@
 
 namespace nx::vms::client::desktop::analytics::taxonomy {
 
-QString kDateTimeAttributeName = "^/DATE_TIME/^";
-QString kCameraAttributeName = "^/CAMERA/^";
-QString kObjectTypeAttributeName = "^/OBJECT_TYPE/^";
 QStringList kBuiltInAttributes = {
     kDateTimeAttributeName,
     kCameraAttributeName,
@@ -34,6 +31,11 @@ public:
             : &appContext()->localSettings()->analyticsSearchTableVisibleAttributes),
         mode(mode)
     {
+        displayNameByAttribute = {
+            {kDateTimeAttributeName, tr("Date/Time")},
+            {kCameraAttributeName, tr("Camera")},
+            {kObjectTypeAttributeName, tr("Object Type")},
+        };
     }
 
     void load()
@@ -55,6 +57,12 @@ public:
                 // In the tile mode, built-in attributes go first.
                 orderedAttributes.removeOne(attribute);
                 orderedAttributes.prepend(attribute);
+            }
+            else
+            {
+                // In the table mode, built-in attributes go first by default.
+                if (!orderedAttributes.contains(attribute))
+                    orderedAttributes.prepend(attribute);
             }
 
             if (!allAttributes.contains(attribute))
@@ -152,14 +160,10 @@ AttributeDisplayManager::AttributeDisplayManager(
 {
     d->analyticsFilterModel = filterModel;
 
-    d->displayNameByAttribute = {
-        {kDateTimeAttributeName, tr("Date/Time")},
-        {kCameraAttributeName, tr("Camera")},
-        {kObjectTypeAttributeName, tr("Object Type")},
-    };
-
-    connect(d->analyticsFilterModel, &core::analytics::taxonomy::AnalyticsFilterModel::objectTypesChanged,
-        d.get(), &Private::handleObjectTypesChanged);
+    connect(d->analyticsFilterModel,
+        &core::analytics::taxonomy::AnalyticsFilterModel::objectTypesChanged,
+        d.get(),
+        &Private::handleObjectTypesChanged);
 
     d->load();
 }
@@ -253,7 +257,8 @@ void AttributeDisplayManager::placeAttributeBefore(
 QStringList AttributeDisplayManager::attributesForObjectType(
     const QStringList& objectTypeIds) const
 {
-    const core::analytics::taxonomy::ObjectType* objectType = d->analyticsFilterModel->findFilterObjectType(objectTypeIds);
+    const core::analytics::taxonomy::ObjectType* objectType =
+        d->analyticsFilterModel->findFilterObjectType(objectTypeIds);
     if (!objectType)
         return {};
 

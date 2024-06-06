@@ -4,19 +4,20 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Window
 
-import Nx.Core
 import Nx.Analytics
 import Nx.Controls
+import Nx.Core
+import Nx.Core.Controls
 import Nx.Models
 import Nx.RightPanel
 
-import nx.vms.client.desktop
 import nx.vms.client.core
 import nx.vms.client.core.analytics as Analytics
+import nx.vms.client.desktop
 import nx.vms.client.desktop.analytics
 
-
 import "metrics.js" as Metrics
+import "../../RightPanel/private" as RightPanel
 
 Window
 {
@@ -24,6 +25,7 @@ Window
 
     property WindowContext windowContext: null
     property bool showPreview: false
+    property alias tileView: tileViewButton.checked
 
     modality: Qt.NonModal
 
@@ -260,12 +262,12 @@ Window
                 filtersPanel.width = pos
         }
 
-        Column
+        ColumnLayout
         {
             id: resultsPanel
 
             anchors.left: filtersPanel.right
-
+            spacing: 0
             width:
             {
                 let resultsWidth = content.width - filtersPanel.width - 1
@@ -284,14 +286,20 @@ Window
 
             height: content.height
 
-            Row
+            RowLayout
             {
-                width: resultsPanel.width
+                height: 48
+                Layout.leftMargin: 8
+                Layout.rightMargin: 8
+                Layout.fillHeight: false
+                spacing: 4
+                visible: !eventModel.placeholderRequired
 
                 CounterBlock
                 {
                     id: counterBlock
 
+                    Layout.alignment: Qt.AlignVCenter
                     property int availableNewTracks: eventModel.analyticsSetup
                         ? eventModel.analyticsSetup.availableNewTracks : 0
 
@@ -333,136 +341,456 @@ Window
                 {
                     id: settingsButton
 
+                    Layout.alignment: Qt.AlignVCenter
                     text: qsTr("Settings")
                     visible: d.objectTypeSelected
-                    anchors.verticalCenter: parent.verticalCenter
                     icon.source: "image://skin/20x20/Outline/settings.svg"
 
                     onClicked:
                     {
-                        filterSettingsDialog.show()
+                        if (tileView)
+                            tileFilterSettingsDialog.show()
+                        else
+                            tableFilterSettingsDialog.show()
                     }
+                }
+
+                Item
+                {
+                    Layout.fillWidth: true
+                }
+
+                ImageButton
+                {
+                    id: tileViewButton
+
+                    Layout.alignment: Qt.AlignVCenter
+                    checkable: true
+                    checked: true
+
+                    icon.source: "image://skin/20x20/Outline/card_view.svg"
+                    icon.color: checked ? ColorTheme.colors.light4 : ColorTheme.colors.light16
                 }
             }
 
             Rectangle
             {
-                width: resultsPanel.width
                 height: 1
                 color: ColorTheme.colors.dark6
             }
 
-            EventGrid
+            StackLayout
             {
-                id: eventGrid
+                id: layout
+                currentIndex: dialog.tileView ? 0 : 1
+                Layout.fillHeight: true
 
-                objectName: "AnalyticsSearchDialog.EventGrid"
-                standardTileInteraction: false
-                keyNavigationEnabled: false //< We implement our own.
-                focus: true
-
-                currentIndex: selection.index.row
-
-                placeholder
+                EventGrid
                 {
-                    icon: "image://skin/64x64/Outline/noobjects.svg?primary=dark17"
-                    title: qsTr("No objects")
-                    description: qsTr("Try changing the filters or configure object detection "
-                        + "in the camera plugin settings")
-                }
+                    id: eventGrid
 
-                tileController
-                {
-                    showInformation: d.objectTypeSelected
-                    showThumbnails: true
-                    selectedRow: dialog.showPreview ? selection.index.row : -1
-                    attributeManager: d.tileViewAttributeManager
+                    objectName: "AnalyticsSearchDialog.EventGrid"
+                    standardTileInteraction: false
+                    keyNavigationEnabled: false //< We implement our own.
+                    focus: true
 
-                    videoPreviewMode: showPreview
-                        ? RightPanelGlobals.VideoPreviewMode.none
-                        : RightPanelGlobals.VideoPreviewMode.selection
+                    currentIndex: selection.index.row
+                    controller.active: tileView
 
-                    onClicked: row =>
+                    placeholder
                     {
-                        if (!showPreview)
-                        {
-                            previewPanel.slideAnimationEnabled = true
-                            showPreview = true
-                        }
-                        eventGrid.forceActiveFocus()
-                        if (row !== selection.index.row)
-                            selection.index = eventModel.index(row, 0)
+                        icon: "image://skin/64x64/Outline/noobjects.svg?primary=dark17"
+                        title: qsTr("No objects")
+                        description: qsTr("Try changing the filters or configure object detection "
+                            + "in the camera plugin settings")
                     }
 
-                    onDoubleClicked:
-                        d.showSelectionOnLayout()
+                    tileController
+                    {
+                        showInformation: d.objectTypeSelected
+                        showThumbnails: true
+                        selectedRow: dialog.showPreview ? selection.index.row : -1
+                        attributeManager: d.tileViewAttributeManager
+
+                        videoPreviewMode: showPreview
+                            ? RightPanelGlobals.VideoPreviewMode.none
+                            : RightPanelGlobals.VideoPreviewMode.selection
+
+                        onClicked: row =>
+                        {
+                            if (!showPreview)
+                            {
+                                previewPanel.slideAnimationEnabled = true
+                                showPreview = true
+                            }
+                            eventGrid.forceActiveFocus()
+                            if (row !== selection.index.row)
+                                selection.index = eventModel.index(row, 0)
+                        }
+
+                        onDoubleClicked:
+                            d.showSelectionOnLayout()
+                    }
+
+                    Item
+                    {
+                        // Single item which is re-parented to the selected tile overlay.
+                        id: tilePreviewOverlay
+
+                        parent: eventGrid.tileController.hoveredTile
+                            && eventGrid.tileController.hoveredTile.overlayContainer
+
+                        anchors.fill: parent || undefined
+                        visible: parent
+                            && eventGrid.tileController.hoveredTile
+                            && eventGrid.tileController.hoveredTile.hovered
+                            && !showPreview
+
+                        Column
+                        {
+                            anchors.right: parent.right
+                            anchors.bottom: parent.bottom
+                            anchors.margins: 4
+                            spacing: 4
+
+                            TileOverlayButton
+                            {
+                                icon.source: "image://skin/20x20/Solid/show_on_layout.svg"
+                                accent: true
+
+                                onClicked:
+                                    d.showSelectionOnLayout()
+                            }
+                        }
+                    }
+
+                    PersistentIndexWatcher
+                    {
+                        id: selection
+                    }
+
+                    ModelDataAccessor
+                    {
+                        id: accessor
+                        model: eventGrid.model
+                    }
+
+                    InformationBubble
+                    {
+                        id: informationToolTip
+
+                        view: showPreview ? null : eventGrid
+                        z: 2
+                    }
+
+                    readonly property real availableWidth: width - leftMargin - rightMargin
+
+                    readonly property int numColumns: Math.floor(
+                        availableWidth / (Metrics.kMinimumTileWidth + columnSpacing))
+
+                    readonly property int rowsPerPage:
+                        Math.floor((height - topMargin - bottomMargin) / cellHeight)
+
+                    columnWidth: (availableWidth / numColumns) - columnSpacing
+
+                    width: resultsPanel.width
+                    height: resultsPanel.height - counterBlock.height
+
+                    model: eventModel
+
+                    Shortcut
+                    {
+                        sequence: "Home"
+                        enabled: eventGrid.count > 0 && showPreview
+
+                        onActivated:
+                            selection.index = eventModel.index(0, 0)
+                    }
+
+                    Shortcut
+                    {
+                        sequence: "End"
+                        enabled: eventGrid.count > 0 && showPreview
+
+                        onActivated:
+                            selection.index = eventModel.index(eventModel.rowCount() - 1, 0)
+                    }
+
+                    Shortcut
+                    {
+                        sequence: "Left"
+                        enabled: eventGrid.count > 0 && selection.index.valid && showPreview
+
+                        onActivated:
+                        {
+                            const newRow = Math.max(selection.index.row - 1, 0)
+                            selection.index = eventModel.index(newRow, 0)
+                        }
+                    }
+
+                    Shortcut
+                    {
+                        sequence: "Right"
+                        enabled: eventGrid.count > 0 && selection.index.valid && showPreview
+
+                        onActivated:
+                        {
+                            const newRow = Math.min(selection.index.row + 1, eventModel.rowCount() - 1)
+                            selection.index = eventModel.index(newRow, 0)
+                        }
+                    }
+
+                    Shortcut
+                    {
+                        sequence: "Up"
+                        enabled: eventGrid.count > 0 && selection.index.valid && showPreview
+
+                        onActivated:
+                        {
+                            const newRow = selection.index.row -
+                                (tileView ? eventGrid.numColumns : 1)
+                            if (newRow >= 0)
+                                selection.index = eventModel.index(newRow, 0)
+                        }
+                    }
+
+                    Shortcut
+                    {
+                        sequence: "Down"
+                        enabled: eventGrid.count > 0 && selection.index.valid && showPreview
+
+                        onActivated:
+                        {
+                            const newRow = selection.index.row +
+                                (tileView ? eventGrid.numColumns : 1)
+                            if (newRow < eventModel.rowCount())
+                                selection.index = eventModel.index(newRow, 0)
+                        }
+                    }
+
+                    Shortcut
+                    {
+                        sequence: "PgUp"
+                        enabled: eventGrid.count > 0 && selection.index.valid && showPreview
+
+                        onActivated:
+                        {
+                            const rowsToSkip = tileView
+                                ? eventGrid.rowsPerPage * eventGrid.numColumns
+                                : tableView.rowsPerPage
+                            const newRow = Math.max(0, selection.index.row - rowsToSkip)
+                            selection.index = eventModel.index(newRow, 0)
+                        }
+                    }
+
+                    Shortcut
+                    {
+                        sequence: "PgDown"
+                        enabled: eventGrid.count > 0 && selection.index.valid && showPreview
+
+                        onActivated:
+                        {
+                            const rowsToSkip = tileView
+                                ? eventGrid.rowsPerPage * eventGrid.numColumns
+                                : tableView.rowsPerPage
+                            const newRow = Math.min(eventModel.rowCount() - 1,
+                                selection.index.row + rowsToSkip)
+                            selection.index = eventModel.index(newRow, 0)
+                        }
+                    }
+
+                    Shortcut
+                    {
+                        sequences: ["Up", "Down", "Left", "Right", "PgUp", "PgDown"]
+                        enabled: eventGrid.count > 0 && !selection.index.valid
+
+                        onActivated:
+                            selection.index = eventModel.index(0, 0)
+                    }
                 }
 
-                Item
+                ScrollView
                 {
-                    // Single item which is re-parented to the selected tile overlay.
-                    id: tilePreviewOverlay
+                    ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
+                    contentWidth: tableView.width - 8
+                    clip: true
 
-                    parent: eventGrid.tileController.hoveredTile
-                        && eventGrid.tileController.hoveredTile.overlayContainer
-
-                    anchors.fill: parent || undefined
-                    visible: parent
-                        && eventGrid.tileController.hoveredTile
-                        && eventGrid.tileController.hoveredTile.hovered
-                        && !showPreview
-
-                    Column
+                    TableView
                     {
-                        anchors.right: parent.right
-                        anchors.bottom: parent.bottom
-                        anchors.margins: 4
-                        spacing: 4
+                        id: tableView
 
-                        TileOverlayButton
+                        objectName: "AnalyticsSearchDialog.TableView"
+                        anchors.fill: parent
+                        anchors.leftMargin: 8
+                        anchors.rightMargin: 16
+                        horizontalHeaderVisible: true
+                        readonly property int cellHeight: 28
+                        readonly property int rowsPerPage:
+                            Math.floor((height - topMargin - bottomMargin) / cellHeight)
+                        property int hoveredRow: -1
+
+                        clip: true
+                        selectionBehavior: TableView.SelectRows
+                        headerBackgroundColor: ColorTheme.colors.dark2
+
+                        model: AnalyticsDialogTableModel
                         {
-                            icon.source: "image://skin/20x20/Solid/show_on_layout.svg"
-                            accent: true
+                            id: tableModel
+                            sourceModel: eventModel
+                            attributeManager: d.tableViewAttributeManager
+                            objectTypeIds: analyticsFilters.selectedAnalyticsObjectTypeIds
+                        }
 
-                            onClicked:
-                                d.showSelectionOnLayout()
+                        Connections
+                        {
+                            target: selection
+                            function onIndexChanged()
+                            {
+                                if (tableView.selectionModel.currentIndex.row === selection.index.row)
+                                    return
+
+                                tableView.selectionModel.setCurrentIndex(
+                                    selection.index, ItemSelectionModel.Current)
+                                tableView.positionViewAtRow(tableView.currentRow, TableView.Contain)
+                            }
+                        }
+
+                        onCurrentRowChanged:
+                        {
+                            if (currentRow >= 0)
+                                selection.index = eventModel.index(tableView.currentRow, 0)
+                        }
+
+                        delegate: Rectangle
+                        {
+                            id: tableDelegate
+
+                            property bool isCurrentRow: tableView.currentRow === row
+                            property bool isHoveredRow: tableView.hoveredRow === row
+                            property var modelData: model
+
+                            color: isCurrentRow && showPreview
+                                ? ColorTheme.colors.dark9
+                                : isHoveredRow ? ColorTheme.colors.dark4 : ColorTheme.colors.dark2
+                            implicitWidth: Math.max(contentRowLayout.implicitWidth, 28)
+                            implicitHeight: Math.max(
+                                contentRowLayout.implicitHeight, tableView.cellHeight)
+
+                            HoverHandler
+                            {
+                                onHoveredChanged:
+                                {
+                                    if (hovered)
+                                        tableView.hoveredRow = row
+                                    else if (tableView.hoveredRow === row)
+                                        tableView.hoveredRow = -1
+                                }
+                            }
+
+                            RowLayout
+                            {
+                                id: contentRowLayout
+
+                                anchors.fill: parent
+                                anchors.leftMargin: 8
+                                spacing: 8
+
+                                ColoredImage
+                                {
+                                    height: 20
+                                    sourcePath: model.iconKey
+                                        ? "image://skin/" + model.iconKey
+                                        : ""
+                                    primaryColor: isHoveredRow
+                                        ? ColorTheme.colors.light7
+                                        : ColorTheme.colors.light10
+                                    visible: !!sourcePath
+                                }
+
+                                Repeater
+                                {
+                                    model: tableDelegate.modelData.foregroundColor
+
+                                    Rectangle
+                                    {
+                                        width: 16
+                                        height: 16
+                                        color: modelData ?? "transparent"
+                                        border.color:
+                                            ColorTheme.transparent(ColorTheme.colors.light1, 0.1)
+                                        radius: 1
+                                    }
+                                }
+
+                                Text
+                                {
+                                    Layout.fillWidth: true
+
+                                    elide: Text.ElideRight
+                                    font.pixelSize: 14
+
+                                    color: isHoveredRow
+                                        ? ColorTheme.colors.light7
+                                        : ColorTheme.colors.light10
+                                    text: model.display || ""
+                                }
+
+                                Item
+                                {
+                                    id: spacer
+                                    Layout.fillWidth: true
+                                }
+
+                                ImageButton
+                                {
+                                    id: previewIcon
+
+                                    rightPadding: 4
+
+                                    icon.source: "image://skin/20x20/Solid/show_on_layout.svg"
+                                    visible: isHoveredRow
+                                        && column === tableView.model.columnCount() - 1
+
+                                    onClicked:
+                                        eventModel.showOnLayout(row)
+                                }
+                            }
+
+                            MouseArea
+                            {
+                                anchors.fill: parent
+                                enabled: !previewIcon.hovered
+                                onClicked:
+                                {
+                                    tableView.selectionModel.setCurrentIndex(
+                                        tableModel.index(row, column), ItemSelectionModel.Current)
+                                    if (!showPreview)
+                                    {
+                                        previewPanel.slideAnimationEnabled = true
+                                        showPreview = true
+                                    }
+                                }
+
+                                onDoubleClicked:
+                                {
+                                    eventModel.showOnLayout(row)
+                                }
+                            }
+                        }
+
+                        RightPanel.ModelViewController
+                        {
+                            id: controller
+
+                            view: tableView
+                            model: eventModel
+                            active: !tileView
+                            loggingCategory: LoggingCategory { name: "Nx.RightPanel.TableView" }
                         }
                     }
                 }
 
-                PersistentIndexWatcher
-                {
-                    id: selection
-                }
-
-                ModelDataAccessor
-                {
-                    id: accessor
-                    model: eventGrid.model
-                }
-
-                InformationBubble
-                {
-                    id: informationToolTip
-
-                    view: showPreview ? null : eventGrid
-                    z: 2
-                }
-
-                readonly property real availableWidth: width - leftMargin - rightMargin
-
-                readonly property int numColumns: Math.floor(
-                    availableWidth / (Metrics.kMinimumTileWidth + columnSpacing))
-
-                readonly property int rowsPerPage:
-                    Math.floor((height - topMargin - bottomMargin) / cellHeight)
-
-                columnWidth: (availableWidth / numColumns) - columnSpacing
-
-                width: resultsPanel.width
-                height: resultsPanel.height - counterBlock.height
-
-                model: RightPanelModel
+                RightPanelModel
                 {
                     id: eventModel
 
@@ -485,109 +813,6 @@ Window
                         analyticsFilters.setSelectedAttributeFilters(
                             analyticsSetup.attributeFilters)
                     }
-                }
-
-                Shortcut
-                {
-                    sequence: "Home"
-                    enabled: eventGrid.count > 0
-
-                    onActivated:
-                        selection.index = eventModel.index(0, 0)
-                }
-
-                Shortcut
-                {
-                    sequence: "End"
-                    enabled: eventGrid.count > 0
-
-                    onActivated:
-                        selection.index = eventModel.index(eventModel.rowCount() - 1, 0)
-                }
-
-                Shortcut
-                {
-                    sequence: "Left"
-                    enabled: eventGrid.count > 0 && selection.index.valid
-
-                    onActivated:
-                    {
-                        const newRow = Math.max(selection.index.row - 1, 0)
-                        selection.index = eventModel.index(newRow, 0)
-                    }
-                }
-
-                Shortcut
-                {
-                    sequence: "Right"
-                    enabled: eventGrid.count > 0 && selection.index.valid
-
-                    onActivated:
-                    {
-                        const newRow = Math.min(selection.index.row + 1, eventModel.rowCount() - 1)
-                        selection.index = eventModel.index(newRow, 0)
-                    }
-                }
-
-                Shortcut
-                {
-                    sequence: "Up"
-                    enabled: eventGrid.count > 0 && selection.index.valid
-
-                    onActivated:
-                    {
-                        const newRow = selection.index.row - eventGrid.numColumns
-                        if (newRow >= 0)
-                            selection.index = eventModel.index(newRow, 0)
-                    }
-                }
-
-                Shortcut
-                {
-                    sequence: "Down"
-                    enabled: eventGrid.count > 0 && selection.index.valid
-
-                    onActivated:
-                    {
-                        const newRow = selection.index.row + eventGrid.numColumns
-                        if (newRow < eventModel.rowCount())
-                            selection.index = eventModel.index(newRow, 0)
-                    }
-                }
-
-                Shortcut
-                {
-                    sequence: "PgUp"
-                    enabled: eventGrid.count > 0 && selection.index.valid
-
-                    onActivated:
-                    {
-                        const newRow = Math.max(0,
-                            selection.index.row - eventGrid.rowsPerPage * eventGrid.numColumns)
-                        selection.index = eventModel.index(newRow, 0)
-                    }
-                }
-
-                Shortcut
-                {
-                    sequence: "PgDown"
-                    enabled: eventGrid.count > 0 && selection.index.valid
-
-                    onActivated:
-                    {
-                        const newRow = Math.min(eventModel.rowCount() - 1,
-                            selection.index.row + eventGrid.rowsPerPage * eventGrid.numColumns)
-                        selection.index = eventModel.index(newRow, 0)
-                    }
-                }
-
-                Shortcut
-                {
-                    sequences: ["Up", "Down", "Left", "Right", "PgUp", "PgDown"]
-                    enabled: eventGrid.count > 0 && !selection.index.valid
-
-                    onActivated:
-                        selection.index = eventModel.index(0, 0)
                 }
             }
         }
@@ -702,8 +927,15 @@ Window
 
         property AttributeDisplayManager tileViewAttributeManager:
             windowContext && eventModel.analyticsSetup
-            ? AttributeDisplayManagerFactory.create(AttributeDisplayManager.Mode.tileView, filterModel)
-            : null
+                ? AttributeDisplayManagerFactory.create(
+                    AttributeDisplayManager.Mode.tileView, filterModel)
+                : null
+
+        property AttributeDisplayManager tableViewAttributeManager:
+            windowContext && eventModel.analyticsSetup
+                ? AttributeDisplayManagerFactory.create(
+                    AttributeDisplayManager.Mode.tableView, filterModel)
+                : null
 
         readonly property Analytics.Engine selectedAnalyticsEngine:
             tabBar.currentItem ? tabBar.currentItem.engine : null
@@ -833,8 +1065,19 @@ Window
 
     FilterSettingsDialog
     {
-        id: filterSettingsDialog
+        id: tileFilterSettingsDialog
+
+        title: qsTr("Tile Settings")
         attributeManager: d.tileViewAttributeManager
+        objectTypeIds: analyticsFilters.selectedAnalyticsObjectTypeIds
+    }
+
+    FilterSettingsDialog
+    {
+        id: tableFilterSettingsDialog
+
+        title: qsTr("Table Settings")
+        attributeManager: d.tableViewAttributeManager
         objectTypeIds: analyticsFilters.selectedAnalyticsObjectTypeIds
     }
 }
