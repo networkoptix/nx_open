@@ -170,6 +170,7 @@ bool BookmarkSearchListModel::Private::requestFetch(
     const auto sortOrder = EventSearch::sortOrderFromDirection(request.direction);
     auto filter = QnCameraBookmarkSearchFilter{
         .centralTimePointMs = duration_cast<milliseconds>(request.centralPointUs),
+        .text = textFilter->text().trimmed(),
         .limit = q->maximumCount(),
         .orderBy = QnBookmarkSortOrder(BookmarkSortField::startTime, sortOrder),
         .cameras = idsFromCameras(q->cameraSet().cameras())};
