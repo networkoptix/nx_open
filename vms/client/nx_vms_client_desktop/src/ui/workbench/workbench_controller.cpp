@@ -757,12 +757,16 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene* /*scene*/, QEven
         };
 
     const auto tryStartPtz =
-        [this](PtzInstrument::DirectionFlag direction) -> bool
+        [this](PtzInstrument::DirectionFlag direction, bool suppressBanner = false) -> bool
         {
             const auto widget = qobject_cast<QnMediaResourceWidget*>(
                 display()->widget(Qn::CentralRole));
 
             if (!m_ptzInstrument->supportsContinuousPtz(widget, direction))
+                return false;
+
+            // Don't show "PTZ can only be used in the live mode" banner if it is suppressed.
+            if (suppressBanner && !widget->isPlayingLive())
                 return false;
 
             m_ptzInstrument->toggleContinuousPtz(widget, direction, true);
@@ -841,7 +845,7 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene* /*scene*/, QEven
                 moveCursor(QPoint(-1, 0), QPoint(0, -1));
             else if (e->isAutoRepeat())
                 break;
-            else if (tryStartPtz(PtzInstrument::DirectionFlag::panLeft))
+            else if (tryStartPtz(PtzInstrument::DirectionFlag::panLeft, /*suppressBanner*/ navigator()->canJump()))
                 break;
             else if (!shift(ShiftDirection::rewind))
                 showNavigationMessage();
@@ -855,7 +859,7 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene* /*scene*/, QEven
                 moveCursor(QPoint(1, 0), QPoint(0, 1));
             else if (e->isAutoRepeat())
                 break;
-            else if (tryStartPtz(PtzInstrument::DirectionFlag::panRight))
+            else if (tryStartPtz(PtzInstrument::DirectionFlag::panRight, /*suppressBanner*/ navigator()->canJump()))
                 break;
             else if (!shift(ShiftDirection::fastForward))
                 showNavigationMessage();
@@ -995,6 +999,7 @@ void QnWorkbenchController::at_scene_keyReleased(QGraphicsScene* /*scene*/, QEve
                     navigator()->rewind();
                 }
             }
+            m_rewindDirection = ShiftDirection::noShift;
         };
 
     switch (e->key())
