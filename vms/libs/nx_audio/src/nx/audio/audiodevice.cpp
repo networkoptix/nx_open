@@ -112,6 +112,11 @@ AudioDevice::AudioDevice(QObject* parent):
 
 AudioDevice::~AudioDevice()
 {
+    deinitialize();
+}
+
+void AudioDevice::deinitialize()
+{
     if (m_device)
     {
         // Disable context
