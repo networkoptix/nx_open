@@ -35,7 +35,6 @@ bool isValidUrl(const QUrl& url)
 }
 
 static constexpr auto kAnyDomain = "*";
-static constexpr int kInvalidIndex = -1;
 
 enum DurationUnitItemRole
 {
@@ -222,7 +221,7 @@ QnWebpageDialog::QnWebpageDialog(SystemContext* systemContext, QWidget* parent, 
         ui->comboBoxRefreshPeriodUnit, QnTimeStrings::Suffix::Seconds, 1s);
     addDurationUnitComboBoxItem(
         ui->comboBoxRefreshPeriodUnit, QnTimeStrings::Suffix::Minutes, 1min);
-    ui->comboBoxRefreshPeriodUnit->setCurrentIndex(kInvalidIndex);
+    ui->comboBoxRefreshPeriodUnit->setCurrentIndex(0); //< Seconds by default.
 
     updateText();
     updateSelectServerMenuButtonVisibility();
@@ -260,6 +259,10 @@ void QnWebpageDialog::updateText()
     ui->disableCertificateCheckBox->setText(isIntegration
         ? tr("Allow opening this integration without SSL certificate checking")
         : tr("Allow opening this web page without SSL certificate checking"));
+
+    ui->refreshCheckBox->setText(isIntegration
+        ? tr("Auto-refresh integration")
+        : tr("Auto-refresh web page"));
 
     updateTitle();
 }

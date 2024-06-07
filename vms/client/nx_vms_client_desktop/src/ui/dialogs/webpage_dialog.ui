@@ -226,11 +226,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QCheckBox" name="refreshCheckBox">
-           <property name="text">
-            <string>Auto-refresh web page</string>
-           </property>
-          </widget>
+          <widget class="QCheckBox" name="refreshCheckBox"/>
          </item>
          <item>
           <widget class="QWidget" name="refreshParametersWidget" native="true">
