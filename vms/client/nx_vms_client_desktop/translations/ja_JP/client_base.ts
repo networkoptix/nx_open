@@ -6890,7 +6890,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Last day</source>
-      <translation>直近 24 時間</translation>
+      <translation>今日</translation>
     </message>
     <message>
       <source>Last 7 days</source>

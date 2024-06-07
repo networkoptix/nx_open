@@ -1261,7 +1261,7 @@ pour activer le PTZ</translation>
     <name>StringEditor</name>
     <message>
       <source>Min 3 characters</source>
-      <translation type="unfinished">Min 3 characters</translation>
+      <translation>Min 3 caractères</translation>
     </message>
   </context>
   <context>
