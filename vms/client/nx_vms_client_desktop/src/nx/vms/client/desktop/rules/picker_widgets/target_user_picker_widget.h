@@ -20,7 +20,6 @@ public:
 
 protected:
     void onSelectButtonClicked() override;
-    void updateUi() override;
 
 private:
     std::unique_ptr<QnSubjectValidationPolicy> m_policy;

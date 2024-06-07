@@ -5,6 +5,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/common/user_management/user_management_helpers.h>
 #include <nx/vms/rules/user_validation_policy.h>
 
 #include "../action_builder.h"
@@ -16,25 +17,9 @@
 #include "../rule.h"
 #include "../strings.h"
 #include "../utils/field.h"
+#include "../utils/validity.h"
 
 namespace nx::vms::rules {
-
-namespace {
-
-ValidationResult getValidity(
-    const QnSubjectValidationPolicy& policy, bool acceptAll, const UuidSet& subjects)
-{
-    const auto validity = policy.validity(acceptAll, subjects);
-    if (validity == QValidator::State::Acceptable)
-        return {};
-
-    return {
-        QValidator::State::Intermediate,
-        policy.calculateAlert(acceptAll, subjects)
-    };
-}
-
-} // namespace
 
 ValidationResult TargetUserFieldValidator::validity(
     const Field* field, const Rule* rule, common::SystemContext* context) const
@@ -61,7 +46,7 @@ ValidationResult TargetUserFieldValidator::validity(
             {
                 return {
                     QValidator::State::Invalid,
-                    tr("Acknowledge field must be provided for the given validation policy")};
+                    Strings::fieldValueMustBeProvided(utils::kAcknowledgeFieldName)};
             }
 
             if (acknowledgeField->value() == true)
@@ -72,7 +57,7 @@ ValidationResult TargetUserFieldValidator::validity(
                 {
                     return {
                         QValidator::State::Invalid,
-                        tr("SourceCameraField field must be provided for the given validation policy")};
+                        Strings::fieldValueMustBeProvided(utils::kCameraIdFieldName)};
                 }
 
                 QnRequiredAccessRightPolicy policy{
@@ -86,7 +71,8 @@ ValidationResult TargetUserFieldValidator::validity(
 
                 policy.setCameras(cameras);
 
-                return getValidity(policy, targetUserField->acceptAll(), targetUserField->ids());
+                return utils::usersValidity(
+                    policy, targetUserField->acceptAll(), targetUserField->ids());
             }
         }
         else if (targetUserFieldProperties.validationPolicy == kUserWithEmailValidationPolicy)
@@ -95,14 +81,16 @@ ValidationResult TargetUserFieldValidator::validity(
             QnUserWithEmailValidationPolicy policy{
                 context, targetUserFieldProperties.allowEmptySelection};
 
-            return getValidity(policy, targetUserField->acceptAll(), targetUserField->ids());
+            return utils::usersValidity(
+                policy, targetUserField->acceptAll(), targetUserField->ids());
         }
         else if (targetUserFieldProperties.validationPolicy == kCloudUserValidationPolicy)
         {
             QnCloudUsersValidationPolicy policy{
                 context, targetUserFieldProperties.allowEmptySelection};
 
-            return getValidity(policy, targetUserField->acceptAll(), targetUserField->ids());
+            return utils::usersValidity(
+                policy, targetUserField->acceptAll(), targetUserField->ids());
         }
         else if (targetUserFieldProperties.validationPolicy == kLayoutAccessValidationPolicy)
         {
@@ -112,16 +100,16 @@ ValidationResult TargetUserFieldValidator::validity(
             {
                 return {
                     QValidator::State::Invalid,
-                    tr("Layout field must be provided for the given validation policy")};
+                    Strings::fieldValueMustBeProvided(utils::kLayoutIdFieldName)};
             }
 
             QnLayoutAccessValidationPolicy policy{
                 context, targetUserFieldProperties.allowEmptySelection};
-
             policy.setLayout(
                 context->resourcePool()->getResourceById<QnLayoutResource>(layoutField->value()));
 
-            return getValidity(policy, targetUserField->acceptAll(), targetUserField->ids());
+            return utils::usersValidity(
+                policy, targetUserField->acceptAll(), targetUserField->ids());
         }
         else
         {
@@ -129,7 +117,8 @@ ValidationResult TargetUserFieldValidator::validity(
         }
     }
 
-    return {};
+    QnDefaultSubjectValidationPolicy policy{context, targetUserFieldProperties.allowEmptySelection};
+    return utils::usersValidity(policy, targetUserField->acceptAll(), targetUserField->ids());
 }
 
 } // namespace nx::vms::rules

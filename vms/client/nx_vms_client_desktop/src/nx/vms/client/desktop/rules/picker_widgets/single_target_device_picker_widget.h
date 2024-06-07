@@ -15,7 +15,6 @@
 #include <nx/vms/rules/utils/event.h>
 #include <nx/vms/rules/utils/field.h>
 
-#include "../utils/icons.h"
 #include "../utils/strings.h"
 #include "resource_picker_widget_base.h"
 
@@ -70,9 +69,6 @@ private:
     void updateUi() override
     {
         ResourcePickerWidgetBase<vms::rules::TargetSingleDeviceField>::updateUi();
-
-        m_selectButton->setText(Strings::selectButtonText(systemContext(), m_field));
-        m_selectButton->setIcon(selectButtonIcon(systemContext(), m_field));
 
         if (Policy::canUseSourceCamera())
         {

@@ -17,7 +17,6 @@ public:
     SingleTargetLayoutPicker(
         vms::rules::LayoutField* field, SystemContext* systemContext, ParamsWidget* parent);
 
-    void updateUi() override;
     void onSelectButtonClicked() override;
 
 private:

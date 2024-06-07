@@ -12,13 +12,17 @@
 #include <nx/vms/rules/utils/event_parameter_helper.h>
 
 #include "../rule.h"
-#include "../utils/field.h"
+#include "../strings.h"
 
 namespace nx::vms::rules {
 
 ValidationResult TextWithFieldsValidator::validity(
     const Field* field, const Rule* rule, common::SystemContext* context) const
 {
+    const auto textWithFields = dynamic_cast<const TextWithFields*>(field);
+    if (!NX_ASSERT(textWithFields, tr("Unacceptable typed of field")))
+        return {QValidator::State::Invalid, Strings::invalidFieldType()};
+
     using namespace utils;
     const auto event = rule->eventFilters().front();
     const auto objectTypeField = event->fieldByType<AnalyticsObjectTypeField>();
@@ -32,9 +36,6 @@ ValidationResult TextWithFieldsValidator::validity(
     bool containsCorrect = false;
     bool allCorrect = true;
     QStringList incorrectParams;
-    const auto textWithFields = dynamic_cast<const TextWithFields*>(field);
-    if (!NX_ASSERT(textWithFields, tr("Unacceptable typed of field")))
-        return {.validity = QValidator::State::Invalid, .description = tr("Internal error")};
 
     auto parsedValues = textWithFields->parsedValues();
     for (auto& value: parsedValues)

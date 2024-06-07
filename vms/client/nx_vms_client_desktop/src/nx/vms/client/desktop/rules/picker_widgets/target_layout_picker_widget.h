@@ -10,8 +10,6 @@
 #include <nx/vms/rules/action_builder_fields/target_layout_field.h>
 #include <ui/widgets/select_resources_button.h>
 
-#include "../utils/icons.h"
-#include "../utils/strings.h"
 #include "resource_picker_widget_base.h"
 
 namespace nx::vms::client::desktop::rules {
@@ -32,14 +30,6 @@ protected:
             return;
 
         m_field->setValue(selectedLayouts);
-    }
-
-    void updateUi() override
-    {
-        ResourcePickerWidgetBase<vms::rules::TargetLayoutField>::updateUi();
-
-        m_selectButton->setText(Strings::selectButtonText(systemContext(), m_field));
-        m_selectButton->setIcon(selectButtonIcon(systemContext(), m_field));
     }
 };
 

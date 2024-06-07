@@ -13,9 +13,6 @@
 #include <nx/vms/rules/utils/field.h>
 #include <ui/workbench/workbench_context.h>
 
-#include "../utils/icons.h"
-#include "../utils/strings.h"
-
 namespace nx::vms::client::desktop::rules {
 
 SingleTargetLayoutPicker::SingleTargetLayoutPicker(
@@ -25,14 +22,6 @@ SingleTargetLayoutPicker::SingleTargetLayoutPicker(
     :
     ResourcePickerWidgetBase<vms::rules::LayoutField>(field, systemContext, parent)
 {
-}
-
-void SingleTargetLayoutPicker::updateUi()
-{
-    ResourcePickerWidgetBase<vms::rules::LayoutField>::updateUi();
-
-    m_selectButton->setText(Strings::selectButtonText(systemContext(), m_field));
-    m_selectButton->setIcon(selectButtonIcon(systemContext(), m_field));
 }
 
 void SingleTargetLayoutPicker::onSelectButtonClicked()

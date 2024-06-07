@@ -92,8 +92,8 @@ bool QnSubjectValidationPolicy::isEmptySelectionAllowed() const
 QValidator::State QnSubjectValidationPolicy::validity(bool allUsers,
     const QSet<nx::Uuid>& subjects) const
 {
-    if (!allUsers && subjects.empty() && !m_allowEmptySelection)
-        return QValidator::Invalid;
+    if (!allUsers && subjects.empty())
+        return m_allowEmptySelection ? QValidator::Acceptable : QValidator::Invalid;
 
     QnUserResourceList users;
     QSet<nx::Uuid> groupIds;
@@ -102,6 +102,13 @@ QValidator::State QnSubjectValidationPolicy::validity(bool allUsers,
         users = resourcePool()->getResources<QnUserResource>();
     else
         nx::vms::common::getUsersAndGroups(systemContext(), subjects, users, groupIds);
+
+    if (users.empty() && !groupIds.empty())
+    {
+        const auto usersInGroups = nx::vms::common::allUsers(systemContext(), groupIds);
+        if (usersInGroups.empty())
+            return QValidator::Intermediate;
+    }
 
     enum StateFlag
     {
@@ -154,9 +161,23 @@ QValidator::State QnSubjectValidationPolicy::validity(bool allUsers,
 QString QnSubjectValidationPolicy::calculateAlert(
     bool allUsers, const QSet<nx::Uuid>& subjects) const
 {
-    return !allUsers && subjects.empty() && !m_allowEmptySelection
-        ? nx::vms::common::html::document(nx::vms::event::StringsHelper::needToSelectUserText())
-        : QString();
+    if (allUsers)
+        return {};
+
+    if (subjects.empty() && !m_allowEmptySelection)
+        return nx::vms::common::html::document(nx::vms::event::StringsHelper::needToSelectUserText());
+
+    QnUserResourceList users;
+    QSet<nx::Uuid> groupIds;
+    nx::vms::common::getUsersAndGroups(systemContext(), subjects, users, groupIds);
+    if (users.empty() && !groupIds.empty())
+    {
+        const auto usersInGroups = nx::vms::common::allUsers(systemContext(), groupIds);
+        if (usersInGroups.empty())
+            return nx::vms::common::html::document(tr("None of selected user roles contain users"));
+    }
+
+    return {};
 }
 
 //-------------------------------------------------------------------------------------------------

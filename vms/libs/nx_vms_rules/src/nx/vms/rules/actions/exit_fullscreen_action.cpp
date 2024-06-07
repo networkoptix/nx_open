@@ -18,6 +18,8 @@ const ItemDescriptor& ExitFullscreenAction::manifest()
         .flags = ItemFlag::instant,
         .executionTargets = ExecutionTarget::clients,
         .fields = {
+            makeFieldDescriptor<TargetLayoutField>(utils::kLayoutIdsFieldName,
+                Strings::onLayout()),
             makeFieldDescriptor<TargetUserField>(
                 utils::kUsersFieldName,
                 Strings::to(),
@@ -26,8 +28,6 @@ const ItemDescriptor& ExitFullscreenAction::manifest()
                     .visible = false,
                     .acceptAll = true
                 }.toVariantMap()),
-            makeFieldDescriptor<TargetLayoutField>(utils::kLayoutIdsFieldName,
-                Strings::onLayout()),
         },
         .resources = {{utils::kLayoutIdsFieldName, {ResourceType::layout}}},
     };

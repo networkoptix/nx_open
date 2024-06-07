@@ -12,7 +12,6 @@
 #include <nx/vms/rules/utils/field.h>
 
 #include "../params_widgets/params_widget.h"
-#include "../utils/icons.h"
 #include "../utils/strings.h"
 #include "resource_picker_widget_base.h"
 
@@ -37,10 +36,8 @@ public:
     using CameraPickerWidgetBase<vms::rules::SourceCameraField, Policy>::CameraPickerWidgetBase;
 
 protected:
-    using CameraPickerWidgetBase<vms::rules::SourceCameraField, Policy>::m_selectButton;
     using CameraPickerWidgetBase<vms::rules::SourceCameraField, Policy>::m_field;
     using CameraPickerWidgetBase<vms::rules::SourceCameraField, Policy>::systemContext;
-    using CameraPickerWidgetBase<vms::rules::SourceCameraField, Policy>::fieldValidity;
 
     void onSelectButtonClicked() override
     {
@@ -51,15 +48,6 @@ protected:
             m_field->setAcceptAll(Policy::emptyListIsValid() && selectedCameras.empty());
             m_field->setIds(selectedCameras);
         }
-    }
-
-    void updateUi() override
-    {
-        CameraPickerWidgetBase<vms::rules::SourceCameraField, Policy>::updateUi();
-
-        m_selectButton->setText(Strings::selectButtonText(systemContext(), m_field));
-        m_selectButton->setIcon(
-            selectButtonIcon(systemContext(), m_field, fieldValidity().validity));
     }
 };
 
@@ -104,10 +92,6 @@ protected:
     {
         CameraPickerWidgetBase<vms::rules::TargetDeviceField, Policy>::updateUi();
 
-        m_selectButton->setText(Strings::selectButtonText(systemContext(), m_field));
-        m_selectButton->setIcon(
-            selectButtonIcon(systemContext(), m_field, fieldValidity().validity));
-
         m_checkBox->setEnabled(
             vms::rules::hasSourceCamera(parentParamsWidget()->eventDescriptor().value()));
 
@@ -118,11 +102,9 @@ protected:
 private:
     using CameraPickerWidgetBase<vms::rules::TargetDeviceField, Policy>::m_field;
     using CameraPickerWidgetBase<vms::rules::TargetDeviceField, Policy>::m_contentWidget;
-    using CameraPickerWidgetBase<vms::rules::TargetDeviceField, Policy>::m_selectButton;
     using CameraPickerWidgetBase<vms::rules::TargetDeviceField, Policy>::connect;
     using CameraPickerWidgetBase<vms::rules::TargetDeviceField, Policy>::systemContext;
     using CameraPickerWidgetBase<vms::rules::TargetDeviceField, Policy>::parentParamsWidget;
-    using CameraPickerWidgetBase<vms::rules::TargetDeviceField, Policy>::fieldValidity;
 
     QCheckBox* m_checkBox{nullptr};
 
