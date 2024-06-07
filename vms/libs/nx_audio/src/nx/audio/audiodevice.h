@@ -29,6 +29,8 @@ public:
     AudioDevice(QObject* parent = nullptr);
     ~AudioDevice();
 
+    void deinitialize();
+
     Sound* createSound(const nx::media::audio::Format& format) const;
 
     /**
