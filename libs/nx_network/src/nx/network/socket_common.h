@@ -147,6 +147,10 @@ public:
     bool isLocalNetwork() const;
     bool isIpv4LinkLocalNetwork() const;
 
+    /**
+     * @return true if object was constructed using the ipv4 or ipv6 constructor. Returns false
+     * if the object was constructed via a string.
+     */
     bool isIpAddress() const;
     bool isPureIpV6() const;
 

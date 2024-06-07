@@ -76,6 +76,11 @@ public:
         return waitUntilStarted();
     }
 
+    virtual bool isStarted() const
+    {
+        return m_started;
+    }
+
     virtual bool waitUntilStarted()
     {
         // NOTE: Valgrind does not stand small timeouts.
@@ -85,10 +90,12 @@ public:
         if (moduleStartedFuture.wait_for(initializedMaxWaitTime) !=
             std::future_status::ready)
         {
+            m_started = false;
             return false;
         }
 
-        return moduleStartedFuture.get();
+        m_started = moduleStartedFuture.get();
+        return m_started;
     }
 
     void stop()
@@ -98,6 +105,8 @@ public:
             if (m_moduleInstance)
                 m_moduleInstance->pleaseStop();
         }
+
+        m_started = false;
 
         if (m_moduleProcessThread.joinable())
             m_moduleProcessThread.join();
@@ -220,6 +229,7 @@ private:
     std::unique_ptr<ModuleProcessType> m_moduleInstance;
     nx::utils::thread m_moduleProcessThread;
     std::unique_ptr<nx::utils::promise<bool /*result*/>> m_moduleStartedPromise;
+    std::atomic_bool m_started = false;
     mutable std::mutex m_mutex;
 };
 

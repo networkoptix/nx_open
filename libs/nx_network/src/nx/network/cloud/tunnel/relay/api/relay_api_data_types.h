@@ -108,8 +108,9 @@ struct CreateClientSessionRequest
     std::string targetPeerName;
     std::string desiredSessionId;
 
-    // This field is used by traffic_relay internally. TODO: #akolesnikov remove it from here.
+    // These fields are used by traffic_relay internally. TODO: #akolesnikov remove it from here.
     bool isRequestReceivedOverSsl = false;
+    nx::network::SocketAddress clientEndpoint;
 };
 
 #define CreateClientSessionRequest_Fields (targetPeerName)(desiredSessionId)
