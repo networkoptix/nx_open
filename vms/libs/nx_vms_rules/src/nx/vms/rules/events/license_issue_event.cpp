@@ -58,6 +58,7 @@ const ItemDescriptor& LicenseIssueEvent::manifest()
         .id = utils::type<LicenseIssueEvent>(),
         .groupId = kServerIssueEventGroup,
         .displayName = NX_DYNAMIC_TRANSLATABLE(tr("License Issue")),
+        .flags = {ItemFlag::instant, ItemFlag::localLicense},
         .resources = {
             {utils::kDeviceIdsFieldName, {ResourceType::device, Qn::ViewContentPermission}},
             {utils::kServerIdFieldName, {ResourceType::server}}},

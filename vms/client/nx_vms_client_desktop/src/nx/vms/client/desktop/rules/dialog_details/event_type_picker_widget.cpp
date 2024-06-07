@@ -10,6 +10,7 @@
 #include <nx/vms/rules/manifest.h>
 #include <nx/vms/rules/strings.h>
 #include <nx/vms/rules/utils/common.h>
+#include <nx/vms/rules/utils/compatibility.h>
 #include <ui/common/palette.h>
 
 namespace nx::vms::client::desktop::rules {
@@ -22,15 +23,11 @@ EventTypePickerWidget::EventTypePickerWidget(SystemContext* context, QWidget* pa
     ui->setupUi(this);
     setPaletteColor(ui->whenLabel, QPalette::WindowText, QPalette().color(QPalette::Light));
 
-    const auto servers = systemContext()->resourcePool()->servers();
-    for (const auto& eventDescriptor: systemContext()->vmsRulesEngine()->events())
+    for (const auto& eventDescriptor: nx::vms::rules::utils::filterItems(
+        systemContext(),
+        nx::vms::rules::utils::defaultItemFilters(),
+        systemContext()->vmsRulesEngine()->events().values()))
     {
-        if (!vms::rules::utils::hasItemSupportedServer(servers, eventDescriptor))
-            continue;
-
-        if (eventDescriptor.flags.testFlag(vms::rules::ItemFlag::system))
-            continue;
-
         ui->eventTypeComboBox->addItem(eventDescriptor.displayName, eventDescriptor.id);
     }
 

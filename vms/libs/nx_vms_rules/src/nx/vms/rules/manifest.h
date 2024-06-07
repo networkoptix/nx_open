@@ -34,7 +34,11 @@ NX_REFLECTION_ENUM_CLASS(ItemFlag,
     omitLogging = 1 << 4,
 
     /** The item may appear in the event log, but must not be created. */
-    deprecated = 1 << 5
+    deprecated = 1 << 5,
+
+    /** Type of license required for item to be visible in UI. */
+    saasLicense = 1 << 6,
+    localLicense = 1 << 7
 )
 
 Q_DECLARE_FLAGS(ItemFlags, ItemFlag)

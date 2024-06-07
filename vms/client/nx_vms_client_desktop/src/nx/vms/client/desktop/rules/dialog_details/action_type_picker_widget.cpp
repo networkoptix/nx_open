@@ -11,6 +11,7 @@
 #include <nx/vms/rules/manifest.h>
 #include <nx/vms/rules/strings.h>
 #include <nx/vms/rules/utils/common.h>
+#include <nx/vms/rules/utils/compatibility.h>
 #include <ui/common/palette.h>
 
 namespace nx::vms::client::desktop::rules {
@@ -23,15 +24,11 @@ ActionTypePickerWidget::ActionTypePickerWidget(SystemContext* context, QWidget* 
     ui->setupUi(this);
     setPaletteColor(ui->doLabel, QPalette::WindowText, core::colorTheme()->color("light1"));
 
-    const auto servers = systemContext()->resourcePool()->servers();
-    for (const auto& actionDescriptor: systemContext()->vmsRulesEngine()->actions())
+    for (const auto& actionDescriptor: nx::vms::rules::utils::filterItems(
+        systemContext(),
+        nx::vms::rules::utils::defaultItemFilters(),
+        systemContext()->vmsRulesEngine()->actions().values()))
     {
-        if (!vms::rules::utils::hasItemSupportedServer(servers, actionDescriptor))
-            continue;
-
-        if (actionDescriptor.flags.testFlag(vms::rules::ItemFlag::system))
-            continue;
-
         ui->actionTypeComboBox->addItem(actionDescriptor.displayName, actionDescriptor.id);
     }
 
