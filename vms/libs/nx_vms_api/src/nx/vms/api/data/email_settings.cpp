@@ -12,4 +12,9 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(EmailSettingsRequest, (json), EmailSettingsRequ
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(EmailSettingsReply, (json), EmailSettingsReply_Fields)
 
+QByteArray EmailSettings::toString() const
+{
+    return QJson::serialized(this);
+}
+
 } // namespace nx::vms::api

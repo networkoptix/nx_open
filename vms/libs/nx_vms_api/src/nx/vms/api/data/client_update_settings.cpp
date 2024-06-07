@@ -15,4 +15,9 @@ ClientUpdateSettings::ClientUpdateSettings():
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ClientUpdateSettings, (json), ClientUpdateSettings_Fields)
 
-} // namespace nx::vms::common::api
+QByteArray ClientUpdateSettings::toString() const
+{
+    return QJson::serialized(this);
+}
+
+} // namespace nx::vms::api

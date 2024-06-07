@@ -8,4 +8,9 @@ namespace nx::vms::api {
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(PersistentUpdateStorage, (json), PersistentUpdateStorage_Fields)
 
+QByteArray PersistentUpdateStorage::toString() const
+{
+    return QJson::serialized(this);
+}
+
 } // namespace nx::vms::api
