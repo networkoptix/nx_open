@@ -11,8 +11,6 @@
 #include <nx/vms/rules/action_builder_fields/target_server_field.h>
 #include <nx/vms/rules/event_filter_fields/source_server_field.h>
 
-#include "../utils/icons.h"
-#include "../utils/strings.h"
 #include "resource_picker_widget_base.h"
 
 namespace nx::vms::client::desktop::rules {
@@ -27,17 +25,6 @@ public:
 
 protected:
     BASE_COMMON_USINGS
-    using ResourcePickerWidgetBase<F>::m_selectButton;
-    using ResourcePickerWidgetBase<F>::updateUi;
-    using ResourcePickerWidgetBase<F>::systemContext;
-
-    void updateUi() override
-    {
-        ResourcePickerWidgetBase<F>::updateUi();
-
-        m_selectButton->setText(Strings::selectButtonText(systemContext(), m_field));
-        m_selectButton->setIcon(selectButtonIcon(systemContext(), m_field));
-    }
 
     void onSelectButtonClicked() override
     {
@@ -47,7 +34,6 @@ protected:
             selectedServers, Policy::isServerValid, Policy::infoText(), this))
         {
             m_field->setIds(selectedServers);
-            updateUi();
         }
     }
 };

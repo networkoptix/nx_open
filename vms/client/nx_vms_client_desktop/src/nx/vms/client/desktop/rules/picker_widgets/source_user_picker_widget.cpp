@@ -10,9 +10,6 @@
 #include <nx/vms/client/desktop/ui/event_rules/subject_selection_dialog.h>
 #include <ui/widgets/select_resources_button.h>
 
-#include "../utils/icons.h"
-#include "../utils/strings.h"
-
 namespace nx::vms::client::desktop::rules {
 
 SourceUserPicker::SourceUserPicker(
@@ -46,14 +43,6 @@ void SourceUserPicker::onSelectButtonClicked()
 
     m_field->setAcceptAll(dialog.allUsers());
     m_field->setIds(dialog.checkedSubjects());
-}
-
-void SourceUserPicker::updateUi()
-{
-    ResourcePickerWidgetBase<vms::rules::SourceUserField>::updateUi();
-
-    m_selectButton->setText(Strings::selectButtonText(systemContext(), m_field));
-    m_selectButton->setIcon(selectButtonIcon(systemContext(), m_field));
 }
 
 } // namespace nx::vms::client::desktop::rules

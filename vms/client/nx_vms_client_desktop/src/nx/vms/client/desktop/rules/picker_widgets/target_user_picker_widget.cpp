@@ -3,12 +3,14 @@
 #include "target_user_picker_widget.h"
 
 #include <core/resource/camera_resource.h>
+#include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/event_rules/subject_selection_dialog.h>
 #include <nx/vms/rules/action_builder_fields/event_devices_field.h>
 #include <nx/vms/rules/action_builder_fields/flag_field.h>
+#include <nx/vms/rules/action_builder_fields/layout_field.h>
 #include <nx/vms/rules/action_builder_fields/target_layout_field.h>
 #include <nx/vms/rules/action_builder_fields/text_field.h>
 #include <nx/vms/rules/actions/open_layout_action.h>
@@ -18,10 +20,6 @@
 #include <nx/vms/rules/event_filter_fields/source_camera_field.h>
 #include <nx/vms/rules/utils/field.h>
 #include <nx/vms/rules/utils/type.h>
-#include <utils/email/email.h>
-
-#include "../utils/icons.h"
-#include "../utils/strings.h"
 
 namespace nx::vms::client::desktop::rules {
 
@@ -75,7 +73,25 @@ void TargetUserPicker::onSelectButtonClicked()
     }
 
     if (isValidationPolicyRequired)
+    {
         dialog.setValidationPolicy(m_policy.get());
+
+        if (m_field->properties().validationPolicy == vms::rules::kLayoutAccessValidationPolicy)
+        {
+            const auto layoutField =
+                getActionField<vms::rules::LayoutField>(vms::rules::utils::kLayoutIdFieldName);
+
+            if (!NX_ASSERT(
+                layoutField, "LayoutField must be provided for the given validation policy"))
+            {
+                return;
+            }
+
+            const auto layoutResource =
+                resourcePool()->getResourceById<QnLayoutResource>(layoutField->value());
+            static_cast<QnLayoutAccessValidationPolicy*>(m_policy.get())->setLayout(layoutResource);
+        }
+    }
 
     dialog.setCheckedSubjects(m_field->ids());
     dialog.setAllUsers(m_field->acceptAll());
@@ -85,25 +101,6 @@ void TargetUserPicker::onSelectButtonClicked()
 
     m_field->setIds(dialog.checkedSubjects());
     m_field->setAcceptAll(dialog.allUsers());
-}
-
-void TargetUserPicker::updateUi()
-{
-    ResourcePickerWidgetBase<vms::rules::TargetUserField>::updateUi();
-
-    int additionalCount{0};
-    if (const auto additionalRecipients =
-        getActionField<vms::rules::ActionTextField>(vms::rules::utils::kEmailsFieldName))
-    {
-        if (!additionalRecipients->value().isEmpty())
-        {
-            const auto emails = additionalRecipients->value().split(';', Qt::SkipEmptyParts);
-            additionalCount = static_cast<int>(emails.size());
-        }
-    }
-
-    m_selectButton->setText(Strings::selectButtonText(systemContext(), m_field, additionalCount));
-    m_selectButton->setIcon(selectButtonIcon(systemContext(), m_field, additionalCount));
 }
 
 } // namespace nx::vms::client::desktop::rules

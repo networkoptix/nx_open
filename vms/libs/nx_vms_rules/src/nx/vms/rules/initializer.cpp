@@ -8,8 +8,10 @@
 #include <nx/vms/rules/event_filter_fields/builtin_fields.h>
 #include <nx/vms/rules/events/builtin_events.h>
 
+#include "action_builder_field_validators/layout_field_validator.h"
 #include "action_builder_field_validators/optional_time_field_validator.h"
 #include "action_builder_field_validators/target_device_field_validator.h"
+#include "action_builder_field_validators/target_layout_field_validator.h"
 #include "action_builder_field_validators/target_server_field_validator.h"
 #include "action_builder_field_validators/target_single_device_field_validator.h"
 #include "action_builder_field_validators/target_user_field_validator.h"
@@ -195,8 +197,10 @@ void Initializer::registerFieldValidators() const
     registerFieldValidator<SourceUserField>(new SourceUserFieldValidator);
 
     // Action field validators.
+    registerFieldValidator<LayoutField>(new LayoutFieldValidator);
     registerFieldValidator<OptionalTimeField>(new OptionalTimeFieldValidator);
     registerFieldValidator<TargetDeviceField>(new TargetDeviceFieldValidator);
+    registerFieldValidator<TargetLayoutField>(new TargetLayoutFieldValidator);
     registerFieldValidator<TargetServerField>(new TargetServerFieldValidator);
     registerFieldValidator<TargetSingleDeviceField>(new TargetSingleDeviceFieldValidator);
     registerFieldValidator<TargetUserField>(new TargetUserFieldValidator);

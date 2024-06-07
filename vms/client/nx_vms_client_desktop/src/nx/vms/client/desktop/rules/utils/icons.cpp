@@ -105,8 +105,14 @@ QIcon selectButtonIcon(SystemContext* context, vms::rules::TargetSingleDeviceFie
 }
 
 QIcon selectButtonIcon(
-    SystemContext* context, vms::rules::TargetUserField* field, int additionalCount)
+    SystemContext* context,
+    vms::rules::TargetUserField* field,
+    int additionalCount,
+    QValidator::State fieldValidity)
 {
+    if (fieldValidity == QValidator::State::Intermediate)
+        return attentionIcon();
+
     if (field->acceptAll())
         return getIcon(QnResourceIconCache::Users);
 

@@ -353,6 +353,14 @@ QString Strings::noSuitableServers(QValidator::State state)
         : tr("There are no suitable servers");
 }
 
+QString Strings::fieldValueMustBeProvided(const QString& fieldName)
+{
+    return tr(
+        "Field %1 value must be provided for the given validation policy",
+        "API error message when event rule cannot be created due to incomplete fields set")
+        .arg(fieldName);
+}
+
 TranslatableString Strings::at()
 {
     return NX_DYNAMIC_TRANSLATABLE(tr("At"));

@@ -13,6 +13,7 @@
 #include "../rule.h"
 #include "../strings.h"
 #include "../utils/field.h"
+#include "../utils/validity.h"
 
 namespace nx::vms::rules {
 
@@ -41,7 +42,7 @@ ValidationResult SourceUserFieldValidator::validity(
             {
                 return {
                     QValidator::State::Invalid,
-                    tr("Source camera field must be provided for the given validation policy")};
+                    Strings::fieldValueMustBeProvided(utils::kCameraIdFieldName)};
             }
 
             const auto cameraIds = cameraField->ids();
@@ -57,15 +58,8 @@ ValidationResult SourceUserFieldValidator::validity(
                     sourceUserFieldProperties.allowEmptySelection};
                 policy.setCameras(cameras);
 
-                const auto validity =
-                    policy.validity(sourceUserField->acceptAll(), sourceUserField->ids());
-
-                if (validity == QValidator::State::Acceptable)
-                    return {};
-
-                return {
-                    QValidator::State::Intermediate,
-                    policy.calculateAlert(sourceUserField->acceptAll(), sourceUserField->ids())};
+                return utils::usersValidity(
+                    policy, sourceUserField->acceptAll(), sourceUserField->ids());
             }
         }
         else
@@ -74,7 +68,8 @@ ValidationResult SourceUserFieldValidator::validity(
         }
     }
 
-    return {};
+    QnDefaultSubjectValidationPolicy policy{context, sourceUserFieldProperties.allowEmptySelection};
+    return utils::usersValidity(policy, sourceUserField->acceptAll(), sourceUserField->ids());
 }
 
 } // namespace nx::vms::rules

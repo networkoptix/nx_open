@@ -14,6 +14,8 @@ class QnResourceAccessSubject;
 // User and role validation policy.
 class NX_VMS_COMMON_API QnSubjectValidationPolicy: public nx::vms::common::SystemContextAware
 {
+    Q_DECLARE_TR_FUNCTIONS(QnSubjectValidationPolicy)
+
 public:
     explicit QnSubjectValidationPolicy(
         nx::vms::common::SystemContext* systemContext,

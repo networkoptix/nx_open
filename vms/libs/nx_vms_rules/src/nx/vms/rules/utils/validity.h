@@ -6,6 +6,7 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
+#include <nx/vms/rules/user_validation_policy.h>
 
 #include "../field_validator.h"
 
@@ -61,6 +62,19 @@ ValidationResult cameraValidity(common::SystemContext* context, QnVirtualCameraR
     return {
         QValidator::State::Invalid,
         ValidationPolicy::getText(context, {device})};
+}
+
+inline ValidationResult usersValidity(
+    const QnSubjectValidationPolicy& policy, bool acceptAll, const UuidSet& subjects)
+{
+    const auto validity = policy.validity(acceptAll, subjects);
+    if (validity == QValidator::State::Acceptable)
+        return {};
+
+    return {
+        QValidator::State::Intermediate,
+        policy.calculateAlert(acceptAll, subjects)
+    };
 }
 
 } // namespace nx::vms::rules::utils

@@ -26,7 +26,10 @@ QIcon selectButtonIcon(SystemContext* context, vms::rules::TargetLayoutField* fi
 QIcon selectButtonIcon(SystemContext* context, vms::rules::TargetServerField* field);
 QIcon selectButtonIcon(SystemContext* context, vms::rules::TargetSingleDeviceField* field);
 QIcon selectButtonIcon(
-    SystemContext* context, vms::rules::TargetUserField* field, int additionalCount);
+    SystemContext* context,
+    vms::rules::TargetUserField* field,
+    int additionalCount,
+    QValidator::State fieldValidity);
 
 QIcon selectButtonIcon(SystemContext* context, vms::rules::SourceCameraField* field);
 QIcon selectButtonIcon(SystemContext* context, vms::rules::SourceServerField* field);

@@ -5,6 +5,11 @@
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QVBoxLayout>
 
+#include <nx/vms/rules/action_builder_fields/text_field.h>
+#include <nx/vms/rules/utils/field.h>
+
+#include "../utils/icons.h"
+#include "../utils/strings.h"
 #include "field_picker_widget.h"
 #include "picker_widget_utils.h"
 
@@ -37,11 +42,15 @@ public:
 protected:
     BASE_COMMON_USINGS
     using PlainFieldPickerWidget<F>::fieldValidity;
+    using PlainFieldPickerWidget<F>::systemContext;
+    using PlainFieldPickerWidget<F>::getActionField;
 
     QPushButton* m_selectButton{nullptr};
 
     void updateUi() override
     {
+        updateSelectButtonUi();
+
         const auto validity = fieldValidity();
         if (validity.validity == QValidator::State::Invalid)
         {
@@ -54,7 +63,37 @@ protected:
         PlainFieldPickerWidget<F>::setValidity({});
     }
 
+    void updateSelectButtonUi();
+
     virtual void onSelectButtonClicked() = 0;
 };
+
+template<class F>
+void ResourcePickerWidgetBase<F>::updateSelectButtonUi()
+{
+    m_selectButton->setText(Strings::selectButtonText(systemContext(), m_field));
+    m_selectButton->setIcon(
+        selectButtonIcon(systemContext(), m_field, fieldValidity().validity));
+}
+
+template<>
+inline void ResourcePickerWidgetBase<nx::vms::rules::TargetUserField>::updateSelectButtonUi()
+{
+    int additionalCount{0};
+    if (const auto additionalRecipients =
+        this->template getActionField<vms::rules::ActionTextField>(vms::rules::utils::kEmailsFieldName))
+    {
+        if (!additionalRecipients->value().isEmpty())
+        {
+            const auto emails = additionalRecipients->value().split(';', Qt::SkipEmptyParts);
+            additionalCount = static_cast<int>(emails.size());
+        }
+    }
+
+    m_selectButton->setText(
+        Strings::selectButtonText(systemContext(), m_field, additionalCount));
+    m_selectButton->setIcon(
+        selectButtonIcon(systemContext(), m_field, additionalCount, fieldValidity().validity));
+}
 
 } // namespace nx::vms::client::desktop::rules
