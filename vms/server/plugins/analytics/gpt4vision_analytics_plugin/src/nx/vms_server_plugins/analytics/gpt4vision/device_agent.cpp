@@ -247,7 +247,8 @@ void DeviceAgent::sendVideoFrameToOpenAi(const open_ai::QueryPayload& payload)
             }
             else
             {
-                showErrorMessage("Request cannot be sent: " + m_client->lastSysErrorCode());
+                showErrorMessage("Request cannot be sent: "
+                    + SystemError::toString(m_client->lastSysErrorCode()));
             }
             m_queryInProgress = false;
         };
