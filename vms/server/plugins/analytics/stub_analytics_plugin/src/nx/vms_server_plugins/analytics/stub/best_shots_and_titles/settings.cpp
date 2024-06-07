@@ -43,6 +43,9 @@ const std::string kTitleHeightSetting = "titleHeight";
 const std::string kTitleObjectCountSetting = "titleObjectCount";
 const std::string kFrameNumberToGenerateTitleSetting = "frameNumberToGenerateTitle";
 
+const std::string kEnableBestShotGeneration = "enableBestShotGeneration";
+const std::string kEnableObjectTitleGeneration = "enableObjectTitleGeneration";
+
 } // namespace best_shots
 } // namespace stub
 } // namespace analytics

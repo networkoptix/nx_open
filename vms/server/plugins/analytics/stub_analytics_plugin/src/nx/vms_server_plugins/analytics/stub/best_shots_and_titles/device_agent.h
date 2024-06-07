@@ -108,7 +108,7 @@ private:
     nx::sdk::Ptr<nx::sdk::analytics::IObjectTrackTitlePacket> generateImageTitle(
         nx::sdk::Uuid trackId);
 
-    void generateBestShotOrTitle();
+    void maybeGenerateBestShotAndTitle();
     void generateBestShotObject();
     void generateTitleObject();
 
@@ -128,7 +128,8 @@ private:
     std::map<nx::sdk::Uuid, int> m_titleGenerationCounterByTrackId;
 
     int64_t m_lastFrameTimestampUs = 0;
-    bool m_generateBestShotOrTitle = true;
+    bool m_generateBestShot = true;
+    bool m_generateTitle = true;
 };
 
 } // namespace best_shots
