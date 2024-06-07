@@ -25,11 +25,13 @@
 #include <nx/network/socket_global.h>
 #include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/scoped_connections.h>
 #include <nx/utils/trace/trace.h>
 #include <nx/vms/client/core/network/cloud_auth_data.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/network/credentials_manager.h>
 #include <nx/vms/client/core/network/logon_data_helpers.h>
+#include <nx/vms/client/core/network/remote_session.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
@@ -99,8 +101,6 @@ struct StartupActionsHandler::Private
 {
     QnWorkbenchContext* const context;
 
-    bool delayedDropGuard = false;
-
     // List of serialized resources that are to be dropped on the scene once the user logs in.
     struct
     {
@@ -118,6 +118,7 @@ struct StartupActionsHandler::Private
     std::unique_ptr<LogonData> delayedLogonParameters;
     std::unique_ptr<QTimer> delayedLogonTimer;
     std::unique_ptr<DefaultWebpageHandler> defaultWebpageHandler;
+    nx::utils::ScopedConnection sessionConnection;
 
     Private(QnWorkbenchContext* context):
         context(context)
@@ -199,9 +200,6 @@ StartupActionsHandler::StartupActionsHandler(QObject* parent):
     connect(action(ProcessStartupParametersAction), &QAction::triggered, this,
         &StartupActionsHandler::handleStartupParameters);
 
-    connect(context()->messageProcessor(), &QnCommonMessageProcessor::initialResourcesReceived,
-        this, &StartupActionsHandler::handleConnected);
-
     // Delayed system connection may require information from qnSystemFinder,
     // so let it process signal first, by queuing following connection.
     connect(qnCloudStatusWatcher, &core::CloudStatusWatcher::cloudSystemsChanged, this,
@@ -214,6 +212,34 @@ StartupActionsHandler::StartupActionsHandler(QObject* parent):
         // restored before the default web page is opened.
         d->defaultWebpageHandler = std::make_unique<DefaultWebpageHandler>(context());
     }
+
+    // Connect to the established session.
+    if (!qnRuntime->isVideoWallMode())
+    {
+        connect(context()->systemContext(), &core::SystemContext::remoteIdChanged, this,
+            [this]()
+            {
+                d->sessionConnection.reset();
+
+                auto session = context()->systemContext()->session();
+                if (!session)
+                    return;
+
+                d->sessionConnection.reset(connect(
+                    session.get(),
+                    &core::RemoteSession::stateChanged,
+                    this,
+                    [this](core::RemoteSession::State state)
+                    {
+                        if (state == core::RemoteSession::State::connected)
+                        {
+                            handleConnected();
+                            // Do not re-load saved state more than once per each session.
+                            d->sessionConnection.reset();
+                        }
+                    }));
+            });
+    }
 }
 
 StartupActionsHandler::~StartupActionsHandler()
@@ -222,7 +248,7 @@ StartupActionsHandler::~StartupActionsHandler()
 
 void StartupActionsHandler::handleConnected()
 {
-    if (!context()->user())
+    if (!NX_ASSERT(context()->user()))
         return;
 
     // Sometimes we get here when 'New Layout' has already been added. But all user's layouts must
@@ -244,26 +270,21 @@ void StartupActionsHandler::handleConnected()
     // cleared here even if no state is saved.
     if (d->delayedDrops.empty() && qnRuntime->isDesktopMode())
         workbench()->applyLoadedState();
+    else
+        submitDelayedDrops();
 
     if (workbench()->layouts().empty())
         menu()->trigger(OpenNewTabAction);
-
-    submitDelayedDrops();
 }
 
 void StartupActionsHandler::submitDelayedDrops()
 {
-    if (d->delayedDropGuard)
-        return;
-
     if (d->delayedDrops.empty())
         return;
 
     // Delayed drops actual only for logged-in users.
-    if (!context()->user())
+    if (!NX_ASSERT(context()->user()))
         return;
-
-    QScopedValueRollback<bool> guard(d->delayedDropGuard, true);
 
     QnResourceList resources;
     if (const auto layoutRef = d->delayedDrops.layoutRef; !layoutRef.isEmpty())
@@ -383,7 +404,10 @@ void StartupActionsHandler::handleStartupParameters()
         d->delayedDrops.layoutRef = startupParameters.layoutRef;
     }
 
-    submitDelayedDrops();
+    // FIXME: #sivanov Remove in 6.1.
+    // This should never happen but keeping in 6.0 to avoid potential issues before the release.
+    if (!NX_ASSERT(!context()->user()))
+        submitDelayedDrops();
 
     // Show beta version for all publication types except releases and montly patches.
     const bool nonPublicVersion =

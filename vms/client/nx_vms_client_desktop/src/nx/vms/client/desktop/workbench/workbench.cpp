@@ -165,8 +165,11 @@ struct Workbench::Private
     /** Whether current layout is being changed. */
     bool inLayoutChangeProcess = false;
 
-    /** Whether workbench is in session restore process. */
-    bool inSessionRestoreProcess = false;
+    /**
+     * Whether workbench is in intended clear process. Flag is used to avoid unneccesary new tab
+     * creation on resources deletion.
+     */
+    bool inClearProcess = false;
 
     std::shared_ptr<StateDelegate> stateDelegate;
 
@@ -278,6 +281,7 @@ WindowContext* Workbench::windowContext() const
 
 void Workbench::clear()
 {
+    QScopedValueRollback<bool> rollback(d->inClearProcess, true);
     setCurrentLayout(nullptr);
 
     QSet<LayoutResourcePtr> removedLayouts;
@@ -735,7 +739,6 @@ void Workbench::updateCentralRoleItem()
 
 void Workbench::update(const WorkbenchState& state)
 {
-    QScopedValueRollback<bool> rollback(d->inSessionRestoreProcess, true);
     clear();
 
     for (const auto& id: state.layoutUuids)
@@ -989,9 +992,9 @@ bool Workbench::isInLayoutChangeProcess() const
     return d->inLayoutChangeProcess;
 }
 
-bool Workbench::isInSessionRestoreProcess() const
+bool Workbench::inClearProcess() const
 {
-    return d->inSessionRestoreProcess;
+    return d->inClearProcess;
 }
 
 } // namespace nx::vms::client::desktop

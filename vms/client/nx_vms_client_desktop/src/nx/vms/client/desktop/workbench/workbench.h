@@ -202,7 +202,12 @@ public:
     void applyLoadedState();
 
     bool isInLayoutChangeProcess() const;
-    bool isInSessionRestoreProcess() const;
+
+    /**
+     * Whether workbench is in intended clear process. Flag is used to avoid unneccesary new tab
+     * creation on resources deletion.
+     */
+    bool inClearProcess() const;
 
 signals:
     /**

@@ -221,9 +221,10 @@ LayoutsHandler::LayoutsHandler(QObject *parent):
             if (!layouts.empty())
                 workbench()->removeLayouts(layouts);
 
+            // Safety measure to ensure client will never have an empty workbench state.
             if (qnClientMessageProcessor->connectionStatus()->state() == QnConnectionState::Ready
                 && workbench()->layouts().empty()
-                && !workbench()->isInSessionRestoreProcess())
+                && !workbench()->inClearProcess())
             {
                 menu()->trigger(action::OpenNewTabAction);
             }
