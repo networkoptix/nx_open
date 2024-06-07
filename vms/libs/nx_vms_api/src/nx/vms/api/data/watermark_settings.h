@@ -18,6 +18,7 @@ struct NX_VMS_API WatermarkSettings
     double opacity = 0.3;
 
     bool operator==(const WatermarkSettings& other) const;
+    QByteArray toString() const;
 };
 
 #define WatermarkSettings_Fields (useWatermark)(frequency)(opacity)

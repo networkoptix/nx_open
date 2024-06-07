@@ -6,9 +6,11 @@
 
 namespace nx::vms::api {
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    BackupSettings,
-    (json),
-    BackupSettings_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(BackupSettings, (json), BackupSettings_Fields)
+
+QByteArray BackupSettings::toString() const
+{
+    return QJson::serialized(this);
+}
 
 } // namespace nx::vms::api

@@ -14,4 +14,9 @@ bool PixelationSettings::operator==(const PixelationSettings& other) const
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(PixelationSettings, (json), PixelationSettings_Fields)
 
+QByteArray PixelationSettings::toString() const
+{
+    return QJson::serialized(this);
+}
+
 } // namespace nx::vms::api

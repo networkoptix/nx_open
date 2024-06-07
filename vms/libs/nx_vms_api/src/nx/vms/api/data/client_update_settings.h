@@ -31,6 +31,7 @@ struct NX_VMS_API ClientUpdateSettings
 
     ClientUpdateSettings();
     bool operator==(const ClientUpdateSettings& other) const = default;
+    QByteArray toString() const;
 };
 
 #define ClientUpdateSettings_Fields \

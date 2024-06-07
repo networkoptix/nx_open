@@ -14,4 +14,9 @@ bool WatermarkSettings::operator==(const WatermarkSettings& other) const
     return nx::reflect::equals(*this, other);
 }
 
+QByteArray WatermarkSettings::toString() const
+{
+    return QJson::serialized(this);
+}
+
 } // namespace nx::vms::api

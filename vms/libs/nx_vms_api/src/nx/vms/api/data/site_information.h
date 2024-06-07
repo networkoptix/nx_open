@@ -11,6 +11,7 @@
 
 #include "module_information.h"
 #include "rest_api_versions.h"
+#include "system_settings.h"
 
 namespace nx::vms::api {
 
@@ -144,28 +145,34 @@ struct SetupDataBase
     /**%apidoc[opt] Site settings preset. */
     SystemSettingsPreset settingsPreset = SystemSettingsPreset::recommended;
 
-    /**%apidoc Site settings to set when Site is configured. */
-    std::map<QString, QJsonValue> settings;
-
     /**%apidoc For local Site only. */
     std::optional<LocalSiteAuth> local;
 };
-#define SetupDataBase_Fields (name)(settingsPreset)(settings)(local)
+#define SetupDataBase_Fields (name)(settingsPreset)(local)
 
 struct NX_VMS_API SetupSystemData: SetupDataBase
 {
+    /**%apidoc[opt] Site settings to set when Site is configured. */
+    std::map<QString, QJsonValue> settings;
+
     /**%apidoc For cloud Site only. */
     std::optional<CloudSystemAuth> cloud;
 };
-#define SetupSystemData_Fields SetupDataBase_Fields(cloud)
+#define SetupSystemData_Fields SetupDataBase_Fields(settings)(cloud)
 NX_VMS_API_DECLARE_STRUCT_EX(SetupSystemData, (json))
 
+/**%apidoc
+ * %param[unused] settings.siteName
+ */
 struct NX_VMS_API SetupSiteData: SetupDataBase
 {
+    /**%apidoc[opt] Site settings to set when Site is configured. */
+    SaveableSiteSettings settings;
+
     /**%apidoc For cloud Site only. */
     std::optional<CloudSiteAuth> cloud;
 };
-#define SetupSiteData_Fields SetupDataBase_Fields(cloud)
+#define SetupSiteData_Fields SetupDataBase_Fields(settings)(cloud)
 NX_VMS_API_DECLARE_STRUCT_EX(SetupSiteData, (json))
 
 } // namespace nx::vms::api

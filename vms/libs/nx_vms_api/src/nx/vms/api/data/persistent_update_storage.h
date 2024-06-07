@@ -16,6 +16,7 @@ struct NX_VMS_API PersistentUpdateStorage
     bool autoSelection = false;
 
     bool operator==(const PersistentUpdateStorage& other) const = default;
+    QByteArray toString() const;
 };
 #define PersistentUpdateStorage_Fields (servers)(autoSelection)
 QN_FUSION_DECLARE_FUNCTIONS(PersistentUpdateStorage, (json), NX_VMS_API)

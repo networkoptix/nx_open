@@ -245,7 +245,6 @@ template<typename Visitor>
 constexpr auto nxReflectVisitAllEnumItems(SiteSettingName*, Visitor&& visitor)
 {
     using Item = nx::reflect::enumeration::Item<SiteSettingName>;
-    using ItemValue = nx::reflect::enumeration::detail::ItemValue<SiteSettingName>;
     const auto& itemName = nx::reflect::enumeration::detail::itemName;
     return visitor(Item{SiteSettingName::none, ""}
         #ifndef Q_MOC_RUN
@@ -404,7 +403,6 @@ template<typename Visitor>
 constexpr auto nxReflectVisitAllEnumItems(SystemSettingName*, Visitor&& visitor)
 {
     using Item = nx::reflect::enumeration::Item<SystemSettingName>;
-    using ItemValue = nx::reflect::enumeration::detail::ItemValue<SystemSettingName>;
     const auto& itemName = nx::reflect::enumeration::detail::itemName;
     return visitor(
         Item{SystemSettingName::sessionLimitMinutes, "sessionLimitMinutes"},

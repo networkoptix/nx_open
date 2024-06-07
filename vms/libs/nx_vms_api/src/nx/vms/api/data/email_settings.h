@@ -57,6 +57,7 @@ struct NX_VMS_API EmailSettings
     bool useCloudServiceToSendEmail = false;
 
     bool operator==(const EmailSettings& other) const = default;
+    QByteArray toString() const;
 };
 #define EmailSettings_Fields (server)(email)(user)(password)(signature)(supportAddress) \
     (connectionType)(port)(timeoutS)(smtpEhloName)(useCloudServiceToSendEmail)
