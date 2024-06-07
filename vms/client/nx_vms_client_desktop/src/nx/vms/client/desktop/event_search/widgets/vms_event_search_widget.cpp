@@ -34,6 +34,7 @@
 #include <nx/vms/rules/ini.h>
 #include <nx/vms/rules/manifest.h>
 #include <nx/vms/rules/strings.h>
+#include <nx/vms/rules/utils/compatibility.h>
 #include <nx/vms/rules/utils/type.h>
 #include <ui/workbench/workbench_context.h>
 
@@ -193,7 +194,10 @@ void VmsEventSearchWidget::Private::setupTypeSelection()
     m_typeSelectionButton->setIcon(qnSkin->icon(kEventRulesIcon));
 
     auto eventFilterMenu =
-        createEventGroupMenu(q->system()->vmsRulesEngine()->eventGroups());
+        createEventGroupMenu(rules::utils::filterEventGroups(
+            q->system(),
+            rules::utils::defaultItemFilters(),
+            q->system()->vmsRulesEngine()->eventGroups()));
     auto defaultAction = eventFilterMenu->actions()[0];
 
     m_typeSelectionButton->setMenu(eventFilterMenu);
@@ -300,15 +304,15 @@ void VmsEventSearchWidget::Private::updateServerEventsMenu()
     NX_ASSERT(m_serverEventsSubmenuAction);
     auto serverMenu = m_serverEventsSubmenuAction->menu();
 
-    const auto eventGroups = q->system()->vmsRulesEngine()->eventGroups();
-    const auto serverGroup = eventGroups.findGroup(kServerIssueEventGroup);
-    NX_ASSERT(serverGroup);
+    const auto serverGroup = rules::utils::filterEventGroups(
+        q->system(),
+        rules::utils::defaultItemFilters(),
+        *q->system()->vmsRulesEngine()->eventGroups().findGroup(kServerIssueEventGroup));
 
     WidgetUtils::clearMenu(serverMenu);
 
-    // TODO: #amalov Check action availability (nvr presence).
-    // It may be easier just to hide unavailable events.
-    auto newMenu = createEventGroupMenu(*serverGroup);
+    // TODO: #amalov It may be easier just to hide unavailable events.
+    auto newMenu = createEventGroupMenu(serverGroup);
     for (auto action : newMenu->actions())
     {
         action->setParent(serverMenu);

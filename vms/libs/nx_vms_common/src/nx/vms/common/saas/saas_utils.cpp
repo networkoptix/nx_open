@@ -32,7 +32,7 @@ bool servicesOverused(SystemContext* systemContext, const QString& seriviceType)
 
 } // namespace
 
-bool saasInitialized(SystemContext* systemContext)
+bool saasInitialized(const SystemContext* systemContext)
 {
     return systemContext->saasServiceManager()->saasState() != SaasState::uninitialized
         && !systemContext->globalSettings()->organizationId().isNull();

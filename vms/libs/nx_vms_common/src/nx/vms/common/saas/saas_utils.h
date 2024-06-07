@@ -13,7 +13,7 @@ namespace nx::vms::common::saas {
 /**
  * @return True if the system described by the given systemContext is a SaaS system.
  */
-NX_VMS_COMMON_API bool saasInitialized(SystemContext* systemContext);
+NX_VMS_COMMON_API bool saasInitialized(const SystemContext* systemContext);
 
 /**
  * @return True if the system described by the given systemContext is a SaaS system and this system

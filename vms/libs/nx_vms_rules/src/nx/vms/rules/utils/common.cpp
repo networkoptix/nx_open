@@ -65,19 +65,6 @@ bool isLoggingAllowed(const Engine* engine, nx::Uuid ruleId)
     return true;
 }
 
-bool hasItemSupportedServer(
-    const QnMediaServerResourceList& servers, const ItemDescriptor& itemDescriptor)
-{
-    if (itemDescriptor.serverFlags == 0)
-        return true;
-
-    return std::any_of(servers.cbegin(), servers.cend(),
-        [&itemDescriptor](const QnMediaServerResourcePtr& server)
-        {
-            return server->getServerFlags().testFlags(itemDescriptor.serverFlags);
-        });
-}
-
 bool isCompatible(const ItemDescriptor& eventDescriptor, const ItemDescriptor& actionDescriptor)
 {
     if (utils::isInstantOnly(eventDescriptor) && utils::isProlongedOnly(actionDescriptor))

@@ -42,10 +42,6 @@ NX_VMS_RULES_API std::optional<FieldDescriptor> fieldByName(
 /** Returns whether logging is allowed for the given rule. */
 NX_VMS_RULES_API bool isLoggingAllowed(const Engine* engine, nx::Uuid ruleId);
 
-/** Returns whether any of the given servers support given event or action. */
-NX_VMS_RULES_API bool hasItemSupportedServer(
-    const QnMediaServerResourceList& servers, const ItemDescriptor& itemDescriptor);
-
 /**
  * Returns whether given event and action are compatible.
  * Instant event is compatible with instant action and with the prolonged action with fixed duration.
