@@ -590,8 +590,10 @@ void SecuritySettingsWidget::updateRemoteAccessToolReadOnlyState(std::optional<b
 {
     using ::setReadOnly;
 
-    bool currentReadOnlyState = readOnly.value_or(isReadOnly())
-        || !accessController()->globalPermissions().testFlag(GlobalPermission::administrator);
+    ui->remoteAccessToolGroupBox->setVisible(
+        accessController()->globalPermissions().testFlag(GlobalPermission::administrator));
+
+    bool currentReadOnlyState = readOnly.value_or(isReadOnly());
 
     setReadOnly(ui->remoteAccessToolGroupBox, currentReadOnlyState);
     setReadOnly(ui->administratorsCheckBox, currentReadOnlyState);
