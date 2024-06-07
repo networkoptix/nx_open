@@ -366,7 +366,7 @@ struct UserSettingsDialog::Private
         QnMessageBox messageBox(
             QnMessageBoxIcon::Success,
             text,
-            {},
+            tr("You can copy the Access Link below, and share it with the implied user."),
             QDialogButtonBox::Ok,
             QDialogButtonBox::Ok,
             parentWidget);

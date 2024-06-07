@@ -63,6 +63,14 @@ public:
     nx::network::ssl::AdapterFunc makeRestrictedAdapterFunc(const std::string& expectedKey);
 
     /**
+     * Create AdapterFunc that first attempts to perform a system certificate check and if it fails,
+     * accepts only certificates with matching public key. This function is intended to be used when
+     * establishing a connection.
+     */
+    nx::network::ssl::AdapterFunc makeGeneralAdapterFunc(
+        const std::string& expectedKey, const std::string& expectedHost);
+
+    /**
      * Create AdapterFunc that uses the active connection certificate cache.
      */
     virtual nx::network::ssl::AdapterFunc makeAdapterFunc(
