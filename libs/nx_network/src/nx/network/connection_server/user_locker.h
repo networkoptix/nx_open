@@ -58,7 +58,7 @@ struct UserKey
 
     bool operator<(const UserKey& other) const
     {
-        return hostAddress < other.hostAddress && username < other.username;
+        return std::tie(hostAddress, username) < std::tie(other.hostAddress, other.username);
     }
 };
 

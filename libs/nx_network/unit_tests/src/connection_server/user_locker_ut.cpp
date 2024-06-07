@@ -11,6 +11,32 @@ namespace network {
 namespace server {
 namespace test {
 
+class UserKey: public testing::Test {};
+
+/**
+ * This key type is used as the key in the UserLockerPool. Incorrect lexicographic comparison led
+ * to the bug described in CB-2420, causing different users with the same IP address to be blocked.
+ * So, the key must be compared lexicographically. That is, all of the fields compared all of the
+ * time, no short circuiting on early fields
+ */
+TEST_F(UserKey, lexicographic_comparison)
+{
+    server::UserKey a{
+        .hostAddress = "127.0.0.1",
+        .username = "a"
+    };
+
+    server::UserKey b{
+        .hostAddress = "127.0.0.1",
+        .username = "b"
+    };
+
+    ASSERT_TRUE(a < b);
+    ASSERT_FALSE(b < a);
+}
+
+// ------------------------------------------------------------------------------------------------
+
 using AuthResult = server::AuthResult;
 
 class UserLocker:
@@ -27,15 +53,21 @@ public:
     }
 
 protected:
+    bool isUserLocked(const UserLockerPool<>::key_type& user)
+    {
+        return m_locker.isLocked(user);
+    }
+
     void givenNotLockedUser()
     {
         ASSERT_FALSE(m_locker.isLocked(m_userKey));
     }
 
-    void givenLockedUser()
+    UserLockerPool<>::key_type givenLockedUser()
     {
         givenNotLockedUser();
         whenDoManyUnsuccesfulAuthentications();
+        return m_userKey;
     }
 
     void whenDoManyUnsuccesfulAuthentications()
@@ -149,6 +181,14 @@ TEST_F(UserLocker, lockout_reason_is_provided)
 {
     givenLockedUser();
     thenLockReasonIsProvided();
+}
+
+TEST_F(UserLocker, second_user_from_same_ip_is_not_blocked)
+{
+    auto user = givenLockedUser();
+    user.username += nx::utils::generateRandomName(1);
+
+    ASSERT_FALSE(isUserLocked(user));
 }
 
 } // namespace test
