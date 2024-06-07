@@ -106,6 +106,11 @@ public:
         return m_cacheMap.empty();
     }
 
+    int size() const
+    {
+        return m_cacheMap.size();
+    }
+
     /**
      * Returns the LRU element without making it the most recently used one.
      * Warning: behavior is undefined if the cache is empty.
