@@ -4,6 +4,7 @@
 
 #include <QtCore/QJsonObject>
 #include <QtCore/QTimer>
+#include <QtCore/QXmlStreamReader>
 
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/http/http_async_client.h>
@@ -19,15 +20,12 @@
 namespace nx::vms::client::desktop {
 
 static const std::chrono::seconds kRequestRetryDelay(5);
-static const QString kTrafficRelayUrlRequest = R"json(
-    {
-        "destinationHostName": "%1",
-        "connectionMethods": 5,
-        "cloudConnectVersion": "connectOverHttpHasHostnameAsString"
-    })json";
 
-static const QString kCloudPathTrafficRelayInfo = "/mediator/server/%1/sessions/";
-static const QString kTrafficRelayUrl = "trafficRelayUrl";
+static const QString kElementSet = "set";
+static const QString kAttributeResName = "resName";
+static const QString kAttributeResValue = "resValue";
+static const QString kResNameValueRelay = "relay";
+static const QString kCloudModulesPath = "/discovery/v2/cloud_modules.xml";
 
 class TrafficRelayUrlWatcher::Private
 {
@@ -88,12 +86,8 @@ public:
         const auto url = nx::network::url::Builder()
             .setScheme(urlCloud.scheme().toStdString())
             .setEndpoint(address)
-            .setPath(nx::format(kCloudPathTrafficRelayInfo, cloudSystemId))
+            .setPath(kCloudModulesPath)
             .toUrl();
-
-        auto messageBody = std::make_unique<nx::network::http::BufferSource>(
-            Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
-            nx::format(kTrafficRelayUrlRequest, cloudSystemId).toStdString());
 
         auto handler = nx::utils::AsyncHandlerExecutor(q).bind(
             [this, url]()
@@ -102,7 +96,7 @@ public:
                 trafficRelayUrl = {};
                 if (httpClient->failed())
                 {
-                    NX_VERBOSE(this, "POST request failed. Url: %1", url);
+                    NX_VERBOSE(this, "GET request failed. Url: %1", url);
                     delayedRequestTrafficRelayUrl.requestOperation();
                     return;
                 }
@@ -111,30 +105,45 @@ public:
                 stopHttpClient();
                 if (result.empty())
                 {
-                    NX_VERBOSE(this, "POST body fetch failed. Url: %1", url);
+                    NX_VERBOSE(this, "GET body fetch failed. Url: %1", url);
+                    delayedRequestTrafficRelayUrl.requestOperation();
+                    return;
+                }
+                const auto xmlResult = result.toByteArray();
+                QXmlStreamReader xmlReader(xmlResult);
+
+                if (xmlReader.atEnd())
+                {
+                    NX_VERBOSE(this, "Can not deserialize GET response. Url: %1", url);
                     delayedRequestTrafficRelayUrl.requestOperation();
                     return;
                 }
 
-                QJsonObject response;
-                if (nx::reflect::json::deserialize(result, &response))
+                while(!xmlReader.atEnd())
                 {
-                    trafficRelayUrl = response[kTrafficRelayUrl].toString();
-                }
-                else
-                {
-                    NX_VERBOSE(this, "Can not deserialize POST response. Url: %1", url);
-                    delayedRequestTrafficRelayUrl.requestOperation();
-                    return;
+                    xmlReader.readNext();
+
+                    if (!xmlReader.isStartElement())
+                        continue;
+
+                    if (xmlReader.name().toString() == kElementSet)
+                    {
+                        const auto attributes = xmlReader.attributes();
+                        if (attributes.hasAttribute(kAttributeResName)
+                            && attributes.value(kAttributeResName).toString() == kResNameValueRelay
+                            && attributes.hasAttribute(kAttributeResValue))
+                        {
+                            trafficRelayUrl = attributes.value(kAttributeResValue).toString();
+                            break;
+                        }
+                    }
                 }
 
-                emit q->trafficRelayUrlReady();
+                if (!trafficRelayUrl.isEmpty())
+                    emit q->trafficRelayUrlReady();
             });
 
-        httpClient->doPost(
-            url,
-            std::move(messageBody),
-            std::move(handler));
+        httpClient->doGet(url, std::move(handler));
     }
 };
 

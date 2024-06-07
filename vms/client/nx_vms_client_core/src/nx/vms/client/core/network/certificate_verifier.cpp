@@ -8,8 +8,8 @@
 #include <QtCore/QFile>
 #include <QtCore/QPointer>
 
-#include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource_management/resource_pool.h>
 #include <nx/network/nx_network_ini.h>
 #include <nx/network/socket_factory.h>
 #include <nx/network/ssl/certificate.h>
@@ -189,6 +189,20 @@ CertificateVerifier::CertificateVerifier(
 
 CertificateVerifier::~CertificateVerifier()
 {
+}
+
+nx::network::ssl::AdapterFunc CertificateVerifier::makeGeneralAdapterFunc(
+    const std::string& expectedKey, const std::string& expectedHost)
+{
+    if (!nx::network::ini().verifyVmsSslCertificates)
+        return nx::network::ssl::kAcceptAnyCertificate;
+
+    return nx::network::ssl::makeAdapterFunc(
+        [expectedKey, expectedHost](const nx::network::ssl::CertificateChainView& chain)
+        {
+            return verifyBySystemCertificates(chain, expectedHost)
+                || NX_ASSERT(!chain.empty()) && (chain[0].publicKey() == expectedKey);
+        });
 }
 
 nx::network::ssl::AdapterFunc CertificateVerifier::makeRestrictedAdapterFunc(
