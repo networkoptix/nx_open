@@ -42,6 +42,9 @@ extern const std::string kTitleHeightSetting;
 extern const std::string kTitleObjectCountSetting;
 extern const std::string kFrameNumberToGenerateTitleSetting;
 
+extern const std::string kEnableBestShotGeneration;
+extern const std::string kEnableObjectTitleGeneration;
+
 } // namespace best_shots
 } // namespace stub
 } // namespace analytics

@@ -43,6 +43,25 @@ R"json(
         [
             {
                 "type": "GroupBox",
+                "caption": "General settings",
+                "items":
+                [
+                    {
+                        "type": "CheckBox",
+                        "name": ")json" + kEnableBestShotGeneration + R"json(",
+                        "caption": "Enable Best Shot generation",
+                        "defaultValue": true
+                    },
+                    {
+                        "type": "CheckBox",
+                        "name": ")json" + kEnableObjectTitleGeneration + R"json(",
+                        "caption": "Enable Object Title generation",
+                        "defaultValue": true
+                    }
+                ]
+            },
+            {
+                "type": "GroupBox",
                 "caption": "General Best Shot generation settings",
                 "items":
                 [

@@ -143,9 +143,9 @@ void DeviceAgent::generateBestShotObject()
     pushMetadataPacket(objectMetadataPacket.releasePtr());
 }
 
-void DeviceAgent::generateBestShotOrTitle()
+void DeviceAgent::maybeGenerateBestShotAndTitle()
 {
-    if (m_generateBestShotOrTitle)
+    if (m_generateBestShot)
     {
         generateBestShotObject();
 
@@ -153,7 +153,8 @@ void DeviceAgent::generateBestShotOrTitle()
         for (Ptr<IObjectTrackBestShotPacket>& bestShotPacket: bestShotPackets)
             pushMetadataPacket(bestShotPacket.releasePtr());
     }
-    else
+
+    if (m_generateTitle)
     {
         generateTitleObject();
 
@@ -161,14 +162,12 @@ void DeviceAgent::generateBestShotOrTitle()
         for (Ptr<IObjectTrackTitlePacket>& titlePacket: titlePackets)
             pushMetadataPacket(titlePacket.releasePtr());
     }
-
-    m_generateBestShotOrTitle = !m_generateBestShotOrTitle;
 }
 
 bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoPacket)
 {
     m_lastFrameTimestampUs = videoPacket->timestampUs();
-    generateBestShotOrTitle();
+    maybeGenerateBestShotAndTitle();
     return true;
 }
 
@@ -180,6 +179,8 @@ void DeviceAgent::doSetNeededMetadataTypes(
 
 void DeviceAgent::configureBestShots(std::map<std::string, std::string>& settings)
 {
+    nx::kit::utils::fromString(settings[kEnableBestShotGeneration], &m_generateBestShot);
+
     m_bestShotGenerationCounterByTrackId.clear();
 
     m_bestShotGenerationContext.policy = bestShotGenerationPolicyFromString(
@@ -240,6 +241,8 @@ void DeviceAgent::configureBestShots(std::map<std::string, std::string>& setting
 
 void DeviceAgent::configureTitles(std::map<std::string, std::string>& settings)
 {
+    nx::kit::utils::fromString(settings[kEnableObjectTitleGeneration], &m_generateTitle);
+
     m_titleGenerationCounterByTrackId.clear();
 
     m_titleGenerationContext.policy = titleGenerationPolicyFromString(
