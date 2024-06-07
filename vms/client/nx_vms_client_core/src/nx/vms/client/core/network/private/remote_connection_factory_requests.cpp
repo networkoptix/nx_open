@@ -153,7 +153,7 @@ struct ModuleInformationWrapper
 };
 NX_REFLECTION_INSTRUMENT(ModuleInformationWrapper, (reply));
 
-nx::utils::Url makeUrl(nx::network::SocketAddress address, std::string path)
+nx::utils::Url makeUrl(nx::network::SocketAddress address, std::string path = {})
 {
     return nx::network::url::Builder()
         .setScheme(kSecureUrlSchemeName)
@@ -172,14 +172,18 @@ struct RemoteConnectionFactoryRequestsManager::Private
     mutable std::unique_ptr<nx::cloud::db::api::Connection> cloudConnection;
     std::unique_ptr<NetworkManager> networkManager = std::make_unique<NetworkManager>();
 
-    Request makeRequestWithCertificateValidation(
-        const nx::network::ssl::CertificateChain& chain) const
+    Request makeRequestWithCertificateValidation(ContextPtr context, const nx::utils::Url& url) const
     {
-        const auto expectedKey = publicKey(chain);
+        const auto expectedKey = publicKey(context->handshakeCertificateChain);
+        const auto& hosts = context->handshakeCertificateChain.front().hosts();
+        const auto lastHostIsServer =
+            !hosts.empty() && !nx::Uuid::fromStringSafe(*hosts.begin()).isNull();
 
         Request request = std::make_unique<AsyncClient>(
             (nx::network::ini().verifyVmsSslCertificates && NX_ASSERT(certificateVerifier))
-                ? certificateVerifier->makeRestrictedAdapterFunc(expectedKey)
+                ? lastHostIsServer
+                    ? certificateVerifier->makeRestrictedAdapterFunc(expectedKey)
+                    : certificateVerifier->makeGeneralAdapterFunc(expectedKey, url.host().toStdString())
                 : nx::network::ssl::kAcceptAnyCertificate);
         NetworkManager::setDefaultTimeouts(request.get());
         return request;
@@ -259,7 +263,7 @@ struct RemoteConnectionFactoryRequestsManager::Private
         ExternalErrorHandler externalErrorHandler = {}) const
     {
         if (!request)
-            request = makeRequestWithCertificateValidation(context->handshakeCertificateChain);
+            request = makeRequestWithCertificateValidation(context, url);
         request->addAdditionalHeader(
             Qn::EC2_RUNTIME_GUID_HEADER_NAME, context->auditId.toStdString());
 
@@ -281,7 +285,7 @@ struct RemoteConnectionFactoryRequestsManager::Private
         nx::Buffer data,
         ExternalErrorHandler externalErrorHandler = {}) const
     {
-        Request request = makeRequestWithCertificateValidation(context->handshakeCertificateChain);
+        Request request = makeRequestWithCertificateValidation(context, url);
         auto messageBody = std::make_unique<BufferSource>(
             Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
             std::move(data));
@@ -326,7 +330,7 @@ RemoteConnectionFactoryRequestsManager::ModuleInformationReply
     // Create a custom client that accepts any certificate and stores its data.
     ModuleInformationReply reply{.handshakeCertificateChain = context->handshakeCertificateChain};
     auto request = certificatePresent
-        ? d->makeRequestWithCertificateValidation(context->handshakeCertificateChain)
+        ? d->makeRequestWithCertificateValidation(context, url)
         : std::make_unique<AsyncClient>(makeStoreCertificateFunc(reply.handshakeCertificateChain));
     NetworkManager::setDefaultTimeouts(request.get());
 
@@ -377,7 +381,7 @@ RemoteConnectionFactoryRequestsManager::ServersInfoReply
     // Create a custom client that accepts any certificate and stores its data.
     ServersInfoReply reply{.handshakeCertificateChain = context->handshakeCertificateChain};
     auto request = certificatePresent
-        ? d->makeRequestWithCertificateValidation(context->handshakeCertificateChain)
+        ? d->makeRequestWithCertificateValidation(context, url)
         : std::make_unique<AsyncClient>(makeStoreCertificateFunc(reply.handshakeCertificateChain));
     NetworkManager::setDefaultTimeouts(request.get());
 
@@ -405,7 +409,7 @@ nx::vms::api::UserModelV1 RemoteConnectionFactoryRequestsManager::getUserModel(
             .toStdString();
 
     const auto url = makeUrl(context->address(), "/rest/v1/users/" + encodedUsername);
-    auto request = d->makeRequestWithCertificateValidation(context->handshakeCertificateChain);
+    auto request = d->makeRequestWithCertificateValidation(context, url);
     request->setCredentials(context->credentials());
     return d->doGet<nx::vms::api::UserModelV1>(
         url,
@@ -515,7 +519,7 @@ nx::vms::api::LoginSession RemoteConnectionFactoryRequestsManager::getCurrentSes
 {
     NX_DEBUG(this, "Requesting username from %1", context);
     const auto url = makeUrl(context->address(), "/rest/v1/login/sessions/current");
-    auto request = d->makeRequestWithCertificateValidation(context->handshakeCertificateChain);
+    auto request = d->makeRequestWithCertificateValidation(context, url);
     request->setCredentials(context->credentials());
 
     ExternalErrorMap expectedErrors{
@@ -567,7 +571,7 @@ void RemoteConnectionFactoryRequestsManager::checkDigestAuthentication(ContextPt
     }
 
     const auto url = makeUrl(context->address(), "/api/moduleInformationAuthenticated");
-    auto request = d->makeRequestWithCertificateValidation(context->handshakeCertificateChain);
+    auto request = d->makeRequestWithCertificateValidation(context, url);
     request->setCredentials(context->credentials());
     d->doGet<ModuleInformationWrapper>(url, context, std::move(request));
 }
