@@ -144,7 +144,7 @@
     </message>
     <message>
       <source>Action Throttling</source>
-      <translation type="unfinished">Action Throttling</translation>
+      <translation>動作節流</translation>
     </message>
   </context>
   <context>
@@ -171,7 +171,7 @@
     </message>
     <message>
       <source>With ID</source>
-      <translation type="unfinished">With ID</translation>
+      <translation>帶 ID</translation>
     </message>
   </context>
   <context>
@@ -335,7 +335,7 @@
     </message>
     <message>
       <source>Set for</source>
-      <translation type="unfinished">Set for</translation>
+      <translation>設定為</translation>
     </message>
     <message>
       <source>Rewind</source>
@@ -365,7 +365,7 @@
     </message>
     <message>
       <source>Fan Failure</source>
-      <translation type="unfinished">Fan Failure</translation>
+      <translation>風扇故障</translation>
     </message>
     <message>
       <source>At</source>
@@ -639,7 +639,7 @@
     </message>
     <message>
       <source>To Users</source>
-      <translation type="unfinished">To Users</translation>
+      <translation>對使用者</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -658,7 +658,7 @@
     </message>
     <message>
       <source>For Plugin</source>
-      <translation type="unfinished">For Plugin</translation>
+      <translation>對於插件</translation>
     </message>
     <message>
       <source>And Caption</source>
@@ -670,7 +670,7 @@
     </message>
     <message>
       <source>And Level Is</source>
-      <translation type="unfinished">And Level Is</translation>
+      <translation>且等級是</translation>
     </message>
   </context>
   <context>
@@ -694,7 +694,7 @@
     </message>
     <message>
       <source>PoE Over Budget</source>
-      <translation type="unfinished">PoE Over Budget</translation>
+      <translation>Poe供電過載</translation>
     </message>
     <message>
       <source>Begin When</source>
@@ -721,7 +721,7 @@
     </message>
     <message>
       <source>Execute to users</source>
-      <translation type="unfinished">Execute to users</translation>
+      <translation>對使用者執行</translation>
     </message>
   </context>
   <context>

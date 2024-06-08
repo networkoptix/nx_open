@@ -2003,19 +2003,19 @@ Press Alt + Click to follow object</translation>
     <name>SaasBanner</name>
     <message>
       <source>System has been suspended. To enable/disable the integration usage for current device the System must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">System has been suspended. To enable/disable the integration usage for current device the System must be in active state. Contact your channel partner for details</translation>
+      <translation>系統已暫停。系統必須處於活躍狀態才能將某些設備啟用/停用此整合。請聯絡您的通路夥伴以了解詳情。</translation>
     </message>
     <message>
       <source>System has been suspended. To enable/disable the integration usage for some device the System must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">System has been suspended. To enable/disable the integration usage for some device the System must be in active state. Contact your channel partner for details</translation>
+      <translation>系統已暫停。系統必須處於活躍狀態才能將某些設備啟用此整合。請聯絡您的通路夥伴以了解詳情。</translation>
     </message>
     <message>
       <source>System has been shut down. To enable this integration usage for current device the System must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">System has been shut down. To enable this integration usage for current device the System must be in active state. Contact your channel partner for details</translation>
+      <translation>系統已關閉。系統必須處於活躍狀態才能將某些設備啟用此整合。請聯絡您的通路夥伴以了解詳情。</translation>
     </message>
     <message>
       <source>System has been shut down. To activate this integration usage for some device the System must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">System has been shut down. To activate this integration usage for some device the System must be in active state. Contact your channel partner for details</translation>
+      <translation>系統已關閉。系統必須處於活躍狀態才能將某些設備啟用此整合。請聯絡您的通路夥伴以了解詳情。</translation>
     </message>
   </context>
   <context>
