@@ -957,6 +957,7 @@ public:
      * requests in your destructor. Better bulletproof your callbacks with `guarded`.
      */
     void cancelRequest(const Handle& requestId);
+    void stop();
 
     enum class DebugFlag
     {
