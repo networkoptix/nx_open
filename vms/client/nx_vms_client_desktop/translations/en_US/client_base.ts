@@ -12079,6 +12079,10 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
         <comment>%1 is a duration</comment>
         <translation></translation>
     </message>
+    <message>
+        <source>You can copy the Access Link below, and share it with the implied user.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::VersionSelectionDialog</name>
