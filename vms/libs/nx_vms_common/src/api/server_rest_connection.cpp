@@ -425,9 +425,14 @@ ServerConnection::ServerConnection(
 {
 }
 
-ServerConnection::~ServerConnection()
+void ServerConnection::stop()
 {
     d->httpClientPool->stop(/*invokeCallbacks*/ true);
+}
+
+ServerConnection::~ServerConnection()
+{
+    stop();
 }
 
 void ServerConnection::updateAddress(nx::network::SocketAddress address)

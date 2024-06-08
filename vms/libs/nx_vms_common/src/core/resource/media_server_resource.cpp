@@ -71,6 +71,12 @@ QnMediaServerResource::~QnMediaServerResource()
     m_runningIfRequests.clear();
 }
 
+void QnMediaServerResource::stopServerConnection()
+{
+    if (m_restConnection)
+        m_restConnection->stop();
+}
+
 void QnMediaServerResource::atPropertyChanged(const QnResourcePtr& /*self*/, const QString& key)
 {
     if (key == QnMediaResource::panicRecordingKey())
