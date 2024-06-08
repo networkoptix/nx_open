@@ -1773,34 +1773,34 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Password should contain different types of symbols</source>
-      <translation type="unfinished">Password should contain different types of symbols</translation>
+      <translation>O contrasinal debe conter diferentes tipos de símbolos</translation>
     </message>
     <message numerus="yes">
       <source>Password must be at least %n characters long</source>
-      <translation type="unfinished">
-        <numerusform>Password must be at least %n characters long</numerusform>
-        <numerusform>Password must be at least %n characters long</numerusform>
+      <translation>
+        <numerusform>O contrasinal debe ter polo menos %n caracteres</numerusform>
+        <numerusform>O contrasinal debe ter polo menos %n caracteres</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password must be no longer than %n characters</source>
-      <translation type="unfinished">
-        <numerusform>Password must be no longer than %n characters</numerusform>
-        <numerusform>Password must be no longer than %n characters</numerusform>
+      <translation>
+        <numerusform>O contrasinal non debe ter máis de %n caracteres</numerusform>
+        <numerusform>O contrasinal non debe ter máis de %n caracteres</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more consecutive characters together</source>
-      <translation type="unfinished">
-        <numerusform>Password should not contain %n or more consecutive characters together</numerusform>
-        <numerusform>Password should not contain %n or more consecutive characters together</numerusform>
+      <translation>
+        <numerusform>O contrasinal non debe conter %n ou máis caracteres consecutivos xuntos</numerusform>
+        <numerusform>O contrasinal non debe conter %n ou máis caracteres consecutivos xuntos</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more repeating characters</source>
-      <translation type="unfinished">
-        <numerusform>Password should not contain %n or more repeating characters</numerusform>
-        <numerusform>Password should not contain %n or more repeating characters</numerusform>
+      <translation>
+        <numerusform>O contrasinal non debe conter %n ou máis caracteres repetitivos</numerusform>
+        <numerusform>O contrasinal non debe conter %n ou máis caracteres repetitivos</numerusform>
       </translation>
     </message>
     <message>
@@ -5716,7 +5716,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Email is not valid</source>
-      <translation type="unfinished">Email is not valid</translation>
+      <translation>O correo electrónico non é válido</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
