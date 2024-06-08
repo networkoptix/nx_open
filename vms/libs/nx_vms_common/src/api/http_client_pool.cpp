@@ -432,6 +432,9 @@ void ClientPool::stop(bool invokeCallbacks)
     decltype(d->connectionPool) dataCopy;
     {
         NX_MUTEX_LOCKER lock(&d->mutex);
+        if (d->stopped)
+            return;
+
         d->stopped = true;
 
         requests.reserve(dataCopy.size() + d->awaitingRequests.size());
