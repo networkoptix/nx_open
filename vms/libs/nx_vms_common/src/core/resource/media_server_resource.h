@@ -175,6 +175,7 @@ public:
     void setWebCamerasDiscoveryEnabled(bool value);
     bool isGuidConflictDetected() const;
     void setGuidConflictDetected(bool value);
+    void stopServerConnection();
 
 private slots:
     void at_propertyChanged(const QnResourcePtr& /*res*/, const QString& key);
