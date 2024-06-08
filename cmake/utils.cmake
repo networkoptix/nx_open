@@ -461,7 +461,7 @@ function(nx_add_merge_directories_target target)
     endforeach()
 
     add_custom_target(${target}
-        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/build_utils/merge_and_sync_directories.py
+        COMMAND ${PYTHON_EXECUTABLE} ${open_build_utils_dir}/merge_and_sync_directories.py
             ${rules} ${MERGE_OUTPUT}
         DEPENDS ${MERGE_DEPENDS} ${depends}
     )
