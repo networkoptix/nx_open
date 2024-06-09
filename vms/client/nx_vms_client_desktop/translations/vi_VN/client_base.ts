@@ -5145,11 +5145,11 @@ to %1</source>
     </message>
     <message>
       <source>RESTRICTED</source>
-      <translation type="unfinished">RESTRICTED</translation>
+      <translation>HẠN CHẾ</translation>
     </message>
     <message>
       <source>Authorize</source>
-      <translation type="unfinished">Authorize</translation>
+      <translation>Ủy quyền</translation>
     </message>
   </context>
   <context>
