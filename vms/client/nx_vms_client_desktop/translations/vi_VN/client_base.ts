@@ -4999,11 +4999,11 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>RESTRICTED</source>
-      <translation type="unfinished">RESTRICTED</translation>
+      <translation>HẠN CHẾ</translation>
     </message>
     <message>
       <source>Authorize</source>
-      <translation type="unfinished">Authorize</translation>
+      <translation>Ủy quyền</translation>
     </message>
   </context>
   <context>
@@ -11913,6 +11913,10 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
       <source>in %1</source>
       <comment>%1 is a duration</comment>
       <translation>trong %1</translation>
+    </message>
+    <message>
+      <source>You can copy the Access Link below, and share it with the implied user.</source>
+      <translation>Bạn có thể sao chép Liên kết truy cập bên dưới và chia sẻ nó với người dùng mà bạn cấp quyền.</translation>
     </message>
   </context>
   <context>

@@ -12095,6 +12095,10 @@ N'épinglez pas ce certificat si vous n'avez pas modifié le certificat SSL du s
       <comment>%1 is a duration</comment>
       <translation>dans %1</translation>
     </message>
+    <message>
+      <source>You can copy the Access Link below, and share it with the implied user.</source>
+      <translation>Vous pouvez copier le lien d'accès ci-dessous et le partager avec les utilisateurs auxquels vous accordez l'autorisation.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::VersionSelectionDialog</name>
