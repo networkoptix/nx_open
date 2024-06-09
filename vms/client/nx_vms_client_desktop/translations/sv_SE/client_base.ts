@@ -12093,6 +12093,10 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
       <comment>%1 is a duration</comment>
       <translation>i %1</translation>
     </message>
+    <message>
+      <source>You can copy the Access Link below, and share it with the implied user.</source>
+      <translation>Du kan kopiera åtkomstlänken nedan och dela den med den underförstådda användaren.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::VersionSelectionDialog</name>
