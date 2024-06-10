@@ -124,8 +124,8 @@ Item
                         {
                             anchors.verticalCenter: title.verticalCenter
                             anchors.right: tileHeader.right
-                            toolTipText: qsTr("Connect %1 application to localhost:%2 to use Cloud "
-                                + "Connect.").arg(title.text).arg(portLabel.text)
+                            toolTipText: qsTr("Connect %1 client application to localhost:%2")
+                                .arg(title.text).arg(portLabel.text)
 
                             helpTopic: HelpTopic.Empty //TODO: #esobolev add link (see VMS-51876)
                         }
