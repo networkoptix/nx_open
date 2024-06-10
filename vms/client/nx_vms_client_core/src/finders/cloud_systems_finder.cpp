@@ -305,15 +305,17 @@ struct CloudSystemsFinder::Private
 
         const auto newIds = nx::utils::toQSet(updatedSystems.keys());
 
+        NX_DEBUG(this, "Update systems: %1", newIds);
+
         QHash<QString, nx::Uuid> removedTargetIds;
 
         {
             NX_MUTEX_LOCKER lock(&mutex);
 
             const auto oldIds = nx::utils::toQSet(systems.keys());
-            const auto addedCloudIds = IdsSet(newIds).subtract(oldIds);
 
-            const auto removedCloudIds = IdsSet(oldIds).subtract(newIds);
+            const auto addedCloudIds = IdsSet(newIds).subtract(oldIds);
+            NX_DEBUG(this, "Add systems: %1", newIds);
             for (const auto addedCloudId: addedCloudIds)
             {
                 NX_DEBUG(this, "Found cloud system %1", addedCloudId);
@@ -325,6 +327,8 @@ struct CloudSystemsFinder::Private
                 pingSystem(addedCloudId);
             }
 
+            const auto removedCloudIds = IdsSet(oldIds).subtract(newIds);
+            NX_DEBUG(this, "Remove systems: %1", removedCloudIds);
             for (const auto removedCloudId: removedCloudIds)
             {
                 NX_DEBUG(this, "Lost cloud system %1", removedCloudId);
