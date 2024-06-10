@@ -21,7 +21,7 @@
 #include <nx/vms/client/desktop/ui/dialogs/web_page_certificate_dialog.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/html/html.h>
-#include <nx/vms/text/time_strings.h>
+#include <nx/vms/text/human_readable.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
 #include <ui/graphics/items/generic/image_button_bar.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
@@ -192,26 +192,34 @@ void QnWebResourceWidget::setupOverlays()
         const auto updateRefreshInterval =
             [webResource, reloadButton, this]()
             {
-                int value = webResource->refreshInterval().count();
-                reloadButton->setIcon(qnSkin->icon(value > 0 ? kRefreshAutoIcon : kRefreshIcon));
+                const bool isAutoRefreshEnabled = webResource->refreshInterval().count() > 0;
+
+                reloadButton->setIcon(
+                    qnSkin->icon(isAutoRefreshEnabled ? kRefreshAutoIcon : kRefreshIcon));
 
                 m_refreshTimer->setInterval(
                     duration_cast<milliseconds>(webResource->refreshInterval()));
 
-                if (value > 0)
+                if (isAutoRefreshEnabled)
                     m_refreshTimer->start();
                 else
                     m_refreshTimer->stop();
 
-                const auto minutesValue = duration_cast<minutes>(webResource->refreshInterval());
-                const QString suffix = QnTimeStrings::suffix(
-                    minutesValue.count() > 0
-                        ? QnTimeStrings::Suffix::Minutes
-                        : QnTimeStrings::Suffix::Seconds);
-
-                setToolTip(value > 0
-                    ? QString("Auto-refresh every %1%2").arg(value).arg(suffix)
-                    : tr("Refresh"));
+                if (isAutoRefreshEnabled)
+                {
+                    using namespace nx::vms::text;
+                    reloadButton->setToolTip(tr("Auto-refresh every %1").arg(
+                        HumanReadable::timeSpan(
+                            duration_cast<milliseconds>(webResource->refreshInterval()),
+                            HumanReadable::Minutes | HumanReadable::Seconds,
+                            HumanReadable::SuffixFormat::Short,
+                            /*separator*/ {},
+                            HumanReadable::kAlwaysSuppressSecondUnit)));
+                }
+                else
+                {
+                    reloadButton->setToolTip(tr("Refresh"));
+                }
             };
 
         connect(webResource, &QnWebPageResource::refreshIntervalChanged,
