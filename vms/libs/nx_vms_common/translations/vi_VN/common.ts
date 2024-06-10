@@ -1338,7 +1338,7 @@
     </message>
     <message>
       <source>Anonymous statistics report last number</source>
-      <translation>Báo cáo thống kê ẩn danh của số trước</translation>
+      <translation>Báo cáo thống kê ẩn danh gần nhất</translation>
     </message>
     <message>
       <source>Anonymous statistics time cycle</source>
