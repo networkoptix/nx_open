@@ -2424,7 +2424,7 @@ Appuyez sur Alt + Cliquez pour suivre l'objet</translation>
     </message>
     <message>
       <source>Cloud</source>
-      <translation>Nuage</translation>
+      <translation>Cloud</translation>
     </message>
     <message>
       <source>Login</source>

@@ -11918,7 +11918,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>You can copy the Access Link below, and share it with the implied user.</source>
-      <translation type="unfinished">You can copy the Access Link below, and share it with the implied user.</translation>
+      <translation>以下のアクセスリンクをコピーして、未登録ユーザーと共有できます。</translation>
     </message>
   </context>
   <context>

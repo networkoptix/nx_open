@@ -1026,7 +1026,7 @@
     </message>
     <message>
       <source>Save Cloud Layout As...</source>
-      <translation>Enregistrer la mise en page du nuage sous...</translation>
+      <translation>Enregistrer la mise en page du cloud sous...</translation>
     </message>
     <message>
       <source>Lookup Lists...</source>
@@ -5316,7 +5316,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>cloud</source>
-      <translation>nuage</translation>
+      <translation>cloud</translation>
     </message>
     <message>
       <source>Path</source>
