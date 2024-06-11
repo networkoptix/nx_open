@@ -109,6 +109,9 @@ protected:
         bool displayRoi = true;
         bool displayAnalyticsObjects = false;
         bool displayHotspots = true;
+
+        /** Add item as already zoomed. */
+        bool zoomed = false;
     };
 
     void addToLayout(

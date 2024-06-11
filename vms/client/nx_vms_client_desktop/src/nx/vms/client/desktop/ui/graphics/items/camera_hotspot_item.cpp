@@ -16,9 +16,9 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/api/mediaserver/image_request.h>
+#include <nx/vms/client/core/image_providers/camera_thumbnail_provider.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/utils/geometry.h>
-#include <nx/vms/client/core/image_providers/camera_thumbnail_provider.h>
 #include <nx/vms/client/desktop/camera_hotspots/camera_hotspots_display_utils.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/action_parameter_types.h>
@@ -232,15 +232,15 @@ void CameraHotspotItem::Private::openItem()
     const auto actionManager = q->menu();
 
     const auto workbenchItems = q->workbench()->currentLayout()->items();
+    const bool isCurrentItemZoomed = q->workbench()->item(Qn::ZoomedRole) != nullptr;
+
     for (const auto item: workbenchItems)
     {
         if (item->resource()->getId() == hotspotData.targetResourceId)
         {
-            if (q->workbench()->item(Qn::ZoomedRole))
-                q->workbench()->setItem(Qn::ZoomedRole, nullptr);
-
             actionManager->trigger(menu::GoToLayoutItemAction, menu::Parameters()
-                .withArgument(Qn::ItemUuidRole, item->uuid()));
+                .withArgument(Qn::ItemUuidRole, item->uuid())
+                .withArgument(Qn::ItemAddInZoomedStateRole, isCurrentItemZoomed));
 
             if (!q->navigator()->syncEnabled())
             {
@@ -264,7 +264,8 @@ void CameraHotspotItem::Private::openItem()
         }
     }
 
-    auto parameters = menu::Parameters(hotspotCamera());
+    auto parameters = menu::Parameters(hotspotCamera())
+        .withArgument(Qn::ItemAddInZoomedStateRole, isCurrentItemZoomed);
     if (!q->navigator()->syncEnabled())
         parameters.setArguments(itemPlaybackParameters());
 
@@ -282,8 +283,11 @@ void CameraHotspotItem::Private::openInNewTab()
 
 void CameraHotspotItem::Private::openItemInPlace()
 {
+    const bool isCurrentItemZoomed = q->workbench()->item(Qn::ZoomedRole) != nullptr;
+
     auto parameters = menu::Parameters(mediaResourceWidget())
-        .withArgument(core::ResourceRole, hotspotCamera());
+        .withArgument(core::ResourceRole, hotspotCamera())
+        .withArgument(Qn::ItemAddInZoomedStateRole, isCurrentItemZoomed);
 
     if (!q->navigator()->syncEnabled()
         || q->workbench()->currentLayout()->items().size() == 1)
