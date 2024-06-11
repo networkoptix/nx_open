@@ -15,6 +15,7 @@
 #include <nx/vms/rules/basic_event.h>
 #include <nx/vms/rules/camera_conflict_list.h>
 #include <nx/vms/rules/client_action.h>
+#include <nx/vms/rules/events/ldap_sync_issue_event.h>
 #include <nx/vms/rules/icon.h>
 #include <nx/vms/rules/network_issue_info.h>
 #include <utils/email/message.h>
@@ -99,6 +100,8 @@ void Metatypes::initialize()
 
     QnJsonSerializer::registerSerializer<std::string>();
     QnJsonSerializer::registerSerializer<nx::network::http::SerializableCredentials>();
+
+    QnJsonSerializer::registerSerializer<LdapSyncIssueEvent::Reasons>();
 };
 
 } // namespace nx::vms::rules

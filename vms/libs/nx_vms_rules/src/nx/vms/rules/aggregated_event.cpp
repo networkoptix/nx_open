@@ -129,4 +129,9 @@ nx::Uuid AggregatedEvent::id() const
     return m_id;
 }
 
+const std::vector<EventPtr>& AggregatedEvent::aggregatedEvents() const
+{
+    return m_aggregatedEvents;
+}
+
 } // namespace nx::vms::rules

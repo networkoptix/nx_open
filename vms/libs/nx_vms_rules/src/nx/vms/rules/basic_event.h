@@ -82,6 +82,12 @@ public:
     /** Returns the event details(such as caption, description, timestamp, source etc.). */
     virtual QVariantMap details(common::SystemContext* context) const;
 
+    /**
+     * Used for filling event's fields with information from aggregated event.
+     * TODO: redesign, VMS-53271
+     */
+    virtual void fillAggregationInfo(const AggregatedEventPtr& /*aggregatedEvent*/){};
+
 protected:
     BasicEvent() = default;
 
