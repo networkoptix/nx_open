@@ -209,15 +209,15 @@ void CameraHotspotItem::Private::openItem()
     const auto actionManager = q->menu();
 
     const auto workbenchItems = q->workbench()->currentLayout()->items();
+    const bool isCurrentItemZoomed = q->workbench()->item(Qn::ZoomedRole) != nullptr;
+
     for (const auto item: workbenchItems)
     {
         if (item->resource()->getId() == hotspotData.targetResourceId)
         {
-            if (q->workbench()->item(Qn::ZoomedRole))
-                q->workbench()->setItem(Qn::ZoomedRole, nullptr);
-
             actionManager->trigger(ui::action::GoToLayoutItemAction, ui::action::Parameters()
-                .withArgument(Qn::ItemUuidRole, item->uuid()));
+                .withArgument(Qn::ItemUuidRole, item->uuid())
+                .withArgument(Qn::ItemAddInZoomedStateRole, isCurrentItemZoomed));
 
             if (!q->navigator()->syncEnabled())
             {
@@ -242,7 +242,8 @@ void CameraHotspotItem::Private::openItem()
         }
     }
 
-    auto parameters = ui::action::Parameters(hotspotCamera());
+    auto parameters = ui::action::Parameters(hotspotCamera())
+        .withArgument(Qn::ItemAddInZoomedStateRole, isCurrentItemZoomed);
     if (!q->navigator()->syncEnabled())
         parameters.setArguments(itemPlaybackParameters());
 
@@ -260,8 +261,11 @@ void CameraHotspotItem::Private::opemItemInNewLayout()
 
 void CameraHotspotItem::Private::openItemInPlace()
 {
+    const bool isCurrentItemZoomed = q->workbench()->item(Qn::ZoomedRole) != nullptr;
+
     auto parameters = ui::action::Parameters(mediaResourceWidget())
-        .withArgument(Qn::ResourceRole, hotspotCamera());
+        .withArgument(Qn::ResourceRole, hotspotCamera())
+        .withArgument(Qn::ItemAddInZoomedStateRole, isCurrentItemZoomed);
 
     if (!q->navigator()->syncEnabled()
         || q->workbench()->currentLayout()->items().size() == 1)
