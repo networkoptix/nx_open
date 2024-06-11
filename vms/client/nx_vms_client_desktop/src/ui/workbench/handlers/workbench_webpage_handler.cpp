@@ -86,6 +86,11 @@ QnWorkbenchWebPageHandler::QnWorkbenchWebPageHandler(QObject* parent /*= nullptr
                 if (!webPage)
                     continue;
 
+                const auto proxyResource =
+                    webPage->getOptions().testFlag(QnWebPageResource::Proxied)
+                        ? webPage
+                        : QnWebPageResourcePtr{};
+
                 auto webDialog = new QnSessionAware<WebViewDialog>(
                     mainWindowWidget(), QDialogButtonBox::NoButton);
 
@@ -97,7 +102,7 @@ QnWorkbenchWebPageHandler::QnWorkbenchWebPageHandler(QObject* parent /*= nullptr
                     /*enableClientApi*/ webPage->getOptions().testFlag(
                         QnWebPageResource::Integration),
                     windowContext(),
-                    webPage->getParentResource(),
+                    proxyResource,
                     /*authenticator*/ nullptr,
                     /*checkCertificate*/ true);
 
