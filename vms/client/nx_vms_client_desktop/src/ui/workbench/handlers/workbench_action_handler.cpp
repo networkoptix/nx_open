@@ -558,7 +558,13 @@ void ActionHandler::addToLayout(
         data.combinedGeometry = QRectF(QPointF(0.5, 0.5), QPointF(-0.5, -0.5));
     }
 
+    if (params.zoomed)
+        layout->setItemData(data.uuid, Qn::ItemAddInZoomedStateRole, true);
+
     layout->addItem(data);
+
+    // Cleanup "zoomed" state to ensure further switches to this item will not be affected.
+    layout->setItemData(data.uuid, Qn::ItemAddInZoomedStateRole, QVariant());
 
     if (resource.dynamicCast<QnAviResource>() && layoutSize == 0)
     {
@@ -990,6 +996,8 @@ void ActionHandler::at_openInLayoutAction_triggered()
             parameters.argument<MotionSelection>(Qn::ItemMotionSelectionRole);
         addParams.analyticsSelection =
             parameters.argument<QRectF>(Qn::ItemAnalyticsSelectionRole);
+        addParams.zoomed =
+            parameters.argument<bool>(Qn::ItemAddInZoomedStateRole, false);
 
         addParams.time = std::chrono::milliseconds(DATETIME_NOW);
         addParams.paused = false;
@@ -1131,6 +1139,8 @@ void ActionHandler::replaceLayoutItemActionTriggered()
 
     if (actionParams.hasArgument(Qn::ItemPausedRole))
         replacementParams.paused = actionParams.argument<bool>(Qn::ItemPausedRole);
+
+    replacementParams.zoomed = actionParams.argument<bool>(Qn::ItemAddInZoomedStateRole, false);
 
     const auto display = context()->display();
     const auto forceNoAnimationGuard = qScopeGuard(
@@ -1795,6 +1805,9 @@ void ActionHandler::at_goToLayoutItemAction_triggered()
 
     if (!targetItem)
         return;
+
+    if (parameters.argument<bool>(Qn::ItemAddInZoomedStateRole, false))
+        workbench()->setItem(Qn::ZoomedRole, targetItem);
 
     workbench()->setItem(Qn::SingleSelectedRole, targetItem);
 }
