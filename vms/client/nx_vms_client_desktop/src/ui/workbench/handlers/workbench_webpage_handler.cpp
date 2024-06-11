@@ -141,7 +141,9 @@ QnWorkbenchWebPageHandler::QnWorkbenchWebPageHandler(QObject* parent /*= nullptr
                 resourcePool()->getResourceByUrl(
                     webPageUrl.toString()).dynamicCast<QnWebPageResource>();
 
-            if (webPage->getOptions().testFlag(QnWebPageResource::Integration) && size.isValid())
+            if (webPage
+                && webPage->getOptions().testFlag(QnWebPageResource::Integration)
+                && size.isValid())
             {
                 webPage->setOpenInWindow(true, size);
                 qnResourcesChangesManager->saveWebPage(webPage);
