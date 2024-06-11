@@ -2021,14 +2021,16 @@ void QnWorkbenchDisplay::at_viewportAnimator_finished()
 
 void QnWorkbenchDisplay::at_layout_itemAdded(QnWorkbenchItem *item)
 {
-    const bool animate = animationAllowed();
+    const bool addInZoomedState = item->data<bool>(Qn::ItemAddInZoomedStateRole, false);
+    const bool animate = animationAllowed() && !addInZoomedState;
     static const bool kStartDisplay = true;
     if (addItemInternal(item, animate, kStartDisplay))
     {
         synchronizeSceneBounds();
         fitInView(animate);
 
-        workbench()->setItem(Qn::ZoomedRole, nullptr); //< Unzoom & fit in view on item addition.
+        // Unzoom & fit in view on item addition except when item is added in zoomed state.
+        workbench()->setItem(Qn::ZoomedRole, addInZoomedState ? item : nullptr);
         if (!item->data<bool>(Qn::ItemSkipFocusOnAdditionRole, false))
         {
             // Newly added item should become selected.

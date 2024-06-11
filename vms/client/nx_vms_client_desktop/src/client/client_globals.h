@@ -228,6 +228,9 @@ namespace Qn
         /** Skipping 'focused' state on addition. */
         ItemSkipFocusOnAdditionRole,
 
+        /** Add item or as already zoomed or switch to existing item in zoomed state. */
+        ItemAddInZoomedStateRole,
+
 //-------------------------------------------------------------------------------------------------
         /* Ptz-based. */
         PtzPresetRole,                              /**< Role for PTZ preset. Value of type QnPtzPreset. */
