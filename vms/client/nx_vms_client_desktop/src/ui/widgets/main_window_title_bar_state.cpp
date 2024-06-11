@@ -270,6 +270,12 @@ public:
         }
     }
 
+    virtual void createInheritedState(DelegateState*, SubstateFlags, const QStringList&) override
+    {
+        // Just return an empty current state without saving and modyfying.
+        return;
+    }
+
 private:
     QPointer<Store> m_store;
 };
