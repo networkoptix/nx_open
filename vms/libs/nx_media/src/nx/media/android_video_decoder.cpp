@@ -163,6 +163,11 @@ public:
         javaDecoder.callMethod<void>("releaseDecoder");
     }
 
+    void releaseSurface()
+    {
+        javaDecoder.callMethod<void>("releaseSurface", "()V");
+    }
+
     void updateTexImage()
     {
         javaDecoder.callMethod<void>("updateTexImage");
@@ -221,6 +226,7 @@ private:
     std::unique_ptr<QOpenGLContext> threadGlCtx;
     std::unique_ptr<QOffscreenSurface> offscreenSurface;
 
+    GLuint textureId = 0;
     FboManager fboManager;
 };
 
@@ -274,10 +280,11 @@ FboTextureHolder AndroidVideoDecoderPrivate::renderFrameToFbo()
             CHECK_GL_ERROR
             program->enableAttributeArray(1);
             CHECK_GL_ERROR
-            program->setUniformValue("frameTexture", GLuint(0));
-            CHECK_GL_ERROR
             program->setUniformValue("texMatrix", getTransformMatrix());
             CHECK_GL_ERROR
+
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_EXTERNAL_OES, textureId);
 
             glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, g_vertex_data);
             glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, g_texture_data);
@@ -388,6 +395,11 @@ AndroidVideoDecoder::AndroidVideoDecoder(
 
 AndroidVideoDecoder::~AndroidVideoDecoder()
 {
+    if (d->initialized)
+    {
+        d->releaseSurface();
+        glDeleteTextures(1, &d->textureId);
+    }
 }
 
 void AndroidVideoDecoderPrivate::addMaxResolutionIfNeeded(const AVCodecID codec)
@@ -497,15 +509,21 @@ int AndroidVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frameSrc, V
 
         d->fboManager.init(d->frameSize);
 
+        glGenTextures(1, &d->textureId);
         QString codecName = codecToString(frame->compressionType);
         QJniObject jCodecName = QJniObject::fromString(codecName);
         d->initialized = d->javaDecoder.callMethod<jboolean>(
-            "init", "(Ljava/lang/String;II)Z",
+            "init", "(Ljava/lang/String;III)Z",
             jCodecName.object<jstring>(),
+            (jint) d->textureId,
             d->frameSize.width(),
             d->frameSize.height());
         if (!d->initialized)
+        {
+            d->releaseSurface();
+            glDeleteTextures(1, &d->textureId);
             return 0; //< wait for I frame
+        }
     }
 
     jlong outFrameNum = 0;
@@ -534,6 +552,8 @@ int AndroidVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frameSrc, V
             {
                 // Subsequent call to decode() will reinitialize javaDecoder.
                 d->initialized = false;
+                d->releaseSurface();
+                glDeleteTextures(1, &d->textureId);
                 return 0;
             }
         }
