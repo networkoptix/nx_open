@@ -12091,7 +12091,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>You can copy the Access Link below, and share it with the implied user.</source>
-      <translation type="unfinished">You can copy the Access Link below, and share it with the implied user.</translation>
+      <translation>Aşağıdaki Erişim Bağlantısını kopyalayabilir ve ilgili kullanıcıyla paylaşabilirsiniz.</translation>
     </message>
   </context>
   <context>
