@@ -6,6 +6,8 @@
 
 #include "basic_event.h"
 
+namespace nx::vms::common { class SystemContext; }
+
 namespace nx::vms::rules {
 
 /** Wrapper around a list of event aggregation information. */
@@ -53,6 +55,8 @@ public:
     size_t count() const;
 
     EventPtr initialEvent() const;
+
+    const std::vector<EventPtr>& aggregatedEvents() const;
 
 private:
     nx::Uuid m_id = nx::Uuid::createUuid(); //< TODO: #amalov Get from initial event if needed.

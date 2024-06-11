@@ -516,6 +516,8 @@ void ActionBuilder::buildAndEmitAction(const AggregatedEventPtr& aggregatedEvent
         return;
     }
 
+    aggregatedEvent->initialEvent()->fillAggregationInfo(aggregatedEvent);
+
     // Action with all data without any user filtration for logging.
     ActionPtr logAction = buildAction(aggregatedEvent);
     if (!NX_ASSERT(logAction))
