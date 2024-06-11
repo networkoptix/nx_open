@@ -6,66 +6,163 @@
 
 namespace nx::media {
 
-FboManager::FboHolder::FboHolder(std::weak_ptr<QOpenGLFramebufferObject> fbo, FboManager* manager):
-    fbo(fbo),
-    manager(manager)
+class FboTexture
 {
-    NX_ASSERT(!manager->m_deleteWhenEmpty);
-}
+    friend class FboHolder;
 
-FboManager::FboHolder::~FboHolder()
-{
-    const auto fboPtr = fbo.lock();
-    if (!fboPtr)
-        return;
-
+public:
+    FboTexture(const QSize& size)
     {
-        NX_MUTEX_LOCKER lock(&manager->m_mutex);
-        manager->m_fbos.erase(
-            std::find(manager->m_fbos.begin(), manager->m_fbos.end(), fboPtr));
-        manager->m_fbosToDelete.push(fboPtr);
-        if (!manager->m_deleteWhenEmpty || !manager->m_fbos.empty())
-            return; //< Do not destroy manager object.
+        m_fbo = std::make_unique<QOpenGLFramebufferObject>(size);
     }
 
-    // Destruction via deleteLater() may happen before returning from this function because manager
-    // may be in another thread. So make sure manager->m_mutex is unlocked when we get here.
-    manager->deleteLater();
+    virtual ~FboTexture()
+    {
+        if (m_textureId.has_value())
+        {
+            NX_ASSERT(!m_fbo, "Texture has been taken, but FBO is still alive");
+            glDeleteTextures(1, &m_textureId.value());
+        }
+    }
+
+    void releaseFbo()
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        if (m_fbo)
+        {
+            m_textureId = m_fbo->takeTexture();
+            m_fbo.reset();
+        }
+    }
+
+    GLuint textureId() const
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        if (m_textureId)
+            return *m_textureId;
+
+        return NX_ASSERT(m_fbo) ? m_fbo->texture() : 0;
+    }
+
+    bool isValid() const
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        return m_fbo && m_fbo->isValid();
+    }
+
+    bool inUse() const
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        return m_inUse;
+    }
+
+    bool setInUse(bool value)
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+
+        if (!NX_ASSERT(m_inUse != value))
+            return false;
+
+        m_inUse = value;
+        return true;
+    }
+
+private:
+    std::unique_ptr<QOpenGLFramebufferObject> m_fbo;
+    std::optional<GLuint> m_textureId;
+    mutable Mutex m_mutex;
+    bool m_inUse = false;
+};
+
+FboTextureHolder::FboTextureHolder(std::shared_ptr<FboTexture> fboTexture):
+    m_fboTexture(std::move(fboTexture))
+{
+    if (m_fboTexture)
+    {
+        if (!m_fboTexture->setInUse(true))
+            m_fboTexture.reset();
+    }
 }
 
-FboManager::FboManager(const QSize& frameSize):
-    m_frameSize(frameSize)
+FboTextureHolder::~FboTextureHolder()
 {
+    if (m_fboTexture)
+        m_fboTexture->setInUse(false);
 }
 
-FboManager::~FboManager()
+GLuint FboTextureHolder::textureId() const
 {
+    return m_fboTexture ? m_fboTexture->textureId() : 0;
 }
 
-void FboManager::deleteWhenEmptyInThread(QThread* thread)
+FboHolder::FboHolder(const QSize& size)
 {
-    NX_MUTEX_LOCKER lock(&m_mutex);
-
-    m_deleteWhenEmpty = true;
-
-    if (m_fbos.empty())
-        deleteLater();
-    else
-        moveToThread(thread);
+    m_fboTexture = std::make_shared<FboTexture>(size);
 }
 
-FboManager::FboPtr FboManager::getFbo()
+FboHolder::~FboHolder()
 {
-    NX_MUTEX_LOCKER lock(&m_mutex);
+    if (m_fboTexture)
+        m_fboTexture->releaseFbo();
+}
 
-    // It looks like the video surface we use releases the presented QVideoFrame too early
-    // (before it is actually rendered). If we delete it immediately, we'll get screen
-    // blinking. Here we give the FBO a slight delay defore the deletion.
-    while (m_fbosToDelete.size() > 1)
-        m_fbosToDelete.pop();
+bool FboHolder::inUse() const
+{
+    return NX_ASSERT(m_fboTexture) && m_fboTexture->inUse();
+}
 
-    m_fbos.emplace_back(new QOpenGLFramebufferObject(m_frameSize));
-    return std::make_shared<FboHolder>(m_fbos.back(), this);
+bool FboHolder::isValid() const
+{
+    return m_fboTexture->isValid();
+}
+
+void FboHolder::bind()
+{
+    if (NX_ASSERT(m_fboTexture))
+        m_fboTexture->m_fbo->bind();
+}
+void FboHolder::release()
+{
+    if (NX_ASSERT(m_fboTexture))
+        m_fboTexture->m_fbo->release();
+}
+
+void FboManager::init(const QSize& frameSize)
+{
+    m_fbos.clear();
+    m_frameSize = frameSize;
+}
+
+FboTextureHolder FboManager::getTexture(std::function<void(FboHolder&)> renderFunction)
+{
+    auto it = std::find_if(
+        m_fbos.begin(),
+        m_fbos.end(),
+        [](const auto& fbo)
+        {
+            return !fbo.inUse();
+        });
+
+    if (it == m_fbos.end())
+    {
+        if (m_fbos.size() >= kFboPoolSize)
+            return {};
+
+        // Create new FBO.
+        m_fbos.emplace_back(m_frameSize);
+        it = m_fbos.end() - 1;
+
+        // Check if FBO was created.
+        if (!it->isValid())
+        {
+            m_fbos.pop_back();
+            return {};
+        }
+    }
+
+    renderFunction(*it);
+
+    return it->getTexture();
 }
 
 } // namespace nx::media

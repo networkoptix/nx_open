@@ -30,8 +30,7 @@
 
 #include "fbo_manager.h"
 
-namespace nx {
-namespace media {
+namespace nx::media {
 
 namespace {
 
@@ -106,13 +105,14 @@ static void fillInputBuffer(
 class TextureBuffer: public QAbstractVideoBuffer
 {
 public:
-    TextureBuffer(
-        FboManager::FboPtr&& fbo,
-        std::shared_ptr<AndroidVideoDecoderPrivate> owner)
+    TextureBuffer(FboTextureHolder textureHolder)
         :
         QAbstractVideoBuffer(QVideoFrame::RhiTextureHandle),
-        m_fbo(std::move(fbo)),
-        m_owner(owner)
+        m_textureHolder(std::move(textureHolder))
+    {
+    }
+
+    ~TextureBuffer()
     {
     }
 
@@ -130,11 +130,13 @@ public:
     {
     }
 
-    virtual quint64 textureHandle(int plane) const override;
+    virtual quint64 textureHandle(int plane) const override
+    {
+        return plane == 0 ? m_textureHolder.textureId() : 0;
+    }
 
 private:
-    mutable FboManager::FboPtr m_fbo;
-    std::weak_ptr<AndroidVideoDecoderPrivate> m_owner;
+    FboTextureHolder m_textureHolder;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -195,7 +197,7 @@ public:
         env->DeleteLocalRef(objectClass);
     }
 
-    FboManager::FboPtr renderFrameToFbo();
+    FboTextureHolder renderFrameToFbo();
     void createGlResources();
 
     static void addMaxResolutionIfNeeded(const AVCodecID codec);
@@ -211,7 +213,6 @@ private:
     RenderContextSynchronizerPtr synchronizer;
     QSize frameSize;
 
-    std::unique_ptr<FboManager> fboManager;
     QOpenGLShaderProgram *program;
 
     typedef std::pair<int, qint64> PtsData;
@@ -219,103 +220,101 @@ private:
 
     std::unique_ptr<QOpenGLContext> threadGlCtx;
     std::unique_ptr<QOffscreenSurface> offscreenSurface;
+
+    FboManager fboManager;
 };
 
 QMap<AVCodecID, QSize> AndroidVideoDecoderPrivate::maxResolutions;
 QMutex AndroidVideoDecoderPrivate::maxResolutionsMutex;
 
-FboManager::FboPtr AndroidVideoDecoderPrivate::renderFrameToFbo()
+FboTextureHolder AndroidVideoDecoderPrivate::renderFrameToFbo()
 {
     QOpenGLFunctions* funcs = QOpenGLContext::currentContext()->functions();
 
     createGlResources();
-    FboManager::FboPtr fboPtr = fboManager->getFbo();
-    auto fbo = fboPtr->fbo.lock();
 
-    CHECK_GL_ERROR
+    return fboManager.getTexture(
+        [this, funcs](FboHolder& fbo)
+        {
+            updateTexImage();
 
-    updateTexImage();
+            // Save current state of rendering context.
+            GLboolean stencilTestEnabled;
+            GLboolean depthTestEnabled;
+            GLboolean scissorTestEnabled;
+            GLboolean blendEnabled;
+            glGetBooleanv(GL_STENCIL_TEST, &stencilTestEnabled);
+            glGetBooleanv(GL_DEPTH_TEST, &depthTestEnabled);
+            glGetBooleanv(GL_SCISSOR_TEST, &scissorTestEnabled);
+            glGetBooleanv(GL_BLEND, &blendEnabled);
+            #if 0 //< No need to save/restore FBO binding because this context is not used anywhere else.
+                GLuint prevFbo = 0;
+                funcs->glGetIntegerv(GL_FRAMEBUFFER_BINDING, (GLint*) &prevFbo);
+            #endif // 0
 
-    // Save current state of rendering context.
-    GLboolean stencilTestEnabled;
-    GLboolean depthTestEnabled;
-    GLboolean scissorTestEnabled;
-    GLboolean blendEnabled;
-    glGetBooleanv(GL_STENCIL_TEST, &stencilTestEnabled);
-    glGetBooleanv(GL_DEPTH_TEST, &depthTestEnabled);
-    glGetBooleanv(GL_SCISSOR_TEST, &scissorTestEnabled);
-    glGetBooleanv(GL_BLEND, &blendEnabled);
-#if 0 //< No need to save/restore FBO binding because this context is not used anywhere else.
-    GLuint prevFbo = 0;
-    funcs->glGetIntegerv(GL_FRAMEBUFFER_BINDING, (GLint*) &prevFbo);
-#endif // 0
+            CHECK_GL_ERROR
 
-    CHECK_GL_ERROR
+            if (stencilTestEnabled)
+                glDisable(GL_STENCIL_TEST);
+            if (depthTestEnabled)
+                glDisable(GL_DEPTH_TEST);
+            if (scissorTestEnabled)
+                glDisable(GL_SCISSOR_TEST);
+            if (blendEnabled)
+                glDisable(GL_BLEND);
 
-    if (stencilTestEnabled)
-        glDisable(GL_STENCIL_TEST);
-    if (depthTestEnabled)
-        glDisable(GL_DEPTH_TEST);
-    if (scissorTestEnabled)
-        glDisable(GL_SCISSOR_TEST);
-    if (blendEnabled)
-        glDisable(GL_BLEND);
+            fbo.bind();
 
-    fbo->bind();
+            glViewport(0, 0, frameSize.width(), frameSize.height());
+            CHECK_GL_ERROR
 
-    glViewport(0, 0, frameSize.width(), frameSize.height());
-    CHECK_GL_ERROR
+            program->bind();
+            CHECK_GL_ERROR
+            program->enableAttributeArray(0);
+            CHECK_GL_ERROR
+            program->enableAttributeArray(1);
+            CHECK_GL_ERROR
+            program->setUniformValue("frameTexture", GLuint(0));
+            CHECK_GL_ERROR
+            program->setUniformValue("texMatrix", getTransformMatrix());
+            CHECK_GL_ERROR
 
-    program->bind();
-    CHECK_GL_ERROR
-    program->enableAttributeArray(0);
-    CHECK_GL_ERROR
-    program->enableAttributeArray(1);
-    CHECK_GL_ERROR
-    program->setUniformValue("frameTexture", GLuint(0));
-    CHECK_GL_ERROR
-    program->setUniformValue("texMatrix", getTransformMatrix());
-    CHECK_GL_ERROR
+            glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, g_vertex_data);
+            glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, g_texture_data);
 
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, g_vertex_data);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, g_texture_data);
+            glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
-    glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+            program->disableAttributeArray(0);
+            program->disableAttributeArray(1);
 
-    program->disableAttributeArray(0);
-    program->disableAttributeArray(1);
+            glBindTexture(GL_TEXTURE_EXTERNAL_OES, 0);
+            CHECK_GL_ERROR
 
-    glBindTexture(GL_TEXTURE_EXTERNAL_OES, 0);
-    CHECK_GL_ERROR
+            fbo.release();
 
-    fbo->release();
+            // Restore state of rendering context.
+            #if 0 //< No need to save/restore FBO binding because this context is not used anywhere else.
+                funcs->glBindFramebuffer(GL_FRAMEBUFFER, prevFbo); // sets both READ and DRAW
+            #endif // 0
 
-    // Restore state of rendering context.
-#if 0 //< No need to save/restore FBO binding because this context is not used anywhere else.
-    funcs->glBindFramebuffer(GL_FRAMEBUFFER, prevFbo); // sets both READ and DRAW
-#endif // 0
-    if (stencilTestEnabled)
-        glEnable(GL_STENCIL_TEST);
-    if (depthTestEnabled)
-        glEnable(GL_DEPTH_TEST);
-    if (scissorTestEnabled)
-        glEnable(GL_SCISSOR_TEST);
-    if (blendEnabled)
-        glEnable(GL_BLEND);
+            if (stencilTestEnabled)
+                glEnable(GL_STENCIL_TEST);
+            if (depthTestEnabled)
+                glEnable(GL_DEPTH_TEST);
+            if (scissorTestEnabled)
+                glEnable(GL_SCISSOR_TEST);
+            if (blendEnabled)
+                glEnable(GL_BLEND);
 
-    glFlush();
-    glFinish();
-
-    return fboPtr;
+            glFlush();
+            glFinish();
+        });
 }
 
 void AndroidVideoDecoderPrivate::createGlResources()
 {
     QOpenGLContext *ctx = QOpenGLContext::currentContext();
     QOpenGLFunctions *funcs = ctx->functions();
-
-    if (!fboManager)
-        fboManager.reset(new FboManager(frameSize));
 
     if (!program)
     {
@@ -389,9 +388,6 @@ AndroidVideoDecoder::AndroidVideoDecoder(
 
 AndroidVideoDecoder::~AndroidVideoDecoder()
 {
-    // Some frames might still be in use, we cannot just delete their backing buffers here.
-    if (d->fboManager)
-        d->fboManager.release()->deleteWhenEmptyInThread(QCoreApplication::instance()->thread());
 }
 
 void AndroidVideoDecoderPrivate::addMaxResolutionIfNeeded(const AVCodecID codec)
@@ -499,6 +495,8 @@ int AndroidVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frameSrc, V
         if (d->frameSize.isEmpty())
             return 0; //< Wait for I frame to be able to extract data from the binary stream.
 
+        d->fboManager.init(d->frameSize);
+
         QString codecName = codecToString(frame->compressionType);
         QJniObject jCodecName = QJniObject::fromString(codecName);
         d->initialized = d->javaDecoder.callMethod<jboolean>(
@@ -552,26 +550,30 @@ int AndroidVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frameSrc, V
 
     // Got a frame.
 
-    FboManager::FboPtr fboToRender;
+    FboTextureHolder textureHolder;
+
     if (d->threadGlCtx)
     {
-        fboToRender = d->renderFrameToFbo();
+        textureHolder = d->renderFrameToFbo();
     }
     else
     {
         d->synchronizer->execInRenderContext(
-            [&fboToRender, this](void*)
+            [&textureHolder, this](void*)
             {
-                fboToRender = d->renderFrameToFbo();
+                textureHolder = d->renderFrameToFbo();
             },
             nullptr);
     }
+
+    if (textureHolder.isNull())
+        return 0;
 
     NX_VERBOSE(this, nx::format("got frame num %1 decode time1=%2 time2=%3").args(
         outFrameNum, time1, tm.elapsed()));
 
     auto videoFrame = new VideoFrame(
-        new TextureBuffer(std::move(fboToRender), d),
+        new TextureBuffer(std::move(textureHolder)),
         QVideoFrameFormat(d->frameSize, QVideoFrameFormat::Format_BGRX8888));
 
     while (!d->frameNumToPtsCache.empty() && d->frameNumToPtsCache.front().first < outFrameNum)
@@ -592,17 +594,6 @@ AbstractVideoDecoder::Capabilities AndroidVideoDecoder::capabilities() const
     return Capability::hardwareAccelerated;
 }
 
-quint64 TextureBuffer::textureHandle(int /*plane*/) const
-{
-    if (m_fbo)
-    {
-        if (auto fbo = m_fbo->fbo.lock())
-            return fbo->texture();
-    }
-    return 0;
-}
-
-} // namespace media
-} // namespace nx
+} // namespace nx::media
 
 #endif // defined(Q_OS_ANDROID)
