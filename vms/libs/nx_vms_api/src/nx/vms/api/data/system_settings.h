@@ -233,12 +233,12 @@ struct NX_VMS_API SettingsBase
 #define SiteSettings_Fields SaveableSiteSettings_Fields UnsaveableSiteSettings_Fields
 enum class SiteSettingName
 {
+    none,
     #ifndef Q_MOC_RUN
         #define VALUE(R, DATA, ITEM) ITEM,
         BOOST_PP_SEQ_FOR_EACH(VALUE, _, SiteSettings_Fields)
         #undef VALUE
     #endif // Q_MOC_RUN
-    none,
 };
 
 template<typename Visitor>
