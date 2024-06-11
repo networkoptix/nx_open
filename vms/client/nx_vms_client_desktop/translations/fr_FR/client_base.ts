@@ -1029,7 +1029,7 @@
     </message>
     <message>
       <source>Save Cloud Layout As...</source>
-      <translation>Enregistrer la mise en page du nuage sous...</translation>
+      <translation>Enregistrer la mise en page du cloud sous...</translation>
     </message>
     <message>
       <source>User Manual...</source>
