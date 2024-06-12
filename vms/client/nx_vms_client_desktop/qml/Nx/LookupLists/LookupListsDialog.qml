@@ -51,6 +51,12 @@ Dialog
         listModel: currentList
     }
 
+    function clearFilter()
+    {
+        editing = true
+        editing = false
+    }
+
     function iconPathForLookupList(data)
     {
         const listType = taxonomy.objectTypeById(data.data.objectTypeId)
@@ -279,8 +285,10 @@ Dialog
                         icon.source: "image://skin/20x20/Outline/delete.svg"
                         onClicked:
                         {
+                            editing = true
                             entriesModel.deleteEntries(tableView.checkedRows)
                             hasChanges = true
+                            editing = false
                         }
                     }
                     TextButton
@@ -303,7 +311,8 @@ Dialog
                     Item { Layout.fillWidth: true }
                     SearchField
                     {
-                        onTextChanged: entriesModel.setFilter(text)
+                        text: control.editing ? '' : text //< Clearing filter on any editing.
+                        onTextChanged: lookupListEntriesFilterModel.setFilterRegularExpression(text)
                     }
                 }
             }
@@ -311,7 +320,12 @@ Dialog
             LookupListTable
             {
                 id: tableView
-                sourceModel: entriesModel
+                sourceModel: LookupListEntriesSortFilterProxyModel
+                {
+                    id: lookupListEntriesFilterModel
+
+                    sourceModel: entriesModel
+                }
                 taxonomy: control.taxonomy
                 onEditingChanged: control.editing = tableView.editing
                 onValueChanged: hasChanges = true
@@ -373,6 +387,7 @@ Dialog
                 enabled: !!currentList
                 textRole: "text"
                 valueRole: "value"
+                onCurrentIndexChanged: clearFilter()
             }
             Button
             {
@@ -398,6 +413,9 @@ Dialog
         {
             visible: false
             onEntriesImported: hasChanges = true
+            Component.onCompleted: editing = true
+            onRejected: editing = false
+            onAccepted: editing = false
         }
     }
 
