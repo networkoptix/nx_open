@@ -14,7 +14,6 @@ public:
     using Formatter = std::function<QVariant(QString)>;
 
     QPointer<LookupListModel> data;
-    std::optional<std::vector<int>> rowsIndexesToShow;
     QMap<QString, Validator> validatorByAttributeName;
     std::map<QString, Formatter> formatterByAttributeName;
     core::analytics::taxonomy::StateView* taxonomy;
@@ -29,7 +28,6 @@ public:
     static QVariant stringFormatter(const QString& value);
     static QVariant objectFormatter(const QString& value);
 
-    std::vector<int> getVisibleIndexes(const QString& filterText) const;
     QVariant getDisplayValue(const QString& attributeName, const QString& value) const;
     QVector<int> removeIncorrectColumnValues();
 

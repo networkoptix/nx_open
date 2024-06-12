@@ -67,7 +67,6 @@ public:
     Q_INVOKABLE void deleteEntries(const QVector<int>& rows);
     void exportEntries(const QSet<int>& selectedRows, QTextStream& outputCsv);
     bool isValidValue(const QString& value, const QString& attributeName);
-    Q_INVOKABLE void setFilter(const QString& searchText);
 
     Q_INVOKABLE core::analytics::taxonomy::StateView* taxonomy();
     Q_INVOKABLE void setTaxonomy(core::analytics::taxonomy::StateView* taxonomy);

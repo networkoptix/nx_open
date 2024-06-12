@@ -57,26 +57,6 @@ QVariant LookupListEntriesModel::Private::getDisplayValue(
     return value.isEmpty() ? value : it->second(value);
 }
 
-std::vector<int> LookupListEntriesModel::Private::getVisibleIndexes(
-    const QString& filterText) const
-{
-    std::vector<int> result;
-    const QString lowerFilterText = filterText.toLower();
-    for (int r = 0; r < data->rawData().entries.size(); r++)
-    {
-        for (auto& [key, value]: data->rawData().entries[r])
-        {
-            const auto displayedValue = getDisplayValue(key, value);
-            if (displayedValue.toString().toLower().contains(lowerFilterText))
-            {
-                result.push_back(r);
-                break;
-            }
-        }
-    }
-    return result;
-}
-
 bool LookupListEntriesModel::Private::intValidator(const QString& value)
 {
     int ignored;

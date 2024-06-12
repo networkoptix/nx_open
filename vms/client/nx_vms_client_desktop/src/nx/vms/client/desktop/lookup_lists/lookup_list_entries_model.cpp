@@ -56,7 +56,7 @@ int LookupListEntriesModel::rowCount(const QModelIndex& /*parent*/) const
     if (!d->data)
         return 0;
 
-    return d->rowsIndexesToShow ? d->rowsIndexesToShow->size() : d->data->rawData().entries.size();
+    return d->data->rawData().entries.size();
 }
 
 int LookupListEntriesModel::columnCount(const QModelIndex& parent) const
@@ -79,9 +79,7 @@ QVariant LookupListEntriesModel::data(const QModelIndex& index, int role) const
             if (key.isEmpty())
                 return QString();
 
-            const int rowIdx =
-                d->rowsIndexesToShow ? d->rowsIndexesToShow->at(index.row()) : index.row();
-            const auto& entry = d->data->rawData().entries[rowIdx];
+            const auto& entry = d->data->rawData().entries[index.row()];
             const auto iter = entry.find(key);
             const auto value = iter != entry.cend() ? iter->second : QString();
             return role == RawValueRole ? value : d->getDisplayValue(key, value);
@@ -246,19 +244,6 @@ int LookupListEntriesModel::columnPosOfAttribute(const QString& attributeName)
     const auto& attributeNames = d->data->rawData().attributeNames;
     const auto pos = std::find(attributeNames.begin(), attributeNames.end(), attributeName);
     return pos != attributeNames.end() ? std::distance(attributeNames.begin(), pos) : -1;
-}
-
-void LookupListEntriesModel::setFilter(const QString& searchText)
-{
-    if (!NX_ASSERT(d->data))
-        return;
-
-    beginResetModel();
-    if (searchText.isEmpty())
-        d->rowsIndexesToShow.reset();
-    else
-        d->rowsIndexesToShow = d->getVisibleIndexes(searchText);
-    endResetModel();
 }
 
 void LookupListEntriesModel::removeIncorrectEntries()

@@ -9,6 +9,7 @@
 #include <nx/vms/api/data/lookup_list_data.h>
 #include <nx/vms/client/core/analytics/taxonomy/object_type.h>
 #include <nx/vms/client/core/analytics/taxonomy/state_view.h>
+#include <nx/vms/client/desktop/lookup_lists/lookup_list_entries_sort_filter_proxy_model.h>
 #include <nx/vms/client/desktop/lookup_lists/lookup_list_export_processor.h>
 #include <nx/vms/client/desktop/lookup_lists/lookup_list_model.h>
 #include <nx/vms/client/desktop/lookup_lists/lookup_list_preview_processor.h>
@@ -141,6 +142,14 @@ protected:
         }
     }
 
+
+    void givenLookupListEntriesProxyModel(const LookupListData& data)
+    {
+        givenLookupListEntriesModel(data);
+        m_entriesProxyModel = std::make_shared<LookupListEntriesSortFilterProxyModel>();
+        m_entriesProxyModel->setSourceModel(m_entriesModel.get());
+    }
+
     void givenLookupListEntriesModel(LookupListModel* lookupList)
     {
         m_entriesModel = std::make_shared<LookupListEntriesModel>();
@@ -238,7 +247,7 @@ protected:
 
     void whenSetFilter(const QString& filter)
     {
-        m_entriesModel->setFilter(filter);
+        m_entriesProxyModel->setFilterRegularExpression(filter);
     }
 
     void thenFixUpIsRequired() { ASSERT_TRUE(m_importModel->fixupRequired()); }
@@ -249,7 +258,7 @@ protected:
         thenRowCountIs(rowCount, m_importModel->lookupListEntriesModel());
     }
 
-    void thenRowCountIs(int rowCount, QAbstractTableModel* model)
+    void thenRowCountIs(int rowCount, QAbstractItemModel* model)
     {
         ASSERT_EQ(rowCount, model->rowCount());
     }
@@ -388,6 +397,7 @@ protected:
     }
 
     std::shared_ptr<LookupListEntriesModel> m_entriesModel;
+    std::shared_ptr<LookupListEntriesSortFilterProxyModel> m_entriesProxyModel;
     std::shared_ptr<LookupListImportEntriesModel> m_importModel;
     QFile m_exportTestFile;
 };
@@ -602,14 +612,14 @@ TEST_F(LookupListTests, search_is_case_independent)
         {{"Value", "AaaA"}},
         {{"Value", "6"}}};
 
-    givenLookupListEntriesModel(testData);
+    givenLookupListEntriesProxyModel(testData);
 
     whenSetFilter("aa");
     const int expectedRowCount = 5;
-    thenRowCountIs(expectedRowCount, m_entriesModel.get());
+    thenRowCountIs(expectedRowCount, m_entriesProxyModel.get());
 
     whenSetFilter("AA");
-    thenRowCountIs(expectedRowCount, m_entriesModel.get());
+    thenRowCountIs(expectedRowCount, m_entriesProxyModel.get());
 }
 
 /**
@@ -618,19 +628,19 @@ TEST_F(LookupListTests, search_is_case_independent)
 
 TEST_F(LookupListTests, search_on_displayed_values)
 {
-    givenLookupListEntriesModel(bigColumnNumberExampleData());
+    givenLookupListEntriesProxyModel(bigColumnNumberExampleData());
 
     whenSetFilter("red");
-    thenRowCountIs(1, m_entriesModel.get());
+    thenRowCountIs(1, m_entriesProxyModel.get());
 
     whenSetFilter("No");
-    thenRowCountIs(1, m_entriesModel.get());
+    thenRowCountIs(1, m_entriesProxyModel.get());
 
     whenSetFilter("Yes");
-    thenRowCountIs(1, m_entriesModel.get());
+    thenRowCountIs(1, m_entriesProxyModel.get());
 
     whenSetFilter("blue");
-    thenRowCountIs(2, m_entriesModel.get());
+    thenRowCountIs(2, m_entriesProxyModel.get());
 }
 
 } // namespace nx::vms::client::desktop
