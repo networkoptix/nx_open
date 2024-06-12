@@ -165,6 +165,9 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
     NX_INI_FLAG(false, allowToPutAnyAccessibleDeviceOnScene,
         "[Dev] Allow to put devices on the scene without view live or view archive permission.");
 
+    NX_INI_FLAG(false, simplifySceneItemMetric,
+        "[Dev] Use simpler metric for the 'closest free slot' item location on the scene.");
+
     NX_INI_STRING("opengl", graphicsApi,
         "[Dev] Select Qt graphics API.\n"
         "Possible values:\n"

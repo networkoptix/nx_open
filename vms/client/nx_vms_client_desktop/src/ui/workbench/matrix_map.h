@@ -2,9 +2,8 @@
 
 #pragma once
 
-#include <cassert>
-
 #include <QtCore/QHash>
+#include <QtCore/QList>
 #include <QtCore/QPair>
 #include <QtCore/QPoint>
 #include <QtCore/QRect>
@@ -151,6 +150,11 @@ public:
         QSet<QPoint>* nonconforming = nullptr) const
     {
         return isOccupiedBy(region, ValueSetConformanceChecker(values), conforming, nonconforming);
+    }
+
+    QList<QPoint> positions() const
+    {
+        return m_itemByPosition.keys();
     }
 
 protected:

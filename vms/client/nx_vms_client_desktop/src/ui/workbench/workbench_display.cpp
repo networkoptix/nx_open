@@ -1995,14 +1995,20 @@ void QnWorkbenchDisplay::adjustGeometry(QnWorkbenchItem *item, bool animate)
         item->setCombinedGeometry(combinedGeometry);
     }
 
-    /* Pin the item. */
-    QnAspectRatioMagnitudeCalculator metric(
+    // Pin the item.
+    const QnAspectRatioMagnitudeCalculator arMetric(
         newPos,
         size,
         item->layout()->boundingRect(),
         Geometry::aspectRatio(m_view->viewport()->size())
             / Geometry::aspectRatio(workbench()->mapper()->step()));
-    QRect geometry = item->layout()->closestFreeSlot(newPos, size, &metric);
+
+    const QnDistanceMagnitudeCalculator distanceMetric(
+        newPos - Geometry::toPoint(QSizeF(size)) / 2.0);
+
+    const QRect geometry = ini().simplifySceneItemMetric
+        ? item->layout()->closestFreeSlot(newPos, size, &distanceMetric)
+        : item->layout()->closestFreeSlot(newPos, size, &arMetric);
     item->layout()->pinItem(item, geometry);
     item->setFlag(Qn::PendingGeometryAdjustment, false);
 
