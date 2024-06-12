@@ -184,14 +184,14 @@ bool Rule::enabled() const
     return m_enabled;
 }
 
-bool Rule::isSystem() const
+bool Rule::isInternal() const
 {
-    return m_system;
+    return m_internal;
 }
 
-void Rule::setSystem(bool system)
+void Rule::setInternal(bool internal)
 {
-    m_system = system;
+    m_internal = internal;
 }
 
 void Rule::setSchedule(const QByteArray& schedule)

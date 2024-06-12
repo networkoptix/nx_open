@@ -61,8 +61,8 @@ public:
     void setEnabled(bool isEnabled);
     bool enabled() const;
 
-    bool isSystem() const;
-    void setSystem(bool system);
+    bool isInternal() const;
+    void setInternal(bool internal);
 
     void setSchedule(const QByteArray& schedule);
     QByteArray schedule() const;
@@ -89,7 +89,7 @@ private:
 
     QString m_comment;
     bool m_enabled = true;
-    bool m_system = false;
+    bool m_internal = false;
     QByteArray m_schedule;
 
     bool m_updateInProgress = false;

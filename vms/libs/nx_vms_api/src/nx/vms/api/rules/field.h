@@ -13,17 +13,16 @@ namespace nx::vms::api::rules {
 
 struct NX_VMS_API Field
 {
-    Q_GADGET
-
-public:
+    /**%apidoc String description of this event or action field type.
+     * %example nx.action.fields.streamQuality
+     */
     QString type;
 
+    /**%apidoc[opt] Key value pair map of field property names to values. */
     QMap<QString, QJsonValue> props;
 };
 
-#define nx_vms_api_rules_Field_Fields \
-    (type)(props)
-
-NX_VMS_API_DECLARE_STRUCT_EX(Field, (json)(ubjson)(xml))
+#define nx_vms_api_rules_Field_Fields (type)(props)
+NX_VMS_API_DECLARE_STRUCT_EX(Field, (json)(ubjson))
 
 } // namespace nx::vms::api::rules

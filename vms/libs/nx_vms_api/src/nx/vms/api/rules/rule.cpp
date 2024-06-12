@@ -6,7 +6,7 @@
 
 namespace nx::vms::api::rules {
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Rule, (json)(ubjson)(xml),
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Rule, (json)(ubjson),
     nx_vms_api_rules_Rule_Fields, (brief, true))
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ResetRules, (json)(ubjson),

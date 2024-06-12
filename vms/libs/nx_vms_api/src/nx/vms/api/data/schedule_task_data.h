@@ -8,10 +8,10 @@ namespace nx::vms::api {
 
 struct NX_VMS_API ScheduleTaskData
 {
-    /**%apidoc[opt] Time of day when the backup starts (in seconds passed from 00:00:00). */
+    /**%apidoc[opt] Time of day when the task starts (in seconds passed from 00:00:00). */
     int startTime = 0;
 
-    /**%apidoc[opt] Time of day when the backup ends (in seconds passed from 00:00:00). */
+    /**%apidoc[opt] Time of day when the task ends (in seconds passed from 00:00:00). */
     int endTime = 0;
 
     /**%apidoc[opt] Weekday for the recording task.

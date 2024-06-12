@@ -153,7 +153,7 @@ QVariant RulesTableModel::data(const QModelIndex& index, int role) const
     }
 
     if (role == IsSystemRuleRole)
-        return rule->isSystem();
+        return rule->isInternal();
 
     if (role == RuleIdRole)
         return QVariant::fromValue(rule->id());
