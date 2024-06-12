@@ -7,6 +7,7 @@
 #include <QtGui/QIcon>
 #include <QtGui/QPainter>
 #include <QtGui/QPixmap>
+#include <QtWidgets/QApplication>
 
 #include <client/client_globals.h>
 #include <core/resource/camera_resource.h>
@@ -21,6 +22,7 @@
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/skin/svg_icon_colorer.h>
+#include <nx/vms/client/core/skin/svg_loader.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
@@ -491,26 +493,31 @@ QPixmap QnResourceIconCache::iconPixmap(Key key,
     QnIcon::Mode mode)
 {
     using namespace nx::vms::client::core;
-    const auto desc = iconDescription(key).iconDescription;
+    const auto& desc = iconDescription(key).iconDescription;
 
-    SvgIconColorer::ThemeSubstitutions resultColors =
-        desc.themeSubstitutions();
-    for (auto [iconMode, remapData]: svgColorSubstitutions.asKeyValueRange())
+    QMap<QString /*source class name*/, QString /*target color name*/> customization;
+    for (const auto& theme : {desc.themeSubstitutions(), svgColorSubstitutions})
     {
-        if (SvgIconColorer::ThemeColorsRemapData::isValidColor(remapData.primary))
-            resultColors[iconMode].primary = remapData.primary;
+        if (auto it = theme.constFind(mode); it != theme.cend())
+        {
+            static const QString kPrimaryKey = "primary";
+            static const QString kSecondaryKey = "secondary";
+            static const QString kTertiaryKey = "tertiary";
 
-        if (SvgIconColorer::ThemeColorsRemapData::isValidColor(remapData.secondary))
-            resultColors[iconMode].secondary = remapData.secondary;
+            if (SvgIconColorer::ThemeColorsRemapData::isValidColor(it->primary))
+                customization[kPrimaryKey] = it->primary;
 
-        if (SvgIconColorer::ThemeColorsRemapData::isValidColor(remapData.tertiary))
-            resultColors[iconMode].tertiary = remapData.tertiary;
+            if (SvgIconColorer::ThemeColorsRemapData::isValidColor(it->secondary))
+                customization[kSecondaryKey] = it->secondary;
+
+            if (SvgIconColorer::ThemeColorsRemapData::isValidColor(it->tertiary))
+                customization[kTertiaryKey] = it->tertiary;
+        }
     }
 
-    return qnSkin->icon({desc.sourceFile(), desc.iconPath(), resultColors})
-        .pixmap(requestedSize, mode);
+    const auto& path = qnSkin->path(desc.iconPath());
+    return loadSvgImage(path, customization, requestedSize, qApp->devicePixelRatio());
 }
-
 
 QnResourceIconCache::IconWithDescription QnResourceIconCache::searchIconOutsideCache(Key key)
 {

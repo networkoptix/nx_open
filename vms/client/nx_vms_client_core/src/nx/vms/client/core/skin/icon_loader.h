@@ -47,7 +47,6 @@ private:
         const QString& name,
         const QString& checkedName,
         const SvgIconColorer::IconSubstitutions& substitutions,
-
         const SvgIconColorer::IconSubstitutions& checkedSubstitutions,
         const QMap<QIcon::Mode, SvgIconColorer::ThemeColorsRemapData>& themeSubstitutions,
         const QMap<QIcon::Mode, SvgIconColorer::ThemeColorsRemapData>& checkedThemeSubstitutions);
