@@ -160,8 +160,9 @@ struct ItemDescriptor
 
     // TODO: #amalov Consider unifying fields, permissions and resources members.
 
+    // TODO: #mmalofeev split ItemDescriptor to EventDescriptor and ActionDescriptor.
     /**%apidoc Path to the mustache template file used to generate email. */
-    QString emailTemplatePath; // TODO: #mmalofeev split ItemDescriptor to EventDescriptior and ActionDescriptor.
+    QString emailTemplatePath;
 
     /**%apidoc[opt]
      * Required Server flags on at least one Server of the merged ones to deal with such an event

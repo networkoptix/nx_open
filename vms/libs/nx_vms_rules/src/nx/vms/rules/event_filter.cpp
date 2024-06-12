@@ -30,8 +30,8 @@ EventFilter::EventFilter(nx::Uuid id, const QString& eventType):
     m_id(id),
     m_eventType(eventType)
 {
-    NX_ASSERT(!id.isNull());
     NX_ASSERT(!m_eventType.isEmpty());
+    NX_ASSERT(!m_id.isNull());
 }
 
 EventFilter::~EventFilter()

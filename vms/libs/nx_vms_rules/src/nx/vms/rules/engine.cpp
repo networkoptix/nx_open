@@ -493,7 +493,7 @@ std::unique_ptr<Rule> Engine::buildRule(const api::Rule& serialized) const
 
     rule->setComment(serialized.comment);
     rule->setEnabled(serialized.enabled);
-    rule->setSystem(serialized.system);
+    rule->setInternal(serialized.internal);
     rule->setSchedule(nx::vms::common::scheduleToByteArray(serialized.schedule));
 
     return rule;

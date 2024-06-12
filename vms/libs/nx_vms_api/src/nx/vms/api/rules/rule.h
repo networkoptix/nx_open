@@ -12,27 +12,25 @@ namespace nx::vms::api::rules {
 
 struct NX_VMS_API Rule: IdData
 {
-    Q_GADGET
-
-public:
     // TODO: #spanasenko and-or logic
     QList<EventFilter> eventList;
     QList<ActionBuilder> actionList;
-    bool enabled = true;
-    bool system = false;
 
-    /*
-     * %apidoc[opt] Schedule of the rule. Empty list means the rule is always enabled.
-     */
+    /**%apidoc[opt] Is rule currently enabled. */
+    bool enabled = true;
+    /**%apidoc[unused] */
+    bool internal = false;
+
+    /**%apidoc[opt] Schedule of the rule. Empty list means the rule is always enabled. */
     nx::vms::api::ScheduleTaskDataList schedule;
 
+    /**%apidoc[opt] String comment explaining the rule. */
     QString comment;
 };
 
 #define nx_vms_api_rules_Rule_Fields \
-    IdData_Fields(eventList)(actionList)(enabled)(system)(schedule)(comment)
-
-NX_VMS_API_DECLARE_STRUCT_AND_LIST_EX(Rule, (json)(ubjson)(xml))
+    IdData_Fields(eventList)(actionList)(enabled)(internal)(schedule)(comment)
+NX_VMS_API_DECLARE_STRUCT_AND_LIST_EX(Rule, (json)(ubjson))
 
 // A dummy struct used in ec2 transactions.
 struct NX_VMS_API ResetRules
@@ -41,7 +39,6 @@ struct NX_VMS_API ResetRules
 };
 
 #define nx_vms_api_rules_ResetRules_Fields (none)
-
 NX_VMS_API_DECLARE_STRUCT_EX(ResetRules, (json)(ubjson))
 
 } // namespace nx::vms::api::rules

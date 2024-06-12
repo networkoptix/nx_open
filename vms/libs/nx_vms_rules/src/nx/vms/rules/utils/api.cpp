@@ -37,7 +37,7 @@ api::Rule serialize(const Rule* rule)
     }
     result.comment = rule->comment();
     result.enabled = rule->enabled();
-    result.system = rule->isSystem();
+    result.internal = rule->isInternal();
     result.schedule = nx::vms::common::scheduleFromByteArray(rule->schedule());
 
     return result;
