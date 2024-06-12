@@ -300,7 +300,7 @@ public:
      *     defined by the metric) to the given position.
      */
     QRect closestFreeSlot(const QPointF& gridPos, const QSize& size,
-        TypedMagnitudeCalculator<QPoint>* metric = nullptr) const;
+        const TypedMagnitudeCalculator<QPoint>* const metric = nullptr) const;
 
     /**
      * @param role Role to get data for.
