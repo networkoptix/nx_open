@@ -12453,7 +12453,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>You can copy the Access Link below, and share it with the implied user.</source>
-      <translation type="unfinished">You can copy the Access Link below, and share it with the implied user.</translation>
+      <translation>Вы можете скопировать ссылку доступа ниже и поделиться ею с предполагаемым пользователем.</translation>
     </message>
   </context>
   <context>
