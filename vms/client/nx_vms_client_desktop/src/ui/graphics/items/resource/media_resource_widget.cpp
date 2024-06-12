@@ -2460,7 +2460,11 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
     if (mediaEvent.code == nx::vms::common::MediaStreamEvent::tooManyOpenedConnections)
         return Qn::TooManyOpenedConnectionsOverlay;
 
-    if (d->display()->camDisplay()->isEOFReached())
+    // Check the EOF state only for devices with the video stream because it is pretty normal for
+    // audio/metadata-only devices (like speakers) to be in this state (e.g., no data in the audio
+    // stream or even no audio stream at all). This is OK, we should not show the loading overlay
+    // for such devices. No need to check for IO modules, it had already been done beforehand.
+    if (d->hasVideo && d->display()->camDisplay()->isEOFReached())
     {
         // No need to check status: offline and unauthorized are checked first.
         return d->isPlayingLive()
