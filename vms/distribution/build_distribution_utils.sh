@@ -373,6 +373,7 @@ distrib_copyServerLibs() # additional_libs_to_copy...
         libnx_vms_utils
         libnx_zip
         libnx_sql
+        libnx_ams_api
         libnx_vms_api
         libnx_analytics_db
         libnx_vms_common
