@@ -27,6 +27,7 @@ option(withDistributions "Enable distributions" ${_withDistributions})
 option(withDocumentation "Generate documentation" ${_withDocumentation})
 option(withTests "Enable unit tests" ON)
 option(withUnitTestsArchive "Enable unit tests archive" ${_withUnitTestsArchive})
+set(withRootTool "false") #< Required in the build_info.json.
 
 # Platform-specific options.
 if(WINDOWS)
