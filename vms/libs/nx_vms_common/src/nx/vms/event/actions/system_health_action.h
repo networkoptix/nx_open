@@ -14,7 +14,7 @@ class NX_VMS_COMMON_API SystemHealthAction: public CommonAction
 public:
     explicit SystemHealthAction(
         common::system_health::MessageType message,
-        const nx::Uuid& eventResourceId = nx::Uuid(),
+        nx::Uuid eventResourceId = {},
         const nx::common::metadata::Attributes& attributes = {});
 };
 
