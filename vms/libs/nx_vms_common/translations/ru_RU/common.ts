@@ -1351,6 +1351,11 @@
       <source>Session authorization required.</source>
       <translation>Требуется авторизация.</translation>
     </message>
+    <message>
+      <source>Not allowed.</source>
+      <comment>Generic HTTP response</comment>
+      <translation>Не допускается.</translation>
+    </message>
   </context>
   <context>
     <name>ServiceTypeDisplayStringHelper</name>

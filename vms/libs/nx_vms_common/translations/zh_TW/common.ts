@@ -1183,6 +1183,11 @@
       <source>Session authorization required.</source>
       <translation>請先驗證連線。</translation>
     </message>
+    <message>
+      <source>Not allowed.</source>
+      <comment>Generic HTTP response</comment>
+      <translation type="unfinished">Not allowed.</translation>
+    </message>
   </context>
   <context>
     <name>ServiceTypeDisplayStringHelper</name>

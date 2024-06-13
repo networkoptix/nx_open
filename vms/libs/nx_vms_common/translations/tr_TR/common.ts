@@ -1239,6 +1239,11 @@
       <source>Session authorization required.</source>
       <translation>Oturum yetkilendirmesi gerekli.</translation>
     </message>
+    <message>
+      <source>Not allowed.</source>
+      <comment>Generic HTTP response</comment>
+      <translation>İzin verilmedi.</translation>
+    </message>
   </context>
   <context>
     <name>ServiceTypeDisplayStringHelper</name>
