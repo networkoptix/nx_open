@@ -2,6 +2,14 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="he_IL" sourcelanguage="en">
   <context>
+    <name>Language</name>
+    <message>
+      <source>Language Name</source>
+      <comment>Language name that will be displayed to the user.</comment>
+      <translation>Hebrew - עברית</translation>
+    </message>
+  </context>
+  <context>
     <name>QnDirectSystemsFinder</name>
     <message>
       <source>System</source>

@@ -162,7 +162,6 @@ void migrateSettingsFrom5_1(LocalSettings* settings, QSettings* oldSettings)
     migrateValue(settings->showFisheyeCalibrationGrid, "isFisheyeCalibrationGridShown");
     migrateValue(settings->hardwareDecodingEnabledProperty, "isHardwareDecodingEnabledProperty");
     migrateValue(settings->maxHardwareDecoders);
-    migrateValue(settings->locale);
     migrateValue(settings->logLevel);
     migrateValue(settings->pcUuid);
     migrateEnumValue(settings->resourceInfoLevel);
@@ -264,6 +263,18 @@ void migrateLogSettings(LocalSettings* settings, QSettings* oldSettings)
     }
 }
 
+void migrateFrom6_0(LocalSettings* settings)
+{
+    static const QString kLocaleValueName = "locale";
+    const auto coreSettings = appContext()->coreSettings();
+    if (settings->exists(kLocaleValueName) && coreSettings->locale().isEmpty())
+    {
+        const auto oldLocaleValue = settings->value(kLocaleValueName);
+        if (oldLocaleValue.isValid())
+            coreSettings->locale = oldLocaleValue.toString();
+    }
+}
+
 } // namespace
 
 LocalSettings::LocalSettings():
@@ -313,6 +324,7 @@ void LocalSettings::migrateOldSettings()
     migrateLastUsedConnectionFrom4_2(this, oldSettings.get());
     migrateMediaFoldersFrom4_3(this, oldSettings.get());
     migrateLogSettings(this, oldSettings.get());
+    migrateFrom6_0(this);
 }
 
 void LocalSettings::setDefaults()
