@@ -1239,6 +1239,11 @@
       <source>Session authorization required.</source>
       <translation>Øktautorisasjon kreves.</translation>
     </message>
+    <message>
+      <source>Not allowed.</source>
+      <comment>Generic HTTP response</comment>
+      <translation>Ikke tillatt.</translation>
+    </message>
   </context>
   <context>
     <name>ServiceTypeDisplayStringHelper</name>

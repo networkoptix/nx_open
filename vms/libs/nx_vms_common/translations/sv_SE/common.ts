@@ -1239,6 +1239,11 @@
       <source>Session authorization required.</source>
       <translation>Sessionsauktorisering krävs.</translation>
     </message>
+    <message>
+      <source>Not allowed.</source>
+      <comment>Generic HTTP response</comment>
+      <translation>Inte tillåtet.</translation>
+    </message>
   </context>
   <context>
     <name>ServiceTypeDisplayStringHelper</name>

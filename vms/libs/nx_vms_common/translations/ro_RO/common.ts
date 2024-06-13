@@ -1295,6 +1295,11 @@
       <source>Session authorization required.</source>
       <translation type="unfinished">Session authorization required.</translation>
     </message>
+    <message>
+      <source>Not allowed.</source>
+      <comment>Generic HTTP response</comment>
+      <translation type="unfinished">Not allowed.</translation>
+    </message>
   </context>
   <context>
     <name>ServiceTypeDisplayStringHelper</name>
