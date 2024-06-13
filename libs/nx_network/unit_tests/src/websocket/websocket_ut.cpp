@@ -1,15 +1,15 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#include <atomic>
 #include <functional>
 #include <future>
-#include <atomic>
 #include <thread>
 
 #include <gtest/gtest.h>
 
-#include <nx/network/websocket/websocket.h>
 #include <nx/network/socket_delegate.h>
 #include <nx/network/socket_factory.h>
+#include <nx/network/websocket/websocket.h>
 #include <nx/utils/thread/cf/wrappers.h>
 
 namespace nx::network::websocket::test {
@@ -628,11 +628,15 @@ protected:
 
     nx::Buffer clientSendBuf;
     nx::Buffer clientReadBuf;
+    Frame clientSendFrame;
+    Frame clientReadFrame;
     SendMode clientSendMode;
     ReceiveMode clientReceiveMode;
 
     nx::Buffer serverSendBuf;
     nx::Buffer serverReadBuf;
+    Frame serverSendFrame;
+    Frame serverReadFrame;
     SendMode serverSendMode;
     ReceiveMode serverReceiveMode;
 
@@ -1115,6 +1119,105 @@ TEST_P(WebSocket, SendMultiFrame_ReceiveFrame)
     stopSockets();
 
     ASSERT_EQ(receivedFrameCount, kTotalMessageCount*kMessageFrameCount);
+}
+
+TEST_P(WebSocket, SendFrame_ReadFrame)
+{
+    givenClientModes(SendMode::singleMessage, ReceiveMode::message);
+    givenServerModes(SendMode::singleMessage, ReceiveMode::message);
+    givenServerClientWebSockets();
+
+    clientSendCb =
+        [&](SystemError::ErrorCode ecode, size_t transferred)
+        {
+            ASSERT_EQ(ecode, SystemError::noError);
+            ASSERT_EQ(clientSendBuf.size(), transferred);
+        };
+
+    serverReadCb =
+        [&](SystemError::ErrorCode ecode, size_t transferred)
+        {
+            if (ecode != SystemError::noError || transferred == 0)
+                return;
+            ASSERT_EQ(serverReadFrame.buffer.size(), transferred);
+            ASSERT_EQ(serverReadFrame.buffer, clientSendBuf);
+            ASSERT_EQ(serverReadFrame.type, FrameType::text);
+            readyPromise.set_value();
+        };
+
+    clientSendFrame.buffer = clientSendBuf;
+    clientSendFrame.type = FrameType::text;
+    serverWebSocket->readAsync(&serverReadFrame, serverReadCb);
+    clientWebSocket->sendAsync(std::move(clientSendFrame), clientSendCb);
+    clientSendFrame.buffer.clear();
+
+    readyFuture.wait();
+    stopSockets();
+}
+
+TEST_P(WebSocket, SendFrame_ReadSome)
+{
+    givenClientModes(SendMode::singleMessage, ReceiveMode::message);
+    givenServerModes(SendMode::singleMessage, ReceiveMode::message);
+    givenServerClientWebSockets();
+
+    clientSendCb =
+        [&](SystemError::ErrorCode ecode, size_t transferred)
+        {
+            ASSERT_EQ(ecode, SystemError::noError);
+            ASSERT_EQ(clientSendBuf.size(), transferred);
+        };
+
+    serverReadCb =
+        [&](SystemError::ErrorCode ecode, size_t transferred)
+        {
+            if (ecode != SystemError::noError || transferred == 0)
+                return;
+            ASSERT_EQ(serverReadBuf.size(), transferred);
+            ASSERT_EQ(serverReadBuf, clientSendBuf);
+            readyPromise.set_value();
+        };
+
+    clientSendFrame.buffer = clientSendBuf;
+    clientSendFrame.type = FrameType::text;
+    serverWebSocket->readSomeAsync(&serverReadBuf, serverReadCb);
+    clientWebSocket->sendAsync(std::move(clientSendFrame), clientSendCb);
+    clientSendFrame.buffer.clear();
+
+    readyFuture.wait();
+    stopSockets();
+}
+
+TEST_P(WebSocket, Send_ReadFrame)
+{
+    givenClientModes(SendMode::singleMessage, ReceiveMode::message);
+    givenServerModes(SendMode::singleMessage, ReceiveMode::message);
+    givenServerClientWebSockets();
+
+    clientSendCb =
+        [&](SystemError::ErrorCode ecode, size_t transferred)
+        {
+            ASSERT_EQ(ecode, SystemError::noError);
+            ASSERT_EQ(clientSendBuf.size(), transferred);
+        };
+
+    serverReadCb =
+        [&](SystemError::ErrorCode ecode, size_t transferred)
+        {
+            if (ecode != SystemError::noError || transferred == 0)
+                return;
+            ASSERT_EQ(serverReadFrame.buffer.size(), transferred);
+            ASSERT_EQ(serverReadFrame.buffer, clientSendBuf);
+            ASSERT_EQ(serverReadFrame.type, FrameType::binary);
+            readyPromise.set_value();
+        };
+
+    serverWebSocket->readAsync(&serverReadFrame, serverReadCb);
+    clientWebSocket->sendAsync(&clientSendBuf, clientSendCb);
+    clientSendFrame.buffer.clear();
+
+    readyFuture.wait();
+    stopSockets();
 }
 
 TEST_P(WebSocket_PingPong, UnexpectedClose_deleteFromCb_send)
