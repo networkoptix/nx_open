@@ -5,6 +5,7 @@ include_guard(GLOBAL)
 include(utils)
 
 set(nx_vms_distribution_dir "${open_source_root}/vms/distribution")
+set(nx_vms_distribution_utils_sh "${nx_vms_distribution_dir}/build_distribution_utils.sh")
 set(vms_distribution_common_dir ${nx_vms_distribution_dir}/common)
 
 set(stripServerBinaries "AUTO" CACHE
