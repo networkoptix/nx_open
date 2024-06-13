@@ -3,7 +3,6 @@
 #include "websocket.h"
 
 #include <nx/network/socket_global.h>
-
 #include <nx/utils/std/future.h>
 
 namespace nx::network::websocket {
@@ -30,7 +29,7 @@ WebSocket::WebSocket(
     m_pingTimer(new nx::network::aio::Timer),
     m_pongTimer(new nx::network::aio::Timer),
     m_aliveTimeout(kAliveTimeout),
-    m_frameType(
+    m_defaultFrameType(
         frameType == FrameType::binary || frameType == FrameType::text
             ? frameType
             : FrameType::binary),
@@ -98,6 +97,18 @@ void WebSocket::onPingTimer()
     m_pingTimer->start(m_aliveTimeout, [this]() { onPingTimer(); });
 }
 
+size_t WebSocket::handleRead(nx::Buffer* const bufferPtr, Frame* const framePtr)
+{
+    NX_ASSERT((!!bufferPtr) ^ (!!framePtr));
+    auto incomingMessage = m_incomingMessageQueue.popFront();
+    auto size = incomingMessage.buffer.size();
+    if (bufferPtr)
+        *bufferPtr = std::move(incomingMessage.buffer);
+    else
+        *framePtr = std::move(incomingMessage);
+    return size;
+}
+
 void WebSocket::onRead(SystemError::ErrorCode error, size_t transferred)
 {
     if (m_failed)
@@ -133,10 +144,9 @@ void WebSocket::onRead(SystemError::ErrorCode error, size_t transferred)
 
     if (m_incomingMessageQueue.size() != 0 && m_userReadContext)
     {
-        auto incomingMessage = m_incomingMessageQueue.popFront();
-        *(m_userReadContext->bufferPtr) = incomingMessage;
+        auto size = handleRead(m_userReadContext->bufferPtr, m_userReadContext->framePtr);
         utils::InterruptionFlag::Watcher watcher(&m_destructionFlag);
-        callOnReadhandler(SystemError::noError, incomingMessage.size());
+        callOnReadhandler(SystemError::noError, size);
         if (watcher.interrupted())
             return;
     }
@@ -193,10 +203,21 @@ void WebSocket::setIsLastFrame()
     dispatch([this]() { m_isLastFrame = true; });
 }
 
+void WebSocket::readAsync(Frame* const frame, IoCompletionHandler handler)
+{
+    readAnyAsync(/*buffer*/ nullptr, frame, std::move(handler));
+}
+
 void WebSocket::readSomeAsync(nx::Buffer* const buffer, IoCompletionHandler handler)
 {
+    readAnyAsync(buffer, /*frame*/ nullptr, std::move(handler));
+}
+
+void WebSocket::readAnyAsync(
+    nx::Buffer* const buffer, Frame* const frame, IoCompletionHandler handler)
+{
     post(
-        [this, buffer, handler = std::move(handler)]() mutable
+        [this, buffer, frame, handler = std::move(handler)]() mutable
         {
             if (m_failed)
             {
@@ -213,11 +234,10 @@ void WebSocket::readSomeAsync(nx::Buffer* const buffer, IoCompletionHandler hand
 
             if (m_incomingMessageQueue.size() != 0)
             {
-                auto incomingMessage = m_incomingMessageQueue.popFront();
-                *buffer = incomingMessage;
+                auto size = handleRead(buffer, frame);
 
                 utils::InterruptionFlag::Watcher watcher(&m_destructionFlag);
-                handler(SystemError::noError, incomingMessage.size());
+                handler(SystemError::noError, size);
                 if (watcher.interrupted())
                     return;
 
@@ -235,31 +255,35 @@ void WebSocket::readSomeAsync(nx::Buffer* const buffer, IoCompletionHandler hand
                 return;
             }
 
-            m_userReadContext.reset(new UserReadContext(std::move(handler), buffer));
+            m_userReadContext.reset(new UserReadContext(std::move(handler), buffer, frame));
         });
 }
 
 void WebSocket::sendAsync(const nx::Buffer* buffer, IoCompletionHandler handler)
 {
-    // TODO: #akolesnikov Avoid copying buffer into lambda.
+    sendAsync(Frame{*buffer, m_defaultFrameType}, std::move(handler));
+}
+
+void WebSocket::sendAsync(Frame&& frame, IoCompletionHandler handler)
+{
     post(
-        [this, buffer = *buffer, handler = std::move(handler)]() mutable
+        [this, frame = std::move(frame), handler = std::move(handler)]() mutable
         {
             nx::Buffer writeBuffer;
             if (m_sendMode == SendMode::singleMessage)
             {
-                writeBuffer = m_serializer.prepareMessage(buffer, m_frameType, m_compressionType);
+                writeBuffer = m_serializer.prepareMessage(frame.buffer, frame.type, m_compressionType);
             }
             else
             {
-                FrameType type = !m_isFirstFrame ? FrameType::continuation : m_frameType;
-                writeBuffer = m_serializer.prepareFrame(buffer, type, m_isLastFrame);
+                FrameType type = !m_isFirstFrame ? FrameType::continuation : frame.type;
+                writeBuffer = m_serializer.prepareFrame(frame.buffer, type, m_isLastFrame);
                 m_isFirstFrame = m_isLastFrame;
                 if (m_isLastFrame)
                     m_isLastFrame = false;
             }
 
-            sendMessage(writeBuffer, buffer.size(), std::move(handler));
+            sendMessage(writeBuffer, frame.buffer.size(), std::move(handler));
         });
 }
 
@@ -377,7 +401,7 @@ void WebSocket::cancelIoInAioThread(nx::network::aio::EventType eventType)
     m_socket->cancelIOSync(eventType);
 }
 
-void WebSocket::gotFrame(FrameType type, const nx::Buffer& data, bool fin)
+void WebSocket::gotFrame(FrameType type, nx::Buffer&& data, bool fin)
 {
     NX_VERBOSE(
         this,
@@ -386,7 +410,7 @@ void WebSocket::gotFrame(FrameType type, const nx::Buffer& data, bool fin)
 
     if (isDataFrame(type))
     {
-        m_incomingMessageQueue.append(data);
+        m_incomingMessageQueue.append(std::move(data), type);
         if (m_receiveMode == ReceiveMode::frame || fin)
             m_incomingMessageQueue.lock();
 

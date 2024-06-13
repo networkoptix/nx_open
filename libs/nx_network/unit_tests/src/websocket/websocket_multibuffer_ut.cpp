@@ -1,8 +1,8 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include <gtest/gtest.h>
-#include <nx/network/websocket/websocket_multibuffer.h>
 
+#include <nx/network/websocket/websocket_multibuffer.h>
 
 namespace nx::network::websocket::test {
 
@@ -23,7 +23,7 @@ protected:
     {
         ASSERT_EQ(buffer.size(), 0);
         ASSERT_EQ(buffer.locked(), false);
-        ASSERT_EQ(buffer.popFront(), nx::Buffer());
+        ASSERT_EQ(buffer.popFront().buffer, nx::Buffer());
 
         // assert no crashes
         buffer.clearLast();
@@ -55,7 +55,7 @@ TEST_F(WebsocketMultibuffer, SingleBuffer_lockLast)
     ASSERT_EQ(buffer.size(), 1);
 
     auto popResult = buffer.popFront();
-    ASSERT_EQ(popResult.size(), kPerBufferWrites * (int)strlen(kPattern));
+    ASSERT_EQ(popResult.buffer.size(), kPerBufferWrites * (int)strlen(kPattern));
 
     assertCorrectEmptyState();
 }
@@ -72,7 +72,7 @@ TEST_F(WebsocketMultibuffer, MultipleBuffer_lockLast)
     ASSERT_EQ(buffer.size(), 10);
 
     auto popResult = buffer.popFront();
-    ASSERT_EQ(popResult.size(), kPerBufferWrites * (int)strlen(kPattern));
+    ASSERT_EQ(popResult.buffer.size(), kPerBufferWrites * (int)strlen(kPattern));
     ASSERT_EQ(buffer.size(), 9);
 }
 

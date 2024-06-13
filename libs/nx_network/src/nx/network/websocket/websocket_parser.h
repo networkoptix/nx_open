@@ -30,7 +30,7 @@ class NX_NETWORK_API Parser
     const int kFixedHeaderLen = 2;
 
 public:
-    using GotFrameHandler = nx::utils::MoveOnlyFunc<void(FrameType, const nx::Buffer&, bool)>;
+    using GotFrameHandler = nx::utils::MoveOnlyFunc<void(FrameType, nx::Buffer&&, bool)>;
 
     Parser(Role role, GotFrameHandler gotFrameHandler);
     void consume(char* data, int len);

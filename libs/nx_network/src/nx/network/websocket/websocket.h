@@ -43,6 +43,12 @@ public:
 
     ~WebSocket();
 
+    /**
+     * Wraps read/send with a Websocket message type.
+     */
+    void readAsync(Frame* const frame, IoCompletionHandler handler);
+    void sendAsync(Frame&& frame, IoCompletionHandler handler);
+
     virtual void readSomeAsync(nx::Buffer* const buffer, IoCompletionHandler handler) override;
     virtual void sendAsync(const nx::Buffer* buffer, IoCompletionHandler handler) override;
 
@@ -64,6 +70,7 @@ public:
      */
     void setIsLastFrame();
     void sendCloseAsync(); /**< Send close frame */
+
     /**
      * After this timeout expired without any read activity read handler (if any) will be invoked
      * with SystemError::timedOut. Should be called before start().
@@ -85,10 +92,12 @@ private:
     {
         IoCompletionHandler handler;
         nx::Buffer* const bufferPtr;
+        Frame* const framePtr;
 
-        UserReadContext(IoCompletionHandler handler, nx::Buffer* const bufferPtr):
+        UserReadContext(IoCompletionHandler handler, nx::Buffer* const bufferPtr, Frame* const framePtr):
             handler(std::move(handler)),
-            bufferPtr(bufferPtr)
+            bufferPtr(bufferPtr),
+            framePtr(framePtr)
         {}
     };
     using UserReadContextPtr = std::unique_ptr<UserReadContext>;
@@ -110,7 +119,7 @@ private:
     std::chrono::milliseconds m_aliveTimeout;
     nx::utils::InterruptionFlag m_destructionFlag;
     bool m_failed = false;
-    FrameType m_frameType;
+    FrameType m_defaultFrameType;
     network::websocket::CompressionType m_compressionType;
     bool m_readingCeased = false;
     bool m_pingPongDisabled = false;
@@ -119,7 +128,7 @@ private:
     virtual void stopWhileInAioThread() override;
 
     /** Parser handler implementation */
-    void gotFrame(FrameType type, const nx::Buffer& data, bool fin);
+    void gotFrame(FrameType type, nx::Buffer&& data, bool fin);
 
     /** Own helper functions*/
     void sendMessage(const nx::Buffer& message, int writeSize, IoCompletionHandler handler);
@@ -128,6 +137,9 @@ private:
     void onPingTimer();
     void onRead(SystemError::ErrorCode ecode, size_t transferred);
     void onWrite(SystemError::ErrorCode ecode, size_t transferred);
+    void readAnyAsync(
+        nx::Buffer* const buffer, Frame* const frame, IoCompletionHandler handler);
+    size_t handleRead(nx::Buffer* const bufferPtr, Frame* const framePtr);
     void callOnReadhandler(SystemError::ErrorCode error, size_t transferred);
     void callOnWriteHandler(SystemError::ErrorCode error, size_t transferred);
     void setFailedState(const QString& message);
