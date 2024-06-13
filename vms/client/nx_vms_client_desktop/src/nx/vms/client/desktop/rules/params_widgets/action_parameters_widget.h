@@ -18,10 +18,12 @@ public:
     explicit ActionParametersWidget(WindowContext* context, QWidget* parent = nullptr);
 
     virtual std::optional<vms::rules::ItemDescriptor> descriptor() const override;
+    void setEdited();
+
+    void updateUi() override;
 
 private:
-    void onRuleSet() override;
-    void updateUi() override;
+    void onRuleSet(bool isNewRule) override;
 
     void onActionFieldChanged(const QString& fieldName);
     void onActionDurationChanged() const;

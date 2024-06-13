@@ -24,7 +24,7 @@ class ParamsWidget: public QWidget, public WindowContextAware
 public:
     explicit ParamsWidget(WindowContext* context, QWidget* parent = nullptr);
 
-    void setRule(const std::shared_ptr<vms::rules::Rule>& rule);
+    void setRule(const std::shared_ptr<vms::rules::Rule>& rule, bool isNewRule);
     vms::rules::Rule* rule() const;
 
     virtual std::optional<vms::rules::ItemDescriptor> descriptor() const = 0;
@@ -38,7 +38,7 @@ public:
     virtual void updateUi() = 0;
 
 protected:
-    virtual void onRuleSet() = 0;
+    virtual void onRuleSet(bool isNewRule) = 0;
 
 private:
     void setupLineEditsPlaceholderColor();

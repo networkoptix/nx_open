@@ -58,7 +58,7 @@ void VmsRulesDialog::addRule()
     auto newRule = std::make_shared<vms::rules::Rule>(nx::Uuid::createUuid(), engine);
     EditVmsRuleDialog editVmsRuleDialog{m_parentWidget};
 
-    editVmsRuleDialog.setRule(newRule);
+    editVmsRuleDialog.setRule(newRule, /*isNewRule*/ true);
     connect(&editVmsRuleDialog, &EditVmsRuleDialog::accepted, [&]() { saveRuleImpl(newRule); });
 
     if (editVmsRuleDialog.exec() == QDialogButtonBox::Cancel)
@@ -110,7 +110,7 @@ void VmsRulesDialog::duplicateRule(nx::Uuid id)
 
     EditVmsRuleDialog editVmsRuleDialog(m_parentWidget);
 
-    editVmsRuleDialog.setRule(clone);
+    editVmsRuleDialog.setRule(clone, /*isNewRule*/ false);
     connect(&editVmsRuleDialog, &EditVmsRuleDialog::accepted, [&]() { saveRuleImpl(clone); });
 
     if (editVmsRuleDialog.exec() == QDialogButtonBox::Cancel)
@@ -129,7 +129,7 @@ void VmsRulesDialog::editRule(nx::Uuid id)
 
     EditVmsRuleDialog editVmsRuleDialog(m_parentWidget);
 
-    editVmsRuleDialog.setRule(clone);
+    editVmsRuleDialog.setRule(clone, /*isNewRule*/ false);
     connect(&editVmsRuleDialog, &EditVmsRuleDialog::accepted, [&]() { saveRuleImpl(clone); });
 
     const auto result = editVmsRuleDialog.exec();

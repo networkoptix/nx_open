@@ -32,6 +32,8 @@ public:
         m_field{field}
     {
         NX_ASSERT(m_field);
+
+        subscribeOnChanges();
     }
 
     template<
@@ -43,6 +45,32 @@ public:
         m_field{field}
     {
         NX_ASSERT(m_field);
+
+        subscribeOnChanges();
+    }
+
+    template<
+        typename Field = F,
+        typename std::enable_if_t<std::is_base_of_v<vms::rules::EventFilterField, Field>, bool> = true>
+    void subscribeOnChanges()
+    {
+        P::connect(
+            P::parentParamsWidget()->eventFilter(),
+            &vms::rules::EventFilter::changed,
+            this,
+            &FieldPickerWidget<F, P>::onFieldChanged);
+    }
+
+    template<
+        typename Field = F,
+        typename std::enable_if_t<std::is_base_of_v<vms::rules::ActionBuilderField, Field>, bool> = true>
+    void subscribeOnChanges()
+    {
+        P::connect(
+            P::parentParamsWidget()->actionBuilder(),
+            &vms::rules::ActionBuilder::changed,
+            this,
+            &FieldPickerWidget<F, P>::onFieldChanged);
     }
 
 protected:
@@ -86,6 +114,13 @@ protected:
             return validator->validity(m_field, P::parentParamsWidget()->rule(), P::systemContext());
 
         return {};
+    }
+
+private:
+    void onFieldChanged(const QString& fieldName)
+    {
+        if (m_field->descriptor()->fieldName == fieldName)
+            P::setEdited();
     }
 };
 

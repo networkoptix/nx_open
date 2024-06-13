@@ -13,8 +13,10 @@ class QLabel;
 
 namespace nx::vms::client::desktop::rules {
 
+class ActionParametersWidget;
 class ActionTypePickerWidget;
 class EditableTitleWidget;
+class EventParametersWidget;
 class EventTypePickerWidget;
 
 class EditVmsRuleDialog:
@@ -23,15 +25,12 @@ class EditVmsRuleDialog:
     Q_OBJECT
 
 public:
-    EditVmsRuleDialog(QWidget* parent = nullptr);
+    explicit EditVmsRuleDialog(QWidget* parent = nullptr);
 
-    void setRule(std::shared_ptr<vms::rules::Rule> rule);
+    void setRule(std::shared_ptr<vms::rules::Rule> rule, bool isNewRule);
 
     void accept() override;
     void reject() override;
-
-signals:
-    void hasChangesChanged();
 
 protected:
     void buttonBoxClicked(QDialogButtonBox::StandardButton button) override;
@@ -43,13 +42,16 @@ private:
     QPushButton* m_deleteButton{nullptr};
     QWidget* m_contentWidget{nullptr};
     EventTypePickerWidget* m_eventTypePicker{nullptr};
-    QWidget* m_eventEditorWidget{nullptr};
+    EventParametersWidget* m_eventEditorWidget{nullptr};
     ActionTypePickerWidget* m_actionTypePicker{nullptr};
-    QWidget* m_actionEditorWidget{nullptr};
+    ActionParametersWidget* m_actionEditorWidget{nullptr};
     QPushButton* m_enabledButton{nullptr};
-    bool m_hasChanges = false;
+    QDialogButtonBox* m_buttonBox{nullptr};
+    bool m_hasChanges{false};
+    bool m_checkValidityOnChanges{false};
 
     std::shared_ptr<vms::rules::Rule> m_rule;
+    bool m_isNewRule{false};
 
     nx::utils::ScopedConnections m_scopedConnections;
 
@@ -68,12 +70,16 @@ private:
     void onEventTypeChanged(const QString& eventType);
     void onEnabledButtonClicked(bool checked);
 
+    void updateButtonBox();
+
     void onEventFilterModified();
     void onActionBuilderModified();
 
     void setHasChanges(bool hasChanges);
 
     void showWarningIfRequired();
+
+    QValidator::State ruleValidity() const;
 };
 
 } // namespace nx::vms::client::desktop::rules

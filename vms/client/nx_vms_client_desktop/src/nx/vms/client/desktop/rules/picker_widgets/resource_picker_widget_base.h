@@ -44,6 +44,7 @@ protected:
     using PlainFieldPickerWidget<F>::fieldValidity;
     using PlainFieldPickerWidget<F>::systemContext;
     using PlainFieldPickerWidget<F>::getActionField;
+    using PlainFieldPickerWidget<F>::isEdited;
 
     QPushButton* m_selectButton{nullptr};
 
@@ -51,11 +52,14 @@ protected:
     {
         updateSelectButtonUi();
 
-        const auto validity = fieldValidity();
-        if (validity.validity == QValidator::State::Invalid)
+        if (isEdited())
         {
-            PlainFieldPickerWidget<F>::setValidity(fieldValidity());
-            return;
+            const auto validity = fieldValidity();
+            if (validity.validity == QValidator::State::Invalid)
+            {
+                PlainFieldPickerWidget<F>::setValidity(validity);
+                return;
+            }
         }
 
         // Only error state must be shown by the widget. Intermidiate state warning must be shown

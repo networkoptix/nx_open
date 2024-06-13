@@ -26,9 +26,17 @@ public:
     virtual void setReadOnly(bool value) = 0;
     virtual void updateUi() = 0;
 
+    /** Returns whether the value of the picker was edited by the user. */
+    bool isEdited() const;
+
+    /** Mark the widget as edited by a user forcefully. */
+    void setEdited();
+
     ParamsWidget* parentParamsWidget() const;
 
 protected:
+    bool m_isEdited{false};
+
     virtual void setValidity(const vms::rules::ValidationResult& validationResult);
 };
 

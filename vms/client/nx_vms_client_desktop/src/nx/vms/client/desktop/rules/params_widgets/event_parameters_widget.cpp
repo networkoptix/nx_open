@@ -27,7 +27,13 @@ std::optional<vms::rules::ItemDescriptor> EventParametersWidget::descriptor() co
     return eventDescriptor();
 }
 
-void EventParametersWidget::onRuleSet()
+void EventParametersWidget::setEdited()
+{
+    for (auto picker: m_pickers)
+        picker->setEdited();
+}
+
+void EventParametersWidget::onRuleSet(bool isNewRule)
 {
     connect(
         eventFilter(),
@@ -56,6 +62,9 @@ void EventParametersWidget::onRuleSet()
         PickerWidget* picker = PickerFactory::createWidget(field, windowContext()->system(), this);
         if (picker == nullptr)
             continue;
+
+        if (!isNewRule)
+            picker->setEdited();
 
         const bool isCurrentPlain = dynamic_cast<PlainPickerWidget*>(picker) != nullptr;
         if (!isCurrentPlain || !isPreviousPlain)
