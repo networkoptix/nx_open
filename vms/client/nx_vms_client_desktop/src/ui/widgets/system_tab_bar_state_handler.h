@@ -18,10 +18,6 @@ class SystemTabBarStateHandler: public QObject, public QnWorkbenchContextAware
 public:
     SystemTabBarStateHandler(QObject* parent);
     void setStateStore(QSharedPointer<Store> store);
-    void moveSystem(int indexFrom, int indexTo);
-    void removeSystem(nx::Uuid systemId);
-    void removeCurrentSystem();
-    void swapSystems(int indexFrom, int indexTo);
 
 signals:
     void tabsChanged();
@@ -32,6 +28,7 @@ private:
     void at_currentSystemChanged(QnSystemDescriptionPtr systemDescription);
     void at_systemDisconnected();
     void at_connectionStateChanged(ConnectActionsHandler::LogicalState logicalValue);
+    void storeWorkbenchState();
 
 private:
     QSharedPointer<Store> m_store;

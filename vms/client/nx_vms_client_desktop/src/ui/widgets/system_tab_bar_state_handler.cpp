@@ -8,6 +8,7 @@
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/widgets/main_window.h>
 #include <ui/workbench/workbench_context.h>
+#include <utils/common/delayed.h>
 
 namespace nx::vms::client::desktop {
 
@@ -26,6 +27,10 @@ SystemTabBarStateHandler::SystemTabBarStateHandler(QObject* parent):
         &ConnectActionsHandler::stateChanged,
         this,
         &SystemTabBarStateHandler::at_connectionStateChanged);
+    connect(windowContext(),
+        &WindowContext::beforeSystemChanged,
+        this,
+        &SystemTabBarStateHandler::storeWorkbenchState);
 }
 
 void SystemTabBarStateHandler::setStateStore(QSharedPointer<Store> store)
@@ -55,8 +60,13 @@ void SystemTabBarStateHandler::at_stateChanged(const State& state)
             if (localSystemId != state.currentSystemId)
             {
                 auto logonData = systemData->logonData;
-                menu()->trigger(menu::ConnectAction,
-                    menu::Parameters().withArgument(Qn::LogonDataRole, logonData));
+                executeLater(
+                    [this, logonData]()
+                    {
+                        menu()->trigger(menu::ConnectAction,
+                            menu::Parameters().withArgument(Qn::LogonDataRole, logonData));
+                    },
+                    this);
             }
         }
     }
@@ -100,7 +110,21 @@ void SystemTabBarStateHandler::at_connectionStateChanged(
 {
     m_store->setConnectionState(logicalValue);
     if (logicalValue == ConnectActionsHandler::LogicalState::disconnected)
+    {
+        storeWorkbenchState();
         m_store->setCurrentSystemId({});
+    }
+}
+
+void SystemTabBarStateHandler::storeWorkbenchState()
+{
+    const auto systemId = m_store->state().currentSystemId;
+    if (!systemId.isNull())
+    {
+        WorkbenchState workbenchState;
+        workbench()->submit(workbenchState);
+        m_store->setWorkbenchState(systemId, workbenchState);
+    }
 }
 
 } // namespace nx::vms::client::desktop
