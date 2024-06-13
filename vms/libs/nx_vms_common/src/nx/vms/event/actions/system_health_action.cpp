@@ -11,7 +11,7 @@ namespace nx::vms::event {
 
 SystemHealthAction::SystemHealthAction(
     common::system_health::MessageType message,
-    const nx::Uuid& eventResourceId,
+    nx::Uuid eventResourceId,
     const nx::common::metadata::Attributes& attributes)
     :
     base_type(ActionType::showPopupAction, EventParameters())
