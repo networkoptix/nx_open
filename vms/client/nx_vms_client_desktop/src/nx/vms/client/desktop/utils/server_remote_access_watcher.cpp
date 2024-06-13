@@ -117,12 +117,14 @@ void ServerRemoteAccessWatcher::updateRemoteAccess(const ServerResourcePtr& serv
 {
     using namespace nx::network::http::header;
     const auto gateway = appContext()->cloudGateway();
-    if (!isRemoteAccessEnabledForCurrentUser())
+    RemoteAccessData remoteAccessData;
+    remoteAccessData.enabledForCurrentUser = isRemoteAccessEnabledForCurrentUser();
+    if (!remoteAccessData.enabledForCurrentUser)
     {
         gateway->forward(server->getPrimaryAddress(),
             /*targetPorts*/ {},
             nx::network::ssl::kAcceptAnyCertificate);
-        server->setForwardedPortConfigurations({});
+        server->setRemoteAccessData(remoteAccessData);
         return;
     }
     auto configurations = server->portForwardingConfigurations();
@@ -150,7 +152,9 @@ void ServerRemoteAccessWatcher::updateRemoteAccess(const ServerResourcePtr& serv
             NX_WARNING(this, "Failed to forward port %1", configuration.port);
     }
 
-    server->setForwardedPortConfigurations(fowardedPortConfiguration);
+    remoteAccessData.forwardedPortConfigurations = fowardedPortConfiguration;
+
+    server->setRemoteAccessData(remoteAccessData);
 }
 
 void ServerRemoteAccessWatcher::updateRemoteAccessForAllServers()

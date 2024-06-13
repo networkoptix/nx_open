@@ -22,6 +22,14 @@ struct ForwardedPortConfiguration: public nx::vms::api::PortForwardingConfigurat
     }
 };
 
+struct RemoteAccessData
+{
+    bool enabledForCurrentUser = true;
+    std::vector<ForwardedPortConfiguration> forwardedPortConfigurations;
+
+    bool operator==(const RemoteAccessData&) const = default;
+};
+
 class NX_VMS_CLIENT_DESKTOP_API ServerResource: public nx::vms::client::core::ServerResource
 {
     Q_OBJECT
@@ -34,18 +42,18 @@ public:
     void setDetached(bool value);
     bool isDetached() const;
 
-    void setForwardedPortConfigurations(const std::vector<ForwardedPortConfiguration>& value);
-    std::vector<ForwardedPortConfiguration> getForwardedPortConfigurations() const;
+    void setRemoteAccessData(const RemoteAccessData& value);
+    RemoteAccessData remoteAccessData() const;
 
 signals:
     void compatibilityChanged(const QnResourcePtr& resource);
     void isDetachedChanged();
-    void forwardedPortConfigurationsChanged();
+    void remoteAccessDataChanged();
 
 private:
     bool m_isCompatible = true;
     bool m_isDetached = false;
-    std::vector<ForwardedPortConfiguration> forwardedPortConfigurations;
+    RemoteAccessData m_remoteAccessData;
 };
 
 using ServerResourcePtr = QnSharedResourcePointer<ServerResource>;
