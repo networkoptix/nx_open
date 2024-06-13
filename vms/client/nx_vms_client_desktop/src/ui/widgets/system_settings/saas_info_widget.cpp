@@ -51,16 +51,18 @@ QFont placeholderMessageFont()
     return font;
 }
 
-int purchasedServicesCount(const nx::vms::common::saas::ServiceManager* serviceManager)
+bool hasServices(const nx::vms::common::saas::ServiceManager* serviceManager)
 {
     if (!NX_ASSERT(serviceManager))
-        return 0;
+        return false;
 
-    int servicesCount = 0;
     for (const auto& [_, saasPurchase]: serviceManager->data().services)
-        servicesCount += saasPurchase.quantity;
+    {
+        if (saasPurchase.used > 0 || saasPurchase.quantity > 0)
+            return true;
+    }
 
-    return servicesCount;
+    return false;
 }
 
 QUrl channelPartnerUrl(const nx::vms::common::saas::ServiceManager* serviceManager)
@@ -154,9 +156,8 @@ void SaasInfoWidget::Private::updateUi()
 {
     const auto serviceManager = q->systemContext()->saasServiceManager();
 
-    const auto hasPurchasedServices = purchasedServicesCount(serviceManager) > 0;
     ui->channelPartnerContactButton->setHidden(!channelPartnerUrl(serviceManager).isValid());
-    ui->stackedWidget->setCurrentWidget(hasPurchasedServices
+    ui->stackedWidget->setCurrentWidget(hasServices(serviceManager)
         ? ui->servicesUsagePage
         : ui->placeholderPage);
 
