@@ -9,6 +9,8 @@
 #include <nx/vms/client/core/network/credentials_manager.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
+#include <nx/vms/client/desktop/window_context.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 
 namespace {
 
@@ -62,6 +64,7 @@ struct MainWindowTitleBarStateReducer
     static State moveSystem(State&& state, int indexFrom, int IndexTo);
     static State setSystemUpdating(State&& state, bool value);
     static State setSystems(State&& state, QList<State::SystemData> systems);
+    static State setWorkbenchState(State&& state, int index, WorkbenchState workbenchState);
 };
 
 MainWindowTitleBarStateReducer::State MainWindowTitleBarStateReducer::setExpanded(
@@ -199,6 +202,13 @@ MainWindowTitleBarStateReducer::State MainWindowTitleBarStateReducer::setSystems
     State&& state, QList<MainWindowTitleBarState::SystemData> systems)
 {
     state.systems = std::move(systems);
+    return state;
+}
+
+MainWindowTitleBarStateReducer::State MainWindowTitleBarStateReducer::setWorkbenchState(
+    State&& state, int index, WorkbenchState workbenchState)
+{
+    state.systems[index].workbenchState = workbenchState;
     return state;
 }
 
@@ -395,6 +405,14 @@ void MainWindowTitleBarStateStore::setSystemUpdating(bool value)
 void MainWindowTitleBarStateStore::setSystems(QList<MainWindowTitleBarState::SystemData> systems)
 {
     dispatch(Reducer::setSystems, systems);
+}
+
+void MainWindowTitleBarStateStore::setWorkbenchState(
+    const Uuid& systemId, const WorkbenchState& workbenchState)
+{
+    const int index = state().findSystemIndex(systemId);
+    if (index >= 0)
+        dispatch(Reducer::setWorkbenchState, index, workbenchState);
 }
 
 int MainWindowTitleBarStateStore::systemCount() const

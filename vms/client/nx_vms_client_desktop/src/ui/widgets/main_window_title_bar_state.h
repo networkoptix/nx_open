@@ -64,6 +64,7 @@ public:
     void activateHomeTab();
     void setSystemUpdating(bool value);
     void setSystems(QList<State::SystemData> systems);
+    void setWorkbenchState(const nx::Uuid& systemId, const WorkbenchState& workbenchState);
 
     int systemCount() const;
     std::optional<State::SystemData> systemData(int index) const;
