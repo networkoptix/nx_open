@@ -76,9 +76,14 @@ OptionalTimePeriod timeWindow(const Container& container)
     if (container.empty())
         return {};
 
-    const auto first = duration_cast<milliseconds>(Facade::startTime(*container.begin()));
-    const auto last = duration_cast<milliseconds>(Facade::startTime(*container.rbegin()));
-    return QnTimePeriod::fromInterval(std::min(first, last), std::max(first, last));
+    const auto first = Facade::startTime(*container.begin());
+    const auto last = Facade::startTime(*container.rbegin());
+
+    // As some of the models work with microseconds (and time window is measured in milliseconds)
+    // we need to round time window to the correct direction.
+    const auto start = floor<milliseconds>(std::min(first, last));
+    const auto end = ceil<milliseconds>(std::max(first, last));
+    return QnTimePeriod::fromInterval(start, end);
 }
 
 /**
