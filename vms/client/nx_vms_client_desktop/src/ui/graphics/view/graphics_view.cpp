@@ -10,6 +10,7 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QGraphicsSceneWheelEvent>
 
+#include <client/client_runtime_settings.h>
 #include <nx/pathkit/rhi_paint_device.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/trace/trace.h>
@@ -77,7 +78,7 @@ QnGraphicsView::QnGraphicsView(QGraphicsScene* scene, nx::vms::client::desktop::
 
     // When 'software' is requested but other APIs are available,
     // QQuickWindow::graphicsApi() returns default platfrom API instead of 'software'.
-    if (QString(nx::vms::client::desktop::ini().graphicsApi) == "software"
+    if (appContext()->runtimeSettings()->graphicsApi() == GraphicsApi::software
         || graphicsApi == QSGRendererInterface::Software)
     {
         // Painting on qml items via RHI is not supported in 'software' mode.

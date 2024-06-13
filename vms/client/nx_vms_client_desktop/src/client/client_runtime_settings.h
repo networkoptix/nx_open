@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <nx/reflect/enum_string_conversion.h>
+#include <nx/vms/client/desktop/settings/types/graphics_api.h>
 #include <utils/common/property_storage.h>
 
 #include "client_globals.h"
@@ -52,6 +54,9 @@ public:
         /** Maximum live buffer size in ms. */
         MAXIMUM_LIVE_BUFFER,
 
+        /** Qt graphics API. */
+        GRAPHICS_API,
+
         VARIABLE_COUNT
     };
 
@@ -77,8 +82,8 @@ private:
         QN_DECLARE_RW_PROPERTY(bool, isSoftwareYuv, setSoftwareYuv, SOFTWARE_YUV, false)
         QN_DECLARE_RW_PROPERTY(int, debugCounter, setDebugCounter, DEBUG_COUNTER, 0)
         QN_DECLARE_RW_PROPERTY(Qn::LightModeFlags, lightMode, setLightMode, LIGHT_MODE, {})
-        QN_DECLARE_RW_PROPERTY(int, lightModeOverride, setLightModeOverride, LIGHT_MODE_OVERRIDE,
-            -1)
+        QN_DECLARE_RW_PROPERTY(int, lightModeOverride, setLightModeOverride,
+            LIGHT_MODE_OVERRIDE, -1)
         QN_DECLARE_RW_PROPERTY(bool, isVideoWallMode, setVideoWallMode, VIDEO_WALL_MODE, false)
         QN_DECLARE_RW_PROPERTY(bool, videoWallWithTimeline, setVideoWallWithTimeLine,
             VIDEO_WALL_WITH_TIMELINE, true)
@@ -89,7 +94,10 @@ private:
             MAX_SCENE_ITEMS_OVERRIDE, 0)
         QN_DECLARE_RW_PROPERTY(bool, isClientUpdateAllowed, setClientUpdateAllowed,
             ALLOW_CLIENT_UPDATE, true)
-        QN_DECLARE_RW_PROPERTY(int, maximumLiveBufferMs, setMaximumLiveBufferMs, MAXIMUM_LIVE_BUFFER, 0)
+        QN_DECLARE_RW_PROPERTY(int, maximumLiveBufferMs, setMaximumLiveBufferMs,
+            MAXIMUM_LIVE_BUFFER, 0)
+        QN_DECLARE_RW_PROPERTY(nx::vms::client::desktop::GraphicsApi, graphicsApi, setGraphicsApi,
+            GRAPHICS_API, nx::vms::client::desktop::GraphicsApi::opengl)
     QN_END_PROPERTY_STORAGE()
 };
 
