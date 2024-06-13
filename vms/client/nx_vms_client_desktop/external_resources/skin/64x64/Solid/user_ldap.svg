@@ -2,6 +2,6 @@
   <g class="64x64/Solid/user_ldap">
     <circle cx="32" cy="32" r="32" fill="#212A2F" class="Primary"/>
     <path fill="#A5B7C0" fill-rule="evenodd" d="M26 24a6 6 0 1 1 12 0v2a6 6 0 1 1-12 0v-2Zm-6.789 17.927c.708-3.451 3.728-5.927 7.23-5.927h.418A9.967 9.967 0 0 0 24 43c0 .685.069 1.354.2 2h-3.354a1.854 1.854 0 0 1-1.807-2.233l.172-.84Z" class="Secondary" clip-rule="evenodd"/>
-    <path fill="#E1E7EA" fill-rule="evenodd" d="M28 43a6 6 0 0 1 6-6h2.5a1.5 1.5 0 0 1 0 3H34a3 3 0 1 0 0 6h2.5a1.5 1.5 0 0 1 0 3H34a6 6 0 0 1-6-6Zm23 0a6 6 0 0 0-6-6h-2.5a1.5 1.5 0 0 0 0 3H45a3 3 0 1 1 0 6h-2.5a1.5 1.5 0 0 0 0 3H45a6 6 0 0 0 6-6Zm-15-1.5a1.5 1.5 0 0 0 0 3h7a1.5 1.5 0 0 0 0-3h-7Z" class="Third" clip-rule="evenodd"/>
+    <path fill="#E1E7EA" fill-rule="evenodd" d="M28 43a6 6 0 0 1 6-6h2.5a1.5 1.5 0 0 1 0 3H34a3 3 0 1 0 0 6h2.5a1.5 1.5 0 0 1 0 3H34a6 6 0 0 1-6-6Zm23 0a6 6 0 0 0-6-6h-2.5a1.5 1.5 0 0 0 0 3H45a3 3 0 1 1 0 6h-2.5a1.5 1.5 0 0 0 0 3H45a6 6 0 0 0 6-6Zm-15-1.5a1.5 1.5 0 0 0 0 3h7a1.5 1.5 0 0 0 0-3h-7Z" class="Tertiary" clip-rule="evenodd"/>
   </g>
 </svg>

@@ -1,8 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 16 16">
   <g class="16x16/Outline/network">
-    <g class="Primary">
-      <path fill="#E1E7EA" class="Primary" fill-rule="evenodd" d="M4 6h1a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h1v8h1V6Zm1-3H2v2h3V3Z" clip-rule="evenodd"/>
-      <path fill="#E1E7EA" class="Primary" d="M14 12h-4v1h1.5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1 0-1H8v-1H5v-1h9V3H7V2h7a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1Z"/>
-    </g>
+    <path fill="#E1E7EA" class="Primary" fill-rule="evenodd" d="M4 6h1a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h1v8h1V6Zm1-3H2v2h3V3Z" clip-rule="evenodd"/>
+    <path fill="#E1E7EA" class="Primary" d="M14 12h-4v1h1.5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1 0-1H8v-1H5v-1h9V3H7V2h7a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1Z"/>
   </g>
 </svg>

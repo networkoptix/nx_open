@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="none" viewBox="0 0 64 64">
   <g class="64x64/Solid/user_temp">
     <circle cx="32" cy="32" r="32" fill="#212A2F" class="Primary"/>
-    <path fill="#E1E7EA" fill-rule="evenodd" d="M44 49a7 7 0 1 0 0-14 7 7 0 0 0 0 14Zm0-11.75c.69 0 1.25.56 1.25 1.25v3.653l2.406 1.39a1.25 1.25 0 1 1-1.25 2.165l-3.013-1.74a1.25 1.25 0 0 1-.643-1.123V38.5c0-.69.56-1.25 1.25-1.25Z" class="Third" clip-rule="evenodd"/>
+    <path fill="#E1E7EA" fill-rule="evenodd" d="M44 49a7 7 0 1 0 0-14 7 7 0 0 0 0 14Zm0-11.75c.69 0 1.25.56 1.25 1.25v3.653l2.406 1.39a1.25 1.25 0 1 1-1.25 2.165l-3.013-1.74a1.25 1.25 0 0 1-.643-1.123V38.5c0-.69.56-1.25 1.25-1.25Z" class="Tertiary" clip-rule="evenodd"/>
     <path fill="#A5B7C0" fill-rule="evenodd" d="M26 24a6 6 0 1 1 12 0v2a6 6 0 1 1-12 0v-2Zm-6.789 17.927c.708-3.451 3.728-5.927 7.23-5.927h8.338A10.949 10.949 0 0 0 33 42a11 11 0 0 0 .414 3H20.846a1.854 1.854 0 0 1-1.807-2.233l.172-.84Z" class="Secondary" clip-rule="evenodd"/>
   </g>
 </svg>

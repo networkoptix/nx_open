@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="none" viewBox="0 0 64 64">
   <g class="64x64/Solid/organization">
-    <path fill="#2FA2DB" d="M0 54h51v3H0z" class="Third"/>
+    <path fill="#2FA2DB" d="M0 54h51v3H0z" class="Tertiary"/>
     <path fill="#A5B7C0" fill-rule="evenodd" d="M2 25.794a2 2 0 0 1 1.633-1.966l11-2.053A2 2 0 0 1 17 23.741V53H2V25.794ZM14 27H5v2h9v-2Zm0 4H5v2h9v-2Zm-9 4h9v2H5v-2Zm5 4H5v2h5v-2Zm37.275-.017A2 2 0 0 1 49 40.962V53H39V40.132a2 2 0 0 1 2.275-1.98l6 .83Z" class="Secondary" clip-rule="evenodd"/>
     <path fill="#CDD7DC" fill-rule="evenodd" d="M20 7a2 2 0 0 0-2 2v44h20V9a2 2 0 0 0-2-2H20Zm1 3h14v2H21v-2Zm0 4h14v2H21v-2Zm14 4H21v2h14v-2Zm-14 4h8v2h-8v-2Z" class="Primary" clip-rule="evenodd"/>
   </g>

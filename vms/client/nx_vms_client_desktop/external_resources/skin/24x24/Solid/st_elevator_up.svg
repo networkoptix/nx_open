@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+  <g class="24x24/Solid/st_elevator_up">
+    <path fill="#fff" fill-rule="evenodd" d="M21 2H3c-.5 0-1 .5-1 1v18c0 .5.5 1 1 1h18c.6 0 1-.5 1-1V3c0-.7-.3-1-1-1Zm-8 18H4V4h9v16Zm6-9v5h-3v-5h-2.5l4-4.1 4 4.1H19ZM8.5 8.6a1.6 1.6 0 1 0 0-3.2 1.6 1.6 0 0 0 0 3.2ZM7 17v-3c-.6 0-1-.4-1-1v-3c0-.6.4-1 1-1h3c.6 0 1 .4 1 1v3c0 .6-.4 1-1 1v3c0 .6-.4 1-1 1H8c-.6 0-1-.4-1-1Z" class="Primary" clip-rule="evenodd"/>
+  </g>
+</svg>

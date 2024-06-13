@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+  <g class="24x24/Solid/door">
+    <path fill="#fff" fill-rule="evenodd" d="M19.196 3.84a1 1 0 0 1 .804.98v14.36a1 1 0 0 1-.804.98l-8 1.6A1 1 0 0 1 10 20.78V20H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h5v-.78a1 1 0 0 1 1.196-.98l8 1.6ZM10 6v12H6V6h4Zm3.636 6c0 .552-.407 1-.909 1s-.909-.448-.909-1 .407-1 .91-1c.501 0 .908.448.908 1Z" class="Primary" clip-rule="evenodd"/>
+  </g>
+</svg>
