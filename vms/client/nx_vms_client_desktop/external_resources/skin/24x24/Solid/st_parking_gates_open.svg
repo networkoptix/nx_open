@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+  <g class="24x24/Solid/st_parking_gates_open">
+    <path fill="#fff" fill-rule="evenodd" d="M19 12h2c.6 0 1 .4 1 1v8c0 .6-.4 1-1 1h-2c-.6 0-1-.4-1-1v-6.5L7.2 3.7c-.4-.4-.4-1 0-1.4.4-.4 1-.4 1.4 0l9.9 9.8c.1 0 .175-.025.25-.05A.74.74 0 0 1 19 12ZM3 19l6-3 6 3h-4l1 3H6l1-3H3Z" class="Primary" clip-rule="evenodd"/>
+  </g>
+</svg>

@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+  <g class="24x24/Solid/st_hvac_fan_start">
+    <path fill="url(#a)" d="M13.3 10.5c1.1-3.4 1.3-6.1.4-7.1-.7-.7-1.3-.9-2.5-.9-3.6 0-5.5 1.5-3.9 4.7.8 1.6 2.7 1.8 3.6 3.2.3-.2.7-.4 1.1-.4.5 0 1 .2 1.3.5Z" class="Vector"/>
+    <path fill="url(#b)" d="M10.7 13.5c-1.1 3.4-1.3 6.1-.4 7.1.7.7 1.3.9 2.5.9 3.6 0 5.5-1.5 3.9-4.7-.8-1.6-2.7-1.8-3.6-3.2-.3.3-.7.4-1.1.4-.5 0-1-.2-1.3-.5Z" class="Vector"/>
+    <path fill="url(#c)" d="M16.8 7.3c-1.6.8-1.8 2.7-3.2 3.6.2.3.4.7.4 1.1 0 .5-.2 1-.5 1.3 3.4 1.1 6.1 1.3 7.1.4.7-.7.9-1.3.9-2.5 0-3.6-1.5-5.5-4.7-3.9Z" class="Vector"/>
+    <path fill="url(#d)" d="M10.5 10.7c-3.4-1.1-6.1-1.3-7.1-.4-.7.7-.9 1.3-.9 2.5 0 3.6 1.5 5.5 4.7 3.9 1.6-.8 1.8-2.7 3.2-3.6-.3-.3-.4-.7-.4-1.1 0-.5.2-1 .5-1.3Z" class="Vector"/>
+  </g>
+  <defs>
+    <linearGradient id="a" x1="7.051" x2="14.47" y1="7.344" y2="6.035" class="a" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff" stop-opacity="0"/>
+      <stop offset="1" stop-color="#fff"/>
+    </linearGradient>
+    <linearGradient id="b" x1="17.294" x2="9.71" y1="17.489" y2="17.489" class="b" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff" stop-opacity="0"/>
+      <stop offset="1" stop-color="#fff"/>
+    </linearGradient>
+    <linearGradient id="c" x1="16.576" x2="17.965" y1="6.596" y2="14.47" class="c" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff" stop-opacity="0"/>
+      <stop offset="1" stop-color="#fff"/>
+    </linearGradient>
+    <linearGradient id="d" x1="7.344" x2="5.955" y1="16.949" y2="9.075" class="d" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff" stop-opacity="0"/>
+      <stop offset="1" stop-color="#fff"/>
+    </linearGradient>
+  </defs>
+</svg>

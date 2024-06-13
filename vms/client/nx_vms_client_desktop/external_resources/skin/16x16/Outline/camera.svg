@@ -1,8 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 16 16">
   <g class="16x16/Outline/camera">
-    <g class="Primary">
-      <path fill="#E5E9EB" class="Primary" d="M8 11a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z"/>
-      <path fill="#E5E9EB" class="Primary" fill-rule="evenodd" d="M1 5a1 1 0 0 0 1 1v2a6 6 0 0 0 12 0V6a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v2Zm13-2H2v2h12V3ZM3 6h10v2A5 5 0 0 1 3 8V6Z" clip-rule="evenodd"/>
-    </g>
+    <path fill="#E5E9EB" class="Primary" d="M8 11a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z"/>
+    <path fill="#E5E9EB" class="Primary" fill-rule="evenodd" d="M1 5a1 1 0 0 0 1 1v2a6 6 0 0 0 12 0V6a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v2Zm13-2H2v2h12V3ZM3 6h10v2A5 5 0 0 1 3 8V6Z" clip-rule="evenodd"/>
   </g>
 </svg>
