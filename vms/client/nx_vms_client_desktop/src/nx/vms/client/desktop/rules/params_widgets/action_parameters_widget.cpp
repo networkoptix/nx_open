@@ -31,7 +31,13 @@ std::optional<vms::rules::ItemDescriptor> ActionParametersWidget::descriptor() c
     return actionDescriptor();
 }
 
-void ActionParametersWidget::onRuleSet()
+void ActionParametersWidget::setEdited()
+{
+    for (auto picker: m_pickers)
+        picker->setEdited();
+}
+
+void ActionParametersWidget::onRuleSet(bool isNewRule)
 {
     connect(
         actionBuilder(),
@@ -47,6 +53,9 @@ void ActionParametersWidget::onRuleSet()
 
     if (auto statePicker = createStatePickerIfRequired())
     {
+        if (!isNewRule)
+            statePicker->setEdited();
+
         m_pickers.push_back(statePicker);
         layout->addWidget(statePicker);
     }
@@ -63,6 +72,9 @@ void ActionParametersWidget::onRuleSet()
         PickerWidget* picker = PickerFactory::createWidget(field, windowContext()->system(), this);
         if (picker == nullptr)
             continue;
+
+        if (!isNewRule)
+            picker->setEdited();
 
         const bool isCurrentPlain = dynamic_cast<PlainPickerWidget*>(picker) != nullptr;
         if (!isCurrentPlain || !isPreviousPlain)

@@ -302,7 +302,7 @@ EditVmsRuleDialog::EditVmsRuleDialog(QWidget* parent):
             &EditVmsRuleDialog::onEventTypeChanged);
         eventFrameLayout->addWidget(m_eventTypePicker);
 
-        m_eventEditorWidget = new QWidget;
+        m_eventEditorWidget = new EventParametersWidget{windowContext()};
         eventFrameLayout->addWidget(m_eventEditorWidget);
 
         eventFrameLayout->addStretch();
@@ -345,7 +345,7 @@ EditVmsRuleDialog::EditVmsRuleDialog(QWidget* parent):
             &EditVmsRuleDialog::onActionTypeChanged);
         actionFrameLayout->addWidget(m_actionTypePicker);
 
-        m_actionEditorWidget = new QWidget;
+        m_actionEditorWidget = new ActionParametersWidget{windowContext()};
         actionFrameLayout->addWidget(m_actionEditorWidget);
 
         actionFrameLayout->addStretch();
@@ -382,30 +382,20 @@ EditVmsRuleDialog::EditVmsRuleDialog(QWidget* parent):
             &EditVmsRuleDialog::onEnabledButtonClicked);
         footerLayout->addWidget(m_enabledButton);
 
-        auto buttonBox = new QDialogButtonBox;
-        buttonBox->setOrientation(Qt::Horizontal);
-        buttonBox->setStandardButtons(
+        m_buttonBox = new QDialogButtonBox;
+        m_buttonBox->setOrientation(Qt::Horizontal);
+        m_buttonBox->setStandardButtons(
             QDialogButtonBox::Cancel | QDialogButtonBox::Ok | QDialogButtonBox::Apply);
-        buttonBox->setCenterButtons(false);
-        footerLayout->addWidget(buttonBox);
+        m_buttonBox->setCenterButtons(false);
+        footerLayout->addWidget(m_buttonBox);
 
-        connect(this,
-            &EditVmsRuleDialog::hasChangesChanged,
-            [buttonBox, this]()
-            {
-                if (auto acceptButton = buttonBox->button(QDialogButtonBox::StandardButton::Apply))
-                {
-                    if (acceptButton->isEnabled() != m_hasChanges)
-                        acceptButton->setEnabled(m_hasChanges);
-                }
-            });
         mainLayout->addLayout(footerLayout);
     }
 
     mainLayout->setStretch(1, 1);
 }
 
-void EditVmsRuleDialog::setRule(std::shared_ptr<vms::rules::Rule> rule)
+void EditVmsRuleDialog::setRule(std::shared_ptr<vms::rules::Rule> rule, bool isNewRule)
 {
     if (!NX_ASSERT(!m_rule) || !NX_ASSERT(rule))
         return;
@@ -430,6 +420,8 @@ void EditVmsRuleDialog::setRule(std::shared_ptr<vms::rules::Rule> rule)
     }
 
     m_rule = std::move(rule);
+    m_isNewRule = isNewRule;
+    m_checkValidityOnChanges = !isNewRule;
 
     displayComment();
     displayRule();
@@ -439,6 +431,9 @@ void EditVmsRuleDialog::setRule(std::shared_ptr<vms::rules::Rule> rule)
 
 void EditVmsRuleDialog::accept()
 {
+    if (ruleValidity() == QValidator::State::Invalid)
+        return;
+
     showWarningIfRequired();
     done(QDialogButtonBox::Ok);
 }
@@ -450,12 +445,31 @@ void EditVmsRuleDialog::reject()
 
 void EditVmsRuleDialog::buttonBoxClicked(QDialogButtonBox::StandardButton button)
 {
-    if (button == QDialogButtonBox::StandardButton::Apply)
+    if (button == QDialogButtonBox::StandardButton::Apply
+        || button == QDialogButtonBox::StandardButton::Ok)
     {
-        showWarningIfRequired();
-        emit accepted();
-        setHasChanges(false);
-        return;
+        if (!m_checkValidityOnChanges && ruleValidity() == QValidator::State::Invalid)
+        {
+            m_eventEditorWidget->setEdited();
+            m_eventEditorWidget->updateUi();
+
+            m_actionEditorWidget->setEdited();
+            m_actionEditorWidget->updateUi();
+
+            m_checkValidityOnChanges = true;
+
+            updateButtonBox();
+
+            return;
+        }
+
+        if (button == QDialogButtonBox::StandardButton::Apply)
+        {
+            showWarningIfRequired();
+            emit accepted();
+            setHasChanges(false);
+            return;
+        }
     }
 
     QnSessionAwareButtonBoxDialog::buttonBoxClicked(button);
@@ -516,7 +530,7 @@ void EditVmsRuleDialog::displayActionEditor()
 
     m_actionEditorWidget = actionEditorWidget;
 
-    actionEditorWidget->setRule(m_rule);
+    actionEditorWidget->setRule(m_rule, m_isNewRule);
 }
 
 void EditVmsRuleDialog::displayEventEditor()
@@ -533,7 +547,7 @@ void EditVmsRuleDialog::displayEventEditor()
 
     m_eventEditorWidget = eventEditorWidget;
 
-    eventEditorWidget->setRule(m_rule);
+    eventEditorWidget->setRule(m_rule, m_isNewRule);
 }
 
 void EditVmsRuleDialog::displayState()
@@ -646,6 +660,26 @@ void EditVmsRuleDialog::onEnabledButtonClicked(bool checked)
     setHasChanges(true);
 }
 
+void EditVmsRuleDialog::updateButtonBox()
+{
+    // For the new rule, all the buttons must be visible. After clicking the Ok or Apply button,
+    // the rule must be validated. If the rule is invalid, it must not be saved, and the dialog
+    // must remain open, with the Ok and Apply buttons disabled until the rule has been fixed. For
+    // existing rules, the Ok and apply buttons must be disabled if the rule is not valid.
+
+    auto isOkButtonEnabled{true};
+    auto isApplyButtonEnabled{m_hasChanges};
+
+    if (m_checkValidityOnChanges && ruleValidity() == QValidator::State::Invalid)
+    {
+        isOkButtonEnabled = false;
+        isApplyButtonEnabled = false;
+    }
+
+    m_buttonBox->button(QDialogButtonBox::StandardButton::Ok)->setEnabled(isOkButtonEnabled);
+    m_buttonBox->button(QDialogButtonBox::StandardButton::Apply)->setEnabled(isApplyButtonEnabled);
+}
+
 void EditVmsRuleDialog::onEventFilterModified()
 {
     const auto serializedEventFilter =
@@ -664,11 +698,8 @@ void EditVmsRuleDialog::onActionBuilderModified()
 
 void EditVmsRuleDialog::setHasChanges(bool hasChanges)
 {
-    if (hasChanges == m_hasChanges)
-        return;
-
     m_hasChanges = hasChanges;
-    emit hasChangesChanged();
+    updateButtonBox();
 }
 
 void EditVmsRuleDialog::showWarningIfRequired()
@@ -682,6 +713,11 @@ void EditVmsRuleDialog::showWarningIfRequired()
             QDialogButtonBox::Ok,
             QDialogButtonBox::Ok);
     }
+}
+
+QValidator::State EditVmsRuleDialog::ruleValidity() const
+{
+    return m_rule->validity(systemContext()).validity;
 }
 
 } // namespace nx::vms::client::desktop::rules

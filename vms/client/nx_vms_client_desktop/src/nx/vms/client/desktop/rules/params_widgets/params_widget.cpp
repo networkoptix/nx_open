@@ -23,14 +23,14 @@ ParamsWidget::ParamsWidget(WindowContext* context, QWidget* parent):
 {
 }
 
-void ParamsWidget::setRule(const std::shared_ptr<vms::rules::Rule>& rule)
+void ParamsWidget::setRule(const std::shared_ptr<vms::rules::Rule>& rule, bool isNewRule)
 {
     if (!NX_ASSERT(!m_rule, "Rule must be set only once"))
         return;
 
     m_rule = rule;
 
-    onRuleSet();
+    onRuleSet(isNewRule);
 
     updateUi();
 }

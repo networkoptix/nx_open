@@ -18,6 +18,16 @@ PickerWidget::PickerWidget(SystemContext* context, ParamsWidget* parent):
 {
 }
 
+bool PickerWidget::isEdited() const
+{
+    return m_isEdited;
+}
+
+void PickerWidget::setEdited()
+{
+    m_isEdited = true;
+}
+
 ParamsWidget* PickerWidget::parentParamsWidget() const
 {
     return dynamic_cast<ParamsWidget*>(parent());

@@ -18,10 +18,12 @@ public:
     explicit EventParametersWidget(WindowContext* context, QWidget* parent = nullptr);
 
     virtual std::optional<vms::rules::ItemDescriptor> descriptor() const override;
+    void setEdited();
+
+    virtual void updateUi() override;
 
 private:
-    virtual void onRuleSet() override;
-    virtual void updateUi() override;
+    virtual void onRuleSet(bool isNewRule) override;
 
     void onEventFieldChanged(const QString& fieldName);
 
