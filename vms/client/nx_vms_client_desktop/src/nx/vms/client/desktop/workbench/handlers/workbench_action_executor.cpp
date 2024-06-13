@@ -57,9 +57,6 @@ WorkbenchActionExecutor::~WorkbenchActionExecutor()
 
 void WorkbenchActionExecutor::execute(const ActionPtr& action)
 {
-    if (!checkUserPermissions(context()->user(), action))
-        return;
-
     const auto& actionType = action->type();
 
     if (action->type() == rules::utils::type<PlaySoundAction>())

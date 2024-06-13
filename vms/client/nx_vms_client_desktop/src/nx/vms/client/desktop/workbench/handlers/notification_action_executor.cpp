@@ -102,11 +102,8 @@ void NotificationActionExecutor::setAcknowledge(
         auto action = systemContext()->vmsRulesEngine()->buildAction(record.actionData)
             .dynamicCast<NotificationAction>();
 
-        if (!action || !checkUserPermissions(context()->user(), action))
+        if (!action)
             continue;
-
-        // TODO: #amalov Transfer source server.
-        action->setServerId(record.serverId);
 
         emit notificationActionReceived(action, {});
     }
@@ -253,9 +250,6 @@ void NotificationActionExecutor::onNotificationActionReceived(
 
 void NotificationActionExecutor::execute(const ActionPtr& action)
 {
-    if (!vms::rules::checkUserPermissions(context()->user(), action))
-        return;
-
     auto notificationAction = action.dynamicCast<NotificationActionBase>();
     if (!NX_ASSERT(notificationAction, "Unexpected action: %1", action->type()))
         return;

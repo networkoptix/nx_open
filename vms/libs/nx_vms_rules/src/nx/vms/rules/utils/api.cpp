@@ -91,11 +91,13 @@ api::ActionBuilder serialize(const ActionBuilder* builder)
     return result;
 }
 
-api::ActionInfo serialize(const BasicAction* action)
+api::ActionInfo serialize(const BasicAction* action, const QSet<QByteArray>& excludedProperties)
 {
+    auto props = nx::utils::propertyNames(action) - excludedProperties;
+
     return api::ActionInfo{
         .ruleId = action->ruleId(),
-        .props = serializeProperties(action, nx::utils::propertyNames(action))
+        .props = serializeProperties(action, props),
     };
 }
 

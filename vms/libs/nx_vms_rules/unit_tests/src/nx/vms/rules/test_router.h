@@ -24,7 +24,7 @@ public:
         emit eventReceived(event, triggeredRules);
     }
 
-    virtual void routeAction(const ActionPtr& action) override
+    virtual void routeAction(const ActionPtr& action, Flags /*flags*/) override
     {
         receiveAction(action);
     }

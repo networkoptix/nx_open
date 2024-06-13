@@ -74,21 +74,4 @@ bool needAcknowledge(const ActionPtr& action)
     return action->property(utils::kAcknowledgeFieldName).toBool();
 }
 
-bool checkUserPermissions(const QnUserResourcePtr& user, const ActionPtr& action)
-{
-    if (!user)
-        return false;
-
-    const auto propValue = action->property(utils::kUsersFieldName);
-    if (!propValue.isValid() || !propValue.canConvert<UuidSelection>())
-        return false;
-
-    const auto userSelection = propValue.value<UuidSelection>();
-    if (userSelection.all || userSelection.ids.contains(user->getId()))
-        return true;
-
-    const auto userGroups = nx::vms::common::userGroupsWithParents(user);
-    return userGroups.intersects(userSelection.ids);
-}
-
 } // namespace nx::vms::rules

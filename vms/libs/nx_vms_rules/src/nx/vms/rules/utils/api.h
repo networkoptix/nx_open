@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <QtCore/QSet>
+
 #include <nx/utils/uuid.h>
 
 #include "../rules_fwd.h"
@@ -27,7 +29,8 @@ NX_VMS_RULES_API api::Rule serialize(const Rule* rule);
 NX_VMS_RULES_API api::EventFilter serialize(const EventFilter* filter);
 NX_VMS_RULES_API api::ActionBuilder serialize(const ActionBuilder *builder);
 
-NX_VMS_RULES_API api::ActionInfo serialize(const BasicAction* action);
+NX_VMS_RULES_API api::ActionInfo serialize(
+    const BasicAction* action, const QSet<QByteArray>& excludedProperties = {});
 NX_VMS_RULES_API api::EventInfo serialize(const BasicEvent* action, UuidList ruleIds = {});
 
 } // namespace nx::vms::rules

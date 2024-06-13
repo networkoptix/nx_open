@@ -22,6 +22,7 @@ const ItemDescriptor& NotificationAction::manifest()
         .id = utils::type<NotificationAction>(),
         .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Show Desktop Notification")),
         .description = {},
+        .flags = {ItemFlag::instant, ItemFlag::userFiltered},
         .executionTargets = {ExecutionTarget::clients, ExecutionTarget::cloud},
         .fields = {
             makeFieldDescriptor<TargetUserField>(

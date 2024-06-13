@@ -52,11 +52,10 @@ void ClientRouter::routeEvent(
     NX_ASSERT(false, "Currently we don't send Events from the Client: %1", event->type());
 }
 
-void ClientRouter::routeAction(const ActionPtr& action)
+void ClientRouter::routeAction(const ActionPtr& action, Flags /*flags*/)
 {
     NX_ASSERT(false, "Currently we don't send Actions from the Client: %1", action->type());
 }
-
 
 void ClientRouter::onActionReceived(const nx::vms::api::rules::ActionInfo& info)
 {
@@ -86,6 +85,5 @@ void ClientRouter::onActionReceived(const nx::vms::api::rules::ActionInfo& info)
 
     receiveAction(action);
 }
-
 
 } // namespace nx::vms::client::core::rules

@@ -38,7 +38,10 @@ NX_REFLECTION_ENUM_CLASS(ItemFlag,
 
     /** Type of license required for item to be visible in UI. */
     saasLicense = 1 << 6,
-    localLicense = 1 << 7
+    localLicense = 1 << 7,
+
+    /** User event filtration is used for action delivery. */
+    userFiltered = 1 << 8
 )
 
 Q_DECLARE_FLAGS(ItemFlags, ItemFlag)

@@ -28,6 +28,16 @@ QnUserResourceSet users(
     return result;
 }
 
+UuidSet userIds(
+    const UuidSelection& selection, const common::SystemContext* context, bool activeOnly)
+{
+    UuidSet result;
+    for (const auto& user: users(selection, context, activeOnly))
+        result.insert(user->getId());
+
+    return result;
+}
+
 bool isUserSelected(
     const UuidSelection& selection,
     const common::SystemContext* context,

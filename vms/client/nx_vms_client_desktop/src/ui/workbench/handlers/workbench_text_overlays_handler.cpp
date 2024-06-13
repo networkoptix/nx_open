@@ -253,9 +253,6 @@ void QnWorkbenchTextOverlaysHandler::execute(const nx::vms::rules::ActionPtr& ac
     if (!NX_ASSERT(overlayAction))
         return;
 
-    if (!nx::vms::rules::checkUserPermissions(context()->user(), action))
-        return;
-
     const auto ruleId = overlayAction->ruleId();
     const auto cameras =
         resourcePool()->getResourcesByIds<QnVirtualCameraResource>(overlayAction->deviceIds());
