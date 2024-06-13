@@ -19,6 +19,7 @@
     #include <QtGui/private/qrhi_p.h>
 #endif
 
+#include <client/client_runtime_settings.h>
 #include <nx/build_info.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log_main.h>
@@ -83,7 +84,7 @@ StaticOpenGLInfo::StaticOpenGLInfo()
 {
     using namespace nx::vms::client::desktop;
 
-    if (QString(ini().graphicsApi) != "opengl")
+    if (appContext()->runtimeSettings()->graphicsApi() != GraphicsApi::opengl)
     {
         if (auto quickWindow = appContext()->mainWindowContext()->quickWindow())
         {

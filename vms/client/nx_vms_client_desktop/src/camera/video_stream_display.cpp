@@ -12,6 +12,7 @@ extern "C"
 } // extern "C"
 
 #include <client/client_module.h>
+#include <client/client_runtime_settings.h>
 #include <core/resource/resource_property_key.h>
 #include <core/resource/security_cam_resource.h>
 #include <decoders/video/abstract_video_decoder.h>
@@ -467,11 +468,11 @@ QnAbstractVideoDecoder* QnVideoStreamDisplay::createVideoDecoder(
     {
         DecoderConfig config;
         config.mtDecodePolicy = toEncoderPolicy(mtDecoding);
-        config.forceGrayscaleDecoding = nx::vms::client::desktop::ini().grayscaleDecoding;
+        config.forceGrayscaleDecoding = ini().grayscaleDecoding;
         // TODO: #ikulaychuk detect actual scene backend.
         config.forceRgbaFormat =
-            QString(nx::vms::client::desktop::ini().graphicsApi) == "software"
-                || QString(nx::vms::client::desktop::ini().sceneRendering) == "qpainter";
+            appContext()->runtimeSettings()->graphicsApi() == GraphicsApi::software
+                || QString(ini().sceneRendering) == "qpainter";
         decoder = new QnFfmpegVideoDecoder(config, /*metrics*/ nullptr, data);
     }
     decoder->setLightCpuMode(m_decodeMode);

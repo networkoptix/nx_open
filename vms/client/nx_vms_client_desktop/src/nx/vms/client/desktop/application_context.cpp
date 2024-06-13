@@ -401,6 +401,11 @@ struct ApplicationContext::Private
         runtimeSettings = std::make_unique<QnClientRuntimeSettings>(startupParameters);
         runtimeSettings->setGLDoubleBuffer(localSettings->glDoubleBuffer());
         runtimeSettings->setMaximumLiveBufferMs(localSettings->maximumLiveBufferMs());
+
+        GraphicsApi graphicsApi = GraphicsApi::opengl;
+        if (NX_ASSERT(nx::reflect::enumeration::fromString(ini().graphicsApi, &graphicsApi)))
+            runtimeSettings->setGraphicsApi(graphicsApi);
+
         common::appContext()->setLocale(localSettings->locale());
 
         #ifdef Q_OS_MACX

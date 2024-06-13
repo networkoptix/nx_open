@@ -187,7 +187,7 @@ void initQmlGlyphCacheWorkaround()
         qputenv("QML_USE_GLYPHCACHE_WORKAROUND", "1");
 }
 
-void askForGraphicsApiSubstitution(nx::kit::IniConfig::Tweaks* iniTweaks)
+void askForGraphicsApiSubstitution()
 {
     #if defined (Q_OS_WINDOWS)
         const QDialogButtonBox::StandardButton selectedButton = QnMessageBox::question(
@@ -199,22 +199,26 @@ void askForGraphicsApiSubstitution(nx::kit::IniConfig::Tweaks* iniTweaks)
             QDialogButtonBox::Yes | QDialogButtonBox::No);
 
         if (selectedButton == QDialogButtonBox::Yes)
-            iniTweaks->set(&ini().graphicsApi, "direct3d11");
+            appContext()->runtimeSettings()->setGraphicsApi(GraphicsApi::direct3d11);
     #endif
 }
 
 void setGraphicsSettings()
 {
-    static const QHash<QString, QSGRendererInterface::GraphicsApi> nameToApi =
+    static const QHash<GraphicsApi, QSGRendererInterface::GraphicsApi> nameToApi =
     {
-        {"software", QSGRendererInterface::Software},
-        {"openvg", QSGRendererInterface::OpenVG},
-        {"opengl", QSGRendererInterface::OpenGL},
-        {"direct3d11", QSGRendererInterface::Direct3D11},
-        {"vulkan", QSGRendererInterface::Vulkan},
-        {"metal", QSGRendererInterface::Metal},
+        {GraphicsApi::software, QSGRendererInterface::Software},
+        {GraphicsApi::openvg, QSGRendererInterface::OpenVG},
+        {GraphicsApi::opengl, QSGRendererInterface::OpenGL},
+        {GraphicsApi::direct3d11, QSGRendererInterface::Direct3D11},
+        {GraphicsApi::vulkan, QSGRendererInterface::Vulkan},
+        {GraphicsApi::metal, QSGRendererInterface::Metal},
     };
-    QQuickWindow::setGraphicsApi(nameToApi.value(ini().graphicsApi, QSGRendererInterface::OpenGL));
+    QQuickWindow::setGraphicsApi(
+        nameToApi.value(
+            appContext()->runtimeSettings()->graphicsApi(),
+            QSGRendererInterface::OpenGL));
+
     QQuickWindow::setDefaultAlphaBuffer(true);
 
     if (nx::build_info::isMacOsX())
@@ -248,11 +252,10 @@ int runApplicationInternal(QApplication* application, const QnStartupParameters&
 
     NX_INFO(NX_SCOPE_TAG, "IniConfig iniFilesDir: %1",  nx::kit::IniConfig::iniFilesDir());
 
-    auto iniTweaks = std::make_unique<nx::kit::IniConfig::Tweaks>();
-    if (QString(nx::vms::client::desktop::ini().graphicsApi) == "opengl")
+    if (appContext()->runtimeSettings()->graphicsApi() == GraphicsApi::opengl)
     {
         if (!QnGLCheckerInstrument::checkGLHardware())
-            askForGraphicsApiSubstitution(iniTweaks.get());
+            askForGraphicsApiSubstitution();
     }
 
     setGraphicsSettings();
