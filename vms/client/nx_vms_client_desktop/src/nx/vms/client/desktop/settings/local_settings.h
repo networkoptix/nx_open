@@ -56,8 +56,6 @@ public:
     Property<int> maxHardwareDecoders{this, "maxHardwareDecoders", 8,
         "Maximum number of hardware decoders."};
 
-    Property<QString> locale{this, "locale", nx::branding::defaultLocale()};
-
     Property<QString> logLevel{this, "logLevel"};
     Property<qint64> maxLogFileSizeB{this, nx::utils::log::kMaxLogFileSizeSymbolicName,
         nx::utils::log::kDefaultMaxLogFileSizeB};
@@ -162,6 +160,10 @@ public:
 
     Property<std::map<QString, QString>> webPageIcons{this, "webPageIcons", {},
         "Web Page icon paths."};
+
+private:
+    // Deperecated properties.
+    Property<QString> locale{this, "locale", nx::branding::defaultLocale()};
 
 public:
     void migrateOldSettings();

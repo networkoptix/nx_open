@@ -2,6 +2,8 @@
 
 #include "application_context.h"
 
+#include <memory>
+
 #include <QtCore/QCoreApplication>
 #include <QtQml/QQmlEngine>
 #include <QtQml/QQmlContext>
@@ -10,6 +12,7 @@
 #include <client_core/client_core_meta_types.h>
 #include <common/static_common_module.h>
 #include <finders/systems_finder.h>
+#include <nx/branding.h>
 #include <nx/branding_proxy.h>
 #include <nx/build_info_proxy.h>
 #include <nx/vms/client/core/analytics/analytics_icon_manager.h>
@@ -25,6 +28,7 @@
 #include <nx/vms/common/network/server_compatibility_validator.h>
 #include <nx/vms/discovery/manager.h>
 #include <nx/vms/utils/external_resources.h>
+#include <nx/vms/utils/translation/translation_manager.h>
 #include <utils/media/voice_spectrum_analyzer.h>
 
 extern "C" {
@@ -77,6 +81,8 @@ struct ApplicationContext::Private
         // Disable secure settings in unit tests.
         settings = std::make_unique<Settings>(
             Settings::InitializationOptions{.useKeychain = (mode != Mode::unitTests)});
+
+        common::appContext()->setLocale(settings->locale());
     }
 
     void initializeQmlEngine()
@@ -141,6 +147,7 @@ struct ApplicationContext::Private
     std::unique_ptr<FontConfig> fontConfig;
     std::unique_ptr<LocalNetworkInterfacesManager> localNetworkInterfacesManager;
     std::unique_ptr<watchers::KnownServerConnections> knownServerConnectionsWatcher;
+    std::unique_ptr<nx::vms::utils::TranslationManager> translationManager;
 };
 
 ApplicationContext::ApplicationContext(
@@ -225,6 +232,45 @@ ApplicationContext* ApplicationContext::instance()
 void ApplicationContext::initializeNetworkModules()
 {
     d->initializeNetworkModules();
+}
+
+void ApplicationContext::initializeTranslations(const QString& targetLocale)
+{
+    d->translationManager = std::make_unique<nx::vms::utils::TranslationManager>();
+
+    const auto langName = targetLocale.split('_').first();
+
+    std::optional<utils::Translation> bestTranslation;
+    for (const auto& translation: d->translationManager->translations())
+    {
+        if (translation.localeCode == targetLocale)
+        {
+            bestTranslation = translation;
+            break;
+        }
+
+        if (translation.localeCode.startsWith(langName))
+        {
+            bestTranslation = translation;
+
+            // Trying to find the exact translation.
+        }
+    }
+
+    if (bestTranslation)
+    {
+        NX_DEBUG(NX_SCOPE_TAG, "Installing translation: %1", bestTranslation->localeCode);
+        d->translationManager->installTranslation(*bestTranslation);
+    }
+    else
+    {
+        NX_DEBUG(NX_SCOPE_TAG, "Installing default translation: %1",
+            nx::branding::defaultLocale());
+        NX_ASSERT(d->translationManager->installTranslation(nx::branding::defaultLocale()),
+            "Translations could not be initialized");
+    }
+
+    d->translationManager->setAssertOnOverlayInstallationFailure();
 }
 
 QQmlEngine* ApplicationContext::qmlEngine() const
@@ -325,6 +371,11 @@ void ApplicationContext::addMainContext(SystemContext* mainContext)
 {
     NX_ASSERT(d->systemContexts.empty()); //< Main context should be first.
     d->systemContexts.push_back(mainContext);
+}
+
+nx::vms::utils::TranslationManager* ApplicationContext::translationManager() const
+{
+    return d->translationManager.get();
 }
 
 } // namespace nx::vms::client::core

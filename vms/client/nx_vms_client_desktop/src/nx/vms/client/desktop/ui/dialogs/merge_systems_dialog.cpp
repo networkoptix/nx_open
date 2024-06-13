@@ -18,6 +18,7 @@
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_connection_user_interaction_delegate.h>
+#include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -58,7 +59,7 @@ MergeSystemsDialog::MergeSystemsDialog(QWidget* parent, std::unique_ptr<Delegate
         this,
         qnClientCoreModule->networkModule()->certificateVerifier(),
         m_delegate.get(),
-        appContext()->localSettings()->locale().toStdString()))
+        appContext()->coreSettings()->locale().toStdString()))
 {
     ui->setupUi(this);
     setButtonBox(ui->buttonBox);

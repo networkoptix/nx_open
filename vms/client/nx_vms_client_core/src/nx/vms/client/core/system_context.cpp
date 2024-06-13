@@ -324,7 +324,8 @@ void SystemContext::setMessageProcessor(QnCommonMessageProcessor* messageProcess
     if (!NX_ASSERT(clientMessageProcessor, "Invalid message processor type"))
         return;
 
-    d->serverRuntimeEventConnector->setMessageProcessor(clientMessageProcessor);
+    if (d->serverRuntimeEventConnector)
+        d->serverRuntimeEventConnector->setMessageProcessor(clientMessageProcessor);
 
     if (!vmsRulesEngine())
         return;

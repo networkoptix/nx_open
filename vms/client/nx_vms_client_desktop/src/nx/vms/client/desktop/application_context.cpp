@@ -87,7 +87,6 @@
 #include <nx/vms/client/desktop/utils/upload_manager.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
 #include <nx/vms/utils/external_resources.h>
-#include <nx/vms/utils/translation/translation_manager.h>
 #include <platform/platform_abstraction.h>
 #include <ui/workaround/qtbug_workaround.h>
 #include <utils/math/color_transformations.h>
@@ -364,7 +363,6 @@ struct ApplicationContext::Private
     std::unique_ptr<QnPlatformAbstraction> platformAbstraction;
     std::unique_ptr<PerformanceMonitor> performanceMonitor;
 
-    std::unique_ptr<nx::vms::utils::TranslationManager> translationManager;
     std::unique_ptr<ApplauncherGuard> applauncherGuard;
     std::unique_ptr<QnClientAutoRunWatcher> autoRunWatcher;
     std::unique_ptr<RadassController> radassController;
@@ -404,7 +402,6 @@ struct ApplicationContext::Private
         runtimeSettings = std::make_unique<QnClientRuntimeSettings>(startupParameters);
         runtimeSettings->setGLDoubleBuffer(localSettings->glDoubleBuffer());
         runtimeSettings->setMaximumLiveBufferMs(localSettings->maximumLiveBufferMs());
-        common::appContext()->setLocale(localSettings->locale());
 
         #ifdef Q_OS_MACX
             if (mac_isSandboxed())
@@ -553,17 +550,6 @@ struct ApplicationContext::Private
         cloudLayoutsManager = std::make_unique<CloudLayoutsManager>();
         cloudCrossSystemManager = std::make_unique<CloudCrossSystemManager>();
         crossSystemLayoutsWatcher = std::make_unique<CrossSystemLayoutsWatcher>();
-    }
-
-    void initializeTranslations()
-    {
-        translationManager = std::make_unique<nx::vms::utils::TranslationManager>();
-        bool loaded = translationManager->installTranslation(localSettings->locale());
-        if (!loaded)
-            loaded = translationManager->installTranslation(nx::branding::defaultLocale());
-        NX_ASSERT(loaded, "Translations could not be initialized");
-
-        translationManager->setAssertOnOverlayInstallationFailure();
     }
 
     void initializeSystemContext()
@@ -741,11 +727,12 @@ ApplicationContext::ApplicationContext(
         // Full initialization.
         case Mode::desktopClient:
         {
+            initializeTranslations(coreSettings()->locale());
+
             d->initializeStateModules();
             d->initializeLogging(startupParameters); //< Depends on state modules.
             d->initializePlatformAbstraction();
             d->performanceMonitor = std::make_unique<PerformanceMonitor>();
-            d->initializeTranslations();
             d->statisticsModule = std::make_unique<ContextStatisticsModule>();
             d->initializeNetworkModules();
             d->initializeSystemContext();
@@ -937,11 +924,6 @@ RunningInstancesManager* ApplicationContext::runningInstancesManager() const
 session::SessionManager* ApplicationContext::sessionManager() const
 {
     return d->sessionManager.get();
-}
-
-nx::vms::utils::TranslationManager* ApplicationContext::translationManager() const
-{
-    return d->translationManager.get();
 }
 
 CloudCrossSystemManager* ApplicationContext::cloudCrossSystemManager() const

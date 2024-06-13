@@ -7,16 +7,18 @@
 #include <common/common_module.h>
 #include <core/resource/device_dependent_strings.h>
 #include <nx/branding.h>
+#include <nx/vms/client/core/ui/translation_list_model.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <ui/common/read_only.h>
-#include <ui/models/translation_list_model.h>
 
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::common;
+
+using TranslationListModel = nx::vms::client::core::TranslationListModel;
 
 QnSystemSettingsWidget::QnSystemSettingsWidget(
     nx::vms::api::SaveableSystemSettings* editableSystemSettings,
@@ -46,7 +48,7 @@ QnSystemSettingsWidget::QnSystemSettingsWidget(
         this,
         [this] { ui->settingsWarningLabel->setVisible(!ui->autoSettingsCheckBox->isChecked()); });
 
-    ui->languageComboBox->setModel(new QnTranslationListModel(this));
+    ui->languageComboBox->setModel(new TranslationListModel(this));
 
     connect(ui->customNotificationLanguageCheckBox,
         &QCheckBox::clicked,
@@ -119,28 +121,14 @@ void QnSystemSettingsWidget::loadDataToUi()
     ui->customNotificationLanguageCheckBox->setChecked(hasCustomLanguage);
     ui->languageComboBox->setVisible(connectedToCloud && hasCustomLanguage);
 
-    int defaultLanguageIndex = -1;
-    int currentLanguage = -1;
-    QString locale = systemSettings()->cloudNotificationsLanguage();
-    for (int i = 0; i < ui->languageComboBox->count(); i++)
+    if (const auto translationModel =
+        qobject_cast<TranslationListModel*>(ui->languageComboBox->model());
+        NX_ASSERT(translationModel))
     {
-        const auto& translation = ui->languageComboBox->itemData(
-            i, QnTranslationListModel::TranslationRole).value<TranslationInfo>();
-
-        if (translation.localeCode == locale)
-            currentLanguage = i;
-
-        if (translation.localeCode == nx::branding::defaultLocale())
-            defaultLanguageIndex = i;
+        const int currentLanguageIndex = translationModel->localeIndex(
+            systemSettings()->cloudNotificationsLanguage());
+        ui->languageComboBox->setCurrentIndex(currentLanguageIndex);
     }
-
-    if (currentLanguage < 0)
-    {
-        NX_ASSERT(defaultLanguageIndex >= 0, "default language must definitely be present in translations");
-        currentLanguage = std::max(defaultLanguageIndex, 0);
-    }
-
-    ui->languageComboBox->setCurrentIndex(currentLanguage);
 }
 
 void QnSystemSettingsWidget::applyChanges()
@@ -155,10 +143,10 @@ void QnSystemSettingsWidget::applyChanges()
     if (!systemSettings()->cloudSystemId().isEmpty())
     {
         const auto& locale = ui->languageComboBox->currentData(
-            QnTranslationListModel::TranslationRole).value<TranslationInfo>().localeCode;
+            TranslationListModel::LocaleCodeRole).toString();
 
         editableSystemSettings->cloudNotificationsLanguage =
-            ui->customNotificationLanguageCheckBox->isChecked() ? locale : QString();
+            ui->customNotificationLanguageCheckBox->isChecked() ? locale : QString{};
     }
 }
 
@@ -187,7 +175,7 @@ bool QnSystemSettingsWidget::hasChanges() const
             return true;
 
         const auto& selectedLocale = ui->languageComboBox->currentData(
-            QnTranslationListModel::TranslationRole).value<TranslationInfo>().localeCode;
+            TranslationListModel::LocaleCodeRole).toString();
         if (ui->customNotificationLanguageCheckBox->isChecked() && selectedLocale != currentLocale)
             return true;
     }
