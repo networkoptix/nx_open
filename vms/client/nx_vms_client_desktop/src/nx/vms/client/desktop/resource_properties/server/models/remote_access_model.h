@@ -13,6 +13,8 @@ class RemoteAccessModel: public QAbstractListModel
     using base_type = QAbstractListModel;
 
     Q_OBJECT
+    Q_PROPERTY(bool enabledForCurrentUser READ enabledForCurrentUser NOTIFY enabledForCurrentUserChanged)
+
 public:
     enum class Roles
     {
@@ -30,6 +32,11 @@ public:
     virtual QHash<int, QByteArray> roleNames() const override;
     virtual QVariant data(const QModelIndex& index, int role) const override;
     virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;
+
+    bool enabledForCurrentUser() const;
+
+signals:
+    void enabledForCurrentUserChanged();
 
 private:
     void updateModel();

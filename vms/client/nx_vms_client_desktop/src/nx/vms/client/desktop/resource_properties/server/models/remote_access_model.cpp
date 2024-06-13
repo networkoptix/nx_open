@@ -10,7 +10,7 @@ namespace nx::vms::client::desktop {
 
 struct RemoteAccessModel::Private
 {
-    std::vector<ForwardedPortConfiguration> configurations;
+    RemoteAccessData remoteAccessData;
     ServerResourcePtr server;
 };
 
@@ -35,7 +35,7 @@ void RemoteAccessModel::setServer(const ServerResourcePtr& server)
     d->server = server;
 
     connect(server.get(),
-        &ServerResource::forwardedPortConfigurationsChanged,
+        &ServerResource::remoteAccessDataChanged,
         this,
         &RemoteAccessModel::updateModel);
 
@@ -59,7 +59,7 @@ QVariant RemoteAccessModel::data(const QModelIndex& index, int role) const
     if (!hasIndex(index.row(), index.column(), index.parent()))
         return QVariant();
 
-    const auto& item = d->configurations[index.row()];
+    const auto& item = d->remoteAccessData.forwardedPortConfigurations[index.row()];
 
     switch (static_cast<Roles>(role))
     {
@@ -81,14 +81,20 @@ int RemoteAccessModel::rowCount(const QModelIndex& parent) const
     if (parent.isValid())
         return 0;
 
-    return d->configurations.size();
+    return d->remoteAccessData.forwardedPortConfigurations.size();
+}
+
+bool RemoteAccessModel::enabledForCurrentUser() const
+{
+    return d->remoteAccessData.enabledForCurrentUser;
 }
 
 void RemoteAccessModel::updateModel()
 {
     beginResetModel();
-    d->configurations = d->server->getForwardedPortConfigurations();
+    d->remoteAccessData = d->server->remoteAccessData();
     endResetModel();
+    emit enabledForCurrentUserChanged();
 }
 
 } // namespace nx::vms::client::desktop

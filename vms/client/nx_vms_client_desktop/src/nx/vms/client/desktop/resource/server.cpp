@@ -32,19 +32,18 @@ bool ServerResource::isDetached() const
     return m_isDetached;
 }
 
-void ServerResource::setForwardedPortConfigurations(
-    const std::vector<ForwardedPortConfiguration>& value)
+void ServerResource::setRemoteAccessData(const RemoteAccessData& value)
 {
-    if (forwardedPortConfigurations == value)
+    if (m_remoteAccessData == value)
         return;
 
-    forwardedPortConfigurations = value;
-    emit forwardedPortConfigurationsChanged();
+    m_remoteAccessData = value;
+    emit remoteAccessDataChanged();
 }
 
-std::vector<ForwardedPortConfiguration> ServerResource::getForwardedPortConfigurations() const
+RemoteAccessData ServerResource::remoteAccessData() const
 {
-    return forwardedPortConfigurations;
+    return m_remoteAccessData;
 }
 
 } // namespace nx::vms::client::desktop

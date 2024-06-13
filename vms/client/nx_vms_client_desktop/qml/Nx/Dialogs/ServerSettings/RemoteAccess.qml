@@ -19,10 +19,15 @@ Item
     {
         id: placeholder
 
-        visible: !remoteAccessGrid.visible
-        imageSource: "image://skin/64x64/Outline/noservices.svg"
-        text: qsTr("No services")
-        additionalText: qsTr("Server is not configured for remote access feature")
+        visible: !remoteAccessGrid.visible || !control.model.enabledForCurrentUser
+        imageSource: control.model.enabledForCurrentUser
+            ? "image://skin/64x64/Outline/noservices.svg"
+            : "image://skin/64x64/Outline/no_access.svg"
+        text: control.model.enabledForCurrentUser ? qsTr("No services") : qsTr("Disabled")
+        additionalText: control.model.enabledForCurrentUser
+            ? qsTr("Server is not configured for remote access feature")
+            : qsTr("Remote access tool is currently disabled. Please enable it or contact your "
+                + "administrator to turn it on.")
         maxWidth: 250
 
         readonly property string url: "" //TODO: #esobolev add link (see VMS-51876)
