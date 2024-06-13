@@ -27,8 +27,4 @@ NX_VMS_RULES_API bool hasTargetServer(const vms::rules::ItemDescriptor& actionDe
 
 NX_VMS_RULES_API bool needAcknowledge(const ActionPtr& action);
 
-// TODO: #amalov Remove when routing is ready.
-/** Returns whether the user has permission to execute the action. */
-NX_VMS_RULES_API bool checkUserPermissions(const QnUserResourcePtr& user, const ActionPtr& action);
-
 } // namespace nx::vms::rules

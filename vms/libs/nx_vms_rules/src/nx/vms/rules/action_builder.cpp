@@ -568,6 +568,8 @@ ActionBuilder::Actions ActionBuilder::buildActionsForTargetUsers(
     if (!NX_ASSERT(eventManifest))
         return {};
 
+    const auto actionManifest = engine()->actionDescriptor(actionType());
+
     UuidSelection initialTargetUsersValue {
         .ids = targetUsersField->ids(),
         .all = targetUsersField->acceptAll()
@@ -580,12 +582,13 @@ ActionBuilder::Actions ActionBuilder::buildActionsForTargetUsers(
     };
 
     std::unordered_map<QByteArray, EventUsers> eventUsersMap;
+    const bool userFiltered = actionManifest->flags.testFlag(ItemFlag::userFiltered);
 
     // If the action should be shown to some users it is required to check if the user has
     // appropriate rights to see the event details.
     for (const auto& user: targetUsersField->users())
     {
-        if (!user->settings().isEventWatched(aggregatedEvent->type()))
+        if (userFiltered && !user->settings().isEventWatched(aggregatedEvent->type()))
         {
             NX_VERBOSE(this, "Event %1 is filtered by user %2",
                 aggregatedEvent->type(), user->getName());
@@ -638,7 +641,6 @@ ActionBuilder::Actions ActionBuilder::buildActionsForTargetUsers(
         additionalRecipientsField->setValue({});
     }
 
-    const auto actionManifest = engine()->actionDescriptor(actionType());
     for (auto& [key, value]: eventUsersMap)
     {
         NX_VERBOSE(this, "Building action for users: %1", value.userIds);

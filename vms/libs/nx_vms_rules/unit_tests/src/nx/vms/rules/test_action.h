@@ -98,7 +98,7 @@ public:
         return ItemDescriptor{
             .id = utils::type<TestActionWithTargetUsers>(),
             .displayName = TranslatableString("Test action with users"),
-            .flags = ItemFlag::instant,
+            .flags = {ItemFlag::instant, ItemFlag::userFiltered},
             .executionTargets = {ExecutionTarget::clients},
             .fields = {
                 makeFieldDescriptor<TargetUserField>(

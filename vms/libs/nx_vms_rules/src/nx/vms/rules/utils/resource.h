@@ -17,6 +17,9 @@ NX_VMS_RULES_API QnUserResourceSet users(
     const common::SystemContext* context,
     bool activeOnly = false);
 
+NX_VMS_RULES_API UuidSet userIds(
+    const UuidSelection& selection, const common::SystemContext* context, bool activeOnly);
+
 NX_VMS_RULES_API bool isUserSelected(
     const UuidSelection& selection,
     const common::SystemContext* context,

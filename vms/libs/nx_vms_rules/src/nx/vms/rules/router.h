@@ -27,6 +27,13 @@ class NX_VMS_RULES_API Router: public QObject
 public:
     using RuleList = std::vector<ConstRulePtr>;
 
+    enum class Flag
+    {
+        clientsOnly = 1 << 0,
+    };
+
+    Q_DECLARE_FLAGS(Flags, Flag)
+
 public:
     Router();
     virtual ~Router();
@@ -37,7 +44,7 @@ public:
 
     virtual void routeEvent(const EventPtr& event, const RuleList& triggeredRules) = 0;
 
-    virtual void routeAction(const ActionPtr& action) = 0;
+    virtual void routeAction(const ActionPtr& action, Flags flags = {}) = 0;
 
     // Default implementation emits the corresponding signal.
     virtual void receiveAction(const ActionPtr& action);

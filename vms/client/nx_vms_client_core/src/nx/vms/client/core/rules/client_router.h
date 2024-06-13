@@ -23,7 +23,7 @@ public:
         const nx::vms::rules::EventPtr& event,
         const RuleList& triggeredRules) override;
 
-    virtual void routeAction(const nx::vms::rules::ActionPtr& action) override;
+    virtual void routeAction(const nx::vms::rules::ActionPtr& action, Flags flags) override;
 
 private:
     void onActionReceived(const nx::vms::api::rules::ActionInfo& info);
