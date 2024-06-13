@@ -1,5 +1,7 @@
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+include(${open_source_root}/cmake/distribution/common.cmake)
+
 if(NOT openSourceBuild)
     include(openssl_signing)
 endif()
@@ -62,7 +64,11 @@ set(script ${CMAKE_CURRENT_SOURCE_DIR}/build_distribution.sh)
 add_custom_command(
     OUTPUT ${installer_output_list}
     COMMAND /bin/bash ${script}
-    DEPENDS ${script} ${depends} ${configured_files}
+    DEPENDS
+        ${script}
+        ${depends}
+        ${configured_files}
+        ${nx_vms_distribution_utils_sh}
     COMMENT "Creating desktop client .deb package"
 )
 
