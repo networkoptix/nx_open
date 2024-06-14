@@ -497,17 +497,22 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
     ui->secondStreamDisableCheckBox->setEnabled(state.settingsOptimizationEnabled);
     ::setReadOnly(ui->secondStreamDisableCheckBox, state.readOnly);
 
-    // Motion detection.
+    // Remote Archive (ONVIF Profile G).
 
-    const bool remoteArchiveMdSupported =
-        state.devicesDescription.hasRemoteArchiveCapability == CombinedValue::All
-        && ini().enableRemoteArchiveSynchronization;
+    const bool hasRemoteArchiveCapability =
+        state.devicesDescription.hasRemoteArchiveCapability == CombinedValue::All;
 
-    ui->groupBoxMotionDetection->setVisible(remoteArchiveMdSupported);
+    ui->remoteArchiveAutoExportGroupBox->setVisible(hasRemoteArchiveCapability);
+    ui->groupBoxMotionDetection->setVisible(hasRemoteArchiveCapability);
 
-    ui->remoteArchiveMotionDetectionCheckBox->setVisible(remoteArchiveMdSupported);
-    if (remoteArchiveMdSupported)
+    if (hasRemoteArchiveCapability)
     {
+        ui->disableImportFromDeviceRadioButton->setChecked(
+            state.expert.remoteArchiveSyncronizationMode
+                == nx::vms::common::RemoteArchiveSyncronizationMode::off);
+        ui->enableImportFromDeviceRadioButton->setChecked(
+            state.expert.remoteArchiveSyncronizationMode
+                == nx::vms::common::RemoteArchiveSyncronizationMode::automatic);
         check_box_utils::setupTristateCheckbox(
             ui->remoteArchiveMotionDetectionCheckBox,
             state.expert.remoteMotionDetectionEnabled);
@@ -640,18 +645,6 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
 
     check_box_utils::setupTristateCheckbox(ui->trustCameraTimeCheckBox, state.expert.trustCameraTime);
     ::setReadOnly(ui->trustCameraTimeCheckBox, state.readOnly);
-
-    // ONVIF Profile G remote archive automatic export.
-
-    ui->remoteArchiveAutoExportGroupBox->setVisible(
-        ini().enableRemoteArchiveSynchronization && remoteArchiveMdSupported);
-
-    ui->disableImportFromDeviceRadioButton->setChecked(
-        state.expert.remoteArchiveSyncronizationMode
-            == nx::vms::common::RemoteArchiveSyncronizationMode::off);
-    ui->enableImportFromDeviceRadioButton->setChecked(
-        state.expert.remoteArchiveSyncronizationMode
-            == nx::vms::common::RemoteArchiveSyncronizationMode::automatic);
 
     // PTZ control block.
     ui->groupBoxPtzControl->setVisible(state.canSwitchPtzPresetTypes()
