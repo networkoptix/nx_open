@@ -828,8 +828,9 @@ void initialize(Manager* manager, Action* root)
         .flags(Main | NoTarget)
         .mode(DesktopMode)
         .text(ContextMenu::tr("Import From Devices..."))
-        .condition(condition::isDeviceAccessRelevant(nx::vms::api::AccessRight::edit)
-            && condition::isRemoteArchiveSynchronizationEnabled());
+        .condition(condition::isLoggedIn()
+            && condition::isDeviceAccessRelevant(nx::vms::api::AccessRight::edit)
+            && condition::hasRemoteArchiveCapability());
 
     factory()
         .flags(Main)
