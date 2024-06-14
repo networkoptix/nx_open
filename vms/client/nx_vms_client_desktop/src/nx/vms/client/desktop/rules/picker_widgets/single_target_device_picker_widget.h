@@ -11,6 +11,7 @@
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/rules/action_builder_fields/target_layout_field.h>
 #include <nx/vms/rules/action_builder_fields/target_single_device_field.h>
+#include <nx/vms/rules/camera_validation_policy.h>
 #include <nx/vms/rules/event_filter_fields/source_camera_field.h>
 #include <nx/vms/rules/utils/event.h>
 #include <nx/vms/rules/utils/field.h>
@@ -51,12 +52,14 @@ public:
 
 private:
     QCheckBox* m_checkBox{nullptr};
+    Policy policy;
 
     void onSelectButtonClicked() override
     {
         auto selectedCameras = UuidSet{m_field->id()};
 
-        if (!CameraSelectionDialog::selectCameras<Policy>(systemContext(), selectedCameras, this)
+        preparePolicy();
+        if (!CameraSelectionDialog::selectCameras(systemContext(), selectedCameras, policy, this)
             || selectedCameras.empty())
         {
             return;
@@ -65,6 +68,8 @@ private:
         m_field->setId(*selectedCameras.begin());
         m_field->setUseSource(false);
     }
+
+    void preparePolicy();
 
     void updateUi() override
     {
@@ -94,5 +99,22 @@ private:
         }
     }
 };
+
+template<typename Policy>
+void SingleTargetDevicePicker<Policy>::preparePolicy()
+{
+}
+
+template<>
+void SingleTargetDevicePicker<QnFullscreenCameraPolicy>::preparePolicy()
+{
+    const auto layoutField =
+        getActionField<vms::rules::TargetLayoutField>(vms::rules::utils::kLayoutIdsFieldName);
+    if (!NX_ASSERT(layoutField))
+        return;
+
+    const auto layouts = resourcePool()->getResourcesByIds<QnLayoutResource>(layoutField->value());
+    policy.setLayouts(layouts);
+}
 
 } // namespace nx::vms::client::desktop::rules

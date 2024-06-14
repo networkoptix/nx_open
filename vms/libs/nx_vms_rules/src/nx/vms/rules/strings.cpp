@@ -361,6 +361,18 @@ QString Strings::fieldValueMustBeProvided(const QString& fieldName)
         .arg(fieldName);
 }
 
+QString Strings::layoutCanOnlyBeShownToOwner(const QString& ownerName)
+{
+    return tr("Chosen local layout can only be shown to its owner %1").arg(ownerName);
+}
+
+QString Strings::usersHaveNoAccessToLayout(bool allUsersWithoutAccess)
+{
+    return allUsersWithoutAccess
+        ? tr("None of selected users have access to the selected layout")
+        : tr("Some users do not have access to the selected layout");
+}
+
 TranslatableString Strings::at()
 {
     return NX_DYNAMIC_TRANSLATABLE(tr("At"));

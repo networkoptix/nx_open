@@ -1143,15 +1143,18 @@ bool QnBusinessRuleViewModel::isValid(Column column) const
             {
                 case EventType::cameraMotionEvent:
                     return isResourcesListValid<QnCameraMotionPolicy>(
+                        systemContext(),
                         resourcePool()->getResourcesByIds<QnCameraMotionPolicy::resource_type>(filtered));
 
                 case EventType::cameraInputEvent:
                     return isResourcesListValid<QnCameraInputPolicy>(
+                        systemContext(),
                         resourcePool()->getResourcesByIds<QnCameraInputPolicy::resource_type>(filtered));
 
                 case EventType::analyticsSdkEvent:
                 case EventType::analyticsSdkObjectDetected:
                     return isResourcesListValid<QnCameraAnalyticsPolicy>(
+                        systemContext(),
                         resourcePool()->getResourcesByIds<QnCameraAnalyticsPolicy::resource_type>(filtered));
 
                 case EventType::softwareTriggerEvent:
@@ -1224,17 +1227,21 @@ bool QnBusinessRuleViewModel::isValid(Column column) const
                     return QnSendEmailActionDelegate::isValidList(filtered, m_actionParams.emailAddress);
                 case ActionType::cameraRecordingAction:
                     return isResourcesListValid<QnCameraRecordingPolicy>(
+                        systemContext(),
                         resourcePool()->getResourcesByIds<QnCameraRecordingPolicy::resource_type>(filtered));
                 case ActionType::bookmarkAction:
                     return isResourcesListValid<QnCameraRecordingPolicy>(
+                        systemContext(),
                         resourcePool()->getResourcesByIds<QnBookmarkActionPolicy::resource_type>(filtered));
                 case ActionType::cameraOutputAction:
                     return isResourcesListValid<QnCameraOutputPolicy>(
+                        systemContext(),
                         resourcePool()->getResourcesByIds<QnCameraOutputPolicy::resource_type>(filtered));
                 case ActionType::playSoundAction:
                 case ActionType::playSoundOnceAction:
                     return !m_actionParams.url.isEmpty()
                         && (isResourcesListValid<QnCameraAudioTransmitPolicy>(
+                            systemContext(),
                             resourcePool()->getResourcesByIds<QnCameraAudioTransmitPolicy::resource_type>(filtered))
                             || m_actionParams.playToClient
                         );
@@ -1273,12 +1280,14 @@ bool QnBusinessRuleViewModel::isValid(Column column) const
                 case ActionType::sayTextAction:
                     return !m_actionParams.sayText.isEmpty()
                         && (isResourcesListValid<QnCameraAudioTransmitPolicy>(
+                            systemContext(),
                             resourcePool()->getResourcesByIds<QnCameraAudioTransmitPolicy::resource_type>(filtered))
                             || m_actionParams.playToClient
                         );
 
                 case ActionType::executePtzPresetAction:
                     return isResourcesListValid<QnExecPtzPresetPolicy>(
+                        systemContext(),
                         resourcePool()->getResourcesByIds<QnExecPtzPresetPolicy::resource_type>(filtered))
                         && m_actionResources.size() == 1
                         && !m_actionParams.presetId.isEmpty();

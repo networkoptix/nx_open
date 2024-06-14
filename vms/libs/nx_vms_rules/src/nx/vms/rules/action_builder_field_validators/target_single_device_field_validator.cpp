@@ -63,28 +63,9 @@ ValidationResult TargetSingleDeviceFieldValidator::validity(
             if (layouts.empty())
                 return {};
 
-            for (const auto& layout: layouts)
-            {
-                const auto layoutItem = layout->getItems();
-                bool isCameraOnLayout = std::any_of(
-                    layoutItem.cbegin(),
-                    layoutItem.cend(),
-                    [&device, &context](const common::LayoutItemData& item)
-                    {
-                        return context->resourcePool()->getResourceByDescriptor(item.resource) == device;
-                    });
-
-                if (!isCameraOnLayout)
-                {
-                    auto alert = layouts.size() == 1
-                        ? tr("This camera is not currently on the selected layout")
-                        : tr("This camera is not currently on some of the selected layouts");
-
-                    return {QValidator::State::Intermediate, alert};
-                }
-            }
-
-            return utils::cameraValidity<QnFullscreenCameraPolicy>(context, device);
+            QnFullscreenCameraPolicy policy;
+            policy.setLayouts(layouts);
+            return utils::cameraValidity<QnFullscreenCameraPolicy>(context, policy, device);
         }
 
         return {QValidator::State::Invalid, Strings::unexpectedPolicy()};
