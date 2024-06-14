@@ -80,15 +80,15 @@ WebPageDataCache::WebPageDataCache(QObject* parent):
     for (const auto& [webPageUrl, webPageSettings]:
         appContext()->localSettings()->webPageSettings().asKeyValueRange())
     {
-        m_settings[webPageUrl] = webPageSettings;
+        m_iconPaths[webPageUrl] = webPageSettings.icon.value_or("");
     }
 }
 
 WebPageDataCache::~WebPageDataCache()
 {
-    QMap<QString, WebPageSettings> settings;
-    for (const auto [webPageUrl, webPageSettings]: m_settings.asKeyValueRange())
-        settings[webPageUrl.toString()] = webPageSettings;
+    QMap<QString, WebPageSettings> settings = appContext()->localSettings()->webPageSettings();
+    for (const auto [webPageUrl, iconUrl]: m_iconPaths.asKeyValueRange())
+        settings[webPageUrl.toString()].icon = iconUrl.toString();
 
     appContext()->localSettings()->webPageSettings = settings;
 }
@@ -132,7 +132,7 @@ void WebPageDataCache::loadNext()
                     [this, webPageUrl](bool hasIcon, bool dedicatedWindow, QSize windowSize)
                     {
                         if (dedicatedWindow)
-                            emit windowSizeChanged(webPageUrl, windowSize);
+                            emit dedicatedWindowSettingsLoaded(webPageUrl, windowSize);
 
                         // Wait until both an icon and metadata are loaded.
                         m_isMetadataLoaded = true;
@@ -165,16 +165,16 @@ void WebPageDataCache::saveIcon(const QUrl& webPageUrl, const QImage& icon, cons
     if (!icon2x.isNull())
         icon2x.save(path2x);
 
-    m_settings[webPageUrl].icon = QUrl::fromLocalFile(path).toString();
+    m_iconPaths[webPageUrl] = QUrl::fromLocalFile(path).toString();
     emit iconChanged(webPageUrl);
 }
 
 std::optional<QUrl> WebPageDataCache::findIconPath(const QUrl& webPageUrl)
 {
-    if (!m_settings[webPageUrl].icon.has_value())
+    if (!m_iconPaths.contains(webPageUrl))
         refresh(webPageUrl);
 
-    const QUrl path = m_settings[webPageUrl].icon.value_or("");
+    const QUrl path = m_iconPaths.value(webPageUrl);
 
     if (!path.isEmpty() && !QFileInfo(path.toLocalFile()).exists())
     {
@@ -189,7 +189,7 @@ void WebPageDataCache::refresh(const QUrl& webPageUrl)
 {
     if (!m_urlsToRefresh.contains(webPageUrl))
     {
-        m_settings.remove(webPageUrl);
+        m_iconPaths[webPageUrl] = "";
         m_urlsToRefresh.append(webPageUrl);
         if (!m_webPage)
             loadNext();
@@ -198,7 +198,7 @@ void WebPageDataCache::refresh(const QUrl& webPageUrl)
 
 void WebPageDataCache::update(const QUrl& webPageUrl, const QImage& icon)
 {
-    if (webPageUrl.isEmpty() || m_settings[webPageUrl].icon != kNoPath || icon.isNull())
+    if (webPageUrl.isEmpty() || m_iconPaths[webPageUrl] != kNoPath || icon.isNull())
         return;
 
     saveIcon(webPageUrl, icon.scaled(kIconSize), icon.scaled(kIconSize * 2));

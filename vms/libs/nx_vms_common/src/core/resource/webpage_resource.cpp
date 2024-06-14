@@ -165,7 +165,7 @@ void QnWebPageResource::setOpenInWindow(bool enabled, const QSize& size)
     setProperty(DedicatedWindowSettings::kPropertyName,
         QString::fromStdString(nx::reflect::json::serialize(settings)));
 
-    emit openInWindowChanged();
+    emit dedicatedWindowSettingsChanged();
 }
 
 QnWebPageResource::Options QnWebPageResource::getOptions() const
