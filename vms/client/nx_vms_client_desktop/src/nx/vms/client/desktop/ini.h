@@ -161,6 +161,9 @@ struct Ini: nx::kit::IniConfig
         "[Dev] The maximum number of requests to the server per minute, after which it is\n"
         "considered that there are too many requests.");
 
+    NX_INI_FLAG(false, disableCrossSiteConnections,
+        "[Dev] Disable cross-site connects to simplify debug and logs collection.");
+
     // ---------------------------------------------------------------------------------------------
     // Design section
     // Flags here can be removed when designers approve the resulting approach.
