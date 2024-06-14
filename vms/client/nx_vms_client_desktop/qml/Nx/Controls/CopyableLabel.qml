@@ -18,6 +18,7 @@ Item
     property alias font: labelTextField.font
     property alias color: labelTextField.color
     readonly property bool hovered: labelMouseArea.containsMouse || clipboardCopyButton.hovered
+    property int copiedTooltipLifetimeMs: 0
 
     implicitHeight: labelTextField.implicitHeight
 
@@ -48,5 +49,10 @@ Item
         anchors.leftMargin: 4
         anchors.verticalCenter: labelTextField.verticalCenter
         visible: control.hovered || animationRunning
+        onAnimationRunningChanged:
+        {
+            if (animationRunning && copiedTooltipLifetimeMs > 0)
+                control.GlobalToolTip.showTemporary(qsTr("copied"), copiedTooltipLifetimeMs)
+        }
     }
 }
