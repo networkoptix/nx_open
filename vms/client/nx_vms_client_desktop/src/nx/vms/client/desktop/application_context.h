@@ -17,7 +17,6 @@ class QnForgottenSystemsManager;
 class QnClientRuntimeSettings;
 struct QnStartupParameters;
 
-namespace nx::i18n { class TranslationManager; }
 namespace nx::cloud::gateway { class VmsGatewayEmbeddable; }
 namespace nx::vms::client::core { class ObjectDisplaySettings; }
 
@@ -175,8 +174,6 @@ public:
 
     RunningInstancesManager* runningInstancesManager() const;
     session::SessionManager* sessionManager() const;
-
-    nx::i18n::TranslationManager* translationManager() const;
 
     /**
      * Monitors available Cloud Systems and manages corresponding cross-system Contexts.

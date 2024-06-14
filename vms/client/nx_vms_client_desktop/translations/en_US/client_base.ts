@@ -1442,14 +1442,6 @@
     </message>
 </context>
 <context>
-    <name>Language</name>
-    <message>
-        <source>Language Name</source>
-        <comment>Language name that will be displayed to the user.</comment>
-        <translation>English (US)</translation>
-    </message>
-</context>
-<context>
     <name>LicenseActivationDialogs</name>
     <message>
         <source>Incompatible license</source>

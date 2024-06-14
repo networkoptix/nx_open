@@ -2,6 +2,14 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="pl_PL" sourcelanguage="en">
   <context>
+    <name>Language</name>
+    <message>
+      <source>Language Name</source>
+      <comment>Language name that will be displayed to the user.</comment>
+      <translation>Polski</translation>
+    </message>
+  </context>
+  <context>
     <name>QnCloudSystemInformationWatcher</name>
     <message>
       <source>Owner: %1</source>

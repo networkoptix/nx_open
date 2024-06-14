@@ -161,7 +161,6 @@ void migrateSettingsFrom5_1(LocalSettings* settings, QSettings* oldSettings)
     migrateValue(settings->autoFpsLimit, "isAutoFpsLimit");
     migrateValue(settings->showFisheyeCalibrationGrid, "isFisheyeCalibrationGridShown");
     migrateValue(settings->hardwareDecodingEnabledProperty, "isHardwareDecodingEnabledProperty");
-    migrateValue(settings->locale);
     migrateValue(settings->logLevel);
     migrateValue(settings->pcUuid);
     migrateEnumValue(settings->resourceInfoLevel);
@@ -263,6 +262,19 @@ void migrateLogSettings(LocalSettings* settings, QSettings* oldSettings)
     }
 }
 
+void migrateFrom6_0(LocalSettings* settings)
+{
+    const auto coreSettings = appContext()->coreSettings();
+    if (coreSettings->locale().isEmpty())
+    {
+        const auto oldValue = settings->value("locale");
+        if (oldValue.isValid() && !oldValue.toString().isEmpty())
+            coreSettings->locale = oldValue.toString();
+        else
+            coreSettings->locale = nx::branding::defaultLocale();
+    }
+}
+
 } // namespace
 
 LocalSettings::LocalSettings():
@@ -305,6 +317,7 @@ void LocalSettings::migrateOldSettings()
     migrateLastUsedConnectionFrom4_2(this, oldSettings.get());
     migrateMediaFoldersFrom4_3(this, oldSettings.get());
     migrateLogSettings(this, oldSettings.get());
+    migrateFrom6_0(this);
 }
 
 void LocalSettings::setDefaults()

@@ -9,6 +9,8 @@
 #include <client/client_globals.h>
 #include <client/client_runtime_settings.h>
 #include <nx/branding.h>
+#include <nx/vms/client/core/settings/client_core_settings.h>
+#include <nx/vms/client/core/ui/translation_list_model.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/dialogs/progress_dialog.h>
 #include <nx/vms/client/desktop/common/utils/aligner.h>
@@ -18,11 +20,11 @@
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/utils/local_file_cache.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
-#include <ui/models/translation_list_model.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <ui/workbench/workbench_context.h>
 
 using namespace nx::vms::client::desktop;
+using TranslationListModel = nx::vms::client::core::TranslationListModel;
 
 namespace {
 
@@ -98,7 +100,7 @@ void QnLookAndFeelPreferencesWidget::applyChanges()
     appContext()->localSettings()->tourCycleTimeMs = selectedTourCycleTimeMs();
     appContext()->localSettings()->resourceInfoLevel = selectedInfoLevel();
     appContext()->localSettings()->timeMode = selectedTimeMode();
-    appContext()->localSettings()->locale = selectedTranslation();
+    appContext()->coreSettings()->locale = selectedTranslation();
     appContext()->localSettings()->ptzAimOverlayEnabled = isPtzAimOverlayEnabled();
     appContext()->localSettings()->showTimestampOnLiveCamera = isShowTimestampOnLiveCameraEnabled();
 
@@ -123,28 +125,13 @@ void QnLookAndFeelPreferencesWidget::loadDataToUi()
     ui->showTimestampInsteadOnLiveCameraCheckBox->setChecked(
         appContext()->localSettings()->showTimestampOnLiveCamera());
 
-    int defaultLanguageIndex = -1;
-    int currentLanguage = -1;
-    QString locale = appContext()->localSettings()->locale();
-    for (int i = 0; i < ui->languageComboBox->count(); i++)
+    if (const auto translationModel =
+        qobject_cast<TranslationListModel*>(ui->languageComboBox->model());
+        NX_ASSERT(translationModel))
     {
-        const auto translation = ui->languageComboBox->itemData(
-            i, QnTranslationListModel::TranslationRole).value<TranslationInfo>();
-
-        if (translation.localeCode == locale)
-            currentLanguage = i;
-
-        if (translation.localeCode == nx::branding::defaultLocale())
-            defaultLanguageIndex = i;
+        const auto currentLocale = appContext()->coreSettings()->locale();
+        ui->languageComboBox->setCurrentIndex(translationModel->localeIndex(currentLocale));
     }
-
-    if (currentLanguage < 0)
-    {
-        NX_ASSERT(defaultLanguageIndex >= 0, "default language must definitely be present in translations");
-        currentLanguage = std::max(defaultLanguageIndex, 0);
-    }
-
-    ui->languageComboBox->setCurrentIndex(currentLanguage);
 
     ui->imageGroupBox->setEnabled(backgroundAllowed());
 
@@ -170,7 +157,7 @@ bool QnLookAndFeelPreferencesWidget::hasChanges() const
     if (backgroundAllowed() && appContext()->localSettings()->backgroundImage() != m_oldBackground)
         return true;
 
-    return appContext()->localSettings()->locale() != selectedTranslation()
+    return appContext()->coreSettings()->locale() != selectedTranslation()
         || appContext()->localSettings()->timeMode() != selectedTimeMode()
         || appContext()->localSettings()->resourceInfoLevel() != selectedInfoLevel()
         || appContext()->localSettings()->tourCycleTimeMs() != selectedTourCycleTimeMs()
@@ -260,11 +247,8 @@ bool QnLookAndFeelPreferencesWidget::backgroundAllowed() const
 
 QString QnLookAndFeelPreferencesWidget::selectedTranslation() const
 {
-    const auto translation = ui->languageComboBox->itemData(
-        ui->languageComboBox->currentIndex(), QnTranslationListModel::TranslationRole)
-        .value<TranslationInfo>();
-
-    return translation.localeCode;
+    return ui->languageComboBox->itemData(
+        ui->languageComboBox->currentIndex(), TranslationListModel::LocaleCodeRole).toString();
 }
 
 Qn::TimeMode QnLookAndFeelPreferencesWidget::selectedTimeMode() const
@@ -302,7 +286,7 @@ Qn::ImageBehavior QnLookAndFeelPreferencesWidget::selectedImageMode() const
 
 void QnLookAndFeelPreferencesWidget::setupLanguageUi()
 {
-    ui->languageComboBox->setModel(new QnTranslationListModel(this));
+    ui->languageComboBox->setModel(new TranslationListModel(this));
 
     connect(ui->languageComboBox, QnComboboxCurrentIndexChanged, this,
         &QnAbstractPreferencesWidget::hasChangesChanged);

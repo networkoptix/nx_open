@@ -361,7 +361,6 @@ struct ApplicationContext::Private
     std::unique_ptr<QnPlatformAbstraction> platformAbstraction;
     std::unique_ptr<PerformanceMonitor> performanceMonitor;
 
-    std::unique_ptr<nx::i18n::TranslationManager> translationManager;
     std::unique_ptr<ApplauncherGuard> applauncherGuard;
     std::unique_ptr<QnClientAutoRunWatcher> autoRunWatcher;
     std::unique_ptr<RadassController> radassController;
@@ -406,7 +405,7 @@ struct ApplicationContext::Private
         if (NX_ASSERT(nx::reflect::enumeration::fromString(ini().graphicsApi, &graphicsApi)))
             runtimeSettings->setGraphicsApi(graphicsApi);
 
-        common::appContext()->setLocale(localSettings->locale());
+        common::appContext()->setLocale(appContext()->coreSettings()->locale());
 
         #ifdef Q_OS_MACX
             if (mac_isSandboxed())
@@ -555,17 +554,6 @@ struct ApplicationContext::Private
         cloudLayoutsManager = std::make_unique<CloudLayoutsManager>();
         cloudCrossSystemManager = std::make_unique<CloudCrossSystemManager>();
         crossSystemLayoutsWatcher = std::make_unique<CrossSystemLayoutsWatcher>();
-    }
-
-    void initializeTranslations()
-    {
-        translationManager = std::make_unique<nx::i18n::TranslationManager>();
-        bool loaded = translationManager->installTranslation(localSettings->locale());
-        if (!loaded)
-            loaded = translationManager->installTranslation(nx::branding::defaultLocale());
-        NX_ASSERT(loaded, "Translations could not be initialized");
-
-        translationManager->setAssertOnOverlayInstallationFailure();
     }
 
     void initializeSystemContext()
@@ -738,9 +726,9 @@ ApplicationContext::ApplicationContext(
         {
             d->initializeStateModules();
             d->initializeLogging(startupParameters); //< Depends on state modules.
+            initializeTranslations(coreSettings()->locale());
             d->initializePlatformAbstraction();
             d->performanceMonitor = std::make_unique<PerformanceMonitor>();
-            d->initializeTranslations();
             d->statisticsModule = std::make_unique<ContextStatisticsModule>();
             d->initializeNetworkModules();
             d->initializeSystemContext();
@@ -937,11 +925,6 @@ RunningInstancesManager* ApplicationContext::runningInstancesManager() const
 session::SessionManager* ApplicationContext::sessionManager() const
 {
     return d->sessionManager.get();
-}
-
-nx::i18n::TranslationManager* ApplicationContext::translationManager() const
-{
-    return d->translationManager.get();
 }
 
 CloudCrossSystemManager* ApplicationContext::cloudCrossSystemManager() const

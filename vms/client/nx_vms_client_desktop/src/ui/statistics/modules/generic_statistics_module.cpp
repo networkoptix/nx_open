@@ -22,7 +22,7 @@ QnGenericStatisticsModule::QnGenericStatisticsModule(QObject* parent):
 
 QnStatisticValuesHash QnGenericStatisticsModule::values() const
 {
-    const auto settingsLocale = appContext()->localSettings()->locale();
+    const auto settingsLocale = appContext()->coreSettings()->locale();
     const auto locale = settingsLocale.isEmpty() ? QLocale::system().name() : settingsLocale;
     const QString certificateValidation =
         QString::fromStdString(nx::reflect::enumeration::toString(
