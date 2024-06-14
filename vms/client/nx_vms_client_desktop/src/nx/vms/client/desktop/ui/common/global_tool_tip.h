@@ -40,6 +40,7 @@ public:
     void setDelay(int value);
 
     Q_INVOKABLE void show(const QString& text, int delay = -1);
+    Q_INVOKABLE void showTemporary(const QString& temporaryText, int durationMs = 1000);
     Q_INVOKABLE void hide();
 
 signals:

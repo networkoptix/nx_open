@@ -175,9 +175,10 @@ Item
                             id: portLabel
                             text: tile.port
                             font: grid.font
-                            color: ColorTheme.colors.light10
+                            color: hovered ? ColorTheme.colors.light4 : ColorTheme.colors.light10
                             width: grid.secondColumnWidth
                             visible: !!tile.port
+                            copiedTooltipLifetimeMs: 2500
                         }
 
                         Item
@@ -217,8 +218,9 @@ Item
                     {
                         text: tile.login == "" ? "—" : tile.login
                         font: grid.font
-                        color: ColorTheme.colors.light10
+                        color: hovered ? ColorTheme.colors.light4 : ColorTheme.colors.light10
                         width: grid.secondColumnWidth
+                        copiedTooltipLifetimeMs: 2500
 
                         Layout.preferredHeight: grid.rowHeight
                     }
@@ -237,9 +239,10 @@ Item
                     {
                         text: tile.password == "" ? "—" : tile.password
                         font: grid.font
-                        color: ColorTheme.colors.light10
+                        color: hovered ? ColorTheme.colors.light4 : ColorTheme.colors.light10
                         width: grid.secondColumnWidth
                         isPassword: true
+                        copiedTooltipLifetimeMs: 2500
 
                         Layout.preferredHeight: grid.rowHeight
                     }

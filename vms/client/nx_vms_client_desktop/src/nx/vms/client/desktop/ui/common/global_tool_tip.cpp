@@ -124,8 +124,10 @@ public slots:
 public:
     GlobalToolTipAttached* q = nullptr;
     QTimer* showTimer = nullptr;
+    QTimer* temporaryTooltipTimer = nullptr;
     QQuickItem* item = nullptr;
     QString text;
+    QString temporaryText;
     QPoint hoverPos;
     bool enabled = true;
     bool showOnHover = true;
@@ -139,6 +141,7 @@ public:
 GlobalToolTipAttached::Private::Private(GlobalToolTipAttached* q, QObject* parent):
     q(q),
     showTimer(new QTimer(this)),
+    temporaryTooltipTimer(new QTimer(this)),
     item(qobject_cast<QQuickItem*>(parent))
 {
     if (QStyle* style = qApp->style())
@@ -160,6 +163,21 @@ GlobalToolTipAttached::Private::Private(GlobalToolTipAttached* q, QObject* paren
 
             if (engine->property(kTargetItemProperty).value<QQuickItem*>() == item)
                 showImmediately();
+        });
+
+    temporaryTooltipTimer->setSingleShot(true);
+    connect(temporaryTooltipTimer, &QTimer::timeout, this,
+        [this]()
+        {
+            temporaryText.clear();
+            const auto toolTip = instance();
+            if (!toolTip)
+                return;
+
+            if (toolTip.isVisible() && item == toolTip.invokerItem() && !text.isEmpty())
+                this->q->show(text);
+            else
+                this->q->hide();
         });
 }
 
@@ -309,7 +327,10 @@ void GlobalToolTipAttached::Private::update()
                 : nullptr);
         }
 
-        toolTip.setText(text);
+        if (!temporaryText.isEmpty())
+            toolTip.setText(temporaryText);
+        else
+            toolTip.setText(text);
         adjustPosition();
     }
 }
@@ -516,15 +537,27 @@ void GlobalToolTipAttached::show(const QString& text, int delay)
         d->showDelayed(d->delayMs);
     else if (d->item != toolTip.invokerItem())
         d->showDelayed(d->shortDelayMs, false);
-    else if (text != toolTip.text())
+    else if (text != toolTip.text() || !d->temporaryText.isEmpty())
         d->showImmediately();
     else
         toolTip.open();
 }
 
+void GlobalToolTipAttached::showTemporary(const QString& temporaryText, int durationMs)
+{
+    if (temporaryText.isEmpty())
+        return;
+
+    d->temporaryText = temporaryText;
+    d->showImmediately();
+    d->temporaryTooltipTimer->start(durationMs);
+}
+
 void GlobalToolTipAttached::hide()
 {
     d->showTimer->stop();
+    d->temporaryText.clear();
+    d->temporaryTooltipTimer->stop();
 
     if (!d->item)
         return;
