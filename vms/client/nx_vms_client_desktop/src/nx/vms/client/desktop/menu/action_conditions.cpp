@@ -2257,12 +2257,20 @@ ConditionWrapper isDeviceAccessRelevant(nx::vms::api::AccessRights requiredAcces
         });
 }
 
-ConditionWrapper isRemoteArchiveSynchronizationEnabled()
+ConditionWrapper hasRemoteArchiveCapability()
 {
     return new CustomBoolCondition(
-        [](const Parameters& /*parameters*/, WindowContext* /*context*/)
+        [](const Parameters& /*parameters*/, WindowContext* context)
         {
-            return ini().enableRemoteArchiveSynchronization;
+            return GenericCondition::check<QnVirtualCameraResourcePtr>(
+                context->system()->resourcePool()->getAllCameras(
+                    /*serverId*/ Uuid{},
+                    /*ignoreDesktopCameras*/ true),
+                MatchMode::any,
+                [](const QnVirtualCameraResourcePtr& camera)
+                {
+                    return camera->hasCameraCapabilities(api::DeviceCapability::remoteArchive);
+                });
         });
 }
 
