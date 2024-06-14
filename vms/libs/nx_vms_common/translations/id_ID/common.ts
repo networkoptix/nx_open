@@ -1186,7 +1186,7 @@
     <message>
       <source>Not allowed.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Not allowed.</translation>
+      <translation>Tidak diperbolehkan.</translation>
     </message>
   </context>
   <context>
