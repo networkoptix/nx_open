@@ -46,6 +46,7 @@ void EngineHolder::stop()
     if (!m_thread)
         return;
 
+    NX_DEBUG(this, "Stopping Engine thread");
     nx::utils::AsyncHandlerExecutor(m_thread.get()).submit(
         [this]
         {
@@ -55,6 +56,7 @@ void EngineHolder::stop()
 
     m_thread->wait();
     m_thread.reset();
+    NX_DEBUG(this, "Engine thread stopped");
 }
 
 Engine* EngineHolder::engine() const
