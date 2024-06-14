@@ -501,16 +501,16 @@ NX_REFLECTION_INSTRUMENT(ObjectTrackFilterFreeText, ObjectTrackFilterFreeText_Fi
 struct ObjectTrackFilter: ObjectTrackFilterFreeText
 {
     /**%apidoc
-     * If specified, only Object Tracks originating from that Device will be considered for search.
-     * Can be a Device id (can be obtained from "id", "physicalId" or "logicalId" field via
-     * `GET /rest/v{1-}/devices`) or MAC address (not supported for certain cameras).
+     * If not empty, only Object Tracks originating from those Devices will be considered for
+     * search. Each item can be a Device id (can be obtained from "id", "physicalId" or "logicalId"
+     * field via `GET /rest/v{1-}/devices`) or MAC address (not supported for certain cameras).
      */
-    std::optional<QString> deviceId;
+    std::vector<QString> deviceIds;
 
     /**%apidoc
-     * If specified, only Object of this Object Type will be considered for search.
+     * If not empty, only Objects of these Object Types will be considered for search.
      */
-    std::optional<QString> objectTypeId;
+    std::vector<QString> objectTypeIds;
 
     /**%apidoc
      * Start of the time period to search within, in milliseconds since epoch (1970-01-01 00:00, UTC).
@@ -540,6 +540,11 @@ struct ObjectTrackFilter: ObjectTrackFilterFreeText
      */
     Qt::SortOrder sortOrder = Qt::SortOrder::DescendingOrder;
 
+    /**%apidoc
+     * If specified, only Object Tracks detected by specified engine will be considered for search.
+     */
+    std::optional<nx::Uuid> analyticsEngineId;
+
     /**%apidoc[opt]
      * If false, then the request is forwarded to every other online Server and the results are merged.
      * Otherwise, the request is processed on the receiving Server only.
@@ -547,7 +552,8 @@ struct ObjectTrackFilter: ObjectTrackFilterFreeText
     bool isLocal = false;
 };
 #define ObjectTrackFilter_Fields ObjectTrackFilterFreeText_Fields \
-    (deviceId)(objectTypeId)(startTimeMs)(endTimeMs)(boundingBox)(limit)(sortOrder)(isLocal)
+    (deviceIds)(objectTypeIds)(startTimeMs)(endTimeMs)(boundingBox)(limit)(sortOrder) \
+    (analyticsEngineId)(isLocal)
 NX_VMS_API_DECLARE_STRUCT_EX(ObjectTrackFilter, (json));
 NX_REFLECTION_INSTRUMENT(ObjectTrackFilter, ObjectTrackFilter_Fields)
 
