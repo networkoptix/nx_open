@@ -9,6 +9,7 @@
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/debug_utils/utils/debug_custom_actions.h>
+#include <nx/vms/client/desktop/ini.h>
 
 #include "cloud_cross_system_context.h"
 
@@ -23,6 +24,9 @@ CloudCrossSystemManager::CloudCrossSystemManager(QObject* parent):
     QObject(parent),
     d(new Private())
 {
+    if (ini().disableCrossSiteConnections)
+        return;
+
     const auto setCloudSystems =
         [this](const QnCloudSystemList& currentCloudSystems)
         {
