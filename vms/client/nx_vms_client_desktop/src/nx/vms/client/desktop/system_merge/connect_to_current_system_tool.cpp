@@ -12,6 +12,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection_user_interaction_delegate.h>
+#include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
@@ -185,7 +186,7 @@ void ConnectToCurrentSystemTool::mergeServer(const QString& adminPassword)
         this,
         qnClientCoreModule->networkModule()->certificateVerifier(),
         m_delegate.get(),
-        appContext()->localSettings()->locale().toStdString());
+        appContext()->coreSettings()->locale().toStdString());
 
     connect(
         m_mergeTool,

@@ -61,8 +61,6 @@ public:
     Property<int> maxNVidiaHardwareDecoders{ this, "maxNVidiaHardwareDecoders", 64,
         "Maximum number of hardware decoders for NVidia." };
 
-    Property<QString> locale{this, "locale", nx::branding::defaultLocale()};
-
     Property<QString> logLevel{this, "logLevel", "none"};
     Property<qint64> maxLogFileSizeB{this, nx::log::kMaxLogFileSizeSymbolicName,
         nx::log::kDefaultMaxLogFileSizeB};
@@ -185,6 +183,10 @@ public:
         "analyticsSearchTableVisibleAttributes",
         {},
         "List and order of visible attributes in the table view of the Advanced Search Dialog."};
+
+private:
+    // Deperecated properties.
+    Property<QString> locale{this, "locale", nx::branding::defaultLocale()};
 
 public:
     void migrateOldSettings();

@@ -1232,14 +1232,6 @@
     </message>
   </context>
   <context>
-    <name>Language</name>
-    <message>
-      <source>Language Name</source>
-      <comment>Language name that will be displayed to the user.</comment>
-      <translation>Українська</translation>
-    </message>
-  </context>
-  <context>
     <name>LayoutTourTextFactory</name>
     <message>
       <source>Start Showreel</source>

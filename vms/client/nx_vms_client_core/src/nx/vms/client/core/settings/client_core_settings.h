@@ -58,6 +58,8 @@ public:
     SecureProperty<SystemAuthenticationData> systemAuthenticationData{
         this, "systemAuthenticationData"};
 
+    Property<QString> locale{this, "locale", {}};
+
     SecureProperty<SerializableCredentials> cloudCredentials{
         this, "cloudCredentials"};
 

@@ -11,6 +11,7 @@
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_resource.h>
+#include <nx/branding.h>
 #include <nx/build_info.h>
 #include <nx/core/transcoding/filters/timestamp_filter.h>
 #include <nx/utils/file_system.h>

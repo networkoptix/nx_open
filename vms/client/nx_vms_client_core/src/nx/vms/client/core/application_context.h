@@ -13,6 +13,7 @@ class QnClientCoreSettings;
 class QnSystemsFinder;
 class QnVoiceSpectrumAnalyzer;
 
+namespace nx::i18n { class TranslationManager; }
 namespace nx::vms::discovery { class Manager; }
 
 namespace nx::vms::client::core {
@@ -108,6 +109,8 @@ public:
      */
     void removeSystemContext(SystemContext* systemContext);
 
+    nx::i18n::TranslationManager* translationManager() const;
+
     FontConfig* fontConfig() const;
 
 signals:
@@ -120,6 +123,12 @@ protected:
     void storeFontConfig(FontConfig* config);
 
     void resetEngine();
+
+    /**
+     *  Initializes translation-related stuff. Should be called on the inheritor side since
+     *  we need some migration/initializations to be done before translations setup.
+     */
+    void initializeTranslations(const QString& targetLocale);
 
 private:
     struct Private;

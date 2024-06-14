@@ -17,6 +17,7 @@
 #include <core/resource/videowall_resource.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/software_version.h>
+#include <nx/utils/url.h>
 #include <nx/vms/api/types/dewarping_types.h>
 #include <nx/vms/api/types/resource_types.h>
 #include <nx/vms/client/core/analytics/analytics_icon_manager.h>
@@ -72,6 +73,7 @@
 #include <nx/vms/client/core/time/month_list_model.h>
 #include <nx/vms/client/core/two_way_audio/two_way_audio_controller.h>
 #include <nx/vms/client/core/ui/frame_section.h>
+#include <nx/vms/client/core/ui/translation_list_model.h>
 #include <nx/vms/client/core/utils/file_io.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/core/utils/model_item_flags_watcher.h>
@@ -136,7 +138,7 @@ void initializeMetaTypes()
 
     qmlRegisterUncreatableType<nx::Uuid>(
         "Nx.Utils", 1, 0, "Uuid", "Cannot create an instance of Uuid.");
-    qmlRegisterUncreatableType<utils::Url>(
+    qmlRegisterUncreatableType<nx::utils::Url>(
         "Nx.Utils", 1, 0, "Url", "Cannot create an instance of Url.");
     qmlRegisterUncreatableType<nx::utils::SoftwareVersion>(
         "Nx.Core", 1, 0, "SoftwareVersion", "Cannot create an instance of SoftwareVersion.");
@@ -189,6 +191,7 @@ void initializeMetaTypes()
     analytics::IconManager::registerQmlType();
     FetchRequest::registerQmlType();
     ColorTheme::registerQmlType();
+    TranslationListModel::registerQmlType();
 
     qRegisterMetaType<nx::vms::client::core::ThumbnailStatus>();
 
