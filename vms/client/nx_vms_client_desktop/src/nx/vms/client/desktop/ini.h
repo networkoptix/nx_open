@@ -314,10 +314,6 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
     // VMS-37021
     NX_INI_FLAG(false, lookupLists, "[Feature] Enable Lookup Lists support.");
 
-    // VMS-32305
-    NX_INI_FLAG(false, enableRemoteArchiveSynchronization,
-        "[Feature] Enable ONVIF Profile G");
-
     // VMS-41144
     NX_INI_FLAG(false, nativeLinkForTemporaryUsers,
         "[Feature] Use native link type for temporary user");
