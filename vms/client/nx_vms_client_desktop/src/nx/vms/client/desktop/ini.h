@@ -198,6 +198,9 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
     NX_INI_INT(false, enableDesktopCameraLazyInitialization,
         "[Dev] Initialize desktop camera only on Push My Screen action.");
 
+    NX_INI_FLAG(false, disableCrossSiteConnections,
+        "[Dev] Disable cross-site connects to simplify debug and logs collection.");
+
     // ---------------------------------------------------------------------------------------------
     // Design section
     // Flags here can be removed when designers approve the resulting approach.
