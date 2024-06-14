@@ -35,6 +35,38 @@ static QString iconFileName(const QUrl& webPageUrl, const QString& postfix = {})
         + postfix + ".png";
 }
 
+void loadMetadata(
+    QWebEnginePage* webPage,
+    std::function<void(bool hasIcon, bool dedicatedWindow, QSize windowSize)> callback)
+{
+    const QString getMetadata = R"(
+        const dedicatedWindow = document.querySelector("meta[name='dedicatedWindow']")
+        const icon = document.querySelector("link[rel*='icon']")
+
+        // Result expression.
+        new Object({
+            hasIcon: !!icon,
+            dedicatedWindow: dedicatedWindow && {
+                width: parseInt(dedicatedWindow.attributes.width?.value),
+                height: parseInt(dedicatedWindow.attributes.height?.value)
+            }
+        })
+    )";
+
+    webPage->runJavaScript(
+        getMetadata,
+        nx::utils::guarded(webPage,
+            [callback](const QVariant& value)
+            {
+                const QJsonObject result = value.toJsonObject();
+                const QJsonObject dedicatedWindow = result["dedicatedWindow"].toObject();
+                const QSize windowSize =
+                    QSize{dedicatedWindow["width"].toInt(), dedicatedWindow["height"].toInt()};
+
+                callback(result["hasIcon"].toBool(), !dedicatedWindow.isEmpty(), windowSize);
+            }));
+}
+
 } // namespace
 
 WebPageDataCache::WebPageDataCache(QObject* parent):
@@ -96,35 +128,17 @@ void WebPageDataCache::loadNext()
                     return;
                 }
 
-                const QString getMetadata = R"(
-                    const dedicatedWindow = document.querySelector("meta[name='dedicatedWindow']")
-                    dedicatedWindow
-                        ? {
-                            width: parseInt(dedicatedWindow.attributes.width?.value),
-                            height: parseInt(dedicatedWindow.attributes.height?.value)
-                        }
-                        : null
-                    )";
-
-                auto saveMetadata = nx::utils::guarded(m_webPage.get(),
-                    [this, webPageUrl](const QVariant& result)
+                loadMetadata(m_webPage.get(),
+                    [this, webPageUrl](bool hasIcon, bool dedicatedWindow, QSize windowSize)
                     {
-                        if (!result.isNull())
-                        {
-                            const QJsonObject obj = result.toJsonObject();
-                            const QSize size{obj["width"].toInt(), obj["height"].toInt()};
-
-                            m_settings[webPageUrl].windowSize = size;
-                            emit windowSizeChanged(webPageUrl, size);
-                        }
+                        if (dedicatedWindow)
+                            emit windowSizeChanged(webPageUrl, windowSize);
 
                         // Wait until both an icon and metadata are loaded.
                         m_isMetadataLoaded = true;
-                        if (m_isIconLoaded)
+                        if (m_isIconLoaded || !hasIcon)
                             executeLater([this]() { loadNext(); }, this);
                     });
-
-                m_webPage->runJavaScript(getMetadata, saveMetadata);
             });
 
         m_webPage->setUrl(webPageUrl);
