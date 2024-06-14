@@ -291,6 +291,8 @@ void initialize(Manager* manager, Action* root)
 
     /* Context menu actions. */
 
+    vx::registerArrangeInGridAction(factory);
+
     factory(FitInViewAction)
         .flags(Scene | NoTarget)
         .text(ContextMenu::tr("Fit in View"))
