@@ -186,6 +186,9 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
     NX_INI_FLAG(false, mainSceneInQml,
         "[Dev] Allow to render main scene translated to QML.");
 
+    NX_INI_FLAG(false, disableCrossSiteConnections,
+        "[Dev] Disable cross-site connects to simplify debug and logs collection.");
+
     // ---------------------------------------------------------------------------------------------
     // Design section
     // Flags here can be removed when designers approve the resulting approach.
