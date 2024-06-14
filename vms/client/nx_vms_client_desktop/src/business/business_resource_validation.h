@@ -17,23 +17,37 @@ bool actionAllowedForUser(
 
 } // namespace QnBusiness
 
-template<typename CheckingPolicy>
-static bool isResourcesListValid(const QnResourceList& resources)
+template<typename ValidationPolicy>
+static bool isResourcesListValid(
+    nx::vms::client::desktop::SystemContext* context,
+    const ValidationPolicy& policy,
+    const QnResourceList& resources)
 {
-    typedef typename CheckingPolicy::resource_type ResourceType;
+    typedef typename ValidationPolicy::resource_type ResourceType;
 
     auto filtered = resources.filtered<ResourceType>();
 
     if (filtered.isEmpty())
-        return CheckingPolicy::emptyListIsValid();
+        return ValidationPolicy::emptyListIsValid();
 
-    if (filtered.size() > 1 && !CheckingPolicy::multiChoiceListIsValid())
+    if (filtered.size() > 1 && !ValidationPolicy::multiChoiceListIsValid())
         return false;
 
     for (const auto& resource: filtered)
-        if (!CheckingPolicy::isResourceValid(resource))
+    {
+        if (!policy.isResourceValid(context, resource))
             return false;
+    }
+
     return true;
+}
+
+template<typename ValidationPolicy>
+static bool isResourcesListValid(
+    nx::vms::client::desktop::SystemContext* context, const QnResourceList& resources)
+{
+    ValidationPolicy policy;
+    return isResourcesListValid(context, policy, resources);
 }
 
 class QnSendEmailActionDelegate: public QnResourceSelectionDialogDelegate

@@ -191,6 +191,8 @@ LayoutSelectionDialog::~LayoutSelectionDialog()
 void LayoutSelectionDialog::at_layoutsChanged()
 {
     update();
+
+    emit layoutsChanged();
 }
 
 void LayoutSelectionDialog::at_localLayoutSelected()
@@ -200,6 +202,8 @@ void LayoutSelectionDialog::at_localLayoutSelected()
         m_sharedLayoutsModel->setCheckedResources({});
 
     update();
+
+    emit layoutsChanged();
 }
 
 void LayoutSelectionDialog::at_sharedLayoutSelected()
@@ -215,6 +219,8 @@ void LayoutSelectionDialog::at_sharedLayoutSelected()
         ui->localGroupBox->setHidden(true);
     }
     update();
+
+    emit layoutsChanged();
 }
 
 void LayoutSelectionDialog::setLocalLayouts(const QnResourceList& layouts,

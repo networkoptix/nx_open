@@ -72,7 +72,7 @@ public:
     struct DummyPolicy
     {
         using resource_type = QnResource;
-        static bool isResourceValid(const QnResourcePtr&) { return true; }
+        static bool isResourceValid(SystemContext*, const QnResourcePtr&) { return true; }
         static QString getText(SystemContext*, const QnResourceList&) { return {}; }
         static bool emptyListIsValid() { return true; }
         static bool multiChoiceListIsValid() { return true; }
@@ -82,6 +82,13 @@ public:
 
     template<typename ResourcePolicy>
     static bool selectCameras(SystemContext* context, UuidSet& selectedCameras, QWidget* parent);
+
+    template<typename ResourcePolicy>
+    static bool selectCameras(
+        SystemContext* context,
+        UuidSet& selectedCameras,
+        const ResourcePolicy& policy,
+        QWidget* parent);
 
 protected:
     virtual void showEvent(QShowEvent* event) override;
@@ -104,24 +111,36 @@ bool CameraSelectionDialog::selectCameras(
     UuidSet& selectedCameras,
     QWidget* parent)
 {
+    ResourcePolicy policy;
+    return selectCameras(context, selectedCameras, policy, parent);
+}
+
+template<typename ResourcePolicy>
+bool CameraSelectionDialog::selectCameras(
+    SystemContext* context,
+    UuidSet& selectedCameras,
+    const ResourcePolicy& policy,
+    QWidget* parent)
+{
     const auto resourceValidator =
-        [](const QnResourcePtr& resource)
+        [&policy, context](const QnResourcePtr& resource)
         {
             const auto target = resource.dynamicCast<typename ResourcePolicy::resource_type>();
             if (target.isNull())
                 return true;
-            return ResourcePolicy::isResourceValid(target);
+
+            return policy.isResourceValid(context, target);
         };
 
     const auto alertTextProvider =
-        [context](const QSet<QnResourcePtr>& resourcesSet)
+        [&policy, context](const QSet<QnResourcePtr>& resourcesSet)
         {
             QnResourceList resourcesList;
             std::copy(std::cbegin(resourcesSet), std::cend(resourcesSet),
                 std::back_inserter(resourcesList));
 
-            const bool isValid = isResourcesListValid<ResourcePolicy>(resourcesList);
-            return isValid ? QString() : ResourcePolicy::getText(context, resourcesList);
+            const bool isValid = isResourcesListValid(context, policy, resourcesList);
+            return isValid ? QString() : policy.getText(context, resourcesList);
         };
 
     CameraSelectionDialog dialog(ResourceFilter(), resourceValidator, alertTextProvider, parent);

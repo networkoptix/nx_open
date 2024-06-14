@@ -38,7 +38,7 @@ ValidationResult camerasValidity(
 
     for (const auto& camera: cameras)
     {
-        if (!ValidationPolicy::isResourceValid(camera))
+        if (!ValidationPolicy::isResourceValid(context, camera))
         {
             hasInvalid = true;
             break;
@@ -54,14 +54,28 @@ ValidationResult camerasValidity(
 }
 
 template <class ValidationPolicy>
-ValidationResult cameraValidity(common::SystemContext* context, QnVirtualCameraResourcePtr device)
+ValidationResult cameraValidity(
+    common::SystemContext* context,
+    const ValidationPolicy& policy,
+    const QnVirtualCameraResourcePtr& device)
 {
-    if (ValidationPolicy::isResourceValid(device))
+    if (policy.isResourceValid(context, device))
         return {};
 
     return {
-        QValidator::State::Invalid,
-        ValidationPolicy::getText(context, {device})};
+        QValidator::State::Intermediate,
+        policy.getText(context, {device})};
+}
+
+template <class ValidationPolicy>
+ValidationResult cameraValidity(
+    common::SystemContext* context, const QnVirtualCameraResourcePtr& device)
+{
+    if (!NX_ASSERT(device, "Camera resource must be provided"))
+        return {QValidator::State::Invalid, QString{}};
+
+    ValidationPolicy policy;
+    return cameraValidity(context, policy, device);
 }
 
 inline ValidationResult usersValidity(
@@ -76,5 +90,10 @@ inline ValidationResult usersValidity(
         policy.calculateAlert(acceptAll, subjects)
     };
 }
+
+NX_VMS_RULES_API ValidationResult layoutValidity(
+    common::SystemContext* context,
+    const QnLayoutResourcePtr& layout,
+    const QnUserResourceList& users);
 
 } // namespace nx::vms::rules::utils

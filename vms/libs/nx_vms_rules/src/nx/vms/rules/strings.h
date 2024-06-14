@@ -87,6 +87,8 @@ public:
     static QString selectCamera(common::SystemContext* context, bool allowMultipleSelection = true);
     static QString noSuitableServers(QValidator::State state);
     static QString fieldValueMustBeProvided(const QString& fieldName);
+    static QString layoutCanOnlyBeShownToOwner(const QString& ownerName);
+    static QString usersHaveNoAccessToLayout(bool allUsersWithoutAccess);
 
     static TranslatableString at();
     static TranslatableString to();

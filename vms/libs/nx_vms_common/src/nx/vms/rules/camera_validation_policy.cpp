@@ -4,7 +4,9 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
+#include <core/resource/layout_resource.h>
 #include <core/resource/resource_display_info.h>
+#include <core/resource_management/resource_pool.h>
 
 using namespace nx::vms::api;
 
@@ -86,7 +88,7 @@ QString genericCameraText(
 }
 
 template <typename CheckingPolicy>
-int invalidResourcesCount(const QnResourceList &resources)
+int invalidResourcesCount(nx::vms::common::SystemContext* context, const QnResourceList &resources)
 {
     typedef typename CheckingPolicy::resource_type ResourceType;
 
@@ -94,7 +96,7 @@ int invalidResourcesCount(const QnResourceList &resources)
     int invalid = 0;
     for(const auto& resource: filtered)
     {
-        if (!CheckingPolicy::isResourceValid(resource))
+        if (!CheckingPolicy::isResourceValid(context, resource))
             invalid++;
     }
 
@@ -123,7 +125,8 @@ QString QnRequireCameraPolicy::getText(
         context, cameras, detailed, "", /* invalid */ 0);
 }
 
-bool QnCameraInputPolicy::isResourceValid(const QnVirtualCameraResourcePtr &camera)
+bool QnCameraInputPolicy::isResourceValid(
+    nx::vms::common::SystemContext* /*context*/, const QnVirtualCameraResourcePtr &camera)
 {
     return camera->hasCameraCapabilities(DeviceCapability::inputPort);
 }
@@ -134,12 +137,13 @@ QString QnCameraInputPolicy::getText(
     const bool detailed)
 {
     QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
-    int invalid = invalidResourcesCount<QnCameraInputPolicy>(cameras);
+    int invalid = invalidResourcesCount<QnCameraInputPolicy>(context, cameras);
     return genericCameraText<QnCameraInputPolicy>(
         context, cameras, detailed, tr("%1 have no input ports", "", invalid), invalid);
 }
 
-bool QnCameraOutputPolicy::isResourceValid(const QnVirtualCameraResourcePtr &camera)
+bool QnCameraOutputPolicy::isResourceValid(
+    nx::vms::common::SystemContext* /*context*/, const QnVirtualCameraResourcePtr &camera)
 {
     return camera->hasCameraCapabilities(DeviceCapability::outputPort);
 }
@@ -150,19 +154,20 @@ QString QnCameraOutputPolicy::getText(
     const bool detailed)
 {
     QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
-    int invalid = invalidResourcesCount<QnCameraOutputPolicy>(cameras);
+    int invalid = invalidResourcesCount<QnCameraOutputPolicy>(context, cameras);
     return genericCameraText<QnCameraOutputPolicy>(
         context, cameras, detailed, tr("%1 have no output relays", "", invalid), invalid);
 }
 
-bool QnExecPtzPresetPolicy::isResourceValid(const QnVirtualCameraResourcePtr& camera)
+bool QnExecPtzPresetPolicy::isResourceValid(
+    nx::vms::common::SystemContext* /*context*/, const QnVirtualCameraResourcePtr& camera)
 {
     return camera->hasAnyOfPtzCapabilities(Ptz::PresetsPtzCapability)
         || camera->getDewarpingParams().enabled;
 }
 
 QString QnExecPtzPresetPolicy::getText(
-    nx::vms::common::SystemContext* /*context*/,
+    nx::vms::common::SystemContext* context,
     const QnResourceList& resources,
     const bool /*detailed*/)
 {
@@ -171,13 +176,14 @@ QString QnExecPtzPresetPolicy::getText(
         return tr("Select exactly one camera");
 
     QnVirtualCameraResourcePtr camera = cameras.first();
-    if (!isResourceValid(camera))
+    if (!isResourceValid(context, camera))
         return tr("%1 has no PTZ presets").arg(getShortResourceName(camera));
 
     return getShortResourceName(camera);
 }
 
-bool QnCameraMotionPolicy::isResourceValid(const QnVirtualCameraResourcePtr& camera)
+bool QnCameraMotionPolicy::isResourceValid(
+    nx::vms::common::SystemContext* /*context*/, const QnVirtualCameraResourcePtr& camera)
 {
     return camera->isScheduleEnabled() && camera->isMotionDetectionSupported();
 }
@@ -188,12 +194,13 @@ QString QnCameraMotionPolicy::getText(
     const bool detailed)
 {
     QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
-    int invalid = invalidResourcesCount<QnCameraMotionPolicy>(cameras);
+    int invalid = invalidResourcesCount<QnCameraMotionPolicy>(context, cameras);
     return genericCameraText<QnCameraMotionPolicy>(
         context, cameras, detailed, tr("Recording or motion detection is disabled for %1"), invalid);
 }
 
-bool QnCameraAudioTransmitPolicy::isResourceValid(const QnVirtualCameraResourcePtr& camera)
+bool QnCameraAudioTransmitPolicy::isResourceValid(
+    nx::vms::common::SystemContext* /*context*/, const QnVirtualCameraResourcePtr& camera)
 {
     return camera->hasTwoWayAudio();
 }
@@ -204,7 +211,7 @@ QString QnCameraAudioTransmitPolicy::getText(
     const bool detailed)
 {
     QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
-    int invalid = invalidResourcesCount<QnCameraAudioTransmitPolicy>(cameras);
+    int invalid = invalidResourcesCount<QnCameraAudioTransmitPolicy>(context, cameras);
     if (cameras.isEmpty())
     {
         return QnDeviceDependentStrings::getDefaultNameFromSet(
@@ -217,7 +224,8 @@ QString QnCameraAudioTransmitPolicy::getText(
         context, cameras, detailed, tr("%1 does not support two-way audio", "", invalid), invalid);
 }
 
-bool QnCameraRecordingPolicy::isResourceValid(const QnVirtualCameraResourcePtr& camera)
+bool QnCameraRecordingPolicy::isResourceValid(
+    nx::vms::common::SystemContext* /*context*/, const QnVirtualCameraResourcePtr& camera)
 {
     return camera->isScheduleEnabled();
 }
@@ -228,12 +236,13 @@ QString QnCameraRecordingPolicy::getText(
     const bool detailed)
 {
     QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
-    int invalid = invalidResourcesCount<QnCameraRecordingPolicy>(cameras);
+    int invalid = invalidResourcesCount<QnCameraRecordingPolicy>(context, cameras);
     return genericCameraText<QnCameraRecordingPolicy>(
         context, cameras, detailed, tr("Recording is disabled for %1"), invalid);
 }
 
-bool QnCameraAnalyticsPolicy::isResourceValid(const QnVirtualCameraResourcePtr& camera)
+bool QnCameraAnalyticsPolicy::isResourceValid(
+    nx::vms::common::SystemContext* /*context*/, const QnVirtualCameraResourcePtr& camera)
 {
     return !camera->compatibleAnalyticsEngines().isEmpty();
 }
@@ -245,15 +254,41 @@ QString QnCameraAnalyticsPolicy::getText(
 {
     const auto cameras = resources.filtered<QnVirtualCameraResource>();
 
-    int invalid = invalidResourcesCount<QnCameraAnalyticsPolicy>(cameras);
+    int invalid = invalidResourcesCount<QnCameraAnalyticsPolicy>(context, cameras);
     return genericCameraText<QnCameraAnalyticsPolicy>(
         context, cameras, detailed, tr("Analytics is not available for %1"), invalid);
+}
+
+void QnFullscreenCameraPolicy::setLayouts(QnLayoutResourceList layouts)
+{
+    m_layouts = std::move(layouts);
+}
+
+bool QnFullscreenCameraPolicy::isResourceValid(
+    nx::vms::common::SystemContext* context, const QnVirtualCameraResourcePtr& camera) const
+{
+    for (const auto& layout: m_layouts)
+    {
+        const auto layoutItem = layout->getItems();
+        bool isCameraOnLayout = std::any_of(
+            layoutItem.cbegin(),
+            layoutItem.cend(),
+            [&camera, context](const nx::vms::common::LayoutItemData& item)
+            {
+                return context->resourcePool()->getResourceByDescriptor(item.resource) == camera;
+            });
+
+        if (!isCameraOnLayout)
+            return false;
+    }
+
+    return true;
 }
 
 QString QnFullscreenCameraPolicy::getText(
     nx::vms::common::SystemContext* context,
     const QnResourceList& resources,
-    const bool /*detailed*/)
+    const bool /*detailed*/) const
 {
     const auto cameras = resources.filtered<QnVirtualCameraResource>();
     if (cameras.empty())
@@ -261,6 +296,13 @@ QString QnFullscreenCameraPolicy::getText(
 
     if (cameras.size() != 1)
         return tr("Select exactly one camera");
+
+    if (!isResourceValid(context, cameras.first()))
+    {
+        return m_layouts.size() == 1
+            ? tr("This camera is not currently on the selected layout")
+            : tr("This camera is not currently on some of the selected layouts");
+    }
 
     return getShortResourceName(cameras.first());
 }
