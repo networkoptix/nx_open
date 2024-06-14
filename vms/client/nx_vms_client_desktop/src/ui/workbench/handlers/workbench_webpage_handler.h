@@ -4,6 +4,7 @@
 
 #include <QtCore/QObject>
 
+#include <core/resource/resource_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 namespace nx::vms::api { enum class WebPageSubtype; }
@@ -22,4 +23,5 @@ public:
 private:
     void addNewWebPage(nx::vms::api::WebPageSubtype subtype);
     void editWebPage();
+    void openInDedicatedWindow(const QnWebPageResourcePtr& webPage);
 };

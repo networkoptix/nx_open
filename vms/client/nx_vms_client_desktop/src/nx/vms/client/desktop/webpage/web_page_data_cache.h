@@ -50,15 +50,15 @@ signals:
     /** Emitted when the icon associated with webPageUrl changes. */
     void iconChanged(const QUrl& webPageUrl);
 
-    /** Emitted when the webpage "windowSize" metadata parameter changes. */
-    void windowSizeChanged(const QUrl& webPageUrl, const QSize& size);
+    /** Emitted when the webpage "dedicatedWindow" settings are loaded. */
+    void dedicatedWindowSettingsLoaded(const QUrl& webPageUrl, const QSize& size);
 
 private:
     void loadNext();
     void saveIcon(const QUrl& webPageUrl, const QImage& icon, const QImage& icon2x = {});
 
 private:
-    QMap<QUrl /*webPageUrl*/, WebPageSettings> m_settings;
+    QMap<QUrl /*webPageUrl*/, QUrl /*iconUrl*/> m_iconPaths;
 
     QList<QUrl> m_urlsToRefresh;
     std::unique_ptr<QWebEnginePage> m_webPage;

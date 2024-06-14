@@ -17,14 +17,19 @@
 #include <core/resource/webpage_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/guarded_callback.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/dialogs/web_view_dialog.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/webpage/web_page_data_cache.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
 #include <ui/dialogs/webpage_dialog.h>
+#include <ui/workbench/workbench_context.h>
+#include <utils/common/event_processors.h>
 
 using namespace nx::vms::client::desktop;
 
@@ -86,55 +91,12 @@ QnWorkbenchWebPageHandler::QnWorkbenchWebPageHandler(QObject* parent /*= nullptr
                 if (!webPage)
                     continue;
 
-                const auto proxyResource =
-                    webPage->getOptions().testFlag(QnWebPageResource::Proxied)
-                        ? webPage
-                        : QnWebPageResourcePtr{};
-
-                auto webDialog = new QnSessionAware<WebViewDialog>(
-                    mainWindowWidget(), QDialogButtonBox::NoButton);
-
-                webDialog->setWindowFlag(Qt::Tool);
-                webDialog->setAttribute(Qt::WA_DeleteOnClose);
-                webDialog->setAttribute(Qt::WA_MacAlwaysShowToolWindow);
-                webDialog->init(
-                    webPage->getUrl(),
-                    /*enableClientApi*/ webPage->getOptions().testFlag(
-                        QnWebPageResource::Integration),
-                    windowContext(),
-                    proxyResource,
-                    /*authenticator*/ nullptr,
-                    /*checkCertificate*/ true);
-
-                auto updateSize =
-                    [webDialog, webPage]()
-                    {
-                        QRect geometry = webDialog->geometry();
-                        const QPoint center = geometry.center();
-                        geometry.setSize(webPage->dedicatedWindowSize());
-                        geometry.moveCenter(center);
-                        webDialog->setGeometry(geometry);
-                    };
-
-                connect(webPage.get(), &QnWebPageResource::openInWindowChanged,
-                    webDialog, updateSize);
-
-                connect(webDialog, &QDialog::finished, this, nx::utils::guarded(webPage.get(),
-                    [webPage, webDialog](int /*result*/)
-                    {
-                        if (webPage->isOpenInWindow())
-                        {
-                            webPage->setOpenInWindow(true, webDialog->size());
-                            qnResourcesChangesManager->saveWebPage(webPage);
-                        }
-                    }));
-
-                webDialog->show();
-                updateSize();
+                openInDedicatedWindow(webPage);
             }
         });
 
-    connect(appContext()->webPageDataCache(), &WebPageDataCache::windowSizeChanged, this,
+    connect(appContext()->webPageDataCache(), &WebPageDataCache::dedicatedWindowSettingsLoaded,
+        this,
         [this](const QUrl& webPageUrl, const QSize& size)
         {
             auto webPage =
@@ -146,7 +108,10 @@ QnWorkbenchWebPageHandler::QnWorkbenchWebPageHandler(QObject* parent /*= nullptr
                 && size.isValid())
             {
                 webPage->setOpenInWindow(true, size);
-                qnResourcesChangesManager->saveWebPage(webPage);
+
+                // Save if possible, otherwise use it locally.
+                if (accessController()->hasPermissions(webPage, Qn::SavePermission))
+                    qnResourcesChangesManager->saveWebPage(webPage);
             }
         });
 }
@@ -193,6 +158,8 @@ void QnWorkbenchWebPageHandler::addNewWebPage(nx::vms::api::WebPageSubtype subty
         menu()->trigger(menu::OpenInDedicatedWindowAction, webPage);
     else
         menu()->trigger(menu::DropResourcesAction, webPage);
+
+    appContext()->webPageDataCache()->refresh(webPage->getUrl());
 }
 
 void QnWorkbenchWebPageHandler::editWebPage()
@@ -260,4 +227,74 @@ void QnWorkbenchWebPageHandler::editWebPage()
     webPage->setOpenInWindow(isOpenInWindow);
 
     qnResourcesChangesManager->saveWebPage(webPage);
+}
+
+void QnWorkbenchWebPageHandler::openInDedicatedWindow(const QnWebPageResourcePtr& webPage)
+{
+    const auto proxyResource =
+        webPage->getOptions().testFlag(QnWebPageResource::Proxied)
+            ? webPage
+            : QnWebPageResourcePtr{};
+
+    auto webDialog =
+        new QnSessionAware<WebViewDialog>(mainWindowWidget(), QDialogButtonBox::NoButton);
+
+    webDialog->setWindowFlag(Qt::Tool);
+    webDialog->setAttribute(Qt::WA_DeleteOnClose);
+    webDialog->setAttribute(Qt::WA_MacAlwaysShowToolWindow);
+    webDialog->init(
+        webPage->getUrl(),
+        /*enableClientApi*/ webPage->getOptions().testFlag(QnWebPageResource::Integration),
+        windowContext(),
+        proxyResource,
+        /*authenticator*/ nullptr,
+        /*checkCertificate*/ true);
+
+    auto getSavedSize =
+        [this](const QString& url, const QSize& defaultSize)
+        {
+            const QString user = context()->user()->getName();
+            const WebPageSettings settings = appContext()->localSettings()->webPageSettings()[url];
+
+            return settings.windowSize.value(user, defaultSize);
+        };
+
+    auto saveSize =
+        [this](const QString& url, const QSize& size)
+        {
+            const QString user = context()->user()->getName();
+            auto settings = appContext()->localSettings()->webPageSettings();
+            settings[url].windowSize[user] = size;
+            appContext()->localSettings()->webPageSettings = settings;
+        };
+
+    auto updateSize =
+        [webDialog, webPage, getSavedSize]()
+        {
+            QRect geometry = webDialog->geometry();
+            const QPoint center = geometry.center();
+            geometry.setSize(getSavedSize(webPage->getUrl(), webPage->dedicatedWindowSize()));
+            geometry.moveCenter(center);
+            webDialog->setGeometry(geometry);
+        };
+
+    auto updateSizeConnection =
+        connect(webPage.get(), &QnWebPageResource::dedicatedWindowSettingsChanged,
+            webDialog, updateSize);
+
+    connect(webDialog, &QDialog::finished, this, nx::utils::guarded(webPage.get(),
+        [webPage, webDialog, saveSize](int /*result*/)
+        {
+            saveSize(webPage->getUrl(), webDialog->size());
+        }));
+
+    webDialog->show();
+    updateSize();
+
+    // Do not update if manually resized.
+    installEventHandler(webDialog, {QEvent::Resize}, this,
+        [webDialog, updateSizeConnection]()
+        {
+            webDialog->disconnect(updateSizeConnection);
+        });
 }

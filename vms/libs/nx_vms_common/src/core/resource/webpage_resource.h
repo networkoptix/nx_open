@@ -95,7 +95,7 @@ signals:
     void subtypeChanged(const QnWebPageResourcePtr& webPage);
     void proxyDomainAllowListChanged(const QnWebPageResourcePtr& webPage);
     void refreshIntervalChanged();
-    void openInWindowChanged();
+    void dedicatedWindowSettingsChanged();
 
 private:
     // This class must not store its status on server side

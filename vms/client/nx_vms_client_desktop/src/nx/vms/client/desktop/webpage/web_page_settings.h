@@ -14,7 +14,8 @@ namespace nx::vms::client::desktop {
 struct WebPageSettings
 {
     std::optional<QString> icon;
-    std::optional<QSize> windowSize;
+    QMap<QString /*user*/, QSize> windowSize;
+
 
     bool operator==(const WebPageSettings&) const = default;
 };

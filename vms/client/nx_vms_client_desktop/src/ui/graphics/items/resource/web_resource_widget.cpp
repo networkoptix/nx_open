@@ -141,7 +141,7 @@ QnWebResourceWidget::QnWebResourceWidget(
     const auto webPage = resource().dynamicCast<QnWebPageResource>();
     if (!webPage->isOpenInWindow())
     {
-        connect(webPage.get(), &QnWebPageResource::openInWindowChanged, this,
+        connect(webPage.get(), &QnWebPageResource::dedicatedWindowSettingsChanged, this,
             [this, webPage]()
             {
                 if (webPage->isOpenInWindow())
