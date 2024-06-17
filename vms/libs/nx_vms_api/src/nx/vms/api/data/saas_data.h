@@ -309,7 +309,7 @@ QN_FUSION_DECLARE_FUNCTIONS(SaasData, (json), NX_VMS_API)
 
 struct NX_VMS_API SaasWithServices: SaasData
 {
-    /**%apidoc SaaS services available to the system from Channel Partners, indexed by the service ID. */
+    /**%apidoc SaaS services available to the Site from Channel Partners, indexed by the service ID. */
     std::map<nx::Uuid, nx::vms::api::SaasService> servicesAvailable;
 };
 #define SaasWithServices_Fields SaasData_Fields(servicesAvailable)
