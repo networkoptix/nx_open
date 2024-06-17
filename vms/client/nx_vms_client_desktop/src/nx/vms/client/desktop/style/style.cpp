@@ -949,6 +949,13 @@ void Style::drawPrimitive(PrimitiveElement element,
             painter->drawRoundedRect(rect.adjusted(0, shadowShift, 0, shadowShift), 2, 2);
             painter->setBrush(buttonColor);
             painter->drawRoundedRect(rect.adjusted(0, qMax(0, -shadowShift), 0, 0), 2, 2);
+
+            if (isErrorStyle(widget))
+            {
+                QnScopedPainterPenRollback penRollback(painter, core::colorTheme()->color("red_l"));
+                painter->drawRoundedRect(rect, 2, 2);
+            }
+
             return;
         }
 
@@ -2747,6 +2754,8 @@ void Style::drawControl(ControlElement element,
 
                 if (isDefaultForegroundRole && isWarningStyle(widget))
                     foregroundRole = QPalette::BrightText;
+                else if (isDefaultForegroundRole && isErrorStyle(widget))
+                    foregroundRole = QPalette::PlaceholderText;
                 else if (isDefaultForegroundRole && isAccented(widget))
                     foregroundRole = QPalette::HighlightedText;
 
@@ -2761,7 +2770,9 @@ void Style::drawControl(ControlElement element,
                 /* Draw icon left-aligned: */
                 if (!buttonOption->icon.isNull())
                 {
-                    QIcon::Mode mode = buttonIconMode(*option);
+                    QIcon::Mode mode = isErrorStyle(widget)
+                        ? QIcon::Mode::Disabled
+                        : buttonIconMode(*option);
 
                     QIcon::State state =
                         buttonOption->state.testFlag(State_On) ? QIcon::On : QIcon::Off;

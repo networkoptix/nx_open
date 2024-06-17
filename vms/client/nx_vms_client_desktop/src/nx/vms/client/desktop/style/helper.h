@@ -178,6 +178,9 @@ struct Properties
     /** Name of a property to make button warning-colored. */
     static const char* kWarningStyleProperty;
 
+    /** Name of a property to make button error-colored. */
+    static const char* kErrorStyleProperty;
+
     /** Name of a property to change default width of the slider handle. */
     static const char* kSliderLength;
 
@@ -257,6 +260,7 @@ QColor linkColor(const QPalette& palette, bool hovered);
 
 bool isAccented(const QWidget* widget);
 bool isWarningStyle(const QWidget* widget);
+bool isErrorStyle(const QWidget* widget);
 bool hasTextButtonBackgroundStyle(const QWidget* widget);
 int textButtonIconSpacing(const QWidget* widget);
 
