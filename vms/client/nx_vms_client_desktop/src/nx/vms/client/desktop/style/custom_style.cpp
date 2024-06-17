@@ -105,6 +105,7 @@ void resetButtonStyle(QAbstractButton* button)
 {
     button->setProperty(nx::style::Properties::kAccentStyleProperty, false);
     button->setProperty(nx::style::Properties::kWarningStyleProperty, false);
+    button->setProperty(nx::style::Properties::kErrorStyleProperty, false);
     button->setProperty(nx::style::Properties::kTextButtonBackgroundProperty, false);
     button->update();
 }
@@ -132,6 +133,12 @@ void setAccentStyle(QDialog* dialog, QDialogButtonBox::StandardButton standardBu
 void setWarningButtonStyle(QAbstractButton* button)
 {
     button->setProperty(nx::style::Properties::kWarningStyleProperty, true);
+    button->update();
+}
+
+void setErrorButtonStyle(QAbstractButton* button)
+{
+    button->setProperty(nx::style::Properties::kErrorStyleProperty, true);
     button->update();
 }
 

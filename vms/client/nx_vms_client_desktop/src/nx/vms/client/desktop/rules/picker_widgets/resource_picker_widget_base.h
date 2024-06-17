@@ -5,6 +5,7 @@
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QVBoxLayout>
 
+#include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/rules/action_builder_fields/text_field.h>
 #include <nx/vms/rules/utils/field.h>
 
@@ -57,11 +58,13 @@ protected:
             const auto validity = fieldValidity();
             if (validity.validity == QValidator::State::Invalid)
             {
+                setErrorButtonStyle(m_selectButton);
                 PlainFieldPickerWidget<F>::setValidity(validity);
                 return;
             }
         }
 
+        resetButtonStyle(m_selectButton);
         // Only error state must be shown by the widget. Intermidiate state warning must be shown
         // by the resource selection dialog.
         PlainFieldPickerWidget<F>::setValidity({});

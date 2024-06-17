@@ -34,6 +34,7 @@ void resetButtonStyle(QAbstractButton* button);
 void setAccentStyle(QAbstractButton* button);
 void setAccentStyle(QDialog* dialog, QDialogButtonBox::StandardButton standardButton);
 void setWarningButtonStyle(QAbstractButton* button);
+void setErrorButtonStyle(QAbstractButton* button);
 
 /** Adds background to text button. Has no effect if the button isn't a text ("flat") button. */
 void setTextButtonWithBackgroundStyle(QAbstractButton* button);
