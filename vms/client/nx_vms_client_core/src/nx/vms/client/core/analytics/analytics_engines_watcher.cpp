@@ -96,7 +96,7 @@ void AnalyticsEnginesWatcher::Private::at_engineManifestChanged(
     if (it == engines.end())
         return;
 
-    it->isDeviceDependent = engine->isDeviceDependent();
+    *it = engineInfoFromResource(engine, SettingsModelSource::resourceProperty);
     emit q->engineUpdated(it->id);
 }
 
