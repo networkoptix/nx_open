@@ -46,6 +46,17 @@ void EventParametersDropDownDelegate::paint(
     }
 }
 
+QSize EventParametersDropDownDelegate::sizeHint(
+    const QStyleOptionViewItem& option, const QModelIndex& index) const
+{
+    auto size = base_type::sizeHint(option, index);
+
+    if (isSeparator(index))
+        size.setHeight(size.height() / 2);
+
+    return size;
+}
+
 QString EventParametersDropDownDelegate::displayText(
     const QVariant& value, const QLocale& /*locale*/) const
 {
