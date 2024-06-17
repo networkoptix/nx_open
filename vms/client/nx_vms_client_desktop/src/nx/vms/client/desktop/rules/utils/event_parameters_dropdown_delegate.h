@@ -19,6 +19,8 @@ public:
         const QStyleOptionViewItem& option,
         const QModelIndex& index) const override;
     virtual QString displayText(const QVariant& value, const QLocale& locale) const override;
+    virtual QSize sizeHint(
+        const QStyleOptionViewItem& option, const QModelIndex& index) const override;
 };
 
 } // namespace nx::vms::client::desktop
