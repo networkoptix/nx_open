@@ -19,8 +19,8 @@ ModalDialog
 
     required property Analytics.StateView taxonomy
     required property LookupListEntriesModel model
-    property alias filePath: previewProcessor.filePath
-    property alias separatorSymbol: previewProcessor.separator
+    property alias filePath: filePathField.text
+    property alias separatorSymbol: separatorField.text
 
     title: qsTr("Import List")
     minimumWidth: 611
