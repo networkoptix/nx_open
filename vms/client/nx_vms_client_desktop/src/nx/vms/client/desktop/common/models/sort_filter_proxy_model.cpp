@@ -51,7 +51,7 @@ int SortFilterProxyModel::count() const
 
 int SortFilterProxyModel::sourceRole(const QString& name) const
 {
-    return roleNames().key(name.toUtf8(), Qt::DisplayRole);
+    return roleNames().key(name.toUtf8(), sortRole());
 }
 
 void SortFilterProxyModel::sort(int column, Qt::SortOrder order)
