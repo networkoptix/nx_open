@@ -38,7 +38,7 @@ struct NX_VMS_API AuditLogFilter
     /**%apidoc:string
      * Server id. Can be obtained from "id" field via `GET /rest/v{1-}/servers`, or be `this` to
      * refer to the current Server, or be `*` to involve all Servers.
-     * %example this
+     * %example *
      */
     nx::Uuid serverId;
 
@@ -58,7 +58,10 @@ struct NX_VMS_API AuditLogFilter
      */
     QString to;
 
-    /**%apidoc[opt] */
+    /**%apidoc[opt]
+     * User session id to filter output.
+     * %example
+     */
     nx::Uuid sessionId;
 };
 #define AuditLogFilter_Fields (serverId)(from)(to)(sessionId)
