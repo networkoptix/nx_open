@@ -144,7 +144,7 @@ class NxOpenConan(ConanFile):
 
         self.build_requires("apidoctool/3.0" "#a2bdf4e63403db9aecbe676c933d0344")
         self.build_requires("qt-host/6.5.3" "#cb4a89251221cd4683f58f03fd308218")
-        self.build_requires("swagger-codegen/3.0.21" "#0811242b97c1aa31a027c236fce5adbd")
+        self.build_requires("swagger-codegen/3.0.21" "#58d9476941c662c4b3f8a9e99683f034")
 
         if self.isLinux:
             # Note: For gcc-toolchain requirement see open/cmake/conan_profiles/gcc.profile.
