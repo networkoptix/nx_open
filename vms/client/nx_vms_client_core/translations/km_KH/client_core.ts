@@ -6,7 +6,7 @@
     <message>
       <source>Language Name</source>
       <comment>Language name that will be displayed to the user.</comment>
-      <translation>ខ េមរភ ាស ា</translation>
+      <translation>ខេមរភាសា</translation>
     </message>
   </context>
   <context>
