@@ -42,6 +42,7 @@ protected:
 
     virtual void wheelEvent(QWheelEvent* e) override;
     virtual void keyPressEvent(QKeyEvent* e) override;
+    void setCurrentIndex(int index);
 
 public slots:
     void setCurrentIndex(const QModelIndex& index);
