@@ -26,6 +26,9 @@ UserResource::UserResource(UserModelV1 data):
             data.accessibleResources.value_or(std::vector<nx::Uuid>()),
             data.isOwner);
 
+    if (!data.userRoleId.isNull())
+        groupIds.push_back(data.userRoleId);
+
     setRawPermissions(permissions);
     setGroupIds(groupIds);
     setResourceAccessRights(resourceAccessRights);
