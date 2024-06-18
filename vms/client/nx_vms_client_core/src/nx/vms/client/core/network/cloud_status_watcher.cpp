@@ -129,7 +129,7 @@ struct CloudStatusWatcher::Private: public QObject
     bool checkSuppressed();
 
     const CloudAuthData& authData() const;
-    bool setAuthData(const CloudAuthData& authData, bool initial, bool forced = false);
+    bool setAuthData(const CloudAuthData& authData, AuthMode mode);
 
     void saveCredentials() const;
 
@@ -145,7 +145,7 @@ struct CloudStatusWatcher::Private: public QObject
 
     void ensureCloudConnection();
     void resetCloudConnection();
-    void updateConnection(bool initial, bool forced = false);
+    void updateConnection(AuthMode mode);
     void issueAccessToken();
     void onAccessTokenIssued(ResultCode result, IssueTokenResponse response,
         const GrantType& grantTupe = GrantType::password);
@@ -246,18 +246,13 @@ void CloudStatusWatcher::logSession(const QString& cloudSystemId)
 
 void CloudStatusWatcher::resetAuthData()
 {
-    setAuthData(CloudAuthData());
+    setAuthData(CloudAuthData(), AuthMode::login);
     appContext()->coreSettings()->setCloudAuthData(CloudAuthData());
 }
 
-bool CloudStatusWatcher::setAuthData(const CloudAuthData& authData, bool forced)
+bool CloudStatusWatcher::setAuthData(const CloudAuthData& authData, AuthMode mode)
 {
-    return d->setAuthData(authData, /*initial*/ false, forced);
-}
-
-bool CloudStatusWatcher::setInitialAuthData(const CloudAuthData& authData)
-{
-    return d->setAuthData(authData, /*initial*/ true);
+    return d->setAuthData(authData, mode);
 }
 
 CloudStatusWatcher::ErrorCode CloudStatusWatcher::error() const
@@ -481,16 +476,26 @@ void CloudStatusWatcher::Private::resetCloudConnection()
     hasUpdateSystemsRequest = false;
 }
 
-void CloudStatusWatcher::Private::updateConnection(bool initial, bool forced)
+void CloudStatusWatcher::Private::updateConnection(AuthMode mode)
 {
-    const auto status = (initial || forced ? CloudStatusWatcher::Offline : CloudStatusWatcher::LoggedOut);
-    setStatus(status, CloudStatusWatcher::NoError);
+    switch (mode)
+    {
+        case AuthMode::initial:
+        case AuthMode::forced:
+            setStatus(CloudStatusWatcher::Offline, CloudStatusWatcher::NoError);
+            break;
+
+        case AuthMode::login:
+            setStatus(CloudStatusWatcher::LoggedOut, CloudStatusWatcher::NoError);
+            break;
+    }
+
     resetCloudConnection();
 
     const auto& credentials = m_authData.credentials;
     if (m_authData.empty())
     {
-        const auto error = (initial || credentials.username.empty())
+        const auto error = (mode == AuthMode::initial || credentials.username.empty())
             ? CloudStatusWatcher::NoError
             : CloudStatusWatcher::InvalidPassword;
         setStatus(CloudStatusWatcher::LoggedOut, error);
@@ -499,7 +504,7 @@ void CloudStatusWatcher::Private::updateConnection(bool initial, bool forced)
     }
 
     ensureCloudConnection();
-    if (credentials.authToken.empty() || forced)
+    if (credentials.authToken.empty() || mode == AuthMode::forced)
     {
         issueAccessToken();
     }
@@ -781,7 +786,7 @@ bool CloudStatusWatcher::Private::checkSuppressed()
     return true;
 }
 
-bool CloudStatusWatcher::Private::setAuthData(const CloudAuthData& authData, bool initial, bool forced)
+bool CloudStatusWatcher::Private::setAuthData(const CloudAuthData& authData, AuthMode mode)
 {
     NX_ASSERT(!authData.credentials.authToken.isPassword());
 
@@ -794,7 +799,7 @@ bool CloudStatusWatcher::Private::setAuthData(const CloudAuthData& authData, boo
     m_authData = authData;
     m_tokenUpdater->onTokenUpdated(m_authData.expiresAt);
 
-    updateConnection(initial, forced);
+    updateConnection(mode);
 
     if (userChanged)
         emit q->cloudLoginChanged();

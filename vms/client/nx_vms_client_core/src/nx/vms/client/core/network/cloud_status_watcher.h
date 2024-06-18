@@ -66,8 +66,19 @@ public:
     /** Resets current cloud credentials. */
     Q_INVOKABLE void resetAuthData();
 
-    bool setInitialAuthData(const nx::vms::client::core::CloudAuthData& authData);
-    bool setAuthData(const nx::vms::client::core::CloudAuthData& authData, bool forced = false);
+    /** Options to update current credentials. */
+    enum class AuthMode
+    {
+        /** Setup credentials on application start. Consider current state as logged out. */
+        initial,
+
+        /** Setup credentials on login to the cloud / bind system to the cloud. */
+        login,
+
+        /** Change credentials forcefully, logout from the current session. */
+        forced,
+    };
+    bool setAuthData(const CloudAuthData& authData, AuthMode mode);
 
     QString cloudLogin() const;
     bool is2FaEnabledForUser() const;

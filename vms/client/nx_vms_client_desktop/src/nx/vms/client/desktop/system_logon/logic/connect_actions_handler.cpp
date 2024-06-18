@@ -199,7 +199,9 @@ struct ConnectActionsHandler::Private
         if (newCloudAuthData.empty())
             return;
 
-        qnCloudStatusWatcher->setAuthData(newCloudAuthData);
+        qnCloudStatusWatcher->setAuthData(
+            newCloudAuthData,
+            core::CloudStatusWatcher::AuthMode::login);
 
         if (auto session = q->system()->session(); session && session->connection())
         {
