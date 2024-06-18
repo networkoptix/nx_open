@@ -12,6 +12,7 @@ namespace nx::rtp {
 
 constexpr int kRtcpHeaderSize = 8;
 constexpr int kRtcpFeedbackHeaderSize = 12;
+constexpr int kRtcpReceiverReportLength = 8;
 
 constexpr uint8_t kRtcpSenderReport = 200;
 constexpr uint8_t kRtcpReceiverReport = 201;
@@ -47,6 +48,11 @@ struct NX_RTP_API RtcpSenderReport
     uint32_t octetCount = 0;
     std::optional<std::string> cname;
 };
+
+NX_RTP_API int buildReceiverReport(
+    uint8_t* dstBuffer,
+    int bufferLen,
+    uint32_t ssrc);
 
 NX_RTP_API int buildClientRtcpReport(
     uint8_t* dstBuffer,
