@@ -1,17 +1,17 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "object_metadata_v0.h"
+#include "object_metadata_v3.h"
 
 #include <nx/fusion/model_functions.h>
 
 namespace nx::common::metadata {
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    ObjectMetadataPacketV0, (json)(ubjson), ObjectMetadataPacketV0_Fields, (brief, true))
+    ObjectMetadataV3, (json)(ubjson), ObjectMetadataV3_Fields, (brief, true))
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    ObjectMetadataV0, (json)(ubjson), ObjectMetadataV0_Fields, (brief, true))
+    ObjectMetadataPacketV3, (json)(ubjson), ObjectMetadataPacketV3_Fields, (brief, true))
 
-ObjectMetadataPacket ObjectMetadataPacketV0::toMetadataPacket() const
+ObjectMetadataPacket ObjectMetadataPacketV3::toMetadataPacket() const
 {
     ObjectMetadataPacket newPacket;
     newPacket.deviceId = deviceId;
@@ -20,12 +20,15 @@ ObjectMetadataPacket ObjectMetadataPacketV0::toMetadataPacket() const
     for (const auto& oldMetadata: objectMetadataList)
     {
         newPacket.analyticsEngineId = oldMetadata.analyticsEngineId;
-        if (oldMetadata.bestShot)
+        if (oldMetadata.objectMetadataType == ObjectMetadataTypeV3::bestShot
+            || oldMetadata.objectMetadataType == ObjectMetadataTypeV3::externalBestShot)
         {
             BestShotMetadata bestShot;
             bestShot.trackId = oldMetadata.trackId;
             bestShot.boundingBox = oldMetadata.boundingBox;
             bestShot.attributes = oldMetadata.attributes;
+            if (oldMetadata.objectMetadataType == ObjectMetadataTypeV3::externalBestShot)
+                bestShot.location = ImageLocation::external;
             newPacket.bestShot = bestShot;
         }
         else

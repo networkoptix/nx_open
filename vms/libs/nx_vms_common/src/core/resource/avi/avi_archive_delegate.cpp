@@ -11,6 +11,7 @@
 
 #include <analytics/common/object_metadata.h>
 #include <analytics/common/object_metadata_v0.h>
+#include <analytics/common/object_metadata_v3.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/resource_media_layout.h>
@@ -129,38 +130,17 @@ CodecParametersConstPtr QnAviArchiveDelegate::getCodecContext(AVStream* stream)
     return m_contexts[stream->index];
 }
 
-void convertMetadataFromOldFormat(QnCompressedMetadata* packet, int version)
+template <typename OldMetadataPacket>
+void convertMetadataFromOldFormat(QnCompressedMetadata* packet)
 {
-    if (version != 0)
-        return; //< nothing to convert.
-
     auto buffer = QByteArray::fromRawData(packet->data(), int(packet->dataSize()));
     bool success = false;
     using namespace nx::common::metadata;
-    auto oldPacket = QnUbjson::deserialized<ObjectMetadataPacketV0>(buffer, ObjectMetadataPacketV0(), &success);
+    auto oldPacket = QnUbjson::deserialized<OldMetadataPacket>(buffer, OldMetadataPacket(), &success);
     if (!success)
         return; //< Don't try to convert;
 
-    ObjectMetadataPacket newPacket;
-    newPacket.deviceId = oldPacket.deviceId;
-    newPacket.timestampUs = oldPacket.timestampUs;
-    newPacket.durationUs = oldPacket.durationUs;
-    for (const auto& oldMetadata: oldPacket.objectMetadataList)
-    {
-        ObjectMetadata newMetadata;
-        newMetadata.typeId = oldMetadata.typeId;
-        newMetadata.trackId = oldMetadata.trackId;
-        newMetadata.boundingBox = oldMetadata.boundingBox;
-        newMetadata.attributes = oldMetadata.attributes;
-        newMetadata.objectMetadataType = oldMetadata.bestShot
-            ? ObjectMetadataType::bestShot
-            : ObjectMetadataType::regular;
-
-        newMetadata.analyticsEngineId = oldMetadata.analyticsEngineId;
-        newPacket.objectMetadataList.push_back(newMetadata);
-    }
-    newPacket.streamIndex = oldPacket.streamIndex;
-
+    ObjectMetadataPacket newPacket = oldPacket.toMetadataPacket();
     packet->setData(QnUbjson::serialized(newPacket));
 }
 
@@ -250,12 +230,20 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
             }
             case AVMEDIA_TYPE_SUBTITLE:
             {
+                using namespace nx::common::metadata;
                 QnAbstractCompressedMetadataPtr metadata;
-                if (m_metadata.metadataStreamVersion
-                    >= QnAviArchiveMetadata::kMetadataStreamVersion_2)
+                const auto version = m_metadata.metadataStreamVersion;
+                if (version >= QnAviArchiveMetadata::kMetadataStreamVersion_4)
                 {
                     const auto packetData = QByteArray((const char*)packet.data, packet.size);
                     metadata = nx::recording::helpers::deserializeMetaDataPacket(packetData);
+                }
+                else if (version >= QnAviArchiveMetadata::kMetadataStreamVersion_2)
+                {
+                    const auto packetData = QByteArray((const char*)packet.data, packet.size);
+                    metadata = nx::recording::helpers::deserializeMetaDataPacket(packetData);
+                    if (auto objects = std::dynamic_pointer_cast<QnCompressedMetadata>(metadata))
+                        convertMetadataFromOldFormat<ObjectMetadataPacketV3>(objects.get());
                 }
                 else
                 {
@@ -263,8 +251,8 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
                         MetadataType::ObjectDetection, packet.size);
 
                     objectDetection->m_data.write((const char*)packet.data, packet.size);
-                    convertMetadataFromOldFormat(
-                        objectDetection.get(), m_metadata.metadataStreamVersion);
+                    if (m_metadata.metadataStreamVersion == 0)
+                        convertMetadataFromOldFormat<ObjectMetadataPacketV0>(objectDetection.get());
 
                     metadata = objectDetection;
                 }

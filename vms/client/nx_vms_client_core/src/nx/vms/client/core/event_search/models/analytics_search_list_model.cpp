@@ -770,41 +770,12 @@ void AnalyticsSearchListModel::Private::processMetadata()
         const auto objectMetadata =
             nx::common::metadata::fromCompressedMetadataPacket(compressedMetadata);
 
-        if (!objectMetadata || objectMetadata->objectMetadataList.empty())
+        if (!objectMetadata)
             continue;
 
         for (const auto& item: objectMetadata->objectMetadataList)
         {
             auto found = findObject(item.trackId);
-            if (item.isBestShot())
-            {
-                if (!found.storage)
-                    continue; //< A valid situation - a track can be filtered out.
-
-                if (item.objectMetadataType
-                    == nx::common::metadata::ObjectMetadataType::externalBestShot)
-                {
-                    externalBestShotTracks.insert(item.trackId);
-                }
-
-                auto& track = found.storage->items[found.index];
-                track.bestShot.timestampUs = objectMetadata->timestampUs;
-                track.bestShot.rect = item.boundingBox;
-                track.bestShot.streamIndex = objectMetadata->streamIndex;
-
-                if (found.storage == &data)
-                {
-                    // If it was an already loaded track, emit dataChanged.
-                    dataChangedTrackIds.insert(track.id);
-                    emitDataChanged->requestOperation();
-                }
-                else if (found.storage == &noBestShotTracks)
-                {
-                    // If it was a no-best-shot track, move it to the newly added.
-                    const int index = newTracks.insert(noBestShotTracks.take(found.index));
-                    found = FoundObjectTrack{&newTracks, index};
-                }
-            }
 
             ObjectPosition pos;
             pos.deviceId = objectMetadata->deviceId;
@@ -815,8 +786,7 @@ void AnalyticsSearchListModel::Private::processMetadata()
             if (found.storage)
             {
                 auto& track = found.storage->items[found.index];
-                if (!item.isBestShot())
-                    track.objectTypeId = item.typeId;
+                track.objectTypeId = item.typeId;
                 pos.attributes = item.attributes;
                 advanceTrack(track, std::move(pos), /*emitDataChanged*/ found.storage == &data);
                 continue;
@@ -829,7 +799,7 @@ void AnalyticsSearchListModel::Private::processMetadata()
             newTrack.id = item.trackId;
             newTrack.deviceId = objectMetadata->deviceId;
             newTrack.objectTypeId = item.typeId;
-            newTrack.analyticsEngineId = item.analyticsEngineId;
+            newTrack.analyticsEngineId = objectMetadata->analyticsEngineId;
             newTrack.attributes = item.attributes;
             newTrack.firstAppearanceTimeUs = objectMetadata->timestampUs;
             newTrack.lastAppearanceTimeUs = objectMetadata->timestampUs;
@@ -838,11 +808,62 @@ void AnalyticsSearchListModel::Private::processMetadata()
             if (!filter.acceptsTrack(newTrack, objectTypeDictionary))
                 continue;
 
-            if (newTrack.bestShot.initialized())
+            if (objectMetadata->bestShot)
                 newTracks.insert(std::move(newTrack));
             else
                 noBestShotTracks.insert(std::move(newTrack));
         }
+
+        if (objectMetadata->bestShot)
+        {
+            const auto& bestShot = objectMetadata->bestShot;
+            auto found = findObject(bestShot->trackId);
+
+            if (found.storage)
+            {
+                using namespace nx::common::metadata;
+                if (objectMetadata->bestShot->location == ImageLocation::external)
+                    externalBestShotTracks.insert(bestShot->trackId);
+
+                auto& track = found.storage->items[found.index];
+                track.bestShot.timestampUs = objectMetadata->timestampUs;
+                track.bestShot.rect = bestShot->boundingBox;
+                track.bestShot.streamIndex = objectMetadata->streamIndex;
+
+                if (found.storage == &data)
+                {
+                    // If it was an already loaded track, emit dataChanged.
+                    dataChangedTrackIds.insert(track.id);
+                    emitDataChanged->requestOperation();
+                }
+                else if (found.storage == &noBestShotTracks)
+                {
+                    // If it was a no-best-shot track, move it to the newly added.
+                    const int index = newTracks.insert(noBestShotTracks.take(found.index));
+                    found = FoundObjectTrack{ &newTracks, index };
+                }
+
+                ObjectPosition pos;
+                pos.deviceId = objectMetadata->deviceId;
+                pos.timestampUs = objectMetadata->timestampUs;
+                pos.durationUs = objectMetadata->durationUs;
+                pos.boundingBox = bestShot->boundingBox;
+
+                if (found.storage)
+                {
+                    auto& track = found.storage->items[found.index];
+                    pos.attributes = bestShot->attributes;
+                    advanceTrack(track, std::move(pos), /*emitDataChanged*/ found.storage == &data);
+                }
+            }
+        }
+
+        if (objectMetadata->title)
+        {
+            // TODO: add title processing here
+            auto found = findObject(objectMetadata->title->trackId);
+        }
+
     }
 
     // Limit the size of the no-best-shot track queue.

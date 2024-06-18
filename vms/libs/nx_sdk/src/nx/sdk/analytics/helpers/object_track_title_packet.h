@@ -57,6 +57,12 @@ public:
     /** See IObjectTrackTitlePacket::flags(). */
     void setFlags(Flags flags);
 
+    /**
+     * @return Bounding box of the title, or an invalid rectangle (e.g. a default-constructed)
+     *     if the title bounding box is unknown.
+     */
+    Rect boundingBox() const { Rect value; getBoundingBox(&value); return value; }
+
 private:
     Uuid m_trackId;
     Flags m_flags = Flags::none;

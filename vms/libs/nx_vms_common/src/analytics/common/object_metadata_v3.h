@@ -6,44 +6,48 @@
 
 namespace nx::common::metadata {
 
-struct ObjectMetadataV0
+NX_REFLECTION_ENUM_CLASS(ObjectMetadataTypeV3,
+    undefined,
+    regular,
+    bestShot,
+    externalBestShot
+)
+
+struct ObjectMetadataV3
 {
     QString typeId;
     nx::Uuid trackId;
     QRectF boundingBox;
-    Attributes attributes;
-    bool bestShot = false;
+    std::vector<Attribute> attributes;
+    ObjectMetadataTypeV3 objectMetadataType;
     nx::Uuid analyticsEngineId;
 };
-
-#define ObjectMetadataV0_Fields \
+#define ObjectMetadataV3_Fields \
     (typeId) \
     (trackId) \
     (boundingBox) \
     (attributes) \
-    (bestShot) \
+    (objectMetadataType) \
     (analyticsEngineId)
 
-QN_FUSION_DECLARE_FUNCTIONS(ObjectMetadataV0, (json)(ubjson));
+QN_FUSION_DECLARE_FUNCTIONS(ObjectMetadataV3, (json)(ubjson));
 
-struct ObjectMetadataPacketV0
+struct ObjectMetadataPacketV3
 {
     nx::Uuid deviceId;
     qint64 timestampUs = 0;
     qint64 durationUs = 0;
-    std::vector<ObjectMetadataV0> objectMetadataList;
+    std::vector<ObjectMetadataV3> objectMetadataList;
     nx::vms::api::StreamIndex streamIndex = nx::vms::api::StreamIndex::undefined;
 
     ObjectMetadataPacket toMetadataPacket() const;
 };
-
-#define ObjectMetadataPacketV0_Fields \
+#define ObjectMetadataPacketV3_Fields \
     (deviceId) \
     (timestampUs) \
     (durationUs) \
     (objectMetadataList) \
     (streamIndex)
-
-QN_FUSION_DECLARE_FUNCTIONS(ObjectMetadataPacketV0, (json)(ubjson));
+QN_FUSION_DECLARE_FUNCTIONS(ObjectMetadataPacketV3, (json)(ubjson));
 
 } // namespace nx::common::metadata

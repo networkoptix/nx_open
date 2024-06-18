@@ -67,6 +67,7 @@ bool isValidFigureRectangle(const QRectF& rect)
 struct ObjectInfo
 {
     nx::Uuid trackId;
+    nx::Uuid analyticsEngineId;
     QColor color;
     QRectF rectangle;
     microseconds startTimestamp = 0us;
@@ -176,6 +177,7 @@ struct TrackElement
  */
 struct Track
 {
+    nx::Uuid analyticsEngineId;
     std::optional<microseconds> minimalDuration;
     std::vector<TrackElement> path; //< Cannot be empty.
 
@@ -270,7 +272,7 @@ public:
 
     QnLayoutResourcePtr layoutResource() const;
 
-    ObjectInfo& addOrUpdateObject(const ObjectMetadata& object);
+    ObjectInfo& addOrUpdateObject(const nx::Uuid& analyticsEngineId, const ObjectMetadata& object);
 
     /** Remove areas which are not supposed to be displayed on the current frame. */
     void removeObjectAreas(milliseconds timestamp);
@@ -320,12 +322,14 @@ QnLayoutResourcePtr WidgetAnalyticsController::Private::layoutResource() const
 }
 
 ObjectInfo& WidgetAnalyticsController::Private::addOrUpdateObject(
+    const nx::Uuid& analyticsEngineId,
     const ObjectMetadata& objectMetadata)
 {
     const auto settings = appContext()->objectDisplaySettings();
 
     auto& objectInfo = objectInfoByTrackId[objectMetadata.trackId];
     objectInfo.trackId = objectMetadata.trackId;
+    objectInfo.analyticsEngineId = analyticsEngineId;
     objectInfo.color = settings->objectColor(objectMetadata);
 
     objectInfo.rectangle = objectMetadata.boundingBox;
@@ -374,7 +378,11 @@ void WidgetAnalyticsController::Private::updateObjectAreas(microseconds timestam
         const bool checkBounds = relevantCameraIds.empty()
             || relevantCameraIds.contains(deviceId);
 
-        if (!filter.acceptsMetadata(deviceId, objectInfo.rawData, objectTypeDictionary,checkBounds))
+        if (!filter.acceptsMetadata(
+            deviceId,
+            objectInfo.analyticsEngineId,
+            objectInfo.rawData,
+            objectTypeDictionary,checkBounds))
         {
             NX_VERBOSE(this, "Object %1 filtered out", objectInfo);
             analyticsWidget->removeArea(objectInfo.trackId);
@@ -447,10 +455,8 @@ std::vector<Track> WidgetAnalyticsController::Private::fetchTracks(
         // Each track will start from the actual object and be sorted by timestamps.
         for (const auto& objectMetadata: objectPacket->objectMetadataList)
         {
-            if (objectMetadata.isBestShot())
-                continue; //< Skip specialized best shot records.
-
             Track& track = objectTrackByTrackId[objectMetadata.trackId];
+            track.analyticsEngineId = objectPacket->analyticsEngineId;
             if (packetHasDuration)
                 track.minimalDuration = microseconds(objectPacket->durationUs);
 
@@ -529,7 +535,7 @@ void WidgetAnalyticsController::updateAreas(microseconds timestamp, int channel)
     // Process each object from the actual metadata packets.
     for (const auto& track: tracks)
     {
-        auto& objectInfo = d->addOrUpdateObject(*track.path[0].metadata);
+        auto& objectInfo = d->addOrUpdateObject(track.analyticsEngineId, *track.path[0].metadata);
         objectInfo.startTimestamp = track.startTimestamp();
         objectInfo.endTimestamp = track.endTimestamp();
 

@@ -86,35 +86,6 @@ static QString makeRectLogLinesIfNeeded(
     return result;
 }
 
-static QString makeBestShotDescriptionLines(const std::vector<ObjectMetadata>& objectMetadataList)
-{
-    std::vector<ObjectMetadata> bestShotMetadataList;
-    std::vector<ObjectMetadata> nonBestShotObjectMetadataList;
-
-    for (const auto& objectMetadata: objectMetadataList)
-    {
-        auto& packetList = objectMetadata.isBestShot()
-            ? bestShotMetadataList
-            : nonBestShotObjectMetadataList;
-
-        packetList.push_back(objectMetadata);
-    }
-
-    NX_ASSERT(!bestShotMetadataList.empty());
-
-    QString result = makeRectLogLinesIfNeeded(
-        bestShotMetadataList,
-        (bestShotMetadataList.size() == 1
-            ? ""
-            : "WARNING: Multiple best shot items in the object packet"));
-
-    result += makeRectLogLinesIfNeeded(
-        nonBestShotObjectMetadataList,
-        "WARNING: Best shot packet contains non-best-shot metadata");
-
-    return result;
-}
-
 template<typename Time>
 static QString toMsString(Time time)
 {
@@ -258,17 +229,10 @@ void MetadataLogger::doPushObjectMetadata(
     if (!m_isAlwaysEnabled && !loggingIni().isLoggingEnabled())
         return;
 
-    m_isLoggingBestShot = false;
-    if (metadataPacket.objectMetadataList.size() == 1)
-    {
-        if (metadataPacket.objectMetadataList[0].isBestShot())
-            m_isLoggingBestShot = true;
-    }
-
     logLine(buildObjectMetadataLogString(
         metadataPacket, buildAdditionalInfoStr(func, additionalInfo)));
 
-    if (!m_isLoggingBestShot)
+    if (metadataPacket.objectMetadataList.size() > 0)
         m_prevObjectMetadataPacketTimestamp = microseconds(metadataPacket.timestampUs);
 }
 
@@ -311,15 +275,20 @@ QString MetadataLogger::buildObjectMetadataLogString(
     const microseconds currentPacketTimestamp{metadataPacket.timestampUs};
     const microseconds diffFromPrev = currentPacketTimestamp - m_prevObjectMetadataPacketTimestamp;
 
+    QString payloadInfo;
+    if (metadataPacket.bestShot)
+        payloadInfo += "; bestShot: " + toString(metadataPacket.bestShot);
+    if (metadataPacket.title)
+        payloadInfo += "; title: " + toString(metadataPacket.title);
+    payloadInfo += "; objects: " + QString::number(metadataPacket.objectMetadataList.size());
+
     return "metadataTimestampMs " + toMsString(currentPacketTimestamp) + ", "
         + "currentTimeMs " + toMsString(vmsSystemTime) + ", "
         + "diffFromPrevMs " + toMsString(diffFromPrev) + ", "
         + "diffFromCurrentTimeMs " + toMsString(currentPacketTimestamp - vmsSystemTime)
         + additionalInfoStr
-        + (metadataPacket.containsBestShotMetadata()
-            ? "; bestShot:\n" + makeBestShotDescriptionLines(metadataPacket.objectMetadataList)
-            : "; objects: " + QString::number(metadataPacket.objectMetadataList.size()) + ":\n"
-                + makeRectLogLinesIfNeeded(metadataPacket.objectMetadataList));
+        + payloadInfo + ":\n"
+        + makeRectLogLinesIfNeeded(metadataPacket.objectMetadataList);
 }
 
 MetadataLogger::MetadataLogger(const QString& filename):
