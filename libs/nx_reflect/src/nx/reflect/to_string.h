@@ -6,6 +6,7 @@
 #include <type_traits>
 
 #include "enum_string_conversion.h"
+#include "type_utils.h"
 
 namespace nx::reflect {
 
@@ -85,6 +86,8 @@ std::string toStringSfinae(T&& value)
         return toStringSfinae(value.toString());
     else if constexpr (nx::reflect::IsInstrumentedEnumV<std::decay_t<T>>)
         return nx::reflect::enumeration::toString(value);
+    else if constexpr (nx::reflect::IsStdChronoDurationV<std::decay_t<T>>)
+        return std::to_string(value.count());
     else
         return toStringSfinae(toString(value));
 }

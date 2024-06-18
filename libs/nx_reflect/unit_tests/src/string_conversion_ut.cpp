@@ -1,5 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#include <chrono>
+
 #include <gtest/gtest.h>
 
 #include <nx/reflect/from_string.h>
@@ -59,6 +61,15 @@ TEST(Stringize, in_class_fromString_is_used)
     ASSERT_EQ(s, nx::reflect::fromString<CustomStringizable>((std::string_view) s.text));
     ASSERT_EQ(s, nx::reflect::fromString<CustomStringizable>(s.text));
     ASSERT_EQ(s, nx::reflect::fromString<CustomStringizable>(s.text.c_str()));
+}
+
+TEST(Duration, DurationToString)
+{
+    std::chrono::seconds seconds{120};
+    std::chrono::minutes minutes{120};
+
+    ASSERT_EQ("120", nx::reflect::toString(seconds));
+    ASSERT_EQ("120", nx::reflect::toString(minutes));
 }
 
 } // namespace nx_reflect_detail_test
