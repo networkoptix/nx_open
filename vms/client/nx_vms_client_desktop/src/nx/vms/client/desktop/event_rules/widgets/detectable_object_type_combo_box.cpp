@@ -23,6 +23,7 @@ DetectableObjectTypeComboBox::DetectableObjectTypeComboBox(QWidget* parent):
     const auto filterModel = taxonomyManager->createFilterModel(this);
 
     setModel(new DetectableObjectTypeModel(filterModel, this));
+    setCurrentIndex(-1);
 }
 
 QStringList DetectableObjectTypeComboBox::selectedObjectTypeIds() const
@@ -39,6 +40,8 @@ void DetectableObjectTypeComboBox::setSelectedObjectTypeIds(const QStringList& o
 
     if (index.isValid())
         setCurrentIndex(index);
+    else
+        setCurrentIndex(-1);
 }
 
 QString DetectableObjectTypeComboBox::selectedMainObjectTypeId() const
@@ -55,6 +58,8 @@ void DetectableObjectTypeComboBox::setSelectedMainObjectTypeId(const QString& ob
 
     if (index.isValid())
         setCurrentIndex(index);
+    else
+        setCurrentIndex(-1);
 }
 
 void DetectableObjectTypeComboBox::setDevices(const UuidSet& devices)

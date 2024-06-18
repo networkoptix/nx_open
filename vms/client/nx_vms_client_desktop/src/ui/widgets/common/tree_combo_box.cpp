@@ -132,6 +132,11 @@ void QnTreeComboBox::updateHighlight()
         m_treeView->setCurrentIndex(highlightIndex);
 }
 
+void QnTreeComboBox::setCurrentIndex(int index)
+{
+    base_type::setCurrentIndex(index);
+}
+
 void QnTreeComboBox::setCurrentIndex(const QModelIndex& index) {
     if (!index.isValid()) {
         base_type::setCurrentIndex(0);
