@@ -181,7 +181,7 @@ public:
         Systems_MergeSystems,
         UserRoles,
         UserSettings_DisableUser,
-        UserSettings,
+        UserSettings_Permissions,
         UserSettings_UserRoles,
         UserWatermark,
         UsingJoystick,

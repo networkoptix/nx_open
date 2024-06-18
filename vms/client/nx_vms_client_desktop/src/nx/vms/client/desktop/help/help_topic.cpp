@@ -354,8 +354,8 @@ QString HelpTopic::relativeUrlForTopic(Id topic)
             return "roles_management.html";
         case Id::UserSettings_DisableUser:
             return "disabling_user.html";
-        case Id::UserSettings:
-            return "changing_user_settings.html";
+        case Id::UserSettings_Permissions:
+            return "permissions-management.html";
         case Id::UserSettings_UserRoles:
             return "introducing_user_roles.html";
         case Id::UserWatermark:
