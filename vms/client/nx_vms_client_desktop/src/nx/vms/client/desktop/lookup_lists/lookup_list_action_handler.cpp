@@ -24,6 +24,7 @@
 #include <nx/vms/client/desktop/menu/action_parameters.h>
 #include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/utils/parameter_helper.h>
 #include <nx/vms/common/lookup_lists/lookup_list_manager.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/workbench/workbench_context.h>
@@ -363,8 +364,6 @@ void LookupListActionHandler::openLookupListsDialog()
 void LookupListActionHandler::openLookupListEditDialog()
 {
     const auto params = menu()->currentParameters(sender());
-    if (!params.hasArgument(Qn::AnalyticsObjectTypeIdRole))
-        return;
 
     if (appContext()->qmlEngine()->baseUrl().isLocalFile())
         appContext()->qmlEngine()->clearComponentCache();
@@ -375,8 +374,14 @@ void LookupListActionHandler::openLookupListEditDialog()
     LookupListModel sourceModel(data);
 
     auto taxonomy = systemContext()->taxonomyManager()->createStateView();
-    LookupListEditDialog dialog(systemContext(), taxonomy, &sourceModel, mainWindowWidget());
-    dialog.setTransientParent(mainWindowWidget());
+    const auto parentWidget = utils::extractParentWidget(params, mainWindowWidget());
+    LookupListEditDialog dialog(systemContext(),
+        taxonomy,
+        // If there is argument Qn::AnalyticsObjectTypeIdRole, open LookupListEditDialog with
+        // specified type otherwize, any type of list is allowed
+        params.hasArgument(Qn::AnalyticsObjectTypeIdRole) ? &sourceModel : nullptr,
+        parentWidget);
+    dialog.setTransientParent(parentWidget);
 
     if (dialog.exec(Qt::ApplicationModal) != QDialog::Accepted)
         return;
@@ -384,6 +389,8 @@ void LookupListActionHandler::openLookupListEditDialog()
     auto resultData = dialog.getLookupListData();
     d->saveData(Private::DataDescriptor{.data = resultData});
     systemContext()->lookupListManager()->addOrUpdate(resultData);
+    if (d->dialog)
+        d->dialog->appendData({resultData});
 }
 
 } // namespace nx::vms::client::desktop

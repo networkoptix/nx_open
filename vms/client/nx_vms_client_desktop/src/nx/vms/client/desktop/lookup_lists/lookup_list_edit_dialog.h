@@ -11,6 +11,10 @@ namespace nx::vms::client::core::analytics::taxonomy { class StateView; }
 namespace nx::vms::client::desktop {
 class LookupListModel;
 
+/**
+ * Dialog, which allows to edit existing Lookup List Model ( if it passed as sourceModel)
+ * or create a new one.
+ */
 class LookupListEditDialog: public QmlDialogWrapper, public SystemContextAware
 {
     Q_OBJECT

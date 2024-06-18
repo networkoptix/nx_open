@@ -24,6 +24,7 @@ public:
     virtual ~LookupListsDialog() override;
 
     void setData(nx::vms::api::LookupListDataList data);
+    void appendData(nx::vms::api::LookupListDataList data);
 
     /** Show error text over the dialog. */
     void showError(const QString& text);
@@ -32,9 +33,11 @@ public:
     void setSaveResult(bool success);
 
     Q_INVOKABLE void save(QList<LookupListModel*> data);
+    Q_INVOKABLE void createListRequested();
 
 signals:
     void loadCompleted(QList<LookupListModel*> data);
+    void appendData(QList<LookupListModel*> data);
     void saveRequested(nx::vms::api::LookupListDataList data);
 };
 

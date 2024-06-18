@@ -5,8 +5,12 @@
 #include <QtCore/QUrl>
 #include <QtQml/QtQml>
 
+#include <client/client_globals.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/menu/action_parameters.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/window_context.h>
 
 #include "lookup_list_entries_model.h"
 #include "lookup_list_entries_sort_filter_proxy_model.h"
@@ -60,6 +64,20 @@ void LookupListsDialog::setData(nx::vms::api::LookupListDataList data)
     for (const auto& elem: data)
         modelList.push_back(new LookupListModel(elem, this));
     emit loadCompleted(modelList);
+}
+
+void LookupListsDialog::appendData(nx::vms::api::LookupListDataList data)
+{
+    QList<LookupListModel*> modelList;
+    for (const auto& elem: data)
+        modelList.push_back(new LookupListModel(elem, this));
+    emit appendData(modelList);
+}
+
+Q_INVOKABLE void LookupListsDialog::createListRequested()
+{
+    appContext()->mainWindowContext()->menu()->triggerForced(menu::OpenEditLookupListsDialogAction,
+        menu::Parameters().withArgument(Qn::ParentWidgetRole, QPointer(window())));
 }
 
 void LookupListsDialog::showError(const QString& text)
