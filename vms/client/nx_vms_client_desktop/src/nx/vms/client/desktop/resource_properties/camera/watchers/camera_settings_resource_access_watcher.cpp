@@ -10,9 +10,9 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/qt_helpers.h>
 #include <nx/vms/client/core/access/access_controller.h>
-#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/system_context.h>
 
 #include "../flux/camera_settings_dialog_store.h"
 
@@ -64,8 +64,21 @@ CameraSettingsResourceAccessWatcher::CameraSettingsResourceAccessWatcher(
     if (!NX_ASSERT(store && systemContext))
         return;
 
-    connect(systemContext->accessController(), &core::AccessController::permissionsMaybeChanged,
-        this, [this]() { d->updatePermissions(); });
+    connect(systemContext->accessController(),
+        &core::AccessController::permissionsMaybeChanged,
+        this,
+        [this](const QnResourceList& resourcesHint)
+        {
+            if (resourcesHint.empty() || std::any_of(resourcesHint.cbegin(), resourcesHint.cend(),
+                [this](const QnResourcePtr& resource)
+                {
+                    const auto camera = resource.objectCast<QnVirtualCameraResource>();
+                    return camera && d->cameras.contains(camera);
+                }))
+            {
+                d->updatePermissions();
+            }
+        });
 
     if (const auto& action = menu->action(ui::action::ToggleScreenRecordingAction))
     {
