@@ -33,38 +33,17 @@ ValidationResult TextWithFieldsValidator::validity(
         context,
         objectTypeField ? objectTypeField->value() : "",
         eventState ? eventState->value() : State::none);
-    bool containsCorrect = false;
-    bool allCorrect = true;
-    QStringList incorrectParams;
 
     auto parsedValues = textWithFields->parsedValues();
     for (auto& value: parsedValues)
     {
         if (value.type != TextWithFields::FieldType::Substitution)
             continue;
-
-        const bool isValid =
-            availableNames.contains(EventParameterHelper::removeBrackets(value.value));
-        value.isValid = isValid;
-        containsCorrect = containsCorrect ? containsCorrect : isValid;
-        if (!isValid)
-        {
-            allCorrect = false;
-            incorrectParams.append(value.value);
-        }
+        value.isValid = availableNames.contains(EventParameterHelper::removeBrackets(value.value));
     }
 
-    ValidationResult result;
-    result.validity = allCorrect
-        ? QValidator::State::Acceptable
-        : containsCorrect
-            ? QValidator::State::Intermediate
-            : QValidator::State::Invalid;
-    result.description = incorrectParams.isEmpty()
-        ? ""
-        : tr("Incorrect event parameters: ") + incorrectParams.join(",");
-    result.additionalData = QVariant::fromValue(parsedValues);
-    return result;
+    return {.validity = QValidator::State::Acceptable,
+        .additionalData = QVariant::fromValue(parsedValues)};
 }
 
 } // namespace nx::vms::rules
