@@ -37,9 +37,11 @@ uint32_t getRtcpSsrc(const uint8_t* data, int size)
 
 int buildReceiverReport(
     uint8_t* dstBuffer,
-    int /*bufferLen*/,
-    quint32 ssrc)
+    int bufferLen,
+    uint32_t ssrc)
 {
+    if (bufferLen < kRtcpReceiverReportLength)
+        return 0;
     uint8_t* curBuffer = dstBuffer;
     *curBuffer++ = (RtpHeader::kVersion << 6);
     *curBuffer++ = kRtcpReceiverReport;  // packet type
