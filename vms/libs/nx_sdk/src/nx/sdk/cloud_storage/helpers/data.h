@@ -419,30 +419,74 @@ struct ObjectRegion
     std::string boundingBoxGridBase64;
 };
 
-// The image/thumbnail that represent the object track metadata. This information describes the
-// image from the media archive (a part of the video frame for track thumbnail). This information
-// is used by Server in case if the best shot image for the track is not uploaded explicitly.
-// BestShot is NULL if its rect is empty.
-struct BestShot
+enum class TrackImageType
 {
-    BestShot() = default;
-    BestShot(const nx::kit::Json& json) noexcept(false);
-    BestShot(const char* jsonData) noexcept(false);
+    undefined,
+    bestShot,
+    title,
+};
 
-    static ValueOrError<BestShot> fromJson(const char* jsonStr) noexcept;
-    static ValueOrError<BestShot> fromJson(const nx::kit::Json& json) noexcept;
+std::string trackImageTypeToString(TrackImageType type);
+TrackImageType trackImageTypeFromString(const std::string& s);
+
+// The image/thumbnail metadata. This information
+// describes the image from the media archive (a part of the video frame for track thumbnail).
+// This information is used by Server in case if the image for the track is not uploaded explicitly.
+// BaseImageMetadata is NULL if its rect is empty.
+struct BaseImageMetadata
+{
+    BaseImageMetadata() = default;
+    BaseImageMetadata(const nx::kit::Json& json) noexcept(false);
+
+    bool operator==(const BaseImageMetadata&) const;
 
     template<typename T>
-    BestShot(const T&) = delete;
-
-    bool operator==(const BestShot&) const;
+    BaseImageMetadata(const T&) = delete;
 
     nx::kit::Json to_json() const;
+    std::map<std::string, nx::kit::detail::json11::Json> toBaseObject() const;
+
     bool isNull() const;
 
     std::chrono::microseconds timestamp{};
     Rect rect;
     int streamIndex = -1;
+};
+
+struct BestShotMetadata: public BaseImageMetadata
+{
+    BestShotMetadata() = default;
+    BestShotMetadata(const nx::kit::Json& json) noexcept(false);
+    BestShotMetadata(const BaseImageMetadata& data) : BaseImageMetadata(data) {}
+    BestShotMetadata(const char* jsonStr) noexcept(false);
+
+    bool operator==(const BestShotMetadata&) const;
+
+    static ValueOrError<BestShotMetadata> fromJson(const char* jsonStr) noexcept;
+    static ValueOrError<BestShotMetadata> fromJson(const nx::kit::Json& json) noexcept;
+
+    nx::kit::Json to_json() const;
+};
+
+struct TitleMetadata: public BaseImageMetadata
+{
+    TitleMetadata() = default;
+    TitleMetadata(const nx::kit::Json& json) noexcept(false);
+    TitleMetadata(const BaseImageMetadata& data): BaseImageMetadata(data) {}
+    TitleMetadata(const char* jsonStr) noexcept(false);
+
+    bool operator==(const TitleMetadata&) const;
+
+    static ValueOrError<TitleMetadata> fromJson(const char* jsonStr) noexcept;
+    static ValueOrError<TitleMetadata> fromJson(const nx::kit::Json& json) noexcept;
+
+    nx::kit::Json to_json() const;
+
+    // Optional text associated with the title.
+    std::string text;
+
+    // Whether a title has an image. It could contain text only.
+    bool hasImage = false;
 };
 
 struct ObjectTrack
@@ -480,31 +524,55 @@ struct ObjectTrack
     ObjectRegion objectPosition;
     // An analytics plugin id that provided data.
     std::string analyticsEngineId;
-    BestShot bestShot;
+
+    std::optional<BestShotMetadata> bestShot;
+    std::optional<TitleMetadata> title;
 };
 
-// BestShot image associated with the given ObjectTrack.
-struct BestShotImage
+// Image data and track id the image is associated with.
+struct Image
 {
-    BestShotImage() = default;
-    BestShotImage(const nx::kit::Json& json) noexcept(false);
-    BestShotImage(const char* jsonData) noexcept(false);
+    Image() = default;
+    Image(const nx::kit::Json& json) noexcept(false);
+    Image(const char* jsonData) noexcept(false);
 
-    static ValueOrError<BestShotImage> fromJson(const char* jsonStr) noexcept;
-    static ValueOrError<BestShotImage> fromJson(const nx::kit::Json& json) noexcept;
+    static ValueOrError<Image> fromJson(const char* jsonStr) noexcept;
+    static ValueOrError<Image> fromJson(const nx::kit::Json& json) noexcept;
 
     template<typename T>
-    BestShotImage(const T&) = delete;
-
-    bool operator==(const BestShotImage&) const;
+    Image(const T&) = delete;
 
     nx::kit::Json to_json() const;
+
+    bool operator==(const Image&) const;
 
     std::string objectTrackId;
     // Human-readable image format name.
     std::string format;
     // Base64 encoded image data.
     std::string data64;
+};
+
+// TrackImage consists of image and metadata needed to construct
+// the image from the archive if it's empty. This is returned when user looks up
+// for a BestShot
+struct TrackImage: BaseImageMetadata
+{
+    TrackImage() = default;
+    TrackImage(const nx::kit::Json& json) noexcept(false);
+    TrackImage(const char* jsonData) noexcept(false);
+
+    static ValueOrError<TrackImage> fromJson(const char* jsonStr) noexcept;
+    static ValueOrError<TrackImage> fromJson(const nx::kit::Json& json) noexcept;
+
+    template<typename T>
+    TrackImage(const T&) = delete;
+
+    bool operator==(const TrackImage&) const;
+
+    nx::kit::Json to_json() const;
+
+    std::optional<Image> image;
 };
 
 using AnalyticsLookupResult = std::vector<ObjectTrack>;

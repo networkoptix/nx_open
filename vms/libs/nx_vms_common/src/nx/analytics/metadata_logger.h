@@ -67,8 +67,6 @@ private:
     bool m_isAlwaysEnabled = false;
     QFile m_outputFile;
 
-    bool m_isLoggingBestShot = false;
-
     std::chrono::microseconds m_prevFrameTimestamp{0};
     std::chrono::microseconds m_prevObjectMetadataPacketTimestamp{0};
     std::chrono::microseconds m_prevCustomMetadataTimestamp{0};

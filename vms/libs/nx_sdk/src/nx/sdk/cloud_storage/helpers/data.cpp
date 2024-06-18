@@ -3,11 +3,11 @@
 #include "data.h"
 
 #include <algorithm>
+#include <sstream>
 
 #include <nx/sdk/cloud_storage/helpers/algorithm.h>
 #include <nx/sdk/helpers/device_info.h>
 
-#include "media_data_packet.h"
 #include "algorithm.h"
 
 namespace nx::sdk::cloud_storage {
@@ -582,6 +582,7 @@ BookmarkList bookmarkListFromJson(const char* data)
 
     return result;
 }
+
 std::string sortOrderToString(SortOrder order)
 {
     switch (order)
@@ -604,6 +605,37 @@ SortOrder sortOrderFromString(const std::string& s)
         return SortOrder::descending;
 
     throw std::logic_error("Unexpected value of the SortOrder string: " + s);
+}
+
+std::string trackImageTypeToString(TrackImageType type)
+{
+    switch (type)
+    {
+        case TrackImageType::bestShot:
+            return "bestShot";
+        case TrackImageType::title:
+            return "title";
+        case TrackImageType::undefined:
+            return "undefined";
+    }
+
+    std::stringstream ss;
+    ss << "Unexpected value of the TrackeImageType: " << (int) type;
+    throw std::logic_error(ss.str());
+}
+
+TrackImageType trackImageTypeFromString(const std::string& s)
+{
+    if (s == "bestShot")
+        return TrackImageType::bestShot;
+
+    if (s == "title")
+        return TrackImageType::title;
+
+    if (s == "undefined")
+        return TrackImageType::undefined;
+
+    throw std::logic_error("Unexpected value of the TrackImageType string: " + s);
 }
 
 std::string BookmarkFilter::sortColumnToString(SortColumn column)
@@ -793,10 +825,10 @@ Rect::Rect(const char* jsonData): Rect(parseJson(jsonData))
 
 Rect::Rect(const nx::kit::Json& json)
 {
-    x = getIntValue(json, "x");
-    y = getIntValue(json, "y");
-    w = getIntValue(json, "w");
-    h = getIntValue(json, "h");
+    x = getDoubleValue(json, "x");
+    y = getDoubleValue(json, "y");
+    w = getDoubleValue(json, "w");
+    h = getDoubleValue(json, "h");
 }
 
 ValueOrError<Rect> Rect::fromJson(const char* jsonStr) noexcept
@@ -1678,54 +1710,133 @@ ValueOrError<ObjectRegion> ObjectRegion::fromJson(const nx::kit::Json& json) noe
     }
 }
 
-BestShot::BestShot(const nx::kit::Json& json)
+//------------- TrackImageMetadata ----------------------
+
+BaseImageMetadata::BaseImageMetadata(const nx::kit::Json& json)
 {
     timestamp = microseconds(getIntValue(json, "timestamp"));
     rect = getObjectValue<Rect>(json, "rect");
     streamIndex = getIntValue(json, "streamIndex");
 }
 
-BestShot::BestShot(const char* jsonData): BestShot(parseJson(jsonData))
+bool BaseImageMetadata::operator==(const BaseImageMetadata& other) const
 {
+    return timestamp == other.timestamp
+        && rect == other.rect
+        && streamIndex == other.streamIndex;
 }
 
-ValueOrError<BestShot> BestShot::fromJson(const char* jsonStr) noexcept
+nx::kit::Json BaseImageMetadata::to_json() const
 {
-    try
-    {
-        return ValueOrError<BestShot>::makeValue(BestShot(jsonStr));
-    }
-    catch (const std::exception& e)
-    {
-        return ValueOrError<BestShot>::makeError(e.what());
-    }
+    return toBaseObject();
 }
 
-ValueOrError<BestShot> BestShot::fromJson(const nx::kit::Json& json) noexcept
-{
-    try
-    {
-        return ValueOrError<BestShot>::makeValue(BestShot(json));
-    }
-    catch (const std::exception& e)
-    {
-        return ValueOrError<BestShot>::makeError(e.what());
-    }
-}
-
-bool BestShot::operator==(const BestShot& other) const
-{
-    return other.rect == rect && other.streamIndex == streamIndex && other.timestamp == timestamp;
-}
-
-nx::kit::Json BestShot::to_json() const
+std::map<std::string, nx::kit::detail::json11::Json> BaseImageMetadata::toBaseObject() const
 {
     return nx::kit::Json::object({
         {"timestamp", (double) timestamp.count()},
         {"rect", rect},
-        {"streamIndex", streamIndex},
+        {"streamIndex", streamIndex}
         });
 }
+
+//------------- Title ----------------------
+
+bool TitleMetadata::operator==(const TitleMetadata& other) const
+{
+    return
+        static_cast<const BaseImageMetadata&>(*this) == static_cast<const BaseImageMetadata&>(other)
+        && text == other.text
+        && hasImage == other.hasImage;
+}
+
+TitleMetadata::TitleMetadata(const nx::kit::Json& json): BaseImageMetadata(json)
+{
+    text = getStringValue(json, "text");
+    hasImage = getBoolValue(json, "hasImage");
+}
+
+TitleMetadata::TitleMetadata(const char* jsonStr): TitleMetadata(parseJson(jsonStr))
+{
+}
+
+ValueOrError<TitleMetadata> TitleMetadata::fromJson(const char* jsonStr) noexcept
+{
+    try
+    {
+        return ValueOrError<TitleMetadata>::makeValue(TitleMetadata(jsonStr));
+    }
+    catch (const std::exception& e)
+    {
+        return ValueOrError<TitleMetadata>::makeError(e.what());
+    }
+}
+
+ValueOrError<TitleMetadata> TitleMetadata::fromJson(const nx::kit::Json& json) noexcept
+{
+    try
+    {
+        return ValueOrError<TitleMetadata>::makeValue(TitleMetadata(json));
+    }
+    catch (const std::exception& e)
+    {
+        return ValueOrError<TitleMetadata>::makeError(e.what());
+    }
+}
+
+nx::kit::Json TitleMetadata::to_json() const
+{
+    auto result = toBaseObject();
+    result["text"] = text;
+    result["hasImage"] = hasImage;
+    return result;
+}
+
+// ------------------------- BestShot ------------------------------------
+
+BestShotMetadata::BestShotMetadata(const nx::kit::Json& json): BaseImageMetadata(json)
+{
+}
+
+BestShotMetadata::BestShotMetadata(const char* jsonStr) : BestShotMetadata(parseJson(jsonStr))
+{
+}
+
+bool BestShotMetadata::operator==(const BestShotMetadata& other) const
+{
+    return BaseImageMetadata::operator==(other);
+}
+
+ValueOrError<BestShotMetadata> BestShotMetadata::fromJson(const char* jsonStr) noexcept
+{
+    try
+    {
+        return ValueOrError<BestShotMetadata>::makeValue(BestShotMetadata(jsonStr));
+    }
+    catch (const std::exception& e)
+    {
+        return ValueOrError<BestShotMetadata>::makeError(e.what());
+    }
+}
+
+ValueOrError<BestShotMetadata> BestShotMetadata::fromJson(const nx::kit::Json& json) noexcept
+{
+    try
+    {
+        return ValueOrError<BestShotMetadata>::makeValue(BestShotMetadata(json));
+    }
+    catch (const std::exception& e)
+    {
+        return ValueOrError<BestShotMetadata>::makeError(e.what());
+    }
+}
+
+nx::kit::Json BestShotMetadata::to_json() const
+{
+    return toBaseObject();
+}
+
+// ----------ObjectTrack ------------------------
 
 ObjectTrack::ObjectTrack(const char* jsonData): ObjectTrack(parseJson(jsonData))
 {
@@ -1741,7 +1852,20 @@ ObjectTrack::ObjectTrack(const nx::kit::Json & json)
     lastAppearanceTimestamp = microseconds(getIntValue(json, "lastAppearanceTimestamp"));
     objectPosition = getObjectValue<ObjectRegion>(json, "objectPosition");
     analyticsEngineId = getStringValue(json, "analyticsEngineId");
-    bestShot = getObjectValue<BestShot>(json, "bestShot");
+
+    title = getOptionalObjectValue<TitleMetadata>(json, "title");
+    bestShot = getOptionalObjectValue<BestShotMetadata>(json, "bestShot");
+}
+
+bool ObjectTrack::operator==(const ObjectTrack& other) const
+{
+    return other.analyticsEngineId == analyticsEngineId && other.attributes == attributes
+        && other.bestShot == bestShot
+        && other.title == title
+        && other.deviceId == deviceId
+        && other.firstAppearanceTimestamp == firstAppearanceTimestamp && other.id == id
+        && other.lastAppearanceTimestamp == lastAppearanceTimestamp
+        && other.objectPosition == objectPosition && other.objectTypeId == objectTypeId;
 }
 
 ValueOrError<ObjectTrack> ObjectTrack::fromJson(const char* jsonStr) noexcept
@@ -1768,18 +1892,10 @@ ValueOrError<ObjectTrack> ObjectTrack::fromJson(const nx::kit::Json& json) noexc
     }
 }
 
-bool ObjectTrack::operator==(const ObjectTrack& other) const
-{
-    return other.analyticsEngineId == analyticsEngineId && other.attributes == attributes
-        && other.bestShot == bestShot && other.deviceId == deviceId
-        && other.firstAppearanceTimestamp == firstAppearanceTimestamp && other.id == id
-        && other.lastAppearanceTimestamp == lastAppearanceTimestamp
-        && other.objectPosition == objectPosition && other.objectTypeId == objectTypeId;
-}
-
 nx::kit::Json ObjectTrack::to_json() const
 {
-    return nx::kit::Json::object({
+    nx::kit::Json::object result =
+    nx::kit::Json::object({
         {"id", id},
         {"deviceId", deviceId},
         {"objectTypeId", objectTypeId},
@@ -1788,58 +1904,113 @@ nx::kit::Json ObjectTrack::to_json() const
         {"lastAppearanceTimestamp", (double) lastAppearanceTimestamp.count()},
         {"objectPosition", objectPosition},
         {"analyticsEngineId", analyticsEngineId},
-        {"bestShot", bestShot}
         });
+
+    if (bestShot)
+        result["bestShot"] = nx::kit::Json(*bestShot);
+    if (title)
+        result["title"] = nx::kit::Json(*title);
+
+    return result;
 }
 
-BestShotImage::BestShotImage(const nx::kit::Json& json)
+Image::Image(const nx::kit::Json& json)
 {
     objectTrackId = getStringValue(json, "objectTrackId");
     format = getStringValue(json, "format");
     data64 = getStringValue(json, "data64");
 }
 
-BestShotImage::BestShotImage(const char* jsonData): BestShotImage(parseJson(jsonData))
+Image::Image(const char* jsonData): Image(parseJson(jsonData))
 {
 }
 
-ValueOrError<BestShotImage> BestShotImage::fromJson(const char* jsonStr) noexcept
-{
-    try
-    {
-        return ValueOrError<BestShotImage>::makeValue(BestShotImage(jsonStr));
-    }
-    catch (const std::exception& e)
-    {
-        return ValueOrError<BestShotImage>::makeError(e.what());
-    }
-}
-
-ValueOrError<BestShotImage> BestShotImage::fromJson(const nx::kit::Json& json) noexcept
-{
-    try
-    {
-        return ValueOrError<BestShotImage>::makeValue(BestShotImage(json));
-    }
-    catch (const std::exception& e)
-    {
-        return ValueOrError<BestShotImage>::makeError(e.what());
-    }
-}
-
-bool BestShotImage::operator == (const BestShotImage& other) const
-{
-    return other.data64 == data64 && other.format == format
-        && other.objectTrackId == objectTrackId;
-}
-
-nx::kit::Json BestShotImage::to_json() const
+nx::kit::Json Image::to_json() const
 {
     return nx::kit::Json::object({
         {"objectTrackId", objectTrackId},
         {"format", format},
-        {"data64", data64},
-        });
+        {"data64", data64}
+    });
+}
+
+ValueOrError<Image> Image::fromJson(const char* jsonStr) noexcept
+{
+    try
+    {
+        return ValueOrError<Image>::makeValue(Image(jsonStr));
+    }
+    catch (const std::exception& e)
+    {
+        return ValueOrError<Image>::makeError(e.what());
+    }
+}
+
+ValueOrError<Image> Image::fromJson(const nx::kit::Json& json) noexcept
+{
+    try
+    {
+        return ValueOrError<Image>::makeValue(Image(json));
+    }
+    catch (const std::exception& e)
+    {
+        return ValueOrError<Image>::makeError(e.what());
+    }
+}
+
+bool Image::operator==(const Image& other) const
+{
+    return objectTrackId == other.objectTrackId
+        && format == other.format
+        && data64 == other.data64;
+}
+
+bool TrackImage::operator==(const TrackImage& other) const
+{
+    return
+        static_cast<const BaseImageMetadata&>(*this) == static_cast<const BaseImageMetadata&>(other)
+        && image == other.image;
+}
+
+TrackImage::TrackImage(const nx::kit::Json& json): BaseImageMetadata(json)
+{
+    image = getOptionalObjectValue<Image>(json, "image");
+}
+
+TrackImage::TrackImage(const char* jsonData): TrackImage(parseJson(jsonData))
+{
+}
+
+ValueOrError<TrackImage> TrackImage::fromJson(const char* jsonStr) noexcept
+{
+    try
+    {
+        return ValueOrError<TrackImage>::makeValue(TrackImage(jsonStr));
+    }
+    catch (const std::exception& e)
+    {
+        return ValueOrError<TrackImage>::makeError(e.what());
+    }
+}
+
+ValueOrError<TrackImage> TrackImage::fromJson(const nx::kit::Json& json) noexcept
+{
+    try
+    {
+        return ValueOrError<TrackImage>::makeValue(TrackImage(json));
+    }
+    catch (const std::exception& e)
+    {
+        return ValueOrError<TrackImage>::makeError(e.what());
+    }
+}
+
+nx::kit::Json TrackImage::to_json() const
+{
+    auto result = toBaseObject();
+    if (image)
+        result["image"] = *image;
+    return result;
 }
 
 AnalyticsLookupResult analyticsLookupResultFromJson(const char* data)

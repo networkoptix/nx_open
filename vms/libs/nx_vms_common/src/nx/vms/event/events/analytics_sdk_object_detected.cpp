@@ -30,7 +30,7 @@ AnalyticsSdkObjectDetected::AnalyticsSdkObjectDetected(
 
 nx::Uuid AnalyticsSdkObjectDetected::engineId() const
 {
-    return m_metadata.analyticsEngineId;
+    return m_packet->analyticsEngineId;
 }
 
 const QString& AnalyticsSdkObjectDetected::objectTypeId() const
@@ -46,7 +46,7 @@ nx::Uuid AnalyticsSdkObjectDetected::objectTrackId() const
 EventParameters AnalyticsSdkObjectDetected::getRuntimeParams() const
 {
     EventParameters params = base_type::getRuntimeParams();
-    params.setAnalyticsEngineId(m_metadata.analyticsEngineId);
+    params.setAnalyticsEngineId(m_packet->analyticsEngineId);
     params.setAnalyticsObjectTypeId(m_metadata.typeId);
     params.objectTrackId = m_metadata.trackId;
     params.attributes = m_metadata.attributes;

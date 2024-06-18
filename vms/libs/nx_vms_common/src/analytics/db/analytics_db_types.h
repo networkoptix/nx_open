@@ -77,33 +77,64 @@ struct Image
 QN_FUSION_DECLARE_FUNCTIONS(Image, (json)(ubjson), NX_VMS_COMMON_API);
 NX_REFLECTION_INSTRUMENT(Image, Image_analytics_storage_Fields)
 
-struct BestShot
+NX_REFLECTION_ENUM_CLASS(ImageType,
+    notDefined,
+    bestShot,
+    title
+);
+
+struct ImageEx: Image
 {
-    qint64 timestampUs = 0;
+    ImageType imageType = ImageType::notDefined;
+    nx::utils::Url url;
+};
+
+struct BaseTrackImage
+{
+    qint64 timestampUs = -1;
     QRectF rect = QRectF{-1, -1, -1, -1};
     nx::vms::api::StreamIndex streamIndex = nx::vms::api::StreamIndex::undefined;
-    Image image;
+    std::optional<Image> image;
+};
+#define BaseTrackImage_analytics_storage_Fields (timestampUs)(rect)(streamIndex)(image)
+QN_FUSION_DECLARE_FUNCTIONS(BaseTrackImage, (json)(ubjson), NX_VMS_COMMON_API);
+NX_REFLECTION_INSTRUMENT(BaseTrackImage, BaseTrackImage_analytics_storage_Fields)
+
+struct BestShot: public BaseTrackImage
+{
+    // Keep timestamp 0 by default for compatibility with previous version.
+    BestShot(): BaseTrackImage() { timestampUs = 0; };
+    BestShot(const BaseTrackImage& image): BaseTrackImage(image) { timestampUs = 0; }
 
     bool initialized() const { return timestampUs > 0; }
 };
-#define BestShot_analytics_storage_Fields (timestampUs)(rect)(streamIndex)(image)
-QN_FUSION_DECLARE_FUNCTIONS(BestShot, (json)(ubjson), NX_VMS_COMMON_API);
-NX_REFLECTION_INSTRUMENT(BestShot, BestShot_analytics_storage_Fields)
 
-struct BestShotEx: public BestShot
+struct TrackImage: public BaseTrackImage
 {
     nx::Uuid deviceId;
 
-    BestShotEx() = default;
+    TrackImage() = default;
 
-    BestShotEx(const BestShot& bestShot):
-        BestShot(bestShot)
+    TrackImage(const BaseTrackImage& bestShot):
+        BaseTrackImage(bestShot)
     {
     }
 };
-#define BestShotEx_analytics_storage_Fields BestShot_analytics_storage_Fields(deviceId)
-QN_FUSION_DECLARE_FUNCTIONS(BestShotEx, (json)(ubjson));
-NX_REFLECTION_INSTRUMENT(BestShotEx, BestShotEx_analytics_storage_Fields)
+#define TrackImage_analytics_storage_Fields BaseTrackImage_analytics_storage_Fields(deviceId)
+QN_FUSION_DECLARE_FUNCTIONS(TrackImage, (json)(ubjson));
+NX_REFLECTION_INSTRUMENT(TrackImage, TrackImage_analytics_storage_Fields)
+
+struct Title: public BaseTrackImage
+{
+    Title() = default;
+    Title(const BaseTrackImage& image): BaseTrackImage(image) {}
+
+    QString text;
+    bool hasImage = false;
+};
+#define Title_analytics_storage_Fields BaseTrackImage_analytics_storage_Fields (text)(hasImage)
+QN_FUSION_DECLARE_FUNCTIONS(Title, (json)(ubjson), NX_VMS_COMMON_API);
+NX_REFLECTION_INSTRUMENT(Title, Title_analytics_storage_Fields)
 
 struct ObjectTrack
 {
@@ -134,6 +165,7 @@ struct ObjectTrack
     ObjectRegion objectPosition;
 
     BestShot bestShot;
+    std::optional<Title> title;
 
     nx::Uuid analyticsEngineId;
 
@@ -146,7 +178,7 @@ struct ObjectTrack
 };
 #define ObjectTrack_analytics_storage_Fields \
     (id)(deviceId)(objectTypeId)(attributes)(firstAppearanceTimeUs)(lastAppearanceTimeUs) \
-    (objectPosition)(bestShot)(analyticsEngineId)(storageId)
+    (objectPosition)(bestShot)(title)(analyticsEngineId)(storageId)
 QN_FUSION_DECLARE_FUNCTIONS(ObjectTrack, (json)(ubjson), NX_VMS_COMMON_API);
 NX_REFLECTION_INSTRUMENT(ObjectTrack, ObjectTrack_analytics_storage_Fields)
 
@@ -224,7 +256,9 @@ struct NX_VMS_COMMON_API Filter
 
     bool empty() const;
 
-    bool acceptsMetadata(const nx::Uuid& deviceId,
+    bool acceptsMetadata(
+        const nx::Uuid& deviceId,
+        const Uuid& analyticsEngineId,
         const nx::common::metadata::ObjectMetadata& metadata,
         const AbstractObjectTypeDictionary& objectTypeDictionary,
         bool checkBoundingBox = true) const;

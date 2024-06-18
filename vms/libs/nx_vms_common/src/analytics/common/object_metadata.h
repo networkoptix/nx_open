@@ -106,35 +106,18 @@ NX_VMS_COMMON_API GroupedAttributes groupAttributes(
 //-------------------------------------------------------------------------------------------------
 static constexpr int kCoordinateDecimalDigits = 4;
 
-NX_REFLECTION_ENUM_CLASS(ObjectMetadataType,
-    /**%apidoc Undefined analytics object. */
+/**%apidoc Describes whether the image should be loaded from the VMS Archive or an Integration. */
+NX_REFLECTION_ENUM_CLASS(ImageLocation,
     undefined,
 
-    /**%apidoc Regular analytics object. It represents a rectangle where object was detected. */
-    regular,
+    /**%apidoc The image is loaded from the VMS Archive. */
+    internal,
 
-    /**%apidoc It points to the best recognized rectangle of the whole track.
-     * This time `boundingBox` can be used to represent track thumbnail.
-     */
-    bestShot,
-
-    /**%apidoc same as `bestShot` but such metadata has explicitly loaded image from a Device.
-     * The API request /ec2/analyticsTrackBestShot uses this data.
-     */
-    externalBestShot
+    /**%apidoc The image is read from an Integration. */
+    external
 )
-
-// TODO: #rvasilenko: This struct should NOT be used bot best shots, because it was originally
-// designed to match IObjectMetadata, and best shots are yielded by a plugin as
-// IObjectTrackBestShotPacket which has no relation to IObjectMetadata.
-struct NX_VMS_COMMON_API ObjectMetadata
+struct BaseMetadata
 {
-    /**%apidoc
-     * Object type.
-     * %example car
-     */
-    QString typeId;
-
     /**%apidoc Unique track Id. */
     nx::Uuid trackId;
 
@@ -142,52 +125,59 @@ struct NX_VMS_COMMON_API ObjectMetadata
      * and `y`), `width` and `height`. Relative coordinates are in range [0;1].
      */
     QRectF boundingBox;
-
-    std::vector<Attribute> attributes;
-
-    /**%apidoc Kind of the object. */
-    ObjectMetadataType objectMetadataType;
-
-    /**%apidoc Unique Id of the analytics engine. */
-    nx::Uuid analyticsEngineId;
-
-    /**%apidoc Image url, only for Best Shot packets. */
-    QString imageUrl;
-
-    /**%apidoc Image data format, only for Best Shot packets. */
-    QString imageDataFormat;
-
-    /**%apidoc Image data size, only for Best Shot packets. */
-    int imageDataSize;
-
-    /**%apidoc Whether the image data is not null, only for Best Shot packets. */
-    bool isImageDataPresent;
-
-    bool isBestShot() const
-    {
-        return objectMetadataType == ObjectMetadataType::bestShot
-            || objectMetadataType == ObjectMetadataType::externalBestShot;
-    }
-
-    bool isExternalBestShot() const
-    {
-        return objectMetadataType == ObjectMetadataType::externalBestShot;
-    }
 };
-#define ObjectMetadata_Fields \
-    (typeId) \
-    (trackId) \
-    (boundingBox) \
-    (attributes) \
-    (objectMetadataType) \
-    (analyticsEngineId)
+#define BaseMetadata_Fields (trackId)(boundingBox)
 
+/**
+ * Designed to match IObjectMetadata, and Best Shots are yielded by an Integration as
+ * IObjectTrackBestShotPacket which has no relation to IObjectMetadata.
+ */
+struct ObjectMetadata: BaseMetadata
+{
+    /**%apidoc Object type.
+     * %example car
+     */
+    QString typeId;
+
+    /**%apidoc Metadata attributes. */
+    std::vector<Attribute> attributes;
+};
+#define ObjectMetadata_Fields BaseMetadata_Fields (typeId) (attributes)
 QN_FUSION_DECLARE_FUNCTIONS(ObjectMetadata, (json)(ubjson), NX_VMS_COMMON_API);
-
 NX_VMS_COMMON_API bool operator==(const ObjectMetadata& left, const ObjectMetadata& right);
 NX_VMS_COMMON_API QString toString(const ObjectMetadata& object);
-
 NX_REFLECTION_INSTRUMENT(ObjectMetadata, ObjectMetadata_Fields)
+
+//-------------------------------------------------------------------------------------------------
+
+struct NX_VMS_COMMON_API BestShotMetadata: public BaseMetadata
+{
+    ImageLocation location = ImageLocation::internal;
+    std::vector<Attribute> attributes;
+
+    BestShotMetadata() = default;
+    BestShotMetadata(const BaseMetadata& base): BaseMetadata(base) {}
+};
+#define BestShotMetadata_Fields BaseMetadata_Fields (location)(attributes)
+QN_FUSION_DECLARE_FUNCTIONS(BestShotMetadata, (json)(ubjson), NX_VMS_COMMON_API);
+NX_VMS_COMMON_API QString toString(const BestShotMetadata& object);
+NX_REFLECTION_INSTRUMENT(BestShotMetadata, BestShotMetadata_Fields)
+
+//-------------------------------------------------------------------------------------------------
+
+struct NX_VMS_COMMON_API TitleMetadata: public BaseMetadata
+{
+    ImageLocation location = ImageLocation::internal;
+    QString text;
+
+    TitleMetadata(const BaseMetadata& base) : BaseMetadata(base) {}
+    TitleMetadata() = default;
+};
+#define TitleMetadata_Fields BaseMetadata_Fields (location)(text)
+QN_FUSION_DECLARE_FUNCTIONS(TitleMetadata, (json)(ubjson), NX_VMS_COMMON_API);
+QN_FUSION_DECLARE_FUNCTIONS(TitleMetadata, (json)(ubjson), NX_VMS_COMMON_API);
+NX_VMS_COMMON_API QString toString(const TitleMetadata& object);
+NX_REFLECTION_INSTRUMENT(TitleMetadata, TitleMetadata_Fields)
 
 //-------------------------------------------------------------------------------------------------
 
@@ -204,35 +194,26 @@ struct NX_VMS_COMMON_API ObjectMetadataPacket
     qint64 durationUs = 0;
 
     std::vector<ObjectMetadata> objectMetadataList;
+    std::optional<BestShotMetadata> bestShot;
+    std::optional<TitleMetadata> title;
 
     /**%apidoc[opt] Video stream from which analytics data was received. */
     nx::vms::api::StreamIndex streamIndex = nx::vms::api::StreamIndex::undefined;
 
-    bool containsBestShotMetadata() const
-    {
-        return std::any_of(
-            objectMetadataList.cbegin(),
-            objectMetadataList.cend(),
-            [](const ObjectMetadata& objectMetadata) { return objectMetadata.isBestShot(); });
-    }
 
-    bool containsExternalBestShotMetadata() const
-    {
-        return std::any_of(
-            objectMetadataList.cbegin(),
-            objectMetadataList.cend(),
-            [](const ObjectMetadata& objectMetadata)
-            {
-                return objectMetadata.isExternalBestShot();
-            });
-    }
+    nx::Uuid analyticsEngineId;
+
+    bool isEmpty() const { return objectMetadataList.empty() && !bestShot && !title; }
 };
 
 #define ObjectMetadataPacket_Fields (deviceId) \
     (timestampUs) \
     (durationUs) \
     (objectMetadataList) \
-    (streamIndex)
+    (bestShot) \
+    (title) \
+    (streamIndex) \
+    (analyticsEngineId)
 
 QN_FUSION_DECLARE_FUNCTIONS(ObjectMetadataPacket, (json)(ubjson), NX_VMS_COMMON_API);
 
@@ -250,6 +231,8 @@ NX_VMS_COMMON_API bool operator<(std::chrono::microseconds first, const ObjectMe
 NX_VMS_COMMON_API bool operator<(const ObjectMetadataPacket& first, std::chrono::microseconds second);
 
 NX_VMS_COMMON_API QString toString(const ObjectMetadataPacket& packet);
+
+//-------------------------------------------------------------------------------------------------
 
 /**
  * Contains the binary data for the records from ObjectMetadataPacket which have the same Object
@@ -279,7 +262,6 @@ using QnConstCompressedObjectMetadataPacketPtr = std::shared_ptr<const QnCompres
 
 NX_VMS_COMMON_API ObjectMetadataPacketPtr fromCompressedMetadataPacket(
     const QnConstCompressedMetadataPtr&);
-NX_VMS_COMMON_API ::std::ostream& operator<<(::std::ostream& os, const ObjectMetadataPacket& packet);
 
 } // namespace metadata
 } // namespace common

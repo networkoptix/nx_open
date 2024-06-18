@@ -34,6 +34,7 @@ struct NX_VMS_COMMON_API QnAviArchiveMetadata
     static const int kMetadataStreamVersion_1 = 1;
     static const int kMetadataStreamVersion_2 = 2;
     static const int kMetadataStreamVersion_3 = 3;
+    static const int kMetadataStreamVersion_4 = 4;
 
     int version = kDefaultVersion;
     QByteArray signature;

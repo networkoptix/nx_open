@@ -11,7 +11,6 @@
 #include <nx/sdk/result.h>
 
 #include "i_device_agent.h"
-#include "i_time_periods.h"
 
 namespace nx::sdk::cloud_storage {
 
@@ -27,6 +26,8 @@ struct StorageSpace
     int64_t totalSpace = -1;
     int64_t freeSpace = -1;
 };
+
+enum class TrackImageType;
 
 /**
  * Engine is an abstraction of a backend communication entity. It's something that knows how to
@@ -124,24 +125,24 @@ public:
         const char* deviceId, int64_t timestampUs, MetadataType type, const char* data) = 0;
 
     /**
-     * Add a best shot image to the `ObjectTrack`. `data` is the JSON representation of the
+     * Add a  image to the `ObjectTrack`. `data` is the JSON representation of the
      * nx::sdk::cloud_storage::Image struct.
      */
-    public: virtual ErrorCode saveBestShotImage(const char* data) = 0;
+    public: virtual ErrorCode saveTrackImage(const char* data, TrackImageType type) = 0;
 
     /**
      * Fetch a best shot image associated with the given objectTrackId. Result string should
      * contain the JSON representation of the nx::sdk::cloud_storage::Image struct.
      */
-    public: Result<IString*> fetchBestShotImage(const char* objectTrackId) const
+    public: Result<IString*> fetchTrackImage(const char* objectTrackId, TrackImageType type) const
     {
         Result<IString*> result;
-        doFetchBestShotImage(objectTrackId, &result);
+        doFetchTrackImage(objectTrackId, type, &result);
         return result;
     }
 
-    protected: virtual void doFetchBestShotImage(
-        const char* objectTrackId, Result<IString*>* outResult) const = 0;
+    protected: virtual void doFetchTrackImage(
+        const char* objectTrackId, TrackImageType type, Result<IString*>* outResult) const = 0;
 
     /**
      * No IArchiveUpdateHandler::onArchiveUpdated() should be called by the plugin before this

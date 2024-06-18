@@ -19,6 +19,10 @@ namespace common {
 namespace metadata {
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
+    BestShotMetadata, (json)(ubjson), BestShotMetadata_Fields, (brief, true))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
+    TitleMetadata, (json)(ubjson), TitleMetadata_Fields, (brief, true))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     ObjectMetadata, (json)(ubjson), ObjectMetadata_Fields, (brief, true))
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     ObjectMetadataPacket, (json)(ubjson), ObjectMetadataPacket_Fields, (brief, true))
@@ -58,27 +62,20 @@ bool operator==(const ObjectMetadata& left, const ObjectMetadata& right)
         && left.attributes == right.attributes;
 }
 
-QString toString(const ObjectMetadata& objectMetadata)
+QString baseMetadataToString(const BaseMetadata& metadata)
 {
     QString s =
-        "x " + QString::number(objectMetadata.boundingBox.x())
-        + ", y " + QString::number(objectMetadata.boundingBox.y())
-        + ", width " + QString::number(objectMetadata.boundingBox.width())
-        + ", height " + QString::number(objectMetadata.boundingBox.height())
-        + ", trackId " + objectMetadata.trackId.toString();
+        "x " + QString::number(metadata.boundingBox.x())
+        + ", y " + QString::number(metadata.boundingBox.y())
+        + ", width " + QString::number(metadata.boundingBox.width())
+        + ", height " + QString::number(metadata.boundingBox.height())
+        + ", trackId " + metadata.trackId.toString();
+    return s;
+}
 
-    if (objectMetadata.isBestShot())
-    {
-        if (!objectMetadata.imageUrl.isNull())
-            s += ", imageUrl " + nx::kit::utils::toString(objectMetadata.imageUrl);
-        if (!objectMetadata.imageDataFormat.isNull())
-            s += ", imageDataFormat " + nx::kit::utils::toString(objectMetadata.imageDataFormat);
-        if (objectMetadata.isImageDataPresent)
-            s += ", imageData present";
-        if (objectMetadata.isImageDataPresent || objectMetadata.imageDataSize != 0)
-            s += ", imageDataSize " + std::to_string(objectMetadata.imageDataSize);
-        return s;
-    }
+QString toString(const ObjectMetadata& objectMetadata)
+{
+    QString s = baseMetadataToString(objectMetadata);
 
     s += ", typeId " + objectMetadata.typeId + ", attributes {";
 
@@ -132,13 +129,27 @@ QString toString(const ObjectMetadataPacket& packet)
 
     for (const auto& object: packet.objectMetadataList)
         s += "    " + toString(object) + "\n";
+    if (packet.bestShot)
+        s += "    best shot: " + toString(*packet.bestShot) + "\n";
+    if (packet.title)
+        s += "    title: " + toString(*packet.title) + "\n";
 
     return s;
 }
 
-::std::ostream& operator<<(::std::ostream& os, const ObjectMetadataPacket& packet)
+QString toString(const BestShotMetadata& bestShot)
 {
-    return os << toString(packet).toStdString();
+    return nx::format("%1, location: %2",
+        baseMetadataToString(bestShot),
+        nx::reflect::toString(bestShot.location));
+}
+
+QString toString(const TitleMetadata& title)
+{
+    return nx::format("%1, location: %2, text: %3",
+        baseMetadataToString(title),
+        nx::reflect::toString(title.location),
+        title.text);
 }
 
 ObjectMetadataPacketPtr fromCompressedMetadataPacket(

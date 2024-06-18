@@ -103,13 +103,15 @@ ObjectTrackEx::ObjectTrackEx(const ObjectTrack& data)
     lastAppearanceTimeUs = data.lastAppearanceTimeUs;
     objectPosition = data.objectPosition;
     bestShot = data.bestShot;
+    title = data.title;
     analyticsEngineId = data.analyticsEngineId;
     storageId = data.storageId;
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Image, (json)(ubjson), Image_analytics_storage_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(BestShot, (json)(ubjson), BestShot_analytics_storage_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(BestShotEx, (json)(ubjson), BestShotEx_analytics_storage_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Title, (json)(ubjson), Title_analytics_storage_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(BaseTrackImage, (json)(ubjson), BaseTrackImage_analytics_storage_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(TrackImage, (json)(ubjson), TrackImage_analytics_storage_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ObjectTrack, (json)(ubjson), ObjectTrack_analytics_storage_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     ObjectTrackEx, (json)(ubjson), ObjectTrackEx_analytics_storage_Fields)
@@ -135,7 +137,9 @@ bool Filter::empty() const
     return *this == Filter();
 }
 
-bool Filter::acceptsMetadata(const nx::Uuid& deviceId,
+bool Filter::acceptsMetadata(
+    const nx::Uuid& deviceId,
+    const Uuid& analyticsEngineId,
     const nx::common::metadata::ObjectMetadata& metadata,
     const AbstractObjectTypeDictionary& objectTypeDictionary,
     bool checkBoundingBox) const
@@ -150,7 +154,7 @@ bool Filter::acceptsMetadata(const nx::Uuid& deviceId,
     track.id = metadata.trackId;
     track.deviceId = deviceId;
     track.objectTypeId = metadata.typeId;
-    track.analyticsEngineId = metadata.analyticsEngineId;
+    track.analyticsEngineId = analyticsEngineId;
     track.attributes = metadata.attributes;
     return acceptsTrackInternal(track,
         objectTypeDictionary,
