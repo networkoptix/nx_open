@@ -683,7 +683,9 @@ bool StartupActionsHandler::connectToCloudIfNeeded(const QnStartupParameters& st
         return false;
 
     NX_DEBUG(this, "Connecting to cloud as %1", authData.credentials.username);
-    appContext()->cloudStatusWatcher()->setInitialAuthData(authData);
+    appContext()->cloudStatusWatcher()->setAuthData(
+        authData,
+        core::CloudStatusWatcher::AuthMode::initial);
     return true;
 }
 
