@@ -65,7 +65,7 @@ Dialog
 
     function createNewList()
     {
-        createNewLookupListDialog.createObject(control).openNewIn(control)
+        dialog.createListRequested()
     }
 
     function editCurrentList()
@@ -134,26 +134,26 @@ Dialog
                 listComboBox.currentIndex = 0
             hasChanges = false
         }
-    }
 
-    Component
-    {
-        id: createNewLookupListDialog
-
-        EditLookupListDialog
+        function onAppendData(data)
         {
-            transientParent: control.Window.window
-            taxonomy: control.taxonomy
-            visible: false
-            onAccepted:
+            if (data.length == 0)
+                return;
+
+            loaded = false
+            const firstModel = data[0]
+            for (let i = 0; i < data.length; ++i)
             {
+                const model = data[i]
                 listsModel.append({
-                    text: viewModel.name,
-                    decorationPath: iconPathForLookupList(viewModel),
-                    value: viewModel
+                    text: model.data.name,
+                    decorationPath: iconPathForLookupList(model),
+                    value: model
                 })
-                listComboBox.currentIndex = listComboBox.indexOfValue(viewModel)
             }
+            listComboBox.currentIndex = listComboBox.indexOfValue(firstModel)
+
+            loaded = true
         }
     }
 
