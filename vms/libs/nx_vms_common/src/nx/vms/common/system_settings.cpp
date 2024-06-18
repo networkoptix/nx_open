@@ -92,8 +92,8 @@ struct SystemSettings::Private
     QnResourcePropertyAdaptor<nx::Uuid> *primaryTimeServerAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* masterCloudSyncListAdaptor = nullptr;
     QnResourcePropertyAdaptor<int>* maxDifferenceBetweenSynchronizedAndInternetTimeAdaptor = nullptr;
-    QnReflectLexicalResourcePropertyAdaptor<std::chrono::milliseconds>* maxDifferenceBetweenSynchronizedAndLocalTimeMsAdaptor = nullptr;
-    QnReflectLexicalResourcePropertyAdaptor<std::chrono::milliseconds>* osTimeChangeCheckPeriodMsAdaptor = nullptr;
+    QnResourcePropertyAdaptor<std::chrono::milliseconds>* maxDifferenceBetweenSynchronizedAndLocalTimeMsAdaptor = nullptr;
+    QnResourcePropertyAdaptor<std::chrono::milliseconds>* osTimeChangeCheckPeriodMsAdaptor = nullptr;
     QnResourcePropertyAdaptor<int>* syncTimeExchangePeriodAdaptor = nullptr;
     QnResourcePropertyAdaptor<int>* syncTimeEpsilonAdaptor = nullptr;
     QnResourcePropertyAdaptor<nx::vms::api::BackupSettings>* backupSettingsAdaptor = nullptr;
@@ -148,7 +148,7 @@ struct SystemSettings::Private
 
     QnResourcePropertyAdaptor<int>* maxRtpRetryCountAdaptor = nullptr;
 
-    QnReflectLexicalResourcePropertyAdaptor<std::chrono::milliseconds>* rtpTimeoutMsAdaptor = nullptr;
+    QnResourcePropertyAdaptor<std::chrono::milliseconds>* rtpTimeoutMsAdaptor = nullptr;
     QnResourcePropertyAdaptor<int>* maxRtspConnectDurationSecondsAdaptor = nullptr;
 
     QnResourcePropertyAdaptor<bool>* cloudConnectUdpHolePunchingEnabledAdaptor = nullptr;
@@ -174,12 +174,12 @@ struct SystemSettings::Private
     QnResourcePropertyAdaptor<nx::vms::api::PixelationSettings>*
         pixelationSettingsAdaptor = nullptr;
 
-    QnReflectLexicalResourcePropertyAdaptor<std::chrono::seconds>* sessionLimitSAdaptor = nullptr;
+    QnResourcePropertyAdaptor<std::chrono::seconds>* sessionLimitSAdaptor = nullptr;
 	QnResourcePropertyAdaptor<bool>* useSessionLimitForCloudAdaptor = nullptr;
     QnResourcePropertyAdaptor<int>* sessionsLimitAdaptor = nullptr;
     QnResourcePropertyAdaptor<int>* sessionsLimitPerUserAdaptor = nullptr;
-    QnReflectLexicalResourcePropertyAdaptor<std::chrono::seconds>* remoteSessionUpdateSAdaptor = nullptr;
-    QnReflectLexicalResourcePropertyAdaptor<std::chrono::seconds>* remoteSessionTimeoutSAdaptor = nullptr;
+    QnResourcePropertyAdaptor<std::chrono::seconds>* remoteSessionUpdateSAdaptor = nullptr;
+    QnResourcePropertyAdaptor<std::chrono::seconds>* remoteSessionTimeoutSAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* defaultVideoCodecAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* defaultExportVideoCodecAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* lowQualityScreenVideoCodecAdaptor = nullptr;
@@ -194,7 +194,7 @@ struct SystemSettings::Private
     QnResourcePropertyAdaptor<int>* mediaBufferSizeKbAdaptor = nullptr;
     QnResourcePropertyAdaptor<int>* mediaBufferSizeForAudioOnlyDeviceKbAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* forceAnalyticsDbStoragePermissionsAdaptor = nullptr;
-    QnReflectLexicalResourcePropertyAdaptor<std::chrono::milliseconds>* checkVideoStreamPeriodMsAdaptor = nullptr;
+    QnResourcePropertyAdaptor<std::chrono::milliseconds>* checkVideoStreamPeriodMsAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* storageEncryptionAdaptor = nullptr;
     QnResourcePropertyAdaptor<QByteArray>* currentStorageEncryptionKeyAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* showServersInTreeForNonAdminsAdaptor = nullptr;
@@ -207,7 +207,7 @@ struct SystemSettings::Private
     QnResourcePropertyAdaptor<bool>* insecureDeprecatedApiInUseEnabledAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* exposeServerEndpointsAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* showMouseTimelinePreviewAdaptor = nullptr;
-    QnReflectLexicalResourcePropertyAdaptor<std::chrono::seconds>* cloudPollingIntervalSAdaptor = nullptr;
+    QnResourcePropertyAdaptor<std::chrono::seconds>* cloudPollingIntervalSAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* allowRegisteringIntegrationsAdaptor = nullptr;
 
     AdaptorList allAdaptors;
@@ -431,13 +431,13 @@ SystemSettings::AdaptorList SystemSettings::initTimeSynchronizationAdaptors()
     timeSynchronizationAdaptors << d->maxDifferenceBetweenSynchronizedAndInternetTimeAdaptor;
 
     d->maxDifferenceBetweenSynchronizedAndLocalTimeMsAdaptor =
-        new QnReflectLexicalResourcePropertyAdaptor<std::chrono::milliseconds>(
+        new QnJsonResourcePropertyAdaptor<std::chrono::milliseconds>(
             "maxDifferenceBetweenSynchronizedAndLocalTimeMs", 2s, this,
             [] { return tr("Max difference between local and source time (milliseconds)"); });
     timeSynchronizationAdaptors << d->maxDifferenceBetweenSynchronizedAndLocalTimeMsAdaptor;
 
     d->osTimeChangeCheckPeriodMsAdaptor =
-        new QnReflectLexicalResourcePropertyAdaptor<std::chrono::milliseconds>(
+        new QnJsonResourcePropertyAdaptor<std::chrono::milliseconds>(
             "osTimeChangeCheckPeriodMs", 5s, this,
             [] { return tr("OS time change check period"); });
     timeSynchronizationAdaptors << d->osTimeChangeCheckPeriodMsAdaptor;
@@ -660,7 +660,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
             "Maximum number of consecutive RTP errors before the server reconnects the RTSP "
             "session."); });
 
-    d->rtpTimeoutMsAdaptor = new QnReflectLexicalResourcePropertyAdaptor<std::chrono::milliseconds>(
+    d->rtpTimeoutMsAdaptor = new QnJsonResourcePropertyAdaptor<std::chrono::milliseconds>(
         "rtpTimeoutMs", 10s, this, [] { return tr("RTP timeout (milliseconds)"); });
 
     d->maxRtspConnectDurationSecondsAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
@@ -722,7 +722,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
             "pixelationSettings", nx::vms::api::PixelationSettings{}, this,
             [] { return tr("Pixelation settings"); });
 
-    d->sessionLimitSAdaptor = new QnReflectLexicalResourcePropertyAdaptor<std::chrono::seconds>(
+    d->sessionLimitSAdaptor = new QnJsonResourcePropertyAdaptor<std::chrono::seconds>(
         Names::sessionLimitS, kDefaultSessionLimit,
         [](const std::chrono::seconds& value) { return value >= 0s; },
         this,
@@ -740,12 +740,12 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         Names::sessionsLimitPerUser, 5'000, [](const int& value) { return value >= 0; }, this,
         [] { return tr("Max session token count per user on single Server"); });
 
-    d->remoteSessionUpdateSAdaptor = new QnReflectLexicalResourcePropertyAdaptor<std::chrono::seconds>(
+    d->remoteSessionUpdateSAdaptor = new QnJsonResourcePropertyAdaptor<std::chrono::seconds>(
         Names::remoteSessionUpdateS, 10s,
         [](const std::chrono::seconds& value) { return value > 0s; }, this,
         [] { return tr("Update interval for remote session token cache (other Servers and Cloud)"); });
 
-    d->remoteSessionTimeoutSAdaptor = new QnReflectLexicalResourcePropertyAdaptor<std::chrono::seconds>(
+    d->remoteSessionTimeoutSAdaptor = new QnJsonResourcePropertyAdaptor<std::chrono::seconds>(
         Names::remoteSessionTimeoutS, 6h,
         [](const std::chrono::seconds& value) { return value > 0s; }, this,
         [] { return tr("Timeout for remote session token cache (other Servers and Cloud)"); });
@@ -829,7 +829,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         "forceAnalyticsDbStoragePermissions", true,  this,
         [] { return tr("Force analytics DB storage mount point permissions in case of failure"); });
 
-    d->checkVideoStreamPeriodMsAdaptor = new QnReflectLexicalResourcePropertyAdaptor<std::chrono::milliseconds>(
+    d->checkVideoStreamPeriodMsAdaptor = new QnJsonResourcePropertyAdaptor<std::chrono::milliseconds>(
         "checkVideoStreamPeriodMs", 10s, this,
         [] { return tr("Check video stream period (milliseconds)"); });
 
@@ -893,7 +893,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         Names::ldap, nx::vms::api::LdapSettings(), this,
         [] { return tr("LDAP settings"); });
 
-    d->cloudPollingIntervalSAdaptor = new QnReflectLexicalResourcePropertyAdaptor<std::chrono::seconds>(
+    d->cloudPollingIntervalSAdaptor = new QnJsonResourcePropertyAdaptor<std::chrono::seconds>(
         Names::cloudPollingIntervalS, 60s,
         [](const std::chrono::seconds& value) { return value >= 1s && value <= 10min; },
         this,
