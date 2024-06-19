@@ -109,6 +109,9 @@ struct AccountData
      * E.g., user password was changed, or user has chosen to log out from all devices.
      */
     int securitySequence = 0;
+
+    /**%apidoc[readonly] The AWS region to which the user belongs. */
+    std::string accountLocation;
 };
 
 struct AccountStatusData
