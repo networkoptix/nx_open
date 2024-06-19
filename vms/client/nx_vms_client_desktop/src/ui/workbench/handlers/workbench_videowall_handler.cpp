@@ -508,24 +508,18 @@ void QnWorkbenchVideoWallHandler::resetLayout(
 
     layout->setCellSpacing(0.0);
 
-    auto reset =
-        [this](const QnVideoWallItemIndexList& items, const LayoutResourcePtr& layout)
-        {
-            updateItemsLayout(items, layout->getId());
-        };
-
     const bool needToSave = !layout->isFile()
         && (layout->hasFlags(Qn::local) || system()->layoutSnapshotManager()->isModified(layout));
 
     if (needToSave)
     {
         auto callback =
-            [this, items, reset](bool success, const LayoutResourcePtr& layout)
+            [this, items](bool success, const LayoutResourcePtr& layout)
             {
                 if (!success)
                     showFailedToApplyChanges();
                 else
-                    reset(items, layout);
+                    updateItemsLayout(items, layout->getId());
                 updateMode();
             };
         system()->layoutSnapshotManager()->save(layout, callback);
@@ -533,7 +527,7 @@ void QnWorkbenchVideoWallHandler::resetLayout(
     }
     else
     {
-        reset(items, layout);
+        updateItemsLayout(items, layout->getId());
     }
 }
 
