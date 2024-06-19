@@ -175,9 +175,13 @@ struct RemoteConnectionFactoryRequestsManager::Private
     Request makeRequestWithCertificateValidation(ContextPtr context, const nx::utils::Url& url) const
     {
         const auto expectedKey = publicKey(context->handshakeCertificateChain);
-        const auto& hosts = context->handshakeCertificateChain.front().hosts();
-        const auto lastHostIsServer =
-            !hosts.empty() && !nx::Uuid::fromStringSafe(*hosts.begin()).isNull();
+        bool lastHostIsServer = false;
+        if (NX_ASSERT(!context->handshakeCertificateChain.empty()))
+        {
+            const auto& hosts = context->handshakeCertificateChain.front().hosts();
+            lastHostIsServer =
+                !hosts.empty() && !nx::Uuid::fromStringSafe(*hosts.begin()).isNull();
+        }
 
         Request request = std::make_unique<AsyncClient>(
             (nx::network::ini().verifyVmsSslCertificates && NX_ASSERT(certificateVerifier))
