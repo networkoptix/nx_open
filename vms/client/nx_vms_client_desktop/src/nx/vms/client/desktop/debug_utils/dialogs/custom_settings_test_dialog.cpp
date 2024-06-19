@@ -37,7 +37,7 @@ void CustomSettingsTestDialog::loadManifest()
     {
         QBuffer reader;
         reader.setData(serializedManifest.toUtf8());
-        QnCameraAdvacedParamsXmlParser::readXml(&reader, manifest);
+        QnCameraAdvancedParamsXmlParser::readXml(&reader, manifest);
     }
     else
     {
