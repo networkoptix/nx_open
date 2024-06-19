@@ -54,7 +54,7 @@ namespace
     }
 }
 
-bool QnCameraAdvacedParamsXmlParser::validateXml(QIODevice *xmlSource)
+bool QnCameraAdvancedParamsXmlParser::validateXml(QIODevice *xmlSource)
 {
     // TODO: #sivanov Why the file is not reset to initial position?
     // It leads to 'EOF' error in parsing.
@@ -111,7 +111,7 @@ namespace QnXmlTag {
     const QString condition             = lit("condition");
 }
 
-bool QnCameraAdvacedParamsXmlParser::readXml(QIODevice *xmlSource, QnCameraAdvancedParams &result) {
+bool QnCameraAdvancedParamsXmlParser::readXml(QIODevice *xmlSource, QnCameraAdvancedParams &result) {
 
     QnIODeviceRAAI guard(xmlSource);
     if (!guard.isValid())
@@ -130,7 +130,7 @@ bool QnCameraAdvacedParamsXmlParser::readXml(QIODevice *xmlSource, QnCameraAdvan
 
     QDomElement root = xmlDom.documentElement();
     if (root.tagName() != QnXmlTag::plugin) {
-        NX_WARNING(typeid(QnCameraAdvacedParamsXmlParser),
+        NX_WARNING(typeid(QnCameraAdvancedParamsXmlParser),
             lit("Parse xml error: could not find tag %1. Got %2 instead.")
             .arg(QnXmlTag::plugin)
             .arg(root.tagName()));
@@ -145,7 +145,7 @@ bool QnCameraAdvacedParamsXmlParser::readXml(QIODevice *xmlSource, QnCameraAdvan
     return parsePluginXml(root, result);
 }
 
-bool QnCameraAdvacedParamsXmlParser::parsePluginXml(const QDomElement& pluginXml, QnCameraAdvancedParams &params) {
+bool QnCameraAdvancedParamsXmlParser::parsePluginXml(const QDomElement& pluginXml, QnCameraAdvancedParams &params) {
     for (QDomNode node = pluginXml.firstChild(); !node.isNull(); node = node.nextSibling()) {
         if (node.nodeName() != QnXmlTag::parameters)
             continue;
@@ -160,7 +160,7 @@ bool QnCameraAdvacedParamsXmlParser::parsePluginXml(const QDomElement& pluginXml
     return true;
 }
 
-bool QnCameraAdvacedParamsXmlParser::parseGroupXml(const QDomElement &groupXml, QnCameraAdvancedParamGroup &group) {
+bool QnCameraAdvancedParamsXmlParser::parseGroupXml(const QDomElement &groupXml, QnCameraAdvancedParamGroup &group) {
 
     group.name = groupXml.attribute(QnXmlTag::groupName);
     group.description = groupXml.attribute(QnXmlTag::groupDescription);
@@ -182,7 +182,7 @@ bool QnCameraAdvacedParamsXmlParser::parseGroupXml(const QDomElement &groupXml, 
     return true;
 }
 
-bool QnCameraAdvacedParamsXmlParser::parseElementXml(const QDomElement& elementXml,
+bool QnCameraAdvancedParamsXmlParser::parseElementXml(const QDomElement& elementXml,
     QnCameraAdvancedParameter& param)
 {
     param.id = elementXml.attribute(QnXmlTag::paramId);
@@ -235,7 +235,7 @@ bool QnCameraAdvacedParamsXmlParser::parseElementXml(const QDomElement& elementX
     return true;
 }
 
-bool QnCameraAdvacedParamsXmlParser::parseDependencyGroupsXml(
+bool QnCameraAdvancedParamsXmlParser::parseDependencyGroupsXml(
     const QDomElement& elementXml,
     std::vector<QnCameraAdvancedParameterDependency>& dependencies)
 {
@@ -258,7 +258,7 @@ bool QnCameraAdvacedParamsXmlParser::parseDependencyGroupsXml(
     return isOk;
 }
 
-bool QnCameraAdvacedParamsXmlParser::parseDependenciesXml(
+bool QnCameraAdvancedParamsXmlParser::parseDependenciesXml(
     const QDomElement& elementXml,
     std::vector<QnCameraAdvancedParameterDependency>& dependencies)
 {
@@ -305,7 +305,7 @@ bool QnCameraAdvacedParamsXmlParser::parseDependenciesXml(
     return isOk;
 }
 
-bool QnCameraAdvacedParamsXmlParser::parseConditionsXml(
+bool QnCameraAdvancedParamsXmlParser::parseConditionsXml(
     const QDomElement &elementXml,
     std::vector<QnCameraAdvancedParameterCondition> &conditions)
 {
@@ -332,7 +332,7 @@ bool QnCameraAdvacedParamsXmlParser::parseConditionsXml(
     return true;
 }
 
-bool QnCameraAdvacedParamsXmlParser::parseConditionString(
+bool QnCameraAdvancedParamsXmlParser::parseConditionString(
     QString conditionString,
     QnCameraAdvancedParameterCondition &condition)
 {

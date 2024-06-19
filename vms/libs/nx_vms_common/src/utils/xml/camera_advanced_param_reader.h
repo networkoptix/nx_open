@@ -7,7 +7,7 @@
 
 class QDomElement;
 
-class NX_VMS_COMMON_API QnCameraAdvacedParamsXmlParser
+class NX_VMS_COMMON_API QnCameraAdvancedParamsXmlParser
 {
 public:
     static bool validateXml(QIODevice *xmlSource);
