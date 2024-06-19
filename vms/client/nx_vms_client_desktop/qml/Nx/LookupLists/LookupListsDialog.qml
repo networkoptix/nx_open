@@ -168,7 +168,7 @@ Dialog
             visible: false
             onAccepted:
             {
-                listsModel.set(listComboBox.listsModelIndex, {
+                listsModel.set(listComboBox.listsModelIndex(), {
                     text: viewModel.name,
                     decoration: iconPathForLookupList(viewModel),
                     value: viewModel
@@ -187,7 +187,7 @@ Dialog
                 const idx = listComboBox.currentIndex > 0
                     ? listComboBox.currentIndex - 1
                     : listsModel.count > 1 ? 0 : -1
-                listsModel.remove(listComboBox.listsModelIndex)
+                listsModel.remove(listComboBox.listsModelIndex())
                 listComboBox.currentIndex = idx
                 hasChanges = true
             }
@@ -373,7 +373,10 @@ Dialog
             {
                 id: listComboBox
 
-                readonly property var listsModelIndex: sortModel.mapToSource(sortModel.index(listComboBox.currentIndex, 0)).row
+                function listsModelIndex()
+                {
+                    return sortModel.mapToSource(sortModel.index(listComboBox.currentIndex, 0)).row
+                }
 
                 model: SortFilterProxyModel
                 {
