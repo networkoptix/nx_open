@@ -203,7 +203,13 @@ Qn::Permissions AccessController::Private::permissionsForCamera(
                 q->systemContext()->peerId(), q->user()->getId());
 
             if (camera->getPhysicalId() == ownDesktopCameraId)
-                permissions |= Qn::ViewLivePermission;
+            {
+                permissions |=
+                    Qn::ViewLivePermission
+                    | Qn::ViewContentPermission
+                    | Qn::ReadPermission
+                    | Qn::PlayAudioPermission;
+            }
         }
     }
 

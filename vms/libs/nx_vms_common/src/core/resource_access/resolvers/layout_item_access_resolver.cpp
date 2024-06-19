@@ -47,8 +47,8 @@ private:
     void handleLayoutSharingMaybeChanged(const QnLayoutResourcePtr& layout);
     void handleLayoutShared(const QnLayoutResourcePtr& layout);
     void handleLayoutUnshared(const QnLayoutResourcePtr& layout);
-    void handleCameraAdded(const QnVirtualCameraResourcePtr& camera);
-    void handleCameraRemoved(const QnVirtualCameraResourcePtr& camera);
+    void handleDesktopCameraAdded(const QnVirtualCameraResourcePtr& camera);
+    void handleDesktopCameraRemoved(const QnVirtualCameraResourcePtr& camera);
 
     void handleVideowallLayoutsAdded(const QnVideoWallResourcePtr& videowall,
         const QVector<nx::Uuid>& layoutIds);
@@ -224,7 +224,7 @@ LayoutItemAccessResolver::Private::Private(
                 if (const auto layout = resource.objectCast<QnLayoutResource>())
                     handleLayoutAdded(layout);
                 else if (const auto camera = resource.objectCast<QnVirtualCameraResource>())
-                    handleCameraAdded(camera);
+                    handleDesktopCameraAdded(camera);
             }
         }, Qt::DirectConnection);
 
@@ -236,7 +236,7 @@ LayoutItemAccessResolver::Private::Private(
                 if (const auto layout = resource.objectCast<QnLayoutResource>())
                     handleLayoutRemoved(layout);
                 else if (const auto camera = resource.objectCast<QnVirtualCameraResource>())
-                    handleCameraRemoved(camera);
+                    handleDesktopCameraRemoved(camera);
             }
         }, Qt::DirectConnection);
 
@@ -568,7 +568,7 @@ void LayoutItemAccessResolver::Private::handleLayoutUnshared(const QnLayoutResou
         /*fromLayoutItem*/ false);
 }
 
-void LayoutItemAccessResolver::Private::handleCameraAdded(const QnVirtualCameraResourcePtr& camera)
+void LayoutItemAccessResolver::Private::handleDesktopCameraAdded(const QnVirtualCameraResourcePtr& camera)
 {
     if (!NX_ASSERT(camera) || !camera->hasFlags(Qn::desktop_camera))
         return;
@@ -595,7 +595,7 @@ void LayoutItemAccessResolver::Private::handleCameraAdded(const QnVirtualCameraR
     q->notifyAccessChanged(affectedSubjectIds);
 }
 
-void LayoutItemAccessResolver::Private::handleCameraRemoved(const QnVirtualCameraResourcePtr& camera)
+void LayoutItemAccessResolver::Private::handleDesktopCameraRemoved(const QnVirtualCameraResourcePtr& camera)
 {
     if (!NX_ASSERT(camera) || !camera->hasFlags(Qn::desktop_camera))
         return;
