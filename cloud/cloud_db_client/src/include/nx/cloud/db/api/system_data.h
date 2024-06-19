@@ -441,9 +441,7 @@ enum class SystemHealth
 {
     offline = 0,
 
-    /**%apidoc The system is online but it has the data synchronization protocol version greater
-     * than the cloud.
-     */
+    /**%apidoc The system is online. */
      online,
 
     /**%apidoc The system is online but it has the data synchronization protocol version greater
