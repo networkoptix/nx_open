@@ -5,6 +5,8 @@ import QtQuick.Controls
 
 import Nx.Core
 import Nx.Core.Controls
+import Nx.Models
+
 import nx.vms.client.desktop
 
 import "private"
@@ -44,7 +46,7 @@ ComboBox
         return currentValue
     }
 
-    property string decorationPath:
+    function getDecorationPath()
     {
         if (!withIconSection)
             return ""
@@ -52,6 +54,22 @@ ComboBox
             return model[currentIndex] ? model[currentIndex][decorationRole] : ""
         const data = NxGlobals.modelData(model.index(currentIndex, 0), decorationRole)
         return data ? data : ""
+    }
+
+    property string decorationPath: getDecorationPath()
+
+    onCurrentIndexChanged: decorationPath = getDecorationPath()
+    onModelChanged:
+    {
+        if (Array.isArray(control.model))
+            decorationPath = model[currentIndex] ? model[currentIndex][decorationRole] : ""
+    }
+
+    property var modelAccessor: ModelDataAccessor
+    {
+        model: control.model
+        onDataChanged: decorationPath = getDecorationPath()
+        onCountChanged: decorationPath = getDecorationPath()
     }
 
     property Component menu: Component
