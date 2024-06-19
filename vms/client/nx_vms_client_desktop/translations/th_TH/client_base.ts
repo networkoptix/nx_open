@@ -4999,11 +4999,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>RESTRICTED</source>
-      <translation type="unfinished">RESTRICTED</translation>
+      <translation>ถูกจำกัด</translation>
     </message>
     <message>
       <source>Authorize</source>
-      <translation type="unfinished">Authorize</translation>
+      <translation>อนุญาต</translation>
     </message>
   </context>
   <context>
@@ -11917,7 +11917,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>You can copy the Access Link below, and share it with the implied user.</source>
-      <translation type="unfinished">You can copy the Access Link below, and share it with the implied user.</translation>
+      <translation>คุณสามารถคัดลอกลิงก์การเข้าถึงด้านล่างและแชร์กับผู้ใช้ได้</translation>
     </message>
   </context>
   <context>
