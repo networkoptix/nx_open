@@ -57,6 +57,7 @@ struct NX_VMS_COMMON_API AnalyticsAction
 
 struct NX_VMS_COMMON_API AvailableAnalyticsActionsOfEngine
 {
+    /**%apidoc Id of the Analytics Engine which offers the Actions. */
     nx::Uuid engineId;
 
     QStringList actionIds;
