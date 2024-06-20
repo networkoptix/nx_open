@@ -332,6 +332,9 @@ NX_VMS_COMMON_API extern const QString kOnvifIgnoreOutdatedNotifications;
 // response.
 NX_VMS_COMMON_API extern const QString kReRequestOnvifRecordingEventsIfAllEventsHaveSameTime;
 
+// Prefer native protocol for remote archive synchronization instead of Onvif Profile-G if available.
+NX_VMS_COMMON_API extern const QString kPreferNativeApiForRemoteArchiveSynchronization;
+
 } // namespace ResourceDataKey
 
 //-------------------------------------------------------------------------------------------------
