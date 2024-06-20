@@ -1,7 +1,5 @@
 [settings]
 build_type=Release
-# OpenCV compilation fails with C++20.
-opencv/*:compiler.cppstd=17
 intel-media-driver/*:compiler.cppstd=17
 
 [options]
@@ -10,21 +8,25 @@ boost/*:bzip2 = False
 boost/*:without_locale = True
 boost/*:without_log = True
 boost/*:without_stacktrace = True
-msys2/*:remove_pkgconf = False
-opencv/*:parallel=False
-opencv/*:contrib=True
-opencv/*:contrib_freetype=False
-opencv/*:contrib_sfm=False
+opencv*:dnn=True
+opencv*:freetype=False
+opencv*:gapi=False
+opencv*:sfm=False
+opencv*:with_eigen=False
+opencv*:with_ffmpeg=False
+opencv*:with_jpeg2000=False
+opencv*:with_openexr=False
+opencv*:with_png=False
+opencv*:with_protobuf=False
+opencv*:with_quirc=False
+opencv*:with_tesseract=False
+opencv*:with_tiff=False
+opencv*:with_wayland=False
+opencv*:with_webp=False
+opencv-static/*:with_jpeg=libjpeg-turbo
+opencv/*:shared=True
+opencv/*:with_cuda=False
 opencv/*:with_jpeg=False
-opencv/*:with_png=False
-opencv/*:with_tiff=False
-opencv/*:with_jpeg2000=False
-opencv/*:with_openexr=False
-opencv/*:with_eigen=False
-opencv/*:with_webp=False
-opencv/*:with_quirc=False
-opencv/*:dnn=True
-opencv/*:with_ffmpeg=False
 protobuf/*:with_zlib=False
 prometheus-cpp/*:with_pull=False
 prometheus-cpp/*:with_push=False

@@ -2,12 +2,14 @@ include(common/linux.profile)
 
 [settings]
 arch=x86_64
+opencv*:build_type=RelWithDebInfo
 
 [options]
-opencv/*:with_cuda=True
-opencv/*:cuda_arch_bin=5.0
+opencv-static/*:cuda_arch_bin=5.0
+opencv-static/*:cudawarping=True
+opencv-static/*:with_cuda=True
 qt/*:mysql=True
 qt/*:psql=True
 
 [tool_requires]
-opencv/*:cuda-toolkit/11.8
+opencv-static/*:cuda-toolkit/11.8
