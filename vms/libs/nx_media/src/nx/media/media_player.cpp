@@ -171,7 +171,7 @@ public:
     double speed = 1.0;
 
     // Video surface list to render. Holds QT property value.
-    QMap<int, QVideoSink*> videoSurfaces;
+    QMap<int, QPointer<QVideoSink>> videoSurfaces;
 
     // Media URL to play. Holds QT property value.
     QUrl url;
@@ -267,6 +267,9 @@ public:
 
     QnTimePeriodList periods;
     void applyVideoQuality();
+
+    /** Push empty video frame to output. */
+    void clearVideoOutput();
 
 private:
     PlayerPrivate(Player* parent);
@@ -796,6 +799,15 @@ void Player::invalidateServer()
     delegate->invalidateServer();
 }
 
+void PlayerPrivate::clearVideoOutput()
+{
+    for (auto [channel, sink]: videoSurfaces.asKeyValueRange())
+    {
+        if (sink)
+            sink->setVideoFrame({});
+    }
+}
+
 bool PlayerPrivate::createArchiveReader()
 {
     if (!resource)
@@ -1193,6 +1205,8 @@ void Player::stop()
     d->setState(State::Stopped);
     if (d->mediaStatus != MediaStatus::NoVideoStreams) //< Preserve NoVideoStreams state.
         d->setMediaStatus(MediaStatus::NoMedia);
+
+    d->clearVideoOutput();
 
     d->log("stop() END");
 }
