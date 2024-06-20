@@ -31,7 +31,7 @@ public:
     void setRequests(const QVariant& requests);
     void refresh();
     Q_INVOKABLE void reject(const QString& id);
-    Q_INVOKABLE void approve(const QString& id, const QString& authCode);
+    Q_INVOKABLE void approve(const QString& id);
 
 signals:
     void requestsChanged();

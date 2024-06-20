@@ -99,7 +99,7 @@ void ApiIntegrationRequestsModel::reject(const QString& id)
         thread());
 }
 
-void ApiIntegrationRequestsModel::approve(const QString& id, const QString&)
+void ApiIntegrationRequestsModel::approve(const QString& id)
 {
     if (!connection()) //< It may be null if the client just disconnected from the server.
         return;

@@ -74,7 +74,7 @@ StackLayout
 
             onApproveClicked: (authCode) =>
             {
-                viewModel.requestsModel.approve(request.requestId, authCode)
+                viewModel.requestsModel.approve(request.requestId)
             }
 
             onRemoveClicked: () =>
