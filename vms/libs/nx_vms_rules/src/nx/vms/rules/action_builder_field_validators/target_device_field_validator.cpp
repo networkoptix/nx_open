@@ -31,9 +31,9 @@ ValidationResult TargetDeviceFieldValidator::validity(
     if (targetDeviceField->useSource() && !hasSourceCamera(eventDescriptor.value()))
         return {QValidator::State::Invalid, {tr("Event does not have source camera")}};
 
-    const auto devicesSelection = targetDeviceField->selection();
+    const auto cameras = utils::cameras(targetDeviceField->selection(), context);
     const auto targetDeviceFieldProperties = targetDeviceField->properties();
-    const bool isValidSelection = !devicesSelection.ids.empty()
+    const bool isValidSelection = !cameras.empty()
         || targetDeviceField->useSource()
         || targetDeviceFieldProperties.allowEmptySelection;
 
@@ -42,8 +42,6 @@ ValidationResult TargetDeviceFieldValidator::validity(
 
     if (!targetDeviceFieldProperties.validationPolicy.isEmpty())
     {
-        const auto cameras = utils::cameras(devicesSelection, context);
-
         if (targetDeviceFieldProperties.validationPolicy == kBookmarkValidationPolicy)
             return utils::camerasValidity<QnBookmarkActionPolicy>(context, cameras);
 

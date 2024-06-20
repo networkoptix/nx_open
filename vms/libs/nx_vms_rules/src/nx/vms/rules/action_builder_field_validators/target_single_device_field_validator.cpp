@@ -23,9 +23,10 @@ ValidationResult TargetSingleDeviceFieldValidator::validity(
     if (!NX_ASSERT(targetSingleDeviceField))
         return {QValidator::State::Invalid, {Strings::invalidFieldType()}};
 
-    const auto deviceId = targetSingleDeviceField->id();
+    const auto device =
+        context->resourcePool()->getResourceById<QnVirtualCameraResource>(targetSingleDeviceField->id());
     const auto targetSingleDeviceFieldProperties = targetSingleDeviceField->properties();
-    const bool isValidSelection = !deviceId.isNull()
+    const bool isValidSelection = device
         || targetSingleDeviceField->useSource()
         || targetSingleDeviceFieldProperties.allowEmptySelection;
 
@@ -38,9 +39,6 @@ ValidationResult TargetSingleDeviceFieldValidator::validity(
 
     if (!targetSingleDeviceFieldProperties.validationPolicy.isEmpty())
     {
-        const auto device =
-            context->resourcePool()->getResourceById<QnVirtualCameraResource>(deviceId);
-
         if (targetSingleDeviceFieldProperties.validationPolicy == kExecPtzValidationPolicy)
             return utils::cameraValidity<QnExecPtzPresetPolicy>(context, device);
 
