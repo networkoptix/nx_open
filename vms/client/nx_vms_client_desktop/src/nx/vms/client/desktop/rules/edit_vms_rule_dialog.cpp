@@ -32,6 +32,7 @@
 #include <nx/vms/rules/utils/common.h>
 #include <nx/vms/rules/utils/event.h>
 #include <nx/vms/rules/utils/field.h>
+#include <nx/vms/rules/utils/rule.h>
 #include <ui/common/palette.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
 
@@ -704,7 +705,7 @@ void EditVmsRuleDialog::setHasChanges(bool hasChanges)
 
 void EditVmsRuleDialog::showWarningIfRequired()
 {
-    if (m_hasChanges && m_rule->validity(systemContext()) != QValidator::State::Acceptable)
+    if (m_hasChanges && ruleValidity() != QValidator::State::Acceptable)
     {
         QnMessageBox::warning(
             this,
@@ -717,7 +718,7 @@ void EditVmsRuleDialog::showWarningIfRequired()
 
 QValidator::State EditVmsRuleDialog::ruleValidity() const
 {
-    return m_rule->validity(systemContext()).validity;
+    return vms::rules::utils::visibleFieldsValidity(m_rule.get(), systemContext()).validity;
 }
 
 } // namespace nx::vms::client::desktop::rules

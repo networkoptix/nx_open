@@ -221,7 +221,10 @@ bool Rule::isValid() const
     return true;
 }
 
-ValidationResult Rule::validity(common::SystemContext* context) const
+ValidationResult Rule::validity(
+    common::SystemContext* context,
+    const EventFieldFilter& eventFieldFilter,
+    const ActionFieldFilter& actionFieldFilter) const
 {
     ValidationResult result;
 
@@ -234,6 +237,9 @@ ValidationResult Rule::validity(common::SystemContext* context) const
             auto fieldDescriptor = field->descriptor();
             if (!NX_ASSERT(fieldDescriptor))
                 return {QValidator::State::Invalid, {}};
+
+            if (eventFieldFilter && !eventFieldFilter(field))
+                continue;
 
             auto validator = m_engine->fieldValidator(field->metatype());
             if (!validator)
@@ -259,6 +265,9 @@ ValidationResult Rule::validity(common::SystemContext* context) const
             auto fieldDescriptor = field->descriptor();
             if (!NX_ASSERT(fieldDescriptor))
                 return {QValidator::State::Invalid, {}};
+
+            if (actionFieldFilter && !actionFieldFilter(field))
+                continue;
 
             auto validator = m_engine->fieldValidator(field->metatype());
             if (!validator)
