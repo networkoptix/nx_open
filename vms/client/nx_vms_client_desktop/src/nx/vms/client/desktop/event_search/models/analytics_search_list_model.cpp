@@ -19,6 +19,18 @@
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/common/lookup_lists/lookup_list_manager.h>
 
+namespace {
+
+nx::vms::api::LookupListEntry convertObjectTrack(const nx::analytics::db::ObjectTrack& track)
+{
+    nx::vms::api::LookupListEntry entry;
+    for (const auto& attribute: track.attributes)
+        entry[attribute.name] = attribute.value;
+    return entry;
+}
+
+} // namespace
+
 namespace nx::vms::client::desktop {
 
 QVariant AnalyticsSearchListModel::data(const QModelIndex& index, int role) const
@@ -94,12 +106,8 @@ QSharedPointer<QMenu> AnalyticsSearchListModel::contextMenu(
                     continue; //< We can add object only to list with same objectTypeId.
 
                 addMenu->addAction<std::function<void()>>(list.name,
-                    [this, track, id = list.id]()
+                    [entry = convertObjectTrack(track), id = list.id]()
                     {
-                        api::LookupListEntry entry;
-                        for(const auto& attribute: track.attributes)
-                            entry[attribute.name] = attribute.value;
-
                         menu::Parameters parameters;
                         parameters.setArguments({
                             {Qn::LookupListEntryRole, QVariant::fromValue(entry)},
@@ -121,11 +129,14 @@ void AnalyticsSearchListModel::addCreateNewListAction(
     QMenu* menu, const nx::analytics::db::ObjectTrack& track) const
 {
     menu->addAction<std::function<void()>>(tr("Create New List..."),
-        [id = track.objectTypeId, this]()
+        [entry = convertObjectTrack(track), objectTypeId = track.objectTypeId]()
         {
+            menu::Parameters parameters;
+            parameters.setArguments(
+                {{Qn::LookupListEntryRole, QVariant::fromValue(entry)},
+                    {Qn::AnalyticsObjectTypeIdRole, objectTypeId}});
             appContext()->mainWindowContext()->menu()->triggerForced(
-                menu::OpenEditLookupListsDialogAction,
-                menu::Parameters().withArgument(Qn::AnalyticsObjectTypeIdRole, id));
+                menu::OpenEditLookupListsDialogAction, parameters);
         });
 }
 
