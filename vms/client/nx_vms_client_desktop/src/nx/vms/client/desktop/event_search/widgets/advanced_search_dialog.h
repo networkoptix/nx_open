@@ -15,7 +15,7 @@ class AdvancedSearchDialog:
     public QnSessionAwareDelegate
 {
 public:
-    AdvancedSearchDialog(QWidget* parent = nullptr);
+    AdvancedSearchDialog(QObject* parent = nullptr);
 
     static void registerStateDelegate();
     static void unregisterStateDelegate();
