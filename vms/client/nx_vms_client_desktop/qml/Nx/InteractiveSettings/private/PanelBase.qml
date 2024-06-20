@@ -23,11 +23,35 @@ FocusScope
     property bool rejectButtonVisible: false
     property bool contentVisible: true
 
-    signal approveClicked(string authCode)
+    signal approveClicked()
     signal rejectClicked()
 
     implicitWidth: column.implicitWidth
     implicitHeight: column.implicitHeight
+
+    function tryApprove()
+    {
+        if (authCode.value === request.pinCode)
+        {
+            approveClicked()
+        }
+        else
+        {
+            authCode.warningState = true
+            authCode.resetFocus()
+            authCode.forceActiveFocus()
+        }
+    }
+
+    Keys.onShortcutOverride: (event) =>
+    {
+        if (activeFocus && (event.key === Qt.Key_Enter || event.key === Qt.Key_Return))
+        {
+            event.accepted = true
+            if (authCode.valid)
+                tryApprove()
+        }
+    }
 
     Control
     {
@@ -95,11 +119,10 @@ FocusScope
                 AuthCode
                 {
                     id: authCode
-                    onValidChanged:
-                    {
-                        if (valid)
-                            approveButton.focus = true
-                    }
+
+                    focus: true
+
+                    onEdited: warningState = false
                 }
             }
 
@@ -114,20 +137,8 @@ FocusScope
                     visible: approveButtonVisible
                     text: qsTr("Approve")
                     enabled: authCode.valid || !authCode.visible
-                    onClicked: informationPanel.approveClicked(authCode.value)
 
-                    Keys.onShortcutOverride: (event) =>
-                    {
-                        switch (event.key)
-                        {
-                            case Qt.Key_Enter:
-                            case Qt.Key_Return:
-                                event.accepted = true
-                                focus = false
-                                informationPanel.approveClicked(authCode.value)
-                                break
-                        }
-                    }
+                    onClicked: tryApprove()
                 }
 
                 Button
