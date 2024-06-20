@@ -42,11 +42,10 @@ static const QString kScreenNumberKey = "screenNumber";
 // ------------------------------------------------------------------------------------------------
 // AdvancedSearchDialog
 
-AdvancedSearchDialog::AdvancedSearchDialog(QWidget* parent) :
+AdvancedSearchDialog::AdvancedSearchDialog(QObject* parent):
     QmlDialogWrapper(
         QUrl("Nx/LeftPanel/private/analytics/AnalyticsSearchDialog.qml"),
-        {},
-        parent),
+        {}),
     QnSessionAwareDelegate(parent)
 {
     rootObjectHolder()->object()->setProperty("workbenchContext", QVariant::fromValue(context()));
