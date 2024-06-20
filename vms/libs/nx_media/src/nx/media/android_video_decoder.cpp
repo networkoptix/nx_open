@@ -570,6 +570,22 @@ int AndroidVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frameSrc, V
 
     // Got a frame.
 
+    qint64 frameTime = -1;
+
+    while (!d->frameNumToPtsCache.empty() && d->frameNumToPtsCache.front().first < outFrameNum)
+        d->frameNumToPtsCache.pop_front(); //< In case of decoder skipped some input frames
+    if (!d->frameNumToPtsCache.empty() && d->frameNumToPtsCache.front().first == outFrameNum)
+    {
+        qint64 pts = d->frameNumToPtsCache.front().second;
+        frameTime = pts / 1000; //< usec to msec
+        d->frameNumToPtsCache.pop_front();
+    }
+
+    // If we didn't find a timestamp for the frame, that usually means that android decoder
+    // provided a frame out of order. In this case we should just skip it.
+    if (frameTime < 0)
+        return 0;
+
     FboTextureHolder textureHolder;
 
     if (d->threadGlCtx)
@@ -596,14 +612,7 @@ int AndroidVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frameSrc, V
         new TextureBuffer(std::move(textureHolder)),
         QVideoFrameFormat(d->frameSize, QVideoFrameFormat::Format_BGRX8888));
 
-    while (!d->frameNumToPtsCache.empty() && d->frameNumToPtsCache.front().first < outFrameNum)
-        d->frameNumToPtsCache.pop_front(); //< In case of decoder skipped some input frames
-    if (!d->frameNumToPtsCache.empty() && d->frameNumToPtsCache.front().first == outFrameNum)
-    {
-        qint64 pts = d->frameNumToPtsCache.front().second;
-        videoFrame->setStartTime(pts / 1000); //< usec to msec
-        d->frameNumToPtsCache.pop_front();
-    }
+    videoFrame->setStartTime(frameTime);
 
     result->reset(videoFrame);
     return (int) outFrameNum - 1; //< convert range [1..N] to [0..N]
