@@ -25,11 +25,16 @@ struct NX_VMS_API ResolutionData
 
     int megaPixels() const;
 
+    std::string toStdString() const;
+    QString toString() const;
+
     /**%apidoc[unused] */
     QSize size;
 };
 
 bool NX_VMS_API deserialize(QnJsonContext* ctx, const QJsonValue& value, ResolutionData* target);
 void NX_VMS_API serialize(QnJsonContext* ctx, const ResolutionData& value, QJsonValue* target);
+
+bool NX_VMS_API fromString(const std::string_view& str, ResolutionData* target);
 
 } // namespace nx::vms::api
