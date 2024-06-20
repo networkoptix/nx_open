@@ -247,6 +247,26 @@ struct LookupListActionHandler::Private
         requestAttemptsCount = 0;
         processQueues();
     }
+
+    void updateDataDescriptorForAddEntryAction(DataDescriptor& descriptor, api::LookupListEntry entryToAdd)
+    {
+        const std::unordered_set attributesNamesSet(
+            descriptor.data.attributeNames.begin(), descriptor.data.attributeNames.end());
+
+        // Remove attributes, not used in lookup list.
+        std::erase_if(
+            entryToAdd, [&](auto& entry) { return !attributesNamesSet.contains(entry.first); });
+
+        if (!NX_ASSERT(!entryToAdd.empty(), "Lookup List Entry is not correct."))
+            return;
+
+        descriptor.data.entries.push_back(entryToAdd);
+        descriptor.successHandler =
+            [this]()
+            {
+                QnMessageBox::success(q->mainWindowWidget(), tr("Object was added to the List"));
+            };
+    }
 };
 
 LookupListActionHandler::LookupListActionHandler(QObject* parent):
@@ -325,21 +345,10 @@ void LookupListActionHandler::onAddEntryToLookupListAction()
     if (!NX_ASSERT(!lookupList.id.isNull(), "Lookup List with provided id wasn't found"))
         return;
 
-    const std::unordered_set attributesNamesSet(
-        lookupList.attributeNames.begin(), lookupList.attributeNames.end());
-
-    auto entryToAdd = parameters.argument<api::LookupListEntry>(Qn::LookupListEntryRole);
-    // Remove attributes, not used in lookup list.
-    std::erase_if(
-        entryToAdd, [&](auto& entry) { return !attributesNamesSet.contains(entry.first); });
-
-    if (!NX_ASSERT(!entryToAdd.empty(), "Lookup List Entry is not correct."))
-        return;
-
-    lookupList.entries.push_back(entryToAdd);
-    d->saveData({lookupList,
-        [this]()
-        { QnMessageBox::success(mainWindowWidget(), tr("Object was added to the List")); }});
+    Private::DataDescriptor descriptor {.data = lookupList};
+    d->updateDataDescriptorForAddEntryAction(
+        descriptor, parameters.argument<api::LookupListEntry>(Qn::LookupListEntryRole));
+    d->saveData(descriptor);
     lookupListManager()->addOrUpdate(lookupList);
 }
 
@@ -386,11 +395,17 @@ void LookupListActionHandler::openLookupListEditDialog()
     if (dialog.exec(Qt::ApplicationModal) != QDialog::Accepted)
         return;
 
-    auto resultData = dialog.getLookupListData();
-    d->saveData(Private::DataDescriptor{.data = resultData});
-    systemContext()->lookupListManager()->addOrUpdate(resultData);
+    Private::DataDescriptor descriptor{.data = dialog.getLookupListData()};
+    if (params.hasArgument(Qn::LookupListEntryRole))
+    {
+        d->updateDataDescriptorForAddEntryAction(
+            descriptor, params.argument<api::LookupListEntry>(Qn::LookupListEntryRole));
+    }
+
+    d->saveData(descriptor);
+    systemContext()->lookupListManager()->addOrUpdate(descriptor.data);
     if (d->dialog)
-        d->dialog->appendData({resultData});
+        d->dialog->appendData({descriptor.data});
 }
 
 } // namespace nx::vms::client::desktop
