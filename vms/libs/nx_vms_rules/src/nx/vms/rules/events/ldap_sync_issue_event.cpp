@@ -87,7 +87,7 @@ const ItemDescriptor& LdapSyncIssueEvent::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<LdapSyncIssueEvent>(),
-        .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Ldap Sync Issue Event")),
+        .displayName = NX_DYNAMIC_TRANSLATABLE(tr("LDAP Sync Issue Event")),
         .description = {},
         .flags = {ItemFlag::instant, ItemFlag::aggregationByTypeSupported},
         .fields = {},
