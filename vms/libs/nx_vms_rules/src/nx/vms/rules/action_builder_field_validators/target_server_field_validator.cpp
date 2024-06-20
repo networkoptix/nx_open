@@ -21,10 +21,10 @@ ValidationResult TargetServerFieldValidator::validity(
     if (!NX_ASSERT(targetServerField))
         return {QValidator::State::Invalid, Strings::invalidFieldType()};
 
-    const auto serversSelection = targetServerField->selection();
+    QnMediaServerResourceList servers = utils::servers(targetServerField->selection(), context);
     const auto targetServerFieldProperties = targetServerField->properties();
     const bool isValidSelection =
-        !serversSelection.ids.empty() || targetServerFieldProperties.allowEmptySelection;
+        !servers.empty() || targetServerFieldProperties.allowEmptySelection;
 
     if (!isValidSelection)
         return {QValidator::State::Invalid, Strings::selectServer()};
@@ -33,8 +33,6 @@ ValidationResult TargetServerFieldValidator::validity(
     {
         if (targetServerFieldProperties.validationPolicy == kHasBuzzerValidationPolicy)
         {
-            QnMediaServerResourceList servers = utils::servers(serversSelection, context);
-
             const auto serversValidity = utils::serversValidity<QnBuzzerPolicy>(servers);
 
             if (serversValidity == QValidator::State::Acceptable)

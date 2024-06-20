@@ -2,6 +2,7 @@
 
 #include "target_layout_field_validator.h"
 
+#include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/rules/action_builder_fields/target_layout_field.h>
 
@@ -11,16 +12,17 @@
 namespace nx::vms::rules {
 
 ValidationResult TargetLayoutFieldValidator::validity(
-    const Field* field, const Rule* /*rule*/, common::SystemContext* /*context*/) const
+    const Field* field, const Rule* /*rule*/, common::SystemContext* context) const
 {
     auto targetLayoutField = dynamic_cast<const TargetLayoutField*>(field);
     if (!NX_ASSERT(targetLayoutField))
         return {QValidator::State::Invalid, Strings::invalidFieldType()};
 
     const auto targetLayoutFieldProperties = targetLayoutField->properties();
-    const auto layoutIds = targetLayoutField->value();
+    const auto layouts =
+        context->resourcePool()->getResourcesByIds<QnLayoutResource>(targetLayoutField->value());
     const bool isValidSelection =
-        !layoutIds.empty() || targetLayoutFieldProperties.allowEmptySelection;
+        !layouts.empty() || targetLayoutFieldProperties.allowEmptySelection;
 
     if (!isValidSelection)
         return {QValidator::State::Invalid, tr("Select at least one layout")};

@@ -28,7 +28,9 @@ ValidationResult LayoutFieldValidator::validity(
     if (!NX_ASSERT(layoutField))
         return {QValidator::State::Invalid, Strings::invalidFieldType()};
 
-    if (layoutField->value().isNull())
+    const auto layout =
+        context->resourcePool()->getResourceById<QnLayoutResource>(layoutField->value());
+    if (!layout)
         return {QValidator::State::Invalid, tr("Select layout")};
 
     auto targetUserField =
@@ -36,9 +38,6 @@ ValidationResult LayoutFieldValidator::validity(
     if (targetUserField)
     {
         const auto users = utils::users(targetUserField->selection(), context);
-        const auto layout =
-            context->resourcePool()->getResourceById<QnLayoutResource>(layoutField->value());
-
         return utils::layoutValidity(context, layout, users.values());
     }
 
