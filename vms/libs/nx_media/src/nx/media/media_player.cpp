@@ -169,7 +169,7 @@ public:
     double speed = 1.0;
 
     // Video surface list to render. Holds QT property value.
-    QMap<int, QVideoSink*> videoSurfaces;
+    QMap<int, QPointer<QVideoSink>> videoSurfaces;
 
     // Whether the current resource is a local file.
     bool isLocalFile = false;
@@ -301,6 +301,9 @@ public:
     void clearCurrentFrame();
     void configureMetadataForReader();
     void updateAudio();
+
+    /** Push empty video frame to output. */
+    void clearVideoOutput();
 };
 
 Player::Private::Private(Player* parent):
@@ -704,6 +707,16 @@ qint64 Player::Private::getDelayForNextFrameWithoutAudioMs(const VideoFramePtr& 
         return (ptsMs - ptsTimerBaseMs) / speed - elapsedMs;
     }
 }
+
+void Player::Private::clearVideoOutput()
+{
+    for (auto [channel, sink]: videoSurfaces.asKeyValueRange())
+    {
+        if (sink)
+            sink->setVideoFrame({});
+    }
+}
+
 
 void Player::Private::applyVideoQuality()
 {
@@ -1172,6 +1185,8 @@ void Player::stop()
     d->setState(State::Stopped);
     if (d->mediaStatus != MediaStatus::NoVideoStreams) //< Preserve NoVideoStreams state.
         d->setMediaStatus(MediaStatus::NoMedia);
+
+    d->clearVideoOutput();
 
     NX_DEBUG(this, "stop() END");
 }
