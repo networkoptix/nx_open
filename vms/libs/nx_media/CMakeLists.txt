@@ -12,7 +12,7 @@ find_package(Qt6 COMPONENTS OpenGL)
 
 set(additional_sources)
 set(additional_sources_include_dirs)
-set(additional_libraries)
+set(additional_private_libraries)
 set(artifacts_dir ${open_source_root}/artifacts)
 
 # QuickSync/Nvidia: Add additional sources for the supported platforms (Windows x64 and Linux x64).
@@ -46,7 +46,7 @@ if(hardware_decoders_x64)
         ${color_conversion_src_path}/ColorSpace.cu
         ${color_conversion_src_path}/Resize.cu
     )
-    list(APPEND additional_libraries CUDA::cudart)
+    list(APPEND additional_private_libraries CUDA::cudart)
 
     if(LINUX)
         list(APPEND additional_sources
@@ -84,9 +84,9 @@ nx_add_target(nx_media
         nx_vms_common
         nx_fusion
         nx_utils
-        ${additional_libraries}
     PRIVATE_LIBS
         Qt6::OpenGL
+        ${additional_private_libraries}
     ADDITIONAL_SOURCES
         ${additional_sources}
     FOLDER client/libs
