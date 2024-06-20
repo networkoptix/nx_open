@@ -111,8 +111,8 @@ target_include_directories(nx_media
 )
 
 if(ANDROID OR IOS)
-    find_package(libjpeg-turbo REQUIRED)
-    target_link_libraries(nx_media PRIVATE libjpeg-turbo::libjpeg-turbo)
+    find_package(JPEG REQUIRED)
+    target_link_libraries(nx_media PRIVATE JPEG::JPEG)
 endif()
 
 if(MACOSX)
