@@ -139,6 +139,18 @@ public:
         m_client->pleaseStopSync();
     }
 
+    void installMultipleCloseHandlers(int count)
+    {
+        for (int i = 0; i < count; ++i)
+        {
+            auto& ctx = m_multipleCloseHandlers.emplace_back(
+                std::make_unique<MultipleCloseHandlerContext>());
+            m_client->addOnConnectionClosedHandler(
+                [ctx = ctx.get()](SystemError::ErrorCode /**/){ ctx->closeEvent.push(); },
+                ctx.get());
+        }
+    }
+
     void enableProxy()
     {
         m_proxy = std::make_unique<StreamProxy>();
@@ -372,6 +384,15 @@ protected:
         m_connectionClosedEventsReceived.pop();
     }
 
+    void thenMultipleCloseHandlersWereInvoked(int n)
+    {
+        for (auto& ctx: m_multipleCloseHandlers)
+        {
+            for (int i = 0; i < n; ++i)
+                ctx->closeEvent.pop();
+        }
+    }
+
     void thenClientReportedConnectionClosureWithResult(
         SystemError::ErrorCode expected)
     {
@@ -411,6 +432,11 @@ private:
         }
     };
 
+    struct MultipleCloseHandlerContext
+    {
+        nx::utils::SyncQueue<void> closeEvent;
+    };
+
     std::unique_ptr<typename AsyncClientTestTypes::ClientType> m_client;
     std::unique_ptr<typename AsyncClientTestTypes::ServerType> m_server;
     std::vector<std::unique_ptr<typename AsyncClientTestTypes::ServerType>> m_oldServers;
@@ -427,6 +453,7 @@ private:
     std::unique_ptr<StreamProxy> m_proxy;
     std::optional<SocketAddress> m_proxyAddress;
     std::atomic<bool> m_dropServerData{false};
+    std::vector<std::unique_ptr<MultipleCloseHandlerContext>> m_multipleCloseHandlers;
 
     virtual void SetUp() override
     {
@@ -436,8 +463,8 @@ private:
 
         m_client->addOnReconnectedHandler(
             std::bind(&StunAsyncClientAcceptanceTest::onReconnected, this));
-        m_client->setOnConnectionClosedHandler(
-            std::bind(&StunAsyncClientAcceptanceTest::saveConnectionClosedEvent, this, _1));
+        m_client->addOnConnectionClosedHandler(
+            std::bind(&StunAsyncClientAcceptanceTest::saveConnectionClosedEvent, this, _1), this);
     }
 
     void startServer()
@@ -682,6 +709,19 @@ TYPED_TEST_P(
 
 TYPED_TEST_P(
     StunAsyncClientAcceptanceTest,
+    multiple_connection_closed_handlers_multiple_times)
+{
+    this->installMultipleCloseHandlers(10);
+
+    this->givenReconnectedClient();
+    this->whenStopServer();
+    this->thenClientReportedConnectionClosure();
+
+    this->thenMultipleCloseHandlersWereInvoked(2);
+}
+
+TYPED_TEST_P(
+    StunAsyncClientAcceptanceTest,
     reconnecting_to_another_server_after_original_has_failed)
 {
     this->givenConnectedClient();
@@ -743,6 +783,7 @@ REGISTER_TYPED_TEST_SUITE_P(StunAsyncClientAcceptanceTest,
     connection_closure_is_reported,
     connection_closure_is_not_reported_after_initial_connect_failure,
     on_connection_closed_handler_triggered_more_than_once,
+    multiple_connection_closed_handlers_multiple_times,
     reconnecting_to_another_server_after_original_has_failed,
     reconnecting_to_another_server_while_original_is_still_alive,
     response_is_not_delivered_after_cancel);

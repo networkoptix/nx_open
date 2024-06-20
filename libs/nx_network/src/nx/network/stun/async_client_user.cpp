@@ -15,7 +15,15 @@ AsyncClientUser::AsyncClientUser(std::shared_ptr<AbstractAsyncClient> client):
         [this, guard = m_asyncGuard.sharedGuard()]()
         {
             if (auto lock = guard->lock())
-                return post(std::bind(&AsyncClientUser::reportReconnect, this));
+                reportReconnect();
+        },
+        m_asyncGuard.sharedGuard().get());
+
+    m_client->addOnConnectionClosedHandler(
+        [this, guard = m_asyncGuard.sharedGuard()](SystemError::ErrorCode reason)
+        {
+            if (auto lock = guard->lock())
+                reportConnectionClosed(reason);
         },
         m_asyncGuard.sharedGuard().get());
 }
@@ -74,7 +82,21 @@ void AsyncClientUser::setIndicationHandler(
 void AsyncClientUser::setOnReconnectedHandler(
     AbstractAsyncClient::ReconnectHandler handler)
 {
-    m_reconnectHandler.swap(handler);
+    dispatch(
+        [this, handler = std::move(handler)]() mutable
+        {
+            m_reconnectHandler.swap(handler);
+        });
+}
+
+void AsyncClientUser::setOnConnectionClosedHandler(
+    AbstractAsyncClient::OnConnectionClosedHandler handler)
+{
+    dispatch(
+        [this, handler = std::move(handler)]() mutable
+        {
+            m_connectionClosedHandler.swap(handler);
+        });
 }
 
 bool AsyncClientUser::setConnectionTimer(
@@ -121,10 +143,24 @@ void AsyncClientUser::disconnectFromClient()
     m_asyncGuard.reset();
 }
 
+void AsyncClientUser::reportConnectionClosed(SystemError::ErrorCode reason)
+{
+    post(
+        [this, reason]()
+        {
+            if (m_connectionClosedHandler)
+                m_connectionClosedHandler(reason);
+        });
+}
+
 void AsyncClientUser::reportReconnect()
 {
-    if (m_reconnectHandler)
-        m_reconnectHandler();
+    post(
+        [this]()
+        {
+            if (m_reconnectHandler)
+                m_reconnectHandler();
+        });
 }
 
 } // namespace stun

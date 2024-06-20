@@ -85,13 +85,13 @@ void MediatorStunClient::sendRequest(
         });
 }
 
-void MediatorStunClient::setOnConnectionClosedHandler(
-    OnConnectionClosedHandler handler)
+void MediatorStunClient::addOnConnectionClosedHandler(
+    OnConnectionClosedHandler handler, void *client)
 {
     dispatch(
-        [this, handler = std::move(handler)]() mutable
+        [this, handler = std::move(handler), client]() mutable
         {
-            m_onConnectionClosedHandler = std::move(handler);
+            m_onConnectionClosedHandlers.emplace(client, std::move(handler));
         });
 }
 
@@ -135,22 +135,29 @@ void MediatorStunClient::handleConnectionClosure(SystemError::ErrorCode reason)
 
     scheduleReconnect();
 
-    if (m_onConnectionClosedHandler)
-        m_onConnectionClosedHandler(reason);
+    nx::utils::InterruptionFlag::Watcher destroyed(&m_destructionFlag);
+
+    for (auto& it: m_onConnectionClosedHandlers)
+    {
+        it.second(reason);
+        if (destroyed.interrupted())
+            return;
+    }
 }
 
 void MediatorStunClient::connectInternal(ConnectHandler handler)
 {
     NX_ASSERT(isInSelfAioThread());
 
-    if (!m_connectionClosureHandlerInstalled)
+    if (!m_connectionClosureHandlerInstalledOnBaseType)
     {
-        base_type::setOnConnectionClosedHandler(
+        base_type::addOnConnectionClosedHandler(
             [this](auto&&... args)
             {
                 handleConnectionClosure(std::forward<decltype(args)>(args)...);
-            });
-        m_connectionClosureHandlerInstalled = true;
+            },
+            this);
+        m_connectionClosureHandlerInstalledOnBaseType = true;
     }
 
     cancelReconnectTimer();

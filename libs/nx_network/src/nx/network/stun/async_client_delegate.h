@@ -27,8 +27,8 @@ public:
     virtual void addOnReconnectedHandler(
         ReconnectHandler handler, void* client = nullptr) override;
 
-    virtual void setOnConnectionClosedHandler(
-        OnConnectionClosedHandler onConnectionClosedHandler) override;
+    virtual void addOnConnectionClosedHandler(
+        OnConnectionClosedHandler onConnectionClosedHandler, void* client = nullptr) override;
 
     virtual void sendRequest(
         nx::network::stun::Message request,

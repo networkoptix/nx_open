@@ -48,8 +48,9 @@ public:
         ReconnectHandler handler,
         void* client = nullptr) override;
 
-    virtual void setOnConnectionClosedHandler(
-        OnConnectionClosedHandler onConnectionClosedHandler) override;
+    virtual void addOnConnectionClosedHandler(
+        OnConnectionClosedHandler onConnectionClosedHandler,
+        void* client = nullptr) override;
 
     virtual void sendRequest(
         Message request,
@@ -107,7 +108,7 @@ private:
     int m_requestIdSequence = 0;
     /** map<request id, request context>. */
     std::map<int, RequestContext> m_activeRequests;
-    OnConnectionClosedHandler m_connectionClosedHandler;
+    std::map<void*, OnConnectionClosedHandler> m_connectionClosedHandlers;
     ConnectHandler m_userConnectHandler;
     http::tunneling::TunnelValidatorFactoryFunc m_tunnelValidatorFactory;
     http::HttpHeaders m_customHeaders;
@@ -144,6 +145,7 @@ private:
         Dictionary& dictionary, void* client);
 
     void onStunConnectionClosed(SystemError::ErrorCode closeReason);
+    bool /*destroyed*/ reportConnectionClosed(SystemError::ErrorCode closeReason);
     void scheduleReconnect();
     void reconnect();
     void onReconnectDone(SystemError::ErrorCode sysErrorCode);

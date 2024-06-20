@@ -41,8 +41,9 @@ public:
         RequestHandler handler,
         void* client = nullptr) override;
 
-    virtual void setOnConnectionClosedHandler(
-        OnConnectionClosedHandler onConnectionClosedHandler) override;
+    virtual void addOnConnectionClosedHandler(
+        OnConnectionClosedHandler onConnectionClosedHandler,
+        void* client = nullptr) override;
 
     virtual void setKeepAliveOptions(
         nx::network::KeepAliveOptions options) override;
@@ -65,11 +66,12 @@ private:
     std::vector<RequestContext> m_postponedRequests;
     std::unique_ptr<nx::network::stun::ServerAlivenessTester> m_alivenessTester;
     std::optional<nx::network::KeepAliveOptions> m_keepAliveOptions;
-    OnConnectionClosedHandler m_onConnectionClosedHandler;
+    nx::utils::InterruptionFlag m_destructionFlag;
+    std::map<void*, OnConnectionClosedHandler> m_onConnectionClosedHandlers;
     bool m_connected = false;
     bool m_externallyProvidedUrl = false;
     nx::network::RetryTimer m_reconnectTimer;
-    bool m_connectionClosureHandlerInstalled = false;
+    bool m_connectionClosureHandlerInstalledOnBaseType = false;
     std::optional<SystemCredentials> m_credentials;
 
     void handleConnectionClosure(SystemError::ErrorCode reason);

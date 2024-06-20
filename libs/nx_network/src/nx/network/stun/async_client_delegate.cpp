@@ -40,11 +40,11 @@ void AsyncClientDelegate::addOnReconnectedHandler(
     m_delegate->addOnReconnectedHandler(std::move(handler), client);
 }
 
-void AsyncClientDelegate::setOnConnectionClosedHandler(
-    OnConnectionClosedHandler onConnectionClosedHandler)
+void AsyncClientDelegate::addOnConnectionClosedHandler(
+    OnConnectionClosedHandler onConnectionClosedHandler, void* client)
 {
-    m_delegate->setOnConnectionClosedHandler(
-        std::move(onConnectionClosedHandler));
+    m_delegate->addOnConnectionClosedHandler(
+        std::move(onConnectionClosedHandler), client);
 }
 
 void AsyncClientDelegate::sendRequest(

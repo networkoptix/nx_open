@@ -17,7 +17,7 @@ AsyncClient::AsyncClient(Settings timeouts):
     m_settings(timeouts),
     m_reconnectTimer(std::make_unique<nx::network::RetryTimer>(m_settings.reconnectPolicy))
 {
-    SocketGlobals::instance().allocationAnalyzer().recordObjectCreation(this);
+     SocketGlobals::instance().allocationAnalyzer().recordObjectCreation(this);
     ++SocketGlobals::instance().debugCounters().stunClientConnectionCount;
 
     bindToAioThread(getAioThread());
@@ -107,10 +107,11 @@ void AsyncClient::addOnReconnectedHandler(
     m_reconnectHandlers.emplace(client, std::move(handler));
 }
 
-void AsyncClient::setOnConnectionClosedHandler(
-    OnConnectionClosedHandler onConnectionClosedHandler)
+void AsyncClient::addOnConnectionClosedHandler(
+    OnConnectionClosedHandler onConnectionClosedHandler, void* client)
 {
-    m_onConnectionClosedHandler.swap(onConnectionClosedHandler);
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    m_connectionClosedHandlers.emplace(client, std::move(onConnectionClosedHandler));
 }
 
 void AsyncClient::sendRequest(
@@ -217,6 +218,7 @@ void AsyncClient::cancelHandlersSync(void* client)
         removeByClient(&m_indicationHandlers, client);
         m_reconnectHandlers.erase(client);
         removeByClient(&m_requestsInProgress, client);
+        m_connectionClosedHandlers.erase(client);
         NX_VERBOSE(this, nx::format("Cancel requests from %1").arg(client));
     }
     else
@@ -250,21 +252,37 @@ void AsyncClient::closeConnection(
 {
     std::unique_ptr< BaseConnectionType > baseConnection;
     {
-        NX_MUTEX_LOCKER lock( &m_mutex );
-        closeConnectionImpl( &lock, errorCode );
-        baseConnection = std::move( m_baseConnection );
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        closeConnectionImpl(&lock, errorCode);
+        baseConnection = std::move(m_baseConnection);
     }
 
     NX_ASSERT(!baseConnection || !connection || connection == baseConnection.get(),
         "Incorrect closeConnection call");
 
-    if (baseConnection)
-    {
-        baseConnection->pleaseStopSync();
+    if (!baseConnection)
+        return;
 
-        // Reporting "connection closed" only if there was a connection to close.
-        if (m_onConnectionClosedHandler)
-            m_onConnectionClosedHandler(errorCode);
+    baseConnection->pleaseStopSync();
+
+    nx::utils::InterruptionFlag::Watcher destroyed(&destructionFlag);
+
+    decltype(m_connectionClosedHandlers) handlersOnTheStack;
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        handlersOnTheStack.swap(m_connectionClosedHandlers);
+    }
+
+    for (auto& it: handlersOnTheStack)
+    {
+        it.second(errorCode);
+        if (destroyed.interrupted())
+            return;
+    }
+
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        m_connectionClosedHandlers.merge(handlersOnTheStack);
     }
 }
 

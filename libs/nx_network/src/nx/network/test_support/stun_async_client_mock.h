@@ -43,8 +43,8 @@ public:
     MOCK_METHOD(void, closeConnection, (SystemError::ErrorCode));
     MOCK_METHOD(void, setKeepAliveOptions, (KeepAliveOptions));
 
-    virtual void setOnConnectionClosedHandler(
-        OnConnectionClosedHandler /*onConnectionClosedHandler*/) override
+    virtual void addOnConnectionClosedHandler(
+        OnConnectionClosedHandler /*onConnectionClosedHandler*/, void* /*client*/) override
     {
         // TODO
     }
