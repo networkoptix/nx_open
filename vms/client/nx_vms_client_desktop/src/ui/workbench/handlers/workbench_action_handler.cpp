@@ -3374,11 +3374,13 @@ void ActionHandler::openInBrowser(
 void ActionHandler::at_openAdvancedSearchDialog_triggered()
 {
     if (!m_advancedSearchDialog)
+    {
         m_advancedSearchDialog = new AdvancedSearchDialog(mainWindowWidget());
 
-    const auto parameters = menu()->currentParameters(sender());
-    const auto parent = utils::extractParentWidget(parameters, mainWindowWidget());
-    m_advancedSearchDialog->setTransientParent(parent);
+        const auto parameters = menu()->currentParameters(sender());
+        const auto parent = utils::extractParentWidget(parameters, mainWindowWidget());
+        m_advancedSearchDialog->window()->setScreen(parent->screen());
+    }
 
     m_advancedSearchDialog->open();
     m_advancedSearchDialog->raise();
