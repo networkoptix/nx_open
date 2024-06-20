@@ -39,11 +39,10 @@ static const QString kScreenNumberKey = "screenNumber";
 // ------------------------------------------------------------------------------------------------
 // AdvancedSearchDialog
 
-AdvancedSearchDialog::AdvancedSearchDialog(QWidget* parent) :
+AdvancedSearchDialog::AdvancedSearchDialog(QObject* parent):
     QmlDialogWrapper(
         QUrl("Nx/Dialogs/Analytics/AnalyticsSearchDialog.qml"),
-        {},
-        parent),
+        {}),
     QnSessionAwareDelegate(parent)
 {
     rootObjectHolder()->object()->setProperty(

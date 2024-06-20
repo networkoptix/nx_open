@@ -52,16 +52,6 @@ Window
             counterBlock.commitAvailableNewTracks()
     }
 
-    onTransientParentChanged:
-    {
-        if (visible)
-        {
-            // Reopen the dialog to apply the new transient parent.
-            hide()
-            show()
-        }
-    }
-
     signal accepted()
 
     TabBar
@@ -964,7 +954,6 @@ Window
 
         function showSelectionOnLayout()
         {
-            dialog.transientParent = null //< Allows to raise the main window.
             if (selection.index.valid)
                 eventModel.showOnLayout(selection.index.row)
         }
