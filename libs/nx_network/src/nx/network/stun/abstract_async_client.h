@@ -76,8 +76,8 @@ public:
     virtual void addOnReconnectedHandler(
         ReconnectHandler handler, void* client = 0) = 0;
 
-    virtual void setOnConnectionClosedHandler(
-        OnConnectionClosedHandler onConnectionClosedHandler) = 0;
+    virtual void addOnConnectionClosedHandler(
+        OnConnectionClosedHandler onConnectionClosedHandler, void* client) = 0;
 
     /** Sends message asynchronously
      *

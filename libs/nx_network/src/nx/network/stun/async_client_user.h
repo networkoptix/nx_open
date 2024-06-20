@@ -38,6 +38,7 @@ public:
     void setIndicationHandler(int method, AbstractAsyncClient::IndicationHandler handler);
     /** Handler called just after broken tcp connection has been restored */
     void setOnReconnectedHandler(AbstractAsyncClient::ReconnectHandler handler);
+    void setOnConnectionClosedHandler(AbstractAsyncClient::OnConnectionClosedHandler handler);
 
     /** Timer is called over and over again until connection is closed */
     bool setConnectionTimer(
@@ -51,11 +52,13 @@ protected:
 
 protected:
     void disconnectFromClient();
+    void reportConnectionClosed(SystemError::ErrorCode reason);
     void reportReconnect();
 
     nx::utils::AsyncOperationGuard m_asyncGuard;
     std::shared_ptr<AbstractAsyncClient> m_client;
     AbstractAsyncClient::ReconnectHandler m_reconnectHandler;
+    AbstractAsyncClient::OnConnectionClosedHandler m_connectionClosedHandler;
     bool m_terminated = false;
 };
 

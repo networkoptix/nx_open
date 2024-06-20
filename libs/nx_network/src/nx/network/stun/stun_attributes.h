@@ -21,7 +21,7 @@ enum Value
 {
     tryAlternate = 300,
     badRequest = 400,
-    unauthtorized = 401,
+    unauthorized = 401,
     notFound = 404,
     unknownAttribute = 420,
     staleNonce = 438,

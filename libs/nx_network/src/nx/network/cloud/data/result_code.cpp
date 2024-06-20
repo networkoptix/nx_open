@@ -14,7 +14,7 @@ ResultCode fromStunErrorToResultCode(
     {
         case nx::network::stun::error::badRequest:
             return ResultCode::badRequest;
-        case nx::network::stun::error::unauthtorized:
+        case nx::network::stun::error::unauthorized:
             return ResultCode::notAuthorized;
         case nx::network::stun::extension::error::notFound:
             return ResultCode::notFound;
@@ -32,7 +32,7 @@ int resultCodeToStunErrorCode(ResultCode resultCode)
         case ResultCode::badRequest:
             return nx::network::stun::error::badRequest;
         case ResultCode::notAuthorized:
-            return nx::network::stun::error::unauthtorized;
+            return nx::network::stun::error::unauthorized;
         case ResultCode::notFound:
             return nx::network::stun::extension::error::notFound;
         case ResultCode::tryAlternate:

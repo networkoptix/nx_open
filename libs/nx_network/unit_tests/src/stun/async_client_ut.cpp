@@ -183,6 +183,7 @@ protected:
 private:
     static constexpr int kNumberOfRequestsToSend = 1024;
 
+    bool m_connectionCloseHandlerInstalled = false;
     std::shared_ptr<nx::network::stun::AsyncClient> m_stunClient;
     nx::utils::SyncQueue<SystemError::ErrorCode> m_connectionClosedPromise;
     nx::utils::SyncQueue<SystemError::ErrorCode> m_requestResult;
@@ -255,11 +256,16 @@ private:
 
     void connectClientToTheServer()
     {
-        m_stunClient->setOnConnectionClosedHandler(
-            [this](SystemError::ErrorCode closeReason)
-            {
-                m_connectionClosedPromise.push(closeReason);
-            });
+        if (!m_connectionCloseHandlerInstalled)
+        {
+            m_connectionCloseHandlerInstalled = true;
+            m_stunClient->addOnConnectionClosedHandler(
+                [this](SystemError::ErrorCode closeReason)
+                {
+                    m_connectionClosedPromise.push(closeReason);
+                },
+                this);
+        }
 
         ASSERT_EQ(SystemError::noError, connectToUrl(serverUrl()));
         ASSERT_EQ(m_serverEndpoint, m_stunClient->remoteAddress());
@@ -388,6 +394,42 @@ protected:
             clientUserRemoved.get_future().wait();
         }
     }
+
+    void givenUsersConnectedToClient(int count)
+    {
+        for (int i = 0; i < count; ++i)
+        {
+            auto& user = m_users.emplace_back(
+                std::make_unique<stun::AsyncClientUser>(getStunClient()));
+
+            user->setOnConnectionClosedHandler(
+                [this, user = user.get()](SystemError::ErrorCode /*closeReason*/)
+                {
+                    m_connectionClosedEvents.push(user);
+                });
+        }
+    }
+
+    void thenAllUsersReceiveConnectionClosedEvent()
+    {
+        std::set<AsyncClientUser*> closedUsers;
+        for (int i = 0; i < static_cast<int>(m_users.size()); ++i)
+        {
+            auto closedUser = m_connectionClosedEvents.pop();
+            closedUsers.emplace(closedUser);
+
+            ASSERT_TRUE(
+                std::any_of(
+                    m_users.begin(), m_users.end(),
+                    [closedUser](const auto& user) { return user.get() == closedUser; }));
+        }
+
+        ASSERT_EQ(m_users.size(), closedUsers.size());
+    }
+
+private:
+    std::vector<std::unique_ptr<stun::AsyncClientUser>> m_users;
+    nx::utils::SyncQueue<stun::AsyncClientUser*> m_connectionClosedEvents;
 };
 
 TEST_F(StunClientUser, correct_cancellation)
@@ -395,6 +437,22 @@ TEST_F(StunClientUser, correct_cancellation)
     givenRegularStunServer();
     givenClientConnectedToServer();
     assertIfResponseReportedAfterClientRemoval();
+}
+
+TEST_F(StunClientUser, multiple_close_handlers_multiple_times)
+{
+    givenUsersConnectedToClient(10);
+
+    givenServerThatBreaksConnectionAfterReceivingRequest();
+
+    for (int i = 0; i < 10; ++i)
+    {
+        givenClientConnectedToServer();
+
+        whenClientSendsRequestToTheServer();
+
+        thenAllUsersReceiveConnectionClosedEvent();
+    }
 }
 
 //-------------------------------------------------------------------------------------------------

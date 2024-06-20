@@ -53,8 +53,8 @@ public:
     virtual void addOnReconnectedHandler(
         ReconnectHandler handler,
         void* client = nullptr) override;
-    virtual void setOnConnectionClosedHandler(
-        OnConnectionClosedHandler onConnectionClosedHandler) override;
+    virtual void addOnConnectionClosedHandler(
+        OnConnectionClosedHandler onConnectionClosedHandler, void* client) override;
 
     virtual void sendRequest(Message request, RequestHandler handler, void* client = nullptr) override;
     // TODO: #akolesnikov This method does not seem to belong here. Remove it.
@@ -115,7 +115,8 @@ private:
     std::map<Buffer, std::pair<void*, RequestHandler>> m_requestsInProgress;
     ConnectionTimers m_connectionTimers;
 
-    OnConnectionClosedHandler m_onConnectionClosedHandler;
+    nx::utils::InterruptionFlag destructionFlag;
+    std::map<void* /*client*/, OnConnectionClosedHandler> m_connectionClosedHandlers;
     ConnectHandler m_connectCompletionHandler;
 
     const char* toString(State state) const;

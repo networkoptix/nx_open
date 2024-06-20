@@ -94,13 +94,13 @@ void AsyncClientWithHttpTunneling::addOnReconnectedHandler(
         });
 }
 
-void AsyncClientWithHttpTunneling::setOnConnectionClosedHandler(
-    OnConnectionClosedHandler handler)
+void AsyncClientWithHttpTunneling::addOnConnectionClosedHandler(
+    OnConnectionClosedHandler handler, void* client)
 {
     dispatch(
-        [this, handler = std::move(handler)]() mutable
+        [this, handler = std::move(handler), client]() mutable
         {
-            m_connectionClosedHandler.swap(handler);
+            m_connectionClosedHandlers.emplace(client, std::move(handler));
         });
 }
 
@@ -215,6 +215,7 @@ void AsyncClientWithHttpTunneling::cancelHandlersSync(void* client)
         cancelUserHandlers(m_activeRequests, client);
         cancelUserHandlers(m_indicationHandlers, client);
         m_reconnectHandlers.erase(client);
+        m_connectionClosedHandlers.erase(client);
 
         NX_VERBOSE(this, "Removed request/indication handlers for client %1", client);
 
@@ -320,8 +321,8 @@ void AsyncClientWithHttpTunneling::createStunClient(
         std::move(connection),
         std::move(settings));
     m_stunClient->bindToAioThread(getAioThread());
-    m_stunClient->setOnConnectionClosedHandler(
-        std::bind(&AsyncClientWithHttpTunneling::onStunConnectionClosed, this, _1));
+    m_stunClient->addOnConnectionClosedHandler(
+        std::bind(&AsyncClientWithHttpTunneling::onStunConnectionClosed, this, _1), this);
     m_stunClient->setIndicationHandler(
         kEveryIndicationMethod,
         std::bind(&AsyncClientWithHttpTunneling::dispatchIndication, this, _1),
@@ -475,10 +476,23 @@ void AsyncClientWithHttpTunneling::onStunConnectionClosed(
 
     closeConnection(closeReason);
 
-    if (m_connectionClosedHandler)
-        m_connectionClosedHandler(closeReason);
+    const bool thisDestroyed = reportConnectionClosed(closeReason);
+    if (thisDestroyed)
+        return;
 
     scheduleReconnect();
+}
+
+bool AsyncClientWithHttpTunneling::reportConnectionClosed(SystemError::ErrorCode closeReason)
+{
+    nx::utils::InterruptionFlag::Watcher destroyed(&m_destructionFlag);
+    for (auto& it: m_connectionClosedHandlers)
+    {
+        it.second(closeReason);
+        if (destroyed.interrupted())
+            return true;
+    }
+    return false;
 }
 
 void AsyncClientWithHttpTunneling::scheduleReconnect()
@@ -489,7 +503,6 @@ void AsyncClientWithHttpTunneling::scheduleReconnect()
             std::bind(&AsyncClientWithHttpTunneling::reconnect, this)))
     {
         NX_DEBUG(this, nx::format("Giving up reconnect to %1 attempts").arg(m_url));
-        // TODO: #akolesnikov It makes sense to add "connection closed" event and raise it here.
     }
 }
 

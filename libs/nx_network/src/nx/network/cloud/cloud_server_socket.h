@@ -113,6 +113,13 @@ public:
     void setSupportedConnectionMethods(hpm::api::ConnectionMethods value);
 
     /**
+     * Install a handler to be notified when the connection to the mediator was closed. It is safe
+     * to call getStatusReport within this handler. It must be installed before starting to listen.
+     */
+    void setOnMediatorConnectionClosed(
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler);
+
+    /**
      * Provides the current status of the listener. Note that the list of errors is cleared on
      * every listen attempt.
      */
@@ -150,8 +157,10 @@ protected:
         SystemError::ErrorCode sysErrorCode,
         std::unique_ptr<AbstractStreamSocket> socket);
 
+    void initializeMediatorConnection();
     void issueRegistrationRequest();
     void onConnectionRequested(hpm::api::ConnectionRequestedEvent event);
+    void onMediatorConnectionClosed(SystemError::ErrorCode closeReason);
     void onMediatorConnectionRestored();
 
     hpm::api::AbstractMediatorConnector* m_mediatorConnector;
@@ -172,6 +181,7 @@ protected:
     std::optional<CloudConnectListenerStatusReport> m_lastListenStatusReport;
     nx::hpm::api::CloudConnectVersion m_cloudConnectVersion =
         nx::hpm::api::kDefaultCloudConnectVersion;
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_onMediatorConnectionClosed;
 
 private:
     void stopWhileInAioThread();

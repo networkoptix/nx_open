@@ -162,13 +162,7 @@ void CloudServerSocket::acceptAsync(AcceptCompletionHandler handler)
             switch (m_state)
             {
                 case State::init:
-                    initTunnelPool(m_acceptQueueLen);
-                    m_mediatorConnection->setOnConnectionRequestedHandler(
-                        [this](auto&&... args) {
-                            onConnectionRequested(std::forward<decltype(args)>(args)...);
-                        });
-                    m_state = State::readyToListen;
-                    NX_VERBOSE(this, "Moved to %1", m_state);
+                    initializeMediatorConnection();
                     [[fallthrough]];
 
                 case State::readyToListen:
@@ -210,14 +204,7 @@ void CloudServerSocket::registerOnMediator(
         return handler(hpm::api::ResultCode::ok);
 
     if (m_state == State::init)
-    {
-        initTunnelPool(m_acceptQueueLen);
-        m_mediatorConnection->setOnConnectionRequestedHandler(
-            [this](auto&&... args) {
-                onConnectionRequested(std::forward<decltype(args)>(args)...);
-            });
-        m_state = State::readyToListen;
-    }
+        initializeMediatorConnection();
 
     NX_ASSERT(m_state == State::readyToListen);
     m_state = State::registeringOnMediator;
@@ -241,6 +228,12 @@ void CloudServerSocket::setSupportedConnectionMethods(
     m_supportedConnectionMethods = value;
 }
 
+void CloudServerSocket::setOnMediatorConnectionClosed(
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
+{
+    m_onMediatorConnectionClosed = std::move(handler);
+}
+
 std::optional<CloudConnectListenerStatusReport> CloudServerSocket::getStatusReport() const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
@@ -252,11 +245,7 @@ void CloudServerSocket::moveToListeningState()
     NX_VERBOSE(this, "Moving to the listening state");
 
     if (!m_tunnelPool)
-        initTunnelPool(m_acceptQueueLen);
-    m_mediatorConnection->setOnConnectionRequestedHandler(
-        [this](auto&&... args) {
-            onConnectionRequested(std::forward<decltype(args)>(args)...);
-        });
+        initializeMediatorConnection();
     m_state = State::listening;
 }
 
@@ -513,6 +502,23 @@ void CloudServerSocket::onNewConnectionHasBeenAccepted(
     handler(sysErrorCode, std::move(socket));
 }
 
+void CloudServerSocket::initializeMediatorConnection()
+{
+    initTunnelPool(m_acceptQueueLen);
+    m_mediatorConnection->setOnConnectionRequestedHandler(
+        [this](auto&&... args)
+        {
+            onConnectionRequested(std::forward<decltype(args)>(args)...);
+        });
+    m_mediatorConnection->setOnConnectionClosedHandler(
+        [this](auto&&... args)
+        {
+            onMediatorConnectionClosed(std::forward<decltype(args)>(args)...);
+        });
+    m_state = State::readyToListen;
+    NX_VERBOSE(this, "Moved to %1", m_state);
+}
+
 void CloudServerSocket::issueRegistrationRequest()
 {
     using namespace std::placeholders;
@@ -562,6 +568,28 @@ void CloudServerSocket::onConnectionRequested(
         acceptor->setMediatorConnection(m_mediatorConnection.get());
         startAcceptor(std::move(acceptor));
     }
+}
+
+void CloudServerSocket::onMediatorConnectionClosed(SystemError::ErrorCode closeReason)
+{
+    NX_DEBUG(this, "Connection to mediator was closed: %1", closeReason);
+
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+
+        if (NX_ASSERT(m_lastListenStatusReport, "Expected the status from last connection opening"))
+        {
+            m_lastListenStatusReport->mediatorListenResponse = std::nullopt;
+            auto& error = m_lastListenStatusReport->mediatorErrors.emplace_back();
+            error.url = m_lastListenStatusReport->mediatorUrl;
+            error.result = {
+                nx::hpm::api::ResultCode::serverConnectionBroken,
+                "Connection was closed: " + SystemError::toString(closeReason)};
+        }
+    }
+
+    if (m_onMediatorConnectionClosed)
+        m_onMediatorConnectionClosed(closeReason);
 }
 
 void CloudServerSocket::onMediatorConnectionRestored()
