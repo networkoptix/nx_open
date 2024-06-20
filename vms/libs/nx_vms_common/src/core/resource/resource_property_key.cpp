@@ -252,6 +252,9 @@ const QString kOnvifIgnoreOutdatedNotifications("onvifIgnoreOutdatedNotification
 const QString kReRequestOnvifRecordingEventsIfAllEventsHaveSameTime(
     "reRequestOnvifRecordingEventsIfAllEventsHaveSameTime");
 
+const QString kPreferNativeApiForRemoteArchiveSynchronization(
+    "preferNativeApiForRemoteArchiveSynchronization");
+
 } // namespace ResourceDataKey
 
 //-------------------------------------------------------------------------------------------------
