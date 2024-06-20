@@ -69,7 +69,13 @@ public:
     bool timeInSchedule(QDateTime time) const;
 
     bool isValid() const;
-    ValidationResult validity(common::SystemContext* context) const;
+
+    using EventFieldFilter = std::function<bool(const EventFilterField*)>;
+    using ActionFieldFilter = std::function<bool(const ActionBuilderField*)>;
+    ValidationResult validity(
+        common::SystemContext* context,
+        const EventFieldFilter& eventFieldFilter = {},
+        const ActionFieldFilter& actionFieldFilter = {}) const;
 
     void connectSignals();
 

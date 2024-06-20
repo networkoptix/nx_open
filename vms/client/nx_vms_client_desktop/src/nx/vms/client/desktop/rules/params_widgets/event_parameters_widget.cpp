@@ -35,11 +35,7 @@ void EventParametersWidget::setEdited()
 
 void EventParametersWidget::onRuleSet(bool isNewRule)
 {
-    connect(
-        eventFilter(),
-        &vms::rules::EventFilter::changed,
-        this,
-        &EventParametersWidget::onEventFieldChanged);
+
 
     auto layout = new QVBoxLayout;
     layout->setSpacing(0);
@@ -85,6 +81,13 @@ void EventParametersWidget::onRuleSet(bool isNewRule)
     layout->addItem(verticalSpacer);
 
     setLayout(layout);
+
+    // Connection order is matter, must be called after all the pickers are created.
+    connect(
+        eventFilter(),
+        &vms::rules::EventFilter::changed,
+        this,
+        &EventParametersWidget::onEventFieldChanged);
 }
 
 void EventParametersWidget::updateUi()

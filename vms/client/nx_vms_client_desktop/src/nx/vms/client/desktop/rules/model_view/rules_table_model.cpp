@@ -35,6 +35,7 @@
 #include <nx/vms/rules/utils/action.h>
 #include <nx/vms/rules/utils/event.h>
 #include <nx/vms/rules/utils/field.h>
+#include <nx/vms/rules/utils/rule.h>
 
 namespace nx::vms::client::desktop::rules {
 
@@ -141,7 +142,11 @@ QVariant RulesTableModel::data(const QModelIndex& index, int role) const
         return {};
 
     if (role == IsRuleValidRole)
-        return rule->isValid() && rule->validity(appContext()->currentSystemContext()).isValid();
+    {
+        return rule->isValid()
+            && vms::rules::utils::visibleFieldsValidity(
+                rule.get(), appContext()->currentSystemContext()).isValid();
+    }
 
     const auto column = index.column();
     if (role == SortDataRole)
@@ -268,8 +273,12 @@ QVariant RulesTableModel::stateColumnData(const ConstRulePtr& rule, int role) co
         if (!rule->enabled())
             return kDisabledRuleIconPath;
 
-        if (!rule->isValid() || !rule->validity(appContext()->currentSystemContext()).isValid())
+        if (!rule->isValid()
+            || !vms::rules::utils::visibleFieldsValidity(
+                rule.get(), appContext()->currentSystemContext()).isValid())
+        {
             return kInvalidRuleIconPath;
+        }
     }
 
     return {};

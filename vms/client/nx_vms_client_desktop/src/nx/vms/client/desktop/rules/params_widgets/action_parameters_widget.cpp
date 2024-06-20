@@ -39,12 +39,6 @@ void ActionParametersWidget::setEdited()
 
 void ActionParametersWidget::onRuleSet(bool isNewRule)
 {
-    connect(
-        actionBuilder(),
-        &vms::rules::ActionBuilder::changed,
-        this,
-        &ActionParametersWidget::onActionFieldChanged);
-
     auto layout = new QVBoxLayout;
     layout->setSpacing(0);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -95,6 +89,13 @@ void ActionParametersWidget::onRuleSet(bool isNewRule)
     layout->addItem(verticalSpacer);
 
     setLayout(layout);
+
+    // Connection order is matter, must be called after all the pickers are created.
+    connect(
+        actionBuilder(),
+        &vms::rules::ActionBuilder::changed,
+        this,
+        &ActionParametersWidget::onActionFieldChanged);
 }
 
 void ActionParametersWidget::updateUi()
