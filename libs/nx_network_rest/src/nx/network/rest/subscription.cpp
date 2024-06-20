@@ -23,23 +23,19 @@ nx::utils::Guard SubscriptionHandler::addSubscription(
 
 void SubscriptionHandler::notify(const QString& id, NotifyType notifyType, QJsonValue payload)
 {
-    NX_MUTEX_LOCKER lock(&m_mutex);
-    if (auto it = m_subscribedIds.find(id); it != m_subscribedIds.end())
+    std::set<std::shared_ptr<SubscriptionCallback>> holder1;
+    std::set<std::shared_ptr<SubscriptionCallback>> holder2;
     {
-        auto callbackCopy = it->second;
-        lock.unlock();
-        for (auto callback: it->second)
-            (*callback)(id, notifyType, payload);
-        lock.relock();
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        if (auto it = m_subscribedIds.find(id); it != m_subscribedIds.end())
+            holder1 = it->second;
+        if (auto it = m_subscribedIds.find(QString("*")); it != m_subscribedIds.end())
+            holder2 = it->second;
     }
-
-    if (auto it = m_subscribedIds.find(QString("*")); it != m_subscribedIds.end())
-    {
-        auto callbackCopy = it->second;
-        lock.unlock();
-        for (auto callback: callbackCopy)
-            (*callback)(id, notifyType, payload);
-    }
+    for (auto callback: holder1)
+        (*callback)(id, notifyType, payload);
+    for (auto callback: holder2)
+        (*callback)(id, notifyType, payload);
 }
 
 void SubscriptionHandler::removeSubscription(
