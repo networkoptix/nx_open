@@ -67,7 +67,7 @@ MultiVideoLayout
 
         onSourceRectChanged:
         {
-            if (index === 0 && d.sourceSize.width <= 0.0)
+            if (index === 0)
                 d.sourceSize = Qt.size(sourceRect.width, sourceRect.height)
         }
 
