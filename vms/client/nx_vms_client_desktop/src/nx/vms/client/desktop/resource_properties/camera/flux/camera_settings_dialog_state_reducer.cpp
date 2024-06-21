@@ -971,31 +971,40 @@ State CameraSettingsDialogStateReducer::setSettingsOptimizationEnabled(State sta
     return state;
 }
 
-State CameraSettingsDialogStateReducer::setHasPowerUserPermissions(
+std::pair<bool, State> CameraSettingsDialogStateReducer::setHasPowerUserPermissions(
     State state,
     bool value)
 {
     NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
+
+    if (state.hasPowerUserPermissions == value)
+        return {false, std::move(state)};
 
     state.hasPowerUserPermissions = value;
-    return state;
+    return {true, std::move(state)};
 }
 
-State CameraSettingsDialogStateReducer::setHasEventLogPermission(
+std::pair<bool, State> CameraSettingsDialogStateReducer::setHasEventLogPermission(
     State state,
     bool value)
 {
     NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
+
+    if (state.hasEventLogPermission == value)
+        return {false, std::move(state)};
 
     state.hasEventLogPermission = value;
-    return state;
+    return {true, std::move(state)};
 }
 
-State CameraSettingsDialogStateReducer::setHasEditAccessRightsForAllCameras(
+std::pair<bool, State> CameraSettingsDialogStateReducer::setHasEditAccessRightsForAllCameras(
     State state,
     bool value)
 {
     NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
+
+    if (state.hasEditAccessRightsForAllCameras == value)
+        return {false, std::move(state)};
 
     state.hasEditAccessRightsForAllCameras = value;
 
@@ -1005,40 +1014,46 @@ State CameraSettingsDialogStateReducer::setHasEditAccessRightsForAllCameras(
         state.singleCameraSettings.cameraHotspots.resetUser();
     }
 
-    return state;
+    return {true, std::move(state)};
 }
 
-CameraSettingsDialogStateReducer::State CameraSettingsDialogStateReducer::setPermissions(
+std::pair<bool, State> CameraSettingsDialogStateReducer::setPermissions(
     State state,
     Qn::Permissions value)
 {
     NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
 
-    state.singleCameraProperties.permissions = value;
+    if (state.singleCameraProperties.permissions == value)
+        return {false, std::move(state)};
 
-    return state;
+    state.singleCameraProperties.permissions = value;
+    return {true, std::move(state)};
 }
 
-CameraSettingsDialogStateReducer::State CameraSettingsDialogStateReducer::setAllCamerasEditable(
+std::pair<bool, State> CameraSettingsDialogStateReducer::setAllCamerasEditable(
     State state,
     bool value)
 {
     NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
+
+    if (state.allCamerasEditable == value)
+        return {false, std::move(state)};
 
     state.allCamerasEditable = value;
-
-    return state;
+    return {true, std::move(state)};
 }
 
-State CameraSettingsDialogStateReducer::setSaasInitialized(
+std::pair<bool, State> CameraSettingsDialogStateReducer::setSaasInitialized(
     State state,
     bool value)
 {
     NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
 
-    state.saasInitialized = value;
+    if (state.saasInitialized == value)
+        return {false, std::move(state)};
 
-    return state;
+    state.saasInitialized = value;
+    return {true, std::move(state)};
 }
 
 State CameraSettingsDialogStateReducer::setSingleVirtualCameraState(
