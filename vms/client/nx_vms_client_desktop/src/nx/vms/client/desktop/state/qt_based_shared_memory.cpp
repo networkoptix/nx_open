@@ -2,17 +2,17 @@
 
 #include "qt_based_shared_memory.h"
 
+#include <QtCore/QDir>
 #include <QtCore/QSharedMemory>
 
-#include <nx/utils/log/assert.h>
-
 #include <nx/branding.h>
+#include <nx/utils/log/assert.h>
 
 namespace nx::vms::client::desktop {
 
 namespace {
 
-static constexpr int kDataVersion = 3;
+static constexpr int kDataVersion = 4;
 static_assert(SessionId::kDataSize == 32, "Data version must be increased if changed.");
 static_assert(SharedMemoryData::kClientCount == 64, "Data version must be increased if changed.");
 static_assert(
@@ -20,7 +20,7 @@ static_assert(
 static_assert(
     SharedMemoryData::kCommandDataSize == 64, "Data version must be increased if changed.");
 static_assert(
-    SharedMemoryData::kTokenSize == 64, "Data version must be increased if changed.");
+    SharedMemoryData::kTokenSize == 8192, "Data version must be increased if changed.");
 
 using ScreensBitMask = quint64;
 
@@ -149,8 +149,8 @@ void serializeData(const SharedMemoryData& source, SerializedSharedMemoryData* t
 }
 
 static const QString kDefaultSharedMemoryKey = nx::branding::customization()
-    + "/DesktopClientQtBasedSharedMemory/"
-    + QString::number(kDataVersion);
+    + "/DesktopClientQtBasedSharedMemory/" + QString::number(kDataVersion) + "/"
+    + QFileInfo(QDir::homePath()).owner();
 
 } // namespace
 

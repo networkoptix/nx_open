@@ -38,7 +38,7 @@ class NX_VMS_CLIENT_DESKTOP_API SharedMemoryData
 public:
     static constexpr int kClientCount = 64;
     static constexpr int kCommandDataSize = 64;
-    static constexpr int kTokenSize = 64;
+    static constexpr int kTokenSize = 8192;
 
     using PidType = ClientProcessExecutionInterface::PidType;
     using ScreenUsageData = QSet<int>;
