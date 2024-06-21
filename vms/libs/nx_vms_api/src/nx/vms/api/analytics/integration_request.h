@@ -102,9 +102,6 @@ struct NX_VMS_API IntegrationRequestData: public RegisterIntegrationRequest
     /**%apidoc Timestamp of the Integration request creation or last update. */
     std::chrono::milliseconds timestampMs{};
 
-    /**%apidoc Integration request expiration timeout in milliseconds. */
-    std::chrono::milliseconds expirationTimeoutMs{};
-
     /**%apidoc IP address the request was received from. */
     QString requestAddress;
 
@@ -115,7 +112,7 @@ struct NX_VMS_API IntegrationRequestData: public RegisterIntegrationRequest
 };
 #define nx_vms_api_analytics_IntegrationRequestData_Fields \
     nx_vms_api_analytics_RegisterIntegrationRequest_Fields \
-    (timestampMs)(expirationTimeoutMs)(requestAddress)(isApproved)
+    (timestampMs)(requestAddress)(isApproved)
 QN_FUSION_DECLARE_FUNCTIONS(
     IntegrationRequestData, (json), NX_VMS_API);
 NX_REFLECTION_INSTRUMENT(
