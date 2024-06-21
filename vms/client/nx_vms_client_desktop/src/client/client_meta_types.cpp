@@ -44,7 +44,6 @@
 #include <nx/vms/client/desktop/help/help_handler.h>
 #include <nx/vms/client/desktop/joystick/dialog/joystick_button_action_choice_model.h>
 #include <nx/vms/client/desktop/joystick/dialog/joystick_button_settings_model.h>
-#include <nx/vms/client/desktop/joystick/settings/osal/osal_device.h>
 #include <nx/vms/client/desktop/lookup_lists/lookup_lists_dialog.h>
 #include <nx/vms/client/desktop/menu/action_parameters.h>
 #include <nx/vms/client/desktop/menu/actions.h>
@@ -242,8 +241,6 @@ void QnClientMetaTypes::initialize()
     qRegisterMetaType<RecordScheduleCellData>();
     qRegisterMetaType<nx::vms::client::desktop::RecordScheduleCellData>();
     qRegisterMetaType<QnClientCameraResource>();
-
-    qRegisterMetaType<nx::vms::client::desktop::joystick::OsalDevice::State>();
 
     registerQmlTypes();
 }
