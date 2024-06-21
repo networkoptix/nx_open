@@ -47,8 +47,7 @@ RemoteSession::RemoteSession(
         [this, sharedMemoryManager]
         {
             const auto token = this->connection()->credentials().authToken;
-            const bool isCloud = this->connection()->userType() == nx::vms::api::UserType::cloud;
-            if (token.isBearerToken() && !isCloud)
+            if (token.isBearerToken())
                 sharedMemoryManager->updateSessionToken(token.value);
         };
 
