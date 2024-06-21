@@ -957,7 +957,7 @@ APPLY(804, broadcastAction, nx::vms::api::EventActionData, \
     false, /*< isRemoveOperation */ \
     InvalidGetHashHelper(), \
     BusinessEventNotificationManagerHelper(), \
-    AllowForAllAccess(), /*< save permission checker */ \
+    ActionControlAccess(), /*< save permission checker */ \
     AllowForAllAccess(), /*< read permission checker */ \
     InvalidFilterFunc(), /*< filter read func */ \
     AllowForAllAccessOut(), /*< check remote peer rights for outgoing transaction */ \
