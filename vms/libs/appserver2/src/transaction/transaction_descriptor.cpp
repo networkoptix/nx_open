@@ -25,6 +25,7 @@
 #include <nx/vms/api/data/storage_flags.h>
 #include <nx/vms/api/data/storage_space_data.h>
 #include <nx/vms/api/data/user_model.h>
+#include <nx/vms/api/types/event_rule_types.h>
 #include <nx/vms/common/saas/saas_service_manager.h>
 #include <nx/vms/common/saas/saas_service_usage_helper.h>
 #include <nx/vms/common/showreel/showreel_manager.h>
@@ -842,8 +843,7 @@ struct InvalidAccess
 struct InvalidAccessOut
 {
     template<typename Param>
-    RemotePeerAccess operator()(SystemContext* systemContext,
-        const Qn::UserAccessData&, const Param&)
+    RemotePeerAccess operator()(SystemContext*, const Qn::UserAccessData&, const Param&)
     {
         NX_ASSERT(false,
             "Invalid outgoing transaction access check (%1).", typeid(Param));
@@ -1459,9 +1459,8 @@ private:
                 accessor.id.toString())};
     }
 
-    static Result forbidUserCreation(const UserAccessorInfo& accessor,
-        const api::UserData& target,
-        GlobalPermission targetPermission)
+    static Result forbidUserCreation(
+        const UserAccessorInfo& accessor, const api::UserData&, GlobalPermission targetPermission)
     {
         return {ErrorCode::forbidden,
             nx::format(ServerApiErrors::tr(
@@ -1646,12 +1645,10 @@ struct ModifyResourceParamAccess
 
     ModifyResourceParamAccess(bool isRemove): isRemove(isRemove) {}
 
-    Result checkAnalyticsIntegrationAccess(
-        SystemContext* systemContext,
-        const Qn::UserAccessData& accessData,
+    Result checkAnalyticsIntegrationAccess(SystemContext* systemContext,
+        const Qn::UserAccessData&,
         const nx::vms::api::ResourceParamWithRefData& param)
     {
-        const auto resPool = systemContext->resourcePool();
         QSet<nx::Uuid> newEngines = QnVirtualCameraResource::calculateUserEnabledAnalyticsEngines(param.value);
         nx::vms::common::saas::IntegrationServiceUsageHelper helper(systemContext);
         helper.proposeChange(param.resourceId, newEngines);
@@ -2142,8 +2139,7 @@ private:
     }
 };
 
-static Result userHasGlobalAccess(
-    SystemContext* systemContext,
+Result userHasGlobalAccess(SystemContext* systemContext,
     const Qn::UserAccessData& accessData,
     GlobalPermission permissions)
 {
@@ -2163,8 +2159,7 @@ static Result userHasGlobalAccess(
     return Result();
 }
 
-static Result userHasAccess(
-    SystemContext* systemContext,
+Result userHasAccess(SystemContext* systemContext,
     const Qn::UserAccessData& accessData,
     const nx::Uuid& targetResourceOrGroupId,
     nx::vms::api::AccessRights requiredAccess)
@@ -2204,6 +2199,64 @@ static Result userHasAccess(
     }
 
     return Result();
+}
+
+Result checkResourceAccess(SystemContext* systemContext,
+    const Qn::UserAccessData& accessData,
+    const std::vector<nx::Uuid>& resourceIds,
+    api::AccessRight accessRight)
+{
+    for (const auto& id: resourceIds)
+    {
+        if (auto hasUserInputResult = userHasAccess(systemContext, accessData, id, accessRight);
+            !hasUserInputResult)
+        {
+            return hasUserInputResult;
+        }
+    }
+    return {};
+};
+
+Result checkActionPermission(SystemContext* systemContext,
+    const Qn::UserAccessData& accessData,
+    const nx::vms::api::EventActionData& data)
+{
+    switch (data.actionType)
+    {
+        case api::ActionType::bookmarkAction:
+        {
+            return checkResourceAccess(
+                systemContext, accessData, data.resourceIds, api::AccessRight::manageBookmarks);
+        }
+        case api::ActionType::cameraOutputAction:
+        case api::ActionType::cameraRecordingAction:
+        case api::ActionType::panicRecordingAction:
+        case api::ActionType::executePtzPresetAction:
+        {
+            return checkResourceAccess(
+                systemContext, accessData, data.resourceIds, api::AccessRight::userInput);
+        }
+
+        // Any additional permissions for these actions?
+        case api::ActionType::sendMailAction:
+        case api::ActionType::diagnosticsAction:
+        case api::ActionType::showPopupAction:
+        case api::ActionType::playSoundAction:
+        case api::ActionType::playSoundOnceAction:
+        case api::ActionType::sayTextAction:
+        case api::ActionType::showTextOverlayAction:
+        case api::ActionType::showOnAlarmLayoutAction:
+        case api::ActionType::execHttpRequestAction:
+        case api::ActionType::acknowledgeAction:
+        case api::ActionType::fullscreenCameraAction:
+        case api::ActionType::exitFullscreenAction:
+        case api::ActionType::openLayoutAction:
+        case api::ActionType::buzzerAction:
+        case api::ActionType::pushNotificationAction:
+        case api::ActionType::undefinedAction:
+        default:
+            return {};
+    };
 }
 
 class SaveServerDataAccess
@@ -2552,8 +2605,7 @@ private:
         return {};
     }
 
-    static Result checkNonBuiltInDeletion(
-        const SystemContext& context, const api::UserGroupData& group)
+    static Result checkNonBuiltInDeletion(const SystemContext&, const api::UserGroupData& group)
     {
         if (api::kPredefinedGroupIds.contains(group.id)
             || api::kDefaultLdapGroupId == group.id)
@@ -2579,6 +2631,33 @@ struct VideoWallControlAccess
     {
         return userHasAccess(systemContext, accessData, data.videowallGuid,
             nx::vms::api::AccessRight::edit);
+    }
+};
+
+struct ActionControlAccess
+{
+    Result operator()(SystemContext* systemContext,
+        const Qn::UserAccessData& accessData,
+        const nx::vms::api::EventActionData& data)
+    {
+        if (hasSystemAccess(accessData))
+            return {};
+
+        auto [userAccessInfo, result] = userAccessorInfo(*systemContext, accessData);
+        if (!result)
+        {
+            return std::move(result);
+        }
+
+        if (!userAccessInfo.permissions.testFlag(GlobalPermission::generateEvents))
+        {
+            auto userResource = systemContext->resourcePool()->getResourceById(
+                accessData.userId).dynamicCast<QnUserResource>();
+            return {ErrorCode::forbidden,
+                ServerApiErrors::tr("the User doesn't have 'generateEvents' permission")};
+        }
+
+        return checkActionPermission(systemContext, accessData, data);
     }
 };
 

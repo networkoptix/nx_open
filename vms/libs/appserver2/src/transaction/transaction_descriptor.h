@@ -99,6 +99,24 @@ Result canModifyStorage(const CanModifyStorageData& data);
 
 namespace detail {
 
+Result userHasGlobalAccess(nx::vms::common::SystemContext* systemContext,
+    const Qn::UserAccessData& accessData,
+    nx::vms::api::GlobalPermission permissions);
+
+Result userHasAccess(nx::vms::common::SystemContext* systemContext,
+    const Qn::UserAccessData& accessData,
+    const nx::Uuid& targetResourceOrGroupId,
+    nx::vms::api::AccessRights requiredAccess);
+
+Result checkResourceAccess(nx::vms::common::SystemContext* systemContext,
+    const Qn::UserAccessData& accessData,
+    const std::vector<nx::Uuid>& resourceIds,
+    nx::vms::api::AccessRight accessRight);
+
+Result checkActionPermission(nx::vms::common::SystemContext* systemContext,
+    const Qn::UserAccessData& accessData,
+    const nx::vms::api::EventActionData& data);
+
 struct NoneType {};
 
 template<typename ParamType>
