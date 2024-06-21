@@ -33,7 +33,7 @@ class NX_VMS_CLIENT_DESKTOP_API LookupListEntriesModel: public QAbstractTableMod
         NOTIFY taxonomyChanged)
 
     using base_type = QAbstractTableModel;
-
+public:
     enum DataRole
     {
         ObjectTypeIdRole = Qt::UserRole,
@@ -41,13 +41,12 @@ class NX_VMS_CLIENT_DESKTOP_API LookupListEntriesModel: public QAbstractTableMod
         RawValueRole //< Raw value of entry.
     };
 
-public:
     explicit LookupListEntriesModel(QObject* parent = nullptr);
     virtual ~LookupListEntriesModel();
 
     virtual QVariant headerData(
         int section,
-        Qt::Orientation orientation,
+        Qt::Orientation orientation = Qt::Orientation::Horizontal,
         int role = Qt::DisplayRole) const override;
 
     virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;

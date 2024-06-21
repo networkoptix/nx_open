@@ -19,12 +19,13 @@ public:
         const QAbstractItemModel* tableModel,
         const QModelIndexList& indexes,
         QWidget* parent = nullptr,
-        const QString& caption = QString());
+        const QString& caption = QString(),
+        int dataRole = Qt::DisplayRole);
 
     static void copyToClipboard(
         const QAbstractItemModel* tableModel,
         const QModelIndexList& indexes,
-        const Qt::ItemDataRole dataRole = Qt::DisplayRole);
+        int dataRole = Qt::DisplayRole);
 
     static QString getExportFilePathFromDialog(
         const QString& fileFilters, QWidget* parent = nullptr, const QString& caption = QString());
@@ -32,7 +33,7 @@ public:
     static void exportToStreamCsv(const QAbstractItemModel* tableModel,
         const QModelIndexList& indexes,
         QTextStream& outputCsv,
-        const Qt::ItemDataRole dataRole = Qt::DisplayRole);
+        int dataRole = Qt::DisplayRole);
 
 private:
     static void getGridHtmlCsvData(const QAbstractItemModel* tableModel,
@@ -40,15 +41,15 @@ private:
         const QChar& textDelimiter,
         QString& textData,
         QString& htmlData,
-        const Qt::ItemDataRole dataRole = Qt::DisplayRole);
+        int dataRole = Qt::DisplayRole);
 
     static QString getGridCsvData(const QAbstractItemModel* tableModel,
         const QModelIndexList& indexes,
         const QChar& textDelimiter,
-        const Qt::ItemDataRole dataRole = Qt::DisplayRole);
+        int dataRole = Qt::DisplayRole);
     static QString getGridHtmlData(const QAbstractItemModel* tableModel,
         const QModelIndexList& indexes,
-        const Qt::ItemDataRole dataRole = Qt::DisplayRole);
+        int dataRole = Qt::DisplayRole);
 };
 
 class QnTableExportCompositeModel: public QAbstractItemModel
