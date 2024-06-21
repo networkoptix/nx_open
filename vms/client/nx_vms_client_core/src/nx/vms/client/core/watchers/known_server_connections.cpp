@@ -38,7 +38,6 @@ struct KnownServerConnections::Private
 {
     void start();
 
-    nx::vms::discovery::Manager* discoveryManager = appContext()->moduleDiscoveryManager();
     QList<Connection> connections;
 };
 
@@ -51,7 +50,7 @@ void KnownServerConnections::Private::start()
     if (connections.size() != oldSize)
         appContext()->coreSettings()->knownServerConnections = connections;
 
-    if (discoveryManager)
+    if (auto discoveryManager = appContext()->moduleDiscoveryManager())
     {
         for (const auto& connection: connections)
             discoveryManager->checkEndpoint(connection.url, connection.serverId);
@@ -95,8 +94,8 @@ void KnownServerConnections::saveConnection(
     d->connections.prepend(connection);
     trimConnectionsList(d->connections);
 
-    if (d->discoveryManager)
-        d->discoveryManager->checkEndpoint(connection.url, connection.serverId);
+    if (auto discoveryManager = appContext()->moduleDiscoveryManager())
+        discoveryManager->checkEndpoint(connection.url, connection.serverId);
     appContext()->coreSettings()->knownServerConnections = d->connections;
 }
 
