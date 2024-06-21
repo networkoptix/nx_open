@@ -216,7 +216,7 @@ void LookupListEntriesModel::exportEntries(const QSet<int>& selectedRows, QTextS
             this, [&](const QModelIndex& index) { return selectedRows.contains(index.row()); });
     }
 
-    QnTableExportHelper::exportToStreamCsv(this, indexes, outputCsv);
+    QnTableExportHelper::exportToStreamCsv(this, indexes, outputCsv, RawValueRole);
 }
 
 bool LookupListEntriesModel::isValidValue(const QString& value, const QString& attributeName)

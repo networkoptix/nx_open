@@ -36,12 +36,20 @@ QVariant LookupListEntriesModel::Private::stringFormatter(const QString& value)
 
 QVariant LookupListEntriesModel::Private::booleanFormatter(const QString& value)
 {
-    return value == "true" ? tr("Yes") : tr("No");
+    if (value == "true")
+        return tr("Yes");
+    if (value == "false")
+        return tr("No");
+    return {};
 }
 
 QVariant LookupListEntriesModel::Private::objectFormatter(const QString& value)
 {
-    return value == "true" ? tr("Present") : tr("Absent");
+    if (value == "true")
+        return tr("Present");
+    if (value == "false")
+        return tr("Absent");
+    return {};
 }
 
 QVariant LookupListEntriesModel::Private::getDisplayValue(

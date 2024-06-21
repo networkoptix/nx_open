@@ -72,7 +72,8 @@ void QnTableExportHelper::exportToFile(
     const QAbstractItemModel* tableModel,
     const QModelIndexList& indexes,
     QWidget* parent,
-    const QString& caption)
+    const QString& caption,
+    const int dataRole)
 {
     const QString filters = QnCustomFileDialog::createFilter(
         {{tr("HTML file"), {"html"}}, {tr("Spread Sheet (CSV) File"), {"csv"}}});
@@ -86,16 +87,16 @@ void QnTableExportHelper::exportToFile(
     if (file.open(QFile::WriteOnly | QFile::Truncate))
     {
         if (fileName.endsWith(".html") || fileName.endsWith(".htm"))
-            file.write(getGridHtmlData(tableModel, indexes).toUtf8());
+            file.write(getGridHtmlData(tableModel, indexes, dataRole).toUtf8());
         else
-            file.write(getGridCsvData(tableModel, indexes, ';').toUtf8());
+            file.write(getGridCsvData(tableModel, indexes, ';', dataRole).toUtf8());
     }
 }
 
 void QnTableExportHelper::exportToStreamCsv(const QAbstractItemModel* tableModel,
     const QModelIndexList& indexes,
     QTextStream& outputCsv,
-    const Qt::ItemDataRole dataRole)
+    int dataRole)
 {
     outputCsv << getGridCsvData(tableModel, indexes, ',', dataRole);
 }
@@ -103,7 +104,7 @@ void QnTableExportHelper::exportToStreamCsv(const QAbstractItemModel* tableModel
 void QnTableExportHelper::copyToClipboard(
     const QAbstractItemModel* tableModel,
     const QModelIndexList& indexes,
-    const Qt::ItemDataRole dataRole)
+    int dataRole)
 {
     QString textData;
     QString htmlData;
@@ -118,7 +119,7 @@ void QnTableExportHelper::copyToClipboard(
 QString QnTableExportHelper::getGridCsvData(const QAbstractItemModel* tableModel,
     const QModelIndexList& indexes,
     const QChar& textDelimiter,
-    const Qt::ItemDataRole dataRole)
+    int dataRole)
 {
     QString textResult;
 
@@ -167,7 +168,7 @@ QString QnTableExportHelper::getGridCsvData(const QAbstractItemModel* tableModel
 
 QString QnTableExportHelper::getGridHtmlData(const QAbstractItemModel* tableModel,
     const QModelIndexList& indexes,
-    const Qt::ItemDataRole dataRole)
+    int dataRole)
 {
     using namespace nx::vms::common;
 
@@ -228,7 +229,7 @@ void QnTableExportHelper::getGridHtmlCsvData(const QAbstractItemModel* tableMode
     const QChar& textDelimiter,
     QString& textData,
     QString& htmlData,
-    const Qt::ItemDataRole dataRole)
+    int dataRole)
 {
     using namespace nx::vms::common;
 

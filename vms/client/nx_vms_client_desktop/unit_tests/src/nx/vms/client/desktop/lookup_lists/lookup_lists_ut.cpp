@@ -305,9 +305,45 @@ protected:
             for (int r = 0; r < exportedData.entries.size(); ++r)
             {
                 // Check that data in importModel is the same as in imported file.
-                ASSERT_EQ(m_importModel->index(r, c).data(), m_entriesModel->index(r, c).data());
+                ASSERT_EQ(m_importModel->index(r, c).data(),
+                    m_entriesModel->index(r, c).data(
+                        LookupListEntriesModel::DataRole::RawValueRole));
             }
         }
+    }
+
+    void thenExportedDataIsTheSameAsInModel()
+    {
+        ASSERT_TRUE(m_exportTestFile.open(QIODevice::ReadOnly));
+
+        int row = -1;
+        while (!m_exportTestFile.atEnd())
+        {
+            const auto lineData = m_exportTestFile.readLine().split(',');
+
+            ASSERT_EQ(lineData.size(), m_entriesModel->columnCount());
+
+            int column = 0;
+            for (QString value: lineData)
+            {
+                if (row == -1) //< The header of file is equal to headerData
+                {
+                    ASSERT_EQ(value.trimmed(), m_entriesModel->headerData(column).toString());
+                }
+                else //< The row data is the same as in model.
+                {
+                    const auto modelIndex = m_entriesModel->index(row, column);
+                    ASSERT_TRUE(modelIndex.isValid());
+                    ASSERT_EQ(value.trimmed(),
+                        modelIndex.data(LookupListEntriesModel::DataRole::RawValueRole)
+                            .toString());
+                }
+                column += 1;
+            }
+            row += 1;
+        }
+
+        thenRowCountIs(row, m_entriesModel.get());
     }
 
     std::map<QString, QString> correctRowToStdMap()
@@ -409,6 +445,13 @@ TEST_F(LookupListTests, export_build_import_preview_lookup_list)
 {
     for (auto& testData: exampleDataList())
         checkBuildingLookupListPreviewModel(testData, testData);
+}
+
+TEST_F(LookupListTests, exported_data_is_valid)
+{
+    givenLookupListEntriesModel(bigColumnNumberExampleData());
+    whenExportModelToFile();
+    thenExportedDataIsTheSameAsInModel();
 }
 
 /**
