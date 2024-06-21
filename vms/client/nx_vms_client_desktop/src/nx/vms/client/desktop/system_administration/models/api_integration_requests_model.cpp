@@ -42,16 +42,6 @@ void ApiIntegrationRequestsModel::setRequests(const QVariant& requests)
     }
 }
 
-void ApiIntegrationRequestsModel::setNewRequestsEnabled(bool enabled)
-{
-    if (m_isNewRequestsEnabled != enabled)
-    {
-        // TODO: VMS-38231: Place code here when the server method becomes available.
-        // m_isNewRequestsEnabled = enabled;
-    }
-    emit isNewRequestsEnabledChanged(); //< Trigger binding updates.
-}
-
 void ApiIntegrationRequestsModel::refresh()
 {
     if (!connection()) //< It may be null if the client just disconnected from the server.

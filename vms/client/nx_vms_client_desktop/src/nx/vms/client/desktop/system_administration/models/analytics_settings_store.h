@@ -28,6 +28,8 @@ class AnalyticsSettingsStore:
     Q_PROPERTY(QVariant analyticsEngines READ analyticsEngines NOTIFY analyticsEnginesChanged)
     Q_PROPERTY(bool loading READ loading NOTIFY loadingChanged)
     Q_PROPERTY(bool hasChanges READ hasChanges NOTIFY hasChangesChanged)
+    Q_PROPERTY(bool isNewRequestsEnabled
+        MEMBER m_isNewRequestsEnabled NOTIFY isNewRequestsEnabledChanged)
 public:
     AnalyticsSettingsStore(QWidget* parent = nullptr);
 
@@ -66,6 +68,7 @@ public:
     bool isNetworkRequestRunning() const;
 
     Q_INVOKABLE void applySettingsValues();
+    Q_INVOKABLE void applySystemSettings();
     Q_INVOKABLE void discardChanges();
 
     Q_INVOKABLE ApiIntegrationRequestsModel* makeApiIntegrationRequestsModel() const;
@@ -78,6 +81,7 @@ signals:
     void currentErrorsChanged();
     void loadingChanged();
     void licenseSummariesChanged();
+    void isNewRequestsEnabledChanged();
     void hasChangesChanged();
 
 private:
@@ -103,10 +107,12 @@ private:
     QPointer<QWidget> m_parent;
     const QScopedPointer<core::AnalyticsEnginesWatcher> m_enginesWatcher;
     QVariantList m_engines;
+    bool m_isNewRequestsEnabled = true;
     bool m_hasChanges = false;
     bool m_settingsLoading = false;
     QList<rest::Handle> m_pendingRefreshRequests;
     QList<rest::Handle> m_pendingApplyRequests;
+    rest::Handle m_systemSettingsRequest = 0;
 
     nx::Uuid m_currentEngineId;
 
