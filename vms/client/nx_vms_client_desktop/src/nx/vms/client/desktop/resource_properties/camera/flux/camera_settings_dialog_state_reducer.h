@@ -81,12 +81,12 @@ public:
     static State setSelectedTab(State state, CameraSettingsTab value);
     static State setReadOnly(State state, bool value);
     static State setSettingsOptimizationEnabled(State state, bool value);
-    static State setHasPowerUserPermissions(State state, bool value);
-    static State setHasEventLogPermission(State state, bool value);
-    static State setHasEditAccessRightsForAllCameras(State state, bool value);
-    static State setPermissions(State state, Qn::Permissions value);
-    static State setAllCamerasEditable(State state, bool value);
-    static State setSaasInitialized(State state, bool value);
+    static std::pair<bool, State> setHasPowerUserPermissions(State state, bool value);
+    static std::pair<bool, State> setHasEventLogPermission(State state, bool value);
+    static std::pair<bool, State> setHasEditAccessRightsForAllCameras(State state, bool value);
+    static std::pair<bool, State> setPermissions(State state, Qn::Permissions value);
+    static std::pair<bool, State> setAllCamerasEditable(State state, bool value);
+    static std::pair<bool, State> setSaasInitialized(State state, bool value);
     static State setSingleVirtualCameraState(State state, const VirtualCameraState& value);
 
     static State setSingleCameraUserName(State state, const QString& text);
