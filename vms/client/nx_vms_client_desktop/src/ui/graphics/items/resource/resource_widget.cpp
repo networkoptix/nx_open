@@ -112,7 +112,7 @@ void splitFormat(const QString &format, QString *left, QString *right)
 }
 
 const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kLight1Theme = {
-    {QIcon::Normal, {.primary = "light1"}}
+    {QIcon::Normal, {.primary = "light4"}},
 };
 
 NX_DECLARE_COLORIZED_ICON(kZoomWindowIcon, "24x24/Outline/zoom_window.svg", kLight1Theme)
@@ -384,12 +384,12 @@ void QnResourceWidget::createButtons()
     iconButton->setVisible(false);
     iconButton->setAcceptedMouseButtons(Qt::NoButton);
     iconButton->setObjectName("ZoomStatusIconButton");
-    iconButton->setIcon(qnSkin->icon(kZoomWindowIcon));
+    iconButton->setIcon(loadSvgIcon(kZoomWindowIcon.iconPath()));
     iconButton->setToolTip(tr("Zoom Window"));
     leftButtonsBar->addButton(Qn::ZoomStatusIconButton, iconButton);
 
     auto closeButton = createStatisticAwareButton("res_widget_close");
-    closeButton->setIcon(qnSkin->icon(kCloseIcon));
+    closeButton->setIcon(loadSvgIcon(kCloseIcon.iconPath()));
     closeButton->setToolTip(tooltipText(closeButtonTooltip(), QKeySequence{"Del"}));
     closeButton->setObjectName("CloseButton");
     connect(closeButton, &QnImageButtonWidget::clicked, this, &QnResourceWidget::close,
@@ -403,7 +403,7 @@ void QnResourceWidget::createButtons()
         this, &QnResourceWidget::moveToDedicatedWindow);
 
     auto infoButton = createStatisticAwareButton("res_widget_info");
-    infoButton->setIcon(qnSkin->icon(kInfoIcon));
+    infoButton->setIcon(loadSvgIcon(kInfoIcon.iconPath()));
     infoButton->setCheckable(true);
     infoButton->setChecked(item()->displayInfo());
     infoButton->setToolTip(tooltipText(infoButtonTooltip(), QKeySequence{"I"}));
@@ -411,7 +411,7 @@ void QnResourceWidget::createButtons()
     connect(infoButton, &QnImageButtonWidget::toggled, this, &QnResourceWidget::at_infoButton_toggled);
 
     auto rotateButton = createStatisticAwareButton("res_widget_rotate");
-    rotateButton->setIcon(qnSkin->icon(kRotateIcon));
+    rotateButton->setIcon(loadSvgIcon(kRotateIcon.iconPath()));
     rotateButton->setToolTip(tooltipText(tr("Rotate"), "Alt+drag"));
     rotateButton->setObjectName("RotateButton");
     setHelpTopic(rotateButton, HelpTopic::Id::MainWindow_MediaItem_Rotate);
@@ -455,8 +455,8 @@ void QnResourceWidget::updateFullscreenButton()
     const auto button = titleBar()->rightButtonsBar()->button(Qn::FullscreenButton);
 
     const auto newIcon = fullscreenMode
-        ? qnSkin->icon(kCollapseIcon)
-        : qnSkin->icon(kExpandIcon);
+        ? loadSvgIcon(kCollapseIcon.iconPath())
+        : loadSvgIcon(kExpandIcon.iconPath());
 
     button->setToolTip(fullscreenMode ? tr("Exit Fullscreen") : tr("Enter Fullscreen"));
     button->setIcon(newIcon);

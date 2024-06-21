@@ -1015,7 +1015,7 @@ void QnMediaResourceWidget::createButtons()
 
     {
         auto ioModuleButton = createStatisticAwareButton("media_widget_io_module");
-        ioModuleButton->setIcon(qnSkin->icon(kIoIcon));
+        ioModuleButton->setIcon(loadSvgIcon(kIoIcon.iconPath()));
         ioModuleButton->setCheckable(true);
         ioModuleButton->setChecked(false);
         ioModuleButton->setToolTip(tr("I/O Module"));
@@ -1025,7 +1025,7 @@ void QnMediaResourceWidget::createButtons()
     }
 
     auto screenshotButton = createStatisticAwareButton("media_widget_screenshot");
-    screenshotButton->setIcon(qnSkin->icon(kScreenshotIcon));
+    screenshotButton->setIcon(loadSvgIcon(kScreenshotIcon.iconPath()));
     screenshotButton->setCheckable(false);
     screenshotButton->setToolTip(tooltipText(tr("Screenshot"), QKeySequence{"Alt+S"}));
     setHelpTopic(screenshotButton, HelpTopic::Id::MainWindow_MediaItem_Screenshot);
@@ -1038,7 +1038,7 @@ void QnMediaResourceWidget::createButtons()
     {
         auto debugScreenshotButton =
             createStatisticAwareButton("media_widget_debug_screenshot");
-        debugScreenshotButton->setIcon(qnSkin->icon(kScreenshotIcon));
+        debugScreenshotButton->setIcon(loadSvgIcon(kScreenshotIcon.iconPath()));
         debugScreenshotButton->setCheckable(false);
         debugScreenshotButton->setToolTip("Debug set of screenshots");
         connect(debugScreenshotButton, &QnImageButtonWidget::clicked, this,
@@ -3416,7 +3416,7 @@ QAction* QnMediaResourceWidget::createActionAndButton(
     ButtonHandler executor)
 {
     auto action = new QAction(this);
-    action->setIcon(qnSkin->icon(iconDecl));
+    action->setIcon(loadSvgIcon(iconDecl.iconPath()));
     action->setCheckable(true);
     action->setChecked(checked);
     action->setShortcut(shortcut);
