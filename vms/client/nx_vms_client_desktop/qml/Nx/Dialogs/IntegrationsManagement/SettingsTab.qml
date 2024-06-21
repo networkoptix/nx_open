@@ -12,7 +12,7 @@ Control
 {
     id: control
 
-    property var requestsModel: null
+    property var store: null
 
     padding: 16
 
@@ -22,7 +22,7 @@ Control
         checkable: true
         spacing: 4
 
-        Binding on checked { value: requestsModel && requestsModel.isNewRequestsEnabled }
-        onSwitchClicked: requestsModel.setNewRequestsEnabled(checked)
+        Binding on checked { value: store && store.isNewRequestsEnabled }
+        onSwitchClicked: store.isNewRequestsEnabled = checked
     }
 }

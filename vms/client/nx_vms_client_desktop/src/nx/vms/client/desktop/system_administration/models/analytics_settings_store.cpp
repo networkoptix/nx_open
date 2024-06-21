@@ -20,6 +20,7 @@
 #include <nx/vms/client/desktop/utils/qml_property.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
+#include <nx/vms/common/system_settings.h>
 
 using namespace nx::vms::common;
 
@@ -64,6 +65,10 @@ AnalyticsSettingsStore::AnalyticsSettingsStore(QWidget* parent):
     const auto serviceManager = systemContext()->saasServiceManager();
     connect(serviceManager, &common::saas::ServiceManager::dataChanged,
         this, &AnalyticsSettingsStore::licenseSummariesChanged);
+
+    m_isNewRequestsEnabled = systemSettings()->isAllowRegisteringIntegrationsEnabled();
+    connect(this, &AnalyticsSettingsStore::isNewRequestsEnabledChanged,
+        this, &AnalyticsSettingsStore::updateHasChanges);
 }
 
 void AnalyticsSettingsStore::updateEngines()
@@ -310,8 +315,30 @@ void AnalyticsSettingsStore::applySettingsValues()
     setLoading(!m_pendingApplyRequests.isEmpty());
 }
 
+void AnalyticsSettingsStore::applySystemSettings()
+{
+    if (m_isNewRequestsEnabled != systemSettings()->isAllowRegisteringIntegrationsEnabled())
+    {
+        auto callback = nx::utils::guarded(this,
+            [this](bool /*success*/, rest::Handle requestId, rest::ServerConnection::ErrorOrEmpty)
+            {
+                NX_ASSERT(m_systemSettingsRequest == requestId || m_systemSettingsRequest == 0);
+                m_systemSettingsRequest = 0;
+            });
+
+        m_systemSettingsRequest = systemContext()->connectedServerApi()->patchSystemSettings(
+            systemContext()->getSessionTokenHelper(),
+            {{.allowRegisteringIntegrations = m_isNewRequestsEnabled}},
+            callback,
+            this);
+    }
+}
+
 void AnalyticsSettingsStore::discardChanges()
 {
+    m_isNewRequestsEnabled = systemSettings()->isAllowRegisteringIntegrationsEnabled();
+    emit isNewRequestsEnabledChanged();
+
     m_settingsValuesByEngineId.clear();
     updateHasChanges();
     if (auto api = connectedServerApi())
@@ -320,6 +347,8 @@ void AnalyticsSettingsStore::discardChanges()
             api->cancelRequest(handle);
         for (auto handle: m_pendingRefreshRequests)
             api->cancelRequest(handle);
+        if (m_systemSettingsRequest != 0)
+            api->cancelRequest(m_systemSettingsRequest);
     }
     m_pendingApplyRequests.clear();
     m_pendingRefreshRequests.clear();
@@ -392,14 +421,17 @@ void AnalyticsSettingsStore::updateHasChanges()
 {
     m_hasChanges =
         std::any_of(m_settingsValuesByEngineId.begin(), m_settingsValuesByEngineId.end(),
-            [](const SettingsValues& values) { return values.changed; });
+            [](const SettingsValues& values) { return values.changed; })
+        || m_isNewRequestsEnabled != systemSettings()->isAllowRegisteringIntegrationsEnabled();
 
     emit hasChangesChanged();
 }
 
 bool AnalyticsSettingsStore::isNetworkRequestRunning() const
 {
-    return !m_pendingApplyRequests.empty() || !m_pendingRefreshRequests.empty();
+    return !m_pendingApplyRequests.empty()
+        || !m_pendingRefreshRequests.empty()
+        || m_systemSettingsRequest != 0;
 }
 
 ApiIntegrationRequestsModel*

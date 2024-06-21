@@ -24,22 +24,17 @@ public:
 public:
     Q_PROPERTY(QVariant requests READ requests NOTIFY requestsChanged)
     Q_PROPERTY(bool isActive MEMBER m_isActive NOTIFY isActiveChanged)
-    Q_PROPERTY(bool isNewRequestsEnabled
-        READ isNewRequestsEnabled NOTIFY isNewRequestsEnabledChanged)
 
     ApiIntegrationRequestsModel(SystemContext* systemContext, QObject* parent = nullptr);
 
     QVariant requests() const { return m_requests; }
     void setRequests(const QVariant& requests);
     void refresh();
-    bool isNewRequestsEnabled() const { return m_isNewRequestsEnabled; }
-    Q_INVOKABLE void setNewRequestsEnabled(bool enabled);
     Q_INVOKABLE void reject(const QString& id);
     Q_INVOKABLE void approve(const QString& id, const QString& authCode);
 
 signals:
     void requestsChanged();
-    void isNewRequestsEnabledChanged();
     void isActiveChanged();
 
 private:

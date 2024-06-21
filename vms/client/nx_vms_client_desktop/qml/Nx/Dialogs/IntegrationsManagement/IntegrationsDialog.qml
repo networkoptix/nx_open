@@ -64,7 +64,7 @@ Dialog
 
             page: SettingsTab
             {
-                requestsModel: dialog.requestsModel
+                store: dialog.store
             }
         }
     }
@@ -84,13 +84,19 @@ Dialog
     onAccepted:
     {
         if (store)
+        {
             store.applySettingsValues()
+            store.applySystemSettings()
+        }
     }
 
     onApplied:
     {
         if (store)
+        {
             store.applySettingsValues()
+            store.applySystemSettings()
+        }
     }
 
     onRejected:
