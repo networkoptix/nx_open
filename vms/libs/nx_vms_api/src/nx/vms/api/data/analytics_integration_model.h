@@ -16,8 +16,8 @@ extern NX_VMS_API const QString kPluginManifestProperty;
 extern NX_VMS_API const QString kIntegrationTypeProperty;
 
 NX_REFLECTION_ENUM_CLASS(IntegrationType,
-    sdk = 1 << 0,
-    api = 1 << 1
+    sdk,
+    api
 );
 
 struct NX_VMS_API IntegrationModel
