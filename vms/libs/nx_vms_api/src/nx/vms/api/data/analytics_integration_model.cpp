@@ -15,7 +15,8 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
 
 IntegrationModel::IntegrationModel(AnalyticsPluginData data):
     id(data.id),
-    name(data.name)
+    name(data.name),
+    type(IntegrationType::sdk)
 {
 }
 
