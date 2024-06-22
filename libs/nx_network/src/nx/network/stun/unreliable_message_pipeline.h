@@ -199,7 +199,7 @@ private:
         if (messageParser.parse(datagram, &bytesParsed) == nx::network::server::ParserState::done)
         {
             m_customPipeline->messageReceived(
-                std::move(sourceAddress),
+                sourceAddress,
                 std::move(msg));
         }
         else
