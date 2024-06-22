@@ -68,6 +68,7 @@ function(_set_customization_from_file)
     endif()
 
     set(customization ${customization_id} PARENT_SCOPE)
+    message(STATUS "Got customization id = \"${customization_id}\"")
 endfunction()
 
 macro(nx_load_customization_package)
