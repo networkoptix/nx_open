@@ -80,7 +80,7 @@ void TunnelConnector::connect(
     for (const SocketAddress& endpoint: response.udpEndpointList)
     {
         std::unique_ptr<RendezvousConnectorWithVerification> rendezvousConnector =
-            createRendezvousConnector(std::move(endpoint));
+            createRendezvousConnector(endpoint);
 
         NX_DEBUG(this, nx::format("cross-nat %1. Udt rendezvous connect to %2")
             .arg(m_connectSessionId).arg(rendezvousConnector->remoteAddress().toString()));
