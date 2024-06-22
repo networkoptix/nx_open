@@ -255,8 +255,10 @@ Qn::RenderStatus QnGLRenderer::renderBlurFBO(const QRectF &sourceRect)
 {
     NX_ASSERT(QOpenGLFramebufferObject::hasOpenGLFramebufferObjects());
 
+    QOpenGLFunctions gl(QOpenGLContext::currentContext());
+
     GLint prevViewPort[4];
-    glGetIntegerv(GL_VIEWPORT, prevViewPort);
+    gl.glGetIntegerv(GL_VIEWPORT, prevViewPort);
 
     auto renderer = QnOpenGLRendererManager::instance(glWidget());
     auto prevMatrix = renderer->getModelViewMatrix();
@@ -265,7 +267,7 @@ Qn::RenderStatus QnGLRenderer::renderBlurFBO(const QRectF &sourceRect)
     QRectF dstPaintRect(prevViewPort[0], prevViewPort[1], prevViewPort[2], prevViewPort[3]);
 
     QSize blurSize = m_blurBufferA->size();
-    glViewport(0, 0, blurSize.width(), blurSize.height());
+    gl.glViewport(0, 0, blurSize.width(), blurSize.height());
 
     m_blurBufferA->bind();
     static const qreal kOpaque = 1.0;
@@ -287,7 +289,7 @@ Qn::RenderStatus QnGLRenderer::renderBlurFBO(const QRectF &sourceRect)
     shader->release();
 
     renderer->setModelViewMatrix(prevMatrix);
-    glViewport(prevViewPort[0], prevViewPort[1], prevViewPort[2], prevViewPort[3]);
+    gl.glViewport(prevViewPort[0], prevViewPort[1], prevViewPort[2], prevViewPort[3]);
     return result;
 }
 
