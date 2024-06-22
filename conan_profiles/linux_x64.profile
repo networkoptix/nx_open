@@ -10,4 +10,4 @@ qt/*:mysql=True
 qt/*:psql=True
 
 [tool_requires]
-opencv/*:cuda-toolkit/11.7
+opencv/*:cuda-toolkit/11.8
