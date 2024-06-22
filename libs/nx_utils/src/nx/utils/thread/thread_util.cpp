@@ -16,7 +16,9 @@
     #include <sys/syscall.h>
     #include <unistd.h>
     #ifndef Q_OS_ANDROID
-        static pid_t gettid(void) { return syscall(__NR_gettid); }
+        #if (__GLIBC__ == 2 && __GLIBC_MINOR__ < 30)
+            static pid_t gettid(void) { return syscall(__NR_gettid); }
+        #endif
     #endif
 #endif
 
