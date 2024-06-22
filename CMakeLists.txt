@@ -20,10 +20,19 @@ include(cmake/customization_package.cmake)
 include(cmake/default_target.cmake)
 set(targetDevice ${default_target_device} CACHE STRING
     "Target device. For the list see cmake/toolchains.")
-if(NOT clangDir STREQUAL "")
-    set(ENV{CLANG_DIR} ${clangDir})
+
+if(targetDevice MATCHES "^linux")
+    option(useCurrentOsComponents
+        "Build using current OS development files."
+        OFF)
 endif()
-include(cmake/open_source/toolchain_detection.cmake)
+
+if(NOT useCurrentOsComponents)
+    if(NOT clangDir STREQUAL "")
+        set(ENV{CLANG_DIR} ${clangDir})
+    endif()
+    include(cmake/open_source/toolchain_detection.cmake)
+endif()
 
 include(cmake/option.cmake)
 nx_option(developerBuild

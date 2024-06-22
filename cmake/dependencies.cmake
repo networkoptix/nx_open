@@ -1,6 +1,6 @@
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-if(LINUX AND NOT ANDROID)
+if(LINUX AND NOT useCurrentOsComponents AND NOT ANDROID)
     if(targetDevice STREQUAL "linux_x64" OR targetDevice STREQUAL "linux_arm64")
         set(OS_DEPS_ROOT ${CONAN_OS_DEPS_FOR_DESKTOP_LINUX_ROOT})
     else()
