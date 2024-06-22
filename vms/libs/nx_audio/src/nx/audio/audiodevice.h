@@ -5,9 +5,6 @@
 #include <QtCore/QList>
 #include <QtCore/QObject>
 
-typedef struct ALCdevice_struct ALCdevice;
-typedef struct ALCcontext_struct ALCcontext;
-
 namespace nx {
 namespace audio {
 
@@ -52,15 +49,15 @@ public:
 private:
     friend class Sound;
 
-    static int internalBufferInSamples(ALCdevice* device);
+    static int internalBufferInSamples(void* device);
     void initDeviceInternal();
 
 signals:
     void volumeChanged(float value);
 
 private:
-    ALCdevice* m_device = nullptr;
-    ALCcontext* m_context = nullptr;
+    void* m_device = nullptr;
+    void* m_context = nullptr;
     float m_volume = 1.0;
 };
 

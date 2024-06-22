@@ -25,7 +25,7 @@ namespace {
     static const qint64 kDefaultMaxAudioJitterUs = 64 * 1000;
 }
 
-Sound::Sound(ALCdevice *device, const Format& audioFormat):
+Sound::Sound(void *device, const Format& audioFormat):
     QObject()
 {
     m_audioFormat = audioFormat;
@@ -179,7 +179,7 @@ uint Sound::bufferTime() const
 
 void Sound::clearBuffers()
 {
-    static constexpr auto kMaxUnqueueCount = 
+    static constexpr auto kMaxUnqueueCount =
         static_cast<ALint>(sizeof(m_tmpBuffer) / sizeof(m_tmpBuffer[0]));
 
     // We can unqueue only a limited number of buffers that can fit into m_tmpBuffer array, so
@@ -199,7 +199,7 @@ void Sound::clearBuffers()
         alGetError(); //< Clear error code.
         alSourceUnqueueBuffers(m_source, unqueueCount, m_tmpBuffer);
 
-        const auto err = alGetError(); 
+        const auto err = alGetError();
         if (err != AL_NO_ERROR)
             return;
 
@@ -387,7 +387,7 @@ bool Sound::outError(int err, const char* strerr)
     return strerr != NULL;
 }
 
-int Sound::checkOpenALError(ALCdevice *device)
+int Sound::checkOpenALError(void *device)
 {
     // get an error
     int err = alGetError();
@@ -395,15 +395,15 @@ int Sound::checkOpenALError(ALCdevice *device)
         const char* strerr = alGetString(err);
         outError(err, strerr);
     }
-    err = alcGetError(device);
+    err = alcGetError((ALCdevice *) device);
     if (err != AL_NO_ERROR)  {
-        const char* strerr = alcGetString(device, err);
+        const char* strerr = alcGetString((ALCdevice *) device, err);
         outError(err, strerr);
     }
     return err;
 }
 
-int Sound::checkOpenALErrorDebug(ALCdevice *device)
+int Sound::checkOpenALErrorDebug(void *device)
 {
 #ifdef _DEBUG
     return checkOpenALError(device);

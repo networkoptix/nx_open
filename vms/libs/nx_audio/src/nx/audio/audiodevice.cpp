@@ -51,9 +51,10 @@ struct ALCdevice_struct
 
 } // unnamed namespace
 
-int AudioDevice::internalBufferInSamples(ALCdevice* device)
+int AudioDevice::internalBufferInSamples(void* device)
 {
-    #if defined(Q_OS_MACX) || defined(Q_OS_IOS)
+    #if defined(Q_OS_MACX) || defined(Q_OS_IOS) || defined(Q_OS_LINUX)
+        // Linux was added above b/c the internal structs were changed in the latest openal.
         /**
          * Looks like Mac OS has a bug in the standard OpenAL implementation.
          * It returns invalid pointer with alcOpenDevice (0x18) and alcCreateContext(0x19).
@@ -116,14 +117,14 @@ AudioDevice::AudioDevice(QObject* parent):
         return;
     }
 
-    m_context = alcCreateContext(m_device, nullptr);
+    m_context = alcCreateContext((ALCdevice *) m_device, nullptr);
     if (!m_context)
     {
         NX_ERROR(this, "Unable to create context");
         return;
     }
 
-    alcMakeContextCurrent(m_context);
+    alcMakeContextCurrent((ALCcontext *) m_context);
     alListener3f(AL_POSITION, 0.0f, 0.0f, 0.0f);
 
     const QByteArray renderer = static_cast<const char*>(alGetString(AL_RENDERER));
@@ -144,12 +145,12 @@ AudioDevice::~AudioDevice()
         {
             alcMakeContextCurrent(nullptr);
             // Release context(s)
-            alcDestroyContext(m_context);
+            alcDestroyContext((ALCcontext *) m_context);
             m_context = nullptr;
         }
 
         // Close device
-        alcCloseDevice(m_device);
+        alcCloseDevice((ALCdevice *) m_device);
         m_device = nullptr;
     }
 
@@ -166,8 +167,8 @@ QString AudioDevice::versionString() const
 
     int majorVersion = 0;
     int minorVersion = 0;
-    alcGetIntegerv(m_device, ALC_MAJOR_VERSION, 1, &majorVersion);
-    alcGetIntegerv(m_device, ALC_MINOR_VERSION, 1, &minorVersion);
+    alcGetIntegerv((ALCdevice *) m_device, ALC_MAJOR_VERSION, 1, &majorVersion);
+    alcGetIntegerv((ALCdevice *) m_device, ALC_MINOR_VERSION, 1, &minorVersion);
 
     return QString::number(majorVersion) + QLatin1String(".") + QString::number(minorVersion);
 }
