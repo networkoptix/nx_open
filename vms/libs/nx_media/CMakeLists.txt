@@ -14,7 +14,7 @@ set(additional_libraries)
 set(artifacts_dir ${open_source_root}/artifacts)
 
 # QuickSync/Nvidia: Add additional sources for the supported platforms (Windows x64 and Linux x64).
-if(NOT APPLE AND arch STREQUAL "x64")
+if(NOT APPLE AND NOT LINUX AND arch STREQUAL "x64")
     set(hardware_decoders_x64 ON)
 endif()
 
