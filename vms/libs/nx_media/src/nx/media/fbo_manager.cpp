@@ -21,7 +21,8 @@ public:
         if (m_textureId.has_value())
         {
             NX_ASSERT(!m_fbo, "Texture has been taken, but FBO is still alive");
-            glDeleteTextures(1, &m_textureId.value());
+            QOpenGLFunctions gl(QOpenGLContext::currentContext());
+            gl.glDeleteTextures(1, &m_textureId.value());
         }
     }
 
