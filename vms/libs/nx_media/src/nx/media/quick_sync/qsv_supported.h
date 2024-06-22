@@ -3,7 +3,7 @@
 #pragma once
 
 #if !defined(__arm__) && !defined(__aarch64__)
-    #if defined(_WIN64) || defined(__linux__)
+    #if defined(_WIN64)
         #define __QSV_SUPPORTED__
     #endif
 #endif
