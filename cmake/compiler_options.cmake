@@ -296,6 +296,7 @@ if(UNIX)
     if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         add_compile_options(
             -Wno-error=maybe-uninitialized
+            -Wno-error=ignored-attributes
             -Wno-missing-field-initializers
             -Wno-psabi
         )
