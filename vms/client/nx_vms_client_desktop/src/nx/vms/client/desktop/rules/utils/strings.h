@@ -33,6 +33,7 @@ public:
     static QString useSourceCameraString(const QString& actionType = {});
     static QString eventLevelDisplayString(api::EventLevel eventLevel);
     static QString autoValue();
+    static QString selectString();
 
 private:
     static QString getName(SystemContext* context, const QnVirtualCameraResourceList& resources);
@@ -40,7 +41,6 @@ private:
     static QString getName(
         const QnUserResourceList& users, api::UserGroupDataList& groups, int additionalCount = 0);
 
-    static QString selectString();
     static QString sourceCameraString();
 };
 

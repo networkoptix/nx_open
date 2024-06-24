@@ -9,6 +9,7 @@
 #include <QtWidgets/QStackedWidget>
 #include <QtWidgets/QVBoxLayout>
 
+#include <nx/vms/client/desktop/rules/utils/strings.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/rules/event_filter_fields/analytics_object_type_field.h>
@@ -99,7 +100,7 @@ ObjectLookupPicker::ObjectLookupPicker(
         sortModel->setSortCaseSensitivity(Qt::CaseInsensitive);
         sortModel->sort(0);
         m_lookupListComboBox->setModel(sortModel);
-        m_lookupListComboBox->setPlaceholderText(tr("Select a list"));
+        m_lookupListComboBox->setPlaceholderText(Strings::selectString());
 
         lookupListsLayout->addWidget(m_lookupListComboBox);
 
