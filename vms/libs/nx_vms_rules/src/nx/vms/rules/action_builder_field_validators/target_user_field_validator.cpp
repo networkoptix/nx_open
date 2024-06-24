@@ -49,17 +49,10 @@ ValidationResult TargetUserFieldValidator::validity(
                     Strings::fieldValueMustBeProvided(utils::kAcknowledgeFieldName)};
             }
 
-            if (acknowledgeField->value() == true)
-            {
-                auto cameraField = rule->eventFilters().front()->fieldByName<SourceCameraField>(
+            auto cameraField = rule->eventFilters().front()->fieldByName<SourceCameraField>(
                     utils::kCameraIdFieldName);
-                if (!NX_ASSERT(cameraField))
-                {
-                    return {
-                        QValidator::State::Invalid,
-                        Strings::fieldValueMustBeProvided(utils::kCameraIdFieldName)};
-                }
-
+            if (acknowledgeField->value() == true && cameraField && !cameraField->acceptAll())
+            {
                 QnRequiredAccessRightPolicy policy{
                     context,
                     vms::api::AccessRight::manageBookmarks,
