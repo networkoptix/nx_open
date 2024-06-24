@@ -300,4 +300,9 @@ QString Strings::sourceCameraString()
     return tr("Source camera");
 }
 
+QString Strings::devModeInfoTitle()
+{
+    return tr("Developer Mode Info");
+}
+
 } // namespace nx::vms::client::desktop::rules

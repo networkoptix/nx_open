@@ -42,6 +42,7 @@
 #include "params_widgets/action_parameters_widget.h"
 #include "params_widgets/event_parameters_widget.h"
 #include "utils/confirmation_dialogs.h"
+#include "utils/strings.h"
 
 namespace nx::vms::client::desktop::rules {
 
@@ -685,7 +686,9 @@ void EditVmsRuleDialog::onEventFilterModified()
 {
     const auto serializedEventFilter =
         QJson::serialized(serialize(m_rule->eventFilters().first()));
-    m_eventLabel->setToolTip(indentedJson(serializedEventFilter));
+    m_eventLabel->setToolTip(QString{"%1:\n%2"}
+                                 .arg(Strings::devModeInfoTitle())
+                                 .arg(indentedJson(serializedEventFilter)));
     setHasChanges(true);
 }
 
@@ -693,7 +696,9 @@ void EditVmsRuleDialog::onActionBuilderModified()
 {
     const auto serializedActionBuilder =
         QJson::serialized(serialize(m_rule->actionBuilders().first()));
-    m_actionLabel->setToolTip(indentedJson(serializedActionBuilder));
+    m_actionLabel->setToolTip(QString{"%1:\n%2"}
+                                  .arg(Strings::devModeInfoTitle())
+                                  .arg(indentedJson(serializedActionBuilder)));
     setHasChanges(true);
 }
 
