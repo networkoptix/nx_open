@@ -407,7 +407,7 @@ protected:
                 {"Approved", "true"}},
             {{"Number", "67890"}, {"Approved", "false"}},
             {{"Color", "#0000FF"}, {"Number", "9876"}},
-            {{"Enum", "base enum item 2.1"}, {"Color", "#0000FF"}},
+            {{"Enum", "base enum item 2.2"}, {"Color", "#0000FF"}},
         };
         return e1;
     }
@@ -684,6 +684,20 @@ TEST_F(LookupListTests, search_on_displayed_values)
 
     whenSetFilter("blue");
     thenRowCountIs(2, m_entriesProxyModel.get());
+}
+
+TEST_F(LookupListTests, search_by_all_columns)
+{
+    givenLookupListEntriesProxyModel(bigColumnNumberExampleData());
+
+    // Search by all values in first row.
+    for (int i = 0; i < m_entriesModel->columnCount(); ++i)
+    {
+        const auto modelIndex = m_entriesModel->index(0, i);
+        ASSERT_TRUE(modelIndex.isValid());
+        whenSetFilter(modelIndex.data().toString());
+        thenRowCountIs(1, m_entriesProxyModel.get());
+    }
 }
 
 } // namespace nx::vms::client::desktop
