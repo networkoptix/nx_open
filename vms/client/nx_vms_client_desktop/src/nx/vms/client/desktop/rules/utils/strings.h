@@ -34,6 +34,7 @@ public:
     static QString eventLevelDisplayString(api::EventLevel eventLevel);
     static QString autoValue();
     static QString selectString();
+    static QString devModeInfoTitle();
 
 private:
     static QString getName(SystemContext* context, const QnVirtualCameraResourceList& resources);
