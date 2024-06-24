@@ -32,6 +32,7 @@
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/settings/message_bar_settings.h>
+#include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/style.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -2169,13 +2170,21 @@ void MultiServerUpdatesWidget::completeClientInstallation(bool clientUpdated)
 
     if (clientUpdated)
     {
-        NX_INFO(this, "completeInstallation() - restarting the client");
-        if (m_clientUpdateTool->restartClient(logonData))
-            return;
+        const auto store = mainWindow()->titleBarStateStore();
+        if (ini().enableMultiSystemTabBar && store->systemCount() > 0)
+        {
+            appContext()->clientStateHandler()->createNewWindow(logonData);
+        }
+        else
+        {
+            NX_INFO(this, "completeInstallation() - restarting the client");
+            if (m_clientUpdateTool->restartClient(logonData))
+                return;
 
-        NX_ERROR(this, "completeInstallation(%1) - failed to run restart command",
-            clientUpdated);
-        QnConnectionDiagnosticsHelper::failedRestartClientMessage(this);
+            NX_ERROR(this, "completeInstallation(%1) - failed to run restart command",
+                clientUpdated);
+            QnConnectionDiagnosticsHelper::failedRestartClientMessage(this);
+        }
     }
 
     setUpdateSourceMode(UpdateSourceType::internet);
