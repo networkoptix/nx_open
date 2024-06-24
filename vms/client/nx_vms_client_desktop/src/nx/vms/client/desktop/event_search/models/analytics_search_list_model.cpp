@@ -86,7 +86,8 @@ QSharedPointer<QMenu> AnalyticsSearchListModel::contextMenu(
 
     menu->addSeparator();
 
-    if (ResourceAccessManager::hasPermissions(cameraResource, Qn::ReadWriteSavePermission))
+    if (ResourceAccessManager::hasPermissions(cameraResource, Qn::ReadWriteSavePermission)
+        && !track.attributes.empty()) //< Adding track without attributes to list is prohibited.
     {
         const auto listManager = systemContext()->lookupListManager();
         auto& lists = listManager->lookupLists();
