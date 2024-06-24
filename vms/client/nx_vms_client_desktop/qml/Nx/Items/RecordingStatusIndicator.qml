@@ -3,6 +3,7 @@
 import QtQuick
 
 import Nx.Core
+import Nx.Core.Controls
 
 import nx.vms.client.desktop
 
@@ -18,10 +19,17 @@ Item
         id: statusHelper
     }
 
-    Image
+    ColoredImage
     {
         id: image
         anchors.centerIn: parent
-        source: statusHelper.qmlIconName
+        sourceSize: Qt.size(20, 20)
+
+        sourcePath: statusHelper.qmlIconName
+
+        primaryColor: (extras.flags & ResourceTree.ResourceExtraStatusFlag.recording
+            || extras.flags & ResourceTree.ResourceExtraStatusFlag.scheduled)
+            ? "red_l"
+            : "dark17"
     }
 }

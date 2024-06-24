@@ -7,6 +7,7 @@
 #include <QtQml/QtQml>
 
 #include <core/misc/schedule_task.h>
+#include <core/resource/camera_history.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/math/math.h>
@@ -21,6 +22,30 @@ using namespace nx::vms::api;
 
 namespace {
 
+const core::SvgIconColorer::ThemeSubstitutions kArchiveTheme = {
+    {QIcon::Normal, {.primary = "light10"}}
+};
+
+const core::SvgIconColorer::ThemeSubstitutions kRecordingTheme = {
+    {QIcon::Normal, {.primary = "red_l1"}}
+};
+
+NX_DECLARE_COLORIZED_ICON(kArchiveIcon, "16x16/Solid/archive.svg", kArchiveTheme)
+NX_DECLARE_COLORIZED_ICON(kNotRecordingIcon, "16x16/Solid/notrecordingnow.svg", kRecordingTheme)
+NX_DECLARE_COLORIZED_ICON(kRecordingIcon, "16x16/Solid/recordingnow.svg", kRecordingTheme)
+
+bool hasArchive(const QnSecurityCamResourcePtr& camera)
+{
+    auto systemContext = SystemContext::fromResource(camera);
+    if (!NX_ASSERT(systemContext))
+        return false;
+
+    const auto footageServers =
+        systemContext->cameraHistoryPool()->getCameraFootageData(camera, /*filterOnlineServers*/ true);
+
+    return !footageServers.empty();
+};
+
 using namespace std::chrono;
 
 static constexpr milliseconds kUpdateInterval = minutes(1);
@@ -34,24 +59,44 @@ static constexpr auto kMotionMetadataTypes = RecordingMetadataTypes(
 static constexpr auto kObjectsMetadataTypes = RecordingMetadataTypes(
     RecordingMetadataType::objects);
 
-std::pair<RecordingType, RecordingMetadataTypes> currentRecordingMode(
+std::pair<RecordingStatus, RecordingMetadataTypes> currentRecordingMode(
     const QnVirtualCameraResourcePtr& camera)
 {
-    if (!camera || !camera->isScheduleEnabled())
-        return {RecordingType::never, {RecordingMetadataType::none}};
+    if (!camera || camera->hasFlags(Qn::virtual_camera))
+        return {RecordingStatus::noRecordingNoArchive, {RecordingMetadataType::none}};
 
-    const auto dateTime = qnSyncTime->currentDateTime();
-    const int dayOfWeek = dateTime.date().dayOfWeek();
-    const int seconds = dateTime.time().msecsSinceStartOfDay() / 1000;
-
-    const auto scheduledTasks = camera->getScheduleTasks();
-    for (const auto& task: scheduledTasks)
+    if (camera->isScheduleEnabled())
     {
-        if (task.dayOfWeek == dayOfWeek && qBetween(task.startTime, seconds, task.endTime + 1))
-            return {task.recordingType, task.metadataTypes};
+        const auto dateTime = qnSyncTime->currentDateTime();
+        const int dayOfWeek = dateTime.date().dayOfWeek();
+        const int seconds = dateTime.time().msecsSinceStartOfDay() / 1000;
+
+        const auto scheduledTasks = camera->getScheduleTasks();
+        bool recordScheduled = false;
+        for (const auto& task: scheduledTasks)
+        {
+            const bool isRecording = (task.recordingType != RecordingType::never);
+            recordScheduled |= isRecording;
+            if (task.dayOfWeek == dayOfWeek && qBetween(task.startTime, seconds, task.endTime + 1)
+                && isRecording)
+            {
+                auto status = RecordingStatus::recordingContinious;
+                if (task.recordingType == RecordingType::metadataOnly)
+                    status = RecordingStatus::recordingMetadataOnly;
+                else if (task.recordingType == RecordingType::metadataAndLowQuality)
+                    status = RecordingStatus::recordingMetadataAndLQ;
+                return {status, task.metadataTypes};
+            }
+        }
+
+        if (recordScheduled)
+            return {RecordingStatus::recordingScheduled, {RecordingMetadataType::none}};
     }
 
-    return {RecordingType::never, {RecordingMetadataType::none}};
+    return {hasArchive(camera)
+        ? RecordingStatus::noRecordingOnlyArchive
+        : RecordingStatus::noRecordingNoArchive,
+        {RecordingMetadataType::none}};
 }
 
 } // namespace
@@ -121,35 +166,35 @@ void RecordingStatusHelper::setCamera(const QnVirtualCameraResourcePtr& camera)
 
 QString RecordingStatusHelper::tooltip() const
 {
-    return tooltip(m_recordingType, m_metadataTypes);
+    return tooltip(m_recordingStatus, m_metadataTypes);
 }
 
 QString RecordingStatusHelper::shortTooltip() const
 {
-    return shortTooltip(m_recordingType, m_metadataTypes);
+    return shortTooltip(m_recordingStatus, m_metadataTypes);
 }
 
 QString RecordingStatusHelper::qmlIconName() const
 {
-    return qmlIconName(m_recordingType, m_metadataTypes);
+    return qmlIconName(m_recordingStatus, m_metadataTypes);
 }
 
 QIcon RecordingStatusHelper::icon() const
 {
-    return icon(m_recordingType, m_metadataTypes);
+    return icon(m_recordingStatus, m_metadataTypes);
 }
 
 QString RecordingStatusHelper::tooltip(
-    RecordingType recordingType,
+    RecordingStatus recordingStatus,
     RecordingMetadataTypes metadataTypes)
 {
-    switch (recordingType)
+    switch (recordingStatus)
     {
-        case RecordingType::never:
+        case RecordingStatus::noRecordingOnlyArchive:
             return tr("Not recording");
-        case RecordingType::always:
+        case RecordingStatus::recordingContinious:
             return tr("Recording everything");
-        case RecordingType::metadataOnly:
+        case RecordingStatus::recordingMetadataOnly:
             switch (metadataTypes)
             {
                 case kMotionAndObjectsMetadataTypes:
@@ -160,7 +205,7 @@ QString RecordingStatusHelper::tooltip(
                     return tr("Recording objects only");
             }
             break;
-        case RecordingType::metadataAndLowQuality:
+        case RecordingStatus::recordingMetadataAndLQ:
             switch (metadataTypes)
             {
                 case kMotionAndObjectsMetadataTypes:
@@ -176,16 +221,16 @@ QString RecordingStatusHelper::tooltip(
 }
 
 QString RecordingStatusHelper::shortTooltip(
-    RecordingType recordingType,
+    RecordingStatus recordingStatus,
     RecordingMetadataTypes metadataTypes)
 {
-    switch (recordingType)
+    switch (recordingStatus)
     {
-        case RecordingType::never:
+        case RecordingStatus::noRecordingOnlyArchive:
             return tr("Not recording");
-        case RecordingType::always:
+        case RecordingStatus::recordingContinious:
             return tr("Continuous");
-        case RecordingType::metadataOnly:
+        case RecordingStatus::recordingMetadataOnly:
             switch (metadataTypes)
             {
                 case kMotionAndObjectsMetadataTypes:
@@ -196,7 +241,7 @@ QString RecordingStatusHelper::shortTooltip(
                     return tr("Objects only");
             }
             break;
-        case RecordingType::metadataAndLowQuality:
+        case RecordingStatus::recordingMetadataAndLQ:
             switch (metadataTypes)
             {
                 case kMotionAndObjectsMetadataTypes:
@@ -213,46 +258,50 @@ QString RecordingStatusHelper::shortTooltip(
 
 QString RecordingStatusHelper::shortTooltip(const QnVirtualCameraResourcePtr& camera)
 {
-    const auto [recordingType, metadataTypes] = currentRecordingMode(camera);
-    return shortTooltip(recordingType, metadataTypes);
+    const auto [recordingStatus, metadataTypes] = currentRecordingMode(camera);
+    return shortTooltip(recordingStatus, metadataTypes);
 }
 
 QString RecordingStatusHelper::qmlIconName(
-    RecordingType recordingType,
+    RecordingStatus recordingStatus,
     RecordingMetadataTypes /*metadataTypes*/)
 {
-    switch (recordingType)
+    switch (recordingStatus)
     {
-        case RecordingType::always:
-        case RecordingType::metadataOnly:
-        case RecordingType::metadataAndLowQuality:
+        case RecordingStatus::recordingContinious:
+        case RecordingStatus::recordingMetadataOnly:
+        case RecordingStatus::recordingMetadataAndLQ:
             return "image://skin/20x20/Solid/record_on.svg";
-        case RecordingType::never:
+        case RecordingStatus::noRecordingOnlyArchive:
             return "image://skin/20x20/Solid/archive.svg";
+        case RecordingStatus::recordingScheduled:
+            return "image://skin/20x20/Solid/record_part.svg";
     }
     return QString();
 }
 
 QIcon RecordingStatusHelper::icon(
-    RecordingType recordingType,
+    RecordingStatus recordingStatus,
     RecordingMetadataTypes /*metadataTypes*/)
 {
-    switch (recordingType)
+    switch (recordingStatus)
     {
-        case RecordingType::always:
-        case RecordingType::metadataOnly:
-        case RecordingType::metadataAndLowQuality:
-            return qnSkin->icon("20x20/Solid/record_on.svg");
-        case RecordingType::never:
-            return qnSkin->icon("20x20/Solid/archive.svg");
+        case RecordingStatus::recordingContinious:
+        case RecordingStatus::recordingMetadataOnly:
+        case RecordingStatus::recordingMetadataAndLQ:
+            return qnSkin->icon(kRecordingIcon);
+        case RecordingStatus::noRecordingOnlyArchive:
+            return qnSkin->icon(kArchiveIcon);
+        case RecordingStatus::recordingScheduled:
+            return qnSkin->icon(kNotRecordingIcon);
     }
     return QIcon();
 }
 
 QIcon RecordingStatusHelper::icon(const QnVirtualCameraResourcePtr& camera)
 {
-    const auto [recordingType, metadataTypes] = currentRecordingMode(camera);
-    return icon(recordingType, metadataTypes);
+    const auto [recordingStatus, metadataTypes] = currentRecordingMode(camera);
+    return icon(recordingStatus, metadataTypes);
 }
 
 void RecordingStatusHelper::registerQmlType()
@@ -262,13 +311,13 @@ void RecordingStatusHelper::registerQmlType()
 
 void RecordingStatusHelper::updateRecordingMode()
 {
-    const auto [newRecordingType, newMetadataTypes] = currentRecordingMode(m_camera);
+    const auto [newRecordingStatus, newMetadataTypes] = currentRecordingMode(m_camera);
 
-    if (newRecordingType == m_recordingType && newMetadataTypes == m_metadataTypes)
+    if (newRecordingStatus == m_recordingStatus && newMetadataTypes == m_metadataTypes)
         return;
 
-    m_recordingType = newRecordingType;
     m_metadataTypes = newMetadataTypes;
+    m_recordingStatus = newRecordingStatus;
 
     emit recordingModeChanged();
 }

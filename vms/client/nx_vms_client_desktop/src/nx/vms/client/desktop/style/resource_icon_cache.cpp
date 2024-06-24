@@ -628,11 +628,6 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
     {
         key = Media;
     }
-    else if (flags.testFlag(Qn::server_archive))
-    {
-        NX_ASSERT(false, "What's that actually?");
-        key = Media;
-    }
     else if (flags.testFlag(Qn::user))
     {
         key = userKey(resource.dynamicCast<QnUserResource>());
