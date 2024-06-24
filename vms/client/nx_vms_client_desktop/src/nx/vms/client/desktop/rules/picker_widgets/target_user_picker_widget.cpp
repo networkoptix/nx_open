@@ -76,7 +76,8 @@ void TargetUserPicker::onSelectButtonClicked()
     {
         dialog.setValidationPolicy(m_policy.get());
 
-        if (m_field->properties().validationPolicy == vms::rules::kLayoutAccessValidationPolicy)
+        const auto validationPolicy = m_field->properties().validationPolicy;
+        if (validationPolicy == vms::rules::kLayoutAccessValidationPolicy)
         {
             const auto layoutField =
                 getActionField<vms::rules::LayoutField>(vms::rules::utils::kLayoutIdFieldName);
@@ -90,6 +91,18 @@ void TargetUserPicker::onSelectButtonClicked()
             const auto layoutResource =
                 resourcePool()->getResourceById<QnLayoutResource>(layoutField->value());
             static_cast<QnLayoutAccessValidationPolicy*>(m_policy.get())->setLayout(layoutResource);
+        }
+        else if (validationPolicy == vms::rules::kBookmarkManagementValidationPolicy)
+        {
+            auto cameraField =
+                getEventField<vms::rules::SourceCameraField>(vms::rules::utils::kCameraIdFieldName);
+
+            if (cameraField && !cameraField->acceptAll())
+            {
+                const auto cameras =
+                    resourcePool()->getResourcesByIds<QnVirtualCameraResource>(cameraField->ids());
+                static_cast<QnRequiredAccessRightPolicy*>(m_policy.get())->setCameras(cameras);
+            }
         }
     }
 
