@@ -77,6 +77,7 @@
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/resource_properties/camera/camera_settings_tab.h>
+#include <nx/vms/client/desktop/resource_views/data/resource_extra_status.h>
 #include <nx/vms/client/desktop/scene/resource_widget/dialogs/encrypted_archive_password_dialog.h>
 #include <nx/vms/client/desktop/scene/resource_widget/overlays/playback_position_item.h>
 #include <nx/vms/client/desktop/scene/resource_widget/overlays/rewind_overlay.h>
@@ -174,18 +175,6 @@ static constexpr auto k360VRAspectRatio = 16.0 / 9.0;
 const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kLight1Theme = {
     {QIcon::Normal, {.primary = "light1"}}
 };
-
-static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kArchiveTheme = {
-    {QIcon::Normal, {.primary = "light10"}}
-};
-
-static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kRecordingTheme = {
-    {QIcon::Normal, {.primary = "red_l1"}}
-};
-
-NX_DECLARE_COLORIZED_ICON(kArchiveIcon, "16x16/Solid/archive.svg", kArchiveTheme)
-NX_DECLARE_COLORIZED_ICON(kNotRecordingIcon, "16x16/Solid/notrecordingnow.svg", kRecordingTheme)
-NX_DECLARE_COLORIZED_ICON(kRecordingIcon, "16x16/Solid/recordingnow.svg", kRecordingTheme)
 
 NX_DECLARE_COLORIZED_ICON(kAreaZoomIcon, "24x24/Outline/area_zoom.svg", kLight1Theme)
 NX_DECLARE_COLORIZED_ICON(kPtzIcon, "24x24/Outline/ptz.svg", kLight1Theme)
@@ -1643,17 +1632,9 @@ void QnMediaResourceWidget::updateIconButton()
     if (!d->camera || d->camera->hasFlags(Qn::virtual_camera))
         return;
 
-    if (d->camera->hasFlags(Qn::server_archive) || hasArchive(d->camera))
+    if (hasArchive(d->camera))
     {
-        QIcon icon;
-        auto rec_state = d->camera->recordingState();
-        if (rec_state == Qn::RecordingState::Off)
-            icon = qnSkin->icon(kArchiveIcon);
-        else if (rec_state == Qn::RecordingState::Scheduled)
-            icon = qnSkin->icon(kNotRecordingIcon);
-        else if (rec_state == Qn::RecordingState::On)
-            icon = qnSkin->icon(kRecordingIcon);
-
+        QIcon icon = m_recordingStatusHelper->icon();
         m_hudOverlay->playbackPositionItem()->setRecordingIcon(icon.pixmap(QSize(12, 12)));
     }
     else

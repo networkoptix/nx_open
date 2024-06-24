@@ -101,30 +101,10 @@ Item
                     primaryColor: "light4"
                 }
 
-                ColoredImage
+                RecordingStatusIndicator
                 {
                     id: recordingIcon
-
-                    sourceSize: Qt.size(20, 20)
-
-                    sourcePath:
-                    {
-                        if (extras.flags & ResourceTree.ResourceExtraStatusFlag.recording)
-                            return "image://skin/20x20/Solid/record_on.svg"
-
-                        if (extras.flags & ResourceTree.ResourceExtraStatusFlag.scheduled)
-                            return "image://skin/20x20/Solid/record_part.svg"
-
-                        if (extras.flags & ResourceTree.ResourceExtraStatusFlag.hasArchive)
-                            return "image://skin/20x20/Solid/archive.svg"
-
-                        return ""
-                    }
-
-                    primaryColor: (extras.flags & ResourceTree.ResourceExtraStatusFlag.recording
-                        || extras.flags & ResourceTree.ResourceExtraStatusFlag.scheduled)
-                            ? "red_l"
-                            : "dark17"
+                    resource: delegateItem.resource
                 }
             }
         }

@@ -14,7 +14,17 @@ Q_MOC_INCLUDE("core/resource/resource.h")
 
 namespace nx::vms::client::desktop {
 
-class RecordingStatusHelper: public QObject
+enum class RecordingStatus
+{
+    recordingContinious,
+    recordingMetadataOnly,
+    recordingMetadataAndLQ,
+    recordingScheduled,
+    noRecordingOnlyArchive,
+    noRecordingNoArchive
+};
+
+class NX_VMS_CLIENT_DESKTOP_API RecordingStatusHelper: public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QnResource* resource READ rawResource WRITE setRawResource NOTIFY resourceChanged)
@@ -34,20 +44,20 @@ public:
     QIcon icon() const;
 
     static QString tooltip(
-        nx::vms::api::RecordingType recordingType,
+        RecordingStatus recordingStatus,
         nx::vms::api::RecordingMetadataTypes metadataTypes);
 
     static QString shortTooltip(
-        nx::vms::api::RecordingType recordingType,
+        RecordingStatus recordingStatus,
         nx::vms::api::RecordingMetadataTypes metadataTypes);
     static QString shortTooltip(const QnVirtualCameraResourcePtr& camera);
 
     static QString qmlIconName(
-        nx::vms::api::RecordingType recordingType,
+        RecordingStatus recordingStatus,
         nx::vms::api::RecordingMetadataTypes metadataTypes);
 
     static QIcon icon(
-        nx::vms::api::RecordingType recordingType,
+        RecordingStatus recordingStatus,
         nx::vms::api::RecordingMetadataTypes metadataTypes);
     static QIcon icon(const QnVirtualCameraResourcePtr& camera);
 
@@ -67,8 +77,8 @@ protected:
     virtual void timerEvent(QTimerEvent* event) override;
 
 private:
-    nx::vms::api::RecordingType m_recordingType = nx::vms::api::RecordingType::never;
     nx::vms::api::RecordingMetadataTypes m_metadataTypes = nx::vms::api::RecordingMetadataType::none;
+    RecordingStatus m_recordingStatus = RecordingStatus::noRecordingNoArchive;
 
     int m_updateTimerId = -1;
     QnVirtualCameraResourcePtr m_camera;

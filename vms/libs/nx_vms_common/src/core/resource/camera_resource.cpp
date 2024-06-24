@@ -669,15 +669,6 @@ void QnVirtualCameraResource::setCustomWebPagePort(int value)
     setProperty(QnVirtualCameraResource::kHttpPortParameterName, propertyValue);
 }
 
-Qn::RecordingState QnVirtualCameraResource::recordingState() const
-{
-    if (!isScheduleEnabled())
-        return Qn::RecordingState::Off;
-    if (getStatus() == nx::vms::api::ResourceStatus::recording)
-        return Qn::RecordingState::On;
-    return Qn::RecordingState::Scheduled;
-}
-
 bool QnVirtualCameraResource::isMotionDetectionActive() const
 {
     if (!isMotionDetectionEnabled())

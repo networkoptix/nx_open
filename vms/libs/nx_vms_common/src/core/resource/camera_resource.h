@@ -177,8 +177,6 @@ public:
     /** Set custom port for Camera Web Page. Pass 0 to reset custom value. */
     void setCustomWebPagePort(int value);
 
-    Qn::RecordingState recordingState() const;
-
     /**
      * Checks if motion detection is enabled and actually can work (hardware, or not exceeding
      * resolution limit or is forced).

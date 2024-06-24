@@ -17,15 +17,6 @@ namespace test {
 class MimeDataTest: public ContextBasedTest
 {
 protected:
-    QnMediaServerResourcePtr createServerResource() const
-    {
-        QnMediaServerResourcePtr server(new QnMediaServerResource());
-        server->setIdUnsafe(nx::Uuid::createUuid());
-        server->setName("server");
-        systemContext()->resourcePool()->addResource(server);
-        return server;
-    }
-
     QnVirtualCameraResourcePtr createCameraResource(const nx::Uuid& parentId) const
     {
         QnVirtualCameraResourcePtr camera(new CameraResourceStub());
@@ -42,7 +33,7 @@ TEST_F(MimeDataTest, mimeDataConversionsAreCorrect)
     static constexpr auto kTestMimeType = "application/x-test-mime-type";
     static constexpr auto kTestMimeData = "Test MIME Data";
 
-    const auto serverResource = createServerResource();
+    const auto serverResource = addServer();
     const auto cameraResource = createCameraResource(serverResource->getId());
 
     QnResourceList resources({

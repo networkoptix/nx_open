@@ -125,7 +125,6 @@ namespace Qn {
         live_cam = utc | sync | live | media | video, // don't set w/o `local` or `remote` flag
         local_live_cam = live_cam | local | network,
         server_live_cam = live_cam | remote, // | network,
-        server_archive = remote | media | video | audio,
         local_video = local_media | video | audio, /**< Local media file. */
         local_image = local_media | still_image, /**< Local still image file. */
 
@@ -134,12 +133,6 @@ namespace Qn {
     Q_DECLARE_FLAGS(ResourceFlags, ResourceFlag)
     Q_FLAG_NS(ResourceFlags)
     Q_DECLARE_OPERATORS_FOR_FLAGS(ResourceFlags)
-
-    NX_REFLECTION_ENUM_CLASS(RecordingState,
-        Off,
-        Scheduled,
-        On
-    )
 
     // TODO: Move to the client code.
     /** Level of detail for displaying resource info. */
