@@ -55,6 +55,13 @@ QnVirtualCameraResourceList getActualCameras(const QnResourcePool* resourcePool)
         });
 }
 
+bool isRuleValid(const vms::rules::ConstRulePtr& rule)
+{
+    return rule->isValid()
+        && vms::rules::utils::visibleFieldsValidity(
+            rule.get(), appContext()->currentSystemContext()).isValid();
+}
+
 constexpr auto kAttentionIconPath = "20x20/Solid/attention.svg?primary=yellow_d";
 constexpr auto kDisabledRuleIconPath = "20x20/Outline/block.svg?primary=light10";
 constexpr auto kInvalidRuleIconPath = "20x20/Solid/alert2.svg?primary=yellow_d";
@@ -141,42 +148,40 @@ QVariant RulesTableModel::data(const QModelIndex& index, int role) const
     if (!canDisplayRule(rule))
         return {};
 
-    if (role == IsRuleValidRole)
-    {
-        return rule->isValid()
-            && vms::rules::utils::visibleFieldsValidity(
-                rule.get(), appContext()->currentSystemContext()).isValid();
-    }
+    static const auto getEffectiveRole =
+        [] (int role, int column) -> int
+        {
+            if (role == SortDataRole && column != StateColumn)
+                return Qt::DisplayRole;
 
-    const auto column = index.column();
-    if (role == SortDataRole)
-    {
-        if (column == StateColumn)
-            return rule->enabled();
+            return role;
+        };
 
-        return data(index, Qt::DisplayRole);
-    }
+    const auto effectiveRole = getEffectiveRole(role, index.column());
 
-    if (role == IsSystemRuleRole)
+    if (effectiveRole == IsRuleValidRole)
+        return isRuleValid(rule);
+
+    if (effectiveRole == IsSystemRuleRole)
         return rule->isInternal();
 
-    if (role == RuleIdRole)
+    if (effectiveRole == RuleIdRole)
         return QVariant::fromValue(rule->id());
 
     switch (index.column())
     {
         case StateColumn:
-            return stateColumnData(rule, role);
+            return stateColumnData(rule, effectiveRole);
         case EventColumn:
-            return eventColumnData(rule, role);
+            return eventColumnData(rule, effectiveRole);
         case SourceColumn:
-            return sourceColumnData(rule, role);
+            return sourceColumnData(rule, effectiveRole);
         case ActionColumn:
-            return actionColumnData(rule, role);
+            return actionColumnData(rule, effectiveRole);
         case TargetColumn:
-            return targetColumnData(rule, role);
+            return targetColumnData(rule, effectiveRole);
         case CommentColumn:
-            return commentColumnData(rule, role);
+            return commentColumnData(rule, effectiveRole);
     }
 
     return {};
@@ -265,6 +270,24 @@ bool RulesTableModel::canDisplayRule(const ConstRulePtr& rule) const
 
 QVariant RulesTableModel::stateColumnData(const ConstRulePtr& rule, int role) const
 {
+    if (role == SortDataRole)
+    {
+        enum SortWeight
+        {
+            disabled,
+            invalid,
+            acceptable
+        };
+
+        if (!rule->enabled())
+            return SortWeight::disabled;
+
+        if (!isRuleValid(rule))
+            return SortWeight::invalid;
+
+        return SortWeight::acceptable;
+    }
+
     if (role == Qt::CheckStateRole)
         return rule->enabled() ? Qt::CheckState::Checked : Qt::CheckState::Unchecked;
 
@@ -273,12 +296,8 @@ QVariant RulesTableModel::stateColumnData(const ConstRulePtr& rule, int role) co
         if (!rule->enabled())
             return kDisabledRuleIconPath;
 
-        if (!rule->isValid()
-            || !vms::rules::utils::visibleFieldsValidity(
-                rule.get(), appContext()->currentSystemContext()).isValid())
-        {
+        if (!isRuleValid(rule))
             return kInvalidRuleIconPath;
-        }
     }
 
     return {};
