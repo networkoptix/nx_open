@@ -99,7 +99,7 @@ class NxOpenConan(ConanFile):
                 if isinstance(dep, str):
                     yield trim_version(dep)
                 elif isinstance(dep, list):
-                    yield trim_version(dep[0])
+                    yield [trim_version(alternative) for alternative in dep]
 
         yield from enumerate_deps(data.get("depends", []))
         yield from enumerate_deps(data.get("recommends", []))
@@ -111,8 +111,13 @@ class NxOpenConan(ConanFile):
             self.output.warn("-DinstallSystemRequirements=ON is ignored for cross builds.")
             return
 
+        plain_deps = [dep for dep in packages if isinstance(dep, str)]
+        alternating_deps = [dep for dep in packages if isinstance(dep, list)]
+
         try:
-            Apt(self).install(packages, check=True)
+            Apt(self).install(plain_deps, check=True)
+            for alternatives in alternating_deps:
+                Apt(self).install_substitutes(check=True, *[[dep] for dep in alternatives])
         except ConanException as e:
             self.output.error(e)
             self.output.error("To install the missing system requirements automatically, "
