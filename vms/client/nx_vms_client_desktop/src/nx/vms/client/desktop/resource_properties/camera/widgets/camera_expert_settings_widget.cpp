@@ -233,17 +233,8 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
     connect(ui->trustCameraTimeCheckBox, &QCheckBox::clicked,
         store, &CameraSettingsDialogStore::setTrustCameraTime);
 
-    connect(ui->disableImportFromDeviceRadioButton, &QRadioButton::clicked, store,
-        [store]
-        {
-            store->setRemoteArchiveSyncronizationEnabled(false);
-        });
-
-    connect(ui->enableImportFromDeviceRadioButton, &QRadioButton::clicked, store,
-        [store]
-        {
-            store->setRemoteArchiveSyncronizationEnabled(true);
-        });
+    connect(ui->remoteArchiveSynchronizationCheckBox, &QCheckBox::clicked,
+        store, &CameraSettingsDialogStore::setRemoteArchiveSynchronizationEnabled);
 
     connect(ui->logicalIdSpinBox, QnSpinboxIntValueChanged,
         store, &CameraSettingsDialogStore::setLogicalId);
@@ -397,8 +388,9 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
     logicalIdHint->setHintText(
         tr("Custom number that can be assigned to a camera for quick identification and access"));
 
-    ui->enableImportFromDeviceRadioButton->setHint(tr("Only camera or server offline periods after "
-        "the first addition to the system will be imported automatically."));
+    ui->remoteArchiveSynchronizationCheckBox->setHint(tr(
+        "Only camera or server offline periods after the first addition to the system will be "
+        "imported automatically."));
 
     ui->alertLabel->setText(tr("Quality and frame rate (FPS) settings in the Recording Schedule"
                                " will become irrelevant"));
@@ -417,7 +409,7 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
     // Cameras or I/O Modules.
     const bool supportsVideoStreamControl = state.supportsVideoStreamControl();
     ui->groupBoxMotionDetection->setEnabled(supportsVideoStreamControl);
-    ui->remoteArchiveAutoExportGroupBox->setEnabled(supportsVideoStreamControl);
+    ui->remoteArchiveSynchronizationGroupBox->setEnabled(supportsVideoStreamControl);
     ui->settingsGroupBox->setEnabled(supportsVideoStreamControl);
     ui->timeSettingsGroupBox->setEnabled(supportsVideoStreamControl);
     ui->useMedia2ToFetchProfilesGroupBox->setEnabled(supportsVideoStreamControl);
@@ -502,17 +494,16 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
     const bool hasRemoteArchiveCapability =
         state.devicesDescription.hasRemoteArchiveCapability == CombinedValue::All;
 
-    ui->remoteArchiveAutoExportGroupBox->setVisible(hasRemoteArchiveCapability);
+    ui->remoteArchiveSynchronizationGroupBox->setVisible(hasRemoteArchiveCapability);
     ui->groupBoxMotionDetection->setVisible(hasRemoteArchiveCapability);
 
     if (hasRemoteArchiveCapability)
     {
-        ui->disableImportFromDeviceRadioButton->setChecked(
-            state.expert.remoteArchiveSyncronizationMode
-                == nx::vms::common::RemoteArchiveSyncronizationMode::off);
-        ui->enableImportFromDeviceRadioButton->setChecked(
-            state.expert.remoteArchiveSyncronizationMode
-                == nx::vms::common::RemoteArchiveSyncronizationMode::automatic);
+        check_box_utils::setupTristateCheckbox(
+            ui->remoteArchiveSynchronizationCheckBox,
+            state.expert.remoteArchiveSynchronizationEnabled);
+        ::setReadOnly(ui->remoteArchiveSynchronizationCheckBox, state.readOnly);
+
         check_box_utils::setupTristateCheckbox(
             ui->remoteArchiveMotionDetectionCheckBox,
             state.expert.remoteMotionDetectionEnabled);

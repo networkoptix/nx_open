@@ -32,7 +32,6 @@
 #include <nx/vms/client/desktop/resource_properties/schedule/record_schedule_cell_data.h>
 #include <nx/vms/client/desktop/utils/virtual_camera_state.h>
 #include <nx/vms/common/resource/camera_hotspots_data.h>
-#include <nx/vms/common/resource/remote_archive_types.h>
 #include <utils/common/aspect_ratio.h>
 
 #include "../camera_settings_tab.h"
@@ -322,8 +321,7 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractFluxState
         UserEditableMultiple<QString> forcedPrimaryProfile;
         UserEditableMultiple<QString> forcedSecondaryProfile;
         nx::vms::api::DeviceProfiles availableProfiles;
-        UserEditableMultiple<common::RemoteArchiveSyncronizationMode>
-            remoteArchiveSyncronizationMode;
+        UserEditableMultiple<bool> remoteArchiveSynchronizationEnabled;
     };
     ExpertSettings expert;
     bool isDefaultExpertSettings = false;

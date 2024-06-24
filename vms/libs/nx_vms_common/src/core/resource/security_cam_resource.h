@@ -14,7 +14,6 @@
 #include <nx/vms/api/data/device_model.h>
 #include <nx/vms/api/data/media_stream_capability.h>
 #include <nx/vms/common/resource/camera_hotspots_data.h>
-#include <nx/vms/common/resource/remote_archive_types.h>
 #include <nx/vms/event/event_fwd.h>
 #include <recording/time_period_list.h>
 
@@ -38,6 +37,7 @@ protected:
 
 public:
     static constexpr int kDefaultMaxFps = 15;
+    static constexpr bool kRemoteArchiveSynchronizationEnabledByDefault = true;
     static nx::Uuid makeCameraIdFromPhysicalId(const QString& physicalId);
 
     using StreamIndex = nx::vms::api::StreamIndex;
@@ -444,11 +444,8 @@ public:
     void setPreferredServerId(const nx::Uuid& value);
     nx::Uuid preferredServerId() const;
 
-    void setRemoteArchiveSynchronizationMode(
-        nx::vms::common::RemoteArchiveSyncronizationMode mode);
-
-    nx::vms::common::RemoteArchiveSyncronizationMode
-        getRemoteArchiveSynchronizationMode() const;
+    void setRemoteArchiveSynchronizationEnabled(bool value);
+    bool isRemoteArchiveSynchronizationEnabled() const;
 
     void setManualRemoteArchiveSynchronizationTriggered(bool isTriggered = true);
     bool isManualRemoteArchiveSynchronizationTriggered() const;
