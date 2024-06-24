@@ -133,7 +133,7 @@ NX_VMS_COMMON_API extern const QString kLastSyncronizedRemoteArchiveTimestampMs;
 /**
  * Whether to download remote (i.e. on-camera) archives.
  */
-NX_VMS_COMMON_API extern const QString kRemoteArchiveSynchronizationMode;
+NX_VMS_COMMON_API extern const QString kRemoteArchiveSynchronizationEnabled;
 
 /**
  * Whether manual remote archive import is triggered.

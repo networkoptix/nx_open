@@ -12,7 +12,6 @@
 
 #include <nx/reflect/enum_string_conversion.h>
 #include <nx/streaming/abstract_archive_delegate.h>
-#include <nx/vms/common/resource/remote_archive_types.h>
 #include <recording/time_period_list.h>
 
 namespace nx {

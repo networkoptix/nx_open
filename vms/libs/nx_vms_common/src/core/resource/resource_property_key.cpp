@@ -82,9 +82,9 @@ const QString kDontRecordSecondaryStreamKey("dontRecordSecondaryStream");
 const QString kDontRecordAudio("dontRecordAudio");
 
 const QString kLastSyncronizedRemoteArchiveTimestampMs("lastSyncronizedRemoteArchiveTimestampMs");
-const QString kRemoteArchiveSynchronizationMode("remoteArchiveSynchronizationMode");
 const QString kManualRemoteArchiveSynchronizationTriggered(
     "manualRemoteArchiveSynchronizationTriggered");
+const QString kRemoteArchiveSynchronizationEnabled("remoteArchiveSynchronizationEnabled");
 
 const QString kTimeSyncEnabledOnceDueToRemoteArchiveSync("timeSyncEnabledOnceDueToRemoteArchiveSync");
 

@@ -177,7 +177,7 @@ public:
     void setRtpTransportType(nx::vms::api::RtpTransportType value);
     void setForcedPrimaryProfile(const QString& value);
     void setForcedSecondaryProfile(const QString& value);
-    void setRemoteArchiveSyncronizationEnabled(bool value);
+    void setRemoteArchiveSynchronizationEnabled(bool value);
     void setAutoMediaPortUsed(bool value);
     void setTrustCameraTime(bool value);
     void setCustomMediaPort(int value);
