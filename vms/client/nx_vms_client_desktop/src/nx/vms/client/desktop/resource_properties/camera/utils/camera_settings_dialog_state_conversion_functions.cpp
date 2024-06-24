@@ -330,12 +330,10 @@ void setForcedSecondaryProfile(const QString& value, const Cameras& cameras)
         camera->setForcedProfile(value, nx::vms::api::StreamIndex::secondary);
 }
 
-void setRemoteArchiveSyncronizationMode(
-    const nx::vms::common::RemoteArchiveSyncronizationMode& mode,
-    const Cameras& cameras)
+void setRemoteArchiveSynchronizationEnabled(bool value, const Cameras& cameras)
 {
     for (const auto& camera: cameras)
-        camera->setRemoteArchiveSynchronizationMode(mode);
+        camera->setRemoteArchiveSynchronizationEnabled(value);
 }
 
 void setTrustCameraTime(bool value, const Cameras& cameras)
@@ -785,10 +783,10 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
     if (state.expert.forcedSecondaryProfile.hasValue())
         setForcedSecondaryProfile(state.expert.forcedSecondaryProfile(), cameras);
 
-    if (state.expert.remoteArchiveSyncronizationMode.hasValue())
+    if (state.expert.remoteArchiveSynchronizationEnabled.hasValue())
     {
-        setRemoteArchiveSyncronizationMode(
-            state.expert.remoteArchiveSyncronizationMode(),
+        setRemoteArchiveSynchronizationEnabled(
+            state.expert.remoteArchiveSynchronizationEnabled(),
             cameras);
     }
 
