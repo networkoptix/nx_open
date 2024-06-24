@@ -55,6 +55,16 @@ public:
         return value() == other;
     }
 
+    inline bool operator<(const TranslatableString& other) const
+    {
+        return value() < other.value();
+    }
+
+    inline bool operator<(const QString& other) const
+    {
+        return value() < other;
+    }
+
 private:
     std::variant<QString, ValueByLocale, Provider> m_value;
     QString m_defaultValue;

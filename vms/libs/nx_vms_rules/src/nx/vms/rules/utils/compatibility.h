@@ -40,6 +40,8 @@ NX_VMS_RULES_API QList<ItemDescriptor> filterItems(
     const ItemFilters& filters,
     QList<ItemDescriptor> descriptors);
 
+NX_VMS_RULES_API QVector<ItemDescriptor> sortItems(QList<ItemDescriptor> descriptors);
+
 NX_VMS_RULES_API Group filterEventGroups(
     const nx::vms::common::SystemContext* context,
     const ItemFilters& filters,

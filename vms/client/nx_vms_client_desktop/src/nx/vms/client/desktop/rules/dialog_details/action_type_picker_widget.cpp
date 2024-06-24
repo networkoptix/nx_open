@@ -21,16 +21,16 @@ ActionTypePickerWidget::ActionTypePickerWidget(SystemContext* context, QWidget* 
     SystemContextAware{context},
     ui(new Ui::ActionTypePickerWidget())
 {
-    ui->setupUi(this);
-    setPaletteColor(ui->doLabel, QPalette::WindowText, core::colorTheme()->color("light1"));
+    using namespace nx::vms::rules::utils;
 
-    for (const auto& actionDescriptor: nx::vms::rules::utils::filterItems(
-        systemContext(),
-        nx::vms::rules::utils::defaultItemFilters(),
-        systemContext()->vmsRulesEngine()->actions().values()))
-    {
+    ui->setupUi(this);
+    setPaletteColor(ui->doLabel, QPalette::WindowText, QPalette().color(QPalette::Light));
+
+    const auto sortedListOfActions = sortItems(filterItems(systemContext(),
+        defaultItemFilters(),
+        systemContext()->vmsRulesEngine()->actions().values()));
+    for (const auto& actionDescriptor: sortedListOfActions)
         ui->actionTypeComboBox->addItem(actionDescriptor.displayName, actionDescriptor.id);
-    }
 
     connect(ui->actionTypeComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
         [this]()

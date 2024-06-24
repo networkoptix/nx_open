@@ -20,16 +20,17 @@ EventTypePickerWidget::EventTypePickerWidget(SystemContext* context, QWidget* pa
     SystemContextAware{context},
     ui(new Ui::EventTypePickerWidget())
 {
+    using namespace nx::vms::rules::utils;
+
     ui->setupUi(this);
     setPaletteColor(ui->whenLabel, QPalette::WindowText, QPalette().color(QPalette::Light));
 
-    for (const auto& eventDescriptor: nx::vms::rules::utils::filterItems(
-        systemContext(),
-        nx::vms::rules::utils::defaultItemFilters(),
-        systemContext()->vmsRulesEngine()->events().values()))
-    {
+    const auto sortedListOfEvents = sortItems(filterItems(systemContext(),
+        defaultItemFilters(),
+        systemContext()->vmsRulesEngine()->events().values()));
+
+    for (const auto& eventDescriptor: sortedListOfEvents)
         ui->eventTypeComboBox->addItem(eventDescriptor.displayName, eventDescriptor.id);
-    }
 
     connect(ui->eventTypeComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
         [this]()

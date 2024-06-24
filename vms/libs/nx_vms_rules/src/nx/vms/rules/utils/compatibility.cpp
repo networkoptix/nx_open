@@ -2,8 +2,11 @@
 
 #include "compatibility.h"
 
+#include <algorithm>
+
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/utils/translatable_string.h>
 #include <nx/vms/common/saas/saas_utils.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/rules/engine.h>
@@ -111,6 +114,16 @@ QList<ItemDescriptor> filterItems(
             it = descriptors.erase(it);
     }
 
+    return descriptors;
+}
+
+QVector<ItemDescriptor> sortItems(QList<ItemDescriptor> descriptors)
+{
+    std::sort(descriptors.begin(),descriptors.end(),
+        [](const auto& left, const auto& right)
+        {
+            return left.displayName < right.displayName;
+        });
     return descriptors;
 }
 
