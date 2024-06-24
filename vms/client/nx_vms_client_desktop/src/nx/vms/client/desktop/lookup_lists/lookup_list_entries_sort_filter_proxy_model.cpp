@@ -34,7 +34,7 @@ bool LookupListEntriesSortFilterProxyModel::filterAcceptsRow(
     if (filterRegExp.pattern().isEmpty())
         return true;
 
-    for (int column = 0; column < sourceModel()->rowCount(); column++)
+    for (int column = 0; column < sourceModel()->columnCount(); column++)
     {
         QModelIndex sourceIndex = sourceModel()->index(sourceRow, column, sourceParent);
         if (sourceIndex.data().toString().contains(filterRegExp))
