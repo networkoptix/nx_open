@@ -164,7 +164,7 @@ distrib_copyMediaserverPluginsToDir() # target_dir_name plugin_lib_name...
             echo "  Copying ${plugin} dedicated directory to ${plugins_dir_name}"
             cp -r "${plugin_path}" "${target_dir}/"
         else
-            echo "ERROR: Cannot find plugin ${plugin}" >&2
+            echo "ERROR: Cannot find plugin ${plugin} with path ${plugin_path}" >&2
         fi
     done
 }
