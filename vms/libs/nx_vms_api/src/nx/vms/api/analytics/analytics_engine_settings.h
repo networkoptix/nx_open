@@ -14,7 +14,7 @@ namespace nx::vms::api {
 
 struct NX_VMS_API AnalyticsEngineSettings
 {
-    /**%apidoc
+    /**%apidoc[immutable]
      * Id of an Analytics Engine.
      */
     nx::Uuid id;
@@ -29,8 +29,6 @@ struct NX_VMS_API AnalyticsEngineSettings
      * Name-value map with errors that occurred while performing the current settings operation.
      */
     std::optional<std::map<QString, QString>> _error;
-
-    nx::Uuid getId() const { return id; }
 };
 #define AnalyticsEngineSettings_Fields (id)(values)(_error)
 QN_FUSION_DECLARE_FUNCTIONS(AnalyticsEngineSettings, (json), NX_VMS_API);

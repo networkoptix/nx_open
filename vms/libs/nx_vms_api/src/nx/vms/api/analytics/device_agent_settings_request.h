@@ -12,6 +12,7 @@
 
 namespace nx::vms::api::analytics {
 
+// Use nx::vms::api::AnalyticsDeviceSettings for new code
 struct NX_VMS_API DeviceAgentSettingsRequest
 {
     /**%apidoc
