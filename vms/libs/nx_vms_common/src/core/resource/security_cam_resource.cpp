@@ -1146,22 +1146,22 @@ nx::Uuid QnSecurityCamResource::preferredServerId() const
     return m_userAttributes.preferredServerId;
 }
 
-void QnSecurityCamResource::setRemoteArchiveSynchronizationMode(
-    nx::vms::common::RemoteArchiveSyncronizationMode mode)
+void QnSecurityCamResource::setRemoteArchiveSynchronizationEnabled(bool value)
 {
-    setProperty(
-        ResourcePropertyKey::kRemoteArchiveSynchronizationMode,
-        QString::fromStdString(nx::reflect::enumeration::toString(mode)));
+    const QString stored = value == kRemoteArchiveSynchronizationEnabledByDefault
+        ? QString()
+        : QnLexical::serialized(value);
+    setProperty(ResourcePropertyKey::kRemoteArchiveSynchronizationEnabled, stored);
 }
 
-nx::vms::common::RemoteArchiveSyncronizationMode
-    QnSecurityCamResource::getRemoteArchiveSynchronizationMode() const
+bool QnSecurityCamResource::isRemoteArchiveSynchronizationEnabled() const
 {
-    auto mode = nx::vms::common::RemoteArchiveSyncronizationMode::off;
-    nx::reflect::enumeration::fromString(
-        getProperty(ResourcePropertyKey::kRemoteArchiveSynchronizationMode).toStdString(),
-        &mode);
-    return mode;
+    bool isEnabled = kRemoteArchiveSynchronizationEnabledByDefault;
+    QnLexical::deserialize(
+        getProperty(ResourcePropertyKey::kRemoteArchiveSynchronizationEnabled),
+        &isEnabled);
+
+    return isEnabled;
 }
 
 void QnSecurityCamResource::setManualRemoteArchiveSynchronizationTriggered(bool isTriggered)

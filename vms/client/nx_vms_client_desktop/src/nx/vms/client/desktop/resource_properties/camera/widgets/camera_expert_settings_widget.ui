@@ -366,25 +366,24 @@
               </widget>
              </item>
              <item>
-              <widget class="QGroupBox" name="remoteArchiveAutoExportGroupBox">
+              <widget class="QGroupBox" name="remoteArchiveSynchronizationGroupBox">
                <property name="title">
-                <string>Import Video from Device</string>
+                <string>Import from Device</string>
                </property>
                <property name="flat">
                 <bool>true</bool>
                </property>
                <layout class="QVBoxLayout" name="verticalLayout_6_1">
                 <item>
-                 <widget class="nx::vms::client::desktop::RadioButtonWithHint" name="disableImportFromDeviceRadioButton">
-                  <property name="text">
-                   <string>Disable import</string>
+                 <widget class="nx::vms::client::desktop::CheckBoxWithHint" name="remoteArchiveSynchronizationCheckBox">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
                   </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="nx::vms::client::desktop::RadioButtonWithHint" name="enableImportFromDeviceRadioButton">
                   <property name="text">
-                   <string>Import camera or server offline periods</string>
+                   <string>Import video automatically</string>
                   </property>
                  </widget>
                 </item>
