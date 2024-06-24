@@ -101,10 +101,12 @@ struct LookupListActionHandler::Private
         removeQueue = {};
     }
 
-    void handleError(const QString& text)
+    void handleError(const QString& title, const QString& description)
     {
         if (dialog)
-            dialog->showError(text);
+            dialog->showError(description);
+        else
+            QnMessageBox::warning(q->mainWindowWidget(), title, description);
     }
 
     void saveList(DataDescriptor dataDescriptor)
@@ -139,7 +141,8 @@ struct LookupListActionHandler::Private
                     NX_WARNING(this, "Lookup List save request %1 failed", requestId);
                     this->requestId = std::nullopt;
 
-                    handleError(tr("Network request failed"));
+                    handleError(
+                        tr("Network request failed"), tr("Lookup List save request failed"));
                     if (dialog)
                         dialog->setSaveResult(false);
                 }
@@ -184,7 +187,7 @@ struct LookupListActionHandler::Private
                     NX_WARNING(this, "Lookup List remove request %1 failed", requestId);
                     this->requestId = std::nullopt;
 
-                    handleError(tr("Network request failed"));
+                    handleError(tr("Network request failed"), tr("Lookup List remove request failed"));
                     if (dialog)
                         dialog->setSaveResult(false);
                 }
@@ -257,8 +260,12 @@ struct LookupListActionHandler::Private
         std::erase_if(
             entryToAdd, [&](auto& entry) { return !attributesNamesSet.contains(entry.first); });
 
-        if (!NX_ASSERT(!entryToAdd.empty(), "Lookup List Entry is not correct."))
+        if (entryToAdd.empty())
+        {
+            handleError(tr("Could not add object to the List"),
+                tr("An object doesn't have attributes that matches selected list"));
             return;
+        }
 
         descriptor.data.entries.push_back(entryToAdd);
         descriptor.successHandler =
