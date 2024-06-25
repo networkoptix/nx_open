@@ -12,6 +12,13 @@ bool AcceptorError::operator==(const AcceptorError& other) const
         httpStatusCode == other.httpStatusCode;
 }
 
+bool AcceptorError::operator<(const AcceptorError& other) const
+{
+    return
+        std::tie(remoteAddress, sysErrorCode, httpStatusCode)
+        < std::tie(other.remoteAddress, other.sysErrorCode, other.httpStatusCode);
+}
+
 std::string AcceptorError::toString() const
 {
     return nx::format("{remoteAddress: %1, sysErrorCode: %2, httpStatusCode: %3}",

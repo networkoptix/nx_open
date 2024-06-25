@@ -2,6 +2,8 @@
 
 #include "acceptor_stub.h"
 
+#include <nx/utils/log/log.h>
+
 namespace nx {
 namespace network {
 namespace test {
@@ -72,32 +74,65 @@ bool AcceptorStub::isAsyncAcceptInProgress() const
     return m_acceptHandler != nullptr;
 }
 
-bool AcceptorStub::reportErrorIfNeeded()
+bool AcceptorStub::reportConnectionEstablishedIfNeeded()
 {
-    if (m_acceptErrorHandler)
+    if (!m_connectionEstablishedHandler)
+        return false;
+
+    nx::utils::Url nextRemoteAddress;
+
     {
         NX_MUTEX_LOCKER lock(&m_mutex);
-        if (!m_acceptorErrorsToReport.empty())
-        {
-            auto nextError = std::move(m_acceptorErrorsToReport.front());
-            m_acceptorErrorsToReport.pop_front();
-            lock.unlock();
+        if (m_connectionsToRemoteAdressesToReport.empty())
+            return false;
 
-            m_acceptErrorHandler(std::move(nextError));
-
-            if (m_acceptorErrorsToReport.empty() && m_allErrorsReportedEvent)
-                m_allErrorsReportedEvent->push();
-
-            return true;
-        }
+        nextRemoteAddress = std::move(m_connectionsToRemoteAdressesToReport.front());
+        m_connectionsToRemoteAdressesToReport.pop_front();
     }
 
-    return false;
+    m_connectionEstablishedHandler(nextRemoteAddress);
+
+    if (m_connectionEstablishedReportedEvent)
+        m_connectionEstablishedReportedEvent->push(std::move(nextRemoteAddress));
+
+    return true;
+}
+
+bool AcceptorStub::reportErrorIfNeeded()
+{
+    if (!m_acceptErrorHandler)
+        return false;
+
+    cloud::AcceptorError nextError;
+    std::size_t remainingErrors = 0;
+
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        if (m_acceptorErrorsToReport.empty())
+            return false;
+
+        nextError = std::move(m_acceptorErrorsToReport.front());
+        m_acceptorErrorsToReport.pop_front();
+
+        remainingErrors = m_acceptorErrorsToReport.size();
+    }
+
+    NX_VERBOSE(this, "Reporting acceptor error: %1, remaining: %2", nextError, remainingErrors);
+
+    m_acceptErrorHandler(nextError);
+
+    if (m_acceptorErrorReportedEvent)
+        m_acceptorErrorReportedEvent->push(std::move(nextError));
+
+    return true;
 }
 
 void AcceptorStub::deliverConnectionIfAvailable()
 {
     if (reportErrorIfNeeded())
+        return;
+
+    if (reportConnectionEstablishedIfNeeded())
         return;
 
     std::optional<std::unique_ptr<AbstractStreamSocket>> connection =
@@ -107,6 +142,16 @@ void AcceptorStub::deliverConnectionIfAvailable()
 
     m_repetitiveTimer.cancelSync();
     nx::utils::swapAndCall(m_acceptHandler, SystemError::noError, std::move(*connection));
+}
+
+void AcceptorStub::setConnectionEstablishedHandler(ConnectionEstablishedHandler handler)
+{
+    m_connectionEstablishedHandler = std::move(handler);
+}
+
+void AcceptorStub::setAcceptErrorHandler(ErrorHandler handler)
+{
+    m_acceptErrorHandler = std::move(handler);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -137,6 +182,30 @@ void AcceptorDelegate::acceptAsync(AcceptCompletionHandler handler)
 void AcceptorDelegate::cancelIOSync()
 {
     m_target->cancelIOSync();
+}
+
+void AcceptorStub::setEstablishedConnectionsToReport(
+        std::list<nx::utils::Url> remoteAddresses,
+        nx::utils::SyncQueue<nx::utils::Url>* connectionEstablishedReported)
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    m_connectionsToRemoteAdressesToReport = std::move(remoteAddresses);
+    m_connectionEstablishedReportedEvent = connectionEstablishedReported;
+}
+
+void AcceptorStub::setAcceptorErrorsToReport(
+        std::list<cloud::AcceptorError> acceptorErrors,
+        nx::utils::SyncQueue<cloud::AcceptorError>* acceptorErrorReported)
+{
+    NX_VERBOSE(this, "Got acceptor errors to report: %1", acceptorErrors.size());
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    m_acceptorErrorsToReport = std::move(acceptorErrors);
+    m_acceptorErrorReportedEvent = acceptorErrorReported;
+}
+
+void AcceptorDelegate::setConnectionEstablishedHandler(ConnectionEstablishedHandler handler)
+{
+    m_target->setConnectionEstablishedHandler(std::move(handler));
 }
 
 std::unique_ptr<AbstractStreamSocket> AcceptorDelegate::getNextSocketIfAny()

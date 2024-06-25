@@ -33,9 +33,15 @@ public:
     virtual void cancelIOSync() override;
 
     virtual std::unique_ptr<AbstractStreamSocket> getNextSocketIfAny() override;
+
     virtual void setAcceptErrorHandler(ErrorHandler) override
     {
-        NX_ASSERT(false, "not implemented");
+        NX_ASSERT(false, "Not implemented");
+    }
+
+    virtual void setConnectionEstablishedHandler(ConnectionEstablishedHandler) override
+    {
+        NX_ASSERT(false, "Not implemented");
     }
 
     void setAcceptTimeout(std::optional<std::chrono::milliseconds> acceptTimeout);

@@ -631,20 +631,20 @@ protected:
                 SystemError::ErrorCode sysError,
                 std::unique_ptr<ReverseConnection> failedConnection) mutable
             {
-                m_errors.push(sysError, std::move(failedConnection));
+                m_connectErrors.push(sysError, std::move(failedConnection));
             });
     }
 
     virtual void TearDown() override
     {
         m_acceptor.pleaseStopSync();
-        //deleteFailedConnectionsInOwnThread();
+        deleteFailedConnectionsInOwnThread();
     }
 
     void deleteFailedConnectionsInOwnThread()
     {
-        while (!m_errors.empty())
-            deleteConnectionInOwnThread(m_errors.pop().second);
+        while (!m_connectErrors.empty())
+            deleteConnectionInOwnThread(m_connectErrors.pop().second);
     }
 
     void deleteConnectionInOwnThread(std::unique_ptr<ReverseConnection> connection)
@@ -657,15 +657,25 @@ protected:
             });
     }
 
-    void thenErrorIsReported()
+    void thenConnectErrorIsReported()
     {
-        auto [sysError, failedConnection] = m_errors.pop();
+        auto [sysError, failedConnection] = m_connectErrors.pop();
         ASSERT_NE(SystemError::noError, sysError);
         ASSERT_NE(nullptr, failedConnection);
     }
 
+    void thenWaitForReadyConnectionErrorIsReported()
+    {
+        auto [sysError, failedConnection] = m_connectErrors.pop();
+        ASSERT_NE(SystemError::noError, sysError);
+        ASSERT_NE(nullptr, failedConnection);
+        ASSERT_TRUE(failedConnection->isConnected());
+        ASSERT_TRUE(failedConnection->isWaitForReadinessInvoked());
+    }
+
 private:
-    nx::utils::SyncMultiQueue<SystemError::ErrorCode, std::unique_ptr<ReverseConnection>> m_errors;
+    nx::utils::SyncMultiQueue<
+        SystemError::ErrorCode, std::unique_ptr<ReverseConnection>> m_connectErrors;
 };
 
 TEST_F(ReverseConnectionAcceptorErrorReporting, connect_error_is_reported)
@@ -677,11 +687,18 @@ TEST_F(ReverseConnectionAcceptorErrorReporting, connect_error_is_reported)
     whenInvokedAcceptAsync();
     whenConnectFails();
 
-    thenErrorIsReported();
+    thenConnectErrorIsReported();
 }
 
 //TEST_F(ReverseConnectionAcceptorErrorReporting, connect_error_is_cached_then_reported)
 //TEST_F(ReverseConnectionAcceptorErrorReporting, wait_for_originator_event_error_is_cached_then_reported)
-//TEST_F(ReverseConnectionAcceptorErrorReporting, wait_for_originator_event_error_is_reported)
+
+TEST_F(ReverseConnectionAcceptorErrorReporting, wait_for_originator_event_error_is_reported)
+{
+    setReadinessWaitAlwaysFails(true);
+    givenStartedAcceptor();
+
+    thenWaitForReadyConnectionErrorIsReported();
+}
 
 } // namespace nx::network::test
