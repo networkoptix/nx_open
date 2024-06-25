@@ -237,13 +237,17 @@ SelfUpdater::UriHandlerUpdateResult SelfUpdater::registerUriHandler()
 {
     UriHandlerUpdateResult result;
 
-    QString binaryPath = nx::build_info::isLinux()
-        ? (qApp->applicationDirPath() + "/client")
-        : qApp->applicationFilePath();
+    const auto minilauncherPath = QDir(qApp->applicationDirPath()).absoluteFilePath(
+        nx::branding::minilauncherBinaryName());
+    if (!QFileInfo::exists(minilauncherPath))
+    {
+        NX_ERROR(this, "Source minilauncher could not be found at %1!", minilauncherPath);
+        return result;
+    }
 
     auto registerHandlerResult = nx::vms::utils::registerSystemUriProtocolHandler(
         /*protocol*/ nx::branding::nativeUriProtocol(),
-        /*applicationBinaryPath*/ binaryPath,
+        /*applicationBinaryPath*/ minilauncherPath,
         /*applicationName*/ nx::branding::vmsName(),
         /*description*/ nx::branding::desktopClientDisplayName(),
         /*customization*/ nx::branding::customization(),
