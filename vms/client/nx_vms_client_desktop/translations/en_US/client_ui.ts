@@ -656,23 +656,19 @@
         <translation></translation>
     </message>
     <message>
-        <source>Disable import</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Import Video from Device</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Import camera or server offline periods</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Do not send Stop PTZ command</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Do not record audio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import from Device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import video automatically</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
