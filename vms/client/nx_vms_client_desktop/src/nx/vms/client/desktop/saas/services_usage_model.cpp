@@ -83,8 +83,26 @@ void ServicesUsageModel::Private::startCamerasSignalsAccumulationTimer()
 void ServicesUsageModel::Private::updateUsedServicesData()
 {
     q->beginResetModel();
-    saasData = serviceManager->data();
     servicesInfo = serviceManager->services();
+    saasData = serviceManager->data();
+
+    // Cloud data can be inconsistent for some reasons, that's why we should filter out all
+    // records for which we do not have correct service description.
+    for (auto it = saasData.services.begin(); it != saasData.services.end(); )
+    {
+        const nx::Uuid& serviceId = it->first;
+        if (servicesInfo.contains(serviceId))
+        {
+            ++it;
+        }
+        else
+        {
+            NX_WARNING(this,
+                "Inconsistent SAAS data: service id %1 is not listed in services", serviceId);
+            it = saasData.services.erase(it);
+        }
+    }
+
     q->endResetModel();
 }
 
