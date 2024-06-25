@@ -66,6 +66,7 @@ public:
         registerAction<TestActionWithTargetUsers>();
         registerAction<TestActionWithPermissions>();
         registerAction<TestActionForUserAndServer>();
+        registerAction<TestActionForServerWithTargetUser>();
 
         mockRule = std::make_unique<Rule>(nx::Uuid::createUuid(), engine.get());
     }
@@ -660,6 +661,28 @@ TEST_F(ActionBuilderTest, clientAndServerAction)
     EXPECT_CALL(mock, actionReceived()).Times(2);
     EXPECT_CALL(mock, targetedUsers(selection)).Times(1);
     EXPECT_CALL(mock, targetedUsers(UuidSelection())).Times(1);
+
+    builder->process(makeSimpleEvent());
+}
+
+TEST_F(ActionBuilderTest, serverWithTargetUserAction)
+{
+    const auto user = addUser(NoGroup, kTestUserName, UserType::local, GlobalPermission::viewLogs);
+
+    UuidSelection selection{
+        .ids = {user->getId()},
+        .all = false};
+
+    auto builder = makeBuilder(TestActionForServerWithTargetUser::manifest().id);
+    auto userField = builder->fieldByName<TargetUserField>(utils::kUsersFieldName);
+    userField->setIds(selection.ids);
+
+    MockActionBuilderEvents mock{builder.get()};
+
+    // Expecting one action copies. Only for server processing with non-empty selection.
+    EXPECT_CALL(mock, actionReceived()).Times(1);
+    EXPECT_CALL(mock, targetedUsers(selection)).Times(1);
+    EXPECT_CALL(mock, targetedUsers(UuidSelection())).Times(0);
 
     builder->process(makeSimpleEvent());
 }
