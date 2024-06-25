@@ -558,6 +558,7 @@ void QnWorkbenchPtzHandler::at_debugGetPtzPositionAction_triggered()
 
 void QnWorkbenchPtzHandler::at_ptzContinuousMoveAction_triggered()
 {
+    NX_DEBUG(this, "ptzContinuousMoveAction triggered");
     auto widget = qobject_cast<QnMediaResourceWidget*>(display()->widget(Qn::CentralRole));
     if (!widget)
         return;
@@ -570,16 +571,28 @@ void QnWorkbenchPtzHandler::at_ptzContinuousMoveAction_triggered()
     if (!item || !controller)
         return;
 
+    if (const auto resource = widget->resource()->toResource(); resource)
+        NX_DEBUG(this, "Resource: %1, controller: %2", resource->getName(), controller.get());
+
     auto speed = parameters.argument<QVector3D>(Qn::ItemDataRole::PtzSpeedRole);
 
     const bool ptzForced = parameters.argument(Qn::ItemDataRole::ForceRole).toBool();
     if (ptzForced)
         d->updatePtzState(!speed.isNull(), widget);
 
-    if (((!qFuzzyIsNull(speed.x()) || !qFuzzyIsNull(speed.y())) && !d->checkPtzMoveEnabled()))
-        return;
+    const bool attemptToChangeSpeedWhileItIsDisabled =
+        (!qFuzzyIsNull(speed.x()) || !qFuzzyIsNull(speed.y())) && !d->checkPtzMoveEnabled();
 
-    if (!qFuzzyIsNull(speed.z()) && !d->checkPtzZoomEnabled())
+    const bool attemptToChangeZoomWhileItIsDisabled =
+        !qFuzzyIsNull(speed.z()) && !d->checkPtzZoomEnabled();
+
+    NX_DEBUG(this, "Attempt to change speed while it is disabled: "
+        "attemptToChangeSpeedWhileItIsDisabled=%1", attemptToChangeSpeedWhileItIsDisabled);
+
+    NX_DEBUG(this, "Attempt to change zoom while it is disabled: "
+        "attemptToChangeZoomWhileItIsDisabled=%1", attemptToChangeZoomWhileItIsDisabled);
+
+    if (attemptToChangeSpeedWhileItIsDisabled || attemptToChangeZoomWhileItIsDisabled)
         return;
 
     const auto rotation = item->rotation()
@@ -588,6 +601,8 @@ void QnWorkbenchPtzHandler::at_ptzContinuousMoveAction_triggered()
 
     Vector speedVector(speed.x(), speed.y(), 0.0, speed.z());
     controller->continuousMove(speedVector);
+
+    NX_DEBUG(this, "Speed is set up");
 
     if (speedVector.isNull())
         widget->clearActionText(2s);
