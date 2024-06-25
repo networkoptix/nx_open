@@ -172,6 +172,33 @@ public:
     nx::vms::rules::UuidSelection m_users;
 };
 
+class TestActionForServerWithTargetUser: public nx::vms::rules::BasicAction
+{
+    Q_OBJECT
+    Q_CLASSINFO("type", "nx.actions.test.serverWithTargetUser")
+
+    Q_PROPERTY(nx::vms::rules::UuidSelection users MEMBER m_users)
+
+public:
+    static ItemDescriptor manifest()
+    {
+        return ItemDescriptor{
+            .id = utils::type<TestActionForServerWithTargetUser>(),
+            .displayName = TranslatableString("Test action for server with target user"),
+            .flags = {ItemFlag::instant},
+            .executionTargets = {ExecutionTarget::servers},
+            .fields = {
+                makeFieldDescriptor<TargetUserField>(
+                    utils::kUsersFieldName,
+                    TranslatableString("Users"))
+            },
+        };
+    }
+
+public:
+    nx::vms::rules::UuidSelection m_users;
+};
+
 class TestActionWithTextWithFields: public nx::vms::rules::BasicAction
 {
     Q_OBJECT

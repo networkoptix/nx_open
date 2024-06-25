@@ -533,9 +533,10 @@ void ActionBuilder::buildAndEmitAction(const AggregatedEventPtr& aggregatedEvent
 
     if (manifest->executionTargets.testFlag(ExecutionTarget::servers))
     {
-        // Action with all data, but without users for server processing.
         auto serverAction = engine()->cloneAction(logAction);
-        serverAction->setProperty(utils::kUsersFieldName, {});
+        // Target users should only be processed if they are not processed on the client side.
+        if (manifest->executionTargets.testFlag(ExecutionTarget::clients))
+            serverAction->setProperty(utils::kUsersFieldName, {});
         actions.push_back(serverAction);
     }
 
