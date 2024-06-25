@@ -86,8 +86,7 @@ bool QnSystemDescriptionAggregator::containsSystem(int priority) const
     return m_systems.contains(priority);
 }
 
-void QnSystemDescriptionAggregator::mergeSystem(int priority,
-    const QnSystemDescriptionPtr& system)
+void QnSystemDescriptionAggregator::mergeSystem(int priority, const QnSystemDescriptionPtr& system)
 {
     if (!NX_ASSERT(system))
         return;
@@ -95,11 +94,6 @@ void QnSystemDescriptionAggregator::mergeSystem(int priority,
     if (const auto it = m_systems.find(priority); it != m_systems.end())
     {
         const auto oldSystem = *it;
-
-        // VMS-43161: There may be multiple cloud systems with the same local id.
-        // Ignoring the offline systems in this case.
-        if (oldSystem->id() != system->id() && oldSystem->isOnline() && !system->isOnline())
-            return;
 
         removeSystem(m_systems[priority]->id(), priority, /*isMerge*/ true);
     }
@@ -203,11 +197,11 @@ void QnSystemDescriptionAggregator::removeSystem(
     if (system->id() != systemId && !isMerge)
         return;
 
-    disconnect(system.data(), nullptr, this, nullptr);
+    system->disconnect(this);
     m_systems.remove(priority);
 
-    // There is no need to update servers during a systems merge. They will be updated at the end of
-    // mergeSystem() (see VMS-47244)
+    // There is no need to update servers during a systems merge. They will be updated at the end
+    // of the mergeSystem() (see VMS-47244).
     if (!isMerge)
         updateServers();
 

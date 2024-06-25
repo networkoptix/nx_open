@@ -4,6 +4,9 @@
 
 #include <finders/local_systems_finder.h>
 
+/**
+ * Handles recent connections, stored in the coreSettings()->recentLocalConnections property.
+ */
 class QnRecentLocalSystemsFinder: public LocalSystemsFinder
 {
     Q_OBJECT

@@ -2,20 +2,20 @@
 
 #include "cloud_system_description.h"
 
+#include <network/system_helpers.h>
 #include <nx/utils/software_version.h>
 
-QnCloudSystemDescriptionPtr QnCloudSystemDescription::create(
-    const QString& systemId,
-    const nx::Uuid& localSystemId,
-    const QString& systemName,
-    const QString& ownerEmail,
-    const QString& ownerFullName,
-    bool online,
-    bool system2faEnabled,
-    const QString& organizationId)
+QnCloudSystemDescriptionPtr QnCloudSystemDescription::create(const QnCloudSystem& system)
 {
     return QnCloudSystemDescriptionPtr(new QnCloudSystemDescription(
-        systemId, localSystemId, systemName, ownerEmail, ownerFullName, online, system2faEnabled, organizationId));
+        /*systemId*/ helpers::getTargetSystemId(system),
+        system.localId,
+        system.name,
+        system.ownerAccountEmail,
+        system.ownerFullName,
+        system.online,
+        system.system2faEnabled,
+        system.organizationId));
 }
 
 QnCloudSystemDescription::QnCloudSystemDescription(
