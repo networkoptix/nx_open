@@ -4,6 +4,7 @@
 
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QMap>
+#include <QtCore/QSharedPointer>
 
 #include <network/base_system_description.h>
 #include <nx/utils/url.h>

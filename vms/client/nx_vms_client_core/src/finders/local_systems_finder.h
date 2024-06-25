@@ -4,6 +4,10 @@
 
 #include <finders/abstract_systems_finder.h>
 
+/**
+ * This class is a common base for ScopeLocalSystemsFinder and QnRecentLocalSystemsFinder.
+ * It contains logic of getting diff between two sets of systems and sending corresponding signals.
+ */
 class LocalSystemsFinder: public QnAbstractSystemsFinder
 {
     Q_OBJECT

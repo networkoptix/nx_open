@@ -14,8 +14,8 @@ QnLocalSystemDescriptionPtr QnLocalSystemDescription::create(
     const nx::Uuid& localSystemId,
     const QString& systemName)
 {
-    return QnLocalSystemDescriptionPtr(new QnLocalSystemDescription(
-        systemId, localSystemId, systemName));
+    return QnLocalSystemDescriptionPtr(
+        new QnLocalSystemDescription(systemId, localSystemId, systemName));
 }
 
 QnLocalSystemDescription::QnLocalSystemDescription(const QString& systemId):
