@@ -920,6 +920,12 @@ void PtzInstrument::updateActionText(QnMediaResourceWidget* widget)
 
 void PtzInstrument::ptzMove(QnMediaResourceWidget* widget, const Vector& speed, bool instant)
 {
+    if (widget && widget->resource())
+    {
+        if (const auto resource = widget->resource()->toResourcePtr())
+            NX_DEBUG(this, "Move attempt: %1", resource->getName());
+    }
+
     PtzData& data = m_dataByWidget[widget];
     data.requestedSpeed = speed;
 
@@ -945,6 +951,7 @@ void PtzInstrument::ptzMove(QnMediaResourceWidget* widget, const Vector& speed, 
     }
     else
     {
+        NX_VERBOSE(this, "PTZ move is postponed");
         if (!m_movementTimer.isActive())
             m_movementTimer.start(speedUpdateIntervalMSec, this);
     }
