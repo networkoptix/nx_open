@@ -18,10 +18,7 @@ class NX_VMS_CLIENT_CORE_API QnSystemsFinder: public QnAbstractSystemsFinder
     typedef QnAbstractSystemsFinder base_type;
 
 public:
-    explicit QnSystemsFinder(QObject* parent = nullptr);
-    virtual ~QnSystemsFinder() override;
-
-    void addSystemsFinder(QnAbstractSystemsFinder* finder, int priority);
+    QnSystemsFinder(QObject* parent = nullptr);
 
 public: //overrides
     SystemDescriptionList systems() const override;
@@ -29,14 +26,30 @@ public: //overrides
 
     static QnSystemsFinder* instance();
 
-private:
-    void onBaseSystemDiscovered(const QnSystemDescriptionPtr& system, int priority);
-    void onSystemLost(const QString& systemId, const nx::Uuid& localId, int priority);
+protected:
+    QnSystemsFinder(bool addDefaultFinders, QObject* parent);
 
-private:
+    void initializeFinders();
+
+    // TODO: #sivanov Change to enum class.
+    enum Source
+    {
+        cloud,
+        direct,
+        recent,
+        saved,
+    };
+    void addSystemsFinder(QnAbstractSystemsFinder* finder, Source source);
+
+    bool mergeSystemIntoExisting(const QnSystemDescriptionPtr& system, Source source);
+
+    void onBaseSystemDiscovered(const QnSystemDescriptionPtr& system, Source source);
+    void onSystemLost(const QString& systemId, const nx::Uuid& localId, Source source);
+
+protected:
     using SystemsFinderList = QMap<QnAbstractSystemsFinder*, nx::utils::ScopedConnectionsPtr>;
     using AggregatorPtr = QSharedPointer<QnSystemDescriptionAggregator>;
-    using AggregatorsList = QHash<nx::Uuid, AggregatorPtr>;
+    using AggregatorsList = QHash<QString, AggregatorPtr>;
 
     SystemsFinderList m_finders;
     AggregatorsList m_systems;
