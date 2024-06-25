@@ -19,6 +19,7 @@ struct NX_NETWORK_API AcceptorError
     std::optional<http::StatusCode::Value> httpStatusCode;
 
     bool operator==(const AcceptorError& other) const;
+    bool operator<(const AcceptorError& other) const;
 
     std::string toString() const;
 };
@@ -29,11 +30,20 @@ class AbstractConnectionAcceptor:
 public:
     using ErrorHandler = nx::utils::MoveOnlyFunc<void(AcceptorError)>;
 
+    using ConnectionEstablishedHandler =
+        nx::utils::MoveOnlyFunc<void(nx::utils::Url /*remoteAddress*/)>;
+
     /**
      * @return Ready-to-use connection from internal listen queue.
      *   nullptr if no connections available.
      */
     virtual std::unique_ptr<AbstractStreamSocket> getNextSocketIfAny() = 0;
+
+    /**
+     * Install a handler that is invoked each time a connection to the remoteAddress is
+     * established.
+     */
+    virtual void setConnectionEstablishedHandler(ConnectionEstablishedHandler) = 0;
 
     /**
      * Used to report errors from the specific acceptor implementation up

@@ -228,6 +228,17 @@ void CloudServerSocket::setSupportedConnectionMethods(
     m_supportedConnectionMethods = value;
 }
 
+void CloudServerSocket::setOnAcceptorConnectionEstablished(
+    nx::utils::MoveOnlyFunc<void(nx::utils::Url)> handler)
+{
+    m_onAcceptorConnectionEstablished = std::move(handler);
+}
+
+void CloudServerSocket::setOnAcceptorError(nx::utils::MoveOnlyFunc<void(AcceptorError)> handler)
+{
+    m_onAcceptorError = std::move(handler);
+}
+
 void CloudServerSocket::setOnMediatorConnectionClosed(
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
 {
@@ -308,24 +319,48 @@ void CloudServerSocket::startAcceptor(
         });
 }
 
+void CloudServerSocket::onAcceptorConnectionEstablished(nx::utils::Url remoteAddress)
+{
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+
+        if (NX_ASSERT(m_lastListenStatusReport, "Expected the status report"))
+        {
+            if (nx::utils::erase_if(m_lastListenStatusReport->acceptorErrors,
+                [&](const auto& i) { return i.remoteAddress == remoteAddress; }))
+            {
+                NX_VERBOSE(this, "An acceptor reconnected to %1", remoteAddress);
+            }
+        }
+    }
+
+    if (m_onAcceptorConnectionEstablished)
+        m_onAcceptorConnectionEstablished(remoteAddress);
+}
+
 void CloudServerSocket::saveAcceptorError(AcceptorError acceptorError)
 {
-    NX_MUTEX_LOCKER lock(&m_mutex);
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
 
-    const auto it = std::find_if(
-        m_lastListenStatusReport->acceptorErrors.begin(),
-        m_lastListenStatusReport->acceptorErrors.end(),
-        [&acceptorError](const AcceptorError& existing)
-        {
-            return existing.remoteAddress == acceptorError.remoteAddress;
-        });
+        const auto it = std::find_if(
+            m_lastListenStatusReport->acceptorErrors.begin(),
+            m_lastListenStatusReport->acceptorErrors.end(),
+            [&acceptorError](const AcceptorError& existing)
+            {
+                    return existing.remoteAddress == acceptorError.remoteAddress;
+            });
 
-    // Save only one acceptor error per host, since some acceptors (relay) try to open multiple
-    // connections at once.
-    if (it == m_lastListenStatusReport->acceptorErrors.end())
-        m_lastListenStatusReport->acceptorErrors.push_back(std::move(acceptorError));
-    else
-        *it = acceptorError; //< Update error so most recent is reported.
+        // Save only one acceptor error per host, since some acceptors (relay) try to open multiple
+        // connections at once.
+        if (it == m_lastListenStatusReport->acceptorErrors.end())
+            m_lastListenStatusReport->acceptorErrors.push_back(acceptorError);
+        else
+            *it = acceptorError; //< Update error so most recent is reported.
+    }
+
+    if (m_onAcceptorError)
+        m_onAcceptorError(std::move(acceptorError));
 }
 
 void CloudServerSocket::onListenRequestCompleted(
@@ -393,6 +428,8 @@ void CloudServerSocket::startAcceptingConnections(
 void CloudServerSocket::initializeCustomAcceptors(
     const hpm::api::ListenResponse& response)
 {
+    NX_DEBUG(this, "Initializing custom acceptors");
+
     const auto cloudCredentials =
         m_mediatorConnection->credentialsProvider()->getSystemCredentials();
     NX_ASSERT(cloudCredentials);
@@ -406,8 +443,17 @@ void CloudServerSocket::initializeCustomAcceptors(
     {
         acceptor->bindToAioThread(getAioThread());
 
+        acceptor->setConnectionEstablishedHandler(
+            [this](auto&&... args)
+            {
+                onAcceptorConnectionEstablished(std::forward<decltype(args)>(args)...);
+            });
+
         acceptor->setAcceptErrorHandler(
-            [this](AcceptorError error) { saveAcceptorError(std::move(error)); });
+            [this](auto&&... args)
+            {
+                saveAcceptorError(std::forward<decltype(args)>(args)...);
+            });
 
         m_customConnectionAcceptors.push_back(acceptor.get());
         m_aggregateAcceptor.add(std::move(acceptor));

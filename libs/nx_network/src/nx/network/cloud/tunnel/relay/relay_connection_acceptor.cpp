@@ -86,6 +86,8 @@ void ReverseConnection::waitForOriginatorToStartUsingConnection(
     post(
         [this, handler = std::move(handler)]() mutable
         {
+            NX_VERBOSE(this, "Waiting for relay %1 to activate the connection",
+                m_relayClient->url());
             m_onConnectionActivated = std::move(handler);
             m_httpPipeline->startReadingConnection();
         });
@@ -133,7 +135,7 @@ void ReverseConnection::onConnectionClosed(
     SystemError::ErrorCode closeReason,
     bool /*connectionDestroyed*/)
 {
-    NX_VERBOSE(this, "Connection %1->%2 is closed with result %3",
+    NX_VERBOSE(this, "Connection %1->%2 is closed with result: %3",
         m_httpPipeline->socket()->getLocalAddress(), m_httpPipeline->socket()->getForeignAddress(),
         SystemError::toString(closeReason));
 
@@ -141,6 +143,8 @@ void ReverseConnection::onConnectionClosed(
 
     if (m_onConnectionActivated)
         nx::utils::swapAndCall(m_onConnectionActivated, closeReason);
+    else
+        NX_DEBUG(this, "Closed connection is not activated, nothing will happen");
 }
 
 void ReverseConnection::onConnectDone(
@@ -150,7 +154,7 @@ void ReverseConnection::onConnectDone(
 {
     if (resultCode == api::ResultCode::ok)
     {
-        NX_VERBOSE(this, "Server relay connection %1->%2 established with result %3",
+        NX_VERBOSE(this, "Server relay connection %1->%2 established with result: %3",
             streamSocket->getLocalAddress(), streamSocket->getForeignAddress(), resultCode);
 
         streamSocket->setRecvTimeout(std::chrono::milliseconds::zero());
@@ -175,7 +179,7 @@ void ReverseConnection::onConnectDone(
     }
     else
     {
-        NX_VERBOSE(this, "Server relay connection failed with result %1", resultCode);
+        NX_VERBOSE(this, "Server relay connection failed with result: %1", resultCode);
     }
 
     nx::utils::swapAndCall(m_connectHandler, api::toSystemError(resultCode));
@@ -298,7 +302,7 @@ ConnectionAcceptor::ConnectionAcceptor(const nx::utils::Url& relayUrl):
     bindToAioThread(getAioThread());
 
     m_acceptor.setOnConnectionEstablished(
-        [this](auto&&... args) { updateAcceptorConfiguration(std::move(args)...); });
+        [this](auto&&... args) { onConnectionEstablished(std::move(args)...); });
 
     m_acceptor.setConnectErrorHandler(
         [this](auto&&... args) { reportAcceptorError(std::forward<decltype(args)>(args)...); });
@@ -357,6 +361,11 @@ void ConnectionAcceptor::setAcceptErrorHandler(ErrorHandler handler)
     m_acceptErrorHandler = std::move(handler);
 }
 
+void ConnectionAcceptor::setConnectionEstablishedHandler(ConnectionEstablishedHandler handler)
+{
+    m_connectionEstablishedHandler = std::move(handler);
+}
+
 void ConnectionAcceptor::setConnectTimeout(
     std::optional<std::chrono::milliseconds> timeout)
 {
@@ -366,6 +375,14 @@ void ConnectionAcceptor::setConnectTimeout(
 void ConnectionAcceptor::stopWhileInAioThread()
 {
     m_acceptor.pleaseStopSync();
+}
+
+void ConnectionAcceptor::onConnectionEstablished(const detail::ReverseConnection& newConnection)
+{
+    updateAcceptorConfiguration(newConnection);
+
+    if (m_connectionEstablishedHandler)
+        m_connectionEstablishedHandler(m_relayUrl);
 }
 
 void ConnectionAcceptor::updateAcceptorConfiguration(
@@ -384,13 +401,27 @@ void ConnectionAcceptor::reportAcceptorError(
 
     const auto httpStatus = failedConnection->relayClient().prevRequestHttpStatusCode();
 
-    m_acceptErrorHandler(
-        AcceptorError{
-            failedConnection->relayClient().url(),
-            sysErrorCode,
-            httpStatus == http::StatusCode::undefined
-                ? std::nullopt
-                : std::make_optional(httpStatus)});
+    AcceptorError error{
+        failedConnection->relayClient().url(),
+        sysErrorCode,
+        httpStatus == http::StatusCode::undefined
+            ? std::nullopt
+            : std::make_optional(httpStatus)};
+
+    const auto count = m_acceptor.connectionCount();
+
+    NX_VERBOSE(this, "Got an error from the relay with connection count: %1, error: %2",
+        count, error);
+
+    if (count > 0)
+    {
+        NX_VERBOSE(this,
+            "Ignoring the error from the relay %1 because the acceptor has more connections: %2",
+            m_relayUrl, count);
+        return;
+    }
+
+    m_acceptErrorHandler(std::move(error));
 }
 
 std::unique_ptr<AbstractStreamSocket> ConnectionAcceptor::toStreamSocket(

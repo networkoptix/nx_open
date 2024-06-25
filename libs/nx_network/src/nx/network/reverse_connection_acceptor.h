@@ -204,9 +204,6 @@ public:
     using AcceptCompletionHandler = nx::utils::MoveOnlyFunc<
         void(SystemError::ErrorCode, std::unique_ptr<Connection>)>;
 
-    using ConnectErrorHandler = nx::utils::MoveOnlyFunc<
-        void(SystemError::ErrorCode, std::unique_ptr<Connection>)>;
-
     using OnConnectionEstablished = nx::utils::MoveOnlyFunc<
         void(const Connection& connection)>;
 
@@ -274,15 +271,6 @@ public:
         m_connectRetryDelayCalculator = nx::utils::ProgressiveDelayCalculator(m_connectRetryPolicy.delayPolicy);
     }
 
-    /**
-     * if m_connector->connectAsync() fails, this handler is invoked with the failed connection
-     * instead of asking the connection to start accepting.
-     */
-    void setConnectErrorHandler(ConnectErrorHandler handler)
-    {
-        m_connectErrorHandler = std::move(handler);
-    }
-
     void start()
     {
         post([this]() { openConnections(/*causedByConnectError?*/ false); });
@@ -300,7 +288,7 @@ public:
                     return;
 
                 startAcceptingAnotherConnectionIfAppropriate();
-                provideConnectionToTheCaller(std::move(connectionToReturn));
+                provideConnectionToTheCaller(SystemError::noError, std::move(connectionToReturn));
             });
     }
 
@@ -329,10 +317,34 @@ public:
         return connectionToReturn;
     }
 
-    void setOnConnectionEstablished(
-        OnConnectionEstablished handler)
+    /**
+     * Install a handler to be called each time a connection is established.
+     * WARNING: This handler is called under a locked mutex. The caller MUST ensure they do not
+     * call another function on the acceptor that will lead to a deadlock.
+     * Must be called before start and acceptAsync.
+     */
+    void setOnConnectionEstablished(OnConnectionEstablished handler)
     {
         m_onConnectionEstablished = std::move(handler);
+    }
+
+    /**
+     * Intall a handler to be called each time a connection experiences an error. This can be while
+     * establishing a connection or while waiting for the originator to activate the connection.
+     * This is a dedicated channel that reports all connection errors independent of acceptAsync.
+     * Must be called before start and acceptAsync.
+     */
+    void setConnectErrorHandler(AcceptCompletionHandler handler)
+    {
+        m_connectErrorHandler = std::move(handler);
+    }
+
+    /**
+     * @return the number of connections established OR ready for usage, inclusive.
+     */
+    std::size_t connectionCount()
+    {
+        return m_connectionsSize + m_acceptedConnectionsSize;
     }
 
     AbstractReverseConnector<Connection>& connector() { return *m_connector; }
@@ -345,6 +357,8 @@ protected:
         m_connections.clear();
         m_acceptedConnections.clear();
         m_connector.reset();
+        m_connectionsSize = 0;
+        m_acceptedConnectionsSize = 0;
     }
 
 private:
@@ -376,10 +390,13 @@ private:
 
     std::unique_ptr<AbstractReverseConnector<Connection>> m_connector;
     Connections m_connections;
+    std::atomic_size_t m_connectionsSize = 0;
     AcceptCompletionHandler m_acceptHandler;
-    ConnectErrorHandler m_connectErrorHandler;
+    AcceptCompletionHandler m_waitForReadyConnectionErrorHandler;
+    AcceptCompletionHandler m_connectErrorHandler;
     OnConnectionEstablished m_onConnectionEstablished;
     std::deque<std::unique_ptr<Connection>> m_acceptedConnections;
+    std::atomic_size_t m_acceptedConnectionsSize = 0;
     std::size_t m_preemptiveConnectionCount = kDefaultPreemptiveConnectionCount;
     std::size_t m_maxReadyConnectionCount = kDefaultMaxReadyConnectionCount;
     ConnectRetryPolicy m_connectRetryPolicy;
@@ -452,19 +469,22 @@ private:
         SystemError::ErrorCode connectResult,
         std::unique_ptr<Connection> connection)
     {
-        NX_MUTEX_LOCKER lock(&m_mutex);
-
+        // Invoke the error handler before locking the mutex.
         if (connectResult != SystemError::noError)
         {
             NX_VERBOSE(this, "Connect failed. %1", connectResult);
 
             if (m_connectErrorHandler)
                 m_connectErrorHandler(connectResult, std::move(connection));
-
-            return openConnections(/*causedByConnectError?*/ true);
         }
 
+        NX_MUTEX_LOCKER lock(&m_mutex);
+
+        if (connectResult != SystemError::noError)
+            return openConnections(/*causedByConnectError?*/ true);
+
         m_connections.push_back(ConnectionContext());
+        m_connectionsSize = m_connections.size();
         auto connectionIter = --m_connections.end();
         connectionIter->connection = std::move(connection);
         connectionIter->state = ConnectionState::connected;
@@ -505,8 +525,10 @@ private:
         typename Connections::iterator connectionIter,
         SystemError::ErrorCode resultCode)
     {
-        NX_VERBOSE(this, "Reverse connection %1 preparation completed with result %2",
-            &connectionIter->connection, SystemError::toString(resultCode));
+        auto readyConnection = std::move(connectionIter->connection);
+
+        NX_VERBOSE(this, "Reverse connection %1 preparation completed with result: %2",
+            readyConnection.get(), SystemError::toString(resultCode));
 
         std::unique_ptr<Connection> connectionToReturn;
 
@@ -514,10 +536,14 @@ private:
             NX_MUTEX_LOCKER lock(&m_mutex);
 
             if (resultCode == SystemError::noError)
-                m_acceptedConnections.push_back(std::move(connectionIter->connection));
+            {
+                m_acceptedConnections.push_back(std::move(readyConnection));
+                m_acceptedConnectionsSize = m_acceptedConnections.size();
+            }
 
             m_connections.erase(connectionIter);
-            openConnections(/*causedByConnectError?*/ false);
+            m_connectionsSize = m_connections.size();
+            openConnections(/*causedByConnectError?*/ resultCode != SystemError::noError);
 
             if (m_acceptHandler)
                 connectionToReturn = takeNextAcceptedConnection();
@@ -525,8 +551,11 @@ private:
             startAcceptingAnotherConnectionIfAppropriate();
         }
 
+        if (resultCode != SystemError::noError && m_connectErrorHandler)
+            m_connectErrorHandler(resultCode, std::move(readyConnection));
+
         if (connectionToReturn)
-            provideConnectionToTheCaller(std::move(connectionToReturn));
+            provideConnectionToTheCaller(SystemError::noError, std::move(connectionToReturn));
     }
 
     std::unique_ptr<Connection> takeNextAcceptedConnection()
@@ -536,6 +565,7 @@ private:
         {
             result = std::move(m_acceptedConnections.front());
             m_acceptedConnections.pop_front();
+            m_acceptedConnectionsSize = m_acceptedConnections.size();
 
             NX_VERBOSE(this, "Providing reverse connection %1", &result);
         }
@@ -554,13 +584,15 @@ private:
     }
 
     void provideConnectionToTheCaller(
+        SystemError::ErrorCode sysErrorCode,
         std::unique_ptr<Connection> connection)
     {
-        connection->bindToAioThread(SocketGlobals::aioService().getRandomAioThread());
+        if (connection)
+            connection->bindToAioThread(SocketGlobals::aioService().getRandomAioThread());
 
         nx::utils::swapAndCall(
             m_acceptHandler,
-            SystemError::noError,
+            sysErrorCode,
             std::move(connection));
     }
 

@@ -121,6 +121,20 @@ public:
 
     virtual std::unique_ptr<AbstractStreamSocket> getNextSocketIfAny() override;
 
+    /**
+     * Install a handler to be called when the acceptor establishes a reverse connection to the
+     * relay, but before that connection is actively accepting connections from the client.
+     * NOTE: must be called before acceptAsync().
+     */
+    virtual void setConnectionEstablishedHandler(
+        AbstractConnectionAcceptor::ConnectionEstablishedHandler handler) override;
+
+    /**
+     * Install a handler to be called when an error occurs, e.g. there is an error connecting to
+     * the relay. This is a dedicated channel in addition to the result passed via the handler in
+     * acceptAsync().
+     * NOTE: must be called before acceptAsync().
+     */
     virtual void setAcceptErrorHandler(ErrorHandler) override;
 
     void setConnectTimeout(std::optional<std::chrono::milliseconds> timeout);
@@ -132,8 +146,10 @@ private:
     const nx::utils::Url m_relayUrl;
     ReverseConnectionAcceptor<detail::ReverseConnection> m_acceptor;
     bool m_started = false;
+    AbstractConnectionAcceptor::ConnectionEstablishedHandler m_connectionEstablishedHandler;
     AbstractConnectionAcceptor::ErrorHandler m_acceptErrorHandler;
 
+    void onConnectionEstablished(const detail::ReverseConnection& newConnection);
     void updateAcceptorConfiguration(const detail::ReverseConnection& newConnection);
     void reportAcceptorError(
         SystemError::ErrorCode sysErrorCode,

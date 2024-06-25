@@ -112,6 +112,13 @@ public:
     hpm::api::ResultCode registerOnMediatorSync();
     void setSupportedConnectionMethods(hpm::api::ConnectionMethods value);
 
+    void setOnAcceptorConnectionEstablished(nx::utils::MoveOnlyFunc<void(nx::utils::Url)> handler);
+    /**
+     * @Install a handler to notified when the socket experiences a connection error to the relay, e.g. if a connection
+     * is closed or it fails to connect at all.
+     */
+    void setOnAcceptorError(nx::utils::MoveOnlyFunc<void(AcceptorError)> handler);
+
     /**
      * Install a handler to be notified when the connection to the mediator was closed. It is safe
      * to call getStatusReport within this handler. It must be installed before starting to listen.
@@ -143,6 +150,7 @@ protected:
     void bindToAioThreadUnchecked(aio::AbstractAioThread* aioThread);
     void initTunnelPool(int queueLen);
     void startAcceptor(std::unique_ptr<AbstractTunnelAcceptor> acceptor);
+    void onAcceptorConnectionEstablished(nx::utils::Url remoteAddress);
     void saveAcceptorError(AcceptorError acceptorError);
     void onListenRequestCompleted(
         nx::hpm::api::ResultCode resultCode, hpm::api::ListenResponse response);
@@ -182,6 +190,8 @@ protected:
     nx::hpm::api::CloudConnectVersion m_cloudConnectVersion =
         nx::hpm::api::kDefaultCloudConnectVersion;
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_onMediatorConnectionClosed;
+    nx::utils::MoveOnlyFunc<void(nx::utils::Url/*remoteAddress*/)> m_onAcceptorConnectionEstablished;
+    nx::utils::MoveOnlyFunc<void(AcceptorError)> m_onAcceptorError;
 
 private:
     void stopWhileInAioThread();
