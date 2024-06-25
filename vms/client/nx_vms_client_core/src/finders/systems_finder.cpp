@@ -31,59 +31,59 @@ enum class SystemHideFlag
 };
 Q_DECLARE_FLAGS(SystemHideFlags, SystemHideFlag)
 
-enum Priority
-{
-    kCloudPriority,
-    kDirectFinder,
-    kRecentFinder,
-    kScopeFinder,
-};
-
 } // namespace
 
 QnSystemsFinder::QnSystemsFinder(QObject* parent):
-    base_type(parent)
+    QnSystemsFinder(/*addDefaultFinders*/ true, parent)
 {
-    NX_ASSERT(nx::vms::common::ServerCompatibilityValidator::isInitialized(),
-        "Internal finders use it on start when processing existing system descriptions");
-
-    // Load saved systems first.
-    auto recentLocalSystemsFinder = new QnRecentLocalSystemsFinder(this);
-    addSystemsFinder(recentLocalSystemsFinder, kRecentFinder);
-
-    auto scopeLocalSystemsFinder = new ScopeLocalSystemsFinder(this);
-    addSystemsFinder(scopeLocalSystemsFinder, kScopeFinder);
-
-    auto cloudSystemsFinder = new CloudSystemsFinder(this);
-    addSystemsFinder(cloudSystemsFinder, kCloudPriority);
-
-    auto searchUrlManager = new SearchAddressManager(this);
-    auto directSystemsFinder = new QnDirectSystemsFinder(searchUrlManager, this);
-    addSystemsFinder(directSystemsFinder, kDirectFinder);
 }
 
-QnSystemsFinder::~QnSystemsFinder()
-{}
+QnSystemsFinder::QnSystemsFinder(bool addDefaultFinders, QObject* parent):
+    base_type(parent)
+{
+    if (addDefaultFinders)
+        initializeFinders();
+}
 
 QnSystemsFinder* QnSystemsFinder::instance()
 {
     return appContext()->systemsFinder();
 }
 
-void QnSystemsFinder::addSystemsFinder(QnAbstractSystemsFinder* finder, int priority)
+void QnSystemsFinder::initializeFinders()
+{
+    NX_ASSERT(nx::vms::common::ServerCompatibilityValidator::isInitialized(),
+        "Internal finders use it on start when processing existing system descriptions");
+
+    // Load saved systems first.
+    auto recentLocalSystemsFinder = new QnRecentLocalSystemsFinder(this);
+    addSystemsFinder(recentLocalSystemsFinder, Source::recent);
+
+    auto scopeLocalSystemsFinder = new ScopeLocalSystemsFinder(this);
+    addSystemsFinder(scopeLocalSystemsFinder, Source::saved);
+
+    auto cloudSystemsFinder = new CloudSystemsFinder(this);
+    addSystemsFinder(cloudSystemsFinder, Source::cloud);
+
+    auto searchUrlManager = new SearchAddressManager(this);
+    auto directSystemsFinder = new QnDirectSystemsFinder(searchUrlManager, this);
+    addSystemsFinder(directSystemsFinder, Source::direct);
+}
+
+void QnSystemsFinder::addSystemsFinder(QnAbstractSystemsFinder* finder, Source source)
 {
     nx::utils::ScopedConnectionsPtr connections(new nx::utils::ScopedConnections());
 
     *connections << connect(finder, &QnAbstractSystemsFinder::systemDiscovered, this,
-        [this, priority](const QnSystemDescriptionPtr& system)
+        [this, source](const QnSystemDescriptionPtr& system)
         {
-            onBaseSystemDiscovered(system, priority);
+            onBaseSystemDiscovered(system, source);
         });
 
     *connections << connect(finder, &QnAbstractSystemsFinder::systemLost, this,
-        [this, priority](const QString& id, const nx::Uuid& localId)
+        [this, source](const QString& id, const nx::Uuid& localId)
         {
-            onSystemLost(id, localId, priority);
+            onSystemLost(id, localId, source);
         });
 
     *connections << connect(finder, &QObject::destroyed, this,
@@ -91,21 +91,74 @@ void QnSystemsFinder::addSystemsFinder(QnAbstractSystemsFinder* finder, int prio
 
     m_finders.insert(finder, connections);
     for (const auto& system: finder->systems())
-        onBaseSystemDiscovered(system, priority);
+        onBaseSystemDiscovered(system, source);
 }
 
-void QnSystemsFinder::onBaseSystemDiscovered(const QnSystemDescriptionPtr& system, int priority)
+bool QnSystemsFinder::mergeSystemIntoExisting(const QnSystemDescriptionPtr& system, Source source)
 {
-    NX_VERBOSE(this, "Discovered system %1 (priority %2)", system, priority);
-    const auto it = m_systems.find(system->localId());
+    const auto it = m_systems.find(system->id());
     if (it != m_systems.end())
     {
         const auto existingSystem = *it;
         NX_VERBOSE(this, "Merging system %1 into existing one %2 by id %3",
-            system, existingSystem, system->localId());
-        existingSystem->mergeSystem(priority, system);
-        return;
+            system, existingSystem, system->id());
+        existingSystem->mergeSystem(source, system);
+        return true;
     }
+
+    // Recent and Scope finders do not know anything about the cloud ids, so we need to iterate
+    // over all systems to check whether system with the same local id already exists.
+    QList<AggregatorPtr> systemsWithSameLocalId;
+    const nx::Uuid localId = system->localId();
+    for (const auto& existingSystem: m_systems)
+    {
+        if (existingSystem->localId() == localId)
+            systemsWithSameLocalId.append(existingSystem);
+    }
+    if (systemsWithSameLocalId.empty())
+        return false;
+
+    // Handling scenario when newly found system does not know about cloud id, but existing knows.
+    if (source == Source::recent || source == Source::saved)
+    {
+        for (const auto& existingSystem: systemsWithSameLocalId)
+        {
+            if (existingSystem->containsSystem(Source::cloud)
+                || existingSystem->containsSystem(Source::direct))
+            {
+                NX_VERBOSE(this, "Merging system %1 into existing one %2 by local id %3",
+                    system, existingSystem, system->id());
+                existingSystem->mergeSystem(source, system);
+                return true;
+            }
+        }
+    }
+
+    // Handling scenario when newly found system knows about cloud id, but existing does not.
+    if (source == Source::cloud|| source == Source::direct)
+    {
+        for (const auto& existingSystem: systemsWithSameLocalId)
+        {
+            // Several systems with the same local id but different cloud ids are allowed.
+            if (existingSystem->containsSystem(Source::cloud))
+                continue;
+
+            NX_VERBOSE(this, "Replacing system %1 by newly found %2 by local id %3",
+                existingSystem, system, localId);
+            m_systems.remove(existingSystem->id());
+            emit systemLost(existingSystem->id(), localId);
+            return false; //< New system will be added further.
+        }
+    }
+
+    return false;
+}
+
+void QnSystemsFinder::onBaseSystemDiscovered(const QnSystemDescriptionPtr& system, Source source)
+{
+    NX_VERBOSE(this, "Discovered system %1 (source %2)", system, source);
+    if (mergeSystemIntoExisting(system, source))
+        return;
 
     const SystemHideFlags systemHideOptions(nx::vms::client::core::ini().systemsHideOptions);
     const auto systemCompatibility = system->systemCompatibility();
@@ -116,7 +169,8 @@ void QnSystemsFinder::onBaseSystemDiscovered(const QnSystemDescriptionPtr& syste
         return;
     }
 
-    const auto isCloudAndNotOnline = [system] { return system->isCloudSystem() && !system->isOnline(); };
+    const auto isCloudAndNotOnline =
+        [system] { return system->isCloudSystem() && !system->isOnline(); };
     if (systemHideOptions.testFlag(SystemHideFlag::notConnectableCloud) && isCloudAndNotOnline())
         return;
 
@@ -129,10 +183,10 @@ void QnSystemsFinder::onBaseSystemDiscovered(const QnSystemDescriptionPtr& syste
     if (systemHideOptions.testFlag(SystemHideFlag::nonLocalHost) && !system->hasLocalServer())
         return;
 
-    if (systemHideOptions.testFlag(SystemHideFlag::autoDiscovered) && priority == kDirectFinder)
+    if (systemHideOptions.testFlag(SystemHideFlag::autoDiscovered) && source == Source::direct)
         return;
 
-    const AggregatorPtr target(new QnSystemDescriptionAggregator(priority, system));
+    const AggregatorPtr target(new QnSystemDescriptionAggregator(source, system));
 
     auto updateRecordInRecentConnections =
         [this, target]
@@ -152,7 +206,7 @@ void QnSystemsFinder::onBaseSystemDiscovered(const QnSystemDescriptionPtr& syste
         };
 
     NX_VERBOSE(this, "Creating a new aggregator from %1", target);
-    m_systems.insert(target->localId(), target);
+    m_systems.insert(target->id(), target);
     connect(target.get(), &QnBaseSystemDescription::systemNameChanged, this,
         updateRecordInRecentConnections);
     connect(target.get(), &QnBaseSystemDescription::versionChanged, this,
@@ -162,22 +216,22 @@ void QnSystemsFinder::onBaseSystemDiscovered(const QnSystemDescriptionPtr& syste
     emit systemDiscovered(target.dynamicCast<QnBaseSystemDescription>());
 }
 
-void QnSystemsFinder::onSystemLost(const QString& systemId, const nx::Uuid& localId, int priority)
+void QnSystemsFinder::onSystemLost(const QString& systemId, const nx::Uuid& localId, Source source)
 {
-    NX_VERBOSE(this, "Lost system %1 (local id %2, priority %3)", systemId, localId, priority);
+    NX_VERBOSE(this, "Lost system %1 (local id %2, source %3)", systemId, localId, source);
 
-    const auto it = m_systems.find(localId);
+    const auto it = m_systems.find(systemId);
     if (it == m_systems.end())
         return;
 
     const auto aggregator = *it;
-    if (!aggregator->containsSystem(priority))
+    if (!aggregator->containsSystem(source))
         return;
 
     if (aggregator->isAggregator())
     {
         NX_VERBOSE(this, "Removing system %1 from aggregator %2", systemId, aggregator);
-        aggregator->removeSystem(systemId, priority);
+        aggregator->removeSystem(systemId, source);
         return;
     }
 

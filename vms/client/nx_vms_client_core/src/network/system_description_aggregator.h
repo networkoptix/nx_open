@@ -23,9 +23,10 @@ public:
 
     void mergeSystem(int priority, const QnSystemDescriptionPtr& system);
 
+    // TODO: #sivanov SystemId check is highly suspicious here, aggregator must not know about
+    // model-level ids.
     void removeSystem(const QString& systemId, int priority, bool isMerge = false);
 
-public: // overrides
     QString id() const override;
 
     nx::Uuid localId() const override;

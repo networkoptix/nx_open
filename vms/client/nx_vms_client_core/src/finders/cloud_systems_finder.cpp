@@ -280,17 +280,7 @@ struct CloudSystemsFinder::Private
         {
             NX_ASSERT(!helpers::isNewSystem(system), "Cloud system can't be NEW system");
 
-            const auto targetId = helpers::getTargetSystemId(system);
-            const auto systemDescription = QnCloudSystemDescription::create(
-                targetId,
-                system.localId,
-                system.name,
-                system.ownerAccountEmail,
-                system.ownerFullName,
-                system.online,
-                system.system2faEnabled,
-                system.organizationId);
-
+            const auto systemDescription = QnCloudSystemDescription::create(system);
             if (system.online)
             {
                 auto initialServer = createInitialServer(system);
