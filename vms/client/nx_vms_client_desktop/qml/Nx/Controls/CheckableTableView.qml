@@ -50,6 +50,8 @@ TableView
             {
                 model: root.model
                 width: root.columnWidthProvider(index)
+                leftPadding: 8
+                rightPadding: 8
             }
         }
     }

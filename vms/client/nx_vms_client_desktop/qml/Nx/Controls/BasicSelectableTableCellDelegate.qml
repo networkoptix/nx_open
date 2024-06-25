@@ -28,7 +28,10 @@ Rectangle
     {
         id: contentRowLayout
         anchors.fill: parent
-        spacing: 8
+        anchors.margins: 4
+        anchors.leftMargin: 8
+        anchors.rightMargin: 8
+        spacing: 4
 
         Loader
         {

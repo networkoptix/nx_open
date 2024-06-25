@@ -56,7 +56,7 @@ TableView
     {
         id: impl
 
-        readonly property int minColumnWidth: 32
+        readonly property int minColumnWidth: 28
         property var columnWidthCache: []
 
         function updateColumnWidths()
