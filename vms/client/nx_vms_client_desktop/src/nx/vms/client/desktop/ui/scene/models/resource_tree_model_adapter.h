@@ -78,6 +78,7 @@ public:
     void setFilterText(const QString& value);
 
     bool isFiltering() const;
+    void invalidateFilter();
 
     QModelIndex rootIndex() const;
     bool localFilesMode() const;

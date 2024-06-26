@@ -315,7 +315,6 @@ void ResourceBrowserWrapper::beforeGroupProcessing()
     if (!tree)
         return;
 
-    m_nestedResourceIndex = QModelIndex();
     m_nestedResourceLevel = -1;
 
     const auto selection = tree.selection();
@@ -323,7 +322,7 @@ void ResourceBrowserWrapper::beforeGroupProcessing()
         return;
 
     auto [index, level] = findResourceIndex(selection[0]);
-    if (!index.isValid())
+    if (!index.isValid() || !NX_ASSERT(level != -1))
         return;
 
     // If explicitly selected a recorder's child.
@@ -333,8 +332,8 @@ void ResourceBrowserWrapper::beforeGroupProcessing()
         ++level;
     }
 
-    m_nestedResourceIndex = index;
     m_nestedResourceLevel = level;
+    tree.model()->pushState({index});
 
     saveGroupExpandedState(selection);
 }
@@ -345,10 +344,20 @@ void ResourceBrowserWrapper::afterGroupProcessing(ui::action::IDType eventType)
         [this]()
         {
             m_groupExpandedState = {};
-            m_nestedResourceIndex = QModelIndex();
+            m_nestedResourceLevel = -1;
         });
 
-    if (!tree || !NX_ASSERT(m_nestedResourceIndex.isValid()))
+    if (!tree || m_nestedResourceLevel == -1)
+        return;
+
+    // FilterProxyModel used in ResourceTreeModelAdapter does not support recursive filtering.
+    // Therefore filtering must be updated manually here.
+    tree.model()->invalidateFilter();
+
+    const auto state = tree.model()->popState();
+    const auto nestedResourceIndex = NX_ASSERT(state.size() == 1) ? state[0] : QModelIndex{};
+
+    if (!NX_ASSERT(nestedResourceIndex.isValid()))
         return;
 
     if (eventType == ui::action::NewCustomGroupCreatedEvent)
@@ -356,7 +365,7 @@ void ResourceBrowserWrapper::afterGroupProcessing(ui::action::IDType eventType)
     else if (!NX_ASSERT(eventType == ui::action::CustomGroupRenamedEvent))
         return;
 
-    QModelIndex index = m_nestedResourceIndex;
+    QModelIndex index = nestedResourceIndex;
     for (int i = 0; i < m_nestedResourceLevel; ++i)
         index = index.parent();
 
