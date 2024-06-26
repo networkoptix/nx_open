@@ -56,7 +56,7 @@ void QnRecentLocalSystemsFinder::updateSystems()
         static const int kVeryFarPriority = 100000;
 
         nx::vms::api::ModuleInformationWithAddresses fakeServerInfo;
-        fakeServerInfo.id = QnUuid::createUuid();   //< It should be new unique id.
+        fakeServerInfo.id = nx::Uuid::createUuid();   //< It should be new unique id.
         fakeServerInfo.systemName = connection.systemName;
         fakeServerInfo.realm = QString::fromStdString(nx::network::AppInfo::realm());
         fakeServerInfo.cloudHost =

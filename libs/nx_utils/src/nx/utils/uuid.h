@@ -134,3 +134,5 @@ NX_UTILS_API size_t qHash(const QnUuid& uuid, size_t seed = 0 ) noexcept;
 NX_UTILS_API QDataStream& operator<<(QDataStream& s, const QnUuid& id);
 NX_UTILS_API QDebug operator<<(QDebug dbg, const QnUuid& id);
 NX_UTILS_API QDataStream& operator>>(QDataStream& s, QnUuid& id);
+
+namespace nx { using Uuid = QnUuid; }

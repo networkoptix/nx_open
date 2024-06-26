@@ -4,22 +4,22 @@
 
 #include <network/system_helpers.h>
 
-QnSystemDescription::PointerType QnLocalSystemDescription::createFactory(const QString& systemId)
+QnLocalSystemDescriptionPtr QnLocalSystemDescription::createFactory(const QString& systemId)
 {
-    return PointerType(static_cast<base_type*>(new QnLocalSystemDescription(systemId)));
+    return QnLocalSystemDescriptionPtr(new QnLocalSystemDescription(systemId));
 }
 
-QnSystemDescription::PointerType QnLocalSystemDescription::create(
+QnLocalSystemDescriptionPtr QnLocalSystemDescription::create(
     const QString& systemId,
-    const QnUuid& localSystemId,
+    const nx::Uuid& localSystemId,
     const QString& systemName)
 {
-    return PointerType(static_cast<base_type*>(
-        new QnLocalSystemDescription(systemId, localSystemId, systemName)));
+    return QnLocalSystemDescriptionPtr(
+        new QnLocalSystemDescription(systemId, localSystemId, systemName));
 }
 
 QnLocalSystemDescription::QnLocalSystemDescription(const QString& systemId):
-    base_type(systemId, QnUuid::fromStringSafe(systemId), tr("New Server")),
+    base_type(systemId, nx::Uuid::fromStringSafe(systemId), tr("New Server")),
     m_isNewSystem(true)
 {
     init();
@@ -27,7 +27,7 @@ QnLocalSystemDescription::QnLocalSystemDescription(const QString& systemId):
 
 QnLocalSystemDescription::QnLocalSystemDescription(
     const QString& systemId,
-    const QnUuid& localSystemId,
+    const nx::Uuid& localSystemId,
     const QString& systemName)
     :
     base_type(systemId, localSystemId, systemName),

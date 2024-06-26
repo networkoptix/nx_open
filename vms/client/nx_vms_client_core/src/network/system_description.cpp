@@ -38,7 +38,7 @@ using ServerCompatibilityValidator = nx::vms::common::ServerCompatibilityValidat
 
 QnSystemDescription::QnSystemDescription(
     const QString& systemId,
-    const QnUuid& localId,
+    const nx::Uuid& localId,
     const QString& systemName)
     :
     m_id(systemId),
@@ -58,7 +58,7 @@ QnSystemDescription::~QnSystemDescription()
 QString QnSystemDescription::extractSystemName(const QString& systemName)
 {
     return systemName.isEmpty()
-        ? '<' + tr("Unnamed System") + '>'
+        ? '<' + tr("Unnamed Site") + '>'
         : systemName;
 }
 
@@ -67,7 +67,7 @@ QString QnSystemDescription::id() const
     return m_id;
 }
 
-QnUuid QnSystemDescription::localId() const
+nx::Uuid QnSystemDescription::localId() const
 {
     return m_localId;
 }
@@ -87,7 +87,7 @@ QString QnSystemDescription::ownerFullName() const
     return m_ownerFullName;
 }
 
-bool QnSystemDescription::isReachableServer(const QnUuid& serverId) const
+bool QnSystemDescription::isReachableServer(const nx::Uuid& serverId) const
 {
     return m_reachableServers.contains(serverId);
 }
@@ -152,12 +152,12 @@ void QnSystemDescription::addServer(
         emit versionChanged();
 }
 
-bool QnSystemDescription::containsServer(const QnUuid& serverId) const
+bool QnSystemDescription::containsServer(const nx::Uuid& serverId) const
 {
     return m_servers.contains(serverId);
 }
 
-nx::vms::api::ModuleInformationWithAddresses QnSystemDescription::getServer(const QnUuid& serverId) const
+nx::vms::api::ModuleInformationWithAddresses QnSystemDescription::getServer(const nx::Uuid& serverId) const
 {
     NX_ASSERT(m_servers.contains(serverId),
         "System does not contain specified server");
@@ -268,7 +268,13 @@ nx::utils::SoftwareVersion QnSystemDescription::version() const
         })->version;
 }
 
-void QnSystemDescription::handleReachableServerAdded(const QnUuid& serverId)
+QString QnSystemDescription::idForToStringFromPtr() const
+{
+    return nx::format("System %1 [id: %2, local id: %3]",
+        name(), id(), localId());
+}
+
+void QnSystemDescription::handleReachableServerAdded(const nx::Uuid& serverId)
 {
     const bool containsAlready = m_reachableServers.contains(serverId);
     NX_ASSERT(!containsAlready, "Server is supposed as reachable already");
@@ -292,7 +298,7 @@ void QnSystemDescription::handleReachableServerAdded(const QnUuid& serverId)
     emit reachableStateChanged();
 }
 
-void QnSystemDescription::handleServerRemoved(const QnUuid& serverId)
+void QnSystemDescription::handleServerRemoved(const nx::Uuid& serverId)
 {
     const bool wasReachable = isReachable();
     NX_DEBUG(this, nx::format("Cloud system <%1>, server <%2>: removing from reachable list"), id(),
@@ -311,7 +317,7 @@ void QnSystemDescription::handleServerRemoved(const QnUuid& serverId)
     }
 }
 
-void QnSystemDescription::removeServer(const QnUuid& serverId)
+void QnSystemDescription::removeServer(const nx::Uuid& serverId)
 {
     const bool containsServer = m_servers.contains(serverId);
     NX_ASSERT(containsServer,
@@ -324,7 +330,7 @@ void QnSystemDescription::removeServer(const QnUuid& serverId)
         [this]{ emit saasStateChanged(); });
 
     handleServerRemoved(serverId);
-    const auto priorityPred = [serverId](const QnUuid& id) { return (serverId == id); };
+    const auto priorityPred = [serverId](const nx::Uuid& id) { return (serverId == id); };
     const auto it = std::find_if(m_prioritized.begin(), m_prioritized.end(), priorityPred);
     if (it != m_prioritized.end())
         m_prioritized.erase(it);
@@ -349,7 +355,7 @@ void QnSystemDescription::setName(const QString& value)
     emit systemNameChanged();
 }
 
-void QnSystemDescription::setServerHost(const QnUuid& serverId, const nx::utils::Url& host)
+void QnSystemDescription::setServerHost(const nx::Uuid& serverId, const nx::utils::Url& host)
 {
     const bool containsServer = m_servers.contains(serverId);
 
@@ -370,7 +376,7 @@ void QnSystemDescription::setServerHost(const QnUuid& serverId, const nx::utils:
     emit serverChanged(serverId, QnServerField::Host);
 }
 
-nx::utils::Url QnSystemDescription::getServerHost(const QnUuid& serverId) const
+nx::utils::Url QnSystemDescription::getServerHost(const nx::Uuid& serverId) const
 {
     NX_ASSERT(m_servers.contains(serverId),
         "System does not contain specified server");
@@ -378,7 +384,7 @@ nx::utils::Url QnSystemDescription::getServerHost(const QnUuid& serverId) const
     return m_hosts.value(serverId);
 }
 
-QSet<nx::utils::Url> QnSystemDescription::getServerRemoteAddresses(const QnUuid& serverId) const
+QSet<nx::utils::Url> QnSystemDescription::getServerRemoteAddresses(const nx::Uuid& serverId) const
 {
     NX_ASSERT(m_servers.contains(serverId),
         "System does not contain specified server");
@@ -407,7 +413,7 @@ QSet<nx::utils::Url> QnSystemDescription::getServerRemoteAddresses(const QnUuid&
     return addresses;
 }
 
-qint64 QnSystemDescription::getServerLastUpdatedMs(const QnUuid& serverId) const
+qint64 QnSystemDescription::getServerLastUpdatedMs(const nx::Uuid& serverId) const
 {
     NX_ASSERT(m_servers.contains(serverId),
         "System does not contain specified server");
