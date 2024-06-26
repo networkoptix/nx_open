@@ -2,25 +2,16 @@
 
 #pragma once
 
-#include <QtCore/QSharedPointer>
-
+#include <network/cloud_system_data.h>
 #include <network/system_description.h>
 
-class QnCloudSystemDescription: public QnSystemDescription
+class NX_VMS_CLIENT_CORE_API QnCloudSystemDescription: public QnSystemDescription
 {
     Q_OBJECT
     using base_type = QnSystemDescription;
 
 public:
-    static QSharedPointer<QnCloudSystemDescription> create(
-        const QString& systemId,
-        const QnUuid& localSystemId,
-        const QString& systemName,
-        const QString& ownerEmail,
-        const QString& ownerFullName,
-        bool running,
-        bool system2faEnabled,
-        const QString& organizationId);
+    static QSharedPointer<QnCloudSystemDescription> create(const QnCloudSystem& system);
 
     virtual ~QnCloudSystemDescription() = default;
 
@@ -53,7 +44,7 @@ public: // Overrides
 private:
     QnCloudSystemDescription(
         const QString& systemId,
-        const QnUuid& localSystemId,
+        const nx::Uuid& localSystemId,
         const QString& systemName,
         const QString& ownerEmail,
         const QString& ownerFullName,

@@ -112,7 +112,7 @@ struct CloudSystemsFinder::Private
         if (ini().doNotPingCloudSystems)
             return;
 
-        static const QnUuid kAdapterFuncId = QnUuid::createUuid();
+        static const nx::Uuid kAdapterFuncId = nx::Uuid::createUuid();
         NX_VERBOSE(this, "Cloud system <%1>: send moduleInformation request", cloudSystemId);
 
         ClientPool::Request request;
@@ -247,21 +247,21 @@ struct CloudSystemsFinder::Private
                 continue;
 
             const auto systemDescription = itCurrent.value();
-            NX_DEBUG(this, "Set online state for the system \"%1\" <%2> to [%3]",
-                systemDescription->name(), systemDescription->id(), system.online);
+            NX_DEBUG(this, "Set online state for the system %1 to [%2]",
+                systemDescription, system.online);
             systemDescription->setOnline(system.online);
 
-            NX_VERBOSE(this, "Update last known system version for the system \"%1\" <%2> to [%3]",
-                systemDescription->name(), systemDescription->id(), system.version);
+            NX_VERBOSE(this, "Update last known system version for the system %1 to [%2]",
+                systemDescription, system.version);
             const auto version = nx::utils::SoftwareVersion(system.version);
             systemDescription->updateLastKnownVersion(version);
 
-            NX_VERBOSE(this, "Set 2fa state for the system \"%1\" <%2> to [%3]",
-                systemDescription->name(), systemDescription->id(), system.system2faEnabled);
+            NX_VERBOSE(this, "Set 2fa state for the system %1 to [%2]",
+                systemDescription, system.system2faEnabled);
             systemDescription->set2faEnabled(system.system2faEnabled);
 
-            NX_VERBOSE(this, "Set organization Id for the system \"%1\" <%2> to [%3]",
-                systemDescription->name(), systemDescription->id(), system.organizationId);
+            NX_VERBOSE(this, "Set organization Id for the system %1 to [%2]",
+                systemDescription, system.organizationId);
             systemDescription->setOrganization(system.organizationId);
         }
     }
@@ -280,17 +280,7 @@ struct CloudSystemsFinder::Private
         {
             NX_ASSERT(!helpers::isNewSystem(system), "Cloud system can't be NEW system");
 
-            const auto targetId = helpers::getTargetSystemId(system);
-            const auto systemDescription = QnCloudSystemDescription::create(
-                targetId,
-                system.localId,
-                system.name,
-                system.ownerAccountEmail,
-                system.ownerFullName,
-                system.online,
-                system.system2faEnabled,
-                system.organizationId);
-
+            const auto systemDescription = QnCloudSystemDescription::create(system);
             if (system.online)
             {
                 auto initialServer = createInitialServer(system);
@@ -305,17 +295,21 @@ struct CloudSystemsFinder::Private
 
         const auto newIds = nx::utils::toQSet(updatedSystems.keys());
 
-        QHash<QString, QnUuid> removedTargetIds;
+        NX_DEBUG(this, "Update systems: %1", newIds);
+
+        QHash<QString, nx::Uuid> removedTargetIds;
 
         {
             NX_MUTEX_LOCKER lock(&mutex);
 
             const auto oldIds = nx::utils::toQSet(systems.keys());
-            const auto addedCloudIds = IdsSet(newIds).subtract(oldIds);
 
-            const auto removedCloudIds = IdsSet(oldIds).subtract(newIds);
-            for (const auto addedCloudId : addedCloudIds)
+            const auto addedCloudIds = IdsSet(newIds).subtract(oldIds);
+            NX_DEBUG(this, "Add systems: %1", newIds);
+            for (const auto addedCloudId: addedCloudIds)
             {
+                NX_DEBUG(this, "Found cloud system %1", addedCloudId);
+
                 const auto system = updatedSystems[addedCloudId];
                 emit q->systemDiscovered(system);
 
@@ -323,9 +317,15 @@ struct CloudSystemsFinder::Private
                 pingSystem(addedCloudId);
             }
 
-            for (const auto removedCloudId : removedCloudIds)
+            const auto removedCloudIds = IdsSet(oldIds).subtract(newIds);
+            NX_DEBUG(this, "Remove systems: %1", removedCloudIds);
+            for (const auto removedCloudId: removedCloudIds)
             {
+                NX_DEBUG(this, "Lost cloud system %1", removedCloudId);
+
                 const auto system = systems[removedCloudId];
+                NX_ASSERT(removedCloudId == system->id());
+
                 removedTargetIds.insert(system->id(), system->localId());
                 systems.remove(removedCloudId);
             }
@@ -336,8 +336,7 @@ struct CloudSystemsFinder::Private
         for (const auto id: removedTargetIds.keys())
         {
             const auto localId = removedTargetIds[id];
-            emit q->systemLostInternal(id, localId);
-            emit q->systemLost(id);
+            emit q->systemLost(id, localId);
         }
     }
 };

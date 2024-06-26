@@ -30,7 +30,7 @@ bool isSameSystem(
     const QnBaseSystemDescription& first,
     const QnBaseSystemDescription& second)
 {
-    typedef QSet<QnUuid> ServerIdsSet;
+    typedef QSet<nx::Uuid> ServerIdsSet;
     static const auto extractServerIds =
         [](const QnBaseSystemDescription::ServersList& servers) -> ServerIdsSet
         {
@@ -86,15 +86,17 @@ bool QnSystemDescriptionAggregator::containsSystem(int priority) const
     return m_systems.contains(priority);
 }
 
-void QnSystemDescriptionAggregator::mergeSystem(int priority,
-    const QnSystemDescriptionPtr& system)
+void QnSystemDescriptionAggregator::mergeSystem(int priority, const QnSystemDescriptionPtr& system)
 {
-    NX_ASSERT(system, "System is empty");
-    if (!system)
+    if (!NX_ASSERT(system))
         return;
 
-    if (m_systems.contains(priority))
-        removeSystem(m_systems[priority]->id(), priority);
+    if (const auto it = m_systems.find(priority); it != m_systems.end())
+    {
+        const auto oldSystem = *it;
+
+        removeSystem(m_systems[priority]->id(), priority, /*isMerge*/ true);
+    }
 
     m_systems.insert(priority, system);
 
@@ -149,7 +151,7 @@ void QnSystemDescriptionAggregator::emitSystemChanged()
     emit saasStateChanged();
 }
 
-void QnSystemDescriptionAggregator::handleServerChanged(const QnUuid& serverId,
+void QnSystemDescriptionAggregator::handleServerChanged(const nx::Uuid& serverId,
     QnServerFields fields)
 {
     const auto it = std::find_if(m_servers.begin(), m_servers.end(),
@@ -184,22 +186,24 @@ void QnSystemDescriptionAggregator::onOnlineStateChanged()
     emit onlineStateChanged();
 }
 
-void QnSystemDescriptionAggregator::removeSystem(const QString& systemId, int priority)
+void QnSystemDescriptionAggregator::removeSystem(
+    const QString& systemId, int priority, bool isMerge)
 {
     if (!m_systems.contains(priority))
         return;
 
     const auto& system = m_systems[priority];
 
-    if (system->id() != systemId)
+    if (system->id() != systemId && !isMerge)
         return;
 
-    const auto oldServers = servers();
-
-    disconnect(system.data(), nullptr, this, nullptr);
+    system->disconnect(this);
     m_systems.remove(priority);
 
-    updateServers();
+    // There is no need to update servers during a systems merge. They will be updated at the end
+    // of the mergeSystem() (see VMS-47244).
+    if (!isMerge)
+        updateServers();
 
     if (!m_systems.isEmpty())
         emitSystemChanged();
@@ -210,9 +214,9 @@ QString QnSystemDescriptionAggregator::id() const
     return (isEmptyAggregator() ? QString() : m_systems.first()->id());
 }
 
-QnUuid QnSystemDescriptionAggregator::localId() const
+nx::Uuid QnSystemDescriptionAggregator::localId() const
 {
-    return (isEmptyAggregator() ? QnUuid() : m_systems.first()->localId());
+    return (isEmptyAggregator() ? nx::Uuid() : m_systems.first()->localId());
 }
 
 QString QnSystemDescriptionAggregator::name() const
@@ -270,7 +274,7 @@ nx::vms::api::SaasState QnSystemDescriptionAggregator::saasState() const
         : m_systems.first()->saasState();
 }
 
-bool QnSystemDescriptionAggregator::isReachableServer(const QnUuid& serverId) const
+bool QnSystemDescriptionAggregator::isReachableServer(const nx::Uuid& serverId) const
 {
     if (isEmptyAggregator())
         return false;
@@ -336,7 +340,7 @@ QnBaseSystemDescription::ServersList QnSystemDescriptionAggregator::gatherServer
     return m_systems.first()->servers();
 }
 
-bool QnSystemDescriptionAggregator::containsServer(const QnUuid& serverId) const
+bool QnSystemDescriptionAggregator::containsServer(const nx::Uuid& serverId) const
 {
     for (const auto& systemDescription: m_systems)
     {
@@ -347,7 +351,7 @@ bool QnSystemDescriptionAggregator::containsServer(const QnUuid& serverId) const
 }
 
 nx::vms::api::ModuleInformationWithAddresses QnSystemDescriptionAggregator::getServer(
-    const QnUuid& serverId) const
+    const nx::Uuid& serverId) const
 {
     for (const auto& systemDescription: m_systems)
     {
@@ -357,7 +361,7 @@ nx::vms::api::ModuleInformationWithAddresses QnSystemDescriptionAggregator::getS
     return {};
 }
 
-nx::utils::Url QnSystemDescriptionAggregator::getServerHost(const QnUuid& serverId) const
+nx::utils::Url QnSystemDescriptionAggregator::getServerHost(const nx::Uuid& serverId) const
 {
     for (const auto& systemDescription: m_systems)
     {
@@ -376,7 +380,7 @@ nx::utils::Url QnSystemDescriptionAggregator::getServerHost(const QnUuid& server
 }
 
 QSet<nx::utils::Url> QnSystemDescriptionAggregator::getServerRemoteAddresses(
-    const QnUuid& serverId) const
+    const nx::Uuid& serverId) const
 {
     for (const auto& systemDescription: m_systems)
     {
@@ -387,7 +391,7 @@ QSet<nx::utils::Url> QnSystemDescriptionAggregator::getServerRemoteAddresses(
     return {};
 }
 
-qint64 QnSystemDescriptionAggregator::getServerLastUpdatedMs(const QnUuid& serverId) const
+qint64 QnSystemDescriptionAggregator::getServerLastUpdatedMs(const nx::Uuid& serverId) const
 {
     qint64 result = 0;
 
@@ -449,4 +453,13 @@ nx::utils::SoftwareVersion QnSystemDescriptionAggregator::version() const
         {
             return l->version() < r->version();
         }))->version();
+}
+
+QString QnSystemDescriptionAggregator::idForToStringFromPtr() const
+{
+    QString result = nx::format("System Aggregator %1 [id: %2, local id: %3]:\n",
+        name(), id(), localId());
+    for (const auto& system: m_systems)
+        result += nx::toString(system) + '\n';
+    return result;
 }

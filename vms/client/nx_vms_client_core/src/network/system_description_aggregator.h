@@ -23,12 +23,13 @@ public:
 
     void mergeSystem(int priority, const QnSystemDescriptionPtr& system);
 
-    void removeSystem(const QString& systemId, int priority);
+    // TODO: #sivanov SystemId check is highly suspicious here, aggregator must not know about
+    // model-level ids.
+    void removeSystem(const QString& systemId, int priority, bool isMerge = false);
 
-public: // overrides
     QString id() const override;
 
-    QnUuid localId() const override;
+    nx::Uuid localId() const override;
 
     QString name() const override;
 
@@ -50,17 +51,17 @@ public: // overrides
 
     nx::vms::api::SaasState saasState() const override;
 
-    bool isReachableServer(const QnUuid& serverId) const override;
+    bool isReachableServer(const nx::Uuid& serverId) const override;
 
-    bool containsServer(const QnUuid& serverId) const override;
+    bool containsServer(const nx::Uuid& serverId) const override;
 
-    nx::vms::api::ModuleInformationWithAddresses getServer(const QnUuid& serverId) const override;
+    nx::vms::api::ModuleInformationWithAddresses getServer(const nx::Uuid& serverId) const override;
 
-    nx::utils::Url getServerHost(const QnUuid& serverId) const override;
+    nx::utils::Url getServerHost(const nx::Uuid& serverId) const override;
 
-    QSet<nx::utils::Url> getServerRemoteAddresses(const QnUuid& serverId) const override;
+    QSet<nx::utils::Url> getServerRemoteAddresses(const nx::Uuid& serverId) const override;
 
-    qint64 getServerLastUpdatedMs(const QnUuid& serverId) const override;
+    qint64 getServerLastUpdatedMs(const nx::Uuid& serverId) const override;
 
     bool hasLocalServer() const override;
 
@@ -69,6 +70,8 @@ public: // overrides
     virtual bool isOauthSupported() const override;
 
     virtual nx::utils::SoftwareVersion version() const override;
+
+    virtual QString idForToStringFromPtr() const override;
 
 private:
     void emitSystemChanged();
@@ -80,7 +83,7 @@ private:
 
     void updateServers();
 
-    void handleServerChanged(const QnUuid& serverId, QnServerFields fields);
+    void handleServerChanged(const nx::Uuid& serverId, QnServerFields fields);
 
     bool isEmptyAggregator() const;
 
