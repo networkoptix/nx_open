@@ -25,7 +25,7 @@ Control
     {
         x: 8
         y: 6
-        color: displayValue ? ColorTheme.light : ColorTheme.colors.dark17
+        color: ColorTheme.light
     }
 
     Component
@@ -34,7 +34,7 @@ Control
 
         ElementViewer
         {
-            text: displayValue || qsTr("ANY")
+            text: displayValue
         }
     }
 
@@ -48,7 +48,7 @@ Control
             leftPadding: 26
             rightPadding: 8
             verticalAlignment: Text.AlignVCenter
-            text: displayValue || qsTr("ANY color")
+            text: displayValue
 
             Rectangle
             {
@@ -58,7 +58,7 @@ Control
                 radius: 1
                 anchors.verticalCenter: parent.verticalCenter
                 border.color: ColorTheme.transparent(ColorTheme.colors.light1, 0.1)
-                color: CoreUtils.getValue(value, "transparent")
+                color: value ? value : "transparent"
             }
         }
     }

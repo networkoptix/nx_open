@@ -40,6 +40,8 @@ QVariant LookupListEntriesModel::Private::booleanFormatter(const QString& value)
         return tr("Yes");
     if (value == "false")
         return tr("No");
+
+    NX_ASSERT(false, "Unexpected value");
     return {};
 }
 
@@ -49,6 +51,8 @@ QVariant LookupListEntriesModel::Private::objectFormatter(const QString& value)
         return tr("Present");
     if (value == "false")
         return tr("Absent");
+
+    NX_ASSERT(false, "Unexpected value");
     return {};
 }
 
@@ -59,10 +63,13 @@ QVariant LookupListEntriesModel::Private::getDisplayValue(
         return value; //< Generic Model.
 
     auto it = formatterByAttributeName.find(attributeName);
-    if (it == formatterByAttributeName.end())
-        return {}; //< Incorrect attributeName.
+    if (!NX_ASSERT(it != formatterByAttributeName.end(), "Incorrect attribute name"))
+        return {};
 
-    return value.isEmpty() ? value : it->second(value);
+    if (value.isEmpty())
+        return tr("Any %1").arg(attributeName);
+
+    return it->second(value);
 }
 
 bool LookupListEntriesModel::Private::intValidator(const QString& value)
@@ -160,9 +167,9 @@ void LookupListEntriesModel::Private::initAttributeFunctions()
                             {
                                 return keyValue.first == value || keyValue.second == value;
                             });
-                        return colorIt == colorByHex.cend()
-                            ? QString()
-                            : colorIt->second;
+                        if (!NX_ASSERT(colorIt != colorByHex.cend(), "Unexpected value"))
+                            return QString();
+                        return colorIt->second;
                     };
                     break;
                 }

@@ -48,7 +48,7 @@ ComboBox
 
     function getDecorationPath()
     {
-        if (!withIconSection)
+        if (!withIconSection || !model)
             return ""
         if (Array.isArray(control.model))
             return model[currentIndex] ? model[currentIndex][decorationRole] : ""
@@ -61,7 +61,7 @@ ComboBox
     onCurrentIndexChanged: decorationPath = getDecorationPath()
     onModelChanged:
     {
-        if (Array.isArray(control.model))
+        if (withIconSection && Array.isArray(control.model))
             decorationPath = model[currentIndex] ? model[currentIndex][decorationRole] : ""
     }
 
