@@ -7,9 +7,9 @@
 #include <QtWidgets/QStyle>
 #include <QtWidgets/private/qwidget_p.h>
 
-#include <nx/vms/client/desktop/style/helper.h>
-
 #include <nx/vms/client/desktop/common/widgets/hint_button.h>
+#include <nx/vms/client/desktop/style/helper.h>
+#include <ui/widgets/word_wrapped_label.h>
 
 namespace nx::vms::client::desktop {
 
@@ -67,19 +67,26 @@ void WidgetWithHintPrivate::setSpacing(int value)
     updateContentsMargins();
 }
 
+QWidget* WidgetWithHintPrivate::parentObject()
+{
+    auto wrappedLabel = qobject_cast<QnWordWrappedLabel*>(q);
+    return wrappedLabel ? wrappedLabel->label() : q;
+}
+
 void WidgetWithHintPrivate::handleResize()
 {
     auto rect = q->rect();
     Qt::Alignment alignment = Qt::AlignLeft;
 
-    if (auto label = qobject_cast<QLabel*>(q))
+    const auto parent = parentObject();
+    if (auto label = qobject_cast<QLabel*>(parent))
         alignment = label->alignment();
 
     if (!alignment.testFlag(Qt::AlignRight))
-        rect.setWidth(q->sizeHint().width()); //< Already includes added width.
+        rect.setWidth(parent->sizeHint().width()); //< Already includes added width.
 
     const auto buttonGeometry = QStyle::alignedRect(
-        q->layoutDirection(),
+        parent->layoutDirection(),
         Qt::AlignRight | Qt::AlignVCenter,
         m_button->size(),
         rect);
@@ -104,14 +111,15 @@ void WidgetWithHintPrivate::updateContentsMargins()
     else
     {
         const auto width = m_button->width() + m_spacing;
-        const auto height = qMax(0, m_button->height() - q->height());
+        auto parent = parentObject();
+        const auto height = qMax(0, m_button->height() - parent->height());
         const auto top = height / 2;
         const auto bottom = height - top;
 
-        if (q->layoutDirection() == Qt::RightToLeft)
-            q->setContentsMargins(width, top, 0, bottom);
+        if (parent->layoutDirection() == Qt::RightToLeft)
+            parent->setContentsMargins(width, top, 0, bottom);
         else
-            q->setContentsMargins(0, top, width, bottom);
+            parent->setContentsMargins(0, top, width, bottom);
     }
 }
 

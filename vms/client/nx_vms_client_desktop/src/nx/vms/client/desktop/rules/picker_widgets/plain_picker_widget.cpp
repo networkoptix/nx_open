@@ -24,9 +24,8 @@ PlainPickerWidget::PlainPickerWidget(
         style::Metrics::kDefaultTopLevelMargin,
         4);
 
-    m_label = new WidgetWithHint<QnElidedLabel>;
-    m_label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-    m_label->setElideMode(Qt::ElideRight);
+    m_label = new WidgetWithHint<QnWordWrappedLabel>;
+    m_label->label()->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
     m_label->setFixedHeight(28);
     m_label->setSizePolicy(QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred));
     m_label->setText(displayName);

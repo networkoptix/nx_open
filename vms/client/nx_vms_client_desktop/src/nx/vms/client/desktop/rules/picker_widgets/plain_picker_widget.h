@@ -4,7 +4,7 @@
 
 #include <nx/vms/client/desktop/common/widgets/alert_label.h>
 #include <nx/vms/client/desktop/common/widgets/widget_with_hint.h>
-#include <ui/widgets/common/elided_label.h>
+#include <ui/widgets/word_wrapped_label.h>
 
 #include "picker_widget.h"
 
@@ -23,7 +23,7 @@ public:
     void setValidity(const vms::rules::ValidationResult& validationResult) override;
 
 protected:
-    WidgetWithHint<QnElidedLabel>* m_label{nullptr};
+    WidgetWithHint<QnWordWrappedLabel>* m_label{nullptr};
     QWidget* m_contentWidget{nullptr};
 
 private:
