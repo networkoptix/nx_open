@@ -32,6 +32,7 @@ public:
     void handleResize();
 
 private:
+    QWidget* parentObject();
     void updateContentsMargins();
 
 private:

@@ -4,6 +4,7 @@
 
 #include <nx/vms/rules/action_builder_fields/optional_time_field.h>
 #include <ui/widgets/business/time_duration_widget.h>
+#include <ui/widgets/common/elided_label.h>
 
 #include "field_picker_widget.h"
 

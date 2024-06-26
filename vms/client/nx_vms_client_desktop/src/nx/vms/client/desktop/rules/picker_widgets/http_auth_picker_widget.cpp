@@ -11,6 +11,7 @@
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <ui/dialogs/notification_sound_manager_dialog.h>
+#include <ui/widgets/common/elided_label.h>
 #include <ui/workbench/workbench_context.h>
 
 #include "../utils/strings.h"

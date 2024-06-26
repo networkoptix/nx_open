@@ -6,6 +6,7 @@
 
 #include <nx/vms/rules/utils/field.h>
 #include <ui/common/read_only.h>
+#include <ui/widgets/common/elided_label.h>
 
 namespace nx::vms::client::desktop::rules {
 
