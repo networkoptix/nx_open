@@ -253,7 +253,7 @@ QRectF AreaTooltipItem::boundingRect() const
 void AreaTooltipItem::paint(
     QPainter* painter,
     const QStyleOptionGraphicsItem* /*option*/,
-    QWidget* widget)
+    QWidget* /*widget*/)
 {
     d->updateTextPixmap();
 
@@ -262,6 +262,7 @@ void AreaTooltipItem::paint(
 
     const PainterTransformScaleStripper scaleStripper(painter);
     const auto mappedRect = scaleStripper.mapRect(boundingRect());
+    const auto pixelRatio = painter->device()->devicePixelRatio();
 
     if (d->backgroundColor.isValid())
     {
@@ -275,14 +276,14 @@ void AreaTooltipItem::paint(
 
         arrowPos.geometry.translate(-mappedRect.topLeft());
 
-        const auto imageSize = (mappedRect.size() * widget->devicePixelRatio()).toSize();
+        const auto imageSize = (mappedRect.size() * pixelRatio).toSize();
 
         if (imageSize != d->backgroundCache.size() || arrowPos.geometry != d->arrowGeometry)
         {
             d->arrowGeometry = arrowPos.geometry;
 
             QImage image(imageSize, QImage::Format_RGBA8888_Premultiplied);
-            image.setDevicePixelRatio(widget->devicePixelRatio());
+            image.setDevicePixelRatio(pixelRatio);
             image.fill(Qt::transparent);
 
             QPainter p(&image);
@@ -314,12 +315,12 @@ void AreaTooltipItem::paint(
         // We need to generate cache image with the exact same size as background
         // and render only text into it to avoid moving text on mouse hover.
 
-        const auto imageSize = (mappedRect.size() * widget->devicePixelRatio()).toSize();
+        const auto imageSize = (mappedRect.size() * pixelRatio).toSize();
 
         if (d->noBackGroundCache.size() != imageSize)
         {
             QImage image(imageSize, QImage::Format_RGBA8888_Premultiplied);
-            image.setDevicePixelRatio(widget->devicePixelRatio());
+            image.setDevicePixelRatio(pixelRatio);
             image.fill(Qt::transparent);
 
             QPainter p(&image);
