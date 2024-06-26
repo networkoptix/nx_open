@@ -866,7 +866,7 @@ bool CameraSettingsDialogStore::dualStreamingEnabled() const
 
 bool CameraSettingsDialogStore::recordingEnabled() const
 {
-    return d->state.recording.enabled();
+    return d->state.recording.enabled.valueOr(false);
 }
 
 void CameraSettingsDialogStore::setVirtualCameraIgnoreTimeZone(bool value)
