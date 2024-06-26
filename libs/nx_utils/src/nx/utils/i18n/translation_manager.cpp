@@ -150,12 +150,6 @@ void TranslationManager::installTranslation(const Translation& translation)
     }
 }
 
-std::chrono::milliseconds TranslationManager::defaultInstallTranslationTimeout()
-{
-    static const std::chrono::seconds value([] { return nx::build_info::isArm() ? 5 : 3; }());
-    return value;
-}
-
 PreloadedTranslationReference TranslationManager::preloadTranslation(
     const QString& locale)
 {

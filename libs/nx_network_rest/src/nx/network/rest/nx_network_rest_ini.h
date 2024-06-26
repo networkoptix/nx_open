@@ -26,6 +26,9 @@ struct Ini: nx::kit::IniConfig
         return (value.count() <= 0 || value > default_) ? default_ : value;
     }
 
+    NX_INI_INT(5, waitForTranslationLocaleS,
+        "Wait for translation locale installation on API call. Zero means do not wait.");
+
     NX_INI_FLAG(true, auditOnlyParameterNames,
         "Audit parameter values along with names if false.");
 };
