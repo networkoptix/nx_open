@@ -73,7 +73,7 @@ Control
 
         onActivated: (index) =>
         {
-            control.value = isIndexRelatedToValue(index) ? valueAt(index) : qsTr("Any %1").arg(attribute.name)
+            control.value = isIndexRelatedToValue(index) ? valueAt(index) : ""
             control.finishEditing()
         }
 
