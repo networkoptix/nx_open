@@ -108,7 +108,7 @@ private:
     QPointer<QWidget> m_focusScope;
 
     // Special information to keep selection & expanded state while processing resource groups.
-    QPersistentModelIndex m_nestedResourceIndex;
+    // nestedResourceIndex is saved/restored to the model via pushState/popState.
     int m_nestedResourceLevel = -1; //< Relative to a group being processed.
     QHash<QnResourcePtr, int /*depth*/> m_groupExpandedState;
 };

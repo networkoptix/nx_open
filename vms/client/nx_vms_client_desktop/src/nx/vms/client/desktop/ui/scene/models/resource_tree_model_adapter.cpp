@@ -582,6 +582,12 @@ bool ResourceTreeModelAdapter::isFiltering() const
     return d->isFiltering;
 }
 
+void ResourceTreeModelAdapter::invalidateFilter()
+{
+    if (d->isFiltering)
+        d->updateFilter();
+}
+
 QModelIndex ResourceTreeModelAdapter::rootIndex() const
 {
     return d->rootIndex;
