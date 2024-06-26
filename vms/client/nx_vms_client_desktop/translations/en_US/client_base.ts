@@ -12080,7 +12080,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
         <translation></translation>
     </message>
     <message>
-        <source>You can copy the Access Link below, and share it with the implied user.</source>
+        <source>Copy the Access Link and share it with intended user</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
