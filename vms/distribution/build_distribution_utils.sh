@@ -655,7 +655,7 @@ distrib_copyServerBins() # additional_bins_to_copy...
     # if ENABLE_ROOT_TOOL is not set, consider it to be "false".
     if [[ "${ENABLE_ROOT_TOOL-"false"}" == "true" ]]; then
         echo "Copying root-tool"
-        install -m 750 "${BUILD_DIR}/bin/root_tool" "${stage_bin}/root-tool"
+        install -m 750 "${BUILD_DIR}/bin/root-tool" "${stage_bin}/"
 
         # Use the flavor-specific system_commands.conf if it exists; otherwise use the standard
         # one.
