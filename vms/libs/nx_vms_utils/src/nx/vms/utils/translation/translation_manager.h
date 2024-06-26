@@ -47,8 +47,6 @@ public:
     /** Install the provided translation on an application level. */
     static void installTranslation(const Translation& translation);
 
-    static std::chrono::milliseconds defaultInstallTranslationTimeout();
-
     /*
      * Prepare and asynchronously install the specific locale translation data.
      * Reference counting is used internally, so the same locale translation may be preloaded
@@ -90,7 +88,7 @@ public:
     [[nodiscard]]
     std::unique_ptr<ScopedLocale> installScopedLocale(
         const QString& locale,
-        std::chrono::milliseconds maxWaitTime = defaultInstallTranslationTimeout());
+        std::chrono::milliseconds maxWaitTime = std::chrono::milliseconds(5));
 
     /**
      * Overloaded method.
@@ -101,7 +99,7 @@ public:
     [[nodiscard]]
     std::unique_ptr<ScopedLocale> installScopedLocale(
         const std::vector<QString>& preferredLocales,
-        std::chrono::milliseconds maxWaitTime = defaultInstallTranslationTimeout());
+        std::chrono::milliseconds maxWaitTime = std::chrono::milliseconds(5));
 
     /**
      * Get current thread-level translation.
