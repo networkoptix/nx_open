@@ -27,10 +27,17 @@ class HumanReadableTest: public ::testing::Test
 protected:
     virtual void SetUp() override
     {
-        nx::i18n::TranslationManager translationManager;
-        const bool loaded = translationManager.installTranslation(kLocale);
+        m_translationManager = std::make_unique<nx::i18n::TranslationManager>();
+        const bool loaded = m_translationManager->installTranslation(kLocale);
         ASSERT_TRUE(loaded);
     }
+
+    virtual void TearDown() override
+    {
+        m_translationManager.reset();
+    }
+
+    std::unique_ptr<nx::i18n::TranslationManager> m_translationManager;
 };
 
 TEST_F(HumanReadableTest, timeSpan)

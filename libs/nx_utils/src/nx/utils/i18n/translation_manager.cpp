@@ -29,11 +29,13 @@ namespace nx::i18n {
 struct TranslationManager::Private
 {
     const QList<Translation> translations{loadTranslations()};
+    QList<QPointer<QTranslator>> translators;
 
     mutable nx::Mutex mutex;
     QHash<QString, QSharedPointer<TranslationOverlay>> overlays;
     std::atomic<bool> assertOnOverlayInstallationFailure = false;
     std::atomic<bool> isLoadTranslationsEnabled = true;
+    std::atomic<bool> initialized = true;
 
     std::optional<Translation> findTranslation(const QString& localeCode)
     {
@@ -86,6 +88,7 @@ TranslationManager::TranslationManager(QObject *parent):
 
 TranslationManager::~TranslationManager()
 {
+    deinitialize();
 }
 
 QString TranslationManager::getCurrentThreadLocale()
@@ -120,6 +123,11 @@ bool TranslationManager::installTranslation(const QString& localeCode)
 
 void TranslationManager::installTranslation(const Translation& translation)
 {
+    // Translations in the server can be installed in a delayed functor, after the manager was
+    // deinitialized already.
+    if (!d->isLoadTranslationsEnabled)
+        return;
+
     QString localeCode = translation.localeCode;
     localeCode.replace('-', '_'); /* Minus sign is not supported as a separator... */
 
@@ -129,9 +137,16 @@ void TranslationManager::installTranslation(const Translation& translation)
 
     for (const QString& file: translation.filePaths)
     {
-        auto translator = std::make_unique<QTranslator>(qApp);
-        if (translator->load(file))
-            qApp->installTranslator(translator.release());
+        auto translator = new QTranslator(qApp);
+        if (NX_ASSERT(translator->load(file), "File %1 cannot be loaded", file))
+        {
+            d->translators.append(translator);
+            qApp->installTranslator(translator);
+        }
+        else
+        {
+            delete translator;
+        }
     }
 }
 
@@ -211,9 +226,35 @@ std::unique_ptr<ScopedLocale> TranslationManager::installScopedLocale(
     return std::make_unique<ScopedLocale>(PreloadedTranslationReference(), 0ms);
 }
 
-void TranslationManager::setLoadTranslationsEnabled(bool value)
+void TranslationManager::stopLoadingTranslations()
 {
-    d->isLoadTranslationsEnabled = value;
+    d->isLoadTranslationsEnabled = false;
+}
+
+void TranslationManager::deinitialize()
+{
+    stopLoadingTranslations();
+    {
+        NX_MUTEX_LOCKER lock(&d->mutex);
+        if (!d->initialized) //< Avoid double deinitialization.
+            return;
+
+        for (auto translator: d->translators)
+        {
+            if (translator)
+                qApp->removeTranslator(translator);
+            delete translator.get();
+        }
+        d->translators.clear();
+
+        for (const auto& overlay: d->overlays.values())
+            NX_ASSERT(!overlay->isUsed());
+        d->overlays.clear();
+        d->initialized = false;
+    }
+
+    // The directory was registered in loadTranslations() method.
+    utils::unregisterExternalResourceDirectory("translations");
 }
 
 void TranslationManager::setAssertOnOverlayInstallationFailure(bool assert)

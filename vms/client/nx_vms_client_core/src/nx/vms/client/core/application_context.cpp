@@ -5,8 +5,8 @@
 #include <memory>
 
 #include <QtCore/QCoreApplication>
-#include <QtQml/QQmlEngine>
 #include <QtQml/QQmlContext>
+#include <QtQml/QQmlEngine>
 #include <QtQml/private/qv4engine_p.h>
 
 #include <client_core/client_core_meta_types.h>
@@ -21,6 +21,7 @@
 #include <nx/vms/client/core/event_search/models/visible_item_data_decorator_model.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/network/local_network_interfaces_manager.h>
+#include <nx/vms/client/core/qml/qml_ownership.h>
 #include <nx/vms/client/core/resource/unified_resource_pool.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/core/skin/color_theme.h>
@@ -28,7 +29,6 @@
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/thumbnails/thumbnail_image_provider.h>
-#include <nx/vms/client/core/qml/qml_ownership.h>
 #include <nx/vms/client/core/watchers/known_server_connections.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
 #include <nx/vms/discovery/manager.h>
@@ -61,15 +61,6 @@ static void initializeResources()
 }
 
 namespace nx::vms::client::core {
-
-void initializeExternalResources(const QString& customExternalResourceFile)
-{
-    if (!customExternalResourceFile.isEmpty())
-        nx::utils::registerExternalResource(customExternalResourceFile);
-    nx::utils::registerExternalResource("client_core_external.dat");
-    nx::utils::registerExternalResource("bytedance_iconpark.dat",
-        analytics::IconManager::librariesRoot() + "bytedance.iconpark/");
-}
 
 static ApplicationContext* s_instance = nullptr;
 
@@ -134,6 +125,24 @@ struct ApplicationContext::Private
         systemsFinder = std::make_unique<QnSystemsFinder>();
     }
 
+    void initializeExternalResources()
+    {
+        if (!customExternalResourceFile.isEmpty())
+            nx::utils::registerExternalResource(customExternalResourceFile);
+        nx::utils::registerExternalResource("client_core_external.dat");
+        nx::utils::registerExternalResource("bytedance_iconpark.dat",
+            analytics::IconManager::librariesRoot() + "bytedance.iconpark/");
+    }
+
+    void uninitializeExternalResources()
+    {
+        if (!customExternalResourceFile.isEmpty())
+            nx::utils::unregisterExternalResource(customExternalResourceFile);
+        nx::utils::unregisterExternalResource("client_core_external.dat");
+        nx::utils::unregisterExternalResource("bytedance_iconpark.dat",
+            analytics::IconManager::librariesRoot() + "bytedance.iconpark/");
+    }
+
     ApplicationContext* const q;
     const ApplicationContext::Mode mode;
     const bool ignoreCustomization = false;
@@ -152,6 +161,7 @@ struct ApplicationContext::Private
     std::unique_ptr<LocalNetworkInterfacesManager> localNetworkInterfacesManager;
     std::unique_ptr<watchers::KnownServerConnections> knownServerConnectionsWatcher;
     std::unique_ptr<nx::i18n::TranslationManager> translationManager;
+    QString customExternalResourceFile;
 };
 
 ApplicationContext::ApplicationContext(
@@ -163,14 +173,20 @@ ApplicationContext::ApplicationContext(
     QObject* parent)
     :
     common::ApplicationContext(peerType, customCloudHost, parent),
-    d(new Private{.q = this, .mode = mode, .ignoreCustomization = ignoreCustomization,
-        .skin = std::make_unique<nx::vms::client::core::Skin>(QStringList{":/skin"})})
+    d(new Private{
+        .q = this,
+        .mode = mode,
+        .ignoreCustomization = ignoreCustomization,
+        .skin = std::make_unique<nx::vms::client::core::Skin>(QStringList{":/skin"}),
+        .customExternalResourceFile = customExternalResourceFile
+        }
+    )
 {
     if (NX_ASSERT(!s_instance))
         s_instance = this;
 
     initializeResources();
-    initializeExternalResources(customExternalResourceFile);
+    d->initializeExternalResources();
     initializeMetaTypes();
 
     d->initializeSettings();
@@ -223,6 +239,8 @@ ApplicationContext::ApplicationContext(
 
 ApplicationContext::~ApplicationContext()
 {
+    d->uninitializeExternalResources();
+
     nx::setOnAssertHandler(nullptr);
 
     if (NX_ASSERT(s_instance == this))

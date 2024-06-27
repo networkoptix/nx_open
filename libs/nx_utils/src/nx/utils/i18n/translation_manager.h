@@ -43,7 +43,7 @@ public:
     bool installTranslation(const QString& localeCode);
 
     /** Install the provided translation on an application level. */
-    static void installTranslation(const Translation& translation);
+    void installTranslation(const Translation& translation);
 
     static std::chrono::milliseconds defaultInstallTranslationTimeout();
 
@@ -101,7 +101,11 @@ public:
         const std::vector<QString>& preferredLocales,
         std::chrono::milliseconds maxWaitTime = defaultInstallTranslationTimeout());
 
-    void setLoadTranslationsEnabled(bool value);
+    /** Stop translation manager from loading new translations. */
+    void stopLoadingTranslations();
+
+    /** Remove all translators. */
+    void deinitialize();
 
     /**
      * When assert on failure is enabled, TranslationManager will report an error (assert) if

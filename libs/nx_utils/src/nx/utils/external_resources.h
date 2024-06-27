@@ -19,5 +19,6 @@ NX_UTILS_API bool unregisterExternalResource(
  * Registers all files in the given directory.
  */
 NX_UTILS_API bool registerExternalResourceDirectory(const QString& directory);
+NX_UTILS_API bool unregisterExternalResourceDirectory(const QString& directory);
 
 } // namespace nx::utils

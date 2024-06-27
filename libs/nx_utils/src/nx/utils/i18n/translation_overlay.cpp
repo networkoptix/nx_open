@@ -81,6 +81,12 @@ bool TranslationOverlay::isInstalled() const
     return m_installed;
 }
 
+bool TranslationOverlay::isUsed() const
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    return m_refCount > 0;
+}
+
 void TranslationOverlay::waitForInstallation(std::chrono::milliseconds maxWaitTime)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);

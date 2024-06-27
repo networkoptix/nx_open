@@ -3,6 +3,7 @@
 #include "external_resources.h"
 
 #include <algorithm>
+#include <set>
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QResource>
@@ -13,7 +14,8 @@
 
 namespace nx::utils {
 
-static QSet<QString> g_registeredDirectories;
+// Counted list of registered directories. Each may be registered several times.
+static std::multiset<QString> g_registeredDirectories;
 
 /**
  * Avoid creating the mutex until other code needs it to allow ini tweaks to modify its
@@ -53,7 +55,6 @@ bool registerExternalResource(const QString& filename, const QString& mapRoot)
 bool unregisterExternalResource(const QString& filename, const QString& mapRoot)
 {
     NX_MUTEX_LOCKER lock(resourceMutex());
-    g_registeredDirectories.remove(filename);
     const auto filePath = externalResourcesDirectory().absoluteFilePath(filename);
     NX_ASSERT(QFileInfo::exists(filePath), "Missing resource file %1", filePath);
     return QResource::unregisterResource(filePath, mapRoot);
@@ -62,9 +63,9 @@ bool unregisterExternalResource(const QString& filename, const QString& mapRoot)
 bool registerExternalResourceDirectory(const QString& directory)
 {
     NX_MUTEX_LOCKER lock(resourceMutex());
-    if (g_registeredDirectories.contains(directory))
-        return true;
     g_registeredDirectories.insert(directory);
+    if (g_registeredDirectories.count(directory) > 1)
+        return true;
 
     QDir assetsDirectory(externalResourcesDirectory());
     if (!NX_ASSERT(assetsDirectory.cd(directory),
@@ -80,6 +81,37 @@ bool registerExternalResourceDirectory(const QString& directory)
             const auto r = assetsDirectory.absoluteFilePath(filename);
             return NX_ASSERT(QResource::registerResource(r), "Unable to register asset: %1", r);
         });
+}
+
+bool unregisterExternalResourceDirectory(const QString& directory)
+{
+    NX_MUTEX_LOCKER lock(resourceMutex());
+    auto node = g_registeredDirectories.extract(directory);
+    if (g_registeredDirectories.contains(directory))
+        return true; //< Directory still registered.
+
+    if (node.empty())
+        return true; // It is safe to unregister directory twice.
+
+    QDir assetsDirectory(externalResourcesDirectory());
+    if (!NX_ASSERT(assetsDirectory.cd(directory),
+        "Unable to find '%1' in asset directory: %2", directory, assetsDirectory))
+    {
+        return false;
+    }
+
+    const auto filenames = assetsDirectory.entryList(QDir::Filter::Files);
+    bool result = std::all_of(filenames.cbegin(), filenames.cend(),
+        [&assetsDirectory](const auto& filename)
+        {
+            const auto r = assetsDirectory.absoluteFilePath(filename);
+            return NX_ASSERT(
+                QResource::unregisterResource(r),
+                "Unable to unregister asset: %1",
+                r);
+        });
+
+    return result;
 }
 
 } // namespace nx::utils
