@@ -75,7 +75,7 @@ TransactionFilter::MatchResult TransactionFilter::matchSpecificContents(
  * 10501: saveUser
  * 208: setResourceParam
  * 209: removeResourceParam
- * "bb471566-2513-42e3-9536-d486dd27f1cb": settings' resource id
+ * "99cbc715-539b-4bfe-856f-799b45b69b1e": admin guid
  */
 static constexpr char kCloudFilterJson[] = R"json(
 {
@@ -99,21 +99,21 @@ static constexpr char kCloudFilterJson[] = R"json(
         {
             "ids": [208, 209],
             "contents": {
-                "resourceId": "bb471566-2513-42e3-9536-d486dd27f1cb",
+                "resourceId": "99cbc715-539b-4bfe-856f-799b45b69b1e",
                 "name": "systemName"
             }
         },
         {
             "ids": [208, 209],
             "contents": {
-                "resourceId": "bb471566-2513-42e3-9536-d486dd27f1cb",
+                "resourceId": "99cbc715-539b-4bfe-856f-799b45b69b1e",
                 "name": "specificFeatures"
             }
         },
         {
             "ids": [208, 209],
             "contents": {
-                "resourceId": "bb471566-2513-42e3-9536-d486dd27f1cb",
+                "resourceId": "99cbc715-539b-4bfe-856f-799b45b69b1e",
                 "name": "cloudAccountName"
             }
         },

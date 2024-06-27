@@ -14,7 +14,6 @@
 #include <nx/network/http/http_types.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/qt_direct_connect.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/value_cache.h>
 #include <nx/vms/api/data/backup_settings.h>
@@ -212,14 +211,13 @@ struct SystemSettings::Private
     QnResourcePropertyAdaptor<bool>* allowRegisteringIntegrationsAdaptor = nullptr;
 
     AdaptorList allAdaptors;
-    std::vector<nx::utils::SharedGuardPtr> connections;
 
-    std::atomic_bool initialized = false;
+    mutable nx::Mutex mutex;
+    QnUserResourcePtr admin;
+
     nx::utils::CachedValue<std::string> serverHeaderCache{
         [this] { return makeServerHeaderValue(serverHeaderAdaptor->value()); }};
 };
-
-const nx::Uuid SystemSettings::kResourceId{"bb471566-2513-42e3-9536-d486dd27f1cb"};
 
 SystemSettings::SystemSettings(SystemContext* context, QObject* parent):
     base_type(parent),
@@ -249,6 +247,14 @@ SystemSettings::SystemSettings(SystemContext* context, QObject* parent):
             adapter->markWriteOnly();
         }
     }
+
+    connect(resourcePool(), &QnResourcePool::resourcesAdded, this, &SystemSettings::initialize,
+        Qt::DirectConnection);
+
+    connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
+        &SystemSettings::at_resourcePool_resourceRemoved, Qt::DirectConnection);
+
+    initialize();
 }
 
 SystemSettings::~SystemSettings()
@@ -257,61 +263,27 @@ SystemSettings::~SystemSettings()
 
 void SystemSettings::initialize()
 {
-    if (d->initialized.exchange(true))
+    if (isInitialized())
         return;
 
-    d->connections.reserve(d->allAdaptors.size() + 2);
-    for (auto a: d->allAdaptors)
+    // TODO: #rvasilenko Refactor this. System settings should be moved out from admin user.
+    const auto user = resourcePool()->getAdministrator();
+    if (!user)
+        return;
+
     {
-        a->loadValue(resourcePropertyDictionary()->value(kResourceId, a->key()));
-        d->connections.emplace_back(nx::qtDirectConnect(
-            a, &QnAbstractResourcePropertyAdaptor::valueChanged,
-            [this](const QString& key, const QString& value)
-            {
-                resourcePropertyDictionary()->setValue(kResourceId, key, value);
-                resourcePropertyDictionary()->saveParamsAsync(kResourceId);
-            }));
+        NX_MUTEX_LOCKER locker(&d->mutex);
+        NX_VERBOSE(this, "System settings successfully initialized");
+        d->admin = user;
+        for (auto adaptor: d->allAdaptors)
+            adaptor->setResource(user);
     }
-
-    const auto load =
-        [this](const nx::Uuid& resourceId, const QString& key)
-        {
-            if (resourceId != kResourceId)
-                return;
-
-            const auto value = resourcePropertyDictionary()->value(resourceId, key);
-            if (key == Names::cloudAuthKey)
-            {
-                d->cloudAuthKeyAdaptor->loadValue(value);
-                return;
-            }
-            if (key == Names::ldap)
-            {
-                d->ldapAdaptor->loadValue(value);
-                return;
-            }
-            const auto name = nx::reflect::fromString<api::SystemSettingName>(key.toStdString());
-            switch (name)
-            {
-                #define VALUE(R, ADAPTOR, ITEM) \
-                    case api::SystemSettingName::ITEM: \
-                        d->BOOST_PP_CAT(ITEM, ADAPTOR)->loadValue(value); \
-                        return;
-                BOOST_PP_SEQ_FOR_EACH(VALUE, Adaptor, SystemSettings_Fields)
-                #undef VALUE
-            }
-            NX_ASSERT(false, "Unknown setting name %1", key);
-        };
-    d->connections.emplace_back(nx::qtDirectConnect(
-        resourcePropertyDictionary(), &QnResourcePropertyDictionary::propertyChanged, load));
-    d->connections.emplace_back(nx::qtDirectConnect(
-        resourcePropertyDictionary(), &QnResourcePropertyDictionary::propertyRemoved, load));
     emit initialized();
 }
 
 bool SystemSettings::isInitialized() const
 {
-    return d->initialized;
+    return !d->admin.isNull();
 }
 
 SystemSettings::AdaptorList SystemSettings::initEmailAdaptors()
@@ -1497,6 +1469,18 @@ void SystemSettings::setAllowRegisteringIntegrationsEnabled(bool value)
     d->allowRegisteringIntegrationsAdaptor->setValue(value);
 }
 
+void SystemSettings::at_resourcePool_resourceRemoved(const QnResourcePtr& resource)
+{
+    if (!d->admin || resource != d->admin)
+        return;
+
+    NX_MUTEX_LOCKER locker( &d->mutex );
+    d->admin.reset();
+
+    for (auto adaptor: d->allAdaptors)
+        adaptor->setResource(QnResourcePtr());
+}
+
 nx::vms::api::LdapSettings SystemSettings::ldap() const
 {
     return d->ldapAdaptor->value();
@@ -1519,19 +1503,39 @@ void SystemSettings::setEmailSettings(const QnEmailSettings& emailSettings)
 
 void SystemSettings::synchronizeNow()
 {
-    resourcePropertyDictionary()->saveParamsAsync(kResourceId);
+    for (auto adaptor: d->allAdaptors)
+        adaptor->saveToResource();
+
+    NX_MUTEX_LOCKER locker(&d->mutex);
+    if (!d->admin)
+        return;
+
+    resourcePropertyDictionary()->saveParamsAsync(d->admin->getId());
 }
 
 bool SystemSettings::resynchronizeNowSync(nx::utils::MoveOnlyFunc<
     bool(const QString& paramName, const QString& paramValue)> filter)
 {
-    resourcePropertyDictionary()->markAllParamsDirty(kResourceId, std::move(filter));
+    {
+        NX_MUTEX_LOCKER locker(&d->mutex);
+        NX_ASSERT(d->admin, "Invalid sync state");
+        if (!d->admin)
+            return false;
+        resourcePropertyDictionary()->markAllParamsDirty(d->admin->getId(), std::move(filter));
+    }
     return synchronizeNowSync();
 }
 
 bool SystemSettings::synchronizeNowSync()
 {
-    return resourcePropertyDictionary()->saveParams(kResourceId);
+    for (auto adaptor : d->allAdaptors)
+        adaptor->saveToResource();
+
+    NX_MUTEX_LOCKER locker(&d->mutex);
+    NX_ASSERT(d->admin, "Invalid sync state");
+    if (!d->admin)
+        return false;
+    return resourcePropertyDictionary()->saveParams(d->admin->getId());
 }
 
 bool SystemSettings::takeFromSettings(QSettings* settings, const QnResourcePtr& mediaServer)
@@ -1851,7 +1855,7 @@ void SystemSettings::resetCloudParamsWithLowPriority()
     for (const auto& name: names)
     {
         nx::vms::api::ResourceParamWithRefData param;
-        param.resourceId = kResourceId;
+        param.resourceId = QnUserResource::kAdminGuid;
         param.name = name;
         params.emplace_back(std::move(param));
     }
@@ -2344,7 +2348,7 @@ QList<const QnAbstractResourcePropertyAdaptor*> SystemSettings::allDefaultSettin
 
 bool SystemSettings::isGlobalSetting(const nx::vms::api::ResourceParamWithRefData& param)
 {
-    return kResourceId == param.resourceId;
+    return QnUserResource::kAdminGuid == param.resourceId;
 }
 
 nx::vms::api::MetadataStorageChangePolicy SystemSettings::metadataStorageChangePolicy() const

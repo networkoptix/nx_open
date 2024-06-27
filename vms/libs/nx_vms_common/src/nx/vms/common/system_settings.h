@@ -140,7 +140,6 @@ class NX_VMS_COMMON_API SystemSettings:
 
 public:
     using Names = SystemSettingNames;
-    static const nx::Uuid kResourceId;
 
     SystemSettings(SystemContext* context, QObject* parent = nullptr);
     virtual ~SystemSettings();
@@ -596,6 +595,8 @@ private:
     AdaptorList initTimeSynchronizationAdaptors();
     AdaptorList initCloudAdaptors();
     AdaptorList initMiscAdaptors();
+
+    void at_resourcePool_resourceRemoved(const QnResourcePtr& resource);
 
 private:
     struct Private;
