@@ -454,14 +454,14 @@ QVariant VmsEventSearchListModel::data(const QModelIndex& index, int role) const
         case core::ObjectTrackIdRole:
             return event->property("objectTrackId");
 
-        case Qn::DisplayedResourceListRole:
+        case core::DisplayedResourceListRole:
             if (const auto sourceName = details.value(rules::utils::kSourceNameDetailName);
                 sourceName.isValid())
             {
                 return QVariant::fromValue(QStringList(sourceName.toString()));
             }
         [[fallthrough]];
-        case Qn::ResourceListRole:
+        case core::ResourceListRole:
         {
             if (const auto sourceId = details.value(rules::utils::kSourceIdDetailName);
                 sourceId.isValid())
@@ -472,7 +472,7 @@ QVariant VmsEventSearchListModel::data(const QModelIndex& index, int role) const
                     return QVariant::fromValue(QnResourceList({resource}));
                 }
 
-                if (role == Qn::DisplayedResourceListRole)
+                if (role == core::DisplayedResourceListRole)
                     return {}; //< TODO: #vkutin Replace with <deleted camera> or <deleted server>.
             }
 
