@@ -17,9 +17,9 @@ Most of the source code and other files are licensed under the terms of Mozilla 
 (unless specified otherwise in the files) which can be found in the `license_mpl2.md` file in the
 `licenses/` directory in the root directory of the repository.
 
-ATTENTION: This document provides only brief information about the build process and its
+ATTENTION: This document provides only the brief information about the build process and its
 prerequisites, specific to the current branch. For the most actual instructions how to set up the
-prerequisites, explanation of the build system internals, and recommendations for using the build
+build environment, explanation of the build system internals, and recommendations for using build
 and development tools, refer to the following document in the `master` branch of this repository:
 [build.md](https://github.com/networkoptix/nx_open/blob/master/build.md)
 
