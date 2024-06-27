@@ -142,57 +142,34 @@ public slots:
         bool storePassword);
 
     void connectToCloudSystem(const QString& systemId);
-
     void connectToAnotherSystem();
-
     void testSystemOnline(const QString& serverUrl);
-
     void logoutFromCloud();
-
     void manageCloudAccount();
-
     void loginToCloud();
-
     void createAccount();
-
     void forceActiveFocus();
-
     void forgetUserPassword(const QString& localSystemId, const QString& user);
-
     void forgetAllCredentials(const QString& localSystemId);
-
     void deleteSystem(const QString& systemId, const QString& localSystemId);
 
 signals:
     void systemModelChanged();
-
     void hasCloudConnectionIssueChanged();
-
     void cloudUserNameChanged();
-
     void is2FaEnabledForUserChanged();
-
     void isCloudEnabledChanged();
-
     void visibleControlsChanged();
-
     void gridEnabledChanged();
-
     void resetAutoLogin();
-
     void globalPreloaderVisibleChanged(bool visible);
-
     void globalPreloaderEnabledChanged();
-
     void messageChanged();
-
     void openTile(const QString& systemId, const QString& errorMessage = "",
         bool isLoginError = false);
-
     void closeTile(const QString& systemId);
-
+    void connectionToSystemRevoked();
     void switchPage(int pageIndex);
-
     void dropConnectingState() const;
 
 private:

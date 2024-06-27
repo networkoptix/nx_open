@@ -52,6 +52,12 @@ struct LogonData: core::LogonData
         core::LogonData(logonData)
     {
     }
+
+    bool operator==(const LogonData& other) const
+    {
+        return this->address == other.address
+            && this->credentials == other.credentials;
+    }
 };
 
 struct CloudSystemConnectData

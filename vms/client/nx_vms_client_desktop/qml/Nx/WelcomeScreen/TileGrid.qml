@@ -261,6 +261,11 @@ Item
                     if (item && item.isExpanded)
                         item.shrinkAndStopConnecting()
                 }
+
+                function onConnectionToSystemRevoked()
+                {
+                    closeOpenedTile()
+                }
             }
 
             MouseArea

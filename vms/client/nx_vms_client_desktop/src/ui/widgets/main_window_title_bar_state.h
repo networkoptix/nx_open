@@ -35,6 +35,7 @@ struct MainWindowTitleBarState
     bool systemUpdating = false;
 
     int findSystemIndex(const nx::Uuid& systemId) const;
+    int findSystemIndex(const LogonData& logonData) const;
 };
 
 class MainWindowTitleBarStateStore: public QObject, public FluxStateStore<MainWindowTitleBarState>
@@ -58,6 +59,7 @@ public:
     void removeSystem(const QnSystemDescriptionPtr& systemDescription);
     void removeSystem(const nx::Uuid& systemId);
     void removeSystem(int index);
+    void removeSystem(const LogonData& logonData);
     void removeCurrentSystem();
     void changeCurrentSystem(QnSystemDescriptionPtr systemDescription);
     void moveSystem(int indexFrom, int indexTo);
