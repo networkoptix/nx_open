@@ -56,7 +56,7 @@ SqlFilterFieldEqual::SqlFilterFieldEqual(
     const std::string& placeHolderName,
     QVariant value)
     :
-    SqlFilterField(name, placeHolderName, std::move(value), "=")
+    SqlFilterField(name, placeHolderName, value, value.isNull() ?  " is " : "=")
 {
 }
 
