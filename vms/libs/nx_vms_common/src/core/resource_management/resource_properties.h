@@ -2,9 +2,6 @@
 
 #pragma once
 
-#include <future>
-#include <map>
-
 #include <nx/utils/move_only_func.h>
 #include <nx/vms/api/data/resource_data.h>
 #include <nx/vms/common/system_context_aware.h>
@@ -23,7 +20,7 @@ public:
 
     bool saveParams(const nx::Uuid& resourceId);
     int saveParamsAsync(const nx::Uuid& resourceId);
-    int saveParamsAsync(std::vector<nx::Uuid> resourceIds);
+    int saveParamsAsync(const QList<nx::Uuid>& resourceId);
 
     QString value(const nx::Uuid& resourceId, const QString& key) const;
 
@@ -54,19 +51,18 @@ public:
 public slots:
     bool on_resourceParamRemoved(const nx::Uuid& resourceId, const QString& key);
 signals:
+    void asyncSaveDone(int recId, ec2::ErrorCode);
     void propertyChanged(const nx::Uuid& resourceId, const QString& key);
     void propertyRemoved(const nx::Uuid& resourceId, const QString& key);
 private:
+    void onRequestDone(int reqID, ec2::ErrorCode errorCode);
     void fromModifiedDataToSavedData(
         const nx::Uuid& resourceId,
         nx::vms::api::ResourceParamWithRefDataList& outData);
-    int saveData(
-        std::vector<nx::Uuid> resourceIds, nx::vms::api::ResourceParamWithRefDataList data);
-
+    int saveData(const nx::vms::api::ResourceParamWithRefDataList&& data);
 private:
     using QnResourcePropertyList = QMap<QString, QString>;
     QMap<nx::Uuid, QnResourcePropertyList> m_items;
     QMap<nx::Uuid, QnResourcePropertyList> m_modifiedItems;
-    std::map<nx::Uuid, std::map<int, std::shared_future<void>>> m_resourceSaveInProgress;
     mutable nx::Mutex m_mutex;
 };

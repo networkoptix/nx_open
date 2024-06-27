@@ -3,7 +3,6 @@
 #pragma once
 
 #include <core/ptz/proxy_ptz_controller.h>
-#include <nx/utils/scope_guard.h>
 
 template<class T>
 class QnResourcePropertyAdaptor;
@@ -24,7 +23,7 @@ public:
     QnActivityPtzController(
         Mode mode,
         const QnPtzControllerPtr& baseController);
-    virtual ~QnActivityPtzController() = default;
+    virtual ~QnActivityPtzController();
 
     static bool extends(Ptz::Capabilities capabilities);
 
@@ -60,5 +59,4 @@ public:
 private:
     const Mode m_mode;
     QnResourcePropertyAdaptor<QnPtzObject>* m_adaptor;
-    std::vector<nx::utils::SharedGuardPtr> m_connections;
 };

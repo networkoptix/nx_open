@@ -662,8 +662,7 @@ void QnWorkbenchPtzHandler::at_ptzActivateObjectByHotkeyAction_triggered()
         .argument(Qn::ItemDataRole::PtzPresetIndexRole).toInt();
 
     nx::vms::client::core::ptz::HotkeysResourcePropertyAdaptor adaptor;
-    if (auto resource = widget->resource()->toResourcePtr())
-        adaptor.loadValue(resource->getProperty(adaptor.key()));
+    adaptor.setResource(widget->resource()->toResourcePtr());
 
     QString objectId = adaptor.value().value(hotkey);
     if (objectId.isEmpty())

@@ -6,6 +6,7 @@
 
 #include <QtCore/QAtomicInt>
 
+#include <core/resource/resource_fwd.h>
 #include <nx/fusion/serialization/json_functions.h>
 #include <nx/fusion/serialization/lexical_functions.h>
 #include <nx/reflect/string_conversion.h>
@@ -64,19 +65,12 @@ private:
 template<class T>
 class QnJsonResourcePropertyHandler: public QnResourcePropertyHandler<T> {
 public:
-    virtual bool serialize(const T& value, QString* target) const override
-    {
-        QnJsonContext context;
-        context.setChronoSerializedAsDouble(true);
-        context.setSerializeMapToObject(true);
-        QByteArray serialized;
-        QJson::serialize(&context, value, &serialized);
-        *target = QString::fromUtf8(serialized);
+    virtual bool serialize(const T &value, QString *target) const override {
+        *target = QString::fromUtf8(QJson::serialized(value));
         return true;
     }
 
-    virtual bool deserialize(const QString& value, T* target) const override
-    {
+    virtual bool deserialize(const QString &value, T *target) const override {
         QnJsonContext ctx;
         ctx.setAllowStringConversions(true);
         ctx.setStrictMode(true);
@@ -132,10 +126,13 @@ public:
         QnAbstractResourcePropertyHandler* handler,
         QObject* parent = NULL,
         std::function<QString()> label = nullptr);
-    virtual ~QnAbstractResourcePropertyAdaptor() = default;
+    virtual ~QnAbstractResourcePropertyAdaptor();
 
     const QString& key() const;
     QString label() const;
+
+    QnResourcePtr resource() const;
+    void setResource(const QnResourcePtr &resource);
 
     QVariant value() const;
     bool isDefault() const; //< True if no explicit (not default) value has been set.
@@ -146,12 +143,13 @@ public:
     bool testAndSetValue(const QVariant &expectedValue, const QVariant &newValue);
     virtual void setValue(const QVariant& value) = 0;
     virtual void setJsonValue(const QJsonValue& value) = 0;
+    virtual void setSerializedValue(const QVariant& value);
 
     virtual bool isSerializedValueValid(const QString& value) const = 0;
     virtual bool isJsonValueValid(const QJsonValue& value) const = 0;
 
-    void loadValue(const QString& serializedValue);
-    bool takeFromSettings(QSettings* settings, const QString& prefix);
+    void saveToResource();
+    bool takeFromSettings(QSettings* settings, const QString& preffix);
 
     bool isReadOnly() const { return m_isReadOnly; }
     bool isWriteOnly() const { return m_isWriteOnly; }
@@ -163,13 +161,26 @@ public:
     void markSecurity() { m_isSecurity = true; }
 
 signals:
-    void valueChanged(const QString& key, const QString& value);
+    void valueChanged();
+    void synchronizationNeeded(const QnResourcePtr& resource);
 
 protected:
+    QString defaultSerializedValue() const;
+    virtual QString defaultSerializedValueLocked() const;
     void setValueInternal(const QVariant& value);
 
 private:
-    bool setValueInternalLocked(const QVariant& value);
+    void loadValue(const QString &serializedValue);
+    bool loadValueLocked(const QString &serializedValue);
+
+    void processSaveRequests();
+    void processSaveRequestsNoLock(const QnResourcePtr &resource, const QString &serializedValue);
+    void enqueueSaveRequest();
+    Q_SIGNAL void saveRequestQueued();
+
+    void setResourceInternal(const QnResourcePtr &resource, bool notify);
+
+    Q_SLOT void at_resource_propertyChanged(const QnResourcePtr &resource, const QString &key, const QString& prevValue, const QString& newValue);
 
 private:
     const QString m_key;
@@ -179,9 +190,9 @@ private:
     QAtomicInt m_pendingSave;
 
     mutable nx::Mutex m_mutex;
+    QnResourcePtr m_resource;
     QString m_serializedValue;
     QVariant m_value;
-    QString m_defaultSerializedValue;
 
     bool m_isReadOnly = false;
     bool m_isWriteOnly = false;
@@ -207,6 +218,8 @@ public:
         m_isValueValid(std::move(isValueValid))
     {
         NX_CRITICAL(this->isValueValid(m_defaultValue), QJson::serialized(m_defaultValue));
+        if (handler)
+            handler->serialize(QVariant::fromValue(defaultValue), &m_defaultSerializedValue);
     }
 
     QnResourcePropertyAdaptor(
@@ -261,7 +274,7 @@ public:
 
     void setValue(const T& value)
     {
-        NX_ASSERT(isValueValid(value), "%1 = %2", key(), QJson::serialized(value));
+        NX_ASSERT(isValueValid(value), "%1 = %2", key(), QJson::serialized(m_defaultValue));
         base_type::setValueInternal(QVariant::fromValue(value));
     }
 
@@ -288,10 +301,17 @@ public:
         return QJson::deserialize<T>(value, &typedValue) && isValueValid(typedValue);
     }
 
+protected:
+    virtual QString defaultSerializedValueLocked() const override
+    {
+        return m_defaultSerializedValue;
+    }
+
 private:
     const QMetaType m_type;
     const T m_defaultValue;
     const std::function<bool(const T&)> m_isValueValid;
+    QString m_defaultSerializedValue;
 };
 
 template<class T>

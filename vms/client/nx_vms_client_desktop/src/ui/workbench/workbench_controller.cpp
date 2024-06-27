@@ -919,8 +919,7 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene* /*scene*/, QEven
                 break;
 
             nx::vms::client::core::ptz::HotkeysResourcePropertyAdaptor adaptor;
-            if (auto resource = widget->resource()->toResourcePtr())
-                adaptor.loadValue(resource->getProperty(adaptor.key()));
+            adaptor.setResource(widget->resource()->toResourcePtr());
 
             QString objectId = adaptor.value().value(hotkey);
             if (objectId.isEmpty())
