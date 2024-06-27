@@ -27,10 +27,10 @@ extern "C"
 #include <utils/media/ffmpeg_initializer.h>
 
 #include "aligned_mem_video_buffer.h"
+#include "mac_utils.h"
 
 #if defined(TARGET_OS_IPHONE)
 #include <CoreVideo/CoreVideo.h>
-#include <nx/utils/ios_device_info.h>
 #endif
 
 #include <QtMultimedia/private/qabstractvideobuffer_p.h>
@@ -287,17 +287,9 @@ bool MacVideoDecoder::isCompatible(
     if (!allowHardwareAcceleration)
         return false;
 
-    // VideoToolBox supports H263 only.
-    // If cheat it and provide H263P instead (by changing compression type H263P -> H263)
-    // it would show green box.
-    if (codec != AV_CODEC_ID_H265 &&
-        codec != AV_CODEC_ID_H264 &&
-        codec != AV_CODEC_ID_MPEG4 &&
-        codec != AV_CODEC_ID_MPEG1VIDEO &&
-        codec != AV_CODEC_ID_MPEG2VIDEO)
-    {
+    if (!mac_isHWDecodingSupported(codec))
         return false;
-    }
+
     const QSize maxRes = maxResolution(codec);
     const auto fixedResolution = resolution.height() > resolution.width()
         ? resolution.transposed()
@@ -307,41 +299,20 @@ bool MacVideoDecoder::isCompatible(
 
 QSize MacVideoDecoder::maxResolution(const AVCodecID codec)
 {
-    static const QSize kHdReadyResolution(1280, 720);
     static const QSize kFullHdResolution(1920, 1080);
-    static const QSize kDci4kResolution(4096, 2160);
 
-    using IosDeviceInformation = nx::utils::IosDeviceInformation;
-    const auto& deviceInfo = IosDeviceInformation::currentInformation();
+    static QSize maxH264Resolution = mac_maxDecodeResolutionH264();
+    static QSize maxHevcResolution = mac_maxDecodeResolutionHevc();
+
     switch (codec)
     {
         case AV_CODEC_ID_H264:
+            return maxH264Resolution;
         case AV_CODEC_ID_H265:
-            if (nx::build_info::isMacOsX())
-                return kDci4kResolution;
-
-            if (deviceInfo.type == IosDeviceInformation::Type::iPhone)
-            {
-                if (deviceInfo.majorVersion >= IosDeviceInformation::iPhone6)
-                    return kDci4kResolution;
-            }
-            else if (deviceInfo.type == IosDeviceInformation::Type::iPad)
-            {
-                if (deviceInfo.majorVersion >= IosDeviceInformation::iPadAir2)
-                    return kDci4kResolution;
-            }
-
-            if (codec == AV_CODEC_ID_H265)
-            {
-                // List of models with HEVC:
-                // https://support.apple.com/en-ie/HT207022
-                // https://stackoverflow.com/questions/11197509/how-to-get-device-make-and-model-on-ios
-                return QSize(); //< HEVC is not supported on deviced older than iPhone 6.
-            }
-            return kFullHdResolution;
-
+            return maxHevcResolution;
+        // TODO: If AV1 or VP9 decoding is supported we should enable higher resolutions.
         default:
-            return kHdReadyResolution;
+            return kFullHdResolution;
     }
 }
 
