@@ -639,7 +639,11 @@ void ConnectActionsHandler::handleConnectionError(RemoteConnectionError error)
                     compatibilityInfo,
                     /*moduleInformation*/ {}, //< TODO: #sivanov Make sure it is not needed.
                     /*options*/ {});
-                menu()->trigger(menu::DelayedForcedExitAction);
+                const auto stateStore = mainWindow()->titleBarStateStore();
+                if (stateStore && stateStore->systemCount() > 0)
+                    emit welcomeScreen->connectionToSystemRevoked();
+                else
+                    menu()->trigger(menu::DelayedForcedExitAction);
             }
             break;
         }
@@ -1513,7 +1517,7 @@ void ConnectActionsHandler::connectToServer(LogonData logonData, ConnectionOptio
     const auto isLink = logonData.connectScenario == ConnectScenario::connectUsingCommand;
 
     auto callback = d->makeSingleConnectionCallback(
-        [this, options, connectScenario, originalUsername, isLink]
+        [this, options, connectScenario, originalUsername, isLink, logonData]
             (RemoteConnectionFactory::ConnectionOrError result)
         {
             if (auto error = std::get_if<RemoteConnectionError>(&result))
@@ -1523,7 +1527,7 @@ void ConnectActionsHandler::connectToServer(LogonData logonData, ConnectionOptio
 
                 handleConnectionError(*error);
                 if (ini().enableMultiSystemTabBar)
-                    mainWindow()->titleBarStateStore()->removeCurrentSystem();
+                    mainWindow()->titleBarStateStore()->removeSystem(logonData);
                 disconnectFromServer(DisconnectFlag::Force);
             }
             else

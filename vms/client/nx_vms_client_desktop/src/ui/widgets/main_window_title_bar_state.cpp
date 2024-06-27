@@ -31,10 +31,10 @@ bool MainWindowTitleBarState::SystemData::operator==(const SystemData& other) co
 
 int MainWindowTitleBarState::findSystemIndex(const nx::Uuid& systemId) const
 {
-    auto it = std::find_if(systems.cbegin(), systems.cend(),
-        [systemId](const auto value)
+    const auto it = std::find_if(systems.cbegin(), systems.cend(),
+        [systemId](const auto system)
         {
-            return value.systemDescription->localId() == systemId;
+            return system.systemDescription->localId() == systemId;
         });
 
     if (it == systems.cend())
@@ -42,6 +42,21 @@ int MainWindowTitleBarState::findSystemIndex(const nx::Uuid& systemId) const
 
     return std::distance(systems.cbegin(), it);
 }
+
+int MainWindowTitleBarState::findSystemIndex(const LogonData& logonData) const
+{
+    const auto it = std::find_if(systems.cbegin(), systems.cend(),
+        [logonData](const auto system)
+        {
+            return system.logonData == logonData;
+        });
+
+    if (it == systems.cend())
+        return -1;
+
+    return std::distance(systems.cbegin(), it);
+}
+
 //-------------------------------------------------------------------------------------------------
 // struct MainWindowTitleBarStateReducer
 
@@ -59,6 +74,7 @@ struct MainWindowTitleBarStateReducer
     static State insertSystem(State&& state, int index, State::SystemData value);
     static State removeSystem(State&& state, int index);
     static State removeSystemId(State&& state, nx::Uuid systemId);
+    static State removeSystem(State&& state, const LogonData& logonData);
     static State removeCurrentSystem(State&& state);
     static State changeCurrentSystem(State&& state, QnSystemDescriptionPtr systemDescription);
     static State moveSystem(State&& state, int indexFrom, int IndexTo);
@@ -153,10 +169,16 @@ MainWindowTitleBarStateReducer::State MainWindowTitleBarStateReducer::removeSyst
     return state;
 }
 
-MainWindowTitleBarStateReducer::State MainWindowTitleBarStateReducer::removeSystemId(State&& state,
-    nx::Uuid systemId)
+MainWindowTitleBarStateReducer::State MainWindowTitleBarStateReducer::removeSystemId(
+    State&& state, nx::Uuid systemId)
 {
     return removeSystem(std::move(state), state.findSystemIndex(systemId));
+}
+
+MainWindowTitleBarStateReducer::State MainWindowTitleBarStateReducer::removeSystem(
+    State&& state, const LogonData& logonData)
+{
+    return removeSystem(std::move(state), state.findSystemIndex(logonData));
 }
 
 MainWindowTitleBarStateReducer::State MainWindowTitleBarStateReducer::removeCurrentSystem(
@@ -374,7 +396,16 @@ void MainWindowTitleBarStateStore::removeSystem(const nx::Uuid& systemId)
 void MainWindowTitleBarStateStore::removeSystem(int index)
 {
     if (index >= 0)
-        dispatch(Reducer::removeSystem, index);
+    {
+        State (*f)(State&&, int) = &Reducer::removeSystem;
+        dispatch(f, index);
+    }
+}
+
+void MainWindowTitleBarStateStore::removeSystem(const LogonData& logonData)
+{
+    State (*f)(State&&, const LogonData&) = &Reducer::removeSystem;
+    dispatch(f, logonData);
 }
 
 void MainWindowTitleBarStateStore::removeCurrentSystem()
