@@ -197,7 +197,7 @@ public:
     /**
      * @return QByteArray::fromRawData(data(), size()).
      */
-    QByteArray toRawByteArray() const;
+    QByteArray toRawByteArray() const { return QByteArray::fromRawData(data(), (int) size()); }
 
     /**
      * If the data is stored as std::basic_string, then moves that string outside leaving the buffer empty.
@@ -1178,12 +1178,6 @@ QByteArray BasicBuffer<CharType>::toByteArray() const
         return *m_qByteArray;
 
     return QByteArray(data(), (int) size());
-}
-
-template<typename CharType>
-QByteArray BasicBuffer<CharType>::toRawByteArray() const
-{
-    return QByteArray::fromRawData(data(), (int) size());
 }
 
 template<typename CharType>

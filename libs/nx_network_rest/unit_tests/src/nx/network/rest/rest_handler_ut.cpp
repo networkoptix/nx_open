@@ -84,7 +84,7 @@ public:
         rest::Request request(httpRequest.get(), kSystemSession);
         auto contentType = http::getHeaderValue(httpRequest->headers, "Content-Type");
         if (!contentType.empty())
-            request.content = {std::move(contentType), httpRequest->messageBody.toRawByteArray()};
+            request.content = {std::move(contentType), httpRequest->messageBody.toByteArray()};
 
         m_requests.push_back(std::move(httpRequest));
         return request;
