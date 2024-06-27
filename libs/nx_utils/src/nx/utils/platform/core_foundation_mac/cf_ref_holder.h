@@ -26,9 +26,13 @@ public:
 
     const CFRefType ref() const;
 
-protected:
+    CFRefType* into() { return &m_ref; };
+
     QnCFRefHolder();
 
+    operator const CFRefType() const { return m_ref; }
+
+protected:
     QnCFRefHolder(const QnCFRefHolder& other);
 
     QnCFRefHolder& operator=(const QnCFRefHolder& other);

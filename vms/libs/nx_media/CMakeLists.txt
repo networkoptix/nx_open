@@ -74,6 +74,13 @@ if(hardware_decoders_x64)
     endif()
 endif()
 
+if(APPLE)
+    file(GLOB_RECURSE objc_files
+        src/nx/media/*.mm
+    )
+    list(APPEND additional_sources ${objc_files})
+endif()
+
 nx_add_target(nx_media
     LIBRARY
     GDI
@@ -111,6 +118,14 @@ if(MACOSX)
     find_library(CoreVideo_LIBRARY CoreVideo)
     mark_as_advanced(CoreVideo_LIBRARY)
     target_link_libraries(nx_media PRIVATE ${CoreVideo_LIBRARY})
+
+    find_library(CoreMedia_LIBRARY CoreMedia)
+    mark_as_advanced(CoreMedia_LIBRARY)
+    target_link_libraries(nx_media PRIVATE ${CoreMedia_LIBRARY})
+
+    find_library(VideoToolBox_LIBRARY VideoToolBox)
+    mark_as_advanced(VideoToolBox_LIBRARY)
+    target_link_libraries(nx_media PRIVATE ${VideoToolBox_LIBRARY})
 endif()
 
 if(hardware_decoders_x64)
