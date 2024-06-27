@@ -319,7 +319,7 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
         return true;
     }
 
-    if (dataHoleDetected(md))
+    if (md->dataType != QnAbstractMediaData::GENERIC_METADATA && dataHoleDetected(md))
     {
         NX_VERBOSE(this, "Closing file %1 because data hole has been detected", startTimeUs());
         close();
