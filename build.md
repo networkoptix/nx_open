@@ -6,13 +6,13 @@
 ## Introduction
 
 This document provides the most actual instructions how to set up the prerequisites, explanation of
-the build system internals, and recommendations for using the build and development tools. This
-information supplements the brief information about the build process and its prerequisites from
-`readme.md` specific to the particular branch of the repository.
+the build system internals, and recommendations for using build and development tools. This
+information supplements the one in `readme.md` which describes the details specific to the
+particular branch of the repository.
 
-ATTENTION: Use this document only from the `master` branch of the `nx_open` repository - it is
-kept up-to-date and applicable for building all currently supported branches of the VMS -
-`vms_5.0`, `vms_5.1`, and `master`.
+ATTENTION: Use this document only from the `master` branch of the `nx_open` repository:
+[build.md](https://github.com/networkoptix/nx_open/blob/master/build.md)
+ - it is kept up-to-date and applicable for building all currently supported branches of the VMS.
 
 ---------------------------------------------------------------------------------------------------
 ## Contribution policy
