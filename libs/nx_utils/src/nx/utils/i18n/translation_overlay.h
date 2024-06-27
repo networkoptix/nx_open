@@ -32,6 +32,10 @@ public:
     void removeRef();
 
     bool isInstalled() const;
+
+    /** Check whether there are references on this overlay. */
+    bool isUsed() const;
+
     void waitForInstallation(std::chrono::milliseconds maxWaitTime);
 
     void addThreadContext(const Qt::HANDLE& context);
@@ -44,7 +48,7 @@ private:
     Translation m_translation;
     std::vector<std::unique_ptr<TranslationOverlayItem>> m_translators;
 
-    nx::Mutex m_mutex;
+    mutable nx::Mutex m_mutex;
     int m_refCount = 0;
     QList<Qt::HANDLE> m_threads;
     nx::WaitCondition m_installedCondition;
