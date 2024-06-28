@@ -157,6 +157,11 @@ public:
     ~QnRtspClient();
 
     /**
+     * Update RTSP Client config.
+     */
+    void setConfig(const Config& config) { m_config = config; }
+
+    /**
      * Shutdown TCP socket and terminate current IO operation. Can be called from the other thread.
      * Thread safe.
      */
@@ -342,7 +347,7 @@ private:
 private:
     enum { RTSP_BUFFER_LEN = 1024 * 65 };
 
-    const Config m_config;
+    Config m_config;
 
     // 'initialization in order' block
     unsigned int m_csec;
