@@ -1,8 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "recent_local_systems_finder.h"
+#include "recent_local_system_finder.h"
 
-#include <network/local_system_description.h>
 #include <nx/build_info.h>
 #include <nx/network/address_resolver.h>
 #include <nx/network/app_info.h>
@@ -11,23 +10,25 @@
 #include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
 
-using namespace nx::vms::client::core;
+#include "local_system_description.h"
 
-QnRecentLocalSystemsFinder::QnRecentLocalSystemsFinder(QObject* parent): base_type(parent)
+namespace nx::vms::client::core {
+
+RecentLocalSystemFinder::RecentLocalSystemFinder(QObject* parent): base_type(parent)
 {
     connect(&appContext()->coreSettings()->recentLocalConnections,
         &nx::utils::property_storage::BaseProperty::changed,
         this,
-        &QnRecentLocalSystemsFinder::updateSystems);
+        &RecentLocalSystemFinder::updateSystems);
     connect(&appContext()->coreSettings()->searchAddresses,
         &nx::utils::property_storage::BaseProperty::changed,
         this,
-        &QnRecentLocalSystemsFinder::updateSystems);
+        &RecentLocalSystemFinder::updateSystems);
 
     updateSystems();
 }
 
-void QnRecentLocalSystemsFinder::updateSystems()
+void RecentLocalSystemFinder::updateSystems()
 {
     // Connection version is stored in settings starting from 6.0. Actually this version should be
     // fixed during the settings migration, but if user run 6.0 at least once before this change is
@@ -51,7 +52,7 @@ void QnRecentLocalSystemsFinder::updateSystems()
             continue;
 
         const auto system =
-            QnLocalSystemDescription::create(id.toSimpleString(), id, connection.systemName);
+            LocalSystemDescription::create(id.toSimpleString(), id, connection.systemName);
 
         static const int kVeryFarPriority = 100000;
 
@@ -74,10 +75,12 @@ void QnRecentLocalSystemsFinder::updateSystems()
             for (const QSet<QString>& serverAddresses: it.value())
                 fakeServerInfo.remoteAddresses += serverAddresses;
         }
-        system->addServer(fakeServerInfo, kVeryFarPriority, false);
+        system->addServer(fakeServerInfo, /*online*/ false);
         system->setServerHost(fakeServerInfo.id, connection.urls.first());
         newSystems.insert(system->id(), system);
     }
 
     setSystems(newSystems);
 }
+
+} // namespace nx::vms::client::core

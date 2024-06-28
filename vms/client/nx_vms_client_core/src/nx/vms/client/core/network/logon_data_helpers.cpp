@@ -2,7 +2,6 @@
 
 #include "logon_data_helpers.h"
 
-#include <finders/systems_finder.h>
 #include <network/system_helpers.h>
 #include <nx/network/address_resolver.h>
 #include <nx/network/socket_global.h>
@@ -10,6 +9,7 @@
 #include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
+#include <nx/vms/client/core/system_finder/system_finder.h>
 
 namespace nx::vms::client::core {
 
@@ -27,7 +27,7 @@ std::optional<LogonData> cloudLogonData(const QString& systemId)
     if (!NX_ASSERT(qnCloudStatusWatcher->status() != CloudStatusWatcher::LoggedOut))
         return std::nullopt;
 
-    const auto system = qnSystemsFinder->getSystem(systemId);
+    const auto system = appContext()->systemFinder()->getSystem(systemId);
     if (!system)
     {
         NX_WARNING(NX_SCOPE_TAG, "System %1 does not longer exist", systemId);
@@ -37,7 +37,7 @@ std::optional<LogonData> cloudLogonData(const QString& systemId)
     return cloudLogonData(system);
 }
 
-std::optional<LogonData> cloudLogonData(const QnSystemDescriptionPtr& system)
+std::optional<LogonData> cloudLogonData(const SystemDescriptionPtr& system)
 {
     if (!NX_ASSERT(system))
         return std::nullopt;

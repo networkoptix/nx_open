@@ -4,9 +4,9 @@
 
 #include <map>
 
-#include <finders/systems_finder.h>
 #include <network/system_helpers.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
+#include <nx/vms/client/core/system_finder/system_finder.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/debug_utils/utils/debug_custom_actions.h>
 #include <nx/vms/client/desktop/ini.h>
@@ -43,7 +43,7 @@ CloudCrossSystemManager::CloudCrossSystemManager(QObject* parent):
 
             for (const auto& systemId: addedCloudIds)
             {
-                auto systemDescription = QnSystemsFinder::instance()->getSystem(systemId);
+                auto systemDescription = appContext()->systemFinder()->getSystem(systemId);
                 if (!systemDescription)
                     continue;
 

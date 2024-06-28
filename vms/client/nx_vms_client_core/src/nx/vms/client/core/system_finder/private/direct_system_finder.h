@@ -2,29 +2,32 @@
 
 #pragma once
 
-#include <finders/abstract_systems_finder.h>
-#include <network/system_description.h>
 #include <nx/vms/discovery/manager.h>
+
+#include "../abstract_system_finder.h"
+#include "local_system_description.h"
+
+namespace nx::vms::client::core {
 
 class SearchAddressManager;
 
 /* Performs local system auto discovery based on nx::vms::discovery::Manager. */
-class QnDirectSystemsFinder : public QnAbstractSystemsFinder
+class DirectSystemFinder: public AbstractSystemFinder
 {
     Q_OBJECT
-    typedef QnAbstractSystemsFinder base_type;
+    typedef AbstractSystemFinder base_type;
 
 public:
-    QnDirectSystemsFinder(SearchAddressManager* searchAddressManager, QObject* parent = nullptr);
+    DirectSystemFinder(SearchAddressManager* searchAddressManager, QObject* parent = nullptr);
 
     SystemDescriptionList systems() const override;
-    QnSystemDescriptionPtr getSystem(const QString &id) const override;
+    SystemDescriptionPtr getSystem(const QString &id) const override;
 
 private:
     void updateServerData(const nx::vms::discovery::ModuleEndpoint& module);
     void removeServer(nx::Uuid id);
 
-    typedef QHash<QString, QnSystemDescription::PointerType> SystemsHash;
+    using SystemsHash = QHash<QString, LocalSystemDescriptionPtr>;
     void updateServerInternal(
         SystemsHash::iterator systemIt, const nx::vms::discovery::ModuleEndpoint& module);
 
@@ -40,3 +43,5 @@ private:
 
     SearchAddressManager* m_searchAddressManager;
 };
+
+} // namespace nx::vms::client::core

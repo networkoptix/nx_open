@@ -2,24 +2,24 @@
 
 #pragma once
 
-#include <network/cloud_system_description.h>
 #include <nx/utils/impl_ptr.h>
 
-#include "abstract_systems_finder.h"
+#include "../abstract_system_finder.h"
+#include "cloud_system_description.h"
 
 namespace nx::vms::client::core {
 
-class CloudSystemsFinder: public QnAbstractSystemsFinder
+class CloudSystemFinder: public AbstractSystemFinder
 {
     Q_OBJECT
-    typedef QnAbstractSystemsFinder base_type;
+    typedef AbstractSystemFinder base_type;
 
 public:
-    CloudSystemsFinder(QObject* parent = nullptr);
-    virtual ~CloudSystemsFinder() override;
+    CloudSystemFinder(QObject* parent = nullptr);
+    virtual ~CloudSystemFinder() override;
 
     SystemDescriptionList systems() const override;
-    QnSystemDescriptionPtr getSystem(const QString& id) const override;
+    SystemDescriptionPtr getSystem(const QString& id) const override;
 
 private:
     struct Private;

@@ -9,6 +9,10 @@
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/data/module_information.h>
 
+#include "system_description_fwd.h"
+
+namespace nx::vms::client::core {
+
 enum class QnServerField
 {
     NoField = 0,
@@ -27,21 +31,25 @@ enum class QnSystemCompatibility
     incompatible
 };
 
-class NX_VMS_CLIENT_CORE_API QnBaseSystemDescription: public QObject
+class NX_VMS_CLIENT_CORE_API SystemDescription: public QObject
 {
     Q_OBJECT
-    typedef QObject base_type;
 
 public:
-    QnBaseSystemDescription() : base_type()
-    {
-    }
+    using QObject::QObject;
 
-    virtual ~QnBaseSystemDescription() {}
-
+    /**
+     * Some implementation-defined id-ish string. See `SystemFinder` class documentation for better
+     * understanding and actual implementation details.
+     */
     virtual QString id() const = 0;
 
-    virtual nx::Uuid localId() const = 0;
+    /**
+     * Local ID of the system. Can be empty (for the Factory systems), and generally speaking is
+     * not guaranteed to be unique between different systems (as long as they have no physical
+     * connectivity between each other).
+     */
+    virtual Uuid localId() const = 0;
 
     virtual QString name() const = 0;
 
@@ -55,23 +63,23 @@ public:
 
     virtual bool isNewSystem() const = 0;
 
-    virtual nx::vms::api::SaasState saasState() const = 0;
+    virtual api::SaasState saasState() const = 0;
 
-    typedef QList<nx::vms::api::ModuleInformationWithAddresses> ServersList;
+    using ServersList = QList<api::ModuleInformationWithAddresses>;
     virtual ServersList servers() const = 0;
 
-    virtual bool containsServer(const nx::Uuid &serverId) const = 0;
+    virtual bool containsServer(const Uuid& serverId) const = 0;
 
-    virtual nx::vms::api::ModuleInformationWithAddresses getServer(const nx::Uuid& serverId) const = 0;
+    virtual api::ModuleInformationWithAddresses getServer(const Uuid& serverId) const = 0;
 
-    virtual bool isReachableServer(const nx::Uuid& serverId) const = 0;
+    virtual bool isReachableServer(const Uuid& serverId) const = 0;
 
     // TODO: #ynikitenkov Rename host "field" to appropriate
-    virtual nx::utils::Url getServerHost(const nx::Uuid& serverId) const = 0;
+    virtual nx::utils::Url getServerHost(const Uuid& serverId) const = 0;
 
-    virtual QSet<nx::utils::Url> getServerRemoteAddresses(const nx::Uuid& serverId) const = 0;
+    virtual QSet<nx::utils::Url> getServerRemoteAddresses(const Uuid& serverId) const = 0;
 
-    virtual qint64 getServerLastUpdatedMs(const nx::Uuid& serverId) const = 0;
+    virtual qint64 getServerLastUpdatedMs(const Uuid& serverId) const = 0;
 
     /**
      * We can successfully establish network connection with this system from the current machine.
@@ -81,7 +89,7 @@ public:
 
     /**
      * We definitely know system is online - either because we successfully pinged it - or because
-     * our cloud server marked it as online.
+     * our cloud marked it as online.
      */
     virtual bool isOnline() const = 0;
 
@@ -96,9 +104,9 @@ public:
     virtual QString idForToStringFromPtr() const = 0;
 
 signals:
-    void serverAdded(const nx::Uuid& serverId);
-    void serverChanged(const nx::Uuid& serverId, QnServerFields flags);
-    void serverRemoved(const nx::Uuid& serverId);
+    void serverAdded(const Uuid& serverId);
+    void serverChanged(const Uuid& serverId, QnServerFields flags);
+    void serverRemoved(const Uuid& serverId);
 
     void isCloudSystemChanged();
     void system2faEnabledChanged();
@@ -113,4 +121,4 @@ signals:
     void organizationChanged();
 };
 
-using QnSystemDescriptionPtr = QSharedPointer<QnBaseSystemDescription>;
+} // namespace nx::vms::client::core

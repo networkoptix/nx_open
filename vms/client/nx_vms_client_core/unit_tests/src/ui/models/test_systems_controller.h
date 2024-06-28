@@ -23,7 +23,7 @@ public:
 public:
     virtual CloudStatusWatcher::Status cloudStatus() const override;
     virtual QString cloudLogin() const override;
-    virtual QnAbstractSystemsFinder::SystemDescriptionList systemsList() const override;
+    virtual SystemDescriptionList systemsList() const override;
     virtual nx::vms::client::core::welcome_screen::TileVisibilityScope visibilityScope(
         const nx::Uuid& localId) const override;
     virtual bool setScopeInfo(
@@ -34,11 +34,11 @@ public:
     void emitCloudStatusChanged();
     void emitCloudLoginChanged();
 
-    void emitSystemDiscovered(QnSystemDescriptionPtr systemDescription);
+    void emitSystemDiscovered(SystemDescriptionPtr systemDescription);
     void emitSystemLost(const QString& systemId);
 
 private:
-    QnAbstractSystemsFinder::SystemDescriptionList m_systems;
+    SystemDescriptionList m_systems;
     QHash<nx::Uuid, ScopeInfo> m_scopeInfoHash;
 };
 

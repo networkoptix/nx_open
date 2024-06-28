@@ -11,7 +11,6 @@
 
 #include <client_core/client_core_meta_types.h>
 #include <common/static_common_module.h>
-#include <finders/systems_finder.h>
 #include <nx/branding.h>
 #include <nx/branding_proxy.h>
 #include <nx/build_info_proxy.h>
@@ -28,6 +27,7 @@
 #include <nx/vms/client/core/skin/font_config.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/system_context.h>
+#include <nx/vms/client/core/system_finder/system_finder.h>
 #include <nx/vms/client/core/thumbnails/thumbnail_image_provider.h>
 #include <nx/vms/client/core/watchers/known_server_connections.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
@@ -122,7 +122,7 @@ struct ApplicationContext::Private
         }
         cloudStatusWatcher = std::make_unique<CloudStatusWatcher>();
         moduleDiscoveryManager = std::make_unique<nx::vms::discovery::Manager>();
-        systemsFinder = std::make_unique<QnSystemsFinder>();
+        systemFinder = std::make_unique<SystemFinder>();
     }
 
     void initializeExternalResources()
@@ -150,7 +150,7 @@ struct ApplicationContext::Private
     std::unique_ptr<QQmlEngine> qmlEngine;
     std::unique_ptr<Settings> settings;
     std::unique_ptr<CloudStatusWatcher> cloudStatusWatcher;
-    std::unique_ptr<QnSystemsFinder> systemsFinder;
+    std::unique_ptr<SystemFinder> systemFinder;
     std::unique_ptr<nx::vms::discovery::Manager> moduleDiscoveryManager;
     std::unique_ptr<QnVoiceSpectrumAnalyzer> voiceSpectrumAnalyzer;
     std::unique_ptr<Skin> skin;
@@ -313,9 +313,9 @@ nx::vms::discovery::Manager* ApplicationContext::moduleDiscoveryManager() const
     return d->moduleDiscoveryManager.get();
 }
 
-QnSystemsFinder* ApplicationContext::systemsFinder() const
+SystemFinder* ApplicationContext::systemFinder() const
 {
-    return d->systemsFinder.get();
+    return d->systemFinder.get();
 }
 
 QnVoiceSpectrumAnalyzer* ApplicationContext::voiceSpectrumAnalyzer() const

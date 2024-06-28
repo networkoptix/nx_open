@@ -6,7 +6,6 @@
 
 #include <QtCore/QTimer>
 
-#include <finders/systems_finder.h>
 #include <nx/network/address_resolver.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/network/url/url_parse_helper.h>
@@ -14,6 +13,7 @@
 #include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/ini.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
+#include <nx/vms/client/core/system_finder/system_finder.h>
 #include <nx/vms/discovery/manager.h>
 #include <nx_ec/abstract_ec_connection.h>
 
@@ -102,7 +102,7 @@ void KnownServerConnections::saveConnection(
 
 void KnownServerConnections::removeSystem(const QString& systemId)
 {
-    if (const auto system = qnSystemsFinder->getSystem(systemId))
+    if (const auto system = appContext()->systemFinder()->getSystem(systemId))
     {
         auto knownConnections = appContext()->coreSettings()->knownServerConnections();
         const auto moduleManager = appContext()->moduleDiscoveryManager();

@@ -2,7 +2,7 @@
 
 #include "cross_system_camera_resource.h"
 
-#include <network/base_system_description.h>
+#include <nx/vms/client/core/system_finder/system_description.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/system_context.h>

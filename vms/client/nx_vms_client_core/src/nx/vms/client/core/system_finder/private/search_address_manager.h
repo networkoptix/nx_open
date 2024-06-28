@@ -8,6 +8,8 @@
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/core/settings/search_addresses_info.h>
 
+namespace nx::vms::client::core {
+
 /**
  * Manages QnClientCoreSettings::SearchAddresses. Updates it when it's needed.
  * Should receive all found/updated servers remoteAddresses data.
@@ -36,3 +38,5 @@ private:
 private:
     nx::vms::client::core::SystemSearchAddressesHash m_searchAddressesInfo;
 };
+
+} // namespace nx::vms::client::core

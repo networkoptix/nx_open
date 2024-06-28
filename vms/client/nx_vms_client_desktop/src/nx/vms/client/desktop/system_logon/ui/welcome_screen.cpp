@@ -14,7 +14,6 @@
 #include <client/forgotten_systems_manager.h>
 #include <core/resource/file_processor.h>
 #include <core/resource/resource.h>
-#include <finders/systems_finder.h>
 #include <network/system_helpers.h>
 #include <nx/branding.h>
 #include <nx/network/deprecated/asynchttpclient.h>
@@ -31,6 +30,7 @@
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/core/settings/systems_visibility_manager.h>
 #include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/system_finder/system_finder.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/connection_url_parser.h>
 #include <nx/vms/client/desktop/help/help_handler.h>
@@ -398,7 +398,7 @@ void WelcomeScreen::connectToLocalSystemUsingSavedPassword(
     const QString& userName,
     bool storePassword)
 {
-    const auto system = qnSystemsFinder->getSystem(systemId);
+    const auto system = appContext()->systemFinder()->getSystem(systemId);
     if (!NX_ASSERT(system, "System is empty"))
         return;
 

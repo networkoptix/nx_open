@@ -2,22 +2,26 @@
 
 #pragma once
 
-#include <finders/local_systems_finder.h>
+#include "local_system_finder.h"
+
+namespace nx::vms::client::core {
 
 /**
  * Finder creates tiles for the systems, which were added to Favorites - or hidden - but are not
  * available anymore in any way. Tiles are displayed in the corresponding mode, so user can remove
  * the system from the list.
  */
-class ScopeLocalSystemsFinder: public LocalSystemsFinder
+class ScopeLocalSystemFinder: public LocalSystemFinder
 {
     Q_OBJECT
-    using base_type = LocalSystemsFinder;
+    using base_type = LocalSystemFinder;
 
 public:
-    ScopeLocalSystemsFinder(QObject* parent = nullptr);
-    virtual ~ScopeLocalSystemsFinder() = default;
+    ScopeLocalSystemFinder(QObject* parent = nullptr);
+    virtual ~ScopeLocalSystemFinder() = default;
 
 private:
     virtual void updateSystems() override;
 };
+
+} // namespace nx::vms::client::core

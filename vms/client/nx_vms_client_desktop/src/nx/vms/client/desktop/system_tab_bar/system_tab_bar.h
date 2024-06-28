@@ -4,7 +4,7 @@
 
 #include <QTabBar>
 
-#include <network/base_system_description.h>
+#include <nx/vms/client/core/system_finder/system_description_fwd.h>
 #include <nx/vms/client/desktop/common/widgets/tool_button.h>
 #include <ui/workbench/workbench_context_aware.h>
 
@@ -43,7 +43,7 @@ protected:
 private:
     void insertClosableTab(int index,
         const QString& text,
-        const QnSystemDescriptionPtr& systemDescription);
+        const core::SystemDescriptionPtr& systemDescription);
     bool isHomeTab(int index) const;
     int homeTabIndex() const;
     void updateHomeTabView();

@@ -5,6 +5,8 @@
 #include <network/system_helpers.h>
 #include <nx/utils/software_version.h>
 
+namespace nx::vms::client::core {
+
 QnCloudSystemDescriptionPtr QnCloudSystemDescription::create(const QnCloudSystem& system)
 {
     return QnCloudSystemDescriptionPtr(new QnCloudSystemDescription(
@@ -113,3 +115,5 @@ nx::utils::SoftwareVersion QnCloudSystemDescription::version() const
 {
     return std::max(m_lastKnownVersion, base_type::version());
 }
+
+} // namespace nx::vms::client::core

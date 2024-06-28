@@ -116,7 +116,7 @@ public:
     UniqueUuidSourcePtr otherServersSource();
 
     /**
-     * Provides ids of cloud systems retrieved from the CloudSystemsFinder instance.
+     * Provides ids of cloud systems retrieved from the CloudSystemFinder instance.
      */
     UniqueStringSourcePtr cloudSystemsSource();
 

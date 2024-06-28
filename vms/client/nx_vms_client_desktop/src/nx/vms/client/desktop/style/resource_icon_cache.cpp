@@ -15,7 +15,6 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/webpage_resource.h>
-#include <network/base_system_description.h>
 #include <network/system_helpers.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/vms/client/core/network/remote_connection.h>
@@ -23,6 +22,7 @@
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/skin/svg_icon_colorer.h>
 #include <nx/vms/client/core/skin/svg_loader.h>
+#include <nx/vms/client/core/system_finder/system_description.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>

@@ -29,7 +29,7 @@ QString TestSystemsController::cloudLogin() const
     return qnCloudStatusWatcher->cloudLogin();
 }
 
-QnAbstractSystemsFinder::SystemDescriptionList TestSystemsController::systemsList() const
+SystemDescriptionList TestSystemsController::systemsList() const
 {
     return m_systems;
 }
@@ -68,7 +68,7 @@ void TestSystemsController::emitCloudLoginChanged()
     emit cloudLoginChanged();
 }
 
-void TestSystemsController::emitSystemDiscovered(QnSystemDescriptionPtr systemDescription)
+void TestSystemsController::emitSystemDiscovered(SystemDescriptionPtr systemDescription)
 {
     m_systems.push_back(systemDescription);
 
@@ -78,7 +78,7 @@ void TestSystemsController::emitSystemDiscovered(QnSystemDescriptionPtr systemDe
 void TestSystemsController::emitSystemLost(const QString& systemId)
 {
     auto iter = std::find_if(m_systems.begin(), m_systems.end(),
-        [systemId](QnSystemDescriptionPtr system){
+        [systemId](SystemDescriptionPtr system){
             return system->localId() == nx::Uuid(systemId);
         });
 

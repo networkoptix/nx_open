@@ -23,7 +23,6 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
 #include <core/resource_management/status_dictionary.h>
-#include <finders/systems_finder.h>
 #include <licensing/license.h>
 #include <network/router.h>
 #include <network/system_helpers.h>
@@ -50,6 +49,7 @@
 #include <nx/vms/client/core/network/remote_session_timeout_watcher.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/core/system_finder/system_finder.h>
 #include <nx/vms/client/core/utils/reconnect_helper.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>

@@ -9,13 +9,13 @@
 #include <core/resource/resource_display_info.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <finders/systems_finder.h>
-#include <network/base_system_description.h>
+#include <nx/vms/client/core/system_finder/system_description.h>
+#include <nx/vms/client/core/system_finder/system_finder.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
-#include <nx/vms/client/desktop/other_servers/other_servers_manager.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/other_servers/other_servers_manager.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/item/generic_item/generic_item_builder.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/item/cloud_system_status_item.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/item/resource_item.h>
@@ -130,8 +130,8 @@ InvalidatorPtr cloudSystemNameInvalidator(const QString& systemId)
         return result;
 
     result->connections()->add(QObject::connect(
-        context->systemDescription(),
-        &QnBaseSystemDescription::systemNameChanged,
+        context->systemDescription().get(),
+        &nx::vms::client::core::SystemDescription::systemNameChanged,
         [invalidator = result.get()]
         {
             invalidator->invalidate();
@@ -187,8 +187,8 @@ InvalidatorPtr cloudSystemIconInvalidator(const QString& systemId)
         invalidate));
 
     result->connections()->add(QObject::connect(
-        context->systemDescription(),
-        &QnBaseSystemDescription::onlineStateChanged,
+        context->systemDescription().get(),
+        &nx::vms::client::core::SystemDescription::onlineStateChanged,
         invalidate));
 
     return result;

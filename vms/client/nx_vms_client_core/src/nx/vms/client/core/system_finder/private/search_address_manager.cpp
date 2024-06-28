@@ -5,7 +5,7 @@
 #include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
 
-using namespace nx::vms::client::core;
+namespace nx::vms::client::core {
 
 SearchAddressManager::SearchAddressManager(QObject* parent):
     QObject(parent)
@@ -53,3 +53,5 @@ void SearchAddressManager::update()
 
     appContext()->coreSettings()->searchAddresses = searchAddresses;
 }
+
+} // namespace nx::vms::client::core

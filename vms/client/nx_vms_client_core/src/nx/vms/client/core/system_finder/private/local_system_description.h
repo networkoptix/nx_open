@@ -2,19 +2,22 @@
 
 #pragma once
 
-#include <network/system_description.h>
+#include "single_system_description.h"
 
-class NX_VMS_CLIENT_CORE_API QnLocalSystemDescription: public QnSystemDescription
+namespace nx::vms::client::core {
+
+class LocalSystemDescription;
+using LocalSystemDescriptionPtr = QSharedPointer<LocalSystemDescription>;
+
+class NX_VMS_CLIENT_CORE_API LocalSystemDescription: public SingleSystemDescription
 {
     Q_OBJECT
-    using base_type = QnSystemDescription;
+    using base_type = SingleSystemDescription;
 
 public:
-    using SystemDescriptionPtr = QSharedPointer<QnLocalSystemDescription>;
+    static LocalSystemDescriptionPtr createFactory(const QString& systemId);
 
-    static SystemDescriptionPtr createFactory(const QString& systemId);
-
-    static SystemDescriptionPtr create(
+    static LocalSystemDescriptionPtr create(
         const QString& systemId,
         const nx::Uuid& localSystemId,
         const QString& systemName);
@@ -34,10 +37,10 @@ public: // Overrides
 
 private:
     // Ctor for factory system
-    QnLocalSystemDescription(const QString& systemId);
+    LocalSystemDescription(const QString& systemId);
 
     // Ctor for regular local system
-    QnLocalSystemDescription(
+    LocalSystemDescription(
         const QString& systemId,
         const nx::Uuid& localSystemId,
         const QString& systemName);
@@ -50,4 +53,4 @@ private:
     bool m_isNewSystem;
 };
 
-using QnLocalSystemDescriptionPtr = QnLocalSystemDescription::SystemDescriptionPtr;
+} // namespace nx::vms::client::core

@@ -5,8 +5,8 @@
 #include <QtCore/QPointer>
 
 #include <core/resource/camera_resource.h>
-#include <network/base_system_description.h>
 #include <nx/utils/scoped_connections.h>
+#include <nx/vms/client/core/system_finder/system_description.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
@@ -78,8 +78,8 @@ struct CloudSystemCamerasSource::Private
             };
 
         connections << QObject::connect(
-            systemContext->systemDescription(),
-            &QnBaseSystemDescription::onlineStateChanged,
+            systemContext->systemDescription().get(),
+            &core::SystemDescription::onlineStateChanged,
             handleSystemStateChanges);
 
         connections << QObject::connect(

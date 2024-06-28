@@ -12,9 +12,7 @@
 #include <nx/vms/client/core/network/remote_connection_factory.h>
 #include <nx/vms/client/core/network/remote_connection_fwd.h>
 #include <nx/vms/client/core/resource/resource_fwd.h>
-
-class QnBaseSystemDescription;
-using QnSystemDescriptionPtr = QSharedPointer<QnBaseSystemDescription>;
+#include <nx/vms/client/core/system_finder/system_description_fwd.h>
 
 namespace nx::vms::client::desktop {
 
@@ -28,7 +26,8 @@ public:
     using base_type = QObject;
 
 public:
-    CloudCrossSystemContext(QnSystemDescriptionPtr systemDescription, QObject* parent = nullptr);
+    CloudCrossSystemContext(core::SystemDescriptionPtr systemDescription,
+        QObject* parent = nullptr);
     virtual ~CloudCrossSystemContext() override;
 
     enum class Status
@@ -49,7 +48,7 @@ public:
 
     QString systemId() const;
 
-    QnBaseSystemDescription* systemDescription() const;
+    core::SystemDescriptionPtr systemDescription() const;
 
     SystemContext* systemContext() const;
 

@@ -13,12 +13,12 @@
 
 #include <client/client_globals.h>
 #include <core/resource/resource.h>
-#include <finders/systems_finder.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/core/image_providers/resource_thumbnail_provider.h>
 #include <nx/vms/client/core/ini.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/core/system_finder/system_finder.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/common/widgets/close_button.h>

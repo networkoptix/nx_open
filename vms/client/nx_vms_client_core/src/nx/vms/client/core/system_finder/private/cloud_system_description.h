@@ -3,12 +3,15 @@
 #pragma once
 
 #include <network/cloud_system_data.h>
-#include <network/system_description.h>
 
-class NX_VMS_CLIENT_CORE_API QnCloudSystemDescription: public QnSystemDescription
+#include "single_system_description.h"
+
+namespace nx::vms::client::core {
+
+class NX_VMS_CLIENT_CORE_API QnCloudSystemDescription: public SingleSystemDescription
 {
     Q_OBJECT
-    using base_type = QnSystemDescription;
+    using base_type = SingleSystemDescription;
 
 public:
     static QSharedPointer<QnCloudSystemDescription> create(const QnCloudSystem& system);
@@ -63,3 +66,5 @@ private:
 };
 
 using QnCloudSystemDescriptionPtr = QSharedPointer<QnCloudSystemDescription>;
+
+} // namespace nx::vms::client::core

@@ -22,7 +22,6 @@
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <decoders/video/abstract_video_decoder.h>
-#include <finders/systems_finder.h>
 #include <nx/build_info.h>
 #include <nx/network/http/http_mod_manager.h>
 #include <nx/network/socket_global.h>
@@ -32,6 +31,7 @@
 #include <nx/vms/client/core/analytics/analytics_settings_manager.h>
 #include <nx/vms/client/core/analytics/analytics_settings_manager_factory.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
+#include <nx/vms/client/core/system_finder/system_finder.h>
 #include <nx/vms/client/core/watchers/known_server_connections.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/debug_utils/components/debug_info_storage.h>

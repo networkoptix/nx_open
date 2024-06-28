@@ -4,10 +4,9 @@
 
 #include <optional>
 
-#include "logon_data.h"
+#include <nx/vms/client/core/system_finder/system_description_fwd.h>
 
-class QnBaseSystemDescription;
-using QnSystemDescriptionPtr = QSharedPointer<QnBaseSystemDescription>;
+#include "logon_data.h"
 
 namespace nx::vms::client::core {
 
@@ -16,7 +15,7 @@ NX_VMS_CLIENT_CORE_API std::optional<LogonData> cloudLogonData(const QString& sy
 
 /** Parameters for a connection to the system with the specified cloud system. */
 NX_VMS_CLIENT_CORE_API std::optional<LogonData> cloudLogonData(
-    const QnSystemDescriptionPtr& system);
+    const SystemDescriptionPtr& system);
 
 /** Parameters for a connection to the local system with specified url and credentials. */
 NX_VMS_CLIENT_CORE_API LogonData localLogonData(

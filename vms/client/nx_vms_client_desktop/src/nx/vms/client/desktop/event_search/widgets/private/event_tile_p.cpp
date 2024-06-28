@@ -5,11 +5,12 @@
 
 #include <QtGui/QTextDocument>
 
-#include <finders/systems_finder.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/core/image_providers/resource_thumbnail_provider.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/core/system_finder/system_finder.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/command_action.h>
 #include <nx/vms/client/desktop/common/widgets/close_button.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
@@ -337,7 +338,7 @@ QString EventTile::Private::getSystemName(const QString& systemId)
     if (systemId.isEmpty())
         return QString();
 
-    auto systemDescription = qnSystemsFinder->getSystem(systemId);
+    auto systemDescription = appContext()->systemFinder()->getSystem(systemId);
     if (!NX_ASSERT(systemDescription))
         return QString();
 
