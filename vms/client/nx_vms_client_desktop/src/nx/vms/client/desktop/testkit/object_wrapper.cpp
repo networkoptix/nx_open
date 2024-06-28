@@ -7,6 +7,8 @@
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QMenu>
 
+#include <nx/vms/client/core/testkit/utils.h>
+
 #include "utils.h"
 
 namespace nx::vms::client::desktop::testkit {
@@ -99,11 +101,13 @@ void ObjectWrapper::activateWindow()
 
 QVariantMap ObjectWrapper::metaInfo(QString name) const
 {
-    QVariantMap result = utils::getMetaInfo(m_object->metaObject(), name);
+    using namespace nx::vms::client::core::testkit::utils;
+
+    QVariantMap result = getMetaInfo(m_object->metaObject(), name);
     if (!result.isEmpty())
         return result;
 
-    return utils::getMetaInfo(&this->staticMetaObject, name);
+    return getMetaInfo(&this->staticMetaObject, name);
 }
 
 } // namespace nx::vms::client::desktop::testkit

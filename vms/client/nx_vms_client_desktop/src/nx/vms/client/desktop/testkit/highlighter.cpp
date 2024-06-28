@@ -11,6 +11,7 @@
 #include <QtQuickWidgets/QQuickWidget>
 
 #include <client_core/client_core_module.h>
+#include <nx/vms/client/core/testkit/utils.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/testkit/utils.h>
@@ -216,7 +217,7 @@ QVariant Highlighter::pick(QPoint globalPos) const
         size = minRect.size();
 
     QString className = minObject->metaObject()->className();
-    auto [name, location] = utils::nameAndBaseUrl(minObject);
+    auto [name, location] = core::testkit::utils::nameAndBaseUrl(minObject);
 
     const QRect screenGeometry = screen->geometry();
     const QRect rect(minRect.topLeft() - screenGeometry.topLeft(), minRect.size());

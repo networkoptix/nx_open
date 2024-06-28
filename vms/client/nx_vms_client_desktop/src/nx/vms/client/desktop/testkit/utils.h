@@ -24,9 +24,6 @@ bool tabItemMatches(const QTabBar* tabBar, int index, QJSValue properties);
 /** Returns true if object properties match with graphics item properties. */
 bool graphicsItemMatches(QGraphicsItem* item, QJSValue properties);
 
-/** Returns true if text from UI element (with/without shotcuts) matches with specified text. */
-bool textMatches(QString itemText, QString text);
-
 /** Returns true if index properties match with specified properties. */
 bool indexMatches(QModelIndex index, QJSValue properties);
 
@@ -134,9 +131,6 @@ Qt::MouseButtons sendMouse(
     bool inverted = false,
     int scrollDelta = 0);
 
-/** Property type or method return type info. */
-QVariantMap getMetaInfo(const QMetaObject* meta, QString methodOrProperty);
-
 /** Returns some QModelIndex fields as QVarintMap. */
 QVariant dumpQModelIndex(
     const QAbstractItemModel* model,
@@ -145,9 +139,6 @@ QVariant dumpQModelIndex(
 
 /** Returns QObject properties as QVarintMap. */
 QVariant dumpQObject(const QObject* object, bool withChildren = false);
-
-/** Returns objectName() for QObject or QML id and source location for QQuickItem. */
-std::pair<QString, QString> nameAndBaseUrl(const QObject* object);
 
 /** Returns top level visible QMenu which contains the QAction with valid geometry. */
 std::pair<QMenu*, QRect> findActionGeometry(QAction* action);
