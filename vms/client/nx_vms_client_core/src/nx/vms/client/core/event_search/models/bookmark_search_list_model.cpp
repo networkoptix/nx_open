@@ -354,9 +354,6 @@ bool BookmarkSearchListModel::requestFetch(
     const FetchRequest& request,
     const FetchCompletionHandler& completionHandler)
 {
-    if (currentRequest())
-        return false; //< Can't make a new request until the old one is in progress.
-
     // Cancel dynamic update request.
     d->requestIds.resetValue(detail::MultiRequestIdHolder::Mode::dynamic);
 

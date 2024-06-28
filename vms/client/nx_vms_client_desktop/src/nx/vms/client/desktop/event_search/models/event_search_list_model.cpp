@@ -528,10 +528,7 @@ bool EventSearchListModel::requestFetch(
     const core::FetchRequest& request,
     const FetchCompletionHandler& completionHandler)
 {
-    if (currentRequest())
-        return false; //< Can't make a new request until the old one is in progress.
-
-    // Can't make a new request until the old one is in progress.
+    // Cancel dynamic update request.
     d->multiRequestIdHolder.resetValue(MultiRequestIdHolder::Mode::dynamic);
 
     return d->requestFetch(request, completionHandler, MultiRequestIdHolder::Mode::fetch);
