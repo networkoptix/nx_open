@@ -5,7 +5,7 @@
 #include <qt_graphics_items/graphics_label.h>
 
 #include <core/resource/user_resource.h>
-#include <network/base_system_description.h>
+#include <nx/vms/client/core/system_finder/system_description.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/desktop/cross_system/cross_system_camera_resource.h>

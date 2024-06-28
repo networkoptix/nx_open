@@ -12,13 +12,13 @@
 #include <core/resource/videowall_resource.h>
 #include <core/resource_access/resource_access_filter.h>
 #include <core/resource_management/resource_pool.h>
-#include <finders/systems_finder.h>
 #include <nx/fusion/serialization/json_functions.h>
 #include <nx/utils/math/fuzzy.h>
 #include <nx/utils/qt_helpers.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/vms/client/core/resource/unified_resource_pool.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/core/system_finder/system_finder.h>
 #include <nx/vms/client/desktop/access/caching_access_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/cross_system/cross_system_layout_resource.h>
@@ -503,7 +503,7 @@ void Workbench::addSystem(nx::Uuid systemId, const LogonData& logonData)
     if (!ini().enableMultiSystemTabBar)
         return;
 
-    auto systemDescription = qnSystemsFinder->getSystem(systemId.toSimpleString());
+    auto systemDescription = appContext()->systemFinder()->getSystem(systemId.toSimpleString());
     if (!NX_ASSERT(systemDescription, "Can't find description for system: %1", systemId))
         return;
 
@@ -517,7 +517,7 @@ void Workbench::addSystem(const QString& systemId, const LogonData& logonData)
     if (!ini().enableMultiSystemTabBar)
         return;
 
-    auto systemDescription = qnSystemsFinder->getSystem(systemId);
+    auto systemDescription = appContext()->systemFinder()->getSystem(systemId);
 
     NX_ASSERT(systemDescription, "Can't find description for system: %1", systemId);
 

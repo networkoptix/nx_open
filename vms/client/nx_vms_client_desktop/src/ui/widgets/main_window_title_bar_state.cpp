@@ -2,11 +2,11 @@
 
 #include "main_window_title_bar_state.h"
 
-#include <finders/systems_finder.h>
-#include <network/system_description.h>
 #include <network/system_helpers.h>
 #include <nx/fusion/serialization/json_functions.h>
 #include <nx/vms/client/core/network/credentials_manager.h>
+#include <nx/vms/client/core/system_finder/system_description.h>
+#include <nx/vms/client/core/system_finder/system_finder.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <nx/vms/client/desktop/window_context.h>
@@ -21,11 +21,19 @@ const QString kSystemsKey = "systems";
 
 namespace nx::vms::client::desktop {
 
+using core::SystemDescriptionPtr;
+
 //-------------------------------------------------------------------------------------------------
 // struct MainWindowTitleBarState
 
+QString MainWindowTitleBarState::SystemData::name() const
+{
+    return systemDescription->name();
+}
+
 bool MainWindowTitleBarState::SystemData::operator==(const SystemData& other) const
 {
+    // FIXME: #aivashchenko Comparing pointers looks very suspicious.
     return this->systemDescription == other.systemDescription;
 }
 
@@ -76,7 +84,7 @@ struct MainWindowTitleBarStateReducer
     static State removeSystemId(State&& state, nx::Uuid systemId);
     static State removeSystem(State&& state, const LogonData& logonData);
     static State removeCurrentSystem(State&& state);
-    static State changeCurrentSystem(State&& state, QnSystemDescriptionPtr systemDescription);
+    static State changeCurrentSystem(State&& state, SystemDescriptionPtr systemDescription);
     static State moveSystem(State&& state, int indexFrom, int IndexTo);
     static State setSystemUpdating(State&& state, bool value);
     static State setSystems(State&& state, QList<State::SystemData> systems);
@@ -188,7 +196,7 @@ MainWindowTitleBarStateReducer::State MainWindowTitleBarStateReducer::removeCurr
 }
 
 MainWindowTitleBarStateReducer::State MainWindowTitleBarStateReducer::changeCurrentSystem(
-    State&& state, QnSystemDescriptionPtr systemDescription)
+    State&& state, SystemDescriptionPtr systemDescription)
 {
     const auto systemId = systemDescription->localId();
     const auto index = state.findSystemIndex(systemId);
@@ -260,7 +268,7 @@ public:
         QList<State::SystemData> systems;
         for (const auto systemId: systemIds)
         {
-            auto system = appContext()->systemsFinder()->getSystem(systemId.toSimpleString());
+            auto system = appContext()->systemFinder()->getSystem(systemId.toSimpleString());
 
             LogonData logonData;
             const auto servers = system->servers();
@@ -359,17 +367,17 @@ void MainWindowTitleBarStateStore::setConnectionState(ConnectActionsHandler::Log
         dispatch(Reducer::setConnectionState, value);
 }
 
-void MainWindowTitleBarStateStore::addSystem(const QnSystemDescriptionPtr& systemDescription,
+void MainWindowTitleBarStateStore::addSystem(const SystemDescriptionPtr& systemDescription,
     const LogonData& logonData)
 {
     if (state().findSystemIndex(systemDescription->localId()) >= 0)
         return;
 
     State::SystemData value =
-        {.systemDescription = systemDescription, .logonData = std::move(logonData)};
+        {.systemDescription = systemDescription, .logonData = logonData};
     dispatch(Reducer::addSystem, value);
 
-    connect(systemDescription.get(), &QnSystemDescription::systemNameChanged, this,
+    connect(systemDescription.get(), &core::SystemDescription::systemNameChanged, this,
         [this, systemDescription]
         {
             const int index = state().findSystemIndex(systemDescription->localId());
@@ -382,7 +390,7 @@ void MainWindowTitleBarStateStore::insertSystem(int index, const State::SystemDa
     dispatch(Reducer::insertSystem, index, systemData);
 }
 
-void MainWindowTitleBarStateStore::removeSystem(const QnSystemDescriptionPtr& systemDescription)
+void MainWindowTitleBarStateStore::removeSystem(const SystemDescriptionPtr& systemDescription)
 {
     if (systemDescription)
         removeSystem(systemDescription->localId());
@@ -413,7 +421,7 @@ void MainWindowTitleBarStateStore::removeCurrentSystem()
     dispatch(Reducer::removeCurrentSystem);
 }
 
-void MainWindowTitleBarStateStore::changeCurrentSystem(QnSystemDescriptionPtr systemDescription)
+void MainWindowTitleBarStateStore::changeCurrentSystem(SystemDescriptionPtr systemDescription)
 {
     dispatch(Reducer::changeCurrentSystem, systemDescription);
 }

@@ -15,7 +15,6 @@
 #include <core/resource/file_processor.h>
 #include <core/resource/resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <network/system_description.h>
 #include <nx/cloud/db/api/result_code.h>
 #include <nx/cloud/db/api/system_data.h>
 #include <nx/utils/uuid.h>
@@ -231,8 +230,6 @@ void QnClientMetaTypes::initialize()
     QMetaType::registerConverter<QnCameraBookmarkList, QVariantList>(bookmarkListToVariantList);
     QMetaType::registerConverter<QVariantList, QnCameraBookmarkList>(variantListToBookmarkList);
     QMetaType::registerConverter<QnCameraBookmark, QString>(bookmarkToString);
-
-    qRegisterMetaType<QnServerFields>();
 
     WebViewController::registerMetaType();
 

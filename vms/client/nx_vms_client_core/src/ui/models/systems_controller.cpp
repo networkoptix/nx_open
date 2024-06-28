@@ -2,22 +2,22 @@
 
 #include "systems_controller.h"
 
-#include <finders/systems_finder.h>
-#include <nx/vms/client/core/settings/systems_visibility_manager.h>
 #include <nx/vms/client/core/application_context.h>
+#include <nx/vms/client/core/settings/systems_visibility_manager.h>
+#include <nx/vms/client/core/system_finder/system_finder.h>
 
 using namespace nx::vms::client::core;
 
 SystemsController::SystemsController(QObject* parent): AbstractSystemsController(parent)
 {
-    NX_ASSERT(qnSystemsFinder, "SystemsFinder is not initialized.");
+    NX_ASSERT(appContext()->systemFinder(), "SystemFinder is not initialized.");
     NX_ASSERT(qnCloudStatusWatcher, "CloudStatusWatcher is not initialized.");
     NX_ASSERT(qnSystemsVisibilityManager, "SystemsVisibilityManger is not initialized.");
 
-    connect(qnSystemsFinder, &QnAbstractSystemsFinder::systemDiscovered,
+    connect(appContext()->systemFinder(), &AbstractSystemFinder::systemDiscovered,
         this, &AbstractSystemsController::systemDiscovered);
 
-    connect(qnSystemsFinder, &QnAbstractSystemsFinder::systemLost,
+    connect(appContext()->systemFinder(), &AbstractSystemFinder::systemLost,
         this, &SystemsController::systemLost);
 
     connect(qnCloudStatusWatcher, &CloudStatusWatcher::statusChanged,
@@ -40,9 +40,9 @@ QString SystemsController::cloudLogin() const
     return qnCloudStatusWatcher->cloudLogin();
 }
 
-QnAbstractSystemsFinder::SystemDescriptionList SystemsController::systemsList() const
+SystemDescriptionList SystemsController::systemsList() const
 {
-    return qnSystemsFinder->systems();
+    return appContext()->systemFinder()->systems();
 }
 
 nx::vms::client::core::welcome_screen::TileVisibilityScope SystemsController::visibilityScope(

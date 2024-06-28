@@ -2,20 +2,20 @@
 
 #include <gmock/gmock.h>
 
-#include <finders/systems_finder.h>
+#include <nx/vms/client/core/system_finder/system_finder.h>
 
 namespace nx::vms::client::core::test {
 
-class SystemFinderMock: public QnAbstractSystemsFinder
+class SystemFinderMock: public AbstractSystemFinder
 {
-    using base_type = QnAbstractSystemsFinder;
+    using base_type = AbstractSystemFinder;
 
 public:
     SystemFinderMock(QObject* parent = nullptr):
         base_type(parent)
     {}
 
-    void addSystem(const QnSystemDescriptionPtr& system)
+    void addSystem(const SystemDescriptionPtr& system)
     {
         m_systems.insert(system->id(), system);
         emit systemDiscovered(system);
@@ -38,15 +38,15 @@ public:
         return m_systems.values();
     }
 
-    virtual QnSystemDescriptionPtr getSystem(const QString& id) const override
+    virtual SystemDescriptionPtr getSystem(const QString& id) const override
     {
         const auto it = m_systems.find(id);
 
-        return it != m_systems.end() ? *it : QnSystemDescriptionPtr();
+        return it != m_systems.end() ? *it : SystemDescriptionPtr();
     }
 
 private:
-    using SystemMap = QMap<QString, QnSystemDescriptionPtr>;
+    using SystemMap = QMap<QString, SystemDescriptionPtr>;
 
     SystemMap m_systems;
 };

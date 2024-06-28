@@ -10,7 +10,6 @@
 #include <core/resource/camera_history.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource_management/resource_pool.h>
-#include <finders/systems_finder.h>
 #include <licensing/license.h>
 #include <network/system_helpers.h>
 #include <nx/fusion/model_functions.h>
@@ -26,6 +25,7 @@
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/resource/data_loaders/caching_camera_data_loader.h>
 #include <nx/vms/client/core/resource/user.h>
+#include <nx/vms/client/core/system_finder/system_finder.h>
 #include <nx/vms/client/core/utils/cloud_session_token_updater.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
@@ -49,6 +49,8 @@ namespace nx::vms::client::desktop {
 
 using namespace nx::network::http;
 using namespace nx::cloud::db::api;
+using core::SystemDescription;
+using core::SystemDescriptionPtr;
 
 namespace {
 
@@ -61,7 +63,7 @@ static const nx::utils::SoftwareVersion kMinApiSupportedVersion(5, 1);
 
 struct CloudCrossSystemContext::Private
 {
-    Private(CloudCrossSystemContext* owner, QnSystemDescriptionPtr systemDescription):
+    Private(CloudCrossSystemContext* owner, SystemDescriptionPtr systemDescription):
         q(owner),
         systemDescription(systemDescription)
     {
@@ -117,7 +119,7 @@ struct CloudCrossSystemContext::Private
                 NX_VERBOSE(this, "Cloud status became %1", qnCloudStatusWatcher->status());
                 ensureConnection();
             });
-        connect(systemDescription.get(), &QnBaseSystemDescription::reachableStateChanged, q,
+        connect(systemDescription.get(), &SystemDescription::reachableStateChanged, q,
             [this]
             {
                 NX_VERBOSE(
@@ -126,14 +128,14 @@ struct CloudCrossSystemContext::Private
                     this->systemDescription->isReachable() ? "reachable" : "unreachable");
                 ensureConnection();
             });
-        connect(systemDescription.get(), &QnBaseSystemDescription::onlineStateChanged, q,
+        connect(systemDescription.get(), &SystemDescription::onlineStateChanged, q,
             [this]
             {
                 const bool isOnline = this->systemDescription->isOnline();
                 NX_VERBOSE(this, "System became %1", isOnline ? "online" : "offline");
                 ensureConnection();
             });
-        connect(systemDescription.get(), &QnBaseSystemDescription::system2faEnabledChanged, q,
+        connect(systemDescription.get(), &SystemDescription::system2faEnabledChanged, q,
             [this]
             {
                 NX_VERBOSE(
@@ -146,7 +148,7 @@ struct CloudCrossSystemContext::Private
                 else
                     ensureConnection();
             });
-        connect(systemDescription.get(), &QnBaseSystemDescription::oauthSupportedChanged, q,
+        connect(systemDescription.get(), &SystemDescription::oauthSupportedChanged, q,
             [this]
             {
                 NX_VERBOSE(
@@ -189,7 +191,7 @@ struct CloudCrossSystemContext::Private
 
     CloudCrossSystemContext* const q;
     std::unique_ptr<CloudCrossSystemContextDataLoader> dataLoader;
-    QnSystemDescriptionPtr const systemDescription;
+    SystemDescriptionPtr const systemDescription;
     Status status = Status::uninitialized;
     core::RemoteConnectionFactory::ProcessPtr connectionProcess;
     std::unique_ptr<SystemContext> systemContext;
@@ -638,7 +640,7 @@ struct CloudCrossSystemContext::Private
 };
 
 CloudCrossSystemContext::CloudCrossSystemContext(
-    QnSystemDescriptionPtr systemDescription,
+    SystemDescriptionPtr systemDescription,
     QObject* parent)
     :
     base_type(parent),
@@ -658,8 +660,8 @@ CloudCrossSystemContext::CloudCrossSystemContext(
     const auto update = [this]() { d->updateCameras(); };
 
     connect(this, &CloudCrossSystemContext::statusChanged, this, update);
-    connect(systemDescription.data(), &QnBaseSystemDescription::onlineStateChanged, this, update);
-    connect(systemDescription.data(), &QnBaseSystemDescription::isCloudSystemChanged, this, update);
+    connect(systemDescription.data(), &SystemDescription::onlineStateChanged, this, update);
+    connect(systemDescription.data(), &SystemDescription::isCloudSystemChanged, this, update);
 }
 
 CloudCrossSystemContext::~CloudCrossSystemContext() = default;
@@ -686,9 +688,9 @@ QString CloudCrossSystemContext::systemId() const
     return d->systemDescription->id();
 }
 
-QnBaseSystemDescription* CloudCrossSystemContext::systemDescription() const
+SystemDescriptionPtr CloudCrossSystemContext::systemDescription() const
 {
-    return d->systemDescription.get();
+    return d->systemDescription;
 }
 
 SystemContext* CloudCrossSystemContext::systemContext() const

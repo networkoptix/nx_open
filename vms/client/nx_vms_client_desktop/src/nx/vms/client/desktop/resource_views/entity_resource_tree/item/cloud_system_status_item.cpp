@@ -5,9 +5,9 @@
 #include <QtCore/QCoreApplication> //< For Q_DECLARE_TR_FUNCTIONS.
 
 #include <client/client_globals.h>
-#include <network/base_system_description.h>
 #include <nx/utils/scoped_connections.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/core/system_finder/system_description.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
@@ -110,8 +110,8 @@ CloudSystemStatusItem::CloudSystemStatusItem(const QString& systemId):
         notifyChanged));
 
     d->systemDescriptionConnection.reset(QObject::connect(
-        d->crossSystemContext->systemDescription(),
-        &QnBaseSystemDescription::onlineStateChanged,
+        d->crossSystemContext->systemDescription().get(),
+        &core::SystemDescription::onlineStateChanged,
         notifyChanged));
 }
 

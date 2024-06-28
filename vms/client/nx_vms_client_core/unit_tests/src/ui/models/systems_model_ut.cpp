@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include <network/local_system_description.h>
+#include <nx/vms/client/core/system_finder/private/local_system_description.h>
 #include <ui/models/systems_model.h>
 
 #include "test_systems_controller.h"
@@ -14,9 +14,9 @@ namespace {
 
 using TileVisibilityScope = nx::vms::client::core::welcome_screen::TileVisibilityScope;
 
-QnSystemDescriptionPtr createSystemsDescription()
+SystemDescriptionPtr createSystemsDescription()
 {
-    return QnLocalSystemDescription::create(
+    return LocalSystemDescription::create(
         nx::Uuid::createUuid().toSimpleString(),
         nx::Uuid::createUuid(),
         "name");

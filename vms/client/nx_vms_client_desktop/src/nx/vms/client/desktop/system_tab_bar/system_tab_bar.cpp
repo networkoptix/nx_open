@@ -13,6 +13,7 @@
 
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/core/system_finder/system_description.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/skin/font_config.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
@@ -121,7 +122,7 @@ void SystemTabBar::rebuildTabs()
     for (int i = 0; i < m_store->systemCount(); ++i)
     {
         const auto systemData = m_store->systemData(i);
-        if (tabData(i).value<QnSystemDescriptionPtr>() == systemData->systemDescription)
+        if (tabData(i).value<core::SystemDescriptionPtr>() == systemData->systemDescription)
             continue;
 
         if (i < homeTabIndex())
@@ -266,7 +267,7 @@ void SystemTabBar::contextMenuEvent(QContextMenuEvent* event)
 
 void SystemTabBar::insertClosableTab(int index,
     const QString& text,
-    const QnSystemDescriptionPtr& systemDescription)
+    const core::SystemDescriptionPtr& systemDescription)
 {
     insertTab(index, text);
     setTabData(index, QVariant::fromValue(systemDescription));

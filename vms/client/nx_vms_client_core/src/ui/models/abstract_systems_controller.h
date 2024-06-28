@@ -2,10 +2,9 @@
 
 #pragma once
 
-#include <finders/abstract_systems_finder.h>
-#include <network/base_system_description.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/settings/welcome_screen_info.h>
+#include <nx/vms/client/core/system_finder/abstract_system_finder.h>
 
 class NX_VMS_CLIENT_CORE_API AbstractSystemsController: public QObject
 {
@@ -18,7 +17,7 @@ public:
 public:
     virtual nx::vms::client::core::CloudStatusWatcher::Status cloudStatus() const = 0;
     virtual QString cloudLogin() const = 0;
-    virtual QnAbstractSystemsFinder::SystemDescriptionList systemsList() const = 0;
+    virtual nx::vms::client::core::SystemDescriptionList systemsList() const = 0;
     virtual nx::vms::client::core::welcome_screen::TileVisibilityScope visibilityScope(
         const nx::Uuid& localId) const = 0;
     virtual bool setScopeInfo(
@@ -30,6 +29,6 @@ signals:
     void cloudStatusChanged();
     void cloudLoginChanged();
 
-    void systemDiscovered(const QnSystemDescriptionPtr& systemDescription);
+    void systemDiscovered(const nx::vms::client::core::SystemDescriptionPtr& systemDescription);
     void systemLost(const QString& systemId, const nx::Uuid& localId);
 };

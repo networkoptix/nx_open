@@ -2,6 +2,7 @@
 
 #include "system_tab_bar_state_handler.h"
 
+#include <nx/vms/client/core/system_finder/system_description.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/action_parameters.h>
 #include <nx/vms/client/desktop/window_context.h>
@@ -92,7 +93,8 @@ void SystemTabBarStateHandler::at_stateChanged(const State& state)
     m_storedState = state;
 }
 
-void SystemTabBarStateHandler::at_currentSystemChanged(QnSystemDescriptionPtr systemDescription)
+void SystemTabBarStateHandler::at_currentSystemChanged(
+    core::SystemDescriptionPtr systemDescription)
 {
     if (m_store)
         m_store->changeCurrentSystem(systemDescription);

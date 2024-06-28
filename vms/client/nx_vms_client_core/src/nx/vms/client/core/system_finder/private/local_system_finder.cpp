@@ -1,25 +1,27 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "local_systems_finder.h"
+#include "local_system_finder.h"
 
 #include <nx/utils/qt_helpers.h>
 
-LocalSystemsFinder::LocalSystemsFinder(QObject* parent):
+namespace nx::vms::client::core {
+
+LocalSystemFinder::LocalSystemFinder(QObject* parent):
     base_type(parent)
 {
 }
 
-QnAbstractSystemsFinder::SystemDescriptionList LocalSystemsFinder::systems() const
+SystemDescriptionList LocalSystemFinder::systems() const
 {
     return m_systems.values();
 }
 
-QnSystemDescriptionPtr LocalSystemsFinder::getSystem(const QString& id) const
+SystemDescriptionPtr LocalSystemFinder::getSystem(const QString& id) const
 {
-    return m_systems.value(id, QnSystemDescriptionPtr());
+    return m_systems.value(id, SystemDescriptionPtr());
 }
 
-void LocalSystemsFinder::setSystems(const SystemsHash& newSystems)
+void LocalSystemFinder::setSystems(const SystemsHash& newSystems)
 {
     if (m_systems == newSystems)
         return;
@@ -40,8 +42,10 @@ void LocalSystemsFinder::setSystems(const SystemsHash& newSystems)
     }
 }
 
-void LocalSystemsFinder::removeSystem(const QString& id)
+void LocalSystemFinder::removeSystem(const QString& id)
 {
     if (auto removed = m_systems.take(id))
         emit systemLost(id, removed->localId());
 }
+
+} // namespace nx::vms::client::core

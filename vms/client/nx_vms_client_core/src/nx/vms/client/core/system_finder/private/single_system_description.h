@@ -6,23 +6,20 @@
 #include <QtCore/QMap>
 #include <QtCore/QSharedPointer>
 
-#include <network/base_system_description.h>
 #include <nx/utils/url.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/data/module_information.h>
 
-class NX_VMS_CLIENT_CORE_API QnSystemDescription: public QnBaseSystemDescription
+#include "../system_description.h"
+
+namespace nx::vms::client::core {
+
+/** Base class for storing information about a single system. */
+class NX_VMS_CLIENT_CORE_API SingleSystemDescription: public SystemDescription
 {
     Q_OBJECT
 
-    typedef QnBaseSystemDescription base_type;
-
 public:
-    typedef QSharedPointer<QnSystemDescription> PointerType;
-
-    virtual ~QnSystemDescription();
-
-public: // overrides
     QString id() const override;
 
     nx::Uuid localId() const override;
@@ -64,9 +61,9 @@ public: // overrides
     static QString extractSystemName(const QString& systemName);
 
 public:
-    enum { kDefaultPriority = 0 };
-    void addServer(const nx::vms::api::ModuleInformationWithAddresses& serverInfo,
-        int priority, bool online = true);
+    void addServer(
+        const nx::vms::api::ModuleInformationWithAddresses& serverInfo,
+        bool online = true);
 
     QnServerFields updateServer(
         const nx::vms::api::ModuleInformationWithAddresses& serverInfo,
@@ -79,7 +76,7 @@ public:
     void setName(const QString& value);
 
 protected:
-    QnSystemDescription(
+    SingleSystemDescription(
         const QString& systemId,
         const nx::Uuid& localSystemId,
         const QString& systemName);
@@ -89,21 +86,17 @@ protected:
     void handleServerRemoved(const nx::Uuid& serverId);
 
 private:
-    typedef QHash<nx::Uuid, nx::vms::api::ModuleInformationWithAddresses> ServerInfoHash;
-    typedef QHash<nx::Uuid, QElapsedTimer> ServerLastUpdateTimeHash;
-    typedef QHash<nx::Uuid, nx::utils::Url> HostsHash;
-    typedef QMultiMap<int, nx::Uuid> PrioritiesMap;
-    typedef QSet<nx::Uuid> IdsSet;
-
     const QString m_id;
     const nx::Uuid m_localId;
     const QString m_ownerAccountEmail;
     const QString m_ownerFullName;
     QString m_systemName;
-    ServerLastUpdateTimeHash m_serverTimestamps;
-    ServerInfoHash m_servers;
+    QHash<nx::Uuid, QElapsedTimer> m_serverTimestamps;
+    QHash<nx::Uuid, nx::vms::api::ModuleInformationWithAddresses> m_servers;
     mutable QHash<nx::Uuid, QSet<nx::utils::Url>> m_remoteAddressesCache;
-    PrioritiesMap m_prioritized;
-    HostsHash m_hosts;
-    IdsSet m_reachableServers;
+    QMultiMap<int, nx::Uuid> m_prioritized;
+    QHash<nx::Uuid, nx::utils::Url> m_hosts;
+    QSet<nx::Uuid> m_reachableServers;
 };
+
+} // namespace nx::vms::client::core

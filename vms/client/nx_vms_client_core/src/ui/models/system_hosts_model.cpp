@@ -4,8 +4,6 @@
 
 #include <limits>
 
-#include <finders/systems_finder.h>
-#include <network/system_description.h>
 #include <network/system_helpers.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/algorithm/index_of.h>
@@ -14,6 +12,8 @@
 #include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/network/local_network_interfaces_manager.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
+#include <nx/vms/client/core/system_finder/system_description.h>
+#include <nx/vms/client/core/system_finder/system_finder.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
 
 using namespace nx::vms::client::core;
@@ -25,7 +25,7 @@ using UrlsList = QList<nx::utils::Url>;
 constexpr int kLowestServerPriority = std::numeric_limits<int>::max();
 
 QSet<nx::utils::Url> formAdditionalUrlsSet(
-    const QnSystemDescriptionPtr& systemDescription,
+    const SystemDescriptionPtr& systemDescription,
     const nx::Uuid& serverId)
 {
     const auto mainServerUrl = systemDescription->getServerHost(serverId);
@@ -101,17 +101,17 @@ private:
     void reloadHosts();
 
     void addServer(
-        const QnSystemDescriptionPtr& systemDescription,
+        const SystemDescriptionPtr& systemDescription,
         const nx::Uuid& serverId);
     void updateServerHost(
-        const QnSystemDescriptionPtr& systemDescription,
+        const SystemDescriptionPtr& systemDescription,
         const nx::Uuid& serverId);
     bool updateServerHostInternal(
         const ServerUrlDataList::iterator& it,
-        const QnSystemDescriptionPtr& systemDescription);
+        const SystemDescriptionPtr& systemDescription);
 
     void removeServer(
-        const QnSystemDescriptionPtr& systemDescription,
+        const SystemDescriptionPtr& systemDescription,
         const nx::Uuid& serverId);
     void removeServerInternal(const ServerUrlDataList::iterator& it);
 
@@ -136,7 +136,7 @@ QnSystemHostsModel::HostsModel::HostsModel(QnSystemHostsModel* parent):
 {
     connect(m_owner, &QnSystemHostsModel::systemIdChanged, this, &HostsModel::reloadHosts);
     connect(m_owner, &QnSystemHostsModel::localSystemIdChanged, this, &HostsModel::forceResort);
-    connect(qnSystemsFinder, &QnSystemsFinder::destroyed, this,
+    connect(appContext()->systemFinder(), &SystemFinder::destroyed, this,
         [this] { m_connections.release(); });
 }
 
@@ -290,7 +290,7 @@ void QnSystemHostsModel::HostsModel::reloadHosts()
         return;
 
     const auto reloadHostsHandler =
-        [this](const QnSystemDescriptionPtr& system)
+        [this](const SystemDescriptionPtr& system)
         {
             if (m_systemId != system->id())
                 return;
@@ -298,13 +298,13 @@ void QnSystemHostsModel::HostsModel::reloadHosts()
             for (const auto& server: system->servers())
                 addServer(system, server.id);
 
-            m_connections << connect(system.get(), &QnBaseSystemDescription::serverAdded, this,
+            m_connections << connect(system.get(), &SystemDescription::serverAdded, this,
                 [this, system](const nx::Uuid& id) { addServer(system, id); });
 
-            m_connections << connect(system.get(), &QnBaseSystemDescription::serverRemoved, this,
+            m_connections << connect(system.get(), &SystemDescription::serverRemoved, this,
                 [this, system](const nx::Uuid& id) { removeServer(system, id); });
 
-            m_connections << connect(system.get(), &QnBaseSystemDescription::serverChanged, this,
+            m_connections << connect(system.get(), &SystemDescription::serverChanged, this,
                 [this, system](const nx::Uuid& id, QnServerFields fields)
                 {
                     if (fields.testFlag(QnServerField::Host))
@@ -312,19 +312,21 @@ void QnSystemHostsModel::HostsModel::reloadHosts()
                 });
         };
 
-    if (const auto system = qnSystemsFinder->getSystem(m_systemId))
+    if (const auto system = appContext()->systemFinder()->getSystem(m_systemId))
     {
         reloadHostsHandler(system);
     }
     else
     {
-        m_connections << connect(qnSystemsFinder, &QnAbstractSystemsFinder::systemDiscovered,
-            this, reloadHostsHandler);
+        m_connections << connect(appContext()->systemFinder(),
+            &AbstractSystemFinder::systemDiscovered,
+            this,
+            reloadHostsHandler);
     }
 }
 
 void QnSystemHostsModel::HostsModel::addServer(
-    const QnSystemDescriptionPtr& systemDescription,
+    const SystemDescriptionPtr& systemDescription,
     const nx::Uuid& serverId)
 {
     if (systemDescription->id() != m_systemId)
@@ -351,7 +353,7 @@ void QnSystemHostsModel::HostsModel::addServer(
 }
 
 void QnSystemHostsModel::HostsModel::updateServerHost(
-    const QnSystemDescriptionPtr& systemDescription,
+    const SystemDescriptionPtr& systemDescription,
     const nx::Uuid& serverId)
 {
     if (systemDescription->id() != m_systemId)
@@ -364,7 +366,7 @@ void QnSystemHostsModel::HostsModel::updateServerHost(
 
 bool QnSystemHostsModel::HostsModel::updateServerHostInternal(
     const ServerUrlDataList::iterator& it,
-    const QnSystemDescriptionPtr& systemDescription)
+    const SystemDescriptionPtr& systemDescription)
 {
     if (it == m_serversUrlData.end())
         return false;
@@ -391,7 +393,7 @@ bool QnSystemHostsModel::HostsModel::updateServerHostInternal(
 }
 
 void QnSystemHostsModel::HostsModel::removeServer(
-    const QnSystemDescriptionPtr& systemDescription,
+    const SystemDescriptionPtr& systemDescription,
     const nx::Uuid& serverId)
 {
     if (systemDescription->id() != m_systemId)
@@ -526,7 +528,8 @@ QString QnSystemHostsModel::getRequiredSystemVersion(int hostIndex) const
         if (isCompatible)
             return "";
 
-        if (QnSystemDescriptionPtr system = qnSystemsFinder->getSystem(hostsModel()->systemId()))
+        if (SystemDescriptionPtr system = appContext()->systemFinder()->getSystem(
+            hostsModel()->systemId()))
         {
             auto serverInfo = system->getServer(index.data(ServerIdRole).toUuid());
             if (NX_ASSERT(!serverInfo.version.isNull()))

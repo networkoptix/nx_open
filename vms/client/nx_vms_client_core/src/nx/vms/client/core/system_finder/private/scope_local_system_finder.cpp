@@ -1,8 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "scope_local_systems_finder.h"
+#include "scope_local_system_finder.h"
 
-#include <network/local_system_description.h>
 #include <nx/network/app_info.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/socket_global.h>
@@ -10,21 +9,23 @@
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/core/settings/welcome_screen_info.h>
 
-using namespace nx::vms::client::core;
+#include "local_system_description.h"
+
+namespace nx::vms::client::core {
 
 using TileVisibilityScope = welcome_screen::TileVisibilityScope;
 
-ScopeLocalSystemsFinder::ScopeLocalSystemsFinder(QObject* parent):
+ScopeLocalSystemFinder::ScopeLocalSystemFinder(QObject* parent):
     base_type(parent)
 {
     connect(&appContext()->coreSettings()->tileScopeInfo,
         &nx::utils::property_storage::BaseProperty::changed,
         this,
-        &ScopeLocalSystemsFinder::updateSystems);
+        &ScopeLocalSystemFinder::updateSystems);
     updateSystems();
 }
 
-void ScopeLocalSystemsFinder::updateSystems()
+void ScopeLocalSystemFinder::updateSystems()
 {
     // Connection version is not actual for the systems, which are not accessible in any way, as
     // tile is offline and does not contain an address.
@@ -37,7 +38,7 @@ void ScopeLocalSystemsFinder::updateSystems()
         if (info.visibilityScope == TileVisibilityScope::DefaultTileVisibilityScope)
             continue;
 
-        const auto system = QnLocalSystemDescription::create(id.toSimpleString(), id, info.name);
+        const auto system = LocalSystemDescription::create(id.toSimpleString(), id, info.name);
 
         static const int kVeryFarPriority = 100000;
 
@@ -48,9 +49,11 @@ void ScopeLocalSystemsFinder::updateSystems()
         fakeServerInfo.version = kSystemVersionIsUnknown;
         fakeServerInfo.cloudHost =
             QString::fromStdString(nx::network::SocketGlobals::cloud().cloudHost());
-        system->addServer(fakeServerInfo, kVeryFarPriority, false);
+        system->addServer(fakeServerInfo, /*online*/ false);
         newSystems.insert(system->id(), system);
     }
 
     setSystems(newSystems);
 }
+
+} // namespace nx::vms::client::core

@@ -15,11 +15,11 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_access/resource_access_filter.h>
 #include <core/resource_management/resource_pool.h>
-#include <finders/systems_finder.h>
 #include <nx/utils/app_info.h>
 #include <nx/utils/math/math.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/core/system_finder/system_finder.h>
 #include <nx/vms/client/desktop/common/widgets/screen_recording_indicator.h>
 #include <nx/vms/client/desktop/common/widgets/tool_button.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>

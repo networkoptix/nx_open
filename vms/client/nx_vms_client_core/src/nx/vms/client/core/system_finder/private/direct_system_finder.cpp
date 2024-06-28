@@ -1,8 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "direct_systems_finder.h"
+#include "direct_system_finder.h"
 
-#include <network/local_system_description.h>
 #include <network/system_helpers.h>
 #include <nx/network/address_resolver.h>
 #include <nx/network/http/http_types.h>
@@ -13,9 +12,10 @@
 #include <nx/vms/client/core/application_context.h>
 #include <nx/vms/discovery/manager.h>
 
+#include "local_system_description.h"
 #include "search_address_manager.h"
 
-using namespace nx::vms::client::core;
+namespace nx::vms::client::core {
 
 namespace {
 
@@ -33,7 +33,7 @@ bool isCloudAddress(const nx::network::HostAddress& address)
 
 } // namespace
 
-QnDirectSystemsFinder::QnDirectSystemsFinder(
+DirectSystemFinder::DirectSystemFinder(
     SearchAddressManager* searchAddressManager,
     QObject* parent)
     :
@@ -46,24 +46,24 @@ QnDirectSystemsFinder::QnDirectSystemsFinder(
         return;
 
     moduleManager->onSignals(this,
-        &QnDirectSystemsFinder::updateServerData,
-        &QnDirectSystemsFinder::updateServerData,
-        &QnDirectSystemsFinder::removeServer);
+        &DirectSystemFinder::updateServerData,
+        &DirectSystemFinder::updateServerData,
+        &DirectSystemFinder::removeServer);
 }
 
-QnAbstractSystemsFinder::SystemDescriptionList QnDirectSystemsFinder::systems() const
+SystemDescriptionList DirectSystemFinder::systems() const
 {
     SystemDescriptionList result;
     for (const auto& description : m_systems.values())
-        result.append(description.dynamicCast<QnBaseSystemDescription>());
+        result.append(description.dynamicCast<SystemDescription>());
 
     return result;
 }
 
-QnSystemDescriptionPtr QnDirectSystemsFinder::getSystem(const QString &id) const
+SystemDescriptionPtr DirectSystemFinder::getSystem(const QString &id) const
 {
     const auto systemDescriptions = m_systems.values();
-    const auto predicate = [id](const QnSystemDescriptionPtr &desc)
+    const auto predicate = [id](const SystemDescriptionPtr &desc)
     {
         return (desc->id() == id);
     };
@@ -72,10 +72,10 @@ QnSystemDescriptionPtr QnDirectSystemsFinder::getSystem(const QString &id) const
         systemDescriptions.begin(), systemDescriptions.end(), predicate);
 
     return (it == systemDescriptions.end()
-        ? QnSystemDescriptionPtr() : QnSystemDescriptionPtr(*it));
+        ? SystemDescriptionPtr() : SystemDescriptionPtr(*it));
 }
 
-void QnDirectSystemsFinder::removeSystem(SystemsHash::iterator it)
+void DirectSystemFinder::removeSystem(SystemsHash::iterator it)
 {
     if (it == m_systems.end())
         return;
@@ -89,7 +89,7 @@ void QnDirectSystemsFinder::removeSystem(SystemsHash::iterator it)
     emit systemLost(system->id(), system->localId());
 }
 
-void QnDirectSystemsFinder::updateServerData(const nx::vms::discovery::ModuleEndpoint& module)
+void DirectSystemFinder::updateServerData(const nx::vms::discovery::ModuleEndpoint& module)
 {
     const nx::Uuid localSystemId = helpers::getLocalSystemId(module);
     const QString systemId = helpers::getTargetSystemId(module);
@@ -142,8 +142,8 @@ void QnDirectSystemsFinder::updateServerData(const nx::vms::discovery::ModuleEnd
 
         const bool isNewSystem = helpers::isNewSystem(module);
         const auto systemDescription = (isNewSystem
-            ? QnLocalSystemDescription::createFactory(systemId)
-            : QnLocalSystemDescription::create(systemId, localSystemId, systemName));
+            ? LocalSystemDescription::createFactory(systemId)
+            : LocalSystemDescription::create(systemId, localSystemId, systemName));
 
         itSystem = m_systems.insert(systemId, systemDescription);
     }
@@ -152,7 +152,7 @@ void QnDirectSystemsFinder::updateServerData(const nx::vms::discovery::ModuleEnd
     if (systemDescription->containsServer(module.id))
         systemDescription->updateServer(module);
     else
-        systemDescription->addServer(module, QnSystemDescription::kDefaultPriority);
+        systemDescription->addServer(module);
 
     m_serverToSystem[module.id] = systemId;
 
@@ -166,7 +166,7 @@ void QnDirectSystemsFinder::updateServerData(const nx::vms::discovery::ModuleEnd
     }
 }
 
-void QnDirectSystemsFinder::removeServer(nx::Uuid id)
+void DirectSystemFinder::removeServer(nx::Uuid id)
 {
     const auto systemIt = getSystemItByServer(id);
     const auto serverIsInKnownSystem = (systemIt != m_systems.end());
@@ -189,7 +189,7 @@ void QnDirectSystemsFinder::removeServer(nx::Uuid id)
     removeSystem(systemIt);
 }
 
-void QnDirectSystemsFinder::updateServerInternal(
+void DirectSystemFinder::updateServerInternal(
     SystemsHash::iterator systemIt, const nx::vms::discovery::ModuleEndpoint& module)
 {
     const bool serverIsInKnownSystem = (systemIt != m_systems.end());
@@ -219,7 +219,7 @@ void QnDirectSystemsFinder::updateServerInternal(
     updatePrimaryAddress(updatedModule);
 }
 
-void QnDirectSystemsFinder::updatePrimaryAddress(const nx::vms::discovery::ModuleEndpoint& module)
+void DirectSystemFinder::updatePrimaryAddress(const nx::vms::discovery::ModuleEndpoint& module)
 {
     auto systemIt = getSystemItByServer(module.id);
     const bool serverIsInKnownSystem = (systemIt != m_systems.end());
@@ -257,8 +257,8 @@ void QnDirectSystemsFinder::updatePrimaryAddress(const nx::vms::discovery::Modul
         systemDescription->setName(nx::format(kNameTemplate).arg(module.endpoint.toString()));
 }
 
-QnDirectSystemsFinder::SystemsHash::iterator
-QnDirectSystemsFinder::getSystemItByServer(const nx::Uuid &serverId)
+DirectSystemFinder::SystemsHash::iterator
+DirectSystemFinder::getSystemItByServer(const nx::Uuid &serverId)
 {
     const auto it = m_serverToSystem.find(serverId);
     if (it == m_serverToSystem.end())
@@ -267,3 +267,5 @@ QnDirectSystemsFinder::getSystemItByServer(const nx::Uuid &serverId)
     const auto systemId = it.value();
     return m_systems.find(systemId);
 }
+
+} // namespace nx::vms::client::core

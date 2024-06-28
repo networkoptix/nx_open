@@ -6,11 +6,11 @@
 #include <QtGui/QStandardItemModel>
 #include <QtWidgets/QPushButton>
 
-#include <finders/systems_finder.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/core/network/credentials_manager.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/core/settings/keychain_property_storage_backend.h>
+#include <nx/vms/client/core/system_finder/system_finder.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <ui/workbench/workbench_context.h>
 
@@ -42,7 +42,7 @@ struct CredentialsStoreDialog::Private
         const auto& data = appContext()->coreSettings()->systemAuthenticationData();
         for (auto [systemId, credentialsList]: data)
         {
-            const auto system = qnSystemsFinder->getSystem(systemId.toString());
+            const auto system = appContext()->systemFinder()->getSystem(systemId.toString());
             QString title = system ? system->name() : systemId.toSimpleString();
 
             QStandardItem* item = new QStandardItem(title);

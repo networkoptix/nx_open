@@ -4,7 +4,7 @@
 
 #include <QtCore/QObject>
 
-#include <network/base_system_description.h>
+#include <nx/vms/client/core/system_finder/system_description_fwd.h>
 #include <nx/vms/client/desktop/common/flux/flux_state_store.h>
 #include <nx/vms/client/desktop/system_logon/logic/connect_actions_handler.h>
 #include <nx/vms/client/desktop/workbench/state/workbench_state.h>
@@ -17,11 +17,11 @@ struct MainWindowTitleBarState
 {
     struct SystemData
     {
-        QnSystemDescriptionPtr systemDescription;
+        core::SystemDescriptionPtr systemDescription;
         LogonData logonData;
         WorkbenchState workbenchState;
 
-        QString name() const { return systemDescription->name(); }
+        QString name() const;
         bool operator==(const SystemData& other) const;
     };
 
@@ -54,14 +54,15 @@ public:
     void setActiveSystemTab(int value);
     void setConnectionState(ConnectActionsHandler::LogicalState value);
 
-    void addSystem(const QnSystemDescriptionPtr& systemDescription, const LogonData& logonData);
+    void addSystem(const core::SystemDescriptionPtr& systemDescription,
+        const LogonData& logonData);
     void insertSystem(int index, const State::SystemData systemData);
-    void removeSystem(const QnSystemDescriptionPtr& systemDescription);
+    void removeSystem(const core::SystemDescriptionPtr& systemDescription);
     void removeSystem(const nx::Uuid& systemId);
     void removeSystem(int index);
     void removeSystem(const LogonData& logonData);
     void removeCurrentSystem();
-    void changeCurrentSystem(QnSystemDescriptionPtr systemDescription);
+    void changeCurrentSystem(core::SystemDescriptionPtr systemDescription);
     void moveSystem(int indexFrom, int indexTo);
     void activateHomeTab();
     void setSystemUpdating(bool value);

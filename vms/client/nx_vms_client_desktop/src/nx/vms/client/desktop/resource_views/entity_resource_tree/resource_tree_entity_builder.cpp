@@ -12,9 +12,9 @@
 #include <core/resource/webpage_resource.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_management/resource_pool.h>
-#include <finders/systems_finder.h>
-#include <network/system_description.h>
 #include <nx/vms/client/core/resource/session_resources_signal_listener.h>
+#include <nx/vms/client/core/system_finder/system_description.h>
+#include <nx/vms/client/core/system_finder/system_finder.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/other_servers/other_servers_manager.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>

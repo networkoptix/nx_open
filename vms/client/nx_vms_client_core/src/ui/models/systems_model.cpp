@@ -4,7 +4,6 @@
 
 #include <QtCore/QUrl>
 
-#include <network/system_description.h>
 #include <nx/network/address_resolver.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/math/math.h>
@@ -13,6 +12,7 @@
 #include <nx/utils/software_version.h>
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/api/data/peer_data.h>
+#include <nx/vms/client/core/system_finder/system_description.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
 
 #include "abstract_systems_controller.h"
@@ -62,38 +62,38 @@ public:
 
     void updateOwnerDescription();
 
-    void addSystem(const QnSystemDescriptionPtr& systemDescription);
+    void addSystem(const SystemDescriptionPtr& systemDescription);
 
     void removeSystem(const QString& systemId, const nx::Uuid& localId);
 
     struct InternalSystemData
     {
-        QnSystemDescriptionPtr system;
+        SystemDescriptionPtr system;
         nx::utils::ScopedConnections connections;
     };
     using InternalSystemDataPtr = QSharedPointer<InternalSystemData>;
     using InternalList = QVector<InternalSystemDataPtr>;
 
     void at_serverChanged(
-            const QnSystemDescriptionPtr& systemDescription,
+            const SystemDescriptionPtr& systemDescription,
             const nx::Uuid &serverId,
             QnServerFields fields);
 
     void emitDataChanged(
-        const QnSystemDescriptionPtr& systemDescription,
+        const SystemDescriptionPtr& systemDescription,
         QnSystemsModel::RoleId role);
 
-    void emitDataChanged(const QnSystemDescriptionPtr& systemDescription,
+    void emitDataChanged(const SystemDescriptionPtr& systemDescription,
         QVector<int> roles = QVector<int>());
 
     void resetModel();
 
     nx::utils::SoftwareVersion getIncompatibleVersion(
-        const QnSystemDescriptionPtr& systemDescription) const;
+        const SystemDescriptionPtr& systemDescription) const;
     nx::utils::SoftwareVersion getCompatibleVersion(
-        const QnSystemDescriptionPtr& systemDescription) const;
-    bool isCompatibleSystem(const QnSystemDescriptionPtr& sysemDescription) const;
-    bool isCompatibleCustomization(const QnSystemDescriptionPtr& systemDescription) const;
+        const SystemDescriptionPtr& systemDescription) const;
+    bool isCompatibleSystem(const SystemDescriptionPtr& sysemDescription) const;
+    bool isCompatibleCustomization(const SystemDescriptionPtr& systemDescription) const;
 
     AbstractSystemsController* controller;
     nx::utils::ScopedConnections connections;
@@ -343,14 +343,14 @@ void QnSystemsModelPrivate::updateOwnerDescription()
         << QnSystemsModel::SearchRoleId);
 }
 
-void QnSystemsModelPrivate::addSystem(const QnSystemDescriptionPtr& systemDescription)
+void QnSystemsModelPrivate::addSystem(const SystemDescriptionPtr& systemDescription)
 {
     Q_Q(QnSystemsModel);
 
     const auto data = InternalSystemDataPtr(new InternalSystemData({systemDescription}));
 
     data->connections
-        << connect(systemDescription.get(), &QnBaseSystemDescription::serverChanged, this,
+        << connect(systemDescription.get(), &SystemDescription::serverChanged, this,
             [this, systemDescription] (const nx::Uuid &serverId, QnServerFields fields)
             {
                 searchServerNamesHostsCache.remove(systemDescription->id());
@@ -359,7 +359,7 @@ void QnSystemsModelPrivate::addSystem(const QnSystemDescriptionPtr& systemDescri
             });
 
     data->connections
-        << connect(systemDescription.get(), &QnBaseSystemDescription::systemNameChanged, this,
+        << connect(systemDescription.get(), &SystemDescription::systemNameChanged, this,
             [this, systemDescription]()
             {
                 searchServerNamesHostsCache.remove(systemDescription->id());
@@ -368,7 +368,7 @@ void QnSystemsModelPrivate::addSystem(const QnSystemDescriptionPtr& systemDescri
             });
 
     data->connections
-        << connect(systemDescription.get(), &QnBaseSystemDescription::ownerChanged, this,
+        << connect(systemDescription.get(), &SystemDescription::ownerChanged, this,
             [this, systemDescription]()
             {
                 emitDataChanged(systemDescription, QVector<int>()
@@ -388,55 +388,55 @@ void QnSystemsModelPrivate::addSystem(const QnSystemDescriptionPtr& systemDescri
         };
 
     data->connections
-        << connect(systemDescription.get(), &QnBaseSystemDescription::serverAdded, this, serverAction);
+        << connect(systemDescription.get(), &SystemDescription::serverAdded, this, serverAction);
 
     data->connections
-        << connect(systemDescription.get(), &QnBaseSystemDescription::serverRemoved, this, serverAction);
+        << connect(systemDescription.get(), &SystemDescription::serverRemoved, this, serverAction);
 
     data->connections
-        << connect(systemDescription.get(), &QnBaseSystemDescription::serverChanged, this,
+        << connect(systemDescription.get(), &SystemDescription::serverChanged, this,
             [this, systemDescription]()
             {
                 searchServerNamesHostsCache.remove(systemDescription->id());
             });
 
     data->connections
-        << connect(systemDescription.get(), &QnBaseSystemDescription::newSystemStateChanged, this,
+        << connect(systemDescription.get(), &SystemDescription::newSystemStateChanged, this,
             [this, systemDescription]()
             {
                 emitDataChanged(systemDescription, QnSystemsModel::IsFactorySystemRoleId);
             });
 
     data->connections
-        << connect(systemDescription.get(), &QnBaseSystemDescription::reachableStateChanged, this,
+        << connect(systemDescription.get(), &SystemDescription::reachableStateChanged, this,
             [this, systemDescription]()
             {
                 emitDataChanged(systemDescription, QnSystemsModel::IsReachableRoleId);
             });
 
     data->connections
-        << connect(systemDescription.get(), &QnBaseSystemDescription::onlineStateChanged, this,
+        << connect(systemDescription.get(), &SystemDescription::onlineStateChanged, this,
             [this, systemDescription]()
             {
                 emitDataChanged(systemDescription, QnSystemsModel::IsOnlineRoleId);
             });
 
     data->connections
-        << connect(systemDescription.get(), &QnBaseSystemDescription::system2faEnabledChanged, this,
+        << connect(systemDescription.get(), &SystemDescription::system2faEnabledChanged, this,
             [this, systemDescription]()
             {
                 emitDataChanged(systemDescription, QnSystemsModel::Is2FaEnabledForSystem);
             });
 
     data->connections
-        << connect(systemDescription.get(), &QnBaseSystemDescription::oauthSupportedChanged, this,
+        << connect(systemDescription.get(), &SystemDescription::oauthSupportedChanged, this,
            [this, systemDescription]()
            {
                emitDataChanged(systemDescription, QnSystemsModel::IsCloudOauthSupportedRoleId);
            });
 
     data->connections
-        << connect(systemDescription.get(), &QnBaseSystemDescription::isCloudSystemChanged, this,
+        << connect(systemDescription.get(), &SystemDescription::isCloudSystemChanged, this,
             [this, systemDescription]()
             {
                 QVector<int> roles;
@@ -447,7 +447,7 @@ void QnSystemsModelPrivate::addSystem(const QnSystemDescriptionPtr& systemDescri
             });
 
     data->connections
-        << connect(systemDescription.get(), &QnBaseSystemDescription::saasStateChanged, this,
+        << connect(systemDescription.get(), &SystemDescription::saasStateChanged, this,
             [this, systemDescription]()
             {
                 emitDataChanged(systemDescription,
@@ -483,13 +483,13 @@ void QnSystemsModelPrivate::removeSystem(const QString &systemId, const nx::Uuid
 }
 
 void QnSystemsModelPrivate::emitDataChanged(
-    const QnSystemDescriptionPtr& systemDescription,
+    const SystemDescriptionPtr& systemDescription,
     QnSystemsModel::RoleId role)
 {
     emitDataChanged(systemDescription, QVector<int>() << role);
 }
 
-void QnSystemsModelPrivate::emitDataChanged(const QnSystemDescriptionPtr& systemDescription
+void QnSystemsModelPrivate::emitDataChanged(const SystemDescriptionPtr& systemDescription
     , QVector<int> roles)
 {
     const auto dataIt = std::find_if(internalData.begin(), internalData.end(),
@@ -510,7 +510,7 @@ void QnSystemsModelPrivate::emitDataChanged(const QnSystemDescriptionPtr& system
 }
 
 void QnSystemsModelPrivate::at_serverChanged(
-        const QnSystemDescriptionPtr& systemDescription,
+        const SystemDescriptionPtr& systemDescription,
         const nx::Uuid& serverId,
         QnServerFields fields)
 {
@@ -555,7 +555,7 @@ void QnSystemsModelPrivate::resetModel()
 }
 
 nx::utils::SoftwareVersion QnSystemsModelPrivate::getCompatibleVersion(
-    const QnSystemDescriptionPtr& systemDescription) const
+    const SystemDescriptionPtr& systemDescription) const
 {
     for (const auto& serverInfo: systemDescription->servers())
     {
@@ -567,7 +567,7 @@ nx::utils::SoftwareVersion QnSystemsModelPrivate::getCompatibleVersion(
 }
 
 nx::utils::SoftwareVersion QnSystemsModelPrivate::getIncompatibleVersion(
-    const QnSystemDescriptionPtr& systemDescription) const
+    const SystemDescriptionPtr& systemDescription) const
 {
     const auto servers = systemDescription->servers();
 
@@ -587,7 +587,7 @@ nx::utils::SoftwareVersion QnSystemsModelPrivate::getIncompatibleVersion(
 }
 
 bool QnSystemsModelPrivate::isCompatibleSystem(
-    const QnSystemDescriptionPtr& systemDescription) const
+    const SystemDescriptionPtr& systemDescription) const
 {
     const auto servers = systemDescription->servers();
     return std::all_of(servers.cbegin(), servers.cend(),
@@ -605,7 +605,7 @@ bool QnSystemsModelPrivate::isCompatibleSystem(
 }
 
 bool QnSystemsModelPrivate::isCompatibleCustomization(
-    const QnSystemDescriptionPtr& systemDescription) const
+    const SystemDescriptionPtr& systemDescription) const
 {
     const auto servers = systemDescription->servers();
     return std::all_of(servers.cbegin(), servers.cend(),

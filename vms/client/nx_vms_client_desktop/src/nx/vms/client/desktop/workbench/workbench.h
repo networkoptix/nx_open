@@ -6,8 +6,8 @@
 
 #include <client/client_globals.h>
 #include <core/resource/resource_fwd.h>
-#include <network/base_system_description.h>
 #include <nx/utils/impl_ptr.h>
+#include <nx/vms/client/core/system_finder/system_description_fwd.h>
 #include <nx/vms/client/desktop/resource/resource_fwd.h>
 #include <nx/vms/client/desktop/window_context_aware.h>
 #include <nx/vms/client/desktop/workbench/state/workbench_state.h>
@@ -254,7 +254,7 @@ signals:
      */
     void cellSpacingChanged();
 
-    void currentSystemChanged(QnSystemDescriptionPtr systemDescription);
+    void currentSystemChanged(core::SystemDescriptionPtr systemDescription);
 
 private slots:
     void at_layout_itemAdded(QnWorkbenchItem* item);

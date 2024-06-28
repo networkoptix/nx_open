@@ -1,6 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "cloud_systems_finder.h"
+#include "cloud_system_finder.h"
 
 #include <QtCore/QPointer>
 #include <QtCore/QTimer>
@@ -92,9 +92,9 @@ nx::vms::api::ModuleInformationWithAddresses createInitialServer(const QnCloudSy
 
 } // namespace
 
-struct CloudSystemsFinder::Private
+struct CloudSystemFinder::Private
 {
-    CloudSystemsFinder* const q;
+    CloudSystemFinder* const q;
     mutable nx::Mutex mutex{nx::Mutex::Recursive};
     std::unique_ptr<ClientPool> clientPool = std::make_unique<ClientPool>();
     using SystemsHash = QHash<QString, QnCloudSystemDescriptionPtr>;
@@ -218,7 +218,7 @@ struct CloudSystemsFinder::Private
         {
             // First we must add newly found server to make sure system will not become
             // unreachable in the process.
-            systemDescription->addServer(moduleInformation, QnSystemDescription::kDefaultPriority);
+            systemDescription->addServer(moduleInformation);
             const auto currentServers = systemDescription->servers();
             for (const auto& server: currentServers)
             {
@@ -284,7 +284,7 @@ struct CloudSystemsFinder::Private
             if (system.online)
             {
                 auto initialServer = createInitialServer(system);
-                systemDescription->addServer(initialServer, QnSystemDescription::kDefaultPriority);
+                systemDescription->addServer(initialServer);
                 systemDescription->setServerHost(initialServer.id, systemUrl(system.cloudId));
             }
 
@@ -341,7 +341,7 @@ struct CloudSystemsFinder::Private
     }
 };
 
-CloudSystemsFinder::CloudSystemsFinder(QObject* parent):
+CloudSystemFinder::CloudSystemFinder(QObject* parent):
     base_type(parent),
     d(new Private{.q=this})
 {
@@ -367,29 +367,29 @@ CloudSystemsFinder::CloudSystemsFinder(QObject* parent):
     d->onCloudStatusChanged(qnCloudStatusWatcher->status());
 }
 
-CloudSystemsFinder::~CloudSystemsFinder()
+CloudSystemFinder::~CloudSystemFinder()
 {
     d->clientPool->stop(/*invokeCallbacks*/ false);
 }
 
-QnAbstractSystemsFinder::SystemDescriptionList CloudSystemsFinder::systems() const
+SystemDescriptionList CloudSystemFinder::systems() const
 {
     SystemDescriptionList result;
 
     const NX_MUTEX_LOCKER lock(&d->mutex);
     for (const auto& system: d->systems)
-        result.append(system.dynamicCast<QnBaseSystemDescription>());
+        result.append(system.dynamicCast<SystemDescription>());
 
     return result;
 }
 
-QnSystemDescriptionPtr CloudSystemsFinder::getSystem(const QString &id) const
+SystemDescriptionPtr CloudSystemFinder::getSystem(const QString &id) const
 {
     const NX_MUTEX_LOCKER lock(&d->mutex);
 
     const auto systemDescriptions = d->systems.values();
     const auto predicate =
-        [id](const QnSystemDescriptionPtr &desc)
+        [id](const SystemDescriptionPtr &desc)
         {
             return (desc->id() == id);
         };
@@ -397,8 +397,8 @@ QnSystemDescriptionPtr CloudSystemsFinder::getSystem(const QString &id) const
     const auto it = std::find_if(systemDescriptions.begin(), systemDescriptions.end(), predicate);
 
     return (it == systemDescriptions.end()
-        ? QnSystemDescriptionPtr()
-        : (*it).dynamicCast<QnBaseSystemDescription>());
+        ? SystemDescriptionPtr()
+        : (*it).dynamicCast<SystemDescription>());
 }
 
 } // namespace nx::vms::client::core

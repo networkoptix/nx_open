@@ -5,23 +5,26 @@
 #include <QtCore/QMap>
 #include <QtCore/QSharedPointer>
 
-#include <network/base_system_description.h>
 #include <nx/vms/api/data/module_information.h>
 
-class QnSystemDescriptionAggregator: public QnBaseSystemDescription
+#include "../system_description.h"
+
+namespace nx::vms::client::core {
+
+class SystemDescriptionAggregator: public SystemDescription
 {
-    using base_type = QnBaseSystemDescription;
+    using base_type = SystemDescription;
 
 public:
-    QnSystemDescriptionAggregator(int priority, const QnSystemDescriptionPtr& systemDescription);
-    virtual ~QnSystemDescriptionAggregator() = default;
+    SystemDescriptionAggregator(int priority, const SystemDescriptionPtr& systemDescription);
+    virtual ~SystemDescriptionAggregator() = default;
 
     bool isAggregator() const;
 
     bool containsSystem(const QString& systemId) const;
     bool containsSystem(int priority) const;
 
-    void mergeSystem(int priority, const QnSystemDescriptionPtr& system);
+    void mergeSystem(int priority, const SystemDescriptionPtr& system);
 
     // TODO: #sivanov SystemId check is highly suspicious here, aggregator must not know about
     // model-level ids.
@@ -76,7 +79,7 @@ public:
 private:
     void emitSystemChanged();
 
-    void onSystemNameChanged(const QnSystemDescriptionPtr& system);
+    void onSystemNameChanged(const SystemDescriptionPtr& system);
     void onOnlineStateChanged();
 
     ServersList gatherServers() const;
@@ -88,7 +91,8 @@ private:
     bool isEmptyAggregator() const;
 
 private:
-    typedef QMap<int, QnSystemDescriptionPtr> SystemsMap;
-    SystemsMap m_systems;
+    QMap<int, SystemDescriptionPtr> m_systems;
     ServersList m_servers;
 };
+
+} // namespace nx::vms::client::core

@@ -10,7 +10,6 @@
 class QQmlEngine;
 
 class QnClientCoreSettings;
-class QnSystemsFinder;
 class QnVoiceSpectrumAnalyzer;
 
 namespace nx::i18n { class TranslationManager; }
@@ -24,6 +23,7 @@ class FontConfig;
 class Skin;
 class Settings;
 class SystemContext;
+class SystemFinder;
 class UnifiedResourcePool;
 
 namespace watchers { class KnownServerConnections; }
@@ -69,7 +69,7 @@ public:
 
     nx::vms::discovery::Manager* moduleDiscoveryManager() const;
 
-    QnSystemsFinder* systemsFinder() const;
+    SystemFinder* systemFinder() const;
 
     QnVoiceSpectrumAnalyzer* voiceSpectrumAnalyzer() const;
 
