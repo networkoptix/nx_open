@@ -63,8 +63,8 @@ bool AbstractAsyncSearchListModel::fetchData(const FetchRequest& request)
             const FetchedDataRanges& fetchedRanges,
             const OptionalTimePeriod& timeWindow)
         {
-            if (!NX_ASSERT(d->requestData && d->requestData->id == id))
-                return;
+            if (!d->requestData || d->requestData->id != id)
+                return; // We suppose that the requests can be overriden.
 
             d->requestData = {};
             setFetchInProgress(false);
@@ -100,13 +100,6 @@ bool AbstractAsyncSearchListModel::cancelFetch()
 
     d->requestData = {};
     return true;
-}
-
-OptionalFetchRequest AbstractAsyncSearchListModel::currentRequest() const
-{
-    return d->requestData
-        ? OptionalFetchRequest{d->requestData->request}
-        : OptionalFetchRequest{};
 }
 
 } // namespace nx::vms::client::core

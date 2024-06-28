@@ -27,8 +27,6 @@ public:
     virtual bool fetchData(const FetchRequest& request) override;
     virtual bool cancelFetch() override;
 
-    OptionalFetchRequest currentRequest() const;
-
 protected:
     explicit AbstractAsyncSearchListModel(
         int maximumCount,
