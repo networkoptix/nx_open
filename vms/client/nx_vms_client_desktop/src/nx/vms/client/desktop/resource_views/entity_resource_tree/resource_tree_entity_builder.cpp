@@ -406,7 +406,8 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createCamerasAndDevicesGroupEntity(
 
 AbstractEntityPtr ResourceTreeEntityBuilder::createDialogAllCamerasEntity(
     bool showServers,
-    const std::function<bool(const QnResourcePtr&)>& resourceFilter) const
+    const std::function<bool(const QnResourcePtr&)>& resourceFilter,
+    bool permissionsHandledByFilter) const
 {
     using GroupingRule = GroupingRule<QString, QnResourcePtr>;
     using GroupingRuleStack = GroupingEntity<QString, QnResourcePtr>::GroupingRuleStack;
@@ -449,8 +450,9 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createDialogAllCamerasEntity(
         serverResourcesOrder(),
         groupingRuleStack);
 
-    camerasGroupingEntity->installItemSource(
-        m_itemKeySourcePool->allDevicesSource(user(), resourceFilter));
+    camerasGroupingEntity->installItemSource(permissionsHandledByFilter
+        ? m_itemKeySourcePool->allDevicesSource({}, resourceFilter)
+        : m_itemKeySourcePool->allDevicesSource(user(), resourceFilter));
 
     return camerasGroupingEntity;
 }

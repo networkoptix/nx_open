@@ -26,6 +26,7 @@ CameraSelectionDialog::CameraSelectionDialog(
     const ResourceFilter& resourceFilter,
     const ResourceValidator& resourceValidator,
     const AlertTextProvider& alertTextProvider,
+    bool permissionsHandledByFilter,
     QWidget* parent)
     :
     base_type(parent),
@@ -34,9 +35,10 @@ CameraSelectionDialog::CameraSelectionDialog(
     ui->setupUi(this);
 
     ResourceSelectionWidget::EntityFactoryFunction createTreeEntity =
-        [this, resourceFilter](const entity_resource_tree::ResourceTreeEntityBuilder* builder)
+        [=](const entity_resource_tree::ResourceTreeEntityBuilder* builder)
         {
-            return builder->createDialogAllCamerasEntity(showServersInTree(), resourceFilter);
+            return builder->createDialogAllCamerasEntity(
+                showServersInTree(), resourceFilter, permissionsHandledByFilter);
         };
 
     m_resourceSelectionWidget = new ResourceSelectionWidget(

@@ -96,13 +96,21 @@ ResourceTreeItemKeySourcePool::UniqueResourceSourcePtr ResourceTreeItemKeySource
     const QnMediaServerResourcePtr& parentServer,
     const ResourceFilter& resourceFilter)
 {
+    if (accessSubject.isValid())
+    {
+        return std::make_shared<ResourceSourceAdapter>(
+            std::make_unique<AccessibleResourceProxySource>(
+                systemContext(),
+                accessSubject,
+                std::make_unique<FilteredResourceProxySource>(
+                    resourceFilter,
+                    std::make_unique<CameraResourceSource>(m_cameraResourceIndex, parentServer))));
+    }
+
     return std::make_shared<ResourceSourceAdapter>(
-        std::make_unique<AccessibleResourceProxySource>(
-            systemContext(),
-            accessSubject,
-            std::make_unique<FilteredResourceProxySource>(
-                resourceFilter,
-                std::make_unique<CameraResourceSource>(m_cameraResourceIndex, parentServer))));
+        std::make_unique<FilteredResourceProxySource>(
+            resourceFilter,
+            std::make_unique<CameraResourceSource>(m_cameraResourceIndex, parentServer)));
 }
 
 UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::devicesAndProxiedWebPagesSource(

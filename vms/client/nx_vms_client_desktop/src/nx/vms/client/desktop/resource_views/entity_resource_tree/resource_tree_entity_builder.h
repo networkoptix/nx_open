@@ -60,7 +60,8 @@ public:
 
     AbstractEntityPtr createDialogAllCamerasEntity(
         bool showServers,
-        const std::function<bool(const QnResourcePtr&)>& resourceFilter) const;
+        const std::function<bool(const QnResourcePtr&)>& resourceFilter,
+        bool permissionsHandledByFilter = false) const;
 
     AbstractEntityPtr createDialogAllCamerasAndResourcesEntity(
         bool withProxiedWebPages = true) const;

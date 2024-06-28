@@ -9,11 +9,13 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/resource_dialogs/camera_selection_dialog.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <ui/common/palette.h>
 
 #include "../flux/camera_settings_dialog_state.h"
@@ -160,8 +162,10 @@ void AudioRedirectPickerWidget::selectAudioRedirectDevice()
     const auto resourceFilter =
         [this](const QnResourcePtr& resource)
         {
-            return (capabilityCheck(resource) && resource->getId() != m_deviceId)
-                || (resource->getId() == m_audioRedirectDeviceId);
+            return (resource->getId() == m_audioRedirectDeviceId)
+                || (resource->getId() != m_deviceId
+                    && permissionCheck(resource)
+                    && capabilityCheck(resource));
         };
 
     const auto resourceValidator =
@@ -190,6 +194,7 @@ void AudioRedirectPickerWidget::selectAudioRedirectDevice()
         resourceFilter,
         resourceValidator,
         alertTextProvider,
+        /*permissionsHandledByFilter*/ true,
         this);
     cameraSelectionDialog->setAllCamerasSwitchVisible(*m_streamDirection == Input);
     cameraSelectionDialog->setAllowInvalidSelection(false);
@@ -222,6 +227,14 @@ bool AudioRedirectPickerWidget::capabilityCheck(const QnResourcePtr& resource) c
         return camera->isAudioSupported();
     else
         return camera->hasTwoWayAudio();
+}
+
+bool AudioRedirectPickerWidget::permissionCheck(const QnResourcePtr& resource) const
+{
+    const auto systemContext = SystemContext::fromResource(resource);
+
+    return NX_ASSERT(systemContext)
+        && systemContext->accessController()->hasPermissions(resource, Qn::ReadPermission);
 }
 
 bool AudioRedirectPickerWidget::sameServerCheck(const QnResourcePtr& redirectDevice) const

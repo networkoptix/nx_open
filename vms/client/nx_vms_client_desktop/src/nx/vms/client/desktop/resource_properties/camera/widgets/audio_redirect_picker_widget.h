@@ -46,6 +46,7 @@ private:
     void selectAudioRedirectDevice();
 
     bool capabilityCheck(const QnResourcePtr& resource) const;
+    bool permissionCheck(const QnResourcePtr& resource) const;
     bool sameServerCheck(const QnResourcePtr& resource) const;
 
     nx::Uuid getRedirectDeviceId(const CameraSettingsDialogState& state) const;
