@@ -37,7 +37,7 @@ public:
     using ResourceFilter = std::function<bool(const QnResourcePtr&)>;
 
     /**
-     * Provides all device resources stored in the resource pool.
+     * Provides all device resources stored in the resource pool filtered with specified filter.
      */
     UniqueResourceSourcePtr allDevicesSource(
         const QnResourceAccessSubject& accessSubject,

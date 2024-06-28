@@ -137,6 +137,7 @@ const std::unique_ptr<CameraSelectionDialog>
         hotspotTargetSelectionResourceFilter(hotspotIndex),
         CameraSelectionDialog::ResourceValidator(),
         CameraSelectionDialog::AlertTextProvider(),
+        /*permissionsHandledByFilter*/ false,
         q);
 
     ResourceSelectionWidget::EntityFactoryFunction createTreeEntity =

@@ -35,6 +35,7 @@ public:
         const ResourceFilter& resourceFilter,
         const ResourceValidator& resourceValidator,
         const AlertTextProvider& alertTextProvider,
+        bool permissionsHandledByFilter,
         QWidget* parent);
     virtual ~CameraSelectionDialog() override;
 
@@ -143,7 +144,8 @@ bool CameraSelectionDialog::selectCameras(
             return isValid ? QString() : policy.getText(context, resourcesList);
         };
 
-    CameraSelectionDialog dialog(ResourceFilter(), resourceValidator, alertTextProvider, parent);
+    CameraSelectionDialog dialog(ResourceFilter(), resourceValidator, alertTextProvider,
+        /*permissionsHandledByFilter*/ false, parent);
     dialog.resourceSelectionWidget()->setSelectedResourcesIds(selectedCameras);
     dialog.setAllCamerasSwitchVisible(ResourcePolicy::showAllCamerasSwitch());
     dialog.resourceSelectionWidget()->setShowRecordingIndicator(

@@ -156,6 +156,7 @@ CopyScheduleCameraSelectionDialog::CopyScheduleCameraSelectionDialog(
         /*resourceFilter*/ supportsSchedule(settings),
         /*resourceValidator*/ canApplySchedule(settings),
         /*alertTextProvider*/ initAlertTextProvider(settings),
+        /*permissionsHandledByFilter*/ false,
         parent)
 {
     resourceSelectionWidget()->setShowRecordingIndicator(true);
