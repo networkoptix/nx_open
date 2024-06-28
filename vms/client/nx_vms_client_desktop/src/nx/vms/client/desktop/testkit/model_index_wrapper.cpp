@@ -4,7 +4,7 @@
 
 #include <QtWidgets/QAbstractItemView>
 
-#include "utils.h"
+#include <nx/vms/client/core/testkit/utils.h>
 
 namespace nx::vms::client::desktop::testkit {
 
@@ -71,7 +71,7 @@ bool ModelIndexWrapper::isVisible() const
 
 QVariantMap ModelIndexWrapper::metaInfo(QString name) const
 {
-    return utils::getMetaInfo(&this->staticMetaObject, name);
+    return nx::vms::client::core::testkit::utils::getMetaInfo(&this->staticMetaObject, name);
 }
 
 } // namespace nx::vms::client::desktop::testkit

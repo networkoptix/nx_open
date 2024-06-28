@@ -11,35 +11,9 @@
 #include <QtQuick/QQuickItem>
 #include <QtQuickWidgets/QQuickWidget>
 
+#include <nx/vms/client/core/testkit/utils.h>
 
 namespace nx::vms::client::desktop::testkit::utils {
-
-std::pair<QString, QString> nameAndBaseUrl(const QObject* object)
-{
-    QString id;
-    QUrl contextLocation;
-
-    // Find topmost context with id or at least topmost context base URL.
-    for (auto c = qmlContext(object); c; c = c->parentContext())
-    {
-        if (const auto name = c->nameForObject(const_cast<QObject*>(object)); !name.isEmpty())
-        {
-            id = name;
-            contextLocation = c->baseUrl();
-        }
-        else if (id.isEmpty())
-        {
-            if (const auto baseUrl = c->baseUrl(); !baseUrl.isEmpty())
-                contextLocation = baseUrl;
-        }
-    }
-
-    if (!id.isEmpty() || !contextLocation.isEmpty())
-        return {id, contextLocation.toString()};
-
-
-    return {object->objectName(), ""};
-}
 
 QVariant dumpQModelIndex(const QAbstractItemModel* model, QModelIndex parent, bool withChildren)
 {
@@ -85,7 +59,7 @@ QVariant dumpQObject(const QObject* object, bool withChildren)
             result.insert(mo->property(i).name(), mo->property(i).read(object));
     }
 
-    auto [id, location] = nameAndBaseUrl(object);
+    auto [id, location] = core::testkit::utils::nameAndBaseUrl(object);
     if (!location.isEmpty() && !id.isEmpty())
         result.insert("id", id);
 

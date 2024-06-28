@@ -5,7 +5,7 @@
 #include <QtCore/QMetaObject>
 #include <QtCore/QMetaMethod>
 
-namespace nx::vms::client::desktop::testkit::utils {
+namespace nx::vms::client::core::testkit::utils {
 
 QVariantMap getMetaInfo(const QMetaObject* meta, QString methodOrProperty)
 {
@@ -25,11 +25,11 @@ QVariantMap getMetaInfo(const QMetaObject* meta, QString methodOrProperty)
         if (method.name() != methodOrProperty)
             continue;
         result.insert("is_method", true);
-        result.insert("return_type", QMetaType::typeName(method.returnType()));
+        result.insert("return_type", QMetaType(method.returnType()).name());
         return result;
     }
 
     return {};
 }
 
-} // namespace nx::vms::client::desktop::testkit::utils
+} // namespace nx::vms::client::core::testkit::utils
