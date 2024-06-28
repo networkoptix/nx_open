@@ -12,13 +12,13 @@
 <context>
     <name>QnDirectSystemsFinder</name>
     <message>
-        <source>System</source>
-        <translation></translation>
+        <source>Site</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>System (%1)</source>
-        <comment>%1 is ip and port of system</comment>
-        <translation></translation>
+        <source>Site (%1)</source>
+        <comment>%1 is ip and port of the site</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -31,8 +31,8 @@
 <context>
     <name>QnSystemDescription</name>
     <message>
-        <source>Unnamed System</source>
-        <translation></translation>
+        <source>Unnamed Site</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
