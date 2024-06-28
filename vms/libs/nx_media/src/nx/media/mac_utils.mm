@@ -1,5 +1,8 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#include <unordered_map>
+#include <vector>
+
 #include <QtCore/QSize>
 
 #include <CoreMedia/CMFormatDescription.h>
