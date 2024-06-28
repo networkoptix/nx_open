@@ -137,7 +137,7 @@ void QnDirectSystemsFinder::updateServerData(const nx::vms::discovery::ModuleEnd
             return;
 
         const auto systemName = (isOldServer(module)
-            ? tr("Site")
+            ? tr("System")
             : module.systemName);
 
         const bool isNewSystem = helpers::isNewSystem(module);
@@ -252,7 +252,7 @@ void QnDirectSystemsFinder::updatePrimaryAddress(const nx::vms::discovery::Modul
     // Workaround for systems with version less than 2.3.
     // In these systems only one server is visible, and system name does not exist.
 
-    static const auto kNameTemplate = tr("Site (%1)", "%1 is ip and port of the site");
+    static const auto kNameTemplate = tr("System (%1)", "%1 is ip and port of system");
     if (isOldServer(module))
         systemDescription->setName(nx::format(kNameTemplate).arg(module.endpoint.toString()));
 }
