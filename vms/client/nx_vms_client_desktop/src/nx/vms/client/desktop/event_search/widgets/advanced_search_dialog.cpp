@@ -19,6 +19,10 @@
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/event_processors.h>
 
+#if defined(Q_OS_MACOS)
+    #include <ui/workaround/mac_utils.h>
+#endif
+
 template<>
 nx::vms::client::desktop::AdvancedSearchDialog::StateDelegate*
     Singleton<nx::vms::client::desktop::AdvancedSearchDialog::StateDelegate>::s_instance = nullptr;
@@ -86,6 +90,11 @@ AdvancedSearchDialog::AdvancedSearchDialog(QWidget* parent) :
                 ? qApp->screens()[state->screen]
                 : defaultScreen();
 
+            #if defined(Q_OS_MACOS)
+                // If we do not change NSWindow collectionBehavior here the window will be
+                // shown as fullscreen if its parent (main window) is fullscreen.
+                mac_setFullScreenAuxiliary(window()->winId());
+            #endif
             window()->setScreen(screen);
             setMaximized(state->isMaximized);
 
