@@ -22,3 +22,6 @@ void mac_stopFileAccess();
 bool mac_isSandboxed();
 
 void setHidesOnDeactivate(WId windowId, bool value);
+
+// Make the window display on the same space as the full screen window.
+void mac_setFullScreenAuxiliary(WId windowId);
