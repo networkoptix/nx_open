@@ -200,3 +200,16 @@ void setHidesOnDeactivate(WId windowId, bool value)
 
     [nativeWindow setHidesOnDeactivate: value ? YES : NO];
 }
+
+void mac_setFullScreenAuxiliary(WId windowId)
+{
+    NSView* nativeView = reinterpret_cast<NSView*>(windowId);
+    if (!nativeView)
+        return;
+
+    NSWindow* nativeWindow = [nativeView window];
+    if (!nativeWindow)
+        return;
+
+    [nativeWindow setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
+}
