@@ -10,6 +10,7 @@ from pathlib import Path
 import shutil
 import sys
 import yaml
+import os
 
 
 required_conan_version = ">=1.53.0"
@@ -159,6 +160,13 @@ class NxOpenConan(ConanFile):
         if self.haveDesktopClient or self.haveMediaserver:
             self.build_requires("doxygen/1.8.14" "#ad17490b6013c61d63e10c0e8ea4d6c9")
 
+        if self.isAndroid:
+            self.build_requires("openjdk/18.0.1" "#a8a02e50d3ff18df2248cae06ed5a13c")
+            if "ANDROID_HOME" not in os.environ:
+                self.build_requires("AndroidSDK/33" "#fcd06746ab6c1c4c9e56aff7c5fd44fd")
+            if "ANDROID_NDK" not in os.environ:
+                self.build_requires("AndroidNDK/r26d" "#0ae8a952a8b231f98f2f7f2d61fd249a")
+
     def requirements(self):
         if not self.options.skipCustomizationPackage:
             self.requires("customization/1.0")  #< Always use the latest revision.
@@ -220,6 +228,9 @@ class NxOpenConan(ConanFile):
 
         if self.isArm32 or self.isArm64:
             self.requires("sse2neon/7bd15ea" "#d5c087ce33dbf1425b29d6435284d2c7")
+
+        if self.settings.os in ("Android", "iOS") or self.haveAnalyticsServer:
+            self.requires("libjpeg-turbo/3.0.3" "#1e534ce92aac40555ae9fd1184428b04")
 
     def prepare_pkg_config_files(self):
         if self.isLinux:

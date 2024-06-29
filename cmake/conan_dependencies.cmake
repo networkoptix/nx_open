@@ -124,11 +124,6 @@ if(CONAN_QUICK_START_GUIDE_ROOT)
     set(quick_start_guide_directory ${CONAN_QUICK_START_GUIDE_ROOT})
 endif()
 
-if(CONAN_NX_MOBILE_CLIENT_DEPENDENCIES_ROOT)
-    set(firebase_cpp_sdk_dir ${CONAN_NX_MOBILE_CLIENT_DEPENDENCIES_ROOT}/firebase_cpp_sdk)
-    set(push_dependencies_dir ${CONAN_NX_MOBILE_CLIENT_DEPENDENCIES_ROOT}/push_dependencies)
-endif()
-
 # Exclude conan-generated files from ninja_clean
 foreach(extension "bat" "sh" "ps1")
     nx_store_known_file(${CMAKE_BINARY_DIR}/activate_run.${extension})
