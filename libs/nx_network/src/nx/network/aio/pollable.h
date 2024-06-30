@@ -29,7 +29,11 @@ public:
     Pollable(
         aio::AbstractAioThread* aioThread,
         AbstractSocket::SOCKET_HANDLE fd,
-        std::unique_ptr<CommonSocketImpl> impl = nullptr);
+        std::unique_ptr<CommonSocketImpl> impl);
+
+    Pollable(
+        aio::AbstractAioThread* aioThread,
+        AbstractSocket::SOCKET_HANDLE fd);
 
     Pollable(const Pollable&) = delete;
     Pollable& operator=(const Pollable&) = delete;

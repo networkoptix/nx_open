@@ -15,6 +15,7 @@
 #include <iterator>
 #include <tuple>
 #include <system_error>
+#include <exception>
 
 #include "common.h"
 

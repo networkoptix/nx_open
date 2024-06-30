@@ -1,6 +1,6 @@
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -298,6 +298,7 @@ if(UNIX)
             -Wno-error=maybe-uninitialized
             -Wno-error=unused-result
             -Wno-error=ignored-attributes
+            -Wno-error=deprecated-declarations
             -Wno-missing-field-initializers
             -Wno-psabi
         )

@@ -27,6 +27,13 @@ Pollable::Pollable(
     bindToAioThread(aioThread);
 }
 
+Pollable::Pollable(
+    aio::AbstractAioThread* aioThread,
+    AbstractSocket::SOCKET_HANDLE fd)
+    :
+    Pollable(aioThread, fd, nullptr)
+{}
+
 // NOTE: The destructor is needed to hide CommonSocketImpl declaration.
 Pollable::~Pollable() = default;
 

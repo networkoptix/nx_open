@@ -618,6 +618,25 @@ CommunicatingSocket<SocketInterfaceToImplement>::CommunicatingSocket(
 }
 
 template<typename SocketInterfaceToImplement>
+CommunicatingSocket<SocketInterfaceToImplement>::CommunicatingSocket(
+    aio::AbstractAioThread* aioThread,
+    int type,
+    int protocol,
+    int ipVersion)
+    :
+    CommunicatingSocket(aioThread, type, protocol, ipVersion, nullptr)
+{}
+
+template<typename SocketInterfaceToImplement>
+CommunicatingSocket<SocketInterfaceToImplement>::CommunicatingSocket(
+    aio::AbstractAioThread* aioThread,
+    int newConnSD,
+    int ipVersion)
+    :
+    CommunicatingSocket(aioThread, newConnSD, ipVersion, nullptr)
+{}
+
+template<typename SocketInterfaceToImplement>
 CommunicatingSocket<SocketInterfaceToImplement>::~CommunicatingSocket()
 {
     if (m_aioHelper)

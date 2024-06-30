@@ -134,13 +134,24 @@ public:
         int type,
         int protocol,
         int ipVersion,
-        std::unique_ptr<CommonSocketImpl> sockImpl = nullptr);
+        std::unique_ptr<CommonSocketImpl> sockImpl);
 
     CommunicatingSocket(
         aio::AbstractAioThread* aioThread,
         int newConnSD,
         int ipVersion,
-        std::unique_ptr<CommonSocketImpl> sockImpl = nullptr);
+        std::unique_ptr<CommonSocketImpl> sockImpl);
+
+    CommunicatingSocket(
+        aio::AbstractAioThread* aioThread,
+        int type,
+        int protocol,
+        int ipVersion);
+
+    CommunicatingSocket(
+        aio::AbstractAioThread* aioThread,
+        int newConnSD,
+        int ipVersion);
 
     virtual ~CommunicatingSocket();
 
