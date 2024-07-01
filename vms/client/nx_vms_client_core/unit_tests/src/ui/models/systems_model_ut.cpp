@@ -17,8 +17,9 @@ using TileVisibilityScope = nx::vms::client::core::welcome_screen::TileVisibilit
 QnSystemDescriptionPtr createSystemsDescription()
 {
     return QnLocalSystemDescription::create(
-        nx::Uuid::createUuid().toSimpleString(),
-        nx::Uuid::createUuid(),
+        /*id*/ nx::Uuid::createUuid().toSimpleString(),
+        /*localSystemId*/ nx::Uuid::createUuid(),
+        /*cloudSystemId*/ QString(),
         "name");
 }
 
