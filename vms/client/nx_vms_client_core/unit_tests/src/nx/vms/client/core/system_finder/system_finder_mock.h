@@ -33,6 +33,13 @@ public:
         emit systemLost(system->id(), system->localId());
     }
 
+    void clear()
+    {
+        for (const auto& system: m_systems)
+            emit systemLost(system->id(), system->localId());
+        m_systems.clear();
+    }
+
     virtual SystemDescriptionList systems() const override
     {
         return m_systems.values();

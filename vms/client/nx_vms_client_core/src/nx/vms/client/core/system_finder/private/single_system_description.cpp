@@ -40,11 +40,13 @@ using ServerCompatibilityValidator = nx::vms::common::ServerCompatibilityValidat
 
 SingleSystemDescription::SingleSystemDescription(
     const QString& systemId,
-    const nx::Uuid& localId,
+    const nx::Uuid& localSystemId,
+    const QString& cloudSystemId,
     const QString& systemName)
     :
     m_id(systemId),
-    m_localId(localId),
+    m_localId(localSystemId),
+    m_cloudId(cloudSystemId),
     m_systemName(extractSystemName(systemName))
 {
 }
@@ -64,6 +66,11 @@ QString SingleSystemDescription::id() const
 nx::Uuid SingleSystemDescription::localId() const
 {
     return m_localId;
+}
+
+QString SingleSystemDescription::cloudId() const
+{
+    return m_cloudId;
 }
 
 QString SingleSystemDescription::name() const

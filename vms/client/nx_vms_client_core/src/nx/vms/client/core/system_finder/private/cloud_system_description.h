@@ -48,6 +48,7 @@ private:
     QnCloudSystemDescription(
         const QString& systemId,
         const nx::Uuid& localSystemId,
+        const QString& cloudSystemId,
         const QString& systemName,
         const QString& ownerEmail,
         const QString& ownerFullName,

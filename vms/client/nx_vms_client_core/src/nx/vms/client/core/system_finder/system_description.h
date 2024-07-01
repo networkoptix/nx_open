@@ -51,6 +51,12 @@ public:
      */
     virtual Uuid localId() const = 0;
 
+    /**
+     * Cloud ID of the system. Assigned when it is bound to the cloud, cleared when unbound.
+     * Considered to be unique for all systems which are bound to the cloud.
+     */
+    virtual QString cloudId() const = 0;
+
     virtual QString name() const = 0;
 
     virtual QString ownerAccountEmail() const = 0;

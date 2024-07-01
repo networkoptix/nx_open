@@ -143,7 +143,11 @@ void DirectSystemFinder::updateServerData(const nx::vms::discovery::ModuleEndpoi
         const bool isNewSystem = helpers::isNewSystem(module);
         const auto systemDescription = (isNewSystem
             ? LocalSystemDescription::createFactory(systemId)
-            : LocalSystemDescription::create(systemId, localSystemId, systemName));
+            : LocalSystemDescription::create(
+                systemId,
+                localSystemId,
+                module.cloudSystemId,
+                systemName));
 
         itSystem = m_systems.insert(systemId, systemDescription);
     }

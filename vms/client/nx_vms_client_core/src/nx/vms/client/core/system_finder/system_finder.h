@@ -14,6 +14,7 @@
 namespace nx::vms::client::core {
 
 class SystemDescriptionAggregator;
+using SystemDescriptionAggregatorPtr = QSharedPointer<SystemDescriptionAggregator>;
 
 /**
  * Central place for all discovered systems information. Collects data from different sources and
@@ -50,12 +51,7 @@ public:
     SystemDescriptionList systems() const override;
     SystemDescriptionPtr getSystem(const QString& systemId) const override;
 
-protected:
-    SystemFinder(bool addDefaultFinders, QObject* parent);
-
-    void initializeFinders();
-
-    // TODO: #sivanov Change to enum class.
+    // TODO: #sivanov Change to enum class and move to the SystemDescriptionAggregator logic.
     enum Source
     {
         cloud,
@@ -63,20 +59,26 @@ protected:
         recent,
         saved,
     };
+
+protected:
+    SystemFinder(bool addDefaultFinders, QObject* parent);
+
+    void initializeFinders();
+
     void addSystemFinder(AbstractSystemFinder* finder, Source source);
 
     bool mergeSystemIntoExisting(const SystemDescriptionPtr& system, Source source);
+    SystemDescriptionAggregatorPtr createNewAggregator(
+        const SystemDescriptionPtr& system,
+        Source source) const;
+    bool systemIsHidden(const SystemDescriptionPtr& system, Source source) const;
 
     void onBaseSystemDiscovered(const SystemDescriptionPtr& system, Source source);
     void onSystemLost(const QString& systemId, const nx::Uuid& localId, Source source);
 
 protected:
-    using SystemFinderList = QMap<AbstractSystemFinder*, nx::utils::ScopedConnectionsPtr>;
-    using AggregatorPtr = QSharedPointer<SystemDescriptionAggregator>;
-    using AggregatorsList = QHash<QString, AggregatorPtr>;
-
-    SystemFinderList m_finders;
-    AggregatorsList m_systems;
+    QMap<AbstractSystemFinder*, nx::utils::ScopedConnectionsPtr> m_finders;
+    QHash<QString, SystemDescriptionAggregatorPtr> m_systems;
 };
 
 } // namespace nx::vms::client::core

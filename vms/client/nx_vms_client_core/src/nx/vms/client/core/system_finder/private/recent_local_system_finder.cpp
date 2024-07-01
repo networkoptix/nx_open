@@ -51,8 +51,11 @@ void RecentLocalSystemFinder::updateSystems()
         if (hasOnlyCloudUrls)
             continue;
 
-        const auto system =
-            LocalSystemDescription::create(id.toSimpleString(), id, connection.systemName);
+        const auto system = LocalSystemDescription::create(
+            id.toSimpleString(),
+            id,
+            /*cloudSystemId*/ QString(),
+            connection.systemName);
 
         static const int kVeryFarPriority = 100000;
 
