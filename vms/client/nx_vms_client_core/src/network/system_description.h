@@ -27,6 +27,8 @@ public: // overrides
 
     nx::Uuid localId() const override;
 
+    QString cloudId() const override;
+
     QString name() const override;
 
     QString ownerAccountEmail() const override;
@@ -82,6 +84,7 @@ protected:
     QnSystemDescription(
         const QString& systemId,
         const nx::Uuid& localSystemId,
+        const QString& cloudSystemId,
         const QString& systemName);
 
     void handleReachableServerAdded(const nx::Uuid& serverId);
@@ -97,6 +100,7 @@ private:
 
     const QString m_id;
     const nx::Uuid m_localId;
+    const QString m_cloudId;
     const QString m_ownerAccountEmail;
     const QString m_ownerFullName;
     QString m_systemName;

@@ -37,7 +37,11 @@ void ScopeLocalSystemsFinder::updateSystems()
         if (info.visibilityScope == TileVisibilityScope::DefaultTileVisibilityScope)
             continue;
 
-        const auto system = QnLocalSystemDescription::create(id.toSimpleString(), id, info.name);
+        const auto system = QnLocalSystemDescription::create(
+            id.toSimpleString(),
+            id,
+            /*cloudSystemId*/ QString(),
+            info.name);
 
         static const int kVeryFarPriority = 100000;
 

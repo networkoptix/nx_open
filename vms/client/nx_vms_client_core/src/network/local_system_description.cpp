@@ -4,22 +4,23 @@
 
 #include <network/system_helpers.h>
 
-QnLocalSystemDescriptionPtr QnLocalSystemDescription::createFactory(const QString& systemId)
+LocalSystemDescriptionPtr QnLocalSystemDescription::createFactory(const QString& systemId)
 {
-    return QnLocalSystemDescriptionPtr(new QnLocalSystemDescription(systemId));
+    return LocalSystemDescriptionPtr(new QnLocalSystemDescription(systemId));
 }
 
-QnLocalSystemDescriptionPtr QnLocalSystemDescription::create(
+LocalSystemDescriptionPtr QnLocalSystemDescription::create(
     const QString& systemId,
     const nx::Uuid& localSystemId,
+    const QString& cloudSystemId,
     const QString& systemName)
 {
-    return QnLocalSystemDescriptionPtr(
-        new QnLocalSystemDescription(systemId, localSystemId, systemName));
+    return LocalSystemDescriptionPtr(
+        new QnLocalSystemDescription(systemId, localSystemId, cloudSystemId, systemName));
 }
 
 QnLocalSystemDescription::QnLocalSystemDescription(const QString& systemId):
-    base_type(systemId, nx::Uuid::fromStringSafe(systemId), tr("New Server")),
+    base_type(systemId, nx::Uuid::fromStringSafe(systemId), QString(), tr("New Server")),
     m_isNewSystem(true)
 {
     init();
@@ -28,9 +29,10 @@ QnLocalSystemDescription::QnLocalSystemDescription(const QString& systemId):
 QnLocalSystemDescription::QnLocalSystemDescription(
     const QString& systemId,
     const nx::Uuid& localSystemId,
+    const QString& cloudSystemId,
     const QString& systemName)
     :
-    base_type(systemId, localSystemId, systemName),
+    base_type(systemId, localSystemId, cloudSystemId, systemName),
     m_isNewSystem(false)
 {
     init();
@@ -38,7 +40,7 @@ QnLocalSystemDescription::QnLocalSystemDescription(
 
 void QnLocalSystemDescription::init()
 {
-    connect(this, &QnBaseSystemDescription::newSystemStateChanged, this,
+    connect(this, &QnSystemDescription::newSystemStateChanged, this,
         &QnLocalSystemDescription::updateNewSystemState);
 }
 
@@ -74,8 +76,8 @@ QString QnLocalSystemDescription::ownerFullName() const
 
 void QnLocalSystemDescription::updateNewSystemState()
 {
-    connect(this, &QnBaseSystemDescription::reachableStateChanged,
-        this, &QnBaseSystemDescription::onlineStateChanged);
+    connect(this, &QnSystemDescription::reachableStateChanged,
+        this, &QnSystemDescription::onlineStateChanged);
 
     const auto currentServers = servers();
     const bool newSystemState = std::any_of(currentServers.begin(), currentServers.end(),
