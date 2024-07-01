@@ -5,6 +5,9 @@
 #include <nx/network/address_resolver.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/log/assert.h>
+#include <nx/utils/range_adapters.h>
+
+#include <finders/systems_finder.h>
 
 namespace {
 
@@ -81,6 +84,14 @@ bool QnSystemDescriptionAggregator::containsSystem(const QString& systemId) cons
     return false;
 }
 
+int QnSystemDescriptionAggregator::mostReliableSource() const
+{
+    if (!NX_ASSERT(!isEmptyAggregator()))
+        return QnSystemsFinder::Source::saved; //< Lowest priority just in case.
+
+    return m_systems.firstKey();
+}
+
 bool QnSystemDescriptionAggregator::containsSystem(int priority) const
 {
     return m_systems.contains(priority);
@@ -136,6 +147,18 @@ void QnSystemDescriptionAggregator::mergeSystem(int priority, const QnSystemDesc
 
     updateServers();
     emitSystemChanged();
+}
+
+void QnSystemDescriptionAggregator::mergeSystem(const SystemDescriptionAggregatorPtr& system)
+{
+    for (auto [source, subsystem]: nx::utils::keyValueRange(system->m_systems))
+    {
+        if (NX_ASSERT(!m_systems.contains(source),
+            "Worflow failure, see SystemFinder::mergeSystemIntoExisting() method"))
+        {
+            mergeSystem(source, subsystem);
+        }
+    }
 }
 
 void QnSystemDescriptionAggregator::emitSystemChanged()
@@ -217,6 +240,11 @@ QString QnSystemDescriptionAggregator::id() const
 nx::Uuid QnSystemDescriptionAggregator::localId() const
 {
     return (isEmptyAggregator() ? nx::Uuid() : m_systems.first()->localId());
+}
+
+QString QnSystemDescriptionAggregator::cloudId() const
+{
+    return (isEmptyAggregator() ? QString() : m_systems.first()->cloudId());
 }
 
 QString QnSystemDescriptionAggregator::name() const

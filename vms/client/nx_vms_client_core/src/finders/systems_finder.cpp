@@ -31,6 +31,20 @@ enum class SystemHideFlag
 };
 Q_DECLARE_FLAGS(SystemHideFlags, SystemHideFlag)
 
+// Only CloudSystemFinder and DirectSystemFinder know whether the system has Cloud ID, and we can
+// rely on this knowledge.
+bool hasCloudIdInfo(int source)
+{
+    return source == QnSystemsFinder::Source::cloud || source == QnSystemsFinder::Source::direct;
+}
+
+// Only CloudSystemFinder and DirectSystemFinder know whether the system has Cloud ID, and we can
+// rely on this knowledge.
+bool hasCloudIdInfo(SystemDescriptionAggregatorPtr aggregator)
+{
+    return hasCloudIdInfo(aggregator->mostReliableSource());
+}
+
 } // namespace
 
 QnSystemsFinder::QnSystemsFinder(QObject* parent):
@@ -108,7 +122,7 @@ bool QnSystemsFinder::mergeSystemIntoExisting(const QnSystemDescriptionPtr& syst
 
     // Recent and Scope finders do not know anything about the cloud ids, so we need to iterate
     // over all systems to check whether system with the same local id already exists.
-    QList<AggregatorPtr> systemsWithSameLocalId;
+    QList<SystemDescriptionAggregatorPtr> systemsWithSameLocalId;
     const nx::Uuid localId = system->localId();
     for (const auto& existingSystem: m_systems)
     {
@@ -118,13 +132,39 @@ bool QnSystemsFinder::mergeSystemIntoExisting(const QnSystemDescriptionPtr& syst
     if (systemsWithSameLocalId.empty())
         return false;
 
-    // Handling scenario when newly found system does not know about cloud id, but existing knows.
-    if (source == Source::recent || source == Source::saved)
+    // Check whether newly found system knows about cloud id, but existing does not.
+    if (hasCloudIdInfo(source))
     {
         for (const auto& existingSystem: systemsWithSameLocalId)
         {
-            if (existingSystem->containsSystem(Source::cloud)
-                || existingSystem->containsSystem(Source::direct))
+            // Several systems with the same local id but different cloud ids are allowed.
+            if (hasCloudIdInfo(existingSystem))
+            {
+                NX_ASSERT(existingSystem->cloudId() != system->cloudId(),
+                    "If the systems have the same cloud id, their id also should match: %1 : %2.",
+                    existingSystem,
+                    system);
+                continue;
+            }
+
+            NX_VERBOSE(this, "Replacing system %1 by newly found %2 by local id %3",
+                existingSystem, system, localId);
+            m_systems.remove(existingSystem->id());
+            emit systemLost(existingSystem->id(), localId);
+
+            auto replacementSystem = createNewAggregator(system, source);
+            replacementSystem->mergeSystem(existingSystem);
+            m_systems.insert(replacementSystem->id(), replacementSystem);
+            emit systemDiscovered(replacementSystem);
+
+            return true;
+        }
+    }
+    else //< Check whether newly found system does not know about cloud id, but existing knows.
+    {
+        for (const auto& existingSystem: systemsWithSameLocalId)
+        {
+            if (hasCloudIdInfo(existingSystem))
             {
                 NX_VERBOSE(this, "Merging system %1 into existing one %2 by local id %3",
                     system, existingSystem, system->id());
@@ -134,59 +174,15 @@ bool QnSystemsFinder::mergeSystemIntoExisting(const QnSystemDescriptionPtr& syst
         }
     }
 
-    // Handling scenario when newly found system knows about cloud id, but existing does not.
-    if (source == Source::cloud|| source == Source::direct)
-    {
-        for (const auto& existingSystem: systemsWithSameLocalId)
-        {
-            // Several systems with the same local id but different cloud ids are allowed.
-            if (existingSystem->containsSystem(Source::cloud))
-                continue;
-
-            NX_VERBOSE(this, "Replacing system %1 by newly found %2 by local id %3",
-                existingSystem, system, localId);
-            m_systems.remove(existingSystem->id());
-            emit systemLost(existingSystem->id(), localId);
-            return false; //< New system will be added further.
-        }
-    }
-
     return false;
 }
 
-void QnSystemsFinder::onBaseSystemDiscovered(const QnSystemDescriptionPtr& system, Source source)
+SystemDescriptionAggregatorPtr QnSystemsFinder::createNewAggregator(
+    const QnSystemDescriptionPtr& system,
+    Source source) const
 {
-    NX_VERBOSE(this, "Discovered system %1 (source %2)", system, source);
-    if (mergeSystemIntoExisting(system, source))
-        return;
-
-    const SystemHideFlags systemHideOptions(nx::vms::client::core::ini().systemsHideOptions);
-    const auto systemCompatibility = system->systemCompatibility();
-
-    if (systemHideOptions.testFlag(SystemHideFlag::incompatible)
-        && systemCompatibility == QnSystemCompatibility::incompatible)
-    {
-        return;
-    }
-
-    const auto isCloudAndNotOnline =
-        [system] { return system->isCloudSystem() && !system->isOnline(); };
-    if (systemHideOptions.testFlag(SystemHideFlag::notConnectableCloud) && isCloudAndNotOnline())
-        return;
-
-    if (systemHideOptions.testFlag(SystemHideFlag::requireCompatibilityMode)
-        && systemCompatibility == QnSystemCompatibility::requireCompatibilityMode)
-    {
-        return;
-    }
-
-    if (systemHideOptions.testFlag(SystemHideFlag::nonLocalHost) && !system->hasLocalServer())
-        return;
-
-    if (systemHideOptions.testFlag(SystemHideFlag::autoDiscovered) && source == Source::direct)
-        return;
-
-    const AggregatorPtr target(new QnSystemDescriptionAggregator(source, system));
+    NX_VERBOSE(this, "Creating a new aggregator from %1", system);
+    const SystemDescriptionAggregatorPtr target{new QnSystemDescriptionAggregator(source, system)};
 
     auto updateRecordInRecentConnections =
         [this, target]
@@ -205,15 +201,63 @@ void QnSystemsFinder::onBaseSystemDiscovered(const QnSystemDescriptionPtr& syste
             appContext()->coreSettings()->recentLocalConnections = connections;
         };
 
-    NX_VERBOSE(this, "Creating a new aggregator from %1", target);
-    m_systems.insert(target->id(), target);
     connect(target.get(), &QnBaseSystemDescription::systemNameChanged, this,
         updateRecordInRecentConnections);
     connect(target.get(), &QnBaseSystemDescription::versionChanged, this,
         updateRecordInRecentConnections);
     updateRecordInRecentConnections();
 
-    emit systemDiscovered(target.dynamicCast<QnBaseSystemDescription>());
+    return target;
+}
+
+bool QnSystemsFinder::systemIsHidden(const QnSystemDescriptionPtr& system, Source source) const
+{
+    const SystemHideFlags systemHideOptions(nx::vms::client::core::ini().systemsHideOptions);
+    const auto systemCompatibility = system->systemCompatibility();
+
+    if (systemHideOptions.testFlag(SystemHideFlag::incompatible)
+        && systemCompatibility == QnSystemCompatibility::incompatible)
+    {
+        return true;
+    }
+
+    if (systemHideOptions.testFlag(SystemHideFlag::notConnectableCloud)
+        && system->isCloudSystem()
+        && !system->isOnline())
+    {
+        return true;
+    }
+
+    if (systemHideOptions.testFlag(SystemHideFlag::requireCompatibilityMode)
+        && systemCompatibility == QnSystemCompatibility::requireCompatibilityMode)
+    {
+        return true;
+    }
+
+    if (systemHideOptions.testFlag(SystemHideFlag::nonLocalHost) && !system->hasLocalServer())
+        return true;
+
+    if (systemHideOptions.testFlag(SystemHideFlag::autoDiscovered) && source == Source::direct)
+        return true;
+
+    return false;
+}
+
+void QnSystemsFinder::onBaseSystemDiscovered(const QnSystemDescriptionPtr& system, Source source)
+{
+    NX_VERBOSE(this, "Discovered system %1 (source %2)", system, source);
+    if (mergeSystemIntoExisting(system, source))
+        return;
+
+    if (systemIsHidden(system, source))
+    {
+        NX_VERBOSE(this, "System %1 is hidden by developer options", system);
+        return;
+    }
+
+    const SystemDescriptionAggregatorPtr target = createNewAggregator(system, source);
+    m_systems.insert(target->id(), target);
+    emit systemDiscovered(target);
 }
 
 void QnSystemsFinder::onSystemLost(const QString& systemId, const nx::Uuid& localId, Source source)
@@ -244,7 +288,7 @@ QnAbstractSystemsFinder::SystemDescriptionList QnSystemsFinder::systems() const
 {
     SystemDescriptionList result;
     for (const auto& aggregator: m_systems)
-        result.append(aggregator.dynamicCast<QnBaseSystemDescription>());
+        result.append(aggregator);
 
     return result;
 }
