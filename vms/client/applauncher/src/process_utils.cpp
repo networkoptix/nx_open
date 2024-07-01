@@ -5,18 +5,24 @@
 #include <nx/utils/platform/process.h>
 
 #ifdef Q_OS_LINUX
-#include <unistd.h>
-#include <signal.h>
-#include <sys/wait.h>
-#include <sys/types.h>
-#include <QtCore/QFile>
+    #include <signal.h>
+    #include <unistd.h>
 
-void sig_child_handler(int signum) {
+    #include <QtCore/QFile>
+
+    #include <sys/wait.h>
+
+void sig_child_handler(int signum)
+{
     signal(signum, &sig_child_handler);
     wait(nullptr);
 }
 
-bool ProcessUtils::startProcessDetached(const QString &program, const QStringList &arguments, const QString &workingDirectory, const QStringList &environment) {
+bool ProcessUtils::startProcessDetached(const QString& program,
+    const QStringList& arguments,
+    const QString& workingDirectory,
+    const QStringList& environment)
+{
     /* prepare argv */
     QList<QByteArray> enc_args;
     enc_args.append(QFile::encodeName(program));
@@ -45,10 +51,16 @@ bool ProcessUtils::startProcessDetached(const QString &program, const QStringLis
     if (!workingDirectory.isEmpty())
         encodedName = QFile::encodeName(workingDirectory);
 
+    int fileDescriptorsLimit = static_cast<int>(sysconf(_SC_OPEN_MAX));
+
     pid_t childPid = fork();
 
     if (childPid == 0)
     {
+        // Close all file descriptors except for stdin, stdout, and stderr.
+        for (int i = STDERR_FILENO + 1; i < fileDescriptorsLimit; i++)
+            close(i);
+
         if (!encodedName.isEmpty())
             chdir(encodedName.constData());
 
@@ -59,13 +71,18 @@ bool ProcessUtils::startProcessDetached(const QString &program, const QStringLis
     return childPid != -1;
 }
 
-void ProcessUtils::initialize() {
+void ProcessUtils::initialize()
+{
     signal(SIGCHLD, &sig_child_handler);
 }
 
 #else
 
-bool ProcessUtils::startProcessDetached(const QString &program, const QStringList &arguments, const QString &workingDirectory, const QStringList &environment) {
+bool ProcessUtils::startProcessDetached(const QString& program,
+    const QStringList& arguments,
+    const QString& workingDirectory,
+    const QStringList& environment)
+{
     if(program.isEmpty())
         return false; /* This prevents a crash in QProcess::startDetached. */
 
