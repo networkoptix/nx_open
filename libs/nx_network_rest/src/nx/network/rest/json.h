@@ -75,18 +75,24 @@ inline QJsonValue defaultValue()
     return value;
 }
 
-// throws exception if can't process all withs
 template<typename T>
-QJsonValue filter(
-    const T& data, Params filters = {},
-    DefaultValueAction defaultValueAction = DefaultValueAction::appendMissing)
+inline QJsonValue serialized(const T& data)
 {
     QnJsonContext jsonContext;
     jsonContext.setSerializeMapToObject(true);
     jsonContext.setChronoSerializedAsDouble(true);
     QJsonValue value;
     QJson::serialize(&jsonContext, data, &value);
+    return value;
+}
 
+// throws exception if can't process all withs
+template<typename T>
+QJsonValue filter(
+    const T& data, Params filters = {},
+    DefaultValueAction defaultValueAction = DefaultValueAction::appendMissing)
+{
+    auto value = serialized(data);
     auto with = details::extractWithParam(&filters);
     static const auto defaultJson = defaultValue<T>();
     details::filter(&value, &defaultJson, defaultValueAction, std::move(filters), std::move(with));

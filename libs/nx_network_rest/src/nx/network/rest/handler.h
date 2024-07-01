@@ -110,7 +110,11 @@ public:
     using SubscriptionCallback =
         nx::utils::MoveOnlyFunc<void(const QString& id, NotifyType, QJsonValue payload)>;
 
-    virtual nx::utils::Guard subscribe(const QString& /*id*/, SubscriptionCallback) { return {}; }
+    virtual nx::utils::Guard subscribe(const QString& /*id*/, const Request&, SubscriptionCallback)
+    {
+        return {};
+    }
+
     virtual QString idParamName() const { return {}; }
     virtual QString subscriptionId(const Request&) { return {}; }
     virtual void audit(const Request& request, const Response& response);

@@ -3,6 +3,7 @@
 #include "system_settings.h"
 
 #include <nx/fusion/model_functions.h>
+#include <nx/network/rest/json.h>
 
 namespace nx::vms::api {
 
@@ -80,12 +81,7 @@ bool deserialize(QnJsonContext* context, const QJsonValue& value, SiteSettings* 
 
 QJsonValue SiteSettings::front() const
 {
-    QnJsonContext context;
-    context.setSerializeMapToObject(true);
-    context.setChronoSerializedAsDouble(true);
-    QJsonValue result;
-    QJson::serialize(&context, *this, &result);
-    return result;
+    return nx::network::rest::json::serialized(*this);
 }
 
 } // namespace nx::vms::api

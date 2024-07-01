@@ -137,7 +137,8 @@ protected:
     virtual Response executePut(const Request& request) override;
     virtual Response executeDelete(const Request& request) override;
     virtual QString subscriptionId(const Request& request) override;
-    virtual nx::utils::Guard subscribe(const QString& id, SubscriptionCallback callback) override;
+    virtual nx::utils::Guard subscribe(
+        const QString& id, const Request& request, SubscriptionCallback callback) override;
     virtual QString idParamName() const override { return m_idParamName; }
 
     template<typename OutputData>
@@ -325,18 +326,9 @@ protected:
             : json::DefaultValueAction::removeEqual;
     }
 
-protected:
-    const QString m_idParamName;
-    const CrudFeatures m_features;
-};
-
-template<typename Derived>
-Response CrudHandler<Derived>::executeGet(const Request& request)
-{
-    if constexpr (DoesMethodExist_read<Derived>::value)
+    template<typename Filter>
+    std::tuple<Filter, Params, json::DefaultValueAction> processGetRequest(const Request& request)
     {
-        auto* d = static_cast<Derived*>(this);
-        using Filter = typename MethodArgument0<decltype(&Derived::read)>::type;
         Filter filter = request.params().toJson(/*excludeCommon*/ true).isEmpty()
             ? Filter()
             : deserialize<Filter>(request);
@@ -350,26 +342,37 @@ Response CrudHandler<Derived>::executeGet(const Request& request)
         }
         else
         {
-            QnJsonContext jsonContext;
-            jsonContext.setChronoSerializedAsDouble(true);
-            QJsonValue intermediate;
-            QJson::serialize(&jsonContext, filter, &intermediate);
+            auto intermediate = json::serialized(filter);
             if (intermediate.isObject())
                 filtered = Params::fromJson(intermediate.toObject());
-        }
-
-        ResponseAttributes responseAttributes;
-        auto list = call(&Derived::read, std::move(filter), request, &responseAttributes);
-        if constexpr (DoesMethodExist_fillMissingParamsForResponse<Derived>::value)
-        {
-            for (auto& model: list)
-                d->fillMissingParamsForResponse(&model, request);
         }
         auto params = request.params();
         for (auto [key, value]: filtered.keyValueRange())
             params.remove(key);
+        auto defaultValueAction = extractDefaultValueAction(&params, request.apiVersion());
+        return {std::move(filter), std::move(params), defaultValueAction};
+    }
 
-        const auto defaultValueAction = extractDefaultValueAction(&params, request.apiVersion());
+protected:
+    const QString m_idParamName;
+    const CrudFeatures m_features;
+};
+
+template<typename Derived>
+Response CrudHandler<Derived>::executeGet(const Request& request)
+{
+    if constexpr (DoesMethodExist_read<Derived>::value)
+    {
+        auto [filter, params, defaultValueAction] =
+            processGetRequest<typename MethodArgument0<decltype(&Derived::read)>::type>(request);
+        ResponseAttributes responseAttributes;
+        auto list = call(&Derived::read, std::move(filter), request, &responseAttributes);
+        if constexpr (DoesMethodExist_fillMissingParamsForResponse<Derived>::value)
+        {
+            auto* d = static_cast<Derived*>(this);
+            for (auto& model: list)
+                d->fillMissingParamsForResponse(&model, request);
+        }
         if (const auto id = idParam(request);
             (id.value && id.isInPath) || m_idParamName.isEmpty())
         {
@@ -661,7 +664,8 @@ Response CrudHandler<Derived>::executePatch(const Request& request)
 }
 
 template<typename Derived>
-nx::utils::Guard CrudHandler<Derived>::subscribe(const QString& id, SubscriptionCallback callback)
+nx::utils::Guard CrudHandler<Derived>::subscribe(
+    const QString& id, const Request&, SubscriptionCallback callback)
 {
     NX_ASSERT(!id.isEmpty(), "Id must be obtained by subscriptionId()");
     if constexpr (DoesMethodExist_addSubscription<Derived>::value)

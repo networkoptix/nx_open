@@ -3,6 +3,7 @@
 #include "audit_details.h"
 
 #include <nx/fusion/model_functions.h>
+#include <nx/network/rest/json.h>
 
 #include "software_version_serialization.h"
 
@@ -20,10 +21,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ProxySessionDetails, (ubjson)(json), ProxySessi
 void serialize_field(const AllAuditDetails::type& data, QVariant* target)
 {
     QByteArray tmp;
-    QnJsonContext jsonContext;
-    jsonContext.setChronoSerializedAsDouble(true);
-    jsonContext.setSerializeMapToObject(true);
-    QJson::serialize(&jsonContext, data, &tmp);
+    QJsonDetail::serialize_json(nx::network::rest::json::serialized(data), &tmp);
     serialize_field(tmp, target);
 }
 

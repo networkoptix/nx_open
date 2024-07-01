@@ -496,14 +496,16 @@ void OpenApiSchema::postprocessResponse(const Request& request, QJsonValue* resp
     if (response->isNull())
         return;
 
-    const auto [path, method] = getJsonPathAndMethod(request);
-    postprocessResponse(path, method, request, response);
+    const auto schemaMethod = QString::fromStdString(request.method().toString()).toLower();
+    const auto [path, method] = getJsonPathAndMethod(schemaMethod, request.decodedPath());
+    postprocessResponse(path, method, request.params(), schemaMethod, response);
 }
 
 void OpenApiSchema::postprocessResponse(
     const QJsonObject& path,
     const QJsonObject& method,
-    const Request& request,
+    const Params& params,
+    const QString& decodedPath,
     QJsonValue* response)
 {
     if (path.isEmpty() || method.isEmpty())
@@ -514,16 +516,17 @@ void OpenApiSchema::postprocessResponse(
     if (content.isEmpty())
         return;
 
-    auto orderByValues = request.params().values("_orderBy");
+    auto orderByValues = params.values("_orderBy");
     orderByValues.removeAll(QString());
-    Postprocessor(request.decodedPath(), {orderByValues})(
+    Postprocessor(decodedPath, {orderByValues})(
         response, getObject(getObject(content, "application/json"), "schema"));
 }
 
 void OpenApiSchema::validateOrThrow(Request* request, http::HttpHeaders* headers)
 {
     NX_CRITICAL(request);
-    const auto [path, method] = getJsonPathAndMethod(*request);
+    const auto [path, method] = getJsonPathAndMethod(
+        QString::fromStdString(request->method().toString()).toLower(), request->decodedPath());
     validateOrThrow(path, method, request, headers);
 }
 
@@ -643,28 +646,29 @@ QJsonObject OpenApiSchema::paths() const
     return json::getObject(m_schema, "paths");
 }
 
-std::pair<QJsonObject, QJsonObject> OpenApiSchema::getJsonPathAndMethod(const Request& request)
+std::pair<QJsonObject, QJsonObject> OpenApiSchema::getJsonPathAndMethod(
+    const QString& method, const QString& decodedPath)
 {
     std::pair<QJsonObject, QJsonObject> result;
-    if (!NX_ASSERT(!request.decodedPath().isEmpty()))
+    if (!NX_ASSERT(!decodedPath.isEmpty()))
         return result;
     const auto paths = json::getObject(m_schema, "paths");
     if (!NX_ASSERT(!paths.isEmpty()))
         return result;
-    const auto path = paths.find(request.decodedPath());
+    const auto path = paths.find(decodedPath);
     if (path == paths.end())
-        throw Exception::notFound(NX_FMT("Unknown scheme path %1", request.decodedPath()));
+        throw Exception::notFound(NX_FMT("Unknown scheme path %1", decodedPath));
     auto& [pathObject, methodObject] = result;
     pathObject = path->toObject();
     if (!NX_ASSERT(!pathObject.isEmpty()))
         return result;
-    const auto method = pathObject.find(QByteArray::fromStdString(request.method().toString()).toLower());
-    if (method == pathObject.end())
+    const auto methodIt = pathObject.find(method);
+    if (methodIt == pathObject.end())
     {
-        throw Exception::internalServerError(NX_FMT(
-            "Unknown scheme method %1 for %2", request.method(), request.decodedPath()));
+        throw Exception::internalServerError(
+            NX_FMT("Unknown scheme method %1 for %2", method, decodedPath));
     }
-    methodObject = method->toObject();
+    methodObject = methodIt->toObject();
     NX_ASSERT(!methodObject.isEmpty());
     return result;
 }
@@ -836,26 +840,31 @@ void OpenApiSchemas::validateOrThrow(Request* request, http::HttpHeaders* header
         return;
 
     auto [schema, path, method] = findSchema(
-        decodedPath, QString::fromStdString(request->method().toString()), /*throwIfNotFound*/ true);
+        decodedPath,
+        request->method(),
+        /*throwIfNotFound*/ true);
     if (schema)
         schema->validateOrThrow(path, method, request, headers);
 }
 
-void OpenApiSchemas::postprocessResponse(const Request& request, QJsonValue* response)
+void OpenApiSchemas::postprocessResponse(
+    const nx::network::http::Method& method,
+    const Params& params,
+    const QString& decodedPath,
+    QJsonValue* response)
 {
-    const auto decodedPath = request.decodedPath();
     if (!NX_ASSERT(!decodedPath.isEmpty()))
         return;
 
-    auto [schema, path, method] =
-        findSchema(decodedPath, QString::fromStdString(request.method().toString()));
+    auto [schema, path, method_] = findSchema(decodedPath, method);
     if (schema)
-        schema->postprocessResponse(path, method, request, response);
+        schema->postprocessResponse(path, method_, params, decodedPath, response);
 }
 
 std::tuple<std::shared_ptr<OpenApiSchema>, QJsonObject, QJsonObject> OpenApiSchemas::findSchema(
-    const QString& requestPath, const QString& requestMethod, bool throwIfNotFound)
+    const QString& requestPath, const nx::network::http::Method& method_, bool throwIfNotFound)
 {
+    const QString schemaMethod = QString::fromStdString(method_.toString()).toLower();
     for (std::size_t version = 0; version < m_schemas.size(); ++version)
     {
         auto schema = m_schemas[version];
@@ -877,11 +886,11 @@ std::tuple<std::shared_ptr<OpenApiSchema>, QJsonObject, QJsonObject> OpenApiSche
             continue;
         }
 
-        const auto method = pathObject.find(requestMethod.toLower());
+        const auto method = pathObject.find(schemaMethod);
         if (method == pathObject.end())
         {
             throw Exception::notImplemented(
-                NX_FMT("Unknown OpenAPI schema method %1 for %2", requestMethod, requestPath));
+                NX_FMT("Unknown OpenAPI schema method %1 for %2", method_, requestPath));
         }
         auto methodObject = method->toObject();
         NX_ASSERT(!methodObject.isEmpty());
