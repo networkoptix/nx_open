@@ -244,6 +244,23 @@ struct WorkbenchExportHandler::Private
         return
             [this](const Filename& filename, bool quiet) -> bool
             {
+                // Most OS do not work well with filenames longer than 255 symbols.
+                static const int kFileNameLenghtLimit = 255;
+
+                if (filename.completeFileName().size() > kFileNameLenghtLimit)
+                {
+                    if (!quiet)
+                    {
+                        // Second argument must be converted to string to avoid invalid .arg()
+                        // overload and to avoid substitutions of possible '%2' in the filename.
+                        QnMessageBox::warning(q->mainWindowWidget(), tr("Cannot write file"),
+                            tr("%1 filename length is more than %2 characters.", "%1 is file name")
+                                .arg(filename.completeFileName(),
+                                    QString::number(kFileNameLenghtLimit)));
+                    }
+                    return false;
+                }
+
                 if (isInRunningExports(filename))
                 {
                     if (!quiet)
