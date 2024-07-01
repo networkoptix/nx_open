@@ -67,7 +67,7 @@ QVariant LookupListEntriesModel::Private::getDisplayValue(
         return {};
 
     if (value.isEmpty())
-        return tr("Any %1").arg(attributeName);
+        return tr("Any %1").arg(attributeName.split(".").back());
 
     return it->second(value);
 }

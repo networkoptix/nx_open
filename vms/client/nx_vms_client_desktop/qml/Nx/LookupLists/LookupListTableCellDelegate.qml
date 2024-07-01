@@ -35,7 +35,7 @@ FocusScope
     function edit()
     {
         control.editingStarted()
-        editor.value = model.display
+        editor.value = model.rawValue
         isEditing = true
         editor.startEditing()
     }
@@ -45,7 +45,7 @@ FocusScope
         if (!isEditing)
             return
 
-        const previousValue = model.display
+        const previousValue = model.rawValue
         const newValue = editor.value
 
         isEditing = false
@@ -92,7 +92,7 @@ FocusScope
         anchors.fill: parent
         focus: true
         clip: true
-        value: model.display
+        value: model.rawValue
 
         objectType: control.objectType
         attribute: control.attribute
@@ -116,7 +116,7 @@ FocusScope
                     break
 
                 case Qt.Key_Escape:
-                    control.revert(model.display)
+                    control.revert(model.rawValue)
                     break
 
                 default:

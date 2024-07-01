@@ -260,14 +260,12 @@ void LookupListImportEntriesModel::applyFix()
             if (!NX_ASSERT(posToChange.isValid()))
                 return;
 
-            if (!NX_ASSERT(d->listEntriesModel
-                               ->data(posToChange, LookupListEntriesModel::DataRole::RawValueRole)
-                               .toString()
-                               .isEmpty()),
-                "Data on change position must be empty")
-            {
+            const auto rawValueByPos =
+                d->listEntriesModel
+                ->data(posToChange, LookupListEntriesModel::DataRole::RawValueRole)
+                .toString();
+            if (!NX_ASSERT(rawValueByPos.isEmpty(), "Data on change position must be empty"))
                 return;
-            }
 
             d->listEntriesModel->setData(
                 posToChange, fixupEntry.incorrectToCorrectWord[incorectWord]);
