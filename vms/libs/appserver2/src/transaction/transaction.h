@@ -1897,16 +1897,6 @@ struct TransactionModel
     /**%apidoc Error description if this transaction is stored in the DB incorrectly. */
     std::optional<QString> _error;
 
-    template<typename T>
-    void setData(T&& data)
-    {
-        QJsonValue value;
-        QnJsonContext context;
-        context.setChronoSerializedAsDouble(true);
-        context.setSerializeMapToObject(true);
-        QJson::serialize(&context, data, &value);
-        this->data = value;
-    }
     void setError(const QString& message, const QByteArray& binaryData, bool withData);
 };
 #define TransactionModel_Fields (id)(info)(binaryDataSizeB)(data)(_error)
