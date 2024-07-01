@@ -38,17 +38,14 @@ using ServerCompatibilityValidator = nx::vms::common::ServerCompatibilityValidat
 
 QnSystemDescription::QnSystemDescription(
     const QString& systemId,
-    const nx::Uuid& localId,
+    const nx::Uuid& localSystemId,
+    const QString& cloudSystemId,
     const QString& systemName)
     :
     m_id(systemId),
-    m_localId(localId),
-    m_systemName(extractSystemName(systemName)),
-    m_serverTimestamps(),
-    m_servers(),
-    m_prioritized(),
-    m_hosts(),
-    m_reachableServers()
+    m_localId(localSystemId),
+    m_cloudId(cloudSystemId),
+    m_systemName(extractSystemName(systemName))
 {
 }
 
@@ -70,6 +67,11 @@ QString QnSystemDescription::id() const
 nx::Uuid QnSystemDescription::localId() const
 {
     return m_localId;
+}
+
+QString QnSystemDescription::cloudId() const
+{
+    return m_cloudId;
 }
 
 QString QnSystemDescription::name() const

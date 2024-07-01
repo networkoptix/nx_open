@@ -50,8 +50,11 @@ void QnRecentLocalSystemsFinder::updateSystems()
         if (hasOnlyCloudUrls)
             continue;
 
-        const auto system =
-            QnLocalSystemDescription::create(id.toSimpleString(), id, connection.systemName);
+        const auto system = QnLocalSystemDescription::create(
+            id.toSimpleString(),
+            id,
+            /*cloudSystemId*/ QString(),
+            connection.systemName);
 
         static const int kVeryFarPriority = 100000;
 

@@ -143,7 +143,11 @@ void QnDirectSystemsFinder::updateServerData(const nx::vms::discovery::ModuleEnd
         const bool isNewSystem = helpers::isNewSystem(module);
         const auto systemDescription = (isNewSystem
             ? QnLocalSystemDescription::createFactory(systemId)
-            : QnLocalSystemDescription::create(systemId, localSystemId, systemName));
+            : QnLocalSystemDescription::create(
+                systemId,
+                localSystemId,
+                module.cloudSystemId,
+                systemName));
 
         itSystem = m_systems.insert(systemId, systemDescription);
     }

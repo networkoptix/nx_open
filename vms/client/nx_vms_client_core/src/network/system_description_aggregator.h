@@ -8,6 +8,9 @@
 #include <network/base_system_description.h>
 #include <nx/vms/api/data/module_information.h>
 
+class QnSystemDescriptionAggregator;
+using SystemDescriptionAggregatorPtr = QSharedPointer<QnSystemDescriptionAggregator>;
+
 class QnSystemDescriptionAggregator: public QnBaseSystemDescription
 {
     using base_type = QnBaseSystemDescription;
@@ -18,10 +21,17 @@ public:
 
     bool isAggregator() const;
 
+    /**
+     * The least index in the aggregator, which is considered to be the most reliable source of
+     * truth.
+     */
+    int mostReliableSource() const;
+
     bool containsSystem(const QString& systemId) const;
     bool containsSystem(int priority) const;
 
     void mergeSystem(int priority, const QnSystemDescriptionPtr& system);
+    void mergeSystem(const SystemDescriptionAggregatorPtr& system);
 
     // TODO: #sivanov SystemId check is highly suspicious here, aggregator must not know about
     // model-level ids.
@@ -30,6 +40,8 @@ public:
     QString id() const override;
 
     nx::Uuid localId() const override;
+
+    QString cloudId() const override;
 
     QString name() const override;
 
@@ -92,3 +104,4 @@ private:
     SystemsMap m_systems;
     ServersList m_servers;
 };
+using SystemDescriptionAggregatorPtr = QSharedPointer<QnSystemDescriptionAggregator>;

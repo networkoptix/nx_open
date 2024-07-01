@@ -10,6 +10,7 @@ QnCloudSystemDescriptionPtr QnCloudSystemDescription::create(const QnCloudSystem
     return QnCloudSystemDescriptionPtr(new QnCloudSystemDescription(
         /*systemId*/ helpers::getTargetSystemId(system),
         system.localId,
+        system.cloudId,
         system.name,
         system.ownerAccountEmail,
         system.ownerFullName,
@@ -21,6 +22,7 @@ QnCloudSystemDescriptionPtr QnCloudSystemDescription::create(const QnCloudSystem
 QnCloudSystemDescription::QnCloudSystemDescription(
     const QString& systemId,
     const nx::Uuid& localSystemId,
+    const QString& cloudSystemId,
     const QString& systemName,
     const QString& ownerEmail,
     const QString& ownerFullName,
@@ -28,7 +30,7 @@ QnCloudSystemDescription::QnCloudSystemDescription(
     bool system2faEnabled,
     const QString& organizationId)
     :
-    base_type(systemId, localSystemId, systemName),
+    base_type(systemId, localSystemId, cloudSystemId, systemName),
     m_ownerEmail(ownerEmail),
     m_ownerFullName(ownerFullName),
     m_online(online),

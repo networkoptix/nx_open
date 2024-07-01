@@ -4,19 +4,21 @@
 
 #include <network/system_description.h>
 
+class QnLocalSystemDescription;
+using LocalSystemDescriptionPtr = QSharedPointer<QnLocalSystemDescription>;
+
 class NX_VMS_CLIENT_CORE_API QnLocalSystemDescription: public QnSystemDescription
 {
     Q_OBJECT
     using base_type = QnSystemDescription;
 
 public:
-    using SystemDescriptionPtr = QSharedPointer<QnLocalSystemDescription>;
+    static LocalSystemDescriptionPtr createFactory(const QString& systemId);
 
-    static SystemDescriptionPtr createFactory(const QString& systemId);
-
-    static SystemDescriptionPtr create(
+    static LocalSystemDescriptionPtr create(
         const QString& systemId,
         const nx::Uuid& localSystemId,
+        const QString& cloudSystemId,
         const QString& systemName);
 
 public: // Overrides
@@ -40,6 +42,7 @@ private:
     QnLocalSystemDescription(
         const QString& systemId,
         const nx::Uuid& localSystemId,
+        const QString& cloudSystemId,
         const QString& systemName);
 
     void init();
@@ -49,5 +52,3 @@ private:
 private:
     bool m_isNewSystem;
 };
-
-using QnLocalSystemDescriptionPtr = QnLocalSystemDescription::SystemDescriptionPtr;
