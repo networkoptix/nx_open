@@ -11,6 +11,9 @@
 
 namespace nx::vms::client::core {
 
+class SystemDescriptionAggregator;
+using SystemDescriptionAggregatorPtr = QSharedPointer<SystemDescriptionAggregator>;
+
 class SystemDescriptionAggregator: public SystemDescription
 {
     using base_type = SystemDescription;
@@ -21,10 +24,17 @@ public:
 
     bool isAggregator() const;
 
+    /**
+     * The least index in the aggregator, which is considered to be the most reliable source of
+     * truth.
+     */
+    int mostReliableSource() const;
+
     bool containsSystem(const QString& systemId) const;
     bool containsSystem(int priority) const;
 
     void mergeSystem(int priority, const SystemDescriptionPtr& system);
+    void mergeSystem(const SystemDescriptionAggregatorPtr& system);
 
     // TODO: #sivanov SystemId check is highly suspicious here, aggregator must not know about
     // model-level ids.
@@ -33,6 +43,8 @@ public:
     QString id() const override;
 
     nx::Uuid localId() const override;
+
+    QString cloudId() const override;
 
     QString name() const override;
 
@@ -94,5 +106,7 @@ private:
     QMap<int, SystemDescriptionPtr> m_systems;
     ServersList m_servers;
 };
+
+using SystemDescriptionAggregatorPtr = QSharedPointer<SystemDescriptionAggregator>;
 
 } // namespace nx::vms::client::core

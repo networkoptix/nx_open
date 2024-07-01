@@ -14,14 +14,15 @@ LocalSystemDescriptionPtr LocalSystemDescription::createFactory(const QString& s
 LocalSystemDescriptionPtr LocalSystemDescription::create(
     const QString& systemId,
     const nx::Uuid& localSystemId,
+    const QString& cloudSystemId,
     const QString& systemName)
 {
     return LocalSystemDescriptionPtr(
-        new LocalSystemDescription(systemId, localSystemId, systemName));
+        new LocalSystemDescription(systemId, localSystemId, cloudSystemId, systemName));
 }
 
 LocalSystemDescription::LocalSystemDescription(const QString& systemId):
-    base_type(systemId, nx::Uuid::fromStringSafe(systemId), tr("New Server")),
+    base_type(systemId, nx::Uuid::fromStringSafe(systemId), QString(), tr("New Server")),
     m_isNewSystem(true)
 {
     init();
@@ -30,9 +31,10 @@ LocalSystemDescription::LocalSystemDescription(const QString& systemId):
 LocalSystemDescription::LocalSystemDescription(
     const QString& systemId,
     const nx::Uuid& localSystemId,
+    const QString& cloudSystemId,
     const QString& systemName)
     :
-    base_type(systemId, localSystemId, systemName),
+    base_type(systemId, localSystemId, cloudSystemId, systemName),
     m_isNewSystem(false)
 {
     init();
