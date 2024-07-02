@@ -21,8 +21,7 @@ const ItemDescriptor& PushNotificationAction::manifest()
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<PushNotificationAction>(),
         .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Send Mobile Notification")),
-        .executionTargets = ExecutionTarget::servers,
-        .targetServers = TargetServers::serverWithPublicIp,
+        .executionTargets = {ExecutionTarget::clients, ExecutionTarget::cloud},
         .fields = {
             makeFieldDescriptor<TargetUserField>(
                 utils::kUsersFieldName,
