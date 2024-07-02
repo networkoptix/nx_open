@@ -10,6 +10,9 @@ namespace apple_utils {
 std::vector<std::string> getProcessCmdLineArgs();
 const std::string getPathToExecutable();
 
+// Get a path to NSApplicationSupportDirectory.
+std::string getAppDataLocation();
+
 } // namespace apple_utils
 } // namespace kit
 } // namespace nx

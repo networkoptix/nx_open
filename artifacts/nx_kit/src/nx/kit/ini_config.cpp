@@ -14,6 +14,11 @@
 
 #include "utils.h"
 
+#if defined(__APPLE__)
+    #include <TargetConditionals.h>
+    #include "apple_utils.h"
+#endif
+
 namespace nx {
 namespace kit {
 
@@ -59,10 +64,12 @@ static std::string getEnv(const char* envVar)
 static std::string determineIniFilesDir()
 {
     using nx::kit::utils::kPathSeparator;
-    
+
     #if defined(ANDROID) || defined(__ANDROID__)
         // On Android, tmpnam() returns "/tmp", which does not exist.
         return "/sdcard/";
+    #elif defined(__APPLE__) && TARGET_OS_IPHONE
+        return apple_utils::getAppDataLocation() + kPathSeparator;
     #else
         #if defined(_WIN32)
             static const char* const kIniDirEnvVar = "LOCALAPPDATA";

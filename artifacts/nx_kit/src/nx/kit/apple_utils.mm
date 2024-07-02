@@ -25,6 +25,13 @@ const std::string getPathToExecutable()
     return [[[[NSProcessInfo processInfo] arguments] objectAtIndex:0] fileSystemRepresentation];
 }
 
+std::string getAppDataLocation()
+{
+    NSArray* paths = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES);
+    NSString* applicationSupportDirectory = [paths lastObject];
+    return [applicationSupportDirectory UTF8String];
+}
+
 } // namespace apple_utils
 } // namespace kit
 } // namespace nx
