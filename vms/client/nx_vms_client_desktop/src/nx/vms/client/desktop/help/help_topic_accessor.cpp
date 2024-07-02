@@ -5,6 +5,7 @@
 #include <QtCore/QAbstractItemModel>
 #include <QtCore/QObject>
 #include <QtQuick/QQuickItem>
+#include <QtQuick/QQuickWindow>
 #include <QtWidgets/QAbstractItemView>
 #include <QtWidgets/QGraphicsProxyWidget>
 #include <QtWidgets/QGraphicsScene>
@@ -200,7 +201,7 @@ int HelpTopicAccessor::helpTopicAt(QGraphicsItem* item, const QPointF& pos, bool
 
 int HelpTopicAccessor::helpTopicAt(QQuickItem* item, const QPointF& pos)
 {
-    if (!NX_ASSERT(item) || !item->isVisible() || !item->contains(pos))
+    if (!item || !item->isVisible() || !item->contains(pos))
         return HelpTopic::Id::Empty;
 
     const auto children = item->childItems();
@@ -212,6 +213,14 @@ int HelpTopicAccessor::helpTopicAt(QQuickItem* item, const QPointF& pos)
     }
 
     return helpTopic(item);
+}
+
+int HelpTopicAccessor::helpTopicAt(QQuickWindow* window, const QPointF& pos)
+{
+    const auto topicId = helpTopicAt(window->contentItem(), pos);
+    return topicId != HelpTopic::Id::Empty
+        ? topicId
+        : HelpTopicAccessor::helpTopic(static_cast<QObject*>(window));
 }
 
 } // namespace nx::vms::client::desktop
