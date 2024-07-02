@@ -79,6 +79,7 @@ void LayoutGeneralSettingsWidget::loadState(const LayoutSettingsDialogState& sta
 
     ui->lockedCheckBox->setChecked(state.locked);
     ui->fixedSizeGroupBox->setChecked(state.fixedSizeEnabled);
+    ui->fixedSizeGroupBox->setEnabled(!state.locked);
     ui->fixedWidthSpinBox->setValue(state.fixedSize.width());
     ui->fixedHeightSpinBox->setValue(state.fixedSize.height());
 }
