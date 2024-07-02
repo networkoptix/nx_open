@@ -63,7 +63,7 @@ public:
     WelcomeScreen(WindowContext* context, QWidget* parent = nullptr);
     virtual ~WelcomeScreen() override;
 
-    void connectionToSystemEstablished(const nx::Uuid& systemId);
+    void connectionToSystemEstablished(const QString& systemId);
 
 public: // Properties
     QObject* systemModel();

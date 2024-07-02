@@ -147,9 +147,9 @@ WelcomeScreen::~WelcomeScreen()
     m_runningRequests.clear();
 }
 
-void WelcomeScreen::connectionToSystemEstablished(const nx::Uuid& systemId)
+void WelcomeScreen::connectionToSystemEstablished(const QString& systemId)
 {
-    emit closeTile(systemId.toString());
+    emit closeTile(systemId);
 }
 
 QObject* WelcomeScreen::systemModel()
