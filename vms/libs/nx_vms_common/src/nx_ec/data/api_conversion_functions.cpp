@@ -67,6 +67,8 @@ namespace ec2 {
 
 struct overload_tag {};
 
+static const auto ActionServiceOffsetParameterType = QStringLiteral("__ActionServiceOffset");
+
 void fromApiToResource(const EventRuleData& src, vms::event::RulePtr& dst)
 {
     dst->setId(src.id);
@@ -88,6 +90,16 @@ void fromApiToResource(const EventRuleData& src, vms::event::RulePtr& dst)
     dst->setComment(src.comment);
     dst->setSchedule(src.schedule);
     dst->setSystem(src.system);
+
+    if (const auto& text = dst->actionParams().text; !text.isEmpty()) {
+        switch (src.actionType) {
+        case ActionType::showPopupAction:
+            dst->setActionType(ActionType(src.actionType + text.toInt()));
+            break;
+        default:
+            break;
+        }
+    }
 }
 
 void fromResourceToApi(const vms::event::RulePtr& src, EventRuleData& dst)
@@ -99,7 +111,20 @@ void fromResourceToApi(const vms::event::RulePtr& src, EventRuleData& dst)
     dst.actionResourceIds = toStdVector(src->actionResources());
 
     dst.eventCondition = QJson::serialized(src->eventParams());
-    dst.actionParams = QJson::serialized(src->actionParams());
+    {
+        auto actionParams = src->actionParams();
+        switch (src->actionType()) {
+        case ActionType::vxMonitoringAction: {
+            NX_ASSERT(actionParams.text.isEmpty(), "action parameter 'text' must be empty, instead: %1", actionParams.text);
+            actionParams.text = QString::number(uint(EServiceOffset::VX));
+            break;
+        }
+        default:
+            break;
+        }
+
+        dst.actionParams = QJson::serialized(actionParams);
+    }
 
     dst.eventState = src->eventState();
     dst.actionType = src->actionType();

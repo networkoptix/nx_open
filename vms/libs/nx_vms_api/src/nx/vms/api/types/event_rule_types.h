@@ -144,6 +144,10 @@ NX_REFLECTION_ENUM(EventType,
     userDefinedEvent = 1000
 )
 
+enum class EServiceOffset {
+    VX = 1000,
+};
+
 NX_REFLECTION_ENUM(ActionType,
     undefinedAction = 0,
 
@@ -267,7 +271,12 @@ NX_REFLECTION_ENUM(ActionType,
      * actionParams:
      * TODO: #dfisenko Add parameters when they are defined.
      */
-    showIntercomInformer = 22
+    showIntercomInformer = 22,
+
+    /**
+     * VX-specific actions
+     */
+    vxMonitoringAction = uint64_t(EServiceOffset::VX) + showPopupAction
 )
 
 enum EventLevel

@@ -101,6 +101,7 @@ AbstractActionPtr ActionFactory::createAction(
         case ActionType::fullscreenCameraAction:
         case ActionType::exitFullscreenAction:
         case ActionType::buzzerAction:
+        case ActionType::vxMonitoringAction:
             return AbstractActionPtr(new CommonAction(actionType, runtimeParams));
 
         default:

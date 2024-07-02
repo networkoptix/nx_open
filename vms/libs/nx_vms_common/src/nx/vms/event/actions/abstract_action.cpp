@@ -41,6 +41,7 @@ bool requiresCameraResource(ActionType actionType)
         case ActionType::openLayoutAction:
         case ActionType::exitFullscreenAction:
         case ActionType::buzzerAction:
+        case ActionType::vxMonitoringAction:
             return false;
 
         case ActionType::playSoundOnceAction:
@@ -261,6 +262,7 @@ QList<ActionType> userAvailableActions()
         ActionType::fullscreenCameraAction,
         ActionType::exitFullscreenAction,
         ActionType::buzzerAction,
+        ActionType::vxMonitoringAction,
     };
 
     return result;
