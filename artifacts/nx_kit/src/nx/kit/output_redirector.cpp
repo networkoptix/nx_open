@@ -15,6 +15,55 @@
     #pragma warning(disable: 4996) //< MSVC: freopen() is unsafe.
 #endif
 
+#if defined(__ANDROID__)
+    #include <jni.h>
+
+    JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* /*reserved*/)
+    {
+        JNIEnv* env = nullptr;
+
+        if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK)
+            return JNI_ERR;
+
+        // Call QtNative.activity().getApplicationContext().getFilesDir().getPath()
+
+        jclass nativeActivityClass = env->FindClass("org/qtproject/qt/android/QtNative");
+        jmethodID activityMethod = env->GetStaticMethodID(
+            nativeActivityClass, "activity", "()Landroid/app/Activity;");
+        jobject activityInstance = env->CallStaticObjectMethod(nativeActivityClass, activityMethod);
+
+        jclass contextClass = env->FindClass("android/content/Context");
+        jmethodID appContextMethod = env->GetMethodID(
+            contextClass, "getApplicationContext", "()Landroid/content/Context;");
+        jobject appContext = env->CallObjectMethod(activityInstance, appContextMethod);
+
+        jmethodID filesDirMethod = env->GetMethodID(
+            env->GetObjectClass(appContext), "getFilesDir", "()Ljava/io/File;");
+        jobject fileObject = env->CallObjectMethod(appContext, filesDirMethod);
+
+        jmethodID pathMethod = env->GetMethodID(
+            env->GetObjectClass(fileObject), "getPath", "()Ljava/lang/String;");
+        jstring pathObject = (jstring) env->CallObjectMethod(fileObject, pathMethod);
+
+        const char* utf = env->GetStringUTFChars(pathObject, nullptr);
+        std::string filesDir(utf);
+        env->ReleaseStringUTFChars(pathObject, utf);
+
+        filesDir += '/';
+        nx::kit::IniConfig::setIniFilesDir(filesDir.c_str());
+        nx::kit::OutputRedirector::getInstance();
+
+        return JNI_VERSION_1_6;
+    }
+#else
+    namespace nx {
+    namespace kit {
+    /** The redirection is performed by this static initialization. */
+    const OutputRedirector& unused_OutputRedirector = nx::kit::OutputRedirector::getInstance();
+    } // namespace kit
+    } // namespace nx
+#endif
+
 namespace nx {
 namespace kit {
 
@@ -53,9 +102,6 @@ OutputRedirector::OutputRedirector(const char* overridingLogFilesDir /*= nullptr
             m_isStderrRedirected = redirectOutput(stderr, "stderr", logFilesDir + kStderrFilename);
     #endif
 }
-
-/** The redirection is performed by this static initialization. */
-const OutputRedirector& unused_OutputRedirector = OutputRedirector::getInstance();
 
 static bool redirectOutput(FILE* stream, const char* streamName, const std::string& filename)
 {

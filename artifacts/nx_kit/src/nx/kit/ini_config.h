@@ -24,7 +24,7 @@ namespace kit {
  *     non-existing path.
  * - Linux, MacOS: "$NX_INI_DIR/" (if NX_INI_DIR env var is defined), or "$HOME/.config/nx_ini/"
  *     (if HOME env var is defined), "/etc/nx_ini/" (otherwise).
- * - Android: "/sdcard/".
+ * - Android: "/data/user/0/<application-id>/files/".
  * - iOS: "/var/mobile/Containers/Data/Application/<application-uuid>/Library/Application Support/"
  *
  * Each derived class represents a dedicated .ini file. If, on attempt to load a file, it is found

@@ -67,7 +67,7 @@ static std::string determineIniFilesDir()
 
     #if defined(ANDROID) || defined(__ANDROID__)
         // On Android, tmpnam() returns "/tmp", which does not exist.
-        return "/sdcard/";
+        return "/data/local/tmp/";
     #elif defined(__APPLE__) && TARGET_OS_IPHONE
         return apple_utils::getAppDataLocation() + kPathSeparator;
     #else
