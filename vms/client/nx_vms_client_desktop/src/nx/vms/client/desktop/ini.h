@@ -276,10 +276,6 @@ struct Ini: nx::kit::IniConfig
     NX_INI_FLAG(false, enableMultiSystemTabBar,
         "[Feature] Enable double layer tab bar.");
 
-    // VMS-32305
-    NX_INI_FLAG(false, enableRemoteArchiveSynchronization,
-        "[Feature] Enable ONVIF Profile G");
-
     // ---------------------------------------------------------------------------------------------
     // Support section.
     // Flags here can be removed when support engineers decide whether to discard the flag or move

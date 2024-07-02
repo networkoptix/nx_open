@@ -456,8 +456,7 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
     // Motion detection.
 
     const bool remoteArchiveMdSupported =
-        state.devicesDescription.hasRemoteArchiveCapability == CombinedValue::All
-        && ini().enableRemoteArchiveSynchronization;
+        state.devicesDescription.hasRemoteArchiveCapability == CombinedValue::All;
 
     ui->groupBoxMotionDetection->setVisible(remoteArchiveMdSupported);
 
@@ -598,8 +597,7 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
 
     // ONVIF Profile G remote archive automatic export.
 
-    ui->remoteArchiveAutoImportGroupBox->setVisible(
-        ini().enableRemoteArchiveSynchronization && remoteArchiveMdSupported);
+    ui->remoteArchiveAutoImportGroupBox->setVisible(remoteArchiveMdSupported);
 
     check_box_utils::setupTristateCheckbox(
         ui->remoteArchiveAutoImportCheckBox,
