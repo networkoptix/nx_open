@@ -685,7 +685,7 @@ void ConnectActionsHandler::establishConnection(RemoteConnectionPtr connection)
     session->setStickyReconnect(appContext()->localSettings()->stickReconnectToServer());
     LogonData logonData = connection->createLogonData();
     const auto serverModuleInformation = connection->moduleInformation();
-    nx::Uuid systemId(::helpers::getTargetSystemId(serverModuleInformation));
+    auto systemId = ::helpers::getTargetSystemId(serverModuleInformation);
 
     connect(session.get(), &RemoteSession::stateChanged, this,
         [this, logonData, systemId](RemoteSession::State state)

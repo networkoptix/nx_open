@@ -498,27 +498,12 @@ void Workbench::setCurrentLayoutIndex(int index)
     setCurrentLayout(d->layouts[std::clamp<int>(0, index, d->layouts.size())].get());
 }
 
-void Workbench::addSystem(nx::Uuid systemId, const LogonData& logonData)
-{
-    if (!ini().enableMultiSystemTabBar)
-        return;
-
-    auto systemDescription = appContext()->systemFinder()->getSystem(systemId.toSimpleString());
-    if (!NX_ASSERT(systemDescription, "Can't find description for system: %1", systemId))
-        return;
-
-    const auto stateStore = mainWindow()->titleBarStateStore();
-    stateStore->addSystem(systemDescription, logonData);
-    emit currentSystemChanged(systemDescription);
-}
-
 void Workbench::addSystem(const QString& systemId, const LogonData& logonData)
 {
     if (!ini().enableMultiSystemTabBar)
         return;
 
     auto systemDescription = appContext()->systemFinder()->getSystem(systemId);
-
     NX_ASSERT(systemDescription, "Can't find description for system: %1", systemId);
 
     if (ini().enableMultiSystemTabBar)
