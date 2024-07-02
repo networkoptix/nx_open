@@ -1,14 +1,10 @@
-#!/usr/bin/env python
-
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 from conan.errors import ConanException
 from conan.tools.build import cross_building
 from conan.tools.files import save
 from conan.tools.system.package_manager import Apt
-from conans import ConanFile, __version__ as conan_version
-from conans.model import Generator
-from conans.tools import Version
+from conan import ConanFile
 from itertools import chain
 from pathlib import Path
 import shutil
