@@ -29,6 +29,11 @@ public:
     virtual void notifySettingsChanged(const nx::network::rest::audit::Record& auditRecord,
         std::map<QString, QString> settings) = 0;
 
+    virtual AuditHandle notifyProxySessionStarted(
+        const nx::network::rest::audit::Record& auditRecord,
+        const nx::utils::Url& dstUrl,
+        bool wasConnected) = 0;
+
     template <nx::vms::api::AuditRecordType type,
         typename Details = typename nx::vms::api::details::details_type<type,
             nx::vms::api::AllAuditDetails::mapping>::type>

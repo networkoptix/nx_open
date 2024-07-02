@@ -44,6 +44,16 @@ const auto session =
         legacyRecord.rangeStartSec = details->startS.count();
         legacyRecord.rangeEndSec = details->endS.count();
     };
+const auto proxySession =
+    [](const AuditRecord& record, QnLegacyAuditRecord& legacyRecord)
+    {
+        const auto details = record.get<ProxySessionDetails>();
+
+        legacyRecord.rangeStartSec = details->startS.count();
+        legacyRecord.rangeEndSec = details->endS.count();
+        legacyRecord.addParam("target", details->target.toUtf8());
+        legacyRecord.addParam("wasConnected", details->wasConnected ? "1": "0");
+    };
 const auto playback =
     [](const AuditRecord& record, QnLegacyAuditRecord& legacyRecord)
     {
@@ -108,6 +118,14 @@ const auto session =
     {
         record.details = SessionDetails{std::chrono::seconds(legacyRecord.rangeStartSec),
             std::chrono::seconds(legacyRecord.rangeEndSec)};
+    };
+const auto proxySession =
+    [](const QnLegacyAuditRecord& legacyRecord, AuditRecord& record)
+    {
+        record.details = ProxySessionDetails{
+            {std::chrono::seconds(legacyRecord.rangeStartSec), std::chrono::seconds(legacyRecord.rangeEndSec)},
+            QString(legacyRecord.extractParam("target")),
+            legacyRecord.extractParam("wasConnected") == "1"};
     };
 const auto playback =
     [](const QnLegacyAuditRecord& legacyRecord, AuditRecord& record)
@@ -222,7 +240,8 @@ constexpr auto visitAllConversions(Visitor&& visitor)
         Conversion<AuditRecordType::cloudBind>{detailsToParams::cloud, paramsToDetails::cloud},
         Conversion<AuditRecordType::cloudUnbind>{detailsToParams::cloud, paramsToDetails::cloud},
         Conversion<AuditRecordType::siteMerge>{detailsToParams::nothing, paramsToDetails::nothing},
-        Conversion<AuditRecordType::databaseRestore>{detailsToParams::nothing, paramsToDetails::nothing}
+        Conversion<AuditRecordType::databaseRestore>{detailsToParams::nothing, paramsToDetails::nothing},
+        Conversion<AuditRecordType::proxySession>{detailsToParams::proxySession, paramsToDetails::proxySession}
     );
 }
 

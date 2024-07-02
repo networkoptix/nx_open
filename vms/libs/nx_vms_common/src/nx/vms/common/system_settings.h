@@ -84,6 +84,7 @@ struct SystemSettingNames
     DECLARE_SETTING_NAME(videoTrafficEncryptionForced);
     DECLARE_SETTING_NAME(webSocketEnabled);
     DECLARE_SETTING_NAME(pixelationSettings);
+    DECLARE_SETTING_NAME(proxyConnectionAccessPolicy);
 
     static const inline std::set<QString> kReadOnlyNames = {
         cloudAccountName,
