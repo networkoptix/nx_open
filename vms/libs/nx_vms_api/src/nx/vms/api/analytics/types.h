@@ -7,6 +7,7 @@
 #include <QtCore/QRectF>
 
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/reflect/instrument.h>
 #include <nx/utils/uuid.h>
 
 namespace nx::vms::api::analytics {
@@ -20,5 +21,6 @@ struct Rect
 };
 #define nx_vms_api_analytics_Rect_Fields (x)(y)(width)(height)
 QN_FUSION_DECLARE_FUNCTIONS(Rect, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(Rect, nx_vms_api_analytics_Rect_Fields)
 
 } // namespace nx::vms::api::analytics
