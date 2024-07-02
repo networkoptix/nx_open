@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include <variant>
 #include <tuple>
 #include <type_traits>
+#include <variant>
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/network/http/auth_restriction_list.h>
@@ -132,6 +132,17 @@ struct NX_VMS_API UpdateDetails
 QN_FUSION_DECLARE_FUNCTIONS(UpdateDetails, (ubjson)(json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(UpdateDetails, UpdateDetails_Fields)
 
+/**%apidoc Used when `eventType` equals to `proxySession`. */
+struct NX_VMS_API ProxySessionDetails: PeriodDetails
+{
+    QString target;
+    bool wasConnected = false;
+    bool operator==(const ProxySessionDetails& other) const = default;
+};
+#define ProxySessionDetails_Fields PeriodDetails_Fields(target)(wasConnected)
+QN_FUSION_DECLARE_FUNCTIONS(ProxySessionDetails, (ubjson)(json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(ProxySessionDetails, ProxySessionDetails_Fields)
+
 namespace details
 {
     template<nx::vms::api::AuditRecordType type, typename Details>
@@ -250,7 +261,8 @@ using AllAuditDetails =
         details::map<AuditRecordType::updateInstall, UpdateDetails>,
         details::map<AuditRecordType::mitmAttack, MitmDetails>,
         details::map<AuditRecordType::cloudBind, std::nullptr_t>,
-        details::map<AuditRecordType::cloudUnbind, std::nullptr_t>>;
+        details::map<AuditRecordType::cloudUnbind, std::nullptr_t>,
+        details::map<AuditRecordType::proxySession, ProxySessionDetails>>;
 
 NX_VMS_API void serialize_field(const AllAuditDetails::type& data, QVariant* target);
 NX_VMS_API void deserialize_field(const QVariant& value, AllAuditDetails::type* target);

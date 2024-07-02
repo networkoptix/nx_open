@@ -149,7 +149,7 @@ const SaveableSettingsBase kDefaultSettingsBase{
     .mediaBufferSizeKb = 256,
     .osTimeChangeCheckPeriodMs = 5s,
     .proxyConnectTimeoutSec = 5,
-    .proxyConnectionAccessPolicy = ProxyConnectionAccessPolicy::admins,
+    .proxyConnectionAccessPolicy = ProxyConnectionAccessPolicy::powerUsers,
     .resourceFileUri = nx::utils::Url{"https://resources.vmsproxy.com/resource_data.json"},
     .rtpTimeoutMs = 10s,
     .securityForPowerUsers = true,

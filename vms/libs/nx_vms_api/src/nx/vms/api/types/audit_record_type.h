@@ -34,7 +34,8 @@ NX_REFLECTION_ENUM_CLASS(AuditRecordType,
     storageRemove = 0x800000,
     mitmAttack = 0x1000000,
     cloudBind = 0x2000000,
-    cloudUnbind = 0x4000000
+    cloudUnbind = 0x4000000,
+    proxySession = 0x8000000
 )
 
 } // namespace nx::vms::api

@@ -393,6 +393,8 @@ QString QnAuditLogModel::eventTypeToString(Qn::LegacyAuditRecordType eventType)
         case Qn::AR_CloudUnbind:
             return nx::format(tr("Disconnected from %1", "%1 is the Cloud name (like Nx Cloud)"),
                 nx::branding::cloudName());
+        case Qn::AR_ProxySession:
+            return tr("Server proxy connection");
     }
     return QString();
 }

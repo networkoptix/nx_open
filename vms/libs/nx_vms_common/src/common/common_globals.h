@@ -243,7 +243,8 @@ namespace Qn {
         AR_StorageRemove = static_cast<int>(nx::vms::api::AuditRecordType::storageRemove),
         AR_MitmAttack = static_cast<int>(nx::vms::api::AuditRecordType::mitmAttack),
         AR_CloudBind = static_cast<int>(nx::vms::api::AuditRecordType::cloudBind),
-        AR_CloudUnbind = static_cast<int>(nx::vms::api::AuditRecordType::cloudUnbind)
+        AR_CloudUnbind = static_cast<int>(nx::vms::api::AuditRecordType::cloudUnbind),
+        AR_ProxySession = static_cast<int>(nx::vms::api::AuditRecordType::proxySession)
     )
     Q_DECLARE_FLAGS(LegacyAuditRecordTypes, LegacyAuditRecordType)
     Q_DECLARE_OPERATORS_FOR_FLAGS(LegacyAuditRecordTypes)
