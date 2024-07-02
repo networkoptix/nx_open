@@ -8,6 +8,7 @@
 #include <QtGui/QCursor>
 #include <QtGui/QDesktopServices>
 #include <QtGui/QHelpEvent>
+#include <QtQuick/QQuickWindow>
 #include <QtWidgets/QWhatsThis>
 #include <QtWidgets/QWidget>
 
@@ -79,16 +80,24 @@ void HelpHandler::openHelpTopicInternal(HelpTopic::Id topic)
 bool HelpHandler::eventFilter(QObject* watched, QEvent* event)
 {
     auto widget = qobject_cast<QWidget*>(watched);
+    QQuickWindow* window = nullptr;
+
     if (!widget)
-        return false;
+    {
+        window = qobject_cast<QQuickWindow*>(watched);
+        if (!window)
+            return false;
+    }
 
     switch (event->type())
     {
         case QEvent::QueryWhatsThis:
         {
-            bool accepted =
-                HelpTopicAccessor::helpTopicAt(widget, widget->mapFromGlobal(QCursor::pos()))
-                    != HelpTopic::Id::Empty;
+            const int topicId = widget
+                ? HelpTopicAccessor::helpTopicAt(widget, widget->mapFromGlobal(QCursor::pos()))
+                : HelpTopicAccessor::helpTopicAt(window, window->mapFromGlobal(QCursor::pos()));
+
+            const bool accepted = topicId != HelpTopic::Id::Empty;
             event->setAccepted(accepted);
             return accepted;
         }
@@ -96,7 +105,9 @@ bool HelpHandler::eventFilter(QObject* watched, QEvent* event)
         {
             auto e = static_cast<QHelpEvent*>(event);
 
-            int topicId = HelpTopicAccessor::helpTopicAt(widget, e->pos(), true);
+            const int topicId = widget
+                ? HelpTopicAccessor::helpTopicAt(widget, e->pos(), /* bubbleUp */ true)
+                : HelpTopicAccessor::helpTopicAt(window, e->pos());
 
             if (topicId != HelpTopic::Id::Empty)
             {
@@ -118,6 +129,21 @@ bool HelpHandler::eventFilter(QObject* watched, QEvent* event)
             {
                 QWhatsThis::leaveWhatsThisMode();
                 return true;
+            }
+
+            // Qt Quick does not handle WhatsThis event, so we need to simulate its behavior.
+            if (window && e->button() == Qt::LeftButton && QWhatsThis::inWhatsThisMode())
+            {
+                if (const auto topicId = HelpTopicAccessor::helpTopicAt(window, e->pos());
+                    topicId != HelpTopic::Id::Empty)
+                {
+                    event->accept();
+
+                    setHelpTopic(topicId);
+
+                    QWhatsThis::leaveWhatsThisMode();
+                    return true;
+                }
             }
 
             return false;
