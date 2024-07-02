@@ -97,9 +97,6 @@ public:
     bool footerEnabled() const;
     void setFooterEnabled(bool value);
 
-    bool headerEnabled() const;
-    void setHeaderEnabled(bool value);
-
     // Resources are not stored, function only generates text.
     void setResourceList(const QnResourceList& list, const QString& cloudSystemId);
     void setResourceList(const QStringList& list, const QString& cloudSystemId);

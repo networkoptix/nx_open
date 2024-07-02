@@ -59,7 +59,6 @@ static constexpr int kDefaultDummyTileSpacing = 8;
 static constexpr int kScrollBarStep = 16;
 
 static constexpr int kDefaultThumbnailWidth = 214;
-static constexpr int kAlternativeThumbnailWidth = 242;
 
 static constexpr auto kFadeCurtainColorName = "dark3";
 
@@ -344,7 +343,6 @@ void EventRibbon::Private::updateTile(int index)
     widget->setAction(modelIndex.data(Qn::CommandActionRole).value<CommandActionPtr>());
     widget->setAdditionalAction(modelIndex.data(Qn::AdditionalActionRole).value<CommandActionPtr>());
     widget->setFooterEnabled(m_footersEnabled);
-    widget->setHeaderEnabled(m_headersEnabled);
 
     setHelpTopic(widget, modelIndex.data(Qn::HelpTopicIdRole).toInt());
 
@@ -403,10 +401,6 @@ void EventRibbon::Private::updateTilePreview(int index)
         return;
     }
 
-    const auto defaultThumbnailWidth = headersEnabled()
-        ? kDefaultThumbnailWidth
-        : kAlternativeThumbnailWidth;
-
     const auto previewTimeMs = duration_cast<milliseconds>(
         modelIndex.data(core::PreviewTimeRole).value<microseconds>());
 
@@ -415,8 +409,8 @@ void EventRibbon::Private::updateTilePreview(int index)
         modelIndex.data(core::ItemZoomRectRole).value<QRectF>(), -rotation / 90);
 
     const auto thumbnailWidth = previewCropRect.isEmpty()
-        ? defaultThumbnailWidth
-        : qMin<int>(defaultThumbnailWidth / previewCropRect.width(), kMaximumThumbnailWidth);
+        ? kDefaultThumbnailWidth
+        : qMin<int>(kDefaultThumbnailWidth / previewCropRect.width(), kMaximumThumbnailWidth);
 
     const bool precisePreview = !previewCropRect.isEmpty()
         || modelIndex.data(core::ForcePrecisePreviewRole).toBool();
@@ -1022,26 +1016,6 @@ void EventRibbon::Private::setFootersEnabled(bool value)
         const auto& widget = m_tiles[i]->widget;
         if (NX_ASSERT(widget))
             widget->setFooterEnabled(m_footersEnabled);
-    }
-}
-
-bool EventRibbon::Private::headersEnabled() const
-{
-    return m_headersEnabled;
-}
-
-void EventRibbon::Private::setHeadersEnabled(bool value)
-{
-    if (m_headersEnabled == value)
-        return;
-
-    m_headersEnabled = value;
-
-    for (int i = m_visible.lower(); i < m_visible.upper(); ++i)
-    {
-        const auto& widget = m_tiles[i]->widget;
-        if (NX_ASSERT(widget))
-            widget->setHeaderEnabled(m_headersEnabled);
     }
 }
 

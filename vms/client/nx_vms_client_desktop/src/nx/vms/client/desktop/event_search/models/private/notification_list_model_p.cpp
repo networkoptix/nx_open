@@ -923,7 +923,12 @@ QString NotificationListModel::Private::iconPath(const vms::event::AbstractActio
     const auto& params = action->getRuntimeParams();
 
     if (params.eventType >= EventType::userDefinedEvent)
-        return "16x16/Outline/generic.svg";
+    {
+        const auto sourceResources = event::sourceResources(params, system()->resourcePool());
+        if (sourceResources && !sourceResources->isEmpty())
+            return eventIconPath(nx::vms::rules::Icon::resource);
+        return eventIconPath(nx::vms::rules::Icon::generic);
+    }
 
     switch (params.eventType)
     {
@@ -932,8 +937,7 @@ QString NotificationListModel::Private::iconPath(const vms::event::AbstractActio
         case EventType::cameraIpConflictEvent:
             return eventIconPath(nx::vms::rules::Icon::resource);
         case EventType::analyticsSdkEvent:
-            return eventIconPath(nx::vms::rules::Icon::analyticsEvent, /*custom*/ {},
-                {system()->resourcePool()->getResourceById(params.eventResourceId)});
+            return eventIconPath(nx::vms::rules::Icon::analyticsEvent);
         case EventType::analyticsSdkObjectDetected:
         {
             const auto state = q->system()->analyticsTaxonomyStateWatcher()->state();

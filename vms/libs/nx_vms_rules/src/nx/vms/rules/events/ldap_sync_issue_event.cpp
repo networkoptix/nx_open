@@ -78,7 +78,7 @@ QVariantMap LdapSyncIssueEvent::details(common::SystemContext* context) const
 {
     auto result = BasicEvent::details(context);
     utils::insertLevel(result, nx::vms::event::Level::important);
-    utils::insertIcon(result, nx::vms::rules::Icon::networkIssue);
+    utils::insertIcon(result, nx::vms::rules::Icon::server);
     utils::insertIfNotEmpty(result, utils::kDetailingDetailName, reasonText());
     return result;
 }

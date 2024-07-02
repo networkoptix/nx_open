@@ -70,7 +70,7 @@ QVariantMap AnalyticsEvent::details(common::SystemContext* context) const
     utils::insertIfNotEmpty(result, utils::kAnalyticsEventTypeDetailName, analyticsEventCaption(context));
     result.insert(utils::kEmailTemplatePathDetailName, manifest().emailTemplatePath);
     utils::insertLevel(result, nx::vms::event::Level::common);
-    utils::insertIcon(result, nx::vms::rules::Icon::resource);
+    utils::insertIcon(result, nx::vms::rules::Icon::analyticsEvent);
     utils::insertClientAction(result, nx::vms::rules::ClientAction::previewCameraOnTime);
 
     return result;

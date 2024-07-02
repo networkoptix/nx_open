@@ -6,15 +6,15 @@
 
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
+#include <nx/vms/client/core/event_search/utils/event_search_utils.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/window_context.h>
+#include <ui/workbench/workbench_context.h>
 
 #include "private/event_list_model_p.h"
-
-#include <ui/workbench/workbench_context.h>
 
 namespace nx::vms::client::desktop {
 
@@ -60,6 +60,9 @@ QVariant EventListModel::data(const QModelIndex& index, int role) const
 
         case core::TimestampRole:
             return QVariant::fromValue(event.timestamp);
+
+        case core::TimestampTextRole:
+            return  core::EventSearchUtils::timeFromNowText(event.timestamp, systemContext());
 
         case core::PreviewTimeRole:
             return QVariant::fromValue(event.previewTime);
