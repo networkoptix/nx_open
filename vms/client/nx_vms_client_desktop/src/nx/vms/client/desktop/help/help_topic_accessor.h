@@ -8,6 +8,7 @@ class QObject;
 class QWidget;
 class QGraphicsItem;
 class QQuickItem;
+class QQuickWindow;
 
 namespace nx::vms::client::desktop {
 
@@ -25,6 +26,7 @@ public:
     static int helpTopicAt(QWidget* widget, const QPoint& pos, bool bubbleUp = false);
     static int helpTopicAt(QGraphicsItem* item, const QPointF& pos, bool bubbleUp = false);
     static int helpTopicAt(QQuickItem* item, const QPointF& pos); //< Always from parent down.
+    static int helpTopicAt(QQuickWindow* window, const QPointF& pos); //< Always from parent down.
     static int helpTopic(QObject* object);
     static int helpTopic(const QWidget* object);
 };
