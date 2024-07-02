@@ -68,9 +68,6 @@ struct Facade
     }
 };
 
-NX_DECLARE_COLORIZED_ICON(kCameraIcon, "20x20/Solid/camera.svg", \
-    core::kEmptySubstitutions)
-
 } // namespace
 
 struct SimpleMotionSearchListModel::Private
@@ -214,7 +211,7 @@ QVariant SimpleMotionSearchListModel::data(const QModelIndex& index, int role) c
             return tr("Motion");
 
         case core::DecorationPathRole:
-            return "tree/camera.svg";
+            return "16x16/Outline/motion.svg";
 
         case Qn::HelpTopicIdRole:
             return rules::eventHelpId(vms::api::EventType::cameraMotionEvent);

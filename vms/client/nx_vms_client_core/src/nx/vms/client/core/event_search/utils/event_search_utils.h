@@ -3,7 +3,6 @@
 #pragma once
 
 #include <QObject>
-
 #include <chrono>
 
 #include <nx/vms/client/core/event_search/event_search_globals.h>
@@ -41,6 +40,9 @@ public:
     static QString timestampText(
         const std::chrono::milliseconds& timestampMs,
         SystemContext* context);
+
+    static QString timeFromNowText(
+        const std::chrono::microseconds& timestampMs, SystemContext* context);
 };
 
 } // namespace nx::vms::client::core

@@ -59,20 +59,15 @@ static constexpr int kProgressBarResolution = 1000;
 static constexpr int kSeparatorHeight = 6;
 
 static constexpr int kMaximumPreviewHeightWithHeader = 135;
-static constexpr int kMaximumPreviewHeightWithoutHeader = 151;
 
-static constexpr QMargins kMarginsWithHeader(8, 8, 8, 8);
-static constexpr QMargins kMarginsWithoutHeader(8, 4, 8, 8);
+static constexpr QMargins kMarginsWithHeader(10, 10, 10, 10);
 
 static constexpr QMargins kWidePreviewMarginsWithHeader(0, 0, 0, 0);
-static constexpr QMargins kWidePreviewMarginsWithoutHeader(0, 4, 0, 0);
 
 static constexpr QMargins kNarrowPreviewMarginsWithHeader(0, 2, 0, 0);
-static constexpr QMargins kNarrowPreviewMarginsWithoutHeader(0, 0, 0, 0);
 
 // Close button margins are fine-tuned in correspondence with tile layout.
-static constexpr QMargins kCloseButtonMarginsWithHeader(0, 6, 2, 0);
-static constexpr QMargins kCloseButtonMarginsWithoutHeader(0, 2, 2, 0);
+static constexpr QMargins kCloseButtonMarginsWithHeader(0, 10, 10, 0);
 
 static constexpr auto kDefaultReloadMode = AsyncImageWidget::ReloadMode::showPreviousImage;
 
@@ -90,7 +85,7 @@ EventTile::EventTile(QWidget* parent):
     setAttribute(Qt::WA_Hover);
 
     setPaletteColor(this, QPalette::Base, core::colorTheme()->color("dark5"));
-    setPaletteColor(this, QPalette::Light, core::colorTheme()->color("light10"));
+    setPaletteColor(this, QPalette::Light, core::colorTheme()->color("light7"));
     setPaletteColor(this, QPalette::WindowText, core::colorTheme()->color("light16"));
     setPaletteColor(this, QPalette::Text, core::colorTheme()->color("light4"));
     setPaletteColor(this, QPalette::Highlight, core::colorTheme()->color("brand_core"));
@@ -126,11 +121,11 @@ EventTile::EventTile(QWidget* parent):
     setPaletteColor(ui->imagePreviewWidget, QPalette::Window, core::colorTheme()->color("dark7"));
     setPaletteColor(ui->imagePreviewWidget, QPalette::WindowText, core::colorTheme()->color("dark16"));
 
-    ui->nameLabel->setForegroundRole(QPalette::Light);
+    ui->nameLabel->setForegroundRole(QPalette::Text);
     ui->timestampLabel->setForegroundRole(QPalette::WindowText);
     ui->descriptionLabel->setForegroundRole(QPalette::Light);
     ui->debugPreviewTimeLabel->setForegroundRole(QPalette::Light);
-    ui->resourceListLabel->setForegroundRole(QPalette::Light);
+    ui->resourceListLabel->setForegroundRole(QPalette::WindowText);
     ui->footerLabel->setForegroundRole(QPalette::Light);
 
     QFont font;
@@ -195,6 +190,15 @@ EventTile::EventTile(QWidget* parent):
     ui->attributeTable->setContent({});
     ui->footerLabel->setText({});
     ui->timestampLabel->setText({});
+
+    ui->secondaryTimestampHolder->show();
+    ui->imagePreviewWidget->setMaximumHeight(kMaximumPreviewHeightWithHeader);
+    ui->videoPreviewWidget->setMinimumHeight(kMaximumPreviewHeightWithHeader);
+    ui->videoPreviewWidget->setMaximumHeight(kMaximumPreviewHeightWithHeader);
+    ui->mainWidget->layout()->setContentsMargins(kMarginsWithHeader);
+    ui->wideHolder->layout()->setContentsMargins(kWidePreviewMarginsWithHeader);
+    ui->narrowHolder->layout()->setContentsMargins(kNarrowPreviewMarginsWithHeader);
+    d->closeButtonAnchor->setMargins(kCloseButtonMarginsWithHeader);
 
     static constexpr int kProgressLabelShift = 8;
     anchorWidgetToParent(d->progressLabel, {0, 0, 0, kProgressLabelShift});
@@ -697,43 +701,6 @@ void EventTile::setFooterEnabled(bool value)
     d->footerEnabled = value;
     ui->attributeTable->setHidden(!d->footerEnabled || ui->attributeTable->content().empty());
     ui->footerLabel->setHidden(!d->footerEnabled || ui->footerLabel->text().isEmpty());
-}
-
-bool EventTile::headerEnabled() const
-{
-    return !ui->iconLabel->isHidden();
-}
-
-void EventTile::setHeaderEnabled(bool value)
-{
-    if (headerEnabled() == value)
-        return;
-
-    ui->iconLabel->setHidden(!value);
-    ui->nameLabel->setHidden(!value);
-
-    ui->secondaryTimestampHolder->show();
-    // TODO: #vbutkevich unify layout for headerEnabled:true and false. VMS-52513
-    if (value)
-    {
-        ui->imagePreviewWidget->setMaximumHeight(kMaximumPreviewHeightWithHeader);
-        ui->videoPreviewWidget->setMinimumHeight(kMaximumPreviewHeightWithHeader);
-        ui->videoPreviewWidget->setMaximumHeight(kMaximumPreviewHeightWithHeader);
-        ui->mainWidget->layout()->setContentsMargins(kMarginsWithHeader);
-        ui->wideHolder->layout()->setContentsMargins(kWidePreviewMarginsWithHeader);
-        ui->narrowHolder->layout()->setContentsMargins(kNarrowPreviewMarginsWithHeader);
-        d->closeButtonAnchor->setMargins(kCloseButtonMarginsWithHeader);
-    }
-    else
-    {
-        ui->imagePreviewWidget->setMaximumHeight(kMaximumPreviewHeightWithoutHeader);
-        ui->videoPreviewWidget->setMinimumHeight(kMaximumPreviewHeightWithoutHeader);
-        ui->videoPreviewWidget->setMaximumHeight(kMaximumPreviewHeightWithoutHeader);
-        ui->mainWidget->layout()->setContentsMargins(kMarginsWithoutHeader);
-        ui->wideHolder->layout()->setContentsMargins(kWidePreviewMarginsWithoutHeader);
-        ui->narrowHolder->layout()->setContentsMargins(kNarrowPreviewMarginsWithoutHeader);
-        d->closeButtonAnchor->setMargins(kCloseButtonMarginsWithoutHeader);
-    }
 }
 
 EventTile::Mode EventTile::mode() const

@@ -1,13 +1,14 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "event_ribbon.h"
-#include "private/event_ribbon_p.h"
 
-#include <QtWidgets/QScrollBar>
 #include <QtGui/QHoverEvent>
+#include <QtWidgets/QScrollBar>
 
 #include <nx/vms/client/desktop/event_search/widgets/event_tile.h>
 #include <nx/vms/client/desktop/utils/widget_utils.h>
+
+#include "private/event_ribbon_p.h"
 
 namespace nx::vms::client::desktop {
 
@@ -59,16 +60,6 @@ bool EventRibbon::footersEnabled() const
 void EventRibbon::setFootersEnabled(bool value)
 {
     d->setFootersEnabled(value);
-}
-
-bool EventRibbon::headersEnabled() const
-{
-    return d->headersEnabled();
-}
-
-void EventRibbon::setHeadersEnabled(bool value)
-{
-    d->setHeadersEnabled(value);
 }
 
 Qt::ScrollBarPolicy EventRibbon::scrollBarPolicy() const

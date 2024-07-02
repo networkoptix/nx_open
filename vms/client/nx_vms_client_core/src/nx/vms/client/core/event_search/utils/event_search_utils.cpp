@@ -9,9 +9,8 @@
 #include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/time/formatter.h>
-#include <utils/common/synctime.h>
-
 #include <utils/common/delayed.h>
+#include <utils/common/synctime.h>
 
 namespace nx::vms::client::core {
 
@@ -81,6 +80,28 @@ QString EventSearchUtils::timestampText(qint64 timestampMs) const
 {
     return timestampText(std::chrono::milliseconds(timestampMs), systemContext());
 }
+
+QString EventSearchUtils::timeFromNowText(
+    const std::chrono::microseconds& timestamp, SystemContext* context)
+{
+    using namespace std::chrono;
+    if (timestamp <= 0ms || !NX_ASSERT(context))
+        return {};
+
+    const auto timestampMs = duration_cast<milliseconds>(timestamp);
+    const QDateTime dateTime = context->serverTimeWatcher()->displayTime(timestampMs.count());
+
+    // For current day display time in the format '<N> <Time> ago'.
+    if (qnSyncTime->currentDateTime().date() == dateTime.date())
+    {
+        const milliseconds msecsAgo{
+            QDateTime::currentMSecsSinceEpoch() - dateTime.toMSecsSinceEpoch()};
+        return time::fromNow(duration_cast<seconds>(msecsAgo)).toUpper();
+    }
+
+    return timestampText(timestampMs, context);
+}
+
 
 QString EventSearchUtils::timestampText(
     const std::chrono::milliseconds& timestampMs,

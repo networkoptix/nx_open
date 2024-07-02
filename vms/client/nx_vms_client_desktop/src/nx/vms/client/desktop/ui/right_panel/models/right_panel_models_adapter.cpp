@@ -409,7 +409,7 @@ QVariant RightPanelModelsAdapter::data(const QModelIndex& index, int role) const
             {
                 auto resources = data.value<QnResourceList>();
                 for (const auto& resource: resources)
-                    result.push_back(common::html::bold(resource->getName()));
+                    result.push_back(resource->getName());
             }
 
             return result;

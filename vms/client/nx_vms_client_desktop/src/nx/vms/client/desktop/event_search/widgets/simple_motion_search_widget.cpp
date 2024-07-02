@@ -53,7 +53,6 @@ public:
         m_areaButton(q->createCustomFilterButton())
     {
         NX_CRITICAL(m_model);
-        q->view()->setHeadersEnabled(false);
 
         setReadOnly(m_areaButton, true); //< Does not affect close button.
         m_areaButton->setAccented(true);
