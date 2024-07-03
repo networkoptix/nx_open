@@ -70,6 +70,8 @@ Item
         {
             id: grid
 
+            property bool tileIsOpened: false
+
             x: (tileGrid.width - width + tileGrid.tileSpacing) / 2
             y: (tileGrid.height - height + tileGrid.tileSpacing) / 2
             width: (tileGrid.alignToCenter ? tileGrid.colCount : tileGrid.maxColCount) *
@@ -137,13 +139,19 @@ Item
                                 }
                             }
                             tileGrid.setOpenedTileModalityInterfaceLock(true)
+                            grid.tileIsOpened = true
                         }
 
-                        onShrinked: tileGrid.setOpenedTileModalityInterfaceLock(false)
+                        onShrinked:
+                        {
+                            tileGrid.setOpenedTileModalityInterfaceLock(false)
+                            grid.tileIsOpened = false
+                        }
 
                         visibilityMenuModel: model
                         hideActionEnabled: tileGrid.hideActionEnabled
-                        shiftPressed: tileGrid.shiftPressed
+
+                        showDeleteSystemButton: grid.tileIsOpened ? false : tileGrid.shiftPressed
 
                         Component.onCompleted: systemTilesStorage.addItem(this);
                         Component.onDestruction: systemTilesStorage.removeItem(this);

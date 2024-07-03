@@ -50,7 +50,7 @@ Item
         enabled: !tile.isConnecting
         visible: tile.isFactorySystem
             ? false
-            : (closedTileItem.tile.connectable || tile.cloud || !tile.shiftPressed)
+            : (closedTileItem.tile.connectable || tile.cloud || !tile.showDeleteSystemButton)
 
         menuComponent: tileMenuComponent
 
@@ -82,7 +82,8 @@ Item
     {
         id: deleteButton
 
-        visible: !tile.connectable && !tile.isFactorySystem && !tile.cloud && tile.shiftPressed
+        visible: !tile.connectable && !tile.isFactorySystem
+            && !tile.cloud && tile.showDeleteSystemButton
 
         anchors.right: parent.right
         anchors.rightMargin: 8

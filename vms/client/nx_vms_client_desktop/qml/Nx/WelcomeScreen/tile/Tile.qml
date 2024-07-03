@@ -42,7 +42,7 @@ Button
 
     property var visibilityMenuModel: null
     property bool hideActionEnabled: false
-    property bool shiftPressed: false
+    property bool showDeleteSystemButton: false
 
     readonly property bool connectable: online && !incompatible && !unreachable
     readonly property bool loggedIn: logicImpl.hasSavedConnection
