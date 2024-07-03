@@ -117,14 +117,18 @@ qint64 QnFile::read( char* buffer, qint64 count )
     return bytesRead;
 }
 
-qint64 QnFile::write( const char* buffer, qint64 count )
+qint64 QnFile::write(const char* buffer, qint64 count)
 {
-    auto printLogMessage = [](const QString& m)
-    {
-        NX_ERROR(typeid(QnFile), lit("Write failed. %1 Errno: %2").arg(m).arg(errno));
-    };
+    auto printLogMessage =
+        [this, count, buffer](const QString& m)
+        {
+            NX_ERROR(
+                this, "Write failed. %1 Errno: %2. Buffer: %3 size: %4, fd: %5, fd is valid: %6",
+                m, errno, (const void*) buffer, count, m_fd,
+                fcntl(m_fd, F_GETFD) == 0);
+        };
 
-    if( !isOpen() )
+    if (!isOpen())
     {
         printLogMessage(lit("File is not opened."));
         return -1LL;
