@@ -151,7 +151,11 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(
     setHelpTopic(m_buttons[kIntegrationsButton], HelpTopic::Id::PluginsAndAnalytics);
 
     connect(m_buttons[kBusinessRulesButton], &QPushButton::clicked, this,
-        [this] { menu()->trigger(menu::OpenBusinessRulesAction); });
+        [this]
+            {
+                menu()->trigger(menu::OpenBusinessRulesAction);
+                menu()->trigger(menu::OpenVmsRulesDialogAction);
+            });
 
     connect(m_buttons[kDeviceListButton], &QPushButton::clicked, this,
         [this] { menu()->trigger(menu::CameraListAction); });
@@ -160,7 +164,11 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(
         [this] { menu()->trigger(menu::OpenAuditLogAction); });
 
     connect(m_buttons[kEventLogButton], &QPushButton::clicked, this,
-        [this] { menu()->trigger(menu::OpenBusinessLogAction); });
+        [this]
+            {
+                menu()->trigger(menu::OpenBusinessLogAction);
+                menu()->trigger(menu::OpenEventLogAction);
+            });
 
     connect(m_buttons[kBookmarksButton], &QPushButton::clicked, this,
         [this] { menu()->trigger(menu::OpenBookmarksSearchAction); });

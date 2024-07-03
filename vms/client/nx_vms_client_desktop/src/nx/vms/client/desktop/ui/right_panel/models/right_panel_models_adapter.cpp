@@ -592,6 +592,8 @@ void RightPanelModelsAdapter::showEventLog()
 {
     if (NX_ASSERT(d->context()))
         d->context()->menu()->trigger(menu::OpenBusinessLogAction);
+    if (NX_ASSERT(d->context()))
+        d->context()->menu()->trigger(menu::OpenEventLogAction);
 }
 
 void RightPanelModelsAdapter::setHighlightedTimestamp(microseconds value)

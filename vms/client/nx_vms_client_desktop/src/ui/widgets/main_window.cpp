@@ -342,6 +342,7 @@ MainWindow::MainWindow(WindowContext* context, QWidget* parent, Qt::WindowFlags 
     addAction(action(menu::PreferencesGeneralTabAction));
     addAction(action(menu::OpenBookmarksSearchAction));
     addAction(action(menu::OpenBusinessLogAction));
+    addAction(action(menu::OpenEventLogAction));
     addAction(action(menu::CameraListAction));
     addAction(action(menu::BusinessEventsAction));
     addAction(action(menu::OpenFileAction));

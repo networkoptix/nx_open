@@ -133,6 +133,9 @@
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/common/utils/camera_hotspots_support.h>
 #include <nx/vms/event/action_parameters.h>
+#include <nx/vms/rules/actions/write_to_log_action.h>
+#include <nx/vms/rules/group.h>
+#include <nx/vms/rules/utils/type.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <platform/environment.h>
 #include <recording/time_period_list.h>
@@ -2444,6 +2447,11 @@ void ActionHandler::at_cameraIssuesAction_triggered()
     menu()->trigger(menu::OpenBusinessLogAction,
         menu()->currentParameters(sender())
         .withArgument(Qn::EventTypeRole, vms::api::EventType::anyCameraEvent));
+    menu::Parameters parameters = menu()->currentParameters(sender());
+    parameters.setArgument(Qn::EventTypeRole, QString(nx::vms::rules::kDeviceIssueEventGroup));
+    parameters.setArgument(
+        Qn::ActionTypeRole, vms::rules::utils::type<vms::rules::WriteToLogAction>());
+    menu()->trigger(menu::OpenEventLogAction, parameters);
 }
 
 void ActionHandler::at_cameraBusinessRulesAction_triggered() {
