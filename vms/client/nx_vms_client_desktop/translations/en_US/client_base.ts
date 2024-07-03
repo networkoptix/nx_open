@@ -12327,6 +12327,11 @@ We recommend you not to open this web page. If you understand the risks, you can
         <source>We are preparing files for the export process. Please wait for a few seconds.</source>
         <translation></translation>
     </message>
+    <message>
+        <source>%1 filename length is more than %2 characters.</source>
+        <comment>%1 is file name</comment>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::WorkbenchUpdateWatcher</name>
