@@ -13,7 +13,7 @@ namespace nx::vms::api {
 struct NX_VMS_API PersistentUpdateStorage
 {
     QList<nx::Uuid> servers;
-    bool autoSelection = false;
+    bool autoSelection = true;
 
     bool operator==(const PersistentUpdateStorage& other) const = default;
     QByteArray toString() const;
