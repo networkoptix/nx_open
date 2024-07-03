@@ -82,10 +82,19 @@ ConfigurableLogSettings::ConfigurableLogSettings(const nx::vms::api::ServerLogSe
 nx::vms::api::ServerLogSettings ConfigurableLogSettings::applyTo(
     const nx::vms::api::ServerLogSettings& settings) const
 {
+    static auto logSettingNames = nx::reflect::enumeration::visitAllItems<nx::log::LogName>(
+        [](auto&&... items)
+        {
+            return std::array<nx::log::LogName, sizeof...(items)>{items.value...};
+        });
+
     nx::vms::api::ServerLogSettings result = settings;
 
     if (loggingLevel)
-        result.mainLog.primaryLevel = result.httpLog.primaryLevel = *loggingLevel;
+    {
+        for (const auto& name: logSettingNames)
+            result.logSettings(name).primaryLevel = *loggingLevel;
+    }
 
     if (maxVolumeSizeB)
         result.maxVolumeSizeB = *maxVolumeSizeB;
