@@ -549,6 +549,7 @@ void EventPanel::Private::showContextMenu(const QPoint& pos)
 {
     QMenu contextMenu;
     const auto actions = {
+        menu::OpenEventLogAction,
         menu::OpenBusinessLogAction,
         menu::BusinessEventsAction,
         menu::PreferencesNotificationTabAction};

@@ -16,7 +16,9 @@
 #include <nx/vms/client/desktop/radass/radass_action_factory.h>
 #include <nx/vms/client/desktop/showreel/showreel_actions.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/timeline/timeline_actions_factory.h>
+#include <nx/vms/rules/engine.h>
 #include <ui/workbench/workbench_layout.h>
 
 #include "action.h"
@@ -212,18 +214,33 @@ void initialize(Manager* manager, Action* root)
                 MatchMode::any)
             && !condition::showreelIsRunning());
 
+    // TODO: remove flag during VMS-53670
+    const bool isOldEngineEnabled =
+        manager->windowContext()->system()->vmsRulesEngine()->isOldEngineEnabled();
+
     factory(OpenBusinessLogAction)
         .flags(NoTarget | SingleTarget | MultiTarget | ResourceTarget
             | LayoutItemTarget | WidgetTarget | GlobalHotkey)
         .mode(DesktopMode)
         .requiredGlobalPermission(GlobalPermission::viewLogs)
-        .shortcut("Ctrl+L")
-        .condition(!condition::showreelIsRunning())
+        .shortcut(isOldEngineEnabled ? "Ctrl+L" : "")
+        .condition(!condition::showreelIsRunning() && condition::hasOldEventRulesEngine())
         .text(ContextMenu::tr("Event Log...")); //< To be displayed on button tooltip
+
+    factory(OpenEventLogAction)
+        .flags(GlobalHotkey | Main | DevMode | NoTarget | SingleTarget | MultiTarget
+            | ResourceTarget | LayoutItemTarget | WidgetTarget)
+        .mode(DesktopMode)
+        .requiredGlobalPermission(GlobalPermission::viewLogs)
+        .shortcut(isOldEngineEnabled ? "" : "Ctrl+L")
+        .text("Event log...")
+        .condition(!condition::showreelIsRunning()
+            && condition::hasNewEventRulesEngine());
 
     factory(OpenBusinessRulesAction)
         .mode(DesktopMode)
         .flags(NoTarget | SingleTarget | MultiTarget | ResourceTarget | LayoutItemTarget | WidgetTarget)
+        .condition(condition::hasOldEventRulesEngine())
         .requiredPowerUserPermissions();
 
     factory(OpenFailoverPriorityAction)
@@ -2362,14 +2379,6 @@ void initialize(Manager* manager, Action* root)
             .requiredPowerUserPermissions()
             .text("VMS Rules...")
             .shortcut("Ctrl+Alt+E")
-            .condition(!condition::showreelIsRunning()
-                && condition::hasNewEventRulesEngine());
-
-        factory(OpenEventLogAction)
-            .flags(GlobalHotkey | Main | DevMode)
-            .mode(DesktopMode)
-            .requiredGlobalPermission(GlobalPermission::viewLogs)
-            .text("Event log...")
             .condition(!condition::showreelIsRunning()
                 && condition::hasNewEventRulesEngine());
 
