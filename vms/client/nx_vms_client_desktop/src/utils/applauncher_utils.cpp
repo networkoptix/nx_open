@@ -198,15 +198,6 @@ bool checkOnline(bool runWhenOffline)
             delta.count());
         return true;
     }
-    else
-    {
-        // Legacy applauncher check, for the versions without PingRequest
-        static const nx::utils::SoftwareVersion anyVersion(3, 0);
-        bool notUsed = false;
-        result = isVersionInstalled(anyVersion, &notUsed);
-        if (result == ResultType::ok)
-            return true;
-    }
 
     return (result == ResultType::connectError) && runWhenOffline
         && client::desktop::SelfUpdater::runMinilaucher();
