@@ -30,42 +30,17 @@ Item
                 + "administrator to turn it on.")
         maxWidth: 250
 
-        readonly property string url: "" //TODO: #esobolev add link (see VMS-51876)
-
         anchors.verticalCenterOffset: 0
-
-        Component
-        {
-            id: helpComponent
-
-            Window
-            {
-                width: 1024
-                height: 750
-                modality: Qt.ApplicationModal
-
-                WebEngineView
-                {
-                    url: placeholder.url
-                    anchors.fill: parent
-                }
-            }
-        }
         
         Text
         {
             textFormat: Text.RichText
-            text: "<a href=\"%1\">%2</a>".arg(placeholder.url).arg(qsTr("Learn more"))
+            text: "<a href=#>%1</a>".arg(qsTr("Learn more"))
 
             Layout.alignment: Qt.AlignHCenter
 
-            onLinkActivated:
-            {
-                const helpTools = helpComponent.createObject()
-
-                helpTools.show()
-                helpTools.raise()
-            }
+            //TODO: #esobolev add link (see VMS-51876)
+            onLinkActivated: HelpHandler.openHelpTopic(HelpTopic.ServerSettings_General)
         }
     }
 
@@ -132,7 +107,7 @@ Item
                             toolTipText: qsTr("Connect %1 client application to localhost:%2")
                                 .arg(title.text).arg(portLabel.text)
 
-                            helpTopic: HelpTopic.Empty //TODO: #esobolev add link (see VMS-51876)
+                            helpTopic: HelpTopic.ServerSettings_General //TODO: #esobolev add link (see VMS-51876)
                         }
                     }
 
