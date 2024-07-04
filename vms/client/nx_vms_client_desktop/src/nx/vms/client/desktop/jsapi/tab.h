@@ -46,7 +46,7 @@ class Tab: public QObject
 
 public:
     /** @private */
-    Tab(WindowContext* context, QnWorkbenchLayout* layout = nullptr, QObject* parent = nullptr);
+    Tab(WindowContext* context, QObject* parent = nullptr);
 
     /** @private */
     virtual ~Tab() override;
