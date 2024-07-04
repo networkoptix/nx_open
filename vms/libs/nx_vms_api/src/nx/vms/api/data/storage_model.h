@@ -57,11 +57,6 @@ struct NX_VMS_API StorageModel: ResourceWithParameters
     using DbUpdateTypes =
         std::tuple<StorageData, std::optional<ResourceStatusData>, ResourceParamWithRefDataList>;
 
-    nx::Uuid getId() const { return id; }
-    void setId(nx::Uuid id_) { id = std::move(id_); }
-    static_assert(nx::utils::isCreateModelV<StorageModel>);
-    static_assert(nx::utils::isUpdateModelV<StorageModel>);
-
     DbUpdateTypes toDbTypes() &&;
     static std::vector<StorageModel> fromDbTypes(DbListTypes data);
     static StorageModel fromDb(StorageData data);

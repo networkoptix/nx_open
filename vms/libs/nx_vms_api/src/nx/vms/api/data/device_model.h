@@ -106,12 +106,6 @@ struct NX_VMS_API DeviceModelGeneral: ResourceWithParameters
         CameraAttributesDataList,
         ResourceStatusDataList,
         ResourceParamWithRefDataList>;
-
-    [[nodiscard]] nx::Uuid getId() const { return id; }
-    void setId(nx::Uuid id_) { id = id_; }
-    static_assert(nx::utils::isCreateModelV<DeviceModelGeneral>);
-    static_assert(nx::utils::isUpdateModelV<DeviceModelGeneral>);
-    static_assert(nx::utils::isFlexibleIdModelV<DeviceModelGeneral>);
 };
 #define DeviceModelGeneral_Fields \
     ResourceWithParameters_Fields \

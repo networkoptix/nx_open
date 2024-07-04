@@ -1152,7 +1152,7 @@ struct LogsManagementWatcher::Private
 
                     for (const auto& [key, settings]: list)
                     {
-                        q->onReceivedServerLogSettings(settings.getId(), settings);
+                        q->onReceivedServerLogSettings(settings.id, settings);
                     }
                 });
 
@@ -1174,7 +1174,7 @@ struct LogsManagementWatcher::Private
                     if (!NX_ASSERT(deserializationResult.success))
                         return;
 
-                    q->onReceivedServerLogSettings(settings.getId(), settings);
+                    q->onReceivedServerLogSettings(settings.id, settings);
                 });
 
             if (auto api = q->connectedServerApi(); NX_ASSERT(api))

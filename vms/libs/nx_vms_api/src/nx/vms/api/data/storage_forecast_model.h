@@ -2,10 +2,11 @@
 
 #pragma once
 
+#include <map>
+
 #include <nx/fusion/model_functions_fwd.h>
 
 #include "id_data.h"
-#include "map.h"
 
 namespace nx::vms::api {
 
@@ -58,6 +59,6 @@ struct NX_VMS_API StorageForecast
     (recordedS)(archiveDurationForecastS)(averageBitrate)(averageDensity)(recordedBytesPerStorage)
 QN_FUSION_DECLARE_FUNCTIONS(StorageForecast, (json), NX_VMS_API)
 
-using StorageForecastValues = Map<nx::Uuid /*id*/, std::vector<api::StorageForecast> /*forecast*/>;
+using StorageForecastValues = std::map<nx::Uuid /*id*/, std::vector<api::StorageForecast> /*forecast*/>;
 
 } // namespace nx::vms::api

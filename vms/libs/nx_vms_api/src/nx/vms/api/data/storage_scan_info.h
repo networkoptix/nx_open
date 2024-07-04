@@ -2,11 +2,11 @@
 
 #pragma once
 
+#include <map>
+
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/types/rebuild_state.h>
-
-#include "map.h"
 
 namespace nx::vms::api {
 
@@ -34,7 +34,7 @@ struct NX_VMS_API StorageScanInfo
 QN_FUSION_DECLARE_FUNCTIONS(StorageScanInfo, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(StorageScanInfo, StorageScanInfo_Fields)
 
-using StorageScanInfoFull = Map<QString, StorageScanInfo>;
-using StorageScanInfoFullMap = Map<nx::Uuid, StorageScanInfoFull>;
+using StorageScanInfoFull = std::map<QString, StorageScanInfo>;
+using StorageScanInfoFullMap = std::map<nx::Uuid, StorageScanInfoFull>;
 
 } // namespace nx::vms::api

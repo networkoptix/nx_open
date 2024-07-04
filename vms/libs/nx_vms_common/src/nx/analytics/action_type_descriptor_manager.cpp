@@ -32,7 +32,7 @@ std::map<ActionTypeId, ActionTypeDescriptor> retrieveActionTypeDescriptors(
             continue;
 
         ActionTypeDescriptor descriptor(engineId, actionType);
-        result[descriptor.getId()] = descriptor;
+        result[descriptor.id] = descriptor;
     }
 
     return result;

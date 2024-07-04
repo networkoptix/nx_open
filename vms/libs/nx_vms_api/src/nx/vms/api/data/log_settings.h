@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <map>
 #include <vector>
 
 #include <QtCore/QString>
@@ -11,8 +12,6 @@
 #include <nx/utils/log/log_level.h>
 #include <nx/utils/log/log_writers.h>
 #include <nx/utils/uuid.h>
-
-#include "map.h"
 
 namespace nx::vms::api {
 
@@ -80,8 +79,6 @@ struct NX_VMS_API ServerLogSettings
     /**%apidoc[opt] HWID log settings. */
     LogSettings systemLog;
 
-    nx::Uuid getId() const { return id; }
-
     LogSettings& logSettings(nx::log::LogName logName)
     {
         switch (logName)
@@ -102,6 +99,6 @@ struct NX_VMS_API ServerLogSettings
 QN_FUSION_DECLARE_FUNCTIONS(ServerLogSettings, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(ServerLogSettings, ServerLogSettings_Fields)
 
-using ServerLogSettingsMap = Map<nx::Uuid, nx::vms::api::ServerLogSettings>;
+using ServerLogSettingsMap = std::map<nx::Uuid, nx::vms::api::ServerLogSettings>;
 
 } // namespace nx::vms::api

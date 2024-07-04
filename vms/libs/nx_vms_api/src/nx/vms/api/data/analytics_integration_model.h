@@ -62,8 +62,6 @@ struct NX_VMS_API IntegrationModel
      */
     IntegrationType type = IntegrationType::sdk;
 
-    nx::Uuid getId() const { return id; }
-
     IntegrationModel() = default;
     explicit IntegrationModel(AnalyticsPluginData data);
 

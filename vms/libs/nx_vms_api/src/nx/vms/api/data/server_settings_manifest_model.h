@@ -2,9 +2,10 @@
 
 #pragma once
 
+#include <map>
+
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/settings.h>
-#include <nx/vms/api/data/map.h>
 
 namespace nx::utils {
 
@@ -18,6 +19,6 @@ struct SettingsDescription: public std::map<QString, nx::utils::SettingInfo>
 {
 };
 
-using ServerSettingsManifestValues = Map<nx::Uuid, SettingsDescription>;
+using ServerSettingsManifestValues = std::map<nx::Uuid, SettingsDescription>;
 
 } // nx::vms::api

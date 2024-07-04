@@ -413,7 +413,7 @@ namespace QJsonDetail {
         const QJsonValue& value,
         std::variant<Args...>* target)
     {
-        static_assert(!nx::utils::IsOptional<T>::value);
+        static_assert(!nx::utils::Is<std::optional, T>());
         if constexpr (std::is_same<std::nullptr_t, T>::value)
         {
             if (value.isNull())

@@ -97,8 +97,6 @@ struct BaseDescriptor
     }
 
     bool operator==(const BaseDescriptor& other) const = default;
-
-    QString getId() const { return id; }
 };
 #define nx_vms_api_analytics_BaseDescriptor_Fields (id)(name)
 NX_REFLECTION_INSTRUMENT(BaseDescriptor, nx_vms_api_analytics_BaseDescriptor_Fields);
@@ -164,8 +162,6 @@ struct EngineDescriptor
     }
 
     bool operator==(const EngineDescriptor& other) const = default;
-
-    nx::Uuid getId() const { return id; }
 };
 #define nx_vms_api_analytics_EngineDescriptor_Fields (id)(name)(pluginId)(capabilities)
 NX_REFLECTION_INSTRUMENT(EngineDescriptor, nx_vms_api_analytics_EngineDescriptor_Fields);

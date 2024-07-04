@@ -19,16 +19,15 @@
 #include <nx/vms/client/desktop/menu/action_parameters.h>
 #include <nx/vms/client/desktop/resource_properties/user/utils/access_subject_editing_context.h>
 #include <nx/vms/client/desktop/system_administration/watchers/non_editable_users_and_groups.h>
+#include <nx/vms/client/desktop/system_logon/logic/context_current_user_watcher.h>
 #include <nx/vms/client/desktop/system_logon/logic/fresh_session_token_helper.h>
 #include <nx/vms/client/desktop/ui/messages/user_groups_messages.h>
 #include <nx/vms/client/desktop/utils/ldap_status_watcher.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/common/user_management/user_group_manager.h>
-#include <nx/vms/common/user_management/user_management_helpers.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
 #include <ui/workbench/workbench_context.h>
-#include <nx/vms/client/desktop/system_logon/logic/context_current_user_watcher.h>
 
 #include "../globals/session_notifier.h"
 #include "../globals/user_group_request_chain.h"
@@ -447,7 +446,7 @@ GroupSettingsDialogState GroupSettingsDialog::createState(const nx::Uuid& groupI
         const auto groupName = groupData->name.toLower();
         for (const auto& group: groupManager->groups())
         {
-            if (group.getId() != groupId && group.name.toLower() == groupName)
+            if (group.id != groupId && group.name.toLower() == groupName)
             {
                 state.nameIsUnique = false;
                 break;

@@ -123,7 +123,7 @@ public:
     nx::Uuid addGroup(const QString& name, const std::vector<nx::Uuid>& parents)
     {
         api::UserGroupData group;
-        group.setId(nx::Uuid::createUuid());
+        group.id = nx::Uuid::createUuid();
         group.name = name;
         group.parentGroupIds = parents;
         systemContext()->userGroupManager()->addOrUpdate(group);
@@ -133,7 +133,7 @@ public:
     nx::Uuid addLdapDefaultGroup(const std::vector<nx::Uuid>& parents)
     {
         api::UserGroupData group;
-        group.setId(nx::vms::api::kDefaultLdapGroupId);
+        group.id = nx::vms::api::kDefaultLdapGroupId;
         group.name = "LDAP Default";
         group.type = api::UserType::ldap;
         group.parentGroupIds = parents;

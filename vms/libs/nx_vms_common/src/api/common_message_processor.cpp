@@ -955,7 +955,7 @@ void QnCommonMessageProcessor::resetUserGroups(const UserGroupDataList& userGrou
     for (const auto& group: userGroups)
     {
         m_context->accessRightsManager()->setOwnResourceAccessMap(
-            group.getId(), {group.resourceAccessRights.begin(), group.resourceAccessRights.end()});
+            group.id, {group.resourceAccessRights.begin(), group.resourceAccessRights.end()});
     }
 }
 

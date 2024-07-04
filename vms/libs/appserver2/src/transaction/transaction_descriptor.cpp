@@ -1278,7 +1278,7 @@ private:
                 : "User '%1(%2)' can't enable himself.";
 
             return {ErrorCode::forbidden,
-                nx::format(errTemplate, existing.name, existing.getId().toString())};
+                nx::format(errTemplate, existing.name, existing.id.toString())};
         }
 
         if (existing.name != modified.name)

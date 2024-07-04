@@ -3,11 +3,10 @@
 #pragma once
 
 #include <chrono>
+#include <map>
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/uuid.h>
-
-#include "map.h"
 
 namespace nx::vms::api {
 
@@ -58,7 +57,7 @@ struct NX_VMS_API ServerTimePeriod
 };
 
 using ServerTimePeriodList = std::vector<ServerTimePeriod>;
-using DeviceFootageMap = Map<nx::Uuid, ServerTimePeriodList>;
+using DeviceFootageMap = std::map<nx::Uuid, ServerTimePeriodList>;
 
 constexpr bool operator<(std::chrono::milliseconds timeMs, const ServerTimePeriod& other)
 {

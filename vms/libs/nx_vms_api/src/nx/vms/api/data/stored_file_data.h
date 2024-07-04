@@ -36,7 +36,6 @@ struct NX_VMS_API StoredFilePath
     }
 
     const QString& getId() const { return path; }
-    void setId(const QString& id) { path = id; }
 
     QString path;
 };

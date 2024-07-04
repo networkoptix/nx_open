@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <nx/utils/crud_model.h>
 #include <nx/utils/member_detector.h>
 #include <nx/utils/type_traits.h>
 #include <nx/vms/api/data/data_fwd.h>
@@ -18,19 +19,19 @@ MEMBER_CHECKER(id);
 template<typename Data, typename Functor>
 auto invokeOnVector(Data&& data, Functor&& functor)
 {
-    if constexpr (nx::utils::IsVector<std::decay_t<decltype(data)>>::value)
+    if constexpr (nx::utils::Is<std::vector, std::decay_t<decltype(data)>>())
         return functor(std::decay_t<decltype(data[0])>());
     else
-        return functor(std::move(data));
+        return functor(std::forward<Data>(data));
 }
 
 template<typename Data, typename Functor>
 auto invokeOnOptional(Data&& data, Functor&& functor)
 {
-    if constexpr (nx::utils::IsOptional<std::decay_t<decltype(data)>>::value)
-        return invokeOnVector(std::decay_t<decltype(*data)>(), std::move(functor));
+    if constexpr (nx::utils::Is<std::optional, std::decay_t<decltype(data)>>())
+        return invokeOnVector(std::decay_t<decltype(*data)>(), std::forward<Functor>(functor));
     else
-        return invokeOnVector(std::move(data), std::move(functor));
+        return invokeOnVector(std::forward<Data>(data), std::forward<Functor>(functor));
 }
 
 enum ApplyType
@@ -39,6 +40,7 @@ enum ApplyType
     applyComma,
     applyOr
 };
+
 template<ApplyType type, typename Model, typename Functor>
 void invokeOnDbTypes(Functor&& functor)
 {
@@ -47,8 +49,11 @@ void invokeOnDbTypes(Functor&& functor)
         const auto invoke =
             [&functor](auto&& data)
             {
-                return invokeOnOptional(
-                    std::move(data), [&functor](auto&& data) { return functor(std::move(data)); });
+                return invokeOnOptional(std::forward<decltype(data)>(data),
+                    [&functor](auto&& data)
+                    {
+                        return functor(std::forward<decltype(data)>(data));
+                    });
             };
         if constexpr (type == applyAnd)
         {
@@ -93,10 +98,12 @@ inline void throwError(Result r)
 template<typename IgnoredDbType, typename DbType, typename Model, typename Id>
 void assertModelToDbTypesProducedValidResult(const DbType& value, const Id& id)
 {
+    using nx::utils::model::getId;
+
     if constexpr (!std::is_same_v<DbType, IgnoredDbType>
         && !std::is_same_v<DbType, nx::vms::api::ResourceStatusData>)
     {
-        if constexpr (nx::utils::IsVector<DbType>::value)
+        if constexpr (nx::utils::Is<std::vector, DbType>())
         {
             NX_ASSERT(std::find_if(value.begin(),
                           value.end(),
@@ -104,7 +111,7 @@ void assertModelToDbTypesProducedValidResult(const DbType& value, const Id& id)
                           {
                               return item.checkResourceExists
                                   == nx::vms::api::CheckResourceExists::yes
-                                  || item.getId() != id;
+                                  || getId(item) != id;
                           })
                     == value.end(),
                 "%1 toDbTypes() must fill %2 with resource id %3 and checkResourceExists != yes",
@@ -115,7 +122,7 @@ void assertModelToDbTypesProducedValidResult(const DbType& value, const Id& id)
         else
         {
             NX_ASSERT(value.checkResourceExists != nx::vms::api::CheckResourceExists::yes
-                    && value.getId() == id,
+                    && getId(value) == id,
                 "%1 toDbTypes() must fill %2 with resource id %3 and checkResourceExists != yes",
                 typeid(Model),
                 typeid(DbType),

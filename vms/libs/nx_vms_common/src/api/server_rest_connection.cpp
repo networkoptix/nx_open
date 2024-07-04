@@ -2306,7 +2306,7 @@ Handle ServerConnection::saveUserAsync(
     auto request = prepareRequest(
         newUser ? nx::network::http::Method::put : nx::network::http::Method::patch,
         prepareUrl(
-            QString("/rest/v4/users/%1").arg(userData.getId().toString()),
+            QString("/rest/v4/users/%1").arg(userData.id.toString()),
             /*params*/ {}),
         Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
         nx::reflect::json::serialize(userData));

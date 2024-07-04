@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <map>
+
 #include <QtCore/QString>
 #include <QtCore/QVariantMap>
 
@@ -10,7 +12,6 @@
 #include <nx/utils/uuid.h>
 
 #include "data_macros.h"
-#include "map.h"
 
 namespace nx {
 namespace vms {
@@ -165,7 +166,7 @@ NX_REFLECTION_INSTRUMENT(DetailedLicenseData, DetailedLicenseData_Fields)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(LicenseSummaryData)
 NX_REFLECTION_INSTRUMENT(LicenseSummaryData, LicenseSummaryData_Fields)
 
-using LicenseSummaryValues = Map<QString /*type*/, LicenseSummaryData /*summary*/>;
+using LicenseSummaryValues = std::map<QString /*type*/, LicenseSummaryData /*summary*/>;
 
 } // namespace api
 } // namespace vms

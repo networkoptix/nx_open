@@ -83,7 +83,7 @@ public:
         nx::vms::api::UserType type = nx::vms::api::UserType::local)
     {
         api::UserGroupData group;
-        group.setId(nx::Uuid::createUuid());
+        group.id = nx::Uuid::createUuid();
         group.name = name;
         group.type = type;
         group.parentGroupIds = parents;

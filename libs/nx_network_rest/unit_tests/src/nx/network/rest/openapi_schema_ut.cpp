@@ -247,11 +247,14 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(TestData, (json), (id)(name)(list))
     /**%apidoc GET /rest/v1/map
      * %ingroup Test
      * %param[ref] _with
-     * %return:{TestDataMap}
+     * %return:{std::map<nx::Uuid, TestData>}
+     *     %param[unused] *.id
      *
-     **%apidoc:{TestDataMap} PUT /rest/v1/map
+     **%apidoc:{std::map<nx::Uuid, TestData>} PUT /rest/v1/map
      * %ingroup Test
-     * %return:{TestDataMap}
+     * %param[unused] *.id
+     * %return:{std::map<nx::Uuid, TestData>}
+     *     %param[unused] *.id
      */
     reg("rest/v1/map");
 

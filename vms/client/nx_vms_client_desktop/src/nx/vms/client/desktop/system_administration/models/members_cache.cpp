@@ -88,7 +88,7 @@ void MembersCache::loadInfo(nx::vms::common::SystemContext* systemContext)
     const auto allGroups = systemContext->userGroupManager()->groups();
     for (const auto& group: allGroups)
     {
-        const auto id = group.getId();
+        const auto& id = group.id;
         m_info.insert(id, infoFromContext(systemContext, id));
         members.groups << id;
     }

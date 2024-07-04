@@ -3,13 +3,13 @@
 #pragma once
 
 #include <chrono>
+#include <map>
 #include <vector>
 
 #include <QtCore/QString>
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/uuid.h>
-#include <nx/vms/api/data/map.h>
 #include <nx/vms/api/json/value_or_array.h>
 
 namespace nx::vms::api {
@@ -46,7 +46,7 @@ struct NX_VMS_API AvailableAnalyticsActions
 QN_FUSION_DECLARE_FUNCTIONS(AvailableAnalyticsActions, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(AvailableAnalyticsActions, AvailableAnalyticsActions_Fields);
 
-using EngineActionsMap = Map<nx::Uuid /*engineId*/, AvailableAnalyticsActions>;
+using EngineActionsMap = std::map<nx::Uuid /*engineId*/, AvailableAnalyticsActions>;
 
 struct NX_VMS_API AnalyticsAction
 {

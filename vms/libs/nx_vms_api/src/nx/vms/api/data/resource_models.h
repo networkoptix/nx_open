@@ -25,9 +25,6 @@ struct NX_VMS_API ResourceGroup
 
     /**%apidoc Whether this group comes with the Site and can not be removed. */
     bool isPredefined = false;
-
-    nx::Uuid getId() const { return id; }
-    void setId(nx::Uuid id_) { id = std::move(id_); }
 };
 #define ResourceGroup_Fields \
     (id) \

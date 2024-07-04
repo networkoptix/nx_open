@@ -61,9 +61,6 @@ struct NX_VMS_API UserModelBase
 
     bool operator==(const UserModelBase& other) const = default;
 
-    nx::Uuid getId() const { return id; }
-    void setId(nx::Uuid id_) { id = std::move(id_); }
-
     UserDataEx toUserData() &&;
     static UserModelBase fromUserData(UserData&& baseData);
 };
@@ -115,9 +112,6 @@ struct NX_VMS_API UserModelV1: public UserModelBase
 
     DbUpdateTypes toDbTypes() &&;
     static std::vector<UserModelV1> fromDbTypes(DbListTypes data);
-
-    static_assert(nx::utils::isCreateModelV<UserModelV1>);
-    static_assert(nx::utils::isUpdateModelV<UserModelV1>);
 };
 #define UserModelV1_Fields UserModelBase_Fields(isOwner)(permissions)(userRoleId)(accessibleResources)
 QN_FUSION_DECLARE_FUNCTIONS(UserModelV1, (json), NX_VMS_API)
@@ -200,9 +194,6 @@ struct NX_VMS_API UserModelV3: public UserModelBase, public ResourceWithParamete
 
     DbUpdateTypes toDbTypes() &&;
     static std::vector<UserModelV3> fromDbTypes(DbListTypes data);
-
-    static_assert(nx::utils::isCreateModelV<UserModelV3>);
-    static_assert(nx::utils::isUpdateModelV<UserModelV3>);
 };
 #define UserModelV3_Fields \
     UserModelBase_Fields \
