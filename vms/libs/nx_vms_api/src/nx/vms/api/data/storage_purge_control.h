@@ -25,4 +25,7 @@ struct NX_VMS_API StoragePurgeControlData
 QN_FUSION_DECLARE_FUNCTIONS(StoragePurgeControlData, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(StoragePurgeControlData, StoragePurgeControlData_Fields);
 
+// Disabling id generation upon creation in CrudHandler::create
+std::false_type enableIdGeneration(StoragePurgeControlData);
+
 } // namespace nx::vms::api

@@ -50,8 +50,6 @@ struct NX_VMS_API DeviceSearchId
     nx::Uuid searchId() const;
     nx::Uuid serverIdFromId() const;
 
-    QString getId() const { return id; }
-
     void setIds(const nx::Uuid& searchId, const nx::Uuid& serverId);
     const QString& toString() const { return id; }
 };

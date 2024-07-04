@@ -37,18 +37,12 @@ struct NX_VMS_API UserRoleModel
 
     bool operator==(const UserRoleModel& other) const = default;
 
-    nx::Uuid getId() const { return id; }
-    void setId(nx::Uuid id_) { id = std::move(id_); }
-
     using DbReadTypes = std::tuple<UserGroupData>;
     using DbUpdateTypes = std::tuple<UserGroupData>;
     using DbListTypes = std::tuple<UserGroupDataList>;
 
     DbUpdateTypes toDbTypes() &&;
     static std::vector<UserRoleModel> fromDbTypes(DbListTypes data);
-
-    static_assert(nx::utils::isCreateModelV<UserRoleModel>);
-    static_assert(nx::utils::isUpdateModelV<UserRoleModel>);
 };
 #define UserRoleModel_Fields (id)(name)(description)(permissions)(parentGroupIds)(accessibleResources)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST_EX(UserRoleModel, (csv_record)(json)(ubjson)(xml))

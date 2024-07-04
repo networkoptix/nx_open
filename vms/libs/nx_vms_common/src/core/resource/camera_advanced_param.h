@@ -3,6 +3,7 @@
 #pragma once
 
 #include <functional>
+#include <map>
 
 #include <core/resource/resource_fwd.h>
 #include <nx/fusion/model_functions_fwd.h>
@@ -330,13 +331,7 @@ struct NX_VMS_COMMON_API QnCameraAdvancedParams
 };
 #define QnCameraAdvancedParams_Fields (name)(version)(pluginUniqueId)(packet_mode)(groups)
 
-struct QnCameraAdvancedParamsMap: std::map<nx::Uuid, QnCameraAdvancedParams>
-{
-    using base_type = std::map<nx::Uuid, QnCameraAdvancedParams>;
-    using base_type::base_type;
-    const QnCameraAdvancedParams& front() const { return begin()->second; }
-    nx::Uuid getId() const { return (size() == 1) ? begin()->first : nx::Uuid(); }
-};
+using QnCameraAdvancedParamsMap = std::map<nx::Uuid, QnCameraAdvancedParams>;
 
 struct NX_VMS_COMMON_API QnCameraAdvancedParamsPostBody
 {

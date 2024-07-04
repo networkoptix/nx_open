@@ -178,8 +178,6 @@ struct NX_VMS_API ServerInformationBase: ModuleInformationBase
         ModuleInformationBase(rhs),
         remoteAddresses(rhs.remoteAddresses)
     {}
-
-    nx::Uuid getId() const { return id; }
 };
 #define ServerInformationBase_Fields  \
     (type) \
@@ -283,8 +281,6 @@ struct NX_VMS_API ServerRuntimeInformation: ServerPortInformation, ServerTimeZon
 
     ServerRuntimeInformation() = default;
     ServerRuntimeInformation(const ServerRuntimeInformation& rhs) = default;
-
-    nx::Uuid getId() const { return id; }
 };
 
 #define ServerRuntimeInformation_Fields \

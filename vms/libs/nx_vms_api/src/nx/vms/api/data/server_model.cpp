@@ -5,6 +5,7 @@
 #include <set>
 
 #include <nx/fusion/model_functions.h>
+#include <nx/utils/crud_model.h>
 #include <nx/utils/std/algorithm.h>
 
 namespace nx::vms::api {
@@ -18,7 +19,8 @@ struct LessById
     template<typename L, typename R>
     bool operator()(const L& lhs, const R& rhs) const
     {
-        return lhs.getId() < rhs.getId();
+        using nx::utils::model::getId;
+        return getId(lhs) < getId(rhs);
     }
 } constexpr lessById{};
 

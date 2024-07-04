@@ -302,7 +302,9 @@ struct NX_VMS_API SiteSettings: SaveableSiteSettings, SettingsBase
     bool operator==(const SiteSettings&) const = default;
     size_t size() const { return 1u; }
     bool empty() const { return false; }
-    QJsonValue front() const;
+
+    // Ad hoc for CrudHandler::read
+    [[nodiscard]] QJsonValue front() const;
 };
 QN_FUSION_DECLARE_FUNCTIONS(SiteSettings, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(SiteSettings, SiteSettings_Fields)

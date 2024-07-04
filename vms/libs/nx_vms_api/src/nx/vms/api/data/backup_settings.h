@@ -21,9 +21,11 @@ struct NX_VMS_API BackupSettings
 
     bool operator==(const BackupSettings& other) const = default;
 
-    nx::Uuid getId() const { return id; }
     QByteArray toString() const;
 };
+
+// See `crud_model.h`.
+constexpr std::false_type enableIdGeneration(BackupSettings);
 
 #define BackupSettings_Fields \
     (id) \

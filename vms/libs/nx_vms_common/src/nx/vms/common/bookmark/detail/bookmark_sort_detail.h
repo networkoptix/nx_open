@@ -1,6 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include <core/resource/camera_bookmark.h>
+#include <nx/utils/crud_model.h>
 #include <nx/vms/api/data/bookmark_models.h>
 
 class QnResourcePool;
@@ -33,8 +34,10 @@ template<typename BookmarkType>
 inline BookmarkType createBookmarkAtTimePoint(
     const nx::Uuid& id, const std::chrono::milliseconds& time)
 {
+    using nx::utils::model::setId;
+
     BookmarkType result;
-    result.setId(id);
+    setId(result, id);
     result.startTimeMs = time;
     return result;
 }

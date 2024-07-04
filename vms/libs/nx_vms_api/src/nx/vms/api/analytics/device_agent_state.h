@@ -20,8 +20,6 @@ struct NX_VMS_API DeviceAgentState
     DeviceAgentState() = default;
     DeviceAgentState(const nx::Uuid& id): id(id) {}
     bool operator==(const DeviceAgentState& other) const = default;
-
-    nx::Uuid getId() const { return id; }
 };
 #define DeviceAgentState_Fields (id)(engineId)(isEnabled)
 QN_FUSION_DECLARE_FUNCTIONS(DeviceAgentState, (json), NX_VMS_API)

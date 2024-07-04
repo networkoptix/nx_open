@@ -2,13 +2,37 @@
 
 #pragma once
 
-#include <chrono>
 #include <functional>
-#include <optional>
 #include <type_traits>
-#include <vector>
 
 namespace nx::utils {
+
+namespace detail {
+
+template<template<typename...> class, typename>
+struct Is_template: std::false_type
+{
+};
+
+template<template<typename...> class T, typename... Ts>
+struct Is_template<T, T<Ts...>>: std::true_type
+{
+};
+
+template<template<typename, size_t> class, typename>
+struct Is_template_type_size_t: std::false_type
+{
+};
+
+template<template<typename, size_t> class T, typename F, size_t S>
+struct Is_template_type_size_t<T, T<F, S>>: std::true_type
+{
+};
+
+// using nx::utils::model::getId;
+// using nx::utils::model::setId;
+
+} // namespace detail
 
 template<typename T, typename = void>
 struct isIterable: std::false_type {};
@@ -34,50 +58,54 @@ struct IsIterator<T, std::void_t<typename std::iterator_traits<T>::value_type>>:
 
 template<typename... U> inline constexpr bool IsIteratorV = IsIterator<U...>::value;
 
-template<typename>
-struct IsOptional: std::false_type {};
-
-template<typename T>
-struct IsOptional<std::optional<T>>: std::true_type {};
-
-template<typename>
-struct IsVector: std::false_type {};
-
-template<typename T, typename A>
-struct IsVector<std::vector<T, A>>: std::true_type {};
-
-template<typename>
-struct IsDuration: std::false_type {};
-
-template<typename Rep, typename Period>
-struct IsDuration<std::chrono::duration<Rep, Period>>: std::true_type {};
-
-template<typename ...Args>
-constexpr bool IsDurationV = IsDuration<Args...>::value;
-
-template<typename, typename = std::void_t<>>
-struct HasGetId: std::false_type {};
-template<typename T>
-struct HasGetId<T, std::void_t<decltype(&T::getId)>>: std::true_type {};
-
-template<typename, typename = std::void_t<>>
-struct HasSetId: std::false_type {};
-template<typename T>
-struct HasSetId<T, std::void_t<decltype(&T::setId)>>: std::true_type {};
-
-template <typename T>
-struct HasGetIdAndSetId
+template<template<typename...> class Template, typename T>
+constexpr bool Is()
 {
-    static constexpr bool value = HasGetId<T>::value && HasSetId<T>::value;
+    return detail::Is_template<Template, T>{};
+}
+
+template<template<typename, size_t> class Template, typename T>
+constexpr bool Is()
+{
+    return detail::Is_template_type_size_t<Template, T>{};
+}
+
+template<typename T, typename = void>
+struct IsKeyValueContainer: std::false_type
+{
 };
 
-template <typename T> using IsCreateModel = HasGetIdAndSetId<T>;
-template <typename T> using IsUpdateModel = HasGetId<T>;
-template <typename T> using IsFlexibleIdModel = HasGetIdAndSetId<T>;
+template<typename T>
+struct IsKeyValueContainer<T,
+    std::void_t<decltype(std::declval<T>().begin()->first),
+        decltype(std::declval<T>().begin()->second)>>: std::true_type
+{
+};
 
-template <typename T> constexpr bool isCreateModelV = IsCreateModel<T>::value;
-template <typename T> constexpr bool isUpdateModelV = IsUpdateModel<T>::value;
-template <typename T> constexpr bool isFlexibleIdModelV = IsFlexibleIdModel<T>::value;
+template<auto>
+struct FunctionTraits;
+
+// For free and static member functions
+template<typename Ret, typename... Args, Ret (*FuncPtr)(Args...)>
+struct FunctionTraits<FuncPtr>
+{
+    using ReturnType = Ret;
+    using ArgumentsList = std::tuple<Args...>;
+
+    template<size_t I>
+    using ArgumentType = std::tuple_element_t<I, ArgumentsList>;
+};
+
+// For non-static member functions
+template<typename Ret, typename Class, typename... Args, Ret (Class::*MemberPtr)(Args...)>
+struct FunctionTraits<MemberPtr>
+{
+    using ReturnType = Ret;
+    using ArgumentsList = std::tuple<Args...>;
+
+    template<size_t I>
+    using ArgumentType = std::tuple_element_t<I, ArgumentsList>;
+};
 
 } // namespace nx::utils
 

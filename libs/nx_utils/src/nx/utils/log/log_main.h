@@ -180,8 +180,8 @@ inline void setLevelReducerEnabled(bool value)
     { \
         const auto systemErrorBak = SystemError::getLastOSErrorCode(); \
         static nx::log::detail::LevelReducer levelReducer(LEVEL); \
-        if (auto helper = nx::log::detail::Helper(&levelReducer, (TAG))) \
-            helper.log(::nx::format(__VA_ARGS__)); \
+        if (auto _log_helper = nx::log::detail::Helper(&levelReducer, (TAG))) \
+            _log_helper.log(::nx::format(__VA_ARGS__)); \
         SystemError::setLastErrorCode(systemErrorBak); \
     } \
 } while (0)

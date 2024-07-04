@@ -3,6 +3,7 @@
 #pragma once
 
 #include <chrono>
+#include <map>
 #include <optional>
 #include <set>
 
@@ -11,8 +12,6 @@
 #include <nx/utils/serialization/qt_core_types.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/json/value_or_array.h>
-
-#include "map.h"
 
 namespace nx::vms::api {
 
@@ -137,8 +136,6 @@ struct NX_VMS_API BookmarkIdV1
     const nx::Uuid& bookmarkId() const { return id; }
     nx::Uuid serverId() const { return {}; }
 
-    const nx::Uuid& getId() const { return id; }
-    void setId(nx::Uuid id_) { id = id_; }
     QString toString() const { return id.toSimpleString(); }
 
     bool operator==(const BookmarkIdV1& other) const = default;
@@ -159,7 +156,6 @@ struct NX_VMS_API BookmarkIdV3
     nx::Uuid serverId() const;
     void setIds(const nx::Uuid& bookmarkId, const nx::Uuid& serverId);
 
-    QString getId() const { return id; }
     void setId(const nx::Uuid& id_) { id = id_.toSimpleString(); }
     const QString& toString() const { return id; }
 
@@ -332,6 +328,6 @@ struct NX_VMS_API BookmarkDescriptionRequest: BookmarkIdV3, BookmarkProtection
 NX_REFLECTION_INSTRUMENT(BookmarkDescriptionRequest, BookmarkDescriptionRequest_Fields);
 QN_FUSION_DECLARE_FUNCTIONS(BookmarkDescriptionRequest, (json), NX_VMS_API)
 
-using BookmarkTagCounts = Map<QString /*tag*/, int /*count*/>;
+using BookmarkTagCounts = std::map<QString /*tag*/, int /*count*/>;
 
 } // namespace nx::vms::api

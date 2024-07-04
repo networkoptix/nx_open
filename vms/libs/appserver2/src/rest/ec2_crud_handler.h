@@ -4,6 +4,7 @@
 
 #include <nx/network/rest/crud_handler.h>
 #include <nx/network/rest/subscription.h>
+#include <nx/utils/crud_model.h>
 #include <nx/utils/elapsed_timer.h>
 #include <nx/utils/scope_guard.h>
 #include <transaction/transaction.h>
@@ -47,6 +48,7 @@ public:
     std::vector<Model> read(Filter filter, const nx::network::rest::Request& request)
     {
         using namespace details;
+        using nx::utils::model::getId;
 
         auto processor = m_queryProcessor->getAccess(
             static_cast<const Derived*>(this)->prepareAuditRecord(request));
@@ -55,10 +57,10 @@ public:
         // `std::type_identity` (or similar) can be used to pass the read type info and avoid
         // useless `readType` object instantiation.
         const auto query =
-            [id = filter.getId(), &processor](const auto& readType)
+            [id = getId(filter), &processor](const auto& readType)
             {
                 using Arg = std::decay_t<decltype(readType)>;
-                using Output = std::conditional_t<nx::utils::IsVector<Arg>::value, Arg, std::vector<Arg>>;
+                using Output = std::conditional_t<nx::utils::Is<std::vector, Arg>(), Arg, std::vector<Arg>>;
                 return processor.template processQueryAsync<decltype(id), Output>(
                     getReadCommand<Output>(),
                     std::move(id),
@@ -124,6 +126,7 @@ public:
     void update(Model data, const nx::network::rest::Request& request)
     {
         using namespace details;
+        using nx::utils::model::getId;
 
         std::promise<Result> promise;
         auto processor = m_queryProcessor->getAccess(
@@ -137,12 +140,12 @@ public:
 
             using IgnoredDbType = std::decay_t<decltype(mainDbItem)>;
             const auto update =
-                [id = data.getId()](auto&& x, auto& copy, auto* list)
+                [id = getId(data)](auto&& x, auto& copy, auto* list)
                 {
                     using DbType = std::decay_t<decltype(x)>;
                     Result result;
                     assertModelToDbTypesProducedValidResult<IgnoredDbType, DbType, Model>(x, id);
-                    if constexpr (nx::utils::IsVector<DbType>::value)
+                    if constexpr (nx::utils::Is<std::vector, DbType>())
                     {
                         const auto command = getUpdateCommand<std::decay_t<decltype(x[0])>>();
                         result = copy.template processMultiUpdateSync<DbType>(
@@ -167,7 +170,7 @@ public:
                     const auto updateItem =
                         [update, &copy, list](auto&& item) -> Result
                         {
-                            if constexpr (nx::utils::IsOptional<std::decay_t<decltype(item)>>::value)
+                            if constexpr (nx::utils::Is<std::optional, std::decay_t<decltype(item)>>())
                                 return item ? update(std::move(*item), copy, list) : Result();
                             else
                                 return update(std::move(item), copy, list);
@@ -198,18 +201,20 @@ public:
 
     QString getSubscriptionId(const nx::network::rest::Request& request)
     {
+        using nx::utils::model::getId;
+
         if (request.method() == nx::network::http::Method::get)
         {
             return request.params().toJson(/*excludeCommon*/ true).isEmpty()
                 ? QString("*")
-                : nx::toString(request.parseContentOrThrow<Filter>().getId());
+                : nx::toString(getId(request.parseContentOrThrow<Filter>()));
         }
 
         if (request.method() == nx::network::http::Method::delete_)
         {
             return request.params().toJson(/*excludeCommon*/ true).isEmpty()
                 ? QString("*")
-                : nx::toString(request.parseContentOrThrow<DeleteInput>().getId());
+                : nx::toString(getId(request.parseContentOrThrow<DeleteInput>()));
         }
 
         NX_ASSERT(false, "Use `get` to `subscribe` or `delete` to `unsubscribe`");
@@ -234,11 +239,12 @@ private:
     void notify(const QnAbstractTransaction& transaction)
     {
         using namespace details;
+        using nx::utils::model::getId;
 
         if (DeleteCommand == transaction.command)
         {
             const auto id =
-                static_cast<const QnTransaction<DeleteInput>&>(transaction).params.getId();
+                getId(static_cast<const QnTransaction<DeleteInput>&>(transaction).params);
             if (isValidType(id))
             {
                 NX_VERBOSE(this, "Notify %1 for %2", id, transaction.command);
@@ -254,7 +260,7 @@ private:
                 if (getUpdateCommand<T>() != transaction.command)
                     return false;
 
-                const auto id = static_cast<const QnTransaction<T>&>(transaction).params.getId();
+                const auto id = getId(static_cast<const QnTransaction<T>&>(transaction).params);
                 if (isValidType(id))
                 {
                     NX_VERBOSE(this, "Notify %1 for %2", id, transaction.command);

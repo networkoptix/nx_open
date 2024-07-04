@@ -12,8 +12,6 @@ namespace nx::vms::api {
 
 struct NX_VMS_API ConnnectServersData
 {
-    nx::Uuid getId() const { return id; }
-
     /**%apidoc:string
      * Server id. Can be obtained from "id" field via `GET /rest/v{1-}/servers` or be "this" to
      * refer to the current Server.

@@ -8,6 +8,7 @@
 #include <QtCore/QString>
 
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/utils/crud_model.h>
 #include <nx/utils/member_detector.h>
 #include <nx/utils/type_traits.h>
 #include <nx/utils/void.h>
@@ -19,6 +20,40 @@
 #include "response.h"
 
 namespace nx::network::rest {
+
+namespace detail {
+
+#define MEMBER_CHECKER(MEMBER) \
+    NX_UTILS_DECLARE_FIELD_DETECTOR_SIMPLE(DoesMemberExist_##MEMBER, MEMBER)
+    MEMBER_CHECKER(front);
+#undef MEMBER_CHECKER
+
+template<typename Container>
+decltype(auto) front(const Container& c)
+{
+    NX_ASSERT(c.size() != 0);
+    if constexpr (nx::utils::IsKeyValueContainer<std::decay_t<Container>>::value)
+        return c.begin()->second;
+    else if constexpr (DoesMemberExist_front<std::decay_t<Container>>::value)
+        return c.front();
+    else
+        return *c.begin();
+}
+
+template<typename... T>
+constexpr bool StaticAssertAll()
+{
+    static_assert((T::value && ...));
+    return (T::value && ...);
+}
+
+// Consider moving to `type_traits.h`. `FunctionArgumentType` is already declared in
+// `signature_extractor.h`, but this one has a simpler interface: it allows to pass a pointer to
+// the function directly.
+template <auto FunctionPtr, size_t I>
+using FunctionArgumentType = typename nx::utils::FunctionTraits<FunctionPtr>::template ArgumentType<I>;
+
+} // namespace detail
 
 enum class CrudFeature
 {
@@ -92,28 +127,6 @@ protected:
         auto it = result->pathParams.findValue(m_idParamName);
         return it && *it != NX_FMT("*");
     }
-
-    template<typename T>
-    struct MethodArgument0
-    {
-    };
-
-    template<typename Result, typename Argument0, typename Class, typename... Args>
-    struct MethodArgument0<Result (Class::*)(Argument0, Args...)>
-    {
-        using type = Argument0;
-    };
-
-    template<typename T>
-    struct MethodResult
-    {
-    };
-
-    template<typename Result, typename Class, typename... Args>
-    struct MethodResult<Result (Class::*)(Args...)>
-    {
-        using type = Result;
-    };
 
     #define METHOD_CHECKER(METHOD) \
         NX_UTILS_DECLARE_FIELD_DETECTOR_SIMPLE(DoesMethodExist_##METHOD, METHOD)
@@ -209,10 +222,10 @@ protected:
 
     template<typename Data>
     Response response(
-        const Data& data, const Request& request, ResponseAttributes responseAttributes = {},
+        Data&& data, const Request& request, ResponseAttributes responseAttributes = {},
         Params filters = {}, json::DefaultValueAction defaultValueAction = json::DefaultValueAction::appendMissing)
     {
-        auto json = json::filter(data, std::move(filters), defaultValueAction);
+        auto json = json::filter(std::forward<Data>(data), std::move(filters), defaultValueAction);
         if (NX_ASSERT(m_schemas))
             m_schemas->postprocessResponse(request, &json);
         const auto format = request.responseFormatOrThrow();
@@ -229,7 +242,7 @@ protected:
         {
             if constexpr (DoesMethodExist_fillMissingParamsForResponse<Derived>::value)
                 static_cast<Derived*>(this)->fillMissingParamsForResponse(&*resource, request);
-            return response(*resource, request, std::move(responseAttributes));
+            return response(std::move(*resource), request, std::move(responseAttributes));
         }
 
         // This may actually happen if created resource is removed faster than the handler
@@ -240,8 +253,9 @@ protected:
     template<typename Id>
     auto readById(Id id, const Request& request, ResponseAttributes* responseAttributes)
     {
+        using detail::front;
         auto list = call(&Derived::read, id, request, responseAttributes);
-        using ResultType = std::optional<std::decay_t<decltype(list.front())>>;
+        using ResultType = std::optional<std::decay_t<decltype(front(list))>>;
         if (list.empty())
             return ResultType(std::nullopt);
         if (const auto size = list.size(); size != 1)
@@ -251,7 +265,7 @@ protected:
             NX_ASSERT(false, error);
             throw Exception::internalServerError(error);
         }
-        return ResultType(std::move(list.front()));
+        return ResultType(std::move(front(list)));
     }
 
     struct IdParam
@@ -364,7 +378,7 @@ Response CrudHandler<Derived>::executeGet(const Request& request)
     if constexpr (DoesMethodExist_read<Derived>::value)
     {
         auto [filter, params, defaultValueAction] =
-            processGetRequest<typename MethodArgument0<decltype(&Derived::read)>::type>(request);
+            processGetRequest<detail::FunctionArgumentType<&Derived::read, 0>>(request);
         ResponseAttributes responseAttributes;
         auto list = call(&Derived::read, std::move(filter), request, &responseAttributes);
         if constexpr (DoesMethodExist_fillMissingParamsForResponse<Derived>::value)
@@ -376,10 +390,11 @@ Response CrudHandler<Derived>::executeGet(const Request& request)
         if (const auto id = idParam(request);
             (id.value && id.isInPath) || m_idParamName.isEmpty())
         {
+            using detail::front;
             const auto size = list.size();
             if (size == 1)
             {
-                return response(list.front(),
+                return response(std::move(front(list)),
                     request, std::move(responseAttributes), std::move(params), defaultValueAction);
             }
 
@@ -397,7 +412,7 @@ Response CrudHandler<Derived>::executeGet(const Request& request)
             else
                 throw Exception::internalServerError(error);
         }
-        return response(list,
+        return response(std::move(list),
             request, std::move(responseAttributes), std::move(params), defaultValueAction);
     }
     else
@@ -409,8 +424,12 @@ Response CrudHandler<Derived>::executeGet(const Request& request)
 template<typename Derived>
 Response CrudHandler<Derived>::executePost(const Request& request)
 {
+    using nx::utils::model::setId;
+    using namespace nx::utils::model;
+
     if constexpr (DoesMethodExist_create<Derived>::value)
     {
+        using Model = detail::FunctionArgumentType<&Derived::create, 0>;
         const auto derived = static_cast<Derived*>(this);
         if (!m_features.testFlag(CrudFeature::idInPost) && idParam(request).value)
         {
@@ -418,36 +437,39 @@ Response CrudHandler<Derived>::executePost(const Request& request)
                 NX_FMT("The parameter %1 must not be specified when creating a new object.",
                     m_idParamName));
         }
-        using Model = typename MethodArgument0<decltype(&Derived::create)>::type;
         Model model = deserialize<Model>(request);
         if constexpr (DoesMethodExist_fillMissingParams<Derived>::value)
             derived->fillMissingParams(&model, request);
 
-        if constexpr (nx::utils::isCreateModelV<Model>)
+        if constexpr (isIdGenerationEnabled<Model>)
         {
-            if (auto id = model.getId(); id == decltype(id)())
+            // This will reference the actual Model type in errors. Grep for `StaticAssertAll`.
+            detail::StaticAssertAll<HasGetId<Model>, CanSetIdWithArg<Model, nx::Uuid>>();
+            if (auto id = getId(model); id == decltype(id)())
             {
-                model.setId(nx::Uuid::createUuid());
+                setId(model, nx::Uuid::createUuid());
             }
             else if constexpr (DoesMethodExist_read<Derived>::value)
             {
                 ResponseAttributes responseAttributes;
+                // This is pretty wasteful, since the idea here is just to check for existence.
+                // TODO: `virtual bool checkExisting(const nx::Uuid&) const { /*use resource pool*/ }
                 if (call(&Derived::read, std::move(id), request, &responseAttributes).size() == 1)
                     throw Exception::forbidden("Already exists");
             }
         }
 
         ResponseAttributes responseAttributes;
-        using Result = typename MethodResult<decltype(&Derived::create)>::type;
+        using Result = typename nx::utils::FunctionTraits<&Derived::create>::ReturnType;
         if constexpr (!std::is_same<Result, void>::value)
         {
-            const auto result = call(&Derived::create, std::move(model), request, &responseAttributes);
-            return response(result, request, std::move(responseAttributes));
+            auto result = call(&Derived::create, std::move(model), request, &responseAttributes);
+            return response(std::move(result), request, std::move(responseAttributes));
         }
         else if constexpr (DoesMethodExist_read<Derived>::value
-            && nx::utils::HasGetId<Model>::value)
+            && nx::utils::model::HasGetId<Model>::value)
         {
-            auto id = model.getId();
+            auto id = getId(model);
             call(&Derived::create, std::move(model), request, &responseAttributes);
             return responseById(std::move(id), request, std::move(responseAttributes));
         }
@@ -466,10 +488,12 @@ Response CrudHandler<Derived>::executePost(const Request& request)
 template<typename Derived>
 Response CrudHandler<Derived>::executeDelete(const Request& request)
 {
+    using nx::utils::model::getId;
+
     if constexpr (DoesMethodExist_delete_<Derived>::value)
     {
         ResponseAttributes responseAttributes;
-        using Id = typename MethodArgument0<decltype(&Derived::delete_)>::type;
+        using Id = detail::FunctionArgumentType<&Derived::delete_, 0>;
         if constexpr (std::is_same<Id, Void>::value)
         {
             call(&Derived::delete_, Void(), request, &responseAttributes);
@@ -477,9 +501,10 @@ Response CrudHandler<Derived>::executeDelete(const Request& request)
         else
         {
             Id id = deserialize<Id>(request);
-            if constexpr (nx::utils::HasGetId<Id>::value && !DoesMethodExist_loadFromParams<Id>::value)
+            if constexpr (nx::utils::model::adHocIsIdCheckOnDeleteEnabled<Id>
+                && !DoesMethodExist_loadFromParams<Id>::value)
             {
-                if (id.getId() == std::decay_t<decltype(id.getId())>())
+                if (getId(id) == std::decay_t<decltype(getId(id))>())
                     throw Exception::missingParameter(m_idParamName);
             }
             call(&Derived::delete_, std::move(id), request, &responseAttributes);
@@ -495,11 +520,13 @@ Response CrudHandler<Derived>::executeDelete(const Request& request)
 template<typename Derived>
 Response CrudHandler<Derived>::executePut(const Request& request)
 {
+    using nx::utils::model::getId;
+
     if constexpr (DoesMethodExist_update<Derived>::value)
     {
         const auto d = static_cast<Derived*>(this);
-        using Model = typename MethodArgument0<decltype(&Derived::update)>::type;
-        using Result = typename MethodResult<decltype(&Derived::update)>::type;
+        using Model = detail::FunctionArgumentType<&Derived::update, 0>;
+        using Result = typename nx::utils::FunctionTraits<&Derived::update>::ReturnType;
         Model model = deserialize<Model>(request, /*wrapInObject*/ true);
         if constexpr (DoesMethodExist_fillMissingParams<Derived>::value)
             d->fillMissingParams(&model, request);
@@ -508,25 +535,26 @@ Response CrudHandler<Derived>::executePut(const Request& request)
         {
             if constexpr (!std::is_same<Result, void>::value)
             {
-                const auto result =
+                using detail::front;
+                auto result =
                     call(&Derived::update, std::move(model), request, &responseAttributes);
                 if constexpr (DoesMethodExist_size<Result>::value)
                 {
                     if (NX_ASSERT(result.size() == 1, "Expected 1 result, got %1", result.size()))
-                        return response(result.front(), request, std::move(responseAttributes));
+                        return response(std::move(front(result)), request, std::move(responseAttributes));
                     return {
                         responseAttributes.statusCode, std::move(responseAttributes.httpHeaders)};
                 }
                 else
                 {
-                    return response(result, request, std::move(responseAttributes));
+                    return response(std::move(result), request, std::move(responseAttributes));
                 }
             }
             else
             {
                 if constexpr (DoesMethodExist_read<Derived>::value)
                 {
-                    auto id = model.getId();
+                    auto id = getId(model);
                     if (id == decltype(id)())
                         throw Exception::missingParameter(m_idParamName);
 
@@ -545,8 +573,8 @@ Response CrudHandler<Derived>::executePut(const Request& request)
 
         if constexpr (!std::is_same<Result, void>::value)
         {
-            const auto result = call(&Derived::update, std::move(model), request, &responseAttributes);
-            return response(result, request, std::move(responseAttributes));
+            auto result = call(&Derived::update, std::move(model), request, &responseAttributes);
+            return response(std::move(result), request, std::move(responseAttributes));
         }
         else
         {
@@ -555,10 +583,10 @@ Response CrudHandler<Derived>::executePut(const Request& request)
             {
                 if (!m_features.testFlag(CrudFeature::fastUpdate))
                 {
-                    auto emptyFilter = typename MethodArgument0<decltype(&Derived::read)>::type{};
-                    const auto result =
+                    auto emptyFilter = detail::FunctionArgumentType<&Derived::read, 0>{};
+                    auto result =
                         call(&Derived::read, std::move(emptyFilter), request, &responseAttributes);
-                    return response(result, request, std::move(responseAttributes));
+                    return response(std::move(result), request, std::move(responseAttributes));
                 }
             }
             return {responseAttributes.statusCode, std::move(responseAttributes.httpHeaders)};
@@ -573,17 +601,19 @@ Response CrudHandler<Derived>::executePut(const Request& request)
 template<typename Derived>
 Response CrudHandler<Derived>::executePatch(const Request& request)
 {
+    using nx::utils::model::getId;
+
     if constexpr (DoesMethodExist_read<Derived>::value && DoesMethodExist_update<Derived>::value)
     {
         const auto d = static_cast<Derived*>(this);
-        using Model = typename MethodArgument0<decltype(&Derived::update)>::type;
-        using Result = typename MethodResult<decltype(&Derived::update)>::type;
+        using Model = detail::FunctionArgumentType<&Derived::update, 0>;
+        using Result = typename nx::utils::FunctionTraits<&Derived::update>::ReturnType;
         std::optional<QJsonValue> incomplete;
         Model model = request.parseContentAllowingOmittedValuesOrThrow<Model>(&incomplete);
         ResponseAttributes responseAttributes;
         if (idParam(request).value || m_idParamName.isEmpty())
         {
-            auto id = model.getId();
+            auto id = getId(model);
             if (id == decltype(id)())
                 throw Exception::missingParameter(m_idParamName);
 
@@ -605,9 +635,9 @@ Response CrudHandler<Derived>::executePatch(const Request& request)
                 d->fillMissingParams(&model, request);
             if constexpr (!std::is_same<Result, void>::value)
             {
-                const auto result =
+                auto result =
                     call(&Derived::update, std::move(model), request, &responseAttributes);
-                return response(result, request, std::move(responseAttributes));
+                return response(std::move(result), request, std::move(responseAttributes));
             }
             else
             {
@@ -618,7 +648,7 @@ Response CrudHandler<Derived>::executePatch(const Request& request)
             }
         }
 
-        auto emptyFilter = model.getId();
+        auto emptyFilter = getId(model);
         if (!m_features.testFlag(CrudFeature::fastUpdate))
         {
             if (!incomplete)
@@ -644,17 +674,17 @@ Response CrudHandler<Derived>::executePatch(const Request& request)
 
         if constexpr (!std::is_same<Result, void>::value)
         {
-            const auto result =
+            auto result =
                 call(&Derived::update, std::move(model), request, &responseAttributes);
-            return response(result, request, std::move(responseAttributes));
+            return response(std::move(result), request, std::move(responseAttributes));
         }
         else
         {
             call(&Derived::update, std::move(model), request, &responseAttributes);
             if (m_features.testFlag(CrudFeature::fastUpdate))
                 return {responseAttributes.statusCode, std::move(responseAttributes.httpHeaders)};
-            const auto result = call(&Derived::read, emptyFilter, request, &responseAttributes);
-            return response(result, request, std::move(responseAttributes));
+            auto result = call(&Derived::read, emptyFilter, request, &responseAttributes);
+            return response(std::move(result), request, std::move(responseAttributes));
         }
     }
     else

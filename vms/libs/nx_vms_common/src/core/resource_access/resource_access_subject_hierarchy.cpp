@@ -75,12 +75,12 @@ public:
 
     void handleGroupAddedOrUpdated(const nx::vms::api::UserGroupData& group)
     {
-        q->addOrUpdate(group.getId(), {group.parentGroupIds.cbegin(), group.parentGroupIds.cend()});
+        q->addOrUpdate(group.id, {group.parentGroupIds.cbegin(), group.parentGroupIds.cend()});
     }
 
     void handleGroupRemoved(const nx::vms::api::UserGroupData& group)
     {
-        q->remove(group.getId());
+        q->remove(group.id);
     }
 
     void handleGroupsReset()

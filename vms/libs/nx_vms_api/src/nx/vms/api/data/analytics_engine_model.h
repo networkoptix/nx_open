@@ -17,8 +17,6 @@ struct NX_VMS_API EngineModel
     nx::Uuid id;
     QString name;
     nx::Uuid integrationId;
-
-    nx::Uuid getId() const { return id; }
 };
 #define nx_vms_api_analytics_EngineModel_Fields (id)(name)(integrationId)
 QN_FUSION_DECLARE_FUNCTIONS(EngineModel, (json), NX_VMS_API);

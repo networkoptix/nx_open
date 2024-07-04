@@ -21,16 +21,17 @@ struct TestData: NestedTestData
     std::vector<NestedTestData> list;
 };
 
-/**%apidoc
- * %param[unused] *.id
- */
 struct TestDataMap: std::map<nx::Uuid, TestData>
 {
-    using base_type = std::map<nx::Uuid, TestData>;
-    using base_type::base_type;
-    TestDataMap(base_type&& origin): base_type(std::move(origin)) {}
-    const TestData& front() const { return begin()->second; }
-    nx::Uuid getId() const { return (size() == 1) ? begin()->first : nx::Uuid(); }
+    // TODO: Implement & use ValueOrMap instead.
+    [[nodiscard]] const auto& getId() const
+    {
+        static const key_type defaultValue{};
+        const key_type& result = 1 == size() ? begin()->first : defaultValue;
+
+        // decltype(auto) will be deduced as const reference here
+        return result;
+    }
 };
 
 /**%apidoc Device information object.

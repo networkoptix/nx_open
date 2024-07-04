@@ -2,10 +2,11 @@
 
 #pragma once
 
+#include <map>
+
 #include <nx/fusion/model_functions_fwd.h>
 
 #include "id_data.h"
-#include "map.h"
 
 namespace nx::vms::api {
 
@@ -54,7 +55,7 @@ struct NX_VMS_API RecordingStatisticsData
     (archiveDurationS)(averageBitrate)(averageDensity)(recordedBytesPerStorage)
 QN_FUSION_DECLARE_FUNCTIONS(RecordingStatisticsData, (json), NX_VMS_API)
 
-using RecordingStatisticsValues = Map<nx::Uuid /*id*/,
+using RecordingStatisticsValues = std::map<nx::Uuid /*id*/,
     std::vector<api::RecordingStatisticsData> /*statistics*/>;
 
 } // namespace nx::vms::api

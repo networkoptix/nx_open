@@ -29,7 +29,7 @@ struct NX_VMS_API IntegrationRequestIdentity
     IntegrationRequestIdentity() = default;
     IntegrationRequestIdentity(const nx::Uuid& requestId): requestId(requestId) {}
 
-    nx::Uuid getId() { return requestId; }
+    nx::Uuid getId() const { return requestId; }
 
     bool operator==(const IntegrationRequestIdentity& other) const = default;
 };

@@ -24,6 +24,13 @@ struct NX_VMS_API RebuildArchiveFilter
     std::optional<std::chrono::system_clock::time_point> startPointMs;
 };
 
+// Disabling Id generation for non-crud procedure call (see `crud_model.h`).
+std::false_type enableIdGeneration(RebuildArchiveFilter);
+
+// Disabling the check, because if `id` is initialized from `*`, `id = nx::Uuid()` will trigger
+// `missingParameter` error when `CrudHandler::executeDelete` is called (see `crud_model.h`).
+std::false_type adHocEnableIdCheckOnDelete(RebuildArchiveFilter);
+
 #define RebuildArchiveFilter_Fields (id)(location)(startPointMs)
 
 QN_FUSION_DECLARE_FUNCTIONS(RebuildArchiveFilter, (json), NX_VMS_API)

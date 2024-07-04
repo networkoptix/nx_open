@@ -37,10 +37,6 @@ struct NX_VMS_API IdData
      */
     void fillId() { id = nx::Uuid::createUuid(); }
 
-    nx::Uuid getId() const { return id; }
-    void setId(nx::Uuid value) { id = std::move(value); }
-    static_assert(nx::utils::isFlexibleIdModelV<IdData>);
-
     nx::Uuid id;
 };
 #define IdData_Fields (id)
