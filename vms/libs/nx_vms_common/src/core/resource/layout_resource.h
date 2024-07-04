@@ -133,7 +133,9 @@ signals:
     void itemRemoved(
         const QnLayoutResourcePtr& resource, const nx::vms::common::LayoutItemData& item);
     void itemChanged(
-        const QnLayoutResourcePtr& resource, const nx::vms::common::LayoutItemData& item);
+        const QnLayoutResourcePtr& resource,
+        const nx::vms::common::LayoutItemData& item,
+        const nx::vms::common::LayoutItemData& oldItem);
 
     void cellAspectRatioChanged(const QnLayoutResourcePtr &resource);
     void cellSpacingChanged(const QnLayoutResourcePtr &resource);

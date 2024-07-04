@@ -74,6 +74,18 @@ public:
         return lastLayouts.empty() ? QnLayoutResourcePtr() : lastLayouts.takeFirst();
     }
 
+    bool hasSignals() const
+    {
+        return !lastSignals.empty();
+    }
+
+    void clearSignals()
+    {
+        lastSignals.clear();
+        lastLayouts.clear();
+        lastResourceIds.clear();
+    }
+
     using LayoutSet = std::set<QnLayoutResourcePtr>;
     LayoutSet toSet(const QnCounterHash<QnLayoutResourcePtr>& layouts)
     {
@@ -252,6 +264,150 @@ TEST_F(LayoutItemWatcherTest, addRemoveLayout)
 
     ASSERT_EQ(popNextSignal(), QString("resourceRemoved"));
     ASSERT_EQ(popNextResourceId(), layout2_item2);
+}
+
+TEST_F(LayoutItemWatcherTest, layoutItemChanged)
+{
+    // Initialize watched layout with two items, with camera1 and camera2 respectively.
+
+    const auto layout = createLayout();
+    const auto camera1 = createCamera();
+    const auto camera2 = createCamera();
+    const auto camera3 = createCamera();
+    const auto item1 = addToLayout(layout, camera1);
+    const auto item2 = addToLayout(layout, camera2);
+
+    watcher->addWatchedLayout(layout);
+    ASSERT_TRUE(watcher->hasResource(camera1->getId()));
+    ASSERT_TRUE(watcher->hasResource(camera2->getId()));
+    ASSERT_FALSE(watcher->hasResource(camera3->getId()));
+    ASSERT_EQ(toSet(watcher->resourceLayouts(camera1->getId())), LayoutSet({layout}));
+    ASSERT_EQ(toSet(watcher->resourceLayouts(camera2->getId())), LayoutSet({layout}));
+    ASSERT_EQ(toSet(watcher->resourceLayouts(camera3->getId())), LayoutSet());
+
+    ASSERT_TRUE(hasSignals());
+    clearSignals();
+
+    auto items = layout->getItems();
+
+    // Just swap item cameras.
+    items[item1].resource.id = camera2->getId();
+    items[item2].resource.id = camera1->getId();
+
+    layout->setItems(items);
+
+    // Check that nothing have changed.
+    ASSERT_TRUE(watcher->hasResource(camera1->getId()));
+    ASSERT_TRUE(watcher->hasResource(camera2->getId()));
+    ASSERT_FALSE(watcher->hasResource(camera3->getId()));
+    ASSERT_EQ(toSet(watcher->resourceLayouts(camera1->getId())), LayoutSet({layout}));
+    ASSERT_EQ(toSet(watcher->resourceLayouts(camera2->getId())), LayoutSet({layout}));
+    ASSERT_EQ(toSet(watcher->resourceLayouts(camera3->getId())), LayoutSet());
+
+    // Depending on internal item order, there could have been add-remove or remove-add signals,
+    // we don't check them here.
+    ASSERT_TRUE(hasSignals());
+    clearSignals();
+
+    // Replace in item2 camera1 with camera3.
+    items[item2].resource.id = camera3->getId();
+    layout->setItems(items);
+
+    ASSERT_FALSE(watcher->hasResource(camera1->getId()));
+    ASSERT_TRUE(watcher->hasResource(camera2->getId()));
+    ASSERT_TRUE(watcher->hasResource(camera3->getId()));
+    ASSERT_EQ(toSet(watcher->resourceLayouts(camera1->getId())), LayoutSet());
+    ASSERT_EQ(toSet(watcher->resourceLayouts(camera2->getId())), LayoutSet({layout}));
+    ASSERT_EQ(toSet(watcher->resourceLayouts(camera3->getId())), LayoutSet({layout}));
+
+    ASSERT_EQ(popNextSignal(), QString("removedFromLayout"));
+    ASSERT_EQ(popNextResourceId(), camera1->getId());
+    ASSERT_EQ(popNextLayout(), layout);
+
+    ASSERT_EQ(popNextSignal(), QString("resourceRemoved"));
+    ASSERT_EQ(popNextResourceId(), camera1->getId());
+
+    ASSERT_EQ(popNextSignal(), QString("addedToLayout"));
+    ASSERT_EQ(popNextResourceId(), camera3->getId());
+    ASSERT_EQ(popNextLayout(), layout);
+
+    ASSERT_EQ(popNextSignal(), QString("resourceAdded"));
+    ASSERT_EQ(popNextResourceId(), camera3->getId());
+
+    ASSERT_FALSE(hasSignals());
+
+    // Replace in item1 camera2 with camera3.
+    items[item1].resource.id = camera3->getId();
+    layout->setItems(items);
+
+    ASSERT_FALSE(watcher->hasResource(camera1->getId()));
+    ASSERT_FALSE(watcher->hasResource(camera2->getId()));
+    ASSERT_TRUE(watcher->hasResource(camera3->getId()));
+    ASSERT_EQ(toSet(watcher->resourceLayouts(camera1->getId())), LayoutSet());
+    ASSERT_EQ(toSet(watcher->resourceLayouts(camera2->getId())), LayoutSet());
+    ASSERT_EQ(toSet(watcher->resourceLayouts(camera3->getId())), LayoutSet({layout}));
+
+    ASSERT_EQ(popNextSignal(), QString("removedFromLayout"));
+    ASSERT_EQ(popNextResourceId(), camera2->getId());
+    ASSERT_EQ(popNextLayout(), layout);
+
+    ASSERT_EQ(popNextSignal(), QString("resourceRemoved"));
+    ASSERT_EQ(popNextResourceId(), camera2->getId());
+
+    ASSERT_FALSE(hasSignals());
+
+    // Replace in item2 camera3 with null.
+    items[item2].resource.id = nx::Uuid{};
+    layout->setItems(items);
+
+    ASSERT_FALSE(watcher->hasResource(camera1->getId()));
+    ASSERT_FALSE(watcher->hasResource(camera2->getId()));
+    ASSERT_TRUE(watcher->hasResource(camera3->getId()));
+    ASSERT_EQ(toSet(watcher->resourceLayouts(camera1->getId())), LayoutSet());
+    ASSERT_EQ(toSet(watcher->resourceLayouts(camera2->getId())), LayoutSet());
+    ASSERT_EQ(toSet(watcher->resourceLayouts(camera3->getId())), LayoutSet({layout}));
+
+    ASSERT_FALSE(hasSignals());
+
+    // Replace in item1 camera3 with null.
+    items[item1].resource.id = nx::Uuid{};
+    layout->setItems(items);
+
+    ASSERT_FALSE(watcher->hasResource(camera1->getId()));
+    ASSERT_FALSE(watcher->hasResource(camera2->getId()));
+    ASSERT_FALSE(watcher->hasResource(camera3->getId()));
+    ASSERT_EQ(toSet(watcher->resourceLayouts(camera1->getId())), LayoutSet());
+    ASSERT_EQ(toSet(watcher->resourceLayouts(camera2->getId())), LayoutSet());
+    ASSERT_EQ(toSet(watcher->resourceLayouts(camera3->getId())), LayoutSet());
+
+    ASSERT_EQ(popNextSignal(), QString("removedFromLayout"));
+    ASSERT_EQ(popNextResourceId(), camera3->getId());
+    ASSERT_EQ(popNextLayout(), layout);
+
+    ASSERT_EQ(popNextSignal(), QString("resourceRemoved"));
+    ASSERT_EQ(popNextResourceId(), camera3->getId());
+
+    ASSERT_FALSE(hasSignals());
+
+    // Replace in item1 null with camera1.
+    items[item1].resource.id = camera1->getId();
+    layout->setItems(items);
+
+    ASSERT_TRUE(watcher->hasResource(camera1->getId()));
+    ASSERT_FALSE(watcher->hasResource(camera2->getId()));
+    ASSERT_FALSE(watcher->hasResource(camera3->getId()));
+    ASSERT_EQ(toSet(watcher->resourceLayouts(camera1->getId())), LayoutSet({layout}));
+    ASSERT_EQ(toSet(watcher->resourceLayouts(camera2->getId())), LayoutSet());
+    ASSERT_EQ(toSet(watcher->resourceLayouts(camera3->getId())), LayoutSet());
+
+    ASSERT_EQ(popNextSignal(), QString("addedToLayout"));
+    ASSERT_EQ(popNextResourceId(), camera1->getId());
+    ASSERT_EQ(popNextLayout(), layout);
+
+    ASSERT_EQ(popNextSignal(), QString("resourceAdded"));
+    ASSERT_EQ(popNextResourceId(), camera1->getId());
+
+    ASSERT_FALSE(hasSignals());
 }
 
 } // namespace test
