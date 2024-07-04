@@ -36,7 +36,7 @@ struct EventMetaData;
 
 class StringsHelper;
 
-using EventReason = nx::vms::api:: EventReason;
+using EventReason = nx::vms::api::EventReason;
 using EventState = nx::vms::api::EventState;
 using EventType = nx::vms::api::EventType;
 using ActionType = nx::vms::api::ActionType;

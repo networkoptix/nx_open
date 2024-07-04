@@ -2,16 +2,17 @@
 
 #include "datetime.h"
 
-#include <QtCore/QDateTime>
-
 #include "nx_utils_ini.h"
 #include "std_string_utils.h"
+#include "string.h"
 
 namespace nx::utils {
 
 using namespace std::chrono;
 
 namespace {
+
+constexpr qint64 kUsPerMs = 1000;
 
 QDateTime parseRfc1123Date(const std::string_view& str)
 {
@@ -193,6 +194,35 @@ std::string formatDateTime(std::chrono::steady_clock::time_point tp)
         std::chrono::steady_clock::now()};
     return formatDateTime(baseTimePoints.first +
         std::chrono::duration_cast<system_clock::duration>(tp - baseTimePoints.second));
+}
+
+qint64 parseDateTimeUsec(const QString& dateTimeStr)
+{
+    if (dateTimeStr.toLower().trimmed() == "now")
+        return DATETIME_NOW;
+
+    if (!dateTimeStr.startsWith('-')
+        && (dateTimeStr.contains('T') || dateTimeStr.contains('-')))
+    {
+        const auto dt = QDateTime::fromString(trimAndUnquote(dateTimeStr), Qt::ISODateWithMs);
+        if (dt.isValid())
+            return dt.toMSecsSinceEpoch() * kUsPerMs;
+    }
+
+    const auto timestampMsec = dateTimeStr.toLongLong();
+    if (timestampMsec == DATETIME_NOW)
+        return DATETIME_NOW;
+
+    return timestampMsec * kUsPerMs;
+}
+
+qint64 parseDateTimeMsec(const QString& dateTimeStr)
+{
+    const auto usecSinceEpoch = parseDateTimeUsec(dateTimeStr);
+    if (usecSinceEpoch < 0 || usecSinceEpoch == DATETIME_NOW)
+        return usecSinceEpoch; // special values are returned "as is"
+
+    return usecSinceEpoch / kUsPerMs;
 }
 
 } // namespace nx::utils

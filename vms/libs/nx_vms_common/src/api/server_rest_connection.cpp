@@ -1299,7 +1299,7 @@ Handle ServerConnection::eventLog(
 }
 
 Handle ServerConnection::createEvent(
-    const nx::vms::api::rules::EventInfo& info,
+    nx::vms::api::rules::PropertyMap info,
     Result<ErrorOrEmpty>::type callback,
     QThread* targetThread)
 {

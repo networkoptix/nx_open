@@ -59,7 +59,6 @@
 #include <nx/vms/api/data/user_group_model.h>
 #include <nx/vms/api/data/user_model.h>
 #include <nx/vms/api/rules/acknowledge.h>
-#include <nx/vms/api/rules/event_info.h>
 #include <nx/vms/event/event_fwd.h>
 #include <nx/vms/utils/abstract_session_token_helper.h>
 #include <recording/time_period_list.h>
@@ -405,7 +404,7 @@ public:
         std::optional<Timeouts> timeouts = std::nullopt);
 
     Handle createEvent(
-        const nx::vms::api::rules::EventInfo& info,
+        nx::vms::api::rules::PropertyMap info,
         Result<ErrorOrEmpty>::type callback,
         QThread* targetThread = nullptr);
 

@@ -43,26 +43,6 @@ inline QString replaceNonFileNameCharacters(const QString &string, const QChar &
 }
 
 /*!
-\param dateTime Can be one of following:\n
-- millis since since 1970-01-01
-- date in ISO format (YYYY-MM-DDTHH:mm:ss)
-- special value "now". In this case DATETIME_NOW is returned
-- negative value. In this case value returned "as is"
-\return usec since epoch
-*/
-NX_UTILS_API qint64 parseDateTimeUsec( const QString& dateTimeStr );
-
-/*!
-\param dateTime Can be one of following:\n
-- millis since since 1970-01-01
-- date in ISO format (YYYY-MM-DDTHH:mm:ss)
-- special value "now". In this case DATETIME_NOW is returned
-- negative value. In this case value returned "as is"
-\return msec since epoch
-*/
-NX_UTILS_API qint64 parseDateTimeMsec( const QString& dateTimeStr );
-
-/*!
 Like QString::toInt, but throws on failure.
 */
 NX_UTILS_API int parseInt(const QString& string, int base = 10);

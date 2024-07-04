@@ -16,6 +16,7 @@
 #include <nx/utils/qt_helpers.h>
 #include <nx/utils/scoped_connections.h>
 #include <nx/utils/std/algorithm.h>
+#include <nx/vms/api/rules/event_info.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/network/remote_connection.h>
@@ -413,7 +414,7 @@ bool SoftwareTriggerCameraButtonController::Private::setVmsTriggerState(
         nx::vms::event::StringsHelper::getSoftwareTriggerName(nameField->value()),
         iconField->value());
 
-    api->createEvent(nx::vms::rules::serialize(triggerEvent.get()),
+    api->createEvent(nx::vms::rules::serialize(triggerEvent.get()).props,
         [this, ruleId, state](bool success, auto handle, auto result)
         {
             if (const auto error = std::get_if<nx::network::rest::Result>(&result))
