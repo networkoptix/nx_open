@@ -205,7 +205,7 @@ bool SeamlessVideoDecoder::decode(
         if (!frameInfo.size.isEmpty())
             isSimilarParams &= frameInfo.size == d->prevFrameInfo.size;
 
-        if (d->currentCodecParameters && frame->context)
+        if (d->currentCodecParameters && frame->context && frame->context->getWidth() > 0)
             isSimilarParams &= frame->context->isEqual(*d->currentCodecParameters);
     }
     if (!isSimilarParams || (d->resetDecoder && frame->flags & QnAbstractMediaData::MediaFlags_AVKey))
