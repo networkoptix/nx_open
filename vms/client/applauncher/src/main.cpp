@@ -132,15 +132,6 @@ ApplauncherProcess::StartupParameters parseCommandLineParameters()
 
 int main(int argc, char* argv[])
 {
-    #ifdef Q_OS_UNIX
-        // Prevent holding inherited file descriptors.
-        // Otherwise if the applauncher is started via QProcess::startDetached() from the desktop
-        // client the QtWebEngineProcess will outlive the desktop client.
-        const int fdLimit = sysconf(_SC_OPEN_MAX);
-        for (int i = STDERR_FILENO + 1; i < fdLimit; i++)
-            close(i);
-    #endif
-
     qApp->setOrganizationName(nx::branding::company());
     qApp->setApplicationName(nx::branding::applauncherInternalName());
     qApp->setApplicationVersion(nx::build_info::vmsVersion());
