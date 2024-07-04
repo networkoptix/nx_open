@@ -18,7 +18,7 @@ Tab::Tab(
     QObject* parent)
     :
     base_type(parent),
-    d(new detail::TabApiBackend(context, context->workbench()->currentLayout()))
+    d(new detail::TabApiBackend(context))
 {
     using namespace detail;
 
