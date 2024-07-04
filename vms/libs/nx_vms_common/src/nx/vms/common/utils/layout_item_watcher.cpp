@@ -20,6 +20,8 @@ public:
 
     void handleItemAdded(const QnLayoutResourcePtr& layout, const LayoutItemData& item);
     void handleItemRemoved(const QnLayoutResourcePtr& layout, const LayoutItemData& item);
+    void handleItemChanged(const QnLayoutResourcePtr& layout, const LayoutItemData& item,
+        const LayoutItemData& oldItem);
 
 public:
     QSet<QnLayoutResourcePtr> watchedLayouts;
@@ -62,6 +64,9 @@ bool LayoutItemWatcher::addWatchedLayout(const QnLayoutResourcePtr& layout)
 
     connect(layout.get(), &QnLayoutResource::itemRemoved,
         d.get(), &Private::handleItemRemoved, Qt::DirectConnection);
+
+    connect(layout.get(), &QnLayoutResource::itemChanged,
+        d.get(), &Private::handleItemChanged, Qt::DirectConnection);
 
     return true;
 }
@@ -120,7 +125,7 @@ void LayoutItemWatcher::Private::handleItemAdded(
     if (resourceId.isNull())
         return;
 
-    NX_VERBOSE(q, "Item added to layout %1, resource id %2", layout, item.resource.id);
+    NX_VERBOSE(q, "Resource id %1 added to layout %2", resourceId, layout);
 
     bool addedToLayout = false;
     bool addedToFirstLayout = false;
@@ -144,7 +149,7 @@ void LayoutItemWatcher::Private::handleItemRemoved(
     if (resourceId.isNull())
         return;
 
-    NX_VERBOSE(q, "Item removed from layout %1, resource id %2", layout, item.resource.id);
+    NX_VERBOSE(q, "Resource id %1 removed from layout %2", resourceId, layout);
 
     bool removedFromLayout = false;
     bool removedFromLastLayout = false;
@@ -164,6 +169,16 @@ void LayoutItemWatcher::Private::handleItemRemoved(
 
     if (removedFromLastLayout)
         emit q->resourceRemoved(resourceId);
+}
+
+void LayoutItemWatcher::Private::handleItemChanged(
+    const QnLayoutResourcePtr& layout, const LayoutItemData& item, const LayoutItemData& oldItem)
+{
+    if (item.resource.id == oldItem.resource.id)
+        return;
+
+    handleItemRemoved(layout, oldItem);
+    handleItemAdded(layout, item);
 }
 
 } // namespace nx::vms::common
