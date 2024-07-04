@@ -73,9 +73,9 @@ struct TabApiBackend::Private: public QObject
 {
     TabApiBackend* const q;
     QPointer<QnWorkbenchContext> const context;
-    QPointer<QnWorkbenchLayout> const layout;
     QPointer<QnWorkbenchDisplay> const display;
     QPointer<QnWorkbenchNavigator> const navigator;
+    const Uuid layoutId;
 
     UuidSet selectedItems;
     nx::Uuid focusedItem;
@@ -83,10 +83,17 @@ struct TabApiBackend::Private: public QObject
     QSet<nx::Uuid> availableItems;
     nx::utils::ScopedConnections connections;
 
-    Private(
-        TabApiBackend* q,
-        QnWorkbenchContext* context,
-        QnWorkbenchLayout* layout);
+    /**
+     * Create interface which will work with the current layout. Signals will be listened only if
+     * the current layout id is the same as original when the integration was created.
+     */
+    Private(TabApiBackend* q, QnWorkbenchContext* context);
+    ~Private();
+
+    /** Workbench current layout. Never returns null. */
+    QnWorkbenchLayout* layout() const { return context->workbench()->currentLayout(); }
+
+    bool isCurrentLayout() const { return layout()->resourceId() == layoutId; }
 
     /** Connect to all workbench entities. Actual only when the layout is current. */
     void establishWorkbenchConnections();
@@ -127,15 +134,15 @@ struct TabApiBackend::Private: public QObject
 
 TabApiBackend::Private::Private(
     TabApiBackend* q,
-    QnWorkbenchContext* context,
-    QnWorkbenchLayout* layout)
+    QnWorkbenchContext* context)
     :
     q(q),
     context(context),
-    layout(layout),
     display(context->display()),
-    navigator(context->navigator())
+    navigator(context->navigator()),
+    layoutId(layout()->resourceId())
 {
+    NX_VERBOSE(this, "New integration created for layout %1", layout()->name());
     auto workbench = context->workbench();
 
     // Actually this is possibly never needed as when layout changed, the integration is recreated,
@@ -143,11 +150,9 @@ TabApiBackend::Private::Private(
     connect(workbench, &Workbench::currentLayoutChanged, this,
         [this]()
         {
-            if (this->layout
-                && this->context->workbench()->currentLayout() == this->layout)
-            {
+            NX_VERBOSE(this, "Current layout changed but the integration is still alive");
+            if (isCurrentLayout())
                 establishWorkbenchConnections();
-            }
         });
 
     connect(workbench, &Workbench::currentLayoutAboutToBeChanged, this,
@@ -156,7 +161,7 @@ TabApiBackend::Private::Private(
             connections.reset();
         });
 
-    if (NX_ASSERT(layout && workbench->currentLayout() == layout))
+    if (NX_ASSERT(isCurrentLayout()))
         establishWorkbenchConnections();
 
     const auto handleItemAdded =
@@ -172,25 +177,29 @@ TabApiBackend::Private::Private(
                 });
         };
 
-    connect(layout, &QnWorkbenchLayout::itemAdded, this,
+    connect(layout(), &QnWorkbenchLayout::itemAdded, this,
         [this, q, handleItemAdded](QnWorkbenchItem* addedItem)
         {
+            NX_VERBOSE(this, "Layout item added handled");
             handleItemAdded(addedItem);
             emit q->itemAdded(itemState(addedItem));
         });
 
-    for (const auto& item: layout->items())
+    for (const auto& item: layout()->items())
         handleItemAdded(item);
 
-    connect(layout, &QnWorkbenchLayout::itemRemoved, this,
+    connect(layout(), &QnWorkbenchLayout::itemRemoved, this,
         [this, q](QnWorkbenchItem* removedItem)
         {
-            if (!this->layout)
-                return;
-
+            NX_VERBOSE(this, "Layout item removed handled");
             availableItems.remove(removedItem->uuid());
             emit q->itemRemoved(removedItem->uuid());
         });
+}
+
+TabApiBackend::Private::~Private()
+{
+    NX_VERBOSE(this, "Integration is destroyed");
 }
 
 void TabApiBackend::Private::establishWorkbenchConnections()
@@ -210,13 +219,10 @@ void TabApiBackend::Private::establishWorkbenchConnections()
 
 void TabApiBackend::Private::handleSliderChanged()
 {
-    if (!layout)
-        return;
-
     if (isSyncedLayout())
     {
         // Windows for all items of synced layout are changed simultaneously.
-        for (const auto item: layout->items())
+        for (const auto item: layout()->items())
             handleItemChanged(item);
     }
     else if (const auto focused = focusedMediaWidget())
@@ -229,10 +235,7 @@ void TabApiBackend::Private::updateLayoutItemData(
     const QUuid& itemId,
     const ItemParams& params)
 {
-    if (!layout)
-        return;
-
-    auto currentLayout = layout->resource();
+    auto currentLayout = layout()->resource();
     if (!NX_ASSERT(currentLayout))
         return;
 
@@ -272,10 +275,7 @@ void TabApiBackend::Private::updateItemParams(
     const QUuid& itemId,
     const ItemParams& params)
 {
-    if (!layout)
-        return;
-
-    const auto item = layout->item(itemId);
+    const auto item = layout()->item(itemId);
     if (!item)
         return;
 
@@ -328,9 +328,6 @@ void TabApiBackend::Private::updateItemParams(
             if (!isFocusedWidget(mediaWidget))
                 return; //< Do all timeline changes only if item is current one.
 
-            if (context->workbench()->currentLayout() != layout)
-                return; //< Do not change timeline appearance for the other layout.
-
             const auto timeSlider = navigator->timeSlider();
             if (params.media->timelineWindow.has_value())
             {
@@ -367,7 +364,7 @@ void TabApiBackend::Private::handleItemChanged(QnWorkbenchItem* item) const
 
 Item TabApiBackend::Private::itemState(QnWorkbenchItem* item) const
 {
-    if (!layout || !item)
+    if (!item)
         return {};
 
     const auto& itemId = item->uuid();
@@ -392,7 +389,7 @@ Item TabApiBackend::Private::itemState(QnWorkbenchItem* item) const
 
 std::optional<MediaParams> TabApiBackend::Private::itemMediaParams(QnWorkbenchItem* item) const
 {
-    if (!layout || !item)
+    if (!item)
         return {};
 
     const auto type = resourceType(item->resource());
@@ -408,7 +405,6 @@ std::optional<MediaParams> TabApiBackend::Private::itemMediaParams(QnWorkbenchIt
     result.timestampMs = mediaWidget->position();
     result.speed = mediaWidget->speed();
 
-    const bool isCurrentLayout = context->workbench()->currentLayout() == layout;
     const bool synced = isSyncedLayout();
 
     const auto fillFromTimeSlider =
@@ -431,7 +427,7 @@ std::optional<MediaParams> TabApiBackend::Private::itemMediaParams(QnWorkbenchIt
     const auto tryFillFromItemData =
         [this, &result](const nx::Uuid& itemId)
         {
-            auto layoutResource = layout->resource();
+            auto layoutResource = layout()->resource();
             if (!NX_ASSERT(layoutResource))
                 return false;
 
@@ -453,7 +449,7 @@ std::optional<MediaParams> TabApiBackend::Private::itemMediaParams(QnWorkbenchIt
     const auto tryFillFromAnyLayoutItemData =
         [&]()
         {
-            for (const auto anyLayoutItem: layout->items())
+            for (const auto anyLayoutItem: layout()->items())
             {
                 const auto type = resourceType(anyLayoutItem->resource());
                 if (detail::hasMediaStream(type) && tryFillFromItemData(anyLayoutItem->uuid()))
@@ -461,7 +457,7 @@ std::optional<MediaParams> TabApiBackend::Private::itemMediaParams(QnWorkbenchIt
             }
         };
 
-    if (isCurrentLayout)
+    if (isCurrentLayout())
     {
         const auto focused = focusedMediaWidget();
 
@@ -520,14 +516,14 @@ QnResourceWidget* TabApiBackend::Private::focusedMediaWidget() const
     const auto it = std::find_if(widgets.cbegin(), widgets.cend(),
         [this](const QnResourceWidget* widget)
         {
-            return widget->item()->layout() == layout && isFocusedWidget(widget);
+            return isFocusedWidget(widget);
         });
     return it == widgets.cend() ? nullptr : *it;
 }
 
 bool TabApiBackend::Private::isFocusedWidget(const QnResourceWidget* widget) const
 {
-    if (!layout || !widget)
+    if (!widget)
         return false;
 
     const auto state = widget->selectionState();
@@ -536,6 +532,7 @@ bool TabApiBackend::Private::isFocusedWidget(const QnResourceWidget* widget) con
         case QnResourceWidget::SelectionState::focused:
         case QnResourceWidget::SelectionState::focusedAndSelected:
             return true;
+
         case QnResourceWidget::SelectionState::inactiveFocused:
         {
             // We suppose item is focused in the inactive state only if
@@ -544,10 +541,7 @@ bool TabApiBackend::Private::isFocusedWidget(const QnResourceWidget* widget) con
             return !std::any_of(widgets.cbegin(), widgets.cend(),
                 [this](const QnResourceWidget* widget)
                 {
-                    const auto item = widget->item();
-                    return item
-                        && item->layout() == layout
-                        && widget->selectionState() == QnResourceWidget::SelectionState::focused;
+                    return widget->selectionState() == QnResourceWidget::SelectionState::focused;
                 });
         }
         default:
@@ -557,15 +551,11 @@ bool TabApiBackend::Private::isFocusedWidget(const QnResourceWidget* widget) con
 
 bool TabApiBackend::Private::isSyncedLayout() const
 {
-    if (!layout)
-        return false;
-
     auto streamSynchronizer = context->workbench()->windowContext()->streamSynchronizer();
 
-    const auto currentLayout = context->workbench()->currentLayout();
-    const auto state = currentLayout == layout
+    const auto state = NX_ASSERT(isCurrentLayout())
         ? streamSynchronizer->state()
-        : layout->streamSynchronizationState();
+        : layout()->streamSynchronizationState();
     return state.isSyncOn;
 }
 
@@ -575,7 +565,7 @@ ItemVector TabApiBackend::Private::itemStatesFromIds(const Ids& ids) const
     ItemVector result;
     for (const auto& id: ids)
     {
-        if (const auto item = layout->item(id))
+        if (const auto item = layout()->item(id))
             result.push_back(itemState(item));
     }
     return result;
@@ -583,11 +573,8 @@ ItemVector TabApiBackend::Private::itemStatesFromIds(const Ids& ids) const
 
 ItemVector TabApiBackend::Private::allItemStates() const
 {
-    if (!layout)
-        return detail::ItemVector();
-
     UuidList itemIds;
-    for (const auto& item: layout->items())
+    for (const auto& item: layout()->items())
         itemIds.append(item->uuid());
     return itemStatesFromIds(itemIds);
 }
@@ -600,7 +587,7 @@ ItemResult TabApiBackend::Private::itemOperationResult(
     itemResult.error = error;
 
     if (!itemId.isNull())
-        itemResult.item = itemState(layout->item(itemId));
+        itemResult.item = itemState(layout()->item(itemId));
 
     return itemResult;
 }
@@ -611,7 +598,7 @@ void TabApiBackend::Private::handleResourceWidgetAdded(QnResourceWidget* widget)
     if (!item)
         return;
 
-    if (item->layout() != layout)
+    if (!NX_ASSERT(isCurrentLayout()))
         return;
 
     const auto itemId = item->uuid();
@@ -625,7 +612,7 @@ void TabApiBackend::Private::handleResourceWidgetAdded(QnResourceWidget* widget)
     const auto handleSelectedStateChanged =
         [this, item, itemId](QnResourceWidget* widget)
         {
-            if (!layout || !widget || context->workbench()->isInLayoutChangeProcess())
+            if (!widget || context->workbench()->isInLayoutChangeProcess())
                 return;
 
             const auto state = widget->selectionState();
@@ -677,11 +664,10 @@ bool TabApiBackend::Private::hasPermissions(
 
 TabApiBackend::TabApiBackend(
     QnWorkbenchContext* context,
-    QnWorkbenchLayout* layout,
     QObject* parent)
     :
     base_type(parent),
-    d(new Private(this, context, layout))
+    d(new Private(this, context))
 {
 }
 
@@ -692,26 +678,20 @@ TabApiBackend::~TabApiBackend()
 State TabApiBackend::state() const
 {
     detail::State result;
-    if (!d->layout)
-        return result;
-
     result.items = d->allItemStates();
     result.sync = d->isSyncedLayout();
     result.selection = ItemSelection{
-        d->itemState(d->layout->item(d->focusedItem)),
+        d->itemState(d->layout()->item(d->focusedItem)),
         d->itemStatesFromIds(d->selectedItems)
     };
 
-    result.properties = propertiesState(d->layout);
+    result.properties = propertiesState(d->layout());
     return result;
 }
 
 ItemResult TabApiBackend::item(const QUuid& itemId) const
 {
-    if (!d->layout)
-        return {Error::failed(), {}};
-
-    const auto item = d->layout->item(itemId);
+    const auto item = d->layout()->item(itemId);
     return item
         ? ItemResult{Error::success(), d->itemState(item)}
         : ItemResult{cantFindItemResult(), {}};
@@ -721,9 +701,6 @@ ItemResult TabApiBackend::addItem(
     const QUuid& resourceId,
     const ItemParams& params)
 {
-    if (!d->layout)
-        return {Error::failed(), {}};
-
     const auto pool = d->context->resourcePool();
     const auto resource = pool->getResourceById(resourceId);
     if (!resource)
@@ -749,12 +726,12 @@ ItemResult TabApiBackend::addItem(
     }
 
     common::LayoutItemData itemData = layoutItemFromResource(resource,
-        /*forceCloud*/ d->layout->resource()->hasFlags(Qn::cross_system));
+        /*forceCloud*/ d->layout()->resource()->hasFlags(Qn::cross_system));
     itemData.flags = Qn::PendingGeometryAdjustment;
 
     const auto itemId = itemData.uuid.toQUuid();
     d->updateLayoutItemData(itemId, params);
-    d->layout->resource()->addItem(itemData);
+    d->layout()->resource()->addItem(itemData);
     d->updateItemParams(itemId, params);
 
     return d->itemOperationResult(Error::success(), itemId);
@@ -764,10 +741,7 @@ Error TabApiBackend::setItemParams(
     const QUuid& itemId,
     const ItemParams& params)
 {
-    if (!d->layout)
-        return Error::failed();
-
-    const auto item = d->layout->item(itemId);
+    const auto item = d->layout()->item(itemId);
     if (!item)
         return cantFindItemResult();
 
@@ -778,14 +752,11 @@ Error TabApiBackend::setItemParams(
 
 Error TabApiBackend::removeItem(const QUuid& itemId)
 {
-    if (!d->layout)
-        return Error::failed();
-
-    const auto item = d->layout->item(itemId);
+    const auto item = d->layout()->item(itemId);
     if (!item)
         return cantFindItemResult();
 
-    d->layout->removeItem(item);
+    d->layout()->removeItem(item);
     return Error::success();
 }
 
@@ -794,10 +765,7 @@ Error TabApiBackend::syncWith(const QUuid& itemId)
     if (itemId.isNull())
         return Error::invalidArguments(tr(""));
 
-    if (!d->layout)
-        return Error::failed();
-
-    const auto item = d->layout->item(itemId);
+    const auto item = d->layout()->item(itemId);
     if (!item)
         return cantFindItemResult();
 
@@ -812,24 +780,18 @@ Error TabApiBackend::syncWith(const QUuid& itemId)
 
 Error TabApiBackend::stopSyncPlay()
 {
-    if (!d->layout)
-        return Error::failed();
-
-    if (d->context->workbench()->currentLayout() == d->layout)
+    if (NX_ASSERT(d->isCurrentLayout()))
     {
         auto streamSynchronizer = d->context->workbench()->windowContext()->streamSynchronizer();
         streamSynchronizer->setState(StreamSynchronizationState::disabled());
     }
 
-    d->layout->setStreamSynchronizationState(StreamSynchronizationState::disabled());
-    return Error::success();
+    // d->layout()->setStreamSynchronizationState(StreamSynchronizationState::disabled());
+    return Error::failed();
 }
 
 Error TabApiBackend::setLayoutProperties(const LayoutProperties& properties)
 {
-    if (!d->layout)
-        return Error::failed();
-
     Qn::Permissions requiredPermissions;
     if (properties.locked.has_value())
         requiredPermissions |= Qn::EditLayoutSettingsPermission;
@@ -837,7 +799,7 @@ Error TabApiBackend::setLayoutProperties(const LayoutProperties& properties)
     if (properties.minimumSize.has_value())
         requiredPermissions |= Qn::SavePermission;
 
-    const auto layoutResource = d->layout->resource();
+    const auto layoutResource = d->layout()->resource();
     if (!d->hasPermissions(layoutResource, requiredPermissions))
         return Error::denied();
 
@@ -852,13 +814,10 @@ Error TabApiBackend::setLayoutProperties(const LayoutProperties& properties)
 
 Error TabApiBackend::saveLayout()
 {
-    if (!d->layout)
-        return Error::failed();
-
-    if (!d->hasPermissions(d->layout->resource(), Qn::SavePermission))
+    const auto layoutResource = d->layout()->resource();
+    if (!d->hasPermissions(layoutResource, Qn::SavePermission))
         return Error::denied();
 
-    const auto layoutResource = d->layout->resource();
     const auto menu = d->context->menu();
     const bool success = menu->triggerIfPossible(ui::action::SaveLayoutAction, layoutResource);
     return success
