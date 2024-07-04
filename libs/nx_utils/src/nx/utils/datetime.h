@@ -53,4 +53,17 @@ NX_UTILS_API std::chrono::system_clock::time_point parseDateTime(std::string_vie
 
 NX_UTILS_API std::string formatDateTime(std::chrono::steady_clock::time_point tp);
 
+/**
+ * @param dateTime Can be one of following:
+ * - millis since since 1970-01-01
+ * - date in ISO format (YYYY-MM-DDTHH:mm:ss)
+ * - special value "now". In this case DATETIME_NOW is returned
+ * - negative value. In this case value returned "as is"
+ * @return msec since epoch
+*/
+NX_UTILS_API qint64 parseDateTimeMsec(const QString& dateTimeStr);
+
+/** Same as parseDateTimeMsec(), but return usec. */
+NX_UTILS_API qint64 parseDateTimeUsec(const QString& dateTimeStr);
+
 } // namespace nx::utils

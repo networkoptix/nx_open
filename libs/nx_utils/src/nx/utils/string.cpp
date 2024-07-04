@@ -4,19 +4,19 @@
 
 #include <array>
 #include <cmath>
-#include <string>
-#include <sstream>
 #include <iomanip>
+#include <sstream>
+#include <string>
 
 #include <QtCore/QByteArray>
 #include <QtCore/QRegularExpression>
 
-#include <nx/utils/log/assert.h>
+#include <nx/kit/utils.h>
 #include <nx/utils/datetime.h>
+#include <nx/utils/exception.h>
+#include <nx/utils/log/assert.h>
 #include <nx/utils/random.h>
 #include <nx/utils/std/optional.h>
-#include <nx/utils/exception.h>
-#include <nx/kit/utils.h>
 
 using nx::kit::utils::isSpaceOrControlChar;
 
@@ -46,39 +46,6 @@ QString replaceCharacters(
     }
 
     return result;
-}
-
-qint64 parseDateTimeUsec(const QString& dateTimeStr)
-{
-    constexpr qint64 kUSecPerMSec = 1000;
-
-    if (dateTimeStr.toLower().trimmed() == "now")
-    {
-        return DATETIME_NOW;
-    }
-    else if (dateTimeStr.contains('T') || (dateTimeStr.contains('-') && !dateTimeStr.startsWith('-')))
-    {
-        QDateTime tmpDateTime = QDateTime::fromString(trimAndUnquote(dateTimeStr), Qt::ISODateWithMs);
-        return tmpDateTime.toMSecsSinceEpoch() * kUSecPerMSec;
-    }
-    else
-    {
-        int64_t timestampMsec = dateTimeStr.toLongLong();
-        if (timestampMsec == DATETIME_NOW)
-            return DATETIME_NOW;
-        return timestampMsec * kUSecPerMSec;
-    }
-}
-
-qint64 parseDateTimeMsec(const QString& dateTimeStr)
-{
-    static const qint64 kUsecPerMs = 1000;
-
-    qint64 usecSinceEpoch = parseDateTimeUsec(dateTimeStr);
-    if (usecSinceEpoch < 0 || usecSinceEpoch == DATETIME_NOW)
-        return usecSinceEpoch;  //special values are returned "as is"
-
-    return usecSinceEpoch / kUsecPerMs;
 }
 
 int parseInt(const QString& string, int base)

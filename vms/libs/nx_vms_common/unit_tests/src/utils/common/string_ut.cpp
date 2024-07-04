@@ -7,6 +7,7 @@
 
 #include <nx/fusion/model_functions.h>
 #include <nx/string.h>
+#include <nx/utils/datetime.h>
 #include <nx/utils/string.h>
 #include <nx/vms/event/helpers.h>
 

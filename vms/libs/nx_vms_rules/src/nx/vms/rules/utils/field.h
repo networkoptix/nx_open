@@ -59,6 +59,7 @@ static constexpr auto kSourceFieldName = "source";
 static constexpr auto kStateFieldName = "state";
 static constexpr auto kTagsFieldName = "tags";
 static constexpr auto kTextFieldName = "text";
+static constexpr auto kTimestampFieldName = "timestamp";
 static constexpr auto kTooltipFieldName = "tooltip";
 static constexpr auto kUrlFieldName = "url";
 static constexpr auto kUsersFieldName = "users";
