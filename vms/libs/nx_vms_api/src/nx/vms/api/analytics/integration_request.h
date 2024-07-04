@@ -8,13 +8,14 @@
 #include <QtCore/QString>
 
 #include <nx/fusion/model_functions_fwd.h>
-#include <nx/fusion/serialization/json_fwd.h>
 #include <nx/fusion/serialization/json_functions.h>
+#include <nx/fusion/serialization/json_fwd.h>
 #include <nx/reflect/instrument.h>
 #include <nx/reflect/json.h>
 #include <nx/utils/serialization/qjson.h>
 #include <nx/utils/serialization/qt_core_types.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/api/analytics/device_agent_manifest.h>
 #include <nx/vms/api/analytics/engine_manifest.h>
 #include <nx/vms/api/analytics/plugin_manifest.h>
 

@@ -66,6 +66,8 @@ struct NX_VMS_API DeviceAgentManifest
 
     /**%apidoc[opt] */
     TypeLibrary typeLibrary;
+
+    bool operator==(const DeviceAgentManifest& other) const = default;
 };
 
 NX_VMS_API std::vector<ManifestError> validate(const DeviceAgentManifest& deviceAgentManifest);
