@@ -990,7 +990,7 @@ void WebViewController::initClientApiSupport(
     registerApiObjectWithFactory("vms.tab",
         [=](QObject* parent) -> QObject*
         {
-            return new jsapi::Tab(context, context->workbench()->currentLayout(), parent);
+            return new jsapi::Tab(context, parent);
         });
 
     registerApiObjectWithFactory("vms.resources",
