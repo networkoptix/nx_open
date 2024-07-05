@@ -656,24 +656,20 @@
       <translation type="unfinished">Web Page Port</translation>
     </message>
     <message>
-      <source>Disable import</source>
-      <translation type="unfinished">Disable import</translation>
-    </message>
-    <message>
-      <source>Import Video from Device</source>
-      <translation type="unfinished">Import Video from Device</translation>
-    </message>
-    <message>
-      <source>Import camera or server offline periods</source>
-      <translation type="unfinished">Import camera or server offline periods</translation>
-    </message>
-    <message>
       <source>Do not send Stop PTZ command</source>
       <translation>Не отправлять команду остановки PTZ</translation>
     </message>
     <message>
       <source>Do not record audio</source>
       <translation>Не записывать звук</translation>
+    </message>
+    <message>
+      <source>Import from Device</source>
+      <translation>Импорт с устройства</translation>
+    </message>
+    <message>
+      <source>Import video automatically</source>
+      <translation type="unfinished">Import video automatically</translation>
     </message>
   </context>
   <context>

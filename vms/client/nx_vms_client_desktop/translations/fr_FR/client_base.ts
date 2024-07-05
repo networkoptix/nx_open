@@ -12096,8 +12096,8 @@ N'épinglez pas ce certificat si vous n'avez pas modifié le certificat SSL du s
       <translation>dans %1</translation>
     </message>
     <message>
-      <source>You can copy the Access Link below, and share it with the implied user.</source>
-      <translation>Vous pouvez copier le lien d'accès ci-dessous et le partager avec les utilisateurs auxquels vous accordez l'autorisation.</translation>
+      <source>Copy the Access Link and share it with intended user</source>
+      <translation>Copiez le lien d'accès et partagez-le avec l'utilisateur prévu</translation>
     </message>
   </context>
   <context>
@@ -12348,6 +12348,11 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
       <translation>Nous préparons des fichiers pour le processus d'exportation. S.V.P. patienter quelques secondes.</translation>
+    </message>
+    <message>
+      <source>%1 filename length is more than %2 characters.</source>
+      <comment>%1 is file name</comment>
+      <translation>la longueur du nom de fichier %1 est supérieure à %2 caractères.</translation>
     </message>
   </context>
   <context>

@@ -12451,8 +12451,8 @@ Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL s
       <translation>w %1</translation>
     </message>
     <message>
-      <source>You can copy the Access Link below, and share it with the implied user.</source>
-      <translation type="unfinished">You can copy the Access Link below, and share it with the implied user.</translation>
+      <source>Copy the Access Link and share it with intended user</source>
+      <translation type="unfinished">Copy the Access Link and share it with intended user</translation>
     </message>
   </context>
   <context>
@@ -12705,6 +12705,11 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
       <translation>Przygotowujemy pliki do eksportu. Proszę zaczekać kilka sekund.</translation>
+    </message>
+    <message>
+      <source>%1 filename length is more than %2 characters.</source>
+      <comment>%1 is file name</comment>
+      <translation type="unfinished">%1 filename length is more than %2 characters.</translation>
     </message>
   </context>
   <context>

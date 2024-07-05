@@ -656,24 +656,20 @@
       <translation>網頁埠號</translation>
     </message>
     <message>
-      <source>Disable import</source>
-      <translation>停用匯入</translation>
-    </message>
-    <message>
-      <source>Import Video from Device</source>
-      <translation>從裝置匯入影片</translation>
-    </message>
-    <message>
-      <source>Import camera or server offline periods</source>
-      <translation>匯入攝影機或伺服器離線期間</translation>
-    </message>
-    <message>
       <source>Do not send Stop PTZ command</source>
       <translation>不發送停止 PTZ 命令</translation>
     </message>
     <message>
       <source>Do not record audio</source>
       <translation>不錄製音訊</translation>
+    </message>
+    <message>
+      <source>Import from Device</source>
+      <translation type="unfinished">Import from Device</translation>
+    </message>
+    <message>
+      <source>Import video automatically</source>
+      <translation>自動匯入錄影資料</translation>
     </message>
   </context>
   <context>

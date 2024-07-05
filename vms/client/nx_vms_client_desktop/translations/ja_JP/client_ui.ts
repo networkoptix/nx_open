@@ -656,24 +656,20 @@
       <translation>Webページポート</translation>
     </message>
     <message>
-      <source>Disable import</source>
-      <translation>インポートを無効化</translation>
-    </message>
-    <message>
-      <source>Import Video from Device</source>
-      <translation>デバイスから映像をインポート</translation>
-    </message>
-    <message>
-      <source>Import camera or server offline periods</source>
-      <translation>カメラまたはサーバーのオフライン期間をインポートする</translation>
-    </message>
-    <message>
       <source>Do not send Stop PTZ command</source>
       <translation>PTZ 停止コマンドを送信しない</translation>
     </message>
     <message>
       <source>Do not record audio</source>
       <translation>音声を録音しない</translation>
+    </message>
+    <message>
+      <source>Import from Device</source>
+      <translation>デバイスからインポート</translation>
+    </message>
+    <message>
+      <source>Import video automatically</source>
+      <translation>映像を自動的にインポート</translation>
     </message>
   </context>
   <context>

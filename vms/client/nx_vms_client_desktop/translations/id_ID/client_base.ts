@@ -11916,8 +11916,8 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
       <translation>in %1</translation>
     </message>
     <message>
-      <source>You can copy the Access Link below, and share it with the implied user.</source>
-      <translation>Anda dapat menyalin Access Link di bawah, dan membagikannya dengan pengguna tersirat.</translation>
+      <source>Copy the Access Link and share it with intended user</source>
+      <translation>Salin Link Akses dan bagikan dengan pengguna yang dituju</translation>
     </message>
   </context>
   <context>
@@ -12166,6 +12166,11 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
       <translation>Kami sedang mempersiapkan file untuk proses ekspor. Harap tunggu beberapa detik.</translation>
+    </message>
+    <message>
+      <source>%1 filename length is more than %2 characters.</source>
+      <comment>%1 is file name</comment>
+      <translation type="unfinished">%1 filename length is more than %2 characters.</translation>
     </message>
   </context>
   <context>

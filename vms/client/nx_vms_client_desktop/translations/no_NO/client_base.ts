@@ -12092,8 +12092,8 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
       <translation>i %1</translation>
     </message>
     <message>
-      <source>You can copy the Access Link below, and share it with the implied user.</source>
-      <translation type="unfinished">You can copy the Access Link below, and share it with the implied user.</translation>
+      <source>Copy the Access Link and share it with intended user</source>
+      <translation>Kopier tilgangslenken og del den med tiltenkt bruker</translation>
     </message>
   </context>
   <context>
@@ -12343,6 +12343,11 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
       <translation>Vi forbereder filer for eksportprosessen. Vent noen sekunder.</translation>
+    </message>
+    <message>
+      <source>%1 filename length is more than %2 characters.</source>
+      <comment>%1 is file name</comment>
+      <translation>%1 filnavnlengden er mer enn %2 tegn.</translation>
     </message>
   </context>
   <context>

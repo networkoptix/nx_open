@@ -11915,8 +11915,8 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
       <translation>trong %1</translation>
     </message>
     <message>
-      <source>You can copy the Access Link below, and share it with the implied user.</source>
-      <translation>Bạn có thể sao chép Liên kết truy cập bên dưới và chia sẻ nó với người dùng mà bạn cấp quyền.</translation>
+      <source>Copy the Access Link and share it with intended user</source>
+      <translation type="unfinished">Copy the Access Link and share it with intended user</translation>
     </message>
   </context>
   <context>
@@ -12165,6 +12165,11 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
       <translation>Chúng tôi đang chuẩn bị các tập tin cho quá trình xuất khẩu. Xin vui lòng chờ trong vài giây.</translation>
+    </message>
+    <message>
+      <source>%1 filename length is more than %2 characters.</source>
+      <comment>%1 is file name</comment>
+      <translation type="unfinished">%1 filename length is more than %2 characters.</translation>
     </message>
   </context>
   <context>

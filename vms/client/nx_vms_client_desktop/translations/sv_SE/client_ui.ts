@@ -656,24 +656,20 @@
       <translation>Porten för webbsida</translation>
     </message>
     <message>
-      <source>Disable import</source>
-      <translation>Inaktivera import</translation>
-    </message>
-    <message>
-      <source>Import Video from Device</source>
-      <translation>Importera video från enheten</translation>
-    </message>
-    <message>
-      <source>Import camera or server offline periods</source>
-      <translation>Importera kamera eller server offline perioder</translation>
-    </message>
-    <message>
       <source>Do not send Stop PTZ command</source>
       <translation>Skicka inte Stop PTZ-kommandot</translation>
     </message>
     <message>
       <source>Do not record audio</source>
       <translation>Spela inte in ljud</translation>
+    </message>
+    <message>
+      <source>Import from Device</source>
+      <translation>Importera från enhet</translation>
+    </message>
+    <message>
+      <source>Import video automatically</source>
+      <translation>Importera video automatiskt</translation>
     </message>
   </context>
   <context>

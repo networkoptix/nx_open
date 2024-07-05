@@ -656,24 +656,20 @@
       <translation>Port Halaman Web</translation>
     </message>
     <message>
-      <source>Disable import</source>
-      <translation>Nonaktifkan impor</translation>
-    </message>
-    <message>
-      <source>Import Video from Device</source>
-      <translation>Impor Video dari Perangkat</translation>
-    </message>
-    <message>
-      <source>Import camera or server offline periods</source>
-      <translation>Impor periode offline kamera atau server</translation>
-    </message>
-    <message>
       <source>Do not send Stop PTZ command</source>
       <translation>Jangan kirim perintah Stop PTZ</translation>
     </message>
     <message>
       <source>Do not record audio</source>
       <translation>Jangan merekam audio</translation>
+    </message>
+    <message>
+      <source>Import from Device</source>
+      <translation>Impor dari Perangkat</translation>
+    </message>
+    <message>
+      <source>Import video automatically</source>
+      <translation>Impor video secara otomatis</translation>
     </message>
   </context>
   <context>
