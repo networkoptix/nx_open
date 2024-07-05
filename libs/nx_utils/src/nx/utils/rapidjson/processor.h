@@ -49,6 +49,13 @@ concept ObjectPredicateType = requires(T t, ObjectIterator& memberIt)
 template<typename T>
 concept PredicateType = ArrayPredicateType<T> || ObjectPredicateType<T>;
 
+enum class NX_UTILS_API ElementWithExistingName
+{
+    add,
+    ignore,
+    replace
+};
+
 namespace details {
 
 template<typename T>
@@ -354,6 +361,7 @@ struct ValuePtrHelper
         return true;
     }
 
+    template<ElementWithExistingName AddingBehavior>
     bool add(::rapidjson::Value&& name,
         ::rapidjson::Value&& value,
         ::rapidjson::Document::AllocatorType& alloc) const
@@ -361,6 +369,19 @@ struct ValuePtrHelper
     {
         if (!isValid())
             return false;
+
+        if constexpr (AddingBehavior != ElementWithExistingName::add)
+        {
+            auto itr = m_ptr->FindMember(name.GetString());
+            if (itr != end())
+            {
+                if constexpr (AddingBehavior == ElementWithExistingName::ignore)
+                    return false;
+
+                return set(itr, std::move(value)); //< Replace.
+            }
+        }
+
         m_ptr->AddMember(std::move(name), std::move(value), alloc);
         return true;
     }
@@ -477,7 +498,7 @@ private:
     ValueHelper m_val;
 };
 
-template<ReturnCount Count>
+template<ReturnCount Count, ElementWithExistingName AddingBehavior>
 class AddValueToObject
 {
 public:
@@ -492,14 +513,26 @@ public:
     void execute(IteratorType& it, const ValuePtrHelper<IteratorType>& ptrHelper)
     {
         ObjectPtrHelper curr{ptrHelper.get(it)};
-        addToRes<returnCount>(result, curr.add(std::move(m_name.get<returnCount>()), std::move(m_val.get<returnCount>()), m_val.allocator));
+        addToRes<returnCount>(
+            result,
+            curr.add<AddingBehavior>(
+                std::move(m_name.get<returnCount>()),
+                std::move(m_val.get<returnCount>()),
+                m_val.allocator)
+        );
         ++it;
     }
 
     void execute(const ::rapidjson::Pointer& path, ::rapidjson::Value* root)
     {
         ObjectPtrHelper curr = path.Get(*root);
-        addToRes<returnCount>(result, curr.add(std::move(m_name.get<returnCount>()), std::move(m_val.get<returnCount>()), m_val.allocator));
+        addToRes<returnCount>(
+            result,
+            curr.add<AddingBehavior>(
+                std::move(m_name.get<returnCount>()),
+                std::move(m_val.get<returnCount>()),
+                m_val.allocator)
+        );
     }
 
 private:
@@ -845,28 +878,48 @@ public:
             [](const auto& t) { return t; });
     }
 
-    template<class T, PredicateType... Predicates>
+    /*
+     * RFC 8259 ( https://www.rfc-editor.org/rfc/rfc8259#section-4 ) says: "The names within an
+     * object SHOULD be unique.". So it is recommended to use unique names in the object, but it
+     * is not obligatory. Due to this uncertainty, addValueToObject can behave in several different
+     * manners:
+     *   - add     : the new element will be added even if an element with the same name already
+     *               exists (equals to rapidjson AddMember behavior)
+     *   - replace : (default option) the existing element value with the same name will be
+     *               replaced with the new one
+     *   - ignore  : if the element with the same name already exists, no changes will be made,
+     *               function will return false
+     */
+    template<
+        ElementWithExistingName AddingBehavior = ElementWithExistingName::replace,
+        class T,
+        PredicateType... Predicates
+    >
     bool addValueToObject(
         const std::string& name, T&& newValue, const std::string& path, Predicates... preds)
     {
         details::Path parsedPath{path, preds...};
         if (!parsedPath.isValid())
             return false;
-        details::AddValueToObject<details::ReturnCount::One> action{
+        details::AddValueToObject<details::ReturnCount::One, AddingBehavior> action{
             details::ValueHelper(name, m_data->GetAllocator()),
             details::ValueHelper(std::move(newValue), m_data->GetAllocator())};
         applyActionWithCondition(parsedPath, m_curr, &action);
         return action.result;
     }
 
-    template<class T, PredicateType... Predicates>
+    template<
+        ElementWithExistingName AddingBehavior = ElementWithExistingName::replace,
+        class T,
+        PredicateType... Predicates
+    >
     int addValueToObjectAll(
         const std::string& name, T&& newValue, const std::string& path, Predicates... preds)
     {
         details::Path parsedPath{path, preds...};
         if (!parsedPath.isValid())
             return 0;
-        details::AddValueToObject<details::ReturnCount::All> action{
+        details::AddValueToObject<details::ReturnCount::All, AddingBehavior> action{
             details::ValueHelper(name, m_data->GetAllocator()),
             details::ValueHelper(std::move(newValue), m_data->GetAllocator())};
         applyActionWithCondition(parsedPath, m_curr, &action);
