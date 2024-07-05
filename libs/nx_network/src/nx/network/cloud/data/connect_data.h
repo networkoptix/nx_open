@@ -125,7 +125,7 @@ struct NX_NETWORK_API ConnectResponseData
      */
     CloudConnectVersion cloudConnectVersion = kCurrentCloudConnectVersion;
 
-    /**%apidoc:string[opt] Endpoint of a different mediator node to try. */
+    /**%apidoc:string Endpoint of a different mediator node to try. */
     std::optional<network::SocketAddress> alternateMediatorEndpointStunUdp;
 };
 

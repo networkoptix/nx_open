@@ -83,7 +83,7 @@ struct NX_VMS_API OtherSiteRequest
     /**%apidoc[opt] Whether discovered Sites should be in the list. */
     bool showDiscovered = true;
 
-    /**%apidoc:stringArray[opt] Endpoint to ping and add into the result. */
+    /**%apidoc:stringArray Endpoint to ping and add into the result. */
     std::optional<nx::vms::api::json::ValueOrArray<QString>> endpoint;
 };
 #define OtherSiteRequest_Fields (showDiscovered)(endpoint)

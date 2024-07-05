@@ -32,7 +32,7 @@ struct NX_VMS_API StoragePurgeStatusData
     State state = State::idle;
     /**%apidoc:any */
     LastPurgeData lastPurgeData;
-    /**%apidoc:any */
+    /**%apidoc:float */
     double progress = 0.0;
 };
 
