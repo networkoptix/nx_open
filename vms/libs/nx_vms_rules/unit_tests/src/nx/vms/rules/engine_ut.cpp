@@ -144,6 +144,17 @@ TEST_F(EngineTest, descriptionWithoutIdMustNotBeRegistered)
     ASSERT_TRUE(engine->actions().empty());
 }
 
+TEST_F(EngineTest, descriptionWithoutNameMustNotBeRegistered)
+{
+    ItemDescriptor descriptorWithoutName {.id = "nx.descriptor.id"};
+
+    ASSERT_FALSE(engine->registerEvent(descriptorWithoutName, testEventConstructor));
+    ASSERT_FALSE(engine->registerAction(descriptorWithoutName, testActionConstructor));
+
+    ASSERT_TRUE(engine->events().empty());
+    ASSERT_TRUE(engine->actions().empty());
+}
+
 TEST_F(EngineTest, validDescriptorMustBeRegistered)
 {
     ItemDescriptor eventDescriptor{

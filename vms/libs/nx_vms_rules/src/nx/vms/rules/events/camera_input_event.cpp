@@ -65,7 +65,7 @@ QString CameraInputEvent::extendedCaption(common::SystemContext* context) const
     return tr("Input on %1").arg(resourceName);
 }
 
-const ItemDescriptor& CameraInputEvent::manifest(common::SystemContext* context)
+ItemDescriptor CameraInputEvent::manifest(common::SystemContext* context)
 {
     auto getDisplayName =
         [context = QPointer<common::SystemContext>(context)]
@@ -79,7 +79,7 @@ const ItemDescriptor& CameraInputEvent::manifest(common::SystemContext* context)
                 tr("Input Signal on Camera"));
         };
 
-    static const auto kDescriptor = ItemDescriptor{
+    auto kDescriptor = ItemDescriptor{
         .id = utils::type<CameraInputEvent>(),
         .displayName = TranslatableString(getDisplayName),
         .flags = ItemFlag::prolonged,

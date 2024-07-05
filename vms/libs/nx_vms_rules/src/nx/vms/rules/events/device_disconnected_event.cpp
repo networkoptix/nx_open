@@ -86,7 +86,7 @@ QString DeviceDisconnectedEvent::name(common::SystemContext* context)
         tr("Camera Disconnected"));
 }
 
-const ItemDescriptor& DeviceDisconnectedEvent::manifest(common::SystemContext* context)
+ItemDescriptor DeviceDisconnectedEvent::manifest(common::SystemContext* context)
 {
     auto getDisplayName =
         [context = QPointer<common::SystemContext>(context)]
@@ -109,7 +109,7 @@ const ItemDescriptor& DeviceDisconnectedEvent::manifest(common::SystemContext* c
                 tr("Camera"));
         };
 
-    static const auto kDescriptor = ItemDescriptor{
+    auto kDescriptor = ItemDescriptor{
         .id = utils::type<DeviceDisconnectedEvent>(),
         .groupId = kDeviceIssueEventGroup,
         .displayName = TranslatableString(getDisplayName),

@@ -45,6 +45,8 @@ public:
 
     operator QString() const { return value(); }
 
+    bool empty() const { return value().isEmpty(); };
+
     inline bool operator==(const TranslatableString& other) const
     {
         return value() == other.value();
