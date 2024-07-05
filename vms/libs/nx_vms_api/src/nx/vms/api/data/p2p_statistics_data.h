@@ -13,8 +13,6 @@ struct NX_VMS_API P2pStatisticsData
 {
     qint64 totalBytesSent = 0;
     qint64 totalDbData = 0;
-
-    /**%apidoc:object */
     QMap<QString, qint64> p2pCounters;
 };
 #define P2pStatisticsData_Fields \
