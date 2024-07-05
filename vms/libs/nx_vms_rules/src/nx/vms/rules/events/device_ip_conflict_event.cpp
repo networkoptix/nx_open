@@ -91,7 +91,7 @@ QString DeviceIpConflictEvent::name(common::SystemContext* context)
         tr("Camera IP Conflict", "", 1));
 }
 
-const ItemDescriptor& DeviceIpConflictEvent::manifest(common::SystemContext* context)
+ItemDescriptor DeviceIpConflictEvent::manifest(common::SystemContext* context)
 {
     auto getDisplayName =
         [context = QPointer<common::SystemContext>(context)]
@@ -102,7 +102,7 @@ const ItemDescriptor& DeviceIpConflictEvent::manifest(common::SystemContext* con
             return DeviceIpConflictEvent::name(context);
         };
 
-    static const auto kDescriptor = ItemDescriptor{
+    auto kDescriptor = ItemDescriptor{
         .id = utils::type<DeviceIpConflictEvent>(),
         .groupId = kDeviceIssueEventGroup,
         .displayName = TranslatableString(getDisplayName),

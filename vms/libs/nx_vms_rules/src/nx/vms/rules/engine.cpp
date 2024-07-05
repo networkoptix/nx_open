@@ -43,9 +43,10 @@ using namespace std::chrono;
 
 namespace {
 
+// TODO: #amalov Extend this check with BuiltinTypesTest checks for external manifest registration.
 bool isDescriptorValid(const ItemDescriptor& descriptor)
 {
-    if (descriptor.id.isEmpty())
+    if (descriptor.id.isEmpty() || descriptor.displayName.empty())
         return false;
 
     std::set<QString> uniqueFields;

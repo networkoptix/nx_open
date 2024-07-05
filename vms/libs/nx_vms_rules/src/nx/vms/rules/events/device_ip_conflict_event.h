@@ -32,7 +32,7 @@ public:
     virtual QString resourceKey() const override;
     virtual QVariantMap details(common::SystemContext* context) const override;
 
-    static const ItemDescriptor& manifest(common::SystemContext* context);
+    static ItemDescriptor manifest(common::SystemContext* context);
 
 private:
     QString caption(common::SystemContext* context) const;
