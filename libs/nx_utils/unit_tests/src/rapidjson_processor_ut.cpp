@@ -504,6 +504,48 @@ TEST(Processor, AddToObject)
         Cont("name", QStringList{"C", "F"}));
     ASSERT_EQ(s3, 2);
     ASSERT_EQ(r.toStdString(), jsonString.toStdString());
+
+    // Test different behavior when add value with existing name
+    {
+        // If we try to add to object element with existing name nothing happens
+        Processor small{smallJson.toUtf8()};
+        auto res = small.addValueToObject<ElementWithExistingName::ignore>("name", "new name", "");
+        ASSERT_FALSE(res);
+        ASSERT_EQ(small.toStdString(), smallJsonString.toStdString());
+    }
+    {
+        // Replace element with existing name to new value
+        Processor small{smallJson.toUtf8()};
+        auto res = small.addValueToObject<ElementWithExistingName::replace>("name", "new name", "");
+        ASSERT_TRUE(res);
+        smallJsonString.replace("smallObject", "new name");
+        ASSERT_EQ(small.toStdString(), smallJsonString.toStdString());
+    }
+    smallJsonString = smallJson.simplified().remove(" ");
+    {
+        // Use default behavior of addMember: two fields in object with the same manes as a result of operation
+        Processor small{smallJson.toUtf8()};
+        auto res = small.addValueToObject<ElementWithExistingName::add>("name", "new name", "");
+        ASSERT_TRUE(res);
+        insertAfterPeviousElement(
+            smallJsonString, R"("sections":[{"name":"S1"},{"name":"S2"}])", R"(,"name":"new name")");
+        ASSERT_EQ(small.toStdString(), smallJsonString.toStdString());
+    }
+
+    // Two ways of getting values will give two different results when in object present two fields with same name
+    {
+        Processor small{smallJson.toUtf8()};
+        small.addValueToObject<ElementWithExistingName::add>("name", "new name", "");
+
+        // Only first element
+        auto getRes1 = small.getAllValues<std::string>("/name");
+        std::vector<std::string> expectedRes1{"smallObject"};
+        ASSERT_EQ(getRes1, expectedRes1);
+        // Both elements with same names
+        auto getRes2 = small.getAllValues<std::string>("/[?]", NameCont("name"));
+        std::vector<std::string> expectedRes2{"smallObject", "new name"};
+        ASSERT_EQ(getRes2, expectedRes2);
+    }
 }
 
 TEST(Processor, AddToArray)
