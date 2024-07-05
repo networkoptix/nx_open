@@ -513,8 +513,11 @@ bool isDefaultExpertSettings(const State& state)
     if (!state.expert.forcedSecondaryProfile.valueOr({}).isEmpty())
         return false;
 
-    if (state.expert.remoteArchiveAutoImportEnabled.valueOr(false))
-        return false;
+    {
+        const bool expected = QnSecurityCamResource::kRemoteArchiveSynchronizationEnabledByDefault;
+        if (state.expert.remoteArchiveAutoImportEnabled.valueOr(expected) != expected)
+            return false;
+    }
 
     return state.expert.rtpTransportType.hasValue()
         && state.expert.rtpTransportType() == vms::api::RtpTransportType::automatic;

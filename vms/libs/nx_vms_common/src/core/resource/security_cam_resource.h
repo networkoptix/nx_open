@@ -41,6 +41,7 @@ protected:
 
 public:
     static constexpr int kDefaultMaxFps = 15;
+    static constexpr bool kRemoteArchiveSynchronizationEnabledByDefault = true;
     static const Qn::LicenseType kDefaultLicenseType;
     static QnUuid makeCameraIdFromPhysicalId(const QString& physicalId);
 
@@ -428,7 +429,7 @@ public:
     QnUuid preferredServerId() const;
 
     void synchronizeRemoteArchiveOnce();
-    void setRemoteArchiveSynchronizationEnabled(bool isEnabled);
+    void setRemoteArchiveSynchronizationEnabled(bool value);
     bool isRemoteArchiveSynchronizationEnabled() const;
 
     /**
