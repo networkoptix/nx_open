@@ -6,12 +6,13 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 
-struct QnMacAndDeviceClass {
+struct QnMacAndDeviceClass
+{
     QnMacAndDeviceClass() {}
 
     QnMacAndDeviceClass(const QString &_class, const QString &_mac)
         : xclass(_class),
-          mac(_mac)
+        mac(_mac)
     {}
 
     QString xclass;
@@ -23,7 +24,8 @@ QN_FUSION_DECLARE_FUNCTIONS(QnMacAndDeviceClass, (json))
 
 typedef std::vector<QnMacAndDeviceClass> QnMacAndDeviceClassList;
 
-struct QnHardwareInfo  {
+struct QnHardwareInfo
+{
     QString boardID;
     QString boardUUID;
     QString compatibilityBoardUUID;
