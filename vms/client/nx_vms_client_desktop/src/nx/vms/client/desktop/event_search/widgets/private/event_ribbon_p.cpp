@@ -342,6 +342,7 @@ void EventRibbon::Private::updateTile(int index)
     widget->setCloseable(modelIndex.data(Qn::RemovableRole).toBool());
     widget->setAction(modelIndex.data(Qn::CommandActionRole).value<CommandActionPtr>());
     widget->setAdditionalAction(modelIndex.data(Qn::AdditionalActionRole).value<CommandActionPtr>());
+    widget->setOnCloseAction(modelIndex.data(Qn::OnCloseActionRole).value<CommandActionPtr>());
     widget->setFooterEnabled(m_footersEnabled);
 
     setHelpTopic(widget, modelIndex.data(Qn::HelpTopicIdRole).toInt());

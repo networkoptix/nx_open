@@ -253,6 +253,7 @@ public:
         PreviewIdRole = Qn::ItemDataRoleCount,
         CommandActionRole,
         AdditionalActionRole,
+        OnCloseActionRole,
         FlatFilteredAttributeListRole
     };
 
@@ -464,6 +465,13 @@ QVariant RightPanelModelsAdapter::data(const QModelIndex& index, int role) const
         {
             return CommandAction::createQmlAction(
                 data(index, Qn::AdditionalActionRole).value<CommandActionPtr>(),
+                core::appContext()->qmlEngine()).toVariant();
+        }
+
+        case Private::OnCloseActionRole:
+        {
+            return CommandAction::createQmlAction(
+                data(index, Qn::OnCloseActionRole).value<CommandActionPtr>(),
                 core::appContext()->qmlEngine()).toVariant();
         }
 

@@ -191,6 +191,7 @@ constexpr auto nxReflectVisitAllEnumItems(ItemDataRole*, Visitor&& visitor)
         IDR_ITEM(AdditionalTextRole),
         IDR_ITEM(RemovableRole),
         IDR_ITEM(CommandActionRole),
+        IDR_ITEM(OnCloseActionRole),
         IDR_ITEM(TimeoutRole),
         IDR_ITEM(BusyIndicatorVisibleRole),
         IDR_ITEM(ProgressValueRole),

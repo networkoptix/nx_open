@@ -20,8 +20,13 @@
 #include <nx/vms/client/desktop/workbench/handlers/notification_action_handler.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/intercom/utils.h>
+#include <nx/vms/event/actions/actions_fwd.h>
+#include <nx/vms/event/actions/system_health_action.h>
 #include <nx/vms/event/aggregation_info.h>
 #include <nx/vms/event/strings_helper.h>
+#include <nx_ec/data/api_conversion_functions.h>
+#include <nx_ec/managers/abstract_event_rules_manager.h>
+#include <transaction/message_bus_adapter.h>
 #include <utils/common/delayed.h>
 
 namespace nx::vms::client::desktop {
@@ -128,7 +133,7 @@ void CallNotificationsListModel::Private::addNotification(
             const auto intercomLayoutId = nx::vms::common::calculateIntercomLayoutId(camera);
             eventData.actionParameters =
                 system()->resourcePool()->getResourceById(intercomLayoutId);
-            eventData.removable = false;
+            eventData.removable = true;
 
             eventData.extraAction = CommandActionPtr(new CommandAction());
             eventData.extraAction->setText(tr("Open"));
@@ -170,6 +175,30 @@ void CallNotificationsListModel::Private::addNotification(
 
             connect(eventData.extraAction.data(), &CommandAction::triggered,
                 [this, openDoorActionHandler]() { executeLater(openDoorActionHandler, this); });
+
+            eventData.onCloseAction = CommandActionPtr(new CommandAction());
+
+            const auto rejectCallActionHandler =
+                [this, camera]()
+                {
+                    vms::event::SystemHealthActionPtr broadcastAction(
+                        new vms::event::SystemHealthAction(
+                            MessageType::rejectIntercomCall,
+                            camera->getId()));
+
+                    if (const auto connection = system()->messageBusConnection())
+                    {
+                        const auto manager = connection->getEventRulesManager(
+                            nx::network::rest::kSystemSession);
+                        nx::vms::api::EventActionData actionData;
+                        ec2::fromResourceToApi(broadcastAction, actionData);
+                        manager->broadcastEventAction(actionData,
+                            [](int /*handle*/, ec2::ErrorCode) {});
+                    }
+                };
+
+            connect(eventData.onCloseAction.data(), &CommandAction::triggered,
+                [this, rejectCallActionHandler]() { executeLater(rejectCallActionHandler, this); });
 
             m_soundController.play("doorbell.mp3");
 

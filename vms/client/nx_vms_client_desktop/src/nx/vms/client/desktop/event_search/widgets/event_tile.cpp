@@ -209,7 +209,14 @@ EventTile::EventTile(QWidget* parent):
     ui->nameLabel->ensurePolished();
     d->defaultTitlePalette = ui->nameLabel->palette();
 
-    connect(d->closeButton, &QPushButton::clicked, this, &EventTile::closeRequested);
+    connect(d->closeButton, &QAbstractButton::clicked, this,
+        [this]
+        {
+            if (d->onCloseAction)
+                d->onCloseAction->trigger();
+
+            emit closeRequested();
+        });
 
     const auto activateLink =
         [this](const QString& link)
@@ -495,6 +502,11 @@ void EventTile::setAdditionalAction(const CommandActionPtr& value)
     ui->additionalActionButton->setAction(d->additionalAction.get());
     ui->additionalActionButton->setHidden(!d->additionalAction);
     ui->additionalActionButton->setFlat(true);
+}
+
+void EventTile::setOnCloseAction(const CommandActionPtr& value)
+{
+    d->onCloseAction.reset(CommandAction::createQtAction(value));
 }
 
 void EventTile::paintEvent(QPaintEvent* /*event*/)
