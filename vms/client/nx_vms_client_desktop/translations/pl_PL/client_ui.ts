@@ -656,24 +656,20 @@
       <translation>Port strony internetowej</translation>
     </message>
     <message>
-      <source>Disable import</source>
-      <translation>Wyłącz importowanie</translation>
-    </message>
-    <message>
-      <source>Import Video from Device</source>
-      <translation>Importuj wideo z urządzenia</translation>
-    </message>
-    <message>
-      <source>Import camera or server offline periods</source>
-      <translation>Importuj okresy offline kamery lub serwera</translation>
-    </message>
-    <message>
       <source>Do not send Stop PTZ command</source>
       <translation type="unfinished">Do not send Stop PTZ command</translation>
     </message>
     <message>
       <source>Do not record audio</source>
       <translation type="unfinished">Do not record audio</translation>
+    </message>
+    <message>
+      <source>Import from Device</source>
+      <translation type="unfinished">Import from Device</translation>
+    </message>
+    <message>
+      <source>Import video automatically</source>
+      <translation>Importuj wideo automatycznie</translation>
     </message>
   </context>
   <context>

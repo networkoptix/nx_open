@@ -12095,8 +12095,8 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <translation>em %1</translation>
     </message>
     <message>
-      <source>You can copy the Access Link below, and share it with the implied user.</source>
-      <translation type="unfinished">You can copy the Access Link below, and share it with the implied user.</translation>
+      <source>Copy the Access Link and share it with intended user</source>
+      <translation type="unfinished">Copy the Access Link and share it with intended user</translation>
     </message>
   </context>
   <context>
@@ -12346,6 +12346,11 @@ Recomendamos que você não abra esta página da ‘web’. Se você entender os
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
       <translation>Estamos preparando arquivos para o processo de exportação. Por favor, aguarde alguns segundos.</translation>
+    </message>
+    <message>
+      <source>%1 filename length is more than %2 characters.</source>
+      <comment>%1 is file name</comment>
+      <translation type="unfinished">%1 filename length is more than %2 characters.</translation>
     </message>
   </context>
   <context>

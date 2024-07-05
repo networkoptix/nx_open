@@ -656,24 +656,20 @@
       <translation>Cổng trang web</translation>
     </message>
     <message>
-      <source>Disable import</source>
-      <translation>Vô hiệu hóa nhập</translation>
-    </message>
-    <message>
-      <source>Import Video from Device</source>
-      <translation>Nhập video từ thiết bị</translation>
-    </message>
-    <message>
-      <source>Import camera or server offline periods</source>
-      <translation>Nhập thời gian ngoại tuyến của camera hoặc máy chủ</translation>
-    </message>
-    <message>
       <source>Do not send Stop PTZ command</source>
       <translation>Không gửi lệnh Dừng PTZ</translation>
     </message>
     <message>
       <source>Do not record audio</source>
       <translation>Không ghi lại âm thanh</translation>
+    </message>
+    <message>
+      <source>Import from Device</source>
+      <translation type="unfinished">Import from Device</translation>
+    </message>
+    <message>
+      <source>Import video automatically</source>
+      <translation>Nhập video tự động</translation>
     </message>
   </context>
   <context>

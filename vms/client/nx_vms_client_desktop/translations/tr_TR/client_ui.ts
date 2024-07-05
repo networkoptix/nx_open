@@ -656,24 +656,20 @@
       <translation>Web Sayfası Bağlantı Noktası</translation>
     </message>
     <message>
-      <source>Disable import</source>
-      <translation>İçe aktarmayı devre dışı bırak</translation>
-    </message>
-    <message>
-      <source>Import Video from Device</source>
-      <translation>Cihazdan İçe Video Aktar</translation>
-    </message>
-    <message>
-      <source>Import camera or server offline periods</source>
-      <translation>Kamera veya sunucu çevrimdışı dönemlerini içe aktarın</translation>
-    </message>
-    <message>
       <source>Do not send Stop PTZ command</source>
       <translation>PTZ'yi Durdur komutunu göndermeyin</translation>
     </message>
     <message>
       <source>Do not record audio</source>
       <translation>Sesi kayıt etme</translation>
+    </message>
+    <message>
+      <source>Import from Device</source>
+      <translation>Cihazdan içe aktar</translation>
+    </message>
+    <message>
+      <source>Import video automatically</source>
+      <translation>Videoyu otomatik olarak içe aktar</translation>
     </message>
   </context>
   <context>

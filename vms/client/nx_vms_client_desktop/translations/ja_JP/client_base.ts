@@ -6637,7 +6637,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Users with Digest Authentication</source>
-      <translation>ダイジェスト認証を使用するユーザー</translation>
+      <translation>Digest 認証を使用するユーザー</translation>
     </message>
     <message>
       <source>No users found</source>
@@ -10976,7 +10976,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
       <source>%n out of %1 users are allowed to use digest authentication (not secure).</source>
       <comment>%n is digest user count, %1 is total user count</comment>
       <translation>
-        <numerusform>%1 ユーザー中 %n 名が Digest認証を利用できる (安全ではない) 設定です。</numerusform>
+        <numerusform>%1 ユーザー中 %n 名が Digest 認証を利用できる (安全ではない) 設定です。</numerusform>
       </translation>
     </message>
     <message>
@@ -11917,8 +11917,8 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
       <translation>%1後</translation>
     </message>
     <message>
-      <source>You can copy the Access Link below, and share it with the implied user.</source>
-      <translation>以下のアクセスリンクをコピーして、未登録ユーザーと共有できます。</translation>
+      <source>Copy the Access Link and share it with intended user</source>
+      <translation>アクセスリンクをコピーして、対象のユーザーに共有してください。</translation>
     </message>
   </context>
   <context>
@@ -12165,6 +12165,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
       <translation>エクスポート処理用のファイルを準備中です。しばらくお待ちください。</translation>
+    </message>
+    <message>
+      <source>%1 filename length is more than %2 characters.</source>
+      <comment>%1 is file name</comment>
+      <translation>%1 ファイル名の長さが %2 文字を超えています。</translation>
     </message>
   </context>
   <context>

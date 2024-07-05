@@ -12090,8 +12090,8 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
       <translation>içinde %1</translation>
     </message>
     <message>
-      <source>You can copy the Access Link below, and share it with the implied user.</source>
-      <translation>Aşağıdaki Erişim Bağlantısını kopyalayabilir ve ilgili kullanıcıyla paylaşabilirsiniz.</translation>
+      <source>Copy the Access Link and share it with intended user</source>
+      <translation>Erişim Bağlantısını kopyalayın ve hedef kullanıcıyla paylaşın</translation>
     </message>
   </context>
   <context>
@@ -12340,6 +12340,11 @@ Bu web sayfasını açmamanızı öneririz. Riskleri anlıyorsanız web sayfası
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
       <translation>Dosyaları dışarı aktarma işlemini hazırlıyorum. Lütfen birkaç saniye bekleyiniz.</translation>
+    </message>
+    <message>
+      <source>%1 filename length is more than %2 characters.</source>
+      <comment>%1 is file name</comment>
+      <translation>%1 dosya adı uzunluğu %2 karakterden fazla.</translation>
     </message>
   </context>
   <context>

@@ -12094,8 +12094,8 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
       <translation>i %1</translation>
     </message>
     <message>
-      <source>You can copy the Access Link below, and share it with the implied user.</source>
-      <translation>Du kan kopiera åtkomstlänken nedan och dela den med den underförstådda användaren.</translation>
+      <source>Copy the Access Link and share it with intended user</source>
+      <translation>Kopiera åtkomstlänken och dela den med den avsedda användaren</translation>
     </message>
   </context>
   <context>
@@ -12346,6 +12346,11 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
       <translation>Vi förbereder filer för exportprocessen. Vänta några sekunder.</translation>
+    </message>
+    <message>
+      <source>%1 filename length is more than %2 characters.</source>
+      <comment>%1 is file name</comment>
+      <translation>%1 filnamnets längd är mer än %2 tecken.</translation>
     </message>
   </context>
   <context>

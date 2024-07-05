@@ -656,24 +656,20 @@
       <translation>Nettsideport</translation>
     </message>
     <message>
-      <source>Disable import</source>
-      <translation type="unfinished">Disable import</translation>
-    </message>
-    <message>
-      <source>Import Video from Device</source>
-      <translation>Importer video fra enheten</translation>
-    </message>
-    <message>
-      <source>Import camera or server offline periods</source>
-      <translation>Importer kamera eller server offline perioder</translation>
-    </message>
-    <message>
       <source>Do not send Stop PTZ command</source>
       <translation>Ikke send Stop PTZ-kommandoen</translation>
     </message>
     <message>
       <source>Do not record audio</source>
       <translation>Ikke ta opp lyd</translation>
+    </message>
+    <message>
+      <source>Import from Device</source>
+      <translation>Importer fra enhet</translation>
+    </message>
+    <message>
+      <source>Import video automatically</source>
+      <translation>Importer video automatisk</translation>
     </message>
   </context>
   <context>
