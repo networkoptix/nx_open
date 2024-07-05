@@ -90,6 +90,7 @@ if(withTests)
     add_subdirectory(unit_tests)
 endif()
 
+# This command generates nx_vms_common_other_files target.
 qt6_add_shaders(nx_vms_common "pixelation_shaders"
     PREFIX
         "/"
@@ -99,3 +100,4 @@ qt6_add_shaders(nx_vms_common "pixelation_shaders"
         "src/nx/vms/common/pixelation/shaders/pixelation.frag"
         "src/nx/vms/common/pixelation/shaders/pixelation.vert"
 )
+set_property(TARGET nx_vms_common_other_files PROPERTY FOLDER common/other_files)
