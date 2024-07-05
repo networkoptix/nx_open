@@ -61,6 +61,8 @@ QString QnSystemHealthStringsHelper::messageTitle(MessageType messageType)
             return tr("Intercom call");
         case MessageType::showMissedCallInformer:
             return tr("Intercom missed call");
+        case MessageType::rejectIntercomCall:
+            return tr("Reject intercom call");
 
         default:
             break;

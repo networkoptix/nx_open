@@ -104,6 +104,9 @@ QVariant EventListModel::data(const QModelIndex& index, int role) const
         case Qn::CommandActionRole:
             return QVariant::fromValue(event.extraAction);
 
+        case Qn::OnCloseActionRole:
+            return QVariant::fromValue(event.onCloseAction);
+
         case Qn::TimeoutRole:
             return event.removable ? QVariant::fromValue(event.lifetime) : QVariant();
 

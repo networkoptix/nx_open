@@ -71,6 +71,8 @@ public:
     CommandActionPtr additionalAction() const;
     void setAdditionalAction(const CommandActionPtr& value);
 
+    void setOnCloseAction(const CommandActionPtr& value);
+
     bool busyIndicatorVisible() const;
     void setBusyIndicatorVisible(bool value);
 

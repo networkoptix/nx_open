@@ -54,6 +54,7 @@ public:
         menu::IDType actionId = menu::NoAction;
         menu::Parameters actionParameters;
         CommandActionPtr extraAction;
+        CommandActionPtr onCloseAction;
 
         // Analytics data.
         nx::Uuid objectTrackId;

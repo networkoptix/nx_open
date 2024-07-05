@@ -40,6 +40,7 @@ public:
     bool closeable = false;
     std::unique_ptr<QAction> action; //< Button action.
     std::unique_ptr<QAction> additionalAction;
+    std::unique_ptr<QAction> onCloseAction;
     QnElidedLabel* const progressLabel;
     const QScopedPointer<QTimer> loadPreviewTimer;
     bool isPreviewLoadNeeded = true;

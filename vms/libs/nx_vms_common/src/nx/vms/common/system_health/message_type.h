@@ -78,6 +78,11 @@ NX_REFLECTION_ENUM_CLASS(MessageType,
      */
     showMissedCallInformer = 35,
 
+    /**
+     * Informs a server that a user has closed call notification.
+     */
+    rejectIntercomCall = 36,
+
     // IMPORTANT!!!
     // Enum order change is forbidden as leads to stored settings failure and protocol change.
 
