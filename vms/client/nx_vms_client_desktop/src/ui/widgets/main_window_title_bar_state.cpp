@@ -269,6 +269,8 @@ public:
         for (const auto systemId: systemIds)
         {
             auto system = appContext()->systemFinder()->getSystem(systemId.toSimpleString());
+            if (!system)
+                continue;
 
             LogonData logonData;
             const auto servers = system->servers();
