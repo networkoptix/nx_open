@@ -71,6 +71,9 @@ NX_DECLARE_COLORIZED_ICON(kRecordOnIcon, "20x20/Solid/record_on.svg",\
 NX_DECLARE_COLORIZED_ICON(kRecordPartIcon, "20x20/Solid/record_part.svg",\
     kTreeThemeSubstitutions)
 
+NX_DECLARE_COLORIZED_ICON(kCameraNotificationIcon, "20x20/Outline/device.svg",\
+    kTreeThemeSubstitutions)
+
 NX_DECLARE_COLORIZED_ICON(kCameraWarningIcon, "20x20/Solid/camera_warning.svg",\
     kTreeThemeSubstitutions)
 NX_DECLARE_COLORIZED_ICON(kCameraOfflineIcon, "20x20/Solid/camera_offline.svg",\
@@ -85,7 +88,11 @@ NX_DECLARE_COLORIZED_ICON(kVirtualCamerasIcon, "20x20/Solid/virtual_camera.svg",
     kTreeThemeSubstitutions)
 NX_DECLARE_COLORIZED_ICON(kVirtualCamerasOfflineIcon, "20x20/Solid/virtual_camera.svg",\
     kTreeThemeOfflineSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kVirtualCamerasNotificationIcon, "20x20/Outline/virtual_camera.svg",\
+    kTreeThemeSubstitutions)
 NX_DECLARE_COLORIZED_ICON(kMultisensorIcon, "20x20/Solid/multisensor.svg",\
+    kTreeThemeSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kMultisensorNotificationIcon, "20x20/Outline/multisensor.svg",\
     kTreeThemeSubstitutions)
 
 NX_DECLARE_COLORIZED_ICON(kAlertYellowIcon, "20x20/Solid/alert2.svg", kYellowTheme)
@@ -103,6 +110,8 @@ NX_DECLARE_COLORIZED_ICON(kSystemCloudIcon, "20x20/Solid/system_cloud.svg",\
     kTreeThemeSubstitutions)
 
 NX_DECLARE_COLORIZED_ICON(kEncoderIcon, "20x20/Solid/encoder.svg",\
+    kTreeThemeSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kEncoderNotificationIcon, "20x20/Outline/encoder.svg",\
     kTreeThemeSubstitutions)
 
 NX_DECLARE_COLORIZED_ICON(kHealthMonitorOfflineIcon, "20x20/Solid/health_monitor_offline.svg",\
@@ -122,6 +131,8 @@ NX_DECLARE_COLORIZED_ICON(kIOOfflineIcon, "20x20/Solid/io_offline.svg",\
 NX_DECLARE_COLORIZED_ICON(kIOUnauthorizedIcon, "20x20/Solid/io_unauthorized.svg",\
     kTreeThemeSubstitutions)
 NX_DECLARE_COLORIZED_ICON(kIOIcon, "20x20/Solid/io.svg",\
+    kTreeThemeSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kIONotificationIcon, "20x20/Outline/io.svg",\
     kTreeThemeSubstitutions)
 
 NX_DECLARE_COLORIZED_ICON(kLayoutCloudIcon, "20x20/Solid/layout_cloud.svg",\
@@ -176,6 +187,8 @@ NX_DECLARE_COLORIZED_ICON(kServersIcon, "20x20/Solid/servers.svg",\
     kTreeThemeSubstitutions)
 NX_DECLARE_COLORIZED_ICON(kServerIcon, "20x20/Solid/server.svg",\
     kTreeThemeSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kServerNotificationIcon, "20x20/Outline/server.svg",\
+    kTreeThemeSubstitutions)
 NX_DECLARE_COLORIZED_ICON(kServerOfflineIcon, "20x20/Solid/server_offline.svg",\
     kTreeThemeOfflineSubstitutions)
 NX_DECLARE_COLORIZED_ICON(kServerCurrentIcon, "20x20/Solid/server_current.svg",\
@@ -186,6 +199,8 @@ NX_DECLARE_COLORIZED_ICON(kServerUnauthorizedIcon, "20x20/Solid/server_unauthori
     kTreeThemeSubstitutions)
 
 NX_DECLARE_COLORIZED_ICON(kUserIcon, "20x20/Solid/user.svg",\
+    kTreeThemeSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kUserNotificationIcon, "20x20/Outline/user.svg",\
     kTreeThemeSubstitutions)
 NX_DECLARE_COLORIZED_ICON(kGroupIcon, "20x20/Solid/group.svg",\
     kTreeThemeSubstitutions)
@@ -336,20 +351,25 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent):
     // Cameras.
     m_cache.insert(Cameras, IconWithDescription(kCamerasIcon));
     m_cache.insert(Camera, IconWithDescription(kCameraIcon));
+    m_cache.insert(Camera | NotificationMode, IconWithDescription(kCameraNotificationIcon));
     m_cache.insert(Camera | Offline, IconWithDescription(kCameraOfflineIcon));
     m_cache.insert(Camera | Unauthorized, IconWithDescription(kCameraUnauthorizedIcon));
     m_cache.insert(Camera | Incompatible, IconWithDescription(kCameraWarningIcon));
     m_cache.insert(VirtualCamera, IconWithDescription(kVirtualCamerasIcon));
     m_cache.insert(VirtualCamera | Offline, IconWithDescription(kVirtualCamerasOfflineIcon));
+    m_cache.insert(VirtualCamera | NotificationMode, IconWithDescription(kVirtualCamerasNotificationIcon));
     m_cache.insert(CrossSystemStatus | Unauthorized, IconWithDescription(kAlertYellowIcon));
     m_legacyIconsPaths.insert(CrossSystemStatus | Control, "legacy/loading.gif"); //< The Control uses to describe loading state.
     m_legacyIconsPaths.insert(CrossSystemStatus | Offline, "cloud/cloud_20_disabled.png");
     m_cache.insert(IOModule, IconWithDescription(kIOIcon));
+    m_cache.insert(IOModule | NotificationMode, IconWithDescription(kIONotificationIcon));
     m_cache.insert(IOModule | Offline, IconWithDescription(kIOOfflineIcon));
     m_cache.insert(IOModule | Unauthorized, IconWithDescription(kIOUnauthorizedIcon));
     m_cache.insert(IOModule | Incompatible, IconWithDescription(kCameraWarningIcon));
     m_cache.insert(Recorder, IconWithDescription(kEncoderIcon));
+    m_cache.insert(Recorder | NotificationMode, IconWithDescription(kEncoderNotificationIcon));
     m_cache.insert(MultisensorCamera, IconWithDescription(kMultisensorIcon));
+    m_cache.insert(MultisensorCamera | NotificationMode, IconWithDescription(kMultisensorNotificationIcon));
 
     // Local files.
     m_cache.insert(LocalResources, IconWithDescription(kFolderOpenIcon));
@@ -362,6 +382,7 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent):
 
     m_cache.insert(Users, IconWithDescription(kGroupIcon));
     m_cache.insert(User, IconWithDescription(kUserIcon));
+    m_cache.insert(User | NotificationMode, IconWithDescription(kUserNotificationIcon));
     m_cache.insert(CloudUser, IconWithDescription(kUserCloudIcon));
     m_cache.insert(LdapUser, IconWithDescription(kUserLdapIcon));
     m_cache.insert(LocalUser, IconWithDescription(kUserIcon));
@@ -387,6 +408,7 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent):
 
     // Analytics.
     m_cache.insert(AnalyticsEngine, IconWithDescription(kServerIcon));
+    m_cache.insert(AnalyticsEngine | NotificationMode, IconWithDescription(kServerNotificationIcon));
     m_cache.insert(AnalyticsEngines, IconWithDescription(kServersIcon));
     m_cache.insert(AnalyticsEngine | Offline, IconWithDescription(kServerOfflineIcon));
 
@@ -471,6 +493,14 @@ QString QnResourceIconCache::iconPath(Key key) const
         return legacyIconPath;
 
     auto it = m_cache.find(key);
+    if (it != m_cache.cend())
+        return it->iconDescription.iconPath();
+
+    it = m_cache.find(key & (AdditionalFlagsMask | StatusMask | TypeMask));
+    if (it != m_cache.cend())
+        return it->iconDescription.iconPath();
+
+    it = m_cache.find(key & (AdditionalFlagsMask | TypeMask));
     if (it != m_cache.cend())
         return it->iconDescription.iconPath();
 

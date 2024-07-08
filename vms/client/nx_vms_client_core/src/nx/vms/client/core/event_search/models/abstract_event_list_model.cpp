@@ -67,7 +67,7 @@ QVariant AbstractEventListModel::data(const QModelIndex& index, int role) const
             return path.isEmpty()
                 ? QPixmap()
                 : path.endsWith(".svg")
-                    ? qnSkin->icon(path, kIconSubstitutions).pixmap(16)
+                    ? qnSkin->icon(path, kIconSubstitutions).pixmap(20)
                     : qnSkin->pixmap(path);
         }
 

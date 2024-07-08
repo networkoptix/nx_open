@@ -49,6 +49,7 @@ static constexpr auto kRoundingRadius = 2;
 static constexpr int kMaxNumberOfDisplayedAttributes = 4;
 
 static constexpr auto kTitleFontWeight = QFont::Medium;
+static constexpr auto kTitleFontSize = 14;
 static constexpr auto kTimestampFontWeight = QFont::Normal;
 static constexpr auto kDescriptionFontWeight = QFont::Normal;
 static constexpr auto kResourceListFontWeight = QFont::Medium;
@@ -125,12 +126,12 @@ EventTile::EventTile(QWidget* parent):
     ui->timestampLabel->setForegroundRole(QPalette::WindowText);
     ui->descriptionLabel->setForegroundRole(QPalette::Light);
     ui->debugPreviewTimeLabel->setForegroundRole(QPalette::Light);
-    ui->resourceListLabel->setForegroundRole(QPalette::WindowText);
+    ui->resourceListLabel->setForegroundRole(QPalette::Light);
     ui->footerLabel->setForegroundRole(QPalette::Light);
 
     QFont font;
     font.setWeight(kTitleFontWeight);
-    font.setPixelSize(fontConfig()->normal().pixelSize());
+    font.setPixelSize(kTitleFontSize);
     ui->nameLabel->setFont(font);
     ui->nameLabel->setProperty(style::Properties::kDontPolishFontProperty, true);
     ui->nameLabel->setOpenExternalLinks(false);

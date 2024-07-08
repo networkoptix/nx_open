@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 20 20">
+  <g class="20x20/Outline/virtual_camera">
+    <path fill="#E1E7EA" fill-rule="evenodd" d="M3.2 5.2v9.6h13.6V5.2H3.2ZM3 4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1H3Zm10 7.8a1.8 1.8 0 1 0 0-3.6 1.8 1.8 0 0 0 0 3.6Zm0 1.2a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM7 7H5v2h2V7Z" class="Primary" clip-rule="evenodd"/>
+  </g>
+</svg>

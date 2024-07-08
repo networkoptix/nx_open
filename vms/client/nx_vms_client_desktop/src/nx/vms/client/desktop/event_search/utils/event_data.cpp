@@ -17,19 +17,19 @@ namespace nx::vms::client::desktop {
 using nx::vms::rules::Icon;
 
 static const QMap<Icon, QString> kIconPaths = {
-    {Icon::alert, "16x16/Outline/image.svg"},
-    {Icon::motion, "16x16/Outline/motion.svg"},
-    {Icon::license, "16x16/Outline/key.svg"},
-    {Icon::networkIssue, "16x16/Outline/network.svg"},
-    {Icon::storage, "16x16/Outline/storage.svg"},
-    {Icon::server, "16x16/Outline/server.svg"},
-    {Icon::inputSignal, "16x16/Outline/input_signal.svg"},
-    {Icon::pluginDiagnostic, "16x16/Outline/plugin.svg"},
-    {Icon::fanError, "16x16/Outline/fan.svg"},
+    {Icon::alert, "20x20/Outline/image.svg"},
+    {Icon::motion, "20x20/Outline/motion.svg"},
+    {Icon::license, "20x20/Outline/key.svg"},
+    {Icon::networkIssue, "20x20/Outline/network.svg"},
+    {Icon::storage, "20x20/Outline/storage.svg"},
+    {Icon::server, "20x20/Outline/server.svg"},
+    {Icon::inputSignal, "20x20/Outline/input_signal.svg"},
+    {Icon::pluginDiagnostic, "20x20/Outline/plugin.svg"},
+    {Icon::fanError, "20x20/Outline/fan.svg"},
      // TODO: VMS-47520: check how this event is called and create if required.
-    {Icon::cloudOffline, "16x16/Outline/cloud_offline.svg"},
-    {Icon::analyticsEvent, "16x16/Outline/analytics.svg"},
-    {Icon::generic, "16x16/Outline/generic.svg"},
+    {Icon::cloudOffline, "20x20/Outline/cloud_offline.svg"},
+    {Icon::analyticsEvent, "20x20/Outline/analytics.svg"},
+    {Icon::generic, "20x20/Outline/generic.svg"},
 };
 
 bool needIconDevices(nx::vms::rules::Icon icon)
@@ -48,9 +48,13 @@ QString eventIconPath(
             return {};
 
         case Icon::resource:
+        {
             return devices.isEmpty()
-                ? qnResIconCache->iconPath(QnResourceIconCache::Camera)
-                : qnResIconCache->iconPath(devices.front());
+                ? qnResIconCache->iconPath(
+                      QnResourceIconCache::Camera | QnResourceIconCache::NotificationMode)
+                : qnResIconCache->iconPath(QnResourceIconCache::key(devices.front())
+                      | QnResourceIconCache::NotificationMode);
+        }
 
         case Icon::softTrigger:
             return SoftwareTriggerPixmaps::effectivePixmapPath(custom);

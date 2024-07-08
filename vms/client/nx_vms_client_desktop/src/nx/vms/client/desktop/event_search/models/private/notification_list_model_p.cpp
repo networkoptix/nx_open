@@ -905,7 +905,7 @@ QString NotificationListModel::Private::iconPath(const vms::event::AbstractActio
     {
         case QnNotificationLevel::Value::ImportantNotification:
         case QnNotificationLevel::Value::CriticalNotification:
-            return "16x16/Outline/warning.svg";
+            return "20x20/Outline/warning.svg";
 
         case QnNotificationLevel::Value::SuccessNotification:
             return "16x16/Outline/check.svg";
@@ -918,7 +918,7 @@ QString NotificationListModel::Private::iconPath(const vms::event::AbstractActio
         return eventIconPath(nx::vms::rules::Icon::inputSignal);
 
     if (action->actionType() == ActionType::showOnAlarmLayoutAction)
-        return "16x16/Outline/soft_trigger.svg";
+        return "20x20/Outline/soft_trigger.svg";
 
     const auto& params = action->getRuntimeParams();
 

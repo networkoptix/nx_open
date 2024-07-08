@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 20 20">
+  <g class="20x20/Outline/server">
+    <g class="Primary">
+      <path fill="#E1E7EA" d="M5.52 12.167a.604.604 0 0 0 0 1.208h2.417a.604.604 0 1 0 0-1.208H5.521Z"/>
+      <path fill="#E1E7EA" fill-rule="evenodd" d="M2.5 3.708c0-.667.541-1.208 1.208-1.208h12.084c.667 0 1.208.541 1.208 1.208v12.084c0 .667-.541 1.208-1.208 1.208H3.708A1.208 1.208 0 0 1 2.5 15.792V3.708Zm1.208 0h12.084v2.417H3.708V3.708Zm12.084 3.625V9.75H3.708V7.333h12.084ZM3.708 15.792v-4.833h12.084v4.833H3.708Z" clip-rule="evenodd"/>
+    </g>
+  </g>
+</svg>
