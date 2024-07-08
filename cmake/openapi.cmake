@@ -2,8 +2,8 @@ include_guard()
 
 include(find_java)
 
-if(Java_VERSION_MINOR LESS 6 OR Java_VERSION_MINOR GREATER 8)
-    message(FATAL_ERROR "Java Runtime Environment 6, 7 or 8 is required for apidoctool.")
+if(Java_VERSION_MINOR LESS 8)
+    message(FATAL_ERROR "Java Runtime Environment 8 or newer is required for apidoctool.")
 endif()
 
 set(apidoctool_jar "${CONAN_APIDOCTOOL_ROOT}/apidoctool.jar")
