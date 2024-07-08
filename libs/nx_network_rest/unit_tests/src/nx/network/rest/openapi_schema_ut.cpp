@@ -355,7 +355,7 @@ TEST_F(OpenApiSchemaTest, Validate)
         }
         catch (const Exception& e)
         {
-            ASSERT_EQ(e.message(), "Invalid parameter `general.name`: null.");
+            ASSERT_EQ(e.message(), "Invalid parameter `general.name`: null");
             throw;
         },
         Exception);
@@ -367,7 +367,7 @@ TEST_F(OpenApiSchemaTest, Validate)
         }
         catch (const Exception& e)
         {
-            ASSERT_EQ(e.message(), "Invalid parameter `_orderBy`: invalid.");
+            ASSERT_EQ(e.message(), "Invalid parameter `_orderBy`: invalid");
             throw;
         },
         Exception);
