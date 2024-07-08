@@ -11,6 +11,25 @@
 #include <nx/vms/rules/event_filter_fields/text_lookup_field.h>
 #include <nx/vms/rules/rule.h>
 
+namespace {
+
+void renameColumnName(nx::vms::api::LookupListData& data)
+{
+    if (!NX_ASSERT(data.attributeNames.size() == 1, "Generic Lists must have one attribute"))
+        return;
+
+    for (auto& entry: data.entries)
+    {
+        const auto value = entry.begin()->second;
+        entry.clear();
+
+        const auto columnName = data.attributeNames[0];
+        entry[columnName] = value;
+    }
+}
+
+} // namespace
+
 namespace nx::vms::client::desktop {
 
 LookupListModel::LookupListModel(QObject* parent):
@@ -44,7 +63,16 @@ void LookupListModel::setAttributeNames(QList<QString> value)
     m_data.attributeNames.clear();
     for (const auto& v: value)
         m_data.attributeNames.push_back(v);
+
+    if (isGeneric())
+        renameColumnName(m_data);
+
     emit attributeNamesChanged();
+}
+
+bool LookupListModel::isGeneric() const
+{
+    return m_data.objectTypeId.isEmpty();
 }
 
 int LookupListModel::countOfAssociatedVmsRules(SystemContext* systemContext) const

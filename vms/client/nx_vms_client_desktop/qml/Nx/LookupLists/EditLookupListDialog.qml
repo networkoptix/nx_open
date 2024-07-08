@@ -115,6 +115,9 @@ ModalDialog
 
     function updateSelectedAttributes()
     {
+        if (model.isGeneric)
+            return
+
         let attributeNames = []
         for (let i = 0; i < attributesModel.count; ++i)
         {
@@ -138,7 +141,6 @@ ModalDialog
         property alias name: model.data.name
         property alias objectTypeId: model.data.objectTypeId
         property Analytics.ObjectType listType: taxonomy ? taxonomy.objectTypeById(data.objectTypeId) : null
-        property bool isGeneric: !listType
         property bool isValid: !!name && (isGeneric ? !!columnName : attributeNames.length)
         property string columnName: (isGeneric && attributeNames.length) ? attributeNames[0] : ""
 
