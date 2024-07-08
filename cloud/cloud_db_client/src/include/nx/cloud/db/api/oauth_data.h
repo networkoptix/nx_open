@@ -10,6 +10,8 @@
 #include <nx/reflect/instrument.h>
 #include <nx/network/jose/jwt.h>
 
+#include "two_factor_auth_data.h"
+
 namespace nx::cloud::db::api {
 
 // Code style violated in fields names to match RFC
@@ -242,6 +244,11 @@ public:
 
     std::optional<int> securitySequence() const;
     void setSecuritySequence(int val);
+
+
+    // For internal purpose only. The AWS region the user account belongs to.
+    std::optional<std::string> region() const;
+    void setRegion(const std::string& val);
 };
 
 using Token = nx::network::jws::Token<ClaimSet>;
@@ -269,6 +276,9 @@ struct AccSecuritySettingsChangedEvent
     // Account email
     std::string email;
 
+    // Account region
+    std::string accRegion;
+
     // Event type
     AccSettingChanged eventType;
 
@@ -277,10 +287,32 @@ struct AccSecuritySettingsChangedEvent
     std::optional<std::string> validSession;
 };
 
-NX_REFLECTION_INSTRUMENT(AccSecuritySettingsChangedEvent, (ts)(email)(eventType)(validSession))
+NX_REFLECTION_INSTRUMENT(AccSecuritySettingsChangedEvent, (ts)(email)(accRegion)(eventType)(validSession))
 
 using GetAccSecuritySettingsChangedEventsResponse = std::vector<AccSecuritySettingsChangedEvent>;
 
+struct AuthSession
+{
+    /**%apidoc Session id.*/
+    std::string id;
 
+    /**%apidoc The username associated with the session. */
+    std::string username;
+
+    /**%apidoc Client id. */
+    std::string clientId;
+
+    /**%apidoc The session creation time in seconds since UTC. */
+    std::chrono::system_clock::time_point startTime;
+
+    /**%apidoc The session expiration time in seconds since UTC. */
+    std::chrono::system_clock::time_point expirationTime;
+
+    /**%apidoc True if mfa was passed for the session, false otherwise */
+    SecondFactorState mfaStatus = SecondFactorState::notEntered;
+};
+
+NX_REFLECTION_INSTRUMENT(AuthSession, (id)(username)(clientId)(startTime)(expirationTime) \
+    (mfaStatus))
 
 } // namespace nx::cloud::db::api
