@@ -91,7 +91,9 @@ public:
 
         /* Additional flags */
         ReadOnly        = 0x10000,
-        AlwaysSelected  = 0x20000
+        AlwaysSelected  = 0x20000,
+        NotificationMode = 0x30000,
+        AdditionalFlagsMask = 0xFF0000
     };
     Q_DECLARE_FLAGS(Key, KeyPart)
     Q_FLAG(Key)

@@ -32,6 +32,8 @@
 #include <ui/common/notification_levels.h>
 #include <utils/common/synctime.h>
 
+#include "nx/vms/client/desktop/style/resource_icon_cache.h"
+
 namespace nx::vms::client::desktop {
 
 using namespace nx::vms::event;
@@ -66,43 +68,44 @@ QString iconPath(const EventParameters& parameters, core::SystemContext* context
     switch (parameters.eventType)
     {
         case EventType::storageFailureEvent:
-            return "16x16/Outline/storage.svg";
+            return "20x20/Outline/storage.svg";
 
         case EventType::backupFinishedEvent:
-            return "16x16/Outline/storage.svg";
+            return "20x20/Outline/storage.svg";
 
         case EventType::serverStartEvent:
         case EventType::serverFailureEvent:
         case EventType::serverCertificateError:
         case EventType::serverConflictEvent:
-            return "16x16/Outline/server.svg";
+            return "20x20/Outline/server.svg";
 
         case EventType::licenseIssueEvent:
-            return "16x16/Outline/key.svg";
+            return "20x20/Outline/key.svg";
 
         case EventType::cameraDisconnectEvent:
         case EventType::cameraIpConflictEvent:
-            return "16x16/Outline/camera.svg";
+            return "20x20/Outline/device.svg";
         case EventType::networkIssueEvent:
-            return "16x16/Outline/network.svg";
+            return "20x20/Outline/network.svg";
 
         case EventType::ldapSyncIssueEvent:
+            return "20x20/Outline/server.svg";
         case EventType::saasIssueEvent:
-            return "20x20/Solid/alert2.svg";
+            return "20x20/Outline/key.svg";
 
         case EventType::softwareTriggerEvent:
             return SoftwareTriggerPixmaps::effectivePixmapPath(parameters.description);
 
         case EventType::pluginDiagnosticEvent:
-            return "16x16/Outline/plugin.svg";
+            return "20x20/Outline/plugin.svg";
 
         case EventType::cameraMotionEvent:
-            return "16x16/Outline/motion.svg";
+            return "20x20/Outline/motion.svg";
 
         case EventType::cameraInputEvent:
-            return "16x16/Outline/input_signal.svg";
+            return "20x20/Outline/input_signal.svg";
         case EventType::analyticsSdkEvent:
-            return "16x16/Outline/analytics.svg";
+            return "20x20/Outline/analytics.svg";
         case EventType::analyticsSdkObjectDetected:
         {
             const auto objectTypeId = parameters.getAnalyticsObjectTypeId();
@@ -117,9 +120,11 @@ QString iconPath(const EventParameters& parameters, core::SystemContext* context
             const auto sourceResources = event::sourceResources(parameters,
                 context->resourcePool());
             if (sourceResources && !sourceResources->isEmpty())
-                return "16x16/Outline/camera.svg";
-
-            return "16x16/Outline/generic.svg";
+            {
+                return qnResIconCache->iconPath(QnResourceIconCache::key(sourceResources->front())
+                    | QnResourceIconCache::NotificationMode);
+            }
+            return "20x20/Outline/generic.svg";
         }
 
         default:

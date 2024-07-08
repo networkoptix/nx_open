@@ -211,7 +211,7 @@ QVariant SimpleMotionSearchListModel::data(const QModelIndex& index, int role) c
             return tr("Motion");
 
         case core::DecorationPathRole:
-            return "16x16/Outline/motion.svg";
+            return "20x20/Outline/motion.svg";
 
         case Qn::HelpTopicIdRole:
             return rules::eventHelpId(vms::api::EventType::cameraMotionEvent);
