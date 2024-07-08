@@ -65,9 +65,16 @@ static constexpr char kOauthJwksPath[] = "/cdb/oauth2/jwks";
 static constexpr char kOauthJwkByIdPath[] = "/cdb/oauth2/jwks/{kid}";
 static constexpr char kAccSecuritySettingsChangedEvents[] = "/cdb/oauth2/account_events";
 
+// TODO: #anekrasov Move to a separate file, for oauth2 service
+static constexpr char kOauthSessionPath[] = "/oauth2/session/{sessionId}";
+static constexpr char kOauthInternalLogoutPath[] = "/oauth2/user/{userId}";
+static constexpr char kOauthInternalClientLogoutPath[] = "/oauth2/user/{userId}/{clientId}";
+
 static constexpr char kTokenParam[] = "token";
 static constexpr char kClientIdParam[] = "clientId";
+static constexpr char kUserIdParam[] = "userId";
 static constexpr char kKidParam[] = "kid";
+static constexpr char kSessionIdParam[] = "sessionId";
 
 static constexpr char kTwoFactorAuthGetKey[] = "/cdb/account/self/2fa/totp/key";
 static constexpr char kTwoFactorAuthValidateKey[] = "/cdb/account/self/2fa/totp/key/{key}";

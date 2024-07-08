@@ -56,4 +56,14 @@ void ClaimSet::setSecuritySequence(int val)
     set("pwdSeq", val);
 }
 
+std::optional<std::string> ClaimSet::region() const
+{
+    return get<std::string>("region");
+}
+
+void ClaimSet::setRegion(const std::string& val)
+{
+    set("region", val);
+}
+
 } // namespace nx::cloud::db::api
