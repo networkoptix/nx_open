@@ -251,6 +251,9 @@ void LookupListEntriesModel::removeIncorrectEntries()
     if (!NX_ASSERT(d->data, "Function must never be called on uninitialized model"))
         return;
 
+    if (d->data->isGeneric())
+        return; //< Validation for generic lists is not required.
+
     // Remove remaining empty rows, after column values validation.
     deleteEntries(d->removeIncorrectColumnValues());
 }

@@ -16,6 +16,7 @@ class NX_VMS_CLIENT_DESKTOP_API LookupListModel: public QObject
         READ attributeNames
         WRITE setAttributeNames
         NOTIFY attributeNamesChanged)
+    Q_PROPERTY(bool isGeneric READ isGeneric NOTIFY isGenericChanged)
 
 public:
     LookupListModel(QObject* parent = nullptr);
@@ -25,12 +26,14 @@ public:
     QList<QString> attributeNames() const;
     void setAttributeNames(QList<QString> value);
     nx::vms::api::LookupListData& rawData() { return m_data; }
+    bool isGeneric() const;
 
     Q_INVOKABLE int countOfAssociatedVmsRules(SystemContext* systemContext) const;
 
 signals:
     void dataChanged();
     void attributeNamesChanged();
+    void isGenericChanged();
 
 private:
     nx::vms::api::LookupListData m_data;

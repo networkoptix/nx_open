@@ -250,6 +250,36 @@ protected:
         m_entriesProxyModel->setFilterRegularExpression(filter);
     }
 
+    void whenSetAttributesNames(const QList<QString>& attributesNames)
+    {
+        m_entriesModel->listModel()->setAttributeNames(attributesNames);
+    }
+
+    void thenListEntriesHasAttributes(const QList<QString>& attributesNames)
+    {
+        ASSERT_EQ(m_entriesModel->listModel()->attributeNames(), attributesNames);
+
+        thenColumnCountIs(attributesNames.size(), m_entriesModel.get());
+        thenHeaderDataEqualTo(m_entriesModel.get(), attributesNames);
+
+        for (const auto& entry: m_entriesModel->listModel()->rawData().entries)
+        {
+            for (const auto& [attribute, _]: entry)
+                ASSERT_TRUE(attributesNames.contains(attribute));
+        }
+    }
+
+    void thenHeaderDataEqualTo(QAbstractItemModel* model, const QList<QString>& data)
+    {
+        int valueToCheckLeft = data.size();
+        for (int column = 0; column < m_entriesModel->columnCount(); ++column)
+        {
+            if (data.contains(m_entriesModel->headerData(column).toString()))
+                valueToCheckLeft -= 1;
+        }
+        ASSERT_EQ(valueToCheckLeft, 0);
+    }
+
     void thenFixUpIsRequired() { ASSERT_TRUE(m_importModel->fixupRequired()); }
     void thenFixUpIsNotRequired() { ASSERT_FALSE(m_importModel->fixupRequired()); }
 
@@ -698,6 +728,14 @@ TEST_F(LookupListTests, search_by_all_columns)
         whenSetFilter(modelIndex.data().toString());
         thenRowCountIs(1, m_entriesProxyModel.get());
     }
+}
+
+TEST_F(LookupListTests, rename_generic_list_column)
+{
+    givenLookupListEntriesModel(smallColumnNumberGenericExampleData());
+    const QList<QString> newColumn{"New one"};
+    whenSetAttributesNames(newColumn);
+    thenListEntriesHasAttributes(newColumn);
 }
 
 } // namespace nx::vms::client::desktop
