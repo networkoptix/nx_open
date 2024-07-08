@@ -2,7 +2,6 @@
 
 #include "openapi_schema_ut.h"
 
-#include <QFile>
 #include <memory>
 
 #include <gtest/gtest.h>
@@ -62,15 +61,15 @@ public:
     class MockCrudHandler: public CrudHandler<MockCrudHandler<Model>>
     {
     public:
-        std::vector<Model> read(IdData filter, const Request& request) { return {{}}; }
-        void create(Model data, const Request& request) {}
+        std::vector<Model> read(IdData, const Request&) { return {{}}; }
+        void create(Model, const Request&) {}
     };
 
     class MockBase64Handler: public CrudHandler<MockBase64Handler>
     {
     public:
         MockBase64Handler(): CrudHandler<MockBase64Handler>(/*idParamName*/ "param") {}
-        std::vector<Base64Model> read(Base64Model filter, const Request& request)
+        std::vector<Base64Model> read(Base64Model filter, const Request&)
         {
             return {std::move(filter)};
         }
@@ -81,7 +80,7 @@ public:
     public:
         MockMapHandler(): CrudHandler<MockMapHandler>(/*idParamName*/ "fakeId") {}
         TestDataMap read(IdData, const Request&) { return m_data; }
-        void update(TestDataMap data, const Request&) { m_data = data; }
+        void update(TestDataMap data, const Request&) { m_data = std::move(data); }
 
     private:
         TestDataMap m_data;
@@ -91,7 +90,7 @@ public:
     class MockHandler: public Handler
     {
     public:
-        virtual Response executeGet(const Request& request) override
+        virtual Response executeGet(const Request&) override
         {
             Response response(http::StatusCode::ok);
             response.content = {
@@ -99,7 +98,7 @@ public:
             return response;
         }
 
-        virtual Response executePost(const Request& request) override
+        virtual Response executePost(const Request&) override
         {
             return http::StatusCode::ok;
         }
@@ -110,7 +109,7 @@ public:
     };
 
     void testPerformance(
-        HandlerPool* pool, const QStringList& text, QByteArray body = {})
+        HandlerPool* pool, const QStringList& text, const QByteArray& body = {})
     {
         const int testCount = 1000;
         nx::utils::ElapsedTimer timer(nx::utils::ElapsedTimerState::started);
@@ -125,7 +124,7 @@ public:
         NX_INFO(this, "Made %1 API requests in %2", testCount, timer.elapsed());
     }
 
-    QJsonValue testJson()
+    static QJsonValue testJson()
     {
         using namespace nx::utils::json;
         QJsonObject object1{{"id", "11111111-1111-1111-1111-111111111111"}, {"name", "1"}};
