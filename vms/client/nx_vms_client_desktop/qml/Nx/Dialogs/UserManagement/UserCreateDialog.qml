@@ -218,6 +218,8 @@ DialogWithState
 
         Button
         {
+            enabled: !dialog.isSaving
+
             text: dialog.isSaving ? "" : qsTr("Add User")
             width: Math.max(implicitWidth, 80)
             isAccentButton: true
