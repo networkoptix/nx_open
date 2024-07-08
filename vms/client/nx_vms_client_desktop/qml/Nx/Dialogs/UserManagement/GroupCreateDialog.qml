@@ -193,6 +193,8 @@ DialogWithState
 
         Button
         {
+            enabled: !dialog.isSaving
+
             text: dialog.isSaving ? "" : qsTr("Add Group")
             width: Math.max(implicitWidth, 80)
             isAccentButton: true
@@ -201,7 +203,7 @@ DialogWithState
             NxDotPreloader
             {
                 anchors.centerIn: parent
-                running:  dialog.isSaving
+                running: dialog.isSaving
             }
         }
     }
