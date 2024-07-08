@@ -497,10 +497,7 @@ bool WorkbenchUi::calculateTimelineVisible(QnResourceWidget* widget) const
         return false;
 
     if (const auto accessController = ResourceAccessManager::accessController(resource))
-    {
-        return accessController->hasPermissions(resource, Qn::ViewFootagePermission)
-            || !flags.testFlag(Qn::live); //< Show slider for local files.
-    }
+        return accessController->hasPermissions(resource, Qn::ViewContentPermission);
 
     return false;
 }
