@@ -58,7 +58,7 @@ bool paintButtonFunction(QPainter* painter, const QStyleOption* /*option*/, cons
 
 // TODO: @pprivalov Remove this old fashioned color substitutions when figma plugin is ready.
 static const QColor kBasePrimaryColor = "#ffffff";
-static const QColor kThumbnailsColor = "#e1e7ea";
+static const QColor kThumbnailsColor = "#D9D9D9";
 static const QColor kSoundColor = "#A5B7C0";
 static const QColor kUnmuteColor = "#698796";
 static const QColor kUnmuteCrossColor = "#C22626";
@@ -306,6 +306,7 @@ void ControlWidget::initButton(
     button->setFixedSize(large ? QSize{52, 24} : QSize{24, 24});
     button->setToolTip(buttonAction->toolTip());
     button->setCheckable(true);
+    button->setEnabled(buttonAction->isEnabled());
 
     if (!connectToAction)
         return;
@@ -316,7 +317,7 @@ void ControlWidget::initButton(
         &QAction::toggled,
         [button, buttonAction](bool isChecked)
         {
-            button->setChecked(isChecked);
+            button->setChecked(buttonAction->isEnabled() && isChecked);
         });
     connect(
         buttonAction,
@@ -325,6 +326,7 @@ void ControlWidget::initButton(
         {
             button->setToolTip(buttonAction->toolTip());
             button->setEnabled(buttonAction->isEnabled());
+            button->setChecked(buttonAction->isEnabled() && buttonAction->isChecked());
         });
 }
 

@@ -107,21 +107,27 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     auto separatorBeforeSlider = new QnSeparator(Qt::Vertical, 1, lightSeparatorColor, this);
     auto separatorAfterSlider = new QnSeparator(Qt::Vertical, 1, darkSeparatorColor, this);
 
-    connect(navigator(), &QnWorkbenchNavigator::timelineRelevancyChanged, this,
+    const auto handleTimelineRelevancyChanged =
         [this, zoomButtons, separatorBeforeSlider, separatorAfterSlider, timelinePlaceholder]
             (bool isRelevant)
         {
             bool reset = m_timeSlider->isVisible() != isRelevant;
             m_timeSlider->setVisible(isRelevant);
             m_timeScrollBar->setVisible(isRelevant);
-            zoomButtons->setEnabled(isRelevant);
+            zoomButtons->setVisible(isRelevant);
             separatorBeforeSlider->setVisible(!isRelevant);
             separatorAfterSlider->setVisible(!isRelevant);
             timelinePlaceholder->setVisible(!isRelevant);
             m_sliderInnerShading->setFrameWidth(isRelevant ? 2.0 : 0.0);
+            action(menu::ToggleThumbnailsAction)->setEnabled(isRelevant);
             if (reset)
                 m_timeSlider->invalidateWindow();
-        });
+        };
+
+    connect(navigator(), &QnWorkbenchNavigator::timelineRelevancyChanged,
+        this, handleTimelineRelevancyChanged);
+
+    handleTimelineRelevancyChanged(navigator()->isTimelineRelevant());
 
     /* Initialize navigator. */
     navigator()->setTimeSlider(m_timeSlider);
