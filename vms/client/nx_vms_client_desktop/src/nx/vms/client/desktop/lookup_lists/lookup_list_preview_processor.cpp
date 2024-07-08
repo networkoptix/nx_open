@@ -47,7 +47,11 @@ QString LookupListPreviewHelper::getImportFilePathFromDialog()
     const QString caption = tr("Import Lookup List");
     const QString fileFilters = QnCustomFileDialog::createFilter(
         {{tr("Text files"), {"txt", "csv", "tsv"}}, {tr("All other text files"), {"*"}}});
-    return QFileDialog::getOpenFileName(nullptr, caption, previousDir, fileFilters, nullptr, options);
+    auto filePath = QFileDialog::getOpenFileName(nullptr, caption, previousDir, fileFilters, nullptr, options);
+    if (!filePath.isEmpty())
+        appContext()->localSettings()->lastImportDir = QFileInfo(filePath).absolutePath();
+
+    return filePath;
 }
 
 bool LookupListPreviewProcessor::setImportFilePathFromDialog()
@@ -63,11 +67,9 @@ bool LookupListPreviewProcessor::setImportFilePathFromDialog()
     if (d->separator.isEmpty())
     {
         const auto extension = QFileInfo(fileName).suffix();
-        // By default set separator as comma.
+        // By default set separator to comma.
         setSeparator(extension == "tsv" ? "\t" : ",");
     }
-
-    appContext()->localSettings()->lastImportDir = QFileInfo(fileName).absolutePath();
     return true;
 }
 
