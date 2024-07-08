@@ -149,7 +149,8 @@ private:
     quint8* m_rtpDataBuffer;
     bool m_tcpMode;
     QMap<quint32, quint16> m_prevTimestamp;
-    qint64 m_position;
+    int64_t m_position = DATETIME_NOW;
+    int64_t m_reopenPosition = 0; //< Skip data to this position after reopen.
     QnSecurityCamResourcePtr m_camera;
     QnMediaServerResourcePtr m_server;
     QnMediaServerResourcePtr m_fixedServer;

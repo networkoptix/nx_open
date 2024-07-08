@@ -74,7 +74,6 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(
             .sleepIfEmptySocket = sleepIfEmptySocket})),
     m_rtpData(0),
     m_tcpMode(true),
-    m_position(DATETIME_NOW),
     m_lastMediaFlags(-1),
     m_closing(false),
     m_singleShotMode(false),
@@ -349,6 +348,7 @@ QnMediaServerResourcePtr QnRtspClientArchiveDelegate::getServerOnTime(qint64 tim
 bool QnRtspClientArchiveDelegate::open(const QnResourcePtr &resource,
     AbstractArchiveIntegrityWatcher * /*archiveIntegrityWatcher*/)
 {
+    m_reopenPosition = 0;
     QnSecurityCamResourcePtr camera = resource.dynamicCast<QnSecurityCamResource>();
     NX_ASSERT(camera);
     if (!camera)
@@ -517,6 +517,8 @@ qint64 QnRtspClientArchiveDelegate::endTime() const
 
 bool QnRtspClientArchiveDelegate::reopen()
 {
+    NX_DEBUG(this, "Reopen rtsp session: %1, position: %2", m_camera, m_position);
+
     close();
 
     if (m_blockReopening)
@@ -530,7 +532,10 @@ bool QnRtspClientArchiveDelegate::reopen()
     m_reopenTimer.restart();
 
     if (m_camera)
+    {
+        m_reopenPosition = m_position;
         return openInternal();
+    }
 
     return false;
 }
@@ -543,16 +548,33 @@ bool QnRtspClientArchiveDelegate::isConnectionExpired() const
 QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
 {
     if (!m_currentServerUpToDate.test_and_set() || isConnectionExpired())
+    {
+        NX_DEBUG(this, "Connection expired, reopen rtsp session: %1, max session duration: %2",
+            m_camera, m_maxSessionDurationMs);
         reopen();
+    }
 
     if (!m_footageUpToDate.test_and_set()) {
         if (m_isMultiserverAllowed)
             checkMinTimeFromOtherServer(m_camera);
     }
 
-    QnAbstractMediaDataPtr result = getNextDataInternal();
-    if (!result && !m_blockReopening && !m_closing)
-        result = getNextDataInternal(); // try again in case of RTSP reconnect
+    QnAbstractMediaDataPtr result;
+    while (!m_closing)
+    {
+        result = getNextDataInternal();
+        if (!result && !m_blockReopening && !m_closing)
+            result = getNextDataInternal(); // try again in case of RTSP reconnect
+
+        if (!result || m_reopenPosition == 0 || m_reopenPosition < result->timestamp)
+        {
+            m_reopenPosition = 0;
+            break;
+        }
+
+        NX_VERBOSE(this, "Skip frame after reconnect: %1, reopen position: %2",
+            result->timestamp, m_reopenPosition);
+    }
 
     if (!m_serverTimePeriod.isNull() && m_isMultiserverAllowed)
     {
@@ -613,15 +635,16 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextDataInternal()
     {
         if (!m_rtpData || (!m_rtspSession->isOpened() && !m_closing))
         {
-            //m_rtspSession->stop(); // reconnect
+            NX_DEBUG(this, "Rtsp session closed, reopen rtsp session");
             reopen();
             return result;
         }
 
         int rtpChannelNum = 0;
         int blockSize  = m_rtpData->read((char*)m_rtpDataBuffer, MAX_RTP_BUFFER_SIZE);
-        if (blockSize <= 0 && !m_closing) {
-            //m_rtspSession->stop(); // reconnect
+        if (blockSize <= 0 && !m_closing)
+        {
+            NX_DEBUG(this, "Failed to read rtsp data, reopen rtsp session");
             reopen();
             return result;
         }
@@ -652,10 +675,9 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextDataInternal()
         quint8* data = m_rtpDataBuffer;
         if (m_tcpMode)
         {
-            if (blockSize < 4) {
-//                qWarning() << Q_FUNC_INFO << __LINE__ << "strange RTP/TCP packet. len < 4. Ignored";
+            if (blockSize < 4)
                 return result;
-            }
+
             rtpChannelNum = m_rtpDataBuffer[1];
             blockSize -= 4;
             data += 4;
@@ -716,7 +738,10 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextDataInternal()
         */
     }
     if (!result && !m_closing)
+    {
+        NX_DEBUG(this, "Invalid rtsp data, reopen rtsp session");
         reopen();
+    }
     if (result)
     {
         if (result->dataType != QnAbstractMediaData::EMPTY_DATA)
@@ -746,6 +771,7 @@ qint64 QnRtspClientArchiveDelegate::seek(qint64 time, bool findIFrame)
         nx::utils::timestampToDebugString(time / 1000),
         m_camera);
 
+    m_reopenPosition = 0;
     m_blockReopening = false;
 
     //if (time == m_position)
