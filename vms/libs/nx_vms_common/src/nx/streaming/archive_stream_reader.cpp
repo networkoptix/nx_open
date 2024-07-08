@@ -369,7 +369,7 @@ qint64 QnArchiveStreamReader::determineDisplayTime(bool reverseMode)
 
 bool QnArchiveStreamReader::getNextVideoPacket()
 {
-    while(1)
+    while (!needToStop())
     {
         // Get next video packet and store it
         m_nextData = m_delegate->getNextData();
@@ -385,6 +385,7 @@ bool QnArchiveStreamReader::getNextVideoPacket()
         if (video)
             return true;
     }
+    return false;
 }
 
 QnAbstractMediaDataPtr QnArchiveStreamReader::createEmptyPacket(bool isReverseMode)
