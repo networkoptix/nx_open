@@ -2,6 +2,9 @@
 
 #include "completer.h"
 
+#include <QListView>
+#include <QScrollBar>
+
 #include <QtCore/QScopedValueRollback>
 #include <QtGui/QKeyEvent>
 #include <QtWidgets/QAbstractItemView>
@@ -13,10 +16,20 @@
 #include <ui/common/palette.h>
 
 #include "event_parameters_dropdown_delegate.h"
+#include "nx/vms/client/desktop/resource_dialogs/resource_dialogs_constants.h"
 
 namespace nx::vms::client::desktop::rules {
 
 using namespace nx::vms::rules::utils;
+
+bool isSelectable(const QModelIndex& index)
+{
+    auto data = index.data(Qt::ItemIsSelectable);
+    if (data.canConvert<bool>())
+        return data.toBool();
+
+    return true;
+}
 
 struct Completer::Private: public QObject
 {
@@ -126,6 +139,7 @@ void Completer::Private::initPopup(QAbstractItemView* popup)
 {
     popup->installEventFilter(q);
     popup->setItemDelegate(new EventParametersDropDownDelegate(q));
+    popup->setSelectionMode(QAbstractItemView::SingleSelection);
     setPaletteColor(popup, QPalette::Base, core::colorTheme()->color("dark13"));
     // Color of highlight and scroll.
     setPaletteColor(popup, QPalette::Midlight, core::colorTheme()->color("dark16"));
@@ -277,6 +291,21 @@ Completer::Completer(const QStringList& words, QTextEdit* textEdit, QObject* par
 
 bool Completer::eventFilter(QObject* obj, QEvent* event)
 {
+    const auto scroll = [&](const int increment)
+    {
+        auto nextIndex = d->completer->currentIndex().siblingAtRow(d->completer->popup()->currentIndex().row() + increment);
+        if (!nextIndex.isValid())
+            return true;
+
+        if(!isSelectable(nextIndex))
+            nextIndex = nextIndex.siblingAtRow(nextIndex.row() + increment);
+
+        d->completer->popup()->setCurrentIndex(nextIndex);
+        d->completer->popup()->scrollTo(nextIndex);
+        d->completer->popup()->update();
+        return true;
+    };
+
     if (event->type() == QEvent::KeyPress)
     {
         // It is required to handle such event here, otherwise new line is added in the text
@@ -289,6 +318,15 @@ bool Completer::eventFilter(QObject* obj, QEvent* event)
                 d->completer->popup()->hide();
                 emit d->completer->activated(d->completer->popup()->currentIndex().data().toString());
                 return true;
+
+            case Qt::Key_Down:
+                scroll(1);
+                return true;
+
+            case Qt::Key_Up:
+                scroll(-1);
+                return true;
+
             default:
                 break;
         }
