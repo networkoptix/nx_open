@@ -801,6 +801,45 @@ void OpenApiSchema::validateParameters(const QJsonObject& pathOrMethod, const Re
     }
 }
 
+SchemaWordSearchResult OpenApiSchema::searchForWord(const QString& word) const
+{
+    SchemaWordSearchResult locations;
+    searchForWordInJson(paths(), word, QString(), &locations);
+    return locations;
+}
+
+void OpenApiSchema::searchForWordInJson(const QJsonValue& value,
+    const QString& word,
+    const QString& path,
+    SchemaWordSearchResult* locations)
+{
+    if (value.isObject())
+    {
+        for (const QJsonObject obj = value.toObject(); const QString& key : obj.keys())
+        {
+            QString newPath = path.isEmpty() ? key : path + "." + key;
+            if (key.contains(word, Qt::CaseInsensitive))
+                locations->emplace_back(newPath, key);
+
+            searchForWordInJson(obj.value(key), word, newPath, locations);
+        }
+    }
+    else if (value.isArray())
+    {
+        const QJsonArray array = value.toArray();
+        for (int i = 0; i < array.size(); ++i)
+        {
+            QString newPath = path + "[" + QString::number(i) + "]";
+            searchForWordInJson(array.at(i), word, newPath, locations);
+        }
+    }
+    else if (value.isString())
+    {
+        if (value.toString().contains(word, Qt::CaseInsensitive))
+            locations->emplace_back(path, value.toString());
+    }
+}
+
 std::shared_ptr<OpenApiSchema> OpenApiSchema::load(const QString& location)
 {
     QFile file(location);

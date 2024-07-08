@@ -10,6 +10,8 @@
 
 namespace nx::network::rest::json {
 
+using SchemaWordSearchResult = std::vector<std::pair<QString, QString>>;
+
 // See the documentation here: https://swagger.io/docs/specification/
 class NX_NETWORK_REST_API OpenApiSchema
 {
@@ -30,6 +32,7 @@ public:
         nx::network::http::HttpHeaders* = nullptr);
 
     QJsonObject paths() const;
+    SchemaWordSearchResult searchForWord(const QString& word) const;
 
     static std::shared_ptr<OpenApiSchema> load(const QString& location);
 
@@ -42,6 +45,11 @@ private:
     void validateParameters(const QJsonObject& pathOrMethod, const Request& request);
     std::pair<QJsonObject, QJsonObject> getJsonPathAndMethod(
         const QString& method, const QString& decodedPath);
+
+    static void searchForWordInJson(const QJsonValue& value,
+        const QString& word,
+        const QString& path,
+        SchemaWordSearchResult* locations);
 
 private:
     QJsonObject m_schema;
