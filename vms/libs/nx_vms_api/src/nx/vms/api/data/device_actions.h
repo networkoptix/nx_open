@@ -177,8 +177,6 @@ struct DeviceFootageRequest
      * %// Appeared starting from /rest/v4/devices/{id}/footage.
      */
     std::optional<AnalyticsFilter> analytics;
-
-    bool operator==(const DeviceFootageRequest& other) const = default;
 };
 
 #define DeviceFootageRequest_Fields \

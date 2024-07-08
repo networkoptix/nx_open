@@ -2,9 +2,9 @@
 
 #include <gtest/gtest.h>
 
+#include <nx/kit/ini_config.h>
 #include <nx/network/rest/handler.h>
 #include <nx/network/rest/nx_network_rest_ini.h>
-#include <nx/kit/ini_config.h>
 #include <nx/utils/test_support/run_test.h>
 
 namespace nx::network::rest::test {
@@ -543,7 +543,7 @@ TEST_F(RestRequestTest, RestTypeException)
     }
     catch (const rest::Exception& error)
     {
-        EXPECT_EQ("Invalid parameter `id`: 777.", error.message());
+        EXPECT_EQ("Invalid parameter `id`: 777", error.message());
     }
 
     ASSERT_EQ(777, request->paramOrThrow<int>("id"));
@@ -602,7 +602,7 @@ TEST_F(RestResponseTest, ErrorResult)
     expectJsonResponse(
         rest::Response(Result::invalidParameter("a", "X")),
         http::StatusCode::unprocessableEntity,
-        R"json({"error":"2","errorId":"invalidParameter","errorString":"Invalid parameter `a`: X."})json");
+        R"json({"error":"2","errorId":"invalidParameter","errorString":"Invalid parameter `a`: X"})json");
 }
 
 class RestResultTest:

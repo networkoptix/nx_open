@@ -130,7 +130,7 @@ void parseParameters(const nx::utils::Url& url, SystemUri* uri)
         return;
 
     QUrlQuery query(url.query());
-    for (const auto [key, value]: query.queryItems(QUrl::FullyDecoded))
+    for (const auto& [key, value]: query.queryItems(QUrl::FullyDecoded))
         parameters.insert(key.toLower(), value);
 
     QString authKey = parameters.take(kAuthKey);
