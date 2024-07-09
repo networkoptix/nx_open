@@ -907,8 +907,8 @@ void GraphicsQmlView::paint(QPainter* painter, const QStyleOptionGraphicsItem*, 
     const auto devicePixelRatio = painter->device()->devicePixelRatioF();
     d->paintQml(devicePixelRatio);
 
-    auto renderer = QnOpenGLRendererManager::instance(glWidget);
-    glWidget->makeCurrent();
+    glWidget->makeCurrent(); //< Required for renderer creation.
+    const auto renderer = QnOpenGLRendererManager::instance(glWidget);
 
     QnGlNativePainting::begin(glWidget, painter);
 
