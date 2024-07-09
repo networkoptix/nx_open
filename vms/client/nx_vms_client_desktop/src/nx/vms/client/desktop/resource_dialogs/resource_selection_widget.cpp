@@ -182,6 +182,13 @@ ResourceSelectionWidget::ResourceSelectionWidget(
                     parentIndex.data(core::ResourceRole).value<QnResourcePtr>();
                 if (parentResource && parentResource->hasFlags(Qn::server))
                     return true;
+
+                const auto parentNodeType = parentIndex.data(Qn::NodeTypeRole);
+                if (parentNodeType.isValid() && parentNodeType.value<ResourceTree::NodeType>()
+                    == ResourceTree::NodeType::layouts)
+                {
+                    return true;
+                }
             }
 
             const auto checkStateData =
