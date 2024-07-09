@@ -8,6 +8,7 @@
 #include <nx/vms/client/core/system_finder/system_description.h>
 #include <nx/vms/client/core/system_finder/system_finder.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
@@ -518,6 +519,15 @@ QList<nx::Uuid> MainWindowTitleBarStateStore::systemsIds() const
     for (const auto& system: state().systems)
         result.append(system.systemDescription->localId());
     return result;
+}
+
+bool MainWindowTitleBarStateStore::hasWorkbenchState() const
+{
+    return std::any_of(state().systems.cbegin(), state().systems.cend(),
+        [](const auto& system)
+        {
+            return !system.workbenchState.isEmpty();
+        });
 }
 
 } // nx::vms::client::desktop

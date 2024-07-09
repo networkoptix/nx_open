@@ -1,7 +1,5 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "resource_tree_model_test_fixture.h"
-
 #include <api/runtime_info_manager.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/file_layout_resource.h>
@@ -13,6 +11,8 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
+
+#include "resource_tree_model_test_fixture.h"
 
 namespace nx::vms::client::desktop {
 namespace test {
@@ -189,6 +189,11 @@ TEST_F(ResourceTreeModelTest, topLevelNodesOrder)
         "Other Sites",
         "Local Files"};
 
+    if (ini().hideOtherSystemsFromResourceTree)
+    {
+        auto it = std::remove(referenceSequence.begin(), referenceSequence.end(), "Other Sites");
+        referenceSequence.erase(it, referenceSequence.end());
+    }
     // Check tree.
     ASSERT_EQ(transformToDisplayStrings(allMatchingIndexes(topLevelNode())), referenceSequence);
 }

@@ -11,6 +11,7 @@
 #include <nx/utils/random.h>
 #include <nx/utils/test_support/test_with_temporary_directory.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <nx/vms/client/desktop/state/client_state_storage.h>
 #include <nx/vms/client/desktop/state/session_state.h>
@@ -99,7 +100,7 @@ public:
     virtual bool loadState(
         const DelegateState& state,
         SubstateFlags flags,
-        const StartupParameters& params) override
+        const StartupParameters& /*params*/) override
     {
         if (flags.testFlag(ClientStateDelegate::Substate::systemIndependentParameters))
             data().independent = nx::Uuid(state.value(kIndependentKey).toString());
@@ -321,11 +322,29 @@ protected:
         const SessionState sessionState = makeSessionState(
             session,
             ClientStateDelegate::Substate::allParameters);
-        session.path = createFile(
-            session.filename,
-            QJson::serialized(sessionState),
-            kSessionId);
-
+        if (ini().enableMultiSystemTabBar)
+        {
+            const SessionState specificState = makeSessionState(
+                session,
+                ClientStateDelegate::Substate::systemSpecificParameters);
+            session.path = createFile(
+                session.filename,
+                QJson::serialized(specificState),
+                kSessionId);
+            const SessionState independentState = makeSessionState(
+                session,
+                ClientStateDelegate::Substate::systemIndependentParameters);
+            session.path = createFile(
+                ClientStateStorage::kCommonSubstateFileName,
+                QJson::serialized(independentState));
+        }
+        else
+        {
+            session.path = createFile(
+                session.filename,
+                QJson::serialized(sessionState),
+                kSessionId);
+        }
         m_savedSessions.insert(id, session);
     }
 
@@ -394,7 +413,14 @@ protected:
     SavedSession savedSession(int id = 0)
     {
         NX_ASSERT(m_savedSessions.contains(id));
-        return m_savedSessions.value(id);
+        SavedSession result = m_savedSessions.value(id);
+        if (ini().enableMultiSystemTabBar && id < m_savedSessions.count() - 1)
+        {
+            // Independent state of the current session was overwritten by the latest session.
+            for (int i = 0; i < kNumberOfDelegates; ++i)
+                result.data[i].independent = m_savedSessions.last().data[i].independent;
+        }
+        return result;
     }
 
     Session currentSession()
@@ -568,7 +594,6 @@ TEST_F(ClientStateHandlerTest, fullRestoreOnConnect)
     clientStateHandler()->connectionToSystemEstablished(/*fullRestoreEnabled*/ true, kSessionId, kLogonData);
 
     ASSERT_EQ(currentSession(), savedSession(0));
-
     ASSERT_EQ(runningProcessesCount(), 2);
     ASSERT_EQ(runningProcessesCountBySession(kSessionId), 1); //< The current one doesn't count.
 }
@@ -632,7 +657,6 @@ TEST_F(ClientStateHandlerTest, restoreWindowsConfiguration1)
     const auto secondId = givenAnotherRunningInstance(kSessionId);
 
     clientStateHandler()->connectionToSystemEstablished(/*fullRestoreEnabled*/ false, kSessionId, kLogonData);
-
     clientStateHandler()->restoreWindowsConfiguration(kLogonData);
 
     ASSERT_EQ(currentSession(), savedSession(0));
@@ -647,7 +671,6 @@ TEST_F(ClientStateHandlerTest, restoreWindowsConfiguration2)
     givenSavedSession(1);
 
     clientStateHandler()->connectionToSystemEstablished(/*fullRestoreEnabled*/ false, kSessionId, kLogonData);
-
     clientStateHandler()->restoreWindowsConfiguration(kLogonData);
 
     ASSERT_EQ(currentSession(), savedSession(0));
@@ -680,7 +703,6 @@ TEST_F(ClientStateHandlerTest, requestToLoadState)
 {
     givenSavedSession();
     clientStateHandler()->connectionToSystemEstablished(/*fullRestoreEnabled*/ true, kSessionId, kLogonData);
-
     clientStateHandler()->clientRequestedToRestoreState(savedSession(0).filename);
     ASSERT_EQ(currentSession(), savedSession(0));
 }

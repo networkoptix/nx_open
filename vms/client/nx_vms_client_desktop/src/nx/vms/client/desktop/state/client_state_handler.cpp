@@ -8,6 +8,7 @@
 #include <client/client_runtime_settings.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <statistics/statistics_manager.h>
 #include <ui/statistics/modules/session_restore_statistics_module.h>
 
@@ -325,8 +326,7 @@ void ClientStateHandler::restoreWindowsConfiguration(core::LogonData logonData)
         if (NX_ASSERT(d->processExecutionInterface))
             d->processExecutionInterface->runClient(parameters);
     }
-
-    loadClientState(ownState, ClientStateDelegate::Substate::allParameters, /*force*/ true);
+    loadClientState(ownState);
 }
 
 void ClientStateHandler::deleteWindowsConfiguration()
@@ -352,8 +352,9 @@ void ClientStateHandler::clientRequestedToSaveState()
         return;
 
     const QString randomFilename = nx::Uuid::createUuid().toString() + ".json";
-    const auto state = serializeState(ClientStateDelegate::Substate::allParameters);
+    const auto state = serializeState(ClientStateDelegate::Substate::systemSpecificParameters);
     d->clientStateStorage.writeSessionState(d->sessionId, randomFilename, state);
+    storeSystemIndependentState();
 }
 
 void ClientStateHandler::clientRequestedToRestoreState(const QString& filename)
@@ -361,8 +362,7 @@ void ClientStateHandler::clientRequestedToRestoreState(const QString& filename)
     if (!NX_ASSERT(d->sessionId != SessionId()))
         return;
 
-    auto state = d->clientStateStorage.readSessionState(d->sessionId, filename);
-    loadClientState(state, ClientStateDelegate::Substate::allParameters, /*force*/ true);
+    loadClientState(d->clientStateStorage.readSessionState(d->sessionId, filename));
 }
 
 void ClientStateHandler::setStatisticsModules(
@@ -420,6 +420,25 @@ void ClientStateHandler::loadClientState(
 
     if (d->statisticsModule)
         d->statisticsModule->stopCapturing();
+}
+
+void ClientStateHandler::loadClientState(const SessionState& state)
+{
+    if (ini().enableMultiSystemTabBar)
+    {
+        loadClientState(
+            state,
+            ClientStateDelegate::Substate::systemSpecificParameters,
+            /*force*/ true);
+        loadClientState(
+            d->clientStateStorage.readCommonSubstate(),
+            ClientStateDelegate::Substate::systemIndependentParameters,
+            /*force*/ true);
+    }
+    else
+    {
+        loadClientState(state, ClientStateDelegate::Substate::allParameters, /*force*/ true);
+    }
 }
 
 } // namespace nx::vms::client::desktop
