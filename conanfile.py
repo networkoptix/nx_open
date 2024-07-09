@@ -183,6 +183,7 @@ class NxOpenConan(ConanFile):
                 self.requires("cuda-toolkit/11.8" "#e3abcd1414a93ff2b41f1b159c431c9c")
                 self.requires("libvpl/2023.4.0" "#d3846418a105faa17d740e65a5b98398")
                 self.requires("zlib/1.2.12" "#bb959a1d68d4c35d0fba4cc66f5bb25f")
+                self.requires("libpq/13.4" "#3c130555eda25ad50be3824716b0ce4d")
 
         if self.isLinux:
             if self.settings.arch == "x86_64":
@@ -193,7 +194,6 @@ class NxOpenConan(ConanFile):
                 self.requires("intel-media-driver/23.4.3" "#f39057b746ee544509b0014aba18ec0a")
 
                 self.requires("libmysqlclient/8.0.17" "#87d0d0dca416ff91ff910c66b57eab1a")
-                self.requires("libpq/13.4" "#3c130555eda25ad50be3824716b0ce4d")
 
             if not self.isArm32:
                 self._os_deps_package = "os_deps_for_desktop_linux"
