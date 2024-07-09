@@ -254,7 +254,13 @@ void CloudStreamSocket::cancelIoInAioThread(aio::EventType eventType)
     if (eventType == aio::etNone || eventType == aio::etWrite)
     {
         m_writeIoBinder.pleaseStopSync();
-        m_connector.reset(); //< Cancelling connect.
+
+        // Cancelling connectAsync().
+        m_connector.reset();
+
+        // Cancelling connect().
+        if (auto promisePtr = m_connectPromisePtr.exchange(nullptr))
+            promisePtr->set_value(SystemError::interrupted);
     }
 
     if (m_socketDelegate)
@@ -430,6 +436,8 @@ void CloudStreamSocket::stopWhileInAioThread()
         setDelegate(nullptr);
     }
     m_connector.reset();
+    if (auto promisePtr = m_connectPromisePtr.exchange(nullptr))
+        promisePtr->set_value(SystemError::interrupted);
 
     m_aioThreadBinder.pleaseStopSync();
 }
