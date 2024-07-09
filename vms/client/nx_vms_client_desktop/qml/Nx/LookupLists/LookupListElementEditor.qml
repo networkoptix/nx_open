@@ -98,7 +98,7 @@ Control
                 return control.value
             }
 
-            placeholderText: control.value ? control.value : qsTr("Any %1").arg(attribute ? attribute.name : "value")
+            placeholderText: qsTr("Any %1").arg(attribute ? attribute.name : "value")
 
             Connections
             {
@@ -129,7 +129,7 @@ Control
                 return control.value
             }
 
-            placeholderText: control.value ? control.value : qsTr("Any %1").arg(attribute.name)
+            placeholderText: qsTr("Any %1").arg(attribute.name)
             minimum: attribute.minValue
             maximum: attribute.maxValue
 

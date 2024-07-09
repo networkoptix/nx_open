@@ -35,16 +35,28 @@ FocusScope
             : Number(value).toString()
     }
 
-    function setValue(value)
+    function setValue(text)
     {
-        const parsedValue = valueFromText(value)
-        const isInvalidValue = textField.validator && parsedValue && textField.validator.validate(parsedValue) !== Qt.Acceptable
-        if (textField.value !== parsedValue || isInvalidValue)
+        const parsedValue = valueFromText(text)
+
+        if (textField.value === parsedValue)
+            return
+
+        if (parsedValue === undefined)
         {
-            textField.value = textField.validator
-                ? MathUtils.bound(textField.validator.bottom, parsedValue, textField.validator.top)
-                : parsedValue
+            // 'undefined' is valid value, returned on empty text.
+            textField.value = parsedValue
+            return
         }
+
+        if (isNaN(parsedValue))
+            return //< NaN is returned during casting of incorrect string to number. (for example symbol '-').
+
+        // Value is invalid, when it is outside [min,max] range.
+        const isInvalidValue = textField.validator && (textField.validator.validate(parsedValue) !== Qt.Acceptable)
+        textField.value = isInvalidValue
+            ? MathUtils.bound(textField.validator.bottom, parsedValue, textField.validator.top)
+            : parsedValue
     }
 
     function clear()
@@ -152,12 +164,7 @@ FocusScope
                 textField.clear()
         }
 
-        onTextChanged:
-        {
-            const parsedValue = valueFromText(text)
-            if (parsedValue !== value)
-                value = parsedValue
-        }
+        onTextChanged: setValue(text)
 
         onEditingFinished: control.editingFinished()
 

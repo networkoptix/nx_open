@@ -96,6 +96,10 @@
             "rgb": "#0000FF"
           },
           {
+            "name": "green",
+            "rgb": "#00FF00"
+          },
+          {
             "name": "red",
             "rgb": "#FF0000"
           },
@@ -249,12 +253,17 @@
             "type": "Boolean"
           },
           {
-            "name": "Number",
+            "name": "IntNumberWithoutLimit",
+            "type": "Number",
+            "subtype": "integer"
+          },
+          {
+            "name": "FloatNumberWithoutLimit",
             "type": "Number",
             "subtype": "float"
           },
           {
-            "name": "Base Type Numeric Attribute 2",
+            "name": "FloatNumberWithLimit",
             "type": "Number",
             "subtype": "float",
             "minValue": 1.0,
@@ -262,16 +271,50 @@
             "unit": "kg"
           },
           {
+            "name": "FloatNumberWithMinLimit",
+            "type": "Number",
+            "subtype": "float",
+            "minValue": 1.5
+          },
+          {
+            "name": "FloatNumberWithMaxLimit",
+            "type": "Number",
+            "subtype": "float",
+            "maxValue": 10.8
+          },
+          {
             "name": "Base Type Numeric Attribute 3",
             "type": "Number",
             "subtype": "integer"
           },
           {
-            "name": "Base Type Numeric Attribute 4",
+            "name": "IntNumberWithLimit",
             "type": "Number",
             "subtype": "integer",
             "minValue": 2,
             "maxValue": 20,
+            "unit": "unit"
+          },
+          {
+            "name": "IntNumberWithLimitBellowZero",
+            "type": "Number",
+            "subtype": "integer",
+            "minValue": -20,
+            "maxValue": -1,
+            "unit": "unit"
+          },
+          {
+            "name": "IntNumberWithMinLimit",
+            "type": "Number",
+            "subtype": "integer",
+            "minValue": 0,
+            "unit": "unit"
+          },
+          {
+            "name": "IntNumberWithMaxLimit",
+            "type": "Number",
+            "subtype": "integer",
+            "maxValue": 100,
             "unit": "unit"
           },
           {
@@ -327,16 +370,34 @@
         "Approved": {
           "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
         },
-        "Number": {
+        "IntNumberWithoutLimit": {
           "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
         },
-        "Base Type Numeric Attribute 2": {
+        "IntNumberWithLimit": {
+          "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+        },
+        "IntNumberWithLimitBellowZero": {
+          "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+        },
+        "IntNumberWithMinLimit": {
+          "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+        },
+        "IntNumberWithMaxLimit": {
+          "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+        },
+        "FloatNumberWithLimit": {
+          "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+        },
+        "FloatNumberWithoutLimit": {
+          "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+        },
+        "FloatNumberWithMaxLimit": {
+          "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+        },
+        "FloatNumberWithMinLimit": {
           "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
         },
         "Base Type Numeric Attribute 3": {
-          "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
-        },
-        "Base Type Numeric Attribute 4": {
           "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
         },
         "Enum": {

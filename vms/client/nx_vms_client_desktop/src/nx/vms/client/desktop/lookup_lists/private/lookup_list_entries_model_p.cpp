@@ -72,16 +72,32 @@ QVariant LookupListEntriesModel::Private::getDisplayValue(
     return it->second(value);
 }
 
-bool LookupListEntriesModel::Private::intValidator(const QString& value)
+bool LookupListEntriesModel::Private::intValidator(
+    const QString& value, const QVariant& min, const QVariant& max)
 {
-    int ignored;
-    return reflect::json::deserialize(value.toStdString(), &ignored);
+    bool ok = false;
+    //TODO: change to reflect::json::deserialize after fix of VMS-53821
+    int intValue = value.toInt(&ok);
+    if (!ok)
+        return false;
+    if (!min.isNull() && min.toInt() > intValue)
+        return false;
+    if (!max.isNull() && max.toInt() < intValue)
+        return false;
+    return true;
 }
 
-bool LookupListEntriesModel::Private::doubleValidator(const QString& value)
+bool LookupListEntriesModel::Private::doubleValidator(
+    const QString& value, const QVariant& min, const QVariant& max)
 {
-    double ignoredDouble;
-    return reflect::json::deserialize(value.toStdString(), &ignoredDouble);
+    double doubleValue;
+    if (!reflect::json::deserialize(value.toStdString(), &doubleValue))
+        return false;
+    if (!min.isNull() && min.toDouble() > doubleValue)
+        return false;
+    if (!max.isNull() && max.toDouble() < doubleValue)
+        return false;
+    return true;
 }
 
 bool LookupListEntriesModel::Private::booleanValidator(const QString& value)
@@ -122,13 +138,17 @@ void LookupListEntriesModel::Private::initAttributeFunctions()
             {
                 case Attribute::Type::number:
                 {
-                    const bool isIntType = attribute->subtype == "int";
+                    const bool isIntType = attribute->subtype == "integer";
                     formatterByAttributeName[fullAttributeName] = isIntType
                         ? &Private::intFormatter
                         : &Private::doubleFormatter;
-                    validatorByAttributeName[fullAttributeName] = isIntType
-                        ? &Private::intValidator
-                        : &Private::doubleValidator;
+                    validatorByAttributeName[fullAttributeName] =
+                        [isIntType, min = attribute->minValue, max = attribute->maxValue]
+                        (const QString& value)
+                        {
+                            return isIntType ? intValidator(value, min, max)
+                                             : doubleValidator(value, min, max);
+                        };
                     break;
                 }
                 case Attribute::Type::boolean:
