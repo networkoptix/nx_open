@@ -87,6 +87,9 @@ public:
     /** Resets all rules. Emits corresponding signal. */
     void resetRules(const std::vector<api::Rule>& rulesData);
 
+    /** Builds Rule from API Rule. */
+    std::unique_ptr<Rule> buildRule(const api::Rule& ruleData) const;
+
     /** Removes existing rule from the engine, does nothing otherwise. Emits corresponding signal. */
     void removeRule(nx::Uuid ruleId);
 
@@ -201,7 +204,6 @@ private:
     // not cached, and if the event is prolonged, it checks that it has a valid state.
     bool checkEvent(const EventPtr& event) const;
 
-    std::unique_ptr<Rule> buildRule(const api::Rule& ruleData) const;
     std::unique_ptr<Rule> cloneRule(const Rule* rule) const;
 
     void onEventReceved(const EventPtr& event, const std::vector<ConstRulePtr>& triggeredRules);
