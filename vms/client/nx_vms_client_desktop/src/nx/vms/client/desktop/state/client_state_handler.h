@@ -213,6 +213,7 @@ private:
         const SessionState& state,
         ClientStateDelegate::SubstateFlags flags,
         bool applyState = false);
+    void loadClientState(const SessionState& state);
 
 private:
     struct Private;

@@ -79,6 +79,7 @@ public:
     WorkbenchState workbenchState(const nx::Uuid& systemId) const;
     bool isTitleBarEnabled() const;
     QList<nx::Uuid> systemsIds() const;
+    bool hasWorkbenchState() const;
 
 signals:
     void stateChanged(const State& state);

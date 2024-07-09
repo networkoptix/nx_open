@@ -794,7 +794,9 @@ void ConnectActionsHandler::establishConnection(RemoteConnectionPtr connection)
 
     // TODO: #sivanov Implement separate address and credentials handling.
     appContext()->clientStateHandler()->connectionToSystemEstablished(
-        appContext()->localSettings()->restoreUserSessionData(),
+        appContext()->localSettings()->restoreUserSessionData()
+            && (!mainWindow()->titleBarStateStore()
+                || !mainWindow()->titleBarStateStore()->hasWorkbenchState()),
         session->sessionId(),
         logonData);
 }
