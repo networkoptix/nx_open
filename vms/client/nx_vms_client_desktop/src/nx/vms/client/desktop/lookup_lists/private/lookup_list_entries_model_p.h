@@ -19,10 +19,10 @@ public:
     core::analytics::taxonomy::StateView* taxonomy;
 
     void initAttributeFunctions();
-    static bool intValidator(const QString& value);
+    static bool intValidator(const QString& value, const QVariant& min, const QVariant& max);
     static QVariant intFormatter(const QString& value);
     static QVariant doubleFormatter(const QString& value);
-    static bool doubleValidator(const QString& value);
+    static bool doubleValidator(const QString& value, const QVariant& min, const QVariant& max);
     static bool booleanValidator(const QString& value);
     static QVariant booleanFormatter(const QString& value);
     static QVariant stringFormatter(const QString& value);

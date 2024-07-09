@@ -388,9 +388,18 @@ protected:
     {
         QVariantMap entry;
         entry["Approved"] = "true";
-        entry["Number"] = "1";
+        entry["IntNumberWithoutLimit"] = "1";
         entry["Color"] = "#FF0000";
         entry["Enum"] = "base enum item 2.1";
+        entry["FloatNumberWithLimit"] = "3.5";
+        entry["FloatNumberWithoutLimit"] = "-9.67";
+        entry["FloatNumberWithMinLimit"] = "34.67";
+        entry["FloatNumberWithMaxLimit"] = "0.01";
+        entry["IntNumberWithLimit"] = "5";
+        entry["IntNumberWithLimitBellowZero"] = "-11";
+        entry["IntNumberWithMinLimit"] = "5";
+        entry["IntNumberWithMaxLimit"] = "78";
+
         return entry;
     }
 
@@ -426,18 +435,36 @@ protected:
         e1.objectTypeId = "base.object.type.1";
         e1.id = nx::Uuid::createUuid();
         e1.name = "Numbers";
-        e1.attributeNames.push_back("Number");
+        e1.attributeNames.push_back("IntNumberWithoutLimit");
+        e1.attributeNames.push_back("FloatNumberWithLimit");
+        e1.attributeNames.push_back("FloatNumberWithoutLimit");
+        e1.attributeNames.push_back("FloatNumberWithMinLimit");
+        e1.attributeNames.push_back("FloatNumberWithMaxLimit");
         e1.attributeNames.push_back("Color");
         e1.attributeNames.push_back("Enum");
         e1.attributeNames.push_back("Approved");
+        e1.attributeNames.push_back("IntNumberWithLimit");
+        e1.attributeNames.push_back("IntNumberWithLimitBellowZero");
+        e1.attributeNames.push_back("IntNumberWithMinLimit");
+        e1.attributeNames.push_back("IntNumberWithMaxLimit");
         e1.entries = {
-            {{"Number", "12345"},
+            {{"IntNumberWithoutLimit", "12345"},
                 {"Color", "#FF0000"},
                 {"Enum", "base enum item 2.1"},
-                {"Approved", "true"}},
-            {{"Number", "67890"}, {"Approved", "false"}},
-            {{"Color", "#0000FF"}, {"Number", "9876"}},
-            {{"Enum", "base enum item 2.2"}, {"Color", "#0000FF"}},
+                {"Approved", "true"},
+                {"IntNumberWithLimit", "19"},
+                {"FloatNumberWithLimit", "5.0"},
+                {"FloatNumberWithoutLimit", "9.876"},
+                {"FloatNumberWithMinLimit", "1.6"},
+                {"FloatNumberWithMaxLimit", "10.7"},
+                {"IntNumberWithLimitBellowZero", "-13"},
+                {"IntNumberWithMinLimit", "100"},
+                {"IntNumberWithMaxLimit", "99"},
+            },
+            {{"IntNumberWithoutLimit", "67890"}, {"Approved", "false"}},
+            {{"Color", "#00FF00"}, {"IntNumberWithoutLimit", "9876"}},
+            {{"IntNumberWithLimit", "4"}, {"FloatNumberWithLimit", "2"}},
+            {{"Enum", "base enum item 2.2"}, {"FloatNumberWithLimit", "7"}, {"Color", "#0000FF"}},
         };
         return e1;
     }
@@ -448,9 +475,9 @@ protected:
         e1.id = nx::Uuid::createUuid();
         e1.name = "Derived";
         e1.objectTypeId = "derived.object.type.1";
-        e1.attributeNames.push_back("Number");
+        e1.attributeNames.push_back("IntNumberWithoutLimit");
         e1.attributeNames.push_back("Derived Number Attribute");
-        e1.entries.push_back({{"Derived Number Attribute", "1"}, {"Number", "9876"}});
+        e1.entries.push_back({{"Derived Number Attribute", "1"}, {"IntNumberWithoutLimit", "9876"}});
         return e1;
     }
 
@@ -509,7 +536,8 @@ TEST_F(LookupListTests, add_empty_row)
 {
     const int initialRowCount = givenImportModel(bigColumnNumberExampleData());
 
-    whenAddEntriesByImportModel({{{"Number", ""}, {"Color", ""}, {"Approved", ""}}});
+    whenAddEntriesByImportModel(
+        {{{"IntNumberWithoutLimit", ""}, {"Color", ""}, {"Approved", ""}}});
 
     // The entry should not be added to the model,
     // so the number of rows before and after must be the same.
@@ -581,12 +609,76 @@ TEST_F(LookupListTests, validate_enum_value)
 }
 
 /**
- * Check validation of lookup list with incorrect number value.
+ * Check validation of lookup list with incorrect int number value, without limit.
  */
-TEST_F(LookupListTests, validate_number_value)
+TEST_F(LookupListTests, validate_int_number_value_limitless)
 {
-    checkValidationOfEmptyRowWithOneIncorrect("Number", "incorrect", "1");
-    checkValidationOfRowsWithCorrectAndIncorrectValues("Number");
+    checkValidationOfEmptyRowWithOneIncorrect("IntNumberWithoutLimit", "incorrect", "1");
+    checkValidationOfEmptyRowWithOneIncorrect("IntNumberWithoutLimit", "1.987", "1");
+    checkValidationOfRowsWithCorrectAndIncorrectValues("IntNumberWithoutLimit");
+}
+
+/**
+ * Check validation of lookup list with incorrect float number value, without limit.
+ */
+TEST_F(LookupListTests, validate_float_number_value_limitless)
+{
+    checkValidationOfEmptyRowWithOneIncorrect("FloatNumberWithoutLimit", "incorrect", "1.987");
+    checkValidationOfEmptyRowWithOneIncorrect("FloatNumberWithoutLimit", "incorrect", "1");
+    checkValidationOfRowsWithCorrectAndIncorrectValues("FloatNumberWithoutLimit");
+}
+
+/**
+ * Check validation of lookup list with float number value, outside min/max range.
+ */
+TEST_F(LookupListTests, validate_float_number_value_with_limit)
+{
+    // Value less than min.
+    checkValidationOfEmptyRowWithOneIncorrect("FloatNumberWithLimit", "0.1", "1.987");
+    // Value more than max.
+    checkValidationOfEmptyRowWithOneIncorrect("FloatNumberWithLimit", "11.1", "1.987");
+
+
+    // Check type with limit only in min value. Value less than min.
+    checkValidationOfEmptyRowWithOneIncorrect("FloatNumberWithMinLimit", "1.49", "19");
+
+    // Check type with limit only in max value. Value more than max.
+    checkValidationOfEmptyRowWithOneIncorrect("FloatNumberWithMaxLimit", "10.81", "19");
+
+    checkValidationOfRowsWithCorrectAndIncorrectValues("FloatNumberWithLimit");
+}
+
+/**
+ * Check validation of lookup list with int number value, outside min/max range.
+ */
+TEST_F(LookupListTests, validate_int_number_value_with_limit)
+{
+    // Value less than min.
+    checkValidationOfEmptyRowWithOneIncorrect("IntNumberWithLimit", "-1", "19");
+    // Value more than max.
+    checkValidationOfEmptyRowWithOneIncorrect("IntNumberWithLimit", "60", "8");
+
+    // Check type with limit only in min value. Value less than min.
+    checkValidationOfEmptyRowWithOneIncorrect("IntNumberWithMinLimit", "-1", "19");
+
+    // Check type with limit only in max value. Value more than max.
+    checkValidationOfEmptyRowWithOneIncorrect("IntNumberWithMaxLimit", "134", "19");
+
+    checkValidationOfRowsWithCorrectAndIncorrectValues("IntNumberWithLimit");
+}
+
+/**
+ * Check validation of lookup list with negative int number value, outside min/max range.
+ */
+TEST_F(LookupListTests, validate_int_negative_number_value_with_limit)
+{
+    // Value less than min.
+    checkValidationOfEmptyRowWithOneIncorrect("IntNumberWithLimitBellowZero", "-60", "-10");
+
+    // Value more than max.
+    checkValidationOfEmptyRowWithOneIncorrect("IntNumberWithLimitBellowZero", "100", "-5");
+
+    checkValidationOfRowsWithCorrectAndIncorrectValues("IntNumberWithLimitBellowZero");
 }
 
 /**
@@ -713,7 +805,10 @@ TEST_F(LookupListTests, search_on_displayed_values)
     thenRowCountIs(1, m_entriesProxyModel.get());
 
     whenSetFilter("blue");
-    thenRowCountIs(2, m_entriesProxyModel.get());
+    thenRowCountIs(1, m_entriesProxyModel.get());
+
+    whenSetFilter("green");
+    thenRowCountIs(1, m_entriesProxyModel.get());
 }
 
 TEST_F(LookupListTests, search_by_all_columns)
