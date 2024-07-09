@@ -112,6 +112,11 @@ namespace Qn {
          */
         cross_system = 1 << 29,
 
+        /**
+         * Do not generate periodic(auto) thumbnails for camera
+         */
+        no_periodic_thumbnails = 1 << 30,
+
         local_media = local | media | url,
         exported_media = local_media | exported,
 

@@ -1072,10 +1072,6 @@ void QnRtspClientArchiveDelegate::setupRtspSession(
         QNetworkProxy proxy = QnNetworkProxyFactory::proxyToResource(server);
         if (proxy.type() != QNetworkProxy::NoProxy)
             session->setProxyAddr(proxy.hostName(), proxy.port());
-
-        session->setAdditionAttribute(
-            Qn::SERVER_GUID_HEADER_NAME,
-            server->getId().toByteArray());
     }
 
     session->setTransport(nx::vms::api::RtpTransportType::tcp);
