@@ -92,8 +92,8 @@ Control
                 rightPadding: 13
                 topPadding: 13
                 bottomPadding: 13
-                icon.width: 10
-                icon.height: 10
+                icon.width: 16
+                icon.height: 16
                 focusPolicy: Qt.NoFocus
 
                 flat: true
