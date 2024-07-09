@@ -138,4 +138,4 @@ private:
     std::vector<std::shared_ptr<AbstractMediaDataFilter>> m_filters;
 };
 
-using QnAbstractArchiveStreamReaderPtr = QSharedPointer<QnAbstractArchiveStreamReader>;
+using QnAbstractArchiveStreamReaderPtr = std::shared_ptr<QnAbstractArchiveStreamReader>;

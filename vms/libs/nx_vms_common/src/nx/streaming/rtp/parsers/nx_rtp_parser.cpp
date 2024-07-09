@@ -24,20 +24,22 @@ static const int RTSP_FFMPEG_VIDEO_HEADER_SIZE = 3;
 static const int RTSP_FFMPEG_METADATA_HEADER_SIZE = 8; //< m_duration + metadataType
 
 QnNxRtpParser::QnNxRtpParser(nx::Uuid deviceId, const QString& tag):
-    m_deviceId(deviceId),
-    m_nextDataPacketBuffer(nullptr),
-    m_position(AV_NOPTS_VALUE),
-    m_isAudioEnabled(true),
-    m_primaryLogger(
+    base_type()
+{
+    using namespace nx::analytics;
+    m_primaryLogger = std::make_unique<MetadataLogger>(
         nx::format("rtp_parser_%1@%2_").args(tag, nx::kit::utils::toString(this)),
-        m_deviceId,
+        deviceId,
         /*engineId*/ nx::Uuid(),
-        nx::vms::api::StreamIndex::primary),
-    m_secondaryLogger(
+        nx::vms::api::StreamIndex::primary);
+    m_secondaryLogger = std::make_unique<MetadataLogger>(
         nx::format("rtp_parser_%1@%2_").args(tag, nx::kit::utils::toString(this)),
-        m_deviceId,
+        deviceId,
         /*engineId*/ nx::Uuid(),
-        nx::vms::api::StreamIndex::secondary)
+        nx::vms::api::StreamIndex::secondary);
+}
+
+QnNxRtpParser::QnNxRtpParser()
 {
 }
 
@@ -62,8 +64,7 @@ void QnNxRtpParser::logMediaData(const QnAbstractMediaDataPtr& data)
         return;
 
     const bool isSecondaryProvider = data->flags & QnAbstractMediaData::MediaFlags_LowQuality;
-    auto logger = isSecondaryProvider ? &m_secondaryLogger : &m_primaryLogger;
-
+    auto& logger = isSecondaryProvider ? m_secondaryLogger : m_primaryLogger;
     if (logger)
         logger->pushData(data);
 }
@@ -82,8 +83,30 @@ Result QnNxRtpParser::processData(const uint8_t* data, int dataSize, bool& gotDa
 
     const quint8* payload = data + RtpHeader::kSize;
     dataSize -= RtpHeader::kSize;
+
+    return processData(*rtpHeader, payload, dataSize, gotData);
+}
+
+Result QnNxRtpParser::processData(
+    const RtpHeader& rtpHeader,
+    quint8* rtpBufferBase,
+    int bufferOffset,
+    int dataSize,
+    bool& gotData)
+{
+    return processData(rtpHeader, rtpBufferBase + bufferOffset, dataSize, gotData);
+}
+
+Result QnNxRtpParser::processData(
+    const RtpHeader& rtpHeader,
+    const uint8_t* payload,
+    int dataSize,
+    bool& gotData)
+{
+    gotData = false;
+
     // Odd numbers - codec context, even numbers - data.
-    const bool isCodecContext = qFromBigEndian(rtpHeader->ssrc) & 1;
+    const bool isCodecContext = qFromBigEndian(rtpHeader.ssrc) & 1;
     if (isCodecContext)
     {
         int contextVersion = 0;
@@ -105,8 +128,8 @@ Result QnNxRtpParser::processData(const uint8_t* data, int dataSize, bool& gotDa
     {
         CodecParametersConstPtr context = m_context;
 
-        if (rtpHeader->padding)
-            dataSize -= qFromBigEndian(rtpHeader->padding);
+        if (rtpHeader.padding)
+            dataSize -= qFromBigEndian(rtpHeader.padding);
         if (dataSize < 1)
             return {false, NX_FMT("Unexpected data size %1", dataSize)};
 
@@ -253,7 +276,7 @@ Result QnNxRtpParser::processData(const uint8_t* data, int dataSize, bool& gotDa
             if (context)
                 m_nextDataPacket->compressionType = context->getCodecId();
             m_nextDataPacket->timestamp =
-                qFromBigEndian(rtpHeader->timestamp) + (qint64(timestampHigh) << 32);
+                qFromBigEndian(rtpHeader.timestamp) + (qint64(timestampHigh) << 32);
         }
 
         NX_VERBOSE(this, "Got data of type %1 for time %2",
@@ -266,7 +289,7 @@ Result QnNxRtpParser::processData(const uint8_t* data, int dataSize, bool& gotDa
         if (m_nextDataPacket->dataType == QnAbstractMediaData::VIDEO)
             m_lastFramePtsUs = m_nextDataPacket->timestamp;
 
-        if (rtpHeader->marker)
+        if (rtpHeader.marker)
         {
             if (m_nextDataPacket->flags & QnAbstractMediaData::MediaFlags_LIVE)
                 m_position = DATETIME_NOW;

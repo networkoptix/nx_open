@@ -398,6 +398,12 @@ void QnRtspClient::parseRangeHeader(const QString& rangeStr)
     }
 }
 
+void QnRtspClient::setTcpSocket(std::unique_ptr<nx::network::AbstractStreamSocket> socket)
+{
+    NX_MUTEX_LOCKER lock(&m_socketMutex);
+    m_tcpSock = std::move(socket);
+}
+
 CameraDiagnostics::Result QnRtspClient::open(const nx::utils::Url& url, qint64 startTime)
 {
     /*
@@ -437,22 +443,25 @@ CameraDiagnostics::Result QnRtspClient::open(const nx::utils::Url& url, qint64 s
             "Bearer token authorization can't be used with insecure url scheme.");
     }
 
+    if (m_proxySocket)
     {
-        NX_MUTEX_LOCKER lock(&m_socketMutex);
-        m_tcpSock = nx::network::SocketFactory::createStreamSocket(
-            nx::network::ssl::kAcceptAnyCertificate, isSslRequired, m_natTraversal);
+        setTcpSocket(std::move(m_proxySocket));
     }
-
-    m_tcpSock->setRecvTimeout(TCP_RECEIVE_TIMEOUT_MS);
-
-    nx::network::SocketAddress targetAddress;
-    if (m_proxyAddress)
-        targetAddress = *m_proxyAddress;
     else
-        targetAddress = nx::network::url::getEndpoint(m_url, DEFAULT_RTP_PORT);
+    {
+        setTcpSocket(nx::network::SocketFactory::createStreamSocket(
+            nx::network::ssl::kAcceptAnyCertificate, isSslRequired, m_natTraversal));
 
-    if (!m_tcpSock->connect(targetAddress, std::chrono::milliseconds(TCP_CONNECT_TIMEOUT_MS)))
-        return CameraDiagnostics::CannotOpenCameraMediaPortResult(url, targetAddress.port);
+        m_tcpSock->setRecvTimeout(TCP_RECEIVE_TIMEOUT_MS);
+        nx::network::SocketAddress targetAddress;
+        if (m_proxyAddress)
+            targetAddress = *m_proxyAddress;
+        else
+            targetAddress = nx::network::url::getEndpoint(m_url, DEFAULT_RTP_PORT);
+
+        if (!m_tcpSock->connect(targetAddress, std::chrono::milliseconds(TCP_CONNECT_TIMEOUT_MS)))
+            return CameraDiagnostics::CannotOpenCameraMediaPortResult(url, targetAddress.port);
+    }
 
     m_tcpSock->setNoDelay(true);
     m_tcpSock->setRecvTimeout(m_tcpTimeout);
@@ -464,14 +473,17 @@ CameraDiagnostics::Result QnRtspClient::open(const nx::utils::Url& url, qint64 s
         return CameraDiagnostics::NoErrorResult();
     }
 
-    auto result = sendOptions();
-    if (!result)
+    if (m_doSendOptions)
     {
-        stop();
-        return result;
+        auto result = sendOptions();
+        if (!result)
+        {
+            stop();
+            return result;
+        }
     }
 
-    result = sendDescribe();
+    auto result = sendDescribe();
     if (result)
         NX_DEBUG(this, "Successfully opened RTSP stream %1", m_url);
 
@@ -1592,6 +1604,17 @@ void QnRtspClient::setProxyAddr(const nx::String& addr, int port)
     m_proxyAddress = nx::network::SocketAddress(addr, (uint16_t) port);
 }
 
+void QnRtspClient::setProxySocket(std::unique_ptr<nx::network::AbstractStreamSocket> proxySocket)
+{
+    m_proxySocket = std::move(proxySocket);
+}
+
+void QnRtspClient::resetProxyAddr()
+{
+    m_proxyAddress.reset();
+    m_proxySocket.reset();
+}
+
 void QnRtspClient::setPlayNowModeAllowed(bool value)
 {
     m_playNowMode = value;
@@ -1692,6 +1715,9 @@ CameraDiagnostics::Result QnRtspClient::sendRequestAndReceiveResponse(
 
         m_serverInfo = nx::network::http::getHeaderValue(
             response.headers, nx::network::http::header::Server::NAME);
+
+        NX_VERBOSE(this, "Got Response response. url='%1', response= %2",
+            request.requestLine.url, responseBuf);
 
         switch (response.statusLine.statusCode)
         {
@@ -1795,4 +1821,8 @@ void QnRtspClient::setIgnoreQopInDigest(bool value)
 bool QnRtspClient::ignoreQopInDigest(bool value) const
 {
     return m_ignoreQopInDigest;
+}
+void QnRtspClient::setDoSendOptions(bool value)
+{
+    m_doSendOptions = value;
 }

@@ -73,7 +73,11 @@ void RtpParser::clear()
 QnAbstractMediaDataPtr RtpParser::nextData(const nx::rtp::RtcpSenderReport& senderReport)
 {
     auto data = m_codecParser->nextData();
-    if (data)
+    if (m_codecParser->isUtcTime())
+    {
+        m_isUtcTime = true;
+    }
+    else if (data)
     {
         data->timestamp = getTimestamp(data->timestamp, senderReport);
         m_isUtcTime = senderReport.ntpTimestamp != 0 || m_onvifExtensionTimestamp.has_value();

@@ -70,4 +70,4 @@ private:
     std::atomic<int> m_numberOfErrors{};
 };
 
-typedef QSharedPointer<QnAbstractMediaStreamDataProvider> QnAbstractMediaStreamDataProviderPtr;
+typedef std::shared_ptr<QnAbstractMediaStreamDataProvider> QnAbstractMediaStreamDataProviderPtr;

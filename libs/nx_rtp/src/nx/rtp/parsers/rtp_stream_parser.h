@@ -35,6 +35,7 @@ public:
     virtual bool forceProcessEmptyData() const { return false; }
 
     int getFrequency() const { return m_frequency; };
+    virtual bool isUtcTime() const { return false; }
 
 protected:
     void setFrequency(int frequency) { m_frequency = frequency; }

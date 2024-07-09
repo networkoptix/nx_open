@@ -263,6 +263,8 @@ public:
     nx::utils::Url getUrl() const;
 
     void setProxyAddr(const nx::String& addr, int port);
+    void resetProxyAddr();
+    void setProxySocket(std::unique_ptr<nx::network::AbstractStreamSocket> proxySocket);
 
     QStringList getSdpByType(nx::rtp::Sdp::MediaType mediaType) const;
     int getTrackCount(nx::rtp::Sdp::MediaType mediaType) const;
@@ -319,6 +321,8 @@ public:
     bool readAndProcessTextData();
     void setCloudConnectEnabled(bool enabled);
 
+    void setDoSendOptions(bool value);
+
 private:
     void addRangeHeader( nx::network::http::Request* const request, qint64 startPos, qint64 endPos );
     nx::network::http::Request createDescribeRequest();
@@ -343,6 +347,7 @@ private:
     void addCommonHeaders(nx::network::http::HttpHeaders& headers);
     void addAdditionalHeaders(const QString& requestName, nx::network::http::HttpHeaders* outHeaders);
     QString parseContentBase(const QString& buffer);
+    void setTcpSocket(std::unique_ptr<nx::network::AbstractStreamSocket> socket);
 
 private:
     enum { RTSP_BUFFER_LEN = 1024 * 65 };
@@ -370,6 +375,7 @@ private:
     nx::rtp::Sdp m_sdp;
 
     std::unique_ptr<nx::network::AbstractStreamSocket> m_tcpSock;
+    std::unique_ptr<nx::network::AbstractStreamSocket> m_proxySocket;
     nx::utils::Url m_url;
     QString m_SessionId;
     unsigned short m_ServerPort;
@@ -383,6 +389,7 @@ private:
     std::optional<nx::network::SocketAddress> m_proxyAddress;
     QString m_contentBase;
     nx::vms::api::RtpTransportType m_actualTransport;
+    bool m_doSendOptions = true;
 
     struct RtpChannel
     {

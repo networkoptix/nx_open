@@ -8,17 +8,33 @@
 
 #include <nx/analytics/metadata_logger.h>
 #include <nx/rtp/result.h>
+#include <nx/rtp/parsers/rtp_stream_parser.h>
 #include <nx/utils/software_version.h>
 
 namespace nx::rtp {
 
-class NX_VMS_COMMON_API QnNxRtpParser
+class NX_VMS_COMMON_API QnNxRtpParser: public VideoStreamParser
 {
+    using base_type = VideoStreamParser;
 public:
     /** @param tag Human-readable tag for logging. */
     QnNxRtpParser(nx::Uuid deviceId, const QString& tag);
+    QnNxRtpParser();
 
-    Result processData(const uint8_t* data, int size, bool& gotData);
+    virtual void setSdpInfo(const Sdp::Media& sdp) override {}
+
+    virtual bool isUtcTime() const override { return true; }
+
+    virtual Result processData(
+        const RtpHeader& rtpHeader,
+        quint8* rtpBufferBase,
+        int bufferOffset,
+        int bytesRead,
+        bool& gotData) override;
+    virtual void clear() override {}
+
+    Result processData(const quint8* data, int size, bool& gotData);
+
     QnAbstractMediaDataPtr nextData();
 
     qint64 position() const { return m_position; }
@@ -32,19 +48,22 @@ public:
 
 private:
     void logMediaData(const QnAbstractMediaDataPtr& metadata);
+    Result processData(
+        const RtpHeader& rtpHeader, const uint8_t* payload,
+        int dataSize, bool& gotData);
+
 
 private:
     nx::utils::SoftwareVersion m_serverVersion;
-    const nx::Uuid m_deviceId;
     CodecParametersConstPtr m_context;
     QnAbstractMediaDataPtr m_mediaData;
     QnAbstractMediaDataPtr m_nextDataPacket;
-    nx::utils::ByteArray* m_nextDataPacketBuffer;
-    qint64 m_position;
-    bool m_isAudioEnabled;
+    nx::utils::ByteArray* m_nextDataPacketBuffer = nullptr;
+    qint64 m_position = AV_NOPTS_VALUE;
+    bool m_isAudioEnabled = true;
     qint64 m_lastFramePtsUs; //< Intended for debug.
-    nx::analytics::MetadataLogger m_primaryLogger;
-    nx::analytics::MetadataLogger m_secondaryLogger;
+    std::unique_ptr<nx::analytics::MetadataLogger> m_primaryLogger;
+    std::unique_ptr<nx::analytics::MetadataLogger> m_secondaryLogger;
 };
 
 using QnNxRtpParserPtr = QSharedPointer<QnNxRtpParser>;

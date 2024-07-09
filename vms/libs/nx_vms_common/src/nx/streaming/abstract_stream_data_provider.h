@@ -64,4 +64,4 @@ private:
     std::atomic<Qn::ConnectionRole> m_role;
 };
 
-using QnAbstractStreamDataProviderPtr = QSharedPointer<QnAbstractStreamDataProvider>;
+using QnAbstractStreamDataProviderPtr = std::shared_ptr<QnAbstractStreamDataProvider>;
