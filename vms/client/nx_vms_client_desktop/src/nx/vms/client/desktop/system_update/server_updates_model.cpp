@@ -111,7 +111,9 @@ QVariant ServerUpdatesModel::data(const QModelIndex& index, int role) const
             }
             else if (column == NameColumn && item->offline)
             {
-                return qnResIconCache->iconColor(server);
+                return server
+                    ? qnResIconCache->iconColor(server)
+                    : qnResIconCache->iconColor(QnResourceIconCache::Server, QnIcon::Disabled);
             }
             break;
 
