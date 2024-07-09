@@ -3297,7 +3297,7 @@ to %1</source>
     </message>
     <message>
       <source>With enabled digest authentication</source>
-      <translation>Digest認証有効</translation>
+      <translation>Digest 認証有効</translation>
     </message>
     <message>
       <source>Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</source>
@@ -5735,7 +5735,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>To enable digest authentication password reset is required</source>
-      <translation>Digest認証を有効にするには、パスワードの再設定が必要です</translation>
+      <translation>Digest 認証を有効にするには、パスワードの再設定が必要です</translation>
     </message>
   </context>
   <context>
@@ -5854,7 +5854,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Allow digest authentication for this user</source>
-      <translation>このユーザーのDigest認証を許可する</translation>
+      <translation>このユーザーの Digest 認証を許可する</translation>
     </message>
     <message>
       <source>Learn More</source>
@@ -10266,7 +10266,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
       <source>%n out of %1 users are allowed to use digest authentication (not secure).</source>
       <comment>%n is digest user count, %1 is total user count</comment>
       <translation>
-        <numerusform>%1 ユーザー中 %n 名が Digest認証を利用できる (安全ではない) 設定です。</numerusform>
+        <numerusform>%1 ユーザー中 %n 名が Digest 認証を利用できる (安全ではない) 設定です。</numerusform>
       </translation>
     </message>
     <message>
@@ -10915,7 +10915,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Users with Digest Authentication</source>
-      <translation>ダイジェスト認証を使用するユーザー</translation>
+      <translation>Digest 認証を使用するユーザー</translation>
     </message>
   </context>
   <context>

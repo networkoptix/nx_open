@@ -1072,7 +1072,7 @@
     </message>
     <message>
       <source>Hardware ID of Server with this license does not match Hardware ID on which license was activated.</source>
-      <translation type="unfinished">Hardware ID of Server with this license does not match Hardware ID on which license was activated.</translation>
+      <translation>A ID de hardware do servidor con esta licenza non coincide coa ID de hardware na que se activou a licenza.</translation>
     </message>
   </context>
   <context>

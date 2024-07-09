@@ -3243,7 +3243,7 @@
     <name>UserSettingsDialog</name>
     <message>
       <source>This user can use digest authentication.</source>
-      <translation>このユーザーはDigest認証を使用できます。</translation>
+      <translation>このユーザーは Digest 認証を使用できます。</translation>
     </message>
     <message>
       <source>Force Secure Authentication</source>
