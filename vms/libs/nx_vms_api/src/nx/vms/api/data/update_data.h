@@ -30,7 +30,7 @@ NX_REFLECTION_ENUM(UpdateAction,
 )
 
 NX_REFLECTION_ENUM_CLASS(UpdateComponent,
-    /**%apidoc Component is not known. */
+    /**%apidoc[unused] Component is not known. */
     unknown,
 
     /**%apidoc Desktop Client. */
@@ -164,13 +164,7 @@ struct NX_VMS_API UpdateInformation
     std::string description;
     std::string eula;
 
-    /**%apidoc Map of update components to a list of possible update packages.
-     * Current possible values:
-     * "unknown": Component is not known.
-     * "client": Desktop Client.
-     * "customClient": Desktop Client with custom branding.
-     * "server": VMS Server.
-     */
+    /**%apidoc Map of update components to a list of possible update packages. */
     std::map<UpdateComponent, std::vector<UpdatePackage>> packages;
     std::string url;
 
