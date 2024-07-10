@@ -11,6 +11,8 @@
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/widgets/checkable_header_view.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/system_administration/delegates/logs_management_table_delegate.h>
 #include <nx/vms/client/desktop/system_administration/models/logs_management_model.h>
@@ -47,6 +49,7 @@ LogsManagementWidget::LogsManagementWidget(
     m_watcher(context->logsManagementWatcher())
 {
     setupUi();
+    setHelpTopic(this, HelpTopic::Id::SystemSettings_LogsManagement);
 }
 
 LogsManagementWidget::~LogsManagementWidget()
