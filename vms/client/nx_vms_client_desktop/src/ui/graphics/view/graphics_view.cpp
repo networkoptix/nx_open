@@ -43,7 +43,6 @@ struct QnGraphicsView::Private
     QQuickWidget* quickWidget = nullptr;
     QPointer<RhiRenderingItem> renderingItem;
     QPointer<TextureSizeHelper> textureSizeHelperItem;
-    bool frameEnded = true;
 };
 
 QnGraphicsView::QnGraphicsView(QGraphicsScene* scene, nx::vms::client::desktop::MainWindow* parent):
@@ -131,12 +130,6 @@ QnGraphicsView::QnGraphicsView(QGraphicsScene* scene, nx::vms::client::desktop::
 
     d->quickWidget->quickWindow()->setColor(
         nx::vms::client::core::colorTheme()->color("dark3")); //< window
-
-    connect(d->quickWidget->quickWindow(), &QQuickWindow::afterFrameEnd, this,
-        [this]()
-        {
-            d->frameEnded = true;
-        });
 }
 
 QnGraphicsView::~QnGraphicsView()
@@ -169,10 +162,8 @@ void QnGraphicsView::paintEvent(QPaintEvent* event)
 
 void QnGraphicsView::paintRhi()
 {
-    // Avoid painting frames faster than QQuickWidget can render them.
-    if (!d->frameEnded)
-        return;
-    d->frameEnded = false;
+    // It would be better to skip rendering when previous frame has not been rendered yet by
+    // QQuickWidget but that breaks paint tracking for resource widgets in QnWorkbenchRenderWatcher.
 
     if (!d->renderingItem)
         return;
