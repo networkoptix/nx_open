@@ -1300,8 +1300,7 @@ void QnMediaResourceWidget::updateTwoWayAudioButton() const
         capabilityButtonsAreVisible()
         && !d->camera->hasFlags(Qn::cross_system)
         && d->camera->audioOutputDevice()->hasTwoWayAudio()
-        && d->camera->isTwoWayAudioEnabled()
-        && !d->camera->isIntercom();
+        && d->camera->isTwoWayAudioEnabled();
 
     if (twoWayAudioButtonVisible)
         m_buttonController->createTwoWayAudioButton();
@@ -1317,9 +1316,9 @@ void QnMediaResourceWidget::updateIntercomButtons()
         && d->camera->isIntercom();
 
     if (intercomButtonVisible)
-        m_buttonController->createIntercomButtons();
+        m_buttonController->createOpenDoorButton();
     else
-        m_buttonController->removeIntercomButtons();
+        m_buttonController->removeOpenDoorButton();
 }
 
 void QnMediaResourceWidget::setupHud()
