@@ -124,12 +124,10 @@ QnTransactionTransportBase::QnTransactionTransportBase(
     m_state = NotDefined;
     m_connected = false;
     m_prevGivenHandlerID = 0;
-    m_credentialsSource = CredentialsSource::serverKey;
     m_asyncReadScheduled = false;
     m_remoteIdentityTime = 0;
     m_connectionType = ConnectionType::none;
     m_compressResponseMsgBody = false;
-    m_authOutgoingConnectionByServerKey = true;
     m_base64EncodeOutgoingTransactions = false;
     m_sentTranSequence = 0;
     m_waiterCount = 0;
@@ -571,11 +569,10 @@ void QnTransactionTransportBase::doOutgoingConnect(
 
     if (remotePeerUrl.userName().isEmpty())
     {
-        fillAuthInfo( m_httpClient, m_credentialsSource == CredentialsSource::serverKey );
+        fillAuthInfo(m_httpClient);
     }
     else
     {
-        m_credentialsSource = CredentialsSource::remoteUrl;
         m_httpClient->setCredentials(nx::network::http::PasswordCredentials(
             remotePeerUrl.userName().toStdString(), remotePeerUrl.password().toStdString()));
     }
@@ -1162,7 +1159,7 @@ void QnTransactionTransportBase::serializeAndSendNextDataBuffer()
 
             if (m_remotePeerCredentials.isNull())
             {
-                fillAuthInfo(m_outgoingTranClient, true);
+                fillAuthInfo(m_outgoingTranClient);
             }
             else
             {
@@ -1238,35 +1235,26 @@ void QnTransactionTransportBase::at_responseReceived(
 
     if (statusCode == nx::network::http::StatusCode::unauthorized)
     {
-        m_credentialsSource = (CredentialsSource)((int)m_credentialsSource + 1);
-        if (m_credentialsSource < CredentialsSource::none)
+        using nx::network::http::getHeaderValue;
+        const auto& headers = client->response()->headers;
+        nx::Uuid guid(getHeaderValue(headers, Qn::EC2_SERVER_GUID_HEADER_NAME));
+        if (!guid.isNull())
         {
-            fillAuthInfo(m_httpClient, m_credentialsSource == CredentialsSource::serverKey);
-            repeatDoGet();
-        }
-        else
-        {
-            using nx::network::http::getHeaderValue;
-            const auto& headers = client->response()->headers;
-            nx::Uuid guid(getHeaderValue(headers, Qn::EC2_SERVER_GUID_HEADER_NAME));
-            if (!guid.isNull())
-            {
-                emit peerIdDiscovered(remoteAddr(), guid);
+            emit peerIdDiscovered(remoteAddr(), guid);
 
-                nx::network::rest::AuthResult authResult =
-                    nx::network::rest::AuthResult::Auth_UnknownError;
-                if (auto authResultValue = getHeaderValue(headers, Qn::AUTH_RESULT_HEADER_NAME);
-                    !nx::reflect::fromString(authResultValue, &authResult))
-                {
-                    NX_DEBUG(this,
-                        "Unexpected `%1` value: `%2`",
-                        Qn::AUTH_RESULT_HEADER_NAME,
-                        authResultValue);
-                }
-                emit remotePeerUnauthorized(guid, authResult);
+            nx::network::rest::AuthResult authResult =
+                nx::network::rest::AuthResult::Auth_UnknownError;
+            if (auto authResultValue = getHeaderValue(headers, Qn::AUTH_RESULT_HEADER_NAME);
+                !nx::reflect::fromString(authResultValue, &authResult))
+            {
+                NX_DEBUG(this,
+                    "Unexpected `%1` value: `%2`",
+                    Qn::AUTH_RESULT_HEADER_NAME,
+                    authResultValue);
             }
-            cancelConnecting();
+            emit remotePeerUnauthorized(guid, authResult);
         }
+        cancelConnecting();
         return;
     }
 
@@ -1634,25 +1622,6 @@ void QnTransactionTransportBase::postTransactionDone(const nx::network::http::As
             "Network error posting transaction to %1. system result code: %2",
             m_postTranBaseUrl.toString(), SystemError::toString(client->lastSysErrorCode()));
         setStateNoLock(Error);
-        return;
-    }
-
-    DataToSend& dataCtx = m_dataToSend.front();
-
-    if (client->response()->statusLine.statusCode == nx::network::http::StatusCode::unauthorized &&
-        m_authOutgoingConnectionByServerKey)
-    {
-        NX_VERBOSE(this,
-            "Failed to authenticate on peer %1 by key. Retrying using admin credentials...",
-            m_postTranBaseUrl.toString());
-        m_authOutgoingConnectionByServerKey = false;
-        fillAuthInfo(m_outgoingTranClient, m_authOutgoingConnectionByServerKey);
-        m_outgoingTranClient->doPost(
-            m_postTranBaseUrl,
-            m_base64EncodeOutgoingTransactions
-            ? "application/text"
-            : Qn::serializationFormatToHttpContentType(m_remotePeer.dataFormat),
-            dataCtx.encodedSourceData);
         return;
     }
 
