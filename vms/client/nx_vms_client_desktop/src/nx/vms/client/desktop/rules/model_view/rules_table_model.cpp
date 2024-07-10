@@ -607,7 +607,10 @@ QVariant RulesTableModel::targetUserData(const vms::rules::ActionBuilder* action
     users = users.filtered([](const QnUserResourcePtr& user) { return user->isEnabled(); });
 
     const auto properties = targetUserField->properties();
-    const bool isValidSelection = !users.empty() || !groups.empty() || properties.allowEmptySelection;
+    const bool isValidSelection = targetUserField->acceptAll()
+        || !users.empty()
+        || !groups.empty()
+        || properties.allowEmptySelection;
 
     if (role == Qt::DisplayRole)
     {
