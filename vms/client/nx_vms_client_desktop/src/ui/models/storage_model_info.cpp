@@ -39,7 +39,7 @@ QnStorageModelInfo::QnStorageModelInfo(const nx::vms::api::StorageSpaceDataV1& r
         : nx::vms::api::StorageArchiveMode::exclusive;
 }
 
-QnStorageModelInfo::QnStorageModelInfo( const QnStorageResourcePtr& storage)
+QnStorageModelInfo::QnStorageModelInfo(const QnStorageResourcePtr& storage)
     : id(storage->getId())
     , isUsed(storage->isUsedForWriting())
     , url(storage->getUrl())
@@ -52,4 +52,13 @@ QnStorageModelInfo::QnStorageModelInfo( const QnStorageResourcePtr& storage)
     , isDbReady(storage->persistentStatusFlags().testFlag(
         nx::vms::api::StoragePersistentFlag::dbReady))
     , archiveMode(storage->storageArchiveMode())
-{}
+{
+    // QnClientStorageResource which was instantitated on the client side and is not
+    // represented in the database has null storageArchiveMode property.
+    if (archiveMode == nx::vms::api::StorageArchiveMode::undefined)
+    {
+        archiveMode = isExternal
+            ? nx::vms::api::StorageArchiveMode::isolated
+            : nx::vms::api::StorageArchiveMode::exclusive;
+    }
+}
