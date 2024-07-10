@@ -264,6 +264,24 @@ void Renderer::Private::drawDirectionMark(
 {
     const auto glWidget = qobject_cast<QOpenGLWidget*>(widget);
 
+    if (!glWidget) //< Software or RHI.
+    {
+        static const QPainterPath kDirectionMarkPoly =
+            []()
+            {
+                QPainterPath path;
+                path.addPolygon(kDirectionMark);
+                return path;
+            }();
+
+        painter->save();
+        painter->translate(position);
+        painter->rotate(180 * angle / M_PI);
+        painter->fillPath(kDirectionMarkPoly, color);
+        painter->restore();
+        return;
+    }
+
     QnGlNativePainting::begin(glWidget, painter);
 
     const auto functions = QOpenGLContext::currentContext()->functions();
