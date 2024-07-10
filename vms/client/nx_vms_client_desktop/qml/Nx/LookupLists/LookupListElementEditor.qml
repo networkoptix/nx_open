@@ -133,7 +133,7 @@ Control
             minimum: attribute.minValue
             maximum: attribute.maxValue
 
-            mode: attribute.subtype === "int"
+            mode: attribute.subtype === "integer"
                 ? NumberInput.Integer
                 : NumberInput.Real
 
