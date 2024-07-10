@@ -51,7 +51,7 @@ public:
     virtual void updateCredentials(nx::network::http::Credentials credentials);
 
 protected:
-    virtual bool fillAuthInfo(nx::network::http::AsyncClient* httpClient, bool authByKey) override;
+    virtual bool fillAuthInfo(nx::network::http::AsyncClient* httpClient) override;
 
 private:
     void watchForUnauthorize();

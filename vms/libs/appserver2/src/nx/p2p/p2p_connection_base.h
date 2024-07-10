@@ -185,7 +185,7 @@ signals:
     void allDataSent(QWeakPointer<ConnectionBase> connection);
 
 protected:
-    virtual bool fillAuthInfo(nx::network::http::AsyncClient* httpClient, bool authByKey) = 0;
+    virtual bool fillAuthInfo(nx::network::http::AsyncClient* httpClient) = 0;
     void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread);
     void stopWhileInAioThread();
 
@@ -242,8 +242,6 @@ private:
     nx::Buffer m_readBuffer;
 
     std::unique_ptr<nx::network::http::AsyncClient> m_httpClient;
-
-    CredentialsSource m_credentialsSource = CredentialsSource::userNameAndPassword;
 
     vms::api::PeerDataEx m_remotePeer;
     vms::api::PeerDataEx m_localPeer;

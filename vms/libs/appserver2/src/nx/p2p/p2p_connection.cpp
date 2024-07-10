@@ -96,10 +96,10 @@ Connection::~Connection()
     pleaseStopSync();
 }
 
-bool Connection::fillAuthInfo(nx::network::http::AsyncClient* httpClient, bool authByKey)
+bool Connection::fillAuthInfo(nx::network::http::AsyncClient* httpClient)
 {
     using namespace nx::network::http;
-    if (authByKey)
+    if (localPeer().isServer())
     {
         auto server = resourcePool()->getResourceById<QnMediaServerResource>(remotePeer().id);
         if (!server || server->getAuthKey().isEmpty())
@@ -122,16 +122,7 @@ bool Connection::fillAuthInfo(nx::network::http::AsyncClient* httpClient, bool a
         return true;
     }
 
-    if (NX_ASSERT(localPeer().isServer(), "Client must have credentials filled"))
-    {
-        // Try auth by admin user if allowed
-        if (QnUserResourcePtr adminUser = resourcePool()->getAdministrator())
-        {
-            httpClient->setCredentials(Credentials(adminUser->getName().toStdString(),
-                Ha1AuthToken(adminUser->getDigest().toStdString())));
-        }
-    }
-    return true;
+    return false;
 }
 
 bool Connection::validateRemotePeerData(const vms::api::PeerDataEx& remotePeer) const

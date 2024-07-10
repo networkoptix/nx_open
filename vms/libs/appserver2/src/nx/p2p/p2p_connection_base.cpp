@@ -225,24 +225,11 @@ void ConnectionBase::onHttpClientDone()
 
     if (statusCode == nx::network::http::StatusCode::unauthorized)
     {
-        // try next credential source
-        m_credentialsSource = (CredentialsSource)((int)m_credentialsSource + 1);
-        using namespace std::placeholders;
-        if (m_httpClient->url().userName().isEmpty()
-            && m_credentialsSource < CredentialsSource::none
-            && fillAuthInfo(m_httpClient.get(), m_credentialsSource == CredentialsSource::serverKey))
-        {
-            m_httpClient->doGet(
-                m_httpClient->url(), [this] { return ConnectionBase::onHttpClientDone(); });
-        }
-        else
-        {
-            using nx::network::http::getHeaderValue;
-            auto headerValue = getHeaderValue(m_responseHeaders, Qn::AUTH_RESULT_HEADER_NAME);
-            if (headerValue.empty())
-                headerValue = "Unauthorized";
-            cancelConnecting(State::Unauthorized, nx::format(headerValue));
-        }
+        using nx::network::http::getHeaderValue;
+        auto headerValue = getHeaderValue(m_responseHeaders, Qn::AUTH_RESULT_HEADER_NAME);
+        if (headerValue.empty())
+            headerValue = "Unauthorized";
+        cancelConnecting(State::Unauthorized, nx::format(headerValue));
         return;
     }
 
@@ -429,11 +416,9 @@ void ConnectionBase::startConnection()
 
     requestUrl.setQuery(requestUrlQuery.toString());
     if (requestUrl.password().isEmpty())
-        fillAuthInfo(m_httpClient.get(), m_credentialsSource == CredentialsSource::serverKey);
+        fillAuthInfo(m_httpClient.get());
 
-    m_httpClient->doGet(
-        requestUrl,
-        std::bind(&ConnectionBase::onHttpClientDone, this));
+    m_httpClient->doGet(requestUrl, std::bind(&ConnectionBase::onHttpClientDone, this));
 }
 
 void ConnectionBase::startReading()

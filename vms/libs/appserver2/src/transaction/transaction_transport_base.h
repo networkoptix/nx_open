@@ -233,7 +233,7 @@ signals:
     void onSomeDataReceivedFromRemotePeer();
 
 protected:
-    virtual void fillAuthInfo(const nx::network::http::AsyncHttpClientPtr& /*httpClient*/, bool /*authByKey*/) {};
+    virtual void fillAuthInfo(const nx::network::http::AsyncHttpClientPtr& /*httpClient*/) {}
 
 private:
     struct DataToSend
@@ -288,7 +288,6 @@ private:
     int m_prevGivenHandlerID;
 
     nx::Buffer m_extraData;
-    CredentialsSource m_credentialsSource;
     QElapsedTimer m_lastReceiveTimer;
     int m_postedTranCount = 0;
     bool m_asyncReadScheduled;
@@ -305,7 +304,6 @@ private:
     ConnectionGuardSharedState* const m_connectionGuardSharedState;
     std::unique_ptr<ConnectionLockGuard> m_connectionLockGuard;
     nx::network::http::AsyncHttpClientPtr m_outgoingTranClient;
-    bool m_authOutgoingConnectionByServerKey;
     nx::utils::Url m_postTranBaseUrl;
     std::optional<nx::utils::Url> m_mockedUpPostTranUrl;
     nx::Buffer m_dummyReadBuffer;
