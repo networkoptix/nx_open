@@ -373,6 +373,8 @@ void QnServerStorageManager::saveStorages(const QnStorageResourceList& storages)
             {
                 if (const auto clientStorage = storage.dynamicCast<QnClientStorageResource>())
                     clientStorage->setActive(true);
+
+                storage->savePropertiesAsync();
             }
         },
         this);

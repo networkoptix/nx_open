@@ -1361,9 +1361,6 @@ void QnStorageConfigWidget::applyChanges()
         }
     }
 
-    for (const auto& storage: storagesToUpdate)
-        storage->savePropertiesAsync();
-
     const auto storageManager = systemContext()->serverStorageManager();
     if (!storagesToUpdate.empty())
         storageManager->saveStorages(storagesToUpdate);
