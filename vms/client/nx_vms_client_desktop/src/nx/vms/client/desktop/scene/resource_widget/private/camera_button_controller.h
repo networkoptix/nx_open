@@ -46,8 +46,8 @@ public:
     void createTwoWayAudioButton();
     void removeTwoWayAudioButton();
 
-    void createIntercomButtons();
-    void removeIntercomButtons();
+    void createOpenDoorButton();
+    void removeOpenDoorButton();
 
 signals:
     void ioStateChanged(const QnIOStateData& value);
@@ -67,12 +67,6 @@ private:
         nx::vms::api::ExtendedCameraOutput outputPort);
 
     QString getDesktopUniqueId() const;
-
-    void createIntercomMuteButton();
-    void removeIntercomMuteButton();
-
-    void createOpenDoorButton();
-    void removeOpenDoorButton();
 
 private:
     QnTwoWayAudioWidget* m_twoWayAudioWidget = nullptr;

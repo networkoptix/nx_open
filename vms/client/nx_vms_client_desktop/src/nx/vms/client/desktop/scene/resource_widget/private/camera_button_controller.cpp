@@ -31,18 +31,6 @@ namespace {
 
 static constexpr int kTriggerButtonHeight = 40;
 
-void setMuteState(SoftwareTriggerButton* button)
-{
-    button->setIcon("mute_call");
-    button->setToolTip(CameraButtonController::tr("Mute"));
-}
-
-void setUnmuteStata(SoftwareTriggerButton* button)
-{
-    button->setIcon("unmute_call");
-    button->setToolTip(CameraButtonController::tr("Unmute"));
-}
-
 } // namespace
 
 CameraButtonController::CameraButtonController(QnMediaResourceWidget* mediaResourceWidget):
@@ -142,16 +130,31 @@ void CameraButtonController::removeTwoWayAudioButton()
     m_twoWayAudioWidgetId = nx::Uuid();
 }
 
-void CameraButtonController::createIntercomButtons()
+void CameraButtonController::createOpenDoorButton()
 {
-    createIntercomMuteButton();
-    createOpenDoorButton();
+    if (!m_camera)
+        return;
+
+    ensureButtonState(ExtendedCameraOutput::powerRelay,
+        [this]
+        {
+            auto openDoorButton = new SoftwareTriggerButton(m_parentWidget);
+            openDoorButton->setIcon("_door_opened");
+            openDoorButton->setToolTip(tr("Open Door"));
+
+            connect(openDoorButton, &SoftwareTriggerButton::clicked,
+                [this, openDoorButton]
+                {
+                    handleButtonClick(openDoorButton, ExtendedCameraOutput::powerRelay);
+                });
+
+            return openDoorButton;
+        });
 }
 
-void CameraButtonController::removeIntercomButtons()
+void CameraButtonController::removeOpenDoorButton()
 {
-    removeIntercomMuteButton();
-    removeOpenDoorButton();
+    removeButton(ExtendedCameraOutput::powerRelay);
 }
 
 void CameraButtonController::handleChangedIOState(const QnIOStateData& value)
@@ -204,99 +207,6 @@ QString CameraButtonController::getDesktopUniqueId() const
     return core::DesktopResource::calculateUniqueId(
         systemContext->peerId(),
         workbench()->context()->user()->getId());
-}
-
-void CameraButtonController::createIntercomMuteButton()
-{
-    if (!m_camera)
-        return;
-
-    if (m_intercomMuteButtonData)
-        return;
-
-    m_intercomMuteButtonData.emplace(IntercomMuteButtonData());
-
-    m_intercomMuteButtonData->button = new SoftwareTriggerButton(m_parentWidget);
-    m_intercomMuteButtonData->id = m_buttonsContainer->addItem(m_intercomMuteButtonData->button);
-    m_intercomMuteButtonData->twoWayAudioManager.reset(
-        new TwoWayAudioManager(getDesktopUniqueId(), m_camera));
-
-    connect(m_intercomMuteButtonData->button, &SoftwareTriggerButton::clicked,
-        [this]
-        {
-            if (!m_intercomMuteButtonData->button->isLive())
-            {
-                menu()->trigger(ui::action::JumpToLiveAction, m_parentWidget);
-                return;
-            }
-
-            if (m_intercomMuteButtonData->state == IntercomButtonState::unmute)
-                m_intercomMuteButtonData->twoWayAudioManager->startStreaming();
-            else
-                m_intercomMuteButtonData->twoWayAudioManager->stopStreaming();
-        });
-
-    connect(m_intercomMuteButtonData->twoWayAudioManager.get(),
-        &TwoWayAudioManager::streamingStateChanged,
-        [this](TwoWayAudioManager::StreamingState state)
-        {
-            if (state == TwoWayAudioManager::StreamingState::active)
-            {
-                setMuteState(m_intercomMuteButtonData->button);
-            }
-            else if (state == TwoWayAudioManager::StreamingState::disabled
-                || (state == TwoWayAudioManager::StreamingState::error
-                    && m_intercomMuteButtonData->state == IntercomButtonState::mute))
-            {
-                setUnmuteStata(m_intercomMuteButtonData->button);
-            }
-
-            m_intercomMuteButtonData->state = (state == TwoWayAudioManager::StreamingState::active)
-                ? IntercomButtonState::mute
-                : IntercomButtonState::unmute;
-
-            if (state == TwoWayAudioManager::StreamingState::error)
-                m_intercomMuteButtonData->button->setState(SoftwareTriggerButton::State::Failure);
-        });
-
-    NX_ASSERT(m_intercomMuteButtonData->state == IntercomButtonState::unmute);
-    setUnmuteStata(m_intercomMuteButtonData->button);
-}
-
-void CameraButtonController::removeIntercomMuteButton()
-{
-    if (m_intercomMuteButtonData)
-        m_buttonsContainer->deleteItem(m_intercomMuteButtonData->id);
-
-    m_intercomMuteButtonData.reset();
-
-}
-
-void CameraButtonController::createOpenDoorButton()
-{
-    if (!m_camera)
-        return;
-
-    ensureButtonState(ExtendedCameraOutput::powerRelay,
-        [this]
-        {
-            auto openDoorButton = new SoftwareTriggerButton(m_parentWidget);
-            openDoorButton->setIcon("_door_opened");
-            openDoorButton->setToolTip(tr("Open Door"));
-
-            connect(openDoorButton, &SoftwareTriggerButton::clicked,
-                [this, openDoorButton]
-                {
-                    handleButtonClick(openDoorButton, ExtendedCameraOutput::powerRelay);
-                });
-
-            return openDoorButton;
-        });
-}
-
-void CameraButtonController::removeOpenDoorButton()
-{
-    removeButton(ExtendedCameraOutput::powerRelay);
 }
 
 } // namespace nx::vms::client::desktop
