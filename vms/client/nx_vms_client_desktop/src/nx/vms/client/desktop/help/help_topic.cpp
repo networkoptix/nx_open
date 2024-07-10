@@ -300,6 +300,8 @@ QString HelpTopic::relativeUrlForTopic(Id topic)
             return "configuring-secure-connections.html";
         case Id::ServerSettings_ArchiveRestoring:
             return "restoring_broken_archive.html";
+        case Id::ServerSettings_Backup:
+            return "configuring_redundant_storage_.html";
         case Id::ServerSettings_Failover:
             return "configuring_failover.html";
         case Id::ServerSettings_General:
@@ -334,6 +336,8 @@ QString HelpTopic::relativeUrlForTopic(Id topic)
             return "working_with_a_resource_tree.html";
         case Id::SystemSettings_General_TourCycleTime:
             return "tours.html";
+        case Id::SystemSettings_LogsManagement:
+            return "collecting_logs.html";
         case Id::SystemSettings_Notifications:
             return "notifications.html";
         case Id::SystemSettings_ScreenRecording:

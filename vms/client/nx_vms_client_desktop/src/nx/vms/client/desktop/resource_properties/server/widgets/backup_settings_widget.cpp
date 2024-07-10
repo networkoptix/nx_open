@@ -16,6 +16,8 @@
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/system_context.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/resource_dialogs/backup_settings_view_common.h>
 #include <nx/vms/client/desktop/resource_dialogs/backup_settings_view_widget.h>
 #include <nx/vms/client/desktop/resource_dialogs/details/filtered_resource_view_widget.h>
@@ -96,6 +98,8 @@ BackupSettingsWidget::BackupSettingsWidget(ServerSettingsDialogStore* store, QWi
 
     connect(ui->backupBandwidthSettingsWidget, &BackupBandwidthSettingsWidget::hasChangesChanged,
         this, &BackupSettingsWidget::hasChangesChanged);
+
+    setHelpTopic(this, HelpTopic::Id::ServerSettings_Backup);
 }
 
 BackupSettingsWidget::~BackupSettingsWidget()
