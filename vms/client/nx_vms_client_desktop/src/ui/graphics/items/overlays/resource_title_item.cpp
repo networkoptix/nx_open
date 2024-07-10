@@ -92,7 +92,8 @@ void QnResourceTitleItem::paint(QPainter* painter,
         m_backgroundCache = QPixmap::fromImage(img);
     }
 
-    painter->drawPixmap(paintRect.toRect(), m_backgroundCache);
+    // Slightly adjust top coordinate to avoid seams when the widget is rotated.
+    painter->drawPixmap(paintRect.toRect().adjusted(0, -1, 0, 0), m_backgroundCache);
 }
 
 void QnResourceTitleItem::setSimpleMode(bool isSimpleMode, bool animate)
