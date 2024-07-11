@@ -676,7 +676,7 @@
     <name>CameraHotspotsSettingsWidget</name>
     <message>
       <source>Hotspots</source>
-      <translation>Points chauds</translation>
+      <translation>Hotspots</translation>
     </message>
     <message>
       <source>Add</source>
