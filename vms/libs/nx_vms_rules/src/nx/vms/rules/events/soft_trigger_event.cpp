@@ -98,8 +98,7 @@ const ItemDescriptor& SoftTriggerEvent::manifest()
         .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Soft Trigger")),
         .flags = {ItemFlag::instant, ItemFlag::prolonged},
         .fields = {
-            makeFieldDescriptor<UniqueIdField>("triggerId",
-                NX_DYNAMIC_TRANSLATABLE(tr("Invisible"))),
+            makeFieldDescriptor<UniqueIdField>("triggerId", TranslatableString("Invisible")),
             makeFieldDescriptor<SourceCameraField>(
                 utils::kCameraIdFieldName,
                 Strings::occursAt(),
@@ -121,8 +120,10 @@ const ItemDescriptor& SoftTriggerEvent::manifest()
                 NX_DYNAMIC_TRANSLATABLE(tr("Icon"))),
         },
         .resources = {
-            {utils::kCameraIdFieldName, {ResourceType::device, Qn::ViewContentPermission}},
-            {utils::kUserIdFieldName, {ResourceType::user}}},
+            {utils::kCameraIdFieldName,
+                {ResourceType::device, Qn::ViewContentPermission, Qn::SoftTriggerPermission}},
+            {utils::kUserIdFieldName, {ResourceType::user, {}, Qn::WritePermission}}},
+        .createPermissions = nx::vms::api::GlobalPermission::none,
         .emailTemplatePath = ":/email_templates/software_trigger.mustache"
     };
     return kDescriptor;

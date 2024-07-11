@@ -159,7 +159,8 @@ struct ItemDescriptor
     nx::vms::api::GlobalPermissions readPermissions;
 
     /**%apidoc[opt] Global permissions required to create an item. */
-    nx::vms::api::GlobalPermissions createPermissions;
+    nx::vms::api::GlobalPermissions createPermissions =
+        nx::vms::api::GlobalPermission::generateEvents;
 
     // TODO: #amalov Consider unifying fields, permissions and resources members.
 
