@@ -19,8 +19,8 @@ ModalDialog
 
     required property Analytics.StateView taxonomy
     required property LookupListEntriesModel model
-    property alias filePath: filePathField.text
-    property alias separatorSymbol: separatorField.text
+    property alias filePath: previewProcessor.filePath
+    property alias separatorSymbol: previewProcessor.separator
 
     title: qsTr("Import List")
     minimumWidth: 611
@@ -102,6 +102,12 @@ ModalDialog
                 Layout.fillWidth: true
                 text: previewProcessor.filePath
                 readOnly: true
+
+                onTextChanged:
+                {
+                    if (text !== previewProcessor.filePath)
+                        previewProcessor.filePath = text
+                }
             }
 
             Button
@@ -129,6 +135,12 @@ ModalDialog
 
                 text: previewProcessor.separator
                 maximumLength: 1
+
+                onTextChanged:
+                {
+                    if (text !== previewProcessor.separator)
+                        previewProcessor.separator = text
+                }
                 Keys.onPressed: (event) =>
                 {
                     event.accepted = true
@@ -179,7 +191,13 @@ ModalDialog
 
                 checked: previewProcessor.dataHasHeaderRow
                 text: qsTr("Data contains header")
-                onCheckedChanged: resetTextFieldFocus()
+
+                onCheckedChanged:
+                {
+                    if (checked !== previewProcessor.dataHasHeaderRow)
+                        previewProcessor.dataHasHeaderRow = checked
+                    resetTextFieldFocus()
+                }
             }
         }
 
@@ -268,9 +286,6 @@ ModalDialog
         }
 
         rowsNumber: 10
-        filePath: filePathField.text
-        separator: separatorField.text
-        dataHasHeaderRow: headerCheckBox.checked
 
         onSeparatorChanged: initImportModel()
         onFilePathChanged: initImportModel()
