@@ -57,7 +57,7 @@ QString HelpTopic::relativeUrlForTopic(Id topic)
         case Id::CameraSettings_AspectRatio:
             return "setting_camera_aspect_ratio.html";
         case Id::CameraSettings_Dewarping:
-            return "setting_up_fish-eye_cameras.html";
+            return "dewarp-controls.html";
         case Id::CameraSettings_Expert_DisableArchivePrimary:
             return "disabling_recording_of_primary.html";
         case Id::CameraSettings_Expert_Rtp:
@@ -69,7 +69,7 @@ QString HelpTopic::relativeUrlForTopic(Id topic)
         case Id::CameraSettings_Motion:
             return "setting_up_motion_mask_and_motion_sensitivity_(adm.html";
         case Id::CameraSettings_Recording_ArchiveLength:
-            return "configuring_maximum_and_minimu.html";
+            return "configuring-maxi-and-min-archive-storage.html";
         case Id::CameraSettings_Recording_Export:
             return "copying_recording_schedule_fro.html";
         case Id::CameraSettings_Rotation:
@@ -83,7 +83,7 @@ QString HelpTopic::relativeUrlForTopic(Id topic)
         case Id::CloudLayoutsIntroduction:
             return "adding-items-to-layout.html";
         case Id::CloudLayoutsIntroductionAssign:
-            return "assigning-layout-to-users-and-.html";
+            return "layout-management.html";
         case Id::ConnectToCamerasOverOnlyHttps:
             return "to-connect-to-cameras-over-onl.html";
         case Id::EnableArchiveEncryption:
@@ -123,7 +123,7 @@ QString HelpTopic::relativeUrlForTopic(Id topic)
         case Id::EventsActions:
             return "configuring_events_and_actions.html";
         case Id::EventsActions_LdapSyncIssue:
-            return "ldap-sync-issue.html";
+            return "ldap-sync-failure.html";
         case Id::EventsActions_LicenseIssue:
             return "license_issue.html";
         case Id::EventsActions_MediaServerConflict:
@@ -181,9 +181,9 @@ QString HelpTopic::relativeUrlForTopic(Id topic)
         case Id::LaunchingAndClosing:
             return "launching_and_closing_vms_client.html";
         case Id::LayoutSettings_EMapping:
-            return "e-mapping.html";
+            return "layout-backgrounds.html";
         case Id::LayoutSettings_Locking:
-            return "locking_layouts.html";
+            return "saving-locking-layouts.html";
         case Id::Ldap:
             return "adding_users_from_ldap_server.html";
         case Id::Licenses:
@@ -211,7 +211,7 @@ QString HelpTopic::relativeUrlForTopic(Id topic)
         case Id::MainWindow_MediaItem_Local:
             return "playing_back_local_files_in_vms.html";
         case Id::MainWindow_MediaItem_Ptz:
-            return "setting_up_ptz.html";
+            return "ptz-controls.html";
         case Id::MainWindow_MediaItem_Rotate:
             return "rotate.html";
         case Id::MainWindow_MediaItem_Screenshot:
@@ -237,7 +237,7 @@ QString HelpTopic::relativeUrlForTopic(Id topic)
         case Id::MainWindow_Playback:
             return "playback_panel.html";
         case Id::MainWindow_Scene_EMapping:
-            return "e-mapping.html";
+            return "layout-backgrounds.html";
         case Id::MainWindow_Scene:
             return "index.html";
         case Id::MainWindow_Scene_PreviewSearch:
@@ -257,13 +257,13 @@ QString HelpTopic::relativeUrlForTopic(Id topic)
         case Id::MainWindow_TitleBar_MainMenu:
             return "main_menu.html";
         case Id::MainWindow_TitleBar_NewLayout:
-            return "creating_a_new_layout_(admin_only).html";
+            return "creating-and-sharing-layouts.html";
         case Id::MainWindow_Tree_Camera:
             return "configuring_cameras.html";
         case Id::MainWindow_Tree_Exported:
             return "viewing_videos_exported_from_a.html";
         case Id::MainWindow_Tree:
-            return "working_with_a_resource_tree.html";
+            return "resource-panel.html";
         case Id::MainWindow_Tree_Layouts:
             return "customizing_product_name.html";
         case Id::MainWindow_Tree_MultiVideo:
@@ -275,13 +275,13 @@ QString HelpTopic::relativeUrlForTopic(Id topic)
         case Id::MainWindow_Tree_Users:
             return "users_management.html";
         case Id::MainWindow_Tree_WebPage:
-            return "using_display_product_name_as_.html";
+            return "managing-web-pages-and-integrations.html";
         case Id::MainWindow_WebPageItem:
-            return "using_display_product_name_as_.html";
+            return "managing-web-pages-and-integrations.html";
         case Id::MediaFolders:
             return "configuring_media_folders.html";
         case Id::NewUser:
-            return "creating_a_new_user_(admin_only).html";
+            return "adding-users.html";
         case Id::NotificationsPanel:
             return "notifications_panel.html";
         case Id::OtherSystems:
@@ -295,7 +295,7 @@ QString HelpTopic::relativeUrlForTopic(Id topic)
         case Id::Rapid_Review:
             return "rapid_review_export.html";
         case Id::SaveLayout:
-            return "saving_layouts_(admin_only).html";
+            return "saving-locking-layouts.html";
         case Id::SecureConnection:
             return "configuring-secure-connections.html";
         case Id::ServerSettings_ArchiveRestoring:
@@ -333,7 +333,7 @@ QString HelpTopic::relativeUrlForTopic(Id topic)
         case Id::SystemSettings_General_Logs:
             return "collecting_logs.html";
         case Id::SystemSettings_General_ShowIpInTree:
-            return "working_with_a_resource_tree.html";
+            return "resource-panel.html";
         case Id::SystemSettings_General_TourCycleTime:
             return "tours.html";
         case Id::SystemSettings_LogsManagement:
@@ -345,11 +345,13 @@ QString HelpTopic::relativeUrlForTopic(Id topic)
         case Id::SystemSettings_Server_Backup:
             return "backing_up_and_restoring_produ.html";
         case Id::SystemSettings_Server_CameraAutoDiscovery:
-            return "disabling_automatic_discovery.html";
+            return "discovering_cameras_automatica.html";
         case Id::SystemSettings_Server_Mail:
             return "configuring_mail_server_for_e-.html";
         case Id::SystemSettings_UserManagement:
-            return "user_management_form.html";
+            return "manage-users.html";
+        case Id::SystemSettings_UserManagement_Groups:
+            return "managing-groups.html";
         case Id::Systems_ConnectToCurrentSystem:
             return "join_server_from_different_sys.html";
         case Id::Systems_MergeSystems:
@@ -359,9 +361,9 @@ QString HelpTopic::relativeUrlForTopic(Id topic)
         case Id::UserSettings_DisableUser:
             return "disabling_user.html";
         case Id::UserSettings_Permissions:
-            return "permissions-management.html";
+            return "configuring-users.html";
         case Id::UserSettings_UserRoles:
-            return "introducing_user_roles.html";
+            return "built-in-groups.html";
         case Id::UserWatermark:
             return "user_watermark_on_exports.html";
         case Id::UsingJoystick:

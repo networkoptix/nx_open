@@ -179,6 +179,7 @@ public:
         SystemSettings_Server_CameraAutoDiscovery,
         SystemSettings_Server_Mail,
         SystemSettings_UserManagement,
+        SystemSettings_UserManagement_Groups,
         Systems_ConnectToCurrentSystem,
         Systems_MergeSystems,
         UserRoles,
