@@ -98,6 +98,8 @@ void setupBlend(QRhiGraphicsPipeline* pipeline)
 
 namespace nx::pathkit {
 
+static constexpr auto kMatrix4x4Size = 4 * 4 * sizeof(float);
+
 RhiPaintDeviceRenderer::RhiPaintDeviceRenderer(QRhi* rhi): m_rhi(rhi) {}
 
 RhiPaintDeviceRenderer::~RhiPaintDeviceRenderer() {}
@@ -123,7 +125,7 @@ void RhiPaintDeviceRenderer::createTexturePipeline(QRhiRenderPassDescriptor* rp)
     std::unique_ptr<QRhiBuffer> tubuf(
         m_rhi->newBuffer(QRhiBuffer::Dynamic,
         QRhiBuffer::UniformBuffer,
-        64 + 4));
+        kMatrix4x4Size));
     tubuf->create();
 
     sampler.reset(m_rhi->newSampler(
@@ -196,7 +198,7 @@ void RhiPaintDeviceRenderer::createPathPipeline(QRhiRenderPassDescriptor* rp)
     ubuf.reset(m_rhi->newBuffer(
         QRhiBuffer::Dynamic,
         QRhiBuffer::UniformBuffer,
-        64 + 4));
+        kMatrix4x4Size));
     ubuf->create();
 
     csrb.reset(m_rhi->newShaderResourceBindings());
@@ -277,7 +279,7 @@ bool RhiPaintDeviceRenderer::prepare(QRhiRenderPassDescriptor* rp, QRhiResourceU
     u->updateDynamicBuffer(cbuf.get(), 0, colors.size() * sizeof(float), colors.data());
     u->updateDynamicBuffer(tvbuf.get(), 0, textureData.size() * sizeof(float), textureData.data());
 
-    u->updateDynamicBuffer(ubuf.get(), 0, 64, modelView().constData());
+    u->updateDynamicBuffer(ubuf.get(), 0, kMatrix4x4Size, modelView().constData());
     return true;
 }
 
