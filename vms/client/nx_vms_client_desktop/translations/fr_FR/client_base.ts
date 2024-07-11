@@ -4103,7 +4103,7 @@ Clé de licence : %2</translation>
     </message>
     <message>
       <source>Hotspots</source>
-      <translation>Points chauds</translation>
+      <translation>Hotspots</translation>
     </message>
     <message>
       <source>press and hold</source>
@@ -7664,7 +7664,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Place Hotspot</source>
-      <translation>Placer un point d'accès</translation>
+      <translation>Placer un Hotspots</translation>
     </message>
     <message>
       <source>NO DATA</source>
@@ -8021,7 +8021,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Hotspots</source>
-      <translation>Points chauds</translation>
+      <translation>Hotspots</translation>
     </message>
     <message>
       <source>Integrations</source>
@@ -13082,7 +13082,7 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
     </message>
     <message>
       <source>Hotspots</source>
-      <translation>Points chauds</translation>
+      <translation>Hotspots</translation>
     </message>
     <message>
       <source>Toolbar</source>
