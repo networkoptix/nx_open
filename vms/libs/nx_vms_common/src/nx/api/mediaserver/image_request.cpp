@@ -8,7 +8,8 @@ namespace nx::api {
 
 bool CameraImageRequest::isSpecialTimeValue(std::chrono::milliseconds value)
 {
-    return value.count() < 0 || value.count() == DATETIME_NOW;
+    return value == nx::api::ImageRequest::kLatestThumbnail
+        || value.count() == DATETIME_NOW;
 }
 
 } // namespace nx::api
