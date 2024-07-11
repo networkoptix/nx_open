@@ -17,29 +17,6 @@
 
 namespace {
 
-/**
- * Since 3.0 Client uses relative rpath to specify its libs location. Thus we don't have to put it
- * into LD_LIBRARY_PATH.
- */
-const nx::utils::SoftwareVersion kRpathIncludedVersion(3, 0);
-
-/**
- * Since 3.0 client uses correct window class name depending on its customization. Previous
- * versions use executable name as WM class (client-bin) which won't work properly for startup
- * notification protocol (which is used in many Linux distros launchers). For these versions we
- * pass -name <wmclass> parameter which sets the correct WM class to windows.
- */
-const nx::utils::SoftwareVersion kWindowClassFixedVersion(3, 0);
-
-/**
- * Since 4.0 client uses GStreamer 1.0 and is compatible to Ubuntu 18.04. Previous clients require
- * GStreamer 0.10 which is not available in Ubuntu 18.04. Previous Ubuntu versions had GStreamer
- * 0.10 in repos but it didn't have to be installed. For such systems we have to provide GStreamer
- * libraries manually. Applauncher stores them in a separate directory and brings them to client
- * instances via LD_LIBRARY_PATH.
- */
-const nx::utils::SoftwareVersion kNewGstreamerUsedVersion(4, 0);
-
 struct RunParameters
 {
     QString path;
@@ -278,60 +255,7 @@ bool ApplauncherProcess::startApplication(
 
     const QString binPath = installation->executableFilePath();
     QStringList environment = QProcess::systemEnvironment();
-
     QStringList arguments = task.arguments;
-
-    if (nx::build_info::isLinux())
-    {
-        const QString kLdLibraryPathVariable = "LD_LIBRARY_PATH";
-        QStringList ldLibraryPaths;
-
-        if (installation->version() < kRpathIncludedVersion)
-        {
-            const QString clientLibPath = installation->libraryPath();
-
-            if (!clientLibPath.isEmpty() && QFile::exists(clientLibPath))
-                ldLibraryPaths.append(clientLibPath);
-        }
-
-        if (installation->version() < kNewGstreamerUsedVersion)
-        {
-            const QString gstreamerLibsLibsPath =
-                QDir(qApp->applicationDirPath()).absoluteFilePath("../lib/gstreamer-0.10");
-
-            ldLibraryPaths.append(gstreamerLibsLibsPath);
-        }
-
-        if (installation->version() < kWindowClassFixedVersion)
-        {
-            arguments.append("-name");
-            arguments.append(nx::branding::brand());
-        }
-
-        if (!ldLibraryPaths.isEmpty())
-        {
-            const QString ldLibraryPath = ldLibraryPaths.join(':');
-
-            QRegularExpression varRegExp(QString("%1=(.+)").arg(kLdLibraryPathVariable));
-
-            auto it = environment.begin();
-            for (; it != environment.end(); ++it)
-            {
-                const QRegularExpressionMatch match = varRegExp.match(*it);
-                if (match.isValid())
-                {
-                    *it = QString("%1=%2:%3").arg(
-                        kLdLibraryPathVariable,
-                        ldLibraryPath,
-                        match.captured(1));
-                    break;
-                }
-            }
-
-            if (it == environment.end())
-                environment.append(QString("%1=%2").arg(kLdLibraryPathVariable, ldLibraryPath));
-        }
-    }
 
     NX_VERBOSE(this, "Launching version %1 (path %2)", targetVersion, binPath);
 
