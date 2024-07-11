@@ -10,6 +10,7 @@
 
 #include "action_builder_field_validators/layout_field_validator.h"
 #include "action_builder_field_validators/optional_time_field_validator.h"
+#include "action_builder_field_validators/sound_field_validator.h"
 #include "action_builder_field_validators/target_device_field_validator.h"
 #include "action_builder_field_validators/target_layout_field_validator.h"
 #include "action_builder_field_validators/target_server_field_validator.h"
@@ -199,6 +200,7 @@ void Initializer::registerFieldValidators() const
     // Action field validators.
     registerFieldValidator<LayoutField>(new LayoutFieldValidator);
     registerFieldValidator<OptionalTimeField>(new OptionalTimeFieldValidator);
+    registerFieldValidator<SoundField>(new SoundFieldValidator);
     registerFieldValidator<TargetDeviceField>(new TargetDeviceFieldValidator);
     registerFieldValidator<TargetLayoutField>(new TargetLayoutFieldValidator);
     registerFieldValidator<TargetServerField>(new TargetServerFieldValidator);

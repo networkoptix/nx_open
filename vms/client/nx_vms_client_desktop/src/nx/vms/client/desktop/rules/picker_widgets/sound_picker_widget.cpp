@@ -4,6 +4,7 @@
 
 #include <QtWidgets/QHBoxLayout>
 
+#include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/server_notification_cache.h>
@@ -53,11 +54,20 @@ SoundPicker::SoundPicker(
 
 void SoundPicker::updateUi()
 {
-    PlainFieldPickerWidget<vms::rules::SoundField>::updateUi();
-
     auto soundModel = m_serverNotificationCache->persistentGuiModel();
     QSignalBlocker blocker{m_comboBox};
     m_comboBox->setCurrentIndex(soundModel->rowByFilename(m_field->value()));
+
+    if (isEdited())
+    {
+        const auto validity = fieldValidity();
+        if (validity.validity == QValidator::State::Invalid)
+            setErrorStyle(m_comboBox);
+        else
+            resetErrorStyle(m_comboBox);
+
+        PlainFieldPickerWidget<vms::rules::SoundField>::updateUi();
+    }
 }
 
 void SoundPicker::onCurrentIndexChanged(int index)
