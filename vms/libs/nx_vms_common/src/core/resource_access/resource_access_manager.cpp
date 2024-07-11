@@ -841,12 +841,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
         return Qn::NoPermissions;
 
     if (targetUser->isAdministrator())
-    {
-        if (isSubjectAdministrator && !targetUser->isCloud())
-            return filterByUserType(Qn::ReadWriteSavePermission | Qn::WriteDigestPermission);
-
         return Qn::ReadPermission;
-    }
 
     if (isSubjectAdministrator || !m_accessRightsResolver->hasFullAccessRights(targetUser->getId()))
         return filterByUserType(Qn::FullUserPermissions);
