@@ -227,18 +227,6 @@ copyLibs()
         local -r OPENGL_LIBS_PATH="$STAGE_LIB/opengl"
         mkdir "$OPENGL_LIBS_PATH"
         distrib_copySystemLibs "$OPENGL_LIBS_PATH" libOpenGL.so.0
-
-        # GStreamer 0.10 is required for applauncher to run old clients (< 4.0).
-        local -r OLD_GSTREAMER_LIBS_PATH="$STAGE_LIB/gstreamer-0.10"
-        mkdir "$OLD_GSTREAMER_LIBS_PATH"
-        distrib_copyLibs "${LEGACY_OS_DEPS_DIR}/usr/lib/${TARGET_TRIPLET}" \
-            "$OLD_GSTREAMER_LIBS_PATH" \
-            libgstreamer-0.10.so.0 \
-            libgstapp-0.10.so.0 \
-            libgstbase-0.10.so.0 \
-            libgstinterfaces-0.10.so.0 \
-            libgstpbutils-0.10.so.0 \
-            libgstvideo-0.10.so.0
     fi
 
     if [ "$ARCH" != "arm64" ] && [ "$ARCH" != "arm" ];

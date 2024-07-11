@@ -69,21 +69,6 @@ namespace ec2
             return QJson::serialized(tranObject);
         }
 
-        /*
-         * Serialize Command::Value as int to send transaction
-         * to the old server with version < 4.0.
-         */
-        template <class T>
-        QByteArray serializedLegacyTransactionWithHeader(
-            const QnTransaction<T>& tran, const QnTransactionTransportHeader& header)
-        {
-            QJsonValue jsonTran;
-            QJson::serialize(tran, &jsonTran);
-            auto jsonObject = jsonTran.toObject();
-            jsonObject["command"] = (int) tran.command;
-            return serializedTransactionWithHeaderInternal(jsonObject, header);
-        }
-
         QByteArray serializedTransactionWithHeader(const QByteArray &serializedTran, const QnTransactionTransportHeader &header);
 
         template<class T>

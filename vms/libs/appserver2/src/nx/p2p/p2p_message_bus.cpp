@@ -1329,15 +1329,6 @@ bool MessageBus::handlePushTransactionData(
     const TransportHeader& header,
     nx::Locker<nx::Mutex>* lock)
 {
-    // Workaround for compatibility with server 3.1/3.2 with p2p mode on
-    // It could send subscribeForDataUpdates binary message among json data.
-    // TODO: we have to remove this checking in 4.0 because it is fixed on server side.
-    if (localPeer().dataFormat == Qn::SerializationFormat::json && !serializedTran.isEmpty()
-        && serializedTran[0] == (quint8)MessageType::subscribeForDataUpdates)
-    {
-        return true; //< Ignore binary message
-    }
-
     using namespace std::placeholders;
     return handleTransaction(
         this,
