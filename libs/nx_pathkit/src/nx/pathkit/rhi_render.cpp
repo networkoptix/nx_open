@@ -29,17 +29,27 @@ int pathToTriangles(
     std::vector<float>& colors,
     QSize clip)
 {
-    const auto count = pp.aa
-        ? path.toAATriangles(
-            /*tolerance*/ 0.25,
-            /*clipBounds*/ SkRect::MakeXYWH(0, 0, clip.width(), clip.height()),
-            &triangles)
-        : path.toTriangles(
+    const auto prevSize = triangles.size();
+    if (pp.aa)
+    {
+        path.toAATriangles(
             /*tolerance*/ 0.25,
             /*clipBounds*/ SkRect::MakeXYWH(0, 0, clip.width(), clip.height()),
             &triangles);
+    }
+    else
+    {
+        path.toTriangles(
+            /*tolerance*/ 0.25,
+            /*clipBounds*/ SkRect::MakeXYWH(0, 0, clip.width(), clip.height()),
+            &triangles);
+    }
 
-    if (count > 0)
+    // Each triangle vertex is 3 floats: x, y, alpha.
+    const auto numVerts = (triangles.size() - prevSize) / 3;
+
+    // Add color for each vertex.
+    for (size_t i = 0; i < numVerts; ++i)
     {
         colors.push_back(color.redF());
         colors.push_back(color.greenF());
@@ -47,7 +57,7 @@ int pathToTriangles(
         colors.push_back(pp.opacity * color.alphaF());
     }
 
-    return count;
+    return numVerts;
 }
 
 SkPaint::Cap getSkCap(Qt::PenCapStyle style)
@@ -105,7 +115,7 @@ void RhiPaintDeviceRenderer::createTexturePipeline(QRhiRenderPassDescriptor* rp)
     tex->create();
 
     tvbuf.reset(m_rhi->newBuffer(
-        QRhiBuffer::Immutable,
+        QRhiBuffer::Dynamic,
         QRhiBuffer::VertexBuffer,
         4 * 5 * sizeof(float)));
     tvbuf->create();
@@ -169,15 +179,15 @@ void RhiPaintDeviceRenderer::createTexturePipeline(QRhiRenderPassDescriptor* rp)
 void RhiPaintDeviceRenderer::createPathPipeline(QRhiRenderPassDescriptor* rp)
 {
     vbuf.reset(m_rhi->newBuffer(
-        QRhiBuffer::Immutable,
+        QRhiBuffer::Dynamic,
         QRhiBuffer::VertexBuffer,
         1));
     vbuf->create();
 
     cbuf.reset(m_rhi->newBuffer(
         QRhiBuffer::Dynamic,
-        QRhiBuffer::UniformBuffer,
-        4 * 4));
+        QRhiBuffer::VertexBuffer,
+        1));
     cbuf->create();
 
     ubuf.reset(m_rhi->newBuffer(
@@ -191,11 +201,7 @@ void RhiPaintDeviceRenderer::createPathPipeline(QRhiRenderPassDescriptor* rp)
         QRhiShaderResourceBinding::uniformBuffer(
             0,
             kCommonVisibility,
-            ubuf.get()),
-        QRhiShaderResourceBinding::uniformBuffer(
-            1,
-            QRhiShaderResourceBinding::VertexStage,
-            cbuf.get())
+            ubuf.get())
     });
     csrb->create();
 
@@ -213,10 +219,12 @@ void RhiPaintDeviceRenderer::createPathPipeline(QRhiRenderPassDescriptor* rp)
     });
     QRhiVertexInputLayout inputLayout;
     inputLayout.setBindings({
-        { 3 * sizeof(float) }
+        { 3 * sizeof(float) },
+        { 4 * sizeof(float) }
     });
     inputLayout.setAttributes({
         { 0, 0, QRhiVertexInputAttribute::Float3, 0 },
+        { 1, 1, QRhiVertexInputAttribute::Float4, 0 },
     });
     cps->setVertexInputLayout(inputLayout);
     cps->setShaderResourceBindings(csrb.get());
@@ -244,16 +252,27 @@ bool RhiPaintDeviceRenderer::prepare(QRhiRenderPassDescriptor* rp, QRhiResourceU
         textureData,
         m_size);
 
-    vbuf->setSize(vertexData.size() * sizeof(vertexData[0]));
-    if (!vbuf->create())
+    const auto resizeBuffer =
+        [&](QRhiBuffer* buffer, size_t minSize)
+        {
+            if (buffer->size() < minSize * sizeof(float))
+            {
+                buffer->setSize(minSize * sizeof(float));
+                return buffer->create();
+            }
+            return true;
+        };
+
+    if (!resizeBuffer(vbuf.get(), vertexData.size()))
+        return false;
+    if (!resizeBuffer(cbuf.get(), colors.size()))
+        return false;
+    if (!resizeBuffer(tvbuf.get(), textureData.size()))
         return false;
 
-    tvbuf->setSize(textureData.size() * sizeof(textureData[0]));
-    if (!tvbuf->create())
-        return false;
-
-    u->uploadStaticBuffer(vbuf.get(), vertexData.data());
-    u->uploadStaticBuffer(tvbuf.get(), textureData.data());
+    u->updateDynamicBuffer(vbuf.get(), 0, vertexData.size() * sizeof(float), vertexData.data());
+    u->updateDynamicBuffer(cbuf.get(), 0, colors.size() * sizeof(float), colors.data());
+    u->updateDynamicBuffer(tvbuf.get(), 0, textureData.size() * sizeof(float), textureData.data());
 
     u->updateDynamicBuffer(ubuf.get(), 0, 64, modelView().constData());
     return true;
@@ -332,13 +351,11 @@ std::vector<RhiPaintDeviceRenderer::Batch> RhiPaintDeviceRenderer::processEntrie
                     if (pathToTriangles(path, color, *paintPath, triangles, colors, clip) == 0)
                         return;
 
-                    std::unique_ptr<QRhiBuffer> colorBuf(m_rhi->newBuffer(
-                        QRhiBuffer::Dynamic,
-                        QRhiBuffer::UniformBuffer,
-                        4 * sizeof(float)));
-                    colorBuf->create();
-
-                    u->updateDynamicBuffer(colorBuf.get(), 0, colorBuf->size(), &colors[colorsOffset]);
+                    if (!batches.empty() && batches.back().colorInput)
+                    {
+                        batches.back().count += ((int) triangles.size() - offset) / 3;
+                        return;
+                    }
 
                     std::unique_ptr<QRhiShaderResourceBindings> bindings(
                         m_rhi->newShaderResourceBindings());
@@ -346,21 +363,18 @@ std::vector<RhiPaintDeviceRenderer::Batch> RhiPaintDeviceRenderer::processEntrie
                         QRhiShaderResourceBinding::uniformBuffer(
                             0,
                             kCommonVisibility,
-                            ubuf.get()),
-                        QRhiShaderResourceBinding::uniformBuffer(
-                            1,
-                            QRhiShaderResourceBinding::VertexStage,
-                            colorBuf.get())
+                            ubuf.get())
                     });
                     bindings->create();
 
                     batches.push_back({
                         .offset = offset,
+                        .colorsOffset = colorsOffset,
                         .count = ((int) triangles.size() - offset) / 3,
                         .bindigs = std::move(bindings),
                         .pipeline = cps.get(),
                         .vertexInput = vbuf.get(),
-                        .dataBuffer = std::move(colorBuf)
+                        .colorInput = cbuf.get(),
                     });
                 };
 
@@ -455,10 +469,22 @@ void RhiPaintDeviceRenderer::render(QRhiCommandBuffer* cb)
         cb->setGraphicsPipeline(batch.pipeline);
         cb->setViewport(QRhiViewport(0, 0, m_size.width(), m_size.height()));
         cb->setShaderResources(batch.bindigs.get());
-        const QRhiCommandBuffer::VertexInput vbufBinding(
-            batch.vertexInput,
-            batch.offset * sizeof(float));
-        cb->setVertexInput(0, 1, &vbufBinding);
+
+        if (batch.colorInput)
+        {
+            const QRhiCommandBuffer::VertexInput vbufBindings[] = {
+                { batch.vertexInput, batch.offset * sizeof(float) },
+                { batch.colorInput, batch.colorsOffset * sizeof(float) }
+            };
+            cb->setVertexInput(0, 2, vbufBindings);
+        }
+        else
+        {
+            const QRhiCommandBuffer::VertexInput vbufBinding(
+                batch.vertexInput,
+                batch.offset * sizeof(float));
+            cb->setVertexInput(0, 1, &vbufBinding);
+        }
         cb->draw(batch.count);
     }
 }

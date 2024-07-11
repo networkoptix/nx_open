@@ -26,13 +26,14 @@ class NX_PATHKIT_API RhiPaintDeviceRenderer
 public:
     struct Batch
     {
-        int offset;
-        int count;
+        int offset = 0;
+        int colorsOffset = 0;
+        int count = 0;
 
         std::unique_ptr<QRhiShaderResourceBindings> bindigs;
         QRhiGraphicsPipeline* pipeline = nullptr;
         QRhiBuffer* vertexInput = nullptr;
-        std::unique_ptr<QRhiBuffer> dataBuffer;
+        QRhiBuffer* colorInput = nullptr;
 
         std::function<void(QRhi*, QRhiCommandBuffer*, QSize)> render;
     };
