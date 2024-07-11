@@ -174,6 +174,9 @@ void RhiPaintDeviceRenderer::createTexturePipeline(QRhiRenderPassDescriptor* rp)
     tps->setShaderResourceBindings(tsrb.get());
     tps->setRenderPassDescriptor(rp);
     tps->create();
+
+    const int maxSize = m_rhi->resourceLimit(QRhi::TextureSizeMax);
+    m_textureCache.setMaxCost(maxSize * maxSize);
 }
 
 void RhiPaintDeviceRenderer::createPathPipeline(QRhiRenderPassDescriptor* rp)
@@ -307,7 +310,8 @@ std::unique_ptr<QRhiShaderResourceBindings> RhiPaintDeviceRenderer::createTextur
 
         texture->create();
         rub->uploadTexture(texture.get(), img);
-        m_textureCache.insert(key, new TextureEntry(texture));
+        const auto size = texture->pixelSize();
+        m_textureCache.insert(key, new TextureEntry(texture), size.width() * size.height());
     }
 
     textures.push_back(texture);
