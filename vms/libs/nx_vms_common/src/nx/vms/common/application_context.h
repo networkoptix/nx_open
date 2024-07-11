@@ -12,6 +12,7 @@ class QnLongRunableCleanup;
 class QnStoragePluginFactory;
 
 namespace nx::metrics { struct ApplicationMetricsStorage; }
+namespace nx::i18n { class TranslationManager; }
 
 namespace nx::vms::common {
 
@@ -50,6 +51,12 @@ public:
 
     /** Set application language locale code (in form `en_US`). */
     void setLocale(const QString& value);
+
+    /** Application-wide translation manager. Should always exist. */
+    nx::i18n::TranslationManager* translationManager() const;
+
+    /** Set application-wide translation manager. Weak pointer is stored. */
+    void setTranslationManager(nx::i18n::TranslationManager* value);
 
     void setModuleShortId(const nx::Uuid& id, int number);
     int moduleShortId(const nx::Uuid& id) const;

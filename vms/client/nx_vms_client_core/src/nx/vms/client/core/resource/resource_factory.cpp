@@ -4,6 +4,7 @@
 
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/system_context.h>
+#include <nx_ec/data/api_conversion_functions.h>
 
 #include "server.h"
 #include "user.h"
@@ -47,7 +48,9 @@ QnUserResourcePtr ResourceFactory::createUser(
         }
     }
 
-    return base_type::createUser(systemContext, data);
+    QnUserResourcePtr result(new UserResource(data.type, data.externalId));
+    ec2::fromApiToResource(data, result);
+    return result;
 }
 
 } // namespace nx::vms::client::core

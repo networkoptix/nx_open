@@ -262,6 +262,7 @@ void ApplicationContext::initializeTranslations(const QString& targetLocale)
 {
     NX_INFO(this, "Trying to Initialize translations for locale %1", targetLocale);
     d->translationManager = std::make_unique<nx::i18n::TranslationManager>();
+    setTranslationManager(d->translationManager.get());
 
     const auto langName = targetLocale.split('_').first();
 

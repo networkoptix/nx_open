@@ -6,11 +6,10 @@
 #include <QtCore/QScopedValueRollback>
 
 #include <api/server_rest_connection.h>
-#include <core/resource/user_resource.h>
 #include <core/resource_management/resource_properties.h>
 #include <health/system_health_strings_helper.h>
 #include <nx/reflect/json.h>
-#include <nx/utils/guarded_callback.h>
+#include <nx/vms/client/core/resource/user.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
@@ -159,36 +158,17 @@ void QnPopupSettingsWidget::applyChanges()
     if (m_currentUser)
     {
         auto userSettings = m_currentUser->settings();
-        const auto oldUserSettings = userSettings;
-        userSettings.setWatchedEvents(watchedEvents());
-        m_currentUser->setSettings(userSettings);
+        if (userSettings.watchedEvents() != watchedEvents())
+        {
+            auto sessionTokenHelper = FreshSessionTokenHelper::makeHelper(this,
+                tr("Save user"),
+                tr("Enter your account password"),
+                tr("Save"),
+                FreshSessionTokenHelper::ActionType::updateSettings);
 
-        nx::vms::api::ResourceWithParameters parameters;
-        parameters.setFromParameter({ResourcePropertyKey::User::kUserSettings,
-            QString::fromStdString(nx::reflect::json::serialize(m_currentUser->settings()))});
-
-        auto sessionTokenHelper = FreshSessionTokenHelper::makeHelper(this,
-            tr("Save user"),
-            tr("Enter your account password"),
-            tr("Save"),
-            FreshSessionTokenHelper::ActionType::updateSettings);
-
-        systemContext()->connectedServerApi()->patchUserParameters(
-            m_currentUser->getId(),
-            parameters,
-            sessionTokenHelper,
-            nx::utils::guarded(this,
-                [this, oldUserSettings](bool success,
-                    int /*handle*/,
-                    rest::ErrorOrData<nx::vms::api::UserModelV3> /*errorOrData*/)
-                {
-                    if (success)
-                        return;
-
-                    if (m_currentUser)
-                        m_currentUser->setSettings(oldUserSettings);
-                }),
-            thread());
+            userSettings.setWatchedEvents(watchedEvents());
+            m_currentUser->saveSettings(userSettings, sessionTokenHelper);
+        }
     }
 
     appContext()->localSettings()->popupSystemHealth = storedSystemHealth();
@@ -238,7 +218,7 @@ void QnPopupSettingsWidget::at_userChanged(const QnUserResourcePtr& user)
     if (m_currentUser)
         m_currentUser->disconnect(this);
 
-    m_currentUser = user;
+    m_currentUser = user.dynamicCast<nx::vms::client::core::UserResource>();
 
     if (!m_currentUser)
         return;

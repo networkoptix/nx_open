@@ -33,13 +33,19 @@ struct NX_VMS_COMMON_API UserSettings
      */
     std::set<std::string> eventFilter;
 
+    /**
+     * Preferred locale of the user. Will affect language of the notifications (and later emails)
+     * displayed both in desktop and mobile client.
+     */
+    std::string locale;
+
     bool operator == (const UserSettings& /*other*/) const = default;
     bool isEventWatched(nx::vms::api::EventType eventType) const;
     bool isEventWatched(const QString& eventType) const;
     QList<nx::vms::api::EventType> watchedEvents() const;
     void setWatchedEvents(const QList<nx::vms::api::EventType>& events);
 };
-#define UserSettings_Fields (eventFilter)
+#define UserSettings_Fields (eventFilter)(locale)
 NX_REFLECTION_INSTRUMENT(UserSettings, UserSettings_Fields)
 
 struct NX_VMS_COMMON_API QnUserHash

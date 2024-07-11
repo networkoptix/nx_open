@@ -44,6 +44,8 @@ DialogWithState
     property bool emailEditable: true
     property string password: generalSettings.password
     property bool passwordEditable: true
+    property alias locale: generalSettings.locale
+    property bool localeEditable: true
     property alias userEnabled: generalSettings.userEnabled
     property bool userEnabledEditable: true
     property alias allowInsecure: generalSettings.allowInsecure
