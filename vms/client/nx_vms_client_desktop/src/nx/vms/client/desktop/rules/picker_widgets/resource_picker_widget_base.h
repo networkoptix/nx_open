@@ -58,13 +58,13 @@ protected:
             const auto validity = fieldValidity();
             if (validity.validity == QValidator::State::Invalid)
             {
-                setErrorButtonStyle(m_selectButton);
+                setErrorStyle(m_selectButton);
                 PlainFieldPickerWidget<F>::setValidity(validity);
                 return;
             }
         }
 
-        resetButtonStyle(m_selectButton);
+        resetErrorStyle(m_selectButton);
         // Only error state must be shown by the widget. Intermidiate state warning must be shown
         // by the resource selection dialog.
         PlainFieldPickerWidget<F>::setValidity({});

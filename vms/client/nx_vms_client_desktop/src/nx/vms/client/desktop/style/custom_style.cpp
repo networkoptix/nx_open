@@ -101,6 +101,18 @@ void setWarningFrame(QWidget* widget, int frameWidth, int roundingRadius)
     widget->setStyleSheet(styleTemplate);
 }
 
+void setErrorStyle(QWidget* widget)
+{
+    widget->setProperty(nx::style::Properties::kErrorStyleProperty, true);
+    widget->update();
+}
+
+void resetErrorStyle(QWidget* widget)
+{
+    widget->setProperty(nx::style::Properties::kErrorStyleProperty, false);
+    widget->update();
+}
+
 void resetButtonStyle(QAbstractButton* button)
 {
     button->setProperty(nx::style::Properties::kAccentStyleProperty, false);
@@ -133,12 +145,6 @@ void setAccentStyle(QDialog* dialog, QDialogButtonBox::StandardButton standardBu
 void setWarningButtonStyle(QAbstractButton* button)
 {
     button->setProperty(nx::style::Properties::kWarningStyleProperty, true);
-    button->update();
-}
-
-void setErrorButtonStyle(QAbstractButton* button)
-{
-    button->setProperty(nx::style::Properties::kErrorStyleProperty, true);
     button->update();
 }
 
