@@ -815,7 +815,7 @@ TEST_F(ResourceAccessManagerTest, checkAdministratorCanNotEditOtherAdministrator
     resourcePool()->addResource(cloudAdministrator);
 
     EXPECT_FALSE(hasPermissions(localAdministrator, cloudAdministrator, Qn::WriteDigestPermission));
-    EXPECT_TRUE(hasPermissions(cloudAdministrator, localAdministrator, Qn::WriteDigestPermission));
+    EXPECT_FALSE(hasPermissions(cloudAdministrator, localAdministrator, Qn::WriteDigestPermission));
 
     for (const auto& permission: {
         Qn::WritePasswordPermission, Qn::WriteAccessRightsPermission,
@@ -874,11 +874,10 @@ TEST_F(ResourceAccessManagerTest, checkCanModifyUserDigestAuthorizationEnabled)
 
     QnUserResourceList users = {administrator, cloudAdministrator, powerUser, cloud, ldap, other};
     QVector<std::pair<QnUserResourcePtr, QnUserResourcePtr>> allowedScenarios = {
-        {administrator, administrator},
+        {administrator, administrator}, //< Can modify himself.
         {administrator, powerUser},
         {administrator, ldap},
         {administrator, other},
-        {cloudAdministrator, administrator},
         {cloudAdministrator, powerUser},
         {cloudAdministrator, ldap},
         {cloudAdministrator, other},
