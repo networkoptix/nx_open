@@ -12,8 +12,11 @@
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/utils/i18n/scoped_locale.h>
+#include <nx/utils/i18n/translation_manager.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/qobject.h>
+#include <nx/vms/common/application_context.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/event/migration_utils.h>
 
@@ -580,8 +583,10 @@ ActionBuilder::Actions ActionBuilder::buildActionsForTargetUsers(
     {
         AggregatedEventPtr event;
         UuidSet userIds;
+        QString locale;
     };
 
+    // Group users by permissions and locale, so only limited number of actions will be produced.
     std::unordered_map<QByteArray, EventUsers> eventUsersMap;
     const bool userFiltered = actionManifest->flags.testFlag(ItemFlag::userFiltered);
 
@@ -605,14 +610,25 @@ ActionBuilder::Actions ActionBuilder::buildActionsForTargetUsers(
         if (!filteredAggregatedEvent)
             continue;
 
-        // Grouping users with the same permissions.
-        auto hash = permissionHash(*eventManifest, filteredAggregatedEvent);
+        const auto locale = QString::fromStdString(user->settings().locale);
+        // Grouping users with the same permissions and same locale.
+        auto hash = permissionHash(*eventManifest, filteredAggregatedEvent)
+            .append(locale.toUtf8());
+
         auto it = eventUsersMap.find(hash);
 
         if (it == eventUsersMap.end())
-            eventUsersMap.emplace(hash, EventUsers{filteredAggregatedEvent, {user->getId()}});
+        {
+            eventUsersMap.emplace(hash, EventUsers{
+                filteredAggregatedEvent,
+                {user->getId()},
+                locale
+            });
+        }
         else
+        {
             it->second.userIds << user->getId();
+        }
     }
 
     auto additionalRecipientsField = fieldByNameImpl<ActionTextField>(utils::kEmailsFieldName);
@@ -650,6 +666,20 @@ ActionBuilder::Actions ActionBuilder::buildActionsForTargetUsers(
         targetUsersField->setSelection({
             .ids = std::move(value.userIds),
             .all = false});
+
+        nx::i18n::ScopedLocalePtr scopedLocale;
+        const auto locale = value.locale;
+        if (locale.isEmpty())
+        {
+            NX_VERBOSE(
+                this, "User language is not set, customization language will be used");
+        }
+        else
+        {
+            auto translationManager = nx::vms::common::appContext()->translationManager();
+            if (NX_ASSERT(translationManager))
+                scopedLocale = translationManager->installScopedLocale(locale);
+        }
 
         auto actions = filterActionPermissions(
             buildAction(value.event),

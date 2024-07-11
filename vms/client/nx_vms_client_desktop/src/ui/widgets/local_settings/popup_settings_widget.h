@@ -7,6 +7,7 @@
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QWidget>
 
+#include <nx/vms/client/core/resource/resource_fwd.h>
 #include <nx/vms/common/system_health/message_type.h>
 #include <nx/vms/event/event_fwd.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
@@ -42,5 +43,5 @@ private:
     QMap<nx::vms::common::system_health::MessageType, QCheckBox*> m_systemHealthCheckBoxes;
     bool m_updating;
     std::unique_ptr<nx::vms::event::StringsHelper> m_helper;
-    QnUserResourcePtr m_currentUser;
+    nx::vms::client::core::UserResourcePtr m_currentUser;
 };

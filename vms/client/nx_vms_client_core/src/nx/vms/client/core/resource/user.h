@@ -2,8 +2,17 @@
 
 #pragma once
 
+#include <api/server_rest_connection_fwd.h>
 #include <core/resource/user_resource.h>
+#include <nx/utils/async_handler_executor.h>
 #include <nx/vms/api/data/user_model.h>
+
+namespace nx::vms::common {
+
+class AbstractSessionTokenHelper;
+using SessionTokenHelperPtr = std::shared_ptr<AbstractSessionTokenHelper>;
+
+} // namespace nx::vms::common
 
 namespace nx::vms::client::core {
 
@@ -20,6 +29,13 @@ public:
 
     /** Constructor for cross-system contexts as of 6.0 and newer. */
     explicit UserResource(nx::vms::api::UserModelV3 data);
+
+    /** Send request to the currently connected server to save user settings. */
+    rest::Handle saveSettings(
+        const UserSettings& value,
+        common::SessionTokenHelperPtr sessionTokenHelper,
+        std::function<void(bool /*success*/, rest::Handle /*handle*/)> callback = {},
+        nx::utils::AsyncHandlerExecutor executor = {});
 
 protected:
     virtual void updateInternal(const QnResourcePtr& source, NotifierList& notifiers) override;

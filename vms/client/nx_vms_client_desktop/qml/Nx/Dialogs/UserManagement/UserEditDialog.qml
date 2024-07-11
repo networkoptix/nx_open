@@ -44,6 +44,8 @@ DialogWithState
     property alias emailEditable: generalSettings.emailEditable
     property alias password: generalSettings.password
     property alias passwordEditable: generalSettings.passwordEditable
+    property alias locale: generalSettings.locale
+    property alias localeEditable: generalSettings.localeEditable
     property alias userEnabled: generalSettings.userEnabled
     property alias userEnabledEditable: generalSettings.userEnabledEditable
     property alias allowInsecure: generalSettings.allowInsecure

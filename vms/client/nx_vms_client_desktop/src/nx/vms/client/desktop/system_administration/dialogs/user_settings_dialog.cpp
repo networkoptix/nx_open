@@ -15,7 +15,6 @@
 #include <client/client_globals.h>
 #include <client/client_message_processor.h>
 #include <common/common_globals.h>
-#include <core/resource/user_resource.h>
 #include <core/resource_access/access_rights_manager.h>
 #include <core/resource_access/resource_access_subject_hierarchy.h>
 #include <core/resource_management/resource_pool.h>
@@ -34,6 +33,7 @@
 #include <nx/vms/client/core/network/credentials_manager.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/resource/server.h>
+#include <nx/vms/client/core/resource/user.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
@@ -150,7 +150,7 @@ struct UserSettingsDialog::Private
     QmlProperty<QDateTime> firstLoginTime;
     QmlProperty<bool> linkReady;
 
-    QnUserResourcePtr user;
+    core::UserResourcePtr user;
     rest::Handle currentRequest = 0;
 
     Private(UserSettingsDialog* parent, DialogType dialogType):
@@ -447,6 +447,142 @@ struct UserSettingsDialog::Private
             parentWidget);
         messageBox.setWindowTitle(qApp->applicationDisplayName());
         messageBox.exec();
+    }
+
+    void onUserSaveRequestCompleted(
+        const UserSettingsDialogState& state,
+        std::optional<QString> actualPassword,
+        common::SessionTokenHelperPtr sessionTokenHelper,
+        bool success,
+        int handle,
+        rest::ErrorOrData<nx::vms::api::UserModelV3> errorOrData)
+    {
+        if (NX_ASSERT(handle == currentRequest))
+            currentRequest = 0;
+
+        if (!success)
+        {
+            if (const auto error = std::get_if<nx::network::rest::Result>(&errorOrData);
+                error && error->error != nx::network::rest::Result::SessionExpired)
+            {
+                showServerError(tr("Failed to apply changes"), *error);
+            }
+            isSaving = false;
+            return;
+        }
+
+        if (actualPassword)
+        {
+            if (auto currentSession = q->systemContext()->session())
+                currentSession->updatePassword(*actualPassword);
+        }
+
+        if (auto data = std::get_if<nx::vms::api::UserModelV3>(&errorOrData))
+        {
+            if (data->type == nx::vms::api::UserType::temporaryLocal)
+            {
+                if (dialogType == CreateUser)
+                {
+                    NX_ASSERT(data->temporaryToken);
+
+                    showMessageBoxWithLink(
+                        tr("New User"),
+                        tr("User %1 has been successfully created!")
+                            .arg(common::html::colored(
+                                data->name, core::colorTheme()->color("light4"))),
+                        data->temporaryToken->token);
+                }
+                else if (data->temporaryToken)
+                {
+                    updateUiFromTemporaryToken(*data->temporaryToken);
+                }
+            }
+
+            if (user)
+            {
+                // Update user locally ahead of receiving update from the server
+                // to avoid UI blinking.
+                user->setName(data->name);
+                user->setEmail(state.email);
+                user->setFullName(state.fullName);
+                user->setRawPermissions(state.globalPermissions);
+                user->setEnabled(state.userEnabled);
+                user->setGroupIds(data->groupIds);
+            }
+
+            UserGroupRequestChain::updateLayoutSharing(
+                q->systemContext(), data->resourceAccessRights);
+
+            // Update access rights locally.
+            q->systemContext()->accessRightsManager()->setOwnResourceAccessMap(
+                data->id, {data->resourceAccessRights.begin(), data->resourceAccessRights.end()});
+
+            // Changing password or disabling digest auth leads to reconnect,
+            // make sure the new token is issued for reconnect to succeed.
+            if (state.isSelf)
+            {
+                if (!state.password.isEmpty())
+                {
+                    q->refreshToken(state.password);
+                }
+                else if (q->originalState().allowInsecure && !state.allowInsecure)
+                {
+                    const auto credentials = q->systemContext()->connectionCredentials();
+                    NX_ASSERT(credentials.authToken.isPassword());
+                    const auto password = credentials.authToken.value;
+                    if (NX_ASSERT(!password.empty()))
+                        q->refreshToken(QString::fromStdString(password));
+                }
+            }
+        }
+
+        auto completeSaving =
+            [this, state]()
+            {
+                isSaving = false;
+                q->saveStateComplete(state);
+            };
+
+        if (user)
+        {
+            auto userSettings = user->settings();
+            const bool userSettingsChanged = (userSettings.locale != state.locale.toStdString());
+            userSettings.locale = state.locale.toStdString();
+
+            if (userSettingsChanged)
+            {
+                auto callback =
+                    [this, completeSaving](bool success, int handle)
+                    {
+                        if (NX_ASSERT(handle == currentRequest))
+                            currentRequest = 0;
+
+                        // TODO: #sivanov Pass error to the handler.
+                        if (!success)
+                        {
+                            isSaving = false;
+                            showServerError(tr("Failed to apply changes"), {});
+                        }
+                        else
+                        {
+                            completeSaving();
+                        }
+                    };
+                currentRequest = user->saveSettings(
+                    userSettings,
+                    sessionTokenHelper,
+                    callback,
+                    q);
+            }
+            else
+            {
+                completeSaving();
+            }
+        }
+        else
+        {
+            completeSaving();
+        }
     }
 };
 
@@ -1015,6 +1151,9 @@ UserSettingsDialogState UserSettingsDialog::createState(const QnUserResourcePtr&
     state.fullNameEditable = permissions.testFlag(Qn::WriteFullNamePermission);
     state.email = user->getEmail();
     state.emailEditable = permissions.testFlag(Qn::WriteEmailPermission);
+    state.locale = QString::fromStdString(user->settings().locale);
+    // FIXME: Create separate permission.
+    state.localeEditable = permissions.testFlag(Qn::WriteFullNamePermission);
     state.passwordEditable = permissions.testFlag(Qn::WritePasswordPermission);
     state.userEnabled = user->isEnabled();
     state.userEnabledEditable = permissions.testFlag(Qn::WriteAccessRightsPermission);
@@ -1152,88 +1291,13 @@ void UserSettingsDialog::saveState(const UserSettingsDialogState& state)
             [this, state, actualPassword, sessionTokenHelper](
                 bool success, int handle, rest::ErrorOrData<nx::vms::api::UserModelV3> errorOrData)
             {
-                if (NX_ASSERT(handle == d->currentRequest))
-                    d->currentRequest = 0;
-
-                d->isSaving = false;
-
-                if (!success)
-                {
-                    if (const auto error = std::get_if<nx::network::rest::Result>(&errorOrData);
-                        error && error->error != nx::network::rest::Result::SessionExpired)
-                    {
-                        d->showServerError(tr("Failed to apply changes"), *error);
-                    }
-                    return;
-                }
-
-                if (actualPassword)
-                {
-                    if (auto currentSession = systemContext()->session())
-                        currentSession->updatePassword(*actualPassword);
-                }
-
-                if (auto data = std::get_if<nx::vms::api::UserModelV3>(&errorOrData))
-                {
-                    if (data->type == nx::vms::api::UserType::temporaryLocal)
-                    {
-                        if (d->dialogType == CreateUser)
-                        {
-                            NX_ASSERT(data->temporaryToken);
-
-                            d->showMessageBoxWithLink(
-                                tr("New User"),
-                                tr("User %1 has been successfully created!")
-                                    .arg(common::html::colored(
-                                        data->name,
-                                        core::colorTheme()->color("light4"))),
-                                data->temporaryToken->token);
-                        }
-                        else if (data->temporaryToken)
-                        {
-                            d->updateUiFromTemporaryToken(*data->temporaryToken);
-                        }
-                    }
-
-                    if (d->user)
-                    {
-                        // Update user locally ahead of receiving update from the server
-                        // to avoid UI blinking.
-                        d->user->setName(data->name);
-                        d->user->setEmail(state.email);
-                        d->user->setFullName(state.fullName);
-                        d->user->setRawPermissions(state.globalPermissions);
-                        d->user->setEnabled(state.userEnabled);
-                        d->user->setGroupIds(data->groupIds);
-                    }
-
-                    UserGroupRequestChain::updateLayoutSharing(
-                        systemContext(), data->resourceAccessRights);
-
-                    // Update access rights locally.
-                    systemContext()->accessRightsManager()->setOwnResourceAccessMap(data->id,
-                        {data->resourceAccessRights.begin(), data->resourceAccessRights.end()});
-
-                    // Changing password or disabling digest auth leads to reconnect,
-                    // make sure the new token is issued for reconnect to succeed.
-                    if (state.isSelf)
-                    {
-                        if (!state.password.isEmpty())
-                        {
-                            refreshToken(state.password);
-                        }
-                        else if (originalState().allowInsecure && !state.allowInsecure)
-                        {
-                            const auto credentials = systemContext()->connectionCredentials();
-                            NX_ASSERT(credentials.authToken.isPassword());
-                            const auto password = credentials.authToken.value;
-                            if (NX_ASSERT(!password.empty()))
-                                refreshToken(QString::fromStdString(password));
-                        }
-                    }
-                }
-
-                saveStateComplete(state);
+                d->onUserSaveRequestCompleted(
+                    state,
+                    actualPassword,
+                    sessionTokenHelper,
+                    success,
+                    handle,
+                    errorOrData);
             }), thread());
 }
 
@@ -1339,7 +1403,7 @@ bool UserSettingsDialog::setUser(const QnUserResourcePtr& user)
     if (d->user)
         d->user->disconnect(this);
 
-    d->user = user;
+    d->user = user.dynamicCast<core::UserResource>();
 
     if (user)
     {

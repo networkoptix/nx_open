@@ -12,6 +12,7 @@
 #include <nx/metrics/application_metrics_storage.h>
 #include <nx/network/cloud/tunnel/tcp/tunnel_tcp_endpoint_verificator_factory.h>
 #include <nx/network/socket_global.h>
+#include <nx/utils/i18n/translation_manager.h>
 #include <nx/utils/thread/long_runnable.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/timer_manager.h>
@@ -50,6 +51,8 @@ struct ApplicationContext::Private
     std::unique_ptr<QnStoragePluginFactory> storagePluginFactory;
     std::unique_ptr<nx::utils::TimerManager> timerManager;
     std::unique_ptr<ApplicationMetricsStorage> metricsStorage;
+
+    QPointer<nx::i18n::TranslationManager> translationManager;
 };
 
 ApplicationContext::ApplicationContext(
@@ -142,6 +145,16 @@ QString ApplicationContext::locale() const
 void ApplicationContext::setLocale(const QString& value)
 {
     d->locale = value;
+}
+
+nx::i18n::TranslationManager* ApplicationContext::translationManager() const
+{
+    return d->translationManager.get();
+}
+
+void ApplicationContext::setTranslationManager(nx::i18n::TranslationManager* value)
+{
+    d->translationManager = value;
 }
 
 void ApplicationContext::setModuleShortId(const nx::Uuid& id, int number)

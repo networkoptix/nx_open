@@ -37,6 +37,8 @@ struct UserSettingsDialogState
     Q_PROPERTY(bool emailEditable MEMBER emailEditable)
     Q_PROPERTY(QString password MEMBER password)
     Q_PROPERTY(bool passwordEditable MEMBER passwordEditable)
+    Q_PROPERTY(QString locale MEMBER locale)
+    Q_PROPERTY(bool localeEditable MEMBER localeEditable)
     Q_PROPERTY(bool userEnabled MEMBER userEnabled)
     Q_PROPERTY(bool userEnabledEditable MEMBER userEnabledEditable)
     Q_PROPERTY(bool allowInsecure MEMBER allowInsecure)
@@ -70,6 +72,8 @@ public:
     bool emailEditable = true;
     QString password;
     bool passwordEditable = true;
+    QString locale;
+    bool localeEditable = true;
     bool userEnabled = true;
     bool userEnabledEditable = true;
     bool allowInsecure = false;

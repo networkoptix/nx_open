@@ -1,17 +1,18 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.15
-import QtQuick.Controls 2.15
-import QtQuick.Layouts 1.15
-import QtQuick.Window 2.15
-import QtQuick.Shapes 1.15
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
+import QtQuick.Window
+import QtQuick.Shapes
 
 import Qt5Compat.GraphicalEffects
 
-import Nx.Core 1.0
-import Nx.Controls 1.0
+import Nx.Core
+import Nx.Controls
 
-import nx.vms.client.desktop 1.0
+import nx.vms.client.core
+import nx.vms.client.desktop
 
 import "../Components"
 
@@ -24,6 +25,7 @@ Item
     property alias fullName: fullNameTextField.text
     property alias email: emailTextField.text
     property alias password: passwordTextField.text
+    property alias locale: languageComboBox.currentValue
     property alias allowInsecure: allowInsecureCheckBox.checked
     property alias linkValidUntil: temporaryLinkSettings.linkValidUntil
     property alias expiresAfterLoginS: temporaryLinkSettings.expiresAfterLoginS
@@ -381,6 +383,24 @@ Item
                 {
                     id: groupsComboBox
 
+                    width: parent.width
+                }
+            }
+
+            CenteredField
+            {
+                visible: control.userType != UserSettingsGlobal.CloudUser
+
+                text: qsTr("Notification Language")
+
+                ComboBox
+                {
+                    id: languageComboBox
+
+                    model: TranslationListModel {}
+                    currentIndex: 0
+                    textRole: "display"
+                    valueRole: "localeCode"
                     width: parent.width
                 }
             }

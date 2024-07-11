@@ -35,6 +35,9 @@ Item
     property string password: ""
     property bool passwordEditable: true
 
+    property string locale: ""
+    property bool localeEditable: true
+
     property alias userEnabled: enabledUserSwitch.checked
     property bool userEnabledEditable: true
 
@@ -523,6 +526,29 @@ Item
                             id: groupsComboBox
 
                             width: parent.width
+                        }
+                    }
+
+                    CenteredField
+                    {
+                        text: qsTr("Notification Language")
+
+                        ComboBox
+                        {
+                            id: languageComboBox
+
+                            model: TranslationListModel {}
+                            currentIndex: !!control.locale
+                                ? model.localeIndex(control.locale)
+                                : -1
+                            textRole: "display"
+                            valueRole: "localeCode"
+                            width: parent.width
+                            enabled: control.localeEditable
+                                && control.enabled
+                                && control.userType != UserSettingsGlobal.CloudUser
+
+                            onCurrentValueChanged: control.locale = currentValue ?? ""
                         }
                     }
 
