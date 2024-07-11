@@ -23,6 +23,8 @@
 #include <nx/vms/client/desktop/common/utils/validators.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/common/widgets/input_field.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -743,6 +745,7 @@ OutgoingMailSettingsWidget::OutgoingMailSettingsWidget(
     AbstractSystemSettingsWidget(editableSystemSettings, parent),
     d(new Private(this))
 {
+    setHelpTopic(this, HelpTopic::Id::SystemSettings_Server_Mail);
 }
 
 OutgoingMailSettingsWidget::~OutgoingMailSettingsWidget()
