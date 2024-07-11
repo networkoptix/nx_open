@@ -293,7 +293,11 @@ class NxOpenConan(ConanFile):
                 self.import_package("intel-media-sdk")
                 self.import_package("intel-onevpl")
                 self.import_package("intel-gmmlib")
-                self.import_files_from_package("intel-media-driver", "lib/dri", "lib/libva-drivers", "*.so*")
+                self.import_files_from_package(
+                    "intel-media-driver",
+                    "lib/dri",
+                    "lib/libva-drivers",
+                    "*.so*")
                 self.import_package("libvpl")
 
             if not self.isArm32:

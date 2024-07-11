@@ -9,6 +9,17 @@
 #--------------------------------------------------------------------------------------------------
 # private
 
+# Checks whether the specified array is set and not empty. We can't use simple `[[ -n ]]`
+# because with arrays it will produce an error with `set -u` if the variable is not set or empty.
+# [in] variable_name
+#
+checkArrayNotEmpty()
+{
+    local -r variable_name="$1" && shift
+
+    eval "[[ -n \${${variable_name}:+full} ]]"
+}
+
 # [in] PLATFORM_NEW
 #
 distrib_librarySuffix()
@@ -687,6 +698,9 @@ distrib_copyServerBins() # additional_bins_to_copy...
     echo "Copying configuration scripts"
     install -m 755 "${SCRIPTS_DIR}/config_helper.sh" "${stage_bin}/"
     install -m 755 "${SCRIPTS_DIR}/upgrade_config.sh" "${stage_bin}/"
+
+    echo "Copying ffmpeg-gpl"
+    install -D -m 755 "${BUILD_DIR}/bin/ffmpeg/ffmpeg-gpl" "${stage_bin}/ffmpeg/ffmpeg-gpl"
 }
 
 # [in] SERVER_PLUGINS[]
@@ -704,16 +718,19 @@ distrib_copyMediaserverPlugins()
 
     local -r main_plugin_dir="${STAGE}/${BIN_INSTALL_PATH}/plugins"
     local -r optional_plugin_dir="${STAGE}/${BIN_INSTALL_PATH}/plugins_optional"
-    local plugin
-    for plugin in "${SERVER_PLUGINS_TO_MOVE_TO_OPTIONAL[@]}"; do
-        if [[ -d "${main_plugin_dir}/${plugin}" ]]; then
-            echo "Moving ${plugin} from ${main_plugin_dir}/ to ${optional_plugin_dir}/"
-            mv "${main_plugin_dir}/${plugin}" "${optional_plugin_dir}/"
-        else
-            echo "Moving lib${plugin}.so from ${main_plugin_dir}/ to ${optional_plugin_dir}/"
-            mv "${main_plugin_dir}/lib${plugin}.so" "${optional_plugin_dir}/"
-        fi
-    done
+
+    if checkArrayNotEmpty SERVER_PLUGINS_TO_MOVE_TO_OPTIONAL; then
+        local plugin
+        for plugin in "${SERVER_PLUGINS_TO_MOVE_TO_OPTIONAL[@]}"; do
+            if [[ -d "${main_plugin_dir}/${plugin}" ]]; then
+                echo "Moving ${plugin} from ${main_plugin_dir}/ to ${optional_plugin_dir}/"
+                mv "${main_plugin_dir}/${plugin}" "${optional_plugin_dir}/"
+            else
+                echo "Moving lib${plugin}.so from ${main_plugin_dir}/ to ${optional_plugin_dir}/"
+                mv "${main_plugin_dir}/lib${plugin}.so" "${optional_plugin_dir}/"
+            fi
+        done
+    fi
 }
 
 distrib_createArchive() # archive dir command...
