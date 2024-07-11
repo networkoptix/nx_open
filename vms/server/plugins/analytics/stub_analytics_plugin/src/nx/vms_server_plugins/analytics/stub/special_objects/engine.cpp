@@ -73,6 +73,9 @@ std::string Engine::manifestString() const
             {
                 "id": ")json" + kFixedObjectType + R"json(",
                 "name": "Fixed object"
+            },
+            {
+                "id": ")json" + kEmptyTypeNameObjectType + R"json("
             }
         ]
     },

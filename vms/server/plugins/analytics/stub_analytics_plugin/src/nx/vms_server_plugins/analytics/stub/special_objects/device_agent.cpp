@@ -65,7 +65,8 @@ std::string DeviceAgent::manifestString() const
     [
         { "objectTypeId": ")json" + kFixedObjectType + R"json(" },
         { "objectTypeId": ")json" + kBlinkingObjectType + R"json(" },
-        { "objectTypeId": ")json" + kCounterObjectType + R"json(" }
+        { "objectTypeId": ")json" + kCounterObjectType + R"json(" },
+        { "objectTypeId": ")json" + kEmptyTypeNameObjectType + R"json(" }
     ],
     "typeLibrary":
     {
@@ -128,6 +129,8 @@ Result<const ISettingsResponse*> DeviceAgent::settingsReceived()
         std::unique_lock<std::mutex> lock(m_deviceAgentSettings.fixedObjectColorMutex);
         m_deviceAgentSettings.fixedObjectColor = settingValue(kFixedObjectColorSetting);
     }
+
+    m_deviceAgentSettings.generateEmptyTypeNameObject = toBool(settingValue(kGenerateEmptyTypeNameObjectSetting));
 
     m_deviceAgentSettings.generateCounter = toBool(settingValue(kGenerateCounterSetting));
 
@@ -311,6 +314,19 @@ void DeviceAgent::addFixedObjectIfNeeded(Ptr<ObjectMetadataPacket> objectMetadat
     objectMetadataPacket->addItem(objectMetadata.get());
 }
 
+void DeviceAgent::addEmptyTypeNameObjectIfNeeded(Ptr<ObjectMetadataPacket> objectMetadataPacket)
+{
+    if (!m_deviceAgentSettings.generateEmptyTypeNameObject)
+        return;
+
+    auto objectMetadata = makePtr<ObjectMetadata>();
+    static const Uuid trackId = UuidHelper::randomUuid();
+    objectMetadata->setTypeId(kEmptyTypeNameObjectType);
+    objectMetadata->setTrackId(trackId);
+    objectMetadata->setBoundingBox(Rect(0.25F, 0.25F, 0.45F, 0.45F));
+    objectMetadataPacket->addItem(objectMetadata.get());
+}
+
 void DeviceAgent::addCounterIfNeeded(Ptr<ObjectMetadataPacket> objectMetadataPacket)
 {
     if (!m_deviceAgentSettings.generateCounter)
@@ -363,6 +379,7 @@ std::vector<IMetadataPacket*> DeviceAgent::cookSomeObjects()
     addBlinkingObjectIfNeeded(metadataTimestampUs, &result, objectMetadataPacket);
     addFixedObjectIfNeeded(objectMetadataPacket);
     addCounterIfNeeded(objectMetadataPacket);
+    addEmptyTypeNameObjectIfNeeded(objectMetadataPacket);
 
     const microseconds delay(m_lastVideoFrameTimestampUs - metadataTimestampUs);
 

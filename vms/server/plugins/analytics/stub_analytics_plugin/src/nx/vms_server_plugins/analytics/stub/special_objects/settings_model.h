@@ -14,6 +14,8 @@ const std::string kGenerateFixedObjectSetting{"generateFixedObject"};
 const std::string kFixedObjectColorSetting{"fixedObjectColor"};
 const std::string kNoSpecialColorSettingValue{"No special color"};
 
+const::std::string kGenerateEmptyTypeNameObjectSetting{"generateEmptyTypeNameObject"};
+
 const std::string kGenerateCounterSetting{"generateCounter"};
 const std::string kCounterBoundingBoxSideSizeSetting{"counterBoundingBoxSideSize"};
 const std::string kCounterXOffsetSetting{"counterXOffset"};
@@ -58,6 +60,13 @@ static const std::string kSettingsModel = /*suppress newline*/ 1 + R"json(
                                 "Red", "White", "#FFFFC0", "!invalid!", "#NONHEX"
                             ],
                             "defaultValue": ")json" + kNoSpecialColorSettingValue + R"json("
+                        },
+                        {
+                            "type": "CheckBox",
+                            "name": ")json" + kGenerateEmptyTypeNameObjectSetting + R"json(",
+                            "caption": "Generate an Object with an empty type name",
+                            "description": "Generate an Object of a type that has a non-empty id but an empty name",
+                            "defaultValue": false
                         },
                         {
                             "type": "CheckBox",

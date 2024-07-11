@@ -26,6 +26,7 @@ namespace special_objects {
 const std::string kBlinkingObjectType = "nx.stub.blinkingObject";
 const std::string kFixedObjectType = "nx.stub.fixedObject";
 const std::string kCounterObjectType = "nx.stub.counter";
+const std::string kEmptyTypeNameObjectType = "nx.stub.emptyTypeNameObject";
 
 class DeviceAgent: public nx::sdk::analytics::ConsumingDeviceAgent
 {
@@ -59,6 +60,9 @@ private:
         std::vector<nx::sdk::analytics::IMetadataPacket*>* metadataPackets,
         nx::sdk::Ptr<nx::sdk::analytics::ObjectMetadataPacket> objectMetadataPacket);
 
+    void addEmptyTypeNameObjectIfNeeded(
+        nx::sdk::Ptr<nx::sdk::analytics::ObjectMetadataPacket> objectMetadataPacket);
+
     void addFixedObjectIfNeeded(
         nx::sdk::Ptr<nx::sdk::analytics::ObjectMetadataPacket> objectMetadataPacket);
 
@@ -88,13 +92,16 @@ private:
         {
             return generateFixedObject
                 || generateCounter
-                || blinkingObjectPeriodMs.load() != std::chrono::milliseconds::zero();
+                || blinkingObjectPeriodMs.load() != std::chrono::milliseconds::zero()
+                || generateEmptyTypeNameObject;
         }
 
         std::atomic<bool> generateFixedObject{false};
 
         std::mutex fixedObjectColorMutex;
         std::string fixedObjectColor;
+
+        std::atomic<bool> generateEmptyTypeNameObject{false};
 
         std::atomic<bool> generateCounter{false};
 
