@@ -319,8 +319,6 @@ QPalette makeApplicationPalette()
 
 } // namespace
 
-static ApplicationContext* s_instance = nullptr;
-
 struct ApplicationContext::Private
 {
     ApplicationContext* const q;
@@ -686,9 +684,6 @@ ApplicationContext::ApplicationContext(
         .startupParameters = startupParameters
     })
 {
-    if (NX_ASSERT(!s_instance))
-        s_instance = this;
-
     initDeveloperOptions(startupParameters);
     initializeResources();
     initializeExternalResources();
@@ -785,15 +780,6 @@ ApplicationContext::~ApplicationContext()
 
     // Web Page icon cache uses application context.
     d->webPageDataCache.reset();
-
-    if (NX_ASSERT(s_instance == this))
-        s_instance = nullptr;
-}
-
-ApplicationContext* ApplicationContext::instance()
-{
-    NX_ASSERT(s_instance);
-    return s_instance;
 }
 
 nx::utils::SoftwareVersion ApplicationContext::version() const

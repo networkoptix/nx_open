@@ -2417,6 +2417,19 @@ Handle ServerConnection::removeGroupAsync(
     return handle;
 }
 
+Handle ServerConnection::createTicket(
+    Result<ErrorOrData<nx::vms::api::LoginSession>>::type callback,
+    QThread* targetThread)
+{
+    auto request = prepareRequest(
+        nx::network::http::Method::post,
+        prepareUrl("/rest/v3/login/tickets", {}),
+        Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
+        {});
+
+    return executeRequest(request, std::move(callback), targetThread);
+}
+
 Handle ServerConnection::getCurrentSession(
     Result<ErrorOrData<nx::vms::api::LoginSession>>::type callback,
     QThread* targetThread)

@@ -66,6 +66,12 @@ public:
     QnLongRunableCleanup* longRunableCleanup() const;
     nx::metrics::ApplicationMetricsStorage* metrics() const;
 
+    template<typename ContextType>
+    ContextType* as()
+    {
+        return qobject_cast<ContextType*>(this);
+    }
+
 private:
     struct Private;
     nx::utils::ImplPtr<Private> d;

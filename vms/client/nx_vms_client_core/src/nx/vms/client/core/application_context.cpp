@@ -62,8 +62,6 @@ static void initializeResources()
 
 namespace nx::vms::client::core {
 
-static ApplicationContext* s_instance = nullptr;
-
 struct ApplicationContext::Private
 {
     void initializeSettings()
@@ -182,9 +180,6 @@ ApplicationContext::ApplicationContext(
         }
     )
 {
-    if (NX_ASSERT(!s_instance))
-        s_instance = this;
-
     initializeResources();
     d->initializeExternalResources();
     initializeMetaTypes();
@@ -242,15 +237,6 @@ ApplicationContext::~ApplicationContext()
     d->uninitializeExternalResources();
 
     nx::setOnAssertHandler(nullptr);
-
-    if (NX_ASSERT(s_instance == this))
-        s_instance = nullptr;
-}
-
-ApplicationContext* ApplicationContext::instance()
-{
-    NX_ASSERT(s_instance);
-    return s_instance;
 }
 
 void ApplicationContext::initializeNetworkModules()
