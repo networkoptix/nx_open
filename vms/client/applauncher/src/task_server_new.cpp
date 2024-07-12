@@ -76,6 +76,9 @@ void TaskServerNew::run()
 {
     static const int kErrorSleepTimeoutMs = 1000;
     static const int kClientConnectionTimeoutMs = 1000;
+    static const int kMaxAcceptErrorCount = 5;
+
+    int acceptErrorCount = 0;
 
     while (!m_terminated)
     {
@@ -91,9 +94,17 @@ void TaskServerNew::run()
 
             NX_DEBUG(this, "Failed to listen to pipe %1. %2", m_pipeName, osError);
 
+            if (++acceptErrorCount >= kMaxAcceptErrorCount)
+            {
+                NX_DEBUG(this, "Too many errors while accepting connections. Stopping the server.");
+                break;
+            }
+
             msleep(kErrorSleepTimeoutMs);
             continue;
         }
+
+        acceptErrorCount = 0;
 
         processNewConnection(clientConnectionPtr.get());
     }
