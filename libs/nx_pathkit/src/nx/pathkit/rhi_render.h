@@ -2,10 +2,13 @@
 
 #pragma once
 
+#include <unordered_set>
 #include <vector>
 
 #include <QtCore/QCache>
+#include <QtGui/rhi/qrhi.h>
 
+#include "atlas.h"
 #include "rhi_paint_engine.h"
 
 class QRhi;
@@ -30,7 +33,7 @@ public:
         int colorsOffset = 0;
         int count = 0;
 
-        std::unique_ptr<QRhiShaderResourceBindings> bindigs;
+        QRhiShaderResourceBindings* bindigs = nullptr;
         QRhiGraphicsPipeline* pipeline = nullptr;
         QRhiBuffer* vertexInput = nullptr;
         QRhiBuffer* colorInput = nullptr;
@@ -45,8 +48,22 @@ public:
         TextureEntry(std::shared_ptr<QRhiTexture> t): texture(t) {}
     };
 
+    struct Settings
+    {
+        int cacheSize = 0; //< Use max texture size.
+        int atlasSize = 1024;
+        int maxAtlasEntrySize = 128;
+    };
+
+    static constexpr Settings kDefaultSettinigs =
+    {
+        .cacheSize = 0,
+        .atlasSize = 1024,
+        .maxAtlasEntrySize = 128
+    };
+
 public:
-    RhiPaintDeviceRenderer(QRhi* rhi);
+    RhiPaintDeviceRenderer(QRhi* rhi, Settings settings = kDefaultSettinigs);
     ~RhiPaintDeviceRenderer();
 
     void sync(RhiPaintDevice* pd);
@@ -68,13 +85,22 @@ private:
         std::vector<float>& textureVerts,
         QSize clip);
 
-    std::unique_ptr<QRhiShaderResourceBindings> createTextureBinding(
+    QRhiShaderResourceBindings* createTextureBinding(
         QRhiResourceUpdateBatch* rub,
-        const QPixmap& pixmap);
+        const QPixmap& pixmap,
+        QRectF* outRect);
 
-    QRhi* m_rhi;
+    QRectF textureCoordsFromAtlas(const Atlas::Rect& rect, int padding) const;
+
+    void prepareAtlas();
+
+    QImage getImage(const QPixmap& pixmap);
+
+    QRhi* const m_rhi;
+    Settings m_settings;
     QSize m_size;
     std::vector<PaintData> entries;
+    bool isBgraSupported = false;
 
     // Path fill/stroke (color) pipeline settings.
     std::unique_ptr<QRhiGraphicsPipeline> cps;
@@ -91,11 +117,22 @@ private:
     std::unique_ptr<QRhiSampler> sampler;
     std::unique_ptr<QRhiShaderResourceBindings> tsrb;
 
-    std::vector<Batch> batches;
+    std::unique_ptr<Atlas> atlas;
+    std::unique_ptr<QRhiTexture> atlasTexture;
+    std::vector<QRhiTextureUploadEntry> atlasUpdates;
+    std::unique_ptr<QRhiShaderResourceBindings> atlasTsrb;
+    QHash<quint64, Atlas::Rect> atlasCache;
 
-    std::vector<std::shared_ptr<QRhiTexture>> textures;
+    struct Texture
+    {
+        std::shared_ptr<QRhiTexture> texture;
+        std::unique_ptr<QRhiShaderResourceBindings> tsrb;
+    };
+    std::vector<Texture> textures;
 
     QCache<qint64, TextureEntry> m_textureCache;
+
+    std::vector<Batch> batches;
 };
 
 } // namespace nx::pathkit

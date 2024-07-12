@@ -98,7 +98,13 @@ void RhiRenderingItemRenderer::setWindow(QQuickWindow* window)
         return;
 
     m_window = window;
-    m_paintRenderer.reset(new RhiPaintDeviceRenderer(m_window->rhi()));
+    m_paintRenderer.reset(new RhiPaintDeviceRenderer(
+        m_window->rhi(),
+        {
+            .cacheSize = 0, //< Use max texture size.
+            .atlasSize = 1024, //< Tuned for scene rendering.
+            .maxAtlasEntrySize = 400 //< Tuned for scene rendering.
+        }));
 }
 
 void RhiRenderingItemRenderer::syncPaintDevice(RhiPaintDevice* pd)
