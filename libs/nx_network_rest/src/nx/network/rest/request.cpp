@@ -19,8 +19,9 @@ Request::Request(
     bool isConnectionSecure,
     bool isJsonRpcRequest)
     :
+    mutableUserSession(userSession),
     httpRequest(httpRequest),
-    userSession(userSession),
+    userSession(mutableUserSession),
     foreignAddress(foreignAddress),
     serverPort(serverPort),
     isConnectionSecure(isConnectionSecure),
@@ -355,7 +356,12 @@ Request::SystemAccessGuard::~SystemAccessGuard()
 
 Request::SystemAccessGuard Request::forceSystemAccess() const
 {
-    return SystemAccessGuard(&const_cast<Request*>(this)->userSession.access);
+    return SystemAccessGuard(&mutableUserSession.access);
+}
+
+void Request::forceSessionAccess(UserAccessData access) const
+{
+    mutableUserSession.access = std::move(access);
 }
 
 } // namespace nx::network::rest
