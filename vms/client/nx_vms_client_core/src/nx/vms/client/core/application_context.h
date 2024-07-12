@@ -30,7 +30,7 @@ namespace watchers { class KnownServerConnections; }
 
 /**
  * Main context of the desktop client application. Exists through all application lifetime and is
- * accessible from anywhere using `instance()` method.
+ * accessible from anywhere using `appContext function.
  */
 class NX_VMS_CLIENT_CORE_API ApplicationContext: public common::ApplicationContext
 {
@@ -52,11 +52,6 @@ public:
         const QString& customExternalResourceFile = {},
         QObject* parent = nullptr);
     virtual ~ApplicationContext() override;
-
-    /**
-     * Main context of the desktop client application. Exists through all application lifetime.
-     */
-    static ApplicationContext* instance();
 
     /**
      * Initialize network-related modules.
@@ -135,6 +130,12 @@ private:
     nx::utils::ImplPtr<Private> d;
 };
 
-inline ApplicationContext* appContext() { return ApplicationContext::instance(); }
+/**
+ * Main context of the client application. Exists through all application lifetime.
+ */
+inline ApplicationContext* appContext()
+{
+    return common::ApplicationContext::instance()->as<ApplicationContext>();
+}
 
 } // namespace nx::vms::client::core
