@@ -24,12 +24,14 @@ ResultType sendCommandToApplauncher(
     SystemError::ErrorCode resultCode = sock.connectToServerSync(pipeName.toStdString());
     if (resultCode != SystemError::noError)
     {
+        // Client often fails to find applauncher if it is running from build directory, so don't
+        // spam logs in this case.
         if (nx::build_info::publicationType() != nx::build_info::PublicationType::local)
         {
-            NX_WARNING(NX_SCOPE_TAG, "Failed to connect to local server %1. %2",
-                pipeName,
+            NX_WARNING(NX_SCOPE_TAG, "%1: Failed to connect to pipe %2. %3", __func__, pipeName,
                 SystemError::toString(resultCode));
         }
+
         return ResultType::connectError;
     }
 
@@ -38,7 +40,9 @@ ResultType sendCommandToApplauncher(
     resultCode = sock.write(serializedTask.data(), serializedTask.size(), &bytesWritten);
     if (resultCode != SystemError::noError)
     {
-        NX_WARNING(NX_SCOPE_TAG, "Failed to send launch task to local server %1. %2",
+        NX_WARNING(NX_SCOPE_TAG,
+            "%1: Failed to send launch task to local server %2. %3",
+            __func__,
             launcherPipeName(),
             SystemError::toString(resultCode));
         return ResultType::connectError;
@@ -49,7 +53,8 @@ ResultType sendCommandToApplauncher(
     resultCode = sock.read(buf, sizeof(buf), &bytesRead, timeoutMs);
     if (resultCode != SystemError::noError)
     {
-        NX_WARNING(NX_SCOPE_TAG, "Failed to read response from local server %1. %2",
+        NX_WARNING(NX_SCOPE_TAG, "%1: Failed to read response from local server %2. %3",
+            __func__,
             launcherPipeName(),
             SystemError::toString(resultCode));
         return ResultType::connectError;

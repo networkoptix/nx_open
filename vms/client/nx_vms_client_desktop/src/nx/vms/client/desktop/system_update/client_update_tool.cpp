@@ -53,9 +53,9 @@ constexpr milliseconds kProcessTerminateTimeout = 15s;
 
 bool requestInstalledVersions(QList<nx::utils::SoftwareVersion>* versions)
 {
-    // Try to run applauncher if it is not running.
-    if (!checkOnline())
+    if (!checkOnlineTryToStartIfOffline())
         return false;
+
     int kMaxTries = 5;
     do
     {

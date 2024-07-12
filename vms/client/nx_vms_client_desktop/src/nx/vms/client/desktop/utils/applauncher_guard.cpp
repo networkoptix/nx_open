@@ -33,7 +33,7 @@ void ApplauncherGuard::timerEvent(QTimerEvent* event)
         return;
     }
 
-    applauncher::api::checkOnline();
+    applauncher::api::checkOnlineTryToStartIfOffline();
 }
 
 } // namespace nx::vms::client::desktop
