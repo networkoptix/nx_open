@@ -92,7 +92,11 @@ rest::Handle UserResource::saveSettings(
                 executor.submit(callback, success, handle);
         });
 
-    return systemContext->connectedServerApi()->patchUserParameters(
+    auto api = systemContext->connectedServerApi();
+    if (!api)
+        return rest::Handle{};
+
+    return api->patchUserParameters(
         getId(),
         parameters,
         sessionTokenHelper,

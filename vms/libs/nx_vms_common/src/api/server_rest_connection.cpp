@@ -2864,6 +2864,9 @@ typename ServerConnectionBase::Result<ResultType>::type ServerConnection::makeSe
                             [ctx, handle, success, result...](
                                 std::optional<nx::network::http::AuthToken> token)
                             {
+                                if (!ctx->ptr)
+                                    return;
+
                                 if (!token)
                                 {
                                     // Token was not updated. Process the original callback.
@@ -2906,6 +2909,9 @@ typename ServerConnectionBase::Result<ResultType>::type ServerConnection::makeSe
                                     [ctx, originalHandle](
                                         bool success, Handle handle, CallbackParameters... result)
                                     {
+                                        if (!ctx->ptr)
+                                            return;
+
                                         executeInThread(ctx->interactionThread,
                                             [ctx, handle, originalHandle]
                                             {
@@ -2980,6 +2986,10 @@ typename ServerConnectionBase::Result<ResultType>::type ServerConnection::makeSe
                             // when it shows a modal dialog, and therefore storedRequests container
                             // could be modified inside.
                             auto token = ctx->helper->refreshToken();
+
+                            // ServerConnection instance may have been destroyed in refreshToken().
+                            if (!ctx->ptr)
+                                return;
 
                             // Set the reissued token value for previously sent requests. Currently
                             // the token value is accessed only from the interaction thread, so
