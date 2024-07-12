@@ -72,7 +72,9 @@ public:
     void updateIcon();
     qreal getWidthOfText(const QString& text, const QLabel* label) const;
     QString getElidedResourceText(const QStringList& list);
+    QString getElidedResourceTextForInformers(const QStringList& list);
     void setResourceList(const QStringList& list);
+    void updateResourceListStyle();
     bool isPreviewNeeded() const;
     bool isPreviewUpdateRequired() const;
     void requestPreview();

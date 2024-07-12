@@ -82,7 +82,7 @@ QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget* parent):
     for (auto messageType: supportedMessageTypes(systemContext()))
     {
         QCheckBox* checkbox = new QCheckBox(this);
-        checkbox->setText(QnSystemHealthStringsHelper::messageTitle(messageType));
+        checkbox->setText(QnSystemHealthStringsHelper::messageShortTitle(messageType));
         ui->systemHealthLayout->addWidget(checkbox);
         m_systemHealthCheckBoxes[messageType] = checkbox;
 

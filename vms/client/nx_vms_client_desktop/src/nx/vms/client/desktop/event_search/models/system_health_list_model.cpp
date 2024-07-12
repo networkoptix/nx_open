@@ -12,8 +12,8 @@
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <ui/common/notification_levels.h>
-#include <utils/common/delayed.h>
 #include <ui/workbench/workbench_context.h>
+#include <utils/common/delayed.h>
 
 #include "private/system_health_list_model_p.h"
 
@@ -53,7 +53,7 @@ QVariant SystemHealthListModel::data(const QModelIndex& index, int role) const
     switch (role)
     {
         case Qt::DisplayRole:
-            return d->text(index.row());
+            return d->title(index.row());
 
         case core::TimestampRole:
             return d->timestamp(index.row());
@@ -72,6 +72,9 @@ QVariant SystemHealthListModel::data(const QModelIndex& index, int role) const
             const auto color = d->color(index.row());
             return color.isValid() ? QVariant::fromValue(color) : QVariant();
         }
+
+        case core::DescriptionTextRole:
+            return d->description(index.row());
 
         case Qn::CommandActionRole:
             return QVariant::fromValue(d->commandAction(index.row()));

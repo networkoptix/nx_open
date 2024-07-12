@@ -34,7 +34,6 @@ QnNotificationLevel::Value QnNotificationLevel::valueOf(
 
         // Gray notifications.
         case MessageType::archiveRebuildCanceled:
-        case MessageType::metadataOnSystemStorage:
             return QnNotificationLevel::Value::CommonNotification;
 
         // Green notifications.
@@ -50,6 +49,7 @@ QnNotificationLevel::Value QnNotificationLevel::valueOf(
         case MessageType::defaultCameraPasswords:
         case MessageType::noInternetForTimeSync:
         case MessageType::usersEmailIsEmpty:
+        case MessageType::metadataOnSystemStorage:
         case MessageType::cameraRecordingScheduleIsInvalid:
         case MessageType::replacedDeviceDiscovered:
         case MessageType::metadataStorageNotSet:
@@ -83,9 +83,9 @@ QColor QnNotificationLevel::notificationColor(Value level)
         case Value::NoNotification:        return Qt::transparent;
         case Value::OtherNotification:     return Qt::white;
         case Value::CommonNotification:    return colorTheme()->color("green_l2");
-        case Value::ImportantNotification: return colorTheme()->color("yellow_core");
-        case Value::CriticalNotification:  return colorTheme()->color("red_l2");
-        case Value::SuccessNotification:   return colorTheme()->color("green_l2");
+        case Value::ImportantNotification: return colorTheme()->color("yellow_l");
+        case Value::CriticalNotification:  return colorTheme()->color("red_l");
+        case Value::SuccessNotification:   return colorTheme()->color("green_l");
         default:
             NX_ASSERT(false, "All enum values must be handled");
             break;
@@ -97,12 +97,12 @@ QColor QnNotificationLevel::notificationTextColor(Value level)
 {
     switch (level)
     {
-        case Value::ImportantNotification: return colorTheme()->color("yellow_core");
-        case Value::CriticalNotification:  return colorTheme()->color("red_l2");
-        case Value::SuccessNotification:   return colorTheme()->color("green_l2");
+        case Value::ImportantNotification: return colorTheme()->color("yellow_l");
+        case Value::CriticalNotification:  return colorTheme()->color("red_l");
+        case Value::SuccessNotification:   return colorTheme()->color("green_l");
         case Value::OtherNotification:     return Qt::white;
         case Value::CommonNotification:
         default:
-            return colorTheme()->color("light10");
+            return colorTheme()->color("light4");
     }
 }

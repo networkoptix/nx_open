@@ -211,10 +211,11 @@ struct WorkbenchExportHandler::Private
         const QnResourcePtr& resource, bool saveExistingLayout, bool forceTranscoding)
     {
         const auto& manager = q->windowContext()->localNotificationsManager();
-        QString fullPath = fileName(settings).completeFileName();
+        const QString fullPath = fileName(settings).completeFileName();
+        const QString fileNameWithExtension = QFileInfo(fullPath).fileName();
 
         const auto exportProcessId = manager->addProgress(
-            saveExistingLayout ? tr("Saving layout") : tr("Exporting video"), fullPath);
+            saveExistingLayout ? tr("Saving layout") : tr("Exporting video"), fileNameWithExtension);
 
         const auto progressDialog = new ProgressDialog(q->mainWindowWidget());
         progressDialog->setText(fullPath);

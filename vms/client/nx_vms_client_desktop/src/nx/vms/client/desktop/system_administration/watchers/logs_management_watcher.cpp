@@ -14,6 +14,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_display_info.h>
 #include <core/resource_management/resource_pool.h>
+#include <health/system_health_strings_helper.h>
 #include <nx/network/http/async_file_downloader.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
@@ -48,20 +49,19 @@ bool needLogLevelWarningFor(const LogsManagementWatcher::UnitPtr& unit)
     return settings && settings->mainLog.primaryLevel > LogsManagementWatcher::defaultLogLevel();
 }
 
+// TODO: #vbutkevich list of resources must be passed as is to EventTile,
+// so it performs formatting on it's own
 QString shortList(const QList<QnMediaServerResourcePtr>& servers)
 {
-    QString result;
+    QStringList resultList;
 
-    for (int i = 0; i < qMin(3, servers.size()); ++i)
+    for (const auto& server: servers)
     {
-        auto info = QnResourceDisplayInfo(servers[i]);
-        result += nx::format("<b>%1</b> (%2) <br/>", info.name(), info.host());
+        const auto info = QnResourceDisplayInfo(server);
+        resultList.append(nx::format("%1 (%2)", info.name(), info.host()));
     }
 
-    if (servers.size() > 3)
-        result += LogsManagementWatcher::tr("... and %n more", "", servers.size() - 3);
-
-    return result;
+    return QnSystemHealthStringsHelper::resourceText(resultList);
 }
 
 LogsManagementWatcher::State watcherState(Qt::CheckState state)
@@ -916,7 +916,7 @@ struct LogsManagementWatcher::Private
             if (clientLogLevelWarning.isNull())
             {
                 clientLogLevelWarning = notificationManager->add(
-                    tr("Debug logging is enabled on the Client"),
+                    tr("Debug logging is enabled on the client"),
                     {},
                     true);
 
@@ -924,7 +924,7 @@ struct LogsManagementWatcher::Private
                     QnNotificationLevel::Value::ImportantNotification);
 
                 notificationManager->setTooltip(clientLogLevelWarning,
-                    tr("Debug logging is enabled, resulting in degraded performance."));
+                    tr("Debug logging is enabled.\nClient performance is degraded."));
             }
         }
         else
@@ -959,12 +959,14 @@ struct LogsManagementWatcher::Private
             }
 
             notificationManager->setTitle(serverLogLevelWarning,
-                tr("Debug logging is enabled on %n Servers", "", resList.size()));
+                resList.size() == 1
+                    ? tr("Debug logging is enabled")
+                    : tr("Debug logging is enabled on %n Servers", "", resList.size()));
 
-            notificationManager->setAdditionalText(serverLogLevelWarning, shortList(resList));
+            notificationManager->setDescription(serverLogLevelWarning, shortList(resList));
 
             notificationManager->setTooltip(serverLogLevelWarning,
-                tr("Debug logging is enabled, resulting in degraded performance."));
+                tr("Debug logging is enabled.\nSite performance is degraded."));
         }
         else
         {
@@ -1026,7 +1028,7 @@ struct LogsManagementWatcher::Private
 
             QnNotificationLevel::Value level;
             QString title;
-            QString additionalText;
+            QString description;
             std::optional<ProgressState> progress;
             switch (state)
             {
@@ -1034,61 +1036,43 @@ struct LogsManagementWatcher::Private
                 case State::hasSelection:
                 {
                     NX_ASSERT(cancelled, "Internal logic error");
-
                     level = QnNotificationLevel::Value::ImportantNotification;
-
-                    title = tr("Logs downloading canceled");
-
+                    title = tr("Logs download canceled");
                     break;
                 }
 
                 case State::loading:
                 {
                     level = QnNotificationLevel::Value::ImportantNotification;
-
-                    title = speed > 0 ? tr("Downloading file...") : tr("Pending download...");
-
-                    additionalText = nx::format("<b>%1</b> <br/> %2",
-                        tr("%n Servers", "", units.size()),
-                        "0Mbps"); //TODO: #spanasenko Speed & time.
-
+                    title = tr("Downloading logs...");
+                    description = shortList(resources); //TODO: #spanasenko Speed & time.
                     progress = {this->progress};
-
                     break;
                 }
 
                 case State::finished:
                 {
-                    level = QnNotificationLevel::Value::ImportantNotification;
-
+                    level = QnNotificationLevel::Value::SuccessNotification;
                     title = tr("Logs downloaded");
-
-                    additionalText = nx::format("<b>%1</b>",
-                        tr("%n Servers", "", units.size()));
-
+                    description = shortList(resources);
                     progress = {ProgressState::completed};
-
                     break;
                 }
 
                 case State::hasErrors:
                 case State::hasLocalErrors:
                 {
-                    level = QnNotificationLevel::Value::ImportantNotification;
-
-                    title = tr("Logs downloading failed");
-
-                    additionalText = shortList(resources);
-
+                    level = QnNotificationLevel::Value::CriticalNotification;
+                    title = tr("Logs download failed");
+                    description = shortList(resources);
                     progress = {ProgressState::failed};
-
                     break;
                 }
             }
 
             notificationManager->setLevel(logsDownloadNotification, level);
             notificationManager->setTitle(logsDownloadNotification, title);
-            notificationManager->setAdditionalText(logsDownloadNotification, additionalText);
+            notificationManager->setDescription(logsDownloadNotification, description);
             notificationManager->setProgress(logsDownloadNotification, progress);
 
         }

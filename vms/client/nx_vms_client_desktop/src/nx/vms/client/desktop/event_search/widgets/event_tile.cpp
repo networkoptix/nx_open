@@ -153,7 +153,6 @@ EventTile::EventTile(QWidget* parent):
     ui->debugPreviewTimeLabel->setProperty(style::Properties::kDontPolishFontProperty, true);
 
     font.setWeight(kResourceListFontWeight);
-    font.setPixelSize(fontConfig()->small().pixelSize());
     ui->resourceListLabel->setFont(font);
     ui->resourceListLabel->setProperty(style::Properties::kDontPolishFontProperty, true);
     ui->resourceListLabel->setOpenExternalLinks(false);
@@ -764,6 +763,7 @@ void EventTile::setVisualStyle(Style value)
         return;
 
     d->style = value;
+    d->updateResourceListStyle();
     d->updatePalette();
 }
 

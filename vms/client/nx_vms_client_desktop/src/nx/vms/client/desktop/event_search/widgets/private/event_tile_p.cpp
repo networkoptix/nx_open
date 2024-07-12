@@ -5,6 +5,7 @@
 
 #include <QtGui/QTextDocument>
 
+#include <health/system_health_strings_helper.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/core/image_providers/resource_thumbnail_provider.h>
 #include <nx/vms/client/core/skin/color_theme.h>
@@ -20,6 +21,11 @@
 #include <utils/common/delayed.h>
 
 namespace {
+static constexpr qsizetype kResourcesInforemersTextSize = 12;
+// TODO: #vbutkevich make value dynamic, after removing QnSystemHealthStringsHelper::resourceText.
+static constexpr qsizetype kMaxResourceTextWidth = 50;
+static constexpr qsizetype kResourcesTextSize = 10;
+static constexpr qsizetype kMaximumResourceInformersLineLimit = 3;
 static constexpr qsizetype kMaximumResourceLineLimit = 1;
 static constexpr char kMultipleResourcesSeparator = ',';
 static constexpr int kTileTitleLineLimit = 2;
@@ -151,7 +157,7 @@ void EventTile::Private::updatePalette()
 
     int lighterBy = highlighted ? 1 : 0;
     if (style == Style::informer)
-        ++lighterBy;
+        lighterBy += 2;
 
     pal.setColor(QPalette::Window, core::colorTheme()->lighter(base, lighterBy));
     pal.setColor(QPalette::Midlight, core::colorTheme()->lighter(base, lighterBy + 1));
@@ -179,10 +185,30 @@ qreal EventTile::Private::getWidthOfText(const QString& text, const QLabel* labe
     return QFontMetricsF(label->font()).boundingRect(text).width();
 }
 
-QString EventTile::Private::getElidedResourceText(const QStringList& list)
+QString EventTile::Private::getElidedResourceTextForInformers(const QStringList& list)
 {
     if (list.empty())
-        return q->visualStyle() == Style::informer ? "" : tr("UNKNOWN");
+        return {};
+
+    return QnSystemHealthStringsHelper::resourceText(
+        list, kMaxResourceTextWidth, kMaximumResourceInformersLineLimit);
+}
+
+void EventTile::Private::updateResourceListStyle()
+{
+    auto font = q->ui->resourceListLabel->font();
+    font.setPixelSize(
+        style == Style::standard ? kResourcesTextSize : kResourcesInforemersTextSize);
+    q->ui->resourceListLabel->setFont(font);
+}
+
+QString EventTile::Private::getElidedResourceText(const QStringList& list)
+{
+    if (q->visualStyle() == Style::informer)
+        return getElidedResourceTextForInformers(list);
+
+    if (list.empty())
+        return tr("UNKNOWN");
 
     const auto maxWidth = q->ui->resourceListLabel->width();
     if (list.size() == 1)
@@ -363,6 +389,7 @@ QString EventTile::Private::getElidedStringByRowsNumberAndWidth(
     doc.setHtml(common::html::toHtml(text));
     doc.setTextWidth(textWidth);
     WidgetUtils::elideDocumentLines(&doc, rowLimit, true, "(...)");
+    // Must return html, since many strings in labels are created with html formatting.
     return doc.toHtml();
 }
 

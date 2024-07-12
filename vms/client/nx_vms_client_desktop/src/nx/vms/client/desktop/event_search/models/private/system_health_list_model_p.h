@@ -36,7 +36,8 @@ public:
     MessageType message(int index) const;
     QnResourcePtr resource(int index) const;
 
-    QString text(int index) const;
+    QString title(int index) const;
+    QString description(int index) const;
     QString toolTip(int index) const;
     QString decorationPath(int index) const;
     QColor color(int index) const;

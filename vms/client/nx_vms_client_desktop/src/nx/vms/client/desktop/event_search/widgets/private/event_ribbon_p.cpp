@@ -289,16 +289,6 @@ void EventRibbon::Private::updateTile(int index)
 
     QString tileDescription = modelIndex.data(core::DescriptionTextRole).toString();
 
-    // Limit the number of lines inside tile description.
-    // Empty description should remain empty, without any invisible html.
-    if (!tileDescription.isEmpty())
-    {
-        QTextDocument doc;
-        doc.setHtml(nx::vms::common::html::toHtml(tileDescription));
-        WidgetUtils::elideDocumentLines(&doc, kTileDescriptionLineLimit);
-        tileDescription = doc.toHtml();
-    }
-
     // Check whether the tile is a special progress bar tile.
     const auto progressVariant = modelIndex.data(Qn::ProgressValueRole);
     if (progressVariant.canConvert<ProgressState>())

@@ -10,6 +10,6 @@ TEST(systemHealthStringsHelper, checkMessageTitles)
     for (auto messageType:
         system_health::allMessageTypes({system_health::isMessageVisibleInSettings}))
     {
-        EXPECT_FALSE(QnSystemHealthStringsHelper::messageTitle(messageType).isEmpty());
+        EXPECT_FALSE(QnSystemHealthStringsHelper::messageShortTitle(messageType).isEmpty());
     }
 }

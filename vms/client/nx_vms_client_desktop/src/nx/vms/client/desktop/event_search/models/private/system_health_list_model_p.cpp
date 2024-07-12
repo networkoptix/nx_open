@@ -204,25 +204,18 @@ QnResourcePtr SystemHealthListModel::Private::resource(int index) const
     return m_items[index].resource;
 }
 
-QString SystemHealthListModel::Private::text(int index) const
+QString SystemHealthListModel::Private::description(int index) const
+{
+    return QnSystemHealthStringsHelper::messageDescription(m_items[index].message);
+}
+
+QString SystemHealthListModel::Private::title(int index) const
 {
     const auto& item = m_items[index];
     const QString resourceName = item.resource ? item.resource->getName() : "";
 
     switch (item.message)
     {
-        case MessageType::usersEmailIsEmpty:
-            return tr("Email address is not set for %n users", "",
-                getResourceSet(item.message).size());
-
-        case MessageType::backupStoragesNotConfigured:
-            return tr("Backup storage is not configured on %n Servers", "",
-                getResourceSet(item.message).size());
-
-        case MessageType::cameraRecordingScheduleIsInvalid:
-            return tr("Recording schedule is invalid for %n cameras", "",
-                getResourceSet(item.message).size());
-
         case MessageType::replacedDeviceDiscovered:
         {
             using namespace nx::vms::common;
@@ -243,21 +236,9 @@ QString SystemHealthListModel::Private::text(int index) const
             return result;
         }
 
-        case MessageType::remoteArchiveSyncError:
-            return tr("Import archive from %1 failed").arg(resourceName);
-
-        case MessageType::metadataStorageNotSet:
-            return tr("Storage for analytics data is not set on %n Servers", "",
-                getResourceSet(item.message).size());
-
-        case MessageType::metadataOnSystemStorage:
-            return tr("System partition is used for analytics data on %n Servers", "",
-                getResourceSet(item.message).size());
-
         default:
-            return QnSystemHealthStringsHelper::messageText(item.message,
-                QnResourceDisplayInfo(item.resource).toString(
-                    appContext()->localSettings()->resourceInfoLevel()));
+            return QnSystemHealthStringsHelper::messageNotificationTitle(
+                item.message, getResourceSet(item.message));
     }
 }
 
@@ -266,6 +247,14 @@ QnResourceList SystemHealthListModel::Private::displayedResourceList(int index) 
     const auto message = messageType(index);
     switch (message)
     {
+        case MessageType::archiveIntegrityFailed:
+        case MessageType::archiveRebuildFinished:
+        case MessageType::archiveRebuildCanceled:
+        case MessageType::remoteArchiveSyncError:
+        case MessageType::defaultCameraPasswords:
+        //< Requires implementation on message side to get resource list.
+            return getSortedResourceList(message);
+
         case MessageType::usersEmailIsEmpty:
         case MessageType::storagesNotConfigured:
         case MessageType::backupStoragesNotConfigured:
@@ -283,31 +272,7 @@ QString SystemHealthListModel::Private::toolTip(int index) const
 {
     const auto& item = m_items[index];
 
-    if (item.message == MessageType::cameraRecordingScheduleIsInvalid)
-    {
-        using namespace nx::vms::common::html;
-
-        QStringList result;
-        result << tr("Recording schedule on some cameras contains recording modes that are not "
-            "supported.");
-        result << ""; //< Additional line break by design.
-
-        const auto cameraResources =
-            getSortedResourceList(MessageType::cameraRecordingScheduleIsInvalid);
-
-        for (const auto& cameraResource: cameraResources)
-        {
-            const auto camera = cameraResource.dynamicCast<QnVirtualCameraResource>();
-            if (!NX_ASSERT(camera))
-                continue;
-
-            result << colored(camera->getName(), core::colorTheme()->color("light8"))
-                + " "
-                + colored(camera->getHostAddress(), core::colorTheme()->color("light16"));
-        }
-        return result.join(kLineBreak);
-    }
-
+    // TODO: move all text values to QnSystemHealthStringsHelper::messageTooltip.
     if (item.message == MessageType::replacedDeviceDiscovered)
     {
         using namespace nx::vms::common;
@@ -377,9 +342,7 @@ QString SystemHealthListModel::Private::toolTip(int index) const
         return tooltipLines.join("<br>");
     }
 
-    return QnSystemHealthStringsHelper::messageTooltip(item.message,
-        QnResourceDisplayInfo(item.resource).toString(
-            appContext()->localSettings()->resourceInfoLevel()));
+    return QnSystemHealthStringsHelper::messageTooltip(item.message, getResourceSet(item.message));
 }
 
 QString SystemHealthListModel::Private::decorationPath(int index) const
@@ -606,6 +569,10 @@ QnResourceList SystemHealthListModel::Private::getSortedResourceList(
     const auto resourceNameLessThan =
         [collator = std::move(collator)](const QnResourcePtr& lhs, const QnResourcePtr& rhs)
         {
+            if (!NX_ASSERT(lhs))
+                return false;
+            if (!NX_ASSERT(rhs))
+                return true;
             return collator.compare(lhs->getName(), rhs->getName()) < 0;
         };
 
@@ -776,43 +743,57 @@ int SystemHealthListModel::Private::priority(MessageType message)
 
 QString SystemHealthListModel::Private::decorationPath(MessageType message)
 {
-    switch (QnNotificationLevel::valueOf(message))
+    switch (message)
     {
-        case QnNotificationLevel::Value::CriticalNotification:
-        case QnNotificationLevel::Value::ImportantNotification:
-            return "20x20/Solid/alert2.svg";
+        case MessageType::showIntercomInformer:
+        case MessageType::showMissedCallInformer:
+            return "20x20/Outline/call.svg";
 
-        case QnNotificationLevel::Value::SuccessNotification:
-            return "20x20/Outline/checkmark.svg";
+        case MessageType::cameraRecordingScheduleIsInvalid:
+            return "20x20/Outline/device.svg";
 
+        case MessageType::smtpIsNotSet:
+            return "20x20/Outline/server.svg";
+
+        case MessageType::emailIsEmpty:
+        case MessageType::usersEmailIsEmpty:
+        case MessageType::emailSendError:
+            return "20x20/Outline/email.svg";
+
+        case MessageType::noLicenses:
+            return "20x20/Outline/key.svg";
+
+        case MessageType::archiveRebuildFinished:
+            return "20x20/Outline/success.svg";
+
+        case MessageType::backupStoragesNotConfigured:
+        case MessageType::storagesNotConfigured:
+        case MessageType::archiveRebuildCanceled:
+        case MessageType::metadataOnSystemStorage:
+            return "20x20/Outline/storage.svg";
+
+        case MessageType::cloudPromo:
+            return "20x20/Outline/cloud.svg";
+
+        // There is no specific icon for message, the icon will be provided according it's level.
         default:
             break;
     }
 
-    switch (message)
+    switch (QnNotificationLevel::valueOf(message))
     {
-        case MessageType::smtpIsNotSet:
-        case MessageType::emailIsEmpty:
-        case MessageType::usersEmailIsEmpty:
-        case MessageType::emailSendError:
-            return "16x16/Outline/email.svg";
+        case QnNotificationLevel::Value::CriticalNotification:
+        case QnNotificationLevel::Value::ImportantNotification:
+            return "20x20/Outline/warning.svg";
 
-        case MessageType::noLicenses:
-            return "16x16/Outline/license.svg";
-
-        case MessageType::backupStoragesNotConfigured:
-        case MessageType::storagesNotConfigured:
-        case MessageType::archiveRebuildFinished:
-        case MessageType::archiveRebuildCanceled:
-        case MessageType::metadataOnSystemStorage: //< TODO: #vbreus Probably should be changed to the 'analytics' icon.
-            return "16x16/Outline/storage.svg";
-
-        case MessageType::cloudPromo:
-            return "cloud/cloud_20.png";
+        case QnNotificationLevel::Value::SuccessNotification:
+            return "20x20/Outline/success.svg";
 
         default:
-            return {};
+            break;
     }
+    return "";
+
 }
 
 } // namespace nx::vms::client::desktop

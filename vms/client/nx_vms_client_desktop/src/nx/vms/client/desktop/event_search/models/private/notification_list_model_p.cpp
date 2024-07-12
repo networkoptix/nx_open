@@ -908,7 +908,7 @@ QString NotificationListModel::Private::iconPath(const vms::event::AbstractActio
             return "20x20/Outline/warning.svg";
 
         case QnNotificationLevel::Value::SuccessNotification:
-            return "16x16/Outline/check.svg";
+            return "20x20/Outline/success.svg";
 
         default:
             break;
