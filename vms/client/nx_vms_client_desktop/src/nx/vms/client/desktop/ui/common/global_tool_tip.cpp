@@ -5,12 +5,10 @@
 #include <QtCore/QPointF>
 #include <QtCore/QRectF>
 #include <QtCore/QTimer>
-
 #include <QtQml/QtQml>
-
-#include <QtQuick/QQuickWindow>
 #include <QtQuick/QQuickItem>
-
+#include <QtQuick/QQuickWindow>
+#include <QtQuick/private/qquicktext_p.h>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QStyle>
 
@@ -179,6 +177,20 @@ GlobalToolTipAttached::Private::Private(GlobalToolTipAttached* q, QObject* paren
             else
                 this->q->hide();
         });
+
+    if (const auto textItem = qobject_cast<QQuickText*>(parent))
+    {
+        // If the `GlobalToolTip` is used with the `Text` item, changing the `Text.text` property
+        // will cause the `Text` to no longer accept hover events if the text is plain text.
+        connect(
+            textItem,
+            &QQuickText::textChanged,
+            this,
+            [textItem, this]
+            {
+                textItem->setAcceptHoverEvents(showOnHover);
+            });
+    }
 }
 
 GlobalToolTipAttached::Private::~Private()
