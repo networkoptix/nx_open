@@ -17,6 +17,32 @@
 
 using namespace nx::vms::api;
 
+namespace {
+
+QnUserResourceList buildUserList(
+    const QSet<nx::Uuid>& subjects, nx::vms::common::SystemContext* context)
+{
+    QnUserResourceList users;
+    QSet<nx::Uuid> groupIds;
+    nx::vms::common::getUsersAndGroups(context, subjects, users, groupIds);
+
+    for (const auto& user: context->accessSubjectHierarchy()->usersInGroups(groupIds))
+    {
+        if (std::find_if(users.begin(), users.end(),
+            [user](const QnUserResourcePtr& existing)
+            {
+                return user->getId() == existing->getId();
+            }) == users.end())
+        {
+            users << user;
+        }
+    }
+
+    return users;
+}
+
+} // namespace
+
 //-------------------------------------------------------------------------------------------------
 // QnSubjectValidationPolicy
 
@@ -430,31 +456,9 @@ QString QnCloudUsersValidationPolicy::calculateAlert(
     bool allUsers,
     const QSet<nx::Uuid>& subjects) const
 {
-    const auto buildUserList =
-        [this](const QSet<nx::Uuid>& subjects) -> QnUserResourceList
-        {
-            QnUserResourceList users;
-            QSet<nx::Uuid> groupIds;
-            nx::vms::common::getUsersAndGroups(systemContext(), subjects, users, groupIds);
-
-            for (const auto& user: systemContext()->accessSubjectHierarchy()->usersInGroups(groupIds))
-            {
-                if (std::find_if(users.begin(), users.end(),
-                    [user](const QnUserResourcePtr& existing)
-                    {
-                        return user->getId() == existing->getId();
-                    }) == users.end())
-                {
-                    users << user;
-                }
-            }
-
-            return users;
-        };
-
     const QnUserResourceList users = allUsers
         ? resourcePool()->getResources<QnUserResource>()
-        : buildUserList(subjects);
+        : buildUserList(subjects, systemContext());
 
     int nonCloudCount = 0, totalCount = 0;
     for (const auto& user: users)
@@ -515,4 +519,31 @@ bool QnUserWithEmailValidationPolicy::userValidity(const QnUserResourcePtr& user
         return true;
 
     return nx::email::isValidAddress(user->getEmail());
+}
+
+QString QnUserWithEmailValidationPolicy::calculateAlert(
+    bool allUsers, const QSet<nx::Uuid>& subjects) const
+{
+    QString alert = base_type::calculateAlert(allUsers, subjects);
+    if (!alert.isEmpty())
+        return alert;
+
+    const QnUserResourceList users = allUsers
+        ? resourcePool()->getResources<QnUserResource>()
+        : buildUserList(subjects, systemContext());
+
+    int invalidUsersCount{};
+    for (const auto& user: users)
+    {
+        if (!userValidity(user))
+            ++invalidUsersCount;
+    }
+
+    if (invalidUsersCount == users.size())
+        return tr("Email address is not set for all the selected users.");
+
+    if (invalidUsersCount > 0)
+        return tr("Email address is not set for some selected users.");
+
+    return {};
 }
