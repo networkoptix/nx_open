@@ -36,10 +36,20 @@ constexpr int kMinimumPanelWidth = 36;
 constexpr int kSideMargin = 5;
 constexpr int kMenuIconWidth = 20;
 
-static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kArrowTheme =
+const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kArrowTheme =
 {{QnIcon::Normal, {.primary = "dark17"}}};
-NX_DECLARE_COLORIZED_ICON(kArrowCloseIcon, "titlebar/arrow_close.svg", kArrowTheme);
+const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kCloudTheme =
+{{QnIcon::Normal, {.primary = "light4"}}};
+const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kCloudDisabledTheme =
+{{QnIcon::Normal, {.primary = "light4", .alpha=0.7}}};
+const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kCloudRedTheme =
+{{QnIcon::Normal, {.primary = "red"}}};
+NX_DECLARE_COLORIZED_ICON(kArrowCloseIcon, "20x20/Solid/arrow_close.svg", kArrowTheme);
 NX_DECLARE_COLORIZED_ICON(kArrowOpenIcon, "20x20/Solid/arrow_open.svg", kArrowTheme);
+
+NX_DECLARE_COLORIZED_ICON(kCloudIcon, "20x20/Outline/cloud.svg", kCloudTheme);
+NX_DECLARE_COLORIZED_ICON(kCloudDisabledIcon, "20x20/Outline/cloud.svg", kCloudDisabledTheme);
+NX_DECLARE_COLORIZED_ICON(kCloudOfflineIcon, "20x20/Outline/cloud_offline.svg", kCloudRedTheme);
 
 } // namespace
 
@@ -178,9 +188,9 @@ QnCloudStatusPanelPrivate::QnCloudStatusPanelPrivate(QnCloudStatusPanel* parent)
 #ifdef DIRECT_CLOUD_CONNECT
     systemsMenu(nullptr),
 #endif
-    loggedInIcon(qnSkin->icon("cloud/cloud_20_selected.png")),
-    loggedOutIcon(qnSkin->icon("cloud/cloud_20_disabled.png")),
-    offlineIcon(qnSkin->icon("cloud/cloud_20_offline_disabled.png"))
+    loggedInIcon(qnSkin->icon(kCloudIcon)),
+    loggedOutIcon(qnSkin->icon(kCloudDisabledIcon)),
+    offlineIcon(qnSkin->icon(kCloudOfflineIcon))
 {
     Q_Q(QnCloudStatusPanel);
     loggedInMenu->setWindowFlags(loggedInMenu->windowFlags());
