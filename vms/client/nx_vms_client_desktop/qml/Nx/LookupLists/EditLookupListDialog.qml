@@ -132,15 +132,14 @@ ModalDialog
     LookupListModel
     {
         id: model
+
         data.id: sourceModel ? sourceModel.data.id : NxGlobals.generateUuid()
-        data.name: sourceModel ? sourceModel.data.name : qsTr("New List")
-        data.objectTypeId: sourceModel ? sourceModel.data.objectTypeId : ""
         data.entries: sourceModel ? sourceModel.data.entries : []
         attributeNames: sourceModel ? sourceModel.attributeNames : ["Value"]
+        objectTypeId: sourceModel ? sourceModel.objectTypeId : ""
+        name: sourceModel ? sourceModel.name : qsTr("New List")
 
-        property alias name: model.data.name
-        property alias objectTypeId: model.data.objectTypeId
-        property Analytics.ObjectType listType: taxonomy ? taxonomy.objectTypeById(data.objectTypeId) : null
+        property Analytics.ObjectType listType: taxonomy ? taxonomy.objectTypeById(objectTypeId) : null
         property bool isValid: !!name && (isGeneric ? !!columnName : attributeNames.length)
         property string columnName: (isGeneric && attributeNames.length) ? attributeNames[0] : ""
 

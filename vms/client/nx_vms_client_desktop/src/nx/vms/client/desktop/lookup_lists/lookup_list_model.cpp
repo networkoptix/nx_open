@@ -75,6 +75,37 @@ bool LookupListModel::isGeneric() const
     return m_data.objectTypeId.isEmpty();
 }
 
+void LookupListModel::setObjectTypeId(const QString& objectTypeId)
+{
+    if (objectTypeId == m_data.objectTypeId)
+        return;
+
+    const bool previousIsGenericValue = isGeneric();
+    m_data.objectTypeId = objectTypeId;
+    emit objectTypeIdChanged();
+    if (previousIsGenericValue != isGeneric())
+        emit isGenericChanged();
+}
+
+QString LookupListModel::objectTypeId() const
+{
+    return m_data.objectTypeId;
+}
+
+QString LookupListModel::name() const
+{
+    return m_data.name;
+}
+
+void LookupListModel::setName(const QString& name)
+{
+    if (name == m_data.name)
+        return;
+
+    m_data.name = name;
+    emit nameChanged();
+}
+
 int LookupListModel::countOfAssociatedVmsRules(SystemContext* systemContext) const
 {
     using namespace nx::vms::rules;
