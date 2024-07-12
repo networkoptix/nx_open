@@ -21,6 +21,8 @@ LookupListEntriesSortFilterProxyModel::LookupListEntriesSortFilterProxyModel(QOb
     setDynamicSortFilter(true);
     setFilterCaseSensitivity(Qt::CaseInsensitive);
     setFilterKeyColumn(-1);
+    setSortRole(LookupListEntriesModel::DataRole::SortRole);
+    setFilterRole(Qt::DisplayRole);
 }
 
 bool LookupListEntriesSortFilterProxyModel::filterAcceptsRow(

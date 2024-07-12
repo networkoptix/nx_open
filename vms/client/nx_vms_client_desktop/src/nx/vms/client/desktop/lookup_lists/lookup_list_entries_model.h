@@ -38,7 +38,11 @@ public:
     {
         ObjectTypeIdRole = Qt::UserRole,
         AttributeNameRole,
-        RawValueRole //< Raw value of entry.
+        RawValueRole, //< Raw value of entry.
+        // Combination of DisplayRole and RawValueRole.
+        // Required for correct sorting of number values.
+        // Will return empty QVariant for empty values, and display values for all other values.
+        SortRole
     };
 
     explicit LookupListEntriesModel(QObject* parent = nullptr);
