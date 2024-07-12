@@ -22,7 +22,8 @@ public:
     ServerStartedEvent(std::chrono::microseconds timestamp, nx::Uuid serverId);
 
     virtual QString resourceKey() const override;
-    virtual QVariantMap details(common::SystemContext* context) const override;
+    virtual QVariantMap details(common::SystemContext* context,
+        const nx::vms::api::rules::PropertyMap& aggregatedInfo) const override;
 
 private:
     QString extendedCaption(common::SystemContext* context) const;

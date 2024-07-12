@@ -43,14 +43,14 @@ QString PoeOverBudgetEvent::resourceKey() const
     return m_serverId.toSimpleString();
 }
 
-QVariantMap PoeOverBudgetEvent::details(common::SystemContext* context) const
+QVariantMap PoeOverBudgetEvent::details(
+    common::SystemContext* context, const nx::vms::api::rules::PropertyMap& aggregatedInfo) const
 {
-    auto result = BasicEvent::details(context);
+    auto result = BasicEvent::details(context, aggregatedInfo);
 
     utils::insertIfNotEmpty(result, utils::kReasonDetailName, reason());
     utils::insertIfNotEmpty(result, utils::kDescriptionDetailName, description());
     utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
-    result.insert(utils::kEmailTemplatePathDetailName, manifest().emailTemplatePath);
     utils::insertLevel(result, nx::vms::event::Level::critical);
     utils::insertClientAction(result, nx::vms::rules::ClientAction::poeSettings);
     utils::insertIcon(result, nx::vms::rules::Icon::networkIssue);

@@ -49,9 +49,10 @@ PluginDiagnosticEvent::PluginDiagnosticEvent(
 {
 }
 
-QVariantMap PluginDiagnosticEvent::details(common::SystemContext* context) const
+QVariantMap PluginDiagnosticEvent::details(
+    common::SystemContext* context, const nx::vms::api::rules::PropertyMap& aggregatedInfo) const
 {
-    auto result = AnalyticsEngineEvent::details(context);
+    auto result = AnalyticsEngineEvent::details(context, aggregatedInfo);
 
     if (!result.contains(utils::kCaptionDetailName))
         result.insert(utils::kCaptionDetailName, eventCaption());

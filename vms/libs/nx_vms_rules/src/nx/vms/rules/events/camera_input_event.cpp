@@ -40,13 +40,13 @@ QString CameraInputEvent::aggregationKey() const
     return CameraEvent::resourceKey();
 }
 
-QVariantMap CameraInputEvent::details(common::SystemContext* context) const
+QVariantMap CameraInputEvent::details(
+    common::SystemContext* context, const nx::vms::api::rules::PropertyMap& aggregatedInfo) const
 {
-    auto result = base_type::details(context);
+    auto result = base_type::details(context, aggregatedInfo);
 
     utils::insertIfNotEmpty(result, utils::kDetailingDetailName, detailing());
     utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
-    result.insert(utils::kEmailTemplatePathDetailName, manifest(context).emailTemplatePath);
     utils::insertLevel(result, nx::vms::event::Level::common);
     utils::insertIcon(result, nx::vms::rules::Icon::inputSignal);
     utils::insertClientAction(result, nx::vms::rules::ClientAction::previewCamera);

@@ -27,7 +27,8 @@ public:
         const QString& reasonText);
 
     virtual QString resourceKey() const override;
-    virtual QVariantMap details(common::SystemContext* context) const override;
+    virtual QVariantMap details(common::SystemContext* context,
+        const nx::vms::api::rules::PropertyMap& aggregatedInfo) const override;
     virtual QString uniqueName() const override;
 
     static const ItemDescriptor& manifest();

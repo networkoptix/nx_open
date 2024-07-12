@@ -24,9 +24,10 @@ QString CameraEvent::resourceKey() const
     return m_cameraId.toSimpleString();
 }
 
-QVariantMap CameraEvent::details(common::SystemContext* context) const
+QVariantMap CameraEvent::details(
+    common::SystemContext* context, const nx::vms::api::rules::PropertyMap& aggregatedInfo) const
 {
-    auto result = BasicEvent::details(context);
+    auto result = BasicEvent::details(context, aggregatedInfo);
 
     result.insert(utils::kHasScreenshotDetailName, true);
     result.insert(utils::kScreenshotLifetimeDetailName, QVariant::fromValue(utils::kScreenshotLifetime));

@@ -10,6 +10,7 @@
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/rules/utils/event.h>
 
+#include "aggregated_event.h"
 #include "engine.h"
 #include "strings.h"
 #include "utils/event_details.h"
@@ -70,7 +71,8 @@ QString BasicEvent::cacheKey() const
     return {};
 }
 
-QVariantMap BasicEvent::details(common::SystemContext* context) const
+QVariantMap BasicEvent::details(common::SystemContext* context,
+    const nx::vms::api::rules::PropertyMap& /*aggregatedInfo*/) const
 {
     QVariantMap result;
 
@@ -82,12 +84,15 @@ QVariantMap BasicEvent::details(common::SystemContext* context) const
     {
         result[utils::kSourceIdDetailName] = QVariant::fromValue(source);
         utils::insertIfNotEmpty(
-            result,
-            utils::kSourceNameDetailName,
-            Strings::resource(context, source));
+            result, utils::kSourceNameDetailName, Strings::resource(context, source));
     }
 
     return result;
+}
+
+nx::vms::api::rules::PropertyMap BasicEvent::aggregatedInfo(const AggregatedEvent&) const
+{
+    return {};
 }
 
 QString BasicEvent::name(common::SystemContext* context) const

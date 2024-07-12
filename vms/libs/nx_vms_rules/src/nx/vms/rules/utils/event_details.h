@@ -25,7 +25,6 @@ static constexpr auto kDescriptionDetailName = "description";
 static constexpr auto kDestinationDetailName = "destination";
 // Keep in sync with StringsHelper::eventDetails(). Not include reason.
 static constexpr auto kDetailingDetailName = "detailing";
-static constexpr auto kEmailTemplatePathDetailName = "emailTemplate";
 // Verbose event caption with resource name. Used as email subject or bookmark name.
 // Keep in sync with StringsHelper::eventAtResource().
 static constexpr auto kExtendedCaptionDetailName = "extendedCaption";

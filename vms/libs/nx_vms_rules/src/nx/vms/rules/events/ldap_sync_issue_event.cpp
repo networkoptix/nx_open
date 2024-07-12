@@ -4,6 +4,7 @@
 
 #include <chrono>
 
+#include <nx/fusion/serialization/json_functions.h>
 #include <nx/vms/rules/aggregated_event.h>
 #include <nx/vms/rules/icon.h>
 #include <nx/vms/rules/utils/event_details.h>
@@ -13,6 +14,9 @@
 #include "../utils/type.h"
 
 namespace {
+
+static constexpr auto kReasonToCount = "reasonToCount";
+
 bool isValidReason(nx::vms::api::EventReason reason)
 {
     switch (reason)
@@ -27,6 +31,7 @@ bool isValidReason(nx::vms::api::EventReason reason)
             return false;
     }
 }
+
 } // namespace
 
 namespace nx::vms::rules {
@@ -54,33 +59,46 @@ QString LdapSyncIssueEvent::uniqueName() const
         BasicEvent::uniqueName(), QString::number(static_cast<int>(reasonCode())));
 }
 
-void LdapSyncIssueEvent::fillAggregationInfo(const AggregatedEventPtr& aggregatedEvent)
+QVariantMap LdapSyncIssueEvent::details(
+    common::SystemContext* context, const nx::vms::api::rules::PropertyMap& aggregatedInfo) const
 {
-    Reasons reasonsMap;
-
-    for (const auto& event: aggregatedEvent->aggregatedEvents())
-    {
-        const auto ldapEvent = event.dynamicCast<LdapSyncIssueEvent>();
-        if (!NX_ASSERT(ldapEvent, "Unexpected type of event: %1", event->type()))
-            continue;
-
-        const auto reason = ldapEvent->reasonCode();
-        if (!NX_ASSERT(isValidReason(reason), "Unexpected reasonCode value: %1", reason))
-            continue;
-
-        reasonsMap[reason] += 1;
-    }
-
-    setCountByReasons(reasonsMap);
-}
-
-QVariantMap LdapSyncIssueEvent::details(common::SystemContext* context) const
-{
-    auto result = BasicEvent::details(context);
+    auto result = BasicEvent::details(context, aggregatedInfo);
     utils::insertLevel(result, nx::vms::event::Level::important);
     utils::insertIcon(result, nx::vms::rules::Icon::server);
-    utils::insertIfNotEmpty(result, utils::kDetailingDetailName, reasonText());
+    utils::insertIfNotEmpty(result, utils::kReasonDetailName, reasonText(aggregatedInfo));
+
     return result;
+}
+
+nx::vms::api::rules::PropertyMap LdapSyncIssueEvent::aggregatedInfo(
+    const AggregatedEvent& aggregatedEvent) const
+{
+    nx::vms::api::rules::PropertyMap aggregatedInfo;
+    std::map<vms::api::EventReason, int> reasonToCount;
+    NX_ASSERT(!aggregatedEvent.aggregatedEvents().empty(), "Aggregated event cannot be empty.");
+    for (const auto& event: aggregatedEvent.aggregatedEvents())
+    {
+        const auto ldapSyncIssueEvent = event.dynamicCast<LdapSyncIssueEvent>();
+        if (!NX_ASSERT(ldapSyncIssueEvent, "Unexpected type of event: %1.", event->type()))
+            continue;
+
+        const auto reason = ldapSyncIssueEvent->reasonCode();
+        if (!NX_ASSERT(isValidReason(reason), "Unexpected reasonCode value: %1.", reason))
+            continue;
+
+        reasonToCount[reason]++;
+    }
+
+    NX_ASSERT(!reasonToCount.empty(), "At least one cause of an event is expected: %1.", type());
+
+    if (reasonToCount.size() == 1 && reasonToCount.begin()->second == 1)
+        return aggregatedInfo;
+
+    QnJsonContext context;
+    context.setSerializeMapToObject(true);
+    QJson::serialize(&context, reasonToCount, &aggregatedInfo[kReasonToCount]);
+
+    return aggregatedInfo;
 }
 
 const ItemDescriptor& LdapSyncIssueEvent::manifest()
@@ -96,22 +114,26 @@ const ItemDescriptor& LdapSyncIssueEvent::manifest()
     return kDescriptor;
 }
 
-QString LdapSyncIssueEvent::reasonText() const
+QString LdapSyncIssueEvent::reasonText(
+    const nx::vms::api::rules::PropertyMap& aggregatedInfo) const
 {
-    QStringList result;
-    for (auto [reason, count]: m_countByReasons.asKeyValueRange())
-    {
-        result +=
-            tr("%1 (%n times)", "%1 is description of event. Will be replaced in runtime", count)
-                .arg(ldapSyncIssueReason(reason));
-    }
+    if (aggregatedInfo.isEmpty())
+        return reasonText(m_reasonCode);
 
-    return result.size() > 1 ? result.join(", ") : ldapSyncIssueReason(m_reasonCode);
+    std::map<vms::api::EventReason, int> data;
+    if (!NX_ASSERT(QJson::deserialize(aggregatedInfo[kReasonToCount], &data) && !data.empty()))
+        return reasonText(m_reasonCode);
+
+    QStringList reasons;
+    for (const auto& [reason, count]: data)
+        reasons << tr("%1 (%n times)", "%1 is a cause of the event", count).arg(reasonText(reason));
+
+    return reasons.join(", ");
 }
 
-QString LdapSyncIssueEvent::ldapSyncIssueReason(vms::api::EventReason reasonCode) const
+QString LdapSyncIssueEvent::reasonText(vms::api::EventReason reason) const
 {
-    switch (reasonCode)
+    switch (reason)
     {
         case api::EventReason::failedToConnectToLdap:
             return tr("Failed to connect to the LDAP server.");
@@ -128,9 +150,11 @@ QString LdapSyncIssueEvent::ldapSyncIssueReason(vms::api::EventReason reasonCode
             return tr("Some LDAP users or groups were not found in the LDAP database.");
 
         default:
-            NX_ASSERT(false, "Unexpected switch value: %1", reasonCode);
+            NX_ASSERT(false, "Unexpected reason: %1", reason);
         return {};
     }
+
+    return {};
 }
 
 } // namespace nx::vms::rules

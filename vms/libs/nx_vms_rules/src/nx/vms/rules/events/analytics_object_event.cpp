@@ -63,15 +63,15 @@ nx::analytics::taxonomy::AbstractObjectType* AnalyticsObjectEvent::objectTypeByI
         : nullptr;
 }
 
-QVariantMap AnalyticsObjectEvent::details(common::SystemContext* context) const
+QVariantMap AnalyticsObjectEvent::details(
+    common::SystemContext* context, const nx::vms::api::rules::PropertyMap& aggregatedInfo) const
 {
-    auto result = AnalyticsEngineEvent::details(context);
+    auto result = AnalyticsEngineEvent::details(context, aggregatedInfo);
 
     utils::insertIfNotEmpty(result, utils::kCaptionDetailName, analyticsObjectCaption(context));
     utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
     result.insert(utils::kHasScreenshotDetailName, true);
     utils::insertIfNotEmpty(result, utils::kAnalyticsObjectTypeDetailName, analyticsObjectCaption(context));
-    result.insert(utils::kEmailTemplatePathDetailName, manifest().emailTemplatePath);
     utils::insertLevel(result, nx::vms::event::Level::common);
     utils::insertIcon(result, nx::vms::rules::Icon::analyticsObjectDetected);
 

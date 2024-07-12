@@ -45,9 +45,10 @@ QString AnalyticsEngineEvent::resourceKey() const
     return m_cameraId.toSimpleString();
 }
 
-QVariantMap AnalyticsEngineEvent::details(common::SystemContext* context) const
+QVariantMap AnalyticsEngineEvent::details(
+    common::SystemContext* context, const nx::vms::api::rules::PropertyMap& aggregatedInfo) const
 {
-    auto result = DescribedEvent::details(context);
+    auto result = DescribedEvent::details(context, aggregatedInfo);
 
     utils::insertIfValid(result, utils::kPluginIdDetailName, QVariant::fromValue(m_engineId));
     utils::insertIfNotEmpty(result, utils::kDetailingDetailName, detailing());

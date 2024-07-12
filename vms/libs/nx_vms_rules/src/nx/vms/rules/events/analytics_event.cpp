@@ -57,9 +57,10 @@ QString AnalyticsEvent::aggregationKey() const
     return cameraId().toSimpleString();
 }
 
-QVariantMap AnalyticsEvent::details(common::SystemContext* context) const
+QVariantMap AnalyticsEvent::details(
+    common::SystemContext* context, const nx::vms::api::rules::PropertyMap& aggregatedInfo) const
 {
-    auto result = AnalyticsEngineEvent::details(context);
+    auto result = AnalyticsEngineEvent::details(context, aggregatedInfo);
 
     if (!result.contains(utils::kCaptionDetailName))
         utils::insertIfNotEmpty(result, utils::kCaptionDetailName, analyticsEventCaption(context));
@@ -68,7 +69,6 @@ QVariantMap AnalyticsEvent::details(common::SystemContext* context) const
     utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
     result.insert(utils::kHasScreenshotDetailName, true);
     utils::insertIfNotEmpty(result, utils::kAnalyticsEventTypeDetailName, analyticsEventCaption(context));
-    result.insert(utils::kEmailTemplatePathDetailName, manifest().emailTemplatePath);
     utils::insertLevel(result, nx::vms::event::Level::common);
     utils::insertIcon(result, nx::vms::rules::Icon::analyticsEvent);
     utils::insertClientAction(result, nx::vms::rules::ClientAction::previewCameraOnTime);

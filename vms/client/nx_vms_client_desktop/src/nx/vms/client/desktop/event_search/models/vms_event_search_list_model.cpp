@@ -409,7 +409,7 @@ QVariant VmsEventSearchListModel::data(const QModelIndex& index, int role) const
 
     const auto& event = systemContext()->vmsRulesEngine()->buildEvent(
         d->data[index.row()].eventData);
-    const auto& details = event->details(systemContext());
+    const auto& details = event->details(systemContext(), d->data[index.row()].aggregatedInfo);
 
     switch (role)
     {

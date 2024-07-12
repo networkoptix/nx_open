@@ -104,9 +104,10 @@ public:
         m_cacheKey = cacheKey;
     }
 
-    virtual QVariantMap details(common::SystemContext* context) const override
+    virtual QVariantMap details(common::SystemContext* context,
+        const nx::vms::api::rules::PropertyMap& aggregatedInfo) const override
     {
-        auto result = base_type::details(context);
+        auto result = base_type::details(context, aggregatedInfo);
         result[utils::kSourceNameDetailName] = "Test resource";
         nx::vms::rules::utils::insertLevel(result, nx::vms::event::Level::none);
         nx::vms::rules::utils::insertIcon(result, nx::vms::rules::Icon::alert);

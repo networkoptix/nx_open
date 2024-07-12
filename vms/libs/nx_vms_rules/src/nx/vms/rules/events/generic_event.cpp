@@ -33,16 +33,16 @@ QString GenericEvent::resourceKey() const
     return {};
 }
 
-QVariantMap GenericEvent::details(common::SystemContext* context) const
+QVariantMap GenericEvent::details(
+    common::SystemContext* context, const nx::vms::api::rules::PropertyMap& aggregatedInfo) const
 {
-    auto result = base_type::details(context);
+    auto result = base_type::details(context, aggregatedInfo);
 
     result.remove(utils::kSourceIdDetailName);
     utils::insertIfNotEmpty(result, utils::kExtraCaptionDetailName, extraCaption());
     utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption());
     utils::insertIfNotEmpty(result, utils::kDetailingDetailName, description());
     utils::insertIfNotEmpty(result, utils::kSourceNameDetailName, source());
-    result.insert(utils::kEmailTemplatePathDetailName, manifest().emailTemplatePath);
     utils::insertLevel(result, nx::vms::event::Level::common);
     utils::insertIcon(result, icon());
     utils::insertClientAction(result, ClientAction::previewCameraOnTime);

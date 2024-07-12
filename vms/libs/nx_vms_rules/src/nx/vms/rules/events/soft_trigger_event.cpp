@@ -50,16 +50,16 @@ QString SoftTriggerEvent::aggregationKey() const
     return m_triggerId.toSimpleString();
 }
 
-QVariantMap SoftTriggerEvent::details(common::SystemContext* context) const
+QVariantMap SoftTriggerEvent::details(
+    common::SystemContext* context, const nx::vms::api::rules::PropertyMap& aggregatedInfo) const
 {
-    auto result = BasicEvent::details(context);
+    auto result = BasicEvent::details(context, aggregatedInfo);
 
     utils::insertIfNotEmpty(result, utils::kCaptionDetailName, caption());
     utils::insertIfNotEmpty(result, utils::kDetailingDetailName, detailing());
     utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
     utils::insertIfNotEmpty(result, utils::kTriggerNameDetailName, trigger());
     utils::insertIfValid(result, utils::kUserIdDetailName, QVariant::fromValue(m_userId));
-    result.insert(utils::kEmailTemplatePathDetailName, manifest().emailTemplatePath);
 
     utils::insertLevel(result, nx::vms::event::Level::common);
     utils::insertIcon(result, nx::vms::rules::Icon::softTrigger);

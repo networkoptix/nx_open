@@ -32,7 +32,7 @@ nx::vms::rules::EventPtr EventModelData::event(core::SystemContext* context) con
 const QVariantMap& EventModelData::details(SystemContext* context) const
 {
     if (m_details.empty())
-        m_details = event(context)->details(context);
+        m_details = event(context)->details(context, m_record.aggregatedInfo);
 
     NX_ASSERT(!m_details.empty());
     return m_details;
