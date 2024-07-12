@@ -12170,7 +12170,7 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     <message>
       <source>%1 filename length is more than %2 characters.</source>
       <comment>%1 is file name</comment>
-      <translation type="unfinished">%1 filename length is more than %2 characters.</translation>
+      <translation>%1 panjang nama file lebih dari %2 karakter.</translation>
     </message>
   </context>
   <context>
