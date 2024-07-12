@@ -100,7 +100,14 @@ namespace nx::pathkit {
 
 static constexpr auto kMatrix4x4Size = 4 * 4 * sizeof(float);
 
-RhiPaintDeviceRenderer::RhiPaintDeviceRenderer(QRhi* rhi): m_rhi(rhi) {}
+RhiPaintDeviceRenderer::RhiPaintDeviceRenderer(QRhi* rhi, Settings settings):
+    m_rhi(rhi),
+    m_settings(settings)
+{
+    const int maxSize = m_rhi->resourceLimit(QRhi::TextureSizeMax);
+    if (m_settings.cacheSize == 0)
+        m_settings.cacheSize = maxSize;
+}
 
 RhiPaintDeviceRenderer::~RhiPaintDeviceRenderer() {}
 
@@ -110,27 +117,44 @@ void RhiPaintDeviceRenderer::sync(RhiPaintDevice* pd)
     entries = static_cast<RhiPaintEngine*>(pd->paintEngine())->m_paths;
 }
 
+static constexpr int kPadding = 1;
+static constexpr auto kFilter = QRhiSampler::Linear;
+
 void RhiPaintDeviceRenderer::createTexturePipeline(QRhiRenderPassDescriptor* rp)
 {
-    std::unique_ptr<QRhiTexture> tex(m_rhi->newTexture(
-        QRhiTexture::RGBA8, {1, 1}, 1, {}));
-    tex->create();
+    #if Q_BYTE_ORDER == Q_LITTLE_ENDIAN
+        // Allow uploading textures with QImage::Format_ARGB32_Premultiplied format.
+        std::unique_ptr<QRhiTexture> tex(m_rhi->newTexture(
+            QRhiTexture::BGRA8, {1, 1}, 1, {}));
+        isBgraSupported = tex->create();
+        if (!isBgraSupported)
+        {
+            tex->setFormat(QRhiTexture::RGBA8);
+            tex->create();
+        }
+    #else
+        std::unique_ptr<QRhiTexture> tex(m_rhi->newTexture(
+            QRhiTexture::RGBA8, {1, 1}, 1, {}));
+        tex->create();
+    #endif
 
-    tvbuf.reset(m_rhi->newBuffer(
-        QRhiBuffer::Dynamic,
-        QRhiBuffer::VertexBuffer,
-        4 * 5 * sizeof(float)));
+    tvbuf.reset(
+        m_rhi->newBuffer(
+            QRhiBuffer::Dynamic,
+            QRhiBuffer::VertexBuffer,
+            4 * 5 * sizeof(float)));
     tvbuf->create();
 
     std::unique_ptr<QRhiBuffer> tubuf(
-        m_rhi->newBuffer(QRhiBuffer::Dynamic,
-        QRhiBuffer::UniformBuffer,
-        kMatrix4x4Size));
+        m_rhi->newBuffer(
+            QRhiBuffer::Dynamic,
+            QRhiBuffer::UniformBuffer,
+            kMatrix4x4Size));
     tubuf->create();
 
     sampler.reset(m_rhi->newSampler(
-        QRhiSampler::Linear,
-        QRhiSampler::Linear,
+        kFilter,
+        kFilter,
         QRhiSampler::None,
         QRhiSampler::ClampToEdge,
         QRhiSampler::ClampToEdge));
@@ -171,14 +195,32 @@ void RhiPaintDeviceRenderer::createTexturePipeline(QRhiRenderPassDescriptor* rp)
         { 0, 1, QRhiVertexInputAttribute::Float2, 2 * sizeof(float) },
         { 0, 2, QRhiVertexInputAttribute::Float, 4 * sizeof(float) },
     });
-    tps->setTopology(QRhiGraphicsPipeline::TriangleStrip);
+    tps->setTopology(QRhiGraphicsPipeline::Triangles);
     tps->setVertexInputLayout(inputLayout);
     tps->setShaderResourceBindings(tsrb.get());
     tps->setRenderPassDescriptor(rp);
     tps->create();
 
-    const int maxSize = m_rhi->resourceLimit(QRhi::TextureSizeMax);
-    m_textureCache.setMaxCost(maxSize * maxSize);
+    m_textureCache.setMaxCost(m_settings.cacheSize * m_settings.cacheSize);
+
+    const int atlasSize = std::min(
+        m_rhi->resourceLimit(QRhi::TextureSizeMax),
+        m_settings.atlasSize);
+
+    atlasTexture.reset(m_rhi->newTexture(QRhiTexture::RGBA8, QSize(atlasSize, atlasSize), 1));
+    atlasTexture->create();
+    atlasTsrb.reset(m_rhi->newShaderResourceBindings());
+    atlasTsrb->setBindings({
+        QRhiShaderResourceBinding::uniformBuffer(0,
+            kCommonVisibility,
+            ubuf.get()),
+        QRhiShaderResourceBinding::sampledTexture(1,
+            QRhiShaderResourceBinding::FragmentStage,
+            atlasTexture.get(),
+            sampler.get())
+    });
+    atlasTsrb->create();
+    atlas.reset(new Atlas(atlasTexture->pixelSize().width(), atlasTexture->pixelSize().height()));
 }
 
 void RhiPaintDeviceRenderer::createPathPipeline(QRhiRenderPassDescriptor* rp)
@@ -291,11 +333,56 @@ QMatrix4x4 RhiPaintDeviceRenderer::modelView() const
     return viewProjection;
 }
 
-std::unique_ptr<QRhiShaderResourceBindings> RhiPaintDeviceRenderer::createTextureBinding(
+QRectF RhiPaintDeviceRenderer::textureCoordsFromAtlas(const Atlas::Rect& rect, int padding) const
+{
+    if (padding == 1)
+    {
+        return QRectF(
+            (float) (rect.x + padding) / atlas->width(),
+            (float) (rect.y + padding)/ atlas->height(),
+            (float) (rect.w - 2 * padding) / atlas->width(),
+            (float) (rect.h - 2 * padding) / atlas->height());
+    }
+
+    return QRectF(
+        (float) (rect.x + 0.5) / atlas->width(),
+        (float) (rect.y + 0.5) / atlas->height(),
+        (float) (rect.w - 1) / atlas->width(),
+        (float) (rect.h - 1) / atlas->height());
+}
+
+QImage RhiPaintDeviceRenderer::getImage(const QPixmap& pixmap)
+{
+    QImage image = pixmap.toImage();
+
+    if (image.format() == QImage::Format_RGBA8888_Premultiplied)
+        return image;
+
+    if (isBgraSupported && image.format() == QImage::Format_ARGB32_Premultiplied)
+        return image;
+
+    image.convertTo(QImage::Format_RGBA8888_Premultiplied);
+    return image;
+}
+
+QRhiShaderResourceBindings* RhiPaintDeviceRenderer::createTextureBinding(
     QRhiResourceUpdateBatch* rub,
-    const QPixmap& pixmap)
+    const QPixmap& pixmap,
+    QRectF* outRect)
 {
     const auto key = pixmap.cacheKey();
+
+    const int maxSize = m_settings.maxAtlasEntrySize;
+
+    if (pixmap.size().width() <= maxSize && pixmap.size().height() <= maxSize
+        && !m_textureCache.contains(key))
+    {
+        if (const auto rect = atlasCache.value(key); !rect.isNull())
+        {
+            *outRect = textureCoordsFromAtlas(rect, kPadding);
+            return atlasTsrb.get();
+        }
+    }
 
     std::shared_ptr<QRhiTexture> texture;
 
@@ -305,18 +392,16 @@ std::unique_ptr<QRhiShaderResourceBindings> RhiPaintDeviceRenderer::createTextur
     }
     else
     {
-        auto img = pixmap.toImage();
-        img.convertTo(QImage::Format_RGBA8888_Premultiplied);
-
-        texture.reset(m_rhi->newTexture(QRhiTexture::RGBA8, pixmap.size(), 1));
-
+        auto image = getImage(pixmap);
+        const auto textureFormat = image.format() == QImage::Format_ARGB32_Premultiplied
+            ? QRhiTexture::BGRA8
+            : QRhiTexture::RGBA8;
+        texture.reset(m_rhi->newTexture(textureFormat, pixmap.size(), 1));
         texture->create();
-        rub->uploadTexture(texture.get(), img);
+        rub->uploadTexture(texture.get(), image);
         const auto size = texture->pixelSize();
         m_textureCache.insert(key, new TextureEntry(texture), size.width() * size.height());
     }
-
-    textures.push_back(texture);
 
     std::unique_ptr<QRhiShaderResourceBindings> tsrb(m_rhi->newShaderResourceBindings());
     tsrb->setBindings({
@@ -329,7 +414,140 @@ std::unique_ptr<QRhiShaderResourceBindings> RhiPaintDeviceRenderer::createTextur
             sampler.get())
     });
     tsrb->create();
-    return tsrb;
+
+    textures.push_back({
+        .texture = texture,
+        .tsrb = std::move(tsrb)
+    });
+
+    *outRect = QRectF(0, 0, 1, 1);
+    return textures.back().tsrb.get();
+}
+
+void RhiPaintDeviceRenderer::prepareAtlas()
+{
+    std::unordered_set<Atlas::Rect> usedRects;
+    bool atlasContainsNewRectsOnly = false;
+
+    std::vector<QPixmap> smallPixmaps;
+
+    const int maxSize = m_settings.maxAtlasEntrySize;
+
+    for (const auto& entry: entries)
+    {
+        if (auto paintPixmap = std::get_if<PaintPixmap>(&entry))
+        {
+            const auto& pixmap = paintPixmap->pixmap;
+            const auto key = pixmap.cacheKey();
+            if (pixmap.size().width() <= maxSize && pixmap.size().height() <= maxSize
+                && !m_textureCache.contains(key))
+            {
+                if (const auto rect = atlasCache.value(key); !rect.isNull())
+                    usedRects.insert(rect);
+                else
+                    smallPixmaps.push_back(pixmap);
+            }
+        }
+    }
+
+    std::sort(smallPixmaps.begin(), smallPixmaps.end(),
+        [](const auto& p1, const auto& p2)
+        {
+            return p1.width() * p1.height() < p2.width() * p2.height();
+        });
+
+    for (const auto& pixmap: smallPixmaps)
+    {
+        auto rect = atlas->add(pixmap.width() + 2 * kPadding, pixmap.height() + 2 * kPadding);
+
+        if (rect.isNull() && !atlasContainsNewRectsOnly)
+        {
+            // Not enough space, remove unused rects.
+            // Do not remove rects that we are going to use in this frame. If we already did that,
+            // just skip using the atlas as there are no rects we can safely remove.
+
+            for (const auto& entry: entries)
+            {
+                if (auto paintPixmap = std::get_if<PaintPixmap>(&entry))
+                {
+                    auto rect = atlasCache.value(paintPixmap->pixmap.cacheKey());
+                    if (!rect.isNull())
+                        usedRects.insert(rect);
+                }
+            }
+
+            atlas->removeIf([&usedRects](const auto& rect) { return !usedRects.contains(rect); });
+            atlasCache.removeIf(
+                [&usedRects](const std::pair<const quint64&, Atlas::Rect&>& keyAndRect)
+                {
+                    return !usedRects.contains(keyAndRect.second);
+                });
+
+            atlasContainsNewRectsOnly = true;
+
+            rect = atlas->add(pixmap.width() + 2 * kPadding, pixmap.height() + 2 * kPadding);
+        }
+
+        if (!rect.isNull())
+        {
+            atlasCache.insert(pixmap.cacheKey(), rect);
+            usedRects.insert(rect);
+
+            QImage image;
+
+            if (kPadding == 1)
+            {
+                // Render the pixmap into a larger image suitable for texture uploading.
+                image = QImage(
+                    pixmap.width() + kPadding * 2,
+                    pixmap.height() + kPadding * 2,
+                    QImage::Format_RGBA8888_Premultiplied);
+                image.fill(Qt::transparent);
+                image.setDevicePixelRatio(pixmap.devicePixelRatio());
+                QPainter painter(&image);
+                painter.drawPixmap(QPointF(kPadding, kPadding) / pixmap.devicePixelRatio(), pixmap);
+
+                // Fill the paddings to avoid texture bleading.
+                constexpr int bytesPerPixel = 4;
+                const int imageWidth = image.width();
+                const int imageHeight = image.height();
+                // Top.
+                memmove(
+                    image.scanLine(0) + bytesPerPixel,
+                    image.scanLine(1) + bytesPerPixel,
+                    (imageWidth - 2) * bytesPerPixel);
+                // Bottom.
+                memmove(
+                    image.scanLine(imageHeight - 1) + bytesPerPixel,
+                    image.scanLine(imageHeight - 2) + bytesPerPixel,
+                    (imageWidth - 2) * bytesPerPixel);
+
+                for (int i = 0; i < imageHeight; ++i)
+                {
+                    auto line = reinterpret_cast<int32_t*>(image.scanLine(i));
+                    // Left
+                    line[0] = line[1];
+                    // Right.
+                    line += (imageWidth - 2);
+                    line[1] = line[0];
+                }
+            }
+            else
+            {
+                image = pixmap.toImage();
+                if (image.format() != QImage::Format_RGBA8888_Premultiplied)
+                    image.convertTo(QImage::Format_RGBA8888_Premultiplied);
+            }
+
+            NX_ASSERT(rect.w == image.width() && rect.h == image.height());
+
+            QRhiTextureSubresourceUploadDescription subresDesc(image);
+            subresDesc.setDestinationTopLeft(QPoint(rect.x, rect.y));
+            QRhiTextureUploadEntry entry(0, 0, subresDesc);
+
+            atlasUpdates.push_back(entry);
+        }
+    }
 }
 
 std::vector<RhiPaintDeviceRenderer::Batch> RhiPaintDeviceRenderer::processEntries(
@@ -343,6 +561,9 @@ std::vector<RhiPaintDeviceRenderer::Batch> RhiPaintDeviceRenderer::processEntrie
     std::vector<RhiPaintDeviceRenderer::Batch> batches;
 
     textures.clear();
+    atlasUpdates.clear();
+
+    prepareAtlas();
 
     for (const auto& entry: entries)
     {
@@ -363,21 +584,11 @@ std::vector<RhiPaintDeviceRenderer::Batch> RhiPaintDeviceRenderer::processEntrie
                         return;
                     }
 
-                    std::unique_ptr<QRhiShaderResourceBindings> bindings(
-                        m_rhi->newShaderResourceBindings());
-                    bindings->setBindings({
-                        QRhiShaderResourceBinding::uniformBuffer(
-                            0,
-                            kCommonVisibility,
-                            ubuf.get())
-                    });
-                    bindings->create();
-
                     batches.push_back({
                         .offset = offset,
                         .colorsOffset = colorsOffset,
                         .count = ((int) triangles.size() - offset) / 3,
-                        .bindigs = std::move(bindings),
+                        .bindigs = csrb.get(),
                         .pipeline = cps.get(),
                         .vertexInput = vbuf.get(),
                         .colorInput = cbuf.get(),
@@ -425,30 +636,42 @@ std::vector<RhiPaintDeviceRenderer::Batch> RhiPaintDeviceRenderer::processEntrie
             const QPointF bottomLeft = paintPixmap->transform.map(r.bottomLeft());
             const QPointF bottomRight = paintPixmap->transform.map(r.bottomRight());
 
-            QRectF src(0, 0, 1, 1);
+            QRectF src;
+            auto bindings = createTextureBinding(u, paintPixmap->pixmap, &src);
 
-            if (const auto s = paintPixmap->pixmap.size(); !s.isEmpty())
+            if (const auto s = paintPixmap->pixmap.size();
+                !s.isEmpty() && (src.size() != s || !src.topLeft().isNull()))
             {
-                src.setX(paintPixmap->src.x() / s.width());
-                src.setY(paintPixmap->src.y() / s.height());
-                src.setWidth(paintPixmap->src.width() / s.width());
-                src.setHeight(paintPixmap->src.height() / s.height());
+                src.setX(src.x() + src.width() * paintPixmap->src.x() / s.width());
+                src.setY(src.y() + src.height() * paintPixmap->src.y() / s.height());
+                src.setWidth(src.width() * paintPixmap->src.width() / s.width());
+                src.setHeight(src.height() * paintPixmap->src.height() / s.height());
             }
 
             std::vector<float> vertexData = {
                 (float) topLeft.x(),     (float) topLeft.y(),     (float) src.left(),  (float) src.top(),    (float) paintPixmap->opacity,
                 (float) topRight.x(),    (float) topRight.y(),    (float) src.right(), (float) src.top(),    (float) paintPixmap->opacity,
                 (float) bottomLeft.x(),  (float) bottomLeft.y(),  (float) src.left(),  (float) src.bottom(), (float) paintPixmap->opacity,
+
+                (float) bottomLeft.x(),  (float) bottomLeft.y(),  (float) src.left(),  (float) src.bottom(), (float) paintPixmap->opacity,
+                (float) topRight.x(),    (float) topRight.y(),    (float) src.right(), (float) src.top(),    (float) paintPixmap->opacity,
                 (float) bottomRight.x(), (float) bottomRight.y(), (float) src.right(), (float) src.bottom(), (float) paintPixmap->opacity,
             };
 
-            batches.push_back({
-                .offset = (int) textureVerts.size(),
-                .count = 4,
-                .bindigs = createTextureBinding(u, paintPixmap->pixmap),
-                .pipeline = tps.get(),
-                .vertexInput = tvbuf.get(),
-            });
+            if (!batches.empty() && batches.back().bindigs == bindings)
+            {
+                batches.back().count += 6;
+            }
+            else
+            {
+                batches.push_back({
+                    .offset = (int) textureVerts.size(),
+                    .count = 6,
+                    .bindigs = bindings,
+                    .pipeline = tps.get(),
+                    .vertexInput = tvbuf.get(),
+                });
+            }
 
             std::copy(vertexData.begin(), vertexData.end(), std::back_inserter(textureVerts));
         }
@@ -457,6 +680,14 @@ std::vector<RhiPaintDeviceRenderer::Batch> RhiPaintDeviceRenderer::processEntrie
             customPaint->prepare(m_rhi, rp, u, modelView());
             batches.push_back({.render = customPaint->render});
         }
+    }
+
+    if (!atlasUpdates.empty())
+    {
+        QRhiTextureUploadDescription desc;
+        desc.setEntries(atlasUpdates.begin(), atlasUpdates.end());
+        u->uploadTexture(atlasTexture.get(), desc);
+        atlasUpdates.clear();
     }
 
     return batches;
@@ -474,7 +705,7 @@ void RhiPaintDeviceRenderer::render(QRhiCommandBuffer* cb)
 
         cb->setGraphicsPipeline(batch.pipeline);
         cb->setViewport(QRhiViewport(0, 0, m_size.width(), m_size.height()));
-        cb->setShaderResources(batch.bindigs.get());
+        cb->setShaderResources(batch.bindigs);
 
         if (batch.colorInput)
         {

@@ -123,6 +123,8 @@ TEST_F(PaintEngineTest, checkRendering)
             p.drawImage(QRect(50, 100, 100, 50), pix, QRect(5, 5, 40, 40));
             p.restore();
 
+            p.drawImage(10, 170, pix);
+
             p.drawImage(QRect(80, 130, 100, 50), pix, QRect(5, 5, 40, 40));
             p.drawImage(QRect(80, 30, 100, 50), pix, QRect(5, 5, 40, 40));
 
