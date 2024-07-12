@@ -2,7 +2,7 @@
 
 #include "Eigen/Dense"
 
-#include "ByteTrack/Rect.h"
+#include "Rect.h"
 
 namespace byte_track
 {
@@ -22,13 +22,15 @@ public:
 
     void initiate(StateMean& mean, StateCov& covariance, const DetectBox& measurement);
 
+    // Predict state of the object based on motion model. Also update estimation of errors.
     void predict(StateMean& mean, StateCov& covariance);
 
+    // Update state of the object based on new measurement. Also update estimation of errors.
     void update(StateMean& mean, StateCov& covariance, const DetectBox& measurement);
 
 private:
-    float std_weight_position_;
-    float std_weight_velocity_;
+    float std_weight_position_ = 0.0;
+    float std_weight_velocity_ = 0.0;
 
     Eigen::Matrix<float, 8, 8, Eigen::RowMajor> motion_mat_;
     Eigen::Matrix<float, 4, 8, Eigen::RowMajor> update_mat_;

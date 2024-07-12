@@ -1,8 +1,9 @@
-#include "ByteTrack/STrack.h"
+#include "STrack.h"
 
 #include <cstddef>
 
-byte_track::STrack::STrack(const Rect<float>& rect, const float& score) :
+byte_track::STrack::STrack(
+    const Rect<float>& rect, const float& score, uint64_t timestamp, int objectClass):
     kalman_filter_(),
     mean_(),
     covariance_(),
@@ -13,7 +14,10 @@ byte_track::STrack::STrack(const Rect<float>& rect, const float& score) :
     track_id_(0),
     frame_id_(0),
     start_frame_id_(0),
-    tracklet_len_(0)
+    tracklet_len_(0),
+    m_timestamp(timestamp),
+    m_updateTimestamp(timestamp),
+    m_objectClass(objectClass)
 {
 }
 
@@ -40,33 +44,33 @@ const float& byte_track::STrack::getScore() const
     return score_;
 }
 
-const size_t& byte_track::STrack::getTrackId() const
+const uint64_t& byte_track::STrack::getTrackId() const
 {
     return track_id_;
 }
 
-const size_t& byte_track::STrack::getFrameId() const
+const uint64_t& byte_track::STrack::getFrameId() const
 {
     return frame_id_;
 }
 
-const size_t& byte_track::STrack::getStartFrameId() const
+const uint64_t& byte_track::STrack::getStartFrameId() const
 {
     return start_frame_id_;
 }
 
-const size_t& byte_track::STrack::getTrackletLength() const
+const uint64_t& byte_track::STrack::getTrackletLength() const
 {
     return tracklet_len_;
 }
 
-void byte_track::STrack::activate(const size_t& frame_id, const size_t& track_id)
+void byte_track::STrack::activate(const uint64_t& frame_id, const uint64_t& track_id)
 {
     kalman_filter_.initiate(mean_, covariance_, rect_.getXyah());
+    m_updateTimestamp = m_timestamp;
 
     updateRect();
 
-    state_ = STrackState::Tracked;
     if (frame_id == 1)
     {
         is_activated_ = true;
@@ -77,9 +81,10 @@ void byte_track::STrack::activate(const size_t& frame_id, const size_t& track_id
     tracklet_len_ = 0;
 }
 
-void byte_track::STrack::reActivate(const STrack &new_track, const size_t &frame_id, const int &new_track_id)
+void byte_track::STrack::reActivate(const STrack &new_track, const uint64_t &frame_id, const int &new_track_id)
 {
     kalman_filter_.update(mean_, covariance_, new_track.getRect().getXyah());
+    m_updateTimestamp = m_timestamp;
 
     updateRect();
 
@@ -94,18 +99,21 @@ void byte_track::STrack::reActivate(const STrack &new_track, const size_t &frame
     tracklet_len_ = 0;
 }
 
-void byte_track::STrack::predict()
+void byte_track::STrack::predict(uint64_t timestamp)
 {
     if (state_ != STrackState::Tracked)
     {
         mean_[7] = 0;
     }
     kalman_filter_.predict(mean_, covariance_);
+    updateRect();
+    m_timestamp = timestamp;
 }
 
-void byte_track::STrack::update(const STrack &new_track, const size_t &frame_id)
+void byte_track::STrack::update(const STrack &new_track, const uint64_t &frame_id)
 {
     kalman_filter_.update(mean_, covariance_, new_track.getRect().getXyah());
+    m_updateTimestamp = m_timestamp;
 
     updateRect();
 

@@ -1,4 +1,4 @@
-#include "ByteTrack/BYTETracker.h"
+#include "BYTETracker.h"
 
 #include <cstddef>
 #include <limits>
@@ -7,18 +7,13 @@
 #include <stdexcept>
 #include <utility>
 #include <vector>
+#include <iostream>
 
-byte_track::BYTETracker::BYTETracker(const int& frame_rate,
-                                     const int& track_buffer,
-                                     const float& track_thresh,
-                                     const float& high_thresh,
-                                     const float& match_thresh) :
-    track_thresh_(track_thresh),
-    high_thresh_(high_thresh),
-    match_thresh_(match_thresh),
-    max_time_lost_(static_cast<size_t>(frame_rate / 30.0 * track_buffer)),
-    frame_id_(0),
-    track_id_count_(0)
+#include <nx/utils/log/assert.h>
+#include <nx/utils/log/log.h>
+
+byte_track::BYTETracker::BYTETracker(const byte_track::ByteTrackerConfig& config):
+    m_config(config)
 {
 }
 
@@ -26,8 +21,30 @@ byte_track::BYTETracker::~BYTETracker()
 {
 }
 
-std::vector<byte_track::BYTETracker::STrackPtr> byte_track::BYTETracker::update(const std::vector<Object>& objects)
+void byte_track::BYTETracker::setConfidences(float defaultTrackBirthConfidence,
+    std::shared_ptr<ConfidenceMap> trackBirthConfidences,
+    float defaultGoodDetectionConfidence,
+    std::shared_ptr<ConfidenceMap> goodDetectionConfidences)
 {
+    m_config.goodDetectionThreshold = defaultGoodDetectionConfidence;
+    m_config.trackBirthThreshold = defaultTrackBirthConfidence;
+    m_trackBirthConfidences = trackBirthConfidences;
+    m_goodDetectionConfidences = goodDetectionConfidences;
+}
+
+std::vector<byte_track::STrackPtr> byte_track::BYTETracker::update(
+    const std::vector<Object>& objects, std::optional<uint64_t> timestamp)
+{
+    if (timestamp)
+    {
+        NX_ASSERT(frame_id_ == 0 || *timestamp > m_timestamp);
+        m_timestamp = *timestamp;
+    }
+    else
+    {
+        m_timestamp += m_config.defaultDtUs;
+    }
+
     ////////////////// Step 1: Get detections //////////////////
     frame_id_++;
 
@@ -37,8 +54,8 @@ std::vector<byte_track::BYTETracker::STrackPtr> byte_track::BYTETracker::update(
 
     for (const auto &object : objects)
     {
-        const auto strack = std::make_shared<STrack>(object.rect, object.prob);
-        if (object.prob >= track_thresh_)
+        const auto strack = std::make_shared<STrack>(object.rect, object.prob, m_timestamp, object.label);
+        if (isGoodDetection(strack))
         {
             det_stracks.push_back(strack);
         }
@@ -70,7 +87,7 @@ std::vector<byte_track::BYTETracker::STrackPtr> byte_track::BYTETracker::update(
     // Predict current pose by KF
     for (auto &strack : strack_pool)
     {
-        strack->predict();
+        strack->predict(m_timestamp);
     }
 
     ////////////////// Step 2: First association, with IoU //////////////////
@@ -84,8 +101,13 @@ std::vector<byte_track::BYTETracker::STrackPtr> byte_track::BYTETracker::update(
         std::vector<int> unmatch_detection_idx, unmatch_track_idx;
 
         const auto dists = calcIouDistance(strack_pool, det_stracks);
-        linearAssignment(dists, strack_pool.size(), det_stracks.size(), match_thresh_,
-                         matches_idx, unmatch_track_idx, unmatch_detection_idx);
+        linearAssignment(dists,
+            strack_pool.size(),
+            det_stracks.size(),
+            m_config.iouMatchingGoodDetectionsThreshold,
+            matches_idx,
+            unmatch_track_idx,
+            unmatch_detection_idx);
 
         for (const auto &match_idx : matches_idx)
         {
@@ -125,8 +147,13 @@ std::vector<byte_track::BYTETracker::STrackPtr> byte_track::BYTETracker::update(
         std::vector<int> unmatch_track_idx, unmatch_detection_idx;
 
         const auto dists = calcIouDistance(remain_tracked_stracks, det_low_stracks);
-        linearAssignment(dists, remain_tracked_stracks.size(), det_low_stracks.size(), 0.5,
-                         matches_idx, unmatch_track_idx, unmatch_detection_idx);
+        linearAssignment(dists,
+            remain_tracked_stracks.size(),
+            det_low_stracks.size(),
+            m_config.iouMatchingPoorDetectionsThreshold,
+            matches_idx,
+            unmatch_track_idx,
+            unmatch_detection_idx);
 
         for (const auto &match_idx : matches_idx)
         {
@@ -163,10 +190,14 @@ std::vector<byte_track::BYTETracker::STrackPtr> byte_track::BYTETracker::update(
         std::vector<int> unmatch_unconfirmed_idx;
         std::vector<std::vector<int>> matches_idx;
 
-        // Deal with unconfirmed tracks, usually tracks with only one beginning frame
         const auto dists = calcIouDistance(non_active_stracks, remain_det_stracks);
-        linearAssignment(dists, non_active_stracks.size(), remain_det_stracks.size(), 0.7,
-                         matches_idx, unmatch_unconfirmed_idx, unmatch_detection_idx);
+        linearAssignment(dists,
+            non_active_stracks.size(),
+            remain_det_stracks.size(),
+            m_config.iouMatchingNonActiveTracksThreshold,
+            matches_idx,
+            unmatch_unconfirmed_idx,
+            unmatch_detection_idx);
 
         for (const auto &match_idx : matches_idx)
         {
@@ -185,7 +216,7 @@ std::vector<byte_track::BYTETracker::STrackPtr> byte_track::BYTETracker::update(
         for (const auto &unmatch_idx : unmatch_detection_idx)
         {
             const auto track = remain_det_stracks[unmatch_idx];
-            if (track->getScore() < high_thresh_)
+            if (!isBirthDetection(track))
             {
                 continue;
             }
@@ -198,7 +229,7 @@ std::vector<byte_track::BYTETracker::STrackPtr> byte_track::BYTETracker::update(
     ////////////////// Step 5: Update state //////////////////
     for (const auto &lost_strack : lost_stracks_)
     {
-        if (frame_id_ - lost_strack->getFrameId() > max_time_lost_)
+        if (m_timestamp - lost_strack->getUpdateTimestamp() > m_config.maxTimeSinceUpdateMs*1000.0)
         {
             lost_strack->markAsRemoved();
             current_removed_stracks.push_back(lost_strack);
@@ -206,26 +237,17 @@ std::vector<byte_track::BYTETracker::STrackPtr> byte_track::BYTETracker::update(
     }
 
     tracked_stracks_ = jointStracks(current_tracked_stracks, refind_stracks);
-    lost_stracks_ = subStracks(jointStracks(subStracks(lost_stracks_, tracked_stracks_), current_lost_stracks), removed_stracks_);
-    removed_stracks_ = jointStracks(removed_stracks_, current_removed_stracks);
+    lost_stracks_ = subStracks(jointStracks(subStracks(lost_stracks_, tracked_stracks_), current_lost_stracks), current_removed_stracks);
 
     std::vector<STrackPtr> tracked_stracks_out, lost_stracks_out;
     removeDuplicateStracks(tracked_stracks_, lost_stracks_, tracked_stracks_out, lost_stracks_out);
     tracked_stracks_ = tracked_stracks_out;
     lost_stracks_ = lost_stracks_out;
 
-    std::vector<STrackPtr> output_stracks;
-    for (const auto &track : tracked_stracks_)
-    {
-        if (track->isActivated())
-        {
-            output_stracks.push_back(track);
-        }
-    }
-
+    auto output_stracks = jointStracks(jointStracks(tracked_stracks_, lost_stracks_), current_removed_stracks);
     return output_stracks;
 }
-std::vector<byte_track::BYTETracker::STrackPtr> byte_track::BYTETracker::jointStracks(const std::vector<STrackPtr> &a_tlist,
+std::vector<byte_track::STrackPtr> byte_track::BYTETracker::jointStracks(const std::vector<STrackPtr> &a_tlist,
                                                                                       const std::vector<STrackPtr> &b_tlist) const
 {
     std::map<int, int> exists;
@@ -247,7 +269,7 @@ std::vector<byte_track::BYTETracker::STrackPtr> byte_track::BYTETracker::jointSt
     return res;
 }
 
-std::vector<byte_track::BYTETracker::STrackPtr> byte_track::BYTETracker::subStracks(const std::vector<STrackPtr> &a_tlist,
+std::vector<byte_track::STrackPtr> byte_track::BYTETracker::subStracks(const std::vector<STrackPtr> &a_tlist,
                                                                                     const std::vector<STrackPtr> &b_tlist) const
 {
     std::map<int, STrackPtr> stracks;
@@ -287,7 +309,7 @@ void byte_track::BYTETracker::removeDuplicateStracks(const std::vector<STrackPtr
     {
         for (size_t j = 0; j < ious[i].size(); j++)
         {
-            if (ious[i][j] < 0.15)
+            if (ious[i][j] < m_config.iouRemoveDuplicateThreshold)
             {
                 overlapping_combinations.emplace_back(i, j);
             }
@@ -399,7 +421,8 @@ std::vector<std::vector<float>> byte_track::BYTETracker::calcIous(const std::vec
 }
 
 std::vector<std::vector<float> > byte_track::BYTETracker::calcIouDistance(const std::vector<STrackPtr> &a_tracks,
-                                                                          const std::vector<STrackPtr> &b_tracks) const
+                                                                          const std::vector<STrackPtr> &b_tracks,
+                                                                          bool checkTrackClass) const
 {
     std::vector<byte_track::Rect<float>> a_rects, b_rects;
     for (size_t i = 0; i < a_tracks.size(); i++)
@@ -415,12 +438,15 @@ std::vector<std::vector<float> > byte_track::BYTETracker::calcIouDistance(const 
     const auto ious = calcIous(a_rects, b_rects);
 
     std::vector<std::vector<float>> cost_matrix;
-    for (size_t i = 0; i < ious.size(); i++)
+    for (size_t i = 0; i < ious.size(); i++) // a_tracks
     {
         std::vector<float> iou;
-        for (size_t j = 0; j < ious[i].size(); j++)
+        for (size_t j = 0; j < ious[i].size(); j++) // b_tracks
         {
-            iou.push_back(1 - ious[i][j]);
+            auto value = ious[i][j];
+            if (checkTrackClass && a_tracks[i]->getObjectClass() != b_tracks[j]->getObjectClass())
+                value = 0.0;
+            iou.push_back(1 - value);
         }
         cost_matrix.push_back(iou);
     }
@@ -584,4 +610,28 @@ double byte_track::BYTETracker::execLapjv(const std::vector<std::vector<float>> 
     delete[]y_c;
 
     return opt;
+}
+
+bool byte_track::BYTETracker::isGoodDetection(STrackPtr detection)
+{
+    auto confidence = m_config.goodDetectionThreshold;
+    NX_ASSERT(m_goodDetectionConfidences);
+    auto it = m_goodDetectionConfidences->find(detection->getObjectClass());
+    if (it != m_goodDetectionConfidences->end())
+        confidence = it->second;
+
+    return detection->getScore() > confidence;
+}
+
+bool byte_track::BYTETracker::isBirthDetection(STrackPtr detection)
+{
+    auto confidence = m_config.trackBirthThreshold;
+
+    NX_ASSERT(m_trackBirthConfidences);
+    auto it = m_trackBirthConfidences->find(detection->getObjectClass());
+    if (it != m_trackBirthConfidences->end())
+        confidence = it->second;
+
+    return detection->getScore() > confidence;
+
 }
