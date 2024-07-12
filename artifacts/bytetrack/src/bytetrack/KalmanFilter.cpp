@@ -1,4 +1,4 @@
-#include "ByteTrack/KalmanFilter.h"
+#include "KalmanFilter.h"
 
 #include <cstddef>
 
@@ -51,9 +51,9 @@ void byte_track::KalmanFilter::predict(StateMean &mean, StateCov &covariance)
     std(7) = std_weight_velocity_ * mean(3);
 
     StateMean tmp = std.array().square();
-    StateCov motion_cov = tmp.asDiagonal();
+    StateCov motion_cov = tmp.asDiagonal(); // should be scaled by form of dy
 
-    mean = motion_mat_ * mean.transpose();
+    mean = motion_mat_ * mean.transpose(); // motion_mat_ scale by dt
     covariance = motion_mat_ * covariance * (motion_mat_.transpose()) + motion_cov;
 }
 

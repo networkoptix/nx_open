@@ -4,12 +4,15 @@
 
 namespace byte_track
 {
+// Top, left, width, height representation of rectangle.
 template<typename T>
 using Tlwh = Eigen::Matrix<T, 1, 4, Eigen::RowMajor>;
 
+// Top, left, bottom, right representation of rectangle.
 template<typename T>
 using Tlbr = Eigen::Matrix<T, 1, 4, Eigen::RowMajor>;
 
+// Center x, y, ratio a = width/height, height representation of rectangle.
 template<typename T>
 using Xyah = Eigen::Matrix<T, 1, 4, Eigen::RowMajor>;
 

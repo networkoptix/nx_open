@@ -7,6 +7,10 @@ add_subdirectory(quazip)
 add_subdirectory(qt-mustache)
 add_subdirectory(stun_oauth_token_tools)
 
+if(withAnalyticsServer)
+    add_subdirectory(bytetrack)
+endif()
+
 if(withTests)
     add_subdirectory(googletest)
 endif()
