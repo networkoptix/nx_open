@@ -73,6 +73,7 @@ QVariant LookupListEntriesModel::data(const QModelIndex& index, int role) const
     switch (role)
     {
         case RawValueRole:
+        case SortRole:
         case Qt::DisplayRole:
         {
             const auto key = attribute(d->data->rawData(), index.column());
@@ -82,6 +83,11 @@ QVariant LookupListEntriesModel::data(const QModelIndex& index, int role) const
             const auto& entry = d->data->rawData().entries[index.row()];
             const auto iter = entry.find(key);
             const auto value = iter != entry.cend() ? iter->second : QString();
+
+            // If value is empty, sorting must be performed by empty value, not displayed.
+            if (role == SortRole && value.isEmpty())
+                return {};
+
             return role == RawValueRole ? value : d->getDisplayValue(key, value);
         }
 
@@ -120,7 +126,7 @@ bool LookupListEntriesModel::setData(const QModelIndex& index, const QVariant& v
     else
         entry[key] = valueAsString;
 
-    emit dataChanged(index, index, {Qt::DisplayRole, RawValueRole});
+    emit dataChanged(index, index, {Qt::DisplayRole, RawValueRole, SortRole});
     return true;
 }
 
@@ -130,6 +136,7 @@ QHash<int, QByteArray> LookupListEntriesModel::roleNames() const
     roles[ObjectTypeIdRole] = "objectTypeId";
     roles[AttributeNameRole] = "attributeName";
     roles[RawValueRole] = "rawValue";
+    roles[SortRole] = "sort";
     return roles;
 }
 

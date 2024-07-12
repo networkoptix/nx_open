@@ -245,7 +245,7 @@
         "icon": "base.icon",
         "attributes": [
           {
-            "name": "Base Type String Attribute 1",
+            "name": "StringType",
             "type": "String"
           },
           {
@@ -364,7 +364,7 @@
         }
       },
       "base.object.type.1": {
-        "Base Type String Attribute 1": {
+        "StringType": {
           "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
         },
         "Approved": {

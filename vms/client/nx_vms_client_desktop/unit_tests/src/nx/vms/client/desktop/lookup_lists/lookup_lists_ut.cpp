@@ -255,6 +255,11 @@ protected:
         m_entriesModel->listModel()->setAttributeNames(attributesNames);
     }
 
+    void whenSortingByColumn(int column, Qt::SortOrder order)
+    {
+        m_entriesProxyModel->sort(column, order);
+    }
+
     void thenListEntriesHasAttributes(const QList<QString>& attributesNames)
     {
         ASSERT_EQ(m_entriesModel->listModel()->attributeNames(), attributesNames);
@@ -376,6 +381,69 @@ protected:
         thenRowCountIs(row, m_entriesModel.get());
     }
 
+    template<class T>
+    void thenValuesAreOrdered(Qt::SortOrder order, int column)
+    {
+        QVariant previousValue;
+
+        for (int row = 0; row < m_entriesProxyModel->rowCount(); ++row)
+        {
+            const auto index = m_entriesProxyModel->index(row, column);
+            ASSERT_TRUE(index.isValid());
+            const auto currentValue = index.data(LookupListEntriesModel::DataRole::SortRole);
+            if (currentValue.isNull())
+                continue;
+
+            ASSERT_TRUE(currentValue.canConvert<T>());
+            if (previousValue.isNull())
+            {
+                previousValue = currentValue;
+                continue;
+            }
+
+            if (order == Qt::AscendingOrder)
+                ASSERT_LE(previousValue.value<T>(), currentValue.value<T>());
+            else
+                ASSERT_GE(previousValue.value<T>(), currentValue.value<T>());
+        }
+    }
+
+    void checkAnyValuesAreGrouped(QVariant& previousValue, int row, int column)
+    {
+        const auto index = m_entriesProxyModel->index(row, column);
+        ASSERT_TRUE(index.isValid());
+        bool endOfAnyValueGroup = false; //< After sorting empty values are sorted to one group.
+        const auto currentValue = index.data(LookupListEntriesModel::DataRole::SortRole);
+        if (currentValue.isNull())
+        {
+            ASSERT_FALSE(endOfAnyValueGroup);
+            ASSERT_TRUE(previousValue.isNull());
+        }
+        else
+        {
+            endOfAnyValueGroup = true;
+        }
+        previousValue = currentValue;
+    }
+    void thenEmptyValuesAreAtTheBegining(int column)
+    {
+        QVariant previousValue =
+            m_entriesProxyModel->index(0, column).data(LookupListEntriesModel::DataRole::SortRole);
+
+        for (int row = 1; row < m_entriesProxyModel->rowCount(); ++row)
+            checkAnyValuesAreGrouped(previousValue, row, column);
+    }
+
+    void thenEmptyValuesAreAtTheEnd(int column)
+    {
+        int rowCount = m_entriesProxyModel->rowCount();
+        QVariant previousValue = m_entriesProxyModel->index(rowCount, column)
+                                     .data(LookupListEntriesModel::DataRole::SortRole);
+
+        for (int row = rowCount - 1; row >= 0; --row)
+            checkAnyValuesAreGrouped(previousValue, row, column);
+    }
+
     std::map<QString, QString> correctRowToStdMap()
     {
         std::map<QString, QString> result;
@@ -427,6 +495,50 @@ protected:
             {{"Value", "5"}},
             {{"Value", "6"}}};
         return e2;
+    }
+
+    LookupListData numericColumnExampleData()
+    {
+        LookupListData e1;
+        e1.objectTypeId = "base.object.type.1";
+        e1.id = nx::Uuid::createUuid();
+        e1.name = "Numbers";
+        e1.attributeNames.push_back("IntNumberWithoutLimit");
+        e1.attributeNames.push_back("FloatNumberWithoutLimit");
+        e1.entries = {
+            {{"IntNumberWithoutLimit", "-10"}},
+            {{"IntNumberWithoutLimit", "100"}},
+            {{"IntNumberWithoutLimit", "1"}},
+            {{"IntNumberWithoutLimit", "5"}},
+            {{"IntNumberWithoutLimit", "90"}},
+            {{"IntNumberWithoutLimit", "90"}},
+            {{"IntNumberWithoutLimit", "-1"}},
+            {{"IntNumberWithoutLimit", "10000"}},
+            {{"IntNumberWithoutLimit", "1001"}},
+            {{"FloatNumberWithoutLimit", "100.28"}},
+            {{"IntNumberWithoutLimit", ""}, {"FloatNumberWithoutLimit", "1.5"}},
+        };
+        return e1;
+    }
+
+    LookupListData stringColumnExampleData()
+    {
+        LookupListData e1;
+        e1.objectTypeId = "base.object.type.1";
+        e1.id = nx::Uuid::createUuid();
+        e1.name = "Enums";
+        e1.attributeNames.push_back("StringType");
+        e1.attributeNames.push_back("FloatNumberWithoutLimit");
+        e1.entries = {
+            {{"StringType", "10000"}},
+            {{"StringType", "1001"}},
+            {{"StringType", "aaaa"}},
+            {{"StringType", "bbbb"}},
+            {{"StringType", "c"}},
+            {{"FloatNumberWithoutLimit", "100.28"}},
+            {{"StringType", ""}, {"FloatNumberWithoutLimit", "1.5"}},
+        };
+        return e1;
     }
 
     LookupListData bigColumnNumberExampleData()
@@ -831,6 +943,30 @@ TEST_F(LookupListTests, rename_generic_list_column)
     const QList<QString> newColumn{"New one"};
     whenSetAttributesNames(newColumn);
     thenListEntriesHasAttributes(newColumn);
+}
+
+TEST_F(LookupListTests, sorting_of_numeric_values)
+{
+    givenLookupListEntriesProxyModel(numericColumnExampleData());
+    whenSortingByColumn(0, Qt::AscendingOrder);
+    thenEmptyValuesAreAtTheEnd(0);
+    thenValuesAreOrdered<int>(Qt::AscendingOrder, 0);
+
+    whenSortingByColumn(0, Qt::DescendingOrder);
+    thenEmptyValuesAreAtTheBegining(0);
+    thenValuesAreOrdered<int>(Qt::DescendingOrder, 0);
+}
+
+TEST_F(LookupListTests, sorting_of_string_values)
+{
+    givenLookupListEntriesProxyModel(stringColumnExampleData());
+    whenSortingByColumn(0, Qt::AscendingOrder);
+    thenEmptyValuesAreAtTheEnd(0);
+    thenValuesAreOrdered<QString>(Qt::AscendingOrder, 0);
+
+    whenSortingByColumn(0, Qt::DescendingOrder);
+    thenEmptyValuesAreAtTheBegining(0);
+    thenValuesAreOrdered<QString>(Qt::DescendingOrder, 0);
 }
 
 } // namespace nx::vms::client::desktop
