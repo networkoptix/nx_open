@@ -174,7 +174,11 @@ void QnPopupSettingsWidget::applyChanges()
             tr("Save"),
             FreshSessionTokenHelper::ActionType::updateSettings);
 
-        systemContext()->connectedServerApi()->patchUserParameters(
+        auto api = systemContext()->connectedServerApi();
+        if (!api)
+            return;
+
+        api->patchUserParameters(
             m_currentUser->getId(),
             parameters,
             sessionTokenHelper,
