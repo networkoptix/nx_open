@@ -13,6 +13,7 @@ extern "C" {
 }
 
 static const int NOT_ENOUGHT_BUFFER = -1;
+const static int UNSUPPORTED_PARAM = 3;
 
 enum VC1Code{
     VC1_CODE_ENDOFSEQ  = 0x0A,

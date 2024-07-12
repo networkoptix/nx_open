@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/codec/hevc/hevc_decoder_configuration_record.h>
+#include <nx/codec/h265/hevc_decoder_configuration_record.h>
 #include <nx/media/h264_utils.h>
 
 TEST(media, build_extradata_h264)
@@ -40,7 +40,7 @@ TEST(media, parse_extradata_h265)
         0x08, 0x44, 0x01, 0xc0, 0xf2, 0xf0, 0x3c, 0x90, 0x00};
 
     // Test read.
-    nx::media::hevc::HEVCDecoderConfigurationRecord hvcc;
+    nx::media::h265::HEVCDecoderConfigurationRecord hvcc;
     ASSERT_TRUE(hvcc.read(frameData, sizeof(frameData)));
     ASSERT_EQ(hvcc.sps.size(), 1);
     ASSERT_EQ(hvcc.pps.size(), 1);

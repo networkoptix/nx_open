@@ -8,6 +8,8 @@ extern "C" {
 #include <libavutil/imgutils.h>
 } // extern "C"
 
+#include <nx/codec/h264/common.h>
+#include <nx/codec/h264/sequence_parameter_set.h>
 #include <nx/codec/nal_units.h>
 #include <nx/media/codec_parameters.h>
 #include <nx/media/ffmpeg/ffmpeg_utils.h>
@@ -86,10 +88,10 @@ void QnFfmpegVideoDecoder::determineOptimalThreadType(const QnConstCompressedVid
         if (curNal[0] == 0)
         {
             const quint8* end = curNal + data->dataSize();
-            for(curNal = NALUnit::findNextNAL(curNal, end); curNal < end; curNal = NALUnit::findNextNAL(curNal, end))
+            for(curNal = nx::media::nal::findNextNAL(curNal, end); curNal < end; curNal = nx::media::nal::findNextNAL(curNal, end))
             {
-                const auto nalType = NALUnit::decodeType(*curNal);
-                if (nalType >= nuSliceNonIDR && nalType <= nuSliceIDR) {
+                const auto nalType = nx::media::h264::decodeType(*curNal);
+                if (nalType >= nx::media::h264::nuSliceNonIDR && nalType <= nx::media::h264::nuSliceIDR) {
                     nx::utils::BitStreamReader bitReader;
                     try {
                         bitReader.setBuffer(curNal + 1, end);
@@ -168,6 +170,7 @@ bool QnFfmpegVideoDecoder::resetDecoder(const QnConstCompressedVideoDataPtr& dat
         m_needRecreate = true;
         return true; // can't reset right now
     }
+
     avcodec_free_context(&m_context);
     m_spsFound = false;
     return openDecoder(data);
@@ -324,18 +327,18 @@ bool QnFfmpegVideoDecoder::decode(
                 if (curPtr + nalLen >= dataEnd)
                     break;
 
-                const auto nalUnitType = NALUnit::decodeType(curPtr[nalLen]);
-                if (nalUnitType == nuSPS)
+                const auto nalUnitType = nx::media::h264::decodeType(curPtr[nalLen]);
+                if (nalUnitType == nx::media::h264::nuSPS)
                 {
-                    SPSUnit sps;
-                    const quint8* end = NALUnit::findNALWithStartCode(curPtr+nalLen, dataEnd, true);
+                    nx::media::h264::SequenceParameterSet sps;
+                    const quint8* end = nx::media::nal::findNALWithStartCode(curPtr+nalLen, dataEnd);
                     sps.decodeBuffer(curPtr + nalLen, end);
                     sps.deserialize();
                     processNewResolutionIfChanged(data, sps.getWidth(), sps.getHeight());
                     m_spsFound = true;
                     break;
                 }
-                curPtr = NALUnit::findNALWithStartCode(curPtr + nalLen, dataEnd, true);
+                curPtr = nx::media::nal::findNALWithStartCode(curPtr + nalLen, dataEnd);
             }
             if (!m_spsFound && m_context->extradata_size == 0)
             {

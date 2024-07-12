@@ -7,6 +7,7 @@
 #include <QtCore/QSize>
 #include <QtCore/QString>
 
+#include <nx/codec/h264/sequence_parameter_set.h>
 #include <nx/codec/nal_units.h>
 #include <nx/media/video_data_packet.h>
 
@@ -16,6 +17,6 @@ NX_MEDIA_CORE_API std::vector<uint8_t> buildExtraDataAnnexB(const uint8_t* data,
 NX_MEDIA_CORE_API std::vector<uint8_t> buildExtraDataMp4FromAnnexB(const uint8_t* data, int32_t size);
 NX_MEDIA_CORE_API std::vector<uint8_t> buildExtraDataMp4(const std::vector<nal::NalUnitInfo>& nalUnits);
 
-NX_MEDIA_CORE_API bool extractSps(const QnCompressedVideoData* videoData, SPSUnit& sps);
+NX_MEDIA_CORE_API bool extractSps(const QnCompressedVideoData* videoData, SequenceParameterSet& sps);
 
 } // namespace nx::media::h264

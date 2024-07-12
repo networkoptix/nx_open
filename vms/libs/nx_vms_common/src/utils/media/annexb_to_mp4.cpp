@@ -2,7 +2,7 @@
 
 #include "annexb_to_mp4.h"
 
-#include <nx/codec/hevc/extradata.h>
+#include <nx/codec/h265/extradata.h>
 #include <nx/codec/nal_units.h>
 #include <nx/media/h264_utils.h>
 #include <nx/media/utils.h>
@@ -15,7 +15,7 @@ std::vector<uint8_t> buildExtraDataMp4(const QnCompressedVideoData* frame)
     std::vector<uint8_t> extradata;
     auto extraDataBuilder = frame->compressionType == AV_CODEC_ID_H264
         ? nx::media::h264::buildExtraDataMp4FromAnnexB
-        : nx::media::hevc::buildExtraDataMp4FromAnnexB;
+        : nx::media::h265::buildExtraDataMp4FromAnnexB;
     if (frame->context && frame->context->getExtradata() && frame->context->getExtradataSize())
     {
         extradata = extraDataBuilder(

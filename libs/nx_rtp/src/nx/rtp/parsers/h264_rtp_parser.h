@@ -4,6 +4,7 @@
 
 #include <QtCore/QByteArray>
 
+#include <nx/codec/h264/sequence_parameter_set.h>
 #include <nx/codec/nal_units.h>
 #include <nx/media/video_data_packet.h>
 #include <nx/rtp/parsers/rtp_chunk_buffer.h>
@@ -29,7 +30,7 @@ public:
 private:
     RtpChunkBuffer m_chunks;
     std::vector<uint8_t> m_sdpSpsPps;
-    SPSUnit m_sps;
+    nx::media::h264::SequenceParameterSet m_sps;
     bool m_spsInitialized;
     bool m_builtinSpsFound;
     bool m_builtinPpsFound;

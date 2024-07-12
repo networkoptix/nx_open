@@ -5,10 +5,10 @@
 #include <array>
 
 #include <nx/codec/h263/h263_utils.h>
-#include <nx/codec/hevc/extradata.h>
-#include <nx/codec/hevc/hevc_common.h>
-#include <nx/codec/hevc/sequence_parameter_set.h>
-#include <nx/codec/hevc/hevc_decoder_configuration_record.h>
+#include <nx/codec/h265/extradata.h>
+#include <nx/codec/h265/hevc_common.h>
+#include <nx/codec/h265/hevc_decoder_configuration_record.h>
+#include <nx/codec/h265/sequence_parameter_set.h>
 #include <nx/codec/jpeg/jpeg_utils.h>
 #include <nx/media/h264_utils.h>
 #include <nx/media/mime_types.h>
@@ -19,16 +19,16 @@ namespace nx::media {
 bool isExtradataInMp4Format(const QnCompressedVideoData* data)
 {
     return data->context &&
-        data->context->getExtradataSize() >= hevc::HEVCDecoderConfigurationRecord::kMinSize &&
+        data->context->getExtradataSize() >= h265::HEVCDecoderConfigurationRecord::kMinSize &&
         data->context->getExtradata()[0] == 1; // configurationVersion
 }
 
-bool extractSpsH265(const QnCompressedVideoData* data, hevc::SequenceParameterSet& sps)
+bool extractSpsH265(const QnCompressedVideoData* data, h265::SequenceParameterSet& sps)
 {
     std::vector<nal::NalUnitInfo> nalUnits;
     if (isExtradataInMp4Format(data))
     {
-        hevc::HEVCDecoderConfigurationRecord record;
+        h265::HEVCDecoderConfigurationRecord record;
         if (!record.read(data->context->getExtradata(), data->context->getExtradataSize()))
         {
             NX_DEBUG(NX_SCOPE_TAG, "Failed to parse H265 extradata");
@@ -45,13 +45,13 @@ bool extractSpsH265(const QnCompressedVideoData* data, hevc::SequenceParameterSe
     nalUnits = nal::findNalUnitsAnnexB((const uint8_t*)data->data(), data->dataSize());
     for (const auto& nalu: nalUnits)
     {
-        hevc::NalUnitHeader packetHeader;
+        h265::NalUnitHeader packetHeader;
         if (!packetHeader.decode(nalu.data, nalu.size))
             return false;
 
         switch (packetHeader.unitType)
         {
-            case hevc::NalUnitType::spsNut:
+            case h265::NalUnitType::spsNut:
                 return parseNalUnit(nalu.data, nalu.size, sps);
             default:
                 break;
@@ -72,14 +72,14 @@ QSize getFrameSize(const QnCompressedVideoData* frame)
     {
         case AV_CODEC_ID_H265:
         {
-            hevc::SequenceParameterSet sps;
+            h265::SequenceParameterSet sps;
             if (extractSpsH265(frame, sps))
                 return QSize(sps.width, sps.height);
             return QSize();
         }
         case AV_CODEC_ID_H264:
         {
-            SPSUnit sps;
+            h264::SequenceParameterSet sps;
             if (h264::extractSps(frame, sps))
                 return QSize(sps.getWidth(), sps.getHeight());
             return QSize();
@@ -152,7 +152,7 @@ bool fillExtraDataAnnexB(const QnCompressedVideoData* video, uint8_t** outExtrad
     if (video->compressionType == AV_CODEC_ID_H264)
         extradata = h264::buildExtraDataAnnexB((const uint8_t*)video->data(), video->dataSize());
     else if (video->compressionType == AV_CODEC_ID_H265)
-        extradata = hevc::buildExtraDataAnnexB((const uint8_t*)video->data(), video->dataSize());
+        extradata = h265::buildExtraDataAnnexB((const uint8_t*)video->data(), video->dataSize());
     else
         return true; //< at this moment ignore all other codecs
 
@@ -179,7 +179,7 @@ std::vector<uint8_t> buildExtraDataAnnexB(const QnConstCompressedVideoDataPtr& f
     if (frame->compressionType == AV_CODEC_ID_H264)
         return h264::buildExtraDataAnnexB((const uint8_t*) frame->data(), frame->dataSize());
     else if (frame->compressionType == AV_CODEC_ID_H265)
-        return hevc::buildExtraDataAnnexB((const uint8_t*) frame->data(), frame->dataSize());
+        return h265::buildExtraDataAnnexB((const uint8_t*) frame->data(), frame->dataSize());
     return std::vector<uint8_t>();
 }
 

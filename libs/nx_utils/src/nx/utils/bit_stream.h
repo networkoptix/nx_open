@@ -90,6 +90,8 @@ public:
     void putBits(uint32_t num, uint32_t value);
     void putBytes(const uint8_t* data, uint32_t size);
     void putBit(uint32_t value);
+    void putSignedGolomb(int32_t value);
+    void putGolomb(uint32_t value);
     void flushBits(bool finishLastByte = false);
     uint32_t getBitsCount();
     int getBytesCount();

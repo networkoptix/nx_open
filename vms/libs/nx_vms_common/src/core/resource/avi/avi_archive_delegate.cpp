@@ -21,6 +21,7 @@
 #include <export/sign_helper.h>
 #include <motion/light_motion_archive_connection.h>
 #include <nx/codec/h263/h263_utils.h>
+#include <nx/codec/h264/common.h>
 #include <nx/codec/nal_units.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/media/av_codec_helper.h>
@@ -61,9 +62,9 @@ static bool isH264IFrame(const QnAbstractMediaDataPtr& data)
 
     const quint8* pData = (const quint8*)data->data();
     const quint8* pDataEnd = pData + data->dataSize();
-    while ((pData = NALUnit::findNextNAL(pData, pDataEnd)) != pDataEnd)
+    while ((pData = nx::media::nal::findNextNAL(pData, pDataEnd)) != pDataEnd)
     {
-        if (NALUnit::isIFrame(pData, pDataEnd - pData))
+        if (nx::media::h264::isIFrame(pData, pDataEnd - pData))
             return true;
     }
 
@@ -176,7 +177,7 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
         if (stream->codecpar->codec_id == AV_CODEC_ID_H264 && packet.size == 6)
         {
             // may be H264 delimiter as separate packet. remove it
-            if (packet.data[0] == 0x00 && packet.data[1] == 0x00 && packet.data[2] == 0x00 && packet.data[3] == 0x01 && packet.data[4] == nuDelimiter)
+            if (packet.data[0] == 0x00 && packet.data[1] == 0x00 && packet.data[2] == 0x00 && packet.data[3] == 0x01 && packet.data[4] == nx::media::h264::nuDelimiter)
                 continue; // skip delimiter
         }
 

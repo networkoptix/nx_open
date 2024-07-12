@@ -5,7 +5,8 @@
 #include <cstdint>
 #include <vector>
 
-#include <nx/codec/hevc/hevc_decoder_configuration_record.h>
+#include <nx/codec/h264/common.h>
+#include <nx/codec/h265/hevc_decoder_configuration_record.h>
 #include <nx/utils/log/log.h>
 
 #include "nal_extradata.h"
@@ -63,8 +64,8 @@ std::string getMimeType(const AVCodecParameters* codecpar)
 
             const uint8_t* dataStart = (const uint8_t*) &data[0];
             const uint8_t* dataEnd = dataStart + data.size();
-            const auto nalu = NALUnit::findNextNAL(dataStart, dataEnd);
-            if (nalu && dataEnd - nalu >= 4 && (nalu[0] & 0x1F) == NALUnitType::nuSPS)
+            const auto nalu = nx::media::nal::findNextNAL(dataStart, dataEnd);
+            if (nalu && dataEnd - nalu >= 4 && nx::media::h264::decodeType(nalu[0]) == nx::media::h264::NALUnitType::nuSPS)
             {
                 constexpr size_t kAvc1BufferSize = 12;
                 result.resize(kAvc1BufferSize);
@@ -83,7 +84,7 @@ std::string getMimeType(const AVCodecParameters* codecpar)
         case AV_CODEC_ID_H265:
         {
             // Hope we will never transcode to h265, so use extradata only in hvcc format.
-            nx::media::hevc::HEVCDecoderConfigurationRecord hvcc;
+            nx::media::h265::HEVCDecoderConfigurationRecord hvcc;
             if (hvcc.read(codecpar->extradata, codecpar->extradata_size))
             {
                 // ISO/IEC 14496-15, Annex E.3.

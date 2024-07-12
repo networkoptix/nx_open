@@ -14,8 +14,6 @@
 static const char EXPORT_SIGN_MAGIC[] = "RhjrjLbkMxTujHI!";
 static const nx::utils::QnCryptographicHash::Algorithm EXPORT_SIGN_METHOD = nx::utils::QnCryptographicHash::Md5;
 
-class SPSUnit;
-class PPSUnit;
 class QnLicensePool;
 
 class NX_VMS_COMMON_API QnSignHelper: public QObject

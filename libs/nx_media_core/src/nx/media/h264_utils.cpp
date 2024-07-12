@@ -70,7 +70,7 @@ bool isExtradataInMp4Format(const QnCompressedVideoData* data)
         data->context->getExtradata()[0] == 1;
 }
 
-bool extractSps(const QnCompressedVideoData* data, SPSUnit& sps)
+bool extractSps(const QnCompressedVideoData* data, SequenceParameterSet& sps)
 {
     std::vector<nal::NalUnitInfo> nalUnits;
     if (isExtradataInMp4Format(data))
@@ -80,7 +80,7 @@ bool extractSps(const QnCompressedVideoData* data, SPSUnit& sps)
 
     for (const auto& nalu: nalUnits)
     {
-        if (NALUnit::decodeType(*nalu.data) == nuSPS)
+        if (nx::media::h264::decodeType(*nalu.data) == nuSPS)
         {
             sps.decodeBuffer(nalu.data, nalu.data + nalu.size);
             return sps.deserialize() == 0;
@@ -96,7 +96,7 @@ std::vector<uint8_t> buildExtraDataAnnexB(const uint8_t* data, int32_t size)
     auto nalUnits = nx::media::nal::findNalUnitsAnnexB(data, size);
     for (const auto& nalu: nalUnits)
     {
-        const auto nalType = NALUnit::decodeType(*nalu.data);
+        const auto nalType = nx::media::h264::decodeType(*nalu.data);
         if (nalType == nuSPS || nalType == nuPPS)
         {
             extraData.insert(extraData.end(), startcode.begin(), startcode.end());
@@ -117,7 +117,7 @@ std::vector<uint8_t> buildExtraDataMp4(const std::vector<nal::NalUnitInfo>& nalU
     std::vector<std::vector<uint8_t>> ppsVector;
     for (const auto& nalu: nalUnits)
     {
-        const auto nalType = NALUnit::decodeType(*nalu.data);
+        const auto nalType = nx::media::h264::decodeType(*nalu.data);
         if (nalType == nuSPS)
             spsVector.emplace_back(nalu.data, nalu.data + nalu.size);
         else if (nalType == nuPPS)
