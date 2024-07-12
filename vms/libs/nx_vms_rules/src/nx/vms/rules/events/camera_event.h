@@ -17,7 +17,8 @@ class NX_VMS_RULES_API CameraEvent: public BasicEvent
 
 public:
     virtual QString resourceKey() const override;
-    virtual QVariantMap details(common::SystemContext* context) const override;
+    virtual QVariantMap details(common::SystemContext* context,
+        const nx::vms::api::rules::PropertyMap& aggregatedInfo) const override;
 
 protected:
     CameraEvent() = default;

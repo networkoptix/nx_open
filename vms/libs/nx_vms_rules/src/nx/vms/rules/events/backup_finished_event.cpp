@@ -15,13 +15,13 @@ QString BackupFinishedEvent::resourceKey() const
     return m_serverId.toSimpleString();
 }
 
-QVariantMap BackupFinishedEvent::details(common::SystemContext* context) const
+QVariantMap BackupFinishedEvent::details(
+    common::SystemContext* context, const nx::vms::api::rules::PropertyMap& aggregatedInfo) const
 {
-    auto result = BasicEvent::details(context);
+    auto result = BasicEvent::details(context, aggregatedInfo);
 
     utils::insertIfNotEmpty(result, utils::kReasonDetailName, reasonDetail());
     utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
-    result.insert(utils::kEmailTemplatePathDetailName, manifest().emailTemplatePath);
     utils::insertLevel(result, nx::vms::event::Level::success);
     utils::insertIcon(result, nx::vms::rules::Icon::storage);
     utils::insertClientAction(result, nx::vms::rules::ClientAction::serverSettings);

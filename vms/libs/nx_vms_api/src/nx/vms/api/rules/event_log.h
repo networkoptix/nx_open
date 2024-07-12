@@ -98,8 +98,8 @@ struct NX_VMS_API EventLogRecord
      */
     QMap<QString, QJsonValue> actionData;
 
-    /**%apidoc[opt] Event aggregation count in the rule period. */
-    size_t aggregationCount = 0;
+    /**%apidoc[opt] Event aggregated info during the rule period. */
+    QMap<QString, QJsonValue> aggregatedInfo;
 
     /**%apidoc[opt] VMS rule id. */
     nx::Uuid ruleId;
@@ -112,7 +112,7 @@ struct NX_VMS_API EventLogRecord
 };
 
 #define EventLogRecord_Fields \
-    (timestampMs)(eventData)(actionData)(aggregationCount)(ruleId)(flags)(serverId)
+    (timestampMs)(eventData)(actionData)(aggregatedInfo)(ruleId)(flags)(serverId)
 
 NX_REFLECTION_INSTRUMENT(EventLogRecord, EventLogRecord_Fields)
 QN_FUSION_DECLARE_FUNCTIONS(EventLogRecord, (json)(sql_record), NX_VMS_API)

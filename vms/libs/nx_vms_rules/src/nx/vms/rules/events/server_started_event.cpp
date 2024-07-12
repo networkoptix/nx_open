@@ -21,12 +21,12 @@ QString ServerStartedEvent::resourceKey() const
     return m_serverId.toSimpleString();
 }
 
-QVariantMap ServerStartedEvent::details(common::SystemContext* context) const
+QVariantMap ServerStartedEvent::details(
+    common::SystemContext* context, const nx::vms::api::rules::PropertyMap& aggregatedInfo) const
 {
-    auto result = BasicEvent::details(context);
+    auto result = BasicEvent::details(context, aggregatedInfo);
 
     utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
-    result.insert(utils::kEmailTemplatePathDetailName, manifest().emailTemplatePath);
     utils::insertLevel(result, nx::vms::event::Level::common);
     utils::insertIcon(result, nx::vms::rules::Icon::server);
     utils::insertClientAction(result, nx::vms::rules::ClientAction::serverSettings);

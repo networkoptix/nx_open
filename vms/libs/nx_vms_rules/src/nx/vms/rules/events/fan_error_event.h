@@ -20,7 +20,8 @@ public:
     FanErrorEvent(nx::Uuid serverId, std::chrono::microseconds timestamp);
 
     virtual QString resourceKey() const override;
-    virtual QVariantMap details(common::SystemContext* context) const override;
+    virtual QVariantMap details(common::SystemContext* context,
+        const nx::vms::api::rules::PropertyMap& aggregatedInfo) const override;
 
     static const ItemDescriptor& manifest();
 

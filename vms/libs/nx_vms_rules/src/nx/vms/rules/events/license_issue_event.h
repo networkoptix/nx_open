@@ -23,9 +23,11 @@ public:
         const UuidSet& disabledCameras);
 
     virtual QString resourceKey() const override;
-    virtual QVariantMap details(common::SystemContext* context) const override;
-
     static const ItemDescriptor& manifest();
+
+protected:
+    virtual QVariantMap details(common::SystemContext* context,
+        const nx::vms::api::rules::PropertyMap& aggregatedInfo) const override;
 
 private:
     QString extendedCaption(common::SystemContext* context) const;

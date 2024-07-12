@@ -14,8 +14,6 @@ class NX_VMS_RULES_API LdapSyncIssueEvent: public BasicEvent
     Q_OBJECT
     Q_CLASSINFO("type", "nx.events.ldapSyncIssue")
 public:
-    using Reasons = QMap<vms::api::EventReason, int>;
-
     LdapSyncIssueEvent() = default;
     LdapSyncIssueEvent(
         std::chrono::microseconds timestamp,
@@ -25,9 +23,10 @@ public:
 
     virtual QString resourceKey() const override;
     virtual QString uniqueName() const override;
-    virtual QVariantMap details(common::SystemContext* context) const override;
-
-    void fillAggregationInfo(const AggregatedEventPtr& aggregatedEvent) override;
+    virtual QVariantMap details(common::SystemContext* context,
+        const nx::vms::api::rules::PropertyMap& aggregatedInfo) const override;
+    virtual nx::vms::api::rules::PropertyMap aggregatedInfo(
+        const AggregatedEvent& aggregatedEvent) const override;
 
     static const ItemDescriptor& manifest();
 
@@ -35,10 +34,9 @@ private:
     FIELD(vms::api::EventReason, reasonCode, setReasonCode)
     FIELD(std::chrono::seconds, syncInterval, setSyncInterval)
     FIELD(nx::Uuid, serverId, setServerId)
-    FIELD(Reasons, countByReasons, setCountByReasons)
 
-    QString reasonText() const;
-    QString ldapSyncIssueReason(vms::api::EventReason reasonCode) const;
+    QString reasonText(vms::api::EventReason reason) const;
+    QString reasonText(const nx::vms::api::rules::PropertyMap& aggregatedInfo = {}) const;
 };
 
 } // namespace nx::vms::rules

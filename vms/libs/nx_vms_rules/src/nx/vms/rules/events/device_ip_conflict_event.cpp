@@ -37,15 +37,15 @@ QString DeviceIpConflictEvent::resourceKey() const
     return m_serverId.toSimpleString();
 }
 
-QVariantMap DeviceIpConflictEvent::details(common::SystemContext* context) const
+QVariantMap DeviceIpConflictEvent::details(
+    common::SystemContext* context, const nx::vms::api::rules::PropertyMap& aggregatedInfo) const
 {
-    auto result = BasicEvent::details(context);
+    auto result = BasicEvent::details(context, aggregatedInfo);
 
     utils::insertIfNotEmpty(result, utils::kCaptionDetailName, caption(context));
     utils::insertIfNotEmpty(result, utils::kDetailingDetailName, detailing());
     utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
     utils::insertIfNotEmpty(result, utils::kNameDetailName, name(context));
-    result.insert(utils::kEmailTemplatePathDetailName, manifest(context).emailTemplatePath);
     utils::insertLevel(result, nx::vms::event::Level::important);
     utils::insertIcon(result, nx::vms::rules::Icon::resource);
     utils::insertClientAction(result, nx::vms::rules::ClientAction::browseUrl);

@@ -35,14 +35,14 @@ QString DeviceDisconnectedEvent::resourceKey() const
     return m_cameraId.toSimpleString();
 }
 
-QVariantMap DeviceDisconnectedEvent::details(common::SystemContext* context) const
+QVariantMap DeviceDisconnectedEvent::details(
+    common::SystemContext* context, const nx::vms::api::rules::PropertyMap& aggregatedInfo) const
 {
-    auto result = BasicEvent::details(context);
+    auto result = BasicEvent::details(context, aggregatedInfo);
 
     utils::insertIfNotEmpty(result, utils::kCaptionDetailName, caption(context));
     utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
     utils::insertIfNotEmpty(result, utils::kNameDetailName, name(context));
-    result.insert(utils::kEmailTemplatePathDetailName, manifest(context).emailTemplatePath);
     utils::insertIcon(result, nx::vms::rules::Icon::resource);
     utils::insertLevel(result, nx::vms::event::Level::critical);
     utils::insertClientAction(result, nx::vms::rules::ClientAction::cameraSettings);

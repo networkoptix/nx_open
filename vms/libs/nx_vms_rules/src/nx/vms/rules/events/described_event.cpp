@@ -37,9 +37,10 @@ void DescribedEvent::setDescription(const QString& description)
     m_description = description;
 }
 
-QVariantMap DescribedEvent::details(common::SystemContext* context) const
+QVariantMap DescribedEvent::details(
+    common::SystemContext* context, const nx::vms::api::rules::PropertyMap& aggregatedInfo) const
 {
-    auto result = BasicEvent::details(context);
+    auto result = BasicEvent::details(context, aggregatedInfo);
 
     utils::insertIfNotEmpty(result, utils::kCaptionDetailName, m_caption);
     utils::insertIfNotEmpty(result, utils::kDescriptionDetailName, m_description);

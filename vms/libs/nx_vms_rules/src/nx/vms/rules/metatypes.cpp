@@ -100,8 +100,6 @@ void Metatypes::initialize()
 
     QnJsonSerializer::registerSerializer<std::string>();
     QnJsonSerializer::registerSerializer<nx::network::http::SerializableCredentials>();
-
-    QnJsonSerializer::registerSerializer<LdapSyncIssueEvent::Reasons>();
 };
 
 } // namespace nx::vms::rules

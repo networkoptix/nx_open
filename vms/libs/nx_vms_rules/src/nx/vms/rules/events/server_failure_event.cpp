@@ -26,13 +26,13 @@ QString ServerFailureEvent::resourceKey() const
     return m_serverId.toSimpleString();
 }
 
-QVariantMap ServerFailureEvent::details(common::SystemContext* context) const
+QVariantMap ServerFailureEvent::details(
+    common::SystemContext* context, const nx::vms::api::rules::PropertyMap& aggregatedInfo) const
 {
-    auto result = BasicEvent::details(context);
+    auto result = BasicEvent::details(context, aggregatedInfo);
 
     utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
     utils::insertIfNotEmpty(result, utils::kReasonDetailName, reason(context));
-    result.insert(utils::kEmailTemplatePathDetailName, manifest().emailTemplatePath);
     utils::insertLevel(result, nx::vms::event::Level::critical);
     utils::insertIcon(result, nx::vms::rules::Icon::server);
     utils::insertClientAction(result, nx::vms::rules::ClientAction::serverSettings);

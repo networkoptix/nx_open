@@ -381,7 +381,7 @@ QString EventLogModel::textData(Column column, const EventLogModelData& data) co
         {
             auto description = actionDetails.value(rules::utils::kDescriptionDetailName).toString();
             if (description.isEmpty())
-                description = eventDetails.value(rules::utils::kDetailingDetailName).value<QStringList>().join('\n');
+                description = nx::vms::rules::Strings::eventDetails(eventDetails).join('\n');
 
             return description;
         }
@@ -392,19 +392,10 @@ QString EventLogModel::textData(Column column, const EventLogModelData& data) co
 
 QString EventLogModel::tooltip(Column column, const EventLogModelData& data) const
 {
-    constexpr auto kDelimiter = QChar('\n');
-
     if (column != DescriptionColumn)
         return QString();
 
-    // TODO: #amalov Consider tooltip unification with event and notification panels.
-    QString result = textData(column, data);
-
-    const auto reason = data.details(systemContext()).value(rules::utils::kReasonDetailName);
-    if (reason.isValid())
-        result.append(kDelimiter).append(reason.toString());
-
-    return result;
+    return textData(column, data);
 }
 
 bool EventLogModel::hasAccessToArchive(const nx::Uuid& cameraId) const

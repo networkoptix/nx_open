@@ -80,13 +80,11 @@ public:
     virtual QString cacheKey() const;
 
     /** Returns the event details(such as caption, description, timestamp, source etc.). */
-    virtual QVariantMap details(common::SystemContext* context) const;
+    virtual QVariantMap details(common::SystemContext* context,
+        const nx::vms::api::rules::PropertyMap& aggregatedInfo) const;
 
-    /**
-     * Used for filling event's fields with information from aggregated event.
-     * TODO: redesign, VMS-53271
-     */
-    virtual void fillAggregationInfo(const AggregatedEventPtr& /*aggregatedEvent*/){};
+    virtual nx::vms::api::rules::PropertyMap aggregatedInfo(
+        const AggregatedEvent& aggregatedEvent) const;
 
 protected:
     BasicEvent() = default;

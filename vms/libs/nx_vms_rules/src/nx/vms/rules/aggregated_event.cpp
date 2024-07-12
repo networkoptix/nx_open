@@ -52,7 +52,8 @@ QVariantMap AggregatedEvent::details(common::SystemContext* context) const
     if (m_aggregatedEvents.empty())
         return {};
 
-    auto eventDetails = initialEvent()->details(context);
+    auto aggregatedInfo = initialEvent()->aggregatedInfo(*this);
+    auto eventDetails = initialEvent()->details(context, aggregatedInfo);
 
     const auto count = m_aggregatedEvents.size();
     eventDetails[utils::kCountDetailName] = QVariant::fromValue(count);

@@ -29,7 +29,8 @@ public:
         nx::Uuid engineId,
         nx::vms::api::EventLevel level);
 
-    virtual QVariantMap details(common::SystemContext* context) const override;
+    virtual QVariantMap details(common::SystemContext* context,
+        const nx::vms::api::rules::PropertyMap& aggregatedInfo) const override;
 
 private:
     QString eventCaption() const;
