@@ -255,6 +255,7 @@ void WebDownloader::startDownload()
     auto notificationsManager = windowContext()->localNotificationsManager();
     m_notificationId = notificationsManager->addProgress(
         tr("Downloading file..."), m_fileInfo.fileName(), /*cancellable*/ true);
+    notificationsManager->setTooltip(m_notificationId, m_fileInfo.absolutePath());
     setState(State::Downloading);
 
     auto action = CommandActionPtr(new CommandAction(tr("Open Containing Folder")));
@@ -374,15 +375,21 @@ void WebDownloader::setState(State state)
             break;
         case State::Completed:
             NX_ASSERT(prevState == State::Downloading);
+            progressManager->setLevel(
+                m_notificationId, QnNotificationLevel::Value::SuccessNotification);
             progressManager->setProgress(m_notificationId,
                 ProgressState::completed);
             progressManager->setTitle(m_notificationId, tr("File downloaded"));
+            progressManager->setTooltip(m_notificationId, {});
             break;
         case State::Failed:
             NX_ASSERT(prevState == State::Downloading);
+            progressManager->setLevel(
+                m_notificationId, QnNotificationLevel::Value::CriticalNotification);
             progressManager->setProgress(
                 m_notificationId, ProgressState::failed);
             progressManager->setTitle(m_notificationId, tr("File downloading failed"));
+            progressManager->setTooltip(m_notificationId, {});
             break;
         default:
             NX_ASSERT(false && "Invalid state change");

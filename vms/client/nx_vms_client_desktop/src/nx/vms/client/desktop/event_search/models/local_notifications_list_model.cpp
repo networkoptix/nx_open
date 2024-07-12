@@ -25,11 +25,11 @@ QString levelDecorationPath(QnNotificationLevel::Value level)
     switch (level)
     {
         case QnNotificationLevel::Value::SuccessNotification:
-            return "20x20/Outline/checkmark.svg";
+            return "20x20/Outline/success.svg";
 
         case QnNotificationLevel::Value::ImportantNotification:
         case QnNotificationLevel::Value::CriticalNotification:
-            return "20x20/Solid/alert2.svg";
+            return "20x20/Outline/warning.svg";
 
         default:
             return {};
@@ -39,10 +39,10 @@ QString levelDecorationPath(QnNotificationLevel::Value level)
 QString progressDecorationPath(ProgressState progress)
 {
     if (progress.isFailed())
-        return "20x20/Solid/alert2.svg";
+        return "20x20/Outline/warning.svg";
 
     if (progress.isCompleted())
-        return "20x20/Outline/checkmark.svg";
+        return "20x20/Outline/success.svg";
 
     return {};
 }
@@ -190,17 +190,7 @@ QVariant LocalNotificationsListModel::data(const QModelIndex& index, int role) c
         }
 
         case Qt::ForegroundRole:
-        {
-            if (const auto progress = manager->progress(notificationId))
-            {
-                return progress->isFailed()
-                    ? QnNotificationLevel::notificationTextColor(
-                        QnNotificationLevel::Value::ImportantNotification)
-                    : QVariant();
-            }
-
             return QnNotificationLevel::notificationTextColor(manager->level(notificationId));
-        }
 
         case Qn::TimeoutRole:
             return manager->isCancellable(notificationId)

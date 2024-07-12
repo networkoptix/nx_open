@@ -2,11 +2,13 @@
 
 #include "system_health_strings_helper.h"
 
+#include <core/resource/camera_resource.h>
 #include <nx/branding.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/string.h>
 #include <nx/vms/client/core/common/utils/cloud_url_helper.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/common/html/html.h>
@@ -15,7 +17,7 @@
 using namespace nx::vms::client;
 using namespace nx::vms::client::desktop;
 
-QString QnSystemHealthStringsHelper::messageTitle(MessageType messageType)
+QString QnSystemHealthStringsHelper::messageShortTitle(MessageType messageType)
 {
     switch (messageType)
     {
@@ -71,48 +73,51 @@ QString QnSystemHealthStringsHelper::messageTitle(MessageType messageType)
     return QString();
 }
 
-QString QnSystemHealthStringsHelper::messageText(MessageType messageType,
-   const QString& resourceName)
+QString QnSystemHealthStringsHelper::messageNotificationTitle(MessageType messageType,
+   const QSet<QnResourcePtr>& resources)
 {
     namespace html = nx::vms::common::html;
 
-    // TODO: #sivanov Elide on the widget level.
-    static const int kMaxNameLength = 30;
-
     switch (messageType)
     {
+        case MessageType::emailIsEmpty:
+            return tr("Email address is not set for your account");
+        case MessageType::showIntercomInformer:
+            return tr("Calling...");
+        case MessageType::showMissedCallInformer:
+            return tr("Missed call");
+        case MessageType::storagesNotConfigured:
+        {
+            return resources.isEmpty()
+                ? tr("Storage is not configured")
+                : tr("Storage is not configured on %n servers", "", resources.size());
+        }
+
+        case MessageType::backupStoragesNotConfigured:
+        {
+            return resources.isEmpty()
+                ? tr("Backup storage is not configured")
+                : tr("Backup storage is not configured on %n servers", "", resources.size());
+        }
+
+        case MessageType::cameraRecordingScheduleIsInvalid:
+        {
+            return resources.isEmpty()
+                ? tr("Recording schedule is invalid")
+                : tr("Recording schedule is invalid on %n cameras", "", resources.size());
+        }
+
         case MessageType::usersEmailIsEmpty:
-            return tr("Email address is not set for user %1")
-                .arg(nx::utils::elideString(resourceName, kMaxNameLength));
+        {
+            return resources.isEmpty()
+                ? tr("Email address is not set")
+                : tr("Email address is not set for %n users", "", resources.size());
+        }
 
         case MessageType::cloudPromo:
         {
-            const bool isLoggedIntoCloud =
-                qnCloudStatusWatcher->status() != core::CloudStatusWatcher::LoggedOut;
-
-            const QString kCloudNameText = html::bold(nx::branding::cloudName());
-            const QString kMessage = isLoggedIntoCloud
-                ? tr("Connect your Site to %1 &mdash; make it accessible from anywhere!",
-                    "%1 is the cloud name (like Nx Cloud)").arg(kCloudNameText)
-                : tr("Check out %1 &mdash; connect to your Site from anywhere!",
-                    "%1 is the cloud name (like Nx Cloud)").arg(kCloudNameText);
-
-            using nx::vms::utils::SystemUri;
-            core::CloudUrlHelper urlHelper(
-                SystemUri::ReferralSource::DesktopClient,
-                SystemUri::ReferralContext::None);
-
-            static const QString kTemplate = QString::fromLatin1(
-                "<style>td {padding-top: %4px; padding-right: %4px}</style>"
-                "<p>%1</p>"
-                "<table cellpadding='0' cellspacing='0'>"
-                "<tr><td>%2</td><td>%3</td></tr>"
-                "</table>");
-
-            return kTemplate.arg(kMessage)
-                .arg(html::link(tr("Learn more"), urlHelper.aboutUrl()))
-                .arg(html::customLink(tr("Connect"), "settings")) //< TODO: Replace to `#settings`.
-                .arg(nx::style::Metrics::kStandardPadding);
+            return tr("Check out %1",
+                    "%1 is the cloud name (like Nx Cloud)").arg(nx::branding::cloudName());
         }
 
         case MessageType::defaultCameraPasswords:
@@ -122,16 +127,57 @@ QString QnSystemHealthStringsHelper::messageText(MessageType messageType,
             return tr("No server has internet access for time synchronization");
 
         case MessageType::remoteArchiveSyncError:
-            return tr("Error occurred during remote archive synchronization");
+            return tr("Remote archive synchronization failed");
+
+        case MessageType::metadataStorageNotSet:
+            return tr("Storage for analytics data is not set on %n Servers", "",
+                resources.size());
+
+        case MessageType::metadataOnSystemStorage:
+        {
+            return resources.isEmpty()
+                ? tr("Site storage is used for analytics data")
+                : tr("Site storage is used for analytics data on %n servers",
+                      "",
+                      resources.size());
+        }
 
         default:
             break;
     }
-    return messageTitle(messageType);
+    return messageShortTitle(messageType);
 }
 
-QString QnSystemHealthStringsHelper::messageTooltip(MessageType messageType,
-    QString resourceName)
+QString QnSystemHealthStringsHelper::messageDescription(MessageType messageType)
+{
+    switch (messageType)
+    {
+        case MessageType::cloudPromo:
+        {
+            using nx::vms::utils::SystemUri;
+            core::CloudUrlHelper urlHelper(
+                SystemUri::ReferralSource::DesktopClient, SystemUri::ReferralContext::None);
+
+            static const QString kTemplate =
+                QString::fromLatin1("<style>td {padding-top: %4px; padding-right: %4px}</style>"
+                                    "<p>%1</p>"
+                                    "<table cellpadding='0' cellspacing='0'>"
+                                    "<tr><td>%2</td><td>%3</td></tr>"
+                                    "</table>");
+
+            return kTemplate.arg(tr("Connect to your Site from anywhere!"))
+                .arg(nx::vms::common::html::link(tr("Learn more"), urlHelper.aboutUrl()))
+                .arg(nx::vms::common::html::customLink(
+                    tr("Connect"), "settings")) //< TODO: #sivanov Replace to `#settings`.
+                .arg(nx::style::Metrics::kStandardPadding);
+        }
+        default:
+            return {};
+    }
+}
+
+QString QnSystemHealthStringsHelper::messageTooltip(
+    MessageType messageType, const QSet<QnResourcePtr>& resources)
 {
     QStringList messageParts;
 
@@ -144,43 +190,56 @@ QString QnSystemHealthStringsHelper::messageTooltip(MessageType messageType,
         case MessageType::defaultCameraPasswords:
             return QString(); //< TODO: #vkutin #sivanov Some tooltip would be nice.
 
+        case MessageType::archiveIntegrityFailed:
+        case MessageType::archiveRebuildFinished:
+        case MessageType::archiveRebuildCanceled:
+            return QString();
+
         case MessageType::storagesNotConfigured:
         case MessageType::backupStoragesNotConfigured:
         case MessageType::metadataStorageNotSet:
             return QString(); //< Server list is displayed separately.
 
         case MessageType::noInternetForTimeSync:
-            return tr("Unable to synchronize time: No internet connection available.");
+            return tr("No online server in the site has internet access for time synchronization.");
 
         case MessageType::emailIsEmpty:
             messageParts << tr("Email address is not set.")
-                << tr("You cannot receive notifications by email.");
+                << tr("You cannot receive Site notifications by email.");
             break;
         case MessageType::smtpIsNotSet:
             messageParts << tr("Email server is not set.")
-                << tr("You cannot receive notifications by email.");
+                << tr("You cannot receive Site notifications by email.");
             break;
         case MessageType::usersEmailIsEmpty:
             messageParts << tr("Some users have not set their email addresses.")
-                << tr("They cannot receive notifications by email.");
-            break;
-        case MessageType::archiveIntegrityFailed:
-            messageParts << resourceName;
+                << tr("They cannot receive Site notifications by email.");
             break;
         case MessageType::noLicenses:
             messageParts << tr("You have no licenses.") << tr("You cannot record video from cameras.");
             break;
-        case MessageType::archiveRebuildFinished:
-            messageParts << tr("Rebuilding archive index is completed on the following Server:") << resourceName;
-            break;
-        case MessageType::archiveRebuildCanceled:
-            messageParts << tr("Rebuilding archive index is canceled by user on the following Server:") << resourceName;
-            break;
         case MessageType::metadataOnSystemStorage:
             messageParts << tr("Analytics data can take up large amounts of space.");
             messageParts << tr("We recommend choosing another location for it instead of the "
-                "system partition.");
+                "site partition.");
             break;
+        case MessageType::cameraRecordingScheduleIsInvalid:
+        {
+            QStringList result;
+            result << tr("Some cameras are set to record in a mode they do not support.");
+            result << ""; //< Additional line break by design.
+
+            for (const auto& cameraResource: resources)
+            {
+                const auto camera = cameraResource.dynamicCast<QnVirtualCameraResource>();
+                if (!NX_ASSERT(camera))
+                    continue;
+
+                result << camera->getName();
+            }
+            return result.join(nx::vms::common::html::kLineBreak);
+        }
+
         default:
             break;
     }
@@ -189,5 +248,25 @@ QString QnSystemHealthStringsHelper::messageTooltip(MessageType messageType,
         return messageParts.join('\n');
 
     /* Description is ended with a dot, title is not. */
-    return messageText(messageType, resourceName) + '.';
+    return messageNotificationTitle(messageType, resources) + '.';
+}
+
+QString QnSystemHealthStringsHelper::resourceText(
+    const QStringList& list, int maxWidth, int maxResourcesLines)
+{
+    if (list.empty())
+        return {};
+
+    QStringList formattedResources;
+    for (int i = 0; i < list.size() && i < maxResourcesLines; ++i)
+        formattedResources.append(nx::utils::elideString(list[i], maxWidth, "(...)"));
+
+    if (list.size() >= maxResourcesLines)
+    {
+        const auto numberOfHiddenResources = list.size() - maxResourcesLines;
+        const auto coloredLine = nx::vms::common::html::colored(
+            tr("+ %n more", "", numberOfHiddenResources), core::colorTheme()->color("light16"));
+        formattedResources.append(coloredLine);
+    }
+    return QString("<html><body>%1</body></html>").arg(formattedResources.join("<br>"));
 }

@@ -91,7 +91,7 @@ void LocalSessionTokenExpirationWatcher::setNotificationTimeLeft(std::chrono::mi
     const auto minutesLeftStr = (timeLeft.count() == 0)
         ? tr("Less than a minute left")
         : tr("%n minutes left", "", timeLeft.count());
-    m_notificationManager->setAdditionalText(*m_notification, minutesLeftStr);
+    m_notificationManager->setDescription(*m_notification, minutesLeftStr);
 }
 
 } // namespace nx::vms::client::desktop

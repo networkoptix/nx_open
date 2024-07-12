@@ -316,9 +316,12 @@ void ClientUpdateManager::Private::notifyUserAboutSuccessfulInstallation()
             .arg(versionUrl, branding::vmsName()),
         /*cancellable*/ true);
     notificationsManager->setIconPath(
-        installationNotificationId, "40x40/Solid/update_complete.svg");
+        installationNotificationId, "20x20/Outline/success.svg");
     notificationsManager->setProgress(
         installationNotificationId, ProgressState::completed);
+    notificationsManager->setLevel(
+        installationNotificationId, QnNotificationLevel::Value::SuccessNotification);
+    notificationsManager->setTooltip(installationNotificationId, {});
     notificationsManager->setAction(installationNotificationId, restartAction);
 }
 
@@ -342,15 +345,16 @@ void ClientUpdateManager::Private::notifyUserAboutClientAutoUpdate()
 
     NX_VERBOSE(this, "Showing a notification about Client-only auto-update feature.");
 
-    autoUpdateFeatureNotificationId = notificationsManager->add(tr("Automatic client updates"),
+    autoUpdateFeatureNotificationId = notificationsManager->add(tr("Client auto-updates"),
         tr("New client-only updates will be installed automatically. "
            "You can change this in the settings."),
         /*cancellable*/ true);
     notificationsManager->setIconPath(
-        autoUpdateFeatureNotificationId, "40x40/Solid/update_auto.svg");
+        autoUpdateFeatureNotificationId, "20x20/Outline/reload.svg");
     notificationsManager->setProgress(
         autoUpdateFeatureNotificationId, ProgressState::completed);
     notificationsManager->setAction(autoUpdateFeatureNotificationId, settingsAction);
+    notificationsManager->setTooltip(autoUpdateFeatureNotificationId, {});
 }
 
 void ClientUpdateManager::Private::disableClientAutoUpdateNofitication()
@@ -389,7 +393,8 @@ void ClientUpdateManager::Private::showErrorNotification(const QString& message)
         notificationsManager->setTitle(errorNotificationId, message);
     }
 
-    notificationsManager->setIconPath(errorNotificationId, "20x20/Solid/alert2.svg?primary=yellow_l");
+    notificationsManager->setLevel(errorNotificationId, QnNotificationLevel::Value::CriticalNotification);
+    notificationsManager->setIconPath(errorNotificationId, "20x20/Outline/warning.svg");
 }
 
 void ClientUpdateManager::Private::hideErrorNotification()
