@@ -25,6 +25,34 @@ namespace {
 
 static const int kZipInstallationTimeoutMs = 30000;
 
+ResultType getApplauncherState()
+{
+    // Try to run applauncher if it is not running.
+    static int lastPingRequest = 0;
+    PingRequest request;
+    request.pingId = ++lastPingRequest;
+    auto start = std::chrono::system_clock::now().time_since_epoch();
+    request.pingStamp = std::chrono::duration_cast<std::chrono::milliseconds>(start).count();
+
+    PingResponse response;
+    ResultType result = sendCommandToApplauncher(request, &response);
+
+    if (result == ResultType::ok)
+    {
+        auto finish = std::chrono::system_clock::now().time_since_epoch();
+        auto delta = std::chrono::duration_cast<std::chrono::milliseconds>(finish - start);
+        NX_DEBUG(NX_SCOPE_TAG, "Applauncher is online, checked in %1 ms.", delta.count());
+        return result;
+    }
+
+    if (result == ResultType::connectError)
+        NX_DEBUG(NX_SCOPE_TAG, "Applauncher is offline.");
+    else
+        NX_DEBUG(NX_SCOPE_TAG, "Error while sending command to applauncher, result: %1", result);
+
+    return result;
+}
+
 } // namespace
 
 ResultType isVersionInstalled(
@@ -183,38 +211,24 @@ ResultType getInstalledVersions(QList<nx::utils::SoftwareVersion>* versions)
     return response.result;
 }
 
-bool checkOnline(bool runWhenOffline)
+bool checkOnline()
 {
-    /* Try to run applauncher if it is not running. */
-    // New online checks, for applauncher with PingRequest
-    static int lastPingRequest = 0;
-    PingRequest request;
-    request.pingId = lastPingRequest++;
-    auto start = std::chrono::system_clock::now().time_since_epoch();
-    request.pingStamp = std::chrono::duration_cast<std::chrono::milliseconds>(start).count();
+    return getApplauncherState() == ResultType::ok;
+}
 
-    PingResponse response;
-    ResultType result = sendCommandToApplauncher(request, &response);
+bool checkOnlineTryToStartIfOffline()
+{
+    const auto result = getApplauncherState();
+
     if (result == ResultType::ok)
-    {
-        auto finish = std::chrono::system_clock::now().time_since_epoch();
-        auto delta = std::chrono::duration_cast<std::chrono::milliseconds>(finish - start);
-        NX_VERBOSE(NX_SCOPE_TAG, "checkOnline(runWhenOffline=%1) checked online status in %d ms",
-            delta.count());
         return true;
-    }
-    else
-    {
-        // Legacy applauncher check, for the versions without PingRequest
-        static const nx::utils::SoftwareVersion anyVersion(3, 0);
-        bool notUsed = false;
-        result = isVersionInstalled(anyVersion, &notUsed);
-        if (result == ResultType::ok)
-            return true;
-    }
 
-    return (result == ResultType::connectError) && runWhenOffline
-        && client::desktop::SelfUpdater::runMinilaucher();
+    if (result != ResultType::connectError)
+        return false;
+
+    NX_DEBUG(NX_SCOPE_TAG, "Trying to start minilauncher.");
+
+    return client::desktop::SelfUpdater::runMinilaucher();
 }
 
 } // namespace nx::vms::applauncher::api

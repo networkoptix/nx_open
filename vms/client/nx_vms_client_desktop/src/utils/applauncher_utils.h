@@ -26,7 +26,8 @@ ResultType restartClient(nx::utils::SoftwareVersion version = {},
     const QString& auth = {},
     const QString& systemUri = {});
 
-bool checkOnline(bool runWhenOffline = true);
+bool checkOnline();
+bool checkOnlineTryToStartIfOffline();
 
 /**
  * Installs client update from a zip file.
