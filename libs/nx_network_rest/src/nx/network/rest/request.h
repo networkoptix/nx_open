@@ -11,9 +11,13 @@ namespace nx::network::rest {
 // TODO: Either make it movable, or `enable_shared_from_this`.
 struct NX_NETWORK_REST_API Request
 {
+private:
+    mutable UserSession mutableUserSession;
+
+public:
     // TODO: These should be private, all data should be available by getters.
     const nx::network::http::Request* const httpRequest = nullptr;
-    UserSession userSession;
+    const UserSession& userSession;
     const nx::network::HostAddress foreignAddress;
     const int serverPort;
     const bool isConnectionSecure;
@@ -128,6 +132,8 @@ struct NX_NETWORK_REST_API Request
         UserAccessData m_origin;
     };
     [[nodiscard]] SystemAccessGuard forceSystemAccess() const;
+
+    void forceSessionAccess(UserAccessData access) const;
 
 private:
     nx::network::http::Method calculateMethod() const;
