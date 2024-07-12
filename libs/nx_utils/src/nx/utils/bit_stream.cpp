@@ -339,6 +339,29 @@ void BitStreamWriter::putBit(uint32_t value)
     putBits(1, value);
 }
 
+void BitStreamWriter::putSignedGolomb(int32_t value)
+{
+    if (value <= 0)
+        putGolomb(-value * 2);
+    else
+        putGolomb(value * 2-1);
+}
+
+void BitStreamWriter::putGolomb(uint32_t value)
+{
+    unsigned maxVal = 0;
+    int x = 1;
+    int nBit = 0;
+    for ( ; maxVal < value; maxVal += x) {
+        x <<= 1;
+        nBit++;
+    }
+
+    putBits(nBit+1, 1);
+    putBits(nBit, value - (x-1));
+}
+
+
 void BitStreamWriter::flushBits(bool finishLastByte)
 {
     if (finishLastByte)

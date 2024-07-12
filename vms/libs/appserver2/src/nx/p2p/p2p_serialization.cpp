@@ -109,9 +109,9 @@ QByteArray serializePeersMessage(
             writer.putBit(isOnline);
             if (isOnline)
             {
-                NALUnit::writeUEGolombCode(writer, record.distance);
+                writer.putGolomb(record.distance);
                 if (record.distance > 0)
-                    NALUnit::writeUEGolombCode(writer, record.firstVia);
+                    writer.putGolomb(record.firstVia);
             }
             else
             {

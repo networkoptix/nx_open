@@ -4,7 +4,7 @@
 
 #include <optional>
 
-#include <nx/codec/hevc/hevc_common.h>
+#include <nx/codec/h265/hevc_common.h>
 #include <nx/media/video_data_packet.h>
 #include <nx/rtp/parsers/rtp_chunk_buffer.h>
 #include <nx/rtp/parsers/rtp_stream_parser.h>
@@ -62,19 +62,19 @@ private:
     Result handlePayload(const uint8_t* payload, int payloadLength);
 
     Result handleSingleNalUnitPacket(
-        const nx::media::hevc::NalUnitHeader* header,
+        const nx::media::h265::NalUnitHeader* header,
         const uint8_t* payload, //< payload is already shifted for header size
         int payloadLength);
     Result handleAggregationPacket(
-        const nx::media::hevc::NalUnitHeader* header,
+        const nx::media::h265::NalUnitHeader* header,
         const uint8_t* payload, //< payload is already shifted for header size
         int payloadLength);
     Result handleFragmentationPacket(
-        const nx::media::hevc::NalUnitHeader* header,
+        const nx::media::h265::NalUnitHeader* header,
         const uint8_t* payload, //< payload is already shifted for header size
         int payloadLength);
     Result handlePaciPacket(
-        const nx::media::hevc::NalUnitHeader* header,
+        const nx::media::h265::NalUnitHeader* header,
         const uint8_t* payload, //< payload is already shifted for header size
         int payloadLength);
 
@@ -88,14 +88,14 @@ private:
     inline void goBackForPayloadHeader(const uint8_t** outPayload, int* outPayloadLength);
 
     void updateNalFlags(
-        nx::media::hevc::NalUnitType header,
+        nx::media::h265::NalUnitType header,
         const uint8_t* payload,
         int payloadLength);
 
     void insertPayloadHeader(
         uint8_t** payloadStart,
         int* payloadLength,
-        nx::media::hevc::NalUnitType unitType,
+        nx::media::h265::NalUnitType unitType,
         uint8_t tid);
 
     int additionalBufferSize() const;
@@ -104,10 +104,10 @@ private:
     void parseFmtp(const QStringList& fmtp);
     bool extractPictureDimensionsFromSps(const uint8_t* buffer, int bufferLength);
     void reset(bool softReset = false); //< Always returns false
-    void addChunk(nx::media::hevc::NalUnitType, int bufferOffset, int payloadLength, bool hasStartCode);
+    void addChunk(nx::media::h265::NalUnitType, int bufferOffset, int payloadLength, bool hasStartCode);
 
     bool isNewFrame(
-        nx::media::hevc::NalUnitType unitType,
+        nx::media::h265::NalUnitType unitType,
         const uint8_t* payload,
         int payloadLength);
 

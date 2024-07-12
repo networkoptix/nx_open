@@ -2,8 +2,10 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/codec/hevc/hevc_common.h>
-#include <nx/codec/hevc/sequence_parameter_set.h>
+#include <nx/codec/h264/sequence_parameter_set.h>
+#include <nx/codec/h264/supplemental_enhancement_information.h>
+#include <nx/codec/h265/hevc_common.h>
+#include <nx/codec/h265/sequence_parameter_set.h>
 #include <nx/codec/nal_units.h>
 
 using SourcePayload = QByteArray;
@@ -31,7 +33,7 @@ TEST(NalUnits, decodeNal)
         const auto result = QByteArray::fromHex(entry.second);
         destination.resize(result.size());
 
-        NALUnit::decodeNAL(
+        nx::media::nal::decodeEpb(
             (const quint8*)source.constData(),
             (const quint8*)source.constData() + source.size(),
             (quint8*)destination.data(),
@@ -43,23 +45,23 @@ TEST(NalUnits, decodeNal)
 
 TEST(NalUnits, h264SEIWrongPayloadSize)
 {
-    SPSUnit sps;
+    nx::media::h264::SequenceParameterSet sps;
     {
-        SEIUnit sei;
+        nx::media::h264::SupplementalEnhancementInformation sei;
         uint8_t data[] =
             {0x26, 0x00, 0x03, 0x34, 0xac, 0x56};
         sei.decodeBuffer(data, data + sizeof(data));
         ASSERT_TRUE(sei.deserialize(sps, 0));
     }
     {
-        SEIUnit sei;
+        nx::media::h264::SupplementalEnhancementInformation sei;
         uint8_t data[] =
             {0x26, 0x00, 0x04, 0x34, 0xac, 0x56};
         sei.decodeBuffer(data, data + sizeof(data));
         ASSERT_FALSE(sei.deserialize(sps, 0));
     }
     {
-        SEIUnit sei;
+        nx::media::h264::SupplementalEnhancementInformation sei;
         uint8_t data[] =
             {0x26, 0x00, 0xFF, 0x01, 0x34, 0xac, 0x56};
         sei.decodeBuffer(data, data + sizeof(data));
@@ -69,7 +71,7 @@ TEST(NalUnits, h264SEIWrongPayloadSize)
 
 TEST(NalUnits, h264SPSWrongResolution)
 {
-    SPSUnit sps;
+    nx::media::h264::SequenceParameterSet sps;
     uint8_t data[] =
         {0x27, 0xf4, 0x00, 0x34, 0xac, 0x56, 0x80, 0x50, 0x05, 0xba, 0x6e, 0x04, 0x04, 0x04, 0x04};
     sps.decodeBuffer(data, data + sizeof(data));
@@ -89,8 +91,8 @@ TEST(NalUnits, hevcDecodeSpsNoCrash)
     for (const auto& entry : kEncodedSps)
     {
         const auto buffer = QByteArray::fromHex(entry.first);
-        nx::media::hevc::SequenceParameterSet sps;
-        const auto result = nx::media::hevc::parseNalUnit(
+        nx::media::h265::SequenceParameterSet sps;
+        const auto result = nx::media::h265::parseNalUnit(
             (const uint8_t*) buffer.constData(), buffer.size(), sps);
         ASSERT_EQ(result, entry.second);
     }

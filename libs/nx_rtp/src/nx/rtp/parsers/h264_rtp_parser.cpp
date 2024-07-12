@@ -2,6 +2,8 @@
 
 #include "h264_rtp_parser.h"
 
+#include <nx/codec/h264/common.h>
+#include <nx/codec/h264/slice_header.h>
 #include <nx/media/ffmpeg_helper.h>
 #include <nx/rtp/rtp.h>
 #include <nx/utils/log/log.h>
@@ -44,8 +46,8 @@ void H264Parser::setSdpInfo(const Sdp::Media& sdp)
                 {
                     QByteArray nal = QByteArray::fromBase64(nalStr.toUtf8());
                     // Some cameras sends extra start code in SPSPSS sdp string.
-                    nal = NALUnit::dropBorderedStartCodes(nal);
-                    if (nal.size() > 0 && NALUnit::decodeType(nal[0]) == nuSPS)
+                    nal = nx::media::nal::dropBorderedStartCodes(nal);
+                    if (nal.size() > 0 && nx::media::h264::decodeType(nal[0]) == nx::media::h264::nuSPS)
                         decodeSpsInfo((uint8_t*)nal.data(), nal.size());
 
                     uint32_t sizeData = htonl(nal.size());
@@ -130,7 +132,7 @@ bool H264Parser::isFirstSliceNal(
     const quint8* data,
     int dataLen ) const
 {
-    bool isSlice = NALUnit::isSliceNal(nalType);
+    bool isSlice = nx::media::h264::isSliceNal(nalType);
     if(!isSlice)
         return false;
 
@@ -152,21 +154,21 @@ bool H264Parser::isFirstSliceNal(
 
 void H264Parser::updateNalFlags(const uint8_t* data, int size)
 {
-    const auto nalUnitType = NALUnit::decodeType(*data);
+    const auto nalUnitType = nx::media::h264::decodeType(*data);
 
-    if (nalUnitType == nuSPS)
+    if (nalUnitType == nx::media::h264::nuSPS)
     {
         m_builtinSpsFound = true;
         decodeSpsInfo(data, size);
     }
-    else if (nalUnitType == nuPPS)
+    else if (nalUnitType == nx::media::h264::nuPPS)
     {
         m_builtinPpsFound = true;
     }
-    else if (NALUnit::isSliceNal(nalUnitType))
+    else if (nx::media::h264::isSliceNal(nalUnitType))
     {
         m_frameExists = true;
-        if (nalUnitType == nuSliceIDR)
+        if (nalUnitType == nx::media::h264::nuSliceIDR)
         {
             m_keyDataExists = true;
             if (m_idrCounter < kMinIdrCountToDetectIFrameByIdr)
@@ -175,7 +177,7 @@ void H264Parser::updateNalFlags(const uint8_t* data, int size)
                     ++m_idrCounter;
             }
         }
-        else if (m_idrCounter < kMinIdrCountToDetectIFrameByIdr && NALUnit::isIFrame(data, size))
+        else if (m_idrCounter < kMinIdrCountToDetectIFrameByIdr && nx::media::h264::isIFrame(data, size))
         {
             m_keyDataExists = true;
         }
@@ -193,25 +195,25 @@ bool H264Parser::isPacketStartsNewFrame(
 
     int nalLen = bufferEnd - curPtr;
 
-    if (packetType == STAP_A_PACKET)
+    if (packetType == nx::media::h264::STAP_A_PACKET)
     {
         if (curPtr + 2 >= bufferEnd)
             return false;
 
         curPtr += 2;
     }
-    else if (packetType == STAP_B_PACKET)
+    else if (packetType == nx::media::h264::STAP_B_PACKET)
     {
         if (curPtr + 4 >= bufferEnd)
             return false;
 
         curPtr += 4;
     }
-    else if (packetType == MTAP16_PACKET || packetType == MTAP24_PACKET)
+    else if (packetType == nx::media::h264::MTAP16_PACKET || packetType == nx::media::h264::MTAP24_PACKET)
     {
         return false;
     }
-    else if (packetType == FU_A_PACKET || packetType == FU_B_PACKET)
+    else if (packetType == nx::media::h264::FU_A_PACKET || packetType == nx::media::h264::FU_B_PACKET)
     {
         if (!(*curPtr & 0x80))
             return false; //< FU_A/B continue packet
@@ -221,15 +223,15 @@ bool H264Parser::isPacketStartsNewFrame(
         curPtr--;
     }
 
-    const auto nalUnitType = NALUnit::decodeType(*curPtr);
-    if (!NALUnit::isSliceNal(nalUnitType))
+    const auto nalUnitType = nx::media::h264::decodeType(*curPtr);
+    if (!nx::media::h264::isSliceNal(nalUnitType))
         return true;
     if (!isFirstSliceNal(nalUnitType, curPtr, nalLen))
         return false;
     if (m_spsInitialized && !m_sps.frame_mbs_only_flag)
     {
         // Interlaced video.
-        SliceUnit slice;
+        nx::media::h264::SliceHeader slice;
         slice.decodeBuffer(curPtr, bufferEnd);
         slice.deserialize(&m_sps, nullptr /*pps*/);
         if (slice.bottom_field_flag)
@@ -267,15 +269,15 @@ Result H264Parser::processData(
     m_lastRtpTime = rtpHeader.getTimestamp();
 
     m_packetPerNal++;
-    uint8_t packetType = NALUnit::decodeType(*curPtr);
+    uint8_t packetType = nx::media::h264::decodeType(*curPtr);
     int nalRefIDC = *curPtr++ & 0xe0;
 
     switch (packetType)
     {
-        case STAP_B_PACKET:
-        case STAP_A_PACKET:
+        case nx::media::h264::STAP_B_PACKET:
+        case nx::media::h264::STAP_A_PACKET:
         {
-            if (packetType == STAP_B_PACKET)
+            if (packetType == nx::media::h264::STAP_B_PACKET)
             {
                 if (bufferEnd-curPtr < 2)
                 {
@@ -306,15 +308,15 @@ Result H264Parser::processData(
             }
             break;
         }
-        case FU_B_PACKET:
-        case FU_A_PACKET:
+        case nx::media::h264::FU_B_PACKET:
+        case nx::media::h264::FU_A_PACKET:
         {
             if (bufferEnd-curPtr < 1)
             {
                 clear();
                 return {false, NX_FMT("Failed to parse RTP packet, invalid FU_A_PACKET")};
             }
-            uint8_t nalUnitType = NALUnit::decodeType(*curPtr); // FU header.
+            uint8_t nalUnitType = nx::media::h264::decodeType(*curPtr); // FU header.
             if (*curPtr & 0x80) // FU_A first packet
             {
                 updateNalFlags(curPtr, bufferEnd - curPtr);
@@ -335,7 +337,7 @@ Result H264Parser::processData(
             }
 
             curPtr++;
-            if (packetType == FU_B_PACKET)
+            if (packetType == nx::media::h264::FU_B_PACKET)
             {
                 if (bufferEnd-curPtr < 2)
                 {
@@ -357,8 +359,8 @@ Result H264Parser::processData(
                 m_packetPerNal == 0);
             break;
         }
-        case MTAP16_PACKET:
-        case MTAP24_PACKET:
+        case nx::media::h264::MTAP16_PACKET:
+        case nx::media::h264::MTAP24_PACKET:
         {
             // Not implemented.
             clear();

@@ -2,7 +2,7 @@
 
 #include "nal_extradata.h"
 
-#include <nx/codec/hevc/hevc_decoder_configuration_record.h>
+#include <nx/codec/h265/hevc_decoder_configuration_record.h>
 #include <nx/codec/nal_units.h>
 #include <nx/utils/log/log.h>
 
@@ -77,7 +77,7 @@ std::vector<uint8_t> readH265SeqHeaderFromExtraData(const uint8_t* extraData, in
     if (!extraData)
         return result;
 
-    nx::media::hevc::HEVCDecoderConfigurationRecord hvcc;
+    nx::media::h265::HEVCDecoderConfigurationRecord hvcc;
     if (!hvcc.read(extraData, extraDataSize))
     {
         NX_WARNING(NX_SCOPE_TAG, "Failed to parse hvcc");

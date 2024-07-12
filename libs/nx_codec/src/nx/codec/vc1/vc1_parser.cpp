@@ -2,7 +2,7 @@
 
 #include "vc1_parser.h"
 
-#include <memory.h>
+#include <memory>
 #include <sstream>
 
 #include <QtCore/QDebug>
@@ -152,7 +152,7 @@ int VC1SequenceHeader::decode_sequence_header()
             res_sm = bitReader.getBits(2); //reserved
             if (res_sm) {
                 qWarning() << "Reserved RES_SM=" << res_sm << " is forbidden";
-                return NALUnit::UNSUPPORTED_PARAM;
+                return UNSUPPORTED_PARAM;
             }
         }
 
@@ -171,19 +171,19 @@ int VC1SequenceHeader::decode_sequence_header()
         fastuvmc = bitReader.getBit();
         if (!profile && !fastuvmc) {
             qWarning() << "FASTUVMC unavailable in Simple Profile";
-            return NALUnit::UNSUPPORTED_PARAM;
+            return UNSUPPORTED_PARAM;
         }
         extended_mv = bitReader.getBit();
         if (!profile && extended_mv) {
             qWarning() << "Extended MVs unavailable in Simple Profile";
-            return NALUnit::UNSUPPORTED_PARAM;
+            return UNSUPPORTED_PARAM;
         }
         dquant = bitReader.getBits(2);
         vstransform = bitReader.getBit();
         int res_transtab = bitReader.getBit();
         if (res_transtab) {
             qWarning() << "1 for reserved RES_TRANSTAB is forbidden\n";
-            return NALUnit::UNSUPPORTED_PARAM;
+            return UNSUPPORTED_PARAM;
         }
         overlap = bitReader.getBit();
         resync_marker = bitReader.getBit();
@@ -224,7 +224,7 @@ int VC1SequenceHeader::decode_sequence_header_adv()
     /*
     if(psf) { //PsF, 6.1.13
         qWarning() << "Progressive Segmented Frame mode: not supported (yet)";
-        return NALUnit::UNSUPPORTED_PARAM;
+        return UNSUPPORTED_PARAM;
     }
     */
     max_b_frames = 7;

@@ -7,13 +7,13 @@
 #include <QtCore/QSize>
 #include <QtCore/QString>
 
-#include <nx/codec/hevc/sequence_parameter_set.h>
+#include <nx/codec/h265/sequence_parameter_set.h>
 #include <nx/media/video_data_packet.h>
 
 namespace nx::media {
 
 NX_MEDIA_CORE_API bool extractSpsH265(
-    const QnCompressedVideoData* videoData, hevc::SequenceParameterSet& sps);
+    const QnCompressedVideoData* videoData, h265::SequenceParameterSet& sps);
 
 NX_MEDIA_CORE_API QSize getFrameSize(const QnCompressedVideoData* frame);
 NX_MEDIA_CORE_API double getDefaultSampleAspectRatio(const QSize& srcSize);

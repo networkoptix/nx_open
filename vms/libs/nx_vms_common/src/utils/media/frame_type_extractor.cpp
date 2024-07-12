@@ -2,6 +2,8 @@
 
 #include "frame_type_extractor.h"
 
+#include <nx/codec/h264/common.h>
+#include <nx/codec/h264/slice_header.h>
 #include <nx/codec/nal_units.h>
 #include <nx/codec/vc1/vc1_parser.h>
 
@@ -77,16 +79,16 @@ FrameTypeExtractor::FrameType FrameTypeExtractor::getH264FrameType(
     while (data < end)
     {
         if (m_dataWithNalPrefixes)
-            data = NALUnit::findNextNAL(data, end);
+            data = nx::media::nal::findNextNAL(data, end);
         else
             data += 4;
         if (data >= end)
             break;
 
-        const auto nalType = NALUnit::decodeType(*data);
-        if (nalType >= nuSliceNonIDR && nalType <= nuSliceIDR)
+        const auto nalType = nx::media::h264::decodeType(*data);
+        if (nalType >= nx::media::h264::nuSliceNonIDR && nalType <= nx::media::h264::nuSliceIDR)
         {
-            if (nalType == nuSliceIDR)
+            if (nalType == nx::media::h264::nuSliceIDR)
                 return I_Frame;
             quint8 nal_ref_idc = (*data >> 5) & 3;
             if (nal_ref_idc)
@@ -101,11 +103,11 @@ FrameTypeExtractor::FrameType FrameTypeExtractor::getH264FrameType(
                 if (slice_type >= 5)
                     slice_type -= 5; //< +5 flag is: all other slices at this picture must be of the same type.
 
-                if (slice_type == SliceUnit::I_TYPE || slice_type == SliceUnit::SI_TYPE)
+                if (slice_type == nx::media::h264::SliceHeader::I_TYPE || slice_type == nx::media::h264::SliceHeader::SI_TYPE)
                     return P_Frame; //< Fake. It is i-frame, but not IDR, so we can't seek to this time and etc.  // I_Frame;
-                else if (slice_type == SliceUnit::P_TYPE || slice_type == SliceUnit::SP_TYPE)
+                else if (slice_type == nx::media::h264::SliceHeader::P_TYPE || slice_type == nx::media::h264::SliceHeader::SP_TYPE)
                     return P_Frame;
-                else if (slice_type == SliceUnit::B_TYPE)
+                else if (slice_type == nx::media::h264::SliceHeader::B_TYPE)
                     return B_Frame;
                 else
                     return UnknownFrameType;
@@ -126,7 +128,7 @@ FrameTypeExtractor::FrameType FrameTypeExtractor::getMpegVideoFrameType(
     const quint8* end = data + size;
     while (data <= end-4 && data[3] > 0x80)
     {
-        data = NALUnit::findNextNAL(data + 4, end);
+        data = nx::media::nal::findNextNAL(data + 4, end);
         if (data == end)
             return UnknownFrameType;
         data -= 3;
@@ -175,7 +177,7 @@ FrameTypeExtractor::FrameType FrameTypeExtractor::getVCFrameType(
     {
         return I_Frame;
 #if 0
-        const quint8* next = NALUnit::findNextNAL(data + 3, data + size);
+        const quint8* next = nx::media::nal::findNextNAL(data + 3, data + size);
         if (next < data+size)
         {
             //m_vcSequence->vc1_unescape_buffer(data + 4, next - (data + 4));
@@ -197,7 +199,7 @@ FrameTypeExtractor::FrameType FrameTypeExtractor::getMpeg4FrameType(
     const quint8* end = data + size;
     while (data <= end - 4 && data[3] != 0xb6)
     {
-        data = NALUnit::findNextNAL(data + 4, end);
+        data = nx::media::nal::findNextNAL(data + 4, end);
         if (data == end)
             return UnknownFrameType;
         data -= 3;

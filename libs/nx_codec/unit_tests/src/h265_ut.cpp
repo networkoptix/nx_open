@@ -2,10 +2,10 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/codec/hevc/hevc_common.h>
-#include <nx/codec/hevc/sequence_parameter_set.h>
+#include <nx/codec/h265/hevc_common.h>
+#include <nx/codec/h265/sequence_parameter_set.h>
 
-using namespace nx::media::hevc;
+using namespace nx::media::h265;
 
 TEST(H265, SpsParse)
 {

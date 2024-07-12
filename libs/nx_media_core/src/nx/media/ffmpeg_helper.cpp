@@ -5,7 +5,7 @@
 #include <QtCore/QBuffer>
 #include <QtCore/QDebug>
 
-#include <nx/codec/hevc/extradata.h>
+#include <nx/codec/h265/extradata.h>
 #include <nx/codec/nal_units.h>
 #include <nx/media/audio/format.h>
 #include <nx/media/av_codec_helper.h>
@@ -117,7 +117,7 @@ CodecParametersPtr QnFfmpegHelper::createVideoCodecParametersMp4(
     if (video->compressionType == AV_CODEC_ID_H264)
         extradata = nx::media::h264::buildExtraDataMp4(nalUnits);
     else if (video->compressionType == AV_CODEC_ID_H265)
-        extradata = nx::media::hevc::buildExtraDataMp4(nalUnits);
+        extradata = nx::media::h265::buildExtraDataMp4(nalUnits);
 
     if (extradata.empty())
     {

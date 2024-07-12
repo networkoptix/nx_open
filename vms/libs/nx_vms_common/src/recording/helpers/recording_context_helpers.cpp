@@ -5,7 +5,7 @@
 #include <QtCore/QDataStream>
 #include <QtCore/QtEndian>
 
-#include <nx/codec/hevc/hevc_common.h>
+#include <nx/codec/h265/hevc_common.h>
 #include <nx/codec/nal_units.h>
 #include <nx/media/ffmpeg_helper.h>
 #include <nx/media/h264_utils.h>

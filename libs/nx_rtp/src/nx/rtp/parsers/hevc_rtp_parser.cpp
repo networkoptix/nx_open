@@ -2,7 +2,7 @@
 
 #include "hevc_rtp_parser.h"
 
-#include <nx/codec/hevc/sequence_parameter_set.h>
+#include <nx/codec/h265/sequence_parameter_set.h>
 #include <nx/codec/nal_units.h>
 #include <nx/media/ffmpeg_helper.h>
 #include <nx/utils/log/assert.h>
@@ -22,10 +22,10 @@ bool isKeyFrame(const uint8_t* data, int64_t size)
     auto nalUnits = nx::media::nal::findNalUnitsMp4(data, size);
     for (const auto& nalu: nalUnits)
     {
-        nx::media::hevc::NalUnitHeader nalHeader;
+        nx::media::h265::NalUnitHeader nalHeader;
         if (nalHeader.decode(nalu.data, nalu.size))
         {
-            if (nx::media::hevc::isRandomAccessPoint(nalHeader.unitType))
+            if (nx::media::h265::isRandomAccessPoint(nalHeader.unitType))
                 return true;
         }
     }
@@ -33,8 +33,6 @@ bool isKeyFrame(const uint8_t* data, int64_t size)
 }
 
 } // namespace
-
-namespace hevc = nx::media::hevc;
 
 HevcParser::HevcParser()
 {
@@ -120,7 +118,7 @@ void HevcParser::parseFmtp(const QStringList& fmtpParams)
         auto parameterSet = QByteArray::fromBase64(param.mid(pos + 1).toUtf8());
         // Some cameras (e.g. DigitalWatchdog)
         // may send extra start code in parameter set SDP string.
-        parameterSet = NALUnit::dropBorderedStartCodes(parameterSet);
+        parameterSet = nx::media::nal::dropBorderedStartCodes(parameterSet);
         if (param.startsWith(kSdpVpsPrefix))
         {
             m_context.vps = parameterSet;
@@ -146,7 +144,7 @@ Result HevcParser::handlePayload(const uint8_t* payload, int payloadLength)
     if (payloadLength <= 0)
         return {false, "Not enough data in RTP payload"};
 
-    hevc::NalUnitHeader packetHeader;
+    nx::media::h265::NalUnitHeader packetHeader;
     QString errorString;
     if (!packetHeader.decode(payload, payloadLength, &errorString))
     {
@@ -156,23 +154,23 @@ Result HevcParser::handlePayload(const uint8_t* payload, int payloadLength)
     updateNalFlags(packetHeader.unitType, payload, payloadLength);
     skipPayloadHeader(&payload, &payloadLength);
 
-    auto packetType = hevc::fromNalUnitTypeToPacketType(packetHeader.unitType);
+    auto packetType = nx::media::h265::fromNalUnitTypeToPacketType(packetHeader.unitType);
     switch (packetType)
     {
-        case hevc::PacketType::singleNalUnitPacket:
+        case nx::media::h265::PacketType::singleNalUnitPacket:
             return handleSingleNalUnitPacket(&packetHeader, payload, payloadLength);
-        case hevc::PacketType::fragmentationPacket:
+        case nx::media::h265::PacketType::fragmentationPacket:
             return handleFragmentationPacket(&packetHeader, payload, payloadLength);
-        case hevc::PacketType::aggregationPacket:
+        case nx::media::h265::PacketType::aggregationPacket:
             return handleAggregationPacket(&packetHeader, payload, payloadLength);
-        case hevc::PacketType::paciPacket:
+        case nx::media::h265::PacketType::paciPacket:
             return handlePaciPacket(&packetHeader, payload, payloadLength);
         default:
             return {false, NX_FMT("Unknown packet type %1", (int) packetType)};
     }
 }
 
-bool HevcParser::isNewFrame(hevc::NalUnitType unitType, const uint8_t* payload, int payloadLength)
+bool HevcParser::isNewFrame(nx::media::h265::NalUnitType unitType, const uint8_t* payload, int payloadLength)
 {
     const uint8_t* data = payload;
     const uint8_t* dataEnd = payload + payloadLength;
@@ -181,7 +179,7 @@ bool HevcParser::isNewFrame(hevc::NalUnitType unitType, const uint8_t* payload, 
     bool result = false;
     while (data < dataEnd)
     {
-        if (hevc::isNewAccessUnit(unitType))
+        if (nx::media::h265::isNewAccessUnit(unitType))
         {
             if (m_frameStartFound)
             {
@@ -189,7 +187,7 @@ bool HevcParser::isNewFrame(hevc::NalUnitType unitType, const uint8_t* payload, 
                 result = true;
             }
         }
-        else if (hevc::isSlice(unitType))
+        else if (nx::media::h265::isSlice(unitType))
         {
             int first_slice_segment_in_pic_flag = data[2] & 0x80;
             if (first_slice_segment_in_pic_flag)
@@ -206,8 +204,8 @@ bool HevcParser::isNewFrame(hevc::NalUnitType unitType, const uint8_t* payload, 
             }
             return result;
         }
-        data = NALUnit::findNextNAL(data, dataEnd);
-        hevc::NalUnitHeader nalHeader;
+        data = nx::media::nal::findNextNAL(data, dataEnd);
+        nx::media::h265::NalUnitHeader nalHeader;
         if (data < dataEnd && !nalHeader.decode(data, dataEnd - data))
             return false;
         unitType = nalHeader.unitType;
@@ -216,7 +214,7 @@ bool HevcParser::isNewFrame(hevc::NalUnitType unitType, const uint8_t* payload, 
 }
 
 void HevcParser::addChunk(
-    nx::media::hevc::NalUnitType unitType, int bufferOffset, int payloadLength, bool hasStartCode)
+    nx::media::h265::NalUnitType unitType, int bufferOffset, int payloadLength, bool hasStartCode)
 {
     const uint8_t* payload = m_rtpBufferBase + bufferOffset;
 
@@ -231,7 +229,7 @@ void HevcParser::addChunk(
 }
 
 Result HevcParser::handleSingleNalUnitPacket(
-    const hevc::NalUnitHeader* header,
+    const nx::media::h265::NalUnitHeader* header,
     const uint8_t* payload,
     int payloadLength)
 {
@@ -254,10 +252,10 @@ Result HevcParser::handleSingleNalUnitPacket(
     }
 
     updateNalFlags(header->unitType, payload, payloadLength);
-    if (header->unitType == hevc::NalUnitType::spsNut)
+    if (header->unitType == nx::media::h265::NalUnitType::spsNut)
     {
-        hevc::SequenceParameterSet sps;
-        if (!nx::media::hevc::parseNalUnit(payload, payloadLength, sps))
+        nx::media::h265::SequenceParameterSet sps;
+        if (!nx::media::h265::parseNalUnit(payload, payloadLength, sps))
             return {false, "Failed to parse SPS"};
         m_context.width = sps.width;
         m_context.height = sps.height;
@@ -268,7 +266,7 @@ Result HevcParser::handleSingleNalUnitPacket(
 }
 
 Result HevcParser::handleAggregationPacket(
-    const hevc::NalUnitHeader* /*header*/,
+    const nx::media::h265::NalUnitHeader* /*header*/,
     const uint8_t* payload,
     int payloadLength)
 {
@@ -282,10 +280,10 @@ Result HevcParser::handleAggregationPacket(
         payload += 2; //< Skip size field.
         payloadLength -= 2;
 
-        if (payloadLength < nalSize || nalSize < hevc::NalUnitHeader::kTotalLength)
+        if (payloadLength < nalSize || nalSize < nx::media::h265::NalUnitHeader::kTotalLength)
             return {false, NX_FMT("Invalid payload length %1", payloadLength)};
 
-        hevc::NalUnitHeader nalHeader;
+        nx::media::h265::NalUnitHeader nalHeader;
         if (!nalHeader.decode(payload, payloadLength))
             return {false, "Can't decode nal header"};
 
@@ -307,11 +305,11 @@ Result HevcParser::handleAggregationPacket(
 }
 
 Result HevcParser::handleFragmentationPacket(
-    const hevc::NalUnitHeader* header,
+    const nx::media::h265::NalUnitHeader* header,
     const uint8_t* payload,
     int payloadLength)
 {
-    hevc::FuHeader fuHeader;
+    nx::media::h265::FuHeader fuHeader;
     if(!fuHeader.decode(payload, payloadLength))
         return {false, "Can't decode FU header"};
 
@@ -340,7 +338,7 @@ Result HevcParser::handleFragmentationPacket(
 }
 
 Result HevcParser::handlePaciPacket(
-    const nx::media::hevc::NalUnitHeader* /*header*/,
+    const nx::media::h265::NalUnitHeader* /*header*/,
     const uint8_t* /*payload*/,
     int /*payloadLength*/)
 {
@@ -364,41 +362,41 @@ bool HevcParser::skipDonIfNeeded(
 
 void HevcParser::skipPayloadHeader(const uint8_t** outPayload, int* outPayloadLength)
 {
-    *outPayload += hevc::NalUnitHeader::kTotalLength;
-    *outPayloadLength -= hevc::NalUnitHeader::kTotalLength;
+    *outPayload += nx::media::h265::NalUnitHeader::kTotalLength;
+    *outPayloadLength -= nx::media::h265::NalUnitHeader::kTotalLength;
 }
 
 void HevcParser::skipFuHeader(const uint8_t** outPayload, int* outPayloadLength)
 {
-    *outPayload += hevc::FuHeader::kTotalLength;
-    *outPayloadLength -= hevc::FuHeader::kTotalLength;
+    *outPayload += nx::media::h265::FuHeader::kTotalLength;
+    *outPayloadLength -= nx::media::h265::FuHeader::kTotalLength;
 }
 
 void HevcParser::goBackForPayloadHeader(const uint8_t** outPayload, int* outPayloadLength)
 {
-    *outPayload -= hevc::NalUnitHeader::kTotalLength;
-    *outPayloadLength += hevc::NalUnitHeader::kTotalLength;
+    *outPayload -= nx::media::h265::NalUnitHeader::kTotalLength;
+    *outPayloadLength += nx::media::h265::NalUnitHeader::kTotalLength;
 }
 
 void HevcParser::updateNalFlags(
-    hevc::NalUnitType unitType,
+    nx::media::h265::NalUnitType unitType,
     const uint8_t* payload,
     int payloadLength)
 {
-    if (unitType == hevc::NalUnitType::vpsNut)
+    if (unitType == nx::media::h265::NalUnitType::vpsNut)
     {
         m_context.inStreamVpsFound = true;
     }
-    else if (unitType == hevc::NalUnitType::spsNut)
+    else if (unitType == nx::media::h265::NalUnitType::spsNut)
     {
         m_context.inStreamSpsFound = true;
         extractPictureDimensionsFromSps(payload, payloadLength);
     }
-    else if (unitType == hevc::NalUnitType::ppsNut)
+    else if (unitType == nx::media::h265::NalUnitType::ppsNut)
     {
         m_context.inStreamPpsFound = true;
     }
-    else if(hevc::isRandomAccessPoint(unitType))
+    else if(nx::media::h265::isRandomAccessPoint(unitType))
     {
         m_context.keyDataFound = true;
     }
@@ -456,8 +454,8 @@ void HevcParser::reset(bool softReset)
 
 bool HevcParser::extractPictureDimensionsFromSps(const uint8_t* buffer, int bufferLength)
 {
-    hevc::SequenceParameterSet sps;
-    if (!nx::media::hevc::parseNalUnit(buffer, bufferLength, sps))
+    nx::media::h265::SequenceParameterSet sps;
+    if (!nx::media::h265::parseNalUnit(buffer, bufferLength, sps))
         return false;
 
     m_context.width = sps.width;
@@ -469,11 +467,11 @@ bool HevcParser::extractPictureDimensionsFromSps(const uint8_t* buffer, int buff
 void HevcParser::insertPayloadHeader(
     uint8_t** payloadStart,
     int* payloadLength,
-    nx::media::hevc::NalUnitType unitType,
+    nx::media::h265::NalUnitType unitType,
     uint8_t tid)
 {
-    *payloadStart -= hevc::NalUnitHeader::kTotalLength;
-    *payloadLength += hevc::NalUnitHeader::kTotalLength;
+    *payloadStart -= nx::media::h265::NalUnitHeader::kTotalLength;
+    *payloadLength += nx::media::h265::NalUnitHeader::kTotalLength;
     (*payloadStart)[0] = ((uint8_t)unitType) << 1;
     (*payloadStart)[1] = tid;
 }

@@ -710,7 +710,7 @@ begin_label:
             bool isKeyFrame = false;
             if (videoData)
             {
-                isKeyFrame = m_currentData->flags  & AV_PKT_FLAG_KEY;
+                isKeyFrame = m_currentData->flags & AV_PKT_FLAG_KEY;
                 if (videoData->context)
                 {
                     if (m_frameTypeExtractor == 0 || videoData->context.get() != m_frameTypeExtractor->getContext().get())
