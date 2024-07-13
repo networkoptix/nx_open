@@ -7443,14 +7443,6 @@ We recommend you not to open this web page. If you understand the risks, you can
         <translation></translation>
     </message>
     <message>
-        <source>Mute</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Unmute</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Open Door</source>
         <translation></translation>
     </message>
