@@ -7395,14 +7395,6 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
   <context>
     <name>nx::vms::client::desktop::CameraButtonController</name>
     <message>
-      <source>Mute</source>
-      <translation>Mute</translation>
-    </message>
-    <message>
-      <source>Unmute</source>
-      <translation>Tidak mute</translation>
-    </message>
-    <message>
       <source>Heater</source>
       <translation>Heater</translation>
     </message>

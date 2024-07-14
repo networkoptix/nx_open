@@ -7522,14 +7522,6 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
   <context>
     <name>nx::vms::client::desktop::CameraButtonController</name>
     <message>
-      <source>Mute</source>
-      <translation>Demp</translation>
-    </message>
-    <message>
-      <source>Unmute</source>
-      <translation>Skru av demping</translation>
-    </message>
-    <message>
       <source>Heater</source>
       <translation>Varmeapparat</translation>
     </message>

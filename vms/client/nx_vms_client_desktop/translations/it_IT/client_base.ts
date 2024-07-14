@@ -7522,14 +7522,6 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
   <context>
     <name>nx::vms::client::desktop::CameraButtonController</name>
     <message>
-      <source>Mute</source>
-      <translation type="unfinished">Mute</translation>
-    </message>
-    <message>
-      <source>Unmute</source>
-      <translation type="unfinished">Unmute</translation>
-    </message>
-    <message>
       <source>Heater</source>
       <translation type="unfinished">Heater</translation>
     </message>

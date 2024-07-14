@@ -7522,14 +7522,6 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
   <context>
     <name>nx::vms::client::desktop::CameraButtonController</name>
     <message>
-      <source>Mute</source>
-      <translation>Dempen</translation>
-    </message>
-    <message>
-      <source>Unmute</source>
-      <translation>Dempen opheffen</translation>
-    </message>
-    <message>
       <source>Heater</source>
       <translation>Verwarming</translation>
     </message>

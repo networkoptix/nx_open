@@ -7522,14 +7522,6 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
   <context>
     <name>nx::vms::client::desktop::CameraButtonController</name>
     <message>
-      <source>Mute</source>
-      <translation>Tysta</translation>
-    </message>
-    <message>
-      <source>Unmute</source>
-      <translation>Ljud på</translation>
-    </message>
-    <message>
       <source>Heater</source>
       <translation>Värmare</translation>
     </message>

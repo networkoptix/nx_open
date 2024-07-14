@@ -7522,14 +7522,6 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
   <context>
     <name>nx::vms::client::desktop::CameraButtonController</name>
     <message>
-      <source>Mute</source>
-      <translation>Stumm</translation>
-    </message>
-    <message>
-      <source>Unmute</source>
-      <translation>Stummschaltung aufheben</translation>
-    </message>
-    <message>
       <source>Heater</source>
       <translation>Heizung</translation>
     </message>

@@ -7522,14 +7522,6 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
   <context>
     <name>nx::vms::client::desktop::CameraButtonController</name>
     <message>
-      <source>Mute</source>
-      <translation>Muet</translation>
-    </message>
-    <message>
-      <source>Unmute</source>
-      <translation>Rétablir le son</translation>
-    </message>
-    <message>
       <source>Heater</source>
       <translation>Chauffage</translation>
     </message>

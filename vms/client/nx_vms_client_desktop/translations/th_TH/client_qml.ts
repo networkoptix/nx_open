@@ -984,7 +984,7 @@
     <name>GroupsComboBox</name>
     <message>
       <source>Select</source>
-      <translation type="unfinished">Select</translation>
+      <translation>เลือก</translation>
     </message>
     <message>
       <source>Search</source>
@@ -2071,7 +2071,7 @@ Press Alt + Click to follow object</source>
     </message>
     <message>
       <source>Select</source>
-      <translation type="unfinished">Select</translation>
+      <translation>เลือก</translation>
     </message>
     <message>
       <source>Cancel</source>
