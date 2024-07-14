@@ -7395,14 +7395,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::CameraButtonController</name>
     <message>
-      <source>Mute</source>
-      <translation>靜音</translation>
-    </message>
-    <message>
-      <source>Unmute</source>
-      <translation>取消靜音</translation>
-    </message>
-    <message>
       <source>Heater</source>
       <translation>加熱器</translation>
     </message>

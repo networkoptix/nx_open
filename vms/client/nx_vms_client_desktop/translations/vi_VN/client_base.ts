@@ -7394,14 +7394,6 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
   <context>
     <name>nx::vms::client::desktop::CameraButtonController</name>
     <message>
-      <source>Mute</source>
-      <translation>Tắt tiếng</translation>
-    </message>
-    <message>
-      <source>Unmute</source>
-      <translation>Bật tiếng</translation>
-    </message>
-    <message>
       <source>Heater</source>
       <translation>Sưởi</translation>
     </message>

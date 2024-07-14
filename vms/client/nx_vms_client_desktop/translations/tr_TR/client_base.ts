@@ -7520,14 +7520,6 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
   <context>
     <name>nx::vms::client::desktop::CameraButtonController</name>
     <message>
-      <source>Mute</source>
-      <translation>Sessiz</translation>
-    </message>
-    <message>
-      <source>Unmute</source>
-      <translation>Sesi aç</translation>
-    </message>
-    <message>
       <source>Heater</source>
       <translation>Isıtıcı</translation>
     </message>

@@ -120,7 +120,7 @@
     </message>
     <message>
       <source>Toggle Mute</source>
-      <translation type="unfinished">Toggle Mute</translation>
+      <translation>Alternar silencio</translation>
     </message>
     <message>
       <source>Close Page</source>
@@ -195,7 +195,7 @@
     </message>
     <message>
       <source>Toggle Mute</source>
-      <translation type="unfinished">Toggle Mute</translation>
+      <translation>Alternar silencio</translation>
     </message>
     <message>
       <source>Close Page</source>

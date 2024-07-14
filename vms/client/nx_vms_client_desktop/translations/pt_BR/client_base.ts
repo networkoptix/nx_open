@@ -7522,14 +7522,6 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
   <context>
     <name>nx::vms::client::desktop::CameraButtonController</name>
     <message>
-      <source>Mute</source>
-      <translation>Mudo</translation>
-    </message>
-    <message>
-      <source>Unmute</source>
-      <translation>Restaurar Som</translation>
-    </message>
-    <message>
       <source>Heater</source>
       <translation>Aquecedor</translation>
     </message>

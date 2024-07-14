@@ -7521,14 +7521,6 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
   <context>
     <name>nx::vms::client::desktop::CameraButtonController</name>
     <message>
-      <source>Mute</source>
-      <translation>Silenciar</translation>
-    </message>
-    <message>
-      <source>Unmute</source>
-      <translation>Activar sonido</translation>
-    </message>
-    <message>
       <source>Heater</source>
       <translation>Calentador</translation>
     </message>
