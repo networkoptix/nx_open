@@ -7453,14 +7453,6 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
       <translation>Essuie-glaces</translation>
     </message>
     <message>
-      <source>Mute</source>
-      <translation>Muet</translation>
-    </message>
-    <message>
-      <source>Unmute</source>
-      <translation>Rétablir le son</translation>
-    </message>
-    <message>
       <source>Open Door</source>
       <translation>Ouvrir la porte</translation>
     </message>

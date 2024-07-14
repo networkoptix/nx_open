@@ -7339,14 +7339,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>와이퍼</translation>
     </message>
     <message>
-      <source>Mute</source>
-      <translation type="unfinished">Mute</translation>
-    </message>
-    <message>
-      <source>Unmute</source>
-      <translation type="unfinished">Unmute</translation>
-    </message>
-    <message>
       <source>Open Door</source>
       <translation type="unfinished">Open Door</translation>
     </message>

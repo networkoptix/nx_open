@@ -7451,14 +7451,6 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
       <translation>Limpiaparabrisas</translation>
     </message>
     <message>
-      <source>Mute</source>
-      <translation>Silenciar</translation>
-    </message>
-    <message>
-      <source>Unmute</source>
-      <translation>Activar sonido</translation>
-    </message>
-    <message>
       <source>Open Door</source>
       <translation>Abrir Puerta</translation>
     </message>

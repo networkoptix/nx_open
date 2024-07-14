@@ -7452,14 +7452,6 @@ Recomendamos que você não abra esta página da ‘web’. Se você entender os
       <translation>Limpador</translation>
     </message>
     <message>
-      <source>Mute</source>
-      <translation>Mudo</translation>
-    </message>
-    <message>
-      <source>Unmute</source>
-      <translation>Restaurar Som</translation>
-    </message>
-    <message>
       <source>Open Door</source>
       <translation type="unfinished">Open Door</translation>
     </message>

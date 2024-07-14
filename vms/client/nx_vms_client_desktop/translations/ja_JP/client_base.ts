@@ -7338,14 +7338,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>ワイパー</translation>
     </message>
     <message>
-      <source>Mute</source>
-      <translation>ミュート</translation>
-    </message>
-    <message>
-      <source>Unmute</source>
-      <translation>ミュート解除</translation>
-    </message>
-    <message>
       <source>Open Door</source>
       <translation>ドアを開ける</translation>
     </message>

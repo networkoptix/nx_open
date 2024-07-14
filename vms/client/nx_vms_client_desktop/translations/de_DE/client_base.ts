@@ -7449,14 +7449,6 @@ Wir empfehlen Ihnen, diese Webseite nicht zu öffnen. Wenn Sie die Risiken verst
       <translation>Wischer</translation>
     </message>
     <message>
-      <source>Mute</source>
-      <translation>Stumm</translation>
-    </message>
-    <message>
-      <source>Unmute</source>
-      <translation>Stummschaltung aufheben</translation>
-    </message>
-    <message>
       <source>Open Door</source>
       <translation type="unfinished">Open Door</translation>
     </message>

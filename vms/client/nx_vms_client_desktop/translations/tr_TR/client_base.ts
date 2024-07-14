@@ -7446,14 +7446,6 @@ Bu web sayfasını açmamanızı öneririz. Riskleri anlıyorsanız web sayfası
       <translation>Silecek</translation>
     </message>
     <message>
-      <source>Mute</source>
-      <translation>Sessiz</translation>
-    </message>
-    <message>
-      <source>Unmute</source>
-      <translation>Sesi aç</translation>
-    </message>
-    <message>
       <source>Open Door</source>
       <translation>Kapıyı Aç</translation>
     </message>

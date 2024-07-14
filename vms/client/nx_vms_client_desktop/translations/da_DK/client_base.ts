@@ -7452,14 +7452,6 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
       <translation>Visker</translation>
     </message>
     <message>
-      <source>Mute</source>
-      <translation type="unfinished">Mute</translation>
-    </message>
-    <message>
-      <source>Unmute</source>
-      <translation type="unfinished">Unmute</translation>
-    </message>
-    <message>
       <source>Open Door</source>
       <translation type="unfinished">Open Door</translation>
     </message>

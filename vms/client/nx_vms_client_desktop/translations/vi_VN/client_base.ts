@@ -7337,14 +7337,6 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
       <translation>Cần gạt</translation>
     </message>
     <message>
-      <source>Mute</source>
-      <translation>Tắt tiếng</translation>
-    </message>
-    <message>
-      <source>Unmute</source>
-      <translation>Bật tiếng</translation>
-    </message>
-    <message>
       <source>Open Door</source>
       <translation>Mở Cửa</translation>
     </message>

@@ -7340,14 +7340,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>雨刷</translation>
     </message>
     <message>
-      <source>Mute</source>
-      <translation>靜音</translation>
-    </message>
-    <message>
-      <source>Unmute</source>
-      <translation>取消靜音</translation>
-    </message>
-    <message>
       <source>Open Door</source>
       <translation>開門</translation>
     </message>

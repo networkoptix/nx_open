@@ -429,7 +429,7 @@
     </message>
     <message>
       <source>Bookmark Log</source>
-      <translation type="unfinished">Bookmark Log</translation>
+      <translation>Rexistro de marcadores</translation>
     </message>
     <message>
       <source>Clear Filter</source>
@@ -1287,7 +1287,7 @@
     <name>ExportSettingsDialog</name>
     <message>
       <source>Export Video</source>
-      <translation type="unfinished">Export Video</translation>
+      <translation>Exportar vídeo</translation>
     </message>
     <message>
       <source>Single Camera</source>
@@ -1880,7 +1880,7 @@
     </message>
     <message>
       <source>Download complete!</source>
-      <translation type="unfinished">Download complete!</translation>
+      <translation>Descarga completada!</translation>
     </message>
     <message>
       <source>Failed to save logs to the selected folder</source>
@@ -2050,7 +2050,7 @@
     <name>NewVirtualCameraDialog</name>
     <message>
       <source>New Virtual Camera...</source>
-      <translation type="unfinished">New Virtual Camera...</translation>
+      <translation>Nova cámara virtual...</translation>
     </message>
     <message>
       <source>To server</source>
@@ -2415,7 +2415,7 @@
     </message>
     <message>
       <source>Play</source>
-      <translation type="unfinished">Play</translation>
+      <translation>Reproducir</translation>
     </message>
     <message>
       <source>Add...</source>
@@ -3314,11 +3314,11 @@
     </message>
     <message>
       <source>Upload File...</source>
-      <translation type="unfinished">Upload File...</translation>
+      <translation>Cargar ficheiro...</translation>
     </message>
     <message>
       <source>Upload Folder...</source>
-      <translation type="unfinished">Upload Folder...</translation>
+      <translation>Cargar cartafol...</translation>
     </message>
   </context>
   <context>

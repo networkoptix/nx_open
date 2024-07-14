@@ -7669,14 +7669,6 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
       <translation>Wycieraczka</translation>
     </message>
     <message>
-      <source>Mute</source>
-      <translation>Wyciszenie</translation>
-    </message>
-    <message>
-      <source>Unmute</source>
-      <translation>Włącz dźwięk</translation>
-    </message>
-    <message>
       <source>Open Door</source>
       <translation>Otwórz drzwi</translation>
     </message>

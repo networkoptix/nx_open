@@ -7675,14 +7675,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>Стеклоочиститель</translation>
     </message>
     <message>
-      <source>Mute</source>
-      <translation>Без звука</translation>
-    </message>
-    <message>
-      <source>Unmute</source>
-      <translation>Включить звук</translation>
-    </message>
-    <message>
       <source>Open Door</source>
       <translation type="unfinished">Open Door</translation>
     </message>

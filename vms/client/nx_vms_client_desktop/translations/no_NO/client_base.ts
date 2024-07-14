@@ -7453,14 +7453,6 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
       <translation>Vindusvisker</translation>
     </message>
     <message>
-      <source>Mute</source>
-      <translation>Demp</translation>
-    </message>
-    <message>
-      <source>Unmute</source>
-      <translation>Skru av demping</translation>
-    </message>
-    <message>
       <source>Open Door</source>
       <translation>Åpen dør</translation>
     </message>

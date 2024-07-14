@@ -7453,14 +7453,6 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
       <translation>Torkare</translation>
     </message>
     <message>
-      <source>Mute</source>
-      <translation>Tysta</translation>
-    </message>
-    <message>
-      <source>Unmute</source>
-      <translation>Ljud på</translation>
-    </message>
-    <message>
       <source>Open Door</source>
       <translation>Öppna dörr</translation>
     </message>

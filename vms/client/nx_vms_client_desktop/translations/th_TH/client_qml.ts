@@ -1099,7 +1099,7 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>Select</source>
-      <translation type="unfinished">Select</translation>
+      <translation>เลือก</translation>
     </message>
     <message>
       <source>Cancel</source>

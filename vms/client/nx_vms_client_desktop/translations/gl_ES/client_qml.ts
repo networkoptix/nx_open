@@ -562,7 +562,7 @@
     <name>IntervalPreviewControls</name>
     <message>
       <source>Toggle Mute</source>
-      <translation type="unfinished">Toggle Mute</translation>
+      <translation>Alternar silencio</translation>
     </message>
     <message>
       <source>Previous Object</source>
@@ -570,11 +570,11 @@
     </message>
     <message>
       <source>Pause</source>
-      <translation type="unfinished">Pause</translation>
+      <translation>Pausa</translation>
     </message>
     <message>
       <source>Play</source>
-      <translation type="unfinished">Play</translation>
+      <translation>Reproducir</translation>
     </message>
     <message>
       <source>Next Object</source>

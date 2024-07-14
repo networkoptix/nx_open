@@ -3993,9 +3993,9 @@ to %1</translation>
     </message>
     <message numerus="yes">
       <source>%n channels.</source>
-      <translation type="unfinished">
-        <numerusform>%n channels.</numerusform>
-        <numerusform>%n channels.</numerusform>
+      <translation>
+        <numerusform>%n canles.</numerusform>
+        <numerusform>%n canles.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -4262,7 +4262,7 @@ to %1</translation>
     </message>
     <message>
       <source>Virtual Camera</source>
-      <translation type="unfinished">Virtual Camera</translation>
+      <translation>Cámara virtual</translation>
     </message>
     <message>
       <source>Virtual Camera %1</source>
@@ -5655,7 +5655,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Some cameras require passwords to be set</source>
-      <translation type="unfinished">Some cameras require passwords to be set</translation>
+      <translation>Algunhas cámaras requiren que se establezan contrasinais</translation>
     </message>
     <message>
       <source>No server has internet access for time synchronization</source>
@@ -6020,7 +6020,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Email is not valid.</source>
-      <translation type="unfinished">Email is not valid.</translation>
+      <translation>O correo electrónico non é válido.</translation>
     </message>
     <message>
       <source>Password cannot be empty.</source>
@@ -7451,14 +7451,6 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Wiper</source>
       <translation>Limpador</translation>
-    </message>
-    <message>
-      <source>Mute</source>
-      <translation>Silenciar</translation>
-    </message>
-    <message>
-      <source>Unmute</source>
-      <translation>Cancelar silencio</translation>
     </message>
     <message>
       <source>Open Door</source>
@@ -10932,11 +10924,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::TimestampOverlaySettingsWidget</name>
     <message>
       <source>Long</source>
-      <translation type="unfinished">Long</translation>
+      <translation>Longo</translation>
     </message>
     <message>
       <source>Short</source>
-      <translation type="unfinished">Short</translation>
+      <translation>Curto</translation>
     </message>
   </context>
   <context>
@@ -12173,7 +12165,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Previous Frame</source>
-      <translation type="unfinished">Previous Frame</translation>
+      <translation>Fotograma anterior</translation>
     </message>
     <message>
       <source>Speed Up</source>
@@ -12181,7 +12173,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Next Frame</source>
-      <translation type="unfinished">Next Frame</translation>
+      <translation>Fotograma seguinte</translation>
     </message>
     <message>
       <source>Previous Chunk</source>
@@ -12189,7 +12181,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>To Start</source>
-      <translation type="unfinished">To Start</translation>
+      <translation>Para comezar</translation>
     </message>
     <message>
       <source>Next Chunk</source>
@@ -12197,7 +12189,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>To End</source>
-      <translation type="unfinished">To End</translation>
+      <translation>Para rematar</translation>
     </message>
     <message>
       <source>Rewind is not available for VMAX</source>

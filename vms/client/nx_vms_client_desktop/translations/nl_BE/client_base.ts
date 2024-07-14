@@ -7449,14 +7449,6 @@ We raden u aan deze webpagina niet te openen. Als u de risico's begrijpt, kunt u
       <translation>Ruitenwissers</translation>
     </message>
     <message>
-      <source>Mute</source>
-      <translation>Dempen</translation>
-    </message>
-    <message>
-      <source>Unmute</source>
-      <translation>Dempen opheffen</translation>
-    </message>
-    <message>
       <source>Open Door</source>
       <translation type="unfinished">Open Door</translation>
     </message>

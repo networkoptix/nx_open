@@ -7342,14 +7342,6 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
       <translation>Wiper</translation>
     </message>
     <message>
-      <source>Mute</source>
-      <translation>Mute</translation>
-    </message>
-    <message>
-      <source>Unmute</source>
-      <translation>Tidak mute</translation>
-    </message>
-    <message>
       <source>Open Door</source>
       <translation>Buka Pintu</translation>
     </message>
