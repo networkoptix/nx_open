@@ -67,6 +67,17 @@ public:
     }
 };
 
+class RequestPathFetcher
+{
+public:
+    using type = std::string;
+
+    type operator()(const network::http::RequestContext& requestContext) const
+    {
+        return requestContext.request.requestLine.url.path().toStdString();
+    }
+};
+
 /**
  * Fetches request header with the given name.
  * If there are multiple headers with the same name present, the first one is returned.

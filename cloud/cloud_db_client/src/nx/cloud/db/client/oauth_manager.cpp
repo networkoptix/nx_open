@@ -19,14 +19,26 @@ std::chrono::seconds OauthManager::lastServerTime() const
     return std::chrono::ceil<std::chrono::seconds>(m_requestsExecutor->lastResponseTime());
 }
 
-void OauthManager::issueToken(
+void OauthManager::issueTokenLegacy(
     const api::IssueTokenRequest& request,
     nx::utils::MoveOnlyFunc<void(api::ResultCode, api::IssueTokenResponse)> completionHandler)
 {
     m_requestsExecutor->makeAsyncCall<api::IssueTokenResponse>(
         nx::network::http::Method::post,
-        kOauthTokenPath,
+        kOauthTokenPathLegacy,
         {}, //query
+        request,
+        std::move(completionHandler));
+}
+
+void OauthManager::issueTokenV1(
+    const api::IssueTokenRequest& request,
+    nx::utils::MoveOnlyFunc<void(api::ResultCode, api::IssueTokenResponse)> completionHandler)
+{
+    m_requestsExecutor->makeAsyncCall<api::IssueTokenResponse>(
+        nx::network::http::Method::post,
+        kOauthTokenPathV1,
+        {}, // query
         request,
         std::move(completionHandler));
 }
@@ -37,7 +49,7 @@ void OauthManager::issueAuthorizationCode(
 {
     m_requestsExecutor->makeAsyncCall<api::IssueCodeResponse>(
         nx::network::http::Method::post,
-        kOauthTokenPath,
+        kOauthTokenPathLegacy,
         {}, //query
         request,
         std::move(completionHandler));

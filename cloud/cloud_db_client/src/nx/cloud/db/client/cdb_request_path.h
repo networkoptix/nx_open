@@ -55,7 +55,7 @@ static constexpr char kAuthSystemAccessLevel[] = "/cdb/auth_provider/system/{sys
 static constexpr char kAuthVmsServerCertificatePublicKey[] =
     "/cdb/auth_provider/system/{systemId}/server/{serverId}/certificate/{fingerprint}/public-key";
 
-static constexpr char kOauthTokenPath[] = "/cdb/oauth2/token";
+static constexpr char kOauthTokenPathLegacy[] = "/cdb/oauth2/token";
 static constexpr char kOauthTokenValidatePath[] = "/cdb/oauth2/token/{token}";
 static constexpr char kOauthIntrospectPath[] = "/cdb/oauth2/introspect";
 static constexpr char kOauthTokensDeletePath[] = "/cdb/oauth2/user/self/client/{clientId}";
@@ -64,6 +64,7 @@ static constexpr char kOauthStunTokenPath[] = "/cdb/oauth2/stun-token";
 static constexpr char kOauthJwksPath[] = "/cdb/oauth2/jwks";
 static constexpr char kOauthJwkByIdPath[] = "/cdb/oauth2/jwks/{kid}";
 static constexpr char kAccSecuritySettingsChangedEvents[] = "/cdb/oauth2/account_events";
+static constexpr char kOauthTokenPathV1[] = "/cdb/oauth2/v1/token";
 
 // TODO: #anekrasov Move to a separate file, for oauth2 service
 static constexpr char kOauthSessionPath[] = "/oauth2/session/{sessionId}";

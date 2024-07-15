@@ -758,7 +758,7 @@ std::future<RemoteConnectionFactoryContext::CloudTokenInfo>
 
     auto promise = std::make_unique<std::promise<Context::CloudTokenInfo>>();
     auto future = promise->get_future();
-    d->cloudConnection->oauthManager()->issueToken(
+    d->cloudConnection->oauthManager()->issueTokenLegacy(
         request,
         [promise = std::move(promise)](ResultCode resultCode, IssueTokenResponse response)
         {

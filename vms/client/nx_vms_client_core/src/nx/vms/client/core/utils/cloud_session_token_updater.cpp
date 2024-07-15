@@ -136,7 +136,7 @@ void CloudSessionTokenUpdater::issueToken(
     // Initialize timed "request in progress" flag.
     m_requestInProgressTimer.setRemainingTime(kMaxTokenUpdateRequestTime);
 
-    m_cloudConnection->oauthManager()->issueToken(request, executor.bind(handler));
+    m_cloudConnection->oauthManager()->issueTokenLegacy(request, executor.bind(handler));
 }
 
 } // namespace nx::vms::client::core

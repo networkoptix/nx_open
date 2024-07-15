@@ -17,7 +17,12 @@ public:
 
     virtual std::chrono::seconds lastServerTime() const override;
 
-    virtual void issueToken(
+    virtual void issueTokenLegacy(
+        const api::IssueTokenRequest& request,
+        nx::utils::MoveOnlyFunc<void(api::ResultCode, api::IssueTokenResponse)> completionHandler)
+        override;
+
+    virtual void issueTokenV1(
         const api::IssueTokenRequest& request,
         nx::utils::MoveOnlyFunc<void(api::ResultCode, api::IssueTokenResponse)> completionHandler)
         override;
