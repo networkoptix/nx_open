@@ -79,7 +79,6 @@ bool isEmptyMediaAllowed(const QnResourcePtr& res)
 
 namespace nx::streaming {
 
-nx::Mutex RtspStreamProvider::s_defaultTransportMutex;
 nx::vms::api::RtpTransportType RtspStreamProvider::s_defaultTransportToUse =
     nx::vms::api::RtpTransportType::automatic;
 
@@ -691,7 +690,7 @@ nx::vms::api::RtpTransportType RtspStreamProvider::getRtpTransport() const
     if (m_rtpTransport != nx::vms::api::RtpTransportType::automatic)
         return m_rtpTransport;
 
-    NX_MUTEX_LOCKER lock(&s_defaultTransportMutex);
+    NX_MUTEX_LOCKER lock(&defaultTransportMutex());
     return s_defaultTransportToUse;
 }
 
@@ -942,6 +941,12 @@ void RtspStreamProvider::createTrackParsers()
     }
 }
 
+nx::Mutex& RtspStreamProvider::defaultTransportMutex()
+{
+    static nx::Mutex s_defaultTransportMutex;
+    return s_defaultTransportMutex;
+}
+
 void RtspStreamProvider::closeStream()
 {
     if (m_RtpSession.isOpened())
@@ -980,7 +985,7 @@ void RtspStreamProvider::setDefaultTransport(nx::vms::api::RtpTransportType rtpT
 {
     NX_INFO(typeid(RtspStreamProvider), "Set default transport: %1", rtpTransport);
 
-    NX_MUTEX_LOCKER lock(&s_defaultTransportMutex);
+    NX_MUTEX_LOCKER lock(&defaultTransportMutex());
     s_defaultTransportToUse = rtpTransport;
 }
 

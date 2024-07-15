@@ -13,10 +13,10 @@ NX_REFLECTION_ENUM_CLASS(CloudConnectVersion,
     /** Used when cloudConnectionVersion attribute is missing in message */
     initial = 1,
 
-    /** #CLOUD-398 */
+    /** #CLOUD-398. */
     tryingEveryAddressOfPeer,
 
-    /** #CLOUD-824 */
+    /** #CLOUD-824. */
     serverChecksConnectionState,
 
     /** #VMS-8224. */
@@ -24,6 +24,9 @@ NX_REFLECTION_ENUM_CLASS(CloudConnectVersion,
 
     /** #CB-236. */
     connectOverHttpHasHostnameAsString,
+
+    /** #NXLIB-382, #CB-2410. */
+    clientReportsCloudConnectStatistics,
 
     /** #CB-2331. */
     clientSupportsRelayConnectionTesting
