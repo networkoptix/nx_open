@@ -82,6 +82,8 @@ private:
 
     bool isDragValid() const;
 
+    void reloadDesktopCameraThumbnailIfNeeded();
+
 private:
     friend class QnVideowallScreenWidget;
     friend class QnVideowallItemWidgetHoverProgressAccessor;

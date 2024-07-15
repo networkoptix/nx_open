@@ -28,6 +28,8 @@ public:
 
     virtual ~LayoutThumbnailLoader() override;
 
+    QMap<QnResourcePtr, core::ThumbnailStatus> getItemStatuses() const;
+
     virtual QImage image() const override;
     virtual QSize sizeHint() const override;
     virtual core::ThumbnailStatus status() const override;
