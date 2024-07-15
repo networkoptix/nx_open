@@ -7,9 +7,6 @@ compiler=gcc
 compiler.version=12
 compiler.libcxx=libstdc++11
 compiler.cppstd=20
-# libmysqlclient uses C++20 keyword `requires` for variable names, also it sets -std=c++14 by
-# itself.
-libmysqlclient/*:compiler.cppstd=14
 
 [options]
 libmysqlclient/*:shared=True

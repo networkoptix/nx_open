@@ -145,7 +145,7 @@ class NxOpenConan(ConanFile):
             return
 
         self.build_requires("apidoctool/3.0" "#bf58d9463e9fa82f3dcec3f6de7c152b")
-        self.build_requires("qt-host/6.5.3" "#cb4a89251221cd4683f58f03fd308218")
+        self.build_requires("qt-host/6.5.3" "#b22af1ae61cfb13f9de09455d441c8de")
         self.build_requires("swagger-codegen/3.0.21" "#58d9476941c662c4b3f8a9e99683f034")
 
         if self.isLinux:
@@ -183,8 +183,8 @@ class NxOpenConan(ConanFile):
             return
 
         self.requires(f"ffmpeg/{self.ffmpeg_version_and_revision}")
-        self.requires("openssl/1.1.1q" "#a23bd98469b500b2d658a17351fa279c")
-        self.requires("qt/6.5.3" "#ac92651a15a76040d142eb819c63d085")
+        self.requires("openssl/1.1.1q" "#bcc8c366b4291c68913eabe817fb15c7")
+        self.requires("qt/6.5.3" "#ff8b70ec26514dd008683acfd39a52bf")
         self.requires("roboto-fonts/1.0" "#a1d64ec2d6a2e16f8f476b2b47162123")
         self.requires("boost/1.83.0" "#e0be85c6f8107d7e960246e31cbbf7ab")
         self.requires("rapidjson/cci.20230929" "#624c0094d741e6a3749d2e44d834b96c")
@@ -193,18 +193,18 @@ class NxOpenConan(ConanFile):
             if self.settings.arch == "x86_64":
                 self.requires("cuda-toolkit/12.5.1" "#52c56e278e56d5a0cb47df11090bbeb7")
                 self.requires("libvpl/2023.4.0" "#d3846418a105faa17d740e65a5b98398")
-                self.requires("zlib/1.2.12" "#bb959a1d68d4c35d0fba4cc66f5bb25f")
-                self.requires("libpq/13.4" "#3c130555eda25ad50be3824716b0ce4d")
+                self.requires("zlib/1.2.13" "#df233e6bed99052f285331b9f54d9070")
+                self.requires("libpq/15.5" "#fa107fbe709db74faa6e2cb3cf18a5ae")
 
         if self.isLinux:
             if self.settings.arch == "x86_64":
-                self.requires("libva/2.16.0" "#b2c637d798ea5fe5ee939ec3d89d5b91")
+                self.requires("libva/2.16.0" "#3b9a31708fbe3a31bd024ad301b48d23")
                 self.requires("intel-media-sdk/19.4" "#ecb7939833f8de0ffb197905a4f5a75a")
                 self.requires("intel-onevpl/23.4.2" "#da72e6e5e4cb8ce4baf25ce4c0b1a602")
                 self.requires("intel-gmmlib/22.3.15" "#6c54e5bd7885b8f25ff748ec7b2f991c")
-                self.requires("intel-media-driver/23.4.3" "#f39057b746ee544509b0014aba18ec0a")
+                self.requires("intel-media-driver/23.4.3" "#f5bb92ca710c7cd8cf5e8ee4afa18355")
 
-                self.requires("libmysqlclient/8.0.17" "#87d0d0dca416ff91ff910c66b57eab1a")
+                self.requires("libmysqlclient/8.1.0" "#96475a9cb3a02bbe2626543d0b3d33b7")
 
             if not self.isArm32:
                 self._os_deps_package = "os_deps_for_desktop_linux"
@@ -214,10 +214,7 @@ class NxOpenConan(ConanFile):
         if self.haveDesktopClient:
             self.requires("hidapi/0.10.1" "#569759f2f39447fe3dbef070243585cc")
             self.requires("pathkit/d776371" "#d1516a12d5e1e70fc8253a501acb3a7f")
-
-            if not self.isEdge1:
-                self.requires("flite/2.2" "#069d57cbc32aa09dcbae1c79e94e48ef")
-                self.requires("range-v3/0.11.0" "#8d874cb9cdd7b81806d624493b82f9c0")
+            self.requires("range-v3/0.11.0" "#8d874cb9cdd7b81806d624493b82f9c0")
 
         if self.isWindows or self.isAndroid or (self.isLinux and not self.isArm32):
             self.requires("openal/ec2ffbfa" "#324f5f4e95db7ca22aaeba745a775e85")
@@ -234,6 +231,10 @@ class NxOpenConan(ConanFile):
 
         if self.settings.os in ("Android", "iOS") or self.haveAnalyticsServer:
             self.requires("libjpeg-turbo/3.0.3" "#1e534ce92aac40555ae9fd1184428b04")
+
+        if self.haveDesktopClient or self.haveMediaserver:
+            if not self.isEdge1:
+                self.requires("flite/2.2" "#069d57cbc32aa09dcbae1c79e94e48ef")
 
     def prepare_pkg_config_files(self):
         if self.isLinux:
