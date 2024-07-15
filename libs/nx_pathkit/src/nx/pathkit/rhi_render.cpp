@@ -79,7 +79,7 @@ int pathToTriangles(
     QColor color,
     const nx::pathkit::PaintPath& pp,
     VertexAllocator& triangles,
-    std::vector<float>& colors,
+    VertexAllocator& colors,
     QSize clip)
 {
     const auto prevSize = triangles.size();
@@ -93,14 +93,22 @@ int pathToTriangles(
     // Each triangle vertex is 3 floats: x, y, alpha.
     const auto numVerts = (triangles.size() - prevSize) / 3;
 
+    const float colorF[4] = {
+        color.redF(),
+        color.greenF(),
+        color.blueF(),
+        (float) pp.opacity * color.alphaF()};
+
+    float* pColor = (float*) colors.lock(sizeof(float), numVerts * 4);
+
     // Add color for each vertex.
     for (size_t i = 0; i < numVerts; ++i)
     {
-        colors.push_back(color.redF());
-        colors.push_back(color.greenF());
-        colors.push_back(color.blueF());
-        colors.push_back(pp.opacity * color.alphaF());
+        memmove(pColor, colorF, 4 * sizeof(float));
+        pColor += 4;
     }
+
+    colors.unlock(numVerts * 4);
 
     return numVerts;
 }
@@ -331,7 +339,7 @@ bool RhiPaintDeviceRenderer::prepare(QRhiRenderPassDescriptor* rp, QRhiResourceU
     }
 
     VertexAllocator vertexData;
-    std::vector<float> colors;
+    VertexAllocator colors;
     std::vector<float> textureData;
 
     batches = processEntries(
@@ -699,7 +707,7 @@ std::vector<RhiPaintDeviceRenderer::Batch> RhiPaintDeviceRenderer::processEntrie
     QRhiRenderPassDescriptor* rp,
     QRhiResourceUpdateBatch* u,
     VertexAllocator& triangles,
-    std::vector<float>& colors,
+    VertexAllocator& colors,
     std::vector<float>& textureVerts,
     QSize clip)
 {

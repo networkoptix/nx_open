@@ -83,7 +83,7 @@ private:
         QRhiRenderPassDescriptor* rp,
         QRhiResourceUpdateBatch* u,
         VertexAllocator& triangles,
-        std::vector<float>& colors,
+        VertexAllocator& colors,
         std::vector<float>& textureVerts,
         QSize clip);
 
