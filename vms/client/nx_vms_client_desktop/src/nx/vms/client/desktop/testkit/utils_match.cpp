@@ -189,6 +189,7 @@ bool objectMatches(const QObject* object, QJSValue properties)
     }
 
     static const QList<const char*> intProperties{
+        "row",
         "column",
         "x",
         "y",
