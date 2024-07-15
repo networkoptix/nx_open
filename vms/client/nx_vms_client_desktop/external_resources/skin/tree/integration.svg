@@ -1,5 +1,5 @@
-<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path fill-rule="evenodd" clip-rule="evenodd" d="M2 3.5C2 3.22386 2.22386 3 2.5 3H17.5C17.7761 3 18 3.22386 18 3.5V6H2V3.5ZM2 7H18V16.5C18 16.7761 17.7761 17 17.5 17H2.5C2.22386 17 2 16.7761 2 16.5V7ZM8 4H7V5H8V4ZM3 4H4V5H3V4ZM6 4H5V5H6V4Z" fill="#A5B7C0"/>
-<path d="M9 9L6 12L9 15" stroke="black" stroke-width="1.5" stroke-linejoin="round"/>
-<path d="M11 9L14 12L11 15" stroke="black" stroke-width="1.5" stroke-linejoin="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 20 20">
+  <g class="20x20/Solid/integration">
+    <path fill="#A5B7C0" fill-rule="evenodd" d="M2.108 5.49a.368.368 0 0 0 0 .52L5.49 9.392a.368.368 0 0 0 .52 0L9.392 6.01a.368.368 0 0 0 0-.52L6.01 2.108a.368.368 0 0 0-.52 0L2.108 5.49Zm8.39-2.99a.5.5 0 0 1 .5-.5h6.5a.5.5 0 0 1 .5.5V9a.5.5 0 0 1-.5.5h-6.5a.5.5 0 0 1-.5-.5V2.5Zm-7.998 8a.5.5 0 0 0-.5.5v6.5a.5.5 0 0 0 .5.5H9a.5.5 0 0 0 .5-.5V11a.5.5 0 0 0-.5-.5H2.5Zm8.498 0a.5.5 0 0 0-.5.5v6.5a.5.5 0 0 0 .5.5h6.5a.5.5 0 0 0 .5-.5V11a.5.5 0 0 0-.5-.5h-6.5Z" class="Primary" clip-rule="evenodd"/>
+  </g>
 </svg>
