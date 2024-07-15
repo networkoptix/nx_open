@@ -28,9 +28,9 @@ public:
 
         connect(
             m_comboBox,
-            &QComboBox::currentTextChanged,
+            &QComboBox::activated,
             this,
-            &DropdownTextPickerWidgetBase<F, D>::onCurrentIndexChanged);
+            &DropdownTextPickerWidgetBase<F, D>::onActivated);
     }
 
 protected:
@@ -38,7 +38,7 @@ protected:
 
     D* m_comboBox{nullptr};
 
-    virtual void onCurrentIndexChanged() = 0;
+    virtual void onActivated() = 0;
 };
 
 } // namespace nx::vms::client::desktop::rules

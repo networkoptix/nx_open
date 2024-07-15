@@ -8,6 +8,7 @@
 #include "../manifest.h"
 #include "../rules_fwd.h"
 
+namespace nx::vms::common { class SystemContext; }
 namespace nx::vms::rules { class StateField; }
 
 namespace nx::vms::rules::utils {
@@ -43,35 +44,20 @@ NX_VMS_RULES_API std::optional<FieldDescriptor> fieldByName(
 NX_VMS_RULES_API bool isLoggingAllowed(const Engine* engine, nx::Uuid ruleId);
 
 /**
- * Returns whether given event and action are compatible.
- * Instant event is compatible with instant action and with the prolonged action with fixed duration.
- * Prolonged event is compatible with the prolonged and instant actions.
- */
-NX_VMS_RULES_API bool isCompatible(
-    const ItemDescriptor& eventDescriptor, const ItemDescriptor& actionDescriptor);
-
-/**
- * Returns whether value in the given state field is compatible with the given event filter.
- * `State::instant` is compatible with the instant event, all the rest states are compatible with
- * the prologed events.
- */
-NX_VMS_RULES_API bool isCompatible(
-    const Engine* engine, const StateField* stateField, const EventFilter* eventFilter);
-
-/**
- * Returns whether value in the given state field is compatible with the given action builder.
- * Prolonged action compatible only with `State::none` value. Actions with fixed duration or instant
- * actions compatible with all state values, except `State::none`.
- */
-NX_VMS_RULES_API bool isCompatible(
-    const Engine* engine, const StateField* stateField, const ActionBuilder* actionBuilder);
-
-/**
  * Return whether the given event filter is compatible with the given action builder.
  * The function checks whether selected event and action types are compatible and whether event
  * state in the event filter is compatible for the given event type and for the given action builder.
  */
 NX_VMS_RULES_API bool isCompatible(
-    const Engine* engine, const EventFilter* eventFilter, const ActionBuilder* actionBuilder);
+    const Engine* engine,
+    const EventFilter* eventFilter,
+    const ActionBuilder* actionBuilder);
+
+/**
+ * Returns all the available states that can be used with the given rule. These states are
+ * the intersection of the states available for the event filter and action builder in
+ * the given rule.
+ */
+NX_VMS_RULES_API QSet<State> getAvailableStates(const Engine* engine, const Rule* rule);
 
 } // namespace nx::vms::rules::utils

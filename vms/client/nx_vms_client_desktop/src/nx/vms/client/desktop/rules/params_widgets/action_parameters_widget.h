@@ -25,8 +25,7 @@ public:
 private:
     void onRuleSet(bool isNewRule) override;
 
-    void onActionFieldChanged(const QString& fieldName);
-    void onActionDurationChanged() const;
+    void onFieldChanged(const QString& fieldName);
 
     PickerWidget* createStatePickerIfRequired();
 

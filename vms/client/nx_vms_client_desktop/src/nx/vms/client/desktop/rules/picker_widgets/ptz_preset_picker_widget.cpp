@@ -71,15 +71,13 @@ void PtzPresetPicker::updateUi()
     updateComboBox();
 }
 
-void PtzPresetPicker::onCurrentIndexChanged()
+void PtzPresetPicker::onActivated()
 {
     m_field->setValue(m_comboBox->currentData().toString());
 }
 
 void PtzPresetPicker::updateComboBox()
 {
-    const QSignalBlocker blocker{m_comboBox};
-
     m_comboBox->clear();
     for (const auto& preset: m_presets)
         m_comboBox->addItem(preset.name, preset.id);

@@ -15,7 +15,7 @@ public:
 
 private:
     void updateUi() override;
-    void onCurrentIndexChanged() override;
+    void onActivated() override;
 };
 
 } // namespace nx::vms::client::desktop::rules

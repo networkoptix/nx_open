@@ -2,7 +2,6 @@
 
 #include "repeat_sound_action.h"
 
-#include "../action_builder_fields/event_id_field.h"
 #include "../action_builder_fields/sound_field.h"
 #include "../action_builder_fields/target_device_field.h"
 #include "../action_builder_fields/target_user_field.h"

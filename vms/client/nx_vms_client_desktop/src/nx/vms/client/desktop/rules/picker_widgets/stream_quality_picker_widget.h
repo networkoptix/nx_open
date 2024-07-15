@@ -30,11 +30,10 @@ protected:
     {
         DropdownTextPickerWidgetBase<vms::rules::StreamQualityField>::updateUi();
 
-        QSignalBlocker blocker{m_comboBox};
         m_comboBox->setCurrentIndex(m_comboBox->findData(QVariant::fromValue(m_field->value())));
     }
 
-    void onCurrentIndexChanged() override
+    void onActivated() override
     {
         m_field->setValue(m_comboBox->currentData().value<vms::api::StreamQuality>());
     }

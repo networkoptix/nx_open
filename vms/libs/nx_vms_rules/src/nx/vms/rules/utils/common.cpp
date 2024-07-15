@@ -8,10 +8,10 @@
 #include "../engine.h"
 #include "../event_filter.h"
 #include "../event_filter_fields/customizable_flag_field.h"
-#include "../event_filter_fields/state_field.h"
 #include "../rule.h"
 #include "../utils/field.h"
 #include "action.h"
+#include "event.h"
 
 namespace nx::vms::rules::utils {
 
@@ -65,64 +65,21 @@ bool isLoggingAllowed(const Engine* engine, nx::Uuid ruleId)
     return true;
 }
 
-bool isCompatible(const ItemDescriptor& eventDescriptor, const ItemDescriptor& actionDescriptor)
+bool isCompatible(
+    const Engine* engine,
+    const EventFilter* eventFilter,
+    const ActionBuilder* actionBuilder)
 {
-    if (utils::isInstantOnly(eventDescriptor) && utils::isProlongedOnly(actionDescriptor))
-    {
-        // Instant event might be used with the prolonged action only if the action has 'duration'.
-        return std::any_of(
-            actionDescriptor.fields.cbegin(),
-            actionDescriptor.fields.cend(),
-            [](const auto& fieldDescriptor)
-            {
-                return fieldDescriptor.fieldName == vms::rules::utils::kDurationFieldName;
-            });
-    }
+    const auto availableStates =
+        getAvailableStates(engine, eventFilter) & getAvailableStates(engine, actionBuilder);
 
-    return true;
+    return !availableStates.empty();
 }
 
-bool isCompatible(
-    const Engine* engine, const StateField* stateField, const EventFilter* eventFilter)
+QSet<State> getAvailableStates(const Engine* engine, const Rule* rule)
 {
-    const auto eventDescription = engine->eventDescriptor(eventFilter->eventType());
-
-    return stateField->value() == State::instant
-        ? eventDescription->flags.testFlag(ItemFlag::instant)
-        : eventDescription->flags.testFlag(ItemFlag::prolonged);
-}
-
-bool isCompatible(
-    const Engine* engine, const StateField* stateField, const ActionBuilder* actionBuilder)
-{
-    const auto isActionProlonged = isProlonged(engine, actionBuilder);
-
-    return stateField->value() == State::none
-        ? isActionProlonged
-        : !isActionProlonged;
-}
-
-bool isCompatible(
-    const Engine* engine, const EventFilter* eventFilter, const ActionBuilder* actionBuilder)
-{
-    const auto eventDescriptor = engine->eventDescriptor(eventFilter->eventType());
-    const auto actionDescriptor = engine->actionDescriptor(actionBuilder->actionType());
-    if (!eventDescriptor || !actionDescriptor)
-        return false;
-
-    if (!isCompatible(eventDescriptor.value(), actionDescriptor.value()))
-        return false;
-
-    if (const auto stateField = eventFilter->fieldByName<StateField>(kStateFieldName))
-    {
-        if (!isCompatible(engine, stateField, eventFilter)
-            || !isCompatible(engine, stateField, actionBuilder))
-        {
-            return false;
-        }
-    }
-
-    return true;
+    return getAvailableStates(engine, rule->eventFilters().first())
+        & getAvailableStates(engine, rule->actionBuilders().first());
 }
 
 } // namespace nx::vms::rules::utils

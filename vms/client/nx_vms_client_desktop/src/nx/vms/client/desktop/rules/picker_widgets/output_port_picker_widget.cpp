@@ -55,7 +55,6 @@ void OutputPortPicker::updateUi()
         }
     }
 
-    const QSignalBlocker blocker{m_comboBox};
     m_comboBox->clear();
     m_comboBox->addItem(Strings::autoValue(), QString{});
     for (const auto& relayOutput: outputPorts)
@@ -64,7 +63,7 @@ void OutputPortPicker::updateUi()
     m_comboBox->setCurrentIndex(m_comboBox->findData(m_field->value()));
 }
 
-void OutputPortPicker::onCurrentIndexChanged()
+void OutputPortPicker::onActivated()
 {
     m_field->setValue(m_comboBox->currentData().toString());
 }

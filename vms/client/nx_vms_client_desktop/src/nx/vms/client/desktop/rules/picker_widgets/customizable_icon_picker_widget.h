@@ -34,7 +34,7 @@ public:
     }
 
 protected:
-    void onCurrentIndexChanged() override
+    void onActivated() override
     {
         m_field->setValue(m_comboBox->currentIcon());
     }
@@ -43,7 +43,6 @@ protected:
     {
         DropdownTextPickerWidgetBase<vms::rules::CustomizableIconField, IconComboBox>::updateUi();
 
-        QSignalBlocker blocker{m_comboBox};
         m_comboBox->setCurrentIcon(SoftwareTriggerPixmaps::effectivePixmapName(m_field->value()));
     }
 };
