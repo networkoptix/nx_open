@@ -4,6 +4,7 @@
 
 #include <algorithm>
 
+#include <nx/network/cloud/cloud_connect_version.h>
 #include <nx/network/cloud/data/connection_result_data.h>
 #include <nx/network/connection_server/server_statistics.h>
 #include <nx/network/http/server/http_statistics.h>
@@ -47,17 +48,20 @@ struct CloudConnectStatistics
     int serverCount = 0;
     int clientCount = 0;
 
+    std::map<api::CloudConnectVersion, int> clientVersions;
+
     int totalConnectionsEstablishedPerMinute = 0;
     std::map<nx::network::cloud::ConnectType, ConnectTypeStatistics> establishedConnectionsPerType;
 
     int totalConnectionsFailedPerMinute = 0;
-    std::map<api::NatTraversalResultCode, NatTraversalResultCodeStatistics> failedConnectionsPerResultCode;
+    std::map<api::NatTraversalResultCode, NatTraversalResultCodeStatistics>
+        failedConnectionsPerResultCode;
 
     // Response times from the mediator for successful connections.
     PercentilesMs mediatorResponseTimePercentiles;
 };
 
-#define CloudConnectStatistics_Fields (serverCount)(clientCount) \
+#define CloudConnectStatistics_Fields (serverCount)(clientCount)(clientVersions) \
     (totalConnectionsEstablishedPerMinute)(totalConnectionsFailedPerMinute) \
     (establishedConnectionsPerType)(failedConnectionsPerResultCode) \
     (mediatorResponseTimePercentiles)

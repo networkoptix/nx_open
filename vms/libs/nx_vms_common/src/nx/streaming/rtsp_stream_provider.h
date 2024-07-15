@@ -175,6 +175,9 @@ private:
     void createTrackParsers();
 
 protected:
+    static nx::Mutex& defaultTransportMutex();
+
+protected:
     QnRtspClient m_RtpSession;
     nx::streaming::rtp::TimeOffsetPtr m_timeOffset;
     std::vector<bool> m_gotKeyDataInfo;
@@ -242,7 +245,6 @@ protected:
     std::optional<std::chrono::steady_clock::time_point> m_packetLossReportTime;
 
     mutable nx::Mutex m_mutex;
-    static nx::Mutex s_defaultTransportMutex;
     static nx::vms::api::RtpTransportType s_defaultTransportToUse;
     std::set<nx::network::MulticastAddressRegistry::RegisteredAddressHolderPtr>
         m_registeredMulticastAddresses;

@@ -17,6 +17,12 @@
 
 namespace nx::hpm::api {
 
+namespace detail {
+
+api::CloudConnectVersion NX_NETWORK_API clientCloudConnectVersion();
+
+} // namespace detail
+
 /**
  * Parameters of a request to connect to a listening peer. With this request, a client app
  * specifies which peer it wants to connect to and which connection methods it supports. This
@@ -57,7 +63,7 @@ struct NX_NETWORK_API ConnectRequestData
     /**%apidoc:integer Version of the cloud connect implementation the client has.
      * The default value defined in the code must be used.
      */
-    CloudConnectVersion cloudConnectVersion = kCurrentCloudConnectVersion;
+    CloudConnectVersion cloudConnectVersion = detail::clientCloudConnectVersion();
 };
 
 NX_REFLECTION_INSTRUMENT(ConnectRequestData, (destinationHostName)(originatingPeerId) \
@@ -147,5 +153,26 @@ struct NX_NETWORK_API ConnectResponse:
 };
 
 static constexpr std::string_view kDelayParamName = "delay";
+
+// ------------------------------------------------------------------------------------------------
+
+namespace test {
+
+static std::optional<CloudConnectVersion> kCurrentCloudConnectVersionOverride;
+/**
+ * Override the CloudConnectVersion reported in ConnectRequest structures. test only! the original
+ * CloudCOnnectVersion is restored when this instance is destroyed.
+ */
+class NX_NETWORK_API ConnectRequestVersionOverride
+{
+public:
+    ConnectRequestVersionOverride(CloudConnectVersion version);
+    ~ConnectRequestVersionOverride();
+
+private:
+    std::optional<CloudConnectVersion> m_original;
+};
+
+} // namespace test
 
 } // namespace nx::hpm::api

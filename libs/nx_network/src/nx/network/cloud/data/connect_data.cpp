@@ -6,6 +6,33 @@
 
 namespace nx::hpm::api {
 
+namespace test {
+
+ConnectRequestVersionOverride::ConnectRequestVersionOverride(CloudConnectVersion version):
+    m_original(kCurrentCloudConnectVersionOverride)
+{
+    kCurrentCloudConnectVersionOverride = version;
+}
+
+ConnectRequestVersionOverride::~ConnectRequestVersionOverride()
+{
+    kCurrentCloudConnectVersionOverride = m_original;
+}
+
+} // namespace test
+
+namespace detail {
+
+CloudConnectVersion clientCloudConnectVersion()
+{
+    if (test::kCurrentCloudConnectVersionOverride)
+        return *test::kCurrentCloudConnectVersionOverride;
+
+    return kCurrentCloudConnectVersion;
+}
+
+} // namespace detail
+
 namespace stun = network::stun;
 using namespace stun::extension;
 
