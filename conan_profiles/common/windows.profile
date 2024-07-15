@@ -16,6 +16,6 @@ opencv-static/*:with_cuda=True
 qt/*:psql=True
 
 [tool_requires]
-opencv-static/*:cuda-toolkit/11.8
+opencv-static/*:cuda-toolkit/12.5.1
 openssl/*:jom/1.1.2
 qt*:patch-windows/0.1,strawberryperl/5.30.0.1

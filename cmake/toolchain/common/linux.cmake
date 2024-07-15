@@ -37,5 +37,4 @@ else()
 endif()
 
 set(CMAKE_CUDA_HOST_COMPILER ${CMAKE_CXX_COMPILER})
-set(CMAKE_CUDA_FLAGS
-    "-allow-unsupported-compiler -forward-unknown-to-host-compiler ${CMAKE_CXX_FLAGS}")
+set(CMAKE_CUDA_FLAGS "-forward-unknown-to-host-compiler ${CMAKE_CXX_FLAGS}")

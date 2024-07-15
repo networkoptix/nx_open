@@ -28,7 +28,7 @@
             <Component><File Name="nx_monitoring.dll" KeyPath="yes" DiskId="2"/></Component>
             <Component><File Name="quazip.dll" KeyPath="yes" DiskId="2"/></Component>
             <Component><File Name="udt.dll" KeyPath="yes" DiskId="2"/></Component>
-            <Component><File Name="cudart64_110.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="cudart64_12.dll" KeyPath="yes" DiskId="2"/></Component>
             <Component><File Name="libvpl.dll" KeyPath="yes" DiskId="2"/></Component>
         </ComponentGroup>
     </Fragment>
