@@ -106,8 +106,9 @@ private:
     QRhi* const m_rhi;
     Settings m_settings;
     QSize m_size;
-    std::vector<PaintData> entries;
+    std::shared_ptr<PaintEnginePaths> entries;
     bool isBgraSupported = false;
+    std::unique_ptr<SkPathRefAllocator> pathAllocator;
 
     // Path fill/stroke (color) pipeline settings.
     std::unique_ptr<QRhiGraphicsPipeline> cps;

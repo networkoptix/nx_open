@@ -382,7 +382,11 @@ bool RhiPaintDeviceRenderer::prepare(QRhiRenderPassDescriptor* rp, QRhiResourceU
     {
         createPathPipeline(rp);
         createTexturePipeline(rp);
+        pathAllocator.reset(SkPath::CreateAllocator());
     }
+
+    if (!entries || entries->rendered)
+        return true;
 
     VertexAllocator vertexData;
     VertexAllocator colors;
@@ -420,6 +424,9 @@ bool RhiPaintDeviceRenderer::prepare(QRhiRenderPassDescriptor* rp, QRhiResourceU
     u->updateDynamicBuffer(tvbuf.get(), 0, textureData.size() * sizeof(float), textureData.data());
 
     u->updateDynamicBuffer(ubuf.get(), 0, kMatrix4x4Size, modelView().constData());
+
+    entries->rendered = true;
+
     return true;
 }
 
@@ -531,7 +538,7 @@ void RhiPaintDeviceRenderer::prepareAtlas()
 
     const int maxSize = m_settings.maxAtlasEntrySize;
 
-    for (const auto& entry: entries)
+    for (const auto& entry: entries->m_paths)
     {
         if (auto paintPixmap = std::get_if<PaintPixmap>(&entry))
         {
@@ -564,7 +571,7 @@ void RhiPaintDeviceRenderer::prepareAtlas()
             // Do not remove rects that we are going to use in this frame. If we already did that,
             // just skip using the atlas as there are no rects we can safely remove.
 
-            for (const auto& entry: entries)
+            for (const auto& entry: entries->m_paths)
             {
                 if (auto paintPixmap = std::get_if<PaintPixmap>(&entry))
                 {
@@ -675,14 +682,14 @@ void RhiPaintDeviceRenderer::fillTextureVerts(
 
     if (paintPixmap.clip)
     {
-        SkPath borderPath;
+        SkPath borderPath(pathAllocator.get());
         borderPath.moveTo(topLeft.x(), topLeft.y());
         borderPath.lineTo(topRight.x(), topRight.y());
         borderPath.lineTo(bottomRight.x(), bottomRight.y());
         borderPath.lineTo(bottomLeft.x(), bottomLeft.y());
         borderPath.close();
 
-        SkPath clipped;
+        SkPath clipped(pathAllocator.get());
         Op(borderPath, *paintPixmap.clip, SkPathOp::kIntersect_SkPathOp, &clipped);
 
         VertexAllocator triangles;
@@ -765,7 +772,7 @@ std::vector<RhiPaintDeviceRenderer::Batch> RhiPaintDeviceRenderer::processEntrie
 
     prepareAtlas();
 
-    for (const auto& entry: entries)
+    for (const auto& entry: entries->m_paths)
     {
         if (auto paintPath = std::get_if<PaintPath>(&entry))
         {
@@ -799,7 +806,7 @@ std::vector<RhiPaintDeviceRenderer::Batch> RhiPaintDeviceRenderer::processEntrie
             {
                 if (paintPath->clip)
                 {
-                    SkPath clipped;
+                    SkPath clipped(pathAllocator.get());
                     Op(paintPath->path, *paintPath->clip, SkPathOp::kIntersect_SkPathOp, &clipped);
                     addPath(paintPath->path, paintPath->brush.color());
                 }
@@ -817,7 +824,7 @@ std::vector<RhiPaintDeviceRenderer::Batch> RhiPaintDeviceRenderer::processEntrie
                     getSkCap(paintPath->pen.capStyle()),
                     getSkJoin(paintPath->pen.joinStyle()),
                     paintPath->pen.miterLimit());
-                SkPath tmp;
+                SkPath tmp(pathAllocator.get());
 
                 if (auto dashEffect = getPenDashEffect(paintPath->pen))
                 {
@@ -873,6 +880,8 @@ std::vector<RhiPaintDeviceRenderer::Batch> RhiPaintDeviceRenderer::processEntrie
         u->uploadTexture(atlasTexture.get(), desc);
         atlasUpdates.clear();
     }
+
+    pathAllocator->clear();
 
     return batches;
 }
