@@ -703,13 +703,12 @@ std::vector<RhiPaintDeviceRenderer::Batch> RhiPaintDeviceRenderer::processEntrie
 
             if (paintPath->pen.style() != Qt::NoPen)
             {
-                SkPaint skPaint;
-                skPaint.setStroke(true);
-                skPaint.setStrokeCap(getSkCap(paintPath->pen.capStyle()));
-                skPaint.setStrokeJoin(getSkJoin(paintPath->pen.joinStyle()));
-                skPaint.setStrokeMiter(paintPath->pen.miterLimit());
-                skPaint.setStrokeWidth(paintPath->pen.widthF());
-                SkStrokeRec strokeRec(skPaint);
+                SkStrokeRec strokeRec(SkStrokeRec::kHairline_InitStyle);
+                strokeRec.setStrokeStyle(paintPath->pen.widthF(), /* strokeAndFill */ false);
+                strokeRec.setStrokeParams(
+                    getSkCap(paintPath->pen.capStyle()),
+                    getSkJoin(paintPath->pen.joinStyle()),
+                    paintPath->pen.miterLimit());
                 SkPath tmp;
                 strokeRec.applyToPath(&tmp, paintPath->path);
 
