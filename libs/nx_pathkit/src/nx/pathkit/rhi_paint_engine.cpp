@@ -60,9 +60,12 @@ QPen scalePen(const QPen& pen, QTransform tr)
     return newPen;
 }
 
-SkPath painterPathToSkPath(const QPainterPath& path, const QTransform& tr)
+SkPath painterPathToSkPath(
+    const QPainterPath& path,
+    const QTransform& tr,
+    SkPathRefAllocator* allocator = nullptr)
 {
-    SkPath skPath;
+    SkPath skPath(allocator);
 
     for (int i = 0; i < path.elementCount(); ++i)
     {
@@ -122,6 +125,29 @@ SkMatrix transformToSk(const QTransform& t)
 
 namespace nx::pathkit {
 
+PaintEnginePaths::PaintEnginePaths()
+{
+    m_allocator.reset(SkPath::CreateAllocator());
+}
+
+void PaintEnginePaths::clear()
+{
+    m_paths.clear();
+    m_allocator->clear();
+    rendered = false;
+}
+
+SkPathRefAllocator* PaintEnginePaths::getAllocator()
+{
+    return m_allocator.get();
+}
+
+void PaintEnginePaths::addPath(PaintData p)
+{
+    rendered = false;
+    m_paths.append(std::move(p));
+}
+
 PaintPath::~PaintPath() {}
 
 RhiPaintEngine::RhiPaintEngine(RhiPaintDevice* device):
@@ -136,6 +162,7 @@ RhiPaintEngine::RhiPaintEngine(RhiPaintDevice* device):
     ),
     m_device(device)
 {
+    m_paths = std::make_shared<PaintEnginePaths>();
 }
 
 bool RhiPaintEngine::begin(QPaintDevice*)
@@ -179,7 +206,7 @@ QPaintEngine::Type RhiPaintEngine::type() const
 
 void RhiPaintEngine::drawPixmap(const QRectF& r, const QPixmap& pm, const QRectF& sr)
 {
-    m_paths.push_back(PaintPixmap{
+    m_paths->addPath(PaintPixmap{
         .dst = r,
         .pixmap = pm,
         .src = sr,
@@ -191,10 +218,10 @@ void RhiPaintEngine::drawPixmap(const QRectF& r, const QPixmap& pm, const QRectF
 
 void RhiPaintEngine::drawPath(const QPainterPath& path)
 {
-    m_paths.push_back(PaintPath{
+    m_paths->addPath(PaintPath{
         .pen = scalePen(state->pen(), state->transform()),
         .brush = state->brush(),
-        .path = painterPathToSkPath(path, state->transform()),
+        .path = painterPathToSkPath(path, state->transform(), m_paths->getAllocator()),
         .aa = state->renderHints().testFlag(QPainter::Antialiasing),
         .opacity = state->opacity(),
         .clip = getClip()
@@ -214,23 +241,28 @@ void RhiPaintEngine::drawPolygon(
     int pointCount,
     QPaintEngine::PolygonDrawMode mode)
 {
-    SkPath skPath;
-    std::vector<SkPoint> skPoints;
+    SkPath skPath(m_paths->getAllocator());
 
     const auto transform = state->transform();
 
-    for (int i = 0; i < pointCount; ++i)
+    if (pointCount > 0)
     {
-        const auto p = transform.map(points[i]);
+        const auto p0 = transform.map(points[0]);
+        skPath.moveTo(p0.x(), p0.y());
 
-        skPoints.emplace_back(SkPoint::Make(p.x(), p.y()));
+        for (int i = 1; i < pointCount; ++i)
+        {
+            const auto p = transform.map(points[i]);
+            skPath.lineTo(p.x(), p.y());
+        }
+
+        if (mode != QPaintEngine::PolylineMode)
+            skPath.close();
     }
-
-    skPath.addPoly(skPoints.data(), skPoints.size(), /*close*/ mode != QPaintEngine::PolylineMode);
 
     applyPolygonModePath(skPath, mode);
 
-    m_paths.push_back(PaintPath{
+    m_paths->addPath(PaintPath{
         .pen = scalePen(state->pen(), state->transform()),
         .brush = state->brush(),
         .path = skPath,
@@ -242,7 +274,7 @@ void RhiPaintEngine::drawPolygon(
 
 void RhiPaintEngine::drawCustom(const PaintCustom& custom)
 {
-    m_paths.push_back(custom);
+    m_paths->addPath(custom);
 }
 
 void RhiPaintEngine::updateClipPath(const QPainterPath& clipPath, Qt::ClipOperation op)

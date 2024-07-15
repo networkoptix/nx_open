@@ -50,6 +50,20 @@ struct PaintCustom
 
 using PaintData = std::variant<PaintPath, PaintPixmap, PaintCustom>;
 
+class PaintEnginePaths
+{
+public:
+    PaintEnginePaths();
+
+    void clear();
+    SkPathRefAllocator* getAllocator();
+    void addPath(PaintData p);
+
+    bool rendered = false;
+    QVector<PaintData> m_paths;
+    std::unique_ptr<SkPathRefAllocator> m_allocator;
+};
+
 /**
  * A paint engine implementation which generates a list of drawing paths using Skia PathOps API.
  */
@@ -81,7 +95,7 @@ private:
     void updateClipPath(const SkPath& skPath, Qt::ClipOperation op);
     std::optional<SkPath> getClip() const;
 
-    std::vector<PaintData> m_paths;
+    std::shared_ptr<PaintEnginePaths> m_paths;
     RhiPaintDevice* m_device = nullptr;
 
     bool m_clipEnabled = false;
