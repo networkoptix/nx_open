@@ -108,7 +108,7 @@
     </message>
     <message>
       <source>Connection timed out</source>
-      <translation type="unfinished">Connection timed out</translation>
+      <translation>Conexión esgotada / interrumpida</translation>
     </message>
     <message>
       <source>The server is incompatible.</source>
