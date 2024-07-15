@@ -24,8 +24,11 @@ public:
 
     virtual std::chrono::seconds lastServerTime() const = 0;
 
-    virtual void issueToken(
+    virtual void issueTokenLegacy(
         const IssueTokenRequest& request,
+        nx::utils::MoveOnlyFunc<void(ResultCode, IssueTokenResponse)> completionHandler) = 0;
+
+    virtual void issueTokenV1(const IssueTokenRequest& request,
         nx::utils::MoveOnlyFunc<void(ResultCode, IssueTokenResponse)> completionHandler) = 0;
 
     virtual void issueAuthorizationCode(
