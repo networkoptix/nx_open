@@ -119,11 +119,11 @@ NX_DECLARE_COLORIZED_ICON(kHealthMonitorOfflineIcon, "20x20/Solid/health_monitor
 NX_DECLARE_COLORIZED_ICON(kHealthMonitorIcon, "20x20/Solid/health_monitor.svg",\
     kTreeThemeSubstitutions)
 
-NX_DECLARE_COLORIZED_ICON(kExtensionProxiedIcon, "20x20/Solid/extension_proxied.svg",\
+NX_DECLARE_COLORIZED_ICON(kIntegrationProxiedIcon, "20x20/Solid/integration_proxied.svg",\
     kTreeThemeSubstitutions)
-NX_DECLARE_COLORIZED_ICON(kExtensionIcon, "20x20/Solid/extension.svg",\
+NX_DECLARE_COLORIZED_ICON(kIntegrationIcon, "20x20/Solid/integration.svg",\
     kTreeThemeSubstitutions)
-NX_DECLARE_COLORIZED_ICON(kExtensionsIcon, "20x20/Solid/extensions.svg",\
+NX_DECLARE_COLORIZED_ICON(kIntegrationsIcon, "20x20/Solid/integrations.svg",\
     kTreeThemeSubstitutions)
 
 NX_DECLARE_COLORIZED_ICON(kIOOfflineIcon, "20x20/Solid/io_offline.svg",\
@@ -397,9 +397,9 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent):
     m_cache.insert(VideoWallMatrix, IconWithDescription(kMatrixIcon));
 
     // Integrations.
-    m_cache.insert(Integrations, IconWithDescription(kExtensionsIcon));
-    m_cache.insert(Integration, IconWithDescription(kExtensionIcon));
-    m_cache.insert(IntegrationProxied, IconWithDescription(kExtensionProxiedIcon));
+    m_cache.insert(Integrations, IconWithDescription(kIntegrationsIcon));
+    m_cache.insert(Integration, IconWithDescription(kIntegrationIcon));
+    m_cache.insert(IntegrationProxied, IconWithDescription(kIntegrationProxiedIcon));
 
     // Web Pages.
     m_cache.insert(WebPages, IconWithDescription(kWebpagesIcon));

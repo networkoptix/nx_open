@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 20 20">
+  <g class="20x20/Solid/integrations">
+    <path fill="#A5B7C0" fill-rule="evenodd" d="M8.5 2.5A.5.5 0 0 1 9 2h4.5a.5.5 0 0 1 .5.5V7a.5.5 0 0 1-.5.5H9a.5.5 0 0 1-.5-.5V2.5ZM2.154 5.12a.525.525 0 0 1 0-.74l2.225-2.226a.525.525 0 0 1 .742 0l2.225 2.225a.525.525 0 0 1 0 .742L5.121 7.346a.525.525 0 0 1-.742 0L2.154 5.121ZM2.5 8.5A.5.5 0 0 0 2 9v4.5a.5.5 0 0 0 .5.5H7a.5.5 0 0 0 .5-.5V9a.5.5 0 0 0-.5-.5H2.5Zm6 .5a.5.5 0 0 1 .5-.5h4.5a.5.5 0 0 1 .5.5v4.5a.5.5 0 0 1-.5.5H9a.5.5 0 0 1-.5-.5V9ZM16 4h-1v11h-5v1h6V4Zm1 6v7h-5v1h6V7h-1v3ZM4 15h5v1H4v-1Zm7 3v-1H6v1h5Z" class="Primary" clip-rule="evenodd"/>
+  </g>
+</svg>
