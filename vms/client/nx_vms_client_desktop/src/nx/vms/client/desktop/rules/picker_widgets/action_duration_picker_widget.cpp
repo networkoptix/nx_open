@@ -85,23 +85,23 @@ ActionDurationPickerWidget::ActionDurationPickerWidget(
             auto layout = new QHBoxLayout{widget};
             layout->setSpacing(style::Metrics::kDefaultLayoutSpacing.width());
 
-            m_actionStartComboBox = new QComboBox;
-            if (eventDescriptor->flags.testFlag(vms::rules::ItemFlag::instant))
-            {
-                m_actionStartComboBox->addItem(
-                    tr("Event Occurs"),
-                    QVariant::fromValue(api::rules::State::instant));
-            }
-
-            if (eventDescriptor->flags.testFlag(vms::rules::ItemFlag::prolonged))
-            {
-                m_actionStartComboBox->addItem(
-                    tr("Event Starts"),
-                    QVariant::fromValue(api::rules::State::started));
-                m_actionStartComboBox->addItem(
-                    tr("Event Stops"),
-                    QVariant::fromValue(api::rules::State::stopped));
-            }
+            m_actionStartComboBox = new StateComboBox;
+            m_actionStartComboBox->setStateStringProvider(
+                [](vms::rules::State state)
+                {
+                    switch(state)
+                    {
+                        case vms::rules::State::instant:
+                            return tr("Event occurs");
+                        case vms::rules::State::started:
+                            return tr("Event starts");
+                        case vms::rules::State::stopped:
+                            return tr("Event stops");
+                        default:
+                            NX_ASSERT(false, "Unexpected state is provided");
+                            return QString{};
+                    }
+                });
 
             layout->addWidget(m_actionStartComboBox);
 
@@ -178,6 +178,10 @@ void ActionDurationPickerWidget::updateUi()
 {
     if (m_actionStartComboBox)
     {
+        const auto eventDurationType = vms::rules::getEventDurationType(
+            systemContext()->vmsRulesEngine(), parentParamsWidget()->eventFilter());
+        m_actionStartComboBox->update(eventDurationType);
+
         const auto stateField =
             getEventField<vms::rules::StateField>(vms::rules::utils::kStateFieldName);
         m_actionStartComboBox->setCurrentIndex(

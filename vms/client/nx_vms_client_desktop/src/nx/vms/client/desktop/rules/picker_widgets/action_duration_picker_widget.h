@@ -7,6 +7,7 @@
 #include <nx/vms/rules/action_builder_fields/optional_time_field.h>
 #include <ui/widgets/business/time_duration_widget.h>
 
+#include "../utils/state_combo_box.h"
 #include "field_picker_widget.h"
 
 namespace nx::vms::client::desktop::rules {
@@ -29,7 +30,7 @@ public:
 private:
     QComboBox* m_durationTypeComboBox{};
     QWidget* m_contentWidget{};
-    QComboBox* m_actionStartComboBox{};
+    StateComboBox* m_actionStartComboBox{};
     TimeDurationWidget* m_timeDurationWidget{};
 
     void onDurationTypeChanged();

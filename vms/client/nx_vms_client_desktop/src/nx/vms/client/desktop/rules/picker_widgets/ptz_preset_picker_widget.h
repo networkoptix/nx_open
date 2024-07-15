@@ -22,7 +22,7 @@ private:
     QnPtzPresetList m_presets;
 
     void updateUi() override;
-    void onCurrentIndexChanged() override;
+    void onActivated() override;
     void updateComboBox();
 };
 

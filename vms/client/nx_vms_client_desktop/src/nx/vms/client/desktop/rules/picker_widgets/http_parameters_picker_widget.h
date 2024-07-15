@@ -27,22 +27,13 @@ protected:
         DropdownTextPickerWidgetBase<F>::updateUi();
 
         const auto fieldValue = m_field->value();
-        {
-            QSignalBlocker blocker{m_comboBox};
-            if (fieldValue.isEmpty())
-                m_comboBox->setCurrentText(Strings::autoValue());
-            else
-                m_comboBox->setCurrentText(fieldValue);
-        }
+        m_comboBox->setCurrentText(!fieldValue.isEmpty() ? fieldValue : Strings::autoValue());
     }
 
-    void onCurrentIndexChanged() override
+    void onActivated() override
     {
         const auto value = m_comboBox->currentText().trimmed();
-        if (value != Strings::autoValue())
-            m_field->setValue(value);
-        else
-            m_field->setValue({});
+        m_field->setValue(value != Strings::autoValue() ? value : QString{});
     }
 };
 
@@ -56,7 +47,6 @@ public:
         :
         HttpParametersPickerBase<vms::rules::ContentTypeField>(field, context, parent)
     {
-        QSignalBlocker blocker{m_comboBox};
         m_comboBox->addItem(Strings::autoValue());
         m_comboBox->addItem("text/plain");
         m_comboBox->addItem("text/html");
@@ -76,7 +66,6 @@ public:
         :
         HttpParametersPickerBase<vms::rules::HttpMethodField>(field, context, parent)
     {
-        QSignalBlocker blocker{m_comboBox};
         m_comboBox->addItem(Strings::autoValue());
         m_comboBox->addItem("GET");
         m_comboBox->addItem("POST");

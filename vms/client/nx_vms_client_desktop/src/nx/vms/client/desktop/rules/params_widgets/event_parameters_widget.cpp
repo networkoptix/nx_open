@@ -35,8 +35,6 @@ void EventParametersWidget::setEdited()
 
 void EventParametersWidget::onRuleSet(bool isNewRule)
 {
-
-
     auto layout = new QVBoxLayout;
     layout->setSpacing(0);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -83,11 +81,15 @@ void EventParametersWidget::onRuleSet(bool isNewRule)
     setLayout(layout);
 
     // Connection order is matter, must be called after all the pickers are created.
+    // EventFilter::changed signal is emitted whenever any field property is changed. Often, a
+    // single user action changes more than one property. A queued connection is used here to
+    // ensure that the UI is updated after all required properties have been changed.
     connect(
         eventFilter(),
         &vms::rules::EventFilter::changed,
         this,
-        &EventParametersWidget::onEventFieldChanged);
+        &EventParametersWidget::onEventFieldChanged,
+        Qt::QueuedConnection);
 }
 
 void EventParametersWidget::updateUi()

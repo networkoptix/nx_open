@@ -19,6 +19,7 @@
 #include "event_filter_field_validators/source_camera_field_validator.h"
 #include "event_filter_field_validators/source_server_field_validator.h"
 #include "event_filter_field_validators/source_user_field_validator.h"
+#include "event_filter_field_validators/state_field_validator.h"
 #include "event_filter_field_validators/text_with_fields_validator.h"
 
 namespace nx::vms::rules {
@@ -196,6 +197,7 @@ void Initializer::registerFieldValidators() const
     registerFieldValidator<SourceCameraField>(new SourceCameraFieldValidator);
     registerFieldValidator<SourceServerField>(new SourceServerFieldValidator);
     registerFieldValidator<SourceUserField>(new SourceUserFieldValidator);
+    registerFieldValidator<StateField>(new StateFieldValidator);
 
     // Action field validators.
     registerFieldValidator<LayoutField>(new LayoutFieldValidator);

@@ -11,42 +11,45 @@ StatePicker::StatePicker(
     SystemContext* context,
     ParamsWidget* parent)
     :
-    DropdownTextPickerWidgetBase<vms::rules::StateField>{field, context, parent}
+    DropdownTextPickerWidgetBase<vms::rules::StateField, StateComboBox>{field, context, parent}
 {
     m_label->setText({});
 
-    const auto itemFlags = parentParamsWidget()->eventDescriptor()->flags;
+    m_comboBox->setStateStringProvider(
+        [](vms::rules::State state)
+        {
+            switch(state)
+            {
+                case vms::rules::State::instant:
+                    return tr("When event occurs");
+                case vms::rules::State::started:
+                    return tr("When event starts");
+                case vms::rules::State::stopped:
+                    return tr("When event stops");
+                default:
+                    NX_ASSERT(false, "Unexpected state is provided");
+                    return QString{};
+            }
+        });
 
     m_comboBox->setCurrentIndex(-1);
     m_comboBox->setPlaceholderText(tr("Select state"));
-
-    if (itemFlags.testFlag(vms::rules::ItemFlag::instant))
-    {
-        m_comboBox->addItem(
-            tr("When event occurs"),
-            QVariant::fromValue(api::rules::State::instant));
-    }
-
-    if (itemFlags.testFlag(vms::rules::ItemFlag::prolonged))
-    {
-        m_comboBox->addItem(
-            tr("When event starts"),
-            QVariant::fromValue(api::rules::State::started));
-        m_comboBox->addItem(
-            tr("When event stops"),
-            QVariant::fromValue(api::rules::State::stopped));
-    }
 }
 
 void StatePicker::updateUi()
 {
-    DropdownTextPickerWidgetBase<vms::rules::StateField>::updateUi();
+    DropdownTextPickerWidgetBase<vms::rules::StateField, StateComboBox>::updateUi();
 
-    QSignalBlocker blocker{m_comboBox};
+    const auto eventDurationType = vms::rules::getEventDurationType(
+        systemContext()->vmsRulesEngine(), parentParamsWidget()->eventFilter());
+
+    m_comboBox->update(eventDurationType);
     m_comboBox->setCurrentIndex(m_comboBox->findData(QVariant::fromValue(m_field->value())));
+
+    setVisible(m_comboBox->count() > 1);
 }
 
-void StatePicker::onCurrentIndexChanged()
+void StatePicker::onActivated()
 {
     if (m_comboBox->currentIndex() != -1)
         m_field->setValue(m_comboBox->currentData().value<api::rules::State>());

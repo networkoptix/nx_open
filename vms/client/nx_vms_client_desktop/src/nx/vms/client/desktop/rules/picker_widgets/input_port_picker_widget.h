@@ -19,7 +19,7 @@ public:
     using DropdownTextPickerWidgetBase<vms::rules::InputPortField>::DropdownTextPickerWidgetBase;
 
 protected:
-    void onCurrentIndexChanged() override
+    void onActivated() override
     {
         m_field->setValue(m_comboBox->currentData().toString());
     }
@@ -35,7 +35,6 @@ private:
         if (!NX_ASSERT(sourceCameraField))
             return;
 
-        QSignalBlocker blocker{m_comboBox};
         m_comboBox->clear();
 
         m_comboBox->addItem(Strings::autoValue(), QString());

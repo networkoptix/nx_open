@@ -32,8 +32,11 @@ ActionTypePickerWidget::ActionTypePickerWidget(SystemContext* context, QWidget* 
     for (const auto& actionDescriptor: sortedListOfActions)
         ui->actionTypeComboBox->addItem(actionDescriptor.displayName, actionDescriptor.id);
 
-    connect(ui->actionTypeComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
-        [this]()
+    connect(
+        ui->actionTypeComboBox,
+        &QComboBox::activated,
+        this,
+        [this]
         {
             emit actionTypePicked(actionType());
         });

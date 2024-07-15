@@ -18,7 +18,6 @@
 #include <nx/vms/rules/event_filter_fields/analytics_object_type_field.h>
 #include <nx/vms/rules/event_filter_fields/source_camera_field.h>
 #include <nx/vms/rules/utils/field.h>
-#include <ui/widgets/common/elided_label.h>
 #include <ui/widgets/common/tree_combo_box.h>
 
 #include "field_picker_widget.h"
@@ -45,9 +44,9 @@ public:
 
         connect(
             m_comboBox,
-            &D::currentIndexChanged,
+            &D::activated,
             this,
-            &DropdownIdPickerWidgetBase<F, D>::onCurrentIndexChanged);
+            &DropdownIdPickerWidgetBase<F, D>::onActivated);
     }
 
 protected:
@@ -55,7 +54,7 @@ protected:
 
     D* m_comboBox{nullptr};
 
-    virtual void onCurrentIndexChanged() = 0;
+    virtual void onActivated() = 0;
 
     QnVirtualCameraResourceList getCameras() const
     {
@@ -91,7 +90,7 @@ public:
     }
 
 protected:
-    void onCurrentIndexChanged() override
+    void onActivated() override
     {
         m_field->setValue(
             m_comboBox->currentData(ui::PluginDiagnosticEventModel::PluginIdRole).value<nx::Uuid>());
@@ -100,8 +99,6 @@ protected:
     void updateUi() override
     {
         DropdownIdPickerWidgetBase<vms::rules::AnalyticsEngineField, QnTreeComboBox>::updateUi();
-
-        QSignalBlocker blocker{m_comboBox};
 
         m_pluginDiagnosticEventModel->filterByCameras(
             resourcePool()->getResources<vms::common::AnalyticsEngineResource>(),
@@ -158,10 +155,21 @@ public:
         sortModel->setSourceModel(m_analyticsSdkEventModel);
 
         m_comboBox->setModel(sortModel);
+
+        const auto sourceCameraField =
+            getEventField<vms::rules::SourceCameraField>(vms::rules::utils::kCameraIdFieldName);
+        if (NX_ASSERT(sourceCameraField))
+        {
+            connect(
+                sourceCameraField,
+                &vms::rules::SourceCameraField::idsChanged,
+                this,
+                &AnalyticsEventTypePicker::onSelectedCamerasChanged);
+        }
     }
 
 protected:
-    void onCurrentIndexChanged() override
+    void onActivated() override
     {
         m_field->setEngineId(
             m_comboBox->currentData(ui::AnalyticsSdkEventModel::EngineIdRole).value<nx::Uuid>());
@@ -171,22 +179,46 @@ protected:
 
     void updateUi() override
     {
-        QSignalBlocker blocker{m_comboBox};
+        DropdownIdPickerWidgetBase<vms::rules::AnalyticsEventTypeField, QnTreeComboBox>::updateUi();
 
         m_analyticsSdkEventModel->loadFromCameras(
-            getCameras(),
-            m_comboBox->currentData(ui::AnalyticsSdkEventModel::EngineIdRole).value<nx::Uuid>(),
-            m_comboBox->currentData(ui::AnalyticsSdkEventModel::EventTypeIdRole).value<QString>());
+            getCameras(), m_field->engineId(), m_field->typeId());
 
         m_comboBox->setEnabled(m_analyticsSdkEventModel->isValid());
 
-        auto engineId = m_field->engineId();
-        auto typeId = m_field->typeId();
+        const auto analyticsModel = m_comboBox->model();
+        auto items = analyticsModel->match(
+            analyticsModel->index(0, 0),
+            ui::AnalyticsSdkEventModel::EventTypeIdRole,
+            /*value*/ QVariant::fromValue(m_field->typeId()),
+            /*hits*/ 1,
+            Qt::MatchExactly | Qt::MatchRecursive);
 
-        auto analyticsModel = m_comboBox->model();
+        if (items.size() == 1)
+            m_comboBox->setCurrentIndex(items.front());
+    }
+
+private:
+    ui::AnalyticsSdkEventModel* m_analyticsSdkEventModel{nullptr};
+
+    void onSelectedCamerasChanged()
+    {
+        const auto engineId = m_field->engineId();
+        const auto typeId = m_field->typeId();
+
+        const auto cameras = getCameras();
+        m_analyticsSdkEventModel->loadFromCameras(cameras, engineId, typeId);
+
+        if (cameras.empty())
+        {
+            m_field->setTypeId({});
+            m_field->setEngineId({});
+            return;
+        }
 
         if (engineId.isNull() || typeId.isNull())
         {
+            const auto analyticsModel = m_comboBox->model();
             const auto selectableItems = analyticsModel->match(
                 analyticsModel->index(0, 0),
                 ui::AnalyticsSdkEventModel::ValidEventRole,
@@ -196,34 +228,14 @@ protected:
 
             if (!selectableItems.empty())
             {
-                // Use the first selectable item
-                m_comboBox->setCurrentIndex(selectableItems.front());
-
-                // #mmalofeev Is it right to use the first available selectable item in the case when
-                // engineId or typeId is not set? If do so it will lead to rule model changes which in
-                // turn will leads to required apply or discard changes action from the user. Choose
-                // first selectable item and do not change model is also not an option cause it may
-                // leads to different values in different launches. Isn't it better to leave dropdown
-                // blank?
-                // updateFieldValue();
+                const auto firstItem = selectableItems.first();
+                m_field->setTypeId(
+                    firstItem.data(ui::AnalyticsSdkEventModel::EventTypeIdRole).toString());
+                m_field->setEngineId(
+                    firstItem.data(ui::AnalyticsSdkEventModel::EngineIdRole).value<nx::Uuid>());
             }
         }
-        else
-        {
-            auto items = analyticsModel->match(
-                analyticsModel->index(0, 0),
-                ui::AnalyticsSdkEventModel::EventTypeIdRole,
-                /*value*/ QVariant::fromValue(typeId),
-                /*hits*/ 1,
-                Qt::MatchExactly | Qt::MatchRecursive);
-
-            if (items.size() == 1)
-                m_comboBox->setCurrentIndex(items.front());
-        }
     }
-
-private:
-    ui::AnalyticsSdkEventModel* m_analyticsSdkEventModel{nullptr};
 };
 
 class AnalyticsObjectTypePicker:
@@ -249,14 +261,14 @@ public:
     }
 
 protected:
-    void onCurrentIndexChanged() override
+    void onActivated() override
     {
         m_field->setValue(m_comboBox->selectedMainObjectTypeId());
     }
 
     void updateUi() override
     {
-        QSignalBlocker blocker{m_comboBox};
+        DropdownIdPickerWidgetBase<vms::rules::AnalyticsObjectTypeField, DetectableObjectTypeComboBox>::updateUi();
 
         const auto ids = getCameras().ids();
         m_comboBox->setDevices(UuidSet{ids.begin(), ids.end()});

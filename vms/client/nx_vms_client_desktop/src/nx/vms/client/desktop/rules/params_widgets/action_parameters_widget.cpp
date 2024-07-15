@@ -8,10 +8,9 @@
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/rules/action_builder.h>
-#include <nx/vms/rules/action_builder_fields/optional_time_field.h>
-#include <nx/vms/rules/action_builder_fields/time_field.h>
+#include <nx/vms/rules/action_builder_field.h>
 #include <nx/vms/rules/event_filter.h>
-#include <nx/vms/rules/event_filter_fields/state_field.h>
+#include <nx/vms/rules/event_filter_field.h>
 #include <nx/vms/rules/utils/common.h>
 #include <nx/vms/rules/utils/field.h>
 #include <ui/workbench/workbench_context.h>
@@ -91,11 +90,22 @@ void ActionParametersWidget::onRuleSet(bool isNewRule)
     setLayout(layout);
 
     // Connection order is matter, must be called after all the pickers are created.
+    // ActionBuilder::changed signal is emitted whenever any field property is changed. Often, a
+    // single user action changes more than one property. A queued connection is used here to
+    // ensure that the UI is updated after all required properties have been changed.
     connect(
         actionBuilder(),
         &vms::rules::ActionBuilder::changed,
         this,
-        &ActionParametersWidget::onActionFieldChanged);
+        &ActionParametersWidget::onFieldChanged,
+        Qt::QueuedConnection);
+
+    connect(
+        eventFilter(),
+        &vms::rules::EventFilter::changed,
+        this,
+        &ActionParametersWidget::onFieldChanged,
+        Qt::QueuedConnection);
 }
 
 void ActionParametersWidget::updateUi()
@@ -104,89 +114,9 @@ void ActionParametersWidget::updateUi()
         picker->updateUi();
 }
 
-void ActionParametersWidget::onActionFieldChanged(const QString& fieldName)
+void ActionParametersWidget::onFieldChanged(const QString& /*fieldName*/)
 {
-    if (fieldName == vms::rules::utils::kDurationFieldName)
-        onActionDurationChanged();
-
     updateUi();
-}
-
-void ActionParametersWidget::onActionDurationChanged() const
-{
-    // During the rule editing by the user, some values might becomes inconsistent. The code below
-    // is fixing such a values.
-    // TODO: #mmalofeev find a better place for the code below.
-
-    const auto durationField = actionBuilder()->fieldByName<vms::rules::OptionalTimeField>(
-        vms::rules::utils::kDurationFieldName);
-    if (!NX_ASSERT(durationField))
-        return;
-
-    const auto isEventInstantOnly = vms::rules::utils::isInstantOnly(eventDescriptor().value());
-    if (isEventInstantOnly && durationField->value() == std::chrono::microseconds::zero())
-    {
-        // Zero duration does not have sense for instant only event.
-        const auto defaultDuration = durationField->properties().defaultValue;
-
-        QSignalBlocker blocker{durationField};
-        if (NX_ASSERT(
-            defaultDuration != std::chrono::seconds::zero(),
-            "Default value for the '%1' field in the '%2' cannot be zero, fix the manifest",
-            vms::rules::utils::kDurationFieldName,
-            descriptor()->id))
-        {
-            durationField->setValue(defaultDuration);
-        }
-        else
-        {
-            durationField->setValue(std::chrono::seconds{1});
-        }
-    }
-
-    const auto stateField = eventFilter()->fieldByType<vms::rules::StateField>();
-    if (stateField)
-    {
-        // When a user is changed action duration from zero to non zero value or vice versa,
-        // event state must also be corrected.
-
-        QSignalBlocker blocker{stateField};
-        if (durationField->value() == std::chrono::microseconds::zero())
-        {
-            // Action duration is requested to be equal the event duration. The only `State::none`
-            // is accepted for such a case.
-            stateField->setValue(api::rules::State::none);
-            return;
-        }
-
-        if (stateField->value() == api::rules::State::none)
-        {
-            // Some non zero duration is selected. `State::none` must be changed to the other
-            // appropriate state value.
-            stateField->setValue(eventDescriptor()->flags.testFlag(vms::rules::ItemFlag::instant)
-                ? api::rules::State::instant
-                : api::rules::State::started);
-        }
-    }
-
-    // When action has non zero duration, pre and post recording (except bookmark action
-    // pre-recording) fields must have zero value.
-    const auto fixTimeField =
-        [this, durationField](const QString& fieldName)
-        {
-            const auto timeField = actionBuilder()->fieldByName<vms::rules::TimeField>(fieldName);
-            if (!timeField)
-                return;
-
-            if (durationField && durationField->value() != std::chrono::microseconds::zero())
-            {
-                QSignalBlocker blocker{timeField};
-                timeField->setValue(std::chrono::microseconds::zero());
-            }
-        };
-
-    fixTimeField(vms::rules::utils::kRecordBeforeFieldName);
-    fixTimeField(vms::rules::utils::kRecordAfterFieldName);
 }
 
 PickerWidget* ActionParametersWidget::createStatePickerIfRequired()

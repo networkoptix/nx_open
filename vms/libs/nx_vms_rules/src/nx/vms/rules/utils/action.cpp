@@ -74,4 +74,13 @@ bool needAcknowledge(const ActionPtr& action)
     return action->property(utils::kAcknowledgeFieldName).toBool();
 }
 
+QSet<State> getAvailableStates(
+    const Engine* engine, const ActionBuilder* actionBuilder)
+{
+    if (isProlonged(engine, actionBuilder))
+        return {State::none};
+
+    return {State::instant, State::started, State::stopped};
+}
+
 } // namespace nx::vms::rules

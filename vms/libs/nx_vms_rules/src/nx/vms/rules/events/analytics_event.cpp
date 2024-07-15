@@ -104,7 +104,7 @@ const ItemDescriptor& AnalyticsEvent::manifest()
         .id = utils::type<AnalyticsEvent>(),
         .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Analytics Event")),
         .description = {},
-        .flags = {ItemFlag::prolonged},
+        .flags = {ItemFlag::instant, ItemFlag::prolonged}, //< Actual duration depends on the AnalyticsEventTypeField.
         .fields = {
             utils::makeStateFieldDescriptor(Strings::beginWhen()),
             makeFieldDescriptor<AnalyticsEventTypeField>(

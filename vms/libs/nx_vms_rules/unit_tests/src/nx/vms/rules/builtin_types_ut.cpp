@@ -54,8 +54,17 @@ public:
 
         EXPECT_FALSE(manifest.id.isEmpty());
         EXPECT_FALSE(manifest.displayName.value().isEmpty());
+
+        // Duration must be provided.
         EXPECT_TRUE(manifest.flags.testFlag(ItemFlag::instant)
             || manifest.flags.testFlag(ItemFlag::prolonged));
+
+        if constexpr(std::derived_from<T, BasicAction>)
+        {
+            // Action duration cannot be mixed.
+            EXPECT_FALSE(manifest.flags.testFlag(ItemFlag::instant)
+                && manifest.flags.testFlag(ItemFlag::prolonged));
+        }
 
         // Check all manifest fields correspond to properties with the same name.
         for (const auto& field: manifest.fields)

@@ -215,8 +215,11 @@ bool Rule::isValid() const
     if (m_filters.empty() || m_builders.empty())
         return false;
 
-    if (!utils::isCompatible(m_engine, m_filters.front().get(), m_builders.front().get()))
+    if (!utils::isCompatible(
+        m_engine, m_filters.front().get(), m_builders.front().get()))
+    {
         return false;
+    }
 
     return true;
 }
@@ -228,8 +231,7 @@ ValidationResult Rule::validity(
 {
     ValidationResult result;
 
-    QStringList alerts;
-
+    QStringList eventFilterAlerts;
     for (const auto& eventFilter: m_filters)
     {
         for (auto [fieldName, field]: eventFilter->fields().asKeyValueRange())
@@ -250,14 +252,21 @@ ValidationResult Rule::validity(
 
             if (!fieldValidity.description.isEmpty())
             {
-                alerts << tr("`%1` field `%2` alert: %3")
-                    .arg(eventFilter->eventType())
+                eventFilterAlerts << QString{" - %1(%2): %3"}
                     .arg(fieldName)
+                    .arg(field->metatype())
                     .arg(fieldValidity.description);
             }
         }
+
+        if (!eventFilterAlerts.isEmpty())
+        {
+            eventFilterAlerts.push_front(
+                tr("`%1` event filter field alerts:").arg(eventFilter->eventType()));
+        }
     }
 
+    QStringList actionBuilderAlerts;
     for (const auto& actionBuilder: m_builders)
     {
         for (auto [fieldName, field]: actionBuilder->fields().asKeyValueRange())
@@ -278,15 +287,21 @@ ValidationResult Rule::validity(
 
             if (!fieldValidity.description.isEmpty())
             {
-                alerts << tr("`%1` field `%2` alert: %3")
-                    .arg(actionBuilder->actionType())
+                actionBuilderAlerts << QString{" - %1(%2): %3"}
                     .arg(fieldName)
+                    .arg(field->metatype())
                     .arg(fieldValidity.description);
             }
         }
+
+        if (!actionBuilderAlerts.isEmpty())
+        {
+            actionBuilderAlerts.push_front(
+                tr("`%1` action builder field alerts:").arg(actionBuilder->actionType()));
+        }
     }
 
-    if (!alerts.isEmpty())
+    if (const auto alerts = eventFilterAlerts + actionBuilderAlerts; !alerts.isEmpty())
         result.description = alerts.join('\n');
 
     return result;

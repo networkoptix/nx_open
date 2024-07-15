@@ -27,4 +27,17 @@ NX_VMS_RULES_API bool hasSourceCamera(const vms::rules::ItemDescriptor& eventDes
 
 NX_VMS_RULES_API bool hasSourceServer(const vms::rules::ItemDescriptor& eventDescriptor);
 
+enum class EventDurationType
+{
+    instant,
+    prolonged,
+    mixed
+};
+
+NX_VMS_RULES_API EventDurationType getEventDurationType(
+    const Engine* engine, const EventFilter* eventFilter);
+
+NX_VMS_RULES_API QSet<State> getAvailableStates(
+    const Engine* engine, const EventFilter* eventFilter);
+
 } // namespace nx::vms::rules

@@ -32,8 +32,11 @@ EventTypePickerWidget::EventTypePickerWidget(SystemContext* context, QWidget* pa
     for (const auto& eventDescriptor: sortedListOfEvents)
         ui->eventTypeComboBox->addItem(eventDescriptor.displayName, eventDescriptor.id);
 
-    connect(ui->eventTypeComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
-        [this]()
+    connect(
+        ui->eventTypeComboBox,
+        &QComboBox::activated,
+        this,
+        [this]
         {
             emit eventTypePicked(eventType());
         });

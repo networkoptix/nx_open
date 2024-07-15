@@ -3,11 +3,15 @@
 #pragma once
 
 #include <nx/utils/scoped_connections.h>
+#include <nx/vms/client/desktop/common/widgets/alert_label.h>
 #include <nx/vms/client/desktop/common/widgets/editable_label.h>
 #include <nx/vms/client/desktop/common/widgets/slide_switch.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
+#include <nx/vms/rules/field_validator.h>
 #include <nx/vms/rules/rule.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
+
+#include "helpers/rule_compatibility_manager.h"
 
 class QLabel;
 
@@ -45,12 +49,14 @@ private:
     EventParametersWidget* m_eventEditorWidget{nullptr};
     ActionTypePickerWidget* m_actionTypePicker{nullptr};
     ActionParametersWidget* m_actionEditorWidget{nullptr};
+    AlertLabel* m_alertLabel{nullptr};
     QPushButton* m_enabledButton{nullptr};
     QDialogButtonBox* m_buttonBox{nullptr};
     bool m_hasChanges{false};
     bool m_checkValidityOnChanges{false};
 
     std::shared_ptr<vms::rules::Rule> m_rule;
+    std::unique_ptr<RuleCompatibilityManager> m_ruleCompatibilityManager;
     bool m_isNewRule{false};
 
     nx::utils::ScopedConnections m_scopedConnections;
@@ -79,7 +85,7 @@ private:
 
     void showWarningIfRequired();
 
-    QValidator::State ruleValidity() const;
+    vms::rules::ValidationResult ruleValidity() const;
 };
 
 } // namespace nx::vms::client::desktop::rules

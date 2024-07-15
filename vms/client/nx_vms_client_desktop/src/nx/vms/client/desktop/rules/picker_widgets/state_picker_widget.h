@@ -3,13 +3,13 @@
 #pragma once
 
 #include <nx/vms/rules/event_filter_fields/state_field.h>
-#include <nx/vms/rules/utils/field.h>
 
+#include "../utils/state_combo_box.h"
 #include "dropdown_text_picker_widget_base.h"
 
 namespace nx::vms::client::desktop::rules {
 
-class StatePicker: public DropdownTextPickerWidgetBase<vms::rules::StateField>
+class StatePicker: public DropdownTextPickerWidgetBase<vms::rules::StateField, StateComboBox>
 {
     Q_OBJECT
 
@@ -18,7 +18,7 @@ public:
 
 protected:
     void updateUi() override;
-    void onCurrentIndexChanged() override;
+    void onActivated() override;
 };
 
 } // namespace nx::vms::client::desktop::rules
