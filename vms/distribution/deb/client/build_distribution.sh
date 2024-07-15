@@ -239,7 +239,7 @@ copyLibs()
             libmfxhw64.so.1 \
             libmfx.so.1 \
             libmfx-gen.so.1.2 \
-            libcudart.so.11.0
+            libcudart.so.12
         mkdir "${STAGE_LIB}/libva-drivers"
         cp "${BUILD_DIR}/lib/libva-drivers/iHD_drv_video.so" "${STAGE_LIB}/libva-drivers"
     fi
