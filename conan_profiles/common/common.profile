@@ -8,6 +8,7 @@ boost/*:bzip2 = False
 boost/*:without_locale = True
 boost/*:without_log = True
 boost/*:without_stacktrace = True
+libsrtp/*:with_openssl = True
 opencv*:dnn=True
 opencv*:freetype=False
 opencv*:gapi=False
