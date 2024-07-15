@@ -28,6 +28,7 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/image_providers/layout_thumbnail_loader.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/utils/mime_data.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <ui/animation/opacity_animator.h>
@@ -57,6 +58,7 @@ namespace {
 
 // We request this size for thumbnails.
 static const QSize kPreviewSize(640, 480);
+
 }
 
 class QnVideowallItemWidgetHoverProgressAccessor: public AbstractAccessor
@@ -483,11 +485,14 @@ void QnVideowallItemWidget::at_updateThumbnailStatus(ThumbnailStatus status)
     switch (status)
     {
         case ThumbnailStatus::Loaded:
+        {
             m_resourceStatus = Qn::EmptyOverlay;
             m_layoutThumbnail = QPixmap::fromImage(m_layoutThumbnailProvider->image());
             NX_VERBOSE(this) << "QnVideowallItemWidget got thumbs of size " << m_layoutThumbnail.size();
             update();
+            reloadDesktopCameraThumbnailIfNeeded();
             break;
+        }
 
         case ThumbnailStatus::Loading:
             m_resourceStatus = Qn::LoadingOverlay;
@@ -497,4 +502,30 @@ void QnVideowallItemWidget::at_updateThumbnailStatus(ThumbnailStatus status)
             m_resourceStatus = Qn::NoDataOverlay;
             break;
     }
+}
+
+void QnVideowallItemWidget::reloadDesktopCameraThumbnailIfNeeded()
+{
+    if (!m_layout)
+        return;
+
+    const auto items = m_layout->getItems();
+    if (items.size() != 1)
+        return;
+
+    const auto resource = getResourceByDescriptor(items.begin()->resource);
+    if (!resource || !resource->hasFlags(Qn::desktop_camera))
+        return;
+
+    const auto itemsStatuses = m_layoutThumbnailProvider->getItemStatuses();
+    const auto desktopCameraIter = itemsStatuses.find(resource);
+    if (desktopCameraIter == itemsStatuses.end() || *desktopCameraIter != ThumbnailStatus::NoData)
+        return;
+
+    static const std::chrono::milliseconds kDesktopCameraThumbnailReloadTimeout(2000);
+
+    executeDelayedParented(
+        [this]{ m_layoutThumbnailProvider->loadAsync(); },
+        kDesktopCameraThumbnailReloadTimeout,
+        this);
 }

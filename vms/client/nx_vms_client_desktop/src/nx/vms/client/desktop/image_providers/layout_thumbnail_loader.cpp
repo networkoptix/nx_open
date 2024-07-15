@@ -244,23 +244,20 @@ struct LayoutThumbnailLoader::Private
         NX_VERBOSE(this, "LayoutThumbnailLoader(%1) item = %2 status = %3",
             layoutName, item->name, strStatus);
 
+        item->status = status;
         switch (status)
         {
             case core::ThumbnailStatus::Loading:
                 break;
 
             case core::ThumbnailStatus::Loaded:
-                item->status = status;
                 loaderIsComplete = true;
                 break;
 
             case core::ThumbnailStatus::Invalid:
             case core::ThumbnailStatus::NoData:
-                // We try not to change status if we had already 'Loaded
                 if(item->status != core::ThumbnailStatus::Loaded)
                     drawStatusPixmap(status, aspectRatio, item);
-                else
-                    item->status = status;
                 loaderIsComplete = true;
                 break;
             case core::ThumbnailStatus::Refreshing:
@@ -472,6 +469,15 @@ LayoutThumbnailLoader::LayoutThumbnailLoader(
 
 LayoutThumbnailLoader::~LayoutThumbnailLoader()
 {
+}
+
+QMap<QnResourcePtr, core::ThumbnailStatus> LayoutThumbnailLoader::getItemStatuses() const
+{
+    QMap<QnResourcePtr, core::ThumbnailStatus> result;
+    for (const auto& item: d->items)
+        result[item->resource] = item->status;
+
+    return result;
 }
 
 QnLayoutResourcePtr LayoutThumbnailLoader::layout() const
@@ -709,7 +715,7 @@ void LayoutThumbnailLoader::doLoadAsync()
         const auto handleStatusChange =
             [this, thumbnailItem, zoomRect](core::ThumbnailStatus status)
             {
-                QnAspectRatio sourceAr(thumbnailItem->provider->sizeHint());
+                const QnAspectRatio sourceAr(thumbnailItem->provider->sizeHint());
                 if (status == core::ThumbnailStatus::Loaded)
                 {
                     const auto sourceAr =
@@ -719,6 +725,7 @@ void LayoutThumbnailLoader::doLoadAsync()
                         : sourceAr * Geometry::aspectRatio(zoomRect);
                     d->drawTile(thumbnailItem, aspectRatio, zoomRect);
                 }
+
                 // TODO: Why do we use different types for aspect ratio
                 // in drawTile and updateTileStatus ?
                 d->updateTileStatus(status, sourceAr, thumbnailItem);
