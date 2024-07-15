@@ -2,7 +2,7 @@
 
 import QtQml
 import QtQuick
-import QtQuick.Controls
+import QtQml
 
 import Nx.Controls
 import Nx.Core
@@ -13,6 +13,8 @@ Text
 {
     id: root
 
+    property int row: model.row
+    property int column: model.column
     property bool isElided: width < implicitWidth
 
     elide: Text.ElideRight

@@ -52,7 +52,11 @@ PickerWidget* createPickerImpl(
     if (!NX_ASSERT(actualField))
         return {};
 
-    return new Picker{actualField, context, parent};
+    auto result = new Picker{actualField, context, parent};
+
+    result->setObjectName(field->descriptor()->fieldName); //< Required for auto tests.
+
+    return result;
 }
 
 PickerWidget* createSourceCameraPicker(
