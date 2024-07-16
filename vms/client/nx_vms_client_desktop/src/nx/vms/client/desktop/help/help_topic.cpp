@@ -147,7 +147,7 @@ QString HelpTopic::relativeUrlForTopic(Id topic)
         case Id::EventsActions_SendMail:
             return "mail_notifications.html";
         case Id::EventsActions_SendMobileNotification:
-            return "notifications.html";
+            return "send_mobile_notification.html";
         case Id::EventsActions_ShowDesktopNotification:
             return "notifications.html";
         case Id::EventsActions_ShowOnAlarmLayout:
