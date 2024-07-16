@@ -19,6 +19,7 @@
 #include <utils/common/delayed.h>
 
 #include "detail/globals_structures.h"
+#include "detail/helpers.h"
 #include "types.h"
 
 namespace nx::vms::client::desktop::jsapi {
@@ -157,7 +158,7 @@ Error Tabs::Private::remove(Tab* tab)
 
 Error Tabs::Private::open(const ResourceUniqueId& id)
 {
-    const auto resource = appContext()->unifiedResourcePool()->resource(id.id, id.localSystemId);
+    const auto resource = detail::getResourceIfAvailable(id);
     if (!resource || !resource->hasFlags(Qn::layout))
         return Error::failed();
 

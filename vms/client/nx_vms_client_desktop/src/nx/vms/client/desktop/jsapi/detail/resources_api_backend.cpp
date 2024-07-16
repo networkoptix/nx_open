@@ -5,46 +5,19 @@
 #include <core/resource/resource.h>
 #include <core/resource/security_cam_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/vms/client/core/resource/unified_resource_pool.h>
 #include <core/resource_management/resource_properties.h>
 #include <nx/reflect/json.h>
 #include <nx/utils/serialization/qjson.h>
+#include <nx/vms/client/core/resource/unified_resource_pool.h>
 #include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <ui/workbench/workbench_context.h>
 
+#include "helpers.h"
 #include "resources_structures.h"
 
 namespace nx::vms::client::desktop::jsapi::detail {
 namespace {
-
-/**
- * Show if we currently support specific resource type in API and user has enough access
- * rights.
- */
-bool isResourceAvailable(
-    const QnResourcePtr& resource,
-    Qn::Permissions permissions = Qn::ViewContentPermission)
-{
-    return resource
-        && detail::resourceType(resource) != ResourceType::undefined
-        && ResourceAccessManager::hasPermissions(resource, permissions);
-}
-
-QnResourcePtr getResourceIfAvailable(
-    const ResourceUniqueId& resourceId,
-    Qn::Permissions permissions = Qn::ViewContentPermission)
-{
-    const core::UnifiedResourcePool* pool = appContext()->unifiedResourcePool();
-    const auto resource = pool->resource(
-        resourceId.id,
-        resourceId.localSystemId.isNull()
-            ? appContext()->currentSystemContext()->localSystemId()
-            : resourceId.localSystemId);
-
-    return isResourceAvailable(resource, permissions) ? resource : QnResourcePtr{};
-}
 
 Error resourceNotFound()
 {
