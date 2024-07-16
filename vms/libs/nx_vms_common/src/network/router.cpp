@@ -45,6 +45,7 @@ QnRoute routeTo(
     // Route to itself (mediaserver-side only).
     if (serverId == systemContext->peerId())
     {
+        NX_VERBOSE(NX_SCOPE_TAG, "Return route to the current server.");
         result.addr =
             nx::network::SocketAddress(nx::network::HostAddress::localhost, server->getPort());
         return result;
