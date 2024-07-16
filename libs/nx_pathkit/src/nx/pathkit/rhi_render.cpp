@@ -399,9 +399,10 @@ bool RhiPaintDeviceRenderer::prepare(QRhiRenderPassDescriptor* rp, QRhiResourceU
     const auto resizeBuffer =
         [&](QRhiBuffer* buffer, size_t minSize)
         {
-            if (buffer->size() < minSize * sizeof(float))
+            minSize *= sizeof(float);
+            if (buffer->size() < minSize || minSize * 2 < buffer->size())
             {
-                buffer->setSize(minSize * sizeof(float));
+                buffer->setSize(minSize);
                 return buffer->create();
             }
             return true;
