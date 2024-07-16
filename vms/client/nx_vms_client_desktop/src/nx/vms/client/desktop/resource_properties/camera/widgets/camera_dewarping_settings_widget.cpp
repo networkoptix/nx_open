@@ -39,7 +39,7 @@ CameraDewarpingSettingsWidget::CameraDewarpingSettingsWidget(
     if (NX_ASSERT(thumbnail))
         engine->setObjectOwnership(thumbnail.get(), QQmlEngine::CppOwnership);
 
-    setHelpTopic(this, HelpTopic::Id::MainWindow_MediaItem_Dewarping);
+    setHelpTopic(this, HelpTopic::Id::CameraSettings_Dewarping);
 
     rootObject()->setProperty("store", QVariant::fromValue(store));
     rootObject()->setProperty("previewSource", QVariant::fromValue(thumbnail.get()));
