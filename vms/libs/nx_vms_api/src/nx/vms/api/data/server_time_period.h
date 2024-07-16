@@ -42,14 +42,14 @@ struct NX_VMS_API ServerTimePeriod
     nx::Uuid serverId;
 
     /**%apidoc[opt] Start time in milliseconds. */
-    std::chrono::milliseconds startTimeMs{0};
+    std::chrono::milliseconds startTimeMs = kMinTimeValue;
 
     /**%apidoc
      * Duration in milliseconds. Not presented for a video chunk that is currently being recorded.
      */
     std::optional<std::chrono::milliseconds> durationMs;
 
-    static constexpr auto kMinTimeValue = std::chrono::milliseconds();
+    static constexpr auto kMinTimeValue = std::chrono::milliseconds::zero();
 
     static constexpr auto kMaxTimeValue =
         std::chrono::milliseconds(std::numeric_limits<qint64>::max());

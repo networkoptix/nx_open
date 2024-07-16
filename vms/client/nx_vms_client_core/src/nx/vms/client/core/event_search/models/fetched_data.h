@@ -54,14 +54,13 @@ FetchedData<Container> makeFetchedData(
 namespace detail {
 
 template<typename Facade, typename Iterator>
-bool isSortedCorrectly(const Iterator begin,
-    const Iterator end,
-    Qt::SortOrder order)
+bool isSortedCorrectly(
+    const Iterator begin, const Iterator end, Qt::SortOrder order)
 {
     using PredicateType = std::function<bool (const typename Facade::Type& lhs,
         const typename Facade::Type& rhs)>;
 
-    const auto predicate = order == Qt::AscendingOrder
+    const auto predicate = (order == Qt::AscendingOrder)
         ? PredicateType([](const auto& lhs, const auto& rhs)
             { return Facade::startTime(lhs) < Facade::startTime(rhs); })
         : PredicateType([](const auto& lhs, const auto& rhs)
@@ -266,8 +265,13 @@ FetchedData<Container> makeFetchedData(
     const FetchRequest& request)
 {
     using namespace EventSearch;
-    NX_ASSERT(detail::isSortedCorrectly<Facade>(current, Qt::DescendingOrder));
-    NX_ASSERT(detail::isSortedCorrectly<Facade>(fetched, sortOrderFromDirection(request.direction)));
+    constexpr auto kCurrentOrder = Qt::DescendingOrder;
+
+    NX_ASSERT(detail::isSortedCorrectly<Facade>(current, kCurrentOrder),
+        "Invalid current sort order: %1", kCurrentOrder);
+
+    NX_ASSERT(detail::isSortedCorrectly<Facade>(fetched, sortOrderFromDirection(request.direction)),
+        "Invalid fetched sort order: %1", request.direction);
 
     if (request.direction == EventSearch::FetchDirection::newer)
     {

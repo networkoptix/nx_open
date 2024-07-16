@@ -191,8 +191,7 @@ struct EventSearchListModel::Private: public QObject
     QString description(const EventParameters& parameters) const;
 
     using GetCallback = std::function<void(bool, rest::Handle, ActionDataList&&)>;
-    rest::Handle getEvents(const core::FetchRequest& request,
-        GetCallback callback) const;
+    rest::Handle getEvents(const core::FetchRequest& request, GetCallback callback) const;
 
     void fetchLive();
 
