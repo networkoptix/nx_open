@@ -4,6 +4,7 @@
 
 #include <nx/reflect/json.h>
 
+#include "detail/helpers.h"
 #include "detail/resources_api_backend.h"
 #include "types.h"
 

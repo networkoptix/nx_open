@@ -114,12 +114,4 @@ struct ParameterResult
 };
 NX_REFLECTION_INSTRUMENT(ParameterResult, (error)(value))
 
-namespace detail {
-
-/** Check if a resource with the specified type may have media stream (at least theoretically). */
-bool hasMediaStream(const ResourceType type);
-
-ResourceType resourceType(const QnResourcePtr& resource);
-
-} // namespace detail
 } // namespace nx::vms::client::desktop::jsapi

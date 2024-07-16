@@ -27,6 +27,7 @@
 #include <ui/workbench/workbench_navigator.h>
 #include <utils/common/delayed.h>
 
+#include "helpers.h"
 #include "resources_structures.h"
 
 namespace nx::vms::client::desktop::jsapi::detail {
@@ -700,8 +701,8 @@ ItemResult TabApiBackend::item(const QUuid& itemId) const
 
 ItemResult TabApiBackend::addItem(const ResourceUniqueId& resourceId, const ItemParams& params)
 {
-    const auto pool = appContext()->unifiedResourcePool();
-    const auto resource = pool->resource(resourceId.id, resourceId.localSystemId);
+    const auto resource = getResourceIfAvailable(resourceId);
+
     if (!resource)
     {
         return d->itemOperationResult(
