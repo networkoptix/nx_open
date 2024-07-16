@@ -66,6 +66,8 @@ public:
 
     void setRequest(const QString& request);
     void setRole(Qn::ConnectionRole role);
+    void setCredentials(const nx::network::http::Credentials& credentials);
+    std::optional<nx::network::http::Credentials> credentials() const;
     void setPreferredAuthScheme(const nx::network::http::header::AuthScheme::Value scheme);
 
     static void setDefaultTransport(nx::vms::api::RtpTransportType defaultTransportToUse);
@@ -109,9 +111,6 @@ public:
     std::chrono::microseconds translateTimestampFromCameraToVmsSystem(
         std::chrono::microseconds timestamp,
         int channelNumber);
-
-    QAuthenticator credentials() const;
-    void setCredentials(const QAuthenticator& credentials);
 
     /*
      * Never correct RTSP time, trust RTSP source.
@@ -255,7 +254,7 @@ protected:
     nx::network::AbstractStreamSocket* m_tcpSocket = nullptr;
     bool m_cloudConnectEnabled = false;
     nx::utils::Url m_url;
-    QAuthenticator m_credentials;
+    std::optional<nx::network::http::Credentials> m_credentials;
 };
 
 class NX_VMS_COMMON_API RtspResourceStreamProvider: public RtspStreamProvider

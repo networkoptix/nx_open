@@ -764,12 +764,12 @@ std::chrono::microseconds RtspStreamProvider::translateTimestampFromCameraToVmsS
     return result;
 }
 
-QAuthenticator RtspStreamProvider::credentials() const
+std::optional<nx::network::http::Credentials> RtspStreamProvider::credentials() const
 {
     return m_credentials;
 }
 
-void RtspStreamProvider::setCredentials(const QAuthenticator& credentials)
+void RtspStreamProvider::setCredentials(const nx::network::http::Credentials& credentials)
 {
     m_credentials = credentials;
 }
@@ -792,8 +792,8 @@ CameraDiagnostics::Result RtspStreamProvider::openStream()
     m_registeredMulticastAddresses.clear();
     updateStreamUrlIfNeeded();
 
-    m_RtpSession.setCredentials(
-        nx::network::http::Credentials(credentials()), m_preferredAuthScheme);
+    m_RtpSession.setCredentials(credentials().value_or(
+        nx::network::http::Credentials()), m_preferredAuthScheme);
 
     {
         NX_MUTEX_LOCKER lock(&m_tracksMutex);
@@ -1107,7 +1107,10 @@ nx::vms::api::RtpTransportType RtspResourceStreamProvider::getRtpTransport() con
 CameraDiagnostics::Result RtspResourceStreamProvider::openStream()
 {
     setUrl(m_resource->getUrl());
-    setCredentials(m_resource->getAuth());
+
+    // Set credentials from resource only if not already forced.
+    if (!m_credentials)
+        setCredentials(nx::network::http::Credentials(m_resource->getAuth()));
 
     m_RtpSession.setMediaTypeEnabled(
         nx::rtp::Sdp::MediaType::Audio,
@@ -1117,6 +1120,8 @@ CameraDiagnostics::Result RtspResourceStreamProvider::openStream()
         m_resource->isRtspMetatadaRequired());
 
     auto result = base_type::openStream();
+    if (result.errorCode != CameraDiagnostics::ErrorCode::noError)
+        return result;
 
     bool videoExist = false;
     bool audioExist = false;
