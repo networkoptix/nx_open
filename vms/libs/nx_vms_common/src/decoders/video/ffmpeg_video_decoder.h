@@ -53,8 +53,6 @@ public:
     int getLastDecodeResult() const override { return m_lastDecodeResult; }
 
 private:
-    static AVCodec* findCodec(AVCodecID codecId);
-
     bool openDecoder(const QnConstCompressedVideoDataPtr& data);
     bool initFFmpegDecoder();
     void processNewResolutionIfChanged(const QnConstCompressedVideoDataPtr& data, int width, int height);
@@ -66,10 +64,9 @@ private:
     void setMultiThreadDecoding(bool value);
 
 private:
-    AVCodec* m_codec = nullptr;
     AVCodecContext *m_context;
 
-    AVCodecID m_codecId;
+    AVCodecID m_codecId = AV_CODEC_ID_NONE;
     QnAbstractVideoDecoder::DecodeMode m_decodeMode;
     QnAbstractVideoDecoder::DecodeMode m_newDecodeMode;
 

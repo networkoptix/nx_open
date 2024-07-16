@@ -22,6 +22,7 @@ extern "C" {
 #include <nx/media/codec_parameters.h>
 #include <nx/media/config.h>
 #include <nx/media/ffmpeg/audio_encoder.h>
+#include <nx/media/ffmpeg/old_api.h>
 #include <nx/media/ffmpeg_helper.h>
 #include <nx/media/media_data_packet.h>
 #include <nx/media/video_data_packet.h>
@@ -356,8 +357,6 @@ struct DesktopDataProvider::Private
 
     int encodedFrames = 0;
     BufferedScreenGrabber* grabber = nullptr;
-    quint8* videoBuf = nullptr;
-    int videoBufSize = 0;
     AVCodecContext* videoCodecCtx = nullptr;
     CodecParametersConstPtr videoContext;
     AVFrame* frame = nullptr;
@@ -482,10 +481,6 @@ bool DesktopDataProvider::initVideoCapturing()
     d->grabber->setLogo(d->logo);
     d->grabber->setTimer(d->timer.get());
 
-
-    d->videoBufSize = av_image_get_buffer_size((AVPixelFormat) d->grabber->format(), d->grabber->width(), d->grabber->height(), /*align*/ 1);
-    d->videoBuf = (quint8*) av_malloc(d->videoBufSize);
-
     d->frame = av_frame_alloc();
     int ret = av_image_alloc(d->frame->data, d->frame->linesize,
         d->grabber->width(), d->grabber->height(), d->grabber->format(), /*align*/ 1);
@@ -501,7 +496,7 @@ bool DesktopDataProvider::initVideoCapturing()
     else
         videoCodecName = getResource()->systemContext()->globalSettings()->defaultExportVideoCodec();
 
-    AVCodec* videoCodec = avcodec_find_encoder_by_name(videoCodecName.toLatin1().data());
+    const AVCodec* videoCodec = avcodec_find_encoder_by_name(videoCodecName.toLatin1().data());
     if (!videoCodec)
     {
         NX_WARNING(this, "Configured codec: %1 not found, h263p will used", videoCodecName);
@@ -590,11 +585,12 @@ bool DesktopDataProvider::initAudioCapturing()
         int sampleRate = format.sampleRate();
         int channels = d->audioInfo.size() > 1 ? /*stereo*/ 2 : format.channelCount();
 
+        AVChannelLayout layout;
+        av_channel_layout_default(&layout, channels);
         if (!d->audioEncoder.initialize(AV_CODEC_ID_MP2,
             sampleRate,
-            channels,
             fromQtAudioFormat(format),
-            av_get_default_channel_layout(channels),
+            layout,
             /*bitrate*/ 64000 * channels))
         {
             m_lastErrorStr = tr("Could not initialize audio encoder.");
@@ -644,11 +640,10 @@ int DesktopDataProvider::processData(bool flush)
     if (d->frame->width <= 0 || d->frame->height <= 0)
         return -1;
 
-    d->outPacket->data = d->videoBuf;
-    d->outPacket->size = d->videoBufSize;
+    QnFfmpegAvPacket outPacket;
     int got_packet = 0;
-    int encodeResult = avcodec_encode_video2(d->videoCodecCtx, d->outPacket, flush ? 0 : d->frame, &got_packet);
-
+    int encodeResult = nx::media::ffmpeg::old_api::encode(
+        d->videoCodecCtx, &outPacket, flush ? 0 : d->frame, &got_packet);
 
     if (encodeResult < 0)
         return encodeResult; //< error
@@ -662,14 +657,13 @@ int DesktopDataProvider::processData(bool flush)
 
     if (got_packet > 0)
     {
-
         QnWritableCompressedVideoDataPtr video = QnWritableCompressedVideoDataPtr(
-            new QnWritableCompressedVideoData(d->outPacket->size, d->videoContext));
-        video->m_data.write((const char*) d->videoBuf, d->outPacket->size);
+            new QnWritableCompressedVideoData(outPacket.size, d->videoContext));
+        video->m_data.write((const char*) outPacket.data, outPacket.size);
         video->compressionType = d->videoCodecCtx->codec_id;
-        video->timestamp = av_rescale_q(d->videoCodecCtx->coded_frame->pts, d->videoCodecCtx->time_base, timeBaseNative) + d->initTime;
+        video->timestamp = av_rescale_q(outPacket.pts, d->videoCodecCtx->time_base, timeBaseNative) + d->initTime;
 
-        if(d->videoCodecCtx->coded_frame->key_frame)
+        if(outPacket.flags & AV_PKT_FLAG_KEY)
             video->flags |= QnAbstractMediaData::MediaFlags_AVKey;
         video->flags |= QnAbstractMediaData::MediaFlags_LIVE;
         video->dataProvider = this;
@@ -678,7 +672,7 @@ int DesktopDataProvider::processData(bool flush)
 
     putAudioData();
 
-    return d->outPacket->size;
+    return outPacket.size;
 }
 
 void DesktopDataProvider::putAudioData()
@@ -904,14 +898,10 @@ void DesktopDataProvider::closeStream()
     avcodec_free_context(&d->videoCodecCtx);
 
     if (d->frame) {
-        avpicture_free((AVPicture*) d->frame);
+        av_freep(&d->frame->data[0]);
         av_free(d->frame);
         d->frame = 0;
     }
-
-    if (d->videoBuf)
-        av_free(d->videoBuf);
-    d->videoBuf = 0;
 
     foreach(EncodedAudioInfo* audioChannel, d->audioInfo)
         delete audioChannel;

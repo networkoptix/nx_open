@@ -17,7 +17,6 @@
 #include <nx/utils/log/log.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/test_support/test_context.h>
-#include <utils/media/ffmpeg_initializer.h>
 
 // TODO: #dklychkov Move mock classes to a separate file.
 // TODO: #dklychkov Rename this test to something like quality_chooser_ut.
@@ -485,8 +484,6 @@ class NxMediaPlayerTest: public nx::vms::common::test::ContextBasedTest
 protected:
     virtual void SetUp()
     {
-        ffmpegInitializer = std::make_unique<QnFfmpegInitializer>();
-
         VideoDecoderRegistry::instance()->reinitialize(); //< Just in case.
         VideoDecoderRegistry::instance()->addPlugin<MockVideoDecoder>("MockVideoDecoder");
     }
@@ -494,11 +491,7 @@ protected:
     virtual void TearDown()
     {
         VideoDecoderRegistry::instance()->reinitialize();
-        ffmpegInitializer.reset();
     }
-
-private:
-    std::unique_ptr<QnFfmpegInitializer> ffmpegInitializer;
 };
 
 } // namespace

@@ -8,6 +8,7 @@
 
 #include <core/resource/media_resource.h>
 #include <core/resource/storage_resource.h>
+#include <nx/media/ffmpeg/ffmpeg_utils.h>
 #include <nx/media/ffmpeg_helper.h>
 #include <nx/media/utils.h>
 #include <nx/media/video_data_packet.h>
@@ -27,7 +28,7 @@ namespace {
 
 QString fileExtensionFromContainer(const QString& container)
 {
-    AVOutputFormat* outputCtx = av_guess_format(container.toLatin1().data(), NULL, NULL);
+    const AVOutputFormat* outputCtx = av_guess_format(container.toLatin1().data(), NULL, NULL);
     if (outputCtx == 0)
     {
         throw ErrorEx(
@@ -83,7 +84,7 @@ void StorageRecordingContext::initializeRecordingContext(int64_t startTimeUs)
             "Failed to initialize Ffmpeg. Not enough memory.",
             m_recordingContext.storage);
     }
-
+    m_lastDts = 0;
     m_recordingContext.formatCtx->start_time = startTimeUs;
 }
 
@@ -189,7 +190,7 @@ void StorageRecordingContext::writeHeader(StorageContext& context)
         throw ErrorEx(
             Error::Code::incompatibleCodec,
             NX_FMT("Video or audio codec is incompatible with '%1' format. Try another format. Ffmpeg error: %2, codecs: %3",
-                m_container, QnFfmpegHelper::avErrorToString(rez), codecs));
+                m_container, nx::media::ffmpeg::avErrorToString(rez), codecs));
     }
 }
 
@@ -288,12 +289,14 @@ void StorageRecordingContext::writeData(const QnConstAbstractMediaDataPtr& media
     QnFfmpegAvPacket avPkt;
     int64_t timestamp = getPacketTimeUsec(md);
     int64_t timestampOffsetUsec = md->timestamp - timestamp;
-    qint64 dts = av_rescale_q(timestamp, srcRate, stream->time_base);
+    int64_t dts = av_rescale_q(timestamp, srcRate, stream->time_base);
 
-    if (stream->cur_dts > 0)
-        avPkt.dts = qMax((qint64)stream->cur_dts + 1, dts);
+    if (m_lastDts > 0)
+        avPkt.dts = std::max(m_lastDts + 1, dts);
     else
         avPkt.dts = dts;
+
+    m_lastDts = dts;
 
     const QnCompressedVideoData* video = dynamic_cast<const QnCompressedVideoData*>(md.get());
     if (video && video->pts != AV_NOPTS_VALUE
@@ -349,7 +352,7 @@ void StorageRecordingContext::writeData(const QnConstAbstractMediaDataPtr& media
             this,
             "Write to '%1' failed. Ffmpeg error: '%2'",
             nx::utils::url::hidePassword(context.fileName),
-            ret < 0 ? QnFfmpegHelper::avErrorToString(ret) : "Write failed");
+            ret < 0 ? nx::media::ffmpeg::avErrorToString(ret) : "Write failed");
 
         return;
     }

@@ -5,28 +5,24 @@
 #include <QtCore/QBuffer>
 #include <QtCore/QDebug>
 
-#include <nx/codec/nal_units.h>
-#include <nx/media/h264_utils.h>
 #include <nx/codec/hevc/extradata.h>
+#include <nx/codec/nal_units.h>
 #include <nx/media/audio/format.h>
 #include <nx/media/av_codec_helper.h>
 #include <nx/media/codec_parameters.h>
+#include <nx/media/h264_utils.h>
 #include <nx/media/utils.h>
 #include <nx/media/video_data_packet.h>
 #include <nx/utils/bit_stream.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/type_utils.h>
 
-extern "C"
-{
+extern "C" {
 #include <libavutil/error.h>
 #include <libavutil/opt.h>
 #include <libavutil/pixdesc.h>
 #include <libswresample/swresample.h>
-
 } // extern "C"
-
-QnFfmpegHelper::StaticHolder QnFfmpegHelper::StaticHolder::instance;
 
 namespace ffmpeg {
 
@@ -91,16 +87,6 @@ bool QnFfmpegHelper::isChromaPlane(int plane, const AVPixFmtDescriptor* avPixFmt
 
     // The plane is non-chroma (presumably, Y, RGB or A) - the plane's height equals the frame's.
     return false;
-}
-
-AVCodec* QnFfmpegHelper::findAvCodec(AVCodecID codecId)
-{
-    AVCodec* codec = avcodec_find_decoder(codecId);
-
-    if (!codec || codec->id != codecId)
-        return &StaticHolder::instance.avCodec;
-
-    return codec;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -170,16 +156,9 @@ CodecParametersPtr QnFfmpegHelper::createVideoCodecParametersAnnexB(
     return codecParams;
 }
 
-std::string QnFfmpegHelper::avErrorToString(int errorCode)
-{
-    char errorBuffer[AV_ERROR_MAX_STRING_SIZE];
-    av_strerror(errorCode, errorBuffer, AV_ERROR_MAX_STRING_SIZE);
-    return errorBuffer;
-}
-
 int QnFfmpegHelper::audioSampleSize(AVCodecContext* ctx)
 {
-    return ctx->channels * av_get_bytes_per_sample(ctx->sample_fmt);
+    return ctx->ch_layout.nb_channels * av_get_bytes_per_sample(ctx->sample_fmt);
 }
 
 AVSampleFormat QnFfmpegHelper::fromAudioFormatToFfmpegSampleType(const nx::media::audio::Format& format)
@@ -211,7 +190,7 @@ AVSampleFormat QnFfmpegHelper::fromAudioFormatToFfmpegSampleType(const nx::media
 
 int QnFfmpegHelper::getDefaultFrameSize(AVCodecParameters* avCodecParams)
 {
-    AVCodec* avCodec = avcodec_find_encoder(avCodecParams->codec_id);
+    const AVCodec* avCodec = avcodec_find_encoder(avCodecParams->codec_id);
     if (!avCodec)
         return 0;
 
@@ -219,9 +198,8 @@ int QnFfmpegHelper::getDefaultFrameSize(AVCodecParameters* avCodecParams)
 
     if (avCodec->sample_fmts)
         encoderContext->sample_fmt = avCodec->sample_fmts[0];
-    encoderContext->channels = avCodecParams->channels;
+    encoderContext->ch_layout = avCodecParams->ch_layout;
     encoderContext->sample_rate = avCodecParams->sample_rate;
-    encoderContext->channel_layout = av_get_default_channel_layout(encoderContext->channels);
     encoderContext->bit_rate = 64'000;
     auto status = avcodec_open2(encoderContext, avCodec, nullptr);
     auto res = status >= 0 ? encoderContext->frame_size : 0;
@@ -258,27 +236,29 @@ int QnFfmpegHelper::planeCount(const AVPixFmtDescriptor* avPixFmtDescriptor)
 QnFfmpegAudioHelper::QnFfmpegAudioHelper(AVCodecContext* decoderContext):
     m_swr(swr_alloc())
 {
-    av_opt_set_int(m_swr, "in_channel_layout", decoderContext->channel_layout, 0);
-    av_opt_set_int(m_swr, "out_channel_layout", decoderContext->channel_layout, 0);
-    av_opt_set_int(m_swr, "in_channel_count", decoderContext->channels, 0);
-    av_opt_set_int(m_swr, "out_channel_count", decoderContext->channels, 0);
-    av_opt_set_int(m_swr, "in_sample_rate", decoderContext->sample_rate, 0);
-    av_opt_set_int(m_swr, "out_sample_rate", decoderContext->sample_rate, 0);
-    av_opt_set_sample_fmt(m_swr, "in_sample_fmt", decoderContext->sample_fmt, 0);
-    av_opt_set_sample_fmt(m_swr, "out_sample_fmt",
-        av_get_packed_sample_fmt(decoderContext->sample_fmt), 0);
+    // Convert to packed audio format.
+    swr_alloc_set_opts2(
+        &m_swr,
+        &decoderContext->ch_layout,
+        av_get_packed_sample_fmt(decoderContext->sample_fmt),
+        decoderContext->sample_rate,
+        &decoderContext->ch_layout,
+        decoderContext->sample_fmt,
+        decoderContext->sample_rate,
+        0,
+        NULL);
     swr_init(m_swr);
-
-    m_channel_layout = decoderContext->channel_layout;
-    m_channels = decoderContext->channels;
+    m_channel_layout = decoderContext->ch_layout.u.mask;
+    m_channels = decoderContext->ch_layout.nb_channels;
     m_sample_rate = decoderContext->sample_rate;
     m_sample_fmt = decoderContext->sample_fmt;
 }
 
+
 bool QnFfmpegAudioHelper::isCompatible(AVCodecContext* decoderContext) const
 {
-    return m_channel_layout == (int)decoderContext->channel_layout
-        && m_channels == decoderContext->channels
+    return m_channel_layout == (int)decoderContext->ch_layout.u.mask
+        && m_channels == decoderContext->ch_layout.nb_channels
         && m_sample_rate == decoderContext->sample_rate
         && m_sample_fmt == decoderContext->sample_fmt;
 }

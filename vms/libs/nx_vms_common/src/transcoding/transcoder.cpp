@@ -256,7 +256,6 @@ int QnTranscoder::setVideoCodec(
     if (params.isEmpty())
         params = suggestMediaStreamParams(codec, quality);
 
-    QnFfmpegVideoTranscoder* ffmpegTranscoder;
     m_videoCodec = codec;
     switch (method)
     {
@@ -265,26 +264,25 @@ int QnTranscoder::setVideoCodec(
             break;
         case TM_FfmpegTranscode:
         {
-            ffmpegTranscoder = new QnFfmpegVideoTranscoder(
+            m_vTranscoder = std::make_unique<QnFfmpegVideoTranscoder>(
                 m_decoderConfig,
                 m_metrics,
                 codec);
 
-            ffmpegTranscoder->setOutputResolutionLimit(resolution);
-            ffmpegTranscoder->setBitrate(bitrate);
-            ffmpegTranscoder->setParams(params);
-            ffmpegTranscoder->setQuality(quality);
-            ffmpegTranscoder->setUseRealTimeOptimization(m_useRealTimeOptimization);
+            m_vTranscoder->setOutputResolutionLimit(resolution);
+            m_vTranscoder->setBitrate(bitrate);
+            m_vTranscoder->setParams(params);
+            m_vTranscoder->setQuality(quality);
+            m_vTranscoder->setUseRealTimeOptimization(m_useRealTimeOptimization);
             auto filterChain = QnImageFilterHelper::createFilterChain(m_transcodingSettings);
-            ffmpegTranscoder->setFilterChain(filterChain);
+            m_vTranscoder->setFilterChain(filterChain);
 
             if (codec != AV_CODEC_ID_H263P && codec != AV_CODEC_ID_MJPEG) {
                 // H263P and MJPEG codecs have bug for multi thread encoding in current ffmpeg version
                 bool isAtom = getCPUString().toLower().contains(QLatin1String("atom"));
                 if (isAtom || resolution.height() >= 1080)
-                    ffmpegTranscoder->setUseMultiThreadEncode(true);
+                    m_vTranscoder->setUseMultiThreadEncode(true);
             }
-            m_vTranscoder = QSharedPointer<QnFfmpegVideoTranscoder>(ffmpegTranscoder);
             break;
         }
             /*
@@ -315,10 +313,10 @@ QnTranscoder::OperationResult QnTranscoder::setAudioCodec(AVCodecID codec, Trans
     switch (method)
     {
         case TM_DirectStreamCopy:
-            m_aTranscoder = QnAudioTranscoderPtr();
+            m_aTranscoder.reset();
             break;
         case TM_FfmpegTranscode:
-            m_aTranscoder = QnAudioTranscoderPtr(new QnFfmpegAudioTranscoder(codec));
+            m_aTranscoder = std::make_unique<QnFfmpegAudioTranscoder>(codec);
             break;
             /*
         case TM_QuickSyncTranscode:

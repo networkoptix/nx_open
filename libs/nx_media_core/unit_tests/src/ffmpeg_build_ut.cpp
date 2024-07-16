@@ -11,7 +11,7 @@ namespace nx::media::test {
 TEST(ffmpeg, build_configuration)
 {
 #ifdef __linux__
-    AVInputFormat* device = nullptr;
+    const AVInputFormat* device = nullptr;
     bool alsaPresent = false;
     while ((device = av_input_audio_device_next(device)))
     {
@@ -20,6 +20,9 @@ TEST(ffmpeg, build_configuration)
     }
     ASSERT_TRUE(alsaPresent);
 #endif // __linux__
+
+    // Decoders
+    ASSERT_TRUE(avcodec_find_decoder(AV_CODEC_ID_PNG));
 }
 
 

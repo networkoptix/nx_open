@@ -137,7 +137,7 @@ open_ai::QueryPayload::Message::Content::ImageUrl DeviceAgent::encodeImage(
         return {};
     }
 
-    AVCodec* codec = avcodec_find_encoder_by_name(
+    const AVCodec* codec = avcodec_find_encoder_by_name(
         (format == "jpg" || format == "jpeg") ? "mjpeg" : format.c_str());
     if (!codec)
     {
@@ -200,8 +200,18 @@ open_ai::QueryPayload::Message::Content::ImageUrl DeviceAgent::encodeImage(
         frame->data[i] = (uint8_t*) (videoFrame->data(i));
     }
 
-    int gotFrame = 0;
-    if (int error = avcodec_encode_video2(context, packet, frame, &gotFrame); error < 0)
+    if (int error = avcodec_send_frame(context, frame); error < 0)
+    {
+        showErrorMessage(NX_FMT(
+            "Internal plugin error %1: cannot use %2 to encode image of %3x%4.",
+            error,
+            format,
+            videoFrame->width(),
+            videoFrame->height()
+        ).toStdString());
+    }
+
+    if (int error = avcodec_receive_packet(context, packet); error < 0)
     {
         showErrorMessage(NX_FMT(
             "Internal plugin error %1: cannot use %2 to encode image of %3x%4.",
@@ -216,6 +226,7 @@ open_ai::QueryPayload::Message::Content::ImageUrl DeviceAgent::encodeImage(
     QByteArray buffer;
     buffer.append((const char*) packet->data, packet->size);
     std::string imageData = buffer.toBase64().toStdString();
+    av_packet_unref(packet);
     return {.url = "data:image/" + format + ";base64," + std::move(imageData)};
 }
 

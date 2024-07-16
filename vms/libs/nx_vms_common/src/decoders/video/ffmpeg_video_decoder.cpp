@@ -4,13 +4,14 @@
 
 #include <QtCore/QThread>
 
-extern "C"
-{
+extern "C" {
 #include <libavutil/imgutils.h>
 } // extern "C"
 
 #include <nx/codec/nal_units.h>
 #include <nx/media/codec_parameters.h>
+#include <nx/media/ffmpeg/ffmpeg_utils.h>
+#include <nx/media/ffmpeg/old_api.h>
 #include <nx/media/utils.h>
 #include <nx/metrics/metrics_storage.h>
 #include <nx/utils/log/log.h>
@@ -22,18 +23,13 @@ static const int MAX_DECODE_THREAD = 4;
 
 namespace {
 
-static bool isImageCanBeDecodedViaQt(AVCodecID compressionType)
+bool isImage(const QnConstCompressedVideoDataPtr& data)
 {
-    switch (compressionType)
-    {
-        case AV_CODEC_ID_PNG:
-            return true;
-        default:
-            return false;
-    }
+    return data->compressionType == AV_CODEC_ID_PNG
+        || data->flags & QnAbstractMediaData::MediaFlags_StillImage;
 }
 
-} // namespace
+}
 
 QnFfmpegVideoDecoder::QnFfmpegVideoDecoder(
     const DecoderConfig& config,
@@ -41,7 +37,6 @@ QnFfmpegVideoDecoder::QnFfmpegVideoDecoder(
     const QnConstCompressedVideoDataPtr& data)
     :
     m_context(0),
-    m_codecId(data->compressionType),
     m_decodeMode(DecodeMode_Full),
     m_newDecodeMode(DecodeMode_NotDefined),
     m_lightModeFrameCounter(0),
@@ -71,19 +66,11 @@ QnFfmpegVideoDecoder::~QnFfmpegVideoDecoder(void)
         m_metrics->decoders()--;
 }
 
-AVCodec* QnFfmpegVideoDecoder::findCodec(AVCodecID codecId)
-{
-    AVCodec* codec = 0;
-
-    if (codecId != AV_CODEC_ID_NONE)
-        codec = avcodec_find_decoder(codecId);
-
-    return codec;
-}
-
 void QnFfmpegVideoDecoder::determineOptimalThreadType(const QnConstCompressedVideoDataPtr& data)
 {
-    if (m_useMtDecoding)
+    // Don't use multithread decoding for images, since then ffmpeg increases AVCodecContext->delay
+    // to more than 0 and does not output frames on single call decode(without flushing).
+    if (m_useMtDecoding && !isImage(data))
         m_context->thread_count = qMin(MAX_DECODE_THREAD, QThread::idealThreadCount() + 1);
     else
         m_context->thread_count = 1; //< Turn off multi thread decoding.
@@ -139,9 +126,14 @@ void QnFfmpegVideoDecoder::determineOptimalThreadType(const QnConstCompressedVid
 
 bool QnFfmpegVideoDecoder::openDecoder(const QnConstCompressedVideoDataPtr& data)
 {
-    m_codec = findCodec(data->compressionType);
-    m_context = avcodec_alloc_context3(m_codec);
-
+    auto codec = avcodec_find_decoder(data->compressionType);
+    if (codec == nullptr)
+    {
+        NX_ERROR(this, "Failed to open ffmpeg video decoder, codec not found: %1",
+            data->compressionType);
+        return false;
+    }
+    m_context = avcodec_alloc_context3(codec);
     if (data->context)
     {
         data->context->toAvCodecContext(m_context);
@@ -158,15 +150,14 @@ bool QnFfmpegVideoDecoder::openDecoder(const QnConstCompressedVideoDataPtr& data
 
     determineOptimalThreadType(data);
 
-    int status = avcodec_open2(m_context, m_codec, NULL);
+    int status = avcodec_open2(m_context, codec, NULL);
     if (status < 0)
     {
         NX_ERROR(this, "Failed to open ffmpeg video decoder, error: %1",
-            QnFfmpegHelper::avErrorToString(status));
+            nx::media::ffmpeg::avErrorToString(status));
         return false;
     }
-    // keep frame unless we call 'av_frame_unref'
-    m_context->refcounted_frames = 1;
+    m_codecId = data->compressionType;
     return true;
 }
 
@@ -212,11 +203,11 @@ int QnFfmpegVideoDecoder::decodeVideo(
     int *got_picture_ptr,
     const AVPacket *avpkt)
 {
-    m_lastDecodeResult = avcodec_decode_video2(avctx, picture, got_picture_ptr, avpkt);
+    m_lastDecodeResult = nx::media::ffmpeg::old_api::decode(avctx, picture, got_picture_ptr, avpkt);
     if (m_lastDecodeResult < 0)
     {
         NX_DEBUG(this, "Ffmpeg decoder error: %1",
-            QnFfmpegHelper::avErrorToString(m_lastDecodeResult));
+            nx::media::ffmpeg::avErrorToString(m_lastDecodeResult));
     }
     if (m_lastDecodeResult > 0 && m_metrics)
         m_metrics->decodedPixels() += picture->width * picture->height;
@@ -231,27 +222,18 @@ int QnFfmpegVideoDecoder::decodeVideo(
 bool QnFfmpegVideoDecoder::decode(
     const QnConstCompressedVideoDataPtr& data, CLVideoDecoderOutputPtr* const outFramePtr)
 {
-    bool isImage = false;
-    if (data)
-    {
-        isImage = data->flags.testFlag(QnAbstractMediaData::MediaFlags_StillImage)
-            || isImageCanBeDecodedViaQt(data->compressionType);
-    }
-
     if (data && m_codecId != data->compressionType)
     {
-        if (m_codecId != AV_CODEC_ID_NONE && data->context)
+        if (!data->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey))
         {
-            if (!data->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey))
-            {
-                NX_DEBUG(this,
-                    "Decoding should start from key frame, skip. codec: %1, timestamp: %2",
-                    data->compressionType, data->timestamp);
-                return false; //< Can't switch decoder to new codec right now.
-            }
-            resetDecoder(data);
+            NX_DEBUG(this,
+                "Decoding should start from key frame, skip. codec: %1, timestamp: %2",
+                data->compressionType, data->timestamp);
+            return false; //< Can't switch decoder to new codec right now.
         }
-        m_codecId = data->compressionType;
+        if (!resetDecoder(data))
+            return false;
+
     }
 
     CLVideoDecoderOutput* const outFrame = outFramePtr->data();
@@ -263,7 +245,7 @@ bool QnFfmpegVideoDecoder::decode(
         m_lastFlags = data->flags;
         m_lastChannelNumber = data->channelNumber;
 
-        if (m_codec == 0 && !isImage)
+        if (m_context == 0)
         {
             NX_WARNING(this, "Decoder not found, codec: %1", data->compressionType);
             return false;
@@ -303,7 +285,8 @@ bool QnFfmpegVideoDecoder::decode(
         if (m_needRecreate && (data->flags & AV_PKT_FLAG_KEY))
         {
             m_needRecreate = false;
-            resetDecoder(data);
+            if (!resetDecoder(data))
+                return false;
         }
 
         QnFfmpegAvPacket avpkt((unsigned char*) data->data(), (int) data->dataSize());
@@ -366,12 +349,11 @@ bool QnFfmpegVideoDecoder::decode(
                 processNewResolutionIfChanged(data, data->context->getWidth(), data->context->getHeight());
         }
 
-        // -------------------------
         if(m_context->codec)
         {
             decodeVideo(m_context, outFrame, &got_picture, &avpkt);
-            for(int i = 0; i < 2 && !got_picture && (data->flags & QnAbstractMediaData::MediaFlags_DecodeTwice); ++i)
-                decodeVideo(m_context, outFrame, &got_picture, &avpkt);
+            if (!got_picture && data->flags & QnAbstractMediaData::MediaFlags_StillImage)
+                decodeVideo(m_context, outFrame, &got_picture, nullptr);
         }
 
         if (got_picture)
@@ -397,31 +379,6 @@ bool QnFfmpegVideoDecoder::decode(
                 m_prevFrameDuration = data->timestamp - m_prevTimestamp;
             m_prevTimestamp = data->timestamp;
 
-        }
-
-        // sometimes ffmpeg can't decode image files. Try to decode in QT
-        if (!got_picture && isImage)
-        {
-            QImage tmpQtImg;
-            tmpQtImg.loadFromData(avpkt.data, avpkt.size);
-            if (tmpQtImg.width() > 0 && tmpQtImg.height() > 0) {
-                // TODO: #dklychkov Maybe set correct ffmpeg format if possible instead of conversion
-                if (tmpQtImg.format() != QImage::Format_RGBA8888)
-                    tmpQtImg = tmpQtImg.convertToFormat(QImage::Format_RGBA8888);
-
-                got_picture = 1;
-                CLVideoDecoderOutput tmpFrame;
-                tmpFrame.clean();
-                tmpFrame.setUseExternalData(true);
-                tmpFrame.format = AV_PIX_FMT_RGBA;
-                tmpFrame.data[0] = (quint8*) tmpQtImg.constBits();
-                tmpFrame.linesize[0] = tmpQtImg.bytesPerLine();
-                m_context->width = tmpFrame.width = tmpQtImg.width();
-                m_context->height = tmpFrame.height = tmpQtImg.height();
-                tmpFrame.pkt_dts = data->timestamp;
-                outFrame->copyFrom(&tmpFrame);
-                return true;
-            }
         }
     }
     else

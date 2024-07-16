@@ -17,13 +17,12 @@ public:
     struct Config
     {
         int32_t srcSampleRate = 0;
-        int64_t srcChannelLayout = 0;
+        AVChannelLayout srcChannelLayout;
         AVSampleFormat srcSampleFormat = AV_SAMPLE_FMT_NONE;
         int32_t dstSampleRate = 0;
-        int64_t dstChannelLayout = 0;
+        AVChannelLayout dstChannelLayout;
         AVSampleFormat dstSampleFormat = AV_SAMPLE_FMT_NONE;
         uint32_t dstFrameSize = 0;
-        int32_t dstChannelCount = 0;
     };
 
 public:

@@ -2,14 +2,13 @@
 
 #include "ffmpeg_audio_resampler.h"
 
-extern "C"
-{
+extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavutil/opt.h>
 #include <libswresample/swresample.h>
 }
 
-#include <nx/media/ffmpeg_helper.h>
+#include <nx/media/ffmpeg/ffmpeg_utils.h>
 #include <nx/utils/log/log.h>
 
 FfmpegAudioResampler::FfmpegAudioResampler()
@@ -28,12 +27,12 @@ bool FfmpegAudioResampler::init(const Config& config)
 {
     m_samplePts.clear();
     m_config = config;
-    m_swrContext = swr_alloc_set_opts(
-        NULL,
-        config.dstChannelLayout,
+    swr_alloc_set_opts2(
+        &m_swrContext,
+        &config.dstChannelLayout,
         config.dstSampleFormat,
         config.dstSampleRate,
-        config.srcChannelLayout,
+        &config.srcChannelLayout,
         config.srcSampleFormat,
         config.srcSampleRate,
         0,
@@ -47,13 +46,13 @@ bool FfmpegAudioResampler::init(const Config& config)
     if (status < 0)
     {
         NX_ERROR(this, "Could not open resample context, error: %1",
-            QnFfmpegHelper::avErrorToString(status));
+            nx::media::ffmpeg::avErrorToString(status));
         swr_free(&m_swrContext);
         m_swrContext = nullptr;
         return false;
     }
     m_buffer.init(
-        FfmpegAudioBuffer::Config{config.dstChannelCount, config.dstSampleFormat});
+        FfmpegAudioBuffer::Config{config.dstChannelLayout.nb_channels, config.dstSampleFormat});
     return true;
 }
 
@@ -77,11 +76,11 @@ bool FfmpegAudioResampler::pushFrame(AVFrame* inputFrame)
     if (result < 0)
     {
         NX_ERROR(this, "Failed to resample audio data %1",
-            QnFfmpegHelper::avErrorToString(result));
+            nx::media::ffmpeg::avErrorToString(result));
         return false;
     }
     m_buffer.finishWriting(static_cast<uint64_t>(result));
-    m_samplePts.push_back({inputFrame->pkt_pts, result});
+    m_samplePts.push_back({inputFrame->pts, result});
     return true;
 }
 
@@ -99,8 +98,7 @@ AVFrame* FfmpegAudioResampler::nextFrame()
     m_frame->nb_samples = m_config.dstFrameSize;
     m_frame->sample_rate = m_config.dstSampleRate;
     m_frame->format = m_config.dstSampleFormat;
-    m_frame->channel_layout = m_config.dstChannelLayout;
-    m_frame->channels = m_config.dstChannelCount;
+    m_frame->ch_layout = m_config.dstChannelLayout;
 
     if (m_samplePts.empty())
         return m_frame;

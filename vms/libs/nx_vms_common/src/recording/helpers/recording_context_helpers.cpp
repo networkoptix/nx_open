@@ -12,8 +12,7 @@
 #include <nx/media/utils.h>
 #include <nx/utils/log/log.h>
 
-extern "C"
-{
+extern "C" {
 #include <libavformat/avformat.h>
 } // extern "C"
 
@@ -36,7 +35,6 @@ bool addStream(const CodecParametersConstPtr& codecParameters, AVFormatContext* 
         return false;
     }
     stream->id = formatContext->nb_streams - 1;
-    stream->first_dts = 0; //< TODO: #lbusygin Change to AV_NOPTS_VALUE? See doc.
 
     if (avCodecParams->codec_type == AVMEDIA_TYPE_VIDEO)
     {
@@ -54,7 +52,7 @@ bool addStream(const CodecParametersConstPtr& codecParameters, AVFormatContext* 
     if (stream->codecpar->codec_id == AV_CODEC_ID_MP3)
     {
         // avoid FFMPEG bug for MP3 mono. block_align hard-coded inside ffmpeg for stereo channels and it is cause problem
-        if (stream->codecpar->channels == 1)
+        if (stream->codecpar->ch_layout.nb_channels == 1)
             stream->codecpar->block_align = 0;
         // Fill frame_size for MP3 (it is a constant). AVI container works wrong without it.
         if (stream->codecpar->frame_size == 0)

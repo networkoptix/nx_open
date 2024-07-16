@@ -11,6 +11,7 @@ extern "C" {
 #include <libswscale/swscale.h>
 } // extern "C"
 
+#include <nx/media/ffmpeg/old_api.h>
 #include <nx/media/ffmpeg_helper.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
@@ -155,9 +156,6 @@ void FfmpegVideoDecoderPrivate::initContext(const QnConstCompressedVideoDataPtr&
         avcodec_free_context(&codecContext);
         return;
     }
-
-    // keep frame unless we call 'av_frame_unref'
-    codecContext->refcounted_frames = 1;
 }
 
 AVFrame* FfmpegVideoDecoderPrivate::convertPixelFormat(const AVFrame* srcFrame)
@@ -298,13 +296,13 @@ int FfmpegVideoDecoder::decode(
     }
 
     int gotPicture = 0;
-    int res = avcodec_decode_video2(d->codecContext, d->frame, &gotPicture, &avpkt);
+    int res = nx::media::ffmpeg::old_api::decode(d->codecContext, d->frame, &gotPicture, &avpkt);
     if (res <= 0 || !gotPicture)
         return res; //< Negative value means error, zero means buffering.
 
     QSize frameSize(d->frame->width, d->frame->height);
     qint64 startTimeMs = d->frame->pkt_dts / 1000;
-    int frameNum = qMax(0, d->codecContext->frame_number - 1);
+    int frameNum = qMax(0, d->codecContext->frame_num - 1);
 
     auto qtPixelFormat = toQtPixelFormat((AVPixelFormat)d->frame->format);
 

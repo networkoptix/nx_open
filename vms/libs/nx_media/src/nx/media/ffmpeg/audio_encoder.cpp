@@ -2,7 +2,7 @@
 
 #include "audio_encoder.h"
 
-#include <nx/media/ffmpeg_helper.h>
+#include <nx/media/ffmpeg/ffmpeg_utils.h>
 #include <nx/utils/log/log.h>
 
 namespace nx::media::ffmpeg {
@@ -35,14 +35,13 @@ CodecParametersPtr AudioEncoder::codecParams()
 bool AudioEncoder::initialize(
     AVCodecID codecId,
     int sampleRate,
-    int channels,
     AVSampleFormat format,
-    uint64_t layout,
+    AVChannelLayout layout,
     int bitrate)
 {
     close();
 
-    AVCodec* codec = avcodec_find_encoder(codecId);
+    const AVCodec* codec = avcodec_find_encoder(codecId);
     if (!codec)
     {
         NX_WARNING(this, "Failed to initialize audio encoder, codec not found: %1", codecId);
@@ -51,8 +50,7 @@ bool AudioEncoder::initialize(
 
     m_encoderContext = avcodec_alloc_context3(codec);
     m_encoderContext->sample_fmt = format;
-    m_encoderContext->channels = channels;
-    m_encoderContext->channel_layout = layout;
+    m_encoderContext->ch_layout = layout;
     m_encoderContext->sample_rate = sampleRate;
     m_encoderContext->bit_rate = bitrate;
 
@@ -60,7 +58,7 @@ bool AudioEncoder::initialize(
     if (status < 0)
     {
         NX_WARNING(this, "Failed to open audio encoder: %1",
-            QnFfmpegHelper::avErrorToString(status));
+            nx::media::ffmpeg::avErrorToString(status));
         return false;
     }
     m_codecParams.reset(new CodecParameters(m_encoderContext));
@@ -74,13 +72,12 @@ bool AudioEncoder::sendFrame(uint8_t* data, int size)
     m_inputFrame->nb_samples = size;
     m_inputFrame->sample_rate = m_encoderContext->sample_rate;
     m_inputFrame->format = m_encoderContext->sample_fmt;
-    m_inputFrame->channel_layout = m_encoderContext->channel_layout;
-    m_inputFrame->channels = m_encoderContext->channels;
+    m_inputFrame->ch_layout = m_encoderContext->ch_layout;
     auto status = avcodec_send_frame(m_encoderContext, m_inputFrame);
     if (status < 0)
     {
         NX_WARNING(this, "Could not send audio frame to encoder, Error code: %1",
-            QnFfmpegHelper::avErrorToString(status));
+            nx::media::ffmpeg::avErrorToString(status));
         return false;
     }
     return true;
@@ -96,7 +93,7 @@ bool AudioEncoder::receivePacket(QnWritableCompressedAudioDataPtr& result)
     if (status < 0)
     {
         NX_WARNING(this, "Could not receive audio packet from encoder, Error code: %1",
-            QnFfmpegHelper::avErrorToString(status));
+            nx::media::ffmpeg::avErrorToString(status));
         return false;
     }
 

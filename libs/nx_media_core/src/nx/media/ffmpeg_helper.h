@@ -7,7 +7,6 @@ extern "C" {
 #include <libavformat/avio.h>
 #include <libavutil/imgutils.h>
 #include <libavutil/mem.h>
-
 } // extern "C"
 
 #include <nx/media/codec_parameters.h>
@@ -36,15 +35,8 @@ public:
     static CodecParametersPtr createVideoCodecParametersMp4(
         const QnCompressedVideoData* video, int width, int height);
 
-    /**
-     * @return Either a codec found in ffmpeg registry, or a static instance of a stub AVCodec in case
-     * the proper codec is not available in ffmpeg; never null.
-     */
-    static AVCodec* findAvCodec(AVCodecID codecId);
-
     static qint64 getFileSizeByIOContext(AVIOContext* ioContext);
 
-    static std::string avErrorToString(int errorCode);
     static void registerLogCallback();
 
     static int audioSampleSize(AVCodecContext* ctx);
@@ -63,31 +55,6 @@ public:
      * fails an assertion and returns 0.
      */
     static int planeCount(const AVPixFmtDescriptor* avPixFmtDescriptor);
-
-private:
-    /**
-     * Holds a globally shared static instance of a stub AVCodec used for
-     * AVCodecContext when the proper codec is not available in ffmpeg.
-     */
-    class StaticHolder
-    {
-    public:
-        // Instance is not const because ffmpeg requires non-const AVCodec.
-        static StaticHolder instance;
-
-        AVCodec avCodec;
-
-    private:
-        StaticHolder()
-        {
-            memset(&avCodec, 0, sizeof(avCodec));
-            avCodec.id = AV_CODEC_ID_NONE;
-            avCodec.type = AVMEDIA_TYPE_VIDEO;
-        }
-
-        StaticHolder(const StaticHolder&);
-        void operator=(const StaticHolder&);
-    };
 };
 
 struct SwrContext;

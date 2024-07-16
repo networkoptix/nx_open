@@ -3,7 +3,7 @@
 #include "ffmpeg_audio_decoder.h"
 
 #include <nx/media/audio_data_packet.h>
-#include <nx/media/ffmpeg_helper.h>
+#include <nx/media/ffmpeg/ffmpeg_utils.h>
 #include <nx/utils/log/log_main.h>
 
 struct AVCodecContext;
@@ -22,7 +22,7 @@ QnFfmpegAudioDecoder::QnFfmpegAudioDecoder(const QnCompressedAudioDataPtr& data)
     if (m_codec == AV_CODEC_ID_NONE)
         return;
 
-    codec = avcodec_find_decoder(m_codec);
+    auto codec = avcodec_find_decoder(m_codec);
 
     m_audioDecoderCtx = avcodec_alloc_context3(codec);
 
@@ -59,47 +59,52 @@ bool QnFfmpegAudioDecoder::decode(QnCompressedAudioDataPtr& data, nx::utils::Byt
 {
     result.clear();
 
-    if (!codec)
+    if (!m_audioDecoderCtx)
         return false;
 
     const unsigned char* inbuf_ptr = (const unsigned char*) data->data();
     int size = static_cast<int>(data->dataSize());
     unsigned char* outbuf = (unsigned char*)result.data();
 
-    int outbuf_len = 0;
-
-    while (size > 0)
+    QnFfmpegAvPacket avpkt((quint8*) inbuf_ptr, size);
+    int error = avcodec_send_packet(m_audioDecoderCtx, &avpkt);
+    if (error < 0)
     {
-        QnFfmpegAvPacket avpkt((quint8*) inbuf_ptr, size);
-        int got_frame = 0;
-        // TODO: ffmpeg-test.
-        // TODO: #dmishin Get rid of deprecated functions.
-        int inputConsumed = avcodec_decode_audio4(m_audioDecoderCtx, m_outFrame, &got_frame, &avpkt);
-        if (inputConsumed < 0)
-            return false;
-        if (got_frame)
-        {
-            int decodedBytes =
-                m_outFrame->nb_samples * QnFfmpegHelper::audioSampleSize(m_audioDecoderCtx);
-            if (outbuf_len + decodedBytes > (int)result.capacity())
-            {
-                result.reserve(result.capacity() * 2);
-                outbuf = (quint8*)result.data() + outbuf_len;
-            }
-
-            if (!m_audioHelper || !m_audioHelper->isCompatible(m_audioDecoderCtx))
-                m_audioHelper.reset(new QnFfmpegAudioHelper(m_audioDecoderCtx));
-            m_audioHelper->copyAudioSamples(outbuf, m_outFrame);
-
-            outbuf_len += decodedBytes;
-            outbuf += decodedBytes;
-        }
-
-        size -= inputConsumed;
-        inbuf_ptr += inputConsumed;
-
+        NX_WARNING(this, "Failed to decode audio packet timestamp: %1, error: %2", data->timestamp,
+            nx::media::ffmpeg::avErrorToString(error));
+        return false;
     }
 
+    int outbuf_len = 0;
+    while (error >= 0)
+    {
+        error = avcodec_receive_frame(m_audioDecoderCtx, m_outFrame);
+        if (error == AVERROR(EAGAIN) || error == AVERROR_EOF)
+            break;
+
+        if (error < 0)
+        {
+            NX_WARNING(this, "Failed to decode(receive) audio packet timestamp: %1, error: %2",
+                data->timestamp,
+                nx::media::ffmpeg::avErrorToString(error));
+            return false;
+        }
+
+        int decodedBytes =
+            m_outFrame->nb_samples * QnFfmpegHelper::audioSampleSize(m_audioDecoderCtx);
+        if (outbuf_len + decodedBytes > (int)result.capacity())
+        {
+            result.reserve(result.capacity() * 2);
+            outbuf = (quint8*)result.data() + outbuf_len;
+        }
+
+        if (!m_audioHelper || !m_audioHelper->isCompatible(m_audioDecoderCtx))
+            m_audioHelper.reset(new QnFfmpegAudioHelper(m_audioDecoderCtx));
+        m_audioHelper->copyAudioSamples(outbuf, m_outFrame);
+
+        outbuf_len += decodedBytes;
+        outbuf += decodedBytes;
+    }
     result.finishWriting(static_cast<unsigned int>(outbuf_len));
     return true;
 }

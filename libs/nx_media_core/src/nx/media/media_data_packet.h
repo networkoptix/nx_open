@@ -14,10 +14,6 @@
 // TODO: #dmishin move all classes to separate source files.
 // TODO: #dmishin place this code into proper namespace.
 
-class QIODevice;
-class QRegion;
-struct AVCodecContext;
-
 enum MediaQuality
 {
     MEDIA_Quality_High = 1,
@@ -81,7 +77,7 @@ public:
 
         // Switch archive to a new server.
         MediaFlags_NewServer            = 0x00400,
-        MediaFlags_DecodeTwice          = 0x00800,
+        // Empty flag                   = 0x00800,
         // Fast channel zapping flag.
         MediaFlags_FCZ                  = 0x01000,
 

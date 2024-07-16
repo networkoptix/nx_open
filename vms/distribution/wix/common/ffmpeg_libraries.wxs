@@ -8,13 +8,13 @@
         <ComponentGroup Id="FfmpegLibrariesComponentGroup"
                 Source="${CMAKE_BINARY_DIR}/bin"
                 Directory="InstallDirRoot">
-            <Component><File Name="avcodec-58.dll" KeyPath="yes" DiskId="2"/></Component>
-            <Component><File Name="avdevice-58.dll" KeyPath="yes" DiskId="2"/></Component>
-            <Component><File Name="avfilter-7.dll" KeyPath="yes" DiskId="2"/></Component>
-            <Component><File Name="avformat-58.dll" KeyPath="yes" DiskId="2"/></Component>
-            <Component><File Name="avutil-56.dll" KeyPath="yes" DiskId="2"/></Component>
-            <Component><File Name="swscale-5.dll" KeyPath="yes" DiskId="2"/></Component>
-            <Component><File Name="swresample-3.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="avcodec-61.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="avdevice-61.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="avfilter-10.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="avformat-61.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="avutil-59.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="swscale-8.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="swresample-5.dll" KeyPath="yes" DiskId="2"/></Component>
         </ComponentGroup>
     </Fragment>
 </Wix>

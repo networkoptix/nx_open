@@ -21,7 +21,6 @@ public:
     bool isInitialized() const;
 
 private:
-    AVCodec* codec = nullptr;
     AVCodecContext* m_audioDecoderCtx = nullptr;
 
     static bool m_first_instance;

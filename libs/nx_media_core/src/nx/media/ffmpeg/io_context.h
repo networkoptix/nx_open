@@ -20,7 +20,7 @@ public:
     AVIOContext* getAvioContext();
 
     std::function<int(uint8_t* buffer, int size)> readHandler;
-    std::function<int(uint8_t* buffer, int size)> writeHandler;
+    std::function<int(const uint8_t* buffer, int size)> writeHandler;
     std::function<int(int64_t pos, int whence)> seekHandler;
 
 private:

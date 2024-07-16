@@ -37,13 +37,15 @@ void QnMediaContextSerializableData::initializeFrom(const AVCodecParameters* cod
         extradata = QByteArray((const char*) codecParams->extradata,
             codecParams->extradata_size);
     }
-    channels = codecParams->channels;
+    // TODO: support custom channel order.
+    NX_ASSERT(codecParams->ch_layout.order == AV_CHANNEL_ORDER_UNSPEC || codecParams->ch_layout.order == AV_CHANNEL_ORDER_NATIVE);
+    channels = codecParams->ch_layout.nb_channels;
+    channelLayout = codecParams->ch_layout.u.mask;
     sampleRate = codecParams->sample_rate;
     sampleFmt = (AVSampleFormat)codecParams->format;
     bitsPerCodedSample = codecParams->bits_per_coded_sample;
     width = codecParams->width;
     height = codecParams->height;
     bitRate = codecParams->bit_rate;
-    channelLayout = codecParams->channel_layout;
     blockAlign = codecParams->block_align;
 }

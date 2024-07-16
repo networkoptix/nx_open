@@ -34,7 +34,7 @@ void SimpleAudioParser::setSdpInfo(const Sdp::Media& sdp)
     const auto codecParams = m_context->getAvCodecParameters();
     codecParams->codec_type = AVMEDIA_TYPE_AUDIO;
     codecParams->codec_id = m_codecId;
-    codecParams->channels = m_channels;
+    av_channel_layout_default(&codecParams->ch_layout, m_channels);
     codecParams->sample_rate = StreamParser::getFrequency();
     codecParams->format = AV_SAMPLE_FMT_S16;
     codecParams->bits_per_coded_sample = m_bits_per_coded_sample;

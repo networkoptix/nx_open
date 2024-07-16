@@ -588,10 +588,7 @@ bool ScreenGrabber::direct3DDataToFrame(void* opaque, AVFrame* pFrame)
         pFrame->sample_aspect_ratio.num = 1;
         pFrame->sample_aspect_ratio.den = 1;
     }
-    pFrame->coded_picture_number = m_frameNum++;
-    // pFrame->pts = m_timer.elapsed();
     pFrame->best_effort_timestamp = pFrame->pts;
-
     bool rez = dataToFrame(
         (unsigned char*) lockedRect.pBits, lockedRect.Pitch, m_ddm.Width, m_ddm.Height, pFrame);
     pSurface->UnlockRect();

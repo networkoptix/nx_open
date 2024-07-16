@@ -26,6 +26,7 @@
 #include <nx/media/av_codec_helper.h>
 #include <nx/media/codec_parameters.h>
 #include <nx/media/config.h>
+#include <nx/media/ffmpeg/ffmpeg_utils.h>
 #include <nx/media/ffmpeg_helper.h>
 #include <nx/media/video_data_packet.h>
 #include <nx/utils/log/log.h>
@@ -165,7 +166,7 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
         {
             if (status != AVERROR_EOF)
             {
-                NX_DEBUG(this, "Failed to read frame: %1", QnFfmpegHelper::avErrorToString(status));
+                NX_DEBUG(this, "Failed to read frame: %1", nx::media::ffmpeg::avErrorToString(status));
                 m_readFailed = true;
             }
             return QnAbstractMediaDataPtr();
@@ -210,7 +211,7 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
 
             case AVMEDIA_TYPE_AUDIO:
             {
-                if (packet.stream_index != m_audioStreamIndex || stream->codecpar->channels < 1)
+                if (packet.stream_index != m_audioStreamIndex || stream->codecpar->ch_layout.nb_channels < 1)
                     continue;
 
                 qint64 timestamp = packetTimestamp(packet);
@@ -581,16 +582,15 @@ bool QnAviArchiveDelegate::findStreams()
     if (m_streamsFound)
         return true;
 
-    if (m_fastStreamFind) {
+    if (m_fastStreamFind)
+    {
         m_formatContext->interrupt_callback.callback = &interruptDetailFindStreamInfo;
         avformat_find_stream_info(m_formatContext, nullptr);
         m_formatContext->interrupt_callback.callback = 0;
         m_streamsFound = m_formatContext->nb_streams > 0;
-        for (unsigned i = 0; i < m_formatContext->nb_streams; ++i)
-            m_formatContext->streams[i]->first_dts = 0; // reset first_dts. If don't do it, av_seek will seek to begin of file always
     }
-    else {
-        // TODO: #rvasilenko avoid using deprecated methods
+    else
+    {
         m_streamsFound = avformat_find_stream_info(m_formatContext, nullptr) >= 0;
     }
 
@@ -604,26 +604,8 @@ bool QnAviArchiveDelegate::findStreams()
         if (m_firstDts == qint64(AV_NOPTS_VALUE))
             m_firstDts = 0;
 
-        if (m_durationUs == AV_NOPTS_VALUE
-            && !m_fastStreamFind
-            && m_formatContext->nb_streams > 0
-            && !m_resource->flags().testFlag(Qn::still_image))
-        {
-            av_seek_frame(m_formatContext,
-                /*stream_index*/ -1,
-                /*timestamp*/ std::numeric_limits<qint64>::max(),
-                /*flags*/ AVSEEK_FLAG_ANY);
-            const auto stream = m_formatContext->streams[0];
-            if (stream && stream->cur_dts != AV_NOPTS_VALUE)
-            {
-                const auto dtsRange = stream->first_dts == AV_NOPTS_VALUE
-                    ? stream->cur_dts
-                    : stream->cur_dts - stream->first_dts;
-                const static AVRational r{1, 1'000'000};
-                m_durationUs = av_rescale_q(dtsRange, stream->time_base, r);
-            }
-            av_seek_frame(m_formatContext, /*stream_index*/ -1, 0, AVSEEK_FLAG_ANY);
-        }
+        if (m_formatContext->duration_estimation_method == AVFMT_DURATION_FROM_BITRATE)
+            NX_DEBUG(this, "File duration can be not accurate!");
     }
     else {
         close();

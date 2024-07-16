@@ -19,7 +19,6 @@
 #include <utils/common/instance_storage.h>
 #include <utils/common/long_runable_cleanup.h>
 #include <utils/common/synctime.h>
-#include <utils/media/ffmpeg_initializer.h>
 
 // Resources initialization must be located outside of the namespace.
 static void initializeResources()
@@ -46,7 +45,6 @@ struct ApplicationContext::Private
 
     std::unique_ptr<QnLongRunnablePool> longRunnablePool;
     std::unique_ptr<QnLongRunableCleanup> longRunableCleanup;
-    std::unique_ptr<QnFfmpegInitializer> ffmpegInitializer;
     std::unique_ptr<QnSyncTime> syncTime;
     std::unique_ptr<QnStoragePluginFactory> storagePluginFactory;
     std::unique_ptr<nx::utils::TimerManager> timerManager;
@@ -78,7 +76,6 @@ ApplicationContext::ApplicationContext(
 
     d->longRunnablePool = std::make_unique<QnLongRunnablePool>();
     d->longRunableCleanup = std::make_unique<QnLongRunableCleanup>();
-    d->ffmpegInitializer = std::make_unique<QnFfmpegInitializer>();
     QnFfmpegHelper::registerLogCallback();
 
     initNetworking(customCloudHost);

@@ -2,7 +2,7 @@
 
 #include "ffmpeg_audio_buffer.h"
 
-#include <nx/media/ffmpeg_helper.h>
+#include <nx/media/ffmpeg/ffmpeg_utils.h>
 #include <nx/utils/log/log.h>
 
 FfmpegAudioBuffer::~FfmpegAudioBuffer()
@@ -72,7 +72,7 @@ bool FfmpegAudioBuffer::allocBuffers(uint64_t sampleCount)
     if (result < 0)
     {
         NX_ERROR(this, "Failed to allocate resample buffer, error: %1",
-            QnFfmpegHelper::avErrorToString(result));
+            nx::media::ffmpeg::avErrorToString(result));
         return false;
     }
     if (m_sampleBuffers)

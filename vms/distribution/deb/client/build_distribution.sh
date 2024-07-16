@@ -173,12 +173,12 @@ copyLibs()
     echo "  Copying 3rd-party libs"
 
     local -r THIRD_PARTY_LIBS=(
-        libavcodec.so.58
-        libavfilter.so.7
-        libavformat.so.58
-        libavutil.so.56
-        libswscale.so.5
-        libswresample.so.3
+        libavcodec.so.61
+        libavfilter.so.10
+        libavformat.so.61
+        libavutil.so.59
+        libswscale.so.8
+        libswresample.so.5
 
         libcrypto.so.1.1
         libssl.so.1.1

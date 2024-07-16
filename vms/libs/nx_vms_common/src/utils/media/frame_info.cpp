@@ -10,6 +10,7 @@
 #include <QtGui/QImage>
 
 #include <nx/media/config.h>
+#include <nx/media/ffmpeg/ffmpeg_utils.h>
 #include <nx/media/ffmpeg_helper.h>
 #include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
@@ -390,7 +391,7 @@ QByteArray CLVideoDecoderOutput::rawData() const
         r < 0)
     {
         NX_WARNING(this, "Failed to get the raw data, FFmpeg error %1",
-            QnFfmpegHelper::avErrorToString(r));
+            nx::media::ffmpeg::avErrorToString(r));
         return QByteArray();
     }
     return result;
@@ -490,7 +491,6 @@ bool CLVideoDecoderOutput::convertTo(const AVFrame* avFrame) const
 void CLVideoDecoderOutput::assignMiscData(const CLVideoDecoderOutput* other)
 {
     pkt_dts = other->pkt_dts;
-    pkt_pts = other->pkt_pts;
     pts = other->pts;
     flags = other->flags;
     sample_aspect_ratio = other->sample_aspect_ratio;

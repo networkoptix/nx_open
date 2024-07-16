@@ -65,7 +65,7 @@ bool isKeyFrame(const QnCompressedVideoDataPtr& encodedFrame)
 
 void setDecodeTwiceFlag(const QnCompressedVideoDataPtr& encodedFrame)
 {
-    encodedFrame->flags.setFlag(QnAbstractMediaData::MediaFlags_DecodeTwice);
+    encodedFrame->flags.setFlag(QnAbstractMediaData::MediaFlags_StillImage);
 }
 
 } // namespace

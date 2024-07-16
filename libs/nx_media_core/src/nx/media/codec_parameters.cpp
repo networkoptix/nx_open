@@ -34,14 +34,18 @@ bool deserializeCodecParameters(CodecParameters& codecParameters, const char* da
         return false;
 
     codecParams->codec_type = deserializedData.codecType;
-    codecParams->channels = deserializedData.channels;
     codecParams->sample_rate = deserializedData.sampleRate;
     codecParams->format = deserializedData.sampleFmt;
     codecParams->bits_per_coded_sample = deserializedData.bitsPerCodedSample;
     codecParams->width = deserializedData.width;
     codecParams->height = deserializedData.height;
     codecParams->bit_rate = deserializedData.bitRate;
-    codecParams->channel_layout = deserializedData.channelLayout;
+
+    codecParams->ch_layout.order =
+        deserializedData.channelLayout ? AV_CHANNEL_ORDER_NATIVE : AV_CHANNEL_ORDER_UNSPEC;
+    codecParams->ch_layout.u.mask = deserializedData.channelLayout;
+    codecParams->ch_layout.nb_channels = deserializedData.channels;
+
     codecParams->block_align = deserializedData.blockAlign;
     codecParams->codec_id = deserializedData.codecId;
     codecParameters.setExtradata(
@@ -257,7 +261,7 @@ int CodecParameters::getExtradataSize() const
 
 int CodecParameters::getChannels() const
 {
-    return m_codecParams->channels;
+    return m_codecParams->ch_layout.nb_channels;
 }
 
 int CodecParameters::getSampleRate() const
@@ -292,7 +296,7 @@ int CodecParameters::getBitRate() const
 
 quint64 CodecParameters::getChannelLayout() const
 {
-    return m_codecParams->channel_layout;
+    return m_codecParams->ch_layout.u.mask;
 }
 
 int CodecParameters::getBlockAlign() const

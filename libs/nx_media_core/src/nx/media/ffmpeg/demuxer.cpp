@@ -2,6 +2,7 @@
 
 #include "demuxer.h"
 
+#include <nx/media/ffmpeg/ffmpeg_utils.h>
 #include <nx/utils/log/log.h>
 
 namespace nx::media::ffmpeg {
@@ -33,7 +34,7 @@ bool Demuxer::open(IoContextPtr ioContext)
     if (status < 0)
     {
         NX_ERROR(this, "Failed to open audio stream, error: %1",
-            QnFfmpegHelper::avErrorToString(status));
+            nx::media::ffmpeg::avErrorToString(status));
         return false;
     }
 
@@ -41,7 +42,7 @@ bool Demuxer::open(IoContextPtr ioContext)
     if (status < 0)
     {
         NX_ERROR(this, "Failed to find stream info, error: %1",
-            QnFfmpegHelper::avErrorToString(status));
+            nx::media::ffmpeg::avErrorToString(status));
         return false;
     }
     return true;
@@ -62,7 +63,7 @@ QnAbstractMediaDataPtr Demuxer::getNextData()
         if (status != AVERROR_EOF)
         {
             NX_ERROR(this, "Failed to read frame, error: %1",
-                QnFfmpegHelper::avErrorToString(status));
+                nx::media::ffmpeg::avErrorToString(status));
         }
         return nullptr;
     }

@@ -147,8 +147,7 @@ void FfmpegImageProvider::load(bool sync)
                         return {};
 
                     // Preparing frame to correctly decode it as a screenshot.
-                    frame->flags |= QnAbstractMediaData::MediaFlags_DecodeTwice
-                        | QnAbstractMediaData::MediaFlags_StillImage;
+                    frame->flags |= QnAbstractMediaData::MediaFlags_StillImage;
 
                     QSharedPointer<CLVideoDecoderOutput> outFrame(new CLVideoDecoderOutput());
                     QnFfmpegVideoDecoder decoder(

@@ -17,6 +17,7 @@ extern "C"
 
 #include <nx/build_info.h>
 #include <nx/codec/nal_units.h>
+#include <nx/media/ffmpeg/old_api.h>
 #include <nx/media/ffmpeg_helper.h>
 #include <nx/media/h264_utils.h>
 #include <nx/media/utils.h>
@@ -24,7 +25,6 @@ extern "C"
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
 #include <utils/media/annexb_to_mp4.h>
-#include <utils/media/ffmpeg_initializer.h>
 
 #include "aligned_mem_video_buffer.h"
 #include "mac_utils.h"
@@ -52,14 +52,6 @@ namespace {
         static const int kHWAcceleratorFailed = 0xb1b4b1ab;
 
         return ffmpegErrorCode == kHWAcceleratorFailed;
-    }
-
-    static enum AVPixelFormat get_format(AVCodecContext *s, const enum AVPixelFormat *pix_fmts)
-    {
-        int status = av_videotoolbox_default_init(s);
-        if (status != 0)
-            NX_WARNING(NX_SCOPE_TAG, "IOS hardware decoder init failure: %1", status);
-        return pix_fmts[0];
     }
 
     QVideoFrameFormat::PixelFormat toQtPixelFormat(AVPixelFormat pixFormat)
@@ -240,7 +232,6 @@ void MacVideoDecoderPrivate::initContext(const QnConstCompressedVideoDataPtr& fr
 
     codecContext->thread_count = 1;
     codecContext->opaque = this;
-    codecContext->get_format = get_format;
 
     if (avcodec_open2(codecContext, codec, nullptr) < 0)
     {
@@ -249,16 +240,10 @@ void MacVideoDecoderPrivate::initContext(const QnConstCompressedVideoDataPtr& fr
         closeCodecContext();
         return;
     }
-
-    // keep frame unless we call 'av_buffer_unref'
-    codecContext->refcounted_frames = 1;
 }
 
 void MacVideoDecoderPrivate::closeCodecContext()
 {
-    if (codecContext)
-        av_videotoolbox_default_free(codecContext);
-
     avcodec_free_context(&codecContext);
 }
 
@@ -365,7 +350,7 @@ int MacVideoDecoder::decode(
     }
 
     int gotPicture = 0;
-    int res = avcodec_decode_video2(d->codecContext, d->frame, &gotPicture, &avpkt);
+    int res = nx::media::ffmpeg::old_api::decode(d->codecContext, d->frame, &gotPicture, &avpkt);
     if (res <= 0 || !gotPicture)
     {
         NX_WARNING(this, "IOS decoder error. gotPicture %1, errorCode %2", gotPicture, res);
@@ -382,7 +367,7 @@ int MacVideoDecoder::decode(
 
     QSize frameSize(d->frame->width, d->frame->height);
     qint64 startTimeMs = d->frame->pkt_dts / 1000;
-    int frameNum = qMax(0, d->codecContext->frame_number - 1);
+    int frameNum = qMax(0, d->codecContext->frame_num - 1);
 
     QVideoFrameFormat::PixelFormat qtPixelFormat = QVideoFrameFormat::Format_Invalid;
     d->isHardwareAccelerated = d->frame->data[3];

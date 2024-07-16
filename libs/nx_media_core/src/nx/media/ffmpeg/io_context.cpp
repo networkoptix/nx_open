@@ -5,16 +5,14 @@
 #include <fstream>
 
 extern "C" {
-
-#include <libavutil/opt.h>
 #include <libavformat/avio.h>
-
+#include <libavutil/opt.h>
 } // extern "C"
 
 namespace nx::media::ffmpeg {
 
 static int ffmpegRead(void *opaque, uint8_t* buffer, int size);
-static int ffmpegWrite(void *opaque, uint8_t* buf, int size);
+static int ffmpegWrite(void *opaque, const uint8_t* buffer, int size);
 static int64_t ffmpegSeek(void* opaque, int64_t pos, int whence);
 
 IoContext::IoContext(uint32_t bufferSize, bool writable, bool seekable)
@@ -53,7 +51,7 @@ static int ffmpegRead(void *opaque, uint8_t* buffer, int size)
     return bytesRead == 0 ? AVERROR_EOF : bytesRead;
 }
 
-static int ffmpegWrite(void *opaque, uint8_t* buffer, int size)
+static int ffmpegWrite(void *opaque, const uint8_t* buffer, int size)
 {
     IoContext* owner = reinterpret_cast<IoContext*>(opaque);
     if (!owner->writeHandler)
@@ -160,7 +158,7 @@ IoContextPtr createFile(const std::string& fileName)
 
     auto ioContext = std::make_unique<IoContext>(1024*64, /*writable*/true, /*seekable*/true);
     ioContext->writeHandler =
-        [file](uint8_t* buffer, int size)
+        [file](const uint8_t* buffer, int size)
         {
             file->write((char*)buffer, size);
             return size;

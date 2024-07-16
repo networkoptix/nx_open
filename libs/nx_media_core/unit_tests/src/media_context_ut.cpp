@@ -19,14 +19,14 @@ void fillDummyAvCodecParameters(AVCodecParameters* avCodecParams)
     QnFfmpegHelper::copyAvCodecContextField((void**) &avCodecParams->extradata, kExtradataDummy,
         strlen(kExtradataDummy));
 
-    avCodecParams->channels = 113;
+    avCodecParams->ch_layout.nb_channels = 113;
+    avCodecParams->ch_layout.u.mask = INT_MAX * 10;
     avCodecParams->sample_rate = 114;
     avCodecParams->format = AV_SAMPLE_FMT_NONE;
     avCodecParams->bits_per_coded_sample = 115;
     avCodecParams->width = 118;
     avCodecParams->height = 119;
     avCodecParams->bit_rate = 120;
-    avCodecParams->channel_layout = ((quint64) INT_MAX) * 10;
     avCodecParams->block_align = -10;
 }
 

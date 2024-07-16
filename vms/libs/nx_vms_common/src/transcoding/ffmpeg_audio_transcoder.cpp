@@ -5,6 +5,7 @@
 #include <nx/media/audio_data_packet.h>
 #include <nx/media/codec_parameters.h>
 #include <nx/media/config.h>
+#include <nx/media/ffmpeg/ffmpeg_utils.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/scope_guard.h>
@@ -14,30 +15,18 @@ namespace {
 
 const int kDefaultFrameSize = 1024;
 
-int calcBits(quint64 value)
+int getMaxAudioChannels(const AVCodec* avCodec)
 {
-    int result = 0;
-    while (value)
-    {
-        if (value & 1)
-            ++result;
-        value >>= 1;
-    }
-    return result;
-}
-
-int getMaxAudioChannels(AVCodec* avCodec)
-{
-    if (!avCodec->channel_layouts)
+    if (!avCodec->ch_layouts)
         return 1; // default value if unknown
 
     int result = 0;
-    for (const uint64_t* layout = avCodec->channel_layouts; *layout; ++layout)
-        result = qMax(result, calcBits(*layout));
+    for (auto layout = avCodec->ch_layouts; layout->nb_channels; ++layout)
+        result = std::max(result, layout->nb_channels);
     return result;
 }
 
-int getDefaultDstSampleRate(int srcSampleRate, AVCodec* avCodec)
+int getDefaultDstSampleRate(int srcSampleRate, const AVCodec* avCodec)
 {
     int result = srcSampleRate;
     bool isPcmCodec = avCodec->id == AV_CODEC_ID_ADPCM_G726
@@ -72,7 +61,7 @@ int getDefaultBitrate(AVCodecContext* context)
 {
     if (context->codec_id == AV_CODEC_ID_ADPCM_G726)
         return 16'000; // G726 supports bitrate in range [16'000..40'000] Kbps only.
-    return 64'000 * context->channels;
+    return 64'000 * context->ch_layout.nb_channels;
 }
 
 } // namespace
@@ -108,7 +97,7 @@ bool QnFfmpegAudioTranscoder::open(const CodecParametersConstPtr& context)
 {
     NX_ASSERT(context);
 
-    AVCodec* avCodec = avcodec_find_encoder(m_codecId);
+    const AVCodec* avCodec = avcodec_find_encoder(m_codecId);
     if (!avCodec)
     {
         NX_WARNING(this, "Could not find encoder for codec %1.", m_codecId);
@@ -118,12 +107,8 @@ bool QnFfmpegAudioTranscoder::open(const CodecParametersConstPtr& context)
     m_encoderCtx = avcodec_alloc_context3(avCodec);
     m_encoderCtx->sample_fmt = avCodec->sample_fmts[0] != AV_SAMPLE_FMT_NONE ? avCodec->sample_fmts[0] : AV_SAMPLE_FMT_S16;
 
-    m_encoderCtx->channels = context->getChannels();
-    int maxEncoderChannels = getMaxAudioChannels(avCodec);
-    if (m_encoderCtx->channels > maxEncoderChannels)
-        m_encoderCtx->channels = maxEncoderChannels;
-
-    m_encoderCtx->channel_layout = av_get_default_channel_layout(m_encoderCtx->channels);
+    av_channel_layout_default(
+        &m_encoderCtx->ch_layout, std::min(context->getChannels(), getMaxAudioChannels(avCodec)));
     if (m_dstSampleRate > 0)
         m_encoderCtx->sample_rate = m_dstSampleRate;
     else
@@ -167,13 +152,12 @@ bool QnFfmpegAudioTranscoder::initResampler()
 {
     FfmpegAudioResampler::Config config {
         m_decoderCtx->sample_rate,
-        static_cast<int64_t>(m_decoderCtx->channel_layout),
+        m_decoderCtx->ch_layout,
         m_decoderCtx->sample_fmt,
         m_encoderCtx->sample_rate,
-        static_cast<int64_t>(m_encoderCtx->channel_layout),
+        m_encoderCtx->ch_layout,
         m_encoderCtx->sample_fmt,
-        static_cast<uint32_t>(m_encoderCtx->frame_size),
-        m_encoderCtx->channels};
+        static_cast<uint32_t>(m_encoderCtx->frame_size)};
 
     return m_resampler.init(config);
 }
@@ -218,7 +202,7 @@ bool QnFfmpegAudioTranscoder::sendPacket(const QnConstAbstractMediaDataPtr& medi
 
     if (error && error != AVERROR_EOF)
     {
-        NX_WARNING(this, "ffmpeg audio decoder error: %1", QnFfmpegHelper::avErrorToString(error));
+        NX_WARNING(this, "ffmpeg audio decoder error: %1", nx::media::ffmpeg::avErrorToString(error));
         return false;
     }
 
@@ -241,7 +225,7 @@ bool QnFfmpegAudioTranscoder::sendPacket(const QnConstAbstractMediaDataPtr& medi
         if (error != 0)
         {
             NX_WARNING(this, "Could not receive audio frame from decoder, Error code: %1.",
-                QnFfmpegHelper::avErrorToString(error));
+                nx::media::ffmpeg::avErrorToString(error));
             return false;
         }
 
@@ -273,7 +257,7 @@ bool QnFfmpegAudioTranscoder::receivePacket(QnAbstractMediaDataPtr* const result
         if (status && status != AVERROR(EAGAIN))
         {
             NX_WARNING(this, "Could not receive audio packet from encoder, Error code: %1.",
-                QnFfmpegHelper::avErrorToString(status));
+                nx::media::ffmpeg::avErrorToString(status));
             return false;
         }
 
@@ -286,7 +270,7 @@ bool QnFfmpegAudioTranscoder::receivePacket(QnAbstractMediaDataPtr* const result
         if (status && status != AVERROR_EOF)
         {
             NX_WARNING(this, "Could not send audio frame to encoder, Error code: %1.",
-                QnFfmpegHelper::avErrorToString(status));
+                nx::media::ffmpeg::avErrorToString(status));
             return false;
         }
     }
@@ -316,17 +300,11 @@ void QnFfmpegAudioTranscoder::tuneContextsWithMedia(
     if (inCtx->frame_size == 0)
         inCtx->frame_size = kDefaultFrameSize;
 
-    if (inCtx->channel_layout == 0 && media->context)
-        inCtx->channel_layout = media->context->getChannelLayout();
-
-    if (inCtx->channel_layout == 0)
-        inCtx->channel_layout = av_get_default_channel_layout(inCtx->channels);
+    if (inCtx->ch_layout.u.mask == 0 && media->context)
+        inCtx->ch_layout = media->context->getAvCodecParameters()->ch_layout;
 
     if (outCtx->frame_size == 0)
         outCtx->frame_size = (m_dstFrameSize > 0 ? m_dstFrameSize : inCtx->frame_size);
-
-    if (outCtx->channel_layout == 0)
-        outCtx->channel_layout = av_get_default_channel_layout(outCtx->channels);
 }
 
 QnAbstractMediaDataPtr QnFfmpegAudioTranscoder::createMediaDataFromAVPacket(const AVPacket &packet)
