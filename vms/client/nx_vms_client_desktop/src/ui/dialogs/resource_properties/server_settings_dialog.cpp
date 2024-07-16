@@ -288,7 +288,7 @@ bool QnServerSettingsDialog::event(QEvent* e)
 {
     const auto type = e->type();
     if (type == QEvent::Hide || type == QEvent::Show)
-        d->poeSettingsPage->setAutoUpdate(type == QEvent::Show);
+        d->poeSettingsPage->setAutoUpdate(type == QEvent::Show && isPageVisible(PoePage));
 
     return base_type::event(e);
 }

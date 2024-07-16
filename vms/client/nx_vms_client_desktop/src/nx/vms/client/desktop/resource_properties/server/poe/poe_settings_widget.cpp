@@ -57,8 +57,21 @@ PoeSettingsWidget::Private::Private(PoeSettingsWidget* owner):
         [this]() { store.setHasChanges(ui.poeTable->hasUserChanges()); });
     connect(&controller, &PoeController::initialUpdateInProgressChanged, &store,
         [this]() { store.setPreloaderVisible(controller.initialUpdateInProgress()); });
-    connect(&controller, &PoeController::updatingPoweringModesChanged, &store,
-        [this]() { store.setBlockUi(controller.updatingPoweringModes()); });
+    connect(&controller,
+        &PoeController::updatingPoweringModesChanged,
+        &store,
+        [this]()
+        {
+            store.setBlockUi(controller.updatingPoweringModes());
+
+            // PoeController requests the state of the NVR once per second, causing
+            // isNetworkRequestRunning() to return true during these moments. As a result, if any
+            // changes occur in QnServerSettingsDialog during one of these requests, the state of
+            // Ok and Apply buttons will not be updated. Here, the buttons are forcibly updated
+            // after each such request.
+            // TODO: #esobolev Need to discuss with #dfisenko why this was done? (see VMS-53195)
+            emit q->hasChangesChanged();
+        });
 
     updateBlockData();
 }
