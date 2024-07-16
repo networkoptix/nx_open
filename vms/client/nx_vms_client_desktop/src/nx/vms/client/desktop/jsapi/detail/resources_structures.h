@@ -29,7 +29,7 @@ NX_REFLECTION_ENUM_CLASS(ResourceType,
     /** IO module Resource. */
     io_module,
 
-    /** Some streaming Resource like an RTSP sources. */
+    /** Virtual camera Resource. */
     virtual_camera,
 
     /** Web page Resource. */
