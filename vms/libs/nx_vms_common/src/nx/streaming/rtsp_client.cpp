@@ -3,7 +3,7 @@
 #include <QtCore/QtGlobal>
 
 #if defined(Q_OS_LINUX)
-#include <sys/ioctl.h>
+    #include <sys/ioctl.h>
 #endif
 
 #include <network/tcp_connection_priv.h>
@@ -1669,6 +1669,23 @@ int QnRtspClient::readSocketWithBuffering(quint8* buf, size_t bufSize, bool read
     return bytesRead;
 }
 
+CameraDiagnostics::Result QnRtspClient::parseErrorResponse(
+    const nx::network::rtsp::RtspResponse& response)
+{
+    std::string allowValue = nx::network::http::getHeaderValue(response.headers, "Allow");
+    std::transform(allowValue.begin(), allowValue.end(), allowValue.begin(), ::toupper);
+    if (!allowValue.empty()
+         && allowValue.find("GET") != std::string::npos
+         && allowValue.find("HEAD") != std::string::npos)
+    {
+        return CameraDiagnostics::UnsupportedProtocolResult(
+            m_url.toString(), nx::network::http::kUrlSchemeName);
+    }
+
+    return CameraDiagnostics::RequestFailedResult(
+        m_url.toString(), nx::String(response.statusLine.reasonPhrase));
+}
+
 CameraDiagnostics::Result QnRtspClient::sendRequestAndReceiveResponse(
     nx::network::http::Request&& request, QByteArray& responseBuf)
 {
@@ -1743,8 +1760,7 @@ CameraDiagnostics::Result QnRtspClient::sendRequestAndReceiveResponse(
 
             default:
                 NX_DEBUG(this, "Response failed: %1", response.statusLine.toString());
-                return CameraDiagnostics::RequestFailedResult(
-                    m_url.toString(), nx::String(response.statusLine.reasonPhrase));
+                return parseErrorResponse(response);
         }
 
         addCommonHeaders(request.headers); //< Update sequence after unauthorized response.
@@ -1818,7 +1834,7 @@ void QnRtspClient::setIgnoreQopInDigest(bool value)
     m_ignoreQopInDigest = value;
 }
 
-bool QnRtspClient::ignoreQopInDigest(bool value) const
+bool QnRtspClient::ignoreQopInDigest() const
 {
     return m_ignoreQopInDigest;
 }

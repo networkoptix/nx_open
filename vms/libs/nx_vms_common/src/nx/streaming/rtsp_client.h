@@ -316,7 +316,7 @@ public:
     * Some cameras declare qop support in digest authentication, but actually don't support it.
     */
     void setIgnoreQopInDigest(bool value);
-    bool ignoreQopInDigest(bool value) const;
+    bool ignoreQopInDigest() const;
 
     bool readAndProcessTextData();
     void setCloudConnectEnabled(bool enabled);
@@ -348,6 +348,7 @@ private:
     void addAdditionalHeaders(const QString& requestName, nx::network::http::HttpHeaders* outHeaders);
     QString parseContentBase(const QString& buffer);
     void setTcpSocket(std::unique_ptr<nx::network::AbstractStreamSocket> socket);
+    CameraDiagnostics::Result parseErrorResponse(const nx::network::rtsp::RtspResponse& response);
 
 private:
     enum { RTSP_BUFFER_LEN = 1024 * 65 };
