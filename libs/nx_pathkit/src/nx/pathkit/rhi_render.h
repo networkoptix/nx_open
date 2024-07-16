@@ -95,6 +95,11 @@ private:
     void prepareAtlas();
 
     QImage getImage(const QPixmap& pixmap);
+    void fillTextureVerts(
+        const PaintPixmap& paintPixmap,
+        const QRectF& textureSrc,
+        QSize clip,
+        std::vector<float>& textureVerts);
 
     QRhi* const m_rhi;
     Settings m_settings;

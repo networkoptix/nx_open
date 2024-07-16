@@ -17,6 +17,8 @@ using namespace pk;
 
 namespace {
 
+static constexpr float kTolerance = 0.25f;
+
 static const QRhiShaderResourceBinding::StageFlags kCommonVisibility =
     QRhiShaderResourceBinding::VertexStage
     | QRhiShaderResourceBinding::FragmentStage;
@@ -30,20 +32,11 @@ int pathToTriangles(
     QSize clip)
 {
     const auto prevSize = triangles.size();
+    const SkRect clipBounds = SkRect::MakeXYWH(0, 0, clip.width(), clip.height());
     if (pp.aa)
-    {
-        path.toAATriangles(
-            /*tolerance*/ 0.25,
-            /*clipBounds*/ SkRect::MakeXYWH(0, 0, clip.width(), clip.height()),
-            &triangles);
-    }
+        path.toAATriangles(kTolerance, clipBounds, &triangles);
     else
-    {
-        path.toTriangles(
-            /*tolerance*/ 0.25,
-            /*clipBounds*/ SkRect::MakeXYWH(0, 0, clip.width(), clip.height()),
-            &triangles);
-    }
+        path.toTriangles(kTolerance, clipBounds, &triangles);
 
     // Each triangle vertex is 3 floats: x, y, alpha.
     const auto numVerts = (triangles.size() - prevSize) / 3;
@@ -550,6 +543,105 @@ void RhiPaintDeviceRenderer::prepareAtlas()
     }
 }
 
+void RhiPaintDeviceRenderer::fillTextureVerts(
+    const PaintPixmap& paintPixmap,
+    const QRectF& textureSrc,
+    QSize clip,
+    std::vector<float>& textureVerts)
+{
+    const QRectF srcRect = paintPixmap.src.isEmpty()
+        ? QRectF(QPoint(0, 0), paintPixmap.pixmap.size())
+        : paintPixmap.src;
+
+    QTransform toTexture;
+    toTexture.translate(
+        textureSrc.x(),
+        textureSrc.y());
+    toTexture.scale(
+        textureSrc.width() / paintPixmap.pixmap.width(),
+        textureSrc.height() / paintPixmap.pixmap.height());
+
+    const auto dst = paintPixmap.dst;
+
+    const QPointF topLeft = paintPixmap.transform.map(dst.topLeft());
+    const QPointF topRight = paintPixmap.transform.map(dst.topRight());
+    const QPointF bottomLeft = paintPixmap.transform.map(dst.bottomLeft());
+    const QPointF bottomRight = paintPixmap.transform.map(dst.bottomRight());
+
+    if (paintPixmap.clip)
+    {
+        SkPath borderPath;
+        borderPath.moveTo(topLeft.x(), topLeft.y());
+        borderPath.lineTo(topRight.x(), topRight.y());
+        borderPath.lineTo(bottomRight.x(), bottomRight.y());
+        borderPath.lineTo(bottomLeft.x(), bottomLeft.y());
+        borderPath.close();
+
+        SkPath clipped;
+        Op(borderPath, *paintPixmap.clip, SkPathOp::kIntersect_SkPathOp, &clipped);
+
+        std::vector<float> triangles;
+        clipped.toTriangles(
+            kTolerance,
+            /*clipBounds*/ SkRect::MakeXYWH(0, 0, clip.width(), clip.height()),
+            &triangles);
+
+        bool invertible = false;
+        QTransform inverted = paintPixmap.transform.inverted(&invertible);
+
+        QTransform toPixmap;
+        toPixmap.translate(srcRect.x(), srcRect.y());
+        toPixmap.scale(
+            srcRect.width() / dst.width(),
+            srcRect.height() / dst.height());
+        toPixmap.translate(-dst.x(), -dst.y());
+
+        inverted = inverted * toPixmap * toTexture;
+
+        constexpr auto kStride = 3;
+        textureVerts.reserve(textureVerts.size() + 5 * (triangles.size() / kStride));
+
+        for (size_t i = 0; i + kStride <= triangles.size(); i += kStride)
+        {
+            const QPointF v(triangles[i], triangles[i + 1]);
+            const QPointF t = inverted.map(v);
+
+            textureVerts.push_back(v.x());
+            textureVerts.push_back(v.y());
+            textureVerts.push_back(t.x());
+            textureVerts.push_back(t.y());
+            textureVerts.push_back(paintPixmap.opacity);
+        }
+    }
+    else
+    {
+        const auto rect = toTexture.mapRect(srcRect);
+
+        const qreal vx[4] = {topLeft.x(), topRight.x(), bottomRight.x(), bottomLeft.x()};
+        const qreal vy[4] = {topLeft.y(), topRight.y(), bottomRight.y(), bottomLeft.y()};
+        const qreal tx[4] = {rect.left(), rect.right(), rect.right(), rect.left()};
+        const qreal ty[4] = {rect.top(), rect.top(), rect.bottom(), rect.bottom()};
+
+        const auto emitVertex =
+            [&vx, &vy, &tx, &ty, &textureVerts, opacity=paintPixmap.opacity](int i)
+            {
+                textureVerts.push_back(vx[i]);
+                textureVerts.push_back(vy[i]);
+                textureVerts.push_back(tx[i]);
+                textureVerts.push_back(ty[i]);
+                textureVerts.push_back(opacity);
+            };
+
+        textureVerts.reserve(textureVerts.size() + 5 * (3 + 3));
+
+        // 0 - 1
+        // | / |
+        // 3 - 2
+        for (int i: {0, 1, 3, 3, 1, 2})
+            emitVertex(i);
+    }
+}
+
 std::vector<RhiPaintDeviceRenderer::Batch> RhiPaintDeviceRenderer::processEntries(
     QRhiRenderPassDescriptor* rp,
     QRhiResourceUpdateBatch* u,
@@ -629,51 +721,27 @@ std::vector<RhiPaintDeviceRenderer::Batch> RhiPaintDeviceRenderer::processEntrie
         }
         else if (auto paintPixmap = std::get_if<PaintPixmap>(&entry))
         {
-            auto r = paintPixmap->dst;
-
-            const QPointF topLeft = paintPixmap->transform.map(r.topLeft());
-            const QPointF topRight = paintPixmap->transform.map(r.topRight());
-            const QPointF bottomLeft = paintPixmap->transform.map(r.bottomLeft());
-            const QPointF bottomRight = paintPixmap->transform.map(r.bottomRight());
-
             QRectF src;
             auto bindings = createTextureBinding(u, paintPixmap->pixmap, &src);
 
-            if (const auto s = paintPixmap->pixmap.size();
-                !s.isEmpty() && (src.size() != s || !src.topLeft().isNull()))
-            {
-                src.setX(src.x() + src.width() * paintPixmap->src.x() / s.width());
-                src.setY(src.y() + src.height() * paintPixmap->src.y() / s.height());
-                src.setWidth(src.width() * paintPixmap->src.width() / s.width());
-                src.setHeight(src.height() * paintPixmap->src.height() / s.height());
-            }
+            const auto offset = textureVerts.size();
 
-            std::vector<float> vertexData = {
-                (float) topLeft.x(),     (float) topLeft.y(),     (float) src.left(),  (float) src.top(),    (float) paintPixmap->opacity,
-                (float) topRight.x(),    (float) topRight.y(),    (float) src.right(), (float) src.top(),    (float) paintPixmap->opacity,
-                (float) bottomLeft.x(),  (float) bottomLeft.y(),  (float) src.left(),  (float) src.bottom(), (float) paintPixmap->opacity,
-
-                (float) bottomLeft.x(),  (float) bottomLeft.y(),  (float) src.left(),  (float) src.bottom(), (float) paintPixmap->opacity,
-                (float) topRight.x(),    (float) topRight.y(),    (float) src.right(), (float) src.top(),    (float) paintPixmap->opacity,
-                (float) bottomRight.x(), (float) bottomRight.y(), (float) src.right(), (float) src.bottom(), (float) paintPixmap->opacity,
-            };
+            fillTextureVerts(*paintPixmap, src, clip, textureVerts);
 
             if (!batches.empty() && batches.back().bindigs == bindings)
             {
-                batches.back().count += 6;
+                batches.back().count += (textureVerts.size() - offset) / 5;
             }
             else
             {
                 batches.push_back({
-                    .offset = (int) textureVerts.size(),
-                    .count = 6,
+                    .offset = (int) offset,
+                    .count = (int) (textureVerts.size() - offset) / 5,
                     .bindigs = bindings,
                     .pipeline = tps.get(),
                     .vertexInput = tvbuf.get(),
                 });
             }
-
-            std::copy(vertexData.begin(), vertexData.end(), std::back_inserter(textureVerts));
         }
         else if (auto customPaint = std::get_if<PaintCustom>(&entry))
         {

@@ -33,6 +33,7 @@ struct PaintPixmap
     QPixmap pixmap;
     QRectF src;
     QTransform transform;
+    std::optional<pk::SkPath> clip;
     qreal opacity = 1.0;
 };
 

@@ -173,6 +173,7 @@ void RhiPaintEngine::drawPixmap(const QRectF& r, const QPixmap& pm, const QRectF
         .pixmap = pm,
         .src = sr,
         .transform = state->transform(),
+        .clip = getClip(),
         .opacity = painter()->opacity()
     });
 }
