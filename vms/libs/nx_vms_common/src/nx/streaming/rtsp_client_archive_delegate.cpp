@@ -524,7 +524,8 @@ bool QnRtspClientArchiveDelegate::reopen()
 
     if (m_camera)
     {
-        m_reopenPosition = m_position;
+        if (m_position != DATETIME_NOW && m_position != DATETIME_INVALID)
+            m_reopenPosition = m_position;
         return openInternal();
     }
 
