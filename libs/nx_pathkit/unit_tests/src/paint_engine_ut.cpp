@@ -92,15 +92,21 @@ TEST_F(PaintEngineTest, checkRendering)
         [](QPaintDevice* pd)
         {
             QPainter p(pd);
+
+            // Currently RHI always does smooth pixmap transform.
+            p.setRenderHint(QPainter::SmoothPixmapTransform);
+
             p.setPen(Qt::black);
             p.setBrush(QColor(255, 0, 0, 100));
 
+            // Prepare a pixmap that would be used throughout the test.
             QImage pix(50, 50, QImage::Format_RGBA8888_Premultiplied);
             pix.setDevicePixelRatio(2);
             pix.fill(Qt::black);
             QPainter tmp(&pix);
             tmp.fillRect(10, 10, 30, 30, Qt::green);
 
+            // Test opactity and transform.
             p.drawRect(0, 0, 100, 100);
 
             p.save();
@@ -109,6 +115,7 @@ TEST_F(PaintEngineTest, checkRendering)
             p.drawRect(50, 50, 50, 50);
             p.restore();
 
+            // Test drawing text.
             p.save();
             p.rotate(15);
             auto f = p.font();
@@ -117,12 +124,16 @@ TEST_F(PaintEngineTest, checkRendering)
             p.drawText(100, 100, "TEST");
             p.restore();
 
+            // Test clipping with transform.
             p.save();
+            p.setClipRect(QRect(0, 0, 200, 160));
             p.rotate(15);
             p.setOpacity(0.5);
+            p.setClipRect(QRect(70, 125, 40, 25), Qt::ClipOperation::IntersectClip);
             p.drawImage(QRect(50, 100, 100, 50), pix, QRect(5, 5, 40, 40));
             p.restore();
 
+            // Test image drawing.
             p.drawImage(10, 170, pix);
 
             p.drawImage(QRect(80, 130, 100, 50), pix, QRect(5, 5, 40, 40));
@@ -134,6 +145,7 @@ TEST_F(PaintEngineTest, checkRendering)
 
             p.setPen(QPen(Qt::black, 2));
 
+            // Test drawing a polygon.
             QPolygon poly;
             QList<QPoint> points;
             points << QPoint(100, 100);
@@ -143,6 +155,7 @@ TEST_F(PaintEngineTest, checkRendering)
             poly.append(points);
             p.drawPolygon(poly);
 
+            // Test line patterns.
             p.save();
             p.scale(2, 2);
 
@@ -165,6 +178,7 @@ TEST_F(PaintEngineTest, checkRendering)
             p.drawLine(25, 0, 25, 50);
             p.restore();
 
+            // Test a path with a hole.
             p.setBrush(Qt::blue);
 
             QRect hole(140, 140, 50, 50);
@@ -178,6 +192,26 @@ TEST_F(PaintEngineTest, checkRendering)
 
             p.setPen(QPen(Qt::black, 1));
             p.drawPath(fullPath.subtracted(holePath));
+
+            // Test clipping of a pixmap.
+            QImage textImage(100, 100, QImage::Format_RGBA8888_Premultiplied);
+            textImage.setDevicePixelRatio(2);
+            textImage.fill(Qt::white);
+            {
+                QPainter pp(&textImage);
+                pp.setPen(Qt::black);
+                pp.setBrush(Qt::black);
+                pp.drawLine(0, 0, 50, 50);
+                auto f = p.font();
+                f.setPixelSize(20);
+                pp.setFont(f);
+                pp.drawText(0, 20, "TEXT");
+            }
+            // It is important to transform the image into pixmap ourselves otherwise Qt does it
+            // for us but resulting internal pixmap would be extracted from source rect.
+            const QPixmap textPixmap = QPixmap::fromImage(textImage);
+            p.setClipRect(140, 82, 40, 40);
+            p.drawPixmap(QRectF(140, 82, 50, 50), textPixmap, QRectF(10, 10, 30, 80));
         };
 
     paint(&paintDevice);
