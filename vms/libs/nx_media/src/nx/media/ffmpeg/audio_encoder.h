@@ -20,9 +20,8 @@ public:
     bool initialize(
         AVCodecID codec,
         int sampleRate,
-        int channels,
         AVSampleFormat format,
-        uint64_t layout,
+        AVChannelLayout layout,
         int bitrate);
     bool sendFrame(uint8_t* data, int size);
     bool receivePacket(QnWritableCompressedAudioDataPtr& result);

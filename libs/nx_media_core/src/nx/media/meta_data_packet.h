@@ -11,6 +11,9 @@
 #include <nx/media/sse_helper.h>
 #include <nx/media/stream_event.h>
 
+class QIODevice;
+class QRegion;
+
 struct QnAbstractCompressedMetadata;
 struct QnCompressedMetadata;
 struct QnMetaDataV1;

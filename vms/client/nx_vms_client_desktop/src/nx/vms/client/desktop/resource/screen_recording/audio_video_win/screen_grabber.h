@@ -99,7 +99,6 @@ private:
     RECT m_rect{0, 0, 0, 0};
     D3DDISPLAYMODE m_ddm{};
     QElapsedTimer* m_timer = nullptr;
-    unsigned m_frameNum = 0;
     int m_currentIndex = 0;
 
     const screen_recording::CaptureMode m_mode;

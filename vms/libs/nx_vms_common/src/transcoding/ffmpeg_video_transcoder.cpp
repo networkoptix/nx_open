@@ -8,6 +8,8 @@
 #include <decoders/video/ffmpeg_video_decoder.h>
 #include <nx/media/codec_parameters.h>
 #include <nx/media/config.h>
+#include <nx/media/ffmpeg/ffmpeg_utils.h>
+#include <nx/media/ffmpeg/old_api.h>
 #include <nx/media/utils.h>
 #include <nx/media/video_data_packet.h>
 #include <nx/metrics/metrics_storage.h>
@@ -85,7 +87,6 @@ QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(
         m_lastSrcWidth[i] = -1;
         m_lastSrcHeight[i] = -1;
     }
-    m_videoEncodingBuffer = (quint8*) qMallocAligned(kMaxEncodedFrameSize, 32);
     if (m_metrics)
         m_metrics->transcoders()++;
 }
@@ -97,7 +98,6 @@ void QnFfmpegVideoTranscoder::setFixedFrameRate(int value)
 
 QnFfmpegVideoTranscoder::~QnFfmpegVideoTranscoder()
 {
-    qFreeAligned(m_videoEncodingBuffer);
     close();
     if (m_metrics)
         m_metrics->transcoders()--;
@@ -176,7 +176,7 @@ bool QnFfmpegVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
     if (!prepareFilters(m_codecId, video))
         return false;
 
-    AVCodec* avCodec = avcodec_find_encoder(m_codecId);
+    const AVCodec* avCodec = avcodec_find_encoder(m_codecId);
     if (avCodec == 0)
     {
         NX_WARNING(this, "Could not find encoder for codec %1.", m_codecId);
@@ -361,8 +361,8 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
     static AVRational r = { 1, 1'000'000 };
     if (m_fixedFrameRate)
     {
-        m_frameNumToPts[m_encoderCtx->frame_number] = decodedFrame->pts;
-        decodedFrame->pts = m_encoderCtx->frame_number;
+        m_frameNumToPts[m_encoderCtx->frame_num] = decodedFrame->pts;
+        decodedFrame->pts = m_encoderCtx->frame_num;
     }
     else
     {
@@ -380,7 +380,7 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
 
     // Improve performance by omitting frames to encode in case if encoding goes way too slow..
     // TODO: #muskov make mediaserver's config option and HTTP query option to disable feature
-    if (m_useRealTimeOptimization && m_encoderCtx->frame_number > OPTIMIZATION_BEGIN_FRAME)
+    if (m_useRealTimeOptimization && m_encoderCtx->frame_num > OPTIMIZATION_BEGIN_FRAME)
     {
         // the more frames are dropped the lower limit is gonna be set
         // (x + (x >> k)) is faster and more precise then (x * (1 + 0.5^k))
@@ -393,13 +393,14 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
     }
     decodedFrame->pict_type = AV_PICTURE_TYPE_NONE;
 
-    QnFfmpegAvPacket outPacket(m_videoEncodingBuffer, kMaxEncodedFrameSize);
+    QnFfmpegAvPacket outPacket;
     int got_packet = 0;
-    int encodeResult = avcodec_encode_video2(m_encoderCtx, &outPacket, decodedFrame.data(), &got_packet);
+    int encodeResult = nx::media::ffmpeg::old_api::encode(
+        m_encoderCtx, &outPacket, decodedFrame.data(), &got_packet);
     if (encodeResult < 0)
     {
         NX_WARNING(this, "Failed to encode video, error: %1",
-            QnFfmpegHelper::avErrorToString(encodeResult));
+            nx::media::ffmpeg::avErrorToString(encodeResult));
         return encodeResult;
     }
     if (m_metrics)
@@ -425,7 +426,8 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
 
     if (outPacket.flags & AV_PKT_FLAG_KEY)
         resultVideoData->flags |= QnAbstractMediaData::MediaFlags_AVKey;
-    resultVideoData->m_data.write((const char*) m_videoEncodingBuffer, outPacket.size); // todo: remove data copy here!
+
+    resultVideoData->m_data.write((const char*) outPacket.data, outPacket.size); // todo: remove data copy here!
     resultVideoData->compressionType = updateCodec(m_codecId);
 
     if (!m_ctxPtr)

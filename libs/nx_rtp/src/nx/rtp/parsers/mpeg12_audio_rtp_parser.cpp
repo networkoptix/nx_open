@@ -127,7 +127,8 @@ Result Mpeg12AudioParser::updateFromMpegAudioHeader(
     AVCodecParameters* const codecParams = m_mediaContext->getAvCodecParameters();
     codecParams->codec_type = AVMEDIA_TYPE_AUDIO;
     codecParams->codec_id = codecId;
-    codecParams->channels = channelNumberFromChannelMode(mpegAudioHeader.channelMode);
+    av_channel_layout_default(
+        &codecParams->ch_layout, channelNumberFromChannelMode(mpegAudioHeader.channelMode));
     codecParams->sample_rate = mpegAudioHeader.samplingRate;
     return {true};
 }

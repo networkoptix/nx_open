@@ -5,8 +5,7 @@
 #include <algorithm>
 #include <chrono>
 
-extern "C"
-{
+extern "C" {
 #include <libavutil/imgutils.h>
 #include <libswscale/swscale.h>
 } // extern "C"
@@ -22,18 +21,18 @@ extern "C"
 #include <nx/utils/log/log.h>
 #include <nx/utils/math/math.h>
 #include <nx/utils/thread/long_runnable.h>
+#include <nx/vms/client/core/utils/video_cache.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/core/utils/video_cache.h>
 #include <ui/graphics/items/resource/resource_widget_renderer.h>
 #include <ui/graphics/opengl/gl_functions.h>
 #include <utils/common/adaptive_sleep.h>
 
 #ifdef __QSV_SUPPORTED__
-#include <nx/media/nvidia/nvidia_video_decoder_old_player.h>
-#include <nx/media/quick_sync/quick_sync_video_decoder_old_player.h>
+    #include <nx/media/nvidia/nvidia_video_decoder_old_player.h>
+    #include <nx/media/quick_sync/quick_sync_video_decoder_old_player.h>
 #endif // __QSV_SUPPORTED__
 
 #include "buffered_frame_displayer.h"
@@ -779,7 +778,6 @@ bool QnVideoStreamDisplay::downscaleOrForward(
             return false;
     }
     dst->pkt_dts = src->pkt_dts;
-    dst->pkt_pts = src->pkt_pts;
     dst->flags = src->flags;
     dst->channel = src->channel;
     dst->scaleFactor = scaleFactor;

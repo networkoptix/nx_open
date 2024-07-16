@@ -44,7 +44,7 @@ NX_VMS_COMMON_API void setupIoContext(
     AVFormatContext* formatContext,
     void* userCtx,
     int (*read)(void* userCtx, uint8_t* data, int size),
-    int (*write)(void* userCtx, uint8_t* data, int size),
+    int (*write)(void* userCtx, const uint8_t* data, int size),
     int64_t (*seek)(void* userCtx, int64_t pos, int whence)) noexcept(false);
 
 NX_VMS_COMMON_API nx::sdk::Ptr<nx::sdk::cloud_storage::IMediaDataPacket> mediaPacketFromFrame(

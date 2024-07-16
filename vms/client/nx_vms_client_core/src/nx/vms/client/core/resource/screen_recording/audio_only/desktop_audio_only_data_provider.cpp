@@ -7,8 +7,7 @@
 #include <QtMultimedia/QAudioDevice>
 #include <QtMultimedia/QAudioSource>
 
-extern "C"
-{
+extern "C" {
 #include <libavcodec/avcodec.h>
 }
 
@@ -118,11 +117,12 @@ void DesktopAudioOnlyDataProvider::run()
     int sampleRate = format.sampleRate();
     int channels = m_audioSourcesInfo.size() > 1 ? kStereoChannelCount : format.channelCount();
 
+    AVChannelLayout layout;
+    av_channel_layout_default(&layout, channels);
     if (!m_audioEncoder.initialize(AV_CODEC_ID_MP2,
         sampleRate,
-        channels,
         fromQtAudioFormat(format),
-        av_get_default_channel_layout(channels),
+        layout,
         kSingleChannelBitrate * channels))
     {
         return;

@@ -85,12 +85,12 @@ void AacParser::setSdpInfo(const Sdp::Media& sdp)
     aacCodec.readConfig(aacConfig);
 
     m_context = std::make_shared<CodecParameters>();
-    const auto avCodecParams = m_context->getAvCodecParameters();
-    avCodecParams->codec_type = AVMEDIA_TYPE_AUDIO;
-    avCodecParams->codec_id = AV_CODEC_ID_AAC;
-    avCodecParams->channels = aacCodec.m_channels;
-    avCodecParams->sample_rate = aacCodec.m_sample_rate;
-    avCodecParams->format = AV_SAMPLE_FMT_FLTP;
+    const auto codecParams = m_context->getAvCodecParameters();
+    codecParams->codec_type = AVMEDIA_TYPE_AUDIO;
+    codecParams->codec_id = AV_CODEC_ID_AAC;
+    av_channel_layout_default(&codecParams->ch_layout, aacCodec.m_channels);
+    codecParams->sample_rate = aacCodec.m_sample_rate;
+    codecParams->format = AV_SAMPLE_FMT_FLTP;
     m_context->setExtradata((const quint8*)aacConfig.data(), aacConfig.size());
 }
 

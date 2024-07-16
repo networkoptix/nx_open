@@ -323,11 +323,11 @@ void avCodecParametersFromCodecInfo(
     SET_IF_DEFINED_INT(codecParams->height, info.height);
     SET_IF_DEFINED_INT(codecParams->codec_tag, info.codecTag);
     SET_IF_DEFINED_INT(codecParams->bit_rate, info.bitRate);
-    SET_IF_DEFINED_INT(codecParams->channels, info.channels);
+    SET_IF_DEFINED_INT(codecParams->ch_layout.nb_channels, info.channels);
     SET_IF_DEFINED_INT(codecParams->frame_size, info.frameSize);
     SET_IF_DEFINED_INT(codecParams->sample_rate, info.sampleRate);
     SET_IF_DEFINED_INT(codecParams->bits_per_coded_sample, info.bitsPerCodedSample);
-    SET_IF_DEFINED_INT(codecParams->channel_layout, info.channelLayout);
+    SET_IF_DEFINED_INT(codecParams->ch_layout.u.mask, info.channelLayout);
 
     const auto extradata = nx::sdk::cloud_storage::fromBase64(info.extradataBase64);
     QnFfmpegHelper::copyAvCodecContextField(
@@ -358,8 +358,8 @@ nx::sdk::cloud_storage::CodecInfoData codecInfoFromAvCodecParameters(
     result.frameSize = codecParams->frame_size;
     result.sampleRate = codecParams->sample_rate;
     result.bitsPerCodedSample = codecParams->bits_per_coded_sample;
-    result.channels = codecParams->channels;
-    result.channelLayout = codecParams->channel_layout;
+    result.channels = codecParams->ch_layout.nb_channels;
+    result.channelLayout = codecParams->ch_layout.u.mask;
     result.blockAlign = codecParams->block_align;
     result.extradataBase64 = nx::sdk::cloud_storage::toBase64(
         codecParams->extradata, codecParams->extradata_size);
@@ -371,7 +371,7 @@ void setupIoContext(
     AVFormatContext* formatContext,
     void* userCtx,
     int (*read)(void* userCtx, uint8_t* data, int size),
-    int (*write)(void* userCtx, uint8_t* data, int size),
+    int (*write)(void* userCtx, const uint8_t* data, int size),
     int64_t (*seek)(void* userCtx, int64_t pos, int whence)) noexcept(false)
 {
     constexpr int kBlockSize = 1024 * 1024;

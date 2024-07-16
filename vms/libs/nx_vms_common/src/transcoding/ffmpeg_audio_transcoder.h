@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include <stdint.h>
+#include <memory>
 
-#include <QtCore/QCoreApplication>
+#include <stdint.h>
 
 #include <nx/media/ffmpeg_helper.h>
 #include <nx/utils/byte_array.h>
@@ -18,8 +18,6 @@
  */
 class NX_VMS_COMMON_API QnFfmpegAudioTranscoder: public QnAudioTranscoder
 {
-    Q_DECLARE_TR_FUNCTIONS(QnFfmpegAudioTranscoder)
-
 public:
     /**
      * \param codecId Id of destination codec.
@@ -110,4 +108,4 @@ private:
     int m_dstFrameSize;
 };
 
-typedef QSharedPointer<QnFfmpegAudioTranscoder> QnFfmpegAudioTranscoderPtr;
+using QnFfmpegAudioTranscoderPtr = std::unique_ptr<QnFfmpegAudioTranscoder>;

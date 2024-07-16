@@ -2,8 +2,9 @@
 
 #pragma once
 
+#include <memory>
+
 #include <QtCore/QQueue>
-#include <QtCore/QSharedPointer>
 #include <QtCore/QString>
 
 extern "C" {
@@ -85,7 +86,7 @@ protected:
     AVCodecID m_codecId;
     Qn::StreamQuality m_quality;
 };
-typedef QSharedPointer<QnCodecTranscoder> QnCodecTranscoderPtr;
+using QnCodecTranscoderPtr = std::unique_ptr<QnCodecTranscoder>;
 
 //!Base class for all video transcoders
 class QnVideoTranscoder: public QnCodecTranscoder
@@ -102,9 +103,10 @@ public:
     QnAudioTranscoder(AVCodecID codecId): QnCodecTranscoder(codecId) {}
     virtual bool open(const QnConstCompressedAudioDataPtr& /*video*/)  = 0;
 };
-typedef QSharedPointer<QnAudioTranscoder> QnAudioTranscoderPtr;
+typedef std::unique_ptr<QnAudioTranscoder> QnAudioTranscoderPtr;
 
 class QnFfmpegVideoTranscoder;
+class QnFfmpegAudioTranscoder;
 
 //!Multiplexes one or more raw media streams into container format. Can apply transcoding to input media streams
 /*
@@ -229,8 +231,8 @@ private:
 
 protected:
     DecoderConfig m_decoderConfig;
-    QSharedPointer<QnFfmpegVideoTranscoder> m_vTranscoder;
-    QnAudioTranscoderPtr m_aTranscoder;
+    std::unique_ptr<QnFfmpegVideoTranscoder> m_vTranscoder;
+    std::unique_ptr<QnFfmpegAudioTranscoder> m_aTranscoder;
     AVCodecID m_videoCodec;
     AVCodecID m_audioCodec;
     bool m_videoStreamCopy;
@@ -256,4 +258,4 @@ private:
     BeforeOpenCallback m_beforeOpenCallback;
 };
 
-typedef QSharedPointer<QnTranscoder> QnTranscoderPtr;
+using QnTranscoderPtr = std::unique_ptr<QnTranscoder>;

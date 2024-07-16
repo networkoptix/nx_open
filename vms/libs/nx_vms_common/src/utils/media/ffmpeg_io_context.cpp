@@ -4,11 +4,9 @@
 
 #include <core/resource/storage_resource.h>
 
-extern "C"
-{
+extern "C" {
 #include <libavutil/mem.h>
 #include <libavutil/opt.h>
-
 } // extern "C"
 
 namespace {
@@ -20,7 +18,7 @@ static qint32 ffmpegReadPacket(void *opaque, quint8* buf, int size)
     return bytesRead == 0 ? AVERROR_EOF : bytesRead;
 }
 
-static qint32 ffmpegWritePacket(void *opaque, quint8* buf, int size)
+static qint32 ffmpegWritePacket(void *opaque, const quint8* buf, int size)
 {
     QIODevice* reader = reinterpret_cast<QIODevice*> (opaque);
     if (reader)

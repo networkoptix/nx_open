@@ -71,7 +71,6 @@ private:
     QSize m_targetResolution;
     QSize m_sourceResolution;
 
-    quint8* m_videoEncodingBuffer;
     AVCodecContext* m_encoderCtx;
 
     int m_lastSrcWidth[CL_MAX_CHANNELS];

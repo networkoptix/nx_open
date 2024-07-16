@@ -3,10 +3,10 @@
 #include "ffmpeg_audio_filter.h"
 
 extern "C" {
+#include <libavcodec/avcodec.h>
 #include <libavfilter/avfilter.h>
 #include <libavfilter/buffersink.h>
 #include <libavfilter/buffersrc.h>
-#include <libavcodec/avcodec.h>
 #include <libavutil/opt.h>
 }
 
@@ -74,19 +74,14 @@ bool FfmpegAudioFilter::init(
         close();
         return false;
     }
-
-    if (!decContext->channel_layout)
-        decContext->channel_layout = av_get_default_channel_layout(decContext->channels);
-
-    static const enum AVSampleFormat out_sample_fmts[] = { decContext->sample_fmt, (AVSampleFormat)-1 };
-    static const int64_t out_channel_layouts[] = { static_cast<int64_t>(decContext->channel_layout), -1 };
-    static const int out_sample_rates[] = { decContext->sample_rate, -1 };
+    char ch_layout[64];
+    av_channel_layout_describe(&decContext->ch_layout, ch_layout, sizeof(ch_layout));
 
     std::stringstream args;
     args << "time_base=" << timeBase.num << "/" << timeBase.den << ":"
          << "sample_rate=" << decContext->sample_rate << ":"
          << "sample_fmt=" << av_get_sample_fmt_name(decContext->sample_fmt) << ":"
-         << "channel_layout=0x" << decContext->channel_layout;
+         << "channel_layout=" << ch_layout;
 
     status = avfilter_graph_create_filter(
         &m_bufferSrc, bufferSrc, "in", args.str().c_str(), NULL, m_graph);
@@ -106,7 +101,10 @@ bool FfmpegAudioFilter::init(
         return false;
     }
 
-    status = av_opt_set_int_list(m_bufferSink, "sample_fmts", out_sample_fmts, -1,
+    status = av_opt_set(
+        m_bufferSink,
+        "sample_fmt",
+        av_get_sample_fmt_name(decContext->sample_fmt),
         AV_OPT_SEARCH_CHILDREN);
     if (status < 0)
     {
@@ -114,15 +112,17 @@ bool FfmpegAudioFilter::init(
         close();
         return false;
     }
-    status = av_opt_set_int_list(m_bufferSink, "channel_layouts", out_channel_layouts, -1,
-        AV_OPT_SEARCH_CHILDREN);
+    status = av_opt_set(m_bufferSink, "channel_layouts", ch_layout, AV_OPT_SEARCH_CHILDREN);
     if (status < 0)
     {
         NX_ERROR(this, "Cannot set output channel layout");
         close();
         return false;
     }
-    status = av_opt_set_int_list(m_bufferSink, "sample_rates", out_sample_rates, -1,
+    status = av_opt_set_int(
+        m_bufferSink,
+        "sample_rate",
+        decContext->sample_rate,
         AV_OPT_SEARCH_CHILDREN);
     if (status < 0)
     {

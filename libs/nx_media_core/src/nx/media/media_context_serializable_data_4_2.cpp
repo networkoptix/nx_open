@@ -42,13 +42,13 @@ void QnMediaContextSerializableData_4_2::initializeFrom(const AVCodecParameters*
         extradata = QByteArray((const char*)codecParams->extradata,
             codecParams->extradata_size);
     }
-    channels = codecParams->channels;
+    channels = codecParams->ch_layout.nb_channels;
     sampleRate = codecParams->sample_rate;
     sampleFmt = (AVSampleFormat)codecParams->format;
     bitsPerCodedSample = codecParams->bits_per_coded_sample;
     codedWidth_deprecated = width = codecParams->width;
     codedHeight_deprecated = height = codecParams->height;
     bitRate = codecParams->bit_rate;
-    channelLayout = codecParams->channel_layout;
+    channelLayout = codecParams->ch_layout.u.mask;
     blockAlign = codecParams->block_align;
 }

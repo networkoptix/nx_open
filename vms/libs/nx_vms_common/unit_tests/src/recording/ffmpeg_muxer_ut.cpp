@@ -3,11 +3,11 @@
 #include <gtest/gtest.h>
 
 #include <decoders/audio/ffmpeg_audio_decoder.h>
+#include <nx/media/ffmpeg/ffmpeg_utils.h>
 #include <nx/utils/log/log.h>
 #include <transcoding/ffmpeg_audio_transcoder.h>
 
-extern "C"
-{
+extern "C" {
 #include <libavformat/avformat.h>
 } // extern "C"
 
@@ -29,7 +29,7 @@ public:
         if (status < 0)
         {
             NX_ERROR(this, "Failed to allocate format context: %1",
-                QnFfmpegHelper::avErrorToString(status));
+                nx::media::ffmpeg::avErrorToString(status));
             return false;
         }
         return true;
@@ -49,7 +49,7 @@ public:
         if (status < 0)
         {
             NX_ERROR(this, "Failed to copy codec parameters: %1",
-                QnFfmpegHelper::avErrorToString(status));
+                nx::media::ffmpeg::avErrorToString(status));
             return false;
         }
         return true;
@@ -113,7 +113,7 @@ TEST(FfmpegAudioDecoder, decodingG726)
     const auto avCodecParams = codecParameters->getAvCodecParameters();
     avCodecParams->codec_type = AVMEDIA_TYPE_AUDIO;
     avCodecParams->codec_id = AV_CODEC_ID_ADPCM_G726;
-    avCodecParams->channels = 1;
+    av_channel_layout_default(&avCodecParams->ch_layout, 1);
     avCodecParams->sample_rate = 8000;
     avCodecParams->format = AV_SAMPLE_FMT_S16;
     avCodecParams->bits_per_coded_sample = 2;
