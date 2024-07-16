@@ -137,9 +137,7 @@ struct VmsEventSearchListModel::Private
 
     void fetchLive();
 
-    rest::Handle getEvents(
-        const core::FetchRequest& request,
-        GetCallback callback) const;
+    rest::Handle getEvents(const core::FetchRequest& request, GetCallback callback) const;
 
     bool requestFetch(
         const core::FetchRequest& request,
@@ -193,12 +191,13 @@ rest::Handle VmsEventSearchListModel::Private::getEvents(
     const core::FetchRequest& request,
     GetCallback callback) const
 {
-    if (!NX_ASSERT(callback && !q->isFilterDegenerate()))
+    NX_CRITICAL(callback);
+    if (!NX_ASSERT(!q->isFilterDegenerate()))
         return {};
 
     const auto timePointMs = duration_cast<milliseconds>(request.centralPointUs);
     using Period = nx::vms::api::ServerTimePeriod;
-    nx::vms::api::rules::EventLogFilter filter = request.direction == FetchDirection::older
+    nx::vms::api::rules::EventLogFilter filter = (request.direction == FetchDirection::older)
         ? Period{.startTimeMs = Period::kMinTimeValue, .durationMs = timePointMs}
         : Period{.startTimeMs = timePointMs};
 
