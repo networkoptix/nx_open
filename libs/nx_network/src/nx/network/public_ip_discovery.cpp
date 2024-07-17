@@ -3,6 +3,7 @@
 #include "public_ip_discovery.h"
 
 #include <chrono>
+#include <regex>
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QElapsedTimer>
@@ -19,7 +20,8 @@ const QString kDefaultSecondaryUrlsList(NX_FMT(
     "https://tools-eu.vmsproxy.com/myip;https://%1/myip", nx::branding::cloudHost()));
 
 const int kRequestTimeoutMs = 10 * 1000;
-const QLatin1String kIpRegExprValue("[^a-zA-Z0-9\\.](([0-9]){1,3}\\.){3}([0-9]){1,3}[^a-zA-Z0-9\\.]");
+const std::string kIpRegExprValue("[^a-zA-Z0-9\\.](([0-9]){1,3}\\.){3}([0-9]){1,3}[^a-zA-Z0-9\\.]");
+static const std::regex kIpRegExpr(kIpRegExprValue);
 
 } // namespace
 
@@ -136,21 +138,20 @@ void PublicIPDiscovery::handleReply(const nx::network::http::AsyncHttpClientPtr&
         return;
     }
 
-    /* QRegExp class is not thread-safe. */
-    const QRegularExpression ipRegExpr(kIpRegExprValue);
-
     /* Check if reply contents contain any ip address. */
-    auto response = toByteArray(
-        " " + httpClient->fetchMessageBodyBuffer() + " ");
-    const auto match = ipRegExpr.match(QString::fromUtf8(response));
-    if (!match.hasMatch())
+    const std::string response =
+        std::string(" ") + httpClient->fetchMessageBodyBuffer().toStdString() + " ";
+
+    std::smatch match;
+    if (!std::regex_search(response, match, kIpRegExpr) || match.size() < 1)
         return;
 
-    const auto result = match.capturedView().mid(1, match.capturedLength() - 2).toString();
-    if (result.isEmpty())
+    std::string result = match[0].str();
+    result = result.substr(1, result.size() - 2);
+    if (result.empty())
         return;
 
-    QHostAddress newAddress = QHostAddress(result);
+    QHostAddress newAddress(QString::fromStdString(result));
     if (!newAddress.isNull())
     {
         NX_VERBOSE(this, nx::format("Found public IP address %1").arg(newAddress.toString()));
