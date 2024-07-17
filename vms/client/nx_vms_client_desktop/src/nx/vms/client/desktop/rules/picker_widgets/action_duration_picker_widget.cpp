@@ -124,7 +124,7 @@ ActionDurationPickerWidget::ActionDurationPickerWidget(
             auto actionStartLabel = new QnElidedLabel;
             actionStartLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
             actionStartLabel->setElideMode(Qt::ElideRight);
-            actionStartLabel->setText(tr("Duration"));
+            actionStartLabel->setText(tr("For"));
 
             contentLayout->addWidget(actionStartLabel);
 
