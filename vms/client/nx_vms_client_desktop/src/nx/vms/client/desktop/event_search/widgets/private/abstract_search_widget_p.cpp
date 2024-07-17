@@ -24,9 +24,9 @@
 #include <nx/utils/pending_operation.h>
 #include <nx/utils/unicode_chars.h>
 #include <nx/vms/client/core/common/models/concatenation_list_model.h>
-#include <nx/vms/client/core/utils/managed_camera_set.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/core/utils/managed_camera_set.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/common/utils/custom_painted.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
@@ -942,12 +942,15 @@ void AbstractSearchWidget::Private::tryFetchData()
         request.centralPointUs = currentCentralPointUs();
     }
 
+    auto indicator = relevantIndicatorModel(request.direction);
     if (!m_mainModel->canFetchData(request.direction))
+    {
+        indicator->setVisible(false);
+        updatePlaceholderVisibility();
         return;
+    }
 
     m_mainModel->fetchData(request);
-
-    auto indicator = relevantIndicatorModel(request.direction);
     const bool active = m_mainModel->fetchInProgress();
     indicator->setActive(active);
     if (active)
