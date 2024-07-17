@@ -76,7 +76,7 @@ static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kButtonsI
 };
 
 NX_DECLARE_COLORIZED_ICON(kPlayIcon, "20x20/Outline/play.svg", kButtonsIconTheme)
-NX_DECLARE_COLORIZED_ICON(kAddIcon, "20x20/Outline/add.svg", kTitleBarIconTheme);
+NX_DECLARE_COLORIZED_ICON(kAddIcon, "16x16/Outline/plussmall.svg", kButtonsIconTheme);
 NX_DECLARE_COLORIZED_ICON(kArrowDownIcon,
     "16x16/Outline/arrow_down.svg",
     kTitleBarIconSubstitutions) // TODO: check how it works, now it is white arrow
