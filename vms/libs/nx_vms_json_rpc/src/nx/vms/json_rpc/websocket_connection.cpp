@@ -57,39 +57,44 @@ bool isResponse(const QJsonValue& value)
 
 WebSocketConnection::WebSocketConnection(
     std::unique_ptr<nx::network::websocket::WebSocket> socket,
-    OnDone onDone)
+    OnDone onDone,
+    RequestHandler requestHandler)
     :
     m_onDone(std::move(onDone)),
-    m_incomingProcessor{std::make_unique<IncomingProcessor>()},
-    m_outgoingProcessor{
-        std::make_unique<OutgoingProcessor>([this](auto value) { send(std::move(value)); })},
     m_socket(std::move(socket))
 {
     base_type::bindToAioThread(m_socket->getAioThread());
     if (auto socket = m_socket->socket())
         m_address = socket->getForeignAddress();
-}
-
-void WebSocketConnection::setRequestHandler(RequestHandler requestHandler)
-{
-    m_incomingProcessor = std::make_unique<IncomingProcessor>(
-        [this, requestHandler = std::move(requestHandler)](auto request, auto responseHandler)
-        {
-            requestHandler(
-                std::move(request),
-                [this, handler = std::move(responseHandler)](auto response) mutable
-                {
-                    dispatch([response = std::move(response),
-                                    handler = std::move(handler)]() mutable
-                        { handler(std::move(response)); });
-                },
-                this);
-        });
+    if (requestHandler)
+    {
+        m_incomingProcessor = std::make_unique<IncomingProcessor>(
+            [this, requestHandler = std::move(requestHandler)](auto request, auto responseHandler)
+            {
+                requestHandler(
+                    std::move(request),
+                    [this, handler = std::move(responseHandler)](auto response) mutable
+                    {
+                        dispatch(
+                            [response = std::move(response), handler = std::move(handler)]() mutable
+                            {
+                                handler(std::move(response));
+                            });
+                    },
+                    this);
+            });
+    }
+    else
+    {
+        m_incomingProcessor = std::make_unique<IncomingProcessor>();
+    }
+    m_outgoingProcessor =
+        std::make_unique<OutgoingProcessor>([this](auto value) { send(std::move(value)); });
+    m_socket->start();
 }
 
 void WebSocketConnection::start()
 {
-    m_socket->start();
     readNextMessage();
 }
 

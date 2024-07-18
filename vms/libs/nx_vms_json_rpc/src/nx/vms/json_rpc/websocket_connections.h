@@ -13,6 +13,8 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/api/data/json_rpc.h>
 
+namespace nx::network::websocket { class WebSocket; }
+
 namespace nx::vms::json_rpc {
 
 class WebSocketConnection;
@@ -23,6 +25,7 @@ public:
     virtual ~Executor() = default;
     virtual void execute(
         std::weak_ptr<WebSocketConnection> connection,
+        const std::any& connectionInfo,
         nx::utils::MoveOnlyFunc<void(nx::vms::api::JsonRpcResponse)> handler) = 0;
 };
 
@@ -45,9 +48,11 @@ public:
     virtual ~WebSocketConnections() { clear(); }
     void clear();
 
-    void addConnection(std::shared_ptr<WebSocketConnection> connection);
+    WebSocketConnection* addConnection(
+        std::any connectionInfo, std::unique_ptr<nx::network::websocket::WebSocket> socket);
+
     void removeConnection(WebSocketConnection* connection);
-    void updateConnectionGuards(
+    void addConnectionGuards(
         WebSocketConnection* connection, std::vector<nx::utils::Guard> guards);
 
     std::size_t count() const;
@@ -65,7 +70,8 @@ private:
     void executeAsync(
         Connection* connection,
         std::unique_ptr<Executor> executor,
-        nx::utils::MoveOnlyFunc<void(nx::vms::api::JsonRpcResponse)> handler);
+        nx::utils::MoveOnlyFunc<void(nx::vms::api::JsonRpcResponse)> handler,
+        std::any connectionInfo);
 
 private:
     mutable nx::Mutex m_mutex;
