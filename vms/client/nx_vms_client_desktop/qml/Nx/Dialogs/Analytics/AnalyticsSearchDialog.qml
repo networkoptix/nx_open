@@ -45,6 +45,8 @@ Window
 
     title: qsTr("Advanced Object Search")
 
+    ContextHelp.topicId: HelpTopic.ObjectSearch
+
     onVisibleChanged:
     {
         // Always load new tiles when the dialog is reopened.
