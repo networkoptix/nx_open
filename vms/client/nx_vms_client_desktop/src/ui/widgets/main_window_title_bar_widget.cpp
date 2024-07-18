@@ -440,7 +440,7 @@ void QnMainWindowTitleBarWidget::dropEvent(QDropEvent* event)
     event->acceptProposedAction();
 }
 
-ToolButton *QnMainWindowTitleBarWidget::newActionButton(
+ToolButton* QnMainWindowTitleBarWidget::newActionButton(
     menu::IDType actionId,
     const QIcon& icon,
     int helpTopicId)
@@ -565,9 +565,9 @@ void QnMainWindowTitleBarWidget::initMultiSystemTabBar()
         const QColor background = "#212A2F";
         const QColor cross = "#E1E7EA";
         const core::SvgIconColorer::IconSubstitutions colorSubs = {
-            { QnIcon::Normal, {{background, "dark7"}, {cross, "light4"}}},
-            { QnIcon::Active, {{background, "red_d1" }, {cross, "light4"}}},
-            { QnIcon::Pressed, {{background, "red_d1" }, {cross, "light4"}}}};
+            {QnIcon::Normal, {{background, "dark7"}, {cross, "light4"}}},
+            {QnIcon::Active, {{background, "red_d1" }, {cross, "light4"}}},
+            {QnIcon::Pressed, {{background, "red_d1" }, {cross, "light4"}}}};
         QIcon icon = qnSkin->icon("titlebar/window_close.svg", "", nullptr, colorSubs);
         d->systemLayout->addWidget(newActionButton(menu::ExitAction, icon));
     }
@@ -600,6 +600,7 @@ void QnMainWindowTitleBarWidget::initMultiSystemTabBar()
         {
             Q_D(QnMainWindowTitleBarWidget);
             d->resizer->setGeometry(0, height() - kResizerHeight, width(), kResizerHeight);
+            d->resizer->raise();
             emit geometryChanged();
         });
 }
