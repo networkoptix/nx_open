@@ -27,13 +27,11 @@ public:
         void(nx::vms::api::JsonRpcRequest, ResponseHandler, WebSocketConnection*)>;
     using OnDone = nx::utils::MoveOnlyFunc<void(WebSocketConnection*)>;
 
-    WebSocketConnection(
-        std::unique_ptr<nx::network::websocket::WebSocket> socket,
-        OnDone onDone,
-        RequestHandler handler = nullptr);
+    WebSocketConnection(std::unique_ptr<nx::network::websocket::WebSocket> socket, OnDone onDone);
     virtual ~WebSocketConnection() override;
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
 
+    void setRequestHandler(RequestHandler requestHandler);
     void start();
     void send(
         nx::vms::api::JsonRpcRequest request,
