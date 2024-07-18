@@ -37,7 +37,7 @@ Item
         id: impl
         property bool valuesChangedEnabled: true
         property var currentSectionScrollBar: null
-        property var initialValues
+        property var previousValues
     }
 
     QtObject
@@ -89,7 +89,7 @@ Item
             impl.currentSectionScrollBar.sizeChanged.connect(scroll)
         }
 
-        impl.initialValues = initialValues
+        impl.previousValues = initialValues
         if (initialValues)
             setValues(initialValues, /*isInitial*/ true)
 
@@ -108,6 +108,7 @@ Item
             return
 
         impl.valuesChangedEnabled = false
+        impl.previousValues = values
         Settings.setValues(contentItem, values, isInitial)
         valuesChanged()
         impl.valuesChangedEnabled = true
@@ -117,8 +118,8 @@ Item
     {
         impl.valuesChangedEnabled = false
 
-        if (impl.initialValues)
-            Settings.setValue(item, impl.initialValues[item.name])
+        if (impl.previousValues)
+            Settings.setValue(item, impl.previousValues[item.name])
         else
             Settings.resetValue(item);
 
