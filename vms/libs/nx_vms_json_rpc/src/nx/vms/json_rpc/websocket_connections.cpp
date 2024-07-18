@@ -14,7 +14,8 @@ namespace nx::vms::json_rpc {
 void WebSocketConnections::executeAsync(
     Connection* connection,
     std::unique_ptr<Executor> executor,
-    nx::utils::MoveOnlyFunc<void(nx::vms::api::JsonRpcResponse)> handler)
+    nx::utils::MoveOnlyFunc<void(nx::vms::api::JsonRpcResponse)> handler,
+    std::any connectionInfo)
 {
     auto threadIt = connection->threads.insert(connection->threads.begin(), std::thread());
     *threadIt = std::thread(
@@ -22,13 +23,13 @@ void WebSocketConnections::executeAsync(
             executor = std::move(executor),
             handler = std::move(handler),
             weakConnection = std::weak_ptr(connection->connection),
+            connectionInfo = std::move(connectionInfo),
             threadIt]() mutable
         {
             std::promise<api::JsonRpcResponse> promise;
-            auto future = promise.get_future();
-            executor->execute(weakConnection,
-                [p = std::move(promise)](auto r) mutable { p.set_value(std::move(r)); });
-            auto response = future.get();
+            executor->execute(weakConnection, connectionInfo,
+                [&](auto r) { promise.set_value(std::move(r)); });
+            auto response = promise.get_future().get();
             executor.reset();
             if (auto connection = weakConnection.lock())
             {
@@ -47,12 +48,13 @@ void WebSocketConnections::executeAsync(
         });
 }
 
-void WebSocketConnections::addConnection(std::shared_ptr<WebSocketConnection> connection)
+WebSocketConnection* WebSocketConnections::addConnection(
+    std::any connectionInfo, std::unique_ptr<nx::network::websocket::WebSocket> socket)
 {
-    auto connectionPtr = connection.get();
-    NX_VERBOSE(this, "Add connection %1", connectionPtr);
-    connection->setRequestHandler(
-        [this](auto request, auto handler, auto connection)
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    auto connection = std::make_unique<WebSocketConnection>(std::move(socket),
+        [this](auto connection) { removeConnection(connection); },
+        [this, connectionInfo = std::move(connectionInfo)](auto request, auto handler, auto connection)
         {
             NX_MUTEX_LOCKER lock(&m_mutex);
             auto it = m_connections.find(connection);
@@ -64,7 +66,6 @@ void WebSocketConnections::addConnection(std::shared_ptr<WebSocketConnection> co
                     connection,
                     request.id ? nx::reflect::json::serialize(*request.id) + ' ' : std::string(),
                     request.method);
-                handler(api::JsonRpcResponse());
                 return;
             }
 
@@ -75,7 +76,8 @@ void WebSocketConnections::addConnection(std::shared_ptr<WebSocketConnection> co
                     executeAsync(
                         &it->second,
                         executorCreator->create(std::move(request)),
-                        std::move(handler));
+                        std::move(handler),
+                        std::move(connectionInfo));
                     return;
                 }
             }
@@ -83,11 +85,12 @@ void WebSocketConnections::addConnection(std::shared_ptr<WebSocketConnection> co
             handler(api::JsonRpcResponse::makeError(request.responseId(),
                 {api::JsonRpcError::methodNotFound, "Unsupported method"}));
         });
-    {
-        NX_MUTEX_LOCKER lock(&m_mutex);
-        m_connections.emplace(connectionPtr, Connection{std::move(connection)});
-    }
+    auto connectionPtr = connection.get();
+    m_connections.emplace(connectionPtr, Connection{std::move(connection)});
+    lock.unlock();
+    NX_VERBOSE(this, "Add connection %1", connectionPtr);
     connectionPtr->start();
+    return connectionPtr;
 }
 
 void WebSocketConnections::removeConnection(WebSocketConnection* connection)
@@ -105,15 +108,13 @@ void WebSocketConnections::removeConnection(WebSocketConnection* connection)
     holder.stop();
 }
 
-void WebSocketConnections::updateConnectionGuards(
-    WebSocketConnection* connection, std::vector<nx::utils::Guard> guards)
+void WebSocketConnections::addConnectionGuards(WebSocketConnection* connection, std::vector<nx::utils::Guard> guards)
 {
-    std::vector<nx::utils::Guard> oldGuards;
     NX_MUTEX_LOCKER lock(&m_mutex);
     if (auto it = m_connections.find(connection); it != m_connections.end())
     {
-        std::swap(it->second.guards, oldGuards);
-        it->second.guards = std::move(guards);
+        for (auto& g: guards)
+            it->second.guards.insert(it->second.guards.end(), std::move(g));
     }
 }
 

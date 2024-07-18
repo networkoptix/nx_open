@@ -67,7 +67,6 @@ constexpr AuthMethods httpAuthMethods =
 constexpr AuthMethods defaultAuthMethods = httpAuthMethods
     | AuthMethod::cookie
     | AuthMethod::urlQueryDigest
-    | AuthMethod::temporaryUrlQueryKey
     | AuthMethod::xRuntimeGuid
     | AuthMethod::urlQuerySessionToken
     | AuthMethod::urlQueryTicket;

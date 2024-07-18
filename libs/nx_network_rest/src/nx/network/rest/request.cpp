@@ -358,9 +358,4 @@ Request::SystemAccessGuard Request::forceSystemAccess() const
     return SystemAccessGuard(&const_cast<Request*>(this)->userSession.access);
 }
 
-void Request::forceSessionAccess(UserAccessData access) const
-{
-    const_cast<Request*>(this)->userSession.access = std::move(access);
-}
-
 } // namespace nx::network::rest
