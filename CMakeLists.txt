@@ -59,7 +59,7 @@ endif()
 
 include(cmake/versions/release_version.cmake)
 
-set(conanNxRemote http://artifactory.nxvms.dev/artifactory/api/conan/conan
+set(conanNxRemote https://artifactory.nxvms.dev/artifactory/api/conan/conan
     CACHE INTERNAL "The URL of Conan remote containing packages needed for the build."
 )
 include(cmake/conan_dependencies.cmake)
