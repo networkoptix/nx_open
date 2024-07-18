@@ -129,6 +129,8 @@ struct NX_NETWORK_REST_API Request
     };
     [[nodiscard]] SystemAccessGuard forceSystemAccess() const;
 
+    void forceSessionAccess(UserAccessData access) const;
+
 private:
     nx::network::http::Method calculateMethod() const;
     Params calculateParams() const;

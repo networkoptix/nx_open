@@ -91,9 +91,6 @@ void WebSocketClient::onUpgrade()
 
     socket->setNonBlockingMode(true);
     socket->bindToAioThread(getAioThread());
-    WebSocketConnection::RequestHandler handler;
-    if (m_handler)
-        handler = [this](auto&&... args) { m_handler(std::forward<decltype(args)>(args)...); };
     m_connection = std::make_unique<WebSocketConnection>(
         std::make_unique<nx::network::websocket::WebSocket>(std::move(socket),
             nx::network::websocket::Role::client,
@@ -108,8 +105,12 @@ void WebSocketClient::onUpgrade()
                 auto connectionPtr = m_connection.get();
                 connectionPtr->pleaseStop([connection = std::move(m_connection)]() {});
             }
-        },
-        std::move(handler));
+        });
+    if (m_handler)
+    {
+        m_connection->setRequestHandler(
+            [this](auto&&... args) { m_handler(std::forward<decltype(args)>(args)...); });
+    }
     m_connection->start();
 }
 
