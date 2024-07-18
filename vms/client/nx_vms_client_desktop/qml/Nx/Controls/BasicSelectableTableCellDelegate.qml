@@ -16,13 +16,14 @@ Rectangle
 
     required property bool selected
     readonly property string decorationPath: model.decoration ?? ""
+    property bool hovered: TableView.view ? TableView.view.hoveredRow === row : false
 
     signal clicked()
     signal doubleClicked()
 
     implicitWidth: Math.max(contentRowLayout.implicitWidth, 28)
     implicitHeight: Math.max(contentRowLayout.implicitHeight, 28)
-    color: control.selected ? ColorTheme.colors.dark9 : ColorTheme.colors.dark7
+    color: selected ? ColorTheme.colors.dark9 : (hovered ? ColorTheme.colors.dark8 : ColorTheme.colors.dark7)
 
     RowLayout
     {

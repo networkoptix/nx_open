@@ -63,9 +63,11 @@ CheckableTableView
         {
             Rectangle
             {
-                implicitHeight: 28
-                color: ColorTheme.colors.dark7
                 required property bool selected
+                property bool hovered: TableView.view ? TableView.view.hoveredRow === row : false
+
+                implicitHeight: 28
+                color: selected ? ColorTheme.colors.dark9 : (hovered ? ColorTheme.colors.dark8 : ColorTheme.colors.dark7)
 
                 LookupListTableCellDelegate
                 {

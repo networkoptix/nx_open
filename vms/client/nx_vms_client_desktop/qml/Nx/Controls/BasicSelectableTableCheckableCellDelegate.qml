@@ -10,10 +10,11 @@ Rectangle
     id: control
 
     required property bool selected
+    property bool hovered: TableView.view ? TableView.view.hoveredRow === row : false
 
     implicitWidth: 28
     implicitHeight: 28
-    color: selected ? ColorTheme.colors.dark9 : ColorTheme.colors.dark7
+    color: selected ? ColorTheme.colors.dark9 : (hovered ? ColorTheme.colors.dark8 : ColorTheme.colors.dark7)
 
     CheckBox
     {

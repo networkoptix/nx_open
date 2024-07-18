@@ -16,6 +16,7 @@ Text
     property int row: model.row
     property int column: model.column
     property bool isElided: width < implicitWidth
+    property bool hovered: TableView.view ? TableView.view.hoveredRow === row : false
 
     elide: Text.ElideRight
 
