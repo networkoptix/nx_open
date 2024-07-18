@@ -146,6 +146,7 @@ public:
         MediaFolders,
         NewUser,
         NotificationsPanel,
+        ObjectSearch,
         OtherSystems,
         PluginsAndAnalytics,
         PtzManagement_Tour,
