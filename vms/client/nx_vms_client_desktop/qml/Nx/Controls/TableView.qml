@@ -28,8 +28,19 @@ TableView
     property alias deleteShortcut: deleteShortcut
     property alias enterShortcut: enterShortcut
 
+    property int hoveredRow: hoverHandler.hovered
+        ? control.rowAtPosition(hoverHandler.point.position.x, hoverHandler.point.position.y, /*includeSpacing*/ true)
+        : -1
+
     // Whether column width must be equal to the appropriate header delegate width.
     property var useDelegateWidthAsColumnWidth: (column => false)
+
+    function rowAtPosition(x, y, includeSpacing)
+    {
+        const cellUnderMouse = cellAtPosition(x, y, includeSpacing)
+        const indexUnderCursor = modelIndex(cellUnderMouse)
+        return rowAtIndex(indexUnderCursor)
+    }
 
     function getButtonItem(columnIndex)
     {
@@ -182,6 +193,11 @@ TableView
 
             color: ColorTheme.colors.dark12
         }
+    }
+
+    HoverHandler
+    {
+        id: hoverHandler
     }
 
     Shortcut
