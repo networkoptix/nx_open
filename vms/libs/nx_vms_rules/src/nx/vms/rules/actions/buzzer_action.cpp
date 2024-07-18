@@ -30,7 +30,7 @@ const ItemDescriptor& BuzzerAction::manifest()
                 }.toVariantMap()),
             utils::makeTimeFieldDescriptor<OptionalTimeField>(
                 utils::kDurationFieldName,
-                Strings::fixedDuration(),
+                Strings::for_(),
                 {},
                 TimeFieldProperties{
                     .value = 1s,

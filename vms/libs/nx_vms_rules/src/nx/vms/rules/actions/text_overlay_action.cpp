@@ -32,7 +32,7 @@ const ItemDescriptor& TextOverlayAction::manifest()
                 ResourceFilterFieldProperties{}.toVariantMap()),
             utils::makeTimeFieldDescriptor<OptionalTimeField>(
                 utils::kDurationFieldName,
-                Strings::fixedDuration(),
+                Strings::for_(),
                 /*description*/ {},
                 TimeFieldProperties{
                     .value = 5s,

@@ -92,13 +92,13 @@ public:
 
     static TranslatableString at();
     static TranslatableString to();
+    static TranslatableString for_();
     static TranslatableString occursAt();
     static TranslatableString beginWhen();
     static TranslatableString duration();
     static TranslatableString preRecording();
     static TranslatableString postRecording();
     static TranslatableString intervalOfAction();
-    static TranslatableString fixedDuration();
     static TranslatableString state();
     static TranslatableString volume();
     static TranslatableString rewind();

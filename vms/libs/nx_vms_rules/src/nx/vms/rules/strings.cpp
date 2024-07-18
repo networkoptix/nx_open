@@ -383,6 +383,11 @@ TranslatableString Strings::to()
     return NX_DYNAMIC_TRANSLATABLE(tr("To"));
 }
 
+TranslatableString Strings::for_()
+{
+    return NX_DYNAMIC_TRANSLATABLE(tr("For"));
+}
+
 TranslatableString Strings::occursAt()
 {
     return NX_DYNAMIC_TRANSLATABLE(tr("Occurs At"));
@@ -411,11 +416,6 @@ TranslatableString Strings::postRecording()
 TranslatableString Strings::intervalOfAction()
 {
     return NX_DYNAMIC_TRANSLATABLE(tr("Interval of Action"));
-}
-
-TranslatableString Strings::fixedDuration()
-{
-    return NX_DYNAMIC_TRANSLATABLE(tr("Fixed duration"));
 }
 
 TranslatableString Strings::state()
