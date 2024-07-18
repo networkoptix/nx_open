@@ -80,6 +80,8 @@ DialogWithState
 
     title: qsTr("New User")
 
+    ContextHelp.topicId: HelpTopic.UserSettings_Permissions
+
     validateFunc: () =>
     {
         if (generalSettings.validate())

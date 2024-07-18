@@ -284,6 +284,8 @@ QString HelpTopic::relativeUrlForTopic(Id topic)
             return "adding-users.html";
         case Id::NotificationsPanel:
             return "notifications_panel.html";
+        case Id::ObjectSearch:
+            return "objects_tab.html";
         case Id::OtherSystems:
             return "configuring_multi-server_envir.html";
         case Id::PluginsAndAnalytics:

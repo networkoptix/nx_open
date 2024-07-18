@@ -56,6 +56,8 @@
 #include <nx/vms/client/desktop/event_search/models/analytics_search_list_model.h>
 #include <nx/vms/client/desktop/event_search/utils/common_object_search_setup.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_ribbon.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -176,6 +178,8 @@ AnalyticsSearchWidget::AnalyticsSearchWidget(WindowContext* context, QWidget* pa
 
     updateAllowance();
     d->updateTaxonomyIfNeeded();
+
+    HelpTopicAccessor::setHelpTopic(this, HelpTopic::Id::ObjectSearch);
 }
 
 AnalyticsSearchWidget::~AnalyticsSearchWidget()
