@@ -28,7 +28,6 @@ const ItemDescriptor& PushNotificationAction::manifest()
                 Strings::to(),
                 {},
                 ResourceFilterFieldProperties{
-                    .visible = false,
                     .acceptAll = false,
                     .ids = nx::utils::toQSet(vms::api::kAllPowerUserGroupIds),
                     .validationPolicy = kCloudUserValidationPolicy
