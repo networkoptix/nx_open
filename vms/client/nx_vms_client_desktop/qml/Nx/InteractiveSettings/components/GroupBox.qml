@@ -22,6 +22,7 @@ Group
     property var defaultValue
     property var value: defaultValue
     property bool isActive: false
+    property var parametersModel
 
     property string switchButtonBehavior: "disable"
 
