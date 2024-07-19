@@ -5,6 +5,8 @@
 #include <QtCore/QIODevice>
 #include <QtCore/QSharedPointer>
 
+#include <nx/fusion/model_functions_fwd.h>
+
 namespace nx::email {
 
 struct NX_VMS_COMMON_API Attachment
@@ -14,13 +16,17 @@ struct NX_VMS_COMMON_API Attachment
     Attachment(QString filename, const QString& contentFilename, QString mimetype);
     Attachment(QString filename, QIODevice& io, QString mimetype);
 
+    bool operator==(const Attachment& other) const = default;
+
     QString filename;
     QByteArray content;
     QString mimetype;
 };
 
-using AttachmentPtr = QSharedPointer<Attachment>;
-using AttachmentList = QList<AttachmentPtr>;
+#define Attachments_Fields (filename)(content)(mimetype)
+QN_FUSION_DECLARE_FUNCTIONS(Attachment, (json), NX_VMS_COMMON_API)
+
+using AttachmentList = QList<Attachment>;
 
 struct NX_VMS_COMMON_API Message
 {
@@ -29,6 +35,11 @@ struct NX_VMS_COMMON_API Message
     QString plainBody;
 
     AttachmentList attachments;
+
+    bool operator==(const Message& other) const = default;
 };
+
+#define Message_Fields (subject)(body)(plainBody)(attachments)
+QN_FUSION_DECLARE_FUNCTIONS(Message, (json), NX_VMS_COMMON_API)
 
 } // namespace nx::email

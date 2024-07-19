@@ -4,9 +4,13 @@
 
 #include <QtCore/QFile>
 
+#include <nx/fusion/model_functions.h>
 #include <nx/utils/log/assert.h>
 
 namespace nx::email {
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Attachment, (json), Attachments_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Message, (json), Message_Fields)
 
 Attachment::Attachment(QString filename, QString mimetype):
     filename(std::move(filename)),
