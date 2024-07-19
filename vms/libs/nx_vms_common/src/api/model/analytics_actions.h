@@ -15,12 +15,12 @@ struct NX_VMS_COMMON_API AvailableAnalyticsActionsOfEngine
     QStringList actionIds;
 };
 #define AvailableAnalyticsActionsOfEngine_Fields (engineId)(actionIds)
+QN_FUSION_DECLARE_FUNCTIONS(AvailableAnalyticsActionsOfEngine, (json), NX_VMS_COMMON_API)
 
-struct NX_VMS_COMMON_API AvailableAnalyticsActions
+// TODO: Consider using the one from NX_VMS_API. However, the new one has `actionIds` instead...
+struct NX_VMS_COMMON_API LegacyAvailableAnalyticsActions
 {
     QList<AvailableAnalyticsActionsOfEngine> actions;
 };
-#define AvailableAnalyticsActions_Fields (actions)
-
-QN_FUSION_DECLARE_FUNCTIONS(AvailableAnalyticsActionsOfEngine, (json), NX_VMS_COMMON_API)
-QN_FUSION_DECLARE_FUNCTIONS(AvailableAnalyticsActions, (json), NX_VMS_COMMON_API)
+#define LegacyAvailableAnalyticsActions_Fields (actions)
+QN_FUSION_DECLARE_FUNCTIONS(LegacyAvailableAnalyticsActions, (json), NX_VMS_COMMON_API)
