@@ -5820,7 +5820,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <name>QnWorkbenchNotificationsHandler</name>
     <message>
       <source>Unable to acknowledge event on removed camera.</source>
-      <translation>Impossible de reconnaître l'événement sur la caméra retirée.</translation>
+      <translation>Impossible d'acquitter l'événement sur la caméra retirée.</translation>
     </message>
   </context>
   <context>
@@ -10237,7 +10237,7 @@ Vous pouvez le forcer, mais il peut augmenter significativement la charge du pro
     </message>
     <message>
       <source>Acknowledge</source>
-      <translation>Reconnaître</translation>
+      <translation>Acquitter</translation>
     </message>
   </context>
   <context>
