@@ -31,8 +31,8 @@ derived from `class nx::sdk::IPlugin` (`src/nx/sdk/i_plugin.h`). This base inter
 the name and the prototype of the entry point function.
 
 ATTENTION: If you consider linking your Plugin to any dynamic libraries, including the ones from
-the OS, consult [src/nx/sdk/dynamic_libraries.md](@ref md_src_nx_sdk_dynamic_libraries) to avoid
-potential issues.
+the OS, and the C++ standard library, consult
+[src/nx/sdk/dynamic_libraries.md](@ref md_src_nx_sdk_dynamic_libraries) to avoid potential crashes.
 
 To make it possible to develop plugins using a different C++ compiler (e.g. with an incompatible
 ABI) rather than the one used to compile the VMS itself, or potentially in languages other than
@@ -107,6 +107,9 @@ Prerequisites:
 ```
 - CMake >= 3.3.2
 - Windows (7 or 10): Microsoft Visual Studio >= 2017
+    - ATTENTION: When linking to the C++ runtime dynamically (Visual Studio does it by default),
+        avoid using the latest build tools (toolset) to avoid crashes - see the details in
+        [src/nx/sdk/dynamic_libraries.md](@ref md_src_nx_sdk_dynamic_libraries).
 - Linux (Ubuntu 18.04, 20.04, 22.04) including ARM (e.g. Raspberry Pi or Nvidia Tegra) native or
     cross-compiling:
     - g++ >= 7.5
