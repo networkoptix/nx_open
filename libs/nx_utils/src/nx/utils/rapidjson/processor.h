@@ -63,7 +63,7 @@ struct TypeHelper
 {
     using OutputType = T;
 
-    std::optional<OutputType> get(::rapidjson::Value* jsonNode) const
+    static std::optional<OutputType> get(::rapidjson::Value* jsonNode)
     {
         if (!jsonNode)
             return std::nullopt;
@@ -82,7 +82,7 @@ struct TypeHelper<int>
 {
     using OutputType = int;
 
-    std::optional<OutputType> get(::rapidjson::Value* jsonNode) const
+    static std::optional<OutputType> get(::rapidjson::Value* jsonNode)
     {
         if (jsonNode && jsonNode->IsInt())
             return jsonNode->GetInt();
@@ -95,7 +95,7 @@ struct TypeHelper<bool>
 {
     using OutputType = bool;
 
-    std::optional<OutputType> get(::rapidjson::Value* jsonNode) const
+    static std::optional<OutputType> get(::rapidjson::Value* jsonNode)
     {
         if (jsonNode && jsonNode->IsBool())
             return jsonNode->GetBool();
@@ -108,7 +108,7 @@ struct TypeHelper<double>
 {
     using OutputType = double;
 
-    std::optional<OutputType> get(::rapidjson::Value* jsonNode) const
+    static std::optional<OutputType> get(::rapidjson::Value* jsonNode)
     {
         if (jsonNode && jsonNode->IsDouble())
             return jsonNode->GetDouble();
@@ -121,12 +121,12 @@ struct TypeHelper<std::string>
 {
     using OutputType = std::string;
 
-    std::optional<OutputType> get(::rapidjson::Value* jsonNode) const
+    static std::optional<OutputType> get(::rapidjson::Value* jsonNode)
     {
         if (!jsonNode)
             return std::nullopt;
         if (jsonNode->IsString())
-            return jsonNode->GetString();
+            return OutputType(jsonNode->GetString(), jsonNode->GetStringLength());
         if (jsonNode->IsInt())
             return std::to_string(jsonNode->GetInt());
         return std::nullopt;
@@ -138,7 +138,7 @@ struct TypeHelper<QString>
 {
     using OutputType = QString;
 
-    std::optional<OutputType> get(::rapidjson::Value* jsonNode) const
+    static std::optional<OutputType> get(::rapidjson::Value* jsonNode)
     {
         auto value = TypeHelper<std::string>().get(jsonNode);
         if (value.has_value())
@@ -152,7 +152,7 @@ struct TypeHelper<::rapidjson::Value*>
 {
     using OutputType = ::rapidjson::Value*;
 
-    std::optional<OutputType> get(::rapidjson::Value* jsonNode) const
+    static std::optional<OutputType> get(::rapidjson::Value* jsonNode)
     {
         if (!jsonNode)
             return std::nullopt;
@@ -667,7 +667,7 @@ namespace predicate {
 class NX_UTILS_API All
 {
 public:
-    bool operator()(auto&) const
+    bool operator()(const auto&) const
     {
         return true;
     }
@@ -701,25 +701,39 @@ private:
 class NX_UTILS_API Compare
 {
 public:
-    explicit Compare(const std::string& name, const QString& val);
+    explicit Compare(const std::string& key, const QString& val);
 
     bool operator()(const ArrayIterator& root) const;
 
 private:
-    std::string m_name;
-    QString m_value;
+    const ::rapidjson::Pointer m_pointer;
+    const QString m_value;
 };
 
 class NX_UTILS_API ContainedIn
 {
 public:
-    explicit ContainedIn(const std::string& name, const QStringList& values);
+    explicit ContainedIn(const std::string& key, const QStringList& values);
 
     bool operator()(const ArrayIterator& root) const;
 
 private:
-    std::string m_name;
-    QStringList m_values;
+    const ::rapidjson::Pointer m_pointer;
+    const QStringList m_values;
+};
+
+class NX_UTILS_API IsEmpty
+{
+public:
+    bool operator()(const ArrayIterator& root) const
+    {
+        return root->Empty();
+    }
+
+    bool operator()(const ObjectIterator& root) const
+    {
+        return root->value.ObjectEmpty();
+    }
 };
 
 } // namespace predicate
@@ -768,14 +782,9 @@ public:
         if (!action.result)
             return std::nullopt;
         if constexpr (std::is_same_v<T, Processor>)
-        {
             return Processor(*this, action.result);
-        }
         else
-        {
-            details::TypeHelper<T> helper;
-            return helper.get(action.result);
-        }
+            return details::TypeHelper<T>::get(action.result);
     }
 
     template<class T, PredicateType... Predicates>
@@ -798,7 +807,7 @@ public:
             }
             else
             {
-                auto convVal = details::TypeHelper<T>().get(val);
+                auto convVal = details::TypeHelper<T>::get(val);
                 if (convVal.has_value())
                     outputVector.push_back(convVal.value());
             }
