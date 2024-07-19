@@ -3,6 +3,7 @@
 #include "device_agent.h"
 
 #include <algorithm>
+#include <unordered_set>
 
 #include <nx/kit/utils.h>
 #include <nx/sdk/helpers/active_setting_changed_response.h>
@@ -131,6 +132,39 @@ void DeviceAgent::dumpActiveSettingChangedAction(
     NX_PRINT << "}";
 }
 
+Json::array deduplicateArrayByPropertyName(const Json::array& array, const std::string& propertyName)
+{
+    std::unordered_set<std::string> uniquePropertyValues;
+    Json::array deduplicatedArray;
+
+    for (const Json& item: array)
+    {
+        if (!item.is_object())
+        {
+            deduplicatedArray.push_back(item);
+            continue;
+        }
+
+        const auto propertyValue = item[propertyName];
+
+        if (!propertyValue.is_string())
+        {
+            deduplicatedArray.push_back(item);
+            continue;
+        }
+
+        const std::string propertyValueString = propertyValue.string_value();
+
+        if (uniquePropertyValues.find(propertyValueString) == uniquePropertyValues.end())
+        {
+            deduplicatedArray.push_back(item);
+            uniquePropertyValues.insert(propertyValueString);
+        }
+    }
+
+    return deduplicatedArray;
+}
+
 void DeviceAgent::doGetSettingsOnActiveSettingChange(
     Result<const IActiveSettingChangedResponse*>* outResult,
     const IActiveSettingChangedAction* activeSettingChangedAction)
@@ -165,6 +199,9 @@ void DeviceAgent::doGetSettingsOnActiveSettingChange(
     m_activeSettingsBuilder.updateSettings(settingId, &activeSettingsItems, &values);
 
     Json::array updatedActiveSettingsItems = activeSettingsItems.array_items();
+
+    updatedActiveSettingsItems = deduplicateArrayByPropertyName(updatedActiveSettingsItems, kName);
+
     Json::object updatedActiveSection = activeSettingsSectionIt->object_items();
     updatedActiveSection[kItems] = updatedActiveSettingsItems;
     *activeSettingsSectionIt = updatedActiveSection;
