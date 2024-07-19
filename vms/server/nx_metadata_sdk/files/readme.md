@@ -139,7 +139,7 @@ On Windows, after CMake generation phase, Visual Studio GUI can be used to compi
 open `..\metadata_sdk-build\<sample_name>\<sample_name>.sln` and build the `ALL_BUILD` project.
 Make sure that the platform combo-box is set to "x64".
 
-After successful build, locate the built artifacts:
+After the successful build, locate the built artifacts:
 ```
 # Windows:
 ..\metadata_sdk-build\<sample_name>\Debug\<sample_name>.dll
