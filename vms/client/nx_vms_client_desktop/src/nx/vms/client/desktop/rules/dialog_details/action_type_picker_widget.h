@@ -25,6 +25,7 @@ public:
 
     QString actionType() const;
     void setActionType(const QString& actionType);
+    void setProlongedActionsEnabled(bool enabled);
 
 signals:
     void actionTypePicked(const QString& actionType);
