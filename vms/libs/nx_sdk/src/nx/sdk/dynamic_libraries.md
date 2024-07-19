@@ -77,6 +77,23 @@ link to `libc++` statically to make sure that the plugin will function properly 
 will start using `libc++` at some point in the future.
 
 ---------------------------------------------------------------------------------------------------
+## Depending on Visual C++ runtime on Windows
+
+When using Visual Studio to compile a plugin on Windows, and choosing to use dynamic linking with
+the Visual C++ Runtime Redistributable (msvcp140.dll), the resulting plugin may be not compatible
+with the VMS built using the toolsets (compilers) that use an older runtime version. The newer
+runtime version will do fine.
+
+For example, as of 2024-07-19, the std::mutex ABI has undergone a breaking change in the toolset
+version 14.40 as opposed to 14.38, which did not happen for years before that. And now if a plugin
+uses std::mutex, is compiled with 14.40, and is used in VMS compiled with 14.38, it will crash.
+More details on this issue can be found here:
+[Visual Studio forum](https://developercommunity.visualstudio.com/t/Access-violation-with-std::mutex::lock-a/10664660)
+
+Currently, the recommendation is either to use the toolset version not newer than 14.38, or to link
+the plugin with the C++ runtime statically.
+
+---------------------------------------------------------------------------------------------------
 ## Bundling public libraries with the Plugin
 
 NOTE: Here we discuss bundling the Plugin with publicly available dynamic libraries; bundling the

@@ -59,6 +59,14 @@ procedure of Python 3.8 could look like the following:
 - NOTE: Microsoft Visual Studio 2019 can also be used to build the repository branches `vms_5.0`,
     `vms_5.0_patch` and `vms_5.1`, but its support may be dropped in further branches like
     `vms_5.1_patch`, `vms_6.0` and `master`.
+- ATTENTION: For now, avoid using the Visual Studio "toolsets" (compiler versions) later than
+    `14.38` - they not only demonstrate internal compiler errors, but also introduce some C++
+    runtime ABI changes which e.g. make plugins compiled with them incompatible with the software
+    compiled using previous toolsets (as our VMS releases up to 6.0 are).
+    - In Visual Studio Installer, select the "Individual components" tab, type `14.38 x64` into a
+        "Search components" field, and select both:
+        - `MSVC v143 - VS 2022 C++ x64/x86 build tools (v14.38-17.8)`
+        - `C++ v14.38 (17.8) ATL for v143 build tools (x86 & x64)`
 
 Install **CMake**, **Ninja** and **Conan** via **`pip`**. Note that `pip` must be run with
 **Administrator privileges**: find the Command Prompt in the Start menu, right-click it and choose
