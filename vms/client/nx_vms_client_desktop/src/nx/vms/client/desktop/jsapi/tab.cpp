@@ -17,12 +17,9 @@
 
 namespace nx::vms::client::desktop::jsapi {
 
-Tab::Tab(
-    WindowContext* context,
-    QObject* parent)
-    :
+Tab::Tab(WindowContext* context, QnWorkbenchLayout* layout, QObject* parent):
     base_type(parent),
-    d(new detail::TabApiBackend(context))
+    d(new detail::TabApiBackend(context, layout))
 {
     registerTypes();
 
@@ -82,13 +79,12 @@ Error Tab::saveLayout()
 
 QString Tab::id() const
 {
-    nx::Uuid resourceId = d->layout()->resourceId();
-    return resourceId.isNull() ? QString() : resourceId.toSimpleString();
+    return NX_ASSERT(d->layout()) ? d->layout()->resourceId().toSimpleString() : QString{};
 }
 
 QString Tab::name() const
 {
-    return d->layout()->name();
+    return NX_ASSERT(d->layout()) ? d->layout()->name() : QString{};
 }
 
 QnWorkbenchLayout* Tab::layout() const
