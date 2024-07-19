@@ -7,4 +7,4 @@
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     AvailableAnalyticsActionsOfEngine, (json), AvailableAnalyticsActionsOfEngine_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    AvailableAnalyticsActions, (json), AvailableAnalyticsActions_Fields)
+    LegacyAvailableAnalyticsActions, (json), LegacyAvailableAnalyticsActions_Fields)

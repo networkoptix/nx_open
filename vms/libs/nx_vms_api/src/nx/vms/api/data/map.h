@@ -16,6 +16,7 @@ template<typename Key, typename Value>
 class Map: public std::map<Key, Value>
 {
 public:
+    using std::map<Key, Value>::map;
     const Value& front() const { return this->begin()->second; }
     Key getId() const { return (this->size() == 1) ? this->begin()->first : Key(); }
 };

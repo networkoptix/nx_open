@@ -3,13 +3,50 @@
 #pragma once
 
 #include <chrono>
+#include <vector>
 
 #include <QtCore/QString>
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/api/data/map.h>
+#include <nx/vms/api/json/value_or_array.h>
 
 namespace nx::vms::api {
+
+struct NX_VMS_API RequestAvailableAnalyticsActions
+{
+    /**%apidoc[opt]
+     * Server on which the Analytics Actions are applicable to the specified metadata Object type.
+     * If not set, non-local engines will be included in the search results.
+     */
+    nx::Uuid serverId;
+
+    /**%apidoc[opt]:stringArray
+     * Engine id(s) to get Analytic Actions for.
+     */
+    nx::vms::api::json::ValueOrArray<QString> engineId;
+
+    /**%apidoc
+     * Id of an Object type to which an Action should be applicable.
+     */
+    QString objectTypeId;
+};
+#define RequestAvailableAnalyticsActions_Fields (serverId)(engineId)(objectTypeId)
+QN_FUSION_DECLARE_FUNCTIONS(RequestAvailableAnalyticsActions, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(
+    RequestAvailableAnalyticsActions, RequestAvailableAnalyticsActions_Fields);
+
+struct NX_VMS_API AvailableAnalyticsActions
+{
+    /**%apidoc[readonly] */
+    std::vector<QString> actionIds;
+};
+#define AvailableAnalyticsActions_Fields (actionIds)
+QN_FUSION_DECLARE_FUNCTIONS(AvailableAnalyticsActions, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(AvailableAnalyticsActions, AvailableAnalyticsActions_Fields);
+
+using EngineActionsMap = Map<nx::Uuid /*engineId*/, AvailableAnalyticsActions>;
 
 struct NX_VMS_API AnalyticsAction
 {

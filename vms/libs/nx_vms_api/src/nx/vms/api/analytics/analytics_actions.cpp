@@ -7,6 +7,10 @@
 
 namespace nx::vms::api {
 
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
+    RequestAvailableAnalyticsActions, (json), RequestAvailableAnalyticsActions_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
+    AvailableAnalyticsActions, (json), AvailableAnalyticsActions_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(AnalyticsAction, (json), AnalyticsAction_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(AnalyticsActionResult, (json), AnalyticsActionResult_Fields)
 
