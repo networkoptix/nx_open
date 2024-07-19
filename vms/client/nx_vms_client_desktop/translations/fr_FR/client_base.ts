@@ -6143,7 +6143,7 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
     <name>QnWorkbenchNotificationsHandler</name>
     <message>
       <source>Unable to acknowledge event on removed camera.</source>
-      <translation>Impossible de reconnaître l'événement sur la caméra retirée.</translation>
+      <translation>Impossible d'acquitter l'événement sur la caméra retirée.</translation>
     </message>
   </context>
   <context>
@@ -9656,7 +9656,7 @@ Vous pouvez le forcer, mais il peut augmenter significativement la charge du pro
     </message>
     <message>
       <source>Acknowledge</source>
-      <translation>Reconnaître</translation>
+      <translation>Acquitter</translation>
     </message>
     <message>
       <source>Calling...</source>

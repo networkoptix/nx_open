@@ -2099,7 +2099,7 @@
     </message>
     <message>
       <source>Acknowledge</source>
-      <translation>Reconnaître</translation>
+      <translation>Acquitter</translation>
     </message>
     <message>
       <source>Analytics Event</source>
