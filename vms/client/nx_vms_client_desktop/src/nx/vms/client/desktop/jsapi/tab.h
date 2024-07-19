@@ -30,7 +30,8 @@ class Tab: public QObject
 
     /**
      * @addtogroup vms-tab
-     * Contains methods and signals to work with the tab containing the current web page.
+     * Contains methods and signals to work with the tab containing the current web page. If the
+     * web page is opened in a dedicated window, @ref vms-tabs should be used.
      * @{
      */
 
@@ -46,7 +47,7 @@ class Tab: public QObject
 
 public:
     /** @private */
-    Tab(WindowContext* context, QObject* parent = nullptr);
+    Tab(WindowContext* context, QnWorkbenchLayout* layout, QObject* parent = nullptr);
 
     /** @private */
     virtual ~Tab() override;

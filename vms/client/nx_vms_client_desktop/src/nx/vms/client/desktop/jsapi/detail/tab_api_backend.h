@@ -26,14 +26,13 @@ class TabApiBackend: public QObject
 
 public:
     /**
-     * Creates backend for the management functions and watchs for the tab with the currently
-     * active layout.
+     * Creates backend for the management functions and watches for the tab with the specified
+     * layout.
      * @param context Context to be used for the access to the workbench functions.
+     * @param layout Layout to be watched for.
+     * @param parent Parent.
      */
-    TabApiBackend(
-        WindowContext* context,
-        QObject* parent = nullptr);
-
+    TabApiBackend(WindowContext* context, QnWorkbenchLayout* layout, QObject* parent = nullptr);
     virtual ~TabApiBackend() override;
 
     State state() const;
@@ -52,7 +51,6 @@ public:
     Error setLayoutProperties(const LayoutProperties& properties);
     Error saveLayout();
 
-    /** Current workbench layout. */
     QnWorkbenchLayout* layout() const;
 
 signals:

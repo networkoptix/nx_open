@@ -992,12 +992,6 @@ void WebViewController::initClientApiSupport(
             return new jsapi::Tabs(context, parent);
         });
 
-    registerApiObjectWithFactory("vms.tab",
-        [=](QObject* parent) -> QObject*
-        {
-            return new jsapi::Tab(context, parent);
-        });
-
     registerApiObjectWithFactory("vms.resources",
         [=](QObject* parent) -> QObject*
         {
@@ -1052,7 +1046,15 @@ void WebViewController::initClientApiSupport(
             return new jsapi::Self(item, parent);
         });
 
-    initClientApiSupport(item->layout()->windowContext(), authCondition);
+    QnWorkbenchLayout* layout = item->layout();
+
+    registerApiObjectWithFactory("vms.tab",
+        [=](QObject* parent) -> QObject*
+        {
+            return new jsapi::Tab(layout->windowContext(), layout, parent);
+        });
+
+    initClientApiSupport(layout->windowContext(), authCondition);
 }
 
 void WebViewController::registerMetaType()
