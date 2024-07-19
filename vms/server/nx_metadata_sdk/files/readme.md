@@ -105,7 +105,7 @@ These samples can be compiled and linked using CMake.
 
 Prerequisites:
 ```
-- CMake >= 3.3.2
+- CMake >= 3.14
 - Windows (7 or 10): Microsoft Visual Studio >= 2017
     - ATTENTION: When linking to the C++ runtime dynamically (Visual Studio does it by default),
         avoid using the latest build tools (toolset) to avoid crashes - see the details in
