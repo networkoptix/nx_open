@@ -28,6 +28,12 @@ public:
         registerEventField<StateField>();
         registerEventField<TestEventField>();
 
+        m_engine->registerActionField(
+            fieldMetatype<EmailMessageField>(),
+            [this](const FieldDescriptor* descriptor)
+            {
+                return new EmailMessageField(m_engine->systemContext(), descriptor);
+            });
         registerActionField<TestActionField>();
         registerActionField<TargetDeviceField>();
         registerActionField<OptionalTimeField>();
@@ -45,6 +51,7 @@ public:
         registerAction<TestAction>();
         registerAction<TestProlongedAction>();
         registerAction<TestActionWithInterval>();
+        registerAction<TestActionWithEmail>();
     }
 };
 

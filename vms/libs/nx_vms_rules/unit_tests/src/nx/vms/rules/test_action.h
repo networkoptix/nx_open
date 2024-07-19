@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <nx/vms/rules/action_builder_fields/email_message_field.h>
 #include <nx/vms/rules/action_builder_fields/optional_time_field.h>
 #include <nx/vms/rules/action_builder_fields/target_device_field.h>
 #include <nx/vms/rules/action_builder_fields/target_user_field.h>
@@ -9,6 +10,7 @@
 #include <nx/vms/rules/basic_action.h>
 #include <nx/vms/rules/utils/field.h>
 #include <nx/vms/rules/utils/type.h>
+#include <utils/email/message.h>
 
 namespace nx::vms::rules::test {
 
@@ -223,6 +225,30 @@ public:
     }
 
     QString m_text;
+};
+
+class TestActionWithEmail: public nx::vms::rules::BasicAction
+{
+    Q_OBJECT
+    Q_CLASSINFO("type", "nx.actions.test.withEmailMessage")
+
+    Q_PROPERTY(nx::email::Message message MEMBER m_message)
+
+public:
+    static ItemDescriptor manifest()
+    {
+        return ItemDescriptor{
+            .id = utils::type<TestActionWithTextWithFields>(),
+            .displayName = TranslatableString("Test action for email field"),
+            .fields = {
+                makeFieldDescriptor<EmailMessageField>(
+                    utils::kMessageFieldName,
+                    TranslatableString("Email message field"))
+            }
+        };
+    }
+
+    nx::email::Message m_message;
 };
 
 } // namespace nx::vms::rules::test

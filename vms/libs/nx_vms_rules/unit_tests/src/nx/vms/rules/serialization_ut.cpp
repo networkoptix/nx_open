@@ -12,6 +12,7 @@
 #include <nx/vms/rules/utils/common.h>
 #include <nx/vms/rules/utils/serialization.h>
 
+#include "test_action.h"
 #include "test_field.h"
 #include "test_plugin.h"
 #include "test_router.h"
@@ -108,6 +109,38 @@ TEST(VmsRulesSerialization, Event)
     EXPECT_EQ(sourceEvent->level, resultEvent->level);
     EXPECT_EQ(sourceEvent->reason, resultEvent->reason);
     EXPECT_EQ(sourceEvent->conflicts, resultEvent->conflicts);
+}
+
+TEST(VmsRulesSerialization, Action)
+{
+    const auto sourceAction = QSharedPointer<TestActionWithEmail>::create();
+
+    sourceAction->setOriginPeerId(nx::Uuid::createUuid());
+    sourceAction->setTimestamp(std::chrono::microseconds{100});
+    sourceAction->setState(State::instant);
+    sourceAction->setRuleId(nx::Uuid::createUuid());
+    sourceAction->setId(nx::Uuid::createUuid());
+
+    sourceAction->m_message.attachments.emplace_back("test content", "test mimetype");
+    sourceAction->m_message.body = "test body";
+    sourceAction->m_message.plainBody = "test plain body";
+    sourceAction->m_message.subject = "test subject";
+
+    const auto propData =
+        serializeProperties(sourceAction.get(), nx::utils::propertyNames(sourceAction.get()));
+
+    auto propJson = QJson::serialized(propData);
+    SCOPED_TRACE(propJson.toStdString());
+
+    const auto resultAction = QSharedPointer<TestActionWithEmail>::create();
+    deserializeProperties(propData, resultAction.get());
+
+    EXPECT_EQ(sourceAction->originPeerId(), resultAction->originPeerId());
+    EXPECT_EQ(sourceAction->timestamp(), resultAction->timestamp());
+    EXPECT_EQ(sourceAction->state(), resultAction->state());
+    EXPECT_EQ(sourceAction->ruleId(), resultAction->ruleId());
+    EXPECT_EQ(sourceAction->id(), resultAction->id());
+    EXPECT_EQ(sourceAction->m_message, resultAction->m_message);
 }
 
 TEST(VmsRulesSerialization, VariantStringList)

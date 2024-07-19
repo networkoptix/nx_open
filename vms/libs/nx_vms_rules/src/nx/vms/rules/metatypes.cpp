@@ -38,6 +38,7 @@ void Metatypes::initialize()
     // Register types and serializers in alphabetical order.
 
     qRegisterMetaType<email::Message>();
+    QnJsonSerializer::registerSerializer<email::Message>();
 
     qRegisterMetaType<nx::network::http::AuthType>();
     QnJsonSerializer::registerSerializer<nx::network::http::AuthType>();
