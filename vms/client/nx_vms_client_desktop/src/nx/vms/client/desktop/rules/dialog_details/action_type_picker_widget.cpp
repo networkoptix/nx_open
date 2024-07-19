@@ -3,6 +3,8 @@
 #include "action_type_picker_widget.h"
 #include "ui_action_type_picker_widget.h"
 
+#include <QtGui/QStandardItemModel>
+
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -12,6 +14,7 @@
 #include <nx/vms/rules/strings.h>
 #include <nx/vms/rules/utils/common.h>
 #include <nx/vms/rules/utils/compatibility.h>
+#include <nx/vms/rules/utils/field.h>
 #include <ui/common/palette.h>
 
 namespace nx::vms::client::desktop::rules {
@@ -63,6 +66,34 @@ void ActionTypePickerWidget::setActionType(const QString& actionType)
     ui->actionTypeComboBox->setPlaceholderText(
         vms::rules::Strings::actionName(systemContext(), actionType));
     ui->actionTypeComboBox->setCurrentIndex(-1);
+}
+
+void ActionTypePickerWidget::setProlongedActionsEnabled(bool enabled)
+{
+    const auto model = qobject_cast<QStandardItemModel*>(ui->actionTypeComboBox->model());
+    if (!NX_ASSERT(model, "Unexpected model type is used by the QComboBox"))
+        return;
+
+    const auto engine = systemContext()->vmsRulesEngine();
+
+    for (int row = 0; row < model->rowCount(); ++row)
+    {
+        auto item = model->item(row);
+        const auto actionId = item->data(Qt::UserRole).toString();
+
+        const auto actionDescriptor = engine->actionDescriptor(actionId);
+
+        const auto isProlonged = actionDescriptor->flags.testFlag(vms::rules::ItemFlag::prolonged);
+        const auto hasDuration = vms::rules::utils::fieldByName(
+            vms::rules::utils::kDurationFieldName, actionDescriptor.value());
+
+        if (isProlonged && !hasDuration)
+        {
+            item->setFlags(enabled
+                ? item->flags() | Qt::ItemIsEnabled
+                : item->flags() & ~Qt::ItemIsEnabled);
+        }
+    }
 }
 
 } // namespace nx::vms::client::desktop::rules

@@ -77,6 +77,7 @@ private:
     void onEnabledButtonClicked(bool checked);
 
     void updateButtonBox();
+    void updateEnabledActions();
 
     void onEventFilterModified();
     void onActionBuilderModified();

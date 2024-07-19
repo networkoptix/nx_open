@@ -357,6 +357,8 @@ void EditVmsRuleDialog::displayRule()
         m_eventTypePicker->setEventType(m_rule->eventFilters().first()->eventType());
         const QSignalBlocker actionPickerBlocker{m_actionTypePicker};
         m_actionTypePicker->setActionType(m_rule->actionBuilders().first()->actionType());
+
+        updateEnabledActions();
     }
 
     if (ini().developerMode)
@@ -453,15 +455,13 @@ void EditVmsRuleDialog::onScheduleClicked()
 
 void EditVmsRuleDialog::onActionTypeChanged(const QString& actionType)
 {
-    // TODO: #mmalofeev user must not be able to choose invalid event-action pair.
-    if (!m_ruleCompatibilityManager->changeActionType(actionType))
+    if (!NX_ASSERT(
+        m_ruleCompatibilityManager->changeActionType(actionType),
+        "Incompatible event(%1)-action(%2) pair is choosen",
+        m_rule->eventFilters().first()->eventType(),
+        actionType))
     {
-        QnSessionAwareMessageBox::warning(this,
-            tr("Incompatible event-action pair is choosen."
-                " Prolonged action without duration incompatible with the instant event"));
-
         m_actionTypePicker->setActionType(m_rule->actionBuilders().first()->actionType());
-
         return;
     }
 
@@ -472,17 +472,17 @@ void EditVmsRuleDialog::onActionTypeChanged(const QString& actionType)
 
 void EditVmsRuleDialog::onEventTypeChanged(const QString& eventType)
 {
-    // TODO: #mmalofeev user must not be able to choose invalid event-action pair.
-    if (!m_ruleCompatibilityManager->changeEventType(eventType))
+    if (!NX_ASSERT(
+        m_ruleCompatibilityManager->changeEventType(eventType),
+        "Incompatible event(%1)-action(%2) pair is choosen",
+        eventType,
+        m_rule->actionBuilders().first()->actionType()))
     {
-        QnSessionAwareMessageBox::warning(this,
-            tr("Incompatible event-action pair is choosen."
-                " Prolonged action without duration incompatible with the instant event"));
-
         m_eventTypePicker->setEventType(m_rule->eventFilters().first()->eventType());
-
         return;
     }
+
+    updateEnabledActions();
 
     setHasChanges(true);
 
@@ -515,6 +515,14 @@ void EditVmsRuleDialog::updateButtonBox()
     m_buttonBox->button(QDialogButtonBox::StandardButton::Apply)->setEnabled(isApplyButtonEnabled);
 }
 
+void EditVmsRuleDialog::updateEnabledActions()
+{
+    const auto eventDurationType =
+        vms::rules::getEventDurationType(m_rule->engine(), m_rule->eventFilters().first());
+    m_actionTypePicker->setProlongedActionsEnabled(
+        eventDurationType != vms::rules::EventDurationType::instant);
+}
+
 void EditVmsRuleDialog::onEventFilterModified()
 {
     const auto serializedEventFilter =
@@ -522,6 +530,8 @@ void EditVmsRuleDialog::onEventFilterModified()
     m_eventLabel->setToolTip(QString{"%1:\n%2"}
                                  .arg(Strings::devModeInfoTitle())
                                  .arg(indentedJson(serializedEventFilter)));
+
+    updateEnabledActions();
     setHasChanges(true);
 }
 
