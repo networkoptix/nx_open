@@ -72,6 +72,8 @@ public:
     /** Auto-terminate server session when destroying. */
     void setAutoTerminate(bool value);
 
+    std::chrono::microseconds age() const;
+
 signals:
     void stateChanged(State state);
     void reconnectingToServer(const QnMediaServerResourcePtr& server);

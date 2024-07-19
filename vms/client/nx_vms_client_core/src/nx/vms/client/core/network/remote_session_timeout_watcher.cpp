@@ -86,7 +86,16 @@ struct RemoteSessionTimeoutWatcher::Private
     std::optional<seconds> calculateSessionRemainingTime(RemoteConnectionPtr connection) const
     {
         if (connection->connectionInfo().isCloud())
-            return calculatePasswordRemainingTime();
+        {
+            auto currentSession = session.lock();
+            if (!currentSession)
+                return std::nullopt;
+
+            if (useSessionTimeoutLimitForCloud && passwordSessionTimeoutLimit.has_value())
+                return duration_cast<seconds>(*passwordSessionTimeoutLimit - currentSession->age());
+
+            return std::nullopt;
+        }
 
         return connection->credentials().authToken.isBearerToken()
             ? calculateTokenRemainingTime(connection)
