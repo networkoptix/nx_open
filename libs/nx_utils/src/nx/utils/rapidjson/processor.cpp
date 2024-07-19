@@ -95,7 +95,7 @@ std::string Processor::toStdString() const
     ::rapidjson::StringBuffer buffer;
     ::rapidjson::Writer<::rapidjson::StringBuffer> writer(buffer);
     m_curr->Accept(writer);
-    return buffer.GetString();
+    return std::string{buffer.GetString(), buffer.GetLength()};
 }
 
 bool Processor::isValid() const
@@ -117,54 +117,52 @@ void Processor::getWithRecursiveSearch(
         iterateRecursive<details::ObjectPtrHelper>(parent, condition, action);
     else if (parent->IsArray())
         iterateRecursive<details::ArrayPtrHelper>(parent, condition, action);
-    else
-        return;
 }
 
 namespace predicate {
 
+::rapidjson::Pointer pointerFromKey(const std::string& key)
+{
+    return ::rapidjson::Pointer(key.starts_with('/') ? key : ('/' + key));
+}
+
 bool NameContains::operator()(const ObjectIterator& root) const
 {
-    std::string name = root->name.GetString();
+    const std::string_view name{root->name.GetString(), root->name.GetStringLength()};
     return name.find(m_namePart) != std::string::npos;
 }
 
-Compare::Compare(const std::string& name, const QString& val)
+Compare::Compare(const std::string& key, const QString& val):
+    m_pointer(pointerFromKey(key)),
+    m_value(val)
 {
-    m_name = name;
-    if (!name.starts_with("/"))
-        m_name = "/" + m_name;
-    m_value = val;
 }
 
 bool Compare::operator()(const ArrayIterator& root) const
 {
-    ::rapidjson::Pointer pointer(m_name);
-    if (!pointer.IsValid())
+    if (!m_pointer.IsValid())
         return false;
-    ::rapidjson::Value* jsonOut = pointer.Get(*root);
-    details::TypeHelper<QString> helper;
-    auto result = helper.get(jsonOut);
+    ::rapidjson::Value* jsonOut = m_pointer.Get(*root);
+
+    using Helper = details::TypeHelper<std::remove_cv_t<decltype(m_value)>>;
+    auto result = Helper::get(jsonOut);
     return result.has_value() && result.value() == m_value;
 }
 
-ContainedIn::ContainedIn(
-    const std::string& name, const QStringList& values)
+ContainedIn::ContainedIn(const std::string& key, const QStringList& values):
+    m_pointer(pointerFromKey(key)),
+    m_values(values)
 {
-    m_name = name;
-    if (!name.starts_with("/"))
-        m_name = "/" + m_name;
-    m_values = values;
 }
 
 bool ContainedIn::operator()(const ArrayIterator& root) const
 {
-    ::rapidjson::Pointer pointer(m_name);
-    if (!pointer.IsValid())
+    if (!m_pointer.IsValid())
         return false;
-    ::rapidjson::Value* jsonOut = pointer.Get(*root);
-    details::TypeHelper<QString> helper;
-    auto result = helper.get(jsonOut);
+    ::rapidjson::Value* jsonOut = m_pointer.Get(*root);
+
+    using Helper = details::TypeHelper<std::remove_cv_t<decltype(m_values)::value_type>>;
+    auto result = Helper::get(jsonOut);
     return result.has_value() && m_values.contains(result.value());
 }
 
