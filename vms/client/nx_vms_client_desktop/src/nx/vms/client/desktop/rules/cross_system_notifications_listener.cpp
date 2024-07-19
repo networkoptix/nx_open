@@ -113,6 +113,9 @@ public:
 
     void reauthenticate()
     {
+        if (!p2pWebsocketTransport)
+            return;
+
         auto const credentials = qnCloudStatusWatcher->credentials();
         CloudAuthenticate cloudAuthenticate;
         cloudAuthenticate.accessToken = QString::fromStdString(credentials.authToken.value);
@@ -137,7 +140,10 @@ private:
             || httpClient->response()->statusLine.statusCode
                 != http::StatusCode::switchingProtocols)
         {
-            NX_DEBUG(this, "Cloud connection error: %1", httpClient->lastSysErrorCode());
+            NX_DEBUG(this,
+                "Cloud connection error: %1, status code: %2",
+                httpClient->lastSysErrorCode(),
+                httpClient->response()->statusLine.statusCode);
             scheduleReconnect();
             return;
         }
