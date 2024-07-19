@@ -2126,9 +2126,11 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutAboutToBeChanged()
         }
         else if (auto webWidget = dynamic_cast<QnWebResourceWidget*>(widget))
         {
+            // Make the workbench layout as a parent of the suspended state to ensure that the
+            // lifetime of the state is equal to the lifetime of the layout.
             webWidget->item()->setData(
                 Qn::ItemWebPageSavedStateDataRole,
-                webWidget->webView()->controller()->suspend());
+                webWidget->webView()->controller()->suspend(/*parent*/ layout));
         }
     }
 
@@ -2199,7 +2201,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged()
 
             // Resume the web page from the saved state.
             webWidget->webView()->controller()->resume(
-                item->data(Qn::ItemWebPageSavedStateDataRole));
+                item->data(Qn::ItemWebPageSavedStateDataRole), item->resource());
 
             // We just moved the saved state to the web page but QVariant cannot handle move
             // semantics, so set the saved state to null.
