@@ -53,6 +53,7 @@ struct RemoteSession::Private
     State state = State::waitingPeer;
     bool stickyReconnect = false;
     std::unique_ptr<ReconnectHelper> reconnectHelper;
+    std::chrono::microseconds sessionStartTime{0};
 
     /** Actual error code for the server we were connected to. */
     std::optional<RemoteConnectionErrorCode> activeServerReconnectErrorCode;
@@ -65,6 +66,7 @@ struct RemoteSession::Private
 
     void terminateServerSessionIfNeeded();
     void updateTokenExpirationTime();
+    std::chrono::microseconds age() const;
 };
 
 void RemoteSession::Private::terminateServerSessionIfNeeded()
@@ -79,7 +81,7 @@ void RemoteSession::Private::updateTokenExpirationTime()
         "/rest/v4/login/sessions/current",
         nx::network::rest::Params(),
         nx::utils::guarded(connection.get(),
-            [connection = connection.get()](
+            [this](
                 bool success,
                 rest::Handle /*requestId*/,
                 QByteArray data,
@@ -100,10 +102,16 @@ void RemoteSession::Private::updateTokenExpirationTime()
                     return;
                 }
 
+                sessionStartTime = qnSyncTime->currentTimePoint() - session.ageS;
                 connection->setSessionTokenExpirationTime(
                     qnSyncTime->currentTimePoint() + session.expiresInS);
             }),
         QThread::currentThread());
+}
+
+std::chrono::microseconds RemoteSession::Private::age() const
+{
+    return qnSyncTime->currentTimePoint() - sessionStartTime;
 }
 
 RemoteSession::RemoteSession(
@@ -131,6 +139,7 @@ RemoteSession::RemoteSession(
     tokenExpirationTimer->setInterval(kTokenExpirationUpdateInterval);
     tokenExpirationTimer->callOnTimeout([this] { d->updateTokenExpirationTime(); });
     tokenExpirationTimer->start();
+    d->updateTokenExpirationTime();
 }
 
 RemoteSession::~RemoteSession()
@@ -237,6 +246,11 @@ void RemoteSession::setAutoTerminate(bool value)
 {
     NX_VERBOSE(this, "Set session auto-terminate to %1", value);
     d->autoTerminate = value;
+}
+
+std::chrono::microseconds RemoteSession::age() const
+{
+    return d->age();
 }
 
 bool RemoteSession::keepCurrentServerOnError(RemoteConnectionErrorCode error)

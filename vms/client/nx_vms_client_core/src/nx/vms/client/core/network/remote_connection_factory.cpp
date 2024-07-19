@@ -601,16 +601,31 @@ struct RemoteConnectionFactory::Private
         }
     }
 
-    void checkServerCloudConnection(ContextPtr context)
+    void loginWithCloudToken(ContextPtr context)
     {
         if (!context)
             return;
 
-        requestsManager->getCurrentSession(context);
+        const auto currentSession = requestsManager->getCurrentSession(context);
 
         // Assuming server cloud connection problems if fresh cloud token is unauthorized
         if (context->failed() && context->error() == RemoteConnectionErrorCode::sessionExpired)
+        {
             context->rewriteError(RemoteConnectionErrorCode::cloudUnavailableOnServer);
+            return;
+        }
+
+        if (!context->failed())
+        {
+            const auto tokenExpirationTime =
+                qnSyncTime->currentTimePoint() + currentSession.expiresInS;
+
+            if (!context->sessionTokenExpirationTime
+                || context->sessionTokenExpirationTime > tokenExpirationTime)
+            {
+                context->sessionTokenExpirationTime = tokenExpirationTime;
+            }
+        }
     }
 
     /**
@@ -1122,9 +1137,7 @@ struct RemoteConnectionFactory::Private
             {
                 processCloudToken(context()); // User Interaction (2FA if needed).
                 NX_DEBUG(this, "Login with Cloud Token.");
-
-                if (!hasCachedData)
-                    checkServerCloudConnection(context()); //< GET /rest/v1/login/sessions/current
+                loginWithCloudToken(context()); //< GET /rest/v1/login/sessions/current
             }
         }
         else if (context())
