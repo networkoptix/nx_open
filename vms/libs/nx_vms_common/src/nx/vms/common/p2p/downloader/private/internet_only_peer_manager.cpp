@@ -101,8 +101,7 @@ AbstractPeerManager::RequestContextPtr<nx::Buffer> InternetOnlyPeerManager::down
                 setPromiseValueIfEmpty(promise, {});
         });
 
-    std::function<void()> cancelRequest =
-        [promise, httpClient = httpClient.get()]() { setPromiseValueIfEmpty(promise, {}); };
+    std::function<void()> cancelRequest = [promise]() { setPromiseValueIfEmpty(promise, {}); };
 
     return std::make_unique<InternetRequestContext<nx::Buffer>>(
         std::move(httpClient), promise->get_future(), cancelRequest);

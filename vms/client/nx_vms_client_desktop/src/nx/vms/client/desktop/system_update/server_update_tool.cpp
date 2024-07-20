@@ -115,6 +115,7 @@ ServerUpdateTool::~ServerUpdateTool()
 
     saveInternalState();
     m_downloader->disconnect(this);
+    m_serverConnection->stop();
     m_serverConnection.reset();
     NX_VERBOSE(this) << "~ServerUpdateTool() done";
 }
@@ -1147,15 +1148,16 @@ bool ServerUpdateTool::requestInstallAction(
 
 void ServerUpdateTool::requestModuleInformation()
 {
-    //NX_VERBOSE(this, "requestModuleInformation()");
-    auto callback =
-        [tool = QPointer(this), connection = m_serverConnection](
+    NX_VERBOSE(this, "%1()", __func__);
+
+    auto callback = nx::utils::guarded(this,
+        [this](
             bool success, rest::Handle /*handle*/,
             const rest::RestResultWithData<QList<nx::vms::api::ModuleInformation>>& response)
         {
-            if (success && tool)
-                emit tool->moduleInformationReceived(response.data);
-        };
+            if (success)
+                emit moduleInformationReceived(response.data);
+        });
 
     // We expect that m_serverConnection is created in requestStartUpdate
     if (!m_serverConnection)
