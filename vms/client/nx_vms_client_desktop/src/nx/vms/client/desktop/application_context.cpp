@@ -66,6 +66,7 @@
 #include <nx/vms/client/desktop/state/client_process_runner.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <nx/vms/client/desktop/state/fallback_shared_memory.h>
+#include <nx/vms/client/desktop/state/file_based_shared_memory.h>
 #include <nx/vms/client/desktop/state/qt_based_shared_memory.h>
 #include <nx/vms/client/desktop/state/running_instances_manager.h>
 #include <nx/vms/client/desktop/state/shared_memory_manager.h>
@@ -359,7 +360,12 @@ struct ApplicationContext::Private
         clientStateHandler->setClientProcessExecutionInterface(
             std::make_unique<ClientProcessRunner>());
 
-        SharedMemoryInterfacePtr sharedMemoryInterface = std::make_unique<QtBasedSharedMemory>();
+        SharedMemoryInterfacePtr sharedMemoryInterface;
+        if (ini().useFileBasedSharedMemory)
+            sharedMemoryInterface = std::make_unique<FileBasedSharedMemory>();
+        else
+            sharedMemoryInterface = std::make_unique<QtBasedSharedMemory>();
+
         if (!sharedMemoryInterface->initialize())
             sharedMemoryInterface = std::make_unique<FallbackSharedMemory>();
 
