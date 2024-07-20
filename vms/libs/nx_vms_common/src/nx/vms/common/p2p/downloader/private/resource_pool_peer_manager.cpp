@@ -19,11 +19,13 @@ namespace nx::vms::common::p2p::downloader {
 namespace {
 
 template<typename Promise>
-auto makeCanceller(Promise promise, const rest::ServerConnectionPtr& connection, rest::Handle handle)
+auto makeCanceller(
+    Promise promise, const rest::ServerConnectionWeakPtr& weakConnection, rest::Handle handle)
 {
-    return [promise, connection, handle]()
+    return [promise, weakConnection, handle]()
         {
-            connection->cancelRequest(handle);
+            if (auto connection = weakConnection.lock())
+                connection->cancelRequest(handle);
             AbstractPeerManager::setPromiseValueIfEmpty(promise, {});
         };
 }

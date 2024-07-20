@@ -27,6 +27,7 @@ using Callback = std::function<void(bool success, Handle requestId, ResultType r
 
 class ServerConnection;
 using ServerConnectionPtr = std::shared_ptr<ServerConnection>;
+using ServerConnectionWeakPtr = std::weak_ptr<ServerConnection>;
 
 using JsonRpcBatchResultCallback = Callback<std::vector<nx::vms::api::JsonRpcResponse>>;
 using JsonResultCallback = Callback<nx::network::rest::JsonResult>;
