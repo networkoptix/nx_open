@@ -74,6 +74,9 @@ QVariant AnalyticsDialogTableModel::data(const QModelIndex& index, int role) con
             if (columnName == kCameraAttributeName)
                 return sourceIndex.data(core::DisplayedResourceListRole);
 
+            if (columnName == kTitleAttributeName)
+                return sourceIndex.data(core::ObjectTitleRole);
+
             const auto attributes = sourceIndex.data(core::AnalyticsAttributesRole)
                 .value<core::analytics::AttributeList>();
             for (const auto& attribute: attributes)

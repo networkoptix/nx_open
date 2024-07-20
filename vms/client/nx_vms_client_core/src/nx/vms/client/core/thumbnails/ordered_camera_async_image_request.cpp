@@ -50,7 +50,11 @@ OrderedCameraAsyncImageRequest::OrderedCameraAsyncImageRequest(
             const auto handleReady =
                 [this, callback]()
                 {
-                    setImage(d->imageResult->image());
+                    if (const auto image = d->imageResult->image(); !image.isNull())
+                        setImage(image);
+                    else
+                        setError(d->imageResult->errorString());
+
                     callback();
                 };
 

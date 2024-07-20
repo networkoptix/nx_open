@@ -15,7 +15,7 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
-#include <nx/vms/client/core/common/utils/custom_thread_pool.h>
+#include <nx/vms/client/core/common/utils/thread_pool.h>
 #include <nx/vms/client/core/system_context.h>
 #include <utils/common/delayed.h>
 
@@ -81,7 +81,7 @@ struct CameraAsyncImageRequest::Private
 
     QThreadPool* threadPool() const
     {
-        return CustomThreadPool::instance("CameraAsyncImageRequest_thread_pool");
+        return ThreadPool::instance("CameraAsyncImageRequest_thread_pool");
     }
 };
 
@@ -101,14 +101,14 @@ CameraAsyncImageRequest::CameraAsyncImageRequest(
         || !NX_ASSERT(systemContext)
         || !NX_ASSERT(d->threadPool()))
     {
-        setImage({});
+        setError("Invalid operation");
         return;
     }
 
     const auto api = systemContext->connectedServerApi();
     if (!api)
     {
-        setImage({});
+        setError("No server connection");
         return;
     }
 
@@ -133,7 +133,7 @@ CameraAsyncImageRequest::CameraAsyncImageRequest(
 
             if (!success || imageData.isEmpty() || isJsonError || !d->threadPool())
             {
-                setImage({});
+                setError(QString::fromUtf8(imageData));
                 return;
             }
 
@@ -158,7 +158,7 @@ CameraAsyncImageRequest::CameraAsyncImageRequest(
 
     d->requestId = api->cameraThumbnailAsync(requestParams, callback, thread());
     if (d->requestId == rest::Handle())
-        setImage({});
+        setError("Failed to send request");
 };
 
 CameraAsyncImageRequest::CameraAsyncImageRequest(

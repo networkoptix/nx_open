@@ -88,7 +88,7 @@ TileBase
                     ? (closeButton.width - 2)
                     : 0
 
-                text: (model && model.display) || ""
+                text: (model && (model.objectTitle || model.display)) || ""
 
                 onLinkActivated:
                     tile.linkActivated(link)

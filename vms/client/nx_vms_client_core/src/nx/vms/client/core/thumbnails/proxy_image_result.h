@@ -16,6 +16,9 @@ class NX_VMS_CLIENT_CORE_API ProxyImageResult: public AsyncImageResult
 public:
     explicit ProxyImageResult(AsyncImageResult* source, QObject* parent = nullptr);
     explicit ProxyImageResult(std::shared_ptr<AsyncImageResult> source, QObject* parent = nullptr);
+
+private:
+    void handleSourceReady(AsyncImageResult* source);
 };
 
 } // namespace nx::vms::client::core

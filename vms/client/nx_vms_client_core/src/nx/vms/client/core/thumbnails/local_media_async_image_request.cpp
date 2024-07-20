@@ -9,7 +9,7 @@
 #include <core/resource/resource.h>
 #include <decoders/video/ffmpeg_video_decoder.h>
 #include <nx/utils/log/log.h>
-#include <nx/vms/client/core/common/utils/custom_thread_pool.h>
+#include <nx/vms/client/core/common/utils/thread_pool.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <utils/common/delayed.h>
 #include <utils/media/frame_info.h>
@@ -93,7 +93,7 @@ struct LocalMediaAsyncImageRequest::Private
 
     QThreadPool* threadPool() const
     {
-        return CustomThreadPool::instance("LocalMediaAsyncImageRequest_thread_pool");
+        return ThreadPool::instance("LocalMediaAsyncImageRequest_thread_pool");
     }
 };
 
@@ -108,7 +108,7 @@ LocalMediaAsyncImageRequest::LocalMediaAsyncImageRequest(
 {
     if (!NX_ASSERT(resource && resource->hasFlags(Qn::local_media)) || !NX_ASSERT(d->threadPool()))
     {
-        setImage({});
+        setError("Invalid operation");
         return;
     }
 

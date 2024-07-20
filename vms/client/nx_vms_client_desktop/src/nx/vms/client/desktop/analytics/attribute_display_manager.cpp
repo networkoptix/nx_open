@@ -15,6 +15,7 @@ namespace nx::vms::client::desktop::analytics::taxonomy {
 
 QStringList kBuiltInAttributes = {
     kDateTimeAttributeName,
+    kTitleAttributeName,
     kCameraAttributeName,
     kObjectTypeAttributeName,
 };
@@ -33,6 +34,7 @@ public:
     {
         displayNameByAttribute = {
             {kDateTimeAttributeName, tr("Date/Time")},
+            {kTitleAttributeName, tr("Title")},
             {kCameraAttributeName, tr("Camera")},
             {kObjectTypeAttributeName, tr("Object Type")},
         };
@@ -62,7 +64,13 @@ public:
             {
                 // In the table mode, built-in attributes go first by default.
                 if (!orderedAttributes.contains(attribute))
-                    orderedAttributes.prepend(attribute);
+                {
+                    int pos = 0;
+                    if (const auto nextIt = it + 1; nextIt != kBuiltInAttributes.rend())
+                        pos = orderedAttributes.indexOf(*nextIt) + 1;
+
+                    orderedAttributes.insert(pos, attribute);
+                }
             }
 
             if (!allAttributes.contains(attribute))
@@ -194,9 +202,6 @@ QString AttributeDisplayManager::displayName(const QString& attribute) const
 
 void AttributeDisplayManager::setVisible(const QString& attribute, bool visible)
 {
-    if (attribute == kDateTimeAttributeName)
-        return; //< This attribute is not allowed to be hidden.
-
     if (!canBeHidden(attribute))
         return;
 

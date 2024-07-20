@@ -19,6 +19,7 @@
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/core/skin/skin_image_provider.h>
 #include <nx/vms/client/core/system_context.h>
+#include <nx/vms/client/core/thumbnails/remote_async_image_provider.h>
 
 using namespace nx::vms::client::core;
 
@@ -52,12 +53,18 @@ QnClientCoreModule::QnClientCoreModule(
     d->resourceDataProviderFactory->registerResourceType<DesktopAudioOnlyResource>();
     d->sessionTokenTerminator = std::make_unique<SessionTokenTerminator>();
 
-    appContext()->qmlEngine()->addImageProvider("skin",
-        new nx::vms::client::core::SkinImageProvider());
+    const auto qmlEngine = appContext()->qmlEngine();
+    qmlEngine->addImageProvider("skin", new nx::vms::client::core::SkinImageProvider());
+    qmlEngine->addImageProvider("remote", new nx::vms::client::core::RemoteAsyncImageProvider(
+        systemContext));
 }
 
 QnClientCoreModule::~QnClientCoreModule()
 {
+    const auto qmlEngine = appContext()->qmlEngine();
+    qmlEngine->removeImageProvider("remote");
+    qmlEngine->removeImageProvider("skin");
+
     if (s_instance == this)
         s_instance = nullptr;
 }

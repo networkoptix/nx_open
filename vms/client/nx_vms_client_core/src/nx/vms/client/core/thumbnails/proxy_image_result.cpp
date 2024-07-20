@@ -11,22 +11,22 @@ ProxyImageResult::ProxyImageResult(AsyncImageResult* source, QObject* parent):
 {
     if (!NX_ASSERT(source))
     {
-        setImage({});
+        setError("Invalid operation");
     }
     else if (source->isReady())
     {
-        setImage(source->image());
+        handleSourceReady(source);
     }
     else
     {
         connect(source, &AsyncImageResult::ready, this,
-            [this, source]() { setImage(source->image()); });
+            [this, source]() { handleSourceReady(source); });
 
         connect(source, &QObject::destroyed, this,
             [this]()
             {
                 if (!isReady())
-                    setImage({});
+                    setError("Source request cancelled");
             });
     }
 }
@@ -36,17 +36,25 @@ ProxyImageResult::ProxyImageResult(std::shared_ptr<AsyncImageResult> source, QOb
 {
     if (!NX_ASSERT(source))
     {
-        setImage({});
+        setError("Invalid operation");
     }
     else if (source->isReady())
     {
-        setImage(source->image());
+        handleSourceReady(source.get());
     }
     else
     {
         connect(source.get(), &AsyncImageResult::ready, this,
-            [this, source]() { setImage(source->image()); });
+            [this, source]() { handleSourceReady(source.get()); });
     }
+}
+
+void ProxyImageResult::handleSourceReady(AsyncImageResult* source)
+{
+    if (const auto image = source->image(); !image.isNull())
+        setImage(image);
+    else
+        setError(source->errorString());
 }
 
 } // namespace nx::vms::client::core

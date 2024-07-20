@@ -23,7 +23,7 @@ FallbackImageResult::FallbackImageResult(
 
     if (!NX_ASSERT(m_selector))
     {
-        setImage({});
+        setError("Invalid operation");
         return;
     }
 

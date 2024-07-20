@@ -11,6 +11,7 @@ namespace nx::vms::client::core::analytics::taxonomy { class AnalyticsFilterMode
 namespace nx::vms::client::desktop::analytics::taxonomy {
 
 static const QString kDateTimeAttributeName = "^/DATE_TIME/^";
+static const QString kTitleAttributeName = "^/OBJECT_TITLE/^";
 static const QString kCameraAttributeName = "^/CAMERA/^";
 static const QString kObjectTypeAttributeName = "^/OBJECT_TYPE/^";
 

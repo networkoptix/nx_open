@@ -24,6 +24,7 @@ class Skin;
 class Settings;
 class SystemContext;
 class SystemFinder;
+class ThreadPool;
 class UnifiedResourcePool;
 
 namespace watchers { class KnownServerConnections; }
@@ -107,6 +108,14 @@ public:
     nx::i18n::TranslationManager* translationManager() const;
 
     FontConfig* fontConfig() const;
+
+    /**
+     * Obtain a named thread pool.
+     * This is the preferred way (instead of explicitly creating a QThreadPool), as these pools are
+     * owned by the application context, and destruction of them and their threads happens at
+     * a safe moment (before QCoreApplication destruction).
+     */
+    ThreadPool* threadPool(const QString& id) const;
 
 signals:
     void systemContextAdded(SystemContext* systemContext);

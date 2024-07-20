@@ -877,11 +877,14 @@ Window
                 const getData = name => accessor.getData(selection.index, name)
 
                 return {
+                    "trackId": getData("trackId"),
                     "previewResource": getData("previewResource"),
                     "previewTimestampMs": getData("previewTimestampMs") || 0,
                     "previewAspectRatio": getData("previewAspectRatio") || 1.0,
                     "timestamp": getData("timestamp") || "",
                     "display": getData("display") || "",
+                    "objectTitle": getData("objectTitle") || "",
+                    "hasTitleImage": getData("hasTitleImage") || false,
                     "description": getData("description") || "",
                     "additionalText": getData("additionalText") || "",
                     "attributes": getData("attributes") || [],

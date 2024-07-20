@@ -21,6 +21,12 @@ void AsyncImageResult::setImage(const QImage& image)
     emit ready(QPrivateSignal());
 }
 
+void AsyncImageResult::setError(const QString& errorString)
+{
+    m_errorString = errorString;
+    setImage({});
+}
+
 std::chrono::microseconds AsyncImageResult::timestamp(const QImage& image)
 {
     if (image.isNull())

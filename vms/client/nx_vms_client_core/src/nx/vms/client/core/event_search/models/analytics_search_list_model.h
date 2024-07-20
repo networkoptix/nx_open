@@ -78,6 +78,8 @@ public:
 
     virtual QVariant data(const QModelIndex& index, int role) const override;
 
+    virtual QHash<int, QByteArray> roleNames() const override;
+
 protected:
     virtual bool requestFetch(
         const FetchRequest& request,
