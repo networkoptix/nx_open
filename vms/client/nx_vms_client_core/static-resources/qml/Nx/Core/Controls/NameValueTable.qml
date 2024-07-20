@@ -301,10 +301,10 @@ Item
             for (let i = 0; i < children.length; ++i)
                 allChildren.push(children[i])
 
-            grid.rowLookup = allChildren.filter(child => child instanceof Text)
-                .reduce((result, child, index, array) =>
+            grid.rowLookup = allChildren.reduce(
+                    (result, child, index, array) =>
                     {
-                        if (index % 2 === 0)
+                        if (child.isLabel)
                         {
                             computeHeightOfLastItem(result, child)
 

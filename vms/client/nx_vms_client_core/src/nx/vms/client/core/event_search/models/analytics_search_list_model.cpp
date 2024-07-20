@@ -1108,7 +1108,7 @@ bool AnalyticsSearchListModel::hasOnlyLiveCameras() const
 
 int AnalyticsSearchListModel::availableNewTracks() const
 {
-    if (d->liveProcessingMode == LiveProcessingMode::manualAdd)
+    if (d->liveProcessingMode != LiveProcessingMode::manualAdd)
         return 0;
 
     return d->newTrackCountUnknown
@@ -1250,6 +1250,14 @@ QVariant AnalyticsSearchListModel::data(const QModelIndex& index, int role) cons
         case ObjectTrackIdRole:
             return QVariant::fromValue(track.id);
 
+        case ObjectTitleRole:
+            return track.title
+                ? QVariant::fromValue(track.title->text)
+                : QVariant{};
+
+        case HasTitleImageRole:
+            return track.title && track.title->hasImage;
+
         case DurationRole:
             return QVariant::fromValue(objectDuration(track));
 
@@ -1280,6 +1288,15 @@ QVariant AnalyticsSearchListModel::data(const QModelIndex& index, int role) cons
         default:
             return base_type::data(index, role);
     }
+}
+
+QHash<int, QByteArray> AnalyticsSearchListModel::roleNames() const
+{
+    auto result = base_type::roleNames();
+    result[ObjectTrackIdRole] = "trackId";
+    result[ObjectTitleRole] = "objectTitle";
+    result[HasTitleImageRole] = "hasTitleImage";
+    return result;
 }
 
 bool AnalyticsSearchListModel::requestFetch(

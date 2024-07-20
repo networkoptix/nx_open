@@ -17,6 +17,7 @@
 #include <nx/utils/external_resources.h>
 #include <nx/utils/i18n/translation_manager.h>
 #include <nx/vms/client/core/analytics/analytics_icon_manager.h>
+#include <nx/vms/client/core/common/utils/private/thread_pool_manager_p.h>
 #include <nx/vms/client/core/event_search/models/visible_item_data_decorator_model.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/network/local_network_interfaces_manager.h>
@@ -145,6 +146,7 @@ struct ApplicationContext::Private
     const ApplicationContext::Mode mode;
     const bool ignoreCustomization = false;
 
+    std::unique_ptr<ThreadPool::Manager> threadPoolManager{new ThreadPool::Manager()};
     std::unique_ptr<QQmlEngine> qmlEngine;
     std::unique_ptr<Settings> settings;
     std::unique_ptr<CloudStatusWatcher> cloudStatusWatcher;
@@ -318,6 +320,11 @@ Settings* ApplicationContext::coreSettings() const
 void ApplicationContext::storeFontConfig(FontConfig* config)
 {
     d->fontConfig.reset(config);
+}
+
+ThreadPool* ApplicationContext::threadPool(const QString& id) const
+{
+    return d->threadPoolManager->get(id);
 }
 
 FontConfig* ApplicationContext::fontConfig() const

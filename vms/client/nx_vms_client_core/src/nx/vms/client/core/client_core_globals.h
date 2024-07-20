@@ -31,10 +31,10 @@ enum CoreItemDataRole
     DescriptionTextRole,            /**< Role for generic description text (QString). */
     TimestampTextRole,              /**< Role for timestamp text (QString). */
     DisplayedResourceListRole,      /**< Resource list displayed in a Right Panel tile (QnResourceList or QStringList). */
-    TimestampMsRole,                /**< Role for some timestamp, in milliseconds since epoch (std::chrono::milliseconds). */
+    TimestampMsRole,                /**< Role for some timestamp, in milliseconds since epoch (qint64). */
     UuidRole,                       /**< Role for target uuid. Used in LoadVideowallMatrixAction. */
     DurationRole,                   /**< Role for duration in microseconds (std::chrono::microseconds). */
-    DurationMsRole,                   /**< Role for duration in microseconds (std::chrono::microseconds). */
+    DurationMsRole,                 /**< Role for duration in milliseconds (qint64). */
 
     CameraBookmarkRole,             /**< Role for the selected camera bookmark (if any). Used in Edit/RemoveBookmarkAction */
     BookmarkTagRole,                /**< Role for bookmark tag. Used in OpenBookmarksSearchAction */
@@ -60,7 +60,7 @@ enum CoreItemDataRole
     ThumbnailRole,                  /**< Role for thumbnail. Value of type QUrl. */
 
     PreviewIdRole,
-    PreviewTimeRole,              /**< Role for camera preview time in microseconds since epoch (std::chrono::microseconds). */
+    PreviewTimeRole,                /**< Role for camera preview time in microseconds since epoch (std::chrono::microseconds). */
     PreviewStateRole,
     PreviewAspectRatioRole,
     PreviewTimeMsRole,
@@ -69,6 +69,9 @@ enum CoreItemDataRole
 
     IsVisibleRole,
     IsHighlightedRole,
+
+    ObjectTitleRole,                /** Role for analytics object title (QString). */
+    HasTitleImageRole,              /** Role for analytics object title image presense (bool). */
 
     CoreItemDataRoleCount
 };

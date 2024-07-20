@@ -313,8 +313,11 @@ void EventRibbon::Private::updateTile(int index)
         }
     }
 
+    auto title = modelIndex.data(core::ObjectTitleRole).toString();
+    if (title.isEmpty())
+        title = modelIndex.data(Qt::DisplayRole).toString();
+
     // Check whether the tile is a special separator tile.
-    const auto title = modelIndex.data(Qt::DisplayRole).toString();
     if (title.isEmpty())
         return;
 

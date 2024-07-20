@@ -30,6 +30,8 @@ public:
 
     QImage image() const { return m_image; }
 
+    QString errorString() const { return m_errorString; }
+
     /**
      * Whether the image is ready and can be queried and used.
      * May be set right after construction if the image was obtained synchronously.
@@ -54,9 +56,16 @@ protected:
      */
     virtual void setImage(const QImage& image);
 
+    /**
+    * Descendants must call this method when an error is encountered.
+    * setImage({}) is automatically called from this function.
+    */
+    void setError(const QString& errorString);
+
 private:
     bool m_ready = false;
     QImage m_image;
+    QString m_errorString;
 };
 
 } // namespace nx::vms::client::core

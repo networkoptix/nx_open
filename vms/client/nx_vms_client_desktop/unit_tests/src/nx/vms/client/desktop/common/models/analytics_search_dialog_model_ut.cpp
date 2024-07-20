@@ -84,6 +84,12 @@ public:
                     + " "
                     + QString::number(row);
 
+            case core::ObjectTitleRole:
+                return
+                    m_attributeManager->displayName(analytics::taxonomy::kTitleAttributeName)
+                    + " "
+                    + QString::number(row);
+
             case core::AnalyticsAttributesRole:
             {
                 AttributeList result;

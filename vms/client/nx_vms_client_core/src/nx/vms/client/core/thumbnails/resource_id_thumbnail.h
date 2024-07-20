@@ -20,7 +20,7 @@ namespace nx::vms::client::core {
  */
 class NX_VMS_CLIENT_CORE_API ResourceIdentificationThumbnail:
     public AbstractCachingResourceThumbnail,
-	public QQmlParserStatus
+    public QQmlParserStatus
 {
     Q_OBJECT
     Q_INTERFACES(QQmlParserStatus)

@@ -326,10 +326,8 @@ Rectangle
             }
         }
 
-        ScrollView
+        RowLayout
         {
-            id: nameValueScrollView
-
             anchors.top: displayColumn.bottom
             anchors.topMargin: 16
             anchors.bottom: parent.bottom
@@ -339,35 +337,100 @@ Rectangle
             anchors.right: parent.right
             anchors.rightMargin: -12
 
-            ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
+            spacing: 16
 
-            contentWidth: availableWidth - 8 //< Mind vertical scrollbar width.
-            contentHeight: attributeTable.height
-            clip: true
-
-            Flickable
+            Column
             {
-                anchors.fill: parent
-                boundsBehavior: Flickable.StopAtBounds
+                id: titleColumn
 
-                NameValueTable
+                Layout.alignment: Qt.AlignTop
+
+                leftPadding: 20
+                rightPadding: 8
+                spacing: 16
+
+                visible: !!(titleText.text || titleImage.imageTrackId)
+
+                Text
                 {
-                    id: attributeTable
+                    id: titleText
 
-                    items: previewPanel.selectedItem ? previewPanel.selectedItem.attributes : []
-                    rawItems: previewPanel.selectedItem ? previewPanel.selectedItem.rawAttributes : []
-                    visible: items.length
-                    width: nameValueScrollView.contentWidth
+                    width: 118
 
-                    copyable: true
-                    copyIconPath: "image://skin/20x20/Outline/to_search.svg"
-                    nameColor: ColorTheme.colors.light16
-                    valueColor: ColorTheme.colors.light10
-                    nameFont { pixelSize: FontConfig.normal.pixelSize; weight: Font.Normal }
-                    valueFont { pixelSize: FontConfig.normal.pixelSize; weight: Font.Normal }
+                    font.pixelSize: 18
+                    font.weight: Font.Medium
 
-                    onSearchRequested: (row) =>
-                        previewPanel.searchRequested(row)
+                    color: ColorTheme.colors.light4
+                    textFormat: Text.PlainText
+
+                    text: previewPanel.selectedItem ? previewPanel.selectedItem.objectTitle : ""
+                    visible: !!text
+
+                    wrapMode: Text.Wrap
+                    maximumLineCount: 2
+                    elide: Text.ElideRight
+                }
+
+                Image
+                {
+                    id: titleImage
+
+                    readonly property string imageTrackId:
+                        previewPanel.selectedItem && previewPanel.selectedItem.hasTitleImage
+                            ? previewPanel.selectedItem.trackId.toSimpleString()
+                            : ""
+
+                    visible: !!imageTrackId
+
+                    source: imageTrackId
+                        ? `image://remote/rest/v3/analytics/objectTracks/${imageTrackId}/titleImage`
+                        : ""
+
+                    NxDotPreloader
+                    {
+                        color: ColorTheme.colors.light10
+                        running: titleImage.status === Image.Loading
+                    }
+                }
+            }
+
+            ScrollView
+            {
+                id: nameValueScrollView
+
+                Layout.fillHeight: true
+                Layout.fillWidth: true
+
+                ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
+
+                contentWidth: availableWidth - 8 //< Mind vertical scrollbar width.
+                contentHeight: attributeTable.height
+                clip: true
+
+                Flickable
+                {
+                    anchors.fill: parent
+                    boundsBehavior: Flickable.StopAtBounds
+
+                    NameValueTable
+                    {
+                        id: attributeTable
+
+                        items: previewPanel.selectedItem ? previewPanel.selectedItem.attributes : []
+                        rawItems: previewPanel.selectedItem ? previewPanel.selectedItem.rawAttributes : []
+                        visible: items.length
+                        width: nameValueScrollView.contentWidth
+
+                        copyable: true
+                        copyIconPath: "image://skin/20x20/Outline/to_search.svg"
+                        nameColor: ColorTheme.colors.light16
+                        valueColor: ColorTheme.colors.light10
+                        nameFont { pixelSize: FontConfig.normal.pixelSize; weight: Font.Normal }
+                        valueFont { pixelSize: FontConfig.normal.pixelSize; weight: Font.Normal }
+
+                        onSearchRequested: (row) =>
+                            previewPanel.searchRequested(row)
+                    }
                 }
             }
         }

@@ -106,7 +106,7 @@ LivePreviewRequest::LivePreviewRequest(
 {
     if (!NX_ASSERT(m_manager))
     {
-        setImage({});
+        setError("Invalid operation");
         return;
     }
 
@@ -118,7 +118,7 @@ LivePreviewRequest::LivePreviewRequest(
     }
 
     m_managerConnections << connect(m_manager, &QObject::destroyed, this,
-        [this]() { setImage({}); });
+        [this]() { setError("Loading cancelled"); });
 
     m_managerConnections <<
         connect(m_manager, &ThumbnailLoadingManager::individualPreviewThumbnailLoaded, this,
