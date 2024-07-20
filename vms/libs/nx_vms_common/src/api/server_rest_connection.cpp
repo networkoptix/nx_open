@@ -427,6 +427,7 @@ ServerConnection::ServerConnection(
 
 void ServerConnection::stop()
 {
+    NX_DEBUG(this, "Stopping...");
     d->httpClientPool->stop(/*invokeCallbacks*/ true);
 }
 

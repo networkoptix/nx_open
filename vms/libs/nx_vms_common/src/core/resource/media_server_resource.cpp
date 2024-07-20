@@ -67,8 +67,7 @@ QnMediaServerResource::QnMediaServerResource():
 QnMediaServerResource::~QnMediaServerResource()
 {
     directDisconnectAll();
-    NX_MUTEX_LOCKER lock(&m_mutex);
-    m_runningIfRequests.clear();
+    stopServerConnection();
 }
 
 void QnMediaServerResource::stopServerConnection()
