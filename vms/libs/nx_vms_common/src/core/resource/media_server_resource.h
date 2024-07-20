@@ -210,7 +210,6 @@ private:
     nx::vms::api::ServerFlags m_serverFlags;
     nx::utils::SoftwareVersion m_version;
     nx::utils::OsInfo m_osInfo;
-    QVector<nx::network::http::AsyncHttpClientPtr> m_runningIfRequests;
     QElapsedTimer m_statusTimer;
     QString m_authKey;
     mutable nx::Mutex m_attributesMutex;
