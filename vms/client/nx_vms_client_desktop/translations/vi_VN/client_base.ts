@@ -11908,7 +11908,7 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>Copy the Access Link and share it with intended user</source>
-      <translation type="unfinished">Copy the Access Link and share it with intended user</translation>
+      <translation>Sao chép Liên kết truy cập và chia sẻ với người dùng mong muốn</translation>
     </message>
   </context>
   <context>
