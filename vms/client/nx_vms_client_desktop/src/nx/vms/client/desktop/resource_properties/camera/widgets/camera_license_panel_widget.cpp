@@ -74,14 +74,19 @@ void CameraLicensePanelWidget::loadState(const CameraSettingsDialogState& state)
 {
     check_box_utils::setupTristateCheckbox(ui->useLicenseCheckBox, state.recording.enabled);
     updateLicensesButton(state);
-    ui->useLicenseCheckBox->setText(tr("Use License", "", state.devicesCount));
+    ui->useLicenseCheckBox->setText(state.saasInitialized
+        ? tr("Use Service", "", state.devicesCount)
+        : tr("Use License", "", state.devicesCount));
+
     setReadOnly(ui->useLicenseCheckBox, state.readOnly);
 }
 
 void CameraLicensePanelWidget::updateLicensesButton(const CameraSettingsDialogState& state)
 {
     ui->moreLicensesButton->setVisible(state.hasPowerUserPermissions
-        && m_licenseUsageProvider && m_licenseUsageProvider->limitExceeded());
+        && !state.saasInitialized
+        && m_licenseUsageProvider
+        && m_licenseUsageProvider->limitExceeded());
 }
 
 } // namespace nx::vms::client::desktop
