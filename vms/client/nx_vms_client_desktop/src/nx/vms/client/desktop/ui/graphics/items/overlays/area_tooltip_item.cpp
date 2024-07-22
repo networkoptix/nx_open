@@ -14,6 +14,7 @@
 #include <nx/vms/client/desktop/ui/graphics/painters/highlighted_area_text_painter.h>
 #include <nx/vms/client/desktop/common/utils/painter_transform_scale_stripper.h>
 #include <nx/vms/client/desktop/ui/graphics/items/overlays/figure/figure.h>
+#include <nx/vms/client/desktop/ini.h>
 
 namespace nx::vms::client::desktop {
 
@@ -264,6 +265,46 @@ void AreaTooltipItem::paint(
     const auto mappedRect = scaleStripper.mapRect(boundingRect());
     const auto pixelRatio = painter->device()->devicePixelRatio();
 
+    static bool drawDirect = !ini().cacheAnalyticsTooltips;
+
+    if (drawDirect)
+    {
+        const auto rect = scaleStripper.mapRect(
+            Geometry::eroded(boundingRect(), kArrowSize.height()));
+
+        painter->save();
+        painter->setClipRect(mappedRect);
+        painter->translate(mappedRect.topLeft());
+
+        if (d->backgroundColor.isValid())
+        {
+            const auto scale = parentWidget()->size();
+            auto arrowPos = arrowPosition(
+                rect,
+                scaleStripper.mapRect(d->figure->boundingRect(scale).translated(-pos())));
+
+            painter->setPen(Qt::NoPen);
+            painter->setBrush(d->backgroundColor);
+            painter->drawRoundedRect(
+                QRectF(rect.topLeft() - mappedRect.topLeft(), rect.size()),
+                kRoundingRadius, kRoundingRadius);
+
+            if (arrowPos.edge != ArrowPosition::kNoEdge)
+                paintArrow(painter, arrowPos.geometry.translated(-mappedRect.topLeft()), static_cast<Qt::Edge>(arrowPos.edge));
+        }
+
+        paintPixmapSharp(
+            painter,
+            d->textPixmap,
+            QPointF(
+                kTooltipMargins.left() + kArrowSize.height(),
+                kTooltipMargins.top() + kArrowSize.height())
+            );
+
+        painter->restore();
+        return;
+    }
+
     if (d->backgroundColor.isValid())
     {
         const auto rect = scaleStripper.mapRect(
@@ -282,7 +323,7 @@ void AreaTooltipItem::paint(
         {
             d->arrowGeometry = arrowPos.geometry;
 
-            QImage image(imageSize, QImage::Format_RGBA8888_Premultiplied);
+            QImage image(imageSize, QImage::Format_ARGB32_Premultiplied);
             image.setDevicePixelRatio(pixelRatio);
             image.fill(Qt::transparent);
 
@@ -319,7 +360,7 @@ void AreaTooltipItem::paint(
 
         if (d->noBackGroundCache.size() != imageSize)
         {
-            QImage image(imageSize, QImage::Format_RGBA8888_Premultiplied);
+            QImage image(imageSize, QImage::Format_ARGB32_Premultiplied);
             image.setDevicePixelRatio(pixelRatio);
             image.fill(Qt::transparent);
 
