@@ -18,12 +18,8 @@ ResourceType resourceType(const QnResourcePtr& resource);
 /**
  * Checks if resource is currently supported and the user has required permissions.
  */
-bool isResourceAvailable(
-    const QnResourcePtr& resource,
-    Qn::Permissions permissions = Qn::ViewContentPermission);
+bool isResourceAvailable(const QnResourcePtr& resource);
 
-QnResourcePtr getResourceIfAvailable(
-    const ResourceUniqueId& resourceId,
-    Qn::Permissions permissions = Qn::ViewContentPermission);
+QnResourcePtr getResourceIfAvailable(const ResourceUniqueId& resourceId);
 
 } // namespace nx::vms::client::desktop::jsapi::detail

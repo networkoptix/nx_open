@@ -49,15 +49,28 @@ bool hasMediaStream(const ResourceType type)
         || type == ResourceType::local_video;
 }
 
-bool isResourceAvailable(const QnResourcePtr& resource, Qn::Permissions permissions)
+bool isResourceAvailable(const QnResourcePtr& resource)
 {
-    return resource
-        && detail::resourceType(resource) != ResourceType::undefined
-        && ResourceAccessManager::hasPermissions(resource, permissions);
+    if (!resource)
+        return false;
+
+    switch (detail::resourceType(resource))
+    {
+        case ResourceType::layout:
+        {
+            return !resource->hasFlags(Qn::ResourceFlag::local) //< Ignore unsaved layouts.
+                && ResourceAccessManager::hasPermissions(resource, Qn::ReadPermission);
+        }
+
+        case ResourceType::undefined:
+            return false;
+
+        default:
+            return ResourceAccessManager::hasPermissions(resource, Qn::ViewContentPermission);
+    }
 }
 
-QnResourcePtr getResourceIfAvailable(
-    const ResourceUniqueId& resourceId, Qn::Permissions permissions)
+QnResourcePtr getResourceIfAvailable(const ResourceUniqueId& resourceId)
 {
     const core::UnifiedResourcePool* pool = appContext()->unifiedResourcePool();
     const auto resource = pool->resource(
@@ -66,7 +79,7 @@ QnResourcePtr getResourceIfAvailable(
             ? appContext()->currentSystemContext()->localSystemId()
             : resourceId.localSystemId);
 
-    return isResourceAvailable(resource, permissions) ? resource : QnResourcePtr{};
+    return isResourceAvailable(resource) ? resource : QnResourcePtr{};
 }
 
 } // namespace nx::vms::client::desktop::jsapi::detail
