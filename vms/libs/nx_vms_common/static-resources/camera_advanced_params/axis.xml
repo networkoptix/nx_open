@@ -123,18 +123,84 @@
                     range="Disabled,Low,Medium,High,Higher,Extreme"
                     internalRange="off,10,20,30,40,50"
                     readCmd="param.cgi"/>
+                <param id="root.Image.I0.MPEG.ZProfile"
+                    name="Profile"
+                    dataType="Enumeration"
+                    range="Classic,Optimized for Storage"
+                    internalRange="classic,storage"
+                    readCmd="param.cgi">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition
+                                    watch="root.Image.I0.MPEG.ZStrength"
+                                    condition="valueNe=Disabled"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
                 <param id="root.Image.I0.MPEG.ZGopMode"
                     name="GOP mode"
                     dataType="Enumeration"
                     range="Fixed,Dynamic"
                     internalRange="fixed,dynamic"
-                    readCmd="param.cgi"/>
+                    readCmd="param.cgi">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition
+                                    watch="root.Image.I0.MPEG.ZStrength"
+                                    condition="valueNe=Disabled"/>
+                            </conditional-show>
+                        </dependencies-show>
+                        <dependencies-ranges>
+                            <conditional-range remove-values-from-range="Fixed">
+                                <condition
+                                    watch="root.Image.I0.MPEG.ZProfile"
+                                    condition="valueNe=Classic"/>
+                            </conditional-range>
+                            <conditional-range add-values-to-range="Fixed">
+                                <condition
+                                    watch="root.Image.I0.MPEG.ZProfile"
+                                    condition="value=Classic"/>
+                            </conditional-range>
+                        </dependencies-ranges>
+                    </dependencies>
+                </param>
+                <param id="root.Image.I0.MPEG.ZMaxGopLength"
+                    name="Max GOP Length"
+                    dataType="Number"
+                    range="1,1023"
+                    readCmd="param.cgi">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition
+                                    watch="root.Image.I0.MPEG.ZGopMode"
+                                    condition="value=Dynamic"/>
+                                <condition
+                                    watch="root.Image.I0.MPEG.ZStrength"
+                                    condition="valueNe=Disabled"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
                 <param id="root.Image.I0.MPEG.ZFpsMode"
                     name="FPS mode"
                     dataType="Enumeration"
                     range="Fixed,Dynamic"
                     internalRange="fixed,dynamic"
-                    readCmd="param.cgi"/>
+                    readCmd="param.cgi">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition
+                                    watch="root.Image.I0.MPEG.ZStrength"
+                                    condition="valueNe=Disabled"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
                 <param id="root.Image.I0.MPEG.ZMinFps"
                     name="Lower FPS limit"
                     description="0 means that the FPS is allowed to go as low as the dynamic frame rate can go. If a value is greater than 0 the dynamic frame rate is not allowed to go below the specified value."
@@ -148,6 +214,9 @@
                                 <condition
                                     watch="root.Image.I0.MPEG.ZFpsMode"
                                     condition="value=Dynamic"/>
+                                <condition
+                                    watch="root.Image.I0.MPEG.ZStrength"
+                                    condition="valueNe=Disabled"/>
                             </conditional-show>
                         </dependencies-show>
                     </dependencies>
