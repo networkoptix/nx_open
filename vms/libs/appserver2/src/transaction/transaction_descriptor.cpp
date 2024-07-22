@@ -2673,12 +2673,15 @@ struct ActionControlAccess
             return std::move(result);
         }
 
-        if (!userAccessInfo.permissions.testFlag(GlobalPermission::generateEvents))
+        if (data.actionType != api::ActionType::cameraOutputAction
+            && !userAccessInfo.permissions.testFlag(GlobalPermission::generateEvents))
         {
             auto userResource = systemContext->resourcePool()->getResourceById(
                 accessData.userId).dynamicCast<QnUserResource>();
             return {ErrorCode::forbidden,
-                ServerApiErrors::tr("the User doesn't have 'generateEvents' permission")};
+                nx::format(
+                    ServerApiErrors::tr("the User %1 doesn't have 'generateEvents' permission"),
+                    userResource ? userResource->getName() : accessData.userId.toString())};
         }
 
         return checkActionPermission(systemContext, accessData, data);
