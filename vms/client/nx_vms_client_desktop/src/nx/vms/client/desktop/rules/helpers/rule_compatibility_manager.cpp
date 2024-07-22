@@ -138,7 +138,7 @@ void RuleCompatibilityManager::fixStateValue()
         {
             // If the current state is not valid use any from the available.
             QSignalBlocker blocker{stateField};
-            stateField->setValue(*availableStates.begin());
+            stateField->setValue(availableStates.first());
         }
     }
 }

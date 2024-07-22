@@ -54,10 +54,10 @@ NX_VMS_RULES_API bool isCompatible(
     const ActionBuilder* actionBuilder);
 
 /**
- * Returns all the available states that can be used with the given rule. These states are
- * the intersection of the states available for the event filter and action builder in
- * the given rule.
+ * Returns sorted list of all the available states that can be used by the StateField with the given
+ * rule. These states are the intersection of the states available for the event filter and action
+ * builder in the given rule.
  */
-NX_VMS_RULES_API QSet<State> getAvailableStates(const Engine* engine, const Rule* rule);
+NX_VMS_RULES_API QList<State> getAvailableStates(const Engine* engine, const Rule* rule);
 
 } // namespace nx::vms::rules::utils
