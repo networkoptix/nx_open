@@ -76,10 +76,14 @@ bool isCompatible(
     return !availableStates.empty();
 }
 
-QSet<State> getAvailableStates(const Engine* engine, const Rule* rule)
+QList<State> getAvailableStates(const Engine* engine, const Rule* rule)
 {
-    return getAvailableStates(engine, rule->eventFilters().first())
-        & getAvailableStates(engine, rule->actionBuilders().first());
+    auto result = (getAvailableStates(engine, rule->eventFilters().first())
+        & getAvailableStates(engine, rule->actionBuilders().first())).values();
+
+    std::sort(result.begin(), result.end());
+
+    return result;
 }
 
 } // namespace nx::vms::rules::utils
