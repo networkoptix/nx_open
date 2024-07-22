@@ -10,6 +10,7 @@
 #include <nx/utils/serialization/qjson.h>
 #include <nx/vms/client/core/resource/unified_resource_pool.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <ui/workbench/workbench_context.h>
 
@@ -116,9 +117,12 @@ Error ResourcesApiBackend::setParameter(
     const QString& name,
     const QJsonValue& value)
 {
-    const QnResourcePtr resource = getResourceIfAvailable(resourceId, Qn::ReadWriteSavePermission);
+    const QnResourcePtr resource = getResourceIfAvailable(resourceId);
     if (!resource)
         return resourceNotFound();
+
+    if (ResourceAccessManager::hasPermissions(resource, Qn::ReadWriteSavePermission))
+        return Error::denied();
 
     resource->setProperty(name, QString::fromStdString(nx::reflect::json::serialize(value)));
     return resource->systemContext()->resourcePropertyDictionary()->saveParams({resource->getId()})
