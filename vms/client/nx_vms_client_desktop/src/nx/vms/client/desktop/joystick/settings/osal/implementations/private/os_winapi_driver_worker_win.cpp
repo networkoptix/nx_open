@@ -71,8 +71,6 @@ OsWinApiDriver::Worker::Worker(QObject* parent)
         return;
     }
 
-    isDirectInputInitialized = true;
-
     devicePollingTimer = new QTimer(this);
     devicePollingTimer->setInterval(100);
     devicePollingTimer->start();
@@ -85,9 +83,6 @@ OsWinApiDriver::Worker::~Worker()
 
 void OsWinApiDriver::Worker::enumerateDevices()
 {
-    if (!isDirectInputInitialized)
-        return;
-
     bool isDevicesChanged = false;
 
     QSet<QString> registeredDeviceIds;
@@ -285,12 +280,20 @@ void OsWinApiDriver::Worker::registerDevice(const OsWinApiDeviceWin::Device& dev
 
 void OsWinApiDriver::Worker::unregisterDeviceById(const QString& deviceId)
 {
+    NX_DEBUG(this, "Unregistering device with id=%1", deviceId);
+
     const auto osWinApiDevice = osWinApiDevices.take(deviceId);
 
     if (!NX_ASSERT(osWinApiDevice))
         return;
 
+    osWinApiDevice->release();
     osWinApiDevice->deleteLater();
+
+    if (!NX_ASSERT(devices.contains(deviceId)))
+        return;
+
+    devices.remove(deviceId);
 }
 
 } // namespace nx::vms::client::desktop::joystick

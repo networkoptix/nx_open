@@ -20,8 +20,6 @@ class QTimer;
 
 namespace nx::vms::client::desktop::joystick {
 
-class OsWinApiDevice;
-
 class OsWinApiDriver::Worker: public QObject
 {
     Q_OBJECT
@@ -51,7 +49,6 @@ public:
     QList<OsWinApiDeviceWin::Device> foundDevices;
 
     LPDIRECTINPUT8 directInput = nullptr; //< Actually, it must be single per app.
-    bool isDirectInputInitialized = false;
 
     struct Subscription
     {
@@ -60,7 +57,7 @@ public:
     };
 
     QMap<QString, QList<Subscription>> deviceSubscribers;
-    QMap<QString, OsalDevice*> osWinApiDevices;
+    QMap<QString, OsWinApiDeviceWin*> osWinApiDevices;
 
     QTimer* devicePollingTimer = nullptr;
 };

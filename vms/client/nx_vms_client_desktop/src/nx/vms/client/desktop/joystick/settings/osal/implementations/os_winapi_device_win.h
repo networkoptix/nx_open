@@ -27,6 +27,8 @@ public:
 
     virtual JoystickDeviceInfo info() const override;
 
+    void release();
+
 protected:
     void poll();
     static bool enumerateObjectsCallback(LPCDIDEVICEOBJECTINSTANCE deviceObject, LPVOID devicePtr);
