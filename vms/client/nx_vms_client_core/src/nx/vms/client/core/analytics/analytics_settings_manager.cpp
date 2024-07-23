@@ -86,7 +86,6 @@ struct AnalyticsSettingsManager::Private
     struct SettingsData: DeviceAgentData
     {
         std::weak_ptr<AnalyticsSettingsListener> listener;
-        DeviceAgentSettingsSession session;
     };
 
     struct Subscription
@@ -254,24 +253,14 @@ void AnalyticsSettingsManager::Private::loadResponseData(
 {
     auto& data = dataByAgentIdRef(id);
 
-    // Data can be received as an API request reply or directly in the transaction. We need to
-    // determine which source is more actual. Session id will be changed when camera jumps onto
-    // another server. Sequence number grows on the server side when model or values are changed.
-    // Empty session id means plugin is disabled currently, so we should always handle it.
-    const bool receivedDataIsNewer = response.session.id.isNull()
-        || response.session.id != data.session.id
-        || response.session.sequenceNumber >= data.session.sequenceNumber;
-
-    data.session = response.session;
-
     // When model is changed on the server side, it's id is re-generated, so we may quickly compare
     // model id first.
-    const bool modelChanged = receivedDataIsNewer && data.model != response.settingsModel;
+    const bool modelChanged = data.model != response.settingsModel;
 
     if (modelChanged)
         data.model = response.settingsModel;
 
-    const bool valuesChanged = receivedDataIsNewer && (data.values != response.settingsValues);
+    const bool valuesChanged = data.values != response.settingsValues;
     if (valuesChanged)
         data.values = response.settingsValues;
 
@@ -281,9 +270,9 @@ void AnalyticsSettingsManager::Private::loadResponseData(
     const bool statusChanged = (data.status != status);
     data.status = status;
 
-    NX_VERBOSE(this, "Store settings for %1, response is actual: %2 "
-        "model changed: %3, values changed: %4, status %5",
-        toString(id), receivedDataIsNewer, modelChanged, valuesChanged, (int)status);
+    NX_VERBOSE(this, "Store settings for %1, "
+        "model changed: %2, values changed: %3, status %4",
+        toString(id), modelChanged, valuesChanged, (int)status);
     if (modelChanged)
         NX_VERBOSE(this, "Updated model:\n%1", data.model);
     if (valuesChanged)

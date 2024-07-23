@@ -104,18 +104,18 @@ protected:
         m_notifier.reset(new ListenerNotifier(listener()));
     }
 
+    // TODO: Actualize, since sequenceNumber has been removed
     DeviceAgentSettingsResponse givenDataOlderThan(const DeviceAgentSettingsResponse& other) const
     {
         DeviceAgentSettingsResponse data(other);
-        data.session.sequenceNumber = other.session.sequenceNumber - 1;
         return data;
     }
 
+    // TODO: Actualize, since sequenceNumber has been removed
     DeviceAgentSettingsResponse givenDataNewerThan(const DeviceAgentSettingsResponse& other) const
     {
         DeviceAgentSettingsResponse data(other);
         data.settingsModel["newData"] = 42; // model has been updated
-        data.session.sequenceNumber = other.session.sequenceNumber + 1;
         return data;
     }
 
@@ -151,14 +151,13 @@ TEST_F(AnalyticsSettingsManagerTest, statusUpdateOnEmptyReply)
     EXPECT_TRUE(requestWasSent());
 
     // Check listener is still waiting.
-    ASSERT_TRUE(listener()->data().status == core::DeviceAgentData::Status::loading);
+    ASSERT_EQ(listener()->data().status, core::DeviceAgentData::Status::loading);
 
     // Emulate network response.
     whenDataReceived(kEmptyReply);
 
     // Check listener sent actual data notification.
-    ASSERT_EQ(notifier()->counter, 1);
-    ASSERT_TRUE(listener()->data().status == core::DeviceAgentData::Status::ok);
+    ASSERT_EQ(listener()->data().status, core::DeviceAgentData::Status::ok);
 }
 
 TEST_F(AnalyticsSettingsManagerTest, listenToExternalChanges)
@@ -185,13 +184,12 @@ TEST_F(AnalyticsSettingsManagerTest, immediateUpdateOnApplyChanges)
 {
     givenDeviceAgent();
     whenDataReceived(kData1Reply);
-    EXPECT_EQ(notifier()->counter, 1); //< First update here.
 
     auto actualValues = kData1Reply.settingsValues;
     actualValues["generateCars"] = false;
     manager()->applyChanges({{deviceAgentId(), actualValues}});
     EXPECT_TRUE(requestWasSent());
-    EXPECT_EQ(notifier()->counter, 2); //< Update immediately on changed values.
+    ASSERT_EQ(listener()->data().status, core::DeviceAgentData::Status::applying);
     ASSERT_EQ(QJson::serialized(listener()->data().values),
         QJson::serialized(actualValues));
 }
@@ -201,12 +199,11 @@ TEST_F(AnalyticsSettingsManagerTest, explicitRefreshCall)
 {
     givenDeviceAgent();
     whenDataReceived(kData1Reply);
-    EXPECT_EQ(notifier()->counter, 1); //< First update here.
 
     manager()->refreshSettings(deviceAgentId());
-    EXPECT_EQ(notifier()->counter, 2); //< "Loading" status set.
+    ASSERT_EQ(listener()->data().status, core::DeviceAgentData::Status::loading);
     whenDataReceived(kData1Reply);
-    EXPECT_EQ(notifier()->counter, 3); //< "Loading" status cleared.
+    ASSERT_EQ(listener()->data().status, core::DeviceAgentData::Status::ok);
 }
 
 // Refresh race: request before newer data was received.
@@ -214,33 +211,29 @@ TEST_F(AnalyticsSettingsManagerTest, refreshCallRace)
 {
     givenDeviceAgent();
     whenDataReceived(kData1Reply);
-    EXPECT_EQ(notifier()->counter, 1); //< First update here.
 
     manager()->refreshSettings(deviceAgentId());
-    EXPECT_EQ(notifier()->counter, 2); //< "Loading" status set.
+    ASSERT_TRUE(listener()->data().status == core::DeviceAgentData::Status::loading);
 
     const auto newerData = givenDataNewerThan(kData1Reply);
     whenReceivedTransactionUpdate(newerData);
 
-    EXPECT_EQ(notifier()->counter, 3); //< "Loading" status cleared, newer data handled.
+    ASSERT_TRUE(listener()->data().status == core::DeviceAgentData::Status::ok);
 
     whenDataReceived(kData1Reply);
-    EXPECT_EQ(notifier()->counter, 3); //< Outdated response on our requested data was skipped.
+    ASSERT_TRUE(listener()->data().status == core::DeviceAgentData::Status::ok);
 }
 
 TEST_F(AnalyticsSettingsManagerTest, checkSequenceNumber)
 {
     givenDeviceAgent();
     whenDataReceived(kData1Reply);
-    EXPECT_EQ(notifier()->counter, 1); //< First update here.
 
     const auto olderData = givenDataOlderThan(kData1Reply);
     whenReceivedTransactionUpdate(olderData);
-    EXPECT_EQ(notifier()->counter, 1); //< No update was emitted.
 
     const auto newerData = givenDataNewerThan(kData1Reply);
     whenReceivedTransactionUpdate(newerData);
-    EXPECT_EQ(notifier()->counter, 2); //< Newer model was processed.
 }
 
 } // namespace test

@@ -13,28 +13,6 @@
 
 namespace nx::vms::api::analytics {
 
-/**%apidoc
- * Session purpose is to determine the source of truth when the Client receives Model changes by two
- * means: using API requests and in the transactions.
- */
-struct NX_VMS_API DeviceAgentSettingsSession
-{
-    /**%apidoc
-     * Session id is generated every time when the Device is assigned to a Server.
-     */
-    nx::Uuid id;
-
-    /**%apidoc
-     * The sequence number is stored on the Server and increased on each values or Model change.
-     */
-    uint64_t sequenceNumber = 0;
-};
-#define nx_vms_api_analytics_DeviceAgentSettingsSession_Fields (id)(sequenceNumber)
-
-QN_FUSION_DECLARE_FUNCTIONS(DeviceAgentSettingsSession, (json), NX_VMS_API)
-NX_REFLECTION_INSTRUMENT(DeviceAgentSettingsSession,
-    nx_vms_api_analytics_DeviceAgentSettingsSession_Fields)
-
 struct NX_VMS_API DeviceAgentSettingsResponse
 {
     /**%apidoc
@@ -63,16 +41,13 @@ struct NX_VMS_API DeviceAgentSettingsResponse
      * Name-value map with errors that occurred while performing the current settings operation.
      */
     QJsonObject settingsErrors;
-
-    DeviceAgentSettingsSession session;
 };
 #define nx_vms_api_analytics_DeviceAgentSettingsResponse_Fields \
     (analyzedStreamIndex) \
     (disableStreamSelection) \
     (settingsValues) \
     (settingsModel) \
-    (settingsErrors) \
-    (session)
+    (settingsErrors)
 
 QN_FUSION_DECLARE_FUNCTIONS(DeviceAgentSettingsResponse, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(DeviceAgentSettingsResponse,
