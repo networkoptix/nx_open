@@ -1,17 +1,16 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include <gtest/gtest.h>
-
 #include <memory>
-#include <qjsonobject.h>
+
+#include <gtest/gtest.h>
 
 #include <QtCore/QFile>
 
 #include <nx/analytics/taxonomy/state_compiler.h>
 #include <nx/analytics/taxonomy/state_helper.h>
-#include <nx/analytics/taxonomy/support/test_resource_support_proxy.h>
 #include <nx/reflect/json/deserializer.h>
 #include <nx/vms/api/analytics/descriptors.h>
+#include <nx/vms/common/test_support/analytics/taxonomy/test_resource_support_proxy.h>
 #include <nx/vms/common/test_support/resource/analytics_engine_resource_mock.h>
 #include <nx/vms/common/test_support/resource/camera_resource_stub.h>
 

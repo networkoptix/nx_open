@@ -1,9 +1,12 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "utils.h"
-#include <qjsonobject.h>
 
 #include <QtCore/QFile>
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonObject>
+
+#include <nx/reflect/json.h>
 
 namespace nx::analytics::taxonomy {
 
@@ -13,10 +16,9 @@ bool loadDescriptorsTestData(const QString& filePath, TestData* outTestData)
     if (!file.open(QFile::ReadOnly))
         return false;
 
-    const QByteArray data = file.readAll();
+    const auto data = file.readAll().toStdString();
 
-    auto [fullData, jsonResult] =
-        nx::reflect::json::deserialize<QJsonObject>(data.toStdString());
+    auto [fullData, jsonResult] = nx::reflect::json::deserialize<QJsonObject>(data);
 
     outTestData->fullData = fullData;
 
@@ -24,13 +26,13 @@ bool loadDescriptorsTestData(const QString& filePath, TestData* outTestData)
         return false;
 
     const QJsonObject maybeDescriptors = outTestData->fullData.contains("descriptors")
-            ? outTestData->fullData["descriptors"].toObject()
-            : outTestData->fullData;
+        ? outTestData->fullData["descriptors"].toObject()
+        : outTestData->fullData;
 
-    const QByteArray maybeDescriptorsAsBytes = QJsonDocument(maybeDescriptors).toJson();
-
+    const auto maybeDescriptorsAsBytes = QJsonDocument(maybeDescriptors).toJson().toStdString();
     auto [deserializedDescriptors, result] =
-        nx::reflect::json::deserialize<nx::vms::api::analytics::Descriptors>(maybeDescriptorsAsBytes.toStdString());
+        nx::reflect::json::deserialize<nx::vms::api::analytics::Descriptors>(
+            maybeDescriptorsAsBytes);
 
     outTestData->descriptors = deserializedDescriptors;
 

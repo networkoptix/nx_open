@@ -6,12 +6,13 @@
 
 namespace nx::analytics::taxonomy {
 
-struct TestData
+struct NX_VMS_COMMON_TEST_SUPPORT_API TestData
 {
     nx::vms::api::analytics::Descriptors descriptors;
     QJsonObject fullData;
 };
 
-bool loadDescriptorsTestData(const QString& filePath, TestData* outTestData);
+NX_VMS_COMMON_TEST_SUPPORT_API bool loadDescriptorsTestData(
+    const QString& filePath, TestData* outTestData);
 
 } // namespace nx::analytics::taxonomy
