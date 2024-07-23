@@ -24,9 +24,6 @@ using namespace nx::vms::rules::utils;
 using namespace nx::vms::rules;
 using namespace nx::vms;
 
-constexpr char kStartOfSubstitutionSymbol = '{';
-constexpr char kEndOfSubstitutionSymbol = '}';
-constexpr char kGroupSeparatorSymbol = '.';
 constexpr int kSubgroupStart = 2;
 const auto kEventAttributesPrefix = QStringLiteral("event.attributes.");
 
