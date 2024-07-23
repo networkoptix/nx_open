@@ -35,6 +35,8 @@ struct OsWinApiDeviceWin::Private
     int minZ, maxZ;
 
     int buttonsNumber = 0;
+
+    QMetaObject::Connection pollingConnection;
 };
 
 OsWinApiDeviceWin::OsWinApiDeviceWin(const Device& device, QTimer* pollingTimer):
@@ -54,7 +56,8 @@ OsWinApiDeviceWin::OsWinApiDeviceWin(const Device& device, QTimer* pollingTimer)
     if (!NX_ASSERT(d->pollingTimer))
         return;
 
-    connect(d->pollingTimer, &QTimer::timeout, this, &OsWinApiDeviceWin::poll);
+    d->pollingConnection = connect(d->pollingTimer, &QTimer::timeout, this,
+        &OsWinApiDeviceWin::poll);
 }
 
 OsWinApiDeviceWin::~OsWinApiDeviceWin()
@@ -64,6 +67,16 @@ OsWinApiDeviceWin::~OsWinApiDeviceWin()
 JoystickDeviceInfo OsWinApiDeviceWin::info() const
 {
     return d->device.info;
+}
+
+void OsWinApiDeviceWin::release()
+{
+    disconnect(d->pollingConnection);
+
+    if (!NX_ASSERT(d->device.inputDevice))
+        return;
+
+    d->device.inputDevice->Release();
 }
 
 void OsWinApiDeviceWin::poll()
