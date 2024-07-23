@@ -13,7 +13,7 @@ class NX_VMS_COMMON_API AbstractStateWatcher: public QObject
     Q_OBJECT
 
 public:
-    AbstractStateWatcher(QObject* parent): QObject(parent) {}
+    AbstractStateWatcher(QObject* parent = nullptr): QObject(parent) {}
 
     virtual ~AbstractStateWatcher() {}
 
