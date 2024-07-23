@@ -172,8 +172,11 @@ void Completer::Private::updateCompleter(int cursorPosition, const QString& text
     currentWord.begin = startOfSubstitution == -1 ? 0 : startOfSubstitution;
 
     const auto spaceAfterWord = text.indexOf(spacePattern, cursorPosition);
-    const auto wordEnd = spaceAfterWord == -1 ? text.size() : spaceAfterWord;
-    currentWord.length = wordEnd - currentWord.begin;
+    const auto separatorAfterWord = text.indexOf(q->m_separatorPattern, cursorPosition);
+    auto wordEnd = spaceAfterWord == -1 ? text.size() : spaceAfterWord;
+    wordEnd = std::min(wordEnd, separatorAfterWord == -1 ? text.size() : separatorAfterWord);
+    currentWord.length = (wordEnd == separatorAfterWord) ? (wordEnd - currentWord.begin + 1)
+                                                         : (wordEnd - currentWord.begin);
 
     const auto currentWordSlice =
         textBeforeCursor.sliced(currentWord.begin, cursorPosition - currentWord.begin);
@@ -225,6 +228,13 @@ bool Completer::containsElement(const QString& element)
         return d->completerModel->isCorrectParameter(element);
 
     return true; // TODO: #vbutkevich need to add solution for other types of models
+}
+
+void Completer::addSpaceChar(char c)
+{
+    m_separatorChars.append(QString(c));
+    m_separatorPattern = QRegularExpression(
+        "[" + m_separatorChars.join("") + "]", QRegularExpression::CaseInsensitiveOption);
 }
 
 Completer::Completer(EventParametersModel* model, QTextEdit* textEdit, QObject* parent):

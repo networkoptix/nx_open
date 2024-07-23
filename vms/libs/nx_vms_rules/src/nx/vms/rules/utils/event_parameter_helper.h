@@ -9,6 +9,10 @@ namespace nx::vms::common { class SystemContext; }
 
 namespace nx::vms::rules::utils {
 
+constexpr char kStartOfSubstitutionSymbol = '{';
+constexpr char kEndOfSubstitutionSymbol = '}';
+constexpr char kGroupSeparatorSymbol = '.';
+
 class NX_VMS_RULES_API EventParameterHelper
 {
 public:

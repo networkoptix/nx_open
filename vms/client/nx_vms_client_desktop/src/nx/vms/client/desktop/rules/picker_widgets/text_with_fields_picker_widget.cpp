@@ -126,6 +126,8 @@ TextWithFieldsPicker::TextWithFieldsPicker(
     d(new Private(this))
 {
     d->completer = new Completer{nullptr, m_textEdit, this};
+    d->completer->addSpaceChar(kStartOfSubstitutionSymbol);
+    d->completer->addSpaceChar(kEndOfSubstitutionSymbol);
 }
 
 TextWithFieldsPicker::~TextWithFieldsPicker()

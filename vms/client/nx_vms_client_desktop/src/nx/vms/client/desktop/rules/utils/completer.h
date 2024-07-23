@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <QRegularExpression>
+
 #include <QtCore/QAbstractListModel>
 #include <QtWidgets/QCompleter>
 #include <QtWidgets/QLineEdit>
@@ -26,6 +28,7 @@ public:
      */
     void setModel(EventParametersModel* model);
     bool containsElement(const QString& element);
+    void addSpaceChar(char c);
 
 protected:
     bool eventFilter(QObject* obj, QEvent* event) override;
@@ -33,6 +36,8 @@ protected:
 private:
     struct Private;
     nx::utils::ImplPtr<Private> d;
+    QRegularExpression m_separatorPattern{"\\s", QRegularExpression::CaseInsensitiveOption};
+    QStringList m_separatorChars;
 };
 
 } // namespace nx::vms::client::desktop::rules
