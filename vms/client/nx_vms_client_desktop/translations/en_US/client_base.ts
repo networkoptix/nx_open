@@ -7723,6 +7723,13 @@ If you intended to move analytics data to another storage location, please conta
             <numerusform>Use Licenses</numerusform>
         </translation>
     </message>
+    <message numerus="yes">
+        <source>Use Service</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::CameraMotionSettingsWidget</name>
