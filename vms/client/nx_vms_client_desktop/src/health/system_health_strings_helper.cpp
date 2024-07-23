@@ -135,7 +135,7 @@ QString QnSystemHealthStringsHelper::messageNotificationTitle(MessageType messag
 
         case MessageType::metadataOnSystemStorage:
         {
-            return resources.isEmpty()
+            return resources.size() == 1
                 ? tr("Site storage is used for analytics data")
                 : tr("Site storage is used for analytics data on %n servers",
                       "",
