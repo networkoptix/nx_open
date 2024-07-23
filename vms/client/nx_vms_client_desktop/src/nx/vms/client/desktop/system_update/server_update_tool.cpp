@@ -115,8 +115,12 @@ ServerUpdateTool::~ServerUpdateTool()
 
     saveInternalState();
     m_downloader->disconnect(this);
-    m_serverConnection->stop();
-    m_serverConnection.reset();
+    if (m_serverConnection)
+    {
+        m_serverConnection->stop();
+        m_serverConnection.reset();
+    }
+
     NX_VERBOSE(this) << "~ServerUpdateTool() done";
 }
 
