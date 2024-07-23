@@ -620,7 +620,7 @@ void QnAuditLogDialog::setupCheckboxes()
     setupFilterCheckbox(ui->checkBoxServers,
         colorTheme()->color("auditLog.actions.updateServer"),
         Qn::AR_ServerUpdate | Qn::AR_ServerRemove | Qn::AR_StorageInsert | Qn::AR_StorageUpdate
-            | Qn::AR_StorageRemove);
+            | Qn::AR_StorageRemove | Qn::AR_ProxySession);
     setupFilterCheckbox(ui->checkBoxBRules,
         colorTheme()->color("auditLog.actions.rules"),
         Qn::AR_BEventUpdate | Qn::AR_BEventRemove | Qn::AR_BEventReset);

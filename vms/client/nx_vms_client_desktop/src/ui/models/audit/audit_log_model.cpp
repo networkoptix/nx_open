@@ -486,6 +486,30 @@ QString QnAuditLogModel::eventDescriptionText(const QnLegacyAuditRecord* data) c
                 nx::branding::cloudName(),
                 data->authSession.userAgent);
             break;
+        case Qn::AR_ProxySession:
+        {
+            if (data->rangeEndSec)
+            {
+                result = nx::format(
+                    tr("%1 - %2, Duration: %3, Target: %4",
+                        "%1 is start time of proxy connection, %2 is end time of proxy connection, "
+                        "%3 is proxy connection duration, %4 is proxy connection target address"),
+                    formatDateTime(data->rangeStartSec),
+                    formatDateTime(data->rangeEndSec),
+                    formatDuration(data->rangeEndSec - data->rangeStartSec),
+                    data->extractParam("target"));
+            }
+            else
+            {
+                result = nx::format(
+                    tr("Start time: %1, Target: %2",
+                        "%1 is start time of proxy connection, "
+                        "%2 is proxy connection target address"),
+                    formatDateTime(data->rangeStartSec),
+                    data->extractParam("target"));
+            }
+            break;
+        }
         default:
             result = getResourcesString(data->resources);
     }
@@ -843,6 +867,7 @@ QVariant QnAuditLogModel::colorForType(Qn::LegacyAuditRecordType actionType) con
     case Qn::AR_StorageRemove:
     case Qn::AR_ServerUpdate:
     case Qn::AR_ServerRemove:
+    case Qn::AR_ProxySession:
         return core::colorTheme()->color("auditLog.actions.updateServer");
     case Qn::AR_BEventReset:
     case Qn::AR_BEventUpdate:
