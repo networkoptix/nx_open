@@ -4,6 +4,8 @@
 
 #include <optional>
 
+#include <nx/utils/std/algorithm.h>
+
 #include "abstract_event_type.h"
 #include "abstract_group.h"
 #include "abstract_object_type.h"
@@ -183,6 +185,43 @@ QList<QString> getAttributesNames(const AbstractState* taxonomyState, const QStr
 
     addAttributesRecursive(taxonomyState->objectTypeById(objectId), {});
     return result;
+}
+
+NX_VMS_COMMON_API AbstractAttribute* findAttributeByName(
+    const AbstractState* taxonomyState, const QString& objectTypeId, const QString& name)
+{
+    auto findAttribute = nx::utils::y_combinator(
+        [](auto findAttribute, const AbstractObjectType* objectType, const QString& name)
+            -> AbstractAttribute*
+        {
+            if (!objectType)
+                return nullptr;
+
+            for (AbstractAttribute* attribute: objectType->attributes())
+            {
+                const QString& attributeName = attribute->name();
+
+                if (attributeName == name)
+                    return attribute;
+
+                if (attribute->type() == AbstractAttribute::Type::object
+                    && name.startsWith(attributeName)
+                    && name.size() > attributeName.size()
+                    && name[attributeName.size()] == '.')
+                {
+                    AbstractAttribute* result = findAttribute(
+                        attribute->objectType(), name.mid(attributeName.size() + 1));
+
+                    if (result)
+                        return result;
+                }
+            }
+
+            return nullptr;
+        }
+    );
+
+    return findAttribute(taxonomyState->objectTypeById(objectTypeId), name);
 }
 
 // TODO: Remove later, when the code debt issue described below is fixed.

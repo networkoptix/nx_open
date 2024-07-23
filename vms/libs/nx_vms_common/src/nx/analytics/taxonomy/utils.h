@@ -53,4 +53,7 @@ QString maybeUnscopedExtendedObjectTypeId(const QString& scopedExtendedObjectTyp
 NX_VMS_COMMON_API QList<QString> getAttributesNames(
     const AbstractState* taxonomyState, const QString& objectId);
 
+NX_VMS_COMMON_API AbstractAttribute* findAttributeByName(
+    const AbstractState* taxonomyState, const QString& objectTypeId, const QString& name);
+
 } // namespace nx::analytics::taxonomy

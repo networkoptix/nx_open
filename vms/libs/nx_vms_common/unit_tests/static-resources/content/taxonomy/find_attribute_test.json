@@ -1,0 +1,51 @@
+{
+    "descriptors": {
+        "objectTypeDescriptors": {
+            "objectType1": {
+                "id": "objectType1",
+                "attributes": [
+                    { "name": "attribute1", "type": "String" },
+                    { "name": "attribute2", "type": "String" },
+                    { "name": "attribute3", "type": "String" },
+                    { "name": "objectAttribute", "type": "Object", "subtype": "objectType2" }
+                ]
+            },
+            "derivedFromObjectType1": {
+                "id": "derivedFromObjectType1",
+                "base": "objectType1"
+            },
+            "derivedFromDerivedFromObjectType1": {
+                "id": "derivedFromDerivedFromObjectType1",
+                "base": "derivedFromObjectType1"
+            },
+            "objectType2": {
+                "id": "objectType2",
+                "attributes": [
+                    { "name": "attribute1", "type": "String" },
+                    { "name": "attribute2", "type": "String" },
+                    { "name": "attribute3", "type": "String" }
+                ]
+            }
+        }
+    },
+    "tests": {
+        "simpleLookup": {
+            "objectType": "objectType1",
+            "attribute": "attribute2"
+        },
+        "missingAttribute": {
+            "objectType": "objectType1",
+            "attribute": "nonExistingAttribute",
+            "shouldBeFound": false
+        },
+        "lookupInTheBaseObject": {
+            "objectType": "derivedFromDerivedFromObjectType1",
+            "attribute": "attribute2"
+        },
+        "lookupNestedAttribute": {
+            "objectType": "objectType1",
+            "attribute": "objectAttribute.attribute2",
+            "expectedName": "attribute2"
+        }
+    }
+}
