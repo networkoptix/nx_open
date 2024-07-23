@@ -90,6 +90,8 @@ void OsWinApiDriver::Worker::enumerateDevices()
 
     bool isDevicesChanged = false;
 
+    QSet<QString> registeredDeviceIds;
+
     for (const auto& device: foundDevices)
     {
         if (devices.contains(device.info.id))
@@ -100,6 +102,7 @@ void OsWinApiDriver::Worker::enumerateDevices()
 
         devices[device.info.id] = device;
         registerDevice(device);
+        registeredDeviceIds.insert(device.info.id);
 
         isDevicesChanged = true;
     }
@@ -119,6 +122,14 @@ void OsWinApiDriver::Worker::enumerateDevices()
         unregisterDeviceById(disappearedDeviceId);
 
         isDevicesChanged = true;
+    }
+
+    for (const auto& device: foundDevices)
+    {
+        if (registeredDeviceIds.contains(device.info.id))
+            continue;
+
+        device.inputDevice->Release();
     }
 
     if (isDevicesChanged)
