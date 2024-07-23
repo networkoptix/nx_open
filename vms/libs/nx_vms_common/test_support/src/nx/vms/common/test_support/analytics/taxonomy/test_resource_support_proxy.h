@@ -6,7 +6,7 @@
 
 namespace nx::analytics::taxonomy {
 
-class TestResourceSupportProxy: public AbstractResourceSupportProxy
+class NX_VMS_COMMON_TEST_SUPPORT_API TestResourceSupportProxy: public AbstractResourceSupportProxy
 {
 public:
     TestResourceSupportProxy();

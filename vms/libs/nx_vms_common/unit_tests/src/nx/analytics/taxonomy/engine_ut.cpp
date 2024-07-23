@@ -1,16 +1,15 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include <gtest/gtest.h>
-
 #include <optional>
+
+#include <gtest/gtest.h>
 
 #include <QtCore/QFile>
 
-#include <nx/analytics/taxonomy/support/utils.h>
-#include <nx/analytics/taxonomy/support/test_resource_support_proxy.h>
 #include <nx/analytics/taxonomy/state_compiler.h>
-
 #include <nx/reflect/json/deserializer.h>
+#include <nx/vms/common/test_support/analytics/taxonomy/test_resource_support_proxy.h>
+#include <nx/vms/common/test_support/analytics/taxonomy/utils.h>
 
 using namespace nx::vms::api::analytics;
 
