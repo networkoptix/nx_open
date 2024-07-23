@@ -100,7 +100,6 @@ ListenerNotifier::ListenerNotifier(const core::AnalyticsSettingsListenerPtr& lis
         [this](const core::DeviceAgentData& data)
         {
             lastData = data;
-            ++counter;
         });
 }
 

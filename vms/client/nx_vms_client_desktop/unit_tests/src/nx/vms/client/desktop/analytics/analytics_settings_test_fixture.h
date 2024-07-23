@@ -81,7 +81,6 @@ public:
     ListenerNotifier(const core::AnalyticsSettingsListenerPtr& listener);
 
     core::DeviceAgentData lastData;
-    int counter = 0;
 };
 
 class AnalyticsSettingsTestFixture: public ContextBasedTest
