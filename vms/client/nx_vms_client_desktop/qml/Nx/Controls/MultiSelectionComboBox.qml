@@ -259,7 +259,10 @@ Control
                         onYChanged:
                         {
                             // Set the maximum height when the position of the item is known.
-                            if (index == popup.maxVisibleItems - 1)
+                            const lastVisibleItemIndex =
+                                Math.min(popup.maxVisibleItems, control.model.count) - 1
+
+                            if (index == lastVisibleItemIndex)
                                 listView.Layout.maximumHeight = y + height
                         }
 
