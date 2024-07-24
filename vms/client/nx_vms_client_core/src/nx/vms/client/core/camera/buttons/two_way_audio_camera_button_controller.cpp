@@ -68,6 +68,9 @@ bool TwoWayAudioCameraButtonController::Private::start(const CameraButton& butto
     const bool result = controller->start(
         [this, button](bool success)
         {
+            if (!success)
+                q->removeActiveAction(button.id);
+
             if (success && button.type == CameraButton::Type::checkable)
                 setButtonChecked(button, /*checked*/ true);
 

@@ -5,16 +5,30 @@
 #include <QtMultimedia/QAudioDevice>
 #include <QtMultimedia/QMediaDevices>
 
+#include <nx/build_info.h>
+
 #include "desktop_audio_only_resource.h"
 
 namespace nx::vms::client::core {
 
+namespace {
+
+bool hasAudioInputs()
+{
+    // Assume that we have a mic on mobile platforms to avoid requesting permissions at app launch.
+    if (nx::build_info::isAndroid() || nx::build_info::isIos())
+        return true;
+
+    return !QMediaDevices::audioInputs().isEmpty();
+}
+
+} // namespace
+
 QnResourceList DesktopAudioOnlyResourceSearcherImpl::findResources()
 {
     QnResourceList result;
-    const auto availableDevices = QMediaDevices::audioInputs();
 
-    if (!availableDevices.isEmpty())
+    if (hasAudioInputs())
         result << QnResourcePtr(new DesktopAudioOnlyResource());
 
     return result;
