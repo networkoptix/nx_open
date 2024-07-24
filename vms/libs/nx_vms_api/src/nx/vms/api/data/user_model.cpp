@@ -188,7 +188,7 @@ std::vector<UserModelV3> UserModelV3::fromDbTypes(DbListTypes data)
 
 void TemporaryToken::generateToken()
 {
-    token = kPrefix + nx::utils::random::generateName(10);
+    token = kPrefix + nx::utils::random::generateName(30);
 }
 
 bool TemporaryToken::isValid() const
