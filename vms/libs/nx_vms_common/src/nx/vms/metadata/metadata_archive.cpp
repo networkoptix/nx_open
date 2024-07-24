@@ -242,6 +242,37 @@ int MetadataArchive::aggregationIntervalSeconds() const
     return m_aggregationIntervalSeconds;
 }
 
+int64_t MetadataArchive::recordCount() const
+{
+    MetadataHelper helper(m_dataDir);
+    QList<QDate> existingRecords = helper.recordedMonth(m_physicalId);
+    if (existingRecords.isEmpty())
+        return 0;
+
+    int64_t result = 0;
+    int64_t startTimeMs = existingRecords.first().startOfDay().toMSecsSinceEpoch();
+    int64_t endTimeMs = existingRecords.last().startOfDay().addMonths(1).toMSecsSinceEpoch() - 1;
+    while (startTimeMs <= endTimeMs)
+    {
+        qint64 minTime, maxTime;
+        const auto timePointMs = startTimeMs;
+        dateBounds(timePointMs, minTime, maxTime);
+
+        auto indexFile = MetadataBinaryFileFactory::instance().create();
+        fillFileNames(timePointMs, indexFile.get());
+        if (!indexFile->openReadOnly())
+        {
+            NX_WARNING(this, "%1: Failed to open index file %2", __func__, indexFile->fileName());
+            continue;
+        }
+
+        result += (indexFile->size() - kMetadataIndexHeaderSize) / kIndexRecordSize;
+        startTimeMs = maxTime + 1;
+    }
+
+    return result;
+}
+
 QString MetadataArchive::getFilePrefix(const QDate& datetime) const
 {
     MetadataHelper helper(m_dataDir);
@@ -802,8 +833,6 @@ QnTimePeriodList MetadataArchive::matchPeriodInternal(
 
             if (recordMatcher->isEmpty() || metadataFile->openReadOnly())
             {
-                const int recordSize = noGeometryMode
-                    ? index.header.noGeometryRecordSize() : index.header.recordSize;
                 if (metadataFile->isOpen())
                     index.truncateToBytes(metadataFile->size(), noGeometryMode);
 

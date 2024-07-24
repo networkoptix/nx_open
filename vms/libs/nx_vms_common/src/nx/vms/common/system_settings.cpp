@@ -111,6 +111,7 @@ struct SystemSettings::Private
     QnResourcePropertyAdaptor<QString>* lastMergeSlaveIdAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* statisticsReportServerApiAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* clientStatisticsSettingsUrlAdaptor = nullptr;
+    QnResourcePropertyAdaptor<std::chrono::seconds>* deviceStorageInfoUpdateIntervalSAdaptor = nullptr;
 
     // set of email settings adaptors
     QnResourcePropertyAdaptor<nx::vms::api::EmailSettings>* emailSettingsAdaptor = nullptr;
@@ -347,6 +348,11 @@ SystemSettings::AdaptorList SystemSettings::initStaticticsAdaptors()
         "clientStatisticsSettingsUrl", QString(), this,
         [] { return tr("Anonymous statistics report Client settings"); });
 
+    d->deviceStorageInfoUpdateIntervalSAdaptor =
+        new QnJsonResourcePropertyAdaptor<std::chrono::seconds>(
+            "deviceStorageInfoUpdateIntervalS", 7 * 24 * 3600 * 1s, this,
+            [] { return tr("Device storage information update interval"); });
+
     connect(
         d->statisticsAllowedAdaptor,
         &QnAbstractResourcePropertyAdaptor::valueChanged,
@@ -363,7 +369,8 @@ SystemSettings::AdaptorList SystemSettings::initStaticticsAdaptors()
         << d->statisticsReportTimeCycleAdaptor
         << d->statisticsReportUpdateDelayAdaptor
         << d->statisticsReportServerApiAdaptor
-        << d->clientStatisticsSettingsUrlAdaptor;
+        << d->clientStatisticsSettingsUrlAdaptor
+        << d->deviceStorageInfoUpdateIntervalSAdaptor;
 
     return result;
 }
@@ -1691,6 +1698,16 @@ void SystemSettings::setLastMergeSlaveId(const nx::Uuid& value)
 nx::utils::Url SystemSettings::clientStatisticsSettingsUrl() const
 {
     return nx::utils::Url::fromUserInput(d->clientStatisticsSettingsUrlAdaptor->value().trimmed());
+}
+
+std::chrono::seconds SystemSettings::deviceStorageInfoUpdateInterval() const
+{
+    return d->deviceStorageInfoUpdateIntervalSAdaptor->value();
+}
+
+void SystemSettings::setDeviceStorageInfoUpdateInterval(std::chrono::seconds value)
+{
+    d->deviceStorageInfoUpdateIntervalSAdaptor->setValue(value);
 }
 
 QString SystemSettings::statisticsReportServerApi() const

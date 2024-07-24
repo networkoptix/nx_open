@@ -85,6 +85,7 @@ struct SystemSettingNames
     DECLARE_SETTING_NAME(webSocketEnabled);
     DECLARE_SETTING_NAME(pixelationSettings);
     DECLARE_SETTING_NAME(proxyConnectionAccessPolicy);
+    DECLARE_SETTING_NAME(deviceStorageInfoUpdateIntervalS);
 
     static const inline std::set<QString> kReadOnlyNames = {
         cloudAccountName,
@@ -275,6 +276,9 @@ public:
     void setLastMergeSlaveId(const nx::Uuid& value);
 
     nx::utils::Url clientStatisticsSettingsUrl() const;
+
+    std::chrono::seconds deviceStorageInfoUpdateInterval() const;
+    void setDeviceStorageInfoUpdateInterval(std::chrono::seconds value);
 
     QString statisticsReportServerApi() const;
     void setStatisticsReportServerApi(const QString& value);
