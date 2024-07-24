@@ -114,6 +114,7 @@ const SaveableSettingsBase kDefaultSettingsBase{
     .crossdomainEnabled = false,
     .currentStorageEncryptionKey = QByteArray{},
     .defaultVideoCodec = QString{"h263p"},
+    .deviceStorageInfoUpdateIntervalS = 604800s,
     .disabledVendors = QString{},
     .downloaderPeers = QMap<QString, QList<nx::Uuid>>{},
     .ec2AliveUpdateIntervalSec = 60,

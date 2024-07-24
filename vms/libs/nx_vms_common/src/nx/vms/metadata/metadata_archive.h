@@ -141,6 +141,7 @@ public:
     int wordSize() const;
     int getChannel() const;
     int aggregationIntervalSeconds() const;
+    int64_t recordCount() const;
 
     QString physicalId() const;
     QString getFilePrefix(const QDate& datetime) const;

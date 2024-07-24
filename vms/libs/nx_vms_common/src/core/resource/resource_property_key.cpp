@@ -90,6 +90,8 @@ const QString kTimeSyncEnabledOnceDueToRemoteArchiveSync("timeSyncEnabledOnceDue
 
 const QString kNoVideoSupport("noVideoSupport");
 
+const QString kStorageInfo("storageInfo");
+
 namespace Onvif {
 
 const QString kMediaUrl("MediaUrl");

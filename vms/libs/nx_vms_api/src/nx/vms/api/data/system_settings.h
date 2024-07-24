@@ -68,6 +68,7 @@ struct SaveableSettingsBase
     std::optional<bool> crossdomainEnabled;
     std::optional<QByteArray> currentStorageEncryptionKey;
     std::optional<QString> defaultVideoCodec;
+    std::optional<std::chrono::seconds> deviceStorageInfoUpdateIntervalS;
     std::optional<QString> disabledVendors;
     std::optional<QMap<QString, QList<nx::Uuid>>> downloaderPeers;
     std::optional<int> ec2AliveUpdateIntervalSec; //< TODO: Make std::chrono.
@@ -147,6 +148,7 @@ struct SaveableSettingsBase
     (crossdomainEnabled) \
     (currentStorageEncryptionKey) \
     (defaultVideoCodec) \
+    (deviceStorageInfoUpdateIntervalS) \
     (disabledVendors) \
     (downloaderPeers) \
     (ec2AliveUpdateIntervalSec) \
