@@ -35,7 +35,8 @@ bool mimeFormatsIntersects(const QStringList& firstMimeFormats,
     return nx::utils::toQSet(firstMimeFormats).intersects(nx::utils::toQSet(secondMimeFormats));
 }
 
-bool hasNodeType(const QModelIndex& index,
+bool hasNodeType(
+    const QModelIndex& index,
     nx::vms::client::desktop::ResourceTree::NodeType nodeType)
 {
     if (!index.isValid())
@@ -48,6 +49,23 @@ bool hasNodeType(const QModelIndex& index,
     return nodeTypeData.value<nx::vms::client::desktop::ResourceTree::NodeType>() == nodeType;
 }
 
+bool hasTopLevelNodeType(
+    const QModelIndex& index,
+    nx::vms::client::desktop::ResourceTree::NodeType nodeType)
+{
+    if (!index.isValid())
+        return false;
+
+    if (!index.parent().isValid())
+        return hasNodeType(index, nodeType);
+
+    auto topLevelParent = index.parent();
+    while (topLevelParent.parent().isValid())
+        topLevelParent = topLevelParent.parent();
+
+    return hasNodeType(topLevelParent, nodeType);
+}
+
 bool hasResourceFlags(const QModelIndex& index, Qn::ResourceFlags resourceFlags)
 {
     if (!index.isValid())
@@ -55,6 +73,28 @@ bool hasResourceFlags(const QModelIndex& index, Qn::ResourceFlags resourceFlags)
 
     const auto resource = index.data(ResourceRole).value<QnResourcePtr>();
     return resource && resource->hasFlags(resourceFlags);
+}
+
+bool isWebPage(const QnResourcePtr& resource)
+{
+    if (const auto webPageResource = resource.dynamicCast<QnWebPageResource>())
+        return webPageResource->subtype() == nx::vms::api::WebPageSubtype::none;
+    return false;
+}
+
+bool isIntegration(const QnResourcePtr& resource)
+{
+    if (const auto webPageResource = resource.dynamicCast<QnWebPageResource>())
+        return webPageResource->subtype() == nx::vms::api::WebPageSubtype::clientApi;
+    return false;
+}
+
+bool mimeDataResourcesMatches(
+    const nx::vms::client::desktop::MimeData& mimeData,
+    std::function<bool(const QnResourcePtr&)> predicate)
+{
+    const auto resources = mimeData.resources();
+    return std::all_of(resources.begin(), resources.end(), predicate);
 }
 
 QnMediaServerResourcePtr parentServer(const QModelIndex& index)
@@ -243,11 +283,25 @@ bool ResourceTreeDragDropDecoratorModel::canDropMimeData(const QMimeData* mimeDa
     if (!targetIndex.isValid())
         return false;
 
-    if (ini().webPagesAndIntegrations
-        && (hasNodeType(targetIndex, NodeType::webPages)
-            || hasNodeType(targetIndex, NodeType::integrations)))
+    // Do not allow to drop anything than web pages and integrations into corresponding groups.
+    if (ini().webPagesAndIntegrations) //< Separate "Web Pages" and "Integrations" top level items.
     {
-        return false;
+        if (hasTopLevelNodeType(targetIndex, NodeType::webPages))
+            return mimeDataResourcesMatches(data, isWebPage);
+
+        if (hasTopLevelNodeType(targetIndex, NodeType::integrations))
+            return mimeDataResourcesMatches(data, isIntegration);
+    }
+    else //< Both Web Pages and Integrations are grouped by "Web Pages" parent item.
+    {
+        if (hasTopLevelNodeType(targetIndex, NodeType::webPages))
+        {
+            return mimeDataResourcesMatches(data,
+                [](const QnResourcePtr& resource)
+                {
+                    return isWebPage(resource) || isIntegration(resource);
+                });
+        }
     }
 
     // Don't allow to drop camera items from layouts to the main devices tree.
@@ -296,6 +350,8 @@ bool ResourceTreeDragDropDecoratorModel::dropMimeData(const QMimeData* mimeData,
         return true;
     }
 
+    // TODO: #vbreus Get clear specification regarding un-proxying web pages by drag-and-drop
+    // action. Make sure that custom group manipulating doesn't conflict with this mechanic.
     else if (hasNodeType(index, NodeType::webPages) && !ini().webPagesAndIntegrations)
     {
         // Setting empty parent ID for web pages forces them not to be proxied.
@@ -454,7 +510,7 @@ void ResourceTreeDragDropDecoratorModel::moveResources(
     {
         if (!cameras.empty())
         {
-            if(!dropParentServer.isNull()
+            if (!dropParentServer.isNull()
                 && cameras.first()->getParentId() != dropParentServer->getId())
             {
                 m_actionHandler->moveResourcesToServer(
@@ -468,9 +524,16 @@ void ResourceTreeDragDropDecoratorModel::moveResources(
             }
         }
 
-        // Web pages can only be moved within a server.
-        if (!webPages.empty() && webPages.first()->getParentId() == dropParentServer->getId())
-            moveResourcesToGroup(webPages);
+        if (!webPages.empty())
+        {
+            // Web pages can only be moved within parent node such as server node, "Web Pages"
+            // group node or "Integrations" group node.
+            if (dropParentServer.isNull()
+                || (webPages.first()->getParentId() == dropParentServer->getId()))
+            {
+                moveResourcesToGroup(webPages);
+            }
+        }
     }
     else
     {

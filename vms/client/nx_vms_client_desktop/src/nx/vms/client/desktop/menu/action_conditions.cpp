@@ -1856,37 +1856,37 @@ ActionVisibility CreateNewResourceTreeGroupCondition::check(
 
     if (parameters.hasArgument(Qn::TopLevelParentNodeTypeRole))
     {
-        const auto topLevelNodeType =
-            parameters.argument(Qn::TopLevelParentNodeTypeRole).value<ResourceTree::NodeType>();
-        if (topLevelNodeType != ResourceTree::NodeType::servers
-            && topLevelNodeType != ResourceTree::NodeType::camerasAndDevices
-            && topLevelNodeType != ResourceTree::NodeType::resource)
-        {
+        const std::set<ResourceTree::NodeType> kTopLevelTreeNodesThatAllowsCustomGroups{
+            ResourceTree::NodeType::servers,
+            ResourceTree::NodeType::camerasAndDevices,
+            ResourceTree::NodeType::resource,
+            ResourceTree::NodeType::webPages,
+            ResourceTree::NodeType::integrations
+        };
+
+        const auto topLevelNodeType = parameters.argument(Qn::TopLevelParentNodeTypeRole)
+            .value<ResourceTree::NodeType>();
+
+        if (!kTopLevelTreeNodesThatAllowsCustomGroups.contains(topLevelNodeType))
             return InvisibleAction;
-        }
     }
 
-    const bool containCameras = std::any_of(std::cbegin(resources), std::cend(resources),
+    const auto resourceCanBeInCustomGroup =
         [](const QnResourcePtr& resource)
         {
             return resource.dynamicCast<QnVirtualCameraResource>()
                 || resource.dynamicCast<QnWebPageResource>();
-        });
+        };
 
-    if (!containCameras)
+    // None of selected resources can be placed into a group.
+    if (!std::any_of(std::cbegin(resources), std::cend(resources), resourceCanBeInCustomGroup))
         return InvisibleAction;
 
-    if (!parameters.argument(Qn::OnlyResourceTreeSiblingsRole).toBool())
+    // Selection contains type of resource that cannot be placed into a group.
+    if (!std::all_of(std::cbegin(resources), std::cend(resources), resourceCanBeInCustomGroup))
         return DisabledAction;
 
-    const bool containNonCameras = std::any_of(std::cbegin(resources), std::cend(resources),
-        [](const QnResourcePtr& resource)
-        {
-            return !(resource.dynamicCast<QnVirtualCameraResource>() ||
-                resource.dynamicCast<QnWebPageResource>());
-        });
-
-    if (containNonCameras)
+    if (!parameters.argument(Qn::OnlyResourceTreeSiblingsRole).toBool())
         return DisabledAction;
 
     const auto groupId = resourceCustomGroupId(resources.first());

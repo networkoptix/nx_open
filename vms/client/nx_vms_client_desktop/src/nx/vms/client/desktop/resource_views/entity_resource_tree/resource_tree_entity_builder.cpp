@@ -794,45 +794,71 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createShowreelsGroupEntity() const
 
 AbstractEntityPtr ResourceTreeEntityBuilder::createIntegrationsGroupEntity() const
 {
-    auto integrationList = makeKeyList<QnResourcePtr>(
-        webPageItemCreator(m_itemFactory.get(), hasPowerUserPermissions()),
-        numericOrder());
+    using GroupingRule = GroupingRule<QString, QnResourcePtr>;
+    using GroupingRuleStack = GroupingEntity<QString, QnResourcePtr>::GroupingRuleStack;
 
-    integrationList->installItemSource(m_itemKeySourcePool->integrationsSource(
+    GroupingRuleStack groupingRuleStack;
+    groupingRuleStack.push_back({
+        userDefinedGroupIdGetter(),
+        userDefinedGroupItemCreator(m_itemFactory.get(), hasPowerUserPermissions()),
+        Qn::ResourceTreeCustomGroupIdRole,
+        resource_grouping::kUserDefinedGroupingDepth,
+        numericOrder()});
+
+    auto integrationsGroupingEntity = std::make_unique<GroupingEntity<QString, QnResourcePtr>>(
+        webPageItemCreator(m_itemFactory.get(), hasPowerUserPermissions()),
+        core::ResourceRole,
+        numericOrder(),
+        groupingRuleStack);
+
+    integrationsGroupingEntity->installItemSource(m_itemKeySourcePool->integrationsSource(
         user(), /*includeProxiedIntegrations*/ true));
 
     Qt::ItemFlags flags = {Qt::ItemIsEnabled, Qt::ItemIsSelectable};
-
     if (hasPowerUserPermissions())
         flags |= Qt::ItemIsDropEnabled;
 
     return makeFlatteningGroup(
         m_itemFactory->createIntegrationsItem(flags),
-        std::move(integrationList),
+        std::move(integrationsGroupingEntity),
         FlatteningGroupEntity::AutoFlatteningPolicy::noChildrenPolicy);
 }
 
 AbstractEntityPtr ResourceTreeEntityBuilder::createWebPagesGroupEntity() const
 {
+    using GroupingRule = GroupingRule<QString, QnResourcePtr>;
+    using GroupingRuleStack = GroupingEntity<QString, QnResourcePtr>::GroupingRuleStack;
+
+    GroupingRuleStack groupingRuleStack;
+    groupingRuleStack.push_back({
+        userDefinedGroupIdGetter(),
+        userDefinedGroupItemCreator(m_itemFactory.get(), hasPowerUserPermissions()),
+        Qn::ResourceTreeCustomGroupIdRole,
+        resource_grouping::kUserDefinedGroupingDepth,
+        numericOrder()});
+
     ResourceItemCreator itemCreator = ini().webPagesAndIntegrations
         ? webPageItemCreator(m_itemFactory.get(), hasPowerUserPermissions())
         : resourceItemCreator(m_itemFactory.get(), user(), hasPowerUserPermissions());
 
-    auto webPagesList = makeKeyList<QnResourcePtr>(itemCreator, numericOrder());
-
-    Qt::ItemFlags flags = {Qt::ItemIsEnabled, Qt::ItemIsSelectable};
+    auto webPagesGroupingEntity = std::make_unique<GroupingEntity<QString, QnResourcePtr>>(
+        itemCreator,
+        core::ResourceRole,
+        numericOrder(),
+        groupingRuleStack);
 
     if (ini().webPagesAndIntegrations)
     {
-        webPagesList->installItemSource(m_itemKeySourcePool->webPagesSource(
-            user(), /*includeProxiedWebPages*/ true));
+        webPagesGroupingEntity->installItemSource(
+            m_itemKeySourcePool->webPagesSource(user(), /*includeProxiedWebPages*/ true));
     }
     else
     {
-        webPagesList->installItemSource(m_itemKeySourcePool->webPagesAndIntegrationsSource(
-            user(), /*includeProxied*/ false));
+        webPagesGroupingEntity->installItemSource(
+            m_itemKeySourcePool->webPagesAndIntegrationsSource(user(), /*includeProxied*/ false));
     }
 
+    Qt::ItemFlags flags = {Qt::ItemIsEnabled, Qt::ItemIsSelectable};
     if (hasPowerUserPermissions())
         flags |= Qt::ItemIsDropEnabled;
 
@@ -841,7 +867,9 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createWebPagesGroupEntity() const
         : FlatteningGroupEntity::AutoFlatteningPolicy::noChildrenPolicy;
 
     return makeFlatteningGroup(
-        m_itemFactory->createWebPagesItem(flags), std::move(webPagesList), flatteningPolicy);
+        m_itemFactory->createWebPagesItem(flags),
+        std::move(webPagesGroupingEntity),
+        flatteningPolicy);
 }
 
 AbstractEntityPtr ResourceTreeEntityBuilder::createLocalFilesGroupEntity() const
