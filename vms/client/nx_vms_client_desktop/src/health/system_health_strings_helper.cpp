@@ -221,7 +221,7 @@ QString QnSystemHealthStringsHelper::messageTooltip(
         case MessageType::metadataOnSystemStorage:
             messageParts << tr("Analytics data can take up large amounts of space.");
             messageParts << tr("We recommend choosing another location for it instead of the "
-                "site partition.");
+                "system partition.");
             break;
         case MessageType::cameraRecordingScheduleIsInvalid:
         {
