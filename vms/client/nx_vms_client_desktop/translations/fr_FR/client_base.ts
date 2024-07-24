@@ -7726,6 +7726,13 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
         <numerusform>Utiliser les Licences</numerusform>
       </translation>
     </message>
+    <message numerus="yes">
+      <source>Use Service</source>
+      <translation type="unfinished">
+        <numerusform>Use Service</numerusform>
+        <numerusform>Use Service</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraMotionSettingsWidget</name>

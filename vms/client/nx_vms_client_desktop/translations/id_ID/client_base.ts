@@ -7597,6 +7597,12 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
         <numerusform>Gunakan Lisensi</numerusform>
       </translation>
     </message>
+    <message numerus="yes">
+      <source>Use Service</source>
+      <translation type="unfinished">
+        <numerusform>Use Service</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraMotionSettingsWidget</name>
