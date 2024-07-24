@@ -640,7 +640,7 @@ Handle ServerConnection::bindSystemToCloud(
 }
 
 Handle ServerConnection::unbindSystemFromCloud(
-    nx::vms::common::SessionTokenHelperPtr helper,
+    nx::vms::common::SessionTokenHelperPtr tokenHelper,
     const QString& password,
     Result<ErrorOrEmpty>::type callback,
     QThread* targetThread)
@@ -653,7 +653,7 @@ Handle ServerConnection::unbindSystemFromCloud(
         prepareUrl("/rest/v3/system/cloud/unbind", /*params*/ {}),
         nx::reflect::json::serialize(data));
 
-    auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
+    auto wrapper = makeSessionAwareCallback(tokenHelper, request, std::move(callback));
 
     auto handle = request.isValid()
         ? executeRequest(request, wrapper, targetThread)
@@ -664,7 +664,7 @@ Handle ServerConnection::unbindSystemFromCloud(
 }
 
 Handle ServerConnection::dumpDatabase(
-    nx::vms::common::SessionTokenHelperPtr helper,
+    nx::vms::common::SessionTokenHelperPtr tokenHelper,
     Result<ErrorOrData<QByteArray>>::type callback,
     QThread* targetThread)
 {
@@ -695,7 +695,7 @@ Handle ServerConnection::dumpDatabase(
     timeouts.messageBodyReadTimeout = std::chrono::minutes(5);
 
     auto wrapper =
-        makeSessionAwareCallback(helper, request, std::move(internalCallback), timeouts);
+        makeSessionAwareCallback(tokenHelper, request, std::move(internalCallback), timeouts);
 
     auto handle = request.isValid()
         ? executeRequest(request, std::move(wrapper), targetThread, timeouts)
@@ -706,7 +706,7 @@ Handle ServerConnection::dumpDatabase(
 }
 
 Handle ServerConnection::restoreDatabase(
-    nx::vms::common::SessionTokenHelperPtr helper,
+    nx::vms::common::SessionTokenHelperPtr tokenHelper,
     const QByteArray& data,
     Result<ErrorOrEmpty>::type callback,
     QThread* targetThread)
@@ -717,7 +717,7 @@ Handle ServerConnection::restoreDatabase(
         nx::network::http::header::ContentType::kBinary.value,
         data);
 
-    auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
+    auto wrapper = makeSessionAwareCallback(tokenHelper, request, std::move(callback));
 
     auto timeouts = nx::network::http::AsyncClient::Timeouts::defaults();
     timeouts.sendTimeout = std::chrono::minutes(5);
@@ -731,7 +731,7 @@ Handle ServerConnection::restoreDatabase(
 }
 
 Handle ServerConnection::putServerLogSettings(
-    nx::vms::common::SessionTokenHelperPtr helper,
+    nx::vms::common::SessionTokenHelperPtr tokenHelper,
     const nx::Uuid& serverId,
     const nx::vms::api::ServerLogSettings& settings,
     Result<ErrorOrEmpty>::type callback,
@@ -745,7 +745,7 @@ Handle ServerConnection::putServerLogSettings(
         Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
         nx::reflect::json::serialize(settings));
 
-    auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
+    auto wrapper = makeSessionAwareCallback(tokenHelper, request, std::move(callback));
 
     auto handle = request.isValid()
         ? executeRequest(request, std::move(wrapper), targetThread)
@@ -756,7 +756,7 @@ Handle ServerConnection::putServerLogSettings(
 }
 
 Handle ServerConnection::patchSystemSettings(
-    nx::vms::common::SessionTokenHelperPtr helper,
+    nx::vms::common::SessionTokenHelperPtr tokenHelper,
     const nx::vms::api::SaveableSystemSettings& settings,
     Result<ErrorOrEmpty>::type callback,
     nx::utils::AsyncHandlerExecutor executor)
@@ -769,7 +769,7 @@ Handle ServerConnection::patchSystemSettings(
         Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
         nx::reflect::json::serialize(settings));
 
-    auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
+    auto wrapper = makeSessionAwareCallback(tokenHelper, request, std::move(callback));
 
     auto handle = request.isValid()
         ? executeRequest(request, std::move(wrapper), executor)
@@ -802,7 +802,7 @@ Handle ServerConnection::addFileDownload(
 Handle ServerConnection::addCamera(
     const nx::Uuid& targetServerId,
     const nx::vms::api::DeviceModelForSearch& device,
-    nx::vms::common::SessionTokenHelperPtr helper,
+    nx::vms::common::SessionTokenHelperPtr tokenHelper,
     Result<ErrorOrData<nx::vms::api::DeviceModelForSearch>>::type&& callback,
     QThread* thread)
 {
@@ -813,7 +813,7 @@ Handle ServerConnection::addCamera(
 
     proxyRequestUsingServer(request, targetServerId);
 
-    auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
+    auto wrapper = makeSessionAwareCallback(tokenHelper, request, std::move(callback));
 
     auto handle = request.isValid()
         ? executeRequest(request, std::move(wrapper), thread)
@@ -826,7 +826,7 @@ Handle ServerConnection::addCamera(
 Handle ServerConnection::searchCamera(
     const nx::Uuid& targetServerId,
     const nx::vms::api::DeviceSearch& deviceSearchData,
-    nx::vms::common::SessionTokenHelperPtr helper,
+    nx::vms::common::SessionTokenHelperPtr tokenHelper,
     Result<ErrorOrData<nx::vms::api::DeviceSearch>>::type&& callback,
     QThread* targetThread)
 {
@@ -837,7 +837,7 @@ Handle ServerConnection::searchCamera(
 
     proxyRequestUsingServer(request, targetServerId);
 
-    auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
+    auto wrapper = makeSessionAwareCallback(tokenHelper, request, std::move(callback));
 
     auto handle = request.isValid()
         ? executeRequest(request, std::move(wrapper), targetThread)
@@ -850,7 +850,7 @@ Handle ServerConnection::searchCamera(
 Handle ServerConnection::searchCameraStatus(
     const nx::Uuid& targetServerId,
     const QString& searchId,
-    nx::vms::common::SessionTokenHelperPtr helper,
+    nx::vms::common::SessionTokenHelperPtr tokenHelper,
     Result<ErrorOrData<nx::vms::api::DeviceSearch>>::type&& callback,
     QThread* targetThread)
 {
@@ -859,7 +859,7 @@ Handle ServerConnection::searchCameraStatus(
 
     proxyRequestUsingServer(request, targetServerId);
 
-    auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
+    auto wrapper = makeSessionAwareCallback(tokenHelper, request, std::move(callback));
 
     auto handle = request.isValid()
         ? executeRequest(request, std::move(wrapper), targetThread)
@@ -872,7 +872,7 @@ Handle ServerConnection::searchCameraStatus(
 Handle ServerConnection::searchCameraStop(
     const nx::Uuid& targetServerId,
     const QString& searchId,
-    nx::vms::common::SessionTokenHelperPtr helper,
+    nx::vms::common::SessionTokenHelperPtr tokenHelper,
     Result<ErrorOrEmpty>::type callback,
     QThread* targetThread)
 {
@@ -881,7 +881,7 @@ Handle ServerConnection::searchCameraStop(
 
     proxyRequestUsingServer(request, targetServerId);
 
-    auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
+    auto wrapper = makeSessionAwareCallback(tokenHelper, request, std::move(callback));
 
     auto handle = request.isValid()
         ? executeRequest(request, std::move(wrapper), targetThread)
@@ -1455,7 +1455,6 @@ Handle ServerConnection::setEngineAnalyticsSettings(
     nx::vms::api::analytics::EngineSettingsRequest request;
     request.settingsValues = settings;
     request.analyticsEngineId = engine->getId();
-    // TODO: Fill settingsModelId when it is supported by the Client.
     using namespace nx::vms::api::analytics;
     return executePost<nx::network::rest::JsonResult>(
         "/ec2/analyticsEngineSettings",
@@ -1509,13 +1508,11 @@ Handle ServerConnection::setDeviceAnalyticsSettings(
     const QnVirtualCameraResourcePtr& device,
     const nx::vms::common::AnalyticsEngineResourcePtr& engine,
     const QJsonObject& settings,
-    const nx::Uuid& settingsModelId,
     Result<nx::vms::api::analytics::DeviceAgentSettingsResponse>::type&& callback,
     QThread* targetThread)
 {
     nx::vms::api::analytics::DeviceAgentSettingsRequest request;
     request.settingsValues = settings;
-    request.settingsModelId = settingsModelId;
     request.analyticsEngineId = engine->getId();
     request.deviceId = device->getId().toString();
 
@@ -1718,7 +1715,7 @@ bool mergeJsonRpcResults(
 }
 
 Handle ServerConnection::jsonRpcBatchCall(
-    nx::vms::common::SessionTokenHelperPtr helper,
+    nx::vms::common::SessionTokenHelperPtr tokenHelper,
     const std::vector<nx::vms::api::JsonRpcRequest>& requests,
     JsonRpcBatchResultCallback&& callback,
     QThread* targetThread,
@@ -1783,7 +1780,7 @@ Handle ServerConnection::jsonRpcBatchCall(
 
     auto wrapper = makeSessionAwareCallbackInternal<
         rest::ErrorOrData<JsonRpcResultType>, rest::ErrorOrData<JsonRpcResultType>>(
-            helper,
+            tokenHelper,
             request,
             std::move(internalCallback),
             timeouts,
@@ -1840,7 +1837,7 @@ Handle ServerConnection::putEmptyResult(
 }
 
 Handle ServerConnection::putRest(
-    nx::vms::common::SessionTokenHelperPtr helper,
+    nx::vms::common::SessionTokenHelperPtr tokenHelper,
     const QString &action,
     const nx::network::rest::Params &params,
     const QByteArray &body,
@@ -1853,7 +1850,7 @@ Handle ServerConnection::putRest(
         Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
         body);
 
-    auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
+    auto wrapper = makeSessionAwareCallback(tokenHelper, request, std::move(callback));
 
     auto handle = request.isValid()
         ? executeRequest(request, std::move(wrapper), executor)
@@ -1863,7 +1860,7 @@ Handle ServerConnection::putRest(
 }
 
 Handle ServerConnection::patchRest(
-    nx::vms::common::SessionTokenHelperPtr helper,
+    nx::vms::common::SessionTokenHelperPtr tokenHelper,
     const QString& action,
     const nx::network::rest::Params& params,
     const nx::String& body,
@@ -1875,7 +1872,7 @@ Handle ServerConnection::patchRest(
         Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
         body);
 
-    auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
+    auto wrapper = makeSessionAwareCallback(tokenHelper, request, std::move(callback));
 
     auto handle =
         request.isValid() ? executeRequest(request, std::move(wrapper), executor) : Handle();
@@ -1883,7 +1880,7 @@ Handle ServerConnection::patchRest(
     return handle;
 }
 
-Handle ServerConnection::postRest(nx::vms::common::SessionTokenHelperPtr helper,
+Handle ServerConnection::postRest(nx::vms::common::SessionTokenHelperPtr tokenHelper,
     const QString& action,
     const nx::network::rest::Params& params,
     const QByteArray& body,
@@ -1895,7 +1892,7 @@ Handle ServerConnection::postRest(nx::vms::common::SessionTokenHelperPtr helper,
         Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
         body);
 
-    auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
+    auto wrapper = makeSessionAwareCallback(tokenHelper, request, std::move(callback));
 
     auto handle =
         request.isValid() ? executeRequest(request, std::move(wrapper), executor) : Handle();
@@ -1950,7 +1947,7 @@ Handle ServerConnection::deleteEmptyResult(
 }
 
 Handle ServerConnection::deleteRest(
-    nx::vms::common::SessionTokenHelperPtr helper,
+    nx::vms::common::SessionTokenHelperPtr tokenHelper,
     const QString &action,
     const nx::network::rest::Params &params,
     Result<ErrorOrEmpty>::type callback,
@@ -1960,7 +1957,7 @@ Handle ServerConnection::deleteRest(
         nx::network::http::Method::delete_,
         prepareUrl(action, params));
 
-    auto wrapper = makeSessionAwareCallback(std::move(helper), request, std::move(callback));
+    auto wrapper = makeSessionAwareCallback(std::move(tokenHelper), request, std::move(callback));
 
     auto handle = request.isValid()
         ? executeRequest(request, std::move(wrapper), std::move(executor))
@@ -2183,7 +2180,7 @@ Handle ServerConnection::testLdapSettingsAsync(
 
 Handle ServerConnection::setLdapSettingsAsync(
     const nx::vms::api::LdapSettings& settings,
-    nx::vms::common::SessionTokenHelperPtr helper,
+    nx::vms::common::SessionTokenHelperPtr tokenHelper,
     Result<ErrorOrData<nx::vms::api::LdapSettings>>::type&& callback,
     QThread* targetThread)
 {
@@ -2195,7 +2192,7 @@ Handle ServerConnection::setLdapSettingsAsync(
         Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
         nx::reflect::json::serialize(settings));
 
-    auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
+    auto wrapper = makeSessionAwareCallback(tokenHelper, request, std::move(callback));
 
     auto handle = request.isValid()
         ? executeRequest(request, std::move(wrapper), targetThread)
@@ -2207,7 +2204,7 @@ Handle ServerConnection::setLdapSettingsAsync(
 
 Handle ServerConnection::modifyLdapSettingsAsync(
     const nx::vms::api::LdapSettings& settings,
-    nx::vms::common::SessionTokenHelperPtr helper,
+    nx::vms::common::SessionTokenHelperPtr tokenHelper,
     Result<ErrorOrData<nx::vms::api::LdapSettings>>::type&& callback,
     QThread* targetThread)
 {
@@ -2219,7 +2216,7 @@ Handle ServerConnection::modifyLdapSettingsAsync(
         Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
         nx::reflect::json::serialize(settings));
 
-    auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
+    auto wrapper = makeSessionAwareCallback(tokenHelper, request, std::move(callback));
 
     auto handle = request.isValid()
         ? executeRequest(request, std::move(wrapper), targetThread)
@@ -2256,7 +2253,7 @@ Handle ServerConnection::getLdapStatusAsync(
 }
 
 Handle ServerConnection::syncLdapAsync(
-    nx::vms::common::SessionTokenHelperPtr helper,
+    nx::vms::common::SessionTokenHelperPtr tokenHelper,
     Result<ErrorOrEmpty>::type&& callback,
     QThread* targetThread)
 {
@@ -2267,7 +2264,7 @@ Handle ServerConnection::syncLdapAsync(
             /*params*/ {}),
         Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json));
 
-    auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
+    auto wrapper = makeSessionAwareCallback(tokenHelper, request, std::move(callback));
 
     auto handle = request.isValid()
         ? executeRequest(request, std::move(wrapper), targetThread)
@@ -2278,7 +2275,7 @@ Handle ServerConnection::syncLdapAsync(
 }
 
 Handle ServerConnection::resetLdapAsync(
-    nx::vms::common::SessionTokenHelperPtr helper,
+    nx::vms::common::SessionTokenHelperPtr tokenHelper,
     Result<ErrorOrEmpty>::type&& callback,
     QThread* targetThread)
 {
@@ -2289,7 +2286,7 @@ Handle ServerConnection::resetLdapAsync(
             /*params*/ {}),
         Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json));
 
-    auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
+    auto wrapper = makeSessionAwareCallback(tokenHelper, request, std::move(callback));
 
     auto handle = request.isValid()
         ? executeRequest(request, std::move(wrapper), targetThread)
@@ -2302,7 +2299,7 @@ Handle ServerConnection::resetLdapAsync(
 Handle ServerConnection::saveUserAsync(
     bool newUser,
     const nx::vms::api::UserModelV3& userData,
-    nx::vms::common::SessionTokenHelperPtr helper,
+    nx::vms::common::SessionTokenHelperPtr tokenHelper,
     Result<ErrorOrData<nx::vms::api::UserModelV3>>::type&& callback,
     QThread* targetThread)
 {
@@ -2314,7 +2311,7 @@ Handle ServerConnection::saveUserAsync(
         Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
         nx::reflect::json::serialize(userData));
 
-    auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
+    auto wrapper = makeSessionAwareCallback(tokenHelper, request, std::move(callback));
 
     auto handle = request.isValid()
         ? executeRequest(request, std::move(wrapper), targetThread)
@@ -2327,7 +2324,7 @@ Handle ServerConnection::saveUserAsync(
  Handle ServerConnection::patchUserParameters(
     nx::Uuid id,
     const nx::vms::api::ResourceWithParameters& parameters,
-    nx::vms::common::SessionTokenHelperPtr helper,
+    nx::vms::common::SessionTokenHelperPtr tokenHelper,
     Result<ErrorOrData<nx::vms::api::UserModelV3>>::type&& callback,
     QThread* targetThread)
 {
@@ -2339,7 +2336,7 @@ Handle ServerConnection::saveUserAsync(
         Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
         nx::reflect::json::serialize(parameters));
 
-    auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
+    auto wrapper = makeSessionAwareCallback(tokenHelper, request, std::move(callback));
 
     auto handle = request.isValid()
         ? executeRequest(request, std::move(wrapper), targetThread)
@@ -2351,7 +2348,7 @@ Handle ServerConnection::saveUserAsync(
 
 Handle ServerConnection::removeUserAsync(
     const nx::Uuid& userId,
-    nx::vms::common::SessionTokenHelperPtr helper,
+    nx::vms::common::SessionTokenHelperPtr tokenHelper,
     Result<ErrorOrEmpty>::type&& callback,
     QThread* targetThread)
 {
@@ -2361,7 +2358,7 @@ Handle ServerConnection::removeUserAsync(
             QString("/rest/v4/users/%1").arg(userId.toString()),
             /*params*/ {}));
 
-    auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
+    auto wrapper = makeSessionAwareCallback(tokenHelper, request, std::move(callback));
 
     auto handle = request.isValid()
         ? executeRequest(request, std::move(wrapper), targetThread)
@@ -2374,7 +2371,7 @@ Handle ServerConnection::removeUserAsync(
 Handle ServerConnection::saveGroupAsync(
     bool newGroup,
     const nx::vms::api::UserGroupModel& groupData,
-    nx::vms::common::SessionTokenHelperPtr helper,
+    nx::vms::common::SessionTokenHelperPtr tokenHelper,
     Result<ErrorOrData<nx::vms::api::UserGroupModel>>::type&& callback,
     QThread* targetThread)
 {
@@ -2386,7 +2383,7 @@ Handle ServerConnection::saveGroupAsync(
         Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
         nx::reflect::json::serialize(groupData));
 
-    auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
+    auto wrapper = makeSessionAwareCallback(tokenHelper, request, std::move(callback));
 
     auto handle = request.isValid()
         ? executeRequest(request, std::move(wrapper), targetThread)
@@ -2398,7 +2395,7 @@ Handle ServerConnection::saveGroupAsync(
 
 Handle ServerConnection::removeGroupAsync(
     const nx::Uuid& groupId,
-    nx::vms::common::SessionTokenHelperPtr helper,
+    nx::vms::common::SessionTokenHelperPtr tokenHelper,
     Result<ErrorOrEmpty>::type&& callback,
     QThread* targetThread)
 {
@@ -2408,7 +2405,7 @@ Handle ServerConnection::removeGroupAsync(
             QString("/rest/v4/userGroups/%1").arg(groupId.toString()),
             /*params*/ {}));
 
-    auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
+    auto wrapper = makeSessionAwareCallback(tokenHelper, request, std::move(callback));
 
     auto handle = request.isValid()
         ? executeRequest(request, std::move(wrapper), targetThread)

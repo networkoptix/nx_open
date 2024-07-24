@@ -64,11 +64,6 @@ struct NX_VMS_API DeviceAgentSettingsResponse
      */
     QJsonObject settingsErrors;
 
-    /**%apidoc
-     * Current id of the Settings Model. Such ids are used to check that values match the Model.
-     */
-    nx::Uuid settingsModelId;
-
     DeviceAgentSettingsSession session;
 };
 #define nx_vms_api_analytics_DeviceAgentSettingsResponse_Fields \
@@ -77,7 +72,6 @@ struct NX_VMS_API DeviceAgentSettingsResponse
     (settingsValues) \
     (settingsModel) \
     (settingsErrors) \
-    (settingsModelId) \
     (session)
 
 QN_FUSION_DECLARE_FUNCTIONS(DeviceAgentSettingsResponse, (json), NX_VMS_API)

@@ -57,7 +57,6 @@ public:
         const QnVirtualCameraResourcePtr& device,
         const nx::vms::common::AnalyticsEngineResourcePtr& engine,
         const QJsonObject& settings,
-        const nx::Uuid& settingsModelId,
         AnalyticsSettingsCallback callback) override
     {
         if (!NX_ASSERT(device) || !NX_ASSERT(engine) || !NX_ASSERT(m_owner))
@@ -69,7 +68,6 @@ public:
                 device,
                 engine,
                 settings,
-                settingsModelId,
                 nx::utils::guarded(m_owner, callback),
                 m_owner->thread());
         }

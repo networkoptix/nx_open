@@ -266,14 +266,10 @@ void AnalyticsSettingsManager::Private::loadResponseData(
 
     // When model is changed on the server side, it's id is re-generated, so we may quickly compare
     // model id first.
-    const bool modelChanged = receivedDataIsNewer
-        && (data.modelId != response.settingsModelId || data.model != response.settingsModel);
+    const bool modelChanged = receivedDataIsNewer && data.model != response.settingsModel;
 
     if (modelChanged)
-    {
         data.model = response.settingsModel;
-        data.modelId = response.settingsModelId;
-    }
 
     const bool valuesChanged = receivedDataIsNewer && (data.values != response.settingsValues);
     if (valuesChanged)
@@ -374,8 +370,7 @@ bool AnalyticsSettingsManager::activeSettingsChanged(
                     .model = result.settingsModel,
                     .values = result.settingsValues,
                     .errors = result.settingsErrors,
-                    .modelId = result.settingsModelId,
-                    .status = DeviceAgentData::Status::ok
+                    .status = DeviceAgentData::Status::ok,
                 });
 
             d->actionResultReceived(
@@ -384,7 +379,7 @@ bool AnalyticsSettingsManager::activeSettingsChanged(
                     .actionUrl = result.actionUrl,
                     .messageToUser = result.messageToUser,
                     .useProxy = result.useProxy,
-                    .useDeviceCredentials = result.useDeviceCredentials
+                    .useDeviceCredentials = result.useDeviceCredentials,
                 });
         });
 
@@ -435,7 +430,6 @@ AnalyticsSettingsManager::Error AnalyticsSettingsManager::applyChanges(
             device,
             engine,
             settings,
-            d->dataByAgentId(agentId).modelId,
             [this, agentId](
                 bool success,
                 rest::Handle requestId,
