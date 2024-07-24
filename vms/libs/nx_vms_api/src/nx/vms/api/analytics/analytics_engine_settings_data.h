@@ -22,11 +22,6 @@ struct NX_VMS_API EngineSettingsResponse
     QJsonObject settingsModel;
 
     /**%apidoc
-     * Current id of the Settings Model. Such ids are used to check that values match the Model.
-     */
-    nx::Uuid settingsModelId;
-
-    /**%apidoc
      * Name-value map with errors that occurred while performing the current settings operation.
      */
     QJsonObject settingsErrors;
@@ -36,7 +31,6 @@ struct NX_VMS_API EngineSettingsResponse
 #define nx_vms_api_analytics_EngineSettingsResponse_Fields \
     (settingsValues) \
     (settingsModel) \
-    (settingsModelId) \
     (settingsErrors)
 QN_FUSION_DECLARE_FUNCTIONS(EngineSettingsResponse, (json), NX_VMS_API)
 

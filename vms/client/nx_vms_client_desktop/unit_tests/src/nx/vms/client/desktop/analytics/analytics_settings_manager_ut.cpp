@@ -108,15 +108,14 @@ protected:
     {
         DeviceAgentSettingsResponse data(other);
         data.session.sequenceNumber = other.session.sequenceNumber - 1;
-        data.settingsModelId = nx::Uuid::createUuid(); //< Make sure this will cause model change.
         return data;
     }
 
     DeviceAgentSettingsResponse givenDataNewerThan(const DeviceAgentSettingsResponse& other) const
     {
         DeviceAgentSettingsResponse data(other);
+        data.settingsModel["newData"] = 42; // model has been updated
         data.session.sequenceNumber = other.session.sequenceNumber + 1;
-        data.settingsModelId = nx::Uuid::createUuid(); //< Make sure this will cause model change.
         return data;
     }
 

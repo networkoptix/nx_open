@@ -34,18 +34,12 @@ struct NX_VMS_API DeviceAgentSettingsRequest
      * Name-value map with setting values, using JSON types corresponding to each setting type.
      */
     SettingsValues settingsValues;
-
-    /**%apidoc
-     * Id of the Settings Model the values supposed to be applied to.
-     */
-    nx::Uuid settingsModelId;
 };
 #define nx_vms_api_analytics_DeviceAgentSettingsRequest_Fields \
     (deviceId) \
     (analyticsEngineId) \
     (analyzedStreamIndex) \
-    (settingsValues) \
-    (settingsModelId)
+    (settingsValues)
 
 QN_FUSION_DECLARE_FUNCTIONS(DeviceAgentSettingsRequest, (json), NX_VMS_API)
 
