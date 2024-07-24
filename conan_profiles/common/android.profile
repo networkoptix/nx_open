@@ -21,8 +21,9 @@ boost/*:header_only = True
 
 [tool_requires]
 openal/*:AndroidNDK/r26d
-qt/*:AndroidNDK/r26d, AndroidSDK/33, openjdk/18.0.1
+qt/*:AndroidNDK/r26d, AndroidSDK/34, openjdk/18.0.1
 openssl/*:AndroidNDK/r26d
 ffmpeg/*:AndroidStandaloneToolchain/r26d
 libjpeg-turbo/*:AndroidNDK/r26d
 pathkit/*:AndroidNDK/r26d
+zlib/*:AndroidNDK/r26d

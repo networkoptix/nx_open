@@ -144,7 +144,7 @@ class NxOpenConan(ConanFile):
         if self.options.onlyUnrevisionedPackages:
             return
 
-        self.build_requires("apidoctool/3.0" "#5a4cff0b5bf1286df599e345ee47a28b")
+        self.build_requires("apidoctool/3.0" "#bf58d9463e9fa82f3dcec3f6de7c152b")
         self.build_requires("qt-host/6.5.3" "#cb4a89251221cd4683f58f03fd308218")
         self.build_requires("swagger-codegen/3.0.21" "#58d9476941c662c4b3f8a9e99683f034")
 
@@ -163,9 +163,12 @@ class NxOpenConan(ConanFile):
         if self.isAndroid:
             self.build_requires("openjdk/18.0.1" "#a8a02e50d3ff18df2248cae06ed5a13c")
             if "ANDROID_HOME" not in os.environ:
-                self.build_requires("AndroidSDK/33" "#fcd06746ab6c1c4c9e56aff7c5fd44fd")
+                self.build_requires("AndroidSDK/34" "#eea6103b2dcc6cd808d0e8c2ee512bf9")
             if "ANDROID_NDK" not in os.environ:
                 self.build_requires("AndroidNDK/r26d" "#0ae8a952a8b231f98f2f7f2d61fd249a")
+        else:
+            # Java runtime for apidoctool.
+            self.tool_requires("openjdk-jre/17.0.12" "#ceed4d8b4fdfbd3f680688f67488dc27")
 
     def requirements(self):
         if not self.options.skipCustomizationPackage:
