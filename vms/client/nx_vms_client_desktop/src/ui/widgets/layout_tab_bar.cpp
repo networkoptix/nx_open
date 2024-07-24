@@ -39,7 +39,8 @@ using namespace nx::vms::client::desktop;
 
 namespace {
 
-static const int kMinimumTabSizeWidth = 50;
+static constexpr int kMinimumTabWidth = 64;
+static constexpr int kMaximumTabWidth = 196;
 static const QnIndents kTabIndents = {12, 8};
 static const QMargins kSingleLevelContentMargins = {1, 0, 1, 0};
 static const QMargins kDoubleLevelContentMargins = {0, 4, 1, 4};
@@ -353,18 +354,17 @@ QSize QnLayoutTabBar::minimumSizeHint() const
 
 QSize QnLayoutTabBar::tabSizeHint(int index) const
 {
-    auto result = base_type::tabSizeHint(index);
-    int width = result.width() + nx::style::Metrics::kInterSpace;
-    if (width < kMinimumTabSizeWidth)
-        width = kMinimumTabSizeWidth;
+    const auto result = base_type::tabSizeHint(index);
+    const int width = std::max(kMinimumTabWidth,
+        std::min(result.width() + nx::style::Metrics::kInterSpace, kMaximumTabWidth));
     return QSize(width, result.height());
 }
 
 QSize QnLayoutTabBar::minimumTabSizeHint(int index) const
 {
     auto result = base_type::minimumTabSizeHint(index);
-    if (result.width() < kMinimumTabSizeWidth)
-        result.setWidth(kMinimumTabSizeWidth);
+    if (result.width() < kMinimumTabWidth)
+        result.setWidth(kMinimumTabWidth);
     return result;
 }
 
