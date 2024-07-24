@@ -7596,6 +7596,12 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
         <numerusform>Sử dụng giấy phép</numerusform>
       </translation>
     </message>
+    <message numerus="yes">
+      <source>Use Service</source>
+      <translation type="unfinished">
+        <numerusform>Use Service</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraMotionSettingsWidget</name>

@@ -7724,6 +7724,13 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
         <numerusform>Lisansı Kullan</numerusform>
       </translation>
     </message>
+    <message numerus="yes">
+      <source>Use Service</source>
+      <translation type="unfinished">
+        <numerusform>Servisi kulan</numerusform>
+        <numerusform>Use Service</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraMotionSettingsWidget</name>

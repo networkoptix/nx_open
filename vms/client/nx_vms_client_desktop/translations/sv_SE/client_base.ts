@@ -7726,6 +7726,13 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
         <numerusform>Använd licens</numerusform>
       </translation>
     </message>
+    <message numerus="yes">
+      <source>Use Service</source>
+      <translation type="unfinished">
+        <numerusform>Använd tjänsten</numerusform>
+        <numerusform>Use Service</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraMotionSettingsWidget</name>

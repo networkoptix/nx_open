@@ -7726,6 +7726,13 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
         <numerusform>Käytä lisenssiä</numerusform>
       </translation>
     </message>
+    <message numerus="yes">
+      <source>Use Service</source>
+      <translation type="unfinished">
+        <numerusform>Use Service</numerusform>
+        <numerusform>Use Service</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraMotionSettingsWidget</name>

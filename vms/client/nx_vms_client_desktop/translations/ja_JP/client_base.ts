@@ -7597,6 +7597,12 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>ライセンスを使用</numerusform>
       </translation>
     </message>
+    <message numerus="yes">
+      <source>Use Service</source>
+      <translation>
+        <numerusform>サービスを使用する</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraMotionSettingsWidget</name>

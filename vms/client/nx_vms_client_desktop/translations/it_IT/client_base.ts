@@ -7726,6 +7726,13 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
         <numerusform>Utilizzare la licenza</numerusform>
       </translation>
     </message>
+    <message numerus="yes">
+      <source>Use Service</source>
+      <translation type="unfinished">
+        <numerusform>Use Service</numerusform>
+        <numerusform>Use Service</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraMotionSettingsWidget</name>
