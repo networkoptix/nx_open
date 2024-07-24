@@ -29,7 +29,14 @@ void ImageVideoBuffer::unmap()
 
 VideoFramePtr videoFrameFromImage(const QImage& image)
 {
-    const auto pixelFormat = QVideoFrameFormat::pixelFormatFromImageFormat(image.format());
+    // https://github.com/qt/qtmultimedia/commit/bdc9e0a2e30d2a7a7edf0c52630eb8137038cd89
+    // QVideoFrameFormat::Format_RGBA8888_Premultiplied is to be added in Qt 6.8
+    // Format_RGBX8888 suits the best as a workaround.
+    // TODO: Remove this after upgrade to Qt 6.7 where pixelFormatFromImageFormat is fixed.
+    const auto pixelFormat = image.format() == QImage::Format_RGBA8888_Premultiplied
+        ? QVideoFrameFormat::Format_RGBX8888
+        : QVideoFrameFormat::pixelFormatFromImageFormat(image.format());
+
     if (!NX_ASSERT(pixelFormat != QVideoFrameFormat::Format_Invalid))
         return {};
 
