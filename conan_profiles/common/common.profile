@@ -2,6 +2,7 @@
 build_type=Release
 # OpenCV compilation fails with C++20.
 opencv/*:compiler.cppstd=17
+intel-media-driver/*:compiler.cppstd=17
 
 [options]
 boost/*:zlib = False
@@ -25,6 +26,8 @@ opencv/*:with_quirc=False
 opencv/*:dnn=True
 opencv/*:with_ffmpeg=False
 protobuf/*:with_zlib=False
+prometheus-cpp/*:with_pull=False
+prometheus-cpp/*:with_push=False
 
 [tool_requires]
 boost/*:b2/4.10.1
