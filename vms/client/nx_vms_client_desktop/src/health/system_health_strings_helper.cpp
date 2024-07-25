@@ -261,7 +261,7 @@ QString QnSystemHealthStringsHelper::resourceText(
     for (int i = 0; i < list.size() && i < maxResourcesLines; ++i)
         formattedResources.append(nx::utils::elideString(list[i], maxWidth, "(...)"));
 
-    if (list.size() >= maxResourcesLines)
+    if (list.size() > maxResourcesLines)
     {
         const auto numberOfHiddenResources = list.size() - maxResourcesLines;
         const auto coloredLine = nx::vms::common::html::colored(
