@@ -232,7 +232,7 @@ std::string Engine::manifestString() const
             },
             {
                 "type": "CheckBox",
-                "caption": "Object Type with Enum attributes with inline items.",
+                "caption": "Object Type with Enum attributes with inline items",
                 "name": "generateInstanceOfObjectTypeWithEnumAttributesWithInlineItems",
                 "defaultValue": true
             }
