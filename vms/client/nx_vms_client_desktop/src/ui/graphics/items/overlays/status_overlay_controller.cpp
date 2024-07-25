@@ -11,7 +11,8 @@
 
 namespace {
 
-static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kOfflineTheme = {{QIcon::Normal, {.primary = "red_core"}}};
+const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kOfflineTheme = {{QIcon::Normal, {.primary = "red_core"}}};
+const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kLightTheme = {{QIcon::Normal, {.primary = "light10"}}};
 
 template<typename Type>
 int toInt(Type value)
@@ -339,8 +340,16 @@ const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions QnStatusOverlayC
     {
         case Qn::OfflineOverlay:
             return kOfflineTheme;
+        case Qn::AccessDeniedOverlay:
+        case Qn::NoVideoDataOverlay:
+        case Qn::NoDataOverlay:
+        case Qn::NoExportPermissionOverlay:
+        case Qn::TooManyOpenedConnectionsOverlay:
+        case Qn::NoLiveStreamOverlay:
+        case Qn::CannotDecryptMediaOverlay:
+            return kLightTheme;
         default:
-            return {};
+            return kOfflineTheme;
     }
 }
 
