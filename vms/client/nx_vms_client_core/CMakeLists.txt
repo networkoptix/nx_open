@@ -27,9 +27,18 @@ nx_add_external_resources_target(bytedance_iconpark
         ${open_source_root}/artifacts/analytics_icons/bytedance_iconpark
 )
 
+if(IOS)
+    set(ios_sources
+        src/utils/mac_permissions.mm
+    )
+else()
+    set(ios_sources)
+endif()
+
 nx_add_target(nx_vms_client_core LIBRARY
     ADDITIONAL_SOURCES
         ${qt_helpers_sources}
+        ${ios_sources}
     PUBLIC_LIBS
         Qt6::Multimedia
         Qt6::Quick
