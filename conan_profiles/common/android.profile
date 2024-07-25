@@ -9,3 +9,6 @@ compiler.cppstd=20
 
 os=Android
 os.api_level=22
+
+[tool_requires]
+openal/*:AndroidNDK/r25b
