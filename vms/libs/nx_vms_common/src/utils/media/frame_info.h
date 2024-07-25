@@ -96,7 +96,6 @@ public:
 
     /** Assign misc fields except but no video data */
     void assignMiscData(const CLVideoDecoderOutput* other);
-    void fillRightEdge();
 
     static AVPixelFormat fixDeprecatedPixelFormat(AVPixelFormat original);
 

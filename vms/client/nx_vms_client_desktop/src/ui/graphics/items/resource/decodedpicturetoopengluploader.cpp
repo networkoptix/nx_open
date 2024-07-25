@@ -324,7 +324,7 @@ public:
             if (m_renderer->gl)
                 m_renderer->gl->glBindTexture(GL_TEXTURE_2D, m_id);
 
-            if (roundedWidth < textureSize.width()) {
+            if (width < textureSize.width()) {
 
                 //NX_ASSERT( textureSize == QSize(textureWidth, textureHeight) );
 
@@ -333,9 +333,9 @@ public:
                     m_renderer->gl->glTexSubImage2D(
                         GL_TEXTURE_2D,
                         0,
-                        roundedWidth,
+                        width,
                         0,
-                        qMin(ROUND_COEFF, textureSize.width() - roundedWidth),
+                        qMin(ROUND_COEFF, textureSize.width() - width),
                         textureSize.height(),
                         internalFormat,
                         GL_UNSIGNED_BYTE,
@@ -1226,7 +1226,7 @@ bool DecodedPictureToOpenGLUploader::renderVideoMemory(
     else
         displaySize = frameSize;
 
-    displaySize = alignSize(displaySize, 8, 8);
+    displaySize = alignSizeCeil(displaySize, 8, 8);
 
     bool isNewTexture = texture->ensureInitialized(
         displaySize.width(), displaySize.height(), displaySize.width(), 1, GL_RGBA, 1, -1);
@@ -1378,7 +1378,7 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
         {
             QnGlRendererTexture* texture = emptyPictureBuf->texture(i);
             texture->ensureInitialized(
-                r_w[i], h[i], lineSizes[i],
+                r_w[i], h[i], r_w[i],
                 1, singleComponent, 1, i == Y_PLANE_INDEX ? 0x10 : (i == A_PLANE_INDEX ? 0x00 : 0x80) );
 
             NX_VERBOSE(this,
@@ -1391,29 +1391,14 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
                     .arg(qPower2Ceil(r_w[i],ROUND_COEFF))
                     .arg(h[i])
                     .arg(reinterpret_cast<size_t>(planes[i])));
+
             if (d->gl)
             {
                 d->gl->glBindTexture( GL_TEXTURE_2D, texture->id() );
-                glCheckError("glBindTexture");
-            }
-
-            const quint64 lineSizes_i = lineSizes[i];
-            const quint64 r_w_i = r_w[i];
-//            d->glPixelStorei(GL_UNPACK_ROW_LENGTH, lineSizes_i);
-//            glCheckError("glPixelStorei");
-            NX_ASSERT( lineSizes_i >= qPower2Ceil(r_w_i,ROUND_COEFF) );
-
-            if (d->gl)
-            {
-                loadImageData(
-                    d->gl,
-                    texture->textureSize().width(),
-                    texture->textureSize().height(),
-                    lineSizes_i,
-                    h[i],
-                    1,
-                    singleComponent,
-                    planes[i]);
+                d->gl->glPixelStorei(GL_UNPACK_ROW_LENGTH, lineSizes[i]);
+                d->gl->glTexSubImage2D(
+                    GL_TEXTURE_2D, 0, 0, 0, r_w[i], h[i], singleComponent, GL_UNSIGNED_BYTE, planes[i]);
+                d->gl->glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
             }
             bitrateCalculator.bytesProcessed( qPower2Ceil(r_w[i],ROUND_COEFF)*h[i] );
         }

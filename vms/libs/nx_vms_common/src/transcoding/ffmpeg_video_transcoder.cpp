@@ -156,7 +156,7 @@ bool QnFfmpegVideoTranscoder::prepareFilters(
                 m_sourceResolution, m_outputResolutionLimit);
             return false;
         }
-        m_outputResolutionLimit = alignSize(m_outputResolutionLimit, 16, 4);
+        m_outputResolutionLimit = alignSizeRound(m_outputResolutionLimit, 16, 4);
 
         // Use user resolution if it less as a source before filters.
         if (m_outputResolutionLimit.height() < m_sourceResolution.height())
