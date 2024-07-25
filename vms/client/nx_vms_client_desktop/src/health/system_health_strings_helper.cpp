@@ -109,7 +109,7 @@ QString QnSystemHealthStringsHelper::messageNotificationTitle(MessageType messag
 
         case MessageType::usersEmailIsEmpty:
         {
-            return resources.isEmpty()
+            return resources.size() <= 1
                 ? tr("Email address is not set")
                 : tr("Email address is not set for %n users", "", resources.size());
         }
