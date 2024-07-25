@@ -26,6 +26,7 @@
 #include <nx/vms/api/analytics/engine_manifest.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/system_context.h>
+#include <nx/vms/common/system_health/message_type.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
 #include <nx/vms/text/human_readable.h>
@@ -38,6 +39,7 @@
 #include "rule.h"
 
 using namespace nx::vms::api;
+using namespace nx::vms::common::system_health;
 
 namespace {
 
@@ -207,6 +209,12 @@ QString StringsHelper::eventName(EventType value, int count) const
                 resourcePool(),
                 tr("Any Device Issue"),
                 tr("Any Camera Issue"));
+
+        case EventType::systemHealthEvent + (int)MessageType::showIntercomInformer:
+            return tr("Call Request");
+
+        case EventType::systemHealthEvent + (int)MessageType::showMissedCallInformer:
+            return tr("Call Request Missed");
 
         default:
             return QString();
