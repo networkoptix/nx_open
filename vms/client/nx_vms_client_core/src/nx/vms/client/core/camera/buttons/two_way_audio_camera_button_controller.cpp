@@ -11,6 +11,12 @@
 #include <nx/vms/client/core/two_way_audio/two_way_audio_controller.h>
 #include <nx/vms/common/intercom/utils.h>
 
+#if defined(Q_OS_ANDROID)
+    #include <QtCore/private/qandroidextras_p.h>
+#elif defined(Q_OS_IOS)
+    #include <utils/mac_permissions.h>
+#endif
+
 namespace nx::vms::client::core {
 
 struct TwoWayAudioCameraButtonController::Private
@@ -25,6 +31,8 @@ struct TwoWayAudioCameraButtonController::Private
     bool start(const CameraButton& button);
     bool stop(const CameraButton& button);
     void setButtonChecked(CameraButton button, bool checked);
+
+    bool ensurePermissions();
 };
 
 void TwoWayAudioCameraButtonController::Private::updateButton()
@@ -82,6 +90,9 @@ void TwoWayAudioCameraButtonController::Private::updateButton()
 
 bool TwoWayAudioCameraButtonController::Private::start(const CameraButton& button)
 {
+    if (!ensurePermissions())
+        return false;
+
     const bool result = controller->start(
         [this, button](bool success)
         {
@@ -124,6 +135,26 @@ void TwoWayAudioCameraButtonController::Private::setButtonChecked(
 {
     button.checked = checked;
     q->addOrUpdateButton(button);
+}
+
+bool TwoWayAudioCameraButtonController::Private::ensurePermissions()
+{
+    // Request permission to record audio here for better user experience.
+    // This way we can show an error message if the user denies the permission.
+    #if defined(Q_OS_ANDROID)
+        // This also serves as a workaround for crashes when Qt asks for the permission itself.
+        static const auto kAudioPermission = QStringLiteral("android.permission.RECORD_AUDIO");
+        const auto checkFuture = QtAndroidPrivate::checkPermission(kAudioPermission);
+        if (checkFuture.result() != QtAndroidPrivate::Authorized)
+        {
+            return QtAndroidPrivate::requestPermission(kAudioPermission).result()
+                == QtAndroidPrivate::Authorized;
+        }
+    #elif defined(Q_OS_IOS)
+        return mac_ensureAudioRecordPermission();
+    #endif
+
+    return true;
 }
 
 //-------------------------------------------------------------------------------------------------
