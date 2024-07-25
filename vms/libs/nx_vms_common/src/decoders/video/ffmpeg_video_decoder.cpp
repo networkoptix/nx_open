@@ -407,7 +407,6 @@ bool QnFfmpegVideoDecoder::decode(
         if (outFrame->convertTo(&tmpFrame))
         {
             outFrame->copyFrom(&tmpFrame);
-            outFrame->fillRightEdge();
             outFrame->sample_aspect_ratio = getSampleAspectRatio();
             outFrame->flags = m_lastFlags;
             outFrame->channel = m_lastChannelNumber;
@@ -418,7 +417,6 @@ bool QnFfmpegVideoDecoder::decode(
     if (got_picture)
     {
         outFrame->format = CLVideoDecoderOutput::fixDeprecatedPixelFormat(m_context->pix_fmt);
-        outFrame->fillRightEdge();
         outFrame->sample_aspect_ratio = getSampleAspectRatio();
         outFrame->flags = m_lastFlags;
         outFrame->channel = m_lastChannelNumber;

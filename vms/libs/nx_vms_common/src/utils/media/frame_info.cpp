@@ -191,38 +191,6 @@ void CLVideoDecoderOutput::copyPlane(
     }
 }
 
-void CLVideoDecoderOutput::fillRightEdge()
-{
-    if (format == -1)
-        return;
-    const AVPixFmtDescriptor* descriptor = av_pix_fmt_desc_get((AVPixelFormat) format);
-    if (descriptor == nullptr)
-        return;
-    quint32 filler = 0;
-    int w = width;
-    int h = height;
-    for (int i = 0; i < QnFfmpegHelper::planeCount(descriptor) && data[i]; ++i)
-    {
-        int bpp = descriptor->comp[i].step;
-        int fillLen = linesize[i] - w*bpp;
-        if (fillLen >= 4)
-        {
-            quint8* dst = data[i] + w*bpp;
-            for (int y = 0; y < h; ++y)
-            {
-                *dst = filler;
-                dst += linesize[i];
-            }
-        }
-        if (i == 0)
-        {
-            filler = 0x80808080;
-            w >>= descriptor->log2_chroma_w;
-            h >>= descriptor->log2_chroma_h;
-        }
-    }
-}
-
 AVPixelFormat CLVideoDecoderOutput::fixDeprecatedPixelFormat(AVPixelFormat original)
 {
     switch (original)
@@ -278,7 +246,6 @@ bool CLVideoDecoderOutput::reallocate(int newWidth, int newHeight, int newFormat
         linesize,
         (quint8*) av_malloc(numBytes),
         (AVPixelFormat) format, roundWidth, height, /*align*/ 1);
-    fillRightEdge();
     return true;
 }
 
@@ -298,7 +265,6 @@ bool CLVideoDecoderOutput::reallocate(int newWidth, int newHeight, int newFormat
         linesize,
         (quint8*) av_malloc(numBytes),
         (AVPixelFormat) format, lineSizeHint, height, /*align*/ 1);
-    fillRightEdge();
     return true;
 }
 

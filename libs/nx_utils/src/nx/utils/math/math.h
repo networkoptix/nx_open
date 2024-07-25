@@ -126,11 +126,17 @@ inline int qPower2Round(int value, int step)
     return qPower2Floor(value + step / 2, step);
 }
 
-inline QSize alignSize(QSize source, int widthAlign, int heightAlign)
+inline QSize alignSizeRound(QSize source, int widthAlign, int heightAlign)
 {
     int width = qPower2Round(source.width(), widthAlign);
     int height = qPower2Round(source.height(), heightAlign);
+    return QSize(width, height);
+}
 
+inline QSize alignSizeCeil(QSize source, int widthAlign, int heightAlign)
+{
+    int width = qPower2Ceil((uint32_t)source.width(), widthAlign);
+    int height = qPower2Ceil((uint32_t)source.height(), heightAlign);
     return QSize(width, height);
 }
 
