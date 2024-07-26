@@ -101,6 +101,7 @@ class QnAudioTranscoder: public QnCodecTranscoder
 public:
     QnAudioTranscoder(AVCodecID codecId): QnCodecTranscoder(codecId) {}
     virtual bool open(const QnConstCompressedAudioDataPtr& /*video*/)  = 0;
+    virtual void setSampleRate(int value) = 0;
 };
 typedef QSharedPointer<QnAudioTranscoder> QnAudioTranscoderPtr;
 
