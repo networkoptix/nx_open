@@ -293,9 +293,6 @@ CodecParametersConstPtr ExportStorageStreamRecorder::getAudioCodecParameters(
     }
 
     m_audioTranscoder = std::make_unique<QnFfmpegAudioTranscoder>(dstAudioCodec);
-
-    //< Minimal supported sample rate in mp4(with mp3), see ffmpeg movenc.c:6700
-    constexpr int kMinMp4Mp3SampleRate = 16000;
     if (container.toLower() == "mp4"
         && dstAudioCodec == AV_CODEC_ID_MP3
         && sourceCodecParams->getSampleRate() < kMinMp4Mp3SampleRate)
