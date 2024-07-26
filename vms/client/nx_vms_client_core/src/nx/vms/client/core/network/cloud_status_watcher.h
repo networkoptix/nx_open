@@ -121,4 +121,4 @@ private:
 
 } // namespace nx::vms::client::core
 
-#define qnCloudStatusWatcher appContext()->cloudStatusWatcher()
+#define qnCloudStatusWatcher nx::vms::client::core::appContext()->cloudStatusWatcher()
