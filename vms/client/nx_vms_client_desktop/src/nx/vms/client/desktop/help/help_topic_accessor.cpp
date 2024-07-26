@@ -6,9 +6,9 @@
 #include <QtCore/QObject>
 #include <QtQuick/QQuickItem>
 #include <QtQuick/QQuickWindow>
+#include <QtQuickWidgets/QQuickWidget>
 #include <QtWidgets/QAbstractItemView>
 #include <QtWidgets/QGraphicsProxyWidget>
-#include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QGraphicsView>
 #include <QtWidgets/QWidget>
 
@@ -88,6 +88,14 @@ int HelpTopicAccessor::helpTopicAt(QWidget* widget, const QPoint& pos, bool bubb
             topicId = queryable->helpTopicAt(widgetPos);
             if (topicId != HelpTopic::Id::Empty)
                 return topic(topicId);
+        }
+
+        if (QQuickWidget* widget = dynamic_cast<QQuickWidget*>(widget))
+        {
+            topicId = helpTopicAt(widget->rootObject(), pos);
+            return topicId != HelpTopic::Id::Empty
+                ? topicId
+                : HelpTopicAccessor::helpTopic(static_cast<QObject*>(widget));
         }
 
         if (QGraphicsView* view = dynamic_cast<QGraphicsView*>(widget))
