@@ -7,7 +7,6 @@ namespace ResourcePropertyKey {
 const QString kAnalog("analog");
 const QString kIsAudioSupported("isAudioSupported");
 const QString kForcedIsAudioSupported("forcedIsAudioSupported");
-const QString kHasDualStreaming("hasDualStreaming");
 const QString kStreamFpsSharing("streamFpsSharing");
 const QString kDts("dts");
 

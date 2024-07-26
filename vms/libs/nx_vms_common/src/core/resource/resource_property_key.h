@@ -17,7 +17,6 @@ namespace ResourcePropertyKey {
 NX_VMS_COMMON_API extern const QString kAnalog;
 NX_VMS_COMMON_API extern const QString kIsAudioSupported;
 NX_VMS_COMMON_API extern const QString kForcedIsAudioSupported;
-NX_VMS_COMMON_API extern const QString kHasDualStreaming;
 NX_VMS_COMMON_API extern const QString kStreamFpsSharing;
 NX_VMS_COMMON_API extern const QString kDts;
 

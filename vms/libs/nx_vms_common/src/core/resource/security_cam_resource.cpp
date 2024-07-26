@@ -581,7 +581,8 @@ QnScheduleTaskList QnSecurityCamResource::getScheduleTasks() const
     return m_userAttributes.scheduleTasks;
 }
 
-bool QnSecurityCamResource::hasDualStreaming() const {
+bool QnSecurityCamResource::hasDualStreaming() const
+{
     return m_cachedHasDualStreaming.get();
 }
 
@@ -599,14 +600,9 @@ void QnSecurityCamResource::setCameraMediaCapability(const nx::vms::api::CameraM
 
 bool QnSecurityCamResource::hasDualStreamingInternal() const
 {
-    const auto capabilities = cameraMediaCapability();
-    if (capabilities.hasDualStreaming)
-        return true;
-
-    // Compatibility with version < 3.1.2
-    QString val = getProperty(ResourcePropertyKey::kHasDualStreaming);
-    return val.toInt() > 0;
+    return cameraMediaCapability().hasDualStreaming;
 }
+
 
 bool QnSecurityCamResource::isDtsBased() const
 {

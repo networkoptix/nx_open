@@ -80,7 +80,7 @@ bool CameraResourceStub::hasDualStreamingInternal() const
 void CameraResourceStub::setHasDualStreaming(bool value)
 {
     d->hasDualStreaming = value;
-    setProperty(ResourcePropertyKey::kHasDualStreaming, "1"); //< Reset cached values.
+    resetCachedValues();
 }
 
 void CameraResourceStub::markCameraAsNvr()
