@@ -68,8 +68,6 @@ void initializeExternalResources(const QString& customExternalResourceFile)
         analytics::IconManager::librariesRoot() + "bytedance.iconpark/");
 }
 
-static ApplicationContext* s_instance = nullptr;
-
 struct ApplicationContext::Private
 {
     void initializeSettings()
@@ -161,9 +159,6 @@ ApplicationContext::ApplicationContext(
     common::ApplicationContext(peerType, customCloudHost, parent),
     d(new Private{.q = this, .mode = mode, .ignoreCustomization = ignoreCustomization})
 {
-    if (NX_ASSERT(!s_instance))
-        s_instance = this;
-
     initializeResources();
     initializeExternalResources(customExternalResourceFile);
     initializeMetaTypes();
@@ -218,15 +213,6 @@ ApplicationContext::ApplicationContext(
 ApplicationContext::~ApplicationContext()
 {
     nx::utils::setOnAssertHandler(nullptr);
-
-    if (NX_ASSERT(s_instance == this))
-        s_instance = nullptr;
-}
-
-ApplicationContext* ApplicationContext::instance()
-{
-    NX_ASSERT(s_instance);
-    return s_instance;
 }
 
 void ApplicationContext::initializeNetworkModules()

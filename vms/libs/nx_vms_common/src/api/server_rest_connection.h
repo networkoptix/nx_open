@@ -803,6 +803,11 @@ public:
         Result<ErrorOrEmpty>::type&& callback,
         QThread* targetThread);
 
+    /** Requests the one-time authorization ticket which can be used in rest API requests. */
+    Handle createTicket(
+        Result<ErrorOrData<nx::vms::api::LoginSession>>::type callback,
+        QThread* targetThread);
+
     Handle loginAsync(
         const nx::vms::api::LoginSessionRequest& data,
         Result<ErrorOrData<nx::vms::api::LoginSession>>::type callback,
