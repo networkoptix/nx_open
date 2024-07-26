@@ -9,7 +9,6 @@ import Nx.Controls
 
 import nx.vms.client.desktop
 import nx.vms.client.core
-import nx.vms.client.desktop
 
 /**
  * A tree view with multi-selection, drag-n-drop and editing support.

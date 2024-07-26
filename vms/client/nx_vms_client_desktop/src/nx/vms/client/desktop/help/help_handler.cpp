@@ -9,11 +9,13 @@
 #include <QtGui/QDesktopServices>
 #include <QtGui/QHelpEvent>
 #include <QtQuick/QQuickWindow>
+#include <QtQuickWidgets/QQuickWidget>
 #include <QtWidgets/QWhatsThis>
 #include <QtWidgets/QWidget>
 
 #include <nx/build_info.h>
 #include <nx/utils/external_resources.h>
+#include <nx/utils/log/log.h>
 
 #include "help_dialog.h"
 #include "help_topic_accessor.h"
@@ -49,17 +51,33 @@ void HelpHandler::openHelpTopic(int topic)
 void HelpHandler::openHelpTopic(HelpTopic::Id topic)
 {
     if (nx::build_info::isLinux())
+    {
+        NX_DEBUG(NX_SCOPE_TAG, "Opening help topic %1 in the internal browser", topic);
+
         instance().openHelpTopicInternal(topic);
+    }
     else
-        QDesktopServices::openUrl(urlForTopic(topic));
+    {
+        const auto url = urlForTopic(topic);
+
+        if (url.isEmpty())
+            return;
+
+        NX_DEBUG(NX_SCOPE_TAG, "Opening help topic %1 with url %2", topic, url);
+
+        QDesktopServices::openUrl(url);
+    }
 }
 
 QUrl HelpHandler::urlForTopic(HelpTopic::Id topic)
 {
     const auto helpRoot = nx::utils::externalResourcesDirectory().absolutePath() + "/help/";
     QString filePath = helpRoot + HelpTopic::relativeUrlForTopic(topic);
+
     if (QFile::exists(filePath))
         return QUrl::fromLocalFile(filePath);
+
+    NX_WARNING(NX_SCOPE_TAG, "Unable to find help file %1 for topic %2", filePath, topic);
 
     return QUrl();
 }
@@ -80,62 +98,30 @@ void HelpHandler::openHelpTopicInternal(HelpTopic::Id topic)
 bool HelpHandler::eventFilter(QObject* watched, QEvent* event)
 {
     auto widget = qobject_cast<QWidget*>(watched);
-    QQuickWindow* window = nullptr;
 
-    if (!widget)
+    if (widget)
     {
-        window = qobject_cast<QQuickWindow*>(watched);
-        if (!window)
-            return false;
-    }
-
-    switch (event->type())
-    {
-        case QEvent::QueryWhatsThis:
+        switch (event->type())
         {
-            const int topicId = widget
-                ? HelpTopicAccessor::helpTopicAt(widget, widget->mapFromGlobal(QCursor::pos()))
-                : HelpTopicAccessor::helpTopicAt(window, window->mapFromGlobal(QCursor::pos()));
-
-            const bool accepted = topicId != HelpTopic::Id::Empty;
-            event->setAccepted(accepted);
-            return accepted;
-        }
-        case QEvent::WhatsThis:
-        {
-            auto e = static_cast<QHelpEvent*>(event);
-
-            const int topicId = widget
-                ? HelpTopicAccessor::helpTopicAt(widget, e->pos(), /* bubbleUp */ true)
-                : HelpTopicAccessor::helpTopicAt(window, e->pos());
-
-            if (topicId != HelpTopic::Id::Empty)
+            case QEvent::QueryWhatsThis:
             {
-                event->accept();
+                bool accepted =
+                    HelpTopicAccessor::helpTopicAt(widget, widget->mapFromGlobal(QCursor::pos()))
+                        != HelpTopic::Id::Empty;
 
-                setHelpTopic(topicId);
-
-                QWhatsThis::leaveWhatsThisMode();
-                return true;
+                event->setAccepted(accepted);
+                return accepted;
             }
-
-            return false;
-        }
-        case QEvent::MouseButtonPress:
-        {
-            auto e = static_cast<QMouseEvent*>(event);
-
-            if (e->button() == Qt::RightButton && QWhatsThis::inWhatsThisMode())
+            case QEvent::WhatsThis:
             {
-                QWhatsThis::leaveWhatsThisMode();
-                return true;
-            }
+                auto e = static_cast<QHelpEvent*>(event);
 
-            // Qt Quick does not handle WhatsThis event, so we need to simulate its behavior.
-            if (window && e->button() == Qt::LeftButton && QWhatsThis::inWhatsThisMode())
-            {
-                if (const auto topicId = HelpTopicAccessor::helpTopicAt(window, e->pos());
-                    topicId != HelpTopic::Id::Empty)
+                int topicId = HelpTopicAccessor::helpTopicAt(widget, e->pos(), /* bubbleUp */ true);
+
+                NX_DEBUG(this, "WhatsThis event: with widget %1, position: %2, help topic: %3",
+                    watched, e->pos(), topicId);
+
+                if (topicId != HelpTopic::Id::Empty)
                 {
                     event->accept();
 
@@ -144,13 +130,38 @@ bool HelpHandler::eventFilter(QObject* watched, QEvent* event)
                     QWhatsThis::leaveWhatsThisMode();
                     return true;
                 }
+
+                return false;
+            }
+        }
+    }
+
+    if (QWhatsThis::inWhatsThisMode() && event->type() == QEvent::MouseButtonPress)
+    {
+        auto e = static_cast<QMouseEvent*>(event);
+
+        if (e->button() == Qt::RightButton || e->button() == Qt::LeftButton)
+        {
+            if (e->button() == Qt::LeftButton)
+            {
+                if (auto window = qobject_cast<QQuickWindow*>(watched))
+                {
+                    const auto topicId = HelpTopicAccessor::helpTopicAt(window, e->pos());
+
+                    // Qt Quick does not handle WhatsThis event, so we need to simulate its behavior.
+                    if (topicId != HelpTopic::Id::Empty)
+                        setHelpTopic(topicId);
+                }
             }
 
-            return false;
+            event->accept();
+            QWhatsThis::leaveWhatsThisMode();
+            return true;
         }
-        default:
-            return false;
+
     }
+
+    return false;
 }
 
 HelpHandler& HelpHandler::instance()
