@@ -12,6 +12,9 @@
 #include "ffmpeg_audio_resampler.h"
 #include "transcoder.h"
 
+//< Minimal supported sample rate in mp4(with mp3), see ffmpeg(7.0.1) movenc.c:7579
+constexpr int kMinMp4Mp3SampleRate = 16000;
+
 /**
  * Transcodes audio packets from one format to another.
  * Can be used to change codec and/or sample rate.
