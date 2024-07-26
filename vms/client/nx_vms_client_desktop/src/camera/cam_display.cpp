@@ -210,7 +210,6 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
                 if (m_streamsChangedCallback)
                 {
                     if (propertyName == ResourcePropertyKey::kMediaCapabilities
-                        || propertyName == ResourcePropertyKey::kHasDualStreaming
                         || propertyName == ResourcePropertyKey::kStreamUrls)
                     {
                         m_streamsChangedCallback();
