@@ -31,6 +31,12 @@ static AVPixelFormat jpegPixelFormatToRtp(AVPixelFormat value)
     }
 }
 
+bool isMoovFormat(const QString& container)
+{
+    return container.compare("mp4", Qt::CaseInsensitive) == 0
+        || container.compare("ismv", Qt::CaseInsensitive) == 0;
+}
+
 static qint32 ffmpegReadPacket(void* /*opaque*/, quint8* /*buf*/, int /*size*/)
 {
     NX_ASSERT(false, "This class for streaming encoding! This function call MUST not exists!");
@@ -225,8 +231,7 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
             if (video->context)
                 avcodec_parameters_copy(m_videoCodecParameters, video->context->getAvCodecParameters());
 
-            if (m_container.compare("mp4", Qt::CaseInsensitive) == 0
-                ||  m_container.compare("ismv", Qt::CaseInsensitive) == 0)
+            if (isMoovFormat(m_container))
             {
                 if (!nx::media::fillExtraDataAnnexB(
                     video.get(),
@@ -274,6 +279,14 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
                     if (isCodecSupported(codec))
                     {
                         setAudioCodec(codec, TranscodeMethod::TM_FfmpegTranscode);
+                        if (isMoovFormat(m_container)
+                            && audio->context->getSampleRate() < kMinMp4Mp3SampleRate
+                            && codec == AV_CODEC_ID_MP3
+                            && m_aTranscoder)
+                        {
+                            m_aTranscoder->setSampleRate(kMinMp4Mp3SampleRate);
+                        }
+
                         break;
                     }
                 }
@@ -504,11 +517,11 @@ int QnFfmpegTranscoder::finalizeInternal(nx::utils::ByteArray* const /*result*/)
     for (int streamIndex = 0; streamIndex < 2; ++streamIndex)
     {
         //finalizing codec transcoder
-        QnCodecTranscoderPtr transcoder;
+        QnCodecTranscoder* transcoder;
         if (streamIndex == 0)
-            transcoder = m_vTranscoder;
+            transcoder = m_vTranscoder.get();
         else if (streamIndex == 1)
-            transcoder = m_aTranscoder;
+            transcoder = m_aTranscoder.get();
         if (!transcoder)
             continue;
 
