@@ -8,7 +8,6 @@
 #include <include/core/SkPath.h>
 #include <include/pathops/SkPathOps.h>
 
-using namespace pk;
 
 namespace {
 
@@ -190,7 +189,7 @@ void RhiPaintEngine::drawPath(const QPainterPath& path)
     });
 }
 
-std::optional<pk::SkPath> RhiPaintEngine::getClip() const
+std::optional<SkPath> RhiPaintEngine::getClip() const
 {
     if (m_clipEnabled)
         return m_clipPath;

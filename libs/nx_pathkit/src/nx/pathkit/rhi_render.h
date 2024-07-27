@@ -24,6 +24,8 @@ class QRhiTexture;
 
 namespace nx::pathkit {
 
+class VertexAllocator;
+
 class NX_PATHKIT_API RhiPaintDeviceRenderer
 {
 public:
@@ -80,7 +82,7 @@ private:
     std::vector<Batch> processEntries(
         QRhiRenderPassDescriptor* rp,
         QRhiResourceUpdateBatch* u,
-        std::vector<float>& triangles,
+        VertexAllocator& triangles,
         std::vector<float>& colors,
         std::vector<float>& textureVerts,
         QSize clip);
