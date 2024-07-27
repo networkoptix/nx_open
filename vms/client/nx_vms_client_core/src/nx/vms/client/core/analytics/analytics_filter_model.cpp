@@ -333,14 +333,11 @@ void AnalyticsFilterModel::rebuild()
     if (!m_taxonomyManager)
         return;
 
-    setObjectTypes({});
-    setEngines({});
-
-    if (!NX_ASSERT(m_objectTypes.empty() && m_engines.empty()))
-        return;
-
-    m_stateViewBuilder =
+    auto newStateViewBuilder =
         std::make_unique<taxonomy::StateViewBuilder>(m_taxonomyManager->currentTaxonomy());
+
+    // Swap to avoid destroying objects used in QML during update.
+    std::swap(m_stateViewBuilder, newStateViewBuilder);
 
     setEngines(enginesFromFilters(m_stateViewBuilder->engineFilters()));
     update(m_engine, m_devices, m_attributeValues, m_liveTypesExcluded, /*force*/ true);
