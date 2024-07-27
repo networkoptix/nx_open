@@ -7598,8 +7598,8 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message numerus="yes">
       <source>Use Service</source>
-      <translation type="unfinished">
-        <numerusform>Use Service</numerusform>
+      <translation>
+        <numerusform>Sử dụng dịch vụ</numerusform>
       </translation>
     </message>
   </context>
@@ -12167,7 +12167,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <message>
       <source>%1 filename length is more than %2 characters.</source>
       <comment>%1 is file name</comment>
-      <translation type="unfinished">%1 filename length is more than %2 characters.</translation>
+      <translation>Độ dài tên tệp %1 dài hơn %2 ký tự.</translation>
     </message>
   </context>
   <context>

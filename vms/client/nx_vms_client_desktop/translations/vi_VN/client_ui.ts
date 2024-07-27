@@ -665,7 +665,7 @@
     </message>
     <message>
       <source>Import from Device</source>
-      <translation type="unfinished">Import from Device</translation>
+      <translation>Nhập từ thiết bị</translation>
     </message>
     <message>
       <source>Import video automatically</source>

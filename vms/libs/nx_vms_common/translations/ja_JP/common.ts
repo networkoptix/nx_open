@@ -1741,6 +1741,10 @@
       <source>HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility</source>
       <translation>HTTPヘッダー: サーバー、サポートされている変数: $vmsName, $vmsVersion, $company, $compatibility</translation>
     </message>
+    <message>
+      <source>Device storage information update interval</source>
+      <translation>デバイスのストレージ情報の更新間隔</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::event::StringsHelper</name>
