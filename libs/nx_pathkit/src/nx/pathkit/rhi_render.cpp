@@ -1,19 +1,70 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+// Qt foreach macro breaks Skia code, so include Skia headers first.
+#include <include/core/SkStrokeRec.h>
+#include <include/pathops/SkPathOps.h>
+#include <src/gpu/ganesh/GrEagerVertexAllocator.h>
+#include <src/gpu/ganesh/geometry/GrAATriangulator.h>
+#include <src/gpu/ganesh/geometry/GrTriangulator.h>
+
 #include "rhi_render.h"
 
 #include <QtCore/QFile>
 #include <QtGui/QImage>
 #include <QtGui/rhi/qrhi.h>
 
-#include <include/core/SkStrokeRec.h>
-#include <include/pathops/SkPathOps.h>
-
 #include <nx/utils/log/assert.h>
 #include <nx/pathkit/rhi_paint_device.h>
 #include <nx/pathkit/rhi_paint_engine.h>
 
-using namespace pk;
+namespace nx::pathkit {
+
+class VertexAllocator: public GrEagerVertexAllocator
+{
+public:
+    void* lock(size_t stride, int eagerCount) override
+    {
+        m_lastStride = stride;
+        const size_t allocSize = m_size + eagerCount * stride;
+        if (allocSize > m_capacity)
+        {
+            m_data.realloc(allocSize);
+            m_capacity = allocSize;
+        }
+        return m_data + m_size;
+    }
+
+    void unlock(int actualCount) override
+    {
+        m_size += actualCount * m_lastStride;
+    }
+
+    size_t size() const
+    {
+        return m_size / sizeof(float);
+    }
+
+    float& operator[](int i)
+    {
+        return *reinterpret_cast<float*>(m_data + i * sizeof(float));
+    }
+
+    float operator[](int i) const
+    {
+        return *reinterpret_cast<const float*>(m_data + i * sizeof(float));
+    }
+
+    const void* data() const
+    {
+        return m_data;
+    }
+
+private:
+    skia_private::AutoTMalloc<char> m_data;
+    size_t m_capacity = 0;
+    size_t m_size = 0;
+    size_t m_lastStride = 0;
+};
 
 namespace {
 
@@ -27,16 +78,17 @@ int pathToTriangles(
     const SkPath& path,
     QColor color,
     const nx::pathkit::PaintPath& pp,
-    std::vector<float>& triangles,
+    VertexAllocator& triangles,
     std::vector<float>& colors,
     QSize clip)
 {
     const auto prevSize = triangles.size();
     const SkRect clipBounds = SkRect::MakeXYWH(0, 0, clip.width(), clip.height());
+    bool isLinear;
     if (pp.aa)
-        path.toAATriangles(kTolerance, clipBounds, &triangles);
+        GrAATriangulator::PathToAATriangles(path, kTolerance, clipBounds, &triangles);
     else
-        path.toTriangles(kTolerance, clipBounds, &triangles);
+        GrTriangulator::PathToTriangles(path, kTolerance, clipBounds, &triangles, &isLinear);
 
     // Each triangle vertex is 3 floats: x, y, alpha.
     const auto numVerts = (triangles.size() - prevSize) / 3;
@@ -88,8 +140,6 @@ void setupBlend(QRhiGraphicsPipeline* pipeline)
 }
 
 } // namespace
-
-namespace nx::pathkit {
 
 static constexpr auto kMatrix4x4Size = 4 * 4 * sizeof(float);
 
@@ -280,7 +330,7 @@ bool RhiPaintDeviceRenderer::prepare(QRhiRenderPassDescriptor* rp, QRhiResourceU
         createTexturePipeline(rp);
     }
 
-    std::vector<float> vertexData;
+    VertexAllocator vertexData;
     std::vector<float> colors;
     std::vector<float> textureData;
 
@@ -580,11 +630,14 @@ void RhiPaintDeviceRenderer::fillTextureVerts(
         SkPath clipped;
         Op(borderPath, *paintPixmap.clip, SkPathOp::kIntersect_SkPathOp, &clipped);
 
-        std::vector<float> triangles;
-        clipped.toTriangles(
+        VertexAllocator triangles;
+        bool isLinear;
+        GrTriangulator::PathToTriangles(
+            clipped,
             kTolerance,
             /*clipBounds*/ SkRect::MakeXYWH(0, 0, clip.width(), clip.height()),
-            &triangles);
+            &triangles,
+            &isLinear);
 
         bool invertible = false;
         QTransform inverted = paintPixmap.transform.inverted(&invertible);
@@ -645,7 +698,7 @@ void RhiPaintDeviceRenderer::fillTextureVerts(
 std::vector<RhiPaintDeviceRenderer::Batch> RhiPaintDeviceRenderer::processEntries(
     QRhiRenderPassDescriptor* rp,
     QRhiResourceUpdateBatch* u,
-    std::vector<float>& triangles,
+    VertexAllocator& triangles,
     std::vector<float>& colors,
     std::vector<float>& textureVerts,
     QSize clip)

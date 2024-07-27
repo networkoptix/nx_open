@@ -19,10 +19,10 @@ struct NX_PATHKIT_API PaintPath
 {
     QPen pen;
     QBrush brush;
-    pk::SkPath path;
+    SkPath path;
     bool aa = false;
     qreal opacity = 1.0;
-    std::optional<pk::SkPath> clip;
+    std::optional<SkPath> clip;
 
     ~PaintPath();
 };
@@ -33,7 +33,7 @@ struct PaintPixmap
     QPixmap pixmap;
     QRectF src;
     QTransform transform;
-    std::optional<pk::SkPath> clip;
+    std::optional<SkPath> clip;
     qreal opacity = 1.0;
 };
 
@@ -78,13 +78,13 @@ public:
 
 private:
     void updateClipPath(const QPainterPath& clipPath, Qt::ClipOperation op);
-    std::optional<pk::SkPath> getClip() const;
+    std::optional<SkPath> getClip() const;
 
     std::vector<PaintData> m_paths;
     RhiPaintDevice* m_device = nullptr;
 
     bool m_clipEnabled = false;
-    pk::SkPath m_clipPath;
+    SkPath m_clipPath;
 };
 
 } // namespace nx::pathkit
