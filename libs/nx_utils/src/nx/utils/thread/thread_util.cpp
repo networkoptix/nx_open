@@ -15,9 +15,6 @@
     #include <sys/types.h>
     #include <sys/syscall.h>
     #include <unistd.h>
-    #ifndef Q_OS_ANDROID
-        static pid_t gettid(void) { return syscall(__NR_gettid); }
-    #endif
 #endif
 
 

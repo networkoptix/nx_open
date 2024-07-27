@@ -45,7 +45,7 @@ nx_configure_directory(
 
 nx_generate_package_json(${CMAKE_CURRENT_BINARY_DIR}/package.json
     COMPONENT client
-    VARIANTS "{ \"name\": \"ubuntu\", \"minimumVersion\": \"18.04\" }")
+    VARIANTS "{ \"name\": \"ubuntu\", \"minimumVersion\": \"20.04\" }")
 list(APPEND configured_files ${CMAKE_CURRENT_BINARY_DIR}/package.json)
 
 nx_get_component_translation_list(client_translation_files "client" SHELL_COMPATIBLE)

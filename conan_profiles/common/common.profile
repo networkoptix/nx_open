@@ -31,6 +31,7 @@ opencv/*:with_jpeg=False
 protobuf/*:with_zlib=False
 prometheus-cpp/*:with_pull=False
 prometheus-cpp/*:with_push=False
+sdk-gcc/*:with_sanitizer=False
 
 [tool_requires]
 boost/*:b2/4.10.1

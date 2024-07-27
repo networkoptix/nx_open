@@ -197,9 +197,7 @@ private:
         messageParser.setMessage(&msg);
         if (messageParser.parse(datagram, &bytesParsed) == nx::network::server::ParserState::done)
         {
-            m_customPipeline->messageReceived(
-                std::move(sourceAddress),
-                std::move(msg));
+            m_customPipeline->messageReceived(sourceAddress, msg);
         }
         else
         {
