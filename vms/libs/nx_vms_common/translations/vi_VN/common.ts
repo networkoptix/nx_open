@@ -1741,6 +1741,10 @@
       <source>HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility</source>
       <translation>Tiêu đề HTTP: Máy chủ, các biến được hỗ trợ: $vmsName, $vmsVersion, $company, $compatibility</translation>
     </message>
+    <message>
+      <source>Device storage information update interval</source>
+      <translation type="unfinished">Device storage information update interval</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::event::StringsHelper</name>

@@ -1800,6 +1800,10 @@
       <source>HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility</source>
       <translation>HTTP-huvud: Server, variabler som stöds: $vmsName, $vmsVersion, $company, $compatibility</translation>
     </message>
+    <message>
+      <source>Device storage information update interval</source>
+      <translation>Uppdateringsintervall för enhetens lagringsinformation</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::event::StringsHelper</name>

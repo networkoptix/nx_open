@@ -1918,6 +1918,10 @@
       <source>HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility</source>
       <translation>HTTP-заголовок: Сервер, поддерживаемые переменные: $vmsName, $vmsVersion, $company, $compatibility</translation>
     </message>
+    <message>
+      <source>Device storage information update interval</source>
+      <translation type="unfinished">Device storage information update interval</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::event::StringsHelper</name>
