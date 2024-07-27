@@ -69,7 +69,7 @@ class NxOpenConan(ConanFile):
         "onlyUnrevisionedPackages": False,
     }
 
-    ffmpeg_version_and_revision = "7.0.1#0aacbfd72e71c819ba590180d4080c5d"
+    ffmpeg_version_and_revision = "7.0.1#7952d1aecfb45b1de6520d2c1c29c0f9"
 
     def configure(self):
         # The open-source Customization Package coming from Conan has the name "opensource-meta",
@@ -184,40 +184,40 @@ class NxOpenConan(ConanFile):
 
         self.requires(f"ffmpeg/{self.ffmpeg_version_and_revision}")
         self.requires("openssl/1.1.1q" "#bcc8c366b4291c68913eabe817fb15c7")
-        self.requires("qt/6.5.3" "#ff8b70ec26514dd008683acfd39a52bf")
+        self.requires("qt/6.5.3" "#15a56b89358b91317b8d2eef7d8cc41f")
         self.requires("roboto-fonts/1.0" "#a1d64ec2d6a2e16f8f476b2b47162123")
         self.requires("boost/1.83.0" "#e0be85c6f8107d7e960246e31cbbf7ab")
         self.requires("rapidjson/cci.20230929" "#624c0094d741e6a3749d2e44d834b96c")
+        self.requires("zlib/1.2.13" "#df233e6bed99052f285331b9f54d9070")
 
         if self.isWindows or self.isLinux:
             if self.settings.arch == "x86_64":
                 self.requires("cuda-toolkit/12.5.1" "#52c56e278e56d5a0cb47df11090bbeb7")
-                self.requires("libvpl/2023.4.0" "#d3846418a105faa17d740e65a5b98398")
-                self.requires("zlib/1.2.13" "#df233e6bed99052f285331b9f54d9070")
+                self.requires("libvpl/2023.4.0" "#7c3fb86a89705272e31f163320e8384f")
                 self.requires("libpq/15.5" "#fa107fbe709db74faa6e2cb3cf18a5ae")
 
         if self.isLinux:
             if self.settings.arch == "x86_64":
-                self.requires("libva/2.16.0" "#3b9a31708fbe3a31bd024ad301b48d23")
-                self.requires("intel-media-sdk/19.4" "#ecb7939833f8de0ffb197905a4f5a75a")
-                self.requires("intel-onevpl/23.4.2" "#da72e6e5e4cb8ce4baf25ce4c0b1a602")
-                self.requires("intel-gmmlib/22.3.15" "#6c54e5bd7885b8f25ff748ec7b2f991c")
-                self.requires("intel-media-driver/23.4.3" "#f5bb92ca710c7cd8cf5e8ee4afa18355")
+                self.requires("libva/2.16.0" "#62244701af6f028be1e1d1051e648488")
+                self.requires("intel-media-sdk/19.4" "#a3ac2d7e36a1260f757893833af8dea2")
+                self.requires("intel-onevpl/23.4.2" "#35a35b4e4db86741752331dce439a71d")
+                self.requires("intel-gmmlib/22.3.15" "#89d1f903368a92dfe057e7bed2afb3d8")
+                self.requires("intel-media-driver/23.4.3" "#fc9a92c1f8ef08c7beb2a4c7f69935b1")
 
                 self.requires("libmysqlclient/8.1.0" "#96475a9cb3a02bbe2626543d0b3d33b7")
 
             if not self.isArm32:
                 self._os_deps_package = "os_deps_for_desktop_linux"
-                self.requires("os_deps_for_desktop_linux/ubuntu_bionic"
-                    "#0efcda690cbe2353c8e96c47c8ee6784")
+                self.requires("os_deps_for_desktop_linux/ubuntu_focal"
+                    "#511e050eafd9d4a0ec666081b2eeb87d")
 
         if self.haveDesktopClient:
-            self.requires("hidapi/0.10.1" "#569759f2f39447fe3dbef070243585cc")
+            self.requires("hidapi/0.10.1" "#67c06b0755251878327ddea8fe964d6b")
             self.requires("pathkit/d776371" "#d1516a12d5e1e70fc8253a501acb3a7f")
             self.requires("range-v3/0.11.0" "#8d874cb9cdd7b81806d624493b82f9c0")
 
         if self.isWindows or self.isAndroid or (self.isLinux and not self.isArm32):
-            self.requires("openal/ec2ffbfa" "#324f5f4e95db7ca22aaeba745a775e85")
+            self.requires("openal/ec2ffbfa" "#baf81c7873a6dc2c60d67bb41efd9aa4")
 
         if self.isWindows:
             self.requires("directx/JUN2010" "#ca268f1b54e3874ad43524cd81447b01")

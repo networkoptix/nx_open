@@ -5,4 +5,4 @@
 # request a certain revision for a dependency. This is a profile to work-around the issue for
 # gcc-toolchain dependency.
 [build_requires]
-gcc-toolchain/12.2#cf5f65f09eb5b734ab697e685b33a021
+gcc-toolchain/13.3#3bc1bf7050bea34d44860b7954995692

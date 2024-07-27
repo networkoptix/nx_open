@@ -14,9 +14,9 @@ if(LINUX AND NOT ANDROID)
     set(ENV{PKG_CONFIG_PATH} ${os_deps_pkg_config_dir})
 
     if(arch STREQUAL "arm")
-        set(icu_version 57)
+        set(icu_version 67)
     else()
-        set(icu_version 60)
+        set(icu_version 66)
     endif()
 
     set(icu_runtime_libs
