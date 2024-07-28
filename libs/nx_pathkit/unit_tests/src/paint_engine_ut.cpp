@@ -162,20 +162,28 @@ TEST_F(PaintEngineTest, checkRendering)
             p.setPen(QPen(Qt::black, 0));
             p.drawLine(5, 0, 5, 50);
 
-            p.setPen(QPen(Qt::black, 1));
+            QPen pen(Qt::black, 1, Qt::CustomDashLine);
+            pen.setDashPattern({1, 2, 3});
+            pen.setDashOffset(5);
+            p.setPen(pen);
             p.drawLine(10, 0, 10, 50);
 
-            p.setPen(QPen(Qt::black, 2));
+            pen.setStyle(Qt::DotLine);
+            pen.setWidth(2);
+            p.setPen(pen);
             p.drawLine(15, 0, 15, 50);
 
-            p.setPen(QPen(Qt::black, 3));
+            p.setPen(QPen(Qt::black, 3, Qt::DashDotDotLine));
             p.drawLine(20, 0, 20, 50);
 
-            QPen cp(Qt::black, 2);
+            QPen cp(Qt::black, 2, Qt::DashDotLine);
             cp.setCosmetic(true);
             p.setPen(cp);
-            p.setPen(QPen(Qt::black, 3));
             p.drawLine(25, 0, 25, 50);
+
+            p.setPen(QPen(Qt::black, 4, Qt::DashLine));
+            p.drawLine(30, 0, 30, 50);
+
             p.restore();
 
             // Test a path with a hole.
