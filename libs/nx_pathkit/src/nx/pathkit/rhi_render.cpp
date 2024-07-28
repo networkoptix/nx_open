@@ -1,7 +1,9 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 // Qt foreach macro breaks Skia code, so include Skia headers first.
+#include <include/core/SkPathEffect.h>
 #include <include/core/SkStrokeRec.h>
+#include <include/effects/SkDashPathEffect.h>
 #include <include/pathops/SkPathOps.h>
 #include <src/gpu/ganesh/GrEagerVertexAllocator.h>
 #include <src/gpu/ganesh/geometry/GrAATriangulator.h>
@@ -135,6 +137,50 @@ SkPaint::Join getSkJoin(Qt::PenJoinStyle style)
         case Qt::MPenJoinStyle:
         default: return SkPaint::kDefault_Join;
     }
+}
+
+sk_sp<SkPathEffect> getPenDashEffect(const QPen& pen)
+{
+    std::vector<float> intervals;
+
+    switch (pen.style())
+    {
+        case Qt::CustomDashLine:
+        {
+            const auto pattern = pen.dashPattern();
+            intervals.reserve(pattern.size() + pattern.size() % 2);
+
+            for (auto value: pattern)
+                intervals.push_back(value * pen.widthF());
+            if (intervals.size() % 2) //< Skia requires even number.
+                intervals.push_back(intervals.front());
+            break;
+        }
+        case Qt::DashLine:
+            for (auto value: {4, 2})
+                intervals.push_back(value * pen.widthF());
+            break;
+        case Qt::DotLine:
+            for (auto value: {1, 2})
+                intervals.push_back(value * pen.widthF());
+            break;
+        case Qt::DashDotLine:
+            for (auto value: {4, 2, 1, 2})
+                intervals.push_back(value * pen.widthF());
+            break;
+        case Qt::DashDotDotLine:
+            for (auto value: {4, 2, 1, 2, 1, 2})
+                intervals.push_back(value * pen.widthF());
+            break;
+        case Qt::SolidLine:
+        default:
+            return nullptr;
+    }
+
+    return SkDashPathEffect::Make(
+        intervals.data(),
+        intervals.size(),
+        pen.dashOffset() * pen.widthF());
 }
 
 void setupBlend(QRhiGraphicsPipeline* pipeline)
@@ -771,7 +817,16 @@ std::vector<RhiPaintDeviceRenderer::Batch> RhiPaintDeviceRenderer::processEntrie
                     getSkJoin(paintPath->pen.joinStyle()),
                     paintPath->pen.miterLimit());
                 SkPath tmp;
-                strokeRec.applyToPath(&tmp, paintPath->path);
+
+                if (auto dashEffect = getPenDashEffect(paintPath->pen))
+                {
+                    dashEffect->filterPath(&tmp, paintPath->path, &strokeRec, nullptr);
+                    strokeRec.applyToPath(&tmp, tmp);
+                }
+                else
+                {
+                    strokeRec.applyToPath(&tmp, paintPath->path);
+                }
 
                 if (paintPath->clip)
                     Op(tmp, *paintPath->clip, SkPathOp::kIntersect_SkPathOp, &tmp);
