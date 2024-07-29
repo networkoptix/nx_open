@@ -292,7 +292,7 @@
          <item>
           <widget class="QCheckBox" name="openInWindowCheckBox">
            <property name="text">
-            <string>Force open in dedicated window</string>
+            <string>Force open in a dedicated window</string>
            </property>
           </widget>
          </item>
