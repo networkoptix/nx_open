@@ -44,6 +44,7 @@
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/messages/resources_messages.h>
 #include <nx/vms/client/desktop/window_context.h>
+#include <nx/vms/client/desktop/workbench/handlers/notification_action_handler.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/intercom/utils.h>
 #include <nx/vms/common/system_context.h>
@@ -69,6 +70,7 @@
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_state_manager.h>
+#include <utils/common/delayed.h>
 #include <utils/common/delete_later.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/synctime.h>
@@ -212,6 +214,8 @@ LayoutActionHandler::LayoutActionHandler(WindowContext* windowContext, QObject* 
 
     connect(action(menu::OpenIntercomLayoutAction), &QAction::triggered, this,
         &LayoutActionHandler::at_openIntercomLayoutAction_triggered);
+    connect(action(menu::OpenMissedCallIntercomLayoutAction), &QAction::triggered, this,
+        &LayoutActionHandler::at_openMissedCallIntercomLayoutAction_triggered);
 
     connect(appContext()->unifiedResourcePool(), &core::UnifiedResourcePool::resourcesRemoved, this,
         [this](const QnResourceList& resources)
@@ -1268,6 +1272,24 @@ void LayoutActionHandler::at_openIntercomLayoutAction_triggered()
         ec2::fromResourceToApi(broadcastAction, actionData);
         manager->broadcastEventAction(actionData, [](int /*handle*/, ec2::ErrorCode) {});
     }
+}
+
+void LayoutActionHandler::at_openMissedCallIntercomLayoutAction_triggered()
+{
+    at_openInNewTabAction_triggered();
+
+    const menu::Parameters parameters = menu()->currentParameters(sender());
+
+    const vms::event::AbstractActionPtr action(new vms::event::SystemHealthAction(
+        MessageType::showMissedCallInformer,
+        parameters.argument(menu::OtherType).value<nx::Uuid>()));
+
+    executeDelayedParented(
+        [this, action]
+        {
+            windowContext()->notificationActionHandler()->removeNotification(action);
+        },
+        this);
 }
 
 } // namespace nx::vms::client::desktop

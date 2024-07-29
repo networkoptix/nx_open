@@ -288,8 +288,19 @@ void NotificationActionHandler::addNotification(const vms::event::AbstractAction
     showSplash(action);
 }
 
-void NotificationActionHandler::removeNotification(
-    const vms::event::AbstractActionPtr& action)
+void NotificationActionHandler::addSystemHealthEvent(
+    MessageType message, const vms::event::AbstractActionPtr& action)
+{
+    setSystemHealthEventVisibleInternal(message, QVariant::fromValue(action), true);
+}
+
+void NotificationActionHandler::setSystemHealthEventVisible(
+    MessageType message, const QnResourcePtr& resource, bool visible)
+{
+    setSystemHealthEventVisibleInternal(message, QVariant::fromValue(resource), visible);
+}
+
+void NotificationActionHandler::removeNotification(const vms::event::AbstractActionPtr& action)
 {
     const vms::api::EventType eventType = action->getRuntimeParams().eventType;
 
@@ -305,18 +316,6 @@ void NotificationActionHandler::removeNotification(
     {
         emit notificationRemoved(action);
     }
-}
-
-void NotificationActionHandler::addSystemHealthEvent(
-    MessageType message, const vms::event::AbstractActionPtr& action)
-{
-    setSystemHealthEventVisibleInternal(message, QVariant::fromValue(action), true);
-}
-
-void NotificationActionHandler::setSystemHealthEventVisible(
-    MessageType message, const QnResourcePtr& resource, bool visible)
-{
-    setSystemHealthEventVisibleInternal(message, QVariant::fromValue(resource), visible);
 }
 
 void NotificationActionHandler::setSystemHealthEventVisibleInternal(
