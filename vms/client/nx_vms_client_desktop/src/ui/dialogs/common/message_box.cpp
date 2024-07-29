@@ -25,7 +25,7 @@ static constexpr int kMinimumWidth = 400;
 
 const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kGreenTheme = {
     {QIcon::Normal, {.primary = "green_attention"}}};
-NX_DECLARE_COLORIZED_ICON(kSuccessIcon, "64x64/Outline/success-wider.svg", kGreenTheme)
+NX_DECLARE_COLORIZED_ICON(kSuccessIcon, "64x64/Outline/success.svg", kGreenTheme)
 
 } // namespace
 

@@ -1,6 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="20" fill="none" viewBox="0 0 24 20">
   <g class="24x20/Solid/video_export">
-    <path fill="#A5B7C0" class="Primary" fill-rule="evenodd" d="M2 3h10a2 2 0 0 1 2 2v3h-3a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h3v3a2 2 0 0 1-2 2H2V3Zm1 1h4v1H3V4Zm6 0h4v1H9V4ZM7 15H3v1h4v-1Zm2 1v-1h4v1H9Z" clip-rule="evenodd"/>
-    <path fill="#A5B7C0" class="Primary" d="M17 7.04a.5.5 0 0 1 .812-.39l3.7 2.96a.5.5 0 0 1 0 .78l-3.7 2.96a.5.5 0 0 1-.812-.39V11h-5.5a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5H17V7.04Z"/>
+    <path fill="#A5B7C0" fill-rule="evenodd" d="M12 3H2v14h10a2 2 0 0 0 2-2v-3h-3a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1h3V5a2 2 0 0 0-2-2ZM7 4H3v1h4V4Zm6 0H9v1h4V4ZM3 15h4v1H3v-1Zm6 0v1h4v-1H9Zm8.812-8.35a.5.5 0 0 0-.812.39V9h-5.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5H17v1.96a.5.5 0 0 0 .812.39l3.7-2.96a.5.5 0 0 0 0-.78l-3.7-2.96Z" class="Primary" clip-rule="evenodd"/>
   </g>
 </svg>
