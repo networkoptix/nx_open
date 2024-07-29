@@ -391,7 +391,7 @@ nx::vms::api::UserModelV1 RemoteConnectionFactoryRequestsManager::Private::getUs
     const auto userIt = std::find_if(users.cbegin(), users.cend(),
         [userName = context->credentials().username](const auto& user)
         {
-            return user.name == userName;
+            return user.name.toLower() == userName;
         });
 
     if (userIt == users.cend())
