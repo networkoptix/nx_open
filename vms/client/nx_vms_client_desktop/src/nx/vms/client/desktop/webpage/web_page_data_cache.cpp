@@ -47,8 +47,8 @@ void loadMetadata(
         new Object({
             hasIcon: !!icon,
             dedicatedWindow: dedicatedWindow && {
-                width: parseInt(dedicatedWindow.attributes.width?.value),
-                height: parseInt(dedicatedWindow.attributes.height?.value)
+                width: parseInt(dedicatedWindow.attributes.width?.value) || 0,
+                height: parseInt(dedicatedWindow.attributes.height?.value) || 0
             }
         })
     )";
