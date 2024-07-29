@@ -23,7 +23,7 @@ RoutingRecord::RoutingRecord(
 qint32 AlivePeerInfo::distanceTo(const PersistentIdData& peer) const
 {
     auto itr = routeTo.find(peer);
-    return itr != routeTo.end() ? itr.value().distance : kMaxDistance;
+    return itr != routeTo.end() ? itr->second.distance : kMaxDistance;
 }
 
 qint32 RouteToPeerInfo::minDistance(RoutingInfo* outViaList) const
@@ -31,14 +31,14 @@ qint32 RouteToPeerInfo::minDistance(RoutingInfo* outViaList) const
     if (m_minDistance == kMaxDistance)
     {
         for (auto itr = m_routeVia.cbegin(); itr != m_routeVia.cend(); ++itr)
-            m_minDistance = std::min(m_minDistance, itr.value().distance);
+            m_minDistance = std::min(m_minDistance, itr->second.distance);
     }
     if (outViaList)
     {
         for (auto itr = m_routeVia.cbegin(); itr != m_routeVia.cend(); ++itr)
         {
-            if (itr.value().distance == m_minDistance)
-                outViaList->insert(itr.key(), itr.value());
+            if (itr->second.distance == m_minDistance)
+                outViaList->emplace(itr->first, itr->second);
         }
     }
     return m_minDistance;
@@ -47,7 +47,7 @@ qint32 RouteToPeerInfo::minDistance(RoutingInfo* outViaList) const
 qint32 RouteToPeerInfo::distanceVia(const PersistentIdData& peer) const
 {
     auto itr = m_routeVia.find(peer);
-    return itr != m_routeVia.end() ? itr.value().distance : kMaxDistance;
+    return itr != m_routeVia.end() ? itr->second.distance : kMaxDistance;
 }
 
 // ---------------------- BidirectionRoutingInfo --------------

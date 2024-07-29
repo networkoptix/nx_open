@@ -1422,7 +1422,7 @@ nx::Uuid MessageBus::routeToPeerVia(
 
     RoutingInfo via;
     *distance = m_peers->distanceTo(peerId, &via);
-    return via.isEmpty() ? nx::Uuid() : via.begin().key().id;
+    return via.empty() ? nx::Uuid() : via.begin()->first.id;
 }
 
 int MessageBus::distanceToPeer(const nx::Uuid& peerId) const
