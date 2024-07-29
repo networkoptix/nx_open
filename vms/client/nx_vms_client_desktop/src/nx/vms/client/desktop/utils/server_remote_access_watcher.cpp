@@ -13,6 +13,7 @@
 #include <nx/vms/api/types/proxy_connection_access_policy.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/network/certificate_verifier.h>
+#include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource/server.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -117,11 +118,14 @@ void ServerRemoteAccessWatcher::updateRemoteAccess(const ServerResourcePtr& serv
 {
     using namespace nx::network::http::header;
     const auto gateway = appContext()->cloudGateway();
+    auto address = systemContext()->connection()->connectionInfo().isCloud()
+        ? server->getCloudAddress().value()
+        : server->getPrimaryAddress();
     RemoteAccessData remoteAccessData;
     remoteAccessData.enabledForCurrentUser = isRemoteAccessEnabledForCurrentUser();
     if (!remoteAccessData.enabledForCurrentUser)
     {
-        gateway->forward(server->getPrimaryAddress(),
+        gateway->forward(address,
             /*targetPorts*/ {},
             nx::network::ssl::kAcceptAnyCertificate);
         server->setRemoteAccessData(remoteAccessData);
@@ -133,10 +137,9 @@ void ServerRemoteAccessWatcher::updateRemoteAccess(const ServerResourcePtr& serv
         targetPorts.insert(configuration.port);
 
     BearerAuthorization header(systemContext()->connectionCredentials().authToken.value);
-    gateway->enforceHeadersFor(
-        server->getPrimaryAddress(), {{kProxyAuthorization, header.toString()}});
+    gateway->enforceHeadersFor(address, {{kProxyAuthorization, header.toString()}});
 
-    auto forwardedPorts = gateway->forward(server->getPrimaryAddress(),
+    auto forwardedPorts = gateway->forward(address,
         targetPorts,
         systemContext()->certificateVerifier()->makeAdapterFunc(
             server->getId(), server->getApiUrl()));
