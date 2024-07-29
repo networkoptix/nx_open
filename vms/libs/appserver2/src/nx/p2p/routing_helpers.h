@@ -18,7 +18,7 @@ struct RoutingRecord
     vms::api::PersistentIdData firstVia;
 };
 
-using RoutingInfo = QMap<vms::api::PersistentIdData, RoutingRecord>;
+using RoutingInfo = std::map<vms::api::PersistentIdData, RoutingRecord>;
 
 struct AlivePeerInfo
 {
@@ -40,7 +40,7 @@ struct RouteToPeerInfo
 
     void remove(const vms::api::PersistentIdData& id)
     {
-        m_routeVia.remove(id);
+        m_routeVia.erase(id);
         m_minDistance = kMaxDistance;
     }
 
