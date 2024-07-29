@@ -579,9 +579,15 @@ enum IDType
 
     /**
      * Opens Intercom Layout when clicking on a notification tile.
-     * Closes the notification on all clients.
+     * Closes the call notification on all clients.
      */
     OpenIntercomLayoutAction,
+
+    /**
+     * Opens Intercom Layout when clicking on a notification tile.
+     * Closes the missed call notification on current client.
+     */
+    OpenMissedCallIntercomLayoutAction,
 
     /**
      * Opens selected resources in the Alarm Layout.

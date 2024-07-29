@@ -27,6 +27,8 @@ public:
     void setSystemHealthEventVisible(
         MessageType message, const QnResourcePtr& resource, bool visible);
 
+    void removeNotification(const vms::event::AbstractActionPtr& action);
+
 signals:
     void systemHealthEventAdded(MessageType message, const QVariant& params);
     void systemHealthEventRemoved(MessageType message, const QVariant& params);
@@ -42,7 +44,6 @@ private:
     void at_businessActionReceived(const nx::vms::event::AbstractActionPtr& action);
 
     void addNotification(const nx::vms::event::AbstractActionPtr& businessAction);
-    void removeNotification(const nx::vms::event::AbstractActionPtr& action);
 
     void addSystemHealthEvent(
         MessageType message,

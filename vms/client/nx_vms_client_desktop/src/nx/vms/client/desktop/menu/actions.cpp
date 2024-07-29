@@ -1207,6 +1207,11 @@ void initialize(Manager* manager, Action* root)
         .flags(SingleTarget | ResourceTarget)
         .condition(new OpenInNewEntityCondition());
 
+    factory(OpenMissedCallIntercomLayoutAction)
+        .mode(DesktopMode)
+        .flags(SingleTarget | ResourceTarget)
+        .condition(new OpenInNewEntityCondition());
+
     factory(OpenCurrentLayoutInNewWindowAction)
         .flags(NoTarget)
         .condition(new LightModeCondition(Qn::LightModeNoNewWindow));

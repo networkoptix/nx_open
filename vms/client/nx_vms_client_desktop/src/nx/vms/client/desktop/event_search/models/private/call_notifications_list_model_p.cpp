@@ -118,6 +118,9 @@ void CallNotificationsListModel::Private::addNotification(
     eventData.ruleId = runtimeParameters.eventResourceId;
     eventData.source = camera;
     eventData.previewCamera = camera;
+    eventData.actionParameters = system()->resourcePool()->getResourceById(
+        nx::vms::common::calculateIntercomLayoutId(camera));
+    eventData.removable = true;
 
     switch (message)
     {
@@ -131,10 +134,6 @@ void CallNotificationsListModel::Private::addNotification(
             eventData.title = tr("Calling...");
             eventData.iconPath = "20x20/Outline/call.svg";
             eventData.level = QnNotificationLevel::Value::SuccessNotification;
-            const auto intercomLayoutId = nx::vms::common::calculateIntercomLayoutId(camera);
-            eventData.actionParameters =
-                system()->resourcePool()->getResourceById(intercomLayoutId);
-            eventData.removable = true;
 
             eventData.extraAction = CommandActionPtr(new CommandAction());
             eventData.extraAction->setText(tr("Open"));
@@ -208,11 +207,12 @@ void CallNotificationsListModel::Private::addNotification(
         case MessageType::showMissedCallInformer:
         {
             eventData.id = nx::Uuid::createUuid(); //< We have to show every missed call separately.
-            eventData.actionId = menu::NoAction;
+            eventData.actionId = menu::OpenMissedCallIntercomLayoutAction;
             eventData.title = tr("Missed Call");
             eventData.iconPath = "20x20/Outline/call.svg";
             eventData.level = QnNotificationLevel::Value::CriticalNotification;
-            eventData.removable = true;
+            eventData.actionParameters.setArgument(menu::OtherType, eventData.id);
+
             break;
         }
         default:
