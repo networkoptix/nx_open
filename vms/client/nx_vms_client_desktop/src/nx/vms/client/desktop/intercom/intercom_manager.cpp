@@ -46,6 +46,11 @@ class IntercomManager::Private:
 public:
     IntercomManager* const q;
 
+    static QString intercomLayoutName(const QString& intercomCameraName)
+    {
+        return tr("%1 Layout").arg(intercomCameraName);
+    }
+
     Private(SystemContext* context, IntercomManager* owner):
         QObject(),
         SystemContextAware(context),
@@ -160,12 +165,19 @@ public:
         if (!layoutResource)
         {
             LayoutResourcePtr intercomLayout = layoutFromResource(intercomCamera);
-            intercomLayout->setName(tr("%1 Layout").arg(intercomCamera->getName()));
+            intercomLayout->setName(intercomLayoutName(intercomCamera->getName()));
             intercomLayout->setIdUnsafe(intercomLayoutId);
             intercomLayout->addFlags(Qn::local_intercom_layout);
             intercomLayout->setParentId(intercomCamera->getId());
 
             resourcePool->addNewResources({intercomLayout});
+
+            connect(intercomCamera.get(), &QnVirtualCameraResource::nameChanged,
+                intercomLayout.get(),
+                [intercomCamera, intercomLayout]
+                {
+                    intercomLayout->setName(intercomLayoutName(intercomCamera->getName()));
+                });
         }
     }
 
