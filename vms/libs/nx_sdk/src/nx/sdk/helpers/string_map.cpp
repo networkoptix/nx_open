@@ -8,15 +8,17 @@
 
 namespace nx::sdk {
 
-void StringMap::setItem(const std::string& key, const std::string& value)
+void StringMap::setItem(std::string key, std::string value)
 {
     NX_KIT_ASSERT(!key.empty());
-    m_map[key] = value;
+    m_map[std::move(key)] = std::move(value);
+    m_lookupCache.clear();
 }
 
 void StringMap::clear()
 {
     m_map.clear();
+    m_lookupCache.clear();
 }
 
 int StringMap::count() const
@@ -29,9 +31,8 @@ const char* StringMap::key(int i) const
     if (i < 0 || i >= (int) m_map.size())
         return nullptr;
 
-    auto position = m_map.cbegin();
-    std::advance(position, i);
-    return position->first.c_str();
+    initLookupCache();
+    return m_lookupCache[i * 2];
 }
 
 const char* StringMap::value(int i) const
@@ -39,9 +40,8 @@ const char* StringMap::value(int i) const
     if (i < 0 || i >= (int) m_map.size())
         return nullptr;
 
-    auto position = m_map.cbegin();
-    std::advance(position, i);
-    return position->second.c_str();
+    initLookupCache();
+    return m_lookupCache[i * 2 + 1];
 }
 
 const char* StringMap::value(const char* key) const
@@ -54,6 +54,19 @@ const char* StringMap::value(const char* key) const
         return nullptr;
 
     return it->second.c_str();
+}
+
+void StringMap::initLookupCache() const
+{
+    if (m_lookupCache.empty())
+    {
+        m_lookupCache.reserve(m_map.size() * 2);
+        for (const auto& [key, value]: m_map)
+        {
+            m_lookupCache.push_back(key.c_str());
+            m_lookupCache.push_back(value.c_str());
+        }
+    }
 }
 
 } // namespace nx::sdk

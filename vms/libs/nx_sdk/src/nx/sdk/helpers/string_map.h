@@ -3,13 +3,13 @@
 #pragma once
 
 #include <map>
+#include <vector>
 
 #include <nx/sdk/helpers/ref_countable.h>
 #include <nx/sdk/i_string_map.h>
 
 namespace nx::sdk {
 
-// TODO: Do something with O(N^2) complexity of lookup by index.
 class StringMap: public RefCountable<IStringMap>
 {
 public:
@@ -19,7 +19,7 @@ public:
 
     StringMap(Map map): m_map(std::move(map)) {}
 
-    void setItem(const std::string& key, const std::string& value);
+    void setItem(std::string key, std::string value);
 
     void clear();
 
@@ -34,7 +34,13 @@ public:
     virtual const char* value(const char* key) const override;
 
 private:
+    void initLookupCache() const;
+
+private:
     Map m_map;
+
+    // Cache for lookup by index to avoid O(N^2).
+    mutable std::vector<const char*> m_lookupCache;
 };
 
 } // namespace nx::sdk
