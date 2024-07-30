@@ -100,19 +100,17 @@ add_test(NAME analytics_plugin_ut COMMAND analytics_plugin_ut)
 set(testConfigFileHeader "# Paths to plugin library files which must be unit-tested.")
 
 if(WIN32)
-    set(testConfigFile ${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/analytics_plugin_ut.cfg)
-    string(CONCAT testConfigContent
-        "${testConfigFileHeader}\n"
-        "../../stub_analytics_plugin/$<CONFIG>/stub_analytics_plugin.dll\n"
-        "../../sample_analytics_plugin/$<CONFIG>/sample_analytics_plugin.dll\n"
-    )
+    set(libPrefix "")
+    set(libSuffix "dll")
 else()
-    set(testConfigFile ${CMAKE_CURRENT_BINARY_DIR}/analytics_plugin_ut.cfg)
-    string(CONCAT testConfigContent
-        "${testConfigFileHeader}\n"
-        "../stub_analytics_plugin/libstub_analytics_plugin.so\n"
-        "../sample_analytics_plugin/libsample_analytics_plugin.so\n"
-    )
+    set(libPrefix "lib")
+    set(libSuffix "so")
 endif()
 
+set(testConfigFile ${CMAKE_CURRENT_BINARY_DIR}/analytics_plugin_ut.cfg)
+string(CONCAT testConfigContent
+    "${testConfigFileHeader}\n"
+    "../stub_analytics_plugin/${libPrefix}stub_analytics_plugin.${libSuffix}\n"
+    "../sample_analytics_plugin/${libPrefix}sample_analytics_plugin.${libSuffix}\n"
+)
 file(GENERATE OUTPUT ${testConfigFile} CONTENT ${testConfigContent})

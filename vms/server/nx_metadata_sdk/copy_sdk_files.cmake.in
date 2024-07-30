@@ -29,6 +29,7 @@ set(copied_sample_2_target @copied_sample_2_target@)
 set(copied_sample_unit_tests_origin @copied_sample_unit_tests_origin@)
 set(copied_sample_unit_tests_files @copied_sample_unit_tests_files@)
 set(copied_sample_unit_tests_target @copied_sample_unit_tests_target@)
+set(msvc_environment_setup_script @msvc_environment_setup_script@)
 
 include(@open_source_root@/cmake/utils.cmake)
 
@@ -57,3 +58,10 @@ nx_copy_always(${copied_sample_unit_tests_origin} "${copied_sample_unit_tests_fi
     ${target_dir}/samples/${copied_sample_unit_tests_target})
 
 nx_copy_always(@open_source_root@ @open_source_root@/licenses ${target_dir})
+
+if(msvc_environment_setup_script)
+    nx_copy_always(
+        @open_source_root@/build_utils/msvc/
+        @open_source_root@/build_utils/msvc/${msvc_environment_setup_script}
+        ${target_dir})
+endif()
