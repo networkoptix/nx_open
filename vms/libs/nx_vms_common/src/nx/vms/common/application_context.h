@@ -65,6 +65,9 @@ public:
         return qobject_cast<ContextType*>(this);
     }
 
+protected:
+    void stopAll();
+
 private:
     struct Private;
     nx::utils::ImplPtr<Private> d;
