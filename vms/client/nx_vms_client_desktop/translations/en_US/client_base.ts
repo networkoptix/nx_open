@@ -1381,8 +1381,8 @@
     </message>
     <message numerus="yes">
         <source>Delete %n groups?</source>
-        <translation type="unfinished">
-            <numerusform>Delete %n group?</numerusform>
+        <translation>
+            <numerusform>Delete group?</numerusform>
             <numerusform>Delete %n groups?</numerusform>
         </translation>
     </message>
@@ -5982,7 +5982,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
         <source>Delete %n devices?</source>
         <translation>
-            <numerusform>Delete %n device?</numerusform>
+            <numerusform>Delete device?</numerusform>
             <numerusform>Delete %n devices?</numerusform>
         </translation>
     </message>
@@ -6184,8 +6184,8 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
         <source>Delete %n users?</source>
-        <translation type="unfinished">
-            <numerusform>Delete %n user?</numerusform>
+        <translation>
+            <numerusform>Delete user?</numerusform>
             <numerusform>Delete %n users?</numerusform>
         </translation>
     </message>
@@ -6482,7 +6482,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
         <source>Delete %n groups</source>
         <translation>
-            <numerusform>Delete %n group</numerusform>
+            <numerusform>Delete group</numerusform>
             <numerusform>Delete %n groups</numerusform>
         </translation>
     </message>
@@ -6607,10 +6607,10 @@ If you intended to move analytics data to another storage location, please conta
         <translation></translation>
     </message>
     <message numerus="yes">
-        <source>Delete %n Rules?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <source>Delete %n rules?</source>
+        <translation>
+            <numerusform>Delete rule?</numerusform>
+            <numerusform>Delete %n rules?</numerusform>
         </translation>
     </message>
 </context>
