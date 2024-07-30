@@ -11,6 +11,7 @@
 #include <nx/vms/common/system_settings.h>
 #include <utils/common/synctime.h>
 
+#include "private/remote_connection_factory_cache.h"
 #include "remote_connection.h"
 #include "remote_session.h"
 
@@ -190,6 +191,14 @@ void RemoteSessionTimeoutWatcher::tick()
             d->timeLeftWhenCancelled.reset();
             d->notificationVisible = false;
             emit hideNotification();
+        }
+
+        // If the token is expired, the cached data for this system must be forcibly deleted. This
+        // usually happens when the session duration is changed for cloud users.
+        if (connection->connectionInfo().isCloud())
+        {
+            RemoteConnectionFactoryCache::clearForCloudId(
+                connection->moduleInformation().cloudSystemId);
         }
 
         emit sessionExpired(d->sessionExpirationReason(session));
