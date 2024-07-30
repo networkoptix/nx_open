@@ -1242,7 +1242,7 @@
     <message>
         <source>Not allowed.</source>
         <comment>Generic HTTP response</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1802,7 +1802,7 @@
     </message>
     <message>
         <source>Device storage information update interval</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>

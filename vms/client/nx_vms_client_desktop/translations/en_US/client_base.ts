@@ -3942,7 +3942,7 @@ License Key: %2</source>
     </message>
     <message>
         <source>Text Files</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -4040,7 +4040,7 @@ License Key: %2</source>
     </message>
     <message>
         <source>Displays IP addresses for cameras and servers.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -5066,11 +5066,11 @@ License Key: %2</source>
     </message>
     <message>
         <source>RESTRICTED</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Authorize</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -7056,15 +7056,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>View Live.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>User Input.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Edit Settings.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -7725,9 +7725,9 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
         <source>Use Service</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Use Service</numerusform>
+            <numerusform>Use Services</numerusform>
         </translation>
     </message>
 </context>
@@ -12080,7 +12080,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
         <source>Copy the Access Link and share it with intended user</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -12329,7 +12329,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
         <source>%1 filename length is more than %2 characters.</source>
         <comment>%1 is file name</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
