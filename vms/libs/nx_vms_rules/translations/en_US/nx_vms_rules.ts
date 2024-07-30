@@ -152,10 +152,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Fixed duration</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>State</source>
         <translation type="unfinished"></translation>
     </message>
@@ -185,6 +181,27 @@
     </message>
     <message>
         <source>And Description</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Field %1 value must be provided for the given validation policy</source>
+        <comment>API error message when event rule cannot be created due to incomplete fields set</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Chosen local layout can only be shown to its owner %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>None of selected users have access to the selected layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Some users do not have access to the selected layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>For</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -489,10 +506,42 @@
     </message>
 </context>
 <context>
+    <name>nx::vms::rules::LayoutFieldValidator</name>
+    <message>
+        <source>Select layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>nx::vms::rules::LdapSyncIssueEvent</name>
     <message>
-        <source>Ldap Sync Issue Event</source>
-        <translation></translation>
+        <source>LDAP Sync Issue Event</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 (%n times)</source>
+        <comment>%1 is a cause of the event</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Failed to connect to the LDAP server.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to complete the sync within a %1 timeout.</source>
+        <comment>Timeout duration in human-readable form (ex.: 1 minute)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No user accounts on LDAP server match the synchronization settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Some LDAP users or groups were not found in the LDAP database.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -634,11 +683,23 @@
 <context>
     <name>nx::vms::rules::OptionalTimeFieldValidator</name>
     <message>
-        <source>Value can not be less than %1</source>
+        <source>Duration cannot be less than zero</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Value can not be more than %1</source>
+        <source>Zero duration cannot be set for the `%1` event state</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Non zero duration cannot be set for the `%1` event state</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Value cannot be less than %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Value cannot be more than %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -751,7 +812,11 @@
 <context>
     <name>nx::vms::rules::Rule</name>
     <message>
-        <source>`%1` field `%2` alert: %3</source>
+        <source>`%1` event filter field alerts:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>`%1` action builder field alerts:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -925,15 +990,11 @@
         <source>By</source>
         <translation></translation>
     </message>
-    <message>
-        <source>Invisible</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
-    <name>nx::vms::rules::SourceUserFieldValidator</name>
+    <name>nx::vms::rules::SoundFieldValidator</name>
     <message>
-        <source>Source camera field must be provided for the given validation policy</source>
+        <source>Sound is not selected</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -954,6 +1015,13 @@
     <message>
         <source>To users</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::rules::StateFieldValidator</name>
+    <message>
+        <source>`%1` state is not valid for the `%2` event and `%3` action with the given parameters</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1019,13 +1087,9 @@
     </message>
 </context>
 <context>
-    <name>nx::vms::rules::TargetUserFieldValidator</name>
+    <name>nx::vms::rules::TargetLayoutFieldValidator</name>
     <message>
-        <source>Acknowledge field must be provided for the given validation policy</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Layout field must be provided for the given validation policy</source>
+        <source>Select at least one layout</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1048,14 +1112,6 @@
     <name>nx::vms::rules::TextWithFieldsValidator</name>
     <message>
         <source>Unacceptable typed of field</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Internal error</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Incorrect event parameters: </source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -236,6 +236,14 @@
         <source>Settings</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Tile Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Table Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>AnalyticsSettings</name>
@@ -335,6 +343,17 @@ Select an Integration to begin configuring its parameters.</source>
     <message>
         <source>Remove Request</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>AuthCode</name>
+    <message>
+        <source>Wrong pairing code</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Paste</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -587,6 +606,13 @@ Select an Integration to begin configuring its parameters.</source>
     <message>
         <source>Click on the icon to read more</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>CopyableLabel</name>
+    <message>
+        <source>copied</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1436,17 +1462,6 @@ Select an Integration to begin configuring its parameters.</source>
     </message>
 </context>
 <context>
-    <name>LookupListElementViewer</name>
-    <message>
-        <source>ANY</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>ANY color</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>LookupListImportDialog</name>
     <message>
         <source>Import List</source>
@@ -2065,7 +2080,15 @@ Press Alt + Click to follow object</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Disabled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Server is not configured for remote access feature</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remote access tool is currently disabled. Please enable it or contact your administrator to turn it on.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2077,7 +2100,7 @@ Press Alt + Click to follow object</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Connect %1 application to localhost:%2 to use Cloud Connect.</source>
+        <source>Connect %1 client application to localhost:%2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2774,6 +2797,10 @@ Press Alt + Click to follow object</source>
         <source>The added site will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Notification Language</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>UserEditDialog</name>
@@ -2909,6 +2936,10 @@ Press Alt + Click to follow object</source>
     <message>
         <source>This user’s login duplicates the login of another user. None of them is able to log in. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Notification Language</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
