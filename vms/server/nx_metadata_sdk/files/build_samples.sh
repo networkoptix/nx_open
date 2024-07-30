@@ -34,7 +34,9 @@ fi
 
 case "$(uname -s)" in #< Check if running in Windows from Cygwin/MinGW.
     CYGWIN*|MINGW*)
-        GEN_OPTIONS=( -Ax64 )
+        # Assume that the MSVC environment is set up correctly and Ninja is installed. Also
+        # specify the compiler explicitly to avoid clashes with gcc.
+        GEN_OPTIONS=( -GNinja -DCMAKE_CXX_COMPILER=cl.exe -DCMAKE_C_COMPILER=cl.exe )
         BASE_DIR=$(cygpath -w "$BASE_DIR") #< Windows-native cmake requires Windows path.
         BUILD_OPTIONS=()
         if [[ $BUILD_TYPE == Release ]]

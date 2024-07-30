@@ -18,6 +18,10 @@ set BASE_DIR_WITH_BACKSLASH=%~dp0
 set BASE_DIR=%BASE_DIR_WITH_BACKSLASH:~0,-1%
 set BUILD_DIR=%BASE_DIR%-build
 
+echo on
+call "%BASE_DIR%/call_vcvars64.bat" || goto :exit
+@echo off
+
 if [%1] == [--no-tests] (
     shift
     set NO_TESTS=1
@@ -32,9 +36,10 @@ if [%1] == [--debug] (
     set BUILD_TYPE=Release
 )
 
-if [%BUILD_TYPE%] == [Release] (
-    set BUILD_OPTIONS=--config %BUILD_TYPE%
-)
+:: Use Ninja generator to avoid using CMake compiler search heuristics for MSBuild. Also, specify
+:: the compiler explicitly to avoid potential clashes with gcc if run from a Cygwin/MinGW/GitBash
+:: shell.
+set GENERATOR_OPTIONS=-GNinja -DCMAKE_BUILD_TYPE=%BUILD_TYPE% -DCMAKE_C_COMPILER=cl.exe -DCMAKE_CXX_COMPILER=cl.exe
 
 echo on
     rmdir /S /Q "%BUILD_DIR%" 2>NUL
@@ -68,14 +73,14 @@ goto :exit
         mkdir "%SAMPLE_BUILD_DIR%" || @exit /b
         cd "%SAMPLE_BUILD_DIR%" || @exit /b
 
-        cmake "%SOURCE_DIR%" -Ax64 %1 %2 %3 %4 %5 %6 %7 %8 %9 || @exit /b
-        cmake --build . %BUILD_OPTIONS% || @exit /b
+        cmake "%SOURCE_DIR%" %GENERATOR_OPTIONS% %1 %2 %3 %4 %5 %6 %7 %8 %9 || @exit /b
+        cmake --build . || @exit /b
     @echo off
 
     if [%SAMPLE%] == [unit_tests] (
-        set ARTIFACT=%SAMPLE_BUILD_DIR%\%BUILD_TYPE%\analytics_plugin_ut.exe
+        set ARTIFACT=%SAMPLE_BUILD_DIR%\analytics_plugin_ut.exe
     ) else (
-        set ARTIFACT=%SAMPLE_BUILD_DIR%\%BUILD_TYPE%\%SAMPLE%.dll
+        set ARTIFACT=%SAMPLE_BUILD_DIR%\%SAMPLE%.dll
     )
 
     if not exist "%ARTIFACT%" (

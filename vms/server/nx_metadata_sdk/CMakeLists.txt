@@ -83,17 +83,23 @@ file(GLOB_RECURSE copied_sample_unit_tests_files CONFIGURE_DEPENDS
 
 set(copy_sdk_files_script ${CMAKE_CURRENT_BINARY_DIR}/copy_sdk_files.cmake)
 
-# Substitute variable values into the cmake script which will be called at the build phase.
-nx_configure_file(${CMAKE_CURRENT_SOURCE_DIR}/copy_sdk_files.cmake.in
-    ${copy_sdk_files_script} @ONLY)
-
 if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
     set(sample_build_script "./build_samples.sh")
+    set(build_scripts ${CMAKE_CURRENT_SOURCE_DIR}/files/${sample_build_script})
 elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
     set(sample_build_script "build_samples.bat")
+    set(msvc_environment_setup_script "call_vcvars64.bat")
+    set(build_scripts
+        ${CMAKE_CURRENT_SOURCE_DIR}/files/${sample_build_script}
+        ${open_source_root}/build_utils/msvc/${msvc_environment_setup_script}
+    )
 else()
     message(FATAL_ERROR "Building SDK sample(s) supported only on Windows and Linux.")
 endif()
+
+# Substitute variable values into the cmake script which will be called at the build phase.
+nx_configure_file(${CMAKE_CURRENT_SOURCE_DIR}/copy_sdk_files.cmake.in
+    ${copy_sdk_files_script} @ONLY)
 
 # On developer workstations, when not cross-compiling, unit tests for SDK samples will be run
 # during the build phase. On CI, such tests are run with other tests, because they are included in
@@ -107,10 +113,11 @@ else()
     set(sampleTestsTrigger "--no-tests")
 endif()
 
+set(buildSamplesEnvironmentSetup "")
 if(targetDevice STREQUAL "windows_x64")
     if(NOT openSourceBuild)
         # Use MSVC 2019 compiler for non-open-source builds only.
-        set(compilingOptions "-Tv142")
+        set(buildSamplesEnvironmentSetup ${CMAKE_COMMAND} -E env NX_FORCED_MSVC_VERSION="14.29")
     endif()
 else()
     if(targetDevice STREQUAL "linux_arm32"
@@ -136,7 +143,7 @@ endif()
 nx_add_custom_command(OUTPUT ${zip_file}
     DEPENDS
         ${copy_sdk_files_script}
-        ${CMAKE_CURRENT_SOURCE_DIR}/files/${sample_build_script}
+        ${build_scripts}
         ${copied_static_files}
         ${copied_nx_kit_files}
         ${copied_nx_sdk_src_nx_sdk_files}
@@ -152,6 +159,7 @@ nx_add_custom_command(OUTPUT ${zip_file}
     COMMAND ${CMAKE_COMMAND} -E
         echo "  Building samples${sample_tests_message} - see ${sample_build_log}"
     COMMAND ${CMAKE_COMMAND} -E chdir ${sdk_dir}
+        ${buildSamplesEnvironmentSetup}
         ${sample_build_script} ${sampleTestsTrigger} ${compilingOptions}
         >${sample_build_log} 2>&1
 
