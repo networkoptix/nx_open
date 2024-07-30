@@ -2,25 +2,13 @@
 
 @setlocal %= Reset errorlevel and prohibit changing env vars of the parent shell. =%
 
-@if not "%VisualStudioVersion%" == "" goto :vcvars_set
-@set VCVARS_BAT="C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Auxiliary\Build\vcvars64.bat"
-@if exist %VCVARS_BAT% goto :vcvars_bat_found
-@set VCVARS_BAT="C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat"
-@if exist %VCVARS_BAT% goto :vcvars_bat_found
-@echo MSVC env vars are not detected, and vcvars64.bat is not found. Fix the installation path of
-@echo Visual Studio or Build Tools hard-coded in this script as the value of VCVARS_BAT.
-@(call) %= Set ERRORLEVEL to 1 (failure). =%
-@goto :exit
-
-:vcvars_bat_found
-
-call %VCVARS_BAT% || @goto :exit
-
-:vcvars_set
-
-:: Make the build dir at the same level as the parent dir of this script, suffixed with "-build".
 @set SOURCE_DIR_WITH_BACKSLASH=%~dp0
 @set SOURCE_DIR=%SOURCE_DIR_WITH_BACKSLASH:~0,-1%
+
+:: Initialize the MSVC environment.
+call %SOURCE_DIR%\build_utils\msvc\call_vcvars64.bat || @goto :exit
+
+:: Make the build dir at the same level as the parent dir of this script, suffixed with "-build".
 @set BUILD_DIR=%SOURCE_DIR%-build
 
 @if exist "%BUILD_DIR%\CMakeCache.txt" goto :skip_generation
@@ -29,7 +17,11 @@ call %VCVARS_BAT% || @goto :exit
     :: Ensure that only the currently supplied CMake arguments are in effect.
     del "%BUILD_DIR%\CMakeCache.txt" 2>NUL
 
-    cmake "%SOURCE_DIR%" -B "%BUILD_DIR%" -GNinja %* || @goto :exit
+    :: Use the Ninja generator to avoid using CMake compiler search heuristics for MSBuild. Also,
+    :: specify the compiler explicitly to avoid potential clashes with gcc if ran from a
+    :: Cygwin/MinGW shell.
+    GENERATOR_OPTIONS=-GNinja -DCMAKE_C_COMPILER=cl.exe -DCMAKE_CXX_COMPILER=cl.exe
+    cmake "%SOURCE_DIR%" %GENERATOR_OPTIONS% -B "%BUILD_DIR%" %* || @goto :exit
 :skip_generation
 
 cmake --build "%BUILD_DIR%"
