@@ -1086,75 +1086,75 @@
     <name>EncryptedLayoutStrings</name>
     <message>
       <source>Please enter a valid password</source>
-      <translation type="unfinished">Please enter a valid password</translation>
+      <translation>Por favor, introduce un contrasinal válido</translation>
     </message>
     <message>
       <source>The password is not valid.</source>
-      <translation type="unfinished">The password is not valid.</translation>
+      <translation>O contrasinal non é válido.</translation>
     </message>
     <message>
       <source>Encrypted layout</source>
-      <translation type="unfinished">Encrypted layout</translation>
+      <translation>Deseño encriptado</translation>
     </message>
     <message>
       <source>The file %1 is encrypted. Please enter the password:</source>
-      <translation type="unfinished">The file %1 is encrypted. Please enter the password:</translation>
+      <translation>O fichero %1 está encriptado. Por favor, introduce o contrasinal:</translation>
     </message>
     <message>
       <source>Please re-enter password for layout %1:</source>
-      <translation type="unfinished">Please re-enter password for layout %1:</translation>
+      <translation>Por favor, volve a introducir o contrasinal para o deseño %1:</translation>
     </message>
   </context>
   <context>
     <name>EventSearchWidget::Private</name>
     <message>
       <source>Server events</source>
-      <translation type="unfinished">Server events</translation>
+      <translation>Eventos do servidor</translation>
     </message>
     <message>
       <source>Analytics events</source>
-      <translation type="unfinished">Analytics events</translation>
+      <translation>Eventos de análise</translation>
     </message>
     <message>
       <source>Any event</source>
-      <translation type="unfinished">Any event</translation>
+      <translation>Calquera evento</translation>
     </message>
     <message>
       <source>Any device issue</source>
-      <translation type="unfinished">Any device issue</translation>
+      <translation>Calquera problema co dispositivo</translation>
     </message>
     <message>
       <source>Any camera issue</source>
-      <translation type="unfinished">Any camera issue</translation>
+      <translation>Calquera problema coa cámara</translation>
     </message>
     <message>
       <source>Any server event</source>
-      <translation type="unfinished">Any server event</translation>
+      <translation>Calquera evento do servidor</translation>
     </message>
     <message>
       <source>Device issues</source>
-      <translation type="unfinished">Device issues</translation>
+      <translation>Problemas cos dispositivos</translation>
     </message>
     <message>
       <source>Camera issues</source>
-      <translation type="unfinished">Camera issues</translation>
+      <translation>Problemas coa cámara</translation>
     </message>
     <message>
       <source>Any analytics event</source>
-      <translation type="unfinished">Any analytics event</translation>
+      <translation>Calquera evento de análise</translation>
     </message>
   </context>
   <context>
     <name>ExitFullscreenActionHelper</name>
     <message>
       <source>Select layout...</source>
-      <translation type="unfinished">Select layout...</translation>
+      <translation>Seleccionar deseño...</translation>
     </message>
     <message numerus="yes">
       <source>%n layouts</source>
-      <translation type="unfinished">
-        <numerusform>%n layouts</numerusform>
-        <numerusform>%n layouts</numerusform>
+      <translation>
+        <numerusform>%n deseños</numerusform>
+        <numerusform>%n deseños</numerusform>
       </translation>
     </message>
   </context>
@@ -1162,54 +1162,54 @@
     <name>FileSystemStrings</name>
     <message>
       <source>Audio Video Interleave</source>
-      <translation type="unfinished">Audio Video Interleave</translation>
+      <translation>Audio Video Intercalado</translation>
     </message>
     <message>
       <source>Matroska</source>
-      <translation type="unfinished">Matroska</translation>
+      <translation>Matroska</translation>
     </message>
     <message>
       <source>MPEG-4 Part 14</source>
-      <translation type="unfinished">MPEG-4 Part 14</translation>
+      <translation>MPEG-4 Parte 14</translation>
     </message>
     <message>
       <source>%1 Media File</source>
-      <translation type="unfinished">%1 Media File</translation>
+      <translation>%1 Arquivo multimedia</translation>
     </message>
     <message>
       <source>Executable %1 Media File</source>
-      <translation type="unfinished">Executable %1 Media File</translation>
+      <translation>Arquivo multimedia executable %1</translation>
     </message>
   </context>
   <context>
     <name>FullscreenActionHelper</name>
     <message>
       <source>Source camera</source>
-      <translation type="unfinished">Source camera</translation>
+      <translation>Cámara fonte</translation>
     </message>
     <message>
       <source>Select device...</source>
-      <translation type="unfinished">Select device...</translation>
+      <translation>Seleccionar dispositivo...</translation>
     </message>
     <message>
       <source>Select camera...</source>
-      <translation type="unfinished">Select camera...</translation>
+      <translation>Seleccionar cámara...</translation>
     </message>
     <message>
       <source>Select layout...</source>
-      <translation type="unfinished">Select layout...</translation>
+      <translation>Seleccionar deseño...</translation>
     </message>
     <message numerus="yes">
       <source>%n layouts</source>
-      <translation type="unfinished">
-        <numerusform>%n layouts</numerusform>
-        <numerusform>%n layouts</numerusform>
+      <translation>
+        <numerusform>%n deseños</numerusform>
+        <numerusform>%n deseños</numerusform>
       </translation>
     </message>
     <message>
       <source>%1 on %2</source>
       <comment>Camera %1 on layout %2</comment>
-      <translation type="unfinished">%1 on %2</translation>
+      <translation>%1 en %2</translation>
     </message>
   </context>
   <context>
@@ -1224,66 +1224,66 @@
     <name>LayoutTourTextFactory</name>
     <message>
       <source>Start Showreel</source>
-      <translation type="unfinished">Start Showreel</translation>
+      <translation>Comezar Showreel</translation>
     </message>
   </context>
   <context>
     <name>LicenseActivationDialogs</name>
     <message>
       <source>Incompatible license</source>
-      <translation type="unfinished">Incompatible license</translation>
+      <translation>Licenza incompatible</translation>
     </message>
     <message>
       <source>License you are trying to activate is incompatible with your software.</source>
-      <translation type="unfinished">License you are trying to activate is incompatible with your software.</translation>
+      <translation>A licenza que intentas activar é incompatible co teu software.</translation>
     </message>
     <message>
       <source>To report the issue please contact %1.</source>
-      <translation type="unfinished">To report the issue please contact %1.</translation>
+      <translation>Para informar do problema, por favor, ponte en contacto con %1.</translation>
     </message>
     <message>
       <source>Failed to activate license</source>
-      <translation type="unfinished">Failed to activate license</translation>
+      <translation>Erro ao activar a licenza</translation>
     </message>
     <message>
       <source>Invalid data received.</source>
-      <translation type="unfinished">Invalid data received.</translation>
+      <translation>Datos recibidos non válidos.</translation>
     </message>
     <message>
       <source>Database error occurred.</source>
-      <translation type="unfinished">Database error occurred.</translation>
+      <translation>Produciuse un erro na base de datos.</translation>
     </message>
     <message>
       <source>Invalid License Key</source>
-      <translation type="unfinished">Invalid License Key</translation>
+      <translation>Clave de licenza non válida</translation>
     </message>
     <message>
       <source>Please make sure it is entered correctly.</source>
-      <translation type="unfinished">Please make sure it is entered correctly.</translation>
+      <translation>Por favor, asegúrate de que se introducíu correctamente.</translation>
     </message>
     <message>
       <source>Invalid activation key file</source>
-      <translation type="unfinished">Invalid activation key file</translation>
+      <translation>Arquivo de clave de activación non válido</translation>
     </message>
     <message>
       <source>Select a valid activation key file to continue.</source>
-      <translation type="unfinished">Select a valid activation key file to continue.</translation>
+      <translation>Selecciona un archivo de clave de activación válido para continuar.</translation>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware ID %1</source>
-      <translation type="unfinished">This license is already activated and linked to Hardware ID %1</translation>
+      <translation>Esta licenza xa está activada e vinculada ao ID de Hardware %1</translation>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware ID %1 on %2</source>
-      <translation type="unfinished">This license is already activated and linked to Hardware ID %1 on %2</translation>
+      <translation>Esta licenza xa está activada e vinculada ao Hardware ID %1 en %2</translation>
     </message>
     <message>
       <source>License already activated on another server</source>
-      <translation type="unfinished">License already activated on another server</translation>
+      <translation>A licenza xa está activada noutro servidor</translation>
     </message>
     <message>
       <source>You already activated this license</source>
-      <translation type="unfinished">You already activated this license</translation>
+      <translation>Xa activaches esta licenza</translation>
     </message>
     <message>
       <source>To activate License Key manually please contact %1.</source>
@@ -1324,36 +1324,36 @@
     <message>
       <source>Hardware ID: %1
 License Key: %2</source>
-      <translation type="unfinished">Hardware ID: %1
-License Key: %2</translation>
+      <translation>ID de hardware: %1
+Clave de licenza: %2</translation>
     </message>
     <message>
       <source>Copy Parameters</source>
-      <translation type="unfinished">Copy Parameters</translation>
+      <translation>Parámetros de copia</translation>
     </message>
     <message>
       <source>If your System does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</source>
-      <translation type="unfinished">If your System does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</translation>
+      <translation>Se o teu sistema non ten acceso a Internet, envía a clave de licenza e o ID de hardware proporcionados a %1 para recibir o arquivo de activación.</translation>
     </message>
     <message>
       <source>If your System does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</source>
-      <translation type="unfinished">If your System does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</translation>
+      <translation>Se o teu sistema non ten acceso a Internet, por favor, envía a clave de licenza e o ID de hardware proporcionados ao teu equipo de asistencia rexional/de licencias, para recibir o arquivo de activación:</translation>
     </message>
   </context>
   <context>
     <name>LicenseDeactivationDialogs</name>
     <message numerus="yes">
       <source>Failed to deactivate %n licenses</source>
-      <translation type="unfinished">
-        <numerusform>Failed to deactivate %n licenses</numerusform>
-        <numerusform>Failed to deactivate %n licenses</numerusform>
+      <translation>
+        <numerusform>Erro ao desactivar %n licenzas</numerusform>
+        <numerusform>Erro ao desactivar %n licenzas</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 of %n licenses cannot be deactivated</source>
-      <translation type="unfinished">
-        <numerusform>%1 of %n licenses cannot be deactivated</numerusform>
-        <numerusform>%1 of %n licenses cannot be deactivated</numerusform>
+      <translation>
+        <numerusform>%1 de %n licenzas non poden ser desactivadas</numerusform>
+        <numerusform>%1 de %n licenzas non poden ser desactivadas</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1636,34 +1636,34 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Common</source>
-      <translation type="unfinished">Common</translation>
+      <translation>Común</translation>
     </message>
     <message>
       <source>This password is in list of the most popular passwords.</source>
-      <translation type="unfinished">This password is in list of the most popular passwords.</translation>
+      <translation>Este contrasinal está na lista dos contrasinais máis populares.</translation>
     </message>
     <message>
       <source>Incorrect</source>
-      <translation type="unfinished">Incorrect</translation>
+      <translation>Incorrecto</translation>
     </message>
     <message>
       <source>Only latin letters, numbers and keyboard symbols %1 are allowed.</source>
-      <translation type="unfinished">Only latin letters, numbers and keyboard symbols %1 are allowed.</translation>
+      <translation>Só se permiten letras latinas, números e símbolos de teclado %1.</translation>
     </message>
     <message>
       <source>Only latin letters, numbers and keyboard symbols are allowed.</source>
-      <translation type="unfinished">Only latin letters, numbers and keyboard symbols are allowed.</translation>
+      <translation>Só se permiten letras latinas, números e símbolos de teclado.</translation>
     </message>
   </context>
   <context>
     <name>PermissionsInfoTable</name>
     <message>
       <source>Cameras &amp; Resources</source>
-      <translation type="unfinished">Cameras &amp; Resources</translation>
+      <translation>Cámaras e recursos</translation>
     </message>
     <message>
       <source>Shared Layouts</source>
-      <translation type="unfinished">Shared Layouts</translation>
+      <translation>Deseños compartidos</translation>
     </message>
     <message>
       <source>Permissions</source>
@@ -1679,127 +1679,127 @@ License Key: %2</translation>
     <name>Ptz</name>
     <message>
       <source>Cannot get the current position from camera &quot;%1&quot;</source>
-      <translation type="unfinished">Cannot get the current position from camera &quot;%1&quot;</translation>
+      <translation>Non se pode obter a posición actual da cámara &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Please wait for the camera to go online.</source>
-      <translation type="unfinished">Please wait for the camera to go online.</translation>
+      <translation>Por favor, espera a que a cámara se conecte.</translation>
     </message>
     <message>
       <source>Failed to get current position</source>
-      <translation type="unfinished">Failed to get current position</translation>
+      <translation>Erro ao obtener a posición actual</translation>
     </message>
     <message>
       <source>Cannot set the current position for camera &quot;%1&quot;</source>
-      <translation type="unfinished">Cannot set the current position for camera &quot;%1&quot;</translation>
+      <translation>Non se pode obter a posición actual da cámara &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Failed to set current position</source>
-      <translation type="unfinished">Failed to set current position</translation>
+      <translation>Erro ao obter a posición actual</translation>
     </message>
     <message>
       <source>Preset used by some tours. Delete it anyway?</source>
-      <translation type="unfinished">Preset used by some tours. Delete it anyway?</translation>
+      <translation>Preaxuste utilizado por algúns percorridos. Borralo de todos modos?</translation>
     </message>
     <message>
       <source>These tours will become invalid.</source>
-      <translation type="unfinished">These tours will become invalid.</translation>
+      <translation>Estes percorridos quedarán inválidados.</translation>
     </message>
   </context>
   <context>
     <name>PtzInstrument</name>
     <message>
       <source>Layout is locked</source>
-      <translation type="unfinished">Layout is locked</translation>
+      <translation>O deseño está bloqueado</translation>
     </message>
     <message>
       <source>This camera does not support advanced PTZ</source>
-      <translation type="unfinished">This camera does not support advanced PTZ</translation>
+      <translation>Esta cámara non é compatible con PTZ avanzado</translation>
     </message>
     <message>
       <source>Zooming out...</source>
-      <translation type="unfinished">Zooming out...</translation>
+      <translation>Alonxando, zoom out...</translation>
     </message>
     <message>
       <source>Moving...</source>
-      <translation type="unfinished">Moving...</translation>
+      <translation>Movendo...</translation>
     </message>
     <message>
       <source>Zooming in...</source>
-      <translation type="unfinished">Zooming in...</translation>
+      <translation>Ampliando, zoom in...</translation>
     </message>
     <message>
       <source>Focusing...</source>
-      <translation type="unfinished">Focusing...</translation>
+      <translation>Enfocando...</translation>
     </message>
     <message>
       <source>PTZ can only be used in the live mode</source>
-      <translation type="unfinished">PTZ can only be used in the live mode</translation>
+      <translation>PTZ só se pode utilizar no modo en directo</translation>
     </message>
   </context>
   <context>
     <name>PtzOverlayWidget</name>
     <message>
       <source>Zoom In</source>
-      <translation type="unfinished">Zoom In</translation>
+      <translation>Ampliar, zoom in</translation>
     </message>
     <message>
       <source>Zoom Out</source>
-      <translation type="unfinished">Zoom Out</translation>
+      <translation>Alonxar, zoom out</translation>
     </message>
     <message>
       <source>Focus Far</source>
-      <translation type="unfinished">Focus Far</translation>
+      <translation>Enfoque lonxano</translation>
     </message>
     <message>
       <source>Focus Near</source>
-      <translation type="unfinished">Focus Near</translation>
+      <translation>Enfoque cercano</translation>
     </message>
     <message>
       <source>Auto Focus</source>
-      <translation type="unfinished">Auto Focus</translation>
+      <translation>Auto enfoque</translation>
     </message>
     <message>
       <source>Change Dewarping Mode</source>
-      <translation type="unfinished">Change Dewarping Mode</translation>
+      <translation>Cambiar o modo de descarga</translation>
     </message>
   </context>
   <context>
     <name>QWebEnginePage</name>
     <message>
       <source>Are you sure you want to leave this page? Changes that you made may not be saved.</source>
-      <translation type="unfinished">Are you sure you want to leave this page? Changes that you made may not be saved.</translation>
+      <translation>Seguro que queres saír desta páxina? É posible que os cambios realizados non se garden.</translation>
     </message>
   </context>
   <context>
     <name>QnAboutDialog</name>
     <message>
       <source>OpenGL version</source>
-      <translation type="unfinished">OpenGL version</translation>
+      <translation>Versión OpenGL</translation>
     </message>
     <message>
       <source>OpenGL renderer</source>
-      <translation type="unfinished">OpenGL renderer</translation>
+      <translation>Renderizador OpenGL</translation>
     </message>
     <message>
       <source>OpenGL vendor</source>
-      <translation type="unfinished">OpenGL vendor</translation>
+      <translation>Provedor OpenGL</translation>
     </message>
     <message>
       <source>OpenGL max texture size</source>
-      <translation type="unfinished">OpenGL max texture size</translation>
+      <translation>Tamaño máximo da textura OpenGL</translation>
     </message>
     <message>
       <source>%1 version %2 (%3).</source>
-      <translation type="unfinished">%1 version %2 (%3).</translation>
+      <translation>%1 versión %2 (%3).</translation>
     </message>
     <message>
       <source>Built for %1-%2 with %3.</source>
-      <translation type="unfinished">Built for %1-%2 with %3.</translation>
+      <translation>Creado para %1-%2 con %3.</translation>
     </message>
     <message>
       <source>Regional / License support</source>
-      <translation type="unfinished">Regional / License support</translation>
+      <translation>Apoio rexional / de licenza</translation>
     </message>
   </context>
   <context>
@@ -1810,14 +1810,14 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Saving...</source>
-      <translation type="unfinished">Saving...</translation>
+      <translation>Gardando...</translation>
     </message>
   </context>
   <context>
     <name>QnAccessibleLayoutsWidget</name>
     <message>
       <source>Giving access to some layouts you give access to all cameras on them. Also user will get access to all new cameras on these layouts.</source>
-      <translation type="unfinished">Giving access to some layouts you give access to all cameras on them. Also user will get access to all new cameras on these layouts.</translation>
+      <translation>Dando acceso a algúns layouts, dáse acceso a todas as cámaras neles. Tamén o usuario terá acceso a todas as novas cámaras nestes deseños.</translation>
     </message>
   </context>
   <context>
@@ -1828,22 +1828,22 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Image Enhancement - %1</source>
-      <translation type="unfinished">Image Enhancement - %1</translation>
+      <translation>Mellora de imaxe - %1</translation>
     </message>
   </context>
   <context>
     <name>QnAdvancedSettingsWidget</name>
     <message>
       <source>Helps avoid problems with OpenGL drawing which result in 100% CPU load.</source>
-      <translation type="unfinished">Helps avoid problems with OpenGL drawing which result in 100% CPU load.</translation>
+      <translation>Axuda a evitar problemas co debuxo OpenGL que provoca unha carga do 100% da CPU.</translation>
     </message>
     <message>
       <source>Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters.</source>
-      <translation type="unfinished">Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters.</translation>
+      <translation>Axusta aos valores mínimos que non degraden a visualización en directo. Un buffer maior fai a reprodución máis suave, pero aumenta o retardo entre o tempo real e a visualización en directo; un buffer menor reduce o retardo, pero pode provocar imaxes entrecortadas.</translation>
     </message>
     <message>
       <source>Warning! This is an experimental option that saves CPU but may affect animation.</source>
-      <translation type="unfinished">Warning! This is an experimental option that saves CPU but may affect animation.</translation>
+      <translation>Ollooo! Esta é unha opción experimental que aforra CPU, pero pode afectar á animación.</translation>
     </message>
     <message>
       <source>Disabled</source>
@@ -1859,27 +1859,27 @@ License Key: %2</translation>
     </message>
     <message>
       <source>May lead to privacy issues</source>
-      <translation type="unfinished">May lead to privacy issues</translation>
+      <translation>Pode plantear problemas de privacidade</translation>
     </message>
     <message>
       <source>Connect only servers with public certificate</source>
-      <translation type="unfinished">Connect only servers with public certificate</translation>
+      <translation>Conectar só servidores con certificado público</translation>
     </message>
     <message>
       <source>Certificate storage will be cleared.</source>
-      <translation type="unfinished">Certificate storage will be cleared.</translation>
+      <translation>O almacenamento de certificados será borrado.</translation>
     </message>
     <message>
       <source>Current client instance will be disconnected.</source>
-      <translation type="unfinished">Current client instance will be disconnected.</translation>
+      <translation>A instancia actual do cliente será desconectada.</translation>
     </message>
     <message>
       <source>All other client windows will be closed.</source>
-      <translation type="unfinished">All other client windows will be closed.</translation>
+      <translation>Todas as demais ventanas do cliente serán pechadas.</translation>
     </message>
     <message>
       <source>Security settings changed</source>
-      <translation type="unfinished">Security settings changed</translation>
+      <translation>Configuración de seguridade cambiada</translation>
     </message>
     <message>
       <source>Continue</source>
@@ -1887,15 +1887,15 @@ License Key: %2</translation>
     </message>
     <message>
       <source>On the first connection to the server, your confirmation will be requested to accept the certificate if it contains errors</source>
-      <translation type="unfinished">On the first connection to the server, your confirmation will be requested to accept the certificate if it contains errors</translation>
+      <translation>Na primeira conexión co servidor, será solicitada túa confirmación para aceptar o certificado se este contén erros</translation>
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Seleccionar cartafol...</translation>
     </message>
     <message>
       <source>Failed to save logs to the selected folder</source>
-      <translation type="unfinished">Failed to save logs to the selected folder</translation>
+      <translation>Erro ao gardar os rexistros na carpeta seleccionada</translation>
     </message>
     <message>
       <source>Download complete!</source>
@@ -1929,11 +1929,11 @@ License Key: %2</translation>
     <name>QnAuditLogDialog</name>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation type="unfinished">Copy Selection to Clipboard</translation>
+      <translation>Copiar selección no portapapeis</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation type="unfinished">Export Selection to File...</translation>
+      <translation>Exportar a selección ao arquivo...</translation>
     </message>
     <message>
       <source>Select All</source>
@@ -1941,7 +1941,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Export selected records to a file</source>
-      <translation type="unfinished">Export selected records to a file</translation>
+      <translation>Exportar as gravacións seleccionadas a un arquivo</translation>
     </message>
     <message>
       <source>Devices</source>
@@ -1953,85 +1953,85 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Device actions</source>
-      <translation type="unfinished">Device actions</translation>
+      <translation>Accións do dispositivo</translation>
     </message>
     <message>
       <source>Camera actions</source>
-      <translation type="unfinished">Camera actions</translation>
+      <translation>Accións da cámara</translation>
     </message>
     <message>
       <source>No sessions</source>
-      <translation type="unfinished">No sessions</translation>
+      <translation>Sen sesións</translation>
     </message>
     <message>
       <source>No cameras</source>
-      <translation type="unfinished">No cameras</translation>
+      <translation>Sen cámaras</translation>
     </message>
     <message>
       <source>Select sessions to see their details</source>
-      <translation type="unfinished">Select sessions to see their details</translation>
+      <translation>Selecciona sesións para ver os detalles</translation>
     </message>
     <message>
       <source>Select cameras to see their details</source>
-      <translation type="unfinished">Select cameras to see their details</translation>
+      <translation>Selecciona cámaras para ver os seus detalles</translation>
     </message>
     <message>
       <source>No archive for this position</source>
-      <translation type="unfinished">No archive for this position</translation>
+      <translation>Sen arquivos para esta posición</translation>
     </message>
     <message numerus="yes">
       <source>These devices are removed from System</source>
-      <translation type="unfinished">
-        <numerusform>These devices are removed from System</numerusform>
-        <numerusform>These devices are removed from System</numerusform>
+      <translation>
+        <numerusform>Estes dipositivos elimináronse do sistema</numerusform>
+        <numerusform>Estes dispositivos elimináronse do sistema</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These cameras are removed from System</source>
-      <translation type="unfinished">
-        <numerusform>These cameras are removed from System</numerusform>
-        <numerusform>These cameras are removed from System</numerusform>
+      <translation>
+        <numerusform>Estas cámaras elimináronse do sistema</numerusform>
+        <numerusform>Estas cámaras elimináronse do sistema</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These servers are removed from System</source>
-      <translation type="unfinished">
-        <numerusform>These servers are removed from System</numerusform>
-        <numerusform>These servers are removed from System</numerusform>
+      <translation>
+        <numerusform>Estes servidores elimináronse do sistema</numerusform>
+        <numerusform>Estes servidores elimináronse do sistema</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These users are removed from System</source>
-      <translation type="unfinished">
-        <numerusform>These users are removed from System</numerusform>
-        <numerusform>These users are removed from System</numerusform>
+      <translation>
+        <numerusform>Estes usuarios elimináronse do sistema</numerusform>
+        <numerusform>Estes usuarios elimináronse do sistema</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These resources are removed from System</source>
-      <translation type="unfinished">
-        <numerusform>These resources are removed from System</numerusform>
-        <numerusform>These resources are removed from System</numerusform>
+      <translation>
+        <numerusform>Estes recursos elimináronse do sistema</numerusform>
+        <numerusform>Estes recursos elimináronse do sistema</numerusform>
       </translation>
     </message>
     <message>
       <source>Audit trail replay</source>
-      <translation type="unfinished">Audit trail replay</translation>
+      <translation>Reprodución de pistas de auditoría</translation>
     </message>
     <message numerus="yes">
       <source>Details for %n sessions of %1</source>
       <comment>Total number will be substituted as %1</comment>
-      <translation type="unfinished">
-        <numerusform>Details for %n sessions of %1</numerusform>
-        <numerusform>Details for %n sessions of %1</numerusform>
+      <translation>
+        <numerusform>Detalles para %n sesións de %1</numerusform>
+        <numerusform>Detalles para %n sesións de %1</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Details for %n cameras of %1</source>
       <comment>Total number will be substituted as %1</comment>
-      <translation type="unfinished">
-        <numerusform>Details for %n cameras of %1</numerusform>
-        <numerusform>Details for %n cameras of %1</numerusform>
+      <translation>
+        <numerusform>Detalles para %n cámaras de %1</numerusform>
+        <numerusform>Detalles para %n cámaras de %1</numerusform>
       </translation>
     </message>
   </context>
@@ -2043,7 +2043,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Unsuccessful login</source>
-      <translation type="unfinished">Unsuccessful login</translation>
+      <translation>Erro en inicio de sesión</translation>
     </message>
     <message>
       <source>Login</source>
@@ -2051,63 +2051,63 @@ License Key: %2</translation>
     </message>
     <message>
       <source>User updated</source>
-      <translation type="unfinished">User updated</translation>
+      <translation>Usuario actualizado</translation>
     </message>
     <message>
       <source>Watching live</source>
-      <translation type="unfinished">Watching live</translation>
+      <translation>Vendo en directo</translation>
     </message>
     <message>
       <source>Watching archive</source>
-      <translation type="unfinished">Watching archive</translation>
+      <translation>Vendo arquivo</translation>
     </message>
     <message>
       <source>Exporting video</source>
-      <translation type="unfinished">Exporting video</translation>
+      <translation>Exportando vídeo</translation>
     </message>
     <message>
       <source>System name changed</source>
-      <translation type="unfinished">System name changed</translation>
+      <translation>Nome de sistema cambiado</translation>
     </message>
     <message>
       <source>System merge</source>
-      <translation type="unfinished">System merge</translation>
+      <translation>Fusión do sistema</translation>
     </message>
     <message>
       <source>General settings updated</source>
-      <translation type="unfinished">General settings updated</translation>
+      <translation>Configuración xeral actualizada</translation>
     </message>
     <message>
       <source>Server updated</source>
-      <translation type="unfinished">Server updated</translation>
+      <translation>Servidor actualizado</translation>
     </message>
     <message>
       <source>Server removed</source>
-      <translation type="unfinished">Server removed</translation>
+      <translation>Servidor borrado</translation>
     </message>
     <message>
       <source>User removed</source>
-      <translation type="unfinished">User removed</translation>
+      <translation>Usuario/a borrado/a</translation>
     </message>
     <message>
       <source>Database restored</source>
-      <translation type="unfinished">Database restored</translation>
+      <translation>Base de datos restaurada</translation>
     </message>
     <message>
       <source>Session begins</source>
-      <translation type="unfinished">Session begins</translation>
+      <translation>Comeza a sesión</translation>
     </message>
     <message>
       <source>Session ends</source>
-      <translation type="unfinished">Session ends</translation>
+      <translation>Remata a sesión</translation>
     </message>
     <message>
       <source>Duration</source>
-      <translation type="unfinished">Duration</translation>
+      <translation>Duración</translation>
     </message>
     <message>
       <source>User</source>
-      <translation type="unfinished">User</translation>
+      <translation>Usuaria/o</translation>
     </message>
     <message>
       <source>IP</source>
@@ -2119,7 +2119,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Date</source>
-      <translation type="unfinished">Date</translation>
+      <translation>Data</translation>
     </message>
     <message>
       <source>Time</source>
@@ -2131,15 +2131,15 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Click to expand</source>
-      <translation type="unfinished">Click to expand</translation>
+      <translation>Preme para expandir</translation>
     </message>
     <message>
       <source>Device updated</source>
-      <translation type="unfinished">Device updated</translation>
+      <translation>Dispositivo actualizado</translation>
     </message>
     <message>
       <source>Camera updated</source>
-      <translation type="unfinished">Camera updated</translation>
+      <translation>Cámara actualizada</translation>
     </message>
     <message>
       <source>Device added</source>
