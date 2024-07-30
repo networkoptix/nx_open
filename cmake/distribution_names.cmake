@@ -65,6 +65,8 @@ function(set_distribution_names)
         "${prefix}-hpm-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
     set(client_debug_distribution_name
         "${prefix}-client_debug-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
+    set(mobile_client_debug_distribution_name
+        "${prefix}-client_debug-${mobileClientVersion.full}-${suffix}" PARENT_SCOPE)
     set(server_debug_distribution_name
         "${prefix}-server_debug-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
     set(misc_debug_distribution_name
