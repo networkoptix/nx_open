@@ -86,6 +86,11 @@ ApplicationContext::ApplicationContext(
     d->metricsStorage = std::make_unique<ApplicationMetricsStorage>();
 }
 
+void ApplicationContext::stopAll()
+{
+    d->longRunnablePool->stopAll();
+}
+
 ApplicationContext::~ApplicationContext()
 {
     d->longRunnablePool->stopAll();
