@@ -205,7 +205,7 @@
     </message>
     <message>
         <source>The server&apos;s certificate was rejected.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
