@@ -54,12 +54,12 @@
 <context>
     <name>BookmarkFacadeStrings</name>
     <message>
-        <source>System Event</source>
-        <comment>Shows that the bookmark was created by a system event</comment>
+        <source>Removed camera</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Removed camera</source>
+        <source>Site Event</source>
+        <comment>Shows that the bookmark was created by a site event</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -571,6 +571,14 @@
         <source>Select exactly one camera</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>This camera is not currently on the selected layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This camera is not currently on some of the selected layouts</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnLicense</name>
@@ -1021,6 +1029,13 @@
     </message>
 </context>
 <context>
+    <name>QnSubjectValidationPolicy</name>
+    <message>
+        <source>None of selected user roles contain users</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnTimeStrings</name>
     <message>
         <source>ms</source>
@@ -1291,6 +1306,17 @@
     <message>
         <source>Multiple groups</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>QnUsersWithEmailValidationPolicy</name>
+    <message>
+        <source>Email address is not set for all the selected users.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Email address is not set for some selected users.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1818,6 +1844,10 @@
     </message>
     <message>
         <source>HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Device storage information update interval</source>
         <translation></translation>
     </message>
     <message>

@@ -78,11 +78,6 @@
 <context>
     <name>Result</name>
     <message>
-        <source>Invalid parameter `%1`: %2.</source>
-        <comment>%1 is name, %2 is value.</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Missing required parameter: %1.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -150,6 +145,11 @@
     <message>
         <source>Not allowed.</source>
         <comment>Generic HTTP response</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid parameter `%1`: %2</source>
+        <comment>%1 is name, %2 is value.</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>

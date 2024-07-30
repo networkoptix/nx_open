@@ -10,32 +10,6 @@
     </message>
 </context>
 <context>
-    <name>QnDirectSystemsFinder</name>
-    <message>
-        <source>Site</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Site (%1)</source>
-        <comment>%1 is ip and port of the site</comment>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QnLocalSystemDescription</name>
-    <message>
-        <source>New Server</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>QnSystemDescription</name>
-    <message>
-        <source>Unnamed Site</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>QnSystemsModel</name>
     <message>
         <source>Owner: %1</source>
@@ -173,7 +147,7 @@
     </message>
     <message>
         <source>The server&apos;s certificate was rejected.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>If this error persists, please contact your site administrator.</source>
@@ -304,6 +278,18 @@
     </message>
 </context>
 <context>
+    <name>nx::vms::client::core::DirectSystemFinder</name>
+    <message>
+        <source>Site</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Site (%1)</source>
+        <comment>%1 is ip and port of the site</comment>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>nx::vms::client::core::EventSearchUtils</name>
     <message>
         <source>Last day</source>
@@ -350,6 +336,20 @@
     </message>
     <message>
         <source>Stop Object Tracking</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::client::core::LocalSystemDescription</name>
+    <message>
+        <source>New Server</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::client::core::SingleSystemDescription</name>
+    <message>
+        <source>Unnamed Site</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
