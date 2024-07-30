@@ -38,7 +38,7 @@ bool ConfirmationDialogs::confirmDelete(QWidget* parent, size_t count)
     customizeDialog(
         dialog,
         QnMessageBox::Icon::Question,
-        tr("Delete %n Rules?", "", count),
+        tr("Delete %n rules?", "", count),
         tr("This action cannot be undone"),
         QDialogButtonBox::Cancel,
         QDialogButtonBox::NoButton,
