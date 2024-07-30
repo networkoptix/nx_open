@@ -2416,6 +2416,7 @@ Handle ServerConnection::removeGroupAsync(
 }
 
 Handle ServerConnection::createTicket(
+    const nx::Uuid& targetServerId,
     Result<ErrorOrData<nx::vms::api::LoginSession>>::type callback,
     QThread* targetThread)
 {
@@ -2425,6 +2426,7 @@ Handle ServerConnection::createTicket(
         Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
         {});
 
+    proxyRequestUsingServer(request, targetServerId);
     return executeRequest(request, std::move(callback), targetThread);
 }
 
