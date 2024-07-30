@@ -1802,7 +1802,7 @@
     </message>
     <message>
       <source>Device storage information update interval</source>
-      <translation type="unfinished">Device storage information update interval</translation>
+      <translation>Cihaz depolama bilgisi güncelleme aralığı</translation>
     </message>
   </context>
   <context>
