@@ -248,6 +248,8 @@ const QString kOnvifRemoteArchiveEnabled("onvifRemoteArchiveEnabled");
 
 const QString kGsoapAdditionalFlags("gsoapAdditionalFlags");
 
+const QString kTimezoneConfiguration("timezoneConfiguration");
+
 const QString kOnvifIgnoreOutdatedNotifications("onvifIgnoreOutdatedNotifications");
 
 const QString kReRequestOnvifRecordingEventsIfAllEventsHaveSameTime(
