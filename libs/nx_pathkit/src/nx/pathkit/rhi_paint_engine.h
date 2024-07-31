@@ -78,6 +78,7 @@ public:
 
 private:
     void updateClipPath(const QPainterPath& clipPath, Qt::ClipOperation op);
+    void updateClipPath(const SkPath& skPath, Qt::ClipOperation op);
     std::optional<SkPath> getClip() const;
 
     std::vector<PaintData> m_paths;
