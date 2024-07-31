@@ -34,6 +34,7 @@ public:
 
 signals:
     void stateChanged(const nx::vms::client::desktop::joystick::OsalDevice::State& state);
+    void failed();
 };
 
 } // namespace nx::vms::client::desktop::joystick

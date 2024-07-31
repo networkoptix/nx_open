@@ -14,6 +14,7 @@
 namespace nx::vms::client::desktop::joystick {
 
 struct JoystickDescriptor;
+class Manager;
 
 class DeviceHid: public Device
 {
@@ -28,13 +29,13 @@ class DeviceHid: public Device
     };
 
 public:
-    DeviceHid(const JoystickDescriptor& modelInfo, const QString& path, QObject* parent = nullptr);
+    DeviceHid(const JoystickDescriptor& modelInfo, const QString& path, Manager* manager);
 
     virtual ~DeviceHid() override;
 
     virtual bool isValid() const override;
 
-public slots:
+public:
     void onStateChanged(const QBitArray& newState);
 
 protected:
