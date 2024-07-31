@@ -1851,10 +1851,6 @@
       <source>Take system name and settings from:</source>
       <translation>次のシステム名および設定を使用:</translation>
     </message>
-    <message>
-      <source>warn icon</source>
-      <translation>警告アイコン</translation>
-    </message>
   </context>
   <context>
     <name>MultiServerUpdatesWidget</name>
@@ -2614,7 +2610,7 @@
     </message>
     <message>
       <source>Issued by</source>
-      <translation>発行者:</translation>
+      <translation>発行者</translation>
     </message>
     <message>
       <source>Self-signed root certificate</source>

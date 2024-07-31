@@ -1851,10 +1851,6 @@
       <source>Take system name and settings from:</source>
       <translation>Sistem adını ve ayarlarını al:</translation>
     </message>
-    <message>
-      <source>warn icon</source>
-      <translation>uyar simgesi</translation>
-    </message>
   </context>
   <context>
     <name>MultiServerUpdatesWidget</name>

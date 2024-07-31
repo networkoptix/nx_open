@@ -1851,10 +1851,6 @@
       <source>Take system name and settings from:</source>
       <translation>Prendre le nom et les paramètres du système à partir de :</translation>
     </message>
-    <message>
-      <source>warn icon</source>
-      <translation>icône d'avertissement</translation>
-    </message>
   </context>
   <context>
     <name>MultiServerUpdatesWidget</name>

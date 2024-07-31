@@ -1851,10 +1851,6 @@
       <source>Take system name and settings from:</source>
       <translation>시스템명 및 설정값 취득:</translation>
     </message>
-    <message>
-      <source>warn icon</source>
-      <translation type="unfinished">warn icon</translation>
-    </message>
   </context>
   <context>
     <name>MultiServerUpdatesWidget</name>

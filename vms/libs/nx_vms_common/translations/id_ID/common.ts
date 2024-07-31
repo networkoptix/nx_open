@@ -1743,7 +1743,7 @@
     </message>
     <message>
       <source>Device storage information update interval</source>
-      <translation type="unfinished">Device storage information update interval</translation>
+      <translation>Interval pembaruan informasi penyimpanan perangkat</translation>
     </message>
   </context>
   <context>

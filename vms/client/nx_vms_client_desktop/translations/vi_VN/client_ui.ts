@@ -1851,10 +1851,6 @@
       <source>Take system name and settings from:</source>
       <translation>Lấy tên hệ thống và cài đặt từ:</translation>
     </message>
-    <message>
-      <source>warn icon</source>
-      <translation>biểu tượng cảnh báo</translation>
-    </message>
   </context>
   <context>
     <name>MultiServerUpdatesWidget</name>
