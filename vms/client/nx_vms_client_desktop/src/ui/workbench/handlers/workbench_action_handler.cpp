@@ -325,6 +325,8 @@ ActionHandler::ActionHandler(QObject *parent) :
     connect(action(menu::PreviousLayoutAction), &QAction::triggered, this,
         &ActionHandler::at_previousLayoutAction_triggered);
 
+    connect(action(menu::OpenAction), &QAction::triggered, this,
+        &ActionHandler::at_openAction_triggered);
     connect(action(menu::OpenInLayoutAction), &QAction::triggered, this,
         &ActionHandler::at_openInLayoutAction_triggered);
     connect(action(menu::OpenInCurrentLayoutAction), &QAction::triggered, this,
@@ -932,6 +934,19 @@ void ActionHandler::at_changeDefaultCameraPassword_triggered()
 
     const bool forceShowCamerasList = parameters.argument(Qn::ForceShowCamerasList, false);
     changeDefaultPasswords(QString(), camerasWithDefaultPassword, forceShowCamerasList);
+}
+
+void ActionHandler::at_openAction_triggered()
+{
+    auto parameters = menu()->currentParameters(sender());
+    QnResourceList resources = parameters.resources();
+
+    // Remove web pages as they are processed in QnWorkbenchWebPageHandler.
+    resources.removeIf(
+        [](const QnResourcePtr& resource) { return resource->hasFlags(Qn::web_page); });
+
+    parameters.setResources(resources);
+    menu()->trigger(menu::OpenInCurrentLayoutAction, parameters);
 }
 
 void ActionHandler::at_openInLayoutAction_triggered()

@@ -1114,6 +1114,16 @@ void initialize(Manager* manager, Action* root)
         .flags(Scene | Tree)
         .separator();
 
+    factory(OpenAction)
+        .flags(Tree | Table | SingleTarget | MultiTarget | ResourceTarget | LayoutItemTarget | WidgetTarget)
+        .requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission | Qn::AddRemoveItemsPermission)
+        .text(ContextMenu::tr("Open"))
+        .conditionalText(ContextMenu::tr("Monitor"),
+            condition::hasFlags(Qn::server, MatchMode::all))
+        .condition(
+            ConditionWrapper(new OpenInCurrentLayoutCondition())
+            && !condition::isShowreelReviewMode());
+
     /* Resource actions. */
     factory(OpenInLayoutAction)
         .flags(SingleTarget | MultiTarget | ResourceTarget | LayoutItemTarget | WidgetTarget)
@@ -1122,11 +1132,9 @@ void initialize(Manager* manager, Action* root)
         .condition(new OpenInLayoutCondition());
 
     factory(OpenInCurrentLayoutAction)
-        .flags(Tree | Table | SingleTarget | MultiTarget | ResourceTarget | LayoutItemTarget | WidgetTarget)
-        .requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission | Qn::AddRemoveItemsPermission)
-        .text(ContextMenu::tr("Open"))
-        .conditionalText(ContextMenu::tr("Monitor"),
-            condition::hasFlags(Qn::server, MatchMode::all))
+        .flags(SingleTarget | MultiTarget | ResourceTarget | LayoutItemTarget | WidgetTarget)
+        .requiredTargetPermissions(Qn::CurrentLayoutResourceRole,
+            Qn::WritePermission | Qn::AddRemoveItemsPermission)
         .condition(
             ConditionWrapper(new OpenInCurrentLayoutCondition())
             && !condition::isShowreelReviewMode());

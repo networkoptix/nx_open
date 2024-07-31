@@ -161,6 +161,7 @@ protected:
     void at_nextLayoutAction_triggered();
     void at_previousLayoutAction_triggered();
 
+    void at_openAction_triggered();
     void at_openInLayoutAction_triggered();
 
     void at_openInCurrentLayoutAction_triggered();
