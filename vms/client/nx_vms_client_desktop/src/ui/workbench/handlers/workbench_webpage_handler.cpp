@@ -95,6 +95,23 @@ QnWorkbenchWebPageHandler::QnWorkbenchWebPageHandler(QObject* parent /*= nullptr
             }
         });
 
+    connect(action(menu::OpenAction), &QAction::triggered, this,
+        [this]()
+        {
+            menu::Parameters parameters = menu()->currentParameters(sender());
+            for (const QnResourcePtr& resource: parameters.resources())
+            {
+                auto webPage = resource.dynamicCast<QnWebPageResource>();
+                if (!webPage)
+                    continue;
+
+                if (webPage->isOpenInWindow())
+                    openInDedicatedWindow(webPage);
+                else
+                    menu()->trigger(menu::OpenInCurrentLayoutAction, webPage);
+            }
+        });
+
     connect(appContext()->webPageDataCache(), &WebPageDataCache::dedicatedWindowSettingsLoaded,
         this,
         [this](const QUrl& webPageUrl, const QSize& size)

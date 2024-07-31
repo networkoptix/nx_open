@@ -552,6 +552,12 @@ enum IDType
     /* Resource actions. */
 
     /**
+     * Opens selected resources using the default method (either in the current layout or in a
+     * dedicated window).
+     */
+    OpenAction,
+
+    /**
      * Opens selected resources in provided layout.
      *
      * Parameters:
