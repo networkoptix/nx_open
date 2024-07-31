@@ -755,9 +755,12 @@ QString SystemHealthListModel::Private::decorationPath(MessageType message)
         case MessageType::smtpIsNotSet:
             return "20x20/Outline/server.svg";
 
+        case MessageType::emailSendError:
+        case MessageType::archiveIntegrityFailed:
+            return "20x20/Outline/error.svg";
+
         case MessageType::emailIsEmpty:
         case MessageType::usersEmailIsEmpty:
-        case MessageType::emailSendError:
             return "20x20/Outline/email.svg";
 
         case MessageType::noLicenses:
