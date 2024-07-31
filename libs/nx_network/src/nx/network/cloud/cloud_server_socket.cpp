@@ -321,6 +321,8 @@ void CloudServerSocket::startAcceptor(
 
 void CloudServerSocket::onAcceptorConnectionEstablished(nx::utils::Url remoteAddress)
 {
+    remoteAddress.setUserInfo({});
+
     {
         NX_MUTEX_LOCKER lock(&m_mutex);
 
@@ -340,6 +342,8 @@ void CloudServerSocket::onAcceptorConnectionEstablished(nx::utils::Url remoteAdd
 
 void CloudServerSocket::saveAcceptorError(AcceptorError acceptorError)
 {
+    acceptorError.remoteAddress.setUserInfo({});
+
     {
         NX_MUTEX_LOCKER lock(&m_mutex);
 
@@ -348,7 +352,7 @@ void CloudServerSocket::saveAcceptorError(AcceptorError acceptorError)
             m_lastListenStatusReport->acceptorErrors.end(),
             [&acceptorError](const AcceptorError& existing)
             {
-                    return existing.remoteAddress == acceptorError.remoteAddress;
+                return existing.remoteAddress == acceptorError.remoteAddress;
             });
 
         // Save only one acceptor error per host, since some acceptors (relay) try to open multiple
