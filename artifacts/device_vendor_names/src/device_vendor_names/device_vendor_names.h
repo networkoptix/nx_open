@@ -25,6 +25,10 @@ inline QString shortVendorByName(const QString& vendor)
         {"2n telecommunications", "2nt"},
         {"hangzhou hikvision digital technology co., ltd", "hikvision"},
         {"arecont vision", "arecontvision"},
+        {"uniview tec", "uniview"},
+        {"uniview_tec", "uniview"},
+        {"univiewtec", "uniview"},
+        {"unv", "uniview"},
     };
     return shortVendorNames.value(vendor, vendor);
 }
