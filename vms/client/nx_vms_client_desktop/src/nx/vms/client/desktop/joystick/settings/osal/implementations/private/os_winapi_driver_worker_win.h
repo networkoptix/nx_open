@@ -28,18 +28,22 @@ public:
     Worker(QObject* parent = nullptr);
     ~Worker();
 
-public:
     void enumerateDevices();
 
 signals:
     void deviceListChanged();
+    void deviceFailed();
 
 public:
     void setupDeviceListener(const QString& path, const OsalDeviceListener* listener);
     void removeDeviceListener(const OsalDeviceListener* listener);
 
+public slots:
+    void stopDevicePolling();
+    void startDevicePolling();
+
 private:
-    static bool enumDevicesCallback(LPCDIDEVICEINSTANCE deviceInstance, LPVOID workerPtr);
+    static bool enumerationCallback(LPCDIDEVICEINSTANCE deviceInstance, LPVOID workerPtr);
 
     void registerDevice(const OsWinApiDeviceWin::Device& device);
     void unregisterDeviceById(const QString& deviceId);

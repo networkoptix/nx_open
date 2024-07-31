@@ -23,7 +23,7 @@ OsalDriver* OsalDriver::getDriver()
 #if defined(Q_OS_WIN)
     instance = new OsWinApiDriver();
 #elif defined(Q_OS_MAC)
-    instance = new OsHidDriverMac();
+    instance = new OsHidDriver();
 #else
     NX_ASSERT(false, "OsalDriver::getDriver() should only be used in Windows and macOS.");
 #endif

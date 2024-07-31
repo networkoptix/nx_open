@@ -56,6 +56,8 @@ struct Manager::Private
     QMap<QString, ActionFactoryPtr> actionFactories;
     bool deviceActionsEnabled = true;
 
+    bool isActive = true;
+
     QTimer* const pollTimer;
 };
 
@@ -93,10 +95,12 @@ Manager::Manager(QObject* parent):
             if (state == Qt::ApplicationActive)
             {
                 d->pollTimer->start();
+                d->isActive = true;
             }
             else
             {
                 d->pollTimer->stop();
+                d->isActive = false;
 
                 for (auto& device: m_devices)
                     device->resetState();
@@ -305,7 +309,7 @@ void Manager::removeUnpluggedJoysticks(const QSet<QString>& foundDevicePaths)
         const QString path = it.key();
         if (!foundDevicePaths.contains(path))
         {
-            NX_VERBOSE(this, "Joystick has been removed: %1", path);
+            NX_VERBOSE(this, "Joystick has been removed:\n%1", path);
 
             it = m_devices.erase(it);
             d->deviceConnections.erase(path);
@@ -353,6 +357,11 @@ void Manager::initializeDevice(const DevicePtr& device, const JoystickDescriptor
 bool Manager::isGeneralJoystickConfig(const JoystickDescriptor& config)
 {
     return d->defaultGeneralDeviceConfig.model == config.model;
+}
+
+bool Manager::isActive() const
+{
+    return d->isActive;
 }
 
 QTimer* Manager::pollTimer() const
