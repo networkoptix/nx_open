@@ -2,16 +2,17 @@
 
 #include "device_linux.h"
 
+#include <algorithm>
+
 #include <fcntl.h>
 #include <linux/joystick.h>
-#include <sys/types.h>
 #include <sys/stat.h>
-
-#include <algorithm>
+#include <sys/types.h>
 
 #include <QtCore/QPair>
 
 #include "descriptors.h"
+#include "manager.h"
 
 namespace {
 
@@ -83,9 +84,9 @@ DeviceLinux::DeviceLinux(
     const JoystickDescriptor& modelInfo,
     const QString& path,
     QTimer* pollTimer,
-    QObject* parent)
+    Manager* manager)
     :
-    base_type(modelInfo, path, pollTimer, parent)
+    base_type(modelInfo, path, pollTimer, manager)
 {
     m_dev = open(path.toStdString().c_str(), O_RDONLY | O_NONBLOCK);
     updateStickAxisLimits(modelInfo);

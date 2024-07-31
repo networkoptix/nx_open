@@ -2,8 +2,6 @@
 
 #include "os_hid_device_mac.h"
 
-#include <memory>
-
 #include <hidapi/hidapi.h>
 
 #include <QtCore/QTimer>
@@ -23,7 +21,7 @@ namespace nx::vms::client::desktop::joystick {
 struct OsHidDeviceMac::Private
 {
     hid_device* dev = nullptr;
-    std::unique_ptr<QTimer> pollingTimer;
+    QTimer* pollingTimer;
     JoystickDeviceInfo deviceInfo;
     QBitArray state;
 };
@@ -65,9 +63,9 @@ bool OsHidDeviceMac::open()
     }
 
     if (!d->pollingTimer)
-        d->pollingTimer = std::make_unique<QTimer>(this);
+        d->pollingTimer = new QTimer(this);
     d->pollingTimer->setInterval(kDevicePollingInterval);
-    connect(d->pollingTimer.get(), &QTimer::timeout, this, &OsHidDeviceMac::poll);
+    connect(d->pollingTimer, &QTimer::timeout, this, &OsHidDeviceMac::poll);
     d->pollingTimer->start();
 
     return true;
@@ -83,6 +81,8 @@ int OsHidDeviceMac::read(unsigned char* buffer, int bufferSize)
 
 void OsHidDeviceMac::poll()
 {
+    NX_TRACE(this, "Polling device %1...", d->deviceInfo.modelName);
+
     char buffer[kMaxHidReportSize];
     const int bytesRead = read((unsigned char*)buffer, sizeof(buffer));
 
@@ -111,6 +111,22 @@ void OsHidDeviceMac::stall()
     d->pollingTimer->stop();
     hid_close(d->dev);
     d->dev = nullptr;
+}
+
+void OsHidDeviceMac::halt()
+{
+    if (!d->dev)
+        return;
+
+    d->pollingTimer->stop();
+}
+
+void OsHidDeviceMac::resume()
+{
+    if (!d->dev)
+        return;
+
+    d->pollingTimer->start();
 }
 
 } // namespace nx::vms::client::desktop::joystick

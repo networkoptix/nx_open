@@ -15,6 +15,7 @@
 namespace nx::vms::client::desktop::joystick {
 
 struct JoystickDescriptor;
+class Manager;
 
 class NonBlockingDeviceWin: public Device
 {
@@ -32,13 +33,13 @@ public:
     NonBlockingDeviceWin(
         const JoystickDescriptor& modelInfo,
         const QString& path,
-        QObject* parent = nullptr);
+        Manager* manager);
 
     virtual ~NonBlockingDeviceWin() override;
 
     virtual bool isValid() const override;
 
-public slots:
+public:
     void onStateChanged(const nx::vms::client::desktop::joystick::OsalDevice::State& state);
 
 protected:

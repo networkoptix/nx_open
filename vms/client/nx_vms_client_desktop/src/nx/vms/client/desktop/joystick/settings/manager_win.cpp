@@ -4,14 +4,13 @@
 
 #include <libloaderapi.h>
 
-#include <QtCore/QDir>
 #include <QtCore/QElapsedTimer>
 
 #include <nx/utils/log/log_main.h>
 #include <nx/utils/qt_helpers.h>
 
-#include "device_win.h"
 #include "descriptors.h"
+#include "device_win.h"
 
 using namespace std::chrono;
 
@@ -133,7 +132,7 @@ DeviceWindowsPtr ManagerWindows::createDevice(
     }
 
     auto device = QSharedPointer<DeviceWindows>(
-        new DeviceWindows(directInputDeviceObject, deviceConfig, path, pollTimer()));
+        new DeviceWindows(directInputDeviceObject, deviceConfig, path, pollTimer(), this));
     connect(device.data(), &Device::failed, this, [this, path] { onDeviceFailed(path); });
     d->intitializingDevices[path] = device;
 

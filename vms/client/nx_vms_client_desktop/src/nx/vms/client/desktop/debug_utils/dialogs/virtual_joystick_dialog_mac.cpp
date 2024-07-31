@@ -164,7 +164,7 @@ int VirtualJoystickDialog::buttonShiftFromName(const QString& name) const
 
 void VirtualJoystickDialog::attachVirtualJoystick()
 {
-    auto driver = dynamic_cast<joystick::OsHidDriverMac*>(joystick::OsalDriver::getDriver());
+    auto driver = dynamic_cast<joystick::OsHidDriver*>(joystick::OsalDriver::getDriver());
 
     if (!NX_ASSERT(driver))
         return;
@@ -177,7 +177,7 @@ void VirtualJoystickDialog::attachVirtualJoystick()
 
 void VirtualJoystickDialog::detachVirtualJoystick()
 {
-    auto driver = dynamic_cast<joystick::OsHidDriverMac*>(joystick::OsalDriver::getDriver());
+    auto driver = dynamic_cast<joystick::OsHidDriver*>(joystick::OsalDriver::getDriver());
 
     if (!NX_ASSERT(driver) || !NX_ASSERT(m_virtualJoystickDevice))
         return;

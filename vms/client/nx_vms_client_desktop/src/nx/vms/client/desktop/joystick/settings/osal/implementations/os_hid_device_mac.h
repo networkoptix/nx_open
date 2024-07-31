@@ -20,6 +20,8 @@ public:
     virtual bool open() override;
 
     virtual void stall() override;
+    virtual void halt() override;
+    virtual void resume() override;
 
 protected:
     void poll();

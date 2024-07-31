@@ -22,6 +22,12 @@ public:
         const OsalDeviceListener* listener) override;
     virtual void removeDeviceListener(const OsalDeviceListener* listener) override;
 
+    virtual void halt() override;
+    virtual void resume() override;
+
+private:
+    void enumerateDevices();
+
 private:
     class Worker;
     struct Private;

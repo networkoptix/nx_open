@@ -2,9 +2,9 @@
 
 #include "non_blocking_manager_win.h"
 
-#include <QtCore/QDir>
+#include <QtGui/QGuiApplication>
 
-#include <nx/utils/log/log_main.h>
+#include <nx/utils/log/log.h>
 
 #include "non_blocking_device_win.h"
 #include "osal/osal_driver.h"
@@ -16,6 +16,23 @@ NonBlockingManagerWin::NonBlockingManagerWin(QObject* parent):
 {
     connect(OsalDriver::getDriver(), &OsalDriver::deviceListChanged,
         this, &NonBlockingManagerWin::onDeviceListChanged);
+
+    connect(qApp, &QGuiApplication::applicationStateChanged,
+        [this](Qt::ApplicationState state)
+        {
+            if (state == Qt::ApplicationActive)
+            {
+                NX_DEBUG(this, "Application became active. Resuming the joystick driver.");
+
+                OsalDriver::getDriver()->resume();
+            }
+            else
+            {
+                NX_DEBUG(this, "Application became inactive. Halting the joystick driver.");
+
+                OsalDriver::getDriver()->halt();
+            }
+        });
 }
 
 void NonBlockingManagerWin::onDeviceListChanged()

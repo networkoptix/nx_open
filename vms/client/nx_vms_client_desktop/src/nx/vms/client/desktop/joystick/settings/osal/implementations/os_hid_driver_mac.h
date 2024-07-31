@@ -11,11 +11,11 @@
 
 namespace nx::vms::client::desktop::joystick {
 
-class OsHidDriverMac: public OsalDriver
+class OsHidDriver: public OsalDriver
 {
 public:
-    OsHidDriverMac();
-    virtual ~OsHidDriverMac() override;
+    OsHidDriver();
+    virtual ~OsHidDriver() override;
 
     virtual QList<JoystickDeviceInfo> deviceList() override;
     virtual void setupDeviceListener(
@@ -23,6 +23,10 @@ public:
         const OsalDeviceListener* listener) override;
     virtual void removeDeviceListener(const OsalDeviceListener* listener) override;
 
+    virtual void halt() override;
+    virtual void resume() override;
+
+public:
     void attachVirtualDevice(OsHidDevice* device);
     void detachVirtualDevice(OsHidDevice* device);
 

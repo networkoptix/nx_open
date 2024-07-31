@@ -2,7 +2,7 @@
 
 #include "manager_hid.h"
 
-#include <QtCore/QDir>
+#include <QtGui/QGuiApplication>
 
 #include <nx/utils/log/log_main.h>
 
@@ -16,11 +16,33 @@ ManagerHid::ManagerHid(QObject* parent):
 {
     connect(OsalDriver::getDriver(), &OsalDriver::deviceListChanged,
         this, &ManagerHid::onHidDeviceListChanged);
-}
 
+    connect(qApp, &QGuiApplication::applicationStateChanged,
+        [this](Qt::ApplicationState state)
+        {
+            if (state == Qt::ApplicationActive)
+            {
+                NX_DEBUG(this, "Application became active. Resuming the joystick driver.");
+
+                OsalDriver::getDriver()->resume();
+            }
+            else
+            {
+                NX_DEBUG(this, "Application became inactive. Halting the joystick driver.");
+
+                OsalDriver::getDriver()->halt();
+            }
+        });
+}
 
 void ManagerHid::onHidDeviceListChanged()
 {
+    if (!isActive())
+    {
+        NX_DEBUG(this, "Joystick devices are updated, but the manager is not active. Skipping.");
+        return;
+    }
+
     QSet<QString> foundDevices;
 
     const auto& deviceList = OsalDriver::getDriver()->deviceList();
@@ -34,19 +56,19 @@ void ManagerHid::onHidDeviceListChanged()
 
         NX_DEBUG(this,
             "A new Joystick has been found. "
-            "Manufacturer: %1, model: %2, id: %3, path: %4",
+            "Manufacturer: %1, model: %2, id: %3, path:\n%4",
             deviceInfo.manufacturerName, deviceInfo.modelName, deviceInfo.id, deviceInfo.path);
 
         const auto config = getDeviceDescription(deviceInfo.modelName);
         if (isGeneralJoystickConfig(config))
         {
-            NX_VERBOSE(this, "Unsupported device. Model: %1, path: %2", deviceInfo.modelName,
+            NX_VERBOSE(this, "Unsupported device. Model: %1, path:\n%2", deviceInfo.modelName,
                 deviceInfo.path);
 
             continue;
         }
 
-        auto device = new DeviceHid(config, deviceInfo.path, pollTimer());
+        auto device = new DeviceHid(config, deviceInfo.path, this);
 
         initializeDevice(DevicePtr(device), config);
     }

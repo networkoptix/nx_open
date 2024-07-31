@@ -4,6 +4,9 @@
 
 #include <QtCore/QPair>
 
+#include <nx/utils/log/log.h>
+
+#include "manager.h"
 #include "osal/osal_driver.h"
 
 namespace nx::vms::client::desktop::joystick {
@@ -36,7 +39,6 @@ struct NonBlockingDeviceWin::Private
     int bufferSize = 0;
     QScopedArrayPointer<unsigned char> buffer;
 
-    int bitCount = 0;
     std::vector<ParsedFieldLocation> axisLocations;
     std::vector<ParsedFieldLocation> buttonLocations;
 };
@@ -44,9 +46,9 @@ struct NonBlockingDeviceWin::Private
 NonBlockingDeviceWin::NonBlockingDeviceWin(
     const JoystickDescriptor& modelInfo,
     const QString& path,
-    QObject* parent)
+    Manager* manager)
     :
-    base_type(modelInfo, path, nullptr, parent),
+    base_type(modelInfo, path, nullptr, manager),
     d(new Private{.q = this, .stateListener = new NonBlockingDeviceWinStateListener(this)})
 {
     OsalDriver::getDriver()->setupDeviceListener(path, d->stateListener);
@@ -79,6 +81,12 @@ bool NonBlockingDeviceWin::isValid() const
 
 void NonBlockingDeviceWin::onStateChanged(const OsalDevice::State& state)
 {
+    if (!m_manager->isActive())
+    {
+        NX_DEBUG(this, "Device manager is not active, ignoring the state change.");
+        return;
+    }
+
     std::vector<bool> buttonStates;
     for (int i = 0; i < state.buttons.count(); i++)
         buttonStates.push_back(state.buttons[i]);

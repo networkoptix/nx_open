@@ -5,6 +5,9 @@
 #include <QtCore/QBitArray>
 #include <QtCore/QPair>
 
+#include <nx/utils/log/log.h>
+
+#include "manager.h"
 #include "osal/osal_driver.h"
 
 namespace {
@@ -53,9 +56,9 @@ struct DeviceHid::Private
 DeviceHid::DeviceHid(
     const JoystickDescriptor& modelInfo,
     const QString& path,
-    QObject* parent)
+    Manager* manager)
     :
-    base_type(modelInfo, path, nullptr, parent),
+    base_type(modelInfo, path, nullptr, manager),
     d(new Private{.q = this, .stateListener = new DeviceHidStateListener(this)})
 {
     OsalDriver::getDriver()->setupDeviceListener(path, d->stateListener);
@@ -92,6 +95,12 @@ bool DeviceHid::isValid() const
 
 void DeviceHid::onStateChanged(const QBitArray& newOsHidLevelState)
 {
+    if (!m_manager->isActive())
+    {
+        NX_DEBUG(this, "Device manager is not active, ignoring the state change.");
+        return;
+    }
+
     const State newState = parseOsHidLevelState(newOsHidLevelState);
 
     processNewState(newState);

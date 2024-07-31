@@ -32,6 +32,9 @@ public:
     virtual void setupDeviceListener(const QString& path, const OsalDeviceListener* listener) = 0;
     virtual void removeDeviceListener(const OsalDeviceListener* listener) = 0;
 
+    virtual void halt() = 0;
+    virtual void resume() = 0;
+
 signals:
     void deviceListChanged();
 };

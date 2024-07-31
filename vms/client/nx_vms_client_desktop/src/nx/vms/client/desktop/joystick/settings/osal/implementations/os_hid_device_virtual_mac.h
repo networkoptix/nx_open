@@ -20,7 +20,13 @@ public:
     virtual bool isOpened() const override { return true; }
     virtual bool open() override { return true; }
 
+    // TODO: #alevenkov Try to avoid empty implementations in the next refactoring.
     virtual void stall() override { }
+    // This is not needed for virtual devices, because they are only used for halting the joystick
+    // during the application inactivity. But when the application is inactive, a user can't
+    // interact with the virtual joystick anyway.
+    virtual void halt() override { }
+    virtual void resume() override { }
 
     QBitArray state() const { return m_state; }
     void setState(const QBitArray& newState);

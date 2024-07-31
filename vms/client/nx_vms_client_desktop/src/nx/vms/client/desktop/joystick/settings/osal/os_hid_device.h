@@ -13,6 +13,8 @@ public:
     virtual bool open() = 0;
 
     virtual void stall() = 0;
+    virtual void halt() = 0;
+    virtual void resume() = 0;
 
 protected:
     virtual int read(unsigned char* buffer, int bufferSize) = 0;
