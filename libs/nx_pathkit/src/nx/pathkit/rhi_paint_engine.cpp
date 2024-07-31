@@ -107,6 +107,17 @@ SkPath painterPathToSkPath(const QPainterPath& path, const QTransform& tr)
     return skPath;
 }
 
+SkMatrix transformToSk(const QTransform& t)
+{
+    if (t.isIdentity())
+        return {};
+
+    return SkMatrix::MakeAll(
+        t.m11(), t.m21(), t.m31(),
+        t.m12(), t.m22(), t.m32(),
+        t.m13(), t.m23(), t.m33());
+}
+
 } // namespace
 
 namespace nx::pathkit {
@@ -149,9 +160,10 @@ void RhiPaintEngine::updateState(const QPaintEngineState& state)
     else if (flags & DirtyClipRegion)
     {
         m_clipEnabled = true;
-        QPainterPath path;
-        for (const QRect& rect: state.clipRegion())
-            path.addRect(rect);
+        SkPath path;
+        for (const QRect& r: state.clipRegion())
+            path.addRect(r.left(), r.top(), r.right() + 1, r.bottom() + 1);
+        path.transform(transformToSk(state.transform()));
         updateClipPath(path, state.clipOperation());
     }
     else if (flags & DirtyClipEnabled)
@@ -235,8 +247,18 @@ void RhiPaintEngine::drawCustom(const PaintCustom& custom)
 
 void RhiPaintEngine::updateClipPath(const QPainterPath& clipPath, Qt::ClipOperation op)
 {
-    const SkPath skPath = painterPathToSkPath(clipPath, state->transform());
+    if (op == Qt::NoClip)
+    {
+        updateClipPath(SkPath{}, op);
+        return;
+    }
 
+    const SkPath skPath = painterPathToSkPath(clipPath, state->transform());
+    updateClipPath(skPath, op);
+}
+
+void RhiPaintEngine::updateClipPath(const SkPath& skPath, Qt::ClipOperation op)
+{
     switch (op)
     {
         case Qt::NoClip:
