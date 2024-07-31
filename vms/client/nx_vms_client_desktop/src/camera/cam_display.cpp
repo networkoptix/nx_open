@@ -510,7 +510,7 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
         bool canSwitchToMT = isFullScreen()
             || appContext()->radassController()->consumerCount() == 1;
 
-        bool shouldSwitchToMT = (m_isRealTimeSource && m_totalFrames > 100 && m_dataQueue.size() >= m_dataQueue.size()-1) || !m_isRealTimeSource;
+        bool shouldSwitchToMT = (m_isRealTimeSource && m_totalFrames > 100 && m_dataQueue.size() >= m_dataQueue.maxSize()-1) || !m_isRealTimeSource;
         if (canSwitchToMT && shouldSwitchToMT)
         {
             if (!m_useMTRealTimeDecode)
@@ -546,7 +546,7 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
             NX_VERBOSE(this, "Increase live buffer size to %1 ms because of empty input buffer",
                 m_liveBufferSizeMkSec / 1000);
             m_delay.afterdelay();
-            m_delay.addQuant(m_liveBufferSizeMkSec /2); // realtime buffering for more smooth playback
+            m_delay.addQuant(m_liveBufferSizeMkSec /2 - needToSleep); // realtime buffering for more smooth playback
             m_realTimeHurryUp = false;
         }
         else if (queueLen > m_liveBufferSizeMkSec)
