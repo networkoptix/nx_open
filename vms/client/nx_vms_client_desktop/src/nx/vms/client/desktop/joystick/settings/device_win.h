@@ -18,6 +18,7 @@
 namespace nx::vms::client::desktop::joystick {
 
 struct JoystickDescriptor;
+class Manager;
 
 class DeviceWindows: public Device
 {
@@ -31,7 +32,7 @@ public:
         const JoystickDescriptor& modelInfo,
         const QString& path,
         QTimer* pollTimer,
-        QObject* parent = 0);
+        Manager* manager);
 
     virtual ~DeviceWindows() override;
 
