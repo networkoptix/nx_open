@@ -556,7 +556,7 @@ void Workbench::setCurrentLayout(QnWorkbenchLayout* layout)
             if (password.isEmpty())
             {
                 // The layout must be removed after opening, not during opening. Otherwise, the
-                // tabbar invariant will be violated.
+                // tabbar invariant will be violated. Changing layout process must be completed.
                 executeDelayedParented(
                     [this, layout]
                     {
@@ -564,15 +564,16 @@ void Workbench::setCurrentLayout(QnWorkbenchLayout* layout)
                             QnWorkbenchLayoutList() << layout);
                     },
                     this);
-                return;
             }
+            else // Try to reload layout with entered password.
+            {
+                layout::reloadFromFile(resource, password);
+                layout->layoutSynchronizer()->update();
 
-            layout::reloadFromFile(resource, password);
-            layout->layoutSynchronizer()->update();
-
-            auto systemContext = SystemContext::fromResource(resource);
-            if (NX_ASSERT(systemContext))
-                systemContext->layoutSnapshotManager()->store(resource);
+                auto systemContext = SystemContext::fromResource(resource);
+                if (NX_ASSERT(systemContext))
+                    systemContext->layoutSnapshotManager()->store(resource);
+            }
         }
     }
 
