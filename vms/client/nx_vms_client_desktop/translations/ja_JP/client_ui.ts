@@ -2826,7 +2826,7 @@
     </message>
     <message>
       <source>Issued by</source>
-      <translation>発行者:</translation>
+      <translation>発行者</translation>
     </message>
     <message>
       <source>Self-signed root certificate</source>

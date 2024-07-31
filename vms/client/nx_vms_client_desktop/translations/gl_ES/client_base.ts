@@ -2143,107 +2143,107 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>Device added</source>
-      <translation type="unfinished">Device added</translation>
+      <translation>Dispositivo engadido</translation>
     </message>
     <message>
       <source>Camera added</source>
-      <translation type="unfinished">Camera added</translation>
+      <translation>Cámara engadida</translation>
     </message>
     <message>
       <source>Device removed</source>
-      <translation type="unfinished">Device removed</translation>
+      <translation>Dispositivo eliminado</translation>
     </message>
     <message>
       <source>Camera removed</source>
-      <translation type="unfinished">Camera removed</translation>
+      <translation>Cámara eliminada</translation>
     </message>
     <message>
       <source>Device name</source>
-      <translation type="unfinished">Device name</translation>
+      <translation>Nome do dispositivo</translation>
     </message>
     <message>
       <source>Camera name</source>
-      <translation type="unfinished">Camera name</translation>
+      <translation>Nome da cámara</translation>
     </message>
     <message>
       <source>Email settings changed</source>
-      <translation type="unfinished">Email settings changed</translation>
+      <translation>Configuración de mail cambiada</translation>
     </message>
     <message>
       <source>Filled circle mark means the archive is still available</source>
-      <translation type="unfinished">Filled circle mark means the archive is still available</translation>
+      <translation>O sinal do círculo cheo significa que o arquivo aínda está disponible</translation>
     </message>
     <message>
       <source>Update installed</source>
-      <translation type="unfinished">Update installed</translation>
+      <translation>Actualización instalada</translation>
     </message>
     <message numerus="yes">
       <source>%n actions</source>
-      <translation type="unfinished">
-        <numerusform>%n actions</numerusform>
-        <numerusform>%n actions</numerusform>
+      <translation>
+        <numerusform>%n accións</numerusform>
+        <numerusform>%n accioóns</numerusform>
       </translation>
     </message>
     <message>
       <source>Event rule changed</source>
-      <translation type="unfinished">Event rule changed</translation>
+      <translation>Regla de evento modificada</translation>
     </message>
     <message>
       <source>Event rule removed</source>
-      <translation type="unfinished">Event rule removed</translation>
+      <translation>Regla de evento eliminada</translation>
     </message>
     <message>
       <source>Event rules reset to default</source>
-      <translation type="unfinished">Event rules reset to default</translation>
+      <translation>Reglas de evento restablecidas por defecto</translation>
     </message>
     <message>
       <source>Storage added</source>
-      <translation type="unfinished">Storage added</translation>
+      <translation>Almacenamento engadido</translation>
     </message>
     <message>
       <source>Storage updated</source>
-      <translation type="unfinished">Storage updated</translation>
+      <translation>Almacenamento actualizado</translation>
     </message>
     <message>
       <source>Storage removed</source>
-      <translation type="unfinished">Storage removed</translation>
+      <translation>Almacenamento eliminado</translation>
     </message>
     <message>
       <source>MitM Attack</source>
-      <translation type="unfinished">MitM Attack</translation>
+      <translation>Ataque MitM</translation>
     </message>
     <message>
       <source>MitM attack from server %1</source>
-      <translation type="unfinished">MitM attack from server %1</translation>
+      <translation>Ataque MitM dende servidor %1</translation>
     </message>
     <message>
       <source>Connected to %1</source>
       <comment>%1 is the Cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connected to %1</translation>
+      <translation>Conectado a %1</translation>
     </message>
     <message>
       <source>Disconnected from %1</source>
       <comment>%1 is the Cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Disconnected from %1</translation>
+      <translation>Desconectado de %1</translation>
     </message>
     <message>
       <source>Connected to %1 via %2</source>
       <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 5.2.0.0)</comment>
-      <translation type="unfinished">Connected to %1 via %2</translation>
+      <translation>Connectado a %1 vía %2</translation>
     </message>
     <message>
       <source>Disconnected from %1 via %2</source>
       <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 5.2.0.0)</comment>
-      <translation type="unfinished">Disconnected from %1 via %2</translation>
+      <translation>Desconnectado de %1 vía %2</translation>
     </message>
   </context>
   <context>
     <name>QnBlinkingImageButtonWidget</name>
     <message numerus="yes">
       <source>You have %n notifications</source>
-      <translation type="unfinished">
-        <numerusform>You have %n notifications</numerusform>
-        <numerusform>You have %n notifications</numerusform>
+      <translation>
+        <numerusform>Eo! Tes %n notificacións</numerusform>
+        <numerusform>Eo! Tes %n notificacións</numerusform>
       </translation>
     </message>
   </context>
@@ -2251,101 +2251,101 @@ Clave de licenza: %2</translation>
     <name>QnBookmarkWidget</name>
     <message>
       <source>Do not lock archive</source>
-      <translation type="unfinished">Do not lock archive</translation>
+      <translation>Non bloquear arquivo</translation>
     </message>
     <message>
       <source>1 month</source>
-      <translation type="unfinished">1 month</translation>
+      <translation>1 mes</translation>
     </message>
     <message>
       <source>3 month</source>
-      <translation type="unfinished">3 month</translation>
+      <translation>3 meses</translation>
     </message>
     <message>
       <source>6 month</source>
-      <translation type="unfinished">6 month</translation>
+      <translation>6 meses</translation>
     </message>
     <message>
       <source>year</source>
-      <translation type="unfinished">year</translation>
+      <translation>ano</translation>
     </message>
     <message>
       <source>Name cannot be empty.</source>
-      <translation type="unfinished">Name cannot be empty.</translation>
+      <translation>O nome non pode estar baleiro.</translation>
     </message>
     <message>
       <source>Description cannot be empty</source>
-      <translation type="unfinished">Description cannot be empty</translation>
+      <translation>A descripción non pode esta baleira</translation>
     </message>
   </context>
   <context>
     <name>QnBusinessResourceValidationStrings</name>
     <message numerus="yes">
       <source>%1 of %n devices</source>
-      <translation type="unfinished">
-        <numerusform>%1 of %n devices</numerusform>
-        <numerusform>%1 of %n devices</numerusform>
+      <translation>
+        <numerusform>%1 de %n dispositivos</numerusform>
+        <numerusform>%1 de %n dispositivos</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 of %n cameras</source>
-      <translation type="unfinished">
-        <numerusform>%1 of %n cameras</numerusform>
-        <numerusform>%1 of %n cameras</numerusform>
+      <translation>
+        <numerusform>%1 de %n cámaras</numerusform>
+        <numerusform>%1 de %n cámaras</numerusform>
       </translation>
     </message>
     <message>
       <source>Select at least one device</source>
-      <translation type="unfinished">Select at least one device</translation>
+      <translation>Selecciona polo menos un dispositivo</translation>
     </message>
     <message>
       <source>Select at least one camera</source>
-      <translation type="unfinished">Select at least one camera</translation>
+      <translation>Selecciona polo menos unha cámara</translation>
     </message>
     <message numerus="yes">
       <source>%1 of %n I/O modules</source>
-      <translation type="unfinished">
-        <numerusform>%1 of %n I/O modules</numerusform>
-        <numerusform>%1 of %n I/O modules</numerusform>
+      <translation>
+        <numerusform>%1 de %n I/O módulos</numerusform>
+        <numerusform>%1 de %n I/O módulos</numerusform>
       </translation>
     </message>
     <message>
       <source>Any Device</source>
-      <translation type="unfinished">Any Device</translation>
+      <translation>Calquera dispositivo</translation>
     </message>
     <message>
       <source>Any Camera</source>
-      <translation type="unfinished">Any Camera</translation>
+      <translation>Calquera cámara</translation>
     </message>
   </context>
   <context>
     <name>QnBusinessRuleItemDelegate</name>
     <message>
       <source>Manage Bookmarks</source>
-      <translation type="unfinished">Manage Bookmarks</translation>
+      <translation>Xestionar marcadores</translation>
     </message>
   </context>
   <context>
     <name>QnBusinessRuleViewModel</name>
     <message>
       <source>Error: %1</source>
-      <translation type="unfinished">Error: %1</translation>
+      <translation>Erro: %1</translation>
     </message>
     <message>
       <source>Instant</source>
-      <translation type="unfinished">Instant</translation>
+      <translation>Instantáneo</translation>
     </message>
     <message>
       <source>Stops</source>
-      <translation type="unfinished">Stops</translation>
+      <translation>Para</translation>
     </message>
     <message>
       <source>Starts</source>
-      <translation type="unfinished">Starts</translation>
+      <translation>Comeza</translation>
     </message>
     <message>
       <source>Occurs</source>
-      <translation type="unfinished">Occurs</translation>
+      <translation>Ocorre</translation>
     </message>
     <message>
       <source>N/A</source>
@@ -2353,7 +2353,7 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>Every %1</source>
-      <translation type="unfinished">Every %1</translation>
+      <translation>Cada %1</translation>
     </message>
     <message>
       <source>System</source>
@@ -2361,57 +2361,57 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>Any Server</source>
-      <translation type="unfinished">Any Server</translation>
+      <translation>Calquera servidor</translation>
     </message>
     <message>
       <source>Any Device</source>
-      <translation type="unfinished">Any Device</translation>
+      <translation>Calquera dispositivo</translation>
     </message>
     <message>
       <source>Any Camera</source>
-      <translation type="unfinished">Any Camera</translation>
+      <translation>Calquera cámara</translation>
     </message>
     <message numerus="yes">
       <source>%n Servers</source>
-      <translation type="unfinished">
-        <numerusform>%n Servers</numerusform>
-        <numerusform>%n Servers</numerusform>
+      <translation>
+        <numerusform>%n Servidores</numerusform>
+        <numerusform>%n Servidores</numerusform>
       </translation>
     </message>
     <message>
       <source>User</source>
-      <translation type="unfinished">User</translation>
+      <translation>Usuaria/o</translation>
     </message>
     <message>
       <source>Source Server</source>
-      <translation type="unfinished">Source Server</translation>
+      <translation>Servidor fonte</translation>
     </message>
     <message>
       <source>Source Camera</source>
-      <translation type="unfinished">Source Camera</translation>
+      <translation>Cámara fonte</translation>
     </message>
     <message numerus="yes">
       <source>Source and %n more Cameras</source>
-      <translation type="unfinished">
-        <numerusform>Source and %n more Cameras</numerusform>
-        <numerusform>Source and %n more Cameras</numerusform>
+      <translation>
+        <numerusform>Fonte e %n cámaras máis</numerusform>
+        <numerusform>Fonte e %n cámaras máis</numerusform>
       </translation>
     </message>
     <message>
       <source>Select at least one Device</source>
-      <translation type="unfinished">Select at least one Device</translation>
+      <translation>Selecciona polo menos un dispositivo</translation>
     </message>
     <message>
       <source>Select at least one Camera</source>
-      <translation type="unfinished">Select at least one Camera</translation>
+      <translation>Selecciona polo menos unha cámara</translation>
     </message>
     <message>
       <source>Select Server</source>
-      <translation type="unfinished">Select Server</translation>
+      <translation>Selecciona un servidor</translation>
     </message>
     <message>
       <source>Source Server and %1</source>
-      <translation type="unfinished">Source Server and %1</translation>
+      <translation>Servidor fonte e %1</translation>
     </message>
   </context>
   <context>
@@ -2424,11 +2424,11 @@ Clave de licenza: %2</translation>
     <message>
       <source>at</source>
       <extracomment>&quot;at&quot; is from the sentence &quot;Display the text _at_ these cameras&quot;</extracomment>
-      <translation type="unfinished">at</translation>
+      <translation>en</translation>
     </message>
     <message>
       <source>Select at least one device</source>
-      <translation type="unfinished">Select at least one device</translation>
+      <translation>Selecciona polo menos un dispositivo</translation>
     </message>
     <message>
       <source>Select at least one camera</source>
