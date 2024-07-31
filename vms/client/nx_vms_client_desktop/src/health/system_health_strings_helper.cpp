@@ -88,21 +88,21 @@ QString QnSystemHealthStringsHelper::messageNotificationTitle(MessageType messag
             return tr("Missed call");
         case MessageType::storagesNotConfigured:
         {
-            return resources.isEmpty()
+            return resources.size() <= 1
                 ? tr("Storage is not configured")
                 : tr("Storage is not configured on %n servers", "", resources.size());
         }
 
         case MessageType::backupStoragesNotConfigured:
         {
-            return resources.isEmpty()
+            return resources.size() <= 1
                 ? tr("Backup storage is not configured")
                 : tr("Backup storage is not configured on %n servers", "", resources.size());
         }
 
         case MessageType::cameraRecordingScheduleIsInvalid:
         {
-            return resources.isEmpty()
+            return resources.size() <= 1
                 ? tr("Recording schedule is invalid")
                 : tr("Recording schedule is invalid on %n cameras", "", resources.size());
         }
@@ -135,7 +135,7 @@ QString QnSystemHealthStringsHelper::messageNotificationTitle(MessageType messag
 
         case MessageType::metadataOnSystemStorage:
         {
-            return resources.size() == 1
+            return resources.size() <= 1
                 ? tr("System storage is used for analytics data")
                 : tr("System storage is used for analytics data on %n servers",
                       "",
