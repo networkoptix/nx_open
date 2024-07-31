@@ -80,20 +80,18 @@ Control
 
             width: parent.width
             height: 52
+            anchors.horizontalCenter: parent.horizontalCenter
 
             component ArrowButton: Button
             {
                 property bool forward: false
 
-                y: 6
-                width: 36
-                height: 36
-                leftPadding: 13
-                rightPadding: 13
-                topPadding: 13
-                bottomPadding: 13
-                icon.width: 16
-                icon.height: 16
+                y: 8
+                width: 20
+                height: 20
+                anchors.verticalCenter: parent.verticalCenter
+                icon.width: 20
+                icon.height: 20
                 focusPolicy: Qt.NoFocus
 
                 flat: true
@@ -104,7 +102,7 @@ Control
             ArrowButton
             {
                 x: 10
-                icon.source: "image://skin/16x16/Outline/arrow_left.svg"
+                icon.source: "image://skin/20x20/Outline/arrow_left.svg"
                 id: "backArrowButton"
 
                 readonly property int kMinYear: 1970
@@ -130,7 +128,7 @@ Control
             ArrowButton
             {
                 x: parent.width - width - 10
-                icon.source: "image://skin/16x16/Outline/arrow_right.svg"
+                icon.source: "image://skin/20x20/Outline/arrow_right.svg"
                 id: "forwardArrowButton"
 
                 onReleased:
