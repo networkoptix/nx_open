@@ -323,6 +323,8 @@ NX_VMS_COMMON_API extern const QString kOnvifRemoteArchiveEnabled;
 // Additional flags that can be passed to gSOAP library.
 NX_VMS_COMMON_API extern const QString kGsoapAdditionalFlags;
 
+NX_VMS_COMMON_API extern const QString kTimezoneConfiguration;
+
 // Force disable ONVIF PullPoint Notification timestamp validation.
 NX_VMS_COMMON_API extern const QString kOnvifIgnoreOutdatedNotifications;
 
