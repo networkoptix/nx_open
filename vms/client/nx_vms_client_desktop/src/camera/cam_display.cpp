@@ -399,7 +399,7 @@ void QnCamDisplay::hurryUpCheckForCamera(QnCompressedVideoDataPtr vd, float spee
         {
             m_delayedFrameCount = qMin(0, m_delayedFrameCount);
             m_delayedFrameCount--;
-            if (m_delayedFrameCount < -10 && m_dataQueue.size() >= m_dataQueue.size()*0.75)
+            if (m_delayedFrameCount < -10 && m_dataQueue.size() >= m_dataQueue.maxSize()*0.75)
             {
                 appContext()->radassController()->streamBackToNormal(this);
             }
