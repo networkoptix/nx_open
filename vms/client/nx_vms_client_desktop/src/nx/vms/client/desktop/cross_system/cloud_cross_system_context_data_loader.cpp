@@ -109,7 +109,10 @@ struct CloudCrossSystemContextDataLoader::Private
                 requestData();
             });
 
-        return connection->getServersInfo(std::move(callback), q->thread());
+        return connection->getServersInfo(
+            /*onlyFreshInfo*/ false,
+            std::move(callback),
+            q->thread());
     }
 
     rest::Handle requestServerFootageData()

@@ -529,10 +529,14 @@ Handle ServerConnection::getMediaServers(
 }
 
 Handle ServerConnection::getServersInfo(
+    bool onlyFreshInfo,
     Result<ErrorOrData<nx::vms::api::ServerInformationList>>::type&& callback,
     QThread* targetThread)
 {
-    return executeGet("/rest/v1/servers/*/info", {}, std::move(callback), targetThread);
+    return executeGet(
+        "/rest/v1/servers/*/info",
+        {{"onlyFreshInfo", QnLexical::serialized(onlyFreshInfo)}},
+        std::move(callback), targetThread);
 }
 
 Handle ServerConnection::bindSystemToCloud(
