@@ -1851,10 +1851,6 @@
       <source>Take system name and settings from:</source>
       <translation>使用此系統的名稱與設定：</translation>
     </message>
-    <message>
-      <source>warn icon</source>
-      <translation>警告圖示</translation>
-    </message>
   </context>
   <context>
     <name>MultiServerUpdatesWidget</name>

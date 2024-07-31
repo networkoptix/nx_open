@@ -1851,10 +1851,6 @@
       <source>Take system name and settings from:</source>
       <translation>Vegye át a rendszer nevét és beállításait innen:</translation>
     </message>
-    <message>
-      <source>warn icon</source>
-      <translation type="unfinished">warn icon</translation>
-    </message>
   </context>
   <context>
     <name>MultiServerUpdatesWidget</name>

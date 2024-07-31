@@ -1851,10 +1851,6 @@
       <source>Take system name and settings from:</source>
       <translation>Nazwę systemu i ustawienia pobierz od:</translation>
     </message>
-    <message>
-      <source>warn icon</source>
-      <translation type="unfinished">warn icon</translation>
-    </message>
   </context>
   <context>
     <name>MultiServerUpdatesWidget</name>

@@ -7599,8 +7599,8 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message numerus="yes">
       <source>Use Service</source>
-      <translation type="unfinished">
-        <numerusform>Use Service</numerusform>
+      <translation>
+        <numerusform>Gunakan Layanan</numerusform>
       </translation>
     </message>
   </context>

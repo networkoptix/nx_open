@@ -1851,10 +1851,6 @@
       <source>Take system name and settings from:</source>
       <translation>Ta systemnamn och inställningar från:</translation>
     </message>
-    <message>
-      <source>warn icon</source>
-      <translation>varningsikon</translation>
-    </message>
   </context>
   <context>
     <name>MultiServerUpdatesWidget</name>

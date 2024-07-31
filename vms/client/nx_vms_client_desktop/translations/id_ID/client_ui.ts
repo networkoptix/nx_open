@@ -1851,10 +1851,6 @@
       <source>Take system name and settings from:</source>
       <translation>Ambil nama sistem dan pengaturan dari:</translation>
     </message>
-    <message>
-      <source>warn icon</source>
-      <translation>ikon peringatan</translation>
-    </message>
   </context>
   <context>
     <name>MultiServerUpdatesWidget</name>
