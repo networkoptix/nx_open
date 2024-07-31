@@ -76,6 +76,7 @@ void requestCacheInfoUpdate(
     nx::vms::common::ServerCompatibilityValidator::Purpose purpose)
 {
     connection->serverApi()->getServersInfo(
+        /*onlyFreshInfo*/ false,
         [connection, purpose=purpose](
             bool success,
             rest::Handle /*handle*/,
