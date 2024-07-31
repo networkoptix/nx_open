@@ -584,7 +584,14 @@ public:
         Result<nx::vms::api::MediaServerDataList>::type callback,
         QThread* targetThread = nullptr);
 
+    /**
+     * Request servers information.
+     * @param onlyFreshInfo Flag to filter out Server Info from offline Servers. If `false` is
+     *     passed, info from database will be returned, otherwise a request to each server will be
+     *     sent separately.
+     */
     Handle getServersInfo(
+        bool onlyFreshInfo,
         Result<ErrorOrData<nx::vms::api::ServerInformationList>>::type&& callback,
         QThread* targetThread);
 
