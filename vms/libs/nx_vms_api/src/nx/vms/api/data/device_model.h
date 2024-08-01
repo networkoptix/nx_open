@@ -30,6 +30,7 @@ struct DeviceGroupSettings
      * %example Group 1
      */
     QString name;
+    bool operator==(const DeviceGroupSettings& other) const = default;
 };
 #define DeviceGroupSettings_Fields (id)(name)
 QN_FUSION_DECLARE_FUNCTIONS(DeviceGroupSettings, (json), NX_VMS_API)
