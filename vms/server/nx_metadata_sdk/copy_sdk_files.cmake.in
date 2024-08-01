@@ -59,9 +59,7 @@ nx_copy_always(${copied_sample_unit_tests_origin} "${copied_sample_unit_tests_fi
 
 nx_copy_always(@open_source_root@ @open_source_root@/licenses ${target_dir})
 
-if(msvc_environment_setup_script)
-    nx_copy_always(
-        @open_source_root@/build_utils/msvc/
-        @open_source_root@/build_utils/msvc/${msvc_environment_setup_script}
-        ${target_dir})
-endif()
+nx_copy_always(
+    @open_source_root@/build_utils/msvc/
+    @open_source_root@/build_utils/msvc/${msvc_environment_setup_script}
+    ${target_dir})
