@@ -47,6 +47,7 @@ namespace nx::vms::client::core {
 
 struct RemoteSession::Private
 {
+    RemoteSession* const q;
     QPointer<RemoteConnectionFactory> remoteConnectionFactory;
     QPointer<QnClientMessageProcessor> messageProcessor;
     RemoteConnectionPtr connection;
@@ -105,6 +106,7 @@ void RemoteSession::Private::updateTokenExpirationTime()
                 sessionStartTime = qnSyncTime->currentTimePoint() - session.ageS;
                 currentConnection->setSessionTokenExpirationTime(
                     qnSyncTime->currentTimePoint() + session.expiresInS);
+                emit q->tokenExpirationTimeChanged();
             }),
         QThread::currentThread());
 }
@@ -121,7 +123,7 @@ RemoteSession::RemoteSession(
     :
     base_type(parent),
     SystemContextAware(systemContext),
-    d(new Private())
+    d(new Private{.q = this})
 {
     d->remoteConnectionFactory = qnClientCoreModule->networkModule()->connectionFactory();
 
@@ -544,6 +546,7 @@ void RemoteSession::onCloudSessionTokenExpiring()
                     nx::network::http::BearerAuthToken(response.access_token));
                 connection->updateCredentials(std::move(credentials), response.expires_at);
                 d->cloudTokenUpdater->onTokenUpdated(response.expires_at);
+                d->updateTokenExpirationTime();
             }
         };
 

@@ -260,6 +260,11 @@ void RemoteSessionTimeoutWatcher::sessionStarted(std::shared_ptr<RemoteSession> 
                 tick();
             });
 
+        connect(session.get(),
+            &RemoteSession::tokenExpirationTimeChanged,
+            this,
+            &RemoteSessionTimeoutWatcher::tick);
+
         connect(session->systemContext()->userWatcher(),
             &nx::vms::client::core::UserWatcher::userChanged,
             this,

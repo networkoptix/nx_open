@@ -88,6 +88,8 @@ signals:
 
     void credentialsChanged();
 
+    void tokenExpirationTimeChanged();
+
 protected:
     virtual bool keepCurrentServerOnError(RemoteConnectionErrorCode errorCode);
 
