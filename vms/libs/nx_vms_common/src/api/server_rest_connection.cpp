@@ -531,8 +531,7 @@ rest::Handle ServerConnection::cameraThumbnailAsync(const nx::api::CameraImageRe
     if (debugFlags().testFlag(DebugFlag::disableThumbnailRequests))
         return {};
 
-    QnThumbnailRequestData data;
-    data.request = request;
+    QnThumbnailRequestData data{request, QnThumbnailRequestData::RequestType::cameraThumbnail};
     data.format = Qn::SerializationFormat::ubjson;
 
     return executeGet(lit("/ec2/cameraThumbnail"), data.toParams(), callback, targetThread);
