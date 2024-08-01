@@ -82,13 +82,13 @@ file(GLOB_RECURSE copied_sample_unit_tests_files CONFIGURE_DEPENDS
     ${copied_sample_unit_tests_origin}/*)
 
 set(copy_sdk_files_script ${CMAKE_CURRENT_BINARY_DIR}/copy_sdk_files.cmake)
+set(msvc_environment_setup_script "call_vcvars64.bat")
 
 if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
     set(sample_build_script "./build_samples.sh")
     set(build_scripts ${CMAKE_CURRENT_SOURCE_DIR}/files/${sample_build_script})
 elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
     set(sample_build_script "build_samples.bat")
-    set(msvc_environment_setup_script "call_vcvars64.bat")
     set(build_scripts
         ${CMAKE_CURRENT_SOURCE_DIR}/files/${sample_build_script}
         ${open_source_root}/build_utils/msvc/${msvc_environment_setup_script}
