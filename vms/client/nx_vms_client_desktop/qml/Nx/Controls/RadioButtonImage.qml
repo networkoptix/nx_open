@@ -19,7 +19,10 @@ ColoredImage
 
     opacity: enabled ? 1.0 : 0.3
     baselineOffset: 12
-    sourceSize: Qt.size(16, 16)
+
+    sourceSize: Qt.size(12, 12)
+    implicitWidth: 16
+    implicitHeight: 16
 
     primaryColor:
     {
