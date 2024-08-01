@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <mutex>
+
 #include <QtGui/QPaintEngine>
 
 #include "include/core/SkPath.h"
@@ -50,17 +52,104 @@ struct PaintCustom
 
 using PaintData = std::variant<PaintPath, PaintPixmap, PaintCustom>;
 
-class PaintEnginePaths
+/**
+ * Synchronized data container for paint engine entries. It is shared between RhiPaintEngine and
+ * RhiPaintDeviceRenderer and allows to submit paint data from the engine to the render (which may
+ * reside in a separate thread in case of QML threaded rendering). It also tracks whether the data
+ * has been rendered to avoid processing it multiple times.
+ */
+class RhiPaintEngineSyncData
 {
 public:
-    PaintEnginePaths();
+    /**
+     * RAII class to lock the data for reading. Allows to iterate over the entries submitted to the
+     * paint engine since last clear() call. On destruction, unlocks the data and marks it as
+     * rendered to avoid processing the same data again.
+     */
+    class Entries
+    {
+        friend class RhiPaintEngineSyncData;
 
+        Entries(RhiPaintEngineSyncData* parent): m_parent(parent)
+        {
+            m_parent->m_mutex.lock();
+            if (m_parent->m_rendered)
+                std::exchange(m_parent, nullptr)->m_mutex.unlock();
+        }
+
+    public:
+        Entries(const Entries&) = delete;
+        Entries& operator=(const Entries&) = delete;
+
+        Entries(Entries&& other): m_parent(other.m_parent)
+        {
+            other.m_parent = nullptr;
+        }
+
+        Entries& operator=(Entries&& other)
+        {
+            if (this != &other)
+            {
+                unlock();
+                m_parent = std::exchange(other.m_parent, nullptr);
+            }
+            return *this;
+        }
+
+        ~Entries() { unlock(); }
+
+        /**
+         * Returns true if current RhiPaintEngineSyncData has already been rendered.
+         */
+        bool isNull() const { return !m_parent; }
+
+        /**
+         * Returns all paint data entries submitted to the paint engine since last clear() call.
+         */
+        const QVector<PaintData>& all() const { return m_parent->m_entries; }
+
+    private:
+        void unlock()
+        {
+            if (!m_parent)
+                return;
+            m_parent->m_rendered = true;
+            m_parent->m_mutex.unlock();
+        }
+
+        RhiPaintEngineSyncData* m_parent;
+    };
+
+    RhiPaintEngineSyncData();
+
+    /**
+     * Clears the data and marks it as not rendered.
+     */
     void clear();
-    SkPathRefAllocator* getAllocator();
-    void addPath(PaintData p);
 
-    bool rendered = false;
-    QVector<PaintData> m_paths;
+    /**
+     * Appends a paint data entry to the list and marks the data as not rendered.
+     */
+    void append(PaintData&& p);
+
+    /**
+     * Appends a result of a function which generates a paint path to the list and marks the data
+     * as not rendered. The function is called under a lock to avoid issues with implicit paths
+     * re-allocations that may happen on renderer thread.
+     */
+    void append(std::function<PaintPath(SkPathRefAllocator*)> locked);
+
+    /**
+     * Locks the data for reading. Once the result object is destroyed, the data is considered as
+     * rendered and any subsequent calls return a null object until the next clear() or append()
+     * call.
+     */
+    Entries renderLock() { return Entries(this); }
+
+private:
+    mutable std::mutex m_mutex;
+    bool m_rendered = false;
+    QVector<PaintData> m_entries;
     std::unique_ptr<SkPathRefAllocator> m_allocator;
 };
 
@@ -95,7 +184,7 @@ private:
     void updateClipPath(const SkPath& skPath, Qt::ClipOperation op);
     std::optional<SkPath> getClip() const;
 
-    std::shared_ptr<PaintEnginePaths> m_paths;
+    std::shared_ptr<RhiPaintEngineSyncData> m_data;
     RhiPaintDevice* m_device = nullptr;
 
     bool m_clipEnabled = false;

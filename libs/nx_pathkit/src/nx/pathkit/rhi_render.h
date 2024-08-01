@@ -80,6 +80,7 @@ private:
     QMatrix4x4 modelView() const;
 
     std::vector<Batch> processEntries(
+        const RhiPaintEngineSyncData::Entries& entries,
         QRhiRenderPassDescriptor* rp,
         QRhiResourceUpdateBatch* u,
         VertexAllocator& triangles,
@@ -94,7 +95,7 @@ private:
 
     QRectF textureCoordsFromAtlas(const Atlas::Rect& rect, int padding) const;
 
-    void prepareAtlas();
+    void prepareAtlas(const RhiPaintEngineSyncData::Entries& entries);
 
     QImage getImage(const QPixmap& pixmap);
     void fillTextureVerts(
@@ -106,7 +107,7 @@ private:
     QRhi* const m_rhi;
     Settings m_settings;
     QSize m_size;
-    std::shared_ptr<PaintEnginePaths> entries;
+    std::shared_ptr<RhiPaintEngineSyncData> inputData;
     bool isBgraSupported = false;
     std::unique_ptr<SkPathRefAllocator> pathAllocator;
 

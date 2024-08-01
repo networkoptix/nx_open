@@ -12,6 +12,7 @@
 #include "rhi_render.h"
 
 #include <QtCore/QFile>
+#include <QtCore/QScopeGuard>
 #include <QtGui/QImage>
 #include <QtGui/rhi/qrhi.h>
 
@@ -211,7 +212,7 @@ RhiPaintDeviceRenderer::~RhiPaintDeviceRenderer() {}
 void RhiPaintDeviceRenderer::sync(RhiPaintDevice* pd)
 {
     m_size = {pd->width(), pd->height()};
-    entries = static_cast<RhiPaintEngine*>(pd->paintEngine())->m_paths;
+    inputData = static_cast<RhiPaintEngine*>(pd->paintEngine())->m_data;
 }
 
 static constexpr int kPadding = 1;
@@ -385,7 +386,12 @@ bool RhiPaintDeviceRenderer::prepare(QRhiRenderPassDescriptor* rp, QRhiResourceU
         pathAllocator.reset(SkPath::CreateAllocator());
     }
 
-    if (!entries || entries->rendered)
+    if (!inputData)
+        return true;
+
+    QScopeGuard clearInput([this]() { inputData.reset(); });
+    auto entries = inputData->renderLock();
+    if (entries.isNull())
         return true;
 
     VertexAllocator vertexData;
@@ -393,6 +399,7 @@ bool RhiPaintDeviceRenderer::prepare(QRhiRenderPassDescriptor* rp, QRhiResourceU
     std::vector<float> textureData;
 
     batches = processEntries(
+        entries,
         rp,
         u,
         vertexData,
@@ -424,8 +431,6 @@ bool RhiPaintDeviceRenderer::prepare(QRhiRenderPassDescriptor* rp, QRhiResourceU
     u->updateDynamicBuffer(tvbuf.get(), 0, textureData.size() * sizeof(float), textureData.data());
 
     u->updateDynamicBuffer(ubuf.get(), 0, kMatrix4x4Size, modelView().constData());
-
-    entries->rendered = true;
 
     return true;
 }
@@ -529,7 +534,7 @@ QRhiShaderResourceBindings* RhiPaintDeviceRenderer::createTextureBinding(
     return textures.back().tsrb.get();
 }
 
-void RhiPaintDeviceRenderer::prepareAtlas()
+void RhiPaintDeviceRenderer::prepareAtlas(const RhiPaintEngineSyncData::Entries& entries)
 {
     std::unordered_set<Atlas::Rect> usedRects;
     bool atlasContainsNewRectsOnly = false;
@@ -538,7 +543,7 @@ void RhiPaintDeviceRenderer::prepareAtlas()
 
     const int maxSize = m_settings.maxAtlasEntrySize;
 
-    for (const auto& entry: entries->m_paths)
+    for (const auto& entry: entries.all())
     {
         if (auto paintPixmap = std::get_if<PaintPixmap>(&entry))
         {
@@ -571,7 +576,7 @@ void RhiPaintDeviceRenderer::prepareAtlas()
             // Do not remove rects that we are going to use in this frame. If we already did that,
             // just skip using the atlas as there are no rects we can safely remove.
 
-            for (const auto& entry: entries->m_paths)
+            for (const auto& entry: entries.all())
             {
                 if (auto paintPixmap = std::get_if<PaintPixmap>(&entry))
                 {
@@ -758,6 +763,7 @@ void RhiPaintDeviceRenderer::fillTextureVerts(
 }
 
 std::vector<RhiPaintDeviceRenderer::Batch> RhiPaintDeviceRenderer::processEntries(
+    const RhiPaintEngineSyncData::Entries& entries,
     QRhiRenderPassDescriptor* rp,
     QRhiResourceUpdateBatch* u,
     VertexAllocator& triangles,
@@ -770,9 +776,9 @@ std::vector<RhiPaintDeviceRenderer::Batch> RhiPaintDeviceRenderer::processEntrie
     textures.clear();
     atlasUpdates.clear();
 
-    prepareAtlas();
+    prepareAtlas(entries);
 
-    for (const auto& entry: entries->m_paths)
+    for (const auto& entry: entries.all())
     {
         if (auto paintPath = std::get_if<PaintPath>(&entry))
         {
