@@ -1347,7 +1347,7 @@
     <name>FilteredResourceViewWidget</name>
     <message>
       <source>Nothing found</source>
-      <translation>何も見つかりませんでした</translation>
+      <translation>見つかりません</translation>
     </message>
   </context>
   <context>
@@ -2381,7 +2381,7 @@
     </message>
     <message>
       <source>Nothing found</source>
-      <translation>何も見つかりませんでした</translation>
+      <translation>見つかりません</translation>
     </message>
     <message>
       <source>New User...</source>

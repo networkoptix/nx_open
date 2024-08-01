@@ -945,7 +945,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Nothing found</source>
-      <translation>何も見つかりませんでした</translation>
+      <translation>見つかりません</translation>
     </message>
     <message>
       <source>Drag video files or images to the client window, or add local media folder through the Local Settings dialog</source>
@@ -1317,7 +1317,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Last day</source>
-      <translation>直近 24 時間</translation>
+      <translation>今日</translation>
     </message>
     <message>
       <source>Last 7 days</source>
