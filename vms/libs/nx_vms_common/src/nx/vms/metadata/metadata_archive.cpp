@@ -786,6 +786,18 @@ void MetadataArchive::loadDataFromIndexDesc(
     }
 }
 
+QDate MetadataArchive::monthForDate(const QDate& currentMonth) const
+{
+    MetadataHelper helper(m_dataDir);
+    const QList<QDate> existingRecords = helper.recordedMonth(m_physicalId);
+    for (const auto& newDate: existingRecords)
+    {
+        if (newDate >= currentMonth)
+            return newDate;
+    }
+    return QDate();
+}
+
 QnTimePeriodList MetadataArchive::matchPeriodInternal(
     RecordMatcher* recordMatcher,
     std::function<bool()> interruptionCallback,

@@ -228,6 +228,7 @@ private:
 
 protected:
     bool openFiles(qint64 timestampMs);
+    QDate monthForDate(const QDate& currentMonth) const;
 
 private:
     QString m_filePrefix;
