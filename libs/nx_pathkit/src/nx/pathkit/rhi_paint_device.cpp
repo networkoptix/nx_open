@@ -71,7 +71,7 @@ void RhiPaintDevice::setDevicePixelRatio(qreal scaleFactor)
 
 void RhiPaintDevice::clear()
 {
-    m_paintEngine->m_paths->clear();
+    m_paintEngine->m_data->clear();
 }
 
 } // namespace nx::pathkit
