@@ -11,21 +11,41 @@ namespace nx::network::rest { class Params; }
 
 struct NX_VMS_COMMON_API QnThumbnailRequestData: QnMultiserverRequestData
 {
-    QnThumbnailRequestData() = default;
-    QnThumbnailRequestData(const nx::api::CameraImageRequest& request):
-        request(request)
+    // New API endpoints should use distinct types instead.
+    enum class RequestType
     {
-    }
+        cameraThumbnail,
+        analyticsTrackBestShot,
+        analyticsTrackTitle,
+    };
 
-    QnThumbnailRequestData(nx::api::CameraImageRequest&& request):
-        request(request)
+    QnThumbnailRequestData(RequestType type):
+        type(type)
+    {}
+
+    QnThumbnailRequestData(nx::api::CameraImageRequest request, RequestType type):
+        request(std::move(request)),
+        type(type)
     {
     }
 
     nx::api::CameraImageRequest request;
+    RequestType type;
 
-    virtual void loadFromParams(
-        QnResourcePool* resourcePool, const nx::network::rest::Params& params) override;
+    static QnThumbnailRequestData loadFromParams(
+        QnResourcePool *resourcePool, const nx::network::rest::Params& params, RequestType requestType)
+    {
+        QnThumbnailRequestData data(requestType);
+        data.loadFromParams(resourcePool, params);
+        return data;
+    }
+
     virtual nx::network::rest::Params toParams() const override;
     std::optional<QString> getError() const;
+
+private:
+    // Explicitly disabling the possibility to call QnMultiserverRequestData, since it will not
+    // initialize the `.type` field.
+    virtual void loadFromParams(
+        QnResourcePool* resourcePool, const nx::network::rest::Params& params) override;
 };
