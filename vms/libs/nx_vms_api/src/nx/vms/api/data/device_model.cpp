@@ -89,7 +89,6 @@ void extractParametersToFields(DeviceModelV3* m)
         if (NX_ASSERT(jsonValue.isArray()))
         {
             QJsonArray mediaStreams = jsonValue.toArray();
-            const size_t s = mediaStreams.size();
             for (QJsonValueRef streamReference: mediaStreams)
             {
                 // `nx::vms::common::CameraMediaStreamInfo.transports` is stored as
@@ -333,6 +332,13 @@ std::vector<Model> fromDbTypes(typename Model::DbListTypes all)
     return devices;
 }
 
+std::optional<DeviceGroupSettings> groupFromCameraData(CameraData&& data)
+{
+    if (!data.groupId.isEmpty() || !data.groupName.isEmpty())
+        return DeviceGroupSettings{std::move(data.groupId), std::move(data.groupName)};
+    return std::nullopt;
+}
+
 } // namespace
 
 DeviceModelGeneral DeviceModelGeneral::fromCameraData(CameraData data)
@@ -346,7 +352,8 @@ DeviceModelGeneral DeviceModelGeneral::fromCameraData(CameraData data)
         .serverId = data.parentId,
         .isManuallyAdded = data.manuallyAdded,
         .vendor = std::move(data.vendor),
-        .model = std::move(data.model)};
+        .model = std::move(data.model),
+        .group = groupFromCameraData(std::move(data))};
 }
 
 CameraData DeviceModelGeneral::toCameraData() &&
