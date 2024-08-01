@@ -27,29 +27,32 @@ NxObject
             && (Qt.application.state !== Qt.ApplicationActive)
         readonly property bool canPlay: interruptor.playable && !interruptedOnInactivity
         property real interruptedPosition: -1
+        property bool interrupted: false
 
         onCanPlayChanged:
         {
-            if (!canPlay)
-                interrupt()
-            else if (canPlay && player && player.playbackState === MediaPlayer.Paused)
-                resumePlaying()
+            if (canPlay)
+                tryResumePlaying()
+            else
+                tryInterrupt()
         }
 
-        function resumePlaying()
+        function tryResumePlaying()
         {
-            if (!player)
+            if (!player || !d.interrupted)
                 return
 
+            d.interrupted = false
             player.position = interruptedPosition
             player.play()
         }
 
-        function interrupt()
+        function tryInterrupt()
         {
-            if (!player)
+            if (!player || player.playbackState !== MediaPlayer.Playing || d.interrupted)
                 return
 
+            d.interrupted = true
             d.interruptedPosition = currentPosition()
             player.pause()
         }
