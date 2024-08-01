@@ -755,10 +755,6 @@ QString SystemHealthListModel::Private::decorationPath(MessageType message)
         case MessageType::smtpIsNotSet:
             return "20x20/Outline/server.svg";
 
-        case MessageType::emailSendError:
-        case MessageType::archiveIntegrityFailed:
-            return "20x20/Outline/error.svg";
-
         case MessageType::emailIsEmpty:
         case MessageType::usersEmailIsEmpty:
             return "20x20/Outline/email.svg";
@@ -786,6 +782,8 @@ QString SystemHealthListModel::Private::decorationPath(MessageType message)
     switch (QnNotificationLevel::valueOf(message))
     {
         case QnNotificationLevel::Value::CriticalNotification:
+            return "20x20/Outline/error.svg";
+
         case QnNotificationLevel::Value::ImportantNotification:
             return "20x20/Outline/warning.svg";
 
