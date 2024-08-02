@@ -111,7 +111,10 @@ void setId(T& t, Id&& id)
 template<typename, typename = std::void_t<>>
 struct HasGetId: std::false_type {};
 template<typename T>
-struct HasGetId<T, std::void_t<decltype(getId(std::declval<T>()))>>: std::true_type {};
+struct HasGetId<T, std::void_t<decltype(getId(std::declval<T>()))>>: std::true_type
+{
+    using type = std::remove_cvref_t<decltype(getId(std::declval<T>()))>;
+};
 
 template<typename, typename, typename = std::void_t<>>
 struct CanSetIdWithArg: std::false_type {};

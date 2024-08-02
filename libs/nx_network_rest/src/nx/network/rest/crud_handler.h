@@ -341,13 +341,17 @@ protected:
     }
 
     template<typename Filter>
-    std::tuple<Filter, Params, json::DefaultValueAction> processGetRequest(const Request& request)
+    std::tuple<std::decay_t<Filter>, Params, json::DefaultValueAction> processGetRequest(
+        const Request& request)
     {
-        Filter filter = request.params().toJson(/*excludeCommon*/ true).isEmpty()
-            ? Filter()
-            : deserialize<Filter>(request);
+        using FilterType = std::decay_t<Filter>;
+
+        FilterType filter = request.params().toJson(/*excludeCommon*/ true).isEmpty()
+            ? FilterType()
+            : deserialize<FilterType>(request);
         Params filtered;
-        if constexpr (DoesMethodExist_toParams<Filter>::value)
+
+        if constexpr (DoesMethodExist_toParams<FilterType>::value)
         {
             filtered = filter.toParams();
             filtered.insert("local", QString());
@@ -356,14 +360,15 @@ protected:
         }
         else
         {
-            auto intermediate = json::serialized(filter);
-            if (intermediate.isObject())
+            if (auto intermediate = json::serialized(filter); intermediate.isObject())
                 filtered = Params::fromJson(intermediate.toObject());
         }
+
         auto params = request.params();
         for (auto [key, value]: filtered.keyValueRange())
             params.remove(key);
         auto defaultValueAction = extractDefaultValueAction(&params, request.apiVersion());
+
         return {std::move(filter), std::move(params), defaultValueAction};
     }
 
@@ -424,7 +429,6 @@ Response CrudHandler<Derived>::executeGet(const Request& request)
 template<typename Derived>
 Response CrudHandler<Derived>::executePost(const Request& request)
 {
-    using nx::utils::model::setId;
     using namespace nx::utils::model;
 
     if constexpr (DoesMethodExist_create<Derived>::value)
@@ -467,7 +471,7 @@ Response CrudHandler<Derived>::executePost(const Request& request)
             return response(std::move(result), request, std::move(responseAttributes));
         }
         else if constexpr (DoesMethodExist_read<Derived>::value
-            && nx::utils::model::HasGetId<Model>::value)
+            && HasGetId<Model>::value)
         {
             auto id = getId(model);
             call(&Derived::create, std::move(model), request, &responseAttributes);
@@ -520,7 +524,7 @@ Response CrudHandler<Derived>::executeDelete(const Request& request)
 template<typename Derived>
 Response CrudHandler<Derived>::executePut(const Request& request)
 {
-    using nx::utils::model::getId;
+    using namespace nx::utils::model;
 
     if constexpr (DoesMethodExist_update<Derived>::value)
     {
@@ -554,13 +558,29 @@ Response CrudHandler<Derived>::executePut(const Request& request)
             {
                 if constexpr (DoesMethodExist_read<Derived>::value)
                 {
-                    auto id = getId(model);
-                    if (id == decltype(id)())
-                        throw Exception::missingParameter(m_idParamName);
+                    using IdType = std::conditional_t<
+                        HasGetId<Model>::value,
+                        typename HasGetId<Model>::type,
+                        std::monostate
+                    >;
+                    IdType id = {};
+
+                    if constexpr (HasGetId<Model>::value)
+                    {
+                        id = getId(model);
+                        if (id == IdType{})
+                            throw Exception::missingParameter(m_idParamName);
+                    }
 
                     call(&Derived::update, std::move(model), request, &responseAttributes);
-                    if (!m_features.testFlag(CrudFeature::fastUpdate))
-                        return responseById(std::move(id), request, std::move(responseAttributes));
+                    if constexpr (HasGetId<Model>::value)
+                    {
+                        if (!m_features.testFlag(CrudFeature::fastUpdate))
+                        {
+                            return responseById(
+                                id, request, std::move(responseAttributes));
+                        }
+                    }
                 }
                 else
                 {
@@ -601,7 +621,7 @@ Response CrudHandler<Derived>::executePut(const Request& request)
 template<typename Derived>
 Response CrudHandler<Derived>::executePatch(const Request& request)
 {
-    using nx::utils::model::getId;
+    using namespace nx::utils::model;
 
     if constexpr (DoesMethodExist_read<Derived>::value && DoesMethodExist_update<Derived>::value)
     {
@@ -613,27 +633,30 @@ Response CrudHandler<Derived>::executePatch(const Request& request)
         ResponseAttributes responseAttributes;
         if (idParam(request).value || m_idParamName.isEmpty())
         {
-            auto id = getId(model);
-            if (id == decltype(id)())
-                throw Exception::missingParameter(m_idParamName);
-
-            if (incomplete && !m_features.testFlag(CrudFeature::fastUpdate))
+            if constexpr (HasGetId<Model>::value)
             {
-                const auto systemAccessGuard = request.forceSystemAccess();
-                const auto existing = readById(id, request, &responseAttributes);
-                if (!existing)
-                    throw Exception::notFound(NX_FMT("Resource '%1' is not found", id));
-                QString error;
-                if (!json::merge(
-                    &model, *existing, *incomplete, &error, /*chronoSerializedAsDouble*/ true))
+                if (incomplete && !m_features.testFlag(CrudFeature::fastUpdate))
                 {
-                    throw Exception::badRequest(error);
+                    auto id = getId(model);
+                    if (id == decltype(id)())
+                        throw Exception::missingParameter(m_idParamName);
+
+                    const auto systemAccessGuard = request.forceSystemAccess();
+                    const auto existing = readById(id, request, &responseAttributes);
+                    if (!existing)
+                        throw Exception::notFound(NX_FMT("Resource '%1' is not found", id));
+                    QString error;
+                    if (!json::merge(
+                        &model, *existing, *incomplete, &error, /*chronoSerializedAsDouble*/ true))
+                    {
+                        throw Exception::badRequest(error);
+                    }
                 }
             }
 
             if constexpr (DoesMethodExist_fillMissingParams<Derived>::value)
                 d->fillMissingParams(&model, request);
-            if constexpr (!std::is_same<Result, void>::value)
+            if constexpr (!std::is_same_v<Result, void>)
             {
                 auto result =
                     call(&Derived::update, std::move(model), request, &responseAttributes);
@@ -642,31 +665,38 @@ Response CrudHandler<Derived>::executePatch(const Request& request)
             else
             {
                 call(&Derived::update, std::move(model), request, &responseAttributes);
-                if (!m_features.testFlag(CrudFeature::fastUpdate))
-                    return responseById(std::move(id), request, std::move(responseAttributes));
+
+                if constexpr (HasGetId<Model>::value)
+                {
+                    if (!m_features.testFlag(CrudFeature::fastUpdate))
+                        return responseById(getId(model), request, std::move(responseAttributes));
+                }
                 return {responseAttributes.statusCode, std::move(responseAttributes.httpHeaders)};
             }
         }
 
-        auto emptyFilter = getId(model);
-        if (!m_features.testFlag(CrudFeature::fastUpdate))
+        if constexpr (HasGetId<Model>::value)
         {
-            if (!incomplete)
+            if (!m_features.testFlag(CrudFeature::fastUpdate))
             {
-                QJsonValue serialized;
-                QJson::serialize(model, &serialized);
-                incomplete = std::move(serialized);
-            }
-            const auto systemAccessGuard = request.forceSystemAccess();
-            QString error;
-            if (!json::merge(
-                &model,
-                call(&Derived::read, emptyFilter, request, &responseAttributes),
-                *incomplete,
-                &error,
-                /*chronoSerializedAsDouble*/ true))
-            {
-                throw Exception::badRequest(error);
+                auto emptyFilter = getId(model);
+                if (!incomplete)
+                {
+                    QJsonValue serialized;
+                    QJson::serialize(model, &serialized);
+                    incomplete = std::move(serialized);
+                }
+                const auto systemAccessGuard = request.forceSystemAccess();
+                QString error;
+                if (!json::merge(
+                    &model,
+                    call(&Derived::read, emptyFilter, request, &responseAttributes),
+                    *incomplete,
+                    &error,
+                    /*chronoSerializedAsDouble*/ true))
+                {
+                    throw Exception::badRequest(error);
+                }
             }
         }
         if constexpr (DoesMethodExist_fillMissingParams<Derived>::value)
@@ -681,10 +711,15 @@ Response CrudHandler<Derived>::executePatch(const Request& request)
         else
         {
             call(&Derived::update, std::move(model), request, &responseAttributes);
-            if (m_features.testFlag(CrudFeature::fastUpdate))
-                return {responseAttributes.statusCode, std::move(responseAttributes.httpHeaders)};
-            auto result = call(&Derived::read, emptyFilter, request, &responseAttributes);
-            return response(std::move(result), request, std::move(responseAttributes));
+            if constexpr (HasGetId<Model>::value)
+            {
+                if (!m_features.testFlag(CrudFeature::fastUpdate))
+                {
+                    const auto result = call(&Derived::read, getId(model), request, &responseAttributes);
+                    return response(result, request, std::move(responseAttributes));
+                }
+            }
+            return {responseAttributes.statusCode, std::move(responseAttributes.httpHeaders)};
         }
     }
     else

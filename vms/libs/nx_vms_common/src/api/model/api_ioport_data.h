@@ -65,12 +65,9 @@ struct NX_VMS_COMMON_API QnCameraPortsData
 
 struct NX_VMS_COMMON_API QnIOStateData
 {
-    QnIOStateData(): isActive(false), timestamp(0) {}
-    QnIOStateData(const QString& id, bool isActive, qint64 timestamp): id(id), isActive(isActive), timestamp(timestamp) {}
-
     QString id;
     bool isActive = false;
-    qint64 timestamp = -1;
+    qint64 timestamp = 0;
 
     bool operator==(const QnIOStateData& other) const = default;
 };
