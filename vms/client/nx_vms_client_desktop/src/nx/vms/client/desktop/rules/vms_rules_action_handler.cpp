@@ -167,26 +167,26 @@ void VmsRulesActionHandler::openEventLogDialog()
         [this] { return new EventLogDialog(mainWindowWidget()); });
 
     const auto parameters = menu()->currentParameters(sender());
-    const auto eventType = parameters.argument(Qn::EventTypeRole, QString());
-    const auto actionType = parameters.argument(Qn::ActionTypeRole, QString());
-    const auto eventDevices = parameters.resources().filtered<QnVirtualCameraResource>();
+    UuidSet eventDeviceIds;
+    for (const auto& device: parameters.resources().filtered<QnVirtualCameraResource>())
+        eventDeviceIds.insert(device->getId());
 
-    if (!eventType.isEmpty() || !actionType.isEmpty() || !eventDevices.isEmpty())
+    d->eventLogDialog->disableUpdateData();
+
+    if (parameters.hasArgument(Qn::TimePeriodRole))
     {
-        const auto now = QDateTime::currentMSecsSinceEpoch();
-        UuidSet eventDeviceIds;
-        for (const auto& device: eventDevices)
-            eventDeviceIds.insert(device->getId());
-
-        d->eventLogDialog->disableUpdateData();
-
-        d->eventLogDialog->setDateRange(now, now);
-        d->eventLogDialog->setEventType(eventType);
-        d->eventLogDialog->setActionType(actionType);
-        d->eventLogDialog->setEventDevices(eventDeviceIds);
-
-        d->eventLogDialog->enableUpdateData();
+        const auto period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
+        d->eventLogDialog->setDateRange(period.startTimeMs, period.endTimeMs());
     }
+    else
+    {
+        d->eventLogDialog->resetDateRange();
+    }
+    d->eventLogDialog->setEventType(parameters.argument(Qn::EventTypeRole, QString()));
+    d->eventLogDialog->setActionType(parameters.argument(Qn::ActionTypeRole, QString()));
+    d->eventLogDialog->setEventDevices(eventDeviceIds);
+
+    d->eventLogDialog->enableUpdateData();
 }
 
 } // namespace nx::vms::client::desktop::rules

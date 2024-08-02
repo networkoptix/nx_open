@@ -2466,6 +2466,9 @@ void ActionHandler::at_cameraIssuesAction_triggered()
     parameters.setArgument(Qn::EventTypeRole, QString(nx::vms::rules::kDeviceIssueEventGroup));
     parameters.setArgument(
         Qn::ActionTypeRole, vms::rules::utils::type<vms::rules::WriteToLogAction>());
+    const auto now = QDateTime::currentMSecsSinceEpoch();
+    // Set current day as time period.
+    parameters.setArgument(Qn::TimePeriodRole, QnTimePeriod::fromInterval(now, now));
     menu()->trigger(menu::OpenEventLogAction, parameters);
 }
 
