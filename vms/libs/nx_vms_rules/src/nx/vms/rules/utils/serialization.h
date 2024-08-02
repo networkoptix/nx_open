@@ -14,6 +14,11 @@ NX_VMS_RULES_API bool deserializeProperties(
     const QMap<QString, QJsonValue>& propMap,
     QObject* object);
 
-NX_VMS_RULES_API QByteArray serialized(const QObject* object);
+/**
+ * Generic method for property serialization of event and action objects used by the
+ * VMS Rules Engine.
+ * @param storedOnly - exclude properties without stored flag.
+ */
+NX_VMS_RULES_API QByteArray serialized(const QObject* object, bool storedOnly);
 
 } // namespace nx::vms::rules

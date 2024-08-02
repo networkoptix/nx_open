@@ -23,7 +23,7 @@ class NX_VMS_RULES_API HttpAction: public nx::vms::rules::BasicAction
     Q_PROPERTY(QString content READ content WRITE setContent)
     FIELD(QString, contentType, setContentType)
     FIELD(QString, method, setMethod)
-    Q_PROPERTY(AuthenticationInfo auth READ auth WRITE setAuth)
+    Q_PROPERTY(AuthenticationInfo auth READ auth WRITE setAuth STORED false)
 
 public:
     static const ItemDescriptor& manifest();

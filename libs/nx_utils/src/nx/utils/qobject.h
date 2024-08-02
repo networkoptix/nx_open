@@ -25,7 +25,10 @@ enum class PropertyAccess
     writable = 0x2,
 
     /** Property must exists and must be readable and writable. */
-    fullAccess = readable | writable
+    fullAccess = readable | writable,
+
+    /** The property must exists and have stored flag. */
+    stored = 0x4,
 };
 Q_DECLARE_FLAGS(PropertyAccessFlags, PropertyAccess)
 
@@ -59,6 +62,9 @@ inline QSet<QByteArray> propertyNames(
     for (int i = offset; i < metaObject->propertyCount(); ++i)
     {
         auto property = metaObject->property(i);
+
+        if (propertyAccessFlags.testFlag(PropertyAccess::stored) && !property.isStored())
+            continue;
 
         if (propertyAccessFlags.testFlag(PropertyAccess::readable) && !property.isReadable())
             continue;

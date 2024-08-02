@@ -253,8 +253,8 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
     reset();
 }
 
-QnEventLogDialog::~QnEventLogDialog() {
-}
+QnEventLogDialog::~QnEventLogDialog()
+{}
 
 QStandardItem* QnEventLogDialog::createEventTree(QStandardItem* rootItem, EventType value)
 {
