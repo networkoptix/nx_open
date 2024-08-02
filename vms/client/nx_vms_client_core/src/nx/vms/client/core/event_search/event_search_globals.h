@@ -13,8 +13,8 @@ Q_NAMESPACE_EXPORT(NX_VMS_CLIENT_CORE_API)
 Q_CLASSINFO("RegisterEnumClassesUnscoped", "false")
 
 NX_REFLECTION_ENUM_CLASS(FetchDirection,
-    older,
-    newer
+    older, //< Descending data order.
+    newer //< Ascending data order.
 );
 Q_ENUM_NS(FetchDirection)
 

@@ -99,7 +99,7 @@ NxObject
 
             function directionName(direction)
             {
-                return direction === EventSearch.FetchDirection.older ? "earlier" : "later"
+                return direction === EventSearch.FetchDirection.older ? "older" : "newer"
             }
 
             console.debug(loggingCategory,

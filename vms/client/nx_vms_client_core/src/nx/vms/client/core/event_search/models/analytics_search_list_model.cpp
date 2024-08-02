@@ -191,13 +191,6 @@ AnalyticsSearchListModel::Private::Private(AnalyticsSearchListModel* q):
 
     connect(q, &AbstractSearchListModel::camerasChanged, this, &Private::updateMetadataReceivers);
 
-    connect(q, &AbstractSearchListModel::fetchFinished, this,
-        [this](FetchResult result, int /*centralItemIndex*/,  FetchRequest request)
-        {
-            if (result == FetchResult::complete && request.direction == FetchDirection::newer)
-                gapBeforeNewTracks = false;
-        });
-
     connect(q->systemContext()->accessController(), &AccessController::permissionsMaybeChanged, this,
         [this](const QnResourceList& resources)
         {
@@ -941,6 +934,13 @@ FetchedDataRanges AnalyticsSearchListModel::Private::applyFetchedData(
     mergeOldData<Facade>(newData, data.items, request.direction);
 
     auto fetched = makeFetchedData<Facade>(data.items, newData, request);
+    const auto newerResultsCount = request.direction == FetchDirection::newer
+        ? fetched.ranges.tail.length
+        : fetched.ranges.body.length;
+    gapBeforeNewTracks = newerResultsCount >= q->maximumCount() / 2;
+    if (liveProcessingMode == LiveProcessingMode::automaticAdd)
+        q->setLive(!gapBeforeNewTracks);
+
     truncateFetchedData(fetched, request.direction, q->maximumCount());
 
     updateEventSearchData<Facade>(q, data.items, fetched, request.direction);
@@ -1142,12 +1142,50 @@ void AnalyticsSearchListModel::commitAvailableNewTracks()
 
     NX_VERBOSE(this, "Live update commit");
 
+    const auto currentTimeWindow =
+        [this]()
+        {
+            if (auto result = fetchedTimeWindow(); result)
+                return *result;
+            return QnTimePeriod::anytime();
+        }();
+
+    // Commit only new tracks which are in the current fetched window or newer. We suppose that
+    // if we don't have gaps in data then we have ALL new newly added items added to the current
+    // data.
+    int newlyAddedItems = 0;
     for (auto& item: d->newTracks.items)
-        d->data.insert(std::move(item), this);
+    {
+        if (Facade::startTime(item) >= currentTimeWindow.startTime())
+        {
+            if (const int index = d->data.indexOf(Facade::id(item)); index != -1)
+            {
+                NX_ASSERT(Facade::equal(d->data.items[index], item));
+                continue; //< We can have it when there is a race between metadata and api request.
+            }
 
-    setFetchedTimeWindow(timeWindow<Facade>(d->data.items));
+            // We have milliseconds precision in our DB and microseconds precisiong in the objects
+            // stream. So we cut microseconds to milliseconds here to avoid different timestamps,
+            // exactly like in object track searcher.
+            item.firstAppearanceTimeUs = (item.firstAppearanceTimeUs / 1000) * 1000;
+            d->data.insert(std::move(item), this);
+            ++newlyAddedItems;
+        }
+    }
 
+    NX_DEBUG(this, "Added items on live update: %1", newlyAddedItems);
     d->newTracks.clear();
+    if (newlyAddedItems)
+    {
+        while (d->data.size() > maximumCount())
+        {
+            const int index = d->data.size() - 1;
+            AnalyticsSearchListModel::ScopedRemoveRows(this, index, index);
+            d->data.take(d->data.size() - 1);
+        }
+
+        setFetchedTimeWindow(timeWindow<Facade>(d->data.items));
+    }
 
     if (d->liveProcessingMode == LiveProcessingMode::manualAdd)
         emit availableNewTracksChanged();
