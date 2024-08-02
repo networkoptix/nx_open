@@ -103,9 +103,13 @@ bool deserializeProperties(const QMap<QString, QJsonValue>& propMap, QObject* ob
     return true;
 }
 
-QByteArray serialized(const QObject* object)
+QByteArray serialized(const QObject* object, bool storedOnly)
 {
-    return QJson::serialized(serializeProperties(object, nx::utils::propertyNames(object)));
+    nx::utils::PropertyAccessFlags flags = nx::utils::PropertyAccess::anyAccess;
+    if (storedOnly)
+        flags.setFlag(nx::utils::PropertyAccess::stored);
+
+    return QJson::serialized(serializeProperties(object, nx::utils::propertyNames(object, flags)));
 }
 
 } // namespace nx::vms::rules
