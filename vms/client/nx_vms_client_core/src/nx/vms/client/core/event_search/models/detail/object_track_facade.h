@@ -15,7 +15,7 @@ struct ObjectTrackFacade
 
     static TimeType startTime(const Type& track);
 
-    static const nx::Uuid& id(const Type& data);
+    static nx::Uuid id(const Type& data);
 
     static bool equal(const Type& left, const Type& right);
 };

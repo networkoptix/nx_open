@@ -2,6 +2,8 @@
 
 #include "object_track_facade.h"
 
+#include <nx/utils/log/log_main.h>
+
 namespace nx::vms::client::core::detail {
 
 ObjectTrackFacade::TimeType ObjectTrackFacade::startTime(const Type& track)
@@ -9,14 +11,21 @@ ObjectTrackFacade::TimeType ObjectTrackFacade::startTime(const Type& track)
     return TimeType(track.firstAppearanceTimeUs);
 }
 
-const nx::Uuid& ObjectTrackFacade::id(const Type& data)
+nx::Uuid ObjectTrackFacade::id(const Type& data)
 {
-    return data.id;
+    if (!data.id.isNull())
+        return data.id;
+
+    NX_WARNING(NX_SCOPE_TAG, "Object track can't have empty id, generating it from the data.");
+    return nx::Uuid::fromArbitraryData(data.analyticsEngineId.toString()
+        + data.deviceId.toString()
+        + QString::number(data.firstAppearanceTimeUs));
 }
 
-bool ObjectTrackFacade::equal(const Type& /*left*/, const Type& /*right*/)
+bool ObjectTrackFacade::equal(const Type& left, const Type& right)
 {
-    return false; //< Analytics data is unchangable.
+    return id(left) == id(right)
+        && startTime(left) == startTime(right);
 }
 
 } // namespace nx::vms::client::core::detail

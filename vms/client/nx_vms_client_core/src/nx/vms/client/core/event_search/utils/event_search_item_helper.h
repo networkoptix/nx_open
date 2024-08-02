@@ -18,7 +18,7 @@ using namespace std::chrono;
 
 /**
  * Merges old data (which can't be changed) and new one to one container. Removes intersected
- * elements. Source container is always sorted in descending order.
+ * elements. Old data is always sorted in descending order.
  */
 template<typename Facade,
     typename NewDataContainer,
@@ -27,44 +27,92 @@ void mergeOldData(NewDataContainer& newData,
     const OldDataContainer& oldData,
     EventSearch::FetchDirection direction)
 {
-    using Predicate = event_search::detail::Predicate<Facade>;
+    NX_ASSERT(detail::isSortedCorrectly<Facade>(oldData, Qt::DescendingOrder));
+    NX_ASSERT(detail::isSortedCorrectly<Facade>(newData, sortOrderFromDirection(direction)));
 
     if (oldData.empty())
         return; // Nothing to merge.
 
-    const auto centralTimePoint = newData.empty()
-        ? typename Facade::TimeType(0)
-        : Facade::startTime(newData.front());
-
-    const bool newDataWasEmpty = newData.empty();
-    if (direction == EventSearch::FetchDirection::newer)
-        newData.insert(newData.begin(), oldData.rbegin(), oldData.rend());
-    else
-        newData.insert(newData.begin(), oldData.begin(), oldData.end());
-
-    if (newDataWasEmpty)
+    if (newData.empty())
+    {
+        NewDataContainer data = direction == EventSearch::FetchDirection::newer
+            ? NewDataContainer(oldData.rbegin(), oldData.rend())
+            : NewDataContainer(oldData.begin(), oldData.end());
+        std::swap(newData, data);
         return;
+    }
 
-    const auto startIt = std::lower_bound(newData.begin(), newData.end(), centralTimePoint,
-        Predicate::lowerBound(direction));
-    const auto endIt = std::upper_bound(startIt, newData.end(), centralTimePoint,
-        Predicate::upperBound(direction));
+    detail::printDebugData<Facade>(newData, "new data");
 
-    // We don't expect a wide range to check here as it consists of items with one timestamp.
-    // Also we expect that the items are unchanged.
-    std::set<nx::Uuid> foundIds;
-    const auto removeStartIt = std::remove_if(startIt, endIt,
-        [&foundIds](const auto& item)
+    NewDataContainer result;
+    result.reserve(oldData.size() + newData.size());
+    auto inserter = std::back_inserter(result);
+
+    using Predicate = event_search::detail::Predicate<Facade>;
+    const auto less = Predicate::less(direction);
+
+    if (direction == EventSearch::FetchDirection::newer)
+        std::merge(oldData.rbegin(), oldData.rend(), newData.begin(), newData.end(), inserter, less);
+    else
+        std::merge(oldData.begin(), oldData.end(), newData.begin(), newData.end(), inserter, less);
+
+    NX_ASSERT(detail::isSortedCorrectly<Facade>(result, sortOrderFromDirection(direction)));
+    detail::printDebugData<Facade>(result, "after merge");
+
+    const auto removeDuplicates =
+        [&result, direction](typename Facade::TimeType start, typename Facade::TimeType end)
         {
-            const auto id = Facade::id(item);
-            if (foundIds.find(id) != foundIds.end())
-                return true;
+            if (direction == EventSearch::FetchDirection::older)
+                std::swap(start, end);
 
-            foundIds.insert(id);
-            return false;
-        });
+            std::set<nx::Uuid> foundIds;
+            const auto startIt = std::lower_bound(
+                result.begin(), result.end(), start, Predicate::lowerBound(direction));
+            const auto endIt = std::upper_bound(
+                result.begin(), result.end(), end, Predicate::upperBound(direction));
 
-    newData.erase(removeStartIt, endIt);
+            const auto removeStartIt = std::remove_if(startIt, endIt,
+                [&foundIds](const auto& item)
+                {
+                    const auto id = Facade::id(item);
+                    if (foundIds.find(id) != foundIds.end())
+                        return true;
+
+                    foundIds.insert(id);
+                    return false;
+                });
+
+            result.erase(removeStartIt, endIt);
+            return removeStartIt != endIt;
+        };
+
+    const auto oldDataStartTime = std::min(Facade::startTime(oldData.front()),
+        Facade::startTime(oldData.back()));
+    const auto oldDataEndTime = std::max(Facade::startTime(oldData.front()),
+        Facade::startTime(oldData.back()));
+    const auto newDataStartTime = std::min(Facade::startTime(newData.front()),
+        Facade::startTime(newData.back()));
+    const auto newDataEndTime = std::max(Facade::startTime(newData.front()),
+        Facade::startTime(newData.back()));
+
+    const auto intersectionStartTime = std::max(oldDataStartTime, newDataStartTime);
+    const auto intersectionEndTime = std::min(oldDataEndTime, newDataEndTime);
+
+    if (intersectionStartTime <= intersectionEndTime) //< Has time periods intersection.
+    {
+        removeDuplicates(intersectionStartTime, intersectionEndTime);
+        detail::printDebugData<Facade>(result, "after normal deletion");
+    }
+
+    NX_ASSERT(detail::isSortedCorrectly<Facade>(result, sortOrderFromDirection(direction)));
+
+    const bool hasRemovals = removeDuplicates(Facade::TimeType::zero(), Facade::TimeType::max());
+    if (hasRemovals)
+    {
+        detail::printDebugData<Facade>(result, "wrong objects");
+        NX_ASSERT(false, "Found duplicates in inappropriate stage of merging.");
+    }
+    std::swap(newData, result);
 }
 
 /**

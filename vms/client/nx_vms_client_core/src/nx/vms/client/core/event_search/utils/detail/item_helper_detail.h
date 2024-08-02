@@ -5,7 +5,18 @@
 #include <nx/utils/scoped_model_operations.h>
 #include <nx/vms/client/core/event_search/models/fetched_data.h>
 
+#include <nx/utils/log/log.h>
+
 namespace nx::vms::client::core::detail {
+
+template<typename Facade, typename Container, typename Tag>
+void printDebugData(const Container& container, const Tag& tag)
+{
+    NX_DEBUG(NX_SCOPE_TAG, "Object debug data for '%1' start, size: %2", tag, container.size());
+    for (const auto& item: container)
+        NX_DEBUG(NX_SCOPE_TAG, "%1, %2", Facade::id(item), Facade::startTime(item).count());
+    NX_DEBUG(NX_SCOPE_TAG, "Object debug data for '%1' end", tag);
+}
 
 /**
  * Inserts tail data to the current container according to the specified direction. Emits needed
