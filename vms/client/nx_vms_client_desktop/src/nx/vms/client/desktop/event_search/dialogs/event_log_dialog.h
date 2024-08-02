@@ -34,6 +34,8 @@ public:
     void disableUpdateData();
     void enableUpdateData();
     void setDateRange(qint64 startTimeMs, qint64 endTimeMs);
+    // Set data range to default range [current day - 7 days, current day].
+    void resetDateRange();
     const UuidSet& eventDevices() const;
     void setEventDevices(const UuidSet& ids);
     void setActionType(const QString& value);
@@ -81,6 +83,18 @@ private:
         const QString& actionType,
         const QString& text);
 
+    struct FilterState
+    {
+        QString eventType;
+        QString actionType;
+        UuidSet resources;
+        qint64 startTimeMs = 0;
+        qint64 endTimeMs = 0;
+        bool operator==(const FilterState&) const = default;
+    };
+
+    FilterState collectFilterState() const;
+
 private:
     QScopedPointer<Ui::EventLogDialog> ui;
 
@@ -93,6 +107,7 @@ private:
     UuidSet m_eventDevices;
     bool m_updateDisabled = false;
     bool m_dirty = false;
+    FilterState m_filterState;
 
     QAction* m_filterAction;
     QAction* m_resetFilterAction;
