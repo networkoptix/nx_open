@@ -3145,8 +3145,11 @@ void QnWorkbenchVideoWallHandler::filterAllowedMediaResources(QnResourceList& re
             if (isAllowed(resource))
                 return false;
 
-            if (auto virtualCamera = resource.objectCast<QnVirtualCameraResource>())
-                noAccessResources << virtualCamera;
+            if (auto camera = resource.objectCast<QnVirtualCameraResource>();
+                camera && !camera->hasFlags(Qn::cross_system))
+            {
+                noAccessResources << camera;
+            }
 
             return true;
         });
