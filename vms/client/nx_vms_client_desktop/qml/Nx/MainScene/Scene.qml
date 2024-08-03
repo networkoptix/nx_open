@@ -21,22 +21,6 @@ Item
         objectName: "renderingItem"
     }
 
-    Text
-    {
-        visible: LocalSettings.iniConfigValue("developerMode")
-
-        anchors
-        {
-            top: parent.top
-            right: performanceText.left
-            topMargin: 16
-            rightMargin: 16
-        }
-        color: "#505050"
-        text: "Experimental: %1".arg(LocalSettings.iniConfigValue("graphicsApi"))
-        font.pixelSize: 20
-    }
-
     PerformanceText
     {
         id: performanceText
