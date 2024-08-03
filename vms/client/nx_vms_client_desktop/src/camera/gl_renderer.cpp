@@ -9,7 +9,9 @@
 #include <QtWidgets/QErrorMessage>
 
 #include <camera/client_video_camera.h>
+#include <nx/media/ffmpeg_video_decoder.h>
 #include <nx/media/sse_helper.h>
+#include <nx/media/video_frame.h>
 #include <nx/pathkit/rhi_paint_engine.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
@@ -528,7 +530,14 @@ bool QnGLRenderer::drawVideoTextures(
             const AVPixelFormat format = (AVPixelFormat)decodedFrame->format;
             const unsigned int width = decodedFrame->width;
             const unsigned int height = decodedFrame->height;
-            if (NX_ASSERT(format == AV_PIX_FMT_RGBA))
+
+            const QRectF sourceRect(
+                textureRect.x() * width,
+                textureRect.y() * height,
+                textureRect.width() * width,
+                textureRect.height() * height);
+
+            if (format == AV_PIX_FMT_RGBA)
             {
                 QImage nonOwningImage(
                     decodedFrame->data[0],
@@ -537,13 +546,14 @@ bool QnGLRenderer::drawVideoTextures(
                     decodedFrame->linesize[0],
                     QImage::Format_RGBA8888_Premultiplied);
 
-                const QRectF sourceRect(
-                    textureRect.x() * nonOwningImage.width(),
-                    textureRect.y() * nonOwningImage.height(),
-                    textureRect.width() * nonOwningImage.width(),
-                    textureRect.height() * nonOwningImage.height());
-
                 painter->drawImage(viewRect, nonOwningImage, sourceRect);
+            }
+            else
+            {
+                std::unique_ptr<nx::media::VideoFrame> nonOwning(
+                    nx::media::FfmpegVideoDecoder::fromAVFrame(decodedFrame.get()));
+
+                painter->drawImage(viewRect, nonOwning->toImage(), sourceRect);
             }
         }
         else

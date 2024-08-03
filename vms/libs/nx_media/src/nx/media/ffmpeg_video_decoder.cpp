@@ -48,15 +48,17 @@ QVideoFrameFormat::PixelFormat toQtPixelFormat(AVPixelFormat pixFormat)
 class AvFrameMemoryBuffer: public QAbstractVideoBuffer
 {
 public:
-    AvFrameMemoryBuffer(AVFrame* frame):
+    AvFrameMemoryBuffer(AVFrame* frame, bool ownsFrame):
         QAbstractVideoBuffer(QVideoFrame::NoHandle),
-        m_frame(frame)
+        m_frame(frame),
+        m_ownsFrame(ownsFrame)
     {
     }
 
     virtual ~AvFrameMemoryBuffer()
     {
-        av_frame_free(&m_frame);
+        if (m_ownsFrame)
+            av_frame_free(&m_frame);
     }
 
     virtual MapData map(QVideoFrame::MapMode mode) override
@@ -93,6 +95,7 @@ public:
 
 private:
     AVFrame* m_frame = nullptr;
+    bool m_ownsFrame = true;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -123,7 +126,13 @@ public:
     void initContext(const QnConstCompressedVideoDataPtr& frame);
 
     // convert color space if QT doesn't support it
-    AVFrame* convertPixelFormat(const AVFrame* srcFrame);
+    static AVFrame* convertPixelFormat(const AVFrame* srcFrame, SwsContext** scaleContext);
+
+    // Create video frame from AVFrame. If the ownership is taken the *pFrame is set to null.
+    static VideoFrame* fromAVFrame(
+        AVFrame** pFrame,
+        SwsContext** scaleContext,
+        bool tryToTakeOwnership = true);
 
     AVCodecContext* codecContext;
     AVFrame* frame;
@@ -149,20 +158,22 @@ void FfmpegVideoDecoderPrivate::initContext(const QnConstCompressedVideoDataPtr&
     }
 }
 
-AVFrame* FfmpegVideoDecoderPrivate::convertPixelFormat(const AVFrame* srcFrame)
+AVFrame* FfmpegVideoDecoderPrivate::convertPixelFormat(
+    const AVFrame* srcFrame,
+    SwsContext** scaleContext)
 {
     static const AVPixelFormat dstAvFormat = AV_PIX_FMT_YUV420P;
 
-    if (!scaleContext)
+    if (!*scaleContext)
     {
-        scaleContext = sws_getContext(
+        *scaleContext = sws_getContext(
             srcFrame->width, srcFrame->height, (AVPixelFormat)srcFrame->format,
             srcFrame->width, srcFrame->height, dstAvFormat,
             SWS_BICUBIC, nullptr, nullptr, nullptr);
     }
 
     // ffmpeg can return null context
-    if (!scaleContext)
+    if (!*scaleContext)
         return nullptr;
 
     AVFrame* dstFrame = av_frame_alloc();
@@ -184,7 +195,7 @@ AVFrame* FfmpegVideoDecoderPrivate::convertPixelFormat(const AVFrame* srcFrame)
     dstFrame->format = dstAvFormat;
 
     sws_scale(
-        scaleContext,
+        *scaleContext,
         srcFrame->data, srcFrame->linesize,
         0, srcFrame->height,
         dstFrame->data, dstFrame->linesize);
@@ -250,6 +261,52 @@ QSize FfmpegVideoDecoder::maxResolution(const AVCodecID codec)
     return s_maxResolutions.value(AV_CODEC_ID_NONE);
 }
 
+VideoFrame* FfmpegVideoDecoderPrivate::fromAVFrame(
+    AVFrame** pFrame,
+    SwsContext** scaleContext,
+    bool tryToTakeOwnership)
+{
+    QSize frameSize((*pFrame)->width, (*pFrame)->height);
+    qint64 startTimeMs = (*pFrame)->pkt_dts / 1000;
+
+    auto qtPixelFormat = toQtPixelFormat((AVPixelFormat)(*pFrame)->format);
+
+    // Frame moved to the buffer. Buffer keeps reference to a frame.
+    QAbstractVideoBuffer* buffer;
+    if (qtPixelFormat != QVideoFrameFormat::Format_Invalid)
+    {
+        buffer = new AvFrameMemoryBuffer(*pFrame, tryToTakeOwnership);
+        if (tryToTakeOwnership)
+            *pFrame = nullptr;
+    }
+    else
+    {
+        AVFrame* newFrame = FfmpegVideoDecoderPrivate::convertPixelFormat(*pFrame, scaleContext);
+        if (!newFrame)
+            return nullptr; //< can't convert pixel format
+        qtPixelFormat = toQtPixelFormat((AVPixelFormat)newFrame->format);
+        buffer = new AvFrameMemoryBuffer(newFrame, /* ownsFrame */ true);
+    }
+
+    VideoFrame* videoFrame = new VideoFrame(buffer, {frameSize, qtPixelFormat});
+    videoFrame->setStartTime(startTimeMs);
+    return videoFrame;
+}
+
+VideoFrame* FfmpegVideoDecoder::fromAVFrame(const AVFrame* frame)
+{
+    SwsContext* scaleContext = nullptr;
+    AVFrame* pFrame = const_cast<AVFrame*>(frame);
+
+    auto videoFrame = FfmpegVideoDecoderPrivate::fromAVFrame(
+        &pFrame, &scaleContext, /* ownsFrame */ false);
+
+    if (scaleContext)
+        sws_freeContext(scaleContext);
+
+    return videoFrame;
+}
+
 int FfmpegVideoDecoder::decode(
     const QnConstCompressedVideoDataPtr& compressedVideoData, VideoFramePtr* outDecodedFrame)
 {
@@ -291,30 +348,18 @@ int FfmpegVideoDecoder::decode(
     if (res <= 0 || !gotPicture)
         return res; //< Negative value means error, zero means buffering.
 
-    QSize frameSize(d->frame->width, d->frame->height);
-    qint64 startTimeMs = d->frame->pkt_dts / 1000;
-    int frameNum = qMax(0, d->codecContext->frame_num - 1);
+    const int frameNum = qMax(0, d->codecContext->frame_num - 1);
 
-    auto qtPixelFormat = toQtPixelFormat((AVPixelFormat)d->frame->format);
+    VideoFrame* videoFrame = FfmpegVideoDecoderPrivate::fromAVFrame(
+        &d->frame,
+        &d->scaleContext,
+        /*tryToTakeOwnership*/ true);
 
-    // Frame moved to the buffer. buffer keeps reference to a frame.
-    QAbstractVideoBuffer* buffer;
-    if (qtPixelFormat != QVideoFrameFormat::Format_Invalid)
-    {
-        buffer = new AvFrameMemoryBuffer(d->frame);
+    if (!d->frame) //< If the ownership was taken allocate a new frame.
         d->frame = av_frame_alloc();
-    }
-    else
-    {
-        AVFrame* newFrame = d->convertPixelFormat(d->frame);
-        if (!newFrame)
-            return -1; //< can't convert pixel format
-        qtPixelFormat = toQtPixelFormat((AVPixelFormat)newFrame->format);
-        buffer = new AvFrameMemoryBuffer(newFrame);
-    }
 
-    VideoFrame* videoFrame = new VideoFrame(buffer, {frameSize, qtPixelFormat});
-    videoFrame->setStartTime(startTimeMs);
+    if (!videoFrame)
+        return -1;
 
     outDecodedFrame->reset(videoFrame);
     return frameNum;

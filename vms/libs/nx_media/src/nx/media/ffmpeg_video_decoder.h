@@ -35,6 +35,9 @@ public:
 
     static QSize maxResolution(const AVCodecID codec);
 
+    // Create non-owning VideoFrame from AVFrame.
+    static VideoFrame* fromAVFrame(const AVFrame* frame);
+
     virtual int decode(
         const QnConstCompressedVideoDataPtr& frame, VideoFramePtr* result = nullptr) override;
 
