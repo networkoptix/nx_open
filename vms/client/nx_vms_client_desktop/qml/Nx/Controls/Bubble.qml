@@ -196,7 +196,7 @@ Item
                 {
                     id: backgroundItem
 
-                    visible: false //< Rendered by the effect.
+                    visible: GraphicsInfo.api == GraphicsInfo.Software //< Rendered by the effect.
 
                     width: bubble.width
                     height: bubble.height
