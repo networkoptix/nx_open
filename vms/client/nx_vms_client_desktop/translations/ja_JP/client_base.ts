@@ -4944,7 +4944,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>NO LIVE STREAM</source>
-      <translation>ライブ映像はありません</translation>
+      <translation>ライブ映像なし</translation>
     </message>
     <message>
       <source>TOO MANY CONNECTIONS</source>
@@ -5043,15 +5043,15 @@ License Key: %2</source>
     </message>
     <message>
       <source>Last 5 minutes</source>
-      <translation>直近の5分</translation>
+      <translation>直近5分間</translation>
     </message>
     <message>
       <source>Last 60 minutes</source>
-      <translation>直近の60分</translation>
+      <translation>直近60分間</translation>
     </message>
     <message>
       <source>Last 24 hours</source>
-      <translation>直近の24時間</translation>
+      <translation>直近24時間</translation>
     </message>
     <message>
       <source>Longest period available</source>
