@@ -25,6 +25,8 @@ namespace Ui {
 class SignDialog;
 }
 
+class QnSignDialogVideoOutput;
+
 class SignDialog: public QnSessionAwareButtonBoxDialog
 {
     Q_OBJECT
@@ -53,7 +55,7 @@ private:
 
     QScopedPointer<QnSignDialogDisplay> m_camDispay;
     QScopedPointer<QnAbstractArchiveStreamReader> m_reader;
-    QScopedPointer<QnSignDialogGlWidget> m_openGLWidget;
+    QScopedPointer<QnSignDialogVideoOutput> m_videoOutputWidget;
     QnResourceWidgetRenderer *m_renderer = nullptr;
     QnSignInfo* m_srcVideoInfo = nullptr;
     QVBoxLayout* m_layout = nullptr;
