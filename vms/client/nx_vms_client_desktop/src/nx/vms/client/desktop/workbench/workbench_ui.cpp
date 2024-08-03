@@ -1654,7 +1654,11 @@ void WorkbenchUi::updateFpsGeometry()
     if (auto quickWidget = qobject_cast<QnGraphicsView*>(
         m_controlsWidget->scene()->views().first())->quickWidget())
     {
+        const qreal top = (m_title && m_title->isVisible())
+            ? m_title->effectiveGeometry().bottom()
+            : 0;
         quickWidget->rootObject()->setProperty("notificationsPanelX", right);
+        quickWidget->rootObject()->setProperty("titleY", top);
         return;
     }
 

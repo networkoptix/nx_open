@@ -14,6 +14,7 @@ Item
 
     property bool performanceInfoVisible: false
     property real notificationsPanelX: 0
+    property real titleY: 0
 
     RhiRenderingItem
     {
@@ -41,8 +42,8 @@ Item
         id: performanceText
         visible: rootItem.performanceInfoVisible
 
-        anchors.top: parent.top
         x: rootItem.notificationsPanelX - width
+        y: rootItem.titleY
     }
 
     TextureSizeHelper
