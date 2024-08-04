@@ -1805,15 +1805,15 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>This password is in list of the most popular passwords</source>
-      <translation type="unfinished">This password is in list of the most popular passwords</translation>
+      <translation>Este contrasinal está na lista dos contrasinais máis populares</translation>
     </message>
     <message>
       <source>Only latin letters, numbers and keyboard symbols %1 are allowed</source>
-      <translation type="unfinished">Only latin letters, numbers and keyboard symbols %1 are allowed</translation>
+      <translation>Só se permiten letras latinas, números e símbolos de teclado %1</translation>
     </message>
     <message>
       <source>Only latin letters, numbers and keyboard symbols are allowed</source>
-      <translation type="unfinished">Only latin letters, numbers and keyboard symbols are allowed</translation>
+      <translation>Só se permiten letras latinas, números e símbolos de teclado</translation>
     </message>
   </context>
   <context>
@@ -4706,9 +4706,9 @@ Clave de licenza: %2</translation>
     </message>
     <message numerus="yes">
       <source>%n Layouts</source>
-      <translation type="unfinished">
-        <numerusform>%n Layouts</numerusform>
-        <numerusform>%n Layouts</numerusform>
+      <translation>
+        <numerusform>%n Deseños</numerusform>
+        <numerusform>%n Deseños</numerusform>
       </translation>
     </message>
   </context>

@@ -5,11 +5,11 @@
     <name>GroupStrings</name>
     <message>
       <source>Any event</source>
-      <translation type="unfinished">Any event</translation>
+      <translation>Calquera evento</translation>
     </message>
     <message>
       <source>Any camera issue</source>
-      <translation type="unfinished">Any camera issue</translation>
+      <translation>Calquera problema coa cámara</translation>
     </message>
     <message>
       <source>Any server issue</source>
