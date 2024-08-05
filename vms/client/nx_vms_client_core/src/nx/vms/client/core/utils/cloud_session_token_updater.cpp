@@ -60,9 +60,9 @@ CloudSessionTokenUpdater::~CloudSessionTokenUpdater()
 {
 }
 
-void CloudSessionTokenUpdater::updateTokenIfNeeded()
+void CloudSessionTokenUpdater::updateTokenIfNeeded(bool force)
 {
-    const bool expired = m_expirationTimer.hasExpired();
+    const bool expired = force || m_expirationTimer.hasExpired();
     const bool requestInProgress = !m_requestInProgressTimer.hasExpired();
     if (!expired || requestInProgress)
     {
