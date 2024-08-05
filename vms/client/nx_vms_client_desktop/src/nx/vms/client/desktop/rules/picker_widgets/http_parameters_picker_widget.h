@@ -34,6 +34,8 @@ protected:
     {
         const auto value = m_comboBox->currentText().trimmed();
         m_field->setValue(value != Strings::autoValue() ? value : QString{});
+
+        DropdownTextPickerWidgetBase<F>::onActivated();
     }
 };
 

@@ -68,19 +68,15 @@ private:
 
     void displayActionEditor();
     void displayEventEditor();
+    void displayDeveloperModeInfo();
 
     void onCommentChanged(const QString& comment);
     void onDeleteClicked();
     void onScheduleClicked();
-    void onActionTypeChanged(const QString& actionType);
-    void onEventTypeChanged(const QString& eventType);
     void onEnabledButtonClicked(bool checked);
 
     void updateButtonBox();
     void updateEnabledActions();
-
-    void onEventFilterModified();
-    void onActionBuilderModified();
 
     void setHasChanges(bool hasChanges);
 

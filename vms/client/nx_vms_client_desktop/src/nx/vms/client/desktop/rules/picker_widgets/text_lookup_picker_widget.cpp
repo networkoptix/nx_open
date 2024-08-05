@@ -121,6 +121,8 @@ TextLookupPicker::TextLookupPicker(
         [this]
         {
             m_field->setCheckType(m_checkTypeComboBox->currentData().value<LookupCheckType>());
+
+            setEdited();
         });
 
     connect(
@@ -130,6 +132,8 @@ TextLookupPicker::TextLookupPicker(
         [this](int index)
         {
             m_field->setValue(m_lookupListComboBox->itemData(index).value<nx::Uuid>().toString());
+
+            setEdited();
         });
 
     connect(
@@ -139,6 +143,8 @@ TextLookupPicker::TextLookupPicker(
         [this](const QString& text)
         {
             m_field->setValue(text);
+
+            setEdited();
         });
 }
 

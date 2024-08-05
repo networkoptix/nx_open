@@ -35,6 +35,8 @@ protected:
         {
             m_field->setIds(selectedServers);
         }
+
+        ResourcePickerWidgetBase<F>::onSelectButtonClicked();
     }
 };
 

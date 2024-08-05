@@ -36,6 +36,8 @@ protected:
     void onActivated() override
     {
         m_field->setValue(m_comboBox->currentData().value<vms::api::StreamQuality>());
+
+        DropdownTextPickerWidgetBase<vms::rules::StreamQualityField>::onActivated();
     }
 };
 

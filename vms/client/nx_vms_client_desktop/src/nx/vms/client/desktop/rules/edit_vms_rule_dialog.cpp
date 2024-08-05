@@ -156,7 +156,10 @@ EditVmsRuleDialog::EditVmsRuleDialog(QWidget* parent):
             m_eventTypePicker,
             &EventTypePickerWidget::eventTypePicked,
             this,
-            &EditVmsRuleDialog::onEventTypeChanged);
+            [this](const QString& eventType)
+            {
+                m_ruleCompatibilityManager->changeEventType(eventType);
+            });
         eventFrameLayout->addWidget(m_eventTypePicker);
 
         m_eventEditorWidget = new EventParametersWidget{windowContext()};
@@ -199,7 +202,10 @@ EditVmsRuleDialog::EditVmsRuleDialog(QWidget* parent):
             m_actionTypePicker,
             &ActionTypePickerWidget::actionTypePicked,
             this,
-            &EditVmsRuleDialog::onActionTypeChanged);
+            [this](const QString& actionType)
+            {
+                m_ruleCompatibilityManager->changeActionType(actionType);
+            });
         actionFrameLayout->addWidget(m_actionTypePicker);
 
         m_actionEditorWidget = new ActionParametersWidget{windowContext()};
@@ -287,6 +293,33 @@ void EditVmsRuleDialog::setRule(std::shared_ptr<vms::rules::Rule> rule, bool isN
     m_rule = std::move(rule);
     m_ruleCompatibilityManager =
         std::make_unique<RuleCompatibilityManager>(m_rule.get(), systemContext());
+
+    connect(
+        m_ruleCompatibilityManager.get(),
+        &RuleCompatibilityManager::ruleModified,
+        this,
+        [this]
+        {
+            if (m_eventEditorWidget->eventType() != m_rule->eventFilters().first()->eventType()
+                || m_actionEditorWidget->actionType() != m_rule->actionBuilders().first()->actionType())
+            {
+                // Event or action type is changed, UI rebuild required.
+
+                displayRule();
+                setHasChanges(true);
+
+                return;
+            }
+
+            m_eventEditorWidget->updateUi();
+            m_actionEditorWidget->updateUi();
+
+            updateEnabledActions();
+            setHasChanges(true);
+            displayDeveloperModeInfo();
+        },
+        Qt::QueuedConnection);
+
     m_isNewRule = isNewRule;
     m_checkValidityOnChanges = !isNewRule;
 
@@ -349,40 +382,17 @@ void EditVmsRuleDialog::displayComment()
 
 void EditVmsRuleDialog::displayRule()
 {
-    if (!NX_ASSERT(!m_rule->actionBuilders().empty()) || !NX_ASSERT(!m_rule->eventFilters().empty()))
+    if (!NX_ASSERT(m_rule->isValid()))
         return;
 
-    {
-        const QSignalBlocker eventPickerBlocker{m_eventTypePicker};
-        m_eventTypePicker->setEventType(m_rule->eventFilters().first()->eventType());
-        const QSignalBlocker actionPickerBlocker{m_actionTypePicker};
-        m_actionTypePicker->setActionType(m_rule->actionBuilders().first()->actionType());
+    m_eventTypePicker->setEventType(m_rule->eventFilters().first()->eventType());
+    m_actionTypePicker->setActionType(m_rule->actionBuilders().first()->actionType());
 
-        updateEnabledActions();
-    }
-
-    if (ini().developerMode)
-    {
-        onEventFilterModified();
-        onActionBuilderModified();
-
-        m_scopedConnections.reset();
-
-        m_scopedConnections << connect(
-            m_rule->eventFilters().first(),
-            &vms::rules::EventFilter::changed,
-            this,
-            &EditVmsRuleDialog::onEventFilterModified);
-
-        m_scopedConnections << connect(
-            m_rule->actionBuilders().first(),
-            &vms::rules::ActionBuilder::changed,
-            this,
-            &EditVmsRuleDialog::onActionBuilderModified);
-    }
+    updateEnabledActions();
 
     displayEventEditor();
     displayActionEditor();
+    displayDeveloperModeInfo();
 }
 
 void EditVmsRuleDialog::displayActionEditor()
@@ -399,7 +409,10 @@ void EditVmsRuleDialog::displayActionEditor()
 
     m_actionEditorWidget = actionEditorWidget;
 
-    actionEditorWidget->setRule(m_rule, m_isNewRule);
+    m_actionEditorWidget->setRule(m_rule, m_isNewRule);
+
+    if (m_checkValidityOnChanges)
+        m_actionEditorWidget->setEdited();
 }
 
 void EditVmsRuleDialog::displayEventEditor()
@@ -416,7 +429,41 @@ void EditVmsRuleDialog::displayEventEditor()
 
     m_eventEditorWidget = eventEditorWidget;
 
-    eventEditorWidget->setRule(m_rule, m_isNewRule);
+    m_eventEditorWidget->setRule(m_rule, m_isNewRule);
+
+    if (m_checkValidityOnChanges)
+        eventEditorWidget->setEdited();
+}
+
+void EditVmsRuleDialog::displayDeveloperModeInfo()
+{
+    if (ini().developerMode)
+    {
+        const auto serializedEventFilter =
+            QJson::serialized(serialize(m_rule->eventFilters().first()));
+        m_eventLabel->setToolTip(QString{"%1:\n%2"}
+                                    .arg(Strings::devModeInfoTitle())
+                                    .arg(indentedJson(serializedEventFilter)));
+
+        const auto serializedActionBuilder =
+            QJson::serialized(serialize(m_rule->actionBuilders().first()));
+        m_actionLabel->setToolTip(QString{"%1:\n%2"}
+                                    .arg(Strings::devModeInfoTitle())
+                                    .arg(indentedJson(serializedActionBuilder)));
+
+        const auto validity = ruleValidity();
+        if (validity.isValid())
+        {
+            m_alertLabel->setVisible(false);
+        }
+        else
+        {
+            m_alertLabel->setVisible(true);
+            m_alertLabel->setText(QString{"%1\n%2"}
+                .arg(Strings::devModeInfoTitle())
+                .arg(validity.description));
+        }
+    }
 }
 
 void EditVmsRuleDialog::displayState()
@@ -453,42 +500,6 @@ void EditVmsRuleDialog::onScheduleClicked()
     m_rule->setSchedule(dialog.schedule());
 }
 
-void EditVmsRuleDialog::onActionTypeChanged(const QString& actionType)
-{
-    if (!NX_ASSERT(
-        m_ruleCompatibilityManager->changeActionType(actionType),
-        "Incompatible event(%1)-action(%2) pair is choosen",
-        m_rule->eventFilters().first()->eventType(),
-        actionType))
-    {
-        m_actionTypePicker->setActionType(m_rule->actionBuilders().first()->actionType());
-        return;
-    }
-
-    setHasChanges(true);
-
-    displayRule();
-}
-
-void EditVmsRuleDialog::onEventTypeChanged(const QString& eventType)
-{
-    if (!NX_ASSERT(
-        m_ruleCompatibilityManager->changeEventType(eventType),
-        "Incompatible event(%1)-action(%2) pair is choosen",
-        eventType,
-        m_rule->actionBuilders().first()->actionType()))
-    {
-        m_eventTypePicker->setEventType(m_rule->eventFilters().first()->eventType());
-        return;
-    }
-
-    updateEnabledActions();
-
-    setHasChanges(true);
-
-    displayRule();
-}
-
 void EditVmsRuleDialog::onEnabledButtonClicked(bool checked)
 {
     m_rule->setEnabled(checked);
@@ -523,47 +534,9 @@ void EditVmsRuleDialog::updateEnabledActions()
         eventDurationType != vms::rules::EventDurationType::instant);
 }
 
-void EditVmsRuleDialog::onEventFilterModified()
-{
-    const auto serializedEventFilter =
-        QJson::serialized(serialize(m_rule->eventFilters().first()));
-    m_eventLabel->setToolTip(QString{"%1:\n%2"}
-                                 .arg(Strings::devModeInfoTitle())
-                                 .arg(indentedJson(serializedEventFilter)));
-
-    updateEnabledActions();
-    setHasChanges(true);
-}
-
-void EditVmsRuleDialog::onActionBuilderModified()
-{
-    const auto serializedActionBuilder =
-        QJson::serialized(serialize(m_rule->actionBuilders().first()));
-    m_actionLabel->setToolTip(QString{"%1:\n%2"}
-                                  .arg(Strings::devModeInfoTitle())
-                                  .arg(indentedJson(serializedActionBuilder)));
-    setHasChanges(true);
-}
-
 void EditVmsRuleDialog::setHasChanges(bool hasChanges)
 {
     m_hasChanges = hasChanges;
-
-    if (ini().developerMode)
-    {
-        const auto validity = ruleValidity();
-        if (validity.isValid())
-        {
-            m_alertLabel->setVisible(false);
-        }
-        else
-        {
-            m_alertLabel->setVisible(true);
-            m_alertLabel->setText(QString{"%1\n%2"}
-                .arg(Strings::devModeInfoTitle())
-                .arg(validity.description));
-        }
-    }
 
     updateButtonBox();
 }

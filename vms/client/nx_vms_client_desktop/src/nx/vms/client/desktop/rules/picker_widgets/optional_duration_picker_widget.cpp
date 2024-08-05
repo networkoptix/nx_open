@@ -92,6 +92,8 @@ void OptionalDurationPicker::onEnabledChanged(bool isEnabled)
         m_field->setValue(m_field->properties().defaultValue);
     else
         m_field->setValue(vms::rules::OptionalTimeField::value_type::zero());
+
+    setEdited();
 }
 
 } // namespace nx::vms::client::desktop::rules

@@ -52,6 +52,8 @@ protected:
     void onValueChanged(int value)
     {
         m_field->setValue(value);
+
+        setEdited();
     }
 };
 

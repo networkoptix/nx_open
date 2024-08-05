@@ -120,6 +120,8 @@ private:
     void onValueChanged()
     {
         m_field->setValue(std::chrono::seconds{m_timeDurationWidget->value()});
+
+        setEdited();
     }
 };
 

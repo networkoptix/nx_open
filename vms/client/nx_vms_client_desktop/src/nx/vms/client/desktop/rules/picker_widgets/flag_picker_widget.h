@@ -52,12 +52,15 @@ public:
 private:
     using FieldPickerWidget<F, PickerWidget>::m_field;
     using FieldPickerWidget<F, PickerWidget>::connect;
+    using FieldPickerWidget<F, PickerWidget>::setEdited;
 
     QCheckBox* m_checkBox{nullptr};
 
     void onStateChanged(int state)
     {
         m_field->setValue(state == Qt::Checked);
+
+        setEdited();
     }
 
     void updateUi() override

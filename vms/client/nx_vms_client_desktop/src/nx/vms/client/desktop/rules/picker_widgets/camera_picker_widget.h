@@ -48,6 +48,8 @@ protected:
             m_field->setAcceptAll(Policy::emptyListIsValid() && selectedCameras.empty());
             m_field->setIds(selectedCameras);
         }
+
+        CameraPickerWidgetBase<vms::rules::SourceCameraField, Policy>::onSelectButtonClicked();
     }
 };
 
@@ -86,6 +88,8 @@ protected:
             m_field->setAcceptAll(Policy::emptyListIsValid() && selectedCameras.empty());
             m_field->setIds(selectedCameras);
         }
+
+        CameraPickerWidgetBase<vms::rules::TargetDeviceField, Policy>::onSelectButtonClicked();
     }
 
     void updateUi() override

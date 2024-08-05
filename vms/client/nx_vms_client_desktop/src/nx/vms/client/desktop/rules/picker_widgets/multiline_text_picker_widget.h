@@ -63,6 +63,8 @@ protected:
     void onTextChanged()
     {
         m_field->setText(m_textEdit->toPlainText());
+
+        setEdited();
     }
 };
 

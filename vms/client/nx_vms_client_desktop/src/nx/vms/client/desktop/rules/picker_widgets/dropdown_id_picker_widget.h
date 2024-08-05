@@ -54,7 +54,10 @@ protected:
 
     D* m_comboBox{nullptr};
 
-    virtual void onActivated() = 0;
+    virtual void onActivated()
+    {
+        setEdited();
+    }
 
     QnVirtualCameraResourceList getCameras() const
     {
@@ -94,6 +97,8 @@ protected:
     {
         m_field->setValue(
             m_comboBox->currentData(ui::PluginDiagnosticEventModel::PluginIdRole).value<nx::Uuid>());
+
+        DropdownIdPickerWidgetBase<vms::rules::AnalyticsEngineField, QnTreeComboBox>::onActivated();
     }
 
     void updateUi() override
@@ -175,6 +180,8 @@ protected:
             m_comboBox->currentData(ui::AnalyticsSdkEventModel::EngineIdRole).value<nx::Uuid>());
         m_field->setTypeId(
             m_comboBox->currentData(ui::AnalyticsSdkEventModel::EventTypeIdRole).value<QString>());
+
+        DropdownIdPickerWidgetBase<vms::rules::AnalyticsEventTypeField, QnTreeComboBox>::onActivated();
     }
 
     void updateUi() override
@@ -264,6 +271,8 @@ protected:
     void onActivated() override
     {
         m_field->setValue(m_comboBox->selectedMainObjectTypeId());
+
+        DropdownIdPickerWidgetBase<vms::rules::AnalyticsObjectTypeField, DetectableObjectTypeComboBox>::onActivated();
     }
 
     void updateUi() override

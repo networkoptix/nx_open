@@ -109,11 +109,13 @@ void TargetUserPicker::onSelectButtonClicked()
     dialog.setCheckedSubjects(m_field->ids());
     dialog.setAllUsers(m_field->acceptAll());
 
-    if (dialog.exec() != QDialog::Accepted)
-        return;
+    if (dialog.exec() == QDialog::Accepted)
+    {
+        m_field->setIds(dialog.checkedSubjects());
+        m_field->setAcceptAll(dialog.allUsers());
+    }
 
-    m_field->setIds(dialog.checkedSubjects());
-    m_field->setAcceptAll(dialog.allUsers());
+    ResourcePickerWidgetBase<vms::rules::TargetUserField>::onSelectButtonClicked();
 }
 
 } // namespace nx::vms::client::desktop::rules

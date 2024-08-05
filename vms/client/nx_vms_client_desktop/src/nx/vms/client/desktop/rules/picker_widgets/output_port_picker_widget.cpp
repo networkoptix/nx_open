@@ -66,6 +66,8 @@ void OutputPortPicker::updateUi()
 void OutputPortPicker::onActivated()
 {
     m_field->setValue(m_comboBox->currentData().toString());
+
+    DropdownTextPickerWidgetBase<vms::rules::OutputPortField>::onActivated();
 }
 
 } // namespace nx::vms::client::desktop::rules

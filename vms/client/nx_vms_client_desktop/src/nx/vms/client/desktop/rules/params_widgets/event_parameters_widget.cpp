@@ -29,12 +29,16 @@ std::optional<vms::rules::ItemDescriptor> EventParametersWidget::descriptor() co
 
 void EventParametersWidget::setEdited()
 {
+    NX_ASSERT(eventFilter()->eventType() == m_eventType);
+
     for (auto picker: m_pickers)
         picker->setEdited();
 }
 
 void EventParametersWidget::onRuleSet(bool isNewRule)
 {
+    m_eventType = eventFilter()->eventType();
+
     auto layout = new QVBoxLayout;
     layout->setSpacing(0);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -79,28 +83,14 @@ void EventParametersWidget::onRuleSet(bool isNewRule)
     layout->addItem(verticalSpacer);
 
     setLayout(layout);
-
-    // Connection order is matter, must be called after all the pickers are created.
-    // EventFilter::changed signal is emitted whenever any field property is changed. Often, a
-    // single user action changes more than one property. A queued connection is used here to
-    // ensure that the UI is updated after all required properties have been changed.
-    connect(
-        eventFilter(),
-        &vms::rules::EventFilter::changed,
-        this,
-        &EventParametersWidget::onEventFieldChanged,
-        Qt::QueuedConnection);
 }
 
 void EventParametersWidget::updateUi()
 {
+    NX_ASSERT(eventFilter()->eventType() == m_eventType);
+
     for (auto picker: m_pickers)
         picker->updateUi();
-}
-
-void EventParametersWidget::onEventFieldChanged(const QString& /*fieldName*/)
-{
-    updateUi();
 }
 
 } // namespace nx::vms::client::desktop::rules

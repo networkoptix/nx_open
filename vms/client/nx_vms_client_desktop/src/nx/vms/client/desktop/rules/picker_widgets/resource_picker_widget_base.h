@@ -72,7 +72,10 @@ protected:
 
     void updateSelectButtonUi();
 
-    virtual void onSelectButtonClicked() = 0;
+    virtual void onSelectButtonClicked()
+    {
+        setEdited();
+    }
 };
 
 template<class F>

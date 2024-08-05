@@ -53,6 +53,8 @@ void StatePicker::onActivated()
 {
     if (m_comboBox->currentIndex() != -1)
         m_field->setValue(m_comboBox->currentData().value<api::rules::State>());
+
+    DropdownTextPickerWidgetBase<vms::rules::StateField, StateComboBox>::onActivated();
 }
 
 } // namespace nx::vms::client::desktop::rules

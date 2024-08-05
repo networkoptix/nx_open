@@ -14,8 +14,12 @@ class RuleCompatibilityManager : public QObject, public SystemContextAware
 public:
     RuleCompatibilityManager(vms::rules::Rule* rule, SystemContext* context, QObject* parent = nullptr);
 
-    bool changeEventType(const QString& eventType);
-    bool changeActionType(const QString& actionType);
+    void changeEventType(const QString& eventType);
+    void changeActionType(const QString& actionType);
+
+signals:
+    // Emits when an event or action type or any field is changed.
+    void ruleModified();
 
 private:
     vms::rules::Rule* m_rule{};
