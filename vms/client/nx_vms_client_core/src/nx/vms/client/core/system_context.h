@@ -124,6 +124,9 @@ public:
 
     AccessController* accessController() const;
 
+    virtual void startModuleDiscovery(
+        nx::vms::discovery::Manager* moduleDiscoveryManager) override;
+
 signals:
     void remoteIdChanged(const nx::Uuid& id);
 

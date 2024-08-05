@@ -740,7 +740,7 @@ ApplicationContext::ApplicationContext(
             d->initializeSystemContext();
             d->initializeCrossSystemModules();
             d->unifiedResourcePool = std::make_unique<UnifiedResourcePool>();
-            d->mainSystemContext->enableRouting(moduleDiscoveryManager());
+            d->mainSystemContext->startModuleDiscovery(moduleDiscoveryManager());
             d->initializeClientCoreModule();
             d->initializeQml();
             d->initializeLocalResourcesSearch();

@@ -108,14 +108,9 @@ public:
     AbstractCertificateVerifier* certificateVerifier() const;
 
     /**
-     * Enable access to Context's servers using alternative routes, found by the provided manager.
+     * Start checking what VMS Server network interfaces are accessible.
      */
-    void enableRouting(nx::vms::discovery::Manager* moduleDiscoveryManager);
-
-    /**
-     * Whether Module Discovery Manager is set to the context.
-     */
-    bool isRoutingEnabled() const;
+    virtual void startModuleDiscovery(nx::vms::discovery::Manager* moduleDiscoveryManager);
 
     /**
      * Helper class to find the shortest route to the VMS Server. Can be null, e.g. in unit tests

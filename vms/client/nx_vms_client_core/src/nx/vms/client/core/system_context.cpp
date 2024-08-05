@@ -60,8 +60,6 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
             d->ptzControllerPool = std::make_unique<ptz::ControllerPool>(this);
             d->userWatcher = std::make_unique<UserWatcher>(this);
             d->watermarkWatcher = std::make_unique<WatermarkWatcher>(this);
-            d->serverPrimaryInterfaceWatcher = std::make_unique<ServerPrimaryInterfaceWatcher>(
-                this);
             d->vmsRulesEngineHolder = std::make_unique<nx::vms::rules::EngineHolder>(
                 this,
                 std::make_unique<nx::vms::rules::Initializer>(this),
@@ -72,8 +70,6 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
             d->ptzControllerPool = std::make_unique<CrossSystemPtzControllerPool>(this);
             d->userWatcher = std::make_unique<UserWatcher>(this);
             d->watermarkWatcher = std::make_unique<WatermarkWatcher>(this);
-            d->serverPrimaryInterfaceWatcher = std::make_unique<ServerPrimaryInterfaceWatcher>(
-                this);
             break;
 
         case Mode::cloudLayouts:
@@ -252,6 +248,13 @@ AccessController* SystemContext::accessController() const
 void SystemContext::resetAccessController(AccessController* accessController)
 {
     d->accessController.reset(accessController);
+}
+
+void SystemContext::startModuleDiscovery(
+    nx::vms::discovery::Manager* moduleDiscoveryManager)
+{
+    base_type::startModuleDiscovery(moduleDiscoveryManager);
+    d->serverPrimaryInterfaceWatcher = std::make_unique<ServerPrimaryInterfaceWatcher>(this);
 }
 
 } // namespace nx::vms::client::desktop

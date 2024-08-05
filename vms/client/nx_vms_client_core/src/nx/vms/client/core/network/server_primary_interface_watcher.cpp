@@ -4,6 +4,7 @@
 
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <network/system_helpers.h>
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/core/application_context.h>
@@ -19,7 +20,8 @@ ServerPrimaryInterfaceWatcher::ServerPrimaryInterfaceWatcher(
     QObject(parent),
     SystemContextAware(systemContext)
 {
-    appContext()->moduleDiscoveryManager()->onSignals(this,
+    systemContext->moduleDiscoveryManager()->onSignals(
+        this,
         &ServerPrimaryInterfaceWatcher::onConnectionChanged,
         &ServerPrimaryInterfaceWatcher::onConnectionChanged,
         &ServerPrimaryInterfaceWatcher::onConnectionChangedById);
@@ -28,6 +30,7 @@ ServerPrimaryInterfaceWatcher::ServerPrimaryInterfaceWatcher(
         &QnResourcePool::statusChanged,
         this,
         &ServerPrimaryInterfaceWatcher::onResourcePoolStatusChanged);
+
     connect(resourcePool(),
         &QnResourcePool::resourcesAdded,
         this,
@@ -51,29 +54,35 @@ void ServerPrimaryInterfaceWatcher::onResourcesAdded(const QnResourceList& resou
     if (currentServerId.isNull())
         return;
 
-    auto connection = this->connection();
-    if (!NX_ASSERT(connection, "Connection must already be established"))
-        return;
-
-    const auto address = connection->address();
-
     for (const auto& resource: resources)
     {
-        if (resource->getId() != currentServerId)
+        auto server = resource.dynamicCast<QnMediaServerResource>();
+        if (!server)
             continue;
 
-        auto currentServer = resource.dynamicCast<QnMediaServerResource>();
-        if (!NX_ASSERT(currentServer))
-            return;
+        if (server->getId() == currentServerId)
+        {
+            auto connection = this->connection();
+            if (!NX_ASSERT(connection, "Connection must already be established"))
+                return;
+            const auto address = connection->address();
 
-        currentServer->setPrimaryAddress(address);
-        NX_DEBUG(this,
-            "Initial set primary address of %1 (%2) to default %3",
-            currentServer->getName(),
-            currentServer->getId().toString(),
-            address.toString());
-        updatePrimaryInterface(currentServer);
-        return;
+            server->setPrimaryAddress(address);
+            NX_DEBUG(this,
+                "Initial set primary address of %1 (%2) to default %3",
+                server->getName(),
+                server->getId().toString(),
+                address.toString());
+            updatePrimaryInterface(server);
+        }
+        else if (server->hasFlags(Qn::cross_system))
+        {
+            auto endpoint = server->getPrimaryAddress();
+            endpoint.address = helpers::serverCloudHost(
+                systemContext()->moduleInformation().cloudId(),
+                server->getId());
+            systemContext()->moduleDiscoveryManager()->checkEndpoint(endpoint, server->getId());
+        }
     }
 }
 
@@ -92,7 +101,7 @@ void ServerPrimaryInterfaceWatcher::onResourcePoolStatusChanged(const QnResource
 void ServerPrimaryInterfaceWatcher::updatePrimaryInterface(const QnMediaServerResourcePtr& server)
 {
     const auto serverId = server->getId();
-    const auto module = appContext()->moduleDiscoveryManager()->getModule(serverId);
+    const auto module = systemContext()->moduleDiscoveryManager()->getModule(serverId);
     if (!module)
         return;
 

@@ -77,6 +77,12 @@ public:
      * Pool.
      */
     void start(QnResourcePool* resourcePool);
+
+    /**
+     * Start checking provided urls only.
+     */
+    void startModuleConnectorOnly();
+
     void stop();
 
     std::list<ModuleEndpoint> getAll() const; //< All accessible modules.
