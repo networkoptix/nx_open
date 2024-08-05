@@ -34,7 +34,7 @@ public:
         nx::cloud::db::api::ResultCode,
         nx::cloud::db::api::IssueTokenResponse)>;
 
-    void updateTokenIfNeeded();
+    void updateTokenIfNeeded(bool force = false);
 
     void issueToken(
         const nx::cloud::db::api::IssueTokenRequest& request,
