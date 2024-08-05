@@ -195,7 +195,7 @@ def archiveByGlob(archiver, category, target_dir, source_dir, pattern, recursive
 def archiveSdkUnitTests(archiver, conf, src_bin_dir):
     ut_file_patterns = {
         "Linux": ["*.so*", "*_ut"],
-        "Windows": ["*.dll", "*.pdb", "*_ut.exe"],
+        "Windows": ["*.dll", "*_ut.exe"],
         "Darwin": ["*.dylib", "*_ut"]
     }[conf.CMAKE_SYSTEM_NAME]
     source_dir = Path(conf.METADATA_SDK_BUILD_DIR)
@@ -234,7 +234,7 @@ def main():
     lib_dir = bin_dir if isWindows else "lib"
     lib_globs = {
         "Linux": ["*.so*"],
-        "Windows": ["*.dll", "*.pdb"],
+        "Windows": ["*.dll"],
         "Darwin": ["*.dylib"]
     }[conf.CMAKE_SYSTEM_NAME]
     metainfo = load_unit_test_metainfo()
