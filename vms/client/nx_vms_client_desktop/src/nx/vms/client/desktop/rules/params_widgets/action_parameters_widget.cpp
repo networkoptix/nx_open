@@ -32,12 +32,16 @@ std::optional<vms::rules::ItemDescriptor> ActionParametersWidget::descriptor() c
 
 void ActionParametersWidget::setEdited()
 {
+    NX_ASSERT(actionBuilder()->actionType() == m_actionType);
+
     for (auto picker: m_pickers)
         picker->setEdited();
 }
 
 void ActionParametersWidget::onRuleSet(bool isNewRule)
 {
+    m_actionType = actionBuilder()->actionType();
+
     auto layout = new QVBoxLayout;
     layout->setSpacing(0);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -88,35 +92,14 @@ void ActionParametersWidget::onRuleSet(bool isNewRule)
     layout->addItem(verticalSpacer);
 
     setLayout(layout);
-
-    // Connection order is matter, must be called after all the pickers are created.
-    // ActionBuilder::changed signal is emitted whenever any field property is changed. Often, a
-    // single user action changes more than one property. A queued connection is used here to
-    // ensure that the UI is updated after all required properties have been changed.
-    connect(
-        actionBuilder(),
-        &vms::rules::ActionBuilder::changed,
-        this,
-        &ActionParametersWidget::onFieldChanged,
-        Qt::QueuedConnection);
-
-    connect(
-        eventFilter(),
-        &vms::rules::EventFilter::changed,
-        this,
-        &ActionParametersWidget::onFieldChanged,
-        Qt::QueuedConnection);
 }
 
 void ActionParametersWidget::updateUi()
 {
+    NX_ASSERT(actionBuilder()->actionType() == m_actionType);
+
     for (auto picker: m_pickers)
         picker->updateUi();
-}
-
-void ActionParametersWidget::onFieldChanged(const QString& /*fieldName*/)
-{
-    updateUi();
 }
 
 PickerWidget* ActionParametersWidget::createStatePickerIfRequired()

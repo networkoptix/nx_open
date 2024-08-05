@@ -208,17 +208,23 @@ void ActionDurationPickerWidget::onDurationTypeChanged()
         m_field->setValue(std::chrono::seconds::zero());
     else
         m_field->setValue(m_field->properties().defaultValue);
+
+    setEdited();
 }
 
 void ActionDurationPickerWidget::onDurationValueChanged()
 {
     m_field->setValue(std::chrono::seconds{m_timeDurationWidget->value()});
+
+    setEdited();
 }
 
 void ActionDurationPickerWidget::onStateChanged()
 {
     const auto stateField = getEventField<vms::rules::StateField>(vms::rules::utils::kStateFieldName);
     stateField->setValue(m_actionStartComboBox->currentData().value<api::rules::State>());
+
+    setEdited();
 }
 
 } // namespace nx::vms::client::desktop::rules

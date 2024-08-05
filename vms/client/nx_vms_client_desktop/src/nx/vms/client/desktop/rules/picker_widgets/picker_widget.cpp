@@ -25,7 +25,11 @@ bool PickerWidget::isEdited() const
 
 void PickerWidget::setEdited()
 {
-    m_isEdited = true;
+    if (!m_isEdited)
+    {
+        m_isEdited = true;
+        updateUi();
+    }
 }
 
 ParamsWidget* PickerWidget::parentParamsWidget() const

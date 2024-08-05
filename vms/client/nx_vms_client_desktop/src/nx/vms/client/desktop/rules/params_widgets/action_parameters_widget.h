@@ -22,13 +22,14 @@ public:
 
     void updateUi() override;
 
+    const QString& actionType() const { return m_actionType; }
+
 private:
     void onRuleSet(bool isNewRule) override;
 
-    void onFieldChanged(const QString& fieldName);
-
     PickerWidget* createStatePickerIfRequired();
 
+    QString m_actionType; //< Action for which the widget was created.
     std::vector<PickerWidget*> m_pickers;
 };
 

@@ -37,6 +37,8 @@ protected:
     void onActivated() override
     {
         m_field->setValue(m_comboBox->currentIcon());
+
+        DropdownTextPickerWidgetBase<vms::rules::CustomizableIconField, IconComboBox>::onActivated();
     }
 
     void updateUi() override

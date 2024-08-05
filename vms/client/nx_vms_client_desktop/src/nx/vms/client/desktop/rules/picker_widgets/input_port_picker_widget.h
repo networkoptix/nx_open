@@ -22,6 +22,8 @@ protected:
     void onActivated() override
     {
         m_field->setValue(m_comboBox->currentData().toString());
+
+        DropdownTextPickerWidgetBase<vms::rules::InputPortField>::onActivated();
     }
 
 private:

@@ -38,7 +38,10 @@ protected:
 
     D* m_comboBox{nullptr};
 
-    virtual void onActivated() = 0;
+    virtual void onActivated()
+    {
+        setEdited();
+    }
 };
 
 } // namespace nx::vms::client::desktop::rules

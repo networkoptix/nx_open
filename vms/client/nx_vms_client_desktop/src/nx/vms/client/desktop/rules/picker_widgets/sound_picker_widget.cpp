@@ -74,6 +74,8 @@ void SoundPicker::onCurrentIndexChanged(int index)
 {
     auto soundModel = m_serverNotificationCache->persistentGuiModel();
     m_field->setValue(soundModel->filenameByRow(index));
+
+    setEdited();
 }
 
 void SoundPicker::onManageButtonClicked()

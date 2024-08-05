@@ -59,14 +59,14 @@ private:
         auto selectedCameras = UuidSet{m_field->id()};
 
         preparePolicy();
-        if (!CameraSelectionDialog::selectCameras(systemContext(), selectedCameras, policy, this)
-            || selectedCameras.empty())
+        if (CameraSelectionDialog::selectCameras(systemContext(), selectedCameras, policy, this)
+            && !selectedCameras.empty())
         {
-            return;
+            m_field->setId(*selectedCameras.begin());
+            m_field->setUseSource(false);
         }
 
-        m_field->setId(*selectedCameras.begin());
-        m_field->setUseSource(false);
+        ResourcePickerWidgetBase<vms::rules::TargetSingleDeviceField>::onSelectButtonClicked();
     }
 
     void preparePolicy();
@@ -97,6 +97,8 @@ private:
         {
             m_field->setUseSource(false);
         }
+
+        setEdited();
     }
 };
 

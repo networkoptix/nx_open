@@ -122,16 +122,22 @@ HttpAuthPicker::~HttpAuthPicker()
 void HttpAuthPicker::onLoginChanged(const QString& text)
 {
     m_field->setLogin(text.toStdString());
+
+    setEdited();
 }
 
 void HttpAuthPicker::onPasswordChanged(const QString& text)
 {
     m_field->setPassword(text.toStdString());
+
+    setEdited();
 }
 
 void HttpAuthPicker::onTokenChanged(const QString& text)
 {
     m_field->setToken(text.toStdString());
+
+    setEdited();
 }
 
 void HttpAuthPicker::updateUi()
@@ -170,6 +176,8 @@ void HttpAuthPicker::onCurrentIndexChanged(int /*index*/)
 {
     const auto value = d->comboBox->currentData().value<nx::network::http::AuthType>();
     m_field->setAuthType(value);
+
+    setEdited();
 
     const bool isBearer = value == nx::network::http::AuthType::authBearer;
     d->loginPasswordGroup->setVisible(!isBearer);

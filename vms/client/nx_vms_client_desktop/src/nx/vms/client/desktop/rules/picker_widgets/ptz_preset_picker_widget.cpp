@@ -74,6 +74,8 @@ void PtzPresetPicker::updateUi()
 void PtzPresetPicker::onActivated()
 {
     m_field->setValue(m_comboBox->currentData().toString());
+
+    DropdownTextPickerWidgetBase<vms::rules::PtzPresetField>::onActivated();
 }
 
 void PtzPresetPicker::updateComboBox()

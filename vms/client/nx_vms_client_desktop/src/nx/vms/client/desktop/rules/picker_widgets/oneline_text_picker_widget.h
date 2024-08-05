@@ -55,7 +55,10 @@ protected:
 
     QLineEdit* m_lineEdit{nullptr};
 
-    virtual void onTextChanged(const QString& text) = 0;
+    virtual void onTextChanged(const QString& /*text*/)
+    {
+        setEdited();
+    }
 };
 
 template<typename F>
@@ -89,6 +92,8 @@ protected:
     void onTextChanged(const QString& text) override
     {
         m_field->setValue(text);
+
+        OnelineTextPickerWidgetBase<F>::onTextChanged(text);
     }
 };
 

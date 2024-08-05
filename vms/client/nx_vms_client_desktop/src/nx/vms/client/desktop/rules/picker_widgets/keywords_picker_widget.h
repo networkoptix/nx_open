@@ -43,6 +43,8 @@ protected:
     void onTextChanged(const QString& text) override
     {
         m_field->setString(text);
+
+        OnelineTextPickerWidgetBase<vms::rules::KeywordsField>::onTextChanged(text);
     }
 };
 

@@ -43,6 +43,8 @@ void SourceUserPicker::onSelectButtonClicked()
 
     m_field->setAcceptAll(dialog.allUsers());
     m_field->setIds(dialog.checkedSubjects());
+
+    ResourcePickerWidgetBase<vms::rules::SourceUserField>::onSelectButtonClicked();
 }
 
 } // namespace nx::vms::client::desktop::rules

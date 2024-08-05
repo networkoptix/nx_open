@@ -115,11 +115,13 @@ void SingleTargetLayoutPicker::onSelectButtonClicked()
 
     dialog.setSharedLayouts(sharedLayouts, selection);
 
-    if (dialog.exec() != QDialog::Accepted)
-        return;
+    if (dialog.exec() == QDialog::Accepted)
+    {
+        const auto selectedLayouts = dialog.checkedLayouts();
+        m_field->setValue(selectedLayouts.empty() ? nx::Uuid{} : *selectedLayouts.begin());
+    }
 
-    const auto selectedLayouts = dialog.checkedLayouts();
-    m_field->setValue(selectedLayouts.empty() ? nx::Uuid{} : *selectedLayouts.begin());
+    ResourcePickerWidgetBase<vms::rules::LayoutField>::onSelectButtonClicked();
 }
 
 } // namespace nx::vms::client::desktop::rules

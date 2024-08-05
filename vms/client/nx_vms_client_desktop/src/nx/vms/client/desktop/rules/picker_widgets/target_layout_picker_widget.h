@@ -18,6 +18,7 @@ class TargetLayoutPicker:
     public ResourcePickerWidgetBase<vms::rules::TargetLayoutField>
 {
     Q_OBJECT
+
 public:
     using ResourcePickerWidgetBase<vms::rules::TargetLayoutField>::ResourcePickerWidgetBase;
 
@@ -26,10 +27,10 @@ protected:
     {
         auto selectedLayouts = m_field->value();
 
-        if (!MultipleLayoutSelectionDialog::selectLayouts(selectedLayouts, this))
-            return;
+        if (MultipleLayoutSelectionDialog::selectLayouts(selectedLayouts, this))
+            m_field->setValue(selectedLayouts);
 
-        m_field->setValue(selectedLayouts);
+        ResourcePickerWidgetBase<vms::rules::TargetLayoutField>::onSelectButtonClicked();
     }
 };
 

@@ -58,8 +58,11 @@ RuleCompatibilityManager::RuleCompatibilityManager(
         &RuleCompatibilityManager::onActionBuilderFieldChanged);
 }
 
-bool RuleCompatibilityManager::changeEventType(const QString& eventType)
+void RuleCompatibilityManager::changeEventType(const QString& eventType)
 {
+    if (m_rule->eventFilters().first()->eventType() == eventType)
+        return;
+
     auto newEventFilter = m_engine->buildEventFilter(eventType);
 
     if (!vms::rules::utils::isCompatible(
@@ -77,50 +80,51 @@ bool RuleCompatibilityManager::changeEventType(const QString& eventType)
     fixStateValue();
     fixUseSourceValue();
 
-    return NX_ASSERT(
+    NX_ASSERT(
         vms::rules::utils::isCompatible(
             systemContext()->vmsRulesEngine(),
             m_rule->eventFilters().first(),
             m_rule->actionBuilders().first()),
         makeCompatibilityAlertMessage(m_rule));
+
+    emit ruleModified();
 }
 
-bool RuleCompatibilityManager::changeActionType(const QString& actionType)
+void RuleCompatibilityManager::changeActionType(const QString& actionType)
 {
+    if (m_rule->actionBuilders().first()->actionType() == actionType)
+        return;
+
     auto newActionBuilder = m_engine->buildActionBuilder(actionType);
-
-    if (!vms::rules::utils::isCompatible(
-        systemContext()->vmsRulesEngine(),
-        m_rule->eventFilters().first(),
-        newActionBuilder.get()))
-    {
-        // User must not have an ability to select invalid action type.
-        return false;
-    }
-
     replaceActionBuilder(std::move(newActionBuilder));
 
     fixStateValue();
     fixUseSourceValue();
 
-    return NX_ASSERT(
+    NX_ASSERT(
         vms::rules::utils::isCompatible(
             systemContext()->vmsRulesEngine(),
             m_rule->eventFilters().first(),
             m_rule->actionBuilders().first()),
         makeCompatibilityAlertMessage(m_rule));
+
+    emit ruleModified();
 }
 
 void RuleCompatibilityManager::onEventFilterFieldChanged(const QString& fieldName)
 {
     if (fieldName == vms::rules::utils::kEventTypeIdFieldName)
         onAnalyticsEventTypeChanged();
+
+    emit ruleModified();
 }
 
 void RuleCompatibilityManager::onActionBuilderFieldChanged(const QString& fieldName)
 {
     if (fieldName == vms::rules::utils::kDurationFieldName)
         onDurationChanged();
+
+    emit ruleModified();
 }
 
 void RuleCompatibilityManager::fixStateValue()

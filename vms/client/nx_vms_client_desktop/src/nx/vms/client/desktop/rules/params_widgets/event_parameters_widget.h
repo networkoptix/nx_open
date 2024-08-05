@@ -22,11 +22,12 @@ public:
 
     virtual void updateUi() override;
 
+    const QString& eventType() const { return m_eventType; }
+
 private:
     virtual void onRuleSet(bool isNewRule) override;
 
-    void onEventFieldChanged(const QString& fieldName);
-
+    QString m_eventType; //< Event for which the widget was created.
     std::vector<PickerWidget*> m_pickers;
 };
 

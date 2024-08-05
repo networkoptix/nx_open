@@ -64,6 +64,8 @@ private:
         }
 
         m_field->setValue(newValue);
+
+        setEdited();
     }
 
     void updateUi() override

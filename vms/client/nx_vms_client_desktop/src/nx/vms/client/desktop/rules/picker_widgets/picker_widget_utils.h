@@ -9,6 +9,7 @@ namespace nx::vms::client::desktop::rules {
     using base::m_field;\
     using base::connect;\
     using base::resourcePool;\
-    using base::parentParamsWidget;
+    using base::parentParamsWidget;\
+    using base::setEdited;
 
 } // namespace nx::vms::client::desktop::rules

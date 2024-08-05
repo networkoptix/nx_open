@@ -71,6 +71,9 @@ void VolumePicker::onVolumeChanged()
 {
     const auto newValue = static_cast<float>(m_volumeSlider->value()) / kOneHundredPercent;
     m_field->setValue(newValue);
+
+    setEdited();
+
     if (m_inProgress)
         nx::audio::AudioDevice::instance()->setVolume(newValue);
 }
