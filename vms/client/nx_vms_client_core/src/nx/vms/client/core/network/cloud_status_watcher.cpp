@@ -435,7 +435,7 @@ bool CloudStatusWatcher::Private::updateSystemsInternal(int triesCount)
                     "Access token is expired, waiting for the token refresh,\
                     Try #%1",
                     kUpdateSystemsTriesCount - triesCount + 1);
-                m_tokenUpdater->updateTokenIfNeeded();
+                m_tokenUpdater->updateTokenIfNeeded(/* force*/ true);
                 const auto request = [this, tries = triesCount - 1]()
                 { updateSystemsInternal(tries); };
                 executeDelayedParented(request, /*delay*/ 10s, this);
