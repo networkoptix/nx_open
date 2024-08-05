@@ -35,4 +35,7 @@ using UbJsonResultCallback = Callback<nx::network::rest::UbjsonResult>;
 
 static constexpr std::chrono::seconds kDefaultVmsApiTimeout = std::chrono::seconds(30);
 
+// Should be less than rest::kDefaultVmsApiTimeout which is used by client by default.
+static constexpr std::chrono::seconds kDefaultDelegateTimeout = std::chrono::seconds(15);
+
 }; // namespace rest
