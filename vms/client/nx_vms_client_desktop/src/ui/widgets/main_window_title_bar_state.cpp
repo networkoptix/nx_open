@@ -102,15 +102,7 @@ MainWindowTitleBarStateReducer::State MainWindowTitleBarStateReducer::setExpande
 MainWindowTitleBarStateReducer::State MainWindowTitleBarStateReducer::setHomeTabActive(
     State&& state, bool value)
 {
-    if (!value && state.activeSystemTab < 0)
-    {
-        if (state.systems.count() > 0)
-            state.activeSystemTab = 0;
-    }
-    else
-    {
-        state.homeTabActive = value;
-    }
+    state.homeTabActive = value;
     return state;
 }
 
@@ -215,10 +207,16 @@ MainWindowTitleBarStateReducer::State MainWindowTitleBarStateReducer::moveSystem
     {
         return state;
     }
-    const auto systemData = state.systems.at(indexFrom);
-    state = removeSystem(std::move(state), indexFrom);
-    state = insertSystem(std::move(state), indexTo, systemData);
-    state.activeSystemTab = indexTo;
+
+    state.systems.move(indexFrom, indexTo);
+
+    if (state.activeSystemTab == indexFrom)
+        state.activeSystemTab = indexTo;
+    else if (indexFrom < state.activeSystemTab && indexTo >= state.activeSystemTab)
+        --state.activeSystemTab;
+    else if (indexFrom > state.activeSystemTab && indexTo <= state.activeSystemTab)
+        ++state.activeSystemTab;
+
     return state;
 }
 
@@ -379,13 +377,6 @@ void MainWindowTitleBarStateStore::addSystem(const SystemDescriptionPtr& systemD
     State::SystemData value =
         {.systemDescription = systemDescription, .logonData = logonData};
     dispatch(Reducer::addSystem, value);
-
-    connect(systemDescription.get(), &core::SystemDescription::systemNameChanged, this,
-        [this, systemDescription]
-        {
-            const int index = state().findSystemIndex(systemDescription->localId());
-            emit systemNameChanged(index, systemDescription->name());
-        });
 }
 
 void MainWindowTitleBarStateStore::insertSystem(int index, const State::SystemData systemData)

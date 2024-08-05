@@ -392,11 +392,13 @@ ConnectActionsHandler::ConnectActionsHandler(WindowContext* windowContext, QObje
 
     connect(action(menu::ConnectToCloudSystemAction), &QAction::triggered, this,
         &ConnectActionsHandler::at_connectToCloudSystemAction_triggered);
+
     connect(
         action(menu::ConnectToCloudSystemWithUserInteractionAction),
         &QAction::triggered,
         this,
         &ConnectActionsHandler::onConnectToCloudSystemWithUserInteractionTriggered);
+
     connect(action(menu::ReconnectAction), &QAction::triggered, this,
         &ConnectActionsHandler::at_reconnectAction_triggered);
 
@@ -424,6 +426,7 @@ ConnectActionsHandler::ConnectActionsHandler(WindowContext* windowContext, QObje
 
     connect(action(menu::OpenLoginDialogAction), &QAction::triggered, this,
         &ConnectActionsHandler::showLoginDialog, Qt::QueuedConnection);
+
     connect(action(menu::BeforeExitAction), &QAction::triggered, this,
         [this]()
         {
@@ -1009,9 +1012,9 @@ void ConnectActionsHandler::updatePreloaderVisibility()
         case LogicalState::disconnected:
         {
             // Show welcome screen, hide preloader.
-            resourceModeAction->setChecked(false);
-            welcomeScreen->setConnectingToSystem(/*systemId*/ {});
             welcomeScreen->setGlobalPreloaderVisible(false);
+            welcomeScreen->setConnectingToSystem(/*systemId*/ {});
+            resourceModeAction->setChecked(false);
             break;
         }
         case LogicalState::connecting:
@@ -1088,9 +1091,14 @@ void ConnectActionsHandler::at_connectAction_triggered()
 
     const auto actionParameters = menu()->currentParameters(sender());
 
+    const auto logonData = actionParameters.hasArgument(Qn::LogonDataRole)
+        ? std::make_optional(actionParameters.argument<LogonData>(Qn::LogonDataRole))
+        : std::nullopt;
+
     if (!qnRuntime->isDesktopMode())
     {
-        connectToServerInNonDesktopMode(actionParameters.argument<LogonData>(Qn::LogonDataRole));
+        if (NX_ASSERT(logonData))
+            connectToServerInNonDesktopMode(*logonData);
         return;
     }
 
@@ -1099,8 +1107,14 @@ void ConnectActionsHandler::at_connectAction_triggered()
     if (d->logicalState == LogicalState::connected)
     {
         NX_VERBOSE(this, "Disconnecting from the current server first");
+
+        const bool fromSystemTabBar = logonData
+            && logonData->connectScenario == ConnectScenario::connectFromTabBar;
+
         // Ask user if he wants to save changes.
-        if (!disconnectFromServer(DisconnectFlag::NoFlags))
+        if (!disconnectFromServer(fromSystemTabBar
+            ? DisconnectFlag::SwitchingSystemTabs
+            : DisconnectFlag::NoFlags))
         {
             NX_VERBOSE(this, "User cancelled the disconnect");
 
@@ -1119,35 +1133,35 @@ void ConnectActionsHandler::at_connectAction_triggered()
         disconnectFromServer(DisconnectFlag::Force);
     }
 
-    if (actionParameters.hasArgument(Qn::LogonDataRole))
+    if (logonData)
     {
-        const auto logonData = actionParameters.argument<LogonData>(Qn::LogonDataRole);
-        NX_DEBUG(this, "Connecting to the server %1", logonData.address);
+        NX_DEBUG(this, "Connecting to the server %1", logonData->address);
         NX_VERBOSE(this,
             "Connection flags: storeSession %1, storePassword %2, secondary %3",
-            logonData.storeSession,
-            logonData.storePassword,
-            logonData.secondaryInstance);
+            logonData->storeSession,
+            logonData->storePassword,
+            logonData->secondaryInstance);
 
-        if (!logonData.address.isNull())
+        if (!logonData->address.isNull())
         {
             ConnectionOptions options(UpdateSystemWeight);
-            if (logonData.storeSession)
+            if (logonData->storeSession)
                 options |= StoreSession;
 
-            if ((logonData.storePassword || appContext()->localSettings()->autoLogin())
+            if ((logonData->storePassword || appContext()->localSettings()->autoLogin())
                 && NX_ASSERT(appContext()->localSettings()->saveCredentialsAllowed()))
             {
                 options |= StorePassword;
             }
 
             // Ignore warning messages for now if one client instance is opened already.
-            if (logonData.secondaryInstance)
+            if (logonData->secondaryInstance)
                 d->warnMessagesDisplayed = true;
 
             NX_VERBOSE(this, "Connecting to the server %1 with testing before",
-                logonData.address);
-            connectToServer(logonData, options);
+                logonData->address);
+
+            connectToServer(*logonData, options);
         }
     }
     else if (NX_ASSERT(actionParameters.hasArgument(Qn::RemoteConnectionRole)))
@@ -1420,7 +1434,8 @@ bool ConnectActionsHandler::disconnectFromServer(DisconnectFlags flags)
         return false;
     }
 
-    if (flags.testFlag(DisconnectFlag::SwitchingServer))
+    if (flags.testFlag(DisconnectFlag::SwitchingServer)
+        || flags.testFlag(DisconnectFlag::SwitchingSystemTabs))
     {
         setState(LogicalState::connecting);
     }

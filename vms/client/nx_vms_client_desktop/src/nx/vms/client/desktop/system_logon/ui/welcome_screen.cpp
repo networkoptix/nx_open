@@ -250,6 +250,23 @@ void WelcomeScreen::openConnectingTile(std::optional<RemoteConnectionErrorCode> 
         this);
 }
 
+void WelcomeScreen::openArbitraryTile(const QString& systemId)
+{
+    if (!NX_ASSERT(!systemId.isEmpty()))
+        return;
+
+    executeLater(
+        [this, systemId]()
+        {
+            const auto indexes = m_systemModel->match(m_systemModel->index(0, 0),
+                QnSystemsModel::SystemIdRoleId, systemId, 1, Qt::MatchFixedString);
+
+            if (!indexes.empty())
+                emit openTileByIndex(indexes[0].row());
+        },
+        this);
+}
+
 bool WelcomeScreen::connectingTileExists() const
 {
     return !m_connectingSystemId.isEmpty();

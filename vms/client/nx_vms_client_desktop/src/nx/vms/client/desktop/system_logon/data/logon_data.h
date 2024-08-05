@@ -22,6 +22,9 @@ NX_REFLECTION_ENUM_CLASS(ConnectScenario,
     /** Connecting from the Resource Tree context menu. */
     connectFromTree,
 
+    /** Connecting from System Tab Bar. */
+    connectFromTabBar,
+
     /** Connecting using the Command Line parameters. */
     connectUsingCommand,
 

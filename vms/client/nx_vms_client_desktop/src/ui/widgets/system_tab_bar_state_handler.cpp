@@ -2,12 +2,13 @@
 
 #include "system_tab_bar_state_handler.h"
 
+#include <QtGui/QAction>
+
 #include <nx/vms/client/core/system_finder/system_description.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/action_parameters.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
-#include <ui/widgets/main_window.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/delayed.h>
 
@@ -32,12 +33,31 @@ SystemTabBarStateHandler::SystemTabBarStateHandler(QObject* parent):
         &WindowContext::beforeSystemChanged,
         this,
         &SystemTabBarStateHandler::storeWorkbenchState);
+
+    connect(action(menu::ResourcesModeAction), &QAction::toggled, this,
+        [this](bool value)
+        {
+            if (!m_store)
+                return;
+
+            const auto connectionState =
+                windowContext()->connectActionsHandler()->logicalState();
+
+            m_store->setHomeTabActive(!value
+                && connectionState != ConnectActionsHandler::LogicalState::connecting);
+
+            m_store->setExpanded(!value
+                || connectionState != ConnectActionsHandler::LogicalState::disconnected);
+        });
 }
 
 void SystemTabBarStateHandler::setStateStore(QSharedPointer<Store> store)
 {
-    disconnect(m_store.get());
+    if (m_store)
+        m_store->disconnect(this);
+
     m_store = store;
+
     if (m_store)
     {
         connect(m_store.get(),
@@ -52,42 +72,16 @@ void SystemTabBarStateHandler::at_stateChanged(const State& state)
     if (state.systems != m_storedState.systems)
         emit tabsChanged();
 
-    if (state.activeSystemTab != m_storedState.activeSystemTab)
-    {
-        emit activeSystemTabChanged(state.activeSystemTab);
-        if (const auto systemData = m_store->systemData(state.activeSystemTab))
-        {
-            const auto localSystemId = systemData->systemDescription->localId();
-            if (localSystemId != state.currentSystemId)
-            {
-                auto logonData = systemData->logonData;
-                executeLater(
-                    [this, logonData]()
-                    {
-                        menu()->trigger(menu::ConnectAction,
-                            menu::Parameters().withArgument(Qn::LogonDataRole, logonData));
-                    },
-                    this);
-            }
-        }
-    }
-
     if (state.homeTabActive != m_storedState.homeTabActive)
     {
-        mainWindow()->setWelcomeScreenVisible(state.homeTabActive);
         if (state.homeTabActive)
             emit activeSystemTabChanged(state.systems.count());
         else
             emit activeSystemTabChanged(state.activeSystemTab);
     }
-
-    if (state.currentSystemId != m_storedState.currentSystemId)
+    else if (state.activeSystemTab != m_storedState.activeSystemTab && !state.homeTabActive)
     {
-        if (state.currentSystemId.isNull()
-            && state.connectState == ConnectActionsHandler::LogicalState::connected)
-        {
-            action(menu::DisconnectMainMenuAction)->trigger();
-        }
+        emit activeSystemTabChanged(state.activeSystemTab);
     }
 
     m_storedState = state;
@@ -110,6 +104,10 @@ void SystemTabBarStateHandler::at_systemDisconnected()
 void SystemTabBarStateHandler::at_connectionStateChanged(
     ConnectActionsHandler::LogicalState logicalValue)
 {
+    m_store->setHomeTabActive(!action(menu::ResourcesModeAction)->isChecked()
+        && windowContext()->connectActionsHandler()->logicalState()
+            != ConnectActionsHandler::LogicalState::connecting);
+
     m_store->setConnectionState(logicalValue);
     if (logicalValue == ConnectActionsHandler::LogicalState::disconnected)
     {

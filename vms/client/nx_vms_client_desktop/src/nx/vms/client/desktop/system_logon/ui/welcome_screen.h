@@ -82,6 +82,8 @@ public: // Properties
 
     void openConnectingTile(std::optional<core::RemoteConnectionErrorCode> errorCode);
 
+    void openArbitraryTile(const QString& systemId);
+
     /** Check if there is an opened tile for the system, we are connecting to. */
     bool connectingTileExists() const;
     void setConnectingToSystem(const QString& value);
@@ -167,6 +169,7 @@ signals:
     void messageChanged();
     void openTile(const QString& systemId, const QString& errorMessage = "",
         bool isLoginError = false);
+    void openTileByIndex(int index);
     void closeTile(const QString& systemId);
     void connectionToSystemRevoked();
     void switchPage(int pageIndex);

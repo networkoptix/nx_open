@@ -11,10 +11,13 @@
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QToolButton>
 
+#include <nx/vms/client/core/network/credentials_manager.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/system_finder/system_description.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/menu/action_parameters.h>
 #include <nx/vms/client/desktop/skin/font_config.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
@@ -24,6 +27,7 @@
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/common/indents.h>
+#include <ui/widgets/main_window.h>
 #include <ui/widgets/main_window_title_bar_state.h>
 #include <ui/widgets/system_tab_bar_state_handler.h>
 #include <ui/workaround/hidpi_workarounds.h>
@@ -32,6 +36,7 @@
 #include "private/close_tab_button.h"
 
 namespace {
+
 static const int kFixedTabSizeHeight = 32;
 static const int kFixedHomeIconWidth = 32;
 static const int kFixedWideHomeIconWidth = 65;
@@ -87,33 +92,88 @@ SystemTabBar::SystemTabBar(QWidget* parent):
 
     // Home tab
     addTab("");
-    auto closeButton = new CloseTabButton(this);
+    const auto closeButton = new CloseTabButton(this);
     setTabButton(0, RightSide, closeButton);
+
     connect(closeButton, &CloseTabButton::clicked, this,
         [this]()
         {
-            if (m_store)
-                m_store->setHomeTabActive(false);
+            const auto state = m_store->state();
+
+            const auto systemIndex =
+                state.activeSystemTab >= 0 && state.activeSystemTab < state.systems.size()
+                    ? state.activeSystemTab
+                    : (state.systems.size() - 1);
+
+            if (systemIndex >= 0)
+            {
+                const auto systemData = state.systems[systemIndex];
+                if (systemData.systemDescription->localId() == state.currentSystemId)
+                    action(menu::ResourcesModeAction)->setChecked(true);
+                else
+                    connectToSystem(systemData.systemDescription, systemData.logonData);
+            }
         });
+
     updateHomeTabView();
+}
+
+void SystemTabBar::connectToSystem(
+    const core::SystemDescriptionPtr& system, const LogonData& logonData)
+{
+    executeLater(
+        [this, system, ld = logonData]()
+        {
+            auto logonData = adjustedLogonData(ld, system->localId());
+            if (logonData.credentials.authToken.empty())
+            {
+                action(menu::ResourcesModeAction)->setChecked(false);
+                mainWindow()->welcomeScreen()->openArbitraryTile(system->id());
+                m_store->removeSystem(system->localId());
+                return;
+            }
+
+            menu()->trigger(menu::ConnectAction, menu::Parameters()
+                .withArgument(Qn::LogonDataRole, logonData));
+        },
+        this);
+}
+
+LogonData SystemTabBar::adjustedLogonData(const LogonData& source, const nx::Uuid& localId) const
+{
+    LogonData adjusted = source;
+
+    if (const auto credentials = core::CredentialsManager::credentials(localId);
+        !credentials.empty())
+    {
+        adjusted.credentials = credentials[0];
+    }
+
+    adjusted.connectScenario = ConnectScenario::connectFromTabBar;
+    adjusted.storePassword = true; //< We don't want to clear a saved password.
+
+    return adjusted;
 }
 
 void SystemTabBar::setStateStore(QSharedPointer<Store> store,
     QSharedPointer<StateHandler> stateHandler)
 {
-    disconnect(m_store.get());
+    if (m_store)
+        m_store->disconnect(this);
+
+    if (m_stateHandler)
+        m_stateHandler->disconnect(this);
+
     m_store = store;
     m_stateHandler = stateHandler;
+
     connect(m_stateHandler.get(), &StateHandler::tabsChanged, this, &SystemTabBar::rebuildTabs);
-    connect(m_stateHandler.get(), &StateHandler::activeSystemTabChanged, this, [this](int index)
+
+    connect(m_stateHandler.get(), &StateHandler::activeSystemTabChanged, this,
+        [this](int index)
         {
             setCurrentIndex(index);
             updateHomeTabView();
-        });
-    connect(m_store.get(), &Store::systemNameChanged, this,
-        [this](int index, const QString& text)
-        {
-            setTabText(index, text);
         });
 }
 
@@ -134,6 +194,7 @@ void SystemTabBar::rebuildTabs()
 
     while (count() - 1 > m_store->systemCount())
         removeTab(homeTabIndex() - 1);
+
     updateHomeTabView();
 }
 
@@ -179,15 +240,17 @@ void SystemTabBar::mousePressEvent(QMouseEvent* event)
 
     m_dragStartPosition = event->pos();
     const int index = tabAt(event->pos());
+
     if (isHomeTab(index))
     {
-        m_store->setHomeTabActive(true);
+        action(menu::ResourcesModeAction)->setChecked(false);
     }
-    else
+    else if (const auto systemData = m_store->systemData(index))
     {
-        m_store->setHomeTabActive(false);
-        if (m_store->state().activeSystemTab != index && index >= 0)
-            m_store->setActiveSystemTab(index);
+        if (systemData->systemDescription->localId() == m_store->state().currentSystemId)
+            action(menu::ResourcesModeAction)->setChecked(true);
+        else
+            connectToSystem(systemData->systemDescription, systemData->logonData);
     }
 }
 
@@ -224,6 +287,7 @@ void SystemTabBar::dragEnterEvent(QDragEnterEvent* event)
     if (event->mimeData()->data("action") == kDragActionMimeData)
         event->acceptProposedAction();
 }
+
 void SystemTabBar::dropEvent(QDropEvent* event)
 {
     const auto mimeData = event->mimeData();
@@ -253,16 +317,57 @@ void SystemTabBar::contextMenuEvent(QContextMenuEvent* event)
     menu.addAction(tr("Disconnect"),
         [this, index]()
         {
-            if (windowContext()->connectActionsHandler()->askDisconnectConfirmation())
-                m_store->removeSystem(index);
+            if (const auto systemData = m_store->systemData(index))
+                disconnectFromSystem(systemData->systemDescription->localId());
         });
 
-    menu.addAction(tr("Open in New Window"), [this, index]()
+    menu.addAction(tr("Open in New Window"),
+        [this, index]()
         {
             if (const auto systemData = m_store->systemData(index))
-                appContext()->clientStateHandler()->createNewWindow(systemData->logonData);
+            {
+                const auto logonData = adjustedLogonData(systemData->logonData,
+                    systemData->systemDescription->localId());
+
+                if (logonData.credentials.authToken.empty())
+                {
+                    // TODO: VMS-54449: Request missing credentials.
+                }
+
+                appContext()->clientStateHandler()->createNewWindow(logonData);
+            }
         });
+
     QnHiDpiWorkarounds::showMenu(&menu, QCursor::pos());
+}
+
+bool SystemTabBar::disconnectFromSystem(const nx::Uuid& localId)
+{
+    if (!windowContext()->connectActionsHandler()->askDisconnectConfirmation())
+        return false;
+
+    const auto state = m_store->state();
+    if (state.currentSystemId == localId)
+    {
+        if (state.systems.size() == 1)
+            action(menu::ResourcesModeAction)->setChecked(false);
+
+        if (isHomeTabActive())
+        {
+            action(menu::DisconnectAction)->trigger();
+        }
+        else
+        {
+            const int systemIndex = state.activeSystemTab == state.systems.size() - 1
+                ? (state.activeSystemTab - 1)
+                : (state.activeSystemTab + 1);
+
+            const auto systemData = state.systems[systemIndex];
+            connectToSystem(systemData.systemDescription, systemData.logonData);
+        }
+    }
+
+    return true;
 }
 
 void SystemTabBar::insertClosableTab(int index,
@@ -272,12 +377,30 @@ void SystemTabBar::insertClosableTab(int index,
     insertTab(index, text);
     setTabData(index, QVariant::fromValue(systemDescription));
 
-    QAbstractButton* closeButton = new CloseTabButton(this);
+    const auto closeButton = new CloseTabButton(this);
     connect(closeButton, &CloseTabButton::clicked,
-        [this, systemId = systemDescription->localId()]()
+        [this, localId = systemDescription->localId()]()
         {
-            m_store->removeSystem(systemId);
+            if (disconnectFromSystem(localId))
+                m_store->removeSystem(localId);
         });
+
+    // closeButton is owned by the tab, so we can use it as a receiver here.
+    // This connection is deleted when the tab is removed.
+    connect(systemDescription.get(), &core::SystemDescription::systemNameChanged, closeButton,
+        [this, systemDescription]()
+        {
+            const auto data = QVariant::fromValue(systemDescription);
+            for (int i = 0; i < count(); ++i)
+            {
+                if (tabData(i) == data)
+                {
+                    setTabText(i, systemDescription->name());
+                    break;
+                }
+            }
+        });
+
     setTabButton(index, RightSide, closeButton);
 }
 

@@ -26,7 +26,7 @@ struct MainWindowTitleBarState
     };
 
     bool expanded = false;
-    bool homeTabActive = false;
+    bool homeTabActive = true;
     nx::Uuid currentSystemId;
     int activeSystemTab = -1;
     ConnectActionsHandler::LogicalState connectState =
@@ -83,7 +83,6 @@ public:
 
 signals:
     void stateChanged(const State& state);
-    void systemNameChanged(int index, const QString& name);
 
 private:
     class StateDelegate;

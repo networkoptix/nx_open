@@ -13,6 +13,7 @@ namespace nx::vms::client::desktop {
 struct MainWindowTitleBarState;
 class MainWindowTitleBarStateStore;
 class SystemTabBarStateHandler;
+struct LogonData;
 
 class SystemTabBar:
     public QTabBar,
@@ -47,7 +48,10 @@ private:
     bool isHomeTab(int index) const;
     int homeTabIndex() const;
     void updateHomeTabView();
+    void connectToSystem(const core::SystemDescriptionPtr& system, const LogonData& logonData);
+    bool disconnectFromSystem(const nx::Uuid& localId);
     QPixmap imageData(int tabIndex) const;
+    LogonData adjustedLogonData(const LogonData& source, const nx::Uuid& localId) const;
 
 private:
     bool m_updating = false;

@@ -402,7 +402,7 @@ void initialize(Manager* manager, Action* root)
         .mode(DesktopMode)
         .text(ContextMenu::tr("Browse Local Files"))
         .toggledText(ContextMenu::tr("Show Welcome Screen"))
-        .condition(!condition::isLoggedIn() && condition::homeTabIsNotActive());
+        .condition(!condition::isLoggedIn());
 
     factory()
         .flags(Main | Tree)

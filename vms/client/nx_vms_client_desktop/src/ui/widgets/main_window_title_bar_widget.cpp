@@ -302,11 +302,16 @@ void QnMainWindowTitleBarWidget::setStateStore(QSharedPointer<Store> store,
 {
     Q_D(QnMainWindowTitleBarWidget);
     d->store = store;
+
     connect(this, &QnMainWindowTitleBarWidget::toggled,
         store.get(), &MainWindowTitleBarStateStore::setExpanded);
+
     connect(store.get(), &MainWindowTitleBarStateStore::stateChanged, this,
         [this, store](MainWindowTitleBarState state)
         {
+            Q_D(QnMainWindowTitleBarWidget);
+            d->resizer->setEnabled(!state.homeTabActive);
+
             if (state.expanded)
                 expand();
             else
@@ -315,6 +320,8 @@ void QnMainWindowTitleBarWidget::setStateStore(QSharedPointer<Store> store,
             setEnabled(store->isTitleBarEnabled());
             hideLayoutPanel(store->isLayoutPanelHidden());
         });
+
+    d->resizer->setEnabled(!d->store->state().homeTabActive);
     d->systemBar->setStateStore(store, stateHandler);
 }
 
