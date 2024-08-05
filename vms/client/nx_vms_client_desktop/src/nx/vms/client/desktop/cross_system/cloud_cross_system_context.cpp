@@ -35,6 +35,7 @@
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/common/system_settings.h>
+#include <nx/vms/discovery/manager.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <utils/common/delayed.h>
 #include <utils/common/synctime.h>
@@ -72,6 +73,10 @@ struct CloudCrossSystemContext::Private
         systemContext = std::make_unique<SystemContext>(
             SystemContext::Mode::crossSystem,
             appContext()->peerId());
+
+        systemContext->startModuleDiscovery(
+            new nx::vms::discovery::Manager(systemContext.get()));
+        systemContext->moduleDiscoveryManager()->startModuleConnectorOnly();
 
         systemContext->resourceDataPool()->setExternalSource(
             appContext()->currentSystemContext()->resourceDataPool());
@@ -481,11 +486,9 @@ struct CloudCrossSystemContext::Private
                 continue;
             }
 
-            const QString cloudAddress = helpers::serverCloudHost(cloudSystemId, server.id);
-
             CrossSystemServerResourcePtr newServer(new CrossSystemServerResource(
                 server.id,
-                cloudAddress.toStdString(),
+                cloudSystemId.toStdString(),
                 systemContext->connection()));
             newServer->setName(server.name);
 
