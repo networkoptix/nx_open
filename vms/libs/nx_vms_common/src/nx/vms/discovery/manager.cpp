@@ -289,6 +289,11 @@ void Manager::start(QnResourcePool* resourcePool)
         handleServerAdded(server);
 }
 
+void Manager::startModuleConnectorOnly()
+{
+    d->moduleConnector->activate();
+}
+
 void Manager::stop()
 {
     d->resourcePoolConnections.reset();

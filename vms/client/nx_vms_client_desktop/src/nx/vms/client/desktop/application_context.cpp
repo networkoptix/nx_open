@@ -734,7 +734,7 @@ ApplicationContext::ApplicationContext(
             d->initializeNetworkModules();
             d->initializeSystemContext();
             d->initializeCrossSystemModules();
-            d->mainSystemContext->enableRouting(moduleDiscoveryManager());
+            d->mainSystemContext->startModuleDiscovery(moduleDiscoveryManager());
             d->initializeClientCoreModule();
             d->initializeQml();
             d->initializeLocalResourcesSearch();

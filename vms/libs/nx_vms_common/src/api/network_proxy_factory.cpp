@@ -73,9 +73,6 @@ QNetworkProxy QnNetworkProxyFactory::proxyToResource(
     if (!context)
         return QNetworkProxy(QNetworkProxy::NoProxy);
 
-    if (!context->isRoutingEnabled()) //< Cloud cross-system contexts have no routing.
-        return QNetworkProxy(QNetworkProxy::NoProxy);
-
     QnMediaServerResourcePtr server;
     auto camera = resource.dynamicCast<QnSecurityCamResource>();
     if (camera)

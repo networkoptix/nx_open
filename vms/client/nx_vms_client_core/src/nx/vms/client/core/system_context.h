@@ -159,6 +159,9 @@ public:
 
     AccessController* accessController() const;
 
+    virtual void startModuleDiscovery(
+        nx::vms::discovery::Manager* moduleDiscoveryManager) override;
+
     VideoCache* videoCache() const;
 
     AnalyticsEventsSearchTreeBuilder* analyticsEventsSearchTreeBuilder() const;
