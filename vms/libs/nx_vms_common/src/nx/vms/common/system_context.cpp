@@ -99,14 +99,9 @@ AbstractCertificateVerifier* SystemContext::certificateVerifier() const
     return d->certificateVerifier;
 }
 
-void SystemContext::enableRouting(nx::vms::discovery::Manager* moduleDiscoveryManager)
+void SystemContext::startModuleDiscovery(nx::vms::discovery::Manager* moduleDiscoveryManager)
 {
     d->moduleDiscoveryManager = moduleDiscoveryManager;
-}
-
-bool SystemContext::isRoutingEnabled() const
-{
-    return !d->moduleDiscoveryManager.isNull();
 }
 
 nx::vms::discovery::Manager* SystemContext::moduleDiscoveryManager() const
