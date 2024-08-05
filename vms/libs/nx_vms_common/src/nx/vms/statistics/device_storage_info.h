@@ -12,21 +12,21 @@ namespace nx::vms::statistics {
 struct NX_VMS_COMMON_API StreamStorageInfo
 {
     std::optional<std::chrono::seconds> archiveSizeS;
-    std::optional<qint64> archiveSizeMb;
+    std::optional<qint64> archiveSizeB;
     std::optional<qint64> archiveIndexRecordCount;
 
     auto operator<=>(const StreamStorageInfo& other) const = default;
 };
-#define StreamStorageInfo_Fields (archiveSizeS)(archiveSizeMb)(archiveIndexRecordCount)
+#define StreamStorageInfo_Fields (archiveSizeS)(archiveSizeB)(archiveIndexRecordCount)
 
 struct NX_VMS_COMMON_API CountAndAverageSize
 {
     std::optional<qint64> recordCount;
-    std::optional<int> recordAverageSize;
+    std::optional<int> recordAverageSizeB;
 
     auto operator<=>(const CountAndAverageSize& other) const = default;
 };
-#define CountAndAverageSize_Fields (recordCount)(recordAverageSize)
+#define CountAndAverageSize_Fields (recordCount)(recordAverageSizeB)
 
 struct NX_VMS_COMMON_API DeviceStorageInfo
 {
