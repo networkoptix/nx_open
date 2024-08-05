@@ -50,7 +50,8 @@ public:
         ClearAutoLogin = 1 << 1,
         /** Disconnecting by pressing Menu->Disconnect. */
         ManualDisconnect = 1 << 2,
-        SwitchingServer = 1 << 3
+        SwitchingServer = 1 << 3,
+        SwitchingSystemTabs = 1 << 4
     };
     Q_DECLARE_FLAGS(DisconnectFlags, DisconnectFlag)
 
@@ -59,6 +60,8 @@ public:
     ~ConnectActionsHandler();
 
     bool askDisconnectConfirmation() const;
+
+    LogicalState logicalState() const;
 
 signals:
     void stateChanged(LogicalState logicalValue, QPrivateSignal);
@@ -72,8 +75,6 @@ private:
         StorePreferredCloudServer = 1 << 3,
     };
     Q_DECLARE_FLAGS(ConnectionOptions, ConnectionOption)
-
-    LogicalState logicalState() const;
 
     bool disconnectFromServer(DisconnectFlags flags);
 

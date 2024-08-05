@@ -263,6 +263,20 @@ Item
                     }
                 }
 
+                function onOpenTileByIndex(index)
+                {
+                    closeOpenedTile()
+
+                    if (index < 0)
+                        return
+
+                    grid.positionViewAtIndex(index, GridView.Beginning)
+                    const item = grid.itemAtIndex(index)
+
+                    if (item)
+                        item.item.expand()
+                }
+
                 function onCloseTile(systemId)
                 {
                     let item = findTile(systemId)
