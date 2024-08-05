@@ -247,14 +247,15 @@ QnResourceList SystemHealthListModel::Private::displayedResourceList(int index) 
     const auto message = messageType(index);
     switch (message)
     {
-        case MessageType::archiveIntegrityFailed:
         case MessageType::archiveRebuildFinished:
         case MessageType::archiveRebuildCanceled:
-        case MessageType::remoteArchiveSyncError:
-        case MessageType::defaultCameraPasswords:
-        //< Requires implementation on message side to get resource list.
-            return getSortedResourceList(message);
+            return parameters(index).resources();
 
+        case MessageType::remoteArchiveSyncError:
+        case MessageType::archiveIntegrityFailed:
+            return m_items[index].serverData->getSourceResources(system()->resourcePool());
+
+        case MessageType::defaultCameraPasswords:
         case MessageType::usersEmailIsEmpty:
         case MessageType::storagesNotConfigured:
         case MessageType::backupStoragesNotConfigured:
@@ -755,6 +756,9 @@ QString SystemHealthListModel::Private::decorationPath(MessageType message)
         case MessageType::smtpIsNotSet:
             return "20x20/Outline/server.svg";
 
+        case MessageType::archiveRebuildCanceled:
+            return "20x20/Outline/error.svg";
+
         case MessageType::emailIsEmpty:
         case MessageType::usersEmailIsEmpty:
             return "20x20/Outline/email.svg";
@@ -767,7 +771,6 @@ QString SystemHealthListModel::Private::decorationPath(MessageType message)
 
         case MessageType::backupStoragesNotConfigured:
         case MessageType::storagesNotConfigured:
-        case MessageType::archiveRebuildCanceled:
         case MessageType::metadataOnSystemStorage:
             return "20x20/Outline/storage.svg";
 
