@@ -260,12 +260,11 @@ void OpenLayoutActionWidget::updateLayoutsButton()
         const bool isWarning = m_layoutWarning != LayoutWarning::NoWarning;
         setWarningStyleOn(button, isWarning);
         const QnIcon::Mode iconMode = isWarning ? QnIcon::Error : QnIcon::Selected;
-        QnResourceIconCache::Key iconKey = QnResourceIconCache::Layout;
 
-        if (layout->isShared())
-            iconKey = QnResourceIconCache::SharedLayout;
-        else if (layout->locked())
-            iconKey = QnResourceIconCache::Layout | QnResourceIconCache::Locked;
+        const QnResourceIconCache::Key iconKey = layout->isShared()
+            ? QnResourceIconCache::SharedLayout
+            : QnResourceIconCache::Layout;
+
         button->setIcon(icon(iconKey, iconMode));
     }
     else

@@ -253,12 +253,7 @@ GenericItem::FlagsProvider cloudSystemFlagsProvider(const QString& systemId)
 GenericItem::DataProvider cloudLayoutIconProvider(const QnLayoutResourcePtr& layout)
 {
     return
-        [layout]
-        {
-            return layout->locked()
-                ? static_cast<int>(QnResourceIconCache::CloudLayout | QnResourceIconCache::Locked)
-                : static_cast<int>(QnResourceIconCache::CloudLayout);
-        };
+        []() -> int { return QnResourceIconCache::CloudLayout; };
 }
 
 InvalidatorPtr cloudLayoutIconInvalidator(const QnLayoutResourcePtr& layout)
