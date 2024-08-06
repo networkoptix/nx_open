@@ -47,7 +47,11 @@ public:
     nx::utils::Url getCurrentStreamUrl() const;
 
     static bool probeStream(
-        const char* address, const char* login, const char* password, std::chrono::seconds timeout);
+        const char* address,
+        const char* login,
+        const char* password,
+        std::chrono::seconds timeout,
+        bool fast = false);
 
     static const std::string& cloudAddressTemplate();
 

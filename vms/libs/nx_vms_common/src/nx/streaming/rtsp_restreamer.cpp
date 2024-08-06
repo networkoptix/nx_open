@@ -6,10 +6,51 @@
 #include <nx/network/address_resolver.h>
 #include <nx/network/http/http_client.h>
 #include <nx/network/socket_global.h>
+#include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/api/data/login.h>
 
 using namespace nx;
+
+namespace {
+
+CameraDiagnostics::Result probeStreamWithClient(
+    const nx::utils::Url& url,
+    std::chrono::seconds timeout,
+    bool useCloud,
+    const std::optional<nx::network::http::Credentials>& credentials,
+    std::optional<nx::network::http::header::AuthScheme::Value> authScheme)
+{
+    QnRtspClient rtspClient(QnRtspClient::Config{});
+    rtspClient.setTCPTimeout(timeout);
+    if (useCloud)
+        rtspClient.setCloudConnectEnabled(true);
+    if (credentials && authScheme)
+        rtspClient.setCredentials(*credentials, *authScheme);
+
+    return rtspClient.open(url);
+}
+
+CameraDiagnostics::Result probeStreamWithTcpConnect(
+    const nx::utils::Url& url,
+    std::chrono::seconds timeout,
+    bool useCloud)
+{
+    using namespace nx::network;
+    bool isSslRequired =
+        (url.scheme().toLower().toUtf8() == rtsp::kSecureUrlSchemeName);
+
+    auto tcpSocket = SocketFactory::createStreamSocket(
+        nx::network::ssl::kAcceptAnyCertificate,
+        isSslRequired,
+        useCloud ? NatTraversalSupport::enabled : NatTraversalSupport::disabled);
+    SocketAddress targetAddress = url::getEndpoint(url, rtsp::DEFAULT_RTSP_PORT);
+    if (!tcpSocket->connect(targetAddress, std::chrono::duration_cast<std::chrono::milliseconds>(timeout)))
+        return CameraDiagnostics::CannotOpenCameraMediaPortResult(url, targetAddress.port);
+    return CameraDiagnostics::NoErrorResult();
+}
+
+} // namespace
 
 namespace nx::streaming {
 
@@ -97,7 +138,11 @@ QnAbstractMediaDataPtr RtspRestreamer::getNextData()
 }
 
 bool RtspRestreamer::probeStream(
-    const char* address, const char* login, const char* password, std::chrono::seconds timeout)
+    const char* address,
+    const char* login,
+    const char* password,
+    std::chrono::seconds timeout,
+    bool fast)
 {
     nx::utils::Url url(address);
     bool force = false;
@@ -116,25 +161,25 @@ bool RtspRestreamer::probeStream(
             NX_ASSERT(!token.empty());
 
         }
-        QnRtspClient rtspClient(QnRtspClient::Config{});
-        rtspClient.setTCPTimeout(timeout);
+        std::optional<nx::network::http::Credentials> credentials;
+        std::optional<nx::network::http::header::AuthScheme::Value> authScheme;
         if (useCloud)
         {
-            rtspClient.setCloudConnectEnabled(true);
-            rtspClient.setCredentials(
-                nx::network::http::BearerAuthToken(token),
-                nx::network::http::header::AuthScheme::bearer);
+            credentials = nx::network::http::BearerAuthToken(token);
+            authScheme = nx::network::http::header::AuthScheme::bearer;
         }
         else if (login && password)
         {
             QAuthenticator auth;
             auth.setUser(QString::fromUtf8(login));
             auth.setPassword(QString::fromUtf8(password));
-            rtspClient.setCredentials(
-                nx::network::http::Credentials(auth), nx::network::http::header::AuthScheme::digest);
+            credentials = nx::network::http::Credentials(auth);
+            authScheme = nx::network::http::header::AuthScheme::digest;
         }
 
-        auto result = rtspClient.open(url);
+        auto result = fast
+            ? probeStreamWithTcpConnect(url, timeout, useCloud)
+            : probeStreamWithClient(url, timeout, useCloud, credentials, authScheme);
         if (result.errorCode == CameraDiagnostics::ErrorCode::noError)
             return true;
         else if (result.errorCode != CameraDiagnostics::ErrorCode::unsupportedProtocol)
