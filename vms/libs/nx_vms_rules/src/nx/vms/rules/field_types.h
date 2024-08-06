@@ -44,7 +44,8 @@ NX_REFLECTION_ENUM_CLASS(ObjectLookupCheckType,
 struct AuthenticationInfo
 {
     nx::network::http::SerializableCredentials credentials;
-    nx::network::http::AuthType authType;
+    nx::network::http::AuthType authType = nx::network::http::AuthType::authBasicAndDigest;
+
     bool operator==(const AuthenticationInfo&) const = default;
 };
 

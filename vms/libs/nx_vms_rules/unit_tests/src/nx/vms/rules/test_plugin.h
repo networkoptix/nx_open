@@ -28,12 +28,7 @@ public:
         registerEventField<StateField>();
         registerEventField<TestEventField>();
 
-        m_engine->registerActionField(
-            fieldMetatype<EmailMessageField>(),
-            [this](const FieldDescriptor* descriptor)
-            {
-                return new EmailMessageField(m_engine->systemContext(), descriptor);
-            });
+        registerActionField<EmailMessageField>(m_engine->systemContext());
         registerActionField<TestActionField>();
         registerActionField<TargetDeviceField>();
         registerActionField<OptionalTimeField>();

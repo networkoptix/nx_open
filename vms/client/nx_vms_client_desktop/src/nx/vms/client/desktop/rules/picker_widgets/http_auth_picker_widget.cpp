@@ -121,21 +121,21 @@ HttpAuthPicker::~HttpAuthPicker()
 
 void HttpAuthPicker::onLoginChanged(const QString& text)
 {
-    m_field->setLogin(text.toStdString());
+    m_field->setLogin(text);
 
     setEdited();
 }
 
 void HttpAuthPicker::onPasswordChanged(const QString& text)
 {
-    m_field->setPassword(text.toStdString());
+    m_field->setPassword(text);
 
     setEdited();
 }
 
 void HttpAuthPicker::onTokenChanged(const QString& text)
 {
-    m_field->setToken(text.toStdString());
+    m_field->setToken(text);
 
     setEdited();
 }
@@ -167,9 +167,9 @@ void HttpAuthPicker::updateUi()
     d->loginPasswordGroup->setVisible(!isBearer);
     d->tokenGroup->setVisible(isBearer);
 
-    d->login->setText(QString::fromStdString(m_field->login()));
-    d->password->setText(QString::fromStdString(m_field->password()));
-    d->token->setText(QString::fromStdString(m_field->token()));
+    d->login->setText(m_field->login());
+    d->password->setText(m_field->password());
+    d->token->setText(m_field->token());
 }
 
 void HttpAuthPicker::onCurrentIndexChanged(int /*index*/)

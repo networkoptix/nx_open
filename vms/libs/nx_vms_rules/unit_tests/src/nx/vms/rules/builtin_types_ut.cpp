@@ -163,14 +163,24 @@ public:
 
     }
 
-    template<class T>
+    template<class F>
     void testActionFieldRegistration(auto... args)
     {
-        SCOPED_TRACE(fieldMetatype<T>().toStdString());
+        SCOPED_TRACE(fieldMetatype<F>().toStdString());
 
-        EXPECT_TRUE(m_engine->registerActionField(
-            fieldMetatype<T>(),
-            [args...](const FieldDescriptor* descriptor){ return new T(args..., descriptor); }));
+        EXPECT_TRUE(Plugin::registerActionField<F>(m_engine, args...));
+
+        const auto& meta = F::staticMetaObject;
+
+        for (const auto& propName: encryptedProperties<F>())
+        {
+            SCOPED_TRACE(propName.toStdString());
+            const auto idx = meta.indexOfProperty(propName.toUtf8().constData());
+            ASSERT_GE(idx, 0);
+
+            const auto prop = meta.property(idx);
+            EXPECT_EQ(prop.userType(), qMetaTypeId<QString>());
+        }
     }
 
     template<class T>

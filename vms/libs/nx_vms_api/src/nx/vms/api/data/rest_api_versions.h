@@ -3,18 +3,19 @@
 #pragma once
 
 #include <array>
-#include <string_view>
 #include <string>
+#include <string_view>
 
 #include "data_macros.h"
 
 constexpr std::array<std::string_view, 4> kRestApiVersions{"v1", "v2", "v3", "v4"};
-using VersionIterator = std::array<std::string_view, kRestApiVersions.size()>::const_iterator;
 
-constexpr auto kRestApiV1 = kRestApiVersions.begin();
+constexpr auto kRestApiV1 = kRestApiVersions.cbegin();
 constexpr auto kRestApiV2 = std::next(kRestApiV1);
 constexpr auto kRestApiV3 = std::next(kRestApiV2);
 constexpr auto kRestApiV4 = std::next(kRestApiV3);
+constexpr auto kRestApiEnd = kRestApiVersions.cend();
+
 constexpr std::string_view kLegacyApi = "legacy";
 
 namespace nx::vms::api {

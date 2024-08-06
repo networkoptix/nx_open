@@ -453,20 +453,30 @@ std::optional<ItemDescriptor> Engine::actionDescriptor(const QString& actionId) 
 
 bool Engine::registerEventField(const QString& type, const EventFieldConstructor& ctor)
 {
-    if (m_eventFields.contains(type))
+    if (isEventFieldRegistered(type))
         return false;
 
     m_eventFields[type] = ctor;
     return true;
 }
 
-bool Engine::registerActionField(const QString& type, const ActionFieldConstructor& ctor)
+bool Engine::registerActionField(const QString& type, const ActionFieldRecord& record)
 {
-    if (m_actionFields.contains(type))
+    if (isActionFieldRegistered(type))
         return false;
 
-    m_actionFields[type] = ctor;
+    m_actionFields.insert(type, record);
     return true;
+}
+
+const QSet<QString>& Engine::encryptedActionBuilderProperties(const QString& type) const
+{
+    static const QSet<QString> kEmpty;
+
+    const auto it = m_actionFields.find(type);
+    return NX_ASSERT(it != m_actionFields.end(), "Unregistered field type: %1", type)
+        ? it.value().encryptedFields
+        : kEmpty;
 }
 
 std::unique_ptr<Rule> Engine::buildRule(const api::Rule& serialized) const
@@ -792,22 +802,23 @@ std::unique_ptr<ActionBuilderField> Engine::buildActionField(
     return field;
 }
 
-std::unique_ptr<ActionBuilderField> Engine::buildActionField(const FieldDescriptor* descriptor) const
+std::unique_ptr<ActionBuilderField> Engine::buildActionField(
+    const FieldDescriptor* descriptor) const
 {
-    const auto& constructor = m_actionFields.value(descriptor->id);
-    if (!constructor)
+    const auto it = m_actionFields.find(descriptor->id);
+    if (it == m_actionFields.end())
     {
         NX_ERROR(
             this,
             "Failed to build action field as an action field for the %1 type is not registered",
             descriptor->id);
 
-        return nullptr; // TODO: #spanasenko Default field type
+        return {};
     }
 
-    std::unique_ptr<ActionBuilderField> field(constructor(descriptor));
+    std::unique_ptr<ActionBuilderField> field(it->constructor(descriptor));
 
-    NX_ASSERT(field, "Field constructor returns nullptr");
+    NX_ASSERT(field, "Field constructor returns nullptr: %1", descriptor->id);
 
     return field;
 }

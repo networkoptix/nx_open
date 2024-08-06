@@ -88,6 +88,7 @@ void Initializer::registerActions() const
 
 void Initializer::registerFields() const
 {
+    // Event filter fields.
     registerEventField<AnalyticsEngineField>();
     registerEventField<AnalyticsEventLevelField>();
     m_engine->registerEventField(
@@ -135,23 +136,14 @@ void Initializer::registerFields() const
         });
     registerEventField<UniqueIdField>();
 
+    // Action builder fields.
     registerActionField<ActionIntField>();
     registerActionField<ActionTextField>();
     registerActionField<ActionFlagField>();
     registerActionField<FpsField>();
     registerActionField<ContentTypeField>();
-    m_engine->registerActionField(
-        fieldMetatype<EmailMessageField>(),
-        [this](const FieldDescriptor* descriptor)
-        {
-            return new EmailMessageField(this->m_context, descriptor);
-        });
-    m_engine->registerActionField(
-        fieldMetatype<ExtractDetailField>(),
-        [this](const FieldDescriptor* descriptor)
-        {
-            return new ExtractDetailField(this->m_context, descriptor);
-        });
+    registerActionField<EmailMessageField>(this->m_context);
+    registerActionField<ExtractDetailField>(this->m_context);
     registerActionField<EventIdField>();
     registerActionField<EventDevicesField>();
     registerActionField<HttpAuthTypeField>();
@@ -165,24 +157,9 @@ void Initializer::registerFields() const
     registerActionField<StreamQualityField>();
     registerActionField<TargetDeviceField>();
     registerActionField<TargetServerField>();
-    m_engine->registerActionField(
-        fieldMetatype<TargetUserField>(),
-        [this](const FieldDescriptor* descriptor)
-        {
-            return new TargetUserField(this->m_context, descriptor);
-        });
-    m_engine->registerActionField(
-        fieldMetatype<TextFormatter>(),
-        [this](const FieldDescriptor* descriptor)
-        {
-            return new TextFormatter(this->m_context, descriptor);
-        });
-    m_engine->registerActionField(
-        fieldMetatype<TextWithFields>(),
-        [this](const FieldDescriptor* descriptor)
-        {
-            return new TextWithFields(this->m_context, descriptor);
-        });
+    registerActionField<TargetUserField>(this->m_context);
+    registerActionField<TextFormatter>(this->m_context);
+    registerActionField<TextWithFields>(this->m_context);
     registerActionField<Substitution>();
     registerActionField<TargetLayoutField>();
     registerActionField<TargetSingleDeviceField>();
