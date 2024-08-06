@@ -12,7 +12,7 @@
 #include <nx/vms/rules/utils/event_parameter_helper.h>
 #include <nx/vms/rules/utils/field.h>
 
-#include "../utils/completer.h"
+#include "../utils/event_parameter_completer.h"
 
 namespace nx::vms::client::desktop::rules {
 
@@ -28,7 +28,7 @@ struct TextWithFieldsPicker::Private: public QObject
         bool operator==(const EventTrackableData&) const = default;
     };
 
-    Completer* completer{nullptr};
+    EventParameterCompleter* completer{nullptr};
     TextWithFieldsPicker* const q;
     EventTrackableData currentEventData;
 
@@ -53,33 +53,41 @@ struct TextWithFieldsPicker::Private: public QObject
         return charFormat;
     }
 
+    QTextCharFormat getDefaultCharFormat(QTextCharFormat charFormat) const
+    {
+        charFormat.setForeground(q->palette().text());
+        charFormat.setUnderlineStyle(QTextCharFormat::UnderlineStyle::NoUnderline);
+        return charFormat;
+    }
+
     void addFormattingToText(const vms::rules::TextWithFields::ParsedValues& parsedValues)
     {
         if (q->m_textEdit->toPlainText().isEmpty())
             return;
 
         auto textCursor = q->m_textEdit->textCursor();
-        const auto charFormat = textCursor.charFormat();
-        const auto correctCharFormat = getCorrectCharFormat(charFormat);
-        const auto incorrectCharFromat = getIncorrectCharFormat(charFormat);
+        const auto currentCharFormat = textCursor.charFormat();
+        const auto defaultCharFormat = getDefaultCharFormat(currentCharFormat);
+        const auto correctCharFormat = getCorrectCharFormat(defaultCharFormat);
+        const auto incorrectCharFormat = getIncorrectCharFormat(defaultCharFormat);
 
         // To change color of part of text from QTextEditor and keep normal behaviour of cursor,
         // have to create a selection by copied cursor, and change char format of selection.
         // The original cursor and text from QTextEditor kept intact.
         for (auto& val: parsedValues)
         {
-            if (val.type != vms::rules::TextWithFields::FieldType::Substitution)
-                continue;
-
             QTextCursor cursor = textCursor;
             cursor.setPosition(val.start);
             cursor.setPosition(val.start + val.length, QTextCursor::KeepAnchor);
 
-            cursor.setCharFormat(val.isValid ? correctCharFormat : incorrectCharFromat);
+            if (val.type == vms::rules::TextWithFields::FieldType::Substitution)
+                cursor.setCharFormat(val.isValid ? correctCharFormat : incorrectCharFormat);
+            else
+                cursor.setCharFormat(defaultCharFormat);
         }
 
         // Resetting char format, to avoid overlapping of char format outside the selection.
-        textCursor.setCharFormat({});
+        textCursor.setCharFormat(currentCharFormat);
         q->m_textEdit->setTextCursor(textCursor);
     }
 
@@ -125,9 +133,7 @@ TextWithFieldsPicker::TextWithFieldsPicker(
     base(field, context, parent),
     d(new Private(this))
 {
-    d->completer = new Completer{nullptr, m_textEdit, this};
-    d->completer->addSpaceChar(kStartOfSubstitutionSymbol);
-    d->completer->addSpaceChar(kEndOfSubstitutionSymbol);
+    d->completer = new EventParameterCompleter{new EventParametersModel({}), m_textEdit, this};
 }
 
 TextWithFieldsPicker::~TextWithFieldsPicker()

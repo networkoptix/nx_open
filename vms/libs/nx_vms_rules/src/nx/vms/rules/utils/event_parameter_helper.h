@@ -9,10 +9,6 @@ namespace nx::vms::common { class SystemContext; }
 
 namespace nx::vms::rules::utils {
 
-constexpr char kStartOfSubstitutionSymbol = '{';
-constexpr char kEndOfSubstitutionSymbol = '}';
-constexpr char kGroupSeparatorSymbol = '.';
-
 class NX_VMS_RULES_API EventParameterHelper
 {
 public:
@@ -23,9 +19,12 @@ public:
     static QString getSubGroupName(const QString& text);
     static QString getMainGroupName(const QString& text);
     static bool isStartOfEventParameter(const QChar& symbol);
+    static bool isIncompleteEventParameter(const QString& word);
     static bool isEndOfEventParameter(const QChar& symbol);
     static int getLatestEventParameterPos(const QStringView& text, int stopPosition);
     static bool containsSubgroups(const QString& eventParameter);
+    static QChar startCharOfEventParameter();
+    static QChar endCharOfEventParameter();
 
     /**
      * Collects list of visible event parameters for a specific event Type and Analytic Object

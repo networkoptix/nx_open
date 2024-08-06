@@ -126,8 +126,8 @@ void TextWithFields::setText(const QString& text)
         return;
 
     d->text = text;
-    emit textChanged();
     d->parseText();
+    emit textChanged();
 }
 
 const TextWithFields::ParsedValues& TextWithFields::parsedValues() const
