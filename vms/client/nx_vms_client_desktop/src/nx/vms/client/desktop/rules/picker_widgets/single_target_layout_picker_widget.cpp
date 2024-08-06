@@ -29,11 +29,9 @@ void SingleTargetLayoutPicker::updateUi()
         m_selectButton->setText(layout->getName());
         m_selectButton->setForegroundRole(QPalette::BrightText);
 
-        QnResourceIconCache::Key iconKey = QnResourceIconCache::Layout;
-        if (layout->isShared())
-            iconKey = QnResourceIconCache::SharedLayout;
-        else if (layout->locked())
-            iconKey = QnResourceIconCache::Layout | QnResourceIconCache::Locked;
+        const QnResourceIconCache::Key iconKey = layout->isShared()
+            ? QnResourceIconCache::SharedLayout
+            : QnResourceIconCache::Layout;
 
         m_selectButton->setIcon(
             core::Skin::maximumSizePixmap(qnResIconCache->icon(iconKey), QnIcon::Selected));
