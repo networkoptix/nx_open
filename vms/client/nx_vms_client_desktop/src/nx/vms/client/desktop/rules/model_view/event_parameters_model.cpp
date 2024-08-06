@@ -22,7 +22,6 @@ struct EventParametersModel::Private
     EventParametersByGroup defaultEventParametersByGroup;
     QList<QString> defaultVisibleElements;
     const QSet<QString> allElements;
-    QString currentExpandedGroup;
 
     void setVisibleElements(const EventParametersByGroup& eventParameterByGroup)
     {
@@ -122,13 +121,6 @@ void EventParametersModel::expandGroup(const QString& groupNameToExpand)
         return;
 
     const auto subGroupName = EventParameterHelper::getSubGroupName(groupNameToExpand);
-
-    if (subGroupName == d->currentExpandedGroup)
-    {
-        // This subgroup was already expanded. No action required.
-        return;
-    }
-
     const auto groupElements = d->subGroupToElements.find(subGroupName);
     if (groupElements == d->subGroupToElements.end())
     {
@@ -148,15 +140,12 @@ void EventParametersModel::expandGroup(const QString& groupNameToExpand)
     if (!isCorrectParameter(subGroupName))
         d->visibleElements.removeOne(EventParameterHelper::addBrackets(subGroupName));
 
-    d->currentExpandedGroup = subGroupName;
-
     endResetModel();
 }
 
 void EventParametersModel::resetExpandedGroup()
 {
     setDefaultVisibleElements();
-    d->currentExpandedGroup.clear();
 }
 
 bool EventParametersModel::isCorrectParameter(const QString& eventParameter)
