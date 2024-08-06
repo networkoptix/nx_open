@@ -531,6 +531,22 @@ const ImageCorrectionResult& DecodedPictureToOpenGLUploader::UploadedPicture::im
     return m_imgCorrection;
 }
 
+void DecodedPictureToOpenGLUploader::UploadedPicture::setDecodedFrame(
+    CLConstVideoDecoderOutputPtr frame)
+{
+    if (frame->isExternalData())
+    {
+        // Since we don't upload to textures until getting into RHI rendering thread,
+        // we need to own the data.
+        m_decodedFrame.reset(new CLVideoDecoderOutput());
+        const_cast<CLVideoDecoderOutput*>(m_decodedFrame.get())->copyFrom(frame.get());
+    }
+    else
+    {
+        m_decodedFrame = frame;
+    }
+}
+
 void DecodedPictureToOpenGLUploader::UploadedPicture::processImage(
     quint8* yPlane,
     int width,
@@ -924,22 +940,6 @@ DecodedPictureToOpenGLUploader::UploadedPicture* DecodedPictureToOpenGLUploader:
         frameUploader->picture()->m_skippingForbidden = true;   //otherwise, we could come to situation that there is no data to display
         lk.unlock();
         frameUploader->run();
-        if (!d->gl)
-        {
-            auto decodedFrame = frameUploader->decodedFrame();
-            if (decodedFrame->isExternalData())
-            {
-                // Since we don't upload to textures until getting into RHI rendering thread,
-                // we need to own the data.
-                auto frame = new CLVideoDecoderOutput();
-                frame->copyFrom(decodedFrame.get());
-                frameUploader->picture()->m_decodedFrame.reset(frame);
-            }
-            else
-            {
-                frameUploader->picture()->m_decodedFrame = std::move(decodedFrame);
-            }
-        }
         lk.relock();
         m_framesWaitingUploadInGUIThread.pop_front();
         delete frameUploader;
@@ -1331,6 +1331,37 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
 
         if (frame->memoryType() == MemoryType::VideoMemory)
             return renderVideoMemory(emptyPictureBuf, frame);
+    }
+    else
+    {
+        QSharedPointer<const CLVideoDecoderOutput> outFrame = frame;
+        switch (frame->format)
+        {
+            case AV_PIX_FMT_RGBA:
+            case AV_PIX_FMT_NV12:
+            case AV_PIX_FMT_YUV420P:
+            case AV_PIX_FMT_YUV422P:
+            case AV_PIX_FMT_YUV444P:
+            case AV_PIX_FMT_YUVA420P:
+                break;
+            default:
+            {
+                QSharedPointer<CLVideoDecoderOutput> newFrame;
+                newFrame.reset(new CLVideoDecoderOutput());
+                newFrame->reallocate(frame->width, frame->height, AV_PIX_FMT_RGBA);
+                frame->convertTo(newFrame.get());
+                newFrame->pkt_dts = frame->pkt_dts;
+                newFrame->sample_aspect_ratio = frame->sample_aspect_ratio;
+                newFrame->flags = frame->flags;
+                outFrame = newFrame;
+                break;
+            }
+        }
+        emptyPictureBuf->setDecodedFrame(frame);
+        const AVPixelFormat format = (AVPixelFormat) frame->format;
+        emptyPictureBuf->texturePack()->setPictureFormat(format);
+        emptyPictureBuf->setColorFormat(format);
+        return true;
     }
 
     const AVPixelFormat format = (AVPixelFormat)frame->format;

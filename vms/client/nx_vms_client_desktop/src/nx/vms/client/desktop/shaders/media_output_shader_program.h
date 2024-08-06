@@ -5,6 +5,10 @@
 #include <nx/vms/api/types/dewarping_types.h>
 #include <ui/graphics/shaders/base_shader_program.h>
 
+extern "C" {
+#include <libavutil/pixfmt.h>
+}
+
 struct ImageCorrectionResult;
 
 namespace nx::vms::api::dewarping {
@@ -76,6 +80,9 @@ public:
     void loadDewarpingParameters(const nx::vms::api::dewarping::MediaData& mediaParams,
         const nx::vms::api::dewarping::ViewData& itemParams, qreal aspectRatio, qreal maxX,
         qreal maxY);
+
+    static size_t planeCount(AVPixelFormat format);
+    static Format formatFromPlaneCount(int planeCount);
 
 private:
     const Key m_key;

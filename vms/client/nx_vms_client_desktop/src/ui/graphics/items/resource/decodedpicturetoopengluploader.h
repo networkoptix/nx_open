@@ -86,8 +86,9 @@ public:
 
         const ImageCorrectionResult& imageCorrectionResult() const;
 
-        /** Returns decoded frame if we don't user OpenGL textures (in case of RHI or software) */
+        /** Returns decoded frame if we don't use OpenGL textures (in case of RHI or software) */
         CLConstVideoDecoderOutputPtr decodedFrame() const { return m_decodedFrame; }
+        void setDecodedFrame(CLConstVideoDecoderOutputPtr frame);
 
     private:
         struct PBOData

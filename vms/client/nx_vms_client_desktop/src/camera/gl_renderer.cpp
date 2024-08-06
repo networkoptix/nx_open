@@ -348,27 +348,18 @@ Qn::RenderStatus QnGLRenderer::drawVideoData(
     if (picLock->width() <= 0 && picLock->height() <= 0)
         return Qn::NothingRendered;
 
-    const auto formatPlaneCount =
-        [](AVPixelFormat format) -> int
-        {
-            switch (format)
-            {
-                case AV_PIX_FMT_RGBA: return 1;
-                case AV_PIX_FMT_NV12: return 2;
-                case AV_PIX_FMT_YUV420P: return 3;
-                case AV_PIX_FMT_YUVA420P: return 4;
-                default: return 0; // Other formats must be converted before picture uploading.
-            }
-        };
-
-    const int planeCount = formatPlaneCount(picLock->colorFormat());
+    const int planeCount = MediaOutputShaderProgram::planeCount(picLock->colorFormat());
     if (!NX_ASSERT(planeCount > 0))
         return Qn::CannotRender;
+
+    QRectF textureRect = picLock->textureRect();
+    if (auto frame = picLock->decodedFrame(); frame && textureRect.isNull())
+        textureRect = QRectF(0, 0, 1, 1);
 
     if (!drawVideoTextures(
         picLock,
         painter,
-        Geometry::subRect(picLock->textureRect(), sourceRect),
+        Geometry::subRect(textureRect, sourceRect),
         targetRect,
         planeCount,
         picLock->glTextures().data(),
@@ -470,21 +461,8 @@ bool QnGLRenderer::drawVideoTextures(
     if (!NX_ASSERT(planeCount >= 1 && planeCount <= 4))
         return false;
 
-    const auto formatFromPlaneCount =
-        [](int planeCount) -> MediaOutputShaderProgram::Format
-        {
-            switch (planeCount)
-            {
-                case 1: return MediaOutputShaderProgram::Format::rgb;
-                case 2: return MediaOutputShaderProgram::Format::nv12;
-                case 3: return MediaOutputShaderProgram::Format::yv12;
-                case 4: return MediaOutputShaderProgram::Format::yva12;
-                default: return {};
-            }
-        };
-
     MediaOutputShaderProgram::Key programKey;
-    programKey.format = formatFromPlaneCount(planeCount);
+    programKey.format = MediaOutputShaderProgram::formatFromPlaneCount(planeCount);
 
     if (m_imgCorrectParam.enabled && programKey.format != MediaOutputShaderProgram::Format::rgb)
         programKey.imageCorrection = MediaOutputShaderProgram::YuvImageCorrection::gamma;

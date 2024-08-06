@@ -119,23 +119,14 @@ void MediaOutputShaderData::loadOpacity(qreal opacity)
 {
     switch (key.format)
     {
-        case MediaOutputShaderProgram::Format::rgb:
-            colorMatrix = withOpacity(QMatrix4x4(), opacity);
-            break;
-
+        // TODO: match color tranformation matrices with Qt.
         case MediaOutputShaderProgram::Format::nv12:
-            colorMatrix = withOpacity(colorTransformation(
-                MediaOutputShaderProgram::ColorSpace::yuvEbu, /*fullRange*/ true), opacity);
-            break;
-
         case MediaOutputShaderProgram::Format::yv12:
-            colorMatrix = withOpacity(kDefaultYuvToRgbMatrix, opacity);
-            break;
-
         case MediaOutputShaderProgram::Format::yva12:
             colorMatrix = withOpacity(kDefaultYuvToRgbMatrix, opacity);
             break;
 
+        case MediaOutputShaderProgram::Format::rgb:
         default:
             colorMatrix = withOpacity(QMatrix4x4(), opacity);
     }

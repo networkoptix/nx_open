@@ -50,7 +50,9 @@ private:
         QRhi* rhi,
         QRhiRenderPassDescriptor* desc);
     void createBindings();
-    void ensureTextures();
+    void ensureTextures(const AVFrame* frame);
+    void uploadFrame(const AVFrame* frame, QRhiResourceUpdateBatch* rub);
+    void uploadFrame(QVideoFrame* videoFrame, QRhiResourceUpdateBatch* rub);
 
     struct Private;
     nx::utils::ImplPtr<Private> d;
