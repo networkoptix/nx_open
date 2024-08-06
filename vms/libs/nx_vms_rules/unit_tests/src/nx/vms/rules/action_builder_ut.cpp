@@ -56,12 +56,7 @@ public:
     ActionBuilderTest():
         TestPlugin(engine.get())
     {
-        m_engine->registerActionField(
-            fieldMetatype<TargetUserField>(),
-            [this](const FieldDescriptor* descriptor)
-            {
-                return new TargetUserField(systemContext(), descriptor);
-            });
+        Plugin::registerActionField<TargetUserField>(m_engine, systemContext());
 
         registerAction<TestActionWithTargetUsers>();
         registerAction<TestActionWithPermissions>();

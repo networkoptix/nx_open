@@ -15,6 +15,7 @@
 #include <nx/vms/rules/event_filter.h>
 #include <nx/vms/rules/event_filter_fields/builtin_fields.h>
 #include <nx/vms/rules/events/builtin_events.h>
+#include <nx/vms/rules/plugin.h>
 #include <nx/vms/rules/rule.h>
 #include <nx/vms/rules/utils/api.h>
 #include <nx/vms/rules/utils/event_parameter_helper.h>
@@ -244,12 +245,8 @@ TEST_F(ActionFieldTest, EventStartTimeInstantEvent)
 
 TEST_F(ActionFieldTest, EventTimeProlongedEvent)
 {
-    engine->registerActionField(
-        fieldMetatype<TextWithFields>(),
-        [this](const FieldDescriptor* descriptor)
-        {
-            return new TextWithFields{systemContext(), descriptor};
-        });
+    Plugin::registerActionField<TextWithFields>(engine.get(), systemContext());
+
     engine->registerAction(
         TestActionWithTextWithFields::manifest(),
         [] { return new TestActionWithTextWithFields{}; });

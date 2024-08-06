@@ -17,7 +17,6 @@ namespace nx::vms::rules {
 class NX_VMS_RULES_API Plugin
 {
 public:
-    Plugin();
     virtual ~Plugin();
 
     virtual void initialize(Engine* engine);
@@ -28,7 +27,22 @@ public:
     virtual void registerEvents() const;
     virtual void registerActions() const;
 
+public:
+    template <class F>
+    static bool registerActionField(Engine* engine, auto... args)
+    {
+        const QString id = fieldMetatype<F>();
+        if (!NX_ASSERT(!id.isEmpty(), "Class does not have required 'metatype' property"))
+            return false;
+
+        return engine->registerActionField(id, Engine::ActionFieldRecord{
+            [args...](const FieldDescriptor* descriptor){ return new F(args..., descriptor); },
+            encryptedProperties<F>()});
+    }
+
 protected:
+    Plugin(); // Should be used as base class only.
+
     template<class C>
     bool registerEventField() const
     {
@@ -48,23 +62,10 @@ protected:
         return false;
     }
 
-    template<class C>
-    bool registerActionField() const
+    template<class F>
+    bool registerActionField(auto... args) const
     {
-        const QString id = fieldMetatype<C>();
-        if (NX_ASSERT(!id.isEmpty(), "Class does not have required 'metatype' property"))
-        {
-            if (!m_engine->isActionFieldRegistered(id))
-            {
-                return m_engine->registerActionField(
-                    id,
-                    [](const FieldDescriptor* descriptor)
-                    {
-                        return new C(descriptor);
-                    });
-            }
-        }
-        return false;
+        return registerActionField<F>(m_engine, args...);
     }
 
     template<class F>

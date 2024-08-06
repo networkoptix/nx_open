@@ -19,14 +19,13 @@ class NX_VMS_RULES_API HttpAuthField: public ActionBuilderField
 {
     Q_OBJECT
     Q_CLASSINFO("metatype", "nx.actions.fields.httpAuth")
+    Q_CLASSINFO("encrypt", "password, token")
 
     Q_PROPERTY(nx::network::http::AuthType authType READ authType WRITE setAuthType NOTIFY
             authTypeChanged)
-    Q_PROPERTY(std::string login READ login WRITE setLogin NOTIFY loginChanged)
-    Q_PROPERTY(std::string password READ password WRITE setPassword NOTIFY passwordChanged)
-    Q_PROPERTY(std::string token READ token WRITE setToken NOTIFY tokenChanged)
-    Q_PROPERTY(AuthenticationInfo auth READ auth WRITE setAuth NOTIFY authChanged)
-
+    Q_PROPERTY(QString login READ login WRITE setLogin NOTIFY loginChanged)
+    Q_PROPERTY(QString password READ password WRITE setPassword NOTIFY passwordChanged)
+    Q_PROPERTY(QString token READ token WRITE setToken NOTIFY tokenChanged)
 
 public:
     using ActionBuilderField::ActionBuilderField;
@@ -34,17 +33,16 @@ public:
     nx::network::http::AuthType authType() const;
     void setAuthType(const nx::network::http::AuthType& authType);
 
-    std::string login() const;
-    void setLogin(const std::string& login);
+    QString login() const;
+    void setLogin(const QString& login);
 
-    std::string password() const;
-    void setPassword(const std::string& password);
+    QString password() const;
+    void setPassword(const QString& password);
 
-    std::string token() const;
-    void setToken(const std::string& token);
+    QString token() const;
+    void setToken(const QString& token);
 
-    AuthenticationInfo auth() const;
-    void setAuth(const AuthenticationInfo& auth);
+    const AuthenticationInfo& auth() const;
 
     virtual QVariant build(const AggregatedEventPtr& eventAggregator) const override;
 
@@ -53,7 +51,6 @@ signals:
     void loginChanged();
     void passwordChanged();
     void tokenChanged();
-    void authChanged();
 
 private:
     AuthenticationInfo m_auth;

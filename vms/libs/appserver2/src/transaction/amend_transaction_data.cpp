@@ -31,6 +31,7 @@
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/crypt/crypt.h>
 #include <nx/vms/event/action_parameters.h>
+#include <nx/vms/rules/encryption.h>
 #include <transaction/transaction_descriptor.h>
 
 namespace ec2 {
@@ -216,7 +217,8 @@ bool amendOutputDataIfNeeded(
     return result;
 }
 
-bool amendOutputDataIfNeeded(const nx::network::rest::UserAccessData& accessData,
+bool amendOutputDataIfNeeded(
+    const nx::network::rest::UserAccessData& accessData,
     QnResourceAccessManager* accessManager,
     nx::vms::api::EventRuleData* rule)
 {
@@ -228,14 +230,47 @@ bool amendOutputDataIfNeeded(const nx::network::rest::UserAccessData& accessData
     if (url.password().isEmpty())
         return false;
 
-    const bool isGranted = accessData == nx::network::rest::kSystemAccess || accessManager->hasPowerUserPermissions(accessData);
-    if (isGranted)
+    if (accessManager->hasPowerUserPermissions(accessData))
         url.setPassword(nx::crypt::decodeStringFromHexStringAES128CBC(url.password()));
     else
         url.setPassword(nx::utils::Url::kMaskedPassword);
     params.url = url.toString();
     rule->actionParams = QJson::serialized(params);
     return true;
+}
+
+bool amendOutputDataIfNeeded(
+    const nx::network::rest::UserAccessData& accessData,
+    QnResourceAccessManager* accessManager,
+    nx::vms::api::rules::Rule* rule)
+{
+    int count = 0;
+
+    for (auto& builder: rule->actionList)
+    {
+        for (auto& [_, field]: builder.fields)
+        {
+            for (const auto& name: nx::vms::rules::encryptedActionBuilderProperties(field.type))
+            {
+                if (auto it = field.props.find(name); it != field.props.end())
+                {
+                    if (accessManager->hasPowerUserPermissions(accessData))
+                    {
+                        it.value() =
+                            nx::crypt::decodeStringFromHexStringAES128CBC(it.value().toString());
+                    }
+                    else
+                    {
+                        it.value() = QString(nx::utils::Url::kMaskedPassword);
+                    }
+
+                    ++count;
+                }
+            }
+        }
+    }
+
+    return count > 0;
 }
 
 bool amendOutputDataIfNeeded(
@@ -253,6 +288,7 @@ bool amendOutputDataIfNeeded(const nx::network::rest::UserAccessData& accessData
 {
     auto result = amendOutputDataIfNeeded(accessData, accessManager, &paramData->allProperties);
     result |= amendOutputDataIfNeeded(accessData, accessManager, &paramData->rules);
+    result |= amendOutputDataIfNeeded(accessData, accessManager, &paramData->vmsRules);
     result |= amendOutputDataIfNeeded(accessData, accessManager, &paramData->storages);
     result |= amendOutputDataIfNeeded(accessData, accessManager, &paramData->users);
     return result;

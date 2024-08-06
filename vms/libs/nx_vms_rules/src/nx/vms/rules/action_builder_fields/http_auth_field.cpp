@@ -4,6 +4,18 @@
 
 namespace nx::vms::rules {
 
+namespace {
+
+std::optional<std::string> optionalString(const QString& str)
+{
+    if (str.isEmpty())
+        return {};
+
+    return str.toStdString();
+}
+
+} // namespace
+
 nx::network::http::AuthType HttpAuthField::authType() const
 {
     return m_auth.authType;
@@ -18,71 +30,62 @@ void HttpAuthField::setAuthType(const nx::network::http::AuthType& authType)
     }
 }
 
-std::string HttpAuthField::login() const
+QString HttpAuthField::login() const
 {
-    return m_auth.credentials.user;
+    return QString::fromStdString(m_auth.credentials.user);
 }
 
-void HttpAuthField::setLogin(const std::string& login)
+void HttpAuthField::setLogin(const QString& value)
 {
-    if (m_auth.credentials.user != login)
+    if (auto login = value.toStdString(); m_auth.credentials.user != login)
     {
-        m_auth.credentials.user = login;
+        m_auth.credentials.user = std::move(login);
         emit loginChanged();
     }
 }
 
-std::string HttpAuthField::password() const
+QString HttpAuthField::password() const
 {
-    return m_auth.credentials.password ? m_auth.credentials.password.value() : "";
+    return QString::fromStdString(m_auth.credentials.password.value_or(std::string()));
 }
 
-void HttpAuthField::setPassword(const std::string& password)
+void HttpAuthField::setPassword(const QString& value)
 {
-    if (m_auth.credentials.password != password)
+    if (auto password = optionalString(value); m_auth.credentials.password != password)
     {
-        m_auth.credentials.password = password.empty() ? std::optional<std::string>() : password;
+        m_auth.credentials.password = std::move(password);
         emit passwordChanged();
 
-        if (!password.empty())
+        if (m_auth.credentials.password)
             setToken({});
     }
 }
 
-std::string HttpAuthField::token() const
+QString HttpAuthField::token() const
 {
-    return m_auth.credentials.token ? m_auth.credentials.token.value() : "";
+    return QString::fromStdString(m_auth.credentials.token.value_or(std::string()));
 }
 
-void HttpAuthField::setToken(const std::string& token)
+void HttpAuthField::setToken(const QString& value)
 {
-    if (m_auth.credentials.token != token)
+    if (auto token = optionalString(value); m_auth.credentials.token != token)
     {
-        m_auth.credentials.token = token.empty() ? std::optional<std::string>() : token;
+        m_auth.credentials.token = std::move(token);
         emit tokenChanged();
 
-        if (!token.empty())
+        if (m_auth.credentials.token)
             setPassword({});
     }
 }
 
-AuthenticationInfo HttpAuthField::auth() const
+const AuthenticationInfo& HttpAuthField::auth() const
 {
     return m_auth;
 }
 
-void HttpAuthField::setAuth(const AuthenticationInfo& auth)
-{
-    if (m_auth != auth)
-    {
-        m_auth = auth;
-        emit authChanged();
-    }
-}
-
 QVariant HttpAuthField::build(const AggregatedEventPtr& /*eventAggregator*/) const
 {
-    return QVariant::fromValue(m_auth);
+    return QVariant::fromValue(auth());
 }
 
 } // namespace nx::vms::rules

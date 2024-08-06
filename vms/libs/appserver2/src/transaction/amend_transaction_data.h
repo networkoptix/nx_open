@@ -4,7 +4,6 @@
 
 #include <vector>
 
-#include <core/resource/resource_property_key.h>
 #include <nx/network/rest/user_access_data.h>
 #include <nx/vms/api/data/full_info_data.h>
 #include <nx/vms/api/data/resource_data.h>
@@ -12,7 +11,13 @@
 
 class QnResourceAccessManager;
 
-namespace nx::vms::api { struct CameraDataEx; }
+namespace nx::vms::api {
+
+struct CameraDataEx;
+
+namespace rules { struct Rule; }
+
+} // namespace nx::vms::api
 
 namespace ec2 {
 
@@ -20,7 +25,8 @@ extern const std::set<QString> kResourceParamToAmend;
 
 // Returns true if data has been amended.
 template <typename T>
-bool amendOutputDataIfNeeded(const nx::network::rest::UserAccessData&, QnResourceAccessManager*, T*)
+bool amendOutputDataIfNeeded(
+    const nx::network::rest::UserAccessData&, QnResourceAccessManager*, T*)
 {
     return false;
 }
@@ -45,9 +51,15 @@ bool amendOutputDataIfNeeded(const nx::network::rest::UserAccessData& accessData
     QnResourceAccessManager* accessManager,
     nx::vms::api::CameraDataEx* paramData);
 
-bool amendOutputDataIfNeeded(const nx::network::rest::UserAccessData& accessData,
+bool amendOutputDataIfNeeded(
+    const nx::network::rest::UserAccessData& accessData,
     QnResourceAccessManager* accessManager,
     nx::vms::api::EventRuleData* rule);
+
+bool amendOutputDataIfNeeded(
+    const nx::network::rest::UserAccessData& accessData,
+    QnResourceAccessManager* accessManager,
+    nx::vms::api::rules::Rule* rule);
 
 bool amendOutputDataIfNeeded(
     const nx::network::rest::UserAccessData& accessData,

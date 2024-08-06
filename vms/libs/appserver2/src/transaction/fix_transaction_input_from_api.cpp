@@ -10,6 +10,7 @@
 #include <nx/vms/api/data/layout_data.h>
 #include <nx/vms/api/data/user_data_ex.h>
 #include <nx/vms/event/action_parameters.h>
+#include <nx/vms/rules/encryption.h>
 #include <transaction/transaction_descriptor.h>
 
 namespace ec2 {
@@ -159,6 +160,30 @@ QnTransaction<nx::vms::api::EventRuleData> fixTransactionInputFromApi(
     }
 
     return originalTran;
+}
+
+QnTransaction<nx::vms::api::rules::Rule> fixTransactionInputFromApi(
+    const QnTransaction<nx::vms::api::rules::Rule>& originalTran, Result* result)
+{
+    auto fixedTran = originalTran;
+
+    for (auto& builder: fixedTran.params.actionList)
+    {
+        for (auto& [_, field]: builder.fields)
+        {
+            for (const auto& name: nx::vms::rules::encryptedActionBuilderProperties(field.type))
+            {
+                if (auto it = field.props.find(name); it != field.props.end())
+                {
+                    it.value() =
+                        nx::crypt::encodeHexStringFromStringAES128CBC(it.value().toString());
+                }
+            }
+        }
+    }
+
+    result = new Result();
+    return fixedTran;
 }
 
 QnTransaction<nx::vms::api::LayoutData> fixTransactionInputFromApi(

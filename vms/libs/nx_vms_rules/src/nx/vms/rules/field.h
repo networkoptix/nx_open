@@ -5,6 +5,7 @@
 #include <QtCore/QMetaClassInfo>
 #include <QtCore/QObject>
 
+#include <nx/utils/string.h>
 #include <nx/utils/uuid.h>
 
 #include "rules_fwd.h"
@@ -41,6 +42,7 @@ class NX_VMS_RULES_API Field: public QObject
 
 public:
     static constexpr auto kMetatype = "metatype";
+    static constexpr auto kEncrypt = "encrypt";
 
 public:
     explicit Field(const FieldDescriptor* descriptor);
@@ -82,6 +84,21 @@ QString fieldMetatype()
     int idx = meta.indexOfClassInfo(Field::kMetatype);
 
     return (idx < 0) ? QString() : meta.classInfo(idx).value();
+}
+
+template <class T>
+QSet<QString> encryptedProperties()
+{
+    const auto& meta = T::staticMetaObject;
+    const auto idx = meta.indexOfClassInfo(Field::kEncrypt);
+    if (idx < 0)
+        return {};
+
+    QSet<QString> result;
+    for (const auto& s: QString(meta.classInfo(idx).value()).split(',', Qt::SkipEmptyParts))
+        result.insert(s.trimmed());
+
+    return result;
 }
 
 } // namespace nx::vms::rules

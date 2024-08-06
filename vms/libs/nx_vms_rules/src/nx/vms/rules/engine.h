@@ -52,8 +52,12 @@ public:
         std::function<EventFilterField*(const FieldDescriptor* descriptor)>;
 
     using ActionConstructor = std::function<BasicAction*()>;
-    using ActionFieldConstructor =
-        std::function<ActionBuilderField*(const FieldDescriptor* descriptor)>;
+    struct ActionFieldRecord
+    {
+        using Constructor = std::function<ActionBuilderField*(const FieldDescriptor* descriptor)>;
+        Constructor constructor;
+        QSet<QString> encryptedFields;
+    };
 
 // Initialization and general info methods.
     explicit Engine(
@@ -146,7 +150,10 @@ public:
     ActionPtr cloneAction(const ActionPtr& action) const;
 
     bool isActionFieldRegistered(const QString& fieldId) const;
-    bool registerActionField(const QString& type, const ActionFieldConstructor& ctor);
+    bool registerActionField(const QString& type, const ActionFieldRecord& record);
+
+    /** To be used with fixTransactionInputFromApi / amendOutputDataIfNeeded function pair. */
+    const QSet<QString>& encryptedActionBuilderProperties(const QString& type) const;
 
     /**
      * Builds action builder based on the registered action descriptor. Builder fields are filled
@@ -247,7 +254,7 @@ private:
     QHash<QString, QPointer<ActionExecutor>> m_executors;
 
     QHash<QString, EventFieldConstructor> m_eventFields;
-    QHash<QString, ActionFieldConstructor> m_actionFields;
+    QHash<QString, ActionFieldRecord> m_actionFields;
 
     QHash<QString, FieldValidator*> m_fieldValidators;
 
