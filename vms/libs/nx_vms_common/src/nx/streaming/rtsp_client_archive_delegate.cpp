@@ -23,6 +23,7 @@
 #include <nx/streaming/archive_stream_reader.h>
 #include <nx/streaming/rtp/parsers/nx_rtp_parser.h>
 #include <nx/streaming/rtsp_client.h>
+#include <nx/utils/math/math.h>
 #include <nx/utils/suppress_exceptions.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
@@ -524,8 +525,11 @@ bool QnRtspClientArchiveDelegate::reopen()
 
     if (m_camera)
     {
-        if (m_position != DATETIME_NOW && m_position != DATETIME_INVALID)
+        if (m_position != DATETIME_NOW && m_position != DATETIME_INVALID
+            && m_mode == PlaybackMode::export_)
+        {
             m_reopenPosition = m_position;
+        }
         return openInternal();
     }
 
@@ -557,7 +561,9 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
         if (!result && !m_blockReopening && !m_closing)
             result = getNextDataInternal(); //< Try again in case of RTSP reconnect.
 
-        if (!result || m_reopenPosition == 0 || m_reopenPosition < result->timestamp)
+        static const int64_t kMaxGopSize = 1'000'000LL * 60;
+        if (!result || m_reopenPosition == 0
+            || !qBetween(m_reopenPosition - kMaxGopSize, (int64_t) result->timestamp, m_reopenPosition))
         {
             m_reopenPosition = 0;
             break;
@@ -1142,6 +1148,7 @@ void QnRtspClientArchiveDelegate::pleaseStop()
 void QnRtspClientArchiveDelegate::setMediaRole(PlaybackMode mode)
 {
     setAdditionalAttribute(Qn::EC2_MEDIA_ROLE, nx::reflect::toString(mode).data());
+    m_mode = mode;
 }
 
 CameraDiagnostics::Result QnRtspClientArchiveDelegate::lastError() const

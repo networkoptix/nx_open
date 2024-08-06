@@ -211,6 +211,7 @@ private:
     const bool m_sleepIfEmptySocket;
     CameraDiagnostics::Result m_lastError = CameraDiagnostics::NoErrorResult();
     nx::utils::ScopedConnections m_cameraConnections;
+    PlaybackMode m_mode = PlaybackMode::default_;
 };
 
 typedef QSharedPointer<QnRtspClientArchiveDelegate> QnRtspClientArchiveDelegatePtr;
