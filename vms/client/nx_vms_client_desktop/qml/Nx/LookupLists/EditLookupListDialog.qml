@@ -135,8 +135,10 @@ ModalDialog
 
         data.id: sourceModel ? sourceModel.data.id : NxGlobals.generateUuid()
         data.entries: sourceModel ? sourceModel.data.entries : []
-        attributeNames: sourceModel ? sourceModel.attributeNames : ["Value"]
+        // objectTypeId must be initialized before attributes names,
+        // since attributeNames changes processing requires correct objectTypeId state.
         objectTypeId: sourceModel ? sourceModel.objectTypeId : ""
+        attributeNames: sourceModel ? sourceModel.attributeNames : ["Value"]
         name: sourceModel ? sourceModel.name : qsTr("New List")
 
         property Analytics.ObjectType listType: taxonomy ? taxonomy.objectTypeById(objectTypeId) : null
