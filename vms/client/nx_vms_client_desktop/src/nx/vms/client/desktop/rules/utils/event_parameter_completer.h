@@ -13,22 +13,20 @@
 
 namespace nx::vms::client::desktop::rules {
 class EventParametersModel;
-class Completer: public QObject
+class NX_VMS_CLIENT_DESKTOP_API EventParameterCompleter: public QObject
 {
     Q_OBJECT
 
 public:
-    Completer(const QStringList& words, QLineEdit* lineEdit, QObject* parent = nullptr);
-    Completer(const QStringList& words, QTextEdit* textEdit, QObject* parent = nullptr);
-    Completer(EventParametersModel* model, QTextEdit* textEdit, QObject* parent = nullptr);
-    virtual ~Completer() override;
+    EventParameterCompleter(
+        EventParametersModel* model, QTextEdit* textEdit, QObject* parent = nullptr);
+    virtual ~EventParameterCompleter() override;
 
     /**
      * Takes ownership of model. Deletes previously used model.
      */
     void setModel(EventParametersModel* model);
     bool containsElement(const QString& element);
-    void addSpaceChar(char c);
 
 protected:
     bool eventFilter(QObject* obj, QEvent* event) override;
@@ -36,8 +34,6 @@ protected:
 private:
     struct Private;
     nx::utils::ImplPtr<Private> d;
-    QRegularExpression m_separatorPattern{"\\s", QRegularExpression::CaseInsensitiveOption};
-    QStringList m_separatorChars;
 };
 
 } // namespace nx::vms::client::desktop::rules

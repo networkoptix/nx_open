@@ -24,6 +24,9 @@ using namespace nx::vms::rules::utils;
 using namespace nx::vms::rules;
 using namespace nx::vms;
 
+constexpr char kStartOfSubstitutionSymbol = '{';
+constexpr char kEndOfSubstitutionSymbol = '}';
+constexpr char kGroupSeparatorSymbol = '.';
 constexpr int kSubgroupStart = 2;
 const auto kEventAttributesPrefix = QStringLiteral("event.attributes.");
 
@@ -244,6 +247,16 @@ bool EventParameterHelper::isEndOfEventParameter(const QChar& symbol)
     return symbol == kEndOfSubstitutionSymbol;
 }
 
+QChar EventParameterHelper::startCharOfEventParameter()
+{
+    return kStartOfSubstitutionSymbol;
+}
+
+QChar EventParameterHelper::endCharOfEventParameter()
+{
+    return kEndOfSubstitutionSymbol;
+}
+
 int EventParameterHelper::getLatestEventParameterPos(const QStringView& text, int stopPosition)
 {
     if (stopPosition >= text.size())
@@ -257,6 +270,11 @@ int EventParameterHelper::getLatestEventParameterPos(const QStringView& text, in
             return -1;
     }
     return -1;
+}
+
+bool EventParameterHelper::isIncompleteEventParameter(const QString& word)
+{
+    return word.startsWith(kStartOfSubstitutionSymbol) && !word.endsWith(kEndOfSubstitutionSymbol);
 }
 
 bool EventParameterHelper::containsSubgroups(const QString& eventParameter)

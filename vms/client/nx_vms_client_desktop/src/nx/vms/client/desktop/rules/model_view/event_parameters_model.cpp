@@ -101,9 +101,6 @@ QVariant EventParametersModel::data(const QModelIndex& index, int role) const
     if (role == Qt::AccessibleDescriptionRole && sep)
         return QVariant::fromValue(Separator{});
 
-    if (role == Qt::ItemIsSelectable)
-        return QVariant::fromValue(!sep);
-
     // EditRole is required for the Completer.
     if ((role == Qt::DisplayRole || role == Qt::EditRole) && !sep)
         return d->visibleElements[index.row()];
