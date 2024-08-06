@@ -17,6 +17,8 @@ extern "C" {
 #include <nx/media/ffmpeg_helper.h>
 #include <nx/media/media_data_packet.h>
 
+class QVideoFrame;
+
 enum class MemoryType
 {
     SystemMemory,
@@ -36,6 +38,7 @@ public:
     virtual AVFrame lockFrame() = 0;
     virtual void unlockFrame() = 0;
     virtual SurfaceType type() = 0;
+    virtual QVideoFrame* frame() { return nullptr; }
 };
 
 class CLVideoDecoderOutput;

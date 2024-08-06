@@ -153,6 +153,37 @@ size_t qHash(const MediaOutputShaderProgram::Key& key, uint seed)
         ::qHash(vp));
 }
 
+size_t MediaOutputShaderProgram::planeCount(AVPixelFormat format)
+{
+    switch (format)
+    {
+        case AV_PIX_FMT_RGBA:
+            return 1;
+        case AV_PIX_FMT_NV12:
+            return 2;
+        case AV_PIX_FMT_YUV420P:
+        case AV_PIX_FMT_YUV422P:
+        case AV_PIX_FMT_YUV444P:
+            return 3;
+        case AV_PIX_FMT_YUVA420P:
+            return 4;
+        default:
+            return 0; // Other formats must be converted before picture uploading.
+    }
+}
+
+MediaOutputShaderProgram::Format MediaOutputShaderProgram::formatFromPlaneCount(int planeCount)
+{
+    switch (planeCount)
+    {
+        case 1: return MediaOutputShaderProgram::Format::rgb;
+        case 2: return MediaOutputShaderProgram::Format::nv12;
+        case 3: return MediaOutputShaderProgram::Format::yv12;
+        case 4: return MediaOutputShaderProgram::Format::yva12;
+        default: return {};
+    }
+}
+
 MediaOutputShaderProgram::MediaOutputShaderProgram(const Key& key, QObject* parent):
     base_type(parent),
     m_key(key)

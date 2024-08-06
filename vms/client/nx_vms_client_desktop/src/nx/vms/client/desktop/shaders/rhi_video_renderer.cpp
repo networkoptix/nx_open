@@ -4,6 +4,8 @@
 
 #include <QtCore/QFile>
 #include <QtGui/rhi/qrhi.h>
+#include <QtMultimedia/QVideoFrame>
+#include <QtMultimedia/private/qabstractvideobuffer_p.h>
 
 #include <nx/utils/log/assert.h>
 #include <utils/color_space/image_correction.h>
@@ -144,7 +146,7 @@ static QString keyToString(MediaOutputShaderProgram::Key programKey)
     return result.join("_");
 }
 
-static int planeCountFromFormat(MediaOutputShaderProgram::Format format)
+static size_t planeCountFromFormat(MediaOutputShaderProgram::Format format)
 {
     switch (format)
     {
@@ -205,13 +207,6 @@ QSize textureSize(AVPixelFormat format, int plane, const QSize& size)
     }
 }
 
-int textureLineSize(MediaOutputShaderProgram::Format format, int plane, const int* lineSizes)
-{
-    if (format == MediaOutputShaderProgram::Format::nv12 && plane != 0)
-        return lineSizes[plane] / 2;
-    return lineSizes[plane];
-}
-
 /** Helper class for building data in std140-qualified uniform block. */
 class Std140BufferBuilder
 {
@@ -254,6 +249,21 @@ private:
     QByteArray m_data;
 };
 
+class VideoTextures: public QVideoFrameTextures
+{
+public:
+    virtual QRhiTexture* texture(uint plane) const override
+    {
+        if (plane > all.size())
+            return nullptr;
+        return all[plane].get();
+    }
+
+    static constexpr size_t maxCount = 4;
+
+    std::array<std::unique_ptr<QRhiTexture>, maxCount> all;
+};
+
 } // namespace
 
 struct RhiVideoRenderer::Private
@@ -267,7 +277,7 @@ struct RhiVideoRenderer::Private
         ubuf.reset();
         sampler.reset();
         srb.reset();
-        textures.clear();
+        textures.reset();
         rhi = nullptr;
     }
 
@@ -281,7 +291,8 @@ struct RhiVideoRenderer::Private
     std::unique_ptr<QRhiShaderResourceBindings> srb;
     std::unique_ptr<QRhiGraphicsPipeline> ps;
 
-    std::vector<std::unique_ptr<QRhiTexture>> textures;
+    std::unique_ptr<QVideoFrameTextures> textures;
+    size_t planeCount = 0;
 
     intptr_t lastUploadedFrame = 0;
 };
@@ -309,10 +320,10 @@ void RhiVideoRenderer::init(
     d->vbuf.reset(rhi->newBuffer(QRhiBuffer::Dynamic, QRhiBuffer::VertexBuffer, vbufSize));
     d->vbuf->create();
 
-    d->textures.clear();
+    auto textures = std::make_unique<VideoTextures>();
     const int minTexSize = rhi->resourceLimit(QRhi::TextureSizeMin);
-    const int planeCount = planeCountFromFormat(d->data.data.key.format);
-    for (int i = 0; i < planeCount; ++i)
+    const size_t planeCount = planeCountFromFormat(d->data.data.key.format);
+    for (size_t i = 0; i < planeCount; ++i)
     {
         std::unique_ptr<QRhiTexture> texture;
         texture.reset(rhi->newTexture(
@@ -321,8 +332,10 @@ void RhiVideoRenderer::init(
             /*sampleCount*/ 1));
         texture->create();
 
-        d->textures.push_back(std::move(texture));
+        textures->all[i] = std::move(texture);
     }
+    d->textures = std::move(textures);
+    d->planeCount = planeCount;
 
     const bool gammaCorrection =
         d->data.data.key.imageCorrection == MediaOutputShaderProgram::YuvImageCorrection::gamma;
@@ -366,12 +379,12 @@ void RhiVideoRenderer::init(
     bindings.push_back(QRhiShaderResourceBinding::uniformBuffer(
         0, kCommonVisibility, d->ubuf.get()));
 
-    for (int i = 0; i < planeCount; ++i)
+    for (size_t i = 0; i < d->planeCount; ++i)
     {
         bindings.push_back(QRhiShaderResourceBinding::sampledTexture(
             1 + i,
             QRhiShaderResourceBinding::FragmentStage,
-            d->textures[i].get(),
+            d->textures->texture(i),
             d->sampler.get()));
     }
 
@@ -416,12 +429,12 @@ void RhiVideoRenderer::createBindings()
     bindings.push_back(QRhiShaderResourceBinding::uniformBuffer(
         0, kCommonVisibility, d->ubuf.get()));
 
-    for (int i = 0; i < (int) d->textures.size(); ++i)
+    for (size_t i = 0; i < d->planeCount; ++i)
     {
         bindings.push_back(QRhiShaderResourceBinding::sampledTexture(
             1 + i,
             QRhiShaderResourceBinding::FragmentStage,
-            d->textures[i].get(),
+            d->textures->texture(i),
             d->sampler.get()));
     }
 
@@ -431,29 +444,101 @@ void RhiVideoRenderer::createBindings()
     NX_ASSERT(d->srb->isLayoutCompatible(prevSrb.get()));
 }
 
-void RhiVideoRenderer::ensureTextures()
+void RhiVideoRenderer::ensureTextures(const AVFrame* frame)
 {
-    const size_t planeCount = planeCountFromFormat(d->data.data.key.format);
+    d->planeCount = MediaOutputShaderProgram::planeCount((AVPixelFormat) frame->format);
 
-    if (planeCount == d->textures.size() && d->textures.front()->pixelSize() == d->data.frame->size())
-        return;
-
-    d->textures.clear();
-
-    for (size_t i = 0; i < planeCount; ++i)
+    auto textures = dynamic_cast<VideoTextures*>(d->textures.get());
+    if (!textures)
     {
-        std::unique_ptr<QRhiTexture> texture;
-        texture.reset(d->rhi->newTexture(
-            textureFormat(d->data.data.key.format, i),
-            textureSize((AVPixelFormat) d->data.frame->format, i, d->data.frame->size()),
-            /*sampleCount*/ 1));
-        texture->create();
-
-        d->textures.push_back(std::move(texture));
+        d->textures = std::make_unique<VideoTextures>();
+        d->textures.get();
     }
 
-    createBindings();
+    for (size_t i = d->planeCount; i < VideoTextures::maxCount; ++i)
+        textures->all[i].reset();
+
+    bool createNewBindings = false;
+
+    const auto frameFormat = MediaOutputShaderProgram::formatFromPlaneCount(d->planeCount);
+
+    for (size_t i = 0; i < d->planeCount; ++i)
+    {
+        const auto format = textureFormat(frameFormat, i);
+        const auto size = textureSize(
+            (AVPixelFormat) frame->format,
+            /* plane */ i,
+            QSize(frame->width, frame->height));
+
+        auto& texture = textures->all[i];
+        if (!texture)
+        {
+            texture.reset(d->rhi->newTexture(format, size, /*sampleCount*/ 1));
+            texture->create();
+            createNewBindings = true;
+        }
+        else if (texture->format() != format || texture->pixelSize() != size)
+        {
+            texture->setFormat(format);
+            texture->setPixelSize(size);
+            texture->create();
+            createNewBindings = true;
+        }
+    }
+
+    if (createNewBindings)
+        createBindings();
+
     d->lastUploadedFrame = 0;
+}
+
+void RhiVideoRenderer::uploadFrame(const AVFrame* frame, QRhiResourceUpdateBatch* rub)
+{
+    ensureTextures(frame);
+
+    const uint8_t* const* planes = frame->data;
+    const int* const lineSizes = frame->linesize;
+    const QSize frameSize(frame->width, frame->height);
+
+    for (size_t i = 0; i < d->planeCount; ++i)
+    {
+        const auto size = textureSize(
+            (AVPixelFormat) frame->format, i, frameSize);
+        const auto stride = lineSizes[i];
+        QByteArray data((const char*)planes[i], size.height() * stride);
+        QRhiTextureSubresourceUploadDescription desc(planes[i], size.height() * stride);
+        desc.setDataStride(stride);
+        rub->uploadTexture(d->textures->texture(i), QRhiTextureUploadEntry(0, 0, desc));
+    }
+}
+
+void RhiVideoRenderer::uploadFrame(QVideoFrame* videoFrame, QRhiResourceUpdateBatch* rub)
+{
+    if (!videoFrame)
+        return;
+
+    d->planeCount = videoFrame->planeCount();
+
+    if (auto textures = videoFrame->videoBuffer()->mapTextures(d->rhi))
+    {
+        d->textures = std::move(textures);
+        createBindings();
+        return;
+    }
+
+    AVFrame frame;
+    memset(&frame, 0, sizeof(frame));
+    frame.format = d->data.frame->format;
+    frame.width = videoFrame->width();
+    frame.height = videoFrame->height();
+    videoFrame->map(QVideoFrame::ReadOnly);
+    for (size_t i = 0; i < d->planeCount; ++i)
+    {
+        frame.linesize[i] = videoFrame->bytesPerLine(i);
+        frame.data[i] = videoFrame->bits(i);
+    }
+
+    uploadFrame(&frame, rub);
 }
 
 void RhiVideoRenderer::prepare(
@@ -478,29 +563,15 @@ void RhiVideoRenderer::prepare(
     else
         d->data = data;
 
-    // Allocate textures.
-    ensureTextures();
-
-    // Upload textures.
-    const uint8_t* const* planes = d->data.frame->data;
-    const int* const lineSizes = d->data.frame->linesize;
-
-    const int planeCount = planeCountFromFormat(d->data.data.key.format);
-
     // TODO: #ikulaychuk add 1x1 black texture for null frame.
 
     if ((intptr_t) d->data.frame.get() != d->lastUploadedFrame)
     {
-        for(int i = 0; i < planeCount; ++i)
-        {
-            const auto size = textureSize(
-                (AVPixelFormat) d->data.frame->format, i, d->data.frame->size());
-            const auto stride = textureLineSize(d->data.data.key.format, i, lineSizes);
+        if (d->data.frame->memoryType() == MemoryType::VideoMemory)
+            uploadFrame(d->data.frame->getVideoSurface()->frame(), rub);
+        else
+            uploadFrame(d->data.frame.get(), rub);
 
-            QRhiTextureSubresourceUploadDescription desc(planes[i], size.height() * stride);
-            desc.setDataStride(stride);
-            rub->uploadTexture(d->textures[i].get(), QRhiTextureUploadEntry(0, 0, desc));
-        }
         d->lastUploadedFrame = (intptr_t) d->data.frame.get();
     }
 
@@ -529,7 +600,7 @@ void RhiVideoRenderer::prepare(
         }
     }
 
-    NX_ASSERT(buffer.size() == d->ubuf->size(), "%1 shoud be %2", buffer.size(), d->ubuf->size());
+    NX_ASSERT(buffer.size() == d->ubuf->size(), "%1 should be %2", buffer.size(), d->ubuf->size());
     rub->updateDynamicBuffer(d->ubuf.get(), 0, buffer.size(), buffer.data());
 
     const quint32 vsize = data.data.verts.size() * 2 * sizeof(float);
