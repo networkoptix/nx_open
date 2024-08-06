@@ -41,8 +41,8 @@ Currently, the following units are included into nx_kit:
 ---------------------------------------------------------------------------------------------------
 ## Building
 
-This kit is suitable to form a source-only artifact `nx_kit` with the only `src` folder in it -
-the source code files will be compiled as part of the project that uses the artifact. For cmake
+This kit is suitable to form a source-only artifact `nx_kit` with the only `src` folder in it - the
+source code files will be compiled as part of the project that uses the artifact. For the CMake
 users, `CMakeLists.txt` can also be deployed to the artifact to be used in `add_subdirectory()`.
 
 All classes and functions in this kit are prefixed with `NX_KIT_API` macro which allows to control
@@ -52,18 +52,26 @@ Tests for these utils are located in the `unit_tests` folder. The test project c
 on Linux using cmake/ctest, on Windows with Cygwin using cmake/ctest or CLion IDE, or on Windows
 using Microsoft Visual Studio 2012+.
 
-To build and run tests on Linux or Windows+Cygwin, with `CMake >= 3.3.2` and `g++ >= 4.8.4`:
+For convenience and as an example, there are scripts named `build.bat` and `build.sh`. These
+scripts build and run `nx_kit` library and its unit tests for Windows and Linux (or
+Windows + Cygwin / MinGW / Git Bash), respectively. They serve as wrappers around the standard
+CMake build procedure, including the generation stage, building and running ctest.
+
+Prerequisites:
 ```
-# Make a folder for build results:
-mkdir .../nx_kit-build
-cd .../nx_kit-build
-
-# Generate Makefiles:
-cmake .../nx_kit
-
-# Compile and link:
-cmake --build .
-
-# Run tests:
-./nx_kit_ut
+- CMake >= 3.14
+- Windows (7, 10 or 11): Microsoft Visual Studio >= 2012
+- Linux (Ubuntu 18.04, 20.04, 22.04)
+    - g++ >= 7.5
+    - make or Ninja
 ```
+
+Please note that on the Windows platform, if you use one of the provided scripts, you should also
+have Ninja installed as part of Microsoft Visual Studio. Additionally, if `build.bat` is
+executed within the `nx` repository directory, it attempts to initialize the environment under the
+assumption that the Microsoft Visual Studio 2022 Community edition is being used. If any of these
+conditions (MSVC version or `nx_kit` directory placement) are not met, the build must be initiated
+from an already initialized environment (e.g., the "x64 Native Tools Command Prompt for VS 2022"
+for MSVC 2022, or its equivalent for the MSVC version installed on your machine).
+
+To view the possible command-line options of the scripts, run them with `-h` or `/?`.
