@@ -44,9 +44,6 @@ QIcon selectButtonIcon(SystemContext* context, vms::rules::LayoutField* field)
     {
         if (resource->isShared())
             return getIcon(QnResourceIconCache::SharedLayout);
-
-        if (resource->locked())
-            return getIcon(QnResourceIconCache::Layout | QnResourceIconCache::Locked);
     }
 
     return getIcon(QnResourceIconCache::Layout);
