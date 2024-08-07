@@ -284,6 +284,60 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
         m_uuidPool(new UuidPool(uuidPoolBase, 16384))
     #endif
 {
+    connect(windowContext(), &WindowContext::beforeSystemChanged,
+        [this]
+        {
+            if (!m_localDesktopCamera || !ini().enableDesktopCameraLazyInitialization)
+                return;
+
+            QSet<QnVideoWallResourcePtr> videowallsToSave;
+            for (const nx::Uuid& videoWallId: m_videoWallsWithLocalDesktopCamera)
+            {
+                const auto videoWall =
+                    resourcePool()->getResourceById<QnVideoWallResource>(videoWallId);
+
+                if (!videoWall)
+                    continue;
+
+                for (QnVideoWallItem videoWallItem: videoWall->items()->getItems())
+                {
+                    if (!m_localDesktopCameraLayoutIds.contains(videoWallItem.layout))
+                        continue;
+
+                    const auto layout =
+                        resourcePool()->getResourceById<QnLayoutResource>(videoWallItem.layout);
+
+                    const nx::vms::common::LayoutItemDataMap layoutItems = layout->getItems();
+                    if (layoutItems.size() != 1)
+                        continue; //< Desktop camera is always the only one item of a layout.
+
+                    if (layoutItems.begin()->resource.id != m_localDesktopCamera->getId())
+                        continue; //< Layout was changed/removed since "Push my screen" activation.
+
+                    videoWallItem.layout = nx::Uuid();
+
+                    QnVideoWallItemIndex itemIndex = resourcePool()->getVideoWallItemByUuid(
+                        videoWallItem.uuid);
+
+                    itemIndex.videowall()->items()->updateItem(videoWallItem);
+                    videowallsToSave << videoWall;
+                }
+            }
+
+            saveVideowalls(videowallsToSave, /*saveLayout*/ false,
+                [this](bool successfullySaved, const QnVideoWallResourcePtr& videowall)
+                {
+                    if (successfullySaved)
+                        cleanupUnusedLayouts({videowall});
+                });
+
+            m_videoWallsWithLocalDesktopCamera.clear();
+            m_localDesktopCameraLayoutIds.clear();
+
+            qnResourcesChangesManager->deleteResource(m_localDesktopCamera);
+            m_localDesktopCamera.clear();
+        });
+
     m_licensesHelper->setCustomValidator(
         std::make_unique<license::VideoWallLicenseValidator>(systemContext()));
 
@@ -1631,7 +1685,7 @@ void QnWorkbenchVideoWallHandler::at_attachToVideoWallAction_triggered()
 
 void QnWorkbenchVideoWallHandler::at_detachFromVideoWallAction_triggered()
 {
-    QnVideoWallItemIndexList items = menu()->currentParameters(sender()).videoWallItems();
+    const QnVideoWallItemIndexList items = menu()->currentParameters(sender()).videoWallItems();
 
     QSet<QnVideoWallResourcePtr> videoWalls;
 
@@ -2143,7 +2197,7 @@ void QnWorkbenchVideoWallHandler::at_pushMyScreenToVideowallAction_triggered()
             continue;
         }
 
-        auto desktopCamera =
+        const auto desktopCamera =
             resourcePool()->getResourceByPhysicalId<QnVirtualCameraResource>(
                 desktopCameraPhysicalId());
 
@@ -2152,6 +2206,7 @@ void QnWorkbenchVideoWallHandler::at_pushMyScreenToVideowallAction_triggered()
             && desktopCamera->hasFlags(Qn::desktop_camera)
             && !desktopCamera->hasFlags(Qn::fake))
         {
+            m_localDesktopCamera = desktopCamera;
             targetLayout = constructLayout({desktopCamera});
 
             NX_INFO(this, "Push my screen is handled. Already existing desktop camera is used.");
@@ -2162,10 +2217,14 @@ void QnWorkbenchVideoWallHandler::at_pushMyScreenToVideowallAction_triggered()
                 systemContext()->desktopCameraStubController()->createLocalCameraStub(
                     desktopCameraPhysicalId());
 
+            m_localDesktopCamera = localCameraStub;
             targetLayout = constructLayout({localCameraStub});
 
             NX_INFO(this, "Push my screen is handled. New desktop camera is constructed.");
         }
+
+        m_videoWallsWithLocalDesktopCamera << videoWallScreenIndex.videowall()->getId();
+        m_localDesktopCameraLayoutIds << targetLayout->getId();
 
         targetLayout->setParentId(videoWallScreenIndex.videowall()->getId());
         targetLayout->setName(videoWallScreenIndex.item().name);
@@ -2437,6 +2496,12 @@ void QnWorkbenchVideoWallHandler::at_resPool_resourceRemoved(const QnResourcePtr
 {
     /* Return id to the pool. */
     m_uuidPool->markAsFree(resource->getId());
+
+    if (resource == m_localDesktopCamera)
+    {
+        m_localDesktopCamera.reset();
+        return;
+    }
 
     QnVideoWallResourcePtr videoWall = resource.dynamicCast<QnVideoWallResource>();
     if (!videoWall)

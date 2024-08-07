@@ -108,6 +108,12 @@ void DesktopCameraStubController::atResourcesRemoved(const QnResourceList& resou
 {
     for (const auto& resource: resources)
     {
+        if (resource == m_localCameraStub)
+        {
+            m_localCameraStub.reset();
+            continue;
+        }
+
         const auto layout = resource.dynamicCast<LayoutResource>();
         if (!layout)
             continue;

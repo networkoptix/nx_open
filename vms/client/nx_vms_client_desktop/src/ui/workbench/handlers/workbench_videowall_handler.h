@@ -275,4 +275,8 @@ private:
     nx::vms::license::VideoWallLicenseUsageHelper* m_licensesHelper;
     QScopedPointer<UuidPool> m_uuidPool;
     QScopedPointer<MultiscreenWidgetGeometrySetter> m_geometrySetter;
+
+    QnVirtualCameraResourcePtr m_localDesktopCamera;
+    QSet<nx::Uuid> m_videoWallsWithLocalDesktopCamera;
+    QSet<nx::Uuid> m_localDesktopCameraLayoutIds;
 };
