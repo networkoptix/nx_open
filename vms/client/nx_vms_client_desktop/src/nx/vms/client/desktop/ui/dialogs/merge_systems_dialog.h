@@ -58,7 +58,11 @@ private slots:
 private:
     void updateKnownSystems();
     void updateErrorLabel(const QString& error);
-    void updateConfigurationBlock();
+    void setConfigurationAllowed(bool value);
+    void updateMergeButtonAvailability();
+
+    /** Show remote system name, adapt controls in case of a factory system. */
+    void processRemoteSystemInfo(const nx::vms::api::ModuleInformation& moduleInformation);
 
 private:
     QScopedPointer<Ui::MergeSystemsDialog> ui;
