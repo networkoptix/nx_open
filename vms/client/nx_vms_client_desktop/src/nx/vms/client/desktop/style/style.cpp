@@ -62,6 +62,7 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/node_view/details/node/view_node_helper.h>
 #include <nx/vms/client/desktop/skin/font_config.h>
+#include <nx/vms/client/desktop/system_tab_bar/private/close_tab_button.h>
 #include <nx/vms/client/desktop/utils/widget_utils.h>
 #include <ui/common/indents.h>
 #include <ui/common/palette.h>
@@ -979,8 +980,10 @@ void Style::drawPrimitive(PrimitiveElement element,
             const bool hovered = option->state.testFlag(State_MouseOver) && enabled;
 
             QRect rect = option->rect;
-
-            QColor mainColor = option->palette.window().color();
+            auto colorGroup = option->state.testFlag(State_On)
+                ? QPalette::Active
+                : QPalette::Inactive;
+            QColor mainColor = option->palette.color(colorGroup, QPalette::Window);
             if (tabBar)
             {
                 switch (shape)
@@ -1035,7 +1038,20 @@ void Style::drawPrimitive(PrimitiveElement element,
                     painter->drawLine(rect.topRight(), rect.bottomRight());
                 }
             }
-
+            else if (const auto closeButton = qobject_cast<const CloseTabButton*>(widget))
+            {
+                if (const auto leftMargin = closeButton->contentsMargins().left())
+                {
+                    QBrush color{option->palette.color(colorGroup, QPalette::Dark)};
+                    painter->fillRect(0, 0, leftMargin, closeButton->height(), color);
+                }
+                if (const auto rightMargin = closeButton->contentsMargins().right())
+                {
+                    QBrush color{option->palette.color(colorGroup, QPalette::Light)};
+                    painter->fillRect(
+                        closeButton->width(), 0, -rightMargin, closeButton->height(), color);
+                }
+            }
             return;
         }
 
@@ -2342,7 +2358,6 @@ void Style::drawControl(ControlElement element,
                     textRect.setRight(textRect.right() -
                         closeButton->width() - Metrics::kInterSpace);
                 }
-
 
                 if (shape == TabShape::Rectangular)
                 {

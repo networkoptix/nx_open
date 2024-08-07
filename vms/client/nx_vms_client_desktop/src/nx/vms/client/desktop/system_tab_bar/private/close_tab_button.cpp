@@ -10,6 +10,9 @@
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/style.h>
 
+#include "../home_tab_button.h"
+#include "../system_tab_bar.h"
+
 namespace {
 
 static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kTabCloseTheme = {
@@ -64,11 +67,19 @@ void CloseTabButton::paintEvent(QPaintEvent*)
 
     if (const auto tabWidget = qobject_cast<const QTabBar*>(parent()))
     {
-        int index = tabWidget->currentIndex();
-        auto position = static_cast<QTabBar::ButtonPosition>(
+        const int currentIndex = tabWidget->currentIndex();
+        const auto position = static_cast<QTabBar::ButtonPosition>(
             style()->styleHint(QStyle::SH_TabBar_CloseButtonPosition, 0, tabWidget));
-        if (tabWidget->tabButton(index, position) == this)
-            state = QIcon::On;
+        if (tabWidget->tabButton(currentIndex, position) == this)
+        {
+            const auto systemTabBar = qobject_cast<const SystemTabBar*>(tabWidget);
+            if (!systemTabBar || systemTabBar->active())
+                state = QIcon::On;
+        }
+    }
+    else if (const auto buttonWidget = qobject_cast<const HomeTabButton*>(parent()))
+    {
+        state = QIcon::On;
     }
     icon().paint(&painter, rect, Qt::AlignLeft | Qt::AlignVCenter, mode, state);
 }
