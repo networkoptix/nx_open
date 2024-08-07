@@ -25,8 +25,17 @@ OptionalDurationPicker::OptionalDurationPicker(
 
     mainLayout->addWidget(m_label);
 
+    auto timeWidgetLayout = new QHBoxLayout;
+
     m_timeDurationWidget = new TimeDurationWidget;
-    mainLayout->addWidget(m_timeDurationWidget);
+    // To prevent widget resizing upon time unit change, set the fixed width big enough for any
+    // possible value.
+    m_timeDurationWidget->setFixedWidth(160);
+    timeWidgetLayout->addWidget(m_timeDurationWidget);
+
+    timeWidgetLayout->addStretch();
+
+    mainLayout->addLayout(timeWidgetLayout);
 
     mainLayout->setStretch(0, 1);
     mainLayout->setStretch(1, 5);
