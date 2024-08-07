@@ -217,14 +217,21 @@ void StyleBasePrivate::drawToolButton(
         else
         {
             rect.translate(shiftX, shiftY);
+            for (const auto& child: widget->children())
+            {
+                const auto& childWidget = qobject_cast<QWidget*>(child);
+                if (childWidget && childWidget->isVisible())
+                {
+                    rect.setWidth(
+                        rect.width() -
+                        childWidget->width() +
+                        childWidget->contentsMargins().right());
+                }
+            }
             if (hasArrow)
-            {
                 drawArrowIndicator(q, option, rect, painter, widget);
-            }
             else
-            {
                 q->drawItemPixmap(painter, rect, Qt::AlignCenter, pm);
-            }
         }
     }
 }

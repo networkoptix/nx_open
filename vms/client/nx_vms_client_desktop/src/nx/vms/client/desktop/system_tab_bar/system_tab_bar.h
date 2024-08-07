@@ -29,25 +29,23 @@ public:
     SystemTabBar(QWidget* parent = nullptr);
     void setStateStore(QSharedPointer<Store> store, QSharedPointer<StateHandler> stateHandler);
     void rebuildTabs();
-    void activateHomeTab();
-    bool isHomeTabActive() const;
     bool isUpdating() const;
+    bool active() const;
 
 protected:
     virtual QSize tabSizeHint(int index) const override;
     virtual void mousePressEvent(QMouseEvent* event) override;
-    virtual void mouseMoveEvent(QMouseEvent* event) override;
-    virtual void dragEnterEvent(QDragEnterEvent* event) override;
-    virtual void dropEvent(QDropEvent* event) override;
     virtual void contextMenuEvent(QContextMenuEvent* event) override;
+    virtual void initStyleOption(QStyleOptionTab* option, int tabIndex) const override;
+
+private slots:
+    void at_currentChanged(int index);
+    void at_tabMoved(int from, int to);
 
 private:
     void insertClosableTab(int index,
         const QString& text,
         const core::SystemDescriptionPtr& systemDescription);
-    bool isHomeTab(int index) const;
-    int homeTabIndex() const;
-    void updateHomeTabView();
     void connectToSystem(const core::SystemDescriptionPtr& system, const LogonData& logonData);
     bool disconnectFromSystem(const nx::Uuid& localId);
     QPixmap imageData(int tabIndex) const;
@@ -57,7 +55,6 @@ private:
     bool m_updating = false;
     QSharedPointer<Store> m_store;
     QSharedPointer<StateHandler> m_stateHandler;
-    QPoint m_dragStartPosition;
 };
 
 } // namespace nx::vms::client::desktop

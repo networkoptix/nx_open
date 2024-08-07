@@ -8,6 +8,9 @@ namespace nx::vms::client::desktop {
 
 class CloseTabButton: public QAbstractButton
 {
+    Q_OBJECT
+    using base_type = QAbstractButton;
+
 public:
     explicit CloseTabButton(QWidget* parent = 0);
     virtual void paintEvent(QPaintEvent* event) override;

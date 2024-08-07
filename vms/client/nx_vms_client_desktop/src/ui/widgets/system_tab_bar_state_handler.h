@@ -11,7 +11,6 @@ namespace nx::vms::client::desktop {
 class SystemTabBarStateHandler: public QObject, public QnWorkbenchContextAware
 {
     Q_OBJECT
-
     using State = MainWindowTitleBarState;
     using Store = MainWindowTitleBarStateStore;
 
@@ -22,6 +21,7 @@ public:
 signals:
     void tabsChanged();
     void activeSystemTabChanged(int index);
+    void homeTabActiveChanged(bool active);
 
 private:
     void at_stateChanged(const State& state);

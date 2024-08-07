@@ -29,6 +29,7 @@
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/style.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/system_tab_bar/home_tab_button.h>
 #include <nx/vms/client/desktop/system_tab_bar/system_tab_bar.h>
 #include <nx/vms/client/desktop/utils/mime_data.h>
 #include <nx/vms/common/showreel/showreel_manager.h>
@@ -137,6 +138,7 @@ public:
     ToolButton* mainMenuButton = nullptr;
     QnLayoutTabBar* layoutBar = nullptr;
     SystemTabBar* systemBar = nullptr;
+    HomeTabButton* systemHomeTab = nullptr;
     ToolButton* newTabButton = nullptr;
     ToolButton* currentLayoutsButton = nullptr;
     QnCloudStatusPanel* cloudPanel = nullptr;
@@ -323,6 +325,7 @@ void QnMainWindowTitleBarWidget::setStateStore(QSharedPointer<Store> store,
 
     d->resizer->setEnabled(!d->store->state().homeTabActive);
     d->systemBar->setStateStore(store, stateHandler);
+    d->systemHomeTab->setStateStore(store, stateHandler);
 }
 
 void QnMainWindowTitleBarWidget::setTabBarStuffVisible(bool visible)
@@ -524,6 +527,8 @@ void QnMainWindowTitleBarWidget::initMultiSystemTabBar()
     d->systemBar = new SystemTabBar(this);
     d->systemBar->setFocusPolicy(Qt::NoFocus);
 
+    d->systemHomeTab = new HomeTabButton(this);
+
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
     mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->setSpacing(0);
@@ -544,6 +549,7 @@ void QnMainWindowTitleBarWidget::initMultiSystemTabBar()
     d->systemLayout->addWidget(d->mainMenuButton);
     d->systemLayout->addWidget(newVLine(0, "dark8"));
     d->systemLayout->addWidget(d->systemBar);
+    d->systemLayout->addWidget(d->systemHomeTab);
     d->systemLayout->addStretch(1);
     d->systemLayout->addSpacing(80);
     d->systemLayout->addWidget(newVLine("dark8", "dark6"));

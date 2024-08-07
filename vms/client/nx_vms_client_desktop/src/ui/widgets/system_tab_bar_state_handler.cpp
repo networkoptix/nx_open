@@ -69,15 +69,15 @@ void SystemTabBarStateHandler::setStateStore(QSharedPointer<Store> store)
 
 void SystemTabBarStateHandler::at_stateChanged(const State& state)
 {
+    if (!NX_ASSERT(m_store))
+        return;
+
     if (state.systems != m_storedState.systems)
         emit tabsChanged();
 
     if (state.homeTabActive != m_storedState.homeTabActive)
     {
-        if (state.homeTabActive)
-            emit activeSystemTabChanged(state.systems.count());
-        else
-            emit activeSystemTabChanged(state.activeSystemTab);
+        emit homeTabActiveChanged(state.homeTabActive);
     }
     else if (state.activeSystemTab != m_storedState.activeSystemTab && !state.homeTabActive)
     {
@@ -90,12 +90,15 @@ void SystemTabBarStateHandler::at_stateChanged(const State& state)
 void SystemTabBarStateHandler::at_currentSystemChanged(
     core::SystemDescriptionPtr systemDescription)
 {
-    if (m_store)
+    if (NX_ASSERT(m_store))
         m_store->changeCurrentSystem(systemDescription);
 }
 
 void SystemTabBarStateHandler::at_systemDisconnected()
 {
+    if (!NX_ASSERT(m_store))
+        return;
+
     const auto parameters = menu()->currentParameters(sender());
     const auto systemId = parameters.argument(Qn::LocalSystemIdRole).value<nx::Uuid>();
     m_store->removeSystem(systemId);
@@ -104,6 +107,9 @@ void SystemTabBarStateHandler::at_systemDisconnected()
 void SystemTabBarStateHandler::at_connectionStateChanged(
     ConnectActionsHandler::LogicalState logicalValue)
 {
+    if (!NX_ASSERT(m_store))
+        return;
+
     m_store->setHomeTabActive(!action(menu::ResourcesModeAction)->isChecked()
         && windowContext()->connectActionsHandler()->logicalState()
             != ConnectActionsHandler::LogicalState::connecting);
@@ -118,6 +124,9 @@ void SystemTabBarStateHandler::at_connectionStateChanged(
 
 void SystemTabBarStateHandler::storeWorkbenchState()
 {
+    if (!NX_ASSERT(m_store))
+        return;
+
     const auto systemId = m_store->state().currentSystemId;
     if (!systemId.isNull())
     {
