@@ -109,7 +109,7 @@ MergeSystemsDialog::MergeSystemsDialog(QWidget* parent, std::unique_ptr<Delegate
         this, &MergeSystemsDialog::at_mergeTool_mergeFinished);
 
     updateKnownSystems();
-    updateConfigurationBlock();
+    updateMergeButtonAvailability();
 }
 
 MergeSystemsDialog::~MergeSystemsDialog()
@@ -169,12 +169,40 @@ void MergeSystemsDialog::updateErrorLabel(const QString& error) {
     ui->errorLabel->setText(error);
 }
 
-void MergeSystemsDialog::updateConfigurationBlock() {
+void MergeSystemsDialog::setConfigurationAllowed(bool value)
+{
+    ui->credentialsGroupBox->setEnabled(value);
+    ui->configurationWidget->setEnabled(value);
+}
+
+void MergeSystemsDialog::updateMergeButtonAvailability()
+{
     const bool found = m_targetModule.has_value();
-    ui->configurationWidget->setEnabled(found);
     m_mergeButton->setEnabled(found);
     if (found)
         m_mergeButton->setFocus();
+}
+
+void MergeSystemsDialog::processRemoteSystemInfo(
+    const nx::vms::api::ModuleInformation& moduleInformation)
+{
+    const bool isNewSystem = helpers::isNewSystem(moduleInformation);
+    if (isNewSystem)
+    {
+        ui->currentSystemRadioButton->setChecked(true);
+        ui->loginEdit->setText(helpers::kFactorySystemUser);
+        ui->passwordEdit->clear();
+    }
+
+    ui->remoteSystemRadioButton->setEnabled(!isNewSystem);
+    ui->loginEdit->setEnabled(!isNewSystem);
+    ui->passwordEdit->setEnabled(!isNewSystem);
+
+    const QString systemName = helpers::getSystemName(moduleInformation);
+    ui->remoteSystemLabel->setText(systemName);
+    ui->remoteSystemRadioButton->setText(systemName);
+
+    m_mergeButton->setText(tr("Merge with %1").arg(systemName));
 }
 
 void MergeSystemsDialog::at_urlComboBox_activated(int index) {
@@ -206,7 +234,7 @@ void MergeSystemsDialog::at_testConnectionButton_clicked()
     m_targetModule.reset();
     m_remoteOwnerCredentials = nx::network::http::Credentials();
 
-    updateConfigurationBlock();
+    updateMergeButtonAvailability();
 
     nx::utils::Url url = nx::utils::Url::fromUserInput(ui->urlComboBox->currentText());
     QString login = ui->loginEdit->text();
@@ -214,13 +242,13 @@ void MergeSystemsDialog::at_testConnectionButton_clicked()
 
     if (!nx::network::http::isUrlScheme(url.scheme()) || url.host().isEmpty()) {
         updateErrorLabel(tr("URL is invalid."));
-        updateConfigurationBlock();
+        updateMergeButtonAvailability();
         return;
     }
 
     if (login.isEmpty()) {
         updateErrorLabel(tr("The login cannot be empty."));
-        updateConfigurationBlock();
+        updateMergeButtonAvailability();
         return;
     }
 
@@ -239,7 +267,7 @@ void MergeSystemsDialog::at_testConnectionButton_clicked()
             .ownSettings = ui->currentSystemRadioButton->isChecked() }
         );
 
-    ui->credentialsGroupBox->setEnabled(false);
+    setConfigurationAllowed(false);
     ui->buttonBox->showProgress(tr("Testing..."));
 }
 
@@ -263,8 +291,7 @@ void MergeSystemsDialog::at_mergeButton_clicked()
     if (!ownerSessionToken)
         return;
 
-    ui->credentialsGroupBox->setEnabled(false);
-    ui->configurationWidget->setEnabled(false);
+    setConfigurationAllowed(false);
     m_mergeButton->setEnabled(false);
 
     if (!ownSettings)
@@ -281,16 +308,9 @@ void MergeSystemsDialog::at_mergeTool_systemFound(
     const nx::vms::api::MergeStatusReply& reply)
 {
     ui->buttonBox->hideProgress();
-    ui->credentialsGroupBox->setEnabled(true);
-
-    if (mergeStatus == MergeSystemsStatus::ok)
-        mergeStatus = MergeSystemsValidator::checkVersionCompatibility(moduleInformation);
-
-    if (mergeStatus == MergeSystemsStatus::ok)
-    {
-        mergeStatus =
-            MergeSystemsValidator::checkCloudCompatibility(currentServer(), moduleInformation);
-    }
+    setConfigurationAllowed(true);
+    if (!moduleInformation.id.isNull())
+        processRemoteSystemInfo(moduleInformation);
 
     ui->warnWidget->setHidden(reply.warnings.empty());
     QStringList warnings;
@@ -304,7 +324,6 @@ void MergeSystemsDialog::at_mergeTool_systemFound(
             ? MergeSystemsTool::getErrorMessage(mergeStatus, moduleInformation)
             : errorText;
         updateErrorLabel(errorLabel);
-        updateConfigurationBlock();
         return;
     }
 
@@ -328,37 +347,9 @@ void MergeSystemsDialog::at_mergeTool_systemFound(
     }
 
     m_targetModule = moduleInformation;
-
-    bool isNewSystem = helpers::isNewSystem(moduleInformation);
-    if (isNewSystem)
-    {
-        ui->currentSystemRadioButton->setChecked(true);
-        ui->loginEdit->setText(helpers::kFactorySystemUser);
-        ui->passwordEdit->clear();
-    }
-
-    ui->remoteSystemRadioButton->setEnabled(!isNewSystem);
-    ui->loginEdit->setEnabled(!isNewSystem);
-    ui->passwordEdit->setEnabled(!isNewSystem);
-
-    const QString systemName = helpers::getSystemName(moduleInformation);
-    ui->remoteSystemLabel->setText(systemName);
-    ui->remoteSystemRadioButton->setText(systemName);
-
-    m_mergeButton->setText(tr("Merge with %1").arg(systemName));
     m_mergeButton->show();
-
-    // Ok status returns empty string.
-    if (allowsToMerge(mergeStatus))
-    {
-        updateErrorLabel(MergeSystemsTool::getErrorMessage(mergeStatus, moduleInformation));
-    }
-    else
-    {
-        updateErrorLabel(QString());
-    }
-
-    updateConfigurationBlock();
+    updateErrorLabel(QString());
+    updateMergeButtonAvailability();
 }
 
 void MergeSystemsDialog::at_mergeTool_mergeFinished(
@@ -367,7 +358,7 @@ void MergeSystemsDialog::at_mergeTool_mergeFinished(
     const nx::vms::api::ModuleInformation& moduleInformation)
 {
     ui->buttonBox->hideProgress();
-    ui->credentialsGroupBox->setEnabled(true);
+    setConfigurationAllowed(true);
 
     if (mergeStatus == MergeSystemsStatus::ok)
     {
@@ -411,7 +402,7 @@ void MergeSystemsDialog::at_mergeTool_mergeFinished(
 
         QnSessionAwareMessageBox::critical(this, tr("Failed to merge Systems"), message);
 
-        updateConfigurationBlock();
+        updateMergeButtonAvailability();
     }
 }
 
