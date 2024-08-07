@@ -18,6 +18,8 @@ class NX_VMS_RULES_API OpenLayoutAction: public nx::vms::rules::BasicAction
     FIELD(nx::Uuid, layoutId, setLayoutId)
 
 public:
+    QVariantMap details(common::SystemContext* context) const override;
+
     static const ItemDescriptor& manifest();
 };
 
