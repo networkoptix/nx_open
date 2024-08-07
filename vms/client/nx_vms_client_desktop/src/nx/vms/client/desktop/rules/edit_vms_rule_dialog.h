@@ -9,6 +9,7 @@
 #include <nx/vms/client/desktop/system_context_aware.h>
 #include <nx/vms/rules/field_validator.h>
 #include <nx/vms/rules/rule.h>
+#include <nx/vms/rules/utils/event.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
 
 #include "helpers/rule_compatibility_manager.h"
@@ -56,6 +57,7 @@ private:
     bool m_checkValidityOnChanges{false};
 
     std::shared_ptr<vms::rules::Rule> m_rule;
+    vms::rules::EventDurationType m_eventDurationType{};
     std::unique_ptr<RuleCompatibilityManager> m_ruleCompatibilityManager;
     bool m_isNewRule{false};
 
