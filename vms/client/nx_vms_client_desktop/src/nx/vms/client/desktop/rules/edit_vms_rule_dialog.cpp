@@ -291,6 +291,8 @@ void EditVmsRuleDialog::setRule(std::shared_ptr<vms::rules::Rule> rule, bool isN
     }
 
     m_rule = std::move(rule);
+    m_eventDurationType =
+        vms::rules::getEventDurationType(engine, m_rule->eventFilters().first());
     m_ruleCompatibilityManager =
         std::make_unique<RuleCompatibilityManager>(m_rule.get(), systemContext());
 
@@ -300,10 +302,16 @@ void EditVmsRuleDialog::setRule(std::shared_ptr<vms::rules::Rule> rule, bool isN
         this,
         [this]
         {
+            const auto eventDurationType = vms::rules::getEventDurationType(
+                systemContext()->vmsRulesEngine(), m_rule->eventFilters().first());
+
             if (m_eventEditorWidget->eventType() != m_rule->eventFilters().first()->eventType()
-                || m_actionEditorWidget->actionType() != m_rule->actionBuilders().first()->actionType())
+                || m_actionEditorWidget->actionType() != m_rule->actionBuilders().first()->actionType()
+                || m_eventDurationType != eventDurationType)
             {
-                // Event or action type is changed, UI rebuild required.
+                // UI rebuild required.
+
+                m_eventDurationType = eventDurationType;
 
                 displayRule();
                 setHasChanges(true);

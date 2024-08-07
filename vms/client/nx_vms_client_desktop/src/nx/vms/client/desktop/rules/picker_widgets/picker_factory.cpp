@@ -166,10 +166,9 @@ PickerWidget* createOptionalDurationPicker(
 {
     if (field->descriptor()->fieldName == vms::rules::utils::kDurationFieldName)
     {
-        const auto event = parent->eventDescriptor();
-        const auto isEventInstantOnly = event->flags.testFlag(vms::rules::ItemFlag::instant)
-            && !event->flags.testFlag(vms::rules::ItemFlag::prolonged);
-        if (isEventInstantOnly)
+        const auto eventDurationType =
+            vms::rules::getEventDurationType(context->vmsRulesEngine(), parent->eventFilter());
+        if (eventDurationType == vms::rules::EventDurationType::instant)
             return createPickerImpl<DurationPicker<vms::rules::OptionalTimeField>>(field, context, parent);
 
         // Create picker widget which also controls event state.
