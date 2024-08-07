@@ -5,10 +5,18 @@
 #include "../action_builder_fields/layout_field.h"
 #include "../action_builder_fields/target_user_field.h"
 #include "../strings.h"
+#include "../utils/event_details.h"
 #include "../utils/field.h"
 #include "../utils/type.h"
 
 namespace nx::vms::rules {
+
+QVariantMap OpenLayoutAction::details(common::SystemContext* context) const
+{
+    auto result = BasicAction::details(context);
+    result.insert(utils::kDestinationDetailName, Strings::subjects(context, users()));
+    return result;
+}
 
 const ItemDescriptor& OpenLayoutAction::manifest()
 {
