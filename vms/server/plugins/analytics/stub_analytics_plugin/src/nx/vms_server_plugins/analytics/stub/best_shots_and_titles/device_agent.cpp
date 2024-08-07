@@ -53,7 +53,7 @@ static const std::string kObjectTypeId = "nx.stub.objectBestShotDemo";
     if (str == kImageTitleGenerationPolicy)
         return TitleGenerationPolicy::image;
 
-    return TitleGenerationPolicy::url;
+    return TitleGenerationPolicy::fixed;
 }
 
 DeviceAgent::DeviceAgent(const nx::sdk::IDeviceInfo* deviceInfo):
