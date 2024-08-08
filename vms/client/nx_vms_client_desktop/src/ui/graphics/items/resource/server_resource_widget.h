@@ -15,6 +15,7 @@
 class QnMediaServerStatisticsManager;
 class StatisticsOverlayWidget;
 class QnGlFunctions;
+class QnImageButtonBar;
 
 class QnServerResourceWidget: public QnResourceWidget
 {

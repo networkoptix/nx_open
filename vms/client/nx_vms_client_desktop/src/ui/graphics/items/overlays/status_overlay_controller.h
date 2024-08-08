@@ -9,8 +9,6 @@
 #include <nx/vms/client/core/skin/svg_icon_colorer.h>
 #include <ui/graphics/items/overlays/resource_status_overlay_widget.h>
 
-class QnStatusOverlayWidget;
-
 class QnStatusOverlayController: public QObject
 {
     Q_OBJECT
@@ -33,50 +31,41 @@ public:
     void setCustomButtonText(const QString& text);
 
     bool isErrorOverlay() const;
-
+    QnStatusOverlayWidget::ErrorStyle errorStyle() const;
     QnStatusOverlayWidget::Controls visibleItems() const;
 
 public:
     QString currentButtonText() const;
 
-    static QString captionText(Qn::ResourceStatusOverlay overlay);
-    static QString descriptionText(Qn::ResourceStatusOverlay overlay);
-    static QString suggestionText(Qn::ResourceStatusOverlay overlay, bool buttonPresent);
-    static QString statusIconPath(Qn::ResourceStatusOverlay overlay);
     static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions statusIconColors(Qn::ResourceStatusOverlay overlay);
     static QPixmap statusIcon(Qn::ResourceStatusOverlay overlay);
 
 signals:
     void statusOverlayChanged(bool animated);
-
     void currentButtonChanged();
-
     void customButtonTextChanged();
-
     void isErrorOverlayChanged();
-
+    void isErrorStyleChanged();
     void buttonClicked(Qn::ResourceOverlayButton button);
-
     void customButtonClicked();
-
     void visibleItemsChanged();
 
 private:
     void updateVisibleItems();
-
     void updateWidgetItems();
-
     void onStatusOverlayChanged(bool animated);
 
     QnStatusOverlayWidget::Controls errorVisibleItems() const;
     QnStatusOverlayWidget::Controls normalVisibleItems() const;
 
     void updateErrorState();
+    void updateErrorStyle();
 
     typedef QHash<int, QString> IntStringHash;
     static IntStringHash getButtonCaptions(const QnResourcePtr& resource);
 
 private:
+    QnResourcePtr m_resource;
     const StatusOverlayWidgetPtr m_widget;
     const IntStringHash m_buttonTexts;
 
@@ -86,4 +75,5 @@ private:
     QString m_customButtonText;
 
     bool m_isErrorOverlay;
+    QnStatusOverlayWidget::ErrorStyle m_errorStyle;
 };

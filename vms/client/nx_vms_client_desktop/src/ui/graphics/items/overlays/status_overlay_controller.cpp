@@ -11,8 +11,167 @@
 
 namespace {
 
-const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kOfflineTheme = {{QIcon::Normal, {.primary = "red_core"}}};
-const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kLightTheme = {{QIcon::Normal, {.primary = "light10"}}};
+const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kRedTheme = {{QIcon::Normal, {.primary = "red"}}};
+const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kWhiteTheme = {{QIcon::Normal, {.primary = "light16"}}};
+
+static const auto kLockIconPath = "48x48/Outline/lock.svg";
+static const auto kRestrictIconPath = "48x48/Outline/restrict.svg";
+static const auto kErrorIconPath = "48x48/Outline/error.svg";
+static const auto kSoundIconPath = "48x48/Outline/sound.svg";
+static const auto kPaidIconPath = "48x48/Outline/paid.svg";
+
+struct OverlayInfo
+{
+    QnStatusOverlayWidget::ErrorStyle style;
+    QString caption;
+    QString statusIconPath;
+    QString tooltip;
+};
+
+using OverlayInfoMap = std::unordered_map<Qn::ResourceStatusOverlay, OverlayInfo>;
+
+const OverlayInfoMap& overlayInfo()
+{
+    static const QString kNotEnoughLicenses = QnStatusOverlayWidget::tr("NOT ENOUGH LICENSES");
+
+    static const OverlayInfoMap kOverlayInfo = {
+        {Qn::EmptyOverlay, {QnStatusOverlayWidget::ErrorStyle::red}},
+        {Qn::LoadingOverlay, {QnStatusOverlayWidget::ErrorStyle::red}},
+        {Qn::OfflineOverlay,
+            {QnStatusOverlayWidget::ErrorStyle::red,
+                QnStatusOverlayWidget::tr("OFFLINE"),
+                kErrorIconPath,
+                QnStatusOverlayWidget::tr(
+                    "This camera cannot be accessed. Perform camera diagnostics within the Desktop Client for additional information.")}},
+        {Qn::ServerOfflineOverlay,
+            {QnStatusOverlayWidget::ErrorStyle::red,
+                QnStatusOverlayWidget::tr("OFFLINE"),
+                kErrorIconPath}},
+        {Qn::UnauthorizedOverlay,
+            {QnStatusOverlayWidget::ErrorStyle::red,
+                QnStatusOverlayWidget::tr("UNAUTHORIZED"),
+                kLockIconPath,
+                QnStatusOverlayWidget::tr(
+                    "This camera requires authorized credentials to be set in the device settings in Cloud portal or Desktop client.")}},
+        {Qn::ServerUnauthorizedOverlay,
+            {QnStatusOverlayWidget::ErrorStyle::red,
+                QnStatusOverlayWidget::tr("UNAUTHORIZED"),
+                kLockIconPath}},
+        {Qn::AnalogWithoutLicenseOverlay,
+            {QnStatusOverlayWidget::ErrorStyle::red, kNotEnoughLicenses, kLockIconPath}},
+        {Qn::VideowallWithoutLicenseOverlay,
+            {QnStatusOverlayWidget::ErrorStyle::red, kNotEnoughLicenses, kLockIconPath}},
+        {Qn::IoModuleDisabledOverlay,
+            {QnStatusOverlayWidget::ErrorStyle::red, kNotEnoughLicenses, kLockIconPath}},
+        {Qn::OldFirmwareOverlay,
+            {QnStatusOverlayWidget::ErrorStyle::red,
+                QnStatusOverlayWidget::tr("UNSUPPORTED"),
+                kLockIconPath}},
+        {Qn::PasswordRequiredOverlay,
+            {QnStatusOverlayWidget::ErrorStyle::red,
+                QnStatusOverlayWidget::tr("PASSWORD REQUIRED"),
+                kLockIconPath}},
+        {Qn::SaasShutDown,
+            {QnStatusOverlayWidget::ErrorStyle::red,
+                QnStatusOverlayWidget::tr("SITE SHUT DOWN"),
+                kErrorIconPath}},
+        {Qn::RestrictedOverlay,
+            {QnStatusOverlayWidget::ErrorStyle::red,
+                QnStatusOverlayWidget::tr("STREAM LIMITATION"),
+                kPaidIconPath}},
+        {Qn::InformationRequiredOverlay,
+            {QnStatusOverlayWidget::ErrorStyle::white,
+                QnStatusOverlayWidget::tr("INFORMATION REQUIRED"),
+                kRestrictIconPath}},
+        {Qn::NoVideoDataOverlay,
+            {QnStatusOverlayWidget::ErrorStyle::white,
+                QnStatusOverlayWidget::tr("AUDIO ONLY"),
+                kSoundIconPath}},
+        {Qn::NoDataOverlay,
+            {QnStatusOverlayWidget::ErrorStyle::white, QnStatusOverlayWidget::tr("NO DATA")}},
+        {Qn::AccessDeniedOverlay,
+            {QnStatusOverlayWidget::ErrorStyle::white,
+                QnStatusOverlayWidget::tr("NO ACCESS"),
+                kRestrictIconPath}},
+        {Qn::NoExportPermissionOverlay,
+            {QnStatusOverlayWidget::ErrorStyle::white,
+                QnStatusOverlayWidget::tr("NO EXPORT PERMISSION"),
+                kLockIconPath}},
+        {Qn::TooManyOpenedConnectionsOverlay,
+            {QnStatusOverlayWidget::ErrorStyle::white,
+                QnStatusOverlayWidget::tr("TOO MANY CONNECTIONS")}},
+        {Qn::NoLiveStreamOverlay,
+            {QnStatusOverlayWidget::ErrorStyle::white,
+                QnStatusOverlayWidget::tr("NO LIVE STREAM")}},
+        {Qn::CannotDecryptMediaOverlay,
+            {QnStatusOverlayWidget::ErrorStyle::white,
+                QnStatusOverlayWidget::tr("ARCHIVE ENCRYPTED"),
+                kLockIconPath}},
+        {Qn::MismatchedCertificateOverlay,
+            {QnStatusOverlayWidget::ErrorStyle::red,
+                QnStatusOverlayWidget::tr("CERTIFICATE ERROR"),
+                kErrorIconPath}},
+    };
+
+    return kOverlayInfo;
+}
+
+QnStatusOverlayWidget::ErrorStyle overlayErrorStyle(Qn::ResourceStatusOverlay overlay)
+{
+    if (auto it = overlayInfo().find(overlay); NX_ASSERT(it != overlayInfo().end()))
+        return it->second.style;
+
+    return QnStatusOverlayWidget::ErrorStyle::red;
+}
+
+QString captionText(Qn::ResourceStatusOverlay overlay)
+{
+    if (auto it = overlayInfo().find(overlay); NX_ASSERT(it != overlayInfo().end()))
+        return it->second.caption;
+
+    return {};
+}
+
+QString statusIconPath(Qn::ResourceStatusOverlay overlay)
+{
+    if (auto it = overlayInfo().find(overlay); NX_ASSERT(it != overlayInfo().end()))
+        return it->second.statusIconPath;
+
+    return {};
+}
+
+QString tooltip(Qn::ResourceStatusOverlay overlay)
+{
+    static const auto kTooltipTemplate = QStringLiteral(R"(
+        <html>
+        <head>
+        <style>
+            p { line-height: 0.75; }
+        </style>
+        </head>
+        <body>
+            %1
+        </body>
+        </html>)");
+
+    if (auto it = overlayInfo().find(overlay); NX_ASSERT(it != overlayInfo().end()))
+    {
+        if (!it->second.tooltip.isEmpty())
+        {
+            const auto& lines = it->second.tooltip.split('\n');
+            QString result;
+            for (const auto& line: lines)
+            {
+                result += "<p>";
+                result += line;
+                result += "</p>\n";
+            }
+            return kTooltipTemplate.arg(result);
+        }
+    }
+
+    return {};
+}
 
 template<typename Type>
 int toInt(Type value)
@@ -34,7 +193,6 @@ bool isErrorOverlayCheck(Qn::ResourceStatusOverlay overlay)
         case Qn::EmptyOverlay:
         case Qn::LoadingOverlay:
         case Qn::NoDataOverlay:
-        case Qn::NoVideoDataOverlay:
         case Qn::NoLiveStreamOverlay:
             return false;
         default:
@@ -50,13 +208,14 @@ QnStatusOverlayController::QnStatusOverlayController(
     QObject* parent)
     :
     base_type(parent),
+    m_resource(resource),
     m_widget(widget),
     m_buttonTexts(getButtonCaptions(resource)),
-    m_visibleItems( QnStatusOverlayWidget::Control::kNoControl),
+    m_visibleItems(QnStatusOverlayWidget::Control::kNoControl),
     m_statusOverlay(Qn::EmptyOverlay),
     m_currentButton(Qn::ResourceOverlayButton::Empty),
-
-    m_isErrorOverlay(isErrorOverlayCheck(m_statusOverlay))
+    m_isErrorOverlay(isErrorOverlayCheck(m_statusOverlay)),
+    m_errorStyle(QnStatusOverlayWidget::ErrorStyle::red)
 {
     NX_ASSERT(resource);
     NX_ASSERT(m_widget, "Status overlay widget can't be nullptr");
@@ -74,7 +233,9 @@ QnStatusOverlayController::QnStatusOverlayController(
         this, &QnStatusOverlayController::customButtonClicked);
 
     connect(this, &QnStatusOverlayController::isErrorOverlayChanged, this,
-        [this]() { m_widget->setErrorStyle(isErrorOverlay()); });
+        [this]() { m_widget->setUseErrorStyle(isErrorOverlay()); });
+    connect(this, &QnStatusOverlayController::isErrorStyleChanged, this,
+        [this]() { m_widget->setErrorStyle(errorStyle()); });
 
     connect(this, &QnStatusOverlayController::currentButtonChanged, this,
         [this]() { m_widget->setButtonText(currentButtonText()); });
@@ -137,13 +298,13 @@ void QnStatusOverlayController::onStatusOverlayChanged(bool /*animated*/)
         m_widget.data(), &QGraphicsWidget::setVisible, isVisibleToParent, false);
 
     m_widget->setCaption(captionText(m_statusOverlay));
-    m_widget->setDescription(descriptionText(m_statusOverlay));
-    m_widget->setSuggestion(
-        suggestionText(m_statusOverlay, m_currentButton != Qn::ResourceOverlayButton::Empty));
 
     m_widget->setIcon(statusIcon(m_statusOverlay));
+    m_widget->setTooltip(tooltip(m_statusOverlay));
+    m_widget->setShowGlow(m_statusOverlay != Qn::LoadingOverlay && m_statusOverlay != Qn::EmptyOverlay);
 
     updateErrorState();
+    updateErrorStyle();
     updateVisibleItems();
 }
 
@@ -159,12 +320,6 @@ QnStatusOverlayWidget::Controls QnStatusOverlayController::errorVisibleItems() c
     const bool buttonPresent = m_currentButton != Qn::ResourceOverlayButton::Empty;
     if (buttonPresent)
         result |= QnStatusOverlayWidget::Control::kButton;
-
-    if (!descriptionText(overlay).isEmpty())
-        result |= QnStatusOverlayWidget::Control::kDescription;
-
-    if (!suggestionText(overlay, buttonPresent).isEmpty())
-        result |= QnStatusOverlayWidget::Control::kSuggestion;
 
     if (!m_customButtonText.isEmpty())
         result |= QnStatusOverlayWidget::Control::kCustomButton;
@@ -222,14 +377,29 @@ bool QnStatusOverlayController::isErrorOverlay() const
     return m_isErrorOverlay;
 }
 
+QnStatusOverlayWidget::ErrorStyle QnStatusOverlayController::errorStyle() const
+{
+    return m_errorStyle;
+}
+
 void QnStatusOverlayController::updateErrorState()
 {
-    const bool isError = isErrorOverlayCheck(statusOverlay());
+    bool isError = isErrorOverlayCheck(statusOverlay());
     if (m_isErrorOverlay == isError)
         return;
 
     m_isErrorOverlay = isError;
     emit isErrorOverlayChanged();
+}
+
+void QnStatusOverlayController::updateErrorStyle()
+{
+    auto errorStyle = overlayErrorStyle(statusOverlay());
+    if (m_errorStyle == errorStyle)
+        return;
+
+    m_errorStyle = errorStyle;
+    emit isErrorStyleChanged();
 }
 
 Qn::ResourceOverlayButton QnStatusOverlayController::currentButton() const
@@ -251,106 +421,15 @@ QString QnStatusOverlayController::currentButtonText() const
     return extractValue(currentButton(), m_buttonTexts);
 }
 
-QString QnStatusOverlayController::captionText(Qn::ResourceStatusOverlay overlay)
-{
-    static const auto kNotEnoughLicenses = tr("NOT ENOUGH LICENSES");
-    static const IntStringHash kCaptions
-    {
-        { Qn::NoDataOverlay, tr("NO DATA") },
-        { Qn::UnauthorizedOverlay, tr("UNAUTHORIZED") },
-        { Qn::AccessDeniedOverlay, tr("NO ACCESS") },
-        { Qn::NoExportPermissionOverlay, tr("NO EXPORT PERMISSION") },
-        { Qn::OfflineOverlay, tr("OFFLINE") },
-        { Qn::AnalogWithoutLicenseOverlay, kNotEnoughLicenses },
-        { Qn::VideowallWithoutLicenseOverlay, kNotEnoughLicenses },
-        { Qn::ServerOfflineOverlay, tr("OFFLINE") },
-        { Qn::ServerUnauthorizedOverlay, tr("UNAUTHORIZED") },
-        { Qn::IoModuleDisabledOverlay, tr("DEVICE DISABLED") },
-        { Qn::TooManyOpenedConnectionsOverlay, tr("TOO MANY CONNECTIONS") },
-        { Qn::PasswordRequiredOverlay, tr("PASSWORD REQUIRED") },
-        { Qn::NoLiveStreamOverlay, tr("NO LIVE STREAM") },
-        { Qn::OldFirmwareOverlay, tr("UNSUPPORTED FIRMWARE VERSION") },
-        { Qn::CannotDecryptMediaOverlay, tr("ARCHIVE ENCRYPTED") },
-        { Qn::InformationRequiredOverlay, tr("INFORMATION REQUIRED") },
-        { Qn::SaasShutDown, tr("SITE SHUT DOWN") },
-        { Qn::RestrictedOverlay, tr("RESTRICTED") },
-    };
-    return extractValue(overlay, kCaptions);
-}
-
-QString QnStatusOverlayController::descriptionText(Qn::ResourceStatusOverlay overlay)
-{
-    switch (overlay)
-    {
-        case Qn::UnauthorizedOverlay:
-            return tr("Please check authentication information");
-        default:
-            break;
-    }
-    return QString();
-}
-
-QString QnStatusOverlayController::suggestionText(Qn::ResourceStatusOverlay overlay,
-    bool buttonPresent)
-{
-    switch (overlay)
-    {
-        case Qn::CannotDecryptMediaOverlay:
-            if (buttonPresent)
-                return QString();
-
-            return tr("Ask your site administrator to enter the encryption password to decrypt this archive");
-
-        default:
-            break;
-    }
-    return QString();
-}
-
-QString QnStatusOverlayController::statusIconPath(Qn::ResourceStatusOverlay overlay)
-{
-    static const auto kLockIconPath = "48x48/Outline/lock.svg";
-    static const auto kRestrictIconPath = "48x48/Outline/restrict.svg";
-    static const auto kErrorIconPath = "48x48/Outline/error.svg";
-    static const auto kSoundIconPath = "48x48/Outline/sound.svg";
-    static const IntStringHash kIconPaths
-    {
-        {Qn::UnauthorizedOverlay, kLockIconPath},
-        {Qn::AccessDeniedOverlay, kRestrictIconPath},
-        {Qn::NoExportPermissionOverlay, kLockIconPath},
-        {Qn::OfflineOverlay, kErrorIconPath},
-        {Qn::AnalogWithoutLicenseOverlay, kLockIconPath},
-        {Qn::VideowallWithoutLicenseOverlay, kLockIconPath},
-        {Qn::ServerUnauthorizedOverlay, kLockIconPath},
-        {Qn::IoModuleDisabledOverlay, kErrorIconPath},
-        {Qn::NoVideoDataOverlay, kSoundIconPath},
-        {Qn::PasswordRequiredOverlay, kLockIconPath},
-        {Qn::CannotDecryptMediaOverlay, kLockIconPath},
-        {Qn::InformationRequiredOverlay, kRestrictIconPath},
-        {Qn::SaasShutDown, kErrorIconPath},
-        {Qn::RestrictedOverlay, kRestrictIconPath},
-    };
-
-    return extractValue(overlay, kIconPaths);
-}
-
 const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions QnStatusOverlayController::statusIconColors(Qn::ResourceStatusOverlay overlay)
 {
-    switch (overlay)
+    if (isErrorOverlayCheck(overlay)
+        && overlayErrorStyle(overlay) == QnStatusOverlayWidget::ErrorStyle::white)
     {
-        case Qn::OfflineOverlay:
-            return kOfflineTheme;
-        case Qn::AccessDeniedOverlay:
-        case Qn::NoVideoDataOverlay:
-        case Qn::NoDataOverlay:
-        case Qn::NoExportPermissionOverlay:
-        case Qn::TooManyOpenedConnectionsOverlay:
-        case Qn::NoLiveStreamOverlay:
-        case Qn::CannotDecryptMediaOverlay:
-            return kLightTheme;
-        default:
-            return kOfflineTheme;
+        return kWhiteTheme;
     }
+
+    return kRedTheme;
 }
 
 QPixmap QnStatusOverlayController::statusIcon(Qn::ResourceStatusOverlay status)
@@ -361,10 +440,9 @@ QPixmap QnStatusOverlayController::statusIcon(Qn::ResourceStatusOverlay status)
     if (pixmapPath.isEmpty())
         return QPixmap();
 
-    QSize size = qnSkin->pixmap(pixmapPath, true).size();
-    return colorTheme.isEmpty()
-        ? qnSkin->pixmap(pixmapPath, true)
-        : qnSkin->icon(pixmapPath, colorTheme).pixmap(size);
+    constexpr QSize kIconSize = {48, 48};
+    return colorTheme.isEmpty() ? qnSkin->pixmap(pixmapPath, true, kIconSize)
+                                : qnSkin->icon(pixmapPath, colorTheme).pixmap(kIconSize);
 }
 
 QnStatusOverlayController::IntStringHash
@@ -382,9 +460,9 @@ QnStatusOverlayController::getButtonCaptions(const QnResourcePtr& resource)
         : QnVirtualCameraResourcePtr());
     IntStringHash result;
     result.insert(toInt(Qn::ResourceOverlayButton::Diagnostics), tr("Diagnostics"));
-    result.insert(toInt(Qn::ResourceOverlayButton::EnableLicense), tr("Enable"));
+    result.insert(toInt(Qn::ResourceOverlayButton::EnableLicense), tr("Activate License"));
     result.insert(toInt(Qn::ResourceOverlayButton::MoreLicenses), tr("Activate License"));
-    result.insert(toInt(Qn::ResourceOverlayButton::SetPassword), tr("Set for this Camera"));
+    result.insert(toInt(Qn::ResourceOverlayButton::SetPassword), tr("Setup"));
     result.insert(toInt(Qn::ResourceOverlayButton::UnlockEncryptedArchive), tr("Unlock"));
     result.insert(toInt(Qn::ResourceOverlayButton::RequestInformation), tr("Provide"));
     result.insert(toInt(Qn::ResourceOverlayButton::Authorize), tr("Authorize"));

@@ -6,8 +6,6 @@
 
 class QLabel;
 class QPushButton;
-class QGraphicsPixmapItem;
-class QnWordWrappedLabel;
 
 namespace nx::vms::client::desktop { class BusyIndicatorGraphicsWidget; }
 
@@ -27,11 +25,15 @@ public:
         kIcon           = 0x04,
         kCaption        = 0x08,
         kButton         = 0x10,
-        kCustomButton    = 0x20,
-        kDescription = 0x40,
-        kSuggestion = 0x80,
+        kCustomButton   = 0x20,
     };
     Q_DECLARE_FLAGS(Controls, Control);
+
+    enum class ErrorStyle
+    {
+        red,
+        white,
+    };
 
     virtual void paint(QPainter* painter,
         const QStyleOptionGraphicsItem* option,
@@ -42,33 +44,33 @@ public:
     void setIconOverlayPixmap(const QPixmap& pixmap);
 
     void setIcon(const QPixmap& pixmap);
-    void setErrorStyle(bool isErrorStyle);
+    void setUseErrorStyle(bool useErrorStyle);
+    void setErrorStyle(ErrorStyle errorStyle);
     void setCaption(const QString& caption);
-    void setDescription(const QString& description);
-    void setSuggestion(const QString& suggestion);
     void setButtonText(const QString& text);
     void setCustomButtonText(const QString& text);
+    void setTooltip(const QString& tooltip) {} //< TODO: zkarakas
+    void setShowGlow(bool showGlow);
 
 signals:
     void actionButtonClicked();
     void customButtonClicked();
+    void closeButtonClicked();
 
 private:
     void setupPreloader();
-
     void setupCentralControls();
-
     void setupExtrasControls();
-
     void initializeHandlers();
-
-    void updateAreasSizes();
+    void updateAreaSizes();
 
 private:
     Controls m_visibleControls;
     int m_visibleExtrasControlsCount = 0;
     bool m_initialized;
-    bool m_errorStyle;
+    bool m_useErrorStyle;
+    ErrorStyle m_errorStyle;
+    bool m_showGlow = false;
 
     QnViewportBoundWidget* const m_preloaderHolder;
     QnViewportBoundWidget* const m_centralHolder;
@@ -86,10 +88,13 @@ private:
     // Central area
     QLabel* const m_centralAreaImage;
     QLabel* const m_caption;
-    QLabel* const m_description;
 
     // Extras
     QPushButton* const m_button;
     QPushButton* const m_customButton;
-    QLabel* const m_suggestion;
+
+    QPixmap m_whiteGlowHorizontal;
+    QPixmap m_whiteGlowVertical;
+    QPixmap m_redGlowHorizontal;
+    QPixmap m_redGlowVertical;
 };
