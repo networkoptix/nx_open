@@ -30,6 +30,7 @@ static constexpr char kSystemBindPath[] = "/cdb/systems/bind";
 static constexpr char kSystemRecordUserSessionStartPath[] = "/cdb/systems/recordUserSessionStart";
 
 static constexpr char kSystemsPath[] = "/cdb/systems";
+static constexpr char kSystemsByEmailPath[] = "/cdb/v1/internal/systems/{accountEmail}";
 
 static constexpr char kSystemPath[] = "/cdb/systems/{systemId}";
 static constexpr char kSystemHealthHistoryPath[] = "/cdb/systems/{systemId}/health-history";
