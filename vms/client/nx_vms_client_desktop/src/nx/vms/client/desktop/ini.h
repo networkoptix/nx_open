@@ -245,13 +245,8 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
     // Flags here can be removed when QA approves the feature to be definitely present in the
     // current release.
 
-    #if !defined(Q_OS_LINUX)
-        static constexpr bool kEnableTimelinePreviewDefault = true;
-    #else
-        static constexpr bool kEnableTimelinePreviewDefault = false;
-    #endif
     // VMS-10483
-    NX_INI_FLAG(kEnableTimelinePreviewDefault, enableTimelinePreview,
+    NX_INI_FLAG(true, enableTimelinePreview,
         "[Feature] Allows to show the screenshot above the timeline when mouse pointer hovers\n"
         "over the timeline.");
 
