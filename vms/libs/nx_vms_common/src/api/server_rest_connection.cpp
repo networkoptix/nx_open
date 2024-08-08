@@ -330,11 +330,10 @@ namespace rest {
 struct ServerConnection::Private
 {
     const nx::vms::common::SystemContext* const systemContext;
+    nx::network::http::ClientPool* const httpClientPool;
     const nx::Uuid auditId;
     const nx::Uuid serverId;
     const nx::log::Tag logTag;
-    const std::unique_ptr<nx::network::http::ClientPool> httpClientPool =
-        std::make_unique<nx::network::http::ClientPool>();
 
     // While most fields of this struct never change during struct's lifetime, some data can be
     // rarely updated. Therefore the following non-const fields should be protected by mutex.
@@ -390,22 +389,18 @@ ServerConnection::ServerConnection(
     QObject(),
     d(new Private{
         .systemContext = systemContext,
+        .httpClientPool = systemContext->httpClientPool(),
         .auditId = systemContext->auditId(),
         .serverId = serverId,
         .logTag = makeLogTag(this, serverId)})
 {
-    setDefaultTimeouts(
-        nx::network::http::AsyncClient::Timeouts{
-        ::rest::kDefaultVmsApiTimeout,
-        ::rest::kDefaultVmsApiTimeout,
-        ::rest::kDefaultVmsApiTimeout });
-
     // TODO: #sivanov Raw pointer is unsafe here as ServerConnection instance may be not deleted
     // after it's owning server (and context) are destroyed. Need to change
     // QnMediaServerResource::restConnection() method to return weak pointer instead.
 }
 
 ServerConnection::ServerConnection(
+    nx::network::http::ClientPool* httpClientPool,
     const nx::Uuid& serverId,
     const nx::Uuid& auditId,
     AbstractCertificateVerifier* certificateVerifier,
@@ -415,6 +410,7 @@ ServerConnection::ServerConnection(
     QObject(),
     d(new Private{
         .systemContext = nullptr,
+        .httpClientPool = httpClientPool,
         .auditId = auditId,
         .serverId = serverId,
         .logTag = makeLogTag(this, serverId),
@@ -425,15 +421,8 @@ ServerConnection::ServerConnection(
 {
 }
 
-void ServerConnection::stop()
-{
-    NX_DEBUG(this, "Stopping...");
-    d->httpClientPool->stop(/*invokeCallbacks*/ true);
-}
-
 ServerConnection::~ServerConnection()
 {
-    stop();
 }
 
 void ServerConnection::updateAddress(nx::network::SocketAddress address)
@@ -458,11 +447,6 @@ void ServerConnection::setUserId(const nx::Uuid& id)
 {
     NX_MUTEX_LOCKER lock(&d->mutex);
     d->userId = id;
-}
-
-void ServerConnection::setDefaultTimeouts(nx::network::http::AsyncClient::Timeouts timeouts)
-{
-    d->httpClientPool->setDefaultTimeouts(timeouts);
 }
 
 Handle ServerConnection::cameraHistoryAsync(

@@ -369,7 +369,7 @@ CloudSystemsFinder::CloudSystemsFinder(QObject* parent):
 
 CloudSystemsFinder::~CloudSystemsFinder()
 {
-    d->clientPool->stop(/*invokeCallbacks*/ false);
+    d->clientPool->stop();
 }
 
 QnAbstractSystemsFinder::SystemDescriptionList CloudSystemsFinder::systems() const

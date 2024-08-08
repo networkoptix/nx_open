@@ -8,6 +8,7 @@
 #include <QtCore/QTimer>
 #include <QtGui/QAction>
 
+#include <api/http_client_pool.h>
 #include <api/runtime_info_manager.h>
 #include <client/client_message_processor.h>
 #include <client/client_runtime_settings.h>
@@ -861,7 +862,8 @@ void ConnectActionsHandler::connectToServerInNonDesktopMode(const LogonData& log
 
     NX_VERBOSE(this, "Executing connect to the %1", logonData.address);
     auto remoteConnectionFactory = qnClientCoreModule->networkModule()->connectionFactory();
-    d->currentConnectionProcess = remoteConnectionFactory->connect(logonData, callback);
+    d->currentConnectionProcess =
+        remoteConnectionFactory->connect(logonData, callback, systemContext());
 }
 
 void ConnectActionsHandler::updatePreloaderVisibility()
@@ -1063,7 +1065,8 @@ void ConnectActionsHandler::at_connectToCloudSystemAction_triggered()
     NX_VERBOSE(this, "Executing connect to the %1", connectionInfo->address);
     auto remoteConnectionFactory = qnClientCoreModule->networkModule()->connectionFactory();
 
-    d->currentConnectionProcess = remoteConnectionFactory->connect(*connectionInfo, callback);
+    d->currentConnectionProcess =
+        remoteConnectionFactory->connect(*connectionInfo, callback, systemContext());
 }
 
 void ConnectActionsHandler::onConnectToCloudSystemWithUserInteractionTriggered()
@@ -1113,7 +1116,8 @@ void ConnectActionsHandler::at_reconnectAction_triggered()
         });
 
     auto remoteConnectionFactory = qnClientCoreModule->networkModule()->connectionFactory();
-    d->currentConnectionProcess = remoteConnectionFactory->connect(logonData, callback);
+    d->currentConnectionProcess =
+        remoteConnectionFactory->connect(logonData, callback, systemContext());
 }
 
 void ConnectActionsHandler::at_disconnectAction_triggered()
@@ -1224,7 +1228,8 @@ void ConnectActionsHandler::at_selectCurrentServerAction_triggered()
             }
         }));
 
-    d->currentConnectionProcess = remoteConnectionFactory->connect(logonData, callback);
+    d->currentConnectionProcess =
+        remoteConnectionFactory->connect(logonData, callback, systemContext());
 
     const auto showModalDialog =
         [dialog = d->switchServerDialog]()
@@ -1358,6 +1363,7 @@ void ConnectActionsHandler::clearConnection()
     resourceAccessManager()->endUpdate();
 
     systemContext()->lookupListManager()->deinitialize();
+    systemContext()->httpClientPool()->stop(/*invokeCallbacks*/ true);
 
     NX_DEBUG(this, "Clear connection finished");
 }
@@ -1403,7 +1409,8 @@ void ConnectActionsHandler::connectToServer(LogonData logonData, ConnectionOptio
         });
 
     auto remoteConnectionFactory = qnClientCoreModule->networkModule()->connectionFactory();
-    d->currentConnectionProcess = remoteConnectionFactory->connect(logonData, callback);
+    d->currentConnectionProcess =
+        remoteConnectionFactory->connect(logonData, callback, systemContext());
 }
 
 void ConnectActionsHandler::reportServerSelectionFailure()

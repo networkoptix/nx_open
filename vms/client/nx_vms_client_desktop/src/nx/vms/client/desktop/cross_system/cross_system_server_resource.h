@@ -2,8 +2,9 @@
 
 #pragma once
 
-#include <nx/vms/client/core/network/remote_connection_fwd.h>
 #include <nx/vms/client/core/resource/server.h>
+
+namespace nx::vms::client::core { class SystemContext; }
 
 namespace nx::vms::client::desktop {
 
@@ -11,13 +12,13 @@ class CrossSystemServerResource: public nx::vms::client::core::ServerResource
 {
 public:
     /** Main server which was used for connection establishing. */
-    CrossSystemServerResource(core::RemoteConnectionPtr connection);
+    CrossSystemServerResource(core::SystemContext* systemContext);
 
     /** Server for video direct access if possible. */
     CrossSystemServerResource(
         const nx::Uuid& id,
         nx::network::SocketAddress endpoint,
-        core::RemoteConnectionPtr connection);
+        core::SystemContext* systemContext);
 
     virtual QString rtspUrl() const override;
 };

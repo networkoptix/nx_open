@@ -204,7 +204,8 @@ void RemoteSession::updatePassword(const QString& newPassword)
     LogonData logonData = d->connection->createLogonData();
     logonData.credentials = credentials;
     logonData.userInteractionAllowed = false; //< We do not expect any errors here.
-    d->currentConnectionProcess = d->remoteConnectionFactory->connect(logonData, callback);
+    d->currentConnectionProcess =
+        d->remoteConnectionFactory->connect(logonData, callback, systemContext());
 }
 
 void RemoteSession::updateBearerToken(std::string token)
@@ -480,8 +481,7 @@ void RemoteSession::reconnectStep()
 
         NX_DEBUG(this, "Performing reconnect attempt to: %1", address);
         d->currentConnectionProcess = d->remoteConnectionFactory->connect(
-            logonData,
-            reconnectRequestCallback);
+            logonData, reconnectRequestCallback, systemContext());
     }
     else
     {

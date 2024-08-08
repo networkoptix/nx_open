@@ -9,9 +9,10 @@ QString RemoteConnectionFactoryContext::toString() const
     return nx::format("ConnectionContext to %1", logonData.address);
 }
 
-RemoteConnectionProcess::RemoteConnectionProcess():
-    context(new RemoteConnectionFactoryContext())
+RemoteConnectionProcess::RemoteConnectionProcess(SystemContext* systemContext):
+    context(new RemoteConnectionFactoryContext(systemContext))
 {
+    NX_ASSERT(systemContext);
 }
 
 RemoteConnectionProcess::~RemoteConnectionProcess()

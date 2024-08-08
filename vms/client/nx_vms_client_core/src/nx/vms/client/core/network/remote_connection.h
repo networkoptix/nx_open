@@ -12,6 +12,7 @@
 #include <nx/vms/api/data/login.h>
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/api/types/connection_types.h>
+#include <nx/vms/client/core/system_context_aware.h>
 #include <nx/vms/time/abstract_time_sync_manager.h>
 #include <nx_ec/ec_api_fwd.h>
 
@@ -37,7 +38,7 @@ class CertificateVerifier;
  * Stores actual connection info and allows to modify it e.g. when we are changing current user
  * password or find a quicker network interface.
  */
-class NX_VMS_CLIENT_CORE_API RemoteConnection: public QObject
+class NX_VMS_CLIENT_CORE_API RemoteConnection: public QObject, public SystemContextAware
 {
     Q_OBJECT
 public:
@@ -49,6 +50,7 @@ public:
         std::shared_ptr<CertificateCache> certificateCache,
         Qn::SerializationFormat serializationFormat,
         nx::Uuid auditId,
+        SystemContext* systemContext,
         QObject* parent = nullptr);
     virtual ~RemoteConnection() override;
 
