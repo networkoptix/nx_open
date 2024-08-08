@@ -14,6 +14,11 @@ namespace nx::vms::api::rules {
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(EventLogFilter, (json), EventLogFilter_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(EventLogRecord, (json)(sql_record), EventLogRecord_Fields)
 
+std::string toString(const EventLogRecord& record)
+{
+    return nx::reflect::json::serialize(record);
+}
+
 } // namespace nx::vms::rules
 
 void serialize_field(const nx::vms::api::rules::PropertyMap& data, QVariant* value)

@@ -408,22 +408,11 @@ QModelIndex EventLogDialog::findServerEventsMenuIndexByEventType(
     return QModelIndex();
 }
 
-EventLogDialog::FilterState EventLogDialog::collectFilterState() const
-{
-    FilterState result;
-    result.eventType = ui->eventComboBox->currentText();
-    result.actionType = ui->actionComboBox->currentText();
-    result.resources = eventDevices();
-    result.startTimeMs = ui->dateRangeWidget->startTimeMs();
-    result.endTimeMs = ui->dateRangeWidget->endTimeMs();
-    return result;
-}
-
 bool EventLogDialog::isFilterExist() const
 {
-    return !resourcePool()->getResourcesByIds<QnVirtualCameraResource>(eventDevices()).empty()
+    return ui->actionComboBox->currentIndex() > 0
         || !eventType(ui->eventComboBox->currentModelIndex()).isEmpty()
-        || ui->actionComboBox->currentIndex() > 0;
+        || !resourcePool()->getResourcesByIds<QnVirtualCameraResource>(eventDevices()).empty();
 }
 
 void EventLogDialog::initEventsModel()
@@ -843,21 +832,17 @@ void EventLogDialog::at_cameraButton_clicked()
 void EventLogDialog::disableUpdateData()
 {
     m_updateDisabled = true;
-    m_filterState = collectFilterState();
 }
 
 void EventLogDialog::enableUpdateData()
 {
     m_updateDisabled = false;
-    if (!m_dirty)
-        return;
 
-    m_dirty = false;
-    const auto newFilterState = collectFilterState();
-    if (isVisible() && newFilterState != m_filterState)
+    if (m_dirty)
     {
-        updateData();
-        m_filterState = newFilterState;
+        m_dirty = false;
+        if (isVisible())
+            updateData();
     }
 }
 

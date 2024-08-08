@@ -214,9 +214,11 @@ void initialize(Manager* manager, Action* root)
                 MatchMode::any)
             && !condition::showreelIsRunning());
 
-    // TODO: remove flag during VMS-53670
-    const bool isOldEngineEnabled =
-        manager->windowContext()->system()->vmsRulesEngine()->isOldEngineEnabled();
+    // VMS Rules and Event log actions.
+
+    // TODO: #amalov Remove the flag with the old engine.
+    static const bool isOldEngineEnabled =
+        condition::hasOldEventRulesEngine()->check(Parameters(), manager->windowContext());
 
     factory(OpenBusinessLogAction)
         .flags(NoTarget | SingleTarget | MultiTarget | ResourceTarget
@@ -228,11 +230,11 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Event Log...")); //< To be displayed on button tooltip
 
     factory(OpenEventLogAction)
-        .flags(GlobalHotkey | Main | DevMode | NoTarget | SingleTarget | MultiTarget
+        .flags(GlobalHotkey | NoTarget | SingleTarget | MultiTarget
             | ResourceTarget | LayoutItemTarget | WidgetTarget)
         .mode(DesktopMode)
         .requiredGlobalPermission(GlobalPermission::viewLogs)
-        .shortcut(isOldEngineEnabled ? "" : "Ctrl+L")
+        .shortcut(isOldEngineEnabled ? "Ctrl+Alt+L" : "Ctrl+L")
         .text("Event log...")
         .condition(!condition::showreelIsRunning()
             && condition::hasNewEventRulesEngine());
@@ -243,10 +245,23 @@ void initialize(Manager* manager, Action* root)
         .condition(condition::hasOldEventRulesEngine())
         .requiredPowerUserPermissions();
 
-    factory(OpenFailoverPriorityAction)
+    factory(BusinessEventsAction)
+        .flags(GlobalHotkey)
         .mode(DesktopMode)
-        .flags(NoTarget)
-        .requiredPowerUserPermissions();
+        .requiredPowerUserPermissions()
+        .text(ContextMenu::tr("Event Rules..."))
+        .shortcut(isOldEngineEnabled ? "Ctrl+E" : "")
+        .condition(!condition::showreelIsRunning());
+
+    factory(OpenVmsRulesDialogAction)
+            .flags(GlobalHotkey | NoTarget | SingleTarget | MultiTarget | ResourceTarget
+                | LayoutItemTarget | WidgetTarget)
+            .mode(DesktopMode)
+            .requiredPowerUserPermissions()
+            .text("VMS Rules...")
+            .shortcut(isOldEngineEnabled ? "Ctrl+Alt+E" : "Ctrl+E")
+            .condition(!condition::showreelIsRunning()
+                && condition::hasNewEventRulesEngine());
 
     factory(AcknowledgeEventAction)
         .mode(DesktopMode)
@@ -262,6 +277,11 @@ void initialize(Manager* manager, Action* root)
             condition::hasPermissionsForResources(Qn::ManageBookmarksPermission)
             && condition::hasFlags(Qn::live_cam, MatchMode::all)
             && condition::hasNewEventRulesEngine());
+
+    factory(OpenFailoverPriorityAction)
+        .mode(DesktopMode)
+        .flags(NoTarget)
+        .requiredPowerUserPermissions();
 
     factory(StartVideoWallControlAction)
         .flags(Tree | VideoWallReviewScene | SingleTarget | MultiTarget | VideoWallItemTarget)
@@ -762,14 +782,6 @@ void initialize(Manager* manager, Action* root)
     factory()
         .flags(Main)
         .separator();
-
-    factory(BusinessEventsAction)
-        .flags(GlobalHotkey)
-        .mode(DesktopMode)
-        .requiredPowerUserPermissions()
-        .text(ContextMenu::tr("Event Rules..."))
-        .shortcut("Ctrl+E")
-        .condition(!condition::showreelIsRunning());
 
     factory(CameraListAction)
         .flags(GlobalHotkey)
@@ -2384,16 +2396,6 @@ void initialize(Manager* manager, Action* root)
             .flags(GlobalHotkey | Main | DevMode)
             .text("Open New Scene")
             .shortcut("Ctrl+Shift+E");
-
-        factory(OpenVmsRulesDialogAction)
-            .flags(GlobalHotkey | Main | DevMode |
-                NoTarget | SingleTarget | MultiTarget | ResourceTarget | LayoutItemTarget | WidgetTarget)
-            .mode(DesktopMode)
-            .requiredPowerUserPermissions()
-            .text("VMS Rules...")
-            .shortcut("Ctrl+Alt+E")
-            .condition(!condition::showreelIsRunning()
-                && condition::hasNewEventRulesEngine());
 
         factory(ShowDebugOverlayAction)
             .flags(GlobalHotkey | Main | DevMode)

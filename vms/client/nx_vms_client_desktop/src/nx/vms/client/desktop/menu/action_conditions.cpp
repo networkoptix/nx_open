@@ -2365,10 +2365,9 @@ ConditionWrapper hasOtherWindows()
 ConditionWrapper hasOldEventRulesEngine()
 {
     return new CustomBoolCondition(
-        [](const Parameters& /*parameters*/, WindowContext* /*context*/)
+        [](const Parameters& /*parameters*/, WindowContext* context)
         {
-            return QString::fromUtf8(rules::ini().rulesEngine) == "old"
-                || QString::fromUtf8(rules::ini().rulesEngine) == "both";
+            return context->system()->vmsRulesEngine()->isOldEngineEnabled();
         });
 }
 
@@ -2377,8 +2376,8 @@ ConditionWrapper hasNewEventRulesEngine()
     return new CustomBoolCondition(
         [](const Parameters& /*parameters*/, WindowContext* context)
         {
-            auto engine = context->workbenchContext()->systemContext()->vmsRulesEngine();
-            return engine && engine->isEnabled();
+            return nx::vms::rules::ini().fullSupport
+                && context->system()->vmsRulesEngine()->isEnabled();
         });
 }
 
