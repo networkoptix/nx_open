@@ -656,17 +656,14 @@ void AbstractSearchWidget::Private::setupCameraDisplaying()
 void AbstractSearchWidget::Private::updateCameraDisplaying()
 {
     const auto resource = q->navigator()->currentResource();
-    const bool isMedia = (bool) resource.dynamicCast<QnMediaResource>();
-
     const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
-    const bool isCamera = camera || !isMedia;
 
-    ui->cameraDisplayingButton->setIcon(qnSkin->icon(isCamera ? kDeviceIcon : kPlayIcon));
+    ui->cameraDisplayingButton->setIcon(qnSkin->icon(camera ? kDeviceIcon : kPlayIcon));
 
     if (resource)
     {
         const auto name = resource->getName();
-        if (isCamera)
+        if (camera)
         {
             const auto baseText = QnDeviceDependentStrings::getNameFromSet(
                 q->system()->resourcePool(),
