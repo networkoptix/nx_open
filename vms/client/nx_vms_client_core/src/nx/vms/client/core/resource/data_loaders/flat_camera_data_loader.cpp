@@ -186,16 +186,18 @@ void FlatCameraDataLoader::handleDataLoaded(
     bool success,
     QnTimePeriodList&& periods)
 {
+    // Cleanup m_loading here to allow new load requests from failed()/ready() signal handlers.
+    const auto completedInfo = std::exchange(m_loading, {});
+
     NX_VERBOSE(this, "Loaded data for %1 (%2), actual filter %3",
-        m_loading.startTimeMs,
-        nx::utils::timestampToDebugString(m_loading.startTimeMs),
+        completedInfo.startTimeMs,
+        nx::utils::timestampToDebugString(completedInfo.startTimeMs),
         filterRepresentation(m_filter, m_dataType));
 
     if (!success)
     {
         NX_VERBOSE(this, "Load Failed");
-        emit failed(m_loading.handle);
-        m_loading = LoadingInfo();
+        emit failed(completedInfo.handle);
         return;
     }
 
@@ -211,12 +213,11 @@ void FlatCameraDataLoader::handleDataLoaded(
             periods.size(),
             m_loadedData.size());
 
-        QnTimePeriodList::overwriteTail(m_loadedData, periods, m_loading.startTimeMs);
+        QnTimePeriodList::overwriteTail(m_loadedData, periods, completedInfo.startTimeMs);
         NX_VERBOSE(this, "Merging finished, size %1.", m_loadedData.size());
     }
 
-    emit ready(m_loading.startTimeMs);
-    m_loading = LoadingInfo();
+    emit ready(completedInfo.startTimeMs);
 }
 
 } // namespace nx::vms::client::core
