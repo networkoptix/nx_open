@@ -200,7 +200,8 @@ public:
     bool terminate(int handle);
     void setPoolSize(int value);
 
-    void stop(bool invokeCallbacks = true);
+    void stop(bool invokeCallbacks = false);
+    void stopSync(bool invokeCallbacks = false);
 
     /** Returns amount of requests which are running or awaiting to be run .*/
     int size() const;
