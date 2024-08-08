@@ -135,7 +135,8 @@ int CompatibilityVersionInstallationDialog::exec()
                 QMetaObject::invokeMethod(this,
                     &CompatibilityVersionInstallationDialog::startUpdate,
                     Qt::QueuedConnection);
-            }));
+            }),
+        appContext()->currentSystemContext());
     return base_type::exec();
 }
 

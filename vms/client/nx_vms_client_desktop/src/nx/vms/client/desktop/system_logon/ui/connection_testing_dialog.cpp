@@ -21,6 +21,7 @@
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/html/html.h>
 #include <utils/connection_diagnostics_helper.h>
 
@@ -256,7 +257,9 @@ void ConnectionTestingDialog::testConnection(
 
     auto remoteConnectionFactory = qnClientCoreModule->networkModule()->connectionFactory();
     const core::LogonData info{address, credentials, nx::vms::api::UserType::local};
-    d->connectionProcess = remoteConnectionFactory->connect(info, callback,
+    d->connectionProcess = remoteConnectionFactory->connect(info,
+        callback,
+        appContext()->currentSystemContext(),
         std::make_unique<Private::ConnectionUserInteractionDelegate>(this));
 
     d->timeoutTimer->start();

@@ -182,7 +182,8 @@ struct RemoteConnectionFactory::Private
             context->sessionTokenExpirationTime,
             context->certificateCache,
             serializationFormat,
-            context->auditId);
+            context->auditId,
+            context->systemContext);
     }
 
     bool executeInUiThreadSync(
@@ -1225,9 +1226,10 @@ void RemoteConnectionFactory::shutdown()
 RemoteConnectionFactory::ProcessPtr RemoteConnectionFactory::connect(
     LogonData logonData,
     Callback callback,
+    SystemContext* systemContext,
     std::unique_ptr<AbstractRemoteConnectionUserInteractionDelegate> customUserInteractionDelegate)
 {
-    auto process = std::make_shared<RemoteConnectionProcess>();
+    auto process = std::make_shared<RemoteConnectionProcess>(systemContext);
 
     process->context->logonData = logonData;
     process->context->customUserInteractionDelegate = std::move(customUserInteractionDelegate);

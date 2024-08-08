@@ -7,30 +7,36 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/vms/client/core/network/certificate_verifier.h>
 #include <nx/vms/client/core/network/remote_connection.h>
+#include <nx/vms/client/desktop/system_context.h>
 
 namespace nx::vms::client::desktop {
 
-CrossSystemServerResource::CrossSystemServerResource(core::RemoteConnectionPtr connection)
+CrossSystemServerResource::CrossSystemServerResource(core::SystemContext* systemContext)
 {
+    NX_CRITICAL(systemContext);
+
     addFlags(Qn::cross_system);
-    setPrimaryAddress(connection->address());
-    m_restConnection = connection->serverApi();
+    setPrimaryAddress(systemContext->connection()->address());
+    m_restConnection = systemContext->connection()->serverApi();
 }
 
 CrossSystemServerResource::CrossSystemServerResource(
     const nx::Uuid& id,
     nx::network::SocketAddress endpoint,
-    core::RemoteConnectionPtr connection)
+    core::SystemContext* systemContext)
 {
+    NX_CRITICAL(systemContext);
+
     addFlags(Qn::cross_system);
     setIdUnsafe(id);
     setPrimaryAddress(std::move(endpoint));
     m_restConnection = rest::ServerConnectionPtr(new rest::ServerConnection(
+        systemContext->httpClientPool(),
         id,
         /*auditId*/ nx::Uuid::createUuid(),
-        connection->certificateCache().get(),
+        systemContext->connection()->certificateCache().get(),
         getPrimaryAddress(),
-        connection->credentials()));
+        systemContext->connection()->credentials()));
 }
 
 QString CrossSystemServerResource::rtspUrl() const

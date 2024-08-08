@@ -26,6 +26,7 @@ namespace nx::vms::client::core {
 
 class AbstractRemoteConnectionFactoryRequestsManager;
 class CertificateVerifier;
+class SystemContext;
 
 /**
  * Central storage class for all transactions-related classes. Owns message bus, query processor,
@@ -90,6 +91,7 @@ public:
     ProcessPtr connect(
         LogonData logonData,
         Callback callback,
+        SystemContext* systemContext,
         std::unique_ptr<AbstractRemoteConnectionUserInteractionDelegate>
             customUserInteractionDelegate = {});
 

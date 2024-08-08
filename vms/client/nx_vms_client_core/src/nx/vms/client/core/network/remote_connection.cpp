@@ -176,7 +176,8 @@ struct RemoteConnection::Private
         std::optional<std::chrono::microseconds> sessionTokenExpirationTime,
         std::shared_ptr<CertificateCache> certificateCache,
         Qn::SerializationFormat serializationFormat,
-        nx::Uuid auditId)
+        nx::Uuid auditId,
+        SystemContext* systemContext)
         :
         peerType(peerType),
         moduleInformation(moduleInformation),
@@ -185,7 +186,10 @@ struct RemoteConnection::Private
         sessionTokenExpirationTime(sessionTokenExpirationTime),
         certificateCache(certificateCache)
     {
+        NX_CRITICAL(systemContext);
+
         serverApi = std::make_shared<rest::ServerConnection>(
+            systemContext->httpClientPool(),
             moduleInformation.id,
             auditId,
             certificateCache.get(),
@@ -210,9 +214,11 @@ RemoteConnection::RemoteConnection(
     std::shared_ptr<CertificateCache> certificateCache,
     Qn::SerializationFormat serializationFormat,
     nx::Uuid auditId,
+    SystemContext* systemContext,
     QObject* parent)
     :
     QObject(parent),
+    SystemContextAware(systemContext),
     d(new Private(
         peerType,
         moduleInformation,
@@ -220,7 +226,8 @@ RemoteConnection::RemoteConnection(
         sessionTokenExpirationTime,
         certificateCache,
         serializationFormat,
-        auditId))
+        auditId,
+        systemContext))
 {
 }
 
@@ -228,16 +235,17 @@ RemoteConnection::~RemoteConnection()
 {
 }
 
-void RemoteConnection::initializeMessageBusConnection(
-    SystemContext* systemContext)
+void RemoteConnection::initializeMessageBusConnection()
 {
     if (!NX_ASSERT(!d->messageBus, "Connection is already initialized"))
         return;
 
+    NX_CRITICAL(systemContext());
+
     d->timeSynchronizationManager =
-        std::make_shared<TimeSyncManager>(systemContext, d->moduleInformation.id);
+        std::make_shared<TimeSyncManager>(systemContext(), d->moduleInformation.id);
     d->messageBus = std::make_unique<ThreadsafeMessageBusAdapter>(
-        systemContext,
+        systemContext(),
         d->jsonTranSerializer.get(),
         d->ubjsonTranSerializer.get());
     d->messageBusConnection = std::make_shared<MessageBusConnection>(
@@ -248,7 +256,7 @@ void RemoteConnection::initializeMessageBusConnection(
         d->timeSynchronizationManager);
     d->messageBusConnection->init(appContext()->moduleDiscoveryManager());
 
-    systemContext->runtimeInfoManager()->updateLocalItem(
+    runtimeInfoManager()->updateLocalItem(
         [this](auto* data)
         {
             data->data.peer.instanceId = d->auditId;
