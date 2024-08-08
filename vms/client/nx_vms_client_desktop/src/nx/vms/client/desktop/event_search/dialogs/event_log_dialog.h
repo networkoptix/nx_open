@@ -83,18 +83,6 @@ private:
         const QString& actionType,
         const QString& text);
 
-    struct FilterState
-    {
-        QString eventType;
-        QString actionType;
-        UuidSet resources;
-        qint64 startTimeMs = 0;
-        qint64 endTimeMs = 0;
-        bool operator==(const FilterState&) const = default;
-    };
-
-    FilterState collectFilterState() const;
-
 private:
     QScopedPointer<Ui::EventLogDialog> ui;
 
@@ -107,7 +95,6 @@ private:
     UuidSet m_eventDevices;
     bool m_updateDisabled = false;
     bool m_dirty = false;
-    FilterState m_filterState;
 
     QAction* m_filterAction;
     QAction* m_resetFilterAction;

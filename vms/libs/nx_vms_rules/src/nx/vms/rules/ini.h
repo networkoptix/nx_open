@@ -11,10 +11,10 @@ struct NX_VMS_RULES_API Ini: public nx::kit::IniConfig
     Ini(): IniConfig("nx_vms_rules.ini") { reload(); }
 
     // Both engines are required for Cloud notifications to work in 5.1.
-    NX_INI_STRING("old", rulesEngine, "Version of VMS Rules Engine (old / new / both)");
+    NX_INI_STRING("new", rulesEngine, "Version of VMS Rules Engine (old / new / both)");
 
     // TODO: #amalov Temporary solution for 5.1. Should be removed in the future.
-    NX_INI_FLAG(false, fullSupport,
+    NX_INI_FLAG(true, fullSupport,
         "Process cloud notification only when set to false.");
 
     NX_INI_FLAG(false, showSystemRules,

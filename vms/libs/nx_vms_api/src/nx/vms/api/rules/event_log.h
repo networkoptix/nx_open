@@ -86,7 +86,7 @@ QN_FUSION_DECLARE_FUNCTIONS(EventLogFilter, (json), NX_VMS_API)
 struct NX_VMS_API EventLogRecord
 {
     /**%apidoc Event timestamp. Used for sorting multiserver response.*/
-    std::chrono::milliseconds timestampMs = {};
+    std::chrono::milliseconds timestampMs = std::chrono::milliseconds::zero();
 
     /**%apidoc Event data. Key is 'fieldName' from event manifest and value is serialized field
      * data. See /rest/v{4-}/events/manifest/events for event manifests.
@@ -116,6 +116,8 @@ struct NX_VMS_API EventLogRecord
 
 NX_REFLECTION_INSTRUMENT(EventLogRecord, EventLogRecord_Fields)
 QN_FUSION_DECLARE_FUNCTIONS(EventLogRecord, (json)(sql_record), NX_VMS_API)
+
+std::string NX_VMS_API toString(const EventLogRecord& record);
 
 } // namespace nx::vms::rules
 
