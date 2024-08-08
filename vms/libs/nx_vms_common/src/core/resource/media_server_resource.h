@@ -165,7 +165,6 @@ public:
     void setWebCamerasDiscoveryEnabled(bool value);
     bool isGuidConflictDetected() const;
     void setGuidConflictDetected(bool value);
-    void stopServerConnection();
 
 protected:
     virtual void updateInternal(const QnResourcePtr& source, NotifierList& notifiers) override;
