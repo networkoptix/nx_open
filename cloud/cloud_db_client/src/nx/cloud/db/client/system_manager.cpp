@@ -53,6 +53,24 @@ void SystemManager::getSystems(
     getSystemsFiltered(filter, std::move(completionHandler));
 }
 
+void SystemManager::getSystemsByEmail(
+    const std::string& email,
+    std::function<void(api::ResultCode, api::SystemDataExList)> completionHandler)
+{
+    api::Filter filter;
+    filter.nameToValue.emplace(
+        api::FilterField::customization, nx::branding::customization().toStdString());
+    nx::utils::UrlQuery query;
+    for (const auto& [name, value]: filter.nameToValue)
+        query.addQueryItem(name, value);
+
+    m_requestsExecutor->makeAsyncCall<api::SystemDataExList>(
+        nx::network::http::Method::get,
+        nx::network::http::rest::substituteParameters(kSystemsByEmailPath, {email}),
+        query,
+        std::move(completionHandler));
+}
+
 void SystemManager::getSystemsFiltered(
     const api::Filter& filter,
     std::function<void(api::ResultCode, api::SystemDataExList)> completionHandler)

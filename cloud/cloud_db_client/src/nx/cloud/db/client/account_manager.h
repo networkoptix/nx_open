@@ -66,6 +66,11 @@ public:
     virtual void getSecuritySettings(
         std::function<void(api::ResultCode, api::AccountSecuritySettings)> completionHandler) override;
 
+    virtual void saveAccountOrganizationAttrs(
+        const std::string& accountEmail,
+        api::AccountOrganizationAttrs orgAttrs,
+        std::function<void(api::ResultCode)> completionHandler) override;
+
 private:
     ApiRequestsExecutor* m_requestsExecutor = nullptr;
 };

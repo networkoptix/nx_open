@@ -150,4 +150,18 @@ void AccountManager::getSecuritySettings(
         std::move(completionHandler));
 }
 
+void AccountManager::saveAccountOrganizationAttrs(
+    const std::string& accountEmail,
+    api::AccountOrganizationAttrs orgAttrs,
+    std::function<void(api::ResultCode)> completionHandler)
+{
+    m_requestsExecutor->makeAsyncCall</*Output*/ void>(
+        nx::network::http::Method::put,
+        nx::network::http::rest::substituteParameters(
+            kAccountOrganizationAttrsPath, {accountEmail}),
+        {}, // query
+        std::move(orgAttrs),
+        std::move(completionHandler));
+}
+
 } // nx::cloud::db::client

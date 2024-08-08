@@ -68,6 +68,11 @@ public:
 
     virtual void getSecuritySettings(
         std::function<void(api::ResultCode, api::AccountSecuritySettings)> completionHandler) = 0;
+
+    virtual void saveAccountOrganizationAttrs(
+        const std::string& accountEmail,
+        api::AccountOrganizationAttrs orgAttrs,
+        std::function<void(api::ResultCode)> completionHandler) = 0;
 };
 
 } // namespace nx::cloud::db::api
