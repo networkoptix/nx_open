@@ -269,10 +269,6 @@ LayoutActionHandler::LayoutActionHandler(WindowContext* windowContext, QObject* 
 
     connect(system()->messageProcessor(), &QnCommonMessageProcessor::businessActionReceived,
         this, &LayoutActionHandler::at_businessActionReceived);
-
-    // TODO: #sivanov Think about moving this connection to Workbench class.
-    connect(windowContext, &WindowContext::beforeSystemChanged, this,
-        [this]() { workbench()->clear(); });
 }
 
 LayoutActionHandler::~LayoutActionHandler()

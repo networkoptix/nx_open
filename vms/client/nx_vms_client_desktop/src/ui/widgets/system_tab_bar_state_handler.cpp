@@ -21,18 +21,21 @@ SystemTabBarStateHandler::SystemTabBarStateHandler(QObject* parent):
         &Workbench::currentSystemChanged,
         this,
         &SystemTabBarStateHandler::at_currentSystemChanged);
+
+    connect(workbench(),
+        &Workbench::systemAboutToBeChanged,
+        this,
+        &SystemTabBarStateHandler::storeWorkbenchState);
+
     connect(action(menu::RemoveSystemFromTabBarAction),
         &QAction::triggered,
         this,
         &SystemTabBarStateHandler::at_systemDisconnected);
+
     connect(windowContext()->connectActionsHandler(),
         &ConnectActionsHandler::stateChanged,
         this,
         &SystemTabBarStateHandler::at_connectionStateChanged);
-    connect(windowContext(),
-        &WindowContext::beforeSystemChanged,
-        this,
-        &SystemTabBarStateHandler::storeWorkbenchState);
 
     connect(action(menu::ResourcesModeAction), &QAction::toggled, this,
         [this](bool value)
@@ -127,7 +130,7 @@ void SystemTabBarStateHandler::storeWorkbenchState()
     if (!NX_ASSERT(m_store))
         return;
 
-    const auto systemId = m_store->state().currentSystemId;
+    const auto systemId = m_store->currentSystemId();
     if (!systemId.isNull())
     {
         WorkbenchState workbenchState;

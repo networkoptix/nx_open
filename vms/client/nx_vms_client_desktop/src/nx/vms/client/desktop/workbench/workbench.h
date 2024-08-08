@@ -236,6 +236,8 @@ signals:
      */
     void itemAboutToBeChanged(Qn::ItemRole role);
 
+    void systemAboutToBeChanged();
+
     /**
      * This signal is emitted whenever a new item is assigned to the role.
      *

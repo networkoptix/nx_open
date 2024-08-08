@@ -273,6 +273,14 @@ Workbench::Workbench(WindowContext* windowContext, QObject* parent):
         &WebEngineProfileManager::downloadRequested,
         this,
         [this](QObject* item) { utils::WebDownloader::download(item, this->windowContext()); });
+
+    connect(windowContext, &WindowContext::beforeSystemChanged, this,
+        [this]()
+        {
+            if (!d->layouts.empty())
+                emit systemAboutToBeChanged();
+            clear();
+        });
 }
 
 Workbench::~Workbench()
