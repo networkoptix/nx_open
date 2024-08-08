@@ -22,7 +22,7 @@ static constexpr AsyncClient::Timeouts kDefaultTimeouts{1min, 1min, 1min};
 
 } // namespace
 
-//--------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // ClientPool::Response
 
 void ClientPool::Response::reset()
@@ -32,7 +32,7 @@ void ClientPool::Response::reset()
     contentType = nx::String();
 }
 
-//--------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // ClientPool::Context
 
 StatusLine ClientPool::Context::getStatusLine() const
@@ -191,7 +191,7 @@ void ClientPool::Context::readHttpResponse(AsyncClient* httpClient)
     }
 }
 
-//--------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // ClientPool::HttpConnection
 
 /**
@@ -233,7 +233,43 @@ struct HttpConnection
     nx::Uuid lastAdapterFuncId;
 };
 
-//--------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
+// AsyncClientStopper
+
+/**
+ * Helper class which signalyzes when AsyncClient is stopped and ready for deletion.
+ */
+struct AsyncClientStopper
+{
+    AsyncClientStopper(std::unique_ptr<AsyncClient>&& clientToStop, bool stopAsync = false):
+        client(std::move(clientToStop))
+    {
+        if (stopAsync && NX_ASSERT(client))
+        {
+            promise = std::make_shared<std::promise<void>>();
+            client->pleaseStop([this]() { promise->set_value(); });
+        }
+    }
+
+    bool isStoppingAsync() const
+    {
+        return promise != nullptr;
+    }
+
+    void stop()
+    {
+        if (promise)
+            promise->get_future().wait();
+        else
+            client->pleaseStopSync();
+    }
+
+private:
+    std::unique_ptr<AsyncClient> client;
+    std::shared_ptr<std::promise<void>> promise;
+};
+
+//-------------------------------------------------------------------------------------------------
 // ClientPool::Private
 
 struct ClientPool::Private
@@ -245,11 +281,10 @@ struct ClientPool::Private
     mutable nx::Mutex mutex;
 
     std::multimap<QString /*endpointWithProtocol*/, std::unique_ptr<HttpConnection>> connectionPool;
+    std::vector<std::unique_ptr<AsyncClientStopper>> stoppingClients;
 
     /** A sequence of requests to be passed to connection pool to process. */
     std::map<int, ContextPtr> awaitingRequests;
-
-    bool stopped = false;
 
     std::unique_ptr<AsyncClient> createHttpConnection()
     {
@@ -278,6 +313,38 @@ struct ClientPool::Private
                 ++itr;
             }
         }
+    }
+
+    void deleteStoppedClients(bool includeAsyncStoppingClients = false)
+    {
+        std::vector<std::unique_ptr<AsyncClientStopper>> stoppedClients;
+
+        {
+            NX_MUTEX_LOCKER lock(&mutex);
+            if (includeAsyncStoppingClients)
+            {
+                stoppedClients.swap(stoppingClients);
+            }
+            else
+            {
+                for (auto it = stoppingClients.begin(); it != stoppingClients.end(); /*no inc*/)
+                {
+                    if ((*it)->isStoppingAsync())
+                    {
+                        ++it;
+                        continue;
+                    }
+
+                    stoppedClients.push_back(std::move(*it));
+                    it = stoppingClients.erase(it);
+                }
+            }
+        }
+
+        for (const std::unique_ptr<AsyncClientStopper>& client: stoppedClients)
+            client->stop();
+
+        stoppedClients.clear();
     }
 
     HttpConnection* getUnusedConnection(const nx::utils::Url& url)
@@ -323,7 +390,20 @@ struct ClientPool::Private
         if (adapterFuncId == connection->lastAdapterFuncId)
             return;
         if (!connection->lastAdapterFuncId.isNull())
+        {
+            if (connection->client)
+            {
+                // AsyncClient should not be deleted under mutex lock. We need to postpone the
+                // destruction to avoid a deadlock.
+                // `onHttpClientDone()` may be called from AioThread. It may try to lock the mutex
+                // which will be already locked at this point. In addition, `AsyncClient`
+                // destructor will wait for AioThread to perform its deletion handler there, so
+                // will also stuck.
+                stoppingClients.push_back(
+                    std::make_unique<AsyncClientStopper>(std::move(connection->client)));
+            }
             connection->client = createHttpConnection();
+        }
         if (adapterFunc)
         {
             if (NX_ASSERT(!adapterFuncId.isNull()))
@@ -400,8 +480,52 @@ struct ClientPool::Private
             sendNextRequestUnsafe();
             cleanupDisconnectedUnsafe();
         }
+
+        deleteStoppedClients();
     }
 
+    void stop(bool sync, bool invokeCallbacks)
+    {
+        NX_DEBUG(this, "%1(). sync=%2, invokeCallbacks=%3", __func__, sync, invokeCallbacks);
+
+        std::vector<ContextPtr> requests;
+
+        {
+            NX_MUTEX_LOCKER lock(&mutex);
+
+            for (const auto&[_, connection]: connectionPool)
+            {
+                requests.push_back(connection->context);
+                if (connection->client)
+                {
+                    stoppingClients.push_back(std::make_unique<AsyncClientStopper>(
+                        std::move(connection->client), /*stopAsync*/ !sync));
+                }
+            }
+
+            for (const auto&[_, context]: awaitingRequests)
+                requests.push_back(context);
+
+            awaitingRequests.clear(); //< We must not create new connections.
+            connectionPool.clear();
+        }
+
+        if (sync)
+            deleteStoppedClients(/*includeAsyncStoppingClients*/ true);
+
+        if (invokeCallbacks)
+        {
+            NX_DEBUG(this, "%1(): Invoking callbacks...", __func__);
+
+            for (const auto& context: requests)
+            {
+                if (context && !context->targetThreadIsDead() && context->completionFunc)
+                    context->completionFunc(context);
+            }
+        }
+
+        NX_DEBUG(this, "%1(): Finished.", __func__);
+    }
 };
 
 //--------------------------------------------------------------------------------------------------
@@ -416,7 +540,7 @@ ClientPool::ClientPool(QObject *parent):
 
 ClientPool::~ClientPool()
 {
-    stop(/*invokeCallbacks*/ false);
+    stopSync();
     SocketGlobals::instance().allocationAnalyzer().recordObjectDestruction(this);
 }
 
@@ -427,38 +551,12 @@ void ClientPool::setPoolSize(int value)
 
 void ClientPool::stop(bool invokeCallbacks)
 {
-    std::vector<ContextPtr> requests;
+    d->stop(/*sync*/ false, invokeCallbacks);
+}
 
-    decltype(d->connectionPool) dataCopy;
-    {
-        NX_MUTEX_LOCKER lock(&d->mutex);
-        if (d->stopped)
-            return;
-
-        d->stopped = true;
-
-        requests.reserve(dataCopy.size() + d->awaitingRequests.size());
-        std::swap(dataCopy, d->connectionPool);
-
-        for (const auto&[_, connection]: dataCopy)
-            requests.push_back(connection->context);
-        for (const auto&[_, context]: d->awaitingRequests)
-            requests.push_back(context);
-
-        d->awaitingRequests.clear(); //< We must not create new connections.
-    }
-
-    for (const auto& [_, connection]: dataCopy)
-        connection->client->pleaseStopSync();
-
-    if (invokeCallbacks)
-    {
-        for (const auto& context: requests)
-        {
-            if (context && !context->targetThreadIsDead() && context->completionFunc)
-                context->completionFunc(context);
-        }
-    }
+void ClientPool::stopSync(bool invokeCallbacks)
+{
+    d->stop(/*sync*/ true, invokeCallbacks);
 }
 
 int ClientPool::sendRequest(ContextPtr context)
@@ -467,15 +565,14 @@ int ClientPool::sendRequest(ContextPtr context)
     {
         NX_MUTEX_LOCKER lock(&d->mutex);
 
-        if (d->stopped)
-            return 0;
-
         requestId = ++d->requestId;
         // Access to d->awaitingRequests is blocked, so no other thread can touch context as well.
         context->handle = requestId;
         d->awaitingRequests.emplace(requestId, context);
         d->sendNextRequestUnsafe();
     }
+
+    d->deleteStoppedClients();
 
     return requestId;
 }

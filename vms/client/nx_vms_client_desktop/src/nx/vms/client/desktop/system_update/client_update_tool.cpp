@@ -294,6 +294,7 @@ void ClientUpdateTool::setServerUrl(
 
     m_serverConnection.reset(
         new rest::ServerConnection(
+            systemContext()->httpClientPool(),
             serverId,
             auditId,
             certificateVerifier,

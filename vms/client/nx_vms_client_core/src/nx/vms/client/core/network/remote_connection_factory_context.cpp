@@ -20,9 +20,10 @@ bool RemoteConnectionFactoryContext::isRestApiSupported() const
         && *logonData.expectedServerVersion >= RemoteConnection::kRestApiSupportVersion;
 }
 
-RemoteConnectionProcess::RemoteConnectionProcess():
-    context(new RemoteConnectionFactoryContext())
+RemoteConnectionProcess::RemoteConnectionProcess(SystemContext* systemContext):
+    context(new RemoteConnectionFactoryContext(systemContext))
 {
+    NX_ASSERT(systemContext);
 }
 
 RemoteConnectionProcess::~RemoteConnectionProcess()

@@ -17,6 +17,7 @@
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_connection_factory.h>
 #include <nx/vms/client/core/network/server_certificate_validation_level.h>
+#include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/test_support/unit_test_application.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
 #include <utils/common/synctime.h>
@@ -120,6 +121,10 @@ class RemoteConnectionFactoryTest: public ::testing::Test
 public:
     RemoteConnectionFactoryTest()
     {
+        systemContext = std::make_unique<SystemContext>(
+            SystemContext::Mode::unitTests, nx::Uuid::createUuid());
+        appContext()->addSystemContext(systemContext.get());
+
         requestsManager = std::make_shared<RemoteConnectionFactoryRequestsManager>();
 
         const auto certificateChain = nx::network::ssl::Certificate::parse(kExpectedServerPem);
@@ -265,7 +270,8 @@ public:
             [&promise](ConnectionOrError result)
             {
                 promise.set_value(result);
-            });
+            },
+            systemContext.get());
         std::future_status status;
         do {
             qApp->processEvents();
@@ -308,6 +314,8 @@ public:
 public:
     // RemoteConnectionFactory uses application secure settings for connection cache.
     UnitTestApplication application;
+
+    std::unique_ptr<SystemContext> systemContext;
 
     /** Storage for certificates which were actually used for connection. */
     std::unique_ptr<CertificateStorage> connectionCertificatesStorage;

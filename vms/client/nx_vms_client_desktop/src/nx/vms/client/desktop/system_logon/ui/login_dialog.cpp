@@ -347,7 +347,7 @@ void LoginDialog::sendTestConnectionRequest()
         .address = info.address,
         .credentials = info.credentials,
         .userType = nx::vms::api::UserType::local};
-    d->connectionProcess = remoteConnectionFactory->connect(logonData, callback);
+    d->connectionProcess = remoteConnectionFactory->connect(logonData, callback, system());
 
     updateUsability();
 }
