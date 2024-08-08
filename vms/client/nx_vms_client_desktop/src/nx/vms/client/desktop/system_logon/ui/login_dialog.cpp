@@ -27,6 +27,7 @@
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/logic/remote_session.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/utils/system_uri.h>
@@ -340,7 +341,7 @@ void LoginDialog::sendTestConnectionRequest()
         .address = info.address,
         .credentials = info.credentials,
         .userType = nx::vms::api::UserType::local};
-    d->connectionProcess = remoteConnectionFactory->connect(logonData, callback);
+    d->connectionProcess = remoteConnectionFactory->connect(logonData, callback, systemContext());
 
     updateUsability();
 }

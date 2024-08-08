@@ -17,6 +17,7 @@
 #include <nx/vms/api/data/login.h>
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/api/data/user_model.h>
+#include <nx/vms/client/core/system_context.h>
 
 #include "logon_data.h"
 #include "remote_connection_error.h"
@@ -33,6 +34,8 @@ struct NX_VMS_CLIENT_CORE_API RemoteConnectionFactoryContext: public QObject
 {
     /** Whether connection process was terminated. */
     std::atomic_bool terminated = false;
+
+    QPointer<SystemContext> systemContext;
 
     /** Initial data, describing where to connect and what to expect. */
     LogonData logonData;
@@ -62,6 +65,8 @@ struct NX_VMS_CLIENT_CORE_API RemoteConnectionFactoryContext: public QObject
     nx::network::ssl::CertificateChain handshakeCertificateChain;
     std::shared_ptr<CertificateCache> certificateCache;
     std::unique_ptr<AbstractRemoteConnectionUserInteractionDelegate> customUserInteractionDelegate;
+
+    RemoteConnectionFactoryContext(SystemContext* systemContext): systemContext(systemContext) {}
 
     const nx::network::SocketAddress& address() const { return logonData.address; }
     const nx::network::http::Credentials& credentials() const { return logonData.credentials; }
@@ -116,7 +121,7 @@ struct RemoteConnectionProcess
     std::shared_ptr<RemoteConnectionFactoryContext> context;
     std::future<void> future;
 
-    RemoteConnectionProcess();
+    RemoteConnectionProcess(SystemContext* systemContext);
     ~RemoteConnectionProcess();
 };
 

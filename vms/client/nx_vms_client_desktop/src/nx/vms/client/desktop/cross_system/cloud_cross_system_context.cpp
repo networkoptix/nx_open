@@ -331,8 +331,7 @@ struct CloudCrossSystemContext::Private
         NX_VERBOSE(this, "Initialize new connection");
 
         connectionProcess = qnClientCoreModule->networkModule()->connectionFactory()->connect(
-            *logonData,
-            handleConnection);
+            *logonData, handleConnection, systemContext.get());
 
         return true;
     }
@@ -347,7 +346,7 @@ struct CloudCrossSystemContext::Private
         }
 
         const nx::Uuid serverId = connection->moduleInformation().id;
-        server = CrossSystemServerResourcePtr(new CrossSystemServerResource(connection));
+        server = CrossSystemServerResourcePtr(new CrossSystemServerResource(systemContext.get()));
         server->setIdUnsafe(serverId);
 
         // If resource with such id was added to the cross-system layout, camera thumb will be
@@ -470,9 +469,7 @@ struct CloudCrossSystemContext::Private
             }
 
             CrossSystemServerResourcePtr newServer(new CrossSystemServerResource(
-                server.id,
-                cloudSystemId.toStdString(),
-                systemContext->connection()));
+                server.id, cloudSystemId.toStdString(), systemContext.get()));
             newServer->setName(server.name);
 
             newServers.push_back(newServer);
