@@ -79,7 +79,8 @@ MergeSystemsDialog::MergeSystemsDialog(QWidget* parent, std::unique_ptr<Delegate
 
     buttonBox()->setStandardButtons(QDialogButtonBox::Cancel);
     m_mergeButton = buttonBox()->addButton(QString(), QDialogButtonBox::ActionRole);
-    m_mergeButton->hide();
+    // Do not join strings to avoid translatable string duplication.
+    m_mergeButton->setText(tr("Merge with %1").arg("..."));
 
     QButtonGroup* buttonGroup = new QButtonGroup(this);
     buttonGroup->addButton(ui->currentSystemRadioButton);
@@ -351,7 +352,6 @@ void MergeSystemsDialog::at_mergeTool_systemFound(
     }
 
     m_targetModule = moduleInformation;
-    m_mergeButton->show();
     updateErrorLabel(QString());
     updateMergeButtonAvailability();
 }
