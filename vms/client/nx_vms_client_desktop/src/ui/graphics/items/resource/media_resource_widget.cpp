@@ -2674,6 +2674,7 @@ Qn::ResourceOverlayButton QnMediaResourceWidget::calculateOverlayButton(
     {
         case Qn::IoModuleDisabledOverlay:
         case Qn::AnalogWithoutLicenseOverlay:
+        case Qn::VideowallWithoutLicenseOverlay:
         {
             if (canChangeSettings)
             {
@@ -2693,12 +2694,12 @@ Qn::ResourceOverlayButton QnMediaResourceWidget::calculateOverlayButton(
         }
 
         case Qn::AccessDeniedOverlay:
+        case Qn::OfflineOverlay:
         {
             return Qn::ResourceOverlayButton::Empty;
         }
 
         case Qn::OldFirmwareOverlay:
-        case Qn::OfflineOverlay:
         {
             return menu()->canTrigger(menu::CameraDiagnosticsAction, d->camera)
                 ? Qn::ResourceOverlayButton::Diagnostics
@@ -2708,7 +2709,7 @@ Qn::ResourceOverlayButton QnMediaResourceWidget::calculateOverlayButton(
         case Qn::UnauthorizedOverlay:
         {
             return canChangeSettings
-                ? Qn::ResourceOverlayButton::Settings
+                ? Qn::ResourceOverlayButton::Authorize
                 : Qn::ResourceOverlayButton::Empty;
         }
 
