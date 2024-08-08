@@ -8,6 +8,7 @@
 #include <QtCore/QTimer>
 #include <QtGui/QAction>
 
+#include <api/http_client_pool.h>
 #include <api/runtime_info_manager.h>
 #include <client/client_message_processor.h>
 #include <client/client_runtime_settings.h>
@@ -1522,6 +1523,7 @@ void ConnectActionsHandler::clearConnection()
     system()->resourceAccessManager()->endUpdate();
 
     system()->lookupListManager()->deinitialize();
+    system()->httpClientPool()->stop(/*invokeCallbacks*/ true);
 
     emit windowContext()->systemChanged();
 

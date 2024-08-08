@@ -154,6 +154,7 @@ public:
      * @param credentials Credentials to authorize requests.
      */
     ServerConnection(
+        nx::network::http::ClientPool* httpClientPool,
         const nx::Uuid& serverId,
         const nx::Uuid& auditId,
         AbstractCertificateVerifier* certificateVerifier,
@@ -176,11 +177,6 @@ public:
     void updateCredentials(nx::network::http::Credentials credentials);
 
     void setUserId(const nx::Uuid& userId);
-
-    /**
-     * Set timeouts for all http requests.
-     */
-    void setDefaultTimeouts(Timeouts timeouts);
 
     struct EmptyResponseType {};
     typedef Result<EmptyResponseType>::type PostCallback;   // use this type for POST requests without result data
@@ -985,7 +981,6 @@ public:
      * requests in your destructor. Better bulletproof your callbacks with `guarded`.
      */
     void cancelRequest(const Handle& requestId);
-    void stop();
 
     enum class DebugFlag
     {

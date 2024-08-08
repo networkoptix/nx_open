@@ -34,6 +34,7 @@ namespace nx::metrics { struct Storage; }
 namespace nx::vms::discovery { class Manager; }
 namespace nx::vms::event { class RuleManager; }
 namespace nx::vms::rules { class Engine; }
+namespace nx::network::http { class ClientPool; }
 
 namespace nx::vms::common {
 
@@ -186,6 +187,11 @@ public:
      * Information about Servers, storing Device footage.
      */
     QnCameraHistoryPool* cameraHistoryPool() const;
+
+    /**
+     * A pool of reusable HTTP connections.
+     */
+    nx::network::http::ClientPool* httpClientPool() const;
 
     /**
      * Resource external data: Server additional addresses.
