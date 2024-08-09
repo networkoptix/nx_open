@@ -15,15 +15,14 @@ LegacyTranscodingSettings::LegacyTranscodingSettings(
     :
     resource(resource)
 {
+    forcedAspectRatio = resource->customAspectRatio();
+    rotation = resource->forcedRotation().value_or(0);
+
     if (!settings)
         return;
 
     // Rotation.
-    if (settings->rotation == "auto")
-    {
-        rotation = resource->forcedRotation().value_or(0);
-    }
-    else
+    if (settings->rotation != "auto")
     {
         rotation = std::atoi(settings->rotation.c_str());
         NX_ASSERT(rotation == 0 || rotation == 90 || rotation == 180 || rotation == 270);
