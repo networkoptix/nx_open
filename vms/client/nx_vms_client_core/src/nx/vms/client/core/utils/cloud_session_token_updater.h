@@ -9,6 +9,7 @@
 
 #include <nx/cloud/db/api/connection.h>
 #include <nx/utils/async_handler_executor.h>
+#include <nx/utils/deadline_timer.h>
 #include <nx/vms/client/core/network/remote_connection_aware.h>
 
 namespace nx::vms::client::core {
@@ -51,8 +52,8 @@ private:
     std::unique_ptr<CloudConnectionFactory> m_cloudConnectionFactory;
     std::unique_ptr<nx::cloud::db::api::Connection> m_cloudConnection;
     QTimer* m_timer = nullptr;
-    QDeadlineTimer m_expirationTimer; //< Countdoun timer to the token update request.
-    QDeadlineTimer m_requestInProgressTimer; //< Means "update request in progress" until expired.
+    nx::utils::DeadlineTimer m_expirationTimer; //< Countdoun timer to the token update request.
+    nx::utils::DeadlineTimer m_requestInProgressTimer; //< Means "update request in progress" until expired.
     bool m_wasSuspended = false;
 };
 
