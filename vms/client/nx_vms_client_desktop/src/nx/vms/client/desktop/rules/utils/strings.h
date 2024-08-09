@@ -36,6 +36,10 @@ public:
     static QString selectString();
     static QString devModeInfoTitle();
 
+    static QString isListed();
+    static QString isNotListed();
+    static QString in();
+
 private:
     static QString getName(SystemContext* context, const QnVirtualCameraResourceList& resources);
     static QString getName(const QnMediaServerResourceList& resources);

@@ -305,4 +305,19 @@ QString Strings::devModeInfoTitle()
     return tr("Developer Mode Info");
 }
 
+QString Strings::isListed()
+{
+    return tr("Is listed");
+}
+
+QString Strings::isNotListed()
+{
+    return tr("Is not listed");
+}
+
+QString Strings::in()
+{
+    return tr("In");
+}
+
 } // namespace nx::vms::client::desktop::rules
