@@ -32,11 +32,6 @@ public:
         decoder->releaseSurface(m_surfaceData.surface);
     }
 
-    virtual QVideoFrame::MapMode mapMode() const override
-    {
-        return QVideoFrame::NotMapped;
-    }
-
     virtual MapData map(QVideoFrame::MapMode /*mode*/) override
     {
         return {};
@@ -49,7 +44,7 @@ public:
         return QVariant::fromValue(m_surfaceData);
     }
 
-    virtual quint64 textureHandle(int /*plane*/) const override
+    virtual quint64 textureHandle(QRhi*, int /*plane*/) const override
     {
         return reinterpret_cast<quint64>(m_surfaceData.surface);
     }

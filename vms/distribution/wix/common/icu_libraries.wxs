@@ -6,11 +6,11 @@
             contain 'DiskId="2"' descriptor, so bundle will strip duplicated copies.
          -->
         <ComponentGroup Id="IcuLibrariesComponentGroup"
-                Source="${icu_directory}/bin"
+                Source="${bin_source_dir}"
                 Directory="InstallDirRoot">
-            <Component><File Name="icudt70.dll" KeyPath="yes" DiskId="2"/></Component>
-            <Component><File Name="icuin70.dll" KeyPath="yes" DiskId="2"/></Component>
-            <Component><File Name="icuuc70.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="icudt74.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="icuin74.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="icuuc74.dll" KeyPath="yes" DiskId="2"/></Component>
         </ComponentGroup>
     </Fragment>
 </Wix>

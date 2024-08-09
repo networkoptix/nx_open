@@ -8,7 +8,7 @@ string(APPEND CMAKE_C_FLAGS " ${compile_options}")
 string(APPEND CMAKE_CXX_FLAGS " ${compile_options}")
 set_directory_properties(PROPERTIES COMPILE_OPTIONS "")
 
-find_package(Qt6 COMPONENTS OpenGL)
+find_package(Qt6 COMPONENTS Multimedia OpenGL REQUIRED)
 
 set(additional_sources)
 set(additional_sources_include_dirs)
@@ -92,6 +92,7 @@ nx_add_target(nx_media
         nx_fusion
         nx_utils
     PRIVATE_LIBS
+        Qt6::Multimedia
         Qt6::OpenGL
         ${additional_private_libraries}
     ADDITIONAL_SOURCES

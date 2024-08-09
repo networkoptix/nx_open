@@ -406,7 +406,7 @@ struct ApplicationContext::Private
 
         common::appContext()->setLocale(appContext()->coreSettings()->locale());
 
-        #ifdef Q_OS_MACX
+        #ifdef Q_OS_MACOS
             if (mac_isSandboxed())
             {
                 runtimeSettings->setLightMode(

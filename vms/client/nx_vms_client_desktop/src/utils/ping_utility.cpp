@@ -4,7 +4,7 @@
 
 #include <QtCore/QDateTime>
 
-#ifdef Q_OS_MACX
+#ifdef Q_OS_MACOS
 
 #include <QDebug>
 
@@ -102,7 +102,7 @@ QnPingUtility::PingResponse QnPingUtility::ping(quint16 seq) {
     result.hostAddress = m_hostAddress;
     result.seq = seq;
 
-#ifdef Q_OS_MACX
+#ifdef Q_OS_MACOS
     timeval time_sent, time_recv;
 
     unsigned short id  = (unsigned short) (arc4random() >> 15);

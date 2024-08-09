@@ -50,7 +50,7 @@ ComboBox
     {
         if (!withIconSection || !model)
             return ""
-        if (Array.isArray(control.model))
+        if (NxGlobals.isSequence(control.model))
             return model[currentIndex] ? model[currentIndex][decorationRole] : ""
         const data = NxGlobals.modelData(model.index(currentIndex, 0), decorationRole)
         return data ? data : ""
@@ -61,7 +61,7 @@ ComboBox
     onCurrentIndexChanged: decorationPath = getDecorationPath()
     onModelChanged:
     {
-        if (withIconSection && Array.isArray(control.model))
+        if (withIconSection && NxGlobals.isSequence(control.model))
             decorationPath = model[currentIndex] ? model[currentIndex][decorationRole] : ""
     }
 
@@ -281,7 +281,7 @@ ComboBox
     {
         id: popupItem
 
-        readonly property var itemData: Array.isArray(control.model) ? modelData : model
+        readonly property var itemData: NxGlobals.isSequence(control.model) ? modelData : model
 
         height: 24
         width: control.width

@@ -183,6 +183,10 @@ copyLibs()
         libcrypto.so.1.1
         libssl.so.1.1
 
+        libicuuc.so.74
+        libicudata.so.74
+        libicui18n.so.74
+
         libopenal.so.1
         libqtkeychain.so.0.9.0
         libquazip.so
@@ -211,7 +215,6 @@ copyLibs()
             libxcb-xinerama.so.0
         distrib_copySystemLibs "$STAGE_LIB" libpng16.so.16 \
             || distrib_copySystemLibs "$STAGE_LIB" libpng.so
-        distrib_copySystemLibs "$STAGE_LIB" "${ICU_RUNTIME_LIBS[@]}"
         distrib_copySystemLibs "$STAGE_LIB" \
             libgstapp-1.0.so.0 \
             libgstbase-1.0.so.0 \
@@ -295,6 +298,8 @@ copyQtLibs()
         QmlWorkerScript
         Quick
         QuickControls2
+        QuickControls2Basic
+        QuickControls2BasicStyleImpl
         QuickControls2Impl
         QuickEffects
         QuickLayouts
@@ -305,6 +310,7 @@ copyQtLibs()
         Sql
         Svg
         WebChannel
+        WebChannelQuick
         WebEngineCore
         WebEngineQuick
         WebEngineWidgets
@@ -344,7 +350,7 @@ copyAdditionalQtFiles()
     echo "Copying additional Qt files"
 
     echo "  Copying qt.conf"
-    cp "$QT_DIR/bin/target_qt.conf" "$STAGE_BIN/"
+    cp "qt.conf" "$STAGE_BIN/"
 
     echo "  Copying (Qt) libexec"
     mkdir "$STAGE_LIBEXEC"

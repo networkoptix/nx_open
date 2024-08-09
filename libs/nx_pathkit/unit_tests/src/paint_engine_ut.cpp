@@ -2,20 +2,9 @@
 
 #include <gtest/gtest.h>
 
-#if QT_VERSION >= QT_VERSION_CHECK(6,6,0)
-    #include <rhi/qrhi.h>
-#else
-    #include <QtGui/private/qrhi_p.h>
-    #if defined(Q_OS_MACOS)
-        #include <QtGui/private/qrhimetal_p.h>
-    #elif defined(Q_OS_WIN)
-        #include <QtGui/private/qrhid3d11_p.h>
-    #endif
-    #include <QtGui/private/qrhigles2_p.h>
-    #include <QtGui/QOffscreenSurface>
-#endif
-
+#include <QtGui/QOffscreenSurface>
 #include <QtGui/QPainterPath>
+#include <QtGui/rhi/qrhi.h>
 
 #include <nx/pathkit/rhi_paint_device.h>
 #include <nx/pathkit/rhi_paint_engine.h>

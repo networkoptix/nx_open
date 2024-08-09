@@ -59,19 +59,12 @@ public:
         av_frame_free(&m_frame);
     }
 
-    virtual QVideoFrame::MapMode mapMode() const override
-    {
-        return m_mapMode;
-    }
-
     virtual MapData map(QVideoFrame::MapMode mode) override
     {
         MapData data;
 
         if (mode != QVideoFrame::ReadOnly)
             return data;
-
-        m_mapMode = mode;
 
         const auto pixelFormat = toQtPixelFormat((AVPixelFormat) m_frame->format);
 
@@ -96,12 +89,10 @@ public:
 
     virtual void unmap() override
     {
-        m_mapMode = QVideoFrame::NotMapped;
     }
 
 private:
     AVFrame* m_frame = nullptr;
-    QVideoFrame::MapMode m_mapMode = QVideoFrame::NotMapped;
 };
 
 //-------------------------------------------------------------------------------------------------

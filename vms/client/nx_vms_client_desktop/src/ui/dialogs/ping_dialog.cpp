@@ -7,7 +7,7 @@
 
 #include <utils/ping_utility.h>
 
-#ifdef Q_OS_MACX
+#ifdef Q_OS_MACOS
 #include <netinet/ip.h>
 #include <netinet/ip_icmp.h>
 #endif
@@ -52,7 +52,7 @@ QString QnPingDialog::responseToString(const QnPingUtility::PingResponse &respon
         return QString(QString("Unknown error for icmp_seq %1")).arg(response.seq);
     case QnPingUtility::Timeout:
         return QString(QString("Request timeout for icmp_seq %1")).arg(response.seq);
-#ifdef Q_OS_MACX
+#ifdef Q_OS_MACOS
     case ICMP_ECHOREPLY:
         return QString(QString("%1 bytes from %2: icmp_seq=%3 ttl=%4 time=%5 ms")).
                 arg(response.bytes).

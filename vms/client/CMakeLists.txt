@@ -1,7 +1,7 @@
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 if(withDesktopClient OR withMobileClient)
-    find_package(Qt6 COMPONENTS Quick Svg REQUIRED)
+    find_package(Qt6 COMPONENTS Multimedia Quick Svg REQUIRED)
 
     add_subdirectory(nx_vms_client_core)
 endif()

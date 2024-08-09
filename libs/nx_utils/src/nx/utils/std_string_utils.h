@@ -1936,4 +1936,19 @@ inline bool operator!=(const char* left, const std::string_view& right)
 inline bool operator!=(const std::string_view& left, const char* right)
 { return !(left == right); }
 
+//-------------------------------------------------------------------------------------------------
+// Previous declarations make "QByteArrayView == const char*" ambiguous.
+
+inline bool operator==(const QByteArrayView& left, const char* right)
+{ return left == QByteArrayView(right); }
+
+inline bool operator==(const char* left, const QByteArrayView& right)
+{ return right == left; }
+
+inline bool operator!=(const QByteArrayView& left, const char* right)
+{ return !(left == right); }
+
+inline bool operator!=(const char* left, const QByteArrayView& right)
+{ return !(right == left); }
+
 #endif // #if defined(QT_CORE_LIB)

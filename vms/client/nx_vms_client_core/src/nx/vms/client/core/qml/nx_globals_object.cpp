@@ -238,6 +238,11 @@ nx::Uuid NxGlobalsObject::generateUuid() const
     return nx::Uuid::createUuid();
 }
 
+bool NxGlobalsObject::isSequence(const QJSValue& value) const
+{
+    return value.isArray() || value.toVariant().canConvert<QVariantList>();
+}
+
 DateRange NxGlobalsObject::dateRange(const QDateTime& start, const QDateTime& end) const
 {
     return DateRange{start, end};
@@ -396,6 +401,12 @@ QString NxGlobalsObject::shortcutText(const QVariant& var) const
 void NxGlobalsObject::forceLayout(QQuickItemView* view) const
 {
     QQuickItemViewPrivate::get(view)->forceLayoutPolish();
+}
+
+void NxGlobalsObject::registerQmlType()
+{
+    qmlRegisterSingletonType<NxGlobalsObject>("nx.vms.client.core", 1, 0, "NxGlobals",
+        [](QQmlEngine*, QJSEngine*) { return new NxGlobalsObject(); });
 }
 
 } // namespace nx::vms::client::core

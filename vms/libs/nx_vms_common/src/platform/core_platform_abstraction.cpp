@@ -15,7 +15,7 @@
 #elif defined(Q_OS_LINUX)
 #   include "process/platform_process_unix.h"
 #   define QnProcessImpl QnUnixProcess
-#elif defined(Q_OS_MACX)
+#elif defined(Q_OS_MACOS)
 #   include "process/platform_process_unix.h"
 #   define QnProcessImpl QnUnixProcess
 #else

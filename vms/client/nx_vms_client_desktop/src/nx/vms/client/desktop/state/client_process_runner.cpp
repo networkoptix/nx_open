@@ -34,7 +34,7 @@ PidType ClientProcessRunner::runClient(const QStringList& arguments) const
     if (!QString(ini().clientExecutableName).isEmpty())
         execName = qApp->applicationDirPath() + '/' + ini().clientExecutableName;
 
-#ifdef Q_OS_MACX
+#ifdef Q_OS_MACOS
     return mac_startDetached(execName, arguments);
 #else
     return utils::UnityLauncherWorkaround::startDetached(execName, arguments);

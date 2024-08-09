@@ -4,7 +4,7 @@
 
 #include <QtCore/QString>
 
-#if defined(Q_OS_MACX)
+#if defined(Q_OS_MACOS)
 
 class QnBundleHelpers
 {
@@ -18,4 +18,4 @@ private:
     ~QnBundleHelpers() = default;
 };
 
-#endif // defined(Q_OS_MACX)
+#endif // defined(Q_OS_MACOS)

@@ -604,7 +604,7 @@ void QnWorkbenchDisplay::initialize(QGraphicsScene* scene, QGraphicsView* view)
             *connection = connect(viewport, &QOpenGLWidget::aboutToCompose, this, localCacheInit);
         // ----------------------------------------------------------------------------------------
 
-#ifndef Q_OS_MACX
+#ifndef Q_OS_MACOS
         /* On macos, this flag results in QnMaskedProxyWidget::paint never called. */
         m_view->setOptimizationFlag(QGraphicsView::DontAdjustForAntialiasing);
 #endif

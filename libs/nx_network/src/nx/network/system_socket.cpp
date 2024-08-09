@@ -1258,7 +1258,7 @@ bool TCPSocket::setKeepAlive(std::optional< KeepAliveOptions > info)
     const int count = (int)info->probeCount;
     if (setsockopt(handle(), SOL_TCP, TCP_KEEPCNT, &count, sizeof(count)) < 0)
         return false;
-#elif defined( Q_OS_MACX )
+#elif defined( Q_OS_MACOS )
     const int inactivityPeriodBeforeFirstProbe =
         intDuration<seconds>(info->inactivityPeriodBeforeFirstProbe);
     if (setsockopt(handle(), IPPROTO_TCP, TCP_KEEPALIVE,
@@ -1311,7 +1311,7 @@ bool TCPSocket::getKeepAlive(std::optional< KeepAliveOptions >* result) const
     (*result)->inactivityPeriodBeforeFirstProbe = seconds(inactivityPeriodBeforeFirstProbe);
     (*result)->probeSendPeriod = seconds(probeSendPeriod);
     (*result)->probeCount = (size_t)probeCount;
-#elif defined( Q_OS_MACX )
+#elif defined( Q_OS_MACOS )
     int inactivityPeriodBeforeFirstProbe = 0;
     if (getsockopt(handle(), IPPROTO_TCP, TCP_KEEPALIVE,
             &inactivityPeriodBeforeFirstProbe, &length) < 0)
@@ -1584,7 +1584,7 @@ std::unique_ptr<AbstractStreamSocket> TCPServerSocket::systemAccept()
     if (!acceptedSocket)
         return nullptr;
 
-#if defined(_WIN32) || defined(Q_OS_MACX)
+#if defined(_WIN32) || defined(Q_OS_MACOS)
     if (nonBlockingMode)
     {
         // Make all platforms behave like Linux, so all new sockets are in blocking mode

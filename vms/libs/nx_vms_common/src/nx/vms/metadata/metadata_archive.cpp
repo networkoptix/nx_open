@@ -607,8 +607,8 @@ void MetadataArchive::loadDataFromIndex(
     std::function<bool()> interruptionCallback,
     AbstractMetadataBinaryFile& metadataFile,
     const Index& index,
-    QVector<IndexRecord>::iterator startItr,
-    const QVector<IndexRecord>::iterator endItr,
+    const QVector<IndexRecord>::const_iterator startItr,
+    const QVector<IndexRecord>::const_iterator endItr,
     QnTimePeriodList& rez) const
 {
     nx::utils::ByteArray buffer(kAlignment, 0, 0);
@@ -676,8 +676,8 @@ void MetadataArchive::loadDataFromIndex(
     const Filter* filter,
     std::function<bool()> interruptionCallback,
     const Index& index,
-    QVector<IndexRecord>::iterator startItr,
-    const QVector<IndexRecord>::iterator endItr,
+    const QVector<IndexRecord>::const_iterator startItr,
+    const QVector<IndexRecord>::const_iterator endItr,
     QnTimePeriodList& rez) const
 {
     for(auto i = startItr; i < endItr;  ++i)
@@ -698,8 +698,8 @@ void MetadataArchive::loadDataFromIndexDesc(
     std::function<bool()> interruptionCallback,
     AbstractMetadataBinaryFile& metadataFile,
     const Index& index,
-    QVector<IndexRecord>::iterator startItr,
-    const QVector<IndexRecord>::iterator endItr,
+    const QVector<IndexRecord>::const_iterator startItr,
+    const QVector<IndexRecord>::const_iterator endItr,
     QnTimePeriodList& rez) const
 {
     nx::utils::ByteArray buffer(kAlignment, 0, 0);
@@ -767,8 +767,8 @@ void MetadataArchive::loadDataFromIndexDesc(
     const Filter* filter,
     std::function<bool()> interruptionCallback,
     const Index& index,
-    QVector<IndexRecord>::iterator startItr,
-    const QVector<IndexRecord>::iterator endItr,
+    const QVector<IndexRecord>::const_iterator startItr,
+    const QVector<IndexRecord>::const_iterator endItr,
     QnTimePeriodList& rez) const
 {
     for (auto i = endItr - 1; i >= startItr; --i)

@@ -2,6 +2,8 @@
 
 .pragma library
 
+.import nx.vms.client.core 1.0 as Core
+
 function isEmptyValue(value)
 {
     return value === undefined || value === null
@@ -60,7 +62,7 @@ function getValue(value, defaultValue)
 
 function toArray(list)
 {
-    if (Array.isArray(list))
+    if (Core.NxGlobals.isSequence(list))
         return list
 
     var result = []

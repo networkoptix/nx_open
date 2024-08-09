@@ -6,12 +6,7 @@
 
 #include <QtGui/QMatrix4x4>
 #include <QtGui/QVector2D>
-
-#if QT_VERSION >= QT_VERSION_CHECK(6, 6, 0)
-    #include <rhi/qrhi.h>
-#else
-    #include <QtGui/private/qrhi_p.h>
-#endif
+#include <QtGui/rhi/qrhi.h>
 
 namespace nx::vms::common::pixelation {
 

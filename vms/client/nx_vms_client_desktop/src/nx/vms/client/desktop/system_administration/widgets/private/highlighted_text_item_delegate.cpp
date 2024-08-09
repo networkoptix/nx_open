@@ -3,6 +3,7 @@
 #include "highlighted_text_item_delegate.h"
 
 #include <QtCore/QCache>
+#include <QtCore/QPointer>
 #include <QtCore/QSortFilterProxyModel>
 #include <QtGui/QAbstractTextDocumentLayout>
 #include <QtGui/QGuiApplication>

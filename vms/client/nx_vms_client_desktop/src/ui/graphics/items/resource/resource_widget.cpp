@@ -770,7 +770,7 @@ QString QnResourceWidget::tooltipText(const QString& toolTip, const QString& hot
     QString result(toolTip);
     if (!hotkey.isEmpty())
     {
-#if defined(Q_OS_MACX)
+#if defined(Q_OS_MACOS)
         static const int kShiftUnicode = 0x21E7;
         static const int kControlUnicode = 0x2303;
         static const int kOptionUnicode = 0x2325;

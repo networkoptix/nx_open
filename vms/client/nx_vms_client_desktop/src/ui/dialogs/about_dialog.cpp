@@ -6,6 +6,7 @@
 #include <QtCore/QEvent>
 #include <QtGui/QClipboard>
 #include <QtGui/QTextDocumentFragment>
+#include <QtGui/rhi/qrhi.h>
 #include <QtQuick/QQuickWindow>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QBoxLayout>
@@ -14,12 +15,6 @@
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QSpacerItem>
-
-#if QT_VERSION >= QT_VERSION_CHECK(6, 6, 0)
-    #include <rhi/qrhi.h>
-#else
-    #include <QtGui/private/qrhi_p.h>
-#endif
 
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_display_info.h>

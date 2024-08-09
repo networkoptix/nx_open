@@ -28,6 +28,8 @@
             <Component><File Name="Qt6QmlModels.dll" KeyPath="yes" DiskId="3"/></Component>
             <Component><File Name="Qt6QmlWorkerScript.dll" KeyPath="yes" DiskId="3"/></Component>
             <Component><File Name="Qt6QuickControls2.dll" KeyPath="yes" DiskId="3"/></Component>
+            <Component><File Name="Qt6QuickControls2Basic.dll" KeyPath="yes" DiskId="3"/></Component>
+            <Component><File Name="Qt6QuickControls2BasicStyleImpl.dll" KeyPath="yes" DiskId="3"/></Component>
             <Component><File Name="Qt6QuickControls2Impl.dll" KeyPath="yes" DiskId="3"/></Component>
             <Component><File Name="Qt6Quick.dll" KeyPath="yes" DiskId="3"/></Component>
             <Component><File Name="Qt6QuickEffects.dll" KeyPath="yes" DiskId="3"/></Component>
@@ -38,6 +40,7 @@
             <Component><File Name="Qt6ShaderTools.dll" KeyPath="yes" DiskId="3"/></Component>
             <Component><File Name="Qt6Svg.dll" KeyPath="yes" DiskId="3"/></Component>
             <Component><File Name="Qt6WebChannel.dll" KeyPath="yes" DiskId="3"/></Component>
+            <Component><File Name="Qt6WebChannelQuick.dll" KeyPath="yes" DiskId="3"/></Component>
             <Component><File Name="Qt6WebEngineCore.dll" KeyPath="yes" DiskId="3"/></Component>
             <Component><File Name="Qt6WebEngineQuickDelegatesQml.dll" KeyPath="yes" DiskId="3"/></Component>
             <Component><File Name="Qt6WebEngineQuick.dll" KeyPath="yes" DiskId="3"/></Component>

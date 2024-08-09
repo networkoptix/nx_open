@@ -116,11 +116,6 @@ public:
     {
     }
 
-    virtual QVideoFrame::MapMode mapMode() const override
-    {
-        return QVideoFrame::NotMapped;
-    }
-
     virtual MapData map(QVideoFrame::MapMode) override
     {
         return {};
@@ -130,7 +125,7 @@ public:
     {
     }
 
-    virtual quint64 textureHandle(int plane) const override
+    virtual quint64 textureHandle(QRhi*, int plane) const override
     {
         return plane == 0 ? m_textureHolder.textureId() : 0;
     }

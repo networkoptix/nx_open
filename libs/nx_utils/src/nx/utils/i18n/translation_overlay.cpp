@@ -5,7 +5,6 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QThread>
 
-#include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log_main.h>
 
 #include "translation_overlay_item.h"
@@ -143,12 +142,12 @@ void TranslationOverlay::handleTranslatorsUnderMutex()
     else
     {
         // Call the same method from the main thread.
-        const auto callback = nx::utils::guarded(this,
+        const auto callback =
             [this]()
             {
                 NX_MUTEX_LOCKER lock(&m_mutex);
                 handleTranslatorsUnderMutex();
-            });
+            };
         QMetaObject::invokeMethod(qApp, callback, Qt::QueuedConnection);
     }
 }

@@ -23,7 +23,6 @@ LDFLAGS="@CMAKE_EXE_LINKER_FLAGS@"
 ARCH="@arch@"
 TARGET_TRIPLET="@COMPILE_TARGET@"
 CPP_RUNTIME_LIBS=( @cpp_runtime_libs_string@ )
-ICU_RUNTIME_LIBS=( @icu_runtime_libs_string@ )
 TRANSLATION_FILES=( @client_translation_files@ )
 
 URI_PROTOCOL="@customization.uriProtocol@"

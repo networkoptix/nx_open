@@ -4,12 +4,7 @@
 
 #include <QtCore/QFile>
 #include <QtGui/QImage>
-
-#if QT_VERSION >= QT_VERSION_CHECK(6,6,0)
-    #include <rhi/qrhi.h>
-#else
-    #include <QtGui/private/qrhi_p.h>
-#endif
+#include <QtGui/rhi/qrhi.h>
 
 #include <include/core/SkStrokeRec.h>
 #include <include/pathops/SkPathOps.h>

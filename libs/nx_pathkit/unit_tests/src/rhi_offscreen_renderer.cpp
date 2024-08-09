@@ -4,14 +4,9 @@
 
 #include <nx/pathkit/rhi_paint_device.h>
 
-#include <QtGui/QImage>
 #include <QtCore/QFile>
-
-#if QT_VERSION >= QT_VERSION_CHECK(6,6,0)
-    #include <rhi/qrhi.h>
-#else
-    #include <QtGui/private/qrhi_p.h>
-#endif
+#include <QtGui/rhi/qrhi.h>
+#include <QtGui/QImage>
 
 namespace nx::pathkit {
 

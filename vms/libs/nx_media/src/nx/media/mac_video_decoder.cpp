@@ -103,16 +103,9 @@ public:
         av_frame_free(&m_frame);
     }
 
-    virtual QVideoFrame::MapMode mapMode() const override
-    {
-        return m_mapMode;
-    }
-
-    virtual MapData map(QVideoFrame::MapMode mode) override
+    virtual MapData map(QVideoFrame::MapMode /*mode*/) override
     {
         MapData data;
-
-        m_mapMode = mode;
 
         data.nPlanes = 1;
 
@@ -171,7 +164,6 @@ public:
 
 private:
     AVFrame* m_frame = nullptr;
-    QVideoFrame::MapMode m_mapMode = QVideoFrame::NotMapped;
 };
 
 //-------------------------------------------------------------------------------------------------

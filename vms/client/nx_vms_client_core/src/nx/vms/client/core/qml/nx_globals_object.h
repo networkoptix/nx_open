@@ -7,6 +7,7 @@
 #include <QtCore/QPersistentModelIndex>
 #include <QtCore/QVariant>
 #include <QtGui/QCursor>
+#include <QtQml/QJSValue>
 #include <QtQuick/QQuickItem>
 
 #include <nx/utils/software_version.h>
@@ -56,6 +57,8 @@ public:
 
     Q_INVOKABLE nx::Uuid uuid(const QString& uuid) const;
     Q_INVOKABLE nx::Uuid generateUuid() const;
+
+    Q_INVOKABLE bool isSequence(const QJSValue& value) const;
 
     Q_INVOKABLE nx::vms::client::core::DateRange dateRange(
         const QDateTime& start, const QDateTime& end) const;
@@ -110,6 +113,8 @@ public:
 
     /** Absolutely force laying out items of the specified item view. */
     Q_INVOKABLE void forceLayout(QQuickItemView* view) const;
+
+    static void registerQmlType();
 };
 
 } // namespace nx::vms::client::core

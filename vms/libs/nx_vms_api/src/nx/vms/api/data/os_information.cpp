@@ -66,7 +66,7 @@ OsInformation OsInformation::fromBuildInfo()
 } // namespace vms
 } // namespace nx
 
-#if defined(Q_OS_OSX)
+#if defined(Q_OS_MACOS)
 
 #include <sys/types.h>
 #include <sys/sysctl.h>
@@ -89,4 +89,4 @@ QString nx::vms::api::OsInformation::currentSystemRuntime()
     return "Unknown";
 }
 
-#endif // defined(Q_OS_OSX)
+#endif // defined(Q_OS_MACOS)

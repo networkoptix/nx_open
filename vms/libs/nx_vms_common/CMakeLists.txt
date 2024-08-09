@@ -26,7 +26,6 @@ nx_add_target(nx_vms_common LIBRARY
     PUBLIC_LIBS
         Qt6::Gui
         Qt6::Concurrent
-        Qt6::Multimedia
         Qt6::Xml
         ffmpeg::ffmpeg
         nx_vms_api

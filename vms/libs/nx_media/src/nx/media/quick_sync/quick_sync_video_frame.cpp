@@ -20,7 +20,8 @@ mfxFrameSurface1* getSurface(const nx::media::VideoFramePtr& frame)
     NX_ASSERT(dynamic_cast<nx::media::quick_sync::QtVideoBuffer*>(videoBuffer)
         || dynamic_cast<nx::media::quick_sync::MfxQtVideoBuffer*>(videoBuffer));
 
-    return reinterpret_cast<mfxFrameSurface1*>(videoBuffer->textureHandle(/*unused*/ 0));
+    return reinterpret_cast<mfxFrameSurface1*>(
+        videoBuffer->textureHandle(/*unused*/ nullptr, /*unused*/ 0));
 }
 
 } // namespace

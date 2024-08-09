@@ -16,7 +16,7 @@
 #include <nx/utils/qt_helpers.h>
 #include <nx/zip/extractor.h>
 
-#if defined(Q_OS_MACX)
+#if defined(Q_OS_MACOS)
 #include <nx/utils/platform/core_foundation_mac/cf_dictionary.h>
 #include <nx/utils/platform/core_foundation_mac/cf_url.h>
 #endif
@@ -28,7 +28,7 @@ namespace {
 static const QRegularExpression kVersionDirRegExp(
     QRegularExpression::anchoredPattern(R"(\d+\.\d+(?:\.\d+\.\d+){0,1})"));
 
-#if defined(Q_OS_LINUX) || defined(Q_OS_MACX)
+#if defined(Q_OS_LINUX) || defined(Q_OS_MACOS)
 QString kInstallationPathPrefix = ".local/share";
 #else
 QString kInstallationPathPrefix = "AppData/Local";
@@ -53,7 +53,7 @@ QString applicationRootPath()
 
 QString extractVersion([[maybe_unused]] const QString& fullPath)
 {
-    #if defined(Q_OS_MACX)
+    #if defined(Q_OS_MACOS)
         static const auto kShortVersionTag = "CFBundleShortVersionString";
         static const auto kBundleVersionTag = "CFBundleVersion";
 

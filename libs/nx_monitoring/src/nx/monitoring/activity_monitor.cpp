@@ -12,7 +12,7 @@
 #elif defined(Q_OS_LINUX)
     #include <nx/monitoring/monitor_linux.h>
     using MonitorImplementation =  nx::monitoring::LinuxMonitor;
-#elif defined(Q_OS_MACX)
+#elif defined(Q_OS_MACOS)
     #include <nx/monitoring/monitor_mac.h>
     using MonitorImplementation = nx::monitoring::MacMonitor;
 #endif

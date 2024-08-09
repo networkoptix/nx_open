@@ -13,19 +13,6 @@ if(LINUX AND NOT ANDROID)
     nx_store_known_files_in_directory(${os_deps_pkg_config_dir})
     set(ENV{PKG_CONFIG_PATH} ${os_deps_pkg_config_dir})
 
-    if(arch STREQUAL "arm")
-        set(icu_version 67)
-    else()
-        set(icu_version 66)
-    endif()
-
-    set(icu_runtime_libs
-        libicuuc.so.${icu_version}
-        libicudata.so.${icu_version}
-        libicui18n.so.${icu_version})
-
-    nx_copy_system_libraries(${icu_runtime_libs})
-
     set(cpp_runtime_libs libstdc++.so.6 libatomic.so.1 libgcc_s.so.1)
     if(arch STREQUAL "x64")
         list(APPEND cpp_runtime_libs libmvec.so.1)
@@ -38,5 +25,4 @@ if(LINUX AND NOT ANDROID)
     endif()
 
     string(REPLACE ";" " " cpp_runtime_libs_string "${cpp_runtime_libs}")
-    string(REPLACE ";" " " icu_runtime_libs_string "${icu_runtime_libs}")
 endif()

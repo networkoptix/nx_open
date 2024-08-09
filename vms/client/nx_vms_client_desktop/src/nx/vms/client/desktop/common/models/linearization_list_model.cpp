@@ -311,7 +311,7 @@ QVariant LinearizationListModel::data(const QModelIndex& index, int role) const
 
         case ExpandedRole:
             return d->isSourceExpanded(sourceIndex)
-                && NX_ASSERT(d->sourceModel()->hasChildren(sourceIndex));
+                && d->sourceModel()->hasChildren(sourceIndex);
 
         default:
             return d->sourceModel()->data(sourceIndex, role);

@@ -145,7 +145,7 @@ class NxOpenConan(ConanFile):
             return
 
         self.build_requires("apidoctool/3.0" "#9b48851ed49e6272d9cf190a230d32c1")
-        self.build_requires("qt-host/6.5.3" "#b22af1ae61cfb13f9de09455d441c8de")
+        self.build_requires("qt-host/6.7.2" "#b52381813fbeb707ff728a1f0031e485")
         self.build_requires("swagger-codegen/3.0.21" "#58d9476941c662c4b3f8a9e99683f034")
 
         if self.isLinux:
@@ -184,11 +184,15 @@ class NxOpenConan(ConanFile):
 
         self.requires(f"ffmpeg/{self.ffmpeg_version_and_revision}")
         self.requires("openssl/1.1.1q" "#bcc8c366b4291c68913eabe817fb15c7")
-        self.requires("qt/6.5.3" "#15a56b89358b91317b8d2eef7d8cc41f")
+        self.requires("qt/6.7.2" "#a9fc65eca626e6303ee82eef4d3aa820")
         self.requires("roboto-fonts/1.0" "#a1d64ec2d6a2e16f8f476b2b47162123")
         self.requires("boost/1.83.0" "#e0be85c6f8107d7e960246e31cbbf7ab")
         self.requires("rapidjson/cci.20230929" "#624c0094d741e6a3749d2e44d834b96c")
         self.requires("zlib/1.2.13" "#df233e6bed99052f285331b9f54d9070")
+
+        if self.settings.os not in ("Android", "iOS"):
+            # Qt dependency.
+            self.requires("icu/74.2" "#a0ffc2036da25e5dbe72dc941074a6c4")
 
         if self.isWindows or self.isLinux:
             if self.settings.arch == "x86_64":
@@ -209,7 +213,7 @@ class NxOpenConan(ConanFile):
             if not self.isArm32:
                 self._os_deps_package = "os_deps_for_desktop_linux"
                 self.requires("os_deps_for_desktop_linux/ubuntu_focal"
-                    "#511e050eafd9d4a0ec666081b2eeb87d")
+                    "#7dbf25f805b1162f64eee4abfc561776")
 
         if self.haveDesktopClient:
             self.requires("hidapi/0.10.1" "#67c06b0755251878327ddea8fe964d6b")
@@ -224,7 +228,6 @@ class NxOpenConan(ConanFile):
             self.requires("intel-media-sdk-bin/2019R1" "#0a123266dd20b84b16a4cc60b752fc4b")
             self.requires("msvc-redist/14.38.33135" "#716dc6c575a38ac17943d6f0f45dde6d")
             self.requires("winsdk-redist/10.0.22621.0" "#8dfc5bcbabe971a46f78c8d2657d7ec2")
-            self.requires("icu-win/70.1" "#1c50009a7165b74563ba149c315737f1")
 
         if self.isArm32 or self.isArm64:
             self.requires("sse2neon/7bd15ea" "#d5c087ce33dbf1425b29d6435284d2c7")
@@ -298,6 +301,7 @@ class NxOpenConan(ConanFile):
             self.import_files_from_package("vms_help", "help", "bin/help", "**/*")
 
         self.import_package("openssl")
+        self.import_package("icu")
         self.import_package("hidapi")
         self.import_package("cuda-toolkit")
 

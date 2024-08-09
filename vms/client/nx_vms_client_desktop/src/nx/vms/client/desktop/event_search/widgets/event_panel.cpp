@@ -19,9 +19,7 @@ EventPanel::EventPanel(WindowContext* context, QWidget* parent):
     d(new Private(this))
 {
     setAttribute(Qt::WA_TranslucentBackground);
-    #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0) || !defined(Q_OS_MACOS)
-        setAutoFillBackground(true);
-    #endif
+    setAutoFillBackground(true);
 
     setPaletteColor(this, QPalette::Dark, core::colorTheme()->color("dark4"));
     setPaletteColor(this, QPalette::Window, core::colorTheme()->color("dark5"));

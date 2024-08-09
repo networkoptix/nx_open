@@ -183,7 +183,7 @@
 #include <utils/email/email.h>
 #include <utils/unity_launcher_workaround.h>
 
-#if defined(Q_OS_MACX)
+#if defined(Q_OS_MACOS)
     #include <utils/mac_utils.h>
 #endif
 

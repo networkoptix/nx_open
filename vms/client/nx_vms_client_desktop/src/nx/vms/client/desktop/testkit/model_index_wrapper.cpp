@@ -26,14 +26,6 @@ ModelIndexWrapper modelIndexToModelIndexWrapper(const QModelIndex& index)
 
 void ModelIndexWrapper::registerMetaType()
 {
-    #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-        // Avoid multiple metatype register calls.
-        if (QMetaType::hasRegisteredComparators(qMetaTypeId<ModelIndexWrapper>()))
-            return;
-
-        QMetaType::registerComparators<ModelIndexWrapper>();
-    #endif
-
     QMetaType::registerConverter<ModelIndexWrapper, QModelIndex>(modelIndexWrapperToModelIndex);
     QMetaType::registerConverter<QModelIndex, ModelIndexWrapper>(modelIndexToModelIndexWrapper);
 }
