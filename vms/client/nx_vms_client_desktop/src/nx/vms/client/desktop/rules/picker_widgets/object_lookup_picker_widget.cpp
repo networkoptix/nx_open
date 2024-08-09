@@ -18,6 +18,7 @@
 #include <ui/widgets/common/elided_label.h>
 
 #include "../model_view/lookup_lists_model.h"
+#include "../utils/strings.h"
 
 namespace nx::vms::client::desktop::rules {
 
@@ -46,10 +47,10 @@ ObjectLookupPicker::ObjectLookupPicker(
         tr("Has attributes"),
         QVariant::fromValue(LookupCheckType::hasAttributes));
     m_checkTypeComboBox->addItem(
-        tr("Listed"),
+        Strings::isListed(),
         QVariant::fromValue(LookupCheckType::inList));
     m_checkTypeComboBox->addItem(
-        tr("Not listed"),
+        Strings::isNotListed(),
         QVariant::fromValue(LookupCheckType::notInList));
 
     comboBoxesLayout->addWidget(m_checkTypeComboBox);
@@ -89,7 +90,7 @@ ObjectLookupPicker::ObjectLookupPicker(
         auto lookupListsLabel = new QnElidedLabel;
         lookupListsLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
         lookupListsLabel->setElideMode(Qt::ElideRight);
-        lookupListsLabel->setText(tr("From"));
+        lookupListsLabel->setText(Strings::in());
         lookupListsLayout->addWidget(lookupListsLabel);
 
         m_lookupListComboBox = new QComboBox;

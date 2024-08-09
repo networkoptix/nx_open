@@ -12,7 +12,9 @@
 #include <nx/vms/client/desktop/rules/utils/strings.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/rules/events/generic_event.h>
 #include <nx/vms/rules/field_types.h>
+#include <nx/vms/rules/utils/type.h>
 #include <ui/widgets/common/elided_label.h>
 
 #include "../model_view/lookup_lists_model.h"
@@ -39,18 +41,21 @@ TextLookupPicker::TextLookupPicker(
 
     auto comboBoxesLayout = new QHBoxLayout;
 
+    const auto isGenericEvent =
+        parent->eventFilter()->eventType() == vms::rules::utils::type<vms::rules::GenericEvent>();
+
     m_checkTypeComboBox = new QComboBox;
     m_checkTypeComboBox->addItem(
         tr("Contains keywords"),
         QVariant::fromValue(LookupCheckType::containsKeywords));
     m_checkTypeComboBox->addItem(
-        tr("Does not contain keywords"),
+        tr("Not contains keywords"),
         QVariant::fromValue(LookupCheckType::doesNotContainKeywords));
     m_checkTypeComboBox->addItem(
-        tr("Contains list entries"),
+        isGenericEvent ? tr("Contains list entries") : Strings::isListed(),
         QVariant::fromValue(LookupCheckType::inList));
     m_checkTypeComboBox->addItem(
-        tr("Does not contain list entries"),
+        isGenericEvent ? tr("Not contains list entries") : Strings::isNotListed(),
         QVariant::fromValue(LookupCheckType::notInList));
 
     comboBoxesLayout->addWidget(m_checkTypeComboBox);
@@ -87,7 +92,7 @@ TextLookupPicker::TextLookupPicker(
         auto lookupListsLabel = new QnElidedLabel;
         lookupListsLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
         lookupListsLabel->setElideMode(Qt::ElideRight);
-        lookupListsLabel->setText(tr("From"));
+        lookupListsLabel->setText(isGenericEvent ? tr("From") : Strings::in());
         lookupListsLayout->addWidget(lookupListsLabel);
 
         m_lookupListComboBox = new QComboBox;
