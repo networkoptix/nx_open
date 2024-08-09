@@ -13,9 +13,9 @@
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <utils/common/synctime.h>
 
-namespace nx::vms::client::core {
-
 using namespace std::chrono;
+
+namespace nx::vms::client::core {
 
 namespace {
 
@@ -66,8 +66,12 @@ void CloudSessionTokenUpdater::updateTokenIfNeeded(bool force)
     const bool requestInProgress = !m_requestInProgressTimer.hasExpired();
     if (!expired || requestInProgress)
     {
-        NX_DEBUG(this, "Do not update token, expiring/expired: %1, request in progress: %2",
-           expired, requestInProgress);
+        NX_DEBUG(
+            this,
+            "Do not update token, expired: %1, remaining time: %2, request in progress: %3",
+            expired,
+            m_expirationTimer.remainingTime(),
+            requestInProgress);
         return;
     }
 
@@ -77,13 +81,14 @@ void CloudSessionTokenUpdater::updateTokenIfNeeded(bool force)
 
 void CloudSessionTokenUpdater::onTokenUpdated(microseconds expirationTime)
 {
-    const auto duration = expirationTime - kTokenUpdateThreshold - qnSyncTime->currentTimePoint();
-    m_expirationTimer.setRemainingTime(duration > microseconds::zero()
+    const auto duration = duration_cast<milliseconds>(
+        expirationTime - kTokenUpdateThreshold - qnSyncTime->currentTimePoint());
+    m_expirationTimer.setRemainingTime(duration > milliseconds::zero()
         ? duration
-        : microseconds::max());
+        : milliseconds::max());
 
     // Reset timed "request in progress" flag.
-    m_requestInProgressTimer.setRemainingTime(microseconds::zero());
+    m_requestInProgressTimer.setRemainingTime(milliseconds::zero());
 
     NX_DEBUG(this, "Access token updated, expires at: %1, expiring/expired: %2",
         expirationTime, m_expirationTimer.hasExpired());
