@@ -277,7 +277,6 @@ distrib_copySystemLibs() # dest_dir libs_to_copy...
 #
 # [in] STAGE
 # [in] CPP_RUNTIME_LIBS
-# [in] ICU_RUNTIME_LIBS
 #
 distrib_copyServerSystemLibs() # destination_path
 {
@@ -296,9 +295,6 @@ distrib_copyServerSystemLibs() # destination_path
         echo "  Copying additional runtime libs: ${additional_runtime_libs[@]}"
         distrib_copySystemLibs "${destination_path}" "${additional_runtime_libs[@]}"
     fi
-
-    echo "  Copying libicu"
-    distrib_copySystemLibs "${destination_path}" "${ICU_RUNTIME_LIBS[@]}"
 
     if [[ "${ARCH}" != "arm" ]]; then
         echo "  Copying other system libs"
@@ -464,6 +460,13 @@ distrib_copyServerLibs() # additional_libs_to_copy...
     libs_to_copy+=(
         libssl
         libcrypto
+    )
+
+    # ICU.
+    libs_to_copy+=(
+        libicuuc
+        libicudata
+        libicui18n
     )
 
     mkdir -p "${STAGE}/${LIB_INSTALL_PATH}"

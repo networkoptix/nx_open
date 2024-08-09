@@ -11,6 +11,7 @@
 #include <QtGui/QOpenGLContext>
 #include <QtGui/QOpenGLFunctions>
 #include <QtGui/QPainter>
+#include <QtGui/rhi/qrhi.h>
 #include <QtOpenGL/QOpenGLFramebufferObject>
 #include <QtQml/QQmlComponent>
 #include <QtQml/QQmlEngine>
@@ -19,12 +20,6 @@
 #include <QtQuick/QQuickRenderControl>
 #include <QtQuick/QQuickRenderTarget>
 #include <QtQuick/QQuickWindow>
-
-#if QT_VERSION >= QT_VERSION_CHECK(6, 6, 0)
-    #include <rhi/qrhi.h>
-#else
-    #include <QtGui/private/qrhi_p.h>
-#endif
 
 #include <client_core/client_core_module.h>
 #include <nx/utils/pending_operation.h>
@@ -39,20 +34,6 @@
 #include <nx/vms/client/desktop/window_context.h>
 #include <ui/widgets/main_window.h>
 #include <ui/workbench/workbench_context.h>
-
-namespace {
-
-QRhi* getRhi(QQuickWindow* window)
-{
-    #if QT_VERSION >= QT_VERSION_CHECK(6,6,0)
-        return window->rhi();
-    #else
-        const auto ri = window->rendererInterface();
-        return static_cast<QRhi*>(ri->getResource(window, QSGRendererInterface::RhiResource));
-    #endif
-}
-
-} // namespace
 
 namespace nx::vms::client::desktop {
 
@@ -168,7 +149,7 @@ public:
         }
         else //if (quickWindow->graphicsApi() != QSGRendererInterface::OpenGL)
         {
-            auto rhi = getRhi(quickWindow.get());
+            auto rhi = quickWindow->rhi();
 
             if (rhi && rhi->isDeviceLost())
             {
@@ -180,7 +161,7 @@ public:
             {
                 if (!renderControl->initialize())
                     return;
-                rhi = getRhi(quickWindow.get());
+                rhi = quickWindow->rhi();
             }
 
             const auto pixelRatio = quickWindow->effectiveDevicePixelRatio();

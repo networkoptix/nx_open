@@ -10,14 +10,9 @@
 #include <QtGui/QOpenGLContext>
 #include <QtGui/QOpenGLFunctions>
 #include <QtGui/QOffscreenSurface>
+#include <QtGui/rhi/qrhi.h>
 #include <QtOpenGLWidgets/QOpenGLWidget>
 #include <QtQuick/QQuickWindow>
-
-#if QT_VERSION >= QT_VERSION_CHECK(6,6,0)
-    #include <rhi/qrhi.h>
-#else
-    #include <QtGui/private/qrhi_p.h>
-#endif
 
 #include <client/client_runtime_settings.h>
 #include <nx/build_info.h>
@@ -30,18 +25,7 @@
 
 #include "gl_context_data.h"
 
-namespace
-{
-
-QRhi* getRhi(QQuickWindow* window)
-{
-    #if QT_VERSION >= QT_VERSION_CHECK(6,6,0)
-        return window->rhi();
-    #else
-        const auto ri = window->rendererInterface();
-        return static_cast<QRhi*>(ri->getResource(window, QSGRendererInterface::RhiResource));
-    #endif
-}
+namespace {
 
 enum
 {
@@ -88,7 +72,7 @@ StaticOpenGLInfo::StaticOpenGLInfo()
     {
         if (auto quickWindow = appContext()->mainWindowContext()->quickWindow())
         {
-            if (auto rhi = getRhi(quickWindow))
+            if (auto rhi = quickWindow->rhi())
                 m_maxTextureSize = rhi->resourceLimit(QRhi::TextureSizeMax);
         }
         return;
@@ -163,7 +147,7 @@ public:
             m_features |= QnGlFunctions::ShadersBroken; /* Shaders are declared but don't work. */
         }
 
-#ifdef Q_OS_MACX
+#ifdef Q_OS_MACOS
         /* Intel HD 3000 driver handles textures with size > 4096 incorrectly (see bug #3141).
          * To fix that we have to override maximum texture size to 4096 for this graphics adapter. */
         if (info.vendor.contains("Intel")

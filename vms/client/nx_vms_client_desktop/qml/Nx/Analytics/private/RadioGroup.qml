@@ -45,7 +45,7 @@ Column
                 function getData(role)
                 {
                     return role
-                        ? Array.isArray(control.model) ? modelData[role] : model[role]
+                        ? NxGlobals.isSequence(control.model) ? modelData[role] : model[role]
                         : modelData
                 }
 

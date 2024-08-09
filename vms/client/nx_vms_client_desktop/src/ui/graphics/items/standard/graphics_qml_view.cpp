@@ -11,6 +11,7 @@
 #include <QtGui/QOpenGLFunctions>
 #include <QtGui/QPaintDevice>
 #include <QtGui/QPaintEngine>
+#include <QtGui/rhi/qrhi.h>
 #include <QtOpenGL/QOpenGLBuffer>
 #include <QtOpenGL/QOpenGLFramebufferObject>
 #include <QtOpenGL/QOpenGLVertexArrayObject>
@@ -43,27 +44,11 @@
 #include <ui/widgets/main_window.h>
 #include <ui/workbench/workbench_context.h>
 
-#if QT_VERSION >= QT_VERSION_CHECK(6,6,0)
-    #include <rhi/qrhi.h>
-#else
-    #include <QtGui/private/qrhi_p.h>
-#endif
-
 namespace {
 
 constexpr auto kQuadVertexCount = 4;
 constexpr auto kCoordPerVertex = 2; //< x, y
 constexpr auto kQuadArrayLength = kQuadVertexCount * kCoordPerVertex;
-
-QRhi* getRhi(QQuickWindow* window)
-{
-    #if QT_VERSION >= QT_VERSION_CHECK(6,6,0)
-        return window->rhi();
-    #else
-        const auto ri = window->rendererInterface();
-        return reinterpret_cast<QRhi*>(ri->getResource(window, QSGRendererInterface::RhiResource));
-    #endif
-}
 
 QWidget* findWindowWidgetOf(QWidget* widget)
 {
@@ -506,7 +491,7 @@ void GraphicsQmlView::setData(const QByteArray& data, const QUrl& url)
 
 void GraphicsQmlView::Private::initRenderTarget()
 {
-    auto rhi = getRhi(quickWindow.get());
+    auto rhi = quickWindow->rhi();
     if (!rhi || rhi->isDeviceLost())
         return;
 
@@ -565,7 +550,7 @@ bool GraphicsQmlView::Private::ensureOffscreen()
 
     if (offscreenInitialized)
     {
-        auto rhi = getRhi(quickWindow.get());
+        auto rhi = quickWindow->rhi();
         if (!rhi->isDeviceLost())
             return true;
 
@@ -585,7 +570,7 @@ bool GraphicsQmlView::Private::ensureOffscreen()
         if (!renderControl->initialize())
             return false;
 
-        auto rhi = getRhi(quickWindow.get());
+        auto rhi = quickWindow->rhi();
 
         initRenderTarget();
 

@@ -124,6 +124,8 @@ void initializeMetaTypes()
 
     qmlRegisterType<Collator>("Nx.Core", 1, 0, "Collator");
 
+    NxGlobalsObject::registerQmlType();
+    // TODO: VMS-54630: Remove this. Only `NxGlobalsObject::registerQmlType` should stay.
     qmlRegisterSingletonType<NxGlobalsObject>("Nx.Core", 1, 0, "NxGlobals",
         [](QQmlEngine*, QJSEngine*) { return new NxGlobalsObject(); });
     qmlRegisterSingletonType<EventSearchUtils>("nx.vms.client.core", 1, 0, "EventSearchUtils",

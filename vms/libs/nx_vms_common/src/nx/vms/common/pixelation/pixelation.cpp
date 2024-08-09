@@ -5,22 +5,12 @@
 #include <memory>
 
 #include <QtCore/QPointer>
+#include <QtGui/QOffscreenSurface>
+#include <QtGui/rhi/qrhi.h>
 
 #include <nx/utils/log/assert.h>
 
 #include "shaders.h"
-
-#if QT_VERSION >= QT_VERSION_CHECK(6,6,0)
-    #include <rhi/qrhi.h>
-#else
-    #include <QtGui/private/qrhi_p.h>
-    #if defined(__arm__)
-        #include <QtGui/private/qrhinull_p.h>
-    #else
-        #include <QtGui/private/qrhigles2_p.h>
-        #include <QtGui/QOffscreenSurface>
-    #endif
-#endif
 
 namespace nx::vms::common::pixelation {
 namespace {

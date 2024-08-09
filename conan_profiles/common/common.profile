@@ -8,6 +8,7 @@ boost/*:bzip2 = False
 boost/*:without_locale = True
 boost/*:without_log = True
 boost/*:without_stacktrace = True
+icu/*:shared=True
 libsrtp/*:with_openssl = True
 opencv*:dnn=True
 opencv*:freetype=False
@@ -40,3 +41,6 @@ boost/*:b2/4.10.1
 # libpq puts the content of this variable directly to CFLAGS. We need to clear it because our CI
 # uses this variable for its own needs and we don't want to see its content in CFLAGS.
 libpq/*:PROFILE=!
+
+[conf]
+qt/*:tools.cmake.cmaketoolchain:generator=Ninja

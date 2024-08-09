@@ -26,11 +26,6 @@ public:
     {
     }
 
-    virtual QVideoFrame::MapMode mapMode() const override
-    {
-        return m_mapMode;
-    }
-
     virtual MapData map(QVideoFrame::MapMode /*mode*/) override
     {
         MapData data;
@@ -57,7 +52,7 @@ public:
         m_allocator->UnlockFrame(m_surface->Data.MemId, &m_surface->Data);
     }
 
-    virtual quint64 textureHandle(int /*plane*/) const override
+    virtual quint64 textureHandle(QRhi*, int /*plane*/) const override
     {
         return reinterpret_cast<quint64>(m_surface);
     }
@@ -65,8 +60,6 @@ public:
 private:
     std::shared_ptr<MFXFrameAllocator> m_allocator;
     mfxFrameSurface1* m_surface;
-    QVideoFrame::MapMode m_mapMode = QVideoFrame::NotMapped;
-
 };
 
 } // namespace nx::media::quick_sync

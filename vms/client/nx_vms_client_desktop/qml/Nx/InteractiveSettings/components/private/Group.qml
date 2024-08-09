@@ -2,6 +2,8 @@
 
 import QtQuick 2.0
 
+import Nx.Core
+
 import "utils.js" as Utils
 
 /**
@@ -31,7 +33,7 @@ Item
         if (!childrenItem)
             return []
 
-        if (!Array.isArray(filledCheckItems))
+        if (!NxGlobals.isSequence(filledCheckItems))
             return childrenItem.layoutItems
 
         let result = []

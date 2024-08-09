@@ -3,7 +3,6 @@
 customization_mobile_client_enabled: '${customization.mobile.enabled}'
 
 qt_directory: '${QT_DIR}'
-icu_directory: '${icu_directory}'
 
 distribution_output_dir: '${distribution_output_dir}'
 

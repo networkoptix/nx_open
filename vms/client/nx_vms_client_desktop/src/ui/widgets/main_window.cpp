@@ -100,7 +100,7 @@
     #include <nx/vms/client/desktop/platforms/windows/gdi_win.h>
 #endif
 
-#ifdef Q_OS_MACX
+#ifdef Q_OS_MACOS
     #include <ui/workaround/mac_utils.h>
 #endif
 
@@ -118,7 +118,7 @@ static constexpr int kSmallMinimalWindowHeight = 300;
 } // namespace
 
 // These functions are used from mac_utils.mm
-#ifdef Q_OS_MACX
+#ifdef Q_OS_MACOS
 extern "C" {
 
 void disable_animations(void* qnmainwindow)
@@ -168,7 +168,7 @@ MainWindow::MainWindow(WindowContext* context, QWidget* parent, Qt::WindowFlags 
 
     QnHiDpiWorkarounds::init();
 
-#ifdef Q_OS_MACX
+#ifdef Q_OS_MACOS
     // Workaround prevents hangs on moving to the fullscreen mode in and out.
 
     const auto handler = nx::utils::guarded(this,
@@ -632,7 +632,7 @@ void MainWindow::setAnimationsEnabled(bool enabled) {
 }
 
 void MainWindow::showFullScreen() {
-#if defined Q_OS_MACX
+#if defined Q_OS_MACOS
     mac_showFullScreen((void*)winId(), true);
     updateDecorationsState();
 
@@ -644,7 +644,7 @@ void MainWindow::showFullScreen() {
 }
 
 void MainWindow::showNormal() {
-#if defined Q_OS_MACX
+#if defined Q_OS_MACOS
     mac_showFullScreen((void*)winId(), false);
     updateDecorationsState();
     // We have to enable minimize button in Mac OS for application in non-fullscreen mode only
@@ -724,7 +724,7 @@ void MainWindow::setOptions(Options options) {
 
 void MainWindow::updateDecorationsState()
 {
-#ifdef Q_OS_MACX
+#ifdef Q_OS_MACOS
     bool fullScreen = mac_isFullscreen((void*)winId());
 #else
     bool fullScreen = isFullScreen();
@@ -734,7 +734,7 @@ void MainWindow::updateDecorationsState()
     action(menu::FullscreenAction)->setChecked(fullScreen);
     action(menu::MaximizeAction)->setChecked(maximized);
 
-#ifdef Q_OS_MACX
+#ifdef Q_OS_MACOS
     bool uiTitleUsed = fullScreen;
 #else
     bool uiTitleUsed = fullScreen || maximized;

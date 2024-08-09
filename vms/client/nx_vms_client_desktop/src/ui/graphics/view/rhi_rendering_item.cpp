@@ -4,43 +4,13 @@
 
 #include <QtCore/QFile>
 #include <QtCore/QRunnable>
+#include <QtGui/rhi/qrhi.h>
 #include <QtQuick/QQuickWindow>
-
-#if QT_VERSION >= QT_VERSION_CHECK(6,6,0)
-    #include <rhi/qrhi.h>
-#else
-    #include <QtGui/private/qrhi_p.h>
-#endif
 
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log_main.h>
 
 using namespace nx::pathkit;
-
-namespace {
-
-QRhi* getRhi(QQuickWindow* window)
-{
-    #if QT_VERSION >= QT_VERSION_CHECK(6,6,0)
-        return window->rhi();
-    #else
-        const auto ri = window->rendererInterface();
-        return static_cast<QRhi*>(ri->getResource(window, QSGRendererInterface::RhiResource));
-    #endif
-}
-
-QRhiSwapChain* getSwapChain(QQuickWindow* window)
-{
-    #if QT_VERSION >= QT_VERSION_CHECK(6,6,0)
-        return m_window->swapChain();
-    #else
-        QSGRendererInterface* rif = window->rendererInterface();
-        return static_cast<QRhiSwapChain*>(
-            rif->getResource(window, QSGRendererInterface::RhiSwapchainResource));
-    #endif
-}
-
-} // namespace
 
 RhiRenderingItem::RhiRenderingItem()
 {
@@ -128,7 +98,7 @@ void RhiRenderingItemRenderer::setWindow(QQuickWindow* window)
         return;
 
     m_window = window;
-    m_paintRenderer.reset(new RhiPaintDeviceRenderer(getRhi(m_window)));
+    m_paintRenderer.reset(new RhiPaintDeviceRenderer(m_window->rhi()));
 }
 
 void RhiRenderingItemRenderer::syncPaintDevice(RhiPaintDevice* pd)
@@ -140,7 +110,7 @@ void RhiRenderingItemRenderer::frameStart()
 {
     // This function is invoked on the render thread, if there is one.
 
-    QRhi* rhi = getRhi(m_window);
+    QRhi* rhi = m_window->rhi();
     if (!NX_ASSERT(rhi, "QQuickWindow is not using QRhi for rendering"))
         return;
 
@@ -150,7 +120,7 @@ void RhiRenderingItemRenderer::frameStart()
         return;
     }
 
-    QRhiSwapChain* swapChain = getSwapChain(m_window);
+    QRhiSwapChain* swapChain = m_window->swapChain();
 
     QSGRendererInterface* rif = m_window->rendererInterface();
     QRhiCommandBuffer* cb = swapChain
@@ -181,7 +151,7 @@ void RhiRenderingItemRenderer::mainPassRecordingStart()
 {
     // This function is invoked on the render thread, if there is one.
 
-    QRhi* rhi = getRhi(m_window);
+    QRhi* rhi = m_window->rhi();
     if (!rhi)
         return;
 
@@ -191,7 +161,7 @@ void RhiRenderingItemRenderer::mainPassRecordingStart()
         return;
     }
 
-    QRhiSwapChain* swapChain = getSwapChain(m_window);
+    QRhiSwapChain* swapChain = m_window->swapChain();
 
     QSGRendererInterface* rif = m_window->rendererInterface();
     QRhiCommandBuffer* cb = swapChain

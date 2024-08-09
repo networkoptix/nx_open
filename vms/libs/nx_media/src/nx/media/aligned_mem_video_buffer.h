@@ -28,8 +28,6 @@ public:
 
     ~AlignedMemVideoBuffer();
 
-    virtual QVideoFrame::MapMode mapMode() const override;
-
     virtual MapData map(QVideoFrame::MapMode mode) override;
 
     virtual void unmap() override;

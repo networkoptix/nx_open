@@ -62,7 +62,7 @@ CollapsiblePanel
 
             OptionButton
             {
-                readonly property var data: Array.isArray(repeater.model)
+                readonly property var data: NxGlobals.isSequence(repeater.model)
                     ? modelData
                     : model
 

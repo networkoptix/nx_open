@@ -22,7 +22,7 @@
     #include <sys/sysinfo.h>
     #include <unistd.h>
     #include <fstream>
-#elif defined(Q_OS_OSX)
+#elif defined(Q_OS_MACOS)
     #include <sys/types.h>
     #include <sys/sysctl.h>
 #endif
@@ -179,7 +179,7 @@ static void detectCoreCount(int& logicalCores, int& physicalCores)
         detectCoreCount(logicalCores, physicalCores);
     }
 
-#elif defined(Q_OS_OSX)
+#elif defined(Q_OS_MACOS)
 
     HardwareInformation::HardwareInformation()
     {

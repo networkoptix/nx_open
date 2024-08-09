@@ -29,6 +29,8 @@ qt_libraries = [
     'QmlWorkerScript',
     'Quick',
     'QuickControls2',
+    'QuickControls2Basic',
+    'QuickControls2BasicStyleImpl',
     'QuickControls2Impl',
     'QuickEffects',
     'QuickLayouts',
@@ -39,6 +41,7 @@ qt_libraries = [
     'Sql',
     'Svg',
     'WebChannel',
+    'WebChannelQuick',
     'WebEngineCore',
     'WebEngineQuick',
     'WebEngineWidgets',
@@ -100,7 +103,6 @@ def create_client_update_file(config, output_file):
     customization_mobile_client_enabled = config['customization_mobile_client_enabled']
 
     # Directory, where icu libraries reside:
-    icu_lib_directory = os.path.join(config['icu_directory'], 'bin')
 
     binaries_dir = config['bin_source_dir']
     current_binary_dir = config['current_binary_dir']
@@ -127,7 +129,7 @@ def create_client_update_file(config, output_file):
         tools.zip_files_to(zip, tools.nx_files(binaries_dir, nx_libraries), binaries_dir)
         tools.zip_files_to(zip, tools.find_all_files(client_update_files_directory),
            client_update_files_directory)
-        tools.zip_files_to(zip, tools.icu_files(icu_lib_directory), icu_lib_directory)
+        tools.zip_files_to(zip, tools.icu_files(binaries_dir), binaries_dir)
         tools.zip_files_to(zip, tools.find_all_files(locale_resources_directory), qt_directory)
         tools.zip_files_to(zip, tools.find_all_files(webengine_locales_directory), qt_directory)
 

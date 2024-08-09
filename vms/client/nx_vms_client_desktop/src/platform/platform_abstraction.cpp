@@ -10,7 +10,7 @@
 #elif defined(Q_OS_LINUX)
 #   include <platform/notification/generic_notifier.h>
 #   define QnNotifierImpl QnGenericNotifier
-#elif defined(Q_OS_MACX)
+#elif defined(Q_OS_MACOS)
 #   include <platform/notification/generic_notifier.h>
 #   define QnNotifierImpl QnGenericNotifier
 #else

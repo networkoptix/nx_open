@@ -196,16 +196,16 @@ private:
         std::function<bool()> interruptionCallback,
         AbstractMetadataBinaryFile& motionFile,
         const Index& index,
-        QVector<IndexRecord>::iterator startItr,
-        const QVector<IndexRecord>::iterator endItr,
+        const QVector<IndexRecord>::const_iterator startItr,
+        const QVector<IndexRecord>::const_iterator endItr,
         QnTimePeriodList& rez) const;
     void loadDataFromIndex(
         AddRecordFunc addRecordFunc,
         const Filter* filter,
         std::function<bool()> interruptionCallback,
         const Index& index,
-        QVector<IndexRecord>::iterator startItr,
-        const QVector<IndexRecord>::iterator endItr,
+        const QVector<IndexRecord>::const_iterator startItr,
+        const QVector<IndexRecord>::const_iterator endItr,
         QnTimePeriodList& rez) const;
 
     void loadDataFromIndexDesc(
@@ -214,16 +214,16 @@ private:
         std::function<bool()> interruptionCallback,
         AbstractMetadataBinaryFile& motionFile,
         const Index& index,
-        QVector<IndexRecord>::iterator startItr,
-        const QVector<IndexRecord>::iterator endItr,
+        const QVector<IndexRecord>::const_iterator startItr,
+        const QVector<IndexRecord>::const_iterator endItr,
         QnTimePeriodList& rez) const;
     void loadDataFromIndexDesc(
         AddRecordFunc addRecordFunc,
         const Filter* filter,
         std::function<bool()> interruptionCallback,
         const Index& index,
-        QVector<IndexRecord>::iterator startItr,
-        const QVector<IndexRecord>::iterator endItr,
+        const QVector<IndexRecord>::const_iterator startItr,
+        const QVector<IndexRecord>::const_iterator endItr,
         QnTimePeriodList& rez) const;
 
 protected:

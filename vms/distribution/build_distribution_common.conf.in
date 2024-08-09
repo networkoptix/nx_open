@@ -17,7 +17,6 @@ COMPILER="@CMAKE_CXX_COMPILER@"
 CFLAGS="@CMAKE_C_FLAGS@"
 LDFLAGS="@CMAKE_EXE_LINKER_FLAGS@"
 CPP_RUNTIME_LIBS=( @cpp_runtime_libs_string@ )
-ICU_RUNTIME_LIBS=( @icu_runtime_libs_string@ )
 SERVER_TRANSLATION_FILES=( @server_translation_files_shell@ )
 GDB_DIR=@CONAN_GDB_ROOT@
 STRIP_BINARIES=@strip_server_distribution_binaries@

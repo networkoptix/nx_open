@@ -46,11 +46,6 @@ AlignedMemVideoBuffer::~AlignedMemVideoBuffer()
         qFreeAligned(d->data[0]);
 }
 
-QVideoFrame::MapMode AlignedMemVideoBuffer::mapMode() const
-{
-    return d->mapMode;
-}
-
 QAbstractVideoBuffer::MapData AlignedMemVideoBuffer::map(QVideoFrame::MapMode mode)
 {
     MapData data;

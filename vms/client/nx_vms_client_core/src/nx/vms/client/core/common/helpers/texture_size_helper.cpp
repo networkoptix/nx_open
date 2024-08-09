@@ -2,27 +2,8 @@
 
 #include "texture_size_helper.h"
 
+#include <QtGui/rhi/qrhi.h>
 #include <QtQuick/QQuickWindow>
-
-#if QT_VERSION >= QT_VERSION_CHECK(6,6,0)
-    #include <rhi/qrhi.h>
-#else
-    #include <QtGui/private/qrhi_p.h>
-#endif
-
-namespace {
-
-QRhi* getRhi(QQuickWindow* window)
-{
-    #if QT_VERSION >= QT_VERSION_CHECK(6,6,0)
-        return window->rhi();
-    #else
-        const auto ri = window->rendererInterface();
-        return static_cast<QRhi*>(ri->getResource(window, QSGRendererInterface::RhiResource));
-    #endif
-}
-
-} // namespace
 
 namespace nx::vms::client::core {
 
@@ -58,7 +39,7 @@ void TextureSizeHelper::setWindow(QQuickWindow* window)
                 if (m_maxTextureSize > 0)
                     return;
 
-                if (auto rhi = getRhi(m_window))
+                if (auto rhi = m_window->rhi())
                     setMaxTextureSize(rhi->resourceLimit(QRhi::TextureSizeMax));
                 else
                     setMaxTextureSize(kDefaultMaxSize);

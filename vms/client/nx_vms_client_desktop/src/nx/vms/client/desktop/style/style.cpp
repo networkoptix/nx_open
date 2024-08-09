@@ -99,7 +99,7 @@ namespace nx::vms::client::desktop {
 
 namespace {
 
-#if defined(Q_OS_WIN) || defined(Q_OS_OSX)
+#if defined(Q_OS_WIN) || defined(Q_OS_MACOS)
 constexpr bool kForceMenuMouseReplay = true;
 #else
 constexpr bool kForceMenuMouseReplay = false;

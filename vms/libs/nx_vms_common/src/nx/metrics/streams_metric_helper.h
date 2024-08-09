@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <atomic>
+
 #include <nx/vms/api/types/motion_types.h>
 
 namespace nx::metrics { struct Storage; }

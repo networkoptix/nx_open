@@ -1,10 +1,11 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.11
+import QtQuick
 
-import Nx.Controls 1.0
+import Nx.Controls
+import Nx.Core
 
-import nx.vms.client.desktop 1.0
+import nx.vms.client.desktop
 
 import "private"
 
@@ -35,7 +36,8 @@ LabeledItem
             readonly property var identifier: modelData
 
             text: (control.itemCaptions && control.itemCaptions[identifier]) || identifier
-            checked: Array.isArray(control.value) && control.value.indexOf(identifier) !== -1
+            checked:
+                NxGlobals.isSequence(control.value) && control.value.indexOf(identifier) !== -1
 
             onClicked:
                 buttons.updateValue()

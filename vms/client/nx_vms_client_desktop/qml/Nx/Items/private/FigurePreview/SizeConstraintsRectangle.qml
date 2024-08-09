@@ -20,13 +20,13 @@ Rectangle
 
     readonly property point defaultOrigin: Qt.point((1 - size.width) / 2, (1 - size.height) / 2)
 
-    readonly property point origin: Array.isArray(originJson)
+    readonly property point origin: NxGlobals.isSequence(originJson)
         ? Qt.point(
             CoreUtils.getValue(originJson[0], defaultOrigin.x),
             CoreUtils.getValue(originJson[1], defaultOrigin.y))
         : defaultOrigin
 
-    readonly property size size: Array.isArray(sizeJson)
+    readonly property size size: NxGlobals.isSequence(sizeJson)
         ? Qt.size(
             CoreUtils.getValue(sizeJson[0], defaultSize),
             CoreUtils.getValue(sizeJson[1], defaultSize))

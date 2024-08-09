@@ -376,7 +376,7 @@ void QnMainWindowTitleBarWidget::mouseDoubleClickEvent(QMouseEvent* event)
 {
     base_type::mouseDoubleClickEvent(event);
 
-#ifndef Q_OS_MACX
+#ifndef Q_OS_MACOS
     Q_D(QnMainWindowTitleBarWidget);
         if (d->skipDoubleClickFlag)
     {

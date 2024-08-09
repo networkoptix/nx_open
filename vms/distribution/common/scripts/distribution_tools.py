@@ -143,27 +143,15 @@ def quazip_files_to(source_dir):
     yield os.path.join(source_dir, f'quazip{_dynamic_library_extension()}')
 
 
-def icu_files(icu_lib_directory):
+def icu_files(source_dir):
     if is_windows():
-        templates = (
-            dynamic_library_filename(template) for template in (
-            'icudt70',
-            'icuin70',
-            'icuuc70'
-        )
-        )
+        templates = ['icudt74', 'icuin74', 'icuuc74']
     else:
-        templates = (
-            f'{dynamic_library_filename(template, version="60")}' for template in (
-            'icudata',
-            'icui18n',
-            'icuuc'
-        )
-        )
+        templates = ['icudata', 'icui18n', 'icuuc']
 
     for template in templates:
-        for file in find_files_by_template(icu_lib_directory, template):
-            yield file
+        yield from find_files_by_template(
+            source_dir, dynamic_library_filename(template, None, '74'))
 
 
 def shared_libraries(directory: str) -> Generator[str, None, None]:

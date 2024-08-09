@@ -629,10 +629,10 @@ Figure
         const maximum = deserializeSize(value && value.maximum, kDefaultMaxSize, minimum)
 
         const minBoxPosition = deserializePosition(
-            value && Array.isArray(value.positions) && value.positions[0], minimum)
+            value && NxGlobals.isSequence(value.positions) && value.positions[0], minimum)
 
         const maxBoxPosition = deserializePosition(
-            value && Array.isArray(value.positions) && value.positions[1], maximum)
+            value && NxGlobals.isSequence(value.positions) && value.positions[1], maximum)
 
         d.minP1 = minBoxPosition
         d.minP2 = Qt.point(d.minP1.x + minimum.width, d.minP1.y + minimum.height)
@@ -654,7 +654,7 @@ Figure
 
     function deserializeSize(sizeJson, defaultSize, minimumSize)
     {
-        let size = Array.isArray(sizeJson)
+        let size = NxGlobals.isSequence(sizeJson)
             ? Qt.size(sizeJson[0] || defaultSize, sizeJson[1] || defaultSize)
             : Qt.size(defaultSize, defaultSize)
 
@@ -667,7 +667,7 @@ Figure
     function deserializePosition(positionJson, size)
     {
         const defaultPos = Qt.point((1 - size.width) / 2, (1 - size.height) / 2)
-        if (!Array.isArray(positionJson))
+        if (!NxGlobals.isSequence(positionJson))
             return defaultPos
 
         const pos = Qt.point(

@@ -9,6 +9,7 @@ compiler.libcxx=libstdc++11
 compiler.cppstd=20
 
 [options]
+icu/*:data_packaging=library
 libmysqlclient/*:shared=True
 libpq/*:shared=True
 qt/*:os_deps_package=os_deps_for_desktop_linux/ubuntu_focal

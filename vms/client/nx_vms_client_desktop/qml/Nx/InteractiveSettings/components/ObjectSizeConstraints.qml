@@ -99,10 +99,10 @@ LabeledItem
         maximum = deserializeSize(value && value.maximum, kDefaultMaxSize, minimum)
 
         minBoxPosition = deserializePosition(
-            value && Array.isArray(value.positions) && value.positions[0], minimum)
+            value && NxGlobals.isSequence(value.positions) && value.positions[0], minimum)
 
         maxBoxPosition = deserializePosition(
-            value && Array.isArray(value.positions) && value.positions[1], maximum)
+            value && NxGlobals.isSequence(value.positions) && value.positions[1], maximum)
 
         valueChanged()
         updatePreview()
@@ -120,7 +120,7 @@ LabeledItem
 
     function deserializeSize(sizeJson, defaultSize, minimumSize)
     {
-        let size = Array.isArray(sizeJson)
+        let size = NxGlobals.isSequence(sizeJson)
             ? Qt.size(sizeJson[0] || defaultSize, sizeJson[1] || defaultSize)
             : Qt.size(defaultSize, defaultSize)
 
@@ -133,7 +133,7 @@ LabeledItem
     function deserializePosition(positionJson, size)
     {
         const defaultPos = Qt.point((1 - size.width) / 2, (1 - size.height) / 2)
-        if (!Array.isArray(positionJson))
+        if (!NxGlobals.isSequence(positionJson))
             return defaultPos
 
         const pos = Qt.point(

@@ -108,10 +108,6 @@ if(CONAN_CUDA-TOOLKIT_ROOT)
     set(ENV{CUDA_PATH} ${CONAN_CUDA-TOOLKIT_ROOT})
 endif()
 
-if(CONAN_ICU-WIN_ROOT)
-    set(icu_directory ${CONAN_ICU-WIN_ROOT})
-endif()
-
 if(CONAN_VMS_HELP_ROOT)
     set(help_directory ${CONAN_VMS_HELP_ROOT})
 endif()

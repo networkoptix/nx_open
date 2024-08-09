@@ -19,7 +19,8 @@ Item
     {
         id: maxBox
 
-        originJson: figureJson && Array.isArray(figureJson.positions) && figureJson.positions[1]
+        originJson:
+            figureJson && NxGlobals.isSequence(figureJson.positions) && figureJson.positions[1]
         sizeJson: figureJson && figureJson.maximum
         baseColor: ColorTheme.colors.roi.maxBox
         defaultSize: 1
@@ -29,7 +30,8 @@ Item
     {
         id: minBox
 
-        originJson: figureJson && Array.isArray(figureJson.positions) && figureJson.positions[0]
+        originJson:
+            figureJson && NxGlobals.isSequence(figureJson.positions) && figureJson.positions[0]
         sizeJson: figureJson && figureJson.minimum
         baseColor: ColorTheme.colors.roi.minBox
         defaultSize: 0

@@ -113,7 +113,7 @@ QString getCPUString()
     bool useSSSE3() { return false; }
     bool useSSE41() { return false; }
     bool useSSE42() { return false; }
-#elif defined(Q_OS_MACX)
+#elif defined(Q_OS_MACOS)
     bool useSSE2() { return true; }
     bool useSSE3() { return true; }
     bool useSSSE3() { return true; }

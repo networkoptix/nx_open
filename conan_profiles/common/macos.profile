@@ -8,6 +8,9 @@ compiler=apple-clang
 compiler.libcxx=libc++
 compiler.cppstd=20
 
+[options]
+icu/*:data_packaging=library
+
 [env]
 libvpx:CC=clang
 libvpx:CXX=clang++

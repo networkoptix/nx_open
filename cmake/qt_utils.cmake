@@ -31,7 +31,6 @@ find_package(Qt6
         Xml
         Sql
         Concurrent
-        Multimedia
         Qml
         Core5Compat
     REQUIRED

@@ -24,11 +24,6 @@ public:
     {
     }
 
-    virtual QVideoFrame::MapMode mapMode() const override
-    {
-        return m_mapMode;
-    }
-
     virtual MapData map(QVideoFrame::MapMode mode) override;
 
     virtual void unmap() override;
