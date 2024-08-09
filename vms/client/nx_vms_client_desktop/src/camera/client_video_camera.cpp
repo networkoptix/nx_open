@@ -156,7 +156,7 @@ void QnClientVideoCamera::exportMediaPeriodToFile(
         }
 
         archiveReader->setCycleMode(false);
-        archiveReader->setQuality(MEDIA_Quality_ForceHigh, true); // for 'mkv' and 'avi' files
+        archiveReader->setQuality(MEDIA_Quality_High, true); // for 'mkv' and 'avi' files
         archiveReader->setPlaybackMask(playbackMask);
 
         // In the case of AVI, it is required to add filtering.
