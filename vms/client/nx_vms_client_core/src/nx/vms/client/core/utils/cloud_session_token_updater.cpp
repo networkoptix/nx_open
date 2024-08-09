@@ -66,8 +66,12 @@ void CloudSessionTokenUpdater::updateTokenIfNeeded(bool force)
     const bool requestInProgress = !m_requestInProgressTimer.hasExpired();
     if (!expired || requestInProgress)
     {
-        NX_DEBUG(this, "Do not update token, expiring/expired: %1, request in progress: %2",
-           expired, requestInProgress);
+        NX_DEBUG(
+            this,
+            "Do not update token, expired: %1, remaining time: %2, request in progress: %3",
+            expired,
+            m_expirationTimer.remainingTime(),
+            requestInProgress);
         return;
     }
 
@@ -78,24 +82,25 @@ void CloudSessionTokenUpdater::updateTokenIfNeeded(bool force)
 void CloudSessionTokenUpdater::onTokenUpdated(microseconds expirationTime)
 {
     // Actual token lifetime.
-    const auto tokenDuration = expirationTime - qnSyncTime->currentTimePoint();
+    const auto tokenDuration = duration_cast<milliseconds>(
+        expirationTime - qnSyncTime->currentTimePoint());
 
     // Interval before the token expiration point when the token is considered expiring.
     const auto updateInterval = std::clamp(
-        duration_cast<microseconds>(kTokenIsExpiringRatio * tokenDuration),
-        duration_cast<microseconds>(kMaxTokenUpdateRequestTime),
-        duration_cast<microseconds>(kTokenUpdateThreshold));
+        duration_cast<milliseconds>(kTokenIsExpiringRatio * tokenDuration),
+        duration_cast<milliseconds>(kMaxTokenUpdateRequestTime),
+        duration_cast<milliseconds>(kTokenUpdateThreshold));
 
     // Time left before the token is considered expiring.
     const auto timeToUpdate = tokenDuration - updateInterval;
 
     // Set expiration timer.
-    m_expirationTimer.setRemainingTime(timeToUpdate > microseconds::zero()
+    m_expirationTimer.setRemainingTime(timeToUpdate > milliseconds::zero()
         ? timeToUpdate
-        : microseconds::max());
+        : milliseconds::max());
 
     // Reset timed "request in progress" flag.
-    m_requestInProgressTimer.setRemainingTime(microseconds::zero());
+    m_requestInProgressTimer.setRemainingTime(milliseconds::zero());
 
     NX_DEBUG(this, "Access token updated, expires at: %1, expiring/expired: %2",
         expirationTime, m_expirationTimer.hasExpired());
