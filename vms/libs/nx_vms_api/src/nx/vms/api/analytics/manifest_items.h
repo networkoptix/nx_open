@@ -292,8 +292,11 @@ NX_REFLECTION_INSTRUMENT(Group, Group_Fields);
 
 struct TypeSupportInfo
 {
+    /**%apidoc[opt] */
     QString eventTypeId; //< eventTypeId and objectTypeId can't be non-empty at the same time.
+    /**%apidoc[opt] */
     QString objectTypeId;
+    /**%apidoc[opt] */
     std::vector<QString> attributes;
 
     bool operator==(const TypeSupportInfo& other) const = default;
