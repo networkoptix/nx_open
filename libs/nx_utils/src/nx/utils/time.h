@@ -35,6 +35,13 @@ NX_UTILS_API std::chrono::milliseconds millisSinceEpoch();
 NX_UTILS_API std::chrono::steady_clock::time_point monotonicTime();
 
 /**
+ * @return Returns the number of milliseconds that have elapsed since the system was started.
+ * The timer continues to run even if the system is suspended. This is not a high resolution timer:
+ * on Windows, it has a resolution of 10-16 ms.
+ */
+NX_UTILS_API std::chrono::milliseconds systemUptime();
+
+/**
  * @return system time and apply test timeShift value on it. It is used in UT only.
  */
 NX_UTILS_API std::chrono::system_clock::time_point systemClockTime();
