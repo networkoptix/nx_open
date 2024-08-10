@@ -15,6 +15,10 @@
     #include <QtCore/QFile>
     #include <QtCore/QProcess>
     #include <nx/utils/app_info.h>
+#elif defined(Q_OS_WINDOWS)
+    #include <windows.h>
+#elif defined(Q_OS_DARWIN)
+    #include <sys/sysctl.h>
 #endif
 
 using namespace std::chrono;
@@ -33,6 +37,74 @@ static milliseconds monotonicTimeShift(0);
 static std::optional<system_clock::time_point> fixedUtcTime;
 
 static std::optional<std::chrono::steady_clock::time_point> testMonotonicTime;
+
+#if defined(Q_OS_LINUX)
+    std::chrono::microseconds durationSinceBoot()
+    {
+        timespec bootTime;
+        if (const int ret = clock_gettime(CLOCK_BOOTTIME, &bootTime); ret != 0)
+        {
+            NX_ERROR(
+                NX_SCOPE_TAG,
+                "clock_gettime(CLOCK_BOOTTIME) failed: %1",
+                SystemError::getLastOSErrorText());
+            return std::chrono::microseconds::zero();
+        }
+
+        return std::chrono::microseconds(
+            (int64_t) bootTime.tv_sec * 1'000'000 + bootTime.tv_nsec / 1'000);
+    }
+#elif defined(Q_OS_DARWIN)
+    // Timestamp of last system boot.
+    static std::chrono::microseconds bootTimestamp()
+    {
+        struct timeval bootTime;
+        int mib[2] = {CTL_KERN, KERN_BOOTTIME};
+        size_t size = sizeof(bootTime);
+        if (const int ret = sysctl(mib, 2, &bootTime, &size, nullptr, 0); ret != 0)
+        {
+            NX_ERROR(
+                NX_SCOPE_TAG,
+                "sysctl(KERN_BOOTTIME) failed: %1",
+                SystemError::getLastOSErrorText());
+            return std::chrono::microseconds::zero();
+        }
+
+        return std::chrono::microseconds(
+            (int64_t) bootTime.tv_sec * 1'000'000 + bootTime.tv_usec);
+    }
+
+    std::chrono::microseconds durationSinceBoot()
+    {
+        std::chrono::microseconds beforeNow;
+        std::chrono::microseconds afterNow;
+        struct timeval now;
+
+        // gettimeofday() carries on incrementing while the device is asleep, but can be
+        // manipulated by the operating system or user. However, the kernel boottime (a timestamp
+        // of when the system last booted) also changes when the system clock is changed, therefore
+        // even though both these values are not fixed, the offset between them is.
+
+        // Avoid race when time changes (by OS or user) so the clock stays monotonic.
+        afterNow = bootTimestamp();
+        do
+        {
+            beforeNow = afterNow;
+            if (const int ret = gettimeofday(&now, nullptr); ret != 0)
+            {
+                NX_ERROR(
+                    NX_SCOPE_TAG,
+                    "gettimeofday() failed: %1",
+                    SystemError::getLastOSErrorText());
+                return std::chrono::microseconds::zero();
+            }
+            afterNow = bootTimestamp();
+        } while (afterNow != beforeNow);
+
+        return std::chrono::microseconds(
+            (int64_t) now.tv_sec * 1'000'000 + now.tv_usec) - beforeNow;
+    }
+#endif
 
 } // namespace
 
@@ -81,6 +153,17 @@ steady_clock::time_point monotonicTime()
     if (testMonotonicTime)
         return *testMonotonicTime;
     return steady_clock::now() + monotonicTimeShift;
+}
+
+std::chrono::milliseconds systemUptime()
+{
+    #if defined(Q_OS_WINDOWS)
+        return std::chrono::milliseconds(GetTickCount64());
+    #elif defined(Q_OS_LINUX) || defined(Q_OS_DARWIN)
+        return std::chrono::duration_cast<std::chrono::milliseconds>(durationSinceBoot());
+    #else
+        #error "Unsupported platform"
+    #endif
 }
 
 std::chrono::system_clock::time_point systemClockTime()
