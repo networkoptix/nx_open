@@ -7728,9 +7728,9 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message numerus="yes">
       <source>Use Service</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Använd tjänsten</numerusform>
-        <numerusform>Use Service</numerusform>
+        <numerusform>Använd tjänsten</numerusform>
       </translation>
     </message>
   </context>
