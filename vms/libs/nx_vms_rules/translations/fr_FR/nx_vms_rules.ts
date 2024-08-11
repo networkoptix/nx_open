@@ -144,7 +144,7 @@
     </message>
     <message>
       <source>I/O Module was disconnected</source>
-      <translation>Module E/S a été déconnecté</translation>
+      <translation>Module I/O a été déconnecté</translation>
     </message>
     <message>
       <source>Device %1 was disconnected</source>
@@ -200,7 +200,7 @@
     <message numerus="yes">
       <source>Device IP Conflict</source>
       <translation>
-        <numerusform>Conflit IP Périphériques</numerusform>
+        <numerusform>Conflit IP Périphérique</numerusform>
         <numerusform>Conflit IP Périphériques</numerusform>
       </translation>
     </message>
