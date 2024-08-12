@@ -1724,7 +1724,7 @@
     </message>
     <message>
       <source>Keep IO port state on when Server connects to the device</source>
-      <translation>Garder l'état du port IO activé lorsque le serveur se connecte au périphérique</translation>
+      <translation>Garder l'état du port IO activé lorsque le serveur se connecte à l'appareil</translation>
     </message>
     <message>
       <source>Media buffer size for audio only devices (KB, 1KB-1MB)</source>
@@ -1736,7 +1736,7 @@
     </message>
     <message>
       <source>Expose device passwords stored in VMS for administrators (for web pages)</source>
-      <translation>Exposer les mots de passe de l'appareil stockés dans VMS pour les administrateurs (pour les pages web)</translation>
+      <translation>Exposer les mots de passe de l'appareil stockés dans le VMS pour les administrateurs (pour les pages web)</translation>
     </message>
     <message>
       <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32)</source>
