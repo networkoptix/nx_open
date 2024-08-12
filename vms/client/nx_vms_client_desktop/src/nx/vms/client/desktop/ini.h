@@ -204,6 +204,37 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
     NX_INI_FLAG(false, useFileBasedSharedMemory,
         "[Dev] Use shared memory based on the memory mapped file.");
 
+    NX_INI_STRING(
+        "typ_header alg kid sid typ_payload client_id iss",
+        debugInfoFilter,
+        "[Dev] Disables output of fields in the information widget. Allows to disable output of\n"
+        "fields you don't need. Use \"all\" to disable all output of fields. More precise\n"
+        "filtering is available by combining the following options:\n"
+        " * \"all\",\n"
+        " * \"fps\",\n"
+        " * \"process_cpu\",\n"
+        " * \"total_cpu\",\n"
+        " * \"memory\",\n"
+        " * \"gpu\",\n"
+        " * \"threads\",\n"
+        " * \"digest\",\n"
+        " * \"token\",\n"
+        " * \"typ_header\",\n"
+        " * \"alg\",\n"
+        " * \"kid\",\n"
+        " * \"exp\",\n"
+        " * \"pwd_time\",\n"
+        " * \"sid\",\n"
+        " * \"typ_payload\",\n"
+        " * \"aud\",\n"
+        " * \"iat\",\n"
+        " * \"sub\",\n"
+        " * \"client_id\",\n"
+        " * \"iss\",\n"
+        " * \"requests_per_min\".\n"
+        "Fields can be combined using space, comma or any other separator."
+    );
+
     // ---------------------------------------------------------------------------------------------
     // Design section
     // Flags here can be removed when designers approve the resulting approach.

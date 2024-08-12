@@ -72,6 +72,10 @@ PerformanceInfo::PerformanceInfo(QObject* parent):
     base_type(parent),
     d(new Private())
 {
+    const auto filter = DebugInfoStorage::instance()->filter();
+    if (filter.contains(DebugInfoStorage::Field::all))
+        return;
+
     connect(appContext()->performanceMonitor(), &PerformanceMonitor::valuesChanged,
         this, &PerformanceInfo::setPerformanceValues);
     connect(appContext()->performanceMonitor(), &PerformanceMonitor::visibleChanged,
@@ -120,17 +124,32 @@ void PerformanceInfo::setPerformanceValues(const QVariantMap& values)
 
     QStringList counters;
 
+    const auto filter = DebugInfoStorage::instance()->filter();
     // Show main values.
-    counters << QString("FPS: %1 (%2ms)")
-        .arg(fpsValue, 0, 'f', 1)
-        .arg(duration_cast<milliseconds>(frameTime).count());
+    if (!filter.contains(DebugInfoStorage::Field::fps))
+    {
+        counters << QString("FPS: %1 (%2ms)")
+            .arg(fpsValue, 0, 'f', 1)
+            .arg(duration_cast<milliseconds>(frameTime).count());
+    }
 
-    counters << QString("Process CPU: %1%").arg(100.0 * processCpuValue.toFloat(), 0, 'f', 1);
-    counters << QString("Total CPU: %1%").arg(100.0 * totalCpuValue.toFloat(), 0, 'f', 1);
-    counters << QString("Memory: %1").arg(memoryText);
-    if (nx::build_info::isWindows() || nx::build_info::isMacOsX())
+    if (!filter.contains(DebugInfoStorage::Field::process_cpu))
+        counters << QString("Process CPU: %1%").arg(100.0 * processCpuValue.toFloat(), 0, 'f', 1);
+
+    if (!filter.contains(DebugInfoStorage::Field::total_cpu))
+        counters << QString("Total CPU: %1%").arg(100.0 * totalCpuValue.toFloat(), 0, 'f', 1);
+
+    if (!filter.contains(DebugInfoStorage::Field::memory))
+        counters << QString("Memory: %1").arg(memoryText);
+
+    if (!filter.contains(DebugInfoStorage::Field::gpu)
+        && (nx::build_info::isWindows() || nx::build_info::isMacOsX()))
+    {
         counters << QString("GPU: %1%").arg(100.0 * gpuValue.toFloat(), 0, 'f', 1);
-    counters << QString("Threads: %1").arg(threadsText);
+    }
+
+    if (!filter.contains(DebugInfoStorage::Field::threads))
+        counters << QString("Threads: %1").arg(threadsText);
 
     // Show all other values.
     for (auto i = remaining.constBegin(); i != remaining.constEnd(); ++i)
@@ -142,13 +161,16 @@ void PerformanceInfo::setPerformanceValues(const QVariantMap& values)
     auto metrics = appContext()->metrics();
     qint64 requestsCount = metrics->totalServerRequests();
     auto requestsPerMin = requestsCount - d->requestCountLastMinute.front();
-    QString requestInfo = nx::format("Requests per min: %1 (total: %2)")
-        .args(requestsPerMin, requestsCount);
+    if (!filter.contains(DebugInfoStorage::Field::requests_per_min))
+    {
+        QString requestInfo = nx::format("Requests per min: %1 (total: %2)")
+            .args(requestsPerMin, requestsCount);
 
-    if (requestsPerMin > ini().maxSeverRequestCountPerMinunte)
-        requestInfo = setWarningStyleHtml(requestInfo);
+        if (requestsPerMin > ini().maxSeverRequestCountPerMinunte)
+            requestInfo = setWarningStyleHtml(requestInfo);
 
-    counters << requestInfo;
+        counters << requestInfo;
+    }
     d->text = html::document(counters.join(html::kLineBreak));
 
     emit textChanged(d->text);
