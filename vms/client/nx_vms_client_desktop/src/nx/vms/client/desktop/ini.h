@@ -334,7 +334,7 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
     NX_INI_FLAG(true, webPagesAndIntegrations, "[Feature] Separates Web Pages and Integrations.");
 
     // VMS-37021
-    NX_INI_FLAG(false, lookupLists, "[Feature] Enable Lookup Lists support.");
+    NX_INI_FLAG(true, lookupLists, "[Feature] Enable Lookup Lists support.");
 
     // VMS-41144
     NX_INI_FLAG(false, nativeLinkForTemporaryUsers,
