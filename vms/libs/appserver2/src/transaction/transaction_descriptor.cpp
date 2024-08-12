@@ -1126,13 +1126,19 @@ struct SaveUserAccess
                 return data;
             };
 
-        if (Result r = !existingUser
-                ? validateUserCreation(*systemContext, accessor, param)
-                : validateUserModifications(
-                    *systemContext, accessor, apiData(*existingUser), param);
-            !r)
+        if (existingUser)
         {
-            return r;
+            const auto existing = apiData(*existingUser);
+            if (existing == param)
+                return {};
+
+            if (auto r = validateUserModifications(*systemContext, accessor, existing, param); !r)
+                return r;
+        }
+        else
+        {
+            if (auto r = validateUserCreation(*systemContext, accessor, param); !r)
+                return r;
         }
 
         // TODO: This should be handled by `forbidNonLocalModification`.
