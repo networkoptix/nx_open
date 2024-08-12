@@ -144,9 +144,12 @@ struct TokenIntrospectionRequest
 
     /**%apidoc Ids of systems to fetch user roles from. */
     std::optional<std::vector<std::string>> system_ids;
+
+    /**%apidoc Skip non-shared systems from system_ids in response.*/
+    bool skip_non_shared = false;
 };
 
-NX_REFLECTION_INSTRUMENT(TokenIntrospectionRequest, (token)(system_ids))
+NX_REFLECTION_INSTRUMENT(TokenIntrospectionRequest, (token)(system_ids)(skip_non_shared))
 
 struct TokenIntrospectionResponse
 {
