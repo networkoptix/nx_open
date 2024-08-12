@@ -6,9 +6,8 @@
 #include <range/v3/algorithm/contains.hpp>
 #include <range/v3/algorithm/find_if.hpp>
 
-#include <QtGui/QColor>
-
 #include <nx/reflect/json/deserializer.h>
+#include <nx/utils/log/log.h>
 #include <nx/vms/client/core/analytics/taxonomy/attribute_set.h>
 #include <nx/vms/client/core/analytics/taxonomy/color_set.h>
 #include <nx/vms/client/core/analytics/taxonomy/enumeration.h>
@@ -41,7 +40,7 @@ QVariant LookupListEntriesModel::Private::booleanFormatter(const QString& value)
     if (value == "false")
         return tr("No");
 
-    NX_ASSERT(false, "Unexpected value");
+    NX_WARNING(typeid(LookupListEntriesModel), "Unexpected value %1", value);
     return {};
 }
 
@@ -52,7 +51,7 @@ QVariant LookupListEntriesModel::Private::objectFormatter(const QString& value)
     if (value == "false")
         return tr("Absent");
 
-    NX_ASSERT(false, "Unexpected value");
+    NX_WARNING(typeid(LookupListEntriesModel), "Unexpected value %1", value);
     return {};
 }
 
@@ -63,8 +62,11 @@ QVariant LookupListEntriesModel::Private::getDisplayValue(
         return value; //< Generic Model.
 
     auto it = formatterByAttributeName.find(attributeName);
-    if (!NX_ASSERT(it != formatterByAttributeName.end(), "Incorrect attribute name"))
+    if (it == formatterByAttributeName.end())
+    {
+        NX_WARNING(typeid(LookupListEntriesModel), "Incorrect attribute name %1", attributeName);
         return {};
+    }
 
     if (value.isEmpty())
         return tr("Any %1").arg(attributeName.split(".").back());
@@ -171,34 +173,52 @@ void LookupListEntriesModel::Private::initAttributeFunctions()
 
                     validatorByAttributeName[fullAttributeName] =
                         [colorByHex](const QString& value)
-                    {
-                        return ranges::any_of(colorByHex,
-                            [value](const auto& keyValue)
-                            {
-                                return keyValue.first == value || keyValue.second == value;
-                            });
-                    };
+                        {
+                            return ranges::any_of(colorByHex,
+                                [value](const auto& keyValue)
+                                {
+                                    return keyValue.first == value || keyValue.second == value;
+                                });
+                        };
 
                     formatterByAttributeName[fullAttributeName] =
                         [colorByHex](const QString& value)
-                    {
-                        auto colorIt = ranges::find_if(colorByHex,
-                            [value](const auto& keyValue)
+                        {
+                            auto colorIt = ranges::find_if(colorByHex,
+                                [value](const auto& keyValue)
+                                {
+                                    return keyValue.first == value || keyValue.second == value;
+                                });
+                            if (colorIt == colorByHex.cend())
                             {
-                                return keyValue.first == value || keyValue.second == value;
-                            });
-                        if (!NX_ASSERT(colorIt != colorByHex.cend(), "Unexpected value"))
-                            return QString();
-                        return colorIt->second;
-                    };
+                                NX_WARNING(typeid(LookupListEntriesModel), "Unexpected color value %1", value);
+                                return QString();
+                            }
+                            return colorIt->second;
+                        };
                     break;
                 }
                 case Attribute::Type::enumeration:
                 {
                     const auto items = attribute->enumeration->items();
                     const QSet itemSet(items.begin(), items.end());
-                    validatorByAttributeName[fullAttributeName] = [itemSet](const QString& value)
-                    { return itemSet.contains(value); };
+                    validatorByAttributeName[fullAttributeName] =
+                        [itemSet](const QString& value)
+                        {
+                            return itemSet.contains(value);
+                        };
+
+                    formatterByAttributeName[fullAttributeName] =
+                        [itemSet](const QString& value)
+                        {
+                            if (!itemSet.contains(value))
+                            {
+                                NX_WARNING(
+                                    typeid(LookupListEntriesModel), "Unexpected enum value %1", value);
+                                return QString();
+                            }
+                            return value;
+                        };
                     break;
                 }
                 default:
