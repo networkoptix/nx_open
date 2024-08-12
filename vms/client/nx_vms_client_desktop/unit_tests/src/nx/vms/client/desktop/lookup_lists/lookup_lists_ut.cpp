@@ -458,7 +458,7 @@ protected:
         entry["Approved"] = "true";
         entry["IntNumberWithoutLimit"] = "1";
         entry["Color"] = "#FF0000";
-        entry["Enum"] = "base enum item 2.1";
+        entry["Enum"] = "base enum item 1.1";
         entry["FloatNumberWithLimit"] = "3.5";
         entry["FloatNumberWithoutLimit"] = "-9.67";
         entry["FloatNumberWithMinLimit"] = "34.67";
@@ -562,7 +562,7 @@ protected:
         e1.entries = {
             {{"IntNumberWithoutLimit", "12345"},
                 {"Color", "#FF0000"},
-                {"Enum", "base enum item 2.1"},
+                {"Enum", "base enum item 1.1"},
                 {"Approved", "true"},
                 {"IntNumberWithLimit", "19"},
                 {"FloatNumberWithLimit", "5.0"},
@@ -576,7 +576,7 @@ protected:
             {{"IntNumberWithoutLimit", "67890"}, {"Approved", "false"}},
             {{"Color", "#00FF00"}, {"IntNumberWithoutLimit", "9876"}},
             {{"IntNumberWithLimit", "4"}, {"FloatNumberWithLimit", "2"}},
-            {{"Enum", "base enum item 2.2"}, {"FloatNumberWithLimit", "7"}, {"Color", "#0000FF"}},
+            {{"Enum", "base enum item 1.2"}, {"FloatNumberWithLimit", "7"}, {"Color", "#0000FF"}},
         };
         return e1;
     }
