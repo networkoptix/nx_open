@@ -41,4 +41,9 @@ void PickerWidget::setValidity(const vms::rules::ValidationResult& /*validationR
 {
 }
 
+bool PickerWidget::hasSeparator()
+{
+    return false;
+}
+
 } // namespace nx::vms::client::desktop::rules

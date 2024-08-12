@@ -189,4 +189,9 @@ void HttpAuthPicker::setReadOnly(bool value)
     setEnabled(!value);
 }
 
+bool HttpAuthPicker::hasSeparator()
+{
+    return true;
+}
+
 } // namespace nx::vms::client::desktop::rules

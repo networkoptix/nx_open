@@ -21,6 +21,7 @@ public:
 protected:
     void updateUi() override;
     void onEnabledChanged(bool isEnabled) override;
+    virtual bool hasSeparator() override;
 
 private:
     QnElidedLabel* m_label{nullptr};

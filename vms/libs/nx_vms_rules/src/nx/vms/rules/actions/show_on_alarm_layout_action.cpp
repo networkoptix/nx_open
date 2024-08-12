@@ -33,12 +33,11 @@ const ItemDescriptor& ShowOnAlarmLayoutAction::manifest()
                 ResourceFilterFieldProperties{
                     .ids = nx::utils::toQSet(vms::api::kAllPowerUserGroupIds)
                 }.toVariantMap()),
-            utils::makePlaybackFieldDescriptor(Strings::rewind()),
-            utils::makeActionFlagFieldDescriptor(
-                "forceOpen",
+            utils::makeActionFlagFieldDescriptor("forceOpen",
                 NX_DYNAMIC_TRANSLATABLE(tr("Force Alarm Layout Opening")),
                 {},
                 /*defaultValue*/ true),
+            utils::makePlaybackFieldDescriptor(Strings::rewind()),
             utils::makeIntervalFieldDescriptor(Strings::intervalOfAction()),
 
             makeFieldDescriptor<EventDevicesField>("eventDeviceIds", {}),
