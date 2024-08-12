@@ -105,4 +105,9 @@ void OptionalDurationPicker::onEnabledChanged(bool isEnabled)
     setEdited();
 }
 
+bool OptionalDurationPicker::hasSeparator()
+{
+    return true;
+}
+
 } // namespace nx::vms::client::desktop::rules

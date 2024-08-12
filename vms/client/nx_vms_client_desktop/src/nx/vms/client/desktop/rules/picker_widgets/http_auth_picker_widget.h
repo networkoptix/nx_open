@@ -20,6 +20,7 @@ public:
 
     void setReadOnly(bool value) override;
     void updateUi() override;
+    virtual bool hasSeparator() override;
 
 private:
     struct Private;

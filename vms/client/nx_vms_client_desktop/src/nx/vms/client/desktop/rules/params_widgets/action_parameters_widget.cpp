@@ -73,7 +73,7 @@ void ActionParametersWidget::onRuleSet(bool isNewRule)
         if (!isNewRule)
             picker->setEdited();
 
-        const bool isCurrentPlain = dynamic_cast<PlainPickerWidget*>(picker) != nullptr;
+        const bool isCurrentPlain = !picker->hasSeparator();
         if (!isCurrentPlain || !isPreviousPlain)
         {
             layout->addSpacing(4);

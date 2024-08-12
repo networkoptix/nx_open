@@ -32,6 +32,12 @@ public:
     /** Mark the widget as edited by a user forcefully. */
     void setEdited();
 
+    /**
+     * The widget should be separated from other widgets using a separator.
+     * By default returns false
+     */
+    virtual bool hasSeparator();
+
     ParamsWidget* parentParamsWidget() const;
 
 protected:
