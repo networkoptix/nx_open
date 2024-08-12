@@ -90,7 +90,7 @@ NotificationListWidget::Private::Private(NotificationListWidget* q):
         AbstractSearchWidget::makePlaceholderText(tr("No new notifications"), {}),
         tr("Notifications Settings"),
         [this] { menu()->trigger(menu::PreferencesNotificationTabAction); },
-        q)),
+        m_ribbonContainer)),
     m_model(new NotificationTabModel(windowContext(), this)),
     m_filterModel(new QSortFilterProxyModel(q))
 {
