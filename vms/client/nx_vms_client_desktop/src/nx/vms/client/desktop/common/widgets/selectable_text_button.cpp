@@ -62,8 +62,8 @@ SelectableTextButton::SelectableTextButton(QWidget* parent):
     p.setColor(QPalette::Inactive, QPalette::WindowText, core::colorTheme()->color("light14"));
     p.setColor(QPalette::Inactive, QPalette::Text, core::colorTheme()->color("light16"));
     p.setColor(QPalette::Inactive, QPalette::HighlightedText, core::colorTheme()->color("light10"));
-    p.setColor(QPalette::Inactive, QPalette::Highlight, core::colorTheme()->color("brand_core", 102));
-    p.setColor(QPalette::Inactive, QPalette::Light, core::colorTheme()->color("brand_l1", 102));
+    p.setColor(QPalette::Inactive, QPalette::Highlight, core::colorTheme()->color("brand", 102));
+    p.setColor(QPalette::Inactive, QPalette::Light, core::colorTheme()->color("brand", 102));
 
     setPalette(p);
 

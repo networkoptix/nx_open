@@ -182,7 +182,7 @@ QnResourceWidget::QnResourceWidget(
 
     setPaletteColor(this, QPalette::WindowText, core::colorTheme()->color("@light1"));
     setPaletteColor(this, QPalette::Window, core::colorTheme()->color("@dark5"));
-    setPaletteColor(this, QPalette::Highlight, core::colorTheme()->color("brand_core", 110));
+    setPaletteColor(this, QPalette::Highlight, core::colorTheme()->color("brand", 110));
 
     setupHud();
     setupSelectionOverlay();
@@ -324,7 +324,7 @@ QIcon QnResourceWidget::loadSvgIcon(const QString& name) const
         {QnIcon::Pressed, core::colorTheme()->color("@light7")},
         {QIcon::Disabled, core::colorTheme()->color("@light4", /*alpha*/ 77)}};
 
-    static const QColor checkedBgColor = core::colorTheme()->color("brand_core");
+    static const QColor checkedBgColor = core::colorTheme()->color("brand");
 
     QPixmapDropShadowFilter filter;
     filter.setBlurRadius(2.5);

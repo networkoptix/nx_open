@@ -56,7 +56,7 @@ void CameraLicensePanelWidget::init(
     m_storeConnections << connect(ui->useLicenseCheckBox, &CheckBox::cannotBeToggled, this,
         [this]()
         {
-            BackgroundFlasher::flash(ui->licenseUsageLabel, core::colorTheme()->color("red_l2"));
+            BackgroundFlasher::flash(ui->licenseUsageLabel, core::colorTheme()->color("red"));
         });
 
     m_storeConnections << connect(store, &CameraSettingsDialogStore::stateChanged,

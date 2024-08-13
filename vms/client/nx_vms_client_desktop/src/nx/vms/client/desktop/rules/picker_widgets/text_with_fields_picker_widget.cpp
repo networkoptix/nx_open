@@ -36,7 +36,7 @@ struct TextWithFieldsPicker::Private: public QObject
 
     QTextCharFormat getIncorrectCharFormat(QTextCharFormat charFormat) const
     {
-        const auto warningColor = core::colorTheme()->color("red_d3");
+        const auto warningColor = core::colorTheme()->color("red");
         charFormat.setUnderlineStyle(QTextCharFormat::UnderlineStyle::WaveUnderline);
         charFormat.setUnderlineColor(warningColor);
         charFormat.setForeground(q->palette().text());
@@ -45,7 +45,7 @@ struct TextWithFieldsPicker::Private: public QObject
 
     QTextCharFormat getCorrectCharFormat(QTextCharFormat charFormat) const
     {
-        const auto highlightColor = core::colorTheme()->color("brand_core");
+        const auto highlightColor = core::colorTheme()->color("brand");
         QBrush brush = q->palette().text();
         brush.setColor(highlightColor);
         charFormat.setForeground(brush);

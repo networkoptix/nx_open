@@ -356,8 +356,8 @@ void OutgoingMailSettingsWidget::Private::setConfigurationStatus(ConfigurationSt
 
     static QHash<ConfigurationStatus, TextAndColorCode> kStatusRepresentation = {
         {ConfigurationStatus::Active, {tr("Active"), "light4"}},
-        {ConfigurationStatus::NotConfigured, {tr("Not configured"), "yellow_d1"}},
-        {ConfigurationStatus::Error, {tr("Error"), "red_l2"}}};
+        {ConfigurationStatus::NotConfigured, {tr("Not configured"), "yellow"}},
+        {ConfigurationStatus::Error, {tr("Error"), "red"}}};
 
     const auto [text, code] = kStatusRepresentation.value(status);
     ui->configurationStatusLabel->setText(text);

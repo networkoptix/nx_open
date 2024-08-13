@@ -554,10 +554,10 @@ void SoftwareTriggerButtonPrivate::ensureImages()
         };
 
     static const QColor kNormalColor = core::colorTheme()->color("@dark1", 128);
-    static const QColor kActiveColor = core::colorTheme()->color("brand_core", 179);
-    static const QColor kPressedColor = core::colorTheme()->color("brand_core", 128);
-    static const QColor kErrorBackgroundColor = core::colorTheme()->color("red_core", 128);
-    static const QColor kErrorFrameColor = core::colorTheme()->color("red_core");
+    static const QColor kActiveColor = core::colorTheme()->color("brand", 179);
+    static const QColor kPressedColor = core::colorTheme()->color("brand", 128);
+    static const QColor kErrorBackgroundColor = core::colorTheme()->color("red", 128);
+    static const QColor kErrorFrameColor = core::colorTheme()->color("red");
 
     QIcon icon;
     const auto normalPixmap = generateStatePixmap(kNormalColor);

@@ -44,7 +44,7 @@ bool paintButtonFunction(QPainter* painter, const QStyleOption* /*option*/, cons
 }
 
 const core::SvgIconColorer::ThemeSubstitutions kBookmarkTheme = {
-    {QnIcon::Normal, {.primary = "light4", .secondary="brand_d7"}}
+    {QnIcon::Normal, {.primary = "light4", .secondary="brand"}}
 };
 
 NX_DECLARE_COLORIZED_ICON(kPlayIcon, "20x20/Solid/play.svg", kBookmarkTheme)

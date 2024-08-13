@@ -66,7 +66,7 @@ QnVirtualCameraResourceList sortedCameras(QnVirtualCameraResourceList cameraList
     return cameraList;
 }
 
-core::SvgIconColorer::ThemeSubstitutions kAlarmTheme = {{QnIcon::Normal, {.primary = "yellow_l"}}};
+core::SvgIconColorer::ThemeSubstitutions kAlarmTheme = {{QnIcon::Normal, {.primary = "yellow"}}};
 
 NX_DECLARE_COLORIZED_ICON(kAlarmIcon, "20x20/Solid/alert2.svg", kAlarmTheme)
 

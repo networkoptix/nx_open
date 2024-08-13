@@ -22,7 +22,7 @@ namespace nx::vms::client::desktop {
 
 NX_DECLARE_COLORIZED_ICON(kContextHintIcon, "16x16/Solid/help.svg", HintButton::kIconSubstitutions)
 core::SvgIconColorer::ThemeSubstitutions kFutureTheme = {
-    {QnIcon::Normal, {.primary = "yellow_d"}}};
+    {QnIcon::Normal, {.primary = "yellow"}}};
 NX_DECLARE_COLORIZED_ICON(kFutureIcon, "16x16/Outline/future.svg", kFutureTheme)
 
 CloudLayoutsIntroDialog::CloudLayoutsIntroDialog(

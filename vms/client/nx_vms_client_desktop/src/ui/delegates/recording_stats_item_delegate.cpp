@@ -78,7 +78,7 @@ void QnRecordingStatsItemDelegate::paint(QPainter* painter, const QStyleOptionVi
     if (!isCameraName)
     {
         static const QColor kChartBackgroundColor = withAlpha(
-            core::colorTheme()->color("brand_core"), 102);
+            core::colorTheme()->color("brand"), 102);
 
         /* Draw chart manually: */
         qreal chartData = index.data(QnRecordingStatsModel::ChartData).toReal();

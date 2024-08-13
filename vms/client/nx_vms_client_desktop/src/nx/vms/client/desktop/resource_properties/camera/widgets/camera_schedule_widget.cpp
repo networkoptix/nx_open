@@ -100,7 +100,7 @@ CameraScheduleWidget::CameraScheduleWidget(
         store, &CameraSettingsDialogStore::setRecordingEnabled);
 
     connect(ui->enableRecordingCheckBox, &CheckBox::cannotBeToggled, this,
-        [this] { BackgroundFlasher::flash(ui->licenseUsageLabel, core::colorTheme()->color("red_l2")); });
+        [this] { BackgroundFlasher::flash(ui->licenseUsageLabel, core::colorTheme()->color("red")); });
 
     // Called when a cell is Alt-clicked. Fetches cell settings as current.
     connect(ui->gridWidget, &ScheduleGridWidget::cellClicked, store,

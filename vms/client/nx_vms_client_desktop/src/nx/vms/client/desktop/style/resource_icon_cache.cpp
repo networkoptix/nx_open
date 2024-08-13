@@ -48,21 +48,21 @@ static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kTreeThem
     {QnIcon::Selected, {.primary = "light4", .secondary = "light2"}},
     {QnIcon::Active, {.primary = "brand_core", .secondary= "light4"}},
     {QnIcon::Normal, {.primary = "light10", .secondary = "light4"}},
-    {QnIcon::Error, {.primary = "red_l2", .secondary = "red_l2"}},
+    {QnIcon::Error, {.primary = "red", .secondary = "red"}},
     {QnIcon::Pressed, {.primary = "light4", .secondary = "light2"}}};
 
 const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kYellowTheme = {
-    {QnIcon::Normal, {.primary = "yellow_l",}}
+    {QnIcon::Normal, {.primary = "yellow",}}
 };
 
 static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions
     kTreeThemeOfflineSubstitutions = {
-        {QnIcon::Disabled, {.primary = "light10", .secondary = "red_l"}},
-        {QnIcon::Selected, {.primary = "light4", .secondary = "red_l"}},
-        {QnIcon::Active, {.primary = "brand_core", .secondary = "red_l"}},
-        {QnIcon::Normal, {.primary = "light10", .secondary = "red_l"}},
-        {QnIcon::Error, {.primary = "red_l2", .secondary = "red_l"}},
-        {QnIcon::Pressed, {.primary = "light4", .secondary = "red_l"}}};
+        {QnIcon::Disabled, {.primary = "light10", .secondary = "red"}},
+        {QnIcon::Selected, {.primary = "light4", .secondary = "red"}},
+        {QnIcon::Active, {.primary = "brand_core", .secondary = "red"}},
+        {QnIcon::Normal, {.primary = "light10", .secondary = "red"}},
+        {QnIcon::Error, {.primary = "red", .secondary = "red"}},
+        {QnIcon::Pressed, {.primary = "light4", .secondary = "red"}}};
 
 NX_DECLARE_COLORIZED_ICON(kHasArchiveIcon, "20x20/Solid/archive.svg",\
     nx::vms::client::core::kEmptySubstitutions)

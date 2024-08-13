@@ -52,7 +52,7 @@ BackupSettingsPickerWidget::BackupSettingsPickerWidget(
     const auto backgroundHighlightAlpha = std::rint(kBackgroundHighlightPercentage / 100.0 * 0xFF);
     const auto backgroundColor = alphaBlend(
         core::colorTheme()->color("dark7"),
-        core::colorTheme()->color("brand_core", backgroundHighlightAlpha));
+        core::colorTheme()->color("brand", backgroundHighlightAlpha));
 
     setPaletteColor(this, QPalette::Window, backgroundColor);
     setAutoFillBackground(true);

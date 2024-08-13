@@ -86,7 +86,7 @@ public:
     ZoomWindowWidget(QGraphicsItem* parent = nullptr, Qt::WindowFlags windowFlags = {}):
         base_type(parent, windowFlags),
         m_interactive(true),
-        m_frameColor(nx::vms::client::core::colorTheme()->color("yellow_core")),
+        m_frameColor(nx::vms::client::core::colorTheme()->color("yellow")),
         m_frameWidth(kFrameWidth)
     {
         setWindowFlags(this->windowFlags() | Qt::Window);
@@ -478,9 +478,9 @@ QColor ZoomWindowInstrument::nextZoomWindowColor() const
 {
     using namespace nx::vms::client::core;
     static const QList<QColor> kFrameColors{{
-        colorTheme()->color("yellow_core"),
-        colorTheme()->color("green_l2"),
-        colorTheme()->color("red_l2"),
+        colorTheme()->color("yellow"),
+        colorTheme()->color("green"),
+        colorTheme()->color("red"),
     }};
 
     QSet<QColor> colors;

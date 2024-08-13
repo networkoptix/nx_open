@@ -48,8 +48,8 @@ public:
         ui->minimizeButton->setIcon(qnSkin->icon("titlebar/window_minimize.svg"));
         const QColor background = core::colorTheme()->color("dark7");
         const core::SvgIconColorer::IconSubstitutions colorSubs = {
-            { QnIcon::Active, {{ background, "red_d1" }}},
-            { QnIcon::Pressed, {{ background, "red_d1" }}}};
+            { QnIcon::Active, {{ background, "red" }}},
+            { QnIcon::Pressed, {{ background, "red" }}}};
         ui->closeButton->setIcon(qnSkin->icon("titlebar/window_close.svg", nullptr, nullptr, colorSubs));
 
         ui->helpButton->setFixedSize(qnSkin->maximumSize(ui->helpButton->icon()));

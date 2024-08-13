@@ -172,7 +172,7 @@ QVariant QnLicenseListModel::foregroundData(const QModelIndex& index) const
         case QnLicenseListModel::ServerColumn:
         {
             if (!serverByLicense(license))
-                return QBrush(core::colorTheme()->color("red_l2"));
+                return QBrush(core::colorTheme()->color("red"));
             break;
         }
 
@@ -186,16 +186,16 @@ QVariant QnLicenseListModel::foregroundData(const QModelIndex& index) const
                 if (index.column() != QnLicenseListModel::ExpirationDateColumn
                     || code == QnLicenseErrorCode::Expired)
                 {
-                    return QBrush(core::colorTheme()->color("red_l2"));
+                    return QBrush(core::colorTheme()->color("red"));
                 }
             }
 
             switch (expirationInfo(license, false).first)
             {
                 case Expired:
-                    return QBrush(core::colorTheme()->color("red_l2"));
+                    return QBrush(core::colorTheme()->color("red"));
                 case SoonExpires:
-                    return QBrush(core::colorTheme()->color("yellow_core"));
+                    return QBrush(core::colorTheme()->color("yellow"));
                 default:
                     break;
             }

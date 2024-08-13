@@ -32,7 +32,7 @@ public:
     Private(FocusFrameItem* parent);
 
 public:
-    QColor color = core::colorTheme()->color("brand_core");
+    QColor color = core::colorTheme()->color("brand");
     int frameWidth = 1;
 
     bool textureDirty = true;

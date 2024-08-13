@@ -45,14 +45,14 @@ static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubst
     {QIcon::Normal, {{klight10Color, "light10"}}},
     {QIcon::Active, {{klight10Color, "light11"}}},
     {QIcon::Selected, {{klight10Color, "light9"}}},
-    {QnIcon::Error, {{klight10Color, "red_l2"}}},
+    {QnIcon::Error, {{klight10Color, "red"}}},
 };
 
 static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kIconTheme = {
     {QIcon::Normal, {.primary = "light10"}},
     {QIcon::Active, {.primary = "light11"}},
     {QIcon::Selected, {.primary = "light9"}},
-    {QnIcon::Error, {.primary = "red_l2"}},
+    {QnIcon::Error, {.primary = "red"}},
 };
 
 NX_DECLARE_COLORIZED_ICON(kCrossCloseIcon, "20x20/Outline/cross_close.svg", kIconTheme)
@@ -107,7 +107,7 @@ ShowreelItemWidget::ShowreelItemWidget(
     base_type(systemContext, windowContext, item, parent),
     m_previewPainter(new ui::LayoutPreviewPainter())
 {
-    setPaletteColor(this, QPalette::Highlight, core::colorTheme()->color("brand_core"));
+    setPaletteColor(this, QPalette::Highlight, core::colorTheme()->color("brand"));
     setPaletteColor(this, QPalette::Dark, core::colorTheme()->color("dark17"));
     setOption(QnResourceWidget::InfoOverlaysForbidden);
     setOption(QnResourceWidget::WindowRotationForbidden);

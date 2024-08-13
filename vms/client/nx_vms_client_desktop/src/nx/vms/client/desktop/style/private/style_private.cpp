@@ -161,20 +161,20 @@ void StylePrivate::drawSwitch(
 
         fillColorOff = hovered ? core::colorTheme()->color("dark14") : core::colorTheme()->color("dark13");
         fillColorOn =
-            hovered ? core::colorTheme()->color("green_l1") : core::colorTheme()->color("green_core");
+            hovered ? core::colorTheme()->color("green_l") : core::colorTheme()->color("green");
         frameColorOff = fillColorOff;
         frameColorOn = fillColorOn;
         signColorOff = core::colorTheme()->color("dark17");
-        signColorOn = hovered ? core::colorTheme()->color("green_l3") : core::colorTheme()->color("green_l2");
+        signColorOn = hovered ? core::colorTheme()->color("green_l") : core::colorTheme()->color("green");
     }
     else
     {
         fillColorOff = core::colorTheme()->color("dark8");
-        fillColorOn = core::colorTheme()->color("green_core");
+        fillColorOn = core::colorTheme()->color("green");
         frameColorOff = core::colorTheme()->color("dark7");
         frameColorOn = fillColorOn;
         signColorOff = core::colorTheme()->color("dark10");
-        signColorOn = core::colorTheme()->color("green_l2");
+        signColorOn = core::colorTheme()->color("green");
     }
 
     // TODO: Implement animation

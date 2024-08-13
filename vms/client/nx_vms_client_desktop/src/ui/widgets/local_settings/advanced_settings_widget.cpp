@@ -527,7 +527,7 @@ void QnAdvancedSettingsWidget::updateCertificateValidationLevelDescription()
     setPaletteColor(
         label,
         QPalette::WindowText,
-        nx::vms::client::core::colorTheme()->color(isWarning ? "red_l2" : "dark14"));
+        nx::vms::client::core::colorTheme()->color(isWarning ? "red" : "dark14"));
 }
 
 void QnAdvancedSettingsWidget::updateLogsManagementWidgetsState()

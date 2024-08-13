@@ -12,7 +12,7 @@
 namespace {
 
 nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kUnavalableTheme = {
-    {QnIcon::Normal, {.primary = "light16", .secondary = "red_l"}}};
+    {QnIcon::Normal, {.primary = "light16", .secondary = "red"}}};
 
 NX_DECLARE_COLORIZED_ICON(
     kCloudUnavailableIcon, "128x128/Outline/cloud_unavailable.svg", kUnavalableTheme)

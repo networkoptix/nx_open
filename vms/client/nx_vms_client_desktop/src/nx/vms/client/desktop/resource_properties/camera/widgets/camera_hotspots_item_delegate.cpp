@@ -250,8 +250,8 @@ void CameraHotspotsItemDelegate::initStyleOption(
 
         if (!cameraIdData.isNull() && cameraResourceData.isNull()) //< Camera no more exists.
         {
-            static const auto kInvalidCameraColor = core::colorTheme()->color("red_core");
-            static const auto kSelectedInvalidCameraColor = core::colorTheme()->color("red_l2");
+            static const auto kInvalidCameraColor = core::colorTheme()->color("red");
+            static const auto kSelectedInvalidCameraColor = core::colorTheme()->color("red_l");
             setupStyleOptionColors(option, kInvalidCameraColor, kSelectedInvalidCameraColor);
         }
 

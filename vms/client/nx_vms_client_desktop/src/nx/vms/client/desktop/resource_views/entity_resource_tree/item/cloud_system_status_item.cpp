@@ -61,11 +61,11 @@ public:
         switch (crossSystemContext->status())
         {
             case CloudCrossSystemContext::Status::uninitialized:
-                return "20x20/Solid/alert2.svg?primary=red_l";
+                return "20x20/Solid/alert2.svg?primary=red";
             case CloudCrossSystemContext::Status::connecting:
                 return "legacy/loading.gif";
             case CloudCrossSystemContext::Status::connectionFailure:
-                return "20x20/Solid/alert2.svg?primary=yellow_l";
+                return "20x20/Solid/alert2.svg?primary=yellow";
             default:
                 break;
         }

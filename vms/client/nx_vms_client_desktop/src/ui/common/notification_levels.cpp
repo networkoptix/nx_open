@@ -82,10 +82,10 @@ QColor QnNotificationLevel::notificationColor(Value level)
     {
         case Value::NoNotification:        return Qt::transparent;
         case Value::OtherNotification:     return Qt::white;
-        case Value::CommonNotification:    return colorTheme()->color("green_l2");
-        case Value::ImportantNotification: return colorTheme()->color("yellow_l");
-        case Value::CriticalNotification:  return colorTheme()->color("red_l");
-        case Value::SuccessNotification:   return colorTheme()->color("green_l");
+        case Value::CommonNotification:    return colorTheme()->color("green");
+        case Value::ImportantNotification: return colorTheme()->color("yellow");
+        case Value::CriticalNotification:  return colorTheme()->color("red");
+        case Value::SuccessNotification:   return colorTheme()->color("green");
         default:
             NX_ASSERT(false, "All enum values must be handled");
             break;
@@ -97,9 +97,9 @@ QColor QnNotificationLevel::notificationTextColor(Value level)
 {
     switch (level)
     {
-        case Value::ImportantNotification: return colorTheme()->color("yellow_l");
-        case Value::CriticalNotification:  return colorTheme()->color("red_l");
-        case Value::SuccessNotification:   return colorTheme()->color("green_l");
+        case Value::ImportantNotification: return colorTheme()->color("yellow");
+        case Value::CriticalNotification:  return colorTheme()->color("red");
+        case Value::SuccessNotification:   return colorTheme()->color("green");
         case Value::OtherNotification:     return Qt::white;
         case Value::CommonNotification:
         default:

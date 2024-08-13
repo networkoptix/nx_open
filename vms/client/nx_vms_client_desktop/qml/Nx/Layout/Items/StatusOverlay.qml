@@ -350,7 +350,7 @@ Item
 
                 case StatusOverlay.UnauthorizedOverlay:
                     return makeErrorOverlayData(qsTr("Unauthorized"),
-                        "image://skin/48x48/Outline/lock.svg?primary=red_l",
+                        "image://skin/48x48/Outline/lock.svg?primary=red",
                         qsTr("Please check authentication information"))
 
                 case StatusOverlay.AccessDenied:
@@ -359,12 +359,12 @@ Item
 
                 case StatusOverlay.OfflineOverlay:
                     return makeErrorOverlayData(qsTr("No signal"),
-                        "image://skin/48x48/Outline/error.svg?primary=red_l")
+                        "image://skin/48x48/Outline/error.svg?primary=red")
 
                 case StatusOverlay.AnalogWithoutLicenseOverlay:
                 case StatusOverlay.VideowallWithoutLicenseOverlay:
                     return makeErrorOverlayData(qsTr("Not enough licenses"),
-                        "image://skin/48x48/Outline/lock.svg?primary=red_l")
+                        "image://skin/48x48/Outline/lock.svg?primary=red")
 
                 case StatusOverlay.ServerOfflineOverlay:
                     return makeErrorOverlayData(qsTr("Server unavailable"))
@@ -375,7 +375,7 @@ Item
 
                 case StatusOverlay.IoModuleDisabledOverlay:
                     return makeErrorOverlayData(qsTr("Device disabled"),
-                        "image://skin/48x48/Outline/error.svg?primary=red_l")
+                        "image://skin/48x48/Outline/error.svg?primary=red")
 
                 case StatusOverlay.TooManyOpenedConnectionsOverlay:
                     return makeErrorOverlayData(qsTr("Too many connections"))
@@ -385,7 +385,7 @@ Item
 
                 case StatusOverlay.PasswordRequiredOverlay:
                     return makeErrorOverlayData(qsTr("Password required"),
-                        "image://skin/48x48/Outline/lock.svg?primary=red_l")
+                        "image://skin/48x48/Outline/lock.svg?primary=red")
 
                 case StatusOverlay.NoLiveStreamOverlay:
                     return makeOverlayData(qsTr("No live stream"))

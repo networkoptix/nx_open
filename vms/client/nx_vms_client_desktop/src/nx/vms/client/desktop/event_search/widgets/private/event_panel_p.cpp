@@ -80,10 +80,10 @@ static constexpr int kMaxMultiThumbnailCount = 5;
 static constexpr int kMultiThumbnailSpacing = 1;
 
 const core::SvgIconColorer::ThemeSubstitutions kTabIconSubstitutions = {
-    {QnIcon::Disabled, {.primary = "dark14", .secondary = "red_l"}},
-    {QnIcon::Selected, {.primary = "light4", .secondary = "red_l"}},
-    {QnIcon::Active, {.primary = "brand_core", .secondary = "red_l"}},
-    {QnIcon::Normal, {.primary = "light10", .secondary = "red_l"}}};
+    {QnIcon::Disabled, {.primary = "dark14", .secondary = "red"}},
+    {QnIcon::Selected, {.primary = "light4", .secondary = "red"}},
+    {QnIcon::Active, {.primary = "brand_core", .secondary = "red"}},
+    {QnIcon::Normal, {.primary = "light10", .secondary = "red"}}};
 
 NX_DECLARE_COLORIZED_ICON(kObjectIcon, "20x20/Solid/object.svg", kTabIconSubstitutions)
 NX_DECLARE_COLORIZED_ICON(kBookmarkIcon, "20x20/Solid/bookmark.svg", kTabIconSubstitutions)

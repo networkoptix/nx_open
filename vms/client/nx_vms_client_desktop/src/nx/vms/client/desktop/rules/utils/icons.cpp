@@ -17,7 +17,7 @@ namespace nx::vms::client::desktop::rules {
 namespace {
 
 const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kAttentionTheme =
-    {{QnIcon::Normal, {.primary = "yellow_d"}}};
+    {{QnIcon::Normal, {.primary = "yellow"}}};
 NX_DECLARE_COLORIZED_ICON(kAttentionIcon, "20x20/Solid/attention.svg", kAttentionTheme);
 
 template<class T>

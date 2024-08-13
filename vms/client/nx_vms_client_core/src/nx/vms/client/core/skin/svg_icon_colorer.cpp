@@ -64,8 +64,8 @@ QByteArray substituteColors(
     {
         for (int pos = 0; pos < data.size(); ++pos)
         {
-            pos = getNextColorPos(data, pos);
-            if (pos != data.size())
+            pos = getNextColorPos(result, pos);
+            if (pos != result.size())
             {
                 int length = kColorValueStringLength;
                 QString currentColor = QString::fromLatin1(data.begin() + pos, length).toLower();

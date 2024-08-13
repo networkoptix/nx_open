@@ -57,8 +57,8 @@ Dialog
             property var icons: ({
                 "information": "image://skin/64x64/Outline/info.svg?primary=light10",
                 "question": "image://skin/64x64/Outline/question.svg?primary=light10",
-                "warning": "image://skin/64x64/Outline/warning.svg?primary=yellow_l",
-                "critical": "image://skin/64x64/Outline/error.svg?primary=red_l"
+                "warning": "image://skin/64x64/Outline/warning.svg?primary=yellow",
+                "critical": "image://skin/64x64/Outline/error.svg?primary=red"
             })
             sourcePath: icons[settingsModel && settingsModel.icon] || icons["information"]
             Layout.alignment: Qt.AlignTop

@@ -245,7 +245,7 @@ QVariant QnPtzTourSpotsModel::data(const QModelIndex &index, int role) const {
             case NameColumn:
             case TimeColumn:
             case SpeedColumn:
-                return QBrush(colorTheme()->color("red_core", 77));
+                return QBrush(colorTheme()->color("red", 77));
             default:
                 break;
             }

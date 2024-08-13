@@ -19,6 +19,16 @@ QString brand()
     return R"(${customization.brand})";
 }
 
+QString brandBgColor()
+{
+    return R"(${customization.brandBgColor})";
+}
+
+QString brandColor()
+{
+    return R"(${customization.brandColor})";
+}
+
 QString company()
 {
     return R"(${customization.companyName})";

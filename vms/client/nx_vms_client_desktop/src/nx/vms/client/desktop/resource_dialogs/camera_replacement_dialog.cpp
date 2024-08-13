@@ -51,7 +51,7 @@ static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kLight4Th
 };
 
 static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kErrorTheme = {
-    {QIcon::Normal, {.primary = "red_l1"}},
+    {QIcon::Normal, {.primary = "red"}},
 };
 
 static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kSuccessTheme = {
@@ -59,7 +59,7 @@ static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kSuccessT
 };
 
 static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kWarningTheme = {
-    {QIcon::Normal, {.primary = "yellow_d"}},
+    {QIcon::Normal, {.primary = "yellow"}},
 };
 
 NX_DECLARE_COLORIZED_ICON(kReloadIcon, "20x20/Outline/reload.svg", kIconSubstitutions)
@@ -136,15 +136,15 @@ QLayout* createDataTransferReportItem(
             break;
 
         case DeviceReplacementInfo::Level::warning:
-            captionTextColor = core::colorTheme()->color("yellow_core");
-            descriptionTextColor = core::colorTheme()->color("yellow_d2");
+            captionTextColor = core::colorTheme()->color("yellow");
+            descriptionTextColor = core::colorTheme()->color("yellow");
             iconPixmap = qnSkin->icon(kWarningIcon).pixmap(20, 20);
             break;
 
         case DeviceReplacementInfo::Level::error:
         case DeviceReplacementInfo::Level::critical:
-            captionTextColor = core::colorTheme()->color("red_l2");
-            descriptionTextColor = core::colorTheme()->color("red_l1");
+            captionTextColor = core::colorTheme()->color("red");
+            descriptionTextColor = core::colorTheme()->color("red");
             iconPixmap = qnSkin->icon(kErrorIcon).pixmap(20, 20);
             break;
 

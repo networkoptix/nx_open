@@ -39,14 +39,14 @@ struct RecordScheduleCellPainter::Private
 
     const QColor emptyCellColor = core::colorTheme()->color("dark5");
     const QColor emptyCellHoveredColor = core::colorTheme()->color("dark6");
-    const QColor recordAlwaysColor = core::colorTheme()->color("green_core");
-    const QColor recordAlwaysHoveredColor = core::colorTheme()->color("green_l1");
-    const QColor recordMotionColor = core::colorTheme()->color("red_d1");
-    const QColor recordMotionHoveredColor = core::colorTheme()->color("red_core");
-    const QColor recordObjectsColor = core::colorTheme()->color("yellow_d1");
-    const QColor recordObjectsHoveredColor = core::colorTheme()->color("yellow_core");
-    const QColor recordMotionAndObjectsColor = core::colorTheme()->color("orange_l2");
-    const QColor recordMotionAndObjectsHoveredColor = recordMotionAndObjectsColor.lighter(110);
+    const QColor recordAlwaysColor = core::colorTheme()->color("green");
+    const QColor recordAlwaysHoveredColor = core::colorTheme()->color("green_l");
+    const QColor recordMotionColor = core::colorTheme()->color("red");
+    const QColor recordMotionHoveredColor = core::colorTheme()->color("red_l");
+    const QColor recordObjectsColor = core::colorTheme()->color("yellow");
+    const QColor recordObjectsHoveredColor = core::colorTheme()->color("yellow_l");
+    const QColor recordMotionAndObjectsColor = core::colorTheme()->color("orange");
+    const QColor recordMotionAndObjectsHoveredColor = core::colorTheme()->color("orange_l");
     const QColor cellBorderColor = core::colorTheme()->color("dark4");
 
     // The following two colors are used to choose the color of a cell text depending on its type.

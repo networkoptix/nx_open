@@ -43,15 +43,15 @@ SubjectSelectionDialog::CustomizableOptions
         {
             return user.isCloud();
         };
-    options.alertColor = core::colorTheme()->color("brand_d5");
+    options.alertColor = core::colorTheme()->color("brand");
     return options;
 }
 
 namespace {
 
 static const core::SvgIconColorer::ThemeSubstitutions colorSubs = {
-    {QnIcon::Normal, {.primary = "light10", .secondary="yellow_l"}},
-    {QnIcon::Selected, {.primary = "light4", .secondary="yellow_l"}}
+    {QnIcon::Normal, {.primary = "light10", .secondary="yellow"}},
+    {QnIcon::Selected, {.primary = "light4", .secondary="yellow"}}
 };
 
 NX_DECLARE_COLORIZED_ICON(kGroupIcon, "20x20/Solid/group.svg",\

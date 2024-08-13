@@ -18,9 +18,9 @@ struct ScheduleCellPainter::Private
 
     const QColor emptyCellColor = core::colorTheme()->color("dark5");
     const QColor emptyCellHoveredColor = core::colorTheme()->color("dark6");
-    const QColor nonEmptyCellColor = core::colorTheme()->color("green_core");
-    const QColor nonEmptyCellHoveredColor = core::colorTheme()->color("green_l1");
-    const QColor selectionFrameColor = core::colorTheme()->color("blue13");
+    const QColor nonEmptyCellColor = core::colorTheme()->color("green");
+    const QColor nonEmptyCellHoveredColor = core::colorTheme()->color("green_l");
+    const QColor selectionFrameColor = core::colorTheme()->color("blue");
 };
 
 ScheduleCellPainter::ScheduleCellPainter():

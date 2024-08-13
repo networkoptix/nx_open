@@ -108,7 +108,7 @@ const core::SvgIconColorer::IconSubstitutions kNavigationIconCheckedSubstitution
         { kUnmuteColor, "light16"},
         { kUnmuteCrossColor, "red_core"},
         { kBackgroundColor, "dark7"},
-        { kCheckedColor, "green_l3"},
+        { kCheckedColor, "green"},
     }},
     { QnIcon::Disabled, {
         { kBasePrimaryColor, "dark11"},
@@ -117,7 +117,7 @@ const core::SvgIconColorer::IconSubstitutions kNavigationIconCheckedSubstitution
         { kUnmuteColor, "light16"},
         { kUnmuteCrossColor, "red_core"},
         { kBackgroundColor, "dark6" },
-        { kCheckedColor, "green_l3"},
+        { kCheckedColor, "green"},
     }},
     { QnIcon::Active, {  //< Hovered
         { kBasePrimaryColor, "light1"},
@@ -126,7 +126,7 @@ const core::SvgIconColorer::IconSubstitutions kNavigationIconCheckedSubstitution
         { kUnmuteColor, "light16"},
         { kUnmuteCrossColor, "red_core"},
         { kBackgroundColor, "dark8" },
-        { kCheckedColor, "green_l3"},
+        { kCheckedColor, "green"},
     }},
     { QnIcon::Pressed, {
         { kBasePrimaryColor, "light1"},
@@ -135,7 +135,7 @@ const core::SvgIconColorer::IconSubstitutions kNavigationIconCheckedSubstitution
         { kUnmuteColor, "light16"},
         { kUnmuteCrossColor, "red_core"},
         { kBackgroundColor, "dark5"},
-        { kCheckedColor, "green_l3"},
+        { kCheckedColor, "green"},
     }},
 };
 

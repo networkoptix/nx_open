@@ -192,12 +192,12 @@ void QnCameraDiagnosticsDialog::at_tool_diagnosticsStepResult(
     if (result)
     {
         message = tr("OK");
-        color = nx::vms::client::core::colorTheme()->color("green_core");
+        color = nx::vms::client::core::colorTheme()->color("green");
     }
     else
     {
         message = tr("FAILED: %1").arg(errorMessage);
-        color = nx::vms::client::core::colorTheme()->color("red_l2");
+        color = nx::vms::client::core::colorTheme()->color("red");
     }
 
     ui->textEdit->append(html::colored(message, color));

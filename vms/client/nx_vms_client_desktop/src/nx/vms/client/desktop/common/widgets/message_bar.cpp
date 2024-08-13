@@ -33,7 +33,7 @@ static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kCloseSub
 
 static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kErrorSubstitution =
 {
-    {QIcon::Normal, {.primary = "red_l"}},
+    {QIcon::Normal, {.primary = "red"}},
 };
 
 NX_DECLARE_COLORIZED_ICON(kCloseIcon, "20x20/Outline/cross_close.svg",\
@@ -187,7 +187,7 @@ void CommonMessageBar::init(const BarDescription& barDescription)
 {
     d->closeButton->setVisible(barDescription.isClosable || !barDescription.isEnabledProperty.isNull());
     const auto& color = barDescription.level == BarDescription::BarLevel::Error
-        ? core::colorTheme()->color("red_l1")
+        ? core::colorTheme()->color("red")
         : core::colorTheme()->color("light4");
     setPaletteColor(this, QPalette::Text, color);
     setPaletteColor(this, QPalette::Link, color);

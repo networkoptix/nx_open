@@ -90,12 +90,12 @@ TEST_F(SvgLoaderTest, customizationMapWithColors)
 TEST_F(SvgLoaderTest, customizationMapWithNames)
 {
     const QMap<QString, QString> customization{
-        {"primary", "cyan"},
+        {"primary", "darkCyan"}, //< Standard QColor name.
         {"secondary", "#101010"},
         {"tertiary", "dark5"}};
 
     image = loadSvgImage(kTestFilePath, customization).toImage();
-    EXPECT_TOP_LEFT("cyan");
+    EXPECT_TOP_LEFT("darkCyan");
     EXPECT_TOP_RIGHT("#101010");
     EXPECT_BOTTOM_LEFT(colorTheme()->color("dark5"));
     EXPECT_BOTTOM_RIGHT("yellow");
@@ -108,6 +108,8 @@ TEST_F(SvgLoaderTest, colorThemeSubstitutions)
     colorThemePtr.reset(); //< Must destroy the singleton instance before creating a new one.
     colorThemePtr.reset(new ColorTheme(
         ":/unit_tests/svg_loader_ut/basic_colors.json",
+        ":/skin/basic_colors.json",
+        ":/skin/derived_colors.json",
         ":/unit_tests/svg_loader_ut/skin_colors.json"));
 
     ASSERT_EQ(colorTheme()->color("brand_core"), QColor("#808080"));

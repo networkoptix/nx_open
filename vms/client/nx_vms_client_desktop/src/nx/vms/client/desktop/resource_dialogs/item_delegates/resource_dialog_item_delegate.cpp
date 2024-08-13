@@ -108,7 +108,7 @@ void ResourceDialogItemDelegate::initStyleOption(
                                                                           : kExtraTextColor);
     }
 
-    static const auto kInvalidTextColor = core::colorTheme()->color("red_core");
+    static const auto kInvalidTextColor = core::colorTheme()->color("red");
     static const auto kCheckedItemTextColor =
         core::colorTheme()->color("resourceTree.mainTextSelected");
     static const auto kCheckedItemExtraTextColor =
@@ -222,7 +222,7 @@ void ResourceDialogItemDelegate::paintItemIcon(
     const auto isValidResourceData = index.data(ResourceDialogItemRole::IsValidResourceRole);
     if (!isValidResourceData.isNull() && !isValidResourceData.toBool() && !option.icon.isNull())
     {
-        const auto invalidIconColor = core::colorTheme()->color("red_core");
+        const auto invalidIconColor = core::colorTheme()->color("red");
         const auto iconSize = option.icon.actualSize(iconRect.size());
         const auto colorizedIcon = QIcon(
             core::Skin::colorize(option.icon.pixmap(iconSize), invalidIconColor));

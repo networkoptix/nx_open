@@ -15,7 +15,7 @@ namespace
 
 SeparatorAreaProperties::SeparatorAreaProperties()
     : width(kDefaultSeparatorWidth)
-    , color(nx::vms::client::core::colorTheme()->color("yellow_core"))
+    , color(nx::vms::client::core::colorTheme()->color("yellow"))
 {
 }
 

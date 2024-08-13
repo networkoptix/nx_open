@@ -24,7 +24,9 @@ class NX_VMS_CLIENT_CORE_API ColorTheme: public QObject
 public:
     explicit ColorTheme(QObject* parent = nullptr);
     explicit ColorTheme(
-        const QString& mainColorsFile,
+        const QString& legacyColorsFile,
+        const QString& basicColorsFile,
+        const QString& derivedColorsFile,
         const QString& skinColorsFile,
         QObject* parent = nullptr);
     virtual ~ColorTheme() override;

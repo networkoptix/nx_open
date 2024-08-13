@@ -202,7 +202,7 @@ QColor ImportFromDeviceDialogModel::Private::getCellColor(const QModelIndex& ind
         case State::error:
         {
             return index.column() == StatusColumn
-                ? colorTheme()->color("red_core")
+                ? colorTheme()->color("red")
                 : colorTheme()->color("light10");
         }
     }

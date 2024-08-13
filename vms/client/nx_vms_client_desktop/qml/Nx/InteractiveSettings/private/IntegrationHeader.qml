@@ -103,7 +103,7 @@ RowLayout
             return !!licenseSummary && licenseSummary.available < licenseSummary.inUse
         }
         sourcePath: "image://skin/20x20/Solid/attention.svg"
-        primaryColor: "yellow_l"
+        primaryColor: "yellow"
         sourceSize: Qt.size(20, 20)
 
         GlobalToolTip.text: licenseSummary && licenseSummary.issueExpirationDate

@@ -154,7 +154,7 @@ QSize HighlightedTextItemDelegate::sizeHint(
     const auto text = common::html::highlightMatch(
         opt.text,
         Private::getSearchRx(opt),
-        core::colorTheme()->color("yellow_d1"));
+        core::colorTheme()->color("yellow"));
 
     doc.setDefaultFont(option.font);
     doc.setDocumentMargin(0);
@@ -188,7 +188,7 @@ void HighlightedTextItemDelegate::paint(
     const auto text = common::html::highlightMatch(
         opt.text,
         Private::getSearchRx(opt),
-        core::colorTheme()->color("yellow_d1"));
+        core::colorTheme()->color("yellow"));
 
     if (QPixmap* const pixmap = d->getPixmap(text, opt, painter->device()->devicePixelRatio()))
     {

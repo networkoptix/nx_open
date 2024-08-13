@@ -47,7 +47,7 @@ ControlBar::ControlBar(QWidget* parent):
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
 
     // Background color.
-    setPaletteColor(this, QPalette::Window, core::colorTheme()->color("brand_d5"));
+    setPaletteColor(this, QPalette::Window, core::colorTheme()->color("brand"));
 
     // Frame color.
     setPaletteColor(this, QPalette::Dark, QColor{});

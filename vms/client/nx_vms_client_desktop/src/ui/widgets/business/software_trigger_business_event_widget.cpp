@@ -30,7 +30,7 @@ namespace {
 static constexpr int kDropdownIconSize = 40;
 
 static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions colorSubs = {
-    {QnIcon::Normal, {.primary = "light10", .secondary="yellow_l"}},
+    {QnIcon::Normal, {.primary = "light10", .secondary="yellow"}},
 };
 
 NX_DECLARE_COLORIZED_ICON(kUserIcon, "20x20/Solid/user.svg",\

@@ -29,7 +29,7 @@ static constexpr int kTabInnerSpacing = 4; //< Spacing between tab icon and text
 static constexpr milliseconds kAnimationDuration = 200ms;
 
 nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kRedTheme = {
-    {QnIcon::Normal, {.primary = "red_l"}}};
+    {QnIcon::Normal, {.primary = "red"}}};
 
 NX_DECLARE_COLORIZED_ICON(kRedIcon, "20x20/Solid/alert2.svg", kRedTheme)
 
@@ -284,7 +284,7 @@ void CompactTabBar::Private::paintTab(int index, QPainter* painter)
 
     if (current)
     {
-        painter->setPen(core::colorTheme()->color("brand_core"));
+        painter->setPen(core::colorTheme()->color("brand"));
         // Fine-tuned in order to nicely blend the line into widget border.
         painter->translate(0, 0.5);
         painter->drawLine(tabRect.bottomLeft() + QPoint{1, 0}, tabRect.bottomRight());
@@ -448,7 +448,7 @@ CompactTabBar::CompactTabBar(QWidget* parent):
     setPaletteColor(this, QPalette::WindowText, core::colorTheme()->color("light12"));
     setPaletteColor(this, QPalette::Light, core::colorTheme()->color("light10"));
     setPaletteColor(this, QPalette::Midlight, core::colorTheme()->color("dark12"));
-    setPaletteColor(this, QPalette::Highlight, core::colorTheme()->color("brand_core"));
+    setPaletteColor(this, QPalette::Highlight, core::colorTheme()->color("brand"));
 
     setPaletteColor(this, QPalette::Disabled, QPalette::WindowText, core::colorTheme()->color("dark12"));
     setPaletteColor(this, QPalette::Disabled, QPalette::Light, core::colorTheme()->color("dark12"));

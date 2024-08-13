@@ -13,7 +13,7 @@ QnIoModuleGridOverlayContents::QnIoModuleGridOverlayContents() :
     d_ptr(new QnIoModuleGridOverlayContentsPrivate(this))
 {
     setPaletteColor(this, QPalette::WindowText, colorTheme()->color("dark13"));
-    setPaletteColor(this, QPalette::HighlightedText, colorTheme()->color("green_l4"));
+    setPaletteColor(this, QPalette::HighlightedText, colorTheme()->color("green"));
     setPaletteColor(this, QPalette::ButtonText, colorTheme()->color("light4"));
     setPaletteColor(this, QPalette::Dark, colorTheme()->color("dark8"));
     setPaletteColor(this, QPalette::Button, colorTheme()->color("dark9"));
