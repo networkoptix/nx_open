@@ -44,6 +44,7 @@
 #include <nx/vms/rules/group.h>
 #include <nx/vms/rules/strings.h>
 #include <nx/vms/rules/utils/type.h>
+#include <nx/vms/time/formatter.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/utils/table_export_helper.h>
 #include <ui/workaround/hidpi_workarounds.h>
@@ -142,6 +143,16 @@ QModelIndex analyticsEventsRoot(QStandardItemModel* model)
         return QModelIndex();
 
     return indices[0];
+}
+
+// Returns width for the longest(symbols count) available date.
+int dateTimeColumnDefaultWidth(QTableView* tableView)
+{
+    static const auto dt =
+        QDateTime::fromString("12/12/2024 12:12:12", "dd/MM/yyyy hh:mm:ss");
+
+    return tableView->fontMetrics().size(Qt::TextSingleLine, time::toString(dt)).width()
+        + style::Metrics::kStandardPadding * 2;
 }
 
 } // namespace
@@ -620,6 +631,14 @@ void EventLogDialog::requestFinished(nx::vms::api::rules::EventLogRecordList&& r
     }
 
     ui->gridEvents->horizontalHeader()->resizeSections(QHeaderView::ResizeToContents);
+
+    // Resize the first column to prevent the datetime text from being reduced. This could happen
+    // when scrolling if the datetime in the beginning of the delegate is shorter than the text in
+    // the middle of the table, which has not yet been uploaded to the table.
+    // TODO: #mmalofeev consider using custom delegate for the datetime column.
+    ui->gridEvents->horizontalHeader()->resizeSection(
+        EventLogModel::DateTimeColumn, dateTimeColumnDefaultWidth(ui->gridEvents));
+
     ui->stackedWidget->setCurrentWidget(ui->gridPage);
 }
 
