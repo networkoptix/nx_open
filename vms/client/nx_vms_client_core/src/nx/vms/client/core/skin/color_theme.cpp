@@ -115,7 +115,7 @@ QJsonObject generatedColorScheme(const ColorTree& basicColors)
                 return "#ff6c00";
 
             if (themeName == "gray_white")
-                return "#ffffff";
+                return ini().invertColors ? "#000000" : "#ffffff";
 
             // Default: dark_blue.
             return "#2fa2db";
