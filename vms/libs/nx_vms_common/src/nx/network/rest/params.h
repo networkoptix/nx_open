@@ -47,6 +47,7 @@ public:
     int remove(const QString& key) { return m_values.remove(key); }
 
     void replace(const QString& key, const QString& value) { m_values.replace(key, value); }
+    void rename(const QString& oldName, const QString& newName);
     void clear() { m_values.clear(); }
 
     auto keyValueRange() const

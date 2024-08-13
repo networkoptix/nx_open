@@ -131,6 +131,16 @@ QJsonObject Params::toJson(bool excludeCommon) const
     return object;
 }
 
+void Params::rename(const QString& oldName, const QString& newName)
+{
+    for (auto it = m_values.find(oldName); it != m_values.end(); it = m_values.find(oldName))
+    {
+        auto value = *it;
+        m_values.erase(it);
+        m_values.insert(newName, value);
+    }
+}
+
 // TODO: Fix or refactor. This function disregards possible content errors. For example,
 //     invalid JSON content (parsing errors) will be silently ignored.
 //     For details: VMS-41649
