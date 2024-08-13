@@ -82,7 +82,7 @@ DialogWithState
 
     title: qsTr("User - %1").arg(login)
 
-    ContextHelp.topicId: HelpTopic.UserSettings_Permissions
+    ContextHelp.topicId: HelpTopic.UserRoles
 
     MembersModel
     {

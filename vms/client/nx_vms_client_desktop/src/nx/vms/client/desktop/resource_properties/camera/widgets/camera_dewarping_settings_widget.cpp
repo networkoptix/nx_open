@@ -32,7 +32,7 @@ CameraDewarpingSettingsWidget::CameraDewarpingSettingsWidget(
     setResizeMode(QQuickWidget::SizeRootObjectToView);
     setSource(QUrl("Nx/Dialogs/CameraSettings/CameraDewarpingSettings.qml"));
     setMinimumSize(kMinimumSize);
-    setHelpTopic(this, HelpTopic::Id::CameraSettings_Dewarping);
+    setHelpTopic(this, HelpTopic::Id::MainWindow_MediaItem_Dewarping);
 
     if (!NX_ASSERT(rootObject()))
         return;
