@@ -154,7 +154,7 @@ NX_DECLARE_COLORIZED_ICON(kLayoutsSharedIcon, "20x20/Solid/layouts_shared.svg",\
 NX_DECLARE_COLORIZED_ICON(kLayoutsIntercomIcon, "20x20/Solid/layouts_intercom.svg",\
     kTreeThemeSubstitutions)
 
-NX_DECLARE_COLORIZED_ICON(kFolderOpenIcon, "20x20/Solid/ws_folder_open.svg",\
+NX_DECLARE_COLORIZED_ICON(kFolderOpenIcon, "20x20/Solid/folder_open.svg",\
     kTreeThemeSubstitutions)
 NX_DECLARE_COLORIZED_ICON(kMediaIcon, "20x20/Solid/media.svg",\
     kTreeThemeSubstitutions)
