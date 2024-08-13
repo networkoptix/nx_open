@@ -77,17 +77,17 @@ PasswordStrengthData UserSettingsGlobal::passwordStrength(const QString& passwor
     switch (info.acceptance())
     {
         case nx::utils::PasswordAcceptance::Good:
-            result.background = core::colorTheme()->color("green_core");
+            result.background = core::colorTheme()->color("green");
             result.accepted = true;
             break;
 
         case nx::utils::PasswordAcceptance::Acceptable:
-            result.background = core::colorTheme()->color("yellow_core");
+            result.background = core::colorTheme()->color("yellow");
             result.accepted = true;
             break;
 
         default:
-            result.background = core::colorTheme()->color("red_core");
+            result.background = core::colorTheme()->color("red");
             result.accepted = false;
             break;
     }

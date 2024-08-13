@@ -308,7 +308,7 @@ void LogsManagementWidget::setupUi()
             m_watcher->setAllItemsAreChecked(false);
         });
 
-    static const QColor finishedColor = core::colorTheme()->color("brand_core");
+    static const QColor finishedColor = core::colorTheme()->color("brand");
     static const QColor errorColor = core::colorTheme()->color("attention.red");
     static const QString coloredTemplate = "<font color='%1'>%2</font>";
 

@@ -62,9 +62,9 @@ bool isRuleValid(const vms::rules::ConstRulePtr& rule)
             rule.get(), appContext()->currentSystemContext()).isValid();
 }
 
-constexpr auto kAttentionIconPath = "20x20/Solid/attention.svg?primary=yellow_d";
+constexpr auto kAttentionIconPath = "20x20/Solid/attention.svg?primary=yellow";
 constexpr auto kDisabledRuleIconPath = "20x20/Outline/block.svg?primary=light10";
-constexpr auto kInvalidRuleIconPath = "20x20/Solid/alert2.svg?primary=yellow_d";
+constexpr auto kInvalidRuleIconPath = "20x20/Solid/alert2.svg?primary=yellow";
 
 } // namespace
 

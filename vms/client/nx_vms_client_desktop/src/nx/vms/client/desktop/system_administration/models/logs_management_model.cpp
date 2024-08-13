@@ -15,7 +15,7 @@ namespace nx::vms::client::desktop {
 namespace {
 
 const QString kNormalLogLevelColor = "light16";
-const QString kWarningLogLevelColor = "yellow_d2";
+const QString kWarningLogLevelColor = "yellow";
 
 static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kRedSubstitutions = {
     {QIcon::Normal, {.primary = "attention.red"}}

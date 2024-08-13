@@ -83,12 +83,12 @@ QColor SelectionWidget::calculateFrameColor() const
     {
         case QnResourceWidget::SelectionState::focusedAndSelected:
         case QnResourceWidget::SelectionState::selected:
-            return core::colorTheme()->color("brand_core");
+            return core::colorTheme()->color("brand_l");
 
         case QnResourceWidget::SelectionState::focused:
             return hasFrameDistinctionColor(m_widget)
                 ? m_widget->frameDistinctionColor().lighter()
-                : core::colorTheme()->color("brand_d4");
+                : core::colorTheme()->color("brand");
 
         case QnResourceWidget::SelectionState::inactiveFocused:
             return hasFrameDistinctionColor(m_widget)
@@ -112,7 +112,7 @@ void SelectionWidget::paintSelection(QPainter* painter)
 
     const PainterTransformScaleStripper scaleStripper(painter);
     painter->fillRect(scaleStripper.mapRect(rect()),
-        toTransparent(core::colorTheme()->color("brand_core"),
+        toTransparent(core::colorTheme()->color("brand"),
         kSelectionOpacity));
 }
 

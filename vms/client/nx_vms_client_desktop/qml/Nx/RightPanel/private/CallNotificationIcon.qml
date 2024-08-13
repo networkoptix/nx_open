@@ -20,7 +20,7 @@ Item
 
         sourcePath: "image://skin/20x20/Solid/notification.svg"
         sourceSize: Qt.size(20, 20)
-        primaryColor: "green_l2"
+        primaryColor: "green"
         name: "CallNotificationIcon"
 
         anchors.centerIn: item

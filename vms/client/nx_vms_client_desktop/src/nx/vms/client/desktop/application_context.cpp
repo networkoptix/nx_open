@@ -295,10 +295,10 @@ QPalette makeApplicationPalette()
     result.setColor(QPalette::Base, colorTheme->color("dark7"));
     result.setColor(QPalette::Window, colorTheme->color("dark7"));
     result.setColor(QPalette::Shadow, colorTheme->color("dark5"));
-    result.setColor(QPalette::Highlight, colorTheme->color("brand_core"));
+    result.setColor(QPalette::Highlight, colorTheme->color("brand"));
     result.setColor(QPalette::HighlightedText, colorTheme->color("brand_contrast"));
-    result.setColor(QPalette::Link, colorTheme->color("brand_d2"));
-    result.setColor(QPalette::LinkVisited, colorTheme->color("brand_core"));
+    result.setColor(QPalette::Link, colorTheme->color("brand"));
+    result.setColor(QPalette::LinkVisited, colorTheme->color("brand_l"));
     result.setColor(QPalette::AlternateBase, colorTheme->color("dark7"));
     result.setColor(QPalette::ToolTipBase, colorTheme->color("light4"));
     result.setColor(QPalette::ToolTipText, colorTheme->color("dark4"));

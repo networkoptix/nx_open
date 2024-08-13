@@ -234,7 +234,7 @@ Button
                     ? "image://skin/16x16/Solid/star.svg"
                     : "image://skin/20x20/Outline/eye_closed.svg"
                 primaryColor: visibilityScope === WelcomeScreen.FavoriteTileVisibilityScope
-                    ? "yellow_l"
+                    ? "yellow"
                     : "light16"
                 sourceSize: Qt.size(width, height)
 

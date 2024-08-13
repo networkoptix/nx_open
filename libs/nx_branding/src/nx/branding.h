@@ -13,10 +13,14 @@ NX_BRANDING_API QString colorTheme();
 /** Customization id. */
 NX_BRANDING_API QString customization();
 
-/**
- * Customization brand. Used for the license compatibility checks.
- */
+/** Customization brand. Used for the license compatibility checks. */
 NX_BRANDING_API QString brand();
+
+/** Primary (brand) color used to generate the customization color scheme. */
+NX_BRANDING_API QString brandColor();
+
+/** Background color used to generate the customization color scheme. */
+NX_BRANDING_API QString brandBgColor();
 
 /** Company name. */
 NX_BRANDING_API QString company();

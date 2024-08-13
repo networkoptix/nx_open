@@ -13,7 +13,7 @@ RowLayout
     {
         Layout.alignment: Qt.AlignTop
         sourcePath: "image://skin/20x20/Solid/alert2.svg"
-        primaryColor: "yellow_l"
+        primaryColor: "yellow"
         sourceSize: Qt.size(20, 20)
     }
 

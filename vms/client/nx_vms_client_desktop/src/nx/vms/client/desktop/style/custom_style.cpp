@@ -68,7 +68,7 @@ void setCustomStyle(QPalette* palette, const QColor& color, qreal disabledOpacit
 
 void setWarningStyle(QPalette* palette, qreal disabledOpacity)
 {
-    setCustomStyle(palette, core::colorTheme()->color("red_l2"), disabledOpacity);
+    setCustomStyle(palette, core::colorTheme()->color("red"), disabledOpacity);
 }
 
 void setWarningStyleOn(QWidget* widget, bool on, qreal disabledOpacity)
@@ -81,7 +81,7 @@ void setWarningStyleOn(QWidget* widget, bool on, qreal disabledOpacity)
 
 QString setWarningStyleHtml(const QString& source)
 {
-    return html::colored(source, core::colorTheme()->color("red_l2"));
+    return html::colored(source, core::colorTheme()->color("red"));
 }
 
 void setWarningFrame(QWidget* widget, int frameWidth, int roundingRadius)
@@ -94,7 +94,7 @@ void setWarningFrame(QWidget* widget, int frameWidth, int roundingRadius)
             border-radius: %3;
         })qss");
 
-    const auto color = core::colorTheme()->color("red_l2");
+    const auto color = core::colorTheme()->color("red");
     const auto styleTemplate =
         styleTemplateRaw.args(color.name(QColor::HexArgb), frameWidth, roundingRadius);
 

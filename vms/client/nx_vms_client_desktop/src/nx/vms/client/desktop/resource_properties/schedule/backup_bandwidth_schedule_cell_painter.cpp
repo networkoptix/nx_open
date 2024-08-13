@@ -32,10 +32,10 @@ struct BackupBandwidthScheduleCellPainter::Private
 
     const QColor noBackupCellColor = core::colorTheme()->color("dark5");
     const QColor noBackupHoveredCellColor = core::colorTheme()->color("dark6");
-    const QColor noLimitColor = core::colorTheme()->color("green_core");
-    const QColor noLimitHoveredColor = core::colorTheme()->color("green_l1");
-    const QColor limitColor = core::colorTheme()->color("red_d1");
-    const QColor limitHoveredColor = core::colorTheme()->color("red_core");
+    const QColor noLimitColor = core::colorTheme()->color("green");
+    const QColor noLimitHoveredColor = core::colorTheme()->color("green_l");
+    const QColor limitColor = core::colorTheme()->color("red");
+    const QColor limitHoveredColor = core::colorTheme()->color("red_l");
     const QColor cellTextColor = core::colorTheme()->color("light4");
 
     QColor cellColor(const QVariant& cellData, bool hovered) const

@@ -79,7 +79,7 @@ public:
                     return expiryDate.toString("dd.MM.yyyy");
 
                 return expiryDate < QDateTime::currentDateTime()
-                    ? QVariant(core::colorTheme()->color("red_l2"))
+                    ? QVariant(core::colorTheme()->color("red"))
                     : QVariant();
             }
 

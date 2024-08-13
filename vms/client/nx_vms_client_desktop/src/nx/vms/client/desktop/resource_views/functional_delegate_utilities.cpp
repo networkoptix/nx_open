@@ -50,7 +50,7 @@ CustomizableItemDelegate* makeVersionStatusDelegate(QnWorkbenchContext* context,
                 ptr->getVersion(), latestMsVersion, true);
             if (updateRequested)
             {
-                item->palette.setColor(QPalette::Text, core::colorTheme()->color("red_l2"));
+                item->palette.setColor(QPalette::Text, core::colorTheme()->color("red"));
             }
         });
     return delegate;

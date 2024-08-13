@@ -147,15 +147,15 @@ void PasswordStrengthIndicator::paintEvent(QPaintEvent* /*event*/)
     switch (d->currentInformation.acceptance())
     {
         case utils::PasswordAcceptance::Good:
-            background = core::colorTheme()->color("green_core");
+            background = core::colorTheme()->color("green");
             break;
 
         case utils::PasswordAcceptance::Acceptable:
-            background = core::colorTheme()->color("yellow_core");
+            background = core::colorTheme()->color("yellow");
             break;
 
         default:
-            background = core::colorTheme()->color("red_core");
+            background = core::colorTheme()->color("red");
             break;
     }
 

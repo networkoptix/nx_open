@@ -68,8 +68,8 @@ MergeSystemsDialog::MergeSystemsDialog(QWidget* parent, std::unique_ptr<Delegate
 
     ui->warnWidget->setHidden(true);
     ui->warnIconLabel->setPixmap(qnSkin->pixmap("tree/warning_yellow.svg"));
-    setPaletteColor(ui->warningLabel, QPalette::WindowText, core::colorTheme()->color("yellow_d2"));
-    setPaletteColor(ui->contactSupportLabel, QPalette::WindowText, core::colorTheme()->color("yellow_d2"));
+    setPaletteColor(ui->warningLabel, QPalette::WindowText, core::colorTheme()->color("yellow"));
+    setPaletteColor(ui->contactSupportLabel, QPalette::WindowText, core::colorTheme()->color("yellow"));
 
     CustomerSupport customerSupport(systemContext());
     const QUrl url(customerSupport.systemContact.address.rawData);

@@ -25,9 +25,9 @@ MenuSection
         if (type === "api" && !requestId)
             return "image://skin/20x20/Solid/api.svg"
         if (type === "api" && !!engineId && !!requestId)
-            return "image://skin/20x20/Solid/api_permission_changed.svg?secondary=yellow_l"
+            return "image://skin/20x20/Solid/api_permission_changed.svg?secondary=yellow"
         if (type === "api" && !engineId && !!requestId)
-            return "image://skin/20x20/Solid/api_not_approved.svg?secondary=red_l"
+            return "image://skin/20x20/Solid/api_not_approved.svg?secondary=red"
 
         return "image://skin/20x20/Solid/sdk.svg"
     }

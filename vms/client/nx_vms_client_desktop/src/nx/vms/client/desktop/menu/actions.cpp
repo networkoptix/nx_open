@@ -57,8 +57,8 @@ const core::SvgIconColorer::IconSubstitutions kTitleBarIconSubstitutions = {
         { kBaseWindowTextColor, "light14" },
     }},
     { QnIcon::Error, {
-        { kBasePrimaryColor, "red_l2" },
-        { kLight4Color, "red_l3" },
+        { kBasePrimaryColor, "red" },
+        { kLight4Color, "red" },
         { kBaseWindowTextColor, "light16" },
     }},
 };
@@ -68,7 +68,7 @@ const core::SvgIconColorer::ThemeSubstitutions kTitleBarIconTheme = {
     { QnIcon::Disabled, {.primary = "dark14" }},
     { QnIcon::Selected, {.primary = "light4"}},
     { QnIcon::Active, {.primary = "light4"}},
-    { QnIcon::Error, {.primary = "red_l2"}},
+    { QnIcon::Error, {.primary = "red"}},
 };
 
 static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kButtonsIconTheme = {

@@ -26,7 +26,7 @@ static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kIconThem
 };
 
 static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kIconErrorTheme = {
-    {QIcon::Normal, {.primary = "red_l2"}},
+    {QIcon::Normal, {.primary = "red"}},
 };
 
 NX_DECLARE_COLORIZED_ICON(kCrossCloseIcon, "20x20/Outline/cross_close.svg", kIconErrorTheme)

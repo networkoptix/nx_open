@@ -79,7 +79,7 @@ AsyncImageWidget::AsyncImageWidget(QWidget* parent):
 {
     setPaletteColor(this, QPalette::Window, core::colorTheme()->color("dark6"));
     setPaletteColor(this, QPalette::WindowText, core::colorTheme()->color("light16"));
-    setPaletteColor(this, QPalette::Highlight, core::colorTheme()->color("brand_core"));
+    setPaletteColor(this, QPalette::Highlight, core::colorTheme()->color("brand"));
     setPaletteColor(this, QPalette::AlternateBase, core::colorTheme()->color("dark1", 110));
 
     retranslateUi();

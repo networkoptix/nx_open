@@ -52,7 +52,7 @@ void detailsPanelUpdateFunction(const QModelIndex& index, ResourceDetailsWidget*
     const auto infoMessageData = index.data(InfoMessageRole);
     if (!infoMessageData.isNull())
     {
-        const auto accentColor = nx::vms::client::core::colorTheme()->color("red_core");
+        const auto accentColor = nx::vms::client::core::colorTheme()->color("red");
         const auto availableServicesData = index.data(AvailableCloudStorageServices);
         if (!availableServicesData.isNull() && availableServicesData.toInt() < 1)
             detailsWidget->setMessage(infoMessageData.toString(), accentColor);

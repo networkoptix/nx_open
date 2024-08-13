@@ -18,13 +18,13 @@ namespace nx::vms::client::desktop {
 namespace {
 
 const core::SvgIconColorer::ThemeSubstitutions kTabIconSubstitutions = {
-    {QnIcon::Disabled, {.primary = "dark14", .secondary = "red_l"}},
-    {QnIcon::Selected, {.primary = "light4", .secondary = "red_l"}},
-    {QnIcon::Active, {.primary = "brand_core", .secondary = "red_l"}},
-    {QnIcon::Normal, {.primary = "light10", .secondary = "red_l"}}};
+    {QnIcon::Disabled, {.primary = "dark14", .secondary = "red"}},
+    {QnIcon::Selected, {.primary = "light4", .secondary = "red"}},
+    {QnIcon::Active, {.primary = "brand_core", .secondary = "red"}},
+    {QnIcon::Normal, {.primary = "light10", .secondary = "red"}}};
 
 const core::SvgIconColorer::ThemeSubstitutions kGreenIconTheme = {
-    {QnIcon::Normal, {.primary = "green_core", .secondary = "red_l"}}};
+    {QnIcon::Normal, {.primary = "green_core", .secondary = "red"}}};
 
 NX_DECLARE_COLORIZED_ICON(kNotificationIcon, "20x20/Solid/notification.svg", kTabIconSubstitutions)
 NX_DECLARE_COLORIZED_ICON(kNotificationsGreenIcon, "20x20/Solid/notification.svg", kGreenIconTheme)

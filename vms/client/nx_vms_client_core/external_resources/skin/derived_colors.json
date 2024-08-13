@@ -1,0 +1,318 @@
+{
+    "blue8":        "blue_l",
+    "blue9":        "blue_l",
+    "blue10":       "blue",
+    "blue11":       "blue_d",
+    "blue12":       "blue_d",
+    "blue13":       "blue_d",
+    "blue14":       "blue_d",
+
+    "green_attention": "green",
+    "green_l4":     "green_l",
+    "green_l3":     "green_l",
+    "green_l2":     "green_l",
+    "green_l1":     "green_l",
+    "green_core":   "green",
+    "green_d1":     "green_d",
+    "green_d2":     "green_d",
+    "green_d3":     "green_d",
+
+    "yellow_attention": "yellow",
+    "yellow_core":  "yellow",
+    "yellow_d1":    "yellow_d",
+    "yellow_d2":    "yellow_d",
+
+    "red_l3":       "red_l",
+    "red_l2":       "red_l",
+    "red_l1":       "red_l",
+    "red_core":     "red",
+    "red_attention": "red",
+    "red_d1":       "red_d",
+    "red_d2":       "red_d",
+    "red_d3":       "red_d",
+    "red_d4":       "red_d",
+    "red_d5":       "red_d",
+    "red_d6":       "red_d",
+    "red_d7":       "red_d",
+
+    "orange_l2":    "#f4663a",
+    "orange_main":  "#d65029",
+    "orange_d3":    "#743320",
+
+    "pink_core":    "#f38282",
+
+    "dialog": {
+        "alertBar": "#61282b",
+        "infoBar": "brand_d5"
+    },
+
+    "particleItem": "#0000ff",
+
+    "detectedObject": [
+        "contrast.blue",
+        "contrast.yellow",
+        "contrast.orange",
+        "contrast.green",
+        "contrast.deep_purple",
+        "contrast.purple",
+        "contrast.pink",
+        "contrast.cyan"
+    ],
+
+    "roi": {
+        "palette": [
+            "contrast.blue",
+            "contrast.yellow",
+            "contrast.orange",
+            "contrast.green",
+            "contrast.deep_purple",
+            "contrast.purple",
+            "contrast.pink",
+            "contrast.cyan"
+        ],
+
+        "minBox": "contrast.blue",
+        "maxBox": "contrast.pink"
+    },
+
+    "tooltip": {
+        "background": "dark13",
+        "text": "brand_contrast"
+    },
+
+    "timeline": {
+        "background": "green_bg",
+        "clockText": "brand_d2",
+        "tooltip": {
+            "background": "light4",
+            "text": "dark4"
+        },
+        "bookmark": {
+            "background": "#295e87",
+            "more_items_label": "#94aec3",
+            "label": "#ffffff",
+            "thick_line": "#154163",
+            "thin_line": "#3e6e93",
+            "button": {
+                "background": "#3e6e93",
+                "text": "#d8e2e9",
+                "background_hover": "#547e9f",
+                "text_hover": "#ffffff",
+                "background_pressed": "#1d5177",
+                "text_pressed": "#d8e2e9"
+            }
+        },
+        "showButton": "#c2a026.setAlpha(199)",
+        "playback": {
+            "pause": "red_core.setAlpha(153)",
+            "archive": "dark1.setAlpha(127)"
+        }
+    },
+
+    "calendar": {
+        "pin_button": {
+            "hovered": "dark8",
+            "pressed": "dark6"
+        },
+        "cell": {
+            "selection": "#2fa2db.setAlpha(192)",
+            "separator": "#121517",
+            "primaryRecording": "#208020",
+            "secondaryRecording": "#20ff20",
+            "primaryMotion": "#800000",
+            "secondaryMotion": "#ff0000",
+            "primaryBookmark": "#3775c4",
+            "secondaryBookmark": "#69a4f0"
+        }
+    },
+
+    "resourceTree": {
+        "mainText":          "light10",
+        "mainTextSelected":  "light4",
+        "mainTextAccented":  "brand_core",
+        "extraText":         "dark17",
+        "extraTextSelected": "light10",
+        "extraTextAccented": "brand_d3",
+        "tooltip": {
+            "background": "dark13",
+            "previewBackground": "dark12",
+            "previewFrame": "dark11",
+            "foreground": "light16",
+            "obsolescenceDimmer": "dark5.setAlpha(179)",
+            "obsolescenceText": "light10"
+        }
+    },
+
+    "scene": {
+        "curtain": "dark1",
+        "customLayoutBackground": "#1d2327",
+        "panelEdgeShadow": "dark1.setAlpha(38)",
+        "grid": {
+            "allowedCell": "green.setAlpha(64)",
+            "disallowedCell": "red.setAlpha(64)"
+        },
+        "banner": {
+            "_": "Over-scene graphics message boxes",
+            "frame": "brand_d2",
+            "window": "brand_d2.setAlpha(204)",
+            "text": "brand_contrast"
+        }
+    },
+
+    "camera": {
+        "_": "Scene media item",
+        "bookmarkBackground": "brand_bg",
+        "hudElementsBackground": "dark1.setAlpha(128)",
+        "motion": "red.setAlpha(51)",
+        "titleGradient": {
+            "top": "dark1.setAlpha(178)",
+            "bottom": "dark1.setAlpha(0)"
+        },
+        "motionSelection": {
+            "pen": "red",
+            "brush": "red.setAlpha(128)"
+        },
+        "motionGrid": {
+            "background": "light1.setAlpha(16)",
+            "foreground": "red.setAlpha(128)"
+        },
+        "twoWayAudio": {
+            "background": {
+                "default": "dark1.setAlpha(128)",
+                "hovered": "brand_core.setAlpha(179)",
+                "pressed": "dark7"
+            },
+            "visualizer": "red_core",
+            "text": "light1"
+        },
+        "sensitivityColors": [
+            "light16",
+            "teal",
+            "green",
+            "light_green",
+            "lime",
+            "lemon",
+            "yellow",
+            "orange",
+            "deep_orange",
+            "red"
+        ],
+        "hotspots": {
+            "palette": [
+                "#a5b7c0",
+                "#ffab40",
+                "#18ffff",
+                "#7c4dff"
+            ],
+            "invalid": "#f02c2c",
+            "text": "#ffffff",
+            "paletteCheckMark": "#000000"
+        },
+        "diagnosticsDialog": "#80ff80"
+    },
+
+    "server": {
+        "_": "Scene server statistics item",
+        "statistics": {
+            "cpu": "blue",
+            "ram": "purple",
+            "hdds": ["light_blue","yellow","green","orange","deep_purple","cyan","teal","pink","deep_orange"],
+            "network": ["red", "yellow", "indigo", "lime"]
+        }
+    },
+
+    "imageEnhancement": {
+        "background": "dark4",
+        "border": "dark8",
+        "histogram": "light9",
+        "selection": "brand_core.setAlpha(110)",
+        "grid": "green_bg",
+        "text": "light1"
+    },
+
+    "ptz": {
+        "_": "All PTZ-related colors",
+        "main": "brand_core",
+        "fill": "brand_l1",
+
+        "manage": {
+            "_": "Manage PTZ dialog",
+            "title": "dark9",
+            "invalid": "red_bg",
+            "warning": "yellow_bg"
+        }
+    },
+
+    "auditLog": {
+        "actions": {
+            "login": "green",
+            "failedLogin": "red",
+            "updateUser": "purple",
+            "updateCamera": "deep_orange",
+            "updateServer": "yellow",
+            "watchingLive": "teal",
+            "watchingArchive": "pink",
+            "exportVideo": "blue",
+            "system": "orange",
+            "rules": "indigo",
+            "emailSettings": "cyan"
+        },
+        "httpLink": "brand",
+        "chart": "brand"
+    },
+
+    "failoverPriority": {
+        "never": "dark17",
+        "low":  "green",
+        "medium": "yellow",
+        "high": "red"
+    },
+
+    "videoWall": {
+        "attach": {
+            "_": "Attach screen dialog",
+            "text": "light1",
+            "error": "red",
+            "desktop": "dark17",
+            "freeSpace": "light9",
+            "item": "brand_l"
+        },
+        "itemFrame": {
+            "_": "Overview mode",
+            "normal": "dark17.setAlpha(196)",
+            "selected": "brand_bg"
+        },
+        "overlayText": "light1.setAlpha(160)",
+        "overlayBackground": "dark1.setAlpha(96)"
+    },
+
+    "layoutBackgroundSettings": {
+        "frameColor": "dark17.setAlpha(196)"
+    },
+
+    "mainWindow": {
+        "customFrame": "light1.setAlpha(64)"
+    },
+
+    "attention": {
+        "yellow": "#dfbf20",
+        "yellow_light": "#e5cc4d",
+        "yellow_dark": "#b2991a",
+        "yellow_bg": "#594c0d",
+
+        "red": "#df2020",
+        "red_light": "#e54d4d",
+        "red_dark": "#b21a1a",
+        "red_bg": "#590d0d",
+
+        "blue": "#208fdf",
+        "blue_light": "#4da6e5",
+        "blue_dark": "#1a73b2",
+        "blue_bg": "#0d3959",
+
+        "green": "#40df20",
+        "green_light": "#66e54d",
+        "green_dark": "#33b21a",
+        "green_bg": "#1a590d"
+    }
+}

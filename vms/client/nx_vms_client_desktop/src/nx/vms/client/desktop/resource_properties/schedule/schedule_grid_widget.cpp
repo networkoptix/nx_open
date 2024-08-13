@@ -132,12 +132,12 @@ struct ScheduleGridWidget::Private
     const QColor headerCellHoveredColor = core::colorTheme()->color("dark9");
 
     const QColor gridColor = core::colorTheme()->color("dark7");
-    const QColor selectionFrameColor = core::colorTheme()->color("blue13");
+    const QColor selectionFrameColor = core::colorTheme()->color("blue");
 
     const QColor cornerHeaderTextColor = core::colorTheme()->color("light16");
     const QColor hourHeaderTextColor = core::colorTheme()->color("light10");
     const QColor weekdayHeaderTextColor = core::colorTheme()->color("light10");
-    const QColor weekendHeaderTextColor = core::colorTheme()->color("red_core");
+    const QColor weekendHeaderTextColor = core::colorTheme()->color("red");
 };
 
 std::optional<QRect> ScheduleGridWidget::Private::selectionFrameRect() const

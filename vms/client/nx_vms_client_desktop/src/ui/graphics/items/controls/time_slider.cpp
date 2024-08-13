@@ -330,10 +330,10 @@ public:
         // TODO: #vkutin Refactor this class to operate with "recording" and "extra" content types.
         const bool analytics = m_slider->selectedExtraContent() == Qn::AnalyticsContent;
 
-        m_colors[Qn::RecordingContent] = core::colorTheme()->color("green_core");
+        m_colors[Qn::RecordingContent] = core::colorTheme()->color("green");
         m_colors[Qn::MotionContent] = analytics
-            ? core::colorTheme()->color("yellow_core")
-            : core::colorTheme()->color("red_d1");
+            ? core::colorTheme()->color("yellow")
+            : core::colorTheme()->color("red");
         m_colors[Qn::TimePeriodContentCount] = core::colorTheme()->color("timeline.background");
 
         m_position = m_minChunkLength = 0ms;
@@ -2442,7 +2442,7 @@ void QnTimeSlider::paint(QPainter* painter, const QStyleOptionGraphicsItem* , QW
     if (qFuzzyIsNull(m_totalLineStretch))
     {
         drawSolidBackground(painter, rect());
-        painter->fillRect(lineBarRect, core::colorTheme()->color("green_core"));
+        painter->fillRect(lineBarRect, core::colorTheme()->color("green"));
     }
     else
     {
@@ -2679,8 +2679,8 @@ void QnTimeSlider::drawSelection(QPainter* painter)
     if (!m_selectionValid)
         return;
 
-    static const QColor kSelectionMarkerColor = core::colorTheme()->color("blue9", 153);
-    static const QColor kSelectionColor = core::colorTheme()->color("blue8", 77);
+    static const QColor kSelectionMarkerColor = core::colorTheme()->color("blue_l", 153);
+    static const QColor kSelectionColor = core::colorTheme()->color("blue", 77);
 
     if (m_selectionStart == m_selectionEnd)
     {
@@ -3091,7 +3091,7 @@ void QnTimeSlider::drawThumbnail(
 
     if (!rect.isEmpty())
     {
-        static const QColor kSelectionMarkerColor = core::colorTheme()->color("blue9", 153);
+        static const QColor kSelectionMarkerColor = core::colorTheme()->color("blue", 153);
 
         qreal a = data.selection;
         qreal width = 1.0 + a * 2.0;
@@ -3168,8 +3168,8 @@ void QnTimeSlider::drawBookmarks(QPainter* painter, const QRectF& rect)
         bookmarkRect.setLeft(quickPositionFromTime(qMax(bookmarkItem.startTime(), m_windowStart)));
         bookmarkRect.setRight(quickPositionFromTime(qMin(bookmarkItem.endTime(), m_windowEnd)));
 
-        static const QColor kBookmarkColor = core::colorTheme()->color("blue12", 204);
-        static const QColor kHoveredBookmarkColor = core::colorTheme()->color("blue10", 230);
+        static const QColor kBookmarkColor = core::colorTheme()->color("blue", 204);
+        static const QColor kHoveredBookmarkColor = core::colorTheme()->color("blue_l", 230);
 
         const bool isHovered = isBookmarkHovered(bookmarkItem);
         const QColor& bgColor = isHovered

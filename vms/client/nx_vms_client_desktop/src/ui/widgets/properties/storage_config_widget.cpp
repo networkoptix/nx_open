@@ -331,7 +331,7 @@ public:
 
         // Set warning color for inaccessible storages.
         if (index.column() == QnStorageListModel::StoragePoolColumn && !storage.isOnline)
-            opt.palette.setColor(QPalette::Text, vms::client::core::colorTheme()->color("red_l2"));
+            opt.palette.setColor(QPalette::Text, vms::client::core::colorTheme()->color("red"));
 
         // Set proper color for hovered editable dropdown item.
         if (!opt.state.testFlag(QStyle::State_Enabled))

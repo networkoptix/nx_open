@@ -89,7 +89,7 @@ EventTile::EventTile(QWidget* parent):
     setPaletteColor(this, QPalette::Light, core::colorTheme()->color("light7"));
     setPaletteColor(this, QPalette::WindowText, core::colorTheme()->color("light16"));
     setPaletteColor(this, QPalette::Text, core::colorTheme()->color("light4"));
-    setPaletteColor(this, QPalette::Highlight, core::colorTheme()->color("brand_core"));
+    setPaletteColor(this, QPalette::Highlight, core::colorTheme()->color("brand"));
 
     d->closeButton->setHidden(true);
     d->closeButtonAnchor->setMargins(kCloseButtonMarginsWithHeader);

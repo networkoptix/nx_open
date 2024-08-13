@@ -655,7 +655,7 @@ void colorize(QWidget* widget)
         palette.setColor(QPalette::Window, core::colorTheme()->color("dark13"));
         palette.setColor(QPalette::WindowText, core::colorTheme()->color("light4"));
         palette.setColor(QPalette::ButtonText, core::colorTheme()->color("light12"));
-        palette.setColor(QPalette::Highlight, core::colorTheme()->color("brand_d1"));
+        palette.setColor(QPalette::Highlight, core::colorTheme()->color("brand"));
         palette.setColor(QPalette::HighlightedText, core::colorTheme()->color("brand_contrast"));
         palette.setColor(QPalette::Midlight, core::colorTheme()->color("dark11"));
         palette.setColor(QPalette::Disabled, QPalette::WindowText,
@@ -672,7 +672,7 @@ void colorize(QWidget* widget)
     else if (qobject_cast<QComboBox*>(widget))
     {
         QPalette palette = widget->palette();
-        palette.setColor(QPalette::Highlight, core::colorTheme()->color("brand_d1"));
+        palette.setColor(QPalette::Highlight, core::colorTheme()->color("brand"));
         palette.setColor(QPalette::HighlightedText, core::colorTheme()->color("brand_contrast"));
         widget->setPalette(palette);
     }
@@ -706,7 +706,7 @@ void colorize(QWidget* widget)
         palette.setColor(QPalette::Base, core::colorTheme()->color("dark14"));
         palette.setColor(QPalette::Highlight, core::colorTheme()->color("dark13"));
         palette.setColor(QPalette::HighlightedText, core::colorTheme()->color("light4"));
-        palette.setColor(QPalette::BrightText, core::colorTheme()->color("red_l2"));
+        palette.setColor(QPalette::BrightText, core::colorTheme()->color("red"));
         widget->setPalette(palette);
     }
     else if (qobject_cast<QAbstractItemView*>(widget))
@@ -718,7 +718,7 @@ void colorize(QWidget* widget)
             palette.setColor(QPalette::Shadow, core::colorTheme()->color("dark11"));
             palette.setColor(QPalette::Mid, core::colorTheme()->color("dark12"));
             palette.setColor(QPalette::Midlight, core::colorTheme()->color("dark14"));
-            palette.setColor(QPalette::Highlight, core::colorTheme()->color("brand_core"));
+            palette.setColor(QPalette::Highlight, core::colorTheme()->color("brand"));
             palette.setColor(QPalette::AlternateBase, core::colorTheme()->color("dark13"));
             palette.setColor(QPalette::Base, Qt::transparent);
             palette.setColor(QPalette::Window, Qt::transparent);
@@ -728,7 +728,7 @@ void colorize(QWidget* widget)
         {
             palette.setColor(QPalette::Base, Qt::transparent);
             palette.setColor(QPalette::Midlight, core::colorTheme()->color("dark12", 102));
-            palette.setColor(QPalette::Highlight, core::colorTheme()->color("brand_core", 77));
+            palette.setColor(QPalette::Highlight, core::colorTheme()->color("brand", 77));
             palette.setColor(QPalette::Text, core::colorTheme()->color("light10"));
             palette.setColor(QPalette::HighlightedText, core::colorTheme()->color("light4"));
 
@@ -915,13 +915,13 @@ void Style::drawPrimitive(PrimitiveElement element,
 
             if (isWarningStyle(widget))
             {
-                mainColor = core::colorTheme()->color("red_core");
+                mainColor = core::colorTheme()->color("red");
                 if (!enabled)
                     mainColor.setAlphaF(nx::style::Hints::kDisabledBrandedButtonOpacity);
             }
             else if (isAccented(widget))
             {
-                mainColor = core::colorTheme()->color("brand_core");
+                mainColor = core::colorTheme()->color("brand");
                 if (!enabled)
                     mainColor.setAlphaF(nx::style::Hints::kDisabledBrandedButtonOpacity);
             }
@@ -953,7 +953,7 @@ void Style::drawPrimitive(PrimitiveElement element,
 
             if (isErrorStyle(widget))
             {
-                QnScopedPainterPenRollback penRollback(painter, core::colorTheme()->color("red_l"));
+                QnScopedPainterPenRollback penRollback(painter, core::colorTheme()->color("red"));
                 painter->drawRoundedRect(rect, 2, 2);
             }
 
@@ -1003,13 +1003,13 @@ void Style::drawPrimitive(PrimitiveElement element,
 
             if (isWarningStyle(widget))
             {
-                mainColor = core::colorTheme()->color("red_core");
+                mainColor = core::colorTheme()->color("red");
                 if (!enabled)
                     mainColor.setAlphaF(nx::style::Hints::kDisabledItemOpacity);
             }
             else if (isAccented(widget))
             {
-                mainColor = core::colorTheme()->color("brand_core");
+                mainColor = core::colorTheme()->color("brand");
                 if (!enabled)
                     mainColor.setAlphaF(nx::style::Hints::kDisabledItemOpacity);
             }
@@ -1127,7 +1127,7 @@ void Style::drawPrimitive(PrimitiveElement element,
                 /* Valid or not valid not focused input: */
                 frameColor = valid
                     ? core::colorTheme()->darker(base, 1)
-                    : core::colorTheme()->color("red_l2");
+                    : core::colorTheme()->color("red");
                 brushColor = base;
             }
 

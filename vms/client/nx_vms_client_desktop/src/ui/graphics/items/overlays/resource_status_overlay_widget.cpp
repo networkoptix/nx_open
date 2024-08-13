@@ -183,7 +183,7 @@ void setupLabel(QLabel* label, LabelStyleFlags style, QnStatusOverlayWidget::Err
 
     QColor color =
         style.testFlag(kErrorStyle) && errorStyle == QnStatusOverlayWidget::ErrorStyle::red
-            ? core::colorTheme()->color("red_l")
+            ? core::colorTheme()->color("red")
             : core::colorTheme()->color("light16");
 
     setPaletteColor(label, QPalette::WindowText, color);

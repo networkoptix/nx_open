@@ -49,8 +49,8 @@ QWidget* createWarningWidget(const QString& caption, const QString& message)
         nx::style::Metrics::kDefaultIconSize,
         nx::style::Metrics::kDefaultIconSize);
     const auto warningPixmap = qnSkin->icon(core::kAlertIcon).pixmap(iconSize);
-    const auto warningCaptionColor = nx::vms::client::core::colorTheme()->color("yellow_core");
-    const auto warningMessageColor = nx::vms::client::core::colorTheme()->color("yellow_d2");
+    const auto warningCaptionColor = nx::vms::client::core::colorTheme()->color("yellow");
+    const auto warningMessageColor = nx::vms::client::core::colorTheme()->color("yellow");
 
     auto warningWidget = new QWidget();
 

@@ -23,15 +23,28 @@ namespace nx::vms::client::core {
 namespace {
 
 QStringList kThemeSpecificColors = {
-    "red", "red_l", "red_d",
-    "blue", "blue_l", "blue_d",
-    "green", "green_l", "green_d",
-    "yellow", "yellow_l", "yellow_d"
+    "red", "pink", "purple", "deep_purple",
+    "indigo", "blue", "light_blue", "cyan",
+    "teal", "green", "light_green", "lime",
+    "yellow", "lemon", "orange", "deep_orange"
 };
+
+QString legacyColorsFileName()
+{
+    return ":/skin/legacy_colors.json";
+}
 
 QString basicColorsFileName()
 {
+    if (auto path = QString::fromUtf8(ini().basicColorsJson); !path.isEmpty())
+        return path;
+
     return ":/skin/basic_colors.json";
+}
+
+QString derivedColorsFileName()
+{
+    return ":/skin/derived_colors.json";
 }
 
 QString skinColorsFileName()
@@ -68,43 +81,74 @@ void initializeThemeSpecificColors(QJsonObject* object)
         object->insert(color, QString("%1.%2").arg(theme, color));
 }
 
-QJsonObject generatedAbsoluteColors(const ColorTree& tree)
+QJsonObject generatedColorScheme(const ColorTree& basicColors)
 {
-    QJsonObject result;
-    auto colors = tree.getRootColors();
+    const auto kBrandStep = 0.03;
+    const auto kBrandBackground = 0.15;
 
-    for (int i = 0; i < 18; ++i)
-    {
-        auto dark = colors[QString("dark%1").arg(i + 1)];
-        auto light = colors[QString("light%1").arg(i + 1)];
-
-        // Some unit tests don't have dark&light colors in the color scheme.
-        if (!dark.isValid() || !light.isValid())
-            continue;
-
-        // Original colors that could be used for Widgets that should always display light text.
-        result.insert(QString("@dark%1").arg(i + 1), dark.name());
-        result.insert(QString("@light%1").arg(i + 1), light.name());
-
-        if (ini().invertColors)
-            qSwap(dark, light);
-
-        result.insert(QString("dark%1").arg(i + 1), dark.name());
-        result.insert(QString("light%1").arg(i + 1), light.name());
-    }
-
-    return result;
-}
-
-QJsonObject generatedColorScheme()
-{
-    const auto kBrandStep = 0.05;
+    const auto kColorStep = 0.03;
+    const auto kColorBackground = 0.15;
 
     QJsonObject result;
-    // TODO: Fill @dark and @light color values for the standard themes.
 
-    auto primary = parseColor(ini().primaryColor);
-    auto background = parseColor(ini().backgroundColor);
+    QString colorTheme = ini().colorTheme;
+    auto primary =
+        [&]() -> QColor
+        {
+            if (colorTheme == "cms_colors")
+                return parseColor(nx::branding::brandColor());
+
+            if (colorTheme == "generated" || colorTheme == "rainbow")
+                return parseColor(ini().primaryColor);
+
+            auto themeName = colorTheme;
+            if (colorTheme == "cms_name")
+                themeName = nx::branding::colorTheme();
+
+            if (themeName == "dark_green")
+                return "#a5ce39";
+
+            if (themeName == "dark_orange")
+                return "#ff6c00";
+
+            if (themeName == "gray_orange")
+                return "#ff6c00";
+
+            if (themeName == "gray_white")
+                return "#ffffff";
+
+            // Default: dark_blue.
+            return "#2fa2db";
+        }();
+
+    auto background =
+        [&]() -> QColor
+        {
+            if (colorTheme == "cms_colors")
+                return parseColor(nx::branding::brandBgColor());
+
+            if (colorTheme == "generated" || colorTheme == "rainbow")
+                return parseColor(ini().backgroundColor);
+
+            auto themeName = colorTheme;
+            if (colorTheme == "cms_name")
+                themeName = nx::branding::colorTheme();
+
+            if (themeName == "dark_green")
+                return "#2fa2db";
+
+            if (themeName == "dark_orange")
+                return "#2fa2db";
+
+            if (themeName == "gray_orange")
+                return "#ffffff";
+
+            if (themeName == "gray_white")
+                return "#ffffff";
+
+            // Default: dark_blue.
+            return "#2fa2db";
+        }();
 
     if (!primary.isValid())
         return result;
@@ -116,18 +160,41 @@ QJsonObject generatedColorScheme()
     auto brand_core = QColor::fromHslF(pH, pS, pL);
     auto brand_dark = QColor::fromHslF(pH, pS, pL - kBrandStep);
     auto brand_light = QColor::fromHslF(pH, pS, pL + kBrandStep);
+    auto brand_bg = QColor::fromHslF(pH, pS, kBrandBackground);
 
+    result.insert("brand", brand_core.name());
     result.insert("brand_core", brand_core.name());
+    result.insert("brand_d", brand_dark.name());
+    result.insert("brand_l", brand_light.name());
     for (int i = 1; i <= 7; ++i)
         result.insert(QString("brand_d%1").arg(i), brand_dark.name());
     for (int i = 1; i <= 4; ++i)
         result.insert(QString("brand_l%1").arg(i), brand_light.name());
+    result.insert("brand_bg", brand_bg.name());
+
+    auto colors = basicColors.getRootColors();
+    for (const auto& colorName: kThemeSpecificColors)
+    {
+        auto color = colors[colorName];
+        if (!NX_ASSERT(color.isValid()))
+            ;
+
+        const auto cH = color.hslHueF();
+        const auto cS = color.hslSaturationF();
+        const auto cL = color.lightnessF();
+
+        result.insert(colorName + "_d", QColor::fromHslF(cH, cS, cL - kColorStep).name());
+        result.insert(colorName + "_l", QColor::fromHslF(cH, cS, cL + kColorStep).name());
+        result.insert(colorName + "_bg", QColor::fromHslF(cH, cS, kColorBackground).name());
+    }
 
     const auto bH = background.isValid() ? background.hslHueF() : pH;
-    const auto bS = qBound(0., ini().backgroundSaturation, 1.);
+    const auto bS = background.isValid()
+        ? (background.hslSaturation() == 0 ? 0 : 0.15)
+        : (pS == 0 ? 0 : 0.15);
 
-    const auto darkStep = qBound(0., ini().darkStep, 0.06);
-    const auto lightStep = qBound(0., ini().lightStep, 0.06);
+    const auto darkStep = 0.02; //qBound(0., ini().darkStep, 0.06);
+    const auto lightStep = 0.03; //qBound(0., ini().lightStep, 0.06);
 
     const bool isRainbow = ini().colorTheme == QString("rainbow");
 
@@ -156,12 +223,40 @@ QJsonObject generatedColorScheme()
         result.insert(QString("light%1").arg(i + 1), light.name());
     }
 
-//    QStringList lst;
-//    for (auto it = result.begin(); it != result.end(); ++it)
-//    {
-//        lst << QString("    \"%1\":       \"%2\",").arg(it.key(), it.value().toString());
-//    }
-//    qDebug() << "\n" << lst.join("\n").toStdString().c_str();
+    auto relativeLuminance =
+        [](const QColor& color) -> double
+        {
+            auto map =
+                [](double v) -> double
+                {
+                    return v <= 0.04045
+                        ? v / 12.92
+                        : pow((v + 0.055) / 1.055, 2.4);
+                };
+
+            return 0.2126 * map(color.redF())
+                + 0.7152 * map(color.greenF())
+                + 0.0722 * map(color.blueF());
+        };
+
+    auto contrastRatio =
+        [&](const QColor& a, const QColor& b)
+        {
+            auto l1 = relativeLuminance(a);
+            auto l2 = relativeLuminance(b);
+            if (l1 < l2)
+                std::swap(l1, l2);
+
+            return (l1 + 0.05) / (l2 + 0.05);
+        };
+
+    auto dark1 = QColor::fromRgb(0, 0, 0);
+    auto light1 = QColor::fromRgb(255, 255, 255);
+    result.insert(
+        "brand_contrast",
+        contrastRatio(brand_core, dark1) > contrastRatio(brand_core, light1)
+            ? dark1.name()
+            : light1.name());
 
     return result;
 }
@@ -190,7 +285,11 @@ struct ColorTheme::Private
     QHash<QString, IconCustomization> iconCustomizationByCategory;
 
     /** Initialize color values, color groups and color substitutions. */
-    void loadColors(const QString& mainColorsFile, const QString& skinColorsFile);
+    void loadColors(
+        const QString& legacyColorsFile,
+        const QString& basicColorsFile,
+        const QString& derivedColorsFile,
+        const QString& skinColorsFile);
 
     void initIconCustomizations();
 
@@ -198,36 +297,42 @@ private:
     QJsonObject readColorDataFromFile(const QString& fileName) const;
 };
 
-void ColorTheme::Private::loadColors(const QString& mainColorsFile, const QString& skinColorsFile)
+void ColorTheme::Private::loadColors(
+    const QString& legacyColorsFile,
+    const QString& basicColorsFile,
+    const QString& derivedColorsFile,
+    const QString& skinColorsFile)
 {
     // Load base colors and override them with the actual skin values.
-
     ColorThemeReader reader;
 
-    QJsonObject baseColors = readColorDataFromFile(mainColorsFile);
-    initializeThemeSpecificColors(&baseColors);
-    reader.addColors(baseColors);
+    QJsonObject originalColors = readColorDataFromFile(legacyColorsFile);
+    reader.addColors(originalColors);
 
-    const ColorTree baseColorTree = reader.getColorTree();
+    const ColorTree originalColorTree = reader.getColorTree();
 
-    QJsonObject currentSkinColors = readColorDataFromFile(skinColorsFile);
-    reader.addColors(currentSkinColors);
+    QJsonObject basicColors = readColorDataFromFile(basicColorsFile);
+    initializeThemeSpecificColors(&basicColors);
+
+    reader.addColors(basicColors);
 
     ColorTree actualColorTree = reader.getColorTree();
 
-    const QJsonObject generatedColors =
-        QStringList{"rainbow", "generated"}.contains(ini().colorTheme)
-            ? generatedColorScheme()
-            : generatedAbsoluteColors(actualColorTree);
+    const QJsonObject generatedColors = generatedColorScheme(actualColorTree);
     reader.addColors(generatedColors);
 
-    // That looks a bit strange.
+    QJsonObject derivedColors = readColorDataFromFile(derivedColorsFile);
+    reader.addColors(derivedColors);
+
+    QJsonObject skinColors = readColorDataFromFile(skinColorsFile);
+    reader.addColors(skinColors);
+
     actualColorTree = reader.getColorTree();
 
     colorTree = actualColorTree.toVariantMap();
     colorsByPath = actualColorTree.colorsByPath();
 
-    colorSubstitutions = baseColorTree.rootColorsDelta(actualColorTree);
+    colorSubstitutions = originalColorTree.rootColorsDelta(actualColorTree);
 
     actualColorTree.baseColorGroups(&groups, &colorInfoByColor);
 }
@@ -272,11 +377,18 @@ void ColorTheme::Private::initIconCustomizations()
 // ColorTheme
 
 ColorTheme::ColorTheme(QObject* parent):
-    ColorTheme(basicColorsFileName(), skinColorsFileName())
+    ColorTheme(
+        legacyColorsFileName(),
+        basicColorsFileName(),
+        derivedColorsFileName(),
+        skinColorsFileName())
 {
 }
 
-ColorTheme::ColorTheme(const QString& basicColorsFileName,
+ColorTheme::ColorTheme(
+    const QString& legacyColorsFileName,
+    const QString& basicColorsFileName,
+    const QString& derivedColorsFileName,
     const QString& skinColorsFileName,
     QObject* parent)
     :
@@ -288,7 +400,11 @@ ColorTheme::ColorTheme(const QString& basicColorsFileName,
     else
         s_instance = this;
 
-    d->loadColors(basicColorsFileName, skinColorsFileName);
+    d->loadColors(
+        legacyColorsFileName,
+        basicColorsFileName,
+        derivedColorsFileName,
+        skinColorsFileName);
     d->initIconCustomizations();
 }
 

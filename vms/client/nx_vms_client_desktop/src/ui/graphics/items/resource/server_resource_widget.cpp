@@ -333,7 +333,7 @@ protected:
 
         /* Draw grid */
         {
-            static const QColor kGridColor = core::colorTheme()->color("brand_core", 100);
+            static const QColor kGridColor = core::colorTheme()->color("brand", 100);
 
             QPen grid;
             grid.setColor(kGridColor);

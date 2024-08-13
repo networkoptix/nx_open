@@ -130,7 +130,7 @@ struct LayoutThumbnailLoader::Private
         noSignalText->setProperty(style::Properties::kDontPolishFontProperty, true);
         noSignalText->setContentsMargins(kMinIndicationMargins);
         noSignalText->setFont(font);
-        setPaletteColor(noSignalText, QPalette::WindowText, core::colorTheme()->color("red_core"));
+        setPaletteColor(noSignalText, QPalette::WindowText, core::colorTheme()->color("red"));
         offlineWidgetLayout->addWidget(noSignalText, 1, Qt::AlignHCenter);
 
         auto noExportPermissionLayout = new QVBoxLayout(noExportPermissionWidget.get());
@@ -146,14 +146,14 @@ struct LayoutThumbnailLoader::Private
         noExportPermissionText->setFont(font);
         setPaletteColor(noExportPermissionText,
             QPalette::WindowText,
-            core::colorTheme()->color("red_core"));
+            core::colorTheme()->color("red"));
         noExportPermissionLayout->addWidget(noExportPermissionText, 1, Qt::AlignHCenter);
 
         nonCameraWidget->setText(tr("NOT A CAMERA"));
         nonCameraWidget->setProperty(style::Properties::kDontPolishFontProperty, true);
         nonCameraWidget->setContentsMargins(kMinIndicationMargins);
         setPaletteColor(nonCameraWidget.data(), QPalette::WindowText,
-            core::colorTheme()->color("red_core"));
+            core::colorTheme()->color("red"));
         nonCameraWidget->setFont(font);
     }
 

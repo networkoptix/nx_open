@@ -115,7 +115,7 @@ void QnBusinessRuleItemDelegate::initStyleOption(QStyleOptionViewItem* option,
         if (auto vopt = qstyleoption_cast<QStyleOptionViewItem*>(option))
             vopt->state &= ~QStyle::State_Enabled;
 
-        option->palette.setColor(QPalette::Highlight, colorTheme()->color("brand_core", 77));
+        option->palette.setColor(QPalette::Highlight, colorTheme()->color("brand", 77));
     }
     else if (!index.data(Qn::ValidRole).toBool())
     {
@@ -123,7 +123,7 @@ void QnBusinessRuleItemDelegate::initStyleOption(QStyleOptionViewItem* option,
         option->palette.setColor(QPalette::Midlight, toTransparent(
             option->palette.color(QPalette::Midlight), kErrorHoverOpacity));
 
-        option->palette.setColor(QPalette::Highlight, colorTheme()->color("brand_core", 77));
+        option->palette.setColor(QPalette::Highlight, colorTheme()->color("brand", 77));
     }
 }
 
@@ -135,7 +135,7 @@ void QnBusinessRuleItemDelegate::paint(
     if (!option.state.testFlag(QStyle::State_Selected))
     {
         if (!index.data(Qn::DisabledRole).toBool() && !index.data(Qn::ValidRole).toBool())
-            painter->fillRect(option.rect, nx::vms::client::core::colorTheme()->color("red_core", 77));
+            painter->fillRect(option.rect, nx::vms::client::core::colorTheme()->color("red", 77));
     }
 
     base_type::paint(painter, option, index);

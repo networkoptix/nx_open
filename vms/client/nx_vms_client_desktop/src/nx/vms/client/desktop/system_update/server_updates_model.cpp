@@ -105,9 +105,9 @@ QVariant ServerUpdatesModel::data(const QModelIndex& index, int role) const
                     return core::colorTheme()->color("dark11");
 
                 if (m_targetVersion.isNull() ||  m_targetVersion <= item->version)
-                    return core::colorTheme()->color("green_l2");
+                    return core::colorTheme()->color("green");
 
-                return core::colorTheme()->color("yellow_core");
+                return core::colorTheme()->color("yellow");
             }
             else if (column == NameColumn && item->offline)
             {

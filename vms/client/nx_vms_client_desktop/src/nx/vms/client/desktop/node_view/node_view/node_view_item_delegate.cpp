@@ -58,7 +58,7 @@ namespace {
         if (progress < 0)
             return;
 
-        static const QColor kChartColor = core::colorTheme()->color("brand_d3");
+        static const QColor kChartColor = core::colorTheme()->color("brand");
 
         const QnScopedPainterPenRollback penRollback(painter, kChartColor);
         const QnScopedPainterBrushRollback brushRollback(painter, kChartColor);

@@ -78,7 +78,7 @@ static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubst
     {QIcon::Normal, {{klight10Color, "light10"}, {kLight16Color, "light16"}}},
     {QIcon::Active, {{klight10Color, "light11"}, {kLight16Color, "light17"}}},
     {QIcon::Selected, {{klight10Color, "light9"}}},
-    {QnIcon::Error, {{klight10Color, "red_l2"}}},
+    {QnIcon::Error, {{klight10Color, "red"}}},
 };
 
 static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kLight12Theme = {

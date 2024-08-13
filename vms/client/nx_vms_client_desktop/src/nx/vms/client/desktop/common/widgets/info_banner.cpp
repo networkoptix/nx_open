@@ -54,11 +54,11 @@ void InfoBanner::setWarningStyleInternal(bool value)
     )css";
 
     const QColor bgColor = value
-        ? toTransparent(core::colorTheme()->color("red_l2"), 0.2)
+        ? toTransparent(core::colorTheme()->color("red"), 0.2)
         : core::colorTheme()->color("dark10");
 
     const QColor textColor = value
-        ? core::colorTheme()->color("red_l2")
+        ? core::colorTheme()->color("red")
         : core::colorTheme()->color("light10");
 
     const QString styleSheet = kStyleSheetTemplate.arg(

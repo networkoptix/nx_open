@@ -148,7 +148,7 @@ void QnGridItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWid
     );
 
     /* Draw! */
-    const QPen pen(core::colorTheme()->color("brand_d7"), m_lineWidth);
+    const QPen pen(core::colorTheme()->color("brand"), m_lineWidth);
     QnScopedPainterPenRollback penRollback(painter, pen);
     QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true);
     QPointF topLeft = mapper()->mapFromGrid(gridRect.topLeft()) - QPointF(mapper()->spacing() / 2, mapper()->spacing() / 2);

@@ -90,8 +90,8 @@ void QnSignInfo::paintEvent(QPaintEvent*)
     using namespace nx::vms::client::core;
     if (finished)
         m_signHelper.setSignOpacity(opacity, signIsMatched
-            ? colorTheme()->color("green_core")
-            : colorTheme()->color("red_core"));
+            ? colorTheme()->color("green")
+            : colorTheme()->color("red"));
     m_signHelper.draw(painter, QSize(width(), height()), m_DrawDetailText);
 
     QString text = tr("Analyzing: %1%").arg(m_progress);
@@ -100,19 +100,19 @@ void QnSignInfo::paintEvent(QPaintEvent*)
         if (signFromFrame.isEmpty())
         {
             painter.setPen(
-                colorTheme()->color("red_core"));
+                colorTheme()->color("red"));
             text = tr("Watermark Not Found");
         }
         else if (signIsMatched)
         {
             painter.setPen(
-                colorTheme()->color("green_core"));
+                colorTheme()->color("green"));
             text = tr("Watermark Matched");
         }
         else
         {
             painter.setPen(
-                colorTheme()->color("red_core"));
+                colorTheme()->color("red"));
             text = tr("Invalid watermark");
         }
     }

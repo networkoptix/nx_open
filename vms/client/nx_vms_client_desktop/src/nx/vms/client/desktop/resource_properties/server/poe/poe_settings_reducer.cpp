@@ -55,7 +55,7 @@ ViewNodeData poweringStatusData(const NetworkPortState& port)
         case PoweringStatus::powered:
             builder.withText(PoeSettingsColumn::status, PoeSettingsTableView::tr("Powered"));
             builder.withData(PoeSettingsColumn::status, Qt::ForegroundRole,
-                core::colorTheme()->color("green_core"));
+                core::colorTheme()->color("green"));
             break;
         default:
             NX_ASSERT(false, "Unexpected network port powering status!");
@@ -239,7 +239,7 @@ node_view::details::NodeViewStatePatch PoeSettingsReducer::totalsDataChangesPatc
         consumption, data.upperPowerLimitWatts);
 
     const auto color = consumption > data.upperPowerLimitWatts
-        ? core::colorTheme()->color("red_l2")
+        ? core::colorTheme()->color("red")
         : core::colorTheme()->color("light4");
 
     const auto nodeData = ViewNodeDataBuilder()

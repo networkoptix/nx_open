@@ -174,7 +174,7 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
         if (option.state.testFlag(State_Error))
         {
             // Use error text color.
-            mainColor = core::colorTheme()->color("red_l2");
+            mainColor = core::colorTheme()->color("red");
             iconMode = QnIcon::Error;
         }
         else
