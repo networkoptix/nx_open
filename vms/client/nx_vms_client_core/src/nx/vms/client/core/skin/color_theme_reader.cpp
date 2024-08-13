@@ -26,6 +26,8 @@ void sortColorsInGroups(ColorTree::ColorGroups* groups)
     }
 }
 
+const static QStringList kColorSuffixes = {"_l", "_d", "_bg", "_core"};
+
 } // namespace
 
 // ColorThemeReader ===============================================================================
@@ -400,7 +402,7 @@ ColorTree::ColorGroups ColorTree::createBaseColorGroups() const
 {
     ColorGroups result;
 
-    const QRegularExpression groupNameRe("([^_\\d]+)");
+    const QRegularExpression groupNameRe("([^\\d]+)");
 
     const QMap<QString, QColor> rootColors = getRootColors();
     for (auto it = rootColors.begin(); it != rootColors.end(); ++it)
@@ -410,7 +412,13 @@ ColorTree::ColorGroups ColorTree::createBaseColorGroups() const
 
         if (auto groupNameMatch = groupNameRe.match(colorName); groupNameMatch.hasMatch())
         {
-            const QString groupName = groupNameMatch.captured(0);
+            QString groupName = groupNameMatch.captured(0);
+            for (const auto& suffix: kColorSuffixes)
+            {
+                if (groupName.endsWith(suffix))
+                    groupName.chop(suffix.size());
+            }
+
             auto& group = result[groupName];
             group.append(color);
         }
