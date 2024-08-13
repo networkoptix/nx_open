@@ -172,6 +172,7 @@ struct ExtendedType: public NamedItem
 {
     /**%apidoc[opt] */
     QString icon; //< internal id or empty.
+    /**%apidoc[opt] */
     std::optional<QString> base;
     /**%apidoc[opt] */
     std::vector<QString> omittedBaseAttributes;
