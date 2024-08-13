@@ -67,6 +67,7 @@ struct CloudSystemConnectData
 {
     QString systemId;
     std::optional<ConnectScenario> connectScenario;
+    bool useCache = true;
 };
 
 } // namespace nx::vms::client::desktop
