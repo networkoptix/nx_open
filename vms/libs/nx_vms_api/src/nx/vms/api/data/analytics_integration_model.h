@@ -61,16 +61,6 @@ struct NX_VMS_API IntegrationModel
      * Integration type (whether the integration is an SDK or API one).
      */
     IntegrationType type = IntegrationType::sdk;
-
-    IntegrationModel() = default;
-    explicit IntegrationModel(AnalyticsPluginData data);
-
-    using DbReadTypes = std::tuple<AnalyticsPluginData, ResourceParamWithRefData>;
-    using DbListTypes = std::tuple<AnalyticsPluginDataList, ResourceParamWithRefDataList>;
-    using DbUpdateTypes = std::tuple<AnalyticsPluginData>;
-
-    DbUpdateTypes toDbTypes() &&;
-    static std::vector<IntegrationModel> fromDbTypes(DbListTypes data);
 };
 #define nx_vms_api_analytics_IntegrationModel_Fields \
     (id)(integrationId)(name)(description)(version)(vendor)(type)

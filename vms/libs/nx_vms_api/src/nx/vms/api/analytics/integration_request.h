@@ -3,6 +3,7 @@
 #pragma once
 
 #include <chrono>
+#include <optional>
 
 #include <QtCore/QJsonValue>
 #include <QtCore/QString>
@@ -109,11 +110,14 @@ struct NX_VMS_API IntegrationRequestData: public RegisterIntegrationRequest
     /**%apidoc Whether the request is approved or not. */
     bool isApproved = false;
 
+     /**%apidoc Integration id. Set when the Integration request is approved. */
+    std::optional<nx::Uuid> integrationId;
+
     bool operator==(const IntegrationRequestData& other) const = default;
 };
 #define nx_vms_api_analytics_IntegrationRequestData_Fields \
     nx_vms_api_analytics_RegisterIntegrationRequest_Fields \
-    (timestampMs)(requestAddress)(isApproved)
+    (timestampMs)(requestAddress)(isApproved)(integrationId)
 QN_FUSION_DECLARE_FUNCTIONS(
     IntegrationRequestData, (json), NX_VMS_API);
 NX_REFLECTION_INSTRUMENT(
