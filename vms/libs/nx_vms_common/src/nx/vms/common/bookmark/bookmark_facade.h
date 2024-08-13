@@ -55,21 +55,14 @@ struct BookmarkFacadeBase: protected BookmarkFacadeStrings
 template<typename Bookmark>
 struct BookmarkFacade: public BookmarkFacadeBase<Bookmark>
 {
-    static auto id(const Bookmark& bookmark)
-    {
-        return bookmark.id;
-    }
+    static auto id(const Bookmark& bookmark) { return bookmark.id; }
+    static auto tags(const Bookmark& bookmark) { return bookmark.tags; }
+    static auto deviceId(const Bookmark& bookmark) { return bookmark.deviceId; }
+    static auto creatorUserId(const Bookmark& bookmark) { return bookmark.creatorUserId; }
 
     static std::chrono::milliseconds creationTimeMs(const Bookmark& bookmark)
     {
-        return bookmark.creationTimeMs
-            ? *bookmark.creationTimeMs
-            : bookmark.startTimeMs;
-    }
-
-    static std::set<QString> tags(const Bookmark& bookmark)
-    {
-        return bookmark.tags;
+        return bookmark.creationTimeMs ? *bookmark.creationTimeMs : bookmark.startTimeMs;
     }
 
     static QString creatorName(const Bookmark& bookmark, QnResourcePool* pool)
@@ -91,15 +84,10 @@ template<>
 struct NX_VMS_COMMON_API BookmarkFacade<QnCameraBookmark>:
     public BookmarkFacadeBase<QnCameraBookmark>
 {
-    static auto id(const Type& bookmark)
-    {
-        return bookmark.guid;
-    }
-
-    static auto creationTimeMs(const Type& bookmark)
-    {
-        return bookmark.creationTimeStampMs;
-    }
+    static auto id(const Type& bookmark) { return bookmark.guid; }
+    static auto creationTimeMs(const Type& bookmark) { return bookmark.creationTimeStampMs; }
+    static auto deviceId(const Type& bookmark) { return bookmark.cameraId; }
+    static auto creatorUserId(const Type& bookmark) { return bookmark.creatorId; }
 
     static auto tags(const Type& bookmark)
     {

@@ -76,6 +76,15 @@ std::function<bool(const Bookmark&, const Bookmark&)>
                 {
                     return BookmarkFacade<Bookmark>::cameraName(bookmark, resourcePool);
                 });
+
+        case BookmarkSortField::id:
+            return createSortPredicate<Bookmark>(ascending, &BookmarkFacade<Bookmark>::id);
+
+        case BookmarkSortField::deviceId:
+            return createSortPredicate<Bookmark>(ascending, &BookmarkFacade<Bookmark>::deviceId);
+
+        case BookmarkSortField::creatorUserId:
+            return createSortPredicate<Bookmark>(ascending, &BookmarkFacade<Bookmark>::creatorUserId);
     }
 
     NX_ASSERT(false, "Invalid bookmark sort field: '%1'", sortField);
