@@ -544,7 +544,7 @@ Item
                 + " and allows you to assign permissions for specific resources.") + "<br>"
                 + qsTr("If you select a permission that depends on another permission both "
                 + "permissions will be granted automatically.")
-            helpTopic: HelpTopic.UserSettings_Permissions
+            helpTopic: HelpTopic.UserRoles
         }
 
         Text

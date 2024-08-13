@@ -567,7 +567,7 @@ void QnMainWindowTitleBarWidget::initMultiSystemTabBar()
     d->systemLayout->addWidget(newVLine("dark8", "dark6"));
     d->systemLayout->addWidget(newActionButton(
         action::EffectiveMaximizeAction,
-        HelpTopic::Id::MainWindow_Fullscreen,
+        HelpTopic::Id::LaunchingAndClosing,
         kControlButtonSize));
     d->systemLayout->addWidget(newVLine("dark8", "dark6"));
     {
@@ -656,7 +656,7 @@ void QnMainWindowTitleBarWidget::initLayoutsOnlyTabBar()
     layout->addWidget(newVLine("dark8", "dark6"));
     layout->addWidget(newActionButton(
         action::EffectiveMaximizeAction,
-        HelpTopic::Id::MainWindow_Fullscreen,
+        HelpTopic::Id::LaunchingAndClosing,
         kControlButtonSize));
     layout->addWidget(newVLine("dark8", "dark6"));
     {

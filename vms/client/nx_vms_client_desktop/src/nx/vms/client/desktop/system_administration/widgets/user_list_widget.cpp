@@ -606,7 +606,7 @@ void UserListWidget::Private::setupUi()
                 deleteUsers({user});
         });
 
-    setHelpTopic(q, HelpTopic::Id::SystemSettings_UserManagement);
+    setHelpTopic(q, HelpTopic::Id::MainWindow_Tree_Users);
 
     // Cursor changes with hover:
     connect(hoverTracker, &ItemViewHoverTracker::itemEnter, this,
