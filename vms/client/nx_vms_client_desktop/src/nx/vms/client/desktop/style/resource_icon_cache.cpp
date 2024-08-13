@@ -79,7 +79,7 @@ NX_DECLARE_COLORIZED_ICON(kCameraWarningIcon, "20x20/Solid/camera_warning.svg",\
 NX_DECLARE_COLORIZED_ICON(kCameraOfflineIcon, "20x20/Solid/camera_offline.svg",\
     kTreeThemeOfflineSubstitutions)
 NX_DECLARE_COLORIZED_ICON(kCameraUnauthorizedIcon, "20x20/Solid/camera_unauthorized.svg",\
-    kTreeThemeSubstitutions)
+    kTreeThemeOfflineSubstitutions)
 NX_DECLARE_COLORIZED_ICON(kCameraIcon, "20x20/Solid/camera.svg",\
     kTreeThemeSubstitutions)
 NX_DECLARE_COLORIZED_ICON(kCamerasIcon, "20x20/Solid/cameras.svg",\
@@ -101,7 +101,7 @@ NX_DECLARE_COLORIZED_ICON(kClientIcon, "20x20/Solid/client.svg",\
     kTreeThemeSubstitutions)
 
 NX_DECLARE_COLORIZED_ICON(kSystemCloudUnauthIcon, "20x20/Solid/system_cloud_unauthorized.svg",\
-    kTreeThemeSubstitutions)
+    kTreeThemeOfflineSubstitutions)
 NX_DECLARE_COLORIZED_ICON(kSystemCloudOfflineIcon, "20x20/Solid/system_cloud_offline.svg",\
     kTreeThemeOfflineSubstitutions)
 NX_DECLARE_COLORIZED_ICON(kSystemCloudWarningIcon, "20x20/Solid/system_cloud_warning.svg",\
@@ -129,7 +129,7 @@ NX_DECLARE_COLORIZED_ICON(kIntegrationsIcon, "20x20/Solid/integrations.svg",\
 NX_DECLARE_COLORIZED_ICON(kIOOfflineIcon, "20x20/Solid/io_offline.svg",\
     kTreeThemeOfflineSubstitutions)
 NX_DECLARE_COLORIZED_ICON(kIOUnauthorizedIcon, "20x20/Solid/io_unauthorized.svg",\
-    kTreeThemeSubstitutions)
+    kTreeThemeOfflineSubstitutions)
 NX_DECLARE_COLORIZED_ICON(kIOIcon, "20x20/Solid/io.svg",\
     kTreeThemeSubstitutions)
 NX_DECLARE_COLORIZED_ICON(kIONotificationIcon, "20x20/Outline/io.svg",\
@@ -196,7 +196,7 @@ NX_DECLARE_COLORIZED_ICON(kServerCurrentIcon, "20x20/Solid/server_current.svg",\
 NX_DECLARE_COLORIZED_ICON(kServerIncompatibleIcon, "20x20/Solid/server_incompatible.svg",\
     kTreeThemeSubstitutions)
 NX_DECLARE_COLORIZED_ICON(kServerUnauthorizedIcon, "20x20/Solid/server_unauthorized.svg",\
-    kTreeThemeSubstitutions)
+    kTreeThemeOfflineSubstitutions)
 
 NX_DECLARE_COLORIZED_ICON(kUserIcon, "20x20/Solid/user.svg",\
     kTreeThemeSubstitutions)
