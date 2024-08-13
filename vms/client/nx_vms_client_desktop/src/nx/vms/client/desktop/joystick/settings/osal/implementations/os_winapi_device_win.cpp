@@ -12,11 +12,9 @@ using namespace std::chrono;
 
 namespace {
 
-constexpr milliseconds kDevicePollingInterval = 100ms;
+constexpr int kJoystickMaxErrors = 10;
 
-constexpr int kMaxHidReportSize = 1024;
-
-} // namespace
+}
 
 namespace nx::vms::client::desktop::joystick {
 
@@ -35,6 +33,9 @@ struct OsWinApiDeviceWin::Private
     int minZ, maxZ;
 
     int buttonsNumber = 0;
+    int errorsCounter = 0;
+
+    QMetaObject::Connection pollingConnection;
 };
 
 OsWinApiDeviceWin::OsWinApiDeviceWin(const Device& device, QTimer* pollingTimer):
@@ -73,6 +74,8 @@ void OsWinApiDeviceWin::poll()
         sizeof(hwState),
         reinterpret_cast<LPVOID>(&hwState));
 
+    NX_TRACE(this, "Polling joystick device...");
+
     State state{
         .isAxisXInitialized = d->isAxisXInitialized,
         .isAxisYInitialized = d->isAxisYInitialized,
@@ -89,11 +92,20 @@ void OsWinApiDeviceWin::poll()
     if (status != DI_OK)
     {
         NX_WARNING(this, "Failed to get device state");
-        // TODO: emit failed();
-        emit stateChanged(state);
+
+        if (++d->errorsCounter > kJoystickMaxErrors)
+        {
+            NX_ERROR(this, "Too many errors, stopping polling");
+
+            disconnect(d->pollingTimer, &QTimer::timeout, this, &OsWinApiDeviceWin::poll);
+        }
+
+        emit failed();
 
         return;
     }
+
+    d->errorsCounter = 0;
 
     state.x = hwState.lX;
     state.y = hwState.lY;

@@ -7,6 +7,7 @@
 #include <nx/utils/log/log_main.h>
 
 #include "descriptors.h"
+#include "manager.h"
 
 namespace nx::vms::client::desktop::joystick {
 
@@ -15,9 +16,9 @@ DeviceWindows::DeviceWindows(
     const JoystickDescriptor& modelInfo,
     const QString& path,
     QTimer* pollTimer,
-    QObject* parent)
+    Manager* manager)
     :
-    base_type(modelInfo, path, pollTimer, parent),
+    base_type(modelInfo, path, pollTimer, manager),
     m_inputDevice(inputDevice)
 {
     if (!NX_ASSERT(m_inputDevice))

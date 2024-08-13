@@ -5,8 +5,10 @@
 #include <QtCore/QTimer>
 
 #include <nx/utils/log/assert.h>
+#include <nx/utils/log/log.h>
 
 #include "descriptors.h"
+#include "manager.h"
 
 namespace nx::vms::client::desktop::joystick {
 
@@ -14,9 +16,10 @@ Device::Device(
     const JoystickDescriptor& modelInfo,
     const QString& path,
     QTimer* pollTimer,
-    QObject* parent)
+    Manager* manager)
     :
-    QObject(parent),
+    QObject(manager),
+    m_manager(manager),
     m_id(modelInfo.id),
     m_modelName(modelInfo.model),
     m_path(path),
@@ -136,6 +139,8 @@ void Device::processNewState(const State& newState)
 
 void Device::pollData()
 {
+    NX_TRACE(this, "Polling joystick device...");
+
     const auto newState = getNewState();
 
     if (newState.buttonStates.empty())

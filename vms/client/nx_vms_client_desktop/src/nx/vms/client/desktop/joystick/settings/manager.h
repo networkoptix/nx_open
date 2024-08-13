@@ -69,6 +69,8 @@ public:
      */
     void setDeviceActionsEnabled(bool enabled);
 
+    bool isActive() const;
+
 protected:
     virtual void updateSearchState();
 

@@ -5,6 +5,7 @@
 #include <fcntl.h>
 
 #include <QtCore/QDir>
+#include <QtGui/QGuiApplication>
 
 #include <linux/joystick.h>
 #include <nx/utils/log/log_main.h>
@@ -43,11 +44,30 @@ ManagerLinux::ManagerLinux(QObject* parent):
     m_enumerateTimer.setInterval(kEnumerationInterval);
     m_enumerateTimer.start();
 
+    connect(qApp, &QGuiApplication::applicationStateChanged,
+        [this](Qt::ApplicationState state)
+        {
+            if (state == Qt::ApplicationActive)
+            {
+                NX_DEBUG(this, "Application became active. Resuming the joystick driver.");
+
+                m_enumerateTimer.start();
+            }
+            else
+            {
+                NX_DEBUG(this, "Application became inactive. Halting the joystick driver.");
+
+                m_enumerateTimer.stop();
+            }
+        });
+
     NX_VERBOSE(this, "Known joystick configs:\n%1", getConfigsDebugInfo(getKnownJoystickConfigs()));
 }
 
 void ManagerLinux::enumerateDevices()
 {
+    NX_TRACE(this, "Joystick enumeration started.");
+
     NX_MUTEX_LOCKER lock(&m_mutex);
     QSet<QString> foundDevices;
 
@@ -92,7 +112,7 @@ void ManagerLinux::enumerateDevices()
         }
 
         const auto config = createDeviceDescription(findDeviceModel(modelAndManufacturer));
-        DeviceLinux* deviceLinux = new DeviceLinux(config, path, pollTimer());
+        DeviceLinux* deviceLinux = new DeviceLinux(config, path, pollTimer(), this);
         DevicePtr device(deviceLinux);
         deviceLinux->setFoundControlsNumber(axesNumber, buttonsNumber);
 
@@ -103,6 +123,8 @@ void ManagerLinux::enumerateDevices()
     }
 
     removeUnpluggedJoysticks(foundDevices);
+
+    NX_TRACE(this, "Joystick enumeration finished.");
 }
 
 QString ManagerLinux::findDeviceModel(const QString& modelAndManufacturer) const

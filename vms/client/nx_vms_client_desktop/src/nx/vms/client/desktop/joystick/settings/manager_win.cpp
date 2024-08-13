@@ -4,7 +4,6 @@
 
 #include <libloaderapi.h>
 
-#include <QtCore/QDir>
 #include <QtCore/QElapsedTimer>
 
 #include <nx/utils/log/log_main.h>
@@ -133,7 +132,7 @@ DeviceWindowsPtr ManagerWindows::createDevice(
     }
 
     auto device = QSharedPointer<DeviceWindows>(
-        new DeviceWindows(directInputDeviceObject, deviceConfig, path, pollTimer()));
+        new DeviceWindows(directInputDeviceObject, deviceConfig, path, pollTimer(), this));
     connect(device.data(), &Device::failed, this, [this, path] { onDeviceFailed(path); });
     d->intitializingDevices[path] = device;
 

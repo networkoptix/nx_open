@@ -13,6 +13,7 @@ namespace nx::vms::client::desktop::joystick {
 
 struct JoystickDescriptor;
 struct AxisDescriptor;
+class Manager;
 
 class Device: public QObject
 {
@@ -59,7 +60,7 @@ public:
         const JoystickDescriptor& modelInfo,
         const QString& path,
         QTimer* pollTimer,
-        QObject* parent = 0);
+        Manager* manager = nullptr);
 
     /** Destructor. */
     virtual ~Device();
@@ -85,7 +86,7 @@ public:
 
     StickPosition currentStickPosition() const;
 
-    /* Set sticks to zero-point and buttons to released state. */
+    /** Set sticks to zero-point and buttons to released state. **/
     void resetState();
 
 signals:
@@ -124,6 +125,7 @@ protected:
     void setInitializedButtonsNumber(int number);
 
 protected:
+    Manager* m_manager;
     QString m_id;
     QString m_modelName;
     QString m_path;

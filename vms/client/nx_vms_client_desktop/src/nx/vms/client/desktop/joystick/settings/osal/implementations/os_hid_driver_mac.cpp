@@ -41,7 +41,7 @@ static JoystickDeviceInfo loadDeviceInfo(hid_device_info* dev)
         };
 }
 
-struct OsHidDriverMac::Private
+struct OsHidDriver::Private
 {
     QTimer* pollingTimer = nullptr;
     QMap<QString, OsHidDevice*> devices;
@@ -63,7 +63,7 @@ struct OsHidDriverMac::Private
     QSet<QString> deviceKeys() const
     {
         auto keys = devices.keys();
-        return QSet<QString>(keys.begin(), keys.end());
+        return {keys.begin(), keys.end()};
     }
 
     void processRealDeviceDetection(const JoystickDeviceInfo& deviceInfo, bool& devicesChanged)
@@ -148,18 +148,18 @@ struct OsHidDriverMac::Private
     }
 };
 
-OsHidDriverMac::OsHidDriverMac():
+OsHidDriver::OsHidDriver():
     d(new Private())
 {
     hid_init();
 
     d->pollingTimer = new QTimer(this);
     d->pollingTimer->setInterval(kEnumerationInterval);
-    connect(d->pollingTimer, &QTimer::timeout, this, &OsHidDriverMac::enumerateDevices);
+    connect(d->pollingTimer, &QTimer::timeout, this, &OsHidDriver::enumerateDevices);
     d->pollingTimer->start();
 }
 
-OsHidDriverMac::~OsHidDriverMac()
+OsHidDriver::~OsHidDriver()
 {
     delete d->pollingTimer;
 
@@ -195,8 +195,10 @@ struct HidDeviceInfoScopedPointerCustomDeleter
 using OsLevelDeviceInfoPtr =
     QScopedPointer<hid_device_info, HidDeviceInfoScopedPointerCustomDeleter>;
 
-void OsHidDriverMac::enumerateDevices()
+void OsHidDriver::enumerateDevices()
 {
+    NX_TRACE(this, "Joystick enumeration started.");
+
     bool devicesChanged = false;
     OsLevelDeviceInfoPtr osLevelDeviceInfos(hid_enumerate(/*vendorId*/ 0x0, /*productId*/ 0x0));
 
@@ -275,7 +277,7 @@ void OsHidDriverMac::enumerateDevices()
         if (isDeviceVirtual)
             d->virtualDevices.remove(devicePath);
 
-        NX_DEBUG(this, "HID device disappeared: %1 %2 (%3)", device->info().manufacturerName,
+        NX_DEBUG(this, "HID device disappeared: %1 %2 \n(%3)", device->info().manufacturerName,
             device->info().modelName, device->info().path);
 
         if (!isDeviceVirtual)
@@ -289,14 +291,16 @@ void OsHidDriverMac::enumerateDevices()
 
     if (devicesChanged)
         emit deviceListChanged();
+
+    NX_TRACE(this, "Joystick enumeration finished.");
 }
 
-QList<JoystickDeviceInfo> OsHidDriverMac::deviceList()
+QList<JoystickDeviceInfo> OsHidDriver::deviceList()
 {
     return d->deviceInfos.values();
 }
 
-void OsHidDriverMac::setupDeviceListener(
+void OsHidDriver::setupDeviceListener(
     const QString& path,
     const OsalDeviceListener* listener)
 {
@@ -319,7 +323,7 @@ void OsHidDriverMac::setupDeviceListener(
     }
 }
 
-void OsHidDriverMac::removeDeviceListener(const OsalDeviceListener* listener)
+void OsHidDriver::removeDeviceListener(const OsalDeviceListener* listener)
 {
     for (auto& listeners: d->deviceSubscriptions)
     {
@@ -334,7 +338,23 @@ void OsHidDriverMac::removeDeviceListener(const OsalDeviceListener* listener)
     }
 }
 
-void OsHidDriverMac::attachVirtualDevice(OsHidDevice* device)
+void OsHidDriver::halt()
+{
+    d->pollingTimer->stop();
+
+    for (auto device: d->devices)
+        device->halt();
+}
+
+void OsHidDriver::resume()
+{
+    d->pollingTimer->start();
+
+    for (auto device: d->devices)
+        device->resume();
+}
+
+void OsHidDriver::attachVirtualDevice(OsHidDevice* device)
 {
     const auto devicePath = device->info().path;
 
@@ -342,7 +362,7 @@ void OsHidDriverMac::attachVirtualDevice(OsHidDevice* device)
     d->attachingVirtualDevices.enqueue(device);
 }
 
-void OsHidDriverMac::detachVirtualDevice(OsHidDevice* device)
+void OsHidDriver::detachVirtualDevice(OsHidDevice* device)
 {
     const auto devicePath = device->info().path;
 

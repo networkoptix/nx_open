@@ -2,13 +2,19 @@
 
 #include "os_winapi_driver_worker_win.h"
 
+#include <chrono>
+
 #include <QtCore/QTimer>
 
 #include <nx/utils/log/log.h>
 
 #include "../os_winapi_device_win.h"
 
+using namespace std::chrono;
+
 namespace {
+
+constexpr milliseconds kJoystickPollInterval = 100ms;
 
 QString errorCodeToString(HRESULT code)
 {
@@ -32,10 +38,10 @@ QString errorCodeToString(HRESULT code)
 
 std::pair<QString, QString> getDeviceModelAndGuid(LPDIRECTINPUTDEVICE8 inputDevice)
 {
-    DIDEVICEINSTANCE joystickinfo;
-    joystickinfo.dwSize = sizeof(joystickinfo);
+    DIDEVICEINSTANCE joystickInfo;
+    joystickInfo.dwSize = sizeof(joystickInfo);
 
-    HRESULT status = inputDevice->GetDeviceInfo(&joystickinfo);
+    HRESULT status = inputDevice->GetDeviceInfo(&joystickInfo);
     if (status != DI_OK)
     {
         NX_WARNING(
@@ -44,8 +50,8 @@ std::pair<QString, QString> getDeviceModelAndGuid(LPDIRECTINPUTDEVICE8 inputDevi
         return {};
     }
 
-    const auto modelName = QString::fromWCharArray(joystickinfo.tszProductName);
-    const auto guid = QString("%1").arg(joystickinfo.guidProduct.Data1, 8, 16, QLatin1Char('0'));
+    const auto modelName = QString::fromWCharArray(joystickInfo.tszProductName);
+    const auto guid = QString("%1").arg(joystickInfo.guidProduct.Data1, 8, 16, QLatin1Char('0'));
 
     return {modelName, guid};
 }
@@ -74,7 +80,7 @@ OsWinApiDriver::Worker::Worker(QObject* parent)
     isDirectInputInitialized = true;
 
     devicePollingTimer = new QTimer(this);
-    devicePollingTimer->setInterval(100);
+    devicePollingTimer->setInterval(kJoystickPollInterval);
     devicePollingTimer->start();
 }
 
@@ -85,8 +91,22 @@ OsWinApiDriver::Worker::~Worker()
 
 void OsWinApiDriver::Worker::enumerateDevices()
 {
-    if (!isDirectInputInitialized)
+    NX_TRACE(this, "Enumeration started");
+
+    foundDevices.clear();
+
+    // This is a blocking system call.
+    HRESULT status = directInput->EnumDevices(
+        DI8DEVCLASS_GAMECTRL,
+        (LPDIENUMDEVICESCALLBACK) &Worker::enumerationCallback,
+        this,
+        DIEDFL_ATTACHEDONLY);
+
+    if (status != DI_OK)
+    {
+        NX_WARNING(this, "Enumeration failed with status: %1", errorCodeToString(status));
         return;
+    }
 
     bool isDevicesChanged = false;
 
@@ -98,7 +118,7 @@ void OsWinApiDriver::Worker::enumerateDevices()
             continue;
 
         NX_DEBUG(this, "Detected new joystick with model=%1 id=%2", device.info.modelName,
-            device.info.id);
+                 device.info.id);
 
         devices[device.info.id] = device;
         registerDevice(device);
@@ -135,22 +155,15 @@ void OsWinApiDriver::Worker::enumerateDevices()
     if (isDevicesChanged)
         emit deviceListChanged();
 
-    foundDevices.clear();
-
-    HRESULT status = directInput->EnumDevices(
-        DI8DEVCLASS_GAMECTRL,
-        (LPDIENUMDEVICESCALLBACK) &Worker::enumDevicesCallback,
-        this,
-        DIEDFL_ATTACHEDONLY);
-
-    if (status != DI_OK)
-        NX_WARNING(this, "Set callback on EnumDevices failed");
+    NX_TRACE(this, "Enumeration finished");
 }
 
-bool OsWinApiDriver::Worker::enumDevicesCallback(
+bool OsWinApiDriver::Worker::enumerationCallback(
     LPCDIDEVICEINSTANCE deviceInstance,
     LPVOID workerPtr)
 {
+    NX_TRACE(NX_SCOPE_TAG, "%1 called", __func__);
+
     if (!deviceInstance)
         return DIENUM_STOP;
 
@@ -167,7 +180,7 @@ bool OsWinApiDriver::Worker::enumDevicesCallback(
 
     if (status != DI_OK)
     {
-        NX_WARNING(worker, "CreateDevice failed: %1", errorCodeToString(status));
+        NX_WARNING(worker, "%1: CreateDevice failed: %2", __func__, errorCodeToString(status));
         return DIENUM_CONTINUE;
     }
 
@@ -175,9 +188,7 @@ bool OsWinApiDriver::Worker::enumDevicesCallback(
     if (status != DI_OK)
     {
         inputDevice->Release();
-        NX_WARNING(
-            worker,
-            "Failed to set data format for joystick: %1",
+        NX_WARNING(worker, "%1: Failed to set data format for joystick: %2", __func__,
             errorCodeToString(status));
         return DIENUM_CONTINUE;
     }
@@ -186,9 +197,7 @@ bool OsWinApiDriver::Worker::enumDevicesCallback(
     if (status != DI_OK)
     {
         inputDevice->Release();
-        NX_WARNING(
-            worker,
-            "Failed to acquire access for joystick: %1",
+        NX_WARNING(worker, "%1: Failed to acquire access for joystick: %2", __func__,
             errorCodeToString(status));
         return DIENUM_CONTINUE;
     }
@@ -200,9 +209,7 @@ bool OsWinApiDriver::Worker::enumDevicesCallback(
 
     if (modelName.isEmpty() && guid.isEmpty())
     {
-        NX_VERBOSE(
-            worker,
-            "Empty device model and guid",
+        NX_VERBOSE(worker, "%1: Empty device model and guid", __func__,
             errorCodeToString(status));
 
         inputDevice->Release();
@@ -270,27 +277,43 @@ void OsWinApiDriver::Worker::removeDeviceListener(const OsalDeviceListener* list
 
 void OsWinApiDriver::Worker::registerDevice(const OsWinApiDeviceWin::Device& device)
 {
+    NX_TRACE(this, "Register device with id=%1", device.info.id);
+
     auto osWinApiDevice = new OsWinApiDeviceWin(device, devicePollingTimer);
     osWinApiDevices[device.info.id] = osWinApiDevice;
 
-    if (deviceSubscribers.contains(device.info.id))
+    connect(osWinApiDevice, &OsalDevice::failed, this, &Worker::deviceFailed);
+
+    if (!deviceSubscribers.contains(device.info.id))
+        return;
+
+    for (auto subscription: deviceSubscribers[device.info.id])
     {
-        for (auto subscription: deviceSubscribers[device.info.id])
-        {
-            connect(osWinApiDevice, &OsalDevice::stateChanged,
-                subscription.listener, &OsalDeviceListener::onStateChanged);
-        }
+        connect(osWinApiDevice, &OsalDevice::stateChanged,
+            subscription.listener, &OsalDeviceListener::onStateChanged);
     }
 }
 
 void OsWinApiDriver::Worker::unregisterDeviceById(const QString& deviceId)
 {
+    NX_TRACE(this, "Unregister device with id=%1", deviceId);
+
     const auto osWinApiDevice = osWinApiDevices.take(deviceId);
 
     if (!NX_ASSERT(osWinApiDevice))
         return;
 
     osWinApiDevice->deleteLater();
+}
+
+void OsWinApiDriver::Worker::stopDevicePolling()
+{
+    devicePollingTimer->stop();
+}
+
+void OsWinApiDriver::Worker::startDevicePolling()
+{
+    devicePollingTimer->start();
 }
 
 } // namespace nx::vms::client::desktop::joystick
