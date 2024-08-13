@@ -18,17 +18,74 @@
 namespace nx::vms::api {
 
 // All sorts are preformed manually, not in the SQL database request.
-NX_REFLECTION_ENUM_CLASS(BookmarkSortField,
+enum class BookmarkSortField
+{
     name,
+
+    /**%apidoc
+     * %caption startTimeMs
+     */
     startTime,
+
+    /**%apidoc
+     * %caption durationMs
+     */
     duration,
+
+    /**%apidoc
+     * %caption creationTimeMs
+     */
     creationTime,
+
     creator,
     tags,
     description,
-    cameraName
-)
 
+    /**%apidoc
+     * %caption deviceName
+     */
+    cameraName,
+
+    creatorUserId,
+    deviceId,
+    id,
+};
+template<typename Visitor>
+constexpr auto nxReflectVisitAllEnumItems(BookmarkSortField*, Visitor&& visitor)
+{
+    using Item = nx::reflect::enumeration::Item<BookmarkSortField>;
+    return visitor(
+        Item{BookmarkSortField::name, "name"},
+        Item{BookmarkSortField::startTime, "startTimeMs"},
+        Item{BookmarkSortField::startTime, "startTime"},
+        Item{BookmarkSortField::duration, "durationMs"},
+        Item{BookmarkSortField::duration, "duration"},
+        Item{BookmarkSortField::creationTime, "creationTimeMs"},
+        Item{BookmarkSortField::creationTime, "creationTime"},
+        Item{BookmarkSortField::creator, "creator"},
+        Item{BookmarkSortField::tags, "tags"},
+        Item{BookmarkSortField::description, "description"},
+        Item{BookmarkSortField::cameraName, "deviceName"},
+        Item{BookmarkSortField::cameraName, "cameraName"},
+
+        Item{BookmarkSortField::creatorUserId, "creatorUserId"},
+        Item{BookmarkSortField::deviceId, "deviceId"},
+        Item{BookmarkSortField::id, "id"}
+    );
+}
+
+/**%apidoc
+ * %param[opt]:enum column
+ * %deprecated Use `_orderBy` instead.
+ * %value name
+ * %value startTime
+ * %value duration
+ * %value creationTime
+ * %value creator
+ * %value tags
+ * %value description
+ * %value cameraName
+ */
 struct NX_VMS_API BookmarkFilterBase
 {
     BookmarkFilterBase(nx::vms::api::json::ValueOrArray<QString> deviceId = {}):
@@ -48,10 +105,10 @@ struct NX_VMS_API BookmarkFilterBase
      * limit/2 bookmarks after.
      * To derminate nearest bookmarks start time field is taken into consideration. If there are
      * bookmarks with the same start time then guid field is used to determine the order.
-     * After bookmarks are gathered they are sorted by the specified column.
-     * In case of ascending sorting (whatever the sorting column is) the split point is right after
-     * the specified time point. In case of descending order the split point is right before the
-     * specified time point.
+     * After bookmarks are gathered they are sorted by the specified _orderBy.
+     * In case of ascending sorting (whatever the sorting _orderBy is) the split point is right
+     * after the specified time point. In case of descending order the split point is right before
+     * the specified time point.
      * In addition to the sort filed all returned bookmarks are sorted by the guid field.
      */
     std::optional<std::chrono::milliseconds> centralTimePointMs;
@@ -77,8 +134,11 @@ struct NX_VMS_API BookmarkFilterBase
      */
     Qt::SortOrder order = Qt::AscendingOrder;
 
-    /**%apidoc[opt] Bookmark field used for ordering. */
-    BookmarkSortField column = BookmarkSortField::startTime;
+    /**%apidoc[opt]
+     * Bookmark field used for ordering.
+     * %example startTimeMs
+     */
+    BookmarkSortField _orderBy = BookmarkSortField::startTime;
 
     /**%apidoc[opt] Do not return bookmarks with duration less than this value. */
     std::optional<std::chrono::milliseconds> minVisibleLengthMs;
@@ -91,9 +151,11 @@ struct NX_VMS_API BookmarkFilterBase
 
     /**%apidoc[opt] Maximum creation time of the bookmark (in milliseconds since epoch, or as a string) */
     std::chrono::milliseconds creationEndTimeMs{};
+
+    static DeprecatedFieldNames* getDeprecatedFieldNames();
 };
 #define BookmarkFilterBase_Fields \
-    (startTimeMs)(endTimeMs)(centralTimePointMs)(text)(limit)(order)(column) \
+    (startTimeMs)(endTimeMs)(centralTimePointMs)(text)(limit)(order)(_orderBy) \
     (minVisibleLengthMs)(deviceId)(creationStartTimeMs)(creationEndTimeMs)
 
 struct BookmarkIdV1

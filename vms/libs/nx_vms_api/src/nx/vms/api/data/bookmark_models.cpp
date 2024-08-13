@@ -29,6 +29,14 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(BookmarkV3, (json), BookmarkV3_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(BookmarkWithRuleV3, (json), BookmarkWithRuleV3_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(BookmarkTagFilter, (json), BookmarkTagFilter_Fields)
 
+DeprecatedFieldNames* BookmarkFilterBase::getDeprecatedFieldNames()
+{
+    static DeprecatedFieldNames kDeprecatedFieldNames{
+        {"_orderBy", "column"}, //< Up to v6.0.
+    };
+    return &kDeprecatedFieldNames;
+}
+
 void BookmarkIdV3::setIds(const nx::Uuid& bookmarkId, const nx::Uuid& serverId)
 {
     id = bookmarkId.toSimpleString() + '_' + serverId.toSimpleString();

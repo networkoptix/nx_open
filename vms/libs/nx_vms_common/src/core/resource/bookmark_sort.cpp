@@ -49,13 +49,10 @@ struct BookmarkFacade: BookmarkSort
     static auto description(const Bookmark& bookmark) { return bookmark.description; }
     static auto startTimeMs(const Bookmark& bookmark) { return bookmark.startTimeMs; }
     static auto durationMs(const Bookmark& bookmark) { return bookmark.durationMs; }
-
     static auto creationTimeMs(const Bookmark& bookmark) { return bookmark.creationTimeMs; }
-
-    static const auto& tags(const Bookmark& bookmark)
-    {
-        return bookmark.tags;
-    }
+    static const auto& tags(const Bookmark& bookmark) { return bookmark.tags; }
+    static const auto& deviceId(const Bookmark& bookmark) { return bookmark.deviceId; }
+    static const auto& creatorUserId(const Bookmark& bookmark) { return bookmark.creatorUserId; }
 
     static QString creatorName(const Bookmark& bookmark, QnResourcePool* resourcePool)
     {
@@ -84,6 +81,8 @@ struct BookmarkFacade<QnCameraBookmark>: BookmarkSort
     static auto description(const Bookmark& bookmark) { return bookmark.description; }
     static auto startTimeMs(const Bookmark& bookmark) { return bookmark.startTimeMs; }
     static auto durationMs(const Bookmark& bookmark) { return bookmark.durationMs; }
+    static const auto& deviceId(const Bookmark& bookmark) { return bookmark.cameraId; }
+    static const auto& creatorUserId(const Bookmark& bookmark) { return bookmark.creatorId; }
 
     static auto creationTimeMs(const Bookmark& bookmark)
     {
@@ -163,6 +162,15 @@ std::function<bool(const Bookmark&, const Bookmark&)>
                 {
                     return BookmarkFacade<Bookmark>::cameraName(bookmark, resourcePool);
                 });
+
+        case BookmarkSortField::id:
+            return createSortPredicate<Bookmark>(ascending, &BookmarkFacade<Bookmark>::id);
+
+        case BookmarkSortField::deviceId:
+            return createSortPredicate<Bookmark>(ascending, &BookmarkFacade<Bookmark>::deviceId);
+
+        case BookmarkSortField::creatorUserId:
+            return createSortPredicate<Bookmark>(ascending, &BookmarkFacade<Bookmark>::creatorUserId);
     }
 
     NX_ASSERT(false, "Invalid bookmark sort field: '%1'", sortField);
