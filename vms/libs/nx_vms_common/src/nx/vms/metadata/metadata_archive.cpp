@@ -258,14 +258,14 @@ int64_t MetadataArchive::recordCount() const
 
         QFile indexFile;
         fillFileNames(timePointMs, &indexFile);
+        startTimeMs = maxTime + 1;
         if (!indexFile.open(QIODevice::ReadOnly))
         {
-            NX_WARNING(this, "%1: Failed to open index file %2", __func__, indexFile.fileName());
+            NX_DEBUG(this, "%1: Failed to open index file %2", __func__, indexFile.fileName());
             continue;
         }
 
         result += (indexFile.size() - kMetadataIndexHeaderSize) / kIndexRecordSize;
-        startTimeMs = maxTime + 1;
     }
 
     return result;
