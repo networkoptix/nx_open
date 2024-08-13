@@ -255,19 +255,17 @@ int64_t MetadataArchive::recordCount() const
     while (startTimeMs <= endTimeMs)
     {
         qint64 minTime, maxTime;
-        const auto timePointMs = startTimeMs;
-        dateBounds(timePointMs, minTime, maxTime);
-
+        dateBounds(startTimeMs, minTime, maxTime);
         auto indexFile = MetadataBinaryFileFactory::instance().create();
-        fillFileNames(timePointMs, indexFile.get());
+        fillFileNames(startTimeMs, indexFile.get());
+        startTimeMs = maxTime + 1;
         if (!indexFile->openReadOnly())
         {
-            NX_WARNING(this, "%1: Failed to open index file %2", __func__, indexFile->fileName());
+            NX_DEBUG(this, "%1: Failed to open index file %2", __func__, indexFile->fileName());
             continue;
         }
 
         result += (indexFile->size() - kMetadataIndexHeaderSize) / kIndexRecordSize;
-        startTimeMs = maxTime + 1;
     }
 
     return result;
