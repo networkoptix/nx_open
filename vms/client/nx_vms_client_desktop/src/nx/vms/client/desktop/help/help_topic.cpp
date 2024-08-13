@@ -56,8 +56,6 @@ QString HelpTopic::relativeUrlForTopic(Id topic)
             return "configuring_devices_using_thei.html";
         case Id::CameraSettings_AspectRatio:
             return "setting_camera_aspect_ratio.html";
-        case Id::CameraSettings_Dewarping:
-            return "dewarp-controls.html";
         case Id::CameraSettings_Expert_DisableArchivePrimary:
             return "disabling_recording_of_primary.html";
         case Id::CameraSettings_Expert_Rtp:
@@ -196,8 +194,6 @@ QString HelpTopic::relativeUrlForTopic(Id topic)
             return "getting_context_help.html";
         case Id::MainWindow_DayTimePicker:
             return "using_calendar.html";
-        case Id::MainWindow_Fullscreen:
-            return "full_screen_and_windowed_mode.html";
         case Id::MainWindow_MediaItem_AnalogCamera:
             return "setting_up_analog_cameras.html";
         case Id::MainWindow_MediaItem_Dewarping:
@@ -350,8 +346,6 @@ QString HelpTopic::relativeUrlForTopic(Id topic)
             return "discovering_cameras_automatica.html";
         case Id::SystemSettings_Server_Mail:
             return "configuring_mail_server_for_e-.html";
-        case Id::SystemSettings_UserManagement:
-            return "manage-users.html";
         case Id::SystemSettings_UserManagement_Groups:
             return "managing-groups.html";
         case Id::Systems_ConnectToCurrentSystem:
@@ -362,8 +356,6 @@ QString HelpTopic::relativeUrlForTopic(Id topic)
             return "roles_management.html";
         case Id::UserSettings_DisableUser:
             return "disabling_user.html";
-        case Id::UserSettings_Permissions:
-            return "permissions-management.html";
         case Id::UserSettings_UserRoles:
             return "built-in-groups.html";
         case Id::UserWatermark:
