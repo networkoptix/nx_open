@@ -17,6 +17,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/reflect/json.h>
+#include <nx/vms/api/data/user_group_data.h>
 #include <nx/vms/client/desktop/access/caching_access_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
@@ -334,8 +335,23 @@ void QnWorkbenchNotificationsHandler::setSystemHealthEventVisibleInternal(
     }
     else
     {
-        /* Only admins can see system health events handled here. */
-        if (!accessController()->hasPowerUserPermissions())
+        if (message == MessageType::showIntercomInformer
+            || message == MessageType::showMissedCallInformer)
+        {
+            if (!accessController()->hasPowerUserPermissions())
+            {
+                const auto currentUser = accessController()->user();
+
+                const auto groups = currentUser->groupIds();
+                const auto advancedViewerGroupIter =
+                    std::find(groups.begin(), groups.end(), nx::vms::api::kAdvancedViewersGroupId);
+
+                if (advancedViewerGroupIter == groups.end())
+                    canShow = false;
+            }
+        }
+        // Only admins can see the rest of system health events handled here. */
+        else if (!accessController()->hasPowerUserPermissions())
             canShow = false;
     }
 
