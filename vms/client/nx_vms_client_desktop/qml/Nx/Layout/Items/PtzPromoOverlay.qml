@@ -4,7 +4,6 @@ import QtQuick
 import QtQuick.Controls
 import QtQml.Models
 
-import Nx
 import Nx.Controls
 import Nx.Core
 import nx.vms.client.core
