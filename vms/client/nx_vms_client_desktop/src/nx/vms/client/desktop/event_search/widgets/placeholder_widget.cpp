@@ -6,10 +6,12 @@
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QVBoxLayout>
 
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/skin/font_config.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
+#include <ui/common/palette.h>
 
 namespace nx::vms::client::desktop {
 
@@ -36,9 +38,8 @@ PlaceholderWidget::PlaceholderWidget(QWidget* parent): QWidget{parent}
     m_placeholderText->setWordWrap(true);
     m_placeholderText->setProperty(style::Properties::kDontPolishFontProperty, true);
     m_placeholderText->setFont(fontConfig()->large());
-    m_placeholderText->setForegroundRole(QPalette::Mid);
     m_placeholderText->setAlignment(Qt::AlignCenter);
-    m_placeholderText->setWordWrap(true);
+    setPaletteColor(m_placeholderText, QPalette::Text, core::colorTheme()->color("dark17"));
     layout->addWidget(m_placeholderText);
 
     m_placeholderAction = new QPushButton;

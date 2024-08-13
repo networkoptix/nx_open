@@ -133,7 +133,7 @@ NotificationListWidget::Private::Private(NotificationListWidget* q):
     m_eventRibbon->setViewportHeader(viewportHeader);
     m_eventRibbon->setViewportMargins(0, 0);
 
-    m_itemCounterLabel->setForegroundRole(QPalette::Mid);
+    setPaletteColor(m_itemCounterLabel, QPalette::Text, core::colorTheme()->color("dark12"));
     m_itemCounterLabel->setText({});
 
     m_eventRibbon->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
