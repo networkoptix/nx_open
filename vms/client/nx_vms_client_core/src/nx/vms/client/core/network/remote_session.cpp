@@ -363,6 +363,11 @@ void RemoteSession::establishConnection(RemoteConnectionPtr connection)
                     errorCode = RemoteConnectionErrorCode::sessionExpired;
             }
             makeServerMarkingFunction(errorCode)();
+            if (d->state == State::waitingPeer && connection->connectionInfo().isCloud()
+                && errorCode == RemoteConnectionErrorCode::truncatedSessionToken)
+            {
+                emit reconnectFailed(errorCode);
+            }
         });
 
     connect(messageBus,

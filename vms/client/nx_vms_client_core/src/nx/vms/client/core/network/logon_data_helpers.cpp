@@ -22,7 +22,7 @@ bool isCloudUrl(const nx::utils::Url& url)
 
 } // namespace
 
-std::optional<LogonData> cloudLogonData(const QString& systemId)
+std::optional<LogonData> cloudLogonData(const QString& systemId, bool useCache)
 {
     if (!NX_ASSERT(qnCloudStatusWatcher->status() != CloudStatusWatcher::LoggedOut))
         return std::nullopt;
@@ -34,10 +34,10 @@ std::optional<LogonData> cloudLogonData(const QString& systemId)
         return std::nullopt;
     }
 
-    return cloudLogonData(system);
+    return cloudLogonData(system, useCache);
 }
 
-std::optional<LogonData> cloudLogonData(const SystemDescriptionPtr& system)
+std::optional<LogonData> cloudLogonData(const SystemDescriptionPtr& system, bool useCache)
 {
     if (!NX_ASSERT(system))
         return std::nullopt;
@@ -160,7 +160,7 @@ std::optional<LogonData> cloudLogonData(const SystemDescriptionPtr& system)
     if (!NX_ASSERT(!url.host().isEmpty(), "Invalid system url %1", url))
         return std::nullopt;
 
-    if (result.expectedCloudSystemId)
+    if (result.expectedCloudSystemId && useCache)
     {
         result.authCacheData =
             appContext()->coreSettings()->systemAuthenticationCache(*result.expectedCloudSystemId);

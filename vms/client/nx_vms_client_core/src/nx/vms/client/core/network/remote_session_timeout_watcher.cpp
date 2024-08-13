@@ -193,14 +193,6 @@ void RemoteSessionTimeoutWatcher::tick()
             emit hideNotification();
         }
 
-        // If the token is expired, the cached data for this system must be forcibly deleted. This
-        // usually happens when the session duration is changed for cloud users.
-        if (connection->connectionInfo().isCloud())
-        {
-            RemoteConnectionFactoryCache::clearForCloudId(
-                connection->moduleInformation().cloudSystemId);
-        }
-
         emit sessionExpired(d->sessionExpirationReason(session));
         return;
     }

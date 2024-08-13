@@ -11,11 +11,14 @@
 namespace nx::vms::client::core {
 
 /** Parameters for a connection to the system with the specified cloud system id. */
-NX_VMS_CLIENT_CORE_API std::optional<LogonData> cloudLogonData(const QString& systemId);
+NX_VMS_CLIENT_CORE_API std::optional<LogonData> cloudLogonData(
+    const QString& systemId,
+    bool useCache = true);
 
 /** Parameters for a connection to the system with the specified cloud system. */
 NX_VMS_CLIENT_CORE_API std::optional<LogonData> cloudLogonData(
-    const SystemDescriptionPtr& system);
+    const SystemDescriptionPtr& system,
+    bool useCache = true);
 
 /** Parameters for a connection to the local system with specified url and credentials. */
 NX_VMS_CLIENT_CORE_API LogonData localLogonData(

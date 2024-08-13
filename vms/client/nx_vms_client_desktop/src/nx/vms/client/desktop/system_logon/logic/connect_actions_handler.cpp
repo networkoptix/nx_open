@@ -177,7 +177,8 @@ struct ConnectActionsHandler::Private
 
         needReconnectToLastCloudSystem = false;
 
-        q->connectToCloudSystem({lastCloudSystemId, /*connectScenario*/ std::nullopt});
+        q->connectToCloudSystem(
+            {lastCloudSystemId, /*connectScenario*/ std::nullopt, /*useCache*/ false});
     }
 
     void reconnectToCloudIfNeeded()
@@ -210,9 +211,14 @@ struct ConnectActionsHandler::Private
         else
         {
             if (qnCloudStatusWatcher->status() == core::CloudStatusWatcher::Online)
-                q->connectToCloudSystem({lastCloudSystemId, /*connectScenario*/ std::nullopt});
+            {
+                q->connectToCloudSystem(
+                    {lastCloudSystemId, /*connectScenario*/ std::nullopt, /*useCache*/ false});
+            }
             else
+            {
                 needReconnectToLastCloudSystem = true;
+            }
         }
     }
 };
@@ -1042,7 +1048,7 @@ void ConnectActionsHandler::updatePreloaderVisibility()
 
 void ConnectActionsHandler::connectToCloudSystem(const CloudSystemConnectData& connectData)
 {
-    const auto connectionInfo = core::cloudLogonData(connectData.systemId);
+    const auto connectionInfo = core::cloudLogonData(connectData.systemId, connectData.useCache);
     d->lastCloudSystemId = connectData.systemId;
 
     if (!connectionInfo)
