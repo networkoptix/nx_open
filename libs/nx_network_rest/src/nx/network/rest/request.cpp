@@ -364,4 +364,13 @@ void Request::forceSessionAccess(UserAccessData access) const
     mutableUserSession.access = std::move(access);
 }
 
+void Request::renameParameter(const QString& oldName, const QString& newName)
+{
+    m_urlParams.rename(oldName, newName);
+    m_pathParams.rename(oldName, newName);
+    if (!m_paramsCache)
+        m_paramsCache = calculateParams();
+    m_paramsCache->rename(oldName, newName);
+}
+
 } // namespace nx::network::rest

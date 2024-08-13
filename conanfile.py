@@ -144,7 +144,7 @@ class NxOpenConan(ConanFile):
         if self.options.onlyUnrevisionedPackages:
             return
 
-        self.build_requires("apidoctool/3.0" "#bf58d9463e9fa82f3dcec3f6de7c152b")
+        self.build_requires("apidoctool/3.0" "#9b48851ed49e6272d9cf190a230d32c1")
         self.build_requires("qt-host/6.5.3" "#b22af1ae61cfb13f9de09455d441c8de")
         self.build_requires("swagger-codegen/3.0.21" "#58d9476941c662c4b3f8a9e99683f034")
 

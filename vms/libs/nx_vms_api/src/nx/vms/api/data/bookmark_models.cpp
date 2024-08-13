@@ -34,6 +34,14 @@ nx::Uuid BookmarkIdV3::serverIdFromCombined(const QString& id)
     return combined_id::serverIdFromCombined(id, '.');
 }
 
+DeprecatedFieldNames* BookmarkFilterBase::getDeprecatedFieldNames()
+{
+    static DeprecatedFieldNames kDeprecatedFieldNames{
+        {"_orderBy", "column"}, //< Up to v6.0.
+    };
+    return &kDeprecatedFieldNames;
+}
+
 void BookmarkIdV3::setIds(const nx::Uuid& bookmarkId, const nx::Uuid& serverId)
 {
     id = combined_id::combineId(bookmarkId, serverId);

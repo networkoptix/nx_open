@@ -133,6 +133,7 @@ protected:
     METHOD_CHECKER(loadFromParams);
     METHOD_CHECKER(size);
     METHOD_CHECKER(toParams);
+    METHOD_CHECKER(getDeprecatedFieldNames);
     METHOD_CHECKER(create);
     METHOD_CHECKER(read);
     METHOD_CHECKER(delete_);
@@ -350,7 +351,6 @@ protected:
             ? FilterType()
             : deserialize<FilterType>(request);
         Params filtered;
-
         if constexpr (DoesMethodExist_toParams<FilterType>::value)
         {
             filtered = filter.toParams();
@@ -367,8 +367,14 @@ protected:
         auto params = request.params();
         for (auto [key, value]: filtered.keyValueRange())
             params.remove(key);
-        auto defaultValueAction = extractDefaultValueAction(&params, request.apiVersion());
+        if constexpr (DoesMethodExist_getDeprecatedFieldNames<Filter>::value)
+        {
+            auto names = Filter::getDeprecatedFieldNames();
+            for (auto it = names->begin(); it != names->end(); ++it)
+                params.remove(it.value());
+        }
 
+        auto defaultValueAction = extractDefaultValueAction(&params, request.apiVersion());
         return {std::move(filter), std::move(params), defaultValueAction};
     }
 

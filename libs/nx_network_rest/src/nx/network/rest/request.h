@@ -134,6 +134,7 @@ public:
     [[nodiscard]] SystemAccessGuard forceSystemAccess() const;
 
     void forceSessionAccess(UserAccessData access) const;
+    void renameParameter(const QString& oldName, const QString& newName);
 
 private:
     nx::network::http::Method calculateMethod() const;
@@ -141,7 +142,7 @@ private:
     QJsonValue calculateContent(bool useException, bool wrapInObject) const;
 
 private:
-    const Params m_urlParams;
+    Params m_urlParams;
     Params m_pathParams;
     const nx::network::http::Method m_method;
     mutable QString m_decodedPath;
