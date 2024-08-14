@@ -118,7 +118,8 @@ public:
     // parentWidget may be used to show a password request dialog, and therefore is mandatory.
     void applySettings(
         const ConfigurableLogSettings& settings,
-        QWidget* parentWidget);
+        QWidget* parentWidget,
+        bool reset = false);
 
     static nx::log::Level defaultLogLevel();
     static nx::vms::api::ServerLogSettings clientLogSettings();
