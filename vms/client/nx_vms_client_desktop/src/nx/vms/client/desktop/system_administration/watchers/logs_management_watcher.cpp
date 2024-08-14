@@ -1555,10 +1555,14 @@ void LogsManagementWatcher::setUpdatesEnabled(bool enabled)
 
 void LogsManagementWatcher::applySettings(
     const ConfigurableLogSettings& settings,
-    QWidget* parentWidget)
+    QWidget* parentWidget,
+    bool reset)
 {
     NX_MUTEX_LOCKER lock(&d->mutex);
-    NX_ASSERT(d->state == State::hasSelection);
+    if (reset)
+        NX_ASSERT(d->state == State::empty);
+    else
+        NX_ASSERT(d->state == State::hasSelection);
 
     std::optional<nx::vms::api::ServerLogSettings> newClientSettings;
     if (d->client->isChecked())

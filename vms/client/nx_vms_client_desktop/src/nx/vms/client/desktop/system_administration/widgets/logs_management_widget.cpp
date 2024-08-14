@@ -257,7 +257,7 @@ void LogsManagementWidget::setupUi()
             if (!NX_ASSERT(m_watcher))
                 return;
 
-            m_watcher->applySettings(ConfigurableLogSettings::defaults(), this);
+            m_watcher->applySettings(ConfigurableLogSettings::defaults(), this, /*reset*/ true);
         });
 
     connect(ui->downloadButton, &QPushButton::clicked, this,
