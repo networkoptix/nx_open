@@ -157,6 +157,13 @@ int dateTimeColumnDefaultWidth(QTableView* tableView)
 
 } // namespace
 
+enum class EventLogDialog::State
+{
+    loading,
+    loaded,
+    error,
+};
+
 EventLogDialog::EventLogDialog(QWidget* parent):
     base_type(parent),
     ui(new Ui::EventLogDialog),
@@ -475,6 +482,33 @@ void EventLogDialog::reset()
     setText(QString());
     ui->dateRangeWidget->reset();
     enableUpdateData();
+    setLoading(State::loaded);
+}
+
+void EventLogDialog::setLoading(EventLogDialog::State state)
+{
+    const bool loading = (state == State::loading);
+    setCursor(loading ? Qt::BusyCursor : Qt::ArrowCursor);
+    ui->filterPanel->setEnabled(!loading);
+
+    switch (state)
+    {
+        case State::loading:
+            ui->stackedWidget->setCurrentWidget(ui->progressPage);
+            break;
+
+        case State::loaded:
+            ui->stackedWidget->setCurrentWidget(ui->gridPage);
+            break;
+
+        case State::error:
+            ui->stackedWidget->setCurrentWidget(ui->warnPage);
+            break;
+
+        default:
+            NX_ASSERT("Unexpected dialog state: %1", (int) state);
+            break;
+    }
 }
 
 void EventLogDialog::updateDataDelayed()
@@ -521,15 +555,14 @@ void EventLogDialog::updateData()
         ui->textSearchLineEdit->text());
 
     m_resetFilterAction->setEnabled(isFilterExist());
+
     if (m_request)
     {
-        ui->stackedWidget->setCurrentWidget(ui->progressPage);
-        setCursor(Qt::BusyCursor);
+        setLoading(State::loading);
     }
     else
     {
-        requestFinished({}); // just clear grid
-        ui->stackedWidget->setCurrentWidget(ui->warnPage);
+        requestFinished({}, /*success*/ false);
     }
 
     m_updateDisabled = false;
@@ -574,7 +607,7 @@ void EventLogDialog::query(
 
             if (auto records = std::get_if<nx::vms::api::rules::EventLogRecordList>(&response))
             {
-                requestFinished(std::move(*records));
+                requestFinished(std::move(*records), /*success*/ true);
             }
             else
             {
@@ -582,6 +615,8 @@ void EventLogDialog::query(
 
                 NX_ERROR(this, "Can't read event log, success: %1, code: %2, error: %3",
                     success, result.error, result.errorString);
+
+                requestFinished({}, /*success*/ false);
             }
 
         });
@@ -606,15 +641,21 @@ void EventLogDialog::retranslateUi()
     ui->eventRulesButton->setVisible(menu()->canTrigger(menu::OpenVmsRulesDialogAction));
 }
 
-void EventLogDialog::requestFinished(nx::vms::api::rules::EventLogRecordList&& records)
+void EventLogDialog::requestFinished(
+    nx::vms::api::rules::EventLogRecordList&& records, bool success)
 {
     m_model->setEvents(std::move(records));
-    setCursor(Qt::ArrowCursor);
+
+    if (!success)
+    {
+        setLoading(State::error);
+        return;
+    }
 
     QLocale locale;
-
     auto start = ui->dateRangeWidget->startDate();
     auto end = ui->dateRangeWidget->endDate();
+
     if (start != end)
     {
         ui->statusLabel->setText(
@@ -638,8 +679,7 @@ void EventLogDialog::requestFinished(nx::vms::api::rules::EventLogRecordList&& r
     // TODO: #mmalofeev consider using custom delegate for the datetime column.
     ui->gridEvents->horizontalHeader()->resizeSection(
         EventLogModel::DateTimeColumn, dateTimeColumnDefaultWidth(ui->gridEvents));
-
-    ui->stackedWidget->setCurrentWidget(ui->gridPage);
+    setLoading(State::loaded);
 }
 
 void EventLogDialog::at_eventsGrid_clicked(const QModelIndex& idx)
