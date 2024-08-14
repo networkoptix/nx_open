@@ -48,6 +48,9 @@ protected:
     virtual void hideEvent(QHideEvent* event) override;
 
 private:
+    enum class State;
+
+private:
     void retranslateUi();
     void initEventsModel();
     void initActionsModel();
@@ -55,6 +58,8 @@ private:
     void reset();
     void updateData();
     void updateDataDelayed();
+    void setLoading(State state);
+
     void at_eventsGrid_clicked(const QModelIndex& index);
     void at_eventsGrid_customContextMenuRequested(const QPoint& screenPos);
     void at_cameraButton_clicked();
@@ -73,7 +78,7 @@ private:
         const QString& eventType) const;
 
     bool isFilterExist() const;
-    void requestFinished(nx::vms::api::rules::EventLogRecordList&& records);
+    void requestFinished(nx::vms::api::rules::EventLogRecordList&& records, bool success);
     void updateActionList(bool instantOnly);
 
     void query(

@@ -15,7 +15,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,1,0,0">
    <item>
-    <widget class="nx::vms::client::desktop::Panel" name="widget" native="true">
+    <widget class="nx::vms::client::desktop::Panel" name="filterPanel" native="true">
      <layout class="QHBoxLayout" name="panelLayout" stretch="0,0,0,0,1,0,0">
       <item>
        <widget class="QnDateRangeWidget" name="dateRangeWidget" native="true"/>
