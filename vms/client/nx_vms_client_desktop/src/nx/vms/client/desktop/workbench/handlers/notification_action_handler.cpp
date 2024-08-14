@@ -338,8 +338,25 @@ void NotificationActionHandler::setSystemHealthEventVisibleInternal(
     }
     else
     {
-        /* Only admins can see system health events handled here. */
-        if (!system()->accessController()->hasPowerUserPermissions())
+        if (message == MessageType::showIntercomInformer
+            || message == MessageType::showMissedCallInformer
+            || message == MessageType::rejectIntercomCall)
+        {
+            if (!system()->accessController()->hasPowerUserPermissions())
+            {
+                const auto currentUser =
+                    windowContext()->workbenchContext()->accessController()->user();
+
+                const auto groups = currentUser->groupIds();
+                const auto advancedViewerGroupIter =
+                    std::find(groups.begin(), groups.end(), api::kAdvancedViewersGroupId);
+
+                if (advancedViewerGroupIter == groups.end())
+                    canShow = false;
+            }
+        }
+        // Only admins can see the rest of system health events handled here. */
+        else if (!system()->accessController()->hasPowerUserPermissions())
             canShow = false;
     }
 
