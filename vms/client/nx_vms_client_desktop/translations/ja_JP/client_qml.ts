@@ -52,7 +52,7 @@
     </message>
     <message>
       <source>General</source>
-      <translation>一般</translation>
+      <translation>全般</translation>
     </message>
     <message>
       <source>Synchronize Users</source>
@@ -837,7 +837,7 @@
     </message>
     <message>
       <source>General</source>
-      <translation>一般</translation>
+      <translation>全般</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -887,7 +887,7 @@
     </message>
     <message>
       <source>General</source>
-      <translation>一般</translation>
+      <translation>全般</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -2377,7 +2377,7 @@ Alt + クリックを使用してください。</translation>
     </message>
     <message>
       <source>General</source>
-      <translation>一般</translation>
+      <translation>全般</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -2475,7 +2475,7 @@ Alt + クリックを使用してください。</translation>
     </message>
     <message>
       <source>General</source>
-      <translation>一般</translation>
+      <translation>全般</translation>
     </message>
     <message>
       <source>Groups</source>
