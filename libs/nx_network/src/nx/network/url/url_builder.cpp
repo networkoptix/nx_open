@@ -143,6 +143,17 @@ Builder& Builder::addQueryItem(const QString& name, const QString& value)
     return setQuery(query);
 }
 
+Builder& Builder::removeQueryItem(const QString& name)
+{
+    nx::utils::UrlQuery query(m_url.query());
+    if (query.hasQueryItem(name))
+    {
+        query.removeQueryItem(name);
+        m_url.setQuery(query);
+    }
+    return *this;
+}
+
 Builder& Builder::setFragment(const QString& fragment, QUrl::ParsingMode mode)
 {
     m_url.setFragment(fragment, mode);
