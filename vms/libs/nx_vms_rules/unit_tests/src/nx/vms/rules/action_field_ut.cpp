@@ -226,12 +226,29 @@ TEST_F(ActionFieldTest, EventTimestamp)
     TextWithFields field(systemContext(), &kDummyDescriptor);
     field.setText("{event.timestamp}");
     auto event = AggregatedEventPtr::create(makeEvent());
+    const auto eventTimeStamp = reflect::toString(
+        std::chrono::duration_cast<std::chrono::seconds>(event->timestamp()).count());
+    EXPECT_EQ(eventTimeStamp, field.build(event).toString());
+}
 
-    QDateTime time;
-    time = time.addMSecs(
+TEST_F(ActionFieldTest, EventTimestampUs)
+{
+    TextWithFields field(systemContext(), &kDummyDescriptor);
+    field.setText("{event.timestampUs}");
+    auto event = AggregatedEventPtr::create(makeEvent());
+    const auto eventTimeStamp = reflect::toString(
+        std::chrono::duration_cast<std::chrono::microseconds>(event->timestamp()).count());
+    EXPECT_EQ(eventTimeStamp, field.build(event).toString());
+}
+
+TEST_F(ActionFieldTest, EventTimestampMs)
+{
+    TextWithFields field(systemContext(), &kDummyDescriptor);
+    field.setText("{event.timestampMs}");
+    auto event = AggregatedEventPtr::create(makeEvent());
+    const auto eventTimeStamp = reflect::toString(
         std::chrono::duration_cast<std::chrono::milliseconds>(event->timestamp()).count());
-
-    EXPECT_EQ(time.toString(), field.build(event).toString());
+    EXPECT_EQ(eventTimeStamp, field.build(event).toString());
 }
 
 TEST_F(ActionFieldTest, EventStartTimeInstantEvent)
