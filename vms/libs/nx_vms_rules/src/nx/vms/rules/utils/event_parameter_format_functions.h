@@ -2,6 +2,7 @@
 
 #include <QString>
 
+#include <nx/vms/rules/aggregated_event.h>
 #include <nx/vms/rules/rules_fwd.h>
 
 namespace nx::vms::common { class SystemContext; }
@@ -21,7 +22,12 @@ QString extendedEventDescription(
 QString eventTime(const AggregatedEventPtr& eventAggregator, common::SystemContext* context);
 QString eventTimeStart(const AggregatedEventPtr& eventAggregator, common::SystemContext* context);
 QString eventTimeEnd(const AggregatedEventPtr& eventAggregator, common::SystemContext* context);
-QString eventTimestamp(const AggregatedEventPtr& eventAggregator, common::SystemContext*);
+template<class T>
+QString eventTimestamp(const AggregatedEventPtr& eventAggregator, common::SystemContext*)
+{
+    const auto count = std::chrono::duration_cast<T>(eventAggregator->timestamp()).count();
+    return QString::fromStdString(reflect::toString(count));
+}
 QString eventSource(const AggregatedEventPtr& eventAggregator, common::SystemContext* context);
 
 QString deviceIp(const AggregatedEventPtr& eventAggregator, common::SystemContext* context);

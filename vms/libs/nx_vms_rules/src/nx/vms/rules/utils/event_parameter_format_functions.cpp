@@ -161,15 +161,6 @@ QString eventTimeEnd(const AggregatedEventPtr& eventAggregator, common::SystemCo
     return eventTime(eventAggregator, context);
 }
 
-QString eventTimestamp(const AggregatedEventPtr& eventAggregator, common::SystemContext*)
-{
-    QDateTime time;
-    time = time.addMSecs(
-        std::chrono::duration_cast<std::chrono::milliseconds>(eventAggregator->timestamp())
-            .count());
-    return time.toString();
-}
-
 QString eventSource(const AggregatedEventPtr& eventAggregator, common::SystemContext* context)
 {
     const auto sourceId = eventSourceId(eventAggregator);
