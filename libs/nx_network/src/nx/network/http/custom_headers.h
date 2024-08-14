@@ -67,4 +67,6 @@ static constexpr char FRAME_ENCODED_BY_PLUGIN[] = "Frame-From-Plugin";
 
 static constexpr char kAcceptLanguageHeader[] = "Accept-Language";
 
+static constexpr char kTicketUrlQueryName[] = "_ticket";
+
 } // namespace Qn
