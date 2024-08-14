@@ -57,6 +57,7 @@ public:
     Builder& setQuery(const nx::utils::UrlQuery& query);
 
     Builder& addQueryItem(const QString& name, const QString& value = {});
+    Builder& removeQueryItem(const QString& name);
 
     template<typename String, typename T>
     Builder& addQueryItem(const String& name, const T& value)
