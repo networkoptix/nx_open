@@ -2225,7 +2225,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>General settings updated</source>
-      <translation>一般設定の更新</translation>
+      <translation>全般設定の更新</translation>
     </message>
     <message>
       <source>Server updated</source>
@@ -3901,7 +3901,7 @@ License Key: %2</source>
     <name>QnLocalSettingsDialog</name>
     <message>
       <source>General</source>
-      <translation>一般</translation>
+      <translation>全般</translation>
     </message>
     <message>
       <source>Look and Feel</source>
@@ -4752,7 +4752,7 @@ License Key: %2</source>
     <name>QnServerSettingsDialog</name>
     <message>
       <source>General</source>
-      <translation>一般</translation>
+      <translation>全般</translation>
     </message>
     <message>
       <source>Storage Analytics</source>
@@ -5328,7 +5328,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnSystemAdministrationDialog</name>
     <message>
       <source>General</source>
-      <translation>一般</translation>
+      <translation>全般</translation>
     </message>
     <message>
       <source>Licenses</source>
@@ -7773,7 +7773,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::CameraSettingsDialog</name>
     <message>
       <source>General</source>
-      <translation>一般</translation>
+      <translation>全般</translation>
     </message>
     <message>
       <source>Recording</source>
@@ -9163,7 +9163,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::LayoutSettingsDialog</name>
     <message>
       <source>General</source>
-      <translation>一般</translation>
+      <translation>全般</translation>
     </message>
     <message>
       <source>Background</source>
@@ -10410,7 +10410,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Turn on webpage proxy on &lt;b&gt;General&lt;/b&gt; tab.</source>
-      <translation>&lt;b&gt;一般&lt;/b&gt; タブでWebページプロキシをオンにしてください。</translation>
+      <translation>&lt;b&gt;全般&lt;/b&gt; タブでWebページプロキシをオンにしてください。</translation>
     </message>
     <message>
       <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</source>
