@@ -64,8 +64,8 @@ Button
             anchors.right: parent.right
             checkState: control.checked ? Qt.Checked : Qt.Unchecked
             hovered: control.hovered
-            uncheckedColor: ColorTheme.colors.dark8
-            uncheckedIndicatorColor: ColorTheme.colors.dark10
+            uncheckedColor: ColorTheme.colors.dark13
+            uncheckedIndicatorColor: ColorTheme.colors.dark17
         }
     }
 }
