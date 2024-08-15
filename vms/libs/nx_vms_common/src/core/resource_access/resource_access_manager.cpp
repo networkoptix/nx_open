@@ -745,8 +745,9 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
             const bool isIntercom = !isShared &&
                 [&]()
                 {
-                    const auto camera = resourcePool()->getResourceById<QnResource>(ownerId);
-                    return nx::vms::common::isIntercom(camera);
+                    const auto camera =
+                        resourcePool()->getResourceById<QnSecurityCamResource>(ownerId);
+                    return camera && camera->isIntercom();
                 }();
 
             if (isShared || isIntercom)

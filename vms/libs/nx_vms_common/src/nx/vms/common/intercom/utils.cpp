@@ -7,24 +7,15 @@
 
 namespace {
 
-const QString kOpenDoorPortName =
-    QString::fromStdString(nx::reflect::toString(nx::vms::api::ExtendedCameraOutput::powerRelay));
+bool isIntercom(const QnResourcePtr& resource)
+{
+    const auto camera = resource.objectCast<QnVirtualCameraResource>();
+    return camera && camera->isIntercom();
+}
 
 } // namespace
 
 namespace nx::vms::common {
-
-bool checkIntercomCallPortExists(const QnVirtualCameraResourcePtr& camera)
-{
-    const auto portDescriptions = camera->ioPortDescriptions();
-    return std::any_of(
-        portDescriptions.begin(),
-        portDescriptions.end(),
-        [](const auto& portData)
-        {
-            return portData.outputName == kOpenDoorPortName;
-        });
-}
 
 nx::Uuid calculateIntercomLayoutId(const QnResourcePtr& intercom)
 {
@@ -34,18 +25,6 @@ nx::Uuid calculateIntercomLayoutId(const QnResourcePtr& intercom)
 nx::Uuid calculateIntercomLayoutId(const nx::Uuid& intercomId)
 {
     return guidFromArbitraryData(intercomId.toString() + "layout");
-}
-
-bool isIntercom(const QnResourcePtr& resource)
-{
-    if (!resource)
-        return false;
-
-    const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
-    if (!camera)
-        return false;
-
-    return checkIntercomCallPortExists(camera);
 }
 
 bool isIntercomOnIntercomLayout(
