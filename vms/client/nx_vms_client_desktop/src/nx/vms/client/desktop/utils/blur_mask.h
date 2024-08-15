@@ -17,7 +17,6 @@ class QnColorGLShaderProgram;
 class QnBlurShaderProgram;
 class QOpenGLTexture;
 
-namespace nx::vms::client::core { class AbstractAnalyticsMetadataProvider; }
 
 namespace nx::vms::client::desktop {
 
@@ -54,14 +53,9 @@ public:
     void drawFull(QOpenGLFramebufferObject* frameBuffer);
 
     /**
-     * Draws analytics objects blur mask into a frame buffer.
+     * Draws blur mask (composed of rectangles) into a frame buffer.
      */
-    void draw(
-        QOpenGLFramebufferObject* frameBuffer,
-        const core::AbstractAnalyticsMetadataProvider* analyticsProvider,
-        const std::optional<QStringList>& objectTypeIds,
-        std::chrono::microseconds timestamp,
-        int channel);
+    void draw(QOpenGLFramebufferObject* frameBuffer, const QVector<QRectF>& rectangles);
 
 private:
     void draw();
