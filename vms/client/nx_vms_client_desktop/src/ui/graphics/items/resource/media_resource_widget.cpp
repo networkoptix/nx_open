@@ -315,6 +315,38 @@ bool hasArchive(const QnSecurityCamResourcePtr& camera)
     return !footageServers.empty();
 };
 
+QVector<QRectF> getBoundingBoxes(
+    const nx::vms::client::core::AbstractAnalyticsMetadataProvider* analyticsProvider,
+    const std::optional<QStringList>& objectTypeIds,
+    std::chrono::microseconds timestamp,
+    int channel)
+{
+    if (!NX_ASSERT(analyticsProvider))
+        return {};
+
+    // Taking metadata within some range.
+    const QList<nx::common::metadata::ObjectMetadataPacketPtr> metadataPackets =
+        analyticsProvider->metadataRange(
+            timestamp - 1ms,
+            timestamp + 1ms,
+            channel);
+
+    QVector<QRectF> result;
+
+    using namespace nx::common::metadata;
+
+    for (const ObjectMetadataPacketPtr& packet: metadataPackets)
+    {
+        for (const ObjectMetadata& metadata: packet->objectMetadataList)
+        {
+            if (!objectTypeIds || objectTypeIds->contains(metadata.typeId))
+                result.push_back(metadata.boundingBox);
+        }
+    }
+
+    return result;
+}
+
 } // namespace
 
 QnMediaResourceWidget::QnMediaResourceWidget(
@@ -1346,12 +1378,13 @@ Qn::RenderStatus QnMediaResourceWidget::paintVideoTexture(
                 ? std::optional<QStringList>{}
                 : pixelationSettings.objectTypeIds;
 
-            m_blurMask->draw(
-                m_renderer->blurMaskFrameBuffer(channel),
+            const auto boundingBoxes = getBoundingBoxes(
                 d->analyticsMetadataProvider.get(),
                 types,
                 timestamp,
                 channel);
+
+            m_blurMask->draw(m_renderer->blurMaskFrameBuffer(channel), boundingBoxes);
         }
     }
     else if (m_blurMask)

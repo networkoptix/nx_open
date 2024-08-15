@@ -8,7 +8,7 @@
 #include <QtOpenGL/QOpenGLVertexArrayObject>
 #include <QtOpenGLWidgets/QOpenGLWidget>
 
-#include <nx/vms/client/core/media/abstract_analytics_metadata_provider.h>
+#include <nx/utils/log/assert.h>
 #include <nx/vms/client/desktop/opengl/opengl_renderer.h>
 #include <ui/graphics/shaders/blur_shader_program.h>
 #include <ui/graphics/shaders/color_shader_program.h>
@@ -87,33 +87,15 @@ void BlurMask::draw()
     m_renderer->glDrawArrays(GL_TRIANGLES, /*first*/ 0, m_vertices.size());
 }
 
-void BlurMask::draw(
-    QOpenGLFramebufferObject* frameBuffer,
-    const core::AbstractAnalyticsMetadataProvider* analyticsProvider,
-    const std::optional<QStringList>& objectTypeIds,
-    std::chrono::microseconds timestamp,
-    int channel)
+void BlurMask::draw(QOpenGLFramebufferObject* frameBuffer, const QVector<QRectF>& rectangles)
 {
-    if (!NX_ASSERT(frameBuffer) || !NX_ASSERT(analyticsProvider))
+    if (!NX_ASSERT(frameBuffer))
         return;
-
-    // Taking metadata within some range.
-    const QList<nx::common::metadata::ObjectMetadataPacketPtr> metadataPackets =
-        analyticsProvider->metadataRange(
-            timestamp - std::chrono::milliseconds(1),
-            timestamp + std::chrono::milliseconds(1),
-            channel);
 
     m_vertices.clear();
 
-    for (const common::metadata::ObjectMetadataPacketPtr& packet: metadataPackets)
-    {
-        for (const common::metadata::ObjectMetadata& metadata: packet->objectMetadataList)
-        {
-            if (!objectTypeIds || objectTypeIds->contains(metadata.typeId))
-                addRectangle(metadata.boundingBox);
-        }
-    }
+    for (const QRectF& rect: rectangles)
+        addRectangle(rect);
 
     draw(frameBuffer);
 }
