@@ -512,7 +512,7 @@ void PtzInstrument::updatePromo(QnMediaResourceWidget* widget)
 
     data.promoOverlay->setPagesVisibility(
         !showOnceSettings()->newPtzMechanicPromo(),
-        !showOnceSettings()->autoTrackingPromo());
+        false); //< VMS-54580: was decided to temporarily disable Target Lock page in 6.0.
 
     const bool showPromo = widget->options().testFlag(QnResourceWidget::ControlPtz)
         && !appContext()->localSettings()->ptzAimOverlayEnabled()
