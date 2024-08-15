@@ -377,11 +377,8 @@ QnVirtualCameraResourcePtr ResourceTreeModelTest::addIntercomCamera(
     if (!hostAddress.isEmpty())
         camera->setHostAddress(hostAddress);
 
-    static const QString kOpenDoorPortName =
-        QString::fromStdString(nx::reflect::toString(nx::vms::api::ExtendedCameraOutput::powerRelay));
-
     QnIOPortData intercomFeaturePort;
-    intercomFeaturePort.outputName = kOpenDoorPortName;
+    intercomFeaturePort.outputName = QnSecurityCamResource::intercomSpecificPortName();
 
     camera->setIoPortDescriptions({intercomFeaturePort}, false);
 

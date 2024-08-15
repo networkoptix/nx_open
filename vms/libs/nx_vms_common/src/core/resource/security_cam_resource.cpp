@@ -22,6 +22,7 @@
 #include <nx/utils/std/algorithm.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/api/data/backup_settings.h>
+#include <nx/vms/common/intercom/utils.h>
 #include <nx/vms/common/saas/saas_service_manager.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
@@ -35,6 +36,9 @@
 using StreamFpsSharingMethod = QnSecurityCamResource::StreamFpsSharingMethod;
 
 namespace {
+
+const QString kPowerRelayPortName =
+    QString::fromStdString(nx::reflect::toString(nx::vms::api::ExtendedCameraOutput::powerRelay));
 
 static const int kShareFpsDefaultReservedSecondStreamFps = 2;
 static const int kSharePixelsDefaultReservedSecondStreamFps = 0;
@@ -86,6 +90,11 @@ nx::Uuid QnSecurityCamResource::makeCameraIdFromPhysicalId(const QString& physic
     if (physicalId.isEmpty())
         return nx::Uuid();
     return guidFromArbitraryData(physicalId);
+}
+
+QString QnSecurityCamResource::intercomSpecificPortName()
+{
+    return kPowerRelayPortName;
 }
 
 void QnSecurityCamResource::setSystemContext(nx::vms::common::SystemContext* systemContext)
@@ -187,6 +196,22 @@ QnSecurityCamResource::QnSecurityCamResource():
                 return result.toInt() == 0;
 
             return !resourceData().value<bool>(ResourceDataKey::kNoVideoSupport);
+        }),
+    m_isIntercom(
+        [this]()
+        {
+            const std::string ioSettings =
+                getProperty(ResourcePropertyKey::kIoSettings).toStdString();
+            const auto [portDescriptions, _] =
+                nx::reflect::json::deserialize<QnIOPortDataList>(ioSettings);
+
+            return std::any_of(
+                portDescriptions.begin(),
+                portDescriptions.end(),
+                [](const auto& portData)
+                {
+                    return portData.outputName == intercomSpecificPortName();
+                });
         })
 {
     NX_VERBOSE(this, "Creating");
@@ -748,6 +773,11 @@ QnIOPortDataList QnSecurityCamResource::ioPortDescriptions(Qn::IOPortType type) 
     return ports;
 }
 
+bool QnSecurityCamResource::isIntercom() const
+{
+    return m_isIntercom.get();
+}
+
 void QnSecurityCamResource::at_motionRegionChanged()
 {
     if (flags() & Qn::foreigner)
@@ -761,6 +791,20 @@ void QnSecurityCamResource::at_motionRegionChanged()
         for (int i = 0; i < numChannels; ++i)
             setMotionMaskPhysical(i);
     }
+}
+
+void QnSecurityCamResource::emitPropertyChanged(
+    const QString& key,
+    const QString& prevValue,
+    const QString& newValue)
+{
+    if (key == ResourcePropertyKey::kIoSettings)
+    {
+        m_isIntercom.reset();
+        emit ioPortDescriptionsChanged(::toSharedPointer(this));
+    }
+
+    base_type::emitPropertyChanged(key, prevValue, newValue);
 }
 
 int QnSecurityCamResource::motionWindowCount() const

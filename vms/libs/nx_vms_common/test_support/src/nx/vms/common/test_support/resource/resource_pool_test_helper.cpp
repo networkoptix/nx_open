@@ -126,11 +126,8 @@ nx::CameraResourceStubPtr QnResourcePoolTestHelper::addIntercomCamera()
 {
     const auto camera = createCamera();
 
-    static const QString kOpenDoorPortName = QString::fromStdString(
-        nx::reflect::toString(ExtendedCameraOutput::powerRelay));
-
     QnIOPortData intercomFeaturePort;
-    intercomFeaturePort.outputName = kOpenDoorPortName;
+    intercomFeaturePort.outputName = QnSecurityCamResource::intercomSpecificPortName();
 
     camera->setIoPortDescriptions({intercomFeaturePort}, false);
     resourcePool()->addResource(camera);
@@ -140,7 +137,7 @@ nx::CameraResourceStubPtr QnResourcePoolTestHelper::addIntercomCamera()
 QnLayoutResourcePtr QnResourcePoolTestHelper::addIntercomLayout(
     const QnVirtualCameraResourcePtr& intercomCamera)
 {
-    if (!NX_ASSERT(intercomCamera && nx::vms::common::isIntercom(intercomCamera)))
+    if (!NX_ASSERT(intercomCamera && intercomCamera->isIntercom()))
         return {};
 
     const auto intercomId = intercomCamera->getId();
