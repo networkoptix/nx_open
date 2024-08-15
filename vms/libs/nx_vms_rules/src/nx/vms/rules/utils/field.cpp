@@ -4,6 +4,7 @@
 
 #include <nx/utils/qt_helpers.h>
 #include <nx/vms/api/data/user_group_data.h>
+#include <nx/vms/rules/ini.h>
 
 #include "../action_builder_fields/extract_detail_field.h"
 #include "../action_builder_fields/flag_field.h"
@@ -69,15 +70,27 @@ FieldDescriptor makeExtractDetailFieldDescriptor(
         {{ "detailName", detailName }});
 }
 
+FieldDescriptor makeTextWithFieldsDescriptorWithVisibilityConfig(
+    const QString& fieldName,
+    const QString& formatString,
+    const TranslatableString& displayName)
+{
+    return makeFieldDescriptor<TextWithFields>(fieldName,
+        displayName,
+        {},
+        {{"text", formatString}, {"visible", ini().showHiddenTextFields}});
+}
+
 FieldDescriptor makeTextFormatterFieldDescriptor(
     const QString& fieldName,
-    const QString& formatString)
+    const QString& formatString,
+    const TranslatableString& displayName)
 {
     return makeFieldDescriptor<TextFormatter>(
         fieldName,
+        displayName,
         {},
-        {},
-        {{ "text", formatString }});
+        {{ "text", formatString }, {"visible", ini().showHiddenTextFields}});
 }
 
 FieldDescriptor makeActionFlagFieldDescriptor(
