@@ -319,6 +319,7 @@ void QnLayoutTabBar::updateTabText(QnWorkbenchLayout *layout)
         return;
 
     setTabText(idx, newText);
+    setTabToolTip(idx, newText);
     fixGeometry();
     emit tabTextChanged();
 }
@@ -443,7 +444,9 @@ void QnLayoutTabBar::at_workbench_layoutsChanged()
             if (index == -1)
             {
                 m_layouts.insert(i, layouts[i]);
-                insertTab(i, layoutIcon(layouts[i]), layoutText(layouts[i]));
+                const auto text = layoutText(layouts[i]);
+                insertTab(i, layoutIcon(layouts[i]), text);
+                setTabToolTip(i, text);
             }
             else
             {

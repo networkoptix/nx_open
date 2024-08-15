@@ -171,8 +171,7 @@ void SystemTabBar::rebuildTabs()
                 continue;
 
             removeTab(i);
-            const auto text = systemData->name();
-            insertClosableTab(i, text, systemData->systemDescription);
+            insertClosableTab(i, systemData->systemDescription);
         }
 
         while (count() > m_store->systemCount())
@@ -276,10 +275,11 @@ bool SystemTabBar::disconnectFromSystem(const nx::Uuid& localId)
 }
 
 void SystemTabBar::insertClosableTab(int index,
-    const QString& text,
     const core::SystemDescriptionPtr& systemDescription)
 {
+    const auto text = systemDescription->name();
     insertTab(index, text);
+    setTabToolTip(index, text);
     setTabData(index, QVariant::fromValue(systemDescription));
 
     const auto closeButton = new CloseTabButton(this);
@@ -288,6 +288,24 @@ void SystemTabBar::insertClosableTab(int index,
         {
             if (disconnectFromSystem(localId))
                 m_store->removeSystem(localId);
+        });
+
+   // closeButton is owned by the tab, so we can use it as a receiver here.
+   // This connection is deleted when the tab is removed.
+    connect(systemDescription.get(), &core::SystemDescription::systemNameChanged, closeButton,
+        [this, systemDescription]()
+        {
+            const auto data = QVariant::fromValue(systemDescription);
+            for (int i = 0; i < count(); ++i)
+            {
+                if (tabData(i) == data)
+                {
+                    const auto text = systemDescription->name();
+                    setTabText(i, text);
+                    setTabToolTip(i, text);
+                    break;
+                }
+            }
         });
 
     connect(m_stateHandler.get(),
