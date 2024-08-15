@@ -169,6 +169,7 @@ def main():
     isMac = conf.CMAKE_SYSTEM_NAME == "Darwin"
     withClient = parse_boolean(conf.WITH_CLIENT)
     withMediaServer = parse_boolean(conf.WITH_MEDIA_SERVER)
+    withAnalyticsServer = parse_boolean(conf.WITH_ANALYTICS_SERVER)
 
     bin_dir = "bin"
     lib_dir = bin_dir if isWindows else "lib"
@@ -238,6 +239,13 @@ def main():
                 target_dir=bin_dir,
                 source_dir=src_bin_dir,
                 file_list=["external.dat"])
+
+        if withAnalyticsServer:
+            archiveFiles(
+                a,
+                target_dir=os.path.join(lib_dir, "libcuda_stub"),
+                source_dir=os.path.join(conf.BUILD_DIR, lib_dir, "libcuda_stub"),
+                file_list=["libnvidia-ml.so.1"])
 
         # Archive translations
         archiveByGlob(a, "translations", translations_dir,
