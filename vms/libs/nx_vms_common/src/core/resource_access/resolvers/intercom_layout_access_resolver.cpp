@@ -13,6 +13,15 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/common/intercom/utils.h>
 
+namespace {
+
+bool isIntercom(const QnVirtualCameraResourcePtr& camera)
+{
+    return camera->isIntercom();
+};
+
+} // namespace
+
 namespace nx::core::access {
 
 using namespace nx::vms::api;
@@ -34,7 +43,7 @@ public:
 
     void handleResourcesAdded(const QnResourceList& resources);
     void handleResourcesRemoved(const QnResourceList& resources);
-    void handleIntercomsAddedOrRemoved(const QnVirtualCameraResourceList& intercoms, bool isAdded);
+    void handleIntercomsAdded(const QnVirtualCameraResourceList& intercoms);
 
     void invalidateSubjects(const QSet<nx::Uuid>& subjectIds);
 
@@ -141,8 +150,7 @@ IntercomLayoutAccessResolver::Private::Private(
         this, &Private::handleResourcesRemoved, Qt::DirectConnection);
 
     NX_MUTEX_LOCKER lk(&mutex);
-    const auto intercoms = resourcePool->getResources<QnVirtualCameraResource>(
-        &nx::vms::common::isIntercom);
+    const auto intercoms = resourcePool->getResources<QnVirtualCameraResource>(&isIntercom);
 
     allIntercoms = {intercoms.cbegin(), intercoms.cend()};
 }
@@ -228,18 +236,75 @@ QSet<nx::Uuid> IntercomLayoutAccessResolver::Private::invalidateCache()
 
 void IntercomLayoutAccessResolver::Private::handleResourcesAdded(const QnResourceList& resources)
 {
-    handleIntercomsAddedOrRemoved(resources.filtered<QnVirtualCameraResource>(
-        &nx::vms::common::isIntercom), /*isAdded*/ true);
+    QnVirtualCameraResourceList intercoms;
+
+    for (const auto& resource: resources)
+    {
+        const auto camera = resource.objectCast<QnVirtualCameraResource>();
+        if (!camera)
+            continue;
+
+        if (camera->isIntercom())
+        {
+            intercoms.push_back(camera);
+        }
+        else
+        {
+            connect(camera.get(), &QnSecurityCamResource::ioPortDescriptionsChanged, this,
+                [this](const QnSecurityCamResourcePtr& securityCamera)
+                {
+                    const auto camera = securityCamera.objectCast<QnVirtualCameraResource>();
+                    if (camera->isIntercom() && !allIntercoms.contains(camera))
+                    {
+                        handleIntercomsAdded({camera});
+                        camera->disconnect(this);
+                    }
+                });
+        }
+    }
+
+    handleIntercomsAdded(intercoms);
 }
 
 void IntercomLayoutAccessResolver::Private::handleResourcesRemoved(const QnResourceList& resources)
 {
-    handleIntercomsAddedOrRemoved(resources.filtered<QnVirtualCameraResource>(
-        &nx::vms::common::isIntercom), /*isAdded*/ false);
+    if (!baseResolver || allIntercoms.empty())
+        return;
+
+    QnVirtualCameraResourceList removedIntercoms;
+    QSet<nx::Uuid> affectedCachedSubjectIds;
+    {
+        NX_MUTEX_LOCKER lk(&mutex);
+        for (const auto& resource: resources)
+        {
+            const auto camera = resource.objectCast<QnVirtualCameraResource>();
+
+            if (!allIntercoms.contains(camera))
+                continue;
+
+            for (const auto& subjectId: nx::utils::keyRange(cachedAccessMaps))
+            {
+                if (baseResolver->accessRights(subjectId, camera))
+                    affectedCachedSubjectIds.insert(subjectId);
+            }
+
+            for (const auto& subjectId: affectedCachedSubjectIds)
+                cachedAccessMaps.remove(subjectId);
+
+            allIntercoms.remove(camera);
+            removedIntercoms.push_back(camera);
+        }
+    }
+
+    NX_DEBUG(q, "Intercoms %1 removed, %3", removedIntercoms,
+        affectedCacheToLogString(affectedCachedSubjectIds));
+
+    baseResolver->notifier()->releaseSubjects(affectedCachedSubjectIds);
+    notifyResolutionChanged(removedIntercoms, /*knownAffectedSubjectIds*/ affectedCachedSubjectIds);
 }
 
-void IntercomLayoutAccessResolver::Private::handleIntercomsAddedOrRemoved(
-    const QnVirtualCameraResourceList& intercoms, bool isAdded)
+void IntercomLayoutAccessResolver::Private::handleIntercomsAdded(
+    const QnVirtualCameraResourceList& intercoms)
 {
     if (!baseResolver || intercoms.empty())
         return;
@@ -258,15 +323,12 @@ void IntercomLayoutAccessResolver::Private::handleIntercomsAddedOrRemoved(
             for (const auto& subjectId: affectedCachedSubjectIds)
                 cachedAccessMaps.remove(subjectId);
 
-            if (isAdded)
-                allIntercoms.insert(intercom);
-            else
-                allIntercoms.remove(intercom);
+            allIntercoms.insert(intercom);
         }
     }
 
-    NX_DEBUG(q, "Intercoms %1 %2, %3", intercoms,
-        isAdded ? "added" : "removed", affectedCacheToLogString(affectedCachedSubjectIds));
+    NX_DEBUG(q, "Intercoms %1 added, %3", intercoms,
+        affectedCacheToLogString(affectedCachedSubjectIds));
 
     baseResolver->notifier()->releaseSubjects(affectedCachedSubjectIds);
     notifyResolutionChanged(intercoms, /*knownAffectedSubjectIds*/ affectedCachedSubjectIds);

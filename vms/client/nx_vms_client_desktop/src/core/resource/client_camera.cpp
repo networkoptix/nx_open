@@ -10,7 +10,6 @@
 #include <nx/vms/client/core/network/remote_session.h>
 #include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/desktop/radass/radass_controller.h>
-#include <nx/vms/common/intercom/utils.h>
 #include <nx_ec/abstract_ec_connection.h>
 
 namespace {
@@ -20,23 +19,11 @@ const QString kAutoSendPtzStopCommandProperty("autoSendPtzStopCommand");
 } // namespace
 
 QnClientCameraResource::QnClientCameraResource(const nx::Uuid& resourceTypeId):
-    base_type(resourceTypeId),
-    m_isIntercom(
-        [this]()
-        {
-            return nx::vms::common::checkIntercomCallPortExists(toSharedPointer(this));
-        })
+    base_type(resourceTypeId)
 {
     // Handle situation when flags are added externally after resource is created.
     connect(this, &QnResource::flagsChanged, this,
         [this]() { m_cachedFlags.store(calculateFlags()); }, Qt::DirectConnection);
-
-    connect(this, &QnClientCameraResource::propertyChanged, this,
-        [this](const QnResourcePtr& /*resource*/, const QString& key)
-        {
-            if (key == ResourcePropertyKey::kIoSettings && !m_isIntercom.get())
-                m_isIntercom.reset();
-        }, Qt::DirectConnection);
 }
 
 Qn::ResourceFlags QnClientCameraResource::calculateFlags() const
@@ -104,11 +91,6 @@ QnAbstractStreamDataProvider* QnClientCameraResource::createDataProvider(
 QString QnClientCameraResource::idForToStringFromPtr() const
 {
     return QnResource::idForToStringFromPtr();
-}
-
-bool QnClientCameraResource::isIntercom() const
-{
-    return m_isIntercom.get();
 }
 
 bool QnClientCameraResource::autoSendPtzStopCommand() const

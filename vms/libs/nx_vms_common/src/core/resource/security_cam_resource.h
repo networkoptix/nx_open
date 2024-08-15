@@ -39,6 +39,7 @@ public:
     static constexpr int kDefaultMaxFps = 15;
     static constexpr bool kRemoteArchiveSynchronizationEnabledByDefault = true;
     static nx::Uuid makeCameraIdFromPhysicalId(const QString& physicalId);
+    static QString intercomSpecificPortName();
 
     using StreamIndex = nx::vms::api::StreamIndex;
 
@@ -487,6 +488,8 @@ public:
      */
     QnIOPortDataList ioPortDescriptions(Qn::IOPortType type = Qn::PT_Unknown) const;
 
+    bool isIntercom() const;
+
     nx::vms::api::ExtendedCameraOutputs extendedOutputs() const;
 
     virtual bool useBitratePerGop() const;
@@ -617,11 +620,15 @@ signals:
     void mediaCapabilitiesChanged(const QnSecurityCamResourcePtr& camera);
     void cameraHotspotsEnabledChanged(const QnSecurityCamResourcePtr& camera);
     void cameraHotspotsChanged(const QnSecurityCamResourcePtr& camera);
+    void ioPortDescriptionsChanged(const QnSecurityCamResourcePtr& camera);
 
 protected slots:
     virtual void at_motionRegionChanged();
 
 protected:
+    virtual void emitPropertyChanged(
+        const QString& key, const QString& prevValue, const QString& newValue) override;
+
     virtual void setSystemContext(nx::vms::common::SystemContext* systemContext) override;
 
     virtual void updateInternal(const QnResourcePtr& source, NotifierList& notifiers) override;
@@ -661,6 +668,7 @@ private:
     nx::utils::CachedValue<MotionStreamIndex> m_cachedMotionStreamIndex;
     nx::utils::CachedValue<QnIOPortDataList> m_cachedIoPorts;
     nx::utils::CachedValue<bool> m_cachedHasVideo;
+    nx::utils::CachedValue<bool> m_isIntercom;
 
 protected slots:
     virtual void resetCachedValues();
