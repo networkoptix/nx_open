@@ -46,11 +46,17 @@ const ItemDescriptor& RepeatSoundAction::manifest()
             makeFieldDescriptor<VolumeField>(
                 utils::kVolumeFieldName,
                 Strings::volume()),
-
-            utils::makeTextFormatterFieldDescriptor("caption", "{event.caption}"),
-            utils::makeTextFormatterFieldDescriptor("description", "{event.description}"),
-            utils::makeTextFormatterFieldDescriptor("tooltip", "{event.extendedDescription}"),
-            utils::makeExtractDetailFieldDescriptor("sourceName", utils::kSourceNameDetailName),
+            utils::makeTextFormatterFieldDescriptor(
+                utils::kCaptionFieldName, "{event.caption}",
+                NX_DYNAMIC_TRANSLATABLE(tr("Caption"))),
+            utils::makeTextFormatterFieldDescriptor(utils::kDescriptionFieldName,
+                "{event.description}",
+                NX_DYNAMIC_TRANSLATABLE(tr("Description"))),
+            utils::makeTextFormatterFieldDescriptor(utils::kTooltipFieldName,
+                "{event.extendedDescription}",
+                NX_DYNAMIC_TRANSLATABLE(tr("Tooltip text"))),
+            utils::makeExtractDetailFieldDescriptor(
+                "sourceName", utils::kSourceNameDetailName),
         },
         .resources = {
             {utils::kDeviceIdsFieldName, {ResourceType::device, {}, {}, FieldFlag::target}},

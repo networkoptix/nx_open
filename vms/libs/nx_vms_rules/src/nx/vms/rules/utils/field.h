@@ -97,9 +97,15 @@ FieldDescriptor makeExtractDetailFieldDescriptor(
     const QString& fieldName,
     const QString& detailName);
 
+FieldDescriptor makeTextWithFieldsDescriptorWithVisibilityConfig(
+    const QString& fieldName,
+    const QString& formatString,
+    const TranslatableString& displayName);
+
 FieldDescriptor makeTextFormatterFieldDescriptor(
     const QString& fieldName,
-    const QString& formatString);
+    const QString& formatString,
+    const TranslatableString& displayName);
 
 FieldDescriptor makeActionFlagFieldDescriptor(
     const QString& fieldName,

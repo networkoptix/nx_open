@@ -218,8 +218,10 @@ EditVmsRuleDialog::EditVmsRuleDialog(QWidget* parent):
         actionLayout->addStretch(1);
 
         contentLayout->addLayout(actionLayout);
+        contentLayout->setSizeConstraint(QLayout::SetMinimumSize);
 
         mainLayout->addWidget(m_contentWidget);
+        mainLayout->setSizeConstraint(QLayout::SetMinimumSize);
     }
 
     {

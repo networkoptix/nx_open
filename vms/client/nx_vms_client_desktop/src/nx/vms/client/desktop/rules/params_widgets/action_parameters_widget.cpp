@@ -45,6 +45,7 @@ void ActionParametersWidget::onRuleSet(bool isNewRule)
     auto layout = new QVBoxLayout;
     layout->setSpacing(0);
     layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSizeConstraint(QLayout::SetMinimumSize);
 
     m_pickers.clear();
 

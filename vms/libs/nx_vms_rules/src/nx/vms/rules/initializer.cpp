@@ -185,6 +185,7 @@ void Initializer::registerFieldValidators() const
     registerFieldValidator<TargetServerField>(new TargetServerFieldValidator);
     registerFieldValidator<TargetSingleDeviceField>(new TargetSingleDeviceFieldValidator);
     registerFieldValidator<TargetUserField>(new TargetUserFieldValidator);
+    registerFieldValidator<TextFormatter>(new TextWithFieldsValidator);
     registerFieldValidator<TextWithFields>(new TextWithFieldsValidator);
 }
 

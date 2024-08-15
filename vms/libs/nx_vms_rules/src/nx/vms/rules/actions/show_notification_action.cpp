@@ -36,31 +36,15 @@ const ItemDescriptor& NotificationAction::manifest()
             makeFieldDescriptor<ActionFlagField>(utils::kAcknowledgeFieldName,
                 NX_DYNAMIC_TRANSLATABLE(tr("Force Acknowledgement"))),
             utils::makeIntervalFieldDescriptor(Strings::intervalOfAction()),
-
-            makeFieldDescriptor<TextWithFields>(
-                utils::kCaptionFieldName,
-                NX_DYNAMIC_TRANSLATABLE(tr("Caption")),
-                /*description*/ {},
-                {
-                    { "text", "{event.caption}" },
-                    { "visible", false }
-                }),
-            makeFieldDescriptor<TextWithFields>(
-                utils::kDescriptionFieldName,
-                NX_DYNAMIC_TRANSLATABLE(tr("Description")),
-                /*description*/ {},
-                {
-                    { "text", "{event.description}" },
-                    { "visible", false }
-                }),
-            makeFieldDescriptor<TextWithFields>(
-                utils::kTooltipFieldName,
-                NX_DYNAMIC_TRANSLATABLE(tr("Tooltip")),
-                /*description*/ {},
-                {
-                    { "text", "{event.extendedDescription}" },
-                    { "visible", false }
-                }),
+            utils::makeTextWithFieldsDescriptorWithVisibilityConfig(utils::kCaptionFieldName,
+                "{event.caption}",
+                NX_DYNAMIC_TRANSLATABLE(tr("Caption"))),
+            utils::makeTextWithFieldsDescriptorWithVisibilityConfig(utils::kDescriptionFieldName,
+                "{event.description}",
+                NX_DYNAMIC_TRANSLATABLE(tr("Description"))),
+            utils::makeTextWithFieldsDescriptorWithVisibilityConfig(utils::kTooltipFieldName,
+                "{event.extendedDescription}",
+                NX_DYNAMIC_TRANSLATABLE(tr("Tooltip text"))),
             makeFieldDescriptor<EventDevicesField>(
                 utils::kDeviceIdsFieldName,
                 Strings::eventDevices()),
