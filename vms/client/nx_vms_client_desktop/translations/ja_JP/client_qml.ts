@@ -2452,7 +2452,7 @@ Alt + クリックを使用してください。</translation>
     </message>
     <message>
       <source>Regular user with credentials</source>
-      <translation>資格情報を持つ通常ユーザー</translation>
+      <translation>認証情報を持つ正規ユーザー</translation>
     </message>
     <message>
       <source>Temporary with link</source>
