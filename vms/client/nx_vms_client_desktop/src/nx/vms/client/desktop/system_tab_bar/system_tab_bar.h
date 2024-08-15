@@ -43,9 +43,7 @@ private slots:
     void at_tabMoved(int from, int to);
 
 private:
-    void insertClosableTab(int index,
-        const QString& text,
-        const core::SystemDescriptionPtr& systemDescription);
+    void insertClosableTab(int index, const core::SystemDescriptionPtr& systemDescription);
     void connectToSystem(const core::SystemDescriptionPtr& system, const LogonData& logonData);
     bool disconnectFromSystem(const nx::Uuid& localId);
     QPixmap imageData(int tabIndex) const;
