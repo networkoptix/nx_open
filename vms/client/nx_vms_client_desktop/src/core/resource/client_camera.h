@@ -37,8 +37,6 @@ public:
      */
     virtual QString idForToStringFromPtr() const override;
 
-    bool isIntercom() const;
-
     /**
     * Whether client should automatically send PTZ Stop command when camera loses focus.
     * Enabled by default, can be disabled by setting a special resource property.
@@ -58,5 +56,4 @@ private:
     Qn::ResourceFlags calculateFlags() const;
 private:
     mutable std::atomic<Qn::ResourceFlags> m_cachedFlags{};
-    nx::utils::CachedValue<bool> m_isIntercom;
 };

@@ -6,6 +6,8 @@
 
 #include <client/desktop_client_message_processor.h>
 #include <core/resource_access/access_rights_manager.h>
+#include <core/resource_access/resource_access_manager.h>
+#include <core/resource_access/resource_access_subject.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
@@ -80,15 +82,24 @@ protected:
         return camera;
     }
 
-    void initializeIntercom(const QnVirtualCameraResourcePtr& camera) const
+    void initializeIntercom(
+        const QnVirtualCameraResourcePtr& camera,
+        bool asOnServerSide = true) const
     {
-        static const QString kOpenDoorPortName = QString::fromStdString(
-            nx::reflect::toString(nx::vms::api::ExtendedCameraOutput::powerRelay));
-
         QnIOPortData intercomFeaturePort;
-        intercomFeaturePort.outputName = kOpenDoorPortName;
+        intercomFeaturePort.outputName = QnSecurityCamResource::intercomSpecificPortName();
 
-        camera->setIoPortDescriptions({intercomFeaturePort}, false);
+        if (asOnServerSide)
+        {
+            camera->setIoPortDescriptions({intercomFeaturePort}, false);
+        }
+        else //< As on the client side.
+        {
+            camera->setProperty(
+                ResourcePropertyKey::kIoSettings,
+                QString::fromStdString(nx::reflect::json::serialize(
+                    QnIOPortDataList{intercomFeaturePort})));
+        }
     }
 
     QnLayoutResourceList layouts() const
@@ -132,7 +143,7 @@ TEST_F(IntercomManagerTest, dontCreateIntercomLayoutWithoutRequiredPermissions)
     ASSERT_TRUE(layouts().empty());
 }
 
-TEST_F(IntercomManagerTest, createIntercomLayoutWhenIntercomIsInitialized)
+TEST_F(IntercomManagerTest, createIntercomLayoutWhenIntercomIsInitializedOnClient)
 {
     loginAs(kPowerUsersGroupId);
     EXPECT_TRUE(layouts().empty());
@@ -141,11 +152,22 @@ TEST_F(IntercomManagerTest, createIntercomLayoutWhenIntercomIsInitialized)
     resourcePool()->addResource(camera);
     EXPECT_TRUE(layouts().empty());
 
-    initializeIntercom(camera);
+    // Fill cache of IntercomLayoutAccessResolver with zero founded intercoms.
+    auto accessibleResources =
+        resourceAccessManager()->resourceAccessMap(accessController()->user());
+    ASSERT_EQ(accessibleResources.size(), 4);
+
+    initializeIntercom(
+        camera,
+        false //< As on the client, because layout is created on the client side.
+    );
 
     ASSERT_EQ(layouts().size(), 1);
     EXPECT_TRUE(nx::vms::common::isIntercomOnIntercomLayout(camera, layouts()[0]));
     EXPECT_TRUE(layouts()[0]->hasFlags(Qn::local));
+
+    accessibleResources = resourceAccessManager()->resourceAccessMap(accessController()->user());
+    ASSERT_EQ(accessibleResources.size(), 5);
 }
 
 TEST_F(IntercomManagerTest, createIntercomLayoutWhenIntercomAccessIsGranted)
