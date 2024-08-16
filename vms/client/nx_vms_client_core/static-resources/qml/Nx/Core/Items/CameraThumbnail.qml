@@ -36,5 +36,6 @@ Rectangle
     {
         id: thumbnail
         maximumSize: width
+        enforced: true
     }
 }
