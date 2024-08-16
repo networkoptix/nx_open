@@ -26,13 +26,16 @@ const ItemDescriptor& HttpAction::manifest()
         .targetServers = TargetServers::currentServer,
         .fields = {
             makeFieldDescriptor<TextWithFields>("url",
-                NX_DYNAMIC_TRANSLATABLE(tr("URL"))),
+                NX_DYNAMIC_TRANSLATABLE(tr("URL")),
+                {},
+                TextWithFieldsFieldProperties{
+                    .validationPolicy = kUrlValidationPolicy}.toVariantMap()),
+            makeFieldDescriptor<HttpMethodField>("method",
+                NX_DYNAMIC_TRANSLATABLE(tr("Method"))),
             makeFieldDescriptor<TextWithFields>("content",
                 NX_DYNAMIC_TRANSLATABLE(tr("Content"))),
             makeFieldDescriptor<ContentTypeField>("contentType",
                 NX_DYNAMIC_TRANSLATABLE(tr("Content type"))),
-            makeFieldDescriptor<HttpMethodField>("method",
-                NX_DYNAMIC_TRANSLATABLE(tr("Method"))),
             makeFieldDescriptor<HttpAuthField>("auth",
                 NX_DYNAMIC_TRANSLATABLE(tr("HTTP authentication"))),
             // TODO: #sivanov Reuse makeIntervalFieldDescriptor instead.

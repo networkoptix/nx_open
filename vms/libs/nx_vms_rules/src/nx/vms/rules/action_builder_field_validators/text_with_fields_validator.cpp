@@ -20,7 +20,7 @@ ValidationResult TextWithFieldsValidator::validity(
     const Field* field, const Rule* rule, common::SystemContext* context) const
 {
     const auto textWithFields = dynamic_cast<const TextWithFields*>(field);
-    if (!NX_ASSERT(textWithFields, tr("Unacceptable typed of field")))
+    if (!NX_ASSERT(textWithFields, "Unacceptable type of field"))
         return {QValidator::State::Invalid, Strings::invalidFieldType()};
 
     using namespace utils;
@@ -39,11 +39,31 @@ ValidationResult TextWithFieldsValidator::validity(
     {
         if (value.type != TextWithFields::FieldType::Substitution)
             continue;
+
         value.isValid = availableNames.contains(EventParameterHelper::removeBrackets(value.value));
     }
 
-    return {.validity = QValidator::State::Acceptable,
+    ValidationResult result{
+        .validity = QValidator::State::Acceptable,
         .additionalData = QVariant::fromValue(parsedValues)};
+
+    const auto text = textWithFields->text();
+    if (!text.isEmpty() && textWithFields->properties().validationPolicy == kUrlValidationPolicy)
+    {
+        const auto url = QUrl::fromUserInput(text);
+        if (!url.isValid())
+        {
+            result.validity = QValidator::State::Invalid;
+            result.description = tr("Url should be valid");
+        }
+        else if (!url.userInfo().isEmpty())
+        {
+            result.validity = QValidator::State::Intermediate;
+            result.description = tr("Url should not contains user or password");
+        }
+    }
+
+    return result;
 }
 
 } // namespace nx::vms::rules

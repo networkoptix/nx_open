@@ -22,6 +22,8 @@ public:
     void updateUi() override;
     virtual bool hasSeparator() override;
 
+    void setValidity(const vms::rules::ValidationResult& validationResult) override;
+
 private:
     struct Private;
     nx::utils::ImplPtr<Private> d;

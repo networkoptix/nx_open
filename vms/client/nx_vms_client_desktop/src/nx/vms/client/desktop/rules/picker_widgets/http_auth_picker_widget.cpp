@@ -7,6 +7,7 @@
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QVBoxLayout>
 
+#include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/window_context.h>
@@ -18,16 +19,37 @@
 
 namespace nx::vms::client::desktop::rules {
 
+namespace {
+
+template<class T>
+T* createLayout(QWidget* parent = nullptr)
+{
+    auto layout = new T{parent};
+    layout->setSpacing(style::Metrics::kDefaultLayoutSpacing.width());
+
+    return layout;
+}
+
+void adjustLayout(QHBoxLayout* layout)
+{
+    layout->setStretch(0, 1);
+    layout->setStretch(1, 5);
+}
+
+} // namespace
+
 struct HttpAuthPicker::Private
 {
     QComboBox* comboBox{nullptr};
     QLineEdit* login{nullptr};
     QLineEdit* password{nullptr};
     QLineEdit* token{nullptr};
+    AlertLabel* alertLabel{nullptr};
     QVBoxLayout* mainLayout{nullptr};
 
     QWidget* loginPasswordGroup{nullptr};
     QWidget* tokenGroup{nullptr};
+    QWidget* alertGroup{nullptr};
 
     const QString bearerStr = "Bearer";
     const QString basicStr = "Basic";
@@ -35,10 +57,7 @@ struct HttpAuthPicker::Private
 
     QHBoxLayout* createWidgetWithHint(const QString& labelText, QWidget* widget)
     {
-        auto lineLayout = new QHBoxLayout();
-        lineLayout->setSpacing(style::Metrics::kDefaultLayoutSpacing.width());
-        lineLayout->setContentsMargins(
-            style::Metrics::kDefaultTopLevelMargin, 4, style::Metrics::kDefaultTopLevelMargin, 4);
+        auto lineLayout = createLayout<QHBoxLayout>();
 
         auto label = new WidgetWithHint<QnElidedLabel>;
         label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
@@ -50,8 +69,7 @@ struct HttpAuthPicker::Private
 
         lineLayout->addWidget(widget);
         lineLayout->setAlignment(label, Qt::AlignTop);
-        lineLayout->setStretch(0, 1);
-        lineLayout->setStretch(1, 5);
+        adjustLayout(lineLayout);
 
         widget->setSizePolicy(QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred));
         return lineLayout;
@@ -63,6 +81,7 @@ struct HttpAuthPicker::Private
         lineEdit->setSizePolicy(QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred));
         if (isPassword)
             lineEdit->setEchoMode(QLineEdit::Password);
+
         return lineEdit;
     }
 };
@@ -75,7 +94,9 @@ HttpAuthPicker::HttpAuthPicker(
     base(field, context, parent),
     d(new HttpAuthPicker::Private())
 {
-    auto mainLayout = new QVBoxLayout{this};
+    auto mainLayout = createLayout<QVBoxLayout>(this);
+    mainLayout->setContentsMargins(
+            style::Metrics::kDefaultTopLevelMargin, 4, style::Metrics::kDefaultTopLevelMargin, 4);
     d->comboBox = new QComboBox;
     mainLayout->addLayout(d->createWidgetWithHint(tr("Authentication"), d->comboBox));
 
@@ -95,6 +116,17 @@ HttpAuthPicker::HttpAuthPicker(
 
     mainLayout->addWidget(d->tokenGroup);
     d->tokenGroup->setVisible(false);
+
+    d->alertGroup = new QWidget{this};
+    auto alertLayout = createLayout<QHBoxLayout>();
+    d->alertGroup->setLayout(alertLayout);
+    d->alertLabel = new AlertLabel{d->alertGroup};
+    alertLayout->addWidget(new QWidget);
+    alertLayout->addWidget(d->alertLabel);
+    adjustLayout(alertLayout);
+
+    mainLayout->addWidget(d->alertGroup);
+    d->alertGroup->setVisible(false);
 
     d->comboBox->addItem(Strings::autoValue(),
         QVariant::fromValue(nx::network::http::AuthType::authBasicAndDigest));
@@ -170,6 +202,47 @@ void HttpAuthPicker::updateUi()
     d->login->setText(m_field->login());
     d->password->setText(m_field->password());
     d->token->setText(m_field->token());
+
+    if (isEdited())
+        setValidity(fieldValidity());
+}
+
+void HttpAuthPicker::setValidity(const vms::rules::ValidationResult& validationResult)
+{
+    if (validationResult.validity == QValidator::State::Acceptable
+        || validationResult.description.isEmpty())
+    {
+        resetErrorStyle(d->token);
+        resetErrorStyle(d->login);
+        resetErrorStyle(d->password);
+
+        d->alertGroup->setVisible(false);
+        d->alertLabel->setText({});
+        return;
+    }
+
+    if (m_field->authType() == nx::network::http::AuthType::authBearer)
+    {
+        setErrorStyle(d->token);
+    }
+    else
+    {
+        if (m_field->login().isEmpty())
+            setErrorStyle(d->login);
+        else
+            resetErrorStyle(d->login);
+
+        if (m_field->password().isEmpty())
+            setErrorStyle(d->password);
+        else
+            resetErrorStyle(d->password);
+    }
+
+    d->alertLabel->setType(validationResult.validity == QValidator::State::Intermediate
+        ? AlertLabel::Type::warning
+        : AlertLabel::Type::error);
+    d->alertLabel->setText(validationResult.description);
+    d->alertGroup->setVisible(true);
 }
 
 void HttpAuthPicker::onCurrentIndexChanged(int /*index*/)

@@ -1139,6 +1139,12 @@ void Style::drawPrimitive(PrimitiveElement element,
                 painter->drawLine(
                     rect.left() + 1, rect.top() + 1.5, rect.right(), rect.top() + 1.5);
 
+            if (isErrorStyle(widget))
+            {
+                QnScopedPainterPenRollback penRollback(painter, core::colorTheme()->color("red_l"));
+                painter->drawRoundedRect(rect, 2, 2);
+            }
+
             return;
         }
 

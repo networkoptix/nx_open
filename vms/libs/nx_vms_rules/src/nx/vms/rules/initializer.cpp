@@ -8,6 +8,8 @@
 #include <nx/vms/rules/event_filter_fields/builtin_fields.h>
 #include <nx/vms/rules/events/builtin_events.h>
 
+#include "action_builder_field_validators/http_auth_field_validator.h"
+#include "action_builder_field_validators/http_method_field_validator.h"
 #include "action_builder_field_validators/layout_field_validator.h"
 #include "action_builder_field_validators/optional_time_field_validator.h"
 #include "action_builder_field_validators/sound_field_validator.h"
@@ -16,11 +18,11 @@
 #include "action_builder_field_validators/target_server_field_validator.h"
 #include "action_builder_field_validators/target_single_device_field_validator.h"
 #include "action_builder_field_validators/target_user_field_validator.h"
+#include "action_builder_field_validators/text_with_fields_validator.h"
 #include "event_filter_field_validators/source_camera_field_validator.h"
 #include "event_filter_field_validators/source_server_field_validator.h"
 #include "event_filter_field_validators/source_user_field_validator.h"
 #include "event_filter_field_validators/state_field_validator.h"
-#include "event_filter_field_validators/text_with_fields_validator.h"
 
 namespace nx::vms::rules {
 
@@ -175,6 +177,8 @@ void Initializer::registerFieldValidators() const
     registerFieldValidator<StateField>(new StateFieldValidator);
 
     // Action field validators.
+    registerFieldValidator<HttpAuthField>(new HttpAuthFieldValidator);
+    registerFieldValidator<HttpMethodField>(new HttpMethodFieldValidator);
     registerFieldValidator<LayoutField>(new LayoutFieldValidator);
     registerFieldValidator<OptionalTimeField>(new OptionalTimeFieldValidator);
     registerFieldValidator<SoundField>(new SoundFieldValidator);
