@@ -418,6 +418,42 @@ NX_REFLECTION_INSTRUMENT(SystemSharing, (systemId)(accountId)(accountFullName)(u
 
 using SystemSharingList = std::vector<SystemSharing>;
 
+/**
+ * Describes an account to system relation.
+ * Extended with account 2fa state information
+ */
+struct SystemSharingEx: SystemSharing
+{
+    using base_type = SystemSharing;
+
+    /**%apidoc True if two-factor authentication is REQUIRED for the account.*/
+    bool account2faEnabled = false;
+
+    bool operator==(const SystemSharingEx& rhs) const
+    {
+        return std::tie(static_cast<const base_type&>(*this), account2faEnabled)
+            == std::tie(static_cast<const base_type&>(rhs), rhs.account2faEnabled);
+    }
+
+    bool operator<(const SystemSharingEx& rhs) const
+    {
+        return std::tie(static_cast<const base_type&>(*this), account2faEnabled)
+            < std::tie(static_cast<const base_type&>(rhs), rhs.account2faEnabled);
+    }
+
+    SystemSharingEx() = default;
+
+    SystemSharingEx(const SystemSharing& systemSharing):
+        SystemSharing(std::move(systemSharing))
+    {
+    }
+};
+
+NX_REFLECTION_INSTRUMENT(SystemSharingEx, (systemId)(accountId)(accountFullName)(usageFrequency) \
+    (lastLoginTime)(type)(readonly)(hidden)(account2faEnabled))
+
+using SystemSharingExList = std::vector<SystemSharingEx>;
+
 struct ShareSystemQuery
 {
     /**%apidoc Specifies whether the "system shared with you" notification is sent or not. */
