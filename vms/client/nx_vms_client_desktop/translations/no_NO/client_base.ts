@@ -6346,7 +6346,7 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     </message>
     <message>
       <source>Screen is locked and cannot be changed</source>
-      <translation type="unfinished">Screen is locked and cannot be changed</translation>
+      <translation>Oppsettet er låst og kan ikke endres</translation>
     </message>
   </context>
   <context>
