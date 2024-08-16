@@ -53,7 +53,7 @@
 #include <nx/vms/event/actions/abstract_action.h>
 #include <nx/vms/event/actions/actions_fwd.h>
 #include <nx/vms/event/actions/common_action.h>
-#include <nx/vms/event/actions/intercom_call_action.h>
+#include <nx/vms/event/actions/system_health_action.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/managers/abstract_event_rules_manager.h>
@@ -1220,7 +1220,7 @@ void LayoutsHandler::at_openIntercomLayoutAction_triggered()
     const auto businessAction =
         parameters.argument<vms::event::AbstractActionPtr>(Qn::ActionDataRole);
 
-    vms::event::IntercomCallActionPtr broadcastAction(new vms::event::IntercomCallAction(
+    vms::event::SystemHealthActionPtr broadcastAction(new vms::event::SystemHealthAction(
         MessageType::showIntercomInformer,
         businessAction->getRuntimeParams().eventResourceId));
     broadcastAction->setToggleState(nx::vms::api::EventState::inactive);

@@ -27,7 +27,4 @@ using SendMailActionPtr = QSharedPointer<class SendMailAction>;
 class SystemHealthAction;
 using SystemHealthActionPtr = QSharedPointer<class SystemHealthAction>;
 
-class IntercomCallAction;
-using IntercomCallActionPtr = QSharedPointer<class IntercomCallAction>;
-
 } // namespace nx::vms::event
