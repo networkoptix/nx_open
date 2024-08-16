@@ -9,7 +9,7 @@ function(verify_python_version_is_compatible)
         ERROR_STRIP_TRAILING_WHITESPACE
     )
 
-    if (NOT "${PYTHON_VERSION}" MATCHES "Python 3\.(8|9|10|11)(\..*)?")
+    if (NOT "${PYTHON_VERSION}" MATCHES "Python 3\.(8|9|10|11|12)(\..*)?")
         set(PYTHON_EXECUTABLE PYTHON_EXECUTABLE-NOTFOUND PARENT_SCOPE)
     endif()
 endfunction()
