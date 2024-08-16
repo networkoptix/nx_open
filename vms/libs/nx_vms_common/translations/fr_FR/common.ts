@@ -1788,7 +1788,7 @@
     </message>
     <message>
       <source>Channel partners service</source>
-      <translation>Service de partenaires de distribution</translation>
+      <translation>Service des partenaires de distribution</translation>
     </message>
     <message>
       <source>Allow Power User editing Security Settings</source>
