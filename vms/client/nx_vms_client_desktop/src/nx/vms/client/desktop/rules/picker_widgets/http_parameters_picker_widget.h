@@ -69,10 +69,11 @@ public:
         HttpParametersPickerBase<vms::rules::HttpMethodField>(field, context, parent)
     {
         m_comboBox->addItem(Strings::autoValue());
-        m_comboBox->addItem("GET");
-        m_comboBox->addItem("POST");
-        m_comboBox->addItem("PUT");
-        m_comboBox->addItem("DELETE");
+        m_comboBox->addItem(network::http::Method::get.data());
+        m_comboBox->addItem(network::http::Method::post.data());
+        m_comboBox->addItem(network::http::Method::put.data());
+        m_comboBox->addItem(network::http::Method::patch.data());
+        m_comboBox->addItem(network::http::Method::delete_.data());
     }
 };
 

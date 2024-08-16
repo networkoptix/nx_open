@@ -130,6 +130,11 @@ void TextWithFields::setText(const QString& text)
     emit textChanged();
 }
 
+TextWithFieldsFieldProperties TextWithFields::properties() const
+{
+    return TextWithFieldsFieldProperties::fromVariantMap(descriptor()->properties);
+}
+
 const TextWithFields::ParsedValues& TextWithFields::parsedValues() const
 {
     return d->values;

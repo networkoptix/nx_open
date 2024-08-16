@@ -9,6 +9,36 @@
 
 namespace nx::vms::rules {
 
+constexpr auto kUrlValidationPolicy = "url";
+
+struct TextWithFieldsFieldProperties
+{
+    /** Whether given field should be visible in the editor. */
+    bool visible{true};
+
+    QString validationPolicy;
+
+    QVariantMap toVariantMap() const
+    {
+        QVariantMap result;
+
+        result.insert("visible", visible);
+        result.insert("validationPolicy", validationPolicy);
+
+        return result;
+    }
+
+    static TextWithFieldsFieldProperties fromVariantMap(const QVariantMap& properties)
+    {
+        TextWithFieldsFieldProperties result;
+
+        result.visible = properties.value("visible", true).toBool();
+        result.validationPolicy = properties.value("validationPolicy").toString();
+
+        return result;
+    }
+};
+
  /** Perform string formatting using event data values. */
 class NX_VMS_RULES_API TextWithFields:
     public ActionBuilderField,
@@ -27,6 +57,8 @@ public:
 
     QString text() const;
     void setText(const QString& text);
+
+    TextWithFieldsFieldProperties properties() const;
 
     void parseText();
 

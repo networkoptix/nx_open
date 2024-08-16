@@ -5,6 +5,7 @@
 #include <QtCore/QJsonDocument>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QPushButton>
+#include <QtWidgets/QScrollArea>
 #include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QStackedWidget>
 #include <QtWidgets/QVBoxLayout>
@@ -131,6 +132,8 @@ EditVmsRuleDialog::EditVmsRuleDialog(QWidget* parent):
     {
         m_contentWidget = new QWidget;
         auto contentLayout = new QHBoxLayout{m_contentWidget};
+        contentLayout->setContentsMargins(style::Metrics::kDefaultTopLevelMargins);
+        contentLayout->setSizeConstraint(QLayout::SetMinimumSize);
 
         auto eventLayout = new QVBoxLayout;
         eventLayout->setSpacing(style::Metrics::kDefaultLayoutSpacing.height());
@@ -151,6 +154,8 @@ EditVmsRuleDialog::EditVmsRuleDialog(QWidget* parent):
 
         auto eventFrameLayout = new QVBoxLayout{eventFrame};
         eventFrameLayout->setSpacing(0);
+        eventFrameLayout->setSizeConstraint(QLayout::SetMinimumSize);
+
         m_eventTypePicker = new EventTypePickerWidget{this->systemContext()};
         connect(
             m_eventTypePicker,
@@ -165,10 +170,7 @@ EditVmsRuleDialog::EditVmsRuleDialog(QWidget* parent):
         m_eventEditorWidget = new EventParametersWidget{windowContext()};
         eventFrameLayout->addWidget(m_eventEditorWidget);
 
-        eventFrameLayout->addStretch();
-
         eventLayout->addWidget(eventFrame);
-
         eventLayout->addStretch(1);
 
         contentLayout->addLayout(eventLayout);
@@ -197,6 +199,8 @@ EditVmsRuleDialog::EditVmsRuleDialog(QWidget* parent):
 
         auto actionFrameLayout = new QVBoxLayout{actionFrame};
         actionFrameLayout->setSpacing(0);
+        actionFrameLayout->setSizeConstraint(QLayout::SetMinimumSize);
+
         m_actionTypePicker = new ActionTypePickerWidget{this->systemContext()};
         connect(
             m_actionTypePicker,
@@ -211,17 +215,17 @@ EditVmsRuleDialog::EditVmsRuleDialog(QWidget* parent):
         m_actionEditorWidget = new ActionParametersWidget{windowContext()};
         actionFrameLayout->addWidget(m_actionEditorWidget);
 
-        actionFrameLayout->addStretch();
-
         actionLayout->addWidget(actionFrame);
-
         actionLayout->addStretch(1);
 
         contentLayout->addLayout(actionLayout);
         contentLayout->setSizeConstraint(QLayout::SetMinimumSize);
 
-        mainLayout->addWidget(m_contentWidget);
-        mainLayout->setSizeConstraint(QLayout::SetMinimumSize);
+        m_scrollArea = new QScrollArea;
+        m_scrollArea->setWidget(m_contentWidget);
+        m_scrollArea->setWidgetResizable(true);
+
+        mainLayout->addWidget(m_scrollArea);
     }
 
     {

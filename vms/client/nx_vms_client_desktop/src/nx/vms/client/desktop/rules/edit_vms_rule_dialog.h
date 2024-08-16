@@ -15,6 +15,7 @@
 #include "helpers/rule_compatibility_manager.h"
 
 class QLabel;
+class QScrollArea;
 
 namespace nx::vms::client::desktop::rules {
 
@@ -45,6 +46,7 @@ private:
     QLabel* m_actionLabel{nullptr};
     EditableLabel* m_editableLabel{nullptr};
     QPushButton* m_deleteButton{nullptr};
+    QScrollArea* m_scrollArea{nullptr};
     QWidget* m_contentWidget{nullptr};
     EventTypePickerWidget* m_eventTypePicker{nullptr};
     EventParametersWidget* m_eventEditorWidget{nullptr};
