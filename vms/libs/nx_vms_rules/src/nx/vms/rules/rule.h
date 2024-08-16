@@ -77,14 +77,6 @@ public:
         const EventFieldFilter& eventFieldFilter = {},
         const ActionFieldFilter& actionFieldFilter = {}) const;
 
-    void connectSignals();
-
-signals:
-    void stateChanged();
-
-private:
-    void updateState();
-
 private:
     nx::Uuid m_id;
     const Engine* m_engine;
@@ -97,10 +89,6 @@ private:
     bool m_enabled = true;
     bool m_internal = false;
     QByteArray m_schedule;
-
-    bool m_updateInProgress = false;
 };
-
-NX_VMS_RULES_API bool operator==(const Rule& left, const Rule& right);
 
 } // namespace nx::vms::rules

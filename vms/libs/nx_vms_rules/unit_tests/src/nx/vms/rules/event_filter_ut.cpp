@@ -67,14 +67,6 @@ protected:
     KeywordsField* descriptionField{};
 };
 
-// TODO: Does the default filter match to the default event?
-// TEST_F(EventFilterTest, defaultGenericEventFilterIsMatchToDefaultGenericEvent)
-// {
-//     EventPtr genericEvent(new GenericEvent);
-
-//     ASSERT_TRUE(filter->match(genericEvent));
-// }
-
 TEST_F(EventFilterTest, allEventFieldsMatchToAllFilterFieldsTest)
 {
     auto genericEvent = makeEvent("Source string", "Caption string", "Description string");

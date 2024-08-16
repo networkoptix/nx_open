@@ -49,8 +49,6 @@ public:
 
     QString metatype() const;
 
-    void connectSignals();
-
     QMap<QString, QJsonValue> serializedProperties() const;
 
     const FieldDescriptor* descriptor() const;
@@ -61,20 +59,10 @@ public:
      */
     bool setProperties(const QVariantMap& properties);
 
-    bool event(QEvent* ev) override;
-
     FieldProperties properties() const;
-
-signals:
-    void stateChanged();
-
-private:
-    void notifyParent();
 
 private:
     const FieldDescriptor* m_descriptor = nullptr;
-    bool m_connected = false;
-    bool m_updateInProgress = false;
 };
 
 template <class T>

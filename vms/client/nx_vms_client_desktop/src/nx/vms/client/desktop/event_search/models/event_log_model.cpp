@@ -31,6 +31,7 @@
 #include <nx/vms/rules/utils/common.h>
 #include <nx/vms/rules/utils/event_details.h>
 #include <nx/vms/rules/utils/field.h>
+#include <nx/vms/rules/utils/resource.h>
 #include <nx/vms/time/formatter.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/synctime.h>

@@ -6,7 +6,8 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/common/system_context.h>
 
-#include "../utils/field.h"
+#include "../manifest.h"
+#include "../utils/resource.h"
 
 namespace nx::vms::rules {
 

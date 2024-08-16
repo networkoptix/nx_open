@@ -25,7 +25,8 @@ AnalyticsObjectEvent::AnalyticsObjectEvent(
     nx::Uuid objectTrackId,
     const nx::common::metadata::Attributes& attributes)
     :
-    AnalyticsEngineEvent(timestamp, QString(), QString(), cameraId, engineId), // TODO: #mmalofeev Should AnalyticsObjectEvent has a caption like an AnalyticsEvent?
+    // TODO: #mmalofeev Should AnalyticsObjectEvent has a caption like an AnalyticsEvent?
+    AnalyticsEngineEvent(timestamp, QString(), QString(), cameraId, engineId),
     m_objectTypeId(objectTypeId),
     m_objectTrackId(objectTrackId),
     m_attributes(attributes)

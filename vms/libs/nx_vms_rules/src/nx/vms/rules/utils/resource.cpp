@@ -7,7 +7,10 @@
 #include <nx/utils/qt_helpers.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
 
+#include "../aggregated_event.h"
+#include "../basic_action.h"
 #include "../field_types.h"
+#include "field.h"
 
 namespace nx::vms::rules::utils {
 
@@ -91,6 +94,38 @@ UuidList getResourceIds(const QObject* entity, std::string_view fieldName)
         result.emplace_back(value.value<nx::Uuid>());
 
     result.removeAll({});
+
+    return result;
+}
+
+
+UuidList getDeviceIds(const AggregatedEventPtr& event)
+{
+    UuidList result;
+    result << getFieldValue<nx::Uuid>(event, utils::kCameraIdFieldName);
+    result << getFieldValue<UuidList>(event, utils::kDeviceIdsFieldName);
+    result.removeAll(nx::Uuid());
+
+    return result;
+}
+
+UuidList getResourceIds(const AggregatedEventPtr& event)
+{
+    auto result = getDeviceIds(event);
+    result << getFieldValue<nx::Uuid>(event, kServerIdFieldName);
+    result << getFieldValue<nx::Uuid>(event, kEngineIdFieldName);
+    result.removeAll(nx::Uuid());
+
+    return result;
+}
+
+UuidList getResourceIds(const ActionPtr& action)
+{
+    UuidList result;
+    result << getFieldValue<nx::Uuid>(action, kCameraIdFieldName);
+    result << getFieldValue<UuidList>(action, kDeviceIdsFieldName);
+    result << getFieldValue<nx::Uuid>(action, kServerIdFieldName);
+    result.removeAll(nx::Uuid());
 
     return result;
 }

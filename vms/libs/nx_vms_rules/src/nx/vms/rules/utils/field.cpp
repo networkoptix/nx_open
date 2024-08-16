@@ -10,8 +10,6 @@
 #include "../action_builder_fields/flag_field.h"
 #include "../action_builder_fields/optional_time_field.h"
 #include "../action_builder_fields/text_with_fields.h"
-#include "../aggregated_event.h"
-#include "../basic_action.h"
 #include "../event_filter_fields/state_field.h"
 
 using namespace std::chrono_literals;
@@ -101,38 +99,6 @@ FieldDescriptor makeActionFlagFieldDescriptor(
 {
     return makeFieldDescriptor<ActionFlagField>(
         fieldName, displayName, description, {{"value", defaultValue}});
-}
-
-UuidList getDeviceIds(const AggregatedEventPtr& event)
-{
-    UuidList result;
-    result << getFieldValue<nx::Uuid>(event, utils::kCameraIdFieldName);
-    result << getFieldValue<UuidList>(event, utils::kDeviceIdsFieldName);
-    result.removeAll(nx::Uuid());
-
-    return result;
-}
-
-UuidList getResourceIds(const AggregatedEventPtr& event)
-{
-    auto result = getDeviceIds(event);
-    result << getFieldValue<nx::Uuid>(event, kServerIdFieldName);
-    result << getFieldValue<nx::Uuid>(event, kEngineIdFieldName);
-    // TODO: #amalov Consider reporting user in resource list.
-    result.removeAll(nx::Uuid());
-
-    return result;
-}
-
-UuidList getResourceIds(const ActionPtr& action)
-{
-    UuidList result;
-    result << getFieldValue<nx::Uuid>(action, kCameraIdFieldName);
-    result << getFieldValue<UuidList>(action, kDeviceIdsFieldName);
-    result << getFieldValue<nx::Uuid>(action, kServerIdFieldName);
-    result.removeAll(nx::Uuid());
-
-    return result;
 }
 
 } // namespace nx::vms::rules::utils

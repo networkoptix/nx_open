@@ -32,6 +32,7 @@
 #include <nx/vms/rules/strings.h>
 #include <nx/vms/rules/utils/event_details.h>
 #include <nx/vms/rules/utils/field.h>
+#include <nx/vms/rules/utils/resource.h>
 #include <ui/common/notification_levels.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/synctime.h>
