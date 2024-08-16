@@ -338,9 +338,13 @@ void NotificationActionHandler::setSystemHealthEventVisibleInternal(
     }
     else
     {
-        /* Only admins can see system health events handled here. */
-        if (!system()->accessController()->hasPowerUserPermissions())
+        // Only admins can see system health events, except intercom call-related.
+        if (message != MessageType::showIntercomInformer
+            && message != MessageType::showMissedCallInformer
+            && !system()->accessController()->hasPowerUserPermissions())
+        {
             canShow = false;
+        }
     }
 
     /* Some messages are not to be displayed to users. */

@@ -6,9 +6,11 @@
 
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/common/system_health/message_type.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
 #include <nx/vms/event/events/abstract_event.h>
 #include <nx/vms/event/strings_helper.h>
@@ -211,11 +213,42 @@ bool QnSendEmailActionDelegate::isValidUser(const QnUserResourcePtr& user)
 namespace QnBusiness {
 
 // TODO: #vkutin It's here until full refactoring.
-bool actionAllowedForUser(const nx::vms::event::AbstractActionPtr& action,
+bool actionAllowedForUser(
+    const nx::vms::event::AbstractActionPtr& action,
     const QnUserResourcePtr& user)
 {
     if (!user)
         return false;
+
+    const auto eventType = action->getRuntimeParams().eventType;
+    if (eventType >= nx::vms::api::EventType::systemHealthEvent
+        && eventType <= nx::vms::api::EventType::maxSystemHealthEvent)
+    {
+        const auto healthMessage = nx::vms::common::system_health::MessageType(
+            eventType - nx::vms::api::EventType::systemHealthEvent);
+
+        if (healthMessage == nx::vms::common::system_health::MessageType::showIntercomInformer
+            || healthMessage == nx::vms::common::system_health::MessageType::showMissedCallInformer)
+        {
+            const auto& runtimeParameters = action->getRuntimeParams();
+
+            const auto systemContext =
+                qobject_cast<nx::vms::client::desktop::SystemContext*>(user->systemContext());
+            if (!NX_ASSERT(systemContext))
+                return false;
+
+            const QnResourcePtr cameraResource =
+                systemContext->resourcePool()->getResourceById(runtimeParameters.eventResourceId);
+
+            const bool hasViewPermission = cameraResource &&
+                systemContext->accessController()->hasPermissions(
+                    cameraResource,
+                    Qn::ViewContentPermission & Qn::UserInputPermissions);
+
+            if (hasViewPermission)
+                return true;
+        }
+    }
 
     switch (action->actionType())
     {
