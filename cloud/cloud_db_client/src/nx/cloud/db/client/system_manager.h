@@ -54,7 +54,7 @@ public:
 
     virtual void getCloudUsersOfSystem(
         const std::string& systemId,
-        std::function<void(api::ResultCode, api::SystemSharingList)> completionHandler) override;
+        std::function<void(api::ResultCode, api::SystemSharingExList)> completionHandler) override;
 
     virtual void saveCloudUserOfSystem(
         const std::string& systemId,
