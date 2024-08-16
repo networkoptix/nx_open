@@ -5,7 +5,7 @@
     <name>AddLookupListEntryDialog</name>
     <message>
       <source>Add Entry</source>
-      <translation type="unfinished">Add Entry</translation>
+      <translation>Legg til oppføring</translation>
     </message>
     <message>
       <source>Add</source>
@@ -16,7 +16,7 @@
     <name>AdvancedSettingsDialog</name>
     <message>
       <source>LDAP - Advanced Settings</source>
-      <translation type="unfinished">LDAP - Advanced Settings</translation>
+      <translation>LDAP - Avanserte innstillinger</translation>
     </message>
     <message>
       <source>Users</source>
@@ -24,7 +24,7 @@
     </message>
     <message>
       <source>Login Attribute</source>
-      <translation type="unfinished">Login Attribute</translation>
+      <translation>Innloggingsattributt</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -32,7 +32,7 @@
     </message>
     <message>
       <source>Membership</source>
-      <translation type="unfinished">Membership</translation>
+      <translation>Medlemskap</translation>
     </message>
     <message>
       <source>Search Timeout</source>
@@ -248,7 +248,7 @@
     </message>
     <message>
       <source>API Integrations</source>
-      <translation type="unfinished">API Integrations</translation>
+      <translation>API Integrasjoner</translation>
     </message>
   </context>
   <context>
@@ -262,23 +262,23 @@
     <name>ApiIntegrations</name>
     <message>
       <source>API Integrations</source>
-      <translation type="unfinished">API Integrations</translation>
+      <translation>API Integrasjoner</translation>
     </message>
     <message>
       <source>API Integrations interact with %1 Server via REST API and exchange metadata</source>
-      <translation type="unfinished">API Integrations interact with %1 Server via REST API and exchange metadata</translation>
+      <translation>API Integrasjoner samhandler med %1 Server via REST API og utveksle metadata</translation>
     </message>
     <message>
       <source>New requests</source>
-      <translation type="unfinished">New requests</translation>
+      <translation>Nye forespørsler</translation>
     </message>
     <message>
       <source>API Integration may be enabled after verifying the code received from Integration provider. New requests may be disabled to prevent unwanted interaction.</source>
-      <translation type="unfinished">API Integration may be enabled after verifying the code received from Integration provider. New requests may be disabled to prevent unwanted interaction.</translation>
+      <translation>API Integrering kan være aktivert etter at du har verifisert koden mottatt fra integrasjonsleverandør. Nye forespørsler kan være deaktivert for å forhindre uønskede interaksjoner.</translation>
     </message>
     <message>
       <source>Enable %1?</source>
-      <translation type="unfinished">Enable %1?</translation>
+      <translation>Aktiver %1?</translation>
     </message>
     <message>
       <source>This Integration will be able to:
@@ -286,23 +286,23 @@
  • get access to archive
  • process video streams
  • exchange metadata over the network</source>
-      <translation type="unfinished">This Integration will be able to:
- • change settings on cameras
- • get access to archive
- • process video streams
- • exchange metadata over the network</translation>
+      <translation>Denne integrasjonen vil kunne:
+ • endre innstillinger på kameraene
+ • få tilgang til arkiv
+ • behandle videostrømmer
+ • utveksle metadata over nettverket</translation>
     </message>
     <message>
       <source>Enable Integration</source>
-      <translation type="unfinished">Enable Integration</translation>
+      <translation>Aktiver integrasjon</translation>
     </message>
     <message>
       <source>Remove %1?</source>
-      <translation type="unfinished">Remove %1?</translation>
+      <translation>Fjerne %1?</translation>
     </message>
     <message>
       <source>This will remove Integration request</source>
-      <translation type="unfinished">This will remove Integration request</translation>
+      <translation>Dette fjerner integrasjonsforespørselen</translation>
     </message>
     <message>
       <source>Remove</source>
@@ -310,7 +310,7 @@
     </message>
     <message>
       <source>Remove Request</source>
-      <translation type="unfinished">Remove Request</translation>
+      <translation>Fjern forespørsel</translation>
     </message>
   </context>
   <context>
@@ -500,7 +500,7 @@
     <name>ConnectionSettingsDialog</name>
     <message>
       <source>LDAP - Connection Settings</source>
-      <translation type="unfinished">LDAP - Connection Settings</translation>
+      <translation>LDAP - Tilkoblingsinnstillinger</translation>
     </message>
     <message>
       <source>Host</source>
@@ -508,7 +508,7 @@
     </message>
     <message>
       <source>Login DN</source>
-      <translation type="unfinished">Login DN</translation>
+      <translation>Logg inn DN</translation>
     </message>
     <message>
       <source>Password</source>
@@ -516,7 +516,7 @@
     </message>
     <message>
       <source>Ignore LDAP server certificate errors</source>
-      <translation type="unfinished">Ignore LDAP server certificate errors</translation>
+      <translation>Ignorer LDAP-tjenersertifikatfeil</translation>
     </message>
     <message>
       <source>Test</source>
@@ -604,11 +604,11 @@
     <name>EditLookupListDialog</name>
     <message>
       <source>List Settings</source>
-      <translation type="unfinished">List Settings</translation>
+      <translation>Innstillinger for liste</translation>
     </message>
     <message>
       <source>New List</source>
-      <translation type="unfinished">New List</translation>
+      <translation>Ny liste</translation>
     </message>
     <message>
       <source>Name</source>
@@ -616,7 +616,7 @@
     </message>
     <message>
       <source>Column Name</source>
-      <translation type="unfinished">Column Name</translation>
+      <translation>Kolonnenavn</translation>
     </message>
     <message>
       <source>OK</source>
@@ -731,7 +731,7 @@
     </message>
     <message>
       <source>Edit Search Base</source>
-      <translation type="unfinished">Edit Search Base</translation>
+      <translation>Rediger søkebase</translation>
     </message>
   </context>
   <context>
@@ -828,11 +828,11 @@
     <name>GlobalPermissionsTab</name>
     <message>
       <source>At the system level, group members have permissions to:</source>
-      <translation type="unfinished">At the system level, group members have permissions to:</translation>
+      <translation>På systemnivå har gruppemedlemmene rettigheter til:</translation>
     </message>
     <message>
       <source>At the system level, the user has permissions to:</source>
-      <translation type="unfinished">At the system level, the user has permissions to:</translation>
+      <translation>På systemnivå har brukeren tillatelser til:</translation>
     </message>
   </context>
   <context>
@@ -1002,7 +1002,7 @@
     </message>
     <message>
       <source>No groups</source>
-      <translation type="unfinished">No groups</translation>
+      <translation>Ingen grupper</translation>
     </message>
   </context>
   <context>
@@ -1049,7 +1049,7 @@
     <name>IntegrationHeader</name>
     <message>
       <source>Insufficient services</source>
-      <translation type="unfinished">Insufficient services</translation>
+      <translation>Utilstrekkelige tjenester</translation>
     </message>
     <message numerus="yes">
       <source>%n suitable integration services are required to turn on the integration</source>
@@ -1392,7 +1392,7 @@
     <name>LookupListsDialog</name>
     <message>
       <source>Lookup Lists</source>
-      <translation type="unfinished">Lookup Lists</translation>
+      <translation>Oppslagslister</translation>
     </message>
     <message>
       <source>Add</source>
@@ -1408,7 +1408,7 @@
     </message>
     <message>
       <source>Create New...</source>
-      <translation type="unfinished">Create New...</translation>
+      <translation>Opprett ny...</translation>
     </message>
     <message>
       <source>Settings</source>
@@ -1445,15 +1445,15 @@
     <name>NoListsPage</name>
     <message>
       <source>No Lists</source>
-      <translation type="unfinished">No Lists</translation>
+      <translation>Ingen lister</translation>
     </message>
     <message>
       <source>You have not created any Lists yet. With lists you can store multiple values to use them in Event Rules. Create a new List to start adding entries.</source>
-      <translation type="unfinished">You have not created any Lists yet. With lists you can store multiple values to use them in Event Rules. Create a new List to start adding entries.</translation>
+      <translation>Du har ikke opprettet noen lister ennå. Med lister kan du lagre flere verdier for å bruke dem i Event regler. Opprett en ny liste for å begynne å legge til oppføringer.</translation>
     </message>
     <message>
       <source>Create New...</source>
-      <translation type="unfinished">Create New...</translation>
+      <translation>Opprett ny...</translation>
     </message>
   </context>
   <context>
@@ -1505,7 +1505,7 @@
     <name>PanelBase</name>
     <message>
       <source>Approve</source>
-      <translation type="unfinished">Approve</translation>
+      <translation>Godkjenn</translation>
     </message>
     <message>
       <source>Reject</source>
@@ -1524,7 +1524,7 @@
     </message>
     <message>
       <source>No custom groups yet</source>
-      <translation type="unfinished">No custom groups yet</translation>
+      <translation>Ingen egendefinerte grupper ennå</translation>
     </message>
     <message>
       <source>No groups found</source>
@@ -1536,11 +1536,11 @@
     </message>
     <message>
       <source>No groups</source>
-      <translation type="unfinished">No groups</translation>
+      <translation>Ingen grupper</translation>
     </message>
     <message>
       <source>Use controls on the left to add to a group</source>
-      <translation type="unfinished">Use controls on the left to add to a group</translation>
+      <translation>Bruk kontrollene til venstre for å legge til en gruppe</translation>
     </message>
     <message>
       <source>Member of</source>
