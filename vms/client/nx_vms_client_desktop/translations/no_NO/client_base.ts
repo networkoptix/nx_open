@@ -5606,7 +5606,7 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>System shut down</source>
-      <translation type="unfinished">System shut down</translation>
+      <translation>Avstengning av systemet</translation>
     </message>
     <message>
       <source>Intercom call</source>
@@ -5705,7 +5705,7 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>Custom access rights</source>
-      <translation type="unfinished">Custom access rights</translation>
+      <translation>Egendefinerte tilgangsrettigheter</translation>
     </message>
   </context>
   <context>
@@ -6037,15 +6037,15 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>System shut down</source>
-      <translation type="unfinished">System shut down</translation>
+      <translation>Slå av systemet</translation>
     </message>
     <message>
       <source>To add a Video Wall, the System should be in active state. %1</source>
-      <translation type="unfinished">To add a Video Wall, the System should be in active state. %1</translation>
+      <translation>For å legge til en Videovegg bør systemet være i aktiv tilstand. %1</translation>
     </message>
     <message>
       <source>Screen is locked and cannot be changed</source>
-      <translation type="unfinished">Screen is locked and cannot be changed</translation>
+      <translation>Oppsettet er låst og kan ikke endres</translation>
     </message>
   </context>
   <context>
@@ -6415,16 +6415,16 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message numerus="yes">
       <source>Delete %n layouts?</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n layouts?</numerusform>
-        <numerusform>Delete %n layouts?</numerusform>
+      <translation>
+        <numerusform>Slett %n oppsett?</numerusform>
+        <numerusform>Slett %n oppsett?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n items were not deleted.</source>
-      <translation type="unfinished">
-        <numerusform>%n items were not deleted.</numerusform>
-        <numerusform>%n items were not deleted.</numerusform>
+      <translation>
+        <numerusform>%n elementer ble ikke slettet.</numerusform>
+        <numerusform>%n elementer ble ikke slettet.</numerusform>
       </translation>
     </message>
     <message>
@@ -6434,17 +6434,17 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     <message numerus="yes">
       <source>These layouts are shared with other users, so they will be deleted for their accounts as well.</source>
       <comment>Numerical form depends on layouts count</comment>
-      <translation type="unfinished">
-        <numerusform>These layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
-        <numerusform>These layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
+      <translation>
+        <numerusform>Disse layoutene deles med andre brukere, så de blir slettet også for kontoene sine.</numerusform>
+        <numerusform>Disse layoutene deles med andre brukere, så de blir slettet også for kontoene sine.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n layouts are shared with other users, so they will be deleted for their accounts as well.</source>
       <comment>Numerical form depends on layouts count</comment>
-      <translation type="unfinished">
-        <numerusform>%n layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
-        <numerusform>%n layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
+      <translation>
+        <numerusform>%n oppsett deles med andre brukere, så de vil bli slettet for deres kontoer også.</numerusform>
+        <numerusform>%n oppsett deles med andre brukere, så de vil bli slettet for deres kontoer også.</numerusform>
       </translation>
     </message>
     <message>
@@ -6500,9 +6500,9 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message numerus="yes">
       <source>Source Server and %n Servers</source>
-      <translation type="unfinished">
-        <numerusform>Source Server and %n Servers</numerusform>
-        <numerusform>Source Server and %n Servers</numerusform>
+      <translation>
+        <numerusform>Kildeserver og %n servere</numerusform>
+        <numerusform>Kildeserver og %n servere</numerusform>
       </translation>
     </message>
   </context>
@@ -7019,15 +7019,15 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     <name>nx::vms::client::desktop::AccessRightsList</name>
     <message>
       <source>View Archive</source>
-      <translation type="unfinished">View Archive</translation>
+      <translation>Vis arkiv</translation>
     </message>
     <message>
       <source>Export Archive</source>
-      <translation type="unfinished">Export Archive</translation>
+      <translation>Eksporter arkiv</translation>
     </message>
     <message>
       <source>View Bookmarks</source>
-      <translation type="unfinished">View Bookmarks</translation>
+      <translation>Vis bokmerker</translation>
     </message>
     <message>
       <source>Manage Bookmarks</source>
@@ -7047,7 +7047,7 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>Depending on the resource type it either allows user to modify device settings or to control video wall.</source>
-      <translation type="unfinished">Depending on the resource type it either allows user to modify device settings or to control video wall.</translation>
+      <translation>Avhengig av ressurstypen lar brukeren enten endre innstillingene eller kontrollere videoveggen.</translation>
     </message>
     <message>
       <source>Allows users to access a resource and view live footage from a camera.</source>
@@ -7293,42 +7293,42 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>Insufficient services</source>
-      <translation type="unfinished">Insufficient services</translation>
+      <translation>Utilstrekkelige tjenester</translation>
     </message>
     <message numerus="yes">
       <source>%n suitable cloud storage services are required</source>
-      <translation type="unfinished">
-        <numerusform>%n suitable cloud storage services are required</numerusform>
-        <numerusform>%n suitable cloud storage services are required</numerusform>
+      <translation>
+        <numerusform>%n egnede sky-lagringstjenester er nødvendig</numerusform>
+        <numerusform>%n egnede sky-lagringstjenester er nødvendig</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n MP</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n MP</numerusform>
         <numerusform>%n MP</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Megapixels</source>
-      <translation type="unfinished">
-        <numerusform>%n Megapixels</numerusform>
-        <numerusform>%n Megapixels</numerusform>
+      <translation>
+        <numerusform>%n Megapixler</numerusform>
+        <numerusform>%n Megapixler</numerusform>
       </translation>
     </message>
     <message>
       <source>Unknown resolution</source>
-      <translation type="unfinished">Unknown resolution</translation>
+      <translation>Ukjent oppløsning</translation>
     </message>
     <message>
       <source>No suitable cloud storage services available</source>
-      <translation type="unfinished">No suitable cloud storage services available</translation>
+      <translation>Ingen passende skylagringstjenester tilgjengelig</translation>
     </message>
     <message numerus="yes">
       <source>%n suitable cloud storage services available</source>
-      <translation type="unfinished">
-        <numerusform>%n suitable cloud storage services available</numerusform>
-        <numerusform>%n suitable cloud storage services available</numerusform>
+      <translation>
+        <numerusform>%n passende skylagringstjenester tilgjengelig</numerusform>
+        <numerusform>%n passende skylagringstjenester tilgjengelig</numerusform>
       </translation>
     </message>
     <message>
@@ -7370,7 +7370,7 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     <name>nx::vms::client::desktop::BackupSettingsViewWidget</name>
     <message>
       <source>There are more cameras being backed up than available services. Please disable backup for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</source>
-      <translation type="unfinished">There are more cameras being backed up than available services. Please disable backup for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</translation>
+      <translation>Det er flere kamera som er sikkerhetskopiert enn tilgjengelige tjenester. Deaktiver sikkerhetskopi av noen kameraer eller legg til flere egnede tjenester. Ellers vil det gjøres automatisk på %1</translation>
     </message>
   </context>
   <context>
@@ -7407,19 +7407,19 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>Backup settings are not available</source>
-      <translation type="unfinished">Backup settings are not available</translation>
+      <translation>Sikkerhetskopiinnstillinger er ikke tilgjengelige</translation>
     </message>
     <message>
       <source>System shut down</source>
-      <translation type="unfinished">System shut down</translation>
+      <translation>Avstengning av systemet</translation>
     </message>
     <message>
       <source>To perform backup to a cloud storage, the System should be in active state. %1</source>
-      <translation type="unfinished">To perform backup to a cloud storage, the System should be in active state. %1</translation>
+      <translation>For å gjøre backup til en sky-lagring, bør systemet være i aktiv tilstand. %1</translation>
     </message>
     <message>
       <source>System suspended. To make changes to backup configuration, the System should be in active state. %1</source>
-      <translation type="unfinished">System suspended. To make changes to backup configuration, the System should be in active state. %1</translation>
+      <translation>Systemet er suspendert. For å gjøre endringer i sikkerhetskopiering bør systemet være i aktiv tilstand. %1</translation>
     </message>
     <message>
       <source>Applies to all servers</source>
@@ -7656,7 +7656,7 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>Place Hotspot</source>
-      <translation type="unfinished">Place Hotspot</translation>
+      <translation>Plasser Wi-Fi-sone</translation>
     </message>
     <message>
       <source>NO DATA</source>
@@ -7671,7 +7671,7 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     <name>nx::vms::client::desktop::CameraHotspotsItemModel</name>
     <message>
       <source>Camera does not exist</source>
-      <translation type="unfinished">Camera does not exist</translation>
+      <translation>Kameraet finnes ikke</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -7683,7 +7683,7 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>Color</source>
-      <translation type="unfinished">Color</translation>
+      <translation>Farge</translation>
     </message>
     <message>
       <source>Pointed</source>
@@ -7728,9 +7728,9 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message numerus="yes">
       <source>Use Service</source>
-      <translation type="unfinished">
-        <numerusform>Use Service</numerusform>
-        <numerusform>Use Service</numerusform>
+      <translation>
+        <numerusform>Bruk tjeneste</numerusform>
+        <numerusform>Bruk tjeneste</numerusform>
       </translation>
     </message>
   </context>
@@ -8020,7 +8020,7 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>Hotspots</source>
-      <translation type="unfinished">Hotspots</translation>
+      <translation>Punkter</translation>
     </message>
     <message>
       <source>Integrations</source>
@@ -8318,15 +8318,15 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>Enter access link to continue your session</source>
-      <translation type="unfinished">Enter access link to continue your session</translation>
+      <translation>Skriv inn tilgangslinken for å fortsette økten</translation>
     </message>
     <message>
       <source>Your session has expired. Please sign in again with your link to continue.</source>
-      <translation type="unfinished">Your session has expired. Please sign in again with your link to continue.</translation>
+      <translation>Økten er utløpt. Vennligst logg på nytt med lenken for å fortsette.</translation>
     </message>
     <message>
       <source>Authentication details are incorrect</source>
-      <translation type="unfinished">Authentication details are incorrect</translation>
+      <translation>Godkjenningsdetaljer er feil</translation>
     </message>
   </context>
   <context>
@@ -8469,11 +8469,11 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     <name>nx::vms::client::desktop::CustomAccessSummaryModel</name>
     <message>
       <source>View video archive</source>
-      <translation type="unfinished">View video archive</translation>
+      <translation>Se opptak av video</translation>
     </message>
     <message>
       <source>Export video archive</source>
-      <translation type="unfinished">Export video archive</translation>
+      <translation>Eksporter videoarkiv</translation>
     </message>
     <message>
       <source>View bookmarks</source>
@@ -8485,7 +8485,7 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>User input</source>
-      <translation type="unfinished">User input</translation>
+      <translation>Brukerinndata</translation>
     </message>
     <message>
       <source>Edit camera settings</source>
@@ -8995,7 +8995,7 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>You do not have a permission to export archive for some of the selected cameras. Video from those cameras will not be exported to the resulting file.</source>
-      <translation type="unfinished">You do not have a permission to export archive for some of the selected cameras. Video from those cameras will not be exported to the resulting file.</translation>
+      <translation>Du har ikke tillatelse til å eksportere arkiv for noen av de valgte kameraene. Video fra disse kameraene blir ikke eksportert til resultatfilen.</translation>
     </message>
   </context>
   <context>

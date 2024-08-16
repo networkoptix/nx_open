@@ -1802,7 +1802,7 @@
     </message>
     <message>
       <source>Device storage information update interval</source>
-      <translation type="unfinished">Device storage information update interval</translation>
+      <translation>Oppdateringsintervall for enhetslagring</translation>
     </message>
   </context>
   <context>
