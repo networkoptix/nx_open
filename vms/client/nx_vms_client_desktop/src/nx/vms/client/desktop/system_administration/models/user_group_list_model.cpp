@@ -108,7 +108,9 @@ struct UserGroupListModel::Private
 
     QStringList getParentGroupNames(const UserGroupData& group) const
     {
-        return nx::vms::common::userGroupNames(q->systemContext(), group.parentGroupIds,
+        return nx::vms::common::userGroupNames(
+            q->systemContext(),
+            nx::utils::toQSet(group.parentGroupIds),
             [](const auto& g1, const auto& g2)
             {
                 return ComparableGroup(g1) < ComparableGroup(g2);
