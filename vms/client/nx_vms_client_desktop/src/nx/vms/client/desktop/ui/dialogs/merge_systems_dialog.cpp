@@ -44,6 +44,12 @@ namespace {
 
 constexpr int kMaxSystemNameLength = 20;
 
+const QSize kIconSize(20, 20);
+
+const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kIconSubstitutions = {
+    {QIcon::Normal, {.primary = "red_l2"}},
+};
+
 } // namespace
 
 namespace nx::vms::client::desktop {
@@ -62,8 +68,6 @@ MergeSystemsDialog::MergeSystemsDialog(QWidget* parent, std::unique_ptr<Delegate
     setButtonBox(ui->buttonBox);
     setHelpTopic(this, HelpTopic::Id::Systems_MergeSystems);
 
-    setWarningStyle(ui->errorLabel);
-
     ui->warnWidget->setHidden(true);
     ui->warnIconLabel->setPixmap(qnSkin->pixmap("tree/warning_yellow.svg"));
     setPaletteColor(ui->warningLabel, QPalette::WindowText, core::colorTheme()->color("yellow_d2"));
@@ -79,10 +83,12 @@ MergeSystemsDialog::MergeSystemsDialog(QWidget* parent, std::unique_ptr<Delegate
     m_mergeButton = buttonBox()->addButton(QString(), QDialogButtonBox::ActionRole);
     // Do not join strings to avoid translatable string duplication.
     m_mergeButton->setText(tr("Merge with %1").arg("..."));
+    setAccentStyle(m_mergeButton);
 
     QButtonGroup* buttonGroup = new QButtonGroup(this);
     buttonGroup->addButton(ui->currentSystemRadioButton);
     buttonGroup->addButton(ui->remoteSystemRadioButton);
+    ui->currentSystemRadioButton->setChecked(true);
 
     auto enableCredentialsControls =
         [this]()
@@ -109,8 +115,19 @@ MergeSystemsDialog::MergeSystemsDialog(QWidget* parent, std::unique_ptr<Delegate
     connect(m_mergeTool, &MergeSystemsTool::mergeFinished,
         this, &MergeSystemsDialog::at_mergeTool_mergeFinished);
 
+    connect(ui->urlComboBox, &QComboBox::currentTextChanged,
+        this, &MergeSystemsDialog::resetStateToDefault);
+    connect(ui->loginEdit, &QLineEdit::textChanged,
+        this, &MergeSystemsDialog::resetStateToDefault);
+    connect(ui->passwordEdit, &PasswordInputField::textChanged,
+        this, &MergeSystemsDialog::resetStateToDefault);
+    connect(ui->currentSystemRadioButton, &QRadioButton::clicked,
+        this, &MergeSystemsDialog::resetStateToDefault);
+    connect(ui->remoteSystemRadioButton, &QRadioButton::clicked,
+        this, &MergeSystemsDialog::resetStateToDefault);
+
     updateKnownSystems();
-    updateMergeButtonAvailability();
+    resetStateToDefault();
 }
 
 MergeSystemsDialog::~MergeSystemsDialog()
@@ -159,21 +176,32 @@ void MergeSystemsDialog::updateKnownSystems()
     const QString displayName = nx::utils::elideString(
         systemSettings()->systemName(), kMaxSystemNameLength);
 
-    ui->currentSystemLabel->setText(
-        tr("You are about to merge the current System %1 with System")
-        .arg(displayName));
-
-    ui->currentSystemRadioButton->setText(tr("%1 (current)").arg(displayName));
+    ui->currentSystemRadioButton->setText(tr("Current (%1)").arg(displayName));
 }
 
-void MergeSystemsDialog::updateErrorLabel(const QString& error) {
-    ui->errorLabel->setText(error);
+void MergeSystemsDialog::updateStatusLabel(const QString& error, bool isError)
+{
+    ui->statusWidget->setHidden(error.isEmpty());
+    ui->statusLabel->setText(error);
+
+    if (isError)
+    {
+        setWarningStyle(ui->statusLabel);
+        ui->statusIconLabel->setPixmap(qnSkin->pixmap("misc/error.svg"));
+    }
+    else
+    {
+        auto palette = ui->statusLabel->palette();
+        setCustomStyle(&palette, core::colorTheme()->color("light4"));
+        ui->statusLabel->setPalette(palette);
+
+        ui->statusIconLabel->setPixmap(qnSkin->pixmap("misc/success.svg"));
+    }
 }
 
 void MergeSystemsDialog::setConfigurationAllowed(bool value)
 {
-    ui->credentialsGroupBox->setEnabled(value);
-    ui->configurationWidget->setEnabled(value);
+    ui->credentialsWidget->setEnabled(value);
 }
 
 void MergeSystemsDialog::updateMergeButtonAvailability()
@@ -200,13 +228,20 @@ void MergeSystemsDialog::processRemoteSystemInfo(
     ui->passwordEdit->setEnabled(!isNewSystem);
 
     const QString systemName = helpers::getSystemName(moduleInformation);
-    ui->remoteSystemLabel->setText(systemName);
-    ui->remoteSystemRadioButton->setText(systemName);
+    ui->remoteSystemRadioButton->setText(tr("Remote (%1)").arg(systemName));
 
     m_mergeButton->setText(tr("Merge with %1").arg(systemName));
 }
 
-void MergeSystemsDialog::at_urlComboBox_activated(int index) {
+void MergeSystemsDialog::resetStateToDefault()
+{
+    ui->statusWidget->setHidden(true);
+    m_targetModule.reset();
+    updateMergeButtonAvailability();
+}
+
+void MergeSystemsDialog::at_urlComboBox_activated(int index)
+{
     if (index == -1)
         return;
 
@@ -242,13 +277,13 @@ void MergeSystemsDialog::at_testConnectionButton_clicked()
     QString password = ui->passwordEdit->text();
 
     if (!nx::network::http::isUrlScheme(url.scheme()) || url.host().isEmpty()) {
-        updateErrorLabel(tr("URL is invalid."));
+        updateStatusLabel(tr("URL is invalid."));
         updateMergeButtonAvailability();
         return;
     }
 
     if (login.isEmpty()) {
-        updateErrorLabel(tr("The login cannot be empty."));
+        updateStatusLabel(tr("The login cannot be empty."));
         updateMergeButtonAvailability();
         return;
     }
@@ -321,10 +356,10 @@ void MergeSystemsDialog::at_mergeTool_systemFound(
 
     if (!allowsToMerge(mergeStatus))
     {
-        const QString errorLabel = errorText.isEmpty()
+        const QString statusLabel = errorText.isEmpty()
             ? MergeSystemsTool::getErrorMessage(mergeStatus, moduleInformation)
             : errorText;
-        updateErrorLabel(errorLabel);
+        updateStatusLabel(statusLabel);
         return;
     }
 
@@ -336,19 +371,19 @@ void MergeSystemsDialog::at_mergeTool_systemFound(
     {
         if (m_url.host() == lit("localhost") || QHostAddress(m_url.host()).isLoopback())
         {
-            updateErrorLabel(
+            updateStatusLabel(
                 tr("Use a specific hostname or IP address rather than %1.").arg(m_url.host()));
         }
         else
         {
-            updateErrorLabel(tr("This is the current System URL."));
+            updateStatusLabel(tr("This is the current System URL."));
         }
 
         return;
     }
 
     m_targetModule = moduleInformation;
-    updateErrorLabel(QString());
+    updateStatusLabel(tr("Success"), /*isError*/ false);
     updateMergeButtonAvailability();
 }
 
