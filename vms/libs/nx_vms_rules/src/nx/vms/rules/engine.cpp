@@ -34,6 +34,7 @@
 #include "rule.h"
 #include "utils/api.h"
 #include "utils/field.h"
+#include "utils/resource.h"
 #include "utils/serialization.h"
 #include "utils/type.h"
 
@@ -708,7 +709,7 @@ bool Engine::registerValidator(const QString& fieldType, FieldValidator* validat
     if (!NX_ASSERT(!fieldType.isEmpty()) || !NX_ASSERT(validator))
         return false;
 
-    validator->setParent(this); //< TODO: #mmlaofeev use unique_ptr instead?
+    validator->setParent(this); //< TODO: #mmalofeev use unique_ptr instead?
     m_fieldValidators.insert(fieldType, validator);
 
     return true;
@@ -783,7 +784,7 @@ std::unique_ptr<EventFilterField> Engine::buildEventField(
             "Failed to build event field as an event field for the %1 type is not registered",
             fieldDescriptor->id);
 
-        return nullptr; // TODO: #spanasenko Default field type
+        return nullptr;
     }
 
     std::unique_ptr<EventFilterField> field(constructor(fieldDescriptor));

@@ -330,7 +330,6 @@ TEST_F(BuiltinTypesTest, BuiltinActions)
     testActionFieldRegistration<ActionTextField>();
     testActionFieldRegistration<ContentTypeField>();
     testActionFieldRegistration<EmailMessageField>(systemContext());
-    testActionFieldRegistration<EventIdField>();
     testActionFieldRegistration<EventDevicesField>();
     testActionFieldRegistration<ExtractDetailField>(systemContext());
     testActionFieldRegistration<ActionFlagField>();
@@ -344,7 +343,6 @@ TEST_F(BuiltinTypesTest, BuiltinActions)
     testActionFieldRegistration<PtzPresetField>();
     testActionFieldRegistration<SoundField>();
     testActionFieldRegistration<StreamQualityField>();
-    testActionFieldRegistration<Substitution>();
     testActionFieldRegistration<TargetDeviceField>();
     testActionFieldRegistration<TargetServerField>();
     testActionFieldRegistration<TargetUserField>(systemContext());

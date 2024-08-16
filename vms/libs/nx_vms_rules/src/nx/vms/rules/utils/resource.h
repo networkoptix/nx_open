@@ -4,6 +4,8 @@
 
 #include <core/resource/resource_fwd.h>
 
+#include "../rules_fwd.h"
+
 namespace nx::vms::common { class SystemContext; }
 
 namespace nx::vms::rules {
@@ -34,6 +36,10 @@ NX_VMS_RULES_API QnVirtualCameraResourceList cameras(
     const common::SystemContext* context);
 
 NX_VMS_RULES_API UuidList getResourceIds(const QObject* entity, std::string_view fieldName);
+
+NX_VMS_RULES_API UuidList getDeviceIds(const AggregatedEventPtr& event);
+NX_VMS_RULES_API UuidList getResourceIds(const AggregatedEventPtr& event);
+NX_VMS_RULES_API UuidList getResourceIds(const ActionPtr& action);
 
 } // namespace utils
 } // namespace nx::vms::rules

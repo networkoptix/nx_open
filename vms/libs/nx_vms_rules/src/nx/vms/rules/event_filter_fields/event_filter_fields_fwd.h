@@ -11,7 +11,6 @@ class FpsField;
 class ContentTypeField;
 class EmailMessageField;
 class ExtractDetailField;
-class EventIdField;
 class EventDevicesField;
 class HttpAuthTypeField;
 class HttpMethodField;

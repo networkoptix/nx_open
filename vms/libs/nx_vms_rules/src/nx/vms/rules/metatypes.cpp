@@ -25,7 +25,6 @@
 
 namespace nx::vms::rules {
 
-// TODO: Consider moving this registration to the API library.
 void Metatypes::initialize()
 {
     static std::atomic_bool initialized = false;

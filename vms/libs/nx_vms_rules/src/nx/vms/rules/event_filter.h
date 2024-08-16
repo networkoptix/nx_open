@@ -37,36 +37,12 @@ public:
     const Rule* rule() const;
     void setRule(const Rule* rule);
 
-    /**
-     * Get all configurable Filter properties in a form of flattened dictionary,
-     * where each key has name in a format "field_name/field_property_name".
-     */
-    std::map<QString, QVariant> flatData() const;
-
-    /**
-     * Update single Filter property.
-     * @path Path of the property, should has "field_name/field_property_name" format.
-     * @value Value that should be assigned to the given property.
-     * @return True on success, false if such field does not exist.
-     */
-    bool updateData(const QString& path, const QVariant& value);
-
-    /**
-     * Update several Filter properties at once.
-     * Does nothing if any of the keys is invalid (e.g. such field does not exist).
-     * @data Dictionary of values.
-     * @return True on success, false otherwise.
-     */
-    bool updateFlatData(const std::map<QString, QVariant>& data);
-
     // Takes ownership.
     void addField(const QString& name, std::unique_ptr<EventFilterField> field);
 
     const QHash<QString, EventFilterField*> fields() const;
 
     bool match(const EventPtr& event) const;
-
-    void connectSignals();
 
     template<class T = Field>
     const T* fieldByName(const QString& name) const
@@ -93,8 +69,6 @@ public:
     }
 
 signals:
-    void stateChanged();
-
     /** Emitted whenever any field property is changed. */
     void changed(const QString& fieldName);
 
@@ -106,8 +80,6 @@ private:
     bool matchFields(const EventPtr& event) const;
     /** Match state field only. */
     bool matchState(const EventPtr& event) const;
-
-    void updateState();
 
     template<class T>
     T* fieldByNameImpl(const QString& name) const
@@ -133,7 +105,6 @@ private:
     QString m_eventType;
     const Rule* m_rule = {};
     std::map<QString, std::unique_ptr<EventFilterField>> m_fields;
-    bool m_updateInProgress = false;
 };
 
 } // namespace nx::vms::rules

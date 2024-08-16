@@ -144,7 +144,6 @@ void Initializer::registerFields() const
     registerActionField<ContentTypeField>();
     registerActionField<EmailMessageField>(this->m_context);
     registerActionField<ExtractDetailField>(this->m_context);
-    registerActionField<EventIdField>();
     registerActionField<EventDevicesField>();
     registerActionField<HttpAuthTypeField>();
     registerActionField<HttpMethodField>();
@@ -160,7 +159,6 @@ void Initializer::registerFields() const
     registerActionField<TargetUserField>(this->m_context);
     registerActionField<TextFormatter>(this->m_context);
     registerActionField<TextWithFields>(this->m_context);
-    registerActionField<Substitution>();
     registerActionField<TargetLayoutField>();
     registerActionField<TargetSingleDeviceField>();
     registerActionField<TimeField>();

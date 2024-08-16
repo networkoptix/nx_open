@@ -8,8 +8,6 @@
 
 namespace nx::vms::rules {
 
-// TODO: Introduce base class for analytics id fields.
-
 class NX_VMS_RULES_API AnalyticsEventTypeField:
     public EventFilterField,
     public nx::vms::common::SystemContextAware

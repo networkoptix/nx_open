@@ -39,35 +39,10 @@ public:
     const Rule* rule() const;
     void setRule(const Rule* rule);
 
-    /**
-     * Get all configurable Builder properties in a form of flattened dictionary,
-     * where each key has name in a format "field_name/field_property_name".
-     */
-    std::map<QString, QVariant> flatData() const;
-
-    /**
-     * Update single Builder property.
-     * @path Path of the property, should has "field_name/field_property_name" format.
-     * @value Value that should be assigned to the given property.
-     * @return True on success, false if such field does not exist.
-     */
-    bool updateData(const QString& path, const QVariant& value);
-
-    /**
-     * Update several Builder properties at once.
-     * Does nothing if any of the keys is invalid (e.g. such field does not exist).
-     * @data Dictionary of values.
-     * @return True on success, false otherwise.
-     */
-    bool updateFlatData(const std::map<QString, QVariant>& data);
-
     // Takes ownership.
     void addField(const QString& name, std::unique_ptr<ActionBuilderField> field);
 
     const QHash<QString, ActionBuilderField*> fields() const;
-
-    QSet<QString> requiredEventFields() const;
-    QSet<nx::Uuid> affectedResources(const EventPtr& event) const;
 
     /**
      * Process the event and emits action() signal whenever appropriate action is
@@ -80,8 +55,6 @@ public:
 
     /** Action require separate start and end events.*/
     bool isProlonged() const;
-
-    void connectSignals();
 
     template<class T = Field>
     const T* fieldByName(const QString& name) const
@@ -108,8 +81,6 @@ public:
     }
 
 signals:
-    void stateChanged();
-
     /** Emitted whenever any field property is changed. */
     void changed(const QString& fieldName);
 
@@ -126,7 +97,6 @@ protected:
 private:
     virtual void onTimer(const nx::utils::TimerId& timerId) override;
 
-    void updateState();
     void setAggregationInterval(std::chrono::microseconds interval);
     void toggleAggregationTimer(bool on);
     Actions buildActionsForTargetUsers(const AggregatedEventPtr& aggregatedEvent);
@@ -146,7 +116,6 @@ private:
     // Running flag for prolonged actions.
     bool m_isActionRunning = false;
     bool m_timerActive = false;
-    bool m_updateInProgress = false;
 
     template<class T>
     T* fieldByNameImpl(const QString& name) const

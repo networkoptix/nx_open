@@ -27,31 +27,6 @@ QString Field::metatype() const
     return metaObject()->classInfo(idx).value();
 }
 
-void Field::connectSignals()
-{
-    if (m_connected)
-        return;
-
-    auto meta = metaObject();
-    for (int i = meta->propertyOffset(); i < meta->propertyCount(); ++i)
-    {
-        const auto& prop = meta->property(i);
-        if (!prop.hasNotifySignal())
-        {
-            // TODO: #spanasenko Improve diagnostics.
-            NX_DEBUG(
-                this,
-                "Property %1 of an %2 instance has no notify signal",
-                prop.name(),
-                meta->className());
-        }
-
-        connect(this, prop.notifySignal().methodSignature().data(), this, SLOT(notifyParent()));
-    }
-
-    m_connected = true;
-}
-
 QMap<QString, QJsonValue> Field::serializedProperties() const
 {
     return serializeProperties(this, nx::utils::propertyNames(this));
@@ -80,23 +55,6 @@ bool Field::setProperties(const QVariantMap& properties)
     }
 
     return isAllPropertiesSet;
-}
-
-bool Field::event(QEvent* ev)
-{
-    if (m_connected && ev->type() == QEvent::DynamicPropertyChange)
-        notifyParent();
-
-    return QObject::event(ev);
-}
-
-void Field::notifyParent()
-{
-    if (m_updateInProgress)
-        return;
-
-    QScopedValueRollback<bool> guard(m_updateInProgress, true);
-    emit stateChanged();
 }
 
 FieldProperties Field::properties() const

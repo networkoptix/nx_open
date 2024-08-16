@@ -2,7 +2,7 @@
 
 #include "event_devices_field.h"
 
-#include "../utils/field.h"
+#include "../utils/resource.h"
 
 namespace nx::vms::rules {
 

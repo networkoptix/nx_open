@@ -123,7 +123,7 @@ const ItemDescriptor& AnalyticsEvent::manifest()
             makeFieldDescriptor<TextLookupField>(
                 utils::kDescriptionFieldName,
                 Strings::andDescription()),
-            // TODO: #amalov Consider adding following fields in 5.1+.
+            // TODO: #amalov Consider adding following fields in 6.1+.
             // makeFieldDescriptor<AnalyticsObjectAttributesField>("attributes", tr("Attributes")),
         },
         .resources = {
