@@ -9125,11 +9125,11 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     <name>nx::vms::client::desktop::GroupSettingsDialog</name>
     <message>
       <source>Delete failed</source>
-      <translation type="unfinished">Delete failed</translation>
+      <translation>Sletting mislyktes</translation>
     </message>
     <message>
       <source>Apply changes?</source>
-      <translation type="unfinished">Apply changes?</translation>
+      <translation>Bruke endringer?</translation>
     </message>
     <message>
       <source>Discard</source>
@@ -9161,7 +9161,7 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>Delete groups</source>
-      <translation type="unfinished">Delete groups</translation>
+      <translation>Slette grupper</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -9169,23 +9169,23 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>Group name cannot be empty</source>
-      <translation type="unfinished">Group name cannot be empty</translation>
+      <translation>Gruppenavn kan ikke være tomt</translation>
     </message>
     <message>
       <source>Group with the same name already exists</source>
-      <translation type="unfinished">Group with the same name already exists</translation>
+      <translation>Gruppe med samme navn finnes fra før</translation>
     </message>
     <message>
       <source>Failed to apply changes to %1 group</source>
-      <translation type="unfinished">Failed to apply changes to %1 group</translation>
+      <translation>Kunne ikke legge til endringer i %1 -gruppen</translation>
     </message>
     <message>
       <source>Current group is a member of all groups selected on this tab and inherits permissions from each of them.</source>
-      <translation type="unfinished">Current group is a member of all groups selected on this tab and inherits permissions from each of them.</translation>
+      <translation>Gjeldende gruppe er medlem av alle valgte grupper på denne fanen og arver tillatelser fra hver av dem.</translation>
     </message>
     <message>
       <source>Select one or multiple groups from which the current group will inherit permissions</source>
-      <translation type="unfinished">Select one or multiple groups from which the current group will inherit permissions</translation>
+      <translation>Velg én eller flere grupper som den gjeldende gruppen vil arve tillatelser</translation>
     </message>
   </context>
   <context>
@@ -9336,18 +9336,18 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>NO EXPORT PERMISSION</source>
-      <translation type="unfinished">NO EXPORT PERMISSION</translation>
+      <translation>INGEN EKSPORT TILLATELSE</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::LdapSettingsWidget</name>
     <message>
       <source>Disconnect LDAP server?</source>
-      <translation type="unfinished">Disconnect LDAP server?</translation>
+      <translation>Koble fra LDAP-tjener?</translation>
     </message>
     <message>
       <source>All LDAP users and groups will be deleted from the system.&lt;br&gt;&lt;br&gt;LDAP settings will be also deleted.</source>
-      <translation type="unfinished">All LDAP users and groups will be deleted from the system.&lt;br&gt;&lt;br&gt;LDAP settings will be also deleted.</translation>
+      <translation>Alle LDAP-brukere og grupper slettes fra systemet.&lt;br&gt;&lt;br&gt;LDAP-innstillinger vil også slettes.</translation>
     </message>
     <message>
       <source>Disconnect</source>
@@ -9355,7 +9355,7 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>Reset Settings</source>
-      <translation type="unfinished">Reset Settings</translation>
+      <translation>Tilbakestill innstillinger</translation>
     </message>
     <message>
       <source>Enter your account password</source>

@@ -2271,7 +2271,7 @@ Alt + クリックを使用してください。</translation>
     </message>
     <message>
       <source>Revoke access after login</source>
-      <translation>ログイン後にアクセスを取り消す</translation>
+      <translation>初回ログイン後からの有効期間を設定</translation>
     </message>
     <message>
       <source>Access may be revoked earlier if the link validity period ends</source>
@@ -2464,7 +2464,7 @@ Alt + クリックを使用してください。</translation>
     </message>
     <message>
       <source>The added system will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</source>
-      <translation>追加されたシステムは、既存のクラウドアカウントを持つユーザーにはすぐに表示されます。クラウドアカウントを持たないユーザーには、電子メールで手順が送信されます。</translation>
+      <translation>追加されたシステムは、既存のクラウドアカウントを持つユーザーにはすぐに表示されます。クラウドアカウントを持たないユーザーには、電子メールで案内が送信されます。</translation>
     </message>
   </context>
   <context>
