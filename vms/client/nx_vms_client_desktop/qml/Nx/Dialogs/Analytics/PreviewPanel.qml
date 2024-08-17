@@ -382,9 +382,15 @@ Rectangle
 
                     visible: !!imageTrackId
 
-                    source: imageTrackId
-                        ? `image://remote/rest/v3/analytics/objectTracks/${imageTrackId}/titleImage`
-                        : ""
+                    source:
+                    {
+                        if (!selectedItem || !selectedItem.previewResource || !imageTrackId)
+                            return ""
+
+                        const path = `rest/v3/analytics/objectTracks/${imageTrackId}/titleImage`
+                        const deviceId = selectedItem.previewResource.id.toSimpleString()
+                        return `image://remote/${path}?deviceId=${deviceId}`
+                    }
 
                     NxDotPreloader
                     {

@@ -10,6 +10,7 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/url.h>
 #include <nx/vms/client/core/common/utils/thread_pool.h>
 #include <nx/vms/client/core/system_context.h>
 
@@ -93,7 +94,12 @@ GenericRemoteImageRequest::GenericRemoteImageRequest(
 
     NX_VERBOSE(this, "Requesting an image (%1)", requestLine);
 
-    d->requestId = api->getRawResult(requestLine, {}, callback, thread());
+    nx::utils::Url url(requestLine);
+
+    d->requestId = api->getRawResult(url.toString(QUrl::PrettyDecoded | QUrl::RemoveQuery),
+        nx::network::rest::Params::fromList(url.queryItems()),
+        callback,
+        thread());
 
     if (d->requestId == rest::Handle())
         setError("Failed to send request");
