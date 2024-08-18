@@ -34,14 +34,13 @@
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/opengl/opengl_renderer.h>
-#include <ui/graphics/shaders/texture_color_shader_program.h>
-#include <ui/workaround/gl_native_painting.h>
-#include <ui/workaround/sharp_pixmap_painting.h>
-
-#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/system_logon/ui/welcome_screen.h>
 #include <nx/vms/client/desktop/window_context.h>
+#include <ui/graphics/shaders/texture_color_shader_program.h>
+#include <ui/graphics/view/quick_widget_container.h>
 #include <ui/widgets/main_window.h>
+#include <ui/workaround/gl_native_painting.h>
+#include <ui/workaround/sharp_pixmap_painting.h>
 #include <ui/workbench/workbench_context.h>
 
 namespace {
@@ -507,6 +506,7 @@ void GraphicsQmlView::Private::initRenderTarget()
     rhiRenderTarget.reset(rhi->newTextureRenderTarget({rhiTexture.get()}));
     rp.reset(rhiRenderTarget->newCompatibleRenderPassDescriptor());
     rhiRenderTarget->setRenderPassDescriptor(rp.get());
+    NX_ASSERT(rhiRenderTarget->create());
 
     auto quickRenderTarget = QQuickRenderTarget::fromRhiRenderTarget(rhiRenderTarget.get());
     quickRenderTarget.setDevicePixelRatio(pixelRatio);
@@ -564,9 +564,19 @@ bool GraphicsQmlView::Private::ensureOffscreen()
         offscreenInitialized = false;
     }
 
-    if (!qobject_cast<QOpenGLWidget*>(
-        appContext()->mainWindowContext()->workbenchContext()->mainWindow()->viewport()))
+    auto viewport = appContext()->mainWindowContext()->workbenchContext()->mainWindow()->viewport();
+    QOpenGLWidget* openGLWidget = qobject_cast<QOpenGLWidget*>(viewport);
+
+    if (!openGLWidget)
     {
+        auto quickWidget = qobject_cast<QuickWidgetContainer*>(viewport)->quickWidget();
+
+        if (quickWidget)
+        {
+            quickWindow->setGraphicsDevice(
+                QQuickGraphicsDevice::fromRhi(quickWidget->quickWindow()->rhi()));
+        }
+
         if (!renderControl->initialize())
             return false;
 
@@ -620,7 +630,7 @@ bool GraphicsQmlView::Private::ensureOffscreen()
     }
 
     openglContext.reset(new QOpenGLContext());
-    openglContext->setShareContext(QOpenGLContext::globalShareContext());
+    openglContext->setShareContext(openGLWidget->context());
     openglContext->create();
     NX_ASSERT(openglContext->isValid());
 
@@ -635,11 +645,10 @@ bool GraphicsQmlView::Private::ensureOffscreen()
     offscreenSurface->create();
     NX_ASSERT(offscreenSurface->isValid());
 
-    openglContext->makeCurrent(offscreenSurface.data());
-
     quickWindow->setGraphicsDevice(QQuickGraphicsDevice::fromOpenGLContext(openglContext.get()));
     renderControl->initialize();
 
+    openglContext->makeCurrent(offscreenSurface.data());
     initializeTexture(qApp->devicePixelRatio());
     openglContext->doneCurrent();
 

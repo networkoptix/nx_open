@@ -220,21 +220,6 @@ void setGraphicsSettings()
             QSGRendererInterface::OpenGL));
 
     QQuickWindow::setDefaultAlphaBuffer(true);
-
-    if (nx::build_info::isMacOsX())
-    {
-        // This should go into QnClientModule::initSurfaceFormat(),
-        // but we must set OpenGL version before creation of GUI application.
-
-        QSurfaceFormat format;
-        // Mac computers OpenGL versions:
-        //   https://support.apple.com/en-us/HT202823
-        format.setProfile(QSurfaceFormat::CoreProfile);
-        // Chromium requires OpenGL 4.1 on macOS for WebGL and other HW accelerated staff.
-        format.setVersion(4, 1);
-
-        QSurfaceFormat::setDefaultFormat(format);
-    }
 }
 
 } // namespace
@@ -404,6 +389,21 @@ int runApplication(int argc, char** argv)
 
     // This attribute is needed to embed QQuickWidget into other QWidgets.
     QApplication::setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
+
+    if (nx::build_info::isMacOsX())
+    {
+        // This should go into QnClientModule::initSurfaceFormat(),
+        // but we must set OpenGL version before creation of GUI application.
+
+        QSurfaceFormat format;
+        // Mac computers OpenGL versions:
+        //   https://support.apple.com/en-us/HT202823
+        format.setProfile(QSurfaceFormat::CoreProfile);
+        // Chromium requires OpenGL 4.1 on macOS for WebGL and other HW accelerated staff.
+        format.setVersion(4, 1);
+
+        QSurfaceFormat::setDefaultFormat(format);
+    }
 
     const QnStartupParameters startupParams = QnStartupParameters::fromCommandLineArg(argc, argv);
     if (ini().roundDpiScaling)
