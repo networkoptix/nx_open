@@ -676,7 +676,7 @@
     <name>CameraHotspotsSettingsWidget</name>
     <message>
       <source>Hotspots</source>
-      <translation type="unfinished">Hotspots</translation>
+      <translation>Punkter</translation>
     </message>
     <message>
       <source>Add</source>
@@ -1848,8 +1848,12 @@
       <translation>Velg</translation>
     </message>
     <message>
-      <source>Take system name and settings from:</source>
-      <translation>Ta systemnavn og innstillinger fra:</translation>
+      <source>Remote</source>
+      <translation type="unfinished">Remote</translation>
+    </message>
+    <message>
+      <source>Take system name and settings from</source>
+      <translation>Ta systemnavn og innstillinger fra</translation>
     </message>
   </context>
   <context>

@@ -1848,8 +1848,12 @@
       <translation>檢查</translation>
     </message>
     <message>
-      <source>Take system name and settings from:</source>
-      <translation>使用此系統的名稱與設定：</translation>
+      <source>Remote</source>
+      <translation type="unfinished">Remote</translation>
+    </message>
+    <message>
+      <source>Take system name and settings from</source>
+      <translation>系統名稱和設定取自</translation>
     </message>
   </context>
   <context>

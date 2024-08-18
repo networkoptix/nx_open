@@ -1030,7 +1030,7 @@
     </message>
     <message>
       <source>Lookup Lists...</source>
-      <translation type="unfinished">Lookup Lists...</translation>
+      <translation>Oppslagslister...</translation>
     </message>
     <message>
       <source>Add</source>
@@ -4103,7 +4103,7 @@ Lisensnøkkel: %2</translation>
     </message>
     <message>
       <source>Hotspots</source>
-      <translation type="unfinished">Hotspots</translation>
+      <translation>Punkter</translation>
     </message>
     <message>
       <source>press and hold</source>
@@ -5060,7 +5060,7 @@ Lisensnøkkel: %2</translation>
     </message>
     <message>
       <source>NO EXPORT PERMISSION</source>
-      <translation type="unfinished">NO EXPORT PERMISSION</translation>
+      <translation>INGEN EKSPORT TILLATELSE</translation>
     </message>
     <message>
       <source>SYSTEM SHUT DOWN</source>
@@ -9704,14 +9704,6 @@ Husk å tilbakestille loggingsnivået til standardinnstillingen etter at du har 
   <context>
     <name>nx::vms::client::desktop::MergeSystemsDialog</name>
     <message>
-      <source>You are about to merge the current System %1 with System</source>
-      <translation>Du er i ferd med å slå sammen det nåværende System %1 med System</translation>
-    </message>
-    <message>
-      <source>%1 (current)</source>
-      <translation>%1 (nåværende)</translation>
-    </message>
-    <message>
       <source>URL is invalid.</source>
       <translation>URL er ugyldig.</translation>
     </message>
@@ -9775,6 +9767,18 @@ Husk å tilbakestille loggingsnivået til standardinnstillingen etter at du har 
     <message>
       <source>It is recommended to contact %1 before proceeding.</source>
       <translation type="unfinished">It is recommended to contact %1 before proceeding.</translation>
+    </message>
+    <message>
+      <source>Current (%1)</source>
+      <translation type="unfinished">Current (%1)</translation>
+    </message>
+    <message>
+      <source>Remote (%1)</source>
+      <translation type="unfinished">Remote (%1)</translation>
+    </message>
+    <message>
+      <source>Success</source>
+      <translation>Suksess</translation>
     </message>
   </context>
   <context>
@@ -11993,7 +11997,7 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
     </message>
     <message>
       <source>Apply changes?</source>
-      <translation type="unfinished">Apply changes?</translation>
+      <translation>Bruke endringer?</translation>
     </message>
     <message>
       <source>Discard</source>
@@ -13076,7 +13080,7 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     </message>
     <message>
       <source>Hotspots</source>
-      <translation type="unfinished">Hotspots</translation>
+      <translation>Punkter</translation>
     </message>
     <message>
       <source>Toolbar</source>

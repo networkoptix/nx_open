@@ -9548,14 +9548,6 @@ Ingatlah untuk mengembalikan Level Logging ke pengaturan default setelah Anda me
   <context>
     <name>nx::vms::client::desktop::MergeSystemsDialog</name>
     <message>
-      <source>You are about to merge the current System %1 with System</source>
-      <translation>Anda akan menggabungkan Sistem saat ini %1 dengan Sistem</translation>
-    </message>
-    <message>
-      <source>%1 (current)</source>
-      <translation>%1 (saat ini)</translation>
-    </message>
-    <message>
       <source>URL is invalid.</source>
       <translation>URL tidak valid.</translation>
     </message>
@@ -9619,6 +9611,18 @@ Ingatlah untuk mengembalikan Level Logging ke pengaturan default setelah Anda me
     <message>
       <source>It is recommended to contact %1 before proceeding.</source>
       <translation>Disarankan untuk menghubungi %1 sebelum melanjutkan.</translation>
+    </message>
+    <message>
+      <source>Current (%1)</source>
+      <translation type="unfinished">Current (%1)</translation>
+    </message>
+    <message>
+      <source>Remote (%1)</source>
+      <translation type="unfinished">Remote (%1)</translation>
+    </message>
+    <message>
+      <source>Success</source>
+      <translation>Sukses</translation>
     </message>
   </context>
   <context>

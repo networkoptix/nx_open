@@ -9702,14 +9702,6 @@ Yeterince günlük topladıktan sonra Günlük Düzeyini varsayılan ayarına d�
   <context>
     <name>nx::vms::client::desktop::MergeSystemsDialog</name>
     <message>
-      <source>You are about to merge the current System %1 with System</source>
-      <translation>%1 sistemi ile mevcut sistemi birleştirmek üzeresiniz</translation>
-    </message>
-    <message>
-      <source>%1 (current)</source>
-      <translation>%1 (mevcut)</translation>
-    </message>
-    <message>
       <source>URL is invalid.</source>
       <translation>URL geçerli değil.</translation>
     </message>
@@ -9773,6 +9765,18 @@ Yeterince günlük topladıktan sonra Günlük Düzeyini varsayılan ayarına d�
     <message>
       <source>It is recommended to contact %1 before proceeding.</source>
       <translation>Devam etmeden önce %1 ile iletişime geçmeniz önerilir.</translation>
+    </message>
+    <message>
+      <source>Current (%1)</source>
+      <translation type="unfinished">Current (%1)</translation>
+    </message>
+    <message>
+      <source>Remote (%1)</source>
+      <translation type="unfinished">Remote (%1)</translation>
+    </message>
+    <message>
+      <source>Success</source>
+      <translation>Başarılı</translation>
     </message>
   </context>
   <context>

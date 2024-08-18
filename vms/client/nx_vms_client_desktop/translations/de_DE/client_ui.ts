@@ -1848,8 +1848,12 @@
       <translation>Überprüfen</translation>
     </message>
     <message>
-      <source>Take system name and settings from:</source>
-      <translation>Nehmen Sie den Systemnamen und die Einstellungen von:</translation>
+      <source>Remote</source>
+      <translation type="unfinished">Remote</translation>
+    </message>
+    <message>
+      <source>Take system name and settings from</source>
+      <translation>Nehmen Sie den Systemnamen und die Einstellungen von</translation>
     </message>
   </context>
   <context>

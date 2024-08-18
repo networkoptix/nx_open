@@ -1848,8 +1848,12 @@
       <translation>Vérifier</translation>
     </message>
     <message>
-      <source>Take system name and settings from:</source>
-      <translation>Prendre le nom et les paramètres du système à partir de :</translation>
+      <source>Remote</source>
+      <translation type="unfinished">Remote</translation>
+    </message>
+    <message>
+      <source>Take system name and settings from</source>
+      <translation>Prendre le nom du système et les paramètres de</translation>
     </message>
   </context>
   <context>

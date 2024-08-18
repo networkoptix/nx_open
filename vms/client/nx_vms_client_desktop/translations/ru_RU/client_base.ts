@@ -10016,14 +10016,6 @@ Remember to return the Logging Level to its default setting after you have colle
   <context>
     <name>nx::vms::client::desktop::MergeSystemsDialog</name>
     <message>
-      <source>You are about to merge the current System %1 with System</source>
-      <translation>Вы собираетесь объединить систему %1 с текущей системой</translation>
-    </message>
-    <message>
-      <source>%1 (current)</source>
-      <translation>%1 (текущая)</translation>
-    </message>
-    <message>
       <source>URL is invalid.</source>
       <translation>Неверный URL-адрес.</translation>
     </message>
@@ -10087,6 +10079,18 @@ Remember to return the Logging Level to its default setting after you have colle
     <message>
       <source>It is recommended to contact %1 before proceeding.</source>
       <translation type="unfinished">It is recommended to contact %1 before proceeding.</translation>
+    </message>
+    <message>
+      <source>Current (%1)</source>
+      <translation type="unfinished">Current (%1)</translation>
+    </message>
+    <message>
+      <source>Remote (%1)</source>
+      <translation type="unfinished">Remote (%1)</translation>
+    </message>
+    <message>
+      <source>Success</source>
+      <translation>Успешно</translation>
     </message>
   </context>
   <context>
@@ -11262,7 +11266,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Shut down</source>
-      <translation type="unfinished">Shut down</translation>
+      <translation>Выключено</translation>
     </message>
   </context>
   <context>

@@ -1848,8 +1848,12 @@
       <translation>Cek</translation>
     </message>
     <message>
-      <source>Take system name and settings from:</source>
-      <translation>Ambil nama sistem dan pengaturan dari:</translation>
+      <source>Remote</source>
+      <translation type="unfinished">Remote</translation>
+    </message>
+    <message>
+      <source>Take system name and settings from</source>
+      <translation>Ambil nama sistem dan pengaturan dari</translation>
     </message>
   </context>
   <context>
