@@ -1848,8 +1848,12 @@
       <translation>Kontrollera</translation>
     </message>
     <message>
-      <source>Take system name and settings from:</source>
-      <translation>Ta systemnamn och inställningar från:</translation>
+      <source>Remote</source>
+      <translation>Fjärr</translation>
+    </message>
+    <message>
+      <source>Take system name and settings from</source>
+      <translation>Ta systemnamn och inställningar från</translation>
     </message>
   </context>
   <context>

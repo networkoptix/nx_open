@@ -9704,14 +9704,6 @@ Kom ihåg att återställa loggningsnivån till standardinställningen efter att
   <context>
     <name>nx::vms::client::desktop::MergeSystemsDialog</name>
     <message>
-      <source>You are about to merge the current System %1 with System</source>
-      <translation>Du håller på att slå samman det nuvarande Systemet %1 med Systemet</translation>
-    </message>
-    <message>
-      <source>%1 (current)</source>
-      <translation>%1 (aktuell)</translation>
-    </message>
-    <message>
       <source>URL is invalid.</source>
       <translation>URL är ogiltig.</translation>
     </message>
@@ -9775,6 +9767,18 @@ Kom ihåg att återställa loggningsnivån till standardinställningen efter att
     <message>
       <source>It is recommended to contact %1 before proceeding.</source>
       <translation>Det rekommenderas att kontakta %1 innan du fortsätter.</translation>
+    </message>
+    <message>
+      <source>Current (%1)</source>
+      <translation>Nuvarande (%1)</translation>
+    </message>
+    <message>
+      <source>Remote (%1)</source>
+      <translation>Fjärr (%1)</translation>
+    </message>
+    <message>
+      <source>Success</source>
+      <translation>Slutförd</translation>
     </message>
   </context>
   <context>

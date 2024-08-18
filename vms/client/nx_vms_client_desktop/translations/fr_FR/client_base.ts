@@ -9704,14 +9704,6 @@ N'oubliez pas de retourner le niveau de journalisation à sa configuration par d
   <context>
     <name>nx::vms::client::desktop::MergeSystemsDialog</name>
     <message>
-      <source>You are about to merge the current System %1 with System</source>
-      <translation>Vous êtes sur le point d'unir le système actuel %1 avec le système</translation>
-    </message>
-    <message>
-      <source>%1 (current)</source>
-      <translation>%1 (actuel)</translation>
-    </message>
-    <message>
       <source>URL is invalid.</source>
       <translation>URL invalide.</translation>
     </message>
@@ -9775,6 +9767,18 @@ N'oubliez pas de retourner le niveau de journalisation à sa configuration par d
     <message>
       <source>It is recommended to contact %1 before proceeding.</source>
       <translation>Il est recommandé de contacter %1 avant de continuer.</translation>
+    </message>
+    <message>
+      <source>Current (%1)</source>
+      <translation type="unfinished">Current (%1)</translation>
+    </message>
+    <message>
+      <source>Remote (%1)</source>
+      <translation type="unfinished">Remote (%1)</translation>
+    </message>
+    <message>
+      <source>Success</source>
+      <translation>Succès</translation>
     </message>
   </context>
   <context>

@@ -1848,8 +1848,12 @@
       <translation>Zkontrolovat</translation>
     </message>
     <message>
-      <source>Take system name and settings from:</source>
-      <translation>Převzít název systému a nastavení z:</translation>
+      <source>Remote</source>
+      <translation type="unfinished">Remote</translation>
+    </message>
+    <message>
+      <source>Take system name and settings from</source>
+      <translation>Převzít název systému a nastavení z</translation>
     </message>
   </context>
   <context>

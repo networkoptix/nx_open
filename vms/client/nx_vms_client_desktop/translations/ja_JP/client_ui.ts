@@ -1848,8 +1848,12 @@
       <translation>チェック</translation>
     </message>
     <message>
-      <source>Take system name and settings from:</source>
-      <translation>次のシステム名および設定を使用:</translation>
+      <source>Remote</source>
+      <translation type="unfinished">Remote</translation>
+    </message>
+    <message>
+      <source>Take system name and settings from</source>
+      <translation>次のシステム名および設定を使用</translation>
     </message>
   </context>
   <context>

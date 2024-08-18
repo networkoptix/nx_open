@@ -9548,14 +9548,6 @@ Remember to return the Logging Level to its default setting after you have colle
   <context>
     <name>nx::vms::client::desktop::MergeSystemsDialog</name>
     <message>
-      <source>You are about to merge the current System %1 with System</source>
-      <translation>您正在合併系統 %1 到主系統</translation>
-    </message>
-    <message>
-      <source>%1 (current)</source>
-      <translation>%1 (目前)</translation>
-    </message>
-    <message>
       <source>URL is invalid.</source>
       <translation>URL 無效.</translation>
     </message>
@@ -9619,6 +9611,18 @@ Remember to return the Logging Level to its default setting after you have colle
     <message>
       <source>It is recommended to contact %1 before proceeding.</source>
       <translation type="unfinished">It is recommended to contact %1 before proceeding.</translation>
+    </message>
+    <message>
+      <source>Current (%1)</source>
+      <translation type="unfinished">Current (%1)</translation>
+    </message>
+    <message>
+      <source>Remote (%1)</source>
+      <translation type="unfinished">Remote (%1)</translation>
+    </message>
+    <message>
+      <source>Success</source>
+      <translation>成功</translation>
     </message>
   </context>
   <context>

@@ -10015,14 +10015,6 @@ Pamiętaj, aby zwrócić poziom logowania do ustawień domyślnych po zebraniu w
   <context>
     <name>nx::vms::client::desktop::MergeSystemsDialog</name>
     <message>
-      <source>You are about to merge the current System %1 with System</source>
-      <translation>Zamierzasz złączyć system bieżący %1 z systemem</translation>
-    </message>
-    <message>
-      <source>%1 (current)</source>
-      <translation>%1 (aktualne)</translation>
-    </message>
-    <message>
       <source>URL is invalid.</source>
       <translation>URL jest nieprawidłowy.</translation>
     </message>
@@ -10086,6 +10078,18 @@ Pamiętaj, aby zwrócić poziom logowania do ustawień domyślnych po zebraniu w
     <message>
       <source>It is recommended to contact %1 before proceeding.</source>
       <translation type="unfinished">It is recommended to contact %1 before proceeding.</translation>
+    </message>
+    <message>
+      <source>Current (%1)</source>
+      <translation type="unfinished">Current (%1)</translation>
+    </message>
+    <message>
+      <source>Remote (%1)</source>
+      <translation type="unfinished">Remote (%1)</translation>
+    </message>
+    <message>
+      <source>Success</source>
+      <translation>Wykonano poprawnie</translation>
     </message>
   </context>
   <context>

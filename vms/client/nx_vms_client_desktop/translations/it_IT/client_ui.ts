@@ -1848,8 +1848,12 @@
       <translation>Controlla</translation>
     </message>
     <message>
-      <source>Take system name and settings from:</source>
-      <translation>Prendi il nome e le impostazioni del sistema da:</translation>
+      <source>Remote</source>
+      <translation type="unfinished">Remote</translation>
+    </message>
+    <message>
+      <source>Take system name and settings from</source>
+      <translation>Prendi il nome e le impostazioni di sistema da</translation>
     </message>
   </context>
   <context>
