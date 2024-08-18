@@ -179,6 +179,7 @@ public:
                 renderTarget->newCompatibleRenderPassDescriptor());
 
             renderTarget->setRenderPassDescriptor(rp.get());
+            renderTarget->create();
 
             auto quickRenderTarget = QQuickRenderTarget::fromRhiRenderTarget(renderTarget.get());
             quickRenderTarget.setDevicePixelRatio(pixelRatio);
@@ -303,7 +304,6 @@ private:
         if (graphicsApi == QSGRendererInterface::OpenGL)
         {
             context->setFormat(format);
-            context->setShareContext(QOpenGLContext::globalShareContext());
             context->setObjectName("NameValueTableContext");
             NX_ASSERT(context->create());
             surface->setFormat(context->format());
