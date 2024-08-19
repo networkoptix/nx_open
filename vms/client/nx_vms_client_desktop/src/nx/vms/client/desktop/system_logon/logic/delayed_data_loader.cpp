@@ -94,7 +94,7 @@ struct DelayedDataLoader::Private
                 {
                     NX_WARNING(
                         this,
-                        "Lookup Lists request %1 failed, error: %2, string: %2",
+                        "Lookup Lists request %1 failed, error: %2, string: %3",
                         requestId, restResult->error, restResult->errorString);
                     return;
                 }
