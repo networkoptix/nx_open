@@ -131,7 +131,7 @@ QnVirtualCameraResourcePtr EventListModel::Private::previewCamera(const EventDat
         return {};
 
     const bool hasAccess = accessController->hasPermissions(event.previewCamera,
-        Qn::ViewContentPermission | Qn::ViewFootagePermission);
+        Qn::ViewContentPermission); //< Any of live / archive permissions will do.
 
     return hasAccess ? event.previewCamera : QnVirtualCameraResourcePtr();
 }
