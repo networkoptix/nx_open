@@ -173,13 +173,24 @@ std::vector<UserModelV3> UserModelV3::fromDbTypes(DbListTypes data)
         {
             for (ResourceParamData& r: f->second)
             {
-                if (r.name != kUserFullName && r.name != kCloudUserAuthenticationInfo)
+                if (r.name == kCloudUserAuthenticationInfo)
+                {
+                    if (model.type == UserType::cloud)
+                    {
+                        QJsonValue value;
+                        model.account2faEnabled = QJson::deserialize(r.value, &value)
+                            && value.isObject() && value.toObject()["twofaEnabled"].toBool();
+                    }
+                    continue;
+                }
+                if (r.name != kUserFullName)
                     static_cast<ResourceWithParameters&>(model).setFromParameter(r);
             }
 
             parameters.erase(f);
         }
-
+        if (model.type == UserType::cloud && !model.account2faEnabled)
+            model.account2faEnabled = false;
         result.push_back(std::move(model));
     }
 
