@@ -90,6 +90,9 @@ MergeSystemsDialog::MergeSystemsDialog(QWidget* parent, std::unique_ptr<Delegate
     buttonGroup->addButton(ui->remoteSystemRadioButton);
     ui->currentSystemRadioButton->setChecked(true);
 
+    const QString kRemoteSystemRadioButtonDefaultText = tr("Remote");
+    ui->remoteSystemRadioButton->setText(kRemoteSystemRadioButtonDefaultText);
+
     auto enableCredentialsControls =
         [this]()
         {
@@ -114,6 +117,12 @@ MergeSystemsDialog::MergeSystemsDialog(QWidget* parent, std::unique_ptr<Delegate
         this, &MergeSystemsDialog::at_mergeTool_systemFound);
     connect(m_mergeTool, &MergeSystemsTool::mergeFinished,
         this, &MergeSystemsDialog::at_mergeTool_mergeFinished);
+
+    connect(ui->urlComboBox, &QComboBox::currentTextChanged, this,
+        [this, kRemoteSystemRadioButtonDefaultText]
+        {
+            ui->remoteSystemRadioButton->setText(kRemoteSystemRadioButtonDefaultText);
+        });
 
     connect(ui->urlComboBox, &QComboBox::currentTextChanged,
         this, &MergeSystemsDialog::resetStateToDefault);
