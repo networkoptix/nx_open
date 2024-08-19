@@ -50,8 +50,6 @@
 
 #include "webview_window.h"
 
-Q_DECLARE_METATYPE(std::shared_ptr<QQuickItem>)
-
 namespace nx::vms::client::desktop {
 
 static_assert(
@@ -918,7 +916,7 @@ void WebViewController::setAuthenticator(std::shared_ptr<AbstractWebAuthenticato
     }
 }
 
-QVariant WebViewController::suspend()
+QVariant WebViewController::suspend(QObject* parent)
 {
     if (!d->qmlView)
         return QVariant();
@@ -931,7 +929,7 @@ QVariant WebViewController::suspend()
     // Do it before taking the item because otherwise its visibility does not change.
     root->setVisible(false);
 
-    std::shared_ptr<QQuickItem> rootItem = d->qmlView->takeRootObject();
+    QQuickItem* rootItem = d->qmlView->takeRootObject();
     if (!rootItem)
         return QVariant();
 
@@ -941,15 +939,21 @@ QVariant WebViewController::suspend()
         webView->setLifecycleState(QQuickWebEngineView::LifecycleState::Frozen);
 
     rootItem->setProperty(kControllerProperty, QVariant::fromValue<QObject*>(nullptr));
+    rootItem->setParent(parent);
 
-    return QVariant::fromValue(rootItem);
+    return QVariant::fromValue(QPointer<QQuickItem>(rootItem));
 }
 
-void WebViewController::resume(QVariant state)
+void WebViewController::resume(QVariant state, const QnResourcePtr& resource)
 {
-    auto rootItem = state.value<std::shared_ptr<QQuickItem>>();
+    auto rootItem = state.value<QPointer<QQuickItem>>();
     if (!rootItem)
+    {
+        if (resource)
+            load(resource);
+
         return;
+    }
 
     if (!d->qmlView)
         return;
@@ -959,6 +963,7 @@ void WebViewController::resume(QVariant state)
         webView->setLifecycleState(QQuickWebEngineView::LifecycleState::Active);
 
     rootItem->setVisible(true);
+    rootItem->setParent(nullptr);
     d->qmlView->setRootObject(rootItem);
 
     emit loadingStatusChanged(QQuickWebEngineView::LoadSucceededStatus);
