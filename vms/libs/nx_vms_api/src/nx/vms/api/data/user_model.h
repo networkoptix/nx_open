@@ -186,6 +186,9 @@ struct NX_VMS_API UserModelV3: public UserModelBase, public ResourceWithParamete
     /**%apidoc[readonly] */
     UserAttributes attributes;
 
+    /**%apidoc[readonly] Presented only for users with `type` equals to `cloud`. */
+    std::optional<bool> account2faEnabled;
+
     bool operator==(const UserModelV3& other) const = default;
 
     using DbReadTypes = std::tuple<UserData, ResourceParamWithRefDataList>;
@@ -198,7 +201,7 @@ struct NX_VMS_API UserModelV3: public UserModelBase, public ResourceWithParamete
 #define UserModelV3_Fields \
     UserModelBase_Fields \
     ResourceWithParameters_Fields \
-    (groupIds)(permissions)(resourceAccessRights)(temporaryToken)(attributes)
+    (groupIds)(permissions)(resourceAccessRights)(temporaryToken)(attributes)(account2faEnabled)
 
 QN_FUSION_DECLARE_FUNCTIONS(UserModelV3, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(UserModelV3, UserModelV3_Fields)
