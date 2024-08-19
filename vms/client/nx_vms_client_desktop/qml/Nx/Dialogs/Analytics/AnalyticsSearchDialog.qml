@@ -759,8 +759,17 @@ Window
                             {
                                 anchors.fill: parent
                                 enabled: !previewIcon.hovered
-                                onClicked:
+                                acceptedButtons: Qt.LeftButton | Qt.RightButton
+
+                                onClicked: (mouse) =>
                                 {
+                                    if (mouse.button === Qt.RightButton)
+                                    {
+                                        eventModel.showContextMenu(
+                                            row, parent.mapToGlobal(mouse.x, mouse.y), false)
+                                        return
+                                    }
+
                                     tableView.selectionModel.setCurrentIndex(
                                         tableModel.index(row, column), ItemSelectionModel.Current)
                                     if (!showPreview)
@@ -770,9 +779,10 @@ Window
                                     }
                                 }
 
-                                onDoubleClicked:
+                                onDoubleClicked: (mouse) =>
                                 {
-                                    eventModel.showOnLayout(row)
+                                    if (mouse.button === Qt.LeftButton)
+                                        eventModel.showOnLayout(row)
                                 }
                             }
                         }
