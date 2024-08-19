@@ -1301,7 +1301,7 @@ void ActionHandler::at_openWelcomeScreenAction_triggered()
 {
     if (ini().enableMultiSystemTabBar)
     {
-        mainWindow()->titleBarStateStore()->activateHomeTab();
+        action(menu::ResourcesModeAction)->setChecked(false);
     }
     else
     {
