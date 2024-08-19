@@ -62,8 +62,6 @@
 #include <nx/vms/client/desktop/radass/radass_controller.h>
 #include <nx/vms/client/desktop/resource/resource_factory.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
-#include <nx/vms/client/desktop/session_manager/default_process_interface.h>
-#include <nx/vms/client/desktop/session_manager/session_manager.h>
 #include <nx/vms/client/desktop/settings/ipc_settings_synchronizer.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/settings/message_bar_settings.h>
@@ -344,8 +342,6 @@ struct ApplicationContext::Private
     std::unique_ptr<ClientStateHandler> clientStateHandler;
     std::unique_ptr<SharedMemoryManager> sharedMemoryManager;
     std::unique_ptr<RunningInstancesManager> runningInstancesManager;
-    std::unique_ptr<session::DefaultProcessInterface> processInterface;
-    std::unique_ptr<session::SessionManager> sessionManager;
 
     // Local resources search modules.
     std::unique_ptr<LocalResourcesContext> localResourcesContext;
@@ -448,15 +444,6 @@ struct ApplicationContext::Private
         runningInstancesManager = std::make_unique<RunningInstancesManager>(
             localSettings.get(),
             sharedMemoryManager.get());
-
-        processInterface = std::make_unique<session::DefaultProcessInterface>();
-        using SessionManager = session::SessionManager;
-        session::Config sessionConfig;
-        sessionConfig.sharedPrefix = nx::branding::customization() + "/SessionManager";
-        const QString appDataLocation = QStandardPaths::writableLocation(
-            QStandardPaths::AppLocalDataLocation);
-        sessionConfig.storagePath = QDir(appDataLocation).absoluteFilePath("sessions");
-        sessionManager = std::make_unique<SessionManager>(sessionConfig, processInterface.get());
 
         IpcSettingsSynchronizer::setup(
             localSettings.get(),
@@ -912,11 +899,6 @@ void ApplicationContext::setSharedMemoryManager(std::unique_ptr<SharedMemoryMana
 RunningInstancesManager* ApplicationContext::runningInstancesManager() const
 {
     return d->runningInstancesManager.get();
-}
-
-session::SessionManager* ApplicationContext::sessionManager() const
-{
-    return d->sessionManager.get();
 }
 
 CloudCrossSystemManager* ApplicationContext::cloudCrossSystemManager() const
