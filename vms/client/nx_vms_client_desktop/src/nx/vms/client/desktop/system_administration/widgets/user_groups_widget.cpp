@@ -64,6 +64,8 @@ nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kPlaceholderTheme = {
 NX_DECLARE_COLORIZED_ICON(
     kNotfoundIcon, "64x64/Outline/notfound.svg", kPlaceholderTheme)
 
+constexpr bool kShowParentGroups = false;
+
 } // namespace
 
 // -----------------------------------------------------------------------------------------------
@@ -333,8 +335,17 @@ UserGroupsWidget::Private::Private(UserGroupsWidget* q, UserGroupManager* manage
 {
     sortModel->setDynamicSortFilter(true);
     sortModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
-    sortModel->setFilterKeyColumn(-1);
-    sortModel->setFilterRole(Qn::FilterKeyRole);
+    if (kShowParentGroups)
+    {
+        sortModel->setFilterKeyColumn(-1);
+        sortModel->setFilterRole(Qn::FilterKeyRole);
+    }
+    else
+    {
+        sortModel->setFilterKeyColumn(UserGroupListModel::NameColumn);
+        sortModel->setFilterRole(Qt::DisplayRole);
+    }
+
     sortModel->setSortRole(Qn::SortKeyRole);
     sortModel->setSourceModel(groupsModel);
 
@@ -402,10 +413,27 @@ void UserGroupsWidget::Private::setupUi()
     header->setHighlightCheckedIndicator(true);
     header->setMaximumSectionSize(kMaximumInteractiveColumnWidth);
     header->setDefaultSectionSize(kDefaultInteractiveColumnWidth);
+    if (!kShowParentGroups)
+    {
+        ui->groupsTable->setColumnHidden(UserGroupListModel::ParentGroupsColumn, true);
+        ui->groupsTable->setColumnHidden(UserGroupListModel::PermissionsColumn, true);
+    }
     header->setResizeContentsPrecision(0); //< Calculate resize using only the visible area.
     header->setSectionResizeMode(QHeaderView::ResizeToContents);
-    header->setSectionResizeMode(UserGroupListModel::DescriptionColumn, QHeaderView::Interactive);
-    header->setSectionResizeMode(UserGroupListModel::ParentGroupsColumn, QHeaderView::Stretch);
+    if (ui->groupsTable->isColumnHidden(UserGroupListModel::ParentGroupsColumn))
+    {
+        header->setSectionResizeMode(UserGroupListModel::DescriptionColumn, QHeaderView::Stretch);
+        header->setSectionResizeMode(UserGroupListModel::NameColumn, QHeaderView::Interactive);
+    }
+    else
+    {
+        header->setSectionResizeMode(
+            UserGroupListModel::DescriptionColumn,
+            QHeaderView::Interactive);
+        header->setSectionResizeMode(
+            UserGroupListModel::ParentGroupsColumn,
+            QHeaderView::Stretch);
+    }
     header->setSectionsClickable(true);
 
     header->setSectionResizeMode(UserGroupListModel::GroupTypeColumn, QHeaderView::Fixed);
