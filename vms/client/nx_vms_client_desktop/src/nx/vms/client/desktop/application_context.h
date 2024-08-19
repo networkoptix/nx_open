@@ -43,11 +43,6 @@ class UploadManager;
 class WebPageIconCache;
 class WindowContext;
 
-namespace session {
-class SessionManager;
-class DefaultProcessInterface;
-} // namespace session
-
 /**
  * Main context of the desktop client application. Exists through all application lifetime and is
  * accessible from anywhere using `instance()` method.
@@ -187,7 +182,6 @@ public:
     void setSharedMemoryManager(std::unique_ptr<SharedMemoryManager> value);
 
     RunningInstancesManager* runningInstancesManager() const;
-    session::SessionManager* sessionManager() const;
 
     nx::vms::utils::TranslationManager* translationManager() const;
 
