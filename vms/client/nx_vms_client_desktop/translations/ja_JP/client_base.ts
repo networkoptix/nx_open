@@ -9615,11 +9615,11 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Current (%1)</source>
-      <translation type="unfinished">Current (%1)</translation>
+      <translation>現在 (%1)</translation>
     </message>
     <message>
       <source>Remote (%1)</source>
-      <translation type="unfinished">Remote (%1)</translation>
+      <translation>リモート (%1)</translation>
     </message>
     <message>
       <source>Success</source>
