@@ -121,16 +121,16 @@ void SystemManager::revokeUserAccess(
 
 void SystemManager::getCloudUsersOfSystem(
     const std::string& systemId,
-    std::function<void(api::ResultCode, api::SystemSharingList)> completionHandler)
+    std::function<void(api::ResultCode, api::SystemSharingExList)> completionHandler)
 {
-    m_requestsExecutor->makeAsyncCall<std::vector<api::SystemSharing>>(
+    m_requestsExecutor->makeAsyncCall<api::SystemSharingExList>(
         nx::network::http::Method::get,
         nx::network::http::rest::substituteParameters(kSystemUsersPath, {systemId}),
         {}, //query
         [completionHandler = std::move(completionHandler)](
-            api::ResultCode resultCode, std::vector<api::SystemSharing> systems)
+            api::ResultCode resultCode, api::SystemSharingExList systems)
         {
-            completionHandler(resultCode, api::SystemSharingList{std::move(systems)});
+            completionHandler(resultCode, api::SystemSharingExList{std::move(systems)});
         });
 }
 
