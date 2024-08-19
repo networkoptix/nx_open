@@ -45,11 +45,6 @@ class WindowContext;
 
 namespace joystick { class Manager; }
 
-namespace session {
-class SessionManager;
-class DefaultProcessInterface;
-} // namespace session
-
 /**
  * Main context of the desktop client application. Exists through all application lifetime and is
  * accessible from anywhere using appContext function.
@@ -168,7 +163,6 @@ public:
     void setSharedMemoryManager(std::unique_ptr<SharedMemoryManager> value);
 
     RunningInstancesManager* runningInstancesManager() const;
-    session::SessionManager* sessionManager() const;
 
     /**
      * Monitors available Cloud Systems and manages corresponding cross-system Contexts.
