@@ -430,9 +430,7 @@ void initialize(Manager* manager, Action* root)
 
     factory()
         .flags(Main | TitleBar | Tree | SingleTarget | ResourceTarget)
-        .text(ContextMenu::tr("New"))
-        .condition(condition::isLoggedIn(/*defaultVisibility*/ DisabledAction)
-            && condition::homeTabIsNotActive(/*defaultVisibility*/ DisabledAction));
+        .text(ContextMenu::tr("New"));
 
     factory.beginSubMenu();
     {
@@ -442,8 +440,7 @@ void initialize(Manager* manager, Action* root)
             .text(ContextMenu::tr("Window"))
             .pulledText(ContextMenu::tr("New Window"))
             .shortcut("Ctrl+N")
-            .condition(condition::isLoggedIn()
-                 && ConditionWrapper(new LightModeCondition(Qn::LightModeNoNewWindow)));
+            .condition(ConditionWrapper(new LightModeCondition(Qn::LightModeNoNewWindow)));
 
         factory(OpenNewTabAction)
             .flags(Main | TitleBar | SingleTarget | NoTarget | GlobalHotkey)
@@ -460,7 +457,8 @@ void initialize(Manager* manager, Action* root)
             .text(ContextMenu::tr("Welcome Screen Tab"))
             .pulledText(ContextMenu::tr("New Welcome Screen Tab"))
             .shortcut("Ctrl+Shift+T")
-            .condition(new LightModeCondition(Qn::LightModeNoNewWindow));
+            .condition(condition::homeTabIsNotActive(ActionVisibility::DisabledAction) &&
+                ConditionWrapper(new LightModeCondition(Qn::LightModeNoNewWindow)));
     }
     factory.endSubMenu();
 
