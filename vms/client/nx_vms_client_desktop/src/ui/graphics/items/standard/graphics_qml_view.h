@@ -34,10 +34,10 @@ public:
     QList<QQmlError> errors() const;
 
     /** Detach root object from this view. */
-    std::shared_ptr<QQuickItem> takeRootObject();
+    QQuickItem* takeRootObject();
 
     /** Set new root object for this view. */
-    void setRootObject(std::shared_ptr<QQuickItem> root);
+    void setRootObject(QQuickItem* root);
 
 public slots:
     void setSource(const QUrl& url);

@@ -147,11 +147,17 @@ public:
     /** Get a list of actions for context menu. Optionally set a parent for each QAction. */
     QList<QAction*> getContextMenuActions(QObject* parent = nullptr) const;
 
-    /** Suspend current page and return its state as QVariant. */
-    QVariant suspend();
+    /**
+     * Suspends the current web page and return its state as QVariant (the state is represented by
+     * QQuickItem that contains WebEngineView). The ownership of the state is transferred to
+     * parent, making the lifetime of the returned state equal to the lifetime of the parent.
+     */
+    QVariant suspend(QObject* parent);
 
-    /** Load and run the page from provided state. */
-    void resume(QVariant state);
+    /**
+     * Loads and runs the web page from state if possible, otherwise loads the resource web page.
+     */
+    void resume(QVariant state, const QnResourcePtr& resource);
 
     /**
      * Set external certificate validator.

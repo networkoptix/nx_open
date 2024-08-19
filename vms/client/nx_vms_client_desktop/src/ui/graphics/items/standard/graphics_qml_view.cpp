@@ -249,7 +249,7 @@ struct GraphicsQmlView::Private
     GraphicsQmlView* view;
     bool offscreenInitialized = false;
     QScopedPointer<QQuickWindow> quickWindow;
-    std::shared_ptr<QQuickItem> rootItem;
+    std::unique_ptr<QQuickItem> rootItem = nullptr;
     QScopedPointer<RenderControl> renderControl;
     QScopedPointer<QOffscreenSurface> offscreenSurface;
     QScopedPointer<QOpenGLContext> openglContext;
@@ -352,16 +352,16 @@ QQuickItem* GraphicsQmlView::rootObject() const
     return d->rootItem.get();
 }
 
-std::shared_ptr<QQuickItem> GraphicsQmlView::takeRootObject()
+QQuickItem* GraphicsQmlView::takeRootObject()
 {
     d->rootItem->setParentItem(nullptr);
-    return d->rootItem;
+    return d->rootItem.release();
 }
 
-void GraphicsQmlView::setRootObject(std::shared_ptr<QQuickItem> root)
+void GraphicsQmlView::setRootObject(QQuickItem* root)
 {
     d->resetComponent(); //< Avoid processing signals from previous root item.
-    d->rootItem = root;
+    d->rootItem.reset(root);
     d->rootItem->setParentItem(d->quickWindow->contentItem());
     d->updateSizes();
 }
