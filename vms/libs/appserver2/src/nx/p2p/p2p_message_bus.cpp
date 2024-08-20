@@ -579,7 +579,6 @@ void MessageBus::at_stateChanged(
                 startReading(connection);
             }
 
-            emit newDirectConnectionEstablished(connection.data());
             if (connection->remotePeer().peerType == PeerType::cloudServer)
                 sendInitialDataToCloud(connection);
 
