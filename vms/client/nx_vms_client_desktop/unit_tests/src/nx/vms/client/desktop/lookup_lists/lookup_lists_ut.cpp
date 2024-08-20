@@ -347,6 +347,42 @@ protected:
         }
     }
 
+    QVariant whenRequestingColorHex(int row, int column)
+    {
+        return m_entriesModel->data(m_entriesModel->index(row, column),
+            LookupListEntriesModel::DataRole::ColorRGBHexValueRole);
+    }
+
+    QVariant whenRequestingColorDisplayValue(int row, int column)
+    {
+        return m_entriesModel->data(m_entriesModel->index(row, column));
+    }
+
+    void thenColorHexIsValidOrEmpty(int row, int column, QVariant value)
+    {
+        const auto attributeName = m_entriesModel->data(m_entriesModel->index(row, column),
+            LookupListEntriesModel::DataRole::AttributeNameRole);
+        const auto rawValue = m_entriesModel->data(m_entriesModel->index(row, column),
+             LookupListEntriesModel::DataRole::RawValueRole).toString();
+        if (attributeName == "Color" && !rawValue.isEmpty())
+            ASSERT_TRUE(value.toString().startsWith("#"));
+        else
+            ASSERT_TRUE(value.isNull());
+    }
+
+    void thenColorNameIsValid(int row, int column, QVariant value)
+    {
+        const auto attributeName = m_entriesModel->data(m_entriesModel->index(row, column),
+            LookupListEntriesModel::DataRole::AttributeNameRole);
+        const auto rawValue = m_entriesModel->data(m_entriesModel->index(row, column),
+             LookupListEntriesModel::DataRole::RawValueRole).toString();
+        const auto displayedValue = value.toString();
+        if (attributeName == "Color" && !rawValue.isEmpty())
+            ASSERT_FALSE(displayedValue.startsWith("#"));
+        else
+            ASSERT_FALSE(displayedValue.isEmpty());
+    }
+
     void thenExportedDataIsTheSameAsInModel()
     {
         ASSERT_TRUE(m_exportTestFile.open(QIODevice::ReadOnly));
@@ -802,6 +838,46 @@ TEST_F(LookupListTests, validate_color_value)
     checkValidationOfEmptyRowWithOneIncorrect("Color", "incorrect", "blue");
     checkValidationOfEmptyRowWithOneIncorrect("Color", "incorrect", "base color 1.1");
     checkValidationOfRowsWithCorrectAndIncorrectValues("Color");
+}
+
+/**
+ * Check hex RGB value is valid.
+ */
+TEST_F(LookupListTests, color_rgb_hex)
+{
+    auto data = bigColumnNumberExampleData();
+    data.entries.push_back({{"Color", "blue"}});
+    data.entries.push_back({{"Color", "green"}});
+        givenLookupListEntriesModel(data);
+
+    for (int row = 0; row < m_entriesModel->rowCount(); ++row)
+    {
+        for (int column = 0; column < m_entriesModel->columnCount(); ++column)
+        {
+            const auto result = whenRequestingColorHex(row, column);
+            thenColorHexIsValidOrEmpty(row, column, result);
+        }
+    }
+}
+
+/**
+ * Check whether displayed color value is valid.
+ */
+TEST_F(LookupListTests, color_displayed_value)
+{
+    auto data = bigColumnNumberExampleData();
+    data.entries.push_back({{"Color", "blue"}});
+    data.entries.push_back({{"Color", "green"}});
+    givenLookupListEntriesModel(data);
+
+    for (int row = 0; row < m_entriesModel->rowCount(); ++row)
+    {
+        for (int column = 0; column < m_entriesModel->columnCount(); ++column)
+        {
+            const auto result = whenRequestingColorDisplayValue(row, column);
+            thenColorNameIsValid(row, column, result);
+        }
+    }
 }
 
 /**

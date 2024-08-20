@@ -24,9 +24,13 @@ ColorSet::~ColorSet()
     // Required here for forward-declared scoped pointer destruction.
 }
 
+std::map<QString, QString> ColorSet::colorByName() const
+{
+    return d->colorByName;
+}
+
 std::unordered_map<QString, QString> ColorSet::colorByHex() const
 {
-    // TODO: #vbutkevich fix possible issue with same hex assigned to different colors.
     std::unordered_map<QString, QString> result;
     for (const auto& [colorName, hex]: d->colorByName)
         result[hex] = colorName;

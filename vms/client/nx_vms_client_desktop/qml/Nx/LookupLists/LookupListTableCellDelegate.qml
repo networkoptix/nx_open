@@ -77,6 +77,7 @@ FocusScope
     {
         displayValue: model.display ?? ""
         value: model.rawValue ?? ""
+        colorHexValue: model.colorRGBHex ?? ""
         visible: !control.isEditing
         anchors.fill: parent
 

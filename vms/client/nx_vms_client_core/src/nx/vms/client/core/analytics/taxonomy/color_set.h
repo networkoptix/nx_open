@@ -22,6 +22,7 @@ public:
     virtual ~ColorSet() override;
 
     std::unordered_map<QString, QString> colorByHex() const;
+    std::map<QString, QString> colorByName() const;
     std::vector<QString> items() const;
 
     Q_INVOKABLE QString color(const QString& item) const;

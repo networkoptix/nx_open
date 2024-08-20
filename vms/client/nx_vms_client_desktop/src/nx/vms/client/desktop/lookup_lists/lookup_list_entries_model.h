@@ -42,7 +42,8 @@ public:
         // Combination of DisplayRole and RawValueRole.
         // Required for correct sorting of number values.
         // Will return empty QVariant for empty values, and display values for all other values.
-        SortRole
+        SortRole,
+        ColorRGBHexValueRole
     };
 
     explicit LookupListEntriesModel(QObject* parent = nullptr);

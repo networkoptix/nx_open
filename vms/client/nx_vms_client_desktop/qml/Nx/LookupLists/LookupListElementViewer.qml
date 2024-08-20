@@ -18,6 +18,7 @@ Control
     required property Analytics.Attribute attribute
     required property string displayValue
     required property string value
+    required property string colorHexValue
 
     property bool isGeneric: !objectType
 
@@ -67,7 +68,7 @@ Control
                 radius: 1
                 anchors.verticalCenter: parent.verticalCenter
                 border.color: ColorTheme.transparent(ColorTheme.colors.light1, 0.1)
-                color: isValidDisplayColor() ? displayValue : "transparent"
+                color: isValidDisplayColor() ? colorHexValue : "transparent"
             }
         }
     }

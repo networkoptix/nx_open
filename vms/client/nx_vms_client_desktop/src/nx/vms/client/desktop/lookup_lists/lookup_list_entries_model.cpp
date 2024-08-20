@@ -59,7 +59,7 @@ int LookupListEntriesModel::rowCount(const QModelIndex& /*parent*/) const
     return d->data->rawData().entries.size();
 }
 
-int LookupListEntriesModel::columnCount(const QModelIndex& parent) const
+int LookupListEntriesModel::columnCount(const QModelIndex& /*parent*/) const
 {
     // Reserve one for checkbox column.
     return d->data ? (int) d->data->rawData().attributeNames.size() : 0;
@@ -74,6 +74,7 @@ QVariant LookupListEntriesModel::data(const QModelIndex& index, int role) const
     {
         case RawValueRole:
         case SortRole:
+        case ColorRGBHexValueRole:
         case Qt::DisplayRole:
         {
             const auto key = attribute(d->data->rawData(), index.column());
@@ -87,6 +88,9 @@ QVariant LookupListEntriesModel::data(const QModelIndex& index, int role) const
             // If value is empty, sorting must be performed by empty value, not displayed.
             if (role == SortRole && value.isEmpty())
                 return {};
+
+            if (role == ColorRGBHexValueRole)
+                return d->getColorHexValue(key, value);
 
             return role == RawValueRole ? value : d->getDisplayValue(key, value);
         }
@@ -126,7 +130,7 @@ bool LookupListEntriesModel::setData(const QModelIndex& index, const QVariant& v
     else
         entry[key] = valueAsString;
 
-    emit dataChanged(index, index, {Qt::DisplayRole, RawValueRole, SortRole});
+    emit dataChanged(index, index, {Qt::DisplayRole, RawValueRole, SortRole, ColorRGBHexValueRole});
     return true;
 }
 
@@ -137,6 +141,7 @@ QHash<int, QByteArray> LookupListEntriesModel::roleNames() const
     roles[AttributeNameRole] = "attributeName";
     roles[RawValueRole] = "rawValue";
     roles[SortRole] = "sort";
+    roles[ColorRGBHexValueRole] = "colorRGBHex";
     return roles;
 }
 

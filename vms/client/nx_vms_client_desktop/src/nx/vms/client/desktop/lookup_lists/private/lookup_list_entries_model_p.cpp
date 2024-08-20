@@ -14,6 +14,8 @@
 #include <nx/vms/client/core/analytics/taxonomy/object_type.h>
 #include <utils/common/hash.h>
 
+using namespace nx::vms::client::core::analytics::taxonomy;
+
 namespace nx::vms::client::desktop {
 
 QVariant LookupListEntriesModel::Private::intFormatter(const QString& value)
@@ -108,10 +110,93 @@ bool LookupListEntriesModel::Private::booleanValidator(const QString& value)
     return reflect::json::deserialize(value.toStdString(), &ignored);
 }
 
+QVariant LookupListEntriesModel::Private::getColorHexValue(
+    const QString& attributeName, const QString& value) const
+{
+    if (const auto calculator = rgbCalculatorByAttributeName.value(attributeName))
+        return calculator(value);
+    return {};
+}
+
+void LookupListEntriesModel::Private::initEnumFunctions(
+        const QString& fullAttributeName, const Attribute* attribute)
+{
+    const auto items = attribute->enumeration->items();
+    const QSet itemSet(items.begin(), items.end());
+    validatorByAttributeName[fullAttributeName] =
+        [itemSet](const QString& value)
+        {
+            return itemSet.contains(value);
+        };
+
+    formatterByAttributeName[fullAttributeName] =
+        [itemSet](const QString& value)
+        {
+            if (!itemSet.contains(value))
+            {
+                NX_WARNING(
+                    typeid(LookupListEntriesModel), "Unexpected enum value %1", value);
+                return QString();
+            }
+            return value;
+        };
+}
+
+void LookupListEntriesModel::Private::initNumberFunctions(const QString& fullAttributeName, const Attribute* attribute)
+{
+    const bool isIntType = attribute->subtype == "integer";
+    formatterByAttributeName[fullAttributeName] = isIntType
+        ? &Private::intFormatter
+        : &Private::doubleFormatter;
+    validatorByAttributeName[fullAttributeName] =
+        [isIntType, min = attribute->minValue, max = attribute->maxValue]
+        (const QString& value)
+        {
+            return isIntType ? intValidator(value, min, max) : doubleValidator(value, min, max);
+        };
+}
+
+void LookupListEntriesModel::Private::initColorFunctions(const QString& fullAttributeName, const Attribute* attribute)
+{
+    const auto colorByHex = attribute->colorSet->colorByHex();
+    const auto colorByName = attribute->colorSet->colorByName();
+    validatorByAttributeName[fullAttributeName] =
+        [colorByHex, colorByName](const QString& value)
+        {
+            return colorByHex.contains(value) || colorByName.contains(value);
+        };
+
+    formatterByAttributeName[fullAttributeName] =
+        [colorByHex, colorByName](const QString& value)
+        {
+            auto colorItByHex = colorByHex.find(value);
+            if (colorItByHex != colorByHex.cend())
+                return colorItByHex->second;
+
+            if (!colorByName.contains(value))
+            {
+                NX_WARNING(typeid(LookupListEntriesModel), "Unexpected color value %1", value);
+                return QString();
+            }
+            return value; //< Value is already valid color name.
+        };
+
+    rgbCalculatorByAttributeName[fullAttributeName] =
+        [colorByHex, colorByName](const QString& value) -> QVariant
+        {
+            if (colorByHex.contains(value))
+                return value; //< Value is already correct RGB.
+
+            auto colorItByName = colorByName.find(value);
+            if (colorItByName != colorByName.cend())
+               return colorItByName->second;
+
+            return {};
+        };
+}
+
 void LookupListEntriesModel::Private::initAttributeFunctions()
 {
-    using namespace nx::vms::client::core::analytics::taxonomy;
-
     if (!taxonomy)
         return;
 
@@ -140,17 +225,7 @@ void LookupListEntriesModel::Private::initAttributeFunctions()
             {
                 case Attribute::Type::number:
                 {
-                    const bool isIntType = attribute->subtype == "integer";
-                    formatterByAttributeName[fullAttributeName] = isIntType
-                        ? &Private::intFormatter
-                        : &Private::doubleFormatter;
-                    validatorByAttributeName[fullAttributeName] =
-                        [isIntType, min = attribute->minValue, max = attribute->maxValue]
-                        (const QString& value)
-                        {
-                            return isIntType ? intValidator(value, min, max)
-                                             : doubleValidator(value, min, max);
-                        };
+                    initNumberFunctions(fullAttributeName, attribute);
                     break;
                 }
                 case Attribute::Type::boolean:
@@ -169,56 +244,12 @@ void LookupListEntriesModel::Private::initAttributeFunctions()
                 }
                 case Attribute::Type::colorSet:
                 {
-                    const auto colorByHex = attribute->colorSet->colorByHex();
-
-                    validatorByAttributeName[fullAttributeName] =
-                        [colorByHex](const QString& value)
-                        {
-                            return ranges::any_of(colorByHex,
-                                [value](const auto& keyValue)
-                                {
-                                    return keyValue.first == value || keyValue.second == value;
-                                });
-                        };
-
-                    formatterByAttributeName[fullAttributeName] =
-                        [colorByHex](const QString& value)
-                        {
-                            auto colorIt = ranges::find_if(colorByHex,
-                                [value](const auto& keyValue)
-                                {
-                                    return keyValue.first == value || keyValue.second == value;
-                                });
-                            if (colorIt == colorByHex.cend())
-                            {
-                                NX_WARNING(typeid(LookupListEntriesModel), "Unexpected color value %1", value);
-                                return QString();
-                            }
-                            return colorIt->second;
-                        };
+                    initColorFunctions(fullAttributeName, attribute);
                     break;
                 }
                 case Attribute::Type::enumeration:
                 {
-                    const auto items = attribute->enumeration->items();
-                    const QSet itemSet(items.begin(), items.end());
-                    validatorByAttributeName[fullAttributeName] =
-                        [itemSet](const QString& value)
-                        {
-                            return itemSet.contains(value);
-                        };
-
-                    formatterByAttributeName[fullAttributeName] =
-                        [itemSet](const QString& value)
-                        {
-                            if (!itemSet.contains(value))
-                            {
-                                NX_WARNING(
-                                    typeid(LookupListEntriesModel), "Unexpected enum value %1", value);
-                                return QString();
-                            }
-                            return value;
-                        };
+                    initEnumFunctions(fullAttributeName, attribute);
                     break;
                 }
                 default:
