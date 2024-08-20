@@ -17,9 +17,15 @@
 
 namespace nx::vms::client::desktop::jsapi {
 
-Tab::Tab(WindowContext* context, QnWorkbenchLayout* layout, QObject* parent):
-    base_type(parent),
-    d(new detail::TabApiBackend(context, layout))
+Tab::Tab(
+    WindowContext* context,
+    QnWorkbenchLayout* layout,
+    std::function<bool()> isSupportedCondition,
+    QObject* parent)
+    :
+    QObject(parent),
+    d(new detail::TabApiBackend(context, layout)),
+    m_isSupportedCondition(isSupportedCondition)
 {
     registerTypes();
 
@@ -34,62 +40,71 @@ Tab::~Tab()
 
 State Tab::state() const
 {
-    return d->state();
+    return ensureSupported() ? d->state() : State{};
 }
 
 ItemResult Tab::item(const QUuid& itemId) const
 {
-    return d->item(itemId);
+    return ensureSupported() ? d->item(itemId) : ItemResult{};
 }
 
 ItemResult Tab::addItem(const QString& resourceId, const ItemParams& params)
 {
-    return d->addItem(resourceId, params);
+    return ensureSupported() ? d->addItem(resourceId, params) : ItemResult{};
 }
 
 Error Tab::setItemParams(const QUuid& itemId, const ItemParams& params)
 {
-    return d->setItemParams(itemId, params);
+    return ensureSupported() ? d->setItemParams(itemId, params) : Error{};
 }
 
 Error Tab::removeItem(const QUuid& itemId)
 {
-    return d->removeItem(itemId);
+    return ensureSupported() ? d->removeItem(itemId) : Error{};
 }
 
 Error Tab::syncWith(const QUuid& itemId)
 {
-    return d->syncWith(itemId);
+    return ensureSupported() ? d->syncWith(itemId) : Error{};
 }
 
 Error Tab::stopSyncPlay()
 {
-    return d->stopSyncPlay();
+    return ensureSupported() ? d->stopSyncPlay() : Error{};
 }
 
 Error Tab::setLayoutProperties(const LayoutProperties& properties)
 {
-    return d->setLayoutProperties(properties);
+    return ensureSupported() ? d->setLayoutProperties(properties) : Error{};
 }
 
 Error Tab::saveLayout()
 {
-    return d->saveLayout();
+    return ensureSupported() ? d->saveLayout() : Error{};
 }
 
 QString Tab::id() const
 {
-    return NX_ASSERT(d->layout()) ? d->layout()->resourceId().toSimpleString() : QString{};
+    // Do not check ensureSupported, because property values may be requested by qt during
+    // initialization.
+    return d->layout() ? d->layout()->resourceId().toSimpleString() : QString{};
 }
 
 QString Tab::name() const
 {
-    return NX_ASSERT(d->layout()) ? d->layout()->name() : QString{};
+    // Do not check ensureSupported, because property values may be requested by qt during
+    // initialization.
+    return d->layout() ? d->layout()->name() : QString{};
 }
 
 QnWorkbenchLayout* Tab::layout() const
 {
     return d->layout();
+}
+
+bool Tab::ensureSupported() const
+{
+    return !m_isSupportedCondition || m_isSupportedCondition();
 }
 
 } // namespace nx::vms::client::desktop::jsapi

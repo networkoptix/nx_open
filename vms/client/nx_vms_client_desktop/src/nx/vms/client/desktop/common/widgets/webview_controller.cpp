@@ -981,10 +981,38 @@ void WebViewController::setCertificateValidator(CertificateValidationFunc valida
 
 void WebViewController::initClientApiSupport(
     WindowContext* context,
-    ClientApiAuthCondition authCondition)
+    ClientApiAuthCondition authCondition,
+    bool isDedicatedWindow)
 {
     if (!NX_ASSERT(context))
         return;
+
+    if (isDedicatedWindow)
+    {
+        // Use Tab object with no layout as vms.tab is not supported in a dedicated window.
+        registerApiObjectWithFactory("vms.tab",
+            [=](QObject* parent) -> QObject*
+            {
+                auto isSupportedCondition =
+                    [context, timer = QElapsedTimer{}]() mutable
+                    {
+                        constexpr auto kTimeout = std::chrono::milliseconds(5000);
+
+                        if (!timer.isValid() || timer.hasExpired(kTimeout.count()))
+                        {
+                            timer.restart();
+                            QnSessionAwareMessageBox::critical(
+                                context->mainWindowWidget(),
+                                tr("Unavailable in dedicated window mode"),
+                                tr("Move this window to the Layout to use this functionality"));
+                        }
+
+                        return false;
+                    };
+
+                return new jsapi::Tab(context, /*layout*/ nullptr, isSupportedCondition, parent);
+            });
+    }
 
     registerApiObjectWithFactory("vms.tabs",
         [=](QObject* parent) -> QObject*
@@ -1051,10 +1079,11 @@ void WebViewController::initClientApiSupport(
     registerApiObjectWithFactory("vms.tab",
         [=](QObject* parent) -> QObject*
         {
-            return new jsapi::Tab(layout->windowContext(), layout, parent);
+            return new jsapi::Tab(
+                layout->windowContext(), layout, /*isSupportedCondition*/ {}, parent);
         });
 
-    initClientApiSupport(layout->windowContext(), authCondition);
+    initClientApiSupport(layout->windowContext(), authCondition, /*isDedicatedWindow*/ false);
 }
 
 void WebViewController::registerMetaType()

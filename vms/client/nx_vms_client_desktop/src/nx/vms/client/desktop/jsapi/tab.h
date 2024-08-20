@@ -21,7 +21,7 @@ namespace jsapi {
 namespace detail { class TabApiBackend; }
 
 /**
- * Contains methods and signals to work with the tab containing the current web page.
+ * Contains methods and signals to work with the tab.
  */
 class Tab: public QObject
 {
@@ -47,7 +47,11 @@ class Tab: public QObject
 
 public:
     /** @private */
-    Tab(WindowContext* context, QnWorkbenchLayout* layout, QObject* parent = nullptr);
+    Tab(
+        WindowContext* context,
+        QnWorkbenchLayout* layout,
+        std::function<bool()> isSupportedCondition = {},
+        QObject* parent = nullptr);
 
     /** @private */
     virtual ~Tab() override;
@@ -102,7 +106,11 @@ signals:
     /** @} */ // group vms-tab
 
 private:
+    bool ensureSupported() const;
+
+private:
     nx::utils::ImplPtr<detail::TabApiBackend> d;
+    std::function<bool()> m_isSupportedCondition;
 };
 
 } // namespace jsapi
