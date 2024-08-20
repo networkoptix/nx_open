@@ -1849,7 +1849,7 @@
     </message>
     <message>
       <source>Remote</source>
-      <translation type="unfinished">Remote</translation>
+      <translation>Uzak</translation>
     </message>
     <message>
       <source>Take system name and settings from</source>

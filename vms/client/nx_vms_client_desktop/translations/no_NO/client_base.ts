@@ -9770,11 +9770,11 @@ Husk å tilbakestille loggingsnivået til standardinnstillingen etter at du har 
     </message>
     <message>
       <source>Current (%1)</source>
-      <translation type="unfinished">Current (%1)</translation>
+      <translation>Gjeldende (%1)</translation>
     </message>
     <message>
       <source>Remote (%1)</source>
-      <translation type="unfinished">Remote (%1)</translation>
+      <translation>Ekstern (%1)</translation>
     </message>
     <message>
       <source>Success</source>

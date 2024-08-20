@@ -9614,11 +9614,11 @@ Ingatlah untuk mengembalikan Level Logging ke pengaturan default setelah Anda me
     </message>
     <message>
       <source>Current (%1)</source>
-      <translation type="unfinished">Current (%1)</translation>
+      <translation>Saat ini ( %1)</translation>
     </message>
     <message>
       <source>Remote (%1)</source>
-      <translation type="unfinished">Remote (%1)</translation>
+      <translation>Remote (%1)</translation>
     </message>
     <message>
       <source>Success</source>

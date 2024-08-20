@@ -9770,11 +9770,11 @@ N'oubliez pas de retourner le niveau de journalisation à sa configuration par d
     </message>
     <message>
       <source>Current (%1)</source>
-      <translation type="unfinished">Current (%1)</translation>
+      <translation>Actuel (%1)</translation>
     </message>
     <message>
       <source>Remote (%1)</source>
-      <translation type="unfinished">Remote (%1)</translation>
+      <translation>Distant (%1)</translation>
     </message>
     <message>
       <source>Success</source>

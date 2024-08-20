@@ -9768,11 +9768,11 @@ Yeterince günlük topladıktan sonra Günlük Düzeyini varsayılan ayarına d�
     </message>
     <message>
       <source>Current (%1)</source>
-      <translation type="unfinished">Current (%1)</translation>
+      <translation>Geçerli (%1)</translation>
     </message>
     <message>
       <source>Remote (%1)</source>
-      <translation type="unfinished">Remote (%1)</translation>
+      <translation>Uzak (%1)</translation>
     </message>
     <message>
       <source>Success</source>
