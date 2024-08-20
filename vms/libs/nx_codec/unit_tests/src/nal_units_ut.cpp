@@ -46,24 +46,30 @@ TEST(NalUnits, h264SEIWrongPayloadSize)
     SPSUnit sps;
     {
         SEIUnit sei;
-        uint8_t data[] =
-            {0x26, 0x00, 0x03, 0x34, 0xac, 0x56};
+        const uint8_t data[] = {0x26, 0x05, 0x03, 0x34, 0xac, 0x56}; //< State size == 3.
         sei.decodeBuffer(data, data + sizeof(data));
         ASSERT_TRUE(sei.deserialize(sps, 0));
+        ASSERT_EQ(sei.m_userDataPayload.size(), 1);
+        ASSERT_EQ(sei.m_processedMessages.size(), 1);
+        ASSERT_EQ(sei.m_userDataPayload.front().second, 3); //< Correct size.
     }
     {
         SEIUnit sei;
-        uint8_t data[] =
-            {0x26, 0x00, 0x04, 0x34, 0xac, 0x56};
+        const uint8_t data[] = {0x26, 0x05, 0x04, 0x34, 0xac, 0x56}; //< State size == 4.
         sei.decodeBuffer(data, data + sizeof(data));
-        ASSERT_FALSE(sei.deserialize(sps, 0));
+        ASSERT_TRUE(sei.deserialize(sps, 0));
+        ASSERT_EQ(sei.m_userDataPayload.size(), 1);
+        ASSERT_EQ(sei.m_processedMessages.size(), 1);
+        ASSERT_EQ(sei.m_userDataPayload.front().second, 3); //< Truncated.
     }
     {
         SEIUnit sei;
-        uint8_t data[] =
-            {0x26, 0x00, 0xFF, 0x01, 0x34, 0xac, 0x56};
+        uint8_t data[] = {0x26, 0x05, 0xFF, 0x01, 0x34, 0xac, 0x56}; //< State size == 256.
         sei.decodeBuffer(data, data + sizeof(data));
-        ASSERT_FALSE(sei.deserialize(sps, 0));
+        ASSERT_TRUE(sei.deserialize(sps, 0));
+        ASSERT_EQ(sei.m_userDataPayload.size(), 1);
+        ASSERT_EQ(sei.m_processedMessages.size(), 1);
+        ASSERT_EQ(sei.m_userDataPayload.front().second, 3); //< Truncated.
     }
 }
 
