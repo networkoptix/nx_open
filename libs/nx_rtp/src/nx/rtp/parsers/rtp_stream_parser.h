@@ -36,12 +36,15 @@ public:
 
     int getFrequency() const { return m_frequency; };
     virtual bool isUtcTime() const { return false; }
+    void setLogId(const std::string& id) { m_id = id; }
 
 protected:
     void setFrequency(int frequency) { m_frequency = frequency; }
+    const std::string& logId() const { return m_id; }
 
 private:
     int m_frequency = 0;
+    std::string m_id;
 };
 
 using StreamParserPtr = std::unique_ptr<nx::rtp::StreamParser>;
