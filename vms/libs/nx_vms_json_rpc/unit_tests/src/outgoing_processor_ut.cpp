@@ -9,12 +9,12 @@ namespace nx::vms::json_rpc::test {
 
 TEST(OutgoingProcessor, batchRequest)
 {
-    std::vector<api::JsonRpcRequest> requests(2);
+    std::vector<JsonRpcRequest> requests(2);
     requests[0].id = 1;
     requests[0].method = "method1";
     requests[1].id = "2";
     requests[1].method = "method2";
-    std::vector<api::JsonRpcResponse> responses(2);
+    std::vector<JsonRpcResponse> responses(2);
     responses[0].id = "2";
     responses[0].result = QJsonValue();
     responses[1].id = 1;
@@ -29,7 +29,7 @@ TEST(OutgoingProcessor, batchRequest)
                 "[{\"id\":1,\"jsonrpc\":\"2.0\",\"method\":\"method1\"},"
                 "{\"id\":\"2\",\"jsonrpc\":\"2.0\",\"method\":\"method2\"}]");
         });
-    std::vector<api::JsonRpcResponse> expectedResponses;
+    std::vector<JsonRpcResponse> expectedResponses;
     processor.processBatchRequest(
         requests, [&expectedResponses](auto value) { expectedResponses = std::move(value); });
     processor.onResponse(responseJson);

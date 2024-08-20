@@ -35,8 +35,8 @@ bool isResponse(const QJsonArray& list)
     {
         if (isResponse(list[i].toObject()) != result)
         {
-            throw api::JsonRpcError{
-                api::JsonRpcError::invalidRequest, "Mixed request and response in a batch"};
+            throw JsonRpcError{
+                JsonRpcError::invalidRequest, "Mixed request and response in a batch"};
         }
     }
     return result;
@@ -116,7 +116,7 @@ void WebSocketConnection::stopWhileInAioThread()
 }
 
 void WebSocketConnection::send(
-    nx::vms::api::JsonRpcRequest request, ResponseHandler handler, QByteArray serializedRequest)
+    JsonRpcRequest request, ResponseHandler handler, QByteArray serializedRequest)
 {
     dispatch(
         [this,
@@ -130,7 +130,7 @@ void WebSocketConnection::send(
 }
 
 void WebSocketConnection::send(
-    std::vector<nx::vms::api::JsonRpcRequest> jsonRpcRequests, BatchResponseHandler handler)
+    std::vector<JsonRpcRequest> jsonRpcRequests, BatchResponseHandler handler)
 {
     dispatch(
         [this, jsonRpcRequests = std::move(jsonRpcRequests), handler = std::move(handler)]() mutable
@@ -168,17 +168,17 @@ void WebSocketConnection::readHandler(const nx::Buffer& buffer)
         QJsonValue data;
         QString error;
         if (!QJsonDetail::deserialize_json(buffer.toRawByteArray(), &data, &error))
-            throw api::JsonRpcError{api::JsonRpcError::parseError, error.toStdString()};
+            throw JsonRpcError{JsonRpcError::parseError, error.toStdString()};
 
         if (isResponse(data))
             m_outgoingProcessor->onResponse(data);
         else
             processRequest(data);
     }
-    catch (api::JsonRpcError e)
+    catch (JsonRpcError e)
     {
         NX_DEBUG(this, "Error %1 processing received message", QJson::serialized(e));
-        send(QJson::serialized(api::JsonRpcResponse::makeError(std::nullptr_t(), std::move(e))));
+        send(QJson::serialized(JsonRpcResponse::makeError(std::nullptr_t(), std::move(e))));
     }
 }
 

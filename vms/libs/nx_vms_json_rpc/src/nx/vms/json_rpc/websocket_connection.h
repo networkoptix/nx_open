@@ -7,7 +7,8 @@
 
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/utils/scope_guard.h>
-#include <nx/vms/api/data/json_rpc.h>
+
+#include "messages.h"
 
 namespace nx::network::websocket { class WebSocket; }
 
@@ -22,9 +23,9 @@ class NX_VMS_JSON_RPC_API WebSocketConnection:
 {
 public:
     using base_type = nx::network::aio::BasicPollable;
-    using ResponseHandler = nx::utils::MoveOnlyFunc<void(nx::vms::api::JsonRpcResponse)>;
+    using ResponseHandler = nx::utils::MoveOnlyFunc<void(JsonRpcResponse)>;
     using RequestHandler = nx::utils::MoveOnlyFunc<
-        void(nx::vms::api::JsonRpcRequest, ResponseHandler, WebSocketConnection*)>;
+        void(JsonRpcRequest, ResponseHandler, WebSocketConnection*)>;
     using OnDone = nx::utils::MoveOnlyFunc<void(WebSocketConnection*)>;
 
     WebSocketConnection(std::unique_ptr<nx::network::websocket::WebSocket> socket, OnDone onDone);
@@ -34,13 +35,13 @@ public:
     void setRequestHandler(RequestHandler requestHandler);
     void start();
     void send(
-        nx::vms::api::JsonRpcRequest request,
+        JsonRpcRequest request,
         ResponseHandler handler = {},
         QByteArray serializedRequest = {});
 
     using BatchResponseHandler =
-        nx::utils::MoveOnlyFunc<void(std::vector<nx::vms::api::JsonRpcResponse>)>;
-    void send(std::vector<nx::vms::api::JsonRpcRequest> jsonRpcRequests,
+        nx::utils::MoveOnlyFunc<void(std::vector<JsonRpcResponse>)>;
+    void send(std::vector<JsonRpcRequest> jsonRpcRequests,
         BatchResponseHandler handler = nullptr);
 
     void addGuard(const QString& id, nx::utils::Guard guard);

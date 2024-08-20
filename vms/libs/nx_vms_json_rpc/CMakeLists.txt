@@ -1,8 +1,7 @@
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 nx_add_target(nx_vms_json_rpc LIBRARY NO_MOC
-    PUBLIC_LIBS
-        nx_vms_api nx_network nx_utils
+    PUBLIC_LIBS nx_fusion nx_network
     FOLDER common/libs
 )
 

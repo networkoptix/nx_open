@@ -6,7 +6,8 @@
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/socket_factory.h>
 #include <nx/utils/url.h>
-#include <nx/vms/api/data/json_rpc.h>
+
+#include "messages.h"
 
 namespace nx::network::http { class AsyncClient; }
 namespace nx::network::websocket { class WebSocket; }
@@ -19,9 +20,9 @@ class NX_VMS_JSON_RPC_API WebSocketClient: public nx::network::aio::BasicPollabl
 {
 public:
     using base_type = nx::network::aio::BasicPollable;
-    using ResponseHandler = nx::utils::MoveOnlyFunc<void(nx::vms::api::JsonRpcResponse)>;
-    using RequestHandler = nx::utils::MoveOnlyFunc<
-        void(nx::vms::api::JsonRpcRequest, ResponseHandler, WebSocketConnection*)>;
+    using ResponseHandler = nx::utils::MoveOnlyFunc<void(JsonRpcResponse)>;
+    using RequestHandler =
+        nx::utils::MoveOnlyFunc<void(JsonRpcRequest, ResponseHandler, WebSocketConnection*)>;
 
     WebSocketClient(
         nx::utils::Url url,
@@ -32,7 +33,7 @@ public:
     virtual ~WebSocketClient() override;
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
     void connectAsync(nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler);
-    void sendAsync(nx::vms::api::JsonRpcRequest request, ResponseHandler handler);
+    void sendAsync(JsonRpcRequest request, ResponseHandler handler);
 
 private:
     virtual void stopWhileInAioThread() override;

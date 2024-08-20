@@ -11,7 +11,8 @@
 
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/system_error.h>
-#include <nx/vms/api/data/json_rpc.h>
+
+#include "../messages.h"
 
 namespace nx::vms::json_rpc::detail {
 
@@ -28,22 +29,22 @@ public:
 
     void clear(SystemError::ErrorCode error);
 
-    using ResponseHandler = nx::utils::MoveOnlyFunc<void(nx::vms::api::JsonRpcResponse)>;
+    using ResponseHandler = nx::utils::MoveOnlyFunc<void(JsonRpcResponse)>;
     void processRequest(
-        nx::vms::api::JsonRpcRequest request,
+        JsonRpcRequest request,
         ResponseHandler handler,
         QByteArray serializedRequest);
 
     using BatchResponseHandler =
-        nx::utils::MoveOnlyFunc<void(std::vector<nx::vms::api::JsonRpcResponse>)>;
+        nx::utils::MoveOnlyFunc<void(std::vector<JsonRpcResponse>)>;
     void processBatchRequest(
-        std::vector<nx::vms::api::JsonRpcRequest> jsonRpcRequests, BatchResponseHandler handler);
+        std::vector<JsonRpcRequest> jsonRpcRequests, BatchResponseHandler handler);
 
     void onResponse(const QJsonValue& data);
 
 private:
-    void send(nx::vms::api::JsonRpcRequest request, QByteArray serializedRequest) const;
-    void send(std::vector<nx::vms::api::JsonRpcRequest> jsonRpcRequests) const;
+    void send(JsonRpcRequest request, QByteArray serializedRequest) const;
+    void send(std::vector<JsonRpcRequest> jsonRpcRequests) const;
     void onResponse(const QJsonArray& list);
 
 private:
@@ -51,7 +52,7 @@ private:
     struct AwaitingBatchResponse
     {
         std::vector<Id> ids;
-        std::vector<nx::vms::api::JsonRpcResponse> errors;
+        std::vector<JsonRpcResponse> errors;
         BatchResponseHandler handler;
     };
 

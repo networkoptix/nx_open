@@ -9,16 +9,16 @@
 #include <QtCore/QJsonValue>
 
 #include <nx/utils/move_only_func.h>
-#include <nx/vms/api/data/json_rpc.h>
+
+#include "messages.h"
 
 namespace nx::vms::json_rpc {
 
 class NX_VMS_JSON_RPC_API IncomingProcessor
 {
 public:
-    using ResponseHandler = nx::utils::MoveOnlyFunc<void(nx::vms::api::JsonRpcResponse)>;
-    using RequestHandler =
-        nx::utils::MoveOnlyFunc<void(nx::vms::api::JsonRpcRequest, ResponseHandler)>;
+    using ResponseHandler = nx::utils::MoveOnlyFunc<void(JsonRpcResponse)>;
+    using RequestHandler = nx::utils::MoveOnlyFunc<void(JsonRpcRequest, ResponseHandler)>;
 
     IncomingProcessor(RequestHandler handler = {}): m_handler(std::move(handler)) {}
     void processRequest(const QJsonValue& data, nx::utils::MoveOnlyFunc<void(QJsonValue)> handler);
@@ -26,9 +26,9 @@ public:
 private:
     struct Request
     {
-        nx::vms::api::JsonRpcRequest jsonRpcRequest;
+        JsonRpcRequest jsonRpcRequest;
 
-        Request(nx::vms::api::JsonRpcRequest jsonRpcRequest):
+        Request(JsonRpcRequest jsonRpcRequest):
             jsonRpcRequest(std::move(jsonRpcRequest))
         {
         }
@@ -37,17 +37,17 @@ private:
     struct BatchRequest
     {
         std::unordered_map<Request*, std::unique_ptr<Request>> requests;
-        std::vector<nx::vms::api::JsonRpcResponse> responses;
+        std::vector<JsonRpcResponse> responses;
         nx::utils::MoveOnlyFunc<void(QJsonValue)> handler;
     };
 
     void onBatchResponse(
-        BatchRequest* batchRequest, Request* request, nx::vms::api::JsonRpcResponse response);
+        BatchRequest* batchRequest, Request* request, JsonRpcResponse response);
 
     void processBatchRequest(
         const QJsonArray& list, nx::utils::MoveOnlyFunc<void(QJsonValue)> handler);
 
-    void sendResponse(nx::vms::api::JsonRpcResponse jsonRpcResponse,
+    void sendResponse(JsonRpcResponse jsonRpcResponse,
         const nx::utils::MoveOnlyFunc<void(QJsonValue)>& handler);
 
 private:
