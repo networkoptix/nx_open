@@ -35,12 +35,15 @@ public:
     virtual bool forceProcessEmptyData() const { return false; }
 
     int getFrequency() const { return m_frequency; };
+    void setLogId(const std::string& id) { m_id = id; }
 
 protected:
     void setFrequency(int frequency) { m_frequency = frequency; }
+    const std::string& logId() const { return m_id; }
 
 private:
     int m_frequency = 0;
+    std::string m_id;
 };
 
 using StreamParserPtr = std::unique_ptr<nx::rtp::StreamParser>;
