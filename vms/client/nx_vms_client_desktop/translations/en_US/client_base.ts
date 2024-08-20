@@ -9775,6 +9775,10 @@ Remember to return the Logging Level to its default setting after you have colle
         <source>Success</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Remote</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::MergeSystemsTool</name>
