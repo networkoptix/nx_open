@@ -145,16 +145,6 @@ QAuthenticator QnNetworkResource::parseAuth(const QString& value)
     return auth;
 }
 
-bool QnNetworkResource::isAuthenticated() const
-{
-    return m_authenticated;
-}
-
-void QnNetworkResource::setAuthenticated(bool auth)
-{
-    m_authenticated = auth;
-}
-
 int QnNetworkResource::httpPort() const
 {
     return m_httpPort;

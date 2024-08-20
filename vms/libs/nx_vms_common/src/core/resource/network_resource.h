@@ -52,10 +52,6 @@ public:
     QAuthenticator getAuth() const;
     QAuthenticator getDefaultAuth() const;
 
-    // if reader will find out that authentication is required => setAuthenticated(false) must be called
-    bool isAuthenticated() const;
-    void setAuthenticated(bool auth);
-
     virtual int httpPort() const;
     virtual void setHttpPort( int newPort );
 
@@ -107,8 +103,6 @@ public:
     static QString mediaPortKey();
 
 private:
-    bool m_authenticated = true;
-
     nx::utils::MacAddress m_macAddress;
     QString m_physicalId;
 
