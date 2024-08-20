@@ -43,6 +43,7 @@
 #include <nx/vms/rules/events/analytics_event.h>
 #include <nx/vms/rules/group.h>
 #include <nx/vms/rules/strings.h>
+#include <nx/vms/rules/utils/action.h>
 #include <nx/vms/rules/utils/type.h>
 #include <nx/vms/time/formatter.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
@@ -62,7 +63,7 @@ using namespace nx::vms::rules;
 
 namespace {
 
-constexpr auto kUpdateDelayMs = 1000;
+constexpr auto kUpdateDelay = 1s;
 constexpr auto kQueryTimeout = 15s;
 
 const auto kAnalyticsEventType = rules::utils::type<AnalyticsEvent>();
@@ -97,7 +98,7 @@ enum EventListRoles
 enum ActionListRoles
 {
     ActionTypeRole = Qt::UserRole + 1,
-    ProlongedActionRole,
+    ProlongedOnlyActionRole, // The action can't connect to instant only events.
 };
 
 QString actionType(const QModelIndex& index)
@@ -260,7 +261,7 @@ EventLogDialog::EventLogDialog(QWidget* parent):
     connect(ui->textSearchLineEdit, &SearchLineEdit::textChanged,
         this, &EventLogDialog::updateDataDelayed);
     m_delayUpdateTimer.setSingleShot(true);
-    m_delayUpdateTimer.setInterval(kUpdateDelayMs);
+    m_delayUpdateTimer.setInterval(kUpdateDelay);
     connect(&m_delayUpdateTimer, &QTimer::timeout, this, &EventLogDialog::updateData);
 
     const auto updateServerEventsMenuIfNeeded =
@@ -456,7 +457,7 @@ void EventLogDialog::initActionsModel()
 {
     QStandardItem* anyActionItem = new QStandardItem(tr("Any Action"));
     anyActionItem->setData(QString(), ActionTypeRole);
-    anyActionItem->setData(false, ProlongedActionRole);
+    anyActionItem->setData(false, ProlongedOnlyActionRole);
     m_actionTypesModel->appendRow(anyActionItem);
 
     // TODO: #amalov Filter inaccessible actions?
@@ -466,7 +467,9 @@ void EventLogDialog::initActionsModel()
         QStandardItem* item = new QStandardItem(
             rules::Strings::actionName(systemContext(), actionDesc.id));
         item->setData(actionDesc.id, ActionTypeRole);
-        item->setData(actionDesc.flags.testFlag(ItemFlag::prolonged), ProlongedActionRole);
+        item->setData(
+            actionDesc.flags.testFlag(ItemFlag::prolonged) && !hasDuration(actionDesc),
+            ProlongedOnlyActionRole);
 
         m_actionTypesModel->appendRow(item);
     }
@@ -527,7 +530,8 @@ void EventLogDialog::updateData()
     m_updateDisabled = true;
     m_delayUpdateTimer.stop();
 
-    const auto eventType = desktop::eventType(ui->eventComboBox->currentModelIndex());
+    const auto index = ui->eventComboBox->currentModelIndex();
+    const auto eventType = desktop::eventType(index);
     const auto eventDesc = systemContext()->vmsRulesEngine()->eventDescriptor(eventType);
     const bool serverIssue = (eventType == kServerIssueEventGroup)
         || (eventDesc && eventDesc->groupId == kServerIssueEventGroup);
@@ -536,9 +540,16 @@ void EventLogDialog::updateData()
     if (serverIssue)
         setEventDevices({});
 
-    bool istantOnly = eventDesc && !eventDesc->flags.testFlag(ItemFlag::prolonged);
+    bool instantOnly = eventDesc && !eventDesc->flags.testFlag(ItemFlag::prolonged);
+    if (const auto analyticsTypeId = analyticsEventTypeId(index);
+        !instantOnly && !analyticsTypeId.isEmpty())
+    {
+        const auto taxonomy = systemContext()->analyticsTaxonomyState();
+        const auto analyticsType = taxonomy->eventTypeById(analyticsTypeId);
+        instantOnly = analyticsType && !analyticsType->isStateDependent();
+    }
 
-    updateActionList(istantOnly);
+    updateActionList(instantOnly);
 
     const auto actionType = desktop::actionType(
         m_actionTypesModel->index(ui->actionComboBox->currentIndex(), 0));
@@ -922,7 +933,7 @@ void EventLogDialog::updateActionList(bool instantOnly)
 {
     const auto prolongedActions = m_actionTypesModel->match(
         m_actionTypesModel->index(0, 0),
-        ProlongedActionRole,
+        ProlongedOnlyActionRole,
         /*value*/ true,
         /*hits*/ -1,
         Qt::MatchExactly);

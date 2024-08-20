@@ -18,6 +18,9 @@ inline bool isProlonged(const ActionPtr& action)
 /** Returns whether the action is prolonged and has no fixed duration. */
 NX_VMS_RULES_API bool isProlonged(const Engine* engine, const ActionBuilder* builder);
 
+/** Returns whether the action is prolonged only and cannot be connected to instant only event. */
+NX_VMS_RULES_API bool hasDuration(const vms::rules::ItemDescriptor& actionDescriptor);
+
 NX_VMS_RULES_API bool hasTargetCamera(const vms::rules::ItemDescriptor& actionDescriptor);
 
 NX_VMS_RULES_API bool hasTargetLayout(const vms::rules::ItemDescriptor& actionDescriptor);
