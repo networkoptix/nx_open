@@ -9,8 +9,7 @@ nx_add_target(nx_vms_api LIBRARY
         "${CMAKE_CURRENT_BINARY_DIR}/protocol_version.cpp"
     PUBLIC_LIBS
         nx_network_rest
-        nx_utils
-        nx_fusion
+        nx_vms_json_rpc
     FOLDER common/libs
 )
 
