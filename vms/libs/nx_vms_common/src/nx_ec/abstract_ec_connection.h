@@ -165,7 +165,6 @@ signals:
     void remotePeerFound(nx::Uuid data, nx::vms::api::PeerType peerType);
     void remotePeerLost(nx::Uuid data, nx::vms::api::PeerType peerType);
     void remotePeerUnauthorized(const nx::Uuid& id, nx::network::rest::AuthResult);
-    void newDirectConnectionEstablished(QnAbstractTransactionTransport* transport);
 
     void settingsChanged(nx::vms::api::ResourceParamDataList settings);
 

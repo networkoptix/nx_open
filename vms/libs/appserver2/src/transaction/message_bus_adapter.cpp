@@ -36,8 +36,6 @@ void TransactionMessageBusAdapter::initInternal()
         this, &AbstractTransactionMessageBus::remotePeerForbidden, Qt::DirectConnection);
     connect(m_bus.get(), &AbstractTransactionMessageBus::remotePeerHandshakeError,
         this, &AbstractTransactionMessageBus::remotePeerHandshakeError);
-    connect(m_bus.get(), &AbstractTransactionMessageBus::newDirectConnectionEstablished,
-        this, &AbstractTransactionMessageBus::newDirectConnectionEstablished, Qt::DirectConnection);
 }
 
 void TransactionMessageBusAdapter::start()
