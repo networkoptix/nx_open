@@ -87,7 +87,7 @@ Result HevcParser::processData(
     if (!gotData && m_chunks.size() > MAX_ALLOWED_FRAME_SIZE)
     {
         reset();
-        NX_WARNING(this, "RTP parser buffer overflow.");
+        NX_WARNING(this, "%1: RTP parser buffer overflow.", logId());
         return {false, "RTP buffer overflow."};
     }
     return {true};
