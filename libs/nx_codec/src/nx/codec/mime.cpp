@@ -62,7 +62,7 @@ std::string getMimeType(const AVCodecParameters* codecpar)
                     codecpar->extradata + codecpar->extradata_size);
             }
 
-            const uint8_t* dataStart = (const uint8_t*) &data[0];
+            const uint8_t* dataStart = data.data();
             const uint8_t* dataEnd = dataStart + data.size();
             const auto nalu = nx::media::nal::findNextNAL(dataStart, dataEnd);
             if (nalu && dataEnd - nalu >= 4 && nx::media::h264::decodeType(nalu[0]) == nx::media::h264::NALUnitType::nuSPS)

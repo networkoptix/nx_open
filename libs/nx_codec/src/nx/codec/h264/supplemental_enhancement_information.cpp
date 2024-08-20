@@ -40,10 +40,18 @@ bool SupplementalEnhancementInformation::deserialize(SequenceParameterSet& sps, 
                 return false;
 
             payloadSize += *curBuff++;
-            if (curBuff >= nalEnd || curBuff + payloadSize > nalEnd)
+            if (curBuff >= nalEnd)
                 return false;
 
-            sei_payload(sps, payloadType, curBuff, payloadSize, orig_hrd_parameters_present_flag);
+            const int realPayloadSize = std::min(payloadSize, int(nalEnd - curBuff));
+            if (realPayloadSize < payloadSize)
+            {
+                NX_VERBOSE(this, "Truncated SEI type %1 from size %2 to %3 bytes",
+                    payloadType, payloadSize, realPayloadSize);
+            }
+
+            sei_payload(
+                sps, payloadType, curBuff, realPayloadSize, orig_hrd_parameters_present_flag);
             m_processedMessages.insert(payloadType);
             curBuff += payloadSize;
         }
