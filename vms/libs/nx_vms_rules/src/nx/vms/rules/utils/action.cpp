@@ -10,6 +10,7 @@
 #include "../basic_action.h"
 #include "../engine.h"
 #include "../manifest.h"
+#include "common.h"
 #include "field.h"
 
 namespace nx::vms::rules {
@@ -22,6 +23,11 @@ bool isProlonged(const Engine* engine, const ActionBuilder* builder)
 
     const auto durationField = builder->fieldByName<OptionalTimeField>(utils::kDurationFieldName);
     return (!durationField || durationField->value() <= std::chrono::seconds::zero());
+}
+
+bool hasDuration(const vms::rules::ItemDescriptor& actionDescriptor)
+{
+    return utils::fieldByName(utils::kDurationFieldName, actionDescriptor).has_value();
 }
 
 bool hasTargetCamera(const vms::rules::ItemDescriptor& actionDescriptor)

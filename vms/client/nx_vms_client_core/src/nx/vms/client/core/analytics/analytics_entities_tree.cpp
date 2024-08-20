@@ -18,6 +18,13 @@
 #include <nx/vms/client/core/system_context.h>
 #include <nx/vms/event/rule.h>
 #include <nx/vms/event/rule_manager.h>
+#include <nx/vms/rules/engine.h>
+#include <nx/vms/rules/event_filter.h>
+#include <nx/vms/rules/event_filter_fields/analytics_event_type_field.h>
+#include <nx/vms/rules/events/analytics_event.h>
+#include <nx/vms/rules/rule.h>
+#include <nx/vms/rules/utils/field.h>
+#include <nx/vms/rules/utils/type.h>
 
 namespace nx::vms::client::core {
 
@@ -30,6 +37,8 @@ using NodeType = AnalyticsEntitiesTreeBuilder::NodeType;
 using NodeFilter = AnalyticsEntitiesTreeBuilder::NodeFilter;
 
 namespace {
+
+static const auto kAnalyticsEventType = rules::utils::type<rules::AnalyticsEvent>();
 
 NodePtr makeNode(NodeType nodeType, QWeakPointer<Node> parent, const QString& text = QString())
 {
@@ -302,14 +311,32 @@ AnalyticsEventsSearchTreeBuilder::AnalyticsEventsSearchTreeBuilder(
     SystemContextAware(systemContext),
     cachedEventTypesTree(makeNode(NodeType::root, {}))
 {
-    using RuleManager = nx::vms::event::RuleManager;
-    const auto ruleManager = systemContext->eventRuleManager();
-    connect(ruleManager, &RuleManager::rulesReset,
-        this, &AnalyticsEventsSearchTreeBuilder::updateEventTypesTree);
-    connect(ruleManager, &RuleManager::ruleAddedOrUpdated,
-        this, &AnalyticsEventsSearchTreeBuilder::updateEventTypesTree);
-    connect(ruleManager, &RuleManager::ruleRemoved,
-        this, &AnalyticsEventsSearchTreeBuilder::updateEventTypesTree);
+    const auto engine = systemContext->vmsRulesEngine();
+
+    if (engine->isOldEngineEnabled())
+    {
+        using RuleManager = nx::vms::event::RuleManager;
+        const auto ruleManager = systemContext->eventRuleManager();
+
+        connect(ruleManager, &RuleManager::rulesReset,
+            this, &AnalyticsEventsSearchTreeBuilder::updateEventTypesTree);
+        connect(ruleManager, &RuleManager::ruleAddedOrUpdated,
+            this, &AnalyticsEventsSearchTreeBuilder::updateEventTypesTree);
+        connect(ruleManager, &RuleManager::ruleRemoved,
+            this, &AnalyticsEventsSearchTreeBuilder::updateEventTypesTree);
+    }
+
+    if (engine->isEnabled())
+    {
+        using Engine = nx::vms::rules::Engine;
+
+        connect(engine, &Engine::rulesReset,
+            this, &AnalyticsEventsSearchTreeBuilder::updateEventTypesTree);
+        connect(engine, &Engine::ruleAddedOrUpdated,
+            this, &AnalyticsEventsSearchTreeBuilder::updateEventTypesTree);
+        connect(engine, &Engine::ruleRemoved,
+            this, &AnalyticsEventsSearchTreeBuilder::updateEventTypesTree);
+    }
 
     auto notifyAboutResourceListChanges =
         [this](const QnResourceList& resources)
@@ -380,11 +407,30 @@ NodePtr AnalyticsEventsSearchTreeBuilder::calculateEventTypesTree() const
     using namespace nx::vms::event;
 
     QSet<api::analytics::EventTypeId> actuallyUsedEventTypes;
-    for (const auto& rule: systemContext()->eventRuleManager()->rules())
+    const auto engine = systemContext()->vmsRulesEngine();
+
+    if (engine->isOldEngineEnabled())
     {
-        if (rule->eventType() == EventType::analyticsSdkEvent)
-            actuallyUsedEventTypes.insert(rule->eventParams().getAnalyticsEventTypeId());
+        for (const auto& rule: systemContext()->eventRuleManager()->rules())
+        {
+            if (rule->eventType() == EventType::analyticsSdkEvent)
+                actuallyUsedEventTypes.insert(rule->eventParams().getAnalyticsEventTypeId());
+        }
     }
+
+    if (engine->isEnabled())
+    {
+        for (const auto& [_, rule] : systemContext()->vmsRulesEngine()->rules())
+        {
+            for (const auto& filter : rule->eventFiltersByType(kAnalyticsEventType))
+            {
+                actuallyUsedEventTypes.insert(
+                    filter->fieldByType<rules::AnalyticsEventTypeField>()->typeId());
+            }
+        }
+    }
+
+    actuallyUsedEventTypes.remove({});
 
     // Early exit if no analytics rules are configured.
     if (actuallyUsedEventTypes.isEmpty())
