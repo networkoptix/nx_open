@@ -74,9 +74,6 @@ signals:
     void remotePeerForbidden(nx::Uuid id, const QString& message);
     void remotePeerHandshakeError(nx::Uuid id);
     void stateChanged(const nx::Uuid& id, const QString& state);
-
-    /** Emitted on a new direct connection to a remote peer has been established */
-    void newDirectConnectionEstablished(QnAbstractTransactionTransport* transport);
 };
 
 } // namespace ec2
