@@ -892,6 +892,7 @@ void RtspStreamProvider::createTrackParsers()
                 track.sdpMedia.rtpmap.codecName);
             continue;
         }
+        codecParser->setLogId(m_logName.toStdString());
         codecParser->setSdpInfo(track.sdpMedia);
         auto audioParser = dynamic_cast<nx::rtp::AudioStreamParser*>(codecParser.get());
         if (audioParser)

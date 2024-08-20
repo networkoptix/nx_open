@@ -12,7 +12,7 @@ static constexpr int kMaxMetadataPacketSizeBytes = 10'000'000;
 
 void BaseMetadataRtpParser::setSdpInfo(const Sdp::Media& sdp)
 {
-    NX_DEBUG(this, "Got SDP information about the media track: %1", sdp);
+    NX_DEBUG(this, "%1: Got SDP information about the media track: %2", logId(), sdp);
     if (sdp.rtpmap.clockRate > 0)
         StreamParser::setFrequency(sdp.rtpmap.clockRate);
 
@@ -21,11 +21,11 @@ void BaseMetadataRtpParser::setSdpInfo(const Sdp::Media& sdp)
 
 QnAbstractMediaDataPtr BaseMetadataRtpParser::nextData()
 {
-    NX_VERBOSE(this, "Next data has been requested");
+    NX_VERBOSE(this, "%1: Next data has been requested", logId());
     QnAbstractMediaDataPtr result;
     if (m_metadata)
     {
-        NX_VERBOSE(this, "Got metadata");
+        NX_VERBOSE(this, "%1: Got metadata", logId());
         result = m_metadata;
         m_metadata.reset();
     }
@@ -41,7 +41,7 @@ Result BaseMetadataRtpParser::processData(
     bool& gotData)
 {
     gotData = false;
-    NX_VERBOSE(this, "Processing next RTP packet");
+    NX_VERBOSE(this, "%1: Processing next RTP packet", logId());
 
     const quint8* const data = rtpBufferBase + bufferOffset;
 
@@ -56,8 +56,8 @@ Result BaseMetadataRtpParser::processData(
         || (m_buffer.size() > kMaxMetadataPacketSizeBytes))
     {
         NX_VERBOSE(this,
-            "Got an RTP packet with timestamp that differs from the previous packet, "
-            "creating metadata");
+            "%1: Got an RTP packet with timestamp that differs from the previous packet, "
+            "creating metadata", logId());
 
         m_metadata = makeCompressedMetadata(*m_previousDataChunkTimestamp);
         if (m_metadata)
@@ -72,7 +72,7 @@ Result BaseMetadataRtpParser::processData(
 
     if (rtpHeader.marker)
     {
-        NX_VERBOSE(this, "Got an RTP packet with the marker bit set, creating metadata");
+        NX_VERBOSE(this, "%1: Got an RTP packet with the marker bit set, creating metadata", logId());
         m_metadata = makeCompressedMetadata(currentDataChunkTimestamp);
         if (m_metadata)
             gotData = true;

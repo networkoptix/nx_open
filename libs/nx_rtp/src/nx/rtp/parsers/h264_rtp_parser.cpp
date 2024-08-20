@@ -74,7 +74,7 @@ void H264Parser::decodeSpsInfo(const uint8_t* data, int size)
     }
     catch(nx::utils::BitStreamException& e)
     {
-        NX_WARNING(this, "Can't deserialize SPS unit. Bitstream error: %1", e.what());
+        NX_WARNING(this, "%1: Can't deserialize SPS unit. Bitstream error: %2", logId(), e.what());
     }
 }
 
@@ -330,9 +330,8 @@ Result H264Parser::processData(
                 // FU_A last packet
                 if (quint16(sequenceNum - m_firstSeqNum) != m_packetPerNal)
                 {
-                    clear();
-                    return {false, NX_FMT("Failed to parse RTP packet, invalid packets per NAL: "
-                        "%1, first: %2, current: %3", m_packetPerNal, m_firstSeqNum, sequenceNum)};
+                    NX_WARNING(this, "%1: Frame is probably broken, invalid packets per NAL: "
+                        "%2, first: %3, current: %4", logId(), m_packetPerNal, m_firstSeqNum, sequenceNum);
                 }
             }
 

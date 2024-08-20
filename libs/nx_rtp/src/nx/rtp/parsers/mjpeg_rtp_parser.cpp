@@ -430,7 +430,7 @@ void MjpegParser::fixResolution(int* width, int* height)
         {
             resolutionWorkaroundLogged = true;
             NX_DEBUG(this,
-                "[mjpeg_rtp_parser] Camera reports resolution 1792 x 112, assuming 3840 x 2160 (~4K)");
+                "%1: Camera reports resolution 1792 x 112, assuming 3840 x 2160 (~4K)", logId());
         }
         *width = 3840 / 8;
         *height = 2160 / 8;
@@ -511,7 +511,8 @@ Result MjpegParser::processData(
                 if (!mjpeg16BitWarningLogged)
                 {
                     mjpeg16BitWarningLogged = true;
-                    NX_DEBUG(this, lit("16-bit MJPEG is not supported"));
+                    NX_DEBUG(this, lit("%1: 16-bit MJPEG is not supported")
+                        .arg(QString::fromStdString(logId())));
                 }
                 return {false, "Only 8-bit MJPEG is supported"};
             }
