@@ -195,8 +195,6 @@ void BaseEc2Connection<QueryProcessorType>::startReceivingNotifications()
         this, &BaseEc2Connection<QueryProcessorType>::remotePeerLost, Qt::DirectConnection);
     connect(messageBus(), &AbstractTransactionMessageBus::remotePeerUnauthorized,
         this, &BaseEc2Connection<QueryProcessorType>::remotePeerUnauthorized, Qt::DirectConnection);
-    connect(messageBus(), &AbstractTransactionMessageBus::newDirectConnectionEstablished,
-        this, &BaseEc2Connection<QueryProcessorType>::newDirectConnectionEstablished, Qt::DirectConnection);
 
     messageBus()->start();
     timeSyncManager()->start();
