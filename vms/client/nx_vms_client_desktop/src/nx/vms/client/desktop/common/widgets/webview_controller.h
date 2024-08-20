@@ -171,8 +171,12 @@ public:
      * @param item Workbench item.
      * @param authCondition Condition which is checked during the authentication using Client API.
      *     May be used with another controller.
+     * @param isDedicatedWindow Whether the web page is opened in a dedicated window.
      */
-    void initClientApiSupport(WindowContext* context, ClientApiAuthCondition authCondition);
+    void initClientApiSupport(
+        WindowContext* context,
+        ClientApiAuthCondition authCondition,
+        bool isDedicatedWindow = true);
 
     /**
      * Initializes Client API.

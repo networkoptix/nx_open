@@ -138,7 +138,7 @@ TabApiBackend::Private::Private(
     display(context->workbenchContext()->display()),
     navigator(context->workbenchContext()->navigator())
 {
-    if (!NX_ASSERT(layout))
+    if (!layout)
         return;
 
     NX_VERBOSE(this, "Integration tab object created for layout %1", layout->name());
