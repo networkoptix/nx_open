@@ -149,10 +149,12 @@ QModelIndex analyticsEventsRoot(QStandardItemModel* model)
 // Returns width for the longest(symbols count) available date.
 int dateTimeColumnDefaultWidth(QTableView* tableView)
 {
-    static const auto dt =
-        QDateTime::fromString("12/12/2024 12:12:12", "dd/MM/yyyy hh:mm:ss");
+    static const auto datetimeString =
+        time::toString(QDateTime::fromString("12/12/2024 12:12:12", "dd/MM/yyyy hh:mm:ss"));
 
-    return tableView->fontMetrics().size(Qt::TextSingleLine, time::toString(dt)).width()
+    // The returned length in pixels is large enough(with some extra) to accommodate any possible
+    // datetime string.
+    return tableView->fontMetrics().averageCharWidth() * datetimeString.size()
         + style::Metrics::kStandardPadding * 2;
 }
 
