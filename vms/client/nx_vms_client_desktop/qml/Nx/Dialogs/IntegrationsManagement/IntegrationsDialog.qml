@@ -104,4 +104,10 @@ Dialog
         if (store)
             store.discardChanges()
     }
+
+    onVisibleChanged:
+    {
+        if (visible)
+            store.refreshSettings()
+    }
 }

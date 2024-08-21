@@ -21,8 +21,7 @@ LabeledItem
     property bool useLabelField: true
     property var defaultValue //< Not used but required by the backend.
 
-    signal valueChanged()
-    signal activeValueEdited() //< This signal is emitted even if isActive is set to false.
+    signal valueChanged(bool activated)
 
     readonly property bool filled: !!figure
 
@@ -39,7 +38,7 @@ LabeledItem
             id: figureNameEdit
             width: parent.width
             visible: useLabelField
-            onTextChanged: valueChanged()
+            onTextChanged: valueChanged(/*activated*/ false)
         }
 
         Row
@@ -86,7 +85,7 @@ LabeledItem
             id: showOnCameraCheckBox
             text: qsTr("Display on video")
             enabled: figureView.hasFigure
-            onCheckedChanged: activeValueEdited()
+            onCheckedChanged: valueChanged(/*activated*/ true)
             topPadding: 0
         }
     }
@@ -121,7 +120,7 @@ LabeledItem
         }
     }
 
-    onFigureChanged: activeValueEdited()
+    onFigureChanged: valueChanged(/*activated*/ true)
 
     function openEditDialog()
     {

@@ -13,10 +13,9 @@ LabeledItem
     property Item targetTextField: contentItem
 
     /** Emitted when the value is modified by keyboard typing. */
-    signal valueEdited()
+    signal valueEdited(bool activated)
 
-    /** Emitted to notify about instant value changes (for example, the input is accepted). */
-    signal activeValueEdited()
+    signal editingFinished()
 
     ActiveTextBehavior {}
 
@@ -25,8 +24,8 @@ LabeledItem
     Connections
     {
         target: targetTextField
-        function onTextEdited() { control.valueEdited() }
-        function onEditingFinished() { control.activeValueEdited() }
+        function onTextEdited() { control.valueEdited(/*activated*/ false) }
+        function onEditingFinished() { control.editingFinished() }
     }
 
     function getFocusState()
