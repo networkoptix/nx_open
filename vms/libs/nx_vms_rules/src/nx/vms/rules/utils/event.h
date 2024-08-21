@@ -27,6 +27,8 @@ NX_VMS_RULES_API bool hasSourceCamera(const vms::rules::ItemDescriptor& eventDes
 
 NX_VMS_RULES_API bool hasSourceServer(const vms::rules::ItemDescriptor& eventDescriptor);
 
+NX_VMS_RULES_API bool hasSourceUser(const vms::rules::ItemDescriptor& eventDescriptor);
+
 enum class EventDurationType
 {
     instant,

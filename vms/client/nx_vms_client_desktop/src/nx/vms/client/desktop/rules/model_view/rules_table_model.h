@@ -65,6 +65,8 @@ private:
     void onRuleAddedOrUpdated(nx::Uuid ruleId, bool added);
     void onRuleRemoved(nx::Uuid ruleId);
     void onRulesReset();
+    void onResourcePoolChanged(const QnResourceList& resources);
+    void onPermissionsChanged(const QnResourceList& resources);
 
     void initialise();
     bool isIndexValid(const QModelIndex& index) const;
@@ -76,6 +78,7 @@ private:
     QVariant sourceColumnData(const ConstRulePtr& rule, int role) const;
     QVariant sourceCameraData(const vms::rules::EventFilter* eventFilter, int role) const;
     QVariant sourceServerData(const vms::rules::EventFilter* eventFilter, int role) const;
+    QVariant sourceUserData(const vms::rules::EventFilter* eventFilter, int role) const;
 
     QVariant actionColumnData(const ConstRulePtr& rule, int role) const;
 
@@ -90,6 +93,23 @@ private:
     QVariant editedStateColumnData(const ConstRulePtr& rule, int role) const;
     QVariant enabledStateColumnData(const ConstRulePtr& rule, int role) const;
     QVariant commentColumnData(const ConstRulePtr& rule, int role) const;
+
+    // Returns all the resource ids for the given row and column.
+    QSet<nx::Uuid> resourceIds(int row, int column) const;
+
+    QSet<nx::Uuid> sourceIds(
+        const vms::rules::EventFilter* eventFilter,
+        const vms::rules::ItemDescriptor& descriptor) const;
+    QSet<nx::Uuid> targetIds(
+        const vms::rules::ActionBuilder* actionBuilder,
+        const vms::rules::ItemDescriptor& descriptor) const;
+
+    // Returns whether the rule under the given row contains source or target device from the
+    // given resources list.
+    bool hasAnyOf(int row, const QList<nx::Uuid>& resourceIds) const;
+
+    // Returns whether the given the rule at rhe given row has resources.
+    bool hasResources(int row);
 };
 
 } // namespace nx::vms::client::desktop::rules
