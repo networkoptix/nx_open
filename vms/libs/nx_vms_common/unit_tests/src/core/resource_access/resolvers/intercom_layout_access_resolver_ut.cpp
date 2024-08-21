@@ -25,6 +25,29 @@ public:
             manager.get(), systemContext()->globalPermissionsWatcher(), /*parent*/ manager.get());
         return new IntercomLayoutAccessResolver(ownResolver, resourcePool());
     }
+
+public:
+    void testAccessToLayoutViaIntercom(
+        const QnVirtualCameraResourcePtr& intercom,
+        const QnLayoutResourcePtr& layout)
+    {
+        // No layout access from single `view` permission to intercom.
+        manager->setOwnResourceAccessMap(kTestSubjectId, {{intercom->getId(), AccessRight::view}});
+        EXPECT_EQ(resolver->accessRights(kTestSubjectId, intercom), AccessRight::view);
+        EXPECT_EQ(resolver->accessRights(kTestSubjectId, layout), AccessRights());
+
+        // No layout access from single `userInput` permission to intercom.
+        manager->setOwnResourceAccessMap(kTestSubjectId, {{intercom->getId(), AccessRight::userInput}});
+        EXPECT_EQ(resolver->accessRights(kTestSubjectId, intercom), AccessRight::userInput);
+        EXPECT_EQ(resolver->accessRights(kTestSubjectId, layout), AccessRights());
+
+        // `view` layout access from `view | userInput` permissions to intercom.
+        manager->setOwnResourceAccessMap(kTestSubjectId,
+            {{intercom->getId(), AccessRight::view | AccessRight::userInput}});
+        EXPECT_EQ(resolver->accessRights(kTestSubjectId, intercom),
+            AccessRight::view | AccessRight::userInput);
+        EXPECT_EQ(resolver->accessRights(kTestSubjectId, layout), AccessRight::view);
+    }
 };
 
 TEST_F(IntercomLayoutAccessResolverTest, noAccess)
@@ -50,22 +73,28 @@ TEST_F(IntercomLayoutAccessResolverTest, accessToLayoutViaIntercom)
     const auto intercom = addIntercomCamera();
     const auto layout = addIntercomLayout(intercom);
 
-    // No layout access from single `view` permission to intercom.
-    manager->setOwnResourceAccessMap(kTestSubjectId, {{intercom->getId(), AccessRight::view}});
-    EXPECT_EQ(resolver->accessRights(kTestSubjectId, intercom), AccessRight::view);
-    EXPECT_EQ(resolver->accessRights(kTestSubjectId, layout), AccessRights());
+    testAccessToLayoutViaIntercom(intercom, layout);
+}
 
-    // No layout access from single `userInput` permission to intercom.
-    manager->setOwnResourceAccessMap(kTestSubjectId, {{intercom->getId(), AccessRight::userInput}});
-    EXPECT_EQ(resolver->accessRights(kTestSubjectId, intercom), AccessRight::userInput);
-    EXPECT_EQ(resolver->accessRights(kTestSubjectId, layout), AccessRights());
+TEST_F(IntercomLayoutAccessResolverTest, accessToLayoutViaIntercomWithPostponedInitialization)
+{
+    const auto intercom = addCamera();
+    toIntercom(intercom);
+    const auto layout = addIntercomLayout(intercom);
 
-    // `view` layout access from `view | userInput` permissions to intercom.
-    manager->setOwnResourceAccessMap(kTestSubjectId,
-        {{intercom->getId(), AccessRight::view | AccessRight::userInput}});
-    EXPECT_EQ(resolver->accessRights(kTestSubjectId, intercom),
-        AccessRight::view | AccessRight::userInput);
-    EXPECT_EQ(resolver->accessRights(kTestSubjectId, layout), AccessRight::view);
+    testAccessToLayoutViaIntercom(intercom, layout);
+}
+
+TEST_F(IntercomLayoutAccessResolverTest, accessToLayoutViaIntercomWhenLayoutIsSavedOnServer)
+{
+    const auto intercom = addCamera();
+    const auto layout = addIntercomLayout(intercom);
+
+    EXPECT_EQ(resolver->accessRights(kTestSubjectId, layout), kNoAccessRights);
+
+    toIntercom(intercom);
+
+    testAccessToLayoutViaIntercom(intercom, layout);
 }
 
 TEST_F(IntercomLayoutAccessResolverTest, accessDetailsViaIntercom)

@@ -123,14 +123,21 @@ nx::CameraResourceStubPtr QnResourcePoolTestHelper::addDesktopCamera(
     return camera;
 }
 
-nx::CameraResourceStubPtr QnResourcePoolTestHelper::addIntercomCamera()
+void QnResourcePoolTestHelper::toIntercom(nx::CameraResourceStubPtr camera)
 {
-    const auto camera = createCamera();
-
     QnIOPortData intercomFeaturePort;
     intercomFeaturePort.outputName = QnSecurityCamResource::intercomSpecificPortName();
 
-    camera->setIoPortDescriptions({intercomFeaturePort}, false);
+    camera->setProperty(
+        ResourcePropertyKey::kIoSettings,
+        QString::fromStdString(nx::reflect::json::serialize(
+            QnIOPortDataList{intercomFeaturePort})));
+}
+
+nx::CameraResourceStubPtr QnResourcePoolTestHelper::addIntercomCamera()
+{
+    const auto camera = createCamera();
+    toIntercom(camera);
     resourcePool()->addResource(camera);
     return camera;
 }
@@ -138,7 +145,7 @@ nx::CameraResourceStubPtr QnResourcePoolTestHelper::addIntercomCamera()
 QnLayoutResourcePtr QnResourcePoolTestHelper::addIntercomLayout(
     const QnVirtualCameraResourcePtr& intercomCamera)
 {
-    if (!NX_ASSERT(intercomCamera && intercomCamera->isIntercom()))
+    if (!NX_ASSERT(intercomCamera))
         return {};
 
     const auto intercomId = intercomCamera->getId();
@@ -148,7 +155,8 @@ QnLayoutResourcePtr QnResourcePoolTestHelper::addIntercomLayout(
     layout->setParentId(intercomId);
 
     resourcePool()->addResource(layout);
-    NX_ASSERT(nx::vms::common::isIntercomLayout(layout));
+    NX_ASSERT(!intercomCamera->isIntercom()
+        || intercomCamera->isIntercom() && nx::vms::common::isIntercomLayout(layout));
     return layout;
 }
 
