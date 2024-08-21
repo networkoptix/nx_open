@@ -56,9 +56,10 @@ struct Facade
 
     static auto id(const Type& data)
     {
-        // TODO: Add id field for the EventLogRecord structure and fill it with the database data.
-        return nx::Uuid::fromArbitraryData(
-            QString::number(data.timestampMs.count()) + data.ruleId.toString());
+        // We have different event types, related to the server or camera with different
+        // parameters. Each distinct event is charactarized by it's event data so we can rely
+        // on it when creating unique identifier of the event.
+        return nx::Uuid::fromArbitraryData(QJson::serialized(data.eventData));
     }
 
     static auto startTime(const Type& data)
@@ -317,6 +318,11 @@ bool VmsEventSearchListModel::Private::requestFetch(
                 QnTimePeriod{});
             return;
         }
+
+        // We can have here duplicated events as the server returns the list of occured actions.
+        // So the trick is to leave only unique events and as we generate unique id for each event
+        // we can just remove duplicates here.
+        core::removeDuplicateItems<Facade>(data, data.begin(), data.end());
 
         core::mergeOldData<Facade>(data, this->data, request.direction);
         auto fetched = core::makeFetchedData<Facade>(this->data, data, request);

@@ -16,6 +16,28 @@ namespace nx::vms::client::core {
 
 using namespace std::chrono;
 
+/** Removes duplcated items from the data using id. Returns number of removed elemnts. */
+template<typename Facade, typename Container, typename ItemIterator>
+int removeDuplicateItems(Container& container,
+    const ItemIterator& itBegin,
+    const ItemIterator& itEnd)
+{
+    std::set<nx::Uuid> foundIds;
+    const auto removeStartIt = std::remove_if(itBegin, itEnd,
+        [&foundIds](const auto& item)
+        {
+            const auto id = Facade::id(item);
+            if (foundIds.find(id) != foundIds.end())
+                return true;
+
+            foundIds.insert(id);
+            return false;
+        });
+
+    container.erase(removeStartIt, itEnd);
+    return std::distance(removeStartIt, itEnd);
+}
+
 /**
  * Merges old data (which can't be changed) and new one to one container. Removes intersected
  * elements. Old data is always sorted in descending order.
@@ -29,6 +51,8 @@ void mergeOldData(NewDataContainer& newData,
 {
     NX_ASSERT(detail::isSortedCorrectly<Facade>(oldData, Qt::DescendingOrder));
     NX_ASSERT(detail::isSortedCorrectly<Facade>(newData, sortOrderFromDirection(direction)));
+
+    detail::printDebugData<Facade>(newData, "old data");
 
     if (oldData.empty())
         return; // Nothing to merge.
@@ -65,25 +89,11 @@ void mergeOldData(NewDataContainer& newData,
             if (direction == EventSearch::FetchDirection::older)
                 std::swap(start, end);
 
-            std::set<nx::Uuid> foundIds;
             const auto startIt = std::lower_bound(
                 result.begin(), result.end(), start, Predicate::lowerBound(direction));
             const auto endIt = std::upper_bound(
                 result.begin(), result.end(), end, Predicate::upperBound(direction));
-
-            const auto removeStartIt = std::remove_if(startIt, endIt,
-                [&foundIds](const auto& item)
-                {
-                    const auto id = Facade::id(item);
-                    if (foundIds.find(id) != foundIds.end())
-                        return true;
-
-                    foundIds.insert(id);
-                    return false;
-                });
-
-            result.erase(removeStartIt, endIt);
-            return removeStartIt != endIt;
+            return removeDuplicateItems<Facade>(result, startIt, endIt);
         };
 
     const auto oldDataStartTime = std::min(Facade::startTime(oldData.front()),
