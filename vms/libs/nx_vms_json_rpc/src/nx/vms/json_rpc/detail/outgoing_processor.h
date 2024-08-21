@@ -29,22 +29,17 @@ public:
 
     void clear(SystemError::ErrorCode error);
 
-    using ResponseHandler = nx::utils::MoveOnlyFunc<void(JsonRpcResponse)>;
-    void processRequest(
-        JsonRpcRequest request,
-        ResponseHandler handler,
-        QByteArray serializedRequest);
+    using ResponseHandler = nx::utils::MoveOnlyFunc<void(Response)>;
+    void processRequest(Request request, ResponseHandler handler, QByteArray serializedRequest);
 
-    using BatchResponseHandler =
-        nx::utils::MoveOnlyFunc<void(std::vector<JsonRpcResponse>)>;
-    void processBatchRequest(
-        std::vector<JsonRpcRequest> jsonRpcRequests, BatchResponseHandler handler);
+    using BatchResponseHandler = nx::utils::MoveOnlyFunc<void(std::vector<Response>)>;
+    void processBatchRequest(std::vector<Request> jsonRpcRequests, BatchResponseHandler handler);
 
     void onResponse(const QJsonValue& data);
 
 private:
-    void send(JsonRpcRequest request, QByteArray serializedRequest) const;
-    void send(std::vector<JsonRpcRequest> jsonRpcRequests) const;
+    void send(Request request, QByteArray serializedRequest) const;
+    void send(std::vector<Request> jsonRpcRequests) const;
     void onResponse(const QJsonArray& list);
 
 private:
@@ -52,7 +47,7 @@ private:
     struct AwaitingBatchResponse
     {
         std::vector<Id> ids;
-        std::vector<JsonRpcResponse> errors;
+        std::vector<Response> errors;
         BatchResponseHandler handler;
     };
 

@@ -18,9 +18,9 @@
 
 namespace nx::vms::json_rpc {
 
-using JsonRpcResponseId = std::variant<QString, int, std::nullptr_t>;
+using ResponseId = std::variant<QString, int, std::nullptr_t>;
 
-struct NX_VMS_JSON_RPC_API JsonRpcRequest
+struct NX_VMS_JSON_RPC_API Request
 {
     /**%apidoc
      * %value "2.0"
@@ -54,9 +54,9 @@ struct NX_VMS_JSON_RPC_API JsonRpcRequest
         return QJson::deserializeOrThrow<T>(&context, *params);
     }
 
-    JsonRpcResponseId responseId() const
+    ResponseId responseId() const
     {
-        JsonRpcResponseId result{std::nullptr_t()};
+        ResponseId result{std::nullptr_t()};
         if (id)
         {
             if (std::holds_alternative<int>(*id))
@@ -68,10 +68,10 @@ struct NX_VMS_JSON_RPC_API JsonRpcRequest
     }
 };
 #define JsonRpcRequest_Fields (jsonrpc)(method)(params)(id)
-QN_FUSION_DECLARE_FUNCTIONS(JsonRpcRequest, (json), NX_VMS_JSON_RPC_API)
-NX_REFLECTION_INSTRUMENT(JsonRpcRequest, JsonRpcRequest_Fields);
+QN_FUSION_DECLARE_FUNCTIONS(Request, (json), NX_VMS_JSON_RPC_API)
+NX_REFLECTION_INSTRUMENT(Request, JsonRpcRequest_Fields);
 
-struct NX_VMS_JSON_RPC_API JsonRpcError
+struct NX_VMS_JSON_RPC_API Error
 {
     // Standard defined error codes for `code` field.
     // Standard codes: https://www.jsonrpc.org/specification#error_object
@@ -102,15 +102,15 @@ struct NX_VMS_JSON_RPC_API JsonRpcError
     std::string message;
     std::optional<QJsonValue> data;
 
-    JsonRpcError() = default;
-    JsonRpcError(int code, std::string message, std::optional<QJsonValue> data = {}):
+    Error() = default;
+    Error(int code, std::string message, std::optional<QJsonValue> data = {}):
         code(code), message(std::move(message)), data(std::move(data)) {}
 };
 #define JsonRpcError_Fields (code)(message)(data)
-QN_FUSION_DECLARE_FUNCTIONS(JsonRpcError, (json), NX_VMS_JSON_RPC_API)
-NX_REFLECTION_INSTRUMENT(JsonRpcError, JsonRpcError_Fields);
+QN_FUSION_DECLARE_FUNCTIONS(Error, (json), NX_VMS_JSON_RPC_API)
+NX_REFLECTION_INSTRUMENT(Error, JsonRpcError_Fields);
 
-struct NX_VMS_JSON_RPC_API JsonRpcResponse
+struct NX_VMS_JSON_RPC_API Response
 {
     /**%apidoc
      * %value "2.0"
@@ -120,12 +120,12 @@ struct NX_VMS_JSON_RPC_API JsonRpcResponse
     // TODO: Use `JsonRpcResponseId` when apidoctool will support `using`.
     std::variant<QString, int, std::nullptr_t> id{std::nullptr_t()};
     std::optional<QJsonValue> result;
-    std::optional<JsonRpcError> error;
+    std::optional<Error> error;
 
-    static JsonRpcResponse makeError(JsonRpcResponseId id, JsonRpcError error);
+    static Response makeError(ResponseId id, Error error);
 
     template<typename T>
-    static JsonRpcResponse makeResult(JsonRpcResponseId id, T&& data)
+    static Response makeResult(ResponseId id, T&& data)
     {
         const auto serialized =
             [](auto&& data)
@@ -157,7 +157,7 @@ struct NX_VMS_JSON_RPC_API JsonRpcResponse
     }
 };
 #define JsonRpcResponse_Fields (jsonrpc)(id)(result)(error)
-QN_FUSION_DECLARE_FUNCTIONS(JsonRpcResponse, (json), NX_VMS_JSON_RPC_API)
-NX_REFLECTION_INSTRUMENT(JsonRpcResponse, JsonRpcResponse_Fields);
+QN_FUSION_DECLARE_FUNCTIONS(Response, (json), NX_VMS_JSON_RPC_API)
+NX_REFLECTION_INSTRUMENT(Response, JsonRpcResponse_Fields);
 
 } // namespace nx::vms::json_rpc

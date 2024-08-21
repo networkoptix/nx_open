@@ -6,11 +6,11 @@
 
 namespace nx::vms::json_rpc {
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(JsonRpcRequest, (json), JsonRpcRequest_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(JsonRpcError, (json), JsonRpcError_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(JsonRpcResponse, (json), JsonRpcResponse_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Request, (json), JsonRpcRequest_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Error, (json), JsonRpcError_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Response, (json), JsonRpcResponse_Fields)
 
-JsonRpcResponse JsonRpcResponse::makeError(JsonRpcResponseId id, JsonRpcError error)
+Response Response::makeError(ResponseId id, Error error)
 {
     return {.id = id, .error = error};
 }

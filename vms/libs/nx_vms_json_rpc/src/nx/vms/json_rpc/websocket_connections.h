@@ -24,7 +24,7 @@ public:
     virtual ~Executor() = default;
     virtual void execute(
         std::weak_ptr<WebSocketConnection> connection,
-        nx::utils::MoveOnlyFunc<void(JsonRpcResponse)> handler) = 0;
+        nx::utils::MoveOnlyFunc<void(Response)> handler) = 0;
 };
 
 class ExecutorCreator
@@ -32,7 +32,7 @@ class ExecutorCreator
 public:
     virtual ~ExecutorCreator() = default;
     virtual bool isMatched(const std::string& method) const = 0;
-    virtual std::unique_ptr<Executor> create(JsonRpcRequest jsonRpcRequest) = 0;
+    virtual std::unique_ptr<Executor> create(Request jsonRpcRequest) = 0;
 };
 
 class NX_VMS_JSON_RPC_API WebSocketConnections
@@ -66,7 +66,7 @@ private:
     void executeAsync(
         Connection* connection,
         std::unique_ptr<Executor> executor,
-        nx::utils::MoveOnlyFunc<void(JsonRpcResponse)> handler);
+        nx::utils::MoveOnlyFunc<void(Response)> handler);
 
 private:
     mutable nx::Mutex m_mutex;

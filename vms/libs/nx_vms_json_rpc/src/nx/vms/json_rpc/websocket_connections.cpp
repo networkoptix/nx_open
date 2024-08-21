@@ -13,7 +13,7 @@ namespace nx::vms::json_rpc {
 void WebSocketConnections::executeAsync(
     Connection* connection,
     std::unique_ptr<Executor> executor,
-    nx::utils::MoveOnlyFunc<void(JsonRpcResponse)> handler)
+    nx::utils::MoveOnlyFunc<void(Response)> handler)
 {
     auto threadIt = connection->threads.insert(connection->threads.begin(), std::thread());
     *threadIt = std::thread(
@@ -23,7 +23,7 @@ void WebSocketConnections::executeAsync(
             weakConnection = std::weak_ptr(connection->connection),
             threadIt]() mutable
         {
-            std::promise<JsonRpcResponse> promise;
+            std::promise<Response> promise;
             auto future = promise.get_future();
             executor->execute(weakConnection,
                 [p = std::move(promise)](auto r) mutable { p.set_value(std::move(r)); });
@@ -63,7 +63,7 @@ void WebSocketConnections::addConnection(std::shared_ptr<WebSocketConnection> co
                     connection,
                     request.id ? nx::reflect::json::serialize(*request.id) + ' ' : std::string(),
                     request.method);
-                handler(JsonRpcResponse());
+                handler(Response());
                 return;
             }
 
@@ -79,8 +79,8 @@ void WebSocketConnections::addConnection(std::shared_ptr<WebSocketConnection> co
                 }
             }
 
-            handler(JsonRpcResponse::makeError(request.responseId(),
-                {JsonRpcError::methodNotFound, "Unsupported method"}));
+            handler(Response::makeError(request.responseId(),
+                {Error::methodNotFound, "Unsupported method"}));
         });
     {
         NX_MUTEX_LOCKER lock(&m_mutex);
