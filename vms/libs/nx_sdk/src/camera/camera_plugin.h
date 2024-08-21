@@ -1416,13 +1416,13 @@ namespace nxcip
 
         //!Change state of relay output port
         /*!
-            \param[in] outputID NULL-terminated ID of output port
+            \param[in] outputId NULL-terminated ID of output port
             \param[in] activate If non-zero, port should be activated (closed circuit), otherwise - deactivated (opened circuit)
             \param[in] autoResetTimeoutMS If non-zero, port MUST return to deactivated state in \a autoResetTimeoutMS millis
             \return 0 on success, otherwise - error code
         */
         virtual int setRelayOutputState(
-            const char* outputID,
+            const char* outputId,
             int activate,
             unsigned int autoResetTimeoutMS ) = 0;
 
