@@ -9780,6 +9780,10 @@ N'oubliez pas de retourner le niveau de journalisation à sa configuration par d
       <source>Success</source>
       <translation>Succès</translation>
     </message>
+    <message>
+      <source>Remote</source>
+      <translation>Distant</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MergeSystemsTool</name>

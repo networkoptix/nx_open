@@ -1848,10 +1848,6 @@
       <translation>Kontrol Et</translation>
     </message>
     <message>
-      <source>Remote</source>
-      <translation>Uzak</translation>
-    </message>
-    <message>
       <source>Take system name and settings from</source>
       <translation>Sistem adını ve ayarlarını al</translation>
     </message>

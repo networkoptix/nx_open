@@ -9625,6 +9625,10 @@ Remember to return the Logging Level to its default setting after you have colle
       <source>Success</source>
       <translation>成功</translation>
     </message>
+    <message>
+      <source>Remote</source>
+      <translation>リモート</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MergeSystemsTool</name>

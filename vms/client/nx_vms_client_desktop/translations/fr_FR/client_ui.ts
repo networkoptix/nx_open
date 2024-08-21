@@ -1848,10 +1848,6 @@
       <translation>Vérifier</translation>
     </message>
     <message>
-      <source>Remote</source>
-      <translation>Distant</translation>
-    </message>
-    <message>
       <source>Take system name and settings from</source>
       <translation>Prendre le nom du système et les paramètres de</translation>
     </message>

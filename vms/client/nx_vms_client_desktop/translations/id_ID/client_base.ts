@@ -9624,6 +9624,10 @@ Ingatlah untuk mengembalikan Level Logging ke pengaturan default setelah Anda me
       <source>Success</source>
       <translation>Sukses</translation>
     </message>
+    <message>
+      <source>Remote</source>
+      <translation>Remote</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MergeSystemsTool</name>

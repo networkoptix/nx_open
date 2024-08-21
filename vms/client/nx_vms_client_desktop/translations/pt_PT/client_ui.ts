@@ -1848,10 +1848,6 @@
       <translation>Verificar</translation>
     </message>
     <message>
-      <source>Remote</source>
-      <translation type="unfinished">Remote</translation>
-    </message>
-    <message>
       <source>Take system name and settings from</source>
       <translation type="unfinished">Take system name and settings from</translation>
     </message>

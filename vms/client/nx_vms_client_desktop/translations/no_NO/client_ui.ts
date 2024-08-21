@@ -1848,10 +1848,6 @@
       <translation>Velg</translation>
     </message>
     <message>
-      <source>Remote</source>
-      <translation>Ekstern</translation>
-    </message>
-    <message>
       <source>Take system name and settings from</source>
       <translation>Ta systemnavn og innstillinger fra</translation>
     </message>

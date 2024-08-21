@@ -1848,10 +1848,6 @@
       <translation>Kiểm tra</translation>
     </message>
     <message>
-      <source>Remote</source>
-      <translation type="unfinished">Remote</translation>
-    </message>
-    <message>
       <source>Take system name and settings from</source>
       <translation>Lấy tên hệ thống và cài đặt từ</translation>
     </message>

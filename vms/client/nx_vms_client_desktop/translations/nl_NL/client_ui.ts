@@ -1848,10 +1848,6 @@
       <translation>Controleer</translation>
     </message>
     <message>
-      <source>Remote</source>
-      <translation type="unfinished">Remote</translation>
-    </message>
-    <message>
       <source>Take system name and settings from</source>
       <translation>Gebruik de systeemnaam en instellingen van</translation>
     </message>

@@ -1848,10 +1848,6 @@
       <translation>Comprova</translation>
     </message>
     <message>
-      <source>Remote</source>
-      <translation type="unfinished">Remote</translation>
-    </message>
-    <message>
       <source>Take system name and settings from</source>
       <translation>Pren el nom i la configuració del sistema de</translation>
     </message>

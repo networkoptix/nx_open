@@ -9780,6 +9780,10 @@ Husk å tilbakestille loggingsnivået til standardinnstillingen etter at du har 
       <source>Success</source>
       <translation>Suksess</translation>
     </message>
+    <message>
+      <source>Remote</source>
+      <translation>Ekstern</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MergeSystemsTool</name>

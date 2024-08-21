@@ -1848,10 +1848,6 @@
       <translation>확인</translation>
     </message>
     <message>
-      <source>Remote</source>
-      <translation type="unfinished">Remote</translation>
-    </message>
-    <message>
       <source>Take system name and settings from</source>
       <translation>시스템명 및 설정값 취득</translation>
     </message>

@@ -9623,6 +9623,10 @@ Hãy nhớ trả lại Mức ghi nhật ký về cài đặt mặc định sau k
       <source>Success</source>
       <translation>Sự thành công</translation>
     </message>
+    <message>
+      <source>Remote</source>
+      <translation type="unfinished">Remote</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MergeSystemsTool</name>
