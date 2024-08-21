@@ -58,6 +58,7 @@ public:
     void setLoading(bool loading);
 
     void refreshSettings(const nx::Uuid& engineId);
+    Q_INVOKABLE void refreshSettings();
     void activeElementChanged(
         const nx::Uuid& engineId,
         const QString& activeElement,

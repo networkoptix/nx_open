@@ -29,24 +29,27 @@ function preprocessModel(model)
 
 function _connectSignals(item)
 {
-    if (item.activeValueEdited)
+    if (item.activated)
     {
-        item.activeValueEdited.connect(
+        item.activated.connect(
             () => settingsView.triggerValuesEdited(item.isActive ? item : null))
     }
 
-    if (item.valueChanged)
+    const valueEditedSignal = item.valueEdited || item.valueChanged //< Prefer valueEdited.
+    if (valueEditedSignal)
     {
-        // An item can be active and only have a `valueChanged` signal.
-        let isDedicatedActiveSignalUsed = item.activeValueEdited
-        let activeItem =
-            (item.isActive && !isDedicatedActiveSignalUsed) ? item : null
+        valueEditedSignal.connect(
+            (activated) =>
+            {
+                // Signal may have a parameter `activated` so items can trigger Active Settings
+                // behavior only when needed.
+                let isDedicatedActiveSignalUsed = activated !== undefined
+                let activeItem =
+                    (item.isActive && (activated || !isDedicatedActiveSignalUsed)) ? item : null
 
-        item.valueChanged.connect(() => settingsView.triggerValuesEdited(activeItem))
+                settingsView.triggerValuesEdited(activeItem)
+            })
     }
-
-    if (item.activated)
-        item.activated.connect(() => settingsView.triggerValuesEdited(item))
 }
 
 function getItemProperties(model, depth)

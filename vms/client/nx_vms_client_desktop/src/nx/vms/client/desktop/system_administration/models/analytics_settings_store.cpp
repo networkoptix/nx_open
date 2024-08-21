@@ -263,6 +263,12 @@ void AnalyticsSettingsStore::refreshSettings(const nx::Uuid& engineId)
     setLoading(true);
 }
 
+void AnalyticsSettingsStore::refreshSettings()
+{
+    discardChanges();
+    refreshSettings(m_currentEngineId);
+}
+
 void AnalyticsSettingsStore::applySettingsValues()
 {
     if (!m_pendingApplyRequests.isEmpty() || !m_pendingRefreshRequests.isEmpty())
@@ -324,6 +330,7 @@ void AnalyticsSettingsStore::applySystemSettings()
             {
                 NX_ASSERT(m_systemSettingsRequest == requestId || m_systemSettingsRequest == 0);
                 m_systemSettingsRequest = 0;
+                updateHasChanges();
             });
 
         m_systemSettingsRequest = systemContext()->connectedServerApi()->patchSystemSettings(

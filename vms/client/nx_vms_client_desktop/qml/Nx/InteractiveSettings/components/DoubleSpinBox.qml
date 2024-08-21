@@ -46,9 +46,9 @@ ActiveTextItem
                 onValueEdited: (isKeyboardTyping) =>
                 {
                     if (isKeyboardTyping)
-                        control.valueEdited()
+                        control.valueEdited(/*activated*/ false)
                     else
-                        control.activeValueEdited() //< Instant changes.
+                        control.valueEdited(/*activated*/ true) //< Instant changes.
                 }
             }
         }
