@@ -59,6 +59,8 @@ public:
     nx::CameraResourceStubPtr createDesktopCamera(const QnUserResourcePtr& user);
     nx::CameraResourceStubPtr addDesktopCamera(const QnUserResourcePtr& user);
 
+    void toIntercom(nx::CameraResourceStubPtr camera);
+
     nx::CameraResourceStubPtr addIntercomCamera();
     QnLayoutResourcePtr addIntercomLayout(const QnVirtualCameraResourcePtr& intercomCamera);
     QnLayoutResourcePtr addIntercom() { return addIntercomLayout(addIntercomCamera()); }
