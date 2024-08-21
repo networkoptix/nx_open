@@ -150,6 +150,15 @@ void VmsRulesActionHandler::openVmsRulesDialog()
     if (!d->rulesDialog)
     {
         d->rulesDialog = std::make_unique<VmsRulesDialog>(mainWindowWidget());
+        connect(
+            d->rulesDialog.get(),
+            &VmsRulesDialog::done,
+            this,
+            [this]
+            {
+                d->rulesDialog.reset();
+            },
+            Qt::QueuedConnection);
         d->initialiseLookupLists();
     }
 

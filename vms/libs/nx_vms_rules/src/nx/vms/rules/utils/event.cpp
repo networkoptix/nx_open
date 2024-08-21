@@ -9,6 +9,7 @@
 #include "../event_filter.h"
 #include "../event_filter_fields/analytics_event_type_field.h"
 #include "../manifest.h"
+#include "common.h"
 #include "field.h"
 
 namespace nx::vms::rules {
@@ -56,6 +57,11 @@ bool hasSourceServer(const vms::rules::ItemDescriptor& eventDescriptor)
         {
             return fieldDescriptor.fieldName == vms::rules::utils::kServerIdFieldName;
         });
+}
+
+bool hasSourceUser(const vms::rules::ItemDescriptor& eventDescriptor)
+{
+    return utils::fieldByName(utils::kUserIdFieldName, eventDescriptor).has_value();
 }
 
 nx::Uuid sourceId(const BasicEvent* event)

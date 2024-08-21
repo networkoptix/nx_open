@@ -29,7 +29,7 @@ VmsRulesDialog::VmsRulesDialog(QWidget* parent):
         QUrl("Nx/VmsRules/VmsRulesDialog.qml"),
         /*initialProperties*/ {},
         parent),
-    QnWorkbenchContextAware(parent),
+    QnSessionAwareDelegate(parent),
     m_parentWidget{parent},
     m_rulesTableModel{QmlProperty<RulesTableModel*>(rootObjectHolder(), "rulesTableModel")}
 {
@@ -177,6 +177,13 @@ void VmsRulesDialog::resetToDefaults()
 void VmsRulesDialog::openEventLogDialog()
 {
     action(menu::OpenEventLogAction)->trigger();
+}
+
+bool VmsRulesDialog::tryClose(bool /*force*/)
+{
+    reject();
+
+    return true;
 }
 
 void VmsRulesDialog::deleteRulesImpl(const UuidList& ids)
