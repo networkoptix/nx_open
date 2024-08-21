@@ -208,9 +208,9 @@ void setGraphicsSettings()
     static const QHash<GraphicsApi, QSGRendererInterface::GraphicsApi> nameToApi =
     {
         {GraphicsApi::software, QSGRendererInterface::Software},
-        {GraphicsApi::openvg, QSGRendererInterface::OpenVG},
         {GraphicsApi::opengl, QSGRendererInterface::OpenGL},
         {GraphicsApi::direct3d11, QSGRendererInterface::Direct3D11},
+        {GraphicsApi::direct3d12, QSGRendererInterface::Direct3D12},
         {GraphicsApi::vulkan, QSGRendererInterface::Vulkan},
         {GraphicsApi::metal, QSGRendererInterface::Metal},
     };
