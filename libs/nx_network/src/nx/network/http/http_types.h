@@ -392,6 +392,7 @@ inline bool operator==(const StatusLine& left, const StatusLine& right)
 NX_NETWORK_API void serializeHeaders(const HttpHeaders& headers, nx::Buffer* dstBuffer);
 
 static constexpr char kDeletedCookieValue[] = "_DELETED_COOKIE_VALUE_";
+NX_NETWORK_API std::string getCookieValue(const std::string_view& name, const HttpHeaders& headers);
 
 class NX_NETWORK_API Request
 {
@@ -414,7 +415,10 @@ public:
     /**
      * @param Case-sensitive cookie name.
      */
-    std::string getCookieValue(const std::string_view& name) const;
+    std::string getCookieValue(const std::string_view& name) const
+    {
+        return http::getCookieValue(name, headers);
+    }
 
     /**
      * @param Case-sensitive cookie name.

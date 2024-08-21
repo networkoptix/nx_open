@@ -20,12 +20,12 @@ Request::Request(
     bool isJsonRpcRequest)
     :
     mutableUserSession(userSession),
-    httpRequest(httpRequest),
     userSession(mutableUserSession),
     foreignAddress(foreignAddress),
     serverPort(serverPort),
     isConnectionSecure(isConnectionSecure),
     isJsonRpcRequest(isJsonRpcRequest),
+    m_httpRequest(httpRequest),
     m_urlParams(Params::fromUrlQuery(QUrlQuery(httpRequest->requestLine.url.toQUrl()))),
     m_method(calculateMethod())
 {
@@ -40,7 +40,7 @@ QString Request::decodedPath() const
 {
     if (!m_decodedPath.isEmpty())
         return m_decodedPath;
-    return m_decodedPath = httpRequest->requestLine.url.path();
+    return m_decodedPath = path();
 }
 
 const Params& Request::params() const
@@ -85,7 +85,7 @@ Qn::SerializationFormat Request::responseFormatOrThrow() const
         return m_responseFormat =
             nx::reflect::fromString(format->toStdString(), Qn::SerializationFormat::json);
     }
-    const auto acceptHeader = http::getHeaderValue(httpRequest->headers, http::header::kAccept);
+    const auto acceptHeader = http::getHeaderValue(m_httpRequest->headers, http::header::kAccept);
     if (acceptHeader.empty())
         return m_responseFormat = Qn::SerializationFormat::json;
 
@@ -101,7 +101,7 @@ std::vector<QString> Request::preferredResponseLocales() const
     if (const auto p = m_urlParams.value("_language"); !p.isEmpty())
         locales.push_back(p);
 
-    if (const auto header = http::getHeaderValue(httpRequest->headers, Qn::kAcceptLanguageHeader);
+    if (const auto header = http::getHeaderValue(m_httpRequest->headers, Qn::kAcceptLanguageHeader);
         !header.empty())
     {
         nx::utils::split(
@@ -122,11 +122,11 @@ std::vector<QString> Request::preferredResponseLocales() const
 
 http::Method Request::calculateMethod() const
 {
-    const auto h = http::getHeaderValue(httpRequest->headers, "X-Method-Override");
+    const auto h = http::getHeaderValue(m_httpRequest->headers, "X-Method-Override");
     if (!h.empty())
         return h;
 
-    return httpRequest->requestLine.method;
+    return m_httpRequest->requestLine.method;
 }
 
 static bool isEqualParam(const QString& original, const QString& duplicate)
@@ -143,10 +143,9 @@ static bool isEqualParam(const QString& original, const QString& duplicate)
 
 Params Request::calculateParams() const
 {
-    const auto method = httpRequest->requestLine.method;
     Params params;
     params.unite(m_pathParams);
-    if (!http::Method::isMessageBodyAllowed(method))
+    if (!http::Method::isMessageBodyAllowed(method()))
     {
         params.unite(m_urlParams);
         if (!isJsonRpcRequest)
@@ -198,12 +197,8 @@ QJsonValue Request::calculateContent(bool useException, bool wrapInObject) const
         urlParamsContent = params.toJson(/*excludeCommon*/ true);
     }
 
-    if (!isJsonRpcRequest && !http::Method::isMessageBodyAllowed(httpRequest->requestLine.method))
-    {
-        if (urlParamsContent.isEmpty())
-            return QJsonValue(QJsonValue::Undefined);
-        return urlParamsContent;
-    }
+    if (!isJsonRpcRequest && !http::Method::isMessageBodyAllowed(method()))
+        return urlParamsContent.isEmpty() ? QJsonValue(QJsonValue::Undefined) : urlParamsContent;
 
     QJsonValue parsedContent(QJsonValue::Undefined);
     if (content)
@@ -239,7 +234,7 @@ QJsonValue Request::calculateContent(bool useException, bool wrapInObject) const
 
     if (!ini().allowUrlParametersForAnyMethod)
     {
-        NX_DEBUG(this, "Ignoring URL parameters for %1", httpRequest->requestLine);
+        NX_DEBUG(this, "Ignoring URL parameters for %1", m_httpRequest->requestLine);
         if (m_pathParams.isEmpty())
             return parsedContent;
         if (!m_urlParams.isEmpty())
@@ -255,7 +250,7 @@ QJsonValue Request::calculateContent(bool useException, bool wrapInObject) const
     if (!parsedContent.isObject())
     {
         NX_DEBUG(
-            this, "Unable to merge %1 for %2", parsedContent.type(), httpRequest->requestLine);
+            this, "Unable to merge %1 for %2", parsedContent.type(), m_httpRequest->requestLine);
         return parsedContent;
     }
 

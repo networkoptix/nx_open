@@ -16,7 +16,6 @@ private:
 
 public:
     // TODO: These should be private, all data should be available by getters.
-    const nx::network::http::Request* const httpRequest = nullptr;
     const UserSession& userSession;
     const nx::network::HostAddress foreignAddress;
     const int serverPort;
@@ -40,7 +39,11 @@ public:
      */
     const nx::network::http::Method& method() const;
 
-    QString path() const { return httpRequest->requestLine.url.path(QUrl::PrettyDecoded); }
+    const nx::network::http::Request* httpRequest() const { return m_httpRequest; };
+    const nx::network::http::HttpHeaders& httpHeaders() const { return m_httpRequest->headers; }
+    const nx::utils::Url& url() const { return m_httpRequest->requestLine.url; }
+
+    QString path() const { return m_httpRequest->requestLine.url.path(QUrl::PrettyDecoded); }
     QString decodedPath() const;
     void setDecodedPath(const QString& path) { m_decodedPath = path; }
 
@@ -142,6 +145,7 @@ private:
     QJsonValue calculateContent(bool useException, bool wrapInObject) const;
 
 private:
+    const nx::network::http::Request* const m_httpRequest = nullptr;
     Params m_urlParams;
     Params m_pathParams;
     const nx::network::http::Method m_method;
