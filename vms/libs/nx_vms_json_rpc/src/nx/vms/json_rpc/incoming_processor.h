@@ -17,38 +17,26 @@ namespace nx::vms::json_rpc {
 class NX_VMS_JSON_RPC_API IncomingProcessor
 {
 public:
-    using ResponseHandler = nx::utils::MoveOnlyFunc<void(JsonRpcResponse)>;
-    using RequestHandler = nx::utils::MoveOnlyFunc<void(JsonRpcRequest, ResponseHandler)>;
+    using ResponseHandler = nx::utils::MoveOnlyFunc<void(Response)>;
+    using RequestHandler = nx::utils::MoveOnlyFunc<void(Request, ResponseHandler)>;
 
     IncomingProcessor(RequestHandler handler = {}): m_handler(std::move(handler)) {}
     void processRequest(const QJsonValue& data, nx::utils::MoveOnlyFunc<void(QJsonValue)> handler);
 
 private:
-    struct Request
-    {
-        JsonRpcRequest jsonRpcRequest;
-
-        Request(JsonRpcRequest jsonRpcRequest):
-            jsonRpcRequest(std::move(jsonRpcRequest))
-        {
-        }
-    };
-
     struct BatchRequest
     {
         std::unordered_map<Request*, std::unique_ptr<Request>> requests;
-        std::vector<JsonRpcResponse> responses;
+        std::vector<Response> responses;
         nx::utils::MoveOnlyFunc<void(QJsonValue)> handler;
     };
 
-    void onBatchResponse(
-        BatchRequest* batchRequest, Request* request, JsonRpcResponse response);
+    void onBatchResponse(BatchRequest* batchRequest, Request* request, Response response);
 
     void processBatchRequest(
         const QJsonArray& list, nx::utils::MoveOnlyFunc<void(QJsonValue)> handler);
 
-    void sendResponse(JsonRpcResponse jsonRpcResponse,
-        const nx::utils::MoveOnlyFunc<void(QJsonValue)>& handler);
+    void sendResponse(Response response, const nx::utils::MoveOnlyFunc<void(QJsonValue)>& handler);
 
 private:
     RequestHandler m_handler;

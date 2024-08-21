@@ -23,9 +23,9 @@ class NX_VMS_JSON_RPC_API WebSocketConnection:
 {
 public:
     using base_type = nx::network::aio::BasicPollable;
-    using ResponseHandler = nx::utils::MoveOnlyFunc<void(JsonRpcResponse)>;
+    using ResponseHandler = nx::utils::MoveOnlyFunc<void(Response)>;
     using RequestHandler = nx::utils::MoveOnlyFunc<
-        void(JsonRpcRequest, ResponseHandler, WebSocketConnection*)>;
+        void(Request, ResponseHandler, WebSocketConnection*)>;
     using OnDone = nx::utils::MoveOnlyFunc<void(WebSocketConnection*)>;
 
     WebSocketConnection(std::unique_ptr<nx::network::websocket::WebSocket> socket, OnDone onDone);
@@ -35,13 +35,13 @@ public:
     void setRequestHandler(RequestHandler requestHandler);
     void start();
     void send(
-        JsonRpcRequest request,
+        Request request,
         ResponseHandler handler = {},
         QByteArray serializedRequest = {});
 
     using BatchResponseHandler =
-        nx::utils::MoveOnlyFunc<void(std::vector<JsonRpcResponse>)>;
-    void send(std::vector<JsonRpcRequest> jsonRpcRequests,
+        nx::utils::MoveOnlyFunc<void(std::vector<Response>)>;
+    void send(std::vector<Request> jsonRpcRequests,
         BatchResponseHandler handler = nullptr);
 
     void addGuard(const QString& id, nx::utils::Guard guard);

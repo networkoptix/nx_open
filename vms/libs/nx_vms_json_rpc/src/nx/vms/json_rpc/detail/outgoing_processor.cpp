@@ -17,18 +17,16 @@ static QString toString(const nx::vms::json_rpc::detail::OutgoingProcessor::Id& 
 
 namespace nx::vms::json_rpc::detail {
 
-static OutgoingProcessor::Id toId(const JsonRpcResponseId& id)
+static OutgoingProcessor::Id toId(const ResponseId& id)
 {
     if (std::holds_alternative<int>(id))
         return std::get<int>(id);
     return std::get<QString>(id);
 }
 
-using Error = JsonRpcError::Code;
-
 void OutgoingProcessor::clear(SystemError::ErrorCode error)
 {
-    auto response = JsonRpcResponse::makeError(std::nullptr_t(),
+    auto response = Response::makeError(std::nullptr_t(),
         {Error::transportError,
             NX_FMT("Connection closed with error %1: %2", error, SystemError::toString(error))
                 .toStdString()});
@@ -51,7 +49,7 @@ void OutgoingProcessor::clear(SystemError::ErrorCode error)
         if (!batchResponse.handler)
             continue;
 
-        std::vector<JsonRpcResponse> responses;
+        std::vector<Response> responses;
         for (auto& id: batchResponse.ids)
         {
             if (std::holds_alternative<int>(id))
@@ -69,7 +67,7 @@ void OutgoingProcessor::clear(SystemError::ErrorCode error)
 }
 
 void OutgoingProcessor::processRequest(
-    JsonRpcRequest request, ResponseHandler handler, QByteArray serializedRequest)
+    Request request, ResponseHandler handler, QByteArray serializedRequest)
 {
     if (!request.id)
     {
@@ -86,7 +84,7 @@ void OutgoingProcessor::processRequest(
         NX_DEBUG(this, "Id %1 is already used", id);
         if (handler)
         {
-            handler(JsonRpcResponse::makeError(request.responseId(),
+            handler(Response::makeError(request.responseId(),
                 {Error::invalidRequest, "Invalid parameter 'id': Already used"}));
         }
         return;
@@ -98,9 +96,9 @@ void OutgoingProcessor::processRequest(
 }
 
 void OutgoingProcessor::processBatchRequest(
-    std::vector<JsonRpcRequest> jsonRpcRequests, BatchResponseHandler handler)
+    std::vector<Request> jsonRpcRequests, BatchResponseHandler handler)
 {
-    std::vector<JsonRpcRequest> goodRequests;
+    std::vector<Request> goodRequests;
     AwaitingBatchResponse awaitingResponse;
     std::unordered_set<Id> ids;
     for (auto& jsonRpcRequest: jsonRpcRequests)
@@ -116,7 +114,7 @@ void OutgoingProcessor::processBatchRequest(
         {
             NX_DEBUG(this, "Id %1 is already used", id);
             awaitingResponse.errors.emplace_back(
-                JsonRpcResponse::makeError(jsonRpcRequest.responseId(),
+                Response::makeError(jsonRpcRequest.responseId(),
                     {Error::invalidRequest, "Invalid parameter 'id': Already used"}));
             continue;
         }
@@ -125,7 +123,7 @@ void OutgoingProcessor::processBatchRequest(
         {
             NX_DEBUG(this, "Id %1 is already used in this batch request", id);
             awaitingResponse.errors.emplace_back(
-                JsonRpcResponse::makeError(jsonRpcRequest.responseId(),
+                Response::makeError(jsonRpcRequest.responseId(),
                     {Error::invalidRequest,
                         "Invalid parameter 'id': Already used in this batch request"}));
             continue;
@@ -183,7 +181,7 @@ void OutgoingProcessor::processBatchRequest(
 }
 
 void OutgoingProcessor::send(
-    JsonRpcRequest request, QByteArray serializedRequest) const
+    Request request, QByteArray serializedRequest) const
 {
     NX_ASSERT_HEAVY_CONDITION(
         serializedRequest.isEmpty() || serializedRequest == QJson::serialized(request),
@@ -194,7 +192,7 @@ void OutgoingProcessor::send(
 }
 
 void OutgoingProcessor::send(
-    std::vector<JsonRpcRequest> jsonRpcRequests) const
+    std::vector<Request> jsonRpcRequests) const
 {
     m_sendFunc(QJson::serialized(jsonRpcRequests));
 }
@@ -207,11 +205,11 @@ void OutgoingProcessor::onResponse(const QJsonValue& data)
         return;
     }
 
-    JsonRpcResponse jsonRpcResponse;
+    Response jsonRpcResponse;
     if (!QJson::deserialize(data, &jsonRpcResponse))
     {
         NX_DEBUG(this, "Failed to deserialize response: %1", data);
-        jsonRpcResponse.error = JsonRpcError{
+        jsonRpcResponse.error = Error{
             Error::parseError, "Failed to deserialize response", data};
     }
 
@@ -249,15 +247,15 @@ void OutgoingProcessor::onResponse(const QJsonValue& data)
 void OutgoingProcessor::onResponse(const QJsonArray& list)
 {
     std::set<Key> batchResponseKeys;
-    std::unordered_map<Id, JsonRpcResponse> idResponses;
-    std::vector<JsonRpcResponse> nullResponses;
+    std::unordered_map<Id, Response> idResponses;
+    std::vector<Response> nullResponses;
     for (int i = 0; i < list.size(); ++i)
     {
-        JsonRpcResponse jsonRpcResponse;
+        Response jsonRpcResponse;
         if (!QJson::deserialize(list[i], &jsonRpcResponse))
         {
             NX_DEBUG(this, "Failed to deserialize response item %1: %2", i, list);
-            jsonRpcResponse.error = JsonRpcError{Error::parseError,
+            jsonRpcResponse.error = Error{Error::parseError,
                 NX_FMT("Failed to deserialize response item %1", i).toStdString(),
                 list};
             nullResponses.push_back(std::move(jsonRpcResponse));
@@ -321,7 +319,7 @@ void OutgoingProcessor::onResponse(const QJsonArray& list)
         NX_DEBUG(this, "Received batch response %1 with %2 ids", batchResponseKey, it->second.ids);
 
         auto handler = std::move(it->second.handler);
-        std::vector<JsonRpcResponse> jsonRpcResponses;
+        std::vector<Response> jsonRpcResponses;
         if (handler)
         {
             for (const auto& id: it->second.ids)

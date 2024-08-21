@@ -20,9 +20,9 @@ class NX_VMS_JSON_RPC_API WebSocketClient: public nx::network::aio::BasicPollabl
 {
 public:
     using base_type = nx::network::aio::BasicPollable;
-    using ResponseHandler = nx::utils::MoveOnlyFunc<void(JsonRpcResponse)>;
+    using ResponseHandler = nx::utils::MoveOnlyFunc<void(Response)>;
     using RequestHandler =
-        nx::utils::MoveOnlyFunc<void(JsonRpcRequest, ResponseHandler, WebSocketConnection*)>;
+        nx::utils::MoveOnlyFunc<void(Request, ResponseHandler, WebSocketConnection*)>;
 
     WebSocketClient(
         nx::utils::Url url,
@@ -33,7 +33,7 @@ public:
     virtual ~WebSocketClient() override;
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
     void connectAsync(nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler);
-    void sendAsync(JsonRpcRequest request, ResponseHandler handler);
+    void sendAsync(Request request, ResponseHandler handler);
 
 private:
     virtual void stopWhileInAioThread() override;

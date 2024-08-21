@@ -114,7 +114,7 @@ void WebSocketClient::onUpgrade()
     m_connection->start();
 }
 
-void WebSocketClient::sendAsync(JsonRpcRequest request, ResponseHandler handler)
+void WebSocketClient::sendAsync(Request request, ResponseHandler handler)
 {
     post(
         [this, request = std::move(request), handler = std::move(handler)]() mutable
@@ -135,8 +135,8 @@ void WebSocketClient::sendAsync(JsonRpcRequest request, ResponseHandler handler)
                         return;
                     }
 
-                    handler(JsonRpcResponse::makeError(request.responseId(),
-                        {JsonRpcError::transportError,
+                    handler(Response::makeError(request.responseId(),
+                        {Error::transportError,
                             NX_FMT("Failed to establish connnection to %1 with error %2",
                                 m_url, errorCode).toStdString()}));
                 });

@@ -6,9 +6,9 @@
 
 namespace nx::vms::api {
 
-using nx::vms::json_rpc::JsonRpcResponseId;
-using nx::vms::json_rpc::JsonRpcRequest;
-using nx::vms::json_rpc::JsonRpcResponse;
-using nx::vms::json_rpc::JsonRpcError;
+using JsonRpcResponseId = nx::vms::json_rpc::ResponseId;
+using JsonRpcRequest = nx::vms::json_rpc::Request;
+using JsonRpcResponse = nx::vms::json_rpc::Response;
+using JsonRpcError = nx::vms::json_rpc::Error;
 
 } // namespace nx::vms::api
