@@ -174,8 +174,8 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
         " * \"opengl\" - default\n"
         " * \"metal\" - Metal (macOS only)\n"
         " * \"direct3d11\" - Direct3D 11 (Windows only)\n"
+        " * \"direct3d12\" - Direct3D 12 (Windows only)\n"
         " * \"vulkan\" - Vulkan\n"
-        " * \"openvg\" - OpenVG\n"
         " * \"software\" - Software\n"
         );
 

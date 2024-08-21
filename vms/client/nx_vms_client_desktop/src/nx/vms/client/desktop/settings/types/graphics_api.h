@@ -10,8 +10,8 @@ NX_REFLECTION_ENUM_CLASS(GraphicsApi,
     opengl,
     metal,
     direct3d11,
+    direct3d12,
     vulkan,
-    openvg,
     software
 );
 

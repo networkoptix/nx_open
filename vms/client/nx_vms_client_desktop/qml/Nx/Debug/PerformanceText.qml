@@ -50,6 +50,8 @@ Text
             }
             case GraphicsInfo.Direct3D11:
                 return "Direct3D 11";
+            case GraphicsInfo.Direct3D12:
+                return "Direct3D 12";
             case GraphicsInfo.Vulkan:
                 return "Vulkan";
             case GraphicsInfo.Metal:
