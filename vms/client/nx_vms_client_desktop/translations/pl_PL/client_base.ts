@@ -10091,6 +10091,10 @@ Pamiętaj, aby zwrócić poziom logowania do ustawień domyślnych po zebraniu w
       <source>Success</source>
       <translation>Wykonano poprawnie</translation>
     </message>
+    <message>
+      <source>Remote</source>
+      <translation type="unfinished">Remote</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MergeSystemsTool</name>

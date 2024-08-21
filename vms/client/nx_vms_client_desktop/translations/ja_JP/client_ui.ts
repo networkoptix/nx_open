@@ -1848,10 +1848,6 @@
       <translation>チェック</translation>
     </message>
     <message>
-      <source>Remote</source>
-      <translation>リモート</translation>
-    </message>
-    <message>
       <source>Take system name and settings from</source>
       <translation>次のシステム名および設定を使用</translation>
     </message>

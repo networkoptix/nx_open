@@ -9778,6 +9778,10 @@ Yeterince günlük topladıktan sonra Günlük Düzeyini varsayılan ayarına d�
       <source>Success</source>
       <translation>Başarılı</translation>
     </message>
+    <message>
+      <source>Remote</source>
+      <translation>Uzak</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MergeSystemsTool</name>

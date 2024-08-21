@@ -9780,6 +9780,10 @@ Kom ihåg att återställa loggningsnivån till standardinställningen efter att
       <source>Success</source>
       <translation>Slutförd</translation>
     </message>
+    <message>
+      <source>Remote</source>
+      <translation>Fjärr</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MergeSystemsTool</name>

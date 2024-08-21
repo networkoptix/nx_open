@@ -1848,10 +1848,6 @@
       <translation>ตรวจสอบ</translation>
     </message>
     <message>
-      <source>Remote</source>
-      <translation type="unfinished">Remote</translation>
-    </message>
-    <message>
       <source>Take system name and settings from</source>
       <translation>ใช้ชื่อระบบและการตั้งค่าจาก</translation>
     </message>

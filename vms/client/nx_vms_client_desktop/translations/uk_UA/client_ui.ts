@@ -1848,10 +1848,6 @@
       <translation>Перевірити</translation>
     </message>
     <message>
-      <source>Remote</source>
-      <translation type="unfinished">Remote</translation>
-    </message>
-    <message>
       <source>Take system name and settings from</source>
       <translation>Системне ім'я та налаштування взято з</translation>
     </message>

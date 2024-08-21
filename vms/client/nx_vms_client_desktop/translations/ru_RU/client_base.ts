@@ -10092,6 +10092,10 @@ Remember to return the Logging Level to its default setting after you have colle
       <source>Success</source>
       <translation>Успешно</translation>
     </message>
+    <message>
+      <source>Remote</source>
+      <translation>Удалённый</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MergeSystemsTool</name>
