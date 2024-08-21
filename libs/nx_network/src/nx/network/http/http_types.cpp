@@ -540,7 +540,7 @@ std::string Request::toString() const
     return toStdString(serialized());
 }
 
-std::string Request::getCookieValue(const std::string_view& name) const
+std::string getCookieValue(const std::string_view& name, const HttpHeaders& headers)
 {
     auto cookieIter = headers.find("cookie");
     if (cookieIter == headers.end())

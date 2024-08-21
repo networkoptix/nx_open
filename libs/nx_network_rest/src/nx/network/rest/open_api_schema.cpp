@@ -541,7 +541,7 @@ void OpenApiSchema::validateOrThrow(const QJsonObject& path,
     validateParameters(path, *request);
     validateParameters(method, *request);
 
-    if (request->httpRequest->requestLine.method.isMessageBodyAllowed())
+    if (request->method().isMessageBodyAllowed())
     {
         (void)[&]
         {
