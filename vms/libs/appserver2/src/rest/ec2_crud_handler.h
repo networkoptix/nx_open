@@ -205,16 +205,16 @@ public:
 
         if (request.method() == nx::network::http::Method::get)
         {
-            return request.params().toJson(/*excludeCommon*/ true).isEmpty()
-                ? QString("*")
-                : nx::toString(getId(request.parseContentOrThrow<Filter>()));
+            return request.params().hasNonRefParameter()
+                ? nx::toString(getId(request.parseContentOrThrow<Filter>()))
+                : QString("*");
         }
 
         if (request.method() == nx::network::http::Method::delete_)
         {
-            return request.params().toJson(/*excludeCommon*/ true).isEmpty()
-                ? QString("*")
-                : nx::toString(getId(request.parseContentOrThrow<DeleteInput>()));
+            return request.params().hasNonRefParameter()
+                ? nx::toString(getId(request.parseContentOrThrow<DeleteInput>()))
+                : QString("*");
         }
 
         NX_ASSERT(false, "Use `get` to `subscribe` or `delete` to `unsubscribe`");

@@ -54,6 +54,7 @@ public:
         return nx::utils::keyValueRange(m_values);
     }
 
+    bool hasNonRefParameter() const;
     bool contains(const QString& key) const { return m_values.contains(key); }
     bool isEmpty() const { return m_values.empty(); }
     bool empty() const { return m_values.empty(); }
