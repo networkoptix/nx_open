@@ -292,7 +292,10 @@ bool TextMatcher::rangeMatchAttributes(
 QString serializeTextSearchConditions(const std::vector<TextSearchCondition>& conditions)
 {
     auto quoteIfNeeded =
-        [](const QString& str) { return str.contains(" ") ? '"' + str + '"' : str; };
+        [](const QString& str, bool force = false)
+        {
+            return force || str.contains(" ") ? '"' + str + '"' : str;
+        };
 
     auto serialize =
         [&](const TextSearchCondition& condition) -> QString
@@ -307,7 +310,8 @@ QString serializeTextSearchConditions(const std::vector<TextSearchCondition>& co
                     return quoteIfNeeded(condition.name)
                         + (condition.isNegative ? "!=" : "=")
                         + (condition.valueToken.matchesFromStart ? "^" : "")
-                        + quoteIfNeeded(condition.valueToken.value)
+                        + quoteIfNeeded(
+                            condition.valueToken.value, /*forced*/ condition.valueToken.isQuoted)
                         + (condition.valueToken.matchesTillEnd ? "$" : "");
                 }
 
