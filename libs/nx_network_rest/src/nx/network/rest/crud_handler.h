@@ -347,9 +347,9 @@ protected:
     {
         using FilterType = std::decay_t<Filter>;
 
-        FilterType filter = request.params().toJson(/*excludeCommon*/ true).isEmpty()
-            ? FilterType()
-            : deserialize<FilterType>(request);
+        FilterType filter = request.params().hasNonRefParameter()
+            ? deserialize<FilterType>(request)
+            : FilterType();
         Params filtered;
         if constexpr (DoesMethodExist_toParams<FilterType>::value)
         {

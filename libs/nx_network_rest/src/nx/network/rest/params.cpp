@@ -115,6 +115,16 @@ QMultiMap<QString, QString> Params::toMap() const
     return m_values;
 }
 
+bool Params::hasNonRefParameter() const
+{
+    for (auto it = m_values.begin(); it != m_values.end(); ++it)
+    {
+        if (!it.key().startsWith(QChar('_')))
+            return true;
+    }
+    return false;
+}
+
 QJsonObject Params::toJson(bool excludeCommon) const
 {
     QJsonObject object;
