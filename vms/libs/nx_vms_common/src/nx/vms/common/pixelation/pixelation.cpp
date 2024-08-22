@@ -939,4 +939,9 @@ std::shared_ptr<QRhiTexture> BlurBuffer::texture() const
     return d->blurProcess->blurTarget()->m_texture;
 }
 
+QRhi* BlurBuffer::rhi() const
+{
+    return d->rhi;
+}
+
 } // namespace nx::vms::common::pixelation
