@@ -93,7 +93,7 @@
           <property name="spacing">
            <number>4</number>
           </property>
-          <item>
+          <item alignment="Qt::AlignTop ">
           <widget class="QLabel" name="iconLabel">
            <property name="minimumSize">
             <size>
