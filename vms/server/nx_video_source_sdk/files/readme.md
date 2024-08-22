@@ -66,7 +66,7 @@ Prerequisites:
     cross-compiling:
     - g++ >= 7.5
     - make or Ninja
-- Qt5 (required by certain samples only)
+- Qt6 (required by certain samples only)
 - Raspberry Pi sysroot (required by certain samples only)
 ```
 
@@ -99,12 +99,12 @@ passed to cmake), or choose to skip Qt-based samples via `--no-qt-samples` optio
 ```
 # Windows:
 # Note the quotes - otherwise, .bat interpreter will split the arg into two by "=".
-build_samples.bat "-DCMAKE_PREFIX_PATH=<full_path_to_Qt5_dir>"
+build_samples.bat "-DCMAKE_PREFIX_PATH=<full_path_to_Qt_dir>" "-DQT_HOST_PATH=<full_path_to_Qt_host_dir>"
 # or
 build_samples.bat --no-qt-samples
 
 # Linux:
-./build_samples.sh -DCMAKE_PREFIX_PATH=<full_path_to_Qt5_dir>
+./build_samples.sh -DCMAKE_PREFIX_PATH=<full_path_to_Qt_dir> -DQT_HOST_PATH=<full_path_to_Qt_host_dir>
 # or
 ./build_samples.sh --no-qt-samples
 ```
