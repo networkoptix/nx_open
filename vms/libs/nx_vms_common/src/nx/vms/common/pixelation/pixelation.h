@@ -43,6 +43,7 @@ public:
     QRhiRenderPassDescriptor* renderPassDescriptor() const;
     QRhiRenderTarget* renderTarget() const;
     QSize size() const;
+    QRhi* rhi() const;
 
 private:
     struct Private;

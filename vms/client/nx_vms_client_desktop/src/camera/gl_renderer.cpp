@@ -186,12 +186,18 @@ Qn::RenderStatus QnGLRenderer::prepareBlurBuffers()
     }
     else
     {
-        if (!m_rhiBlurBuffer || m_rhiBlurBuffer->size() != result)
+        auto rhi = m_quickWidget->quickWindow()->rhi();
+
+        if (!m_rhiBlurBuffer || m_rhiBlurBuffer->size() != result || m_rhiBlurBuffer->rhi() != rhi)
         {
-            m_rhiBlurBuffer.reset(
-                new nx::vms::common::pixelation::BlurBuffer(
-                    m_quickWidget->quickWindow()->rhi(),
-                    result));
+            if (!rhi || rhi->isDeviceLost())
+            {
+                m_rhiBlurBuffer.reset();
+                return Qn::CannotRender;
+            }
+
+            m_rhiBlurBuffer =
+                std::make_unique<nx::vms::common::pixelation::BlurBuffer>(rhi, result);
             return Qn::NewFrameRendered;
         }
     }
@@ -675,6 +681,8 @@ bool QnGLRenderer::drawVideoTextures(
             else
             {
                 QRhi* rhi = m_quickWidget->quickWindow()->rhi();
+                if (!rhi || rhi->isDeviceLost())
+                    return false;
 
                 const QSize size = m_rhiBlurBuffer->size();
 
