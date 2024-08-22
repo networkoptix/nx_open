@@ -14,8 +14,8 @@ then
     echo " --no-qt-samples Exclude samples that require the Qt library."
     echo " --debug Compile using Debug configuration (without optimizations) instead of Release."
     echo "NOTE: If --no-qt-samples is not specified, and cmake cannot find Qt, add the following"
-    echo " argument to this script (will be passed to the cmake generation command):"
-    echo " -DCMAKE_PREFIX_PATH=<absolute-path-to-Qt5-dir>"
+    echo " arguments to this script (will be passed to the cmake generation command):"
+    echo " -DCMAKE_PREFIX_PATH=<absolute-path-to-Qt-dir> -DQT_HOST_PATH=<absolute-path-to-Qt-host-dir>"
     exit
 fi
 
