@@ -115,6 +115,9 @@ TableView
                 if (columnWidthCache[i] === 0)
                     columnWidthCache[i] = defaultColumnWidth
             }
+
+            // By some reasons delegates might not be resized, call forceLayout fix the problem.
+            Qt.callLater(control.forceLayout)
         }
     }
 
