@@ -96,41 +96,6 @@ QRect globalRect(QVariant object, QWindow** window = nullptr);
  */
 qreal sideIntersect(QRect widgetRect, QRect sideRect, Qt::Alignment align);
 
-enum KeyOption {
-    KeyType = 0,
-    KeyPress = 1,
-    KeyRelease = 2,
-};
-
-/**
- * Types specified text into the object.
- * Also supports sequences like `<Enter>`, `<Ctrl+S>` etc.
- */
-Qt::KeyboardModifiers sendKeys(
-    QString keys,
-    QJSValue object = {},
-    KeyOption option = KeyType,
-    Qt::KeyboardModifiers modifiers = Qt::NoModifier);
-
-/**
- * Sends mouse event(s) to the specified window.
- * @param button Button that caused the event. If the event type is MouseMove, the appropriate button for this event is Qt::NoButton.
- * @param buttons State of all buttons at the time of the event.
- * @param modifiers State of all keyboard modifiers.
- */
-Qt::MouseButtons sendMouse(
-    QPoint screenPos,
-    QString eventType,
-    Qt::MouseButton button,
-    Qt::MouseButtons buttons,
-    Qt::KeyboardModifiers modifiers,
-    QWindow* windowHandle = nullptr,
-    bool nativeSetPos = false,
-    QPoint pixelDelta = {},
-    QPoint angleDelta = {},
-    bool inverted = false,
-    int scrollDelta = 0);
-
 /** Returns some QModelIndex fields as QVarintMap. */
 QVariant dumpQModelIndex(
     const QAbstractItemModel* model,

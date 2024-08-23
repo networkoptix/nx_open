@@ -2,7 +2,7 @@
 
 #include "utils.h"
 
-#ifdef Q_OS_MAC
+#if defined(Q_OS_MACOS)
     #include <ApplicationServices/ApplicationServices.h>
 #endif
 
@@ -12,11 +12,9 @@
 #include <QtGui/QWindow>
 #include <QtTest/QSpontaneKeyEvent>
 #include <QtTest/QTest>
-#include <QtWidgets/QApplication>
-#include <QtWidgets/QGraphicsObject>
-#include <QtWidgets/QGraphicsView>
+#include <QtGui/QGuiApplication>
 
-namespace nx::vms::client::desktop::testkit::utils {
+namespace nx::vms::client::core::testkit::utils {
 
 namespace {
 
@@ -28,7 +26,7 @@ int defaultMouseDelay()
 /** Move OS cursor to specified position, requieres asking for permission on macOS. */
 static void setMousePosition(QPoint screenPos)
 {
-    #ifdef Q_OS_MAC
+    #if defined(Q_OS_MACOS)
         CFStringRef keys[] = { kAXTrustedCheckOptionPrompt };
         CFTypeRef values[] = { kCFBooleanTrue };
         CFDictionaryRef options = CFDictionaryCreate(
@@ -124,35 +122,15 @@ Qt::KeyboardModifiers sendKey(
 
 Q_INVOKABLE Qt::KeyboardModifiers sendKeys(
     QString keys,
-    QJSValue object,
+    QObject* receiver,
     KeyOption option,
     Qt::KeyboardModifiers modifiers)
 {
-    QObject* receiver = object.toQObject();
-
     if (!receiver)
         receiver = qGuiApp->focusWindow();
 
     if (!receiver)
         return modifiers;
-
-    // QGraphicsObject should receive key events via its view.
-    if (auto w = qobject_cast<QGraphicsObject*>(receiver))
-    {
-        auto views = w->scene()->views();
-        for (int i = 0; i < views.size(); ++i)
-        {
-            QGraphicsView* view = views.at(i);
-            if (!view->isVisible())
-                continue;
-
-            if (view->window()->windowHandle())
-            {
-                receiver = view;
-                break;
-            }
-        }
-    }
 
     const auto eventType = option == KeyRelease ? QEvent::KeyRelease : QEvent::KeyPress;
 
@@ -293,4 +271,4 @@ Qt::MouseButtons sendMouse(
     return buttons;
 }
 
-} // namespace nx::vms::client::desktop::testkit::utils
+} // namespace nx::vms::client::core::testkit::utils

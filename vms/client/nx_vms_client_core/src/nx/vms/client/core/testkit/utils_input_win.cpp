@@ -3,11 +3,11 @@
 #include "utils.h"
 #include "windows.h"
 
-#include <QtWidgets/QApplication>
+#include <QtGui/QGuiApplication>
 
 #include <range/v3/view/reverse.hpp>
 
-namespace nx::vms::client::desktop::testkit::utils {
+namespace nx::vms::client::core::testkit::utils {
 
 namespace {
 
@@ -225,7 +225,7 @@ void callSendMouse(
 
 Q_INVOKABLE Qt::KeyboardModifiers sendKeys(
     QString keys,
-    QJSValue object,
+    QObject* receiver,
     KeyOption option,
     Qt::KeyboardModifiers modifiers)
 {
@@ -291,4 +291,4 @@ Qt::MouseButtons sendMouse(
     return Qt::NoButton;
 }
 
-} // namespace nx::vms::client::desktop::testkit::utils
+} // namespace nx::vms::client::core::testkit::utils

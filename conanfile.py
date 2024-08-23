@@ -218,6 +218,8 @@ class NxOpenConan(ConanFile):
         if self.haveDesktopClient:
             self.requires("hidapi/0.10.1" "#67c06b0755251878327ddea8fe964d6b")
             self.requires("pathkit/d776371" "#d1516a12d5e1e70fc8253a501acb3a7f")
+
+        if self.haveDesktopClient or self.haveMobileClient:
             self.requires("range-v3/0.11.0" "#8d874cb9cdd7b81806d624493b82f9c0")
 
         if self.isWindows or self.isAndroid or (self.isLinux and not self.isArm32):
