@@ -6,7 +6,6 @@
 #include <QtHttpRequest.h>
 #include <QtHttpServer.h>
 
-#include <QtCore/QBuffer>
 #include <QtCore/QFile>
 #include <QtCore/QJsonObject>
 #include <QtCore/QMimeDatabase>

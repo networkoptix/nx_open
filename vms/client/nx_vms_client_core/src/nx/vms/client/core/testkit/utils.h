@@ -24,6 +24,15 @@ NX_VMS_CLIENT_CORE_API QVariantMap getMetaInfo(const QMetaObject* meta, QString 
  */
 QRect globalRect(QVariant object);
 
+/**
+ * Takes screenshot of the primary screen (or main window on iOS/Android) and returns its image
+ * data. Screenshot is scaled down by application pixel ratio so coordinates inside the image are
+ * directly mapped to top level widgets.
+ * Format name is one of the supported Qt formats for writing, see
+ * https://doc.qt.io/qt-6/qpixmap.html#reading-and-writing-image-files
+ */
+NX_VMS_CLIENT_CORE_API QByteArray takeScreenshot(const char* format = "PNG");
+
 QVariantList findAllObjects(QJSValue properties);
 
 /** Returns objectName() for QObject or QML id and source location for QQuickItem. */

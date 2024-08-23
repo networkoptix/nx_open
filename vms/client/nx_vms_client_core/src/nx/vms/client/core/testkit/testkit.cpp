@@ -2,10 +2,9 @@
 
 #include "testkit.h"
 
-#include <QtCore/QBuffer>
+#include <QtGui/QCursor>
 #include <QtGui/QGuiApplication>
 #include <QtQml/QQmlEngine>
-#include <QtQuick/QQuickWindow>
 
 #include <nx/build_info.h>
 #include <nx/vms/client/core/application_context.h>
@@ -145,22 +144,7 @@ bool TestKit::eventFilter(QObject* obj, QEvent* event)
 
 QByteArray TestKit::screenshot(const char* format)
 {
-    const auto windowList = qApp->topLevelWindows();
-
-    auto window = qobject_cast<QQuickWindow*>(windowList.front());
-    if (!window)
-        return {};
-
-    auto image = window->grabWindow();
-
-    const auto size = image.size();
-    image = image.scaled(size / qApp->devicePixelRatio());
-
-    QByteArray bytes;
-    QBuffer buffer(&bytes);
-    buffer.open(QIODevice::WriteOnly);
-    image.save(&buffer, format);
-    return bytes;
+    return utils::takeScreenshot(format);
 }
 
 QJSValue TestKit::dump(QJSValue object, QJSValue withChildren)

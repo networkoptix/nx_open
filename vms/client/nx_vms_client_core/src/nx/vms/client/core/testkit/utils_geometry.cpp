@@ -2,8 +2,12 @@
 
 #include "utils.h"
 
+#include <QtCore/QBuffer>
 #include <QtGui/QWindow>
 #include <QtQuick/QQuickItem>
+#include <QtQuick/QQuickWindow>
+
+#include <nx/build_info.h>
 
 namespace nx::vms::client::core::testkit::utils {
 
@@ -30,6 +34,45 @@ QRect globalRect(QVariant object)
         return QRect(topLeft.toPoint(), bottomRight.toPoint());
     }
     return QRect();
+}
+
+QByteArray takeScreenshot(const char* format)
+{
+    // Mobile OSes do not allow to take screenshots of the whole screen.
+    if (nx::build_info::isAndroid() || nx::build_info::isIos())
+    {
+        const auto windowList = qApp->topLevelWindows();
+
+        auto window = qobject_cast<QQuickWindow*>(windowList.front());
+        if (!window)
+            return {};
+
+        auto image = window->grabWindow();
+
+        const auto size = image.size();
+        image = image.scaled(size / qApp->devicePixelRatio());
+
+        QByteArray bytes;
+        QBuffer buffer(&bytes);
+        buffer.open(QIODevice::WriteOnly);
+        image.save(&buffer, format);
+        return bytes;
+    }
+
+    QScreen* screen = QGuiApplication::primaryScreen();
+
+    qApp->topLevelWindows().front();
+
+    auto pixmap = screen->grabWindow(0);
+
+    const auto size = pixmap.size();
+    pixmap = pixmap.scaled(size / qApp->devicePixelRatio());
+
+    QByteArray bytes;
+    QBuffer buffer(&bytes);
+    buffer.open(QIODevice::WriteOnly);
+    pixmap.save(&buffer, format);
+    return bytes;
 }
 
 } // namespace nx::vms::client::core::testkit::utils
