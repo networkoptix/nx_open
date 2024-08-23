@@ -152,20 +152,7 @@ QJsonObject TestKit::execute(const QString& source)
 
 QByteArray TestKit::screenshot(const char* format)
 {
-    QScreen* screen = QGuiApplication::primaryScreen();
-
-    qApp->topLevelWindows().front();
-
-    auto pixmap = screen->grabWindow(0);
-
-    const auto size = pixmap.size();
-    pixmap = pixmap.scaled(size / qApp->devicePixelRatio());
-
-    QByteArray bytes;
-    QBuffer buffer(&bytes);
-    buffer.open(QIODevice::WriteOnly);
-    pixmap.save(&buffer, format);
-    return bytes;
+    return core::testkit::utils::takeScreenshot(format);
 }
 
 void TestKit::post(QJSValue object, QString eventName, QJSValue /* args */)
