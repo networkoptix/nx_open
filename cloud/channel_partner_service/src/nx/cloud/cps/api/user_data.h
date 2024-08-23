@@ -35,9 +35,10 @@ struct SystemAllowance
 {
     std::string system_id;
     std::vector<std::string> vmsRoles;
+    std::string organizationName;
 };
 
-NX_REFLECTION_INSTRUMENT(SystemAllowance, (system_id)(vmsRoles))
+NX_REFLECTION_INSTRUMENT(SystemAllowance, (system_id)(vmsRoles)(organizationName))
 
 struct GetUsersResponse
 {
