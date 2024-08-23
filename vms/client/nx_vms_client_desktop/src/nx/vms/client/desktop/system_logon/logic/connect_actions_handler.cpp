@@ -8,7 +8,6 @@
 #include <QtCore/QTimer>
 #include <QtGui/QAction>
 
-#include <api/http_client_pool.h>
 #include <api/runtime_info_manager.h>
 #include <client/client_message_processor.h>
 #include <client/client_runtime_settings.h>
@@ -1359,7 +1358,6 @@ void ConnectActionsHandler::clearConnection()
     resourceAccessManager()->endUpdate();
 
     systemContext()->lookupListManager()->deinitialize();
-    systemContext()->httpClientPool()->stop(/*invokeCallbacks*/ true);
 
     NX_DEBUG(this, "Clear connection finished");
 }

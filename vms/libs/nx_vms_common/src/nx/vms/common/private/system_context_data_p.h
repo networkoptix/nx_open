@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include <api/http_client_pool.h>
 #include <api/runtime_info_manager.h>
 #include <core/resource/camera_history.h>
 #include <core/resource_access/access_rights_manager.h>
@@ -46,7 +45,6 @@ struct SystemContext::Private
     std::unique_ptr<QnResourceStatusDictionary> resourceStatusDictionary;
     std::unique_ptr<QnResourcePropertyDictionary> resourcePropertyDictionary;
     std::unique_ptr<QnCameraHistoryPool> cameraHistoryPool;
-    std::unique_ptr<network::http::ClientPool> httpClientPool;
     std::unique_ptr<QnServerAdditionalAddressesDictionary> serverAdditionalAddressesDictionary;
     std::unique_ptr<QnRuntimeInfoManager> runtimeInfoManager;
     std::unique_ptr<SystemSettings> globalSettings;

@@ -292,8 +292,6 @@ void RemoteSession::establishConnection(RemoteConnectionPtr connection)
             connection->sessionTokenExpirationTime().value_or(std::chrono::microseconds::zero()));
     }
 
-    connection->initializeApiConnection(systemContext());
-
     // Setup message bus connection.
     connection->initializeMessageBusConnection(qnClientCoreModule->commonModule());
     qnSyncTime->setTimeSyncManager(connection->timeSynchronizationManager());

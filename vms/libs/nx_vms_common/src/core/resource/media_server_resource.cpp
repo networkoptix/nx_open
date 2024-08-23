@@ -67,6 +67,13 @@ QnMediaServerResource::QnMediaServerResource():
 QnMediaServerResource::~QnMediaServerResource()
 {
     directDisconnectAll();
+    stopServerConnection();
+}
+
+void QnMediaServerResource::stopServerConnection()
+{
+    if (m_restConnection)
+        m_restConnection->stop();
 }
 
 void QnMediaServerResource::atPropertyChanged(const QnResourcePtr& /*self*/, const QString& key)

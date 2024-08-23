@@ -538,6 +538,9 @@ void QnResourcePool::clear()
     {
         resource->addFlags(Qn::removed);
         resource->disconnect(this);
+
+        if (const auto& server = resource.dynamicCast<QnMediaServerResource>())
+            server->stopServerConnection();
     }
 }
 
