@@ -19,13 +19,17 @@ ValidationResult TargetLayoutFieldValidator::validity(
         return {QValidator::State::Invalid, Strings::invalidFieldType()};
 
     const auto targetLayoutFieldProperties = targetLayoutField->properties();
-    const auto layouts =
-        context->resourcePool()->getResourcesByIds<QnLayoutResource>(targetLayoutField->value());
+    const auto layoutIds = targetLayoutField->value();
     const bool isValidSelection =
-        !layouts.empty() || targetLayoutFieldProperties.allowEmptySelection;
+        !layoutIds.empty() || targetLayoutFieldProperties.allowEmptySelection;
 
     if (!isValidSelection)
         return {QValidator::State::Invalid, tr("Select at least one layout")};
+
+    const auto layouts =
+        context->resourcePool()->getResourcesByIds<QnLayoutResource>(targetLayoutField->value());
+    if (layouts.empty() && !layoutIds.empty())
+        return {QValidator::State::Invalid, Strings::layoutsWereRemoved(layoutIds.size())};
 
     return {};
 }

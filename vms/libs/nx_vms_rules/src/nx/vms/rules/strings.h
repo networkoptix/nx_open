@@ -89,6 +89,9 @@ public:
     static QString fieldValueMustBeProvided(const QString& fieldName);
     static QString layoutCanOnlyBeShownToOwner(const QString& ownerName);
     static QString usersHaveNoAccessToLayout(bool allUsersWithoutAccess);
+    static QString camerasWereRemoved(common::SystemContext* context, int count = 1);
+    static QString serversWereRemoved(int count = 1);
+    static QString layoutsWereRemoved(int count = 1);
 
     static TranslatableString at();
     static TranslatableString to();
