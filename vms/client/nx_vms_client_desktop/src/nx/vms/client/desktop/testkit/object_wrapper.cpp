@@ -71,7 +71,7 @@ void ObjectWrapper::activate()
 
                 if (rect.isValid() && window)
                 {
-                    utils::sendMouse(
+                    core::testkit::utils::sendMouse(
                         rect.center(),
                         "click",
                         /* mouseButton */ Qt::LeftButton,

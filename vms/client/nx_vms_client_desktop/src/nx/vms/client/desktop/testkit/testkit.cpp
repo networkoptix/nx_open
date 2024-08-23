@@ -9,12 +9,15 @@
 #include <QtGui/QScreen>
 #include <QtQml/QQmlEngine>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QGraphicsObject>
+#include <QtWidgets/QGraphicsView>
 
 #include <nx/build_info.h>
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/debug_utils/utils/debug_custom_actions.h>
 #include <nx/vms/client/core/testkit/js_utils.h>
+#include <nx/vms/client/core/testkit/utils.h>
 
 #include "highlighter.h"
 #include "model_index_wrapper.h"
@@ -261,7 +264,7 @@ void TestKit::mouse(QJSValue object, QJSValue parameters)
             return;
     }
 
-    utils::sendMouse(
+    core::testkit::utils::sendMouse(
         screenPos,
         parameters.property("type").toString(),
         /* mouseButton */ button,
@@ -313,7 +316,7 @@ void TestKit::dragAndDrop(QJSValue object, QJSValue parameters)
             for (int i = 0; i <= steps; ++i)
                 points.push_back(from + moveVector * i / steps);
 
-            utils::sendMouse(points.front(),
+            core::testkit::utils::sendMouse(points.front(),
                 "move",
                 Qt::MouseButton::NoButton,
                 Qt::MouseButtons(),
@@ -323,7 +326,7 @@ void TestKit::dragAndDrop(QJSValue object, QJSValue parameters)
 
             std::this_thread::sleep_for(kMouseInputDelay);
 
-            utils::sendMouse(points.front(),
+            core::testkit::utils::sendMouse(points.front(),
                 "press",
                 Qt::MouseButton::LeftButton,
                 Qt::MouseButtons(Qt::MouseButton::LeftButton),
@@ -335,7 +338,8 @@ void TestKit::dragAndDrop(QJSValue object, QJSValue parameters)
 
             for (const auto& point: points)
             {
-                utils::sendMouse(point,
+                core::testkit::utils::sendMouse(
+                    point,
                     "move",
                     Qt::MouseButton::LeftButton,
                     Qt::MouseButtons(Qt::MouseButton::LeftButton),
@@ -344,7 +348,8 @@ void TestKit::dragAndDrop(QJSValue object, QJSValue parameters)
                     true);
             }
 
-            utils::sendMouse(points.back(),
+            core::testkit::utils::sendMouse(
+                points.back(),
                 "release",
                 Qt::MouseButton::LeftButton,
                 Qt::MouseButtons(Qt::MouseButton::LeftButton),
@@ -365,14 +370,34 @@ void TestKit::keys(QJSValue object, QString keys, QString input)
     ensureAsyncActionFinished();
 
     input = input.toUpper();
-    auto option = utils::KeyType;
+    auto option = core::testkit::utils::KeyType;
 
     if (input == "PRESS")
-        option = utils::KeyPress;
+        option = core::testkit::utils::KeyPress;
     else if (input == "RELEASE")
-        option = utils::KeyRelease;
+        option = core::testkit::utils::KeyRelease;
 
-    utils::sendKeys(keys, object, option, QGuiApplication::queryKeyboardModifiers());
+    QObject* receiver = object.toQObject();
+
+    // QGraphicsObject should receive key events via its view.
+    if (auto w = qobject_cast<QGraphicsObject*>(receiver))
+    {
+        auto views = w->scene()->views();
+        for (int i = 0; i < views.size(); ++i)
+        {
+            QGraphicsView* view = views.at(i);
+            if (!view->isVisible())
+                continue;
+
+            if (view->window()->windowHandle())
+            {
+                receiver = view;
+                break;
+            }
+        }
+    }
+
+    core::testkit::utils::sendKeys(keys, receiver, option, QGuiApplication::queryKeyboardModifiers());
 }
 
 QJSValue TestKit::dump(QJSValue object, QJSValue withChildren)

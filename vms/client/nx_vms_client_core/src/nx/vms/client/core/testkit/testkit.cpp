@@ -7,6 +7,7 @@
 #include <QtQml/QQmlEngine>
 #include <QtQuick/QQuickWindow>
 
+#include <nx/build_info.h>
 #include <nx/vms/client/core/application_context.h>
 
 #include "utils.h"
@@ -45,6 +46,16 @@ QString eventName(const QEvent* event)
     };
 
     return eventNames.value(event->type());
+}
+
+QPoint valueToPoint(const QJSValue& value)
+{
+    QPoint result;
+    if (value.hasOwnProperty("x"))
+        result.setX(value.property("x").toInt());
+    if (value.hasOwnProperty("y"))
+        result.setY(value.property("y").toInt());
+    return result;
 }
 
 } // namespace
@@ -156,6 +167,74 @@ QJSValue TestKit::dump(QJSValue object, QJSValue withChildren)
 {
     auto engine = appContext()->qmlEngine();
     return engine->toScriptValue(utils::dumpQObject(object.toQObject(), withChildren.toBool()));
+}
+
+void TestKit::mouse(QJSValue object, QJSValue parameters)
+{
+    const bool hasCoordinates =
+        parameters.property("x").isNumber() && parameters.property("y").isNumber();
+
+    QPointF eventPos(parameters.property("x").toNumber(), parameters.property("y").toNumber());
+    QWindow* window = nullptr;
+    QPoint screenPos;
+
+    if (object.isNull()) //< Screen.
+    {
+        screenPos = hasCoordinates ? eventPos.toPoint() : QCursor::pos();
+    }
+    else
+    {
+        const auto rect = utils::globalRect(object.toVariant());
+        screenPos = hasCoordinates ? (rect.topLeft() + eventPos.toPoint()) : rect.center();
+    }
+
+    const auto buttonProp = parameters.property("button");
+    Qt::MouseButton button = Qt::NoButton;
+
+    if (buttonProp.toInt() == Qt::RightButton || buttonProp.toString() == "right")
+        button = Qt::RightButton;
+    else if (buttonProp.toInt() == Qt::LeftButton || buttonProp.toString() == "left")
+        button = Qt::LeftButton;
+
+    Qt::KeyboardModifiers modifiers(parameters.property("modifiers").toInt());
+    if (!nx::build_info::isWindows())
+        modifiers |= QGuiApplication::keyboardModifiers();
+
+    if (!window)
+    {
+        window = QGuiApplication::topLevelAt(screenPos);
+        if (!window)
+            return;
+    }
+
+    core::testkit::utils::sendMouse(
+        screenPos,
+        parameters.property("type").toString(),
+        /* mouseButton */ button,
+        /* mouseButtons */ QGuiApplication::mouseButtons(),
+        modifiers,
+        window,
+        parameters.property("native").toBool(),
+        valueToPoint(parameters.property("pixelDelta")),
+        valueToPoint(parameters.property("angleDelta")),
+        parameters.property("inverted").toBool(),
+        parameters.property("scrollDelta").toInt());
+}
+
+void TestKit::keys(
+    QJSValue object,
+    QString keys,
+    QString input)
+{
+    input = input.toUpper();
+    auto option = utils::KeyType;
+
+    if (input == "PRESS")
+        option = utils::KeyPress;
+    else if (input == "RELEASE")
+        option = utils::KeyRelease;
+
+    utils::sendKeys(keys, object.toQObject(), option, QGuiApplication::queryKeyboardModifiers());
 }
 
 } // namespace nx::vms::client::core::testkit

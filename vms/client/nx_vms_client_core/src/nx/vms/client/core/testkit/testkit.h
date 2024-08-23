@@ -64,6 +64,21 @@ public:
      */
     static QByteArray screenshot(const char* format);
 
+    /**
+     * Sends mouse event to the object. If the object is null the whole screen is used. Returns
+     * new mouse buttons after sending mouse event(s).
+     */
+    Q_INVOKABLE void mouse(QJSValue object, QJSValue parameters);
+
+    /**
+     * Sends sequence of keyboard events to the object. If object is null the events are sent to
+     * the active window. Input option may be "type", "press" or "release".
+     */
+    Q_INVOKABLE void keys(
+        QJSValue object,
+        QString keys,
+        QString input = "type");
+
 protected:
     bool eventFilter(QObject* obj, QEvent* event) override;
 

@@ -5,6 +5,8 @@
 #include <QtQml/QJSValue>
 #include <QtCore/QRect>
 
+class QWindow;
+
 namespace nx::vms::client::core::testkit::utils {
 
 /** Returns true if text from UI element (with/without shotcuts) matches with specified text. */
@@ -29,5 +31,40 @@ NX_VMS_CLIENT_CORE_API std::pair<QString, QString> nameAndBaseUrl(const QObject*
 
 /** Returns QObject properties as QVarintMap. */
 QVariant dumpQObject(const QObject* object, bool withChildren = false);
+
+enum KeyOption {
+    KeyType = 0,
+    KeyPress = 1,
+    KeyRelease = 2,
+};
+
+/**
+ * Types specified text into the object.
+ * Also supports sequences like `<Enter>`, `<Ctrl+S>` etc.
+ */
+NX_VMS_CLIENT_CORE_API Qt::KeyboardModifiers sendKeys(
+    QString keys,
+    QObject* receiver = nullptr,
+    KeyOption option = KeyType,
+    Qt::KeyboardModifiers modifiers = Qt::NoModifier);
+
+/**
+ * Sends mouse event(s) to the specified window.
+ * @param button Button that caused the event. If the event type is MouseMove, the appropriate button for this event is Qt::NoButton.
+ * @param buttons State of all buttons at the time of the event.
+ * @param modifiers State of all keyboard modifiers.
+ */
+NX_VMS_CLIENT_CORE_API Qt::MouseButtons sendMouse(
+    QPoint screenPos,
+    QString eventType,
+    Qt::MouseButton button,
+    Qt::MouseButtons buttons,
+    Qt::KeyboardModifiers modifiers,
+    QWindow* windowHandle = nullptr,
+    bool nativeSetPos = false,
+    QPoint pixelDelta = {},
+    QPoint angleDelta = {},
+    bool inverted = false,
+    int scrollDelta = 0);
 
 } // namespace nx::vms::client::core::testkit::utils
