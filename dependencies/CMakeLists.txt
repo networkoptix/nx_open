@@ -30,3 +30,7 @@ endif()
 if(withMediaServer OR withClouds OR withDesktopClient)
     add_subdirectory(qtsinglecoreapplication)
 endif()
+
+if(withMediaServer OR withSdk)
+    add_subdirectory(ftplibpp)
+endif()
