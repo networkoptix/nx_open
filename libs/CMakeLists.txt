@@ -23,6 +23,10 @@ if(withDesktopClient)
     add_subdirectory(nx_pathkit)
 endif()
 
+if(withMediaServer)
+    add_subdirectory(nx_json_rpc)
+endif()
+
 if(withMediaServer OR withDesktopClient OR openSourceBuild)
     add_subdirectory(nx_monitoring)
 endif()

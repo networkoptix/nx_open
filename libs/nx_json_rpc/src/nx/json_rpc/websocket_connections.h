@@ -14,7 +14,7 @@
 
 #include "messages.h"
 
-namespace nx::vms::json_rpc {
+namespace nx::json_rpc {
 
 class WebSocketConnection;
 
@@ -35,7 +35,7 @@ public:
     virtual std::unique_ptr<Executor> create(Request jsonRpcRequest) = 0;
 };
 
-class NX_VMS_JSON_RPC_API WebSocketConnections
+class NX_JSON_RPC_API WebSocketConnections
 {
 public:
     WebSocketConnections(std::vector<std::unique_ptr<ExecutorCreator>> executorCreators):
@@ -74,4 +74,4 @@ private:
     std::unordered_map<WebSocketConnection*, Connection> m_connections;
 };
 
-} // namespace nx::vms::json_rpc
+} // namespace nx::json_rpc

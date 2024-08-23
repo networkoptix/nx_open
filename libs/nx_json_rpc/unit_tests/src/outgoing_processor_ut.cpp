@@ -3,9 +3,9 @@
 #include <gtest/gtest.h>
 
 #include <nx/fusion/serialization/json_functions.h>
-#include <nx/vms/json_rpc/detail/outgoing_processor.h>
+#include <nx/json_rpc/detail/outgoing_processor.h>
 
-namespace nx::vms::json_rpc::test {
+namespace nx::json_rpc::test {
 
 TEST(OutgoingProcessor, batchRequest)
 {
@@ -41,4 +41,4 @@ TEST(OutgoingProcessor, batchRequest)
         QJson::serialized(responses[0]).toStdString());
 }
 
-} // namespace nx::vms::json_rpc::test
+} // namespace nx::json_rpc::test

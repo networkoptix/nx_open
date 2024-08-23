@@ -12,11 +12,11 @@
 namespace nx::network::http { class AsyncClient; }
 namespace nx::network::websocket { class WebSocket; }
 
-namespace nx::vms::json_rpc {
+namespace nx::json_rpc {
 
 class WebSocketConnection;
 
-class NX_VMS_JSON_RPC_API WebSocketClient: public nx::network::aio::BasicPollable
+class NX_JSON_RPC_API WebSocketClient: public nx::network::aio::BasicPollable
 {
 public:
     using base_type = nx::network::aio::BasicPollable;
@@ -44,7 +44,7 @@ private:
     nx::utils::Url m_url;
     RequestHandler m_handler;
     std::unique_ptr<nx::network::http::AsyncClient> m_handshakeClient;
-    std::shared_ptr<nx::vms::json_rpc::WebSocketConnection> m_connection;
+    std::shared_ptr<nx::json_rpc::WebSocketConnection> m_connection;
 };
 
-} // namespace nx::vms::json_rpc
+} // namespace nx::json_rpc

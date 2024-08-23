@@ -6,7 +6,7 @@
 
 namespace std {
 
-static QString toString(const nx::vms::json_rpc::detail::OutgoingProcessor::Id& value)
+static QString toString(const nx::json_rpc::detail::OutgoingProcessor::Id& value)
 {
     return std::holds_alternative<int>(value)
         ? nx::toString(std::get<int>(value))
@@ -15,7 +15,7 @@ static QString toString(const nx::vms::json_rpc::detail::OutgoingProcessor::Id& 
 
 } // std
 
-namespace nx::vms::json_rpc::detail {
+namespace nx::json_rpc::detail {
 
 static OutgoingProcessor::Id toId(const ResponseId& id)
 {
@@ -339,4 +339,4 @@ void OutgoingProcessor::onResponse(const QJsonArray& list)
     }
 }
 
-} // namespace nx::vms::json_rpc::detail
+} // namespace nx::json_rpc::detail

@@ -20,10 +20,6 @@ if(withMediaServer
     add_subdirectory(nx_vms_utils)
 endif()
 
-if(withMediaServer)
-    add_subdirectory(nx_vms_json_rpc)
-endif()
-
 if(withDesktopClient OR withMobileClient)
     add_subdirectory(nx_audio)
     add_subdirectory(nx_media)
