@@ -7,7 +7,6 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/vms/client/core/network/certificate_verifier.h>
 #include <nx/vms/client/core/network/remote_connection.h>
-#include <nx/vms/client/desktop/system_context.h>
 
 namespace nx::vms::client::desktop {
 
@@ -27,7 +26,6 @@ CrossSystemServerResource::CrossSystemServerResource(
     setIdUnsafe(id);
     setPrimaryAddress(std::move(endpoint));
     m_restConnection = rest::ServerConnectionPtr(new rest::ServerConnection(
-        systemContext()->httpClientPool(),
         id,
         /*auditId*/ nx::Uuid::createUuid(),
         connection->certificateCache().get(),

@@ -185,6 +185,13 @@ struct RemoteConnection::Private
         sessionTokenExpirationTime(sessionTokenExpirationTime),
         certificateCache(certificateCache)
     {
+        serverApi = std::make_shared<rest::ServerConnection>(
+            moduleInformation.id,
+            auditId,
+            certificateCache.get(),
+            this->connectionInfo.address,
+            this->connectionInfo.credentials);
+
         queryProcessor = std::make_shared<QueryProcessor>(
             moduleInformation.id,
             auditId,
@@ -244,17 +251,6 @@ void RemoteConnection::initializeMessageBusConnection(
     auto data = systemContext->runtimeInfoManager()->localInfo();
     data.data.peer.instanceId = d->auditId;
     systemContext->runtimeInfoManager()->updateLocalItem(data);
-}
-
-void RemoteConnection::initializeApiConnection(SystemContext* systemContext)
-{
-    d->serverApi = std::make_shared<rest::ServerConnection>(
-        systemContext->httpClientPool(),
-        d->moduleInformation.id,
-        d->auditId,
-        d->certificateCache.get(),
-        d->connectionInfo.address,
-        d->connectionInfo.credentials);
 }
 
 const nx::vms::api::ModuleInformation& RemoteConnection::moduleInformation() const
