@@ -8,7 +8,7 @@
 #include "incoming_processor.h"
 #include "detail/outgoing_processor.h"
 
-namespace nx::vms::json_rpc {
+namespace nx::json_rpc {
 
 using namespace detail;
 
@@ -243,4 +243,4 @@ void WebSocketConnection::removeGuard(const QString& id)
         });
 }
 
-} // namespace nx::vms::json_rpc
+} // namespace nx::json_rpc

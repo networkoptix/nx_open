@@ -2,13 +2,13 @@
 
 #pragma once
 
-#include <nx/vms/json_rpc/messages.h>
+#include <nx/json_rpc/messages.h>
 
 namespace nx::vms::api {
 
-using JsonRpcResponseId = nx::vms::json_rpc::ResponseId;
-using JsonRpcRequest = nx::vms::json_rpc::Request;
-using JsonRpcResponse = nx::vms::json_rpc::Response;
-using JsonRpcError = nx::vms::json_rpc::Error;
+using JsonRpcResponseId = nx::json_rpc::ResponseId;
+using JsonRpcRequest = nx::json_rpc::Request;
+using JsonRpcResponse = nx::json_rpc::Response;
+using JsonRpcError = nx::json_rpc::Error;
 
 } // namespace nx::vms::api

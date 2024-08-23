@@ -8,7 +8,7 @@
 
 #include "websocket_connection.h"
 
-namespace nx::vms::json_rpc {
+namespace nx::json_rpc {
 
 void WebSocketConnections::executeAsync(
     Connection* connection,
@@ -144,4 +144,4 @@ void WebSocketConnections::Connection::stop()
     }
 }
 
-} // namespace nx::vms::json_rpc
+} // namespace nx::json_rpc

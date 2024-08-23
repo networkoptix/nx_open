@@ -12,9 +12,9 @@
 
 #include "messages.h"
 
-namespace nx::vms::json_rpc {
+namespace nx::json_rpc {
 
-class NX_VMS_JSON_RPC_API IncomingProcessor
+class NX_JSON_RPC_API IncomingProcessor
 {
 public:
     using ResponseHandler = nx::utils::MoveOnlyFunc<void(Response)>;
@@ -44,4 +44,4 @@ private:
     std::unordered_map<Request*, std::unique_ptr<Request>> m_requests;
 };
 
-} // namespace nx::vms::json_rpc::detail
+} // namespace nx::json_rpc::detail

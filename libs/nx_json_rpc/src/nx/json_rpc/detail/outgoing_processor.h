@@ -14,7 +14,7 @@
 
 #include "../messages.h"
 
-namespace nx::vms::json_rpc::detail {
+namespace nx::json_rpc::detail {
 
 /*
  * Class for internal usage by WebSocketConnection.
@@ -58,4 +58,4 @@ private:
     std::unordered_map<Id, Key> m_awaitingBatchResponses;
 };
 
-} // namespace nx::vms::json_rpc::detail
+} // namespace nx::json_rpc::detail

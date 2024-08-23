@@ -4,7 +4,7 @@
 
 #include <nx/fusion/serialization/json_functions.h>
 
-namespace nx::vms::json_rpc {
+namespace nx::json_rpc {
 
 static std::variant<Request, Response> deserialize(const QJsonValue& data)
 {
@@ -174,4 +174,4 @@ void IncomingProcessor::sendResponse(Response jsonRpcResponse,
     handler(serialized);
 }
 
-} // namespace nx::vms::json_rpc
+} // namespace nx::json_rpc

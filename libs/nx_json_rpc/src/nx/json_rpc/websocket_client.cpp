@@ -9,7 +9,7 @@
 
 #include "websocket_connection.h"
 
-namespace nx::vms::json_rpc {
+namespace nx::json_rpc {
 
 WebSocketClient::WebSocketClient(
     nx::utils::Url url,
@@ -143,4 +143,4 @@ void WebSocketClient::sendAsync(Request request, ResponseHandler handler)
         });
 }
 
-} // namespace nx::vms::json_rpc
+} // namespace nx::json_rpc

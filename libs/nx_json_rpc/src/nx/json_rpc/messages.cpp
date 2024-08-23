@@ -4,7 +4,7 @@
 
 #include <nx/fusion/model_functions.h>
 
-namespace nx::vms::json_rpc {
+namespace nx::json_rpc {
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Request, (json), JsonRpcRequest_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Error, (json), JsonRpcError_Fields)
@@ -15,4 +15,4 @@ Response Response::makeError(ResponseId id, Error error)
     return {.id = id, .error = error};
 }
 
-} // namespace nx::vms::json_rpc
+} // namespace nx::json_rpc
