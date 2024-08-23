@@ -81,10 +81,11 @@ public:
         if (!httpRequest->parse(text.join("\r\n").toUtf8()))
             return std::nullopt;
 
-        rest::Request request(httpRequest.get(), kSystemSession);
         auto contentType = http::getHeaderValue(httpRequest->headers, "Content-Type");
+        std::optional<rest::Content> content;
         if (!contentType.empty())
-            request.content = {std::move(contentType), httpRequest->messageBody.toByteArray()};
+            content = {std::move(contentType), httpRequest->messageBody.toByteArray()};
+        rest::Request request(httpRequest.get(), std::move(content));
 
         m_requests.push_back(std::move(httpRequest));
         return request;
@@ -134,12 +135,12 @@ TEST_F(RestRequestTest, Get)
         ""
     });
     ASSERT_TRUE(request);
-    ASSERT_FALSE(request->content);
+    ASSERT_FALSE(request->content());
 
     EXPECT_EQ("GET", request->method());
     EXPECT_EQ("/some/path", request->decodedPath());
     EXPECT_EQ(Params{}, request->params());
-    EXPECT_FALSE(request->content);
+    EXPECT_FALSE(request->content());
     EXPECT_FALSE(request->isExtraFormattingRequired());
     EXPECT_FALSE(request->parseContent<SomeData>());
 }
@@ -151,7 +152,7 @@ TEST_F(RestRequestTest, GetWithUrlParams)
         ""
     });
     ASSERT_TRUE(request);
-    ASSERT_FALSE(request->content);
+    ASSERT_FALSE(request->content());
 
     EXPECT_EQ("GET", request->method());
     EXPECT_EQ("/some/path", request->decodedPath());
@@ -203,7 +204,7 @@ TEST_F(RestRequestTest, GetWithSomeBools)
         ""
     });
     ASSERT_TRUE(request);
-    ASSERT_FALSE(request->content);
+    ASSERT_FALSE(request->content());
     EXPECT_EQ(Params({{"a", "true"}, {"c", "false"}}), request->params());
 
     const auto data = request->parseContentOrThrow<SomeBools>();
@@ -217,7 +218,7 @@ TEST_F(RestRequestTest, GetWithMixedBools)
         ""
     });
     ASSERT_TRUE(request);
-    ASSERT_FALSE(request->content);
+    ASSERT_FALSE(request->content());
     EXPECT_EQ(Params({{"a", "1"}, {"b", "True"}, {"c", "0"}, {"d", "False"}}), request->params());
 
     const auto data = request->parseContentOrThrow<SomeBools>();
@@ -231,7 +232,7 @@ TEST_F(RestRequestTest, GetWithBoolString)
         ""
     });
     ASSERT_TRUE(request);
-    ASSERT_FALSE(request->content);
+    ASSERT_FALSE(request->content());
     EXPECT_EQ(Params({{"s", "true"}}), request->params());
 
     const auto data = request->parseContentOrThrow<SomeData>();
@@ -246,7 +247,7 @@ TEST_F(RestRequestTest, GetToPostByHeader)
         ""
     });
     ASSERT_TRUE(request);
-    ASSERT_FALSE(request->content);
+    ASSERT_FALSE(request->content());
 
     EXPECT_EQ("POST", request->method());
     EXPECT_EQ("/some/path", request->decodedPath());
@@ -265,7 +266,7 @@ TEST_F(RestRequestTest, Post)
         ""
     });
     ASSERT_TRUE(request);
-    ASSERT_FALSE(request->content);
+    ASSERT_FALSE(request->content());
 
     EXPECT_EQ("POST", request->method());
     EXPECT_EQ("/some/path", request->decodedPath());
@@ -284,9 +285,9 @@ TEST_F(RestRequestTest, PostJson)
         R"json({"b":true,"i":222,"s":"data"})json"
     });
     ASSERT_TRUE(request);
-    ASSERT_TRUE(request->content);
-    EXPECT_EQ(nx::network::http::header::ContentType::kJson, request->content->type);
-    EXPECT_EQ(R"json({"b":true,"i":222,"s":"data"})json", request->content->body);
+    ASSERT_TRUE(request->content());
+    EXPECT_EQ(nx::network::http::header::ContentType::kJson, request->content()->type);
+    EXPECT_EQ(R"json({"b":true,"i":222,"s":"data"})json", request->content()->body);
 
     EXPECT_EQ("POST", request->method());
     EXPECT_EQ("/some/path", request->decodedPath());
@@ -307,11 +308,11 @@ TEST_F(RestRequestTest, PostForm)
         "b=false&i=123&s=some%20text"
     });
     ASSERT_TRUE(request);
-    ASSERT_TRUE(request->content);
+    ASSERT_TRUE(request->content());
     EXPECT_EQ(
         nx::network::http::header::ContentType("application/x-www-form-urlencoded"),
-        request->content->type);
-    EXPECT_EQ("b=false&i=123&s=some%20text", request->content->body);
+        request->content()->type);
+    EXPECT_EQ("b=false&i=123&s=some%20text", request->content()->body);
 
     EXPECT_EQ("POST", request->method());
     EXPECT_EQ("/some/path", request->decodedPath());
@@ -332,9 +333,9 @@ TEST_F(RestRequestTest, PostBadJson)
         "not a json",
     });
     ASSERT_TRUE(request);
-    ASSERT_TRUE(request->content);
-    EXPECT_EQ(nx::network::http::header::ContentType::kJson, request->content->type);
-    EXPECT_EQ("not a json", request->content->body);
+    ASSERT_TRUE(request->content());
+    EXPECT_EQ(nx::network::http::header::ContentType::kJson, request->content()->type);
+    EXPECT_EQ("not a json", request->content()->body);
 
     EXPECT_EQ("POST", request->method());
     EXPECT_EQ("/some/path", request->decodedPath());
@@ -398,7 +399,7 @@ TEST_F(RestRequestTest, PostWithUrlParams)
         ""
     });
     ASSERT_TRUE(request);
-    ASSERT_FALSE(request->content);
+    ASSERT_FALSE(request->content());
 
     EXPECT_EQ("POST", request->method());
     EXPECT_EQ("/some/path", request->decodedPath());
@@ -419,7 +420,7 @@ TEST_F(RestRequestTest, PostWithUrlParamsFailure)
         ""
     });
     ASSERT_TRUE(request);
-    ASSERT_FALSE(request->content);
+    ASSERT_FALSE(request->content());
 
     EXPECT_EQ("POST", request->method());
     EXPECT_EQ("/some/path", request->decodedPath());
@@ -437,9 +438,9 @@ TEST_F(RestRequestTest, PutJson)
         R"json({"s":"some text"})json"
     });
     ASSERT_TRUE(request);
-    ASSERT_TRUE(request->content);
-    EXPECT_EQ(nx::network::http::header::ContentType::kJson, request->content->type);
-    EXPECT_EQ(R"json({"s":"some text"})json", request->content->body);
+    ASSERT_TRUE(request->content());
+    EXPECT_EQ(nx::network::http::header::ContentType::kJson, request->content()->type);
+    EXPECT_EQ(R"json({"s":"some text"})json", request->content()->body);
 
     EXPECT_EQ("PUT", request->method());
     EXPECT_EQ("/some/path", request->decodedPath());
@@ -460,9 +461,9 @@ TEST_F(RestRequestTest, PutJsonInsteadOfEncodedUrl)
         R"json({"s":"some text"})json"
     });
     ASSERT_TRUE(request);
-    ASSERT_TRUE(request->content);
-    EXPECT_EQ(nx::network::http::header::ContentType::kForm, request->content->type);
-    EXPECT_EQ(R"json({"s":"some text"})json", request->content->body);
+    ASSERT_TRUE(request->content());
+    EXPECT_EQ(nx::network::http::header::ContentType::kForm, request->content()->type);
+    EXPECT_EQ(R"json({"s":"some text"})json", request->content()->body);
 
     EXPECT_EQ("PUT", request->method());
     EXPECT_EQ("/some/path", request->decodedPath());
@@ -486,7 +487,7 @@ TEST_F(RestRequestTest, Delete)
         "",
     });
     ASSERT_TRUE(request);
-    ASSERT_FALSE(request->content);
+    ASSERT_FALSE(request->content());
 
     EXPECT_EQ("DELETE", request->method());
     EXPECT_EQ("/some/path", request->decodedPath());

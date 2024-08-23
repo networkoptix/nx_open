@@ -2,10 +2,7 @@
 
 nx_add_target(nx_network_rest LIBRARY
     WERROR
-    PUBLIC_LIBS
-        nx_fusion
-        nx_network
-        nx_utils
+    PUBLIC_LIBS nx_json_rpc
     FOLDER common/libs
 )
 

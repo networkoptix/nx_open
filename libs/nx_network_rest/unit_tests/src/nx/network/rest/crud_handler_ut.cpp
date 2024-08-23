@@ -67,9 +67,8 @@ TEST(CrudHandler, BookmarkPatch)
                     r.requestLine.method = nx::network::http::Method::patch;
                     return r;
                 }();
-            Request result{&request, kSystemSession};
+            Request result{&request, Content{nx::network::http::header::ContentType::kJson, body}};
             result.setDecodedPath("/rest/v3/bookmarks");
-            result.content = Content{nx::network::http::header::ContentType::kJson, body};
             return result;
         };
 

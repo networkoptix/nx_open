@@ -9,6 +9,7 @@ if(LINUX)
 endif()
 
 add_subdirectory(nx_codec)
+add_subdirectory(nx_json_rpc)
 add_subdirectory(nx_media_core)
 add_subdirectory(nx_network)
 add_subdirectory(nx_network_rest)
@@ -21,10 +22,6 @@ add_subdirectory(nx_zip)
 
 if(withDesktopClient)
     add_subdirectory(nx_pathkit)
-endif()
-
-if(withMediaServer)
-    add_subdirectory(nx_json_rpc)
 endif()
 
 if(withMediaServer OR withDesktopClient OR openSourceBuild)

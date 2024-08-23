@@ -36,9 +36,10 @@ public:
         const QString path = httpRequest.requestLine.url.path();
 
         m_requests.push_front(httpRequest);
-        auto request = std::make_unique<Request>(&m_requests.front(), kSystemSession);
+        std::optional<rest::Content> content;
         if (!body.isEmpty())
-            request->content = {http::header::ContentType::kJson, std::move(body)};
+            content = {http::header::ContentType::kJson, std::move(body)};
+        auto request = std::make_unique<Request>(&m_requests.front(), std::move(content));
 
         if (path.startsWith("/rest/"))
         {

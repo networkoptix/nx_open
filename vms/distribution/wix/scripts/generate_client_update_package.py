@@ -83,6 +83,7 @@ nx_libraries = [
     'nx_reflect',
     'nx_network',
     'nx_network_rest',
+    'nx_json_rpc',
     'nx_kit',
     'nx_vms_api',
     'nx_vms_update',

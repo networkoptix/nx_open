@@ -549,18 +549,22 @@ void OpenApiSchema::validateOrThrow(const QJsonObject& path,
             if (body.isEmpty())
                 return;
 
-            if (isRequired(body) && !request->content)
-                throw Exception::badRequest("Missing request content");
-
-            if (!request->content)
+            auto content = request->content()
+                ? request->content()->parseOrThrow()
+                : request->jsonRpcContext()
+                    ? request->jsonRpcContext()->request.params.value_or(QJsonValue::Undefined)
+                    : QJsonValue::Undefined;
+            if (content.isUndefined())
+            {
+                if (isRequired(body))
+                    throw Exception::badRequest("Missing request content");
                 return;
+            }
 
             std::vector<QString> unused{};
             json::validateParameters(
                 getObject(getObject(getObject(body, "content"), "application/json"), "schema"),
-                request->content->parseOrThrow(),
-                QString(),
-                &unused);
+                content, /*name*/ {}, &unused);
 
             // Ad hoc to remove url params from `unused` since they are allowed to be passed
             // in the body for historical reasons.
@@ -593,22 +597,8 @@ void OpenApiSchema::validateOrThrow(const QJsonObject& path,
                     nx::format("Parameter '%1' is not allowed by the Schema.", unused[0]));
             }
 
-            QJsonValue content = request->content->parseOrThrow();
-            if (!NX_ASSERT(!content.isUndefined()))
-                return;
-
             removeUnused(unused, &content);
-
-            auto serialized = Qn::trySerialize(content, Qn::SerializationFormat::json);
-            if (!NX_ASSERT(serialized))
-                return;
-
-            request->content->body = std::move(*serialized);
-
-            // ad hoc to invalidate `request.m_paramsCache`
-            request->setPathParams(request->pathParams());
-            // this forces `request.m_paramsCache` recalculation from `content`
-            (void) request->params();
+            request->updateContent(content);
         }();
     }
 

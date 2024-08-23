@@ -2,9 +2,13 @@
 
 #pragma once
 
+#include <nx/json_rpc/messages.h>
+
 #include "audit.h"
 #include "exception.h"
 #include "params.h"
+
+namespace nx::json_rpc { class WebSocketConnection; }
 
 namespace nx::network::rest {
 
@@ -19,10 +23,7 @@ public:
     const UserSession& userSession;
     const nx::network::HostAddress foreignAddress;
     const int serverPort;
-    const bool isConnectionSecure;
-    const bool isJsonRpcRequest;
-
-    std::optional<Content> content;
+    const bool isConnectionSecure = true;
 
     Request(
         const nx::network::http::Request* httpRequest,
@@ -30,7 +31,20 @@ public:
         const nx::network::HostAddress& foreignAddress = nx::network::HostAddress(),
         int serverPort = 0,
         bool isConnectionSecure = true,
-        bool isJsonRpcRequest = false);
+        std::optional<Content> content = {});
+
+    struct JsonRpcContext
+    {
+        nx::json_rpc::Request request;
+        std::weak_ptr<nx::json_rpc::WebSocketConnection> connection;
+    };
+    Request(
+        JsonRpcContext jsonRpcContext,
+        const UserSession& userSession,
+        const nx::network::HostAddress& foreignAddress = nx::network::HostAddress(),
+        int serverPort = 0);
+
+    Request(const nx::network::http::Request* httpRequest, std::optional<Content> content);
 
     /**
      * Method from request, may be overwritten by:
@@ -39,11 +53,20 @@ public:
      */
     const nx::network::http::Method& method() const;
 
+    const std::optional<Content>& content() const { return m_content; }
+    const std::optional<JsonRpcContext>& jsonRpcContext() const { return m_jsonRpcContext; }
+    void updateContent(QJsonValue value);
     const nx::network::http::Request* httpRequest() const { return m_httpRequest; };
-    const nx::network::http::HttpHeaders& httpHeaders() const { return m_httpRequest->headers; }
-    const nx::utils::Url& url() const { return m_httpRequest->requestLine.url; }
+    const nx::network::http::HttpHeaders& httpHeaders() const { return m_httpHeaders; }
+    const nx::utils::Url& url() const { return m_url; }
 
-    QString path() const { return m_httpRequest->requestLine.url.path(QUrl::PrettyDecoded); }
+    QString path() const
+    {
+        return m_httpRequest
+            ? m_httpRequest->requestLine.url.path(QUrl::PrettyDecoded)
+            : m_decodedPath;
+    }
+
     QString decodedPath() const;
     void setDecodedPath(const QString& path) { m_decodedPath = path; }
 
@@ -146,9 +169,13 @@ private:
 
 private:
     const nx::network::http::Request* const m_httpRequest = nullptr;
+    std::optional<JsonRpcContext> m_jsonRpcContext;
     Params m_urlParams;
     Params m_pathParams;
-    const nx::network::http::Method m_method;
+    nx::network::http::Method m_method;
+    std::optional<Content> m_content;
+    nx::network::http::HttpHeaders m_httpHeaders;
+    nx::utils::Url m_url;
     mutable QString m_decodedPath;
     mutable std::optional<Params> m_paramsCache;
     mutable Qn::SerializationFormat m_responseFormat = Qn::SerializationFormat::unsupported;
