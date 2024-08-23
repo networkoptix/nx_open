@@ -20,6 +20,8 @@ Dialog
 
     title: qsTr("Settings")
 
+    modality: Qt.ApplicationModal
+
     property alias attributeManager: settingsModel.attributeManager
     property alias objectTypeIds: settingsModel.objectTypeIds
 
