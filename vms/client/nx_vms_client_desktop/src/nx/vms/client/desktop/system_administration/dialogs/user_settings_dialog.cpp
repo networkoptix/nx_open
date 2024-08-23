@@ -1320,13 +1320,20 @@ void UserSettingsDialog::refreshToken(const QString& password)
             if (NX_ASSERT(handle == d->currentRequest))
                 d->currentRequest = 0;
 
+            auto connection = systemContext()->connection();
+            if (!connection)
+            {
+                NX_DEBUG(this, "Connection is not available, can't refresh token");
+                return;
+            }
+
             if (auto session = std::get_if<nx::vms::api::LoginSession>(&errorOrData))
             {
                 NX_DEBUG(this, "Received token with length: %1", session->token.length());
 
                 if (NX_ASSERT(!session->token.empty()))
                 {
-                    auto credentials = connection()->credentials();
+                    auto credentials = connection->credentials();
                     if (systemContext()->userWatcher()->user()->shouldDigestAuthBeUsed())
                         credentials.authToken = nx::network::http::PasswordAuthToken(password);
                     else
@@ -1338,13 +1345,13 @@ void UserSettingsDialog::refreshToken(const QString& password)
                     clientMessageProcessor()->holdConnection(
                         QnClientMessageProcessor::HoldConnectionPolicy::reauth);
 
-                    connection()->updateCredentials(
+                    connection->updateCredentials(
                         credentials,
                         tokenExpirationTime);
 
                     using namespace nx::vms::client::core;
 
-                    const auto localSystemId = connection()->moduleInformation().localSystemId;
+                    const auto localSystemId = connection->moduleInformation().localSystemId;
                     const auto savedCredentials = CredentialsManager::credentials(
                         localSystemId, credentials.username);
                     const bool passwordIsAlreadySaved =
