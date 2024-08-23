@@ -548,6 +548,9 @@ struct SystemDataEx: SystemData
     /**%apidoc dictionary{capability: capability version (0-disabled)}. */
     std::map<std::string, int> capabilities;
 
+    /**%apidoc Organization name if system is owned by organization */
+    std::string organizationName;
+
     SystemDataEx() = default;
 
     SystemDataEx(SystemData systemData):
@@ -561,7 +564,7 @@ struct SystemDataEx: SystemData
 // TODO: #akolesnikov Move NX_REFLECTION_INSTRUMENT for other types here as well.
 NX_REFLECTION_INSTRUMENT(SystemDataEx,
     (accessRole)(roleIds)(permissions)(stateOfHealth)(usageFrequency)(lastLoginTime)(mergeInfo) \
-    (capabilities)(version))
+    (capabilities)(version)(organizationName))
 
 // Providing custom JSON serialization functions so that SystemDataEx::attributes are added on the
 // same level with other fields in the resulting JSON document.
