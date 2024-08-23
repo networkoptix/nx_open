@@ -208,8 +208,8 @@ void CallNotificationsListModel::Private::addNotification(
         {
             eventData.id = nx::Uuid::createUuid(); //< We have to show every missed call separately.
             eventData.actionId = menu::OpenMissedCallIntercomLayoutAction;
-            eventData.title = tr("Missed Call");
-            eventData.iconPath = "20x20/Outline/call.svg";
+            eventData.title = tr("Missed call");
+            eventData.iconPath = "20x20/Outline/missed_call.svg";
             eventData.level = QnNotificationLevel::Value::CriticalNotification;
             eventData.actionParameters.setArgument(menu::OtherType, eventData.id);
 
