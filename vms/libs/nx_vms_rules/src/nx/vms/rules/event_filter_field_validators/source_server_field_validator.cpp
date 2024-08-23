@@ -21,13 +21,17 @@ ValidationResult SourceServerFieldValidator::validity(
         return {QValidator::State::Invalid, {Strings::invalidFieldType()}};
 
     const auto sourceServerFieldProperties = sourceServerField->properties();
-    QnMediaServerResourceList servers =
-        context->resourcePool()->getResourcesByIds<QnMediaServerResource>(sourceServerField->ids());
+    const auto serverIds = sourceServerField->ids();
     const bool isValidSelection =
-        !servers.empty() || sourceServerFieldProperties.allowEmptySelection;
+        !serverIds.empty() || sourceServerFieldProperties.allowEmptySelection;
 
     if (!isValidSelection)
         return {QValidator::State::Invalid, Strings::selectServer()};
+
+    QnMediaServerResourceList servers =
+        context->resourcePool()->getResourcesByIds<QnMediaServerResource>(serverIds);
+    if (servers.empty() && !serverIds.empty())
+        return {QValidator::State::Invalid, Strings::serversWereRemoved(serverIds.size())};
 
     if (!sourceServerFieldProperties.validationPolicy.isEmpty())
     {

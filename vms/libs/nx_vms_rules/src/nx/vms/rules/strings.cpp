@@ -373,6 +373,24 @@ QString Strings::usersHaveNoAccessToLayout(bool allUsersWithoutAccess)
         : tr("Some users do not have access to the selected layout");
 }
 
+QString Strings::camerasWereRemoved(common::SystemContext* context, int count)
+{
+    return QnDeviceDependentStrings::getDefaultNameFromSet(
+        context->resourcePool(),
+        tr("Selected devices were removed", "", count),
+        tr("Selected cameras were removed", "", count));
+}
+
+QString Strings::serversWereRemoved(int count)
+{
+    return tr("Selected servers were removed", "", count);
+}
+
+QString Strings::layoutsWereRemoved(int count)
+{
+    return tr("Selected layouts were removed", "", count);
+}
+
 TranslatableString Strings::at()
 {
     return NX_DYNAMIC_TRANSLATABLE(tr("At"));

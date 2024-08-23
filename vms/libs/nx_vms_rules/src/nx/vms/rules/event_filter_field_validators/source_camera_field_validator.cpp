@@ -22,13 +22,17 @@ ValidationResult SourceCameraFieldValidator::validity(
         return {QValidator::State::Invalid, {Strings::invalidFieldType()}};
 
     const auto sourceCameraFieldProperties = sourceCameraField->properties();
-    const auto cameras = context->resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
-        sourceCameraField->ids());
+    const auto cameraIds = sourceCameraField->ids();
     const bool isValidSelection =
-        !cameras.empty() || sourceCameraFieldProperties.allowEmptySelection;
+        !cameraIds.empty() || sourceCameraFieldProperties.allowEmptySelection;
 
     if (!isValidSelection)
         return {QValidator::State::Invalid, Strings::selectCamera(context)};
+
+    const auto cameras =
+        context->resourcePool()->getResourcesByIds<QnVirtualCameraResource>(cameraIds);
+    if (cameras.empty() && !cameraIds.empty())
+        return {QValidator::State::Invalid, Strings::camerasWereRemoved(context, cameraIds.size())};
 
     if (!sourceCameraFieldProperties.validationPolicy.isEmpty())
     {

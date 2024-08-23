@@ -31,14 +31,22 @@ ValidationResult TargetDeviceFieldValidator::validity(
     if (targetDeviceField->useSource() && !hasSourceCamera(eventDescriptor.value()))
         return {QValidator::State::Invalid, {tr("Event does not have source camera")}};
 
-    const auto cameras = utils::cameras(targetDeviceField->selection(), context);
+    const auto camerasSelection = targetDeviceField->selection();
     const auto targetDeviceFieldProperties = targetDeviceField->properties();
-    const bool isValidSelection = !cameras.empty()
+    const bool isValidSelection = !camerasSelection.ids.empty()
         || targetDeviceField->useSource()
         || targetDeviceFieldProperties.allowEmptySelection;
 
     if (!isValidSelection)
         return {QValidator::State::Invalid, Strings::selectCamera(context)};
+
+    const auto cameras = utils::cameras(camerasSelection, context);
+    if (!targetDeviceField->useSource() && cameras.empty() && !camerasSelection.ids.empty())
+    {
+        return {
+            QValidator::State::Invalid,
+            Strings::camerasWereRemoved(context, camerasSelection.ids.size())};
+    }
 
     if (!targetDeviceFieldProperties.validationPolicy.isEmpty())
     {

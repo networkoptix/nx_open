@@ -23,10 +23,9 @@ ValidationResult TargetSingleDeviceFieldValidator::validity(
     if (!NX_ASSERT(targetSingleDeviceField))
         return {QValidator::State::Invalid, {Strings::invalidFieldType()}};
 
-    const auto device =
-        context->resourcePool()->getResourceById<QnVirtualCameraResource>(targetSingleDeviceField->id());
+    const auto deviceId = targetSingleDeviceField->id();
     const auto targetSingleDeviceFieldProperties = targetSingleDeviceField->properties();
-    const bool isValidSelection = device
+    const bool isValidSelection = !deviceId.isNull()
         || targetSingleDeviceField->useSource()
         || targetSingleDeviceFieldProperties.allowEmptySelection;
 
@@ -36,6 +35,10 @@ ValidationResult TargetSingleDeviceFieldValidator::validity(
             QValidator::State::Invalid,
             Strings::selectCamera(context, /*allowMultipleSelection*/ false)};
     }
+
+    const auto device = context->resourcePool()->getResourceById<QnVirtualCameraResource>(deviceId);
+    if (!targetSingleDeviceField->useSource() && !device)
+        return {QValidator::State::Invalid, Strings::camerasWereRemoved(context)};
 
     if (!targetSingleDeviceFieldProperties.validationPolicy.isEmpty())
     {

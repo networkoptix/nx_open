@@ -28,10 +28,14 @@ ValidationResult LayoutFieldValidator::validity(
     if (!NX_ASSERT(layoutField))
         return {QValidator::State::Invalid, Strings::invalidFieldType()};
 
+    const auto layoutId = layoutField->value();
+    if (layoutId.isNull())
+        return {QValidator::State::Invalid, tr("Select layout")};
+
     const auto layout =
         context->resourcePool()->getResourceById<QnLayoutResource>(layoutField->value());
     if (!layout)
-        return {QValidator::State::Invalid, tr("Select layout")};
+        return {QValidator::State::Invalid, Strings::layoutsWereRemoved()};
 
     auto targetUserField =
         rule->actionBuilders().front()->fieldByName<TargetUserField>(utils::kUsersFieldName);
