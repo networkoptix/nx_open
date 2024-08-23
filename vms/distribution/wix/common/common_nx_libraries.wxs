@@ -8,28 +8,29 @@
         <ComponentGroup Id="CommonNxLibrariesComponentGroup"
                 Source="${bin_source_dir}"
                 Directory="InstallDirRoot">
-            <Component><File Name="nx_utils.dll" KeyPath="yes" DiskId="2"/></Component>
-            <Component><File Name="nx_fusion.dll" KeyPath="yes" DiskId="2"/></Component>
-            <Component><File Name="nx_reflect.dll" KeyPath="yes" DiskId="2"/></Component>
-            <Component><File Name="nx_vms_common.dll" KeyPath="yes" DiskId="2"/></Component>
-            <Component><File Name="nx_rtp.dll" KeyPath="yes" DiskId="2"/></Component>
-            <Component><File Name="nx_media_core.dll" KeyPath="yes" DiskId="2"/></Component>
-            <Component><File Name="nx_codec.dll" KeyPath="yes" DiskId="2"/></Component>
-            <Component><File Name="nx_vms_utils.dll" KeyPath="yes" DiskId="2"/></Component>
-            <Component><File Name="nx_network.dll" KeyPath="yes" DiskId="2"/></Component>
-            <Component><File Name="nx_network_rest.dll" KeyPath="yes" DiskId="2"/></Component>
-            <Component><File Name="nx_kit.dll" KeyPath="yes" DiskId="2"/></Component>
-            <Component><File Name="nx_zip.dll" KeyPath="yes" DiskId="2"/></Component>
-            <Component><File Name="nx_vms_api.dll" KeyPath="yes" DiskId="2"/></Component>
-            <Component><File Name="nx_vms_update.dll" KeyPath="yes" DiskId="2"/></Component>
-            <Component><File Name="nx_vms_rules.dll" KeyPath="yes" DiskId="2"/></Component>
-            <Component><File Name="nx_branding.dll" KeyPath="yes" DiskId="2"/></Component>
-            <Component><File Name="nx_build_info.dll" KeyPath="yes" DiskId="2"/></Component>
-            <Component><File Name="nx_monitoring.dll" KeyPath="yes" DiskId="2"/></Component>
-            <Component><File Name="quazip.dll" KeyPath="yes" DiskId="2"/></Component>
-            <Component><File Name="udt.dll" KeyPath="yes" DiskId="2"/></Component>
             <Component><File Name="cudart64_12.dll" KeyPath="yes" DiskId="2"/></Component>
             <Component><File Name="libvpl.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="nx_branding.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="nx_build_info.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="nx_codec.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="nx_fusion.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="nx_json_rpc.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="nx_kit.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="nx_media_core.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="nx_monitoring.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="nx_network.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="nx_network_rest.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="nx_reflect.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="nx_rtp.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="nx_utils.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="nx_vms_api.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="nx_vms_common.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="nx_vms_rules.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="nx_vms_update.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="nx_vms_utils.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="nx_zip.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="quazip.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="udt.dll" KeyPath="yes" DiskId="2"/></Component>
         </ComponentGroup>
     </Fragment>
 </Wix>

@@ -153,6 +153,7 @@ if(CMAKE_BUILD_TYPE MATCHES "RelWithDebInfo")
             nx_codec
             nx_rtp
             nx_kit
+            nx_json_rpc
             udt
         )
 
@@ -161,9 +162,6 @@ if(CMAKE_BUILD_TYPE MATCHES "RelWithDebInfo")
         endif()
         if(TARGET nx_pathkit)
             list(APPEND libs_debug_dependencies nx_pathkit)
-        endif()
-        if(TARGET nx_json_rpc)
-            list(APPEND libs_debug_dependencies nx_json_rpc)
         endif()
         if(TARGET vms_gateway_core)
             list(APPEND libs_debug_dependencies vms_gateway_core)

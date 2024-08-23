@@ -174,21 +174,24 @@ TEST_F(PathRouterTest, Route)
                     case typeCount:
                         break;
                 }
+                std::unique_ptr<Request> request;
                 nx::network::http::Request httpRequest;
-                auto path = data.testPath[type];
-                if (type == jsonRpc)
-                    path.replace('.', '/');
-                httpRequest.requestLine.url.setPath(path);
-                Request request(&httpRequest, kSystemSession, {}, {}, {}, type == jsonRpc);
                 if (type == jsonRpc)
                 {
-                    request.content = {nx::network::http::header::ContentType::kJson,
-                        QJson::serialized(data.params.toJson())};
+                    request = std::make_unique<Request>(
+                        Request::JsonRpcContext{{.method = data.testPath[type].toStdString(),
+                            .params = data.params.toJson()}},
+                        kSystemSession);
                 }
-                ASSERT_TRUE(pathRouter.findHandlerOrThrow(&request));
-                ASSERT_EQ(request.decodedPath().toStdString(), data.expectedPath)
-                    << request.pathParams().toString().toStdString();
-                ASSERT_EQ(request.pathParams(), data.params);
+                else
+                {
+                    httpRequest.requestLine.url.setPath(data.testPath[type]);
+                    request = std::make_unique<Request>(&httpRequest, kSystemSession);
+                }
+                ASSERT_TRUE(pathRouter.findHandlerOrThrow(request.get()));
+                ASSERT_EQ(request->decodedPath().toStdString(), data.expectedPath)
+                    << request->pathParams().toString().toStdString();
+                ASSERT_EQ(request->pathParams(), data.params);
             }
         }
     }

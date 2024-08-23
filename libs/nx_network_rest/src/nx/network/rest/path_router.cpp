@@ -214,7 +214,7 @@ bool PathRouter::Item::fillResultIfMatched(
 {
     if (path.empty())
     {
-        if (request.isJsonRpcRequest)
+        if (request.jsonRpcContext())
         {
             if (fillResultIfMatchedToParams(path, request, result, overlaps))
                 return true;
@@ -259,7 +259,7 @@ bool PathRouter::Item::fillResultIfMatched(
         return true;
 
     // There are no asterisks in JSON RPC path, simulate them.
-    if (request.isJsonRpcRequest && fillResultIfMatchedToFixed("*", path, request, result, overlaps))
+    if (request.jsonRpcContext() && fillResultIfMatchedToFixed("*", path, request, result, overlaps))
         return true;
 
     for (const auto& [_, regexpWithItem]: m_regexp)
@@ -276,7 +276,7 @@ bool PathRouter::Item::fillResultIfMatched(
         }
     }
 
-    if (request.isJsonRpcRequest)
+    if (request.jsonRpcContext())
     {
         if (fillResultIfMatchedToParams(path, request, result, overlaps))
             return true;
@@ -297,7 +297,7 @@ bool PathRouter::Item::fillResultIfMatched(
     if (!m_restOfPathParam.empty())
     {
         auto paramQStr = nx::toString(m_restOfPathParam);
-        if (request.isJsonRpcRequest)
+        if (request.jsonRpcContext())
         {
             auto requestParam = request.param(paramQStr);
             if (!requestParam)

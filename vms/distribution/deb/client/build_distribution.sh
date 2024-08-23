@@ -136,6 +136,7 @@ copyLibs()
         nx_branding
         nx_build_info
         nx_codec
+        nx_json_rpc
         nx_monitoring
         nx_media
         nx_media_core

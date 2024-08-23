@@ -11,23 +11,108 @@
 
 namespace nx::network::rest {
 
+static std::tuple<nx::network::http::Method, QString> methodAndPath(const std::string& method)
+{
+    static constexpr std::array<std::pair<std::string_view, std::string_view>, 7>
+        kValueTailToMethod = {
+            std::make_pair(std::string_view(".create"), nx::network::http::Method::post),
+            std::make_pair(std::string_view(".list"), nx::network::http::Method::get),
+            std::make_pair(std::string_view(".get"), nx::network::http::Method::get),
+            std::make_pair(std::string_view(".update"), nx::network::http::Method::patch),
+            std::make_pair(std::string_view(".delete"), nx::network::http::Method::delete_),
+            std::make_pair(std::string_view(".subscribe"), nx::network::http::Method::get),
+            std::make_pair(std::string_view(".unsubscribe"), nx::network::http::Method::delete_),
+        };
+
+    QString path;
+    for (const auto& [valueTail, httpMethod]: kValueTailToMethod)
+    {
+        if (method.ends_with(valueTail))
+        {
+            path = QString::fromLatin1(method.data(), method.size() - valueTail.size());
+            path.replace('.', '/');
+            return {httpMethod, path};
+        }
+    }
+
+    path = QString::fromStdString(method);
+    path.replace('.', '/');
+    return {nx::network::http::Method::post, path};
+}
+
 Request::Request(
     const http::Request* httpRequest,
     const UserSession& userSession,
     const nx::network::HostAddress& foreignAddress,
     int serverPort,
     bool isConnectionSecure,
-    bool isJsonRpcRequest)
+    std::optional<Content> content)
     :
     mutableUserSession(userSession),
     userSession(mutableUserSession),
     foreignAddress(foreignAddress),
     serverPort(serverPort),
     isConnectionSecure(isConnectionSecure),
-    isJsonRpcRequest(isJsonRpcRequest),
     m_httpRequest(httpRequest),
     m_urlParams(Params::fromUrlQuery(QUrlQuery(httpRequest->requestLine.url.toQUrl()))),
-    m_method(calculateMethod())
+    m_method(calculateMethod()),
+    m_content(std::move(content)),
+    m_httpHeaders(httpRequest->headers),
+    m_url(httpRequest->requestLine.url)
+{
+}
+
+Request::Request(
+    JsonRpcContext jsonRpcContext,
+    const UserSession& userSession,
+    const nx::network::HostAddress& foreignAddress,
+    int serverPort)
+    :
+    mutableUserSession(userSession),
+    userSession(mutableUserSession),
+    foreignAddress(foreignAddress),
+    serverPort(serverPort),
+    m_jsonRpcContext(std::move(jsonRpcContext)),
+    m_responseFormat(Qn::SerializationFormat::json)
+{
+    std::tie(m_method, m_decodedPath) = methodAndPath(m_jsonRpcContext->request.method);
+
+    if (m_jsonRpcContext->request.method.starts_with("rest."))
+        return;
+
+    // Fill m_content for legacy and deprecated api.
+    if (!m_jsonRpcContext->request.params)
+    {
+        m_content = Content{nx::network::http::header::ContentType::kJson, /*body*/ {}};
+        return;
+    }
+
+    if (!m_jsonRpcContext->request.params->isObject())
+    {
+        m_content = Content{nx::network::http::header::ContentType::kJson,
+            QJson::serialized(m_jsonRpcContext->request.params.value())};
+        return;
+    }
+
+    auto object = m_jsonRpcContext->request.params->toObject();
+    QJsonObject body;
+    for (auto it = object.begin(); it != object.end(); ++it)
+    {
+        if (!it.key().startsWith("_"))
+            body.insert(it.key(), it.value());
+    }
+    m_content = Content{nx::network::http::header::ContentType::kJson,
+        body.isEmpty() ? QByteArray{} : QJson::serialized(body)};
+}
+
+Request::Request(const nx::network::http::Request* httpRequest, std::optional<Content> content):
+    Request(
+        httpRequest,
+        kSystemSession,
+        HostAddress{},
+        /*serverPort*/ 0,
+        /*isConnectionSecure*/ true,
+        std::move(content))
 {
 }
 
@@ -148,42 +233,47 @@ Params Request::calculateParams() const
     if (!http::Method::isMessageBodyAllowed(method()))
     {
         params.unite(m_urlParams);
-        if (!isJsonRpcRequest)
+        if (!jsonRpcContext())
             return params;
     }
 
     if (ini().allowUrlParametersForAnyMethod)
         params.unite(m_urlParams);
 
-    if (content)
+    std::optional<QJsonValue> json;
+    if (m_content)
     {
         // TODO: Fix or refactor. This function disregards possible content errors. For example,
         //     invalid JSON content (parsing errors) will be silently ignored.
         //     For details: VMS-41649
-        auto json = content->parse();
-        if (json && json->type() == QJsonValue::Object)
-        {
-            auto contentParams = Params::fromJson(json->toObject());
-            for (auto [key, value]: m_pathParams.keyValueRange())
-            {
-                if (const auto duplicate = contentParams.findValue(key))
-                {
-                    if (isJsonRpcRequest || isEqualParam(value, *duplicate))
-                    {
-                        contentParams.remove(key);
-                    }
-                    else
-                    {
-                        throw Exception::badRequest(NX_FMT(
-                            "Parameter '%1' path value '%2' doesn't match content value '%3'",
-                            key, value, *duplicate));
-                    }
-                }
-            }
-            params.unite(contentParams);
-        }
+        json = m_content->parse();
+    }
+    else if (m_jsonRpcContext)
+    {
+        json = m_jsonRpcContext->request.params;
     }
 
+    if (json && json->type() == QJsonValue::Object)
+    {
+        auto contentParams = Params::fromJson(json->toObject());
+        for (auto [key, value]: m_pathParams.keyValueRange())
+        {
+            if (const auto duplicate = contentParams.findValue(key))
+            {
+                if (jsonRpcContext() || isEqualParam(value, *duplicate))
+                {
+                    contentParams.remove(key);
+                }
+                else
+                {
+                    throw Exception::badRequest(NX_FMT(
+                        "Parameter '%1' path value '%2' doesn't match content value '%3'",
+                        key, value, *duplicate));
+                }
+            }
+        }
+        params.unite(contentParams);
+    }
     return params;
 }
 
@@ -197,25 +287,25 @@ QJsonValue Request::calculateContent(bool useException, bool wrapInObject) const
         urlParamsContent = params.toJson(/*excludeCommon*/ true);
     }
 
-    if (!isJsonRpcRequest && !http::Method::isMessageBodyAllowed(method()))
+    if (!jsonRpcContext() && !http::Method::isMessageBodyAllowed(method()))
         return urlParamsContent.isEmpty() ? QJsonValue(QJsonValue::Undefined) : urlParamsContent;
 
     QJsonValue parsedContent(QJsonValue::Undefined);
-    if (content)
+    if (m_content)
     {
-        if (content->type == http::header::ContentType::kForm)
+        if (m_content->type == http::header::ContentType::kForm)
         {
-            QUrlQuery urlQuery(QUrl::fromEncoded(content->body, QUrl::StrictMode).toString());
+            QUrlQuery urlQuery(QUrl::fromEncoded(m_content->body, QUrl::StrictMode).toString());
             parsedContent = Params::fromUrlQuery(urlQuery).toJson(/*excludeCommon*/ true);
 
             if (parsedContent.toObject().isEmpty())
                 throw Exception::badRequest("Failed to parse request data");
         }
-        else if (content->type == http::header::ContentType::kJson)
+        else if (m_content->type == http::header::ContentType::kJson)
         {
             try
             {
-                parsedContent = QJson::deserializeOrThrow<QJsonValue>(content->body);
+                parsedContent = QJson::deserializeOrThrow<QJsonValue>(m_content->body);
             }
             catch (const QJson::InvalidJsonException& e)
             {
@@ -226,10 +316,14 @@ QJsonValue Request::calculateContent(bool useException, bool wrapInObject) const
         else //< TODO: Other content types should go here when supported.
         {
             if (useException)
-                throw Exception::unsupportedMediaType(NX_FMT("Unsupported type: %1", content->type));
+                throw Exception::unsupportedMediaType(NX_FMT("Unsupported type: %1", m_content->type));
         }
         if (wrapInObject && !parsedContent.isObject())
             parsedContent = QJsonObject{{"_", parsedContent}};
+    }
+    else if (m_jsonRpcContext && m_jsonRpcContext->request.params)
+    {
+        parsedContent = m_jsonRpcContext->request.params.value();
     }
 
     if (!ini().allowUrlParametersForAnyMethod)
@@ -258,6 +352,20 @@ QJsonValue Request::calculateContent(bool useException, bool wrapInObject) const
     for (auto it = urlParamsContent.begin(); it != urlParamsContent.end(); ++it)
         object.insert(it.key(), it.value());
     return object;
+}
+
+void Request::updateContent(QJsonValue value)
+{
+    if (m_jsonRpcContext)
+    {
+        m_jsonRpcContext->request.params = value;
+    }
+    else
+    {
+        m_content->type = http::header::ContentType::kJson;
+        m_content->body = QJson::serialized(value);
+    }
+    m_paramsCache.reset();
 }
 
 namespace {
@@ -363,6 +471,18 @@ void Request::renameParameter(const QString& oldName, const QString& newName)
 {
     m_urlParams.rename(oldName, newName);
     m_pathParams.rename(oldName, newName);
+    if (m_jsonRpcContext
+        && m_jsonRpcContext->request.params
+        && m_jsonRpcContext->request.params->isObject())
+    {
+        auto object = m_jsonRpcContext->request.params->toObject();
+        auto value = object.take(oldName);
+        if (!value.isUndefined())
+        {
+            object.insert(newName, value);
+            m_jsonRpcContext->request.params = object;
+        }
+    }
     if (!m_paramsCache)
         m_paramsCache = calculateParams();
     m_paramsCache->rename(oldName, newName);
