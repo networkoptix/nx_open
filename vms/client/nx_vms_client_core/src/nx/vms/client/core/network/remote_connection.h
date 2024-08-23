@@ -58,8 +58,6 @@ public:
     /** Initialize message bus connection. Actual for the current connection only. */
     void initializeMessageBusConnection(SystemContext* systemContext);
 
-    void initializeApiConnection(SystemContext* systemContext);
-
     const nx::vms::api::ModuleInformation& moduleInformation() const;
 
     void updateModuleInformation(const nx::vms::api::ModuleInformation& moduleInformation);

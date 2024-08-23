@@ -115,7 +115,11 @@ ServerUpdateTool::~ServerUpdateTool()
 
     saveInternalState();
     m_downloader->disconnect(this);
-    m_serverConnection.reset();
+    if (m_serverConnection)
+    {
+        m_serverConnection->stop();
+        m_serverConnection.reset();
+    }
 
     NX_VERBOSE(this) << "~ServerUpdateTool() done";
 }
@@ -1169,7 +1173,6 @@ void ServerUpdateTool::requestModuleInformation()
 
             // TODO: #sivanov Looks like we can take existing rest connection here.
             m_serverConnection.reset(new rest::ServerConnection(
-                systemContext()->httpClientPool(),
                 moduleInformation.id,
                 systemContext()->auditId(),
                 systemContext()->certificateVerifier(),

@@ -25,7 +25,6 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
     d->resourcePropertyDictionary = std::make_unique<QnResourcePropertyDictionary>(this);
     d->saasServiceManager = std::make_unique<saas::ServiceManager>(this);
     d->cameraHistoryPool = std::make_unique<QnCameraHistoryPool>(this);
-
     d->serverAdditionalAddressesDictionary =
         std::make_unique<QnServerAdditionalAddressesDictionary>();
     d->runtimeInfoManager = std::make_unique<QnRuntimeInfoManager>();
@@ -60,31 +59,15 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
     switch (d->mode)
     {
         case Mode::server:
-            d->httpClientPool = std::make_unique<network::http::ClientPool>(this);
             break;
         case Mode::client:
-            d->httpClientPool = std::make_unique<network::http::ClientPool>(this);
             d->deviceLicenseUsageWatcher = std::make_unique<DeviceLicenseUsageWatcher>(this);
             d->videoWallLicenseUsageWatcher = std::make_unique<VideoWallLicenseUsageWatcher>(this);
             break;
         case Mode::unitTests:
-            if (nx::network::SocketGlobals::isInitialized())
-            {
-                // Some tests do not use network. It is OK to not initialize the pool for them.
-                d->httpClientPool = std::make_unique<network::http::ClientPool>(this);
-            }
             d->deviceLicenseUsageWatcher = std::make_unique<DeviceLicenseUsageWatcher>(this);
             d->videoWallLicenseUsageWatcher = std::make_unique<VideoWallLicenseUsageWatcher>(this);
             break;
-    }
-
-    if (d->httpClientPool)
-    {
-        d->httpClientPool->setDefaultTimeouts(nx::network::http::AsyncClient::Timeouts{
-            .sendTimeout = ::rest::kDefaultVmsApiTimeout,
-            .responseReadTimeout = ::rest::kDefaultVmsApiTimeout,
-            .messageBodyReadTimeout = ::rest::kDefaultVmsApiTimeout
-        });
     }
 
     d->cameraNamesWatcher = std::make_unique<QnCameraNamesWatcher>((this));
@@ -200,11 +183,6 @@ QnResourcePropertyDictionary* SystemContext::resourcePropertyDictionary() const
 QnCameraHistoryPool* SystemContext::cameraHistoryPool() const
 {
     return d->cameraHistoryPool.get();
-}
-
-nx::network::http::ClientPool* SystemContext::httpClientPool() const
-{
-    return d->httpClientPool.get();
 }
 
 QnServerAdditionalAddressesDictionary* SystemContext::serverAdditionalAddressesDictionary() const
