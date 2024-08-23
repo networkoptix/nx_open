@@ -22,8 +22,6 @@ class QnCommonModule;
 
 namespace rest { class ServerConnection; }
 
-namespace nx::vms::common { class SystemContext; }
-
 namespace nx::vms::client::core {
 
 class CertificateCache;
@@ -56,8 +54,6 @@ public:
 
     /** Initialize message bus connection. Actual for the current connection only. */
     void initializeMessageBusConnection(QnCommonModule* commonModule);
-
-    void initializeApiConnection(common::SystemContext* systemContext);
 
     const nx::vms::api::ModuleInformation& moduleInformation() const;
 
