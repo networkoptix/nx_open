@@ -5822,7 +5822,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Could not open file &quot;%1&quot;. Please check if the folder is accessible.</source>
-      <translation>ファイル &quot;%1&quot; を開くことができませんでした。フォルダがアクセス可能か確認してください。</translation>
+      <translation>ファイル &quot;%1&quot; を開くことができませんでした。フォルダーにアクセス可能か確認してください。</translation>
     </message>
   </context>
   <context>
