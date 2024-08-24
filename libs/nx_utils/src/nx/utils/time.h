@@ -194,14 +194,14 @@ public:
         shiftCurrentTime(m_clockType, m_currentAbsoluteShift);
     }
 
-    ScopedTimeShift(ScopedTimeShift&& rhs):
+    ScopedTimeShift(ScopedTimeShift&& rhs) noexcept:
         m_clockType(rhs.m_clockType),
         m_currentAbsoluteShift(rhs.m_currentAbsoluteShift)
     {
         rhs.m_currentAbsoluteShift = std::chrono::milliseconds::zero();
     }
 
-    ScopedTimeShift& operator=(ScopedTimeShift&& rhs)
+    ScopedTimeShift& operator=(ScopedTimeShift&& rhs) noexcept
     {
         if (&rhs == this)
             return *this;

@@ -26,10 +26,10 @@ public:
     ~ByteArray();
 
     ByteArray() = default;
-    ByteArray(ByteArray&& other);
+    ByteArray(ByteArray&& other) noexcept;
     ByteArray(const ByteArray& other);
     ByteArray& operator=(const ByteArray& right);
-    ByteArray& operator=(ByteArray&& source);
+    ByteArray& operator=(ByteArray&& source) noexcept;
 
     /**
      * Clears this byte array. Note that capacity remains unchanged.

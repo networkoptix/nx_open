@@ -130,7 +130,7 @@ ByteArray::ByteArray(const ByteArray& other)
     *this = other;
 }
 
-ByteArray::ByteArray(ByteArray&& other)
+ByteArray::ByteArray(ByteArray&& other) noexcept
 {
     *this = std::move(other);
 }
@@ -155,7 +155,7 @@ ByteArray& ByteArray::operator=(const ByteArray& right)
     return *this;
 }
 
-ByteArray& ByteArray::operator=(ByteArray&& right)
+ByteArray& ByteArray::operator=(ByteArray&& right) noexcept
 {
     if (&right == this)
         return *this;
@@ -204,7 +204,6 @@ bool ByteArray::reallocate(size_t capacity)
 
     if (m_data && m_size)
         memcpy(data, m_data, m_size);
-
 
     if (m_data)
         nx::kit::utils::freeAligned(m_data);

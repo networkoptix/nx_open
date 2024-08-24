@@ -52,8 +52,14 @@ ObjectInstanceCounter<T>::ObjectInstanceCounter(const ObjectInstanceCounter&)
     SocketGlobals::instance().debugCounters().recordObjectCreation<T>();
 }
 
+// This move constructor may throw, that breaks C++ Core Guidelines F.6 and is very unusual.
+// We mark it with explicit `noexcept(false)` and suppress the warning.
 template<class T>
 ObjectInstanceCounter<T>::ObjectInstanceCounter(ObjectInstanceCounter&&)
+    #if defined(_MSC_VER)
+        #pragma warning(suppress: 26439)
+    #endif
+    noexcept(false)
 {
     SocketGlobals::instance().allocationAnalyzer().recordObjectCreation(this);
     SocketGlobals::instance().debugCounters().recordObjectCreation<T>();

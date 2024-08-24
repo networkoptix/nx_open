@@ -41,7 +41,7 @@ public:
     Ptr(Ptr<OtherRefCountable>&& other): m_ptr(other.releasePtr()) {}
 
     /** Defined because the template above does not suppress generation of such member. */
-    Ptr(Ptr&& other): m_ptr(other.releasePtr()) {}
+    Ptr(Ptr&& other) noexcept: m_ptr(other.releasePtr()) {}
 
     template<class OtherRefCountable>
     Ptr& operator=(const Ptr<OtherRefCountable>& other) { return assignConst(other); }
@@ -53,7 +53,7 @@ public:
     Ptr& operator=(Ptr<OtherRefCountable>&& other) { return assignRvalue(std::move(other)); }
 
     /** Defined because the template above does not work for same-type assignment. */
-    Ptr& operator=(Ptr&& other) { return assignRvalue(std::move(other)); }
+    Ptr& operator=(Ptr&& other) noexcept { return assignRvalue(std::move(other)); }
 
     ~Ptr() { releaseRef(); }
 

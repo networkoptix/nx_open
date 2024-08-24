@@ -36,7 +36,9 @@ public:
         m_setter(m_object, newValue);
     }
 
-    QnGenericScopedValueRollback(QnGenericScopedValueRollback&& other):
+    QnGenericScopedValueRollback(QnGenericScopedValueRollback&& other) noexcept(
+        std::is_nothrow_move_constructible_v<T> && std::is_nothrow_move_constructible_v<Setter>)
+        :
         m_object(std::move(other.m_object)),
         m_setter(std::move(other.m_setter)),
         m_rollbackValue(std::move(other.m_rollbackValue)),
@@ -72,7 +74,6 @@ private:
     T m_rollbackValue;
     bool m_committed;
 };
-
 
 namespace detail {
 
@@ -131,7 +132,6 @@ public:
     {
     }
 };
-
 
 class QnScopedPropertyRollback: public QnGenericScopedValueRollback<
     QVariant, QObject, ::detail::PropertySetterGetter, ::detail::PropertySetterGetter>

@@ -15,7 +15,7 @@ public:
     ScopedConnection() = default;
     ScopedConnection(QMetaObject::Connection handle): m_handle(handle) {}
     ScopedConnection(const ScopedConnection&) = delete;
-    ScopedConnection(ScopedConnection&& other): m_handle(other.release()) {}
+    ScopedConnection(ScopedConnection&& other) noexcept: m_handle(other.release()) {}
 
     ~ScopedConnection() { reset(); }
 
@@ -47,13 +47,16 @@ class ScopedConnections
 public:
     ScopedConnections() = default;
     ScopedConnections(const ScopedConnections&) = delete;
-    ScopedConnections(ScopedConnections&& other): m_connections(std::move(other.m_connections)) {}
+    ScopedConnections(ScopedConnections&& other) noexcept:
+        m_connections(std::move(other.m_connections))
+    {
+    }
 
     ~ScopedConnections() = default;
 
     ScopedConnections& operator=(const ScopedConnections&) = delete;
 
-    ScopedConnections& operator=(ScopedConnections&& other)
+    ScopedConnections& operator=(ScopedConnections&& other) noexcept
     {
         m_connections = std::move(other.m_connections);
         return *this;

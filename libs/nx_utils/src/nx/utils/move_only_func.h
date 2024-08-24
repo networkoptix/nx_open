@@ -3,6 +3,7 @@
 #pragma once
 
 #include <functional>
+#include <type_traits>
 
 #include <nx/utils/log/assert.h>
 
@@ -43,7 +44,9 @@ class MoveOnlyFunc:
             return *this;
         }
 
-        MoveOnlyFuncWrapper(MoveOnlyFuncWrapper&& rhs):
+        MoveOnlyFuncWrapper(MoveOnlyFuncWrapper&& rhs) noexcept(
+            std::is_nothrow_move_constructible_v<Func>)
+            :
             m_func(std::move(rhs.m_func))
         {
         }

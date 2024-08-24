@@ -87,7 +87,16 @@ public:
     }
 
     template<class OtherResource>
-    QnSharedResourcePointer(const QnSharedResourcePointer<OtherResource>& other):
+    QnSharedResourcePointer(const QnSharedResourcePointer<OtherResource>& other)
+        #ifdef TRACE_REFCOUNT_CHANGE
+            #ifdef _MSC_VER
+                #pragma warning(suppress: 26439)
+            #endif
+            noexcept(false)
+        #else
+            noexcept
+        #endif
+        :
         base_type(other)
     {
         #ifdef TRACE_REFCOUNT_CHANGE

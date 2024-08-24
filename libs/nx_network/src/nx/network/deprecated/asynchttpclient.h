@@ -297,7 +297,7 @@ public:
     {
     }
 
-    AsyncHttpClientPtr(AsyncHttpClientPtr&& right)
+    AsyncHttpClientPtr(AsyncHttpClientPtr&& right) noexcept
     {
         std::swap(m_obj, right.m_obj);
     }
@@ -311,7 +311,13 @@ public:
         return *this;
     }
 
+    // This move assignment operator may throw in `reset()`, that breaks C++ Core Guidelines F.6 and
+    // is very unusual. We mark it with explicit `noexcept(false)` and suppress the warning.
     AsyncHttpClientPtr& operator=(AsyncHttpClientPtr&& right)
+        #if defined(_MSC_VER)
+            #pragma warning(suppress: 26439)
+        #endif
+        noexcept(false)
     {
         if (this == &right)
             return *this;
