@@ -219,7 +219,7 @@ void SystemTabBar::contextMenuEvent(QContextMenuEvent* event)
     const int index = tabAt(event->pos());
 
     QMenu menu(this);
-    menu.addAction(tr("Disconnect"),
+    menu.addAction(tr("Close"),
         [this, index]()
         {
             if (!NX_ASSERT(m_store))
