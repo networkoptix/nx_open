@@ -265,13 +265,15 @@ void SystemTabBar::disconnectFromSystem(const nx::Uuid& localId)
             action(menu::ResourcesModeAction)->setChecked(false);
             menu()->trigger(menu::DisconnectAction);
         }
+        else
+        {
+            const int systemIndex = state.activeSystemTab == state.systems.size() - 1
+                ? (state.activeSystemTab - 1)
+                : (state.activeSystemTab + 1);
 
-        const int systemIndex = state.activeSystemTab == state.systems.size() - 1
-            ? (state.activeSystemTab - 1)
-            : (state.activeSystemTab + 1);
-
-        const auto systemData = state.systems[systemIndex];
-        connectToSystem(systemData.systemDescription, systemData.logonData);
+            const auto systemData = state.systems[systemIndex];
+            connectToSystem(systemData.systemDescription, systemData.logonData);
+        }
     }
 
     m_store->removeSystem(localId);
