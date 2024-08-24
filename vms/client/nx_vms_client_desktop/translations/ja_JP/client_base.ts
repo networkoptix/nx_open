@@ -6141,7 +6141,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Could not open file &quot;%1&quot;. Please check if the folder is accessible.</source>
-      <translation>ファイル &quot;%1&quot; を開くことができませんでした。フォルダがアクセス可能か確認してください。</translation>
+      <translation>ファイル &quot;%1&quot; を開くことができませんでした。フォルダーにアクセス可能か確認してください。</translation>
     </message>
   </context>
   <context>
