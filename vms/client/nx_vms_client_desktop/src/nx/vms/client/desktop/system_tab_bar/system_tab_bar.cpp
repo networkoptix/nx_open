@@ -252,16 +252,19 @@ void SystemTabBar::contextMenuEvent(QContextMenuEvent* event)
     QnHiDpiWorkarounds::showMenu(&menu, QCursor::pos());
 }
 
-bool SystemTabBar::disconnectFromSystem(const nx::Uuid& localId)
+void SystemTabBar::disconnectFromSystem(const nx::Uuid& localId)
 {
     if (!windowContext()->connectActionsHandler()->askDisconnectConfirmation())
-        return false;
+        return;
 
     const auto state = m_store->state();
     if (state.currentSystemId == localId)
     {
         if (state.systems.size() == 1)
+        {
             action(menu::ResourcesModeAction)->setChecked(false);
+            menu()->trigger(menu::DisconnectAction);
+        }
 
         const int systemIndex = state.activeSystemTab == state.systems.size() - 1
             ? (state.activeSystemTab - 1)
@@ -271,7 +274,7 @@ bool SystemTabBar::disconnectFromSystem(const nx::Uuid& localId)
         connectToSystem(systemData.systemDescription, systemData.logonData);
     }
 
-    return true;
+    m_store->removeSystem(localId);
 }
 
 void SystemTabBar::insertClosableTab(int index,
@@ -286,8 +289,7 @@ void SystemTabBar::insertClosableTab(int index,
     connect(closeButton, &CloseTabButton::clicked,
         [this, localId = systemDescription->localId()]()
         {
-            if (disconnectFromSystem(localId))
-                m_store->removeSystem(localId);
+            disconnectFromSystem(localId);
         });
 
    // closeButton is owned by the tab, so we can use it as a receiver here.

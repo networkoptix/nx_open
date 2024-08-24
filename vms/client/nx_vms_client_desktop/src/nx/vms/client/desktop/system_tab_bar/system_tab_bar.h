@@ -45,7 +45,7 @@ private slots:
 private:
     void insertClosableTab(int index, const core::SystemDescriptionPtr& systemDescription);
     void connectToSystem(const core::SystemDescriptionPtr& system, const LogonData& logonData);
-    bool disconnectFromSystem(const nx::Uuid& localId);
+    void disconnectFromSystem(const nx::Uuid& localId);
     QPixmap imageData(int tabIndex) const;
     LogonData adjustedLogonData(const LogonData& source, const nx::Uuid& localId) const;
 
