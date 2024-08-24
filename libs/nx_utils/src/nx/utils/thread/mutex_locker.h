@@ -28,7 +28,7 @@ public:
             m_mutex->unlock();
     }
 
-    Locker(Locker&& rhs):
+    Locker(Locker&& rhs) noexcept:
         m_mutex(rhs.m_mutex),
         m_lockMethod(rhs.m_lockMethod),
         m_sourceFile(rhs.m_sourceFile),
@@ -39,7 +39,7 @@ public:
         rhs.m_isLocked = false;
     }
 
-    Locker& operator=(Locker&& rhs)
+    Locker& operator=(Locker&& rhs) noexcept
     {
         if (m_isLocked)
             unlock();

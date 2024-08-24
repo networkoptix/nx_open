@@ -103,8 +103,8 @@ public:
 
 public:
     ColorTree(const ColorThemeReader::MetaColorNode::Ptr metaTree);
-    ColorTree(const ColorTree&& other);
-    ColorTree& operator=(const ColorTree&& other);
+    ColorTree(ColorTree&& other) noexcept;
+    ColorTree& operator=(ColorTree&& other) noexcept;
 
     ColorTree() = delete;
     ColorTree(const ColorTree&) = delete;

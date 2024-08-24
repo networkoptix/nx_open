@@ -48,7 +48,7 @@ public:
     BasicBuffer(const std::basic_string_view<value_type>& other);
 
     BasicBuffer(const BasicBuffer&);
-    BasicBuffer(BasicBuffer&&);
+    BasicBuffer(BasicBuffer&&) noexcept;
 
     void assign(const value_type* buf, size_type count);
     void assign(const value_type* buf);
@@ -59,7 +59,7 @@ public:
     void assign(const std::basic_string_view<value_type>& other);
 
     BasicBuffer& operator=(const BasicBuffer&);
-    BasicBuffer& operator=(BasicBuffer&&);
+    BasicBuffer& operator=(BasicBuffer&&) noexcept;
 
     BasicBuffer& operator=(const value_type* buf);
     BasicBuffer& operator=(const std::basic_string<value_type>& other);
@@ -325,7 +325,7 @@ BasicBuffer<CharType>::BasicBuffer(const BasicBuffer& other)
 }
 
 template<typename CharType>
-BasicBuffer<CharType>::BasicBuffer(BasicBuffer&& other)
+BasicBuffer<CharType>::BasicBuffer(BasicBuffer&& other) noexcept
 {
     *this = std::move(other);
 }
@@ -416,7 +416,7 @@ BasicBuffer<CharType>& BasicBuffer<CharType>::operator=(const BasicBuffer& other
 }
 
 template<typename CharType>
-BasicBuffer<CharType>& BasicBuffer<CharType>::operator=(BasicBuffer&& other)
+BasicBuffer<CharType>& BasicBuffer<CharType>::operator=(BasicBuffer&& other) noexcept
 {
     m_str = std::move(other.m_str);
     m_qByteArray = std::move(other.m_qByteArray);

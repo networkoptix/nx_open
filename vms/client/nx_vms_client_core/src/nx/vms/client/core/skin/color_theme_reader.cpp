@@ -311,11 +311,11 @@ ColorTree::ColorTree(const ColorThemeReader::MetaColorNode::Ptr metaTree):
     copyNodes(m_root, metaTree);
 }
 
-ColorTree::ColorTree(const ColorTree&& other):
+ColorTree::ColorTree(ColorTree&& other) noexcept:
     m_root(std::move(other.m_root))
 {}
 
-ColorTree& ColorTree::operator=(const ColorTree&& other)
+ColorTree& ColorTree::operator=(ColorTree&& other) noexcept
 {
     m_root = std::move(other.m_root);
     return *this;
