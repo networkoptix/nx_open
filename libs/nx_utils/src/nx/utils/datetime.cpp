@@ -83,7 +83,8 @@ QString timestampToDebugString(qint64 timestampMs, const QString& format)
     const QString defaultFormat = nx::utils::ini().debugTimeRepresentation;
 
     const auto dateTime = QDateTime::fromMSecsSinceEpoch(timestampMs, Qt::UTC);
-    return dateTime.toString(format.isEmpty() ? defaultFormat : format);
+    return dateTime.toString(format.isEmpty() ? defaultFormat : format)
+        + nx::format(" (%1)", timestampMs);
 }
 
 QString timestampToDebugString(milliseconds timestamp, const QString& format)

@@ -525,8 +525,14 @@ void AnalyticsSearchWidget::Private::ensureVisibleAndFetchIfNeeded(
     if (ensureVisible(timestamp, trackId))
         return;
 
-    if (!NX_ASSERT(proposedTimeWindow.contains(timestamp)))
+    // Search models consider QnTimePeriod::endTime included in time windows, consistently with the
+    // server and its request handlers, while QnTimePeriod::contains() considers endTime excluded.
+    // Therefore we cannot use QnTimePeriod::contains() here.
+    if (!NX_ASSERT(timestamp >= proposedTimeWindow.startTime()
+        && timestamp <= proposedTimeWindow.endTime()))
+    {
         return;
+    }
 
     m_model->cancelFetch();
     m_ensureVisibleRequest = std::make_pair(timestamp, trackId);
