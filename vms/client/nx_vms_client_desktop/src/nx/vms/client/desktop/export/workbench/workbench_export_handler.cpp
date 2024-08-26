@@ -336,16 +336,20 @@ WorkbenchExportHandler::WorkbenchExportHandler(QObject *parent):
     connect(d->exportManager.get(), &ExportManager::processFinished, this,
         &WorkbenchExportHandler::exportProcessFinished);
 
-    connect(
-        appContext()->resourceDirectoryBrowser(),
-        &ResourceDirectoryBrowser::layoutUpdatedFromFile,
-        this,
-        [](const QnFileLayoutResourcePtr& layout)
-        {
-            auto systemContext = SystemContext::fromResource(layout);
-            if (NX_ASSERT(systemContext))
-                systemContext->layoutSnapshotManager()->store(layout);
-        });
+    // Resource directory browser may be not initialized in some scenarios.
+    if (auto resourceDirectoryBrowser = appContext()->resourceDirectoryBrowser())
+    {
+        connect(
+            resourceDirectoryBrowser,
+            &ResourceDirectoryBrowser::layoutUpdatedFromFile,
+            this,
+            [](const QnFileLayoutResourcePtr& layout)
+            {
+                auto systemContext = SystemContext::fromResource(layout);
+                if (NX_ASSERT(systemContext))
+                    systemContext->layoutSnapshotManager()->store(layout);
+            });
+    }
 
     connect(action(menu::ExportVideoAction), &QAction::triggered, this,
         [this]()
