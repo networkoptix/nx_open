@@ -29,6 +29,14 @@ NxObject
         property real interruptedPosition: -1
         property bool interrupted: false
 
+        onInterruptedOnInactivityChanged:
+        {
+            // As we have problems on iOS that after application awake stream can jump forward to
+            // the next I frame, we need to forcibly stop media player on app moving to background.
+            if (interruptOnInactivity)
+                interrupt(/*forceStop*/ true)
+        }
+
         onCanPlayChanged:
         {
             if (canPlay)
@@ -49,12 +57,21 @@ NxObject
 
         function tryInterrupt()
         {
-            if (!player || player.playbackState !== MediaPlayer.Playing || d.interrupted)
-                return
+            if (player && player.playbackState === MediaPlayer.Playing && !d.interrupted)
+                interrupt(/*forceStop*/ false)
+        }
+
+        function interrupt(forceStop)
+        {
+            // Store interrupted position only once per interruption cycle.
+            if (!d.interrupted)
+                d.interruptedPosition = currentPosition()
 
             d.interrupted = true
-            d.interruptedPosition = currentPosition()
-            player.pause()
+            if (forceStop)
+                player.stop()
+            else
+                player.pause()
         }
 
         function currentPosition()
