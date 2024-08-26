@@ -68,7 +68,7 @@ public:
 
     private:
         TimerManager* m_timerManager;
-        TimerId m_timerID;
+        TimerId m_timerId;
 
         TimerGuard(const TimerGuard& right);
         TimerGuard& operator=(const TimerGuard& right);

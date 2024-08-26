@@ -89,7 +89,7 @@ private:
         const applauncher::api::AddProcessKillTimerRequest& request,
         applauncher::api::AddProcessKillTimerResponse& response);
 
-    virtual void onTimer(const quint64& timerID) override;
+    virtual void onTimer(const quint64& timerId) override;
 
     template<class CallbackType>
     bool subscribe(applauncher::api::TaskType task,

@@ -22,7 +22,7 @@ using namespace std;
 
 TimerManager::TimerGuard::TimerGuard():
     m_timerManager(nullptr),
-    m_timerID(0)
+    m_timerId(0)
 {
 }
 
@@ -31,15 +31,15 @@ TimerManager::TimerGuard::TimerGuard(
     TimerId timerId)
 :
     m_timerManager(TimerManager),
-    m_timerID(timerId)
+    m_timerId(timerId)
 {
 }
 
 TimerManager::TimerGuard::TimerGuard(TimerGuard&& right):
     m_timerManager(right.m_timerManager),
-    m_timerID(right.m_timerID)
+    m_timerId(right.m_timerId)
 {
-    right.m_timerID = 0;
+    right.m_timerId = 0;
 }
 
 TimerManager::TimerGuard::~TimerGuard()
@@ -56,46 +56,46 @@ TimerManager::TimerGuard& TimerManager::TimerGuard::operator=(
     reset();
 
     m_timerManager = right.m_timerManager;
-    m_timerID = right.m_timerID;
-    right.m_timerID = 0;
+    m_timerId = right.m_timerId;
+    right.m_timerId = 0;
     return *this;
 }
 
 void TimerManager::TimerGuard::reset()
 {
-    if (!m_timerID)
+    if (!m_timerId)
         return;
-    m_timerManager->joinAndDeleteTimer(m_timerID);
-    m_timerID = 0;
+    m_timerManager->joinAndDeleteTimer(m_timerId);
+    m_timerId = 0;
 }
 
 TimerId TimerManager::TimerGuard::get() const
 {
-    return m_timerID;
+    return m_timerId;
 }
 
 TimerId TimerManager::TimerGuard::release()
 {
-    const auto result = m_timerID;
-    m_timerID = 0;
+    const auto result = m_timerId;
+    m_timerId = 0;
     return result;
 }
 
 TimerManager::TimerGuard::operator bool_type() const
 {
-    return m_timerID ? &TimerGuard::this_type_does_not_support_comparisons : 0;
+    return m_timerId ? &TimerGuard::this_type_does_not_support_comparisons : 0;
 }
 
 bool TimerManager::TimerGuard::operator==(
     const TimerManager::TimerGuard& right) const
 {
-    return m_timerID == right.m_timerID;
+    return m_timerId == right.m_timerId;
 }
 
 bool TimerManager::TimerGuard::operator!=(
     const TimerManager::TimerGuard& right) const
 {
-    return m_timerID != right.m_timerID;
+    return m_timerId != right.m_timerId;
 }
 
 //-------------------------------------------------------------------------------------------------
