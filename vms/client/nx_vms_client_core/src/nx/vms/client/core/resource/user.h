@@ -32,7 +32,7 @@ public:
 
     /** Send request to the currently connected server to save user settings. */
     rest::Handle saveSettings(
-        const UserSettings& value,
+        const nx::vms::api::UserSettings& value,
         common::SessionTokenHelperPtr sessionTokenHelper,
         std::function<void(bool /*success*/, rest::Handle /*handle*/)> callback = {},
         nx::utils::AsyncHandlerExecutor executor = {});

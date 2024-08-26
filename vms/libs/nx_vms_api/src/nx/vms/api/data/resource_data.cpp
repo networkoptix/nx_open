@@ -1,9 +1,9 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#include "resource_data.h"
+
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/std/algorithm.h>
-
-#include "resource_data.h"
 
 namespace nx {
 namespace vms {
@@ -77,6 +77,18 @@ std::optional<QJsonValue> ResourceWithParameters::parameter(const QString& key) 
 {
     if (const auto it = parameters.find(key); it != parameters.end())
         return it->second;
+
+    return std::nullopt;
+}
+
+std::optional<QJsonValue> ResourceWithParameters::takeParameter(const QString& key)
+{
+    if (auto it = parameters.find(key); it != parameters.end())
+    {
+        auto value = std::move(it->second);
+        parameters.erase(it);
+        return value;
+    }
 
     return std::nullopt;
 }

@@ -283,7 +283,7 @@ void ResourcesChangesManager::saveCamerasCore(
 
 // Descendant of nx::vms::api::ServerModel structure that serializes partially to be used as body
 // for partial server resource update via PATCH request.
-struct PartialServerModel: public nx::vms::api::ServerModel
+struct PartialServerModel: public nx::vms::api::ServerModelV1
 {};
 NX_REFLECTION_INSTRUMENT(PartialServerModel, (id)(name)(locationId)(isFailoverEnabled)\
     (maxCameras)(backupBitrateBytesPerSecond)(parameters))

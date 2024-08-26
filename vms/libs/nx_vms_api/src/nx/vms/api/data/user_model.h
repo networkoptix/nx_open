@@ -15,6 +15,7 @@
 #include "resource_data.h"
 #include "user_data_ex.h"
 #include "user_external_id.h"
+#include "user_settings.h"
 
 namespace nx::vms::api {
 
@@ -189,6 +190,12 @@ struct NX_VMS_API UserModelV3: public UserModelBase, public ResourceWithParamete
     /**%apidoc[readonly] Presented only for users with `type` equals to `cloud`. */
     std::optional<bool> account2faEnabled;
 
+    /**%apidoc
+     * Settings used by the Client for the User.
+     * %// Appeared starting from /rest/v4/users
+     */
+    std::optional<UserSettings> settings;
+
     bool operator==(const UserModelV3& other) const = default;
 
     using DbReadTypes = std::tuple<UserData, ResourceParamWithRefDataList>;
@@ -197,11 +204,15 @@ struct NX_VMS_API UserModelV3: public UserModelBase, public ResourceWithParamete
 
     DbUpdateTypes toDbTypes() &&;
     static std::vector<UserModelV3> fromDbTypes(DbListTypes data);
+
+    void convertToApiV3();
+    void convertToLatestApi();
 };
 #define UserModelV3_Fields \
     UserModelBase_Fields \
     ResourceWithParameters_Fields \
-    (groupIds)(permissions)(resourceAccessRights)(temporaryToken)(attributes)(account2faEnabled)
+    (groupIds)(permissions)(resourceAccessRights)(temporaryToken)(attributes)(account2faEnabled) \
+    (settings)
 
 QN_FUSION_DECLARE_FUNCTIONS(UserModelV3, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(UserModelV3, UserModelV3_Fields)

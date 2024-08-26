@@ -212,6 +212,7 @@ struct SystemSettings::Private
     QnResourcePropertyAdaptor<bool>* allowRegisteringIntegrationsAdaptor = nullptr;
 
     AdaptorList allAdaptors;
+    std::unordered_set<QString> settingNames;
 
     mutable nx::Mutex mutex;
     QnUserResourcePtr admin;
@@ -256,6 +257,10 @@ SystemSettings::SystemSettings(SystemContext* context, QObject* parent):
         &SystemSettings::at_resourcePool_resourceRemoved, Qt::DirectConnection);
 
     initialize();
+
+    d->settingNames.reserve(d->allAdaptors.size());
+    for (const auto& s: d->allAdaptors)
+        d->settingNames.emplace(s->key());
 }
 
 SystemSettings::~SystemSettings()
@@ -2351,6 +2356,11 @@ const QList<QnAbstractResourcePropertyAdaptor*>& SystemSettings::allSettings() c
     return d->allAdaptors;
 }
 
+const std::unordered_set<QString>& SystemSettings::allSettingNames() const
+{
+    return d->settingNames;
+}
+
 QList<const QnAbstractResourcePropertyAdaptor*> SystemSettings::allDefaultSettings() const
 {
     QList<const QnAbstractResourcePropertyAdaptor*> result;
@@ -2365,7 +2375,8 @@ QList<const QnAbstractResourcePropertyAdaptor*> SystemSettings::allDefaultSettin
 
 bool SystemSettings::isGlobalSetting(const nx::vms::api::ResourceParamWithRefData& param)
 {
-    return QnUserResource::kAdminGuid == param.resourceId;
+    return QnUserResource::kAdminGuid == param.resourceId
+        && allSettingNames().contains(param.name);
 }
 
 nx::vms::api::MetadataStorageChangePolicy SystemSettings::metadataStorageChangePolicy() const

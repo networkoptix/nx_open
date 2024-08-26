@@ -5,6 +5,7 @@
 #include <chrono>
 #include <optional>
 #include <set>
+#include <unordered_set>
 
 #include <QtCore/QObject>
 #include <QtCore/QString>
@@ -378,10 +379,13 @@ public:
     */
     const QList<QnAbstractResourcePropertyAdaptor*>& allSettings() const;
 
+    // To fast check Admin properties that are global settings at the same time.
+    const std::unordered_set<QString>& allSettingNames() const;
+
     // Returns only settings with default value.
     QList<const QnAbstractResourcePropertyAdaptor*> allDefaultSettings() const;
 
-    static bool isGlobalSetting(const nx::vms::api::ResourceParamWithRefData& param);
+    bool isGlobalSetting(const nx::vms::api::ResourceParamWithRefData& param);
 
     int maxP2pQueueSizeBytes() const;
     qint64 maxP2pQueueSizeForAllClientsBytes() const;

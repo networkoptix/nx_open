@@ -117,6 +117,7 @@ struct NX_VMS_API ResourceWithParameters
     void extractFromList(const nx::Uuid& id, ResourceParamWithRefDataList* list);
     void setFromParameter(const ResourceParamData& parameter);
     std::optional<QJsonValue> parameter(const QString& key) const;
+    std::optional<QJsonValue> takeParameter(const QString& key);
 
     bool operator==(const ResourceWithParameters&) const = default;
     /**%apidoc [opt] Extended resource parameters. */

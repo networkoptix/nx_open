@@ -99,39 +99,6 @@ const QString kDeviceID("DeviceID");
 
 } // namespace ResourcePropertyKey::Onvif
 
-namespace Server {
-
-const QString kCpuArchitecture("cpuArchitecture");
-const QString kCpuModelName("cpuModelName");
-const QString kFlavor("flavor");
-const QString kOsInfo("osInfo");
-const QString kPhysicalMemory("physicalMemory");
-const QString kGuidConflictDetected("guidConflictDetected");
-const QString kBrand("productNameShort");
-const QString kFullVersion("fullVersion");
-const QString kPublicationType("publicationType");
-const QString kPublicIp("publicIp");
-const QString kSystemRuntime("systemRuntime");
-const QString kNetworkInterfaces("networkInterfaces");
-const QString kBookmarkCount("bookmarkCount");
-const QString kUdtInternetTraffic_bytes("udtInternetTraffic_bytes");
-const QString kHddList("hddList");
-const QString kNvrPoePortPoweringModes("nvrPoePortPoweringModes");
-const QString kCertificate("certificate");
-const QString kUserProvidedCertificate("userProvidedCertificate");
-const QString kWebCamerasDiscoveryEnabled("webCamerasDiscoveryEnabled");
-const QString kMetadataStorageIdKey("metadataStorageId");
-const QString kTimeZoneInformation("timeZoneInformation");
-const QString kPortForwardingConfigurations("portForwardingConfigurations");
-
-} // namespace ResourcePropertyKey::Server
-
-namespace User {
-
-const QString kUserSettings = "userSettings";
-
-} // namespace ResourcePropertyKey::User
-
 namespace WebPage {
 
 const QString kSubtypeKey("subtype");
