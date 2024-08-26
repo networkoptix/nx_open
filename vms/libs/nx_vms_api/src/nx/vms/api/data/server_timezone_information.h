@@ -17,6 +17,8 @@ struct NX_VMS_API ServerTimeZoneInformation
 
     /**%apidoc Identification of the time zone in the text form. */
     QString timeZoneId;
+
+    bool operator==(const ServerTimeZoneInformation& other) const = default;
 };
 #define ServerTimeZoneInformation_Fields (timeZoneOffsetMs)(timeZoneId)
 NX_REFLECTION_INSTRUMENT(ServerTimeZoneInformation, ServerTimeZoneInformation_Fields);

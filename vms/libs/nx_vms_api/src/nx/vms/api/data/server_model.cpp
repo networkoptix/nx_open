@@ -7,6 +7,7 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/crud_model.h>
 #include <nx/utils/std/algorithm.h>
+#include <nx/vms/api/data/resource_property_key.h>
 
 namespace nx::vms::api {
 
@@ -40,76 +41,202 @@ struct ServerIdAsParentId
     nx::Uuid parentId;
 
     ServerIdAsParentId() = default;
-    ServerIdAsParentId(const ServerModel& model): parentId(model.id) {}
+    ServerIdAsParentId(const ServerModelBase& model): parentId(model.id) {}
 };
 
-std::vector<ServerModel> fromServerData(std::vector<MediaServerData> dataList)
+std::vector<QString> endpointsFromServerData(MediaServerData&& d)
+{
+    if (d.networkAddresses.isEmpty())
+        return {};
+
+    auto s = d.networkAddresses.split(';');
+    return {std::make_move_iterator(s.begin()), std::make_move_iterator(s.end())};
+}
+
+QString endpointsToServerData(std::vector<QString> endpoints)
+{
+    return QStringList(endpoints.begin(), endpoints.end()).join(QChar(';'));
+}
+
+std::map<QString, QString> networkInterfacesFromParameter(QString serialized)
+{
+    std::map<QString, QString> interfaces;
+    for (auto&& item: serialized.split(", "))
+    {
+        auto delimPos = item.lastIndexOf(": ");
+        if (delimPos < 0)
+            continue;
+        interfaces.emplace(item.mid(0, delimPos), item.mid(delimPos + 2));
+    }
+    return interfaces;
+}
+
+template<typename Model>
+void extractFailoverSettings(Model* m, const MediaServerUserAttributesData& data)
+{
+    // Default initialization for `ServerModel::maxCameras` is `0`.
+    // No need to check for `0` for the attribute.
+    m->maxCameras = data.maxCameras;
+    m->isFailoverEnabled = data.allowAutoRedundancy;
+    m->locationId = data.locationId;
+}
+
+template<typename Model>
+void saveFailoverSettings(const Model& model, MediaServerUserAttributesData* data)
+{
+    data->maxCameras = model.maxCameras;
+    data->allowAutoRedundancy = model.isFailoverEnabled;
+    data->locationId = model.locationId;
+}
+
+void extractParametersToFields(ServerModelV1* /*m*/)
+{}
+
+void extractParametersToFields(ServerModelV4* m)
+{
+    if (!m->network)
+        m->network.emplace();
+
+    if (auto param = m->takeParameter(server_properties::kCertificate))
+    {
+        if (auto value = param->toString(); !value.isEmpty())
+            m->network->certificatePem = value.toStdString();
+    }
+    if (auto param = m->takeParameter(server_properties::kUserProvidedCertificate))
+    {
+        if (auto value = param->toString(); !value.isEmpty())
+            m->network->userProvidedCertificatePem = value.toStdString();
+    }
+    if (auto param = m->takeParameter(server_properties::kPublicIp))
+        m->network->publicIp = param->toString();
+    if (auto param = m->takeParameter(server_properties::kNetworkInterfaces))
+        m->network->networkInterfaces = networkInterfacesFromParameter(param->toString());
+
+    if (!m->runtimeInformation)
+        m->runtimeInformation.emplace();
+
+    const auto hwInfoGet =
+        [m]()
+        {
+            if (!m->runtimeInformation->hardwareInformation)
+                m->runtimeInformation->hardwareInformation.emplace();
+            return &m->runtimeInformation->hardwareInformation.value();
+        };
+    if (auto param = m->takeParameter(server_properties::kCpuArchitecture))
+        hwInfoGet()->cpuArchitecture = param->toString();
+    if (auto param = m->takeParameter(server_properties::kCpuModelName))
+        hwInfoGet()->cpuModelName = param->toString();
+    if (auto param = m->takeParameter(server_properties::kPhysicalMemory))
+        hwInfoGet()->physicalMemoryB = param->toDouble();
+
+    if (auto param = m->takeParameter(server_properties::kTimeZoneInformation);
+        param && param->isObject())
+    {
+        m->runtimeInformation->timezone.emplace();
+        QJson::deserialize(*param, &m->runtimeInformation->timezone.value());
+    }
+    if (auto param = m->takeParameter(server_properties::kGuidConflictDetected))
+        m->runtimeInformation->idConflictDetected = param->toBool();
+
+    if (!m->settings)
+        m->settings.emplace();
+
+    if (auto param = m->takeParameter(server_properties::kWebCamerasDiscoveryEnabled))
+        m->settings->webCamerasDiscoveryEnabled = param->toBool();
+}
+
+void moveFieldsToParameters(ServerModelV1* /*m*/)
+{}
+
+void moveFieldsToParameters(ServerModelV4* m)
+{
+    m->parameters[server_properties::kCertificate] =
+        m->network
+            ? QString::fromStdString(m->network->certificatePem)
+            : QString();
+
+    m->parameters[server_properties::kWebCamerasDiscoveryEnabled] =
+        m->settings ? m->settings->webCamerasDiscoveryEnabled : false;
+}
+
+template<typename Model>
+std::vector<Model> fromServerData(std::vector<MediaServerData> dataList)
 {
     using namespace nx::utils;
 
-    std::vector<ServerModel> result;
+    std::vector<Model> result;
     result.reserve(dataList.size());
 
     for (auto&& d: dataList)
     {
-        using namespace nx::utils;
+        Model m;
+        m.id = d.id;
+        m.name = std::move(d.name);
+        m.url = std::move(d.url);
+        m.version = std::move(d.version);
+        m.authKey = std::move(d.authKey);
+        m.osInfo =
+            !d.osInfo.isEmpty() ? std::optional{OsInfo::fromString(d.osInfo)} : std::nullopt;
+        m.flags = d.flags;
+        m.status = ResourceStatus::undefined;
+        if constexpr (std::is_same_v<Model, ServerModelV1>)
+        {
+            m.endpoints = endpointsFromServerData(std::move(d));
+        }
+        else
+        {
+            m.network.emplace();
+            m.network->endpoints = endpointsFromServerData(std::move(d));
+        }
 
-        // Don't mind Clang-Tidy: `emplace_back` will not compile.
-        result.push_back({.id = d.id,
-            .name = std::move(d.name),
-            .url = std::move(d.url),
-            .version = std::move(d.version),
-            .endpoints =
-                [&]() -> std::vector<QString>
-                {
-                    if (d.networkAddresses.isEmpty())
-                        return {};
-
-                    auto s = d.networkAddresses.split(';');
-                    return {std::make_move_iterator(s.begin()), std::make_move_iterator(s.end())};
-                }(),
-            .authKey = std::move(d.authKey),
-            .osInfo =
-                !d.osInfo.isEmpty() ? std::optional{OsInfo::fromString(d.osInfo)} : std::nullopt,
-            .flags = d.flags,
-            .status = ResourceStatus::undefined});
+        result.push_back(std::move(m));
     }
 
     return result;
 }
 
-} // namespace
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ServerModel, (json), ServerModel_Fields)
-
-ServerModel::DbUpdateTypes ServerModel::toDbTypes() &&
+template<typename Model>
+typename Model::DbUpdateTypes toDbTypes(Model model)
 {
     MediaServerData mainData;
-    mainData.id = std::move(id);
-    mainData.name = std::move(name);
-    mainData.url = std::move(url);
-    mainData.version = std::move(version);
-    mainData.flags = std::move(flags);
-    mainData.authKey = std::move(authKey);
-    if (!endpoints.empty())
+    mainData.id = std::move(model.id);
+    mainData.name = std::move(model.name);
+    mainData.url = std::move(model.url);
+    mainData.version = std::move(model.version);
+    mainData.flags = std::move(model.flags);
+    mainData.authKey = std::move(model.authKey);
+    if (model.osInfo)
+        mainData.osInfo = model.osInfo->toString();
+
+    if constexpr (std::is_same_v<Model, ServerModelV1>)
     {
-        mainData.networkAddresses =
-            QStringList(endpoints.begin(), endpoints.end()).join(QChar(';'));
+        if (model.endpoints.empty())
+            mainData.networkAddresses = endpointsToServerData(std::move(model.endpoints));
     }
-    if (osInfo)
-        mainData.osInfo = osInfo->toString();
+    else
+    {
+        if (model.network && !model.network->endpoints.empty())
+            mainData.networkAddresses = endpointsToServerData(std::move(model.network->endpoints));
+    }
 
     MediaServerUserAttributesData attributesData;
     attributesData.serverId = mainData.id;
     attributesData.serverName = mainData.name;
-    attributesData.maxCameras = maxCameras;
-    attributesData.allowAutoRedundancy = isFailoverEnabled;
-    attributesData.backupBitrateBytesPerSecond = backupBitrateBytesPerSecond;
-    attributesData.locationId = locationId;
+    attributesData.backupBitrateBytesPerSecond = model.backupBitrateBytesPerSecond;
 
+    if constexpr (std::is_same_v<Model, ServerModelV1>)
+    {
+        saveFailoverSettings(model, &attributesData);
+    }
+    else
+    {
+        saveFailoverSettings(model.settings.value_or(ServerSettings()), &attributesData);
+    }
     attributesData.checkResourceExists = CheckResourceExists::no;
 
-    auto parameters = asList(mainData.id);
+    moveFieldsToParameters(&model);
+
+    auto parameters = model.asList(mainData.id);
     return {
         std::move(mainData),
         std::move(attributesData),
@@ -117,7 +244,8 @@ ServerModel::DbUpdateTypes ServerModel::toDbTypes() &&
     };
 }
 
-std::vector<ServerModel> ServerModel::fromDbTypes(DbListTypes all)
+template<typename Model>
+std::vector<Model> fromDbTypes(typename Model::DbListTypes all)
 {
     const auto binaryFind =
         [](auto& container, const auto& model)
@@ -131,7 +259,7 @@ std::vector<ServerModel> ServerModel::fromDbTypes(DbListTypes all)
     // `std::move(all)` casts to rvalue-reference.
     // `std::get` moves only the requested element.
 
-    std::vector<ServerModel> servers = fromServerData(nx::utils::unique_sorted(
+    std::vector<Model> servers = fromServerData<Model>(nx::utils::unique_sorted(
         std::get<std::vector<MediaServerData>>(std::move(all)), lessById));
 
     // This all can be done by the QueryProcessor or the CrudHandler.
@@ -150,7 +278,7 @@ std::vector<ServerModel> ServerModel::fromDbTypes(DbListTypes all)
             return result;
         }(std::get<std::vector<StorageData>>(std::move(all)));
 
-    for (ServerModel& s: servers)
+    for (Model& s: servers)
     {
         if (auto a = binaryFind(attributes, s))
         {
@@ -159,12 +287,16 @@ std::vector<ServerModel> ServerModel::fromDbTypes(DbListTypes all)
                 ? std::move(a->serverName)
                 : std::move(s.name);
 
-            // Default initialization for `ServerModel::maxCameras` is `0`.
-            // No need to check for `0` for the attribute.
-            s.maxCameras = a->maxCameras;
-            s.isFailoverEnabled = a->allowAutoRedundancy;
             s.backupBitrateBytesPerSecond = a->backupBitrateBytesPerSecond;
-            s.locationId = a->locationId;
+            if constexpr (std::is_same_v<Model, ServerModelV1>)
+            {
+                extractFailoverSettings(&s, std::move(*a));
+            }
+            else
+            {
+                s.settings.emplace();
+                extractFailoverSettings(&s.settings.value(), std::move(*a));
+            }
         }
 
         // `status` should not be nullable in the DB and this check should be an assertion
@@ -200,9 +332,42 @@ std::vector<ServerModel> ServerModel::fromDbTypes(DbListTypes all)
                 std::back_inserter(s.storages),
                 [](StorageData d) { return StorageModel::fromDb(std::move(d)); });
         }
+        extractParametersToFields(&s);
     }
 
     return servers;
+}
+
+} // namespace
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ServerModelBase, (json), ServerModelBase_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ServerModelV1, (json), ServerModelV1_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ServerModelV4, (json), ServerModelV4_Fields)
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ServerHardwareInformation, (json), ServerHardwareInformation_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ServerTimeZoneInformation, (json), ServerTimeZoneInformation_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ServerNetwork, (json), ServerNetwork_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ServerSettings, (json), ServerSettings_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ServerRuntimeInfo, (json), ServerRuntimeInfo_Fields)
+
+ServerModelV1::DbUpdateTypes ServerModelV1::toDbTypes() &&
+{
+    return api::toDbTypes(std::move(*this));
+}
+
+std::vector<ServerModelV1> ServerModelV1::fromDbTypes(DbListTypes all)
+{
+    return api::fromDbTypes<ServerModelV1>(std::move(all));
+}
+
+ServerModelV4::DbUpdateTypes ServerModelV4::toDbTypes() &&
+{
+    return api::toDbTypes(std::move(*this));
+}
+
+std::vector<ServerModelV4> ServerModelV4::fromDbTypes(DbListTypes all)
+{
+    return api::fromDbTypes<ServerModelV4>(std::move(all));
 }
 
 } // namespace nx::vms::api

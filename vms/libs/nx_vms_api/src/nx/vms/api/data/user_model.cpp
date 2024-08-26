@@ -6,6 +6,7 @@
 #include <nx/utils/random.h>
 #include <nx/utils/std/algorithm.h>
 
+#include "resource_property_key.h"
 #include "user_data_deprecated.h"
 #include "user_group_data.h"
 
@@ -124,6 +125,10 @@ QN_FUSION_DEFINE_FUNCTIONS(UserModelV3, (json))
 
 UserModelV3::DbUpdateTypes UserModelV3::toDbTypes() &&
 {
+    if (settings)
+        QJson::serialize(*settings, &parameters[user_properties::kUserSettings]);
+    else
+        parameters[user_properties::kUserSettings] = QString();
     auto parameters = asList(id);
     auto user = std::move(*this).toUserData();
     user.groupIds = std::move(groupIds);
@@ -183,6 +188,15 @@ std::vector<UserModelV3> UserModelV3::fromDbTypes(DbListTypes data)
                     }
                     continue;
                 }
+                if (r.name == user_properties::kUserSettings)
+                {
+                    if (!r.value.isEmpty())
+                    {
+                        model.settings.emplace();
+                        QJson::deserialize(r.value, &*model.settings);
+                    }
+                    continue;
+                }
                 if (r.name != kUserFullName)
                     static_cast<ResourceWithParameters&>(model).setFromParameter(r);
             }
@@ -195,6 +209,27 @@ std::vector<UserModelV3> UserModelV3::fromDbTypes(DbListTypes data)
     }
 
     return result;
+}
+
+void UserModelV3::convertToApiV3()
+{
+    if (settings)
+    {
+        QJson::serialize(*settings, &parameters[user_properties::kUserSettings]);
+        settings = std::nullopt;
+    }
+}
+
+void UserModelV3::convertToLatestApi()
+{
+    if (auto param = takeParameter(user_properties::kUserSettings))
+    {
+        if (param->isObject())
+        {
+            settings.emplace();
+            QJson::deserialize(*param, &*settings);
+        }
+    }
 }
 
 void TemporaryToken::generateToken()

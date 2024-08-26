@@ -25,28 +25,21 @@ using ResourceParamWithRefDataList = std::vector<ResourceParamWithRefData>;
 
 } // namespace nx::vms::api
 
-struct NX_VMS_COMMON_API UserSettings
+namespace nx::vms::common {
+
+struct NX_VMS_COMMON_API UserSettingsEx: nx::vms::api::UserSettings
 {
-    /**
-     * Black list of events, contains events that are disabled.
-     * Example value: ["nx.events.motion", "nx.events.deviceDisconnected"]
-     */
-    std::set<std::string> eventFilter;
+    UserSettingsEx() = default;
+    UserSettingsEx(nx::vms::api::UserSettings&& rhs);
 
-    /**
-     * Preferred locale of the user. Will affect language of the notifications (and later emails)
-     * displayed both in desktop and mobile client.
-     */
-    std::string locale;
-
-    bool operator == (const UserSettings& /*other*/) const = default;
+    bool operator==(const UserSettingsEx& /*other*/) const = default;
     bool isEventWatched(nx::vms::api::EventType eventType) const;
     bool isEventWatched(const QString& eventType) const;
     QList<nx::vms::api::EventType> watchedEvents() const;
     void setWatchedEvents(const QList<nx::vms::api::EventType>& events);
 };
-#define UserSettings_Fields (eventFilter)(locale)
-NX_REFLECTION_INSTRUMENT(UserSettings, UserSettings_Fields)
+
+} // nx::vms::common
 
 struct NX_VMS_COMMON_API QnUserHash
 {
@@ -208,8 +201,8 @@ public:
 
     virtual QString idForToStringFromPtr() const override; //< Used by toString(const T*).
 
-    void setSettings(const UserSettings& settings);
-    UserSettings settings() const;
+    void setSettings(const nx::vms::api::UserSettings& settings);
+    nx::vms::common::UserSettingsEx settings() const;
 
 signals:
     void permissionsChanged(const QnUserResourcePtr& user);

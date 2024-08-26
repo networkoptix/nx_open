@@ -36,7 +36,13 @@ using nx::vms::api::analytics::IntegrationRequestData;
 using namespace nx::vms::api;
 using namespace nx::vms::event;
 
-QList<EventType> UserSettings::watchedEvents() const
+namespace nx::vms::common {
+
+UserSettingsEx::UserSettingsEx(nx::vms::api::UserSettings&& rhs):
+    nx::vms::api::UserSettings(std::move(rhs))
+{}
+
+QList<EventType> UserSettingsEx::watchedEvents() const
 {
     QList<EventType> result;
     for (const auto eventType: allEvents())
@@ -47,7 +53,7 @@ QList<EventType> UserSettings::watchedEvents() const
     return result;
 }
 
-void UserSettings::setWatchedEvents(const QList<EventType>& events)
+void UserSettingsEx::setWatchedEvents(const QList<EventType>& events)
 {
     static const auto allEventFilter =
         []
@@ -66,15 +72,17 @@ void UserSettings::setWatchedEvents(const QList<EventType>& events)
     eventFilter = newEventFilter;
 }
 
-bool UserSettings::isEventWatched(EventType eventType) const
+bool UserSettingsEx::isEventWatched(EventType eventType) const
 {
     return isEventWatched(convertToNewEvent(eventType));
 }
 
-bool UserSettings::isEventWatched(const QString& eventType) const
+bool UserSettingsEx::isEventWatched(const QString& eventType) const
 {
     return !eventFilter.contains(eventType.toStdString());
 }
+
+} // nx::vms::common
 
 QByteArray QnUserHash::toString(const Type& type)
 {
@@ -832,16 +840,12 @@ QString QnUserResource::idForToStringFromPtr() const
 
 void QnUserResource::setSettings(const UserSettings& settings)
 {
-    NX_MUTEX_LOCKER locker(&m_mutex);
-
     setProperty(ResourcePropertyKey::User::kUserSettings,
         QString::fromStdString(nx::reflect::json::serialize(settings)));
 }
 
-UserSettings QnUserResource::settings() const
+nx::vms::common::UserSettingsEx QnUserResource::settings() const
 {
-    NX_MUTEX_LOCKER locker(&m_mutex);
-
     const auto value = getProperty(ResourcePropertyKey::User::kUserSettings);
     UserSettings result;
     nx::reflect::json::deserialize<UserSettings>(value.toStdString(), &result);

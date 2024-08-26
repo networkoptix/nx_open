@@ -63,7 +63,7 @@ void UserResource::updateInternal(const QnResourcePtr& source, NotifierList& not
 }
 
 rest::Handle UserResource::saveSettings(
-    const UserSettings& value,
+    const nx::vms::api::UserSettings& value,
     common::SessionTokenHelperPtr sessionTokenHelper,
     std::function<void(bool /*success*/, rest::Handle /*handle*/)> callback,
     nx::utils::AsyncHandlerExecutor executor)

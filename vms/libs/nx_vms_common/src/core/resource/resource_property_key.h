@@ -6,6 +6,8 @@
 
 #include <QtCore/QString>
 
+#include <nx/vms/api/data/resource_property_key.h>
+
 /**
  * Contains the keys to treat properties of Resources (QnResource and its inheritors). Properties
  * are mutable attributes of a Resource. The type of any property is QString. Properties are stored
@@ -156,35 +158,13 @@ NX_VMS_COMMON_API extern const QString kDeviceID;
 
 namespace Server {
 
-NX_VMS_COMMON_API extern const QString kCpuArchitecture;
-NX_VMS_COMMON_API extern const QString kCpuModelName;
-NX_VMS_COMMON_API extern const QString kFlavor;
-NX_VMS_COMMON_API extern const QString kOsInfo;
-NX_VMS_COMMON_API extern const QString kPhysicalMemory;
-NX_VMS_COMMON_API extern const QString kGuidConflictDetected;
-// TODO: #rvasilenko Can we change the property text safely?
-NX_VMS_COMMON_API extern const QString kBrand;
-NX_VMS_COMMON_API extern const QString kFullVersion;
-NX_VMS_COMMON_API extern const QString kPublicationType;
-NX_VMS_COMMON_API extern const QString kPublicIp;
-NX_VMS_COMMON_API extern const QString kSystemRuntime;
-NX_VMS_COMMON_API extern const QString kNetworkInterfaces;
-NX_VMS_COMMON_API extern const QString kBookmarkCount;
-NX_VMS_COMMON_API extern const QString kUdtInternetTraffic_bytes;
-NX_VMS_COMMON_API extern const QString kHddList;
-NX_VMS_COMMON_API extern const QString kNvrPoePortPoweringModes;
-NX_VMS_COMMON_API extern const QString kCertificate;
-NX_VMS_COMMON_API extern const QString kUserProvidedCertificate;
-NX_VMS_COMMON_API extern const QString kWebCamerasDiscoveryEnabled;
-NX_VMS_COMMON_API extern const QString kMetadataStorageIdKey;
-NX_VMS_COMMON_API extern const QString kTimeZoneInformation;
-NX_VMS_COMMON_API extern const QString kPortForwardingConfigurations;
+using namespace nx::vms::api::server_properties;
 
 } // namespace Server
 
 namespace User {
 
-NX_VMS_COMMON_API extern const QString kUserSettings;
+using nx::vms::api::user_properties::kUserSettings;
 
 } // namespace User
 
