@@ -632,6 +632,10 @@ bool AnalyticsSearchListModel::Private::commitInternal(const QnTimePeriod& perio
 
 bool AnalyticsSearchListModel::Private::commitPrefetch(const QnTimePeriod& periodToCommit)
 {
+    // A fix for potentially receiving more data than requested.
+    if (m_prefetch.size() > currentRequest().batchSize)
+        m_prefetch.resize(currentRequest().batchSize);
+
     const auto clearPrefetch = nx::utils::makeScopeGuard([this]() { m_prefetch.clear(); });
 
     if (currentRequest().direction == FetchDirection::earlier)
