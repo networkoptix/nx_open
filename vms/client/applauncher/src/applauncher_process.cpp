@@ -417,7 +417,7 @@ bool ApplauncherProcess::addProcessKillTimer(
     return true;
 }
 
-void ApplauncherProcess::onTimer(const quint64& timerID)
+void ApplauncherProcess::onTimer(const quint64& timerId)
 {
     KillProcessTask task;
     {
@@ -425,7 +425,7 @@ void ApplauncherProcess::onTimer(const quint64& timerID)
         if (m_terminated)
             return;
 
-        auto it = m_killProcessTasks.find(timerID);
+        auto it = m_killProcessTasks.find(timerId);
         if (it == m_killProcessTasks.end())
             return;
         task = it->second;

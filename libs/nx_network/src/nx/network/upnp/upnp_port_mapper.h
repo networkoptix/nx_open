@@ -105,7 +105,7 @@ protected: // for testing only
         const SocketAddress& devAddress,
         const DeviceInfo& devInfo);
 
-    virtual void onTimer(const quint64& timerID) override;
+    virtual void onTimer(const quint64& timerId) override;
     virtual bool isEnabled() const override;
 
 private:

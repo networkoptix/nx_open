@@ -49,7 +49,7 @@ DeviceSearcher::DeviceSearcher(
     m_ignoreUsb0NetworkInterfaceIfOthersExist(ignoreUsb0NetworkInterfaceIfOthersExist),
     m_isHttpsForced(isHttpsForced),
     m_discoverTryTimeoutMS(discoverTryTimeoutMS),
-    m_timerID(0),
+    m_timerId(0),
     m_terminated(false),
     m_needToUpdateReceiveSocket(false),
     m_timerManager(timerManager)
@@ -65,7 +65,7 @@ DeviceSearcher::~DeviceSearcher()
 void DeviceSearcher::start()
 {
     NX_MUTEX_LOCKER lk(&m_mutex);
-    m_timerID = m_timerManager->addTimer(
+    m_timerId = m_timerManager->addTimer(
         this,
         std::chrono::milliseconds(m_discoverTryTimeoutMS));
     m_cacheTimer.start();
@@ -84,11 +84,11 @@ void DeviceSearcher::stop()
         NX_WRITE_LOCKER lock(&m_stoppingLock);
         m_terminated = true;
     }
-    //m_timerID cannot be changed after m_terminated set to true
-    if (m_timerID)
+    //m_timerId cannot be changed after m_terminated set to true
+    if (m_timerId)
     {
-        m_timerManager->joinAndDeleteTimer(m_timerID);
-        m_timerID = 0;
+        m_timerManager->joinAndDeleteTimer(m_timerId);
+        m_timerId = 0;
     }
 
     //since dispatching is stopped, no need to synchronize access to m_socketList
@@ -188,14 +188,14 @@ int DeviceSearcher::cacheTimeout() const
     return m_settings->cacheTimeout();
 }
 
-void DeviceSearcher::onTimer(const quint64& /*timerID*/)
+void DeviceSearcher::onTimer(const quint64& /*timerId*/)
 {
     dispatchDiscoverPackets();
 
     NX_MUTEX_LOCKER lk(&m_mutex);
     if (!m_terminated)
     {
-        m_timerID = m_timerManager->addTimer(
+        m_timerId = m_timerManager->addTimer(
             this, std::chrono::milliseconds(m_discoverTryTimeoutMS));
     }
 }

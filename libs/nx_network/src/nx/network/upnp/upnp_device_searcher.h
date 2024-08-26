@@ -136,7 +136,7 @@ private:
     std::function<bool()> m_isHttpsForced;
     const unsigned int m_discoverTryTimeoutMS;
     mutable nx::Mutex m_mutex;
-    quint64 m_timerID;
+    quint64 m_timerId;
     nx::utils::AsyncOperationGuard m_handlerGuard;
     std::map< QString, std::map< SearchHandler*, uintptr_t > > m_handlers;
     mutable QSet<QnInterfaceAndAddr> m_interfacesCache;
@@ -156,7 +156,7 @@ private:
     nx::utils::TimerManager* m_timerManager;
     nx::ReadWriteLock m_stoppingLock;
 
-    virtual void onTimer(const quint64& timerID) override;
+    virtual void onTimer(const quint64& timerId) override;
     void onSomeBytesRead(
         AbstractCommunicatingSocket* sock,
         SystemError::ErrorCode errorCode,

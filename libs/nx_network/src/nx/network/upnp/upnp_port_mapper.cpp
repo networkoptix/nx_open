@@ -174,7 +174,7 @@ bool PortMapper::searchForMappers(
     return atLeastOneFound;
 }
 
-void PortMapper::onTimer(const quint64& /*timerID*/)
+void PortMapper::onTimer(const quint64& /*timerId*/)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     if (m_isEnabled)
