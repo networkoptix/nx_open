@@ -25,7 +25,9 @@ Text
         if (previousWindow)
             previousWindow.beforeRendering.disconnect(performanceInfo.registerFrame)
 
-        window.beforeRendering.connect(performanceInfo.registerFrame)
+        if (window)
+            window.beforeRendering.connect(performanceInfo.registerFrame)
+
         previousWindow = window
     }
 
