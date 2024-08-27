@@ -28,6 +28,7 @@ private:
     void at_currentSystemChanged(core::SystemDescriptionPtr systemDescription);
     void at_systemDisconnected();
     void at_connectionStateChanged(ConnectActionsHandler::LogicalState logicalValue);
+    void dropCloudSystems();
     void storeWorkbenchState();
 
 private:
