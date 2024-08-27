@@ -55,11 +55,6 @@ function(nx_add_targets_to_strengthened)
     endforeach()
 endfunction()
 
-function(nx_use_custom_verify_globs)
-    set_property(GLOBAL APPEND_STRING
-        PROPERTY pre_build_commands "substitute_verify_globs ${CONAN_VERIFY_GLOBS_ROOT}\n\n")
-endfunction()
-
 function(nx_save_ninja_preprocessor_script)
     get_property(targets GLOBAL PROPERTY pre_build_commands)
     file(WRITE ${ninja_tool_script_name} ${targets})
