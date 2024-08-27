@@ -251,7 +251,7 @@ void initialize(Manager* manager, Action* root)
         .requiredPowerUserPermissions()
         .text(ContextMenu::tr("Event Rules..."))
         .shortcut(isOldEngineEnabled ? "Ctrl+E" : "")
-        .condition(!condition::showreelIsRunning());
+        .condition(!condition::showreelIsRunning() && condition::hasOldEventRulesEngine());
 
     factory(OpenVmsRulesDialogAction)
             .flags(GlobalHotkey | NoTarget | SingleTarget | MultiTarget | ResourceTarget
