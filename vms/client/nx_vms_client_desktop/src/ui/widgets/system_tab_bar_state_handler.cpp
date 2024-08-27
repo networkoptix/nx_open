@@ -5,6 +5,8 @@
 #include <QtGui/QAction>
 
 #include <nx/vms/client/core/system_finder/system_description.h>
+#include <nx/vms/client/core/network/cloud_status_watcher.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/action_parameters.h>
 #include <nx/vms/client/desktop/window_context.h>
@@ -36,6 +38,15 @@ SystemTabBarStateHandler::SystemTabBarStateHandler(QObject* parent):
         &ConnectActionsHandler::stateChanged,
         this,
         &SystemTabBarStateHandler::at_connectionStateChanged);
+
+    connect(appContext()->cloudStatusWatcher(),
+        &core::CloudStatusWatcher::statusChanged,
+        this,
+        [this](core::CloudStatusWatcher::Status status)
+        {
+            if (status == core::CloudStatusWatcher::Status::LoggedOut)
+                dropCloudSystems();
+        });
 
     connect(action(menu::ResourcesModeAction), &QAction::toggled, this,
         [this](bool value)
@@ -123,6 +134,17 @@ void SystemTabBarStateHandler::at_connectionStateChanged(
         storeWorkbenchState();
         m_store->setCurrentSystemId({});
     }
+}
+
+void SystemTabBarStateHandler::dropCloudSystems()
+{
+    QList<MainWindowTitleBarState::SystemData> systems = m_store->state().systems;
+    systems.removeIf(
+        [](const auto& system)
+        {
+            return system.logonData.userType == nx::vms::api::UserType::cloud;
+        });
+    m_store->setSystems(systems);
 }
 
 void SystemTabBarStateHandler::storeWorkbenchState()
