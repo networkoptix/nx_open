@@ -106,14 +106,11 @@ Engine::Engine(
         connect(m_router.get(), &Router::actionReceived, this, &Engine::processAcceptedAction);
     }
 
-    connect(
-        this,
-        &Engine::ruleAddedOrUpdated,
-        this,
+    connect(this, &Engine::ruleAddedOrUpdated, this,
         [this](nx::Uuid ruleId, bool added)
         {
-            if (!added && !rule(ruleId)->enabled())
-                stopRunningActions(ruleId); //< The rule was disabled.
+            if (const auto rule = this->rule(ruleId); !added && rule && !rule->enabled())
+                    stopRunningActions(ruleId); //< The rule was disabled.
         });
 
     connect(

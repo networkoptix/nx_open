@@ -30,7 +30,6 @@
 #include <utils/camera/camera_bitrate_calculator.h>
 #include <utils/common/synctime.h>
 
-
 #define SAFE(expr) {NX_MUTEX_LOCKER lock( &m_mutex ); expr;}
 
 using StreamFpsSharingMethod = QnSecurityCamResource::StreamFpsSharingMethod;
@@ -1819,11 +1818,6 @@ float QnSecurityCamResource::rawSuggestBitrateKbps(
 bool QnSecurityCamResource::captureEvent(const nx::vms::event::AbstractEventPtr& /*event*/)
 {
     return false;
-}
-
-QString QnSecurityCamResource::vmsToAnalyticsEventTypeId(nx::vms::api::EventType /*eventType*/) const
-{
-    return QString();
 }
 
 Qn::ConnectionRole QnSecurityCamResource::toConnectionRole(StreamIndex index)

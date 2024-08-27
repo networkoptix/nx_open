@@ -52,12 +52,12 @@ Result AbstractVmsRulesManager::transmitActionSync(const nx::vms::api::rules::Ac
         });
 }
 
-ErrorCode AbstractVmsRulesManager::resetVmsRulesSync()
+ErrorCode AbstractVmsRulesManager::resetVmsRulesSync(bool useDefault)
 {
     return detail::callSync(
         [&](auto handler)
         {
-            resetVmsRules(std::move(handler));
+            resetVmsRules(useDefault, std::move(handler));
         });
 }
 
