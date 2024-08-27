@@ -191,7 +191,6 @@ EventTile::EventTile(QWidget* parent):
     ui->footerLabel->setText({});
     ui->timestampLabel->setText({});
 
-    ui->secondaryTimestampHolder->show();
     ui->imagePreviewWidget->setMaximumHeight(kMaximumPreviewHeightWithHeader);
     ui->videoPreviewWidget->setMinimumHeight(kMaximumPreviewHeightWithHeader);
     ui->videoPreviewWidget->setMaximumHeight(kMaximumPreviewHeightWithHeader);
