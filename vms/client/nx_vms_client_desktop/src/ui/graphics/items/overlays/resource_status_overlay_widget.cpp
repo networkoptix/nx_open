@@ -19,10 +19,25 @@
 #include <ui/widgets/word_wrapped_label.h>
 #include <utils/math/color_transformations.h>
 
+#include "background_generator.h"
+
 using namespace nx::vms::client;
 using namespace nx::vms::client::desktop;
 
+QThreadPool QnStatusOverlayWidget::s_threadPool;
+
+QImage QnStatusOverlayWidget::s_whiteGlowHorizontalImage;
+QImage QnStatusOverlayWidget::s_whiteGlowVerticalImage;
+QImage QnStatusOverlayWidget::s_redGlowHorizontalImage;
+QImage QnStatusOverlayWidget::s_redGlowVerticalImage;
+
 namespace {
+
+constexpr int kBackgroundWidth = 910;
+constexpr int kBackgroundHeight = 553;
+constexpr int kBackgroundRectWidth = 625;
+constexpr int kBackgroundRectHeight = 196;
+constexpr int kMaskSize = 170;
 
 void disableFocus(QGraphicsItem* item)
 {
@@ -71,7 +86,7 @@ void setupButton(QPushButton& button)
             color: %2;
             background-color: %4;
             border-style: solid;
-            border-radius: 2px;
+            border-radius: 4px;
             font: 500 13px;
             padding-left: 16px;
             padding-right: 16px;
@@ -119,7 +134,7 @@ void setupCustomButton(QPushButton& button)
             color: %2;
             background-color: transparent;
             border-style: solid;
-            border-radius: 2px;
+            border-radius: 4px;
             font: 500 13px;
             padding-left: 16px;
             padding-right: 16px;
@@ -195,8 +210,10 @@ QnStatusOverlayWidget::QnStatusOverlayWidget(QGraphicsWidget* parent):
     base_type(parent),
     m_visibleControls(Control::kNoControl),
     m_initialized(false),
+    m_iconVisible(false),
     m_useErrorStyle(false),
     m_errorStyle(ErrorStyle::red),
+    m_showGlow(false),
     m_preloaderHolder(new QnViewportBoundWidget(this)),
     m_centralHolder(new QnViewportBoundWidget(this)),
     m_extrasHolder(new QnViewportBoundWidget(this)),
@@ -207,16 +224,8 @@ QnStatusOverlayWidget::QnStatusOverlayWidget(QGraphicsWidget* parent):
     m_centralAreaImage(new QLabel()),
     m_caption(new QLabel()),
     m_button(new QPushButton()),
-    m_customButton(new QPushButton()),
-    // overlay backgrounds, had to be PNGs since Qt SVG renderer currently doesn't support filters
-    m_whiteGlowHorizontal(":/skin/item_placeholders/info-blue-bg.png"),
-    m_whiteGlowVertical(":/skin/item_placeholders/vertical-info-blue-bg.png"),
-    m_redGlowHorizontal(":/skin/item_placeholders/error-red-bg.png"),
-    m_redGlowVertical(":/skin/item_placeholders/vertical-error-red-bg.png")
+    m_customButton(new QPushButton())
 {
-    NX_ASSERT(!m_whiteGlowHorizontal.isNull() && !m_whiteGlowVertical.isNull()
-        && !m_redGlowHorizontal.isNull() && !m_redGlowVertical.isNull());
-
     makeTransparentForMouse(this);
 
     connect(this, &GraphicsWidget::geometryChanged, this, &QnStatusOverlayWidget::updateAreaSizes);
@@ -227,6 +236,8 @@ QnStatusOverlayWidget::QnStatusOverlayWidget(QGraphicsWidget* parent):
     setupPreloader();
     setupCentralControls();
     setupExtrasControls();
+
+    s_threadPool.waitForDone();
 }
 
 void QnStatusOverlayWidget::paint(QPainter* painter,
@@ -239,17 +250,8 @@ void QnStatusOverlayWidget::paint(QPainter* painter,
     painter->fillRect(destRect, palette().window());
     if (m_showGlow)
     {
-        QPixmap pixmap =
-            [&]()
-            {
-                const auto isError = (m_errorStyle == ErrorStyle::red);
-
-                return (destRect.width() >= destRect.height())
-                    ? (isError ? m_redGlowHorizontal : m_whiteGlowHorizontal)
-                    : (isError ? m_redGlowVertical : m_whiteGlowVertical);
-            }();
-
-        const auto& scaledPixmap = pixmap.scaled(destRect.size().toSize(), Qt::KeepAspectRatio);
+        const auto& scaledPixmap =
+            getBackgroundPixmap().scaled(destRect.size().toSize(), Qt::KeepAspectRatio);
         auto height = destRect.height();
         auto x = destRect.x() + (destRect.width() - scaledPixmap.width()) / 2;
         auto y = destRect.y() + (height - scaledPixmap.height()) / 2;
@@ -265,9 +267,9 @@ void QnStatusOverlayWidget::setVisibleControls(Controls controls)
     const bool preloaderVisible = controls.testFlag(Control::kPreloader);
     const bool imageOverlayVisible = controls.testFlag(Control::kImageOverlay);
 
-    const bool iconVisible = controls.testFlag(Control::kIcon);
+    m_iconVisible = controls.testFlag(Control::kIcon);
     const bool captionVisible = controls.testFlag(Control::kCaption);
-    const bool centralVisible = (iconVisible || captionVisible);
+    const bool centralVisible = (m_iconVisible || captionVisible);
 
     const bool buttonVisible = controls.testFlag(Control::kButton);
     const bool customButtonVisible = controls.testFlag(Control::kCustomButton);
@@ -281,7 +283,7 @@ void QnStatusOverlayWidget::setVisibleControls(Controls controls)
     m_extrasHolder->setVisible(!preloaderVisible && !imageOverlayVisible && extrasVisible);
     m_button->setVisible(buttonVisible);
     m_customButton->setVisible(customButtonVisible);
-    m_centralAreaImage->setVisible(iconVisible);
+    m_centralAreaImage->setVisible(m_iconVisible);
     m_caption->setVisible(captionVisible);
 
     m_centralContainer->adjustSize();
@@ -327,6 +329,7 @@ void QnStatusOverlayWidget::setErrorStyle(ErrorStyle errorStyle)
 
     setupLabel(m_caption, getCaptionStyle(m_useErrorStyle), errorStyle);
     updateAreaSizes();
+    getBackgroundPixmap();  //< preload required pixmap
 }
 
 void QnStatusOverlayWidget::setCaption(const QString& caption)
@@ -351,6 +354,62 @@ void QnStatusOverlayWidget::setCustomButtonText(const QString& text)
 void QnStatusOverlayWidget::setShowGlow(bool showGlow)
 {
     m_showGlow = showGlow;
+}
+
+void QnStatusOverlayWidget::generateBackgrounds()
+{
+    using namespace nx::vms::client::core;
+
+    const QRect kHorizontalRect{(kBackgroundWidth - kBackgroundRectWidth) / 2,
+        (kBackgroundHeight - kBackgroundRectHeight) / 2,
+        kBackgroundRectWidth,
+        kBackgroundRectHeight};
+    const QRect kVerticalRect{(kBackgroundHeight - kBackgroundRectHeight) / 2,
+        (kBackgroundWidth - kBackgroundRectWidth) / 2,
+        kBackgroundRectHeight,
+        kBackgroundRectWidth};
+
+    s_threadPool.setThreadPriority(QThread::LowestPriority);
+    s_threadPool.start(
+        [kHorizontalRect]
+        {
+            s_whiteGlowHorizontalImage = generatePlaceholderBackground(kBackgroundWidth,
+                kBackgroundHeight,
+                kHorizontalRect,
+                kMaskSize,
+                colorTheme()->color("light16"),
+                colorTheme()->color("dark4"));
+        });
+    s_threadPool.start(
+        [kVerticalRect]
+        {
+            s_whiteGlowVerticalImage = generatePlaceholderBackground(kBackgroundHeight,
+                kBackgroundWidth,
+                kVerticalRect,
+                kMaskSize,
+                colorTheme()->color("light16"),
+                colorTheme()->color("dark4"));
+        });
+    s_threadPool.start(
+        [kHorizontalRect]
+        {
+            s_redGlowHorizontalImage = generatePlaceholderBackground(kBackgroundWidth,
+                kBackgroundHeight,
+                kHorizontalRect,
+                kMaskSize,
+                colorTheme()->color("red"),
+                colorTheme()->color("dark4"));
+        });
+    s_threadPool.start(
+        [kVerticalRect]
+        {
+            s_redGlowVerticalImage = generatePlaceholderBackground(kBackgroundHeight,
+                kBackgroundWidth,
+                kVerticalRect,
+                kMaskSize,
+                colorTheme()->color("red"),
+                colorTheme()->color("dark4"));
+        });
 }
 
 void QnStatusOverlayWidget::setupPreloader()
@@ -465,9 +524,15 @@ void QnStatusOverlayWidget::updateAreaSizes()
 
     bool showExtras = m_visibleExtrasControlsCount > 0;
 
-    const qreal minHeight = 95 * scale * m_visibleExtrasControlsCount;
-    showExtras =
-        showExtras && (rect.height() > minHeight); // Do not show extras on too small items
+    const qreal minHeight = 212 * scale;
+    showExtras = showExtras
+        && (rect.height()
+            > minHeight * m_visibleExtrasControlsCount); // Do not show extras on too small items
+
+    if (rect.height() <= minHeight)
+        m_centralAreaImage->hide();
+    else
+        m_centralAreaImage->setVisible(m_iconVisible);
 
     m_preloaderHolder->setFixedSize(rect.size());
     m_centralHolder->setFixedSize(QSizeF(rect.width(), height));
@@ -484,9 +549,10 @@ void QnStatusOverlayWidget::updateAreaSizes()
         const auto& containerGeometry = m_extrasContainer->geometry();
         extrasHeight = containerGeometry.height() * scale;
 
-        constexpr qreal kButtonBottomDistance = 32;
+        constexpr qreal kButtonBottomPosition = 1 - 32. / 432;
+
         m_extrasHolder->setFixedSize(QSizeF(rect.width(), extrasHeight));
-        m_extrasHolder->setPos(0, height - extrasHeight - kButtonBottomDistance * scale);
+        m_extrasHolder->setPos(0, height * kButtonBottomPosition - extrasHeight);
     }
 
     const QSizeF imageSize = m_imageItem.pixmap().isNull()
@@ -530,4 +596,76 @@ void QnStatusOverlayWidget::updateAreaSizes()
     m_extrasHolder->updateScale();
     m_preloaderHolder->updateScale();
     m_centralHolder->updateScale();
+}
+
+QPixmap QnStatusOverlayWidget::getBackgroundPixmap()
+{
+    NX_ASSERT(qApp && qApp->thread() == QThread::currentThread()
+        && s_threadPool.activeThreadCount() == 0 && !s_whiteGlowHorizontalImage.isNull()
+        && !s_whiteGlowVerticalImage.isNull() && !s_redGlowHorizontalImage.isNull()
+        && !s_redGlowVerticalImage.isNull());
+
+    const auto whiteGlowHorizontal = std::make_pair(
+        std::cref(s_whiteGlowHorizontalImage), std::ref(m_whiteGlowHorizontalPixmap));
+    const auto whiteGlowVertical =
+        std::make_pair(std::cref(s_whiteGlowVerticalImage), std::ref(m_whiteGlowVerticalPixmap));
+    const auto redGlowHorizontal =
+        std::make_pair(std::cref(s_redGlowHorizontalImage), std::ref(m_redGlowHorizontalPixmap));
+    const auto redGlowVertical =
+        std::make_pair(std::cref(s_redGlowVerticalImage), std::ref(m_redGlowVerticalPixmap));
+
+    const auto isError = (m_errorStyle == ErrorStyle::red);
+
+    const auto& background = (rect().width() >= rect().height())
+        ? (isError ? redGlowHorizontal : whiteGlowHorizontal)
+        : (isError ? redGlowVertical : whiteGlowVertical);
+
+    if (background.second.isNull())
+        background.second = QPixmap::fromImage(background.first);
+
+    return background.second;
+}
+
+QPixmap QnStatusOverlayWidget::whiteGlowHorizontal()
+{
+    NX_ASSERT(qApp && qApp->thread() == QThread::currentThread()
+        && s_threadPool.activeThreadCount() == 0 && !s_whiteGlowHorizontalImage.isNull());
+
+    if (m_whiteGlowHorizontalPixmap.isNull())
+        m_whiteGlowHorizontalPixmap = QPixmap::fromImage(s_whiteGlowHorizontalImage);
+
+    return m_whiteGlowHorizontalPixmap;
+}
+
+QPixmap QnStatusOverlayWidget::whiteGlowVertical()
+{
+    NX_ASSERT(qApp && qApp->thread() == QThread::currentThread()
+        && s_threadPool.activeThreadCount() == 0 && !s_whiteGlowVerticalImage.isNull());
+
+    if (m_whiteGlowVerticalPixmap.isNull())
+        m_whiteGlowVerticalPixmap = QPixmap::fromImage(s_whiteGlowVerticalImage);
+
+    return m_whiteGlowVerticalPixmap;
+}
+
+QPixmap QnStatusOverlayWidget::redGlowHorizontal()
+{
+    NX_ASSERT(qApp && qApp->thread() == QThread::currentThread()
+        && s_threadPool.activeThreadCount() == 0 && !s_redGlowHorizontalImage.isNull());
+
+    if (m_redGlowHorizontalPixmap.isNull())
+        m_redGlowHorizontalPixmap = QPixmap::fromImage(s_redGlowHorizontalImage);
+
+    return m_redGlowHorizontalPixmap;
+}
+
+QPixmap QnStatusOverlayWidget::redGlowVertical()
+{
+    NX_ASSERT(qApp && qApp->thread() == QThread::currentThread()
+        && s_threadPool.activeThreadCount() == 0 && !s_redGlowVerticalImage.isNull());
+
+    if (m_redGlowVerticalPixmap.isNull())
+        m_redGlowVerticalPixmap = QPixmap::fromImage(s_redGlowVerticalImage);
+
+    return m_redGlowVerticalPixmap;
 }
