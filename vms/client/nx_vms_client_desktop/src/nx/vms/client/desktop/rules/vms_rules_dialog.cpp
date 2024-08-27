@@ -231,6 +231,7 @@ void VmsRulesDialog::resetToDefaultsImpl()
         return;
 
     connection->getVmsRulesManager(nx::network::rest::kSystemSession)->resetVmsRules(
+        /*useDefault*/ true,
         [this](int /*requestId*/, ec2::ErrorCode errorCode)
         {
             if (errorCode != ec2::ErrorCode::ok)

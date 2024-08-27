@@ -35,10 +35,11 @@ NX_VMS_API_DECLARE_STRUCT_AND_LIST_EX(Rule, (json)(ubjson))
 // A dummy struct used in ec2 transactions.
 struct NX_VMS_API ResetRules
 {
-    bool none = false; //< A dummy field that is necessary for nx fusion serialization.
+    /**%apidoc[opt] Reset to default rule set if true, clear rules if false. */
+    bool useDefault = true;
 };
 
-#define nx_vms_api_rules_ResetRules_Fields (none)
+#define nx_vms_api_rules_ResetRules_Fields (useDefault)
 NX_VMS_API_DECLARE_STRUCT_EX(ResetRules, (json)(ubjson))
 
 } // namespace nx::vms::api::rules
