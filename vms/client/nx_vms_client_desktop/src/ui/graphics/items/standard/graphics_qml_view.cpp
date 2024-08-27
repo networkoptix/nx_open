@@ -44,7 +44,7 @@
 #include <ui/workaround/sharp_pixmap_painting.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/graphics/view/quick_widget_container.h>
-
+#include <utils/common/delayed.h>
 namespace {
 
 constexpr auto kQuadVertexCount = 4;
@@ -322,6 +322,9 @@ GraphicsQmlView::~GraphicsQmlView()
     d->rhiRenderTarget.reset();
     d->rhiTexture.reset();
 
+    if (auto rhi = d->quickWindow->rhi())
+        rhi->removeCleanupCallback(d.get());
+
     // Delete quickWindow before rootItem to avoid a crash when Accessibility is enabled in macOS.
     d->quickWindow.reset();
     d->renderControl.reset();
@@ -464,7 +467,8 @@ bool GraphicsQmlView::event(QEvent* event)
         }
         case QEvent::GraphicsSceneResize:
         case QEvent::GraphicsSceneMove:
-            d->updateSizes();
+            // Delay resize as it RHI after device loss may not be initialized yet.
+            executeDelayedParented([this]() { d->updateSizes(); }, this);
             event->accept();
             break;
         default:
@@ -555,20 +559,7 @@ bool GraphicsQmlView::Private::ensureOffscreen()
     std::shared_ptr<QQuickItem> ro;
 
     if (offscreenInitialized)
-    {
-        auto rhi = quickWindow->rhi();
-        if (!rhi->isDeviceLost())
-            return true;
-
-        quickWindow->setRenderTarget({});
-        quickWindow->disconnect(view);
-        rhiRenderTarget.reset();
-        rhiTexture.reset();
-        rp.reset();
-
-        renderControl->invalidate();
-        offscreenInitialized = false;
-    }
+        return true;
 
     auto viewport = appContext()->mainWindowContext()->workbenchContext()->mainWindow()->viewport();
     QOpenGLWidget* openGLWidget = qobject_cast<QOpenGLWidget*>(viewport);
@@ -579,8 +570,11 @@ bool GraphicsQmlView::Private::ensureOffscreen()
 
         if (quickWidget)
         {
-            quickWindow->setGraphicsDevice(
-                QQuickGraphicsDevice::fromRhi(quickWidget->quickWindow()->rhi()));
+            auto rhi = quickWidget->quickWindow()->rhi();
+            if (!rhi || rhi->isDeviceLost())
+                return false;
+
+            quickWindow->setGraphicsDevice(QQuickGraphicsDevice::fromRhi(rhi));
             useTextureReadback = false;
         }
         else
@@ -596,6 +590,19 @@ bool GraphicsQmlView::Private::ensureOffscreen()
         initRenderTarget();
 
         offscreenInitialized = true;
+
+        rhi->addCleanupCallback(this,
+            [this](QRhi* rhi)
+            {
+                quickWindow->setRenderTarget({});
+                quickWindow->disconnect(view);
+                rhiRenderTarget.reset();
+                rhiTexture.reset();
+                rp.reset();
+
+                renderControl->invalidate();
+                offscreenInitialized = false;
+            });
 
         if (!useTextureReadback)
             return true;
