@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <QtCore/QThreadPool>
+
 #include <ui/graphics/items/generic/viewport_bound_widget.h>
 
 class QLabel;
@@ -52,6 +54,8 @@ public:
     void setTooltip(const QString& tooltip) {} //< TODO: zkarakas
     void setShowGlow(bool showGlow);
 
+    static void generateBackgrounds();
+
 signals:
     void actionButtonClicked();
     void customButtonClicked();
@@ -63,14 +67,20 @@ private:
     void setupExtrasControls();
     void initializeHandlers();
     void updateAreaSizes();
+    QPixmap getBackgroundPixmap();
+    QPixmap whiteGlowHorizontal();
+    QPixmap whiteGlowVertical();
+    QPixmap redGlowHorizontal();
+    QPixmap redGlowVertical();
 
 private:
     Controls m_visibleControls;
     int m_visibleExtrasControlsCount = 0;
     bool m_initialized;
+    bool m_iconVisible;
     bool m_useErrorStyle;
     ErrorStyle m_errorStyle;
-    bool m_showGlow = false;
+    bool m_showGlow;
 
     QnViewportBoundWidget* const m_preloaderHolder;
     QnViewportBoundWidget* const m_centralHolder;
@@ -93,8 +103,15 @@ private:
     QPushButton* const m_button;
     QPushButton* const m_customButton;
 
-    QPixmap m_whiteGlowHorizontal;
-    QPixmap m_whiteGlowVertical;
-    QPixmap m_redGlowHorizontal;
-    QPixmap m_redGlowVertical;
+    static QThreadPool s_threadPool;
+
+    static QImage s_whiteGlowHorizontalImage;
+    static QImage s_whiteGlowVerticalImage;
+    static QImage s_redGlowHorizontalImage;
+    static QImage s_redGlowVerticalImage;
+
+    QPixmap m_whiteGlowHorizontalPixmap;
+    QPixmap m_whiteGlowVerticalPixmap;
+    QPixmap m_redGlowHorizontalPixmap;
+    QPixmap m_redGlowVerticalPixmap;
 };

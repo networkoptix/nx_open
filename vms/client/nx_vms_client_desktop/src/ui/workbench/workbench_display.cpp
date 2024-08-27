@@ -70,6 +70,7 @@
 #include <ui/graphics/items/grid/curtain_item.h>
 #include <ui/graphics/items/grid/grid_background_item.h>
 #include <ui/graphics/items/grid/grid_item.h>
+#include <ui/graphics/items/overlays/resource_status_overlay_widget.h>
 #include <ui/graphics/items/resource/button_ids.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/resource/resource_widget.h>
@@ -340,6 +341,8 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
         this, &QnWorkbenchDisplay::updateAudioPlayback);
 
     m_playbackPositionBlinkTimer->start(kActivityTimeout);
+
+    QnStatusOverlayWidget::generateBackgrounds();
 }
 
 QnWorkbenchDisplay::~QnWorkbenchDisplay()
