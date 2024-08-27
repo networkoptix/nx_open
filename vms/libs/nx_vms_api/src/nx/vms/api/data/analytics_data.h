@@ -315,8 +315,8 @@ struct ObjectTrackTitle
 
     /**%apidoc
      * If true, the image can be retrieved via
-     * `GET /rest/v{3-}/analytics/objectTracks/{id}/titleImage` or
-     * `GET /rest/v{3-}/analytics/objectTracks/{id}/titleImage.{format}`.
+     * `GET /rest/v{4-}/analytics/objectTracks/{id}/titleImage` or
+     * `GET /rest/v{4-}/analytics/objectTracks/{id}/titleImage.{format}`.
      */
     bool isImageAvailable = false;
 };
