@@ -28,10 +28,16 @@ public:
         nx::utils::Url url,
         nx::network::http::Credentials credentials,
         nx::network::ssl::AdapterFunc adapterFunc,
-        RequestHandler handler = nullptr);
+        RequestHandler handler = {});
+
+    WebSocketClient(
+        nx::utils::Url url,
+        std::unique_ptr<nx::network::http::AsyncClient> client,
+        RequestHandler handler = {});
 
     virtual ~WebSocketClient() override;
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
+    void setHandler(RequestHandler handler);
     void connectAsync(nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler);
     void sendAsync(Request request, ResponseHandler handler);
 

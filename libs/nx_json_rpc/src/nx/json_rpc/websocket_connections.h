@@ -64,6 +64,7 @@ private:
     };
 
     void executeAsync(
+        ResponseId responseId,
         Connection* connection,
         std::unique_ptr<Executor> executor,
         nx::utils::MoveOnlyFunc<void(Response)> handler);

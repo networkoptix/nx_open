@@ -13,15 +13,13 @@ namespace nx::json_rpc {
 
 WebSocketClient::WebSocketClient(
     nx::utils::Url url,
-    nx::network::http::Credentials credentials,
-    nx::network::ssl::AdapterFunc adapterFunc,
+    std::unique_ptr<nx::network::http::AsyncClient> client,
     RequestHandler handler)
     :
     m_url(std::move(url)),
     m_handler(std::move(handler)),
-    m_handshakeClient(std::make_unique<nx::network::http::AsyncClient>(std::move(adapterFunc)))
+    m_handshakeClient(std::move(client))
 {
-    m_handshakeClient->setCredentials(std::move(credentials));
     nx::network::http::HttpHeaders httpHeaders;
     nx::network::websocket::addClientHeaders(&httpHeaders,
         nx::network::websocket::kWebsocketProtocolName,
@@ -29,6 +27,24 @@ WebSocketClient::WebSocketClient(
     for (const auto& [header, value]: httpHeaders)
         m_handshakeClient->addAdditionalHeader(header, value);
     base_type::bindToAioThread(m_handshakeClient->getAioThread());
+}
+
+WebSocketClient::WebSocketClient(
+    nx::utils::Url url,
+    nx::network::http::Credentials credentials,
+    nx::network::ssl::AdapterFunc adapterFunc,
+    RequestHandler handler)
+    :
+    WebSocketClient(
+        std::move(url),
+        [](nx::network::http::Credentials credentials, nx::network::ssl::AdapterFunc adapterFunc)
+        {
+            auto r = std::make_unique<nx::network::http::AsyncClient>(std::move(adapterFunc));
+            r->setCredentials(std::move(credentials));
+            return r;
+        }(std::move(credentials), std::move(adapterFunc)),
+    std::move(handler))
+{
 }
 
 WebSocketClient::~WebSocketClient()
@@ -43,6 +59,13 @@ void WebSocketClient::bindToAioThread(nx::network::aio::AbstractAioThread* aioTh
     if (m_connection)
         m_connection->bindToAioThread(aioThread);
     m_handshakeClient->bindToAioThread(aioThread);
+}
+
+void WebSocketClient::setHandler(RequestHandler handler)
+{
+    NX_ASSERT(!m_handler);
+    NX_ASSERT(!m_connection);
+    m_handler = std::move(handler);
 }
 
 void WebSocketClient::connectAsync(nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
