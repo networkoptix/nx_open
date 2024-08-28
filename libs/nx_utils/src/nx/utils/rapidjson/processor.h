@@ -201,7 +201,15 @@ struct NX_UTILS_API ValueHelper
     template<class T>
     ValueHelper(T&& val, ::rapidjson::Document::AllocatorType& alloc): allocator(alloc)
     {
-        if constexpr (ConvertedToRapidjsonValue<T>)
+        if constexpr (std::is_same_v<T, ::rapidjson::Value*>)
+        {
+            // Deep copy rapidjson values. By default they are moved, leaving original value
+            // nullified, but that can cause trouble:
+            // - if copy, not move, was the intention
+            // - they may come from another Processor, this will cause the lifetime issue.
+            value = ::rapidjson::Value{std::move(*val), alloc};
+        }
+        else if constexpr (ConvertedToRapidjsonValue<T>)
         {
             value = ::rapidjson::Value{std::move(val)};
         }
