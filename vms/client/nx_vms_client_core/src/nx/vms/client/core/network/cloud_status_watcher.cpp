@@ -72,7 +72,10 @@ QnCloudSystemList getCloudSystemList(const SystemDataExList& systemsList)
         system.system2faEnabled = systemData.system2faEnabled;
         system.name = QString::fromStdString(systemData.name);
         system.ownerAccountEmail = QString::fromStdString(systemData.ownerAccountEmail());
-        system.ownerFullName = QString::fromStdString(systemData.ownerFullName());
+        system.ownerFullName = QString::fromStdString(
+            systemData.organizationName.empty()
+                ? systemData.ownerFullName()
+                : systemData.organizationName);
         system.authKey = {}; //< Intentionally skip saving.
         system.weight = systemData.usageFrequency;
         system.lastLoginTimeUtcMs = std::chrono::duration_cast<std::chrono::milliseconds>(

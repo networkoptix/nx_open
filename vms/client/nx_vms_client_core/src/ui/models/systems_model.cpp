@@ -236,8 +236,9 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
             }
 
             const auto fullName = system->ownerFullName();
-            return (fullName.isEmpty() ? system->ownerAccountEmail()
-                : tr("Owner: %1", "%1 is a user name").arg(fullName));
+            return fullName.isEmpty()
+                ? system->ownerAccountEmail()
+                : tr("Owner: %1", "%1 is a user/company name").arg(fullName);
         }
         case IsFactorySystemRoleId:
             return system->isNewSystem();
