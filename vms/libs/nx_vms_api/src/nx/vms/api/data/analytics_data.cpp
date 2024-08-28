@@ -40,5 +40,9 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ObjectTrackFilterFreeText,
     (json), ObjectTrackFilterFreeText_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ObjectTrackFilter,
     (json), ObjectTrackFilter_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(AnalyticsObjectMetadataRequest,
+    (json), AnalyticsObjectMetadataRequest_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(AnalyticsObjectMetadata,
+    (json), AnalyticsObjectMetadata_Fields)
 
 } // namespace nx::vms::api
