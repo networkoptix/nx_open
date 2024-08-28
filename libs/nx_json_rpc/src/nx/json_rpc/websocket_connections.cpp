@@ -11,6 +11,7 @@
 namespace nx::json_rpc {
 
 void WebSocketConnections::executeAsync(
+    ResponseId responseId,
     Connection* connection,
     std::unique_ptr<Executor> executor,
     nx::utils::MoveOnlyFunc<void(Response)> handler)
@@ -18,17 +19,35 @@ void WebSocketConnections::executeAsync(
     auto threadIt = connection->threads.insert(connection->threads.begin(), std::thread());
     *threadIt = std::thread(
         [this,
+            responseId = std::move(responseId),
             executor = std::move(executor),
             handler = std::move(handler),
             weakConnection = std::weak_ptr(connection->connection),
             threadIt]() mutable
         {
-            std::promise<Response> promise;
-            auto future = promise.get_future();
-            executor->execute(weakConnection,
-                [p = std::move(promise)](auto r) mutable { p.set_value(std::move(r)); });
-            auto response = future.get();
-            executor.reset();
+            auto response =
+                [responseId = std::move(responseId), executor = std::move(executor), &weakConnection]()
+                {
+                    std::promise<Response> promise;
+                    auto future = promise.get_future();
+                    try
+                    {
+                        executor->execute(weakConnection,
+                            [p = std::move(promise)](auto r) mutable { p.set_value(std::move(r)); });
+                        return future.get();
+                    }
+                    catch (const std::exception& e)
+                    {
+                        return nx::json_rpc::Response::makeError(responseId,
+                            {Error::internalError,
+                                NX_FMT("Unhandled exception: %1", e.what()).toStdString()});
+                    }
+                    catch (...)
+                    {
+                        return nx::json_rpc::Response::makeError(
+                            responseId, {Error::internalError, "Unhandled exception"});
+                    }
+                }();
             if (auto connection = weakConnection.lock())
             {
                 NX_MUTEX_LOCKER lock(&m_mutex);
@@ -71,7 +90,9 @@ void WebSocketConnections::addConnection(std::shared_ptr<WebSocketConnection> co
             {
                 if (executorCreator->isMatched(request.method))
                 {
+                    auto responseId = request.responseId();
                     executeAsync(
+                        std::move(responseId),
                         &it->second,
                         executorCreator->create(std::move(request)),
                         std::move(handler));
