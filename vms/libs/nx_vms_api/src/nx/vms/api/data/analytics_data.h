@@ -567,4 +567,44 @@ struct ObjectTrackFilter: IdData, ObjectTrackFilterFreeText
 NX_VMS_API_DECLARE_STRUCT_EX(ObjectTrackFilter, (json));
 NX_REFLECTION_INSTRUMENT(ObjectTrackFilter, ObjectTrackFilter_Fields)
 
+struct AnalyticsObjectMetadataRequest
+{
+    /**%apidoc Id of the Analytic Object Track. */
+    nx::Uuid id;
+
+    /**%apidoc
+     * Flexible Device id (can be obtained from "id", "physicalId" or "logicalId" field via `GET
+     * /rest/v{1-}/devices`) or MAC address (not supported for certain cameras).
+     *
+     * %// TODO: Remove this parameter by implementing the Device-from-ObjectTrackId logic. The
+     *     Device is used for resolution of permissions.
+     */
+    QString deviceId;
+};
+#define AnalyticsObjectMetadataRequest_Fields (id)(deviceId)
+NX_VMS_API_DECLARE_STRUCT_EX(AnalyticsObjectMetadataRequest, (json));
+NX_REFLECTION_INSTRUMENT(AnalyticsObjectMetadataRequest, AnalyticsObjectMetadataRequest_Fields)
+
+struct AnalyticsObjectMetadata
+{
+    /**%apidoc Id of a Device the Object has been detected on. */
+    nx::Uuid deviceId;
+
+    std::chrono::milliseconds timestampMs;
+    std::chrono::milliseconds durationMs;
+
+    /**%apidoc:string
+     * Coordinates of the bounding box on a video frame where an Object is shown; in range [0..1].
+     * The format is: `{x},{y},{width}x{height}`
+     */
+    RectAsString boundingBox;
+
+    /**%apidoc Attributes of an Object, like a car speed. */
+    std::vector<AnalyticsAttribute> attributes;
+};
+#define AnalyticsObjectMetadata_Fields \
+    (deviceId)(timestampMs)(durationMs)(boundingBox)(attributes)
+NX_VMS_API_DECLARE_STRUCT_EX(AnalyticsObjectMetadata, (json));
+NX_REFLECTION_INSTRUMENT(AnalyticsObjectMetadata, AnalyticsObjectMetadata_Fields)
+
 } // namespace nx::vms::api
