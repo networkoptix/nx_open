@@ -12,6 +12,7 @@
 #include "../action_builder_fields/flag_field.h"
 #include "../action_builder_fields/layout_field.h"
 #include "../action_builder_fields/target_user_field.h"
+#include "../action_builder_fields/text_field.h"
 #include "../event_filter.h"
 #include "../event_filter_fields/source_camera_field.h"
 #include "../rule.h"
@@ -31,6 +32,7 @@ ValidationResult TargetUserFieldValidator::validity(
     const auto targetUserFieldProperties = targetUserField->properties();
     const bool isValidSelection = targetUserField->acceptAll()
         || !targetUserField->ids().empty()
+        || hasAdditionalRecipients(rule)
         || targetUserFieldProperties.allowEmptySelection;
 
     if (!isValidSelection)
@@ -70,9 +72,9 @@ ValidationResult TargetUserFieldValidator::validity(
         }
         else if (targetUserFieldProperties.validationPolicy == kUserWithEmailValidationPolicy)
         {
-            // TODO: #mmalofeev check additional recipients.
             QnUserWithEmailValidationPolicy policy{
-                context, targetUserFieldProperties.allowEmptySelection};
+                context,
+                hasAdditionalRecipients(rule) || targetUserFieldProperties.allowEmptySelection};
 
             return utils::usersValidity(
                 policy, targetUserField->acceptAll(), targetUserField->ids());
@@ -112,6 +114,19 @@ ValidationResult TargetUserFieldValidator::validity(
 
     QnDefaultSubjectValidationPolicy policy{context, targetUserFieldProperties.allowEmptySelection};
     return utils::usersValidity(policy, targetUserField->acceptAll(), targetUserField->ids());
+}
+
+bool TargetUserFieldValidator::hasAdditionalRecipients(const Rule* rule) const
+{
+    auto emailsField = rule->actionBuilders().first()->fieldByName<vms::rules::ActionTextField>(
+        vms::rules::utils::kEmailsFieldName);
+    if (emailsField && !emailsField->value().isEmpty())
+    {
+        const auto emails = emailsField->value().split(';', Qt::SkipEmptyParts);
+        return !emails.empty();
+    }
+
+    return false;
 }
 
 } // namespace nx::vms::rules

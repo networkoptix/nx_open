@@ -15,6 +15,9 @@ public:
 
     ValidationResult validity(
         const Field* field, const Rule* rule, common::SystemContext* context) const override;
+
+private:
+    bool hasAdditionalRecipients(const Rule* rule) const;
 };
 
 } // namespace nx::vms::rules
