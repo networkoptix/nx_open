@@ -40,7 +40,8 @@ void insertAfterPeviousElement(
     jsonString.insert(ind + peviousElement.size(), newElement);
 }
 
-std::string documentToString(const rapidjson::Document& doc)
+template <typename T>
+std::string documentToString(const T& doc)
 {
     ::rapidjson::StringBuffer buffer;
     ::rapidjson::Writer<::rapidjson::StringBuffer> writer(buffer);
@@ -684,6 +685,75 @@ TEST(Processor, Negation)
     const auto v3 = rManyFields.getAllValues<std::string>("/[?]",
         std::not_fn(std::not_fn(NameCont("name"))));
     ASSERT_EQ(v2, v3);
+}
+
+TEST(Processor, CopyValueFromOneProcessorToAnother)
+{
+    using namespace nx::utils::rapidjson::predicate;
+
+    Processor procFrom{manyFieldsObject.toUtf8()};
+    const auto valuesExtracted =
+        procFrom.getAllValues<::rapidjson::Value*>("/[?]", NameCont("obj"));
+
+    std::vector<std::string> extractedAsStrings;
+    for (::rapidjson::Value* value: valuesExtracted)
+        extractedAsStrings.push_back(documentToString(*value));
+
+    Processor procTo{smallJson.toUtf8()};
+    procTo.eraseAllValues("/sections/[?]", All()); //< Just prepare initial state.
+
+    for (::rapidjson::Value* value: valuesExtracted)
+        procTo.addValueToArray(value, "/sections");
+
+    const auto valuesInserted = procTo.getAllValues<::rapidjson::Value*>("/sections/[?]", All());
+    ASSERT_EQ(valuesInserted.size(), valuesExtracted.size());
+
+    for (::rapidjson::Value* value: valuesInserted)
+        ASSERT_FALSE(value->IsNull());
+
+    std::vector<std::string> insertedAsStrings;
+    for (::rapidjson::Value* value: valuesInserted)
+        insertedAsStrings.push_back(documentToString(*value));
+    ASSERT_EQ(extractedAsStrings, insertedAsStrings);
+
+    const auto valuesExtractedAfterAdd =
+        procFrom.getAllValues<::rapidjson::Value*>("/[?]", NameCont("obj"));
+    ASSERT_EQ(valuesExtractedAfterAdd, valuesExtracted);
+}
+
+// Basically the same test, but now `procFrom` (Processor we are copying from) has shorter
+// lifetime and is destroyed before doing assertions.
+TEST(Processor, CopyValueFromOneProcessorToAnother2)
+{
+    using namespace nx::utils::rapidjson::predicate;
+
+    Processor procTo{smallJson.toUtf8()};
+    procTo.eraseAllValues("/sections/[?]", All()); //< Just prepare initial state.
+
+    std::vector<::rapidjson::Value*> valuesExtracted;
+    std::vector<std::string> extractedAsStrings;
+    {
+        Processor procFrom{manyFieldsObject.toUtf8()};
+
+        // Get values, they still in original document.
+        valuesExtracted = procFrom.getAllValues<::rapidjson::Value*>("/[?]", NameCont("obj"));
+        for (::rapidjson::Value* value: valuesExtracted)
+            extractedAsStrings.push_back(documentToString(*value));
+
+        for (::rapidjson::Value* value: valuesExtracted)
+            procTo.addValueToArray(value, "/sections");
+    }
+
+    const auto valuesInserted = procTo.getAllValues<::rapidjson::Value*>("/sections/[?]", All());
+    ASSERT_EQ(valuesInserted.size(), valuesExtracted.size());
+
+    for (::rapidjson::Value* value: valuesInserted)
+        ASSERT_FALSE(value->IsNull());
+
+    std::vector<std::string> insertedAsStrings;
+    for (::rapidjson::Value* value: valuesInserted)
+        insertedAsStrings.push_back(documentToString(*value));
+    ASSERT_EQ(extractedAsStrings, insertedAsStrings);
 }
 
 } // namespace nx::utils::rapidjson::test
