@@ -2,6 +2,7 @@
 
 # This file contains functions for populating the script for ninja_tool with commands to be
 # executed on a pre-build step.
+
 option(runNinjaTool
     "Invoke ninja_tool.py (via ninja_launcher) before each invocation of ninja." ON)
 
