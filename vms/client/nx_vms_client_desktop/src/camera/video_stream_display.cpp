@@ -470,8 +470,9 @@ QnAbstractVideoDecoder* QnVideoStreamDisplay::createVideoDecoder(
         config.forceGrayscaleDecoding = ini().grayscaleDecoding;
         // TODO: #ikulaychuk detect actual scene backend.
         config.forceRgbaFormat =
-            appContext()->runtimeSettings()->graphicsApi() == GraphicsApi::software
-                || QString(ini().sceneRendering) == "qpainter";
+            QString(ini().sceneRendering) == "qpainter"
+                || appContext()->runtimeSettings()->graphicsApi() == GraphicsApi::software
+                || appContext()->runtimeSettings()->isSoftwareYuv();
         decoder = new QnFfmpegVideoDecoder(config, /*metrics*/ nullptr, data);
     }
     decoder->setLightCpuMode(m_decodeMode);
