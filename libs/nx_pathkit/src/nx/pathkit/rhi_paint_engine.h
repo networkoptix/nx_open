@@ -12,6 +12,7 @@ class QRhi;
 class QRhiResourceUpdateBatch;
 class QRhiRenderPassDescriptor;
 class QRhiCommandBuffer;
+class QRhiTexture;
 
 namespace nx::pathkit {
 
@@ -39,6 +40,16 @@ struct PaintPixmap
     qreal opacity = 1.0;
 };
 
+struct PaintTexture
+{
+    QRectF dst;
+    std::shared_ptr<QRhiTexture> texture;
+    QRectF src;
+    QTransform transform;
+    qreal opacity = 1.0;
+    bool mirrorY = false;
+};
+
 struct PaintCustom
 {
     std::function<void(
@@ -50,7 +61,7 @@ struct PaintCustom
     std::function<void(QRhi*, QRhiCommandBuffer*, QSize)> render;
 };
 
-using PaintData = std::variant<PaintPath, PaintPixmap, PaintCustom>;
+using PaintData = std::variant<PaintPath, PaintPixmap, PaintTexture, PaintCustom>;
 
 /**
  * Synchronized data container for paint engine entries. It is shared between RhiPaintEngine and
@@ -178,6 +189,7 @@ public:
     void drawPolygon(const QPointF* points, int pointCount, QPaintEngine::PolygonDrawMode mode) override;
 
     void drawCustom(const PaintCustom& custom);
+    void drawTexture(const QRectF& dst, std::shared_ptr<QRhiTexture> texture, bool mirrorY = false);
 
 private:
     void updateClipPath(const QPainterPath& clipPath, Qt::ClipOperation op);

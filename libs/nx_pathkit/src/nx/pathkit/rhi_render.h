@@ -93,6 +93,10 @@ private:
         const QPixmap& pixmap,
         QRectF* outRect);
 
+    QRhiShaderResourceBindings* createTextureBinding(
+        std::shared_ptr<QRhiTexture> texture,
+        QRectF* outRect);
+
     QRectF textureCoordsFromAtlas(const Atlas::Rect& rect, int padding) const;
 
     void prepareAtlas(const RhiPaintEngineSyncData::Entries& entries);
