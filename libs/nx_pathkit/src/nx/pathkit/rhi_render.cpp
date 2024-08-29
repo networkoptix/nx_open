@@ -476,6 +476,31 @@ QImage RhiPaintDeviceRenderer::getImage(const QPixmap& pixmap)
 }
 
 QRhiShaderResourceBindings* RhiPaintDeviceRenderer::createTextureBinding(
+    std::shared_ptr<QRhiTexture> texture,
+    QRectF* outRect)
+{
+    std::unique_ptr<QRhiShaderResourceBindings> tsrb(m_rhi->newShaderResourceBindings());
+    tsrb->setBindings({
+        QRhiShaderResourceBinding::uniformBuffer(0,
+            kCommonVisibility,
+            ubuf.get()),
+        QRhiShaderResourceBinding::sampledTexture(1,
+            QRhiShaderResourceBinding::FragmentStage,
+            texture.get(),
+            sampler.get())
+    });
+    tsrb->create();
+
+    textures.push_back({
+        .texture = texture,
+        .tsrb = std::move(tsrb)
+    });
+
+    *outRect = QRectF(0, 0, 1, 1);
+    return textures.back().tsrb.get();
+}
+
+QRhiShaderResourceBindings* RhiPaintDeviceRenderer::createTextureBinding(
     QRhiResourceUpdateBatch* rub,
     const QPixmap& pixmap,
     QRectF* outRect)
@@ -871,6 +896,55 @@ std::vector<RhiPaintDeviceRenderer::Batch> RhiPaintDeviceRenderer::processEntrie
                     .vertexInput = tvbuf.get(),
                 });
             }
+        }
+        else if (auto paintTexture = std::get_if<PaintTexture>(&entry))
+        {
+            QRectF src;
+            auto bindings = createTextureBinding(paintTexture->texture, &src);
+
+            const auto dst = paintTexture->dst;
+
+            const QPointF topLeft = paintTexture->transform.map(dst.topLeft());
+            const QPointF topRight = paintTexture->transform.map(dst.topRight());
+            const QPointF bottomLeft = paintTexture->transform.map(dst.bottomLeft());
+            const QPointF bottomRight = paintTexture->transform.map(dst.bottomRight());
+
+            const qreal vx[4] = {topLeft.x(), topRight.x(), bottomRight.x(), bottomLeft.x()};
+            const qreal vy[4] = {topLeft.y(), topRight.y(), bottomRight.y(), bottomLeft.y()};
+            const qreal tx[4] = {src.left(), src.right(), src.right(), src.left()};
+
+            float top = src.top();
+            float bottom = src.bottom();
+            if (paintTexture->mirrorY)
+                std::swap(top, bottom);
+            const qreal ty[4] = {top, top, bottom, bottom};
+
+            const auto emitVertex =
+                [&vx, &vy, &tx, &ty, &textureVerts, opacity=paintTexture->opacity](int i)
+                {
+                    textureVerts.push_back(vx[i]);
+                    textureVerts.push_back(vy[i]);
+                    textureVerts.push_back(tx[i]);
+                    textureVerts.push_back(ty[i]);
+                    textureVerts.push_back(opacity);
+                };
+
+            const auto offset = textureVerts.size();
+            textureVerts.reserve(textureVerts.size() + 5 * (3 + 3));
+
+            // 0 - 1
+            // | / |
+            // 3 - 2
+            for (int i: {0, 1, 3, 3, 1, 2})
+                emitVertex(i);
+
+            batches.push_back({
+                .offset = (int) offset,
+                .count = (int) (textureVerts.size() - offset) / 5,
+                .bindigs = bindings,
+                .pipeline = tps.get(),
+                .vertexInput = tvbuf.get(),
+            });
         }
         else if (auto customPaint = std::get_if<PaintCustom>(&entry))
         {

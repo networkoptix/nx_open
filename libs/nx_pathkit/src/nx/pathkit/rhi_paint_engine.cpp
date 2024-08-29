@@ -8,6 +8,7 @@
 #include <include/core/SkPath.h>
 #include <include/pathops/SkPathOps.h>
 
+#include <QtGui/rhi/qrhi.h>
 
 namespace {
 
@@ -287,6 +288,20 @@ void RhiPaintEngine::drawPolygon(
 void RhiPaintEngine::drawCustom(const PaintCustom& custom)
 {
     m_data->append(custom);
+}
+
+void RhiPaintEngine::drawTexture(
+    const QRectF& dst, std::shared_ptr<QRhiTexture> texture, bool mirrorY)
+{
+    const auto size = texture->pixelSize();
+    m_data->append(PaintTexture{
+        .dst = dst,
+        .texture = texture,
+        .src = QRectF(0, 0, size.width(), size.height()), //< Currently unsused.
+        .transform = state->transform(),
+        .opacity = painter()->opacity(),
+        .mirrorY = mirrorY
+    });
 }
 
 void RhiPaintEngine::updateClipPath(const QPainterPath& clipPath, Qt::ClipOperation op)
