@@ -212,6 +212,11 @@ void BubbleToolTip::setTarget(const QPoint& targetPoint)
     d->updatePosition();
 }
 
+const QRectF& BubbleToolTip::targetRect() const
+{
+    return d->targetRect;
+}
+
 void BubbleToolTip::setEnclosingRect(const QRect& value)
 {
     if (d->enclosingRect == value)

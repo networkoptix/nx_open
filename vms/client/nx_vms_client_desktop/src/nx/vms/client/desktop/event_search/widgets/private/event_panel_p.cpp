@@ -611,8 +611,12 @@ void EventPanel::Private::at_eventTileHovered(const QModelIndex& index, EventTil
         installEventHandler(m_lastHoveredTile, {QEvent::Resize, QEvent::Move}, this,
             [this](QObject* /*watched*/, QEvent* event)
             {
-                if (event->type() == QEvent::Move)
+                if (event->type() == QEvent::Move
+                    && m_tooltip->targetRect().topLeft()
+                        != globalGeometry(m_lastHoveredTile).topLeft())
+                {
                     m_tooltip->suppress(/*immediately*/ true);
+                }
 
                 m_tooltip->setTarget(globalGeometry(m_lastHoveredTile));
             }));
