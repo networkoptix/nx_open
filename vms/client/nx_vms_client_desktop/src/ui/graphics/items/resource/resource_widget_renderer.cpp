@@ -64,9 +64,8 @@ void QnResourceWidgetRenderer::setChannelCount(int channelCount)
         ctx = {};
         ctx.uploader.reset(new DecodedPictureToOpenGLUploader(m_openGLWidget, m_quickWidget));
         ctx.uploader->setForceSoftYUV(qnRuntime->isSoftwareYuv());
-        ctx.renderer.reset(new QnGLRenderer(m_openGLWidget, *ctx.uploader));
-        ctx.renderer->setBlurEnabled(
-            appContext()->localSettings()->glBlurEnabled() && m_openGLWidget); // TODO: #ikulaychuk implement blur in RHI.
+        ctx.renderer.reset(new QnGLRenderer(m_openGLWidget, m_quickWidget, *ctx.uploader));
+        ctx.renderer->setBlurEnabled(appContext()->localSettings()->glBlurEnabled());
         ctx.renderer->setScreenshotInterface(m_screenshotInterface);
         ctx.uploader->setYV12ToRgbShaderUsed(ctx.renderer->isYV12ToRgbShaderUsed());
         ctx.uploader->setNV12ToRgbShaderUsed(ctx.renderer->isNV12ToRgbShaderUsed());
@@ -211,6 +210,18 @@ microseconds QnResourceWidgetRenderer::lastDisplayedTimestamp(int channel) const
 void QnResourceWidgetRenderer::setBlurFactor(qreal value)
 {
     m_blurFactor = value;
+}
+
+void QnResourceWidgetRenderer::setBlurRectangles(int channel, const QVector<QRectF>& rectangles)
+{
+    if (channel >= m_renderingContexts.size())
+        return;
+
+    auto& ctx = m_renderingContexts[channel];
+    if (!ctx.renderer)
+        return;
+
+    ctx.renderer->setBlurRectangles(rectangles);
 }
 
 QOpenGLFramebufferObject* QnResourceWidgetRenderer::blurMaskFrameBuffer(int channel) const

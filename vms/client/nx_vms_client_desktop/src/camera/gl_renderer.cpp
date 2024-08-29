@@ -6,6 +6,7 @@
 #include <QtCore/QScopedPointer>
 #include <QtGui/QOpenGLFunctions>
 #include <QtGui/QPainter>
+#include <QtQuickWidgets/QQuickWidget>
 #include <QtWidgets/QErrorMessage>
 
 #include <camera/client_video_camera.h>
@@ -32,6 +33,10 @@
 #include <utils/color_space/image_correction.h>
 #include <utils/color_space/yuvconvert.h>
 #include <utils/common/util.h>
+
+#include <nx/vms/common/pixelation/pixelation.h>
+
+#include <QtGui/rhi/qrhi.h>
 
 using nx::vms::client::core::Geometry;
 using namespace nx::vms::client::desktop;
@@ -73,9 +78,14 @@ bool QnGLRenderer::isPixelFormatSupported(AVPixelFormat pixfmt)
     }
 }
 
-QnGLRenderer::QnGLRenderer(QOpenGLWidget* glWidget, const DecodedPictureToOpenGLUploader& decodedPictureProvider ):
+QnGLRenderer::QnGLRenderer(
+    QOpenGLWidget* glWidget,
+    QQuickWidget* quickWidget,
+    const DecodedPictureToOpenGLUploader& decodedPictureProvider)
+    :
     QnGlFunctions(glWidget),
     m_gl(glWidget ? (new QOpenGLFunctions(glWidget->context())) : nullptr),
+    m_quickWidget(quickWidget),
     m_decodedPictureProvider( decodedPictureProvider ),
     m_brightness( 0 ),
     m_contrast( 0 ),
@@ -143,7 +153,8 @@ void QnGLRenderer::applyMixerSettings(qreal brightness, qreal contrast, qreal hu
 
 Qn::RenderStatus QnGLRenderer::prepareBlurBuffers()
 {
-    NX_ASSERT(QOpenGLFramebufferObject::hasOpenGLFramebufferObjects());
+    if (m_gl)
+        NX_ASSERT(QOpenGLFramebufferObject::hasOpenGLFramebufferObjects());
 
     QSize result;
     DecodedPictureToOpenGLUploader::ScopedPictureLock picLock(m_decodedPictureProvider);
@@ -163,12 +174,26 @@ Qn::RenderStatus QnGLRenderer::prepareBlurBuffers()
     result.setWidth(minPow2(result.width()));
     result.setHeight(minPow2(result.height()));
 
-    if (!m_blurBufferA || m_blurBufferA->size() != result)
+    if (m_gl)
     {
-        m_blurBufferA.reset(new QOpenGLFramebufferObject(result));
-        m_blurBufferB.reset(new QOpenGLFramebufferObject(result));
-        m_blurMaskBuffer.reset(new QOpenGLFramebufferObject(result));
-        return Qn::NewFrameRendered;
+        if (!m_blurBufferA || m_blurBufferA->size() != result)
+        {
+            m_blurBufferA.reset(new QOpenGLFramebufferObject(result));
+            m_blurBufferB.reset(new QOpenGLFramebufferObject(result));
+            m_blurMaskBuffer.reset(new QOpenGLFramebufferObject(result));
+            return Qn::NewFrameRendered;
+        }
+    }
+    else
+    {
+        if (!m_rhiBlurBuffer || m_rhiBlurBuffer->size() != result)
+        {
+            m_rhiBlurBuffer.reset(
+                new nx::vms::common::pixelation::BlurBuffer(
+                    m_quickWidget->quickWindow()->rhi(),
+                    result));
+            return Qn::NewFrameRendered;
+        }
     }
 
     if (qFuzzyEquals(m_blurFactor, m_prevBlurFactor))
@@ -213,6 +238,11 @@ void QnGLRenderer::doBlurStep(const QRectF& sourceRect, const QRectF& dstRect)
 void QnGLRenderer::setBlurFactor(qreal value)
 {
     m_blurFactor = value;
+}
+
+void QnGLRenderer::setBlurRectangles(const QVector<QRectF>& rectangles)
+{
+    m_blurRectangles = rectangles;
 }
 
 Qn::RenderStatus QnGLRenderer::renderBlurFBO(const QRectF &sourceRect)
@@ -260,11 +290,40 @@ Qn::RenderStatus QnGLRenderer::paint(
 {
     if (!m_gl)
     {
-        m_blurBufferA.reset();
-        m_blurBufferB.reset();
-        m_blurMaskBuffer.reset();
-        m_prevBlurFactor = 0.0;
-        return drawVideoData(painter, sourceRect, targetRect, m_decodedPictureProvider.opacity());
+        if (!m_blurEnabled || qFuzzyEquals(m_blurFactor, 0.0))
+        {
+            m_blurBufferA.reset();
+            m_blurBufferB.reset();
+            m_blurMaskBuffer.reset();
+            m_rhiBlurBuffer.reset();
+            m_prevBlurFactor = 0.0;
+            return drawVideoData(
+                painter, sourceRect, targetRect, m_decodedPictureProvider.opacity());
+        }
+        else
+        {
+            Qn::RenderStatus result = prepareBlurBuffers();
+            if (result == Qn::NothingRendered || result == Qn::CannotRender)
+                return result;
+
+            if (result == Qn::NewFrameRendered)
+            {
+                // Render video frame into blur buffer.
+                result = drawVideoData(
+                    /* painter */ nullptr,
+                    sourceRect,
+                    /* targetRect */ {},
+                    m_decodedPictureProvider.opacity());
+
+                if (result == Qn::NewFrameRendered)
+                    m_rhiBlurBuffer->blur(m_blurRectangles, m_blurFactor);
+            }
+
+            if (auto pe = dynamic_cast<nx::pathkit::RhiPaintEngine*>(painter->paintEngine()))
+                pe->drawTexture(targetRect, m_rhiBlurBuffer->texture());
+
+            return result;
+        }
     }
 
     m_gl->initializeOpenGLFunctions();
@@ -346,6 +405,9 @@ Qn::RenderStatus QnGLRenderer::drawVideoData(
         return Qn::CannotRender;
 
     if (picLock->width() <= 0 && picLock->height() <= 0)
+        return Qn::NothingRendered;
+
+    if (m_quickWidget && !painter && !m_rhiBlurBuffer)
         return Qn::NothingRendered;
 
     const int planeCount = MediaOutputShaderProgram::planeCount(picLock->colorFormat());
@@ -494,16 +556,16 @@ bool QnGLRenderer::drawVideoTextures(
 
     if (!m_gl)
     {
-        if (!painter)
-            return false;
-
         auto decodedFrame = picLock->decodedFrame();
         if (!decodedFrame)
             return false;
 
-        auto pe = dynamic_cast<nx::pathkit::RhiPaintEngine*>(painter->paintEngine());
+        // If painter is null, we are rendering into blur buffer.
+        nx::pathkit::RhiPaintEngine* pe = painter
+            ? dynamic_cast<nx::pathkit::RhiPaintEngine*>(painter->paintEngine())
+            : nullptr;
 
-        if (!pe) //< Software.
+        if (!pe && painter) //< Software.
         {
             const AVPixelFormat format = (AVPixelFormat)decodedFrame->format;
             const unsigned int width = decodedFrame->width;
@@ -564,6 +626,8 @@ bool QnGLRenderer::drawVideoTextures(
             const auto toDevice =
                 [painter](QPointF p)
                 {
+                    if (!painter)
+                        return QVector2D(p);
                     return QVector2D(
                         painter->transform().map(p)
                         * painter->device()->devicePixelRatioF());
@@ -585,26 +649,67 @@ bool QnGLRenderer::drawVideoTextures(
                 .sourceRect = textureRect
             };
 
-            // TODO: #ikulaychuk Implement RHI resources cleanup on renderer thread.
-            pe->drawCustom({
-                .prepare = [d, renderer = m_rhiVideoRenderer](
-                    QRhi* rhi,
-                    QRhiRenderPassDescriptor* rp,
-                    QRhiResourceUpdateBatch* u,
-                    const QMatrix4x4& deviceMvp)
-                {
-                    // This function is called  on the rendering thread and create resources.
-                    // So the cleanup should happen on the same thread.
-                    // But currently we are using this code only in QQuickWidget
-                    // which ifself does not use threaded rendering.
-                    renderer->prepare(d, deviceMvp, rhi, rp, u);
-                },
-                .render = [renderer = m_rhiVideoRenderer](
-                    QRhi*, QRhiCommandBuffer* cb, QSize viewportSize)
-                {
-                    renderer->render(cb, viewportSize);
-                }
-            });
+            if (pe)
+            {
+                // TODO: #ikulaychuk Implement RHI resources cleanup on renderer thread.
+                pe->drawCustom({
+                    .prepare = [d, renderer = m_rhiVideoRenderer](
+                        QRhi* rhi,
+                        QRhiRenderPassDescriptor* rp,
+                        QRhiResourceUpdateBatch* u,
+                        const QMatrix4x4& deviceMvp)
+                    {
+                        // This function is called  on the rendering thread and create resources.
+                        // So the cleanup should happen on the same thread.
+                        // But currently we are using this code only in QQuickWidget
+                        // which ifself does not use threaded rendering.
+                        renderer->prepare(d, deviceMvp, rhi, rp, u);
+                    },
+                    .render = [renderer = m_rhiVideoRenderer](
+                        QRhi*, QRhiCommandBuffer* cb, QSize viewportSize)
+                    {
+                        renderer->render(cb, viewportSize);
+                    }
+                });
+            }
+            else
+            {
+                QRhi* rhi = m_quickWidget->quickWindow()->rhi();
+
+                const QSize size = m_rhiBlurBuffer->size();
+
+                QMatrix4x4 viewProjection = rhi->clipSpaceCorrMatrix();
+                const float yCorr = rhi->isYUpInFramebuffer() ? 1 : -1;
+                viewProjection.translate(-1, -1 * yCorr, 0);
+                viewProjection.scale(2.0 / size.width(), yCorr * 2.0 / size.height());
+
+                const QRectF viewRect = QRectF(QPointF(0, 0), size);
+                d.data.verts[0] = QVector2D(viewRect.topLeft());
+                d.data.verts[1] = QVector2D(viewRect.topRight());
+                d.data.verts[2] = QVector2D(viewRect.bottomLeft());
+                d.data.verts[3] = QVector2D(viewRect.bottomRight());
+
+                QRhiCommandBuffer* commandBuffer = nullptr;
+
+                rhi->beginOffscreenFrame(&commandBuffer);
+                QRhiResourceUpdateBatch* updateBatch = rhi->nextResourceUpdateBatch();
+                m_rhiVideoRenderer->prepare(
+                    d,
+                    viewProjection,
+                    rhi,
+                    m_rhiBlurBuffer->renderPassDescriptor(),
+                    updateBatch);
+                commandBuffer->beginPass(
+                    m_rhiBlurBuffer->renderTarget(), Qt::black, {1.0f, 0}, updateBatch);
+                commandBuffer->setViewport({
+                    0,
+                    0,
+                    (float) size.width(),
+                    (float) size.height()});
+                m_rhiVideoRenderer->render(commandBuffer, size);
+                commandBuffer->endPass();
+                rhi->endOffscreenFrame();
+            }
         }
         return true;
     }
