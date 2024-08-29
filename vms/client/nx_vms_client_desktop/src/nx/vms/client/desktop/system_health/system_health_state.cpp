@@ -169,6 +169,8 @@ SystemHealthState::Private::Private(SystemHealthState* q):
 
     connect(m_userEmailsWatcher.get(), &UserEmailsWatcher::userSetChanged,
         q, updateSlot(emailIsEmpty));
+    connect(systemSettings(), &SystemSettings::emailSettingsChanged,
+        q, updateSlot(emailIsEmpty));
     update(SystemHealthIndex::emailIsEmpty);
 
     // UsersEmailIsEmpty.
@@ -379,8 +381,12 @@ bool SystemHealthState::Private::calculateState(SystemHealthIndex index) const
         case SystemHealthIndex::emailIsEmpty:
         {
             const auto user = this->user();
+            const bool smtpIsNotSet = hasPowerUserPermissions()
+                && !(systemSettings()->emailSettings().isValid()
+                    || systemSettings()->emailSettings().useCloudServiceToSendEmail);
             return user && m_userEmailsWatcher->usersWithInvalidEmail().contains(user)
-                && accessController()->hasPermissions(user, Qn::WriteEmailPermission);
+                && accessController()->hasPermissions(user, Qn::WriteEmailPermission)
+                && !smtpIsNotSet;
         }
 
         case SystemHealthIndex::usersEmailIsEmpty:
