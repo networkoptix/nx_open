@@ -140,7 +140,7 @@ class NxOpenConan(ConanFile):
         self.install_system_requirements(packages)
 
     def build_requirements(self):
-        self.build_requires("qt-host/6.5.3" "#eb144d410dfc2e7ee3986101cd3c0fc7")
+        self.build_requires("qt-host/6.5.3" "#ce6f445bd7ad978f3e18f5d5e421a19a")
 
         if self.isLinux:
             # Note: For gcc-toolchain requirement see open/cmake/conan_profiles/gcc.profile.
