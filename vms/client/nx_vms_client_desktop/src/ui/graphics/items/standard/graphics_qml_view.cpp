@@ -32,6 +32,7 @@
 #include <qt_graphics_items/graphics_utils.h>
 
 #include <nx/utils/log/log.h>
+#include <nx/pathkit/rhi_paint_engine.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/opengl/opengl_renderer.h>
 #include <nx/vms/client/desktop/system_logon/ui/welcome_screen.h>
@@ -42,6 +43,7 @@
 #include <ui/workaround/gl_native_painting.h>
 #include <ui/workaround/sharp_pixmap_painting.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/graphics/view/quick_widget_container.h>
 
 namespace {
 
@@ -250,9 +252,10 @@ struct GraphicsQmlView::Private
     bool renderRequested = false;
     bool sceneChanged = false;
 
-    std::unique_ptr<QRhiTexture> rhiTexture;
+    std::shared_ptr<QRhiTexture> rhiTexture;
     std::unique_ptr<QRhiTextureRenderTarget> rhiRenderTarget;
     std::unique_ptr<QRhiRenderPassDescriptor> rp;
+    bool useTextureReadback = false;
     QPixmap rhiImage;
 
     Private(GraphicsQmlView* view): view(view) {}
@@ -497,8 +500,11 @@ void GraphicsQmlView::Private::initRenderTarget()
     const auto pixelRatio = quickWindow->effectiveDevicePixelRatio();
     const QSize deviceSize = quickWindow->size() * pixelRatio;
 
-    rhiTexture.reset(rhi->newTexture(QRhiTexture::RGBA8, deviceSize, 1,
-        QRhiTexture::RenderTarget | QRhiTexture::UsedAsTransferSource));
+    QRhiTexture::Flags textureFlags = QRhiTexture::RenderTarget;
+    if (useTextureReadback)
+        textureFlags |= QRhiTexture::UsedAsTransferSource;
+
+    rhiTexture.reset(rhi->newTexture(QRhiTexture::RGBA8, deviceSize, 1, textureFlags));
 
     if (!rhiTexture->create())
         return;
@@ -575,6 +581,11 @@ bool GraphicsQmlView::Private::ensureOffscreen()
         {
             quickWindow->setGraphicsDevice(
                 QQuickGraphicsDevice::fromRhi(quickWidget->quickWindow()->rhi()));
+            useTextureReadback = false;
+        }
+        else
+        {
+            useTextureReadback = true;
         }
 
         if (!renderControl->initialize())
@@ -583,6 +594,11 @@ bool GraphicsQmlView::Private::ensureOffscreen()
         auto rhi = quickWindow->rhi();
 
         initRenderTarget();
+
+        offscreenInitialized = true;
+
+        if (!useTextureReadback)
+            return true;
 
         connect(quickWindow.get(), &QQuickWindow::afterRendering, view,
             [this, rhi]()
@@ -625,7 +641,6 @@ bool GraphicsQmlView::Private::ensureOffscreen()
             },
             Qt::DirectConnection);
 
-        offscreenInitialized = true;
         return true;
     }
 
@@ -891,7 +906,19 @@ void GraphicsQmlView::paint(QPainter* painter, const QStyleOptionGraphicsItem*, 
             d->renderControl->render();
             d->renderControl->endFrame();
 
-            painter->drawPixmap(0, 0, d->rhiImage);
+            if (d->useTextureReadback)
+            {
+                painter->drawPixmap(0, 0, d->rhiImage);
+                return;
+            }
+
+            if (auto pe = dynamic_cast<nx::pathkit::RhiPaintEngine*>(painter->paintEngine()))
+            {
+                pe->drawTexture(
+                    QRectF(0, 0, size().width(), size().height()),
+                    d->rhiTexture,
+                    /* mirrorY */ d->quickWindow->rhi()->isYUpInFramebuffer());
+            }
         }
         return;
     }
