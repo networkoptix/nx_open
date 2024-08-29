@@ -93,6 +93,7 @@ QnGraphicsView::QnGraphicsView(QGraphicsScene* scene, nx::vms::client::desktop::
     }
 
     auto container = new QuickWidgetContainer();
+    container->setAttribute(Qt::WA_Hover);
     setViewport(container);
     container->setAutoFillBackground(false);
 
