@@ -242,7 +242,11 @@ ConnectActionsHandler::ConnectActionsHandler(WindowContext* windowContext, QObje
         connect(sessionTimeoutWatcher, &RemoteSessionTimeoutWatcher::sessionExpired, this,
             [this](RemoteSessionTimeoutWatcher::SessionExpirationReason reason)
             {
-                const bool isTemporaryUser = system()->connection()->connectionInfo().isTemporary();
+                const auto connection = system()->connection();
+                if (!NX_ASSERT(connection))
+                    return;
+
+                const bool isTemporaryUser = connection->connectionInfo().isTemporary();
                 executeDelayedParented(
                     [this, isTemporaryUser, reason]()
                     {
@@ -794,8 +798,8 @@ void ConnectActionsHandler::establishConnection(RemoteConnectionPtr connection)
         &ConnectActionsHandler::at_reconnectAction_triggered,
         Qt::QueuedConnection);
 
-    qnClientCoreModule->networkModule()->setSession(session);
     system()->setSession(session);
+    qnClientCoreModule->networkModule()->setSession(session);
     const auto welcomeScreen = mainWindow()->welcomeScreen();
     if (welcomeScreen) // Welcome Screen exists in the desktop mode only.
         welcomeScreen->connectionToSystemEstablished(systemId);
