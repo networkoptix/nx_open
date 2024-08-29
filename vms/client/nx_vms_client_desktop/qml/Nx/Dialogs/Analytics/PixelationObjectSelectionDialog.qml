@@ -19,7 +19,7 @@ Dialog
     property var objectTypeIds: []
 
     readonly property SystemContext systemContext: WindowContextAware.context.systemContext
-    readonly property var taxonomyManager: systemContext.taxonomyManager()
+    readonly property var taxonomyManager: systemContext.taxonomyManager
 
     readonly property var availableObjectTypes: [
         "nx.base.Face",
