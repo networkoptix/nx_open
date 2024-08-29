@@ -5,6 +5,8 @@
 #include <memory>
 
 #include <QtCore/QPointer>
+#include <QtGui/QBackingStore>
+#include <QtGui/qpa/qplatformbackingstore.h>
 #include <QtQml/QQmlContext>
 #include <QtQml/QQmlEngine>
 
@@ -275,6 +277,13 @@ QQuickWindow* WindowContext::quickWindow() const
     if (const auto mainWindow = qobject_cast<MainWindow*>(mainWindowWidget()))
         return mainWindow->quickWindow();
 
+    return nullptr;
+}
+
+QRhi* WindowContext::rhi() const
+{
+    if (auto windowWidget = mainWindowWidget())
+        return windowWidget->backingStore()->handle()->rhi();
     return nullptr;
 }
 

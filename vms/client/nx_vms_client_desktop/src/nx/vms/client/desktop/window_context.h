@@ -10,6 +10,7 @@
 
 class QWidget;
 class QQuickWindow;
+class QRhi;
 
 struct QnStartupParameters;
 class QnWorkbenchDisplay;
@@ -127,6 +128,11 @@ public:
      * Returns resource browser quick window. Use only for obtaining graphics API information.
      */
     QQuickWindow* quickWindow() const;
+
+    /**
+     * Returns the RHI instance used by this window.
+     */
+    QRhi* rhi() const;
 
 signals:
     /**
