@@ -2,10 +2,13 @@
 
 #pragma once
 
+#include <optional>
+
 #include <business/business_resource_validation.h>
 #include <core/resource/resource.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/desktop/resource_dialogs/resource_selection_widget.h>
+#include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
 
@@ -14,6 +17,12 @@ namespace Ui { class CameraSelectionDialog; }
 namespace nx::vms::client::desktop {
 
 class ResourceSelectionWidget;
+
+struct PinnedItemDescription
+{
+    QString displayText;
+    QnResourceIconCache::Key iconKey;
+};
 
 class CameraSelectionDialog: public QnSessionAwareButtonBoxDialog
 {
@@ -36,6 +45,7 @@ public:
         const ResourceValidator& resourceValidator,
         const AlertTextProvider& alertTextProvider,
         bool permissionsHandledByFilter,
+        const std::optional<PinnedItemDescription>& pinnedItemDescription,
         QWidget* parent);
     virtual ~CameraSelectionDialog() override;
 
@@ -145,7 +155,7 @@ bool CameraSelectionDialog::selectCameras(
         };
 
     CameraSelectionDialog dialog(ResourceFilter(), resourceValidator, alertTextProvider,
-        /*permissionsHandledByFilter*/ false, parent);
+        /*permissionsHandledByFilter*/ false, /*pinnedItemDescription*/ {}, parent);
     dialog.resourceSelectionWidget()->setSelectedResourcesIds(selectedCameras);
     dialog.setAllCamerasSwitchVisible(ResourcePolicy::showAllCamerasSwitch());
     dialog.resourceSelectionWidget()->setShowRecordingIndicator(

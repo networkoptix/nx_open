@@ -94,7 +94,10 @@ public:
     AbstractEntityPtr createDialogEntities(ResourceTree::ResourceFilters resourceTypes,
         bool alwaysCreateGroupElements = false, bool combineWebPagesAndIntegrations = false) const;
 
-    AbstractEntityPtr addPinnedItem(AbstractEntityPtr baseEntity, AbstractItemPtr pinnedItem) const;
+    AbstractEntityPtr addPinnedItem(
+        AbstractEntityPtr baseEntity,
+        AbstractItemPtr pinnedItem,
+        bool withSeparator = true) const;
 
 private:
     bool hasPowerUserPermissions() const;

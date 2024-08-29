@@ -195,6 +195,7 @@ void AudioRedirectPickerWidget::selectAudioRedirectDevice()
         resourceValidator,
         alertTextProvider,
         /*permissionsHandledByFilter*/ true,
+        /*pinnedItemDescription*/ std::nullopt,
         this);
     cameraSelectionDialog->setAllCamerasSwitchVisible(*m_streamDirection == Input);
     cameraSelectionDialog->setAllowInvalidSelection(false);
