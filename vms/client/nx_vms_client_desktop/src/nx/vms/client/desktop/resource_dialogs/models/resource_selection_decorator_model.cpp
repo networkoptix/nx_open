@@ -101,6 +101,9 @@ QVariant ResourceSelectionDecoratorModel::data(const QModelIndex& index, int rol
     const auto leafCheckState =
         [this](const QModelIndex& index) -> QVariant
         {
+            if (index.data(ResourceDialogItemRole::IsPinnedItemRole).toBool())
+                return m_pinnedItemSelected ?  Qt::Checked : Qt::Unchecked;
+
             const auto resource = index.data(core::ResourceRole).value<QnResourcePtr>();
             if (resource.isNull())
                 return {};
@@ -250,6 +253,23 @@ bool ResourceSelectionDecoratorModel::toggleSelection(const QModelIndex& index)
     const auto toggleLeafSelection =
         [this, &invalidateIndexAndParents](const QModelIndex& index)
         {
+            if (index.data(ResourceDialogItemRole::IsPinnedItemRole).toBool())
+            {
+                m_pinnedItemSelected = !m_pinnedItemSelected;
+                emit dataChanged(
+                    index.siblingAtColumn(0),
+                    index.siblingAtColumn(columnCount(index.parent()) - 1),
+                    {Qt::CheckStateRole});
+
+                if (m_resourceSelectionMode == ResourceSelectionMode::ExclusiveSelection
+                    && !m_selectedResources.isEmpty())
+                {
+                    m_selectedResources.clear();
+                }
+
+                return true;
+            }
+
             const auto resource = index.data(core::ResourceRole).value<QnResourcePtr>();
             if (resource.isNull())
                 return false;
@@ -263,23 +283,28 @@ bool ResourceSelectionDecoratorModel::toggleSelection(const QModelIndex& index)
             }
             else
             {
-                QModelIndex removedIndex;
+                QModelIndexList deselectedIndexes;
                 if (m_resourceSelectionMode != ResourceSelectionMode::MultiSelection)
                 {
                     if (!m_selectedResources.empty())
-                        removedIndex = resourceIndex(*m_selectedResources.begin());
+                        deselectedIndexes.append(resourceIndex(*m_selectedResources.begin()));
 
                     m_selectedResources.clear();
+
+                    if (m_pinnedItemSelected)
+                        deselectedIndexes.append(this->index(0, 0, QModelIndex()));
+
+                    m_pinnedItemSelected = false;
                 }
 
                 m_selectedResources.insert(resource);
                 emit selectedResourcesChanged();
 
-                if (removedIndex.isValid())
+                for (const auto& deselectedIndex: deselectedIndexes)
                 {
                     emit dataChanged(
-                        removedIndex.siblingAtColumn(0),
-                        removedIndex.siblingAtColumn(columnCount(removedIndex.parent()) - 1),
+                        deselectedIndex.siblingAtColumn(0),
+                        deselectedIndex.siblingAtColumn(columnCount(deselectedIndex.parent()) - 1),
                         {Qt::CheckStateRole});
                 }
             }
@@ -357,6 +382,16 @@ void ResourceSelectionDecoratorModel::setSelectionMode(ResourceSelectionMode mod
 QModelIndex ResourceSelectionDecoratorModel::resourceIndex(const QnResourcePtr& resource) const
 {
     return m_resourceMapping.value(resource);
+}
+
+bool ResourceSelectionDecoratorModel::pinnedItemSelected() const
+{
+    return m_pinnedItemSelected;
+}
+
+void ResourceSelectionDecoratorModel::setPinnedItemSelected(bool selected)
+{
+    m_pinnedItemSelected = selected;
 }
 
 } // namespace nx::vms::client::desktop

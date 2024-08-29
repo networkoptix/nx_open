@@ -138,6 +138,7 @@ const std::unique_ptr<CameraSelectionDialog>
         CameraSelectionDialog::ResourceValidator(),
         CameraSelectionDialog::AlertTextProvider(),
         /*permissionsHandledByFilter*/ false,
+        /*pinnedItemDescription*/ std::nullopt,
         q);
 
     ResourceSelectionWidget::EntityFactoryFunction createTreeEntity =

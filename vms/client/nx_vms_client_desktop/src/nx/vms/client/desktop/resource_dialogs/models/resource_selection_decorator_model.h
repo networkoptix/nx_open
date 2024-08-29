@@ -72,6 +72,9 @@ public:
 
     QModelIndex resourceIndex(const QnResourcePtr& resource) const;
 
+    bool pinnedItemSelected() const;
+    void setPinnedItemSelected(bool selected);
+
 signals:
     void selectedResourcesChanged();
 
@@ -79,6 +82,8 @@ private:
     QSet<QnResourcePtr> m_selectedResources;
     ResourceSelectionMode m_resourceSelectionMode;
     QHash<QnResourcePtr, QPersistentModelIndex> m_resourceMapping;
+
+    bool m_pinnedItemSelected = false;
 };
 
 } // namespace nx::vms::client::desktop

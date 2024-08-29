@@ -21,6 +21,7 @@ enum ResourceDialogItemRole
     NewAddedCamerasItemRole, //< Type is bool, true if item from 'New Added Cameras' pinned row.
     ResolutionMegaPixelRole, //< Type is int.
     AvailableCloudStorageServices, //< Type is int, number of available services suitable for a camera.
+    IsPinnedItemRole, //< Type is bool.
 };
 
 enum class ResourceSelectionMode

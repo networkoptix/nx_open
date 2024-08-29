@@ -1213,12 +1213,15 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createDialogEntities(
 
 AbstractEntityPtr ResourceTreeEntityBuilder::addPinnedItem(
     AbstractEntityPtr baseEntity,
-    AbstractItemPtr pinnedItem) const
+    AbstractItemPtr pinnedItem,
+    bool withSeparator) const
 {
     auto result = std::make_unique<CompositionEntity>();
-    result->addSubEntity(createSpacerEntity());
+    if (withSeparator)
+        result->addSubEntity(createSpacerEntity());
     result->addSubEntity(makeSingleItemEntity(std::move(pinnedItem)));
-    result->addSubEntity(createSeparatorEntity());
+    if (withSeparator)
+        result->addSubEntity(createSeparatorEntity());
     result->addSubEntity(std::move(baseEntity));
     return result;
 }
