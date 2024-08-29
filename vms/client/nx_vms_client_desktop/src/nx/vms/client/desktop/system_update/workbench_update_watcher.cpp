@@ -69,7 +69,7 @@ WorkbenchUpdateWatcher::WorkbenchUpdateWatcher(WindowContext* windowContext, QOb
     m_checkLatestUpdateTimer(this),
     m_notifiedVersion(),
     m_updateAction(new CommandAction(tr("Updates"))),
-    m_skipAction(new CommandAction(tr("Skip Version"), "16x16/Outline/skip.svg")),
+    m_skipAction(new CommandAction(tr("Skip Version"), "16x16/Outline/skip.svg?primary=light16")),
     m_private(new Private())
 {
     m_private->notificationsManager = windowContext->localNotificationsManager();
