@@ -577,7 +577,7 @@ void QnGridBackgroundItem::paint(
         if (!m_imgUploader)
         {
             m_imgUploader.reset(new DecodedPictureToOpenGLUploader(glWidget, nullptr));
-            m_renderer.reset(new QnGLRenderer(glWidget, *m_imgUploader));
+            m_renderer.reset(new QnGLRenderer(glWidget, /*quickWidget*/ nullptr, *m_imgUploader));
             m_imgUploader->setYV12ToRgbShaderUsed(m_renderer->isYV12ToRgbShaderUsed());
             m_imgUploader->setNV12ToRgbShaderUsed(m_renderer->isNV12ToRgbShaderUsed());
         }

@@ -4,6 +4,7 @@
 
 #include <memory>
 
+#include <QtCore/QFile>
 #include <QtCore/QPointer>
 #include <QtGui/QOffscreenSurface>
 #include <QtGui/rhi/qrhi.h>
@@ -252,7 +253,13 @@ void MaskRenderingProcess::uploadData(QRhiResourceUpdateBatch* updateBatch)
     updateBatch->updateDynamicBuffer(
         m_vertexBuffer.get(), /*offset*/ 0, m_vertices.size() * sizeof(Vertex), m_vertices.data());
 
-    m_shaderData.matrix->set(viewProjection());
+    QMatrix4x4 matrix = viewProjection();
+    if (rhi()->isYUpInFramebuffer())
+    {
+        matrix.scale(1, -1);
+        matrix.translate(0, -1);
+    }
+    m_shaderData.matrix->set(matrix);
     m_shaderData.color->set(0.0, 1.0, 0.0, 1.0);
     updateBatch->updateDynamicBuffer(
         m_dataBuffer.get(), /*offset*/ 0, sizeof(m_shaderData), &m_shaderData);
@@ -564,6 +571,372 @@ QImage Pixelation::pixelate(
 QThread* Pixelation::thread() const
 {
     return d->rhiThread;
+}
+
+namespace {
+
+QShader load(const QString &name)
+{
+    QFile file(name);
+    const bool isOpened = file.open(QIODevice::ReadOnly);
+    return NX_ASSERT(isOpened, name) ? QShader::fromSerialized(file.readAll()) : QShader{};
+};
+
+std::unique_ptr<QRhiShaderResourceBindings> createBindings(
+    QRhiBuffer* dataBuffer,
+    QRhiTexture* sourceTexture,
+    QRhiSampler* sourceSampler,
+    QRhiTexture* maskTexture,
+    QRhiSampler* maskSampler)
+{
+    std::unique_ptr<QRhiShaderResourceBindings> shaderResourceBindings(
+        dataBuffer->rhi()->newShaderResourceBindings());
+
+    shaderResourceBindings->setBindings({
+        QRhiShaderResourceBinding::uniformBuffer(
+            /*binding*/ 0,
+            QRhiShaderResourceBinding::VertexStage | QRhiShaderResourceBinding::FragmentStage,
+            dataBuffer),
+
+        QRhiShaderResourceBinding::sampledTexture(
+            /*binding*/ 1,
+            QRhiShaderResourceBinding::FragmentStage,
+            sourceTexture,
+            sourceSampler),
+
+        QRhiShaderResourceBinding::sampledTexture(
+            /*binding*/ 2,
+            QRhiShaderResourceBinding::FragmentStage,
+            maskTexture,
+            maskSampler),
+    });
+    shaderResourceBindings->create();
+    return shaderResourceBindings;
+}
+
+} // namespace
+
+class BlurTarget
+{
+public:
+    void init(QRhi* rhi, const QSize& size)
+    {
+        m_rhi = rhi;
+
+        m_texture.reset(m_rhi->newTexture(
+            QRhiTexture::RGBA8,
+            size,
+            /*sampleCount*/ 1,
+            QRhiTexture::RenderTarget | QRhiTexture::UsedAsTransferSource));
+
+        m_texture->create();
+
+        m_renderTarget.reset(m_rhi->newTextureRenderTarget({m_texture.get()}));
+        m_renderPass.reset(m_renderTarget->newCompatibleRenderPassDescriptor());
+        m_renderTarget->setRenderPassDescriptor(m_renderPass.get());
+        m_renderTarget->create();
+
+        m_sampler.reset(m_rhi->newSampler(
+            QRhiSampler::Linear,
+            QRhiSampler::Linear,
+            QRhiSampler::None,
+            QRhiSampler::ClampToEdge,
+            QRhiSampler::ClampToEdge));
+        m_sampler->create();
+    }
+
+    QRhi* m_rhi = nullptr;
+    std::shared_ptr<QRhiTexture> m_texture;
+    std::unique_ptr<QRhiTextureRenderTarget> m_renderTarget;
+    std::unique_ptr<QRhiRenderPassDescriptor> m_renderPass;
+    std::unique_ptr<QRhiSampler> m_sampler;
+};
+
+class BlurProcess
+{
+public:
+    BlurProcess() {}
+
+    void init(QRhi* rhi, QSize size, QRhiTexture* maskTexture);
+    void initBuffers();
+    void initPipeline(std::unique_ptr<QRhiGraphicsPipeline>& pipeline);
+
+    void uploadData(QRhiResourceUpdateBatch* updateBatch);
+    void render();
+
+    void renderPass(
+        QRhiCommandBuffer* commands,
+        QRhiTextureRenderTarget* target,
+        QRhiShaderResourceBindings* bindings);
+
+    void setIntensity(float value) { m_intensity = value; }
+
+    BlurTarget* blurTarget() { return &m_blurTargetA; }
+
+private:
+    QRhi* m_rhi = nullptr;
+
+    QMatrix4x4 m_viewProjection;
+
+    BlurTarget m_blurTargetA;
+    BlurTarget m_blurTargetB;
+
+    std::unique_ptr<QRhiGraphicsPipeline> m_pipeline;
+
+    std::unique_ptr<QRhiShaderResourceBindings> m_atobBindings;
+    std::unique_ptr<QRhiShaderResourceBindings> m_btoaBindings;
+
+    std::vector<Vertex> m_vertices;
+    std::unique_ptr<QRhiBuffer> m_vertexBuffer;
+    bool m_isVertexBufferChanged = true;
+
+    PixelationShader::ShaderData m_shaderData;
+    std::unique_ptr<QRhiBuffer> m_dataBuffer;
+
+    QRhiTexture* m_maskTexture = nullptr;
+    std::unique_ptr<QRhiSampler> m_maskSampler;
+
+    float m_intensity = 1.0;
+
+    std::shared_ptr<QRhiTexture> m_tmpTexture;
+};
+
+void BlurProcess::init(QRhi* rhi, QSize size, QRhiTexture* maskTexture)
+{
+    m_rhi = rhi;
+    m_blurTargetA.init(m_rhi, size);
+    m_blurTargetB.init(m_rhi, size);
+
+    m_tmpTexture.reset(m_rhi->newTexture(
+        QRhiTexture::RGBA8,
+        size,
+        /*sampleCount*/ 1,
+        {}));
+    m_tmpTexture->create();
+
+    m_viewProjection = m_rhi->clipSpaceCorrMatrix();
+    m_viewProjection.ortho(QRectF{0, 0, 1, 1});
+
+    // Flip vertically to prevent the result texture from being flipped due to the frame buffer
+    // coordinate system.
+    if (m_rhi->isYUpInFramebuffer())
+    {
+        m_viewProjection.scale(1, -1);
+        m_viewProjection.translate(0, -1);
+    }
+
+    initBuffers();
+
+    m_maskTexture = maskTexture;
+
+    m_atobBindings = createBindings(
+        m_dataBuffer.get(),
+        m_blurTargetA.m_texture.get(), m_blurTargetA.m_sampler.get(),
+        m_maskTexture, m_maskSampler.get());
+
+    m_btoaBindings = createBindings(
+        m_dataBuffer.get(),
+        m_blurTargetB.m_texture.get(), m_blurTargetB.m_sampler.get(),
+        m_maskTexture, m_maskSampler.get());
+
+    initPipeline(m_pipeline);
+}
+
+void BlurProcess::initBuffers()
+{
+    m_vertexBuffer.reset(m_rhi->newBuffer(
+        QRhiBuffer::Immutable,
+        QRhiBuffer::VertexBuffer,
+        m_vertices.size() * sizeof(Vertex)));
+    m_vertexBuffer->create();
+
+    m_dataBuffer.reset(m_rhi->newBuffer(
+        QRhiBuffer::Dynamic,
+        QRhiBuffer::UniformBuffer,
+        sizeof(PixelationShader::ShaderData)));
+    m_dataBuffer->create();
+
+    m_maskSampler.reset(m_rhi->newSampler(
+        QRhiSampler::Linear,
+        QRhiSampler::Linear,
+        QRhiSampler::None,
+        QRhiSampler::ClampToEdge,
+        QRhiSampler::ClampToEdge));
+
+    m_maskSampler->create();
+
+    addRectangle(m_vertices, {0, 0, 1, 1});
+}
+
+void BlurProcess::initPipeline(std::unique_ptr<QRhiGraphicsPipeline>& pipeline)
+{
+    pipeline.reset(m_rhi->newGraphicsPipeline());
+
+    QRhiVertexInputLayout inputLayout;
+    inputLayout.setBindings({
+        QRhiVertexInputBinding{sizeof(Vertex)}
+    });
+    inputLayout.setAttributes({
+        {/*binding*/ 0, /*location*/ 0, QRhiVertexInputAttribute::Float2, /* vertexOffset */ 0}
+    });
+
+    pipeline->setShaderStages({
+        {QRhiShaderStage::Vertex, load(":/src/nx/vms/common/pixelation/shaders/pixelation.vert.qsb")},
+        {QRhiShaderStage::Fragment, load(":/src/nx/vms/common/pixelation/shaders/pixelation.frag.qsb")}
+    });
+
+    pipeline->setVertexInputLayout(inputLayout);
+    pipeline->setShaderResourceBindings(m_atobBindings.get());
+    pipeline->setRenderPassDescriptor(m_blurTargetB.m_renderPass.get());
+    pipeline->create();
+}
+
+void BlurProcess::uploadData(QRhiResourceUpdateBatch* updateBatch)
+{
+    m_shaderData.matrix->set(m_viewProjection);
+    updateBatch->updateDynamicBuffer(
+        m_dataBuffer.get(), /*offset*/ 0, sizeof(m_shaderData), &m_shaderData);
+
+    if (m_isVertexBufferChanged)
+    {
+        updateBatch->uploadStaticBuffer(
+            m_vertexBuffer.get(),
+            /*offset*/ 0,
+            m_vertices.size() * sizeof(Vertex),
+            m_vertices.data());
+
+        m_isVertexBufferChanged = false;
+    }
+}
+
+void BlurProcess::renderPass(
+    QRhiCommandBuffer* commands,
+    QRhiTextureRenderTarget* target,
+    QRhiShaderResourceBindings* bindings)
+{
+    QRhiResourceUpdateBatch* updateBatch = m_rhi->nextResourceUpdateBatch();
+
+    uploadData(updateBatch);
+
+    commands->beginPass(target, Qt::transparent, {}, updateBatch);
+
+    commands->setGraphicsPipeline(m_pipeline.get());
+
+    const QSize size = target->pixelSize();
+    commands->setViewport(QRhiViewport(0.0f, 0.0f, size.width(), size.height()));
+    commands->setShaderResources(bindings);
+
+    const QRhiCommandBuffer::VertexInput input(m_vertexBuffer.get(), /*offset*/ 0);
+    commands->setVertexInput(0, 1, &input);
+    commands->draw(m_vertices.size());
+
+    commands->endPass();
+}
+
+void BlurProcess::render()
+{
+    constexpr int kMaxMaskSize = 2048;
+    constexpr int kIterations = 4;
+
+    const auto getOffset =
+        [this](int i, bool isHorizontal)
+        {
+            const int adjust = isHorizontal ? 1 : 0;
+            const float step = ((kIterations - 1 - i) * 2 + adjust) * m_intensity * 1.2;
+            return QVector2D(
+                1.0 / kMaxMaskSize * step,
+                1.0 / kMaxMaskSize * step);
+        };
+
+    QRhiCommandBuffer* commands = nullptr;
+
+    for (int i = 0; i < kIterations; ++i)
+    {
+        // A -> B
+        m_rhi->beginOffscreenFrame(&commands);
+        m_shaderData.textureOffset = getOffset(i, /* isHorizontal */ true);
+        m_shaderData.isHorizontalPass = true;
+        renderPass(commands, m_blurTargetB.m_renderTarget.get(), m_atobBindings.get());
+
+        m_rhi->endOffscreenFrame();
+
+        // B -> A
+        m_rhi->beginOffscreenFrame(&commands);
+        m_shaderData.textureOffset = getOffset(i, /* isHorizontal */ false);
+        m_shaderData.isHorizontalPass = false;
+        renderPass(commands, m_blurTargetA.m_renderTarget.get(), m_btoaBindings.get());
+
+        m_rhi->endOffscreenFrame();
+    }
+}
+
+struct BlurBuffer::Private
+{
+    static constexpr int kMaskSizeFactor = 4;
+
+    Private(QRhi* rhi, const QSize& size);
+
+    QRhi* rhi;
+    QSize size;
+    std::unique_ptr<MaskRenderingProcess> mask;
+    QVector<QRectF> maskRectangles;
+    std::unique_ptr<BlurProcess> blurProcess;
+};
+
+BlurBuffer::Private::Private(QRhi* rhi, const QSize& size): rhi(rhi), size(size)
+{
+    const auto maskSize = size / kMaskSizeFactor;
+    mask = std::make_unique<MaskRenderingProcess>(rhi);
+    mask->init(maskSize);
+    mask->setCaptureImage(false);
+
+    blurProcess = std::make_unique<BlurProcess>();
+    blurProcess->init(rhi, size, mask->targetTexture());
+}
+
+BlurBuffer::BlurBuffer(QRhi* rhi, const QSize& size): d(new BlurBuffer::Private(rhi, size))
+{
+}
+
+BlurBuffer::~BlurBuffer()
+{
+}
+
+void BlurBuffer::blur(
+    const QVector<QRectF>& rectangles,
+    double intensity)
+{
+    if (rectangles != d->maskRectangles)
+    {
+        d->mask->clear();
+        for (const auto& rectangle: rectangles)
+            d->mask->addRectangle(rectangle);
+        d->mask->draw();
+        d->maskRectangles = rectangles;
+    }
+
+    d->blurProcess->setIntensity(intensity);
+    d->blurProcess->render();
+}
+
+QRhiRenderPassDescriptor* BlurBuffer::renderPassDescriptor() const
+{
+    return d->blurProcess->blurTarget()->m_renderPass.get();
+}
+
+QRhiRenderTarget* BlurBuffer::renderTarget() const
+{
+    return d->blurProcess->blurTarget()->m_renderTarget.get();
+}
+
+QSize BlurBuffer::size() const
+{
+    return d->size;
+}
+
+std::shared_ptr<QRhiTexture> BlurBuffer::texture() const
+{
+    return d->blurProcess->blurTarget()->m_texture;
 }
 
 } // namespace nx::vms::common::pixelation

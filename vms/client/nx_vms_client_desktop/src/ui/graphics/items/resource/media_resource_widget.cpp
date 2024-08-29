@@ -675,10 +675,7 @@ void QnMediaResourceWidget::initBlurMask()
         return;
 
     if (!m_renderer->openGLWidget())
-    {
-        NX_ASSERT(!ini().objectPixelation);
         return;
-    }
 
     m_blurMask = std::make_unique<BlurMask>(
         QnOpenGLRendererManager::instance(m_renderer->openGLWidget()).get());
@@ -1353,7 +1350,7 @@ Qn::RenderStatus QnMediaResourceWidget::paintVideoTexture(
         }
     }
 
-    if (ini().objectPixelation && m_blurMask)
+    if (ini().objectPixelation)
     {
         const nx::vms::api::PixelationSettings& pixelationSettings =
             systemSettings()->pixelationSettings();
@@ -1369,7 +1366,10 @@ Qn::RenderStatus QnMediaResourceWidget::paintVideoTexture(
         if (m_statusOverlay->opacity() > 0)
         {
             // Blur everything when overlay is displayed.
-            m_blurMask->drawFull(m_renderer->blurMaskFrameBuffer(channel));
+            if (glWidget)
+                m_blurMask->drawFull(m_renderer->blurMaskFrameBuffer(channel));
+            else
+                m_renderer->setBlurRectangles(channel, {QRectF(0, 0, 1, 1)});
         }
         else if (pixelateObjects)
         {
@@ -1384,14 +1384,20 @@ Qn::RenderStatus QnMediaResourceWidget::paintVideoTexture(
                 timestamp,
                 channel);
 
-            m_blurMask->draw(m_renderer->blurMaskFrameBuffer(channel), boundingBoxes);
+            if (glWidget)
+                m_blurMask->draw(m_renderer->blurMaskFrameBuffer(channel), boundingBoxes);
+            else
+                m_renderer->setBlurRectangles(channel, boundingBoxes);
         }
     }
-    else if (m_blurMask)
+    else
     {
         // Blur everything when overlay is displayed.
         m_renderer->setBlurFactor(m_statusOverlay->opacity());
-        m_blurMask->drawFull(m_renderer->blurMaskFrameBuffer(channel));
+        if (glWidget)
+            m_blurMask->drawFull(m_renderer->blurMaskFrameBuffer(channel));
+        else
+            m_renderer->setBlurRectangles(channel, {QRectF(0, 0, 1, 1)});
     }
 
     Qn::RenderStatus result = Qn::RenderStatus::NothingRendered;

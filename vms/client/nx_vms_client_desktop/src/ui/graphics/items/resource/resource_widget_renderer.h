@@ -110,6 +110,7 @@ public:
     /** Set blur in range [0..1]. */
     void setBlurFactor(qreal value);
     QOpenGLFramebufferObject* blurMaskFrameBuffer(int channel) const;
+    void setBlurRectangles(int channel, const QVector<QRectF>& rectangles);
 
     Qn::RenderStatus paint(
         QPainter* painter, int channel, const QRectF& sourceRect,

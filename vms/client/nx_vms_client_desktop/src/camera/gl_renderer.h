@@ -22,15 +22,20 @@ class QnHistogramConsumer;
 class QnFisheyePtzController;
 class QnGLShaderProgram;
 class QOpenGLTexture;
+class BlurBuffer;
 
 namespace nx::vms::client::desktop { class RhiVideoRenderer; }
+namespace nx::vms::common::pixelation { class BlurBuffer; }
 
 class QnGLRenderer : protected QnGlFunctions
 {
 public:
     static bool isPixelFormatSupported(AVPixelFormat pixfmt);
 
-    QnGLRenderer(QOpenGLWidget* glWidget, const DecodedPictureToOpenGLUploader& decodedPictureProvider );
+    QnGLRenderer(
+        QOpenGLWidget* glWidget,
+        QQuickWidget* quickWidget,
+        const DecodedPictureToOpenGLUploader& decodedPictureProvider);
     ~QnGLRenderer();
 
     /*!
@@ -47,6 +52,7 @@ public:
      * Set blur in range [0..1]
      */
     void setBlurFactor(qreal value);
+    void setBlurRectangles(const QVector<QRectF>& rectangles);
 
     Qn::RenderStatus paint(QPainter* painter, const QRectF &sourceRect, const QRectF &targetRect);
     /** The same as paint but don't do actual painting. */
@@ -79,6 +85,7 @@ private:
     ImageCorrectionResult calcImageCorrection();
 private:
     QOpenGLFunctions* const m_gl;
+    QQuickWidget* const m_quickWidget;
     const DecodedPictureToOpenGLUploader& m_decodedPictureProvider;
     qreal m_brightness;
     qreal m_contrast;
@@ -152,6 +159,9 @@ private:
 
     bool m_blurEnabled = true;
     std::shared_ptr<nx::vms::client::desktop::RhiVideoRenderer> m_rhiVideoRenderer;
+
+    std::unique_ptr<nx::vms::common::pixelation::BlurBuffer> m_rhiBlurBuffer;
+    QVector<QRectF> m_blurRectangles;
 };
 
 #endif //QN_GL_RENDERER_H
