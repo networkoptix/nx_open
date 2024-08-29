@@ -177,7 +177,7 @@ void EventTile::Private::updateIcon()
 
     core::SvgIconColorer::ThemeSubstitutions colorTheme =
         {{QnIcon::Normal, {.primary = q->titleColor().toRgb().name().toLatin1()}}};
-    q->ui->iconLabel->setPixmap(qnSkin->icon(iconPath, colorTheme).pixmap(16, 16));
+    q->ui->iconLabel->setPixmap(qnSkin->icon(iconPath, colorTheme).pixmap(20, 20));
 }
 
 qreal EventTile::Private::getWidthOfText(const QString& text, const QLabel* label) const
