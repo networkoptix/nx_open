@@ -60,6 +60,7 @@ public:
     // Target and enclosing rect are specified in global coordinates.
     void setTarget(const QRect& targetRect);
     void setTarget(const QPoint& targetPoint);
+    const QRectF& targetRect() const;
     void setEnclosingRect(const QRect& value);
 
     enum class State
