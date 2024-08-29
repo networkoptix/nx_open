@@ -32,6 +32,11 @@ int countEnabledUsers(const auto& subjects)
         });
 }
 
+bool isUserVisible(const QnUserResourcePtr& user)
+{
+    return !user->attributes().testFlag(nx::vms::api::UserAttribute::hidden);
+}
+
 } // namespace
 
 namespace nx::vms::client::desktop {
@@ -194,16 +199,17 @@ UserListModel::UserListModel(
         this, &UserListModel::updateIndicators);
 
     m_usersModel->setHasCheckboxes(true);
-    m_usersModel->setResources(resourcePool()->getResources<QnUserResource>());
+    m_usersModel->setResources(
+        resourcePool()->getResources<QnUserResource>(&isUserVisible));
 
     connect(resourcePool(), &QnResourcePool::resourceAdded, this,
         [this](const QnResourcePtr& resource)
         {
-            if (m_usersModel->resources().contains(resource))
-                return;
-
             if (auto user = resource.dynamicCast<QnUserResource>())
-                m_usersModel->addResource(resource);
+            {
+                if (isUserVisible(user) && !m_usersModel->resources().contains(user))
+                    m_usersModel->addResource(user);
+            }
         });
 
     connect(resourcePool(), &QnResourcePool::resourceRemoved,
@@ -256,7 +262,10 @@ bool UserListModel::systemHasCustomUsers() const
     // Is it still viable? Or we need to detect users with customized access rights?
 
     const auto customUsers = resourcePool()->getResources<QnUserResource>(
-        [](const QnUserResourcePtr& user) { return user->groupIds().empty(); });
+        [](const QnUserResourcePtr& user)
+        {
+            return isUserVisible(user) && user->groupIds().empty();
+        });
 
     return !customUsers.empty();
 }
