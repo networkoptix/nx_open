@@ -118,14 +118,12 @@ LogonData SystemTabBar::adjustedLogonData(const LogonData& source, const nx::Uui
 {
     LogonData adjusted = source;
 
-    if (const auto credentials = core::CredentialsManager::credentials(localId);
-        !credentials.empty())
-    {
+    const auto credentials = core::CredentialsManager::credentials(localId);
+    if (adjusted.credentials.authToken.empty() && !credentials.empty())
         adjusted.credentials = credentials[0];
-    }
 
     adjusted.connectScenario = ConnectScenario::connectFromTabBar;
-    adjusted.storePassword = true; //< We don't want to clear a saved password.
+    adjusted.storePassword = !credentials.empty() && !credentials[0].authToken.empty();
 
     return adjusted;
 }
@@ -211,7 +209,10 @@ void SystemTabBar::mousePressEvent(QMouseEvent* event)
     const auto systemData = m_store->systemData(index);
     if (systemData->systemDescription->localId() == m_store->currentSystemId())
         action(menu::ResourcesModeAction)->setChecked(true);
-    base_type::mousePressEvent(event);
+    if (m_store->activeSystemTab() < 0)
+        at_currentChanged(index);
+    else
+        base_type::mousePressEvent(event);
 }
 
 void SystemTabBar::contextMenuEvent(QContextMenuEvent* event)

@@ -68,6 +68,7 @@ public:
     void setSystemUpdating(bool value);
     void setSystems(QList<State::SystemData> systems);
     void setWorkbenchState(const nx::Uuid& systemId, const WorkbenchState& workbenchState);
+    void setCurrentCredentials(network::http::Credentials credentials);
 
     int systemCount() const;
     std::optional<State::SystemData> systemData(int index) const;

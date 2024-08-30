@@ -34,6 +34,11 @@ SystemTabBarStateHandler::SystemTabBarStateHandler(QObject* parent):
         this,
         &SystemTabBarStateHandler::at_systemDisconnected);
 
+    connect(action(menu::ConnectAction),
+        &QAction::triggered,
+        this,
+        &SystemTabBarStateHandler::at_connectAction);
+
     connect(windowContext()->connectActionsHandler(),
         &ConnectActionsHandler::stateChanged,
         this,
@@ -104,8 +109,15 @@ void SystemTabBarStateHandler::at_stateChanged(const State& state)
 void SystemTabBarStateHandler::at_currentSystemChanged(
     core::SystemDescriptionPtr systemDescription)
 {
-    if (NX_ASSERT(m_store))
-        m_store->changeCurrentSystem(systemDescription);
+    if (!NX_ASSERT(m_store))
+        return;
+
+    m_store->changeCurrentSystem(systemDescription);
+    if (!m_storedCredentials.authToken.empty())
+    {
+        m_store->setCurrentCredentials(m_storedCredentials);
+        m_storedCredentials = {};
+    }
 }
 
 void SystemTabBarStateHandler::at_systemDisconnected()
@@ -119,7 +131,7 @@ void SystemTabBarStateHandler::at_systemDisconnected()
 }
 
 void SystemTabBarStateHandler::at_connectionStateChanged(
-    ConnectActionsHandler::LogicalState logicalValue)
+    ConnectActionsHandler::LogicalState logicalState)
 {
     if (!NX_ASSERT(m_store))
         return;
@@ -128,11 +140,12 @@ void SystemTabBarStateHandler::at_connectionStateChanged(
         && windowContext()->connectActionsHandler()->logicalState()
             != ConnectActionsHandler::LogicalState::connecting);
 
-    m_store->setConnectionState(logicalValue);
-    if (logicalValue == ConnectActionsHandler::LogicalState::disconnected)
+    m_store->setConnectionState(logicalState);
+    if (logicalState == ConnectActionsHandler::LogicalState::disconnected)
     {
         storeWorkbenchState();
         m_store->setCurrentSystemId({});
+        m_store->setActiveSystemTab(-1);
     }
 }
 
@@ -145,6 +158,12 @@ void SystemTabBarStateHandler::dropCloudSystems()
             return system.logonData.userType == nx::vms::api::UserType::cloud;
         });
     m_store->setSystems(systems);
+}
+
+void SystemTabBarStateHandler::at_connectAction()
+{
+    const auto parameters = menu()->currentParameters(sender());
+    m_storedCredentials = parameters.argument<LogonData>(Qn::LogonDataRole).credentials;
 }
 
 void SystemTabBarStateHandler::storeWorkbenchState()

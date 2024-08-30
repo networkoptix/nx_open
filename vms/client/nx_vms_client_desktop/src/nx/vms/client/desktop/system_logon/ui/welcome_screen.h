@@ -163,7 +163,6 @@ signals:
     void isCloudEnabledChanged();
     void visibleControlsChanged();
     void gridEnabledChanged();
-    void resetAutoLogin();
     void globalPreloaderVisibleChanged(bool visible);
     void globalPreloaderEnabledChanged();
     void messageChanged();

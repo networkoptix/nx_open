@@ -23,17 +23,19 @@ signals:
     void activeSystemTabChanged(int index);
     void homeTabActiveChanged(bool active);
 
-private:
+private slots:
     void at_stateChanged(const State& state);
     void at_currentSystemChanged(core::SystemDescriptionPtr systemDescription);
     void at_systemDisconnected();
-    void at_connectionStateChanged(ConnectActionsHandler::LogicalState logicalValue);
     void dropCloudSystems();
+    void at_connectionStateChanged(ConnectActionsHandler::LogicalState logicalState);
+    void at_connectAction();
     void storeWorkbenchState();
 
 private:
     QSharedPointer<Store> m_store;
     State m_storedState;
+    network::http::Credentials m_storedCredentials;
 };
 
 } // namespace nx::vms::client::desktop

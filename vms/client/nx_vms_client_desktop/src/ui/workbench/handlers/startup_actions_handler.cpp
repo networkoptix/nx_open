@@ -616,8 +616,7 @@ bool StartupActionsHandler::connectToSystemIfNeeded(
 
 bool StartupActionsHandler::attemptAutoLogin()
 {
-    if (!appContext()->localSettings()->autoLogin()
-        || !appContext()->localSettings()->saveCredentialsAllowed())
+    if (!appContext()->localSettings()->saveCredentialsAllowed())
     {
         return false;
     }

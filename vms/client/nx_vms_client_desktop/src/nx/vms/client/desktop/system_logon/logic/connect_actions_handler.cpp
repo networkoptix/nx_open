@@ -1161,7 +1161,7 @@ void ConnectActionsHandler::at_connectAction_triggered()
             if (logonData->storeSession)
                 options |= StoreSession;
 
-            if ((logonData->storePassword || appContext()->localSettings()->autoLogin())
+            if (logonData->storePassword
                 && NX_ASSERT(appContext()->localSettings()->saveCredentialsAllowed()))
             {
                 options |= StorePassword;
@@ -1207,7 +1207,7 @@ void ConnectActionsHandler::at_connectAction_triggered()
 
         // In most cases we will connect succesfully by this url. So we can store it.
         const bool storePasswordForTile = appContext()->localSettings()->saveCredentialsAllowed()
-            && (passwordIsAlreadySaved || appContext()->localSettings()->autoLogin())
+            && passwordIsAlreadySaved
             && !isTemporaryUser;
 
         ConnectionOptions options;
