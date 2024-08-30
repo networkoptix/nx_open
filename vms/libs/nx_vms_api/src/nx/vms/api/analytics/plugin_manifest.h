@@ -17,7 +17,7 @@ namespace nx::vms::api::analytics {
  * The data structure that is given by each Analytics Integration after the Integration has been
  * created.
  * <br/>
- * See the description of the fields in `src/nx/sdk/analytics/manifests.md` in Metadata SDK.
+ * See the description of the fields in `src/nx/sdk/analytics/manifests.md` in the SDK.
  */
 struct NX_VMS_API PluginManifest
 {

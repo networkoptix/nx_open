@@ -26,7 +26,7 @@ target_compile_definitions(ftp_storage_plugin
 )
 
 target_include_directories(ftp_storage_plugin PRIVATE
-    ../../../src #< SDK headers.
+    ../../../../src #< SDK headers.
     ${ftplibpp_dir}
 )
 

@@ -1,0 +1,66 @@
+## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
+# Executes at the build phase. Creates and populates the SDK directory to be zipped.
+
+# Receive variable values from the calling CMakeList.txt.
+set(sdk_name @sdk_name@)
+set(CMAKE_CURRENT_BINARY_DIR @CMAKE_CURRENT_BINARY_DIR@)
+set(CMAKE_SOURCE_DIR @CMAKE_SOURCE_DIR@)
+set(copied_nx_sdk_version_origin @copied_nx_sdk_version_origin@)
+set(copied_nx_sdk_version_file @copied_nx_sdk_version_file@)
+set(copied_nx_sdk_settings_model_origin @copied_nx_sdk_settings_model_origin@)
+set(copied_nx_sdk_settings_model_file @copied_nx_sdk_settings_model_file@)
+set(copied_static_origin @copied_static_origin@)
+set(copied_static_files @copied_static_files@)
+set(copied_nx_kit_origin @copied_nx_kit_origin@)
+set(copied_nx_kit_files @copied_nx_kit_files@)
+set(copied_nx_sdk_src_nx_sdk_origin @copied_nx_sdk_src_nx_sdk_origin@)
+set(copied_nx_sdk_src_nx_sdk_files @copied_nx_sdk_src_nx_sdk_files@)
+set(copied_nx_sdk_unit_tests_origin @copied_nx_sdk_unit_tests_origin@)
+set(copied_nx_sdk_unit_tests_files @copied_nx_sdk_unit_tests_files@)
+set(copied_nx_sdk_analytics_resources_origin @copied_nx_sdk_analytics_resources_origin@)
+set(copied_nx_sdk_analytics_resources_files @copied_nx_sdk_analytics_resources_files@)
+set(msvc_environment_setup_script @msvc_environment_setup_script@)
+
+include(@open_source_root@/cmake/utils.cmake)
+
+set(target_dir ${CMAKE_CURRENT_BINARY_DIR}/${sdk_name})
+
+nx_copy_always(${copied_nx_sdk_version_origin} ${copied_nx_sdk_version_file}
+    ${target_dir}/src)
+nx_copy_always(${copied_nx_sdk_settings_model_origin} ${copied_nx_sdk_settings_model_file}
+    ${target_dir}/src/nx/sdk)
+nx_copy_always(${copied_static_origin} "${copied_static_files}"
+    ${target_dir})
+nx_copy_always(${copied_nx_kit_origin} "${copied_nx_kit_files}"
+    ${target_dir}/nx_kit)
+nx_copy_always(${copied_nx_sdk_src_nx_sdk_origin} "${copied_nx_sdk_src_nx_sdk_files}"
+    ${target_dir}/src/nx/sdk)
+nx_copy_always(${copied_nx_sdk_unit_tests_origin} "${copied_nx_sdk_unit_tests_files}"
+    ${target_dir}/unit_tests)
+nx_copy_always(${copied_nx_sdk_analytics_resources_origin}
+    "${copied_nx_sdk_analytics_resources_files}"
+    ${target_dir}/src/nx/sdk/analytics)
+
+file(READ @sdk_example_files_file@ sdk_example_files_json)
+nx_json_get_array(sdk_example_files_json ARRAY_NAME sample_descriptors)
+foreach(descriptor ${sample_descriptors})
+    string(JSON target GET ${descriptor} "target")
+    string(JSON origin_dir GET ${descriptor} "origin_dir")
+
+    nx_json_get_array(descriptor PATH "sources" ARRAY_NAME sources)
+    nx_copy_always(${origin_dir}/${target} "${sources}" ${target_dir}/samples/${target})
+
+    nx_json_get_array(descriptor PATH "extra_files" ARRAY_NAME extra_files DEFAULT_VALUE "")
+    if(extra_files)
+        nx_copy(${extra_files} DESTINATION ${target_dir}/samples/${target})
+    endif()
+endforeach()
+
+nx_copy_always(@open_source_root@ @open_source_root@/licenses ${target_dir})
+
+nx_copy_always(
+    @open_source_root@/build_utils/msvc/
+    @open_source_root@/build_utils/msvc/${msvc_environment_setup_script}
+    ${target_dir}
+)

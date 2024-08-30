@@ -11,8 +11,8 @@ nx_configure_file(build_distribution_conf.py.in
     ${CMAKE_CURRENT_BINARY_DIR}/build_distribution_conf.py @ONLY)
 
 set(depends unit_tests)
-if(TARGET nx_metadata_sdk)
-    list(APPEND depends nx_metadata_sdk)
+if(TARGET nx_server_plugin_sdk)
+    list(APPEND depends nx_server_plugin_sdk)
 endif()
 if(TARGET nx_sdk_ut)
     list(APPEND depends nx_sdk_ut)

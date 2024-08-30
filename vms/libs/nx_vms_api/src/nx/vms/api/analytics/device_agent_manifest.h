@@ -27,7 +27,7 @@ Q_DECLARE_FLAGS(DeviceAgentCapabilities, DeviceAgentCapability)
  * The data structure that is given by each Analytics Engine's DeviceAgent to the Server after the
  * DeviceAgent has been created by the Engine.
  * <br/>
- * See the description of the fields in `src/nx/sdk/analytics/manifests.md` in Metadata SDK.
+ * See the description of the fields in `src/nx/sdk/analytics/manifests.md` in the SDK.
  */
 struct NX_VMS_API DeviceAgentManifest
 {

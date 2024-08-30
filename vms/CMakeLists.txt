@@ -2,7 +2,8 @@
 
 add_subdirectory(client)
 
-# Important: nx_metadata_sdk subdirectory must be added before adding "distribution" subdirectory.
+# Important: "nx_server_plugin_sdk/" subdirectory must be added before adding the "distribution/"
+# subdirectory.
 if(withMediaServer OR openSourceBuild)
     add_subdirectory(server)
 endif()

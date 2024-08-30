@@ -6,6 +6,14 @@ project(axis_camera_plugin)
 
 set(CMAKE_AUTOMOC ON)
 
+if(DEFINED ENV{QT_DIR})
+    list(APPEND CMAKE_PREFIX_PATH $ENV{QT_DIR})
+endif()
+
+if(NOT QT_HOST_PATH AND DEFINED ENV{QT_HOST_PATH})
+    set(QT_HOST_PATH $ENV{QT_HOST_PATH})
+endif()
+
 file(GLOB_RECURSE source_files CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/*)
 add_library(axis_camera_plugin SHARED ${source_files})
 
@@ -23,14 +31,23 @@ target_compile_definitions(axis_camera_plugin
     INTERFACE NX_PLUGIN_API=${API_IMPORT_MACRO}
 )
 
-find_package(Qt6Core REQUIRED)
-find_package(Qt6Network REQUIRED)
+find_package(Qt6Core)
+find_package(Qt6Network)
+
+if (NOT Qt6Core_FOUND OR NOT Qt6Network_FOUND)
+    message(FATAL_ERROR
+        "Some of the Qt packages are not found. If you are building this plugin as a sample from "
+        "the SDK package, make sure that you set the environment variables QT_DIR and "
+        "QT_HOST_PATH (see readme.md for more information)."
+    )
+endif()
+
 target_link_libraries(axis_camera_plugin PRIVATE
     Qt6::Core
     Qt6::Network
 )
 
-target_include_directories(axis_camera_plugin PRIVATE ../../../src) #< SDK headers.
+target_include_directories(axis_camera_plugin PRIVATE ../../../../src) #< SDK headers.
 
 # Use all CPU cores by MSVC.
 if(MSVC)

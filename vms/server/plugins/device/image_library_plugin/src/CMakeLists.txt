@@ -7,7 +7,7 @@ project(image_library_plugin)
 # Define nx_kit lib, static.
 set(nxKitLibraryType "STATIC" CACHE STRING "" FORCE)
 set(nxKitWithTests "NO" CACHE STRING "" FORCE)
-add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/../../../nx_kit ${CMAKE_CURRENT_BINARY_DIR}/nx_kit)
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/../../../../nx_kit ${CMAKE_CURRENT_BINARY_DIR}/nx_kit)
 
 file(GLOB_RECURSE source_files CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/*)
 add_library(image_library_plugin SHARED ${source_files})
@@ -28,7 +28,7 @@ target_compile_definitions(image_library_plugin
 
 target_link_libraries(image_library_plugin PRIVATE nx_kit)
 
-target_include_directories(image_library_plugin PRIVATE ../../../src) #< SDK headers.
+target_include_directories(image_library_plugin PRIVATE ../../../../src) #< SDK headers.
 
 # Use all CPU cores by MSVC.
 if(MSVC)

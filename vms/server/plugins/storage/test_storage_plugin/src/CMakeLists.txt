@@ -21,7 +21,7 @@ target_compile_definitions(test_storage_plugin
     INTERFACE NX_PLUGIN_API=${API_IMPORT_MACRO}
 )
 
-target_include_directories(test_storage_plugin PRIVATE ../../../src) #< SDK headers.
+target_include_directories(test_storage_plugin PRIVATE ../../../../src) #< SDK headers.
 
 target_include_directories(test_storage_plugin PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
