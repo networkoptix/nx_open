@@ -136,16 +136,6 @@ ThumbnailTooltip::~ThumbnailTooltip()
     // Required here for forward-declared scoped pointer destruction.
 }
 
-QString ThumbnailTooltip::text() const
-{
-    return d->text();
-}
-
-void ThumbnailTooltip::setText(const QString& text)
-{
-    d->text = text;
-}
-
 void ThumbnailTooltip::setMaximumContentSize(const QSize& size)
 {
     d->maximumContentSize = size;

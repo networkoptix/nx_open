@@ -22,9 +22,6 @@ public:
     ThumbnailTooltip(WindowContext* context);
     virtual ~ThumbnailTooltip() override;
 
-    QString text() const;
-    void setText(const QString& text);
-
     void setImageProvider(core::ImageProvider* value);
     void setHighlightRect(const QRectF& rect);
 

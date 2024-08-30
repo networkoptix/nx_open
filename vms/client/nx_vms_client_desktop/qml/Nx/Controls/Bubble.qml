@@ -451,10 +451,19 @@ Item
             const bubbleY_noShadow = Math.min(Math.max(enclosingRect.top, desiredY),
                 enclosingRect.bottom - requiredHeight)
 
-            if (bubbleY_noShadow < enclosingRect.top) //< If the bubble doesn't fit vertically.
-                return undefined
-
             const topShift = bubble.containDecorationsInside ? control.topInset : 0
+
+            if (bubbleY_noShadow < enclosingRect.top) //< If the bubble doesn't fit vertically.
+            {
+                return {
+                    "pointerEdge": selectedEdge,
+                    "normalizedPointerPos": (pointToY - bubbleY_noShadow) / requiredHeight,
+                    "x": bubbleX,
+                    "y": enclosingRect.top,
+                    "truncationRequired": true,
+                    "padding": bubble.topPadding + bubble.bottomPadding + 2 * shadowBlurRadius
+                }
+            }
 
             return {
                 "pointerEdge": selectedEdge,
