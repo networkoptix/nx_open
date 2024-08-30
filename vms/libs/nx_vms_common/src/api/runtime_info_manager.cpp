@@ -91,38 +91,27 @@ bool QnRuntimeInfoManager::hasItem(const nx::Uuid& id)
     return m_items->hasItem(id);
 }
 
-void QnRuntimeInfoManager::updateLocalItem(const QnPeerRuntimeInfo& value)
-{
-    {
-        NX_MUTEX_LOCKER lock(&m_mutex);
-        m_localInfo = value;
-    }
-
-    {
-        NX_MUTEX_LOCKER lock( &m_updateMutex );
-        updateItem(value);
-    }
-}
-
 void QnRuntimeInfoManager::updateRemoteItem(const QnPeerRuntimeInfo& value)
 {
-    NX_MUTEX_LOCKER lock(&m_updateMutex);
-
-    updateItem(value);
+    NX_MUTEX_LOCKER locker(&m_mutex);
+    updateItem(value, locker);
 }
 
-void QnRuntimeInfoManager::updateItem(const QnPeerRuntimeInfo& value)
+void QnRuntimeInfoManager::updateItem(QnPeerRuntimeInfo value, nx::Locker<nx::Mutex>& lock)
 {
-    QnPeerRuntimeInfo modifiedValue = value;
-    if (m_items->hasItem(value.uuid))
+    Qn::NotifierList notifiers;
+    if (m_items->m_itemByUuid.contains(value.uuid))
     {
-        int oldVersion = m_items->getItem(value.uuid).data.version;
-        modifiedValue.data.version = oldVersion + 1;
-        m_items->updateItem(modifiedValue);
+        int oldVersion = m_items->m_itemByUuid.value(value.uuid).data.version;
+        value.data.version = oldVersion + 1;
+        m_items->updateItemUnderLock(value, notifiers);
     }
     else
     {
-        modifiedValue.data.version = 1;
-        m_items->addItem(modifiedValue);
+        value.data.version = 1;
+        m_items->addItemUnderLock(value, notifiers);
     }
+
+    lock.unlock();
+    m_items->notify(notifiers);
 }

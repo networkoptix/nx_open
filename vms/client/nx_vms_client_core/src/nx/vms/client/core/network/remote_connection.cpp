@@ -248,9 +248,12 @@ void RemoteConnection::initializeMessageBusConnection(
         d->timeSynchronizationManager);
     d->messageBusConnection->init(appContext()->moduleDiscoveryManager());
 
-    auto data = systemContext->runtimeInfoManager()->localInfo();
-    data.data.peer.instanceId = d->auditId;
-    systemContext->runtimeInfoManager()->updateLocalItem(data);
+    systemContext->runtimeInfoManager()->updateLocalItem(
+        [this](auto* data)
+        {
+            data->data.peer.instanceId = d->auditId;
+            return true;
+        });
 }
 
 const nx::vms::api::ModuleInformation& RemoteConnection::moduleInformation() const

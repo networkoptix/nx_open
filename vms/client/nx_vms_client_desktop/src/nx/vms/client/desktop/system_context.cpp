@@ -80,7 +80,12 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
     switch (mode)
     {
         case Mode::client:
-            runtimeInfoManager()->updateLocalItem(createLocalRuntimeInfo(this));
+            runtimeInfoManager()->updateLocalItem(
+                [runtimeInfo = createLocalRuntimeInfo(this)](auto* data)
+                {
+                    *data = runtimeInfo;
+                    return true;
+                });
             d->videoWallOnlineScreensWatcher = std::make_unique<VideoWallOnlineScreensWatcher>(
                 this);
 
