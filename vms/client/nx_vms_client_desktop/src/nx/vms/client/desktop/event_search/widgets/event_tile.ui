@@ -93,7 +93,7 @@
           <property name="spacing">
            <number>4</number>
           </property>
-          <item alignment="Qt::AlignTop ">
+          <item alignment="Qt::AlignTop">
           <widget class="QLabel" name="iconLabel">
            <property name="minimumSize">
             <size>
@@ -130,7 +130,26 @@
              <bool>true</bool>
             </property>
            </widget>
-        </item>
+         </item>
+         <item alignment="Qt::AlignRight|Qt::AlignTop">
+          <widget class="nx::vms::client::desktop::CloseButton" name="closeButton">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed"/>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>20</width>
+             <height>20</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>20</width>
+             <height>20</height>
+            </size>
+           </property>
+          </widget>
+         </item>
         </layout>
         </item>
         <item row="1" column="0" colspan="3">
@@ -425,6 +444,11 @@
   </layout>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>nx::vms::client::desktop::CloseButton</class>
+   <extends>HoverButton</extends>
+   <header location="global">nx/vms/client/desktop/common/widgets/close_button.h</header>
+  </customwidget>
   <customwidget>
    <class>nx::vms::client::desktop::ActionPushButton</class>
    <extends>QPushButton</extends>

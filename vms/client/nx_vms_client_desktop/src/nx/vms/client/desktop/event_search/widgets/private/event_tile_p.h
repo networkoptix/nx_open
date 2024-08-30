@@ -35,8 +35,6 @@ public:
     };
 
     EventTile* const q;
-    CloseButton* const closeButton;
-    WidgetAnchor* const closeButtonAnchor;
     bool closeable = false;
     std::unique_ptr<QAction> action; //< Button action.
     std::unique_ptr<QAction> additionalAction;

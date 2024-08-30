@@ -126,6 +126,8 @@ public:
 
     void clear();
 
+    CloseButton* closeButton();
+
 signals:
     void clicked(Qt::MouseButton button, Qt::KeyboardModifiers modifiers);
     void doubleClicked();
