@@ -89,13 +89,14 @@ TEST(SslSocket, AsyncOperationCancellation)
 
 TEST(Socket, postCancellation)
 {
-    constexpr static const int kTestRuns = 10;
+    const int kTestRuns = nx::TestOptions::loadFactor();
+
     constexpr static const int kTestThreadCount = 10;
     constexpr static const int kTestSocketCount = 25;
 
     std::atomic<size_t> postCalls(0);
 
-    auto testFunctor = [&postCalls]()
+    auto testFunctor = [&postCalls, kTestRuns]()
     {
         std::atomic<size_t> counter(0);
 
@@ -123,8 +124,6 @@ TEST(Socket, postCancellation)
 
             for (const auto& sock : sockets)
                 sock->pleaseStopSync();
-
-            //QThread::usleep( 100 );
         }
     };
 
