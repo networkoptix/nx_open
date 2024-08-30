@@ -181,7 +181,7 @@ Item
                 {
                     id: auditTrailButton
 
-                    icon.source: "image://skin/20x20/Outline/calendar.svg"
+                    icon.source: "image://skin/20x20/Outline/audit_trail.svg"
                     icon.width: 20
                     icon.height: 20
                     spacing: 8
