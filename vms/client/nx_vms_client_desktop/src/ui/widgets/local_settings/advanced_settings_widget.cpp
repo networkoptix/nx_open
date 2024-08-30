@@ -90,6 +90,9 @@ QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget *parent) :
     if (nx::media::getHardwareAccelerationType() == nx::media::HardwareAccelerationType::none)
         ui->useHardwareDecodingCheckbox->setEnabled(false);
 
+    if (appContext()->runtimeSettings()->graphicsApi() == GraphicsApi::software)
+        ui->disableBlurCheckbox->setEnabled(false);
+
     ui->maximumLiveBufferLengthSpinBox->setSuffix(' ' + QnTimeStrings::suffix(QnTimeStrings::Suffix::Milliseconds));
 
     setHelpTopic(ui->doubleBufferCheckbox, HelpTopic::Id::SystemSettings_General_DoubleBuffering);
@@ -458,6 +461,12 @@ bool QnAdvancedSettingsWidget::isBlurEnabled() const
 
 void QnAdvancedSettingsWidget::setBlurEnabled(bool value)
 {
+    if (!ui->disableBlurCheckbox->isEnabled())
+    {
+        ui->disableBlurCheckbox->setChecked(true);
+        return;
+    }
+
     ui->disableBlurCheckbox->setChecked(!value);
 }
 
