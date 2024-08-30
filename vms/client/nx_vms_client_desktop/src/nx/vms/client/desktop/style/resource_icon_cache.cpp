@@ -43,13 +43,21 @@ Q_GLOBAL_STATIC(QnResourceIconCache, qn_resourceIconCache);
 
 namespace {
 
-static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kTreeThemeSubstitutions = {
+const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kTreeThemeSubstitutions = {
     {QnIcon::Disabled, {.primary = "light10", .secondary = "light4", .alpha=0.3}},
     {QnIcon::Selected, {.primary = "light4", .secondary = "light2"}},
     {QnIcon::Active, {.primary = "brand_core", .secondary= "light4"}},
     {QnIcon::Normal, {.primary = "light10", .secondary = "light4"}},
     {QnIcon::Error, {.primary = "red", .secondary = "red"}},
     {QnIcon::Pressed, {.primary = "light4", .secondary = "light2"}}};
+
+const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kWarningTheme = {
+    {QnIcon::Disabled, {.primary = "light10", .secondary = "yellow", .alpha=0.3}},
+    {QnIcon::Selected, {.primary = "light4", .secondary = "yellow"}},
+    {QnIcon::Active, {.primary = "brand_core", .secondary= "yellow"}},
+    {QnIcon::Normal, {.primary = "light10", .secondary = "yellow"}},
+    {QnIcon::Error, {.primary = "red", .secondary = "red"}},
+    {QnIcon::Pressed, {.primary = "light4", .secondary = "yellow"}}};
 
 const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kYellowTheme = {
     {QnIcon::Normal, {.primary = "yellow",}}
@@ -75,7 +83,7 @@ NX_DECLARE_COLORIZED_ICON(kCameraNotificationIcon, "20x20/Outline/device.svg",\
     kTreeThemeSubstitutions)
 
 NX_DECLARE_COLORIZED_ICON(kCameraWarningIcon, "20x20/Solid/camera_warning.svg",\
-    kTreeThemeSubstitutions)
+    kWarningTheme)
 NX_DECLARE_COLORIZED_ICON(kCameraOfflineIcon, "20x20/Solid/camera_offline.svg",\
     kTreeThemeOfflineSubstitutions)
 NX_DECLARE_COLORIZED_ICON(kCameraUnauthorizedIcon, "20x20/Solid/camera_unauthorized.svg",\
@@ -105,7 +113,7 @@ NX_DECLARE_COLORIZED_ICON(kSystemCloudUnauthIcon, "20x20/Solid/system_cloud_unau
 NX_DECLARE_COLORIZED_ICON(kSystemCloudOfflineIcon, "20x20/Solid/system_cloud_offline.svg",\
     kTreeThemeOfflineSubstitutions)
 NX_DECLARE_COLORIZED_ICON(kSystemCloudWarningIcon, "20x20/Solid/system_cloud_warning.svg",\
-    kTreeThemeSubstitutions)
+    kWarningTheme)
 NX_DECLARE_COLORIZED_ICON(kSystemCloudIcon, "20x20/Solid/system_cloud.svg",\
     kTreeThemeSubstitutions)
 
