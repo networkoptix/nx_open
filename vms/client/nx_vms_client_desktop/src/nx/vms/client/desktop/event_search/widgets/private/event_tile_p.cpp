@@ -37,8 +37,6 @@ namespace nx::vms::client::desktop {
 
 EventTile::Private::Private(EventTile* q):
     q(q),
-    closeButton(new CloseButton(q)),
-    closeButtonAnchor(anchorWidgetToParent(closeButton, Qt::RightEdge | Qt::TopEdge)),
     progressLabel(new QnElidedLabel(q)),
     loadPreviewTimer(new QTimer(q))
 {
@@ -134,16 +132,16 @@ void EventTile::Private::handleStateChanged(State state)
         {
             const bool hovered = state == State::hoverOn;
             const auto showCloseButton = (hovered || q->progressBarVisible()) && closeable;
-            closeButton->setVisible(showCloseButton);
+            q->closeButton()->setVisible(showCloseButton);
             q->setBackgroundRole(hovered ? QPalette::Midlight : QPalette::Window);
 
             if (showCloseButton)
-                closeButton->raise();
+                q->closeButton()->raise();
             break;
         }
         case State::pressed:
         {
-            closeButton->setVisible(false);
+            q->closeButton()->setVisible(false);
             q->setBackgroundRole(QPalette::Dark);
             break;
         }

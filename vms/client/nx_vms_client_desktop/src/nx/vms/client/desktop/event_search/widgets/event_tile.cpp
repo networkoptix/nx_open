@@ -67,9 +67,6 @@ static constexpr QMargins kWidePreviewMarginsWithHeader(0, 0, 0, 0);
 
 static constexpr QMargins kNarrowPreviewMarginsWithHeader(0, 2, 0, 0);
 
-// Close button margins are fine-tuned in correspondence with tile layout.
-static constexpr QMargins kCloseButtonMarginsWithHeader(0, 10, 10, 0);
-
 static constexpr auto kDefaultReloadMode = AsyncImageWidget::ReloadMode::showPreviousImage;
 
 constexpr auto kDotRadius = 8;
@@ -91,8 +88,10 @@ EventTile::EventTile(QWidget* parent):
     setPaletteColor(this, QPalette::Text, core::colorTheme()->color("light4"));
     setPaletteColor(this, QPalette::Highlight, core::colorTheme()->color("brand"));
 
-    d->closeButton->setHidden(true);
-    d->closeButtonAnchor->setMargins(kCloseButtonMarginsWithHeader);
+    QSizePolicy sizePolicy = ui->closeButton->sizePolicy();
+    sizePolicy.setRetainSizeWhenHidden(true);
+    ui->closeButton->setSizePolicy(sizePolicy);
+    ui->closeButton->setHidden(true);
 
     ui->mainWidget->layout()->setContentsMargins(kMarginsWithHeader);
     ui->wideHolder->layout()->setContentsMargins(kWidePreviewMarginsWithHeader);
@@ -197,7 +196,6 @@ EventTile::EventTile(QWidget* parent):
     ui->mainWidget->layout()->setContentsMargins(kMarginsWithHeader);
     ui->wideHolder->layout()->setContentsMargins(kWidePreviewMarginsWithHeader);
     ui->narrowHolder->layout()->setContentsMargins(kNarrowPreviewMarginsWithHeader);
-    d->closeButtonAnchor->setMargins(kCloseButtonMarginsWithHeader);
 
     static constexpr int kProgressLabelShift = 8;
     anchorWidgetToParent(d->progressLabel, {0, 0, 0, kProgressLabelShift});
@@ -208,7 +206,7 @@ EventTile::EventTile(QWidget* parent):
     ui->nameLabel->ensurePolished();
     d->defaultTitlePalette = ui->nameLabel->palette();
 
-    connect(d->closeButton, &QAbstractButton::clicked, this,
+    connect(ui->closeButton, &QAbstractButton::clicked, this,
         [this]
         {
             if (d->onCloseAction)
@@ -268,7 +266,7 @@ void EventTile::setCloseable(bool value)
     if (progressBarVisible())
     {
         QMargins parentMargins = ui->progressBar->parentWidget()->contentsMargins();
-        parentMargins.setRight(d->closeable ? d->closeButton->width() : kMarginsWithHeader.right());
+        parentMargins.setRight(kMarginsWithHeader.right());
         ui->progressBar->parentWidget()->setContentsMargins(parentMargins);
     }
 
@@ -803,6 +801,11 @@ void EventTile::clear()
     d->clearLabel(ui->resourceListLabel, d->resourceLabelDescriptor);
     setToolTip({});
     setFixedSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
+}
+
+CloseButton* EventTile::closeButton()
+{
+    return ui->closeButton;
 }
 
 } // namespace nx::vms::client::desktop
