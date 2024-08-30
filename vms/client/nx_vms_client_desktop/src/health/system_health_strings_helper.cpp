@@ -237,7 +237,7 @@ QString QnSystemHealthStringsHelper::messageTooltip(
 
                 result << camera->getName();
             }
-            return result.join(nx::vms::common::html::kLineBreak);
+            return result.join("\n");
         }
 
         default:
