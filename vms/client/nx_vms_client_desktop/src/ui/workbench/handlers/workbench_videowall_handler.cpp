@@ -1268,9 +1268,13 @@ void QnWorkbenchVideoWallHandler::setControlMode(bool active)
         // TODO: #sivanov Start control when item goes online.
         sendMessage(QnVideoWallControlMessage(QnVideoWallControlMessage::ControlStarted));
 
+        runtimeInfoManager()->updateLocalItem(
+            [&layoutResource](auto* data)
+            {
+                data->data.videoWallControlSession = layoutResource->getId();
+                return true;
+            });
         QnPeerRuntimeInfo localInfo = runtimeInfoManager()->localInfo();
-        localInfo.data.videoWallControlSession = layoutResource->getId();
-        runtimeInfoManager()->updateLocalItem(localInfo);
 
         setItemControlledBy(localInfo.data.videoWallControlSession, localInfo.uuid, true);
     }
@@ -1299,9 +1303,13 @@ void QnWorkbenchVideoWallHandler::setControlMode(bool active)
         m_controlMode.active = active;
         m_controlMode.cacheTimer->stop();
 
+        runtimeInfoManager()->updateLocalItem(
+            [](auto* data)
+            {
+                data->data.videoWallControlSession = nx::Uuid();
+                return true;
+            });
         QnPeerRuntimeInfo localInfo = runtimeInfoManager()->localInfo();
-        localInfo.data.videoWallControlSession = nx::Uuid();
-        runtimeInfoManager()->updateLocalItem(localInfo);
 
         setItemControlledBy(localInfo.data.videoWallControlSession, localInfo.uuid, false);
     }

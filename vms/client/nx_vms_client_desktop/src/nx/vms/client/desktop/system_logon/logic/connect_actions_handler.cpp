@@ -369,9 +369,13 @@ ConnectActionsHandler::ConnectActionsHandler(WindowContext* windowContext, QObje
     connect(userWatcher, &core::UserWatcher::userChanged, this,
         [this](const QnUserResourcePtr &user)
         {
-            QnPeerRuntimeInfo localInfo = system()->runtimeInfoManager()->localInfo();
-            localInfo.data.userId = user ? user->getId() : nx::Uuid();
-            system()->runtimeInfoManager()->updateLocalItem(localInfo);
+            auto userId = user ? user->getId() : nx::Uuid();
+            system()->runtimeInfoManager()->updateLocalItem(
+                [userId](auto* data)
+                {
+                    data->data.userId = userId;
+                    return true;
+                });
         });
 
     // The watcher should be created here so it can monitor all permission changes.

@@ -41,6 +41,7 @@ template <class T>
 class QnThreadsafeItemStorage
 {
     friend class QnThreadsafeItemStorageNotifier<T>;
+    friend class QnRuntimeInfoManager;
 
 public:
     typedef QList<T> ItemList;

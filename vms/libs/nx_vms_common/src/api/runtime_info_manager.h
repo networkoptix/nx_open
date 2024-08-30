@@ -32,6 +32,23 @@ struct QnPeerRuntimeInfo
     {
         return uuid.isNull();
     }
+
+    bool updateFlag(nx::vms::api::RuntimeFlag flag, bool isSet)
+    {
+        if (data.flags.testFlag(flag) == isSet)
+            return false;
+        data.flags.setFlag(flag, isSet);
+        return true;
+    }
+
+    template<typename T>
+    static bool updateData(T *field, const T& value)
+    {
+        if (*field == value)
+            return false;
+        *field = value;
+        return true;
+    }
 };
 
 
@@ -57,7 +74,22 @@ public:
     QnPeerRuntimeInfo item(const nx::Uuid& id) const;
 
     void setMessageProcessor(QnCommonMessageProcessor* messageProcessor);
-    void updateLocalItem(const QnPeerRuntimeInfo& value);
+
+    /**
+     * Update local peer runtime info.
+     * The functor is called under the locked mutex, so the functor must be non-blocking.
+     * @param update Functor accepting pointer to local info, returns true if update is required.
+     */
+    template<typename Func>
+    bool updateLocalItem(Func update)
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        if (!update(&m_localInfo))
+            return false;
+        updateItem(m_localInfo, lock);
+        return true;
+    }
+
     void updateRemoteItem(const QnPeerRuntimeInfo& value);
 
 signals:
@@ -72,12 +104,11 @@ private:
         const QnPeerRuntimeInfo& item,
         const QnPeerRuntimeInfo& oldItem) override;
 
-    void updateItem(const QnPeerRuntimeInfo& value);
+    void updateItem(QnPeerRuntimeInfo value, nx::Locker<nx::Mutex>& lock);
 
 private:
     /** Mutex that is to be used when accessing items. */
     mutable nx::Mutex m_mutex;
-    mutable nx::Mutex m_updateMutex;
     QnPeerRuntimeInfo m_localInfo;
     QScopedPointer<QnThreadsafeItemStorage<QnPeerRuntimeInfo>> m_items;
     QnCommonMessageProcessor* m_messageProcessor = nullptr;
