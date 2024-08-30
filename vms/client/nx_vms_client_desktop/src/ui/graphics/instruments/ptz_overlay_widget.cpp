@@ -14,7 +14,7 @@ NX_DECLARE_COLORIZED_ICON(kZoomInIcon, "32x32/Solid/zoom_in.svg", kLight1Theme)
 NX_DECLARE_COLORIZED_ICON(kZoomOutIcon, "32x32/Solid/zoom_out.svg", kLight1Theme)
 NX_DECLARE_COLORIZED_ICON(kFocusInIcon, "32x32/Solid/focus_in.svg", kLight1Theme)
 NX_DECLARE_COLORIZED_ICON(kFocusOutIcon, "32x32/Solid/focus_out.svg", kLight1Theme)
-NX_DECLARE_COLORIZED_ICON(kFocusAutoIcon, "16x16/Solid/focus_auto.svg", kLight1Theme)
+NX_DECLARE_COLORIZED_ICON(kFocusAutoIcon, "32x32/Solid/focus_auto.svg", kLight1Theme)
 
 PtzOverlayWidget::PtzOverlayWidget(QGraphicsItem* parent, Qt::WindowFlags windowFlags):
     base_type(parent, windowFlags),
