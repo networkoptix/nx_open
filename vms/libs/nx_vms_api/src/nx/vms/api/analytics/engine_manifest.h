@@ -38,7 +38,7 @@ Q_DECLARE_FLAGS(EngineCapabilities, EngineCapability)
  * The data structure that is given by each Analytics Integration's Engine to the Server after the
  * Engine has been created by the Integration.
  * <br/>
- * See the description of the fields in `src/nx/sdk/analytics/manifests.md` in Metadata SDK.
+ * See the description of the fields in `src/nx/sdk/analytics/manifests.md` in the SDK.
  */
 struct NX_VMS_API EngineManifest
 {

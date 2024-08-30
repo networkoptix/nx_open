@@ -138,14 +138,14 @@ def archiveSdkUnitTests(archiver, conf, src_bin_dir):
         "Windows": ["*.dll", "*_ut.exe"],
         "Darwin": ["*.dylib", "*_ut"]
     }[conf.CMAKE_SYSTEM_NAME]
-    source_dir = Path(conf.METADATA_SDK_BUILD_DIR)
+    source_dir = Path(conf.NX_SERVER_PLUGIN_SDK_DIR)
     file_list = list(
         itertools.chain.from_iterable(source_dir.glob(f"**/{p}") for p in ut_file_patterns))
     if not file_list:
         logging.info("No SDK unit test executables found")
         return
 
-    target_dir = Path("nx_metadata_sdk")
+    target_dir = Path("nx_server_plugin_sdk")
     for f in file_list:
         # Analytics Plugin libraries must go to "plugins_optional/" to make analytics_plugin_ut.cfg
         # from the VMS build directory work.
@@ -197,7 +197,7 @@ def main():
 
 
         if not isMac:
-            logging.info("Archiving standalone metadata_sdk unit tests")
+            logging.info("Archiving standalone server_plugin_sdk unit tests")
             archiveSdkUnitTests(a, conf, src_bin_dir)
 
         logging.info("Archiving unit test executables")

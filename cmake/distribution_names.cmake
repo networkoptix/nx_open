@@ -87,14 +87,8 @@ function(set_distribution_names)
         "${prefix}-client-${mobileClientVersion.full}-${android_aab_suffix}" PARENT_SCOPE)
     set(webadmin_distribution_name
         "${prefix}-webadmin-${releaseVersion.full}-${webadminSuffix}" PARENT_SCOPE)
-    set(metadata_sdk_distribution_name
-        "${prefix}-metadata_sdk-${releaseVersion.full}-${sdkSuffix}" PARENT_SCOPE)
-    set(video_source_sdk_distribution_name
-        "${prefix}-video_source_sdk-${releaseVersion.full}-${sdkSuffix}" PARENT_SCOPE)
-    set(storage_sdk_distribution_name
-        "${prefix}-storage_sdk-${releaseVersion.full}-${sdkSuffix}" PARENT_SCOPE)
-    set(cloud_storage_sdk_distribution_name
-        "${prefix}-cloud_storage_sdk-${releaseVersion.full}-${sdkSuffix}" PARENT_SCOPE)
+    set(server_plugin_sdk_distribution_name
+        "${prefix}-server_plugin_sdk-${releaseVersion.full}-${sdkSuffix}" PARENT_SCOPE)
     set(vms_benchmark_distribution_name
         "${prefix}-vms_benchmark-${releaseVersion.full}-${vmsBenchmarkSuffix}" PARENT_SCOPE)
     set(ssc_analytics_plugin_distribution_name

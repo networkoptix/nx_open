@@ -10,6 +10,6 @@ WITH_ANALYTICS_SERVER = "@withAnalyticsServer@"
 ZIP_COMPRESSION_LEVEL = @zip_compression_level@
 GZIP_COMPRESSION_LEVEL = @gzip_compression_level@
 AFFECTED_TARGETS_LIST_FILE_NAME = "@NX_AFFECTED_TARGETS_LIST_FILE_NAME@"
-METADATA_SDK_BUILD_DIR = "@nx_metadata_sdk_build_dir@"
+NX_SERVER_PLUGIN_SDK_DIR = "@nx_server_plugin_sdk_build_dir@"
 IS_OPEN_SOURCE="@openSourceBuild@"
 INFO_FILE="@testInformationFile@"

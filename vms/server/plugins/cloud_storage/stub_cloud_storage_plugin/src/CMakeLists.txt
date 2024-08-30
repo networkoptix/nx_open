@@ -3,10 +3,10 @@
 cmake_minimum_required(VERSION 3.14)
 project(stub_cloud_storage_plugin)
 
-get_filename_component(sdk_path "../../../src"
+get_filename_component(sdk_path "../../../../src"
     REALPATH BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 
-get_filename_component(nx_kit_path "../../../nx_kit/src"
+get_filename_component(nx_kit_path "../../../../nx_kit/src"
     REALPATH BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 
 file(GLOB_RECURSE source_files CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)

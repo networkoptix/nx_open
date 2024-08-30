@@ -609,3 +609,54 @@ function(nx_get_target_manual_dependencies target out_deps)
 
     set(${out_deps} ${deps} ${local_out_deps} PARENT_SCOPE)
 endfunction()
+
+function(nx_json_add_array json_variable_name)
+    cmake_parse_arguments(JSON "APPEND" "ARRAY_NAME" "PATH" ${ARGN})
+
+    set(json_string ${${json_variable_name}})
+
+    if(JSON_APPEND)
+        string(JSON new_element_index ERROR_VARIABLE bad_object LENGTH ${json_string} ${JSON_PATH})
+        if(NOT bad_object)
+            string(JSON exising_object_type TYPE ${json_string} ${JSON_PATH})
+        endif()
+        if(bad_object OR NOT exising_object_type STREQUAL "ARRAY")
+            string(JSON json_string SET ${json_string} ${JSON_PATH} "[]")
+            set(new_element_index 1)
+        endif()
+    else()
+        string(JSON json_string SET ${json_string} ${JSON_PATH} "[]")
+        set(new_element_index 1)
+    endif()
+
+    foreach(item ${${JSON_ARRAY_NAME}})
+        string(JSON json_string
+            SET ${json_string} ${JSON_PATH} ${new_element_index} "\"${item}\""
+        )
+        math(EXPR new_element_index "${new_element_index} + 1")
+    endforeach()
+
+    set(${json_variable_name} ${json_string} PARENT_SCOPE)
+endfunction()
+
+function(nx_json_get_array json_variable_name)
+    cmake_parse_arguments(JSON "" "ARRAY_NAME" "PATH;DEFAULT_VALUE" ${ARGN})
+
+    set(json_string ${${json_variable_name}})
+
+    string(JSON exising_object_type ERROR_VARIABLE bad_object TYPE ${json_string} ${JSON_PATH})
+    if(bad_object)
+        set(${JSON_ARRAY_NAME} ${DEFAULT_VALUE} PARENT_SCOPE)
+        return()
+    endif()
+
+    set(array "")
+    string(JSON item_count LENGTH ${json_string} ${JSON_PATH})
+    foreach(i RANGE 1 ${item_count})
+        math(EXPR i "${i} - 1")
+        string(JSON item GET ${json_string} ${JSON_PATH} ${i})
+        list(APPEND array ${item})
+    endforeach()
+
+    set(${JSON_ARRAY_NAME} ${array} PARENT_SCOPE)
+endfunction()
