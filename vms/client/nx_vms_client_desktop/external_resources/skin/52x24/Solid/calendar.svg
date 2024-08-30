@@ -2,6 +2,6 @@
   <g class="52x24/Solid/calendar">
     <rect width="52" height="24" fill="#212A2F" class="Secondary" rx="2"/>
     <path fill="#171C1F" d="M2 8h2v8H2z" class="Tertiary"/>
-    <path fill="#fff" fill-rule="evenodd" d="M23.25 6h-.75v.75h-2.25a.75.75 0 0 0-.75.75v9.75c0 .414.336.75.75.75h10.5a.75.75 0 0 0 .75-.75V7.5a.75.75 0 0 0-.75-.75H29.5v1h1V9.5h-10V7.75h2v.5h.75V6Zm5.25 1.75V6h-.75v.75h-3.5v1h3.5v.5h.75v-.5Zm2 2.75h-10V17h10v-6.5Z" class="Primary" clip-rule="evenodd"/>
+    <path fill="#FFFFFF" fill-rule="evenodd" d="M23.25 6h-.75v.75h-2.25a.75.75 0 0 0-.75.75v9.75c0 .414.336.75.75.75h10.5a.75.75 0 0 0 .75-.75V7.5a.75.75 0 0 0-.75-.75H29.5v1h1V9.5h-10V7.75h2v.5h.75V6Zm5.25 1.75V6h-.75v.75h-3.5v1h3.5v.5h.75v-.5Zm2 2.75h-10V17h10v-6.5Z" class="Primary" clip-rule="evenodd"/>
   </g>
 </svg>
