@@ -182,8 +182,6 @@ signals:
 
     void gridEnabledChanged();
 
-    void resetAutoLogin();
-
     void globalPreloaderVisibleChanged(bool visible);
 
     void globalPreloaderEnabledChanged();
