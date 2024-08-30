@@ -90,6 +90,7 @@ struct MainWindowTitleBarStateReducer
     static State setSystemUpdating(State&& state, bool value);
     static State setSystems(State&& state, QList<State::SystemData> systems);
     static State setWorkbenchState(State&& state, int index, WorkbenchState workbenchState);
+    static State setCredentials(State&& state, int index, network::http::Credentials credentials);
 };
 
 MainWindowTitleBarStateReducer::State MainWindowTitleBarStateReducer::setExpanded(
@@ -241,6 +242,13 @@ MainWindowTitleBarStateReducer::State MainWindowTitleBarStateReducer::setWorkben
     return state;
 }
 
+MainWindowTitleBarStateReducer::State MainWindowTitleBarStateReducer::setCredentials(
+    State&& state, int index, network::http::Credentials credentials)
+{
+    state.systems[index].logonData.credentials = credentials;
+    return state;
+}
+
 //-------------------------------------------------------------------------------------------------
 // class MainWindowTitleBarStateStore::StateDelegate
 
@@ -293,9 +301,7 @@ public:
             if (!credentials.empty())
                 logonData.credentials = credentials[0];
 
-            systems << State::SystemData{
-                .systemDescription = system,
-                .logonData = logonData};
+            systems << State::SystemData{.systemDescription = system, .logonData = logonData};
         }
         m_store->setSystems(std::move(systems));
         return true;
@@ -374,8 +380,7 @@ void MainWindowTitleBarStateStore::addSystem(const SystemDescriptionPtr& systemD
     if (state().findSystemIndex(systemDescription->localId()) >= 0)
         return;
 
-    State::SystemData value =
-        {.systemDescription = systemDescription, .logonData = logonData};
+    State::SystemData value = {.systemDescription = systemDescription, .logonData = logonData};
     dispatch(Reducer::addSystem, value);
 }
 
@@ -446,6 +451,13 @@ void MainWindowTitleBarStateStore::setWorkbenchState(
     const int index = state().findSystemIndex(systemId);
     if (index >= 0)
         dispatch(Reducer::setWorkbenchState, index, workbenchState);
+}
+
+void MainWindowTitleBarStateStore::setCurrentCredentials(network::http::Credentials credentials)
+{
+    const int index = state().findSystemIndex(currentSystemId());
+    if (index >= 0)
+        dispatch(Reducer::setCredentials, index, credentials);
 }
 
 int MainWindowTitleBarStateStore::systemCount() const

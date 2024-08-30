@@ -118,12 +118,6 @@ WelcomeScreen::WelcomeScreen(WindowContext* context, QWidget* parent):
         this, &WelcomeScreen::is2FaEnabledForUserChanged);
 
     setHelpTopic(this, HelpTopic::Id::Login);
-
-    connect(&appContext()->localSettings()->autoLogin,
-        &nx::utils::property_storage::BaseProperty::changed,
-        this,
-        &WelcomeScreen::resetAutoLogin);
-
     createSystemModel();
 }
 

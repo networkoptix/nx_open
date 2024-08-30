@@ -134,13 +134,6 @@
         </property>
        </widget>
       </item>
-      <item>
-       <widget class="QCheckBox" name="autoLoginCheckBox">
-        <property name="text">
-         <string>Connect to the previous site on startup</string>
-        </property>
-       </widget>
-      </item>
      </layout>
     </widget>
    </item>

@@ -179,7 +179,6 @@ void migrateSettingsFrom5_1(LocalSettings* settings, QSettings* oldSettings)
     migrateSerializedValue(settings->backgroundImage);
     migrateSerializedValue(settings->lastUsedConnection);
     migrateValue(settings->lastLocalConnectionUrl);
-    migrateValue(settings->autoLogin);
     migrateValue(settings->saveCredentialsAllowed);
     migrateValue(settings->stickReconnectToServer);
     migrateValue(settings->restoreUserSessionData);
