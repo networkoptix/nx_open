@@ -4485,7 +4485,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Current Bitrate</source>
-      <translation>Mevcut Bitrate</translation>
+      <translation>Mevcut Bithızı</translation>
     </message>
   </context>
   <context>
@@ -4904,7 +4904,7 @@ License Key: %2</source>
     <message numerus="yes">
       <source>Server utilizes these %n SSL certificates to authenticate its identity</source>
       <translation>
-        <numerusform>Sunucu, kimliğini doğrulamak için bu %n SSL sertifikalarını kullanır</numerusform>
+        <numerusform>Sunucu, kimliğini doğrulamak için bu %n SSL sertifikasını kullanıyor</numerusform>
         <numerusform>Sunucu, kimliğini doğrulamak için bu %n SSL sertifikalarını kullanır</numerusform>
       </translation>
     </message>
@@ -10194,7 +10194,7 @@ Zorlayabilirsiniz, ancak CPU yükünü önemli ölçüde artırabilir.</translat
     </message>
     <message>
       <source>Applying System updates at the end of the week is not recommended</source>
-      <translation>Hafta bitiminde güncelleme yapmak önerilmez</translation>
+      <translation>Sistem güncellemelerinin hafta sonunda uygulanması önerilmez</translation>
     </message>
   </context>
   <context>
