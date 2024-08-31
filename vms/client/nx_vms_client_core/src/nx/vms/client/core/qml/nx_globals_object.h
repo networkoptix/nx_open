@@ -114,6 +114,9 @@ public:
     /** Absolutely force laying out items of the specified item view. */
     Q_INVOKABLE void forceLayout(QQuickItemView* view) const;
 
+    /** Returns driver information (see QRhiDriverInfo) for RHI of the specified window. */
+    Q_INVOKABLE QVariantMap getDriverInfo(QQuickWindow* window) const;
+
     static void registerQmlType();
 };
 

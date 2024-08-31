@@ -6,6 +6,7 @@
 #include <QtCore/QRegularExpression>
 #include <QtCore/QtMath>
 #include <QtGui/QClipboard>
+#include <QtGui/rhi/qrhi.h>
 #include <QtQuick/private/qquickflickable_p.h>
 #include <QtQuick/private/qquickitem_p.h>
 #include <QtQuick/private/qquickitemview_p_p.h>
@@ -401,6 +402,34 @@ QString NxGlobalsObject::shortcutText(const QVariant& var) const
 void NxGlobalsObject::forceLayout(QQuickItemView* view) const
 {
     QQuickItemViewPrivate::get(view)->forceLayoutPolish();
+}
+
+QVariantMap NxGlobalsObject::getDriverInfo(QQuickWindow* window) const
+{
+    if (!window)
+        return {};
+
+    QRhi* rhi = window->rhi();
+    if (!rhi)
+        return {};
+
+    QRhiDriverInfo info = rhi->driverInfo();
+
+    QVariantMap result;
+    result.insert("deviceId", QString("%1").arg(info.deviceId, 0, 16));
+    result.insert("deviceName", QString(info.deviceName));
+    result.insert("vendorId", QString("%1").arg(info.vendorId, 0, 16));
+    static const QHash<QRhiDriverInfo::DeviceType, QString> deviceTypeNames = {
+        {QRhiDriverInfo::UnknownDevice, "UnknownDevice"},
+        {QRhiDriverInfo::IntegratedDevice, "IntegratedDevice"},
+        {QRhiDriverInfo::DiscreteDevice, "DiscreteDevice"},
+        {QRhiDriverInfo::ExternalDevice, "ExternalDevice"},
+        {QRhiDriverInfo::VirtualDevice, "VirtualDevice"},
+        {QRhiDriverInfo::CpuDevice, "CpuDevice"},
+    };
+    result.insert("deviceType", deviceTypeNames.value(info.deviceType, "UnknownDevice"));
+
+    return result;
 }
 
 void NxGlobalsObject::registerQmlType()

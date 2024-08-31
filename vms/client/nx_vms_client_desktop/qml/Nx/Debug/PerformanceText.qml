@@ -9,8 +9,9 @@ import nx.vms.client.desktop
 
 Text
 {
-    readonly property string graphicsApiName: getApiName()
-    text: performanceInfo.text + `<br>Graphics API: ${graphicsApiName}`
+    property string graphicsInfo: ""
+
+    text: performanceInfo.text + `<br>Graphics: ${graphicsInfo}`
     textFormat: Text.RichText
     color: ColorTheme.highlight
     font.pixelSize: FontConfig.normal.pixelSize
@@ -29,10 +30,32 @@ Text
             window.beforeRendering.connect(performanceInfo.registerFrame)
 
         previousWindow = window
+        updateGraphicsInfo()
     }
 
-    function getApiName()
+    Connections
     {
+        target: previousWindow
+        function onSceneGraphInitialized() { updateGraphicsInfo() }
+        function onSceneGraphInvalidated() { updateGraphicsInfo() }
+    }
+
+    function updateGraphicsInfo()
+    {
+        graphicsInfo = getGraphicsInfo()
+    }
+
+    function getGraphicsInfo()
+    {
+        const driverInfo = NxGlobals.getDriverInfo(previousWindow)
+        let gpuName = driverInfo ? `${driverInfo.deviceName}` : ""
+        // Truncate GPU name so the the text doesn't appear too wide.
+        const kMaxGpuNameLength = 15
+        if (gpuName.length > kMaxGpuNameLength + 3)
+            gpuName = gpuName.substring(0, kMaxGpuNameLength) + '...'
+        if (gpuName.length > 0)
+            gpuName = `(${gpuName})`
+
         switch (GraphicsInfo.api)
         {
             case GraphicsInfo.Software:
@@ -44,16 +67,16 @@ Text
                     : "OpenGL"
                 const profile = GraphicsInfo.profile == GraphicsInfo.OpenGLCoreProfile
                     ? "Core"
-                    : "Compatibility"
+                    : "Compat"
                 const version = `${GraphicsInfo.majorVersion}.${GraphicsInfo.minorVersion}`
-                return `${name} ${version} ${profile}`;
+                return `${name} ${version} ${profile} ${gpuName}`;
             }
             case GraphicsInfo.Direct3D11:
-                return "Direct3D 11";
+                return `Direct3D 11 ${gpuName}`;
             case GraphicsInfo.Direct3D12:
-                return "Direct3D 12";
+                return `Direct3D 12 ${gpuName}`;
             case GraphicsInfo.Vulkan:
-                return "Vulkan";
+                return `Vulkan ${gpuName}`;
             case GraphicsInfo.Metal:
                 return "Metal";
             default:
