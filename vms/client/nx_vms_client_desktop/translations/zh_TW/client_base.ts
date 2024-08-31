@@ -1069,7 +1069,7 @@
     </message>
     <message>
       <source>Proxied Web Page...</source>
-      <translation type="unfinished">Proxied Web Page...</translation>
+      <translation>代理連線網頁...</translation>
     </message>
     <message>
       <source>Layout</source>
@@ -1085,7 +1085,7 @@
     </message>
     <message>
       <source>Show Proxied Resources</source>
-      <translation type="unfinished">Show Proxied Resources</translation>
+      <translation>顯示代理連線資源</translation>
     </message>
     <message>
       <source>Import From Devices...</source>
@@ -7599,8 +7599,8 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Use Service</source>
-      <translation type="unfinished">
-        <numerusform>Use Service</numerusform>
+      <translation>
+        <numerusform>使用服務</numerusform>
       </translation>
     </message>
   </context>
@@ -9610,7 +9610,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>It is recommended to contact %1 before proceeding.</source>
-      <translation type="unfinished">It is recommended to contact %1 before proceeding.</translation>
+      <translation>建議在繼續之前聯絡%1。</translation>
     </message>
     <message>
       <source>Current (%1)</source>
@@ -9618,7 +9618,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Remote (%1)</source>
-      <translation type="unfinished">Remote (%1)</translation>
+      <translation>遠端 (%1)</translation>
     </message>
     <message>
       <source>Success</source>
@@ -9626,7 +9626,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Remote</source>
-      <translation type="unfinished">Remote</translation>
+      <translation>遠端</translation>
     </message>
   </context>
   <context>
@@ -10433,11 +10433,11 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Proxy this integration through the server</source>
-      <translation>透過伺服器代理此整合</translation>
+      <translation>透過伺服器代理連線至此整合</translation>
     </message>
     <message>
       <source>Proxy this web page through the server</source>
-      <translation type="unfinished">Proxy this web page through the server</translation>
+      <translation>透過伺服器代理連線至此網頁</translation>
     </message>
     <message>
       <source>Allow opening this integration without SSL certificate checking</source>
@@ -10631,8 +10631,8 @@ You can force it, but it may significantly increase CPU load.</source>
     <message numerus="yes">
       <source>%1 and %n more layouts</source>
       <comment>%1 will be substituted with a layout name</comment>
-      <translation type="unfinished">
-        <numerusform>%1 and %n more layouts</numerusform>
+      <translation>
+        <numerusform>%1 和其他 %n 個佈局</numerusform>
       </translation>
     </message>
     <message>
@@ -10763,7 +10763,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Shut down</source>
-      <translation type="unfinished">Shut down</translation>
+      <translation>關閉</translation>
     </message>
   </context>
   <context>
@@ -11091,8 +11091,8 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message numerus="yes">
       <source>I trust these servers</source>
-      <translation type="unfinished">
-        <numerusform>I trust these servers</numerusform>
+      <translation>
+        <numerusform>信任這些伺服器</numerusform>
       </translation>
     </message>
   </context>
@@ -11435,7 +11435,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Some features may not be available.</source>
-      <translation type="unfinished">Some features may not be available.</translation>
+      <translation>有些功能可能無法使用。</translation>
     </message>
   </context>
   <context>
@@ -11448,12 +11448,12 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message>
       <source>Your access to the System expires %1</source>
       <comment>%1 is a date</comment>
-      <translation type="unfinished">Your access to the System expires %1</translation>
+      <translation>您對該系統的存取權限過期%1</translation>
     </message>
     <message>
       <source>Your access to the System expires in %1</source>
       <comment>%1 is a duration</comment>
-      <translation type="unfinished">Your access to the System expires in %1</translation>
+      <translation>您對該系統的存取權限即將在%1過期</translation>
     </message>
   </context>
   <context>
@@ -12480,11 +12480,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::AnalyticsObjectAttributesPicker</name>
     <message>
       <source>Event will trigger only if there are matches any of attributes.</source>
-      <translation type="unfinished">Event will trigger only if there are matches any of attributes.</translation>
+      <translation>有任何屬性符合時才會觸發事件。</translation>
     </message>
     <message>
       <source>You can see the names of the attributes and their values on the Objects tab.</source>
-      <translation type="unfinished">You can see the names of the attributes and their values on the Objects tab.</translation>
+      <translation>您可以在物件分頁中查看屬性名稱及其值。</translation>
     </message>
   </context>
   <context>
@@ -12544,7 +12544,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::ObjectLookupPicker</name>
     <message>
       <source>Has attributes</source>
-      <translation type="unfinished">Has attributes</translation>
+      <translation>具屬性</translation>
     </message>
     <message>
       <source>Listed</source>
@@ -12899,7 +12899,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Toolbar</source>
-      <translation type="unfinished">Toolbar</translation>
+      <translation>工具列</translation>
     </message>
   </context>
   <context>
