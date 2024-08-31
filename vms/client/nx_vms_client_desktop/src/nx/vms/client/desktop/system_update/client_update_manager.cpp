@@ -316,7 +316,7 @@ void ClientUpdateManager::Private::notifyUserAboutSuccessfulInstallation()
             .arg(versionUrl, branding::vmsName()),
         /*cancellable*/ true);
     notificationsManager->setIconPath(
-        installationNotificationId, "20x20/Outline/success.svg");
+        installationNotificationId, "20x20/Outline/check.svg");
     notificationsManager->setProgress(
         installationNotificationId, ProgressState::completed);
     notificationsManager->setLevel(

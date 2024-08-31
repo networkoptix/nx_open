@@ -27,7 +27,7 @@ static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kLight16T
 };
 
 NX_DECLARE_COLORIZED_ICON(kCopyIcon, "20x20/Outline/copy.svg", kLight16Theme)
-NX_DECLARE_COLORIZED_ICON(kSuccessIcon, "20x20/Outline/success.svg", kLight10Theme)
+NX_DECLARE_COLORIZED_ICON(kSuccessIcon, "20x20/Outline/check.svg", kLight10Theme)
 
 QString typicalText(ClipboardButton::StandardType type)
 {

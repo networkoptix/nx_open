@@ -66,7 +66,7 @@ NX_DECLARE_COLORIZED_ICON(kReloadIcon, "20x20/Outline/reload.svg", kIconSubstitu
 NX_DECLARE_COLORIZED_ICON(kCheckmarkIcon, "20x20/Outline/checkmark.svg", kLight4Theme)
 
 NX_DECLARE_COLORIZED_ICON(kErrorIcon, "20x20/Outline/error.svg", kErrorTheme)
-NX_DECLARE_COLORIZED_ICON(kSuccessIcon, "20x20/Outline/success.svg", kSuccessTheme)
+NX_DECLARE_COLORIZED_ICON(kSuccessIcon, "20x20/Outline/check.svg", kSuccessTheme)
 NX_DECLARE_COLORIZED_ICON(kWarningIcon, "20x20/Outline/warning.svg", kWarningTheme)
 
 bool showServersInTree(const QnWorkbenchContext* context)

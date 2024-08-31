@@ -111,7 +111,7 @@ static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kLight4Th
 NX_DECLARE_COLORIZED_ICON(kArrowUpIcon, "20x20/Outline/arrow_up.svg", kLight10Theme)
 NX_DECLARE_COLORIZED_ICON(kArrowDownIcon, "20x20/Outline/arrow_down.svg", kLight10Theme)
 NX_DECLARE_COLORIZED_ICON(kDownloadIcon, "20x20/Outline/download.svg", kLight16Theme)
-NX_DECLARE_COLORIZED_ICON(kSuccessIcon, "20x20/Outline/success.svg", kLight10Theme)
+NX_DECLARE_COLORIZED_ICON(kSuccessIcon, "20x20/Outline/check.svg", kLight10Theme)
 NX_DECLARE_COLORIZED_ICON(kReloadIcon, "20x20/Outline/reload.svg", kLight16Theme)
 NX_DECLARE_COLORIZED_ICON(kSettingsIcon, "20x20/Outline/settings.svg", kLight16Theme)
 NX_DECLARE_COLORIZED_ICON(kCheckmarkIcon, "20x20/Outline/checkmark.svg", kLight4Theme)

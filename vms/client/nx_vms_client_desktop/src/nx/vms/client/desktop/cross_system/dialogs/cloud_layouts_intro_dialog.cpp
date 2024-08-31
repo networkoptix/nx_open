@@ -24,6 +24,10 @@ NX_DECLARE_COLORIZED_ICON(kContextHintIcon, "16x16/Solid/help.svg", HintButton::
 core::SvgIconColorer::ThemeSubstitutions kFutureTheme = {
     {QnIcon::Normal, {.primary = "yellow"}}};
 NX_DECLARE_COLORIZED_ICON(kFutureIcon, "16x16/Outline/future.svg", kFutureTheme)
+core::SvgIconColorer::ThemeSubstitutions kAvailableTheme = {
+    {QnIcon::Normal, {.primary = "green"}}};
+NX_DECLARE_COLORIZED_ICON(kAvailableIcon, "20x20/Outline/check.svg", kAvailableTheme)
+
 
 CloudLayoutsIntroDialog::CloudLayoutsIntroDialog(
     Mode mode,
@@ -35,7 +39,7 @@ CloudLayoutsIntroDialog::CloudLayoutsIntroDialog(
 {
     ui->setupUi(this);
     ui->imageLabel->setPixmap(qnSkin->pixmap("promo/cloud_layouts_intro.png"));
-    ui->availableActionsIconLabel->setPixmap(qnSkin->pixmap("16x16/Outline/check.svg"));
+    ui->availableActionsIconLabel->setPixmap(qnSkin->icon(kAvailableIcon).pixmap(16, 16));
     ui->inFutureIconLabel->setPixmap(qnSkin->icon(kFutureIcon).pixmap(16, 16));
     ui->captionLabel->setText(tr(
         "Introducing %1 Layouts",

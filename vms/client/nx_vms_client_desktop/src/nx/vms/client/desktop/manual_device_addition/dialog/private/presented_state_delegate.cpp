@@ -17,7 +17,7 @@ static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kIconSubs
     {QIcon::Active, {.primary = "light11"}},
 };
 
-NX_DECLARE_COLORIZED_ICON(kSuccessIcon, "20x20/Outline/success.svg", kIconSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kSuccessIcon, "20x20/Outline/check.svg", kIconSubstitutions)
 
 using namespace nx::vms::client::desktop;
 
