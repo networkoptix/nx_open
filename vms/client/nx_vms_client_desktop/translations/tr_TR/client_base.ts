@@ -10258,7 +10258,7 @@ Zorlayabilirsiniz, ancak CPU yükünü önemli ölçüde artırabilir.</translat
     <message numerus="yes">
       <source>%n notifications</source>
       <translation>
-        <numerusform>Bildirimleri Tuttur</numerusform>
+        <numerusform>%n bildirim</numerusform>
         <numerusform>%n bildirimler</numerusform>
       </translation>
     </message>
