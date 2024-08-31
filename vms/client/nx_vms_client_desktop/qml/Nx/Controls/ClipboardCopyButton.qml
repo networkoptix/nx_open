@@ -43,7 +43,7 @@ Item
         anchors.fill: parent
         opacity: 0
 
-        sourcePath: "image://skin/20x20/Outline/success.svg"
+        sourcePath: "image://skin/20x20/Outline/check.svg"
         sourceSize: Qt.size(20, 20)
         primaryColor: "light10"
     }

@@ -394,7 +394,7 @@ Item
                                 {
                                     case ResourceAccessInfo.ProvidedVia.own:
                                     case ResourceAccessInfo.ProvidedVia.ownResourceGroup:
-                                        return "image://skin/20x20/Outline/success.svg"
+                                        return "image://skin/20x20/Outline/check.svg"
 
                                     case ResourceAccessInfo.ProvidedVia.layout:
                                         return "image://skin/20x20/Solid/layout.svg"

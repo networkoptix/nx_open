@@ -756,7 +756,7 @@ Item
                                 enabled: control.enabled
                                 text: copied ? copiedText : copyLinkText
                                 icon.source:
-                                    copied ? "image://skin/20x20/Outline/success.svg?primary=light10" : ""
+                                    copied ? "image://skin/20x20/Outline/check.svg?primary=light10" : ""
                                 icon.width: 20
                                 icon.height: 20
                                 Layout.preferredWidth:

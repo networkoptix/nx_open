@@ -291,7 +291,7 @@ Dialog
                             : "red_core"
 
                         sourcePath: dialog.testState == LdapSettings.TestState.ok
-                            ? "image://skin/20x20/Outline/success.svg"
+                            ? "image://skin/20x20/Outline/check.svg"
                             : "image://skin/20x20/Outline/error.svg"
                         sourceSize: Qt.size(20, 20)
                     }

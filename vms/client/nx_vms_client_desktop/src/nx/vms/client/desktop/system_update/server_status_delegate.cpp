@@ -30,7 +30,7 @@ static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kIconErro
 };
 
 NX_DECLARE_COLORIZED_ICON(kCrossCloseIcon, "20x20/Outline/cross_close.svg", kIconErrorTheme)
-NX_DECLARE_COLORIZED_ICON(kSuccessIcon, "20x20/Outline/success.svg", kIconTheme)
+NX_DECLARE_COLORIZED_ICON(kSuccessIcon, "20x20/Outline/check.svg", kIconTheme)
 
 } // namespace
 
