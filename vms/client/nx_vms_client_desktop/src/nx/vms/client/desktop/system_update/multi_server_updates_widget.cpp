@@ -114,7 +114,7 @@ NX_DECLARE_COLORIZED_ICON(kDownloadIcon, "20x20/Outline/download.svg", kLight16T
 NX_DECLARE_COLORIZED_ICON(kSuccessIcon, "20x20/Outline/check.svg", kLight10Theme)
 NX_DECLARE_COLORIZED_ICON(kReloadIcon, "20x20/Outline/reload.svg", kLight16Theme)
 NX_DECLARE_COLORIZED_ICON(kSettingsIcon, "20x20/Outline/settings.svg", kLight16Theme)
-NX_DECLARE_COLORIZED_ICON(kCheckmarkIcon, "20x20/Outline/checkmark.svg", kLight4Theme)
+NX_DECLARE_COLORIZED_ICON(kCheckmarkIcon, "48x48/Outline/checkmark.svg", kLight4Theme)
 
 // Adds resource list to message box
 QTableView* injectResourceList(
@@ -237,7 +237,7 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
     ui->latestVersionBannerLabel->setFont(latestVersionBannerFont);
     ui->latestVersionBannerLabel->setProperty(style::Properties::kDontPolishFontProperty, true);
     ui->latestVersionBannerLabel->setForegroundRole(QPalette::Text);
-    ui->latestVersionIconLabel->setPixmap(qnSkin->icon(kCheckmarkIcon).pixmap(QSize(40, 40)));
+    ui->latestVersionIconLabel->setPixmap(qnSkin->icon(kCheckmarkIcon).pixmap(QSize(48, 48)));
     ui->linkCopiedIconLabel->setPixmap(
         qnSkin->icon(kSuccessIcon).pixmap(QSize(20, 20)));
     ui->linkCopiedWidget->hide();
