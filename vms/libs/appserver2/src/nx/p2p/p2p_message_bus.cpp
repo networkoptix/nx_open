@@ -1314,6 +1314,9 @@ bool MessageBus::handlePushTransactionList(
     auto tranList =  deserializeTransactionList(data, &success);
     if (!success)
         return false;
+
+    NX_VERBOSE(this, "Start processing transaction list received from peer %1, transaction(s): %2",
+        connection->remotePeer().id, tranList.size());
     for (const auto& transaction: tranList)
     {
         if (!handlePushTransactionData(connection, transaction, TransportHeader(), lock))

@@ -33,8 +33,12 @@ bool handleTransactionParams(
     auto transaction = QnTransaction<Param>(abstractTransaction);
     if (!QnUbjson::deserialize(stream, &transaction.params))
     {
-        return NX_ASSERT(false, "Can't deserialize UBJSON transaction: %1",
-            abstractTransaction.command);
+        return NX_ASSERT(false,
+            "Can't deserialize UBJSON transaction: %1, peer: %2, sequence: %3, timestamp: %4",
+            abstractTransaction.command,
+            abstractTransaction.peerID,
+            abstractTransaction.persistentInfo.sequence,
+            abstractTransaction.persistentInfo.timestamp);
     }
     if (!abstractTransaction.persistentInfo.isNull())
         bus->ubjsonTranSerializer()->addToCache(abstractTransaction.persistentInfo, abstractTransaction.command, serializedTransaction);
