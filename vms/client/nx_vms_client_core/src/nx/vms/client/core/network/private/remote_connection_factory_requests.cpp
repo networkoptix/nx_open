@@ -182,7 +182,18 @@ struct RemoteConnectionFactoryRequestsManager::Private
     std::unique_ptr<CloudConnectionFactory> cloudConnectionFactory
         = std::make_unique<CloudConnectionFactory>();
     mutable std::unique_ptr<nx::cloud::db::api::Connection> cloudConnection;
+    mutable nx::Mutex cloudConnectionMutex;
     std::unique_ptr<NetworkManager> networkManager = std::make_unique<NetworkManager>();
+
+    bool ensureCloudConnection() const
+    {
+        NX_MUTEX_LOCKER lock(&cloudConnectionMutex);
+        if (cloudConnection)
+            return true;
+
+        cloudConnection = cloudConnectionFactory->createConnection();
+        return (bool) cloudConnection;
+    }
 
     Request makeRequestWithCertificateValidation(ContextPtr context, const nx::utils::Url& url) const
     {
@@ -734,10 +745,7 @@ std::future<RemoteConnectionFactoryContext::CloudTokenInfo>
     NX_DEBUG(this, "Issue cloud token for %1 in %2", context->credentials().username, context);
     using namespace nx::cloud::db::api;
 
-    if (!d->cloudConnection)
-        d->cloudConnection = d->cloudConnectionFactory->createConnection();
-
-    if (!d->cloudConnection)
+    if (!d->ensureCloudConnection())
     {
         context->setError(RemoteConnectionErrorCode::cloudUnavailableOnClient);
         return {};
