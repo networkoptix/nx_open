@@ -40,6 +40,7 @@ UserDataEx UserModelBase::toUserData() &&
     }
     user.fullName = std::move(fullName);
     user.email = std::move(email);
+    user.locale = std::move(locale);
     user.isEnabled = std::move(isEnabled);
     if (password)
         user.password = std::move(*password);
@@ -60,6 +61,7 @@ UserModelBase UserModelBase::fromUserData(UserData&& baseData)
     model.type = std::move(baseData.type);
     model.fullName = std::move(baseData.fullName);
     model.email = std::move(baseData.email);
+    model.locale = std::move(baseData.locale);
     model.isHttpDigestEnabled = baseData.digest != UserData::kHttpIsDisabledStub
         && baseData.digest != UserData::kCloudPasswordStub;
     model.isEnabled = std::move(baseData.isEnabled);

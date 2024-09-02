@@ -116,6 +116,13 @@ struct NX_VMS_API UserData: ResourceData
      * value when modifying.
      */
     QnLatin1Array cryptSha512Hash; /**< Hash suitable to be used in /etc/shadow file.*/
+
+    /**%apidoc[opt]
+     * Preferred locale of the user. Will affect language of the emails and notifications both in
+     * desktop and mobile clients.
+     * %example en_US
+     */
+    QString locale;
 };
 #define UserData_Fields \
     ResourceData_Fields \
@@ -130,7 +137,8 @@ struct NX_VMS_API UserData: ResourceData
     (attributes) \
     (digest) \
     (hash) \
-    (cryptSha512Hash)
+    (cryptSha512Hash) \
+    (locale)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(UserData)
 NX_REFLECTION_INSTRUMENT(UserData, UserData_Fields)
 

@@ -7,6 +7,7 @@
 #include <tuple>
 #include <vector>
 
+#include <nx/branding.h>
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/type_traits.h>
 
@@ -40,6 +41,13 @@ struct NX_VMS_API UserModelBase
     /**%apidoc[opt] Full name. */
     QString fullName;
 
+    /**%apidoc[opt]
+     * Preferred locale of the user. Will affect language of the emails and notifications both in
+     * desktop and mobile clients.
+     * %example en_US
+     */
+    QString locale = nx::branding::defaultLocale();
+
     /**%apidoc[opt] Disabled users can not login. */
     bool isEnabled = true;
 
@@ -71,6 +79,7 @@ struct NX_VMS_API UserModelBase
     (type) \
     (fullName) \
     (email) \
+    (locale) \
     (isEnabled) \
     (isHttpDigestEnabled) \
     (externalId) \

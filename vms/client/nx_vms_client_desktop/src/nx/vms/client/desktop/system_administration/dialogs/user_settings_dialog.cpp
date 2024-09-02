@@ -319,9 +319,9 @@ struct UserSettingsDialog::Private
         updateDisplayOffset();
     }
 
-    nx::vms::api::UserModelV3 apiDataFromState(const UserSettingsDialogState& state) const
+    nx::vms::api::UserModel apiDataFromState(const UserSettingsDialogState& state) const
     {
-        nx::vms::api::UserModelV3 userData;
+        nx::vms::api::UserModel userData;
 
         userData.type = (nx::vms::api::UserType) state.userType;
 
@@ -349,6 +349,7 @@ struct UserSettingsDialog::Private
         userData.fullName = state.fullName;
         userData.permissions = state.globalPermissions;
         userData.isEnabled = state.userEnabled;
+        userData.locale = state.locale;
         userData.isHttpDigestEnabled = state.allowInsecure;
         for (const auto& group: state.parentGroups)
             userData.groupIds.emplace_back(group.id);
@@ -455,7 +456,7 @@ struct UserSettingsDialog::Private
         common::SessionTokenHelperPtr sessionTokenHelper,
         bool success,
         int handle,
-        rest::ErrorOrData<nx::vms::api::UserModelV3> errorOrData)
+        rest::ErrorOrData<nx::vms::api::UserModel> errorOrData)
     {
         if (NX_ASSERT(handle == currentRequest))
             currentRequest = 0;
@@ -477,7 +478,7 @@ struct UserSettingsDialog::Private
                 currentSession->updatePassword(*actualPassword);
         }
 
-        if (auto data = std::get_if<nx::vms::api::UserModelV3>(&errorOrData))
+        if (auto data = std::get_if<nx::vms::api::UserModel>(&errorOrData))
         {
             if (data->type == nx::vms::api::UserType::temporaryLocal)
             {
@@ -507,6 +508,7 @@ struct UserSettingsDialog::Private
                 user->setFullName(state.fullName);
                 user->setRawPermissions(state.globalPermissions);
                 user->setEnabled(state.userEnabled);
+                user->setLocale(state.locale);
                 user->setGroupIds(data->groupIds);
             }
 
@@ -536,53 +538,9 @@ struct UserSettingsDialog::Private
             }
         }
 
-        auto completeSaving =
-            [this, state]()
-            {
-                isSaving = false;
-                q->saveStateComplete(state);
-            };
+        isSaving = false;
+        q->saveStateComplete(state);
 
-        if (user)
-        {
-            auto userSettings = user->settings();
-            const bool userSettingsChanged = (userSettings.locale != state.locale.toStdString());
-            userSettings.locale = state.locale.toStdString();
-
-            if (userSettingsChanged)
-            {
-                auto callback =
-                    [this, completeSaving](bool success, int handle)
-                    {
-                        if (NX_ASSERT(handle == currentRequest))
-                            currentRequest = 0;
-
-                        // TODO: #sivanov Pass error to the handler.
-                        if (!success)
-                        {
-                            isSaving = false;
-                            showServerError(tr("Failed to apply changes"), {});
-                        }
-                        else
-                        {
-                            completeSaving();
-                        }
-                    };
-                currentRequest = user->saveSettings(
-                    userSettings,
-                    sessionTokenHelper,
-                    callback,
-                    q);
-            }
-            else
-            {
-                completeSaving();
-            }
-        }
-        else
-        {
-            completeSaving();
-        }
     }
 };
 
@@ -855,7 +813,7 @@ void UserSettingsDialog::onTerminateLink()
     if (ret == QDialogButtonBox::Cancel)
         return;
 
-    nx::vms::api::UserModelV3 userData = d->apiDataFromState(originalState());
+    nx::vms::api::UserModel userData = d->apiDataFromState(originalState());
 
     NX_ASSERT(userData.type == nx::vms::api::UserType::temporaryLocal);
 
@@ -884,7 +842,7 @@ void UserSettingsDialog::onTerminateLink()
         sessionTokenHelper,
         nx::utils::guarded(this,
             [this](
-                bool success, int handle, rest::ErrorOrData<nx::vms::api::UserModelV3> errorOrData)
+                bool success, int handle, rest::ErrorOrData<nx::vms::api::UserModel> errorOrData)
             {
                 if (NX_ASSERT(handle == d->currentRequest))
                     d->currentRequest = 0;
@@ -901,7 +859,7 @@ void UserSettingsDialog::onTerminateLink()
                     return;
                 }
 
-                if (auto data = std::get_if<nx::vms::api::UserModelV3>(&errorOrData))
+                if (auto data = std::get_if<nx::vms::api::UserModel>(&errorOrData))
                 {
                     NX_ASSERT(data->temporaryToken);
                     d->updateUiFromTemporaryToken(*data->temporaryToken);
@@ -922,7 +880,7 @@ void UserSettingsDialog::onResetLink(
         return;
     }
 
-    nx::vms::api::UserModelV3 userData = d->apiDataFromState(originalState());
+    nx::vms::api::UserModel userData = d->apiDataFromState(originalState());
 
     NX_ASSERT(userData.type == nx::vms::api::UserType::temporaryLocal);
 
@@ -946,7 +904,7 @@ void UserSettingsDialog::onResetLink(
         sessionTokenHelper,
         nx::utils::guarded(this,
             [this, callback](
-                bool success, int handle, rest::ErrorOrData<nx::vms::api::UserModelV3> errorOrData)
+                bool success, int handle, rest::ErrorOrData<nx::vms::api::UserModel> errorOrData)
             {
                 if (NX_ASSERT(handle == d->currentRequest))
                     d->currentRequest = 0;
@@ -966,7 +924,7 @@ void UserSettingsDialog::onResetLink(
                     return;
                 }
 
-                if (auto data = std::get_if<nx::vms::api::UserModelV3>(&errorOrData))
+                if (auto data = std::get_if<nx::vms::api::UserModel>(&errorOrData))
                 {
                     NX_ASSERT(data->temporaryToken);
 
@@ -1151,8 +1109,8 @@ UserSettingsDialogState UserSettingsDialog::createState(const QnUserResourcePtr&
     state.fullNameEditable = permissions.testFlag(Qn::WriteFullNamePermission);
     state.email = user->getEmail();
     state.emailEditable = permissions.testFlag(Qn::WriteEmailPermission);
-    state.locale = QString::fromStdString(user->settings().locale);
-    // FIXME: Create separate permission.
+    state.locale = user->locale();
+    // FIXME: #sivanov Create separate permission.
     state.localeEditable = permissions.testFlag(Qn::WriteFullNamePermission);
     state.passwordEditable = permissions.testFlag(Qn::WritePasswordPermission);
     state.userEnabled = user->isEnabled();
@@ -1241,7 +1199,7 @@ void UserSettingsDialog::saveState(const UserSettingsDialogState& state)
         return;
     }
 
-    nx::vms::api::UserModelV3 userData = d->apiDataFromState(state);
+    nx::vms::api::UserModel userData = d->apiDataFromState(state);
 
     if (userData.type == nx::vms::api::UserType::temporaryLocal && d->dialogType == CreateUser)
     {
@@ -1289,7 +1247,7 @@ void UserSettingsDialog::saveState(const UserSettingsDialogState& state)
         sessionTokenHelper,
         nx::utils::guarded(this,
             [this, state, actualPassword, sessionTokenHelper](
-                bool success, int handle, rest::ErrorOrData<nx::vms::api::UserModelV3> errorOrData)
+                bool success, int handle, rest::ErrorOrData<nx::vms::api::UserModel> errorOrData)
             {
                 d->onUserSaveRequestCompleted(
                     state,

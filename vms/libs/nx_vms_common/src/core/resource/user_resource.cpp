@@ -8,6 +8,7 @@
 #include <core/resource_access/access_rights_manager.h>
 #include <core/resource_access/resource_access_subject_hierarchy.h>
 #include <core/resource_management/resource_properties.h>
+#include <nx/branding.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/network/aio/timer.h>
 #include <nx/network/app_info.h>
@@ -296,7 +297,8 @@ QnUserHash QnUserHash::scryptPassword(const QString& password, nx::scrypt::Optio
 QnUserResource::QnUserResource(nx::vms::api::UserType userType, nx::vms::api::UserExternalId externalId):
     m_userType(userType),
     m_realm(nx::network::AppInfo::realm().c_str()),
-    m_externalId(std::move(externalId))
+    m_externalId(std::move(externalId)),
+    m_locale(nx::branding::defaultLocale())
 {
     addFlags(Qn::user | Qn::remote);
     setTypeId(nx::vms::api::UserData::kResourceTypeId);
@@ -669,6 +671,25 @@ void QnUserResource::setIntegrationRequestData(
         QString::fromStdString(serializedIntegrationRequestData));
 }
 
+QString QnUserResource::locale() const
+{
+    NX_MUTEX_LOCKER locker(&m_mutex);
+    return m_locale.isEmpty()
+        ? nx::branding::defaultLocale()
+        : m_locale;
+}
+
+void QnUserResource::setLocale(const QString& value)
+{
+    {
+        NX_MUTEX_LOCKER locker(&m_mutex);
+        if (m_locale == value)
+            return;
+        m_locale = value;
+    }
+    emit localeChanged(::toSharedPointer(this));
+}
+
 std::map<nx::Uuid, nx::vms::api::AccessRights> QnUserResource::ownResourceAccessRights() const
 {
     NX_MUTEX_LOCKER locker(&m_mutex);
@@ -794,6 +815,12 @@ void QnUserResource::updateInternal(const QnResourcePtr& source, NotifierList& n
         {
             m_attributes = localOther->m_attributes;
             notifiers << [r = toSharedPointer(this)]{ emit r->attributesChanged(r); };
+        }
+
+        if (m_locale != localOther->m_locale)
+        {
+            m_locale = localOther->m_locale;
+            notifiers << [r = toSharedPointer(this)]{ emit r->localeChanged(r); };
         }
 
         if (m_resourceAccessRights != localOther->m_resourceAccessRights)
