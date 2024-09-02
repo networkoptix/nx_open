@@ -157,6 +157,14 @@ bool EventListModel::addEvent(const EventData& event, Position where)
         : d->addBack(event);
 }
 
+std::list<EventListModel::EventData> EventListModel::addEvents(
+    std::list<EventData> events, Position where)
+{
+    return where == Position::front
+        ? d->addFront(std::move(events))
+        : d->addBack(std::move(events));
+}
+
 bool EventListModel::updateEvent(const EventData& event)
 {
     return d->updateEvent(event);

@@ -59,7 +59,8 @@ using nx::vms::api::ActionType;
 
 namespace {
 
-static const auto kDisplayTimeout = std::chrono::milliseconds(12500);
+constexpr auto kDisplayTimeout = std::chrono::milliseconds(12500);
+constexpr auto kProcessNotificationCacheTimeout = std::chrono::milliseconds(500);
 
 QPixmap toPixmap(const QIcon& icon)
 {
@@ -201,6 +202,13 @@ NotificationListModel::Private::Private(NotificationListModel* q):
         &NotificationActionExecutor::notificationActionReceived,
         this, &NotificationListModel::Private::onNotificationActionBase);
 
+    connect(
+        &m_notificationsCacheTimer,
+        &QTimer::timeout,
+        this,
+        &NotificationListModel::Private::onProcessNotificationsCacheTimeout);
+    m_notificationsCacheTimer.start(kProcessNotificationCacheTimeout);
+
     auto processNewSystem = [this](const QString& systemId)
     {
         connect(appContext()->cloudCrossSystemManager()->systemContext(systemId),
@@ -273,6 +281,27 @@ void NotificationListModel::Private::onRowsAboutToBeRemoved(
     }
 }
 
+void NotificationListModel::Private::onProcessNotificationsCacheTimeout()
+{
+    if (m_notificationsCache.empty())
+        return;
+
+    std::list<EventData> eventList;
+    std::swap(m_notificationsCache, eventList);
+
+    const auto addedEvents = this->q->addEvents(std::move(eventList));
+    if (addedEvents.empty())
+        return;
+
+    for (const auto& eventData: addedEvents)
+    {
+        if (!eventData.cloudSystemId.isEmpty() && eventData.previewCamera)
+            m_itemsByCloudSystem.insert(eventData.cloudSystemId, eventData.id);
+    }
+
+    truncateToMaximumCount();
+}
+
 void NotificationListModel::Private::onNotificationActionBase(
     const QSharedPointer<nx::vms::rules::NotificationActionBase>& action,
     const QString& cloudSystemId)
@@ -292,8 +321,12 @@ void NotificationListModel::Private::onNotificationActionBase(
     }
 
     if (actionType == vms::rules::utils::type<NotificationAction>())
+    {
         onNotificationAction(action.dynamicCast<NotificationAction>(), cloudSystemId);
-    else if (actionType == vms::rules::utils::type<RepeatSoundAction>())
+        return;
+    }
+
+    if (actionType == vms::rules::utils::type<RepeatSoundAction>())
         onRepeatSoundAction(action.dynamicCast<RepeatSoundAction>());
     else if (actionType == vms::rules::utils::type<ShowOnAlarmLayoutAction>())
         onAlarmLayoutAction(action.dynamicCast<ShowOnAlarmLayoutAction>());
@@ -362,11 +395,10 @@ void NotificationListModel::Private::onNotificationAction(
 
     setupClientAction(action, eventData);
 
-    if (!this->q->addEvent(eventData))
-        return;
-
-    if (!cloudSystemId.isEmpty() && eventData.previewCamera)
-        m_itemsByCloudSystem.insert(cloudSystemId, eventData.id);
+    // Cache is required to prevent the app from freezing when a lot of notifications are received.
+    m_notificationsCache.push_front(std::move(eventData));
+    if (m_notificationsCache.size() > m_maximumCount)
+        m_notificationsCache.pop_back();
 }
 
 void NotificationListModel::Private::onRepeatSoundAction(

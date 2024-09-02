@@ -83,6 +83,10 @@ protected:
     };
 
     bool addEvent(const EventData& event, Position where = Position::front);
+
+    // Adds events to the model and returns actually added events.
+    std::list<EventData> addEvents(std::list<EventData> events, Position where = Position::front);
+
     bool updateEvent(const EventData& event);
     bool updateEvent(nx::Uuid id);
     bool removeEvent(const nx::Uuid& id);

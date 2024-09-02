@@ -25,7 +25,9 @@ public:
     void clear();
 
     bool addFront(const EventData& data);
+    std::list<EventData> addFront(std::list<EventData> events);
     bool addBack(const EventData& data);
+    std::list<EventData> addBack(std::list<EventData> events);
 
     bool removeEvent(const nx::Uuid& id);
     void removeEvents(int first, int count);
@@ -44,6 +46,8 @@ public:
 private:
     EventListModel* const q = nullptr;
     utils::KeyedList<nx::Uuid, EventData> m_events;
+
+    void eraseExistingEvents(std::list<EventData>& events) const;
 };
 
 } // namespace nx::vms::client::desktop
