@@ -37,14 +37,44 @@ bool EventListModel::Private::addFront(const EventData& data)
     return true;
 }
 
+std::list<EventListModel::EventData> EventListModel::Private::addFront(std::list<EventData> events)
+{
+    eraseExistingEvents(events);
+
+    if (!events.empty())
+    {
+        ScopedInsertRows insertRows(q, 0, events.size() - 1);
+
+        for (auto eventIt = events.crbegin(); eventIt != events.crend(); ++eventIt)
+            m_events.push_front(eventIt->id, *eventIt);
+    }
+
+    return events;
+}
+
 bool EventListModel::Private::addBack(const EventData& data)
 {
     if (m_events.contains(data.id))
         return false;
 
-    ScopedInsertRows insertRows(q,  m_events.size(), m_events.size());
+    ScopedInsertRows insertRows(q, m_events.size(), m_events.size());
     m_events.push_back(data.id, data);
     return true;
+}
+
+std::list<EventListModel::EventData> EventListModel::Private::addBack(std::list<EventData> events)
+{
+    eraseExistingEvents(events);
+
+    if (!events.empty())
+    {
+        ScopedInsertRows insertRows(q, m_events.size(), m_events.size() + events.size() - 1);
+
+        for (const auto& event: events)
+            m_events.push_back(event.id, event);
+    }
+
+    return events;
 }
 
 bool EventListModel::Private::removeEvent(const nx::Uuid& id)
@@ -147,6 +177,17 @@ QnVirtualCameraResourceList EventListModel::Private::accessibleCameras(const Eve
 
             return ResourceAccessManager::hasPermissions(camera, Qn::ViewContentPermission);
         });
+}
+
+void EventListModel::Private::eraseExistingEvents(std::list<EventData>& events) const
+{
+    for (auto eventIt = events.cbegin(); eventIt != events.cend();)
+    {
+        if (m_events.contains(eventIt->id))
+            eventIt = events.erase(eventIt);
+        else
+            ++eventIt;
+    }
 }
 
 } // namespace nx::vms::client::desktop

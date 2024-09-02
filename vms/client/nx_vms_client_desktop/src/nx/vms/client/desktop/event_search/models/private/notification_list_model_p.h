@@ -5,6 +5,7 @@
 #include <QtCore/QHash>
 #include <QtCore/QScopedPointer>
 #include <QtCore/QSharedPointer>
+#include <QtCore/QTimer>
 
 #include <nx/vms/event/event_fwd.h>
 #include <nx/vms/rules/actions/actions_fwd.h>
@@ -61,6 +62,8 @@ private:
 
     void onRowsAboutToBeRemoved(const QModelIndex& parent, int first, int last);
 
+    void onProcessNotificationsCacheTimeout();
+
     void updateCloudItems(const QString& systemId);
     void removeCloudItems(const QString& systemId);
 
@@ -106,6 +109,9 @@ private:
     SoundController m_soundController;
 
     QMultiHash<QString /*system id*/, nx::Uuid /*item id*/> m_itemsByCloudSystem;
+
+    QTimer m_notificationsCacheTimer;
+    std::list<EventData> m_notificationsCache;
 };
 
 } // namespace nx::vms::client::desktop
