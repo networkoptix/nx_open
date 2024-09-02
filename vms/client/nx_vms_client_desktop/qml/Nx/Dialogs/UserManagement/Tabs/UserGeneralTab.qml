@@ -175,9 +175,9 @@ Item
                 {
                     id: auditTrailButton
 
-                    icon.source: "image://skin/20x20/Outline/audit_trail.svg"
-                    icon.width: 20
-                    icon.height: 20
+                    icon.source: "image://svg/skin/user_settings/audit_trail.svg"
+                    icon.width: 12
+                    icon.height: 14
                     spacing: 8
                     text: qsTr("Audit Trail")
                     visible: control.auditAvailable
