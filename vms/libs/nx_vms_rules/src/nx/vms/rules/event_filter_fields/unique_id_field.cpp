@@ -22,4 +22,9 @@ bool UniqueIdField::match(const QVariant& eventValue) const
     return eventValue.value<nx::Uuid>() == m_id;
 }
 
+QJsonObject UniqueIdField::openApiDescriptor()
+{
+    return {};
+}
+
 } // namespace nx::vms::rules

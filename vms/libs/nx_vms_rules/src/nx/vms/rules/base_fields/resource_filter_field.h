@@ -4,6 +4,8 @@
 
 #include <QtCore/QSet>
 
+#include <nx/vms/rules/utils/openapi_doc.h>
+
 #include "../action_builder_field.h"
 #include "../event_filter_field.h"
 #include "../field_types.h"
@@ -84,6 +86,11 @@ public:
             static_cast<const T*>(this)->descriptor()->properties);
     }
 
+    static QJsonObject openApiDescriptor()
+    {
+        return utils::constructOpenApiDescriptor<T>();
+    }
+
 protected:
     // This field type should be used as base class only.
     ResourceFilterFieldBase() = default;
@@ -109,6 +116,7 @@ signals:
 public:
     using EventFilterField::EventFilterField;
     using ResourceFilterFieldBase<ResourceFilterEventField>::properties;
+    using ResourceFilterFieldBase<ResourceFilterEventField>::openApiDescriptor;
 
     virtual bool match(const QVariant& value) const override;
 };
@@ -129,6 +137,7 @@ signals:
 public:
     using ActionBuilderField::ActionBuilderField;
     using ResourceFilterFieldBase<ResourceFilterActionField>::properties;
+    using ResourceFilterFieldBase<ResourceFilterActionField>::openApiDescriptor;
 
     virtual QVariant build(const AggregatedEventPtr& eventAggregator) const override;
 

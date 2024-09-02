@@ -26,6 +26,7 @@ public:
     void setUseSource(bool value);
 
     QVariant build(const AggregatedEventPtr& eventAggregator) const override;
+    static QJsonObject openApiDescriptor();
 
 signals:
     void useSourceChanged();

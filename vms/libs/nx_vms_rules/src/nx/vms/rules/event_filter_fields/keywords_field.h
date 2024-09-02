@@ -25,6 +25,7 @@ public:
 
     QString string() const;
     void setString(const QString& string);
+    static QJsonObject openApiDescriptor();
 
 signals:
     void stringChanged();

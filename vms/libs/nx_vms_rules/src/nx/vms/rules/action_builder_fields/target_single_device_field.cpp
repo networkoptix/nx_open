@@ -5,6 +5,7 @@
 #include <core/resource/network_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/common/system_context.h>
+#include <nx/vms/rules/utils/openapi_doc.h>
 
 #include "../manifest.h"
 #include "../utils/resource.h"
@@ -58,6 +59,11 @@ QVariant TargetSingleDeviceField::build(const AggregatedEventPtr& event) const
 TargetSingleDeviceFieldProperties TargetSingleDeviceField::properties() const
 {
     return TargetSingleDeviceFieldProperties::fromVariantMap(descriptor()->properties);
+}
+
+QJsonObject TargetSingleDeviceField::openApiDescriptor()
+{
+    return utils::constructOpenApiDescriptor<TargetSingleDeviceField>();
 }
 
 } // namespace nx::vms::rules

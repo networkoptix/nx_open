@@ -73,6 +73,7 @@ public:
     virtual QVariant build(const AggregatedEventPtr& eventAggregator) const override;
 
     TargetSingleDeviceFieldProperties properties() const;
+    static QJsonObject openApiDescriptor();
 
 signals:
     void idChanged();

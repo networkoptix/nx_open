@@ -6,6 +6,7 @@
 #include <nx/vms/common/lookup_lists/lookup_list_manager.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/event/helpers.h>
+#include <nx/vms/rules/utils/openapi_doc.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx_ec/managers/abstract_lookup_list_manager.h>
 
@@ -114,6 +115,20 @@ bool TextLookupField::match(const QVariant& eventValue) const
     }
 
     return {};
+}
+
+QJsonObject TextLookupField::openApiDescriptor()
+{
+    auto result = utils::constructOpenApiDescriptor<TextLookupField>();
+    result["description"] =
+        "Set the <b>UUID</b> of the Lookup List as the value for the check types <b>inList</b> "
+        "or <b>notInList</b>. To find the required Lookup List, "
+        "refer to the response of the request to /rest/v4/lookuplists. <br/>"
+        "To use multiple keywords in <b>containsKeywords</b> or <b>doesNotContainKeywords</b>, "
+        "use a space as the separator. <b>For example:</b> 'keyword1 keyword2'<br/>"
+        "You can also define a complex phrase with spaces by enclosing it in additional quotes. "
+        "<b>For example:</b>  <pre>'\\\\\\\"complex keyword with spaces\\\\\\\"'.</pre>";
+    return result;
 }
 
 } // namespace nx::vms::rules

@@ -21,6 +21,7 @@ public:
     void setId(nx::Uuid id);
 
     bool match(const QVariant& eventValue) const override;
+    static QJsonObject openApiDescriptor();
 
 private:
     mutable nx::Uuid m_id;

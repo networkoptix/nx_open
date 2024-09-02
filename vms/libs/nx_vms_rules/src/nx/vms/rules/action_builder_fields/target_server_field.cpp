@@ -43,4 +43,9 @@ QVariant TargetServerField::build(const AggregatedEventPtr& event) const
     return QVariant::fromValue(result);
 }
 
+QJsonObject TargetServerField::openApiDescriptor()
+{
+    return utils::constructOpenApiDescriptor<TargetServerField>();
+}
+
 } // namespace nx::vms::rules

@@ -4,6 +4,7 @@
 
 #include <nx/utils/log/assert.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/rules/utils/openapi_doc.h>
 
 #include "../field.h"
 #include "../manifest.h"
@@ -22,7 +23,7 @@ FieldDescriptor makeFieldDescriptor(
         .fieldName = fieldName,
         .displayName = displayName,
         .description = description,
-        .properties = properties
+        .properties = utils::addOpenApiToProperties<T>(properties)
     };
 }
 

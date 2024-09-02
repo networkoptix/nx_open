@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <QtCore/QJsonObject>
 #include <QtCore/QMetaClassInfo>
 #include <QtCore/QObject>
 

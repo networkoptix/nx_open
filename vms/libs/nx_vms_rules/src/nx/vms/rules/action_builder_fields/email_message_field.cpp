@@ -3,6 +3,7 @@
 #include "email_message_field.h"
 
 #include <nx/utils/log/assert.h>
+#include <nx/vms/rules/utils/openapi_doc.h>
 #include <utils/email/message.h>
 
 #include "../aggregated_event.h"
@@ -24,6 +25,11 @@ QVariant EmailMessageField::build(const AggregatedEventPtr& eventAggregator) con
     // Return correct type for testing.
     NX_ASSERT(eventAggregator->type().startsWith("nx.events.test"), "Must not be called");
     return QVariant::fromValue(nx::email::Message{});
+}
+
+QJsonObject EmailMessageField::openApiDescriptor()
+{
+    return {};
 }
 
 } // namespace nx::vms::rules

@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <QtCore/QJsonObject>
 #include <QtCore/QSet>
 
 #include <nx/fusion/fusion/fusion_fwd.h>

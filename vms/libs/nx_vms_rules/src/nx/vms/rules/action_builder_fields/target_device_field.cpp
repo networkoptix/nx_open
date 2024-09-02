@@ -42,4 +42,9 @@ QVariant TargetDeviceField::build(const AggregatedEventPtr& event) const
     return QVariant::fromValue(result);
 }
 
+QJsonObject TargetDeviceField::openApiDescriptor()
+{
+    return utils::constructOpenApiDescriptor<TargetDeviceField>();
+}
+
 } // namespace nx::vms::rules
