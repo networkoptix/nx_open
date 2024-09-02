@@ -20,4 +20,9 @@ QVariant ExtractDetailField::build(const AggregatedEventPtr& event) const
     return event->details(systemContext()).value(detailName());
 }
 
+QJsonObject ExtractDetailField::openApiDescriptor()
+{
+    return {};
+}
+
 } // namespace nx::vms::rules

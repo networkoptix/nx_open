@@ -29,6 +29,7 @@ public:
 
     QString typeId() const;
     void setTypeId(const QString& id);
+    static QJsonObject openApiDescriptor();
 
 signals:
     void engineIdChanged();

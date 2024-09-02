@@ -2,6 +2,9 @@
 
 #include "plugin.h"
 
+#include <nx/vms/rules/ini.h>
+#include <nx/vms/rules/utils/openapi_doc.h>
+
 namespace nx::vms::rules {
 
 Plugin::Plugin()
@@ -20,6 +23,8 @@ void Plugin::initialize(Engine* engine)
     registerFieldValidators();
     registerEvents();
     registerActions();
+    if (ini().generateOpenApiDoc)
+        utils::createEventRulesOpenApiDoc(m_engine);
 }
 
 void Plugin::registerFields() const

@@ -6,13 +6,65 @@
 #include <nx/vms/api/data/user_group_data.h>
 #include <nx/vms/rules/ini.h>
 
+#include "../action_builder_fields/event_devices_field.h"
 #include "../action_builder_fields/extract_detail_field.h"
 #include "../action_builder_fields/flag_field.h"
 #include "../action_builder_fields/optional_time_field.h"
 #include "../action_builder_fields/text_with_fields.h"
 #include "../event_filter_fields/state_field.h"
+#include "../event_filter_fields/unique_id_field.h"
+#include "nx/vms/rules/action_builder_fields/email_message_field.h"
 
 using namespace std::chrono_literals;
+
+namespace nx::vms::rules {
+
+template <class T>
+FieldDescriptor makeInvisibleFieldDescriptor(const QString& fieldName,
+    const TranslatableString& displayName,
+    const TranslatableString& description,
+    QVariantMap properties)
+{
+    properties["visible"] = false;
+    return FieldDescriptor{.id = fieldMetatype<T>(),
+        .fieldName = fieldName,
+        .displayName = displayName,
+        .description = description,
+        .properties = properties};
+}
+
+// Invisible types
+template<>
+inline FieldDescriptor makeFieldDescriptor<UniqueIdField>(const QString& fieldName,
+    const TranslatableString& displayName,
+    const TranslatableString& description,
+    const QVariantMap& properties)
+{
+    return makeInvisibleFieldDescriptor<UniqueIdField>(
+        fieldName, displayName, description, properties);
+}
+
+template<>
+inline FieldDescriptor makeFieldDescriptor<EmailMessageField>(const QString& fieldName,
+    const TranslatableString& displayName,
+    const TranslatableString& description,
+    const QVariantMap& properties)
+{
+    return makeInvisibleFieldDescriptor<EmailMessageField>(
+        fieldName, displayName, description, properties);
+}
+
+template<>
+inline FieldDescriptor makeFieldDescriptor<EventDevicesField>(const QString& fieldName,
+    const TranslatableString& displayName,
+    const TranslatableString& description,
+    const QVariantMap& properties)
+{
+    return makeInvisibleFieldDescriptor<EventDevicesField>(
+        fieldName, displayName, description, properties);
+}
+
+} // namespace nx::vms::rules
 
 namespace nx::vms::rules::utils {
 
@@ -65,7 +117,7 @@ FieldDescriptor makeExtractDetailFieldDescriptor(
         fieldName,
         {},
         {},
-        {{ "detailName", detailName }});
+        {{ "detailName", detailName }, {"visible", false}});
 }
 
 FieldDescriptor makeTextWithFieldsDescriptorWithVisibilityConfig(

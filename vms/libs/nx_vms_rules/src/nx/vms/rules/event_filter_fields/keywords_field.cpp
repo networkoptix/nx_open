@@ -5,6 +5,7 @@
 #include <QtCore/QVariant>
 
 #include <nx/vms/event/helpers.h>
+#include <nx/vms/rules/utils/openapi_doc.h>
 
 namespace nx::vms::rules {
 
@@ -26,6 +27,11 @@ void KeywordsField::setString(const QString& string)
         m_list = nx::vms::event::splitOnPureKeywords(m_string);
         emit stringChanged();
     }
+}
+
+QJsonObject KeywordsField::openApiDescriptor()
+{
+    return utils::constructOpenApiDescriptor<KeywordsField>();
 }
 
 } // namespace nx::vms::rules

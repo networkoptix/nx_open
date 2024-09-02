@@ -23,6 +23,7 @@ public:
     ExtractDetailField(nx::vms::common::SystemContext* context, const FieldDescriptor* descriptor);
 
     QVariant build(const AggregatedEventPtr& event) const override;
+    static QJsonObject openApiDescriptor();
 };
 
 } // namespace nx::vms::rules

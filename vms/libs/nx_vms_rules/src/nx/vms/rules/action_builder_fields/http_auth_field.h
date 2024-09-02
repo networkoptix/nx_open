@@ -45,6 +45,7 @@ public:
     const AuthenticationInfo& auth() const;
 
     virtual QVariant build(const AggregatedEventPtr& eventAggregator) const override;
+    static QJsonObject openApiDescriptor();
 
 signals:
     void authTypeChanged();

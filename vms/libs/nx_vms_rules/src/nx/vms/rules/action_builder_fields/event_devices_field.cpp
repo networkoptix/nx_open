@@ -11,4 +11,9 @@ QVariant EventDevicesField::build(const AggregatedEventPtr& event) const
     return QVariant::fromValue(utils::getDeviceIds(event));
 }
 
+QJsonObject EventDevicesField::openApiDescriptor()
+{
+    return {};
+}
+
 } // namespace nx::vms::rules

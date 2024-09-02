@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <nx/vms/rules/utils/openapi_doc.h>
+
 #include "../action_builder_field.h"
 #include "../event_filter_field.h"
 
@@ -32,6 +34,11 @@ public:
         }
     }
 
+    static QJsonObject openApiDescriptor()
+    {
+        return utils::getPropertyOpenApiDescriptor(QMetaType::fromType<T>());
+    }
+
 protected:
     explicit SimpleTypeField(const FieldDescriptor* descriptor): B{descriptor}
     {
@@ -50,6 +57,8 @@ class SimpleTypeActionField: public SimpleTypeField<T, ActionBuilderField, D>
     using SimpleTypeField<T, ActionBuilderField, D>::m_value;
 
 public:
+    using SimpleTypeField<T, ActionBuilderField, D>::openApiDescriptor;
+
     explicit SimpleTypeActionField(const FieldDescriptor* descriptor):
         SimpleTypeField<T, ActionBuilderField, D>{descriptor}
     {
@@ -71,6 +80,7 @@ class SimpleTypeEventField: public SimpleTypeField<T, EventFilterField, D>
     using SimpleTypeField<T, EventFilterField, D>::m_value;
 
 public:
+    using SimpleTypeField<T, EventFilterField, D>::openApiDescriptor;
     explicit SimpleTypeEventField(const FieldDescriptor* descriptor):
         SimpleTypeField<T, EventFilterField, D>{descriptor}
     {

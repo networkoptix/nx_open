@@ -2,6 +2,8 @@
 
 #include "http_auth_field.h"
 
+#include <nx/vms/rules/utils/openapi_doc.h>
+
 namespace nx::vms::rules {
 
 namespace {
@@ -86,6 +88,18 @@ const AuthenticationInfo& HttpAuthField::auth() const
 QVariant HttpAuthField::build(const AggregatedEventPtr& /*eventAggregator*/) const
 {
     return QVariant::fromValue(auth());
+}
+
+QJsonObject HttpAuthField::openApiDescriptor()
+{
+    auto result =  utils::constructOpenApiDescriptor<HttpAuthField>();
+    result["description"] =
+        "If <b>authType</b> is set to one of the following values:"
+        " <b>authBasicAndDigest</b>, <b>authDigest</b>, "
+        "or <b>authBasic</b>, then the <b>login</b> and <b>password</b> "
+        "fields must be set. <br/>"
+        "If <b>authType</b> is set to <b>authBearer</b>, then the <b>token</b> field must be set.";
+    return result;
 }
 
 } // namespace nx::vms::rules

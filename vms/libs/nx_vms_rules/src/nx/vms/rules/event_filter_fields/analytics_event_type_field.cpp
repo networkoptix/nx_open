@@ -5,6 +5,7 @@
 #include <nx/analytics/taxonomy/abstract_state.h>
 #include <nx/analytics/taxonomy/utils.h>
 #include <nx/vms/common/system_context.h>
+#include <nx/vms/rules/utils/openapi_doc.h>
 
 namespace nx::vms::rules {
 
@@ -59,6 +60,11 @@ void AnalyticsEventTypeField::setTypeId(const QString& id)
         m_typeId = id;
         emit typeIdChanged();
     }
+}
+
+QJsonObject AnalyticsEventTypeField::openApiDescriptor()
+{
+    return utils::constructOpenApiDescriptor<AnalyticsEventTypeField>();
 }
 
 } // namespace nx::vms::rules

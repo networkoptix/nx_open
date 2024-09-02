@@ -6,6 +6,7 @@
 #include <api/common_message_processor.h>
 #include <nx/vms/common/lookup_lists/lookup_list_manager.h>
 #include <nx/vms/common/system_context.h>
+#include <nx/vms/rules/utils/openapi_doc.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx_ec/managers/abstract_lookup_list_manager.h>
 
@@ -153,6 +154,17 @@ bool ObjectLookupField::match(const QVariant& eventValue) const
     const auto& lookupListData = std::any_cast<api::LookupListData&>(m_listOrMatcher);
     const auto hasEntry = checkForListEntries(lookupListData, attributes);
     return m_checkType == ObjectLookupCheckType::inList ? hasEntry : !hasEntry;
+}
+
+QJsonObject ObjectLookupField::openApiDescriptor()
+{
+    auto result = utils::constructOpenApiDescriptor<ObjectLookupField>();
+    result["description"] =
+        "Set the <b>UUID</b> of the Lookup List as the value for the check types <b>inList</b> "
+        "or <b>notInList</b>.<br/>"
+        "To find the required Lookup List, "
+        "refer to the response of the request to /rest/v4/lookuplists.";
+    return result;
 }
 
 } // namespace nx::vms::rules

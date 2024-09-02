@@ -58,6 +58,8 @@ public:
     QString text() const;
     void setText(const QString& text);
 
+    static QJsonObject openApiDescriptor();
+
     TextWithFieldsFieldProperties properties() const;
 
     void parseText();

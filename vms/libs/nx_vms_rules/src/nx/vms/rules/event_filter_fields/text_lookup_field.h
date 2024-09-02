@@ -34,6 +34,7 @@ public:
     void setCheckType(TextLookupCheckType type);
 
     bool match(const QVariant& eventValue) const override;
+    static QJsonObject openApiDescriptor();
 
 signals:
     void valueChanged();

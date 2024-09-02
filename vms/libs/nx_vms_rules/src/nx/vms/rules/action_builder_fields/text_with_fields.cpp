@@ -5,6 +5,7 @@
 #include <nx/utils/log/assert.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/rules/utils/event_parameter_helper.h>
+#include <nx/vms/rules/utils/openapi_doc.h>
 
 #include "../aggregated_event.h"
 
@@ -138,6 +139,11 @@ TextWithFieldsFieldProperties TextWithFields::properties() const
 const TextWithFields::ParsedValues& TextWithFields::parsedValues() const
 {
     return d->values;
+}
+
+QJsonObject TextWithFields::openApiDescriptor()
+{
+    return utils::getPropertyOpenApiDescriptor(QMetaType::fromType<QString>());
 }
 
 } // namespace nx::vms::rules
