@@ -519,7 +519,7 @@ ActionBuilder::Actions ActionBuilder::buildActionsForTargetUsers(
         if (!filteredAggregatedEvent)
             continue;
 
-        const auto locale = QString::fromStdString(user->settings().locale);
+        const auto locale = user->locale();
         // Grouping users with the same permissions and same locale.
         auto hash = permissionHash(*eventManifest, filteredAggregatedEvent)
             .append(locale.toUtf8());
@@ -585,9 +585,13 @@ ActionBuilder::Actions ActionBuilder::buildActionsForTargetUsers(
         }
         else
         {
-            auto translationManager = nx::vms::common::appContext()->translationManager();
-            if (NX_ASSERT(translationManager))
-                scopedLocale = translationManager->installScopedLocale(locale);
+            auto appContext = nx::vms::common::appContext();
+            if (appContext) //< Application context is not initialized in unit tests.
+            {
+                auto translationManager = appContext->translationManager();
+                if (translationManager) // Some unit tests do not have translations manager.
+                    scopedLocale = translationManager->installScopedLocale(locale);
+            }
         }
 
         auto actions = filterActionPermissions(

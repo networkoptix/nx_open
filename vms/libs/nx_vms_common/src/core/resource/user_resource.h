@@ -189,6 +189,14 @@ public:
     void setIntegrationRequestData(
         std::optional<nx::vms::api::analytics::IntegrationRequestData> integrationRequestData);
 
+    /**
+     * Preferred locale of the user. Will affect language of the emails and notifications both in
+     * desktop and mobile clients.
+     * %example en_US
+     */
+    QString locale() const;
+    void setLocale(const QString& value);
+
     std::map<nx::Uuid, nx::vms::api::AccessRights> ownResourceAccessRights() const;
 
     virtual nx::vms::api::ResourceStatus getStatus() const override;
@@ -218,6 +226,7 @@ signals:
     void fullNameChanged(const QnResourcePtr& user);
     void externalIdChanged(const QnUserResourcePtr& user);
     void attributesChanged(const QnResourcePtr& user);
+    void localeChanged(const QnResourcePtr& user);
 
     // Emitted if Temporary user has any changes in the token an/or lifetime bounds.
     void temporaryTokenChanged(const QnUserResourcePtr& user);
@@ -247,4 +256,5 @@ private:
     nx::vms::api::UserExternalId m_externalId;
     nx::vms::api::UserAttributes m_attributes;
     std::map<nx::Uuid, nx::vms::api::AccessRights> m_resourceAccessRights;
+    QString m_locale;
 };

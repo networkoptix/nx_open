@@ -552,6 +552,7 @@ void fromApiToResource(const UserData& src, const QnUserResourcePtr& dst)
     dst->setRawPermissions(src.permissions);
     dst->setAttributes(src.attributes);
     dst->setExternalId(src.externalId);
+    dst->setLocale(src.locale);
 
     dst->setPasswordHashes({
         QString::fromStdString(nx::network::AppInfo::realm()),
@@ -579,6 +580,7 @@ void fromResourceToApi(const QnUserResource& src, UserData& dst)
     dst.externalId = src.m_externalId;
     dst.type = src.m_userType;
     dst.attributes = src.m_attributes;
+    dst.locale = src.m_locale;
     dst.resourceAccessRights = src.m_resourceAccessRights;
     dst.cryptSha512Hash = src.m_cryptSha512Hash;
     dst.digest = src.m_digest;
