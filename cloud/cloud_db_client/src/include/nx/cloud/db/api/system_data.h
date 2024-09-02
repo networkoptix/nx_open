@@ -426,19 +426,23 @@ struct SystemSharingEx: SystemSharing
 {
     using base_type = SystemSharing;
 
-    /**%apidoc True if two-factor authentication is REQUIRED for the account.*/
+    /**%apidoc True if a key for two-factor authentication was generated for the account.*/
     bool account2faEnabled = false;
 
     bool operator==(const SystemSharingEx& rhs) const
     {
-        return std::tie(static_cast<const base_type&>(*this), account2faEnabled)
-            == std::tie(static_cast<const base_type&>(rhs), rhs.account2faEnabled);
+        return std::tie(
+                   static_cast<const base_type&>(*this), account2faEnabled)
+            == std::tie(
+                static_cast<const base_type&>(rhs), rhs.account2faEnabled);
     }
 
     bool operator<(const SystemSharingEx& rhs) const
     {
-        return std::tie(static_cast<const base_type&>(*this), account2faEnabled)
-            < std::tie(static_cast<const base_type&>(rhs), rhs.account2faEnabled);
+        return std::tie(
+                   static_cast<const base_type&>(*this), account2faEnabled)
+            < std::tie(
+                static_cast<const base_type&>(rhs), rhs.account2faEnabled);
     }
 
     SystemSharingEx() = default;
