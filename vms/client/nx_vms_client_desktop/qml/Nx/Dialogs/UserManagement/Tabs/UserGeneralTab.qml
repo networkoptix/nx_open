@@ -538,15 +538,11 @@ Item
                             id: languageComboBox
 
                             model: TranslationListModel {}
-                            currentIndex: !!control.locale
-                                ? model.localeIndex(control.locale)
-                                : -1
+                            currentIndex: model.localeIndex(control.locale)
                             textRole: "display"
                             valueRole: "localeCode"
                             width: parent.width
-                            enabled: control.localeEditable
-                                && control.enabled
-                                && control.userType != UserSettingsGlobal.CloudUser
+                            enabled: control.localeEditable && control.enabled
 
                             onCurrentValueChanged: control.locale = currentValue ?? ""
                         }
