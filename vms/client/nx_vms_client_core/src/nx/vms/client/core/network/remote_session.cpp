@@ -54,7 +54,7 @@ struct RemoteSession::Private
     State state = State::waitingPeer;
     bool stickyReconnect = false;
     std::unique_ptr<ReconnectHelper> reconnectHelper;
-    std::chrono::microseconds sessionStartTime{0};
+    std::chrono::microseconds sessionStartTime = qnSyncTime->currentTimePoint();
 
     /** Actual error code for the server we were connected to. */
     std::optional<RemoteConnectionErrorCode> activeServerReconnectErrorCode;

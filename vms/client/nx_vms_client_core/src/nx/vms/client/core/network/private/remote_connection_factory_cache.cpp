@@ -239,6 +239,7 @@ void RemoteConnectionFactoryCache::startWatchingConnection(
         };
 
     QObject::connect(updateTimer.get(), &QTimer::timeout, updateFunc);
+    QObject::connect(connection.get(), &RemoteConnection::credentialsChanged, updateFunc);
 
     updateTimer->start();
 
