@@ -255,18 +255,7 @@ bool ResourceSelectionDecoratorModel::toggleSelection(const QModelIndex& index)
         {
             if (index.data(ResourceDialogItemRole::IsPinnedItemRole).toBool())
             {
-                m_pinnedItemSelected = !m_pinnedItemSelected;
-                emit dataChanged(
-                    index.siblingAtColumn(0),
-                    index.siblingAtColumn(columnCount(index.parent()) - 1),
-                    {Qt::CheckStateRole});
-
-                if (m_resourceSelectionMode == ResourceSelectionMode::ExclusiveSelection
-                    && !m_selectedResources.isEmpty())
-                {
-                    m_selectedResources.clear();
-                }
-
+                setPinnedItemSelected(!pinnedItemSelected());
                 return true;
             }
 
@@ -391,7 +380,34 @@ bool ResourceSelectionDecoratorModel::pinnedItemSelected() const
 
 void ResourceSelectionDecoratorModel::setPinnedItemSelected(bool selected)
 {
+    if (m_pinnedItemSelected == selected)
+        return;
+
     m_pinnedItemSelected = selected;
+
+    const auto pinnedItemIndex = index(0, 0);
+
+    emit dataChanged(
+        pinnedItemIndex,
+        pinnedItemIndex.siblingAtColumn(columnCount() - 1),
+        {Qt::CheckStateRole});
+
+    if (m_resourceSelectionMode == ResourceSelectionMode::ExclusiveSelection)
+    {
+        QModelIndexList deselectedIndexes;
+        for (const auto& resource: m_selectedResources)
+            deselectedIndexes.append(resourceIndex(resource));
+
+        m_selectedResources.clear();
+
+        for (const auto& deselectedIndex: deselectedIndexes)
+        {
+            emit dataChanged(
+                deselectedIndex.siblingAtColumn(0),
+                deselectedIndex.siblingAtColumn(columnCount(deselectedIndex.parent()) - 1),
+                {Qt::CheckStateRole});
+        }
+    }
 }
 
 } // namespace nx::vms::client::desktop
