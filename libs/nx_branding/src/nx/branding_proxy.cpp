@@ -38,4 +38,9 @@ QString QmlProxy::supportAddress()
     return nx::branding::supportAddress();
 }
 
+QString QmlProxy::defaultLocale()
+{
+    return nx::branding::defaultLocale();
+}
+
 } // namespace nx::branding

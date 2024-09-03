@@ -398,7 +398,7 @@ Item
                     id: languageComboBox
 
                     model: TranslationListModel {}
-                    currentIndex: 0
+                    currentIndex: model.localeIndex(Branding.defaultLocale())
                     textRole: "display"
                     valueRole: "localeCode"
                     width: parent.width

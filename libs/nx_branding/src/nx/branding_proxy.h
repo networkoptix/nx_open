@@ -19,6 +19,7 @@ public:
     Q_INVOKABLE static QString vmsName();
     Q_INVOKABLE static bool isDesktopClientCustomized();
     Q_INVOKABLE static QString supportAddress();
+    Q_INVOKABLE static QString defaultLocale();
 };
 
 } // namespace nx::branding
