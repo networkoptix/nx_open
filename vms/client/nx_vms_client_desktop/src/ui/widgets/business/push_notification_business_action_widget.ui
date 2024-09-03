@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>542</width>
-    <height>185</height>
+    <height>189</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -126,16 +126,6 @@
            </property>
            <property name="text">
             <string notr="true">&lt;All users&gt;</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="languageButton">
-           <property name="text">
-            <string>Language Settings</string>
-           </property>
-           <property name="flat">
-            <bool>true</bool>
            </property>
           </widget>
          </item>

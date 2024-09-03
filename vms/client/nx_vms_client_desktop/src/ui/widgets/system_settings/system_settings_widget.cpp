@@ -6,7 +6,6 @@
 #include <client/client_globals.h>
 #include <core/resource/device_dependent_strings.h>
 #include <nx/branding.h>
-#include <nx/vms/client/core/ui/translation_list_model.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
@@ -16,8 +15,6 @@
 
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::common;
-
-using TranslationListModel = nx::vms::client::core::TranslationListModel;
 
 QnSystemSettingsWidget::QnSystemSettingsWidget(
     nx::vms::api::SaveableSystemSettings* editableSystemSettings,
@@ -47,13 +44,6 @@ QnSystemSettingsWidget::QnSystemSettingsWidget(
         this,
         [this] { ui->settingsWarningLabel->setVisible(!ui->autoSettingsCheckBox->isChecked()); });
 
-    ui->languageComboBox->setModel(new TranslationListModel(this));
-
-    connect(ui->customNotificationLanguageCheckBox,
-        &QCheckBox::clicked,
-        this,
-        [this](const bool checked) { ui->languageComboBox->setVisible(checked); });
-
     connect(ui->autoDiscoveryCheckBox,
         &QCheckBox::stateChanged,
         this,
@@ -64,15 +54,6 @@ QnSystemSettingsWidget::QnSystemSettingsWidget(
         &QnAbstractPreferencesWidget::hasChangesChanged);
     connect(ui->autoSettingsCheckBox,
         &QCheckBox::stateChanged,
-        this,
-        &QnAbstractPreferencesWidget::hasChangesChanged);
-
-    connect(ui->customNotificationLanguageCheckBox,
-        &QCheckBox::stateChanged,
-        this,
-        &QnAbstractPreferencesWidget::hasChangesChanged);
-    connect(ui->languageComboBox,
-        qOverload<int>(&QComboBox::currentIndexChanged),
         this,
         &QnAbstractPreferencesWidget::hasChangesChanged);
 
@@ -112,22 +93,6 @@ void QnSystemSettingsWidget::loadDataToUi()
     ui->autoSettingsCheckBox->setChecked(systemSettings()->isCameraSettingsOptimizationEnabled());
     ui->settingsWarningLabel->setVisible(false);
     ui->statisticsReportCheckBox->setChecked(systemSettings()->isStatisticsAllowed());
-
-    const bool connectedToCloud = !systemSettings()->cloudSystemId().isEmpty();
-    const bool hasCustomLanguage = !systemSettings()->cloudNotificationsLanguage().isEmpty();
-
-    ui->customNotificationLanguageCheckBox->setVisible(connectedToCloud);
-    ui->customNotificationLanguageCheckBox->setChecked(hasCustomLanguage);
-    ui->languageComboBox->setVisible(connectedToCloud && hasCustomLanguage);
-
-    if (const auto translationModel =
-        qobject_cast<TranslationListModel*>(ui->languageComboBox->model());
-        NX_ASSERT(translationModel))
-    {
-        const int currentLanguageIndex = translationModel->localeIndex(
-            systemSettings()->cloudNotificationsLanguage());
-        ui->languageComboBox->setCurrentIndex(currentLanguageIndex);
-    }
 }
 
 void QnSystemSettingsWidget::applyChanges()
@@ -139,14 +104,6 @@ void QnSystemSettingsWidget::applyChanges()
     editableSystemSettings->cameraSettingsOptimization = ui->autoSettingsCheckBox->isChecked();
     editableSystemSettings->statisticsAllowed = ui->statisticsReportCheckBox->isChecked();
     ui->settingsWarningLabel->setVisible(false);
-    if (!systemSettings()->cloudSystemId().isEmpty())
-    {
-        const auto& locale = ui->languageComboBox->currentData(
-            TranslationListModel::LocaleCodeRole).toString();
-
-        editableSystemSettings->cloudNotificationsLanguage =
-            ui->customNotificationLanguageCheckBox->isChecked() ? locale : QString{};
-    }
 }
 
 bool QnSystemSettingsWidget::hasChanges() const
@@ -166,25 +123,7 @@ bool QnSystemSettingsWidget::hasChanges() const
     if (ui->statisticsReportCheckBox->isChecked() != systemSettings()->isStatisticsAllowed())
         return true;
 
-    if (!systemSettings()->cloudSystemId().isEmpty())
-    {
-        const auto& currentLocale = systemSettings()->cloudNotificationsLanguage();
-
-        if (ui->customNotificationLanguageCheckBox->isChecked() != !currentLocale.isEmpty())
-            return true;
-
-        const auto& selectedLocale = ui->languageComboBox->currentData(
-            TranslationListModel::LocaleCodeRole).toString();
-        if (ui->customNotificationLanguageCheckBox->isChecked() && selectedLocale != currentLocale)
-            return true;
-    }
-
     return false;
-}
-
-QWidget* QnSystemSettingsWidget::languageComboBox() const
-{
-    return ui->languageComboBox;
 }
 
 void QnSystemSettingsWidget::setReadOnlyInternal(bool readOnly)
@@ -194,6 +133,4 @@ void QnSystemSettingsWidget::setReadOnlyInternal(bool readOnly)
     setReadOnly(ui->autoDiscoveryCheckBox, readOnly);
     setReadOnly(ui->autoSettingsCheckBox, readOnly);
     setReadOnly(ui->statisticsReportCheckBox, readOnly);
-    setReadOnly(ui->customNotificationLanguageCheckBox, readOnly);
-    setReadOnly(ui->languageComboBox, readOnly);
 }
