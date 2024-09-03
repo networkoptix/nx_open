@@ -10064,7 +10064,7 @@ You can force it, but it may significantly increase CPU load.</source>
     <name>nx::vms::client::desktop::NonEditableUsersAndGroups</name>
     <message>
       <source>User management for organization users is available only at the organization level, not the system level</source>
-      <translation type="unfinished">User management for organization users is available only at the organization level, not the system level</translation>
+      <translation>組織使用者管理僅能在組織層級設定，無法在系統層級設定。</translation>
     </message>
     <message>
       <source>You do not have permissions to modify this user</source>
@@ -10445,7 +10445,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Allow opening this web page without SSL certificate checking</source>
-      <translation type="unfinished">Allow opening this web page without SSL certificate checking</translation>
+      <translation>允許在不驗證SSL憑證的情況下開啟網頁</translation>
     </message>
     <message>
       <source>New Web Page</source>

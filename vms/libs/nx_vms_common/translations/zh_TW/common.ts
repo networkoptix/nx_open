@@ -1186,7 +1186,7 @@
     <message>
       <source>Not allowed.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Not allowed.</translation>
+      <translation>不允許。</translation>
     </message>
   </context>
   <context>
@@ -1743,7 +1743,7 @@
     </message>
     <message>
       <source>Device storage information update interval</source>
-      <translation type="unfinished">Device storage information update interval</translation>
+      <translation>裝置儲存資訊更新間隔</translation>
     </message>
   </context>
   <context>
