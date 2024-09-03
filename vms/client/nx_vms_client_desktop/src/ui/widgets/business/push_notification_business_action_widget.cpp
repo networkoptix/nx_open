@@ -61,12 +61,6 @@ private:
     const std::function<void(QWidget*)> m_receiver;
 };
 
-nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kLanguagesTheme = {
-    {QnIcon::Normal, {.primary = "light16"}}
-};
-
-NX_DECLARE_COLORIZED_ICON(kLanguagesIcon, "20x20/Outline/earth.svg", kLanguagesTheme)
-
 } // namespace
 
 namespace nx::vms::client::desktop {
@@ -92,13 +86,6 @@ PushNotificationBusinessActionWidget::PushNotificationBusinessActionWidget(
             .arg(nx::branding::cloudName()));
 
     setHelpTopic(this, HelpTopic::Id::EventsActions_SendMobileNotification);
-
-    ui->languageButton->setIcon(qnSkin->icon(kLanguagesIcon));
-    connect(ui->languageButton, &QPushButton::clicked, this,
-        [this, context]
-        {
-            context->menu()->trigger(menu::SystemAdministrationAction);
-        });
 
     m_aligner->addWidgets(
         {ui->usersLabel, ui->dummyLabel, ui->headerLabel, ui->bodyLabel, ui->dummyLabel2});
@@ -188,8 +175,7 @@ void PushNotificationBusinessActionWidget::at_model_dataChanged(Fields fields)
 void PushNotificationBusinessActionWidget::updateTabOrder(QWidget* before, QWidget* after)
 {
     setTabOrder(before, ui->selectUsersButton);
-    setTabOrder(ui->selectUsersButton, ui->languageButton);
-    setTabOrder(ui->languageButton, ui->customContentCheckBox);
+    setTabOrder(ui->selectUsersButton, ui->customContentCheckBox);
     setTabOrder(ui->customContentCheckBox, ui->headerText);
     setTabOrder(ui->headerText, ui->bodyText);
     setTabOrder(ui->bodyText, ui->addSourceNameCheckBox);
