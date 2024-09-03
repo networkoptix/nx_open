@@ -1279,7 +1279,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>You can hide systems from the main list from the context menu</source>
-      <translation>コンテキストメニューのメインリストからシステムを非表示にすることができます</translation>
+      <translation>コンテキストメニューを使うことで、メインリスト上でシステムを非表示にすることができます。</translation>
     </message>
   </context>
   <context>
