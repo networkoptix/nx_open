@@ -62,6 +62,7 @@ bool isMessageLocked(MessageType message)
         case MessageType::saasInShutdownState:
         case MessageType::showIntercomInformer:
         case MessageType::showMissedCallInformer:
+        case MessageType::notificationLanguageDiffers:
             return true;
 
         default:
@@ -80,6 +81,7 @@ bool isMessageVisibleInSettings(MessageType message)
         case MessageType::cloudPromo:
         case MessageType::defaultCameraPasswords:
         case MessageType::remoteArchiveSyncAvailable:
+        case MessageType::notificationLanguageDiffers:
 
         // TODO: Remove in VMS-7724.
         case MessageType::remoteArchiveSyncFinished:

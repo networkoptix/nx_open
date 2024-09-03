@@ -58,6 +58,7 @@ QnNotificationLevel::Value QnNotificationLevel::valueOf(
         case MessageType::saasIntegrationServicesOverused:
         case MessageType::saasInSuspendedState:
         case MessageType::saasInShutdownState:
+        case MessageType::notificationLanguageDiffers:
             return QnNotificationLevel::Value::ImportantNotification;
 
         // Red notifications.

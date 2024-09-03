@@ -65,6 +65,8 @@ QString QnSystemHealthStringsHelper::messageShortTitle(MessageType messageType)
             return tr("Intercom missed call");
         case MessageType::rejectIntercomCall:
             return tr("Reject intercom call");
+        case MessageType::notificationLanguageDiffers:
+            return tr("Notification and interface languages differ");
 
         default:
             break;
@@ -171,6 +173,8 @@ QString QnSystemHealthStringsHelper::messageDescription(MessageType messageType)
                     tr("Connect"), "settings")) //< TODO: #sivanov Replace to `#settings`.
                 .arg(nx::style::Metrics::kStandardPadding);
         }
+        case MessageType::notificationLanguageDiffers:
+            return tr("Notifications language differs from the interface language");
         default:
             return {};
     }

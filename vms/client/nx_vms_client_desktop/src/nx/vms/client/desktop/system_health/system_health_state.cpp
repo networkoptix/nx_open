@@ -20,8 +20,10 @@
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_session.h>
+#include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/desktop/access/caching_access_controller.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/settings/show_once_settings.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -80,6 +82,7 @@ private:
     std::unique_ptr<InvalidRecordingScheduleWatcher> m_invalidRecordingScheduleWatcher;
     std::unique_ptr<SystemInternetAccessWatcher> m_systemInternetAccessWatcher;
     std::unique_ptr<UserEmailsWatcher> m_userEmailsWatcher;
+    nx::utils::ScopedConnections m_userConnections;
 };
 
 // ------------------------------------------------------------------------------------------------
@@ -97,7 +100,7 @@ SystemHealthState::Private::Private(SystemHealthState* q):
 #define updateSlot(index) [this]() { return update(SystemHealthIndex::index); }
 
     connect(systemContext()->userWatcher(), &core::UserWatcher::userChanged, q,
-        [this]()
+        [this, q](const QnUserResourcePtr& user)
         {
             update(SystemHealthIndex::noLicenses);
             update(SystemHealthIndex::smtpIsNotSet);
@@ -109,6 +112,14 @@ SystemHealthState::Private::Private(SystemHealthState* q):
             updateCamerasWithInvalidSchedule();
             updateUsersWithInvalidEmail();
             updateSaasIssues();
+
+            m_userConnections.reset();
+            if (user)
+            {
+                m_userConnections << connect(user.get(), &QnUserResource::localeChanged, q,
+                    updateSlot(notificationLanguageDiffers));
+            }
+            update(SystemHealthIndex::notificationLanguageDiffers);
         });
 
     // NoLicenses.
@@ -194,12 +205,8 @@ SystemHealthState::Private::Private(SystemHealthState* q):
 
     // CloudPromo.
 
-    connect(&showOnceSettings()->cloudPromo, &ShowOnceSettings::BaseProperty::changed,
-        q,
-        [this](nx::utils::property_storage::BaseProperty* /*property*/)
-        {
-            update(SystemHealthIndex::cloudPromo);
-        });
+    connect(&showOnceSettings()->cloudPromo, &ShowOnceSettings::BaseProperty::changed, q,
+        updateSlot(cloudPromo));
 
     update(SystemHealthIndex::cloudPromo);
 
@@ -220,6 +227,11 @@ SystemHealthState::Private::Private(SystemHealthState* q):
     connect(systemContext()->saasServiceManager(), &saas::ServiceManager::dataChanged, q,
         [this] { updateSaasIssues(); } );
     updateSaasIssues();
+
+    // Notification Language warning.
+    connect(&appContext()->coreSettings()->locale, &core::Settings::BaseProperty::changed, q,
+        updateSlot(notificationLanguageDiffers));
+    update(SystemHealthIndex::notificationLanguageDiffers);
 
 #undef updateSlot
 }
@@ -436,6 +448,12 @@ bool SystemHealthState::Private::calculateState(SystemHealthIndex index) const
         case SystemHealthIndex::saasInShutdownState:
             return hasPowerUserPermissions()
                 && systemContext()->saasServiceManager()->saasShutDown();
+
+        case SystemHealthIndex::notificationLanguageDiffers:
+        {
+            const auto user = this->user();
+            return user && user->locale() != appContext()->coreSettings()->locale();
+        }
 
         default:
             NX_ASSERT(false, "This system health index is not handled by SystemHealthState");
