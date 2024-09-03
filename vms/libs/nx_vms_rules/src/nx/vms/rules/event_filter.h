@@ -40,7 +40,7 @@ public:
     // Takes ownership.
     void addField(const QString& name, std::unique_ptr<EventFilterField> field);
 
-    const QHash<QString, EventFilterField*> fields() const;
+    QHash<QString, EventFilterField*> fields() const;
 
     bool match(const EventPtr& event) const;
 

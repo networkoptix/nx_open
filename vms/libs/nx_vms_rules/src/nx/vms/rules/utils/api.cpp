@@ -50,10 +50,10 @@ api::EventFilter serialize(const EventFilter* filter)
     api::EventFilter result;
 
     const auto fields = filter->fields();
-    for (auto it = fields.cbegin(); it != fields.cend(); ++it)
+    for (const auto& [name, field]: filter->fields().asKeyValueRange())
     {
-        const auto& name = it.key();
-        const auto field = it.value();
+        if (!field->properties().visible)
+            continue;
 
         api::Field serialized;
         serialized.type = field->metatype();
@@ -74,10 +74,10 @@ api::ActionBuilder serialize(const ActionBuilder* builder)
     api::ActionBuilder result;
 
     const auto fields = builder->fields();
-    for (auto it = fields.cbegin(); it != fields.cend(); ++it)
+    for (const auto& [name, field]: builder->fields().asKeyValueRange())
     {
-        const auto& name = it.key();
-        const auto field = it.value();
+        if (!field->properties().visible)
+            continue;
 
         api::Field serialized;
         serialized.type = field->metatype();

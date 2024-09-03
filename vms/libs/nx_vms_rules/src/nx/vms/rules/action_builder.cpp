@@ -321,7 +321,7 @@ void ActionBuilder::addField(const QString& name, std::unique_ptr<ActionBuilderF
     m_fields[name] = std::move(field);
 }
 
-const QHash<QString, ActionBuilderField*> ActionBuilder::fields() const
+QHash<QString, ActionBuilderField*> ActionBuilder::fields() const
 {
     QHash<QString, ActionBuilderField*> result;
     for (const auto& [name, field]: m_fields)

@@ -50,6 +50,7 @@ public:
 
     QString metatype() const;
 
+    /** Full properties representation. */
     QMap<QString, QJsonValue> serializedProperties() const;
 
     const FieldDescriptor* descriptor() const;
