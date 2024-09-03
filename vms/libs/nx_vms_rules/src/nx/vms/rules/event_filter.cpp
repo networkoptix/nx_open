@@ -70,7 +70,7 @@ void EventFilter::addField(const QString& name, std::unique_ptr<EventFilterField
     m_fields[name] = std::move(field);
 }
 
-const QHash<QString, EventFilterField*> EventFilter::fields() const
+QHash<QString, EventFilterField*> EventFilter::fields() const
 {
     QHash<QString, EventFilterField*> result;
     for (const auto& [name, field]: m_fields)

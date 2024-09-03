@@ -254,10 +254,14 @@ bool amendOutputDataIfNeeded(
             {
                 if (auto it = field.props.find(name); it != field.props.end())
                 {
+                    const auto data = it.value().toString();
+                    if (data.isEmpty())
+                        continue;
+
                     if (accessManager->hasPowerUserPermissions(accessData))
                     {
                         it.value() =
-                            nx::crypt::decodeStringFromHexStringAES128CBC(it.value().toString());
+                            nx::crypt::decodeStringFromHexStringAES128CBC(data);
                     }
                     else
                     {

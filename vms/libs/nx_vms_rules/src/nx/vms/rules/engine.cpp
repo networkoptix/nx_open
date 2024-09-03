@@ -786,7 +786,8 @@ std::unique_ptr<EventFilterField> Engine::buildEventField(
 
     std::unique_ptr<EventFilterField> field(constructor(fieldDescriptor));
 
-    NX_ASSERT(field, "Field constructor returns nullptr");
+    if (NX_ASSERT(field, "Field constructor returns nullptr: %1", fieldDescriptor->id))
+        field->moveToThread(thread());
 
     return field;
 }
@@ -816,7 +817,8 @@ std::unique_ptr<ActionBuilderField> Engine::buildActionField(
 
     std::unique_ptr<ActionBuilderField> field(it->constructor(descriptor));
 
-    NX_ASSERT(field, "Field constructor returns nullptr: %1", descriptor->id);
+    if (NX_ASSERT(field, "Field constructor returns nullptr: %1", descriptor->id))
+        field->moveToThread(thread());
 
     return field;
 }

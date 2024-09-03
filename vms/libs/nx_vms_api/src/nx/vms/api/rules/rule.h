@@ -32,6 +32,29 @@ struct NX_VMS_API Rule: IdData
     IdData_Fields(eventList)(actionList)(enabled)(internal)(schedule)(comment)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST_EX(Rule, (json)(ubjson))
 
+
+struct NX_VMS_API RuleV4: public IdData
+{
+    /**%apidoc Event filter field data. */
+    std::map<QString, QJsonValue> event;
+
+    /**%apidoc Action builder field data. */
+    std::map<QString, QJsonValue> action;
+
+    /**%apidoc[opt] Is rule currently enabled. */
+    bool enabled = true;
+
+    /**%apidoc[opt] Schedule of the rule. Empty list means the rule is always enabled. */
+    nx::vms::api::ScheduleTaskDataList schedule;
+
+    /**%apidoc[opt] String comment explaining the rule. */
+    QString comment;
+};
+
+#define nx_vms_api_rules_RuleV4_Fields \
+    IdData_Fields(event)(action)(enabled)(schedule)(comment)
+NX_VMS_API_DECLARE_STRUCT_AND_LIST_EX(RuleV4, (json))
+
 // A dummy struct used in ec2 transactions.
 struct NX_VMS_API ResetRules
 {

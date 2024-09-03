@@ -42,7 +42,7 @@ public:
     // Takes ownership.
     void addField(const QString& name, std::unique_ptr<ActionBuilderField> field);
 
-    const QHash<QString, ActionBuilderField*> fields() const;
+    QHash<QString, ActionBuilderField*> fields() const;
 
     /**
      * Process the event and emits action() signal whenever appropriate action is
