@@ -83,6 +83,12 @@ NX_REFLECTION_ENUM_CLASS(MessageType,
      */
     rejectIntercomCall = 36,
 
+    /**
+     * Show a warning that current user notification language differs from the client application
+     * language. Generated on the client side.
+     */
+    notificationLanguageDiffers = 37,
+
     // IMPORTANT!!!
     // Enum order change is forbidden as leads to stored settings failure and protocol change.
 

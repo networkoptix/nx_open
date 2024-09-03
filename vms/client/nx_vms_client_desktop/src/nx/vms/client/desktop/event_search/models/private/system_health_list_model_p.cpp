@@ -6,6 +6,7 @@
 #include <limits>
 
 #include <QtCore/QCollator>
+#include <QtGui/QDesktopServices>
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
@@ -16,6 +17,7 @@
 #include <health/system_health_strings_helper.h>
 #include <nx/utils/metatypes.h>
 #include <nx/utils/string.h>
+#include <nx/vms/client/core/common/utils/cloud_url_helper.h>
 #include <nx/vms/client/core/resource/session_resources_signal_listener.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -427,6 +429,33 @@ CommandActionPtr SystemHealthListModel::Private::commandAction(int index) const
             return action;
         }
 
+        case MessageType::notificationLanguageDiffers:
+        {
+            const auto action = CommandActionPtr(new CommandAction(tr("Open Settings")));
+            connect(action.data(), &CommandAction::triggered, this,
+                [this]
+                {
+                    auto user = workbenchContext()->user();
+                    if (!NX_ASSERT(user))
+                        return;
+
+                    if (user->isCloud())
+                    {
+                        core::CloudUrlHelper urlHelper(
+                            utils::SystemUri::ReferralSource::DesktopClient,
+                            utils::SystemUri::ReferralContext::None);
+                        const auto url = urlHelper.accountManagementUrl();
+                        QDesktopServices::openUrl(url);
+                    }
+                    else
+                    {
+                        menu()->trigger(menu::UserSettingsAction, {user});
+                    }
+                });
+
+            return action;
+        }
+
         default:
             return {};
     }
@@ -438,6 +467,7 @@ menu::IDType SystemHealthListModel::Private::action(int index) const
     switch (message)
     {
         case MessageType::emailIsEmpty:
+        case MessageType::usersEmailIsEmpty:
             return menu::UserSettingsAction;
 
         case MessageType::noLicenses:
@@ -445,9 +475,6 @@ menu::IDType SystemHealthListModel::Private::action(int index) const
 
         case MessageType::smtpIsNotSet:
             return menu::PreferencesSmtpTabAction;
-
-        case MessageType::usersEmailIsEmpty:
-            return menu::UserSettingsAction;
 
         case MessageType::emailSendError:
             return menu::PreferencesSmtpTabAction;
