@@ -698,7 +698,7 @@ struct ValidateMSSignatureRequest
 {
     /**%apidoc Opaque text. */
     std::string message;
-    /**%apidoc SIGNATURE = base64(hmacSha256(cloudSystemAuthKey, message)) */
+    /**%apidoc SIGNATURE = base64(hmacSha256(cloudAuthKey, message)) */
     std::string signature;
 };
 

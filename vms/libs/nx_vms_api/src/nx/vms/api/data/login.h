@@ -129,7 +129,7 @@ struct NX_VMS_API CloudSignature
      */
     std::string message;
 
-    /**%apidoc SIGNATURE = base64(hmacSha256(cloudSystemAuthKey, message)) */
+    /**%apidoc SIGNATURE = base64(hmacSha256(cloudAuthKey, message)) */
     std::optional<std::string> signature;
 };
 #define CloudSignature_Fields (message)(signature)
