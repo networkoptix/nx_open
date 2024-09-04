@@ -5,6 +5,7 @@
 #include <fstream>
 
 #include <nx/pathkit/atlas.h>
+#include <nx/utils/test_support/test_with_temporary_directory.h>
 
 namespace nx::pathkit {
 
@@ -58,25 +59,6 @@ private:
     std::ofstream m_output;
 };
 
-void dumpAtlas(Atlas& atlas, const std::string& name)
-{
-    SvgRender svg(name, atlas.width(), atlas.height());
-
-    int lastLine = -1;
-
-    atlas.removeIf(
-        [&](const Atlas::Rect& r)
-        {
-            if (r.y != lastLine)
-            {
-                svg.line(0, r.y, atlas.width(), r.y);
-                lastLine = r.y;
-            }
-            svg.rect(r.x, r.y, r.w, r.h);
-            return false;
-        });
-}
-
 using AtlasData = std::vector<Atlas::Rect>;
 
 AtlasData getData(Atlas& atlas)
@@ -95,7 +77,34 @@ AtlasData getData(Atlas& atlas)
 
 } // namespace
 
-TEST(AtlasTest, avoidWasteIf2xSmaller)
+class AtlasTest:
+    public ::testing::Test,
+    public nx::utils::test::TestWithTemporaryDirectory
+{
+public:
+    void dumpAtlas(Atlas& atlas, const std::string& name)
+    {
+        const std::string resultDir = testDataDir().toStdString() + "/";
+
+        SvgRender svg(resultDir + name, atlas.width(), atlas.height());
+
+        int lastLine = -1;
+
+        atlas.removeIf(
+            [&](const Atlas::Rect& r)
+            {
+                if (r.y != lastLine)
+                {
+                    svg.line(0, r.y, atlas.width(), r.y);
+                    lastLine = r.y;
+                }
+                svg.rect(r.x, r.y, r.w, r.h);
+                return false;
+            });
+    }
+};
+
+TEST_F(AtlasTest, avoidWasteIf2xSmaller)
 {
     Atlas atlas(64, 64);
 
@@ -109,7 +118,7 @@ TEST(AtlasTest, avoidWasteIf2xSmaller)
     ASSERT_EQ(data, getData(atlas));
 }
 
-TEST(AtlasTest, sameShelfIfNoSpace)
+TEST_F(AtlasTest, sameShelfIfNoSpace)
 {
     Atlas atlas(100, 40);
 
@@ -123,7 +132,7 @@ TEST(AtlasTest, sameShelfIfNoSpace)
     ASSERT_EQ(data, getData(atlas));
 }
 
-TEST(AtlasTest, newShelfIfNoSpace)
+TEST_F(AtlasTest, newShelfIfNoSpace)
 {
     Atlas atlas(20, 40);
 
@@ -139,7 +148,7 @@ TEST(AtlasTest, newShelfIfNoSpace)
     ASSERT_EQ(data, getData(atlas));
 }
 
-TEST(AtlasTest, fullAfter4Rect)
+TEST_F(AtlasTest, fullAfter4Rect)
 {
     Atlas atlas(20, 20);
 
@@ -151,7 +160,7 @@ TEST(AtlasTest, fullAfter4Rect)
     ASSERT_TRUE(atlas.add(10, 10).isNull());
 }
 
-TEST(AtlasTest, checkSvg)
+TEST_F(AtlasTest, checkSvg)
 {
     Atlas atlas(512, 512);
 

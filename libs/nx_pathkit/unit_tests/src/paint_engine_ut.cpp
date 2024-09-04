@@ -8,6 +8,7 @@
 
 #include <nx/pathkit/rhi_paint_device.h>
 #include <nx/pathkit/rhi_paint_engine.h>
+#include <nx/utils/test_support/test_with_temporary_directory.h>
 
 #include "rhi_offscreen_renderer.h"
 
@@ -15,7 +16,9 @@ namespace nx::pathkit {
 
 namespace test {
 
-class PaintEngineTest: public ::testing::Test
+class PaintEngineTest:
+    public ::testing::Test,
+    public nx::utils::test::TestWithTemporaryDirectory
 {
 public:
     virtual void SetUp() override
@@ -232,11 +235,13 @@ TEST_F(PaintEngineTest, checkRendering)
 
     const auto rhiImage = offscreen.render(&renderer);
 
-    rhiImage.save("frame_rhi.png");
-    referenceImage.save("frame_qpainter.png");
+    const QString resultDir = testDataDir() + "/";
+
+    rhiImage.save(resultDir + "frame_rhi.png");
+    referenceImage.save(resultDir + "frame_qpainter.png");
 
     int accError = 0;
-    imageDiff(rhiImage, referenceImage, accError).save("frame_diff.png");
+    imageDiff(rhiImage, referenceImage, accError).save(resultDir + "frame_diff.png");
 
     const auto errPercent =
         100.0 * accError / (referenceImage.width() * referenceImage.height() * 255 * 3);
