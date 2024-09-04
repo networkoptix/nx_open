@@ -9,6 +9,7 @@
 #include <nx/utils/i18n/scoped_locale.h>
 #include <nx/utils/i18n/translation_manager.h>
 #include <nx/vms/client/core/application_context.h>
+#include <nx/vms/client/core/client_core_globals.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
 
 namespace nx::vms::client::core {
@@ -26,7 +27,7 @@ TranslationListModel::TranslationListModel(QObject* parent):
     {
         TranslationInfo info;
         info.localeCode = translation.localeCode;
-        info.flag = QIcon(QString(":/flags/%1.png").arg(translation.localeCode));
+        info.flag = QIcon(QString(":/skin/flags/%1.png").arg(translation.localeCode));
 
         auto scopedTranslation = manager->installScopedLocale(translation.localeCode);
         info.languageName = QCoreApplication::translate("Language", "Language Name",
@@ -78,6 +79,8 @@ QVariant TranslationListModel::data(const QModelIndex& index, int role) const
             return translation.languageName;
         case Qt::DecorationRole:
             return translation.flag;
+        case DecorationPathRole:
+            return QString("flags/%1.png").arg(translation.localeCode);
         case LocaleCodeRole:
             return translation.localeCode;
         default:
@@ -91,6 +94,7 @@ QHash<int, QByteArray> TranslationListModel::roleNames() const
 {
     auto result = base_type::roleNames();
     result[LocaleCodeRole] = "localeCode";
+    result[DecorationPathRole] = "decorationPath";
     return result;
 }
 

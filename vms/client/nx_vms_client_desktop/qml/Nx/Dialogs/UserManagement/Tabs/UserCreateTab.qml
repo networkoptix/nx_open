@@ -393,14 +393,11 @@ Item
 
                 text: qsTr("Notification Language")
 
-                ComboBox
+                LanguageComboBox
                 {
                     id: languageComboBox
 
-                    model: TranslationListModel {}
                     currentIndex: model.localeIndex(Branding.defaultLocale())
-                    textRole: "display"
-                    valueRole: "localeCode"
                     width: parent.width
                 }
             }

@@ -29,6 +29,10 @@ ComboBox
     // withIconSection and withColorSection are mutually exclusive.
     property bool withIconSection: false
 
+    // If true, the current text color is assigned to the icon's primary channel. Has effect only
+    // if withIconSection is true.
+    property bool colorizeIcons: true
+
     property string tabRole: ""
     property real tabSize: 16
 
@@ -211,7 +215,7 @@ ComboBox
             visible: control.withIconSection
             sourcePath: control.decorationPath
             sourceSize: Qt.size(20, 20)
-            primaryColor: parent.color
+            primaryColor: colorizeIcons ? parent.color : undefined
         }
 
         ContextMenuMouseArea
@@ -343,7 +347,7 @@ ComboBox
                     return icon ? icon : ""
                 }
                 sourceSize: Qt.size(20, 20)
-                primaryColor: parent.color
+                primaryColor: colorizeIcons ? parent.color : undefined
             }
         }
     }
