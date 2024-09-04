@@ -293,13 +293,13 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
     using namespace nx::common::metadata;
     if (auto motionPacket = std::dynamic_pointer_cast<const QnMetaDataV1>(md))
     {
-        NX_VERBOSE(this, "QnStreamRecorder::saveData(): Motion, timestamp %1 us", md->timestamp);
+        NX_VERBOSE(this, "Got motion packet, timestamp %1 us", md->timestamp);
         saveMotion(motionPacket);
     }
     else if (auto metadata = std::dynamic_pointer_cast<const QnCompressedMetadata>(md);
         metadata && metadata->metadataType == MetadataType::ObjectDetection)
     {
-        NX_VERBOSE(this, "QnStreamRecorder::saveData(): Analytics, timestamp %1 us", md->timestamp);
+        NX_VERBOSE(this, "Got analytics packet, timestamp %1 us", md->timestamp);
         const auto analytics =
             std::dynamic_pointer_cast<const QnCompressedObjectMetadataPacket>(metadata);
         saveAnalyticsMetadata(
@@ -458,8 +458,8 @@ bool QnStreamRecorder::saveMotion(const QnConstMetaDataV1Ptr& motion)
     if (motion && !motion->isEmpty() && m_motionFileList[motion->channelNumber])
     {
         NX_VERBOSE(this,
-            "%1: Saving motion, timestamp %2 us, resource: %3",
-            __func__, motion->timestamp, m_resource);
+            "Saving motion, timestamp %1 us, resource: %2",
+            motion->timestamp, m_resource);
         motion->serialize(m_motionFileList[motion->channelNumber].data());
     }
 
