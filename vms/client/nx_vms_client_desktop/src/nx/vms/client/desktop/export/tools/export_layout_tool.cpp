@@ -300,6 +300,7 @@ bool ExportLayoutTool::exportMetadata(const NovMetadata& metadata)
 
     // Exported period.
     {
+        NX_VERBOSE(this, "Exported layout range: %1", d->settings.period);
         if (!writeData("range.bin", d->settings.period.serialize()))
             return false;
     }
@@ -348,6 +349,9 @@ bool ExportLayoutTool::exportMetadata(const NovMetadata& metadata)
                 continue;
 
             auto periods = loader->periods(Qn::RecordingContent).intersected(d->settings.period);
+
+            NX_VERBOSE(this, "Exported recording periods for %1: %2", resource,
+                nx::reflect::json::serialize(periods));
             periods.encode(data);
         }
         else
