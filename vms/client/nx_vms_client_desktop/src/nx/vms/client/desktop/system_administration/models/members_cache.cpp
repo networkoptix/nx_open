@@ -53,6 +53,8 @@ MembersCache::Info MembersCache::infoFromContext(
 {
     if (const auto group = systemContext->userGroupManager()->find(id))
     {
+        NX_ASSERT(!group->attributes.testFlag(api::UserAttribute::hidden));
+
         return {
             .name = group->name,
             .description = group->description,
@@ -62,6 +64,8 @@ MembersCache::Info MembersCache::infoFromContext(
 
     if (const auto user = systemContext->resourcePool()->getResourceById<QnUserResource>(id))
     {
+        NX_ASSERT(!user->attributes().testFlag(api::UserAttribute::hidden));
+
         return {
             .name = user->getName(),
             .description = user->fullName(),
@@ -88,6 +92,9 @@ void MembersCache::loadInfo(nx::vms::common::SystemContext* systemContext)
     const auto allGroups = systemContext->userGroupManager()->groups();
     for (const auto& group: allGroups)
     {
+        if (group.attributes.testFlag(nx::vms::api::UserAttribute::hidden))
+            continue;
+
         const auto& id = group.id;
         m_info.insert(id, infoFromContext(systemContext, id));
         members.groups << id;
@@ -96,6 +103,9 @@ void MembersCache::loadInfo(nx::vms::common::SystemContext* systemContext)
     const auto allUsers = systemContext->resourcePool()->getResources<QnUserResource>();
     for (const auto& user: allUsers)
     {
+        if (user->attributes().testFlag(nx::vms::api::UserAttribute::hidden))
+            continue;
+
         const auto id = user->getId();
         m_info.insert(id, infoFromContext(systemContext, id));
         members.users << id;

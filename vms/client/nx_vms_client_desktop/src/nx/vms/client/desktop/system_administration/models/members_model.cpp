@@ -300,9 +300,14 @@ void MembersModel::readUsersAndGroups()
                 if (!m_cache)
                     return;
 
+                // For now we assume that UserAttribute::hidden cannot change,
+                // so we don't remove hidden groups, assuming they were never added.
+                if (userGroup.attributes.testFlag(api::UserAttribute::hidden))
+                    return;
+
                 // Removal happens before addition, this way we can update the cache.
                 m_cache->modify(
-                    /*removed*/ {userGroup.id}, /*added*/ {userGroup.id}, {}, {});
+                    /*added*/ {userGroup.id}, /*removed*/ {userGroup.id}, {}, {});
 
                 emit customGroupCountChanged();
 
@@ -344,6 +349,11 @@ void MembersModel::readUsersAndGroups()
 
                 for (const auto& user: users)
                 {
+                    // For now we assume that UserAttribute::hidden cannot change,
+                    // so we don't subscribe to userAttributesChanged.
+                    if (user->attributes().testFlag(api::UserAttribute::hidden))
+                        continue;
+
                     addedIds.insert(user->getId());
                     const auto groupIds = user->groupIds();
                     modifiedGroups += QSet<nx::Uuid>{groupIds.begin(), groupIds.end()};
