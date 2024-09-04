@@ -182,6 +182,23 @@ void RemoteConnectionFactoryCache::clearForCloudId(const QString& cloudId)
     nx::vms::client::core::appContext()->coreSettings()->setSystemAuthenticationCache(cloudId, {});
 }
 
+void RemoteConnectionFactoryCache::clearForUser(const std::string& username)
+{
+    auto cacheData =
+        nx::vms::client::core::appContext()->coreSettings()->systemAuthenticationCacheData();
+    std::erase_if(cacheData,
+        [&username](const auto& item)
+        {
+            auto const& [key, value] = item;
+            RemoteConnectionContextData customData;
+            if (!nx::reflect::json::deserialize(value, &customData))
+                return true; //< Remove invalid cache.
+
+            return customData.username == username;
+        });
+    nx::vms::client::core::appContext()->coreSettings()->systemAuthenticationCacheData = cacheData;
+}
+
 void RemoteConnectionFactoryCache::cleanupExpired()
 {
     using namespace std::chrono;
