@@ -533,14 +533,11 @@ Item
                     {
                         text: qsTr("Notification Language")
 
-                        ComboBox
+                        LanguageComboBox
                         {
                             id: languageComboBox
 
-                            model: TranslationListModel {}
                             currentIndex: model.localeIndex(control.locale)
-                            textRole: "display"
-                            valueRole: "localeCode"
                             width: parent.width
                             enabled: control.localeEditable && control.enabled
 
