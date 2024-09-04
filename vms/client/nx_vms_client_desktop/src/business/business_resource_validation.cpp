@@ -362,7 +362,7 @@ bool QnSendEmailActionDelegate::isValidList(const QSet<nx::Uuid>& ids, const QSt
     }
 
     const auto groupUsers = context->accessSubjectHierarchy()->usersInGroups(
-        nx::utils::toQSet(groupIds));
+        nx::utils::toQSet(groupIds), /*withHidden*/ false);
     if (!std::all_of(groupUsers.cbegin(), groupUsers.cend(), isValidUser))
         return false;
 
@@ -421,7 +421,8 @@ QString QnSendEmailActionDelegate::getText(const QSet<nx::Uuid>& ids, const bool
         receivers.push_back(group.name);
     }
 
-    for (const auto& user: context->accessSubjectHierarchy()->usersInGroups(groupIds))
+    for (const auto& user: context->accessSubjectHierarchy()->usersInGroups(
+        groupIds, /*withHidden*/ false))
     {
         if (!user || !user->isEnabled())
             continue;
@@ -872,7 +873,8 @@ QValidator::State QnLayoutAccessValidationPolicy::roleValidity(const nx::Uuid& r
             if (resourceAccessManager()->hasPermission(*group, m_layout, Qn::ReadPermission))
                 return QValidator::Acceptable;
 
-            const auto groupUsers = accessSubjectHierarchy()->usersInGroups({roleId});
+            const auto groupUsers = accessSubjectHierarchy()->usersInGroups(
+                {roleId}, /*withHidden*/ false);
             if (std::any_of(groupUsers.cbegin(), groupUsers.cend(),
                 [this](const auto& user) { return user->isEnabled() && userValidity(user); }))
             {
@@ -909,7 +911,7 @@ void QnLayoutAccessValidationPolicy::setLayout(const QnLayoutResourcePtr& layout
 
 QValidator::State QnCloudUsersValidationPolicy::roleValidity(const nx::Uuid& roleId) const
 {
-    const auto& users = accessSubjectHierarchy()->usersInGroups({roleId});
+    const auto& users = accessSubjectHierarchy()->usersInGroups({roleId}, /*withHidden*/ false);
     bool hasCloud = false;
     bool hasNonCloud = false;
 
@@ -941,7 +943,8 @@ QString QnCloudUsersValidationPolicy::calculateAlert(
             QSet<nx::Uuid> groupIds;
             nx::vms::common::getUsersAndGroups(systemContext(), subjects, users, groupIds);
 
-            for (const auto& user: accessSubjectHierarchy()->usersInGroups(groupIds))
+            for (const auto& user: accessSubjectHierarchy()->usersInGroups(
+                groupIds, /*withHidden*/ false))
             {
                 if (std::find_if(users.begin(), users.end(),
                     [user](const QnUserResourcePtr& existing)
@@ -994,7 +997,7 @@ QValidator::State QnUserWithEmailValidationPolicy::roleValidity(const nx::Uuid& 
 {
     bool hasValid{false};
     bool hasInvalid{false};
-    for (const auto& user: systemContext()->accessSubjectHierarchy()->usersInGroups({roleId}))
+    for (const auto& user: accessSubjectHierarchy()->usersInGroups({roleId}, /*withHidden*/ false))
     {
         if (userValidity(user))
         {

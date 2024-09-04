@@ -234,7 +234,7 @@ std::pair<QnUserResourceList, QList<nx::Uuid>> OpenLayoutActionWidget::getSelect
         nx::vms::common::getUsersAndGroups(systemContext(),
             params.additionalResources, users, groupIds);
         users.append(systemContext()->accessSubjectHierarchy()->usersInGroups(
-            nx::utils::toQSet(groupIds)));
+            nx::utils::toQSet(groupIds), /*withHidden*/ false));
         users = users.filtered([](const QnUserResourcePtr& user) { return user->isEnabled(); });
     }
 
