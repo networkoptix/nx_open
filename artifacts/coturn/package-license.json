@@ -1,0 +1,6 @@
+{
+    "name": "Coturn TURN server",
+    "webLink": ["https://github.com/coturn/coturn"],
+    "licenseType": "BSD-3-Clause",
+    "licenseLink": ["https://github.com/coturn/coturn/blob/master/LICENSE"]
+}
