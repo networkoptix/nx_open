@@ -27,6 +27,7 @@
 #include <nx/vms/client/desktop/common/utils/custom_painted.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/common/widgets/selectable_text_button.h>
+#include <nx/vms/client/desktop/event_search/dialogs/notification_settings_dialog.h>
 #include <nx/vms/client/desktop/event_search/models/notification_tab_model.h>
 #include <nx/vms/client/desktop/event_search/widgets/abstract_search_widget.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_ribbon.h>
@@ -63,6 +64,7 @@ static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kIconSubs
 };
 
 NX_DECLARE_COLORIZED_ICON(kSystemIcon, "20x20/Outline/system.svg", kIconSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kBellIcon, "20x20/Outline/bell.svg", kIconSubstitutions)
 
 nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kPlaceholderTheme = {
     {QnIcon::Normal, {.primary = "dark10"}}};
@@ -84,6 +86,7 @@ NotificationListWidget::Private::Private(NotificationListWidget* q):
     m_itemCounterLabel(new QLabel(q)),
     m_ribbonContainer(new QWidget(q)),
     m_filterSystemsButton(new SelectableTextButton(q)),
+    m_filterNotificationsButton(new SelectableTextButton(q)),
     m_eventRibbon(new EventRibbon(m_ribbonContainer)),
     m_placeholder(PlaceholderWidget::create(
         qnSkin->icon(kNotificationPlaceholderIcon).pixmap(64, 64),
@@ -119,6 +122,9 @@ NotificationListWidget::Private::Private(NotificationListWidget* q):
     headerLayout->setSpacing(0);
     headerLayout->addWidget(m_filterSystemsButton);
     setupFilterSystemsButton();
+
+    headerLayout->addWidget(m_filterNotificationsButton);
+    setupFilterNotificationsButton();
 
     anchorWidgetToParent(m_placeholder);
     anchorWidgetToParent(m_eventRibbon);
@@ -166,18 +172,18 @@ NotificationListWidget::Private::Private(NotificationListWidget* q):
     connect(m_eventRibbon, &EventRibbon::countChanged, this, onCountChanged);
 
     connect(workbenchContext(), &QnWorkbenchContext::userChanged, this,
-        [this] { changeFilterVisibilityIfNeeded(); });
+        [this] { changeHeaderItemsVisibilityIfNeeded(); });
 
     NX_ASSERT(qnCloudStatusWatcher, "Cloud status watcher is not ready");
     connect(qnCloudStatusWatcher,
         &nx::vms::client::core::CloudStatusWatcher::cloudSystemsChanged,
         this,
-        [this] { changeFilterVisibilityIfNeeded(); });
+        [this] { changeHeaderItemsVisibilityIfNeeded(); });
 
     TileInteractionHandler::install(m_eventRibbon);
 
     onCountChanged();
-    changeFilterVisibilityIfNeeded();
+    changeHeaderItemsVisibilityIfNeeded();
 }
 
 NotificationListWidget::Private::~Private()
@@ -252,7 +258,47 @@ void NotificationListWidget::Private::setupFilterSystemsButton()
     m_filterSystemsButton->setMenu(menu);
 }
 
-void NotificationListWidget::Private::changeFilterVisibilityIfNeeded()
+void NotificationListWidget::Private::setupFilterNotificationsButton()
+{
+    m_filterNotificationsButton->setFlat(true);
+    m_filterNotificationsButton->setSelectable(false);
+    m_filterNotificationsButton->setDeactivatable(true);
+    m_filterNotificationsButton->setIcon(qnSkin->icon(kBellIcon));
+    m_filterNotificationsButton->setFocusPolicy(Qt::NoFocus);
+
+    auto menu = new QMenu(q);
+    menu->setProperty(style::Properties::kMenuAsDropdown, true);
+    menu->setWindowFlags(menu->windowFlags() | Qt::BypassGraphicsProxyWidget);
+
+    const auto updateButtonText =
+        [this]
+        {
+            QString buttonText = tr("Notifications filter");
+
+            m_filterNotificationsButton->setText(buttonText);
+        };
+
+    auto action = menu->addAction(tr("Choose Types..."));
+    connect(
+        action,
+        &QAction::triggered,
+        this,
+        [this, updateButtonText]
+        {
+            NotificationSettingsDialog notificationSettingsDialog{q};
+
+            if (notificationSettingsDialog.exec() == QDialog::Accepted)
+            {
+                updateButtonText();
+            }
+        });
+
+    m_filterNotificationsButton->setMenu(menu);
+
+    updateButtonText();
+}
+
+void NotificationListWidget::Private::changeHeaderItemsVisibilityIfNeeded()
 {
     using namespace nx::vms::common;
 
@@ -260,13 +306,11 @@ void NotificationListWidget::Private::changeFilterVisibilityIfNeeded()
         user && user->isCloud() && qnCloudStatusWatcher->cloudSystems().size() > 1
         && saas::saasServicesOperational(system()))
     {
-        m_headerWidget->show();
-        m_separatorLine->show();
+        m_filterSystemsButton->setVisible(true);
     }
     else
     {
-        m_headerWidget->hide();
-        m_separatorLine->hide();
+        m_filterSystemsButton->setVisible(false);
     }
 }
 

@@ -47,7 +47,9 @@ std::set<nx::vms::common::system_health::MessageType> supportedMessageTypes(
 
 } // namespace
 
-QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget* parent):
+namespace nx::vms::client::desktop {
+
+PopupSettingsWidget::PopupSettingsWidget(QWidget* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
     ui(new Ui::PopupSettingsWidget),
@@ -90,7 +92,7 @@ QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget* parent):
             &QnAbstractPreferencesWidget::hasChangesChanged);
     }
 
-    connect(system(), &SystemContext::userChanged, this, &QnPopupSettingsWidget::at_userChanged);
+    connect(system(), &SystemContext::userChanged, this, &PopupSettingsWidget::at_userChanged);
 
     connect(ui->showAllCheckBox, &QCheckBox::toggled, this,
         [this](bool checked)
@@ -109,11 +111,11 @@ QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget* parent):
     at_userChanged(context()->user());
 }
 
-QnPopupSettingsWidget::~QnPopupSettingsWidget()
+PopupSettingsWidget::~PopupSettingsWidget()
 {
 }
 
-void QnPopupSettingsWidget::loadDataToUi()
+void PopupSettingsWidget::loadDataToUi()
 {
     if (m_updating)
         return;
@@ -150,7 +152,7 @@ void QnPopupSettingsWidget::loadDataToUi()
     ui->businessEventsGroupBox->setEnabled((bool) m_currentUser);
 }
 
-void QnPopupSettingsWidget::applyChanges()
+void PopupSettingsWidget::applyChanges()
 {
     NX_ASSERT(!m_updating, "Should never get here while updating");
     QScopedValueRollback<bool> guard(m_updating, true);
@@ -174,13 +176,13 @@ void QnPopupSettingsWidget::applyChanges()
     appContext()->localSettings()->popupSystemHealth = storedSystemHealth();
 }
 
-bool QnPopupSettingsWidget::hasChanges() const
+bool PopupSettingsWidget::hasChanges() const
 {
     return appContext()->localSettings()->popupSystemHealth() != storedSystemHealth()
         || (m_currentUser && m_currentUser->settings().watchedEvents() != watchedEvents());
 }
 
-QList<EventType> QnPopupSettingsWidget::watchedEvents() const
+QList<EventType> PopupSettingsWidget::watchedEvents() const
 {
     const auto eventTypes = supportedEventTypes(systemContext());
 
@@ -197,7 +199,7 @@ QList<EventType> QnPopupSettingsWidget::watchedEvents() const
 }
 
 std::set<nx::vms::common::system_health::MessageType>
-    QnPopupSettingsWidget::storedSystemHealth() const
+    PopupSettingsWidget::storedSystemHealth() const
 {
     std::set<nx::vms::common::system_health::MessageType> result;
 
@@ -210,7 +212,7 @@ std::set<nx::vms::common::system_health::MessageType>
     return result;
 }
 
-void QnPopupSettingsWidget::at_userChanged(const QnUserResourcePtr& user)
+void PopupSettingsWidget::at_userChanged(const QnUserResourcePtr& user)
 {
     if (user == m_currentUser)
         return;
@@ -227,5 +229,7 @@ void QnPopupSettingsWidget::at_userChanged(const QnUserResourcePtr& user)
         m_currentUser.get(),
         &QnUserResource::userSettingsChanged,
         this,
-        &QnPopupSettingsWidget::loadDataToUi);
+        &PopupSettingsWidget::loadDataToUi);
 }
+
+} // namespace nx::vms::client::desktop

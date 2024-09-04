@@ -8,12 +8,14 @@
 #include <QtMultimedia/QAudioDevice>
 
 #include <nx/build_info.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/settings/screen_recording_settings.h>
 #include <nx/vms/utils/platform/autorun.h>
+#include <ui/common/palette.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/workaround/widgets_signals_workaround.h>
@@ -74,6 +76,11 @@ QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget* parent):
 
     if (nx::build_info::isLinux())
         ui->allowEnteringSleepModeCheckBox->setHidden(true); //< Not implemented for Linux.
+
+    setPaletteColor(ui->horizontalLine, QPalette::Shadow, core::colorTheme()->color("dark12"));
+
+    ui->alertLabel->setType(AlertLabel::Type::info);
+    ui->alertLabel->setText(tr("Notifications filters are moved to the right panel"));
 }
 
 QnGeneralPreferencesWidget::~QnGeneralPreferencesWidget()
