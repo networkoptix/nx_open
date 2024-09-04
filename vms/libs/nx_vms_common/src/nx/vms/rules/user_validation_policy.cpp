@@ -26,7 +26,8 @@ QnUserResourceList buildUserList(
     QSet<nx::Uuid> groupIds;
     nx::vms::common::getUsersAndGroups(context, subjects, users, groupIds);
 
-    for (const auto& user: context->accessSubjectHierarchy()->usersInGroups(groupIds))
+    for (const auto& user: context->accessSubjectHierarchy()->usersInGroups(
+        groupIds, /*withHidden*/ false))
     {
         if (std::find_if(users.begin(), users.end(),
             [user](const QnUserResourcePtr& existing)
@@ -39,6 +40,15 @@ QnUserResourceList buildUserList(
     }
 
     return users;
+}
+
+QnUserResourceList allVisibleUsers(QnResourcePool* resourcePool)
+{
+    return resourcePool->getResources<QnUserResource>(
+        [](const QnUserResourcePtr& user)
+        {
+            return !user->attributes().testFlag(nx::vms::api::UserAttribute::hidden);
+        });
 }
 
 } // namespace
@@ -78,7 +88,7 @@ void QnSubjectValidationPolicy::analyze(
     QSet<nx::Uuid> groupIds;
 
     if (allUsers)
-        users = resourcePool()->getResources<QnUserResource>();
+        users = allVisibleUsers(resourcePool());
     else
         nx::vms::common::getUsersAndGroups(systemContext(), subjects, users, groupIds);
 
@@ -125,13 +135,15 @@ QValidator::State QnSubjectValidationPolicy::validity(bool allUsers,
     QSet<nx::Uuid> groupIds;
 
     if (allUsers)
-        users = resourcePool()->getResources<QnUserResource>();
+        users = allVisibleUsers(resourcePool());
     else
         nx::vms::common::getUsersAndGroups(systemContext(), subjects, users, groupIds);
 
     if (users.empty() && !groupIds.empty())
     {
-        const auto usersInGroups = nx::vms::common::allUsers(systemContext(), groupIds);
+        const auto usersInGroups = systemContext()->accessSubjectHierarchy()->usersInGroups(
+            groupIds, /*withHidden*/ false);
+
         if (usersInGroups.empty())
             return QValidator::Intermediate;
     }
@@ -196,9 +208,12 @@ QString QnSubjectValidationPolicy::calculateAlert(
     QnUserResourceList users;
     QSet<nx::Uuid> groupIds;
     nx::vms::common::getUsersAndGroups(systemContext(), subjects, users, groupIds);
+
     if (users.empty() && !groupIds.empty())
     {
-        const auto usersInGroups = nx::vms::common::allUsers(systemContext(), groupIds);
+        const auto usersInGroups = systemContext()->accessSubjectHierarchy()->usersInGroups(
+            groupIds, /*withHidden*/ false);
+
         if (usersInGroups.empty())
             return nx::vms::common::html::document(tr("None of selected user roles contain users"));
     }
@@ -394,7 +409,9 @@ QValidator::State QnLayoutAccessValidationPolicy::roleValidity(const nx::Uuid& r
                 return QValidator::Acceptable;
 
             const auto groupUsers =
-                systemContext()->accessSubjectHierarchy()->usersInGroups({roleId});
+                systemContext()->accessSubjectHierarchy()->usersInGroups(
+                    {roleId}, /*withHidden*/ false);
+
             if (std::any_of(groupUsers.cbegin(), groupUsers.cend(),
                 [this](const auto& user) { return user->isEnabled() && userValidity(user); }))
             {
@@ -431,7 +448,9 @@ void QnLayoutAccessValidationPolicy::setLayout(const QnLayoutResourcePtr& layout
 
 QValidator::State QnCloudUsersValidationPolicy::roleValidity(const nx::Uuid& roleId) const
 {
-    const auto& users = systemContext()->accessSubjectHierarchy()->usersInGroups({roleId});
+    const auto& users = systemContext()->accessSubjectHierarchy()->usersInGroups(
+        {roleId}, /*withHidden*/ false);
+
     bool hasCloud = false;
     bool hasNonCloud = false;
 
@@ -457,7 +476,7 @@ QString QnCloudUsersValidationPolicy::calculateAlert(
     const QSet<nx::Uuid>& subjects) const
 {
     const QnUserResourceList users = allUsers
-        ? resourcePool()->getResources<QnUserResource>()
+        ? allVisibleUsers(resourcePool())
         : buildUserList(subjects, systemContext());
 
     int nonCloudCount = 0, totalCount = 0;
@@ -494,7 +513,8 @@ QValidator::State QnUserWithEmailValidationPolicy::roleValidity(const nx::Uuid& 
 {
     bool hasValid{false};
     bool hasInvalid{false};
-    for (const auto& user: systemContext()->accessSubjectHierarchy()->usersInGroups({roleId}))
+    for (const auto& user: systemContext()->accessSubjectHierarchy()->usersInGroups(
+        {roleId}, /*withHidden*/ false))
     {
         if (userValidity(user))
         {
@@ -529,7 +549,7 @@ QString QnUserWithEmailValidationPolicy::calculateAlert(
         return alert;
 
     const QnUserResourceList users = allUsers
-        ? resourcePool()->getResources<QnUserResource>()
+        ? allVisibleUsers(resourcePool())
         : buildUserList(subjects, systemContext());
 
     int invalidUsersCount{};

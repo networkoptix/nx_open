@@ -57,7 +57,8 @@ QnUserResourceSet allUsers(const SystemContext* context, const IdList& ids)
 
     auto result = nx::utils::toQSet(users);
 
-    const auto groupUsers = context->accessSubjectHierarchy()->usersInGroups(groupIds);
+    const auto groupUsers = context->accessSubjectHierarchy()->usersInGroups(
+        groupIds, /*withHidden*/ true);
 
     for (const auto& user: groupUsers)
         result.insert(user);
