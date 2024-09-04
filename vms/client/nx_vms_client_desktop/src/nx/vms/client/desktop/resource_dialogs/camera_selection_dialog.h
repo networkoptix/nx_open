@@ -32,7 +32,8 @@ class CameraSelectionDialog: public QnSessionAwareButtonBoxDialog
 public:
     using ResourceFilter = std::function<bool(const QnResourcePtr& resource)>;
     using ResourceValidator = std::function<bool(const QnResourcePtr& resource)>;
-    using AlertTextProvider = std::function<QString(const QSet<QnResourcePtr>& resources)>;
+    using AlertTextProvider =
+        std::function<QString(const QSet<QnResourcePtr>& resources, bool pinnedItemSelected)>;
 
     /**
      * @param resourceFilter Unary predicate which defines subset of cameras and devices will be
@@ -101,6 +102,31 @@ public:
         const ResourcePolicy& policy,
         QWidget* parent);
 
+    template<typename ResourcePolicy>
+    static bool selectCameras(
+        SystemContext* context,
+        UuidSet& selectedCameras,
+        bool& sourceCameraSelected,
+        QWidget* parent);
+
+    template<typename ResourcePolicy>
+    static bool selectCameras(
+        SystemContext* context,
+        UuidSet& selectedCameras,
+        bool& sourceCameraSelected,
+        const ResourcePolicy& policy,
+        QWidget* parent);
+
+    template<typename ResourcePolicy>
+    static bool resourceValidator(
+        SystemContext* context, const ResourcePolicy& policy, const QnResourcePtr& resource);
+    template<typename ResourcePolicy>
+    static QString alertTextProvider(
+        SystemContext* context,
+        const ResourcePolicy& policy,
+        const QSet<QnResourcePtr>& resourcesSet,
+        bool pinnedItemSelected);
+
 protected:
     virtual void showEvent(QShowEvent* event) override;
 
@@ -109,6 +135,7 @@ private:
 
     // Translatable string is processed incorrectly in the template method in header file.
     static QString noCamerasAvailableMessage();
+    static QString sourceCamera();
 
 private:
     const std::unique_ptr<Ui::CameraSelectionDialog> ui;
@@ -133,28 +160,18 @@ bool CameraSelectionDialog::selectCameras(
     const ResourcePolicy& policy,
     QWidget* parent)
 {
-    const auto resourceValidator =
-        [&policy, context](const QnResourcePtr& resource)
+    const auto validator = [context, &policy](const QnResourcePtr& resource)
         {
-            const auto target = resource.dynamicCast<typename ResourcePolicy::resource_type>();
-            if (target.isNull())
-                return true;
-
-            return policy.isResourceValid(context, target);
+            return resourceValidator(context, policy, resource);
         };
 
-    const auto alertTextProvider =
-        [&policy, context](const QSet<QnResourcePtr>& resourcesSet)
+    const auto alertProvider =
+        [context, &policy](const QSet<QnResourcePtr>& resourcesSet, bool pinnedItemSelected)
         {
-            QnResourceList resourcesList;
-            std::copy(std::cbegin(resourcesSet), std::cend(resourcesSet),
-                std::back_inserter(resourcesList));
-
-            const bool isValid = isResourcesListValid(context, policy, resourcesList);
-            return isValid ? QString() : policy.getText(context, resourcesList);
+            return alertTextProvider(context, policy, resourcesSet, pinnedItemSelected);
         };
 
-    CameraSelectionDialog dialog(ResourceFilter(), resourceValidator, alertTextProvider,
+    CameraSelectionDialog dialog(ResourceFilter(), validator, alertProvider,
         /*permissionsHandledByFilter*/ false, /*pinnedItemDescription*/ {}, parent);
     dialog.resourceSelectionWidget()->setSelectedResourcesIds(selectedCameras);
     dialog.setAllCamerasSwitchVisible(ResourcePolicy::showAllCamerasSwitch());
@@ -179,6 +196,99 @@ bool CameraSelectionDialog::selectCameras(
 
     selectedCameras = dialog.resourceSelectionWidget()->selectedResourcesIds();
     return true;
+}
+
+template<typename ResourcePolicy>
+bool CameraSelectionDialog::selectCameras(
+    SystemContext* context,
+    UuidSet& selectedCameras,
+    bool& sourceCameraSelected,
+    QWidget* parent)
+{
+    ResourcePolicy policy;
+    return selectCameras(
+        context, selectedCameras, sourceCameraSelected, policy, parent);
+}
+
+template<typename ResourcePolicy>
+bool CameraSelectionDialog::selectCameras(
+    SystemContext* context,
+    UuidSet& selectedCameras,
+    bool& sourceCameraSelected,
+    const ResourcePolicy& policy,
+    QWidget* parent)
+{
+    const auto validator = [context, &policy](const QnResourcePtr& resource)
+        {
+            return resourceValidator(context, policy, resource);
+        };
+
+    const auto alertProvider =
+        [context, &policy](const QSet<QnResourcePtr>& resourcesSet, bool pinnedItemSelected)
+        {
+            return alertTextProvider(context, policy, resourcesSet, pinnedItemSelected);
+        };
+
+    static const PinnedItemDescription kPinnedItemDescription{
+        sourceCamera(), QnResourceIconCache::Camera};
+
+    CameraSelectionDialog dialog(ResourceFilter{}, validator, alertProvider,
+        /*permissionsHandledByFilter*/ false, kPinnedItemDescription, parent);
+
+    dialog.setAllCamerasSwitchVisible(ResourcePolicy::showAllCamerasSwitch());
+    dialog.resourceSelectionWidget()->setShowRecordingIndicator(
+        ResourcePolicy::showRecordingIndicator());
+    if (!ResourcePolicy::multiChoiceListIsValid())
+    {
+        dialog.resourceSelectionWidget()->setSelectionMode(
+            ResourceSelectionMode::ExclusiveSelection);
+    }
+
+    // Must be called after selection mode is set.
+    dialog.resourceSelectionWidget()->setSelectedResourcesIds(selectedCameras);
+    dialog.resourceSelectionWidget()->setPinnedItemSelected(sourceCameraSelected);
+
+    if (dialog.resourceSelectionWidget()->isEmpty())
+    {
+        // Translatable string is processed incorrectly in the template method in header file.
+        QnMessageBox::warning(parent, noCamerasAvailableMessage());
+        return false;
+    }
+
+    if (dialog.exec() != QDialog::Accepted)
+        return false;
+
+    selectedCameras = dialog.resourceSelectionWidget()->selectedResourcesIds();
+    sourceCameraSelected = dialog.resourceSelectionWidget()->pinnedItemSelected();
+
+    return true;
+}
+
+template<typename ResourcePolicy>
+bool CameraSelectionDialog::resourceValidator(
+    SystemContext* context, const ResourcePolicy& policy, const QnResourcePtr& resource)
+{
+    const auto target = resource.dynamicCast<typename ResourcePolicy::resource_type>();
+    if (target.isNull())
+        return true;
+
+    return policy.isResourceValid(context, target);
+}
+
+template<typename ResourcePolicy>
+QString CameraSelectionDialog::alertTextProvider(
+    SystemContext* context,
+    const ResourcePolicy& policy,
+    const QSet<QnResourcePtr>& resourcesSet,
+    bool pinnedItemSelected)
+{
+    if (resourcesSet.isEmpty() && !policy.emptyListIsValid() && pinnedItemSelected)
+        return {};
+
+    QnResourceList resourcesList{resourcesSet.cbegin(), resourcesSet.cend()};
+
+    const bool isValid = isResourcesListValid(context, policy, resourcesList);
+    return isValid ? QString{} : policy.getText(context, resourcesList);
 }
 
 } // namespace nx::vms::client::desktop

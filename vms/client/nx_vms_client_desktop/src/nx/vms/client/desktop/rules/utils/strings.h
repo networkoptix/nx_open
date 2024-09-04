@@ -30,10 +30,10 @@ public:
     static QString selectButtonText(SystemContext* context, vms::rules::SourceServerField* field);
     static QString selectButtonText(SystemContext* context, vms::rules::SourceUserField* field);
 
-    static QString useSourceCameraString(const QString& actionType = {});
     static QString eventLevelDisplayString(api::EventLevel eventLevel);
     static QString autoValue();
     static QString selectString();
+    static QString sourceCameraString();
     static QString devModeInfoTitle();
 
     static QString isListed();
@@ -45,8 +45,6 @@ private:
     static QString getName(const QnMediaServerResourceList& resources);
     static QString getName(
         const QnUserResourceList& users, api::UserGroupDataList& groups, int additionalCount = 0);
-
-    static QString sourceCameraString();
 };
 
 } // namespace nx::vms::client::desktop::rules

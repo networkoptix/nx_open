@@ -33,73 +33,40 @@ public:
         :
         ResourcePickerWidgetBase<vms::rules::TargetSingleDeviceField>(field, context, parent)
     {
-        if (!Policy::canUseSourceCamera())
-            return;
-
-        auto contentLayout = qobject_cast<QVBoxLayout*>(m_contentWidget->layout());
-
-        m_checkBox = new QCheckBox;
-        m_checkBox->setText(Strings::useSourceCameraString(parentParamsWidget()->descriptor()->id));
-
-        contentLayout->addWidget(m_checkBox);
-
-        connect(
-            m_checkBox,
-            &QCheckBox::stateChanged,
-            this,
-            &SingleTargetDevicePicker::onStateChanged);
     }
 
 private:
-    QCheckBox* m_checkBox{nullptr};
     Policy policy;
 
     void onSelectButtonClicked() override
     {
         auto selectedCameras = UuidSet{m_field->id()};
+        auto useSource = m_field->useSource();
 
         preparePolicy();
-        if (CameraSelectionDialog::selectCameras(systemContext(), selectedCameras, policy, this)
-            && !selectedCameras.empty())
+
+        if (Policy::canUseSourceCamera())
         {
-            m_field->setId(*selectedCameras.begin());
-            m_field->setUseSource(false);
+            if (CameraSelectionDialog::selectCameras(
+                systemContext(), selectedCameras, useSource, policy, this))
+            {
+                m_field->setId(selectedCameras.empty() ? nx::Uuid{} : *selectedCameras.begin());
+                m_field->setUseSource(useSource);
+            }
+        }
+        else
+        {
+            if (CameraSelectionDialog::selectCameras(systemContext(), selectedCameras, policy, this)
+                && !selectedCameras.empty())
+            {
+                m_field->setId(*selectedCameras.begin());
+            }
         }
 
         ResourcePickerWidgetBase<vms::rules::TargetSingleDeviceField>::onSelectButtonClicked();
     }
 
     void preparePolicy();
-
-    void updateUi() override
-    {
-        ResourcePickerWidgetBase<vms::rules::TargetSingleDeviceField>::updateUi();
-
-        if (Policy::canUseSourceCamera())
-        {
-            m_checkBox->setEnabled(
-                vms::rules::hasSourceCamera(*parentParamsWidget()->eventDescriptor()));
-            m_selectButton->setEnabled(!m_field->useSource());
-
-            const QSignalBlocker blocker{m_checkBox};
-            m_checkBox->setChecked(m_field->useSource());
-        }
-    }
-
-    void onStateChanged()
-    {
-        if (m_checkBox->isChecked())
-        {
-            m_field->setUseSource(true);
-            m_field->setId({});
-        }
-        else
-        {
-            m_field->setUseSource(false);
-        }
-
-        setEdited();
-    }
 };
 
 template<typename Policy>
