@@ -32,7 +32,7 @@
     </message>
     <message>
       <source>Membership</source>
-      <translation type="unfinished">Membership</translation>
+      <translation>成員資格</translation>
     </message>
     <message>
       <source>Search Timeout</source>
@@ -1054,7 +1054,7 @@
     </message>
     <message>
       <source>0 suitable services available</source>
-      <translation type="unfinished">0 suitable services available</translation>
+      <translation>0 可用服務</translation>
     </message>
     <message>
       <source>OFFLINE</source>
@@ -1425,7 +1425,7 @@
     </message>
     <message>
       <source>The previous link will be invalidated once a new one has been issued</source>
-      <translation type="unfinished">The previous link will be invalidated once a new one has been issued</translation>
+      <translation>一旦發出新連結，之前的連結即會失效。</translation>
     </message>
     <message>
       <source>Create</source>
@@ -1496,7 +1496,7 @@
     <name>PanelBase</name>
     <message>
       <source>Approve</source>
-      <translation type="unfinished">Approve</translation>
+      <translation>確認</translation>
     </message>
     <message>
       <source>Reject</source>
@@ -1620,7 +1620,7 @@
     </message>
     <message>
       <source>Plugins are programs that run on the %1 Server to enable seamless video analytics integrations.</source>
-      <translation type="unfinished">Plugins are programs that run on the %1 Server to enable seamless video analytics integrations.</translation>
+      <translation>套件是在%1 伺服器上執行的程式，用於實現流暢的影像分析整合</translation>
     </message>
   </context>
   <context>
@@ -1746,8 +1746,7 @@ on what has changed.</source>
     <message>
       <source>To use Target Lock Tracking,
 Press Alt + Click to follow object</source>
-      <translation type="unfinished">To use Target Lock Tracking,
-Press Alt + Click to follow object</translation>
+      <translation>使用鎖定目標追跡，按住 Alt + 點擊來追蹤物件。</translation>
     </message>
   </context>
   <context>
