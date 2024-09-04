@@ -262,7 +262,7 @@ Button
                     font.pixelSize: 20
                     color: tile.connectable ? ColorTheme.colors.light4 : ColorTheme.colors.dark14
 
-                    textFormat: context.richTextEnabled ? Text.RichText : Text.PlainText
+                    textFormat: context.richTextEnabled ? Text.StyledText : Text.PlainText
                     text: tile.title
 
                     GlobalToolTip.text: tile.title
@@ -286,8 +286,7 @@ Button
             {
                 id: openedTileLoader
 
-                width: childrenRect.width
-                height: childrenRect.height
+                width: tile.width
 
                 visible: opacity > 0
 
