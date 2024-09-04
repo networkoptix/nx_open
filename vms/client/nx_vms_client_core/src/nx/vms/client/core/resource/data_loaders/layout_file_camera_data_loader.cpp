@@ -73,7 +73,8 @@ QnTimePeriodList QnLayoutFileCameraDataLoader::loadMotion(
             }
         }
     }
-    return QnTimePeriodList::mergeTimePeriods(periods);
+
+    return QnTimePeriodList::mergeTimePeriods(periods).simplified();
 }
 
 void QnLayoutFileCameraDataLoader::load(const QString& filter, const qint64 /*resolutionMs*/)
