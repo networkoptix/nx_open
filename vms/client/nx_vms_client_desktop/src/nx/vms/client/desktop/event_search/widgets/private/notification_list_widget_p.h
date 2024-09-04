@@ -33,7 +33,8 @@ public:
 
 private:
     void setupFilterSystemsButton();
-    void changeFilterVisibilityIfNeeded();
+    void setupFilterNotificationsButton();
+    void changeHeaderItemsVisibilityIfNeeded();
 
 private:
     NotificationListWidget* const q;
@@ -43,6 +44,7 @@ private:
     QLabel* const m_itemCounterLabel;
     QWidget* const m_ribbonContainer;
     SelectableTextButton* const m_filterSystemsButton;
+    SelectableTextButton* const m_filterNotificationsButton;
     EventRibbon* const m_eventRibbon;
     QWidget* const m_placeholder;
     NotificationTabModel* const m_model;

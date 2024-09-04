@@ -19,14 +19,16 @@ class PopupSettingsWidget;
 
 namespace nx::vms::event { class StringsHelper; }
 
-class QnPopupSettingsWidget: public QnAbstractPreferencesWidget, public QnWorkbenchContextAware
+namespace nx::vms::client::desktop {
+
+class PopupSettingsWidget: public QnAbstractPreferencesWidget, public QnWorkbenchContextAware
 {
     Q_OBJECT
     using base_type = QnAbstractPreferencesWidget;
 
 public:
-    explicit QnPopupSettingsWidget(QWidget *parent = 0);
-    ~QnPopupSettingsWidget();
+    explicit PopupSettingsWidget(QWidget *parent = 0);
+    ~PopupSettingsWidget();
 
     virtual void applyChanges() override;
     virtual void loadDataToUi() override;
@@ -45,3 +47,5 @@ private:
     std::unique_ptr<nx::vms::event::StringsHelper> m_helper;
     nx::vms::client::core::UserResourcePtr m_currentUser;
 };
+
+} // namespace nx::vms::client::desktop

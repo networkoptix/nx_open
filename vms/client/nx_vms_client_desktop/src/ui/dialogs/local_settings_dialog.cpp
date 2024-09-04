@@ -21,7 +21,6 @@
 #include <ui/widgets/local_settings/advanced_settings_widget.h>
 #include <ui/widgets/local_settings/general_preferences_widget.h>
 #include <ui/widgets/local_settings/look_and_feel_preferences_widget.h>
-#include <ui/widgets/local_settings/popup_settings_widget.h>
 #include <ui/widgets/local_settings/recording_settings_widget.h>
 #include <ui/workbench/workbench_context.h>
 
@@ -88,7 +87,6 @@ QnLocalSettingsDialog::QnLocalSettingsDialog(QWidget *parent):
             updateRecorderSettings);
     }
 
-    addPage(NotificationsPage, new QnPopupSettingsWidget(this), tr("Notifications"));
     addPage(AdvancedPage, m_advancedSettingsWidget, tr("Advanced"));
 
     setWarningStyle(ui->readOnlyWarningLabel);
