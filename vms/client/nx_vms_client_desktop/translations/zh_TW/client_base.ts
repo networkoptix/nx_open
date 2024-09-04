@@ -7246,7 +7246,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::BackupSettingsViewWidget</name>
     <message>
       <source>There are more cameras being backed up than available services. Please disable backup for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</source>
-      <translation type="unfinished">There are more cameras being backed up than available services. Please disable backup for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</translation>
+      <translation>備份攝影機的數量多於可用服務。請將一些攝影機停用備份或增加更多合適服務，否則，它將於%1自動完成。</translation>
     </message>
   </context>
   <context>
@@ -7283,7 +7283,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Backup settings are not available</source>
-      <translation type="unfinished">Backup settings are not available</translation>
+      <translation>備份設定無法使用</translation>
     </message>
     <message>
       <source>System shut down</source>
@@ -7490,7 +7490,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant</source>
-      <translation>錄影排程中的影像品質和幀率(FPS) 設定將不會發生作用</translation>
+      <translation>錄影排程中的影像品質和幀率(FPS) 設定將不會作用</translation>
     </message>
     <message>
       <source>Do not change these settings unless you are absolutely sure of their potential impact on your system performance</source>
@@ -7644,11 +7644,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Select areas on the preview to set chosen sensitivity for</source>
-      <translation type="unfinished">Select areas on the preview to set chosen sensitivity for</translation>
+      <translation>在預覽影像中選取區域來套用靈敏度設定。</translation>
     </message>
     <message>
       <source>Choose a motion detection sensitivity and select some areas on the preview to set it for</source>
-      <translation type="unfinished">Choose a motion detection sensitivity and select some areas on the preview to set it for</translation>
+      <translation>選擇位移偵測靈敏度，然後在預覽影像上選取要套用的區域</translation>
     </message>
   </context>
   <context>
@@ -7723,11 +7723,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Select areas on the schedule to apply chosen parameters to</source>
-      <translation>在行程表上選擇區塊以標上所選定的參數</translation>
+      <translation>在排程上選擇區塊以套用選定的參數</translation>
     </message>
     <message>
       <source>Set recording parameters and select areas on the schedule grid to apply them to</source>
-      <translation>設定錄影參數及在行程表上選定區塊以套用</translation>
+      <translation>設定錄影參數並在排程表上選取區塊以套用</translation>
     </message>
     <message>
       <source>High minimum value can lead to archive length decrease on other devices</source>
@@ -10683,7 +10683,7 @@ You can force it, but it may significantly increase CPU load.</source>
     <name>nx::vms::client::desktop::RestApiHelper</name>
     <message>
       <source>Password confirmation is required to apply changes</source>
-      <translation type="unfinished">Password confirmation is required to apply changes</translation>
+      <translation>需要再次確認密碼以套用設定</translation>
     </message>
     <message>
       <source>Confirm</source>
@@ -10996,7 +10996,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>Connection with cameras that do not support HTTPS will be lost</source>
-      <translation type="unfinished">Connection with cameras that do not support HTTPS will be lost</translation>
+      <translation>若攝影機不支援 HTTPS ，該攝影機的連線將會中斷。</translation>
     </message>
   </context>
   <context>
@@ -11431,7 +11431,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>If no action is taken, required number of services will be released automatically on %1.</source>
-      <translation type="unfinished">If no action is taken, required number of services will be released automatically on %1.</translation>
+      <translation>如果未採取任何操作，所需數量的服務將在 %1 自動釋出。</translation>
     </message>
     <message>
       <source>Some features may not be available.</source>
@@ -11920,7 +11920,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Copy the Access Link and share it with intended user</source>
-      <translation type="unfinished">Copy the Access Link and share it with intended user</translation>
+      <translation>複製登入連結並並分享給目標使用者</translation>
     </message>
   </context>
   <context>
@@ -12089,7 +12089,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::WeekTimeScheduleDialog</name>
     <message>
       <source>Empty schedule is not allowed</source>
-      <translation type="unfinished">Empty schedule is not allowed</translation>
+      <translation>不允許排程為空白</translation>
     </message>
   </context>
   <context>
@@ -12171,7 +12171,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>%1 filename length is more than %2 characters.</source>
       <comment>%1 is file name</comment>
-      <translation type="unfinished">%1 filename length is more than %2 characters.</translation>
+      <translation>檔名%1長度超過%2字元。</translation>
     </message>
   </context>
   <context>
@@ -12598,7 +12598,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Comment</source>
-      <translation type="unfinished">Comment</translation>
+      <translation>備註</translation>
     </message>
     <message>
       <source>All Devices</source>
@@ -12610,7 +12610,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>No source</source>
-      <translation type="unfinished">No source</translation>
+      <translation>沒有來源</translation>
     </message>
     <message>
       <source>All Servers</source>
@@ -12634,7 +12634,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>No target</source>
-      <translation type="unfinished">No target</translation>
+      <translation>沒有目標</translation>
     </message>
     <message numerus="yes">
       <source>%n layouts</source>
