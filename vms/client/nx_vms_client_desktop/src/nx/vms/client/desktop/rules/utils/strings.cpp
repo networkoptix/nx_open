@@ -174,39 +174,6 @@ QString Strings::selectButtonText(SystemContext* context, vms::rules::SourceUser
     return getName(users, groups);
 }
 
-QString Strings::useSourceCameraString(const QString& actionType)
-{
-    if (!actionType.isEmpty())
-    {
-        if (vms::rules::utils::type<vms::rules::BookmarkAction>() == actionType)
-            return tr("Also set on source camera");
-
-        if (vms::rules::utils::type<vms::rules::DeviceOutputAction>() == actionType)
-            return tr("Also trigger on source camera");
-
-        if (vms::rules::utils::type<vms::rules::DeviceRecordingAction>() == actionType)
-            return tr("Also record source camera");
-
-        if (vms::rules::utils::type<vms::rules::EnterFullscreenAction>() == actionType)
-            return sourceCameraString();
-
-        if (vms::rules::utils::type<vms::rules::PlaySoundAction>() == actionType
-            || vms::rules::utils::type<vms::rules::RepeatSoundAction>() == actionType
-            || vms::rules::utils::type<vms::rules::SpeakAction>() == actionType)
-        {
-            return tr("Also play on source camera");
-        }
-
-        if (vms::rules::utils::type<vms::rules::ShowOnAlarmLayoutAction>() == actionType)
-            return tr("Also show source camera");
-
-        if (vms::rules::utils::type<vms::rules::TextOverlayAction>() == actionType)
-            return tr("Also show on source camera");
-    }
-
-    return tr("Use event source camera");
-}
-
 QString Strings::eventLevelDisplayString(api::EventLevel eventLevel)
 {
     switch (eventLevel)

@@ -17,7 +17,8 @@ class ResourceSelectionWidget: public DetailedResourceTreeWidget
 
 public:
     using ResourceValidator = std::function<bool(const QnResourcePtr& resource)>;
-    using AlertTextProvider = std::function<QString(const QSet<QnResourcePtr>& resources)>;
+    using AlertTextProvider =
+        std::function<QString(const QSet<QnResourcePtr>& resources, bool pinnedItemSelected)>;
 
     /**
      * @param parent Valid pointer to the parent widget, should be initialized
@@ -83,6 +84,12 @@ public:
      * Sets selected resources.
      */
     void setSelectedResources(const QSet<QnResourcePtr>& selectedResources);
+
+    /** Returns whether pinned item is selected. */
+    bool pinnedItemSelected() const;
+
+    /** Set pinned item selected state. */
+    void setPinnedItemSelected(bool selected);
 
     /**
      * @return Set containing selected resources IDs.

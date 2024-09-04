@@ -124,7 +124,9 @@ void ResourceSelectionWidget::Private::updateAlertMessage()
 {
     if (alertTextProvider)
     {
-        const auto alertText = alertTextProvider(selectionDecoratorModel->selectedResources());
+        const auto alertText = alertTextProvider(
+            selectionDecoratorModel->selectedResources(),
+            selectionDecoratorModel->pinnedItemSelected());
         if (!alertText.trimmed().isEmpty())
         {
             q->resourceViewWidget()->setInvalidMessage(alertText);
@@ -272,6 +274,20 @@ void ResourceSelectionWidget::setSelectedResources(const QSet<QnResourcePtr>& re
         return;
 
     d->selectionDecoratorModel->setSelectedResources(resources);
+    emit selectionChanged();
+}
+
+bool ResourceSelectionWidget::pinnedItemSelected() const
+{
+    return d->selectionDecoratorModel->pinnedItemSelected();
+}
+
+void ResourceSelectionWidget::setPinnedItemSelected(bool selected)
+{
+    if (d->selectionDecoratorModel->pinnedItemSelected() == selected)
+        return;
+
+    d->selectionDecoratorModel->setPinnedItemSelected(selected);
     emit selectionChanged();
 }
 

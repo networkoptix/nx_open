@@ -23,7 +23,7 @@ CameraSelectionDialog::AlertTextProvider initAlertTextProvider(
     const CameraSettingsDialogState& settings)
 {
     return
-        [&settings](const QSet<QnResourcePtr>& resources) -> QString
+        [&settings](const QSet<QnResourcePtr>& resources, bool /*pinnedItemSelected*/) -> QString
         {
             QStringList alertRows;
 

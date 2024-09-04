@@ -170,4 +170,9 @@ QString CameraSelectionDialog::noCamerasAvailableMessage()
     return tr("No cameras available");
 }
 
+QString CameraSelectionDialog::sourceCamera()
+{
+    return tr("Source camera");
+}
+
 } // namespace nx::vms::client::desktop

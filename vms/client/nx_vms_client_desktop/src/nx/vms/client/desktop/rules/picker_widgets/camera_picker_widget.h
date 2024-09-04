@@ -12,7 +12,6 @@
 #include <nx/vms/rules/utils/field.h>
 
 #include "../params_widgets/params_widget.h"
-#include "../utils/strings.h"
 #include "resource_picker_widget_base.h"
 
 namespace nx::vms::client::desktop::rules {
@@ -64,58 +63,32 @@ public:
         :
         CameraPickerWidgetBase<vms::rules::TargetDeviceField, Policy>(field, context, parent)
     {
-        auto contentLayout = qobject_cast<QVBoxLayout*>(m_contentWidget->layout());
-
-        m_checkBox = new QCheckBox;
-        m_checkBox->setText(Strings::useSourceCameraString(parentParamsWidget()->descriptor()->id));
-
-        contentLayout->addWidget(m_checkBox);
-
-        connect(
-            m_checkBox,
-            &QCheckBox::stateChanged,
-            this,
-            &TargetCameraPicker<Policy>::onStateChanged);
     }
 
 protected:
     void onSelectButtonClicked() override
     {
         auto selectedCameras = m_field->ids();
+        bool useSource = m_field->useSource();
 
-        if (CameraSelectionDialog::selectCameras<Policy>(systemContext(), selectedCameras, this))
+        if (CameraSelectionDialog::selectCameras<Policy>(
+            systemContext(),
+            selectedCameras,
+            useSource,
+            this))
         {
             m_field->setAcceptAll(Policy::emptyListIsValid() && selectedCameras.empty());
             m_field->setIds(selectedCameras);
+            m_field->setUseSource(useSource);
         }
 
         CameraPickerWidgetBase<vms::rules::TargetDeviceField, Policy>::onSelectButtonClicked();
     }
 
-    void updateUi() override
-    {
-        CameraPickerWidgetBase<vms::rules::TargetDeviceField, Policy>::updateUi();
-
-        m_checkBox->setEnabled(
-            vms::rules::hasSourceCamera(parentParamsWidget()->eventDescriptor().value()));
-
-        QSignalBlocker blocker{m_checkBox};
-        m_checkBox->setChecked(m_field->useSource());
-    }
-
 private:
     using CameraPickerWidgetBase<vms::rules::TargetDeviceField, Policy>::m_field;
-    using CameraPickerWidgetBase<vms::rules::TargetDeviceField, Policy>::m_contentWidget;
-    using CameraPickerWidgetBase<vms::rules::TargetDeviceField, Policy>::connect;
     using CameraPickerWidgetBase<vms::rules::TargetDeviceField, Policy>::systemContext;
     using CameraPickerWidgetBase<vms::rules::TargetDeviceField, Policy>::parentParamsWidget;
-
-    QCheckBox* m_checkBox{nullptr};
-
-    void onStateChanged()
-    {
-        m_field->setUseSource(m_checkBox->isChecked());
-    }
 };
 
 } // namespace nx::vms::client::desktop::rules
