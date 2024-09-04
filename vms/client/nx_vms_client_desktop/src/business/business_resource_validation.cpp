@@ -92,7 +92,8 @@ bool QnSendEmailActionDelegate::isValidList(const QSet<nx::Uuid>& ids, const QSt
     }
 
     const auto groupUsers = context->accessSubjectHierarchy()->usersInGroups(
-        nx::utils::toQSet(groupIds));
+        nx::utils::toQSet(groupIds), /*withHidden*/ false);
+
     if (!std::all_of(groupUsers.cbegin(), groupUsers.cend(), isValidUser))
         return false;
 
@@ -151,7 +152,8 @@ QString QnSendEmailActionDelegate::getText(const QSet<nx::Uuid>& ids, const bool
         receivers.push_back(group.name);
     }
 
-    for (const auto& user: context->accessSubjectHierarchy()->usersInGroups(groupIds))
+    for (const auto& user: context->accessSubjectHierarchy()->usersInGroups(
+        groupIds, /*withHidden*/ false))
     {
         if (!user || !user->isEnabled())
             continue;

@@ -127,7 +127,9 @@ QValidator::State RoleListModel::validateRole(const nx::Uuid& roleId) const
     if (m_roleValidator)
         return m_roleValidator(roleId);
 
-    const auto users = systemContext()->accessSubjectHierarchy()->usersInGroups({roleId});
+    const auto users = systemContext()->accessSubjectHierarchy()->usersInGroups(
+	    {roleId}, /*withHidden*/ false);
+
     std::vector<QnResourceAccessSubject> subjects{users.cbegin(), users.cend()};
 
     return m_userValidator
@@ -177,8 +179,11 @@ QValidator::State RoleListModel::validateUsers(
 QSet<nx::Uuid> RoleListModel::checkedUsers() const
 {
     QSet<nx::Uuid> checkedUsers;
-    for (const auto& user: systemContext()->accessSubjectHierarchy()->usersInGroups(checkedRoles()))
+    for (const auto& user: systemContext()->accessSubjectHierarchy()->usersInGroups(
+	    checkedRoles(), /*withHidden*/ false))
+    {
         checkedUsers.insert(user->getId());
+    }
 
     return checkedUsers;
 }
@@ -440,8 +445,11 @@ void GroupListDelegate::getDisplayInfo(const QModelIndex& index,
     QString& baseName, QString& extInfo) const
 {
     const auto roleId = index.data(core::UuidRole).value<nx::Uuid>();
+
     const int usersInRole = countEnabledUsers(
-        systemContext()->accessSubjectHierarchy()->usersInGroups({roleId}));
+        systemContext()->accessSubjectHierarchy()->usersInGroups(
+		    {roleId}, /*withHidden*/ false));
+
     baseName = userGroupManager()->find(roleId).value_or(api::UserGroupData{}).name;
     extInfo = QString("%1 %2").arg(nx::UnicodeChars::kEnDash, tr("%n Users", "", usersInRole));
 }
