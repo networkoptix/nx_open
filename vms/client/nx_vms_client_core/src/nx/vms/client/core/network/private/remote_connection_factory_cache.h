@@ -21,6 +21,9 @@ public:
     /** Remove connection cache entry for cloud system. */
     static void clearForCloudId(const QString& cloudId);
 
+    /** Remove connection cache entry for user. */
+    static void clearForUser(const std::string& username);
+
     /** Cleanup cache from outdated entries where token was not updated for more than a month). */
     static void cleanupExpired();
 

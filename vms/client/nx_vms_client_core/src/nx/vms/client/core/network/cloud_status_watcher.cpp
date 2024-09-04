@@ -31,6 +31,8 @@
 #include <utils/common/id.h>
 #include <utils/common/synctime.h>
 
+#include "private/remote_connection_factory_cache.h"
+
 using namespace nx::cloud::db::api;
 using namespace std::chrono;
 
@@ -249,6 +251,7 @@ void CloudStatusWatcher::logSession(const QString& cloudSystemId)
 
 void CloudStatusWatcher::resetAuthData()
 {
+    RemoteConnectionFactoryCache::clearForUser(credentials().username);
     setAuthData(CloudAuthData(), AuthMode::login);
     appContext()->coreSettings()->setCloudAuthData(CloudAuthData());
 }
