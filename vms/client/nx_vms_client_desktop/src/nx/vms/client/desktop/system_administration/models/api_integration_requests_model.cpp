@@ -48,7 +48,7 @@ void ApiIntegrationRequestsModel::refresh()
         return;
 
     connectedServerApi()->getRawResult(
-        "/rest/v3/analytics/integrations/*/requests",
+        "/rest/v4/analytics/integrations/*/requests",
         nx::network::rest::Params(),
         nx::utils::guarded(this,
             [this](bool success,
@@ -89,7 +89,7 @@ void ApiIntegrationRequestsModel::reject(const QString& id)
         return;
 
     connectedServerApi()->deleteEmptyResult(
-        nx::format("/rest/v3/analytics/integrations/*/requests/%1", id),
+        nx::format("/rest/v4/analytics/integrations/*/requests/%1", id),
         nx::network::rest::Params(),
         nx::utils::guarded(this,
             [this](bool, rest::Handle, const rest::ServerConnection::EmptyResponseType&)
@@ -106,7 +106,7 @@ void ApiIntegrationRequestsModel::approve(const QString& id)
 
     connectedServerApi()->postRest(
         systemContext()->restApiHelper()->getSessionTokenHelper(),
-        nx::format("/rest/v3/analytics/integrations/*/requests/%1/approve", id),
+        nx::format("/rest/v4/analytics/integrations/*/requests/%1/approve", id),
         nx::network::rest::Params(),
         /*body*/ QByteArray(),
         nx::utils::guarded(this,
