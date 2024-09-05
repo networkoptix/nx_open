@@ -22,7 +22,7 @@ public:
     void setStateStore(QSharedPointer<Store> store, QSharedPointer<StateHandler> stateHandler);
 
 private slots:
-    void at_homeTabActiveChanged(bool active);
+    void updateAppearance();
     void on_clicked();
 
 private:

@@ -637,6 +637,7 @@ bool StartupActionsHandler::attemptAutoLogin()
     {
         logonData.address = nx::network::SocketAddress::fromUrl(url);
         logonData.credentials = std::move(*storedCredentials);
+        logonData.storePassword = !logonData.credentials.authToken.empty();
 
         NX_DEBUG(this, "Auto-login to the server %1", logonData.address);
         menu()->trigger(ConnectAction, Parameters().withArgument(Qn::LogonDataRole, logonData));

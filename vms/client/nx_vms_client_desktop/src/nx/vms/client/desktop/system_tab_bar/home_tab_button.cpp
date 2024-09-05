@@ -70,10 +70,11 @@ HomeTabButton::HomeTabButton(QWidget* parent): base_type(parent)
                     appContext()->mainWindowContext()->menu()->action(menu::ResourcesModeAction)->
                         setChecked(true);
                 }
-//                else
-//                {
-//                    connectToSystem(systemData.systemDescription, systemData.logonData);
-//                }
+                else
+                {
+                    m_stateHandler->connectToSystem(
+                        systemData.systemDescription, systemData.logonData);
+                }
             }
         });
 
@@ -93,17 +94,23 @@ void HomeTabButton::setStateStore(QSharedPointer<Store> store,
             m_stateHandler.get(),
             &SystemTabBarStateHandler::homeTabActiveChanged,
             this,
-            &HomeTabButton::at_homeTabActiveChanged);
+            &HomeTabButton::updateAppearance);
+        connect(
+            m_stateHandler.get(),
+            &SystemTabBarStateHandler::tabsChanged,
+            this,
+            &HomeTabButton::updateAppearance);
         if (m_store)
-            at_homeTabActiveChanged(m_store->isHomeTabActive());
+            updateAppearance();
     }
 }
 
-void HomeTabButton::at_homeTabActiveChanged(bool active)
+void HomeTabButton::updateAppearance()
 {
     if (!NX_ASSERT(m_store))
         return;
 
+    bool active = m_store->isHomeTabActive();
     setChecked(active);
     if (active)
     {

@@ -4,13 +4,16 @@
 
 #include <QtGui/QAction>
 
-#include <nx/vms/client/core/system_finder/system_description.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
+#include <nx/vms/client/core/network/credentials_manager.h>
+#include <nx/vms/client/core/system_finder/system_description.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/action_parameters.h>
+#include <nx/vms/client/desktop/system_logon/ui/welcome_screen.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
+#include <ui/widgets/main_window.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/delayed.h>
 
@@ -84,6 +87,42 @@ void SystemTabBarStateHandler::setStateStore(QSharedPointer<Store> store)
             this,
             &SystemTabBarStateHandler::at_stateChanged);
     }
+}
+
+void SystemTabBarStateHandler::connectToSystem(
+    const core::SystemDescriptionPtr& system, const LogonData& logonData)
+{
+    executeLater(
+        [this, system, ld = logonData]()
+        {
+            auto logonData = adjustedLogonData(ld, system->localId());
+            if (logonData.credentials.authToken.empty())
+            {
+                action(menu::ResourcesModeAction)->setChecked(false);
+                mainWindow()->welcomeScreen()->openArbitraryTile(system->id());
+                m_store->removeSystem(system->localId());
+                return;
+            }
+
+            menu()->trigger(menu::ConnectAction, menu::Parameters()
+                .withArgument(Qn::LogonDataRole, logonData));
+        },
+        this);
+}
+
+LogonData SystemTabBarStateHandler::adjustedLogonData(
+    const LogonData& source, const Uuid& localId) const
+{
+    LogonData adjusted = source;
+
+    const auto credentials = core::CredentialsManager::credentials(localId);
+    if (adjusted.credentials.authToken.empty() && !credentials.empty())
+        adjusted.credentials = credentials[0];
+
+    adjusted.connectScenario = ConnectScenario::connectFromTabBar;
+    adjusted.storePassword = !credentials.empty() && !credentials[0].authToken.empty();
+
+    return adjusted;
 }
 
 void SystemTabBarStateHandler::at_stateChanged(const State& state)

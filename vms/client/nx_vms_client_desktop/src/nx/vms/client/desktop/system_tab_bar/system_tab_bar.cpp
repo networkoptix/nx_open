@@ -93,41 +93,6 @@ SystemTabBar::SystemTabBar(QWidget* parent):
     connect(this, &QTabBar::tabMoved, this, &SystemTabBar::at_tabMoved);
 }
 
-void SystemTabBar::connectToSystem(
-    const core::SystemDescriptionPtr& system, const LogonData& logonData)
-{
-    executeLater(
-        [this, system, ld = logonData]()
-        {
-            auto logonData = adjustedLogonData(ld, system->localId());
-            if (logonData.credentials.authToken.empty())
-            {
-                action(menu::ResourcesModeAction)->setChecked(false);
-                mainWindow()->welcomeScreen()->openArbitraryTile(system->id());
-                m_store->removeSystem(system->localId());
-                return;
-            }
-
-            menu()->trigger(menu::ConnectAction, menu::Parameters()
-                .withArgument(Qn::LogonDataRole, logonData));
-        },
-        this);
-}
-
-LogonData SystemTabBar::adjustedLogonData(const LogonData& source, const nx::Uuid& localId) const
-{
-    LogonData adjusted = source;
-
-    const auto credentials = core::CredentialsManager::credentials(localId);
-    if (adjusted.credentials.authToken.empty() && !credentials.empty())
-        adjusted.credentials = credentials[0];
-
-    adjusted.connectScenario = ConnectScenario::connectFromTabBar;
-    adjusted.storePassword = !credentials.empty() && !credentials[0].authToken.empty();
-
-    return adjusted;
-}
-
 void SystemTabBar::setStateStore(QSharedPointer<Store> store,
     QSharedPointer<StateHandler> stateHandler)
 {
@@ -238,7 +203,7 @@ void SystemTabBar::contextMenuEvent(QContextMenuEvent* event)
 
             if (const auto systemData = m_store->systemData(index))
             {
-                const auto logonData = adjustedLogonData(systemData->logonData,
+                const auto logonData = m_stateHandler->adjustedLogonData(systemData->logonData,
                     systemData->systemDescription->localId());
 
                 if (logonData.credentials.authToken.empty())
@@ -273,7 +238,7 @@ void SystemTabBar::disconnectFromSystem(const nx::Uuid& localId)
                 : (state.activeSystemTab + 1);
 
             const auto systemData = state.systems[systemIndex];
-            connectToSystem(systemData.systemDescription, systemData.logonData);
+            m_stateHandler->connectToSystem(systemData.systemDescription, systemData.logonData);
         }
     }
 
@@ -337,7 +302,7 @@ void SystemTabBar::at_currentChanged(int index)
         if (systemData->systemDescription->localId() == m_store->currentSystemId())
             action(menu::ResourcesModeAction)->setChecked(true);
         else
-            connectToSystem(systemData->systemDescription, systemData->logonData);
+            m_stateHandler->connectToSystem(systemData->systemDescription, systemData->logonData);
     }
 }
 
@@ -348,31 +313,6 @@ void SystemTabBar::at_tabMoved(int from, int to)
 
     QScopedValueRollback<bool> guard(m_updating, true);
     m_store->moveSystem(from, to);
-}
-
-QPixmap SystemTabBar::imageData(int tabIndex) const
-{
-    if (!NX_ASSERT(m_store))
-        return {};
-
-    const auto systemData = m_store->systemData(tabIndex);
-    if (systemData == std::nullopt)
-        return {};
-
-    QSize imageSize = tabSizeHint(tabIndex);
-    const QRect rect({0,0}, imageSize);
-    imageSize *= devicePixelRatio();
-
-    QPixmap result(imageSize);
-    result.setDevicePixelRatio(devicePixelRatio());
-    QPainter painter(&result);
-
-    painter.fillRect(rect, palette().color(QPalette::Active, QPalette::Base));
-    painter.setPen(palette().color(QPalette::Active, QPalette::Text));
-    painter.setFont(fontConfig()->font("systemTabBar"));
-    painter.drawText(rect, systemData->name(), {Qt::AlignCenter});
-
-    return result;
 }
 
 } // namespace nx::vms::client::desktop
