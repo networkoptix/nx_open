@@ -408,21 +408,15 @@ GroupSettingsDialogState GroupSettingsDialog::createState(const nx::Uuid& groupI
             state.parentGroups.insert(MembersModelGroup::fromId(systemContext(), parentGroupId));
 
         const auto subjectHierarchy = systemContext()->accessSubjectHierarchy();
-        const auto memberIds = subjectHierarchy->directMembers(groupId);
 
-        QList<nx::Uuid> users;
+        std::set<nx::Uuid> users;
 
-        for (const auto& memberId: memberIds)
-        {
-            const auto subject = subjectHierarchy->subjectById(memberId);
-            if (subject.isUser())
-                users.push_back(memberId);
-            else if (subject.isRole())
-                state.groups.insert(memberId);
-        }
+        nx::vms::common::getUsersAndGroups(systemContext(),
+            subjectHierarchy->directMembers(groupId),
+            users, state.groups, /*includeHidden*/ false);
 
-        std::sort(users.begin(), users.end());
-        state.users = users;
+        state.users =
+            {std::make_move_iterator(users.begin()), std::make_move_iterator(users.end())};
 
         state.permissionsEditable = systemContext()->accessController()->hasPermissions(
             state.groupId,

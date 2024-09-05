@@ -11,44 +11,77 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/qt_helpers.h>
+#include <nx/utils/std/algorithm.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/user_management/user_group_manager.h>
 
 namespace nx::vms::common {
 
-template<class IdList>
+inline bool isUserHidden(const QnUserResourcePtr& user)
+{
+    return !NX_ASSERT(user) || user->attributes().testFlag(nx::vms::api::UserAttribute::hidden);
+}
+
+inline bool isGroupHidden(const nx::vms::api::UserGroupData& group)
+{
+    return group.attributes.testFlag(nx::vms::api::UserAttribute::hidden);
+}
+
+template<typename IdList>
 void getUsersAndGroups(
     SystemContext* systemContext,
     const IdList& idList,
     QnUserResourceList& users,
-    nx::vms::api::UserGroupDataList& groups)
+    nx::vms::api::UserGroupDataList& groups,
+    bool includeHidden = true)
 {
     if (!NX_ASSERT(systemContext))
         return;
 
     users = systemContext->resourcePool()->getResourcesByIds<QnUserResource>(idList);
     groups = systemContext->userGroupManager()->getGroupsByIds(idList);
+
+    if (!includeHidden)
+    {
+        nx::utils::erase_if(users, &isUserHidden);
+        nx::utils::erase_if(groups, &isGroupHidden);
+    }
 }
 
-template<class IdList>
+template<typename IdList, typename GroupIdSet>
 void getUsersAndGroups(
     SystemContext* systemContext,
     const IdList& idList,
     QnUserResourceList& users,
-    QSet<nx::Uuid>& groupIds)
+    GroupIdSet& groupIds,
+    bool includeHidden = true)
 {
     nx::vms::api::UserGroupDataList groups;
-    getUsersAndGroups(systemContext, idList, users, groups);
+    getUsersAndGroups(systemContext, idList, users, groups, includeHidden);
 
-    groupIds = {};
-    groupIds.reserve(groups.size());
-
+    groupIds.clear();
     for (const auto& group: groups)
         groupIds.insert(group.id);
 }
 
-template<class IdList>
+template<typename IdList, typename UserIdSet, typename GroupIdSet>
+void getUsersAndGroups(
+    SystemContext* systemContext,
+    const IdList& idList,
+    UserIdSet& userIds,
+    GroupIdSet& groupIds,
+    bool includeHidden = true)
+{
+    QnUserResourceList users;
+    getUsersAndGroups(systemContext, idList, users, groupIds, includeHidden);
+
+    userIds.clear();
+    for (const auto& user: users)
+        userIds.insert(user->getId());
+}
+
+template<typename IdList>
 QnUserResourceSet allUsers(SystemContext* context, const IdList& ids)
 {
     QnUserResourceList users;
@@ -66,7 +99,7 @@ QnUserResourceSet allUsers(SystemContext* context, const IdList& ids)
     return result;
 }
 
-template<class IdList>
+template<typename IdList>
 bool allUserGroupsExist(SystemContext* systemContext, const IdList& groupIds)
 {
     if (!NX_ASSERT(systemContext))
@@ -77,7 +110,7 @@ bool allUserGroupsExist(SystemContext* systemContext, const IdList& groupIds)
         [manager](const auto& id) { return manager->contains(id); });
 }
 
-template<class IdList, class LessFunc>
+template<typename IdList, typename LessFunc>
 QStringList userGroupNames(
     const SystemContext* systemContext,
     const IdList& groupIds,
@@ -97,7 +130,7 @@ QStringList userGroupNames(
     return result;
 }
 
-template<class IdList>
+template<typename IdList>
 QStringList userGroupNames(const SystemContext* systemContext, const IdList& groupIds)
 {
     if (!NX_ASSERT(systemContext))
@@ -117,7 +150,7 @@ inline QStringList userGroupNames(const QnUserResourcePtr& user)
         : QStringList{};
 }
 
-template<class IdList>
+template<typename IdList>
 QSet<nx::Uuid> userGroupsWithParents(SystemContext* systemContext, const IdList& groupIds)
 {
     QSet<nx::Uuid> result{groupIds.begin(), groupIds.end()};
