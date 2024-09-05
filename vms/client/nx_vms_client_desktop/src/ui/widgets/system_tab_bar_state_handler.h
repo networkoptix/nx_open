@@ -17,6 +17,8 @@ class SystemTabBarStateHandler: public QObject, public QnWorkbenchContextAware
 public:
     SystemTabBarStateHandler(QObject* parent);
     void setStateStore(QSharedPointer<Store> store);
+    void connectToSystem(const core::SystemDescriptionPtr& system, const LogonData& logonData);
+    LogonData adjustedLogonData(const LogonData& source, const nx::Uuid& localId) const;
 
 signals:
     void tabsChanged();
