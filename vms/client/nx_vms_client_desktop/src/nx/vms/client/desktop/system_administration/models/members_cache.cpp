@@ -8,6 +8,7 @@
 #include <nx/utils/qt_helpers.h>
 #include <nx/vms/common/user_management/predefined_user_groups.h>
 #include <nx/vms/common/user_management/user_group_manager.h>
+#include <nx/vms/common/user_management/user_management_helpers.h>
 
 #include "members_sort.h"
 
@@ -53,7 +54,7 @@ MembersCache::Info MembersCache::infoFromContext(
 {
     if (const auto group = systemContext->userGroupManager()->find(id))
     {
-        NX_ASSERT(!group->attributes.testFlag(api::UserAttribute::hidden));
+        NX_ASSERT(!nx::vms::common::isGroupHidden(*group));
 
         return {
             .name = group->name,
@@ -64,7 +65,7 @@ MembersCache::Info MembersCache::infoFromContext(
 
     if (const auto user = systemContext->resourcePool()->getResourceById<QnUserResource>(id))
     {
-        NX_ASSERT(!user->attributes().testFlag(api::UserAttribute::hidden));
+        NX_ASSERT(!nx::vms::common::isUserHidden(user));
 
         return {
             .name = user->getName(),
@@ -92,7 +93,7 @@ void MembersCache::loadInfo(nx::vms::common::SystemContext* systemContext)
     const auto allGroups = systemContext->userGroupManager()->groups();
     for (const auto& group: allGroups)
     {
-        if (group.attributes.testFlag(nx::vms::api::UserAttribute::hidden))
+        if (nx::vms::common::isGroupHidden(group))
             continue;
 
         const auto id = group.getId();
@@ -103,7 +104,7 @@ void MembersCache::loadInfo(nx::vms::common::SystemContext* systemContext)
     const auto allUsers = systemContext->resourcePool()->getResources<QnUserResource>();
     for (const auto& user: allUsers)
     {
-        if (user->attributes().testFlag(nx::vms::api::UserAttribute::hidden))
+        if (nx::vms::common::isUserHidden(user))
             continue;
 
         const auto id = user->getId();

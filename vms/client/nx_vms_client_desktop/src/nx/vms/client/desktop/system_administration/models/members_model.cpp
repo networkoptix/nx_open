@@ -18,6 +18,7 @@
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/user_management/predefined_user_groups.h>
 #include <nx/vms/common/user_management/user_group_manager.h>
+#include <nx/vms/common/user_management/user_management_helpers.h>
 
 #include "../globals/user_settings_global.h"
 
@@ -183,6 +184,7 @@ void MembersModel::checkCycles()
 
 void MembersModel::readUsersAndGroups()
 {
+    const auto resourcePool = systemContext()->resourcePool();
     const auto userGroupManager = systemContext()->userGroupManager();
 
     if (!m_subjectContext && !m_subjectId.isNull())
@@ -301,7 +303,7 @@ void MembersModel::readUsersAndGroups()
 
                 // For now we assume that UserAttribute::hidden cannot change,
                 // so we don't remove hidden groups, assuming they were never added.
-                if (userGroup.attributes.testFlag(api::UserAttribute::hidden))
+                if (nx::vms::common::isGroupHidden(userGroup))
                     return;
 
                 // Removal happens before addition, this way we can update the cache.
@@ -329,9 +331,9 @@ void MembersModel::readUsersAndGroups()
                 checkCycles();
             });
 
-        auto resourcePool = systemContext()->resourcePool();
+        const auto allUsers = resourcePool->getResources<QnUserResource>(
+            [](const QnUserResourcePtr& user) { return !nx::vms::common::isUserHidden(user); });
 
-        const auto allUsers = resourcePool->getResources<QnUserResource>();
         for (const auto& user: allUsers)
             subscribeToUser(user);
 
@@ -349,8 +351,8 @@ void MembersModel::readUsersAndGroups()
                 for (const auto& user: users)
                 {
                     // For now we assume that UserAttribute::hidden cannot change,
-                    // so we don't subscribe to userAttributesChanged.
-                    if (user->attributes().testFlag(api::UserAttribute::hidden))
+                    // so we don't subscribe to QnUserResource::attributesChanged.
+                    if (nx::vms::common::isUserHidden(user))
                         continue;
 
                     addedIds.insert(user->getId());
@@ -479,13 +481,18 @@ void MembersModel::readUsersAndGroups()
     }
 
     m_subjectMembers = {};
-    auto members = m_subjectContext->subjectHierarchy()->directMembers(m_subjectId);
 
-    for (const auto& id: members)
-        (userGroupManager->contains(id) ? m_subjectMembers.groups : m_subjectMembers.users) << id;
+    std::set<nx::Uuid> memberUsers;
+    std::set<nx::Uuid> memberGroups;
+    nx::vms::common::getUsersAndGroups(systemContext(),
+        m_subjectContext->subjectHierarchy()->directMembers(m_subjectId),
+        memberUsers, memberGroups, /*includeHidden*/ false);
 
-    std::sort(m_subjectMembers.users.begin(), m_subjectMembers.users.end());
-    std::sort(m_subjectMembers.groups.begin(), m_subjectMembers.groups.end());
+    m_subjectMembers.users =
+        {std::make_move_iterator(memberUsers.begin()), std::make_move_iterator(memberUsers.end())};
+
+    m_subjectMembers.groups =
+        {std::make_move_iterator(memberGroups.begin()), std::make_move_iterator(memberGroups.end())};
 
     loadModelData();
 }
