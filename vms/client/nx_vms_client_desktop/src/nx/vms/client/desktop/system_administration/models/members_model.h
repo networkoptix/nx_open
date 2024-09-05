@@ -30,6 +30,10 @@ struct NX_VMS_CLIENT_DESKTOP_API MembersListWrapper
 public:
     MembersListWrapper() {}
     MembersListWrapper(const QList<nx::Uuid>& members): m_members(members) {}
+
+    template<typename Begin, typename End>
+    MembersListWrapper(Begin membersBegin, End membersEnd): m_members(membersBegin, membersEnd) {}
+
     bool operator==(const MembersListWrapper& other) const { return m_members == other.m_members; }
     bool operator==(const QList<nx::Uuid>& other) const { return m_members == other; }
     operator QList<nx::Uuid>() const { return m_members; }

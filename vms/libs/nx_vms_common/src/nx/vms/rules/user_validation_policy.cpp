@@ -45,10 +45,7 @@ QnUserResourceList buildUserList(
 QnUserResourceList allVisibleUsers(QnResourcePool* resourcePool)
 {
     return resourcePool->getResources<QnUserResource>(
-        [](const QnUserResourcePtr& user)
-        {
-            return !user->attributes().testFlag(nx::vms::api::UserAttribute::hidden);
-        });
+        [](const QnUserResourcePtr& user) { return !nx::vms::common::isUserHidden(user); });
 }
 
 } // namespace
