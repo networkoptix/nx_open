@@ -2,6 +2,7 @@
 
 #include "oauth_login_dialog.h"
 
+#include <QtCore/QScopedValueRollback>
 #include <QtCore/QUrlQuery>
 #include <QtWidgets/QBoxLayout>
 #include <QtWidgets/QLineEdit>
@@ -25,6 +26,7 @@ namespace nx::vms::client::desktop {
 namespace {
 
 static constexpr QSize kLoginDialogSize(480, 480);
+bool kCloudLoginDialogIsDisplayed = false;
 
 } // namespace
 
@@ -72,6 +74,11 @@ nx::vms::client::core::CloudAuthData OauthLoginDialog::login(
     const QString& cloudSystem,
     Qt::WindowFlags flags)
 {
+    if (kCloudLoginDialogIsDisplayed)
+        return {};
+
+    QScopedValueRollback<bool> guard(kCloudLoginDialogIsDisplayed, true);
+
     std::unique_ptr<OauthLoginDialog> dialog = !sessionAware
         ? std::make_unique<OauthLoginDialog>(parent, clientType, cloudSystem, flags)
         : std::make_unique<QnSessionAware<OauthLoginDialog>>(
