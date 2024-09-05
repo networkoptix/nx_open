@@ -20,6 +20,9 @@
 #include <QtQuick/QQuickRenderControl>
 #include <QtQuick/QQuickRenderTarget>
 #include <QtQuick/QQuickWindow>
+#if QT_CONFIG(vulkan)
+    #include <QtGui/private/qvulkandefaultinstance_p.h>
+#endif
 
 #include <client_core/client_core_module.h>
 #include <nx/utils/pending_operation.h>
@@ -159,6 +162,8 @@ public:
 
             if (!rhi)
             {
+                // if (!quickWindow->isSceneGraphInitialized())
+                //     quickWindow->setGraphicsDevice();
                 if (!renderControl->initialize())
                     return;
                 rhi = quickWindow->rhi();
@@ -311,6 +316,19 @@ private:
         }
 
         const auto contextGuard = bindContext();
+
+        #if QT_CONFIG(vulkan)
+            QRhi* rhi = appContext()->mainWindowContext()->rhi();
+
+            if (rhi && rhi->backend() == QRhi::Vulkan)
+            {
+                QWidget* mainWindow = appContext()->mainWindowContext()->mainWindowWidget();
+                if (QWindow* w = mainWindow->window()->windowHandle())
+                    quickWindow->setVulkanInstance(w->vulkanInstance());
+                else
+                    quickWindow->setVulkanInstance(QVulkanDefaultInstance::instance());
+            }
+        #endif
 
         if (graphicsApi != QSGRendererInterface::Software)
             renderControl->initialize();

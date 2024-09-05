@@ -28,6 +28,9 @@
 #include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QGraphicsSceneHoverEvent>
 #include <QtWidgets/QGraphicsView>
+#if QT_CONFIG(vulkan)
+    #include <QtGui/private/qvulkandefaultinstance_p.h>
+#endif
 
 #include <qt_graphics_items/graphics_utils.h>
 
@@ -576,6 +579,16 @@ bool GraphicsQmlView::Private::ensureOffscreen()
 
             quickWindow->setGraphicsDevice(QQuickGraphicsDevice::fromRhi(rhi));
             useTextureReadback = false;
+
+            #if QT_CONFIG(vulkan)
+                if (rhi->backend() == QRhi::Vulkan)
+                {
+                    if (QWindow* w = quickWidget->window()->windowHandle())
+                        quickWindow->setVulkanInstance(w->vulkanInstance());
+                    else
+                        quickWindow->setVulkanInstance(QVulkanDefaultInstance::instance());
+                }
+            #endif
         }
         else
         {
