@@ -140,7 +140,6 @@ struct ConnectActionsHandler::Private
     std::unique_ptr<nx::utils::TimerManager> timerManager;
     std::unique_ptr<ec2::CrashReporter> crashReporter;
     bool needReconnectToLastCloudSystem = false;
-    bool cloudLoginDialogIsDisplayed = false;
     QString lastCloudSystemId;
 
     Private(ConnectActionsHandler* owner):
@@ -183,11 +182,6 @@ struct ConnectActionsHandler::Private
 
     void reconnectToCloudIfNeeded()
     {
-        if (cloudLoginDialogIsDisplayed)
-            return;
-
-        QScopedValueRollback<bool> guard(cloudLoginDialogIsDisplayed, true);
-
         auto cloudAuthDataHelper = FreshSessionTokenHelper::makeFreshSessionTokenHelper(
             q->mainWindowWidget(),
             tr("Login to %1", "%1 is the cloud name (like Nx Cloud)")
