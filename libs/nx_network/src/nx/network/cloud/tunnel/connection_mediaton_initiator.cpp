@@ -50,6 +50,11 @@ void ConnectionMediationInitiator::start(
     m_request = request;
     m_handler = std::move(handler);
 
+    NX_ASSERT(m_settings.isUdpHpEnabled || m_settings.isUdpHpOverHttpEnabled,
+        "UDP Hole Punching is disabled");
+    if (!m_settings.isUdpHpEnabled && !m_settings.isUdpHpOverHttpEnabled)
+        return post([this](){ m_handler(hpm::api::ResultCode::noSuitableConnectionMethod, {}); });
+
     if (!m_settings.isUdpHpEnabled)
     {
         NX_VERBOSE(this, "%1. UDP hole punching was disabled. Querying mediator via HTTP",
@@ -101,6 +106,12 @@ void ConnectionMediationInitiator::initiateConnectOverUdp()
 
 void ConnectionMediationInitiator::initiateConnectOverHttp()
 {
+    if (!m_settings.isUdpHpOverHttpEnabled)
+    {
+        NX_VERBOSE(this, "Connect over HTTP is disabled");
+        return;
+    }
+
     NX_VERBOSE(this, "%1. Querying mediator over HTTP", m_connectSessionId);
 
     m_mediatorApiClient = std::make_unique<nx::hpm::api::Client>(

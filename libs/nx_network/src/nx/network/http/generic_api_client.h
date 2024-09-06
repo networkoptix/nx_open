@@ -93,7 +93,19 @@ public:
      */
     void setCacheEnabled(bool enabled) { this->m_cacheEnabled = enabled; }
 
+    /**
+     * Get the value of the HTTP Date header in milliseconds. Must be accessed from within
+     * AIO thread.
+     */
     std::chrono::milliseconds lastResponseTime() const { return this->m_lastResponseTime; }
+
+    /**
+     * Take the HTTP headers from the most recent response received by the client.
+     */
+    nx::network::http::HttpHeaders takeLastResponseHeaders()
+    {
+        return std::exchange(this->m_lastResponseHeaders, {});
+    }
 
 protected:
     /**
@@ -180,6 +192,7 @@ private:
     // Actual value has type CacheEntry<T> where T is passed via OutputData template parameter.
     std::unordered_map<std::string /*GET <path>*/, std::shared_ptr<const BaseCacheEntry>> m_cache;
     std::chrono::milliseconds m_lastResponseTime{0};
+    nx::network::http::HttpHeaders m_lastResponseHeaders;
 
     template<typename Output, typename SerializationLibWrapper, typename... Args>
     auto createHttpClient(const nx::utils::Url& url, Args&&... args);
@@ -524,9 +537,12 @@ void GenericApiClient<ApiResultCodeDescriptor, Base>::processResponse(
     const auto resultCode =
         getResultCode(error, response, requestPtr->lastFusionRequestResult(), output...);
     const auto date = http::getHeaderValue(
-        response ? response->headers : network::http::HttpHeaders(), "Date");
+        response ? response->headers : network::http::HttpHeaders{}, "Date");
     m_lastResponseTime = std::chrono::milliseconds(
         date.empty() ? 0 : nx::utils::parseDateToQDateTime(date).currentMSecsSinceEpoch());
+    m_lastResponseHeaders = response
+        ? std::move(response->headers)
+        : nx::network::http::HttpHeaders{};
 
     if constexpr (!std::is_void_v<CachedType>)
     {

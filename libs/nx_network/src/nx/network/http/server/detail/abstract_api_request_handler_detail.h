@@ -188,8 +188,8 @@ void BaseApiRequestHandler<Input, Descendant>::requestCompleted(
         responseHeaders = std::get<1>(std::forward_as_tuple(output...));
 
     if constexpr (sizeof...(output) > 0)
-    {
         if (result.getErrorClass() == ApiRequestErrorClass::noError)
+    {
         {
             if (!serializeOutputToResponse(
                     result,

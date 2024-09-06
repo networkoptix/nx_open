@@ -14,6 +14,7 @@ class NX_NETWORK_API CloudConnectSettings
 public:
     std::string forcedMediatorUrl;
     bool isUdpHpEnabled = true;
+    bool isUdpHpOverHttpEnabled = true;
     bool isCloudProxyEnabled = true;
     bool isDirectTcpConnectEnabled = true;
     std::chrono::milliseconds delayBeforeSendingConnectToMediatorOverTcp = std::chrono::seconds(3);
