@@ -7,8 +7,8 @@
 #include <QtCore/QMap>
 
 #include <nx/analytics/metadata_logger.h>
-#include <nx/rtp/result.h>
 #include <nx/rtp/parsers/rtp_stream_parser.h>
+#include <nx/rtp/result.h>
 #include <nx/utils/software_version.h>
 
 namespace nx::rtp {
@@ -21,7 +21,7 @@ public:
     QnNxRtpParser(nx::Uuid deviceId, const QString& tag);
     QnNxRtpParser();
 
-    virtual void setSdpInfo(const Sdp::Media& sdp) override {}
+    virtual void setSdpInfo(const Sdp::Media& /*sdp*/) override {}
 
     virtual bool isUtcTime() const override { return true; }
 
