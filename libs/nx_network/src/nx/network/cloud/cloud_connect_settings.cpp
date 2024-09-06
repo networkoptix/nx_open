@@ -22,6 +22,7 @@ CloudConnectSettings& CloudConnectSettings::operator=(const CloudConnectSettings
 
     forcedMediatorUrl = right.forcedMediatorUrl;
     isUdpHpEnabled = right.isUdpHpEnabled;
+    isUdpHpOverHttpEnabled = right.isUdpHpOverHttpEnabled;
     isCloudProxyEnabled = right.isCloudProxyEnabled;
     isDirectTcpConnectEnabled = right.isDirectTcpConnectEnabled;
     delayBeforeSendingConnectToMediatorOverTcp = right.delayBeforeSendingConnectToMediatorOverTcp;
