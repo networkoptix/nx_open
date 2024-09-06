@@ -313,12 +313,14 @@ void ActionBuilder::addField(const QString& name, std::unique_ptr<ActionBuilderF
             setAggregationInterval(optionalTimeField->value());
     }
 
+    const auto fieldPtr = field.get();
+    m_fields[name] = std::move(field);
+
     static const auto onFieldChangedMetaMethod =
         metaObject()->method(metaObject()->indexOfMethod("onFieldChanged()"));
     if (NX_ASSERT(onFieldChangedMetaMethod.isValid()))
-        nx::utils::watchOnPropertyChanges(field.get(), this, onFieldChangedMetaMethod);
+        nx::utils::watchOnPropertyChanges(fieldPtr, this, onFieldChangedMetaMethod);
 
-    m_fields[name] = std::move(field);
 }
 
 QHash<QString, ActionBuilderField*> ActionBuilder::fields() const
