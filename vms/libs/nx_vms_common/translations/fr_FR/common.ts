@@ -216,7 +216,7 @@
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Live Viewers group, view and export archive and Bookmarks.</source>
-      <translation>Les membres de ce groupe peuvent, en plus des autorisations accordées par le groupe Visionneurs, visualiser et exporter les archives et les signets.</translation>
+      <translation>Les membres de ce groupe peuvent, en plus des autorisations accordées par le groupe Visualisateur en direct, visualiser et exporter les archives et les signets.</translation>
     </message>
     <message>
       <source>Members of this group can view live videos, I/O modules and web pages.</source>
@@ -224,7 +224,7 @@
     </message>
     <message>
       <source>Members of this group can view System Health Monitoring information and server processor load in real-time (Server Monitoring).</source>
-      <translation>Les membres de ce groupe peuvent consulter les informations de surveillance de la santé du système et la charge du processeur du serveur en temps réel (Server Monitoring).</translation>
+      <translation>Les membres de ce groupe peuvent consulter les informations de surveillance de la santé du système et la charge du processeur du serveur en temps réel (Surveillance du serveur).</translation>
     </message>
   </context>
   <context>
