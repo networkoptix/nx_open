@@ -171,9 +171,6 @@ void QnRtspClientArchiveDelegate::setCamera(const QnSecurityCamResourcePtr& came
     else
         m_maxSessionDurationMs = std::chrono::milliseconds::max();
 
-    m_cameraConnections << connect(m_camera.get(), &QnResource::parentIdChanged, this,
-        &QnRtspClientArchiveDelegate::reopen);
-
     m_cameraConnections << connect(context->cameraHistoryPool(),
         &QnCameraHistoryPool::cameraHistoryChanged,
         this,
