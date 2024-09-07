@@ -48,6 +48,7 @@ HomeTabButton::HomeTabButton(QWidget* parent): base_type(parent)
     m_closeButton = new CloseTabButton(this);
     auto layout = new QHBoxLayout();
     layout->addWidget(m_closeButton, 0, Qt::AlignRight | Qt::AlignVCenter);
+    layout->addSpacing(10);
     setLayout(layout);
 
     connect(m_closeButton, &QAbstractButton::clicked, this,

@@ -43,10 +43,7 @@ CloseTabButton::CloseTabButton(QWidget* parent): QAbstractButton(parent)
     setFocusPolicy(Qt::NoFocus);
     QIcon icon = qnSkin->icon(kSystemTabBar);
     setIcon(icon);
-    setContentsMargins(0, 0, 10, 0);
-    QSize size = core::Skin::maximumSize(icon);
-    size.setWidth(size.width() + contentsMargins().right() + parent->contentsMargins().right());
-    setFixedSize(size);
+    setFixedSize(kFixedIconWidth, kFixedIconHeight);
 }
 
 void CloseTabButton::paintEvent(QPaintEvent*)

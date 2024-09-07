@@ -2362,12 +2362,12 @@ void Style::drawControl(ControlElement element,
                 if (closeButton && closeButton->isVisible())
                 {
                     textRect.setRight(textRect.right() -
-                        closeButton->width() - Metrics::kInterSpace);
+                        closeButton->width() - Metrics::kInterSpace - rightIndent(widget));
                 }
 
                 if (shape == TabShape::Rectangular)
                 {
-                    textFlags |= Qt::AlignRight | Qt::AlignVCenter;
+                    textFlags |= Qt::AlignLeft | Qt::AlignVCenter;
                     iconWithPadding += padding;
                     textRect.setLeft(textRect.left() + iconWithPadding);
                     auto colorGroup = tab->state.testFlag(State_Selected)
@@ -3430,7 +3430,12 @@ QRect Style::subElementRect(
             {
                 QSize size = tabBar->rightButtonSize;
                 size.setHeight(std::min(size.height(), tabBar->rect.height()));
-                return Geometry::aligned(size, tabBar->rect, Qt::AlignRight | Qt::AlignVCenter);
+                auto rect =
+                    Geometry::aligned(size, tabBar->rect, Qt::AlignRight | Qt::AlignVCenter);
+                const auto identValue = widget->property(Properties::kSideIndentation);
+                if (identValue.canConvert<QnIndents>())
+                    rect.translate(-identValue.value<QnIndents>().right(), 0);
+                return rect;
             }
             break;
         }

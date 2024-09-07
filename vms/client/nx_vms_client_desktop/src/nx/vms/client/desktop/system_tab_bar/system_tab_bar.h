@@ -8,6 +8,8 @@
 #include <nx/vms/client/desktop/common/widgets/tool_button.h>
 #include <ui/workbench/workbench_context_aware.h>
 
+#include "private/tab_width_calculator.h"
+
 namespace nx::vms::client::desktop {
 
 struct MainWindowTitleBarState;
@@ -34,9 +36,12 @@ public:
 
 protected:
     virtual QSize tabSizeHint(int index) const override;
+    virtual QSize minimumTabSizeHint(int index) const override;
     virtual void mousePressEvent(QMouseEvent* event) override;
     virtual void contextMenuEvent(QContextMenuEvent* event) override;
     virtual void initStyleOption(QStyleOptionTab* option, int tabIndex) const override;
+    virtual void resizeEvent(QResizeEvent* event) override;
+    virtual void tabLayoutChange() override;
 
 private slots:
     void at_currentChanged(int index);
@@ -48,8 +53,10 @@ private:
 
 private:
     bool m_updating = false;
+    bool m_resizing = false;
     QSharedPointer<Store> m_store;
     QSharedPointer<StateHandler> m_stateHandler;
+    TabWidthCalculator m_tabWidthCalculator;
 };
 
 } // namespace nx::vms::client::desktop

@@ -7,6 +7,7 @@
 #include <QtGui/QAction>
 #include <QtGui/QDrag>
 #include <QtGui/QPainter>
+#include <QtGui/QtEvents>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QStyleOptionTab>
@@ -38,9 +39,16 @@
 
 namespace {
 
-static const int kFixedTabSizeHeight = 32;
-static const int kFixedHomeIconWidth = 32;
-static const QnIndents kTabIndents = {14, 10};
+static constexpr int kFixedTabHeight = 32;
+static constexpr int kMinimumTabWidth = 64;
+static constexpr int kMaximumTabWidth = 196;
+static constexpr QnIndents kTabPaddings = {14, 10};
+
+static constexpr int kAllDecorationsWidth =
+    kTabPaddings.left()
+    + nx::style::Metrics::kInterSpace
+    + nx::vms::client::desktop::CloseTabButton::kFixedIconWidth
+    + kTabPaddings.right();
 
 static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kSystemSubstitutions =
     {{QnIcon::Normal, {.primary = "light4"}}};
@@ -65,9 +73,9 @@ SystemTabBar::SystemTabBar(QWidget* parent):
     setElideMode(Qt::ElideRight);
     setTabShape(this, nx::style::TabShape::Rectangular);
     setUsesScrollButtons(false);
-    setFixedHeight(kFixedTabSizeHeight);
+    setFixedHeight(kFixedTabHeight);
     setContentsMargins(1, 0, 1, 0);
-    setProperty(style::Properties::kSideIndentation, QVariant::fromValue(kTabIndents));
+    setProperty(style::Properties::kSideIndentation, QVariant::fromValue(kTabPaddings));
 
     // Set palette colors for tabs:
     // - QPalette::Text - text;
@@ -125,11 +133,20 @@ void SystemTabBar::rebuildTabs()
     if (!NX_ASSERT(m_store) || m_updating)
         return;
 
+    const auto fm = fontMetrics();
     {
         QSignalBlocker blocker(this);
+        m_tabWidthCalculator.clear();
         for (int i = 0; i < m_store->systemCount(); ++i)
         {
             const auto systemData = m_store->systemData(i);
+
+            // The width of the tab is the sum of tab text width, width of the close button,
+            // space between them and left and right paddings.
+            const int tabWidth = kAllDecorationsWidth
+                + fm.size(Qt::TextShowMnemonic, systemData->systemDescription->name()).width();
+            m_tabWidthCalculator.addTab(tabWidth);
+
             if (tabData(i).value<core::SystemDescriptionPtr>() == systemData->systemDescription)
                 continue;
 
@@ -158,11 +175,17 @@ bool SystemTabBar::active() const
 
 QSize SystemTabBar::tabSizeHint(int index) const
 {
-    auto size = base_type::tabSizeHint(index);
-    int width = size.width() + style::Metrics::kStandardPadding;
-    if (width < kFixedHomeIconWidth)
-        width = kFixedHomeIconWidth;
-    return QSize(width, kFixedTabSizeHeight);
+    int width = index < m_tabWidthCalculator.count()
+        ? m_tabWidthCalculator.width(index)
+        : base_type::tabSizeHint(index).width();
+    if (width > kMaximumTabWidth)
+        width = kMaximumTabWidth;
+    return QSize(width, kFixedTabHeight);
+}
+
+QSize SystemTabBar::minimumTabSizeHint(int /*index*/) const
+{
+    return QSize(kMinimumTabWidth, kFixedTabHeight);
 }
 
 void SystemTabBar::mousePressEvent(QMouseEvent* event)
@@ -271,6 +294,11 @@ void SystemTabBar::insertClosableTab(int index,
                 if (tabData(i) == data)
                 {
                     const auto text = systemDescription->name();
+                    const auto fm = fontMetrics();
+                    const int tabWidth = kAllDecorationsWidth
+                        + fm.size(Qt::TextShowMnemonic, text).width();
+                    m_tabWidthCalculator.setWidth(i, tabWidth);
+
                     setTabText(i, text);
                     setTabToolTip(i, text);
                     break;
@@ -285,11 +313,41 @@ void SystemTabBar::insertClosableTab(int index,
 
     setTabButton(index, RightSide, closeButton);
 }
+
 void SystemTabBar::initStyleOption(QStyleOptionTab* option, int tabIndex) const
 {
     base_type::initStyleOption(option, tabIndex);
     if (m_store && m_store->isHomeTabActive())
         option->state &= ~QStyle::State_Selected;
+    if (tabIndex < m_tabWidthCalculator.count())
+    {
+        int x = 0;
+        for (int i = 0; i < tabIndex; ++i)
+            x += m_tabWidthCalculator.width(i);
+
+        option->rect = QRect(QPoint(x, 0), QSize(m_tabWidthCalculator.width(tabIndex), kFixedTabHeight));
+        option->text = fontMetrics().elidedText(
+            option->text,
+            elideMode(),
+            m_tabWidthCalculator.width(tabIndex) - kAllDecorationsWidth,
+            Qt::TextShowMnemonic);
+    }
+}
+
+void SystemTabBar::resizeEvent(QResizeEvent* event)
+{
+    QScopedValueRollback<bool> guard(m_resizing, true);
+    m_tabWidthCalculator.calculate(event->size().width());
+    base_type::resizeEvent(event);
+}
+
+void SystemTabBar::tabLayoutChange()
+{
+    if (m_resizing)
+        return;
+
+    m_tabWidthCalculator.reset();
+    adjustSize();
 }
 
 void SystemTabBar::at_currentChanged(int index)
@@ -313,6 +371,7 @@ void SystemTabBar::at_tabMoved(int from, int to)
 
     QScopedValueRollback<bool> guard(m_updating, true);
     m_store->moveSystem(from, to);
+    m_tabWidthCalculator.moveTab(from, to);
 }
 
 } // namespace nx::vms::client::desktop

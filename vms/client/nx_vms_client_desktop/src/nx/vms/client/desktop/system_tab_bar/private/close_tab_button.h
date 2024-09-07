@@ -12,6 +12,9 @@ class CloseTabButton: public QAbstractButton
     using base_type = QAbstractButton;
 
 public:
+    static constexpr int kFixedIconWidth = 16;
+    static constexpr int kFixedIconHeight = 16;
+
     explicit CloseTabButton(QWidget* parent = 0);
     virtual void paintEvent(QPaintEvent* event) override;
 };
