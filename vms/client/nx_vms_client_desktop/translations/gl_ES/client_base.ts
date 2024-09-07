@@ -2432,7 +2432,7 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>Select at least one camera</source>
-      <translation type="unfinished">Select at least one camera</translation>
+      <translation>Selecciona polo menos unha cámara</translation>
     </message>
     <message>
       <source>Devices</source>
@@ -2444,11 +2444,11 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>Any Device</source>
-      <translation type="unfinished">Any Device</translation>
+      <translation>Calquera dispositivo</translation>
     </message>
     <message>
       <source>Any Camera</source>
-      <translation type="unfinished">Any Camera</translation>
+      <translation>Calquera cámara</translation>
     </message>
     <message>
       <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
