@@ -64,7 +64,13 @@ void AnalyticsEventTypeField::setTypeId(const QString& id)
 
 QJsonObject AnalyticsEventTypeField::openApiDescriptor()
 {
-    return utils::constructOpenApiDescriptor<AnalyticsEventTypeField>();
+    auto result =
+        utils::constructOpenApiDescriptor<AnalyticsEventTypeField>();
+    auto properties = result["properties"].toObject();
+    utils::updatePropertyForField(
+        properties, "typeId", "example", "nx.stub.lineCrossing");
+    result["properties"] = properties;
+    return result;
 }
 
 } // namespace nx::vms::rules

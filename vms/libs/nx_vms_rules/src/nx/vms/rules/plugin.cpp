@@ -23,8 +23,6 @@ void Plugin::initialize(Engine* engine)
     registerFieldValidators();
     registerEvents();
     registerActions();
-    if (ini().generateOpenApiDoc)
-        utils::createEventRulesOpenApiDoc(m_engine);
 }
 
 void Plugin::registerFields() const

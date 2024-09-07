@@ -4,6 +4,9 @@
 
 #include <nx/utils/log/assert.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/rules/action_builder_fields/email_message_field.h>
+#include <nx/vms/rules/action_builder_fields/event_devices_field.h>
+#include <nx/vms/rules/event_filter_fields/unique_id_field.h>
 #include <nx/vms/rules/utils/openapi_doc.h>
 
 #include "../field.h"
@@ -26,6 +29,27 @@ FieldDescriptor makeFieldDescriptor(
         .properties = utils::addOpenApiToProperties<T>(properties)
     };
 }
+
+// The template specialization must be declared in the header because MSVC produces a linkage error.
+// Using the inline keyword is not a viable solution, as the specialization is ignored in this case.
+// TODO: #vbutkevich Delete this declarations after the CI is updated to use a newer version of MSVC.
+template<>
+NX_VMS_RULES_API FieldDescriptor makeFieldDescriptor<UniqueIdField>(const QString& fieldName,
+    const TranslatableString& displayName,
+    const TranslatableString& description,
+    const QVariantMap& properties);
+
+template<>
+NX_VMS_RULES_API FieldDescriptor makeFieldDescriptor<EmailMessageField>(const QString& fieldName,
+    const TranslatableString& displayName,
+    const TranslatableString& description,
+    const QVariantMap& properties);
+
+template<>
+NX_VMS_RULES_API FieldDescriptor makeFieldDescriptor<EventDevicesField>(const QString& fieldName,
+    const TranslatableString& displayName,
+    const TranslatableString& description,
+    const QVariantMap& properties);
 
 namespace utils {
 
