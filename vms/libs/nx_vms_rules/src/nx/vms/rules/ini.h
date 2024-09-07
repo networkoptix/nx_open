@@ -22,9 +22,6 @@ struct NX_VMS_RULES_API Ini: public nx::kit::IniConfig
 
     NX_INI_FLAG(false, showHiddenTextFields,
         "Show hidden text fields in VMS rules dialog");
-
-    NX_INI_FLAG(false, generateOpenApiDoc,
-        "Setting the flag to true will trigger the generation of OpenAPI documentation at server startup");
 };
 
 NX_VMS_RULES_API Ini& ini();

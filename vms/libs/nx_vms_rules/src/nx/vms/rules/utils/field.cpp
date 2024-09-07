@@ -12,8 +12,6 @@
 #include "../action_builder_fields/optional_time_field.h"
 #include "../action_builder_fields/text_with_fields.h"
 #include "../event_filter_fields/state_field.h"
-#include "../event_filter_fields/unique_id_field.h"
-#include "nx/vms/rules/action_builder_fields/email_message_field.h"
 
 using namespace std::chrono_literals;
 
@@ -35,7 +33,7 @@ FieldDescriptor makeInvisibleFieldDescriptor(const QString& fieldName,
 
 // Invisible types
 template<>
-inline FieldDescriptor makeFieldDescriptor<UniqueIdField>(const QString& fieldName,
+FieldDescriptor makeFieldDescriptor<UniqueIdField>(const QString& fieldName,
     const TranslatableString& displayName,
     const TranslatableString& description,
     const QVariantMap& properties)
@@ -45,7 +43,7 @@ inline FieldDescriptor makeFieldDescriptor<UniqueIdField>(const QString& fieldNa
 }
 
 template<>
-inline FieldDescriptor makeFieldDescriptor<EmailMessageField>(const QString& fieldName,
+FieldDescriptor makeFieldDescriptor<EmailMessageField>(const QString& fieldName,
     const TranslatableString& displayName,
     const TranslatableString& description,
     const QVariantMap& properties)
@@ -55,7 +53,7 @@ inline FieldDescriptor makeFieldDescriptor<EmailMessageField>(const QString& fie
 }
 
 template<>
-inline FieldDescriptor makeFieldDescriptor<EventDevicesField>(const QString& fieldName,
+FieldDescriptor makeFieldDescriptor<EventDevicesField>(const QString& fieldName,
     const TranslatableString& displayName,
     const TranslatableString& description,
     const QVariantMap& properties)
