@@ -344,7 +344,6 @@ TEST_F(BuiltinTypesTest, BuiltinActions)
     testActionFieldRegistration<TargetDevicesField>();
     testActionFieldRegistration<TargetServersField>();
     testActionFieldRegistration<TargetUsersField>(systemContext());
-    testActionFieldRegistration<TextFormatter>(systemContext());
     testActionFieldRegistration<TextWithFields>(systemContext());
     testActionFieldRegistration<TimeField>();
     testActionFieldRegistration<TargetLayoutField>();

@@ -117,18 +117,6 @@ FieldDescriptor makeTextWithFieldsDescriptorWithVisibilityConfig(
         {{"text", formatString}, {"visible", ini().showHiddenTextFields}});
 }
 
-FieldDescriptor makeTextFormatterFieldDescriptor(
-    const QString& fieldName,
-    const QString& formatString,
-    const TranslatableString& displayName)
-{
-    return makeFieldDescriptor<TextFormatter>(
-        fieldName,
-        displayName,
-        {},
-        {{ "text", formatString }, {"visible", ini().showHiddenTextFields}});
-}
-
 FieldDescriptor makeActionFlagFieldDescriptor(
     const QString& fieldName,
     const TranslatableString& displayName,

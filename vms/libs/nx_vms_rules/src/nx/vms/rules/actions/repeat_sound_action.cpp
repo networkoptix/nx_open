@@ -46,13 +46,13 @@ const ItemDescriptor& RepeatSoundAction::manifest()
             makeFieldDescriptor<VolumeField>(
                 utils::kVolumeFieldName,
                 Strings::volume()),
-            utils::makeTextFormatterFieldDescriptor(
+            utils::makeTextWithFieldsDescriptorWithVisibilityConfig(
                 utils::kCaptionFieldName, "{event.caption}",
                 NX_DYNAMIC_TRANSLATABLE(tr("Caption"))),
-            utils::makeTextFormatterFieldDescriptor(utils::kDescriptionFieldName,
+            utils::makeTextWithFieldsDescriptorWithVisibilityConfig(utils::kDescriptionFieldName,
                 "{event.description}",
                 NX_DYNAMIC_TRANSLATABLE(tr("Description"))),
-            utils::makeTextFormatterFieldDescriptor(utils::kTooltipFieldName,
+            utils::makeTextWithFieldsDescriptorWithVisibilityConfig(utils::kTooltipFieldName,
                 "{event.extendedDescription}",
                 NX_DYNAMIC_TRANSLATABLE(tr("Tooltip text"))),
             utils::makeExtractDetailFieldDescriptor(

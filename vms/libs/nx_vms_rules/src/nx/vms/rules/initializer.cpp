@@ -159,7 +159,6 @@ void Initializer::registerFields() const
     registerActionField<TargetDevicesField>();
     registerActionField<TargetServersField>();
     registerActionField<TargetUsersField>(this->m_context);
-    registerActionField<TextFormatter>(this->m_context);
     registerActionField<TextWithFields>(this->m_context);
     registerActionField<TargetLayoutsField>();
     registerActionField<TargetDeviceField>();
@@ -187,7 +186,6 @@ void Initializer::registerFieldValidators() const
     registerFieldValidator<TargetServersField>(new TargetServerFieldValidator);
     registerFieldValidator<TargetDeviceField>(new TargetSingleDeviceFieldValidator);
     registerFieldValidator<TargetUsersField>(new TargetUserFieldValidator);
-    registerFieldValidator<TextFormatter>(new TextWithFieldsValidator);
     registerFieldValidator<TextWithFields>(new TextWithFieldsValidator);
     registerFieldValidator<TimeField>(new TimeFieldValidator);
 }
