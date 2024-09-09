@@ -258,6 +258,7 @@ public:
     nx::utils::Url getUrl() const;
 
     void setProxyAddr(const nx::String& addr, int port);
+    void resetProxyAddr();
 
     QStringList getSdpByType(nx::rtp::Sdp::MediaType mediaType) const;
     int getTrackCount(nx::rtp::Sdp::MediaType mediaType) const;

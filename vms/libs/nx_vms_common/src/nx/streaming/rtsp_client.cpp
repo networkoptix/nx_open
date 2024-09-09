@@ -1592,6 +1592,11 @@ void QnRtspClient::setProxyAddr(const nx::String& addr, int port)
     m_proxyAddress = nx::network::SocketAddress(addr, (uint16_t) port);
 }
 
+void QnRtspClient::resetProxyAddr()
+{
+    m_proxyAddress.reset();
+}
+
 void QnRtspClient::setPlayNowModeAllowed(bool value)
 {
     m_playNowMode = value;

@@ -1087,6 +1087,8 @@ void QnRtspClientArchiveDelegate::setupRtspSession(
     const QnMediaServerResourcePtr& server,
     QnRtspClient* session) const
 {
+    NX_DEBUG(this, "Setup RTSP session for camera %1 via server %2", camera, server);
+
     session->setCredentials(m_credentials, nx::network::http::header::AuthScheme::digest);
 
     // TODO: #sivanov This place is the only reason to have `auditId` access in the common system
@@ -1097,12 +1099,17 @@ void QnRtspClientArchiveDelegate::setupRtspSession(
     session->setAdditionAttribute(
         Qn::CUSTOM_USERNAME_HEADER_NAME, QString::fromStdString(m_credentials.username).toUtf8());
 
+    session->resetProxyAddr();
+
     // We can get here while client is already closing.
     if (server)
     {
         QNetworkProxy proxy = QnNetworkProxyFactory::proxyToResource(server);
         if (proxy.type() != QNetworkProxy::NoProxy)
+        {
+            NX_DEBUG(this, "Proxy access through server %1:%2", proxy.hostName(), proxy.port());
             session->setProxyAddr(proxy.hostName(), proxy.port());
+        }
 
         session->setAdditionAttribute(
             Qn::SERVER_GUID_HEADER_NAME,
