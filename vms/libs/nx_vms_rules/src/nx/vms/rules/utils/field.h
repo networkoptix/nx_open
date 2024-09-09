@@ -121,11 +121,6 @@ FieldDescriptor makeTextWithFieldsDescriptorWithVisibilityConfig(
     const QString& formatString,
     const TranslatableString& displayName);
 
-FieldDescriptor makeTextFormatterFieldDescriptor(
-    const QString& fieldName,
-    const QString& formatString,
-    const TranslatableString& displayName);
-
 FieldDescriptor makeActionFlagFieldDescriptor(
     const QString& fieldName,
     const TranslatableString& displayName,

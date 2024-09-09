@@ -3,6 +3,7 @@
 #pragma once
 
 #include <QtCore/QString>
+#include <QtSql/QSqlError>
 
 #include <nx/utils/move_only_func.h>
 
@@ -58,6 +59,8 @@ enum class NotificationSource
     Local,
     Remote
 };
+
+NX_VMS_COMMON_API Result toResult(QSqlError&& error);
 
 NX_VMS_COMMON_API QString toString(NotificationSource source);
 

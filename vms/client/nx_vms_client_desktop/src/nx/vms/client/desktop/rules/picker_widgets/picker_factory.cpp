@@ -304,11 +304,8 @@ PickerWidget* PickerFactory::createWidget(
     if (fieldId == fieldMetatype<nx::vms::rules::TargetUsersField>())
         return createPickerImpl<TargetUserPicker>(field, context, parent);
 
-    if (fieldId == fieldMetatype<nx::vms::rules::TextWithFields>()
-        || fieldId == fieldMetatype<nx::vms::rules::TextFormatter>())
-    {
+    if (fieldId == fieldMetatype<nx::vms::rules::TextWithFields>())
         return createPickerImpl<TextWithFieldsPicker>(field, context, parent);
-    }
 
     if (fieldId == fieldMetatype<nx::vms::rules::TimeField>())
         return createPickerImpl<DurationPicker<nx::vms::rules::TimeField>>(field, context, parent);

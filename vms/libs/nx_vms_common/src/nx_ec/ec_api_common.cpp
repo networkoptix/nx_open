@@ -2,8 +2,8 @@
 
 #include "ec_api_common.h"
 
-#include <nx/utils/log/format.h>
 #include <nx/utils/log/assert.h>
+#include <nx/utils/log/format.h>
 
 namespace ec2 {
 
@@ -68,6 +68,13 @@ QString toString(NotificationSource source)
     QString error = NX_FMT("unexpected(%1)", static_cast<int>(source));
     NX_ASSERT(false, error);
     return error;
+}
+
+Result toResult(QSqlError&& error)
+{
+    if (error.type() == QSqlError::NoError)
+        return {};
+    return Result(ec2::ErrorCode::dbError, error.text());
 }
 
 } // namespace ec2
