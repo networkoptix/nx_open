@@ -297,11 +297,6 @@ ModalDialog
         separatorField.focus = false
     }
 
-    onRejected:
-    {
-        fixLookupListImportDialog.reject()
-    }
-
     ProgressDialog
     {
         id: importProgressBar
@@ -309,7 +304,7 @@ ModalDialog
         title: qsTr("Import List")
         visible: false
         onRejected: importProcessor.cancelRunningTask()
-        onDoneClicked: control.accept()
+        onAccepted: control.accept()
     }
 
     FixLookupListImportDialog
