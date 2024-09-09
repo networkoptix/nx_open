@@ -10,6 +10,9 @@ NxObject
     property bool interruptOnInactivity: true
     property bool playable: true
 
+    // Decides if unplayable video should be stopped or paused.
+    property bool forceStopWhenNotPlayable: false
+
     property MediaPlayer player: null
 
     function setInterruptedPosition(timestamp)
@@ -18,6 +21,17 @@ NxObject
     }
 
     onPlayerChanged: setInterruptedPosition(-1)
+
+    onForceStopWhenNotPlayableChanged:
+    {
+        if (forceStopWhenNotPlayable
+            && d.interrupted
+            && player.playbackState === MediaPlayer.Paused)
+        {
+            // Handle current interruption with non-forced-stop state.
+            player.stop()
+        }
+    }
 
     QtObject
     {
@@ -58,7 +72,7 @@ NxObject
         function tryInterrupt()
         {
             if (player && player.playbackState === MediaPlayer.Playing && !d.interrupted)
-                interrupt(/*forceStop*/ false)
+                interrupt(forceStopWhenNotPlayable)
         }
 
         function interrupt(forceStop)
