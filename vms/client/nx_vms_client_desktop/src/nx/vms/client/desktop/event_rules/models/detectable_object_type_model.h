@@ -14,8 +14,6 @@ namespace nx::analytics::taxonomy { class AbstractEngine; }
 
 namespace nx::vms::client::desktop {
 
-namespace analytics { class TaxonomyManager; }
-
 /**
  * An item model providing a tree of analytics detectable object types available in the system.
  */
@@ -26,7 +24,6 @@ class DetectableObjectTypeModel: public ScopedModelOperations<QAbstractItemModel
         sourceModel READ sourceModel CONSTANT)
 
     using base_type = ScopedModelOperations<QAbstractItemModel>;
-    using TaxonomyManager = nx::vms::client::core::analytics::TaxonomyManager;
 
 public:
     explicit DetectableObjectTypeModel(

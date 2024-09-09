@@ -242,7 +242,7 @@ struct NX_VMS_API ServerModelV4: ServerModelBase
 #define ServerModelV4_Fields \
     ServerModelBase_Fields \
     (network)(settings)(runtimeInformation)
-QN_FUSION_DECLARE_FUNCTIONS(ServerModelV4, (json), NX_VMS_API)
+NX_VMS_API_DECLARE_STRUCT_AND_LIST_EX(ServerModelV4, (json))
 NX_REFLECTION_INSTRUMENT(ServerModelV4, ServerModelV4_Fields);
 
 using ServerModel = ServerModelV4;

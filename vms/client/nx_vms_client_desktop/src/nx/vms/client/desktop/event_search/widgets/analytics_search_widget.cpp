@@ -52,6 +52,7 @@
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/common/widgets/item_model_menu.h>
 #include <nx/vms/client/desktop/common/widgets/selectable_text_button.h>
+#include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/desktop/event_rules/models/detectable_object_type_model.h>
 #include <nx/vms/client/desktop/event_search/models/analytics_search_list_model.h>
 #include <nx/vms/client/desktop/event_search/utils/common_object_search_setup.h>
@@ -64,8 +65,10 @@
 #include <nx/vms/client/desktop/utils/qml_property.h>
 #include <nx/vms/client/desktop/utils/widget_utils.h>
 #include <nx/vms/client/desktop/window_context.h>
+#include <nx/vms/common/system_context.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_navigator.h>
 #include <utils/common/event_processors.h>
 
 namespace nx::vms::client::desktop {
@@ -106,18 +109,20 @@ public:
     explicit Private(AnalyticsSearchWidget* q);
 
     void resetFilters();
-    void updateTaxonomyIfNeeded();
+    void updateAllowanceAndTaxonomy();
     std::vector<AbstractEngine*> engines() const;
 
     core::AnalyticsSearchSetup* analyticsSetup() const { return m_analyticsSetup.get(); }
 
 public:
-    const QPointer<TaxonomyManager> taxonomyManager;
+    QPointer<TaxonomyManager> taxonomyManager;
+    nx::utils::ScopedConnection m_currentTaxonomyChangedConnection;
 
 private:
     void setupEngineSelection();
     void setupTypeSelection();
     void updateTaxonomy();
+    void updateTaxonomyIfNeeded();
     void updateTypeButton();
 
     void setupAreaSelection();
@@ -176,8 +181,7 @@ AnalyticsSearchWidget::AnalyticsSearchWidget(WindowContext* context, QWidget* pa
                 resetFilters();
         });
 
-    updateAllowance();
-    d->updateTaxonomyIfNeeded();
+    d->updateAllowanceAndTaxonomy();
 
     HelpTopicAccessor::setHelpTopic(this, HelpTopic::Id::ObjectSearch);
 }
@@ -246,16 +250,16 @@ AnalyticsSearchWidget::Private::Private(AnalyticsSearchWidget* q):
     m_collator.setNumericMode(true);
     m_collator.setCaseSensitivity(Qt::CaseInsensitive);
 
+    installEventHandler(q, QEvent::Show, this, &Private::updateTaxonomyIfNeeded);
+
     if (NX_ASSERT(taxonomyManager))
     {
-        installEventHandler(q, QEvent::Show, this, &Private::updateTaxonomyIfNeeded);
-
-        connect(taxonomyManager, &TaxonomyManager::currentTaxonomyChanged, this,
-            [this]()
-            {
-                this->q->updateAllowance();
-                updateTaxonomyIfNeeded();
-            });
+        m_currentTaxonomyChangedConnection.reset(
+            connect(taxonomyManager, &TaxonomyManager::currentTaxonomyChanged, this,
+                [this]()
+                {
+                    updateAllowanceAndTaxonomy();
+                }));
     }
 
     setupEngineSelection();
@@ -291,6 +295,32 @@ AnalyticsSearchWidget::Private::Private(AnalyticsSearchWidget* q):
             {
                 ensureVisible(request.first, request.second);
             }
+        });
+
+    connect(q->windowContext()->navigator(), &QnWorkbenchNavigator::currentResourceChanged, this,
+        [this, q]()
+        {
+            const auto selectedCamera = q->windowContext()->navigator()->currentResource()
+                .dynamicCast<QnVirtualCameraResource>();
+            if (!selectedCamera)
+                return;
+
+            const auto commonContext = dynamic_cast<nx::vms::client::desktop::SystemContext*>(
+                selectedCamera->systemContext());
+
+            taxonomyManager = commonContext->taxonomyManager();
+            if (!taxonomyManager)
+                return;
+
+            m_currentTaxonomyChangedConnection.reset(
+                connect(taxonomyManager, &TaxonomyManager::currentTaxonomyChanged, this,
+                    [this]()
+                    {
+                        updateAllowanceAndTaxonomy();
+                    }));
+            m_filterModel->setTaxonomyManager(taxonomyManager);
+
+            updateAllowanceAndTaxonomy();
         });
 }
 
@@ -437,6 +467,12 @@ void AnalyticsSearchWidget::Private::updateTaxonomy()
         m_engineSelectionButton->deactivate();
 
     updateTypeButton();
+}
+
+void AnalyticsSearchWidget::Private::updateAllowanceAndTaxonomy()
+{
+    q->updateAllowance();
+    updateTaxonomyIfNeeded();
 }
 
 void AnalyticsSearchWidget::Private::setupAreaSelection()

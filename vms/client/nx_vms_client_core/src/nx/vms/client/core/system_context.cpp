@@ -95,6 +95,7 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
             d->userWatcher = std::make_unique<UserWatcher>(this);
             d->cameraBookmarksManager = std::make_unique<QnCameraBookmarksManager>(this);
             d->watermarkWatcher = std::make_unique<WatermarkWatcher>(this);
+            d->taxonomyManager = std::make_unique<analytics::TaxonomyManager>(this);
             break;
 
         case Mode::cloudLayouts:
