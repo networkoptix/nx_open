@@ -176,8 +176,8 @@ public:
 protected:
     void onActivated() override
     {
-        m_field->setEngineId(
-            m_comboBox->currentData(ui::AnalyticsSdkEventModel::EngineIdRole).value<nx::Uuid>());
+        m_engineId =
+            m_comboBox->currentData(ui::AnalyticsSdkEventModel::EngineIdRole).value<nx::Uuid>();
         m_field->setTypeId(
             m_comboBox->currentData(ui::AnalyticsSdkEventModel::EventTypeIdRole).value<QString>());
 
@@ -189,7 +189,7 @@ protected:
         DropdownIdPickerWidgetBase<vms::rules::AnalyticsEventTypeField, QnTreeComboBox>::updateUi();
 
         m_analyticsSdkEventModel->loadFromCameras(
-            getCameras(), m_field->engineId(), m_field->typeId());
+            getCameras(), m_engineId, m_field->typeId());
 
         m_comboBox->setEnabled(m_analyticsSdkEventModel->isValid());
 
@@ -207,23 +207,23 @@ protected:
 
 private:
     ui::AnalyticsSdkEventModel* m_analyticsSdkEventModel{nullptr};
+    nx::Uuid m_engineId;
 
     void onSelectedCamerasChanged()
     {
-        const auto engineId = m_field->engineId();
         const auto typeId = m_field->typeId();
-
         const auto cameras = getCameras();
-        m_analyticsSdkEventModel->loadFromCameras(cameras, engineId, typeId);
+
+        m_analyticsSdkEventModel->loadFromCameras(cameras, m_engineId, typeId);
 
         if (cameras.empty())
         {
             m_field->setTypeId({});
-            m_field->setEngineId({});
+            m_engineId = {};
             return;
         }
 
-        if (engineId.isNull() || typeId.isNull())
+        if (m_engineId.isNull() || typeId.isNull())
         {
             const auto analyticsModel = m_comboBox->model();
             const auto selectableItems = analyticsModel->match(
@@ -238,8 +238,8 @@ private:
                 const auto firstItem = selectableItems.first();
                 m_field->setTypeId(
                     firstItem.data(ui::AnalyticsSdkEventModel::EventTypeIdRole).toString());
-                m_field->setEngineId(
-                    firstItem.data(ui::AnalyticsSdkEventModel::EngineIdRole).value<nx::Uuid>());
+                m_engineId =
+                    firstItem.data(ui::AnalyticsSdkEventModel::EngineIdRole).value<nx::Uuid>();
             }
         }
     }

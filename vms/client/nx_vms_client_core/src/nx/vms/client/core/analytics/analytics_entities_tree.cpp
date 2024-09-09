@@ -48,27 +48,27 @@ NodePtr makeNode(NodeType nodeType, QWeakPointer<Node> parent, const QString& te
 template<typename EntityType>
 std::vector<ScopedEntity<EntityType>> resolveEntities(
     const std::shared_ptr<AbstractState>& state,
-    const AnalyticsEntitiesTreeBuilder::UnresolvedEntities& entities)
+    const AnalyticsEntitiesTreeBuilder::UnresolvedEntities& unresolvedIds)
 {
     std::vector<ScopedEntity<EntityType>> result;
-    for (const auto& entity: entities)
+    for (const auto& unresolved: unresolvedIds)
     {
-        EntityType* entityType = nullptr;
+        EntityType* entity = nullptr;
         if constexpr (std::is_same_v<AbstractEventType, EntityType>)
-            entityType = state->eventTypeById(entity.entityId);
+            entity = state->eventTypeById(unresolved.entityId);
 
         if constexpr (std::is_same_v<AbstractObjectType, EntityType>)
-            entityType = state->objectTypeById(entity.entityId);
+            entity = state->objectTypeById(unresolved.entityId);
 
-        if (!entityType)
+        if (!entity)
             continue;
 
-        for (const auto& scope: entityType->scopes())
+        for (const auto scope: entity->scopes())
         {
-            if (scope->engine() && scope->engine()->id() == entity.engineId.toString())
+            if (const auto engine = scope->engine(); engine &&
+                (unresolved.engineId.isNull() || engine->id() == unresolved.engineId.toString()))
             {
-                result.push_back(
-                    ScopedEntity<EntityType>(scope->engine(), scope->group(), entityType));
+                result.push_back(ScopedEntity<EntityType>(engine, scope->group(), entity));
             }
         }
     }
