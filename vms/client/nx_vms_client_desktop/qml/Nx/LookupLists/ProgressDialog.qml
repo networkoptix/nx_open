@@ -30,7 +30,6 @@ Dialog
 
     signal progressFinished
     signal progressStarted
-    signal doneClicked
 
     buttonBox: DialogButtonBox
     {
@@ -52,11 +51,7 @@ Dialog
                 visible: isVisibleDoneButton
                 text: qsTr("Done")
                 isAccentButton: true
-                onClicked:
-                {
-                    control.doneClicked()
-                    control.accept()
-                }
+                onClicked: control.accept()
             }
         }
     }
