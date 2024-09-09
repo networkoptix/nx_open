@@ -115,7 +115,8 @@ ServerInformationV1::ServerInformationV1(ServerInformationV4&& rhs):
     ServerInformationBase(std::move(rhs)),
     systemName(std::move(rhs.siteName)),
     cloudSystemId(std::move(rhs.cloudSiteId)),
-    localSystemId(std::move(rhs.localSiteId))
+    localSystemId(std::move(rhs.localSiteId)),
+    systemIdentityTimeMs(rhs.identityTimeMs)
 {}
 
 ServerInformationV1::ServerInformationV1(const ModuleInformationWithAddresses& rhs):
