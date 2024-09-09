@@ -164,7 +164,6 @@ struct NX_VMS_API ServerInformationBase: ModuleInformationBase
      */
     std::string certificatePem;
 
-    std::chrono::milliseconds systemIdentityTimeMs{0};
     TransactionLogTime transactionLogTime;
 
     bool collectedByThisServer = false;
@@ -202,7 +201,6 @@ struct NX_VMS_API ServerInformationBase: ModuleInformationBase
     (remoteAddresses) \
     (userProvidedCertificatePem) \
     (certificatePem) \
-    (systemIdentityTimeMs) \
     (transactionLogTime) \
     (collectedByThisServer)
 
@@ -214,6 +212,7 @@ struct NX_VMS_API ServerInformationV4: ServerInformationBase
     QString siteName;
     QString cloudSiteId;
     nx::Uuid localSiteId;
+    std::chrono::milliseconds identityTimeMs{0};
 
     ServerInformationV4() = default;
     ServerInformationV4(const ServerInformationV4& rhs) = default;
@@ -231,7 +230,8 @@ struct NX_VMS_API ServerInformationV4: ServerInformationBase
     ServerInformationBase_Fields \
     (siteName) \
     (cloudSiteId) \
-    (localSiteId)
+    (localSiteId) \
+    (identityTimeMs)
 
 NX_VMS_API_DECLARE_STRUCT_AND_LIST_EX(ServerInformationV4, (json))
 NX_REFLECTION_INSTRUMENT(ServerInformationV4, ServerInformationV4_Fields);
@@ -241,6 +241,7 @@ struct NX_VMS_API ServerInformationV1: ServerInformationBase
     QString systemName;
     QString cloudSystemId;
     nx::Uuid localSystemId;
+    std::chrono::milliseconds systemIdentityTimeMs{0};
 
     ServerInformationV1() = default;
     ServerInformationV1(const ServerInformationV1& rhs) = default;
@@ -260,7 +261,8 @@ struct NX_VMS_API ServerInformationV1: ServerInformationBase
     ServerInformationBase_Fields \
     (systemName) \
     (cloudSystemId) \
-    (localSystemId)
+    (localSystemId) \
+    (systemIdentityTimeMs)
 
 NX_VMS_API_DECLARE_STRUCT_AND_LIST_EX(ServerInformationV1, (json))
 NX_REFLECTION_INSTRUMENT(ServerInformationV1, ServerInformationV1_Fields);
