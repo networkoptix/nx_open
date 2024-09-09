@@ -120,38 +120,51 @@ void AnalyticsFilterModel::registerQmlType()
 }
 
 AnalyticsFilterModel::AnalyticsFilterModel(TaxonomyManager* taxonomyManager, QObject* parent):
-    QObject(parent),
-    m_taxonomyManager(taxonomyManager)
+    QObject(parent)
 {
-    if (taxonomyManager)
+    setTaxonomyManager(taxonomyManager);
+}
+
+void AnalyticsFilterModel::setTaxonomyManager(TaxonomyManager* taxonomyManager)
+{
+    if (m_taxonomyManager == taxonomyManager)
+        return;
+
+    m_taxonomyManager = taxonomyManager;
+
+    if (!taxonomyManager)
     {
-        auto onTaxonomyChanged =
-            [this]
-            {
-                if (m_isActive)
-                    rebuild();
-
-                const auto taxonomy = m_taxonomyManager->currentTaxonomy();
-
-                if (!taxonomy->resourceSupportProxy())
-                    return;
-
-                m_manifestsUpdatedConnection.reset(connect(
-                    taxonomy->resourceSupportProxy(),
-                    &nx::analytics::taxonomy::AbstractResourceSupportProxy::manifestsMaybeUpdated,
-                    this,
-                    [this]
-                    {
-                        if (m_isActive)
-                            rebuild();
-                    }));
-            };
-
-        connect(taxonomyManager, &TaxonomyManager::currentTaxonomyChanged,
-            this, onTaxonomyChanged);
-
-        onTaxonomyChanged();
+        m_currentTaxonomyChangedConnection.reset();
+        return;
     }
+
+    auto onTaxonomyChanged =
+        [this]
+        {
+            if (m_isActive)
+                rebuild();
+
+            const auto taxonomy = m_taxonomyManager->currentTaxonomy();
+
+            if (!taxonomy->resourceSupportProxy())
+                return;
+
+            m_manifestsUpdatedConnection.reset(connect(
+                taxonomy->resourceSupportProxy(),
+                &nx::analytics::taxonomy::AbstractResourceSupportProxy::manifestsMaybeUpdated,
+                this,
+                [this]
+                {
+                    if (m_isActive)
+                        rebuild();
+                }));
+        };
+
+    m_currentTaxonomyChangedConnection.reset(
+        connect(taxonomyManager, &TaxonomyManager::currentTaxonomyChanged,
+            this, onTaxonomyChanged));
+
+    onTaxonomyChanged();
 }
 
 std::vector<taxonomy::ObjectType*> AnalyticsFilterModel::objectTypes() const
@@ -197,6 +210,9 @@ void AnalyticsFilterModel::update(
     bool liveTypesExcluded,
     bool force)
 {
+    if (!m_taxonomyManager)
+        return;
+
     if (force
         || m_engine != engine
         || m_attributeValues != attributeValues

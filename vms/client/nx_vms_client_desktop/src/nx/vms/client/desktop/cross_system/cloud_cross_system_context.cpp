@@ -12,6 +12,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <licensing/license.h>
 #include <network/system_helpers.h>
+#include <nx/analytics/properties.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/api/data/camera_data_ex.h>
@@ -372,6 +373,7 @@ struct CloudCrossSystemContext::Private
         const nx::Uuid serverId = connection->moduleInformation().id;
         server = CrossSystemServerResourcePtr(new CrossSystemServerResource(systemContext.get()));
         server->setIdUnsafe(serverId);
+        server->setName(connection->moduleInformation().name);
 
         // If resource with such id was added to the cross-system layout, camera thumb will be
         // created before server is added to the resource pool.
@@ -405,6 +407,7 @@ struct CloudCrossSystemContext::Private
                         updateTokenUpdater();
                 }
                 addCamerasToResourcePool(dataLoader->cameras());
+                addServerTaxonomyDescriptions(dataLoader->serverTaxonomyDescriptions());
                 updateStatus(Status::connected);
             });
 
@@ -458,7 +461,7 @@ struct CloudCrossSystemContext::Private
 
                 if (response.error)
                 {
-                    NX_VERBOSE(this, "Issue access token error responce: %1", response.error);
+                    NX_VERBOSE(this, "Issue access token error response: %1", response.error);
                     return;
                 }
 
@@ -506,6 +509,27 @@ struct CloudCrossSystemContext::Private
         // We do not update servers periodically, so count them all as online.
         for (const auto& serverResource: newServers)
             serverResource->setStatus(nx::vms::api::ResourceStatus::online);
+    }
+
+    void addServerTaxonomyDescriptions(const nx::vms::api::ServerModelV4List& serversData)
+    {
+        if (!NX_ASSERT(systemContext))
+            return;
+
+        for (const auto& serverData: serversData)
+        {
+            const auto server = systemContext->resourcePool()->getResourceById(serverData.id);
+
+            const auto descriptorsIter =
+                serverData.parameters.find(nx::analytics::kDescriptorsProperty);
+            if (descriptorsIter == serverData.parameters.end())
+                continue;
+
+            QJsonDocument doc(descriptorsIter->second.toObject());
+            server->setProperty(
+                nx::analytics::kDescriptorsProperty,
+                doc.toJson(QJsonDocument::Compact));
+        }
     }
 
     void addCamerasToResourcePool(std::vector<nx::vms::api::CameraDataEx> cameras)

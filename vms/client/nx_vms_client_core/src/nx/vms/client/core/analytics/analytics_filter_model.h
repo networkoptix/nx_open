@@ -59,6 +59,8 @@ public:
 
     AnalyticsFilterModel(TaxonomyManager* taxonomyManager = nullptr, QObject* parent = nullptr);
 
+    void setTaxonomyManager(TaxonomyManager* taxonomyManager);
+
     /**
      * Returns filter object types structure corresponding to selected options.
      */
@@ -148,6 +150,7 @@ private:
 private:
     QPointer<TaxonomyManager> m_taxonomyManager;
     nx::utils::ScopedConnection m_manifestsUpdatedConnection;
+    nx::utils::ScopedConnection m_currentTaxonomyChangedConnection;
     std::unique_ptr<StateViewBuilder> m_stateViewBuilder;
     std::vector<nx::analytics::taxonomy::AbstractEngine*> m_engines;
     QMap<nx::Uuid, nx::analytics::taxonomy::AbstractEngine*> m_enginesById;

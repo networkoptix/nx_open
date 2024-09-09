@@ -9,6 +9,7 @@
 #include <QtCore/QTimer>
 
 #include <api/server_rest_connection.h>
+#include <nx/analytics/properties.h>
 #include <nx/reflect/json.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
@@ -36,6 +37,7 @@ struct CloudCrossSystemContextDataLoader::Private
     std::optional<rest::Handle> currentRequest;
     std::optional<UserModel> user;
     std::optional<ServerInformationV1List> servers;
+    std::optional<ServerModelV4List> serversTaxonomyDescriptors;
     std::optional<ServerFootageDataList> serverFootageData;
     std::optional<SystemSettings> systemSettings;
     std::optional<LicenseDataList> licenses;
@@ -113,6 +115,51 @@ struct CloudCrossSystemContextDataLoader::Private
         return connection->getServersInfo(
             /*onlyFreshInfo*/ false,
             std::move(callback),
+            q->thread());
+    }
+
+    rest::Handle requestServersTaxonomyDescriptors()
+    {
+        NX_VERBOSE(this, "Updating servers taxonomy descriptors data");
+        auto callback = nx::utils::guarded(q,
+            [this](
+                bool success,
+                ::rest::Handle requestId,
+                QByteArray data,
+                nx::network::http::HttpHeaders /*headers*/)
+            {
+                NX_ASSERT(currentRequest && *currentRequest == requestId);
+                currentRequest = std::nullopt;
+
+                if (!success)
+                {
+                     NX_WARNING(this, "Servers taxonomy descriptors request failed");
+                     return;
+                }
+
+                auto [result, deserializationResult] =
+                    reflect::json::deserialize<ServerModelV4List>(data.data());
+                if (!deserializationResult.success)
+                {
+                    NX_WARNING(
+                        this,
+                        "Servers taxonomy descriptors cannot be deserialized, error: %1",
+                        deserializationResult.errorDescription);
+                    return;
+                }
+
+                NX_VERBOSE(this, "Servers taxonomy descriptors received");
+
+                serversTaxonomyDescriptors = result;
+                requestData();
+            }
+        );
+
+        return connection->getRawResult(
+            QString("/rest/v4/servers?_with=id,parameters.%1")
+                .arg(nx::analytics::kDescriptorsProperty),
+            {},
+            callback,
             q->thread());
     }
 
@@ -299,6 +346,10 @@ struct CloudCrossSystemContextDataLoader::Private
         {
             currentRequest = requestServers();
         }
+        else if (!serversTaxonomyDescriptors)
+        {
+            currentRequest = requestServersTaxonomyDescriptors();
+        }
         else if (!serverFootageData)
         {
             currentRequest = requestServerFootageData();
@@ -362,6 +413,11 @@ UserModel CloudCrossSystemContextDataLoader::user() const
 ServerInformationV1List CloudCrossSystemContextDataLoader::servers() const
 {
     return d->servers.value_or(ServerInformationV1List());
+}
+
+ServerModelV4List CloudCrossSystemContextDataLoader::serverTaxonomyDescriptions() const
+{
+    return d->serversTaxonomyDescriptors.value_or(ServerModelV4List());
 }
 
 ServerFootageDataList CloudCrossSystemContextDataLoader::serverFootageData() const

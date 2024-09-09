@@ -18,7 +18,6 @@ namespace nx::vms::license { class VideoWallLicenseUsageHelper; }
 namespace nx::vms::client::core::analytics {
 class AnalyticsMetadataProviderFactory;
 class AttributeHelper;
-class TaxonomyManager;
 } // namespace nx::vms::client::core::analytics
 
 namespace nx::vms::client::core {

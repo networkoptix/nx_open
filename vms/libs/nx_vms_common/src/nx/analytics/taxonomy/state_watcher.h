@@ -3,8 +3,8 @@
 #pragma once
 
 #include <nx/analytics/taxonomy/abstract_state_watcher.h>
-#include <nx/vms/common/system_context_aware.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/vms/common/system_context_aware.h>
 
 namespace nx::analytics::taxonomy {
 
