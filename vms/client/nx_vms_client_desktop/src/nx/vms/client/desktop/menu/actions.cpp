@@ -702,7 +702,9 @@ void initialize(Manager* manager, Action* root)
         .flags(Main)
         .requiredPowerUserPermissions()
         .text(ContextMenu::tr("Lists Management..."))
-        .condition(condition::isTrue(ini().lookupLists));
+        .condition(
+            condition::isTrue(ini().lookupLists)
+            && condition::homeTabIsNotActive());
 
     factory(LogsManagementAction)
         .flags(NoTarget)
