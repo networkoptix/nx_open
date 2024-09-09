@@ -8,6 +8,7 @@
 #include <QtCore/QBitArray>
 #include <QtCore/QDate>
 #include <QtCore/QLocale>
+#include <QtCore/QTimeZone>
 
 #include <recording/time_period_list.h>
 
@@ -18,9 +19,13 @@ constexpr int kMinYear = 1970;
 constexpr int kMinMonth = 1;
 constexpr int kMaxMonth = 12;
 
-// According to the Qt documentation time zones offset range is in [-14..14] hours range.
-constexpr int kMaxDisplayOffset = std::chrono::milliseconds(std::chrono::hours(14)).count();
-constexpr int kMinDisplayOffset = -kMaxDisplayOffset;
+// As we directly manipulate with display offsets we have increased values and range despite the
+// standard QTimeZone values.
+const int kOffsetRange = std::abs(QTimeZone::MinUtcOffsetSecs)
+    + QTimeZone::MaxUtcOffsetSecs;
+const int kMaxDisplayOffset = std::chrono::milliseconds(
+    std::chrono::seconds(kOffsetRange)).count();
+const int kMinDisplayOffset = -kMaxDisplayOffset;
 
 NX_VMS_CLIENT_CORE_API QDate firstWeekStartDate(const QLocale& locale, int year, int month);
 
