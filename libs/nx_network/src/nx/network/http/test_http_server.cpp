@@ -153,6 +153,7 @@ void TestHttpServer::bindToAioThread(aio::AbstractAioThread* aioThread)
 void TestHttpServer::terminateListener()
 {
     m_httpServer->pleaseStopSync();
+    m_httpMessageDispatcher.waitUntilAllRequestsCompleted();
     m_httpServer.reset();
 }
 
