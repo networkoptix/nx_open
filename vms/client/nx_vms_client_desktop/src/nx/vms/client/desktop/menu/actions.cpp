@@ -258,7 +258,7 @@ void initialize(Manager* manager, Action* root)
                 | LayoutItemTarget | WidgetTarget)
             .mode(DesktopMode)
             .requiredPowerUserPermissions()
-            .text("VMS Rules...")
+            .text(ContextMenu::tr("Event Rules..."))
             .shortcut(isOldEngineEnabled ? "Ctrl+Alt+E" : "Ctrl+E")
             .condition(!condition::showreelIsRunning()
                 && condition::hasNewEventRulesEngine());
