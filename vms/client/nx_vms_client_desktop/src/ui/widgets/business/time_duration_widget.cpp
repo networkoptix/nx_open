@@ -28,6 +28,8 @@ TimeDurationWidget::TimeDurationWidget(QWidget *parent):
     ui->valueSpinBox->setMinimum(m_min);
     ui->valueSpinBox->setMaximum(m_max);
 
+    ui->additionalText->setVisible(false);
+
     connect(ui->periodComboBox, QnComboboxCurrentIndexChanged, this,
         [this]
         {
@@ -118,6 +120,12 @@ void TimeDurationWidget::addDurationSuffix(QnTimeStrings::Suffix suffix)
     ui->periodComboBox->setVisible(true);
 }
 
+void TimeDurationWidget::setAdditionalText(const QString& additionalText)
+{
+    ui->additionalText->setText(additionalText);
+    ui->additionalText->setVisible(!additionalText.isEmpty());
+}
+
 void TimeDurationWidget::setValue(int secs)
 {
     secs = std::clamp(secs, m_min, m_max);
@@ -144,6 +152,11 @@ int TimeDurationWidget::value() const
 QWidget* TimeDurationWidget::lastTabItem() const
 {
     return ui->periodComboBox;
+}
+
+QSpinBox* TimeDurationWidget::valueSpinBox() const
+{
+    return ui->valueSpinBox;
 }
 
 void TimeDurationWidget::updateMinimumValue()

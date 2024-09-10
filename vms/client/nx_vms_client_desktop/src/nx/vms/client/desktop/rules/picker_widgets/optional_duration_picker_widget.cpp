@@ -3,10 +3,13 @@
 #include "optional_duration_picker_widget.h"
 
 #include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QSpinBox>
 
 #include <nx/vms/rules/utils/field.h>
 #include <ui/common/read_only.h>
 #include <ui/widgets/common/elided_label.h>
+
+#include "common.h"
 
 namespace nx::vms::client::desktop::rules {
 
@@ -28,9 +31,7 @@ OptionalDurationPicker::OptionalDurationPicker(
     auto timeWidgetLayout = new QHBoxLayout;
 
     m_timeDurationWidget = new TimeDurationWidget;
-    // To prevent widget resizing upon time unit change, set the fixed width big enough for any
-    // possible value.
-    m_timeDurationWidget->setFixedWidth(160);
+    m_timeDurationWidget->valueSpinBox()->setFixedWidth(kDurationValueSpinBoxWidth);
     timeWidgetLayout->addWidget(m_timeDurationWidget);
 
     timeWidgetLayout->addStretch();

@@ -29,12 +29,12 @@ public:
     FlagsPicker(F* field, SystemContext* context, ParamsWidget* parent):
         base(field, context, parent)
     {
-        auto flagsLayout = new QHBoxLayout;
+        auto flagsLayout = new QHBoxLayout{m_contentWidget};
         flagsLayout->setSpacing(style::Metrics::kDefaultLayoutSpacing.width());
         for (const auto& [flag, displayString]: getFlags())
         {
             auto checkBox = new QCheckBox;
-            checkBox->setText(displayString.toUpper());
+            checkBox->setText(displayString);
             flagsLayout->addWidget(checkBox);
 
             m_checkBoxes.insert({checkBox, flag});
@@ -46,7 +46,8 @@ public:
                 &FlagsPicker::onValueChanged);
         }
 
-        m_contentWidget->setLayout(flagsLayout);
+        flagsLayout->addSpacerItem(
+            new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum));
     }
 
 private:
@@ -75,10 +76,8 @@ private:
         const auto fieldValue = m_field->value();
         for (const auto& [checkBox, flag]: m_checkBoxes)
         {
-            {
-                QSignalBlocker blocker{checkBox};
-                checkBox->setChecked(fieldValue.testFlag(flag));
-            }
+            QSignalBlocker blocker{checkBox};
+            checkBox->setChecked(fieldValue.testFlag(flag));
         }
     }
 
