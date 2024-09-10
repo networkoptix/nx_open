@@ -19,8 +19,6 @@ std::string defaultStreamFilePath(const std::string& pluginHomeDir);
 
 std::string makeObjectTypeFilterSettingName(const std::string& objectTypeId);
 
-std::string readFileToString(const std::string& filePath);
-
 std::string makeSettingsModel(
     const std::string& manifestFilePath,
     const std::string& streamFilePath,

@@ -2,6 +2,8 @@
 
 #include "stream_parser.h"
 
+#include <fstream>
+
 #include "constants.h"
 #include "utils.h"
 #include "../utils.h"
@@ -21,6 +23,19 @@ namespace vms_server_plugins {
 namespace analytics {
 namespace stub {
 namespace object_streamer {
+
+std::string readFileToString(const std::string& filePath)
+{
+    std::ifstream t(filePath);
+
+    if (!t)
+    {
+        NX_PRINT << "Failed to open file: " << filePath << std::endl;
+        return {};
+    }
+
+    return std::string(std::istreambuf_iterator<char>(t), std::istreambuf_iterator<char>());
+}
 
 /** Can be called as `return addError(...);`. */
 [[maybe_unused]] static bool addError(
