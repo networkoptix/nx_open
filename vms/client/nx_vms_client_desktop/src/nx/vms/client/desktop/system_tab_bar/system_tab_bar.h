@@ -50,7 +50,7 @@ private slots:
 
 private:
     void insertClosableTab(int index, const core::SystemDescriptionPtr& systemDescription);
-    void disconnectFromSystem(const nx::Uuid& localId);
+    void closeSystem(const nx::Uuid& localId);
     void switchSystem(bool forward);
 
 private:

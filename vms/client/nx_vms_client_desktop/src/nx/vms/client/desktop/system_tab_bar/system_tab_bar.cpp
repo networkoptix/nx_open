@@ -215,7 +215,7 @@ void SystemTabBar::contextMenuEvent(QContextMenuEvent* event)
                 return;
 
             if (const auto systemData = m_store->systemData(index))
-                disconnectFromSystem(systemData->systemDescription->localId());
+                closeSystem(systemData->systemDescription->localId());
         });
 
     menu.addAction(tr("Open in New Window"),
@@ -241,7 +241,7 @@ void SystemTabBar::contextMenuEvent(QContextMenuEvent* event)
     QnHiDpiWorkarounds::showMenu(&menu, QCursor::pos());
 }
 
-void SystemTabBar::disconnectFromSystem(const nx::Uuid& localId)
+void SystemTabBar::closeSystem(const nx::Uuid& localId)
 {
     if (!windowContext()->connectActionsHandler()->askDisconnectConfirmation())
         return;
@@ -261,7 +261,7 @@ void SystemTabBar::disconnectFromSystem(const nx::Uuid& localId)
                 : (state.activeSystemTab + 1);
 
             const auto systemData = state.systems[systemIndex];
-            m_stateHandler->connectToSystem(systemData.systemDescription, systemData.logonData);
+            m_stateHandler->connectToSystem(systemData);
         }
     }
 
@@ -290,7 +290,7 @@ void SystemTabBar::insertClosableTab(int index,
     connect(closeButton, &CloseTabButton::clicked,
         [this, localId = systemDescription->localId()]()
         {
-            disconnectFromSystem(localId);
+            closeSystem(localId);
         });
 
    // closeButton is owned by the tab, so we can use it as a receiver here.
@@ -387,7 +387,7 @@ void SystemTabBar::at_currentChanged(int index)
         if (systemData->systemDescription->localId() == m_store->currentSystemId())
             action(menu::ResourcesModeAction)->setChecked(true);
         else
-            m_stateHandler->connectToSystem(systemData->systemDescription, systemData->logonData);
+            m_stateHandler->connectToSystem(systemData.value());
     }
 }
 
