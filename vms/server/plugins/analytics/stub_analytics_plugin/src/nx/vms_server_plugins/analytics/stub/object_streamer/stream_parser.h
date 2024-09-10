@@ -17,6 +17,8 @@ namespace analytics {
 namespace stub {
 namespace object_streamer {
 
+std::string readFileToString(const std::string& filePath);
+
 struct Object
 {
     enum class EntryType
