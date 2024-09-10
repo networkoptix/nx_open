@@ -110,6 +110,12 @@ void SystemTabBarStateHandler::connectToSystem(
         this);
 }
 
+void SystemTabBarStateHandler::connectToSystem(
+    const MainWindowTitleBarState::SystemData& systemData)
+{
+    connectToSystem(systemData.systemDescription, systemData.logonData);
+}
+
 LogonData SystemTabBarStateHandler::adjustedLogonData(
     const LogonData& source, const Uuid& localId) const
 {

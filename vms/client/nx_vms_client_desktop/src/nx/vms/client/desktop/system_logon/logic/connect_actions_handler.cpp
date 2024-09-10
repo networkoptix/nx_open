@@ -1296,6 +1296,21 @@ void ConnectActionsHandler::at_disconnectAction_triggered()
     NX_DEBUG(this, "Disconnecting from the server");
     auto systemId = system()->localSystemId();
     const bool wasLoggedIn = !system()->user().isNull();
+    if (wasLoggedIn && ini().enableMultiSystemTabBar)
+    {
+        // Connect to the next system instead of disconnection.
+        const auto stateStore = mainWindow()->titleBarStateStore();
+        if (stateStore->systemCount() > 1)
+        {
+            int systemIndex = stateStore->activeSystemTab();
+            stateStore->removeSystem(systemIndex);
+            if (systemIndex >= stateStore->systemCount())
+                --systemIndex;
+            if (const auto systemData = stateStore->systemData(systemIndex))
+                mainWindow()->systemTabBarStateHandler()->connectToSystem(systemData.value());
+            return;
+        }
+    }
     if (!disconnectFromServer(flags))
         return;
 

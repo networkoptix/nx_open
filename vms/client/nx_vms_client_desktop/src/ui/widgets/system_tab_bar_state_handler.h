@@ -18,6 +18,7 @@ public:
     SystemTabBarStateHandler(QObject* parent);
     void setStateStore(QSharedPointer<Store> store);
     void connectToSystem(const core::SystemDescriptionPtr& system, const LogonData& logonData);
+    void connectToSystem(const MainWindowTitleBarState::SystemData& systemData);
     LogonData adjustedLogonData(const LogonData& source, const nx::Uuid& localId) const;
 
 signals:

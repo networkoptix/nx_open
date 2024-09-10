@@ -73,8 +73,7 @@ HomeTabButton::HomeTabButton(QWidget* parent): base_type(parent)
                 }
                 else
                 {
-                    m_stateHandler->connectToSystem(
-                        systemData.systemDescription, systemData.logonData);
+                    m_stateHandler->connectToSystem(systemData);
                 }
             }
         });
