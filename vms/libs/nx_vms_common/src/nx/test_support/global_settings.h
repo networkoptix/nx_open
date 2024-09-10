@@ -5,4 +5,4 @@
 #include <chrono>
 
 /* Maximum working time for UT */
-static const std::chrono::seconds kGlobalTestTimeout(150);
+static const std::chrono::seconds kGlobalTestTimeout(60);
