@@ -33,12 +33,6 @@ std::string makeObjectTypeFilterSettingName(const std::string& objectTypeId)
     return kObjectTypeFilterPrefix + objectTypeId;
 }
 
-std::string readFileToString(const std::string& filePath)
-{
-    std::ifstream t(filePath);
-    return std::string(std::istreambuf_iterator<char>(t), std::istreambuf_iterator<char>());
-}
-
 std::string makeSettingsModel(
     const std::string& manifestFilePath,
     const std::string& streamFilePath,
