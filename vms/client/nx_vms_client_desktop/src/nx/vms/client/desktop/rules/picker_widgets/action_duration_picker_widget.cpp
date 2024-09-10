@@ -2,6 +2,7 @@
 
 #include "action_duration_picker_widget.h"
 
+#include <QtWidgets/QSpinBox>
 #include <QtWidgets/QVBoxLayout>
 
 #include <nx/vms/client/desktop/style/helper.h>
@@ -10,6 +11,8 @@
 #include <nx/vms/rules/utils/field.h>
 #include <ui/common/read_only.h>
 #include <ui/widgets/common/elided_label.h>
+
+#include "common.h"
 
 namespace nx::vms::client::desktop::rules {
 
@@ -58,8 +61,6 @@ ActionDurationPickerWidget::ActionDurationPickerWidget(
 
     {
         m_contentWidget = new QWidget;
-        auto contentLayout = new QHBoxLayout{m_contentWidget};
-        contentLayout->setSpacing(style::Metrics::kDefaultLayoutSpacing.width());
 
         const auto eventDescriptor = parentParamsWidget()->eventDescriptor();
 
@@ -73,17 +74,18 @@ ActionDurationPickerWidget::ActionDurationPickerWidget(
 
         if (hasStateField)
         {
+            auto contentLayout = new QVBoxLayout{m_contentWidget};
+            contentLayout->setSpacing(style::Metrics::kDefaultLayoutSpacing.width());
+
+            auto durationTypeLayout = new QHBoxLayout;
+            durationTypeLayout->setSpacing(style::Metrics::kDefaultLayoutSpacing.width());
+
             auto actionStartLabel = new QnElidedLabel;
             actionStartLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
             actionStartLabel->setElideMode(Qt::ElideRight);
             actionStartLabel->setText(vms::rules::Strings::beginWhen().value());
 
-            contentLayout->addWidget(actionStartLabel);
-
-            auto widget = new QWidget; //< Required for proper alignment.
-            widget->setSizePolicy(QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred));
-            auto layout = new QHBoxLayout{widget};
-            layout->setSpacing(style::Metrics::kDefaultLayoutSpacing.width());
+            durationTypeLayout->addWidget(actionStartLabel);
 
             m_actionStartComboBox = new StateComboBox;
             m_actionStartComboBox->setStateStringProvider(
@@ -103,7 +105,15 @@ ActionDurationPickerWidget::ActionDurationPickerWidget(
                     }
                 });
 
-            layout->addWidget(m_actionStartComboBox);
+            durationTypeLayout->addWidget(m_actionStartComboBox);
+
+            durationTypeLayout->setStretch(0, 1);
+            durationTypeLayout->setStretch(1, 5);
+
+            contentLayout->addLayout(durationTypeLayout);
+
+            auto durationLayout = new QHBoxLayout;
+            durationLayout->setSpacing(style::Metrics::kDefaultLayoutSpacing.width());
 
             auto durationLabel = new QnElidedLabel;
             durationLabel->setSizePolicy(
@@ -112,15 +122,21 @@ ActionDurationPickerWidget::ActionDurationPickerWidget(
             durationLabel->setElideMode(Qt::ElideRight);
             durationLabel->setText(tr("Duration"));
 
-            layout->addWidget(durationLabel);
+            durationLayout->addWidget(durationLabel);
 
             m_timeDurationWidget = new TimeDurationWidget;
-            layout->addWidget(m_timeDurationWidget);
+            durationLayout->addWidget(m_timeDurationWidget);
 
-            contentLayout->addWidget(widget);
+            durationLayout->setStretch(0, 1);
+            durationLayout->setStretch(1, 5);
+
+            contentLayout->addLayout(durationLayout);
         }
         else
         {
+            auto contentLayout = new QHBoxLayout{m_contentWidget};
+            contentLayout->setSpacing(style::Metrics::kDefaultLayoutSpacing.width());
+
             auto actionStartLabel = new QnElidedLabel;
             actionStartLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
             actionStartLabel->setElideMode(Qt::ElideRight);
@@ -130,10 +146,10 @@ ActionDurationPickerWidget::ActionDurationPickerWidget(
 
             m_timeDurationWidget = new TimeDurationWidget;
             contentLayout->addWidget(m_timeDurationWidget);
-        }
 
-        contentLayout->setStretch(0, 1);
-        contentLayout->setStretch(1, 5);
+            contentLayout->setStretch(0, 1);
+            contentLayout->setStretch(1, 5);
+        }
 
         mainLayout->addWidget(m_contentWidget);
     }
@@ -156,6 +172,13 @@ ActionDurationPickerWidget::ActionDurationPickerWidget(
     m_timeDurationWidget->addDurationSuffix(QnTimeStrings::Suffix::Minutes);
     m_timeDurationWidget->addDurationSuffix(QnTimeStrings::Suffix::Hours);
     m_timeDurationWidget->addDurationSuffix(QnTimeStrings::Suffix::Days);
+
+    const auto fieldProperties = field->properties();
+    m_timeDurationWidget->setMaximum(fieldProperties.maximumValue.count());
+    m_timeDurationWidget->setMinimum(fieldProperties.minimumValue.count());
+
+    m_timeDurationWidget->valueSpinBox()->setFixedWidth(kDurationValueSpinBoxWidth);
+
     connect(
         m_timeDurationWidget,
         &TimeDurationWidget::valueChanged,

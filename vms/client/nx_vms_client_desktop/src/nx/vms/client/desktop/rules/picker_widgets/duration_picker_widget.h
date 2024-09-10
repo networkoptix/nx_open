@@ -4,6 +4,7 @@
 
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QSpinBox>
 
 #include <nx/vms/rules/action_builder_fields/optional_time_field.h>
 #include <nx/vms/rules/action_builder_fields/time_field.h>
@@ -13,6 +14,7 @@
 #include <ui/common/read_only.h>
 #include <ui/widgets/business/time_duration_widget.h>
 
+#include "common.h"
 #include "field_picker_widget.h"
 #include "picker_widget_utils.h"
 
@@ -28,11 +30,9 @@ public:
     DurationPicker(F* field, SystemContext* context, ParamsWidget* parent):
         base(field, context, parent)
     {
-        auto contentLayout = new QHBoxLayout;
+        auto contentLayout = new QHBoxLayout{m_contentWidget};
 
         m_timeDurationWidget = new TimeDurationWidget;
-        m_timeDurationWidget->setSizePolicy(
-            QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred));
         m_timeDurationWidget->addDurationSuffix(QnTimeStrings::Suffix::Minutes);
         m_timeDurationWidget->addDurationSuffix(QnTimeStrings::Suffix::Hours);
         m_timeDurationWidget->addDurationSuffix(QnTimeStrings::Suffix::Days);
@@ -41,12 +41,9 @@ public:
         m_timeDurationWidget->setMaximum(fieldProperties.maximumValue.count());
         m_timeDurationWidget->setMinimum(fieldProperties.minimumValue.count());
 
+        m_timeDurationWidget->valueSpinBox()->setFixedWidth(kDurationValueSpinBoxWidth);
+
         contentLayout->addWidget(m_timeDurationWidget);
-
-        m_additionalText = new QLabel;
-        contentLayout->addWidget(m_additionalText);
-
-        m_contentWidget->setLayout(contentLayout);
 
         connect(
             m_timeDurationWidget,
@@ -59,7 +56,6 @@ protected:
     BASE_COMMON_USINGS
 
     TimeDurationWidget* m_timeDurationWidget{nullptr};
-    QLabel* m_additionalText{nullptr};
 
     virtual void updateUi() override
     {
@@ -86,7 +82,7 @@ protected:
                         /*comment*/ "Part of the text, action duration: "
                         "Begin <time> Before Event Starts"));
 
-                m_additionalText->setText(TimeDurationWidget::tr(
+                m_timeDurationWidget->setAdditionalText(TimeDurationWidget::tr(
                     "Before Event Starts",
                     /*comment*/ "Part of the text, action duration: "
                     "Begin <time> Before Event Starts"));
@@ -99,7 +95,7 @@ protected:
                     /*comment*/ "Part of the text, action duration: "
                     "End <time> After Event Stops"));
 
-                m_additionalText->setText(TimeDurationWidget::tr(
+                m_timeDurationWidget->setAdditionalText(TimeDurationWidget::tr(
                     "After Event Stops",
                     /*comment*/ "Part of the text, action duration: "
                     "End <time> After Event Stops"));
@@ -108,8 +104,6 @@ protected:
                 this->setVisible(!isFixedDuration);
             }
         }
-
-        m_additionalText->setVisible(!m_additionalText->text().isEmpty());
 
         QSignalBlocker blocker{m_timeDurationWidget};
         m_timeDurationWidget->setValue(

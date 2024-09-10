@@ -12,7 +12,6 @@
 #include <nx/vms/event/strings_helper.h>
 
 #include "../group.h"
-#include "../strings.h"
 #include "../utils/event_details.h"
 #include "../utils/field.h"
 #include "../utils/type.h"
@@ -94,7 +93,7 @@ const ItemDescriptor& SaasIssueEvent::manifest()
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<SaasIssueEvent>(),
         .groupId = kServerIssueEventGroup,
-        .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Services issue")),
+        .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Services Issue")),
         .flags = {ItemFlag::instant, ItemFlag::saasLicense},
         .resources = {
             {utils::kDeviceIdsFieldName, {ResourceType::device, Qn::ViewContentPermission}},

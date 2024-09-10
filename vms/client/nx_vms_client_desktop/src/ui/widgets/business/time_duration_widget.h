@@ -8,6 +8,8 @@
 
 #include <nx/vms/text/time_strings.h>
 
+class QSpinBox;
+
 namespace Ui { class TimeDurationWidget; }
 
 namespace nx::vms::client::desktop {
@@ -26,13 +28,16 @@ public:
     // This should be called before setValue
     void addDurationSuffix(QnTimeStrings::Suffix suffix);
 
+    void setAdditionalText(const QString& additionalText);
+
     void setValue(int secs);
     int value() const;
 
     void setMaximum(int secs);
     void setMinimum(int secs);
 
-    QWidget *lastTabItem() const;
+    QWidget* lastTabItem() const;
+    QSpinBox* valueSpinBox() const;
 
 signals:
     void valueChanged();
