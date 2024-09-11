@@ -292,7 +292,6 @@ TEST_F(BuiltinTypesTest, BuiltinEvents)
     testEventFieldRegistration<ExpectedUuidField>();
     testEventFieldRegistration<InputPortField>();
     testEventFieldRegistration<IntField>();
-    testEventFieldRegistration<KeywordsField>();
     testEventFieldRegistration<ObjectLookupField>(systemContext());
     testEventFieldRegistration<SourceCameraField>();
     testEventFieldRegistration<SourceServerField>();

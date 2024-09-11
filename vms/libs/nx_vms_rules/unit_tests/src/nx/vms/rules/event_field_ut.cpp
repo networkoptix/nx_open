@@ -301,43 +301,4 @@ TEST(EventFieldTest, SimpleTypes)
     testSimpleTypeField<EventTextField>({ "", "Hello", "\\/!@#$%^&*()_+" }, true);
 }
 
-TEST(EventFieldTest, KeywordsField)
-{
-    static const struct {
-        QString input;
-        QString keywords;
-        bool match = false;
-    } testData[] = {
-        // Empty keywords match any input.
-        {"", "", true},
-        {"baz", "", true},
-        // Empty input do not match valid keywords.
-        {"", "baz", false},
-        // Valid keywords match input.
-        {"baz", "baz", true},
-        {"fizz baz bar", "baz", true},
-        // Any keyword match is enough.
-        {"fizz baz bar", "baz fizz", true},
-        {"fizz bar", "baz fizz", true},
-        {"fizz", "baz", false},
-        // Keywords are trimmed and unquoted before match, quoted keywords may contain space.
-        {"fizz", "baz   \"fizz\"", true},
-        {"fizz baz bar", "\"baz bar\"", true},
-        {"fizz baz  bar", "\"baz bar\"", false},
-        {"fizz bar baz", "\"baz bar\"", false},
-        // Keywords are first trimmed and then unqouted, not vice versa.
-        {"fizz", "baz \" fizz\"", false},
-        {"fizz", "baz \"fizz \"", false},
-    };
-
-    for(const auto& data: testData)
-    {
-        KeywordsField field{&kDummyDescriptor};
-        field.setString(data.keywords);
-
-        SCOPED_TRACE(nx::format("Input: %1, keywords: %2", data.input, data.keywords).toStdString());
-        EXPECT_EQ(field.match(data.input), data.match);
-    }
-}
-
 } // namespace nx::vms::rules::test

@@ -114,7 +114,6 @@ void Initializer::registerFields() const
     registerEventField<ExpectedUuidField>();
     registerEventField<InputPortField>();
     registerEventField<IntField>();
-    registerEventField<KeywordsField>();
     m_engine->registerEventField(
         fieldMetatype<ObjectLookupField>(),
         [this](const FieldDescriptor* descriptor)

@@ -27,15 +27,11 @@ public:
     MultilineTextPickerWidget(F* field, SystemContext* context, ParamsWidget* parent):
         base(field, context, parent)
     {
-        auto contentLayout = new QHBoxLayout;
+        auto contentLayout = new QHBoxLayout{m_contentWidget};
 
         m_textEdit = new QTextEdit;
         m_textEdit->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
         contentLayout->addWidget(m_textEdit);
-
-        m_contentWidget->setLayout(contentLayout);
-
-        m_textEdit->setPlaceholderText(field->descriptor()->description);
 
         connect(
             m_textEdit,

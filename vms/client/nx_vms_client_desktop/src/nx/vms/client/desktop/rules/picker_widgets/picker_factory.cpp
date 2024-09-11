@@ -20,7 +20,6 @@
 #include "http_auth_picker_widget.h"
 #include "http_parameters_picker_widget.h"
 #include "input_port_picker_widget.h"
-#include "keywords_picker_widget.h"
 #include "number_picker_widget.h"
 #include "object_lookup_picker_widget.h"
 #include "oneline_text_picker_widget.h"
@@ -231,9 +230,6 @@ PickerWidget* PickerFactory::createWidget(
 
     if (fieldId == fieldMetatype<nx::vms::rules::IntField>())
         return createPickerImpl<NumberPicker<vms::rules::IntField>>(field, context, parent);
-
-    if (fieldId == fieldMetatype<nx::vms::rules::KeywordsField>())
-        return createPickerImpl<KeywordsPicker>(field, context, parent);
 
     if (fieldId == fieldMetatype<nx::vms::rules::ObjectLookupField>())
         return createPickerImpl<ObjectLookupPicker>(field, context, parent);
