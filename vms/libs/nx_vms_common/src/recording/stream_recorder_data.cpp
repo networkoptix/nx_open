@@ -37,7 +37,7 @@ QString Error::toString() const
         case Code::transcodingRequired:
             return tr("Video transcoding required.");
         case Code::fileWrite:
-            return tr("File write error. Not enough free space.");
+            return tr("File write error.");
         case Code::invalidResourceType:
             return tr("Invalid resource type for data export.");
         case Code::dataNotFound:
