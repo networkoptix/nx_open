@@ -529,7 +529,7 @@ TEST_F(EngineTest, cacheTimeout)
 
     // Same cache events are matched after timeout.
     std::this_thread::sleep_for(5ms);
-    engine->eventCache()->cleanupOldEventsFromCache(1ms, 1ms);
+    engine->eventCache()->cleanupOldEventsFromCache(1ms);
     EXPECT_EQ(engine->processEvent(event), 1);
     EXPECT_EQ(engine->processEvent(event), 0);
 }
