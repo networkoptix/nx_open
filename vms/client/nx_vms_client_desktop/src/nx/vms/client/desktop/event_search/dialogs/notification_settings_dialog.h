@@ -7,16 +7,21 @@
 namespace nx::vms::client::desktop {
 
 class PopupSettingsWidget;
+class SiteNotificationSettingsManager;
 
 class NotificationSettingsDialog: public QnSessionAwareButtonBoxDialog
 {
     Q_OBJECT
+    using base_type = QnSessionAwareButtonBoxDialog;
 
 public:
-    explicit NotificationSettingsDialog(QWidget* parent);
+    NotificationSettingsDialog(
+        SiteNotificationSettingsManager* siteNotificationSettingsManager, QWidget* parent);
 
     void accept() override;
-    void reject() override;
+
+protected:
+    void showEvent(QShowEvent* event) override;
 
 private:
     PopupSettingsWidget* m_settingsWidget;

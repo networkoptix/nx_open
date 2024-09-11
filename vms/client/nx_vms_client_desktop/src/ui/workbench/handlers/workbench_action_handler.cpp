@@ -251,9 +251,6 @@ ActionHandler::ActionHandler(QObject *parent) :
     connect(action(menu::PreferencesGeneralTabAction), &QAction::triggered, this,
         [this] { openLocalSettingsDialog(QnLocalSettingsDialog::GeneralPage); },
         Qt::QueuedConnection);
-    connect(action(menu::PreferencesNotificationTabAction), &QAction::triggered, this,
-        [this] { openLocalSettingsDialog(QnLocalSettingsDialog::NotificationsPage); },
-        Qt::QueuedConnection);
 
     // System administration.
     connect(action(menu::SystemAdministrationAction), &QAction::triggered,

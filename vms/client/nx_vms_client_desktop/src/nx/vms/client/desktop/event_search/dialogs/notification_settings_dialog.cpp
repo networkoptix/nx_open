@@ -8,9 +8,12 @@
 
 namespace nx::vms::client::desktop {
 
-NotificationSettingsDialog::NotificationSettingsDialog(QWidget* parent):
-    QnSessionAwareButtonBoxDialog{parent},
-    m_settingsWidget{new PopupSettingsWidget{this}}
+NotificationSettingsDialog::NotificationSettingsDialog(
+    SiteNotificationSettingsManager* siteNotificationSettingsManager,
+    QWidget* parent)
+    :
+    base_type{parent},
+    m_settingsWidget{new PopupSettingsWidget{siteNotificationSettingsManager, this}}
 {
     resize(400, 600);
     setMinimumSize(QSize(400, 600));
@@ -23,7 +26,6 @@ NotificationSettingsDialog::NotificationSettingsDialog(QWidget* parent):
     layout->setSpacing(0);
     layout->setContentsMargins(style::Metrics::kDefaultChildMargins);
 
-    m_settingsWidget->loadDataToUi();
     layout->addWidget(m_settingsWidget);
 
     auto buttonBoxLine = new QFrame;
@@ -43,14 +45,14 @@ void NotificationSettingsDialog::accept()
 {
     m_settingsWidget->applyChanges();
 
-    QnSessionAwareButtonBoxDialog::accept();
+    base_type::accept();
 }
 
-void NotificationSettingsDialog::reject()
+void NotificationSettingsDialog::showEvent(QShowEvent* event)
 {
     m_settingsWidget->loadDataToUi();
 
-    QnSessionAwareButtonBoxDialog::reject();
+    base_type::showEvent(event);
 }
 
 } // namespace nx::vms::client::desktop

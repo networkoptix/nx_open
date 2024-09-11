@@ -90,11 +90,6 @@ enum IDType
     PreferencesSmtpTabAction,
 
     /**
-     * Opens notifications settings preferences tab.
-     */
-    PreferencesNotificationTabAction,
-
-    /**
     * Opens notifications settings preferences tab.
     */
     PreferencesCloudTabAction,

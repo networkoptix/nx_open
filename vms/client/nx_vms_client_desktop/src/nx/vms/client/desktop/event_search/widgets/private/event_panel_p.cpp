@@ -551,8 +551,7 @@ void EventPanel::Private::showContextMenu(const QPoint& pos)
         menu::OpenEventLogAction,
         menu::OpenBusinessLogAction,
         menu::BusinessEventsAction,
-        menu::OpenVmsRulesDialogAction,
-        menu::PreferencesNotificationTabAction};
+        menu::OpenVmsRulesDialogAction};
 
     for (const auto actionId: actions)
     {

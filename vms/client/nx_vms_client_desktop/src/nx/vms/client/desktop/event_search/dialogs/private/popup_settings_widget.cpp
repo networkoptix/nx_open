@@ -9,7 +9,6 @@
 #include <core/resource_management/resource_properties.h>
 #include <health/system_health_strings_helper.h>
 #include <nx/reflect/json.h>
-#include <nx/vms/client/core/resource/user.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
@@ -18,45 +17,22 @@
 #include <nx/vms/client/desktop/settings/message_bar_settings.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/logic/fresh_session_token_helper.h>
+#include <nx/vms/client/desktop/utils/site_notification_settings_manager.h>
 #include <nx/vms/event/events/abstract_event.h>
 #include <nx/vms/event/strings_helper.h>
 #include <ui/workbench/workbench_context.h>
 
-using namespace nx::vms::client::desktop;
-
-using EventType = nx::vms::api::EventType;
-
-namespace {
-
-QList<EventType> supportedEventTypes(nx::vms::common::SystemContext* systemContext)
-{
-    using namespace nx::vms::event;
-    return allEvents({
-        isNonDeprecatedEvent,
-        isApplicableForLicensingMode(systemContext)});
-}
-
-std::set<nx::vms::common::system_health::MessageType> supportedMessageTypes(
-    nx::vms::common::SystemContext* systemContext)
-{
-    using namespace nx::vms::common::system_health;
-    return allMessageTypes({
-        isMessageVisibleInSettings,
-        isMessageApplicableForLicensingMode(systemContext)});
-}
-
-} // namespace
-
 namespace nx::vms::client::desktop {
 
-PopupSettingsWidget::PopupSettingsWidget(QWidget* parent):
+PopupSettingsWidget::PopupSettingsWidget(
+    SiteNotificationSettingsManager* siteNotificationSettingsManager,
+    QWidget* parent)
+    :
     base_type(parent),
-    QnWorkbenchContextAware(parent),
     ui(new Ui::PopupSettingsWidget),
-    m_businessRulesCheckBoxes(),
-    m_systemHealthCheckBoxes(),
     m_updating(false),
-    m_helper(new nx::vms::event::StringsHelper(systemContext()))
+    m_siteNotificationSettingsManager{siteNotificationSettingsManager},
+    m_helper(new nx::vms::event::StringsHelper(siteNotificationSettingsManager->systemContext()))
 {
     ui->setupUi(this);
 
@@ -65,12 +41,7 @@ PopupSettingsWidget::PopupSettingsWidget(QWidget* parent):
 
     setHelpTopic(this, HelpTopic::Id::SystemSettings_Notifications);
 
-    ui->deprecationMessageBar->init(
-        {.text = tr("These settings apply only to the site you are logged in."
-            " They will be removed in future versions."),
-        .isEnabledProperty = &messageBarSettings()->notificationsDeprecationInfo});
-
-    for (const auto eventType: supportedEventTypes(systemContext()))
+    for (const auto eventType: m_siteNotificationSettingsManager->supportedEventTypes())
     {
         QCheckBox* checkbox = new QCheckBox(this);
         checkbox->setText(m_helper->eventName(eventType));
@@ -81,7 +52,7 @@ PopupSettingsWidget::PopupSettingsWidget(QWidget* parent):
             &QnAbstractPreferencesWidget::hasChangesChanged);
     }
 
-    for (auto messageType: supportedMessageTypes(systemContext()))
+    for (auto messageType: m_siteNotificationSettingsManager->supportedMessageTypes())
     {
         QCheckBox* checkbox = new QCheckBox(this);
         checkbox->setText(QnSystemHealthStringsHelper::messageShortTitle(messageType));
@@ -92,7 +63,11 @@ PopupSettingsWidget::PopupSettingsWidget(QWidget* parent):
             &QnAbstractPreferencesWidget::hasChangesChanged);
     }
 
-    connect(system(), &SystemContext::userChanged, this, &PopupSettingsWidget::at_userChanged);
+    connect(
+        m_siteNotificationSettingsManager,
+        &SiteNotificationSettingsManager::settingsChanged,
+        this,
+        &PopupSettingsWidget::loadDataToUi);
 
     connect(ui->showAllCheckBox, &QCheckBox::toggled, this,
         [this](bool checked)
@@ -107,8 +82,6 @@ PopupSettingsWidget::PopupSettingsWidget(QWidget* parent):
 
             emit hasChangesChanged();
         });
-
-    at_userChanged(context()->user());
 }
 
 PopupSettingsWidget::~PopupSettingsWidget()
@@ -124,32 +97,31 @@ void PopupSettingsWidget::loadDataToUi()
 
     bool all = true;
 
-    std::set<nx::vms::common::system_health::MessageType> messageTypes =
-        appContext()->localSettings()->popupSystemHealth();
+    std::set<nx::vms::common::system_health::MessageType> watchedMessageTypes =
+        m_siteNotificationSettingsManager->watchedMessages();
 
-    for (auto messageType: supportedMessageTypes(systemContext()))
+    for (auto messageType: m_siteNotificationSettingsManager->supportedMessageTypes())
     {
-        const bool checked = messageTypes.contains(messageType);
+        const bool checked = watchedMessageTypes.contains(messageType);
         m_systemHealthCheckBoxes[messageType]->setChecked(checked);
 
         all &= checked;
     }
 
-    const auto eventTypes = supportedEventTypes(systemContext());
+    const auto supportedEventTypes = m_siteNotificationSettingsManager->supportedEventTypes();
+    const auto watchedEvents =
+        m_siteNotificationSettingsManager->watchedEvents();
+    const auto selectedEvents = watchedEvents.value_or(supportedEventTypes);
 
-    const auto watchedEvents = m_currentUser
-        ? m_currentUser->settings().watchedEvents()
-        : eventTypes;
-
-    for (const auto eventType: eventTypes)
+    for (const auto eventType: supportedEventTypes)
     {
-        bool checked = watchedEvents.contains(eventType);
+        bool checked = selectedEvents.contains(eventType);
         m_businessRulesCheckBoxes[eventType]->setChecked(checked);
         all &= checked;
     }
 
     ui->showAllCheckBox->setChecked(all);
-    ui->businessEventsGroupBox->setEnabled((bool) m_currentUser);
+    ui->businessEventsGroupBox->setEnabled(watchedEvents.has_value());
 }
 
 void PopupSettingsWidget::applyChanges()
@@ -157,39 +129,27 @@ void PopupSettingsWidget::applyChanges()
     NX_ASSERT(!m_updating, "Should never get here while updating");
     QScopedValueRollback<bool> guard(m_updating, true);
 
-    if (m_currentUser)
-    {
-        auto userSettings = m_currentUser->settings();
-        if (userSettings.watchedEvents() != watchedEvents())
-        {
-            auto sessionTokenHelper = FreshSessionTokenHelper::makeHelper(this,
-                tr("Save user"),
-                tr("Enter your account password"),
-                tr("Save"),
-                FreshSessionTokenHelper::ActionType::updateSettings);
-
-            userSettings.setWatchedEvents(watchedEvents());
-            m_currentUser->saveSettings(userSettings, sessionTokenHelper);
-        }
-    }
-
-    appContext()->localSettings()->popupSystemHealth = storedSystemHealth();
+    m_siteNotificationSettingsManager->setWatchedEvents(watchedEvents());
+    m_siteNotificationSettingsManager->setWatchedMessages(storedSystemHealth());
 }
 
 bool PopupSettingsWidget::hasChanges() const
 {
-    return appContext()->localSettings()->popupSystemHealth() != storedSystemHealth()
-        || (m_currentUser && m_currentUser->settings().watchedEvents() != watchedEvents());
+    if (m_siteNotificationSettingsManager->watchedMessages() != storedSystemHealth())
+        return true;
+
+    const auto userWatchedEvents = m_siteNotificationSettingsManager->watchedEvents();
+    return userWatchedEvents && userWatchedEvents != watchedEvents();
 }
 
-QList<EventType> PopupSettingsWidget::watchedEvents() const
+QList<api::EventType> PopupSettingsWidget::watchedEvents() const
 {
-    const auto eventTypes = supportedEventTypes(systemContext());
+    auto eventTypes = m_siteNotificationSettingsManager->supportedEventTypes();
 
     if (ui->showAllCheckBox->isChecked())
         return eventTypes;
 
-    QList<EventType> result;
+    QList<api::EventType> result;
     for (const auto eventType: eventTypes)
     {
         if (m_businessRulesCheckBoxes[eventType]->isChecked())
@@ -203,33 +163,13 @@ std::set<nx::vms::common::system_health::MessageType>
 {
     std::set<nx::vms::common::system_health::MessageType> result;
 
-    for (auto messageType: supportedMessageTypes(systemContext()))
+    for (auto messageType: m_siteNotificationSettingsManager->supportedMessageTypes())
     {
         if (m_systemHealthCheckBoxes[messageType]->isChecked() || ui->showAllCheckBox->isChecked())
             result.insert(messageType);
     }
 
     return result;
-}
-
-void PopupSettingsWidget::at_userChanged(const QnUserResourcePtr& user)
-{
-    if (user == m_currentUser)
-        return;
-
-    if (m_currentUser)
-        m_currentUser->disconnect(this);
-
-    m_currentUser = user.dynamicCast<nx::vms::client::core::UserResource>();
-
-    if (!m_currentUser)
-        return;
-
-    connect(
-        m_currentUser.get(),
-        &QnUserResource::userSettingsChanged,
-        this,
-        &PopupSettingsWidget::loadDataToUi);
 }
 
 } // namespace nx::vms::client::desktop

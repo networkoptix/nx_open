@@ -29,13 +29,13 @@
    <item>
     <widget class="QScrollArea" name="scrollArea">
      <property name="horizontalScrollBarPolicy">
-      <enum>Qt::ScrollBarAlwaysOff</enum>
+      <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
      </property>
      <property name="widgetResizable">
       <bool>true</bool>
      </property>
      <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+      <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop</set>
      </property>
      <widget class="QWidget" name="scrollAreaWidgetContents">
       <property name="geometry">
@@ -43,7 +43,7 @@
         <x>0</x>
         <y>0</y>
         <width>333</width>
-        <height>172</height>
+        <height>151</height>
        </rect>
       </property>
       <property name="sizePolicy">
@@ -98,19 +98,8 @@
      </widget>
     </widget>
    </item>
-   <item>
-    <widget class="nx::vms::client::desktop::CommonMessageBar" name="deprecationMessageBar" native="true"/>
-   </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>nx::vms::client::desktop::CommonMessageBar</class>
-   <extends>QWidget</extends>
-   <header location="global">nx/vms/client/desktop/common/widgets/message_bar.h</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>
