@@ -69,6 +69,8 @@ AnalyticsSettingsStore::AnalyticsSettingsStore(QWidget* parent):
     m_isNewRequestsEnabled = systemSettings()->isAllowRegisteringIntegrationsEnabled();
     connect(this, &AnalyticsSettingsStore::isNewRequestsEnabledChanged,
         this, &AnalyticsSettingsStore::updateHasChanges);
+    connect(systemSettings(), &SystemSettings::allowRegisteringIntegrationsChanged,
+        this, &AnalyticsSettingsStore::updateHasChanges);
 }
 
 void AnalyticsSettingsStore::updateEngines()
