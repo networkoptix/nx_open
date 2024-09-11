@@ -209,6 +209,9 @@
    <item>
     <widget class="nx::vms::client::desktop::CommonMessageBar" name="alertBar" native="true"/>
    </item>
+   <item>
+    <widget class="nx::vms::client::desktop::CommonMessageBar" name="digestAlertBar" native="true"/>
+   </item>
   </layout>
  </widget>
  <customwidgets>

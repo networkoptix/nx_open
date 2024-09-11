@@ -219,6 +219,14 @@ QnServerSettingsWidget::QnServerSettingsWidget(QWidget* parent /* = 0*/) :
     connect(ui->alertBar, &CommonMessageBar::linkActivated,
         this, &QnServerSettingsWidget::showServerCertificate);
 
+    ui->digestAlertBar->init({.level = BarDescription::BarLevel::Error, .isClosable = true});
+    ui->digestAlertBar->setText(tr("Insecure (digest) authentication must be disabled for your "
+                                   "account before remote access will be available."));
+    connect(systemContext()->user().get(),
+        &QnUserResource::digestChanged,
+        this,
+        &QnServerSettingsWidget::updateDigestAlertBar);
+
     /* Set up context help. */
     setHelpTopic(ui->nameLabel, ui->nameLineEdit, HelpTopic::Id::ServerSettings_General);
     setHelpTopic(ui->ipAddressLabel, ui->ipAddressLineEdit,
@@ -358,6 +366,7 @@ void QnServerSettingsWidget::loadDataToUi()
     updateUrl();
     updateWebCamerasDiscoveryEnabled();
     updateCertificatesInfo();
+    updateDigestAlertBar();
 }
 
 void QnServerSettingsWidget::applyChanges()
@@ -431,6 +440,11 @@ void QnServerSettingsWidget::updateCertificatesInfo()
     {
         ui->alertBar->hide();
     }
+}
+
+void QnServerSettingsWidget::updateDigestAlertBar()
+{
+    ui->digestAlertBar->setVisible(systemContext()->user()->digestAuthorizationEnabled());
 }
 
 void QnServerSettingsWidget::showCertificateMismatchBanner(bool dataLoaded)

@@ -42,6 +42,7 @@ private:
     void updateRemoteAccess();
     void updateWebCamerasDiscoveryEnabled();
     void updateCertificatesInfo();
+    void updateDigestAlertBar();
     void showCertificateMismatchBanner(bool dataLoaded);
     int updateCertificatesLabels();
 
