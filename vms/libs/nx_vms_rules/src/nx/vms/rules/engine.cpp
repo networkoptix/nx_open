@@ -853,6 +853,19 @@ size_t Engine::processEvent(const EventPtr& event)
             if (!rule->enabled() || !rule->isValid())
                 continue;
 
+            auto cacheKey = event->cacheKey();
+            if (!cacheKey.isEmpty())
+            {
+                cacheKey += id.toString();
+
+                auto cachedEventData = m_eventCache.rememberEvent(cacheKey);
+                if (m_eventCache.isReportedRecently(cacheKey))
+                {
+                    NX_VERBOSE(this, "Skipping cached event with key: %1", cacheKey);
+                    continue;
+                }
+            }
+
             bool matched = false;
             for (const auto filter: rule->eventFiltersByType(event->type()))
             {
@@ -863,9 +876,15 @@ size_t Engine::processEvent(const EventPtr& event)
                 }
             }
 
+            // TODO: 1. use cachedEventData to match AnalyticsObject more correctly
+            // (bestShot doesn't has typeId, it is needed to remember at context and pass context to the matcher).
+            // TODO: 2. Use addition filtering to not repeat Event for the same objectTrack (same old engine).
+
             if (matched)
             {
                 triggeredRules.push_back(rule);
+                if (!cacheKey.isEmpty())
+                    m_eventCache.reportEvent(cacheKey);
             }
         }
     }
@@ -880,7 +899,6 @@ size_t Engine::processEvent(const EventPtr& event)
         return 0;
     }
 
-    m_eventCache.cacheEvent(event->cacheKey());
 
     m_router->routeEvent(event, triggeredRules);
 
@@ -1022,12 +1040,6 @@ void Engine::checkOwnThread() const
 
 bool Engine::checkEvent(const EventPtr& event) const
 {
-    // This check is required to reduce the number of spamming events.
-    if (m_eventCache.eventWasCached(event->cacheKey()))
-    {
-        NX_VERBOSE(this, "Skipping cached event %1 with key: %2", event->type(), event->cacheKey());
-        return false;
-    }
 
     if (isProlonged(event))
     {

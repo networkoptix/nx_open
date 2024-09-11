@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <set>
+
 #include <nx/reflect/enum_instrument.h>
 #include <nx/utils/serialization/flags.h>
 
@@ -312,5 +314,18 @@ constexpr auto nxReflectVisitAllEnumItems(EventLevel*, Visitor&& visitor)
 
 Q_DECLARE_FLAGS(EventLevels, EventLevel)
 Q_DECLARE_OPERATORS_FOR_FLAGS(EventLevels)
+
+/*
+ * A signle analytics event could contains not all nesessary data to match it.
+ * Some fields could be at the previous events only. So, we need to collect information
+ * related to the analytics track and keep it at this context. Event could use context
+ * to match its attributes (in the future) or its objectType (current version).
+ */
+struct NX_VMS_API AnalyticsTrackContext
+{
+    /** All object types which were detected during the track. */
+    std::set<QString> objectTypeIds;
+};
+
 
 } // namespace nx::vms::api

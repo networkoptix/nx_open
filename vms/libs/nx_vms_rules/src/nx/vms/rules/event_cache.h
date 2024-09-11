@@ -5,24 +5,16 @@
 #include <chrono>
 #include <unordered_map>
 
-#include <nx/utils/elapsed_timer.h>
+#include <nx/vms/event/event_cache.h>
+
 
 namespace nx::vms::rules {
 
-/** Fast simple cache to discard frequent duplicate events. */
-class NX_VMS_RULES_API EventCache
+class NX_VMS_RULES_API EventCache: public nx::vms::event::EventCache
 {
 public:
-    bool eventWasCached(const QString& cacheKey) const;
-    void cacheEvent(const QString& cacheKey);
-
-    void cleanupOldEventsFromCache(
-        std::chrono::milliseconds eventTimeout,
-        std::chrono::milliseconds cleanupTimeout);
-
 private:
-    std::unordered_map<QString, nx::utils::ElapsedTimer> m_cachedEvents;
-    nx::utils::ElapsedTimer m_cacheTimer;
 };
+
 
 } // namespace nx::vms::rules

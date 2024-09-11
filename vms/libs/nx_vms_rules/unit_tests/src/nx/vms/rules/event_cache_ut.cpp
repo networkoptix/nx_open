@@ -13,19 +13,19 @@ TEST(EventCacheTest, cacheKey)
     EventCache cache;
 
     // Empty cache key events are not cached.
-    EXPECT_FALSE(cache.eventWasCached(""));
-    cache.cacheEvent("");
-    EXPECT_FALSE(cache.eventWasCached(""));
+    EXPECT_FALSE(cache.isReportedBefore(""));
+    cache.reportEvent("");
+    EXPECT_FALSE(cache.isReportedBefore(""));
 
     // Same cache events are ignored.
-    EXPECT_FALSE(cache.eventWasCached("a"));
-    cache.cacheEvent("a");
-    EXPECT_TRUE(cache.eventWasCached("a"));
+    EXPECT_FALSE(cache.isReportedBefore("a"));
+    cache.reportEvent("a");
+    EXPECT_TRUE(cache.isReportedBefore("a"));
 
     // Different cache events are matched.
-    EXPECT_FALSE(cache.eventWasCached("b"));
-    cache.cacheEvent("b");
-    EXPECT_TRUE(cache.eventWasCached("b"));
+    EXPECT_FALSE(cache.isReportedBefore("b"));
+    cache.reportEvent("b");
+    EXPECT_TRUE(cache.isReportedBefore("b"));
 }
 
 TEST(EventCacheTest, cacheTimeout)
@@ -35,13 +35,13 @@ TEST(EventCacheTest, cacheTimeout)
     EventCache cache;
 
     // Same cache events are ignored.
-    cache.cacheEvent("a");
-    EXPECT_TRUE(cache.eventWasCached("a"));
+    cache.reportEvent("a");
+    EXPECT_TRUE(cache.isReportedBefore("a"));
 
     // Same cache events are matched after timeout.
     std::this_thread::sleep_for(5ms);
-    cache.cleanupOldEventsFromCache(1ms, 1ms);
-    EXPECT_FALSE(cache.eventWasCached("a"));
+    cache.cleanupOldEventsFromCache(1ms);
+    EXPECT_FALSE(cache.isReportedBefore("a"));
 }
 
 } // nx::vms::rules::test
