@@ -4,6 +4,7 @@ import QtQuick
 import QtQuick.Controls
 
 import Nx.Core
+import Nx.Controls as Nx
 import Nx.Core.Controls
 import Nx.Models
 
@@ -38,6 +39,8 @@ ComboBox
 
     property string enabledRole: ""
     property string decorationRole: "decorationPath"
+    property int maxVisibleItems: 10
+    readonly property int itemHeight: 24
 
     property var displayedColor:
     {
@@ -90,11 +93,12 @@ ComboBox
 
     property Component view: Component
     {
-        ListView
+        Nx.ListView
         {
             clip: true
             model: control.popup.visible ? control.delegateModel : null
-            implicitHeight: contentHeight
+            itemHeightHint: itemHeight
+            implicitHeight: Math.min(itemHeightHint * control.maxVisibleItems, contentHeight)
             currentIndex: control.highlightedIndex
             boundsBehavior: ListView.StopAtBounds
         }
@@ -287,7 +291,7 @@ ComboBox
 
         readonly property var itemData: NxGlobals.isSequence(control.model) ? modelData : model
 
-        height: 24
+        height: control.itemHeight
         width: control.width
 
         enabled: control.enabledRole ? popupItem.itemData[control.enabledRole] : true
