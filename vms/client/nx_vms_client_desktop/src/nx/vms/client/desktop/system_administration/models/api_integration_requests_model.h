@@ -40,7 +40,6 @@ signals:
 private:
     QProperty<bool> m_isActive{false};
     QVariant m_requests;
-    bool m_isNewRequestsEnabled = false;
 };
 
 } // namespace nx::vms::client::desktop
