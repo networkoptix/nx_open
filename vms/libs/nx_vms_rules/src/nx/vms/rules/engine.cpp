@@ -740,13 +740,6 @@ size_t Engine::processEvent(const EventPtr& event)
     checkOwnThread();
     NX_DEBUG(this, "Processing Event: %1, state: %2", event->type(), event->state());
 
-    const auto cacheKey = event->cacheKey();
-    if (m_eventCache->eventWasCached(cacheKey))
-    {
-        NX_VERBOSE(this, "Skipping cached event with key: %1", cacheKey);
-        return {};
-    }
-
     if (!m_eventCache->checkEventState(event))
         return {};
 
@@ -763,6 +756,19 @@ size_t Engine::processEvent(const EventPtr& event)
             if (!rule->enabled())
                 continue;
 
+            auto cacheKey = event->cacheKey();
+            if (!cacheKey.isEmpty())
+            {
+                cacheKey += id.toString();
+
+                auto cachedEventData = m_eventCache->rememberEvent(cacheKey);
+                if (m_eventCache->isReportedRecently(cacheKey))
+                {
+                    NX_VERBOSE(this, "Skipping cached event with key: %1", cacheKey);
+                    continue;
+                }
+            }
+
             bool matched = false;
             for (const auto filter: rule->eventFiltersByType(event->type()))
             {
@@ -772,6 +778,10 @@ size_t Engine::processEvent(const EventPtr& event)
                     break;
                 }
             }
+
+            // TODO: 1. use cachedEventData to match AnalyticsObject more correctly
+            // (bestShot doesn't has typeId, it is needed to remember at context and pass context to the matcher).
+            // TODO: 2. Use addition filtering to not repeat Event for the same objectTrack (same old engine).
 
             if (matched)
             {
@@ -791,6 +801,8 @@ size_t Engine::processEvent(const EventPtr& event)
                 }
 
                 ruleIds += id;
+                if (!cacheKey.isEmpty())
+                    m_eventCache->reportEvent(cacheKey);
             }
         }
     }
@@ -799,8 +811,6 @@ size_t Engine::processEvent(const EventPtr& event)
 
     if (!ruleIds.empty())
     {
-        m_eventCache->cacheEvent(cacheKey);
-
         eventData = serializeProperties(event.get(), eventFields);
         m_router->routeEvent(eventData, ruleIds, resources);
     }
