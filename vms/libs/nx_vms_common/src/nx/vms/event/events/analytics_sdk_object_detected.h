@@ -33,16 +33,20 @@ public:
     static bool checkEventParams(
         nx::vms::common::SystemContext* systemContext,
         const EventParameters& params,
-        const nx::common::metadata::ObjectMetadata& metadata);
+        const nx::common::metadata::ObjectMetadata& metadata,
+        const nx::vms::api::AnalyticsTrackContext* trackContext);
 
     virtual QString getExternalUniqueKey() const override;
 
     const nx::common::metadata::Attributes& attributes() const;
     const std::optional<QString> attribute(const QString& attributeName) const;
 
+    void setTrackContext(nx::vms::api::AnalyticsTrackContext* trackContext);
+
 private:
     const nx::common::metadata::ObjectMetadataPacketPtr m_packet;
     const nx::common::metadata::ObjectMetadata& m_metadata;
+    const nx::vms::api::AnalyticsTrackContext* m_trackContext = nullptr;
 };
 
 } // namespace event

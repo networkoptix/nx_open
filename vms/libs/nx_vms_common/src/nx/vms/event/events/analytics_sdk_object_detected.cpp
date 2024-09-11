@@ -69,21 +69,26 @@ bool AnalyticsSdkObjectDetected::checkEventParams(const EventParameters& params)
 {
     if (!getResource())
         return false;
-    return checkEventParams(getResource()->systemContext(), params, m_metadata);
+    return checkEventParams(getResource()->systemContext(), params, m_metadata, m_trackContext);
 }
 
 bool AnalyticsSdkObjectDetected::checkEventParams(
     nx::vms::common::SystemContext* systemContext,
     const EventParameters& params,
-    const nx::common::metadata::ObjectMetadata& metadata)
+    const nx::common::metadata::ObjectMetadata& metadata,
+    const nx::vms::api::AnalyticsTrackContext* trackContext)
 {
 
     const auto ruleTypeId = params.getAnalyticsObjectTypeId();
 
-    const bool isObjectTypeMatched = ruleTypeId == metadata.typeId
-        || nx::analytics::taxonomy::isBaseType(
-            systemContext->analyticsTaxonomyState().get(),
-            ruleTypeId, metadata.typeId);
+    const bool isObjectTypeMatched = std::any_of(
+        trackContext->objectTypeIds.begin(),
+        trackContext->objectTypeIds.end(),
+        [&ruleTypeId, taxonomy = systemContext->analyticsTaxonomyState()](const auto& typeId)
+        {
+            return ruleTypeId == typeId
+                || nx::analytics::taxonomy::isBaseType(taxonomy.get(), ruleTypeId, typeId);
+        });
     if (!isObjectTypeMatched)
         return false;
 
@@ -105,6 +110,11 @@ const std::optional<QString> AnalyticsSdkObjectDetected::attribute(const QString
     }
 
     return std::nullopt;
+}
+
+void AnalyticsSdkObjectDetected::setTrackContext(nx::vms::api::AnalyticsTrackContext* trackContext)
+{
+    m_trackContext = trackContext;
 }
 
 } // namespace nx::vms:: event
