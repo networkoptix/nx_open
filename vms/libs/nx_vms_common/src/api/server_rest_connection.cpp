@@ -2308,20 +2308,23 @@ Handle ServerConnection::saveUserAsync(
     return handle;
 }
 
- Handle ServerConnection::patchUserParameters(
+ Handle ServerConnection::patchUserSettings(
     nx::Uuid id,
-    const nx::vms::api::ResourceWithParameters& parameters,
+    const nx::vms::api::UserSettings& settings,
     nx::vms::common::SessionTokenHelperPtr tokenHelper,
     Result<ErrorOrData<nx::vms::api::UserModelV3>>::type&& callback,
     QThread* targetThread)
 {
+    QJsonValue serializedSettings;
+    QJson::serialize(settings, &serializedSettings);
+
     auto request = prepareRequest(
         nx::network::http::Method::patch,
         prepareUrl(
             QString("/rest/v4/users/%1").arg(id.toString()),
             /*params*/ {}),
         Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
-        nx::reflect::json::serialize(parameters));
+        nx::reflect::json::serialize(QJsonObject{{"settings", serializedSettings}}));
 
     auto wrapper = makeSessionAwareCallback(tokenHelper, request, std::move(callback));
 
