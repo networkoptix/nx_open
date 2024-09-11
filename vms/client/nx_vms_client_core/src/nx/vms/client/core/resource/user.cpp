@@ -75,10 +75,6 @@ rest::Handle UserResource::saveSettings(
     const auto backup = settings();
     setSettings(value);
 
-    nx::vms::api::ResourceWithParameters parameters;
-    parameters.setFromParameter({ResourcePropertyKey::User::kUserSettings,
-        QString::fromStdString(nx::reflect::json::serialize(value))});
-
     auto internalCallback = nx::utils::guarded(this,
         [this, executor, callback, backup](
             bool success,
@@ -96,10 +92,10 @@ rest::Handle UserResource::saveSettings(
     if (!api)
         return rest::Handle{};
 
-    return api->patchUserParameters(
+    return api->patchUserSettings(
         getId(),
-        parameters,
-        sessionTokenHelper,
+        value,
+        std::move(sessionTokenHelper),
         internalCallback,
         thread());
 }
