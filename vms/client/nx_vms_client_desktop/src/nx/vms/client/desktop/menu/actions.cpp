@@ -154,10 +154,6 @@ void initialize(Manager* manager, Action* root)
         .flags(NoTarget)
         .requiredPowerUserPermissions();
 
-    factory(PreferencesNotificationTabAction)
-        .flags(NoTarget)
-        .text(ContextMenu::tr("Filter...")); //< To be displayed on button tooltip
-
     factory(PreferencesCloudTabAction)
         .flags(NoTarget)
         .requiredPowerUserPermissions();

@@ -15,11 +15,14 @@
 class QSortFilterProxyModel;
 class QToolButton;
 
+namespace nx::vms::event { class StringsHelper; }
+
 namespace nx::vms::client::desktop {
 
 class EventRibbon;
 class NotificationTabModel;
 class SelectableTextButton;
+class SiteNotificationSettingsManager;
 
 class NotificationListWidget::Private:
     public QObject,
@@ -36,6 +39,13 @@ private:
     void setupFilterNotificationsButton();
     void changeHeaderItemsVisibilityIfNeeded();
 
+    void onAnyNotificationActionTriggered();
+    void onEventNotificationsActionTriggered();
+    void onSystemNotificationsActionTriggered();
+    void onChooseTypesActionTriggered();
+    void onFilterNotificationsButtonStateChanged();
+    void updateFilterNotificationsButtonAppearance();
+
 private:
     NotificationListWidget* const q;
     QVBoxLayout* const m_mainLayout;
@@ -50,6 +60,8 @@ private:
     NotificationTabModel* const m_model;
     QSortFilterProxyModel* const m_filterModel;
     QHash<RightPanel::SystemSelection, QAction*> m_systemSelectionActions;
+    SiteNotificationSettingsManager* const m_siteNotificationSettingsManager;
+    std::unique_ptr<event::StringsHelper> m_stringHelper;
 };
 
 } // namespace nx::vms::client::desktop

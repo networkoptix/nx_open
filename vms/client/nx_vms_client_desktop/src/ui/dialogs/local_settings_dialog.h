@@ -34,7 +34,6 @@ public:
         GeneralPage,
         LookAndFeelPage,
         RecordingPage,
-        NotificationsPage,
         AdvancedPage,
 
         PageCount

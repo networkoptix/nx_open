@@ -7,7 +7,6 @@
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QWidget>
 
-#include <nx/vms/client/core/resource/resource_fwd.h>
 #include <nx/vms/common/system_health/message_type.h>
 #include <nx/vms/event/event_fwd.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
@@ -21,13 +20,17 @@ namespace nx::vms::event { class StringsHelper; }
 
 namespace nx::vms::client::desktop {
 
-class PopupSettingsWidget: public QnAbstractPreferencesWidget, public QnWorkbenchContextAware
+class SiteNotificationSettingsManager;
+
+class PopupSettingsWidget: public QnAbstractPreferencesWidget
 {
     Q_OBJECT
     using base_type = QnAbstractPreferencesWidget;
 
 public:
-    explicit PopupSettingsWidget(QWidget *parent = 0);
+    explicit PopupSettingsWidget(
+        SiteNotificationSettingsManager* siteNotificationSettingsManager,
+        QWidget* parent = nullptr);
     ~PopupSettingsWidget();
 
     virtual void applyChanges() override;
@@ -37,15 +40,14 @@ public:
 private:
     QList<nx::vms::api::EventType> watchedEvents() const;
     std::set<nx::vms::common::system_health::MessageType> storedSystemHealth() const;
-    void at_userChanged(const QnUserResourcePtr& user);
 
 private:
     QScopedPointer<Ui::PopupSettingsWidget> ui;
     QMap<nx::vms::api::EventType, QCheckBox*> m_businessRulesCheckBoxes;
     QMap<nx::vms::common::system_health::MessageType, QCheckBox*> m_systemHealthCheckBoxes;
     bool m_updating;
+    SiteNotificationSettingsManager* const m_siteNotificationSettingsManager;
     std::unique_ptr<nx::vms::event::StringsHelper> m_helper;
-    nx::vms::client::core::UserResourcePtr m_currentUser;
 };
 
 } // namespace nx::vms::client::desktop

@@ -17,6 +17,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <health/system_health_strings_helper.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
@@ -40,6 +41,7 @@
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/context_utils.h>
+#include <nx/vms/client/desktop/utils/site_notification_settings_manager.h>
 #include <nx/vms/common/saas/saas_service_manager.h>
 #include <nx/vms/common/saas/saas_utils.h>
 #include <nx/vms/event/actions/abstract_action.h>
@@ -91,11 +93,11 @@ NotificationListWidget::Private::Private(NotificationListWidget* q):
     m_placeholder(PlaceholderWidget::create(
         qnSkin->icon(kNotificationPlaceholderIcon).pixmap(64, 64),
         AbstractSearchWidget::makePlaceholderText(tr("No new notifications"), {}),
-        tr("Notifications Settings"),
-        [this] { menu()->trigger(menu::PreferencesNotificationTabAction); },
         m_ribbonContainer)),
     m_model(new NotificationTabModel(windowContext(), this)),
-    m_filterModel(new QSortFilterProxyModel(q))
+    m_filterModel(new QSortFilterProxyModel(q)),
+    m_siteNotificationSettingsManager{new SiteNotificationSettingsManager{system(), q}},
+    m_stringHelper{new event::StringsHelper{system()}}
 {
     m_headerWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     m_headerWidget->setStyleSheet(
@@ -179,6 +181,12 @@ NotificationListWidget::Private::Private(NotificationListWidget* q):
         &nx::vms::client::core::CloudStatusWatcher::cloudSystemsChanged,
         this,
         [this] { changeHeaderItemsVisibilityIfNeeded(); });
+
+    connect(
+        m_siteNotificationSettingsManager,
+        &SiteNotificationSettingsManager::settingsChanged,
+        this,
+        &NotificationListWidget::Private::updateFilterNotificationsButtonAppearance);
 
     TileInteractionHandler::install(m_eventRibbon);
 
@@ -265,37 +273,44 @@ void NotificationListWidget::Private::setupFilterNotificationsButton()
     m_filterNotificationsButton->setDeactivatable(true);
     m_filterNotificationsButton->setIcon(qnSkin->icon(kBellIcon));
     m_filterNotificationsButton->setFocusPolicy(Qt::NoFocus);
+    m_filterNotificationsButton->setSelectable(true);
+    m_filterNotificationsButton->setDeactivatable(true);
+
+    connect(
+        m_filterNotificationsButton,
+        &SelectableTextButton::stateChanged,
+        this,
+        &NotificationListWidget::Private::onFilterNotificationsButtonStateChanged);
 
     auto menu = new QMenu(q);
     menu->setProperty(style::Properties::kMenuAsDropdown, true);
     menu->setWindowFlags(menu->windowFlags() | Qt::BypassGraphicsProxyWidget);
 
-    const auto updateButtonText =
-        [this]
+    const auto addAction =
+        [menu, this](const QString& text, auto handler)
         {
-            QString buttonText = tr("Notifications filter");
-
-            m_filterNotificationsButton->setText(buttonText);
+            connect(menu->addAction(text), &QAction::triggered, this, handler);
         };
 
-    auto action = menu->addAction(tr("Choose Types..."));
-    connect(
-        action,
-        &QAction::triggered,
-        this,
-        [this, updateButtonText]
-        {
-            NotificationSettingsDialog notificationSettingsDialog{q};
+    addAction(
+        tr("Any Notification"),
+        &NotificationListWidget::Private::onAnyNotificationActionTriggered);
+    addAction(
+        tr("Event Notifications"),
+        &NotificationListWidget::Private::onEventNotificationsActionTriggered);
+    addAction(
+        tr("System Notifications"),
+        &NotificationListWidget::Private::onSystemNotificationsActionTriggered);
 
-            if (notificationSettingsDialog.exec() == QDialog::Accepted)
-            {
-                updateButtonText();
-            }
-        });
+    menu->addSeparator();
+
+    addAction(
+        tr("Choose Types..."),
+        &NotificationListWidget::Private::onChooseTypesActionTriggered);
 
     m_filterNotificationsButton->setMenu(menu);
 
-    updateButtonText();
+    updateFilterNotificationsButtonAppearance();
 }
 
 void NotificationListWidget::Private::changeHeaderItemsVisibilityIfNeeded()
@@ -312,6 +327,78 @@ void NotificationListWidget::Private::changeHeaderItemsVisibilityIfNeeded()
     {
         m_filterSystemsButton->setVisible(false);
     }
+}
+
+void NotificationListWidget::Private::onAnyNotificationActionTriggered()
+{
+    m_siteNotificationSettingsManager->setWatchedEvents(
+        m_siteNotificationSettingsManager->supportedEventTypes());
+    m_siteNotificationSettingsManager->setWatchedMessages(
+        m_siteNotificationSettingsManager->supportedMessageTypes());
+}
+
+void NotificationListWidget::Private::onEventNotificationsActionTriggered()
+{
+    m_siteNotificationSettingsManager->setWatchedEvents(
+        m_siteNotificationSettingsManager->supportedEventTypes());
+    m_siteNotificationSettingsManager->setWatchedMessages({});
+}
+
+void NotificationListWidget::Private::onSystemNotificationsActionTriggered()
+{
+    m_siteNotificationSettingsManager->setWatchedMessages(
+        m_siteNotificationSettingsManager->supportedMessageTypes());
+    m_siteNotificationSettingsManager->setWatchedEvents({});
+}
+
+void NotificationListWidget::Private::onChooseTypesActionTriggered()
+{
+    NotificationSettingsDialog notificationSettingsDialog{m_siteNotificationSettingsManager, q};
+    notificationSettingsDialog.exec();
+}
+
+void NotificationListWidget::Private::onFilterNotificationsButtonStateChanged()
+{
+    if (m_filterNotificationsButton->state() == SelectableTextButton::State::deactivated)
+        onAnyNotificationActionTriggered();
+}
+
+void NotificationListWidget::Private::updateFilterNotificationsButtonAppearance()
+{
+    const auto watchedEvents =
+        m_siteNotificationSettingsManager->watchedEvents().value_or(QList<api::EventType>{});
+    const auto watchedMessages = m_siteNotificationSettingsManager->watchedMessages();
+
+    if (watchedEvents == m_siteNotificationSettingsManager->supportedEventTypes()
+        && watchedMessages == m_siteNotificationSettingsManager->supportedMessageTypes())
+    {
+        QSignalBlocker blocker{m_filterNotificationsButton};
+        m_filterNotificationsButton->setText(tr("Any notification"));
+        m_filterNotificationsButton->setState(SelectableTextButton::State::deactivated);
+
+        return;
+    }
+
+    const auto watchedCount = watchedEvents.size() + watchedMessages.size();
+    if (watchedCount == 1)
+    {
+        if (!watchedEvents.empty())
+        {
+            m_filterNotificationsButton->setText(m_stringHelper->eventName(watchedEvents.first()));
+        }
+        else
+        {
+            m_filterNotificationsButton->setText(
+                QnSystemHealthStringsHelper::messageShortTitle(*watchedMessages.cbegin()));
+        }
+    }
+    else
+    {
+        m_filterNotificationsButton->setText(
+            tr("%n notification types", "", static_cast<int>(watchedCount)));
+    }
+
+    m_filterNotificationsButton->setState(SelectableTextButton::State::selected);
 }
 
 } // namespace nx::vms::client::desktop
