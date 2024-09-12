@@ -3,7 +3,7 @@
 #include "buzzer_action.h"
 
 #include "../action_builder_fields/optional_time_field.h"
-#include "../action_builder_fields/target_server_field.h"
+#include "../action_builder_fields/target_servers_field.h"
 #include "../strings.h"
 #include "../utils/field.h"
 #include "../utils/type.h"
@@ -21,7 +21,7 @@ const ItemDescriptor& BuzzerAction::manifest()
         .executionTargets = ExecutionTarget::servers,
         .targetServers = TargetServers::resourceOwner,
         .fields = {
-            makeFieldDescriptor<TargetServerField>(
+            makeFieldDescriptor<TargetServersField>(
                 utils::kServerIdsFieldName,
                 Strings::at(),
                 {},

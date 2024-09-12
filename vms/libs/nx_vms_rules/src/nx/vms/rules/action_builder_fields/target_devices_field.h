@@ -6,13 +6,16 @@
 
 namespace nx::vms::rules {
 
-constexpr auto kHasBuzzerValidationPolicy = "hasBuzzer";
+constexpr auto kBookmarkValidationPolicy = "bookmark";
+constexpr auto kCameraAudioTransmissionValidationPolicy = "cameraAudioTransmission";
+constexpr auto kCameraOutputValidationPolicy = "cameraOutput";
+constexpr auto kCameraRecordingValidationPolicy = "cameraRecording";
 
 /** Displayed as device selection button and "Use source" checkbox. */
-class NX_VMS_RULES_API TargetServerField: public ResourceFilterActionField
+class NX_VMS_RULES_API TargetDevicesField: public ResourceFilterActionField
 {
     Q_OBJECT
-    Q_CLASSINFO("metatype", "nx.actions.fields.servers")
+    Q_CLASSINFO("metatype", "nx.actions.fields.devices")
 
     Q_PROPERTY(bool useSource READ useSource WRITE setUseSource NOTIFY useSourceChanged)
 

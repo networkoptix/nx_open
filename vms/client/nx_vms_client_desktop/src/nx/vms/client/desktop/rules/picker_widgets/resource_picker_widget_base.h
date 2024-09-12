@@ -87,7 +87,7 @@ void ResourcePickerWidgetBase<F>::updateSelectButtonUi()
 }
 
 template<>
-inline void ResourcePickerWidgetBase<nx::vms::rules::TargetUserField>::updateSelectButtonUi()
+inline void ResourcePickerWidgetBase<nx::vms::rules::TargetUsersField>::updateSelectButtonUi()
 {
     int additionalCount{0};
     if (const auto additionalRecipients =

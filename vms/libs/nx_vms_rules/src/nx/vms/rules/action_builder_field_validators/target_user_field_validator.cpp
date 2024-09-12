@@ -10,8 +10,8 @@
 
 #include "../action_builder.h"
 #include "../action_builder_fields/flag_field.h"
-#include "../action_builder_fields/layout_field.h"
-#include "../action_builder_fields/target_user_field.h"
+#include "../action_builder_fields/target_layout_field.h"
+#include "../action_builder_fields/target_users_field.h"
 #include "../action_builder_fields/text_field.h"
 #include "../event_filter.h"
 #include "../event_filter_fields/source_camera_field.h"
@@ -25,7 +25,7 @@ namespace nx::vms::rules {
 ValidationResult TargetUserFieldValidator::validity(
     const Field* field, const Rule* rule, common::SystemContext* context) const
 {
-    auto targetUserField = dynamic_cast<const TargetUserField*>(field);
+    auto targetUserField = dynamic_cast<const TargetUsersField*>(field);
     if (!NX_ASSERT(targetUserField))
         return {QValidator::State::Invalid, Strings::invalidFieldType()};
 
@@ -89,7 +89,7 @@ ValidationResult TargetUserFieldValidator::validity(
         }
         else if (targetUserFieldProperties.validationPolicy == kLayoutAccessValidationPolicy)
         {
-            auto layoutField = rule->actionBuilders().front()->fieldByName<LayoutField>(
+            auto layoutField = rule->actionBuilders().front()->fieldByName<TargetLayoutField>(
                 utils::kLayoutIdFieldName);
             if (!NX_ASSERT(layoutField))
             {

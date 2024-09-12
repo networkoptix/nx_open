@@ -10,11 +10,20 @@ const IdRenamer kIdRenamer;
 
 IdRenamer::IdRenamer()
 {
-    for (QString name: {"camera", "device", "server", "user", "layout", "eventType"})
-    {
-        m_toApi.insert(name + "Id", name);
-        m_toApi.insert(name + "Ids", name + "s");
-    }
+    for (QString name: {"device", "server", "user"})
+        renameToPlural(name);
+
+    renameToPlural("camera", "devices");
+}
+
+void IdRenamer::renameToPlural(const QString& source, QString target)
+{
+    if (target.isEmpty())
+        target = source + "s";
+
+    m_toApi.insert(source, target);
+    m_toApi.insert(source + "Id", target);
+    m_toApi.insert(source + "Ids", target);
 }
 
 QString IdRenamer::toApi(const QString& name) const
@@ -58,6 +67,7 @@ const UnitConverterBase* unitConverter(int type)
 
 bool isTimeField(const QString& fieldId)
 {
+    // TODO: #amalov Use field metadata for this detection.
     return fieldId == fieldMetatype<TimeField>() || fieldId == fieldMetatype<OptionalTimeField>();
 }
 

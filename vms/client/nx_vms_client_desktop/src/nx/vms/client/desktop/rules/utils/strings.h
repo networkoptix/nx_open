@@ -17,14 +17,14 @@ class Strings
     Q_DECLARE_TR_FUNCTIONS(Strings)
 
 public:
-    static QString selectButtonText(SystemContext* context, vms::rules::LayoutField* field);
-    static QString selectButtonText(SystemContext* context, vms::rules::TargetDeviceField* field);
+    static QString selectButtonText(SystemContext* context, vms::rules::TargetLayoutsField* field);
+    static QString selectButtonText(SystemContext* context, vms::rules::TargetDevicesField* field);
     static QString selectButtonText(SystemContext* context, vms::rules::TargetLayoutField* field);
-    static QString selectButtonText(SystemContext* context, vms::rules::TargetServerField* field);
+    static QString selectButtonText(SystemContext* context, vms::rules::TargetServersField* field);
     static QString selectButtonText(
-        SystemContext* context, vms::rules::TargetSingleDeviceField* field);
+        SystemContext* context, vms::rules::TargetDeviceField* field);
     static QString selectButtonText(
-        SystemContext* context, vms::rules::TargetUserField* field, int additionalCount);
+        SystemContext* context, vms::rules::TargetUsersField* field, int additionalCount);
 
     static QString selectButtonText(SystemContext* context, vms::rules::SourceCameraField* field);
     static QString selectButtonText(SystemContext* context, vms::rules::SourceServerField* field);

@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <chrono>
 #include <optional>
 
 #include <nx/network/aio/scheduler.h>
@@ -42,7 +43,7 @@ public:
         hpm::api::MediatorConnector* mediatorConnector,
         std::unique_ptr<nx::network::aio::Scheduler> scheduler = nullptr,
         const AbstractSpeedTester::Settings& speedTestSettings =
-            {{}, 16, 5, std::chrono::seconds(3)});
+            AbstractSpeedTester::Settings{{}, 16, 5, std::chrono::seconds(3)});
     ~UplinkSpeedReporter();
 
     virtual void stopWhileInAioThread() override;

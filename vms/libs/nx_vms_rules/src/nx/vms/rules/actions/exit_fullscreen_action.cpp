@@ -2,8 +2,8 @@
 
 #include "exit_fullscreen_action.h"
 
-#include "../action_builder_fields/target_layout_field.h"
-#include "../action_builder_fields/target_user_field.h"
+#include "../action_builder_fields/target_layouts_field.h"
+#include "../action_builder_fields/target_users_field.h"
 #include "../strings.h"
 #include "../utils/field.h"
 #include "../utils/type.h"
@@ -18,9 +18,9 @@ const ItemDescriptor& ExitFullscreenAction::manifest()
         .flags = ItemFlag::instant,
         .executionTargets = ExecutionTarget::clients,
         .fields = {
-            makeFieldDescriptor<TargetLayoutField>(utils::kLayoutIdsFieldName,
+            makeFieldDescriptor<TargetLayoutsField>(utils::kLayoutIdsFieldName,
                 Strings::onLayout()),
-            makeFieldDescriptor<TargetUserField>(
+            makeFieldDescriptor<TargetUsersField>(
                 utils::kUsersFieldName,
                 Strings::to(),
                 /*description*/ {},

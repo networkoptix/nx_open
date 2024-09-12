@@ -2,20 +2,20 @@
 
 #pragma once
 
-#include <nx/vms/rules/action_builder_fields/layout_field.h>
+#include <nx/vms/rules/action_builder_fields/target_layout_field.h>
 
 #include "resource_picker_widget_base.h"
 
 namespace nx::vms::client::desktop::rules {
 
 class SingleTargetLayoutPicker:
-    public ResourcePickerWidgetBase<vms::rules::LayoutField>
+    public ResourcePickerWidgetBase<vms::rules::TargetLayoutField>
 {
     Q_OBJECT
 
 public:
     SingleTargetLayoutPicker(
-        vms::rules::LayoutField* field, SystemContext* systemContext, ParamsWidget* parent);
+        vms::rules::TargetLayoutField* field, SystemContext* systemContext, ParamsWidget* parent);
 
     void onSelectButtonClicked() override;
 

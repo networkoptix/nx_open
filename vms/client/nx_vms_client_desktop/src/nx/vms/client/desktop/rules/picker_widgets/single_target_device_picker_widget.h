@@ -9,8 +9,8 @@
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
 #include <nx/vms/client/desktop/resource_dialogs/camera_selection_dialog.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
+#include <nx/vms/rules/action_builder_fields/target_device_field.h>
 #include <nx/vms/rules/action_builder_fields/target_layout_field.h>
-#include <nx/vms/rules/action_builder_fields/target_single_device_field.h>
 #include <nx/vms/rules/camera_validation_policy.h>
 #include <nx/vms/rules/event_filter_fields/source_camera_field.h>
 #include <nx/vms/rules/utils/event.h>
@@ -23,15 +23,15 @@ namespace nx::vms::client::desktop::rules {
 
 template<typename Policy>
 class SingleTargetDevicePicker:
-    public ResourcePickerWidgetBase<vms::rules::TargetSingleDeviceField>
+    public ResourcePickerWidgetBase<vms::rules::TargetDeviceField>
 {
 public:
     SingleTargetDevicePicker(
-        vms::rules::TargetSingleDeviceField* field,
+        vms::rules::TargetDeviceField* field,
         SystemContext* context,
         ParamsWidget* parent)
         :
-        ResourcePickerWidgetBase<vms::rules::TargetSingleDeviceField>(field, context, parent)
+        ResourcePickerWidgetBase<vms::rules::TargetDeviceField>(field, context, parent)
     {
     }
 
@@ -63,7 +63,7 @@ private:
             }
         }
 
-        ResourcePickerWidgetBase<vms::rules::TargetSingleDeviceField>::onSelectButtonClicked();
+        ResourcePickerWidgetBase<vms::rules::TargetDeviceField>::onSelectButtonClicked();
     }
 
     void preparePolicy();
@@ -78,7 +78,7 @@ template<>
 void SingleTargetDevicePicker<QnFullscreenCameraPolicy>::preparePolicy()
 {
     const auto layoutField =
-        getActionField<vms::rules::TargetLayoutField>(vms::rules::utils::kLayoutIdsFieldName);
+        getActionField<vms::rules::TargetLayoutsField>(vms::rules::utils::kLayoutIdsFieldName);
     if (!NX_ASSERT(layoutField))
         return;
 

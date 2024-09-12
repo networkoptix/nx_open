@@ -37,7 +37,7 @@ QIcon attentionIcon()
     return qnSkin->icon(kAttentionIcon);
 }
 
-QIcon selectButtonIcon(SystemContext* context, vms::rules::LayoutField* field)
+QIcon selectButtonIcon(SystemContext* context, vms::rules::TargetLayoutField* field)
 {
     if (const auto resource =
         context->resourcePool()->getResourceById<QnLayoutResource>(field->value()))
@@ -49,7 +49,7 @@ QIcon selectButtonIcon(SystemContext* context, vms::rules::LayoutField* field)
     return getIcon(QnResourceIconCache::Layout);
 }
 
-QIcon selectButtonIcon(SystemContext* context, vms::rules::TargetDeviceField* field)
+QIcon selectButtonIcon(SystemContext* context, vms::rules::TargetDevicesField* field)
 {
     const auto resources =
         context->resourcePool()->getResourcesByIds<QnVirtualCameraResource>(field->ids());
@@ -64,7 +64,7 @@ QIcon selectButtonIcon(SystemContext* context, vms::rules::TargetDeviceField* fi
     return getIcon(QnResourceIconCache::Camera);
 }
 
-QIcon selectButtonIcon(SystemContext* context, vms::rules::TargetLayoutField* field)
+QIcon selectButtonIcon(SystemContext* context, vms::rules::TargetLayoutsField* field)
 {
     const auto resources =
         context->resourcePool()->getResourcesByIds<QnLayoutResource>(field->value());
@@ -78,7 +78,7 @@ QIcon selectButtonIcon(SystemContext* context, vms::rules::TargetLayoutField* fi
     return getIcon(QnResourceIconCache::Layout);
 }
 
-QIcon selectButtonIcon(SystemContext* context, vms::rules::TargetServerField* field)
+QIcon selectButtonIcon(SystemContext* context, vms::rules::TargetServersField* field)
 {
     const auto resources =
         context->resourcePool()->getResourcesByIds<QnMediaServerResource>(field->ids());
@@ -93,7 +93,7 @@ QIcon selectButtonIcon(SystemContext* context, vms::rules::TargetServerField* fi
     return getIcon(QnResourceIconCache::Server);
 }
 
-QIcon selectButtonIcon(SystemContext* context, vms::rules::TargetSingleDeviceField* field)
+QIcon selectButtonIcon(SystemContext* context, vms::rules::TargetDeviceField* field)
 {
     if (field->useSource() || field->id().isNull())
         return getIcon(QnResourceIconCache::Camera);
@@ -103,7 +103,7 @@ QIcon selectButtonIcon(SystemContext* context, vms::rules::TargetSingleDeviceFie
 
 QIcon selectButtonIcon(
     SystemContext* context,
-    vms::rules::TargetUserField* field,
+    vms::rules::TargetUsersField* field,
     int additionalCount,
     QValidator::State fieldValidity)
 {

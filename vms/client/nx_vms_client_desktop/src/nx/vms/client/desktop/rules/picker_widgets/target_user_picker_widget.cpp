@@ -10,8 +10,8 @@
 #include <nx/vms/client/desktop/ui/event_rules/subject_selection_dialog.h>
 #include <nx/vms/rules/action_builder_fields/event_devices_field.h>
 #include <nx/vms/rules/action_builder_fields/flag_field.h>
-#include <nx/vms/rules/action_builder_fields/layout_field.h>
 #include <nx/vms/rules/action_builder_fields/target_layout_field.h>
+#include <nx/vms/rules/action_builder_fields/target_layouts_field.h>
 #include <nx/vms/rules/action_builder_fields/text_field.h>
 #include <nx/vms/rules/actions/open_layout_action.h>
 #include <nx/vms/rules/actions/push_notification_action.h>
@@ -24,11 +24,11 @@
 namespace nx::vms::client::desktop::rules {
 
 TargetUserPicker::TargetUserPicker(
-    vms::rules::TargetUserField* field,
+    vms::rules::TargetUsersField* field,
     SystemContext* context,
     ParamsWidget* parent)
     :
-    ResourcePickerWidgetBase<vms::rules::TargetUserField>{field, context, parent}
+    ResourcePickerWidgetBase<vms::rules::TargetUsersField>{field, context, parent}
 {
     const auto validationPolicy = field->properties().validationPolicy;
     const auto allowEmptySelection = field->properties().allowEmptySelection;
@@ -80,7 +80,7 @@ void TargetUserPicker::onSelectButtonClicked()
         if (validationPolicy == vms::rules::kLayoutAccessValidationPolicy)
         {
             const auto layoutField =
-                getActionField<vms::rules::LayoutField>(vms::rules::utils::kLayoutIdFieldName);
+                getActionField<vms::rules::TargetLayoutField>(vms::rules::utils::kLayoutIdFieldName);
 
             if (!NX_ASSERT(
                 layoutField, "LayoutField must be provided for the given validation policy"))
@@ -115,7 +115,7 @@ void TargetUserPicker::onSelectButtonClicked()
         m_field->setAcceptAll(dialog.allUsers());
     }
 
-    ResourcePickerWidgetBase<vms::rules::TargetUserField>::onSelectButtonClicked();
+    ResourcePickerWidgetBase<vms::rules::TargetUsersField>::onSelectButtonClicked();
 }
 
 } // namespace nx::vms::client::desktop::rules

@@ -3,8 +3,8 @@
 #include "play_sound_action.h"
 
 #include "../action_builder_fields/sound_field.h"
-#include "../action_builder_fields/target_device_field.h"
-#include "../action_builder_fields/target_user_field.h"
+#include "../action_builder_fields/target_devices_field.h"
+#include "../action_builder_fields/target_users_field.h"
 #include "../action_builder_fields/volume_field.h"
 #include "../strings.h"
 #include "../utils/field.h"
@@ -22,14 +22,14 @@ const ItemDescriptor& PlaySoundAction::manifest()
         .targetServers = TargetServers::resourceOwner,
         .fields = {
             makeFieldDescriptor<SoundField>(utils::kSoundFieldName, {}),
-            makeFieldDescriptor<TargetDeviceField>(
+            makeFieldDescriptor<TargetDevicesField>(
                 utils::kDeviceIdsFieldName,
                 Strings::at(),
                 {},
                 ResourceFilterFieldProperties{
                     .validationPolicy = kCameraAudioTransmissionValidationPolicy
                 }.toVariantMap()),
-            makeFieldDescriptor<TargetUserField>(
+            makeFieldDescriptor<TargetUsersField>(
                 utils::kUsersFieldName,
                 NX_DYNAMIC_TRANSLATABLE(tr("To Users")),
                 {},

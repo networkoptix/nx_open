@@ -8,7 +8,7 @@
 #include <utils/email/email.h>
 
 #include "../action_builder_fields/email_message_field.h"
-#include "../action_builder_fields/target_user_field.h"
+#include "../action_builder_fields/target_users_field.h"
 #include "../action_builder_fields/text_field.h"
 #include "../strings.h"
 #include "../utils/event_details.h"
@@ -28,7 +28,7 @@ const ItemDescriptor& SendEmailAction::manifest()
         .executionTargets = ExecutionTarget::servers,
         .targetServers = TargetServers::serverWithPublicIp,
         .fields = {
-            makeFieldDescriptor<TargetUserField>(
+            makeFieldDescriptor<TargetUsersField>(
                 utils::kUsersFieldName,
                 Strings::to(),
                 /*description*/ {},

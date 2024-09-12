@@ -4,7 +4,7 @@
 
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/vms/rules/action_builder_fields/target_layout_field.h>
+#include <nx/vms/rules/action_builder_fields/target_layouts_field.h>
 
 #include "../rule.h"
 #include "../strings.h"
@@ -14,7 +14,7 @@ namespace nx::vms::rules {
 ValidationResult TargetLayoutFieldValidator::validity(
     const Field* field, const Rule* /*rule*/, common::SystemContext* context) const
 {
-    auto targetLayoutField = dynamic_cast<const TargetLayoutField*>(field);
+    auto targetLayoutField = dynamic_cast<const TargetLayoutsField*>(field);
     if (!NX_ASSERT(targetLayoutField))
         return {QValidator::State::Invalid, Strings::invalidFieldType()};
 

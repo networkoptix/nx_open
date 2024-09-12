@@ -6,7 +6,7 @@
 #include <nx/vms/rules/action_builder.h>
 #include <nx/vms/rules/action_builder_fields/optional_time_field.h>
 #include <nx/vms/rules/action_builder_fields/target_device_field.h>
-#include <nx/vms/rules/action_builder_fields/target_single_device_field.h>
+#include <nx/vms/rules/action_builder_fields/target_devices_field.h>
 #include <nx/vms/rules/action_builder_fields/time_field.h>
 #include <nx/vms/rules/actions/bookmark_action.h>
 #include <nx/vms/rules/actions/show_notification_action.h>
@@ -152,10 +152,10 @@ void RuleCompatibilityManager::fixUseSourceValue()
     const auto eventFilter = m_rule->eventFilters().first();
     const auto actionBuilder = m_rule->actionBuilders().first();
 
-    const auto targetDeviceField = actionBuilder->fieldByName<vms::rules::TargetDeviceField>(
+    const auto targetDeviceField = actionBuilder->fieldByName<vms::rules::TargetDevicesField>(
         vms::rules::utils::kDeviceIdsFieldName);
     const auto targetSingleDeviceField =
-        actionBuilder->fieldByName<vms::rules::TargetSingleDeviceField>(
+        actionBuilder->fieldByName<vms::rules::TargetDeviceField>(
             vms::rules::utils::kCameraIdFieldName);
 
     if (!targetDeviceField && !targetSingleDeviceField)

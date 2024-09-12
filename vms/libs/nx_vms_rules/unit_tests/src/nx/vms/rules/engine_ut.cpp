@@ -687,7 +687,7 @@ TEST_F(EngineTest, stopProlongedActionsIsEmittedWhenRuleIsDisabled)
     engine->registerEventField(
         fieldMetatype<SourceCameraField>(),
         [](const FieldDescriptor* descriptor) { return new SourceCameraField{descriptor}; });
-    Plugin::registerActionField<TargetDeviceField>(engine.get());
+    Plugin::registerActionField<TargetDevicesField>(engine.get());
 
     auto rule = makeRule<TestEventProlonged, TestProlongedAction>(
         [] { return new TestEventProlonged; },
@@ -701,7 +701,7 @@ TEST_F(EngineTest, stopProlongedActionsIsEmittedWhenRuleIsDisabled)
     // Action builder makes action for two devices plus source.
     UuidSet targetDevices = { Uuid::createUuid(), Uuid::createUuid() };
     auto targetDeviceField =
-        rule->actionBuilders().first()->fieldByName<TargetDeviceField>(utils::kDeviceIdsFieldName);
+        rule->actionBuilders().first()->fieldByName<TargetDevicesField>(utils::kDeviceIdsFieldName);
     targetDeviceField->setUseSource(true);
     targetDeviceField->setIds(targetDevices);
 

@@ -5,8 +5,8 @@
 #include <nx/utils/qt_helpers.h>
 #include <nx/vms/api/data/user_group_data.h>
 
-#include "../action_builder_fields/target_device_field.h"
-#include "../action_builder_fields/target_user_field.h"
+#include "../action_builder_fields/target_devices_field.h"
+#include "../action_builder_fields/target_users_field.h"
 #include "../action_builder_fields/text_with_fields.h"
 #include "../action_builder_fields/volume_field.h"
 #include "../strings.h"
@@ -26,14 +26,14 @@ const ItemDescriptor& SpeakAction::manifest()
         .fields = {
             makeFieldDescriptor<TextWithFields>(utils::kTextFieldName,
                 NX_DYNAMIC_TRANSLATABLE(tr("Text"))),
-            makeFieldDescriptor<TargetDeviceField>(
+            makeFieldDescriptor<TargetDevicesField>(
                 utils::kDeviceIdsFieldName,
                 NX_DYNAMIC_TRANSLATABLE(tr("At Device")),
                 {},
                 ResourceFilterFieldProperties{
                     .validationPolicy = kCameraAudioTransmissionValidationPolicy
                 }.toVariantMap()),
-            makeFieldDescriptor<TargetUserField>(
+            makeFieldDescriptor<TargetUsersField>(
                 utils::kUsersFieldName,
                 NX_DYNAMIC_TRANSLATABLE(tr("To users")),
                 /*description*/ {},

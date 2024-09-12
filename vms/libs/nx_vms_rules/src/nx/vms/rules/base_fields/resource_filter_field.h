@@ -127,7 +127,6 @@ class NX_VMS_RULES_API ResourceFilterActionField:
 {
     Q_OBJECT
 
-    Q_PROPERTY(bool acceptAll READ acceptAll WRITE setAcceptAll NOTIFY acceptAllChanged)
     Q_PROPERTY(UuidSet ids READ ids WRITE setIds NOTIFY idsChanged)
 
 signals:

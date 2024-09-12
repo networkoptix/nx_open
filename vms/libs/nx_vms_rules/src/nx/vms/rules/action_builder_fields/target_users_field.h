@@ -14,15 +14,17 @@ constexpr auto kUserWithEmailValidationPolicy = "userWithEmail";
 constexpr auto kCloudUserValidationPolicy = "cloudUser";
 constexpr auto kLayoutAccessValidationPolicy = "layoutAccess";
 
-class NX_VMS_RULES_API TargetUserField:
+class NX_VMS_RULES_API TargetUsersField:
     public ResourceFilterActionField,
     public common::SystemContextAware
 {
     Q_OBJECT
     Q_CLASSINFO("metatype", "nx.actions.fields.users")
 
+    Q_PROPERTY(bool acceptAll READ acceptAll WRITE setAcceptAll NOTIFY acceptAllChanged)
+
 public:
-    TargetUserField(common::SystemContext* context, const FieldDescriptor* descriptor);
+    TargetUsersField(common::SystemContext* context, const FieldDescriptor* descriptor);
 
     QnUserResourceSet users() const;
 };

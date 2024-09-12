@@ -7,7 +7,7 @@
 
 #include "../action_builder_fields/event_devices_field.h"
 #include "../action_builder_fields/flag_field.h"
-#include "../action_builder_fields/target_user_field.h"
+#include "../action_builder_fields/target_users_field.h"
 #include "../action_builder_fields/text_with_fields.h"
 #include "../strings.h"
 #include "../utils/event_details.h"
@@ -25,7 +25,7 @@ const ItemDescriptor& NotificationAction::manifest()
         .flags = {ItemFlag::instant, ItemFlag::userFiltered},
         .executionTargets = {ExecutionTarget::clients, ExecutionTarget::cloud},
         .fields = {
-            makeFieldDescriptor<TargetUserField>(
+            makeFieldDescriptor<TargetUsersField>(
                 utils::kUsersFieldName,
                 Strings::to(),
                 {},

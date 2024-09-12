@@ -5,7 +5,7 @@
 #include "../action_builder_fields/fps_field.h"
 #include "../action_builder_fields/optional_time_field.h"
 #include "../action_builder_fields/stream_quality_field.h"
-#include "../action_builder_fields/target_device_field.h"
+#include "../action_builder_fields/target_devices_field.h"
 #include "../action_builder_fields/time_field.h"
 #include "../strings.h"
 #include "../utils/field.h"
@@ -24,7 +24,7 @@ const ItemDescriptor& DeviceRecordingAction::manifest()
         .executionTargets = ExecutionTarget::servers,
         .targetServers = TargetServers::resourceOwner,
         .fields = {
-            makeFieldDescriptor<TargetDeviceField>(
+            makeFieldDescriptor<TargetDevicesField>(
                 utils::kDeviceIdsFieldName,
                 NX_DYNAMIC_TRANSLATABLE(tr("On")),
                 {},

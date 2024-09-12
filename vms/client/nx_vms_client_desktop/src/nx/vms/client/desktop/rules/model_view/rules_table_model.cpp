@@ -23,10 +23,10 @@
 #include <nx/vms/common/user_management/user_management_helpers.h>
 #include <nx/vms/rules/action_builder.h>
 #include <nx/vms/rules/action_builder_fields/target_device_field.h>
-#include <nx/vms/rules/action_builder_fields/target_layout_field.h>
-#include <nx/vms/rules/action_builder_fields/target_server_field.h>
-#include <nx/vms/rules/action_builder_fields/target_single_device_field.h>
-#include <nx/vms/rules/action_builder_fields/target_user_field.h>
+#include <nx/vms/rules/action_builder_fields/target_devices_field.h>
+#include <nx/vms/rules/action_builder_fields/target_layouts_field.h>
+#include <nx/vms/rules/action_builder_fields/target_servers_field.h>
+#include <nx/vms/rules/action_builder_fields/target_users_field.h>
 #include <nx/vms/rules/engine.h>
 #include <nx/vms/rules/event_filter.h>
 #include <nx/vms/rules/event_filter_fields/source_camera_field.h>
@@ -575,7 +575,7 @@ QVariant RulesTableModel::targetCameraData(const vms::rules::ActionBuilder* acti
     bool allowEmptySelection{false};
     const auto resourcePool = appContext()->currentSystemContext()->resourcePool();
 
-    if (const auto targetDeviceField = actionBuilder->fieldByType<vms::rules::TargetDeviceField>())
+    if (const auto targetDeviceField = actionBuilder->fieldByType<vms::rules::TargetDevicesField>())
     {
         useSource = targetDeviceField->useSource();
         allowEmptySelection = targetDeviceField->properties().allowEmptySelection;
@@ -591,7 +591,7 @@ QVariant RulesTableModel::targetCameraData(const vms::rules::ActionBuilder* acti
         }
     }
     else if (const auto targetSingleDeviceField =
-        actionBuilder->fieldByType<vms::rules::TargetSingleDeviceField>())
+        actionBuilder->fieldByType<vms::rules::TargetDeviceField>())
     {
         useSource = targetSingleDeviceField->useSource();
         allowEmptySelection = targetSingleDeviceField->properties().allowEmptySelection;
@@ -647,7 +647,7 @@ QVariant RulesTableModel::targetCameraData(const vms::rules::ActionBuilder* acti
 
 QVariant RulesTableModel::targetLayoutData(const vms::rules::ActionBuilder* actionBuilder, int role) const
 {
-    const auto targetLayoutField = actionBuilder->fieldByType<vms::rules::TargetLayoutField>();
+    const auto targetLayoutField = actionBuilder->fieldByType<vms::rules::TargetLayoutsField>();
     if (!targetLayoutField)
         return {};
 
@@ -690,7 +690,7 @@ QVariant RulesTableModel::targetLayoutData(const vms::rules::ActionBuilder* acti
 
 QVariant RulesTableModel::targetUserData(const vms::rules::ActionBuilder* actionBuilder, int role) const
 {
-    const auto targetUserField = actionBuilder->fieldByType<vms::rules::TargetUserField>();
+    const auto targetUserField = actionBuilder->fieldByType<vms::rules::TargetUsersField>();
     if (!targetUserField)
         return {};
 
@@ -768,7 +768,7 @@ QVariant RulesTableModel::targetServerData(
     const vms::rules::ActionBuilder* actionBuilder,
     int role) const
 {
-    const auto targetServerField = actionBuilder->fieldByType<vms::rules::TargetServerField>();
+    const auto targetServerField = actionBuilder->fieldByType<vms::rules::TargetServersField>();
     if (!targetServerField)
         return {};
 

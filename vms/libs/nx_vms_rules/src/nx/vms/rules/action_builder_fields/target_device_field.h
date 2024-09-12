@@ -2,37 +2,86 @@
 
 #pragma once
 
-#include "../base_fields/resource_filter_field.h"
+#include <nx/vms/common/system_context_aware.h>
+
+#include "../action_builder_field.h"
 
 namespace nx::vms::rules {
 
-constexpr auto kBookmarkValidationPolicy = "bookmark";
-constexpr auto kCameraAudioTransmissionValidationPolicy = "cameraAudioTransmission";
-constexpr auto kCameraOutputValidationPolicy = "cameraOutput";
-constexpr auto kCameraRecordingValidationPolicy = "cameraRecording";
+constexpr auto kCameraFullScreenValidationPolicy = "cameraFullScreen";
+constexpr auto kExecPtzValidationPolicy = "execPtz";
 
-/** Displayed as device selection button and "Use source" checkbox. */
-class NX_VMS_RULES_API TargetDeviceField: public ResourceFilterActionField
+struct TargetSingleDeviceFieldProperties
+{
+    /** Whether given field should be visible in the editor. */
+    bool visible{true};
+
+    /** Value for the the just created field's `id` property. */
+    nx::Uuid id;
+
+    /** Value for the the just created field's `useSource` property. */
+    bool useSource{false};
+
+    bool allowEmptySelection{false};
+    QString validationPolicy;
+
+    QVariantMap toVariantMap() const
+    {
+        QVariantMap result;
+
+        result.insert("id", QVariant::fromValue(id));
+        result.insert("useSource", useSource);
+        result.insert("visible", visible);
+        result.insert("allowEmptySelection", allowEmptySelection);
+        result.insert("validationPolicy", validationPolicy);
+
+        return result;
+    }
+
+    static TargetSingleDeviceFieldProperties fromVariantMap(const QVariantMap& properties)
+    {
+        TargetSingleDeviceFieldProperties result;
+
+        result.id = properties.value("id").value<nx::Uuid>();
+        result.useSource = properties.value("useSource").toBool();
+
+        result.visible = properties.value("visible", true).toBool();
+        result.allowEmptySelection = properties.value("allowEmptySelection", false).toBool();
+        result.validationPolicy = properties.value("validationPolicy").toString();
+
+        return result;
+    }
+};
+
+/** Displayed as a device selection button and a "Use source" checkbox. */
+class NX_VMS_RULES_API TargetDeviceField: public ActionBuilderField
 {
     Q_OBJECT
-    Q_CLASSINFO("metatype", "nx.actions.fields.devices")
+    Q_CLASSINFO("metatype", "nx.actions.fields.device")
 
+    Q_PROPERTY(nx::Uuid id READ id WRITE setId NOTIFY idChanged)
     Q_PROPERTY(bool useSource READ useSource WRITE setUseSource NOTIFY useSourceChanged)
 
 public:
-    using ResourceFilterActionField::ResourceFilterActionField;
+    using ActionBuilderField::ActionBuilderField;
 
+    nx::Uuid id() const;
+    void setId(nx::Uuid id);
     bool useSource() const;
     void setUseSource(bool value);
 
-    QVariant build(const AggregatedEventPtr& eventAggregator) const override;
+    virtual QVariant build(const AggregatedEventPtr& eventAggregator) const override;
+
+    TargetSingleDeviceFieldProperties properties() const;
     static QJsonObject openApiDescriptor();
 
 signals:
+    void idChanged();
     void useSourceChanged();
 
 private:
-    bool m_useSource = false;
+    nx::Uuid m_id;
+    bool m_useSource{false};
 };
 
 } // namespace nx::vms::rules

@@ -10,7 +10,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/rules/action_builder_fields/target_single_device_field.h>
+#include <nx/vms/rules/action_builder_fields/target_device_field.h>
 #include <nx/vms/rules/utils/field.h>
 #include <ui/fisheye/fisheye_ptz_controller.h>
 
@@ -30,7 +30,7 @@ void PtzPresetPicker::updateUi()
     DropdownTextPickerWidgetBase<vms::rules::PtzPresetField>::updateUi();
 
     const auto cameraField =
-        getActionField<vms::rules::TargetSingleDeviceField>(vms::rules::utils::kCameraIdFieldName);
+        getActionField<vms::rules::TargetDeviceField>(vms::rules::utils::kCameraIdFieldName);
 
     if (!NX_ASSERT(cameraField))
         return;

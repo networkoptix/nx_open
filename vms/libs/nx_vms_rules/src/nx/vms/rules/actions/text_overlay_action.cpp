@@ -5,8 +5,8 @@
 #include <nx/vms/common/html/html.h>
 
 #include "../action_builder_fields/optional_time_field.h"
-#include "../action_builder_fields/target_device_field.h"
-#include "../action_builder_fields/target_user_field.h"
+#include "../action_builder_fields/target_devices_field.h"
+#include "../action_builder_fields/target_users_field.h"
 #include "../action_builder_fields/text_with_fields.h"
 #include "../strings.h"
 #include "../utils/event_details.h"
@@ -25,7 +25,7 @@ const ItemDescriptor& TextOverlayAction::manifest()
         .flags = ItemFlag::prolonged,
         .executionTargets = ExecutionTarget::clients,
         .fields = {
-            makeFieldDescriptor<TargetDeviceField>(
+            makeFieldDescriptor<TargetDevicesField>(
                 utils::kDeviceIdsFieldName,
                 Strings::at(),
                 {},
@@ -42,7 +42,7 @@ const ItemDescriptor& TextOverlayAction::manifest()
                 utils::kTextFieldName,
                 NX_DYNAMIC_TRANSLATABLE(tr("Custom Text"))),
 
-            makeFieldDescriptor<TargetUserField>(
+            makeFieldDescriptor<TargetUsersField>(
                 utils::kUsersFieldName,
                 NX_DYNAMIC_TRANSLATABLE(tr("Show To")),
                 /*description*/ {},

@@ -11,12 +11,12 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
-#include <nx/vms/rules/action_builder_fields/layout_field.h>
 #include <nx/vms/rules/action_builder_fields/target_device_field.h>
+#include <nx/vms/rules/action_builder_fields/target_devices_field.h>
 #include <nx/vms/rules/action_builder_fields/target_layout_field.h>
-#include <nx/vms/rules/action_builder_fields/target_server_field.h>
-#include <nx/vms/rules/action_builder_fields/target_single_device_field.h>
-#include <nx/vms/rules/action_builder_fields/target_user_field.h>
+#include <nx/vms/rules/action_builder_fields/target_layouts_field.h>
+#include <nx/vms/rules/action_builder_fields/target_servers_field.h>
+#include <nx/vms/rules/action_builder_fields/target_users_field.h>
 #include <nx/vms/rules/actions/bookmark_action.h>
 #include <nx/vms/rules/actions/device_output_action.h>
 #include <nx/vms/rules/actions/device_recording_action.h>
@@ -34,7 +34,7 @@
 
 namespace nx::vms::client::desktop::rules {
 
-QString Strings::selectButtonText(SystemContext* context, vms::rules::LayoutField* field)
+QString Strings::selectButtonText(SystemContext* context, vms::rules::TargetLayoutField* field)
 {
     if (field->value().isNull())
         return selectString();
@@ -46,7 +46,7 @@ QString Strings::selectButtonText(SystemContext* context, vms::rules::LayoutFiel
     return resource->getName();
 }
 
-QString Strings::selectButtonText(SystemContext* context, vms::rules::TargetDeviceField* field)
+QString Strings::selectButtonText(SystemContext* context, vms::rules::TargetDevicesField* field)
 {
     const auto resources =
         context->resourcePool()->getResourcesByIds<QnVirtualCameraResource>(field->ids());
@@ -65,7 +65,7 @@ QString Strings::selectButtonText(SystemContext* context, vms::rules::TargetDevi
     return getName(context, resources);
 }
 
-QString Strings::selectButtonText(SystemContext* context, vms::rules::TargetLayoutField* field)
+QString Strings::selectButtonText(SystemContext* context, vms::rules::TargetLayoutsField* field)
 {
     const auto resources =
         context->resourcePool()->getResourcesByIds<QnLayoutResource>(field->value());
@@ -79,7 +79,7 @@ QString Strings::selectButtonText(SystemContext* context, vms::rules::TargetLayo
     return tr("%n Layouts", "", static_cast<int>(resources.size()));
 }
 
-QString Strings::selectButtonText(SystemContext* context, vms::rules::TargetServerField* field)
+QString Strings::selectButtonText(SystemContext* context, vms::rules::TargetServersField* field)
 {
     const auto resources =
         context->resourcePool()->getResourcesByIds<QnMediaServerResource>(field->ids());
@@ -99,7 +99,7 @@ QString Strings::selectButtonText(SystemContext* context, vms::rules::TargetServ
 }
 
 QString Strings::selectButtonText(
-    SystemContext* context, vms::rules::TargetSingleDeviceField* field)
+    SystemContext* context, vms::rules::TargetDeviceField* field)
 {
     if (field->useSource())
         return sourceCameraString();
@@ -116,7 +116,7 @@ QString Strings::selectButtonText(
 }
 
 QString Strings::selectButtonText(
-    SystemContext* context, vms::rules::TargetUserField* field, int additionalCount)
+    SystemContext* context, vms::rules::TargetUsersField* field, int additionalCount)
 {
     if (field->acceptAll())
         return tr("All Users");
