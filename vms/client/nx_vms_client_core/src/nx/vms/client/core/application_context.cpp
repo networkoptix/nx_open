@@ -160,7 +160,6 @@ struct ApplicationContext::Private
     std::unique_ptr<FontConfig> fontConfig;
     std::unique_ptr<LocalNetworkInterfacesManager> localNetworkInterfacesManager;
     std::unique_ptr<watchers::KnownServerConnections> knownServerConnectionsWatcher;
-    std::unique_ptr<nx::i18n::TranslationManager> translationManager;
     QString customExternalResourceFile;
 };
 
@@ -249,13 +248,11 @@ void ApplicationContext::initializeNetworkModules()
 void ApplicationContext::initializeTranslations(const QString& targetLocale)
 {
     NX_INFO(this, "Trying to Initialize translations for locale %1", targetLocale);
-    d->translationManager = std::make_unique<nx::i18n::TranslationManager>();
-    setTranslationManager(d->translationManager.get());
 
     const auto langName = targetLocale.split('_').first();
 
     std::optional<nx::i18n::Translation> bestTranslation;
-    for (const auto& translation: d->translationManager->translations())
+    for (const auto& translation: translationManager()->translations())
     {
         if (translation.localeCode == targetLocale)
         {
@@ -274,17 +271,17 @@ void ApplicationContext::initializeTranslations(const QString& targetLocale)
     if (bestTranslation)
     {
         NX_DEBUG(NX_SCOPE_TAG, "Installing translation: %1", bestTranslation->localeCode);
-        d->translationManager->installTranslation(*bestTranslation);
+        translationManager()->installTranslation(*bestTranslation);
     }
     else
     {
         NX_DEBUG(NX_SCOPE_TAG, "Installing default translation: %1",
             nx::branding::defaultLocale());
-        NX_ASSERT(d->translationManager->installTranslation(nx::branding::defaultLocale()),
+        NX_ASSERT(translationManager()->installTranslation(nx::branding::defaultLocale()),
             "Translations could not be initialized");
     }
 
-    d->translationManager->setAssertOnOverlayInstallationFailure();
+    translationManager()->setAssertOnOverlayInstallationFailure();
 }
 
 QQmlEngine* ApplicationContext::qmlEngine() const
@@ -395,11 +392,6 @@ void ApplicationContext::addMainContext(SystemContext* mainContext)
 {
     NX_ASSERT(d->systemContexts.empty()); //< Main context should be first.
     d->systemContexts.push_back(mainContext);
-}
-
-nx::i18n::TranslationManager* ApplicationContext::translationManager() const
-{
-    return d->translationManager.get();
 }
 
 } // namespace nx::vms::client::core

@@ -49,8 +49,7 @@ struct ApplicationContext::Private
     std::unique_ptr<QnStoragePluginFactory> storagePluginFactory;
     std::unique_ptr<nx::utils::TimerManager> timerManager;
     std::unique_ptr<ApplicationMetricsStorage> metricsStorage;
-
-    QPointer<nx::i18n::TranslationManager> translationManager;
+    std::unique_ptr<nx::i18n::TranslationManager> translationManager;
 };
 
 ApplicationContext::ApplicationContext(
@@ -84,6 +83,8 @@ ApplicationContext::ApplicationContext(
     d->storagePluginFactory = std::make_unique<QnStoragePluginFactory>();
     d->timerManager = std::make_unique<nx::utils::TimerManager>("CommonTimerManager");
     d->metricsStorage = std::make_unique<ApplicationMetricsStorage>();
+
+    d->translationManager = std::make_unique<nx::i18n::TranslationManager>();
 }
 
 void ApplicationContext::stopAll()
@@ -99,6 +100,7 @@ ApplicationContext::~ApplicationContext()
     d->longRunableCleanup.reset();
     d->longRunnablePool.reset();
     deinitNetworking();
+    d->translationManager->deinitialize();
 
     if (NX_ASSERT(s_instance == this))
         s_instance = nullptr;
@@ -152,11 +154,6 @@ void ApplicationContext::setLocale(const QString& value)
 nx::i18n::TranslationManager* ApplicationContext::translationManager() const
 {
     return d->translationManager.get();
-}
-
-void ApplicationContext::setTranslationManager(nx::i18n::TranslationManager* value)
-{
-    d->translationManager = value;
 }
 
 void ApplicationContext::setModuleShortId(const nx::Uuid& id, int number)
