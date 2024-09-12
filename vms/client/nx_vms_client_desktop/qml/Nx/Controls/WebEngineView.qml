@@ -22,16 +22,22 @@ Item
 
         webView.userScripts.collection = [
             {
-                worldId: WebEngineScript.MainWorld,
-                injectionPoint: WebEngineScript.DocumentReady,
-                name: "ObjectInjectorScript",
-                sourceUrl: "qrc:///qml/Nx/Controls/web_engine_inject.js"
-            },
-            {
                 injectionPoint: WebEngineScript.DocumentCreation,
                 worldId: WebEngineScript.MainWorld,
                 name: "QWebChannel",
                 sourceUrl: "qrc:///qtwebchannel/qwebchannel.js"
+            },
+            {
+                injectionPoint: WebEngineScript.DocumentCreation,
+                worldId: WebEngineScript.MainWorld,
+                name: "ObjectInjectorScriptConstants",
+                sourceCode: "window.isVmsApiEnabled = true"
+            },
+            {
+                worldId: WebEngineScript.MainWorld,
+                injectionPoint: WebEngineScript.DocumentReady,
+                name: "ObjectInjectorScript",
+                sourceUrl: "qrc:///qml/Nx/Controls/web_engine_inject.js"
             }
         ]
     }

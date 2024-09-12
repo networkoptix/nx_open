@@ -25,13 +25,17 @@ The API consist of some global objects injected to the client JavaScript code. T
 
 The JavaScript API calls `window.vmsApiInit()` to signalize that the API is ready to be used.
 Before this call, global objects of the API are not available. This function should be initialized
-by the user by assigning a callback.
+by the user by assigning a callback. There is also a `window.isVmsApiEnabled` flag, which can be
+used to check whether the API is enabled and will be initialized.
 
-    window.vmsApiInit =
-        async function()
-        {
-            vms.log.info("Here we have all the API objects initialized")
-        }
+    if (window.isVmsApiEnabled)
+    {
+        window.vmsApiInit =
+            async function()
+            {
+                vms.log.info("Here we have all the API objects initialized")
+            }
+    }
 
 ## Signals
 
