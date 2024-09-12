@@ -105,8 +105,6 @@ public:
      */
     void removeSystemContext(SystemContext* systemContext);
 
-    nx::i18n::TranslationManager* translationManager() const;
-
     FontConfig* fontConfig() const;
 
     /**
