@@ -250,7 +250,7 @@ Window
                 }
             }
 
-            onDragPositionChanged:
+            onDragPositionChanged: (pos) =>
                 filtersPanel.width = pos
         }
 
@@ -837,9 +837,10 @@ Window
 
             enabled: showPreview
 
-            onDragPositionChanged:
+            onDragPositionChanged: (pos) =>
             {
-                const requestedWidth = previewPanel.x + previewPanel.width - pos - anchors.rightMargin
+                const requestedWidth =
+                    previewPanel.x + previewPanel.width - pos - anchors.rightMargin
                 previewPanel.setWidth(requestedWidth)
             }
         }
