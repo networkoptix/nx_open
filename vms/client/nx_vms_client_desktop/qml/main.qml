@@ -102,7 +102,7 @@ Control
             edge: Qt.LeftEdge
             target: rightPanel
 
-            onDragPositionChanged:
+            onDragPositionChanged: (pos) =>
             {
                 const threshold = (rightPanel.narrowWidth + rightPanel.wideWidth) / 2
                 const requestedWidth = rightPanel.x + rightPanel.width - pos
@@ -175,7 +175,7 @@ Control
             drag.maximumY: timelinePanel.y + timelinePanel.height - timeline.implicitHeight
             drag.minimumY: drag.maximumY - timelinePanel.maxThumbnailHeight
 
-            onDragPositionChanged:
+            onDragPositionChanged: (pos) =>
             {
                 const narrowHeight = timeline.implicitHeight
                 const threshold = narrowHeight + timelinePanel.minThumbnailHeight / 2
