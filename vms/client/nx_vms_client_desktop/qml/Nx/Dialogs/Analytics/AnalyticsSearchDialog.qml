@@ -696,7 +696,7 @@ Window
 
                                 ColoredImage
                                 {
-                                    height: 20
+                                    sourceSize: Qt.size(20, 20)
                                     sourcePath: model.iconKey
                                         ? "image://skin/" + model.iconKey
                                         : ""
