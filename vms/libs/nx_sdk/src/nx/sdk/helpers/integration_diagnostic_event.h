@@ -5,20 +5,20 @@
 #include <string>
 
 #include <nx/sdk/helpers/ref_countable.h>
-#include <nx/sdk/i_plugin_diagnostic_event.h>
+#include <nx/sdk/i_integration_diagnostic_event.h>
 
 namespace nx::sdk {
 
-class PluginDiagnosticEvent: public RefCountable<IPluginDiagnosticEvent>
+class IntegrationDiagnosticEvent: public RefCountable<IIntegrationDiagnosticEvent>
 {
 public:
-    PluginDiagnosticEvent(Level level, std::string caption, std::string description);
+    IntegrationDiagnosticEvent(Level level, std::string caption, std::string description);
 
     virtual Level level() const override;
     virtual const char* caption() const override;
     virtual const char* description() const override;
 
-    void setLevel(IPluginDiagnosticEvent::Level level);
+    void setLevel(IIntegrationDiagnosticEvent::Level level);
     void setCaption(std::string caption);
     void setDescription(std::string description);
 

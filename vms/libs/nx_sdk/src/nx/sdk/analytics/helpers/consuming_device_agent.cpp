@@ -7,7 +7,7 @@
 #include <nx/sdk/helpers/string.h>
 #include <nx/sdk/helpers/to_string.h>
 #include <nx/sdk/helpers/error.h>
-#include <nx/sdk/helpers/plugin_diagnostic_event.h>
+#include <nx/sdk/helpers/integration_diagnostic_event.h>
 #include <nx/sdk/analytics/helpers/engine.h>
 
 #include <nx/sdk/analytics/i_event_metadata_packet.h>
@@ -213,25 +213,25 @@ void ConsumingDeviceAgent::pushMetadataPacket(
     metadataPacket->releaseRef();
 }
 
-void ConsumingDeviceAgent::pushPluginDiagnosticEvent(
-    IPluginDiagnosticEvent::Level level,
+void ConsumingDeviceAgent::pushIntegrationDiagnosticEvent(
+    IIntegrationDiagnosticEvent::Level level,
     std::string caption,
     std::string description) const
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     if (!m_handler)
     {
-        NX_PRINT << __func__ << "(): "
-            << "INTERNAL ERROR: setHandler() was not called; ignoring Plugin Diagnostic Event.";
+        NX_PRINT << __func__ << "(): INTERNAL ERROR: "
+            << "setHandler() was not called; ignoring Integration Diagnostic Event.";
         return;
     }
 
-    const auto event = makePtr<PluginDiagnosticEvent>(
+    const auto event = makePtr<IntegrationDiagnosticEvent>(
         level, caption, description);
 
-    NX_OUTPUT << "Producing Plugin Diagnostic Event:\n" + event->toString();
+    NX_OUTPUT << "Producing Integration Diagnostic Event:\n" + event->toString();
 
-    m_handler->handlePluginDiagnosticEvent(event.get());
+    m_handler->handleIntegrationDiagnosticEvent(event.get());
 }
 
 // TODO: Consider making a template with param type, checked according to the manifest.

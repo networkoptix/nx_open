@@ -1,6 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "stub_analytics_plugin_diagnostic_events_ini.h"
+#include "stub_analytics_integration_diagnostic_events_ini.h"
 
 namespace nx {
 namespace vms_server_plugins {

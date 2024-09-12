@@ -23,7 +23,7 @@
 
 #include "../utils.h"
 
-#include "stub_analytics_plugin_diagnostic_events_ini.h"
+#include "stub_analytics_integration_diagnostic_events_ini.h"
 
 #undef NX_PRINT_PREFIX
 #define NX_PRINT_PREFIX (this->logUtils.printPrefix)
@@ -62,12 +62,18 @@ std::string DeviceAgent::manifestString() const
 Result<const ISettingsResponse*> DeviceAgent::settingsReceived()
 {
     m_deviceAgentSettings.generateEvents =
-        toBool(settingValue(kGeneratePluginDiagnosticEventsFromDeviceAgentSetting));
+        toBool(settingValue(kGenerateIntegrationDiagnosticEventsFromDeviceAgentSetting));
 
     if (m_deviceAgentSettings.generateEvents)
-        NX_PRINT << __func__ << "(): Plugin Diagnostic Event generation enabled via settings.";
+    {
+        NX_PRINT << __func__
+            << "(): Integration Diagnostic Event generation enabled via settings.";
+    }
     else
-        NX_PRINT << __func__ << "(): Plugin Diagnostic Event generation disabled via settings.";
+    {
+        NX_PRINT << __func__
+            << "(): Integration Diagnostic Event generation disabled via settings.";
+    }
 
     m_eventThreadCondition.notify_all();
 
@@ -85,18 +91,18 @@ void DeviceAgent::eventThreadLoop()
     {
         if (m_deviceAgentSettings.generateEvents)
         {
-            pushPluginDiagnosticEvent(
-                IPluginDiagnosticEvent::Level::info,
+            pushIntegrationDiagnosticEvent(
+                IIntegrationDiagnosticEvent::Level::info,
                 "Info message from DeviceAgent",
                 "Info message description");
 
-            pushPluginDiagnosticEvent(
-                IPluginDiagnosticEvent::Level::warning,
+            pushIntegrationDiagnosticEvent(
+                IIntegrationDiagnosticEvent::Level::warning,
                 "Warning message from DeviceAgent",
                 "Warning message description");
 
-            pushPluginDiagnosticEvent(
-                IPluginDiagnosticEvent::Level::error,
+            pushIntegrationDiagnosticEvent(
+                IIntegrationDiagnosticEvent::Level::error,
                 "Error message from DeviceAgent",
                 "Error message description");
         }

@@ -4,7 +4,7 @@
 
 #include <nx/sdk/analytics/i_metadata_packet.h>
 #include <nx/sdk/analytics/i_metadata_types.h>
-#include <nx/sdk/i_plugin_diagnostic_event.h>
+#include <nx/sdk/i_integration_diagnostic_event.h>
 #include <nx/sdk/i_settings_response.h>
 #include <nx/sdk/i_string.h>
 #include <nx/sdk/i_string_map.h>
@@ -48,7 +48,7 @@ public:
          */
         virtual void handleMetadata(IMetadataPacket* metadataPacket) = 0;
 
-        virtual void handlePluginDiagnosticEvent(IPluginDiagnosticEvent* event) = 0;
+        virtual void handleIntegrationDiagnosticEvent(IIntegrationDiagnosticEvent* event) = 0;
     };
 
     /**

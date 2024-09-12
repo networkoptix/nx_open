@@ -5,7 +5,7 @@
 #include <nx/sdk/i_active_setting_changed_action.h>
 #include <nx/sdk/i_active_setting_changed_response.h>
 #include <nx/sdk/i_device_info.h>
-#include <nx/sdk/i_plugin_diagnostic_event.h>
+#include <nx/sdk/i_integration_diagnostic_event.h>
 #include <nx/sdk/i_settings_response.h>
 #include <nx/sdk/i_string.h>
 #include <nx/sdk/interface.h>
@@ -30,9 +30,9 @@ public:
         static auto interfaceId() { return makeId("nx::sdk::analytics::IEngine::IHandler"); }
 
         virtual ~IHandler() = default;
-        virtual void handlePluginDiagnosticEvent(IPluginDiagnosticEvent* event) = 0;
+        virtual void handleIntegrationDiagnosticEvent(IIntegrationDiagnosticEvent* event) = 0;
 
-        /** Must be called when the Plugin needs to change the data in the Engine manifest. */
+        /** Must be called when the Integration needs to change the data in the Engine manifest. */
         virtual void pushManifest(const IString* manifest) = 0;
     };
 

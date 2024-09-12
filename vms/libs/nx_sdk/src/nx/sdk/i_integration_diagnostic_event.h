@@ -10,13 +10,13 @@ namespace nx::sdk {
  * VMS Event which can be triggered by a Plugin to inform the System about some issue or status
  * change.
  */
-class IPluginDiagnosticEvent: public nx::sdk::Interface<IPluginDiagnosticEvent>
+class IIntegrationDiagnosticEvent: public nx::sdk::Interface<IIntegrationDiagnosticEvent>
 {
 public:
     static auto interfaceId()
     {
-        return makeIdWithAlternative("nx::sdk::IPluginDiagnosticEvent",
-            /* Planned future renaming. */ "nx::sdk::IIntegrationDiagnosticEvent");
+        return makeIdWithAlternative("nx::sdk::IIntegrationDiagnosticEvent",
+            /* Old name from 6.0. */ "nx::sdk::IPluginDiagnosticEvent");
     }
 
     enum class Level
@@ -30,6 +30,6 @@ public:
     virtual const char* caption() const = 0;
     virtual const char* description() const = 0;
 };
-using IPluginDiagnosticEvent0 = IPluginDiagnosticEvent;
+using IIntegrationDiagnosticEvent0 = IIntegrationDiagnosticEvent;
 
 } // namespace nx::sdk

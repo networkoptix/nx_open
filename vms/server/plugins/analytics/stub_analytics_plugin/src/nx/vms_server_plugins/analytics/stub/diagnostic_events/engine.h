@@ -19,8 +19,8 @@ namespace analytics {
 namespace stub {
 namespace diagnostic_events {
 
-const std::string kGeneratePluginDiagnosticEventsFromEngineSetting =
-    "generatePluginDiagnosticEventsFromEngine";
+const std::string kGenerateIntegrationDiagnosticEventsFromEngineSetting =
+    "generateIntegrationDiagnosticEventsFromEngine";
 
 class Engine: public nx::sdk::analytics::Engine
 {

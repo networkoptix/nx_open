@@ -220,11 +220,11 @@ public:
         ASSERT_TRUE(metadata->timestampUs() >= 0);
     }
 
-    virtual void handlePluginDiagnosticEvent(IPluginDiagnosticEvent* event) override
+    virtual void handleIntegrationDiagnosticEvent(IIntegrationDiagnosticEvent* event) override
     {
         ASSERT_TRUE(event != nullptr);
 
-        NX_PRINT << "DeviceAgentHandler: Received a plugin diagnostic event: "
+        NX_PRINT << "DeviceAgentHandler: Received an Integration Diagnostic Event: "
             << "level " << (int) event->level() << ", "
             << "caption " << nx::kit::utils::toString(event->caption()) << ", "
             << "description " << nx::kit::utils::toString(event->description());
@@ -243,11 +243,11 @@ public:
 class EngineHandler: public nx::sdk::RefCountable<IEngine::IHandler>
 {
 public:
-    virtual void handlePluginDiagnosticEvent(IPluginDiagnosticEvent* event) override
+    virtual void handleIntegrationDiagnosticEvent(IIntegrationDiagnosticEvent* event) override
     {
         ASSERT_TRUE(event != nullptr);
 
-        NX_PRINT << "EngineHandler: Received a plugin diagnostic event: "
+        NX_PRINT << "EngineHandler: Received an Integration Diagnostic Event: "
             << "level " << (int) event->level() << ", "
             << "caption " << nx::kit::utils::toString(event->caption()) << ", "
             << "description " << nx::kit::utils::toString(event->description());

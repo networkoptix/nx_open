@@ -65,18 +65,18 @@ void Engine::reportIssues(const Issues& issues) const
 {
     if (!issues.errors.empty())
     {
-        pushPluginDiagnosticEvent(
-            IPluginDiagnosticEvent::Level::error,
+        pushIntegrationDiagnosticEvent(
+            IIntegrationDiagnosticEvent::Level::error,
             "Serious issues in the Object stream",
-            makePluginDiagnosticEventDescription(issues.errors));
+            makeIntegrationDiagnosticEventDescription(issues.errors));
     }
 
     if (!issues.warnings.empty())
     {
-        pushPluginDiagnosticEvent(
-            IPluginDiagnosticEvent::Level::warning,
+        pushIntegrationDiagnosticEvent(
+            IIntegrationDiagnosticEvent::Level::warning,
             "Issues in the Object stream",
-            makePluginDiagnosticEventDescription(issues.warnings));
+            makeIntegrationDiagnosticEventDescription(issues.warnings));
     }
 }
 

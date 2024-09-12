@@ -88,12 +88,12 @@ protected:
     void pushMetadataPacket(IMetadataPacket* metadataPacket);
 
     /**
-     * Sends a PluginDiagnosticEvent to the Server. Can be called from any thread, but if called
-     * before settingsReceived() was called, will be ignored in case setHandler() was not called
-     * yet.
+     * Sends an IntegrationDiagnosticEvent to the Server. Can be called from any thread, but if
+     * called before settingsReceived() was called, will be ignored in case setHandler() was not
+     * called yet.
      */
-    void pushPluginDiagnosticEvent(
-        IPluginDiagnosticEvent::Level level,
+    void pushIntegrationDiagnosticEvent(
+        IIntegrationDiagnosticEvent::Level level,
         std::string caption,
         std::string description) const;
 

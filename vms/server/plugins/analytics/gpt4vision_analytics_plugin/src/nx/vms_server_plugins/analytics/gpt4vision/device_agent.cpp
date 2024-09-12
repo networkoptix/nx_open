@@ -323,7 +323,8 @@ nx::sdk::Result<const nx::sdk::ISettingsResponse*> DeviceAgent::settingsReceived
 
 void DeviceAgent::showErrorMessage(const std::string& message) const
 {
-    pushPluginDiagnosticEvent(IPluginDiagnosticEvent::Level::error, "GPT 4 Vision Error", message);
+    pushIntegrationDiagnosticEvent(
+        IIntegrationDiagnosticEvent::Level::error, "GPT 4 Vision Error", message);
 }
 
 } // namespace nx::vms_server_plugins::analytics::gpt4vision

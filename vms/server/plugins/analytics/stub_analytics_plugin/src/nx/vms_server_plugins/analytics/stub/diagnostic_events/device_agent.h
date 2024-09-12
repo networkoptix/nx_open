@@ -15,7 +15,7 @@
 #include <nx/sdk/analytics/helpers/pixel_format.h>
 
 #include "engine.h"
-#include "stub_analytics_plugin_diagnostic_events_ini.h"
+#include "stub_analytics_integration_diagnostic_events_ini.h"
 
 namespace nx {
 namespace vms_server_plugins {
@@ -23,8 +23,8 @@ namespace analytics {
 namespace stub {
 namespace diagnostic_events {
 
-const std::string kGeneratePluginDiagnosticEventsFromDeviceAgentSetting =
-    "generatePluginDiagnosticEventsFromDeviceAgent";
+const std::string kGenerateIntegrationDiagnosticEventsFromDeviceAgentSetting =
+    "generateIntegrationDiagnosticEventsFromDeviceAgent";
 
 class DeviceAgent: public nx::sdk::analytics::ConsumingDeviceAgent
 {

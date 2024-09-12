@@ -9,7 +9,7 @@
 #include <nx/sdk/ptr.h>
 #include <nx/sdk/helpers/string_map.h>
 #include <nx/sdk/helpers/string.h>
-#include <nx/sdk/helpers/plugin_diagnostic_event.h>
+#include <nx/sdk/helpers/integration_diagnostic_event.h>
 #include <nx/sdk/helpers/settings_response.h>
 #include <nx/sdk/helpers/error.h>
 #include <nx/sdk/helpers/lib_context.h>
@@ -68,8 +68,8 @@ Result<IAction::Result> Engine::executeAction(
     return {};
 }
 
-void Engine::pushPluginDiagnosticEvent(
-    IPluginDiagnosticEvent::Level level,
+void Engine::pushIntegrationDiagnosticEvent(
+    IIntegrationDiagnosticEvent::Level level,
     std::string caption,
     std::string description) const
 {
@@ -77,16 +77,16 @@ void Engine::pushPluginDiagnosticEvent(
     if (!m_handler)
     {
         NX_PRINT << __func__ << "(): INTERNAL ERROR: "
-            << "setHandler() was not called; ignoring the Plugin Diagnostic Event.";
+            << "setHandler() was not called; ignoring the Integration Diagnostic Event.";
         return;
     }
 
-    const auto event = makePtr<PluginDiagnosticEvent>(
+    const auto event = makePtr<IntegrationDiagnosticEvent>(
         level, std::move(caption), std::move(description));
 
-    NX_OUTPUT << "Producing Plugin Diagnostic Event:\n" + event->toString();
+    NX_OUTPUT << "Producing Integration Diagnostic Event:\n" + event->toString();
 
-    m_handler->handlePluginDiagnosticEvent(event.get());
+    m_handler->handleIntegrationDiagnosticEvent(event.get());
 }
 
 void Engine::pushManifest(const std::string& manifest)

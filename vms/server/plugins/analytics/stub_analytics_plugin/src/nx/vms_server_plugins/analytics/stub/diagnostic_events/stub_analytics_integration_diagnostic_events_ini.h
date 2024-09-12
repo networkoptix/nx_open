@@ -13,7 +13,7 @@ namespace diagnostic_events {
 
 struct Ini: public nx::kit::IniConfig
 {
-    Ini(): IniConfig("stub_analytics_plugin_diagnostic_events.ini") { reload(); }
+    Ini(): IniConfig("stub_analytics_integration_diagnostic_events.ini") { reload(); }
 
     NX_INI_FLAG(0, enableOutput, "");
 

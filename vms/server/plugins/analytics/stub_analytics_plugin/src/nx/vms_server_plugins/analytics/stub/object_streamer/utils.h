@@ -25,7 +25,7 @@ std::string makeSettingsModel(
     const std::string& pluginHomeDir,
     const std::set<std::string>& objectTypeIds);
 
-std::string makePluginDiagnosticEventDescription(const std::set<Issue>& issues);
+std::string makeIntegrationDiagnosticEventDescription(const std::set<Issue>& issues);
 
 } // namespace object_streamer
 } // namespace stub

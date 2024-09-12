@@ -82,7 +82,7 @@ std::string makeSettingsModel(
     return Json(settingsModel).dump();
 }
 
-std::string makePluginDiagnosticEventDescription(const std::set<Issue>& issues)
+std::string makeIntegrationDiagnosticEventDescription(const std::set<Issue>& issues)
 {
     std::vector<std::string> issueStrings;
     for (const Issue issue: issues)

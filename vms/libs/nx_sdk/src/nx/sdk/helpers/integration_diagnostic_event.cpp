@@ -1,52 +1,54 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "plugin_diagnostic_event.h"
+#include "integration_diagnostic_event.h"
 
 #include <nx/kit/debug.h>
 #include <nx/kit/utils.h>
 
 namespace nx::sdk {
 
-PluginDiagnosticEvent::PluginDiagnosticEvent(Level level, std::string caption, std::string description):
+IntegrationDiagnosticEvent::IntegrationDiagnosticEvent(
+    Level level, std::string caption, std::string description)
+    :
     m_level(level),
     m_caption(std::move(caption)),
     m_description(std::move(description))
 {
 }
 
-IPluginDiagnosticEvent::Level PluginDiagnosticEvent::level() const
+IIntegrationDiagnosticEvent::Level IntegrationDiagnosticEvent::level() const
 {
     return m_level;
 }
 
-const char* PluginDiagnosticEvent::caption() const
+const char* IntegrationDiagnosticEvent::caption() const
 {
     return m_caption.c_str();
 }
 
-const char* PluginDiagnosticEvent::description() const
+const char* IntegrationDiagnosticEvent::description() const
 {
     return m_description.c_str();
 }
 
-void PluginDiagnosticEvent::setLevel(Level level)
+void IntegrationDiagnosticEvent::setLevel(Level level)
 {
     m_level = level;
 }
 
-void PluginDiagnosticEvent::setCaption(std::string caption)
+void IntegrationDiagnosticEvent::setCaption(std::string caption)
 {
     m_caption = std::move(caption);
 }
 
-void PluginDiagnosticEvent::setDescription(std::string description)
+void IntegrationDiagnosticEvent::setDescription(std::string description)
 {
     m_description = std::move(description);
 }
 
-static std::string levelToString(IPluginDiagnosticEvent::Level level)
+static std::string levelToString(IIntegrationDiagnosticEvent::Level level)
 {
-    using Level = IPluginDiagnosticEvent::Level;
+    using Level = IIntegrationDiagnosticEvent::Level;
 
     switch (level)
     {
@@ -59,7 +61,7 @@ static std::string levelToString(IPluginDiagnosticEvent::Level level)
     }
 }
 
-std::string PluginDiagnosticEvent::toString() const
+std::string IntegrationDiagnosticEvent::toString() const
 {
     static const std::string kIndent(4, ' ');
     return "{\n"

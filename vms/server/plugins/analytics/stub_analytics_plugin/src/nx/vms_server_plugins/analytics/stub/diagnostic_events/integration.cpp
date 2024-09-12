@@ -6,7 +6,7 @@
 #include <nx/kit/utils.h>
 
 #include "engine.h"
-#include "stub_analytics_plugin_diagnostic_events_ini.h"
+#include "stub_analytics_integration_diagnostic_events_ini.h"
 
 namespace nx {
 namespace vms_server_plugins {
@@ -28,8 +28,8 @@ std::string Integration::manifestString() const
 R"json(
 {
     "id": ")json" + instanceId() + R"json(",
-    "name": "Stub, Plugin Diagnostic Events",
-    "description": "A plugin for testing and debugging Plugin Diagnostic Events.",
+    "name": "Stub, Integration Diagnostic Events",
+    "description": "A plugin for testing and debugging Integration Diagnostic Events.",
     "version": "1.0.0",
     "vendor": "Plugin vendor",
     "engineSettingsModel":
@@ -44,8 +44,8 @@ R"json(
                 [
                     {
                         "type": "CheckBox",
-                        "name": ")json" + kGeneratePluginDiagnosticEventsFromEngineSetting + R"json(",
-                        "caption": "Generate Plugin Diagnostic Events from the Engine",
+                        "name": ")json" + kGenerateIntegrationDiagnosticEventsFromEngineSetting + R"json(",
+                        "caption": "Generate Integration Diagnostic Events from the Engine",
                         "defaultValue": false
                     }
                 ]
