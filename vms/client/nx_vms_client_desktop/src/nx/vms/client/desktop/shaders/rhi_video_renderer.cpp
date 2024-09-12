@@ -7,7 +7,7 @@
 #include <QtMultimedia/QVideoFrame>
 #include <QtMultimedia/private/qabstractvideobuffer_p.h>
 
-#include <nx/utils/log/assert.h>
+#include <nx/utils/log/log.h>
 #include <utils/color_space/image_correction.h>
 
 namespace nx::vms::client::desktop {

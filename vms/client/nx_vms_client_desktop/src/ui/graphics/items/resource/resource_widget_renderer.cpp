@@ -65,7 +65,9 @@ void QnResourceWidgetRenderer::setChannelCount(int channelCount)
         ctx.uploader.reset(new DecodedPictureToOpenGLUploader(m_openGLWidget, m_quickWidget));
         ctx.uploader->setForceSoftYUV(qnRuntime->isSoftwareYuv());
         ctx.renderer.reset(new QnGLRenderer(m_openGLWidget, m_quickWidget, *ctx.uploader));
-        ctx.renderer->setBlurEnabled(appContext()->localSettings()->glBlurEnabled());
+        ctx.renderer->setBlurEnabled(
+            appContext()->localSettings()->glBlurEnabled()
+            && appContext()->runtimeSettings()->graphicsApi() != GraphicsApi::software);
         ctx.renderer->setScreenshotInterface(m_screenshotInterface);
         ctx.uploader->setYV12ToRgbShaderUsed(ctx.renderer->isYV12ToRgbShaderUsed());
         ctx.uploader->setNV12ToRgbShaderUsed(ctx.renderer->isNV12ToRgbShaderUsed());

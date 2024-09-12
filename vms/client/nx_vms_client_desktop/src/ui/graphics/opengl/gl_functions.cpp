@@ -68,11 +68,12 @@ StaticOpenGLInfo::StaticOpenGLInfo()
 {
     using namespace nx::vms::client::desktop;
 
-    if (appContext()->runtimeSettings()->graphicsApi() != GraphicsApi::opengl)
+    const auto graphicsApi = appContext()->runtimeSettings()->graphicsApi();
+    if (graphicsApi != GraphicsApi::opengl && graphicsApi != GraphicsApi::legacyopengl)
     {
-        if (auto quickWindow = appContext()->mainWindowContext()->quickWindow())
+        if (auto windowContext = appContext()->mainWindowContext())
         {
-            if (auto rhi = quickWindow->rhi())
+            if (auto rhi = windowContext->rhi())
                 m_maxTextureSize = rhi->resourceLimit(QRhi::TextureSizeMax);
         }
         return;
