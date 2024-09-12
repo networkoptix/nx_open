@@ -993,11 +993,11 @@ bool Engine::isActionFieldRegistered(const QString& fieldId) const
     return m_actionFields.contains(fieldId);
 }
 
-const EventCache& Engine::eventCache() const
+EventCache* Engine::eventCache()
 {
     checkOwnThread();
 
-    return m_eventCache;
+    return &m_eventCache;
 }
 
 const RunningEventWatcher& Engine::runningEventWatcher() const

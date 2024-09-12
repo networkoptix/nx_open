@@ -174,7 +174,7 @@ public:
     /** Processes incoming analytics events and returns matched rule count. */
     size_t processAnalyticsEvents(const std::vector<EventPtr>& events);
 
-    const EventCache& eventCache() const;
+    EventCache* eventCache();
     const RunningEventWatcher& runningEventWatcher() const;
 
     void toggleTimer(nx::utils::TimerEventHandler* handler, bool on);
