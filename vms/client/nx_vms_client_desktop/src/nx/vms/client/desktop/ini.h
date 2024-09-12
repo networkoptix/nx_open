@@ -168,27 +168,18 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
     NX_INI_FLAG(false, simplifySceneItemMetric,
         "[Dev] Use simpler metric for the 'closest free slot' item location on the scene.");
 
-    NX_INI_STRING("opengl", graphicsApi,
-        "[Dev] Select Qt graphics API.\n"
+    NX_INI_STRING("legacyopengl", graphicsApi,
+        "[Dev] Select graphics API.\n"
         "Possible values:\n"
-        " * \"opengl\" - default\n"
+        " * \"legacyopengl\" - legacy OpenGL code, default\n"
+        " * \"autoselect\" - selection depends on the OS\n"
+        " * \"opengl\" - OpenGL or OpenGL ES\n"
         " * \"metal\" - Metal (macOS only)\n"
         " * \"direct3d11\" - Direct3D 11 (Windows only)\n"
         " * \"direct3d12\" - Direct3D 12 (Windows only)\n"
         " * \"vulkan\" - Vulkan\n"
         " * \"software\" - Software\n"
         );
-
-    NX_INI_STRING("qopenglwidget", sceneRendering,
-        "[Dev] Select main scene rendering mechanism.\n"
-        "Possible values:\n"
-        " * \"qopenglwidget\" - default, awailable only when graphicsApi=opengl\n"
-        " * \"qpainter\" - paint on a regular QWidget with QPainter, forced when graphicsApi=software\n"
-        " * \"qml\" - render scene as QML element, default for non-opengl graphicsApi\n"
-        );
-
-    NX_INI_FLAG(false, mainSceneInQml,
-        "[Dev] Allow to render main scene translated to QML.");
 
     // VMS-42523
     NX_INI_INT(250, analyticsSearchRequestDelayMs,

@@ -26,6 +26,7 @@ extern "C" {
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <ui/graphics/items/resource/resource_widget_renderer.h>
 #include <ui/graphics/opengl/gl_functions.h>
 #include <utils/common/adaptive_sleep.h>
@@ -468,9 +469,9 @@ QnAbstractVideoDecoder* QnVideoStreamDisplay::createVideoDecoder(
         DecoderConfig config;
         config.mtDecodePolicy = toEncoderPolicy(mtDecoding);
         config.forceGrayscaleDecoding = ini().grayscaleDecoding;
-        // TODO: #ikulaychuk detect actual scene backend.
+
         config.forceRgbaFormat =
-            QString(ini().sceneRendering) == "qpainter"
+            !appContext()->mainWindowContext()->rhi()
                 || appContext()->runtimeSettings()->graphicsApi() == GraphicsApi::software
                 || appContext()->runtimeSettings()->isSoftwareYuv();
         decoder = new QnFfmpegVideoDecoder(config, /*metrics*/ nullptr, data);

@@ -7,6 +7,8 @@
 namespace nx::vms::client::desktop {
 
 NX_REFLECTION_ENUM_CLASS(GraphicsApi,
+    legacyopengl,
+    autoselect,
     opengl,
     metal,
     direct3d11,

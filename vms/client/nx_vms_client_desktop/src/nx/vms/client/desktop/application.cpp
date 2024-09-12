@@ -207,6 +207,7 @@ void setGraphicsSettings()
 {
     static const QHash<GraphicsApi, QSGRendererInterface::GraphicsApi> nameToApi =
     {
+        {GraphicsApi::legacyopengl, QSGRendererInterface::OpenGL},
         {GraphicsApi::software, QSGRendererInterface::Software},
         {GraphicsApi::opengl, QSGRendererInterface::OpenGL},
         {GraphicsApi::direct3d11, QSGRendererInterface::Direct3D11},
@@ -214,10 +215,20 @@ void setGraphicsSettings()
         {GraphicsApi::vulkan, QSGRendererInterface::Vulkan},
         {GraphicsApi::metal, QSGRendererInterface::Metal},
     };
-    QQuickWindow::setGraphicsApi(
-        nameToApi.value(
-            appContext()->runtimeSettings()->graphicsApi(),
-            QSGRendererInterface::OpenGL));
+
+    auto graphicsApi = appContext()->runtimeSettings()->graphicsApi();
+
+    if (graphicsApi == GraphicsApi::autoselect)
+    {
+        if (nx::build_info::isMacOsX())
+            graphicsApi = GraphicsApi::metal;
+        else if (nx::build_info::isWindows())
+            graphicsApi = GraphicsApi::direct3d11;
+        else
+            graphicsApi = GraphicsApi::opengl;
+    }
+
+    QQuickWindow::setGraphicsApi(nameToApi.value(graphicsApi, QSGRendererInterface::OpenGL));
 
     QQuickWindow::setDefaultAlphaBuffer(true);
 }
@@ -237,7 +248,9 @@ int runApplicationInternal(QApplication* application, const QnStartupParameters&
 
     NX_INFO(NX_SCOPE_TAG, "IniConfig iniFilesDir: %1",  nx::kit::IniConfig::iniFilesDir());
 
-    if (appContext()->runtimeSettings()->graphicsApi() == GraphicsApi::opengl)
+    const auto graphicsApi = appContext()->runtimeSettings()->graphicsApi();
+
+    if (graphicsApi == GraphicsApi::opengl || graphicsApi == GraphicsApi::legacyopengl)
     {
         if (!QnGLCheckerInstrument::checkGLHardware())
             askForGraphicsApiSubstitution();

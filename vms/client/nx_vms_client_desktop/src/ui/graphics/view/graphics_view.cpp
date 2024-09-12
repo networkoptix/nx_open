@@ -55,18 +55,9 @@ QnGraphicsView::QnGraphicsView(QGraphicsScene* scene, nx::vms::client::desktop::
     setViewportUpdateMode(QGraphicsView::NoViewportUpdate);
     setPaletteColor(this, QPalette::Base, nx::vms::client::core::colorTheme()->color("dark1"));
 
-    auto sceneRendering = QString(nx::vms::client::desktop::ini().sceneRendering);
+    const auto graphicsApi = appContext()->runtimeSettings()->graphicsApi();
 
-    const auto graphicsApi = parent->welcomeScreen()
-        ? parent->welcomeScreen()->quickWindow()->rendererInterface()->graphicsApi()
-        : (appContext()->mainWindowContext()->quickWindow()
-            ? appContext()->mainWindowContext()->quickWindow()->rendererInterface()->graphicsApi()
-            : QQuickWindow::graphicsApi());
-
-    if (graphicsApi != QSGRendererInterface::OpenGL && sceneRendering == "qopenglwidget")
-        sceneRendering = "qml";
-
-    if (sceneRendering == "qopenglwidget")
+    if (graphicsApi == GraphicsApi::legacyopengl)
     {
         d->openGLWidget = new QOpenGLWidget(this);
         d->openGLWidget->makeCurrent();
@@ -75,16 +66,7 @@ QnGraphicsView::QnGraphicsView(QGraphicsScene* scene, nx::vms::client::desktop::
         return;
     }
 
-    // When 'software' is requested but other APIs are available,
-    // QQuickWindow::graphicsApi() returns default platfrom API instead of 'software'.
-    if (appContext()->runtimeSettings()->graphicsApi() == GraphicsApi::software
-        || graphicsApi == QSGRendererInterface::Software)
-    {
-        // Painting on qml items via RHI is not supported in 'software' mode.
-        sceneRendering = "qpainter";
-    }
-
-    if (sceneRendering == "qpainter")
+    if (graphicsApi == GraphicsApi::software)
     {
         const auto viewport = new QWidget(this);
         viewport->setAttribute(Qt::WA_Hover);
