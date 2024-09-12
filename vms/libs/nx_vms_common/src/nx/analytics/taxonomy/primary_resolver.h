@@ -11,6 +11,7 @@ class ErrorHandler;
 class PrimaryResolver
 {
 public:
+    // It removes descriptors with invalid id/flags and cleans absent/cycled base descriptors.
     static void resolve(
         nx::vms::api::analytics::Descriptors* inOutDescriptors, ErrorHandler* errorHandler);
 };

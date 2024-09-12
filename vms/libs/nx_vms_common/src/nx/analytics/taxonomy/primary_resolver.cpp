@@ -65,7 +65,7 @@ std::optional<ProcessingError> validateFlags(const Descriptor& descriptor)
 }
 
 template<typename DescriptorMap>
-void filterInvalidTypes(
+void filterInvalidDescriptors(
     const QString& descriptorTypeName,
     DescriptorMap* inOutDescriptorMap,
     ErrorHandler* errorHandler)
@@ -106,12 +106,14 @@ void resolveInheritance(
         std::set<QString> bases;
 
         if (currentDescriptor->base && currentDescriptor->base->isEmpty())
-            currentDescriptor->base = std::nullopt;
+            currentDescriptor->base.reset();
 
         while (currentDescriptor->base)
         {
             bases.insert(currentDescriptor->id);
 
+            // If base descriptor of current descriptor is not in inOutDescriptorMap,
+            // remove current descriptor base type/base items/omitted base items (if they present).
             auto baseItr = inOutDescriptorMap->find(*currentDescriptor->base);
             if (baseItr == inOutDescriptorMap->cend())
             {
@@ -133,6 +135,8 @@ void resolveInheritance(
                 break;
             }
 
+            // If there is a cycle in a base types list,
+            // remove current descriptor base type/base items/omitted base items (if they present).
             if (bases.find(*(currentDescriptor->base)) != bases.cend())
             {
                 errorHandler->handleError(
@@ -158,18 +162,19 @@ void resolveInheritance(
     }
 }
 
-/*static*/
-void PrimaryResolver::resolve(Descriptors* inOutDescriptors, ErrorHandler* errorHandler)
+void PrimaryResolver::resolve(
+    Descriptors* inOutDescriptors,
+    ErrorHandler* errorHandler)
 {
-    filterInvalidTypes(
+    filterInvalidDescriptors(
         kGroupDescriptorTypeName, &inOutDescriptors->groupDescriptors, errorHandler);
-    filterInvalidTypes(
+    filterInvalidDescriptors(
         kEnumTypeDescriptorTypeName, &inOutDescriptors->enumTypeDescriptors, errorHandler);
-    filterInvalidTypes(
+    filterInvalidDescriptors(
         kColorTypeDescriptorTypeName, &inOutDescriptors->colorTypeDescriptors, errorHandler);
-    filterInvalidTypes(
+    filterInvalidDescriptors(
         kObjectTypeDescriptorTypeName, &inOutDescriptors->objectTypeDescriptors, errorHandler);
-    filterInvalidTypes(
+    filterInvalidDescriptors(
         kEventTypeDescriptorTypeName, &inOutDescriptors->eventTypeDescriptors, errorHandler);
 
     resolveInheritance(
