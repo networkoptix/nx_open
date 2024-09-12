@@ -13,8 +13,8 @@
 #include <nx/vms/common/test_support/resource/camera_resource_stub.h>
 #include <nx/vms/rules/action_builder.h>
 #include <nx/vms/rules/action_builder_fields/optional_time_field.h>
-#include <nx/vms/rules/action_builder_fields/target_device_field.h>
-#include <nx/vms/rules/action_builder_fields/target_user_field.h>
+#include <nx/vms/rules/action_builder_fields/target_devices_field.h>
+#include <nx/vms/rules/action_builder_fields/target_users_field.h>
 #include <nx/vms/rules/aggregated_event.h>
 #include <nx/vms/rules/basic_action.h>
 #include <nx/vms/rules/basic_event.h>
@@ -56,7 +56,7 @@ public:
     ActionBuilderTest():
         TestPlugin(engine.get())
     {
-        Plugin::registerActionField<TargetUserField>(m_engine, systemContext());
+        Plugin::registerActionField<TargetUsersField>(m_engine, systemContext());
 
         registerAction<TestActionWithTargetUsers>();
         registerAction<TestActionWithPermissions>();
@@ -106,7 +106,7 @@ public:
 
         const auto usersFieldDescriptor =
             utils::fieldByName(utils::kUsersFieldName, TestActionWithTargetUsers::manifest());
-        auto targetUserField = std::make_unique<TargetUserField>(
+        auto targetUserField = std::make_unique<TargetUsersField>(
             systemContext(), &usersFieldDescriptor.value());
         targetUserField->setIds(selection.ids);
         targetUserField->setAcceptAll(selection.all);
@@ -125,14 +125,14 @@ public:
 
         const auto usersFieldDescriptor =
             utils::fieldByName(utils::kUsersFieldName, TestActionWithPermissions::manifest());
-        auto targetUserField = std::make_unique<TargetUserField>(
+        auto targetUserField = std::make_unique<TargetUsersField>(
             systemContext(), &usersFieldDescriptor.value());
         targetUserField->setIds(selection.ids);
         targetUserField->setAcceptAll(selection.all);
 
         const auto deviceIdsFieldDescriptor =
             utils::fieldByName(utils::kDeviceIdsFieldName, TestActionWithPermissions::manifest());
-        auto devicesField = std::make_unique<TargetDeviceField>(&deviceIdsFieldDescriptor.value());
+        auto devicesField = std::make_unique<TargetDevicesField>(&deviceIdsFieldDescriptor.value());
         devicesField->setUseSource(useSource);
         devicesField->setIds(devices);
         devicesField->setAcceptAll(false);
@@ -647,7 +647,7 @@ TEST_F(ActionBuilderTest, clientAndServerAction)
         .all = false};
 
     auto builder = makeBuilder(TestActionForUserAndServer::manifest().id);
-    auto userField = builder->fieldByName<TargetUserField>(utils::kUsersFieldName);
+    auto userField = builder->fieldByName<TargetUsersField>(utils::kUsersFieldName);
     userField->setIds(selection.ids);
 
     MockActionBuilderEvents mock{builder.get()};
@@ -669,7 +669,7 @@ TEST_F(ActionBuilderTest, serverWithTargetUserAction)
         .all = false};
 
     auto builder = makeBuilder(TestActionForServerWithTargetUser::manifest().id);
-    auto userField = builder->fieldByName<TargetUserField>(utils::kUsersFieldName);
+    auto userField = builder->fieldByName<TargetUsersField>(utils::kUsersFieldName);
     userField->setIds(selection.ids);
 
     MockActionBuilderEvents mock{builder.get()};

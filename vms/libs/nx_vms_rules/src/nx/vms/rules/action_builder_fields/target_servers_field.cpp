@@ -1,18 +1,18 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "target_server_field.h"
+#include "target_servers_field.h"
 
 #include "../aggregated_event.h"
 #include "../utils/field.h"
 
 namespace nx::vms::rules {
 
-bool TargetServerField::useSource() const
+bool TargetServersField::useSource() const
 {
     return m_useSource;
 }
 
-void TargetServerField::setUseSource(bool value)
+void TargetServersField::setUseSource(bool value)
 {
     if (m_useSource != value)
     {
@@ -21,7 +21,7 @@ void TargetServerField::setUseSource(bool value)
     }
 }
 
-QVariant TargetServerField::build(const AggregatedEventPtr& event) const
+QVariant TargetServersField::build(const AggregatedEventPtr& event) const
 {
     auto serverIds = ids().values();
 
@@ -43,9 +43,9 @@ QVariant TargetServerField::build(const AggregatedEventPtr& event) const
     return QVariant::fromValue(result);
 }
 
-QJsonObject TargetServerField::openApiDescriptor()
+QJsonObject TargetServersField::openApiDescriptor()
 {
-    return utils::constructOpenApiDescriptor<TargetServerField>();
+    return utils::constructOpenApiDescriptor<TargetServersField>();
 }
 
 } // namespace nx::vms::rules

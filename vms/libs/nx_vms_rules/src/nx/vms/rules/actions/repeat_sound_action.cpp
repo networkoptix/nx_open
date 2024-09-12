@@ -3,8 +3,8 @@
 #include "repeat_sound_action.h"
 
 #include "../action_builder_fields/sound_field.h"
-#include "../action_builder_fields/target_device_field.h"
-#include "../action_builder_fields/target_user_field.h"
+#include "../action_builder_fields/target_devices_field.h"
+#include "../action_builder_fields/target_users_field.h"
 #include "../action_builder_fields/volume_field.h"
 #include "../strings.h"
 #include "../utils/event_details.h"
@@ -29,14 +29,14 @@ const ItemDescriptor& RepeatSoundAction::manifest()
         .fields = {
             makeFieldDescriptor<SoundField>(utils::kSoundFieldName,
                 NX_DYNAMIC_TRANSLATABLE(tr("Sound"))),
-            makeFieldDescriptor<TargetDeviceField>(
+            makeFieldDescriptor<TargetDevicesField>(
                 utils::kDeviceIdsFieldName,
                 Strings::at(),
                 {},
                 ResourceFilterFieldProperties{
                     .validationPolicy = kCameraAudioTransmissionValidationPolicy
                 }.toVariantMap()),
-            makeFieldDescriptor<TargetUserField>(
+            makeFieldDescriptor<TargetUsersField>(
                 utils::kUsersFieldName,
                 Strings::to(),
                 /*description*/ {},

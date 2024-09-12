@@ -148,20 +148,20 @@ void Initializer::registerFields() const
     registerActionField<EventDevicesField>();
     registerActionField<HttpAuthTypeField>();
     registerActionField<HttpMethodField>();
-    registerActionField<LayoutField>();
+    registerActionField<TargetLayoutField>();
     registerActionField<OptionalTimeField>();
     registerActionField<OutputPortField>();
     registerActionField<PasswordField>();
     registerActionField<PtzPresetField>();
     registerActionField<SoundField>();
     registerActionField<StreamQualityField>();
-    registerActionField<TargetDeviceField>();
-    registerActionField<TargetServerField>();
-    registerActionField<TargetUserField>(this->m_context);
+    registerActionField<TargetDevicesField>();
+    registerActionField<TargetServersField>();
+    registerActionField<TargetUsersField>(this->m_context);
     registerActionField<TextFormatter>(this->m_context);
     registerActionField<TextWithFields>(this->m_context);
-    registerActionField<TargetLayoutField>();
-    registerActionField<TargetSingleDeviceField>();
+    registerActionField<TargetLayoutsField>();
+    registerActionField<TargetDeviceField>();
     registerActionField<TimeField>();
     registerActionField<VolumeField>();
     registerActionField<HttpAuthField>();
@@ -178,14 +178,14 @@ void Initializer::registerFieldValidators() const
     // Action field validators.
     registerFieldValidator<HttpAuthField>(new HttpAuthFieldValidator);
     registerFieldValidator<HttpMethodField>(new HttpMethodFieldValidator);
-    registerFieldValidator<LayoutField>(new LayoutFieldValidator);
+    registerFieldValidator<TargetLayoutField>(new LayoutFieldValidator);
     registerFieldValidator<OptionalTimeField>(new OptionalTimeFieldValidator);
     registerFieldValidator<SoundField>(new SoundFieldValidator);
-    registerFieldValidator<TargetDeviceField>(new TargetDeviceFieldValidator);
-    registerFieldValidator<TargetLayoutField>(new TargetLayoutFieldValidator);
-    registerFieldValidator<TargetServerField>(new TargetServerFieldValidator);
-    registerFieldValidator<TargetSingleDeviceField>(new TargetSingleDeviceFieldValidator);
-    registerFieldValidator<TargetUserField>(new TargetUserFieldValidator);
+    registerFieldValidator<TargetDevicesField>(new TargetDeviceFieldValidator);
+    registerFieldValidator<TargetLayoutsField>(new TargetLayoutFieldValidator);
+    registerFieldValidator<TargetServersField>(new TargetServerFieldValidator);
+    registerFieldValidator<TargetDeviceField>(new TargetSingleDeviceFieldValidator);
+    registerFieldValidator<TargetUsersField>(new TargetUserFieldValidator);
     registerFieldValidator<TextFormatter>(new TextWithFieldsValidator);
     registerFieldValidator<TextWithFields>(new TextWithFieldsValidator);
 }

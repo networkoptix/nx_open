@@ -2,9 +2,29 @@
 
 #include "target_device_field.h"
 
+#include <core/resource/network_resource.h>
+#include <core/resource_management/resource_pool.h>
+#include <nx/vms/common/system_context.h>
+#include <nx/vms/rules/utils/openapi_doc.h>
+
+#include "../manifest.h"
 #include "../utils/resource.h"
 
 namespace nx::vms::rules {
+
+nx::Uuid TargetDeviceField::id() const
+{
+    return m_id;
+}
+
+void TargetDeviceField::setId(nx::Uuid id)
+{
+    if (m_id == id)
+        return;
+
+    m_id = id;
+    emit idChanged();
+}
 
 bool TargetDeviceField::useSource() const
 {
@@ -13,33 +33,32 @@ bool TargetDeviceField::useSource() const
 
 void TargetDeviceField::setUseSource(bool value)
 {
-    if (m_useSource != value)
-    {
-        m_useSource = value;
-        emit useSourceChanged();
-    }
+    if (m_useSource == value)
+        return;
+
+    m_useSource = value;
+    emit useSourceChanged();
 }
 
 QVariant TargetDeviceField::build(const AggregatedEventPtr& event) const
 {
-    auto deviceIds = ids().values();
-
-    if (useSource())
-        deviceIds << utils::getDeviceIds(event);
-
-    // Removing duplicates and maintaining order.
-    UuidSet uniqueIds;
-    UuidList result;
-    for (const auto id : deviceIds)
+    if (m_useSource)
     {
-        if (!uniqueIds.contains(id))
-        {
-            result.push_back(id);
-            uniqueIds.insert(id);
-        }
+        const auto deviceIds = utils::getDeviceIds(event);
+
+        // Use single camera (the last one). Synced with the old engine.
+        if (NX_ASSERT(!deviceIds.isEmpty()))
+            return QVariant::fromValue(deviceIds.last());
+
+        return {};
     }
 
-    return QVariant::fromValue(result);
+    return QVariant::fromValue(m_id);
+}
+
+TargetSingleDeviceFieldProperties TargetDeviceField::properties() const
+{
+    return TargetSingleDeviceFieldProperties::fromVariantMap(descriptor()->properties);
 }
 
 QJsonObject TargetDeviceField::openApiDescriptor()

@@ -6,12 +6,12 @@
 #include <QtGui/QValidator>
 
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/rules/action_builder_fields/layout_field.h>
 #include <nx/vms/rules/action_builder_fields/target_device_field.h>
+#include <nx/vms/rules/action_builder_fields/target_devices_field.h>
 #include <nx/vms/rules/action_builder_fields/target_layout_field.h>
-#include <nx/vms/rules/action_builder_fields/target_server_field.h>
-#include <nx/vms/rules/action_builder_fields/target_single_device_field.h>
-#include <nx/vms/rules/action_builder_fields/target_user_field.h>
+#include <nx/vms/rules/action_builder_fields/target_layouts_field.h>
+#include <nx/vms/rules/action_builder_fields/target_servers_field.h>
+#include <nx/vms/rules/action_builder_fields/target_users_field.h>
 #include <nx/vms/rules/event_filter_fields/source_camera_field.h>
 #include <nx/vms/rules/event_filter_fields/source_server_field.h>
 #include <nx/vms/rules/event_filter_fields/source_user_field.h>
@@ -20,14 +20,14 @@ namespace nx::vms::client::desktop::rules {
 
 QIcon attentionIcon();
 
-QIcon selectButtonIcon(SystemContext* context, vms::rules::LayoutField* field);
-QIcon selectButtonIcon(SystemContext* context, vms::rules::TargetDeviceField* field);
 QIcon selectButtonIcon(SystemContext* context, vms::rules::TargetLayoutField* field);
-QIcon selectButtonIcon(SystemContext* context, vms::rules::TargetServerField* field);
-QIcon selectButtonIcon(SystemContext* context, vms::rules::TargetSingleDeviceField* field);
+QIcon selectButtonIcon(SystemContext* context, vms::rules::TargetDevicesField* field);
+QIcon selectButtonIcon(SystemContext* context, vms::rules::TargetLayoutsField* field);
+QIcon selectButtonIcon(SystemContext* context, vms::rules::TargetServersField* field);
+QIcon selectButtonIcon(SystemContext* context, vms::rules::TargetDeviceField* field);
 QIcon selectButtonIcon(
     SystemContext* context,
-    vms::rules::TargetUserField* field,
+    vms::rules::TargetUsersField* field,
     int additionalCount,
     QValidator::State fieldValidity);
 

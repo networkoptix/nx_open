@@ -2,8 +2,8 @@
 
 #include "open_layout_action.h"
 
-#include "../action_builder_fields/layout_field.h"
-#include "../action_builder_fields/target_user_field.h"
+#include "../action_builder_fields/target_layout_field.h"
+#include "../action_builder_fields/target_users_field.h"
 #include "../strings.h"
 #include "../utils/event_details.h"
 #include "../utils/field.h"
@@ -26,8 +26,8 @@ const ItemDescriptor& OpenLayoutAction::manifest()
         .flags = ItemFlag::instant,
         .executionTargets = ExecutionTarget::clients,
         .fields = {
-            makeFieldDescriptor<LayoutField>(utils::kLayoutIdFieldName, {}),
-            makeFieldDescriptor<TargetUserField>(
+            makeFieldDescriptor<TargetLayoutField>(utils::kLayoutIdFieldName, {}),
+            makeFieldDescriptor<TargetUsersField>(
                 utils::kUsersFieldName,
                 Strings::to(),
                 {},

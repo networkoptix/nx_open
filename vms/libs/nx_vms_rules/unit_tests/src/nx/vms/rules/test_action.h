@@ -4,8 +4,8 @@
 
 #include <nx/vms/rules/action_builder_fields/email_message_field.h>
 #include <nx/vms/rules/action_builder_fields/optional_time_field.h>
-#include <nx/vms/rules/action_builder_fields/target_device_field.h>
-#include <nx/vms/rules/action_builder_fields/target_user_field.h>
+#include <nx/vms/rules/action_builder_fields/target_devices_field.h>
+#include <nx/vms/rules/action_builder_fields/target_users_field.h>
 #include <nx/vms/rules/action_builder_fields/text_with_fields.h>
 #include <nx/vms/rules/basic_action.h>
 #include <nx/vms/rules/utils/field.h>
@@ -45,7 +45,7 @@ public:
             .displayName = TranslatableString("Test prolonged action"),
             .flags = ItemFlag::prolonged,
             .fields = {
-                makeFieldDescriptor<TargetDeviceField>(
+                makeFieldDescriptor<TargetDevicesField>(
                     utils::kDeviceIdsFieldName,
                     TranslatableString("Cameras")),
                 utils::makeTimeFieldDescriptor<OptionalTimeField>(
@@ -103,7 +103,7 @@ public:
             .flags = {ItemFlag::instant, ItemFlag::userFiltered},
             .executionTargets = {ExecutionTarget::clients},
             .fields = {
-                makeFieldDescriptor<TargetUserField>(
+                makeFieldDescriptor<TargetUsersField>(
                     utils::kUsersFieldName,
                     TranslatableString("Users"))
             },
@@ -130,10 +130,10 @@ public:
             .flags = ItemFlag::instant,
             .executionTargets = {ExecutionTarget::clients},
             .fields = {
-                makeFieldDescriptor<TargetUserField>(
+                makeFieldDescriptor<TargetUsersField>(
                     utils::kUsersFieldName,
                     TranslatableString("Users")),
-                makeFieldDescriptor<TargetDeviceField>(
+                makeFieldDescriptor<TargetDevicesField>(
                     utils::kDeviceIdsFieldName,
                     TranslatableString("Devices"),
                     {},
@@ -163,7 +163,7 @@ public:
             .flags = {ItemFlag::instant},
             .executionTargets = {ExecutionTarget::clients, ExecutionTarget::servers},
             .fields = {
-                makeFieldDescriptor<TargetUserField>(
+                makeFieldDescriptor<TargetUsersField>(
                     utils::kUsersFieldName,
                     TranslatableString("Users"))
             },
@@ -190,7 +190,7 @@ public:
             .flags = {ItemFlag::instant},
             .executionTargets = {ExecutionTarget::servers},
             .fields = {
-                makeFieldDescriptor<TargetUserField>(
+                makeFieldDescriptor<TargetUsersField>(
                     utils::kUsersFieldName,
                     TranslatableString("Users"))
             },

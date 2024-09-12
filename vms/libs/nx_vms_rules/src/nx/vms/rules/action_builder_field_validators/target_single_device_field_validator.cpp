@@ -5,12 +5,12 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/rules/action_builder.h>
-#include <nx/vms/rules/action_builder_fields/target_layout_field.h>
+#include <nx/vms/rules/action_builder_fields/target_layouts_field.h>
 #include <nx/vms/rules/camera_validation_policy.h>
 #include <nx/vms/rules/rule.h>
 #include <nx/vms/rules/utils/field.h>
 
-#include "../action_builder_fields/target_single_device_field.h"
+#include "../action_builder_fields/target_device_field.h"
 #include "../strings.h"
 #include "../utils/validity.h"
 
@@ -19,7 +19,7 @@ namespace nx::vms::rules {
 ValidationResult TargetSingleDeviceFieldValidator::validity(
     const Field* field, const Rule* rule, common::SystemContext* context) const
 {
-    auto targetSingleDeviceField = dynamic_cast<const TargetSingleDeviceField*>(field);
+    auto targetSingleDeviceField = dynamic_cast<const TargetDeviceField*>(field);
     if (!NX_ASSERT(targetSingleDeviceField))
         return {QValidator::State::Invalid, {Strings::invalidFieldType()}};
 
@@ -50,7 +50,7 @@ ValidationResult TargetSingleDeviceFieldValidator::validity(
             if (targetSingleDeviceField->useSource())
                 return {};
 
-            auto targetLayoutField = rule->actionBuilders().front()->fieldByName<TargetLayoutField>(
+            auto targetLayoutField = rule->actionBuilders().front()->fieldByName<TargetLayoutsField>(
                 utils::kLayoutIdsFieldName);
             if (!NX_ASSERT(targetLayoutField))
             {

@@ -10,7 +10,7 @@
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/ui/event_rules/layout_selection_dialog.h>
-#include <nx/vms/rules/action_builder_fields/target_user_field.h>
+#include <nx/vms/rules/action_builder_fields/target_users_field.h>
 #include <nx/vms/rules/utils/field.h>
 #include <nx/vms/rules/utils/validity.h>
 #include <ui/workbench/workbench_context.h>
@@ -18,11 +18,11 @@
 namespace nx::vms::client::desktop::rules {
 
 SingleTargetLayoutPicker::SingleTargetLayoutPicker(
-    vms::rules::LayoutField* field,
+    vms::rules::TargetLayoutField* field,
     SystemContext* systemContext,
     ParamsWidget* parent)
     :
-    ResourcePickerWidgetBase<vms::rules::LayoutField>(field, systemContext, parent)
+    ResourcePickerWidgetBase<vms::rules::TargetLayoutField>(field, systemContext, parent)
 {
 }
 
@@ -39,7 +39,7 @@ void SingleTargetLayoutPicker::onSelectButtonClicked()
     QnResourceList localLayouts;
     QnUserResourceList users;
     if (const auto usersField =
-        getActionField<vms::rules::TargetUserField>(vms::rules::utils::kUsersFieldName))
+        getActionField<vms::rules::TargetUsersField>(vms::rules::utils::kUsersFieldName))
     {
         users = usersField->users().values();
     }
@@ -121,7 +121,7 @@ void SingleTargetLayoutPicker::onSelectButtonClicked()
         m_field->setValue(selectedLayouts.empty() ? nx::Uuid{} : *selectedLayouts.begin());
     }
 
-    ResourcePickerWidgetBase<vms::rules::LayoutField>::onSelectButtonClicked();
+    ResourcePickerWidgetBase<vms::rules::TargetLayoutField>::onSelectButtonClicked();
 }
 
 } // namespace nx::vms::client::desktop::rules

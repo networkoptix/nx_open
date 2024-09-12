@@ -4,26 +4,33 @@
 
 namespace nx::vms::rules {
 
-class AnalyticsEngineField;
-class AnalyticsEventLevelField;
-class AnalyticsEventTypeField;
-class AnalyticsObjectAttributesField;
-class AnalyticsObjectTypeField;
-class CustomizableFlagField;
-class CustomizableIconField;
-class CustomizableTextField;
-class EventFlagField;
-class EventTextField;
-class ExpectedUuidField;
-class InputPortField;
-class IntField;
-class KeywordsField;
-class ObjectLookupField;
-class SourceCameraField;
-class SourceServerField;
-class SourceUserField;
-class StateField;
-class TextLookupField;
-class UniqueIdField;
+class ActionFlagField;
+class ActionIntField;
+class ActionTextField;
+class ContentTypeField;
+class EmailMessageField;
+class EventDevicesField;
+class ExtractDetailField;
+class FpsField;
+class HttpAuthField;
+class HttpAuthTypeField;
+class HttpMethodField;
+class OptionalTimeField;
+class OutputPortField;
+class PasswordField;
+class PtzPresetField;
+class SoundField;
+class StreamQualityField;
+class Substitution;
+class TargetDeviceField;
+class TargetDevicesField;
+class TargetLayoutField;
+class TargetLayoutsField;
+class TargetServersField;
+class TargetUsersField;
+class TextFormatter;
+class TextWithFields;
+class TimeField;
+class VolumeField;
 
 } // namespace nx::vms::rules

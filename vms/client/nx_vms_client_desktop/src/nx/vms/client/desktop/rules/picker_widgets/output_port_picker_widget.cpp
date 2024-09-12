@@ -5,7 +5,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/rules/action_builder_fields/target_device_field.h>
+#include <nx/vms/rules/action_builder_fields/target_devices_field.h>
 #include <nx/vms/rules/utils/field.h>
 
 #include "../utils/strings.h"
@@ -15,7 +15,7 @@ namespace nx::vms::client::desktop::rules {
 void OutputPortPicker::updateUi()
 {
     const auto targetDeviceField =
-        getActionField<vms::rules::TargetDeviceField>(vms::rules::utils::kDeviceIdsFieldName);
+        getActionField<vms::rules::TargetDevicesField>(vms::rules::utils::kDeviceIdsFieldName);
     if (!NX_ASSERT(targetDeviceField))
         return;
 

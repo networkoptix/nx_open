@@ -5,7 +5,7 @@
 #include <core/resource/device_dependent_strings.h>
 #include <nx/vms/rules/camera_validation_policy.h>
 
-#include "../action_builder_fields/target_device_field.h"
+#include "../action_builder_fields/target_devices_field.h"
 #include "../engine.h"
 #include "../event_filter.h"
 #include "../rule.h"
@@ -19,7 +19,7 @@ namespace nx::vms::rules {
 ValidationResult TargetDeviceFieldValidator::validity(
     const Field* field, const Rule* rule, common::SystemContext* context) const
 {
-    auto targetDeviceField = dynamic_cast<const TargetDeviceField*>(field);
+    auto targetDeviceField = dynamic_cast<const TargetDevicesField*>(field);
     if (!NX_ASSERT(targetDeviceField))
         return {QValidator::State::Invalid, {Strings::invalidFieldType()}};
 

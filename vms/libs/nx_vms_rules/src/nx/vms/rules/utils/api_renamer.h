@@ -15,6 +15,10 @@ public:
     IdRenamer();
 
     QString toApi(const QString& name) const;
+
+private:
+    void renameToPlural(const QString& source, QString target = {});
+
 private:
     QMap<QString, QString> m_toApi;
 };

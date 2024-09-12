@@ -6,7 +6,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/rules/server_validation_policy.h>
 
-#include "../action_builder_fields/target_server_field.h"
+#include "../action_builder_fields/target_servers_field.h"
 #include "../manifest.h"
 #include "../strings.h"
 #include "../utils/resource.h"
@@ -17,7 +17,7 @@ namespace nx::vms::rules {
 ValidationResult TargetServerFieldValidator::validity(
     const Field* field, const Rule* /*rule*/, common::SystemContext* context) const
 {
-    auto targetServerField = dynamic_cast<const TargetServerField*>(field);
+    auto targetServerField = dynamic_cast<const TargetServersField*>(field);
     if (!NX_ASSERT(targetServerField))
         return {QValidator::State::Invalid, Strings::invalidFieldType()};
 

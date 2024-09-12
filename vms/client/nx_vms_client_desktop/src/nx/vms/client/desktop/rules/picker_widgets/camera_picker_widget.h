@@ -6,7 +6,7 @@
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/resource_dialogs/camera_selection_dialog.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
-#include <nx/vms/rules/action_builder_fields/target_device_field.h>
+#include <nx/vms/rules/action_builder_fields/target_devices_field.h>
 #include <nx/vms/rules/event_filter_fields/source_camera_field.h>
 #include <nx/vms/rules/utils/event.h>
 #include <nx/vms/rules/utils/field.h>
@@ -53,15 +53,15 @@ protected:
 };
 
 template<typename Policy>
-class TargetCameraPicker: public CameraPickerWidgetBase<vms::rules::TargetDeviceField, Policy>
+class TargetCameraPicker: public CameraPickerWidgetBase<vms::rules::TargetDevicesField, Policy>
 {
 public:
     TargetCameraPicker(
-        vms::rules::TargetDeviceField* field,
+        vms::rules::TargetDevicesField* field,
         SystemContext* context,
         ParamsWidget* parent)
         :
-        CameraPickerWidgetBase<vms::rules::TargetDeviceField, Policy>(field, context, parent)
+        CameraPickerWidgetBase<vms::rules::TargetDevicesField, Policy>(field, context, parent)
     {
     }
 
@@ -82,13 +82,13 @@ protected:
             m_field->setUseSource(useSource);
         }
 
-        CameraPickerWidgetBase<vms::rules::TargetDeviceField, Policy>::onSelectButtonClicked();
+        CameraPickerWidgetBase<vms::rules::TargetDevicesField, Policy>::onSelectButtonClicked();
     }
 
 private:
-    using CameraPickerWidgetBase<vms::rules::TargetDeviceField, Policy>::m_field;
-    using CameraPickerWidgetBase<vms::rules::TargetDeviceField, Policy>::systemContext;
-    using CameraPickerWidgetBase<vms::rules::TargetDeviceField, Policy>::parentParamsWidget;
+    using CameraPickerWidgetBase<vms::rules::TargetDevicesField, Policy>::m_field;
+    using CameraPickerWidgetBase<vms::rules::TargetDevicesField, Policy>::systemContext;
+    using CameraPickerWidgetBase<vms::rules::TargetDevicesField, Policy>::parentParamsWidget;
 };
 
 } // namespace nx::vms::client::desktop::rules

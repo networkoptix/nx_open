@@ -101,8 +101,8 @@ PickerWidget* createSourceServerPicker(
 PickerWidget* createTargetDevicePicker(
     vms::rules::Field* field, SystemContext* context, ParamsWidget* parent)
 {
-    const auto targetDeviceField = dynamic_cast<vms::rules::TargetDeviceField*>(field);
-    if (!NX_ASSERT(targetDeviceField, "TargetDeviceField is expected here"))
+    const auto targetDeviceField = dynamic_cast<vms::rules::TargetDevicesField*>(field);
+    if (!NX_ASSERT(targetDeviceField, "TargetDevicesField is expected here"))
         return {};
 
     const auto validationPolicy = targetDeviceField->properties().validationPolicy;
@@ -128,8 +128,8 @@ PickerWidget* createTargetDevicePicker(
 PickerWidget* createTargetServerPicker(
     vms::rules::Field* field, SystemContext* context, ParamsWidget* parent)
 {
-    const auto targetServerField = dynamic_cast<vms::rules::TargetServerField*>(field);
-    if (!NX_ASSERT(targetServerField, "TargetServerField is expected here"))
+    const auto targetServerField = dynamic_cast<vms::rules::TargetServersField*>(field);
+    if (!NX_ASSERT(targetServerField, "TargetServersField is expected here"))
         return {};
 
     if (targetServerField->properties().validationPolicy == vms::rules::kHasBuzzerValidationPolicy)
@@ -142,8 +142,8 @@ PickerWidget* createTargetServerPicker(
 PickerWidget* createSingleTargetCameraPicker(
     vms::rules::Field* field, SystemContext* context, ParamsWidget* parent)
 {
-    const auto targetSingleDeviceField = dynamic_cast<vms::rules::TargetSingleDeviceField*>(field);
-    if (!NX_ASSERT(targetSingleDeviceField, "TargetSingleDeviceField is expected here"))
+    const auto targetSingleDeviceField = dynamic_cast<vms::rules::TargetDeviceField*>(field);
+    if (!NX_ASSERT(targetSingleDeviceField, "TargetDeviceField is expected here"))
         return {};
 
     const auto validationPolicy = targetSingleDeviceField->properties().validationPolicy;
@@ -268,7 +268,7 @@ PickerWidget* PickerFactory::createWidget(
     if (fieldId == fieldMetatype<nx::vms::rules::HttpAuthField>())
         return createPickerImpl<HttpAuthPicker>(field, context, parent);
 
-    if (fieldId == fieldMetatype<nx::vms::rules::LayoutField>())
+    if (fieldId == fieldMetatype<nx::vms::rules::TargetLayoutField>())
         return createPickerImpl<SingleTargetLayoutPicker>(field, context, parent);
 
     if (fieldId == fieldMetatype<nx::vms::rules::OptionalTimeField>())
@@ -286,22 +286,22 @@ PickerWidget* PickerFactory::createWidget(
     if (fieldId == fieldMetatype<vms::rules::StreamQualityField>())
         return createPickerImpl<StreamQualityPicker>(field, context, parent);
 
-    if (fieldId == fieldMetatype<vms::rules::TargetDeviceField>())
+    if (fieldId == fieldMetatype<vms::rules::TargetDevicesField>())
         return createTargetDevicePicker(field, context, parent);
 
     if (fieldId == fieldMetatype<vms::rules::TargetLayoutField>())
         return createPickerImpl<TargetLayoutPicker>(field, context, parent);
 
-    if (fieldId == fieldMetatype<vms::rules::TargetServerField>())
+    if (fieldId == fieldMetatype<vms::rules::TargetServersField>())
         return createTargetServerPicker(field, context, parent);
 
-    if (fieldId == fieldMetatype<vms::rules::TargetSingleDeviceField>())
+    if (fieldId == fieldMetatype<vms::rules::TargetDeviceField>())
         return createSingleTargetCameraPicker(field, context, parent);
 
     if (fieldId == fieldMetatype<vms::rules::SoundField>())
         return createPickerImpl<SoundPicker>(field, context, parent);
 
-    if (fieldId == fieldMetatype<nx::vms::rules::TargetUserField>())
+    if (fieldId == fieldMetatype<nx::vms::rules::TargetUsersField>())
         return createPickerImpl<TargetUserPicker>(field, context, parent);
 
     if (fieldId == fieldMetatype<nx::vms::rules::TextWithFields>()

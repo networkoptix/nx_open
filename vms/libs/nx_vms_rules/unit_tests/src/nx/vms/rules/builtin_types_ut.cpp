@@ -335,21 +335,21 @@ TEST_F(BuiltinTypesTest, BuiltinActions)
     testActionFieldRegistration<FpsField>();
     testActionFieldRegistration<HttpAuthTypeField>();
     testActionFieldRegistration<HttpMethodField>();
-    testActionFieldRegistration<LayoutField>();
     testActionFieldRegistration<OptionalTimeField>();
     testActionFieldRegistration<OutputPortField>();
     testActionFieldRegistration<PasswordField>();
     testActionFieldRegistration<PtzPresetField>();
     testActionFieldRegistration<SoundField>();
     testActionFieldRegistration<StreamQualityField>();
-    testActionFieldRegistration<TargetDeviceField>();
-    testActionFieldRegistration<TargetServerField>();
-    testActionFieldRegistration<TargetUserField>(systemContext());
+    testActionFieldRegistration<TargetDevicesField>();
+    testActionFieldRegistration<TargetServersField>();
+    testActionFieldRegistration<TargetUsersField>(systemContext());
     testActionFieldRegistration<TextFormatter>(systemContext());
     testActionFieldRegistration<TextWithFields>(systemContext());
     testActionFieldRegistration<TimeField>();
     testActionFieldRegistration<TargetLayoutField>();
-    testActionFieldRegistration<TargetSingleDeviceField>();
+    testActionFieldRegistration<TargetLayoutsField>();
+    testActionFieldRegistration<TargetDeviceField>();
     testActionFieldRegistration<VolumeField>();
     testActionFieldRegistration<HttpAuthField>();
 

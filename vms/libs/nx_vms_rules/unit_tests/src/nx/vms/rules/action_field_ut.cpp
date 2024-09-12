@@ -472,13 +472,13 @@ INSTANTIATE_TEST_SUITE_P(CommonSet,
     ::testing::ValuesIn(kFormatResults));
 
 
-TEST_F(ActionFieldTest, TargetUserField)
+TEST_F(ActionFieldTest, TargetUsersField)
 {
     UuidSelection selection;
     selection.ids << nx::Uuid::createUuid() << nx::Uuid::createUuid();
     selection.all = true;
 
-    TargetUserField field(systemContext(), &kDummyDescriptor);
+    TargetUsersField field(systemContext(), &kDummyDescriptor);
     field.setIds(selection.ids);
     field.setAcceptAll(selection.all);
 
@@ -498,7 +498,7 @@ TEST_F(ActionFieldTest, TargetSingleDeviceTest)
     event->m_deviceIds = {nx::Uuid::createUuid(), nx::Uuid::createUuid()};
     const auto aggEvent = AggregatedEventPtr::create(event);
 
-    TargetSingleDeviceField field{&kDummyDescriptor};
+    TargetDeviceField field{&kDummyDescriptor};
     field.setUseSource(true);
 
     auto value = field.build(aggEvent);

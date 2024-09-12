@@ -7,7 +7,7 @@
 
 #include "../action_builder_fields/event_devices_field.h"
 #include "../action_builder_fields/flag_field.h"
-#include "../action_builder_fields/target_user_field.h"
+#include "../action_builder_fields/target_users_field.h"
 #include "../action_builder_fields/text_with_fields.h"
 #include "../strings.h"
 #include "../utils/event_details.h"
@@ -23,7 +23,7 @@ const ItemDescriptor& PushNotificationAction::manifest()
         .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Send Mobile Notification")),
         .executionTargets = {ExecutionTarget::clients, ExecutionTarget::cloud},
         .fields = {
-            makeFieldDescriptor<TargetUserField>(
+            makeFieldDescriptor<TargetUsersField>(
                 utils::kUsersFieldName,
                 Strings::to(),
                 {},

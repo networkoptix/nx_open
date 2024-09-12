@@ -5,7 +5,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/rules/action_builder_fields/fps_field.h>
-#include <nx/vms/rules/action_builder_fields/target_device_field.h>
+#include <nx/vms/rules/action_builder_fields/target_devices_field.h>
 #include <nx/vms/rules/utils/field.h>
 
 #include "number_picker_widget.h"
@@ -22,7 +22,7 @@ private:
     {
         NumberPicker<vms::rules::FpsField>::updateUi();
 
-        auto targetDeviceField = getActionField<vms::rules::TargetDeviceField>(
+        auto targetDeviceField = getActionField<vms::rules::TargetDevicesField>(
             vms::rules::utils::kDeviceIdsFieldName);
 
         if (!NX_ASSERT(targetDeviceField))

@@ -22,7 +22,7 @@
 
 #include "action_builder_field.h"
 #include "action_builder_fields/optional_time_field.h"
-#include "action_builder_fields/target_user_field.h"
+#include "action_builder_fields/target_users_field.h"
 #include "action_builder_fields/text_field.h"
 #include "aggregated_event.h"
 #include "aggregator.h"
@@ -475,7 +475,7 @@ void ActionBuilder::buildAndEmitAction(const AggregatedEventPtr& aggregatedEvent
 ActionBuilder::Actions ActionBuilder::buildActionsForTargetUsers(
     const AggregatedEventPtr& aggregatedEvent)
 {
-    auto targetUsersField = fieldByNameImpl<TargetUserField>(utils::kUsersFieldName);
+    auto targetUsersField = fieldByNameImpl<TargetUsersField>(utils::kUsersFieldName);
     if (!NX_ASSERT(targetUsersField))
         return {};
 

@@ -9,8 +9,8 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/qt_helpers.h>
 #include <nx/vms/rules/action_builder.h>
-#include <nx/vms/rules/action_builder_fields/layout_field.h>
-#include <nx/vms/rules/action_builder_fields/target_user_field.h>
+#include <nx/vms/rules/action_builder_fields/target_layout_field.h>
+#include <nx/vms/rules/action_builder_fields/target_users_field.h>
 #include <nx/vms/rules/rule.h>
 #include <nx/vms/rules/utils/field.h>
 #include <nx/vms/rules/utils/resource.h>
@@ -24,7 +24,7 @@ namespace nx::vms::rules {
 ValidationResult LayoutFieldValidator::validity(
     const Field* field, const Rule* rule, common::SystemContext* context) const
 {
-    auto layoutField = dynamic_cast<const LayoutField*>(field);
+    auto layoutField = dynamic_cast<const TargetLayoutField*>(field);
     if (!NX_ASSERT(layoutField))
         return {QValidator::State::Invalid, Strings::invalidFieldType()};
 
@@ -38,7 +38,7 @@ ValidationResult LayoutFieldValidator::validity(
         return {QValidator::State::Invalid, Strings::layoutsWereRemoved()};
 
     auto targetUserField =
-        rule->actionBuilders().front()->fieldByName<TargetUserField>(utils::kUsersFieldName);
+        rule->actionBuilders().front()->fieldByName<TargetUsersField>(utils::kUsersFieldName);
     if (targetUserField)
     {
         const auto users = utils::users(targetUserField->selection(), context);

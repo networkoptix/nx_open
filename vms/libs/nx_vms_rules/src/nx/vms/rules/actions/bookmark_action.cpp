@@ -3,7 +3,7 @@
 #include "bookmark_action.h"
 
 #include "../action_builder_fields/optional_time_field.h"
-#include "../action_builder_fields/target_device_field.h"
+#include "../action_builder_fields/target_devices_field.h"
 #include "../action_builder_fields/text_field.h"
 #include "../action_builder_fields/time_field.h"
 #include "../strings.h"
@@ -24,7 +24,7 @@ const ItemDescriptor& BookmarkAction::manifest()
         .executionTargets = ExecutionTarget::servers,
         .targetServers = TargetServers::resourceOwner,
         .fields = {
-            makeFieldDescriptor<TargetDeviceField>(
+            makeFieldDescriptor<TargetDevicesField>(
                 utils::kDeviceIdsFieldName,
                 Strings::at(),
                 {},

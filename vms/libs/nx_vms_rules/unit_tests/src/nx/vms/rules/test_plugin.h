@@ -3,7 +3,7 @@
 #pragma once
 
 #include <nx/vms/rules/action_builder_fields/optional_time_field.h>
-#include <nx/vms/rules/action_builder_fields/target_device_field.h>
+#include <nx/vms/rules/action_builder_fields/target_devices_field.h>
 #include <nx/vms/rules/event_filter_fields/state_field.h>
 #include <nx/vms/rules/plugin.h>
 
@@ -30,7 +30,7 @@ public:
 
         registerActionField<EmailMessageField>(m_engine->systemContext());
         registerActionField<TestActionField>();
-        registerActionField<TargetDeviceField>();
+        registerActionField<TargetDevicesField>();
         registerActionField<OptionalTimeField>();
     }
 

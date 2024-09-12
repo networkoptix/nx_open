@@ -2,9 +2,9 @@
 
 #include "enter_fullscreen_action.h"
 
-#include "../action_builder_fields/target_layout_field.h"
-#include "../action_builder_fields/target_single_device_field.h"
-#include "../action_builder_fields/target_user_field.h"
+#include "../action_builder_fields/target_device_field.h"
+#include "../action_builder_fields/target_layouts_field.h"
+#include "../action_builder_fields/target_users_field.h"
 #include "../strings.h"
 #include "../utils/field.h"
 #include "../utils/type.h"
@@ -19,16 +19,16 @@ const ItemDescriptor& EnterFullscreenAction::manifest()
         .flags = ItemFlag::instant,
         .executionTargets = ExecutionTarget::clients,
         .fields = {
-            makeFieldDescriptor<TargetSingleDeviceField>(
+            makeFieldDescriptor<TargetDeviceField>(
                 utils::kCameraIdFieldName,
                 NX_DYNAMIC_TRANSLATABLE(tr("Camera")),
                 {},
                 TargetSingleDeviceFieldProperties{
                     .validationPolicy = kCameraFullScreenValidationPolicy
                 }.toVariantMap()),
-            makeFieldDescriptor<TargetLayoutField>(utils::kLayoutIdsFieldName,
+            makeFieldDescriptor<TargetLayoutsField>(utils::kLayoutIdsFieldName,
                 Strings::onLayout()),
-            makeFieldDescriptor<TargetUserField>(
+            makeFieldDescriptor<TargetUsersField>(
                 utils::kUsersFieldName,
                 NX_DYNAMIC_TRANSLATABLE(tr("Set for")),
                 {},

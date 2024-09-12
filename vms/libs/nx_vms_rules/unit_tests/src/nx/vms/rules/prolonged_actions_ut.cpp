@@ -5,7 +5,7 @@
 
 #include <nx/vms/api/rules/rule.h>
 #include <nx/vms/rules/action_builder.h>
-#include <nx/vms/rules/action_builder_fields/target_device_field.h>
+#include <nx/vms/rules/action_builder_fields/target_devices_field.h>
 #include <nx/vms/rules/action_executor.h>
 #include <nx/vms/rules/engine.h>
 #include <nx/vms/rules/event_connector.h>
@@ -46,7 +46,7 @@ protected:
         auto builder = engine->buildActionBuilder(utils::type<TestProlongedAction>());
         ASSERT_TRUE(builder);
 
-        auto devicesField = dynamic_cast<TargetDeviceField*>(
+        auto devicesField = dynamic_cast<TargetDevicesField*>(
             builder->fields().value(utils::kDeviceIdsFieldName));
         ASSERT_TRUE(devicesField);
         devicesField->setIds({resourceC});

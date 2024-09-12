@@ -15,12 +15,12 @@
 namespace nx::vms::client::desktop::rules {
 
 class TargetLayoutPicker:
-    public ResourcePickerWidgetBase<vms::rules::TargetLayoutField>
+    public ResourcePickerWidgetBase<vms::rules::TargetLayoutsField>
 {
     Q_OBJECT
 
 public:
-    using ResourcePickerWidgetBase<vms::rules::TargetLayoutField>::ResourcePickerWidgetBase;
+    using ResourcePickerWidgetBase<vms::rules::TargetLayoutsField>::ResourcePickerWidgetBase;
 
 protected:
     void onSelectButtonClicked() override
@@ -30,7 +30,7 @@ protected:
         if (MultipleLayoutSelectionDialog::selectLayouts(selectedLayouts, this))
             m_field->setValue(selectedLayouts);
 
-        ResourcePickerWidgetBase<vms::rules::TargetLayoutField>::onSelectButtonClicked();
+        ResourcePickerWidgetBase<vms::rules::TargetLayoutsField>::onSelectButtonClicked();
     }
 };
 
