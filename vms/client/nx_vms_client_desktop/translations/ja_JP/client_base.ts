@@ -7313,7 +7313,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Select a time span on the timeline and right-click the highlighted section to create a bookmark</source>
-      <translation>ブックマークを作成するには、タイムラインで期間を選択し、強調表示されたセクションを右クリックします</translation>
+      <translation>ブックマークを作成するには、タイムラインで期間を選択し、強調表示されたセクションを右クリックしてください。</translation>
     </message>
   </context>
   <context>
@@ -10521,7 +10521,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
     <message>
       <source>No motion detected</source>
-      <translation>モーションが検出されませんでした</translation>
+      <translation>検出されたモーションはありません</translation>
     </message>
     <message numerus="yes">
       <source>%n motion events</source>
