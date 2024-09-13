@@ -55,7 +55,7 @@ function(_configure_conan)
         file(REMOVE ${conan_installed_config_list_file})
 
         set(download_cache_parameter_string "")
-        if(DEFINED "ENV{NX_CONAN_DOWNLOAD_CACHE}")
+        if(DEFINED ENV{NX_CONAN_DOWNLOAD_CACHE})
             message(STATUS "Conan download cache: $ENV{NX_CONAN_DOWNLOAD_CACHE}")
             set(download_cache_parameter_string "download_cache = $ENV{NX_CONAN_DOWNLOAD_CACHE}")
         endif()
