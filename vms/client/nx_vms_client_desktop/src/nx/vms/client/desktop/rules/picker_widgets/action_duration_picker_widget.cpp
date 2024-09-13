@@ -228,9 +228,17 @@ void ActionDurationPickerWidget::updateUi()
 void ActionDurationPickerWidget::onDurationTypeChanged()
 {
     if (m_durationTypeComboBox->currentIndex() == kDurationOfEventIndex)
+    {
         m_field->setValue(std::chrono::seconds::zero());
+    }
     else
-        m_field->setValue(m_field->properties().defaultValue);
+    {
+        auto newValue = std::max(m_field->properties().value, m_field->properties().minimumValue);
+        if (newValue == std::chrono::seconds::zero())
+            newValue = std::chrono::seconds{1};
+
+        m_field->setValue(newValue);
+    }
 
     setEdited();
 }

@@ -391,6 +391,32 @@ QString Strings::layoutsWereRemoved(int count)
     return tr("Selected layouts were removed", "", count);
 }
 
+QString Strings::negativeTime()
+{
+    return tr("Time value cannot be less than zero");
+}
+
+QString Strings::negativeDuration()
+{
+    return tr("Duration cannot be less than zero");
+}
+
+QString Strings::invalidDuration(
+    std::chrono::microseconds value, std::chrono::seconds min, std::chrono::seconds max)
+{
+    if (value < min)
+    {
+        return tr("Value cannot be less than %1").arg(toString(min));
+    }
+
+    if (value > max)
+    {
+        return tr("Value cannot be more than %1").arg(toString(max));
+    }
+
+    return {};
+}
+
 TranslatableString Strings::at()
 {
     return NX_DYNAMIC_TRANSLATABLE(tr("At"));

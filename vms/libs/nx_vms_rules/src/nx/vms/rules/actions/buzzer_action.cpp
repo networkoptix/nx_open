@@ -33,10 +33,8 @@ const ItemDescriptor& BuzzerAction::manifest()
                 Strings::for_(),
                 {},
                 TimeFieldProperties{
-                    .value = 1s,
-                    .defaultValue = 1s,
-                    .maximumValue = 24h,
-                    .minimumValue = 1s}.toVariantMap()),
+                    .value = 5s,
+                    .maximumValue = 24h}.toVariantMap()),
             utils::makeIntervalFieldDescriptor(
                 NX_DYNAMIC_TRANSLATABLE(tr("Action Throttling"))),
         },

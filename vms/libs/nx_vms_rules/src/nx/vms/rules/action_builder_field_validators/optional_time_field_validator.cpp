@@ -25,7 +25,7 @@ ValidationResult OptionalTimeFieldValidator::validity(
     {
         return {
             .validity = QValidator::State::Invalid,
-            .description = tr("Duration cannot be less than zero")
+            .description = Strings::negativeDuration()
         };
     }
 
@@ -60,20 +60,13 @@ ValidationResult OptionalTimeFieldValidator::validity(
     }
 
     const auto timeFieldProperties = optionalTimeField->properties();
-    if (timeFieldValue < timeFieldProperties.minimumValue)
+    if (timeFieldValue < timeFieldProperties.minimumValue
+        || timeFieldValue > timeFieldProperties.maximumValue)
     {
         return {
             .validity = QValidator::State::Invalid,
-            .description = tr("Value cannot be less than %1").arg(
-                toString(timeFieldProperties.minimumValue))};
-    }
-
-    if (timeFieldValue > timeFieldProperties.maximumValue)
-    {
-        return {
-            .validity = QValidator::State::Invalid,
-            .description = tr("Value cannot be more than %1").arg(
-                toString(timeFieldProperties.maximumValue))};
+            .description = Strings::invalidDuration(
+                timeFieldValue, timeFieldProperties.minimumValue, timeFieldProperties.maximumValue)};
     }
 
     return {};

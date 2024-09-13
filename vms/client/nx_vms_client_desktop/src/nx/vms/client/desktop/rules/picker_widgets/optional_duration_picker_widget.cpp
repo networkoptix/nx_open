@@ -56,8 +56,11 @@ OptionalDurationPicker::OptionalDurationPicker(
     m_timeDurationWidget->addDurationSuffix(QnTimeStrings::Suffix::Days);
 
     const auto fieldProperties = field->properties();
-    m_timeDurationWidget->setMaximum(fieldProperties.maximumValue.count());
-    m_timeDurationWidget->setMinimum(fieldProperties.minimumValue.count());
+    m_timeDurationWidget->setMaximum(static_cast<int>(fieldProperties.maximumValue.count()));
+    // The minimum value must be greater than zero. If the user wishes to set a value of zero,
+    // there is a corresponding switch control in the provided widget.
+    m_timeDurationWidget->setMinimum(
+        std::max(static_cast<int>(fieldProperties.minimumValue.count()), 1));
 
     connect(
         m_timeDurationWidget,
@@ -99,9 +102,17 @@ void OptionalDurationPicker::onEnabledChanged(bool isEnabled)
     TitledFieldPickerWidget<vms::rules::OptionalTimeField>::onEnabledChanged(isEnabled);
 
     if (isEnabled)
-        m_field->setValue(m_field->properties().defaultValue);
+    {
+        auto newValue = std::max(m_field->properties().value, m_field->properties().minimumValue);
+        if (newValue == std::chrono::seconds::zero())
+            newValue = std::chrono::seconds{1};
+
+        m_field->setValue(newValue);
+    }
     else
+    {
         m_field->setValue(vms::rules::OptionalTimeField::value_type::zero());
+    }
 
     setEdited();
 }

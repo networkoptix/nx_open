@@ -66,7 +66,6 @@ FieldDescriptor makeIntervalFieldDescriptor(
         description,
         TimeFieldProperties{
             .value = 1min,
-            .defaultValue = 1min,
             .minimumValue = 1s}.toVariantMap());
 }
 
@@ -80,7 +79,6 @@ FieldDescriptor makePlaybackFieldDescriptor(
         description,
         TimeFieldProperties{
             .value = 0s,
-            .defaultValue = 1s,
             .maximumValue = 300s,
             .minimumValue = 0s}.toVariantMap());
 }

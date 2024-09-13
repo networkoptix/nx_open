@@ -43,9 +43,7 @@ const ItemDescriptor& DeviceRecordingAction::manifest()
                 {},
                 TimeFieldProperties{
                     .value = 5s,
-                    .defaultValue = 5s,
-                    .maximumValue = 9999h,
-                    .minimumValue = 1s}.toVariantMap()),
+                    .maximumValue = 9999h}.toVariantMap()),
             utils::makeTimeFieldDescriptor<TimeField>(
                 vms::rules::utils::kRecordBeforeFieldName,
                 Strings::preRecording(),
