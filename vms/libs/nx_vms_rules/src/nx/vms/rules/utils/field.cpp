@@ -33,16 +33,6 @@ FieldDescriptor makeInvisibleFieldDescriptor(const QString& fieldName,
 
 // Invisible types
 template<>
-FieldDescriptor makeFieldDescriptor<UniqueIdField>(const QString& fieldName,
-    const TranslatableString& displayName,
-    const TranslatableString& description,
-    const QVariantMap& properties)
-{
-    return makeInvisibleFieldDescriptor<UniqueIdField>(
-        fieldName, displayName, description, properties);
-}
-
-template<>
 FieldDescriptor makeFieldDescriptor<EmailMessageField>(const QString& fieldName,
     const TranslatableString& displayName,
     const TranslatableString& description,

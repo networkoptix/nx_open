@@ -13,7 +13,7 @@
 
 namespace nx::vms::rules {
 
-/** Common field properties that will be stored in the filed manifest. */
+/** Common field properties that will be stored in the field manifest. */
 struct FieldProperties
 {
     /** Whether given field should be visible in the editor. */
