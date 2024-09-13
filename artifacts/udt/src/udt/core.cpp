@@ -2281,7 +2281,7 @@ void CUDT::checkTimers(bool forceAck)
 
     auto currtime = CTimer::getTime();
 
-    if ((currtime > m_ullNextACKTime) ||
+    if ((currtime >= m_ullNextACKTime) ||
         ((m_congestionControl.m_iACKInterval > 0) && (m_congestionControl.m_iACKInterval <= m_iPktCount)) ||
         forceAck)
     {

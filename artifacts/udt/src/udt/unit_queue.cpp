@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <deque>
 #include <utility>
 
 class UDT_API UnitQueueImpl:
@@ -20,7 +21,7 @@ public:
 
 private:
     int m_bufferSize = 0;
-    std::vector<std::unique_ptr<CPacket>> m_availablePackets;
+    std::deque<std::unique_ptr<CPacket>> m_availablePackets;
     int m_takenPackets = 0;
     std::mutex m_mutex;
 };
@@ -54,8 +55,8 @@ Unit UnitQueueImpl::takeNextAvailUnit()
 
     if (!m_availablePackets.empty())
     {
-        Unit unit(shared_from_this(), std::move(m_availablePackets.back()));
-        m_availablePackets.pop_back();
+        Unit unit(shared_from_this(), std::move(m_availablePackets.front()));
+        m_availablePackets.pop_front();
         return unit;
     }
     else
