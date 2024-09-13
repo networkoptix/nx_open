@@ -316,11 +316,14 @@ void ActionBuilder::addField(const QString& name, std::unique_ptr<ActionBuilderF
     const auto fieldPtr = field.get();
     m_fields[name] = std::move(field);
 
-    static const auto onFieldChangedMetaMethod =
-        metaObject()->method(metaObject()->indexOfMethod("onFieldChanged()"));
-    if (NX_ASSERT(onFieldChangedMetaMethod.isValid()))
-        nx::utils::watchOnPropertyChanges(fieldPtr, this, onFieldChangedMetaMethod);
-
+    auto appContext = nx::vms::common::appContext();
+    if (appContext && nx::vms::api::PeerData::isClient(appContext->localPeerType()))
+    {
+        static const auto onFieldChangedMetaMethod =
+            metaObject()->method(metaObject()->indexOfMethod("onFieldChanged()"));
+        if (NX_ASSERT(onFieldChangedMetaMethod.isValid()))
+            nx::utils::watchOnPropertyChanges(fieldPtr, this, onFieldChangedMetaMethod);
+    }
 }
 
 QHash<QString, ActionBuilderField*> ActionBuilder::fields() const
@@ -668,6 +671,8 @@ Engine* ActionBuilder::engine() const
 void ActionBuilder::onFieldChanged()
 {
     const auto changedField = sender();
+    if (!NX_ASSERT(changedField))
+        return; //< Sender object is already destroyed.
 
     for (const auto& [fieldName, field]: m_fields)
     {
