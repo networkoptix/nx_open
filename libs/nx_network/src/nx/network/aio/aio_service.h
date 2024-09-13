@@ -110,6 +110,8 @@ public:
 
     AbstractAioThread* findLeastUsedAioThread() const;
 
+    std::vector<int> aioThreadsQueueSize() const;
+
 private:
     void initializeAioThreadPool(unsigned int threadCount);
 

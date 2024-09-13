@@ -15,6 +15,7 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/thread/mutex.h>
 
+#include "aio_task_queue.h"
 #include "pollable.h"
 #include "../common_socket_impl.h"
 
@@ -170,6 +171,20 @@ AbstractAioThread* AIOService::findLeastUsedAioThread() const
     }
 
     return threadToUse;
+}
+
+std::vector<int> AIOService::aioThreadsQueueSize() const
+{
+    std::vector<int> result;
+    result.reserve(m_aioThreadPool.size());
+
+    for (auto threadIter = m_aioThreadPool.cbegin(); threadIter != m_aioThreadPool.cend();
+         ++threadIter)
+    {
+        result.push_back((*threadIter)->taskQueue().postedCallCount());
+    }
+
+    return result;
 }
 
 } // namespace nx::network::aio
