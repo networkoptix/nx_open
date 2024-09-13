@@ -268,6 +268,16 @@ void SystemTabBar::disconnectFromSystem(const nx::Uuid& localId)
     m_store->removeSystem(localId);
 }
 
+void SystemTabBar::switchSystem(bool forward)
+{
+    const int systemIndex = m_store->activeSystemTab() + (forward ? 1 : -1);
+    if (systemIndex < 0 || systemIndex >= m_store->systemCount())
+        return;
+
+    const auto systemData = m_store->systemData(systemIndex);
+    m_stateHandler->connectToSystem(systemData->systemDescription, systemData->logonData);
+}
+
 void SystemTabBar::insertClosableTab(int index,
     const core::SystemDescriptionPtr& systemDescription)
 {
@@ -348,6 +358,23 @@ void SystemTabBar::tabLayoutChange()
 
     m_tabWidthCalculator.reset();
     adjustSize();
+}
+
+void SystemTabBar::wheelEvent(QWheelEvent* event)
+{
+    const bool wheelVertical = qAbs(event->angleDelta().y()) > qAbs(event->angleDelta().x());
+    if (wheelVertical
+        && event->device()->capabilities().testFlag(QInputDevice::Capability::PixelScroll))
+    {
+        const int delta = event->pixelDelta().y();
+        if (delta != 0)
+            switchSystem(/*forward*/ delta > 0);
+        event->accept();
+    }
+    else
+    {
+        base_type::wheelEvent(event);
+    }
 }
 
 void SystemTabBar::at_currentChanged(int index)

@@ -42,6 +42,7 @@ protected:
     virtual void initStyleOption(QStyleOptionTab* option, int tabIndex) const override;
     virtual void resizeEvent(QResizeEvent* event) override;
     virtual void tabLayoutChange() override;
+    virtual void wheelEvent(QWheelEvent* event) override;
 
 private slots:
     void at_currentChanged(int index);
@@ -50,6 +51,7 @@ private slots:
 private:
     void insertClosableTab(int index, const core::SystemDescriptionPtr& systemDescription);
     void disconnectFromSystem(const nx::Uuid& localId);
+    void switchSystem(bool forward);
 
 private:
     bool m_updating = false;
