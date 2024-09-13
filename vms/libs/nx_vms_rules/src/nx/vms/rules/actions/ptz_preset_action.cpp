@@ -20,6 +20,9 @@ const ItemDescriptor& PtzPresetAction::manifest()
         .executionTargets = {ExecutionTarget::servers},
         .targetServers = TargetServers::resourceOwner,
         .fields = {
+            makeFieldDescriptor<PtzPresetField>(
+                "presetId",
+                NX_DYNAMIC_TRANSLATABLE(tr("PTZ Preset"))),
             makeFieldDescriptor<TargetDeviceField>(
                 utils::kCameraIdFieldName,
                 Strings::at(),
@@ -27,9 +30,6 @@ const ItemDescriptor& PtzPresetAction::manifest()
                 TargetSingleDeviceFieldProperties{
                     .validationPolicy = kExecPtzValidationPolicy
                 }.toVariantMap()),
-            makeFieldDescriptor<PtzPresetField>(
-                "presetId",
-                NX_DYNAMIC_TRANSLATABLE(tr("PTZ Preset"))),
             utils::makeIntervalFieldDescriptor(Strings::intervalOfAction()),
             makeFieldDescriptor<TargetUsersField>(
                 utils::kUsersFieldName,

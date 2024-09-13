@@ -76,16 +76,16 @@ protected:
                     ? TimeDurationWidget::tr(
                         "Also include",
                         /*comment*/ "Part of the text, action duration: "
-                        "Also include <time> Before Event Starts")
+                        "Also include <time> Before Event")
                     : TimeDurationWidget::tr(
                         "Begin",
                         /*comment*/ "Part of the text, action duration: "
-                        "Begin <time> Before Event Starts"));
+                        "Begin <time> Before Event"));
 
                 m_timeDurationWidget->setAdditionalText(TimeDurationWidget::tr(
-                    "Before Event Starts",
+                    "Before Event",
                     /*comment*/ "Part of the text, action duration: "
-                    "Begin <time> Before Event Starts"));
+                    "Begin <time> Before Event"));
             }
 
             if (m_field->descriptor()->fieldName == vms::rules::utils::kRecordAfterFieldName)
@@ -93,12 +93,12 @@ protected:
                 base::setDisplayName(TimeDurationWidget::tr(
                     "End",
                     /*comment*/ "Part of the text, action duration: "
-                    "End <time> After Event Stops"));
+                    "End <time> After Event"));
 
                 m_timeDurationWidget->setAdditionalText(TimeDurationWidget::tr(
-                    "After Event Stops",
+                    "After Event",
                     /*comment*/ "Part of the text, action duration: "
-                    "End <time> After Event Stops"));
+                    "End <time> After Event"));
 
                 // Post recording must not be visible when fixed duration is set.
                 this->setVisible(!isFixedDuration);
