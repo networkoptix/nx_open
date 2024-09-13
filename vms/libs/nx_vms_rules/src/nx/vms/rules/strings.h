@@ -92,6 +92,10 @@ public:
     static QString camerasWereRemoved(common::SystemContext* context, int count = 1);
     static QString serversWereRemoved(int count = 1);
     static QString layoutsWereRemoved(int count = 1);
+    static QString negativeTime();
+    static QString negativeDuration();
+    static QString invalidDuration(
+        std::chrono::microseconds value, std::chrono::seconds min, std::chrono::seconds max);
 
     static TranslatableString at();
     static TranslatableString to();

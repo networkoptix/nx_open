@@ -13,20 +13,20 @@ struct TimeFieldProperties
     /* Value that used by the action builder to make a field. */
     std::chrono::seconds value = std::chrono::seconds::zero();
 
-    /* Value that used by the OptionalTimeField on switching from 'no duration' to 'has duration'. */
-    std::chrono::seconds defaultValue = value;
-
     /* Maximum duration value. */
     std::chrono::seconds maximumValue = std::chrono::weeks{1};
 
-    /* Minimum duration value. */
+    /**
+     * Minimum duration value. Even if the `minimumValue` is greater than zero, the `value`
+     * can be set to zero if the given structure is used for an OptionalTimeField, for which zero
+     * means the absence of a value.
+     */
     std::chrono::seconds minimumValue = std::chrono::seconds::zero();
 
     QVariantMap toVariantMap() const
     {
         return QVariantMap{
             {"value", QVariant::fromValue(value)},
-            {"default", QVariant::fromValue(defaultValue)},
             {"min", QVariant::fromValue(minimumValue)},
             {"max", QVariant::fromValue(maximumValue)}};
     }
@@ -37,9 +37,6 @@ struct TimeFieldProperties
 
         if (properties.contains("value"))
             result.value = properties.value("value").value<std::chrono::seconds>();
-
-        if (properties.contains("default"))
-            result.defaultValue = properties.value("default").value<std::chrono::seconds>();
 
         if (properties.contains("min"))
             result.minimumValue = properties.value("min").value<std::chrono::seconds>();

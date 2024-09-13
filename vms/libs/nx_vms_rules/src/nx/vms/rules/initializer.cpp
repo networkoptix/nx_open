@@ -19,6 +19,7 @@
 #include "action_builder_field_validators/target_single_device_field_validator.h"
 #include "action_builder_field_validators/target_user_field_validator.h"
 #include "action_builder_field_validators/text_with_fields_validator.h"
+#include "action_builder_field_validators/time_field_validator.h"
 #include "event_filter_field_validators/source_camera_field_validator.h"
 #include "event_filter_field_validators/source_server_field_validator.h"
 #include "event_filter_field_validators/source_user_field_validator.h"
@@ -188,6 +189,7 @@ void Initializer::registerFieldValidators() const
     registerFieldValidator<TargetUsersField>(new TargetUserFieldValidator);
     registerFieldValidator<TextFormatter>(new TextWithFieldsValidator);
     registerFieldValidator<TextWithFields>(new TextWithFieldsValidator);
+    registerFieldValidator<TimeField>(new TimeFieldValidator);
 }
 
 } // namespace nx::vms::rules

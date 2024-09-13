@@ -37,7 +37,6 @@ const ItemDescriptor& BookmarkAction::manifest()
                 /*description*/ {},
                 TimeFieldProperties{
                     .value = 5s,
-                    .defaultValue = 5s,
                     .maximumValue = 600s,
                     .minimumValue = 5s}.toVariantMap()),
             utils::makeTimeFieldDescriptor<TimeField>(

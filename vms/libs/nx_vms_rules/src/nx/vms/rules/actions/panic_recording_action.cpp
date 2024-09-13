@@ -29,9 +29,7 @@ const ItemDescriptor& PanicRecordingAction::manifest()
                     {},
                     TimeFieldProperties{
                         .value = 5s,
-                        .defaultValue = 5s,
-                        .maximumValue = 9999h,
-                        .minimumValue = 1s}.toVariantMap()),
+                        .maximumValue = 9999h}.toVariantMap()),
             utils::makeIntervalFieldDescriptor(Strings::intervalOfAction()),
         },
     };

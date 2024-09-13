@@ -41,10 +41,7 @@ const ItemDescriptor& DeviceOutputAction::manifest()
                 utils::kDurationFieldName,
                 Strings::duration(),
                 {},
-                TimeFieldProperties{
-                    .value = 1s,
-                    .defaultValue = 1s,
-                    .minimumValue = 1s}.toVariantMap()),
+                TimeFieldProperties{.value = 5s}.toVariantMap()),
         },
         .resources = {{utils::kDeviceIdsFieldName, {ResourceType::device, {}, {}, FieldFlag::target}}},
     };

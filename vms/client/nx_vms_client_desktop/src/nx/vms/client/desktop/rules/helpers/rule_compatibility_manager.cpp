@@ -197,21 +197,13 @@ void RuleCompatibilityManager::onDurationChanged()
         && durationField->value() == std::chrono::microseconds::zero())
     {
         // Zero duration does not have sense for instant only event.
-        const auto defaultDuration = durationField->properties().defaultValue;
+        const auto durationFieldProperties = durationField->properties();
+        auto newValue = std::max(durationFieldProperties.value, durationFieldProperties.minimumValue);
+        if (newValue == std::chrono::seconds::zero())
+            newValue = std::chrono::seconds{1};
 
         QSignalBlocker blocker{durationField};
-        if (NX_ASSERT(
-            defaultDuration != std::chrono::seconds::zero(),
-            "Default value for the '%1' field in the '%2' action cannot be zero, fix the manifest",
-            vms::rules::utils::kDurationFieldName,
-            actionBuilder->actionType()))
-        {
-            durationField->setValue(defaultDuration);
-        }
-        else
-        {
-            durationField->setValue(std::chrono::seconds{1});
-        }
+        durationField->setValue(newValue);
     }
 
     fixStateValue();
