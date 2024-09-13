@@ -188,7 +188,8 @@ SystemHealthState::Private::Private(SystemHealthState* q):
 
     connect(m_userEmailsWatcher.get(), &UserEmailsWatcher::userSetChanged, q,
         [this]() { updateUsersWithInvalidEmail(); });
-
+    connect(systemSettings(), &SystemSettings::emailSettingsChanged,
+        q, updateSlot(usersEmailIsEmpty));
     updateUsersWithInvalidEmail();
 
     // StoragesNotConfigured.
@@ -371,6 +372,10 @@ bool SystemHealthState::Private::calculateState(SystemHealthIndex index) const
     if (!user())
         return false;
 
+    const bool smtpIsNotSet = hasPowerUserPermissions()
+        && !(systemSettings()->emailSettings().isValid()
+        || systemSettings()->emailSettings().useCloudServiceToSendEmail);
+
     switch (index)
     {
         case SystemHealthIndex::noInternetForTimeSync:
@@ -383,9 +388,7 @@ bool SystemHealthState::Private::calculateState(SystemHealthIndex index) const
             return hasPowerUserPermissions() && systemContext()->licensePool()->isEmpty();
 
         case SystemHealthIndex::smtpIsNotSet:
-            return hasPowerUserPermissions()
-                && !(systemSettings()->emailSettings().isValid()
-                    || systemSettings()->emailSettings().useCloudServiceToSendEmail);
+            return smtpIsNotSet;
 
         case SystemHealthIndex::defaultCameraPasswords:
             return hasPowerUserPermissions() && hasResourcesForMessageType(index);
@@ -393,16 +396,13 @@ bool SystemHealthState::Private::calculateState(SystemHealthIndex index) const
         case SystemHealthIndex::emailIsEmpty:
         {
             const auto user = this->user();
-            const bool smtpIsNotSet = hasPowerUserPermissions()
-                && !(systemSettings()->emailSettings().isValid()
-                    || systemSettings()->emailSettings().useCloudServiceToSendEmail);
-            return user && m_userEmailsWatcher->usersWithInvalidEmail().contains(user)
-                && accessController()->hasPermissions(user, Qn::WriteEmailPermission)
-                && !smtpIsNotSet;
+            return !smtpIsNotSet && user
+                && m_userEmailsWatcher->usersWithInvalidEmail().contains(user)
+                && accessController()->hasPermissions(user, Qn::WriteEmailPermission);
         }
 
         case SystemHealthIndex::usersEmailIsEmpty:
-            return hasResourcesForMessageType(index);
+            return !smtpIsNotSet && hasResourcesForMessageType(index);
 
         case SystemHealthIndex::cloudPromo:
             return user()
