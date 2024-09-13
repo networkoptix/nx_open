@@ -22,7 +22,9 @@ TestWithDbHelper::TestWithDbHelper(QString tmpDir):
 
     if (sDbConnectionOptions)
         m_dbConnectionOptions = *sDbConnectionOptions;
-    m_dbConnectionOptions.maxConnectionCount = 7; // TODO: #akolesnikov Make tunable
+    // SqLite doesn't support multi-thread access.
+    m_dbConnectionOptions.maxConnectionCount =
+        m_dbConnectionOptions.driverType == RdbmsDriverType::sqlite ? 1 : 7;
 
     if (m_dbConnectionOptions.dbName.isEmpty() && m_dbConnectionOptions.driverType == RdbmsDriverType::sqlite)
     {
