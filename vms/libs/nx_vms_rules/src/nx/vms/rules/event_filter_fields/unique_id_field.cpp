@@ -2,6 +2,8 @@
 
 #include "unique_id_field.h"
 
+#include "../utils/openapi_doc.h"
+
 namespace nx::vms::rules {
 
 nx::Uuid UniqueIdField::id() const
@@ -24,7 +26,7 @@ bool UniqueIdField::match(const QVariant& eventValue) const
 
 QJsonObject UniqueIdField::openApiDescriptor()
 {
-    return {};
+    return utils::getPropertyOpenApiDescriptor(QMetaType::fromType<decltype(m_id)>());
 }
 
 } // namespace nx::vms::rules
