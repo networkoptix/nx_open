@@ -440,6 +440,9 @@ if(NOT compilerMsvc)
             -Wno-c++14-extensions
             -Wno-inconsistent-missing-override
             -Werror=mismatched-tags
+            # TODO: #tszelei Replace with -Wno-missing-designated-field-initializers when that flag
+            # becomes available. See: VMS-55191.
+            -Wno-missing-field-initializers
         )
     endif()
 endif()
