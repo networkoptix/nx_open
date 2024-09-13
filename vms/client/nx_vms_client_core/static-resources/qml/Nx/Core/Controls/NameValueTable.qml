@@ -203,7 +203,7 @@ Item
 
         Text
         {
-            visible: control.maxRowCount && rowsCount() >= control.maxRowCount
+            visible: control.maxRowCount && rowsCount() > control.maxRowCount
             text: qsTr("+ %n more", "", rowsCount() - control.maxRowCount)
             color: nameColor
             lineHeight: tableLineHeight
