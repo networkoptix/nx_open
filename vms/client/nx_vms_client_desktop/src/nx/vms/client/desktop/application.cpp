@@ -2,6 +2,8 @@
 
 #include "application.h"
 
+#include <QtCore/QtGlobal>
+
 #ifdef Q_OS_LINUX
     #include <unistd.h>
 #endif
@@ -34,12 +36,16 @@
 #include <QtQuick/QQuickWindow>
 #include <QtQuickControls2/QQuickStyle>
 #include <QtWidgets/QApplication>
+#if QT_CONFIG(vulkan)
+#include <QtGui/QVulkanInstance>
+#include <QtGui/private/qvulkandefaultinstance_p.h>
+#endif
 
+#include <client_core/client_core_module.h>
 #include <client/client_module.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_startup_parameters.h>
 #include <client/self_updater.h>
-#include <client_core/client_core_module.h>
 #include <common/static_common_module.h>
 #include <nx/audio/audiodevice.h>
 #include <nx/branding.h>
@@ -67,6 +73,8 @@
 #include <nx/vms/client/desktop/ui/dialogs/eula_dialog.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <statistics/statistics_manager.h>
+#include <ui/dialogs/common/message_box.h>
+#include <ui/graphics/gpu/gpu_devices.h>
 #include <ui/graphics/instruments/gl_checker_instrument.h>
 #include <ui/statistics/modules/session_restore_statistics_module.h>
 #include <ui/widgets/main_window.h>
@@ -202,6 +210,73 @@ void askForGraphicsApiSubstitution()
     #endif
 }
 
+// This function is called BEFORE QApplication is created.
+void setGraphicsSettingsEarly(const QnStartupParameters& startupParams)
+{
+    if (build_info::isLinux())
+    {
+        if (qgetenv("QT_QPA_PLATFORM").isEmpty())
+            qputenv("QT_QPA_PLATFORM", "xcb");
+    }
+
+    initQmlGlyphCacheWorkaround();
+
+    // NativeTextRendering is required for the equal text rendering on widgets and qml.
+    if (nx::build_info::isMacOsX() || nx::build_info::isLinux())
+        QQuickWindow::setTextRenderType(QQuickWindow::TextRenderType::NativeTextRendering);
+
+    // This attribute is needed to embed QQuickWidget into other QWidgets.
+    QApplication::setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
+
+    if (ini().roundDpiScaling)
+    {
+        QApplication::setHighDpiScaleFactorRoundingPolicy(
+            Qt::HighDpiScaleFactorRoundingPolicy::Round);
+    }
+
+    if (nx::build_info::isMacOsX())
+    {
+        // This should go into QnClientModule::initSurfaceFormat(),
+        // but we must set OpenGL version before creation of GUI application.
+
+        QSurfaceFormat format;
+        // Mac computers OpenGL versions:
+        //   https://support.apple.com/en-us/HT202823
+        format.setProfile(QSurfaceFormat::CoreProfile);
+        // Chromium requires OpenGL 4.1 on macOS for WebGL and other HW accelerated staff.
+        format.setVersion(4, 1);
+
+        QSurfaceFormat::setDefaultFormat(format);
+    }
+
+    GraphicsApi graphicsApi = GraphicsApi::legacyopengl;
+
+    if (!NX_ASSERT(nx::reflect::enumeration::fromString(ini().graphicsApi, &graphicsApi)))
+        return;
+
+    if (nx::build_info::isLinux())
+    {
+        if (graphicsApi != GraphicsApi::legacyopengl)
+        {
+            // HW decoding through VAAPI requires EGL.
+            static const char* kXcbGlIntegration = "QT_XCB_GL_INTEGRATION";
+            if (qgetenv(kXcbGlIntegration).isEmpty())
+                qputenv(kXcbGlIntegration, "xcb_egl");
+        }
+
+        // Pass special env variables to enable vulkan video decoding.
+        // This sould be done before creation of vulkan instance.
+        static const char* kEnableVulkanVideoIntel = "ANV_VIDEO_DECODE";
+        static const char* kEnableVulkanVideoAmd = "RADV_PERFTEST";
+
+        if (qgetenv(kEnableVulkanVideoIntel).isEmpty())
+            qputenv(kEnableVulkanVideoIntel, "1");
+        if (qgetenv(kEnableVulkanVideoAmd).isEmpty())
+            qputenv(kEnableVulkanVideoAmd, "video_decode");
+    }
+}
+
+// This function is called AFTER QApplication is created.
 void setGraphicsSettings()
 {
     static const QHash<GraphicsApi, QSGRendererInterface::GraphicsApi> nameToApi =
@@ -220,14 +295,24 @@ void setGraphicsSettings()
     if (graphicsApi == GraphicsApi::autoselect)
     {
         if (nx::build_info::isMacOsX())
+        {
             graphicsApi = GraphicsApi::metal;
+        }
         else if (nx::build_info::isWindows())
+        {
             graphicsApi = GraphicsApi::direct3d11;
+        }
         else
-            graphicsApi = GraphicsApi::opengl;
+        {
+            graphicsApi = gpu::isVulkanVideoSupported()
+                ? GraphicsApi::vulkan
+                : GraphicsApi::opengl;
+        }
     }
 
-    QQuickWindow::setGraphicsApi(nameToApi.value(graphicsApi, QSGRendererInterface::OpenGL));
+    const auto selectedApi = nameToApi.value(graphicsApi, QSGRendererInterface::OpenGL);
+    gpu::selectDevice(selectedApi);
+    QQuickWindow::setGraphicsApi(selectedApi);
 
     QQuickWindow::setDefaultAlphaBuffer(true);
 }
@@ -373,12 +458,6 @@ int runApplication(int argc, char** argv)
 {
     nx::kit::OutputRedirector::ensureOutputRedirection();
 
-    if (build_info::isLinux())
-    {
-        if (qgetenv("QT_QPA_PLATFORM").isEmpty())
-            qputenv("QT_QPA_PLATFORM", "xcb");
-    }
-
 #ifdef Q_WS_X11
     XInitThreads();
 #endif
@@ -392,38 +471,12 @@ int runApplication(int argc, char** argv)
     // https://forum.qt.io/topic/131823/lots-of-typeerrors-in-console-when-migrating-to-qt6/5
     // https://bugreports.qt.io/browse/QTBUG-98098
     QQuickStyle::setStyle("Basic");
-    initQmlGlyphCacheWorkaround();
-
-    // NativeTextRendering is required for the equal text rendering on widgets and qml.
-    if (nx::build_info::isMacOsX() || nx::build_info::isLinux())
-        QQuickWindow::setTextRenderType(QQuickWindow::TextRenderType::NativeTextRendering);
 
     nx::utils::rlimit::setMaxFileDescriptors(8000);
 
-    // This attribute is needed to embed QQuickWidget into other QWidgets.
-    QApplication::setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
-
-    if (nx::build_info::isMacOsX())
-    {
-        // This should go into QnClientModule::initSurfaceFormat(),
-        // but we must set OpenGL version before creation of GUI application.
-
-        QSurfaceFormat format;
-        // Mac computers OpenGL versions:
-        //   https://support.apple.com/en-us/HT202823
-        format.setProfile(QSurfaceFormat::CoreProfile);
-        // Chromium requires OpenGL 4.1 on macOS for WebGL and other HW accelerated staff.
-        format.setVersion(4, 1);
-
-        QSurfaceFormat::setDefaultFormat(format);
-    }
-
     const QnStartupParameters startupParams = QnStartupParameters::fromCommandLineArg(argc, argv);
-    if (ini().roundDpiScaling)
-    {
-        QApplication::setHighDpiScaleFactorRoundingPolicy(
-            Qt::HighDpiScaleFactorRoundingPolicy::Round);
-    }
+
+    setGraphicsSettingsEarly(startupParams);
 
     auto application = std::make_unique<QApplication>(argc, argv);
     initApplication(startupParams);
