@@ -28,12 +28,14 @@ protected:
     virtual void SetUp() override
     {
         m_translationManager = std::make_unique<nx::i18n::TranslationManager>();
+        m_translationManager->startLoadingTranslations();
         const bool loaded = m_translationManager->installTranslation(kLocale);
         ASSERT_TRUE(loaded);
     }
 
     virtual void TearDown() override
     {
+        m_translationManager->stopLoadingTranslations();
         m_translationManager.reset();
     }
 

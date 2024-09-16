@@ -231,10 +231,12 @@ ApplicationContext::ApplicationContext(
 
             std::cerr << std::endl;
         });
+    translationManager()->startLoadingTranslations();
 }
 
 ApplicationContext::~ApplicationContext()
 {
+    translationManager()->stopLoadingTranslations();
     d->uninitializeExternalResources();
 
     nx::setOnAssertHandler(nullptr);

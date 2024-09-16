@@ -84,9 +84,7 @@ public:
      * If locale is not found, default app language would be used.
      */
     [[nodiscard]]
-    std::unique_ptr<ScopedLocale> installScopedLocale(
-        const QString& locale,
-        std::chrono::milliseconds maxWaitTime = std::chrono::milliseconds(5));
+    std::unique_ptr<ScopedLocale> installScopedLocale(const QString& locale);
 
     /**
      * Overloaded method.
@@ -96,14 +94,13 @@ public:
      */
     [[nodiscard]]
     std::unique_ptr<ScopedLocale> installScopedLocale(
-        const std::vector<QString>& preferredLocales,
-        std::chrono::milliseconds maxWaitTime = std::chrono::milliseconds(5));
+        const std::vector<QString>& preferredLocales);
+
+    /** Start translation manager to load new translations. */
+    void startLoadingTranslations();
 
     /** Stop translation manager from loading new translations. */
     void stopLoadingTranslations();
-
-    /** Remove all translators. */
-    void deinitialize();
 
     /**
      * When assert on failure is enabled, TranslationManager will report an error (assert) if
@@ -115,11 +112,16 @@ public:
 
     static QString getCurrentThreadLocale();
 
+    void setMaxWaitTime(std::chrono::milliseconds timeout);
+
 protected:
     static void setCurrentThreadLocale(QString locale);
     static void eraseCurrentThreadLocale();
 
 private:
+    /** Remove all translators. */
+    void deinitialize();
+
     /**
      * Find a translation by its locale code and install it on a thread level. If empty locale is
      * passed, then current thread overlay is cleared, and application-wide locale will be used in

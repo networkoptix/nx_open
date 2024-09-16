@@ -95,6 +95,7 @@ TEST(TranslatableString, checkCurrentLocaleWithExplicitValues)
     EXPECT_EQ(s, kValueEn);
 
     i18n::TranslationManager translationManager;
+    translationManager.startLoadingTranslations();
     {
         auto scopedTranslation = translationManager.installScopedLocale(kLocaleEs);
         EXPECT_EQ(s, kValueEs);
