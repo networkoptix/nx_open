@@ -6,6 +6,7 @@
 #include <QtCore/QEvent>
 #include <QtGui/QClipboard>
 #include <QtGui/QTextDocumentFragment>
+#include <QtGui/qpa/qplatformnativeinterface.h>
 #include <QtGui/rhi/qrhi.h>
 #include <QtQuick/QQuickWindow>
 #include <QtWidgets/QApplication>
@@ -238,6 +239,11 @@ void QnAboutDialog::retranslateUi()
     {
         gpu << tr("Unable to get GPU information for %1").arg(graphicsApiName(graphicsApi));
     }
+
+    const QString platform = QGuiApplication::platformName();
+    QPlatformNativeInterface* pni = QGuiApplication::platformNativeInterface();
+    const bool isEgl = pni->nativeResourceForIntegration(QByteArrayLiteral("egldisplay"));
+    gpu << nx::format("<b>%1</b>: %2.", tr("Platform"), platform + (isEgl ? " (EGL)" : ""));
 
     ui->gpuLabel->setText(gpu.join(html::kLineBreak));
 

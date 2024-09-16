@@ -18,3 +18,5 @@ void eglQueryContext() {}
 void eglQueryString() {}
 void eglSwapBuffers() {}
 void eglSwapInterval() {}
+void eglCreateImage() {}
+void eglDestroyImage() {}
