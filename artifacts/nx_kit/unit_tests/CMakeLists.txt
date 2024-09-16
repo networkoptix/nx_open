@@ -75,4 +75,9 @@ target_link_libraries(nx_kit_ut
     disabled_ini_config_ut
 )
 
-add_test(NAME nx_kit_ut COMMAND nx_kit_ut)
+set(test_args "")
+if(DEFINED ENV{NX_KIT_UT_TMP_DIR})
+    set(test_args --tmp "$ENV{NX_KIT_UT_TMP_DIR}")
+endif()
+
+add_test(NAME nx_kit_ut COMMAND nx_kit_ut ${test_args})
