@@ -423,7 +423,6 @@ Rectangle
                         id: attributeTable
 
                         items: previewPanel.selectedItem ? previewPanel.selectedItem.attributes : []
-                        rawItems: previewPanel.selectedItem ? previewPanel.selectedItem.rawAttributes : []
                         visible: items.length
                         width: nameValueScrollView.contentWidth
 

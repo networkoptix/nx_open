@@ -869,8 +869,8 @@ Window
 
             onSearchRequested: (attributeRow) =>
             {
-                const rawAttributes = accessor.getData(selection.index, "rawAttributes")
-                const attribute = rawAttributes[attributeRow]
+                const attributes = accessor.getData(selection.index, "analyticsAttributes")
+                const attribute = attributes[attributeRow]
                 if (attribute)
                     header.searchText = createSearchRequestText(attribute.id, attribute.values)
             }
