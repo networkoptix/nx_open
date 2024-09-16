@@ -80,7 +80,6 @@ const QString kDontRecordPrimaryStreamKey("dontRecordPrimaryStream");
 const QString kDontRecordSecondaryStreamKey("dontRecordSecondaryStream");
 const QString kDontRecordAudio("dontRecordAudio");
 
-const QString kLastSyncronizedRemoteArchiveTimestampMs("lastSyncronizedRemoteArchiveTimestampMs");
 const QString kManualRemoteArchiveSynchronizationTriggered(
     "manualRemoteArchiveSynchronizationTriggered");
 const QString kRemoteArchiveSynchronizationEnabled("remoteArchiveSynchronizationEnabled");
