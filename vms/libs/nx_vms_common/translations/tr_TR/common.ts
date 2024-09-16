@@ -1176,9 +1176,9 @@
     <message numerus="yes">
       <source>Seconds</source>
       <comment>Capitalized full suffix for displaying seconds</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Saniye</numerusform>
-        <numerusform>Seconds</numerusform>
+        <numerusform>Saniye</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1192,9 +1192,9 @@
     <message numerus="yes">
       <source>Hours</source>
       <comment>Capitalized full suffix for displaying hours</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Saat</numerusform>
-        <numerusform>Hours</numerusform>
+        <numerusform>Saat</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1814,16 +1814,16 @@
     </message>
     <message numerus="yes">
       <source>%n minute(s) ago</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n dakika önce</numerusform>
-        <numerusform>%n minute(s) ago</numerusform>
+        <numerusform>%n dakika önce</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n hour(s) ago</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n saat önce</numerusform>
-        <numerusform>%n hour(s) ago</numerusform>
+        <numerusform>%n saat önce</numerusform>
       </translation>
     </message>
     <message>
@@ -1832,9 +1832,9 @@
     </message>
     <message numerus="yes">
       <source>%n day(s) ago</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n gün önce</numerusform>
-        <numerusform>%n day(s) ago</numerusform>
+        <numerusform>%n gün önce</numerusform>
       </translation>
     </message>
     <message>
