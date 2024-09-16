@@ -10,7 +10,6 @@ Item
     id: control
 
     property var items: []
-    property var rawItems: []
 
     // If positive, only maxRowCount rows will be visible.
     property int maxRowCount: 0

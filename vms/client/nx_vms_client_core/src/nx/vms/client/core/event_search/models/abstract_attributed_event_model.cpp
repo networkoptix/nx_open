@@ -19,20 +19,6 @@ QVariant AbstractAttributedEventModel::data(const QModelIndex& index, int role) 
 
             return flattenAttributeList(analyticsAttributes);
         }
-        case RawAttributeListRole:
-        {
-            const auto analyticsAttributes = data(index, AnalyticsAttributesRole)
-                .value<nx::common::metadata::GroupedAttributes>();
-
-            QVariantList result;
-
-            result.reserve(analyticsAttributes.size() * 2);
-
-            for (const auto& group: analyticsAttributes)
-                result << group.name << group.values;
-
-            return result;
-        }
 
         default:
             return base_type::data(index, role);

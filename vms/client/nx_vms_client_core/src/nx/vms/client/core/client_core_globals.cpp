@@ -45,7 +45,6 @@ constexpr auto nxReflectVisitAllEnumItems(CoreItemDataRole*, Visitor&& visitor)
         IDR_CORE_ITEM(DecorationPathRole),
         IDR_CORE_ITEM(AnalyticsAttributesRole),
         IDR_CORE_ITEM(FlatAttributeListRole),
-        IDR_CORE_ITEM(RawAttributeListRole),
         IDR_CORE_ITEM(ObjectTrackIdRole),
         IDR_CORE_ITEM(PreviewStreamSelectionRole),
         IDR_CORE_ITEM(ThumbnailRole),
@@ -84,7 +83,6 @@ QHash<int, QByteArray> clientCoreRoleNames()
     roles[BookmarkTagRole] = "tags";
     roles[DisplayedResourceListRole] = "resourceList";
     roles[FlatAttributeListRole] = "attributes";
-    roles[RawAttributeListRole] = "rawAttributes";
     roles[ThumbnailRole] = "thumbnail";
     roles[IpAddressRole] = "ipAddress";
     roles[UuidRole] = "uuid";
@@ -96,7 +94,7 @@ QHash<int, QByteArray> clientCoreRoleNames()
     roles[PreviewTimeMsRole] = "previewTimestampMs";
     roles[PreviewHighlightRectRole] = "previewHighlightRect";
     roles[AnalyticsEngineNameRole] = "analyticsEngineName";
-    roles[AnalyticsAttributesRole] = "rawAttributes";
+    roles[AnalyticsAttributesRole] = "analyticsAttributes";
 
     roles[IsVisibleRole] = "visible";
     roles[IsHighlightedRole] = "highlighted";
