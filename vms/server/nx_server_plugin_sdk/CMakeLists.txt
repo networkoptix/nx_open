@@ -180,9 +180,16 @@ else()
     set(sampleTestsTrigger "--no-tests")
 endif()
 
-# Set encironmental variables with Qt paths needed by some of the samples.
+set(nx_kit_ut_tmp_dir ${CMAKE_CURRENT_BINARY_DIR}/nx_kit_ut_tmp)
 set(buildSamplesEnvironmentSetup
-    ${CMAKE_COMMAND} -E env QT_DIR=${QT_DIR} QT_HOST_PATH=${QT_HOST_PATH}
+    ${CMAKE_COMMAND} -E env
+        # Set environment variables with Qt paths, needed by some of the samples.
+        QT_DIR=${QT_DIR}
+        QT_HOST_PATH=${QT_HOST_PATH}
+        # Set nx_kit unit test temporary directory - needed to avoid possible clashes when running
+        # multiple nx_kit_ut in CI environment (happens when running more than one build in
+        # parallel).
+        NX_KIT_UT_TMP_DIR=${nx_kit_ut_tmp_dir}
 )
 if(targetDevice STREQUAL "windows_x64")
     if(NOT openSourceBuild)
@@ -215,6 +222,9 @@ endif()
 nx_add_custom_command(OUTPUT ${zip_file}
     DEPENDS ${depends}
     BYPRODUCTS "${sdk_build_dir}" "${sdk_dir}"
+
+    COMMAND ${CMAKE_COMMAND} -E remove_directory ${nx_kit_ut_tmp_dir}
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${nx_kit_ut_tmp_dir}
 
     COMMAND ${CMAKE_COMMAND} -E make_directory ${logs_dir}
     COMMAND ${CMAKE_COMMAND} -P ${copy_sdk_files_script} #< Create and populate sdk dir.
