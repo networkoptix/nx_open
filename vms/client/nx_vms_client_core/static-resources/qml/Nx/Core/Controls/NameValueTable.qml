@@ -154,41 +154,9 @@ Item
 
             delegate: Component
             {
-                Text
+                Row
                 {
-                    id: textControl
-
-                    readonly property bool isLabel: (index % 2) === 0
-
-                    visible:
-                    {
-                        const currentIndexOfRow = (index + 1) / 2
-                        return control.maxRowCount === 0 || currentIndexOfRow <= control.maxRowCount
-                    }
-
-                    color: isLabel ? control.nameColor : control.valueColor
-                    font: isLabel ? control.nameFont : control.valueFont
-
-                    text: modelData[textRoleName] ?? modelData
-                    textFormat: Text.StyledText
-
-                    maximumLineCount: 2
-                    wrapMode: Text.Wrap
-                    elide: Text.ElideRight
-                    horizontalAlignment: isLabel
-                        ? Text.AlignLeft
-                        : control.valueAlignment
-
-                    lineHeight: control.tableLineHeight
-
-                    // Copy icon requires more vertical space.
-                    topPadding: copyable
-                        ? 4
-                        : Math.round(control.attributeTableSpacing / 2)
-                    bottomPadding: copyable
-                        ? 4
-                        : (control.attributeTableSpacing - topPadding)
-                    leftPadding: color.visible ? color.width + 4 : 0
+                    spacing: 4
 
                     Colors
                     {
@@ -196,6 +164,42 @@ Item
 
                         colors: modelData[colorsRoleName]
                         anchors.verticalCenter: parent.verticalCenter
+                    }
+
+                    Text
+                    {
+                        id: textControl
+
+                        readonly property bool isLabel: (index % 2) === 0
+
+                        visible:
+                        {
+                            const currentIndexOfRow = (index + 1) / 2
+                            return control.maxRowCount === 0 || currentIndexOfRow <= control.maxRowCount
+                        }
+
+                        color: isLabel ? control.nameColor : control.valueColor
+                        font: isLabel ? control.nameFont : control.valueFont
+
+                        text: modelData[textRoleName] ?? modelData
+                        textFormat: Text.StyledText
+
+                        maximumLineCount: 2
+                        wrapMode: Text.Wrap
+                        elide: Text.ElideRight
+                        horizontalAlignment: isLabel
+                            ? Text.AlignLeft
+                            : control.valueAlignment
+
+                        lineHeight: control.tableLineHeight
+
+                        // Copy icon requires more vertical space.
+                        topPadding: copyable
+                            ? 4
+                            : Math.round(control.attributeTableSpacing / 2)
+                        bottomPadding: copyable
+                            ? 4
+                            : (control.attributeTableSpacing - topPadding)
                     }
                 }
             }

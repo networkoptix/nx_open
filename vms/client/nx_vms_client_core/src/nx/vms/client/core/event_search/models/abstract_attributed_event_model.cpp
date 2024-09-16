@@ -49,7 +49,7 @@ QVariantList AbstractAttributedEventModel::flattenAttributeList(
         result.append(QJsonObject{{"text", attribute.displayedName}});
         result.append(QJsonObject{
             {"text", valuesText(attribute.displayedValues)},
-            {"color", QJsonValue::fromVariant(attribute.colorValues)},
+            {"colors", QJsonValue::fromVariant(attribute.colorValues)},
             });
     }
 
