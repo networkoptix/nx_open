@@ -14,6 +14,8 @@
 #undef CursorShape
 
 QCursor QnLinuxImages::bitmapCursor(Qt::CursorShape shape) const {
+    if (QGuiApplication::platformName() != "xcb")
+        return QCursor(shape);
     QGuiApplication::setOverrideCursor(shape);
     XFixesCursorImage *xImage = XFixesGetCursorImage(QX11Info::display());
     QGuiApplication::restoreOverrideCursor();
