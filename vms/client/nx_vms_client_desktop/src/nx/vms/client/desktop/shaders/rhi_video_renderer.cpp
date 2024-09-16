@@ -293,6 +293,7 @@ struct RhiVideoRenderer::Private
 
     std::unique_ptr<QVideoFrameTextures> textures;
     size_t planeCount = 0;
+    QVector2D textureScale;
 
     intptr_t lastUploadedFrame = 0;
 };
@@ -522,6 +523,19 @@ void RhiVideoRenderer::uploadFrame(QVideoFrame* videoFrame, QRhiResourceUpdateBa
     if (auto textures = videoFrame->videoBuffer()->mapTextures(d->rhi))
     {
         d->textures = std::move(textures);
+        if (d->textures->texture(0))
+        {
+            const auto textureSize = d->textures->texture(0)->pixelSize();
+            const auto frameSize = videoFrame->size();
+            // When coming from a HW decoder, texture size can be aligned to macroblock size,
+            // so we need to scale texture coordinates to avoid sampling garbage.
+            if (textureSize != frameSize && textureSize.width() > 0 && textureSize.height() > 0)
+            {
+                d->textureScale = QVector2D(
+                    (float) frameSize.width() / textureSize.width(),
+                    (float) frameSize.height() / textureSize.height());
+            }
+        }
         createBindings();
         return;
     }
@@ -572,6 +586,7 @@ void RhiVideoRenderer::prepare(
 
     if ((intptr_t) d->data.frame.get() != d->lastUploadedFrame)
     {
+        d->textureScale = {};
         if (d->data.frame->memoryType() == MemoryType::VideoMemory)
             uploadFrame(d->data.frame->getVideoSurface()->frame(), rub);
         else
@@ -611,7 +626,19 @@ void RhiVideoRenderer::prepare(
     const quint32 vsize = data.data.verts.size() * 2 * sizeof(float);
     const quint32 tsize = data.data.texCoords.size() * 2 * sizeof(float);
     rub->updateDynamicBuffer(d->vbuf.get(), 0, vsize, data.data.verts.constData());
-    rub->updateDynamicBuffer(d->vbuf.get(), vsize, tsize, data.data.texCoords.constData());
+
+    if (d->textureScale.isNull())
+    {
+        rub->updateDynamicBuffer(d->vbuf.get(), vsize, tsize, data.data.texCoords.constData());
+    }
+    else
+    {
+        QList<QVector2D> texCoords;
+        texCoords.reserve(data.data.texCoords.size());
+        for (const auto& point: data.data.texCoords)
+            texCoords << point * d->textureScale;
+        rub->updateDynamicBuffer(d->vbuf.get(), vsize, tsize, texCoords.constData());
+    }
 }
 
 void RhiVideoRenderer::render(
