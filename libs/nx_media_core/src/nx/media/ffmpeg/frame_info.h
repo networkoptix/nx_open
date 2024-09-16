@@ -29,6 +29,7 @@ enum class SurfaceType
 {
     Intel,
     Nvidia,
+    VideoFrame,
 };
 
 class AbstractVideoSurface

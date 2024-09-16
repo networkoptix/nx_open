@@ -14,6 +14,7 @@ extern "C" {
 #include <QtWidgets/QApplication>
 
 #include <nx/media/config.h>
+#include <nx/media/ffmpeg/texture_helper.h>
 #include <nx/media/quick_sync/qsv_supported.h>
 #include <nx/media/yuvconvert.h>
 #include <nx/utils/app_info.h>
@@ -1335,30 +1336,33 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
     else
     {
         QSharedPointer<const CLVideoDecoderOutput> outFrame = frame;
-        switch (frame->format)
+        if (frame->memoryType() != MemoryType::VideoMemory)
         {
-            case AV_PIX_FMT_RGBA:
-            case AV_PIX_FMT_NV12:
-            case AV_PIX_FMT_YUV420P:
-            case AV_PIX_FMT_YUV422P:
-            case AV_PIX_FMT_YUV444P:
-            case AV_PIX_FMT_YUVA420P:
-                break;
-            default:
+            switch (frame->format)
             {
-                QSharedPointer<CLVideoDecoderOutput> newFrame;
-                newFrame.reset(new CLVideoDecoderOutput());
-                newFrame->reallocate(frame->width, frame->height, AV_PIX_FMT_RGBA);
-                frame->convertTo(newFrame.get());
-                newFrame->pkt_dts = frame->pkt_dts;
-                newFrame->sample_aspect_ratio = frame->sample_aspect_ratio;
-                newFrame->flags = frame->flags;
-                outFrame = newFrame;
-                break;
+                case AV_PIX_FMT_RGBA:
+                case AV_PIX_FMT_NV12:
+                case AV_PIX_FMT_YUV420P:
+                case AV_PIX_FMT_YUV422P:
+                case AV_PIX_FMT_YUV444P:
+                case AV_PIX_FMT_YUVA420P:
+                    break;
+                default:
+                {
+                    QSharedPointer<CLVideoDecoderOutput> newFrame;
+                    newFrame.reset(new CLVideoDecoderOutput());
+                    newFrame->reallocate(frame->width, frame->height, AV_PIX_FMT_RGBA);
+                    frame->convertTo(newFrame.get());
+                    newFrame->pkt_dts = frame->pkt_dts;
+                    newFrame->sample_aspect_ratio = frame->sample_aspect_ratio;
+                    newFrame->flags = frame->flags;
+                    outFrame = newFrame;
+                    break;
+                }
             }
         }
         emptyPictureBuf->setDecodedFrame(frame);
-        const AVPixelFormat format = (AVPixelFormat) frame->format;
+        const AVPixelFormat format =  nx::media::getFormat(frame.get());
         emptyPictureBuf->texturePack()->setPictureFormat(format);
         emptyPictureBuf->setColorFormat(format);
         return true;

@@ -531,7 +531,12 @@ void RhiVideoRenderer::uploadFrame(QVideoFrame* videoFrame, QRhiResourceUpdateBa
     frame.format = d->data.frame->format;
     frame.width = videoFrame->width();
     frame.height = videoFrame->height();
-    videoFrame->map(QVideoFrame::ReadOnly);
+    if (!videoFrame->map(QVideoFrame::ReadOnly))
+    {
+        NX_WARNING(this, "Unable to map video frame data");
+        d->planeCount = 0;
+        return;
+    }
     for (size_t i = 0; i < d->planeCount; ++i)
     {
         frame.linesize[i] = videoFrame->bytesPerLine(i);

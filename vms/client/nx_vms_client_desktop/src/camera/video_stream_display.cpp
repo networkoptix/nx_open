@@ -2,6 +2,8 @@
 
 #include "video_stream_display.h"
 
+#include <QtGui/QWindow>
+
 #include <algorithm>
 #include <chrono>
 
@@ -16,6 +18,7 @@ extern "C" {
 #include <core/resource/security_cam_resource.h>
 #include <decoders/video/ffmpeg_video_decoder.h>
 #include <nx/media/ffmpeg/abstract_video_decoder.h>
+#include <nx/media/ffmpeg/hw_video_decoder_old_player.h>
 #include <nx/media/quick_sync/qsv_supported.h>
 #include <nx/media/utils.h>
 #include <nx/utils/log/log.h>
@@ -399,6 +402,13 @@ MultiThreadDecodePolicy QnVideoStreamDisplay::toEncoderPolicy(bool useMtDecoding
     return MultiThreadDecodePolicy::autoDetect;
 }
 
+bool canAddFFmpegHW(const QnConstCompressedVideoDataPtr& data, bool reverseMode)
+{
+    return appContext()->localSettings()->hardwareDecodingEnabled()
+        && !reverseMode
+        && nx::media::HwVideoDecoderOldPlayer::isSupported(data);
+}
+
 #ifdef __QSV_SUPPORTED__
 
 bool canAddIntel(const QnConstCompressedVideoDataPtr& data, bool reverseMode)
@@ -434,8 +444,12 @@ bool QnVideoStreamDisplay::shouldUpdateDecoder(
     }
     else
     {
-        if (canAddIntel(data, reverseMode) || canAddNvidia(data, reverseMode))
+        if (canAddIntel(data, reverseMode)
+            || canAddNvidia(data, reverseMode)
+            || canAddFFmpegHW(data, reverseMode))
+        {
             return true; // Decoder should be changed to hardware
+        }
     }
 
     return false;
@@ -445,7 +459,27 @@ bool QnVideoStreamDisplay::shouldUpdateDecoder(
 
 bool canAddIntel(QnConstCompressedVideoDataPtr&, bool) { return false; }
 bool canAddNvidia(QnConstCompressedVideoDataPtr&, bool) { return false; }
-bool QnVideoStreamDisplay::shouldUpdateDecoder(const QnConstCompressedVideoDataPtr&, bool) { return false; }
+
+bool QnVideoStreamDisplay::shouldUpdateDecoder(
+    const QnConstCompressedVideoDataPtr& data,
+    bool reverseMode)
+{
+    if (!m_decoderData.decoder)
+        return false;
+
+    if (m_decoderData.decoder->hardwareDecoder())
+    {
+        if (!appContext()->localSettings()->hardwareDecodingEnabled())
+            return true; // Decoder should be changed to software
+    }
+    else
+    {
+        if (canAddFFmpegHW(data, reverseMode))
+            return true; // Decoder should be changed to hardware
+    }
+
+    return false;
+}
 
 #endif // __QSV_SUPPORTED__
 
@@ -464,6 +498,13 @@ QnAbstractVideoDecoder* QnVideoStreamDisplay::createVideoDecoder(
         decoder = new NvidiaVideoDecoderOldPlayer();
     }
 #endif // __QSV_SUPPORTED__
+
+    if (canAddFFmpegHW(data, m_reverseMode))
+    {
+        if (auto rhi = appContext()->mainWindowContext()->rhi())
+            decoder = new nx::media::HwVideoDecoderOldPlayer(rhi);
+    }
+
     if (!decoder)
     {
         DecoderConfig config;

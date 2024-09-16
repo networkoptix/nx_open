@@ -417,7 +417,7 @@ Qn::RenderStatus QnGLRenderer::drawVideoData(
         return Qn::NothingRendered;
 
     const int planeCount = MediaOutputShaderProgram::planeCount(picLock->colorFormat());
-    if (!NX_ASSERT(planeCount > 0))
+    if (!NX_ASSERT(planeCount > 0, "Unsupported color format: %1", picLock->colorFormat()))
         return Qn::CannotRender;
 
     QRectF textureRect = picLock->textureRect();

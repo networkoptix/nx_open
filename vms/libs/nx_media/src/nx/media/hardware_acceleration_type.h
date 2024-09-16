@@ -9,6 +9,7 @@ enum class HardwareAccelerationType
     none,
     quickSync,
     nvidia,
+    ffmpeg,
 };
 
 NX_MEDIA_API HardwareAccelerationType getHardwareAccelerationType();
