@@ -248,6 +248,30 @@ static const std::map<MapKey, IntMockData> kMapWithCustomStructAsKey = {
     {{kSecondUuid, 2, "somethingElse"}, {4, 5, 6}}
 };
 
+struct MockDataVariantA
+{
+    std::string a;
+
+    bool operator==(const MockDataVariantA& other) const = default;
+};
+#define MockDataVariantA_Fields (a)
+
+struct MockDataVariantB
+{
+    std::string b;
+
+    bool operator==(const MockDataVariantB& other) const = default;
+};
+#define MockDataVariantB_Fields (b)
+
+struct MockDataWithVariant
+{
+    std::variant<MockDataVariantA, MockDataVariantB> variantField;
+
+    bool operator==(const MockDataWithVariant& other) const = default;
+};
+#define MockDataWithVariant_Fields (variantField)
+
 QByteArray removeSpaceCharacters(const QByteArray input)
 {
     return input.simplified().replace(' ', "");
@@ -322,6 +346,9 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     BriefMockWithDefaults, (json), BriefMockWithDefaults_Fields, (brief, true))
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(MapKey, (json), MapKey_Fields, (brief, true))
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(EnumKeyMap, (json), EnumKeyMap_Fields, (brief, true))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(MockDataVariantA, (json), MockDataVariantA_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(MockDataVariantB, (json), MockDataVariantB_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(MockDataWithVariant, (json), MockDataWithVariant_Fields)
 
 } // namespace
 
@@ -559,6 +586,20 @@ TEST_F(QnJsonTextFixture, StdArrayInt32)
     serializationTest(std::array<int32_t, 5>{1, 2, 3, 4, 5}, R"json([1,2,3,4,5])json");
 }
 
+TEST_F(QnJsonTextFixture, StructWithVariant)
+{
+    MockDataWithVariant data{.variantField = MockDataVariantB{.b = "testB"}};
+    const QByteArray jsonStr = R"json(
+        {
+            "variantField": { "b": "testB" }
+        }
+    )json";
+    EXPECT_EQ(
+        nx::utils::formatJsonString(QJson::serialized(data)),
+        nx::utils::formatJsonString(jsonStr));
+    EXPECT_EQ(data, QJson::deserialized<MockDataWithVariant>(jsonStr));
+}
+
 TEST_F(QnJsonTextFixture, qJsonValue)
 {
     BriefMockDataWithQJsonValue value;
@@ -778,6 +819,21 @@ R"json(
     QJson::serialize(&context, data, &actualJson);
 
     ASSERT_EQ(jsonStr, nx::utils::formatJsonString(actualJson));
+}
+
+TEST_F(QnJsonTextFixture, serializeStructWithVariantWithDefaultSerialization)
+{
+    QnJsonContext context;
+    context.setOptionalDefaultSerialization(true);
+    MockDataWithVariant data{.variantField = MockDataVariantA{.a = "testA"}};
+
+    QJsonValue actualJson;
+    QJson::serialize(&context, data, &actualJson);
+    EXPECT_TRUE(actualJson.isObject());
+    auto obj = actualJson.toObject();
+    EXPECT_TRUE(obj.contains("variantField"));
+    EXPECT_TRUE(obj["variantField"].isNull());
+
 }
 
 TEST_F(QnJsonTextFixture, serializeQListBrief)

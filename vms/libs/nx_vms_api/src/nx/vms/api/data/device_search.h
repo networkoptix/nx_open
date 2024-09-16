@@ -97,6 +97,8 @@ struct NX_VMS_API DeviceSearchIp
 {
     /**%apidoc
      * IP address of the Device. NOTE: Some Device drivers can also accept URL in this field.
+     * In case of URL it can be for example <code>rtsp://192.168.0.1:8554/0/profile4/media.smp</code>,
+     * or <code>http://192.168.0.1</code>. The URL can specify port inside it.
      * %example 192.168.0.1
      */
     QString ip;
@@ -104,6 +106,18 @@ struct NX_VMS_API DeviceSearchIp
 #define DeviceSearchIp_Fields (ip)
 QN_FUSION_DECLARE_FUNCTIONS(DeviceSearchIp, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(DeviceSearchIp, DeviceSearchIp_Fields)
+
+struct NX_VMS_API DeviceSearchUrl
+{
+    /**%apidoc
+     * URL or IP address of the Device.
+     * %example rtsp://192.168.0.1:8554/0/profile4/media.smp
+     */
+    QString url;
+};
+#define DeviceSearchUrl_Fields (url)
+QN_FUSION_DECLARE_FUNCTIONS(DeviceSearchUrl, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(DeviceSearchUrl, DeviceSearchUrl_Fields)
 
 struct NX_VMS_API DeviceSearchIpRange
 {
@@ -125,7 +139,10 @@ NX_REFLECTION_INSTRUMENT(DeviceSearchIpRange, DeviceSearchIpRange_Fields)
 
 struct NX_VMS_API DeviceSearchV2: DeviceSearchBase
 {
-    std::variant<DeviceSearchIp, DeviceSearchIpRange> target;
+    std::variant<DeviceSearchIp, DeviceSearchIpRange, DeviceSearchUrl> target;
+
+    bool hasOneTarget() const;
+    QString targetUrl() const;
 };
 #define DeviceSearchV2_Fields DeviceSearchBase_Fields(target)
 QN_FUSION_DECLARE_FUNCTIONS(DeviceSearchV2, (json), NX_VMS_API)
