@@ -311,7 +311,7 @@ void setGraphicsSettings()
     }
 
     const auto selectedApi = nameToApi.value(graphicsApi, QSGRendererInterface::OpenGL);
-    gpu::selectDevice(selectedApi);
+    gpu::selectDevice(selectedApi, ini().gpuName);
     QQuickWindow::setGraphicsApi(selectedApi);
 
     QQuickWindow::setDefaultAlphaBuffer(true);
