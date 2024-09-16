@@ -55,13 +55,21 @@ struct NX_VMS_API RegisterIntegrationRequest: public IntegrationRequestIdentity
     /**%apidoc Integration authentication code, 4 decimal digits. */
     QString pinCode;
 
+    /**%apidoc Whether the Integration is REST-only. */
+    bool isRestOnly = false;
+
+    /**%apidoc Device Agent Manifest should be provided by REST-only Integrations. */
+    std::optional<DeviceAgentManifest> deviceAgentManifest;
+
     bool operator==(const RegisterIntegrationRequest& other) const = default;
 };
 #define nx_vms_api_analytics_RegisterIntegrationRequest_Fields \
     nx_vms_api_analytics_IntegrationRequestIdentity_Fields \
     (integrationManifest) \
     (engineManifest) \
-    (pinCode)
+    (pinCode) \
+    (isRestOnly) \
+    (deviceAgentManifest)
 QN_FUSION_DECLARE_FUNCTIONS(
     RegisterIntegrationRequest, (json), NX_VMS_API);
 NX_REFLECTION_INSTRUMENT(
