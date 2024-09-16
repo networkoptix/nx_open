@@ -10,6 +10,7 @@
 #include <nx/network/socket_delegate.h>
 #include <nx/network/socket_factory.h>
 #include <nx/network/websocket/websocket.h>
+#include <nx/utils/elapsed_timer.h>
 #include <nx/utils/thread/cf/wrappers.h>
 
 namespace nx::network::websocket::test {
@@ -895,9 +896,6 @@ protected:
 
     virtual void TearDown() override
     {
-        if (m_idleThread.joinable())
-            m_idleThread.join();
-
         WebSocket::TearDown();
     }
 
@@ -909,7 +907,7 @@ protected:
         try { readyPromise.set_value(); } catch (...) {}
     }
 
-    void start()
+    void start(std::optional<std::chrono::milliseconds> maxWaitTime = std::nullopt)
     {
         clientWebSocket->readSomeAsync(&clientReadBuf, clientReadCb);
         if (isClientSending)
@@ -919,7 +917,10 @@ protected:
         if (beforeWaitAction)
             beforeWaitAction();
 
-        readyFuture.wait();
+        if (maxWaitTime)
+            readyFuture.wait_for(*maxWaitTime);
+        else
+            readyFuture.wait();
     }
 
     void startAndWaitForDestroyed()
@@ -931,15 +932,11 @@ protected:
 
     void whenConnectionIsIdleForSomeTime()
     {
-        m_idleThread = std::thread(
-            [this]()
-            {
-                std::this_thread::sleep_for(kShortTimeout * 4);
-                try { readyPromise.set_value(); } catch (...) {}
-            });
-
-        start();
-        readyFuture.wait();
+        using namespace std::chrono;
+        nx::utils::ElapsedTimer timer{nx::utils::ElapsedTimerState::started};
+        start(kShortTimeout * 4);
+        while (timer.elapsed() < kShortTimeout * 4)
+            std::this_thread::sleep_for(10ms);
         if (clientWebSocket)
             clientWebSocket->pleaseStopSync();
         waitForServerSocketDestroyed();
@@ -963,7 +960,6 @@ protected:
     int sentMessageCount = 0;
     const int kTotalMessageCount = 30;
     std::queue<nx::Buffer> sendQueue;
-    std::thread m_idleThread;
 };
 
 TEST_P(WebSocket_PingPong, PingPong_noPingsBecauseOfData)
