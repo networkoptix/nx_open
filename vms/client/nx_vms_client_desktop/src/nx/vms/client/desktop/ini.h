@@ -181,6 +181,11 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
         " * \"software\" - Software\n"
         );
 
+    NX_INI_STRING("nvidia", gpuName,
+        "[Dev] Select GPU to use by a part of its name. Only for Direct3D and Vulkan.\n"
+        "Use \"intel\" for Intel, \"nvidia\" for Nvidia etc.\n"
+        "By default the first available Nvidia GPU is selected.\n");
+
     // VMS-42523
     NX_INI_INT(250, analyticsSearchRequestDelayMs,
         "[Dev] Analytics search request delay in milliseconds.");
