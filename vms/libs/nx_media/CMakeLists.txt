@@ -130,6 +130,11 @@ if(MACOSX)
     target_link_libraries(nx_media PRIVATE ${VideoToolBox_LIBRARY})
 endif()
 
+if((LINUX AND NOT ANDROID AND arch MATCHES "x64|arm64") OR WINDOWS)
+    find_package(VulkanHeaders REQUIRED)
+    target_link_libraries(nx_media PRIVATE Vulkan::Headers)
+endif()
+
 if(hardware_decoders_x64)
     if(LINUX)
         find_package(libva REQUIRED)
