@@ -85,6 +85,8 @@ function(set_distribution_names)
         "${prefix}-client-${mobileClientVersion.full}-${suffix}" PARENT_SCOPE)
     set(mobile_client_aab_distribution_name
         "${prefix}-client-${mobileClientVersion.full}-${android_aab_suffix}" PARENT_SCOPE)
+    set(mobile_client_archive_distribution_name
+        "${prefix}-mobile_client-${mobileClientVersion.full}-${suffix}" PARENT_SCOPE)
     set(webadmin_distribution_name
         "${prefix}-webadmin-${releaseVersion.full}-${webadminSuffix}" PARENT_SCOPE)
     set(server_plugin_sdk_distribution_name
