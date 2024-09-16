@@ -7,7 +7,7 @@
 
 #include <nx/network/cloud/cloud_connect_type.h>
 #include <nx/network/http/http_status.h>
-
+#include <nx/utils/std/cpp20.h>
 namespace nx::network::cloud {
 
 /**
