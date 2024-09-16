@@ -606,6 +606,11 @@ inline bool deserialize(QnJsonContext* /*ctx*/, const QJsonValue& value, std::nu
 template<typename... Args>
 inline void serialize(QnJsonContext* ctx, const std::variant<Args...>& value, QJsonValue* target)
 {
+    if (ctx->isOptionalDefaultSerialization<void>())
+    {
+        *target = QJsonValue();
+        return;
+    }
     std::visit(
         [ctx, target](auto&& arg) { QJson::serialize(ctx, std::move(arg), target); }, value);
 }
