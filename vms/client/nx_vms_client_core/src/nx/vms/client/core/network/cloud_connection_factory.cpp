@@ -3,6 +3,8 @@
 #include "cloud_connection_factory.h"
 
 #include <nx/branding.h>
+#include <nx/build_info.h>
+#include <nx/utils/software_version.h>
 #include <nx/vms/client/core/application_context.h>
 
 using namespace nx::cloud::db::api;
@@ -25,7 +27,12 @@ std::string CloudConnectionFactory::clientId()
         appContext()->localPeerType() == nx::vms::api::PeerType::mobileClient
             ? "mobile_client"
             : "desktop_client";
-    return nx::format("%1/%2", clientType, nx::branding::customization()).toStdString();
+    return nx::format("%1/%2/%3",
+        clientType,
+        nx::branding::customization(),
+        nx::utils::SoftwareVersion(nx::build_info::vmsVersion())
+            .toString(nx::utils::SoftwareVersion::Format::minor))
+        .toStdString();
 }
 
 } // namespace nx::vms::client::core
