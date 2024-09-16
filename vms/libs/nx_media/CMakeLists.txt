@@ -135,9 +135,11 @@ if(hardware_decoders_x64)
         find_package(libva REQUIRED)
         find_package(intel-onevpl REQUIRED)
         find_package(intel-media-sdk REQUIRED)
+        find_package(PkgConfig REQUIRED)
+        pkg_check_modules(DRM REQUIRED IMPORTED_TARGET libdrm)
         target_link_libraries(nx_media
             PUBLIC
-            X11 dl GL libva::libva libvpl::vpl intel-onevpl::mfx-gen
+            X11 dl GL libegl_stub PkgConfig::DRM libva::libva libvpl::vpl intel-onevpl::mfx-gen
         )
     endif()
 
