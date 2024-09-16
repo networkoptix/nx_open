@@ -50,9 +50,6 @@ namespace nx::vms::client::desktop {
 
 using namespace std::chrono;
 
-using namespace nx;
-using namespace nx::vms::client;
-using namespace nx::vms::client::desktop;
 using namespace nx::vms::event;
 
 namespace {

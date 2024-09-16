@@ -55,12 +55,14 @@ QnNotificationSoundModel* ServerNotificationCache::persistentGuiModel() const {
     return m_model;
 }
 
-bool ServerNotificationCache::storeSound(const QString &filePath, int maxLengthMSecs, const QString &customTitle) {
+bool ServerNotificationCache::storeSound(
+    const QString &filePath, int maxLengthMSecs, const QString &customTitle)
+{
     if (!isConnectedToServer())
         return false;
 
-    QString uuid = nx::Uuid::createUuid().toString();
-    QString newFilename = uuid.mid(1, uuid.size() - 2) + QLatin1String(".mp3");
+    const auto newFilename =
+        nx::Uuid::createUuid().toSimpleString().append('.').append(targetContainter);
 
     QString title = customTitle;
     if (title.isEmpty())
@@ -81,8 +83,8 @@ bool ServerNotificationCache::storeSound(const QString &filePath, int maxLengthM
     if (maxLengthMSecs > 0)
         transcoder->setTranscodeDurationLimit(maxLengthMSecs);
 
-    connect(transcoder, SIGNAL(done(QString)), this, SLOT(at_soundConverted(QString)));
-    connect(transcoder, SIGNAL(done(QString)), transcoder, SLOT(deleteLater()));
+    connect(transcoder, &FileTranscoder::done, this, &ServerNotificationCache::at_soundConverted);
+    connect(transcoder, &FileTranscoder::done, transcoder, &FileTranscoder::deleteLater);
     return transcoder->startAsync();
 }
 
