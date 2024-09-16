@@ -281,7 +281,10 @@ QQuickWindow* WindowContext::quickWindow() const
 QRhi* WindowContext::rhi() const
 {
     if (auto windowWidget = mainWindowWidget())
-        return windowWidget->backingStore()->handle()->rhi();
+    {
+        if (auto backingStore = windowWidget->backingStore())
+            return backingStore->handle()->rhi();
+    }
     return nullptr;
 }
 
