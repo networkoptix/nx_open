@@ -11,6 +11,34 @@
 
 namespace nx::network::rest::json::test {
 
+struct MockDataVariantA
+{
+    std::string a;
+
+    bool operator==(const MockDataVariantA& other) const = default;
+};
+#define MockDataVariantA_Fields (a)
+
+struct MockDataVariantB
+{
+    std::string b;
+
+    bool operator==(const MockDataVariantB& other) const = default;
+};
+#define MockDataVariantB_Fields (b)
+
+struct MockDataWithVariant
+{
+    std::variant<MockDataVariantA, MockDataVariantB> variantField;
+
+    bool operator==(const MockDataWithVariant& other) const = default;
+};
+#define MockDataWithVariant_Fields (variantField)
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(MockDataVariantA, (json), MockDataVariantA_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(MockDataVariantB, (json), MockDataVariantB_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(MockDataWithVariant, (json), MockDataWithVariant_Fields)
+
 static inline void filter(QJsonValue* value, Params filters)
 {
     auto with = details::extractWithParam(&filters);
@@ -256,6 +284,34 @@ TEST(Json, KeepDefault)
     ASSERT_EQ(getDouble(mapWithKeepDefault, "d"), 0.);
     ASSERT_TRUE(getObject(mapWithKeepDefault, "o").isEmpty());
     ASSERT_TRUE(getArray(mapWithKeepDefault, "a").isEmpty());
+}
+
+TEST(Json, KeepDefaultWithVariant)
+{
+    using namespace nx::utils::json;
+
+    const auto defaultValueWithVariant = MockDataWithVariant();
+
+    const QJsonValue variantWithDefault =
+        filter(defaultValueWithVariant, {}, DefaultValueAction::appendMissing);
+    EXPECT_EQ(getString(getObject(variantWithDefault, "variantField"), "a"), "");
+
+    const QJsonValue variantWoDefault =
+        filter(defaultValueWithVariant, {}, DefaultValueAction::removeEqual);
+    // All fields with default values for for the field type are stripped.
+    EXPECT_TRUE(asObject(variantWoDefault).empty());
+
+    const auto lastVariant = MockDataWithVariant{.variantField = MockDataVariantB{.b = "1"}};
+
+    const QJsonValue lastVariantWithDefault =
+        filter(lastVariant, {}, DefaultValueAction::appendMissing);
+    EXPECT_EQ(getString(getObject(lastVariantWithDefault, "variantField"), "b"), "1");
+    EXPECT_FALSE(getObject(lastVariantWithDefault, "variantField").contains("a"));
+    const QJsonValue lastVariantWoDefault =
+        filter(lastVariant, {}, DefaultValueAction::removeEqual);
+    // Not default value is not stripped.
+    EXPECT_EQ(getString(getObject(lastVariantWoDefault, "variantField"), "b"), "1");
+    EXPECT_FALSE(getObject(lastVariantWoDefault, "variantField").contains("a"));
 }
 
 TEST(Json, WithAndKeepDefault)
