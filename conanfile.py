@@ -196,6 +196,7 @@ class NxOpenConan(ConanFile):
             self.requires("icu/74.2" "#a0ffc2036da25e5dbe72dc941074a6c4")
 
         if self.isWindows or self.isLinux:
+            self.requires("vulkan-headers/1.3.290.0" "#6a0d12455e50dca266c79b88fda818b3")
             if self.settings.arch == "x86_64":
                 self.requires("cuda-toolkit/12.5.1" "#52c56e278e56d5a0cb47df11090bbeb7")
                 self.requires("libvpl/2023.4.0" "#7c3fb86a89705272e31f163320e8384f")
@@ -206,7 +207,7 @@ class NxOpenConan(ConanFile):
                 self.requires("libva/2.22.0" "#80b7709c721fc7f0aa72cb42f5b91e2b")
                 self.requires("intel-media-sdk/19.4" "#a3ac2d7e36a1260f757893833af8dea2")
                 self.requires("intel-onevpl/23.4.2" "#35a35b4e4db86741752331dce439a71d")
-                self.requires("intel-gmmlib/22.3.15" "#89d1f903368a92dfe057e7bed2afb3d8")
+                self.requires("intel-gmmlib/22.5.2" "#52c5832c9ea9dcc989b58c480de6733a")
                 self.requires("intel-media-driver/23.4.3" "#fc9a92c1f8ef08c7beb2a4c7f69935b1")
 
                 self.requires("libmysqlclient/8.1.0" "#96475a9cb3a02bbe2626543d0b3d33b7")
@@ -214,7 +215,7 @@ class NxOpenConan(ConanFile):
             if not self.isArm32:
                 self._os_deps_package = "os_deps_for_desktop_linux"
                 self.requires("os_deps_for_desktop_linux/ubuntu_focal"
-                    "#8915743e3a654f4c5bf0e30bb080d114")
+                    "#8dde64b7eb69e401b23c0365239eefc6")
 
         if self.haveDesktopClient:
             self.requires("hidapi/0.10.1" "#67c06b0755251878327ddea8fe964d6b")
