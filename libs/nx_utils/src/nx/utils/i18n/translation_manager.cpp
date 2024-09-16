@@ -34,8 +34,9 @@ struct TranslationManager::Private
     mutable nx::Mutex mutex;
     QHash<QString, QSharedPointer<TranslationOverlay>> overlays;
     std::atomic<bool> assertOnOverlayInstallationFailure = false;
-    std::atomic<bool> isLoadTranslationsEnabled = true;
+    std::atomic<int> loadTranslationCounter{};
     std::atomic<bool> initialized = true;
+    std::chrono::milliseconds maxWaitTime = std::chrono::milliseconds(5);
 
     std::optional<Translation> findTranslation(const QString& localeCode)
     {
@@ -123,11 +124,6 @@ bool TranslationManager::installTranslation(const QString& localeCode)
 
 void TranslationManager::installTranslation(const Translation& translation)
 {
-    // Translations in the server can be installed in a delayed functor, after the manager was
-    // deinitialized already.
-    if (!d->isLoadTranslationsEnabled)
-        return;
-
     QString localeCode = translation.localeCode;
     localeCode.replace('-', '_'); /* Minus sign is not supported as a separator... */
 
@@ -185,20 +181,21 @@ std::unique_ptr<ScopedLocale> TranslationManager::installScopedLocale(
 }
 
 std::unique_ptr<ScopedLocale> TranslationManager::installScopedLocale(
-    const QString& locale,
-    std::chrono::milliseconds maxWaitTime)
+    const QString& locale)
 {
-    return installScopedLocale(std::vector<QString>{locale}, maxWaitTime);
+    return installScopedLocale(std::vector<QString>{locale});
 }
 
 std::unique_ptr<ScopedLocale> TranslationManager::installScopedLocale(
-    const std::vector<QString>& preferredLocales,
-    std::chrono::milliseconds maxWaitTime)
+    const std::vector<QString>& preferredLocales)
 {
     nx::utils::ElapsedTimer timer(nx::utils::ElapsedTimerState::started);
 
-    if (!d->isLoadTranslationsEnabled)
+    if (d->loadTranslationCounter == 0) //< All translation consumers are stopped.
+    {
+        NX_VERBOSE(this, "Skip loading translations");
         return std::make_unique<ScopedLocale>(PreloadedTranslationReference(), 0ms);
+    }
 
     for (const auto& locale: preferredLocales)
     {
@@ -212,7 +209,7 @@ std::unique_ptr<ScopedLocale> TranslationManager::installScopedLocale(
             // failed to fit into the given interval.
             return std::make_unique<ScopedLocale>(
                 translationRef,
-                qMax(maxWaitTime - timer.elapsed(), kMinInstallationTime));
+                qMax(d->maxWaitTime - timer.elapsed(), kMinInstallationTime));
         }
     }
 
@@ -222,12 +219,20 @@ std::unique_ptr<ScopedLocale> TranslationManager::installScopedLocale(
 
 void TranslationManager::stopLoadingTranslations()
 {
-    d->isLoadTranslationsEnabled = false;
+    --d->loadTranslationCounter;
+    NX_DEBUG(this, "stop loading translations");
+    NX_ASSERT(d->loadTranslationCounter >= 0);
+}
+
+void TranslationManager::startLoadingTranslations()
+{
+    NX_DEBUG(this, "start loading tanslations");
+    ++d->loadTranslationCounter;
 }
 
 void TranslationManager::deinitialize()
 {
-    stopLoadingTranslations();
+    d->loadTranslationCounter = 0;
     {
         NX_MUTEX_LOCKER lock(&d->mutex);
         if (!d->initialized) //< Avoid double deinitialization.
@@ -340,6 +345,11 @@ void TranslationManager::removePreloadedTranslationReference(const QString& loca
 
     d->overlays[locale]->removeRef();
     // Dereferenced translation data is not deleted, so it may be reused later.
+}
+
+void TranslationManager::setMaxWaitTime(std::chrono::milliseconds timeout)
+{
+    d->maxWaitTime = timeout;
 }
 
 } // namespace nx::i18n

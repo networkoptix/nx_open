@@ -100,7 +100,7 @@ ApplicationContext::~ApplicationContext()
     d->longRunableCleanup.reset();
     d->longRunnablePool.reset();
     deinitNetworking();
-    d->translationManager->deinitialize();
+    d->translationManager.reset();
 
     if (NX_ASSERT(s_instance == this))
         s_instance = nullptr;
