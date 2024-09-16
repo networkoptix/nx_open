@@ -33,7 +33,7 @@ class NX_VMS_COMMON_API FileTranscoder: public QnLongRunnable
 
 public:
     explicit FileTranscoder(std::shared_ptr<nx::metrics::Storage> metrics);
-    virtual ~FileTranscoder();
+    virtual ~FileTranscoder() override;
 
     /*!
         File \a filePath must exist
@@ -96,16 +96,13 @@ public:
         const QString& name,
         const QString& value);
 
-public slots:
-    //!Overrides QnLongRunnable::pleaseStop
+    /** Overrides QnLongRunnable::pleaseStop */
     virtual void pleaseStop() override;
-    //!Start transcoding
-    /*!
-        This method returns immediately. On transcoding end \a done signal is emitted
+
+    /**
+        Start transcoding and returns immediately. On transcoding end \a done signal is emitted.
     */
     bool startAsync();
-    //!Do transcoding in sync mode
-    bool doSyncTranscode();
 
 signals:
     //!Emitted on transcoding finish (successfully or failed). For result see \a resultCode method
@@ -146,4 +143,7 @@ private:
     void setDest( QIODevice* dest );
     bool openFiles();
     void closeFiles();
+
+    /** Do transcoding in sync mode. */
+    bool doSyncTranscode();
 };
