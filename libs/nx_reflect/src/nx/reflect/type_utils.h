@@ -3,14 +3,45 @@
 #pragma once
 
 #include <chrono>
+#include <optional>
 #include <set>
 #include <type_traits>
 #include <unordered_set>
+#include <variant>
 
-#include "generic_visitor.h"
 #include "instrument.h"
 
 namespace nx::reflect {
+
+template<typename T>
+struct IsOptional: std::false_type
+{
+};
+
+template<typename T>
+struct IsOptional<std::optional<T>>: std::true_type
+{
+};
+
+template<typename T>
+inline constexpr bool IsOptionalV = IsOptional<T>::value;
+
+//-------------------------------------------------------------------------------------------------
+
+template<typename... Args>
+struct IsVariant: std::false_type
+{
+};
+
+template<typename... Args>
+struct IsVariant<std::variant<Args...>>: std::true_type
+{
+};
+
+template<typename... Args>
+constexpr bool IsVariantV = IsVariant<Args...>::value;
+
+//-------------------------------------------------------------------------------------------------
 
 /**
  * A simplified replacement for Container concept (until we have c++20 concepts).

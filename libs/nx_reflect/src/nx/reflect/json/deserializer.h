@@ -27,7 +27,8 @@ namespace json {
 enum class DeserializationFlag
 {
     none = 0,
-    ignoreFieldTypeMismatch = 1, // All errors from custom deserializers will be skipped too
+    ignoreFieldTypeMismatch = 1 << 0, // All errors from custom deserializers will be skipped too.
+    fields = 1 << 1, //< Fill deserialized fields.
 };
 
 } // namespace json
@@ -116,7 +117,8 @@ DeserializationResult deserializeVariantType(
 template<typename... Args>
 DeserializationResult deserialize(const DeserializationContext& ctx, std::variant<Args...>* data)
 {
-    return (... || deserializeVariantType<Args>(ctx, data));
+    DeserializationResult r;
+    return (... || (r = deserializeVariantType<Args>(ctx, data))), r;
 }
 
 template<typename... Args>
@@ -175,10 +177,14 @@ DeserializationResult deserialize(
     if (!ctx.value.IsArray())
         return {false, "Array is expected", getStringRepresentation(ctx.value)};
 
+    DeserializationResult result;
+    if (ctx.flags & (int) json::DeserializationFlag::fields)
+        result.fields.resize(ctx.value.Size());
+
     for (rapidjson::SizeType i = 0; i < ctx.value.Size(); ++i)
     {
         typename C::value_type element;
-        const auto deserializationResult =
+        auto deserializationResult =
             deserializeValue(DeserializationContext{ctx.value[i], ctx.flags}, &element);
         if (!deserializationResult.success)
         {
@@ -187,8 +193,10 @@ DeserializationResult deserialize(
             continue;
         }
         std::inserter(*data, data->end()) = std::move(element);
+        if (ctx.flags & (int) json::DeserializationFlag::fields)
+            result.fields[i].fields = std::move(deserializationResult.fields);
     }
-    return DeserializationResult(true);
+    return result;
 }
 
 template<typename C, typename Key, typename = std::void_t<>>
@@ -223,10 +231,11 @@ DeserializationResult deserialize(
             getStringRepresentation(ctx.value)};
     }
 
+    DeserializationResult result;
     for (auto it = ctx.value.MemberBegin(); it != ctx.value.MemberEnd(); ++it)
     {
         typename C::mapped_type element;
-        const auto deserializationResult =
+        auto deserializationResult =
             deserializeValue(DeserializationContext{it->value, ctx.flags}, &element);
         if (!deserializationResult.success)
         {
@@ -237,9 +246,8 @@ DeserializationResult deserialize(
         }
 
         typename C::key_type key;
-        if (!nx::reflect::fromString(
-                std::string_view(it->name.GetString(), it->name.GetStringLength()),
-                &key))
+        std::string_view keyStd(it->name.GetString(), it->name.GetStringLength());
+        if (!nx::reflect::fromString(keyStd, &key))
         {
             if (!(ctx.flags & (int) json::DeserializationFlag::ignoreFieldTypeMismatch))
             {
@@ -251,13 +259,18 @@ DeserializationResult deserialize(
             continue;
         }
 
+        if (ctx.flags & (int) json::DeserializationFlag::fields)
+        {
+            result.addField(
+                std::string{std::move(keyStd)}, std::move(deserializationResult.fields));
+        }
         if constexpr (HasSquareBracketOperatorV<C, decltype(key)>)
             (*data)[std::move(key)] = std::move(element); //< E.g., std::map
         else
             data->emplace(std::move(key), std::move(element)); //< E.g., std::multimap
     }
 
-    return DeserializationResult(true);
+    return result;
 }
 
 template<typename T, typename = std::void_t<>>
@@ -471,7 +484,15 @@ private:
             auto& dataRef = *data;
             auto curDeserializationResult = deserializeValue(
                 DeserializationContext{valueIter->value, ctx.flags}, &dataRef);
-            if (!curDeserializationResult.success)
+            if (curDeserializationResult.success)
+            {
+                if (ctx.flags & ((int) json::DeserializationFlag::fields))
+                {
+                    m_deserealizationResult.addField(
+                        field, std::move(curDeserializationResult.fields));
+                }
+            }
+            else
             {
                 deserializationResult = curDeserializationResult;
                 if (!deserializationResult.firstNonDeserializedField)
@@ -504,12 +525,18 @@ private:
         if (deserializationResult.success)
         {
             field.set(m_data, std::move(data));
+            if (ctx.flags & ((int) json::DeserializationFlag::fields))
+                m_deserealizationResult.addField(field, std::move(deserializationResult.fields));
         }
         else
         {
             // If null value cannot be converted to target value type, then just ignore it.
             if (valueIter->value.GetType() == rapidjson::kNullType)
+            {
+                if (ctx.flags & ((int) json::DeserializationFlag::fields))
+                    m_deserealizationResult.addField(field, std::move(deserializationResult.fields));
                 return DeserializationResult(true);
+            }
 
             if (!deserializationResult.firstNonDeserializedField)
                 deserializationResult.firstNonDeserializedField = field.name();

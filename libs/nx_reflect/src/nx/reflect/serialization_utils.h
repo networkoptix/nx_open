@@ -4,6 +4,7 @@
 
 #include <optional>
 #include <string>
+#include <vector>
 
 namespace nx::reflect {
 
@@ -28,6 +29,17 @@ struct NX_REFLECT_API DeserializationResult
      */
     std::optional<std::string> firstNonDeserializedField;
 
+    struct Field
+    {
+        std::string name;
+        std::vector<Field> fields;
+
+        bool operator==(const Field&) const = default;
+    };
+
+    using Fields = std::vector<Field>;
+    Fields fields;
+
     DeserializationResult(bool result);
     DeserializationResult() = default;
     DeserializationResult(
@@ -39,6 +51,22 @@ struct NX_REFLECT_API DeserializationResult
     operator bool() const noexcept;
 
     std::string toString() const;
+
+    // TODO: Replace with `fields.emplace_back(std::move(name), std::move(fields_))` when newer
+    // clang will be used.
+    void addField(std::string name, std::vector<Field> fields_)
+    {
+        Field f;
+        f.name = std::move(name);
+        f.fields = std::move(fields_);
+        fields.push_back(std::move(f));
+    }
+
+    template<typename Member>
+    void addField(const Member& member, std::vector<Field> fields_)
+    {
+        addField(std::string{member.name()}, std::move(fields_));
+    }
 };
 
 } // namespace nx::reflect
