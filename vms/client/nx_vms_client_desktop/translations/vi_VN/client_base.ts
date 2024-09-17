@@ -317,7 +317,7 @@
     </message>
     <message>
       <source>Exit</source>
-      <translation>Lối ra</translation>
+      <translation>Thoát</translation>
     </message>
     <message>
       <source>Mark Selection Start</source>
@@ -4003,7 +4003,7 @@ to %1</source>
     <name>QnLocalSettingsDialog</name>
     <message>
       <source>General</source>
-      <translation>Chung</translation>
+      <translation>Tổng quan</translation>
     </message>
     <message>
       <source>Look and Feel</source>
@@ -4480,7 +4480,7 @@ to %1</source>
     </message>
     <message>
       <source>Normal</source>
-      <translation>Chung</translation>
+      <translation>Bình thường</translation>
     </message>
     <message>
       <source>High</source>
@@ -4892,7 +4892,7 @@ to %1</source>
     <name>QnServerSettingsDialog</name>
     <message>
       <source>General</source>
-      <translation>Chung</translation>
+      <translation>Tổng quan</translation>
     </message>
     <message>
       <source>Storage Analytics</source>
@@ -5429,7 +5429,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <name>QnSystemAdministrationDialog</name>
     <message>
       <source>General</source>
-      <translation>Chung</translation>
+      <translation>Tổng quan</translation>
     </message>
     <message>
       <source>Licenses</source>
@@ -7629,7 +7629,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <name>nx::vms::client::desktop::CameraSettingsDialog</name>
     <message>
       <source>General</source>
-      <translation>Chung</translation>
+      <translation>Tổng quan</translation>
     </message>
     <message>
       <source>Recording</source>
@@ -8779,7 +8779,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <name>nx::vms::client::desktop::LayoutSettingsDialog</name>
     <message>
       <source>General</source>
-      <translation>Chung</translation>
+      <translation>Tổng quan</translation>
     </message>
     <message>
       <source>Background</source>
