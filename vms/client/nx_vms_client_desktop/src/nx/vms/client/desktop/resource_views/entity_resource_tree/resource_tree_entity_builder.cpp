@@ -21,6 +21,7 @@
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity/base_notification_observer.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity/composition_entity.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity/flattening_group_entity.h>
+#include <nx/vms/client/desktop/resource_views/entity_item_model/entity/group_grouping_entity.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity/grouping_entity.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity/single_item_entity.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity/unique_key_group_list_entity.h>
@@ -746,11 +747,39 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createLayoutItemListEntity(
 
 AbstractEntityPtr ResourceTreeEntityBuilder::createLayoutsGroupEntity() const
 {
-    auto layoutsGroupList = makeUniqueKeyGroupList<QnResourcePtr>(
-        resourceItemCreator(m_itemFactory.get(), user()),
-        [this](const QnResourcePtr& resource) { return createLayoutItemListEntity(resource); },
-        layoutsOrder());
-    layoutsGroupList->installItemSource(m_itemKeySourcePool->layoutsSource(user()));
+    using GroupingRule = GroupingRule<QString, QnResourcePtr>;
+    using GroupingRuleStack = GroupGroupingEntity<QString, QnResourcePtr>::GroupingRuleStack;
+
+    AbstractEntityPtr layoutsEntity;
+    if (ini().foldersForLayoutsInResourceTree)
+    {
+        GroupingRuleStack groupingRuleStack;
+
+        groupingRuleStack.push_back({userDefinedGroupIdGetter(),
+            userDefinedGroupItemCreator(m_itemFactory.get(), hasPowerUserPermissions()),
+            Qn::ResourceTreeCustomGroupIdRole,
+            resource_grouping::kUserDefinedGroupingDepth,
+            numericOrder()});
+
+        auto layoutsGroupGroupingList = std::make_unique<GroupGroupingEntity<QString, QnResourcePtr>>(
+            resourceItemCreator(m_itemFactory.get(), user()),
+            [this](const QnResourcePtr& resource) { return createLayoutItemListEntity(resource); },
+            core::ResourceRole,
+            layoutsOrder(),
+            groupingRuleStack);
+
+        layoutsGroupGroupingList->installItemSource(m_itemKeySourcePool->layoutsSource(user()));
+        layoutsEntity = std::move(layoutsGroupGroupingList);
+    }
+    else
+    {
+        auto layoutsGroupList = makeUniqueKeyGroupList<QnResourcePtr>(
+            resourceItemCreator(m_itemFactory.get(), user()),
+            [this](const QnResourcePtr& resource) { return createLayoutItemListEntity(resource); },
+            layoutsOrder());
+        layoutsGroupList->installItemSource(m_itemKeySourcePool->layoutsSource(user()));
+        layoutsEntity = std::move(layoutsGroupList);
+    }
 
     auto cloudLayoutItemCreator =
         [this](const QnResourcePtr& resource)
@@ -761,8 +790,9 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createLayoutsGroupEntity() const
         };
 
     auto layoutsComposition = std::make_unique<CompositionEntity>();
-    layoutsComposition->addSubEntity(std::move(layoutsGroupList));
+    layoutsComposition->addSubEntity(std::move(layoutsEntity));
 
+    // TODO: #vbreus Implement groups for cloud layouts.
     if (user() && user()->isCloud())
     {
         auto cloudLayoutsList = makeUniqueKeyGroupList<QnResourcePtr>(

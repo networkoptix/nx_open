@@ -3,9 +3,8 @@
 #include "unique_key_group_list_entity.h"
 
 #include <nx/utils/log/assert.h>
-
-#include <nx/vms/client/desktop/resource_views/entity_item_model/entity_model_mapping.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity/entity_notification_guard.h>
+#include <nx/vms/client/desktop/resource_views/entity_item_model/entity_model_mapping.h>
 
 namespace nx::vms::client::desktop {
 namespace entity_item_model {
@@ -169,6 +168,57 @@ bool UniqueKeyGroupListEntity<Key, KeyHasher, KeyEqual>::addItem(const Key& key)
     assignAsSubEntity(group,
         [this](const AbstractEntity* entity)
         { return groupIndex(static_cast<const GroupEntity*>(entity)); });
+
+    return true;
+}
+
+template<class Key, class KeyHasher, class KeyEqual>
+bool UniqueKeyGroupListEntity<Key, KeyHasher, KeyEqual>::moveItem(
+    const Key& key, UniqueKeyGroupListEntity<Key, KeyHasher, KeyEqual>* otherList)
+{
+    if (!otherList)
+        return false;
+
+    // One of two following conditions will met on attempt to move group to the same list.
+    if (otherList->hasItem(key))
+        return false;
+
+    auto keyItr = m_keyMapping.find(key);
+    if (keyItr == std::cend(m_keyMapping))
+        return false;
+
+    // Get index of group within this list.
+    GroupEntity* group = keyItr->second.get();
+    auto groupSequenceItr =
+        std::find(std::cbegin(m_groupSequence), std::cend(m_groupSequence), group);
+    const int groupIndex = std::distance(std::cbegin(m_groupSequence), groupSequenceItr);
+
+    // Get potential position of group within other list.
+    auto otherSequenceItr = std::lower_bound(
+        std::cbegin(otherList->m_groupSequence),
+        std::cend(otherList->m_groupSequence),
+        group,
+        [this](const auto& lhs, const auto& rhs)
+        { return m_itemOrder.comp(lhs->headItem(), rhs->headItem()); });
+
+    const int otherGroupIndex =
+        std::distance(std::cbegin(otherList->m_groupSequence), otherSequenceItr);
+
+    auto guard = moveRowsGuard(modelMapping(), this, groupIndex, 1, otherList, otherGroupIndex);
+
+    otherList->m_keyMapping.emplace(key, std::move(keyItr->second));
+    otherList->m_groupSequence.insert(otherSequenceItr, group);
+
+    group->setDataChangedCallback(
+        [otherList](const GroupEntity* group, const QVector<int>& roles)
+        { otherList->dataChangedHandler(group, roles); });
+
+    otherList->assignAsSubEntity(group,
+        [otherList](const AbstractEntity* entity)
+        { return otherList->groupIndex(static_cast<const GroupEntity*>(entity)); });
+
+    m_keyMapping.erase(keyItr);
+    m_groupSequence.erase(groupSequenceItr);
 
     return true;
 }

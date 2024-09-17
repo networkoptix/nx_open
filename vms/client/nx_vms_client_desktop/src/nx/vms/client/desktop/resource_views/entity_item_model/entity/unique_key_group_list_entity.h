@@ -82,6 +82,17 @@ public:
     bool addItem(const Key& key);
 
     /**
+     * Moves group entity corresponding to the given key to the another group list if such
+     * operation is performable i.e this list contains such group entity while other list is
+     * not. Generates 'move' notifications, persistent indexes of items from moved group won't be
+     * invalidated.
+     * @note Key -> Group transformation of other group list will be bypassed. Consistency of the
+     *     resulting contents is the responsibility of the caller.
+     * @returns True if operation succeeds, i.e group entity was successfully moved.
+     */
+    bool moveItem(const Key& key, UniqueKeyGroupListEntity<Key, KeyHasher, KeyEqual>* otherList);
+
+    /**
      * @todo Add documentation.
      */
     bool removeItem(const Key& key);

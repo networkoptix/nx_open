@@ -99,6 +99,18 @@ QnResourceList selectedResources(const QModelIndexList& selection)
     return result;
 }
 
+QModelIndexList getChildrenIndexes(const QModelIndex& parent)
+{
+    QModelIndexList result;
+    for (int row = 0; row < parent.model()->rowCount(parent); ++row)
+    {
+        const auto childIndex = parent.model()->index(row, 0, parent);
+        result.append(childIndex);
+        result.append(getChildrenIndexes(childIndex));
+    }
+    return result;
+}
+
 QnResourceList childCamerasRecursive(const QModelIndex& index)
 {
     if (!index.isValid())
@@ -107,21 +119,34 @@ QnResourceList childCamerasRecursive(const QModelIndex& index)
         return {};
     }
 
-    std::function<QModelIndexList(const QModelIndex&)> getChildren;
-    getChildren =
-        [&getChildren](const QModelIndex& parent)
-        {
-            QModelIndexList result;
-            for (int row = 0; row < parent.model()->rowCount(parent); ++row)
-            {
-                const auto childIndex = parent.model()->index(row, 0, parent);
-                result.append(childIndex);
-                result.append(getChildren(childIndex));
-            }
-            return result;
-        };
+    const auto children = getChildrenIndexes(index);
+    QnResourceList result;
+    for (const auto& child: children)
+    {
+        const auto resourceData = child.data(core::ResourceRole);
+        if (resourceData.isNull())
+            continue;
 
-    const auto children = getChildren(index);
+        const auto resource = resourceData.value<QnResourcePtr>();
+        if (resource.objectCast<QnVirtualCameraResource>()
+            || resource.objectCast<QnWebPageResource>())
+        {
+            result.push_back(resource);
+        }
+    }
+
+    return result;
+}
+
+QnResourceList childLayoutsRecursive(const QModelIndex& index)
+{
+    if (!index.isValid())
+    {
+        NX_ASSERT(false, "Invalid parameter");
+        return {};
+    }
+
+    const auto children = getChildrenIndexes(index);
 
     QnResourceList result;
     for (const auto& child: children)
@@ -131,8 +156,7 @@ QnResourceList childCamerasRecursive(const QModelIndex& index)
             continue;
 
         const auto resource = resourceData.value<QnResourcePtr>();
-        if (resource.dynamicCast<QnVirtualCameraResource>()
-            || resource.dynamicCast<QnWebPageResource>())
+        if (resource.objectCast<QnLayoutResource>())
         {
             result.push_back(resource);
         }
@@ -360,16 +384,26 @@ struct ResourceTreeInteractionHandler::Private: public QnWorkbenchContextAware
             if (index.data(Qn::NodeTypeRole).value<NodeType>() == NodeType::customResourceGroup)
             {
                 selectedGroupIds << index.data(Qn::ResourceTreeCustomGroupIdRole).toString();
-                const auto childCameras = childCamerasRecursive(index);
-                for (const auto camera: childCameras)
-                    resources.insert(camera);
+
+                const auto childLayouts = childLayoutsRecursive(index);
+                if (!childLayouts.empty())
+                {
+                    for (const auto& layout: childLayouts)
+                        resources.insert(layout);
+                }
+                else
+                {
+                    const auto childCameras = childCamerasRecursive(index);
+                    for (const auto& camera: childCameras)
+                        resources.insert(camera);
+                }
             }
         }
 
         if (!resources.empty())
         {
             // Merge resources within selected groups with directly selected resources.
-            for (const auto directlySelectedResource: result.resources())
+            for (const auto& directlySelectedResource: result.resources())
                 resources.insert(directlySelectedResource);
 
             result.setResources(QnResourceList(resources.cbegin(), resources.cend()));

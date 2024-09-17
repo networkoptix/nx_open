@@ -1,6 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "grouping_entity.h"
+#include "group_grouping_entity.h"
 
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity/entity_notification_guard.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity_model_mapping.h>
@@ -41,14 +41,16 @@ namespace entity_item_model {
 //-------------------------------------------------------------------------------------------------
 
 template <class GroupKey, class Key>
-GroupingEntity<GroupKey, Key>::GroupingEntity(
-    const KeyToItemTransform<Key>& itemCreator,
+GroupGroupingEntity<GroupKey, Key>::GroupGroupingEntity(
+    const KeyToItemTransform<Key>& headItemCreator,
+    const KeyToEntityTransform<Key>& nestedEntityCreator,
     const int keyRole,
     const ItemOrder& itemOrder,
     const GroupingRuleStack& groupingRuleStack)
     :
     base_type(),
-    m_itemCreator(itemCreator),
+    m_headItemCreator(headItemCreator),
+    m_nestedEntityCreator(nestedEntityCreator),
     m_keyRole(keyRole),
     m_itemOrder(itemOrder),
     m_groupingRuleStack(groupingRuleStack)
@@ -62,43 +64,43 @@ GroupingEntity<GroupKey, Key>::GroupingEntity(
 }
 
 template <class GroupKey, class Key>
-int GroupingEntity<GroupKey, Key>::rowCount() const
+int GroupGroupingEntity<GroupKey, Key>::rowCount() const
 {
     return m_topLevelComposition->rowCount();
 }
 
 template <class GroupKey, class Key>
-AbstractEntity* GroupingEntity<GroupKey, Key>::childEntity(int row) const
+AbstractEntity* GroupGroupingEntity<GroupKey, Key>::childEntity(int row) const
 {
     return m_topLevelComposition->childEntity(row);
 }
 
 template <class GroupKey, class Key>
-int GroupingEntity<GroupKey, Key>::childEntityRow(const AbstractEntity* entity) const
+int GroupGroupingEntity<GroupKey, Key>::childEntityRow(const AbstractEntity* entity) const
 {
     return m_topLevelComposition->childEntityRow(entity);
 }
 
 template <class GroupKey, class Key>
-QVariant GroupingEntity<GroupKey, Key>::data(int row, int role) const
+QVariant GroupGroupingEntity<GroupKey, Key>::data(int row, int role) const
 {
     return m_topLevelComposition->data(row, role);
 }
 
 template <class GroupKey, class Key>
-Qt::ItemFlags GroupingEntity<GroupKey, Key>::flags(int row) const
+Qt::ItemFlags GroupGroupingEntity<GroupKey, Key>::flags(int row) const
 {
     return m_topLevelComposition->flags(row);
 }
 
 template <class GroupKey, class Key>
-bool GroupingEntity<GroupKey, Key>::isPlanar() const
+bool GroupGroupingEntity<GroupKey, Key>::isPlanar() const
 {
     return false;
 }
 
 template <class GroupKey, class Key>
-void GroupingEntity<GroupKey, Key>::setItems(const QVector<Key>& keys)
+void GroupGroupingEntity<GroupKey, Key>::setItems(const QVector<Key>& keys)
 {
     {
         auto guard = removeRowsGuard(modelMapping(), 0, rowCount());
@@ -113,16 +115,16 @@ void GroupingEntity<GroupKey, Key>::setItems(const QVector<Key>& keys)
 }
 
 template <class GroupKey, class Key>
-bool GroupingEntity<GroupKey, Key>::addItem(const Key& key)
+bool GroupGroupingEntity<GroupKey, Key>::addItem(const Key& key)
 {
-    auto destinationList = destinationListEntity(key);
+    auto destinationList = destinationGroupListEntity(key);
     m_keyToListMapping.insert(std::make_pair(key, destinationList));
 
     return destinationList->addItem(key);
 }
 
 template <class GroupKey, class Key>
-bool GroupingEntity<GroupKey, Key>::removeItem(const Key& key)
+bool GroupGroupingEntity<GroupKey, Key>::removeItem(const Key& key)
 {
     auto itr = m_keyToListMapping.find(key);
     if (itr == m_keyToListMapping.cend())
@@ -138,7 +140,7 @@ bool GroupingEntity<GroupKey, Key>::removeItem(const Key& key)
 }
 
 template <class GroupKey, class Key>
-void GroupingEntity<GroupKey, Key>::installItemSource(
+void GroupGroupingEntity<GroupKey, Key>::installItemSource(
     const std::shared_ptr<UniqueKeySource<Key>>& keySource)
 {
     m_keySource = keySource;
@@ -157,7 +159,8 @@ void GroupingEntity<GroupKey, Key>::installItemSource(
 }
 
 template <class GroupKey, class Key>
-UniqueKeyListEntity<Key>* GroupingEntity<GroupKey, Key>::destinationListEntity(const Key& itemKey)
+UniqueKeyGroupListEntity<Key>* GroupGroupingEntity<GroupKey, Key>::destinationGroupListEntity(
+    const Key& itemKey)
 {
     const auto stackBegin = std::cbegin(m_groupingRuleStack);
     const auto stackEnd = std::cend(m_groupingRuleStack);
@@ -189,11 +192,11 @@ UniqueKeyListEntity<Key>* GroupingEntity<GroupKey, Key>::destinationListEntity(c
         }
     }
 
-    return static_cast<UniqueKeyListEntity<Key>*>(currentComposition->lastSubentity());
+    return static_cast<UniqueKeyGroupListEntity<Key>*>(currentComposition->lastSubentity());
 }
 
 template <class GroupKey, class Key>
-std::unique_ptr<CompositionEntity>GroupingEntity<GroupKey, Key>::compositionForStack(
+std::unique_ptr<CompositionEntity> GroupGroupingEntity<GroupKey, Key>::compositionForStack(
     GroupingRuleConstIterator currentRuleItr,
     int currentRuleOrder)
 {
@@ -218,23 +221,24 @@ std::unique_ptr<CompositionEntity>GroupingEntity<GroupKey, Key>::compositionForS
                 ruleItr->groupItemOrder));
     }
 
-    auto listEntity = makeKeyList<Key>(m_itemCreator, m_itemOrder);
+    auto groupListEntity =
+        makeUniqueKeyGroupList<Key>(m_headItemCreator, m_nestedEntityCreator, m_itemOrder);
 
     auto groupingDataChangeObserver = std::make_unique<GroupDefiningDataChangeObserver<Key>>(
-        listEntity.get(),
+        groupListEntity.get(),
         m_keyRole,
         m_groupDefiningDataRoles,
         [this](const Key& key) { updateItemGroup(key); });
 
-    listEntity->setNotificationObserver(std::move(groupingDataChangeObserver));
+    groupListEntity->setNotificationObserver(std::move(groupingDataChangeObserver));
 
-    result->addSubEntity(std::move(listEntity));
+    result->addSubEntity(std::move(groupListEntity));
 
     return result;
 }
 
 template <class GroupKey, class Key>
-QVector<int> GroupingEntity<GroupKey, Key>::groupDefiningDataRoles()
+QVector<int> GroupGroupingEntity<GroupKey, Key>::groupDefiningDataRoles()
 {
     QVector<int> result;
     for (const auto& rule: m_groupingRuleStack)
@@ -247,14 +251,14 @@ QVector<int> GroupingEntity<GroupKey, Key>::groupDefiningDataRoles()
 }
 
 template <class GroupKey, class Key>
-void GroupingEntity<GroupKey, Key>::removeEmptyGroups(UniqueKeyListEntity<Key>* tailList)
+void GroupGroupingEntity<GroupKey, Key>::removeEmptyGroups(UniqueKeyGroupListEntity<Key>* tailGroupList)
 {
-    if (tailList->rowCount() > 0)
+    if (tailGroupList->rowCount() > 0)
         return;
 
     const auto boundEntity = m_topLevelComposition.get();
 
-    auto parentGroup = getNearestParentEntityWithType<GroupEntity>(tailList, boundEntity);
+    auto parentGroup = getNearestParentEntityWithType<GroupEntity>(tailGroupList, boundEntity);
     auto parentGroupList = getNearestParentEntityWithType<CaseInsensitiveGroupList>(
         parentGroup, boundEntity);
 
@@ -283,7 +287,7 @@ void GroupingEntity<GroupKey, Key>::removeEmptyGroups(UniqueKeyListEntity<Key>* 
 }
 
 template <class GroupKey, class Key>
-void GroupingEntity<GroupKey, Key>::updateItemGroup(const Key& itemKey)
+void GroupGroupingEntity<GroupKey, Key>::updateItemGroup(const Key& itemKey)
 {
     auto itr = m_keyToListMapping.find(itemKey);
     if (itr == m_keyToListMapping.cend())
@@ -293,7 +297,7 @@ void GroupingEntity<GroupKey, Key>::updateItemGroup(const Key& itemKey)
     }
 
     auto sourceList = itr->second;
-    auto destinationList = destinationListEntity(itemKey);
+    auto destinationList = destinationGroupListEntity(itemKey);
 
     if (sourceList == destinationList)
         return;
@@ -308,9 +312,7 @@ void GroupingEntity<GroupKey, Key>::updateItemGroup(const Key& itemKey)
 // Explicit instantiations.
 //-------------------------------------------------------------------------------------------------
 
-template class NX_VMS_CLIENT_DESKTOP_API GroupingEntity<QString, QnResourcePtr>;
-template class NX_VMS_CLIENT_DESKTOP_API GroupingEntity<QString, int>;
-template class NX_VMS_CLIENT_DESKTOP_API GroupingEntity<QString, nx::Uuid>;
+template class NX_VMS_CLIENT_DESKTOP_API GroupGroupingEntity<QString, QnResourcePtr>;
 
 } // namespace entity_item_model
 } // namespace nx::vms::client::desktop
