@@ -111,7 +111,7 @@ struct WindowContext::Private
 };
 
 WindowContext::WindowContext(QObject* parent):
-    QObject(parent),
+    base_type(parent),
     d(new Private{.q=this})
 {
     // Create state manager before the context as it contains SessionAwareDelegates, trying to
@@ -187,9 +187,7 @@ QWidget* WindowContext::mainWindowWidget() const
 
 SystemContext* WindowContext::system() const
 {
-    // Later on each Window Context will have it's own current system context and be able to switch
-    // between them. For now we have only one current system context available.
-    return appContext()->currentSystemContext();
+    return base_type::system()->as<SystemContext>();
 }
 
 void WindowContext::setCurrentSystem(SystemContext* value)

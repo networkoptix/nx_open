@@ -4,6 +4,7 @@
 
 #include <QtCore/QPointer>
 
+#include <nx/vms/client/core/window_context_aware.h>
 #include <nx/vms/client/desktop/menu/actions.h>
 
 class QAction;
@@ -22,16 +23,13 @@ class SystemContext;
 class WindowContext;
 class Workbench;
 
-class WindowContextAware
+class WindowContextAware: public nx::vms::client::core::WindowContextAware
 {
+    using base_type = nx::vms::client::core::WindowContextAware;
+
 public:
     WindowContextAware(WindowContext* windowContext);
     WindowContextAware(WindowContextAware* windowContextAware);
-
-    /**
-     * Virtual destructor.
-     * We do dynamic_casts to WindowContextAware, so this class must have a vtable.
-     */
     virtual ~WindowContextAware();
 
     WindowContext* windowContext() const;
@@ -58,9 +56,6 @@ public:
      * MainWindow header.
      */
     QWidget* mainWindowWidget() const;
-
-private:
-    QPointer<WindowContext> m_windowContext;
 };
 
 } // namespace nx::vms::client::desktop

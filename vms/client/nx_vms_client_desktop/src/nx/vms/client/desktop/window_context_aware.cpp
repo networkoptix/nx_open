@@ -12,17 +12,8 @@
 namespace nx::vms::client::desktop {
 
 WindowContextAware::WindowContextAware(WindowContext* windowContext):
-    m_windowContext(windowContext)
+    base_type(windowContext)
 {
-    if (auto qobject = dynamic_cast<const QObject*>(this))
-    {
-        QObject::connect(windowContext, &QObject::destroyed, qobject,
-            [this]()
-            {
-                NX_ASSERT(false,
-                    "Context-aware object must be destroyed before the corresponding context is.");
-            });
-    }
 }
 
 WindowContextAware::WindowContextAware(WindowContextAware* windowContextAware):
@@ -32,20 +23,18 @@ WindowContextAware::WindowContextAware(WindowContextAware* windowContextAware):
 
 WindowContextAware::~WindowContextAware()
 {
-    NX_ASSERT(m_windowContext,
-        "Context-aware object must be destroyed before the corresponding context is.");
 }
 
 WindowContext* WindowContextAware::windowContext() const
 {
-    return m_windowContext.data();;
+    return base_type::windowContext()->as<WindowContext>();
 }
 
 SystemContext* WindowContextAware::system() const
 {
     if (auto systemContextAware = dynamic_cast<const CurrentSystemContextAware*>(this))
     {
-        NX_ASSERT(systemContextAware->systemContext() == m_windowContext->system(),
+        NX_ASSERT(systemContextAware->systemContext() == windowContext()->system(),
             "Current system differs from the one class was created with. This class should have "
             "been destroyed before current system is changed. Otherwise implement separate "
             "inheritance from SystemContextAware like in CameraSettingsDialog class.");
@@ -58,32 +47,32 @@ SystemContext* WindowContextAware::system() const
             "with the current system context only, consider to use CurrentSystemContextAware "
             "helper class instead.");
     }
-    return m_windowContext->system();
+    return windowContext()->system();
 }
 
 QnWorkbenchContext* WindowContextAware::workbenchContext() const
 {
-    return m_windowContext->workbenchContext();
+    return windowContext()->workbenchContext();
 }
 
 Workbench* WindowContextAware::workbench() const
 {
-    return m_windowContext->workbench();
+    return windowContext()->workbench();
 }
 
 QnWorkbenchDisplay* WindowContextAware::display() const
 {
-    return m_windowContext->workbenchContext()->display();
+    return windowContext()->workbenchContext()->display();
 }
 
 QnWorkbenchNavigator* WindowContextAware::navigator() const
 {
-    return m_windowContext->navigator();
+    return windowContext()->navigator();
 }
 
 menu::Manager* WindowContextAware::menu() const
 {
-    return m_windowContext->menu();
+    return windowContext()->menu();
 }
 
 QAction* WindowContextAware::action(const menu::IDType id) const
@@ -93,12 +82,12 @@ QAction* WindowContextAware::action(const menu::IDType id) const
 
 MainWindow* WindowContextAware::mainWindow() const
 {
-    return m_windowContext->workbenchContext()->mainWindow();
+    return windowContext()->workbenchContext()->mainWindow();
 }
 
 QWidget* WindowContextAware::mainWindowWidget() const
 {
-    return m_windowContext->workbenchContext()->mainWindowWidget();
+    return windowContext()->workbenchContext()->mainWindowWidget();
 }
 
 } // namespace nx::vms::client::desktop

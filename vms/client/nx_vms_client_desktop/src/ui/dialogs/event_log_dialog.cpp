@@ -56,7 +56,6 @@
 
 using namespace nx;
 using namespace nx::vms::event;
-using namespace nx::vms::client::core;
 using namespace nx::vms::client::desktop;
 using namespace std::chrono;
 
@@ -279,12 +278,13 @@ QStandardItem* QnEventLogDialog::createEventTree(QStandardItem* rootItem, EventT
 void QnEventLogDialog::createAnalyticsEventTree(QStandardItem* rootItem)
 {
     auto addItem =
-        [](QStandardItem* parent, AnalyticsEntitiesTreeBuilder::NodePtr node)
+        [](QStandardItem* parent, nx::vms::client::core::AnalyticsEntitiesTreeBuilder::NodePtr node)
         {
             auto item = new QStandardItem(node->text);
             item->setData(EventType::analyticsSdkEvent, EventTypeRole);
             item->setData(QVariant::fromValue(node->entityId), AnalyticsEventTypeIdRole);
-            item->setSelectable(node->nodeType == AnalyticsEntitiesTreeBuilder::NodeType::eventType);
+            item->setSelectable(node->nodeType
+                == nx::vms::client::core::AnalyticsEntitiesTreeBuilder::NodeType::eventType);
 
             if (NX_ASSERT(parent))
                 parent->appendRow(item);
@@ -411,7 +411,7 @@ void QnEventLogDialog::initEventsModel()
     updateAnalyticsSubmenuOperation->setFlags(nx::utils::PendingOperation::FireOnlyWhenIdle);
 
     connect(system()->analyticsEventsSearchTreeBuilder(),
-        &AnalyticsEventsSearchTreeBuilder::eventTypesTreeChanged,
+        &nx::vms::client::core::AnalyticsEventsSearchTreeBuilder::eventTypesTreeChanged,
         updateAnalyticsSubmenuOperation,
         &nx::utils::PendingOperation::requestOperation);
 }
@@ -762,7 +762,8 @@ void QnEventLogDialog::at_eventsGrid_customContextMenuRequested(const QPoint&)
     QModelIndex idx = ui->gridEvents->currentIndex();
     if (idx.isValid())
     {
-        QnResourcePtr resource = m_model->data(idx, ResourceRole).value<QnResourcePtr>();
+        QnResourcePtr resource =
+            m_model->data(idx, nx::vms::client::core::ResourceRole).value<QnResourcePtr>();
         auto manager = this->menu();
         if (resource && system()->accessController()->hasPermissions(resource,
             Qn::ViewContentPermission))

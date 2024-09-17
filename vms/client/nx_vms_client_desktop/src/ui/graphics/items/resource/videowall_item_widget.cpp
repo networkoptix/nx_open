@@ -50,7 +50,6 @@
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/math/linear_combination.h>
 
-using namespace nx::vms::client::core;
 using namespace nx::vms::client::desktop;
 using nx::vms::client::core::Geometry;
 
@@ -97,7 +96,7 @@ QnVideowallItemWidget::QnVideowallItemWidget(
     setAcceptDrops(true);
     setAcceptedMouseButtons(Qt::LeftButton | Qt::RightButton);
     setClickableButtons(Qt::LeftButton | Qt::RightButton);
-    setPaletteColor(this, QPalette::Window, colorTheme()->color("dark4"));
+    setPaletteColor(this, QPalette::Window, nx::vms::client::core::colorTheme()->color("dark4"));
 
     connect(m_videowall.get(), &QnVideoWallResource::itemChanged, this,
         &QnVideowallItemWidget::at_videoWall_itemChanged);
@@ -173,7 +172,8 @@ void QnVideowallItemWidget::initInfoOverlay()
     QFont font = this->font();
     font.setPixelSize(20);
     setFont(font);
-    setPaletteColor(this, QPalette::WindowText, colorTheme()->color("videoWall.overlayText"));
+    setPaletteColor(this, QPalette::WindowText,
+        nx::vms::client::core::colorTheme()->color("videoWall.overlayText"));
 
     /* Header overlay. */
     m_headerLabel = new GraphicsLabel();
@@ -191,7 +191,7 @@ void QnVideowallItemWidget::initInfoOverlay()
     m_headerWidget->setAcceptedMouseButtons(Qt::NoButton);
     m_headerWidget->setAutoFillBackground(true);
     setPaletteColor(m_headerWidget, QPalette::Window,
-        colorTheme()->color("videoWall.overlayBackground"));
+        nx::vms::client::core::colorTheme()->color("videoWall.overlayBackground"));
 
     QGraphicsLinearLayout *headerOverlayLayout = new QGraphicsLinearLayout(Qt::Vertical);
     headerOverlayLayout->setContentsMargins(10.0, 5.0, 5.0, 10.0);
@@ -243,8 +243,10 @@ void QnVideowallItemWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
 
 void QnVideowallItemWidget::paintFrame(QPainter *painter, const QRectF &paintRect)
 {
-    static const QColor kNormalFrameColor = colorTheme()->color("videoWall.itemFrame.normal");
-    static const QColor kSelectedFrameColor = colorTheme()->color("videoWall.itemFrame.selected");
+    static const QColor kNormalFrameColor =
+        nx::vms::client::core::colorTheme()->color("videoWall.itemFrame.normal");
+    static const QColor kSelectedFrameColor =
+        nx::vms::client::core::colorTheme()->color("videoWall.itemFrame.selected");
 
     if (!paintRect.isValid())
         return;
@@ -421,7 +423,7 @@ void QnVideowallItemWidget::updateLayout()
                 nx::api::ImageRequest::kLatestThumbnail.count(),
                 /*skipExportPermissionCheck*/ true));
 
-        connect(m_layoutThumbnailProvider.get(), &ImageProvider::statusChanged,
+        connect(m_layoutThumbnailProvider.get(), &nx::vms::client::core::ImageProvider::statusChanged,
             this, &QnVideowallItemWidget::at_updateThumbnailStatus);
 
         m_layoutThumbnailProvider->loadAsync();
@@ -480,11 +482,11 @@ bool QnVideowallItemWidget::isDragValid() const
     return !m_mimeData->isEmpty();
 }
 
-void QnVideowallItemWidget::at_updateThumbnailStatus(ThumbnailStatus status)
+void QnVideowallItemWidget::at_updateThumbnailStatus(nx::vms::client::core::ThumbnailStatus status)
 {
     switch (status)
     {
-        case ThumbnailStatus::Loaded:
+        case nx::vms::client::core::ThumbnailStatus::Loaded:
         {
             m_resourceStatus = Qn::EmptyOverlay;
             m_layoutThumbnail = QPixmap::fromImage(m_layoutThumbnailProvider->image());
@@ -494,7 +496,7 @@ void QnVideowallItemWidget::at_updateThumbnailStatus(ThumbnailStatus status)
             break;
         }
 
-        case ThumbnailStatus::Loading:
+        case nx::vms::client::core::ThumbnailStatus::Loading:
             m_resourceStatus = Qn::LoadingOverlay;
             break;
 
@@ -519,8 +521,11 @@ void QnVideowallItemWidget::reloadDesktopCameraThumbnailIfNeeded()
 
     const auto itemsStatuses = m_layoutThumbnailProvider->getItemStatuses();
     const auto desktopCameraIter = itemsStatuses.find(resource);
-    if (desktopCameraIter == itemsStatuses.end() || *desktopCameraIter != ThumbnailStatus::NoData)
+    if (desktopCameraIter == itemsStatuses.end()
+        || *desktopCameraIter != nx::vms::client::core::ThumbnailStatus::NoData)
+    {
         return;
+    }
 
     static const std::chrono::milliseconds kDesktopCameraThumbnailReloadTimeout(2000);
 
