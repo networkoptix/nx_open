@@ -51,6 +51,10 @@ NX_VMS_COMMON_API EventType parentEvent(EventType eventType);
 /** Check if resource required to SETUP rule on this event. */
 NX_VMS_COMMON_API bool isResourceRequired(EventType eventType);
 
+/**
+ * By having the 'toggle state' the old engine means the event may be prolonged,
+ * i.e. have start and stop states.
+ */
 NX_VMS_COMMON_API bool hasToggleState(
     EventType eventType,
     const EventParameters& runtimeParams,

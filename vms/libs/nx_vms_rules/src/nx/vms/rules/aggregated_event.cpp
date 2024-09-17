@@ -126,4 +126,14 @@ const std::vector<EventPtr>& AggregatedEvent::aggregatedEvents() const
     return m_aggregatedEvents;
 }
 
+nx::Uuid AggregatedEvent::ruleId() const
+{
+    return m_ruleId;
+}
+
+void AggregatedEvent::setRuleId(nx::Uuid ruleId)
+{
+    m_ruleId = ruleId;
+}
+
 } // namespace nx::vms::rules

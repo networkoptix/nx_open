@@ -42,7 +42,10 @@ public:
 
     QHash<QString, EventFilterField*> fields() const;
 
-    bool match(const EventPtr& event) const;
+    /** Match all event fields excluding state. */
+    bool matchFields(const EventPtr& event) const;
+    /** Match state field only. */
+    bool matchState(const EventPtr& event) const;
 
     template<class T = Field>
     const T* fieldByName(const QString& name) const
@@ -76,11 +79,6 @@ private slots:
     void onFieldChanged();
 
 private:
-    /** Match all event fields excluding state. */
-    bool matchFields(const EventPtr& event) const;
-    /** Match state field only. */
-    bool matchState(const EventPtr& event) const;
-
     template<class T>
     T* fieldByNameImpl(const QString& name) const
     {

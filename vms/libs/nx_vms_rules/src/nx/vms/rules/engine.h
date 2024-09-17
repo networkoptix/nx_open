@@ -175,7 +175,7 @@ public:
     size_t processAnalyticsEvents(const std::vector<EventPtr>& events);
 
     EventCache* eventCache();
-    const RunningEventWatcher& runningEventWatcher() const;
+    RunningEventWatcher runningEventWatcher(nx::Uuid ruleId);
 
     void toggleTimer(nx::utils::TimerEventHandler* handler, bool on);
 
@@ -209,7 +209,7 @@ private:
 
     // Check whether the given event should be processed. The method is checking if the event is
     // not cached, and if the event is prolonged, it checks that it has a valid state.
-    bool checkEvent(const EventPtr& event) const;
+    bool checkRunningEvent(nx::Uuid ruleId, const EventPtr& event);
 
     std::unique_ptr<Rule> cloneRule(const Rule* rule) const;
 
@@ -270,12 +270,10 @@ private:
     RuleSet m_rules;
     QSet<nx::utils::TimerEventHandler*> m_timerHandlers;
 
-    // All the fields below should be used by Engine's thread only.
-    EventCache m_eventCache;
-    RunningEventWatcher m_runningEventWatcher;
+private: // All the fields below should be used by Engine's thread only.
+    QHash<nx::Uuid, RunningRuleInfo> m_runningRules;
 
-    // Running actions by their resources hash, grouped by rule Id.
-    QHash<nx::Uuid, QHash<size_t, ActionPtr>> m_runningActions;
+    EventCache m_eventCache;
 
     QTimer* m_aggregationTimer;
 };
