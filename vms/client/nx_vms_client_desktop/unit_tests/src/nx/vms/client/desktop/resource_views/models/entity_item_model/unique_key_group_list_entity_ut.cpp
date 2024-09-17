@@ -1,16 +1,15 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#include <QtCore/QCollator>
+
+#include <nx/vms/client/desktop/resource_views/entity_item_model/entity/unique_key_group_list_entity.h>
+#include <nx/vms/client/desktop/resource_views/entity_item_model/entity_item_model.h>
+#include <nx/vms/client/desktop/resource_views/entity_item_model/item/generic_item/generic_item_builder.h>
+#include <nx/vms/client/desktop/resource_views/entity_item_model/item_order/item_order.h>
+
 #include "entity_item_model_test_fixture.h"
 #include "entity_logging_notification_listener.h"
 #include "test_item_pool.h"
-
-#include <QtCore/QCollator>
-
-#include <nx/vms/client/desktop/resource_views/entity_item_model/entity_item_model.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/entity/unique_key_group_list_entity.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/item_order/item_order.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/item/generic_item/generic_item_builder.h>
-#include <iomanip>
 
 namespace {
 
@@ -22,11 +21,6 @@ QStringList getItemNames(const AbstractEntity* entity)
     for (int i = 0; i < entity->rowCount(); ++i)
         items.push_back(entity->data(i, Qt::DisplayRole).toString());
     return items;
-}
-
-QString listToString(const AbstractEntity* entity)
-{
-    return QString("[%1]").arg(getItemNames(entity).join(", "));
 }
 
 std::function<AbstractEntityPtr(int)> nullNestedEntityCreator()
@@ -111,6 +105,58 @@ TEST_F(EntityItemModelTest, DISABLED_modelGroupWithNoOrderAddRenameRemove20000Ti
 
     for (int i = 0; i < kItemsSize; ++i)
         unsortedList->removeItem(keys.at(i));
+}
+
+TEST_F(EntityItemModelTest, groupListcorrectMoveNotificationsForListOfTwoItems)
+{
+    TestItemPool itemPool;
+    itemPool.setItemNameGenerator(sequentialNameGenerator("Item", 10));
+
+    auto sortedList = std::make_unique<UniqueKeyGroupListEntity<int>>(
+        itemPool.itemCreator(), nullNestedEntityCreator(), numericOrder());
+
+    sortedList->setItems({0, 1});
+
+    auto notificationRecorder = std::make_unique<EntityLoggingNotificationListener>();
+    auto queueChecker = notificationRecorder->queueChecker();
+    sortedList->setNotificationObserver(std::move(notificationRecorder));
+
+    // 1. First goes to back.
+    itemPool.setItemName(0, "Item_99");
+
+    // 2. First reverted.
+    itemPool.setItemName(0, "Item_10");
+
+    // 3. Second goes to front.
+    itemPool.setItemName(1, "Item_0");
+
+    // 4. Second reverted.
+    itemPool.setItemName(1, "Item_11");
+
+    SCOPED_TRACE("");
+
+    using Record = NotificationRecord;
+
+    queueChecker.withAnnotation("1. First goes to back")
+        .verifyNotification(Record::dataChanged(0, 0, {Qt::DisplayRole}))
+        .verifyNotification(Record::beginMoveRows(sortedList.get(), 0, 0, sortedList.get(), 2))
+        .withClosing();
+
+    queueChecker.withAnnotation("2. First reverted")
+        .verifyNotification(Record::dataChanged(1, 1, {Qt::DisplayRole}))
+        .verifyNotification(Record::beginMoveRows(sortedList.get(), 1, 1, sortedList.get(), 0))
+        .withClosing();
+
+    queueChecker.withAnnotation("3. Second goes to front")
+        .verifyNotification(Record::dataChanged(1, 1, {Qt::DisplayRole}))
+        .verifyNotification(Record::beginMoveRows(sortedList.get(), 1, 1, sortedList.get(), 0))
+        .withClosing();
+
+    queueChecker.withAnnotation("4. Second reverted")
+        .verifyNotification(Record::dataChanged(0, 0, {Qt::DisplayRole}))
+        .verifyNotification(Record::beginMoveRows(sortedList.get(), 0, 0, sortedList.get(), 2))
+        .withClosing()
+        .verifyIsEmpty();
 }
 
 // Disabled since it doesn't test something particular, more like poor man's benchmark.

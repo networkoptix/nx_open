@@ -1856,7 +1856,7 @@ ActionVisibility CreateNewResourceTreeGroupCondition::check(
 
     if (parameters.hasArgument(Qn::TopLevelParentNodeTypeRole))
     {
-        const std::set<ResourceTree::NodeType> kTopLevelTreeNodesThatAllowsCustomGroups{
+        std::set<ResourceTree::NodeType> topLevelTreeNodesThatAllowsCustomGroups{
             ResourceTree::NodeType::servers,
             ResourceTree::NodeType::camerasAndDevices,
             ResourceTree::NodeType::resource,
@@ -1864,10 +1864,13 @@ ActionVisibility CreateNewResourceTreeGroupCondition::check(
             ResourceTree::NodeType::integrations
         };
 
+        if (ini().foldersForLayoutsInResourceTree)
+            topLevelTreeNodesThatAllowsCustomGroups.insert(ResourceTree::NodeType::layouts);
+
         const auto topLevelNodeType = parameters.argument(Qn::TopLevelParentNodeTypeRole)
             .value<ResourceTree::NodeType>();
 
-        if (!kTopLevelTreeNodesThatAllowsCustomGroups.contains(topLevelNodeType))
+        if (!topLevelTreeNodesThatAllowsCustomGroups.contains(topLevelNodeType))
             return InvisibleAction;
     }
 
@@ -1875,7 +1878,9 @@ ActionVisibility CreateNewResourceTreeGroupCondition::check(
         [](const QnResourcePtr& resource)
         {
             return resource.dynamicCast<QnVirtualCameraResource>()
-                || resource.dynamicCast<QnWebPageResource>();
+                || resource.dynamicCast<QnWebPageResource>()
+                || (resource.dynamicCast<QnLayoutResource>()
+                    && ini().foldersForLayoutsInResourceTree);
         };
 
     // None of selected resources can be placed into a group.

@@ -7,6 +7,7 @@
 
 #include <client/client_globals.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/layout_resource.h>
 #include <core/resource/videowall_item_index.h>
 #include <core/resource/videowall_matrix_index.h>
 #include <core/resource_management/resource_pool.h>
@@ -116,7 +117,8 @@ ActionParameters getActionParameters(
             [](const auto& resource) -> bool
             {
                 return !resource.template dynamicCast<QnVirtualCameraResource>().isNull()
-                    || resource->hasFlags(Qn::web_page);
+                    || resource->hasFlags(Qn::web_page)
+                    || resource->hasFlags(Qn::layout);
             });
 
         if (!childResources.isEmpty())
