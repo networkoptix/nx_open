@@ -54,7 +54,6 @@ NX_DECLARE_COLORIZED_ICON(kReloadIcon, "20x20/Outline/reload.svg", kLight16Subst
 
 } // namespace
 
-using namespace nx::vms::client::core;
 using namespace nx::vms::client::desktop;
 
 QnSearchBookmarksDialogPrivate::QnSearchBookmarksDialogPrivate(
@@ -267,7 +266,8 @@ bool QnSearchBookmarksDialogPrivate::fillActionParameters(menu::Parameters &para
         if (!index.isValid())
             return QnCameraBookmark();
 
-        const auto bookmark = m_model->data(index, CameraBookmarkRole).value<QnCameraBookmark>();
+        const auto bookmark =
+            m_model->data(index, nx::vms::client::core::CameraBookmarkRole).value<QnCameraBookmark>();
         if (!bookmark.isValid())
             return QnCameraBookmark();
 
@@ -329,7 +329,7 @@ bool QnSearchBookmarksDialogPrivate::fillActionParameters(menu::Parameters &para
     if (!currentBookmark.isValid())
         return true;
 
-    params.setArgument(CameraBookmarkRole, currentBookmark);
+    params.setArgument(nx::vms::client::core::CameraBookmarkRole, currentBookmark);
     window = QnTimePeriod(currentBookmark.startTimeMs, currentBookmark.durationMs);
     params.setArgument(Qn::TimePeriodRole, window);
     params.setArgument(Qn::ItemTimeRole, window.startTimeMs);

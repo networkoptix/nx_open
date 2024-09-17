@@ -43,7 +43,6 @@
 
 using std::chrono::microseconds;
 
-using namespace nx::vms::client::core;
 using namespace nx::vms::client::desktop;
 
 struct QnWorkbenchBookmarksHandler::Private
@@ -73,7 +72,7 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = nu
         [this](const QnCameraBookmark &bookmark) -> menu::Parameters
         {
             return navigator()->currentParameters(menu::TimelineScope)
-                .withArgument(CameraBookmarkRole, bookmark);
+                .withArgument(nx::vms::client::core::CameraBookmarkRole, bookmark);
         };
 
     const QPointer<QnBookmarksViewer> bookmarksViewer(navigator()->timeSlider()->bookmarksViewer());
@@ -125,7 +124,7 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = nu
         {
             statisticsModule()->controls()->registerClick("bookmark_tooltip_tag");
             menu()->triggerIfPossible(menu::OpenBookmarksSearchAction,
-                menu::Parameters().withArgument(BookmarkTagRole, tag));
+                menu::Parameters().withArgument(nx::vms::client::core::BookmarkTagRole, tag));
         });
 }
 
@@ -178,7 +177,8 @@ void QnWorkbenchBookmarksHandler::at_editCameraBookmarkAction_triggered()
     if (!camera || !camera->systemContext())
         return;
 
-    QnCameraBookmark bookmark = parameters.argument<QnCameraBookmark>(CameraBookmarkRole);
+    QnCameraBookmark bookmark = parameters.argument<QnCameraBookmark>(
+        nx::vms::client::core::CameraBookmarkRole);
 
     QnMediaServerResourcePtr server = cameraHistoryPool()->getMediaServerOnTime(camera,
         bookmark.startTimeMs.count());
@@ -209,7 +209,8 @@ void QnWorkbenchBookmarksHandler::at_removeCameraBookmarkAction_triggered()
     if (!camera || !camera->systemContext())
         return;
 
-    QnCameraBookmark bookmark = parameters.argument<QnCameraBookmark>(CameraBookmarkRole);
+    QnCameraBookmark bookmark = parameters.argument<QnCameraBookmark>(
+        nx::vms::client::core::CameraBookmarkRole);
 
     QnMessageBox dialog(QnMessageBoxIcon::Question,
         tr("Delete bookmark?"), bookmark.name.trimmed(),

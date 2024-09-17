@@ -39,7 +39,6 @@
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/event_processors.h>
 
-using namespace nx::vms::client::core;
 using namespace nx::vms::client::desktop;
 using namespace nx::core;
 
@@ -414,8 +413,11 @@ void QnStorageAnalyticsWidget::atEventsGrid_customContextMenuRequested(const QPo
     {
         for (auto index: selectedIndexes)
         {
-            if (auto resource = table->model()->data(index, ResourceRole).value<QnResourcePtr>())
+            if (auto resource =
+                table->model()->data(index, nx::vms::client::core::ResourceRole).value<QnResourcePtr>())
+            {
                 selectedResources.append(resource);
+            }
         }
     }
 

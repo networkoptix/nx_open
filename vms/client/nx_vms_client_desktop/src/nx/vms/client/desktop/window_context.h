@@ -5,6 +5,7 @@
 #include <QtCore/QObject>
 
 #include <nx/utils/impl_ptr.h>
+#include <nx/vms/client/core/window_context.h>
 
 #include "window_context_aware.h"
 
@@ -37,8 +38,10 @@ class LocalNotificationsManager;
  * considered as "current" - which is used to display Resource Tree and other system-dependent UI
  * elements.
  */
-class WindowContext: public QObject
+class WindowContext: public nx::vms::client::core::WindowContext
 {
+    using base_type = nx::vms::client::core::WindowContext;
+
     Q_OBJECT
     Q_PROPERTY(QString userId READ userId NOTIFY userIdChanged) //< Proxy to system context.
     Q_PROPERTY(QWidget* mainWindow READ mainWindowWidget CONSTANT)
