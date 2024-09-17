@@ -26,6 +26,9 @@ protected:
     virtual bool defaultAction(const QModelIndex& index) override;
 
 private:
+    virtual void setSystemContext(nx::vms::client::core::SystemContext* systemContext) override;
+
+private:
     class Private;
     nx::utils::ImplPtr<Private> d;
 };

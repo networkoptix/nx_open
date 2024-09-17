@@ -10,6 +10,12 @@
 
 class QnWorkbenchContext;
 
+namespace nx::vms::client::core {
+
+class SystemContext;
+
+} // namespace nx::vms::client::core
+
 namespace nx::vms::client::desktop {
 
 class WindowContext;
@@ -28,6 +34,8 @@ class EventSearchListModel: public core::AbstractAttributedEventModel
 public:
     explicit EventSearchListModel(WindowContext* context, QObject* parent = nullptr);
     virtual ~EventSearchListModel() override;
+
+    virtual void setSystemContext(nx::vms::client::core::SystemContext* systemContext) override;
 
     nx::vms::api::EventType selectedEventType() const;
     void setSelectedEventType(nx::vms::api::EventType value);

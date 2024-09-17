@@ -2,13 +2,8 @@
 
 #include "abstract_search_list_model.h"
 
-#include <chrono>
-
-#include <QtQml/QtQml>
-
 #include <client/client_message_processor.h>
 #include <client_core/client_core_module.h>
-#include <common/common_meta_types.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_access/resource_access_manager.h>
@@ -17,11 +12,10 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/model_row_iterator.h>
+#include <nx/utils/scoped_connections.h>
 #include <nx/vms/client/core/client_core_globals.h>
-#include <nx/vms/client/core/event_search/models/abstract_search_list_model.h>
 #include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/utils/managed_camera_set.h>
-#include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
 #include <utils/common/delayed.h>
 #include <utils/common/synctime.h>
@@ -49,6 +43,8 @@ struct AbstractSearchListModel::Private
 {
     AbstractSearchListModel* const q;
 
+    nx::utils::ScopedConnection userWatcherChangedConnection;
+
     int maximumCount = 500; //< Maximum item count.
     bool liveSupported = false; //< Whether underlying data store can be updated in live.
     bool live = false; //< Live mode enabled state.
@@ -73,7 +69,7 @@ AbstractSearchListModel::Private::Private(
     :
     q(q),
     maximumCount(maximumCount),
-    cameraSet(q->resourcePool(),
+    cameraSet(
         [this](const auto& camera)
         {
             return isCameraApplicable(camera);
@@ -84,34 +80,26 @@ AbstractSearchListModel::Private::Private(
 bool AbstractSearchListModel::Private::isCameraApplicable(
     const QnVirtualCameraResourcePtr& camera) const
 {
+    if (!NX_ASSERT(q->systemContext()))
+        return false;
+
     static const auto kRequiredPermissions = Qn::ReadPermission | Qn::ViewContentPermission;
-    const auto user = q->userWatcher()->user();
+    const auto user = q->systemContext()->userWatcher()->user();
     return user && camera
         && !camera->flags().testFlag(Qn::desktop_camera)
-        && q->resourceAccessManager()->hasPermission(user, camera, kRequiredPermissions);
+        && q->systemContext()->resourceAccessManager()->hasPermission(
+            user, camera, kRequiredPermissions);
 }
 
 //-------------------------------------------------------------------------------------------------
 
 AbstractSearchListModel::AbstractSearchListModel(
     int maximumCount,
-    SystemContext* systemContext,
     QObject* parent)
     :
-    base_type(systemContext, parent),
+    base_type(parent),
     d(new Private(this, maximumCount))
 {
-    NX_CRITICAL(messageProcessor() && resourcePool());
-
-    const auto watcher = userWatcher();
-    connect(watcher, &UserWatcher::userChanged, this,
-        [this](const QnUserResourcePtr& user)
-        {
-            onOnlineChanged(/*isOnline*/ !user.isNull());
-        });
-
-    onOnlineChanged(!userWatcher()->user().isNull());
-
     connect(&d->cameraSet, &ManagedCameraSet::camerasAboutToBeChanged,
         this, &AbstractSearchListModel::clear);
 
@@ -123,16 +111,37 @@ AbstractSearchListModel::AbstractSearchListModel(
         });
 }
 
-AbstractSearchListModel::AbstractSearchListModel(
-    SystemContext* systemContext,
-    QObject* parent)
-    :
-    AbstractSearchListModel(kStandardMaximumItemCount, systemContext, parent)
+AbstractSearchListModel::AbstractSearchListModel(QObject* parent):
+    AbstractSearchListModel(kStandardMaximumItemCount, parent)
 {
 }
 
 AbstractSearchListModel::~AbstractSearchListModel()
 {
+}
+
+void AbstractSearchListModel::setSystemContext(SystemContext* systemContext)
+{
+    if (NX_ASSERT(systemContext))
+    {
+        if (!NX_ASSERT(systemContext->messageProcessor() && systemContext->resourcePool()))
+            return;
+
+        const auto watcher = systemContext->userWatcher();
+
+        d->userWatcherChangedConnection.reset(
+            connect(watcher, &UserWatcher::userChanged, this,
+                [this](const QnUserResourcePtr& user)
+                {
+                    onOnlineChanged(/*isOnline*/ !user.isNull());
+                }));
+
+        onOnlineChanged(!watcher->user().isNull());
+
+        d->cameraSet.setResourcePool(systemContext->resourcePool());
+    }
+
+    base_type::setSystemContext(systemContext);
 }
 
 void AbstractSearchListModel::onOnlineChanged(bool isOnline)

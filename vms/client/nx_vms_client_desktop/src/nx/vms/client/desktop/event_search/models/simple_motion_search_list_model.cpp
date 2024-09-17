@@ -132,10 +132,12 @@ MenuPtr SimpleMotionSearchListModel::Private::contextMenu(const QnTimePeriod& ch
 }
 
 SimpleMotionSearchListModel::SimpleMotionSearchListModel(WindowContext* context, QObject* parent):
-    base_type(context->system(), parent),
+    base_type(parent),
     WindowContextAware(context),
     d(new Private{.q = this})
 {
+    setSystemContext(context->system());
+
     setOfflineAllowed(true);
 
     connect(navigator(), &QnWorkbenchNavigator::currentResourceChanged,

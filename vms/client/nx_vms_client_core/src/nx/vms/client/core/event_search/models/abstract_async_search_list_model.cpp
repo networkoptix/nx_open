@@ -2,13 +2,6 @@
 
 #include "abstract_async_search_list_model.h"
 
-#include <core/resource/camera_resource.h>
-#include <nx/vms/client/core/client_core_globals.h>
-
-#include <nx/utils/log/assert.h>
-#include <nx/utils/log/log.h>
-
-#include "fetch_request.h"
 #include "fetched_data.h"
 
 namespace nx::vms::client::core {
@@ -30,19 +23,15 @@ struct AbstractAsyncSearchListModel::Private
 
 AbstractAsyncSearchListModel::AbstractAsyncSearchListModel(
     int maximumCount,
-    SystemContext* systemContext,
     QObject* parent)
     :
-    base_type(maximumCount, systemContext, parent),
+    base_type(maximumCount, parent),
     d(new Private{.q = this})
 {
 }
 
-AbstractAsyncSearchListModel::AbstractAsyncSearchListModel(
-    SystemContext* systemContext,
-    QObject* parent)
-    :
-    AbstractAsyncSearchListModel(kStandardMaximumItemCount, systemContext, parent)
+AbstractAsyncSearchListModel::AbstractAsyncSearchListModel(QObject* parent):
+    AbstractAsyncSearchListModel(kStandardMaximumItemCount, parent)
 {
 }
 

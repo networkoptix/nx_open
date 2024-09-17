@@ -24,6 +24,7 @@
 #include <QtWidgets/QScrollArea>
 
 #include <api/server_rest_connection.h>
+#include <client/desktop_client_message_processor.h>
 #include <client_core/client_core_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -305,8 +306,7 @@ AnalyticsSearchWidget::Private::Private(AnalyticsSearchWidget* q):
             if (!selectedCamera)
                 return;
 
-            const auto commonContext = dynamic_cast<nx::vms::client::desktop::SystemContext*>(
-                selectedCamera->systemContext());
+            const auto commonContext = selectedCamera->systemContext()->as<SystemContext>();
 
             taxonomyManager = commonContext->taxonomyManager();
             if (!taxonomyManager)
@@ -319,6 +319,15 @@ AnalyticsSearchWidget::Private::Private(AnalyticsSearchWidget* q):
                         updateAllowanceAndTaxonomy();
                     }));
             m_filterModel->setTaxonomyManager(taxonomyManager);
+
+            if (!commonContext->messageProcessor())
+            {
+                // It is cross-system context case.
+                commonContext->createMessageProcessor<QnDesktopClientMessageProcessor>(
+                    taxonomyManager);
+            }
+
+            m_model->setSystemContext(commonContext);
 
             updateAllowanceAndTaxonomy();
         });
