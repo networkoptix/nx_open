@@ -31,6 +31,7 @@ public:
 
         m_textEdit = new QTextEdit;
         m_textEdit->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
+        m_textEdit->setAcceptRichText(false);
         contentLayout->addWidget(m_textEdit);
 
         connect(
