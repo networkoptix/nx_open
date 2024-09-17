@@ -17,21 +17,6 @@
 
 namespace nx::reflect::urlencoded {
 
-template<typename T>
-struct IsOptional: std::false_type
-{
-};
-
-template<typename T>
-struct IsOptional<std::optional<T>>: std::true_type
-{
-};
-
-template<typename T>
-inline constexpr bool IsOptionalV = IsOptional<T>::value;
-
-//-------------------------------------------------------------------------------------------------
-
 template<typename T, typename = std::void_t<>>
 struct hasFromString: std::false_type
 {
