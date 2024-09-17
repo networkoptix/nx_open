@@ -18,7 +18,9 @@ TEST(RunningEventWatcherTest, eventWatcherProperlyHandlesDifferentEventsWithTheS
     simpleEvent->m_cameraId = cameraId;
     testEvent->m_cameraId = cameraId;
 
-    RunningEventWatcher runningEventWatcher;
+    RunningRuleInfo info;
+    RunningEventWatcher runningEventWatcher(info);
+
     EXPECT_FALSE(runningEventWatcher.isRunning(simpleEvent));
     EXPECT_EQ(runningEventWatcher.startTime(simpleEvent), std::chrono::microseconds::zero());
     EXPECT_FALSE(runningEventWatcher.isRunning(testEvent));

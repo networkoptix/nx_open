@@ -578,14 +578,14 @@ TEST_F(EngineTest, cacheState)
 
     // Event state is cached.
     EXPECT_EQ(engine->processEvent(event), 2);
-    EXPECT_TRUE(engine->runningEventWatcher().isRunning(event));
+    EXPECT_TRUE(engine->runningEventWatcher(rule->id()).isRunning(event));
     // As state is not changed, the event must be ignored.
     EXPECT_EQ(engine->processEvent(event), 0);
 
     event->setState(State::stopped);
     EXPECT_EQ(engine->processEvent(event), 0);
     // After the event is processed it must be removed from the event cache.
-    EXPECT_FALSE(engine->runningEventWatcher().isRunning(event));
+    EXPECT_FALSE(engine->runningEventWatcher(rule->id()).isRunning(event));
 }
 
 TEST_F(EngineTest, instantEventsAreNotAddedToRunningEventWatcher)
@@ -601,9 +601,9 @@ TEST_F(EngineTest, instantEventsAreNotAddedToRunningEventWatcher)
     auto event = TestEventPtr::create(std::chrono::microseconds::zero(), State::instant);
 
     EXPECT_EQ(engine->processEvent(event), 2);
-    EXPECT_FALSE(engine->runningEventWatcher().isRunning(event));
+    EXPECT_FALSE(engine->runningEventWatcher(rule->id()).isRunning(event));
     EXPECT_EQ(engine->processEvent(event), 2);
-    EXPECT_FALSE(engine->runningEventWatcher().isRunning(event));
+    EXPECT_FALSE(engine->runningEventWatcher(rule->id()).isRunning(event));
 }
 
 TEST_F(EngineTest, notStartedEventIsNotProcessed)

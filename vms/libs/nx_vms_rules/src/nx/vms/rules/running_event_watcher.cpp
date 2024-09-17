@@ -2,7 +2,8 @@
 
 #include "running_event_watcher.h"
 
-#include <nx/vms/rules/basic_event.h>
+#include "basic_event.h"
+#include "utils/type.h"
 
 namespace nx::vms::rules {
 
@@ -10,14 +11,23 @@ namespace {
 
 QString runningEventKey(const EventPtr& event)
 {
-    return QString{"%1_%2"}.arg(event->type(), event->resourceKey());
+    return utils::makeName(event->type(), event->resourceKey());
 }
 
 } // namespace
 
+RunningEventWatcher::RunningEventWatcher(RunningRuleInfo& info):
+    m_info(info)
+{}
+
 bool RunningEventWatcher::isRunning(const EventPtr& event) const
 {
-    return m_events.contains(runningEventKey(event));
+    return m_info.events.contains(runningEventKey(event));
+}
+
+size_t RunningEventWatcher::runningResourceCount() const
+{
+    return m_info.events.size();
 }
 
 void RunningEventWatcher::add(const EventPtr& event)
@@ -29,7 +39,7 @@ void RunningEventWatcher::add(const EventPtr& event)
         return;
     }
 
-    m_events.insert({runningEventKey(event), event->timestamp()});
+    m_info.events.insert({runningEventKey(event), event->timestamp()});
 }
 
 void RunningEventWatcher::erase(const EventPtr& event)
@@ -41,7 +51,7 @@ void RunningEventWatcher::erase(const EventPtr& event)
         return;
     }
 
-    m_events.erase(runningEventKey(event));
+    m_info.events.erase(runningEventKey(event));
 }
 
 std::chrono::microseconds RunningEventWatcher::startTime(const EventPtr& event) const
@@ -49,8 +59,8 @@ std::chrono::microseconds RunningEventWatcher::startTime(const EventPtr& event) 
     if (!event)
         return std::chrono::microseconds::zero();
 
-    const auto it = m_events.find(runningEventKey(event));
-    return it != m_events.end() ? it->second : std::chrono::microseconds::zero();
+    const auto it = m_info.events.find(runningEventKey(event));
+    return it != m_info.events.end() ? it->second : std::chrono::microseconds::zero();
 }
 
 } // namespace nx::vms::rules

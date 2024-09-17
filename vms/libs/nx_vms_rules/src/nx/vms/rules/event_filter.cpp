@@ -80,17 +80,6 @@ QHash<QString, EventFilterField*> EventFilter::fields() const
     return result;
 }
 
-bool EventFilter::match(const EventPtr& event) const
-{
-    NX_VERBOSE(this, "Matching filter id: %1", m_id);
-
-    if (!matchState(event) || !matchFields(event))
-        return false;
-
-    NX_VERBOSE(this, "Matched filter id: %1", m_id);
-    return true;
-}
-
 bool EventFilter::matchFields(const EventPtr& event) const
 {
     for (const auto& [name, field]: m_fields)
@@ -111,7 +100,6 @@ bool EventFilter::matchFields(const EventPtr& event) const
 
     return true;
 }
-
 
 bool EventFilter::matchState(const EventPtr& event) const
 {

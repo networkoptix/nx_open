@@ -5,15 +5,31 @@
 #include <chrono>
 #include <unordered_map>
 
+#include <QtCore/QHash>
+
 #include "rules_fwd.h"
 
 namespace nx::vms::rules {
 
+struct RunningRuleInfo
+{
+    // Running events by their resource key.
+    std::unordered_map<QString, std::chrono::microseconds> events;
+
+    // Running actions by their resources hash.
+    QHash<size_t, ActionPtr> actions;
+};
+
 class NX_VMS_RULES_API RunningEventWatcher
 {
 public:
+    RunningEventWatcher(RunningRuleInfo& info);
+
     /** Returns whether given event is added to the watcher. */
     bool isRunning(const EventPtr& event) const;
+
+    /** How many different event resources have running on the rule. */
+    size_t runningResourceCount() const;
 
     void add(const EventPtr& event);
     void erase(const EventPtr& event);
@@ -22,7 +38,7 @@ public:
     std::chrono::microseconds startTime(const EventPtr& event) const;
 
 private:
-    std::unordered_map<QString, std::chrono::microseconds> m_events;
+    RunningRuleInfo& m_info;
 };
 
 } // namespace nx::vms::rules

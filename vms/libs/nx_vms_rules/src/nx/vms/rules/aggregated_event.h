@@ -55,8 +55,12 @@ public:
 
     const std::vector<EventPtr>& aggregatedEvents() const;
 
+    nx::Uuid ruleId() const;
+    void setRuleId(nx::Uuid ruleId);
+
 private:
     std::vector<EventPtr> m_aggregatedEvents;
+    nx::Uuid m_ruleId;
 
     AggregatedEvent() = default;
 };

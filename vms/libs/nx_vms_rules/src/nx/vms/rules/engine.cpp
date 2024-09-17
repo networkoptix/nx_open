@@ -128,7 +128,7 @@ Engine::Engine(
         this,
         [this]
         {
-            for (const auto ruleId: m_runningActions.keys())
+            for (const auto ruleId: m_runningRules.keys())
                 stopRunningActions(ruleId);
         }
     );
@@ -829,20 +829,10 @@ size_t Engine::processEvent(const EventPtr& event)
         return 0;
 
     checkOwnThread();
-    NX_DEBUG(this, "Processing Event: %1, state: %2", event->type(), event->state());
+    NX_VERBOSE(this, "Processing Event: %1, state: %2", event->type(), event->state());
 
-    if (!checkEvent(event))
-        return 0;
-
-    if (event->state() == State::started)
-    {
-        // Appropriate `stopped` event must be removed from the watcher when the the engine
-        // completely process the event - after all the action builders are called.
-        m_runningEventWatcher.add(event);
-    }
-
-    EventData eventData;
     std::vector<ConstRulePtr> triggeredRules;
+    std::vector<nx::Uuid> runningRules;
 
     {
         NX_MUTEX_LOCKER lock(&m_ruleMutex);
@@ -866,21 +856,25 @@ size_t Engine::processEvent(const EventPtr& event)
                 }
             }
 
-            bool matched = false;
-            for (const auto filter: rule->eventFiltersByType(event->type()))
-            {
-                if (filter->match(event))
-                {
-                    matched = true;
-                    break;
-                }
-            }
+            // Check if the event is matched by field filters except state.
+            auto matchedFilters = rule->eventFiltersByType(event->type());
+            matchedFilters.removeIf([&event](auto filter){ return !filter->matchFields(event); });
+
+            if (matchedFilters.empty())
+                continue;
+
+            runningRules.push_back(id);
+
+            if (!checkRunningEvent(id, event))
+                matchedFilters.clear();
+
+            matchedFilters.removeIf([&event](auto filter){ return !filter->matchState(event); });
 
             // TODO: 1. use cachedEventData to match AnalyticsObject more correctly
             // (bestShot doesn't has typeId, it is needed to remember at context and pass context to the matcher).
             // TODO: 2. Use addition filtering to not repeat Event for the same objectTrack (same old engine).
 
-            if (matched)
+            if (!matchedFilters.empty())
             {
                 triggeredRules.push_back(rule);
                 if (!cacheKey.isEmpty())
@@ -891,19 +885,14 @@ size_t Engine::processEvent(const EventPtr& event)
 
     NX_DEBUG(this, "Matched with %1 rules", triggeredRules.size());
 
-    if (triggeredRules.empty())
-    {
-        if (event->state() == State::stopped)
-            m_runningEventWatcher.erase(event);
-
-        return 0;
-    }
-
-
-    m_router->routeEvent(event, triggeredRules);
+    if (!triggeredRules.empty())
+        m_router->routeEvent(event, triggeredRules);
 
     if (event->state() == State::stopped)
-        m_runningEventWatcher.erase(event);
+    {
+        for (const auto& id: runningRules)
+            RunningEventWatcher(m_runningRules[id]).erase(event);
+    }
 
     return triggeredRules.size();
 }
@@ -965,19 +954,19 @@ void Engine::processAcceptedAction(const ActionPtr& action)
     {
         const auto isActionProlonged = isProlonged(action);
         if (isActionProlonged && action->state() == State::started)
-            m_runningActions[action->ruleId()].insert(qHash(action), action);
+            m_runningRules[action->ruleId()].actions.insert(qHash(action), action);
 
         executor->execute(action);
 
         if (isActionProlonged && action->state() == State::stopped)
         {
-            auto runningActionIt = m_runningActions.find(action->ruleId());
-            if (runningActionIt != m_runningActions.end())
+            auto runningRuleIt = m_runningRules.find(action->ruleId());
+            if (runningRuleIt != m_runningRules.end())
             {
-                runningActionIt->remove(qHash(action));
+                runningRuleIt->actions.remove(qHash(action));
 
-                if (runningActionIt->empty())
-                    m_runningActions.erase(runningActionIt);
+                if (runningRuleIt->actions.empty())
+                    m_runningRules.erase(runningRuleIt);
             }
         }
     }
@@ -1000,11 +989,11 @@ EventCache* Engine::eventCache()
     return &m_eventCache;
 }
 
-const RunningEventWatcher& Engine::runningEventWatcher() const
+RunningEventWatcher Engine::runningEventWatcher(nx::Uuid ruleId)
 {
     checkOwnThread();
 
-    return m_runningEventWatcher;
+    return RunningEventWatcher(m_runningRules[ruleId]);
 }
 
 void Engine::toggleTimer(nx::utils::TimerEventHandler* handler, bool on)
@@ -1038,29 +1027,46 @@ void Engine::checkOwnThread() const
         "Unexpected thread: %1", currentThread->objectName());
 }
 
-bool Engine::checkEvent(const EventPtr& event) const
+bool Engine::checkRunningEvent(nx::Uuid ruleId, const EventPtr& event)
 {
+    if (!isProlonged(event))
+        return true;
 
-    if (isProlonged(event))
+    auto runningEventWatcher = RunningEventWatcher(m_runningRules[ruleId]);
+
+    // It is required to check if the prolonged events are coming in the right order.
+    // Each stopped event must follow started event. Repeated start and stop events
+    // should be ignored.
+    const auto isEventRunning = runningEventWatcher.isRunning(event);
+
+    if (event->state() == State::started)
     {
-        // It is required to check if the prolonged events are coming in the right order.
-        // Each stopped event must follow started event. Repeated start and stop events
-        // should be ignored.
-        const auto isEventRunning = m_runningEventWatcher.isRunning(event);
-
-        if (event->state() == State::started)
+        if (isEventRunning)
         {
-            if (isEventRunning)
-            {
-                NX_VERBOSE(this, "Event %1-%2 doesn't match due to repeated start",
-                    event->type(), event->resourceKey());
-                return false;
-            }
+            NX_VERBOSE(this, "Event %1-%2 doesn't match due to repeated start",
+                event->type(), event->resourceKey());
+            return false;
         }
-        else if (!isEventRunning)
+
+        // Appropriate `stopped` event must be removed from the watcher when the the engine
+        // completely process the event - after all the action builders are called.
+        runningEventWatcher.add(event);
+    }
+    else // State::stopped
+    {
+        if (!isEventRunning)
         {
             NX_VERBOSE(this, "Event %1-%2 doesn't match due to stop without start",
                 event->type(), event->resourceKey());
+            return false;
+        }
+
+        // Only last running stop event should produce stop action.
+        if (runningEventWatcher.runningResourceCount() > 1)
+        {
+            NX_VERBOSE(this, "Event %1-%2 will not stop action since other events are running.",
+                event->type(), event->resourceKey());
+
             return false;
         }
     }
@@ -1072,11 +1078,11 @@ void Engine::stopRunningActions(nx::Uuid ruleId)
 {
     checkOwnThread();
 
-    auto runningActionsIt = m_runningActions.find(ruleId);
-    if (runningActionsIt == m_runningActions.end())
+    auto runningRuleIt = m_runningRules.find(ruleId);
+    if (runningRuleIt == m_runningRules.end())
         return;
 
-    for (const auto& action: runningActionsIt.value().values())
+    for (const auto& action: runningRuleIt->actions.values())
         stopRunningAction(action);
 }
 
