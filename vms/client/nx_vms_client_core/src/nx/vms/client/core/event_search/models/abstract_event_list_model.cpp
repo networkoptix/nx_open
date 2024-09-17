@@ -2,11 +2,8 @@
 
 #include "abstract_event_list_model.h"
 
-#include <chrono>
-
 #include <QtGui/QPixmap>
 
-#include <common/common_meta_types.h>
 #include <nx/vms/client/core/client_core_globals.h>
 #include <nx/vms/client/core/event_search/utils/event_search_utils.h>
 #include <nx/vms/client/core/skin/color_theme.h>
@@ -27,13 +24,35 @@ static const SvgIconColorer::IconSubstitutions kIconSubstitutions = {
 
 } // namespace
 
+struct AbstractEventListModel::Private
+{
+    AbstractEventListModel* q;
+
+    QPointer<SystemContext> systemContext;
+};
+
 AbstractEventListModel::AbstractEventListModel(
-    SystemContext* context,
     QObject* parent)
     :
     base_type(parent),
-    SystemContextAware(context)
+    d(new Private({.q = this}))
 {
+}
+
+AbstractEventListModel::~AbstractEventListModel()
+{
+}
+
+SystemContext* AbstractEventListModel::systemContext() const
+{
+    return d->systemContext.data();
+}
+
+void AbstractEventListModel::setSystemContext(SystemContext* systemContext)
+{
+    d->systemContext = systemContext;
+
+    emit dataChanged(index(0), index(rowCount() - 1), {TimestampTextRole});
 }
 
 QVariant AbstractEventListModel::data(const QModelIndex& index, int role) const
@@ -47,7 +66,9 @@ QVariant AbstractEventListModel::data(const QModelIndex& index, int role) const
         {
             const auto timestampMs = duration_cast<milliseconds>(
                 index.data(TimestampRole).value<microseconds>());
-            return EventSearchUtils::timestampText(timestampMs, systemContext());
+
+            if (NX_ASSERT(d->systemContext))
+                return EventSearchUtils::timestampText(timestampMs, d->systemContext.data());
         }
 
         case DisplayedResourceListRole:

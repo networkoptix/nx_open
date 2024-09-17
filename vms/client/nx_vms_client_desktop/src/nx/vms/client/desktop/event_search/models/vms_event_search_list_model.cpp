@@ -339,9 +339,10 @@ bool VmsEventSearchListModel::Private::requestFetch(
 //-------------------------------------------------------------------------------------------------
 
 VmsEventSearchListModel::VmsEventSearchListModel(WindowContext* context, QObject* parent):
-    base_type(context->system(), parent),
+    base_type(parent),
     d(new Private(this))
 {
+    setSystemContext(context->system());
     setLiveSupported(true);
     setLivePaused(true);
 }
@@ -398,6 +399,9 @@ bool VmsEventSearchListModel::isConstrained() const
 
 bool VmsEventSearchListModel::hasAccessRights() const
 {
+    if (!NX_ASSERT(systemContext()))
+        return false;
+
     return systemContext()->accessController()->hasGlobalPermissions(GlobalPermission::viewLogs);
 }
 
@@ -413,6 +417,9 @@ QVariant VmsEventSearchListModel::data(const QModelIndex& index, int role) const
     if (!NX_ASSERT(index.row() < static_cast<int>(d->data.size())))
         return {};
 
+    if (!NX_ASSERT(systemContext()))
+        return {};
+
     const auto& event = systemContext()->vmsRulesEngine()->buildEvent(
         d->data[index.row()].eventData);
     const auto& details = event->details(systemContext(), d->data[index.row()].aggregatedInfo);
@@ -423,7 +430,7 @@ QVariant VmsEventSearchListModel::data(const QModelIndex& index, int role) const
             return eventTitle(details);
 
         case core::DecorationPathRole:
-            return iconPath(event, details, resourcePool());
+            return iconPath(event, details, systemContext()->resourcePool());
 
         case Qt::ForegroundRole:
             return QVariant::fromValue(color(details));
@@ -476,7 +483,7 @@ QVariant VmsEventSearchListModel::data(const QModelIndex& index, int role) const
                 sourceId.isValid())
             {
                 if (const auto resource =
-                    resourcePool()->getResourceById(sourceId.value<nx::Uuid>()))
+                    systemContext()->resourcePool()->getResourceById(sourceId.value<nx::Uuid>()))
                 {
                     return QVariant::fromValue(QnResourceList({resource}));
                 }
@@ -494,7 +501,7 @@ QVariant VmsEventSearchListModel::data(const QModelIndex& index, int role) const
                 return {};
 
             return QVariant::fromValue<QnResourcePtr>(
-                resourcePool()->getResourceById<QnVirtualCameraResource>(
+                systemContext()->resourcePool()->getResourceById<QnVirtualCameraResource>(
                     details.value(rules::utils::kSourceIdDetailName).value<nx::Uuid>()));
         }
 

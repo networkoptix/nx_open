@@ -30,10 +30,11 @@ constexpr int kMaxInvalidScheduleTooltipWidth = 320;
 using MessageType = nx::vms::common::system_health::MessageType;
 
 SystemHealthListModel::SystemHealthListModel(WindowContext* context, QObject* parent):
-    base_type(context->system(), parent),
+    base_type(parent),
     WindowContextAware(context),
     d(new Private(this))
 {
+    setSystemContext(context->system());
 }
 
 SystemHealthListModel::~SystemHealthListModel()
@@ -146,6 +147,11 @@ bool SystemHealthListModel::removeRows(int row, int count, const QModelIndex& pa
 
     d->remove(row, count);
     return true;
+}
+
+void SystemHealthListModel::setSystemContext(nx::vms::client::core::SystemContext* systemContext)
+{
+    base_type::setSystemContext(systemContext);
 }
 
 } // namespace nx::vms::client::desktop

@@ -10,19 +10,35 @@
 
 namespace nx::vms::client::core {
 
-ManagedCameraSet::ManagedCameraSet(QnResourcePool* resourcePool, Filter filter, QObject* parent):
+ManagedCameraSet::ManagedCameraSet(Filter filter, QObject* parent):
     base_type(parent),
-    m_resourcePool(resourcePool),
     m_filter(filter)
 {
-    if (!m_resourcePool)
-        return;
+}
 
-    connect(m_resourcePool, &QnResourcePool::resourcesAdded, this,
-        &ManagedCameraSet::handleResourcesAdded);
+ManagedCameraSet::~ManagedCameraSet()
+{
+}
 
-    connect(m_resourcePool, &QnResourcePool::resourcesRemoved, this,
-        &ManagedCameraSet::handleResourcesRemoved);
+void ManagedCameraSet::setResourcePool(QnResourcePool* resourcePool)
+{
+    const bool camerasSetIsChanged = !m_cameras.empty();
+
+    if (camerasSetIsChanged)
+        emit camerasAboutToBeChanged(QPrivateSignal());
+
+    if (m_resourcePool)
+        m_resourcePool->disconnect(this);
+
+    m_resourcePool = resourcePool;
+
+    m_type = Type::multiple;
+    m_cameras.clear();
+
+    if (camerasSetIsChanged)
+        emit camerasChanged(QPrivateSignal());
+
+    invalidateFilter();
 }
 
 ManagedCameraSet::Type ManagedCameraSet::type() const
@@ -47,12 +63,19 @@ void ManagedCameraSet::setAllCameras()
     if (m_type == Type::all)
         return;
 
-    m_notFilteredCameras = NX_ASSERT(m_resourcePool)
-        ? nx::utils::toQSet(
-            m_resourcePool->getAllCameras(/*parentId*/ nx::Uuid(), /*ignoreDesktopCameras*/ true))
-        : QnVirtualCameraResourceSet();
+    if (m_resourcePool)
+    {
+        m_notFilteredCameras = NX_ASSERT(m_resourcePool)
+            ? nx::utils::toQSet(
+                m_resourcePool->getAllCameras(/*parentId*/ nx::Uuid(), /*ignoreDesktopCameras*/ true))
+            : QnVirtualCameraResourceSet();
 
-    setCameras(Type::all, filteredCameras());
+        setCameras(Type::all, filteredCameras());
+    }
+    else
+    {
+        m_type = Type::all;
+    }
 }
 
 void ManagedCameraSet::setSingleCamera(const QnVirtualCameraResourcePtr& camera)
@@ -120,9 +143,10 @@ QnVirtualCameraResourceSet ManagedCameraSet::filteredCameras() const
 
 bool ManagedCameraSet::cameraBelongsToLocalResourcePool(const QnVirtualCameraResourcePtr& camera)
 {
-    return NX_ASSERT(camera)
-        && NX_ASSERT(m_resourcePool)
-        && camera->resourcePool() == m_resourcePool;
+    if (!NX_ASSERT(m_resourcePool))
+        return false;
+
+    return NX_ASSERT(camera) && camera->resourcePool() == m_resourcePool;
 }
 
 void ManagedCameraSet::handleResourcesAdded(const QnResourceList& resources)

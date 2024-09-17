@@ -33,16 +33,11 @@ class NX_VMS_CLIENT_CORE_API AbstractSearchListModel: public AbstractEventListMo
 public:
     static constexpr int kStandardMaximumItemCount = 300;
 
-    explicit AbstractSearchListModel(
-        int maximumCount,
-        SystemContext* systemContext,
-        QObject* parent = nullptr);
-
-    explicit AbstractSearchListModel(
-        SystemContext* systemContext,
-        QObject* parent = nullptr);
-
+    explicit AbstractSearchListModel(int maximumCount, QObject* parent = nullptr);
+    explicit AbstractSearchListModel(QObject* parent = nullptr);
     virtual ~AbstractSearchListModel() override;
+
+    virtual void setSystemContext(SystemContext* systemContext) override;
 
     virtual bool fetchData(const FetchRequest& request);
 

@@ -26,10 +26,11 @@ nx::Uuid EventListModel::EventData::sourceId() const
 }
 
 EventListModel::EventListModel(WindowContext* context, QObject* parent):
-    base_type(context->system(), parent),
+    base_type(parent),
     WindowContextAware(context),
     d(new Private(this))
 {
+    setSystemContext(context->system());
 }
 
 EventListModel::~EventListModel()

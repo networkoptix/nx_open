@@ -17,15 +17,15 @@ class NX_VMS_CLIENT_CORE_API BookmarkSearchListModel: public AbstractAsyncSearch
 
 public:
     explicit BookmarkSearchListModel(
-        int maximumCount,
         SystemContext* systemContext,
+        int maximumCount,
         QObject* parent = nullptr);
 
-    explicit BookmarkSearchListModel(
-        SystemContext* systemContext,
-        QObject* parent = nullptr);
+    explicit BookmarkSearchListModel(SystemContext* systemContext, QObject* parent = nullptr);
 
     virtual ~BookmarkSearchListModel() override;
+
+    virtual void setSystemContext(SystemContext* systemContext) override;
 
     virtual TextFilterSetup* textFilter() const override;
 

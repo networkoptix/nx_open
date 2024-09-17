@@ -19,6 +19,7 @@
 #include <nx/vms/common/html/html.h>
 #include <nx/utils/algorithm/comparator.h>
 #include <nx/utils/math/math.h>
+#include <nx/utils/scoped_connections.h>
 
 #include "detail/multi_request_id_holder.h"
 
@@ -82,6 +83,10 @@ struct BookmarkSearchListModel::Private
 {
     BookmarkSearchListModel* const q;
 
+    nx::utils::ScopedConnection bookmarkAddedConnection;
+    nx::utils::ScopedConnection bookmarkUpdatedConnection;
+    nx::utils::ScopedConnection bookmarkRemovedConnection;
+
     const std::unique_ptr<TextFilterSetup> textFilter{new TextFilterSetup()};
 
     QnCameraBookmarkList bookmarks;
@@ -103,9 +108,13 @@ struct BookmarkSearchListModel::Private
 QnVirtualCameraResourcePtr BookmarkSearchListModel::Private::camera(
     const QnCameraBookmark& bookmark) const
 {
-    const auto user = q->userWatcher()->user();
+    if (!NX_ASSERT(q->systemContext()))
+        return {};
+
+    const auto user = q->systemContext()->userWatcher()->user();
     return user
-        ? q->resourcePool()->getResourceById<QnVirtualCameraResource>(bookmark.cameraId)
+        ? q->systemContext()->resourcePool()->getResourceById<QnVirtualCameraResource>(
+            bookmark.cameraId)
         : QnVirtualCameraResourcePtr();
 }
 
@@ -164,6 +173,9 @@ bool BookmarkSearchListModel::Private::requestFetch(
 {
     using namespace nx::vms::api;
 
+    if (!NX_ASSERT(q->systemContext()))
+        return false;
+
     if (requestIds.value(mode))
         return false; //< Corresponding request is in progress.
 
@@ -181,7 +193,7 @@ bool BookmarkSearchListModel::Private::requestFetch(
         filter.endTimeMs = interestTimePeriod->endTime();
     }
 
-    const auto bookmarksManager = q->cameraBookmarksManager();
+    const auto bookmarksManager = q->systemContext()->cameraBookmarksManager();
 
     const auto safeCompletionHandler =
         [completionHandler](const auto result, const auto& ranges, const auto& timeWindow)
@@ -231,32 +243,42 @@ bool BookmarkSearchListModel::Private::requestFetch(
 //-------------------------------------------------------------------------------------------------
 
 BookmarkSearchListModel::BookmarkSearchListModel(
-    int maximumCount,
     SystemContext* systemContext,
+    int maximumCount,
     QObject* parent)
     :
-    base_type(maximumCount, systemContext, parent),
+    base_type(maximumCount, parent),
     d(new Private{.q = this})
 {
-    const auto bookmarksManager = systemContext->cameraBookmarksManager();
-    connect(bookmarksManager, &QnCameraBookmarksManager::bookmarkAdded, this,
-        [this](const auto& bookmark) { d->addBookmark(bookmark); });
-    connect(bookmarksManager, &QnCameraBookmarksManager::bookmarkUpdated, this,
-        [this](const auto& bookmark) { d->updateBookmark(bookmark); });
-    connect(bookmarksManager, &QnCameraBookmarksManager::bookmarkRemoved, this,
-        [this](const auto& id) { d->removeBookmark(id); });
+    setSystemContext(systemContext);
 }
 
-BookmarkSearchListModel::BookmarkSearchListModel(
-    SystemContext* systemContext,
-    QObject* parent)
-    :
-    BookmarkSearchListModel(kStandardMaximumItemCount, systemContext, parent)
+BookmarkSearchListModel::BookmarkSearchListModel(SystemContext* systemContext, QObject* parent):
+    BookmarkSearchListModel(systemContext, kStandardMaximumItemCount, parent)
 {
 }
 
 BookmarkSearchListModel::~BookmarkSearchListModel()
 {
+}
+
+void BookmarkSearchListModel::setSystemContext(SystemContext* systemContext)
+{
+    const auto bookmarksManager = systemContext->cameraBookmarksManager();
+
+    d->bookmarkAddedConnection.reset(
+        connect(bookmarksManager, &QnCameraBookmarksManager::bookmarkAdded, this,
+            [this](const auto& bookmark) { d->addBookmark(bookmark); }));
+    d->bookmarkUpdatedConnection.reset(
+        connect(bookmarksManager, &QnCameraBookmarksManager::bookmarkUpdated, this,
+            [this](const auto& bookmark) { d->updateBookmark(bookmark); }));
+    d->bookmarkRemovedConnection.reset(
+        connect(bookmarksManager, &QnCameraBookmarksManager::bookmarkRemoved, this,
+            [this](const auto& id) { d->removeBookmark(id); }));
+
+    // We don't have to request bookmarks here, due to systemContext is set up only in constructor.
+
+    base_type::setSystemContext(systemContext);
 }
 
 TextFilterSetup* BookmarkSearchListModel::textFilter() const
@@ -271,6 +293,9 @@ bool BookmarkSearchListModel::isConstrained() const
 
 bool BookmarkSearchListModel::hasAccessRights() const
 {
+    if (!NX_ASSERT(systemContext()))
+        return false;
+
     return systemContext()->accessController()->isDeviceAccessRelevant(
         nx::vms::api::AccessRight::viewBookmarks);
 }

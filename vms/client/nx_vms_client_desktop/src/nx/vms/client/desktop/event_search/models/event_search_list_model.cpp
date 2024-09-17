@@ -174,7 +174,7 @@ struct EventSearchListModel::Private: public QObject
 {
     EventSearchListModel* const q;
 
-    const std::unique_ptr<nx::vms::event::StringsHelper> stringHelper;
+    std::unique_ptr<nx::vms::event::StringsHelper> stringHelper;
     QTimer liveUpdateTimer;
 
     EventType selectedEventType = EventType::undefinedEvent;
@@ -201,8 +201,7 @@ struct EventSearchListModel::Private: public QObject
 };
 
 EventSearchListModel::Private::Private(EventSearchListModel* q):
-    q(q),
-    stringHelper(new vms::event::StringsHelper(q->systemContext()))
+    q(q)
 {
     static constexpr auto kLiveUpdateInterval = 15s;
     connect(&liveUpdateTimer, &QTimer::timeout, this, &Private::fetchLive);
@@ -211,6 +210,9 @@ EventSearchListModel::Private::Private(EventSearchListModel* q):
 
 QString EventSearchListModel::Private::title(const EventParameters& parameters) const
 {
+    if (!stringHelper)
+        return "";
+
     switch (parameters.eventType)
     {
         case EventType::analyticsSdkEvent:
@@ -228,6 +230,9 @@ QString EventSearchListModel::Private::title(const EventParameters& parameters) 
 
 QString EventSearchListModel::Private::description(const EventParameters& parameters) const
 {
+    if (!stringHelper)
+        return "";
+
     return stringHelper->eventDetails(parameters, event::AttrSerializePolicy::none)
         .join(common::html::kLineBreak);
 }
@@ -384,15 +389,23 @@ EventSearchListModel::EventSearchListModel(
     WindowContext* context,
     QObject* parent)
     :
-    base_type(context->system(), parent),
+    base_type(parent),
     d(new Private(this))
 {
+    setSystemContext(context->system());
     setLiveSupported(true);
     setLivePaused(true);
 }
 
 EventSearchListModel::~EventSearchListModel()
 {
+}
+
+void EventSearchListModel::setSystemContext(nx::vms::client::core::SystemContext* systemContext)
+{
+    d->stringHelper.reset(new vms::event::StringsHelper(systemContext));
+
+    base_type::setSystemContext(systemContext);
 }
 
 vms::api::EventType EventSearchListModel::selectedEventType() const
@@ -457,7 +470,8 @@ int EventSearchListModel::rowCount(const QModelIndex &parent) const
 QVariant EventSearchListModel::data(const QModelIndex& index, int role) const
 {
     const auto& eventParams = d->data[index.row()].eventParams;
-    const auto sourceResources = event::sourceResources(eventParams, resourcePool());
+    const auto sourceResources =
+        event::sourceResources(eventParams, systemContext()->resourcePool());
 
     switch (role)
     {

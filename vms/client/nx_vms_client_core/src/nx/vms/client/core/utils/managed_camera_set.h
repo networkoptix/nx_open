@@ -5,8 +5,10 @@
 #include <functional>
 
 #include <QtCore/QObject>
+#include <QtCore/QPointer>
 
 #include <core/resource/resource_fwd.h>
+#include <nx/utils/scoped_connections.h>
 
 class QnResourcePool;
 
@@ -25,11 +27,11 @@ public:
     /** A filter to apply to camera list. It must be immutable. */
     using Filter = std::function<bool(const QnVirtualCameraResourcePtr&)>;
 
-    ManagedCameraSet(QnResourcePool* resourcePool,
-        Filter filter = Filter(),
-        QObject* parent = nullptr);
+    ManagedCameraSet(Filter filter = Filter(), QObject* parent = nullptr);
 
-    virtual ~ManagedCameraSet() override = default;
+    virtual ~ManagedCameraSet() override;
+
+    void setResourcePool(QnResourcePool* resourcePool);
 
     enum class Type
     {
@@ -79,7 +81,10 @@ private:
     bool cameraBelongsToLocalResourcePool(const QnVirtualCameraResourcePtr& camera);
 
 private:
-    const QnResourcePool* m_resourcePool;
+    QPointer<QnResourcePool> m_resourcePool;
+    nx::utils::ScopedConnection resourcePoolResourcesAddedConnection;
+    nx::utils::ScopedConnection resourcePoolResourcesRemovedConnection;
+
     const Filter m_filter;
     Type m_type = Type::multiple;
     QnVirtualCameraResourceSet m_cameras;

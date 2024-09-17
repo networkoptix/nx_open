@@ -23,15 +23,13 @@ class NX_VMS_CLIENT_CORE_API AnalyticsSearchListModel: public AbstractAttributed
 
 public:
     explicit AnalyticsSearchListModel(
+        SystemContext* systemContex,
         int maximumCount,
-        SystemContext* context,
         QObject* parent = nullptr);
-
-    explicit AnalyticsSearchListModel(
-        SystemContext* context,
-        QObject* parent = nullptr);
-
+    explicit AnalyticsSearchListModel(SystemContext* systemContex, QObject* parent = nullptr);
     virtual ~AnalyticsSearchListModel() override;
+
+    virtual void setSystemContext(SystemContext* systemContext) override;
 
     QRectF filterRect() const;
     void setFilterRect(const QRectF& relativeRect);
