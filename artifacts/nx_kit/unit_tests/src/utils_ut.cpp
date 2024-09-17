@@ -561,19 +561,19 @@ TEST(utils, wideCharToStdString)
         u8"\U000103A0\U000103AB", wideCharToStdString((const wchar_t*) u"\U000103A0\U000103AB"));
 
     // Incorrect string ("truth" in Old Persian, low surrogate in the end is missed).
-    const wchar_t lowSurrogateMissedInTheEnd[] = {0xD800, 0xDFA0, 0xD800};
+    const wchar_t lowSurrogateMissedInTheEnd[] = {0xD800, 0xDFA0, 0xD800, 0x0000};
     ASSERT_EQ(u8"\U000103A0\uFFFD", wideCharToStdString(lowSurrogateMissedInTheEnd));
 
     // Incorrect string ("truth" in Old Persian, high surrogate in the end is missed).
-    const wchar_t highSurrogateMissedInTheEnd[] = {0xD800, 0xDFA0, 0xDFAB};
+    const wchar_t highSurrogateMissedInTheEnd[] = {0xD800, 0xDFA0, 0xDFAB, 0x0000};
     ASSERT_EQ(u8"\U000103A0\uFFFD", wideCharToStdString(highSurrogateMissedInTheEnd));
 
     // Incorrect string ("truth" in Old Persian, low surrogate in the beginning is missed).
-    const wchar_t lowSurrogateMissedInTheBeginning[] = {0xD800, 0xD800, 0xDFA0};
+    const wchar_t lowSurrogateMissedInTheBeginning[] = {0xD800, 0xD800, 0xDFA0, 0x0000};
     ASSERT_EQ(u8"\uFFFD\U000103A0", wideCharToStdString(lowSurrogateMissedInTheBeginning));
 
     // Incorrect string ("truth" in Old Persian, high surrogate in the middle is missed).
-    const wchar_t highSurrogateMissedInTheMiddle[] = {0xDFAB, 0xD800, 0xDFA0};
+    const wchar_t highSurrogateMissedInTheMiddle[] = {0xDFAB, 0xD800, 0xDFA0, 0x0000};
     ASSERT_EQ(u8"\uFFFD\U000103A0", wideCharToStdString(highSurrogateMissedInTheMiddle));
 }
 
