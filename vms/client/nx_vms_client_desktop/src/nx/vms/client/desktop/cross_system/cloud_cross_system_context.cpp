@@ -223,7 +223,14 @@ struct CloudCrossSystemContext::Private
                 {
                     tokenUpdater->onTokenUpdated(
                         qnSyncTime->currentTimePoint() + session->expiresInS);
-                    needsCloudAuthorization = false;
+
+                    // If tokenUpdater is not active, it means that the recently issued access token
+                    // had a short lifespan (less than 20 seconds), and tokenUpdater won't have
+                    // enough time to refresh it. As a result, the internal timer will not be
+                    // started. This can happen, for example, when Cloud Session Limiter is enabled,
+                    // and the refresh token was not reissued. In this case, it can be assumed that
+                    // cross-system context requires the refresh token to be reissued.
+                    needsCloudAuthorization = !tokenUpdater->isActive();
                 }
                 else if (const auto error = std::get_if<nx::network::rest::Result>(&errorOrData))
                 {
