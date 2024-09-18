@@ -127,6 +127,11 @@ void CloudSessionTokenUpdater::onTokenUpdated(microseconds expirationTime)
     }
 }
 
+bool CloudSessionTokenUpdater::isActive() const
+{
+    return m_timer->isActive();
+}
+
 void CloudSessionTokenUpdater::issueToken(
     const nx::cloud::db::api::IssueTokenRequest& request,
     IssueTokenHandler handler,

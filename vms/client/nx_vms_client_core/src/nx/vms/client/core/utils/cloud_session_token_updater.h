@@ -44,6 +44,7 @@ public:
 
     // Should be called when new access token is received.
     void onTokenUpdated(std::chrono::microseconds expirationTime);
+    bool isActive() const;
 
 signals:
     void sessionTokenExpiring();
