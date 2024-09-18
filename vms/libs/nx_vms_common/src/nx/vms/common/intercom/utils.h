@@ -11,6 +11,9 @@ namespace nx::vms::common {
 NX_VMS_COMMON_API nx::Uuid calculateIntercomLayoutId(const QnResourcePtr& intercom);
 NX_VMS_COMMON_API nx::Uuid calculateIntercomLayoutId(const nx::Uuid& intercomId);
 
+// Calculates intercom item id onto the child layout. It is unique for the intercom.
+NX_VMS_COMMON_API nx::Uuid calculateIntercomItemId(const QnResourcePtr& intercom);
+
 // Checks if the resource is an intercom placed on it's own child layout.
 NX_VMS_COMMON_API bool isIntercomOnIntercomLayout(
     const QnResourcePtr& resource,
