@@ -153,8 +153,8 @@ ComboBox
     {
         id: textInput
 
-        width: parent.width - indicator.width
-        height: parent.height
+        width: control.width - indicator.width
+        height: control.height
         leftPadding:
         {
             if (control.withIconSection)
