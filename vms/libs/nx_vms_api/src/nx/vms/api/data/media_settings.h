@@ -8,6 +8,7 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/api/data/aspect_ratio_data.h>
 #include <nx/vms/api/data/dewarping_data.h>
 #include <nx/vms/api/data/rect_as_string.h>
 #include <nx/vms/api/data/resolution_data.h>
@@ -63,6 +64,14 @@ struct NX_VMS_API MediaSettings
      */
     std::string rotation = "0";
 
+    /**%apidoc[opt]
+     * A transcoding option. Item aspect ratio, e.g. '4:3' or '16:9'. If the parameter is `auto`,
+     * the video aspect ratio would be taken from the default value defined in the Device Settings
+     * dialog. If the parameter is empty, it will force to don't transcode regardless of the
+     * option value in the Device Settings.
+     */
+    AspectRatioData aspectRatio {/*auto*/ true};
+
     /**%apidoc
      * A transcoding option. Image dewarping. If the parameter is absent, image dewarping will
      * depend on the value in the Device settings dialog.
@@ -103,7 +112,8 @@ struct NX_VMS_API MediaSettings
     bool isValid() const;
 };
 #define MediaSettings_Fields (id)(stream)(positionMs)(resolution)(resolutionWhenTranscoding)\
-    (rotation)(dewarping)(dewarpingXangle)(dewarpingYangle)(dewarpingFov)(dewarpingPanofactor)(zoom)
+    (rotation)(aspectRatio)(dewarping)(dewarpingXangle)(dewarpingYangle)(dewarpingFov)\
+    (dewarpingPanofactor)(zoom)
 QN_FUSION_DECLARE_FUNCTIONS(MediaSettings, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(MediaSettings, MediaSettings_Fields)
 

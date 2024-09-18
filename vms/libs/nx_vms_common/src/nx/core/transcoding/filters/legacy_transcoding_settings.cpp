@@ -28,6 +28,12 @@ LegacyTranscodingSettings::LegacyTranscodingSettings(
         NX_ASSERT(rotation == 0 || rotation == 90 || rotation == 180 || rotation == 270);
     }
 
+    // Aspect ratio.
+    if (!settings->aspectRatio.isAuto)
+    {
+        forcedAspectRatio = QnAspectRatio(settings->aspectRatio.size);
+    }
+
     // Dewarping.
     if (settings->dewarping)
     {
