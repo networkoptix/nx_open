@@ -13,7 +13,7 @@ namespace nx::core::transcoding {
 struct TimestampParams
 {
     FilterParams filterParams;
-    std::chrono::milliseconds timestamp;
+    std::chrono::milliseconds timestamp = std::chrono::milliseconds::zero();
     QTimeZone timeZone{QTimeZone::LocalTime};
 
     bool operator==(const TimestampParams&) const = default;
