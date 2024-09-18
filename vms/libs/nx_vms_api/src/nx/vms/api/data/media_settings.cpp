@@ -2,7 +2,12 @@
 
 #include "media_settings.h"
 
+#include <nx/fusion/model_functions.h>
+
 namespace nx::vms::api {
+
+// For unit test.
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(MediaSettings, (json), MediaSettings_Fields)
 
 MediaSettings::ValidationResult MediaSettings::validateMediaSettings() const
 {
