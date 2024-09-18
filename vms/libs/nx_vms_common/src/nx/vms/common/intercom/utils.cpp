@@ -27,6 +27,11 @@ nx::Uuid calculateIntercomLayoutId(const nx::Uuid& intercomId)
     return guidFromArbitraryData(intercomId.toString() + "layout");
 }
 
+nx::Uuid calculateIntercomItemId(const QnResourcePtr& intercom)
+{
+    return guidFromArbitraryData(intercom->getId().toString() + "item");
+}
+
 bool isIntercomOnIntercomLayout(
     const QnResourcePtr& resource,
     const QnLayoutResourcePtr& layoutResource)
