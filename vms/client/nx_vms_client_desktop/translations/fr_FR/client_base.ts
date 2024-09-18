@@ -1519,7 +1519,7 @@ Clé de licence : %2</translation>
     <message>
       <source>%1 users are receiving emails</source>
       <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
-      <translation>%1 utilisateurs reçoivent des courriels</translation>
+      <translation>Les utilisateurs %1 reçoivent des courriels</translation>
     </message>
     <message>
       <source>%1 is not available</source>
@@ -1554,7 +1554,7 @@ Clé de licence : %2</translation>
     <message>
       <source>%1 users will start receiving emails immediately after you apply these settings</source>
       <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
-      <translation>%1  utilisateurs commenceront à recevoir des e-mails immédiatement après l'application de ces paramètres</translation>
+      <translation>Les utilisateurs %1 commenceront à recevoir des e-mails immédiatement après l'application de ces paramètres</translation>
     </message>
     <message>
       <source>Users are receiving emails</source>
