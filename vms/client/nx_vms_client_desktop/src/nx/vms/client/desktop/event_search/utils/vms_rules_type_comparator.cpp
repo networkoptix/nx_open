@@ -31,21 +31,21 @@ void VmsRulesTypeComparator::initLexOrdering()
 {
     const auto engine = systemContext()->vmsRulesEngine();
 
-    std::map<QString, QString> typeByDisplayName;
+    std::map<QString, QString> displayNameToType;
     for (const auto& descriptor: engine->events())
-        typeByDisplayName.emplace(descriptor.id, descriptor.displayName);
+        displayNameToType.emplace(descriptor.displayName, descriptor.id);
 
     int i = 0;
-    for (const auto& [name, type]: typeByDisplayName)
+    for (const auto& [name, type]: displayNameToType)
         m_eventTypeToLexOrder[type] = i++;
 
-    typeByDisplayName.clear();
+    displayNameToType.clear();
     i = 0;
 
     for (const auto& descriptor: engine->actions())
-        typeByDisplayName.emplace(descriptor.id, descriptor.displayName);
+        displayNameToType.emplace(descriptor.displayName, descriptor.id);
 
-    for (const auto& [name, type]: typeByDisplayName)
+    for (const auto& [name, type]: displayNameToType)
         m_actionTypeToLexOrder[type] = i++;
 }
 

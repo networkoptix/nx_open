@@ -124,8 +124,8 @@ public:
 
     bool lessThanActionType(Iterator l, Iterator r) const
     {
-        const QString lType = l->eventType();
-        const QString rType = r->eventType();
+        const QString lType = l->actionType();
+        const QString rType = r->actionType();
 
         if (lType != rType)
             return m_lexComparator->lexActionLess(lType, rType);
