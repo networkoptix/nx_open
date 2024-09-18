@@ -15,6 +15,9 @@ NX_VMS_COMMON_API QnUuid calculateIntercomLayoutId(const QnResourcePtr& intercom
 
 NX_VMS_COMMON_API QnUuid calculateIntercomLayoutId(const QnUuid& intercomId);
 
+// Calculates intercom item id onto the child layout. It is unique for the intercom.
+NX_VMS_COMMON_API QnUuid calculateIntercomItemId(const QnResourcePtr& intercom);
+
 // Checks if the resource is an intercom.
 // WARNING: It can return false negative result if an intercom is in removing process.
 // Because any intercom-specific feature could be already removed from resource.

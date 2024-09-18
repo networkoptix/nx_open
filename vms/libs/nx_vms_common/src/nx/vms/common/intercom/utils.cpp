@@ -36,6 +36,11 @@ QnUuid calculateIntercomLayoutId(const QnUuid& intercomId)
     return guidFromArbitraryData(intercomId.toString() + "layout");
 }
 
+QnUuid calculateIntercomItemId(const QnResourcePtr& intercom)
+{
+    return guidFromArbitraryData(intercom->getId().toString() + "item");
+}
+
 bool isIntercom(const QnResourcePtr& resource)
 {
     if (!resource)

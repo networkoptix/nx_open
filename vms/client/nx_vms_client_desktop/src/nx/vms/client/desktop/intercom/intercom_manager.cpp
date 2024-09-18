@@ -140,6 +140,14 @@ struct IntercomManager::Private: public QObject
             intercomLayout->addFlags(Qn::local_intercom_layout);
             intercomLayout->setParentId(intercom->getId());
 
+            auto intercomLayoutItems = intercomLayout->getItems();
+            if (NX_ASSERT(intercomLayoutItems.size() == 1))
+            {
+                const auto intercomItem = intercomLayoutItems.begin();
+                intercomItem->uuid = nx::vms::common::calculateIntercomItemId(intercom);
+                intercomLayout->setItems(intercomLayoutItems);
+            }
+
             resourcePool->addNewResources({intercomLayout});
         }
     }
