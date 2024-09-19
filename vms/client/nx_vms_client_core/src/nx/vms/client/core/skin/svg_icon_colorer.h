@@ -95,13 +95,13 @@ public:
             for (auto it1 = begin(); it1 != end(); ++it1)
             {
                 auto mode = it1.key();
-                NX_TRACE(this, "QIcon mode " + mode);
+                NX_TRACE(this, "QIcon mode %1", mode);
                 auto subst = it1.value();
                 for (auto it2 = subst.constBegin(); it2 != subst.constEnd(); ++it2)
                 {
                     auto color = it2.key();
                     auto name = it2.value();
-                    NX_TRACE(this, "  " + color.name() + " " + name);
+                    NX_TRACE(this, "  %1 %2", color.name(), name);
                 }
             }
         }
