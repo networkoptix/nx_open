@@ -15,7 +15,7 @@ include(cmake/customization_package.cmake)
 include(cmake/default_target.cmake)
 set(targetDevice ${default_target_device} CACHE STRING
     "Target device. For the list see cmake/toolchains.")
-if(NOT clangDir STREQUAL "")
+if(NOT clangDir STREQUAL "" AND NOT DEFINED ENV{CLANG_DIR})
     set(ENV{CLANG_DIR} ${clangDir})
 endif()
 include(cmake/open_source/toolchain_detection.cmake)
