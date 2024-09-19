@@ -38,6 +38,8 @@ prom_gauge_t *turn_total_allocations;
 prom_histogram_buckets_t* turn_allocations_duration_buckets;
 prom_histogram_t *turn_allocations_duration;
 
+static void init_prom_metrics(const char** label, int nlabels);
+
 void start_prometheus_server(void) {
   if (turn_params.prometheus == 0) {
     TURN_LOG_FUNC(TURN_LOG_LEVEL_INFO, "prometheus collector disabled, not started\n");
@@ -144,7 +146,45 @@ void start_prometheus_server(void) {
 
   TURN_LOG_FUNC(TURN_LOG_LEVEL_INFO, "prometheus collector started successfully\n");
 
+  init_prom_metrics(label, nlabels);
+
   return;
+}
+
+void init_prom_metrics(const char** label, int nlabels)
+{
+  // Some exporters, like Telegraf, need for metrics being initializated with value.
+  prom_counter_add(stun_binding_request, 0, NULL);
+  prom_counter_add(stun_binding_response, 0, NULL);
+  prom_counter_add(stun_binding_error, 0, NULL);
+
+  prom_counter_add(turn_traffic_rcvp, 0, label);
+  prom_counter_add(turn_traffic_rcvb, 0, label);
+  prom_counter_add(turn_traffic_sentp, 0, label);
+  prom_counter_add(turn_traffic_sentb, 0, label);
+
+  prom_counter_add(turn_traffic_peer_rcvp, 0, label);
+  prom_counter_add(turn_traffic_peer_rcvb, 0, label);
+  prom_counter_add(turn_traffic_peer_sentp, 0, label);
+  prom_counter_add(turn_traffic_peer_sentb, 0, label);
+
+  prom_counter_add(turn_total_traffic_rcvp, 0, label);
+  prom_counter_add(turn_total_traffic_rcvb, 0, label);
+  prom_counter_add(turn_total_traffic_sentp, 0, label);
+  prom_counter_add(turn_total_traffic_sentb, 0, label);
+
+  prom_counter_add(turn_total_traffic_peer_rcvp, 0, NULL);
+  prom_counter_add(turn_total_traffic_peer_rcvb, 0, NULL);
+  prom_counter_add(turn_total_traffic_peer_sentp, 0, NULL);
+  prom_counter_add(turn_total_traffic_peer_sentb, 0, NULL);
+
+  // Not all types are present.
+  static const int socket_types[] = {TCP_SOCKET, UDP_SOCKET, TLS_SOCKET};
+  for (int i = 0; i < sizeof(socket_types) / sizeof(socket_types[0]); ++i) {
+    const char *label[] = {socket_type_name(socket_types[i])};
+    prom_gauge_add(turn_total_allocations, 0, label);
+    prom_histogram_observe(turn_allocations_duration, 0, label);
+  }
 }
 
 void prom_set_finished_traffic(const char *realm, const char *user, unsigned long rsvp, unsigned long rsvb,
