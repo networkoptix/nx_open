@@ -109,6 +109,7 @@ struct SystemSettings::Private
     QnResourcePropertyAdaptor<QString>* lastMergeMasterIdAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* lastMergeSlaveIdAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* statisticsReportServerApiAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString>* crashReportServerApiAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* clientStatisticsSettingsUrlAdaptor = nullptr;
     QnResourcePropertyAdaptor<std::chrono::seconds>* deviceStorageInfoUpdateIntervalSAdaptor = nullptr;
 
@@ -337,6 +338,10 @@ SystemSettings::AdaptorList SystemSettings::initStaticticsAdaptors()
         "statisticsReportServerApi", QString(), this,
         [] { return tr("Anonymous Statistics Report Server URL"); });
 
+    d->crashReportServerApiAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
+        "crashReportServerApi", QString(), this,
+        [] { return tr("Anonymous Crash Report Server API URL"); });
+
     d->clientStatisticsSettingsUrlAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
         "clientStatisticsSettingsUrl", QString(), this,
         [] { return tr("Anonymous statistics report Client settings"); });
@@ -362,6 +367,7 @@ SystemSettings::AdaptorList SystemSettings::initStaticticsAdaptors()
         << d->statisticsReportTimeCycleAdaptor
         << d->statisticsReportUpdateDelayAdaptor
         << d->statisticsReportServerApiAdaptor
+        << d->crashReportServerApiAdaptor
         << d->clientStatisticsSettingsUrlAdaptor
         << d->deviceStorageInfoUpdateIntervalSAdaptor;
 
@@ -1658,6 +1664,16 @@ QString SystemSettings::statisticsReportServerApi() const
 void SystemSettings::setStatisticsReportServerApi(const QString& value)
 {
     d->statisticsReportServerApiAdaptor->setValue(value);
+}
+
+QString SystemSettings::crashReportServerApi() const
+{
+    return d->crashReportServerApiAdaptor->value();
+}
+
+void SystemSettings::setCrashReportServerApi(const QString& value)
+{
+    d->crashReportServerApiAdaptor->setValue(value);
 }
 
 int SystemSettings::maxEventLogRecords() const
