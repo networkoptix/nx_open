@@ -121,11 +121,18 @@ struct NX_VMS_API IntegrationRequestData: public RegisterIntegrationRequest
      /**%apidoc[readonly] Integration id. Set when the Integration request is approved. */
     std::optional<nx::Uuid> integrationId;
 
+     /**%apidoc Engine id. Set when the Integration request is approved. */
+    std::optional<nx::Uuid> engineId;
+
+     /**%apidoc Integration user id. Set when the Integration request is approved. */
+    std::optional<nx::Uuid> integrationUserId;
+
     bool operator==(const IntegrationRequestData& other) const = default;
 };
 #define nx_vms_api_analytics_IntegrationRequestData_Fields \
     nx_vms_api_analytics_RegisterIntegrationRequest_Fields \
-    (timestampMs)(requestAddress)(isApproved)(integrationId)
+    (timestampMs)(requestAddress)(isApproved)(integrationId) \
+    (engineId)(integrationUserId)
 QN_FUSION_DECLARE_FUNCTIONS(
     IntegrationRequestData, (json), NX_VMS_API);
 NX_REFLECTION_INSTRUMENT(
