@@ -38,7 +38,11 @@ const ItemDescriptor& SendEmailAction::manifest()
                 }.toVariantMap()),
             makeFieldDescriptor<ActionTextField>(
                 utils::kEmailsFieldName,
-                NX_DYNAMIC_TRANSLATABLE(tr("Additional Recipients"))),
+                NX_DYNAMIC_TRANSLATABLE(tr("Additional Recipients")),
+                /*description*/ {},
+                ActionTextFieldProperties{
+                    .validationPolicy = kEmailsValidationPolicy
+                }.toVariantMap()),
             makeFieldDescriptor<EmailMessageField>(
                 utils::kMessageFieldName,
                 NX_DYNAMIC_TRANSLATABLE(tr("Email Message")),

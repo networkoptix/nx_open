@@ -8,6 +8,7 @@
 #include <nx/vms/rules/event_filter_fields/builtin_fields.h>
 #include <nx/vms/rules/events/builtin_events.h>
 
+#include "action_builder_field_validators/action_text_field_validator.h"
 #include "action_builder_field_validators/http_auth_field_validator.h"
 #include "action_builder_field_validators/http_method_field_validator.h"
 #include "action_builder_field_validators/layout_field_validator.h"
@@ -176,6 +177,7 @@ void Initializer::registerFieldValidators() const
     registerFieldValidator<StateField>(new StateFieldValidator);
 
     // Action field validators.
+    registerFieldValidator<ActionTextField>(new ActionTextFieldValidator);
     registerFieldValidator<HttpAuthField>(new HttpAuthFieldValidator);
     registerFieldValidator<HttpMethodField>(new HttpMethodFieldValidator);
     registerFieldValidator<TargetLayoutField>(new LayoutFieldValidator);

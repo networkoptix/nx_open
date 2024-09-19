@@ -17,6 +17,7 @@
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/rules/utils/strings.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -27,6 +28,7 @@
 #include <nx/vms/rules/action_builder_fields/target_layouts_field.h>
 #include <nx/vms/rules/action_builder_fields/target_servers_field.h>
 #include <nx/vms/rules/action_builder_fields/target_users_field.h>
+#include <nx/vms/rules/action_builder_fields/text_field.h>
 #include <nx/vms/rules/engine.h>
 #include <nx/vms/rules/event_filter.h>
 #include <nx/vms/rules/event_filter_fields/source_camera_field.h>
@@ -38,6 +40,7 @@
 #include <nx/vms/rules/utils/common.h>
 #include <nx/vms/rules/utils/event.h>
 #include <nx/vms/rules/utils/field.h>
+#include <nx/vms/rules/utils/resource.h>
 #include <nx/vms/rules/utils/rule.h>
 
 namespace nx::vms::client::desktop::rules {
@@ -572,13 +575,16 @@ QVariant RulesTableModel::targetCameraData(const vms::rules::ActionBuilder* acti
     QnVirtualCameraResourceList resources;
     bool useSource{false};
     bool acceptAll{false};
+    bool hasAdditionalRecipients{false};
     bool allowEmptySelection{false};
     const auto resourcePool = appContext()->currentSystemContext()->resourcePool();
 
     if (const auto targetDeviceField = actionBuilder->fieldByType<vms::rules::TargetDevicesField>())
     {
+        const auto targetDeviceFieldProperties = targetDeviceField->properties();
+
         useSource = targetDeviceField->useSource();
-        allowEmptySelection = targetDeviceField->properties().allowEmptySelection;
+        allowEmptySelection = targetDeviceFieldProperties.allowEmptySelection;
         if (targetDeviceField->acceptAll())
         {
             acceptAll = true;
@@ -588,6 +594,17 @@ QVariant RulesTableModel::targetCameraData(const vms::rules::ActionBuilder* acti
         {
             ids = targetDeviceField->ids();
             resources = resourcePool->getResourcesByIds<QnVirtualCameraResource>(ids);
+        }
+
+        if (targetDeviceFieldProperties.validationPolicy
+            == vms::rules::kCameraAudioTransmissionValidationPolicy)
+        {
+            if (const auto targetUsersField =
+                    actionBuilder->fieldByType<vms::rules::TargetUsersField>())
+            {
+                hasAdditionalRecipients = !vms::rules::utils::users(
+                    targetUsersField->selection(), appContext()->currentSystemContext()).isEmpty();
+            }
         }
     }
     else if (const auto targetSingleDeviceField =
@@ -603,7 +620,11 @@ QVariant RulesTableModel::targetCameraData(const vms::rules::ActionBuilder* acti
         return {};
     }
 
-    const bool isValidSelection = useSource || !resources.isEmpty() || allowEmptySelection;
+    const bool isValidSelection = useSource
+        || !resources.isEmpty()
+        || hasAdditionalRecipients
+        || allowEmptySelection;
+
     if (role == Qt::DisplayRole)
     {
         if (!isValidSelection)
@@ -617,7 +638,7 @@ QVariant RulesTableModel::targetCameraData(const vms::rules::ActionBuilder* acti
         }
 
         if (resources.isEmpty())
-            return tr("No target");
+            return {};
 
         if (resources.size() == 1)
         {
@@ -634,9 +655,14 @@ QVariant RulesTableModel::targetCameraData(const vms::rules::ActionBuilder* acti
             return kAttentionIconPath;
 
         const auto targetCamerasCount = resources.size() + (useSource ? 1 : 0);
-        return (acceptAll || targetCamerasCount > 1)
-            ? iconPath(QnResourceIconCache::Cameras)
-            : iconPath(QnResourceIconCache::Camera);
+
+        if (acceptAll || targetCamerasCount > 1)
+            return iconPath(QnResourceIconCache::Cameras);
+
+        if (targetCamerasCount == 1)
+            return iconPath(QnResourceIconCache::Camera);
+
+        return {};
     }
 
     if (role == ResourceIdsRole)
@@ -707,10 +733,23 @@ QVariant RulesTableModel::targetUserData(const vms::rules::ActionBuilder* action
 
     users = users.filtered([](const QnUserResourcePtr& user) { return user->isEnabled(); });
 
+    QStringList additionalRecipients;
+    if (const auto actionTextField = actionBuilder->fieldByName<vms::rules::ActionTextField>(
+        vms::rules::utils::kEmailsFieldName))
+    {
+        const auto emails = actionTextField->value().split(';', Qt::SkipEmptyParts);
+        for (const auto& email: emails)
+        {
+            if (const auto trimmed = email.trimmed(); !trimmed.isEmpty())
+                additionalRecipients.push_back(trimmed);
+        }
+    }
+
     const auto properties = targetUserField->properties();
     const bool isValidSelection = targetUserField->acceptAll()
         || !users.empty()
         || !groups.empty()
+        || !additionalRecipients.isEmpty()
         || properties.allowEmptySelection;
 
     if (role == Qt::DisplayRole)
@@ -721,34 +760,7 @@ QVariant RulesTableModel::targetUserData(const vms::rules::ActionBuilder* action
         if (targetUserField->acceptAll())
             return tr("All Users");
 
-        if (users.empty() && groups.empty())
-            return tr("No target");
-
-        if (users.size() == 1 && groups.empty())
-            return users.front()->getName();
-
-        if (users.empty() && groups.size() <= 2)
-        {
-            QStringList groupNames;
-            for (const auto& group: groups)
-                groupNames.push_back(std::move(group.name));
-
-            groupNames.sort(Qt::CaseInsensitive);
-
-            return groupNames.join(", ");
-        }
-
-        if (groups.empty())
-            return tr("%n Users", "", users.size());
-
-        if (!users.empty())
-        {
-            return QString{"%1, %2"}
-                .arg(tr("%n Groups", "", groups.size()))
-                .arg(tr("%n Users", "", users.size()));
-        }
-
-        return tr("%n Groups", "", groups.size());
+        return Strings::targetRecipientsString(users, groups, additionalRecipients);
     }
 
     if (role == Qt::DecorationRole)
@@ -756,7 +768,9 @@ QVariant RulesTableModel::targetUserData(const vms::rules::ActionBuilder* action
         if (!isValidSelection)
             return kAttentionIconPath;
 
-        return (targetUserField->acceptAll() || users.size() > 1 || !groups.empty())
+        const auto totalRecipientsCount = users.size() + additionalRecipients.size();
+
+        return (targetUserField->acceptAll() || totalRecipientsCount > 1 || !groups.empty())
             ? iconPath(QnResourceIconCache::Users)
             : iconPath(QnResourceIconCache::User);
     }

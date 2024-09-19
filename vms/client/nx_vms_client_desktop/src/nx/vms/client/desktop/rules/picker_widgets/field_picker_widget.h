@@ -50,7 +50,8 @@ protected:
 
     void updateUi() override
     {
-        P::setValidity(fieldValidity());
+        if (this->isEdited())
+            this->setValidity(fieldValidity());
     }
 
     template<typename T>

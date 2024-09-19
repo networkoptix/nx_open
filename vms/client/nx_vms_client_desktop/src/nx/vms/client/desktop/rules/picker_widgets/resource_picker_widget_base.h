@@ -51,23 +51,25 @@ protected:
 
     void updateUi() override
     {
+        PlainFieldPickerWidget<F>::updateUi();
+
         updateSelectButtonUi();
+    }
 
-        if (isEdited())
+    void setValidity(const vms::rules::ValidationResult& validationResult) override
+    {
+        if (validationResult.validity == QValidator::State::Invalid)
         {
-            const auto validity = fieldValidity();
-            if (validity.validity == QValidator::State::Invalid)
-            {
-                setErrorStyle(m_selectButton);
-                PlainFieldPickerWidget<F>::setValidity(validity);
-                return;
-            }
+            setErrorStyle(m_selectButton);
+            PlainFieldPickerWidget<F>::setValidity(validationResult);
         }
-
-        resetErrorStyle(m_selectButton);
-        // Only error state must be shown by the widget. Intermidiate state warning must be shown
-        // by the resource selection dialog.
-        PlainFieldPickerWidget<F>::setValidity({});
+        else
+        {
+            // Only error state must be shown by the widget. Intermidiate state warning must be shown
+            // by the resource selection dialog.
+            resetErrorStyle(m_selectButton);
+            PlainFieldPickerWidget<F>::setValidity({});
+        }
     }
 
     void updateSelectButtonUi();

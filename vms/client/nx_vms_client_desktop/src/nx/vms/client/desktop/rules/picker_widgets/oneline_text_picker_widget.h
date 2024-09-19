@@ -5,6 +5,7 @@
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLineEdit>
 
+#include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/rules/action_builder_fields/password_field.h>
 #include <nx/vms/rules/action_builder_fields/text_field.h>
 #include <nx/vms/rules/event_filter_fields/customizable_text_field.h>
@@ -72,6 +73,16 @@ public:
     {
         if (std::is_same<F, vms::rules::PasswordField>())
             m_lineEdit->setEchoMode(QLineEdit::Password);
+    }
+
+    void setValidity(const vms::rules::ValidationResult& validationResult) override
+    {
+        OnelineTextPickerWidgetBase<F>::setValidity(validationResult);
+
+        if (validationResult.validity == QValidator::State::Invalid)
+            setErrorStyle(m_lineEdit);
+        else
+            resetErrorStyle(m_lineEdit);
     }
 
 protected:

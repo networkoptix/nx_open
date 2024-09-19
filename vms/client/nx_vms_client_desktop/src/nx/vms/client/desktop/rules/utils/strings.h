@@ -40,11 +40,18 @@ public:
     static QString isNotListed();
     static QString in();
 
+    static QString targetRecipientsString(
+        const QnUserResourceList& users,
+        const api::UserGroupDataList& groups,
+        const QStringList& additionalRecipients);
+
 private:
     static QString getName(SystemContext* context, const QnVirtualCameraResourceList& resources);
     static QString getName(const QnMediaServerResourceList& resources);
     static QString getName(
-        const QnUserResourceList& users, api::UserGroupDataList& groups, int additionalCount = 0);
+        const QnUserResourceList& users, const api::UserGroupDataList& groups, int additionalCount);
+    static QString getName(
+        const QnUserResourceList& users, const api::UserGroupDataList& groups);
 };
 
 } // namespace nx::vms::client::desktop::rules
