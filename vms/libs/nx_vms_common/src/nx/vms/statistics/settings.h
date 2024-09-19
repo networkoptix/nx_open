@@ -10,5 +10,6 @@ namespace nx::vms::statistics {
 const QString kDefaultStatisticsServer = NX_STATISTICS_SERVER_URL"";
 const QString kDefaultUser = NX_STATISTICS_SERVER_USER"";
 const QString kDefaultPassword = NX_STATISTICS_SERVER_PASSWORD"";
+const QString kDefaultCrashReportApiUrl = NX_CRASH_REPORT_API_URL"";
 
 } // namespace nx::vms::statistics

@@ -20,7 +20,6 @@
 #include "ec2_thread_pool.h"
 
 static const QString DATE_FORMAT("yyyy-MM-dd_hh-mm-ss");
-static const QString SERVER_API_COMMAND("crashserver/api/report");
 static const QString LAST_CRASH("statisticsReportLastCrash");
 static const QString SENT_PREFIX("sent_");
 
@@ -146,12 +145,18 @@ bool CrashReporter::scanAndReport()
         return false;
     }
 
-    const QString configApi = globalSettings->statisticsReportServerApi();
-    const QString serverApi = configApi.isEmpty()
-        ? nx::vms::statistics::kDefaultStatisticsServer
+    const QString configApi = globalSettings->crashReportServerApi();
+    const QString apiUrl = configApi.isEmpty()
+        ? nx::vms::statistics::kDefaultCrashReportApiUrl
         : configApi;
 
-    const nx::utils::Url url = QString("%1/%2").arg(serverApi).arg(SERVER_API_COMMAND);
+    if (apiUrl.isEmpty())
+    {
+        NX_DEBUG(this, "Crash report URL is not configured; report is not sent");
+        return false;
+    }
+
+    const nx::utils::Url url = apiUrl;
 
     auto crashes = readCrashes();
     while (!crashes.isEmpty())
@@ -187,7 +192,7 @@ void CrashReporter::scanAndReportAsync()
     }
 
     NX_DEBUG(this, "Start new async scan for reports");
-    m_activeCollection = nx::utils::concurrent::run(Ec2ThreadPool::instance(), [=](){
+    m_activeCollection = nx::utils::concurrent::run(Ec2ThreadPool::instance(), [this](){
         // \class nx::utils::concurrent posts a job to \class Ec2ThreadPool rather than create new
         // real thread, we need to reserve a thread to avoid possible deadlock
         QnScopedThreadRollback reservedThread( 1, Ec2ThreadPool::instance() );

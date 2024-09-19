@@ -52,6 +52,7 @@ target_compile_definitions(nx_vms_common
         NX_STATISTICS_SERVER_URL="${statisticsServerUrl}"
         NX_STATISTICS_SERVER_USER="${statisticsServerUser}"
         NX_STATISTICS_SERVER_PASSWORD="${statisticsServerPassword}"
+        NX_CRASH_REPORT_API_URL="${crashReportApiUrl}"
 )
 if(LINUX)
     add_dependencies(nx_vms_common libgl_stub libegl_stub libglx_stub libx11_stub)

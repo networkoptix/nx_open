@@ -284,6 +284,9 @@ public:
     QString statisticsReportServerApi() const;
     void setStatisticsReportServerApi(const QString& value);
 
+    QString crashReportServerApi() const;
+    void setCrashReportServerApi(const QString& value);
+
     int maxEventLogRecords() const;
     void setMaxEventLogRecords(int value);
 

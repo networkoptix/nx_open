@@ -65,6 +65,7 @@ struct SaveableSettingsBase
     std::optional<bool> cloudConnectRelayingOverSslForced;
     std::optional<bool> cloudConnectUdpHolePunchingEnabled;
     std::optional<std::chrono::seconds> cloudPollingIntervalS;
+    std::optional<QString> crashReportServerApi;
     std::optional<bool> crossdomainEnabled;
     std::optional<QByteArray> currentStorageEncryptionKey;
     std::optional<QString> defaultVideoCodec;
@@ -145,6 +146,7 @@ struct SaveableSettingsBase
     (cloudConnectRelayingOverSslForced) \
     (cloudConnectUdpHolePunchingEnabled) \
     (cloudPollingIntervalS) \
+    (crashReportServerApi) \
     (crossdomainEnabled) \
     (currentStorageEncryptionKey) \
     (defaultVideoCodec) \
