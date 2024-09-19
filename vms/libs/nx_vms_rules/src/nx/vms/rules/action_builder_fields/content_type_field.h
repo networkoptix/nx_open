@@ -16,6 +16,12 @@ class NX_VMS_RULES_API ContentTypeField: public SimpleTypeActionField<QString, C
 
 public:
     using SimpleTypeActionField<QString, ContentTypeField>::SimpleTypeActionField;
+    static QJsonObject openApiDescriptor(const QVariantMap& properties)
+    {
+        auto descriptor = SimpleTypeActionField::openApiDescriptor(properties);
+        descriptor[utils::kExampleProperty] = "application/json";
+        return descriptor;
+    }
 
 signals:
     void valueChanged();

@@ -21,12 +21,14 @@ const ItemDescriptor& PushNotificationAction::manifest()
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<PushNotificationAction>(),
         .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Send Mobile Notification")),
+        .description = "Sends a mobile notification via the cloud.",
         .executionTargets = {ExecutionTarget::clients, ExecutionTarget::cloud},
         .fields = {
             makeFieldDescriptor<TargetUsersField>(
                 utils::kUsersFieldName,
                 Strings::to(),
-                {},
+                "Cloud users, who should receive the notification."
+                "By default, all power user group IDs are used as the value.",
                 ResourceFilterFieldProperties{
                     .acceptAll = false,
                     .ids = nx::utils::toQSet(vms::api::kAllPowerUserGroupIds),
@@ -35,20 +37,22 @@ const ItemDescriptor& PushNotificationAction::manifest()
             makeFieldDescriptor<TextWithFields>(
                 utils::kCaptionFieldName,
                 NX_DYNAMIC_TRANSLATABLE(tr("Header")),
-                /*description*/ {},
+                "Notification header",
                 {
                     { "text", "{event.caption}" }
                 }),
             makeFieldDescriptor<TextWithFields>(
                 utils::kDescriptionFieldName,
                 NX_DYNAMIC_TRANSLATABLE(tr("Body")),
-                /*description*/ {},
+                "Notification body.",
                 {
                     { "text", "{event.description}" }
                 }),
             makeFieldDescriptor<ActionFlagField>(
                 "addSource",
-                NX_DYNAMIC_TRANSLATABLE(tr("Add Source Device name to Body"))),
+                NX_DYNAMIC_TRANSLATABLE(tr("Add Source Device name to Body")),
+                "Specifies whether the source "
+                "device name must be added to the body or not."),
             utils::makeIntervalFieldDescriptor(
                 Strings::intervalOfAction()),
             makeFieldDescriptor<EventDevicesField>(

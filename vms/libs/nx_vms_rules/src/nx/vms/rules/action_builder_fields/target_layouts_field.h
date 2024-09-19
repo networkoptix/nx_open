@@ -54,6 +54,13 @@ public:
         return TargetLayoutsFieldProperties::fromVariantMap(descriptor()->properties);
     }
 
+    static QJsonObject openApiDescriptor(const QVariantMap& properties)
+    {
+        auto descriptor = SimpleTypeActionField::openApiDescriptor(properties);
+        descriptor[utils::kDescriptionProperty] = "Specifies the target layouts for the action.";
+        return descriptor;
+    }
+
 signals:
     void valueChanged();
 };

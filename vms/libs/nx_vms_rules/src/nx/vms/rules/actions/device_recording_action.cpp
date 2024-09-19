@@ -20,6 +20,7 @@ const ItemDescriptor& DeviceRecordingAction::manifest()
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<DeviceRecordingAction>(),
         .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Camera Recording")),
+        .description = "Start device recording",
         .flags = ItemFlag::prolonged,
         .executionTargets = ExecutionTarget::servers,
         .targetServers = TargetServers::resourceOwner,
@@ -29,25 +30,26 @@ const ItemDescriptor& DeviceRecordingAction::manifest()
                 NX_DYNAMIC_TRANSLATABLE(tr("On")),
                 {},
                 ResourceFilterFieldProperties{
+                    .base = FieldProperties{.optional = false},
                     .validationPolicy = kCameraRecordingValidationPolicy
                 }.toVariantMap()),
             makeFieldDescriptor<StreamQualityField>(
                 "quality",
-                NX_DYNAMIC_TRANSLATABLE(tr("Quality"))),
+                NX_DYNAMIC_TRANSLATABLE(tr("Quality")),
+                "Recording stream quality"),
             makeFieldDescriptor<FpsField>(
                 "fps",
-                NX_DYNAMIC_TRANSLATABLE(tr("FPS"))),
-            utils::makeTimeFieldDescriptor<OptionalTimeField>(
-                utils::kDurationFieldName,
-                Strings::duration(),
-                {},
+                NX_DYNAMIC_TRANSLATABLE(tr("FPS")),
+                "Frames per second of the recording stream."),
+            utils::makeDurationFieldDescriptor(
                 TimeFieldProperties{
                     .value = 5s,
                     .maximumValue = 9999h}.toVariantMap()),
             utils::makeTimeFieldDescriptor<TimeField>(
                 vms::rules::utils::kRecordBeforeFieldName,
                 Strings::preRecording(),
-                {},
+                "The amount of time to add to "
+                "the recording duration before the event's start time.",
                 TimeFieldProperties{
                     .value = 1s,
                     .maximumValue = 600s,
@@ -55,7 +57,8 @@ const ItemDescriptor& DeviceRecordingAction::manifest()
             utils::makeTimeFieldDescriptor<TimeField>(
                 vms::rules::utils::kRecordAfterFieldName,
                 Strings::postRecording(),
-                {},
+                "The amount of time to add to "
+                "the recording duration after the event's start time.",
                 TimeFieldProperties{
                     .value = 0s,
                     .maximumValue = 600s,

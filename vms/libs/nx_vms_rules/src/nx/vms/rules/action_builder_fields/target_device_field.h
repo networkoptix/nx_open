@@ -13,13 +13,12 @@ constexpr auto kExecPtzValidationPolicy = "execPtz";
 
 struct TargetSingleDeviceFieldProperties
 {
-    /** Whether given field should be visible in the editor. */
-    bool visible{true};
+    FieldProperties base;
 
-    /** Value for the the just created field's `id` property. */
+    /** Value for the just created field's `id` property. */
     nx::Uuid id;
 
-    /** Value for the the just created field's `useSource` property. */
+    /** Value for the just created field's `useSource` property. */
     bool useSource{false};
 
     bool allowEmptySelection{false};
@@ -27,14 +26,12 @@ struct TargetSingleDeviceFieldProperties
 
     QVariantMap toVariantMap() const
     {
-        QVariantMap result;
+        QVariantMap result = base.toVariantMap();
 
         result.insert("id", QVariant::fromValue(id));
         result.insert("useSource", useSource);
-        result.insert("visible", visible);
         result.insert("allowEmptySelection", allowEmptySelection);
         result.insert("validationPolicy", validationPolicy);
-
         return result;
     }
 
@@ -45,7 +42,7 @@ struct TargetSingleDeviceFieldProperties
         result.id = properties.value("id").value<nx::Uuid>();
         result.useSource = properties.value("useSource").toBool();
 
-        result.visible = properties.value("visible", true).toBool();
+        result.base = FieldProperties::fromVariantMap(properties);
         result.allowEmptySelection = properties.value("allowEmptySelection", false).toBool();
         result.validationPolicy = properties.value("validationPolicy").toString();
 
@@ -73,7 +70,7 @@ public:
     virtual QVariant build(const AggregatedEventPtr& eventAggregator) const override;
 
     TargetSingleDeviceFieldProperties properties() const;
-    static QJsonObject openApiDescriptor();
+    static QJsonObject openApiDescriptor(const QVariantMap& properties);
 
 signals:
     void idChanged();

@@ -23,6 +23,7 @@ const ItemDescriptor& DeviceOutputAction::manifest()
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<DeviceOutputAction>(),
         .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Device Output")),
+        .description = "Modify the output state of the device",
         .flags = ItemFlag::prolonged,
         .executionTargets = ExecutionTarget::servers,
         .targetServers = TargetServers::resourceOwner,
@@ -32,15 +33,18 @@ const ItemDescriptor& DeviceOutputAction::manifest()
                 Strings::at(),
                 {},
                 ResourceFilterFieldProperties{
+                    .base = FieldProperties{.optional = false},
                     .validationPolicy = kCameraOutputValidationPolicy
                 }.toVariantMap()),
             makeFieldDescriptor<OutputPortField>(
                 "outputPortId",
-                NX_DYNAMIC_TRANSLATABLE(tr("Output ID"))),
-            utils::makeTimeFieldDescriptor<OptionalTimeField>(
-                utils::kDurationFieldName,
-                Strings::duration(),
-                {},
+                NX_DYNAMIC_TRANSLATABLE(tr("Output ID")),
+                "ID of the device output port "
+                "that requires a state change. <br/>"
+                "The port state is set to <code>on</code> when the action starts "
+                "and to <code>off</code> when it stops.",
+                FieldProperties{.optional = false}.toVariantMap()),
+            utils::makeDurationFieldDescriptor(
                 TimeFieldProperties{.value = 5s}.toVariantMap()),
         },
         .resources = {{utils::kDeviceIdsFieldName, {ResourceType::device, {}, {}, FieldFlag::target}}},

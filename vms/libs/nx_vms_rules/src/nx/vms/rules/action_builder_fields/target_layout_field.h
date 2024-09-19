@@ -16,6 +16,12 @@ class NX_VMS_RULES_API TargetLayoutField: public SimpleTypeActionField<nx::Uuid,
 
 public:
     using SimpleTypeActionField<nx::Uuid, TargetLayoutField>::SimpleTypeActionField;
+    static QJsonObject openApiDescriptor(const QVariantMap& properties)
+    {
+        auto descriptor = SimpleTypeActionField::openApiDescriptor(properties);
+        descriptor[utils::kDescriptionProperty] = "Specifies the target layout for the action.";
+        return descriptor;
+    }
 
 signals:
     void valueChanged();

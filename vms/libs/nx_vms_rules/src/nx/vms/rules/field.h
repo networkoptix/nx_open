@@ -16,18 +16,24 @@ namespace nx::vms::rules {
 /** Common field properties that will be stored in the field manifest. */
 struct FieldProperties
 {
+    static constexpr auto kIsOptionalFieldPropertyName = "optional";
+
     /** Whether given field should be visible in the editor. */
     bool visible{true};
 
+    /** Whether given field should be considered required in OpenApi documentation*/
+    bool optional{true};
+
     QVariantMap toVariantMap() const
     {
-        return {{"visible", visible}};
+        return {{"visible", visible}, {"optional", optional}};
     }
 
     static FieldProperties fromVariantMap(const QVariantMap& properties)
     {
         FieldProperties result;
         result.visible = properties.value("visible", true).toBool();
+        result.optional = properties.value("optional", true).toBool();
 
         return result;
     }

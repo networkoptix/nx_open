@@ -20,23 +20,27 @@ const ItemDescriptor& SpeakAction::manifest()
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<SpeakAction>(),
         .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Speak")),
+        .description = "Speak text on specified resource(s).",
         .flags = {ItemFlag::instant},
         .executionTargets = {ExecutionTarget::clients, ExecutionTarget::servers},
         .targetServers = TargetServers::resourceOwner,
         .fields = {
             makeFieldDescriptor<TextWithFields>(utils::kTextFieldName,
-                NX_DYNAMIC_TRANSLATABLE(tr("Text"))),
+                NX_DYNAMIC_TRANSLATABLE(tr("Text")),
+                {},
+                FieldProperties{.optional = false}.toVariantMap()),
             makeFieldDescriptor<TargetDevicesField>(
                 utils::kDeviceIdsFieldName,
                 NX_DYNAMIC_TRANSLATABLE(tr("At Device")),
                 {},
                 ResourceFilterFieldProperties{
+                    .base = FieldProperties{.optional = false},
                     .validationPolicy = kCameraAudioTransmissionValidationPolicy
                 }.toVariantMap()),
             makeFieldDescriptor<TargetUsersField>(
                 utils::kUsersFieldName,
                 NX_DYNAMIC_TRANSLATABLE(tr("To users")),
-                /*description*/ {},
+                "By default, all power user group IDs are used as the value.",
                 ResourceFilterFieldProperties{
                     .ids = nx::utils::toQSet(vms::api::kAllPowerUserGroupIds),
                     .allowEmptySelection = true

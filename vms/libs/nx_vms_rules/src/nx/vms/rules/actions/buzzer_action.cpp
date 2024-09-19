@@ -17,6 +17,7 @@ const ItemDescriptor& BuzzerAction::manifest()
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<BuzzerAction>(),
         .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Buzzer")),
+        .description = "Enable an NVR buzzer",
         .flags = ItemFlag::prolonged,
         .executionTargets = ExecutionTarget::servers,
         .targetServers = TargetServers::resourceOwner,
@@ -26,15 +27,13 @@ const ItemDescriptor& BuzzerAction::manifest()
                 Strings::at(),
                 {},
                 ResourceFilterFieldProperties{
+                    .base = FieldProperties{.optional = false},
                     .validationPolicy = kHasBuzzerValidationPolicy
                 }.toVariantMap()),
-            utils::makeTimeFieldDescriptor<OptionalTimeField>(
-                utils::kDurationFieldName,
-                Strings::for_(),
-                {},
-                TimeFieldProperties{
-                    .value = 5s,
-                    .maximumValue = 24h}.toVariantMap()),
+            utils::makeDurationFieldDescriptor(TimeFieldProperties{
+                .value = 5s,
+                .maximumValue = 24h}.toVariantMap(),
+                Strings::for_()),
             utils::makeIntervalFieldDescriptor(
                 NX_DYNAMIC_TRANSLATABLE(tr("Action Throttling"))),
         },

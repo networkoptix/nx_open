@@ -42,9 +42,20 @@ QVariant TargetDevicesField::build(const AggregatedEventPtr& event) const
     return QVariant::fromValue(result);
 }
 
-QJsonObject TargetDevicesField::openApiDescriptor()
+QJsonObject TargetDevicesField::openApiDescriptor(const QVariantMap&)
 {
-    return utils::constructOpenApiDescriptor<TargetDevicesField>();
+    auto descriptor = utils::constructOpenApiDescriptor<TargetDevicesField>();
+    descriptor[utils::kDescriptionProperty] =
+        "Specifies the target resources for the action. "
+        "If the <code>useSource</code> flag is set, "
+        "the list of target device IDs (<code>ids</code>) can be omitted.";
+
+    utils::updatePropertyForField(descriptor,
+        "useSource",
+        utils::kDescriptionProperty,
+        "Controls whether the device IDs from the event itself "
+        "should be merged with the list of target device IDs.");
+    return descriptor;
 }
 
 } // namespace nx::vms::rules

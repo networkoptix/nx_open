@@ -4,6 +4,7 @@
 
 #include <QtCore/QSet>
 
+#include <nx/vms/rules/field.h>
 #include <nx/vms/rules/utils/openapi_doc.h>
 
 #include "../action_builder_field.h"
@@ -14,13 +15,12 @@ namespace nx::vms::rules {
 
 struct ResourceFilterFieldProperties
 {
-    /** Whether given field should be visible in the editor. */
-    bool visible{true};
+    FieldProperties base;
 
-    /** Value for the the just created field's `acceptAll` property. */
+    /** Value for the just created field's `acceptAll` property. */
     bool acceptAll{false};
 
-    /** Value for the the just created field's `ids` property. */
+    /** Value for the just created field's `ids` property. */
     UuidSet ids;
 
     bool allowEmptySelection{false};
@@ -28,13 +28,12 @@ struct ResourceFilterFieldProperties
 
     QVariantMap toVariantMap() const
     {
-        QVariantMap result;
+        QVariantMap result = base.toVariantMap();
 
         result.insert("acceptAll", acceptAll);
         if (!ids.empty())
             result.insert("ids", QVariant::fromValue(ids));
 
-        result.insert("visible", visible);
         result.insert("allowEmptySelection", allowEmptySelection);
         result.insert("validationPolicy", validationPolicy);
 
@@ -48,7 +47,7 @@ struct ResourceFilterFieldProperties
         result.acceptAll = properties.value("acceptAll").toBool();
         result.ids = properties.value("ids").value<UuidSet>();
 
-        result.visible = properties.value("visible", true).toBool();
+        result.base = FieldProperties::fromVariantMap(properties);
         result.allowEmptySelection = properties.value("allowEmptySelection", false).toBool();
         result.validationPolicy = properties.value("validationPolicy").toString();
 
@@ -86,7 +85,7 @@ public:
             static_cast<const T*>(this)->descriptor()->properties);
     }
 
-    static QJsonObject openApiDescriptor()
+    static QJsonObject openApiDescriptor(const QVariantMap&)
     {
         return utils::constructOpenApiDescriptor<T>();
     }

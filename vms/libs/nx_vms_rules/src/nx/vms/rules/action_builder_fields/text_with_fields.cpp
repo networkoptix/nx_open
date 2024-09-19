@@ -141,9 +141,18 @@ const TextWithFields::ParsedValues& TextWithFields::parsedValues() const
     return d->values;
 }
 
-QJsonObject TextWithFields::openApiDescriptor()
+QJsonObject TextWithFields::openApiDescriptor(const QVariantMap& properties)
 {
-    return utils::getPropertyOpenApiDescriptor(QMetaType::fromType<QString>());
+    auto descriptor =
+        utils::getPropertyOpenApiDescriptor(QMetaType::fromType<decltype(d->text)>());
+    descriptor[utils::kDescriptionProperty] = "Text value supporting event parameters.";
+
+    const bool isUrl = properties["validationPolicy"] == kUrlValidationPolicy;
+    descriptor[utils::kExampleProperty] = isUrl
+        ? "http://exampleServer/rest/v4/devices/{device.id}"
+        : "Event {event.name} occurred at {event.time} on {device.name}.";
+
+    return descriptor;
 }
 
 } // namespace nx::vms::rules

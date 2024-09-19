@@ -17,9 +17,22 @@
 namespace nx::vms::common { class SystemContext; }
 
 namespace nx::vms::rules::utils {
-
+static constexpr auto kDescriptionProperty = "description";
+static constexpr auto kExampleProperty = "example";
+static constexpr auto kDefaultProperty = "default";
+static constexpr auto kTypeProperty = "type";
+static constexpr auto kEnumProperty = "enum";
+static constexpr auto kMinProperty = "minimum";
+static constexpr auto kMaxProperty = "maximum";
+static constexpr auto kPropertyKey = "properties";
 static constexpr auto kDocOpenApiSchemePropertyName = "openApiSchema";
 const int kMinimumVersionRequiresMerging = 4;
+
+/**
+ * Adds default, minimum, max values from Field properties, if presented.
+ */
+NX_VMS_RULES_API QJsonObject addAdditionalDocFromFieldProperties(
+    QJsonObject openApiDescriptor, const QVariantMap& fieldProperties);
 
 template<class FieldType>
 static QVariantMap addOpenApiToProperties(QVariantMap properties)
@@ -28,11 +41,13 @@ static QVariantMap addOpenApiToProperties(QVariantMap properties)
     if (visibleIt != properties.end() && !visibleIt->toBool())
         return properties; //< Ignoring not visible in UI fields.
 
-    properties[kDocOpenApiSchemePropertyName] = FieldType::openApiDescriptor();
+    properties[kDocOpenApiSchemePropertyName] =
+        addAdditionalDocFromFieldProperties(FieldType::openApiDescriptor(properties), properties);
     return properties;
 }
 
-NX_VMS_RULES_API QJsonObject getPropertyOpenApiDescriptor(const QMetaType& metatype);
+NX_VMS_RULES_API QJsonObject getPropertyOpenApiDescriptor(
+    const QMetaType& metatype, bool addDefaultValue = false);
 
 template<class FieldType>
 static QJsonObject constructOpenApiDescriptor()
@@ -57,7 +72,11 @@ static QJsonObject constructOpenApiDescriptor()
     return result;
 }
 
-NX_VMS_RULES_API void updatePropertyForField(QJsonObject& propertiesObject,
+/**
+ * Safely updates the OpenAPI document value for a field in the properties object.
+ * If the properties object does not contain this field, an assertion will be triggered.
+ */
+NX_VMS_RULES_API void updatePropertyForField(QJsonObject& openApiObjectDescriptor,
     const QString& fieldName,
     const QString& docPropertyName,
     const QString& value);

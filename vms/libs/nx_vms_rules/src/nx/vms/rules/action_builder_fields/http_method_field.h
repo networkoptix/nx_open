@@ -16,6 +16,8 @@ class NX_VMS_RULES_API HttpMethodField: public SimpleTypeActionField<QString, Ht
 
 public:
     using SimpleTypeActionField<QString, HttpMethodField>::SimpleTypeActionField;
+    static const QSet<QString>& allowedValues();
+    static QJsonObject openApiDescriptor(const QVariantMap& properties);
 
 signals:
     void valueChanged();

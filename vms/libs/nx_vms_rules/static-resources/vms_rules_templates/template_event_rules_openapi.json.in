@@ -64,7 +64,15 @@
                         {
                             "schema":
                             {
-                                "$ref": "#/components/schemas/CreateRule"
+                                "allOf":
+                                [
+                                      {
+                                        "$ref": "#/components/schemas/CreateRule"
+                                      },
+                                      {
+                                        "required": ["event", "action"]
+                                      }
+                                ]
                             }
                         }
                     },
@@ -316,21 +324,6 @@
                 "schema": {
                   "type": "boolean",
                   "enum": [true]
-                }
-              },
-              "_keepDefault": {
-                "name": "_keepDefault",
-                "in": "query",
-                "description": "Deprecated, use `_stripDefault` instead. If specified works in reverse to _stripDefault.",
-                "required": false,
-                "style": "form",
-                "explode": true,
-                "schema": {
-                  "type": "boolean",
-                  "enum": [
-                    true,
-                    false
-                  ]
                 }
               },
               "_language": {

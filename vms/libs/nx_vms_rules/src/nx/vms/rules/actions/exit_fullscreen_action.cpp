@@ -15,17 +15,21 @@ const ItemDescriptor& ExitFullscreenAction::manifest()
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<ExitFullscreenAction>(),
         .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Exit Fullscreen")),
+        .description = "Exit fullscreen mode for the specified layouts "
+            "for all users if it is currently displayed.",
         .flags = ItemFlag::instant,
         .executionTargets = ExecutionTarget::clients,
         .fields = {
-            makeFieldDescriptor<TargetLayoutsField>(utils::kLayoutIdsFieldName,
-                Strings::onLayout()),
+                makeFieldDescriptor<TargetLayoutsField>(utils::kLayoutIdsFieldName,
+                    Strings::onLayout(),
+                    {},
+                    FieldProperties{.optional = false}.toVariantMap()),
             makeFieldDescriptor<TargetUsersField>(
                 utils::kUsersFieldName,
                 Strings::to(),
                 /*description*/ {},
                 ResourceFilterFieldProperties{
-                    .visible = false,
+                    .base = FieldProperties{.visible = false},
                     .acceptAll = true
                 }.toVariantMap()),
         },

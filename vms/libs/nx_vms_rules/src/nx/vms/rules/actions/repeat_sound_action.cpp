@@ -23,17 +23,22 @@ const ItemDescriptor& RepeatSoundAction::manifest()
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<RepeatSoundAction>(),
         .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Repeat Sound")),
+        .description = "Play sound repeatedly on the specified device(s) "
+            "and display desktop notification.",
         .flags = {ItemFlag::prolonged},
         .executionTargets = {ExecutionTarget::clients, ExecutionTarget::servers},
         .targetServers = TargetServers::resourceOwner,
         .fields = {
             makeFieldDescriptor<SoundField>(utils::kSoundFieldName,
-                NX_DYNAMIC_TRANSLATABLE(tr("Sound"))),
+                NX_DYNAMIC_TRANSLATABLE(tr("Sound")),
+                {},
+                FieldProperties{.optional = false}.toVariantMap()),
             makeFieldDescriptor<TargetDevicesField>(
                 utils::kDeviceIdsFieldName,
                 Strings::at(),
                 {},
                 ResourceFilterFieldProperties{
+                    .base = FieldProperties{.optional = false},
                     .validationPolicy = kCameraAudioTransmissionValidationPolicy
                 }.toVariantMap()),
             makeFieldDescriptor<TargetUsersField>(
@@ -46,15 +51,12 @@ const ItemDescriptor& RepeatSoundAction::manifest()
             makeFieldDescriptor<VolumeField>(
                 utils::kVolumeFieldName,
                 Strings::volume()),
-            utils::makeTextWithFieldsDescriptorWithVisibilityConfig(
-                utils::kCaptionFieldName, "{event.caption}",
-                NX_DYNAMIC_TRANSLATABLE(tr("Caption"))),
-            utils::makeTextWithFieldsDescriptorWithVisibilityConfig(utils::kDescriptionFieldName,
-                "{event.description}",
-                NX_DYNAMIC_TRANSLATABLE(tr("Description"))),
-            utils::makeTextWithFieldsDescriptorWithVisibilityConfig(utils::kTooltipFieldName,
-                "{event.extendedDescription}",
-                NX_DYNAMIC_TRANSLATABLE(tr("Tooltip text"))),
+            utils::makeNotificationTextWithFieldsDescriptor(
+                utils::kCaptionFieldName, /* isVisibilityConfigurable */ true),
+            utils::makeNotificationTextWithFieldsDescriptor(
+                utils::kDescriptionFieldName, /* isVisibilityConfigurable */ true),
+            utils::makeNotificationTextWithFieldsDescriptor(
+                utils::kTooltipFieldName, /* isVisibilityConfigurable */ true),
             utils::makeExtractDetailFieldDescriptor(
                 "sourceName", utils::kSourceNameDetailName),
         },

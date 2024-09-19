@@ -16,6 +16,13 @@ class NX_VMS_RULES_API SoundField: public SimpleTypeActionField<QString, SoundFi
 
 public:
     using SimpleTypeActionField<QString, SoundField>::SimpleTypeActionField;
+    static QJsonObject openApiDescriptor(const QVariantMap& properties)
+    {
+        auto descriptor = SimpleTypeField::openApiDescriptor(properties);
+        descriptor[utils::kDescriptionProperty] = "Notification sound file name.";
+        descriptor[utils::kExampleProperty] = "bycyclebell.mp3";
+        return descriptor;
+    }
 
 signals:
     void valueChanged();

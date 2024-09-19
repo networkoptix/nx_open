@@ -24,7 +24,7 @@ bool UniqueIdField::match(const QVariant& eventValue) const
     return eventValue.value<nx::Uuid>() == m_id;
 }
 
-QJsonObject UniqueIdField::openApiDescriptor()
+QJsonObject UniqueIdField::openApiDescriptor(const QVariantMap&)
 {
     return utils::getPropertyOpenApiDescriptor(QMetaType::fromType<decltype(m_id)>());
 }

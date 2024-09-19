@@ -22,32 +22,31 @@ const ItemDescriptor& TextOverlayAction::manifest()
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<TextOverlayAction>(),
         .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Show Text Overlay")),
+        .description = "Displays a text overlay on layout items for specified devices.",
         .flags = ItemFlag::prolonged,
         .executionTargets = ExecutionTarget::clients,
         .fields = {
-            makeFieldDescriptor<TargetDevicesField>(
-                utils::kDeviceIdsFieldName,
+            makeFieldDescriptor<TargetDevicesField>(utils::kDeviceIdsFieldName,
                 Strings::at(),
                 {},
-                ResourceFilterFieldProperties{}.toVariantMap()),
-            utils::makeTimeFieldDescriptor<OptionalTimeField>(
-                utils::kDurationFieldName,
-                Strings::for_(),
-                /*description*/ {},
+                ResourceFilterFieldProperties{.base = FieldProperties{.optional = false}}
+                    .toVariantMap()),
+            utils::makeDurationFieldDescriptor(
                 TimeFieldProperties{
                     .value = 5s,
                     .maximumValue = 30s,
-                    .minimumValue = 5s}.toVariantMap()),
+                    .minimumValue = 5s}.toVariantMap(),
+                    Strings::for_()),
             makeFieldDescriptor<TextWithFields>(
                 utils::kTextFieldName,
-                NX_DYNAMIC_TRANSLATABLE(tr("Custom Text"))),
-
+                NX_DYNAMIC_TRANSLATABLE(tr("Custom Text")),
+                "Text to display."),
             makeFieldDescriptor<TargetUsersField>(
                 utils::kUsersFieldName,
                 NX_DYNAMIC_TRANSLATABLE(tr("Show To")),
                 /*description*/ {},
                 ResourceFilterFieldProperties{
-                    .visible = false,
+                    .base = FieldProperties{.visible = false},
                     .acceptAll = true
                 }.toVariantMap()),
             // TODO: #amalov Use Qn::ResouceInfoLevel::RI_WithUrl & AttrSerializePolicy::singleLine

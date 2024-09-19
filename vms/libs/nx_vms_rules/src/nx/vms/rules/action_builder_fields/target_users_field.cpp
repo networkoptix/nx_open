@@ -21,4 +21,11 @@ QnUserResourceSet TargetUsersField::users() const
     return utils::users(UuidSelection{ids(), acceptAll()}, systemContext(), /*activeOnly*/ true);
 }
 
+QJsonObject TargetUsersField::openApiDescriptor(const QVariantMap&)
+{
+    auto descriptor = utils::constructOpenApiDescriptor<TargetUsersField>();
+    descriptor[utils::kDescriptionProperty] = "Specifies the target users for the action.";
+    return descriptor;
+}
+
 } // namespace nx::vms::rules

@@ -61,9 +61,18 @@ TargetSingleDeviceFieldProperties TargetDeviceField::properties() const
     return TargetSingleDeviceFieldProperties::fromVariantMap(descriptor()->properties);
 }
 
-QJsonObject TargetDeviceField::openApiDescriptor()
+QJsonObject TargetDeviceField::openApiDescriptor(const QVariantMap&)
 {
-    return utils::constructOpenApiDescriptor<TargetDeviceField>();
+    auto descriptor = utils::constructOpenApiDescriptor<TargetDeviceField>();
+    descriptor[utils::kDescriptionProperty] =
+        "Specifies the target resource for the action. "
+        "If the <code>useSource</code> flag is set, the <code>id</code> will be ignored";
+    utils::updatePropertyForField(descriptor,
+        "useSource",
+        utils::kDescriptionProperty,
+        "Controls whether the device ID from the event itself should be used "
+        "as target resource for action.");
+    return descriptor;
 }
 
 } // namespace nx::vms::rules

@@ -20,7 +20,7 @@ QVariant ExtractDetailField::build(const AggregatedEventPtr& event) const
     return event->details(systemContext()).value(detailName());
 }
 
-QJsonObject ExtractDetailField::openApiDescriptor()
+QJsonObject ExtractDetailField::openApiDescriptor(const QVariantMap&)
 {
     return {};
 }

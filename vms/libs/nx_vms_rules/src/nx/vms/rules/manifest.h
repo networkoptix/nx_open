@@ -116,8 +116,8 @@ struct FieldDescriptor
     /**%apidoc Field display name. */
     nx::TranslatableString displayName;
 
-    /**%apidoc[opt] Field description to show hint to the user. */
-    nx::TranslatableString description;
+    /**%apidoc[opt] Field description, used in Open Api documentation. */
+    QString description;
 
     /**%apidoc[opt]:object Optional properties corresponding to the actual field id. */
     QVariantMap properties; //< TODO: #mmalofeev should properties required for the field initialisation be separated from the supportive properties?
@@ -139,8 +139,8 @@ struct ItemDescriptor
     /**%apidoc Display name. */
     nx::TranslatableString displayName;
 
-    /**%apidoc[opt] Item description, to show hint to the user. */
-    nx::TranslatableString description;
+    /**%apidoc[opt] Item description, used in Open Api documentation. */
+    QString description;
 
     /**%apidoc Item flags. */
     ItemFlags flags = ItemFlag::instant;
