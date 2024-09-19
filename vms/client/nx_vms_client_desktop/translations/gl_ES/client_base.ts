@@ -2641,7 +2641,7 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>Confirming I/O module is accessible.</source>
-      <translation type="unfinished">Confirming I/O module is accessible.</translation>
+      <translation>Confirmando que o módulo de E/S (I/O) está accesible.</translation>
     </message>
     <message>
       <source>Confirming target I/O module provides media stream.</source>
