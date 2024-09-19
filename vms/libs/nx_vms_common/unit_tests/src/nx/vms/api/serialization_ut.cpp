@@ -111,6 +111,7 @@ const SaveableSettingsBase kDefaultSettingsBase{
     .cloudConnectRelayingOverSslForced = false,
     .cloudConnectUdpHolePunchingEnabled = true,
     .cloudPollingIntervalS = 1min,
+    .crashReportServerApi = QString{},
     .crossdomainEnabled = false,
     .currentStorageEncryptionKey = QByteArray{},
     .defaultVideoCodec = QString{"h263p"},
