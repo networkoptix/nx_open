@@ -16,16 +16,10 @@ ValidationResult HttpMethodFieldValidator::validity(
     if (!NX_ASSERT(httpMethodField))
         return {QValidator::State::Invalid, Strings::invalidFieldType()};
 
-    static const QSet<nx::String> kHttpMethods{
-        network::http::Method::get,
-        network::http::Method::post,
-        network::http::Method::put,
-        network::http::Method::patch,
-        network::http::Method::delete_};
-
     const auto method = httpMethodField->value().trimmed().toUpper();
 
-    if (method.isEmpty() || kHttpMethods.contains(method)) //< Empty string is 'Auto' method type.
+    // Empty string is 'Auto' method type.
+    if (method.isEmpty() || HttpMethodField::allowedValues().contains(method))
         return {};
 
     return {

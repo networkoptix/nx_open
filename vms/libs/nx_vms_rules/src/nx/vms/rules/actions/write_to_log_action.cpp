@@ -13,6 +13,7 @@ const ItemDescriptor& WriteToLogAction::manifest()
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<WriteToLogAction>(),
         .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Write to Log")),
+        .description = "Write a record to the site's log.",
         .executionTargets = ExecutionTarget::servers,
         .targetServers = TargetServers::currentServer,
         .fields = {

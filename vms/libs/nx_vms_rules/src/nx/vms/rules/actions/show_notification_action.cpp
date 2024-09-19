@@ -21,7 +21,7 @@ const ItemDescriptor& NotificationAction::manifest()
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<NotificationAction>(),
         .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Show Desktop Notification")),
-        .description = {},
+        .description = "Show Desktop Notification",
         .flags = {ItemFlag::instant, ItemFlag::userFiltered},
         .executionTargets = {ExecutionTarget::clients, ExecutionTarget::cloud},
         .fields = {
@@ -34,17 +34,16 @@ const ItemDescriptor& NotificationAction::manifest()
                     .validationPolicy = kBookmarkManagementValidationPolicy
                 }.toVariantMap()),
             makeFieldDescriptor<ActionFlagField>(utils::kAcknowledgeFieldName,
-                NX_DYNAMIC_TRANSLATABLE(tr("Force Acknowledgement"))),
+                NX_DYNAMIC_TRANSLATABLE(tr("Force Acknowledgement")),
+                "Specifies whether the user must manually acknowledge this event "
+                "on the event tile and create a bookmark."),
             utils::makeIntervalFieldDescriptor(Strings::intervalOfAction()),
-            utils::makeTextWithFieldsDescriptorWithVisibilityConfig(utils::kCaptionFieldName,
-                "{event.caption}",
-                NX_DYNAMIC_TRANSLATABLE(tr("Caption"))),
-            utils::makeTextWithFieldsDescriptorWithVisibilityConfig(utils::kDescriptionFieldName,
-                "{event.description}",
-                NX_DYNAMIC_TRANSLATABLE(tr("Description"))),
-            utils::makeTextWithFieldsDescriptorWithVisibilityConfig(utils::kTooltipFieldName,
-                "{event.extendedDescription}",
-                NX_DYNAMIC_TRANSLATABLE(tr("Tooltip text"))),
+            utils::makeNotificationTextWithFieldsDescriptor(
+                utils::kCaptionFieldName, /* isVisibilityConfigurable */ true),
+            utils::makeNotificationTextWithFieldsDescriptor(
+                utils::kDescriptionFieldName, /* isVisibilityConfigurable */ true),
+            utils::makeNotificationTextWithFieldsDescriptor(
+                utils::kTooltipFieldName, /* isVisibilityConfigurable */ true),
             makeFieldDescriptor<EventDevicesField>(
                 utils::kDeviceIdsFieldName,
                 Strings::eventDevices()),

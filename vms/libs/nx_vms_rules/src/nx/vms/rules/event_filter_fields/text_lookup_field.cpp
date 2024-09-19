@@ -117,10 +117,10 @@ bool TextLookupField::match(const QVariant& eventValue) const
     return {};
 }
 
-QJsonObject TextLookupField::openApiDescriptor()
+QJsonObject TextLookupField::openApiDescriptor(const QVariantMap&)
 {
     auto result = utils::constructOpenApiDescriptor<TextLookupField>();
-    result["description"] =
+    result[utils::kDescriptionProperty] =
         "Set the <b>UUID</b> of the Lookup List as the value for the check types <b>inList</b> "
         "or <b>notInList</b>. To find the required Lookup List, "
         "refer to the response of the request to /rest/v4/lookuplists. <br/>"

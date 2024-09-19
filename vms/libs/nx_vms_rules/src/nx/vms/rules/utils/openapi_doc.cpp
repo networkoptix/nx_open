@@ -13,12 +13,22 @@
 #include <nx/vms/api/types/event_rule_types.h>
 #include <nx/vms/api/types/resource_types.h>
 #include <nx/vms/common/system_context.h>
+#include <nx/vms/rules/common/time_field_properties.h>
 #include <nx/vms/rules/engine.h>
 #include <nx/vms/rules/field_types.h>
 #include <nx/vms/rules/manifest.h>
 #include <nx/vms/rules/rules_fwd.h>
 
 namespace {
+
+struct PropertyDescriptor
+{
+    QString type;
+    QVariant example;
+    QString format;
+    QString description;
+};
+
 /**
  * Changes the input string to start with a capital letter and removes the last letter 's' if present.
  * Input examples: "events", "analyticsObject"
@@ -30,12 +40,6 @@ QString formatIdPart(QString part)
     if (part.endsWith('s'))
         part.removeLast();
     return part;
-}
-
-QJsonObject createTypeDescriptor(const QString& id)
-{
-    const auto lastPartOfId = id.split('.').last();
-    return QJsonObject{{"type", "string"}, {"enum", QJsonArray({lastPartOfId})}};
 }
 
 QJsonObject readOpenApiDoc(const QString& docPath)
@@ -60,11 +64,105 @@ QJsonObject readOpenApiDoc(const QString& docPath)
     return jsonDoc.object();
 }
 
-template<typename T>
-QJsonObject createEnumDescriptor()
+QJsonValue generateDefaultValue(const QMetaType& metaType)
+{
+    QVariant defaultValue(metaType);
+
+    if (metaType.isValid())
+    {
+        metaType.construct(defaultValue.data());
+        return QJsonValue::fromVariant(defaultValue);
+    }
+
+    return {};
+}
+
+PropertyDescriptor mapMetaTypeToJsonTypeAndExample(const QMetaType& metaType)
+{
+    static const QMap<int, PropertyDescriptor> metaTypeToDescriptor = {
+        {QMetaType::Bool, {.type = "boolean", .example = true}},
+        {QMetaType::Int, {.type = "integer", .example = 123}},
+        {QMetaType::UInt, {.type = "integer", .example = 123}},
+        {QMetaType::Float, {.type = "number", .example = 12.3f, .format = "float"}},
+        {QMetaType::Double, {.type = "number", .example = 12.3, .format = "double"}},
+        {QMetaType::QString, {.type = "string", .example = "example string"}},
+        // API sends value in seconds, but it is stored as microseconds in classes.
+        {QMetaType::fromType<std::chrono::microseconds>().id(),
+            {.type = "integer", .example = 10, .description = "Length in seconds"}},
+        {QMetaType::fromType<nx::Uuid>().id(),
+            {.type = "string",
+                .example = "{00000000-0000-0000-0000-000000000000}",
+                .format = "uuid"}},
+    };
+
+    auto it = metaTypeToDescriptor.find(metaType.id());
+    if (!NX_ASSERT(it != metaTypeToDescriptor.end(),
+            "Not supported field type: %1",
+            metaType.name()))
+    {
+        return {};
+    }
+
+    return it.value();
+}
+
+} // namespace
+
+namespace nx::vms::rules::utils {
+const QString kTemplatePath = ":/vms_rules_templates/template_event_rules_openapi.json.in";
+
+QJsonObject createTypeDescriptor(const QString& id)
+{
+    const auto lastPartOfId = id.split('.').last();
+    return QJsonObject{{kTypeProperty, "string"}, {kEnumProperty, QJsonArray({lastPartOfId})}};
+}
+
+void appendFieldDescription(QJsonObject& fieldObject, const FieldDescriptor& field)
+{
+    if (field.description.isEmpty())
+        return;
+    const auto basicDescription = fieldObject[kDescriptionProperty].toString();
+    fieldObject[kDescriptionProperty] = field.description + "<br/>" + basicDescription;
+}
+
+QJsonObject createUuidListDescriptor(bool isSet)
 {
     QJsonObject result;
-    result["type"] = "string";
+    result[kTypeProperty] = "array";
+    result["items"] = QJsonObject{{kTypeProperty, "string"}, {"format", "uuid"}};
+    result["uniqueItems"] = isSet;
+    result[kExampleProperty] = QJsonArray({"{00000000-0000-0000-0000-000000000000}"});
+    return result;
+}
+
+QJsonObject createBasicTypeDescriptor(const QMetaType& metaType, bool addDefaultValue)
+{
+    QJsonObject result;
+
+    auto descriptor = mapMetaTypeToJsonTypeAndExample(metaType);
+    if (descriptor.type.isEmpty())
+        return {};
+
+    result[kTypeProperty] = descriptor.type;
+    result[kExampleProperty] = QJsonValue::fromVariant(descriptor.example);
+
+    if (!descriptor.format.isEmpty())
+        result["format"] = descriptor.format;
+
+    if (!descriptor.description.isEmpty())
+        result[kDescriptionProperty] = descriptor.description;
+
+    if (addDefaultValue)
+        result[kDefaultProperty] = generateDefaultValue(metaType);
+
+    return result;
+}
+
+template<typename T>
+QJsonObject createEnumDescriptor(bool addDefault)
+{
+    QJsonObject result;
+    result[kTypeProperty] = "string";
     QJsonArray possibleValues;
 
     nx::reflect::enumeration::visitAllItems<T>(
@@ -74,15 +172,55 @@ QJsonObject createEnumDescriptor()
                 possibleValues.append(QString::fromStdString(nx::reflect::toString<T>(value)));
         });
 
-    result["enum"] = possibleValues;
-    result["example"] = possibleValues.first();
+    result[kEnumProperty] = possibleValues;
+    result[kExampleProperty] = possibleValues.at(possibleValues.size() / 2);
+    if (addDefault)
+        result[kDefaultProperty] = QString::fromStdString(nx::reflect::toString<T>(T()));
     return result;
 }
 
-} // namespace
+template<typename T, typename... Enums>
+QJsonObject handleEnumTypes(const QMetaType& metaType, bool addDefaultValue)
+{
+    // Check if the first type in the parameter pack is an enum and matches the metaType.
+    if constexpr (std::is_enum_v<T>)
+    {
+        if (metaType == QMetaType::fromType<T>())
+            return createEnumDescriptor<T>(addDefaultValue);
+    }
 
-namespace nx::vms::rules::utils {
-const QString kTemplatePath = ":/vms_rules_templates/template_event_rules_openapi.json.in";
+    // Recursively check the rest of the parameter pack.
+    if constexpr (sizeof...(Enums) > 0)
+    {
+        return handleEnumTypes<Enums...>(metaType, addDefaultValue);
+    }
+
+    return {};
+}
+
+QJsonObject createStreamQualityDescriptor(bool addDefaultValue)
+{
+    using namespace nx::vms::api;
+    auto defaultValues = createEnumDescriptor<StreamQuality>(addDefaultValue);
+    auto enumVals = defaultValues[kEnumProperty].toArray();
+    static QSet<QString> kIgnoredValue{
+        QString::fromStdString(reflect::toString(StreamQuality::undefined)),
+        QString::fromStdString(reflect::toString(StreamQuality::rapidReview)),
+        QString::fromStdString(reflect::toString(StreamQuality::preset))};
+
+    for (int i = enumVals.size() - 1; i >= 0; --i)
+    {
+        const QJsonValue& val = enumVals.at(i);
+        if (!NX_ASSERT(val.isString(), "Enum values must be string"))
+            continue;
+
+        if (kIgnoredValue.contains(val.toString()))
+            enumVals.removeAt(i);
+    }
+
+    defaultValues[kEnumProperty] = enumVals;
+    return defaultValues;
+}
 
 QJsonObject constructSchemaReference(const QString& displayName)
 {
@@ -96,9 +234,14 @@ void collectOpenApiInfo(
 {
     for (const auto& item: items)
     {
+        if (item.flags.testFlag(ItemFlag::system))
+            continue;
+
         QJsonObject schema;
-        schema["type"] = "object";
+        schema[kTypeProperty] = "object";
         QJsonObject properties;
+        // Field type is required for all events and actions.
+        QJsonArray requiredFields{kTypeProperty};
         for (const auto& field: item.fields)
         {
             if (!field.properties.contains(kDocOpenApiSchemePropertyName))
@@ -115,16 +258,25 @@ void collectOpenApiInfo(
                 continue;
             }
 
+            appendFieldDescription(fieldObject, field);
+
             const auto apiFieldName = toApiFieldName(field.fieldName, field.id);
             properties[apiFieldName] = fieldObject;
+
+            auto optionalIt = field.properties.find(FieldProperties::kIsOptionalFieldPropertyName);
+            if (optionalIt != field.properties.end() && !optionalIt->toBool())
+                requiredFields.append(apiFieldName);
         }
 
         const bool isDocGenerated = !properties.empty() || item.fields.empty();
         if (!NX_ASSERT(isDocGenerated, "No generated documentation for item %1", item.id))
             continue;
 
-        properties["type"] = createTypeDescriptor(item.id);
-        schema["properties"] = properties;
+        properties[kTypeProperty] = createTypeDescriptor(item.id);
+        schema[kPropertyKey] = properties;
+        schema["required"] = requiredFields;
+        if (!item.description.isEmpty())
+            schema[kDescriptionProperty] = item.description;
         listReference.push_back(constructSchemaReference(item.id));
         schemas[VmsRulesOpenApiDocHelper::schemaName(item.id)] = schema;
     }
@@ -140,97 +292,100 @@ QString VmsRulesOpenApiDocHelper::schemaName(const QString& id)
     return formatIdPart(parts.last()) + formatIdPart(parts[parts.size() - 2]);
 }
 
-QJsonObject getPropertyOpenApiDescriptor(const QMetaType& metaType)
+QJsonObject addAdditionalDocFromFieldProperties(
+    QJsonObject openApiDescriptor, const QVariantMap& fieldProperties)
+{
+    if (fieldProperties.empty())
+        return openApiDescriptor;
+
+    auto updateDescriptorWithProperties =
+        [&openApiDescriptor]
+        (const QVariantMap& properties, const QSet<QString>& propertyKeys, const QString& docKey)
+        {
+            auto keyIt = std::find_if(
+                propertyKeys.cbegin(), propertyKeys.cend(),
+            [&properties](const QString& key)
+                 {
+                    return properties.contains(key);
+                 });
+
+            if (keyIt == propertyKeys.end())
+                return; //< There is no expected properties in field.
+
+            auto it = properties.find(*keyIt);
+
+            // Have to explicitly check for bool, otherwise the value will be converted to a number.
+            if (it->metaType() == QMetaType::fromType<bool>())
+            {
+                openApiDescriptor[docKey] = it->toBool();
+                return;
+            }
+
+            if (it->metaType() == QMetaType::fromType<std::chrono::seconds>())
+            {
+                // A cast is required to avoid ambiguity during conversion
+                // to const QJsonValue on GCC.
+                openApiDescriptor[docKey] =
+                    static_cast<qint64>(it->value<std::chrono::seconds>().count());
+                return;
+            }
+
+            if (it->metaType() == QMetaType::fromType<vms::api::rules::State>())
+            {
+                openApiDescriptor[docKey] =
+                    QString::fromStdString(reflect::toString(it->value<vms::api::rules::State>()));
+                return;
+            }
+
+            auto value = QJsonValue::fromVariant(*it);
+
+            if (value.isDouble() && openApiDescriptor.contains(kEnumProperty))
+            {
+                NX_ASSERT(false, "The enum value was incorrectly converted to a numeric value");
+                return;
+            }
+
+            openApiDescriptor[docKey] = QJsonValue::fromVariant(*it);
+        };
+
+    updateDescriptorWithProperties(fieldProperties, {"value", "text"}, kDefaultProperty);
+    updateDescriptorWithProperties(fieldProperties, {"min"}, kMinProperty);
+    updateDescriptorWithProperties(fieldProperties, {"max"}, kMaxProperty);
+
+    return openApiDescriptor;
+}
+
+QJsonObject getPropertyOpenApiDescriptor(const QMetaType& metaType, bool addDefaultValue)
 {
     using namespace nx::vms::api;
-    QJsonObject result;
 
     if (metaType == QMetaType::fromType<UuidSet>() || metaType == QMetaType::fromType<UuidList>())
+        return createUuidListDescriptor(metaType == QMetaType::fromType<UuidSet>());
+
+    if (auto enumDescriptor = handleEnumTypes<vms::api::rules::State,
+            ObjectLookupCheckType,
+            network::http::AuthType,
+            TextLookupCheckType>(metaType, addDefaultValue);
+        !enumDescriptor.isEmpty())
     {
-        result["type"] = "array";
-        result["items"] = QJsonObject{{"type", "string"}, {"format", "uuid"}};
-        result["uniqueItems"] = metaType == QMetaType::fromType<UuidSet>();
-        result["example"] = QJsonArray({"{00000000-0000-0000-0000-000000000000}"});
-        return result;
+        return enumDescriptor;
     }
-
-    if (metaType == QMetaType::fromType<Uuid>())
-    {
-        result["type"] = "string";
-        result["format"] = "uuid";
-        result["example"] = "{00000000-0000-0000-0000-000000000000}";
-        return result;
-    }
-
-    if (metaType == QMetaType::fromType<vms::api::rules::State>())
-        return createEnumDescriptor<vms::api::rules::State>();
-
-    if (metaType == QMetaType::fromType<ObjectLookupCheckType>())
-        return createEnumDescriptor<ObjectLookupCheckType>();
-
-    if (metaType == QMetaType::fromType<network::http::AuthType>())
-        return createEnumDescriptor<network::http::AuthType>();
-
-    if (metaType == QMetaType::fromType<TextLookupCheckType>())
-        return createEnumDescriptor<TextLookupCheckType>();
 
     if (metaType == QMetaType::fromType<EventLevels>())
     {
-        auto result = createEnumDescriptor<EventLevel>();
-        result["description"] =
+        QJsonObject result = createEnumDescriptor<EventLevel>(addDefaultValue);
+        result[kDescriptionProperty] =
             "The value can contain either a single Event Level "
             "or a combination of levels. "
-            "To create a combination, use the | symbol. <b>For example: info|warning.</b>";
+            "To create a <b>combination</b>, use the <code>|</code> symbol. "
+            "For example: <code>info|warning.</code>";
         return result;
     }
 
     if (metaType == QMetaType::fromType<StreamQuality>())
-        return createEnumDescriptor<StreamQuality>();
+        return createStreamQualityDescriptor(addDefaultValue);
 
-    if (metaType == QMetaType::fromType<std::chrono::microseconds>())
-    {
-        result["type"] = "integer";
-        result["example"] = 10;
-        // API sends value in seconds, but it is stored as microseconds in classes.
-        result["description"] = "Length in seconds";
-        return result;
-    }
-
-    switch (metaType.id())
-    {
-        case QMetaType::Bool:
-        {
-            result["type"] = "boolean";
-            result["example"] = false;
-            return result;
-        }
-
-        case QMetaType::Int:
-        {
-            result["type"] = "integer";
-            result["example"] = 123;
-            return result;
-        }
-
-        case QMetaType::Float:
-        {
-            result["type"] = "number";
-            result["format"] = "float";
-            result["example"] = 12.3;
-            return result;
-        }
-
-        default:
-        {
-            if (metaType != QMetaType::fromType<QString>())
-                NX_ASSERT(false, "Not supported field type: %1", metaType.name());
-
-            result["type"] = "string";
-            result["example"] = "example";
-        }
-    }
-
-    return result;
+    return createBasicTypeDescriptor(metaType, addDefaultValue);
 }
 
 QJsonObject VmsRulesOpenApiDocHelper::generateOpenApiDoc(Engine* engine)
@@ -332,14 +487,22 @@ QJsonObject VmsRulesOpenApiDocHelper::addVmsRulesDocIfRequired(
     return openApiDoc;
 }
 
-void updatePropertyForField(QJsonObject& propertiesObject,
+void updatePropertyForField(QJsonObject& openApiObjectDescriptor,
     const QString& fieldName,
     const QString& docPropertyName,
     const QString& value)
 {
-    auto fieldJson = propertiesObject[fieldName].toObject();
+    using namespace nx::utils::json;
+    auto properties =
+        optObject(openApiObjectDescriptor, kPropertyKey, "openApiDescriptor lacks properties");
+
+    auto fieldJson =
+        optObject(properties, fieldName, QString("properties lacks %1").arg(fieldName));
+    if (fieldJson.isEmpty())
+        return;
     fieldJson[docPropertyName] = value;
-    propertiesObject[fieldName] = fieldJson;
+    properties[fieldName] = fieldJson;
+    openApiObjectDescriptor[kPropertyKey] = properties;
 }
 
 } // namespace nx::vms::rules::utils

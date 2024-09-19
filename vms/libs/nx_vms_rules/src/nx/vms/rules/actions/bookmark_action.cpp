@@ -20,6 +20,7 @@ const ItemDescriptor& BookmarkAction::manifest()
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<BookmarkAction>(),
         .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Create Bookmark")),
+        .description = "Create Bookmark",
         .flags = ItemFlag::prolonged,
         .executionTargets = ExecutionTarget::servers,
         .targetServers = TargetServers::resourceOwner,
@@ -29,20 +30,20 @@ const ItemDescriptor& BookmarkAction::manifest()
                 Strings::at(),
                 {},
                 ResourceFilterFieldProperties{
+                    .base = FieldProperties{.optional = false},
                     .validationPolicy = kBookmarkValidationPolicy
                 }.toVariantMap()),
-            utils::makeTimeFieldDescriptor<OptionalTimeField>(
-                utils::kDurationFieldName,
-                Strings::duration(),
-                /*description*/ {},
+            utils::makeDurationFieldDescriptor(
                 TimeFieldProperties{
                     .value = 5s,
                     .maximumValue = 600s,
-                    .minimumValue = 5s}.toVariantMap()),
+                    .minimumValue = 5s}.toVariantMap(),
+                    {},
+                "Minimum duration of the bookmark."),
             utils::makeTimeFieldDescriptor<TimeField>(
                 vms::rules::utils::kRecordBeforeFieldName,
                 Strings::preRecording(),
-                {},
+                "The amount of time to add to the bookmark duration before the event's start time.",
                 TimeFieldProperties{
                     .value = 1s,
                     .maximumValue = 600s,
@@ -50,14 +51,16 @@ const ItemDescriptor& BookmarkAction::manifest()
             utils::makeTimeFieldDescriptor<TimeField>(
                 vms::rules::utils::kRecordAfterFieldName,
                 Strings::postRecording(),
-                {},
+                "The amount of time to add to the bookmark duration after the event's start time.",
                 TimeFieldProperties{
                     .value = 0s,
                     .maximumValue = 600s,
                     .minimumValue = 0s}.toVariantMap()),
             makeFieldDescriptor<ActionTextField>(
                 utils::kTagsFieldName,
-                NX_DYNAMIC_TRANSLATABLE(tr("Add Tags"))),
+                NX_DYNAMIC_TRANSLATABLE(tr("Add Tags")),
+                "List of tags associated with the bookmark. "
+                    "To assign multiple tags, separate them with commas."),
 
             // TODO: #amalov Use Qn::ResouceInfoLevel::RI_WithUrl & AttrSerializePolicy::singleLine
             utils::makeExtractDetailFieldDescriptor(

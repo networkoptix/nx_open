@@ -23,6 +23,17 @@ public:
         setValue(kDefaultVolume);
     };
 
+    static QJsonObject openApiDescriptor(const QVariantMap& properties)
+    {
+        auto descriptor = SimpleTypeField::openApiDescriptor(properties);
+        descriptor[utils::kMinProperty] = 0.0f;
+        // TODO: #vbutkevich probably default value must be set in manifest for each action.
+        descriptor[utils::kDefaultProperty] = kDefaultVolume;
+        descriptor[utils::kMaxProperty] = 1.0f;
+        descriptor[utils::kExampleProperty] = 0.5f;
+        return descriptor;
+    }
+
 signals:
     void valueChanged();
 };

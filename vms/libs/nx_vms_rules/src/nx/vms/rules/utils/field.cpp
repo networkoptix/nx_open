@@ -4,6 +4,7 @@
 
 #include <nx/utils/qt_helpers.h>
 #include <nx/vms/api/data/user_group_data.h>
+#include <nx/vms/rules/basic_action.h>
 #include <nx/vms/rules/ini.h>
 
 #include "../action_builder_fields/event_devices_field.h"
@@ -20,7 +21,7 @@ namespace nx::vms::rules {
 template <class T>
 FieldDescriptor makeInvisibleFieldDescriptor(const QString& fieldName,
     const TranslatableString& displayName,
-    const TranslatableString& description,
+    const QString& description,
     QVariantMap properties)
 {
     properties["visible"] = false;
@@ -35,7 +36,7 @@ FieldDescriptor makeInvisibleFieldDescriptor(const QString& fieldName,
 template<>
 FieldDescriptor makeFieldDescriptor<EmailMessageField>(const QString& fieldName,
     const TranslatableString& displayName,
-    const TranslatableString& description,
+    const QString& description,
     const QVariantMap& properties)
 {
     return makeInvisibleFieldDescriptor<EmailMessageField>(
@@ -45,7 +46,7 @@ FieldDescriptor makeFieldDescriptor<EmailMessageField>(const QString& fieldName,
 template<>
 FieldDescriptor makeFieldDescriptor<EventDevicesField>(const QString& fieldName,
     const TranslatableString& displayName,
-    const TranslatableString& description,
+    const QString& description,
     const QVariantMap& properties)
 {
     return makeInvisibleFieldDescriptor<EventDevicesField>(
@@ -58,25 +59,50 @@ namespace nx::vms::rules::utils {
 
 FieldDescriptor makeIntervalFieldDescriptor(
     const TranslatableString& displayName,
-    const TranslatableString& description)
+    const QString& description,
+    const QVariantMap& properties)
 {
     return makeTimeFieldDescriptor<OptionalTimeField>(
         kIntervalFieldName,
         displayName,
-        description,
-        TimeFieldProperties{
-            .value = 1min,
-            .minimumValue = 1s}.toVariantMap());
+        description.isEmpty()
+            ? QString{"Aggregation interval. <br/>"
+                 "Limits the number of events that can trigger an action. <br/>"
+                 "<b>For example</b>, if the value is set to 30 seconds, "
+                 "the action will only be triggered <b>once</b> every 30 seconds, "
+                 "regardless of how many events occur during that time."}
+            : description,
+        properties.isEmpty()
+            ? TimeFieldProperties{.value = 1min, .minimumValue = 1s}.toVariantMap()
+            : properties);
+}
+
+FieldDescriptor makeDurationFieldDescriptor(const QVariantMap& properties,
+    const TranslatableString& displayName,
+    const QString& description)
+{
+    return utils::makeTimeFieldDescriptor<OptionalTimeField>(
+        kDurationFieldName,
+        displayName,
+        description.isEmpty()
+            ? QString(
+             "Duration of action. "
+             "If the value is set to zero, the duration will be set to the duration of the event.")
+            : description,
+        properties);
 }
 
 FieldDescriptor makePlaybackFieldDescriptor(
     const TranslatableString& displayName,
-    const TranslatableString& description)
+    const QString& description)
 {
     return makeTimeFieldDescriptor<OptionalTimeField>(
         kPlaybackTimeFieldName,
         displayName,
-        description,
+        description.isEmpty()
+            ? QString("The amount of time before "
+              "the current time when the navigation time should be set.")
+            : description,
         TimeFieldProperties{
             .value = 0s,
             .maximumValue = 300s,
@@ -85,7 +111,7 @@ FieldDescriptor makePlaybackFieldDescriptor(
 
 FieldDescriptor makeStateFieldDescriptor(
     const TranslatableString& displayName,
-    const TranslatableString& description,
+    const QString& description,
     vms::rules::State defaultState)
 {
     return makeFieldDescriptor<StateField>(
@@ -106,21 +132,47 @@ FieldDescriptor makeExtractDetailFieldDescriptor(
         {{ "detailName", detailName }, {"visible", false}});
 }
 
-FieldDescriptor makeTextWithFieldsDescriptorWithVisibilityConfig(
-    const QString& fieldName,
-    const QString& formatString,
-    const TranslatableString& displayName)
+FieldDescriptor makeNotificationTextWithFieldsDescriptor(const QString& fieldName,
+    bool isVisibilityConfigurable,
+    QString defaultText,
+    TranslatableString displayName,
+    QString description)
 {
-    return makeFieldDescriptor<TextWithFields>(fieldName,
-        displayName,
-        {},
-        {{"text", formatString}, {"visible", ini().showHiddenTextFields}});
+    const bool visibility = isVisibilityConfigurable ? ini().showHiddenTextFields : true;
+    if (fieldName == kCaptionFieldName)
+    {
+        defaultText = defaultText.isEmpty() ? QString("{event.caption}") : defaultText;
+        displayName = displayName.empty() ? NX_DYNAMIC_TRANSLATABLE(BasicAction::tr("Caption"))
+                                          : displayName;
+        description = QString("Notification title, displayed on the event tile.");
+    }
+    else if (fieldName == kDescriptionFieldName)
+    {
+        defaultText = defaultText.isEmpty() ? QString("{event.description}") : defaultText;
+        displayName = displayName.empty() ? NX_DYNAMIC_TRANSLATABLE(BasicAction::tr("Description"))
+                                          : displayName;
+        description = QString("Description, displayed on the event tile.");
+    }
+    else if (fieldName == kTooltipFieldName)
+    {
+        defaultText = defaultText.isEmpty() ? QString("{event.extendedDescription}") : defaultText;
+        displayName = displayName.empty()
+            ? NX_DYNAMIC_TRANSLATABLE(BasicAction::tr("Tooltip text"))
+            : displayName;
+        description = QString("Text displayed in the event tile's tooltip.");
+    }
+    else
+    {
+        NX_ASSERT(false, "Unexpected field %1", fieldName);
+    }
+    return makeFieldDescriptor<TextWithFields>(
+        fieldName, displayName, description, {{"text", defaultText}, {"visible", visibility}});
 }
 
 FieldDescriptor makeActionFlagFieldDescriptor(
     const QString& fieldName,
     const TranslatableString& displayName,
-    const TranslatableString& description,
+    const QString& description,
     bool defaultValue)
 {
     return makeFieldDescriptor<ActionFlagField>(

@@ -26,12 +26,15 @@ const ItemDescriptor& OpenLayoutAction::manifest()
         .flags = ItemFlag::instant,
         .executionTargets = ExecutionTarget::clients,
         .fields = {
-            makeFieldDescriptor<TargetLayoutField>(utils::kLayoutIdFieldName, {}),
+            makeFieldDescriptor<TargetLayoutField>(
+                utils::kLayoutIdFieldName, {}, {},
+                FieldProperties{.optional = false}.toVariantMap()),
             makeFieldDescriptor<TargetUsersField>(
                 utils::kUsersFieldName,
                 Strings::to(),
                 {},
                 ResourceFilterFieldProperties{
+                    .base = FieldProperties{.optional = false},
                     .validationPolicy = kLayoutAccessValidationPolicy
                 }.toVariantMap()),
             utils::makePlaybackFieldDescriptor(Strings::rewind()),

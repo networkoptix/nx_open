@@ -34,9 +34,9 @@ public:
         }
     }
 
-    static QJsonObject openApiDescriptor()
+    static QJsonObject openApiDescriptor(const QVariantMap&)
     {
-        return utils::getPropertyOpenApiDescriptor(QMetaType::fromType<T>());
+        return utils::getPropertyOpenApiDescriptor(QMetaType::fromType<T>(), true);
     }
 
 protected:

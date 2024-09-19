@@ -36,7 +36,7 @@ public:
     void setCheckType(ObjectLookupCheckType type);
 
     bool match(const QVariant& eventValue) const override;
-    static QJsonObject openApiDescriptor();
+    static QJsonObject openApiDescriptor(const QVariantMap& properties);
 
 signals:
     void valueChanged();

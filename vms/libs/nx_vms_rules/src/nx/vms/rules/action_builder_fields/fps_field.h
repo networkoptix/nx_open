@@ -21,6 +21,14 @@ class NX_VMS_RULES_API FpsField: public SimpleTypeActionField<int, FpsField>
 public:
     using SimpleTypeActionField<int, FpsField>::SimpleTypeActionField;
 
+    static QJsonObject openApiDescriptor(const QVariantMap& properties)
+    {
+        auto descriptor = SimpleTypeActionField::openApiDescriptor(properties);
+        descriptor[utils::kDescriptionProperty] = "If the value is set to 0, "
+            "the maximum available FPS for the recording device will be used.";
+        return descriptor;
+    }
+
 signals:
     void valueChanged();
 };

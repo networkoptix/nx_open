@@ -17,11 +17,15 @@ const ItemDescriptor& PlaySoundAction::manifest()
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<PlaySoundAction>(),
         .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Play Sound")),
+        .description = "Play sound on the specified device(s) and display desktop notification.",
         .flags = {ItemFlag::instant},
         .executionTargets = {ExecutionTarget::clients, ExecutionTarget::servers},
         .targetServers = TargetServers::resourceOwner,
         .fields = {
-            makeFieldDescriptor<SoundField>(utils::kSoundFieldName, {}),
+            makeFieldDescriptor<SoundField>(utils::kSoundFieldName,
+                {},
+                {},
+                FieldProperties{.optional = false}.toVariantMap()),
             makeFieldDescriptor<TargetDevicesField>(
                 utils::kDeviceIdsFieldName,
                 Strings::at(),

@@ -90,16 +90,18 @@ QVariant HttpAuthField::build(const AggregatedEventPtr& /*eventAggregator*/) con
     return QVariant::fromValue(auth());
 }
 
-QJsonObject HttpAuthField::openApiDescriptor()
+QJsonObject HttpAuthField::openApiDescriptor(const QVariantMap&)
 {
-    auto result =  utils::constructOpenApiDescriptor<HttpAuthField>();
-    result["description"] =
+    auto descriptor =  utils::constructOpenApiDescriptor<HttpAuthField>();
+    descriptor[utils::kDescriptionProperty] =
         "If <b>authType</b> is set to one of the following values:"
         " <b>authBasicAndDigest</b>, <b>authDigest</b>, "
         "or <b>authBasic</b>, then the <b>login</b> and <b>password</b> "
         "fields must be set. <br/>"
         "If <b>authType</b> is set to <b>authBearer</b>, then the <b>token</b> field must be set.";
-    return result;
+    utils::updatePropertyForField(descriptor, "authType", "default", "authBasicAndDigest");
+    utils::updatePropertyForField(descriptor, "password", "format", "password");
+    return descriptor;
 }
 
 } // namespace nx::vms::rules

@@ -17,16 +17,13 @@ const ItemDescriptor& PanicRecordingAction::manifest()
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<PanicRecordingAction>(),
         .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Panic Recording")),
-        .description = NX_DYNAMIC_TRANSLATABLE(tr("Panic Recording mode switches recording "
-            "settings for all cameras to maximum FPS and quality.")),
+        .description = "Panic Recording mode switches recording "
+            "settings for all cameras to maximum FPS and quality.",
         .flags = ItemFlag::prolonged,
         .executionTargets = ExecutionTarget::servers,
         .targetServers = TargetServers::currentServer,
         .fields = {
-            utils::makeTimeFieldDescriptor<OptionalTimeField>(
-                    utils::kDurationFieldName,
-                    Strings::duration(),
-                    {},
+            utils::makeDurationFieldDescriptor(
                     TimeFieldProperties{
                         .value = 5s,
                         .maximumValue = 9999h}.toVariantMap()),

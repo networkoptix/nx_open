@@ -21,7 +21,7 @@ const ItemDescriptor& HttpAction::manifest()
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<HttpAction>(),
         .displayName = NX_DYNAMIC_TRANSLATABLE(tr("HTTP(S) Request")),
-        .description = {},
+        .description = "Send HTTP(S) request.",
         .executionTargets = ExecutionTarget::servers,
         .targetServers = TargetServers::currentServer,
         .fields = {
@@ -29,18 +29,22 @@ const ItemDescriptor& HttpAction::manifest()
                 NX_DYNAMIC_TRANSLATABLE(tr("URL")),
                 {},
                 TextWithFieldsFieldProperties{
+                    .base = FieldProperties{.optional = false},
                     .validationPolicy = kUrlValidationPolicy}.toVariantMap()),
             makeFieldDescriptor<HttpMethodField>("method",
-                NX_DYNAMIC_TRANSLATABLE(tr("Method"))),
+                NX_DYNAMIC_TRANSLATABLE(tr("Method")),
+                {},
+                {{"value", QString(network::http::Method::get.data())}}),
             makeFieldDescriptor<TextWithFields>("content",
                 NX_DYNAMIC_TRANSLATABLE(tr("Content"))),
             makeFieldDescriptor<ContentTypeField>("contentType",
-                NX_DYNAMIC_TRANSLATABLE(tr("Content type"))),
+                NX_DYNAMIC_TRANSLATABLE(tr("Content type")),
+                "If not set, it will be calculated based on the content value."),
             makeFieldDescriptor<HttpAuthField>("auth",
-                NX_DYNAMIC_TRANSLATABLE(tr("HTTP authentication"))),
-            // TODO: #sivanov Reuse makeIntervalFieldDescriptor instead.
-            utils::makeTimeFieldDescriptor<OptionalTimeField>(
-                utils::kIntervalFieldName,
+                NX_DYNAMIC_TRANSLATABLE(tr("HTTP authentication")),
+                "HTTP request authentication",
+                FieldProperties{.optional = false}.toVariantMap()),
+            utils::makeIntervalFieldDescriptor(
                 Strings::intervalOfAction(),
                 {},
                 TimeFieldProperties{.maximumValue = std::chrono::days(24855)}.toVariantMap())

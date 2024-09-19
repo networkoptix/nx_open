@@ -16,7 +16,7 @@ public:
     using ActionBuilderField::ActionBuilderField;
 
     QVariant build(const AggregatedEventPtr& eventAggregator) const override;
-    static QJsonObject openApiDescriptor();
+    static QJsonObject openApiDescriptor(const QVariantMap& properties);
 };
 
 } // namespace nx::vms::rules

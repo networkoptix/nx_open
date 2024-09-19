@@ -13,16 +13,14 @@ constexpr auto kUrlValidationPolicy = "url";
 
 struct TextWithFieldsFieldProperties
 {
-    /** Whether given field should be visible in the editor. */
-    bool visible{true};
+    FieldProperties base;
 
     QString validationPolicy;
 
     QVariantMap toVariantMap() const
     {
-        QVariantMap result;
+        QVariantMap result = base.toVariantMap();
 
-        result.insert("visible", visible);
         result.insert("validationPolicy", validationPolicy);
 
         return result;
@@ -32,7 +30,7 @@ struct TextWithFieldsFieldProperties
     {
         TextWithFieldsFieldProperties result;
 
-        result.visible = properties.value("visible", true).toBool();
+        result.base = FieldProperties::fromVariantMap(properties);
         result.validationPolicy = properties.value("validationPolicy").toString();
 
         return result;
@@ -58,7 +56,7 @@ public:
     QString text() const;
     void setText(const QString& text);
 
-    static QJsonObject openApiDescriptor();
+    static QJsonObject openApiDescriptor(const QVariantMap& properties);
 
     TextWithFieldsFieldProperties properties() const;
 

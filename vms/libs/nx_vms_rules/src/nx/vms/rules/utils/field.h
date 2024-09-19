@@ -11,6 +11,7 @@
 
 #include "../field.h"
 #include "../manifest.h"
+#include "../strings.h"
 
 namespace nx::vms::rules {
 
@@ -18,7 +19,7 @@ template<class T>
 FieldDescriptor makeFieldDescriptor(
     const QString& fieldName,
     const TranslatableString& displayName,
-    const TranslatableString& description = {},
+    const QString& description = {},
     const QVariantMap& properties = {})
 {
     return FieldDescriptor{
@@ -37,13 +38,13 @@ FieldDescriptor makeFieldDescriptor(
 template<>
 NX_VMS_RULES_API FieldDescriptor makeFieldDescriptor<EmailMessageField>(const QString& fieldName,
     const TranslatableString& displayName,
-    const TranslatableString& description,
+    const QString& description,
     const QVariantMap& properties);
 
 template<>
 NX_VMS_RULES_API FieldDescriptor makeFieldDescriptor<EventDevicesField>(const QString& fieldName,
     const TranslatableString& displayName,
-    const TranslatableString& description,
+    const QString& description,
     const QVariantMap& properties);
 
 namespace utils {
@@ -89,7 +90,7 @@ template <class T>
 FieldDescriptor makeTimeFieldDescriptor(
     const QString& fieldName,
     const TranslatableString& displayName,
-    const TranslatableString& description = {},
+    const QString& description = {},
     const QVariantMap& properties = {})
 {
     return makeFieldDescriptor<T>(
@@ -101,30 +102,36 @@ FieldDescriptor makeTimeFieldDescriptor(
 
 NX_VMS_RULES_API FieldDescriptor makeIntervalFieldDescriptor(
     const TranslatableString& displayName,
-    const TranslatableString& description = {});
+    const QString& description = {},
+    const QVariantMap& properties = {});
+
+NX_VMS_RULES_API FieldDescriptor makeDurationFieldDescriptor(const QVariantMap& properties,
+    const TranslatableString& displayName = Strings::duration(),
+    const QString& description = {});
 
 FieldDescriptor makePlaybackFieldDescriptor(
     const TranslatableString& displayName,
-    const TranslatableString& description = {});
+    const QString& description = {});
 
 FieldDescriptor makeStateFieldDescriptor(
     const TranslatableString& displayName,
-    const TranslatableString& description = {},
+    const QString& description = {},
     vms::rules::State defaultState = vms::rules::State::started);
 
 FieldDescriptor makeExtractDetailFieldDescriptor(
     const QString& fieldName,
     const QString& detailName);
 
-FieldDescriptor makeTextWithFieldsDescriptorWithVisibilityConfig(
-    const QString& fieldName,
-    const QString& formatString,
-    const TranslatableString& displayName);
+FieldDescriptor makeNotificationTextWithFieldsDescriptor(const QString& fieldName,
+    bool isVisibilityConfigurable = false,
+    QString defaultText = {},
+    TranslatableString displayName = {},
+    QString description = {});
 
 FieldDescriptor makeActionFlagFieldDescriptor(
     const QString& fieldName,
     const TranslatableString& displayName,
-    const TranslatableString& description = {},
+    const QString& description = {},
     bool defaultValue = false);
 
 template <class T, class E>

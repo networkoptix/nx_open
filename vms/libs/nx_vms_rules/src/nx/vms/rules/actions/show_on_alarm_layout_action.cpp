@@ -20,36 +20,35 @@ const ItemDescriptor& ShowOnAlarmLayoutAction::manifest()
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<ShowOnAlarmLayoutAction>(),
         .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Show on Alarm Layout")),
+        .description = "Put the given device(s) to the Alarm Layout.",
         .executionTargets = ExecutionTarget::clients,
         .fields = {
-            makeFieldDescriptor<TargetDevicesField>(
-                utils::kDeviceIdsFieldName,
+            makeFieldDescriptor<TargetDevicesField>(utils::kDeviceIdsFieldName,
                 {},
                 {},
-                ResourceFilterFieldProperties{}.toVariantMap()),
+                ResourceFilterFieldProperties{.base = FieldProperties{.optional = false}}
+                    .toVariantMap()),
             makeFieldDescriptor<TargetUsersField>(utils::kUsersFieldName,
                 Strings::to(),
-                {},
+                "By default, all power user group IDs are used as the value.",
                 ResourceFilterFieldProperties{
                     .ids = nx::utils::toQSet(vms::api::kAllPowerUserGroupIds)
                 }.toVariantMap()),
             utils::makeActionFlagFieldDescriptor("forceOpen",
                 NX_DYNAMIC_TRANSLATABLE(tr("Force Alarm Layout Opening")),
-                {},
+                "Specifies whether the layout must be forcibly opened or not.",
                 /*defaultValue*/ true),
             utils::makePlaybackFieldDescriptor(Strings::rewind()),
             utils::makeIntervalFieldDescriptor(Strings::intervalOfAction()),
 
             makeFieldDescriptor<EventDevicesField>("eventDeviceIds", {}),
-            utils::makeTextWithFieldsDescriptorWithVisibilityConfig(utils::kCaptionFieldName,
-                tr("Alarm: %1").arg("{event.caption}"),
-                NX_DYNAMIC_TRANSLATABLE(tr("Caption"))),
-            utils::makeTextWithFieldsDescriptorWithVisibilityConfig(utils::kDescriptionFieldName,
-                "{event.description}",
-                NX_DYNAMIC_TRANSLATABLE(tr("Description"))),
-            utils::makeTextWithFieldsDescriptorWithVisibilityConfig(utils::kTooltipFieldName,
-                "{event.extendedDescription}",
-                NX_DYNAMIC_TRANSLATABLE(tr("Tooltip text"))),
+            utils::makeNotificationTextWithFieldsDescriptor(
+                utils::kCaptionFieldName, /* isVisibilityConfigurable */ true,
+                tr("Alarm: %1").arg("{event.caption}")),
+            utils::makeNotificationTextWithFieldsDescriptor(
+                utils::kDescriptionFieldName, /* isVisibilityConfigurable */ true),
+            utils::makeNotificationTextWithFieldsDescriptor(
+                utils::kTooltipFieldName, /* isVisibilityConfigurable */ true),
             utils::makeExtractDetailFieldDescriptor("sourceName",
                 utils::kSourceNameDetailName),
         },

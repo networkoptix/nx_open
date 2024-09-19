@@ -27,7 +27,7 @@ QVariant EmailMessageField::build(const AggregatedEventPtr& eventAggregator) con
     return QVariant::fromValue(nx::email::Message{});
 }
 
-QJsonObject EmailMessageField::openApiDescriptor()
+QJsonObject EmailMessageField::openApiDescriptor(const QVariantMap&)
 {
     return {};
 }

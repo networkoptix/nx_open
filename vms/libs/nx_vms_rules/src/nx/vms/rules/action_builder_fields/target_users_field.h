@@ -27,6 +27,7 @@ public:
     TargetUsersField(common::SystemContext* context, const FieldDescriptor* descriptor);
 
     QnUserResourceSet users() const;
+    static QJsonObject openApiDescriptor(const QVariantMap& properties);
 };
 
 } // namespace nx::vms::rules

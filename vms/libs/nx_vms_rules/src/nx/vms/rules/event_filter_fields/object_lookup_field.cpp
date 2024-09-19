@@ -156,10 +156,10 @@ bool ObjectLookupField::match(const QVariant& eventValue) const
     return m_checkType == ObjectLookupCheckType::inList ? hasEntry : !hasEntry;
 }
 
-QJsonObject ObjectLookupField::openApiDescriptor()
+QJsonObject ObjectLookupField::openApiDescriptor(const QVariantMap&)
 {
     auto result = utils::constructOpenApiDescriptor<ObjectLookupField>();
-    result["description"] =
+    result[utils::kDescriptionProperty] =
         "Set the <b>UUID</b> of the Lookup List as the value for the check types <b>inList</b> "
         "or <b>notInList</b>.<br/>"
         "To find the required Lookup List, "

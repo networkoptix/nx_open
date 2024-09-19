@@ -17,6 +17,15 @@ class NX_VMS_RULES_API PtzPresetField: public SimpleTypeActionField<QString, Ptz
 public:
     using SimpleTypeActionField<QString, PtzPresetField>::SimpleTypeActionField;
 
+    static QJsonObject openApiDescriptor(const QVariantMap& properties)
+    {
+        auto descriptor = SimpleTypeField::openApiDescriptor(properties);
+        descriptor[utils::kDescriptionProperty] =
+            "To find the required Ptz Preset, "
+            "refer to the response of the request to /rest/v4/devices/{deviceId}/ptz/presets.";
+        return descriptor;
+    }
+
 signals:
     void valueChanged();
 };

@@ -27,7 +27,7 @@ public:
     using vms::rules::EventFilterField::EventFilterField;
 
     virtual bool match(const QVariant&) const override { return false; };
-    static QJsonObject openApiDescriptor() { return {}; }
+    static QJsonObject openApiDescriptor(const QVariantMap&) { return {}; }
 
 public:
     nx::Uuid id;
@@ -52,7 +52,7 @@ public:
     using vms::rules::ActionBuilderField::ActionBuilderField;
 
     virtual QVariant build(const AggregatedEventPtr&) const override { return {}; }
-    static QJsonObject openApiDescriptor() { return {}; }
+    static QJsonObject openApiDescriptor(const QVariantMap& properties) { return {}; }
 };
 
 } // namespace nx::vms::rules::test
