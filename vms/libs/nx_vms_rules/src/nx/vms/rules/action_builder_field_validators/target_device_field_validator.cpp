@@ -5,16 +5,40 @@
 #include <core/resource/device_dependent_strings.h>
 #include <nx/vms/rules/camera_validation_policy.h>
 
+#include "../action_builder.h"
 #include "../action_builder_fields/target_devices_field.h"
+#include "../action_builder_fields/target_users_field.h"
 #include "../engine.h"
 #include "../event_filter.h"
 #include "../rule.h"
 #include "../strings.h"
 #include "../utils/event.h"
+#include "../utils/field.h"
 #include "../utils/resource.h"
 #include "../utils/validity.h"
 
 namespace nx::vms::rules {
+
+namespace {
+
+bool hasAdditionalRecipients(
+    const Rule* rule,
+    const ResourceFilterFieldProperties& properties,
+    common::SystemContext* context)
+{
+    if (properties.validationPolicy != kCameraAudioTransmissionValidationPolicy)
+        return false;
+
+    const auto targetUsersField =
+        rule->actionBuilders().first()->fieldByName<vms::rules::TargetUsersField>(
+            vms::rules::utils::kUsersFieldName);
+    if (!targetUsersField)
+        return false;
+
+    return !utils::users(targetUsersField->selection(), context).isEmpty();
+}
+
+} // namespace
 
 ValidationResult TargetDeviceFieldValidator::validity(
     const Field* field, const Rule* rule, common::SystemContext* context) const
@@ -35,6 +59,7 @@ ValidationResult TargetDeviceFieldValidator::validity(
     const auto targetDeviceFieldProperties = targetDeviceField->properties();
     const bool isValidSelection = !camerasSelection.ids.empty()
         || targetDeviceField->useSource()
+        || hasAdditionalRecipients(rule, targetDeviceFieldProperties, context)
         || targetDeviceFieldProperties.allowEmptySelection;
 
     if (!isValidSelection)

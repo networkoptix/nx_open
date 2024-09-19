@@ -212,7 +212,7 @@ QString Strings::getName(const QnMediaServerResourceList& resources)
 }
 
 QString Strings::getName(
-    const QnUserResourceList& users, api::UserGroupDataList& groups, int additionalCount)
+    const QnUserResourceList& users, const api::UserGroupDataList& groups, int additionalCount)
 {
     if (users.empty() && groups.empty() && additionalCount == 0)
         return selectString();
@@ -221,40 +221,12 @@ QString Strings::getName(
     if (users.empty() && groups.empty())
         return additionalName;
 
-    QString baseName;
-    if (users.size() == 1 && groups.empty())
-    {
-        baseName = users.front()->getName();
-    }
-    else if (users.empty() && groups.size() <= 2)
-    {
-        QStringList groupNames;
-        for (const auto& group: groups)
-            groupNames.push_back(group.name);
-
-        groupNames.sort(Qt::CaseInsensitive);
-
-        baseName = groupNames.join(", ");
-    }
-    else if (groups.empty())
-    {
-        baseName = tr("%n Users", "", static_cast<int>(users.size()));
-    }
-    else if (!users.empty())
-    {
-        baseName = QString{"%1, %2"}
-            .arg(tr("%n Groups", "", static_cast<int>(groups.size())))
-            .arg(tr("%n Users", "", static_cast<int>(users.size())));
-    }
-    else
-    {
-        baseName = tr("%n Groups", "", static_cast<int>(groups.size()));
-    }
+    auto nameForUsersAndGroups = getName(users, groups);
 
     if (additionalCount != 0)
-        return QString{"%1, %2 additional"}.arg(baseName).arg(additionalCount);
+        return QString{"%1, %2"}.arg(nameForUsersAndGroups).arg(additionalName);
 
-    return baseName;
+    return nameForUsersAndGroups;
 }
 
 QString Strings::selectString()
@@ -285,6 +257,52 @@ QString Strings::isNotListed()
 QString Strings::in()
 {
     return tr("In");
+}
+
+QString Strings::targetRecipientsString(
+    const QnUserResourceList& users,
+    const api::UserGroupDataList& groups,
+    const QStringList& additionalRecipients)
+{
+    QStringList result = additionalRecipients;
+
+    const auto nameForUsersAndGroups = getName(users, groups);
+    if (!nameForUsersAndGroups.isEmpty())
+        result.push_front(nameForUsersAndGroups);
+
+    return result.join("; ");
+}
+
+QString Strings::getName(const QnUserResourceList& users, const api::UserGroupDataList& groups)
+{
+    if (users.empty() && groups.empty())
+        return {};
+
+    if (users.size() == 1 && groups.empty())
+        return users.front()->getName();
+
+    if (users.empty() && groups.size() <= 2)
+    {
+        QStringList groupNames;
+        for (const auto& group: groups)
+            groupNames.push_back(group.name);
+
+        groupNames.sort(Qt::CaseInsensitive);
+
+        return groupNames.join(", ");
+    }
+
+    if (groups.empty())
+        return tr("%n Users", "", static_cast<int>(users.size()));
+
+    if (!users.empty())
+    {
+        return QString{"%1, %2"}
+            .arg(tr("%n Groups", "", static_cast<int>(groups.size())))
+            .arg(tr("%n Users", "", static_cast<int>(users.size())));
+    }
+
+    return tr("%n Groups", "", static_cast<int>(groups.size()));
 }
 
 } // namespace nx::vms::client::desktop::rules
