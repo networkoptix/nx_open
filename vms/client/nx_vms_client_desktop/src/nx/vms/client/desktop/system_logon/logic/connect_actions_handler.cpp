@@ -594,6 +594,7 @@ void ConnectActionsHandler::hideReconnectDialog()
 
 void ConnectActionsHandler::handleConnectionError(RemoteConnectionError error)
 {
+    NX_WARNING(this, "Connection failed: %1", error.toString());
     if (!NX_ASSERT(qnRuntime->isDesktopMode()))
         return;
 
@@ -966,6 +967,7 @@ void ConnectActionsHandler::connectToServerInNonDesktopMode(const LogonData& log
         {
             if (const auto error = std::get_if<RemoteConnectionError>(&result))
             {
+                NX_WARNING(this, "Connection failed: %1", error->toString());
                 if (qnRuntime->isVideoWallMode())
                 {
                     if (*error == RemoteConnectionErrorCode::forbiddenRequest)
@@ -1361,8 +1363,9 @@ void ConnectActionsHandler::at_selectCurrentServerAction_triggered()
             if (NX_ASSERT(dialog))
                 delete dialog.data();
 
-            if (std::get_if<RemoteConnectionError>(&result))
+            if (const auto error = std::get_if<RemoteConnectionError>(&result))
             {
+                NX_WARNING(this, "Connection failed: %1", error->toString());
                 reportServerSelectionFailure();
             }
             else
