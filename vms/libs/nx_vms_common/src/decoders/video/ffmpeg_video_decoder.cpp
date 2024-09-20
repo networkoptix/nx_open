@@ -189,6 +189,8 @@ void QnFfmpegVideoDecoder::processNewResolutionIfChanged(const QnConstCompressed
         m_needRecreate = false;
         resetDecoder(data);
     }
+    if (data->flags.testFlag(QnAbstractMediaData::MediaFlags_newCodecParams))
+        resetDecoder(data);
 }
 
 void QnFfmpegVideoDecoder::setMultiThreadDecoding(bool value)
