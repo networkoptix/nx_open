@@ -114,7 +114,7 @@
     </message>
     <message>
       <source>Control Video Wall</source>
-      <translation>Kiểm soát bức tường video</translation>
+      <translation>Điều khiển Tường video</translation>
     </message>
     <message>
       <source>Push my screen</source>
@@ -194,15 +194,15 @@
     </message>
     <message>
       <source>Folder...</source>
-      <translation>Table of Contents...</translation>
+      <translation>Thư mục...</translation>
     </message>
     <message>
       <source>Web Client...</source>
-      <translation>Khách hàng web...</translation>
+      <translation>Ứng dụng khách Web...</translation>
     </message>
     <message>
       <source>Open Web Client...</source>
-      <translation>Mở một khách hàng web...</translation>
+      <translation>Mở ứng dụng khách Web...</translation>
     </message>
     <message>
       <source>Save Current Layout</source>
@@ -280,12 +280,12 @@
     <message>
       <source>Log out from %1</source>
       <comment>Log out from Nx Cloud</comment>
-      <translation>Đăng xuất từ %1</translation>
+      <translation>Đăng xuất %1</translation>
     </message>
     <message>
       <source>Open %1 Portal...</source>
       <comment>Open Nx Cloud Portal</comment>
-      <translation>Mở Cổng... %1...</translation>
+      <translation>Mở %1...</translation>
     </message>
     <message>
       <source>Account Settings...</source>
@@ -417,7 +417,7 @@
     </message>
     <message>
       <source>Stop Video Wall</source>
-      <translation>Bức tường video stop</translation>
+      <translation>Dừng Tường video</translation>
     </message>
     <message>
       <source>Clear Screen</source>
@@ -593,7 +593,7 @@
     </message>
     <message>
       <source>Video Wall Settings...</source>
-      <translation>Thiết lập bức tường video...</translation>
+      <translation>Cài đặt Tường video...</translation>
     </message>
     <message>
       <source>Add Device...</source>
@@ -3863,7 +3863,7 @@ to %1</source>
     </message>
     <message>
       <source>Never</source>
-      <translation>Thường xuyên</translation>
+      <translation>Không hết hạn</translation>
     </message>
     <message>
       <source>Expired</source>
@@ -3957,7 +3957,7 @@ to %1</source>
       <source>At least %1 are required</source>
       <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
       <translation>
-        <numerusform>Ít nhất %1 là bắt buộc</numerusform>
+        <numerusform>Cần có tối thiểu %1</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -3975,7 +3975,7 @@ to %1</source>
     <name>QnLicenseWidget</name>
     <message>
       <source>Activate Trial License</source>
-      <translation>Bắt đầu cấp giấy phép thử nghiệm</translation>
+      <translation>Kích hoạt giấy phép dùng thử</translation>
     </message>
     <message>
       <source>Open License File</source>
@@ -4684,7 +4684,7 @@ to %1</source>
     </message>
     <message>
       <source>URL</source>
-      <translation>Nơi</translation>
+      <translation>URL</translation>
     </message>
     <message>
       <source>Server</source>
@@ -5085,7 +5085,7 @@ to %1</source>
     </message>
     <message>
       <source>Activate License</source>
-      <translation>Bắt đầu Authorization</translation>
+      <translation>Kích hoạt giấy phép</translation>
     </message>
     <message>
       <source>Please check authentication information</source>
@@ -6194,11 +6194,11 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <name>QnWorkbenchVideoWallHandler</name>
     <message>
       <source>Video Wall</source>
-      <translation>Bức tường video</translation>
+      <translation>Tường video</translation>
     </message>
     <message>
       <source>Video Wall %1</source>
-      <translation>Bức tường video %1</translation>
+      <translation>Tường video %1</translation>
     </message>
     <message>
       <source>New Video Wall...</source>
@@ -6224,7 +6224,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Stop Video Wall?</source>
-      <translation>Dừng Video Wall?</translation>
+      <translation>Dừng Tường Video?</translation>
     </message>
     <message>
       <source>To start it again, you should have physical access to its computer.</source>
@@ -9346,7 +9346,7 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
     </message>
     <message>
       <source>Please update %1 manually using an installation package.</source>
-      <translation>Hãy cập nhật %1 sử dụng gói cài đặt bằng tay.</translation>
+      <translation>Vui lòng cập nhật %1 theo cách thủ công bằng cách sử dụng gói cài đặt.</translation>
     </message>
     <message>
       <source>%1 will be restarted to the updated version.</source>
@@ -9410,7 +9410,7 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
     </message>
     <message>
       <source>Update to Specific Build</source>
-      <translation>Cập nhật lên phiên bản riêng biệt</translation>
+      <translation>Cập nhật lên Bản dựng riêng</translation>
     </message>
     <message>
       <source>Downloading client package...</source>
@@ -9470,7 +9470,7 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
     </message>
     <message>
       <source>Specific Build</source>
-      <translation>Phiên bản riêng biệt</translation>
+      <translation>Bản dựng riêng</translation>
     </message>
     <message>
       <source>Browse for Update File</source>
@@ -9804,7 +9804,7 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
     </message>
     <message>
       <source>URL</source>
-      <translation>Nơi</translation>
+      <translation>URL</translation>
     </message>
     <message>
       <source>URL cannot be empty.</source>

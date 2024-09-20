@@ -461,7 +461,7 @@
     </message>
     <message>
       <source>Professional</source>
-      <translation>Đặc trưng</translation>
+      <translation>Professional</translation>
     </message>
     <message>
       <source>Edge</source>
@@ -473,7 +473,7 @@
     </message>
     <message>
       <source>Video Wall</source>
-      <translation>Bức tường video</translation>
+      <translation>Tường video</translation>
     </message>
     <message>
       <source>I/O Module</source>
@@ -493,7 +493,7 @@
     </message>
     <message>
       <source>Professional Licenses</source>
-      <translation>Giấy phép Chuyên nghiệp</translation>
+      <translation>Giấy phép Professional</translation>
     </message>
     <message>
       <source>Edge Licenses</source>
@@ -562,7 +562,7 @@
     <message numerus="yes">
       <source>%n Professional Licenses</source>
       <translation>
-        <numerusform>Giấy phép Chuyên nghiệp %n</numerusform>
+        <numerusform>%n Giấy phép Professional</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -641,7 +641,7 @@
       <source>%n/%1 Professional Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n%1 Giấy phép chuyên nghiệp</numerusform>
+        <numerusform>%n/%1 Giấy phép Professional</numerusform>
       </translation>
     </message>
     <message numerus="yes">
