@@ -73,7 +73,7 @@ const QString& EventLogModelData::compareString() const
     return m_compareString;
 }
 
-const QVariantMap EventLogModelData::actionDetails(SystemContext* context) const
+const QVariantMap& EventLogModelData::actionDetails(SystemContext* context) const
 {
     if (m_actionDetails.empty())
         m_actionDetails = action(context)->details(context);

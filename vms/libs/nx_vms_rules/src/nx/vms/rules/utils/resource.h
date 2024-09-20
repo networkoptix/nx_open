@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <QtCore/QVariant>
+
 #include <core/resource/resource_fwd.h>
 
 #include "../rules_fwd.h"
@@ -35,9 +37,31 @@ NX_VMS_RULES_API QnVirtualCameraResourceList cameras(
     const UuidSelection& selection,
     const common::SystemContext* context);
 
-NX_VMS_RULES_API UuidList getResourceIds(const QObject* entity, std::string_view fieldName);
+template <class T>
+UuidList fieldResourceIds(const T& entity, std::string_view fieldName)
+{
+    const auto value = entity->property(fieldName.data());
+
+    if (!value.isValid())
+        return {};
+
+    UuidList result;
+
+    if (value.template canConvert<UuidList>())
+        result = value.template value<UuidList>();
+    else if (value.template canConvert<nx::Uuid>())
+        result.emplace_back(value.template value<nx::Uuid>());
+
+    result.removeAll({});
+
+    return result;
+}
 
 NX_VMS_RULES_API UuidList getDeviceIds(const AggregatedEventPtr& event);
+NX_VMS_RULES_API UuidList getDeviceIds(const ActionPtr& action);
+
+NX_VMS_RULES_API UuidList getServerIds(const ActionPtr& action);
+
 NX_VMS_RULES_API UuidList getResourceIds(const AggregatedEventPtr& event);
 NX_VMS_RULES_API UuidList getResourceIds(const ActionPtr& action);
 

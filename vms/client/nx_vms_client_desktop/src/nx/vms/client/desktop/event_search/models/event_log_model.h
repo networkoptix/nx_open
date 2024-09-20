@@ -41,11 +41,11 @@ public:
     QList<Column> columns() const;
     void setColumns(const QList<Column>& columns);
 
-    virtual QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex()) const override;
+    virtual QModelIndex index(int row, int column, const QModelIndex& parent = {}) const override;
     virtual QModelIndex parent(const QModelIndex& child) const override;
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
-    virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
-    virtual void sort(int column, Qt::SortOrder order = Qt::AscendingOrder) override;
+    virtual QVariant data(const QModelIndex& index, int role) const override;
+    virtual void sort(int column, Qt::SortOrder order) override;
 
     virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;
     virtual int columnCount(const QModelIndex& parent = QModelIndex()) const override;
@@ -72,8 +72,6 @@ private:
     static int helpTopicIdData(Column column, const EventLogModelData& data);
 
     QString motionUrl(Column column, const EventLogModelData& data) const;
-
-    QString getResourceName(const QnResourcePtr& resource) const;
 
     bool hasVideoLink(const EventLogModelData& data) const;
     bool hasAccessToArchive(const nx::Uuid& cameraId) const;

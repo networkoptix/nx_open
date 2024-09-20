@@ -12,6 +12,7 @@
 #include "../field.h"
 #include "../manifest.h"
 #include "../strings.h"
+#include "field_names.h"
 
 namespace nx::vms::rules {
 
@@ -48,43 +49,6 @@ NX_VMS_RULES_API FieldDescriptor makeFieldDescriptor<EventDevicesField>(const QS
     const QVariantMap& properties);
 
 namespace utils {
-
-static constexpr auto kAcknowledgeFieldName = "acknowledge";
-static constexpr auto kAttributesFieldName = "attributes";
-static constexpr auto kCameraIdFieldName = "cameraId";
-static constexpr auto kCaptionFieldName = "caption";
-static constexpr auto kDescriptionFieldName = "description";
-static constexpr auto kDetailingFieldName = "detailing";
-static constexpr auto kDeviceIdsFieldName = "deviceIds";
-static constexpr auto kDurationFieldName = "duration";
-static constexpr auto kEmailsFieldName = "emails";
-static constexpr auto kEventTypeIdFieldName = "eventTypeId";
-static constexpr auto kEngineIdFieldName = "engineId";
-static constexpr auto kExtendedCaptionFieldName = "extendedCaption";
-static constexpr auto kIdFieldName = "id";
-static constexpr auto kIntervalFieldName = "interval";
-static constexpr auto kLayoutIdFieldName = "layoutId";
-static constexpr auto kLayoutIdsFieldName = "layoutIds";
-static constexpr auto kMessageFieldName = "message";
-static constexpr auto kNameFieldName = "name";
-static constexpr auto kObjectTypeIdFieldName = "objectTypeId";
-static constexpr auto kOmitLoggingFieldName = "omitLogging";
-static constexpr auto kPlaybackTimeFieldName = "playbackTime";
-static constexpr auto kRecordAfterFieldName = "recordAfter";
-static constexpr auto kRecordBeforeFieldName = "recordBefore";
-static constexpr auto kServerIdFieldName = "serverId";
-static constexpr auto kServerIdsFieldName = "serverIds";
-static constexpr auto kSoundFieldName = "sound";
-static constexpr auto kSourceFieldName = "source";
-static constexpr auto kStateFieldName = "state";
-static constexpr auto kTagsFieldName = "tags";
-static constexpr auto kTextFieldName = "text";
-static constexpr auto kTimestampFieldName = "timestamp";
-static constexpr auto kTooltipFieldName = "tooltip";
-static constexpr auto kUrlFieldName = "url";
-static constexpr auto kUsersFieldName = "users";
-static constexpr auto kUserIdFieldName = "userId";
-static constexpr auto kVolumeFieldName = "volume";
 
 template <class T>
 FieldDescriptor makeTimeFieldDescriptor(
