@@ -24,7 +24,7 @@ namespace nx::vms::api::analytics {
 
 struct NX_VMS_API IntegrationRequestIdentity
 {
-    /**%apidoc Integration request id. */
+    /**%apidoc[readonly] Integration request id. */
     nx::Uuid requestId;
 
     IntegrationRequestIdentity() = default;
@@ -109,16 +109,16 @@ struct NX_VMS_API IntegrationRequestData: public RegisterIntegrationRequest
     {
     }
 
-    /**%apidoc Timestamp of the Integration request creation or last update. */
+    /**%apidoc[readonly] Timestamp of the Integration request creation or last update. */
     std::chrono::milliseconds timestampMs{};
 
-    /**%apidoc IP address the request was received from. */
+    /**%apidoc[readonly] IP address the request was received from. */
     QString requestAddress;
 
-    /**%apidoc Whether the request is approved or not. */
+    /**%apidoc[readonly] Whether the request is approved or not. */
     bool isApproved = false;
 
-     /**%apidoc Integration id. Set when the Integration request is approved. */
+     /**%apidoc[readonly] Integration id. Set when the Integration request is approved. */
     std::optional<nx::Uuid> integrationId;
 
     bool operator==(const IntegrationRequestData& other) const = default;
