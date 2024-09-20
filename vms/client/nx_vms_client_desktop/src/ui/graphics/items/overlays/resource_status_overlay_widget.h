@@ -51,8 +51,10 @@ public:
     void setCaption(const QString& caption);
     void setButtonText(const QString& text);
     void setCustomButtonText(const QString& text);
-    void setTooltip(const QString& tooltip) {} //< TODO: zkarakas
+    void setTooltip(const QString& tooltip);
     void setShowGlow(bool showGlow);
+
+    QString tooltip();
 
     static void generateBackgrounds();
 
@@ -60,6 +62,10 @@ signals:
     void actionButtonClicked();
     void customButtonClicked();
     void closeButtonClicked();
+    void tooltipUpdated(const QPoint& pos = {});
+
+protected:
+    bool eventFilter(QObject* obj, QEvent* ev) override;
 
 private:
     void setupPreloader();
@@ -102,6 +108,8 @@ private:
     // Extras
     QPushButton* const m_button;
     QPushButton* const m_customButton;
+
+    QString m_tooltip;
 
     static QThreadPool s_threadPool;
 

@@ -228,6 +228,9 @@ QnStatusOverlayWidget::QnStatusOverlayWidget(QGraphicsWidget* parent):
 {
     makeTransparentForMouse(this);
 
+    m_centralContainer->installEventFilter(this);
+    m_centralContainer->setAttribute(Qt::WA_Hover);
+
     connect(this, &GraphicsWidget::geometryChanged, this, &QnStatusOverlayWidget::updateAreaSizes);
     connect(this, &GraphicsWidget::scaleChanged, this, &QnStatusOverlayWidget::updateAreaSizes);
     connect(m_button, &QPushButton::clicked, this, &QnStatusOverlayWidget::actionButtonClicked);
@@ -351,9 +354,28 @@ void QnStatusOverlayWidget::setCustomButtonText(const QString& text)
     updateAreaSizes();
 }
 
+void QnStatusOverlayWidget::setTooltip(const QString& tooltip)
+{
+    if (tooltip != m_tooltip)
+    {
+        m_tooltip = tooltip;
+        if (m_centralAreaImage->underMouse() || m_caption->underMouse())
+        {
+            // Fake enter event to re-send tooltip changed message.
+            QEnterEvent event({}, {}, {});
+            eventFilter(m_caption->underMouse() ? m_caption : m_centralAreaImage, &event);
+        }
+    }
+}
+
 void QnStatusOverlayWidget::setShowGlow(bool showGlow)
 {
     m_showGlow = showGlow;
+}
+
+QString QnStatusOverlayWidget::tooltip()
+{
+    return m_tooltip;
 }
 
 void QnStatusOverlayWidget::generateBackgrounds()
@@ -410,6 +432,51 @@ void QnStatusOverlayWidget::generateBackgrounds()
                 colorTheme()->color("red"),
                 colorTheme()->color("dark4"));
         });
+}
+
+bool QnStatusOverlayWidget::eventFilter(QObject* obj, QEvent* event)
+{
+    if (obj == m_centralContainer)
+    {
+        switch (event->type())
+        {
+            case QEvent::HoverEnter:
+            case QEvent::HoverMove:
+            {
+                QRect extendedImageArea;
+                if (m_centralAreaImage->isVisible())
+                {
+                    extendedImageArea.setRect(m_centralAreaImage->x(),
+                        m_centralAreaImage->y(),
+                        m_centralAreaImage->width(),
+                        m_caption->y() - m_centralAreaImage->y());
+                }
+                auto textWidth = m_caption->fontMetrics().horizontalAdvance(m_caption->text());
+                auto textRect = QRect{m_caption->x() + (m_caption->width() - textWidth) / 2,
+                    m_caption->y(),
+                    textWidth,
+                    m_caption->height()};
+
+                auto hoverEvent = static_cast<QHoverEvent*>(event);
+                if (extendedImageArea.contains(hoverEvent->position().toPoint())
+                    || textRect.contains(hoverEvent->position().toPoint()))
+                {
+                    constexpr int kTooltipOffset = 4;
+                    auto widget = m_centralAreaImage->isVisible() ? m_centralAreaImage : m_caption;
+                    QPoint aboveTop{widget->width() / 2, -kTooltipOffset};
+                    const auto& globalPos = widget->mapToGlobal(aboveTop);
+                    emit tooltipUpdated(globalPos);
+                    break;
+                }
+                [[fallthrough]];
+            }
+            case QEvent::HoverLeave:
+            case QEvent::Leave:
+                emit tooltipUpdated();
+                break;
+        }
+    }
+    return false;
 }
 
 void QnStatusOverlayWidget::setupPreloader()

@@ -8,6 +8,7 @@
 #include <QtWidgets/QGraphicsLinearLayout>
 #include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QGraphicsView>
+#include <QtWidgets/QGraphicsWidget>
 #include <QtWidgets/private/qpixmapfilter_p.h>
 
 #include <qt_graphics_items/graphics_label.h>
@@ -36,6 +37,7 @@
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/skin/font_config.h>
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
+#include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/style.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/graphics/items/overlays/selection_overlay_widget.h>
@@ -53,7 +55,7 @@
 #include <ui/graphics/items/generic/image_button_bar.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/generic/proxy_label.h>
-#include <ui/graphics/items/generic/viewport_bound_widget.h>
+#include <ui/graphics/items/generic/tool_tip_widget.h>
 #include <ui/graphics/items/overlays/hud_overlay_widget.h>
 #include <ui/graphics/items/overlays/resource_status_overlay_widget.h>
 #include <ui/graphics/items/overlays/resource_title_item.h>
@@ -78,11 +80,21 @@ using namespace nx::vms::client;
 using namespace nx::vms::client::desktop;
 using nx::vms::client::core::Geometry;
 
+QnToolTipWidget* QnResourceWidget::s_overlayTooltip;
+QGraphicsScene* QnResourceWidget::s_tooltipScene;
+QGraphicsWidget* QnResourceWidget::s_tooltipWidget;
+
 namespace {
 
 static constexpr QSize kTitleButtonSize(28, 28);
 
 static const qreal kHudMargin = 4.0;
+
+constexpr int kTooltipTextWidth = 180;
+constexpr int kTooltipTextHeight = 65;
+constexpr qreal kTooltipLineSpace = 125;
+
+constexpr int kArrowLength = 5;
 
 /** Default timeout before the video is displayed as "loading", in milliseconds. */
 #ifdef QN_RESOURCE_WIDGET_FLASHY_LOADING_OVERLAY
@@ -268,6 +280,8 @@ QnResourceWidget::QnResourceWidget(
 
 QnResourceWidget::~QnResourceWidget()
 {
+    if (s_overlayTooltip && s_overlayTooltip->isVisible() && s_tooltipWidget == this)
+        s_overlayTooltip->hide();
 }
 
 void QnResourceWidget::setupOverlayButtonsHandlers()
@@ -289,6 +303,36 @@ void QnResourceWidget::setupOverlayButtonsHandlers()
             setOverlayWidgetVisibility(m_statusOverlay, visibility, animated);
             updateButtons();
         });
+}
+
+void QnResourceWidget::setupOverlayTooltip()
+{
+    using namespace nx::vms::client::core;
+
+    constexpr qreal kRoundingRadius = 4.;
+    constexpr int kTailWidth = 12;
+
+    setPaletteColor(s_overlayTooltip, QPalette::Window, colorTheme()->color("light2"));
+    s_overlayTooltip->setTextColor(colorTheme()->color("dark5"));
+
+    const auto& kTooltipRect =
+        mapToScene(0, 0, kTooltipTextWidth, kTooltipTextHeight).boundingRect();
+    s_overlayTooltip->setGeometry(kTooltipRect);
+    s_overlayTooltip->setZValue(std::numeric_limits<qreal>::max());
+
+    constexpr int kSideMargin = nx::style::Metrics::kStandardPadding;
+    constexpr int kTopBottomMargin = 15;
+    s_overlayTooltip->setContentsMargins(
+        kSideMargin, kTopBottomMargin, kSideMargin, kTopBottomMargin);
+
+    const auto& rect = s_overlayTooltip->rect();
+    s_overlayTooltip->setTailPos(QPointF(
+        (rect.left() + rect.right()) / 2, rect.bottom() + kArrowLength));
+    s_overlayTooltip->setTailWidth(kTailWidth);
+
+    s_overlayTooltip->setRoundingRadius(kRoundingRadius);
+
+    s_overlayTooltip->hide();
 }
 
 // TODO: #ynikitenkov #high emplace back "titleLayout->setContentsMargins(0, 0, 0, 1);" fix
@@ -748,7 +792,30 @@ void QnResourceWidget::updateCheckedButtons()
 QVariant QnResourceWidget::itemChange(GraphicsItemChange change, const QVariant &value)
 {
     if (change == QGraphicsItem::ItemSelectedHasChanged)
+    {
         updateSelectedState();
+    }
+    else if (change == QGraphicsItem::ItemSceneHasChanged)
+    {
+        if (!s_overlayTooltip)
+        {
+            s_overlayTooltip = new QnToolTipWidget();
+            setupOverlayTooltip();
+        }
+
+        if (scene())
+        {
+            if (scene() != s_tooltipScene)
+            {
+                scene()->addItem(s_overlayTooltip);
+                s_tooltipScene = scene();
+            }
+            connect(m_statusOverlay,
+                &QnStatusOverlayWidget::tooltipUpdated,
+                this,
+                &QnResourceWidget::atOverlayTooltipChanged);
+        }
+    }
 
     return base_type::itemChange(change, value);
 }
@@ -872,7 +939,6 @@ QString QnResourceWidget::uuidString() const
 QString QnResourceWidget::toString() const
 {
     return nx::format("QnResourceWidget %1 (%2)").args(uuid(), m_resource);
-
 }
 
 void QnResourceWidget::moveToDedicatedWindow()
@@ -1368,7 +1434,6 @@ float QnResourceWidget::defaultAspectRatio() const
     return noAspectRatio;
 }
 
-
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
@@ -1391,16 +1456,19 @@ void QnResourceWidget::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
     const bool animate = display()->animationAllowed();
 
     setOverlayVisible(true, animate);
+    s_overlayTooltip->hide();
+
     base_type::hoverMoveEvent(event);
 }
 
-void QnResourceWidget::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
+void QnResourceWidget::hoverLeaveEvent(QGraphicsSceneHoverEvent* event)
 {
     m_mouseInWidget = false;
     const bool animate = display()->animationAllowed();
 
     setOverlayVisible(false, animate);
     updateHud(animate);
+
     base_type::hoverLeaveEvent(event);
 }
 
@@ -1458,4 +1526,39 @@ void QnResourceWidget::at_buttonBar_checkedButtonsChanged()
     const auto checkedButtons = titleBar()->rightButtonsBar()->checkedButtons();
     item()->setData(Qn::ItemCheckedButtonsRole, checkedButtons);
     update();
+}
+
+void QnResourceWidget::atOverlayTooltipChanged(const QPoint& pos)
+{
+    if (!pos.isNull() && !m_statusOverlay->tooltip().isEmpty())
+    {
+        s_overlayTooltip->setText(m_statusOverlay->tooltip(), kTooltipLineSpace);
+        s_overlayTooltip->setTextWidth(kTooltipTextWidth);
+        if (auto view = !scene()->views().isEmpty() ? scene()->views()[0] : nullptr)
+        {
+            s_overlayTooltip->setTailPos(
+                QPointF((s_overlayTooltip->rect().left() + s_overlayTooltip->rect().right()) / 2,
+                    s_overlayTooltip->rect().bottom() + kArrowLength));
+
+            QTransform sceneToViewport = view->viewportTransform();
+            qreal scale = 1.0
+                / std::sqrt(sceneToViewport.m11() * sceneToViewport.m11()
+                    + sceneToViewport.m12() * sceneToViewport.m12());
+            const auto& viewPos = view->mapFromGlobal(pos);
+            const auto& scenePos = view->mapToScene(viewPos);
+
+            auto tooltipSceneWidth = s_overlayTooltip->size().width() * scale;
+            auto tooltipSceneHeight = s_overlayTooltip->size().height() * scale;
+
+            auto x = scenePos.x() - tooltipSceneWidth / 2;
+            auto y = std::max(0., scenePos.y() - tooltipSceneHeight);
+            s_overlayTooltip->setPos(x, y);
+            s_overlayTooltip->show();
+            s_tooltipWidget = this;
+        }
+    }
+    else
+    {
+        s_overlayTooltip->hide();
+    }
 }
