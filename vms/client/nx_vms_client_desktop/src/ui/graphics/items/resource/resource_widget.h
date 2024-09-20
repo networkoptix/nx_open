@@ -26,6 +26,7 @@
 #include <ui/graphics/items/overlays/overlayed.h>
 
 class QGraphicsLinearLayout;
+class QGraphicsScene;
 
 class QnViewportBoundWidget;
 class QnResourceVideoLayout;
@@ -39,6 +40,7 @@ class QnResourceTitleItem;
 class GraphicsLabel;
 class QnStatusOverlayWidget;
 class QnHudOverlayWidget;
+class QnToolTipWidget;
 
 namespace nx::vms::client::desktop { class RewindOverlay; }
 
@@ -409,6 +411,7 @@ protected:
 
 private:
     void setupOverlayButtonsHandlers();
+    void setupOverlayTooltip();
 
     void setupHud();
     void setupSelectionOverlay();
@@ -425,6 +428,8 @@ private:
     Q_SLOT void at_infoButton_toggled(bool toggled);
 
     Q_SLOT void at_buttonBar_checkedButtonsChanged();
+
+    Q_SLOT void atOverlayTooltipChanged(const QPoint& pos);
 
 private:
     void updateSelectedState();
@@ -488,6 +493,10 @@ private:
     SelectionState m_selectionState;
 
     QPixmap m_placeholderPixmap;
+
+    static QnToolTipWidget* s_overlayTooltip;
+    static QGraphicsScene* s_tooltipScene;
+    static QGraphicsWidget *s_tooltipWidget;
 };
 
 typedef QList<QnResourceWidget *> QnResourceWidgetList;

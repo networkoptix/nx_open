@@ -142,32 +142,10 @@ QString statusIconPath(Qn::ResourceStatusOverlay overlay)
 
 QString tooltip(Qn::ResourceStatusOverlay overlay)
 {
-    static const auto kTooltipTemplate = QStringLiteral(R"(
-        <html>
-        <head>
-        <style>
-            p { line-height: 0.75; }
-        </style>
-        </head>
-        <body>
-            %1
-        </body>
-        </html>)");
-
-    if (auto it = overlayInfo().find(overlay); NX_ASSERT(it != overlayInfo().end()))
+    if (auto it = overlayInfo().find(overlay);
+        NX_ASSERT(it != overlayInfo().end()) && !it->second.tooltip.isEmpty())
     {
-        if (!it->second.tooltip.isEmpty())
-        {
-            const auto& lines = it->second.tooltip.split('\n');
-            QString result;
-            for (const auto& line: lines)
-            {
-                result += "<p>";
-                result += line;
-                result += "</p>\n";
-            }
-            return kTooltipTemplate.arg(result);
-        }
+        return it->second.tooltip;
     }
 
     return {};
