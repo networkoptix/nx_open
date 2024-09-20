@@ -510,7 +510,7 @@ bool QnGLRenderer::drawVideoTextures(
         (float)textureRect.right(), (float)textureRect.bottom(),
         (float)textureRect.x(), (float)textureRect.bottom()};
 
-    const float vertexCoordArray[] = {
+    float vertexCoordArray[] = {
         (float)viewRect.left(), (float)viewRect.top(),
         (float)viewRect.right(), (float)viewRect.top(),
         (float)viewRect.right(), (float)viewRect.bottom(),
@@ -541,25 +541,33 @@ bool QnGLRenderer::drawVideoTextures(
         ? m_fisheyeController->mediaDewarpingParams()
         : dewarping::MediaData();
 
-    const auto itemParams = m_fisheyeController
+    auto itemParams = m_fisheyeController
         ? m_fisheyeController->itemDewarpingParams()
         : dewarping::ViewData();
 
     float ar = 1.0;
     if (mediaParams.enabled && itemParams.enabled)
     {
-        ar = float(picLock->width()) / picLock->height();
-        const auto customAR = m_fisheyeController->customAR();
-        if (customAR.isValid())
-            ar = customAR.toFloat();
+        if (isDewarpingAllowed())
+        {
+            ar = float(picLock->width()) / picLock->height();
+            const auto customAR = m_fisheyeController->customAR();
+            if (customAR.isValid())
+                ar = customAR.toFloat();
 
-        programKey.dewarping = true;
+            programKey.dewarping = true;
 
-        programKey.viewProjection = itemParams.panoFactor > 1.0
-            ? MediaOutputShaderProgram::ViewProjection::equirectangular
-            : MediaOutputShaderProgram::ViewProjection::rectilinear;
+            programKey.viewProjection = itemParams.panoFactor > 1.0
+                ? MediaOutputShaderProgram::ViewProjection::equirectangular
+                : MediaOutputShaderProgram::ViewProjection::rectilinear;
 
-        programKey.cameraProjection = mediaParams.cameraProjection;
+            programKey.cameraProjection = mediaParams.cameraProjection;
+        }
+        else
+        {
+            std::rotate(vertexCoordArray, vertexCoordArray + 4, vertexCoordArray + 8);
+            itemParams.enabled = false;
+        }
     }
 
     if (!m_gl)
@@ -895,7 +903,12 @@ void QnGLRenderer::setFisheyeController(QnFisheyePtzController* controller)
 bool QnGLRenderer::isFisheyeEnabled() const
 {
     NX_MUTEX_LOCKER lock( &m_mutex );
-    return m_fisheyeController
+    return m_fisheyeController && isDewarpingAllowed()
         && m_fisheyeController->getCapabilities({nx::vms::common::ptz::Type::operational})
             != Ptz::Capability::NoPtzCapabilities;
+}
+
+bool QnGLRenderer::isDewarpingAllowed() const
+{
+    return !(m_lastDisplayedFlags & QnAbstractMediaData::MediaFlags_ReplacedVideo);
 }

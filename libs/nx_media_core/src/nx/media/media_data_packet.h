@@ -81,7 +81,7 @@ public:
         // Fast channel zapping flag.
         MediaFlags_FCZ                  = 0x01000,
 
-        MediaFlags_Reserved1            = 0x02000,
+        MediaFlags_ReplacedVideo        = 0x02000,
 
         // Hardware decoding is used.
         MediaFlags_HWDecodingUsed       = 0x04000,
@@ -102,6 +102,7 @@ public:
         // Media packet from old archive version that should be BOM decoded before decrpyption
         // This flag can be removed in a 5.3
         MediaFlags_BomDecoding         = 0x100000,
+
         MediaFlags_newCodecParams      = 0x200000
     )
 

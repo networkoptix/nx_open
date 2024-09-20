@@ -81,7 +81,9 @@ public:
     void setHistogramConsumer(QnHistogramConsumer* value);
 
 private:
-    void applyMixerSettings(qreal brightness, qreal contrast, qreal hue, qreal saturation); // deprecated
+    bool isDewarpingAllowed() const;
+    void applyMixerSettings(
+        qreal brightness, qreal contrast, qreal hue, qreal saturation); // deprecated
     ImageCorrectionResult calcImageCorrection();
 private:
     QOpenGLFunctions* const m_gl;
