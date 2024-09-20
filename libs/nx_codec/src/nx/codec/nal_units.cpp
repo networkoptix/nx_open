@@ -217,15 +217,17 @@ std::vector<uint8_t> convertStartCodesToSizes(const uint8_t* data, int32_t size,
     return result;
 }
 
-template <size_t arraySize>
-bool startsWith(const void* data, size_t size, const std::array<uint8_t, arraySize> value)
+int isStartCode(const void* _data, size_t size)
 {
-    return size >= value.size() && memcmp(data, value.data(), value.size()) == 0;
-}
-
-bool isStartCode(const void* data, size_t size)
-{
-    return startsWith(data, size, kStartCode) || startsWith(data, size, kStartCode3B);
+    const uint8_t* data = (const uint8_t*)_data;
+    if (size >= 3 && data[0] == 0 && data[1] == 0)
+    {
+        if (data[2] == 1)
+            return 3;
+        else if (size >= 4 && data[2] == 0 && data[3] == 1)
+            return 4;
+    }
+    return 0;
 }
 
 void convertToStartCodes(uint8_t* const data, const int size)
