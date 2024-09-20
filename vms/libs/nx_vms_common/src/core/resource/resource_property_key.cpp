@@ -251,6 +251,9 @@ const QString kOnvifIgnoreOutdatedNotifications("onvifIgnoreOutdatedNotification
 const QString kReRequestOnvifRecordingEventsIfAllEventsHaveSameTime(
     "reRequestOnvifRecordingEventsIfAllEventsHaveSameTime");
 
+const QString kOnvifForcePtzGetCompatibleConfigurationsSupported(
+    "onvifForcePtzGetCompatibleConfigurationsSupported");
+
 } // namespace ResourceDataKey
 
 //-------------------------------------------------------------------------------------------------
