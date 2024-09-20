@@ -314,16 +314,30 @@ Result H264Parser::processData(
                 clear();
                 return {false, NX_FMT("Failed to parse RTP packet, invalid FU_A_PACKET")};
             }
+            const bool startUnit = *curPtr & 0x80;
+            const bool endUnit = *curPtr & 0x40;
             uint8_t nalUnitType = NALUnit::decodeType(*curPtr); // FU header.
-            if (*curPtr & 0x80) // FU_A first packet
+            bool fixNalHeader = true;
+            if (startUnit) // FU_A first packet
             {
+                // Some cameras send startcode inside of FU unit, so drop it.
+                // ex: 80 00 00 00 01 41 ....
+                if (packetType == FU_A_PACKET)
+                {
+                    const int bufferSize = bufferEnd - curPtr;
+                    const int startCodeSize = nx::media::nal::isStartCode(curPtr + 1, bufferSize - 1);
+                    if (startCodeSize)
+                    {
+                        fixNalHeader = false;
+                        curPtr += startCodeSize + 1;
+                    }
+                }
                 updateNalFlags(curPtr, bufferEnd - curPtr);
                 m_firstSeqNum = sequenceNum;
                 m_packetPerNal = 0;
                 nalUnitType |= nalRefIDC;
             }
-
-            if (*curPtr & 0x40)
+            if (endUnit)
             {
                 // FU_A last packet
                 if (quint16(sequenceNum - m_firstSeqNum) != m_packetPerNal)
@@ -348,7 +362,8 @@ Result H264Parser::processData(
             {
                 // FU_A first packetf
                 --curPtr;
-                *curPtr = nalUnitType;
+                if (fixNalHeader)
+                    *curPtr = nalUnitType;
             }
             m_chunks.addChunk(
                 (int) (curPtr - rtpBufferBase),
