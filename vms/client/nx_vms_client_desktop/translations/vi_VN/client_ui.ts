@@ -3028,7 +3028,7 @@
     </message>
     <message>
       <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
-      <translation>Ghi vào vị trí lưu trữ bị vô hiệu hóa sẽ dừng lại. Tuy nhiên, việc xóa các đoạn phim lỗi thời khỏi nó sẽ tiếp tục.</translation>
+      <translation>Việc ghi vào vị trí lưu trữ bị vô hiệu hóa sẽ dừng lại. Tuy nhiên, việc xóa cảnh quay lỗi thời khỏi vị trí đó sẽ tiếp tục.</translation>
     </message>
     <message>
       <source>Recording was enabled on the USB storage</source>

@@ -8722,7 +8722,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Copy Link Location</source>
-      <translation>Sao chép vị trí liên kết</translation>
+      <translation>Sao chép liên kết vị trí</translation>
     </message>
   </context>
   <context>
