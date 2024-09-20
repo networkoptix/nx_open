@@ -44,7 +44,7 @@ public:
     const QString& compareString() const;
 
     nx::vms::rules::ActionPtr action(SystemContext* context) const;
-    const QVariantMap actionDetails(SystemContext* context) const;
+    const QVariantMap& actionDetails(SystemContext* context) const;
     QString actionType() const;
 
 private:

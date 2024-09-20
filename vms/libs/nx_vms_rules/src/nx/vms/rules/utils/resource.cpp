@@ -10,7 +10,7 @@
 #include "../aggregated_event.h"
 #include "../basic_action.h"
 #include "../field_types.h"
-#include "field.h"
+#include "field_names.h"
 
 namespace nx::vms::rules::utils {
 
@@ -79,41 +79,49 @@ QnVirtualCameraResourceList cameras(
         : context->resourcePool()->getResourcesByIds<QnVirtualCameraResource>(selection.ids);
 }
 
-UuidList getResourceIds(const QObject* entity, std::string_view fieldName)
+template <typename T>
+UuidList deviceIds(const T& entity)
 {
-    const auto value = entity->property(fieldName.data());
-
-    if (!value.isValid())
-        return {};
-
     UuidList result;
 
-    if (value.canConvert<UuidList>())
-        result = value.value<UuidList>();
-    else if (value.canConvert<nx::Uuid>())
-        result.emplace_back(value.value<nx::Uuid>());
-
-    result.removeAll({});
+    for (const auto name: {kCameraIdFieldName, kDeviceIdsFieldName})
+        result.append(fieldResourceIds(entity, name));
 
     return result;
 }
 
-
 UuidList getDeviceIds(const AggregatedEventPtr& event)
 {
+    return deviceIds(event);
+}
+
+UuidList getDeviceIds(const ActionPtr& action)
+{
+    return deviceIds(action);
+}
+
+template <typename T>
+UuidList serverIds(const T& entity)
+{
     UuidList result;
-    result << getFieldValue<nx::Uuid>(event, utils::kCameraIdFieldName);
-    result << getFieldValue<UuidList>(event, utils::kDeviceIdsFieldName);
-    result.removeAll(nx::Uuid());
+
+    for (const auto name: {kServerIdFieldName, kServerIdsFieldName})
+        result.append(fieldResourceIds(entity, name));
 
     return result;
+}
+
+UuidList getServerIds(const ActionPtr& action)
+{
+    return serverIds(action);
 }
 
 UuidList getResourceIds(const AggregatedEventPtr& event)
 {
     auto result = getDeviceIds(event);
-    result << getFieldValue<nx::Uuid>(event, kServerIdFieldName);
-    result << getFieldValue<nx::Uuid>(event, kEngineIdFieldName);
+    result.append(serverIds(event));
+    result.append(fieldResourceIds(event, kEngineIdFieldName));
+
     result.removeAll(nx::Uuid());
 
     return result;
@@ -121,10 +129,8 @@ UuidList getResourceIds(const AggregatedEventPtr& event)
 
 UuidList getResourceIds(const ActionPtr& action)
 {
-    UuidList result;
-    result << getFieldValue<nx::Uuid>(action, kCameraIdFieldName);
-    result << getFieldValue<UuidList>(action, kDeviceIdsFieldName);
-    result << getFieldValue<nx::Uuid>(action, kServerIdFieldName);
+    auto result = getDeviceIds(action);
+    result.append(serverIds(action));
     result.removeAll(nx::Uuid());
 
     return result;

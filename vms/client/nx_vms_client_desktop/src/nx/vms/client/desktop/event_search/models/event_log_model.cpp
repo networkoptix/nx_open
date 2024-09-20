@@ -45,6 +45,122 @@ namespace nx::vms::client::desktop {
 using namespace std::chrono;
 using namespace nx::vms::rules;
 
+namespace {
+
+QString resourceName(const QnResourcePtr& resource)
+{
+    const auto infoLevel = appContext()->localSettings()->resourceInfoLevel();
+    return rules::Strings::resource(resource, infoLevel);
+}
+
+QString resourceNames(const QnResourceList& resources)
+{
+    QStringList names;
+    for (const auto& resource: resources)
+        names.push_back(resourceName(resource));
+
+    return names.join(", ");
+}
+
+UuidList resourceIds(
+    SystemContext* context, EventLogModel::Column column, const EventLogModelData& data)
+{
+    switch (column)
+    {
+        case EventLogModel::EventCameraColumn:
+            return rules::utils::getResourceIds(
+                AggregatedEventPtr::create(data.event(context)));
+            break;
+        case EventLogModel::ActionCameraColumn:
+            return rules::utils::getResourceIds(data.action(context));
+            break;
+        default:
+            NX_ASSERT("Unexpected column: %1", column);
+            return {};
+    }
+}
+
+QString actionTargetText(SystemContext* context, const EventLogModelData& data)
+{
+    if (auto destination =
+        data.actionDetails(context).value(rules::utils::kDestinationDetailName).toString();
+        !destination.isEmpty())
+    {
+        return destination;
+    }
+
+    const auto pool = context->resourcePool();
+
+    if (const auto devices = pool->getResourcesByIds(utils::getDeviceIds(data.action(context)));
+        !devices.empty())
+    {
+        return resourceNames(devices);
+    }
+
+    if (const auto servers = pool->getResourcesByIds(utils::getServerIds(data.action(context)));
+        !servers.empty())
+    {
+        return resourceNames(servers);
+    }
+
+    return {};
+}
+
+QnResourceIconCache::Key actionTargetIcon(SystemContext* context, const EventLogModelData& data)
+{
+    const auto action = data.action(context);
+    auto userCount = action->property("emails").toString().count('@');
+
+    if (userCount > 1)
+        return QnResourceIconCache::Users;
+
+    if (const auto userProp = action->property(rules::utils::kUsersFieldName);
+        userProp.isValid() && userProp.canConvert<UuidSelection>())
+    {
+        const auto selection = userProp.value<UuidSelection>();
+        if (selection.all)
+            return QnResourceIconCache::Users;
+
+        QnUserResourceList users;
+        QSet<nx::Uuid> groups;
+        nx::vms::common::getUsersAndGroups(context, selection.ids, users, groups);
+
+        if (!groups.empty())
+            return QnResourceIconCache::Users;
+
+        userCount += users.size();
+    }
+
+    if (userCount > 1)
+        return QnResourceIconCache::Users;
+    if (userCount == 1)
+        return QnResourceIconCache::User;
+
+    const auto pool = context->resourcePool();
+
+    if (const auto devices = pool->getResourcesByIds(utils::getDeviceIds(action));
+        !devices.empty())
+    {
+        if (devices.size() > 1)
+            return QnResourceIconCache::Cameras;
+
+        return qnResIconCache->key(devices.first());
+    }
+
+    if (const auto servers = pool->getResourcesByIds(utils::getServerIds(action));
+        !servers.empty())
+    {
+        if (servers.size() > 1)
+            return QnResourceIconCache::Servers;
+
+        return qnResIconCache->key(servers.first());
+    }
+
+    return QnResourceIconCache::Unknown;
+}
+
+} // namespace
+
 //-------------------------------------------------------------------------------------------------
 // EventLogModel::DataIndex
 
@@ -278,24 +394,8 @@ QVariant EventLogModel::mouseCursorData(
 
 QnResourcePtr EventLogModel::getResource(Column column, const EventLogModelData& data) const
 {
-    UuidList resourceIds;
-
-    switch (column)
-    {
-        case EventCameraColumn:
-            resourceIds = rules::utils::getResourceIds(
-                AggregatedEventPtr::create(data.event(systemContext())));
-            break;
-        case ActionCameraColumn:
-            resourceIds = rules::utils::getResourceIds(data.action(systemContext()));
-            break;
-        default:
-            NX_ASSERT("Unexpected column: %1", column);
-            break;
-    }
-
-    if (!resourceIds.empty())
-        return resourcePool()->getResourceById(resourceIds.first());
+    if (const auto ids = resourceIds(systemContext(), column, data); !ids.empty())
+        return resourcePool()->getResourceById(ids.first());
 
     return {};
 }
@@ -303,49 +403,15 @@ QnResourcePtr EventLogModel::getResource(Column column, const EventLogModelData&
 QVariant EventLogModel::iconData(Column column, const EventLogModelData& data) const
 {
     if (column == ActionCameraColumn)
-    {
-        const auto action = data.action(systemContext());
-        auto userCount = action->property("emails").toString().count('@');
-
-        if (userCount > 1)
-            return qnResIconCache->icon(QnResourceIconCache::Users);
-
-        if (const auto userProp = action->property(rules::utils::kUsersFieldName);
-            userProp.isValid() && userProp.canConvert<UuidSelection>())
-        {
-            const auto selection = userProp.value<UuidSelection>();
-            if (selection.all)
-            {
-                userCount += 2; // To make sure count is more than one.
-            }
-            else
-            {
-                QnUserResourceList users;
-                QSet<nx::Uuid> groups;
-                nx::vms::common::getUsersAndGroups(systemContext(), selection.ids, users, groups);
-                userCount += (users.size() + groups.size());
-            }
-        }
-        if (userCount > 1)
-            return qnResIconCache->icon(QnResourceIconCache::Users);
-        else if (userCount == 1)
-            return qnResIconCache->icon(QnResourceIconCache::User);
-    }
+        return qnResIconCache->icon(actionTargetIcon(systemContext(), data));
 
     return qnResIconCache->icon(getResource(column, data));
 }
 
-QString EventLogModel::getResourceName(const QnResourcePtr& resource) const
-{
-    const auto infoLevel = appContext()->localSettings()->resourceInfoLevel();
-    return rules::Strings::resource(resource, infoLevel);
-}
-
 QString EventLogModel::textData(Column column, const EventLogModelData& data) const
 {
-    const auto engine = systemContext()->vmsRulesEngine();
-    const auto eventDetails = data.details(systemContext());
-    const auto actionDetails = data.actionDetails(systemContext());
+    const auto& eventDetails = data.details(systemContext());
+    const auto& actionDetails = data.actionDetails(systemContext());
 
     switch (column)
     {
@@ -360,7 +426,7 @@ QString EventLogModel::textData(Column column, const EventLogModelData& data) co
 
         case EventCameraColumn:
         {
-            QString result = getResourceName(getResource(EventCameraColumn, data));
+            QString result = resourceName(getResource(EventCameraColumn, data));
             if (result.isEmpty())
                 result = eventDetails.value(rules::utils::kSourceNameDetailName).toString();
             return result;
@@ -369,15 +435,8 @@ QString EventLogModel::textData(Column column, const EventLogModelData& data) co
             return rules::Strings::actionName(systemContext(), data.actionType());
 
         case ActionCameraColumn:
-        {
-            auto destination =
-                actionDetails.value(rules::utils::kDestinationDetailName).toString();
+            return actionTargetText(systemContext(), data);
 
-            if (destination.isEmpty())
-                destination = getResourceName(getResource(ActionCameraColumn, data));
-
-            return destination;
-        }
         case DescriptionColumn:
         {
             auto description = actionDetails.value(rules::utils::kDescriptionDetailName).toString();
