@@ -570,7 +570,7 @@ static const std::array<uint8_t, 3> kStartCode3B = { 0, 0, 1 };
 
 static constexpr int kNalUnitSizeLength = 4;
 
-NX_CODEC_API bool isStartCode(const void* data, size_t size);
+NX_CODEC_API int isStartCode(const void* data, size_t size);
 NX_CODEC_API void convertToStartCodes(uint8_t* const data, const int size);
 
 } // namespace nx::media::nal
