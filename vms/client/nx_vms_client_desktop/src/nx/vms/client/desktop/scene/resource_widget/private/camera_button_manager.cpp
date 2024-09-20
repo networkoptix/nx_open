@@ -341,7 +341,9 @@ void CameraButtonManager::Private::handleButtonChanged(
     if (!NX_ASSERT(button))
         return;
 
-    if (fields.testFlag(CameraButton::Field::checked))
+    using Field = CameraButton::Field;
+
+    if (fields.testAnyFlags({Field::checked, Field::iconName, Field::checkedIconName}))
     {
         button->setToolTip(getToolTip(data));
         button->setIcon(data.checked
@@ -349,8 +351,7 @@ void CameraButtonManager::Private::handleButtonChanged(
             : data.iconName);
     }
 
-    if (fields.testFlag(CameraButton::Field::name)
-        || fields.testFlag(CameraButton::Field::type))
+    if (fields.testAnyFlags({Field::name, Field::type}))
     {
         // Insert to the a place or update type.
         controller->cancelAction(data.id);
