@@ -224,6 +224,9 @@ const QString kReRequestOnvifRecordingEventsIfAllEventsHaveSameTime(
 const QString kPreferNativeApiForRemoteArchiveSynchronization(
     "preferNativeApiForRemoteArchiveSynchronization");
 
+const QString kOnvifForcePtzGetCompatibleConfigurationsSupported(
+    "onvifForcePtzGetCompatibleConfigurationsSupported");
+
 } // namespace ResourceDataKey
 
 //-------------------------------------------------------------------------------------------------
