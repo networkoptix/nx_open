@@ -822,11 +822,11 @@
     <name>GlobalPermissionsTab</name>
     <message>
       <source>At the system level, group members have permissions to:</source>
-      <translation>システムレベルでは、グループメンバーには以下の権限があります:</translation>
+      <translation>グループメンバーには以下のシステムレベルの行動を許可します:</translation>
     </message>
     <message>
       <source>At the system level, the user has permissions to:</source>
-      <translation>システムレベルでは、ユーザーには以下の権限があります:</translation>
+      <translation>当ユーザーには以下のシステムレベルの行動を許可します:</translation>
     </message>
   </context>
   <context>

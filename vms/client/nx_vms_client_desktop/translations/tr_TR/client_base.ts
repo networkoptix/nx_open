@@ -6413,9 +6413,9 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message numerus="yes">
       <source>Delete %n layouts?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Ekran düzeni silinsin mi?</numerusform>
-        <numerusform>Delete %n layouts?</numerusform>
+        <numerusform>%n Ekran düzeni silinsin mi?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -7309,9 +7309,9 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message numerus="yes">
       <source>%n Megapixels</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Megapiksel</numerusform>
-        <numerusform>%n Megapixels</numerusform>
+        <numerusform>%n Megapiksel</numerusform>
       </translation>
     </message>
     <message>
@@ -7726,9 +7726,9 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message numerus="yes">
       <source>Use Service</source>
-      <translation type="unfinished">
-        <numerusform>Servisi kulan</numerusform>
-        <numerusform>Use Service</numerusform>
+      <translation>
+        <numerusform>Hizmeti Kullan</numerusform>
+        <numerusform>Hizmeti Kullan</numerusform>
       </translation>
     </message>
   </context>
@@ -11259,9 +11259,9 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message numerus="yes">
       <source>I trust these servers</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Bu sunuculara güveniyorum</numerusform>
-        <numerusform>I trust these servers</numerusform>
+        <numerusform>Bu sunuculara güveniyorum</numerusform>
       </translation>
     </message>
   </context>

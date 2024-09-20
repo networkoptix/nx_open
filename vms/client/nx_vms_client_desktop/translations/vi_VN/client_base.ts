@@ -160,7 +160,7 @@
     </message>
     <message>
       <source>Control Video Wall</source>
-      <translation>Kiểm soát bức tường video</translation>
+      <translation>Điều khiển Tường video</translation>
     </message>
     <message>
       <source>Push my screen</source>
@@ -224,15 +224,15 @@
     </message>
     <message>
       <source>Folder...</source>
-      <translation>Table of Contents...</translation>
+      <translation>Thư mục...</translation>
     </message>
     <message>
       <source>Web Client...</source>
-      <translation>Khách hàng web...</translation>
+      <translation>Ứng dụng khách Web...</translation>
     </message>
     <message>
       <source>Open Web Client...</source>
-      <translation>Mở một khách hàng web...</translation>
+      <translation>Mở ứng dụng khách Web...</translation>
     </message>
     <message>
       <source>Save Current Layout</source>
@@ -310,12 +310,12 @@
     <message>
       <source>Log out from %1</source>
       <comment>Log out from Nx Cloud</comment>
-      <translation>Đăng xuất từ %1</translation>
+      <translation>Đăng xuất %1</translation>
     </message>
     <message>
       <source>Open %1 Portal...</source>
       <comment>Open Nx Cloud Portal</comment>
-      <translation>Mở Cổng... %1...</translation>
+      <translation>Mở %1...</translation>
     </message>
     <message>
       <source>Account Settings...</source>
@@ -347,7 +347,7 @@
     </message>
     <message>
       <source>Exit</source>
-      <translation>Lối ra</translation>
+      <translation>Thoát</translation>
     </message>
     <message>
       <source>Mark Selection Start</source>
@@ -447,7 +447,7 @@
     </message>
     <message>
       <source>Stop Video Wall</source>
-      <translation>Bức tường video stop</translation>
+      <translation>Dừng Tường video</translation>
     </message>
     <message>
       <source>Clear Screen</source>
@@ -611,7 +611,7 @@
     </message>
     <message>
       <source>Video Wall Settings...</source>
-      <translation>Thiết lập bức tường video...</translation>
+      <translation>Cài đặt Tường video...</translation>
     </message>
     <message>
       <source>Devices List by Server...</source>
@@ -3808,7 +3808,7 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>Never</source>
-      <translation>Thường xuyên</translation>
+      <translation>Không hết hạn</translation>
     </message>
     <message>
       <source>Expired</source>
@@ -3869,7 +3869,7 @@ Khóa giấy phép: %2</translation>
     <name>QnLicenseWidget</name>
     <message>
       <source>Activate Trial License</source>
-      <translation>Bắt đầu cấp giấy phép thử nghiệm</translation>
+      <translation>Kích hoạt giấy phép dùng thử</translation>
     </message>
     <message>
       <source>Open License File</source>
@@ -3901,7 +3901,7 @@ Khóa giấy phép: %2</translation>
     <name>QnLocalSettingsDialog</name>
     <message>
       <source>General</source>
-      <translation>Chung</translation>
+      <translation>Tổng quan</translation>
     </message>
     <message>
       <source>Look and Feel</source>
@@ -4339,7 +4339,7 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>Normal</source>
-      <translation>Chung</translation>
+      <translation>Bình thường</translation>
     </message>
     <message>
       <source>High</source>
@@ -4519,7 +4519,7 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>URL</source>
-      <translation>Nơi</translation>
+      <translation>URL</translation>
     </message>
     <message>
       <source>Server</source>
@@ -4752,7 +4752,7 @@ Khóa giấy phép: %2</translation>
     <name>QnServerSettingsDialog</name>
     <message>
       <source>General</source>
-      <translation>Chung</translation>
+      <translation>Tổng quan</translation>
     </message>
     <message>
       <source>Storage Analytics</source>
@@ -4935,7 +4935,7 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>Activate License</source>
-      <translation>Bắt đầu Authorization</translation>
+      <translation>Kích hoạt giấy phép</translation>
     </message>
     <message>
       <source>Please check authentication information</source>
@@ -5327,7 +5327,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <name>QnSystemAdministrationDialog</name>
     <message>
       <source>General</source>
-      <translation>Chung</translation>
+      <translation>Tổng quan</translation>
     </message>
     <message>
       <source>Licenses</source>
@@ -5875,11 +5875,11 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <name>QnWorkbenchVideoWallHandler</name>
     <message>
       <source>Video Wall</source>
-      <translation>Bức tường video</translation>
+      <translation>Tường video</translation>
     </message>
     <message>
       <source>Video Wall %1</source>
-      <translation>Bức tường video %1</translation>
+      <translation>Tường video %1</translation>
     </message>
     <message>
       <source>New Video Wall...</source>
@@ -5899,7 +5899,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Stop Video Wall?</source>
-      <translation>Dừng Video Wall?</translation>
+      <translation>Dừng Tường Video?</translation>
     </message>
     <message>
       <source>To start it again, you should have physical access to its computer.</source>
@@ -7772,7 +7772,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <name>nx::vms::client::desktop::CameraSettingsDialog</name>
     <message>
       <source>General</source>
-      <translation>Chung</translation>
+      <translation>Tổng quan</translation>
     </message>
     <message>
       <source>Recording</source>
@@ -9108,7 +9108,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Copy Link Location</source>
-      <translation>Sao chép vị trí liên kết</translation>
+      <translation>Sao chép liên kết vị trí</translation>
     </message>
   </context>
   <context>
@@ -9161,7 +9161,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <name>nx::vms::client::desktop::LayoutSettingsDialog</name>
     <message>
       <source>General</source>
-      <translation>Chung</translation>
+      <translation>Tổng quan</translation>
     </message>
     <message>
       <source>Background</source>
@@ -9293,7 +9293,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <source>At least %1 are required</source>
       <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
       <translation>
-        <numerusform>Ít nhất %1 là bắt buộc</numerusform>
+        <numerusform>Cần có tối thiểu %1</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -9613,11 +9613,11 @@ Hãy nhớ trả lại Mức ghi nhật ký về cài đặt mặc định sau k
     </message>
     <message>
       <source>Current (%1)</source>
-      <translation type="unfinished">Current (%1)</translation>
+      <translation>Hiện tại (%1)</translation>
     </message>
     <message>
       <source>Remote (%1)</source>
-      <translation type="unfinished">Remote (%1)</translation>
+      <translation>Từ xa (%1)</translation>
     </message>
     <message>
       <source>Success</source>
@@ -9625,7 +9625,7 @@ Hãy nhớ trả lại Mức ghi nhật ký về cài đặt mặc định sau k
     </message>
     <message>
       <source>Remote</source>
-      <translation type="unfinished">Remote</translation>
+      <translation>Từ xa</translation>
     </message>
   </context>
   <context>
@@ -9886,7 +9886,7 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
     </message>
     <message>
       <source>Please update %1 manually using an installation package.</source>
-      <translation>Hãy cập nhật %1 sử dụng gói cài đặt bằng tay.</translation>
+      <translation>Vui lòng cập nhật %1 theo cách thủ công bằng cách sử dụng gói cài đặt.</translation>
     </message>
     <message>
       <source>%1 will be restarted to the updated version.</source>
@@ -9950,7 +9950,7 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
     </message>
     <message>
       <source>Update to Specific Build</source>
-      <translation>Cập nhật lên phiên bản riêng biệt</translation>
+      <translation>Cập nhật lên Bản dựng riêng</translation>
     </message>
     <message>
       <source>Downloading client package...</source>
@@ -10010,7 +10010,7 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
     </message>
     <message>
       <source>Specific Build</source>
-      <translation>Phiên bản riêng biệt</translation>
+      <translation>Bản dựng riêng</translation>
     </message>
     <message>
       <source>Browse for Update File</source>
@@ -10400,7 +10400,7 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
     </message>
     <message>
       <source>URL</source>
-      <translation>Nơi</translation>
+      <translation>URL</translation>
     </message>
     <message>
       <source>URL cannot be empty.</source>

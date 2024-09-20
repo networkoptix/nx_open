@@ -423,7 +423,7 @@
     </message>
     <message>
       <source>URL</source>
-      <translation>Nơi</translation>
+      <translation>URL</translation>
     </message>
     <message>
       <source>Content</source>

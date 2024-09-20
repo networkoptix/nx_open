@@ -1099,9 +1099,9 @@
     <message numerus="yes">
       <source>Seconds</source>
       <comment>Capitalized full suffix for displaying seconds</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Saniye</numerusform>
-        <numerusform>Seconds</numerusform>
+        <numerusform>Saniye</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1115,9 +1115,9 @@
     <message numerus="yes">
       <source>Hours</source>
       <comment>Capitalized full suffix for displaying hours</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Saat</numerusform>
-        <numerusform>Hours</numerusform>
+        <numerusform>Saat</numerusform>
       </translation>
     </message>
     <message numerus="yes">
