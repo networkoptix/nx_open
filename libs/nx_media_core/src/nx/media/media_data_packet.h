@@ -77,7 +77,7 @@ public:
 
         // Switch archive to a new server.
         MediaFlags_NewServer            = 0x00400,
-        // Empty flag                   = 0x00800,
+        MediaFlags_newCodecParams       = 0x00800,
         // Fast channel zapping flag.
         MediaFlags_FCZ                  = 0x01000,
 
@@ -101,9 +101,7 @@ public:
 
         // Media packet from old archive version that should be BOM decoded before decrpyption
         // This flag can be removed in a 5.3
-        MediaFlags_BomDecoding         = 0x100000,
-
-        MediaFlags_newCodecParams      = 0x200000
+        MediaFlags_BomDecoding         = 0x100000
     )
 
     Q_DECLARE_FLAGS(MediaFlags, MediaFlag)
