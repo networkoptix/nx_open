@@ -59,7 +59,7 @@ public:
         QSet<QString> encryptedFields;
     };
 
-// Initialization and general info methods.
+    // Initialization and general info methods.
     explicit Engine(
         common::SystemContext* systemContext,
         std::unique_ptr<Router> router,
@@ -68,6 +68,8 @@ public:
 
     void setId(nx::Uuid id);
     Router* router() const;
+
+    void setEnabledFieldsFromIni();
 
     bool isEnabled() const;
     bool isOldEngineEnabled() const;

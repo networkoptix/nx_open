@@ -86,9 +86,7 @@ Engine::Engine(
 {
     systemContext->setVmsRulesEngine(this);
 
-    const QString rulesVersion(ini().rulesEngine);
-    m_enabled = (rulesVersion == "new" || rulesVersion == "both");
-    m_oldEngineEnabled = (rulesVersion != "new");
+    setEnabledFieldsFromIni();
 
     m_aggregationTimer->setInterval(1s);
     connect(m_aggregationTimer, &QTimer::timeout, this,
@@ -143,6 +141,13 @@ Engine::~Engine()
 Router* Engine::router() const
 {
     return m_router.get();
+}
+
+void Engine::setEnabledFieldsFromIni()
+{
+    const QString rulesVersion(ini().rulesEngine);
+    m_enabled = (rulesVersion == "new" || rulesVersion == "both");
+    m_oldEngineEnabled = (rulesVersion != "new");
 }
 
 bool Engine::isEnabled() const
@@ -342,7 +347,7 @@ Group Engine::eventGroups() const
     auto visitor =
         [&eventByGroup](Group& group, auto visitor)->void
         {
-            group.items = std::move(eventByGroup.value(group.id));
+            group.items = eventByGroup.value(group.id);
             for (auto& subgroup: group.groups)
                 visitor(subgroup, visitor);
         };
@@ -848,7 +853,7 @@ size_t Engine::processEvent(const EventPtr& event)
             {
                 cacheKey += id.toString();
 
-                auto cachedEventData = m_eventCache.rememberEvent(cacheKey);
+                m_eventCache.rememberEvent(cacheKey);
                 if (m_eventCache.isReportedRecently(cacheKey))
                 {
                     NX_VERBOSE(this, "Skipping cached event with key: %1", cacheKey);
