@@ -1804,6 +1804,10 @@
         <source>Device storage information update interval</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Anonymous Crash Report Server API URL</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::event::StringsHelper</name>
