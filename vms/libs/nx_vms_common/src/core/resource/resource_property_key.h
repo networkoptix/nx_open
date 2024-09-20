@@ -330,6 +330,9 @@ NX_VMS_COMMON_API extern const QString kOnvifIgnoreOutdatedNotifications;
 // response.
 NX_VMS_COMMON_API extern const QString kReRequestOnvifRecordingEventsIfAllEventsHaveSameTime;
 
+// Force enable/disable check for compatible configurations in Onvif PTZ.
+NX_VMS_COMMON_API extern const QString kOnvifForcePtzGetCompatibleConfigurationsSupported;
+
 } // namespace ResourceDataKey
 
 //-------------------------------------------------------------------------------------------------
