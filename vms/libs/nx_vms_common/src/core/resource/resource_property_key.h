@@ -317,6 +317,9 @@ NX_VMS_COMMON_API extern const QString kReRequestOnvifRecordingEventsIfAllEvents
 // Prefer native protocol for remote archive synchronization instead of Onvif Profile-G if available.
 NX_VMS_COMMON_API extern const QString kPreferNativeApiForRemoteArchiveSynchronization;
 
+// Force enable/disable check for compatible configurations in Onvif PTZ.
+NX_VMS_COMMON_API extern const QString kOnvifForcePtzGetCompatibleConfigurationsSupported;
+
 } // namespace ResourceDataKey
 
 //-------------------------------------------------------------------------------------------------
