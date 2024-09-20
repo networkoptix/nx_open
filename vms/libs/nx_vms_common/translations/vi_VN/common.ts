@@ -177,23 +177,23 @@
     </message>
     <message>
       <source>Power Users</source>
-      <translation>Người dùng quyền hạn lớn</translation>
+      <translation>Người dùng cấp cao</translation>
     </message>
     <message>
       <source>Advanced Viewers</source>
-      <translation>Trình xem nâng cao</translation>
+      <translation>Người xem nâng cao</translation>
     </message>
     <message>
       <source>Viewers</source>
-      <translation>Trình xem</translation>
+      <translation>Người xem</translation>
     </message>
     <message>
       <source>Live Viewers</source>
-      <translation>Xem trực tiếp</translation>
+      <translation>Người xem trực tiếp</translation>
     </message>
     <message>
       <source>System Health Viewers</source>
-      <translation>Trình xem tình trạng hệ thống</translation>
+      <translation>Người xem tình trạng hệ thống</translation>
     </message>
     <message>
       <source>Members of this group can view live videos, I/O modules and web pages.</source>
@@ -463,7 +463,7 @@
     </message>
     <message>
       <source>Professional</source>
-      <translation>Đặc trưng</translation>
+      <translation>Professional</translation>
     </message>
     <message>
       <source>Edge</source>
@@ -475,7 +475,7 @@
     </message>
     <message>
       <source>Video Wall</source>
-      <translation>Bức tường video</translation>
+      <translation>Tường video</translation>
     </message>
     <message>
       <source>I/O Module</source>
@@ -495,7 +495,7 @@
     </message>
     <message>
       <source>Professional Licenses</source>
-      <translation>Giấy phép Chuyên nghiệp</translation>
+      <translation>Giấy phép Professional</translation>
     </message>
     <message>
       <source>Edge Licenses</source>
@@ -564,7 +564,7 @@
     <message numerus="yes">
       <source>%n Professional Licenses</source>
       <translation>
-        <numerusform>Giấy phép Chuyên nghiệp %n</numerusform>
+        <numerusform>%n Giấy phép Professional</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -643,7 +643,7 @@
       <source>%n/%1 Professional Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n%1 Giấy phép chuyên nghiệp</numerusform>
+        <numerusform>%n/%1 Giấy phép Professional</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1743,7 +1743,7 @@
     </message>
     <message>
       <source>Device storage information update interval</source>
-      <translation type="unfinished">Device storage information update interval</translation>
+      <translation>Khoảng thời gian cập nhật thông tin lưu trữ thiết bị</translation>
     </message>
   </context>
   <context>

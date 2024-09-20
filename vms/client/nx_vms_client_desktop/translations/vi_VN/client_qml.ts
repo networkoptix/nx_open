@@ -52,7 +52,7 @@
     </message>
     <message>
       <source>General</source>
-      <translation>chung</translation>
+      <translation>Tổng quan</translation>
     </message>
     <message>
       <source>Synchronize Users</source>
@@ -626,7 +626,7 @@
     </message>
     <message>
       <source>Generic</source>
-      <translation>chung</translation>
+      <translation>Tổng quan</translation>
     </message>
     <message>
       <source>Type</source>
@@ -837,7 +837,7 @@
     </message>
     <message>
       <source>General</source>
-      <translation>chung</translation>
+      <translation>Tổng quan</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -887,7 +887,7 @@
     </message>
     <message>
       <source>General</source>
-      <translation>chung</translation>
+      <translation>Tổng quan</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -2233,7 +2233,7 @@ Nhấn Alt + Click để theo dõi đối tượng</translation>
     <name>SyncComboBox</name>
     <message>
       <source>Never</source>
-      <translation>Thường xuyên</translation>
+      <translation>Không hết hạn</translation>
     </message>
     <message>
       <source>Always</source>
@@ -2375,7 +2375,7 @@ Nhấn Alt + Click để theo dõi đối tượng</translation>
     </message>
     <message>
       <source>General</source>
-      <translation>chung</translation>
+      <translation>Tổng quan</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -2406,7 +2406,7 @@ Nhấn Alt + Click để theo dõi đối tượng</translation>
     </message>
     <message>
       <source>Local</source>
-      <translation>Vị trí</translation>
+      <translation>Cục bộ</translation>
     </message>
     <message>
       <source>Cloud</source>
@@ -2473,7 +2473,7 @@ Nhấn Alt + Click để theo dõi đối tượng</translation>
     </message>
     <message>
       <source>General</source>
-      <translation>chung</translation>
+      <translation>Tổng quan</translation>
     </message>
     <message>
       <source>Groups</source>

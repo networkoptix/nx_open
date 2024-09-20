@@ -25,7 +25,7 @@
   <String Id="InstallAcceptCheckbox">Tôi đồng ý với các</String>
   <String Id="InstallLicenseLinkText">Thỏa thuận bản quyền người dùng cuối</String>
   <String Id="OptionsHeader">Thiết lập tùy chọn</String>
-  <String Id="OptionsLocationLabel">Cài đặt vị trí:</String>
+  <String Id="OptionsLocationLabel">Vị trí cài đặt:</String>
   <String Id="OptionsBrowseButton">Chọn</String>
   <String Id="OptionsOkButton">OK</String>
   <String Id="OptionsCancelButton">Hủy bỏ</String>

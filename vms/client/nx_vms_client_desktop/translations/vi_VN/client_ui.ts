@@ -1623,7 +1623,7 @@
     <name>LicenseWidget</name>
     <message>
       <source>Manual Activation</source>
-      <translation>Kích hoạt bằng tay</translation>
+      <translation>Kích hoạt thủ công</translation>
     </message>
     <message>
       <source>Select License File...</source>
@@ -1639,11 +1639,11 @@
     </message>
     <message>
       <source>Activate Free License</source>
-      <translation>Bắt đầu cấp giấy phép miễn phí</translation>
+      <translation>Kích hoạt giấy phép miễn phí</translation>
     </message>
     <message>
       <source>Activate License</source>
-      <translation>Bắt đầu Authorization</translation>
+      <translation>Kích hoạt giấy phép</translation>
     </message>
     <message>
       <source>Internet Activation</source>
@@ -2182,7 +2182,7 @@
     <name>QnAttachToVideowallDialog</name>
     <message>
       <source>Attach to Video Wall...</source>
-      <translation>Đính kèm với bức tường video...</translation>
+      <translation>Đính kèm vào Tường video...</translation>
     </message>
     <message>
       <source>Preview</source>
@@ -2267,7 +2267,7 @@
     <name>QnVideowallSettingsDialog</name>
     <message>
       <source>Video Wall Settings</source>
-      <translation>Thiết lập bức tường video</translation>
+      <translation>Cài đặt Tường video</translation>
     </message>
     <message>
       <source>Launch video wall when Windows starts.</source>
@@ -2606,7 +2606,7 @@
     </message>
     <message>
       <source>General</source>
-      <translation>Chung</translation>
+      <translation>Tổng quan</translation>
     </message>
     <message>
       <source>Issued by</source>
@@ -2766,7 +2766,7 @@
     </message>
     <message>
       <source>Storage Locations</source>
-      <translation>Nơi lưu trữ</translation>
+      <translation>Vị trí lưu trữ</translation>
     </message>
     <message>
       <source>Reindex Archive</source>
@@ -2796,7 +2796,7 @@
     </message>
     <message>
       <source>URL:</source>
-      <translation>Nơi:</translation>
+      <translation>URL:</translation>
     </message>
     <message>
       <source>Login:</source>
@@ -2992,7 +2992,7 @@
     <name>WebpageDialog</name>
     <message>
       <source>General</source>
-      <translation>Chung</translation>
+      <translation>Tổng quan</translation>
     </message>
     <message>
       <source>SELECT SERVER</source>

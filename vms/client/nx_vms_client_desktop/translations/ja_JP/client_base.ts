@@ -907,15 +907,15 @@
     </message>
     <message>
       <source>Save Window Configuration</source>
-      <translation>ウィンドウの設定を保存</translation>
+      <translation>ウィンドウ構成を保存</translation>
     </message>
     <message>
       <source>Save Windows Configuration</source>
-      <translation>ウィンドウの設定を保存</translation>
+      <translation>ウィンドウ構成を保存</translation>
     </message>
     <message>
       <source>Windows Configuration</source>
-      <translation>ウィンドウの設定</translation>
+      <translation>ウィンドウ構成</translation>
     </message>
     <message>
       <source>Save Current State</source>
@@ -1009,11 +1009,11 @@
     </message>
     <message>
       <source>Save Current Layout As Cloud...</source>
-      <translation>現在のレイアウトをクラウドとして保存...</translation>
+      <translation>現在のレイアウトをクラウドに保存...</translation>
     </message>
     <message>
       <source>Save Layout As Cloud...</source>
-      <translation>レイアウトをクラウドとして保存...</translation>
+      <translation>クラウドレイアウトとして保存...</translation>
     </message>
     <message>
       <source>Save Cloud Layout</source>
@@ -1688,7 +1688,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Insecure</source>
-      <translation>安全でない</translation>
+      <translation>暗号化なし</translation>
     </message>
     <message>
       <source>Connection failed</source>
@@ -3960,15 +3960,15 @@ License Key: %2</source>
     </message>
     <message>
       <source>Stretch</source>
-      <translation>ウィンドウサイズに引き伸ばし</translation>
+      <translation>引き伸ばし</translation>
     </message>
     <message>
       <source>Fit</source>
-      <translation>縦幅を合わせる</translation>
+      <translation>フィット</translation>
     </message>
     <message>
       <source>Crop</source>
-      <translation>横幅を合わせる</translation>
+      <translation>クロップ</translation>
     </message>
     <message>
       <source>This option will not affect Recording Schedule. Recording Schedule is always based on Server Time.</source>
@@ -5289,7 +5289,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnStorageUrlDialog</name>
     <message>
       <source>\\&lt;Computer Name&gt;\&lt;Folder&gt;</source>
-      <translation>\\&lt;Computer Name&gt;\&lt;Folder&gt;</translation>
+      <translation>\\&lt;コンピューター名&gt;\&lt;フォルダー&gt;</translation>
     </message>
     <message>
       <source>Network Shared Resource</source>
@@ -5912,7 +5912,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>More Video Wall licenses required</source>
-      <translation>追加のビデオウォールライセンスが必要</translation>
+      <translation>追加のビデオウォールライセンスが必要です</translation>
     </message>
     <message>
       <source>Control session cannot be started.</source>
@@ -7363,7 +7363,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Select a time span on the timeline and right-click the highlighted section to create a bookmark</source>
-      <translation>ブックマークを作成するには、タイムラインで期間を選択し、強調表示されたセクションを右クリックします</translation>
+      <translation>ブックマークを作成するには、タイムラインで期間を選択し、強調表示されたセクションを右クリックしてください。</translation>
     </message>
   </context>
   <context>
@@ -9430,7 +9430,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Logging level degrades the performance of the system</source>
-      <translation>ログレベルによりシステムのパフォーマンスが低下します</translation>
+      <translation>このログレベルでは、システムのパフォーマンスが低下します</translation>
     </message>
     <message>
       <source>Non-default Logging level. We recommend setting it to &quot;info&quot;</source>
@@ -10430,7 +10430,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>An integration may interact with the Desktop Client and request access to the user session</source>
-      <translation>インテグレーションはデスクトップクライアントと対話し、ユーザーセッションへのアクセスを要求する場合があります</translation>
+      <translation>インテグレーションはデスクトップクライアントと通信し、ユーザーセッションへのアクセスを要求する場合があります</translation>
     </message>
     <message>
       <source>Proxy this integration through the server</source>
@@ -11349,7 +11349,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
     <message>
       <source>No motion detected</source>
-      <translation>モーションが検出されませんでした</translation>
+      <translation>検出されたモーションはありません</translation>
     </message>
     <message numerus="yes">
       <source>%n motion events</source>
@@ -13169,7 +13169,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Window configuration saved</source>
-      <translation>ウィンドウ設定を保存しました</translation>
+      <translation>ウィンドウ構成を保存しました</translation>
     </message>
     <message>
       <source>This build is for demo purposes only.</source>
@@ -13242,7 +13242,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Save Layout As Cloud</source>
-      <translation>レイアウトをクラウドとして保存</translation>
+      <translation>クラウドレイアウトとして保存</translation>
     </message>
   </context>
   <context>
