@@ -102,6 +102,7 @@ const ItemDescriptor& PluginDiagnosticEvent::manifest()
         .resources = {
             {utils::kCameraIdFieldName, {ResourceType::device, Qn::ViewContentPermission}},
             {utils::kEngineIdFieldName, {ResourceType::analyticsEngine}}},
+        .emailTemplatePath = ":/email_templates/generic_event.mustache",
     };
 
     return kDescriptor;

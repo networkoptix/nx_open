@@ -74,6 +74,49 @@ constexpr auto visitAllItems(Visitor&& visitor)
         nx::reflect::detail::forward<Visitor>(visitor));
 }
 
+// Helpers for easily accessing all enum values without having to setup your own visitor
+template<typename... Items>
+struct EnumCounter
+{
+    static constexpr int count = sizeof...(Items) - 1;
+};
+
+template<typename Enum, int N>
+struct EnumArray
+{
+    Enum values[N];
+
+    static constexpr int size() { return N; }
+
+    // Iterators for range based for loops
+    constexpr Enum* begin() { return values; }
+    constexpr const Enum* begin() const { return values; }
+
+    constexpr Enum* end() { return values + N; }
+    constexpr const Enum* end() const { return values + N; }
+
+    constexpr void add(int index, Enum value)
+    {
+        values[index] = value;
+    }
+};
+
+template<typename Enum>
+constexpr auto allEnumValues()
+{
+    return visitAllItems<Enum>(
+        []<typename... Items>(Items&&... items)
+        {
+            constexpr int enumSize = EnumCounter<Enum, Items...>::count;
+            EnumArray<Enum, enumSize> enumArray;
+
+            int index = 0;
+            (enumArray.add(index++, items.value), ...);
+
+            return enumArray;
+        });
+}
+
 } // namespace enumeration
 
 /**

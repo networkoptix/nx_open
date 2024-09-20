@@ -21,6 +21,13 @@ TEST(Enum, simple)
     auto v = SimpleEnum::one;
     nx::reflect::fromString("two"sv, &v);
     EXPECT_EQ(v, SimpleEnum::two);
+
+    auto allEnumValues = nx::reflect::enumeration::allEnumValues<SimpleEnum>();
+    EXPECT_EQ(allEnumValues.size(), 3);
+    EXPECT_NE(std::ranges::find(allEnumValues, SimpleEnum::one), allEnumValues.end());
+    EXPECT_NE(std::ranges::find(allEnumValues, SimpleEnum::two), allEnumValues.end());
+    EXPECT_NE(std::ranges::find(allEnumValues, SimpleEnum::three), allEnumValues.end());
+    EXPECT_EQ(std::ranges::find(allEnumValues, (SimpleEnum) 4), allEnumValues.end());
 }
 
 NX_REFLECTION_ENUM_CLASS(DefinedSimpleEnum, one, two, three)
