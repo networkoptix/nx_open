@@ -4,6 +4,19 @@
 #include <nx/vms/client/desktop/application.h>
 #include <nx/vms/client/desktop/ini.h>
 
+#if defined(_WIN32)
+    // Make video drivers on laptops prefer discrete GPU if available.
+    extern "C" {
+    // Nvidia GPU hint.
+    // http://developer.download.nvidia.com/devzone/devcenter/gamegraphics/files/OptimusRenderingPolicies.pdf
+    __declspec(dllexport) unsigned long NvOptimusEnablement = 0x00000001;
+
+    // AMD GPU hint.
+    // http://developer.amd.com/community/blog/2015/10/02/amd-enduro-system-for-developers/
+    __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
+    }
+#endif
+
 int main(int argc, char** argv)
 {
     if (nx::build_info::isMacOsX()
