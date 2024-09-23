@@ -373,8 +373,6 @@ protected slots:
 
     bool canShowLayoutBackground() const;
 
-    void updateAudioPlayback();
-
 private:
     /* Directly visible state */
 

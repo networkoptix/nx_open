@@ -1907,6 +1907,19 @@ ActionVisibility ReplaceCameraCondition::check(const Parameters& parameters, QnW
     return EnabledAction;
 }
 
+ActionVisibility SoundPlaybackActionCondition::check(const Parameters& parameters, QnWorkbenchContext*)
+{
+    for (QnResourceWidget* widget: parameters.widgets())
+    {
+        auto mediaWidget = qobject_cast<QnMediaResourceWidget*>(widget);
+        if (mediaWidget && mediaWidget->canBeMuted())
+            return EnabledAction;
+    }
+
+    return InvisibleAction;
+}
+
+
 //-------------------------------------------------------------------------------------------------
 // Definitions of resource grouping related actions conditions.
 //-------------------------------------------------------------------------------------------------

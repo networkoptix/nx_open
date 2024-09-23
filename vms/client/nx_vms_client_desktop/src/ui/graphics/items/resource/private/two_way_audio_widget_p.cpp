@@ -60,25 +60,6 @@ constexpr qreal kDisabledOpacityCoeff = 0.3;
 /** Label font size. */
 constexpr int kHintFontPixelSize = 14;
 
-/** Max visualizer value change per second (on increasing and decreasing values). */
-constexpr qreal kVisualizerAnimationUpSpeed = 5.0;
-constexpr qreal kVisualizerAnimationDownSpeed = 1.0;
-
-/** Maximum visualizer height. */
-constexpr qreal kMaxVisualizerHeightCoeff = 0.9;
-
-/** Values lower than that value will be counted as silence. */
-constexpr qreal kNormalizerSilenceValue = 0.1;
-
-/** Maximum value, to which all values are normalized. */
-constexpr qreal kNormalizerIncreaseValue = 0.9;
-
-/** Recommended visualizer line width. */
-constexpr qreal kVisualizerLineWidth = 4.0;
-
-/** Visualizer offset between lines. */
-constexpr qreal kVisualizerLineOffset = 2.0;
-
 /** How long hint should be displayed. */
 constexpr int kShowHintMs = 2000;
 
@@ -90,97 +71,6 @@ constexpr int kDataTimeoutMs = 2000;
 
 constexpr qreal kHidden = 0.0;
 constexpr qreal kVisible = 1.0;
-
-void paintVisualizer(
-    QPainter* painter, const QRectF& rect, const VisualizerData& data)
-{
-    static const QColor kVisualizerColor = core::colorTheme()->color("camera.twoWayAudio.visualizer");
-
-    if (data.isEmpty())
-        return;
-
-    const qreal lineWidth = qRound(qMax(kVisualizerLineWidth,
-        (rect.width() / data.size()) - kVisualizerLineOffset));
-
-    const qreal midY = rect.center().y();
-    const qreal maxHeight = rect.height() * kMaxVisualizerHeightCoeff;
-
-    QPainterPath path;
-    for (int i = 0; i < data.size(); ++i)
-    {
-        const qreal lineHeight = qRound(qMax(maxHeight * data[i], kVisualizerLineOffset * 2));
-        path.addRect(qRound(rect.left() + i * (lineWidth + kVisualizerLineOffset)),
-            qRound(midY - (lineHeight / 2)), lineWidth, lineHeight);
-    }
-
-    paintSharp(painter,
-        [&](QPainter* painter) { painter->fillPath(path, kVisualizerColor); });
-}
-
-void normalizeData(VisualizerData& source)
-{
-    if (source.isEmpty())
-        return;
-
-    const auto max = std::max_element(source.cbegin(), source.cend());
-
-    // Do not normalize if silence.
-    if (*max < kNormalizerSilenceValue)
-        return;
-
-    // Do not normalize if there is bigger value, so normalizing will always only increase values.
-    if (*max > kNormalizerIncreaseValue)
-        return;
-
-    const auto k = kNormalizerIncreaseValue / *max;
-    for (auto& e: source)
-        e *= k;
-}
-
-VisualizerData animateData(const VisualizerData& prev, const VisualizerData& next, qint64 timeStepMs)
-{
-    //NX_ASSERT(next.size() == QnVoiceSpectrumAnalyzer::bandsCount());
-
-    if (prev.size() != next.size())
-        return next;
-
-    const qreal maxUpChange = qBound(0.0, kVisualizerAnimationUpSpeed * timeStepMs / 1000, 1.0);
-    const qreal maxDownChange = qBound(0.0, kVisualizerAnimationDownSpeed * timeStepMs / 1000, 1.0);
-
-    VisualizerData result(prev.size());
-    for (int i = 0; i < prev.size(); ++i)
-    {
-        const auto current = prev[i];
-        const auto target = next[i];
-        auto change = target - current;
-        if (change > 0)
-            change = qMin(change, maxUpChange);
-        else
-            change = qMax(change, -maxDownChange);
-        result[i] = qBound(0.0, current + change, 1.0);
-    }
-
-    return result;
-}
-
-VisualizerData generateEmptyData(qint64 elapsedMs)
-{
-    // Making slider move forth and back...
-    const int size = QnVoiceSpectrumAnalyzer::bandsCount();
-    const int maxIdx = size * 2 - 1;
-
-    VisualizerData result(QnVoiceSpectrumAnalyzer::bandsCount(), 0.0);
-    int idx = qRound(16.0 * elapsedMs / 1000) % maxIdx;
-    if (idx >= size)
-        idx = maxIdx - idx;
-
-    const bool isValidIndex = idx >= 0 && idx < result.size();
-    NX_ASSERT(isValidIndex, "Invalid timeStep value");
-    if (isValidIndex)
-        result[idx] = 0.2;
-
-    return result;
-}
 
 } // namespace
 
@@ -197,6 +87,8 @@ QnTwoWayAudioWidget::Private::Private(
     m_camera(camera),
     m_hintTimer(new QTimer(this))
 {
+    m_voiceSpectrumPainter.options.color = core::colorTheme()->color("camera.twoWayAudio.visualizer");
+
     m_controller = std::make_unique<nx::vms::client::core::TwoWayAudioController>(
         SystemContext::fromResource(m_camera));
     m_controller->setSourceId(sourceId);
@@ -356,7 +248,7 @@ void QnTwoWayAudioWidget::Private::stopStreaming()
 
     m_controller->stop();
     appContext()->voiceSpectrumAnalyzer()->reset();
-    m_visualizerData = VisualizerData();
+    m_voiceSpectrumPainter.reset();
 }
 
 void QnTwoWayAudioWidget::Private::setFixedHeight(qreal height)
@@ -407,26 +299,8 @@ void QnTwoWayAudioWidget::Private::paint(QPainter* painter, const QRectF& source
         if (!visualizerRect.isValid())
             return;
 
-        const auto oldTimeStamp = m_paintTimeStamp;
-        m_paintTimeStamp = m_stateTimer.elapsed();
-        const auto timeStepMs = m_paintTimeStamp - oldTimeStamp;
-
-        auto data = appContext()->voiceSpectrumAnalyzer()->getSpectrumData().data;
-        if (data.isEmpty())
-        {
-            paintVisualizer(painter, visualizerRect, generateEmptyData(m_paintTimeStamp));
-        }
-        else
-        {
-            normalizeData(data);
-
-            // Calculate size hint when first time receiving analyzed data.
-            if (m_visualizerData.isEmpty() && !data.isEmpty())
-                q->updateGeometry();
-
-            m_visualizerData = animateData(m_visualizerData, data, timeStepMs);
-            paintVisualizer(painter, visualizerRect, m_visualizerData);
-        }
+        m_voiceSpectrumPainter.update(m_stateTimer.elapsed(), appContext()->voiceSpectrumAnalyzer()->getSpectrumData().data);
+        m_voiceSpectrumPainter.paint(painter, visualizerRect);
     }
 }
 
@@ -465,7 +339,6 @@ void QnTwoWayAudioWidget::Private::setState(HintState state)
             break;
     }
 
-    m_paintTimeStamp = 0;
     if (m_state == HintState::ok)
     {
         m_stateTimer.invalidate();
