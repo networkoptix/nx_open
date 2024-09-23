@@ -2,6 +2,8 @@
 
 #include "voice_spectrum_analyzer.h"
 
+#include <limits>
+
 #include <QtCore/QtMath>
 
 #include <nx/kit/debug.h>
@@ -53,10 +55,6 @@ void QnVoiceSpectrumAnalyzer::performFft()
     av_fft_calc(m_fftContext, m_fftData);
 }
 
-QnSpectrumData::QnSpectrumData()
-{
-}
-
 QnVoiceSpectrumAnalyzer::QnVoiceSpectrumAnalyzer()
 {
 }
@@ -89,20 +87,52 @@ void QnVoiceSpectrumAnalyzer::initialize(int srcSampleRate, int channels)
 
 void QnVoiceSpectrumAnalyzer::processData(const qint16* sampleData, int sampleCount)
 {
+    processDataInternal(sampleData, sampleCount);
+}
+
+void QnVoiceSpectrumAnalyzer::processData(const qint32* sampleData, int sampleCount)
+{
+    processDataInternal(sampleData, sampleCount);
+}
+
+void QnVoiceSpectrumAnalyzer::processData(
+    const nx::media::audio::Format& format,
+    const void* sampleData,
+    int sampleBytes)
+{
+    if (!NX_ASSERT(format.sampleType == nx::media::audio::Format::SampleType::signedInt) &&
+        (format.sampleSize == 16 || format.sampleSize == 32))
+    {
+        return;
+    }
+
+    if (format.sampleSize == 16)
+    {
+        processData((const qint16*) sampleData, sampleBytes / 2);
+    }
+    else
+    {
+        processData((const qint32*) sampleData, sampleBytes / 4);
+    }
+}
+
+template<class T>
+void QnVoiceSpectrumAnalyzer::processDataInternal(const T* sampleData, int sampleCount)
+{
     // Max volume amplification for input data.
     static const double kBoostLevel = 10 * log10(kBoostLevelDb);
-    qint16 maxAmplifier = 32768 / kBoostLevel;
+    T maxAmplifier = std::numeric_limits<T>::max() / kBoostLevel;
 
-    qint16 maxSampleValue = 0;
+    T maxSampleValue = 0;
     for (int i = 0; i < sampleCount * m_channels; ++i)
-        maxSampleValue = qMax(maxSampleValue, qint16(abs(sampleData[i])));
+        maxSampleValue = qMax(maxSampleValue, T(abs(sampleData[i])));
     maxSampleValue = qMax(maxSampleValue, maxAmplifier);
-    const qint16* p = sampleData;
+    const T* p = sampleData;
 
     for (int i = 0; i < sampleCount; ++i)
     {
         // Calculate an average for all channels. Channel samples are interleaved.
-        qint32 sampleValue = 0;
+        qint64 sampleValue = 0;
         for (int channel = 0; channel < m_channels; ++channel)
             sampleValue += *(p++);
         sampleValue /= m_channels;

@@ -6,6 +6,8 @@
 
 #include <QtCore/QTimer>
 
+#include <nx/utils/log/log.h>
+
 using namespace std::chrono;
 
 namespace {

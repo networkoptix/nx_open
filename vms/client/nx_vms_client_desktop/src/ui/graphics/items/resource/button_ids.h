@@ -21,48 +21,51 @@ enum WidgetButtons
     // Show info, actual for all widgets.
     InfoButton = 1 << 3,
 
+    // Mute button, available only when "play audio from all cameras" option is ON.
+    MuteButton = 1 << 4,
+
     // Rotate, actual for all widgets.
-    RotateButton = 1 << 4,
+    RotateButton = 1 << 5,
 
     //---------------------------------------------------------------------------------------------
     // Media Widget specific buttons.
 
-    HotspotsButton = 1 << 5,
-    PtzButton = 1 << 6,
-    FishEyeButton = 1 << 7,
-    ZoomWindowButton = 1 << 8,
-    IoModuleButton = 1 << 9,
-    ScreenshotButton = 1 << 10,
-    DbgScreenshotButton = 1 << 11,
-    MotionSearchButton = 1 << 12,
-    ObjectSearchButton = 1 << 13,
+    HotspotsButton = 1 << 6,
+    PtzButton = 1 << 7,
+    FishEyeButton = 1 << 8,
+    ZoomWindowButton = 1 << 9,
+    IoModuleButton = 1 << 10,
+    ScreenshotButton = 1 << 11,
+    DbgScreenshotButton = 1 << 12,
+    MotionSearchButton = 1 << 13,
+    ObjectSearchButton = 1 << 14,
 
     //---------------------------------------------------------------------------------------------
     // Server statistics specific buttons.
 
-    ShowLogButton = 1 << 14,
-    CheckIssuesButton = 1 << 15,
+    ShowLogButton = 1 << 15,
+    CheckIssuesButton = 1 << 16,
 
     //---------------------------------------------------------------------------------------------
     // Buttons for the left panel, sorting left-to-right.
 
     // Indicates if is zoomed item, actual for cameras.
-    ZoomStatusIconButton = 1 << 16,
+    ZoomStatusIconButton = 1 << 17,
 
     // Reload web page, web pages only.
-    ReloadPageButton = 1 << 17,
+    ReloadPageButton = 1 << 18,
 
     // Navigate back, web pages only.
-    BackButton = 1 << 18,
+    BackButton = 1 << 19,
 
     // Indicate if video stream is paused
-    PauseButton = 1 << 19,
+    PauseButton = 1 << 20,
 
     //---------------------------------------------------------------------------------------------
     // Buttons on the playback panel.
 
     // Status of the recording, actual for cameras.
-    RecordingStatusIconButton = 1 << 20,
+    RecordingStatusIconButton = 1 << 21,
 };
 
 } // namespace Qn

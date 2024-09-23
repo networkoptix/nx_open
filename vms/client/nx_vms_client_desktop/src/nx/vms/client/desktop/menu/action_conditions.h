@@ -558,6 +558,14 @@ public:
         const Parameters& parameters, WindowContext* context) override;
 };
 
+class SoundPlaybackActionCondition: public Condition
+{
+public:
+    virtual ActionVisibility check(
+        const Parameters& parameters, WindowContext* context) override;
+};
+
+
 //-------------------------------------------------------------------------------------------------
 // Declarations of resource grouping related actions conditions.
 //-------------------------------------------------------------------------------------------------

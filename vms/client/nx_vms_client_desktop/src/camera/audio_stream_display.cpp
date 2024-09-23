@@ -8,6 +8,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
+#include <utils/media/voice_spectrum_analyzer.h>
 
 #include "decoders/audio/abstract_audio_decoder.h"
 
@@ -17,11 +18,16 @@ namespace {
 static const int AVCODEC_MAX_AUDIO_FRAME_SIZE = 192 * 1000;
 }
 
-QnAudioStreamDisplay::QnAudioStreamDisplay(int bufferMs, int prebufferMs):
+QnAudioStreamDisplay::QnAudioStreamDisplay(
+    int bufferMs,
+    int prebufferMs,
+    nx::vms::client::desktop::AudioDecodeMode decodeMode)
+    :
     m_bufferMs(bufferMs),
     m_prebufferMs(prebufferMs),
     m_tooFewDataDetected(true),
     m_isFormatSupported(true),
+    m_decodeMode(decodeMode),
     m_downmixing(false),
     m_forceDownmix(appContext()->localSettings()->downmixAudio()),
     m_sampleConvertMethod(SampleConvertMethod::none),
@@ -35,6 +41,8 @@ QnAudioStreamDisplay::QnAudioStreamDisplay(int bufferMs, int prebufferMs):
     m_audioQueueMutex(nx::Mutex::Recursive),
     m_blockedTimeValue(AV_NOPTS_VALUE)
 {
+    if (m_decodeMode != AudioDecodeMode::normal)
+        m_analyzer = std::make_unique<QnVoiceSpectrumAnalyzer>();
 }
 
 QnAudioStreamDisplay::~QnAudioStreamDisplay()
@@ -155,7 +163,8 @@ bool QnAudioStreamDisplay::initFormatConvertRule(nx::media::audio::Format format
         m_downmixing = false;
     }
 
-    if (nx::audio::Sound::isFormatSupported(format))
+    // If we do spectrum analysis then we always try converting floats to ints.
+    if (m_decodeMode == AudioDecodeMode::normal && nx::audio::Sound::isFormatSupported(format))
         return true;
 
     if (format.sampleType == nx::media::audio::Format::SampleType::floatingPoint)
@@ -225,7 +234,9 @@ bool QnAudioStreamDisplay::putData(QnCompressedAudioDataPtr data, qint64 minTime
         m_startBufferingTime = data->timestamp - bufferSizeMs * 1000;
     }
 
-    bool canDropLateAudio = !m_sound || m_sound->state() != QAudio::State::ActiveState;
+    bool canDropLateAudio =
+        !m_sound ||
+        (m_sound->state() != QAudio::State::ActiveState && m_decodeMode != AudioDecodeMode::spectrumOnly);
     if (canDropLateAudio && data && data->timestamp < minTime)
     {
         clearAudioBuffer();
@@ -251,6 +262,11 @@ bool QnAudioStreamDisplay::putData(QnCompressedAudioDataPtr data, qint64 minTime
 bool QnAudioStreamDisplay::isPlaying() const
 {
     return !m_tooFewDataDetected;
+}
+
+QnVoiceSpectrumAnalyzer* QnAudioStreamDisplay::analyzer() const
+{
+    return m_analyzer.get();
 }
 
 void QnAudioStreamDisplay::playCurrentBuffer()
@@ -313,10 +329,21 @@ void QnAudioStreamDisplay::playCurrentBuffer()
             }
         }
 
-        if (m_sound)
+        if (m_sound && m_decodeMode != AudioDecodeMode::spectrumOnly)
         {
             m_sound->write(
                 (const quint8*) m_decodedAudioBuffer.data(), m_decodedAudioBuffer.size());
+        }
+
+        // Given the code in initFormatConvertRule, we should never get FP sample type here.
+        if (m_decodeMode != AudioDecodeMode::normal &&
+            (audioFormat.sampleSize == 16 || audioFormat.sampleSize == 32) &&
+            audioFormat.sampleType == nx::media::audio::Format::SampleType::signedInt)
+        {
+            // initialize() does nothing if sample rate / channel count didn't change.
+            m_analyzer->initialize(audioFormat.sampleRate, audioFormat.channelCount);
+            m_analyzer->processData(audioFormat, m_decodedAudioBuffer.data(),
+                                    m_decodedAudioBuffer.size());
         }
     }
 }
@@ -349,4 +376,9 @@ void QnAudioStreamDisplay::setForceDownmix(bool value)
 int QnAudioStreamDisplay::getAudioBufferSize() const
 {
     return m_bufferMs;
+}
+
+AudioDecodeMode QnAudioStreamDisplay::decodeMode() const
+{
+    return m_decodeMode;
 }
