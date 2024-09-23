@@ -69,7 +69,8 @@ void ApiIntegrationRequestsModel::refresh()
                 for (const api::analytics::IntegrationRequestData& request: requests)
                 {
                     result.push_back(QJsonObject{
-                        {"requestId", request.requestId.toString()},
+                        // requestId is guaranteed to be non-null.
+                        {"requestId", request.requestId.value_or(nx::Uuid()).toString()},
                         {"pinCode", request.pinCode},
                         {"name", request.integrationManifest.name},
                         {"description", request.integrationManifest.description},

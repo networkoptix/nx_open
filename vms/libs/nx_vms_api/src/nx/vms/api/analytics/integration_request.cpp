@@ -10,9 +10,13 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(IntegrationRequestIdentity,
     (json),
     nx_vms_api_analytics_IntegrationRequestIdentity_Fields, (brief, true))
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(RegisterIntegrationRequest,
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(CreateIntegrationRequest,
     (json),
-    nx_vms_api_analytics_RegisterIntegrationRequest_Fields, (brief, true))
+    nx_vms_api_analytics_CreateIntegrationRequest_Fields, (brief, true))
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(UpdateIntegrationRequest,
+    (json),
+    nx_vms_api_analytics_UpdateIntegrationRequest_Fields, (brief, true))
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(RegisterIntegrationResponse,
     (json),
