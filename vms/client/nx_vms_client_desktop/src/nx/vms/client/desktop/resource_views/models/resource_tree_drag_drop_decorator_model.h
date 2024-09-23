@@ -54,6 +54,7 @@ private:
     void moveResources(
         const QnResourceList& cameras,
         const QnResourceList& webPages,
+        const QnResourceList& layouts,
         const QString& dragGroupId,
         const QString& dropGroupId,
         const QnMediaServerResourcePtr& dropParentServer);

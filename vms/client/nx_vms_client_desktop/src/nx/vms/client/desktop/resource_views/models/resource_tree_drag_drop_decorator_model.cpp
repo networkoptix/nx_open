@@ -4,6 +4,7 @@
 
 #include <client/client_globals.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/layout_resource.h>.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_item_index.h>
@@ -26,6 +27,8 @@ namespace {
 
 using namespace nx::vms::client::core;
 
+using NodeTypeSet = QSet<nx::vms::client::desktop::ResourceTree::NodeType>;
+
 static const QString kPureTreeResourcesOnlyMimeType =
     "application/x-pure-tree-resources-only";
 
@@ -33,6 +36,18 @@ bool mimeFormatsIntersects(const QStringList& firstMimeFormats,
     const QStringList& secondMimeFormats)
 {
     return nx::utils::toQSet(firstMimeFormats).intersects(nx::utils::toQSet(secondMimeFormats));
+}
+
+QModelIndex topLevelParent(const QModelIndex& index)
+{
+    if (!index.isValid())
+        return {};
+
+    QModelIndex result = index;
+    while (result.parent().isValid())
+        result = result.parent();
+
+    return result;
 }
 
 bool hasNodeType(
@@ -53,17 +68,7 @@ bool hasTopLevelNodeType(
     const QModelIndex& index,
     nx::vms::client::desktop::ResourceTree::NodeType nodeType)
 {
-    if (!index.isValid())
-        return false;
-
-    if (!index.parent().isValid())
-        return hasNodeType(index, nodeType);
-
-    auto topLevelParent = index.parent();
-    while (topLevelParent.parent().isValid())
-        topLevelParent = topLevelParent.parent();
-
-    return hasNodeType(topLevelParent, nodeType);
+    return hasNodeType(topLevelParent(index), nodeType);
 }
 
 bool hasResourceFlags(const QModelIndex& index, Qn::ResourceFlags resourceFlags)
@@ -178,6 +183,8 @@ QMimeData* ResourceTreeDragDropDecoratorModel::mimeData(const QModelIndexList& i
     QSet<QnResourcePtr> resources;
     menu::Parameters::ArgumentHash arguments;
 
+    NodeTypeSet topLevelParentNodeTypes;
+
     for (const auto& index: indexes)
     {
         if (!index.isValid())
@@ -186,11 +193,18 @@ QMimeData* ResourceTreeDragDropDecoratorModel::mimeData(const QModelIndexList& i
         if (auto resource = index.data(core::ResourceRole).value<QnResourcePtr>())
             resources.insert(resource);
 
-        QVariant nodeTypeData = index.data(Qn::NodeTypeRole);
+        const auto nodeTypeData = index.data(Qn::NodeTypeRole);
+        const auto topLevelParentNodeTypeData = topLevelParent(index).data(Qn::NodeTypeRole);
         if (!NX_ASSERT(!nodeTypeData.isNull()))
             continue;
 
         const auto nodeType = nodeTypeData.value<NodeType>();
+        if (!topLevelParentNodeTypeData.isNull())
+        {
+            topLevelParentNodeTypes.insert(
+                topLevelParentNodeTypeData.value<ResourceTree::NodeType>());
+        }
+
         switch (nodeType)
         {
             case NodeType::recorder:
@@ -239,6 +253,8 @@ QMimeData* ResourceTreeDragDropDecoratorModel::mimeData(const QModelIndexList& i
                 break;
         }
     }
+
+    arguments.insert(Qn::TopLevelParentNodeTypeRole, QVariant::fromValue(topLevelParentNodeTypes));
 
     MimeData data(baseMimeData.get());
     data.setEntities(entities.values());
@@ -334,6 +350,9 @@ bool ResourceTreeDragDropDecoratorModel::dropMimeData(const QMimeData* mimeData,
 
     const auto index = targetDropIndex(parent);
 
+    QSet<ResourceTree::NodeType> topLevelParentNodeTypes =
+        data.arguments().value(Qn::TopLevelParentNodeTypeRole).value<QSet<ResourceTree::NodeType>>();
+
     // Drop on videowall is handled by videowall.
     if (hasNodeType(index, NodeType::videoWallItem))
     {
@@ -401,6 +420,7 @@ bool ResourceTreeDragDropDecoratorModel::dropMimeData(const QMimeData* mimeData,
     {
         const auto cameras = data.resources().filtered<QnVirtualCameraResource>();
         const auto webPages = data.resources().filtered<QnWebPageResource>();
+        const auto layouts = data.resources().filtered<QnLayoutResource>();
 
         // Parent server as displayed, i.e it will be null if server nodes aren't displayed in the
         // resource tree.
@@ -410,7 +430,18 @@ bool ResourceTreeDragDropDecoratorModel::dropMimeData(const QMimeData* mimeData,
         const auto dropParentServer = parentServer(index);
         const auto dropGroupId = index.data(Qn::ResourceTreeCustomGroupIdRole).toString();
 
-        moveResources(cameras, webPages, dragGroupId, dropGroupId, dropParentServer);
+        moveResources(cameras, webPages, layouts, dragGroupId, dropGroupId, dropParentServer);
+        return true;
+    }
+
+    if (hasNodeType(index, NodeType::layouts))
+    {
+        const auto layouts = data.resources().filtered<QnLayoutResource>();
+
+        const auto dragGroupId =
+            data.arguments().value(Qn::ResourceTreeCustomGroupIdRole).toString();
+
+        moveResources({}, {}, layouts, dragGroupId, QString(), {});
         return true;
     }
 
@@ -459,7 +490,7 @@ bool ResourceTreeDragDropDecoratorModel::dropMimeData(const QMimeData* mimeData,
 
         const auto dropGroupId = index.data(Qn::ResourceTreeCustomGroupIdRole).toString();
 
-        moveResources(cameras, webPages, dragGroupId, dropGroupId, server);
+        moveResources(cameras, webPages, /*layouts*/ {}, dragGroupId, dropGroupId, server);
         return true;
     }
 
@@ -496,6 +527,7 @@ void ResourceTreeDragDropDecoratorModel::moveCustomGroup(
 void ResourceTreeDragDropDecoratorModel::moveResources(
     const QnResourceList& cameras,
     const QnResourceList& webPages,
+    const QnResourceList& layouts,
     const QString& dragGroupId,
     const QString& dropGroupId,
     const QnMediaServerResourcePtr& dropParentServer)
@@ -557,6 +589,7 @@ void ResourceTreeDragDropDecoratorModel::moveResources(
             moveResourcesToGroup(sourceResources);
         }
     }
+    moveResourcesToGroup(layouts);
 }
 
 Qt::DropActions ResourceTreeDragDropDecoratorModel::supportedDropActions() const
@@ -570,6 +603,9 @@ QModelIndex ResourceTreeDragDropDecoratorModel::targetDropIndex(const QModelInde
 
     // Dropping on custom resource group node have no other meaning.
     if (hasNodeType(dropIndex, NodeType::customResourceGroup))
+        return dropIndex;
+
+    if (hasResourceFlags(dropIndex, Qn::layout))
         return dropIndex;
 
     // Dropping on resource within custom resource group is the same as dropping on the parent

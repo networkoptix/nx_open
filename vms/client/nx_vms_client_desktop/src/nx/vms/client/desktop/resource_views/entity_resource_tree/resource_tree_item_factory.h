@@ -35,8 +35,8 @@ public:
 
     // Resource Tree top level group items.
     AbstractItemPtr createServersItem() const;
-    AbstractItemPtr createCamerasAndDevicesItem(Qt::ItemFlags itemFlags) const;
-    AbstractItemPtr createLayoutsItem() const;
+    AbstractItemPtr createCamerasAndDevicesItem(Qt::ItemFlags flags) const;
+    AbstractItemPtr createLayoutsItem(Qt::ItemFlags flags) const;
     AbstractItemPtr createShowreelsItem() const;
     AbstractItemPtr createIntegrationsItem(Qt::ItemFlags flags) const;
     AbstractItemPtr createWebPagesItem(Qt::ItemFlags flags) const;
