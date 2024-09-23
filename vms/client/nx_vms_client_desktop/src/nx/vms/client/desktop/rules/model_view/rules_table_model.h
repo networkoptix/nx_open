@@ -35,7 +35,6 @@ public:
     {
         RuleIdRole = Qt::UserRole,
         ResourceIdsRole,
-        FieldRole,
         IsRuleValidRole,
         IsSystemRuleRole,
         SortDataRole
@@ -55,6 +54,12 @@ public:
     UuidList getRuleIds(const QModelIndexList& indexes) const;
 
     static void registerQmlType();
+
+    /**
+     * The given id will be added to the bunch of the resource ids returned for the Resource Ids
+     * Role if the `acceptAll` property of the `SourceCameraField` is set to `true`.
+     */
+    static const Uuid kAnyDeviceUuid;
 
 private:
     using ConstRulePtr = std::shared_ptr<const vms::rules::Rule>;

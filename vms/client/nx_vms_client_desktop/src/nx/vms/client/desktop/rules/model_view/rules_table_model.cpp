@@ -74,6 +74,8 @@ constexpr auto kInvalidRuleIconPath = "20x20/Solid/alert2.svg?primary=yellow";
 
 } // namespace
 
+const Uuid RulesTableModel::kAnyDeviceUuid;
+
 RulesTableModel::RulesTableModel(QObject* parent):
     QAbstractTableModel(parent),
     m_engine(appContext()->currentSystemContext()->vmsRulesEngine())
@@ -409,11 +411,16 @@ QVariant RulesTableModel::sourceCameraData(const vms::rules::EventFilter* eventF
 
     const auto resourcePool = appContext()->currentSystemContext()->resourcePool();
 
-    const auto ids = sourceCameraField->ids();
+    auto ids = sourceCameraField->ids();
     if (role == ResourceIdsRole)
-        return QVariant::fromValue(ids);
+    {
+        if (sourceCameraField->acceptAll())
+            ids += kAnyDeviceUuid;
 
-    const auto resources = resourcePool->getResourcesByIds<QnVirtualCameraResource>(sourceCameraField->ids());
+        return QVariant::fromValue(ids);
+    }
+
+    const auto resources = resourcePool->getResourcesByIds<QnVirtualCameraResource>(ids);
     const auto properties = sourceCameraField->properties();
     const bool isValidSelection = !resources.empty() || properties.allowEmptySelection;
 
@@ -585,16 +592,8 @@ QVariant RulesTableModel::targetCameraData(const vms::rules::ActionBuilder* acti
 
         useSource = targetDeviceField->useSource();
         allowEmptySelection = targetDeviceFieldProperties.allowEmptySelection;
-        if (targetDeviceField->acceptAll())
-        {
-            acceptAll = true;
-            resources = getActualCameras(resourcePool);
-        }
-        else
-        {
-            ids = targetDeviceField->ids();
-            resources = resourcePool->getResourcesByIds<QnVirtualCameraResource>(ids);
-        }
+        ids = targetDeviceField->ids();
+        resources = resourcePool->getResourcesByIds<QnVirtualCameraResource>(ids);
 
         if (targetDeviceFieldProperties.validationPolicy
             == vms::rules::kCameraAudioTransmissionValidationPolicy)
@@ -612,8 +611,11 @@ QVariant RulesTableModel::targetCameraData(const vms::rules::ActionBuilder* acti
     {
         useSource = targetSingleDeviceField->useSource();
         allowEmptySelection = targetSingleDeviceField->properties().allowEmptySelection;
-        ids = {targetSingleDeviceField->id()};
-        resources = resourcePool->getResourcesByIds<QnVirtualCameraResource>(ids);
+        if (!targetSingleDeviceField->id().isNull())
+        {
+            ids = {targetSingleDeviceField->id()};
+            resources = resourcePool->getResourcesByIds<QnVirtualCameraResource>(ids);
+        }
     }
     else
     {
