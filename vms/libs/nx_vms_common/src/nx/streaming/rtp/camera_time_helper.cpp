@@ -1,3 +1,5 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
 #include "camera_time_helper.h"
 
 #include <nx/streaming/nx_streaming_ini.h>
