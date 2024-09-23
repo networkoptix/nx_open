@@ -711,6 +711,9 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Local Settings..."))
         .role(QAction::PreferencesRole);
 
+    factory(PreferencesLookAndFeelTabAction)
+        .flags(NoTarget);
+
     factory(JoystickSettingsAction)
         .flags(Main)
         .mode(DesktopMode)

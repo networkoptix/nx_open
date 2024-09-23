@@ -167,6 +167,8 @@ public:
      */
     Q_INVOKABLE int displayOffset(qint64 msecsSinceEpoch);
 
+    Q_INVOKABLE void openLookAndFeelSettings() const;
+
 public slots:
     void onDeleteRequested();
     void onAuditTrailRequested();

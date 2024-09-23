@@ -252,6 +252,10 @@ ActionHandler::ActionHandler(QObject *parent) :
         [this] { openLocalSettingsDialog(QnLocalSettingsDialog::GeneralPage); },
         Qt::QueuedConnection);
 
+    connect(action(menu::PreferencesLookAndFeelTabAction), &QAction::triggered, this,
+        [this] { openLocalSettingsDialog(QnLocalSettingsDialog::LookAndFeelPage); },
+        Qt::QueuedConnection);
+
     // System administration.
     connect(action(menu::SystemAdministrationAction), &QAction::triggered,
         this, &ActionHandler::at_systemAdministrationAction_triggered);
