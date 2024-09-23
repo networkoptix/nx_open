@@ -545,6 +545,27 @@ Item
                         }
                     }
 
+                    CenteredField
+                    {
+                        // Visible only when the user is editing his own profile.
+                        visible: control.isSelf
+
+                        TextButton
+                        {
+                            id: interfaceLanguageButton
+                            width: parent.width
+                            text: qsTr("Interface Language")
+                            icon.source: "image://skin/20x20/Outline/earth.svg"
+                            icon.width: 20
+                            icon.height: 20
+
+                            onClicked:
+                            {
+                                control.self.openLookAndFeelSettings()
+                            }
+                        }
+                    }
+
                     SectionHeader
                     {
                         id: accessLinkSection

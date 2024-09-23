@@ -403,9 +403,14 @@ enum IDType
     MinimizeAction,
 
     /**
-     * Opens system settings dialog.
+     * Opens system settings dialog on General tab.
      */
     PreferencesGeneralTabAction,
+
+    /**
+     * Opens system settings dialog on Look and Feel tab.
+     */
+    PreferencesLookAndFeelTabAction,
 
     JoystickSettingsAction,
 

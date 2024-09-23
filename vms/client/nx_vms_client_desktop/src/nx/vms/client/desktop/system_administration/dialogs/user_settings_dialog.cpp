@@ -960,6 +960,11 @@ int UserSettingsDialog::displayOffset(qint64 msecsSinceEpoch)
         seconds(serverTime.offsetFromUtc() - clientTime.offsetFromUtc())).count();
 }
 
+void UserSettingsDialog::openLookAndFeelSettings() const
+{
+    menu()->trigger(menu::PreferencesLookAndFeelTabAction);
+}
+
 void UserSettingsDialog::onCopyLink()
 {
     if (!NX_ASSERT(d->user))
