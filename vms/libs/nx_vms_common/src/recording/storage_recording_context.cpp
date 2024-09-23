@@ -84,7 +84,7 @@ void StorageRecordingContext::initializeRecordingContext(int64_t startTimeUs)
             "Failed to initialize Ffmpeg. Not enough memory.",
             m_recordingContext.storage);
     }
-    m_lastDts = 0;
+    m_streamIndexToLastDts.clear();
     m_recordingContext.formatCtx->start_time = startTimeUs;
 }
 
@@ -291,12 +291,12 @@ void StorageRecordingContext::writeData(const QnConstAbstractMediaDataPtr& media
     int64_t timestampOffsetUsec = md->timestamp - timestamp;
     int64_t dts = av_rescale_q(timestamp, srcRate, stream->time_base);
 
-    if (m_lastDts > 0)
-        avPkt.dts = std::max(m_lastDts + 1, dts);
+    if (m_streamIndexToLastDts[streamIndex] > 0)
+        avPkt.dts = std::max(m_streamIndexToLastDts[streamIndex] + 1, dts);
     else
         avPkt.dts = dts;
 
-    m_lastDts = dts;
+    m_streamIndexToLastDts[streamIndex] = dts;
 
     const QnCompressedVideoData* video = dynamic_cast<const QnCompressedVideoData*>(md.get());
     if (video && video->pts != AV_NOPTS_VALUE
