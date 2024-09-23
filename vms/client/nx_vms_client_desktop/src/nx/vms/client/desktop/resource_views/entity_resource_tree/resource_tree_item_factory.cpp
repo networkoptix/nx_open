@@ -465,22 +465,23 @@ AbstractItemPtr ResourceTreeItemFactory::createVideoWallsItem(QString customName
         .withRole(Qn::NodeTypeRole, QVariant::fromValue(NodeType::videoWalls));
 }
 
-AbstractItemPtr ResourceTreeItemFactory::createCamerasAndDevicesItem(Qt::ItemFlags itemFlags) const
+AbstractItemPtr ResourceTreeItemFactory::createCamerasAndDevicesItem(Qt::ItemFlags flags) const
 {
     return GenericItemBuilder()
         .withRole(Qt::DisplayRole, tr("Cameras & Devices"))
         .withRole(Qn::ResourceIconKeyRole, static_cast<int>(IconCache::Cameras))
         .withRole(Qn::NodeTypeRole, QVariant::fromValue(NodeType::camerasAndDevices))
-        .withFlags(itemFlags);
+        .withFlags(flags);
 }
 
-AbstractItemPtr ResourceTreeItemFactory::createLayoutsItem() const
+AbstractItemPtr ResourceTreeItemFactory::createLayoutsItem(Qt::ItemFlags flags) const
 {
     return GenericItemBuilder()
         .withRole(Qt::DisplayRole, tr("Layouts"))
         .withRole(Qn::ResourceIconKeyRole, static_cast<int>(IconCache::Layouts))
         .withRole(Qn::NodeTypeRole, QVariant::fromValue(NodeType::layouts))
-        .withRole(Qn::HelpTopicIdRole, static_cast<int>(HelpTopic::Id::MainWindow_Tree_Layouts));
+        .withRole(Qn::HelpTopicIdRole, static_cast<int>(HelpTopic::Id::MainWindow_Tree_Layouts))
+        .withFlags(flags);
 }
 
 AbstractItemPtr ResourceTreeItemFactory::createShowreelsItem() const

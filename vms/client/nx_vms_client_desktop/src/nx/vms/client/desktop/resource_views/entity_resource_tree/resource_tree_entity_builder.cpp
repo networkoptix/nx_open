@@ -545,6 +545,7 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createDialogHotspotTargetsEntity(
     bool showServers,
     const std::function<bool(const QnResourcePtr&)>& resourceFilter) const
 {
+    static const Qt::ItemFlags kRootItemsFlags = {Qt::ItemIsEnabled | Qt::ItemIsSelectable};
     auto composition = std::make_unique<CompositionEntity>();
     if (showServers)
     {
@@ -556,12 +557,12 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createDialogHotspotTargetsEntity(
     else
     {
         composition->addSubEntity(makeFlatteningGroup(
-            m_itemFactory->createCamerasAndDevicesItem(Qt::ItemIsEnabled | Qt::ItemIsSelectable),
+            m_itemFactory->createCamerasAndDevicesItem(kRootItemsFlags),
             createDialogAllCamerasEntity(showServers, resourceFilter),
             FlatteningGroupEntity::AutoFlatteningPolicy::noChildrenPolicy));
     }
     composition->addSubEntity(makeFlatteningGroup(
-        m_itemFactory->createLayoutsItem(),
+        m_itemFactory->createLayoutsItem(kRootItemsFlags),
         createDialogShareableLayoutsEntity(resourceFilter),
         FlatteningGroupEntity::AutoFlatteningPolicy::noChildrenPolicy));
 
@@ -762,8 +763,12 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createLayoutsGroupEntity() const
         layoutsEntity = std::move(layoutsGroupList);
     }
 
+    Qt::ItemFlags rootItemFlags = {Qt::ItemIsEnabled, Qt::ItemIsSelectable};
+    if (hasPowerUserPermissions())
+        rootItemFlags |= Qt::ItemIsDropEnabled;
+
     return makeFlatteningGroup(
-        m_itemFactory->createLayoutsItem(),
+        m_itemFactory->createLayoutsItem(rootItemFlags),
         std::move(layoutsEntity),
         FlatteningGroupEntity::AutoFlatteningPolicy::noChildrenPolicy);
 }
@@ -1029,6 +1034,8 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createDialogEntities(
     bool alwaysCreateGroupElements,
     bool combineWebPagesAndIntegrations) const
 {
+    static const Qt::ItemFlags kRootItemsFlags = {Qt::ItemIsEnabled | Qt::ItemIsSelectable};
+
     std::vector<AbstractEntityPtr> entities;
 
     const bool maySkipGroup = !alwaysCreateGroupElements;
@@ -1044,7 +1051,7 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createDialogEntities(
             return entity; //< Only cameras and devices, return without a group element.
 
         entities.push_back(makeFlatteningGroup(
-            m_itemFactory->createCamerasAndDevicesItem(Qt::ItemIsEnabled | Qt::ItemIsSelectable),
+            m_itemFactory->createCamerasAndDevicesItem(kRootItemsFlags),
             std::move(entity),
             flatteningPolicy));
     }
@@ -1060,7 +1067,7 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createDialogEntities(
             return layoutsList; //< Only layouts, return without a group element.
 
         entities.push_back(makeFlatteningGroup(
-            m_itemFactory->createLayoutsItem(),
+            m_itemFactory->createLayoutsItem(kRootItemsFlags),
             std::move(layoutsList),
             flatteningPolicy));
     }
