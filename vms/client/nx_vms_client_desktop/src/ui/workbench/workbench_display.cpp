@@ -40,6 +40,7 @@
 #include <nx/vms/client/desktop/radass/radass_controller.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
+#include <nx/vms/client/desktop/settings/system_specific_local_settings.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_target_provider.h>
@@ -341,14 +342,6 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
         &NotificationActionExecutor::notificationActionReceived,
         this, &QnWorkbenchDisplay::at_notificationAction);
 
-    connect(&appContext()->localSettings()->playAudioForAllItems,
-        &nx::utils::property_storage::BaseProperty::changed,
-        this,
-        &QnWorkbenchDisplay::updateAudioPlayback);
-
-    connect(AudioDispatcher::instance(), &AudioDispatcher::currentAudioSourceChanged,
-        this, &QnWorkbenchDisplay::updateAudioPlayback);
-
     m_playbackPositionBlinkTimer->start(kActivityTimeout);
 }
 
@@ -356,24 +349,6 @@ QnWorkbenchDisplay::~QnWorkbenchDisplay()
 {
     NX_ASSERT(!m_scene);
     NX_ASSERT(!m_view);
-}
-
-void QnWorkbenchDisplay::updateAudioPlayback()
-{
-    const auto centralWidget = m_widgetByRole[Qn::CentralRole];
-    const auto audioEnabled =
-        AudioDispatcher::instance()->currentAudioSource() == mainWindowWidget()->windowHandle();
-
-    for (auto& w: m_widgets)
-    {
-        auto widget = qobject_cast<QnMediaResourceWidget*>(w);
-        auto camDisplay = widget ? widget->display()->camDisplay() : nullptr;
-        if (camDisplay)
-        {
-            camDisplay->playAudio(audioEnabled
-                && (appContext()->localSettings()->playAudioForAllItems() || w == centralWidget));
-        }
-    }
 }
 
 InstrumentManager* QnWorkbenchDisplay::instrumentManager() const
@@ -969,16 +944,12 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget)
             /* Update audio playback. */
             if (QnMediaResourceWidget *oldMediaWidget = dynamic_cast<QnMediaResourceWidget *>(oldWidget))
             {
-                QnCamDisplay *oldCamDisplay = oldMediaWidget ? oldMediaWidget->display()->camDisplay() : nullptr;
-                if (oldCamDisplay)
-                    oldCamDisplay->playAudio(appContext()->localSettings()->playAudioForAllItems());
+                oldMediaWidget->updateAudioPlaybackState();
             }
 
             if (QnMediaResourceWidget *newMediaWidget = dynamic_cast<QnMediaResourceWidget *>(newWidget))
             {
-                QnCamDisplay *newCamDisplay = newMediaWidget ? newMediaWidget->display()->camDisplay() : nullptr;
-                if (newCamDisplay)
-                    newCamDisplay->playAudio(true);
+                newMediaWidget->updateAudioPlaybackState();
             }
 
             break;
@@ -1262,6 +1233,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
     if (checkedButtons != -1)
     {
         checkedButtons &= ~Qn::MotionSearchButton; //< Handled by MotionSearchSynchronizer.
+        checkedButtons &= ~Qn::MuteButton; //< Handled by us in at_workbench_currentLayout(Changed|AboutToBeChanged).
         widget->setCheckedButtons(checkedButtons);
     }
     // If we are opening the widget for the first time, show info button by default if needed.
@@ -2107,6 +2079,8 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutAboutToBeChanged()
     }
     layout->setData(Qn::LayoutSelectionRole, QVariant::fromValue<QVector<nx::Uuid> >(selectedUuids));
 
+    auto mutedItemIds = systemContext()->localSettings()->mutedItemIds();
+
     foreach(QnResourceWidget *widget, widgets())
     {
         if (auto mediaWidget = dynamic_cast<QnMediaResourceWidget*>(widget))
@@ -2127,6 +2101,15 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutAboutToBeChanged()
 
             if (const auto reader = mediaWidget->display()->archiveReader())
                 item->setData(Qn::ItemSpeedRole, reader->getSpeed());
+
+            if (mediaWidget->isMuted())
+            {
+                mutedItemIds.insert(item->uuid());
+            }
+            else
+            {
+                mutedItemIds.erase(item->uuid());
+            }
         }
         else if (auto webWidget = dynamic_cast<QnWebResourceWidget*>(widget))
         {
@@ -2137,6 +2120,16 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutAboutToBeChanged()
                 webWidget->webView()->controller()->suspend(/*parent*/ layout));
         }
     }
+
+    // GC muted item ids & save. Value is written out on assignment.
+    QSet<nx::Uuid> existingItemIds;
+    for (const auto& otherLayout: resourcePool()->getResources<QnLayoutResource>())
+    {
+        for (const auto& itemId: otherLayout->getItems().keys())
+            existingItemIds.insert(itemId);
+    }
+    std::erase_if(mutedItemIds, [&] (const nx::Uuid& id) { return !existingItemIds.contains(id); });
+    systemContext()->localSettings()->mutedItemIds = mutedItemIds;
 
     foreach(QnWorkbenchItem *item, layout->items())
         at_layout_itemRemoved(item);
@@ -2197,6 +2190,8 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged()
             });
     }
 
+    auto mutedItemIds = systemContext()->localSettings()->mutedItemIds();
+
     for (auto resourceWidget: std::as_const(resourceWidgets))
     {
         if (auto webWidget = dynamic_cast<QnWebResourceWidget*>(resourceWidget))
@@ -2216,6 +2211,9 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged()
         const auto mediaResourceWidget = dynamic_cast<QnMediaResourceWidget*>(resourceWidget);
         if (!mediaResourceWidget)
             continue;
+
+        if (mutedItemIds.contains(mediaResourceWidget->uuid()))
+            mediaResourceWidget->setMuted(true);
 
         const auto resource = mediaResourceWidget->resource()->toResourcePtr();
 

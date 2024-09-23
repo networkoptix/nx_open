@@ -12,6 +12,7 @@
 #include <utils/media/voice_spectrum_analyzer.h>
 
 #include "../two_way_audio_widget.h"
+#include "../voice_spectrum_painter.h"
 
 class QnImageButtonWidget;
 class GraphicsLabel;
@@ -19,8 +20,6 @@ class VariantAnimator;
 class SingleCamLicenseStatusHelper;
 
 namespace nx::vms::client::core { class TwoWayAudioController; }
-
-typedef decltype(QnSpectrumData::data) VisualizerData;
 
 class QnTwoWayAudioWidget::Private:
     public QObject
@@ -76,6 +75,5 @@ private:
     QElapsedTimer m_stateTimer;
     bool m_unmuteAudioOnStreamingStop = false;
 
-    VisualizerData m_visualizerData;
-    qint64 m_paintTimeStamp = 0;
+    nx::vms::client::desktop::VoiceSpectrumPainter m_voiceSpectrumPainter;
 };

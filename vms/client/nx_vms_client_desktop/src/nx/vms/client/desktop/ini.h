@@ -328,6 +328,12 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
     NX_INI_FLAG(false, openDefaultWebPageOnConnect,
         "[Feature] Open web page, marked as default, when client connects to a system.");
 
+    NX_INI_FLAG(false, perItemMute,
+        "[Feature] Show per-item mute buttons in 'play audio from all cameras' mode.");
+
+    NX_INI_FLAG(false, audioVisualization,
+        "[Feature] Show audio visualizers on audio-only items.");
+
     // ---------------------------------------------------------------------------------------------
     // Support section.
     // Flags here can be removed when support engineers decide whether to discard the flag or move

@@ -306,7 +306,10 @@ bool AudioPlayer::openNonSafe( QIODevice* dataSource )
     m_mediaFileReader = mediaFileReader.release();
     m_mediaFileReader->setAudioChannel(0);
 
-    m_renderer = new QnAudioStreamDisplay( AUDIO_BUF_SIZE, AUDIO_BUF_SIZE / 2 );
+    m_renderer = new QnAudioStreamDisplay(
+        AUDIO_BUF_SIZE,
+        AUDIO_BUF_SIZE / 2,
+        nx::vms::client::desktop::AudioDecodeMode::normal);
 
     m_filePath = temporaryResUrl;
 
