@@ -1204,7 +1204,7 @@ Qn::ResourceStatusOverlay QnResourceWidget::calculateStatusOverlay(
         return Qn::EmptyOverlay;
 
     if (!hasVideo)
-        return Qn::NoVideoDataOverlay;
+        return ini().audioVisualization ? Qn::EmptyOverlay : Qn::NoVideoDataOverlay;
 
     if (m_renderStatus == Qn::NothingRendered || m_renderStatus == Qn::CannotRender)
         return Qn::LoadingOverlay;

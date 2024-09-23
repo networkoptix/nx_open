@@ -407,6 +407,8 @@ namespace Qn
         FlattenedRole,
         WorkbenchStateRole,
 
+        MutedRole, /**< Role for `MuteAction` parameter. (bool) */
+
         ItemDataRoleCount,
     };
 

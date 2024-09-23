@@ -366,6 +366,12 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
     NX_INI_FLAG(false, foldersForLayoutsInResourceTree,
         "[Feature] Enables folders for layouts in the Resource Tree.");
 
+    NX_INI_FLAG(true, perItemMute,
+        "[Feature] Show per-item mute buttons in 'play audio from all cameras' mode.");
+
+    NX_INI_FLAG(true, audioVisualization,
+        "[Feature] Show audio visualizers on audio-only items.");
+
     // ---------------------------------------------------------------------------------------------
     // Support section.
     // Flags here can be removed when support engineers decide whether to discard the flag or move

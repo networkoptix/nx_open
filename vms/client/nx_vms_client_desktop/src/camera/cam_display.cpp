@@ -20,16 +20,17 @@
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
+#include <utils/media/voice_spectrum_analyzer.h>
 
 #include "audio_stream_display.h"
 #include "video_stream_display.h"
 
 #if defined(Q_OS_MAC)
-#include <IOKit/pwr_mgt/IOPMLib.h>
+    #include <IOKit/pwr_mgt/IOPMLib.h>
 #elif defined(Q_OS_WIN)
-#include <qt_windows.h>
+    #include <qt_windows.h>
 
-#include <nx/vms/client/desktop/resource/screen_recording/audio_video_win/windows_desktop_resource.h>
+    #include <nx/vms/client/desktop/resource/screen_recording/audio_video_win/windows_desktop_resource.h>
 #endif
 
 using namespace nx::vms::client::desktop;
@@ -245,8 +246,7 @@ void QnCamDisplay::setAudioBufferSize(int bufferSize, int prebufferSize)
     m_minAudioDetectJumpInterval = MIN_VIDEO_DETECT_JUMP_INTERVAL + m_audioBufferSize*1000;
     NX_MUTEX_LOCKER lock( &m_audioChangeMutex );
     delete m_audioDisplay;
-    m_audioDisplay = new QnAudioStreamDisplay(m_audioBufferSize, prebufferSize);
-
+    m_audioDisplay = new QnAudioStreamDisplay(m_audioBufferSize, prebufferSize, m_audioDecodeMode);
 }
 
 void QnCamDisplay::addVideoRenderer(int channelCount, QnResourceWidgetRenderer* vw, bool canDownscale)
@@ -1525,7 +1525,8 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
         currentAudioFormat = { nx::media::audio::formatFromMediaContext(ad->context),
             ad->context->getBitsPerCodedSample() };
         audioParamsChanged = m_playingFormat != currentAudioFormat
-            || m_audioDisplay->getAudioBufferSize() != expectedBufferSize;
+            || m_audioDisplay->getAudioBufferSize() != expectedBufferSize
+            || m_audioDisplay->decodeMode() != m_audioDecodeMode;
     }
     if (((media->flags & QnAbstractMediaData::MediaFlags_AfterEOF) || audioParamsChanged) &&
         m_videoQueue[0].size() > 0)
@@ -1575,7 +1576,7 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
             NX_MUTEX_LOCKER lock( &m_audioChangeMutex );
             delete m_audioDisplay;
             m_audioBufferSize = expectedBufferSize;
-            m_audioDisplay = new QnAudioStreamDisplay(m_audioBufferSize, audioPrebufferSize);
+            m_audioDisplay = new QnAudioStreamDisplay(m_audioBufferSize, audioPrebufferSize, m_audioDecodeMode);
             m_playingFormat = currentAudioFormat;
         }
 
@@ -2260,4 +2261,20 @@ int QnCamDisplay::maxDataQueueSize() const
 void QnCamDisplay::setCallbackForStreamChanges(std::function<void()> callback)
 {
     m_streamsChangedCallback = callback;
+}
+
+AudioDecodeMode QnCamDisplay::audioDecodeMode() const
+{
+    return m_audioDecodeMode;
+}
+
+void QnCamDisplay::setAudioDecodeMode(AudioDecodeMode decodeMode)
+{
+    m_audioDecodeMode = decodeMode;
+}
+
+QnSpectrumData QnCamDisplay::audioSpectrum() const
+{
+    NX_MUTEX_LOCKER lock(&m_audioChangeMutex);
+    return m_audioDisplay && m_audioDisplay->analyzer() ? m_audioDisplay->analyzer()->getSpectrumData() : QnSpectrumData();
 }
