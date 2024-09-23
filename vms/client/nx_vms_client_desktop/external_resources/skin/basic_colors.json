@@ -233,7 +233,14 @@
             "#e97119",
             "#d24729",
             "#c22626"
-        ]
+        ],
+        "audioOnly": {
+            "background": "dark1.setAlpha(128)",
+            "visualizer": {
+                "active": "#4caf50",
+                "inactive": "light16"
+            }
+        }
    },
 
    "server": {

@@ -425,6 +425,9 @@ ActionHandler::ActionHandler(QObject *parent) :
 
     connect(action(action::OpenAdvancedSearchDialog), &QAction::triggered,
         this, &ActionHandler::at_openAdvancedSearchDialog_triggered);
+
+    connect(action(ui::action::MuteAction), &QAction::triggered,
+        this, &ActionHandler::at_muteAction_triggered);
 }
 
 ActionHandler::~ActionHandler()
@@ -1662,6 +1665,20 @@ void ActionHandler::at_goToLayoutItemAction_triggered()
         return;
 
     workbench()->setItem(Qn::SingleSelectedRole, targetItem);
+}
+
+void ActionHandler::at_muteAction_triggered()
+{
+    const auto parameters = menu()->currentParameters(sender());
+
+    bool muted = parameters.argument(Qn::MutedRole).toBool();
+
+    for (QnResourceWidget* widget: parameters.widgets())
+    {
+        auto mediaWidget = qobject_cast<QnMediaResourceWidget*>(widget);
+        if (mediaWidget && mediaWidget->canBeMuted())
+            mediaWidget->setMuted(muted);
+    }
 }
 
 void ActionHandler::openSystemAdministrationDialog(int page, const QUrl& url)

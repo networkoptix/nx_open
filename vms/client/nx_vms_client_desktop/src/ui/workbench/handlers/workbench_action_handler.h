@@ -232,6 +232,8 @@ protected slots:
 
     void at_goToLayoutItemAction_triggered();
 
+    void at_muteAction_triggered();
+
     void at_clientCommandRequested(SharedMemoryData::Command command, const QByteArray& data);
 
     void at_saveSessionState_triggered();

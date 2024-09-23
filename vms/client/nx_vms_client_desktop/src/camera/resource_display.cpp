@@ -56,8 +56,6 @@ QnResourceDisplay::QnResourceDisplay(const QnResourcePtr &resource, QObject *par
 
             connect(m_counter, &nx::utils::CounterWithSignal::reachedZero, m_counter, &QObject::deleteLater);
             connect(m_counter, &nx::utils::CounterWithSignal::reachedZero, m_camera, &QObject::deleteLater);
-
-            m_camera->getCamDisplay()->playAudio(qnSettings->playAudioForAllItems());
         }
         else
         {

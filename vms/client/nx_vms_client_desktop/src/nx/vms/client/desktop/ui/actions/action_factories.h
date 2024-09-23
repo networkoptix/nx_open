@@ -87,6 +87,15 @@ private:
     QAction* initRoiAction(const Parameters& parameters, QObject* parent);
 };
 
+class SoundPlaybackActionFactory: public Factory
+{
+    Q_OBJECT
+public:
+    SoundPlaybackActionFactory(QObject* parent);
+
+    virtual ActionList newActions(const Parameters& parameters, QObject* parent) override;
+};
+
 } // namespace action
 } // namespace ui
 } // namespace nx::vms::client::desktop

@@ -25,16 +25,19 @@
 
 #include <nx/utils/elapsed_timer.h>
 #include <nx/vms/client/desktop/camera/abstract_video_display.h>
+#include <nx/vms/client/desktop/camera/audio_decode_mode.h>
 #include <nx/vms/common/globals/media_stream_event.h>
 
 #include <nx/audio/format.h>
 
+class QnVoiceSpectrumAnalyzer;
 class QnResourceWidgetRenderer;
 class QnVideoStreamDisplay;
 class QnAudioStreamDisplay;
 class QnCompressedVideoData;
 class QnArchiveStreamReader;
 class QnlTimeSource;
+struct QnSpectrumData;
 
 /*
 * This class is not duplicate statistics from Reader. If not enough CPU/network this class still show full (correct) stream fps
@@ -153,6 +156,11 @@ public:
     virtual int maxDataQueueSize() const override;
 
     virtual void setCallbackForStreamChanges(std::function<void()> callback) override;
+
+    nx::vms::client::desktop::AudioDecodeMode audioDecodeMode() const;
+    void setAudioDecodeMode(nx::vms::client::desktop::AudioDecodeMode decodeMode);
+    QnSpectrumData audioSpectrum() const;
+
 public slots:
     void onBeforeJump(qint64 time);
     void onSkippingFrames(qint64 time);
@@ -323,6 +331,9 @@ protected:
         m_metadataConsumerByType;
     QVector<bool> m_gotKeyDataInfo;
     std::function<void()> m_streamsChangedCallback;
+
+    nx::vms::client::desktop::AudioDecodeMode m_audioDecodeMode =
+        nx::vms::client::desktop::AudioDecodeMode::normal;
 };
 
 #endif //QN_CAM_DISPLAY_H

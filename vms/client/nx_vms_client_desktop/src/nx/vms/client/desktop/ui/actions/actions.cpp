@@ -1401,6 +1401,12 @@ void initialize(Manager* manager, Action* root)
         .condition(ConditionWrapper(new ChangeResolutionCondition())
             && !condition::isLayoutTourReviewMode());
 
+    factory(MuteAction)
+        .flags(Scene | SingleTarget | MultiTarget | LayoutItemTarget)
+        .text(ContextMenu::tr("Sound Playback..."))
+        .childFactory(new SoundPlaybackActionFactory(manager))
+        .condition(ConditionWrapper(new SoundPlaybackActionCondition()));
+
     factory(CreateNewCustomGroupAction)
         .mode(DesktopMode)
         .flags(Tree | SingleTarget | MultiTarget | ResourceTarget)

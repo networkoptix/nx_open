@@ -312,6 +312,8 @@ namespace Qn
          */
         FlattenedRole,
 
+        MutedRole, /**< Role for `MuteAction` parameter. (bool) */
+
         ItemDataRoleCount,
     };
 

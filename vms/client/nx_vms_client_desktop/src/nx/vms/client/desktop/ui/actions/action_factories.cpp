@@ -448,6 +448,50 @@ QAction* ShowOnItemsFactory::initRoiAction(const Parameters& parameters, QObject
     return action;
 }
 
+SoundPlaybackActionFactory::SoundPlaybackActionFactory(QObject* parent): Factory(parent) {}
+
+Factory::ActionList SoundPlaybackActionFactory::newActions(
+    const Parameters& parameters,
+    QObject* parent)
+{
+    auto actionGroup = new QActionGroup(parent);
+    actionGroup->setExclusive(true);
+
+    int mutedCount = 0;
+    int unmutedCount = 0;
+
+    for (QnResourceWidget* widget: parameters.widgets())
+    {
+        auto mediaWidget = qobject_cast<QnMediaResourceWidget*>(widget);
+        if (mediaWidget && mediaWidget->canBeMuted())
+            (mediaWidget->isMuted() ? mutedCount : unmutedCount)++;
+    }
+
+    auto addAction =
+        [&] (bool muted, const QString& text, bool checked)
+        {
+            auto action = new QAction(parent);
+            action->setText(text);
+            action->setCheckable(true);
+            action->setChecked(checked);
+
+            Parameters parametersCopy = parameters;
+            parametersCopy.setArgument(Qn::MutedRole, muted);
+
+            connect(action, &QAction::triggered, this,
+                [this, parametersCopy]
+                {
+                    menu()->trigger(MuteAction, parametersCopy);
+                });
+
+            actionGroup->addAction(action);
+        };
+
+    addAction(false, tr("Enabled"), mutedCount == 0 && unmutedCount != 0);
+    addAction(true, tr("Disabled"), mutedCount != 0 && unmutedCount == 0);
+    return actionGroup->actions();
+}
+
 } // namespace action
 } // namespace ui
 } // namespace nx::vms::client::desktop

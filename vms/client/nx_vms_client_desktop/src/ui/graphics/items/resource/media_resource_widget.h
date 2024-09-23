@@ -41,6 +41,7 @@ using QnMetaDataV1Ptr = std::shared_ptr<QnMetaDataV1>;
 
 namespace nx::vms::client::desktop {
 
+class VoiceSpectrumPainter;
 class ObjectTrackingButtonController;
 class CameraButtonController;
 class RecordingStatusHelper;
@@ -48,6 +49,7 @@ class MediaResourceWidgetPrivate;
 class AnalyticsOverlayWidget;
 class AreaSelectOverlayWidget;
 class RoiFiguresOverlayWidget;
+class AudioSpectrumOverlayWidget;
 class WatermarkPainter;
 class SoftwareTriggerButton;
 class EncryptedArchivePasswordDialog;
@@ -238,6 +240,12 @@ public:
     double speed() const;
 
     QnIOModuleMonitorPtr getIOModuleMonitor();
+
+    bool canBeMuted() const;
+    bool isMuted() const;
+    void setMuted(bool muted);
+
+    void updateAudioPlaybackState();
 
 signals:
     void speedChanged();
@@ -445,6 +453,9 @@ private:
     void initAreaSelectOverlay();
     void initAnalyticsOverlays();
     void initStatusOverlayController();
+    void initAudioSpectrumOverlay();
+
+    bool shouldShowAudioSpectrum() const;
 
     void createTrigger(const SoftwareTriggerInfo& info);
 
@@ -523,6 +534,8 @@ private:
         m_encryptedArchivePasswordDialog;
     mutable QByteArray m_encryptedArchiveData;
 
+    nx::vms::client::desktop::AudioSpectrumOverlayWidget* m_audioSpectrumOverlayWidget = nullptr;
+
     AreaType m_areaSelectionType{AreaType::none};
     QRectF m_analyticsFilterRect;
 
@@ -536,6 +549,8 @@ private:
     nx::vms::client::desktop::ObjectTrackingButtonController* m_objectTrackingButtonController = nullptr;
 
     QAction* const m_toggleImageEnhancementAction;
+
+    bool m_muted = false;
 };
 
 Q_DECLARE_METATYPE(QnMediaResourceWidget *)

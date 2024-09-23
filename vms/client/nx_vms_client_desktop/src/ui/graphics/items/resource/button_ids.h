@@ -18,38 +18,41 @@ enum WidgetButtons
     // Show info, actual for all widgets.
     InfoButton = 1 << 2,
 
+    // Mute button, available only when "play audio from all cameras" option is ON.
+    MuteButton = 1 << 3,
+
     // Rotate, actual for all widgets.
-    RotateButton = 1 << 3,
+    RotateButton = 1 << 4,
 
     //---------------------------------------------------------------------------------------------
     // Media Widget specific buttons.
 
-    PtzButton = 1 << 4,
-    FishEyeButton = 1 << 5,
-    ZoomWindowButton = 1 << 6,
-    IoModuleButton = 1 << 7,
-    ScreenshotButton = 1 << 8,
-    DbgScreenshotButton = 1 << 9,
-    MotionSearchButton = 1 << 10,
-    ObjectSearchButton = 1 << 11,
+    PtzButton = 1 << 5,
+    FishEyeButton = 1 << 6,
+    ZoomWindowButton = 1 << 7,
+    IoModuleButton = 1 << 8,
+    ScreenshotButton = 1 << 9,
+    DbgScreenshotButton = 1 << 10,
+    MotionSearchButton = 1 << 11,
+    ObjectSearchButton = 1 << 12,
 
     //---------------------------------------------------------------------------------------------
     // Server statistics specific buttons.
 
-    ShowLogButton = 1 << 12,
-    CheckIssuesButton = 1 << 13,
+    ShowLogButton = 1 << 13,
+    CheckIssuesButton = 1 << 14,
 
     //---------------------------------------------------------------------------------------------
     // Buttons for the left panel, sorting left-to-right.
 
     // Status of the recording, actual for cameras.
-    RecordingStatusIconButton = 1 << 14,
+    RecordingStatusIconButton = 1 << 15,
 
     // Reload web page, web pages only.
-    ReloadPageButton = 1 << 15,
+    ReloadPageButton = 1 << 16,
 
     // Navigate back, web pages only.
-    BackButton = 1 << 16,
+    BackButton = 1 << 17,
 };
 
 } // namespace Qn
