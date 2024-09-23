@@ -42,9 +42,9 @@ NX_REFLECTION_INSTRUMENT(
     nx_vms_api_analytics_IntegrationRequestIdentity_Fields);
 
 /**%apidoc
- * Data to create/update an Integration request in the VMS.
+ * Data to create an Integration request in the VMS.
  */
-struct NX_VMS_API RegisterIntegrationRequest: public IntegrationRequestIdentity
+struct NX_VMS_API CreateIntegrationRequest
 {
     /**%apidoc Integration Manifest. */
     PluginManifest integrationManifest;
@@ -61,20 +61,36 @@ struct NX_VMS_API RegisterIntegrationRequest: public IntegrationRequestIdentity
     /**%apidoc Device Agent Manifest should be provided by REST-only Integrations. */
     std::optional<DeviceAgentManifest> deviceAgentManifest;
 
-    bool operator==(const RegisterIntegrationRequest& other) const = default;
+    bool operator==(const CreateIntegrationRequest& other) const = default;
 };
-#define nx_vms_api_analytics_RegisterIntegrationRequest_Fields \
-    nx_vms_api_analytics_IntegrationRequestIdentity_Fields \
+#define nx_vms_api_analytics_CreateIntegrationRequest_Fields \
     (integrationManifest) \
     (engineManifest) \
     (pinCode) \
     (isRestOnly) \
     (deviceAgentManifest)
+
 QN_FUSION_DECLARE_FUNCTIONS(
-    RegisterIntegrationRequest, (json), NX_VMS_API);
+    CreateIntegrationRequest, (json), NX_VMS_API);
 NX_REFLECTION_INSTRUMENT(
-    RegisterIntegrationRequest,
-    nx_vms_api_analytics_RegisterIntegrationRequest_Fields);
+    CreateIntegrationRequest,
+    nx_vms_api_analytics_CreateIntegrationRequest_Fields);
+
+/**%apidoc
+ * Data to update an Integration request in the VMS.
+ */
+struct NX_VMS_API UpdateIntegrationRequest: IntegrationRequestIdentity, CreateIntegrationRequest
+{
+    bool operator==(const UpdateIntegrationRequest& other) const = default;
+};
+#define nx_vms_api_analytics_UpdateIntegrationRequest_Fields \
+    nx_vms_api_analytics_IntegrationRequestIdentity_Fields \
+    nx_vms_api_analytics_CreateIntegrationRequest_Fields
+QN_FUSION_DECLARE_FUNCTIONS(
+    UpdateIntegrationRequest, (json), NX_VMS_API);
+NX_REFLECTION_INSTRUMENT(
+    UpdateIntegrationRequest,
+    nx_vms_api_analytics_UpdateIntegrationRequest_Fields);
 
 /**%apidoc
  * Data to be returned after creating an Integration request.
@@ -101,13 +117,23 @@ NX_REFLECTION_INSTRUMENT(
     RegisterIntegrationResponse,
     nx_vms_api_analytics_RegisterIntegrationResponse_Fields);
 
-struct NX_VMS_API IntegrationRequestData: public RegisterIntegrationRequest
+struct NX_VMS_API IntegrationRequestData: CreateIntegrationRequest
 {
     IntegrationRequestData() = default;
-    IntegrationRequestData(RegisterIntegrationRequest registerIntegrationRequest):
-        RegisterIntegrationRequest(std::move(registerIntegrationRequest))
+
+    IntegrationRequestData(CreateIntegrationRequest registerIntegrationRequest):
+        CreateIntegrationRequest(std::move(registerIntegrationRequest))
     {
     }
+
+    IntegrationRequestData(UpdateIntegrationRequest updateIntegrationRequest):
+        CreateIntegrationRequest(updateIntegrationRequest),
+        requestId(updateIntegrationRequest.requestId)
+    {
+    }
+
+    /**%apidoc Integration request id. */
+    std::optional<nx::Uuid> requestId;
 
     /**%apidoc[readonly] Timestamp of the Integration request creation or last update. */
     std::chrono::milliseconds timestampMs{};
@@ -130,8 +156,8 @@ struct NX_VMS_API IntegrationRequestData: public RegisterIntegrationRequest
     bool operator==(const IntegrationRequestData& other) const = default;
 };
 #define nx_vms_api_analytics_IntegrationRequestData_Fields \
-    nx_vms_api_analytics_RegisterIntegrationRequest_Fields \
-    (timestampMs)(requestAddress)(isApproved)(integrationId) \
+    nx_vms_api_analytics_CreateIntegrationRequest_Fields \
+    (requestId)(timestampMs)(requestAddress)(isApproved)(integrationId) \
     (engineId)(integrationUserId)
 QN_FUSION_DECLARE_FUNCTIONS(
     IntegrationRequestData, (json), NX_VMS_API);
