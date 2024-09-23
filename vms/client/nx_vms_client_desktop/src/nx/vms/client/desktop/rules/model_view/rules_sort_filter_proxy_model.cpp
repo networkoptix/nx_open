@@ -20,6 +20,9 @@ namespace {
 /** Returns whether any of the given camera resources match the given pattern. */
 bool matches(const QString& pattern, const UuidSet& ids)
 {
+    if (ids.contains(RulesTableModel::kAnyDeviceUuid))
+        return true;
+
     const auto resources = appContext()->currentSystemContext()->resourcePool()
         ->getResourcesByIds<QnVirtualCameraResource>(ids);
 
