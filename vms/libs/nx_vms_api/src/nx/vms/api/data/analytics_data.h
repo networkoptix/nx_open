@@ -277,7 +277,7 @@ using ExtendedPluginInfoByServer = std::map<nx::Uuid, PluginInfoExList>;
 
 //-------------------------------------------------------------------------------------------------
 
-struct BestShotV3
+struct BestShotV4
 {
     std::chrono::milliseconds timestampMs;
 
@@ -288,40 +288,49 @@ struct BestShotV3
 
     // TODO: When Best Shot Attributes are implemented on the Server, add them here.
 };
-#define BestShotV3_Fields \
+#define BestShotV4_Fields \
     (timestampMs)(boundingBox)(streamIndex)
-NX_VMS_API_DECLARE_STRUCT_EX(BestShotV3, (json));
-NX_REFLECTION_INSTRUMENT(BestShotV3, BestShotV3_Fields)
+NX_VMS_API_DECLARE_STRUCT_EX(BestShotV4, (json));
+NX_REFLECTION_INSTRUMENT(BestShotV4, BestShotV4_Fields)
+
+/**%apidoc
+ * Common properties of an image taken from a video frame.
+ */
+struct ObjectTrackVideoFrameImageInfo
+{
+    std::chrono::milliseconds timestampMs{};
+
+    /**%apidoc:string
+     * Specifies the image rectangle within a frame, coordinates in range [0..1], in the format
+     * `{x},{y},{width}x{height}`.
+     */
+    RectAsString boundingBox;
+    nx::vms::api::StreamIndex streamIndex = nx::vms::api::StreamIndex::undefined;
+};
+#define ObjectTrackVideoFrameImageInfo_Fields \
+    (timestampMs)(boundingBox)(streamIndex)
+NX_VMS_API_DECLARE_STRUCT_EX(ObjectTrackVideoFrameImageInfo, (json));
+NX_REFLECTION_INSTRUMENT(ObjectTrackVideoFrameImageInfo, ObjectTrackVideoFrameImageInfo_Fields)
 
 struct ObjectTrackTitle
 {
-    /**%apidoc
-     * If the Title has an image, and this image was taken from a video frame, specifies the
-     * timestamp of that frame. Otherwise, is absent.
-     */
-    std::optional<std::chrono::milliseconds> timestampMs;
-
-    /**%apidoc:string.
-     * If the Title has an image, and this image was taken from a video frame, specifies the
-     * image rectangle on that frame, coordinates in range [0..1], in the format
-     * `{x},{y},{width}x{height}`. Otherwise, is absent.
-     */
-    std::optional<RectAsString> boundingBox;
-
-    nx::vms::api::StreamIndex streamIndex = nx::vms::api::StreamIndex::undefined;
-
-    /**%apidoc Single-line text to be shown to the user. */
+    /**%apidoc[opt] Single-line text to be shown to the user. */
     QString text;
 
     /**%apidoc
-     * If true, the image can be retrieved via
+     * Is present if the Title has an image, and this image was taken from a video frame.
+     */
+    std::optional<ObjectTrackVideoFrameImageInfo> imageInfo;
+
+    /**%apidoc
+     * Whether the Title has an image, either taken from a video frame (then imageInfo is present),
+     * or received from an Integration in the form of pixel data.
      * `GET /rest/v{4-}/analytics/objectTracks/{id}/titleImage` or
      * `GET /rest/v{4-}/analytics/objectTracks/{id}/titleImage.{format}`.
      */
     bool isImageAvailable = false;
 };
-#define ObjectTrackTitle_Fields \
-    (timestampMs)(boundingBox)(streamIndex)(text)
+#define ObjectTrackTitle_Fields (text)(imageInfo)
 NX_VMS_API_DECLARE_STRUCT_EX(ObjectTrackTitle, (json));
 NX_REFLECTION_INSTRUMENT(ObjectTrackTitle, ObjectTrackTitle_Fields)
 
@@ -359,7 +368,7 @@ struct AnalyticsAttribute
 NX_VMS_API_DECLARE_STRUCT(AnalyticsAttribute);
 NX_REFLECTION_INSTRUMENT(AnalyticsAttribute, AnalyticsAttribute_Fields)
 
-struct NX_VMS_API ObjectTrackV3
+struct NX_VMS_API ObjectTrackV4
 {
     nx::Uuid id;
 
@@ -377,28 +386,17 @@ struct NX_VMS_API ObjectTrackV3
 
     std::vector<AnalyticsAttribute> attributes;
 
-    std::optional<BestShotV3> bestShot;
+    std::optional<BestShotV4> bestShot;
 
-    std::optional<ObjectTrackTitle> title;
+    std::optional<ObjectTrackTitle> title = std::nullopt;
 
     nx::Uuid analyticsEngineId;
-
-    /**%apidoc
-     * Groups the data under the specified value. I.e., it allows to store multiple independent
-     * sets of data in a single DB instead of having to create a separate DB instance for each
-     * unique value of the storageId.
-     */
-    QString storageId;
-
-    /** Intended for debug. */
-    static ObjectTrackV3 makeStub(nx::Uuid id = nx::Uuid::createUuid());
 };
-#define ObjectTrackV3_Fields \
+#define ObjectTrackV4_Fields \
     (id)(deviceId)(objectTypeId)(firstAppearanceTimeMs)(lastAppearanceTimeMs) \
-    (objectRegion)(attributes)(bestShot)(title)(analyticsEngineId)(storageId)
-NX_VMS_API_DECLARE_STRUCT_EX(ObjectTrackV3, (json));
-NX_VMS_API_DECLARE_LIST(ObjectTrackV3)
-NX_REFLECTION_INSTRUMENT(ObjectTrackV3, ObjectTrackV3_Fields)
+    (objectRegion)(attributes)(bestShot)(title)(analyticsEngineId)
+NX_VMS_API_DECLARE_STRUCT_EX(ObjectTrackV4, (json));
+NX_REFLECTION_INSTRUMENT(ObjectTrackV4, ObjectTrackV4_Fields)
 
 struct ObjectTrackFilterFreeText
 {
@@ -498,7 +496,16 @@ struct ObjectTrackFilterFreeText
 NX_VMS_API_DECLARE_STRUCT_EX(ObjectTrackFilterFreeText, (json));
 NX_REFLECTION_INSTRUMENT(ObjectTrackFilterFreeText, ObjectTrackFilterFreeText_Fields)
 
-struct ObjectTrackFilter: ObjectTrackFilterFreeText
+// All sorts are preformed manually, not in the SQL database request.
+NX_REFLECTION_ENUM_CLASS(ObjectTrackSortField,
+    id,
+    deviceId,
+    objectTypeId,
+    title,
+    analyticsEngineId
+)
+
+struct ObjectTrackFilter: IdData, ObjectTrackFilterFreeText
 {
     /**%apidoc
      * If not empty, only Object Tracks originating from those Devices will be considered for
@@ -533,8 +540,11 @@ struct ObjectTrackFilter: ObjectTrackFilterFreeText
      */
     std::optional<int> limit;
 
+    /**%apidoc[opt] */
+    ObjectTrackSortField _orderBy = ObjectTrackSortField::id;
+
     /**%apidoc[opt]:enum
-     * Sort order of Object Tracks by a Track start timestamp.
+     * Sort order of Object Tracks by a Track start timestamp. Sorting is applied after _orderBy.
      *     %value asc Ascending order.
      *     %value desc Descending order.
      */
@@ -551,9 +561,9 @@ struct ObjectTrackFilter: ObjectTrackFilterFreeText
      */
     bool isLocal = false;
 };
-#define ObjectTrackFilter_Fields ObjectTrackFilterFreeText_Fields \
-    (deviceIds)(objectTypeIds)(startTimeMs)(endTimeMs)(boundingBox)(limit)(sortOrder) \
-    (analyticsEngineId)(isLocal)
+#define ObjectTrackFilter_Fields IdData_Fields ObjectTrackFilterFreeText_Fields \
+    (deviceIds)(objectTypeIds)(startTimeMs)(endTimeMs)(boundingBox)(limit) \
+    (_orderBy)(sortOrder)(analyticsEngineId)(isLocal)
 NX_VMS_API_DECLARE_STRUCT_EX(ObjectTrackFilter, (json));
 NX_REFLECTION_INSTRUMENT(ObjectTrackFilter, ObjectTrackFilter_Fields)
 
