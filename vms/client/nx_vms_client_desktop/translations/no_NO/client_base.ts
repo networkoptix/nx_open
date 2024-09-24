@@ -1106,7 +1106,7 @@
     </message>
     <message>
       <source>Sound Playback...</source>
-      <translation type="unfinished">Sound Playback...</translation>
+      <translation>Lydavspilling...</translation>
     </message>
   </context>
   <context>
@@ -4120,7 +4120,7 @@ Lisensnøkkel: %2</translation>
     </message>
     <message>
       <source>Mute</source>
-      <translation type="unfinished">Mute</translation>
+      <translation>Mute</translation>
     </message>
   </context>
   <context>
