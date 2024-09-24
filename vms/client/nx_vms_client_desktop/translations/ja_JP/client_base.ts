@@ -8215,7 +8215,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Server offline</source>
-      <translation>サーバーオフライン</translation>
+      <translation>サーバーがオフラインです</translation>
     </message>
     <message>
       <source>Device search failed</source>
@@ -8981,7 +8981,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Server offline</source>
-      <translation>サーバーオフライン</translation>
+      <translation>サーバーがオフラインです</translation>
     </message>
     <message>
       <source>Device address field must contain a valid URL, IP address, or RTSP link.</source>
