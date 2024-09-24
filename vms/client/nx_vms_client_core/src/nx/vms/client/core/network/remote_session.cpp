@@ -81,8 +81,8 @@ void RemoteSession::Private::updateTokenExpirationTime()
     connection->serverApi()->getRawResult(
         "/rest/v4/login/sessions/current",
         nx::network::rest::Params(),
-        nx::utils::guarded(connection.get(),
-            [this, currentConnection = connection.get()](
+        nx::utils::guarded(q,
+            [this, currentConnection = QPointer(connection.get())](
                 bool success,
                 rest::Handle /*requestId*/,
                 QByteArray data,
@@ -104,8 +104,11 @@ void RemoteSession::Private::updateTokenExpirationTime()
                 }
 
                 sessionStartTime = qnSyncTime->currentTimePoint() - session.ageS;
-                currentConnection->setSessionTokenExpirationTime(
-                    qnSyncTime->currentTimePoint() + session.expiresInS);
+                if (currentConnection)
+                {
+                    currentConnection->setSessionTokenExpirationTime(
+                        qnSyncTime->currentTimePoint() + session.expiresInS);
+                }
                 emit q->tokenExpirationTimeChanged();
             }),
         QThread::currentThread());
