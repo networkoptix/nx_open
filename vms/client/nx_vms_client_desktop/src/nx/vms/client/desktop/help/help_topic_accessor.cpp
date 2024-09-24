@@ -90,9 +90,9 @@ int HelpTopicAccessor::helpTopicAt(QWidget* widget, const QPoint& pos, bool bubb
                 return topic(topicId);
         }
 
-        if (QQuickWidget* widget = dynamic_cast<QQuickWidget*>(widget))
+        if (QQuickWidget* quickWidget = dynamic_cast<QQuickWidget*>(widget))
         {
-            topicId = helpTopicAt(widget->rootObject(), pos);
+            topicId = helpTopicAt(quickWidget->rootObject(), pos);
             return topicId != HelpTopic::Id::Empty
                 ? topicId
                 : HelpTopicAccessor::helpTopic(static_cast<QObject*>(widget));
