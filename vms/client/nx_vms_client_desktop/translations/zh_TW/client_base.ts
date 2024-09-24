@@ -1099,6 +1099,10 @@
       <source>Convert to Shared Layout</source>
       <translation>轉換成共享佈局</translation>
     </message>
+    <message>
+      <source>Sound Playback...</source>
+      <translation type="unfinished">Sound Playback...</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -4063,6 +4067,10 @@ License Key: %2</source>
     <message>
       <source>Disabled by schedule</source>
       <translation>已依據排程停用</translation>
+    </message>
+    <message>
+      <source>Mute</source>
+      <translation type="unfinished">Mute</translation>
     </message>
   </context>
   <context>
@@ -12930,6 +12938,17 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Start Showreel</source>
       <translation>啟動幻燈片</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ui::action::SoundPlaybackActionFactory</name>
+    <message>
+      <source>Enabled</source>
+      <translation>啟用</translation>
+    </message>
+    <message>
+      <source>Disabled</source>
+      <translation>停用</translation>
     </message>
   </context>
   <context>

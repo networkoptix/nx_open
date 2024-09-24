@@ -1804,6 +1804,10 @@
       <source>Device storage information update interval</source>
       <translation>Cihaz depolama bilgisi güncelleme aralığı</translation>
     </message>
+    <message>
+      <source>Anonymous Crash Report Server API URL</source>
+      <translation>Anonim Çökme Raporu Sunucusu API URL'si</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::event::StringsHelper</name>

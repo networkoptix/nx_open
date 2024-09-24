@@ -1104,6 +1104,10 @@
       <source>Convert to Shared Layout</source>
       <translation type="unfinished">Convert to Shared Layout</translation>
     </message>
+    <message>
+      <source>Sound Playback...</source>
+      <translation type="unfinished">Sound Playback...</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -4113,6 +4117,10 @@ License Key: %2</translation>
     <message>
       <source>Disabled by schedule</source>
       <translation>Uitgeschakeld volgens schema</translation>
+    </message>
+    <message>
+      <source>Mute</source>
+      <translation type="unfinished">Mute</translation>
     </message>
   </context>
   <context>
@@ -13123,6 +13131,17 @@ We raden u aan deze webpagina niet te openen. Als u de risico's begrijpt, kunt u
     <message>
       <source>Start Showreel</source>
       <translation>Start Showreel</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ui::action::SoundPlaybackActionFactory</name>
+    <message>
+      <source>Enabled</source>
+      <translation>Ingeschakeld</translation>
+    </message>
+    <message>
+      <source>Disabled</source>
+      <translation>Uitgeschakeld</translation>
     </message>
   </context>
   <context>

@@ -1099,6 +1099,10 @@
       <source>Convert to Shared Layout</source>
       <translation>Chuyển đổi sang bố cục được chia sẻ</translation>
     </message>
+    <message>
+      <source>Sound Playback...</source>
+      <translation type="unfinished">Sound Playback...</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -4063,6 +4067,10 @@ Khóa giấy phép: %2</translation>
     <message>
       <source>Disabled by schedule</source>
       <translation>Lịch trình bị vô hiêu hóa</translation>
+    </message>
+    <message>
+      <source>Mute</source>
+      <translation type="unfinished">Mute</translation>
     </message>
   </context>
   <context>
@@ -12934,6 +12942,17 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <message>
       <source>Start Showreel</source>
       <translation>Bắt đầu Showreel</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ui::action::SoundPlaybackActionFactory</name>
+    <message>
+      <source>Enabled</source>
+      <translation>Bật</translation>
+    </message>
+    <message>
+      <source>Disabled</source>
+      <translation>Tàn tật</translation>
     </message>
   </context>
   <context>

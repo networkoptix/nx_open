@@ -1104,6 +1104,10 @@
       <source>Convert to Shared Layout</source>
       <translation>Konvertera till delad layout</translation>
     </message>
+    <message>
+      <source>Sound Playback...</source>
+      <translation>Ljuduppspelning...</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -4113,6 +4117,10 @@ Licensnyckel: %2</translation>
     <message>
       <source>Disabled by schedule</source>
       <translation>Inaktiverad enligt schema</translation>
+    </message>
+    <message>
+      <source>Mute</source>
+      <translation>Tysta</translation>
     </message>
   </context>
   <context>
@@ -13122,6 +13130,17 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     <message>
       <source>Start Showreel</source>
       <translation>Starta Showreel</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ui::action::SoundPlaybackActionFactory</name>
+    <message>
+      <source>Enabled</source>
+      <translation>Aktiverad</translation>
+    </message>
+    <message>
+      <source>Disabled</source>
+      <translation>Avaktiverad</translation>
     </message>
   </context>
   <context>

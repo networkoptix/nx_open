@@ -1745,6 +1745,10 @@
       <source>Device storage information update interval</source>
       <translation>デバイスのストレージ情報の更新間隔</translation>
     </message>
+    <message>
+      <source>Anonymous Crash Report Server API URL</source>
+      <translation>匿名クラッシュレポートのサーバーAPI URL</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::event::StringsHelper</name>

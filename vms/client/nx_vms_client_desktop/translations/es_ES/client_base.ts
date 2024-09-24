@@ -1104,6 +1104,10 @@
       <source>Convert to Shared Layout</source>
       <translation>Convertir a diseño compartido</translation>
     </message>
+    <message>
+      <source>Sound Playback...</source>
+      <translation type="unfinished">Sound Playback...</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -4113,6 +4117,10 @@ License Key: %2</translation>
     <message>
       <source>Disabled by schedule</source>
       <translation>Deshabilitado por horario</translation>
+    </message>
+    <message>
+      <source>Mute</source>
+      <translation type="unfinished">Mute</translation>
     </message>
   </context>
   <context>
@@ -13121,6 +13129,17 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
     <message>
       <source>Start Showreel</source>
       <translation>Iniciar Showreel</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ui::action::SoundPlaybackActionFactory</name>
+    <message>
+      <source>Enabled</source>
+      <translation>Habilitado</translation>
+    </message>
+    <message>
+      <source>Disabled</source>
+      <translation>Desactivado</translation>
     </message>
   </context>
   <context>

@@ -1104,6 +1104,10 @@
       <source>Convert to Shared Layout</source>
       <translation>Paylaşılan Ekran Düzenine Dönüştür</translation>
     </message>
+    <message>
+      <source>Sound Playback...</source>
+      <translation>Ses Oynatma...</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -4112,6 +4116,10 @@ License Key: %2</source>
     <message>
       <source>Disabled by schedule</source>
       <translation>Takvim dışı</translation>
+    </message>
+    <message>
+      <source>Mute</source>
+      <translation type="unfinished">Mute</translation>
     </message>
   </context>
   <context>
@@ -13116,6 +13124,17 @@ Bu web sayfasını açmamanızı öneririz. Riskleri anlıyorsanız web sayfası
     <message>
       <source>Start Showreel</source>
       <translation>Showreel'i başlat</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ui::action::SoundPlaybackActionFactory</name>
+    <message>
+      <source>Enabled</source>
+      <translation>Etkinleştir</translation>
+    </message>
+    <message>
+      <source>Disabled</source>
+      <translation>Devre Dışı</translation>
     </message>
   </context>
   <context>
