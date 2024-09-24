@@ -1106,7 +1106,7 @@
     </message>
     <message>
       <source>Sound Playback...</source>
-      <translation type="unfinished">Sound Playback...</translation>
+      <translation>Lecture du son...</translation>
     </message>
   </context>
   <context>
@@ -4120,7 +4120,7 @@ Clé de licence : %2</translation>
     </message>
     <message>
       <source>Mute</source>
-      <translation type="unfinished">Mute</translation>
+      <translation>Muet</translation>
     </message>
   </context>
   <context>

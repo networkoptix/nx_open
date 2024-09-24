@@ -1808,7 +1808,7 @@
     </message>
     <message>
       <source>Anonymous Crash Report Server API URL</source>
-      <translation type="unfinished">Anonymous Crash Report Server API URL</translation>
+      <translation>URL de l'API du serveur de rapport d'incident anonyme</translation>
     </message>
   </context>
   <context>
