@@ -1099,6 +1099,10 @@
       <source>Convert to Shared Layout</source>
       <translation>Konversikan ke Layout yang Dibagi</translation>
     </message>
+    <message>
+      <source>Sound Playback...</source>
+      <translation type="unfinished">Sound Playback...</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -4063,6 +4067,10 @@ Kunci Lisensi: %2</translation>
     <message>
       <source>Disabled by schedule</source>
       <translation>Dinonaktifkan berdasarkan jadwal</translation>
+    </message>
+    <message>
+      <source>Mute</source>
+      <translation type="unfinished">Mute</translation>
     </message>
   </context>
   <context>
@@ -12935,6 +12943,17 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     <message>
       <source>Start Showreel</source>
       <translation>Mulai Showreel</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ui::action::SoundPlaybackActionFactory</name>
+    <message>
+      <source>Enabled</source>
+      <translation>Diaktifkan</translation>
+    </message>
+    <message>
+      <source>Disabled</source>
+      <translation>Dinonaktifkan</translation>
     </message>
   </context>
   <context>

@@ -1099,6 +1099,10 @@
       <source>Convert to Shared Layout</source>
       <translation type="unfinished">Convert to Shared Layout</translation>
     </message>
+    <message>
+      <source>Sound Playback...</source>
+      <translation type="unfinished">Sound Playback...</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -4063,6 +4067,10 @@ License Key: %2</translation>
     <message>
       <source>Disabled by schedule</source>
       <translation>일정에 따라 중지됨</translation>
+    </message>
+    <message>
+      <source>Mute</source>
+      <translation type="unfinished">Mute</translation>
     </message>
   </context>
   <context>
@@ -12935,6 +12943,17 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Start Showreel</source>
       <translation>쇼릴 시작</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ui::action::SoundPlaybackActionFactory</name>
+    <message>
+      <source>Enabled</source>
+      <translation>활성화</translation>
+    </message>
+    <message>
+      <source>Disabled</source>
+      <translation>비활성화</translation>
     </message>
   </context>
   <context>

@@ -1745,6 +1745,10 @@
       <source>Device storage information update interval</source>
       <translation>Khoảng thời gian cập nhật thông tin lưu trữ thiết bị</translation>
     </message>
+    <message>
+      <source>Anonymous Crash Report Server API URL</source>
+      <translation type="unfinished">Anonymous Crash Report Server API URL</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::event::StringsHelper</name>

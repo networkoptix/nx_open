@@ -1745,6 +1745,10 @@
       <source>Device storage information update interval</source>
       <translation>裝置儲存資訊更新間隔</translation>
     </message>
+    <message>
+      <source>Anonymous Crash Report Server API URL</source>
+      <translation type="unfinished">Anonymous Crash Report Server API URL</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::event::StringsHelper</name>
