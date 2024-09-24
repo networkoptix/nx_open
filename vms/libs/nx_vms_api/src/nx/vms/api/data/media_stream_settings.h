@@ -119,6 +119,7 @@ NX_REFLECTION_INSTRUMENT(MediaStreamSettings, MediaStreamSettings_Fields)
 
 /**%apidoc
  * %param[opt] durationMs Fragment length in milliseconds.
+ * %param[unused] download
  */
 struct NX_VMS_API BookmarkStreamSettings: public StreamSettings, public BookmarkProtection
 {
