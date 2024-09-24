@@ -599,6 +599,13 @@ QnMediaResourceWidget::QnMediaResourceWidget(
     updateHotspotsState();
 
     // Connect to audio-related signals.
+    auto updateButtonsAndAudioPlaybackState =
+        [this]()
+        {
+            updateButtonsVisibility();
+            updateAudioPlaybackState();
+        };
+
     connect(AudioDispatcher::instance(),
         &AudioDispatcher::currentAudioSourceChanged,
         this,
@@ -610,6 +617,13 @@ QnMediaResourceWidget::QnMediaResourceWidget(
             updateButtonsVisibility();
             updateAudioPlaybackState();
         });
+    if (d->camera)
+    {
+        connect(d->camera.get(),
+            &QnSecurityCamResource::audioEnabledChanged,
+            this,
+            updateButtonsAndAudioPlaybackState);
+    }
     updateAudioPlaybackState();
 }
 
@@ -842,7 +856,7 @@ void QnMediaResourceWidget::initCameraHotspotsOverlay()
 
 void QnMediaResourceWidget::initAudioSpectrumOverlay()
 {
-    if (!shouldShowAudioSpectrum())
+    if (!mightShowAudioSpectrum())
         return;
 
     m_audioSpectrumOverlayWidget = new AudioSpectrumOverlayWidget(display(), m_compositeOverlay);
@@ -851,9 +865,14 @@ void QnMediaResourceWidget::initAudioSpectrumOverlay()
         {Visible, OverlayFlag::autoRotate | OverlayFlag::bindToViewport, BaseLayer});
 }
 
-bool QnMediaResourceWidget::shouldShowAudioSpectrum() const
+bool QnMediaResourceWidget::mightShowAudioSpectrum() const
 {
     return !d->hasVideo && !d->isIoModule && ini().audioVisualization;
+}
+
+bool QnMediaResourceWidget::shouldShowAudioSpectrum() const
+{
+    return mightShowAudioSpectrum() && d->camera && d->camera->isAudioEnabled();
 }
 
 QnMediaResourceWidget::AreaType QnMediaResourceWidget::areaSelectionType() const
@@ -3524,6 +3543,8 @@ bool QnMediaResourceWidget::canBeMuted() const
 {
     return
         ini().perItemMute &&
+        d->camera &&
+        d->camera->isAudioEnabled() &&
         !isZoomWindow() &&
         appContext()->localSettings()->playAudioForAllItems();
 }
@@ -3562,19 +3583,26 @@ void QnMediaResourceWidget::updateAudioPlaybackState()
 
     bool effectiveMuted =
         !isActiveWindow ||
+        (d->camera && !d->camera->isAudioEnabled()) ||
         (isPlayingAll ? canBeMuted() && isMuted() : !isCentral);
 
     if (shouldShowAudioSpectrum())
     {
+        // OK to pass true unconditionally even if isAudioEnabled == false.
         camDisplay->playAudio(true);
         camDisplay->setAudioDecodeMode(effectiveMuted
             ? AudioDecodeMode::spectrumOnly
             : AudioDecodeMode::normalWithSpectrum);
+
         m_audioSpectrumOverlayWidget->audioSpectrumWidget()->setMuted(effectiveMuted);
+        setOverlayWidgetVisible(m_audioSpectrumOverlayWidget, true, /*animate=*/false);
     }
     else
     {
         camDisplay->playAudio(!effectiveMuted);
         camDisplay->setAudioDecodeMode(AudioDecodeMode::normal);
+
+        if (mightShowAudioSpectrum())
+            setOverlayWidgetVisible(m_audioSpectrumOverlayWidget, false, /*animate=*/false);
     }
 }
