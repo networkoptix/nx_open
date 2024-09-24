@@ -574,6 +574,21 @@ void QnWorkbenchPtzHandler::at_ptzContinuousMoveAction_triggered()
     if (!item || !controller)
         return;
 
+    const auto mediaResource = widget->resource();
+    if (!mediaResource)
+        return;
+
+    const auto resource = mediaResource->toResourcePtr();
+    if (!resource)
+        return;
+
+    const nx::vms::api::ResourceStatus status = resource->getStatus();
+    if (status != nx::vms::api::ResourceStatus::online
+        && status != nx::vms::api::ResourceStatus::recording)
+    {
+        return;
+    }
+
     if (const auto resource = widget->resource()->toResource(); resource)
         NX_DEBUG(this, "Resource: %1, controller: %2", resource->getName(), controller.get());
 
