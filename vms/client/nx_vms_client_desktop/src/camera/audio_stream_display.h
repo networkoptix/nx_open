@@ -98,4 +98,5 @@ private:
     qint64 m_lastAudioTime;
     mutable nx::Mutex m_audioQueueMutex;
     qint64 m_blockedTimeValue;
+    bool m_suspended = false;
 };
