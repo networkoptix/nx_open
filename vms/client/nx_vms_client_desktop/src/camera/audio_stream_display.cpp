@@ -81,6 +81,7 @@ void QnAudioStreamDisplay::unblockTimeValue()
 void QnAudioStreamDisplay::suspend()
 {
     NX_MUTEX_LOCKER lock(&m_guiSync);
+    m_suspended = true;
     if (m_sound)
     {
         m_tooFewDataDetected = true;
@@ -91,6 +92,7 @@ void QnAudioStreamDisplay::suspend()
 void QnAudioStreamDisplay::resume()
 {
     NX_MUTEX_LOCKER lock(&m_guiSync);
+    m_suspended = false;
     if (m_sound)
         m_sound->resume();
 }
@@ -327,6 +329,9 @@ void QnAudioStreamDisplay::playCurrentBuffer()
                 // supported (may be several dlls).
                 m_isConvertMethodInitialized = false;
             }
+            else if (m_suspended)
+                m_sound->suspend();
+
         }
 
         if (m_sound && m_decodeMode != AudioDecodeMode::spectrumOnly)
