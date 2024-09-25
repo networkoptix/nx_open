@@ -66,8 +66,6 @@ const QString kVideoLayout("VideoLayout");
 const QString kMotionStreamKey("motionStream");
 const QString kForcedMotionDetectionKey("forcedMotionDetection");
 
-const QString kUseMedia2ToInitializeCamera("useMedia2ToFetchProfiles");
-
 const QString kForcedLicenseType("forcedLicenseType");
 
 const QString kTwoWayAudioEnabled("twoWayAudioEnabled");
