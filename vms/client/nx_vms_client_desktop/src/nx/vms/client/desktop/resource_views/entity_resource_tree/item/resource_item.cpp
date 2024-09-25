@@ -393,7 +393,7 @@ QVariant ResourceItem::parentResourceData() const
 
 QVariant ResourceItem::customGroupIdData() const
 {
-    if (!isCamera() && !m_resource->hasFlags(Qn::web_page))
+    if (!isCamera() && !m_resource->hasFlags(Qn::web_page) && !m_resource->hasFlags(Qn::layout))
         return QVariant();
 
     if (m_customGroupIdCache.isNull())
