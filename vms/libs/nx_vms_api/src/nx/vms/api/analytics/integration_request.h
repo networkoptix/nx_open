@@ -55,7 +55,7 @@ struct NX_VMS_API CreateIntegrationRequest
     /**%apidoc Integration authentication code, 4 decimal digits. */
     QString pinCode;
 
-    /**%apidoc Whether the Integration is REST-only. */
+    /**%apidoc[opt] Whether the Integration is REST-only. */
     bool isRestOnly = false;
 
     /**%apidoc Device Agent Manifest should be provided by REST-only Integrations. */
