@@ -88,6 +88,11 @@ NX_VMS_COMMON_API extern const QString kIoOverlayStyle;
 // The next three keys are used both as property keys and as data keys, so they are defined both
 // in ResourcePropertyKey and ResourceDataKey namespaces.
 NX_VMS_COMMON_API extern const QString kBitratePerGOP;
+
+/**
+ * To use or not to use onvif Media2 during camera initialization to fetch profiles.
+ * The valid values are described in nx::core::resource::UsingOnvifMedia2Type.
+ */
 NX_VMS_COMMON_API extern const QString kUseMedia2ToFetchProfiles;
 NX_VMS_COMMON_API extern const QString kIoSettings;
 
@@ -95,12 +100,6 @@ NX_VMS_COMMON_API extern const QString kVideoLayout;
 
 NX_VMS_COMMON_API extern const QString kMotionStreamKey;
 NX_VMS_COMMON_API extern const QString kForcedMotionDetectionKey;
-
-/**
- * To use or not to use onvif media2 during camera initialization. The valid values are
- * "autoSelect" (by default), "useIfSupported", "neverUse".
- */
-NX_VMS_COMMON_API extern const QString kUseMedia2ToInitializeCamera;
 
 NX_VMS_COMMON_API extern const QString kForcedLicenseType;
 
