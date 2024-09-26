@@ -18,6 +18,7 @@
 #include <nx/vms/rules/field_types.h>
 #include <nx/vms/rules/manifest.h>
 #include <nx/vms/rules/rules_fwd.h>
+#include <nx/vms/rules/utils/compatibility.h>
 
 namespace {
 
@@ -230,13 +231,10 @@ QJsonObject constructSchemaReference(const QString& displayName)
 }
 
 void collectOpenApiInfo(
-    const QMap<QString, ItemDescriptor>& items, QJsonObject& schemas, QJsonArray& listReference)
+    const QList<ItemDescriptor>& items, QJsonObject& schemas, QJsonArray& listReference)
 {
     for (const auto& item: items)
     {
-        if (item.flags.testFlag(ItemFlag::system))
-            continue;
-
         QJsonObject schema;
         schema[kTypeProperty] = "object";
         QJsonObject properties;
@@ -388,7 +386,7 @@ QJsonObject getPropertyOpenApiDescriptor(const QMetaType& metaType, bool addDefa
     return createBasicTypeDescriptor(metaType, addDefaultValue);
 }
 
-QJsonObject VmsRulesOpenApiDocHelper::generateOpenApiDoc(Engine* engine)
+QJsonObject VmsRulesOpenApiDocHelper::generateOpenApiDoc(nx::vms::common::SystemContext* context)
 {
     QFile templateOpenApi(kTemplatePath);
     if (!NX_ASSERT(
@@ -400,12 +398,18 @@ QJsonObject VmsRulesOpenApiDocHelper::generateOpenApiDoc(Engine* engine)
     QTextStream textStream(&templateOpenApi);
     QString templateText = textStream.readAll();
 
+    // Item descriptors that are not supported by the site need to be filtered out.
+    const auto filteredEvents =
+        filterItems(context, defaultItemFilters(), context->vmsRulesEngine()->events().values());
     QJsonObject schemas;
     QJsonArray eventListReference;
-    collectOpenApiInfo(engine->events(), schemas, eventListReference);
+    collectOpenApiInfo(filteredEvents, schemas, eventListReference);
 
+    // Item descriptors that are not supported by the site need to be filtered out.
+    const auto filteredActions =
+        filterItems(context, defaultItemFilters(), context->vmsRulesEngine()->actions().values());
     QJsonArray actionListReference;
-    collectOpenApiInfo(engine->actions(), schemas, actionListReference);
+    collectOpenApiInfo(filteredActions, schemas, actionListReference);
 
     const auto jsonActionList = QJsonDocument(actionListReference).toJson();
     const auto jsonEventList = QJsonDocument(eventListReference).toJson();
@@ -481,7 +485,7 @@ QJsonObject VmsRulesOpenApiDocHelper::addVmsRulesDocIfRequired(
     if (it != lockableResource->end())
         return it->second;
 
-    mergeOpenApiDoc(openApiDoc, generateOpenApiDoc(systemContext->vmsRulesEngine()));
+    mergeOpenApiDoc(openApiDoc, generateOpenApiDoc(systemContext));
 
     lockableResource->emplace(basicDocFilePath, openApiDoc);
     return openApiDoc;
