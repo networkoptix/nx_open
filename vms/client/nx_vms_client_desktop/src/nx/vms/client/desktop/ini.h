@@ -358,10 +358,6 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
     NX_INI_FLAG(false, allowCslObjectSearch,
         "[Feature] Enables Objects search on Cross System Layouts.");
 
-    // VMS-52088
-    NX_INI_FLAG(false, newOpenInContextMenu,
-        "[Feature] Enables the new \"Open in\" context menu.");
-
     // VMS-41660
     NX_INI_FLAG(false, foldersForLayoutsInResourceTree,
         "[Feature] Enables folders for layouts in the Resource Tree.");
