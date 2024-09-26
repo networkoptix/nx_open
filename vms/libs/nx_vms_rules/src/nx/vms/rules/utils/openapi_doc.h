@@ -98,7 +98,7 @@ public:
      * Result example: "AnalyticsObjectEvent"
      */
     static QString schemaName(const QString& id);
-    static QJsonObject generateOpenApiDoc(Engine* engine);
+    static QJsonObject generateOpenApiDoc(nx::vms::common::SystemContext* context);
 
     /**
      * Adds schemas and paths for VmsRules that are missing in basicDoc.
