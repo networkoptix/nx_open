@@ -9,4 +9,13 @@ bool AnalyticsEngineField::match(const QVariant& eventValue) const
     return value().isNull() || eventValue.value<nx::Uuid>() == value();
 }
 
+QJsonObject AnalyticsEngineField::openApiDescriptor(const QVariantMap& properties)
+{
+    auto descriptor = SimpleTypeEventField::openApiDescriptor(properties);
+    descriptor[utils::kDescriptionProperty] =
+        "Analytics Engine id. To find the required Analytics Engine id, "
+        "refer to the response of the request to <code>/rest/v4/analytics/engines</code>.";
+    return descriptor;
+}
+
 } // namespace nx::vms::rules

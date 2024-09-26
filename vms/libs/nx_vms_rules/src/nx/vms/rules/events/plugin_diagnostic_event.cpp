@@ -80,7 +80,8 @@ const ItemDescriptor& PluginDiagnosticEvent::manifest()
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<PluginDiagnosticEvent>(),
         .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Plugin Diagnostic Event")),
-        .description = {},
+        .description = "Triggered when an event is received from "
+            "a plugin device connected to the site.",
         .fields = {
             makeFieldDescriptor<SourceCameraField>(
                 utils::kCameraIdFieldName,
@@ -93,9 +94,12 @@ const ItemDescriptor& PluginDiagnosticEvent::manifest()
             makeFieldDescriptor<AnalyticsEngineField>("engineId",
                 NX_DYNAMIC_TRANSLATABLE(tr("For Plugin"))),
             makeFieldDescriptor<TextLookupField>(utils::kCaptionFieldName,
-                Strings::andCaption()),
+                Strings::andCaption(),
+                "An optional value used to specify the object type identifier."),
             makeFieldDescriptor<TextLookupField>(utils::kDescriptionFieldName,
-                Strings::andDescription()),
+                Strings::andDescription(),
+                "An optional attribute used to differentiate objects within "
+                "the same class for event filtering."),
             makeFieldDescriptor<AnalyticsEventLevelField>("level",
                 NX_DYNAMIC_TRANSLATABLE(tr("And Level Is"))),
         },

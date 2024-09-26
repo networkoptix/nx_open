@@ -117,7 +117,9 @@ FieldDescriptor makeStateFieldDescriptor(
     return makeFieldDescriptor<StateField>(
         kStateFieldName,
         displayName,
-        description,
+        description.isEmpty()
+            ? QString("State field is required for prolonged event with instant action.")
+            : description,
         {{"value", QVariant::fromValue(defaultState)}});
 }
 

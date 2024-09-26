@@ -113,7 +113,7 @@ ItemDescriptor DeviceDisconnectedEvent::manifest(common::SystemContext* context)
         .id = utils::type<DeviceDisconnectedEvent>(),
         .groupId = kDeviceIssueEventGroup,
         .displayName = TranslatableString(getDisplayName),
-        .description = {},
+        .description = "Triggered when a device is disconnected, regardless of the cause.",
         .flags = {ItemFlag::instant, ItemFlag::aggregationByTypeSupported},
         .fields = {
             makeFieldDescriptor<SourceCameraField>(

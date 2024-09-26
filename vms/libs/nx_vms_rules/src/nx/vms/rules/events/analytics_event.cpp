@@ -103,7 +103,8 @@ const ItemDescriptor& AnalyticsEvent::manifest()
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<AnalyticsEvent>(),
         .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Analytics Event")),
-        .description = {},
+        .description = TranslatableString{"Triggered when an analytics event is triggered"
+            " on source device."},
         .flags = {ItemFlag::instant, ItemFlag::prolonged}, //< Actual duration depends on the AnalyticsEventTypeField.
         .fields = {
             utils::makeStateFieldDescriptor(Strings::beginWhen()),
@@ -112,17 +113,23 @@ const ItemDescriptor& AnalyticsEvent::manifest()
                 Strings::occursAt(),
                 {},
                 ResourceFilterFieldProperties{
+                    .base = FieldProperties{.optional = false},
                     .validationPolicy = kCameraAnalyticsValidationPolicy
                 }.toVariantMap()),
             makeFieldDescriptor<AnalyticsEventTypeField>(
                 utils::kEventTypeIdFieldName,
-                Strings::ofType()),
+                Strings::ofType(),
+                "Specifies the analytics event types used for event filtering.",
+                FieldProperties{.optional = false}.toVariantMap()),
             makeFieldDescriptor<TextLookupField>(
                 utils::kCaptionFieldName,
-                Strings::andCaption()),
+                Strings::andCaption(),
+                "An optional value used to specify the object type identifier."),
             makeFieldDescriptor<TextLookupField>(
                 utils::kDescriptionFieldName,
-                Strings::andDescription()),
+                Strings::andDescription(),
+                "An optional attribute used to differentiate objects within "
+                "the same class for event filtering."),
             // TODO: #amalov Consider adding following fields in 6.1+.
             // makeFieldDescriptor<AnalyticsObjectAttributesField>("attributes", tr("Attributes")),
         },

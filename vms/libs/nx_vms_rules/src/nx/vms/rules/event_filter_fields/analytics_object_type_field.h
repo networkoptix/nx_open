@@ -21,6 +21,7 @@ public:
     AnalyticsObjectTypeField(common::SystemContext* context, const FieldDescriptor* descriptor);
 
     virtual bool match(const QVariant& eventValue) const override;
+    static QJsonObject openApiDescriptor(const QVariantMap& properties);
 
 signals:
     void valueChanged();

@@ -95,6 +95,7 @@ const ItemDescriptor& PoeOverBudgetEvent::manifest()
 
         .groupId = kServerIssueEventGroup,
         .displayName = NX_DYNAMIC_TRANSLATABLE(tr("PoE Over Budget")),
+        .description = "Triggered when the Power over Ethernet (PoE) budget is exceeded on the device.",
         .flags = ItemFlag::prolonged,
         .fields = {
             utils::makeStateFieldDescriptor(Strings::beginWhen()),
@@ -103,6 +104,7 @@ const ItemDescriptor& PoeOverBudgetEvent::manifest()
                 NX_DYNAMIC_TRANSLATABLE(tr("Server")),
                 {},
                 ResourceFilterFieldProperties{
+                    .base = FieldProperties{.optional = false},
                     .validationPolicy = kHasPoeManagementValidationPolicy
                 }.toVariantMap()),
         },

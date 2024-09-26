@@ -17,6 +17,19 @@ class NX_VMS_RULES_API SourceCameraField: public ResourceFilterEventField
 
 public:
     using ResourceFilterEventField::ResourceFilterEventField;
+    static QJsonObject openApiDescriptor(const QVariantMap& properties)
+    {
+        auto descriptor = ResourceFilterEventField::openApiDescriptor(properties);
+        auto resourceFilterProperties = ResourceFilterFieldProperties::fromVariantMap(properties);
+        QString description =
+            "Defines the source camera resources to be used for event filtering.";
+
+        if (resourceFilterProperties.acceptAll && resourceFilterProperties.allowEmptySelection)
+            description += "<br/>If left unspecified or empty, events from any camera will be considered.";
+
+        descriptor[utils::kDescriptionProperty] = description;
+        return descriptor;
+    }
 };
 
 } // namespace nx::vms::rules

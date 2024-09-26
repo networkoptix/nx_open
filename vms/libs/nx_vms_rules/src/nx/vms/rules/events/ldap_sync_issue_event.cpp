@@ -106,7 +106,7 @@ const ItemDescriptor& LdapSyncIssueEvent::manifest()
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<LdapSyncIssueEvent>(),
         .displayName = NX_DYNAMIC_TRANSLATABLE(tr("LDAP Sync Issue Event")),
-        .description = {},
+        .description = "Triggered when the LDAP server fails to synchronize with the site.",
         .flags = {ItemFlag::instant, ItemFlag::aggregationByTypeSupported},
         .fields = {},
         .emailTemplatePath = ":/email_templates/ldap_sync_issue.mustache"

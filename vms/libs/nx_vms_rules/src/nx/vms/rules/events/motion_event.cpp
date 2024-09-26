@@ -41,6 +41,8 @@ const ItemDescriptor& MotionEvent::manifest()
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<MotionEvent>(),
         .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Motion on Camera")),
+        .description = "Triggered when motion is detected on the selected cameras. "
+            "Note: recording must be enabled for the rule to function.",
         .flags = ItemFlag::prolonged,
         .fields = {
             utils::makeStateFieldDescriptor(Strings::beginWhen()),

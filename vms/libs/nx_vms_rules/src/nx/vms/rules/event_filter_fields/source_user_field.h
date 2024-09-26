@@ -21,6 +21,8 @@ public:
     SourceUserField(common::SystemContext* context, const FieldDescriptor* descriptor);
 
     bool match(const QVariant& value) const override;
+
+    static QJsonObject openApiDescriptor(const QVariantMap& properties);
 };
 
 } // namespace nx::vms::rules

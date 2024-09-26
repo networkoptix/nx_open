@@ -16,6 +16,13 @@ class NX_VMS_RULES_API SourceServerField: public ResourceFilterEventField
 
 public:
     using ResourceFilterEventField::ResourceFilterEventField;
+    static QJsonObject openApiDescriptor(const QVariantMap& properties)
+    {
+        auto descriptor = ResourceFilterEventField::openApiDescriptor(properties);
+        descriptor[utils::kDescriptionProperty] =
+            "Defines the source server resources to be used for event filtering.";
+        return descriptor;
+    }
 };
 
 } // namespace nx::vms::rules
