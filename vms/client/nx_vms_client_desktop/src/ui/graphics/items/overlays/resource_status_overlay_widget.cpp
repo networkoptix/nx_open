@@ -615,11 +615,22 @@ void QnStatusOverlayWidget::updateAreaSizes()
         m_extrasContainer->adjustSize();
         const auto& containerGeometry = m_extrasContainer->geometry();
         extrasHeight = containerGeometry.height() * scale;
-
-        constexpr qreal kButtonBottomPosition = 1 - 32. / 432;
-
         m_extrasHolder->setFixedSize(QSizeF(rect.width(), extrasHeight));
-        m_extrasHolder->setPos(0, height * kButtonBottomPosition - extrasHeight);
+
+        constexpr int kButtonOffsetWithText = 24;
+        constexpr int kButtonOffsetWithoutText = 16;
+
+        int buttonOffset = m_caption->isVisible() ? kButtonOffsetWithText : kButtonOffsetWithoutText;
+        int textBottomY = m_caption->height() + buttonOffset;
+        if (!scene()->views().empty())
+        {
+            auto view = scene()->views().first();
+            const auto& globalPos = m_caption->mapToGlobal(QPoint{0, textBottomY});
+            const auto& viewPos = view->mapFromGlobal(globalPos);
+            const auto& scenePos = view->mapToScene(viewPos);
+            const auto& localPos = mapFromScene(scenePos);
+            m_extrasHolder->setPos(0, localPos.y());
+        }
     }
 
     const QSizeF imageSize = m_imageItem.pixmap().isNull()
@@ -652,13 +663,6 @@ void QnStatusOverlayWidget::updateAreaSizes()
     m_imageItem.setScale(imageItemScale);
     m_imageItem.setPos((rect.width() - imageSceneSize.width()) / 2,
         (rect.height() - imageSceneSize.height()) / 2);
-
-    if (showExtras)
-    {
-        auto imageBottom = m_imageItem.y() + imageSceneSize.height();
-        if (m_extrasHolder->y() < imageBottom)
-            m_extrasHolder->setY(height - extrasHeight);
-    }
 
     m_extrasHolder->updateScale();
     m_preloaderHolder->updateScale();

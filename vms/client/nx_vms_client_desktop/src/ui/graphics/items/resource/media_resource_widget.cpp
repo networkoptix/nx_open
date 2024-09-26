@@ -2798,12 +2798,12 @@ Qn::ResourceOverlayButton QnMediaResourceWidget::calculateOverlayButton(
         }
 
         case Qn::AccessDeniedOverlay:
-        case Qn::OfflineOverlay:
         {
             return Qn::ResourceOverlayButton::Empty;
         }
 
         case Qn::OldFirmwareOverlay:
+        case Qn::OfflineOverlay:
         {
             return menu()->canTrigger(menu::CameraDiagnosticsAction, d->camera)
                 ? Qn::ResourceOverlayButton::Diagnostics
