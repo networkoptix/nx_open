@@ -103,46 +103,43 @@ into the provided scripts (use their source code as a reference; run with `-h` o
 the possible options):
 ```
 # Windows, x64:
-build_samples.bat
+build.bat
 
 # Linux or Windows with Cygwin, x64:
-build_samples.sh
+build.sh
 
 # Linux, 64-bit ARM cross-compiling (e.g. Nvidia Tegra):
 # NOTE: The provided file toolchain_arm64.cmake defines which cross-compiler will be used.
-build_samples_arm64.sh
+build_arm64.sh
 
 # Linux, 32-bit ARM cross-compiling, without Raspberry Pi specific samples:
 # NOTE: The provided file toolchain_arm32.cmake defines which cross-compiler will be used.
-build_samples_arm32.sh
+build_arm32.sh
 
 # Linux, Raspberry Pi (32-bit ARM) cross-compiling, with samples specific to Raspberry Pi:
 # NOTE: The provided file toolchain_arm32.cmake defines which cross-compiler will be used.
-build_samples_rpi.sh -DrpiFirmware=<path_to_rpi_sysroot>
+build_arm32.sh -DrpiFirmware=<path_to_rpi_sysroot>
 ```
 
 ATTENTION: Some of the samples require the Qt library. The Qt version should be the same as the one
 that comes with the Server (see the installed Server files), otherwise an unpredictable behavior
-may take place. If CMake cannot find Qt, specify its path to a build_samples* script (will be
-passed to cmake), or choose to skip Qt-based samples via `--no-qt-samples` option, as shown below:
+may take place. To build these samples, specify the paths to `qt` And `qt-host` Conan packages
+distributed by Nx using CMake parameters `QT_DIR` and `QT_HOST_PATH`:
 ```
 # Windows:
-set QT_DIR=<absolute-path-to-Qt6-dir>
-set QT_HOST_PATH=<absolute-path-to-qt6-host-dir>.
-build_samples.bat
-# or
-build_samples.bat --no-qt-samples
+build.bat
 
 # Linux:
-QT_DIR=<absolute-path-to-qt-dir> QT_HOST_PATH=<absolute-path-to-qt-host-dir> ./build_samples.sh
-# or
-./build_samples.sh --no-qt-samples
+build.sh QT_DIR=<absolute-path-to-Qt6-dir> QT_HOST_PATH=<absolute-path-to-qt6-host-dir>.
 ```
 
 `absolute-path-to-qt-dir` and `absolute-path-to-qt-host-dir` are paths to the Conan packages that
 can be installed from [open-source Nx artifactory](http://artifactory.nxvms.dev/).
 The Conan remote URL for this artifactory is
 `https://artifactory.nxvms.dev/artifactory/api/conan/conan`.
+
+Also, if you do not want to run unit tests, it can be achieved by setting the
+`NX_SDK_NO_TESTS` environment variable to `1` (the tests will be built anyway).
 
 You can also build the samples using any IDE that supports CMake projects. The necessary steps
 depend on the IDE; for example, on Windows, you can use the Visual Studio GUI to compile a sample
@@ -154,10 +151,10 @@ folder" from the start windows or `Open` -> `Folder` of the main menu. `plugin_t
 After the successful build, locate the built artifacts:
 ```
 # Windows:
-..\server_plugin_sdk-build\<plugin_type>\<sample_name>\<sample_name>.dll
+..\server_plugin_sdk-build\samples\<plugin_type>\<sample_name>\<sample_name>.dll
 
 # Linux:
-../server_plugin_sdk-build/<plugin_type>/<sample_name>/lib<sample_name>.so
+../server_plugin_sdk-build/samples/<plugin_type>/<sample_name>/lib<sample_name>.so
 ```
 
 To install a plugin, just copy its library file to the dedicated folder in the VMS Server
@@ -169,6 +166,24 @@ C:\Program Files\<vms-installation-dir>\MediaServer\plugins\
 # Linux:
 /opt/<vms-installation-dir>/mediaserver/bin/plugins/
 ```
+
+Some of the plugins (e.g. `stub_analytics_plugin`) require more than one file to work. In this
+case, the library file with the other necessary files and directories must be copied to the
+separate subdirectory under the Server plugin directory, e.g:
+```
+# Windows:
+C:\Program Files\<vms-installation-dir>\MediaServer\plugins\
+- stub_analytics_plugin\
+  - object_streamer\
+  - stub_analytics_plugin.dll
+
+# Linux:
+/opt/<vms-installation-dir>/mediaserver/bin/plugins/
+- stub_analytics_plugin/
+  - object_streamer/
+  - libstub_analytics_plugin.so
+```
+
 ATTENTION: After copying a plugin library, the Server has to be restarted.
 
 ## Specific Plugin Types

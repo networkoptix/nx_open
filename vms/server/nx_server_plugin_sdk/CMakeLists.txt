@@ -150,9 +150,9 @@ list(APPEND depends ${copy_sdk_files_script} ${sdk_example_files_file})
 set(msvc_environment_setup_script "call_vcvars64.bat")
 
 if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
-    set(sample_build_script "./build_samples.sh")
+    set(sample_build_script "./build.sh")
 elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
-    set(sample_build_script "build_samples.bat")
+    set(sample_build_script "build.bat")
 else()
     message(FATAL_ERROR "Building SDK sample(s) supported only on Windows and Linux.")
 endif()
@@ -172,52 +172,52 @@ nx_store_known_files(${sdk_example_files_file})
 # during the build phase. On CI, such tests are run with other tests, because they are included in
 # unit test distribution.
 
-# We can run the SDK tests only if build platform equals target platform.
+# We can run the SDK tests only if the build platform equals the target platform.
 if(targetDevice STREQUAL ${default_target_device})
-    # The tests will be built: inform about that.
+    # The tests will be run: inform about that.
     set(sample_tests_message " and running unit tests")
 else()
-    set(sampleTestsTrigger "--no-tests")
+    if (targetDevice STREQUAL "windows_x64")
+        message(FATAL_ERROR "Cross-compiling for windows_x64 is not supported.")
+    endif()
+    set(set_env_command ${CMAKE_COMMAND} -E env NX_SDK_NO_TESTS=1)
 endif()
 
-set(nx_kit_ut_tmp_dir ${CMAKE_CURRENT_BINARY_DIR}/nx_kit_ut_tmp)
-set(buildSamplesEnvironmentSetup
-    ${CMAKE_COMMAND} -E env
-        # Set environment variables with Qt paths, needed by some of the samples.
-        QT_DIR=${QT_DIR}
-        QT_HOST_PATH=${QT_HOST_PATH}
-        # Set nx_kit unit test temporary directory - needed to avoid possible clashes when running
-        # multiple nx_kit_ut in CI environment (happens when running more than one build in
-        # parallel).
-        NX_KIT_UT_TMP_DIR=${nx_kit_ut_tmp_dir}
-)
 if(targetDevice STREQUAL "windows_x64")
+    set(compiling_options "")
+
     if(NOT openSourceBuild)
         # Use MSVC 2019 compiler for non-open-source builds only.
-        list(APPEND buildSamplesEnvironmentSetup NX_FORCED_MSVC_VERSION="14.29")
+        set(set_env_command ${CMAKE_COMMAND} -E env NX_FORCED_MSVC_VERSION="14.29")
     endif()
 else()
+    set(compiling_options -DCONAN_SDK-GCC_ROOT=${CONAN_SDK-GCC_ROOT})
+
     if(targetDevice STREQUAL "linux_arm32" OR targetDevice STREQUAL "edge1")
         set(toolchainFile "linux_arm32")
-        set(extraArgs --no-tests)
         if(targetDevice STREQUAL "linux_arm32")
-            list(APPEND extraArgs -DrpiFirmware=${CONAN_RPI-FIRMWARE_ROOT})
+            list(APPEND compiling_options -DrpiFirmware=${CONAN_RPI-FIRMWARE_ROOT})
         endif()
     elseif(targetDevice STREQUAL "linux_arm64")
         set(toolchainFile "linux_arm64")
-        set(extraArgs --no-tests)
     elseif(targetDevice STREQUAL "linux_x64")
         set(toolchainFile "linux_x64")
     endif()
 
-    set(compilingOptions -DCONAN_SDK-GCC_ROOT=${CONAN_SDK-GCC_ROOT})
-
     if(toolchainFile)
-        set(compilingOptions ${compilingOptions}
+        list(APPEND compiling_options
             -DCMAKE_TOOLCHAIN_FILE=${CMAKE_CURRENT_SOURCE_DIR}/toolchains/${toolchainFile}.cmake
         )
     endif()
 endif()
+
+set(nx_kit_ut_tmp_dir ${CMAKE_CURRENT_BINARY_DIR}/nx_kit_ut_tmp)
+
+list(APPEND compiling_options
+    -DQT_DIR="${QT_DIR}"
+    -DQT_HOST_PATH="${QT_HOST_PATH}"
+    -DNX_KIT_UT_TMP_DIR="${nx_kit_ut_tmp_dir}"
+)
 
 nx_add_custom_command(OUTPUT ${zip_file}
     DEPENDS ${depends}
@@ -232,8 +232,7 @@ nx_add_custom_command(OUTPUT ${zip_file}
     COMMAND ${CMAKE_COMMAND} -E
         echo "  Building samples${sample_tests_message} - see ${sample_build_log}"
     COMMAND ${CMAKE_COMMAND} -E chdir ${sdk_dir}
-        ${buildSamplesEnvironmentSetup}
-        ${sample_build_script} ${extraArgs} ${compilingOptions}
+        ${set_env_command} ${sample_build_script} ${compiling_options}
         >${sample_build_log} 2>&1
 
     COMMAND ${CMAKE_COMMAND} -E
