@@ -86,8 +86,8 @@ Menu
             : qsTr("Remove from Favorites")
 
         icon.source: menu.model.visibilityScope !== WelcomeScreen.FavoriteTileVisibilityScope
-            ? "image://skin/welcome_screen/tile/menu/star.svg"
-            : "image://skin/welcome_screen/tile/menu/star_crossed.svg"
+            ? "image://skin/20x20/Outline/star.svg"
+            : "image://skin/20x20/Outline/star_crossed.svg"
 
         visible: menu.model.tileType === ConnectTilesModel.GeneralTileType
 

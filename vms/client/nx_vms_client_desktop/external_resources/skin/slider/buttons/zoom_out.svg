@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg width="38px" height="42px" viewBox="0 0 38 42" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <title>minus</title>
-    <g id="minus" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <rect id="Rectangle" fill="#1C2327" x="0" y="0" width="38" height="42"></rect>
-        <rect id="Rectangle" fill="#698796" transform="translate(19, 21) rotate(-270) translate(-19, -21)" x="18" y="15" width="2" height="12"></rect>
-    </g>
-</svg>

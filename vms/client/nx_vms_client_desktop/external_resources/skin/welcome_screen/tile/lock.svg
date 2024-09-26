@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg width="10px" height="14px" viewBox="0 0 10 14" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <!-- Generator: Sketch 64 (93537) - https://sketch.com -->
-    <title>tags/lock</title>
-    <desc>Created with Sketch.</desc>
-    <g id="tags/lock" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <path d="M7,0 C8.1045695,0 9,0.8954305 9,2 L9,6 C9.55228475,6 10,6.44771525 10,7 L10,13 C10,13.5522847 9.55228475,14 9,14 L1,14 C0.44771525,14 6.76353751e-17,13.5522847 0,13 L0,7 C-6.76353751e-17,6.44771525 0.44771525,6 1,6 L1,2 C1,0.8954305 1.8954305,0 3,0 L7,0 Z M5,8.5 C4.44771525,8.5 4,8.94771525 4,9.5 C4,9.82896686 4.15884739,10.1208329 4.40402416,10.3030802 L4.4998705,10.3661429 L4.5,11.5 L5.5,11.5 L5.5011143,10.3655723 C5.79940038,10.1925095 6,9.86968103 6,9.5 C6,8.94771525 5.55228475,8.5 5,8.5 Z M7,2 L3,2 L3,6 L7,6 L7,2 Z" id="Combined-Shape" fill="#3A4D57" fill-rule="nonzero"></path>
-    </g>
-</svg>

@@ -28,9 +28,9 @@ static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kTabClose
 };
 
 NX_DECLARE_COLORIZED_ICON(kSystemTabBar,
-    "tab_bar/system_tab_close.svg",
+    "16x16/Outline/tab_close.svg",
     kTabCloseTheme,
-    "tab_bar/system_tab_close_checked.svg",
+    "16x16/Outline/tab_close.svg",
     kTabCloseCheckedTheme)
 
 };  // namespace

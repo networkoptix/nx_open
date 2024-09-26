@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+  <g class="24x24/Outline/dashboard">
+    <path fill="#B0BEC4" fill-rule="evenodd" d="M5 5v14h4V5H5ZM4 3a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1H4Zm11 2v2h4V5h-4Zm-1-2a1 1 0 0 0-1 1v4a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1h-6Zm1 16v-6h4v6h-4Zm-2-7a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1h-6a1 1 0 0 1-1-1v-8Z" class="Primary" clip-rule="evenodd"/>
+  </g>
+</svg>

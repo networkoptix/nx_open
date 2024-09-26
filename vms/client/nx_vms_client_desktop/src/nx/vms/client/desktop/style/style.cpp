@@ -152,8 +152,8 @@ NX_DECLARE_COLORIZED_ICON(kArrowRightSolidIcon, "20x20/Solid/arrow_right.svg", \
 NX_DECLARE_COLORIZED_ICON(kArrowLeftIcon, "16x16/Outline/arrow_left.svg", kLight1Theme)
 NX_DECLARE_COLORIZED_ICON(kArrowRightIcon, "16x16/Outline/arrow_right.svg", kLight1Theme)
 NX_DECLARE_COLORIZED_ICON(kTabCloseIcon,
-    "tab_bar/tab_close.svg", kTabCloseTheme,
-    "tab_bar/tab_close_checked.svg", kTabCloseCheckedTheme)
+    "16x16/Outline/tab_close.svg", kTabCloseTheme,
+    "16x16/Outline/tab_close.svg", kTabCloseCheckedTheme)
 NX_DECLARE_COLORIZED_ICON(kAddFolder2pxIcon, "24x24/Outline/add_folder_2px.svg", kLight1Theme)
 NX_DECLARE_COLORIZED_ICON(kArrowLeft2pxIcon, "24x24/Outline/arrow_left_2px.svg", kLight1Theme)
 NX_DECLARE_COLORIZED_ICON(kArrowRight2pxIcon, "24x24/Outline/arrow_right_2px.svg", kLight1Theme)

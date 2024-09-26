@@ -22,6 +22,11 @@ static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubst
     {QIcon::Selected, {{kLight16Color, "light15"}}},
 };
 
+const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kIconTheme = {
+    {QIcon::Normal, {.primary = "light16"}},
+    {QIcon::Active, {.primary = "light17"}},
+    {QIcon::Selected, {.primary = "light15"}},
+};
 } // namespace
 
 struct ObtainButton::Private
@@ -47,9 +52,9 @@ ObtainButton::ObtainButton(
     QWidget* parent)
     :
     base_type(
-        qnSkin->icon("user_settings/spinner.svg", kIconSubstitutions),
+        qnSkin->icon("20x20/Outline/loading.svg", kIconTheme),
         text,
-        qnSkin->icon("user_settings/spinner.svg", kIconSubstitutions),
+        qnSkin->icon("20x20/Outline/loading.svg", kIconTheme),
         text,
         parent),
     d(new Private(this))

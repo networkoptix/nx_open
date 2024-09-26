@@ -198,7 +198,7 @@ void initialize(Manager* manager, Action* root)
     factory(WhatsThisAction)
         .flags(NoTarget)
         .text(ContextMenu::tr("Help")) //< To be displayed on button tooltip
-        .icon(qnSkin->icon("titlebar/window_question.svg"));
+        .icon(qnSkin->icon("20x20/Outline/help_main_window.svg"));
 
     factory(CameraDiagnosticsAction)
         .mode(DesktopMode)
@@ -622,18 +622,18 @@ void initialize(Manager* manager, Action* root)
         .toggledText(ContextMenu::tr("Exit Fullscreen"))
         .shortcut(QKeySequence::FullScreen, Builder::Mac, true)
         .shortcutContext(Qt::ApplicationShortcut)
-        .icon(qnSkin->icon("titlebar/window_maximize.svg", "titlebar/window_restore.svg"));
+        .icon(qnSkin->icon("20x20/Outline/expand_main_window.svg", "20x20/Outline/restore.svg"));
 
     factory(MinimizeAction)
         .flags(NoTarget)
         .text(ContextMenu::tr("Minimize"))
-        .icon(qnSkin->icon("titlebar/window_minimize.svg"));
+        .icon(qnSkin->icon("20x20/Outline/expand_main_window.svg"));
 
     factory(MaximizeAction)
         .flags(NoTarget)
         .text(ContextMenu::tr("Maximize"))
         .toggledText(ContextMenu::tr("Restore Down"))
-        .icon(qnSkin->icon("titlebar/window_maximize.svg", "titlebar/window_restore.svg"));
+        .icon(qnSkin->icon("20x20/Outline/expand_main_window.svg", "20x20/Outline/restore.svg"));
 
     factory(FullscreenMaximizeHotkeyAction)
         .flags(GlobalHotkey)

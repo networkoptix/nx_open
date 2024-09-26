@@ -43,8 +43,8 @@ TextField
         padding: 0
 
         icon.source: searchField.menu
-            ? "image://skin/tree/search_drop.svg"
-            : "image://skin/tree/search.svg"
+            ? "image://skin/24x20/Outline/search_drop.svg"
+            : "image://skin/20x20/Outline/search.svg"
 
         icon.color: searchField.text ? searchField.color : searchField.placeholderTextColor
 
@@ -66,7 +66,7 @@ TextField
                 height: implicitHeight * factor
 
                 sourcePath: actionButton.icon.source
-                sourceSize: searchField.menu ? Qt.size(39, 32) : Qt.size(31, 32)
+                sourceSize: searchField.menu ? Qt.size(24, 24) : Qt.size(20, 20)
 
                 primaryColor: actionButton.icon.color
             }

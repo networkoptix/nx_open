@@ -117,7 +117,7 @@ Item
         width: 39
         height: 78
 
-        source: "image://skin/welcome_screen/tile/settings.svg"
+        source: "image://skin/Illustrations/settings_39x78.svg"
         sourceSize: Qt.size(width, height)
 
         visible: isFactorySystem
