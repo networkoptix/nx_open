@@ -52,7 +52,7 @@ QJsonObject AnalyticsEventTypeField::openApiDescriptor(const QVariantMap&)
 {
     auto descriptor = utils::constructOpenApiDescriptor<AnalyticsEventTypeField>();
     utils::updatePropertyForField(
-        descriptor, "typeId", utils::kExampleProperty, "nx.stub.lineCrossing");
+        descriptor, "typeId", utils::kExampleProperty, "nx.lineCrossing");
     return descriptor;
 }
 

@@ -35,4 +35,12 @@ bool SourceUserField::match(const QVariant& value) const
     return nx::vms::common::userGroupsWithParents(user).intersects(ids());
 }
 
+QJsonObject SourceUserField::openApiDescriptor(const QVariantMap& properties)
+{
+    auto descriptor = ResourceFilterEventField::openApiDescriptor(properties);
+    descriptor[utils::kDescriptionProperty] =
+        "Defines the source users to be used for event filtering.";
+    return descriptor;
+}
+
 } // namespace nx::vms::rules

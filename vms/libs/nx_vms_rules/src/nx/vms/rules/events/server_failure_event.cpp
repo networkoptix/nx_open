@@ -77,6 +77,8 @@ const ItemDescriptor& ServerFailureEvent::manifest()
         .id = utils::type<ServerFailureEvent>(),
         .groupId = kServerIssueEventGroup,
         .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Server Failure")),
+        .description = "Triggered when a server goes down due to hardware failure, "
+            "software issue, or manual/emergency shutdown.",
         .resources = {{utils::kServerIdFieldName, {ResourceType::server}}},
         .readPermissions = GlobalPermission::powerUser,
         .emailTemplatePath = ":/email_templates/mediaserver_failure.mustache"

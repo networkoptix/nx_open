@@ -18,6 +18,7 @@ public:
     using SimpleTypeEventField<QString, CustomizableIconField>::SimpleTypeEventField;
 
     virtual bool match(const QVariant& value) const override;
+    static QJsonObject openApiDescriptor(const QVariantMap& properties);
 
 signals:
     void valueChanged();

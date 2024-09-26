@@ -107,18 +107,23 @@ const ItemDescriptor& AnalyticsObjectEvent::manifest()
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<AnalyticsObjectEvent>(),
         .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Analytics Object Detected")),
-        .description = {},
+        .description = "Triggered when an analytics object is detected on source device. "
+            "This event is specific to video analytics that provide object detection metadata, "
+            "enabling accurate categorization based on the object type",
         .fields = {
             makeFieldDescriptor<SourceCameraField>(
                 utils::kCameraIdFieldName,
                 Strings::occursAt(),
                 {},
                 ResourceFilterFieldProperties{
+                    .base = FieldProperties{.optional = false},
                     .validationPolicy = kCameraAnalyticsValidationPolicy
                 }.toVariantMap()),
             makeFieldDescriptor<AnalyticsObjectTypeField>(
                 utils::kObjectTypeIdFieldName,
-                Strings::ofType()),
+                Strings::ofType(),
+                {},
+                FieldProperties{.optional = false}.toVariantMap()),
             makeFieldDescriptor<ObjectLookupField>(
                 utils::kAttributesFieldName,
                 NX_DYNAMIC_TRANSLATABLE(tr("And Object"))),

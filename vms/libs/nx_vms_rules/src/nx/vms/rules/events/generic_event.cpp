@@ -67,6 +67,8 @@ const ItemDescriptor& GenericEvent::manifest()
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<GenericEvent>(),
         .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Generic Event")),
+        .description = "Triggered when the server receives a request "
+            "to <code>/rest/v4/events/create</code> from an external resource.",
         .flags = {ItemFlag::instant, ItemFlag::prolonged},
         .fields = {
             utils::makeStateFieldDescriptor(
@@ -78,13 +80,20 @@ const ItemDescriptor& GenericEvent::manifest()
                 NX_DYNAMIC_TRANSLATABLE(tr("And Source"))),
             makeFieldDescriptor<TextLookupField>(
                 utils::kCaptionFieldName,
-                Strings::andCaption()),
+                Strings::andCaption(),
+                "An optional value used to specify the object type identifier."),
             makeFieldDescriptor<TextLookupField>(
                 utils::kDescriptionFieldName,
-                Strings::andDescription()),
+                Strings::andDescription(),
+                "An optional attribute used to differentiate objects within "
+                "the same class for event filtering."),
             makeFieldDescriptor<CustomizableFlagField>(
                 utils::kOmitLoggingFieldName,
-                NX_DYNAMIC_TRANSLATABLE(tr("Omit logging"))),
+                NX_DYNAMIC_TRANSLATABLE(tr("Omit logging")),
+                "When enabled, the generic event won't be logged. "
+                "This prevents high-frequency actions from spamming the Event Log. "
+                "However, events with a 'Write to log' action will still be "
+                "logged even if this option is checked."),
         },
         .resources = {
             {utils::kServerIdFieldName,

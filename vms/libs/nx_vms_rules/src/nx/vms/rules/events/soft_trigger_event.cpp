@@ -96,6 +96,11 @@ const ItemDescriptor& SoftTriggerEvent::manifest()
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<SoftTriggerEvent>(),
         .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Soft Trigger")),
+        .description = "This event adds a button to one or more devices in the layout. "
+            "When clicked, it triggers the associated action either instantly "
+            "or continuously (while held). Soft trigger buttons appear "
+            "as a circular overlay in the bottom-right corner of the item and display "
+            "the <code>triggerName</code> field on hover.",
         .flags = {ItemFlag::instant, ItemFlag::prolonged},
         .fields = {
             makeFieldDescriptor<UniqueIdField>("triggerId", TranslatableString("Invisible")),
@@ -115,9 +120,11 @@ const ItemDescriptor& SoftTriggerEvent::manifest()
                     .validationPolicy = kUserInputValidationPolicy
                 }.toVariantMap()),
             makeFieldDescriptor<CustomizableTextField>("triggerName",
-                NX_DYNAMIC_TRANSLATABLE(tr("Name"))),
+                NX_DYNAMIC_TRANSLATABLE(tr("Name")),
+                "A brief description of the event that will be triggered."),
             makeFieldDescriptor<CustomizableIconField>("triggerIcon",
-                NX_DYNAMIC_TRANSLATABLE(tr("Icon"))),
+                NX_DYNAMIC_TRANSLATABLE(tr("Icon")),
+                "Icon, displayed within a circular overlay."),
         },
         .resources = {
             {utils::kCameraIdFieldName,

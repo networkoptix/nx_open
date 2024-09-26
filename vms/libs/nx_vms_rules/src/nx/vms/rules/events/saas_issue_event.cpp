@@ -94,6 +94,7 @@ const ItemDescriptor& SaasIssueEvent::manifest()
         .id = utils::type<SaasIssueEvent>(),
         .groupId = kServerIssueEventGroup,
         .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Services Issue")),
+        .description = "Triggered when there is a problem with one or more Services.",
         .flags = {ItemFlag::instant, ItemFlag::saasLicense},
         .resources = {
             {utils::kDeviceIdsFieldName, {ResourceType::device, Qn::ViewContentPermission}},

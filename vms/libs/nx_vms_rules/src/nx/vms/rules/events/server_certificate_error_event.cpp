@@ -49,6 +49,7 @@ const ItemDescriptor& ServerCertificateErrorEvent::manifest()
         .id = utils::type<ServerCertificateErrorEvent>(),
         .groupId = kServerIssueEventGroup,
         .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Server Certificate Error")),
+        .description = "Triggered when the SSL certificate cannot be verified.",
         .resources = {{utils::kServerIdFieldName, {ResourceType::server}}},
         .readPermissions = GlobalPermission::powerUser,
         .emailTemplatePath = ":/email_templates/server_certificate_error.mustache"

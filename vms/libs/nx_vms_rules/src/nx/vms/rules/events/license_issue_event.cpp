@@ -58,6 +58,8 @@ const ItemDescriptor& LicenseIssueEvent::manifest()
         .id = utils::type<LicenseIssueEvent>(),
         .groupId = kServerIssueEventGroup,
         .displayName = NX_DYNAMIC_TRANSLATABLE(tr("License Issue")),
+        .description =  "Triggered when a trial license expires or when "
+            "the server with activated licenses goes offline.",
         .flags = {ItemFlag::instant, ItemFlag::localLicense},
         .resources = {
             {utils::kDeviceIdsFieldName, {ResourceType::device, Qn::ViewContentPermission}},

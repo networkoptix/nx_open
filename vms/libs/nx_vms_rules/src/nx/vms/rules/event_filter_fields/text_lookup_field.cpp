@@ -121,13 +121,23 @@ QJsonObject TextLookupField::openApiDescriptor(const QVariantMap&)
 {
     auto result = utils::constructOpenApiDescriptor<TextLookupField>();
     result[utils::kDescriptionProperty] =
-        "Set the <b>UUID</b> of the Lookup List as the value for the check types <b>inList</b> "
+        "This field filters the event identifier by matching a <b>filter expression</b> "
+        "(<code>checkType</code>: <b>containsKeywords</b> or <b>doesNotContainKeywords</b>) "
+        "or by referencing a <b>lookup list</b> "
+        "identified by its ID (<code>checkType</code>: <b>inList</b> or <b>notInList</b>).<br/><br/>"
+
+        "Set the <b>UUID</b> of the Lookup List as the <code>value</code> "
+        "for the <code>checkType</code> <b>inList</b> "
         "or <b>notInList</b>. To find the required Lookup List, "
-        "refer to the response of the request to /rest/v4/lookuplists. <br/>"
-        "To use multiple keywords in <b>containsKeywords</b> or <b>doesNotContainKeywords</b>, "
-        "use a space as the separator. <b>For example:</b> 'keyword1 keyword2'<br/>"
-        "You can also define a complex phrase with spaces by enclosing it in additional quotes. "
-        "<b>For example:</b>  <pre>'\\\\\\\"complex keyword with spaces\\\\\\\"'.</pre>";
+        "refer to the response of the request to <code>/rest/v4/lookuplists.</code> <br/><br/>"
+
+        "To construct a <b>filter expression</b>, enter the required keywords as the "
+        "<code>value</code> for the <code>checkType</code> <b>containsKeywords</b> "
+        "or <b>doesNotContainKeywords</b>. <br/>"
+        "To use multiple keywords in filter expression, use a space as the separator. <br/>"
+        "<b>For example:</b> <code> 'keyword1 keyword2'</code><br/>"
+        "You can also define a complex keyword phrase with spaces by enclosing it in additional quotes. "
+        "<b>For example:</b>  <code>'\\\\\\\"complex keyword with spaces\\\\\\\"'</code>.";
     return result;
 }
 

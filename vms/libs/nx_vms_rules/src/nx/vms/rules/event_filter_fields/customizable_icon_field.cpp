@@ -14,4 +14,13 @@ bool CustomizableIconField::match(const QVariant& value) const
     return true;
 }
 
+QJsonObject CustomizableIconField::openApiDescriptor(const QVariantMap& properties)
+{
+    auto descriptor = SimpleTypeEventField::openApiDescriptor(properties);
+    descriptor[utils::kDescriptionProperty] =
+        "Icon name, chosen from the system's predefined set.";
+    descriptor[utils::kExampleProperty] = "_bell_on";
+    return descriptor;
+}
+
 } // namespace nx::vms::rules

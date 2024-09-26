@@ -47,12 +47,14 @@ const ItemDescriptor& FanErrorEvent::manifest()
         .id = utils::type<FanErrorEvent>(),
         .groupId = kServerIssueEventGroup,
         .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Fan Failure")),
+        .description = "Triggered when a fan failure is detected on the server.",
         .fields = {
             makeFieldDescriptor<SourceServerField>(
                 utils::kServerIdFieldName,
                 Strings::at(),
                 {},
                 ResourceFilterFieldProperties{
+                    .base = FieldProperties{.optional = false},
                     .validationPolicy = kHasFanMonitoringValidationPolicy
                 }.toVariantMap()),
         },

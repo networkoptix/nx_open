@@ -144,6 +144,8 @@ const ItemDescriptor& NetworkIssueEvent::manifest()
         .id = utils::type<NetworkIssueEvent>(),
         .groupId = kDeviceIssueEventGroup,
         .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Network Issue")),
+        .description = "Triggered when data transfer between the device and server fails, "
+            "and packet loss is detected.",
         .flags = {ItemFlag::instant, ItemFlag::aggregationByTypeSupported},
         .resources = {
             {utils::kCameraIdFieldName, { ResourceType::device, Qn::ViewContentPermission}}},

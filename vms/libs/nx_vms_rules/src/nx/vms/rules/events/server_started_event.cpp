@@ -46,6 +46,7 @@ const ItemDescriptor& ServerStartedEvent::manifest()
         .id = utils::type<ServerStartedEvent>(),
         .groupId = kServerIssueEventGroup,
         .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Server Started")),
+        .description = "Triggered when any server registered in the server starts.",
         .resources = {{utils::kServerIdFieldName, {ResourceType::server}}},
         .readPermissions = GlobalPermission::powerUser,
         .emailTemplatePath = ":/email_templates/mediaserver_started.mustache"

@@ -75,6 +75,8 @@ const ItemDescriptor& ServerConflictEvent::manifest()
         .id = utils::type<ServerConflictEvent>(),
         .groupId = kServerIssueEventGroup,
         .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Server Conflict")),
+        .description = "Triggered when multiple servers on the same network access "
+            "the same devices.",
         .resources = {{utils::kServerIdFieldName, {ResourceType::server}}},
         .readPermissions = GlobalPermission::powerUser,
         .emailTemplatePath = ":/email_templates/mediaserver_conflict.mustache"

@@ -109,6 +109,8 @@ const ItemDescriptor& StorageIssueEvent::manifest()
         .id = utils::type<StorageIssueEvent>(),
         .groupId = kServerIssueEventGroup,
         .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Storage Issue")),
+        .description = "Triggered when the server fails to write data "
+            "to one or more storage devices.",
         .resources = {{utils::kServerIdFieldName, {ResourceType::server}}},
         .readPermissions = GlobalPermission::powerUser,
         .emailTemplatePath = ":/email_templates/storage_failure.mustache"

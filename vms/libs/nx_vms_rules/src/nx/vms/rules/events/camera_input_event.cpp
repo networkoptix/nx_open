@@ -82,6 +82,7 @@ ItemDescriptor CameraInputEvent::manifest(common::SystemContext* context)
     auto kDescriptor = ItemDescriptor{
         .id = utils::type<CameraInputEvent>(),
         .displayName = TranslatableString(getDisplayName),
+        .description = "Triggered when an input signal is detected on one or more devices.",
         .flags = ItemFlag::prolonged,
         .fields = {
             utils::makeStateFieldDescriptor(Strings::state()),

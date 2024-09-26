@@ -28,4 +28,14 @@ bool AnalyticsObjectTypeField::match(const QVariant& eventValue) const
         typeId);
 }
 
+QJsonObject AnalyticsObjectTypeField::openApiDescriptor(const QVariantMap& properties)
+{
+    auto descriptor = SimpleTypeField::openApiDescriptor(properties);
+    descriptor[utils::kDescriptionProperty] =
+        "Specifies the object type available "
+        "for event filtering, which may vary depending on the analytics plugin in use.";
+    descriptor[utils::kExampleProperty] = "nx.base.Bird";
+    return descriptor;
+}
+
 } // namespace nx::vms::rules

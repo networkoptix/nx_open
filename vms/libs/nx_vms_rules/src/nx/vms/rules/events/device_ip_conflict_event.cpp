@@ -106,6 +106,8 @@ ItemDescriptor DeviceIpConflictEvent::manifest(common::SystemContext* context)
         .id = utils::type<DeviceIpConflictEvent>(),
         .groupId = kDeviceIssueEventGroup,
         .displayName = TranslatableString(getDisplayName),
+        .description = "Triggered when a conflict occurs due to another device entering "
+            "the network with the same IP address, causing one of the devices to go offline",
         .resources = {
             {utils::kDeviceIdsFieldName, {ResourceType::device, Qn::WritePermission}},
             {utils::kServerIdFieldName, {ResourceType::server}}},
