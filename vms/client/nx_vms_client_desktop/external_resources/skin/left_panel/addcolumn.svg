@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <title>addcolumn</title>
-    <g id="addcolumn" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <path d="M19,15 C19,15.5522847 18.5522847,16 18,16 L15,16 C14.4477153,16 14,15.5522847 14,15 L14,4 C14,3.44771525 14.4477153,3 15,3 L18,3 C18.5522847,3 19,3.44771525 19,4 L19,15 Z M18,12 L15,12 L15,15 L18,15 L18,12 Z M18,8 L15,8 L15,11 L18,11 L18,8 Z M18,4 L15,4 L15,7 L18,7 L18,4 Z" id="Combined-Shape" fill="#698796" fill-rule="nonzero"></path>
-        <rect id="Rectangle" fill="#698796" x="5" y="5" width="1" height="9"></rect>
-        <rect id="Rectangle" fill="#698796" transform="translate(5.500000, 9.500000) rotate(90.000000) translate(-5.500000, -9.500000) " x="5" y="5" width="1" height="9"></rect>
-    </g>
-</svg>

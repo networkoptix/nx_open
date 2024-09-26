@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg width="38px" height="42px" viewBox="0 0 38 42" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <title>plus</title>
-    <g id="plus" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <rect id="Rectangle" fill="#1C2327" x="0" y="0" width="38" height="42"></rect>
-        <path d="M20,15 L20,20 L25,20 L25,22 L20,22 L20,27 L18,27 L18,22 L13,22 L13,20 L18,20 L18,15 L20,15 Z" id="Combined-Shape" fill="#698796"></path>
-    </g>
-</svg>

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 20 20">
+  <g class="20x20/Solid/folder_open_error">
+    <path fill="#698796" fill-rule="evenodd" d="M2 5a2 2 0 0 1 2-2h4.945a2 2 0 0 1 1.507.685L11.6 5H16a2 2 0 0 1 2 2v4.535A4 4 0 0 0 12.535 17H4a2 2 0 0 1-2-2V5Z" class="Secondary" clip-rule="evenodd"/>
+    <path fill="#A3B8C2" fill-rule="evenodd" d="M5.64 7a2 2 0 0 0-1.962 1.608L3 12l-.5 2.5-.117.586A1.6 1.6 0 0 0 3.952 17h8.583a4 4 0 0 1 6.407-4.71l.819-4.094A1 1 0 0 0 18.78 7H5.64Z" class="Primary" clip-rule="evenodd"/>
+    <circle cx="16" cy="15" r="3" fill="#EF5350" class="Tertiary"/>
+  </g>
+</svg>

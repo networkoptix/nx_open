@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <title>ip</title>
-    <g id="ip" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <path d="M6,4 L6,16 L5,16 L5,4 L6,4 Z M13,4 C14.1045695,4 15,4.8954305 15,6 L15,10 C15,11.1045695 14.1045695,12 13,12 L10,12 L10,16 L9,16 L9,4 L13,4 Z M13,5 L10,5 L10,11 L13,11 C13.5128358,11 13.9355072,10.6139598 13.9932723,10.1166211 L14,10 L14,6 C14,5.48716416 13.6139598,5.06449284 13.1166211,5.00672773 L13,5 Z" fill="#9CB8C2" fill-rule="nonzero"></path>
-    </g>
-</svg>

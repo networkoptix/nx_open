@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="13" height="12" fill="none" viewBox="0 0 13 12">
+<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 12 12">
   <g class="12x12/Outline/checkbox_half_checked">
     <path fill="#E5E9EB" fill-rule="evenodd" d="M1 1h10v10H1V1ZM0 1a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1V1Zm3 5.5h6v-1H3v1Z" class="Primary" clip-rule="evenodd"/>
   </g>

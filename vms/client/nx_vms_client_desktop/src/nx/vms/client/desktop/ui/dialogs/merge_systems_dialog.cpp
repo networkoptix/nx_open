@@ -71,7 +71,7 @@ MergeSystemsDialog::MergeSystemsDialog(QWidget* parent, std::unique_ptr<Delegate
     setHelpTopic(this, HelpTopic::Id::Systems_MergeSystems);
 
     ui->warnWidget->setHidden(true);
-    ui->warnIconLabel->setPixmap(qnSkin->pixmap("tree/warning_yellow.svg"));
+    ui->warnIconLabel->setPixmap(qnSkin->pixmap("16x16/Solid/attention.svg"));
     setPaletteColor(ui->warningLabel, QPalette::WindowText, core::colorTheme()->color("yellow"));
     setPaletteColor(ui->contactSupportLabel, QPalette::WindowText, core::colorTheme()->color("yellow"));
 

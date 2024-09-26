@@ -581,7 +581,7 @@ void QnMainWindowTitleBarWidget::initMultiSystemTabBar()
             { QnIcon::Normal, {{background, "dark7"}, {cross, "light4"}}},
             { QnIcon::Active, {{background, "red" }, {cross, "light4"}}},
             { QnIcon::Pressed, {{background, "red" }, {cross, "light4"}}}};
-        QIcon icon = qnSkin->icon("titlebar/window_close.svg", "", nullptr, colorSubs);
+        QIcon icon = qnSkin->icon("20x20/Outline/close_main_window.svg", "", nullptr, colorSubs);
         d->systemLayout->addWidget(newActionButton(menu::ExitAction, icon));
     }
     d->widgetsToTransfer << d->layoutBar;
@@ -671,7 +671,7 @@ void QnMainWindowTitleBarWidget::initLayoutsOnlyTabBar()
             { QnIcon::Normal, {{background, "dark7"}, {cross, "light4"}}},
             { QnIcon::Active, {{background, "red" }, {cross, "light4"}}},
             { QnIcon::Pressed, {{background, "red" }, {cross, "light4"}}}};
-        QIcon icon = qnSkin->icon("titlebar/window_close.svg",
+        QIcon icon = qnSkin->icon("20x20/Outline/close_main_window.svg",
             /*checkedName*/ "",
             /*suffixes*/ nullptr,
             /*svgColorSubstitutions*/ colorSubs);

@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg width="3px" height="15px" viewBox="0 0 3 15" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <!-- Generator: Sketch 64 (93537) - https://sketch.com -->
-    <title>Welcome Screen/dots</title>
-    <desc>Created with Sketch.</desc>
-    <g id="Welcome-Screen/dots" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <path d="M1.5,12 C2.32842712,12 3,12.6715729 3,13.5 C3,14.3284271 2.32842712,15 1.5,15 C0.671572875,15 0,14.3284271 0,13.5 C0,12.6715729 0.671572875,12 1.5,12 Z M1.5,6 C2.32842712,6 3,6.67157288 3,7.5 C3,8.32842712 2.32842712,9 1.5,9 C0.671572875,9 0,8.32842712 0,7.5 C0,6.67157288 0.671572875,6 1.5,6 Z M1.5,0 C2.32842712,0 3,0.671572875 3,1.5 C3,2.32842712 2.32842712,3 1.5,3 C0.671572875,3 0,2.32842712 0,1.5 C0,0.671572875 0.671572875,0 1.5,0 Z" id="dots" fill="#445B67" fill-rule="nonzero"></path>
-    </g>
-</svg>

@@ -305,7 +305,7 @@ EditableLabel::EditableLabel(QWidget* parent):
     d(new Private(this))
 {
     setFont(fontConfig()->font("editableLabel"));
-    setButtonIcon(qnSkin->icon("system_settings/edit_28.svg", kIconSubstitutions));
+    setButtonIcon(qnSkin->icon("28x28/Solid/edit.svg", kIconSubstitutions));
     setValidator([](const QString& text) { return !text.isEmpty(); });
 }
 

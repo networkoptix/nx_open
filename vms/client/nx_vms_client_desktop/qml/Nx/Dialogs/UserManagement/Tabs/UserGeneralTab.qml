@@ -605,7 +605,7 @@ Item
                             {
                                 id: obtainLinkButton
 
-                                icon.source: "image://skin/user_settings/spinner.svg"
+                                icon.source: "image://skin/20x20/Outline/loading.svg?primary=light16"
                                 icon.width: 20
                                 icon.height: 20
                                 spacing: 4
@@ -629,7 +629,7 @@ Item
 
                             Image
                             {
-                                source: "image://skin/tree/warning_yellow.svg"
+                                source: "image://skin/24x24/Solid/warning.svg?primary=yellow"
                                 sourceSize.width: 24
                                 sourceSize.height: 24
                             }

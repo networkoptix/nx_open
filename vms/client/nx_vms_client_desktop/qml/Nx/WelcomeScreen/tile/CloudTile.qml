@@ -41,7 +41,7 @@ Button
 
             fillMode: Image.Stretch
 
-            sourcePath: "image://skin/welcome_screen/tile/connect_to_cloud.svg"
+            sourcePath: "image://skin/Illustrations/connect_to_cloud_54x32.svg"
             sourceSize: Qt.size(width, height)
         }
 

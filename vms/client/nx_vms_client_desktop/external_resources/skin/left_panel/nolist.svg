@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <title>nolist</title>
-    <g id="nolist" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <path d="M3.151,13.9996304 L2.008,14.9996304 L2,15 L2,14 L3.151,13.9996304 Z M11,14 L11,15 L6.563,14.9996304 L7.706,13.9996304 L11,14 Z M6.58,10.9996304 L5.437,11.9996304 L2,12 L2,11 L6.58,10.9996304 Z M18,11 L18,12 L9.992,11.9996304 L11.135,10.9996304 L18,11 Z M10.008,7.99963035 L8.865,8.99963035 L2,9 L2,8 L10.008,7.99963035 Z M18,8 L18,9 L13.421,8.99963035 L14.564,7.99963035 L18,8 Z M13.436,4.99963035 L12.294,5.99963035 L2,6 L2,5 L13.436,4.99963035 Z M18,5 L18,6 L16.85,5.99963035 L17.992,4.99963035 L18,5 Z" id="Combined-Shape" fill="#698796"></path>
-        <polygon id="Path-2" fill="#698796" fill-rule="nonzero" transform="translate(10.000000, 10.000000) scale(-1, 1) translate(-10.000000, -10.000000) " points="2.3292523 2.62371165 18.3292523 16.6237117 17.6707477 17.3762883 1.6707477 3.37628835"></polygon>
-    </g>
-</svg>

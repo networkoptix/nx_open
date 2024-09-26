@@ -44,13 +44,13 @@ public:
         font.setWeight(kCaptionFontWeight);
         ui->captionLabel->setFont(font);
 
-        ui->helpButton->setIcon(qnSkin->icon("titlebar/window_question.svg"));
-        ui->minimizeButton->setIcon(qnSkin->icon("titlebar/window_minimize.svg"));
+        ui->helpButton->setIcon(qnSkin->icon("20x20/Outline/help_main_window.svg"));
+        ui->minimizeButton->setIcon(qnSkin->icon("20x20/Outline/collapse_main_window.svg"));
         const QColor background = core::colorTheme()->color("dark7");
         const core::SvgIconColorer::IconSubstitutions colorSubs = {
             { QnIcon::Active, {{ background, "red" }}},
             { QnIcon::Pressed, {{ background, "red" }}}};
-        ui->closeButton->setIcon(qnSkin->icon("titlebar/window_close.svg", nullptr, nullptr, colorSubs));
+        ui->closeButton->setIcon(qnSkin->icon("20x20/Outline/close_main_window.svg", nullptr, nullptr, colorSubs));
 
         ui->helpButton->setFixedSize(qnSkin->maximumSize(ui->helpButton->icon()));
         ui->minimizeButton->setFixedSize(qnSkin->maximumSize(ui->minimizeButton->icon()));
@@ -171,8 +171,8 @@ private:
     void updateState()
     {
         ui->maximizeButton->setIcon(m_window && (m_window->isMaximized() || m_window->isFullScreen())
-            ? qnSkin->icon("titlebar/window_restore.svg")
-            : qnSkin->icon("titlebar/window_maximize.svg"));
+            ? qnSkin->icon("20x20/Outline/restore.svg")
+            : qnSkin->icon("20x20/Outline/expand_main_window.svg"));
 
         ui->maximizeButton->setFixedSize(qnSkin->maximumSize(ui->maximizeButton->icon()));
     }

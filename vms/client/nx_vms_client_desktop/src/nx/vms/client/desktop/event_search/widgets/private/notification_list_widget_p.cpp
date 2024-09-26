@@ -66,7 +66,6 @@ static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kIconSubs
 };
 
 NX_DECLARE_COLORIZED_ICON(kSystemIcon, "20x20/Outline/system.svg", kIconSubstitutions)
-NX_DECLARE_COLORIZED_ICON(kBellIcon, "20x20/Outline/bell.svg", kIconSubstitutions)
 
 nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kPlaceholderTheme = {
     {QnIcon::Normal, {.primary = "dark10"}}};
@@ -271,7 +270,6 @@ void NotificationListWidget::Private::setupFilterNotificationsButton()
     m_filterNotificationsButton->setFlat(true);
     m_filterNotificationsButton->setSelectable(false);
     m_filterNotificationsButton->setDeactivatable(true);
-    m_filterNotificationsButton->setIcon(qnSkin->icon(kBellIcon));
     m_filterNotificationsButton->setFocusPolicy(Qt::NoFocus);
     m_filterNotificationsButton->setSelectable(true);
     m_filterNotificationsButton->setDeactivatable(true);

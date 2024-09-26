@@ -502,7 +502,7 @@ int QnServerSettingsWidget::updateCertificatesLabels()
         if (isCertificateMismatch())
         {
             warningImage = new QLabel(this);
-            warningImage->setPixmap(qnSkin->pixmap("tree/warning_yellow.svg"));
+            warningImage->setPixmap(qnSkin->pixmap("16x16/Solid/attention.svg"));
         }
 
         ui->certificateLayout->addRow(certificateLabel, warningImage);
