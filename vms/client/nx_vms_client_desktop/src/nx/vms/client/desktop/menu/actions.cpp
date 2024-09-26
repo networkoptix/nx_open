@@ -1150,61 +1150,27 @@ void initialize(Manager* manager, Action* root)
             ConditionWrapper(new OpenInCurrentLayoutCondition())
             && !condition::isShowreelReviewMode());
 
-    if (ini().newOpenInContextMenu)
-    {
-        factory()
-            .mode(DesktopMode)
-            .flags(Tree | Table | Scene | SingleTarget | MultiTarget | ResourceTarget
-                | LayoutItemTarget | WidgetTarget)
-            .text(ContextMenu::tr(
-                "Open in", /*comment*/ "The \"Open in\" menu, which has a submenu"));
+    factory()
+        .mode(DesktopMode)
+        .flags(Tree | Table | Scene | SingleTarget | MultiTarget | ResourceTarget
+            | LayoutItemTarget | WidgetTarget)
+        .text(ContextMenu::tr(
+            "Open in", /*comment*/ "The \"Open in\" menu, which has a submenu"));
 
-        factory.beginSubMenu();
-        {
-            factory(OpenInNewTabAction)
-                .mode(DesktopMode)
-                .flags(Tree | Table | Scene | SingleTarget | MultiTarget | ResourceTarget
-                    | LayoutItemTarget | WidgetTarget)
-                .text(ContextMenu::tr("New Tab", /*comment*/ "The \"Open in\" submenu item"))
-                .condition(new OpenInNewEntityCondition());
-
-            factory(OpenInNewWindowAction)
-                .mode(DesktopMode)
-                .flags(Tree | Table | Scene | SingleTarget | MultiTarget | ResourceTarget
-                    | LayoutItemTarget | WidgetTarget)
-                .text(ContextMenu::tr("New Window", /*comment*/ "The \"Open in\" submenu item"))
-                .condition(
-                    ConditionWrapper(new OpenInNewEntityCondition())
-                    && ConditionWrapper(new LightModeCondition(Qn::LightModeNoNewWindow))
-                );
-
-            factory(OpenInDedicatedWindowAction)
-                .mode(DesktopMode)
-                .flags(Tree | Scene | SingleTarget | MultiTarget | ResourceTarget | WidgetTarget)
-                .text(ContextMenu::tr(
-                    "Dedicated Window", /*comment*/ "The \"Open in\" submenu item"))
-                .condition(condition::isWebPageOrIntegration());
-        }
-        factory.endSubMenu();
-    }
-    else
+    factory.beginSubMenu();
     {
         factory(OpenInNewTabAction)
             .mode(DesktopMode)
             .flags(Tree | Table | Scene | SingleTarget | MultiTarget | ResourceTarget
                 | LayoutItemTarget | WidgetTarget)
-            .text(ContextMenu::tr("Open in New Tab"))
-            .conditionalText(ContextMenu::tr("Monitor in New Tab"),
-                condition::hasFlags(Qn::server, MatchMode::all))
+            .text(ContextMenu::tr("New Tab", /*comment*/ "The \"Open in\" submenu item"))
             .condition(new OpenInNewEntityCondition());
 
         factory(OpenInNewWindowAction)
             .mode(DesktopMode)
             .flags(Tree | Table | Scene | SingleTarget | MultiTarget | ResourceTarget
                 | LayoutItemTarget | WidgetTarget)
-            .text(ContextMenu::tr("Open in New Window"))
-            .conditionalText(ContextMenu::tr("Monitor in New Window"),
-                condition::hasFlags(Qn::server, MatchMode::all))
+            .text(ContextMenu::tr("New Window", /*comment*/ "The \"Open in\" submenu item"))
             .condition(
                 ConditionWrapper(new OpenInNewEntityCondition())
                 && ConditionWrapper(new LightModeCondition(Qn::LightModeNoNewWindow))
@@ -1213,9 +1179,11 @@ void initialize(Manager* manager, Action* root)
         factory(OpenInDedicatedWindowAction)
             .mode(DesktopMode)
             .flags(Tree | Scene | SingleTarget | MultiTarget | ResourceTarget | WidgetTarget)
-            .text(ContextMenu::tr("Open in Dedicated Window"))
+            .text(ContextMenu::tr(
+                "Dedicated Window", /*comment*/ "The \"Open in\" submenu item"))
             .condition(condition::isWebPageOrIntegration());
     }
+    factory.endSubMenu();
 
     factory(OpenInAlarmLayoutAction)
         .mode(DesktopMode)
@@ -2030,44 +1998,27 @@ void initialize(Manager* manager, Action* root)
 
 #pragma region Showreels
 
-    if (ini().newOpenInContextMenu)
-    {
-        factory()
-            .mode(DesktopMode)
-            .flags(Tree | NoTarget)
-            .text(ContextMenu::tr(
-                "Open in", /*comment*/ "The \"Open in\" menu, which has a submenu"));
+    factory()
+        .mode(DesktopMode)
+        .flags(Tree | NoTarget)
+        .text(ContextMenu::tr(
+            "Open in", /*comment*/ "The \"Open in\" menu, which has a submenu"));
 
-        factory.beginSubMenu();
-        {
-            factory(ReviewShowreelAction)
-                .flags(Tree | NoTarget)
-                .mode(DesktopMode)
-                .text(ContextMenu::tr("New Tab", /*comment*/ "The \"Open in\" submenu item"))
-                .condition(condition::treeNodeType(ResourceTree::NodeType::showreel));
-
-            factory(ReviewShowreelInNewWindowAction)
-                .flags(Tree | NoTarget)
-                .mode(DesktopMode)
-                .text(ContextMenu::tr("New Window", /*comment*/ "The \"Open in\" submenu item"))
-                .condition(condition::treeNodeType(ResourceTree::NodeType::showreel));
-        }
-        factory.endSubMenu();
-    }
-    else
+    factory.beginSubMenu();
     {
         factory(ReviewShowreelAction)
             .flags(Tree | NoTarget)
             .mode(DesktopMode)
-            .text(ContextMenu::tr("Open in New Tab"))
+            .text(ContextMenu::tr("New Tab", /*comment*/ "The \"Open in\" submenu item"))
             .condition(condition::treeNodeType(ResourceTree::NodeType::showreel));
 
         factory(ReviewShowreelInNewWindowAction)
             .flags(Tree | NoTarget)
             .mode(DesktopMode)
-            .text(ContextMenu::tr("Open in New Window"))
+            .text(ContextMenu::tr("New Window", /*comment*/ "The \"Open in\" submenu item"))
             .condition(condition::treeNodeType(ResourceTree::NodeType::showreel));
     }
+    factory.endSubMenu();
 
     factory().flags(Tree).separator().condition(
         condition::treeNodeType(ResourceTree::NodeType::showreel));
