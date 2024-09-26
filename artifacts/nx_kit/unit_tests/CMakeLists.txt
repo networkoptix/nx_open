@@ -1,5 +1,7 @@
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+set(NX_KIT_UT_TMP_DIR "" CACHE PATH "Directory for temporary files created by unit tests.")
+
 #--------------------------------------------------------------------------------------------------
 # Test for disabled (via -DNX_INI_CONFIG_DISABLED) ini_config.
 
@@ -76,8 +78,8 @@ target_link_libraries(nx_kit_ut
 )
 
 set(test_args "")
-if(DEFINED ENV{NX_KIT_UT_TMP_DIR})
-    set(test_args --tmp "$ENV{NX_KIT_UT_TMP_DIR}")
+if(NX_KIT_UT_TMP_DIR)
+    set(test_args --tmp "${NX_KIT_UT_TMP_DIR}")
 endif()
 
 add_test(NAME nx_kit_ut COMMAND nx_kit_ut ${test_args})
