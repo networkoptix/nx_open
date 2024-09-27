@@ -875,8 +875,6 @@ size_t Engine::processEvent(const EventPtr& event)
 
             matchedFilters.removeIf([&event](auto filter){ return !filter->matchState(event); });
 
-            // TODO: 1. use cachedEventData to match AnalyticsObject more correctly
-            // (bestShot doesn't has typeId, it is needed to remember at context and pass context to the matcher).
             // TODO: 2. Use addition filtering to not repeat Event for the same objectTrack (same old engine).
 
             if (!matchedFilters.empty())
@@ -904,11 +902,25 @@ size_t Engine::processEvent(const EventPtr& event)
 
 size_t Engine::processAnalyticsEvents(const std::vector<EventPtr>& events)
 {
+    using namespace nx::vms::rules::utils;
+
     checkOwnThread();
 
     size_t matchedRules{};
     for (const auto& event: events)
+    {
+        const auto key = event->cacheKey();
+        if (!key.isEmpty())
+        {
+            auto context = m_eventCache.rememberEvent(key);
+            const auto objectTypeId = event->property(kObjectTypeIdFieldName).toString();
+            if (!objectTypeId.isEmpty())
+                context->objectTypeId = objectTypeId;
+            else if (!context->objectTypeId.isEmpty())
+                event->setProperty(kObjectTypeIdFieldName, context->objectTypeId);
+        }
         matchedRules += processEvent(event);
+    }
 
     return matchedRules;
 }

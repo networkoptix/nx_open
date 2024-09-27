@@ -4,6 +4,8 @@
 
 #include <set>
 
+#include <QtCore/QString>
+
 #include <nx/reflect/enum_instrument.h>
 #include <nx/utils/serialization/flags.h>
 
@@ -324,7 +326,7 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(EventLevels)
 struct NX_VMS_API AnalyticsTrackContext
 {
     /** All object types which were detected during the track. */
-    std::set<QString> objectTypeIds;
+    QString objectTypeId;
 };
 
 

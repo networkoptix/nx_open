@@ -78,17 +78,12 @@ bool AnalyticsSdkObjectDetected::checkEventParams(
     const nx::common::metadata::ObjectMetadata& metadata,
     const nx::vms::api::AnalyticsTrackContext* trackContext)
 {
-
+    using namespace nx::analytics;
     const auto ruleTypeId = params.getAnalyticsObjectTypeId();
 
-    const bool isObjectTypeMatched = std::any_of(
-        trackContext->objectTypeIds.begin(),
-        trackContext->objectTypeIds.end(),
-        [&ruleTypeId, taxonomy = systemContext->analyticsTaxonomyState()](const auto& typeId)
-        {
-            return ruleTypeId == typeId
-                || nx::analytics::taxonomy::isBaseType(taxonomy.get(), ruleTypeId, typeId);
-        });
+    const auto taxonomy = systemContext->analyticsTaxonomyState();
+    const bool isObjectTypeMatched = ruleTypeId == trackContext->objectTypeId
+        || taxonomy::isBaseType(taxonomy.get(), ruleTypeId, trackContext->objectTypeId);
     if (!isObjectTypeMatched)
         return false;
 
