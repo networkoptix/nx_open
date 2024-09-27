@@ -9,6 +9,7 @@
 #include <nx/vms/api/analytics/integration_request.h>
 #include <nx/vms/client/desktop/resource/rest_api_helper.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/common/user_management/predefined_user_groups.h>
 
 namespace nx::vms::client::desktop {
 
@@ -76,6 +77,8 @@ void ApiIntegrationRequestsModel::refresh()
                         {"description", request.integrationManifest.description},
                         {"vendor", request.integrationManifest.vendor},
                         {"version", request.integrationManifest.version},
+                        {"permission", nx::vms::common::PredefinedUserGroups::find(
+                            nx::vms::api::kPowerUsersGroupId).value_or(api::UserGroupData{}).name}
                     });
                 }
 

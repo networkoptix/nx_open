@@ -168,6 +168,7 @@ Item
             streamSelectorVisible:
                 supportsDualStreaming && settingsViewHeader.currentStreamIndex >= 0
             streamSelectorEnabled: settingsView.contentEnabled
+            permissions.visible: false
 
             onEnableSwitchClicked:
             {
