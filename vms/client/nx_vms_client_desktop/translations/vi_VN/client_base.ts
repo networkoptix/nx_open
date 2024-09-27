@@ -1033,6 +1033,10 @@
       <source>User Manual...</source>
       <translation>Hướng dẫn sử dụng...</translation>
     </message>
+    <message>
+      <source>Sound Playback...</source>
+      <translation type="unfinished">Sound Playback...</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -4169,6 +4173,10 @@ to %1</source>
     <message>
       <source>Object Search</source>
       <translation>Tìm kiếm đối tượng</translation>
+    </message>
+    <message>
+      <source>Mute</source>
+      <translation type="unfinished">Mute</translation>
     </message>
   </context>
   <context>
@@ -11553,6 +11561,17 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     <message>
       <source>Regions of Interest</source>
       <translation>Khu vực quan tâm</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ui::action::SoundPlaybackActionFactory</name>
+    <message>
+      <source>Enabled</source>
+      <translation type="unfinished">Enabled</translation>
+    </message>
+    <message>
+      <source>Disabled</source>
+      <translation type="unfinished">Disabled</translation>
     </message>
   </context>
   <context>

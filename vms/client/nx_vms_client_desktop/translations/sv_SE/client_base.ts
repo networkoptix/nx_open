@@ -1035,6 +1035,10 @@
       <source>User Manual...</source>
       <translation>Användarmanual...</translation>
     </message>
+    <message>
+      <source>Sound Playback...</source>
+      <translation>Ljuduppspelning...</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -4225,6 +4229,10 @@ till %1</translation>
     <message>
       <source>Object Search</source>
       <translation>Objektsökning</translation>
+    </message>
+    <message>
+      <source>Mute</source>
+      <translation>Tysta</translation>
     </message>
   </context>
   <context>
@@ -11712,6 +11720,17 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
     <message>
       <source>Regions of Interest</source>
       <translation>Intresseområden</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ui::action::SoundPlaybackActionFactory</name>
+    <message>
+      <source>Enabled</source>
+      <translation>Aktiverad</translation>
+    </message>
+    <message>
+      <source>Disabled</source>
+      <translation>Inaktiverad</translation>
     </message>
   </context>
   <context>

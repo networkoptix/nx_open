@@ -1035,6 +1035,10 @@
       <source>User Manual...</source>
       <translation>Manuel d'utilisateur...</translation>
     </message>
+    <message>
+      <source>Sound Playback...</source>
+      <translation>Lecture du son...</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -4225,6 +4229,10 @@ to %1</source>
     <message>
       <source>Object Search</source>
       <translation>Recherche d'objet</translation>
+    </message>
+    <message>
+      <source>Mute</source>
+      <translation>Muet</translation>
     </message>
   </context>
   <context>
@@ -11714,6 +11722,17 @@ N'épinglez pas ce certificat si vous n'avez pas modifié le certificat SSL du s
     <message>
       <source>Regions of Interest</source>
       <translation>Zône d'Intérêt</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ui::action::SoundPlaybackActionFactory</name>
+    <message>
+      <source>Enabled</source>
+      <translation>Activé</translation>
+    </message>
+    <message>
+      <source>Disabled</source>
+      <translation>Désactivé</translation>
     </message>
   </context>
   <context>
