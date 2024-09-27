@@ -7,11 +7,7 @@
 include(find_doxygen)
 include(utils)
 
-set(depends server_plugins) #< Not required technically, but useful to prevent errors.
-if(NOT openSourceBuild)
-    list(APPEND deppends mediaserver)
-endif()
-
+set(depends "")
 set(sdk_example_files_json "[]")
 
 macro(_collect_nx_sdk_file_names)
