@@ -297,6 +297,8 @@ NX_REFLECTION_INSTRUMENT(ApiObjectTitleMetadataPacket,
  */
 struct NX_VMS_API ApiEventMetadata
 {
+    /**%apidoc[opt] Type id */
+    std::string typeId;
     /**%apidoc[opt] Caption */
     std::string caption;
     /**%apidoc[opt] Description */
@@ -305,12 +307,13 @@ struct NX_VMS_API ApiEventMetadata
     bool isActive = false;
     /**%apidoc[opt] Track id */
     Uuid trackId;
+    /**%apidoc[opt] Key */
     std::string key;
 
     bool operator==(const ApiEventMetadata& other) const = default;
 };
 #define nx_vms_api_analytics_ApiEventMetadata_Fields \
-    (caption)(description)(isActive)(trackId)(key)
+    (typeId)(caption)(description)(isActive)(trackId)(key)
 QN_FUSION_DECLARE_FUNCTIONS(ApiEventMetadata, (json));
 NX_REFLECTION_INSTRUMENT(ApiEventMetadata,
     nx_vms_api_analytics_ApiEventMetadata_Fields);
