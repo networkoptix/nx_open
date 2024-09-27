@@ -55,7 +55,7 @@
 #include <ui/graphics/items/generic/image_button_bar.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/generic/proxy_label.h>
-#include <ui/graphics/items/generic/tool_tip_widget.h>
+#include <ui/graphics/items/overlays/fixed_width_tooltip_widget.h>
 #include <ui/graphics/items/overlays/hud_overlay_widget.h>
 #include <ui/graphics/items/overlays/resource_status_overlay_widget.h>
 #include <ui/graphics/items/overlays/resource_title_item.h>
@@ -80,7 +80,7 @@ using namespace nx::vms::client;
 using namespace nx::vms::client::desktop;
 using nx::vms::client::core::Geometry;
 
-QnToolTipWidget* QnResourceWidget::s_overlayTooltip;
+QnFixedWidthTooltipWidget* QnResourceWidget::s_overlayTooltip;
 QGraphicsScene* QnResourceWidget::s_tooltipScene;
 QGraphicsWidget* QnResourceWidget::s_tooltipWidget;
 
@@ -315,6 +315,7 @@ void QnResourceWidget::setupOverlayTooltip()
     setPaletteColor(s_overlayTooltip, QPalette::Window, colorTheme()->color("light2"));
     s_overlayTooltip->setTextColor(colorTheme()->color("dark5"));
 
+    s_overlayTooltip->setAutoSize(false);
     const auto& kTooltipRect =
         mapToScene(0, 0, kTooltipTextWidth, kTooltipTextHeight).boundingRect();
     s_overlayTooltip->setGeometry(kTooltipRect);
@@ -799,7 +800,7 @@ QVariant QnResourceWidget::itemChange(GraphicsItemChange change, const QVariant 
     {
         if (!s_overlayTooltip)
         {
-            s_overlayTooltip = new QnToolTipWidget();
+            s_overlayTooltip = new QnFixedWidthTooltipWidget();
             setupOverlayTooltip();
         }
 

@@ -5,11 +5,12 @@
 #include <cmath>
 
 #include <QtGui/QPainter>
-#include <QtGui/QTextCursor>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QGraphicsLinearLayout>
-#include <QtWidgets/QGraphicsSceneWheelEvent>
+#include <QtWidgets/QGraphicsSceneEvent>
 #include <QtWidgets/QStyle>
+
+#include <qt_graphics_items/graphics_label.h>
 
 #include <nx/utils/math/math.h>
 #include <nx/vms/client/core/utils/geometry.h>
@@ -99,8 +100,6 @@ QnToolTipWidget::QnToolTipWidget(QGraphicsItem *parent, Qt::WindowFlags windowFl
     m_autoSize(true)
 {
     setFlag(QGraphicsItem::ItemIgnoresTransformations);
-    m_textDocument.setDocumentMargin(0);
-    m_textDocument.setIndentWidth(0);
 }
 
 QnToolTipWidget::~QnToolTipWidget()
@@ -160,7 +159,7 @@ void QnToolTipWidget::setTailWidth(qreal tailWidth) {
     invalidateShape();
 }
 
-void QnToolTipWidget::pointTo(const QPointF& pos)
+void QnToolTipWidget::pointTo(const QPointF &pos)
 {
     QPointF parentTailPos = mapToParent(m_tailPos);
     QPointF parentZeroPos = mapToParent(QPointF(0, 0));
@@ -171,50 +170,51 @@ void QnToolTipWidget::pointTo(const QPointF& pos)
     setPos(newPos);
 }
 
+GraphicsLabel* QnToolTipWidget::label() const
+{
+    if (layout() && layout()->count() == 1)
+        return dynamic_cast<GraphicsLabel*>(layout()->itemAt(0));
+
+    return nullptr;
+}
+
 QString QnToolTipWidget::text() const
 {
-    return m_textDocument.toPlainText();
+    GraphicsLabel* label = this->label();
+    return label ? label->text() : QString();
 }
 
-void QnToolTipWidget::setText(const QString& text, qreal lineHeight /* = 100 */)
+void QnToolTipWidget::setText(const QString &text)
 {
-    if (text != m_text || lineHeight != m_lineHeight)
+    GraphicsLabel* label = this->label();
+    if(label)
     {
-        m_text = text;
-        m_lineHeight = lineHeight;
-        generateTextPixmap();
-        updateHeight();
+        label->setText(text);
+        return;
     }
+
+    while(layout() && layout()->count() > 0)
+        delete layout()->itemAt(0);
+
+    label = new GraphicsLabel();
+    label->setText(text);
+    label->setAlignment(Qt::AlignCenter);
+    label->setPerformanceHint(GraphicsLabel::PixmapCaching);
+
+    auto layout = new QGraphicsLinearLayout(Qt::Vertical);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->addItem(label);
+    setLayout(layout);
 }
 
-void QnToolTipWidget::setTextWidth(qreal width)
+bool QnToolTipWidget::isAutoSize() const
 {
-    if (!qFuzzyCompare(width, m_textWidth))
-    {
-        m_textWidth = width;
-        m_textDocument.setTextWidth(width);
-
-        const auto& margins = contentsMargins();
-        auto newGeometry = geometry();
-        auto widgetWidth = margins.left() + margins.right() + width;
-        newGeometry.setWidth(widgetWidth);
-        setPreferredWidth(widgetWidth);
-        setMinimumWidth(widgetWidth);
-        setGeometry(newGeometry);
-
-        generateTextPixmap();
-        updateHeight();
-    }
+    return m_autoSize;
 }
 
-void QnToolTipWidget::setTextColor(const QColor& color)
+void QnToolTipWidget::setAutoSize(bool autoSize)
 {
-    if (color != m_textColor)
-    {
-        m_textColor = color;
-        generateTextPixmap();
-        updateHeight();
-    }
+    m_autoSize = autoSize;
 }
 
 QRectF QnToolTipWidget::boundingRect() const
@@ -241,22 +241,27 @@ void QnToolTipWidget::setGeometry(const QRectF &rect) {
         invalidateShape();
 }
 
-void QnToolTipWidget::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
+void QnToolTipWidget::paint(QPainter* painter, const QStyleOptionGraphicsItem* /*option*/, QWidget* /*widget*/)
 {
     ensureShape();
 
     /* Render background. */
     paintSharp(painter,
-        [this, option, widget](QPainter* painter)
+        [this](QPainter* painter)
         {
             QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true);
             QnScopedPainterPenRollback penRollback(painter, QPen(frameBrush(), frameWidth()));
             QnScopedPainterBrushRollback brushRollback(painter, windowBrush());
             painter->drawPath(m_borderShape);
-
-            const auto& margins = contentsMargins();
-            painter->drawPixmap(margins.left(), margins.top(), m_textPixmap);
         });
+}
+
+void QnToolTipWidget::updateGeometry()
+{
+    base_type::updateGeometry();
+
+    if (m_autoSize)
+        resize(effectiveSizeHint(Qt::PreferredSize));
 }
 
 void QnToolTipWidget::wheelEvent(QGraphicsSceneWheelEvent *event) {
@@ -300,56 +305,4 @@ void QnToolTipWidget::ensureShape() const {
     m_borderShape = borderShape;
     m_boundingRect = borderShape.boundingRect(); // TODO: add m_borderPen.widthF() / 2
     m_shapeValid = true;
-}
-
-void QnToolTipWidget::updateHeight()
-{
-    auto margins = contentsMargins();
-    auto textHeight = m_textDocument.size().height();
-    auto newHeight = margins.top() + margins.bottom() + textHeight;
-    if (newHeight != m_oldHeight)
-    {
-        m_oldHeight = newHeight;
-        auto newGeometry = geometry();
-        newGeometry.setHeight(newHeight);
-        setGeometry(newGeometry);
-        update();
-    }
-}
-
-void QnToolTipWidget::generateTextPixmap()
-{
-    m_textDocument.setDefaultStyleSheet(
-        QStringLiteral("body { color: %1; background-color: transparent; }")
-            .arg(m_textColor.name()));
-    m_textDocument.setHtml(QStringLiteral("<body>%1</body>").arg(m_text));
-
-    QTextCursor cursor(&m_textDocument);
-    cursor.select(QTextCursor::Document);
-
-    QTextBlockFormat blockFormat;
-    blockFormat.setLineHeight(m_lineHeight, QTextBlockFormat::ProportionalHeight);
-    cursor.setBlockFormat(blockFormat);
-
-    QTextOption option = m_textDocument.defaultTextOption();
-    option.setAlignment(Qt::AlignCenter);
-    m_textDocument.setDefaultTextOption(option);
-
-    auto ratio = qApp->devicePixelRatio();
-    const auto& size = m_textDocument.size() * ratio;
-
-    if (size.isValid())
-    {
-        m_textPixmap = QPixmap(size.toSize());
-        m_textPixmap.setDevicePixelRatio(ratio);
-        m_textPixmap.fill(Qt::transparent);
-
-        QPainter painter(&m_textPixmap);
-        paintSharp(&painter,
-            [this](QPainter* painter)
-            {
-                QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true);
-                m_textDocument.drawContents(painter);
-            });
-    }
 }

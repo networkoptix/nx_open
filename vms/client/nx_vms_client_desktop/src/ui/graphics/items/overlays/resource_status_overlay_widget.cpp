@@ -362,8 +362,9 @@ void QnStatusOverlayWidget::setTooltip(const QString& tooltip)
         if (m_centralAreaImage->underMouse() || m_caption->underMouse())
         {
             // Fake enter event to re-send tooltip changed message.
-            QEnterEvent event({}, {}, {});
-            eventFilter(m_caption->underMouse() ? m_caption : m_centralAreaImage, &event);
+            QPoint nullPos;
+            QHoverEvent event(QEvent::HoverMove, nullPos, nullPos, nullPos);
+            eventFilter(m_centralContainer, &event);
         }
     }
 }
@@ -451,7 +452,11 @@ bool QnStatusOverlayWidget::eventFilter(QObject* obj, QEvent* event)
                         m_centralAreaImage->width(),
                         m_caption->y() - m_centralAreaImage->y());
                 }
-                auto textWidth = m_caption->fontMetrics().horizontalAdvance(m_caption->text());
+                // Returned text width can sometimes be greater than the widget width, even though
+                // it clearly fits.
+                auto textWidth = std::min(
+                    m_caption->fontMetrics().horizontalAdvance(m_caption->text()),
+                    m_caption->width());
                 auto textRect = QRect{m_caption->x() + (m_caption->width() - textWidth) / 2,
                     m_caption->y(),
                     textWidth,

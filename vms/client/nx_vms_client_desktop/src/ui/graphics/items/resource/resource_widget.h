@@ -40,7 +40,7 @@ class QnResourceTitleItem;
 class GraphicsLabel;
 class QnStatusOverlayWidget;
 class QnHudOverlayWidget;
-class QnToolTipWidget;
+class QnFixedWidthTooltipWidget;
 
 namespace nx::vms::client::desktop { class RewindOverlay; }
 
@@ -494,9 +494,9 @@ private:
 
     QPixmap m_placeholderPixmap;
 
-    static QnToolTipWidget* s_overlayTooltip;
+    static QnFixedWidthTooltipWidget* s_overlayTooltip;
     static QGraphicsScene* s_tooltipScene;
-    static QGraphicsWidget *s_tooltipWidget;
+    static QGraphicsWidget* s_tooltipWidget;
 };
 
 typedef QList<QnResourceWidget *> QnResourceWidgetList;
