@@ -4119,7 +4119,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Mute</source>
-      <translation type="unfinished">Mute</translation>
+      <translation>Sessiz</translation>
     </message>
   </context>
   <context>
