@@ -219,9 +219,9 @@ list(APPEND compiling_options
     -DNX_KIT_UT_TMP_DIR="${nx_kit_ut_tmp_dir}"
 )
 
-nx_add_custom_command(OUTPUT ${zip_file}
+# OUTPUT and BYPRODUCTS must be the last arguments - see the function definition.
+nx_add_custom_command(
     DEPENDS ${depends}
-    BYPRODUCTS "${sdk_build_dir}" "${sdk_dir}"
 
     COMMAND ${CMAKE_COMMAND} -E remove_directory ${nx_kit_ut_tmp_dir}
     COMMAND ${CMAKE_COMMAND} -E make_directory ${nx_kit_ut_tmp_dir}
@@ -244,6 +244,9 @@ nx_add_custom_command(OUTPUT ${zip_file}
         echo "  Zipping SDK - see ${zip_log}"
     COMMAND ${CMAKE_COMMAND} -E chdir ${CMAKE_CURRENT_BINARY_DIR}
         ${CMAKE_COMMAND} -E tar cvf ${zip_file} --format=zip ${sdk_name} >${zip_log}
+
+    OUTPUT ${zip_file}
+    BYPRODUCTS "${sdk_build_dir}" "${sdk_dir}"
 )
 add_custom_target(nx_server_plugin_sdk ALL DEPENDS ${zip_file})
 set_target_properties(nx_server_plugin_sdk PROPERTIES FOLDER sdk)

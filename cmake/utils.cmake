@@ -564,6 +564,8 @@ function(nx_copy_system_libraries)
     nx_store_known_files(${files})
 endfunction()
 
+# When using this function, always make sure that BYPRODUCTS and OUTPUT are the last arguments,
+# otherwise they will contain an incorrect data due to the way CMakeParseArguments works.
 function(nx_add_custom_command)
     cmake_parse_arguments(ARGS "" "" "BYPRODUCTS;OUTPUT" ${ARGN})
 

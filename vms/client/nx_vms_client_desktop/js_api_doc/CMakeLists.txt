@@ -27,11 +27,11 @@ set(zip_log ${logs_dir}/js_api_doc_zip.log)
 
 file(GLOB_RECURSE doxygen_src_files CONFIGURE_DEPENDS ${DOXYGEN_SRC_DIR}/*)
 
-nx_add_custom_command(OUTPUT ${js_api_documentation_zip_file}
+# OUTPUT and BYPRODUCTS must be the last arguments - see the function definition.
+nx_add_custom_command(
     DEPENDS
         ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
         ${doxygen_src_files}
-    BYPRODUCTS ${doxygen_html_dir}
 
     COMMAND ${CMAKE_COMMAND} -E make_directory ${logs_dir}
     COMMAND ${CMAKE_COMMAND} -E
@@ -42,6 +42,9 @@ nx_add_custom_command(OUTPUT ${js_api_documentation_zip_file}
         echo "  Zipping docs - see ${zip_log}"
     COMMAND ${CMAKE_COMMAND} -E chdir ${doxygen_html_dir}
         ${CMAKE_COMMAND} -E tar cf ${js_api_documentation_zip_file} --format=zip ./ >${zip_log}
+
+    OUTPUT ${js_api_documentation_zip_file}
+    BYPRODUCTS ${doxygen_html_dir}
 )
 
 add_custom_target(js_api_documentation ALL DEPENDS ${js_api_documentation_zip_file})
