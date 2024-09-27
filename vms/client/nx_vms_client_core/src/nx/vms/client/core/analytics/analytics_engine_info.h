@@ -9,6 +9,7 @@
 #include <nx/reflect/to_string.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/data/analytics_integration_model.h>
+#include <nx/vms/common/user_management/predefined_user_groups.h>
 
 namespace nx::vms::client::core {
 
@@ -23,6 +24,7 @@ struct AnalyticsEngineInfo
     QJsonObject settingsModel;
     bool isDeviceDependent = false;
     nx::vms::api::analytics::IntegrationType type;
+    std::optional<nx::Uuid> permission;
 
     bool operator==(const AnalyticsEngineInfo& other) const = default;
 
@@ -38,7 +40,10 @@ struct AnalyticsEngineInfo
             {"isLicenseRequired", isLicenseRequired},
             {"settingsModel", settingsModel},
             {"isDeviceDependent", isDeviceDependent},
-            {"type", QString::fromStdString(nx::reflect::toString(type))}
+            {"type", QString::fromStdString(nx::reflect::toString(type))},
+            {"permission",
+                nx::vms::common::PredefinedUserGroups::find(permission.value_or(nx::Uuid{}))
+                    .value_or(api::UserGroupData{}).name}
         };
     }
 };

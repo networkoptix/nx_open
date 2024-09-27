@@ -3,6 +3,7 @@
 #include "analytics_data_helper.h"
 
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
+#include <nx/vms/api/data/user_group_data.h>
 
 namespace nx::vms::client::core {
 
@@ -29,7 +30,12 @@ AnalyticsEngineInfo engineInfoFromResource(
         pluginManifest.isLicenseRequired,
         std::move(settingsModel),
         engine->isDeviceDependent(),
-        plugin->integrationType()
+        plugin->integrationType(),
+
+        // Currently all api integrations have Power Users permission.
+        plugin->integrationType() == nx::vms::api::analytics::IntegrationType::api
+            ? nx::vms::api::kPowerUsersGroupId
+            : std::optional<nx::Uuid>{}
     };
 }
 
