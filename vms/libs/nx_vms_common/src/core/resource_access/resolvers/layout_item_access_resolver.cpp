@@ -129,7 +129,7 @@ AccessRights LayoutItemAccessResolver::accessRights(
     {
         const auto layout = storedLayout->transientLayout();
 
-        if (d->videowallWatcher->layoutVideowall(layout))
+        if (d->isVideowallLayout(layout))
             result |= accessRights(subjectId, layout);
 
         if ((result & kAllowedRights) == kAllowedRights)
@@ -315,7 +315,9 @@ bool LayoutItemAccessResolver::Private::isRelevantLayout(const QnLayoutResourceP
 
 bool LayoutItemAccessResolver::Private::isVideowallLayout(const QnLayoutResourcePtr& layout) const
 {
-    return !videowallWatcher->layoutVideowall(layout).isNull();
+    // Even if a layout already removed from their parent videowall, it is still treated as a
+    // videowall layout if its parent is a videowall.
+    return !layout->getParentResource().objectCast<QnVideoWallResource>().isNull();
 }
 
 bool LayoutItemAccessResolver::Private::isSharedLayout(const QnLayoutResourcePtr& layout) const
