@@ -5,9 +5,10 @@
 #include <QtGui/QBrush>
 #include <QtGui/QFont>
 #include <QtGui/QPen>
-#include <QtGui/QTextDocument>
 
 #include "framed_widget.h"
+
+class GraphicsLabel;
 
 /**
  * A generic balloon tool tip widget. It works just like any other normal widget,
@@ -71,10 +72,19 @@ public:
      *
      * \param text                      New text for this tool tip's label.
      */
-    void setText(const QString &text, qreal lineHeight = 100);
+    void setText(const QString &text);
 
-    void setTextWidth(qreal width);
-    void setTextColor(const QColor& color);
+    /**
+     * \returns                         Whether this tool tip is resized automatically to match
+     *                                  the preferred size of its contents.
+     */
+    bool isAutoSize() const;
+
+    /**
+     * \param autoSize                  Whether this tool tip should be resized automatically to match
+     *                                  the preferred size of its contents.
+     */
+    void setAutoSize(bool autoSize);
 
     virtual QRectF boundingRect() const override;
 
@@ -87,29 +97,23 @@ signals:
 
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+    virtual void updateGeometry() override;
+
     virtual void wheelEvent(QGraphicsSceneWheelEvent *event) override;
 
 private:
+    GraphicsLabel* label() const;
+
     void invalidateShape();
     void ensureShape() const;
-    void updateHeight();
-    void generateTextPixmap();
 
 private:
     mutable bool m_shapeValid;
     mutable QPainterPath m_borderShape;
     mutable QRectF m_boundingRect;
-    QTextDocument m_textDocument;
 
     QPointF m_tailPos;
     qreal m_tailWidth;
     qreal m_roundingRadius;
     bool m_autoSize;
-
-    QString m_text;
-    qreal m_textWidth = 1;
-    qreal m_lineHeight = -1;
-    qreal m_oldHeight = -1;
-    QColor m_textColor = Qt::black;
-    QPixmap m_textPixmap;
 };
