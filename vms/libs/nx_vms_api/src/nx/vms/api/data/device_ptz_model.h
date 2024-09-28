@@ -82,6 +82,53 @@ struct NX_VMS_API PtzPosition: PtzPositionFilter
 #define PtzPosition_Fields PtzPositionFilter_Fields (pan)(tilt)(zoom)(speed)
 QN_FUSION_DECLARE_FUNCTIONS(PtzPosition, (json), NX_VMS_API)
 
+struct NX_VMS_API MinMaxLimit
+{
+    /**%apidoc Minimum value. */
+    qreal min = 0.0;
+
+    /**%apidoc Maximum value. */
+    qreal max = 0.0;
+};
+#define MinMaxLimit_Fields (min)(max)
+QN_FUSION_DECLARE_FUNCTIONS(MinMaxLimit, (json), NX_VMS_API)
+
+struct NX_VMS_API PtzPositionLimits: PtzPositionFilter
+{
+    /**%apidoc Pan limits. */
+    MinMaxLimit pan;
+
+    /**%apidoc Tilt limits. */
+    MinMaxLimit tilt;
+
+    /**%apidoc Field of View (Zoom) limits. */
+    MinMaxLimit fov;
+
+    /**%apidoc Rotation limits. */
+    MinMaxLimit rotation;
+
+    /**%apidoc Focus limits. */
+    MinMaxLimit focus;
+
+    /**%apidoc Pan speed limits. */
+    MinMaxLimit panSpeed;
+
+    /**%apidoc Tilt speed limits. */
+    MinMaxLimit tiltSpeed;
+
+    /**%apidoc Zoom speed limits. */
+    MinMaxLimit zoomSpeed;
+
+    /**%apidoc Rotation speed limits. */
+    MinMaxLimit rotationSpeed;
+
+    /**%apidoc Focus speed limits. */
+    MinMaxLimit focusSpeed;
+};
+#define PtzPositionLimits_Fields PtzPositionFilter_Fields (pan)(tilt)(fov)(rotation)(focus)\
+    (panSpeed)(tiltSpeed)(zoomSpeed)(rotationSpeed)(focusSpeed)
+QN_FUSION_DECLARE_FUNCTIONS(PtzPositionLimits, (json), NX_VMS_API)
+
 struct NX_VMS_API PtzMovement: PtzPosition
 {
     /**%apidoc
