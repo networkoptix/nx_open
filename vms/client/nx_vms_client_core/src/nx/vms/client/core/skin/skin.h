@@ -126,6 +126,12 @@ public:
         const SvgIconColorer::ThemeSubstitutions& checkedThemeSubstitutions);
 
     /**
+     * Add an external pixmap that doesn't exist in resources (e.g. a generated one).
+     * Returns true if the image was added, false if an image with the same key already exists.
+     */
+    bool addGeneratedPixmap(const QString& name, const QPixmap& pixmap);
+
+    /**
      * Loads pixmap with appropriate size according to current hidpi settings.
      * @param desiredSize is used for svg images only, this size may be corrected internally
      *     if `correctDevicePixelRatio` is set to true.
@@ -165,6 +171,7 @@ private:
 private:
     QStringList m_paths;
     IconLoader* m_iconLoader;
+    QMap<QString, QPixmap> m_externalPixmaps;
 };
 
 NX_DECLARE_COLORIZED_ICON(kAlertIcon, "20x20/Solid/alert2.svg", \

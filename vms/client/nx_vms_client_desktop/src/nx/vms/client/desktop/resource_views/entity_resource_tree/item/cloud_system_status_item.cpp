@@ -63,7 +63,7 @@ public:
             case CloudCrossSystemContext::Status::uninitialized:
                 return "20x20/Solid/alert2.svg?primary=red";
             case CloudCrossSystemContext::Status::connecting:
-                return "legacy/loading.gif";
+                return "20x20/Outline/loaders.svg.gen";
             case CloudCrossSystemContext::Status::connectionFailure:
                 return "20x20/Solid/alert2.svg?primary=yellow";
             default:

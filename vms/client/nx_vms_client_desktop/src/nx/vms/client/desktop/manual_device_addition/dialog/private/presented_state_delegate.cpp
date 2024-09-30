@@ -7,6 +7,7 @@
 
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/desktop/common/widgets/loading_indicator.h>
 #include <nx/vms/client/desktop/manual_device_addition/dialog/private/found_devices_model.h>
 #include <nx/vms/client/desktop/utils/widget_utils.h>
 
@@ -63,18 +64,9 @@ void CellWidget::setState(FoundDevicesModel::PresentedState value)
         return;
     }
 
-    const auto movie = qnSkin->newMovie("legacy/loading.gif", button);
-
-    connect(movie, &QMovie::frameChanged, button,
-        [button, movie](int /*frameNumber*/)
-        {
-            button->setIcon(movie->currentPixmap());
-        });
-
-    if (movie->loopCount() != -1)
-        connect(movie, &QMovie::finished, movie, &QMovie::start);
-
-    movie->start();
+    auto indicator = new LoadingIndicator(this);
+    connect(indicator, &LoadingIndicator::frameChanged, button,
+        [button](const QPixmap& pixmap) { button->setIcon(pixmap); });
 }
 
 } // namespace

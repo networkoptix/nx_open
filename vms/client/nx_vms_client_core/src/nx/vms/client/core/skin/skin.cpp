@@ -315,6 +315,15 @@ QIcon Skin::icon(const QString& name,
         themeSubstitutions, checkedThemeSubstitutions);
 }
 
+bool Skin::addGeneratedPixmap(const QString& name, const QPixmap& pixmap)
+{
+    if (m_externalPixmaps.contains(name))
+        return false;
+
+    m_externalPixmaps[name] = pixmap;
+    return true;
+}
+
 QPixmap Skin::pixmap(const QString& name, bool correctDevicePixelRatio, const QSize& desiredSize)
 {
     if (name.endsWith(".svg"))
@@ -333,8 +342,12 @@ QPixmap Skin::getPixmapInternal(const QString& name)
     QPixmap pixmap;
     if (!QPixmapCache::find(name, &pixmap))
     {
-        const auto fullPath = path(name);
-        if (fullPath.isEmpty())
+        if (m_externalPixmaps.contains(name))
+        {
+            pixmap = m_externalPixmaps[name];
+        }
+        else if (const auto fullPath = path(name);
+            fullPath.isEmpty())
         {
             NX_ASSERT(name.contains(kHiDpiSuffix));
         }
@@ -416,6 +429,9 @@ QPixmap Skin::getPixmapFromSvg(const QString& name, bool correctDevicePixelRatio
 
 QString Skin::getDpiDependedName(const QString& name) const
 {
+    if (name.endsWith(".gen"))
+        return name;
+
     if (isHiDpi())
     {
         QFileInfo info(name);

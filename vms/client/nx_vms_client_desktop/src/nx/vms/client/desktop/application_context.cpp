@@ -41,6 +41,7 @@
 #include <nx/utils/log/log_initializer.h>
 #include <nx/vms/api/protocol_version.h>
 #include <nx/vms/client/core/analytics/analytics_icon_manager.h>
+#include <nx/vms/client/core/analytics/object_display_settings.h>
 #include <nx/vms/client/core/resource/resource_processor.h>
 #include <nx/vms/client/core/resource/screen_recording/audio_only/desktop_audio_only_resource.h>
 #include <nx/vms/client/core/resource/screen_recording/desktop_resource_searcher.h>
@@ -51,7 +52,7 @@
 #include <nx/vms/client/core/skin/font_config.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/utils/font_loader.h>
-#include <nx/vms/client/core/analytics/object_display_settings.h>
+#include <nx/vms/client/desktop/common/widgets/loading_indicator.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/desktop/cross_system/cloud_layouts_manager.h>
@@ -78,7 +79,6 @@
 #include <nx/vms/client/desktop/style/old_style.h>
 #include <nx/vms/client/desktop/style/style.h>
 #include <nx/vms/client/desktop/system_administration/watchers/logs_management_watcher.h>
-#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/ui/common/custom_cursors.h>
 #include <nx/vms/client/desktop/ui/image_providers/resource_icon_provider.h>
 #include <nx/vms/client/desktop/utils/applauncher_guard.h>
@@ -600,6 +600,12 @@ struct ApplicationContext::Private
 
         QApplication::setPalette(makeApplicationPalette());
         QToolTip::setPalette(QApplication::palette());
+
+        // Add a generated pixmap that matches one frame of the Loading Indicator animation using
+        // the naming of the corresponding icon in our resource tree (with a .gen suffix). It is
+        // used instead of the original SVG because the gradient coloring there is unsupported.
+        q->skin()->addGeneratedPixmap(
+            "20x20/Outline/loaders.svg.gen", LoadingIndicator::createPixmap());
     }
 
     void initializeQml()
