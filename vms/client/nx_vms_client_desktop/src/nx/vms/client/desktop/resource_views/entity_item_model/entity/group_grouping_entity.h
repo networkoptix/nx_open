@@ -32,8 +32,9 @@ template <class GroupKey, class Key>
 class GroupGroupingEntity: public AbstractEntity
 {
     using base_type = AbstractEntity;
-    using CaseInsensitiveGroupList =
-        UniqueKeyGroupListEntity<GroupKey, CaseInsensitiveStringHasher, CaseInsensitiveStringEqual>;
+    using CaseInsensitiveGroupList = UniqueKeyGroupListEntity<GroupKey,
+        utils::CaseInsensitiveStringHasher,
+        utils::CaseInsensitiveStringEqual>;
 
 public:
     using GroupingRuleStack = std::vector<GroupingRule<GroupKey, Key>>;

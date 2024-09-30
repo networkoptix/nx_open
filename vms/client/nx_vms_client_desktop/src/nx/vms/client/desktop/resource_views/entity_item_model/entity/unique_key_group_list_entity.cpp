@@ -425,7 +425,7 @@ void UniqueKeyGroupListEntity<Key, KeyHasher, KeyEqual>::recoverItemSequenceOrde
 template class NX_VMS_CLIENT_DESKTOP_API UniqueKeyGroupListEntity<QnResourcePtr>;
 template class NX_VMS_CLIENT_DESKTOP_API UniqueKeyGroupListEntity<nx::Uuid>;
 template class NX_VMS_CLIENT_DESKTOP_API UniqueKeyGroupListEntity<QString>;
-template class NX_VMS_CLIENT_DESKTOP_API UniqueKeyGroupListEntity<QString, CaseInsensitiveStringHasher, CaseInsensitiveStringEqual>;
+template class NX_VMS_CLIENT_DESKTOP_API UniqueKeyGroupListEntity<QString, utils::CaseInsensitiveStringHasher, utils::CaseInsensitiveStringEqual>;
 template class NX_VMS_CLIENT_DESKTOP_API UniqueKeyGroupListEntity<int>;
 
 } // namespace entity_item_model

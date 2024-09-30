@@ -199,6 +199,18 @@ TEST_F(EventParametersTest, EventParametersModelResetWithoutExpand)
     thenModelIsInDefaultState(model);
 }
 
+TEST_F(EventParametersTest, EventParametersModelCaseInsesitive)
+{
+    auto model = givenEventParameterModel();
+    ASSERT_TRUE(model.isCorrectParameter("event.group1"));
+    ASSERT_TRUE(model.isCorrectParameter("EVENT.group1"));
+    ASSERT_TRUE(model.isCorrectParameter("event.GROUP1"));
+    ASSERT_TRUE(model.isCorrectParameter("group3.subgroup.space value"));
+    ASSERT_TRUE(model.isCorrectParameter("group3.subgroup.space Value"));
+    ASSERT_TRUE(model.isCorrectParameter("group3.subgroup.Space value"));
+    ASSERT_TRUE(model.isCorrectParameter("group3.SUBGROUP.space value"));
+}
+
 TEST_F(EventParametersTest, EventParametersModelFilter)
 {
     auto model = givenEventParameterModel();
@@ -224,6 +236,10 @@ TEST_F(EventParametersTest, EventParametersModelFilter)
 
     // Set filter to begining of group.
     whenSetFilter("{group");
+    thenNumberOfGroupsIs(model, 2);
+
+    // Set filter to begining of group in differnt case.
+    whenSetFilter("{GROUP");
     thenNumberOfGroupsIs(model, 2);
 
     // Set filter to incorrect value, starting with bracket.

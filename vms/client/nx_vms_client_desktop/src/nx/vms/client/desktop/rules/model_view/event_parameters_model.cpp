@@ -2,6 +2,7 @@
 
 #include "event_parameters_model.h"
 
+#include <nx/utils/string/comparator.h>
 #include <nx/vms/client/desktop/rules/utils/separator.h>
 
 namespace {
@@ -13,15 +14,17 @@ const QString kSeparatorSymbol = "-";
 namespace nx::vms::client::desktop::rules {
 
 using namespace nx::vms::rules::utils;
+using namespace nx::utils;
+
 struct EventParametersModel::Private
 {
     QList<QString> visibleElements;
 
-    using EventParametersByGroup = std::map<QString, QSet<QString>>;
+    using EventParametersByGroup = std::map<QString, QSet<QString>, CaseInsensitiveStringCompare>;
     EventParametersByGroup subGroupToElements;
     EventParametersByGroup defaultEventParametersByGroup;
     QList<QString> defaultVisibleElements;
-    const QSet<QString> allElements;
+    const EventParameterHelper::EventParametersNames allElements;
 
     void setVisibleElements(const EventParametersByGroup& eventParameterByGroup)
     {
@@ -190,7 +193,7 @@ void EventParametersModel::filter(const QString& filter)
         if (d->isSeparator(value) && shouldKeepSeparator)
             continue; //< Keep separator for grouping of the element.
 
-        if (!value.startsWith(filter))
+        if (!value.startsWith(filter, Qt::CaseInsensitive))
         {
             beginRemoveRows({}, i, i);
             d->visibleElements.erase(d->visibleElements.begin() + i);

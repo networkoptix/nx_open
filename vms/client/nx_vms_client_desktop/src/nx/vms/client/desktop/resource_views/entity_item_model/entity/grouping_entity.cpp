@@ -212,7 +212,7 @@ std::unique_ptr<CompositionEntity>GroupingEntity<GroupKey, Key>::compositionForS
             };
 
         result->addSubEntity(makeUniqueKeyGroupList<
-            GroupKey, CaseInsensitiveStringHasher, CaseInsensitiveStringEqual>(
+            GroupKey, utils::CaseInsensitiveStringHasher, utils::CaseInsensitiveStringEqual>(
                 ruleItr->groupKeyToItemTransform,
                 nestedEntityCreator,
                 ruleItr->groupItemOrder));

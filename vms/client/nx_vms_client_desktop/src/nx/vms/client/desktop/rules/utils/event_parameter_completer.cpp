@@ -169,7 +169,11 @@ void EventParameterCompleter::Private::triggerCompleter()
     if (isCompletingInProgress || textEdit == nullptr || !textEdit->hasFocus())
         return;
 
-    initCurrentWord(textEdit->textCursor().position(), textEdit->toPlainText());
+    const auto cursor = textEdit->textCursor();
+    if (cursor.hasSelection())
+        return; //< To avoid triggering on selection.
+
+    initCurrentWord(cursor.position(), textEdit->toPlainText());
     updateCompleter();
 
     // Completer will popup, when cursor placed after the bracket symbol (for e.g '{' is typed)
