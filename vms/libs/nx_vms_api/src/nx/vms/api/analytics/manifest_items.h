@@ -211,7 +211,7 @@ constexpr auto nxReflectVisitAllEnumItems(EventTypeFlag*, Visitor&& visitor)
 /**
  * Description of the Analytics Event type.
  */
-struct EventType: public ExtendedType
+struct AnalyticsEventType: public ExtendedType
 {
     /**%apidoc[opt] */
     EventTypeFlags flags = EventTypeFlag::noFlags;
@@ -222,9 +222,9 @@ struct EventType: public ExtendedType
 
     bool isStateful() const noexcept { return flags.testFlag(EventTypeFlag::stateDependent); }
 };
-#define EventType_Fields ExtendedType_Fields (flags)(groupId)(provider)
-NX_REFLECTION_INSTRUMENT(EventType, EventType_Fields);
-size_t NX_VMS_API qHash(const EventType& eventType);
+#define AnalyticsEventType_Fields ExtendedType_Fields (flags)(groupId)(provider)
+NX_REFLECTION_INSTRUMENT(AnalyticsEventType, AnalyticsEventType_Fields);
+size_t NX_VMS_API qHash(const AnalyticsEventType& eventType);
 
 enum class ObjectTypeFlag
 {
@@ -312,7 +312,7 @@ NX_REFLECTION_INSTRUMENT(TypeSupportInfo, TypeSupportInfo_Fields);
 Q_DECLARE_OPERATORS_FOR_FLAGS(EventTypeFlags)
 Q_DECLARE_OPERATORS_FOR_FLAGS(ObjectTypeFlags)
 
-bool NX_VMS_API operator==(const EventType& lh, const EventType& rh);
+bool NX_VMS_API operator==(const AnalyticsEventType& lh, const AnalyticsEventType& rh);
 
 QN_FUSION_DECLARE_FUNCTIONS(ColorItem, (json), NX_VMS_API)
 QN_FUSION_DECLARE_FUNCTIONS(ColorType, (json), NX_VMS_API)
@@ -320,7 +320,7 @@ QN_FUSION_DECLARE_FUNCTIONS(EnumType, (json), NX_VMS_API)
 QN_FUSION_DECLARE_FUNCTIONS(ItemObject, (json), NX_VMS_API)
 QN_FUSION_DECLARE_FUNCTIONS(AttributeDescription, (json), NX_VMS_API)
 QN_FUSION_DECLARE_FUNCTIONS(ExtendedType, (json), NX_VMS_API)
-QN_FUSION_DECLARE_FUNCTIONS(EventType, (json), NX_VMS_API)
+QN_FUSION_DECLARE_FUNCTIONS(AnalyticsEventType, (json), NX_VMS_API)
 QN_FUSION_DECLARE_FUNCTIONS(ObjectType, (json), NX_VMS_API)
 QN_FUSION_DECLARE_FUNCTIONS(HiddenExtendedType, (json), NX_VMS_API)
 QN_FUSION_DECLARE_FUNCTIONS(AttributesWithId, (json), NX_VMS_API)

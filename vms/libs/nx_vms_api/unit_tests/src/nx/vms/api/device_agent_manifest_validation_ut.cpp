@@ -19,7 +19,7 @@ protected:
         m_manifest = DeviceAgentManifest();
         m_manifest.supportedEventTypeIds = makeStrings("supportedEventType");
         m_manifest.supportedObjectTypeIds = makeStrings("supportedObjectType");
-        m_manifest.eventTypes = makeEntries<EventType>("Event");
+        m_manifest.eventTypes = makeEntries<AnalyticsEventType>("Event");
         m_manifest.objectTypes = makeEntries<ObjectType>("Object");
         m_manifest.groups = makeEntries<Group>("Group");
         m_manifest.deviceAgentSettingsModel = QJsonObject();
@@ -66,7 +66,7 @@ protected:
         givenCorrectManifest();
         m_manifest.supportedEventTypeIds.push_back("id");
 
-        EventType eventType;
+        AnalyticsEventType eventType;
         eventType.id = "id";
         eventType.name = "some name";
         m_manifest.eventTypes.push_back(eventType);

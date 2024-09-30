@@ -10,7 +10,7 @@ namespace nx::vms::api::analytics {
 struct NX_VMS_API TypeLibrary
 {
     /**%apidoc[opt] */
-    QList<EventType> eventTypes;
+    QList<AnalyticsEventType> eventTypes;
 
     /**%apidoc[opt] */
     QList<ObjectType> objectTypes;
