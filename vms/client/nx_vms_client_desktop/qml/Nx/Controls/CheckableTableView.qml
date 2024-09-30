@@ -30,6 +30,7 @@ TableView
         }
 
         sortRole: root.sourceModel.sortRole ?? Qt.DisplayRole
+        sortCaseSensitivity: Qt.CaseInsensitive
     }
 
     headerDelegate: DelegateChooser
