@@ -40,7 +40,7 @@ Item
             const engineId = store.getCurrentEngineId()
             const licenseSummary = engineLicenseSummaryProvider.licenseSummary(engineId)
             viewModel.updateState(
-                store.analyticsEngines,
+                store.analyticsEngines(),
                 licenseSummary,
                 store.settingsModel(engineId),
                 store.settingsValues(engineId),
