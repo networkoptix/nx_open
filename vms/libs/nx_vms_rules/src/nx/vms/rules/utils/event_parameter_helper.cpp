@@ -40,13 +40,13 @@ struct SubstitutionDesc
     FilterFunction filter = {};
 };
 
-QSet<QString> getAttributesParameters(
+EventParameterHelper::EventParametersNames getAttributesParameters(
     const QString& eventType, common::SystemContext* systemContext, const QString& objectId)
 {
     if (eventType != type<AnalyticsObjectEvent>() || objectId.isEmpty())
         return {};
 
-    QSet<QString> result;
+    EventParameterHelper::EventParametersNames result;
     const auto attributesNames =
         getAttributesNames(systemContext->analyticsTaxonomyState().get(), objectId);
     for (auto& attribute: attributesNames)
@@ -109,7 +109,7 @@ bool substitutionIsApplicable(
     return desc.filter(eventDesc.value(), eventState);
 }
 
-const std::map<QString, SubstitutionDesc> kFormatFunctions = {
+const std::map<QString, SubstitutionDesc, nx::utils::CaseInsensitiveStringCompare> kFormatFunctions = {
     {"camera.id", {&deviceId, false, &deviceEvents}},
     {"camera.name", {&deviceName, false, &deviceEvents}},
     {"device.id", {&deviceId, false}},
@@ -182,7 +182,10 @@ EventParameterHelper::EventParametersNames EventParameterHelper::getVisibleEvent
         result.insert(key);
     }
 
-    return result + getAttributesParameters(eventType, systemContext, objectTypeField);
+    for (auto& attributeValue: getAttributesParameters(eventType, systemContext, objectTypeField))
+        result.insert(attributeValue);
+
+    return result;
 }
 
 QString EventParameterHelper::evaluateEventParameter(

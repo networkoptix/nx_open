@@ -241,16 +241,14 @@ QString eventAttribute(const QString& attributeName, const AggregatedEventPtr& e
 {
     using Attributes = nx::common::metadata::Attributes;
 
-    if (const auto& attributesVariant = eventAggregator->property(kAttributesFieldName);
-        attributesVariant.canConvert<Attributes>())
-    {
-        const auto& attributes = attributesVariant.value<Attributes>();
-        auto it = std::find_if(attributes.begin(),
-            attributes.end(),
-            [&attributeName](const auto& attribute) { return attribute.name == attributeName; });
+    const auto& attributesVariant = eventAggregator->property(kAttributesFieldName);
+    if (!attributesVariant.canConvert<Attributes>())
+        return {};
 
-        if (it != attributes.end())
-            return it->value;
+    for (auto& attribute: attributesVariant.value<Attributes>())
+    {
+        if (attributeName.compare(attribute.name, Qt::CaseInsensitive) == 0)
+            return attribute.value;
     }
 
     return {};

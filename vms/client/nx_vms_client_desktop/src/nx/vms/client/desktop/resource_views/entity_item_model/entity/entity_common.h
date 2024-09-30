@@ -6,6 +6,7 @@
 #include <QtCore/QString>
 
 #include <core/resource/shared_resource_pointer.h>
+#include <nx/utils/string/comparator.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity/abstract_entity.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/item/abstract_item.h>
@@ -25,22 +26,6 @@ struct Hasher
     std::size_t operator()(const Key& key) const
     {
         return ::qHash(key);
-    }
-};
-
-struct CaseInsensitiveStringHasher
-{
-    bool operator()(const QString& key) const
-    {
-        return ::qHash(key.toLower());
-    }
-};
-
-struct CaseInsensitiveStringEqual
-{
-    bool operator()(const QString& lhs, const QString& rhs) const
-    {
-        return lhs.compare(rhs, Qt::CaseInsensitive) == 0;
     }
 };
 

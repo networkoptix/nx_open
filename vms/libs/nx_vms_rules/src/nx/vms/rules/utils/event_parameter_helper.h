@@ -2,7 +2,9 @@
 
 #pragma once
 #include <QString>
+#include <set>
 
+#include <nx/utils/string/comparator.h>
 #include <nx/vms/rules/rules_fwd.h>
 
 namespace nx::vms::common { class SystemContext; }
@@ -12,7 +14,7 @@ namespace nx::vms::rules::utils {
 class NX_VMS_RULES_API EventParameterHelper
 {
 public:
-    using EventParametersNames = QSet<QString>;
+    using EventParametersNames = std::set<QString, nx::utils::CaseInsensitiveStringCompare>;
 
     static QString addBrackets(const QString& text);
     static QString removeBrackets(QString text);
