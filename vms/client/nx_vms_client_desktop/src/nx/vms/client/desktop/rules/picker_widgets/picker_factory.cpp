@@ -271,6 +271,9 @@ PickerWidget* PickerFactory::createWidget(
     if (fieldId == fieldMetatype<nx::vms::rules::TargetLayoutField>())
         return createPickerImpl<SingleTargetLayoutPicker>(field, context, parent);
 
+    if (fieldId == fieldMetatype<vms::rules::TargetLayoutsField>())
+        return createPickerImpl<TargetLayoutPicker>(field, context, parent);
+
     if (fieldId == fieldMetatype<nx::vms::rules::OptionalTimeField>())
         return createOptionalDurationPicker(field, context, parent);
 
@@ -288,9 +291,6 @@ PickerWidget* PickerFactory::createWidget(
 
     if (fieldId == fieldMetatype<vms::rules::TargetDevicesField>())
         return createTargetDevicePicker(field, context, parent);
-
-    if (fieldId == fieldMetatype<vms::rules::TargetLayoutField>())
-        return createPickerImpl<TargetLayoutPicker>(field, context, parent);
 
     if (fieldId == fieldMetatype<vms::rules::TargetServersField>())
         return createTargetServerPicker(field, context, parent);
