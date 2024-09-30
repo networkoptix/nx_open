@@ -108,8 +108,7 @@ struct NX_VMS_API DeviceModelGeneral: ResourceWithParameters
         ResourceStatusDataList,
         ResourceParamWithRefDataList>;
 };
-#define DeviceModelGeneral_Fields \
-    ResourceWithParameters_Fields \
+#define DeviceModelGeneral_Fields ResourceWithParameters_Fields \
     (id)(name)(url)(typeId)(mac)(serverId)(physicalId) \
     (isManuallyAdded)(vendor)(model)(group)(credentials)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST_EX(DeviceModelGeneral, (json))
@@ -352,9 +351,9 @@ struct NX_VMS_API DeviceModelV3: DeviceModelV1
     DbUpdateTypes toDbTypes() &&;
     static std::vector<DeviceModelV3> fromDbTypes(DbListTypes data);
 };
-#define DeviceModelV3_Fields DeviceModelGeneral_Fields DeviceModelV1_Fields \
-    (compatibleAnalyticsEngineIds)(mediaCapabilities)(mediaStreams)         \
-    (streamUrls)(userEnabledAnalyticsEngineIds)(parameters)
+#define DeviceModelV3_Fields DeviceModelV1_Fields \
+    (compatibleAnalyticsEngineIds)(mediaCapabilities)(mediaStreams) \
+    (streamUrls)(userEnabledAnalyticsEngineIds)
 QN_FUSION_DECLARE_FUNCTIONS(DeviceModelV3, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(DeviceModelV3, DeviceModelV3_Fields);
 

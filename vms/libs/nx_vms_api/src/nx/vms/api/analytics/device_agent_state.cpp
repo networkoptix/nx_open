@@ -6,6 +6,7 @@
 
 namespace nx::vms::api::analytics {
 
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DeviceAgentId, (json), DeviceAgentId_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DeviceAgentState, (json), DeviceAgentState_Fields)
 
 } // namespace nx::vms::api::analytics

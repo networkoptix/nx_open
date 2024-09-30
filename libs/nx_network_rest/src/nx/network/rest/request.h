@@ -3,9 +3,12 @@
 #pragma once
 
 #include <nx/json_rpc/messages.h>
+#include <nx/reflect/json/deserializer.h>
+#include <nx/reflect/urlencoded/deserializer.h>
 
 #include "audit.h"
 #include "exception.h"
+#include "nx_network_rest_ini.h"
 #include "params.h"
 
 namespace nx::json_rpc { class WebSocketConnection; }
@@ -111,8 +114,14 @@ public:
      * content is filled with the calculated request content.
      */
     template<typename T>
-    T parseContentAllowingOmittedValuesOrThrow(
-        std::optional<QJsonValue>* content, bool wrapInObject = false) const;
+    T parseContentAllowingOmittedValuesOrThrow(std::optional<QJsonValue>* content) const;
+
+    using Fields = nx::reflect::DeserializationResult::Fields;
+    /**
+     * Result is the same as result of parseContentOrThrow. Parsed fields are filled.
+     */
+    template<typename T>
+    T parseContentAllowingOmittedValuesOrThrow(Fields* fields) const;
 
     /** The safe version of parseContent. */
     template<typename T>
@@ -267,12 +276,11 @@ T Request::parseContentOrThrow(bool wrapInObject) const
 }
 
 template<typename T>
-T Request::parseContentAllowingOmittedValuesOrThrow(
-    std::optional<QJsonValue>* content, bool wrapInObject) const
+T Request::parseContentAllowingOmittedValuesOrThrow(std::optional<QJsonValue>* content) const
 {
     try
     {
-        QJsonValue calculatedContent = calculateContent(/*useException*/ true, wrapInObject);
+        auto calculatedContent = calculateContent(/*useException*/ true, /*wrapInObject*/ false);
         if (calculatedContent.isUndefined())
             throw Exception::badRequest("No JSON provided.");
         QnJsonContext ctx;
@@ -290,6 +298,60 @@ T Request::parseContentAllowingOmittedValuesOrThrow(
     {
         throw Exception::badRequest(e.what());
     }
+}
+
+template<typename T>
+T Request::parseContentAllowingOmittedValuesOrThrow(Fields* fields) const
+{
+    T data;
+    Params params;
+    if (m_content)
+    {
+        if (m_content->type == nx::network::http::header::ContentType::kForm)
+        {
+            auto result = nx::reflect::urlencoded::deserialize(
+                std::string_view{m_content->body.constData(), (size_t) m_content->body.size()},
+                &data);
+            if (!result)
+                throw Exception::badRequest(QString::fromStdString(result.toString()));
+            *fields = std::move(result.fields);
+        }
+        else if (m_content->type == nx::network::http::header::ContentType::kJson)
+        {
+            auto result = nx::reflect::json::deserialize(
+                std::string_view{m_content->body.constData(), (size_t) m_content->body.size()},
+                &data,
+                nx::reflect::json::DeserializationFlag::fields);
+            if (!result)
+                throw Exception::badRequest(QString::fromStdString(result.toString()));
+            *fields = std::move(result.fields);
+        }
+        else //< TODO: Other content types should go here when supported.
+        {
+            throw Exception::unsupportedMediaType(NX_FMT("Unsupported type: %1", m_content->type));
+        }
+    }
+    else if (m_jsonRpcContext && m_jsonRpcContext->request.params)
+    {
+        // TODO: Switch JSON RPC to rapidjson.
+        auto serialized = QJson::serialize(m_jsonRpcContext->request.params.value());
+        auto result = nx::reflect::json::deserialize(
+            std::string_view{serialized.constData(), (size_t) serialized.size()},
+            &data,
+            nx::reflect::json::DeserializationFlag::fields);
+        if (!result)
+            throw Exception::badRequest(QString::fromStdString(result.toString()));
+        *fields = std::move(result.fields);
+    }
+    params.unite(m_pathParams);
+    if (ini().allowUrlParametersForAnyMethod
+        || !nx::network::http::Method::isMessageBodyAllowed(method()))
+    {
+        params.unite(m_urlParams);
+    }
+    if (!params.isEmpty())
+        params.uniteOrThrow(&data, fields);
+    return data;
 }
 
 } // namespace nx::network::rest

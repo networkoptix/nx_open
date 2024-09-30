@@ -4,6 +4,8 @@
 
 #include <QtCore/QString>
 
+#include <nx/reflect/instrument.h>
+
 #include "id_data.h"
 
 namespace nx::vms::api {
@@ -23,6 +25,7 @@ struct NX_VMS_API ShowreelItemData
 };
 #define ShowreelItemData_Fields (resourceId)(delayMs)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(ShowreelItemData)
+NX_REFLECTION_INSTRUMENT(ShowreelItemData, ShowreelItemData_Fields)
 
 struct NX_VMS_API ShowreelSettings
 {
@@ -32,6 +35,7 @@ struct NX_VMS_API ShowreelSettings
 };
 #define ShowreelSettings_Fields (manual)
 NX_VMS_API_DECLARE_STRUCT(ShowreelSettings)
+NX_REFLECTION_INSTRUMENT(ShowreelSettings, ShowreelSettings_Fields)
 
 struct NX_VMS_API ShowreelData: IdData
 {
@@ -51,5 +55,6 @@ struct NX_VMS_API ShowreelData: IdData
 };
 #define ShowreelData_Fields IdData_Fields (parentId)(name)(items)(settings)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(ShowreelData)
+NX_REFLECTION_INSTRUMENT(ShowreelData, ShowreelData_Fields)
 
 } // namespace nx::vms::api

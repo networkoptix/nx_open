@@ -71,7 +71,7 @@ void ApiIntegrationRequestsModel::refresh()
                 {
                     result.push_back(QJsonObject{
                         // requestId is guaranteed to be non-null.
-                        {"requestId", request.requestId.value_or(nx::Uuid()).toString()},
+                        {"requestId", request.requestId.toString()},
                         {"pinCode", request.pinCode},
                         {"name", request.integrationManifest.name},
                         {"description", request.integrationManifest.description},

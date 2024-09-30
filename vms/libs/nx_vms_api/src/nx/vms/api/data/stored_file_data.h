@@ -22,6 +22,7 @@ struct NX_VMS_API StoredFileData
 };
 #define StoredFileData_Fields (path)(data)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(StoredFileData)
+NX_REFLECTION_INSTRUMENT(StoredFileData, StoredFileData_Fields)
 
 struct NX_VMS_API StoredFilePath
 {
@@ -41,6 +42,7 @@ struct NX_VMS_API StoredFilePath
 };
 #define StoredFilePath_Fields (path)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(StoredFilePath)
+NX_REFLECTION_INSTRUMENT(StoredFilePath, StoredFilePath_Fields)
 
 } // namespace api
 } // namespace vms

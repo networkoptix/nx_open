@@ -11,6 +11,7 @@
 
 #include <nx/reflect/generic_visitor.h>
 #include <nx/reflect/instrument.h>
+#include <nx/reflect/json/deserializer.h>
 
 #include "../from_string.h"
 #include "../serialization_utils.h"
@@ -72,9 +73,27 @@ class UrlencodedDeserializer;
 template<typename T>
 std::tuple<T, DeserializationResult> tryDeserialize(const std::string_view& str);
 
-// Type that cannot be deserialized is reported during compile time.
 template<typename T>
-std::tuple<T, DeserializationResult> defaultDeserialize(const std::string_view& str) = delete;
+std::tuple<T, DeserializationResult> defaultDeserialize(const std::string_view& str)
+{
+    if constexpr (std::is_same_v<std::string, T>)
+        return {std::string{str}, DeserializationResult{}};
+
+    if constexpr (reflect::detail::HasFromStdStringV<T>)
+        return {T::fromStdString(str), DeserializationResult{}};
+
+    T data;
+    auto r1 = json::deserialize(str, &data, json::DeserializationFlag::fields);
+    if (r1)
+        return {std::move(data), std::move(r1)};
+
+    auto r2 =
+        json::deserialize('"' + std::string{str} + '"', &data, json::DeserializationFlag::fields);
+    if (r2)
+        return {std::move(data), std::move(r2)};
+
+    return {T{}, std::move(r1)};
+}
 
 template<typename T>
 requires IsStdChronoDurationV<T>
@@ -196,7 +215,6 @@ std::tuple<T, DeserializationResult> deserialize(
         return {std::move(data), std::move(r2)};
 
     DeserializationResult result;
-    result.fields.reserve(strValues.size());
     for (const auto& value: strValues)
     {
         auto [element, r] = tryDeserialize<typename T::value_type>(value);
@@ -204,7 +222,6 @@ std::tuple<T, DeserializationResult> deserialize(
             return {std::move(data), std::move(r)};
 
         std::inserter(data, data.end()) = std::move(element);
-        result.addField(std::string{}, std::move(r.fields));
     }
     return {std::move(data), std::move(result)};
 }
@@ -266,6 +283,9 @@ public:
 
         using FieldType = typename WrappedField::Type;
         std::string fieldName = field.name();
+        if (m_deserializationResult.hasField(fieldName))
+            return;
+
         auto it = m_request.find(fieldName);
         if (it == m_request.end())
         {

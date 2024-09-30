@@ -25,6 +25,7 @@ struct NX_VMS_API CameraStreamCapability
 };
 #define CameraStreamCapability_Fields (minBitrateKbps)(maxBitrateKbps)(defaultBitrateKbps)(defaultFps)(maxFps)
 QN_FUSION_DECLARE_FUNCTIONS(CameraStreamCapability, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(CameraStreamCapability, CameraStreamCapability_Fields)
 
 struct NX_VMS_API CameraMediaCapability
 {
@@ -43,6 +44,7 @@ struct NX_VMS_API CameraMediaCapability
 };
 #define CameraMediaCapability_Fields (streamCapabilities)(hasDualStreaming)(hasAudio)(maxResolution)
 QN_FUSION_DECLARE_FUNCTIONS(CameraMediaCapability, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(CameraMediaCapability, CameraMediaCapability_Fields)
 
 NX_REFLECTION_ENUM_CLASS(CameraTraitType,
     aspectRatioDependent = 1

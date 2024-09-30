@@ -158,6 +158,7 @@ struct NX_VMS_API PtzPresetFilter
 };
 #define PtzPresetFilter_Fields (deviceId)(id)
 QN_FUSION_DECLARE_FUNCTIONS(PtzPresetFilter, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(PtzPresetFilter, PtzPresetFilter_Fields)
 
 struct NX_VMS_API PtzPreset: PtzPresetFilter
 {
@@ -166,6 +167,7 @@ struct NX_VMS_API PtzPreset: PtzPresetFilter
 };
 #define PtzPreset_Fields PtzPresetFilter_Fields (name)
 QN_FUSION_DECLARE_FUNCTIONS(PtzPreset, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(PtzPreset, PtzPreset_Fields)
 
 struct NX_VMS_API PtzPresetActivation: PtzPresetFilter
 {
