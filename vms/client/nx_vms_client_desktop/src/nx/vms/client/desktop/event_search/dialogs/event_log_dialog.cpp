@@ -494,7 +494,6 @@ void EventLogDialog::setLoading(EventLogDialog::State state)
 {
     const bool loading = (state == State::loading);
     setCursor(loading ? Qt::BusyCursor : Qt::ArrowCursor);
-    ui->filterPanel->setEnabled(!loading);
 
     switch (state)
     {
