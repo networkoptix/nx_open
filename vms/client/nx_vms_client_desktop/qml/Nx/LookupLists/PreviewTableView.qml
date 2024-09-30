@@ -14,7 +14,6 @@ CoreItems.TableView
     id: control
 
     property bool correct: true
-    readonly property string needSelectionText: qsTr("Select attribute")
     boundsBehavior: CoreItems.Flickable.StopAtBounds
     topMargin: columnsHeader.height
     clip: true
@@ -81,7 +80,7 @@ CoreItems.TableView
                 {
                     if(!repeater.itemAt(i))
                         return false
-                    if (repeater.itemAt(i).displayText === control.needSelectionText)
+                    if (repeater.itemAt(i).currentIndex === -1)
                         return true
                 }
                 return false
@@ -120,7 +119,7 @@ CoreItems.TableView
                     height: columnsHeader.comboBoxHeight
                     visible: control.model.rowCount
                     model: columnsHeader.getModel(index)
-                    placeholderText: control.needSelectionText
+                    placeholderText: qsTr("Select attribute")
 
                     onCurrentTextChanged:
                     {
