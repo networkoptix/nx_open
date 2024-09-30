@@ -47,7 +47,7 @@ struct NX_VMS_API DeviceAgentManifest
     /**%apidoc[opt]
      * %deprecated Use "typeLibrary" and "supportedTypes" fields instead.
      */
-    QList<EventType> eventTypes;
+    QList<AnalyticsEventType> eventTypes;
 
     /**%apidoc[opt]
      * %deprecated Use "typeLibrary" and "supportedTypes" fields instead.

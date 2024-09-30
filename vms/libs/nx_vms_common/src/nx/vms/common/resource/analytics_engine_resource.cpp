@@ -70,7 +70,7 @@ AnalyticsPluginResourcePtr AnalyticsEngineResource::plugin() const
 std::set<QString> AnalyticsEngineResource::eventTypeIds() const
 {
     const auto engineManifest = manifest();
-    return analytics::fromManifestItemListToIds(std::vector<const QList<EventType>*>{
+    return analytics::fromManifestItemListToIds(std::vector<const QList<AnalyticsEventType>*>{
         &engineManifest.eventTypes,
         &engineManifest.typeLibrary.eventTypes});
 }

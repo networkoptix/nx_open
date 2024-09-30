@@ -6,12 +6,12 @@
 
 namespace nx::vms::api::analytics {
 
-bool operator==(const EventType& lh, const EventType& rh)
+bool operator==(const AnalyticsEventType& lh, const AnalyticsEventType& rh)
 {
     return lh.id == rh.id;
 }
 
-size_t qHash(const EventType& eventType)
+size_t qHash(const AnalyticsEventType& eventType)
 {
     return qHash(eventType.id);
 }
@@ -24,7 +24,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ItemObject, (json), ItemObject_Fields, (brief, true))
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ExtendedType, (json), ExtendedType_Fields, (brief, true))
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(EventType, (json), EventType_Fields, (brief, true))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(AnalyticsEventType, (json), AnalyticsEventType_Fields, (brief, true))
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ObjectType, (json), ObjectType_Fields, (brief, true))
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(HiddenExtendedType, (json), HiddenExtendedType_Fields, (brief, true))
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(AttributesWithId, (json), AttributesWithId_Fields, (brief, true))

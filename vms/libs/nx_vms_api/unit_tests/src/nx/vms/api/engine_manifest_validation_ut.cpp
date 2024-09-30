@@ -16,7 +16,7 @@ protected:
     void givenCorrectManifest()
     {
         m_manifest = EngineManifest();
-        m_manifest.eventTypes = makeEntries<EventType>("Event");
+        m_manifest.eventTypes = makeEntries<AnalyticsEventType>("Event");
         m_manifest.objectTypes = makeEntries<ObjectType>("Object");
         m_manifest.groups = makeEntries<Group>("Group");
         m_manifest.objectActions = makeEntries<ObjectAction>("ObjectAction");

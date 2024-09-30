@@ -213,7 +213,7 @@ NX_REFLECTION_INSTRUMENT(ExtendedScopedDescriptor,
 struct EventTypeDescriptor: public ExtendedScopedDescriptor
 {
     EventTypeDescriptor() = default;
-    EventTypeDescriptor(nx::Uuid engineId, const EventType& eventType):
+    EventTypeDescriptor(nx::Uuid engineId, const AnalyticsEventType& eventType):
         ExtendedScopedDescriptor(scopeFromItem(engineId, eventType), eventType),
         flags(eventType.flags)
     {

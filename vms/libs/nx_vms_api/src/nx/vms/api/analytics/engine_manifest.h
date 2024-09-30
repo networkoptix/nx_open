@@ -54,7 +54,7 @@ struct NX_VMS_API EngineManifest
     /**%apidoc[opt]
      * %deprecated Use "typeLibrary" section instead.
      */
-    QList<EventType> eventTypes;
+    QList<AnalyticsEventType> eventTypes;
 
     /**%apidoc[opt]
      * %deprecated Use "typeLibrary" section instead.
