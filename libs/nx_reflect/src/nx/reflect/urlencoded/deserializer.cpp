@@ -6,7 +6,7 @@
 
 namespace nx::reflect::urlencoded::detail {
 
-std::tuple<std::string, bool> decode(const std::string_view& str)
+std::tuple<std::string, DeserializationResult> decode(const std::string_view& str)
 {
     std::string result;
 
@@ -21,12 +21,17 @@ std::tuple<std::string, bool> decode(const std::string_view& str)
                     std::string substr = std::string(str.substr(i + 1, 2));
                     auto sscanfRes = sscanf(substr.data(), "%x", &val);
                     if (sscanfRes != 1)
-                        return {"", false};
+                        return {{}, {false, "Failed to decode", std::move(substr)}};
                     result += static_cast<char>(val);
                     i += 2;
                 }
                 else
-                    return {"", false};
+                {
+                    return {{},
+                        {false,
+                            "Unexpected end of string with encoded symbol at the end",
+                            std::string{str}}};
+                }
                 break;
 
             default:
@@ -34,10 +39,10 @@ std::tuple<std::string, bool> decode(const std::string_view& str)
         }
     }
 
-    return {result, true};
+    return {std::move(result), true};
 }
 
-std::tuple<std::string_view, bool> trimBrackets(const std::string_view& str)
+std::tuple<std::string_view, DeserializationResult> trimBrackets(const std::string_view& str)
 {
     static constexpr std::pair<char, char> kBrackets[] = {
         {'{', '}'}, {'(', ')'}, {'[', ']'}
@@ -51,7 +56,7 @@ std::tuple<std::string_view, bool> trimBrackets(const std::string_view& str)
         if (str.starts_with(p.first))
         {
             if (!str.ends_with(p.second))
-                return {"", false};
+                return {{}, {false, std::string{"Must end with "} + p.second, std::string{str}}};
             return {str.substr(1, str.length() - 2), true};
         }
     }
@@ -59,7 +64,7 @@ std::tuple<std::string_view, bool> trimBrackets(const std::string_view& str)
     return {str, true};
 }
 
-std::tuple<std::vector<std::string_view>, bool> tokenizeRequest(
+std::tuple<std::vector<std::string_view>, DeserializationResult> tokenizeRequest(
     const std::string_view& request, char delimiter)
 {
     std::vector<std::string_view> requestTokenized;
@@ -79,7 +84,12 @@ std::tuple<std::vector<std::string_view>, bool> tokenizeRequest(
             continue;
         }
         if (bracesCounter < 0)
-            return {requestTokenized, false};
+        {
+            return {std::move(requestTokenized),
+                {false,
+                    "Unexpected bracket",
+                    std::string{request.substr(begPos, curPos - begPos)}}};
+        }
         if (c == delimiter)
         {
             requestTokenized.push_back(request.substr(begPos, curPos - begPos));
@@ -92,7 +102,7 @@ std::tuple<std::vector<std::string_view>, bool> tokenizeRequest(
 
     if (curPos > begPos)
         requestTokenized.push_back(request.substr(begPos, curPos - begPos));
-    return {requestTokenized, true};
+    return {std::move(requestTokenized), true};
 }
 
 } // namespace nx::reflect::urlencoded::detail

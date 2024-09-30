@@ -13,6 +13,7 @@
 #include <nx/reflect/instrument.h>
 
 #include "../from_string.h"
+#include "../serialization_utils.h"
 #include "../type_utils.h"
 
 namespace nx::reflect::urlencoded {
@@ -46,7 +47,7 @@ inline constexpr bool IsStringAlikeV =
 
 namespace detail {
 
-NX_REFLECT_API std::tuple<std::string, bool> decode(const std::string_view& str);
+NX_REFLECT_API std::tuple<std::string, DeserializationResult> decode(const std::string_view& str);
 
 /**
  * Cuts enclosing [], {} or () if present.
@@ -59,24 +60,25 @@ NX_REFLECT_API std::tuple<std::string, bool> decode(const std::string_view& str)
  * - `trimBrackets("{foo")` => ("", false)
  * - `trimBrackets("{foo]")` => ("", false)
  */
-NX_REFLECT_API std::tuple<std::string_view, bool> trimBrackets(const std::string_view& str);
+NX_REFLECT_API std::tuple<std::string_view, DeserializationResult> trimBrackets(
+    const std::string_view& str);
 
-NX_REFLECT_API std::tuple<std::vector<std::string_view>, bool> tokenizeRequest(
+NX_REFLECT_API std::tuple<std::vector<std::string_view>, DeserializationResult> tokenizeRequest(
     const std::string_view& request, char delimiter);
 
 template<typename Data>
 class UrlencodedDeserializer;
 
 template<typename T>
-std::tuple<T, bool> tryDeserialize(const std::string_view& str);
+std::tuple<T, DeserializationResult> tryDeserialize(const std::string_view& str);
 
 // Type that cannot be deserialized is reported during compile time.
 template<typename T>
-std::tuple<T, bool> defaultDeserialize(const std::string_view& str) = delete;
+std::tuple<T, DeserializationResult> defaultDeserialize(const std::string_view& str) = delete;
 
 template<typename T>
 requires IsStdChronoDurationV<T>
-std::tuple<T, bool> defaultDeserialize(const std::string_view& str)
+std::tuple<T, DeserializationResult> defaultDeserialize(const std::string_view& str)
 {
     T result;
     bool parsedSuccess = nx::reflect::detail::fromString(str, &result);
@@ -86,7 +88,7 @@ std::tuple<T, bool> defaultDeserialize(const std::string_view& str)
 // Representing timepoint in milliseconds since epoch.
 template<typename T>
 requires IsStdChronoTimePointV<T>
-std::tuple<T, bool> defaultDeserialize(const std::string_view& str)
+std::tuple<T, DeserializationResult> defaultDeserialize(const std::string_view& str)
 {
     std::chrono::milliseconds ms;
     bool parsedSuccess = nx::reflect::detail::fromString(str, &ms);
@@ -100,12 +102,10 @@ template<typename T>
 constexpr bool isInternalDeserializable()
 {
     constexpr bool isContainer =
-        (IsSequenceContainerV<T> ||
-        IsSetContainerV<T> ||
-        IsUnorderedSetContainerV<T>)
-        &&!IsStringAlikeV<T>;
+        (IsSequenceContainerV<T> || IsSetContainerV<T> || IsUnorderedSetContainerV<T>)
+        && !IsStringAlikeV<T>;
 
-    constexpr bool IsAssociativeContainer =
+    constexpr bool isAssociativeContainer =
         (IsAssociativeContainerV<T> && !IsSetContainerV<T>) ||
         (IsUnorderedAssociativeContainerV<T> && !IsUnorderedSetContainerV<T>);
 
@@ -114,36 +114,36 @@ constexpr bool isInternalDeserializable()
         IsInstrumentedV<T> ||
         std::is_arithmetic_v<T> ||
         isContainer ||
-        IsAssociativeContainer ||
+        isAssociativeContainer ||
         std::is_enum_v<T>;
 }
 
 template<typename T>
-std::tuple<T, bool> deserialize(
+std::tuple<T, DeserializationResult> deserialize(
     const std::string_view& str, std::enable_if_t<std::is_same_v<T, std::string>>* = nullptr)
 {
     return decode(str);
 }
 
 template<typename T>
-std::tuple<T, bool> deserialize(
+std::tuple<T, DeserializationResult> deserialize(
     const std::string_view& str, std::enable_if_t<IsOptionalV<T>>* = nullptr)
 {
     return tryDeserialize<typename T::value_type>(str);
 }
 
 template<typename T>
-std::tuple<T, bool> deserialize(
+std::tuple<T, DeserializationResult> deserialize(
     const std::string_view& str, std::enable_if_t<IsInstrumentedV<T>>* = nullptr)
 {
     T data;
-    UrlencodedDeserializer<T> visitor(str, data);
+    UrlencodedDeserializer<T> visitor(str, &data);
     nx::reflect::visitAllFields<T>(visitor);
-    return {data, !visitor.deserializationFailed()};
+    return {data, std::move(visitor).result()};
 }
 
 template<typename T>
-std::tuple<T, bool> deserialize(
+std::tuple<T, DeserializationResult> deserialize(
     const std::string_view& str, std::enable_if_t<std::is_same_v<T, bool>>* = nullptr)
 {
     std::string strCopy(str);
@@ -152,20 +152,22 @@ std::tuple<T, bool> deserialize(
         return {true, true};
     else if (strCopy == "false")
         return {false, true};
-    return {false, false};
+    else
+        return {false, {false, "Failed to deserialze boolean", std::string{str}}};
 }
 
 template<typename T>
-std::tuple<T, bool> deserialize(
+std::tuple<T, DeserializationResult> deserialize(
     const std::string_view& str, std::enable_if_t<std::is_enum_v<T>>* = nullptr)
 {
-    T result;
-    bool parsedSuccess = nx::reflect::fromString(str, &result);
-    return {result, parsedSuccess};
+    T result{};
+    if (nx::reflect::fromString(str, &result))
+        return {result, true};
+    return {result, {false, "Failed to deserialize enum value", std::string{str}}};
 }
 
 template<typename T>
-std::tuple<T, bool> deserialize(
+std::tuple<T, DeserializationResult> deserialize(
     const std::string_view& str,
     std::enable_if_t<std::is_arithmetic_v<T> && !std::is_same_v<T, bool>>* = nullptr)
 {
@@ -174,7 +176,7 @@ std::tuple<T, bool> deserialize(
 }
 
 template<typename T>
-std::tuple<T, bool> deserialize(
+std::tuple<T, DeserializationResult> deserialize(
     const std::string_view& str,
     std::enable_if_t<
         (IsSequenceContainerV<T> ||
@@ -183,25 +185,32 @@ std::tuple<T, bool> deserialize(
         &&!IsStringAlikeV<T>
     >* = nullptr)
 {
-    const auto& [fieldStr, trancatedSuccess] = trimBrackets(str);
-    if (!trancatedSuccess)
-        return {T(), false};
-    const auto& [strValues, tokenizedSuccess] = tokenizeRequest(fieldStr, ',');
-    if (!tokenizedSuccess)
-        return {T(), false};
     T data;
+
+    auto [fieldStr, r1] = trimBrackets(str);
+    if (!r1)
+        return {std::move(data), std::move(r1)};
+
+    auto [strValues, r2] = tokenizeRequest(fieldStr, ',');
+    if (!r2)
+        return {std::move(data), std::move(r2)};
+
+    DeserializationResult result;
+    result.fields.reserve(strValues.size());
     for (const auto& value: strValues)
     {
-        const auto& [element, success] = tryDeserialize<typename T::value_type>(value);
-        if (!success)
-            return {T(), false};
+        auto [element, r] = tryDeserialize<typename T::value_type>(value);
+        if (!r)
+            return {std::move(data), std::move(r)};
+
         std::inserter(data, data.end()) = std::move(element);
+        result.addField(std::string{}, std::move(r.fields));
     }
-    return {data, true};
+    return {std::move(data), std::move(result)};
 }
 
 template<typename T>
-std::tuple<T, bool> deserialize(
+std::tuple<T, DeserializationResult> deserialize(
     const std::string_view& str,
     std::enable_if_t<
         (IsAssociativeContainerV<T> ||
@@ -210,81 +219,115 @@ std::tuple<T, bool> deserialize(
         !IsUnorderedSetContainerV<T>
     >* = nullptr)
 {
-    const auto& [fieldStr, trancatedSuccess] = trimBrackets(str);
-    if (!trancatedSuccess)
-        return {T(), false};
-    const auto& [strValues, tokenizedSuccess] = tokenizeRequest(fieldStr, '&');
-    if (!tokenizedSuccess)
-        return {T(), false};
     T data;
+
+    auto [fieldStr, r1] = trimBrackets(str);
+    if (!r1)
+        return {std::move(data), std::move(r1)};
+
+    auto [strValues, r2] = tokenizeRequest(fieldStr, '&');
+    if (!r2)
+        return {std::move(data), std::move(r2)};
+
+    DeserializationResult result;
     for (const auto& token: strValues)
     {
         auto pos = token.find('=');
         if (pos == std::string::npos)
-            return {data, false};
+            return {std::move(data), {false, "Invalid key-value pair", std::string{token}}};
 
-        const auto& [key, keySuccess] = tryDeserialize<typename T::key_type>(token.substr(0, pos));
-        const auto& [value, valueSuccess] = tryDeserialize<typename T::value_type::second_type>(
+        auto keyStd = token.substr(0, pos);
+        auto [key, keyResult] = tryDeserialize<typename T::key_type>(keyStd);
+        if (!keyResult)
+            return {std::move(data), std::move(keyResult)};
+
+        auto [value, valueResult] = tryDeserialize<typename T::value_type::second_type>(
             token.substr(pos + 1, token.length() - pos - 1));
-        if (!keySuccess || !valueSuccess)
-            return {T(), false};
+        if (!valueResult)
+            return {std::move(data), std::move(valueResult)};
 
         data.emplace(key, value);
+        result.addField(std::string{std::move(keyStd)}, std::move(valueResult.fields));
     }
-    return {data, true};
+    return {std::move(data), std::move(result)};
 }
 
 template<typename Data>
 class UrlencodedDeserializer: public nx::reflect::GenericVisitor<UrlencodedDeserializer<Data>>
 {
 public:
-    UrlencodedDeserializer(const std::string_view& request, Data& data);
+    UrlencodedDeserializer(const std::string_view& request, Data* data);
 
     template<typename WrappedField>
     void visitField(const WrappedField& field)
     {
-        if (m_deserializationFailed)
+        if (!m_deserializationResult)
             return;
-        if (!m_request.count(field.name()))
-            return;
-        auto& fieldStr = m_request[field.name()];
-        if constexpr (IsInstrumentedV<typename WrappedField::Type>)
+
+        using FieldType = typename WrappedField::Type;
+        std::string fieldName = field.name();
+        auto it = m_request.find(fieldName);
+        if (it == m_request.end())
         {
-            bool trancatedSuccess;
-            std::tie(fieldStr, trancatedSuccess) = trimBrackets(m_request[field.name()]);
-            if (!trancatedSuccess)
-            {
-                m_deserializationFailed = true;
-                return;
-            }
+            if constexpr (IsOptionalV<FieldType>)
+                field.set(m_data, std::nullopt);
+            return;
         }
 
-        const auto& [data, result] = tryDeserialize<typename WrappedField::Type>(fieldStr);
-        if (!result)
+        auto serializedField = it->second;
+        DeserializationResult trimResult;
+        if constexpr (IsOptionalV<FieldType>)
         {
-            m_deserializationFailed = true;
+            if constexpr (IsInstrumentedV<typename FieldType::value_type>)
+                std::tie(serializedField, trimResult) = trimBrackets(std::move(serializedField));
+        }
+        else if constexpr (IsInstrumentedV<FieldType>)
+        {
+            std::tie(serializedField, trimResult) = trimBrackets(std::move(serializedField));
+        }
+        if (!trimResult)
+        {
+            updateFailedResult(std::move(fieldName), std::move(trimResult));
             return;
         }
-        field.set(&m_data, std::move(data));
+
+        auto [data, deserializeResult] = tryDeserialize<FieldType>(serializedField);
+        if (!deserializeResult)
+        {
+            updateFailedResult(std::move(fieldName), std::move(deserializeResult));
+            return;
+        }
+
+        m_deserializationResult.addField(
+            std::move(fieldName), std::move(deserializeResult.fields));
+        field.set(m_data, std::move(data));
     }
 
-    bool deserializationFailed() { return m_deserializationFailed; };
+    DeserializationResult result() && { return std::move(m_deserializationResult); }
 
 private:
-    std::unordered_map<std::string, std::string> m_request;
-    bool m_deserializationFailed = false;
-    Data& m_data;
+    void updateFailedResult(std::string fieldName, DeserializationResult result)
+    {
+        m_deserializationResult = std::move(result);
+        if (!m_deserializationResult.firstNonDeserializedField)
+            m_deserializationResult.firstNonDeserializedField = std::move(fieldName);
+    }
+
+private:
+    std::unordered_map<std::string, std::string_view> m_request;
+    DeserializationResult m_deserializationResult{true};
+    Data* m_data;
 };
 
 template<typename Data>
 inline UrlencodedDeserializer<Data>::UrlencodedDeserializer(
-    const std::string_view& request, Data& data):
+    const std::string_view& request, Data* data):
     m_data(data)
 {
-    const auto& [requestTokenized, tokenizeSuccess] = tokenizeRequest(request, '&');
-    if (!tokenizeSuccess)
+    auto [requestTokenized, r] = tokenizeRequest(request, '&');
+    if (!r)
     {
-        m_deserializationFailed = true;
+        m_deserializationResult = std::move(r);
         return;
     }
 
@@ -301,10 +344,14 @@ inline UrlencodedDeserializer<Data>::UrlencodedDeserializer(
             continue;
         }
 
-        const auto& [fieldName, decodeSuccess] = decode(token.substr(0, pos));
-        if (!decodeSuccess)
+        auto encodedField = token.substr(0, pos);
+        auto [fieldName, r] = decode(encodedField);
+        if (!r)
         {
-            m_deserializationFailed = true;
+            m_deserializationResult = {false,
+                "Failed to decode field name: " + std::move(r.errorDescription),
+                std::move(r.firstBadFragment),
+                std::string{encodedField}};
             return;
         }
 
@@ -313,17 +360,20 @@ inline UrlencodedDeserializer<Data>::UrlencodedDeserializer(
 }
 
 template<typename T>
-std::tuple<T, bool> tryDeserialize(const std::string_view& str)
+std::tuple<T, DeserializationResult> tryDeserialize(const std::string_view& str)
 {
     if constexpr (isInternalDeserializable<T>())
     {
         return deserialize<T>(str);
     }
-    else if constexpr (IsStringAlikeV<T>)
+    else if constexpr (IsStringAlikeV<T>
+        || useStringConversionForSerialization((const T*) nullptr))
     {
         bool ok = false;
         auto val = nx::reflect::fromString<T>(str, &ok);
-        return {std::move(val), ok};
+        if (ok)
+            return {std::move(val), true};
+        return {std::move(val), {false, "Failed to deserialize from string", std::string{str}}};
     }
     else
     {
@@ -339,7 +389,7 @@ std::tuple<T, bool> tryDeserialize(const std::string_view& str)
  * @return std::tuple<deserialized value, result>
  */
 template<typename Data>
-std::tuple<Data, bool /*result*/> deserialize(const std::string_view& request)
+std::tuple<Data, DeserializationResult> deserialize(const std::string_view& request)
 {
     return detail::tryDeserialize<Data>(request);
 }
@@ -352,11 +402,11 @@ std::tuple<Data, bool /*result*/> deserialize(const std::string_view& request)
  * NOTE: All fields are considered optional. So, missing field is not an error.
  */
 template<typename Data>
-bool deserialize(const std::string_view& request, Data* data)
+DeserializationResult deserialize(const std::string_view& request, Data* data)
 {
-    bool success;
-    std::tie(*data, success) = deserialize<Data>(request);
-    return success;
+    DeserializationResult r;
+    std::tie(*data, r) = deserialize<Data>(request);
+    return r;
 }
 
 } // namespace nx::reflect::urlencoded
