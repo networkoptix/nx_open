@@ -25,7 +25,6 @@ class AnalyticsSettingsStore:
     public CurrentSystemContextAware
 {
     Q_OBJECT
-    Q_PROPERTY(QVariant analyticsEngines READ analyticsEngines NOTIFY analyticsEnginesChanged)
     Q_PROPERTY(bool loading READ loading NOTIFY loadingChanged)
     Q_PROPERTY(bool hasChanges READ hasChanges NOTIFY hasChangesChanged)
     Q_PROPERTY(bool isNewRequestsEnabled
@@ -49,7 +48,7 @@ public:
     Q_INVOKABLE QJsonObject settingsModel(const nx::Uuid& engineId);
     Q_INVOKABLE QJsonObject errors(const nx::Uuid& engineId) { return m_errors[engineId]; }
 
-    QVariant analyticsEngines() const { return m_engines; }
+    Q_INVOKABLE QVariant analyticsEngines() const { return m_engines; }
     bool isEmpty() const { return m_engines.empty(); }
 
     void updateEngines();

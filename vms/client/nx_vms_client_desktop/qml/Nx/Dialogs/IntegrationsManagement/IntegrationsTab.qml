@@ -42,7 +42,7 @@ Item
                 : null
 
             viewModel.updateState(
-                store.analyticsEngines,
+                store.analyticsEngines(),
                 licenseSummary,
                 store.settingsModel(engineId),
                 store.settingsValues(engineId),
