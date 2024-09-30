@@ -62,7 +62,7 @@ Dialog
             nameField.labelImplicitWidth,
             baseDnField.labelImplicitWidth,
             filterField.labelImplicitWidth,
-            78)
+            86)
 
         CenteredField
         {
