@@ -5,7 +5,7 @@
 #include <QtWidgets/QBoxLayout>
 
 #include <nx/vms/client/core/skin/skin.h>
-#include <ui/workaround/hidpi_workarounds.h>
+#include <nx/vms/client/desktop/common/widgets/loading_indicator.h>
 
 QnProgressWidget::QnProgressWidget(QWidget *parent):
     QWidget(parent),
@@ -16,12 +16,10 @@ QnProgressWidget::QnProgressWidget(QWidget *parent):
     layout->setSizeConstraint(QLayout::SetFixedSize);
     layout->setContentsMargins(0, 0, 0, 0);
 
-    QMovie* movie = qnSkin->newMovie("legacy/loading.gif", this);
-    QnHiDpiWorkarounds::setMovieToLabel(m_img, movie);
-
-    if (movie->loopCount() >= 0)
-        connect(movie, &QMovie::finished, movie, &QMovie::start);
-    movie->start();
+    using LoadingIndicator = nx::vms::client::desktop::LoadingIndicator;
+    auto indicator = new LoadingIndicator(this);
+    connect(indicator, &LoadingIndicator::frameChanged, this,
+        [this](const QPixmap& pixmap) { m_img->setPixmap(pixmap); });
 
     layout->addWidget(m_img);
     layout->addWidget(m_text);

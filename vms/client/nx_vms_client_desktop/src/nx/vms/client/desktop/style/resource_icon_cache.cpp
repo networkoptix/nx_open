@@ -367,7 +367,7 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent):
     m_cache.insert(VirtualCamera | Offline, IconWithDescription(kVirtualCamerasOfflineIcon));
     m_cache.insert(VirtualCamera | NotificationMode, IconWithDescription(kVirtualCamerasNotificationIcon));
     m_cache.insert(CrossSystemStatus | Unauthorized, IconWithDescription(kAlertYellowIcon));
-    m_legacyIconsPaths.insert(CrossSystemStatus | Control, "legacy/loading.gif"); //< The Control uses to describe loading state.
+    m_legacyIconsPaths.insert(CrossSystemStatus | Control, "20x20/Outline/loaders.svg.gen"); //< The Control uses to describe loading state.
     m_legacyIconsPaths.insert(CrossSystemStatus | Offline, "cloud/cloud_20_disabled.png");
     m_cache.insert(IOModule, IconWithDescription(kIOIcon));
     m_cache.insert(IOModule | NotificationMode, IconWithDescription(kIONotificationIcon));
@@ -437,9 +437,9 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent):
         IconWithDescription value;
         const auto substitutions =
             flag.testFlag(Offline) ? kTreeThemeOfflineSubstitutions : kTreeThemeSubstitutions;
-        if (path.endsWith(".gif"))
+        if (path.endsWith(".gen"))
         {
-            value.icon = qnSkin->icon(path);
+            value.icon = qnSkin->pixmap(path);
         }
         else
         {

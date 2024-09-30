@@ -9,6 +9,7 @@
 
 namespace nx::vms::client::desktop {
 
+class LoadingIndicator;
 struct UpdateItem;
 
 // Fancy delegate to show status of updating server.
@@ -42,7 +43,7 @@ protected:
     void setEditorData(QWidget* editor, const QModelIndex& index) const override;
 
 private:
-    QScopedPointer<QMovie> m_updateAnimation;
+    QScopedPointer<LoadingIndicator> m_updateAnimation;
     StatusMode m_statusMode = StatusMode::hidden;
 };
 

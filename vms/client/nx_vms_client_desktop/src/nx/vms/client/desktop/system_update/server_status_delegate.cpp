@@ -14,6 +14,7 @@
 #include <nx/utils/unicode_chars.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/desktop/common/widgets/loading_indicator.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 
 #include "server_updates_model.h"
@@ -56,7 +57,7 @@ public:
         setLayout(layout);
         setMinimumWidth(200);
 
-        connect(owner->m_updateAnimation.data(), &QMovie::frameChanged,
+        connect(owner->m_updateAnimation.data(), &LoadingIndicator::frameChanged,
             this, &ServerStatusWidget::at_changeAnimationFrame);
     }
 
@@ -183,11 +184,11 @@ public:
     }
 
 protected:
-    void at_changeAnimationFrame(int /*frame*/)
+    void at_changeAnimationFrame(const QPixmap& pixmap)
     {
         if (!m_animated)
             return;
-        m_left->setIcon(m_owner->getCurrentAnimationFrame());
+        m_left->setIcon(pixmap);
     }
 
 private:
@@ -202,14 +203,7 @@ private:
 ServerStatusItemDelegate::ServerStatusItemDelegate(QWidget* parent) :
     QStyledItemDelegate(parent)
 {
-    QMovie* const movie = qnSkin->newMovie("legacy/loading.gif", this);
-
-    m_updateAnimation.reset(movie);
-    // Loop this
-    if (movie->loopCount() != -1)
-        connect(movie, &QMovie::finished, movie, &QMovie::start);
-
-    movie->start();
+    m_updateAnimation.reset(new LoadingIndicator(this));
 }
 
 ServerStatusItemDelegate::~ServerStatusItemDelegate()
