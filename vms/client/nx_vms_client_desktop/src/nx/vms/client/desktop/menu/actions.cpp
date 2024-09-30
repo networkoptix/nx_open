@@ -627,7 +627,7 @@ void initialize(Manager* manager, Action* root)
     factory(MinimizeAction)
         .flags(NoTarget)
         .text(ContextMenu::tr("Minimize"))
-        .icon(qnSkin->icon("20x20/Outline/expand_main_window.svg"));
+        .icon(qnSkin->icon("20x20/Outline/collapse_main_window.svg"));
 
     factory(MaximizeAction)
         .flags(NoTarget)
