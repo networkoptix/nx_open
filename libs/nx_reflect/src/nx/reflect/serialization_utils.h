@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <algorithm>
 #include <optional>
 #include <string>
 #include <vector>
@@ -51,6 +52,13 @@ struct NX_REFLECT_API DeserializationResult
     operator bool() const noexcept;
 
     std::string toString() const;
+
+    bool hasField(std::string_view name) const
+    {
+        return std::find_if(
+                fields.begin(), fields.end(), [&name](const auto& f) { return f.name == name; })
+            != fields.end();
+    }
 
     // TODO: Replace with `fields.emplace_back(std::move(name), std::move(fields_))` when newer
     // clang will be used.

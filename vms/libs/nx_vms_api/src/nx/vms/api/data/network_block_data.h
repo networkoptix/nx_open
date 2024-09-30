@@ -51,6 +51,7 @@ struct NX_VMS_API NetworkPortWithPoweringMode
     (poweringMode)
 
 NX_VMS_API_DECLARE_STRUCT_AND_LIST_EX(NetworkPortWithPoweringMode, (json))
+NX_REFLECTION_INSTRUMENT(NetworkPortWithPoweringMode, NetworkPortWithPoweringMode_Fields)
 
 struct NX_VMS_API NetworkPortState: public NetworkPortWithPoweringMode
 {

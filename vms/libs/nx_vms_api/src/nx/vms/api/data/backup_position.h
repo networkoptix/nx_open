@@ -7,7 +7,7 @@
 #include <QtCore/QList>
 
 #include <nx/fusion/model_functions_fwd.h>
-#include <nx/reflect/enum_instrument.h>
+#include <nx/reflect/instrument.h>
 #include <nx/utils/serialization/flags.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/data/server_and_device_id_data.h>
@@ -43,6 +43,7 @@ struct NX_VMS_API BackupPosition: ServerAndDeviceIdData
     (bookmarkStartPositionMs)
 
 QN_FUSION_DECLARE_FUNCTIONS(BackupPosition, (json)(ubjson), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(BackupPosition, BackupPosition_Fields)
 
 struct NX_VMS_API BackupPositionEx: BackupPosition
 {
@@ -64,5 +65,6 @@ using BackupPositionExList = std::vector<BackupPositionEx>;
     (toBackupHighMs)
 
 QN_FUSION_DECLARE_FUNCTIONS(BackupPositionEx, (json)(ubjson), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(BackupPositionEx, BackupPositionEx_Fields)
 
 } // namespace nx::vms::api

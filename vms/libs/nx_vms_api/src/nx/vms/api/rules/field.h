@@ -5,6 +5,7 @@
 #include <QtCore/QJsonValue>
 #include <QtCore/QMap>
 
+#include <nx/reflect/instrument.h>
 #include <nx/utils/uuid.h>
 
 #include "../data/data_macros.h"
@@ -24,5 +25,6 @@ struct NX_VMS_API Field
 
 #define nx_vms_api_rules_Field_Fields (type)(props)
 NX_VMS_API_DECLARE_STRUCT_EX(Field, (json)(ubjson))
+NX_REFLECTION_INSTRUMENT(Field, nx_vms_api_rules_Field_Fields)
 
 } // namespace nx::vms::api::rules

@@ -22,12 +22,8 @@ class WrappedMemberVariableField
 public:
     using Type = Field;
 
-    constexpr WrappedMemberVariableField(
-        const char* name,
-        Field Class::*fieldPtr)
-        :
-        m_name(name),
-        m_fieldPtr(fieldPtr)
+    constexpr WrappedMemberVariableField(const char* name, Field Class::*fieldPtr):
+        m_name(name), m_fieldPtr(fieldPtr)
     {
     }
 
@@ -42,12 +38,11 @@ public:
     }
 
     // Get the wrapped member-variable value from the object obj.
-    auto get(const Class& obj) const
-    {
-        return obj.*m_fieldPtr;
-    }
+    auto get(const Class& obj) const { return obj.*m_fieldPtr; }
 
-    Field Class::* ptr() const { return m_fieldPtr; }
+    Type& ref(Class* obj) const { return obj->*m_fieldPtr; }
+
+    Field Class::*ptr() const { return m_fieldPtr; }
 
 private:
     const char* m_name = nullptr;
@@ -79,6 +74,22 @@ public:
     // Get wrapped property value of obj by invoking the corresponding getter method.
     template<typename Class>
     auto get(const Class& obj) const { return (obj.*m_getter)(); }
+
+    template<typename Class>
+    struct RefWrapper
+    {
+        Class* object;
+        WrappedProperty* property;
+
+        RefWrapper(Class* object, WrappedProperty* property): object(object), property(property) {}
+        operator Type() const { return property->get(*object); }
+
+        template<typename Arg>
+        void operator=(Arg&& value) { property->set(object, detail::forward<Arg>(value)); }
+    };
+
+    template<typename Class>
+    auto ref(Class* object) const { return RefWrapper{object, this}; }
 
 private:
     const char* m_name = nullptr;

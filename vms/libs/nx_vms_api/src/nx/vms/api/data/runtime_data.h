@@ -7,6 +7,7 @@
 #include <QtCore/QVector>
 #include <QtCore/QtGlobal>
 
+#include <nx/utils/serialization/qt_containers_reflect_json.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/types/connection_types.h>
 
@@ -80,5 +81,6 @@ struct NX_VMS_API RuntimeData
     (activeAnalyticsEngines) \
     (prematureVideoWallLicenseExpirationDate)
 NX_VMS_API_DECLARE_STRUCT_EX(RuntimeData, (ubjson)(json)(xml))
+NX_REFLECTION_INSTRUMENT(RuntimeData, RuntimeData_Fields)
 
 } // namespace nx::vms::api

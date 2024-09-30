@@ -178,9 +178,6 @@ DeserializationResult deserialize(
         return {false, "Array is expected", getStringRepresentation(ctx.value)};
 
     DeserializationResult result;
-    if (ctx.flags & (int) json::DeserializationFlag::fields)
-        result.fields.resize(ctx.value.Size());
-
     for (rapidjson::SizeType i = 0; i < ctx.value.Size(); ++i)
     {
         typename C::value_type element;
@@ -193,8 +190,6 @@ DeserializationResult deserialize(
             continue;
         }
         std::inserter(*data, data->end()) = std::move(element);
-        if (ctx.flags & (int) json::DeserializationFlag::fields)
-            result.fields[i].fields = std::move(deserializationResult.fields);
     }
     return result;
 }
@@ -451,7 +446,7 @@ public:
     template<typename WrappedField>
     void visitField(const WrappedField& field)
     {
-        if (!m_deserealizationResult.success)
+        if (!m_deserializationResult.success)
             return;
 
         auto deserializationResult =
@@ -459,13 +454,13 @@ public:
         if (!deserializationResult
             && !(m_ctx.flags & (int) json::DeserializationFlag::ignoreFieldTypeMismatch))
         {
-            m_deserealizationResult = deserializationResult;
+            m_deserializationResult = std::move(deserializationResult);
         }
     }
 
     DeserializationResult ok() const
     {
-        return m_deserealizationResult;
+        return m_deserializationResult;
     }
 
 private:
@@ -480,6 +475,12 @@ private:
         auto valueIter = ctx.value.FindMember(field.name());
         if (valueIter != ctx.value.MemberEnd())
         {
+            if ((ctx.flags & ((int) json::DeserializationFlag::fields))
+                && m_deserializationResult.hasField(field.name()))
+            {
+                return deserializationResult;
+            }
+
             data = T();
             auto& dataRef = *data;
             auto curDeserializationResult = deserializeValue(
@@ -488,7 +489,7 @@ private:
             {
                 if (ctx.flags & ((int) json::DeserializationFlag::fields))
                 {
-                    m_deserealizationResult.addField(
+                    m_deserializationResult.addField(
                         field, std::move(curDeserializationResult.fields));
                 }
             }
@@ -518,6 +519,12 @@ private:
         if (valueIter == ctx.value.MemberEnd())
             return DeserializationResult(true);
 
+        if ((ctx.flags & ((int) json::DeserializationFlag::fields))
+            && m_deserializationResult.hasField(field.name()))
+        {
+            return {};
+        }
+
         T data;
         auto deserializationResult =
             deserializeValue(DeserializationContext{valueIter->value, ctx.flags}, &data);
@@ -526,7 +533,7 @@ private:
         {
             field.set(m_data, std::move(data));
             if (ctx.flags & ((int) json::DeserializationFlag::fields))
-                m_deserealizationResult.addField(field, std::move(deserializationResult.fields));
+                m_deserializationResult.addField(field, std::move(deserializationResult.fields));
         }
         else
         {
@@ -534,7 +541,10 @@ private:
             if (valueIter->value.GetType() == rapidjson::kNullType)
             {
                 if (ctx.flags & ((int) json::DeserializationFlag::fields))
-                    m_deserealizationResult.addField(field, std::move(deserializationResult.fields));
+                {
+                    m_deserializationResult.addField(
+                        field, std::move(deserializationResult.fields));
+                }
                 return DeserializationResult(true);
             }
 
@@ -548,7 +558,7 @@ private:
 private:
     const DeserializationContext& m_ctx;
     Data* m_data = nullptr;
-    DeserializationResult m_deserealizationResult;
+    DeserializationResult m_deserializationResult;
 };
 
 } // namespace json_detail

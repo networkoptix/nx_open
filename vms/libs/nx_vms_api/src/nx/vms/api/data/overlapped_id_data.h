@@ -54,10 +54,10 @@ struct NX_VMS_API OverlappedIdsRequest: IdData
      */
     QString groupId;
 
-    /**%apidoc
+    /**%apidoc[opt]
      * Desired overlapped id to be used on the NVR.
      */
-    std::optional<int> overlappedId;
+    int overlappedId = -1;
 
     OverlappedIdsRequest getId() const { return *this; }
     operator QString() const { return id.toString() + '.' + groupId; }

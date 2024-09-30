@@ -7,6 +7,7 @@
 #include <QtCore/QSize>
 
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/reflect/instrument.h>
 
 namespace nx::vms::api {
 
@@ -36,5 +37,7 @@ bool NX_VMS_API deserialize(QnJsonContext* ctx, const QJsonValue& value, Resolut
 void NX_VMS_API serialize(QnJsonContext* ctx, const ResolutionData& value, QJsonValue* target);
 
 bool NX_VMS_API fromString(const std::string_view& str, ResolutionData* target);
+
+NX_REFLECTION_TAG_TYPE(ResolutionData, useStringConversionForSerialization)
 
 } // namespace nx::vms::api

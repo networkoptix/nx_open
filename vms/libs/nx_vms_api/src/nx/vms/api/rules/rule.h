@@ -31,7 +31,7 @@ struct NX_VMS_API Rule: IdData
 #define nx_vms_api_rules_Rule_Fields \
     IdData_Fields(eventList)(actionList)(enabled)(internal)(schedule)(comment)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST_EX(Rule, (json)(ubjson))
-
+NX_REFLECTION_INSTRUMENT(Rule, nx_vms_api_rules_Rule_Fields)
 
 struct NX_VMS_API RuleV4: public IdData
 {
@@ -54,6 +54,7 @@ struct NX_VMS_API RuleV4: public IdData
 #define nx_vms_api_rules_RuleV4_Fields \
     IdData_Fields(event)(action)(enabled)(schedule)(comment)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST_EX(RuleV4, (json))
+NX_REFLECTION_INSTRUMENT(RuleV4, nx_vms_api_rules_RuleV4_Fields)
 
 // A dummy struct used in ec2 transactions.
 struct NX_VMS_API ResetRules
@@ -64,5 +65,6 @@ struct NX_VMS_API ResetRules
 
 #define nx_vms_api_rules_ResetRules_Fields (useDefault)
 NX_VMS_API_DECLARE_STRUCT_EX(ResetRules, (json)(ubjson))
+NX_REFLECTION_INSTRUMENT(ResetRules, nx_vms_api_rules_ResetRules_Fields)
 
 } // namespace nx::vms::api::rules

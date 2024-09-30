@@ -28,5 +28,6 @@ struct NX_VMS_API EventFilter
 
 #define nx_vms_api_rules_EventFilter_Fields (id)(type)(fields)
 NX_VMS_API_DECLARE_STRUCT_EX(EventFilter, (json)(ubjson))
+NX_REFLECTION_INSTRUMENT(EventFilter, nx_vms_api_rules_EventFilter_Fields)
 
 } // namespace nx::vms::api::rules

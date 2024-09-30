@@ -17,6 +17,9 @@
 
 namespace nx::network::rest::json::test {
 
+NX_REFLECTION_INSTRUMENT(NestedTestData, (id)(name))
+NX_REFLECTION_INSTRUMENT(TestData, (id)(name)(list))
+
 using namespace nx::vms::api;
 using GlobalPermission = HandlerPool::GlobalPermission;
 

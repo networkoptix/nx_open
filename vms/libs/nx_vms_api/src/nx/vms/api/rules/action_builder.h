@@ -28,5 +28,6 @@ struct NX_VMS_API ActionBuilder
 
 #define nx_vms_api_rules_ActionBuilder_Fields (id)(type)(fields)
 NX_VMS_API_DECLARE_STRUCT_EX(ActionBuilder, (json)(ubjson))
+NX_REFLECTION_INSTRUMENT(ActionBuilder, nx_vms_api_rules_ActionBuilder_Fields)
 
 } // namespace nx::vms::api::rules

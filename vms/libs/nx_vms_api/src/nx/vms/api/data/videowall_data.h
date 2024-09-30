@@ -7,6 +7,8 @@
 
 #include <QtCore/QString>
 
+#include <nx/reflect/instrument.h>
+
 #include "id_data.h"
 #include "resource_data.h"
 
@@ -42,6 +44,7 @@ struct NX_VMS_API VideowallItemData
 #define VideowallItemData_Fields \
     (guid)(pcGuid)(layoutGuid)(name)(snapLeft)(snapTop)(snapRight)(snapBottom)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(VideowallItemData)
+NX_REFLECTION_INSTRUMENT(VideowallItemData, VideowallItemData_Fields)
 
 struct NX_VMS_API VideowallScreenData
 {
@@ -80,6 +83,7 @@ struct NX_VMS_API VideowallScreenData
     (pcGuid)(pcIndex)(desktopLeft)(desktopTop)(desktopWidth)(desktopHeight) \
     (layoutLeft)(layoutTop)(layoutWidth)(layoutHeight)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(VideowallScreenData)
+NX_REFLECTION_INSTRUMENT(VideowallScreenData, VideowallScreenData_Fields)
 
 struct NX_VMS_API VideowallMatrixItemData
 {
@@ -90,6 +94,7 @@ struct NX_VMS_API VideowallMatrixItemData
 };
 #define VideowallMatrixItemData_Fields (itemGuid)(layoutGuid)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(VideowallMatrixItemData)
+NX_REFLECTION_INSTRUMENT(VideowallMatrixItemData, VideowallMatrixItemData_Fields)
 
 struct NX_VMS_API VideowallMatrixData: IdData
 {
@@ -104,6 +109,7 @@ struct NX_VMS_API VideowallMatrixData: IdData
 };
 #define VideowallMatrixData_Fields IdData_Fields (name)(items)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(VideowallMatrixData)
+NX_REFLECTION_INSTRUMENT(VideowallMatrixData, VideowallMatrixData_Fields)
 
 /**%apidoc Video wall information object.
  * %param[proprietary] typeId
@@ -134,6 +140,7 @@ struct NX_VMS_API VideowallData: ResourceData
 };
 #define VideowallData_Fields ResourceData_Fields (autorun)(items)(screens)(matrices)(timeline)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(VideowallData)
+NX_REFLECTION_INSTRUMENT(VideowallData, VideowallData_Fields)
 
 struct NX_VMS_API VideowallControlMessageData
 {
@@ -144,6 +151,7 @@ struct NX_VMS_API VideowallControlMessageData
 };
 #define VideowallControlMessageData_Fields (operation)(videowallGuid)(instanceGuid)(params)
 NX_VMS_API_DECLARE_STRUCT(VideowallControlMessageData)
+NX_REFLECTION_INSTRUMENT(VideowallControlMessageData, VideowallControlMessageData_Fields)
 
 } // namespace api
 } // namespace vms
