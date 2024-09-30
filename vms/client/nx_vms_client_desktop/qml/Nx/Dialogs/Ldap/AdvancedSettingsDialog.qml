@@ -128,7 +128,7 @@ Dialog
 
         CenteredField
         {
-            text: qsTr("Proxy LDAP requests %1 via server", "%1 is a line break").arg("<br>")
+            text: qsTr("Proxy LDAP requests via server")
 
             leftSideMargin: 180
             rightSideMargin: 0

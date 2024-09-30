@@ -51,6 +51,7 @@ Item
         anchors.bottom: control.labelHeight > 0 ? undefined : parent.bottom
         anchors.right: innerItem.left
         anchors.rightMargin: 8
+        anchors.left: control.left
 
         spacing: 4
 
@@ -69,6 +70,7 @@ Item
 
             font: Qt.font({pixelSize: 14, weight: Font.Normal})
             color: ColorTheme.colors.light16
+            wrapMode: Text.WordWrap
         }
 
         ContextHintButton
