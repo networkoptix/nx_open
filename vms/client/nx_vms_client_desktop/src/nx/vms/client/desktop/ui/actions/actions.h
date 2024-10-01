@@ -814,9 +814,14 @@ enum IDType
     RadassAction,
 
     /**
-     * Changes muted state for the given item. Muted value provided in MutedRole.
+     * Mutes given items.
      */
-    MuteAction,
+    ItemMuteAction,
+
+    /**
+     * Unmutes given items.
+     */
+    ItemUnmuteAction,
 
     /**
      * For the camera resource list with the same Composite Group ID with dimension less then

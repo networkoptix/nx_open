@@ -576,11 +576,16 @@ public:
         const Parameters& parameters, QnWorkbenchContext* context) override;
 };
 
-class SoundPlaybackActionCondition: public Condition
+class ItemMuteActionCondition: public Condition
 {
 public:
+    ItemMuteActionCondition(bool mute);
+
     virtual ActionVisibility check(
         const Parameters& parameters, QnWorkbenchContext* context) override;
+
+private:
+    bool m_mute = false;
 };
 
 

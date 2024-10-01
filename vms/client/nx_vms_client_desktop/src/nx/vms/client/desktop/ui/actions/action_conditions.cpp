@@ -1907,16 +1907,30 @@ ActionVisibility ReplaceCameraCondition::check(const Parameters& parameters, QnW
     return EnabledAction;
 }
 
-ActionVisibility SoundPlaybackActionCondition::check(const Parameters& parameters, QnWorkbenchContext*)
+ItemMuteActionCondition::ItemMuteActionCondition(bool mute):
+    m_mute(mute)
 {
+}
+
+ActionVisibility ItemMuteActionCondition::check(const Parameters& parameters, QnWorkbenchContext*)
+{
+    int mutedCount = 0;
+    int unmutedCount = 0;
     for (QnResourceWidget* widget: parameters.widgets())
     {
         auto mediaWidget = qobject_cast<QnMediaResourceWidget*>(widget);
         if (mediaWidget && mediaWidget->canBeMuted())
-            return EnabledAction;
+            (mediaWidget->isMuted() ? mutedCount : unmutedCount)++;
     }
 
-    return InvisibleAction;
+    if (m_mute)
+    {
+        return unmutedCount > 0 ? EnabledAction : InvisibleAction;
+    }
+    else
+    {
+        return unmutedCount == 0 && mutedCount > 0 ? EnabledAction : InvisibleAction;
+    }
 }
 
 

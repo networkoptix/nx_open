@@ -391,6 +391,8 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     addAction(action(action::ToggleSyncAction));
     addAction(action(action::ToggleSmartSearchAction));
     addAction(action(action::ToggleInfoAction));
+    addAction(action(action::ItemMuteAction));
+    addAction(action(action::ItemUnmuteAction));
     addAction(action(action::FreespaceAction));
     addAction(action(action::ShowDebugOverlayAction));
     addAction(action(action::DebugToggleElementHighlight));
