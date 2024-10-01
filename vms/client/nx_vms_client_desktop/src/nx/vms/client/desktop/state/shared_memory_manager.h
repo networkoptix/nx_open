@@ -50,6 +50,9 @@ public:
         QObject* parent = nullptr);
     virtual ~SharedMemoryManager() override;
 
+    /** Sets up the required signal-slot connections. */
+    void connectToCloudStatusWatcher();
+
     /**
      * Index of the current client instance. Clients are receving indices by the start order. If
      * some client was closed, it's index become free and can be taken by any client started after.
@@ -118,12 +121,16 @@ public:
     /** Updates token of the current instance session. */
     void updateSessionToken(std::string token);
 
+    /** Updates refresh token for cloud user. */
+    void updateRefreshToken(std::string refreshToken);
+
     /** Notify all instances that they must logout from cloud. */
     void requestLogoutFromCloud();
 
 signals:
     void clientCommandRequested(SharedMemoryData::Command command, const QByteArray& data);
     void sessionTokenChanged(const std::string& token);
+    void refreshTokenChanged(const std::string& token);
 
 private:
     struct Private;

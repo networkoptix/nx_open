@@ -143,7 +143,7 @@ std::optional<nx::network::http::AuthToken> FreshSessionTokenHelper::refreshToke
     return token;
 }
 
-core::CloudAuthData FreshSessionTokenHelper::requestAuthData()
+core::CloudAuthData FreshSessionTokenHelper::requestAuthData(std::function<bool()> closeCondition)
 {
     if (!NX_ASSERT(QThread::currentThread() == qApp->thread()))
         return {};
@@ -155,7 +155,10 @@ core::CloudAuthData FreshSessionTokenHelper::requestAuthData()
         m_parent,
         m_title,
         info(m_actionType).clientType,
-        /*sessionAware*/ false
+        /*sessionAware*/ false,
+        /*cloudSystem*/ {},
+        /*flags*/ {},
+        closeCondition
     );
 
     if (cloudAuthData.needValidateToken

@@ -156,6 +156,7 @@ struct CloudStatusWatcher::Private: public QObject
         const GrantType& grantTupe = GrantType::password);
     void validateAccessToken();
     void scheduleConnectionRetryIfNeeded();
+    void updateRefreshToken(const std::string& refreshToken);
 
 private:
     enum class SuppressionMode
@@ -330,6 +331,11 @@ QnCloudSystemList CloudStatusWatcher::cloudSystems() const
 QnCloudSystemList CloudStatusWatcher::recentCloudSystems() const
 {
     return d->recentCloudSystems;
+}
+
+void CloudStatusWatcher::updateRefreshToken(const std::string& refreshToken)
+{
+    d->updateRefreshToken(refreshToken);
 }
 
 CloudStatusWatcher::Private::Private(CloudStatusWatcher* parent):
@@ -622,6 +628,9 @@ void CloudStatusWatcher::Private::validateAccessToken()
 
             const bool loginChanged = (m_authData.credentials.username != response.username);
             m_authData.credentials.username = std::move(response.username);
+            const auto isRefreshTokenChanged =
+                appContext()->coreSettings()->cloudAuthData().refreshToken
+                    != m_authData.refreshToken;
 
             NX_DEBUG(this, "Access token valid, username: %1", q->cloudLogin());
 
@@ -632,6 +641,8 @@ void CloudStatusWatcher::Private::validateAccessToken()
                 q->updateSystems();
             if (loginChanged)
                 emit q->cloudLoginChanged();
+            if (isRefreshTokenChanged)
+                emit q->refreshTokenChanged(m_authData.refreshToken);
         });
 
     cloudConnection->oauthManager()->legacyValidateToken(
@@ -653,6 +664,15 @@ void CloudStatusWatcher::Private::scheduleConnectionRetryIfNeeded()
             NX_DEBUG(this, "Retrying connection");
             issueAccessToken();
         });
+}
+
+void CloudStatusWatcher::Private::updateRefreshToken(const std::string& refreshToken)
+{
+    if (!cloudConnection || m_authData.refreshToken == refreshToken)
+        return;
+
+    m_authData.refreshToken = refreshToken;
+    issueAccessToken();
 }
 
 void CloudStatusWatcher::Private::ensureCloudConnection()

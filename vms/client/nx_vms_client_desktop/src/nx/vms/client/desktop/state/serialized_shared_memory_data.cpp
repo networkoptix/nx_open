@@ -16,6 +16,8 @@ static_assert(
     SharedMemoryData::kCommandDataSize == 64, "Data version must be increased if changed.");
 static_assert(
     SharedMemoryData::kTokenSize == 8192, "Data version must be increased if changed.");
+static_assert(
+    SharedMemoryData::kCoudUserNameSize == 255, "Data version must be increased if changed.");
 
 
 ScreensBitMask serializedScreens(const SharedMemoryData::ScreenUsageData& screens)
@@ -51,6 +53,8 @@ SerializedSharedMemoryProcessData serializedProcessData(const SharedMemoryData::
     QByteArray commandData = source.commandData;
     commandData.truncate(SharedMemoryData::kCommandDataSize);
     std::copy(commandData.cbegin(), commandData.cend(), result.commandData.begin());
+    std::copy(
+        source.cloudUserName.begin(), source.cloudUserName.end(), result.cloudUserName.begin());
     return result;
 }
 
@@ -64,6 +68,24 @@ SerializedSharedMemorySessionData serializedSessionData(const SharedMemoryData::
         "Invalid token size");
 
     std::copy(session.token.begin(), session.token.end(), result.token.begin());
+    return result;
+}
+
+SerializedSharedMemoryCloudUserSession serializedCloudUserSessions(
+    const SharedMemoryData::CloudUserSession& cloudUserSession)
+{
+    SerializedSharedMemoryCloudUserSession result;
+    std::copy(cloudUserSession.cloudUserName.begin(),
+        cloudUserSession.cloudUserName.end(),
+        result.cloudUserName.begin());
+
+    NX_ASSERT(
+        cloudUserSession.refreshToken.size() + /*null terminator*/ 1 <= SharedMemoryData::kTokenSize,
+        "Invalid token size");
+
+    std::copy(cloudUserSession.refreshToken.begin(),
+        cloudUserSession.refreshToken.end(),
+        result.refreshToken.begin());
     return result;
 }
 
@@ -82,6 +104,7 @@ SharedMemoryData::Process deserializedProcessData(const SerializedSharedMemoryPr
         commandDataSize = -1; // Auto-detect QByteArray length as a null-terminated string.
     }
     result.commandData = QByteArray(source.commandData.data(), commandDataSize);
+    result.cloudUserName = source.cloudUserName.data();
     return result;
 }
 
@@ -94,27 +117,52 @@ SharedMemoryData::Session deserializedSessionData(const SerializedSharedMemorySe
     return result;
 }
 
+SharedMemoryData::CloudUserSession deserializedCloudUserSessions(
+    const SerializedSharedMemoryCloudUserSession& source)
+{
+    SharedMemoryData::CloudUserSession result;
+    result.cloudUserName = source.cloudUserName.data();
+    NX_ASSERT(source.refreshToken.back() == '\0');
+    result.refreshToken = source.refreshToken.data();
+    return result;
+}
+
 } // namespace
 
 SharedMemoryData SerializedSharedMemoryData::deserializedData(
     const SerializedSharedMemoryData& source)
 {
     SharedMemoryData result;
-    std::transform(source.processes.cbegin(), source.processes.cend(), result.processes.begin(),
+    std::transform(source.processes.cbegin(),
+        source.processes.cend(),
+        result.processes.begin(),
         deserializedProcessData);
-    std::transform(source.sessions.cbegin(), source.sessions.cend(), result.sessions.begin(),
+    std::transform(source.sessions.cbegin(),
+        source.sessions.cend(),
+        result.sessions.begin(),
         deserializedSessionData);
+    std::transform(source.cloudUserSessions.cbegin(),
+        source.cloudUserSessions.cend(),
+        result.cloudUserSessions.begin(),
+        deserializedCloudUserSessions);
     return result;
 }
 
 void SerializedSharedMemoryData::serializeData(
-    const SharedMemoryData& source,
-    SerializedSharedMemoryData* target)
+    const SharedMemoryData& source, SerializedSharedMemoryData* target)
 {
-    std::transform(source.processes.cbegin(), source.processes.cend(), target->processes.begin(),
+    std::transform(source.processes.cbegin(),
+        source.processes.cend(),
+        target->processes.begin(),
         serializedProcessData);
-    std::transform(source.sessions.cbegin(), source.sessions.cend(), target->sessions.begin(),
+    std::transform(source.sessions.cbegin(),
+        source.sessions.cend(),
+        target->sessions.begin(),
         serializedSessionData);
+    std::transform(source.cloudUserSessions.cbegin(),
+        source.cloudUserSessions.cend(),
+        target->cloudUserSessions.begin(),
+        serializedCloudUserSessions);
 }
 
 } // namespace nx::vms::client::desktop
