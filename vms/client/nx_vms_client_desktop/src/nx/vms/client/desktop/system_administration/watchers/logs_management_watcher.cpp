@@ -521,6 +521,16 @@ struct LogsManagementWatcher::Unit::Private
                     callback();
             });
 
+        connect(m_collector.get(), &ClientLogCollector::progressChanged,
+            [this, callback](double value)
+            {
+                NX_MUTEX_LOCKER lock(&m_mutex);
+                m_progress = std::min(value / 100, 1.);
+                lock.unlock();
+                if (callback)
+                    callback();
+            });
+
         m_collector->start();
         m_state = DownloadState::loading;
         lock.unlock();
@@ -682,6 +692,9 @@ struct LogsManagementWatcher::Unit::Private
 
             case DownloadState::loading:
             {
+                if (m_progress)
+                    return m_progress.value();
+
                 if (!m_fileSize)
                     return {};
 
@@ -748,7 +761,7 @@ private:
 
     std::unique_ptr<ClientLogCollector> m_collector;
     std::unique_ptr<nx::network::http::AsyncFileDownloader> m_downloader;
-
+    std::optional<double> m_progress;
     size_t m_bytesLoaded{0};
     std::optional<size_t> m_fileSize;
 
@@ -1565,7 +1578,7 @@ void LogsManagementWatcher::applySettings(
         NX_ASSERT(d->state == State::hasSelection);
 
     std::optional<nx::vms::api::ServerLogSettings> newClientSettings;
-    if (d->client->isChecked())
+    if (d->client->isChecked() || reset)
     {
         auto existing = d->client->settings();
         if (!NX_ASSERT(existing))
@@ -1581,7 +1594,7 @@ void LogsManagementWatcher::applySettings(
     QList<UnitPtr> serversToStore;
     for (auto server: d->servers)
     {
-        if (server->isChecked())
+        if (server->isChecked() || reset)
             serversToStore << server;
     }
 

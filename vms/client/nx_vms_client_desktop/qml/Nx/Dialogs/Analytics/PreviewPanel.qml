@@ -96,7 +96,7 @@ Rectangle
         {
             id: closeButton
 
-            icon.source: "image://skin/banners/close.svg"
+            icon.source: "image://skin/16x16/Outline/close.svg"
             onClicked:
             {
                 previewPanel.slideAnimationEnabled = true

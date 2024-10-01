@@ -27,6 +27,8 @@ public:
     virtual bool isNetworkRequestRunning() const override;
     virtual void discardChanges() override;
 
+    nx::vms::client::desktop::TableView* unitsTable();
+
 protected:
     virtual void showEvent(QShowEvent* event) override;
     virtual void hideEvent(QHideEvent* event) override;

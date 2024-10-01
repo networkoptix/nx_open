@@ -378,7 +378,7 @@ void LogsManagementWidget::updateWidgets(LogsManagementWatcher::State state)
 
     ui->stackedWidget->setCurrentWidget(downloadStarted ? ui->activePage : ui->defaultPage);
 
-    ui->unitsTable->setColumnHidden(LogsManagementModel::Columns::StatusColumn, !downloadStarted);
+    ui->unitsTable->setColumnHidden(LogsManagementModel::Columns::StatusColumn, /*downloadStarted*/ false);
 
     ui->downloadButton->setVisible(selectionCount);
     ui->settingsButton->setVisible(selectionCount);
@@ -390,6 +390,11 @@ void LogsManagementWidget::updateWidgets(LogsManagementWatcher::State state)
     ui->downloadingLabel->setVisible(!downloadFinished);
     ui->downloadingPercentageLabel->setVisible(!downloadFinished);
     ui->errorLabel->setVisible(downloadFinished && errorsCount);
+    if (downloadFinished && errorsCount)
+        setPaletteColor(ui->progressBar, QPalette::Highlight, core::colorTheme()->color("red"));
+    else
+        setPaletteColor(ui->progressBar, QPalette::Highlight, core::colorTheme()->color("brand"));
+
     ui->finishedIconButton->setVisible(downloadFinished);
     ui->finishedIconButton->setIcon(errorsCount != 0
         ? qnSkin->icon(kErrorIcon)
@@ -414,23 +419,7 @@ void LogsManagementWidget::addTableWidgets(const QModelIndex& topLeft, const QMo
 
     for (int i = from.row(); i <= to.row(); ++i)
     {
-        auto status = ui->unitsTable->model()->index(i, LogsManagementModel::StatusColumn);
         auto retry = ui->unitsTable->model()->index(i, LogsManagementModel::RetryColumn);
-
-        if (status.data(LogsManagementModel::DownloadingRole).toBool())
-        {
-            if (ui->unitsTable->indexWidget(status) == nullptr)
-            {
-                auto busyButton = new ObtainButton("");
-                busyButton->setFlat(true);
-                busyButton->setFixedSize(20, 20);
-                ui->unitsTable->setIndexWidget(status, std::move(busyButton));
-            }
-        }
-        else
-        {
-            ui->unitsTable->setIndexWidget(status, nullptr);
-        }
 
         if (retry.data(LogsManagementModel::RetryRole).toBool())
         {
@@ -467,6 +456,11 @@ void LogsManagementWidget::updateData()
 {
     if (auto model = dynamic_cast<LogsManagementModel*>(ui->unitsTable->model()))
         model->setFilterText(ui->searchLineEdit->text());
+}
+
+nx::vms::client::desktop::TableView* LogsManagementWidget::unitsTable()
+{
+    return ui->unitsTable;
 }
 
 } // namespace nx::vms::client::desktop

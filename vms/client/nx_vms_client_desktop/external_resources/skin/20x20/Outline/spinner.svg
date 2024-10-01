@@ -1,0 +1,28 @@
+<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="firstHalf" gradientTransform="rotate(90)">
+      <stop offset="0" stop-opacity="0.5" stop-color="#698796" />
+      <stop offset="1" stop-opacity="0" stop-color="#698796" />
+    </linearGradient>
+    <linearGradient id="secondHalf" gradientTransform="rotate(90)">
+      <stop offset="0" stop-opacity="0.5" stop-color="#698796" />
+      <stop offset="1" stop-opacity="1" stop-color="#698796" />
+    </linearGradient>
+  </defs>
+  <g>
+  <circle cx="10" cy="16" r="1" fill="#698796"/>
+  <g stroke-width="2">
+    <path stroke="url(#firstHalf)" d="M 10 16 A 6 6 0 0 1 10 4" />
+    <path stroke="url(#secondHalf)" d="M 10 4 A 6 6 0 0 1 10 16" />
+  </g>
+
+  <animateTransform
+          attributeName="transform"
+          begin="0s"
+          dur="5s"
+          type="rotate"
+          from="0 10 10"
+          to="360 10 10"
+          repeatCount="indefinite" />
+</g>
+</svg>
