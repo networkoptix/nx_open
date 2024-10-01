@@ -5,6 +5,7 @@
 #include <QtGui/QGuiApplication>
 #include <QtGui/QPainter>
 #include <QtGui/QPainterPath>
+#include <QtSvg/QSvgRenderer>
 
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
@@ -28,6 +29,13 @@ LogsManagementTableDelegate::LogsManagementTableDelegate(LogsManagementWidget* p
     base_type(parent)
 {
     parentWidget = parent;
+
+    // TODO: @pprivalov switch to Sergey Panasenko' component instead of doing this
+    auto path = qnSkin->path("20x20/Outline/spinner.svg");
+    svg_renderer = new QSvgRenderer(path, parent->unitsTable());
+
+    connect(svg_renderer, &QSvgRenderer::repaintNeeded,
+        [this, parent] { parent->unitsTable()->viewport()->update(); });
 }
 
 void LogsManagementTableDelegate::paint(
@@ -47,6 +55,10 @@ void LogsManagementTableDelegate::paint(
 
         case Model::LogLevelColumn:
             paintLogLevelColumn(painter, styleOption, index);
+            break;
+
+        case Model::StatusColumn:
+            paintStatusColumn(painter, styleOption, index);
             break;
 
         default:
@@ -133,10 +145,23 @@ void LogsManagementTableDelegate::paintNameColumn(
     if (option.features.testFlag(QStyleOptionViewItem::HasDecoration))
     {
         const auto checkStateData = index.siblingAtColumn(Model::CheckBoxColumn).data(Qt::CheckStateRole);
+        const auto enabled = index.data(Model::EnabledRole).toBool();
         if (!checkStateData.isNull() && checkStateData.value<Qt::CheckState>() != Qt::Unchecked)
-            option.icon.paint(painter, iconRect, option.decorationAlignment, QnIcon::Pressed, QIcon::On);
+        {
+            option.icon.paint(painter,
+                iconRect,
+                option.decorationAlignment,
+                QnIcon::Pressed,
+                (enabled ? QIcon::On : QIcon::Off));
+        }
         else
-            option.icon.paint(painter, iconRect, option.decorationAlignment, QIcon::Normal, QIcon::On);
+        {
+            option.icon.paint(painter,
+                iconRect,
+                option.decorationAlignment,
+                QIcon::Normal,
+                (enabled? QIcon::On : QIcon::Off));
+        }
     }
 
     // Draw text.
@@ -196,6 +221,27 @@ void LogsManagementTableDelegate::paintCheckBoxColumn(
     painter->restore();
 }
 
+void LogsManagementTableDelegate::paintStatusColumn(
+    QPainter* painter,
+    const QStyleOptionViewItem& styleOption,
+    const QModelIndex& index) const
+{
+    if (!index.data(LogsManagementModel::DownloadingRole).toBool())
+    {
+        base_type::paint(painter, styleOption, index);
+        return;
+    }
+
+    QStyleOptionViewItem option(styleOption);
+    initStyleOption(&option, index);
+
+    auto bounds = option.rect;
+    bounds.moveTo(option.rect.center().x() - bounds.width() / 2,
+        option.rect.center().y() - bounds.height() / 2);
+    svg_renderer->render(painter, bounds);
+    QStyledItemDelegate::paint(painter, option, index);
+}
+
 void LogsManagementTableDelegate::drawText(const QModelIndex& index,
     QRect textRect,
     QStyle* style,
@@ -203,13 +249,18 @@ void LogsManagementTableDelegate::drawText(const QModelIndex& index,
     QPainter* painter,
     bool extra) const
 {
+    const auto enabled = index.data(Model::EnabledRole).toBool();
     QColor textColor = core::colorTheme()->color("light10");
+    if (!enabled)
+        textColor = core::colorTheme()->color("light10", 77);
     const auto checkStateData = index.siblingAtColumn(Model::CheckBoxColumn).data(Qt::CheckStateRole);
     if (!checkStateData.isNull() && checkStateData.value<Qt::CheckState>() != Qt::Unchecked)
         textColor = core::colorTheme()->color("light1");
 
     const QString extraInfo = index.data(Model::IpAddressRole).toString();
-    const QColor ipAddressColor = core::colorTheme()->color("light16");
+    QColor ipAddressColor = core::colorTheme()->color("light16");
+    if (!enabled)
+        ipAddressColor = core::colorTheme()->color("light16", 77);
 
     const int textPadding = style->pixelMetric(QStyle::PM_FocusFrameHMargin) + 1; //< As in Qt.
     const int textEnd = textRect.right() - textPadding + 1;

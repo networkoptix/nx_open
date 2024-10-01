@@ -8,6 +8,7 @@
 #include <nx/vms/client/desktop/system_administration/widgets/logs_management_widget.h>
 #include <ui/common/text_pixmap_cache.h>
 
+class QSvgRenderer;
 namespace nx::vms::client::desktop {
 
 class LogsManagementTableDelegate: public QStyledItemDelegate
@@ -38,11 +39,17 @@ private:
         const QStyleOptionViewItem& styleOption,
         const QModelIndex& index) const;
 
+    void paintStatusColumn(
+        QPainter* painter,
+        const QStyleOptionViewItem& styleOption,
+        const QModelIndex& index) const;
+
     void drawText(const QModelIndex& index, QRect textRect, QStyle* style, QStyleOptionViewItem option, QPainter* painter, bool extra) const;
 
 private:
     mutable QnTextPixmapCache m_textPixmapCache;
     LogsManagementWidget* parentWidget = nullptr;
+    QSvgRenderer* svg_renderer = nullptr;
 };
 
 } // namespace nx::vms::client::desktop

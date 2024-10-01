@@ -34,7 +34,7 @@ QIcon icon(LogsManagementUnitPtr unit)
         : qnResIconCache->icon(QnResourceIconCache::Client);
 }
 
-QIcon statusIcon(LogsManagementUnitPtr unit)
+QVariant statusIcon(LogsManagementUnitPtr unit)
 {
     using State = LogsManagementWatcher::Unit::DownloadState;
     switch (unit->state())
@@ -198,7 +198,13 @@ QVariant LogsManagementModel::data(const QModelIndex& index, int role) const
                     return unit->isChecked() ? Qt::Checked : Qt::Unchecked;
 
                 case EnabledRole:
-                    return unit->state() == LogsManagementWatcher::Unit::DownloadState::none;
+                    auto watcherState = m_watcher->state();
+                    if (watcherState == LogsManagementWatcher::State::empty
+                        || watcherState == LogsManagementWatcher::State::hasSelection)
+                    {
+                        return unit->state() == LogsManagementWatcher::Unit::DownloadState::none;
+                    }
+                    return  false;
             }
             break;
 

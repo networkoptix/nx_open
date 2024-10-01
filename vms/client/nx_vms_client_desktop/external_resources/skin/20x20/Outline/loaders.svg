@@ -1,12 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 20 20">
-  <g class="20x20/Outline/loaders">
-    <path fill="url(#a)" fill-rule="evenodd" d="M10 15.5a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11Zm0 1.5a7 7 0 1 0 0-14 7 7 0 0 0 0 14Z" class="Primary" clip-rule="evenodd"/>
-  </g>
-  <defs>
-    <radialGradient id="a" cx="0" cy="0" r="1" class="a" gradientTransform="matrix(0 7 -7 0 10 10)" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#fff"/>
-      <stop offset="0" stop-color="#A5B7C0" stop-opacity="0"/>
-      <stop offset=".911" stop-color="#D6DEE2" stop-opacity=".543"/>
-    </radialGradient>
-  </defs>
+<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M10 15.5C13.0376 15.5 15.5 13.0376 15.5 10C15.5 6.96243 13.0376 4.5 10 4.5C6.96243 4.5 4.5 6.96243 4.5 10C4.5 13.0376 6.96243 15.5 10 15.5ZM10 17C13.866 17 17 13.866 17 10C17 6.13401 13.866 3 10 3C6.13401 3 3 6.13401 3 10C3 13.866 6.13401 17 10 17Z" fill="url(#paint0_angular_2296_144)"/>
+<defs>
+<radialGradient id="paint0_angular_2296_144" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(10 10) rotate(90) scale(7)">
+<stop stop-color="white"/>
+<stop offset="0.0001" stop-color="#A5B7C0" stop-opacity="0"/>
+<stop offset="0.910754" stop-color="#D6DEE2" stop-opacity="0.543326"/>
+</radialGradient>
+</defs>
 </svg>

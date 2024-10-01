@@ -65,12 +65,12 @@ const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kYellowTheme = {
 
 static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions
     kTreeThemeOfflineSubstitutions = {
-        {QnIcon::Disabled, {.primary = "light10", .secondary = "red"}},
-        {QnIcon::Selected, {.primary = "light4", .secondary = "red"}},
-        {QnIcon::Active, {.primary = "brand_core", .secondary = "red"}},
-        {QnIcon::Normal, {.primary = "light10", .secondary = "red"}},
-        {QnIcon::Error, {.primary = "red", .secondary = "red"}},
-        {QnIcon::Pressed, {.primary = "light4", .secondary = "red"}}};
+        {QnIcon::Disabled, {.primary = "light10", .secondary = "red", .alpha = 0.3}},
+        {QnIcon::Selected, {.primary = "light4", .secondary = "red", .alpha = 0.3}},
+        {QnIcon::Active, {.primary = "brand_core", .secondary = "red", .alpha = 0.3}},
+        {QnIcon::Normal, {.primary = "light10", .secondary = "red", .alpha = 0.3}},
+        {QnIcon::Error, {.primary = "red", .secondary = "red", .alpha = 0.3}},
+        {QnIcon::Pressed, {.primary = "light4", .secondary = "red", .alpha = 0.3}}};
 
 NX_DECLARE_COLORIZED_ICON(kHasArchiveIcon, "20x20/Solid/archive.svg",\
     nx::vms::client::core::kEmptySubstitutions)

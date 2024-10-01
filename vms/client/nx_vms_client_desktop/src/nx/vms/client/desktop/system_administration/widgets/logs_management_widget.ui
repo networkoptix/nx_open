@@ -43,7 +43,7 @@
                                 <number>2</number>
                             </property>
                             <property name="leftMargin">
-                                <number>16</number>
+                                <number>24</number>
                             </property>
                             <property name="topMargin">
                                 <number>16</number>
@@ -56,9 +56,6 @@
                             </property>
                             <item>
                                 <layout class="QHBoxLayout" name="horizontalLayout">
-                                    <property name="spacing">
-                                        <number>8</number>
-                                    </property>
                                     <item>
                                         <widget class="QPushButton" name="selectedButton"/>
                                     </item>
