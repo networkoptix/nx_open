@@ -67,6 +67,8 @@ public:
     void updateHasChanges();
     bool isNetworkRequestRunning() const;
 
+    Q_INVOKABLE void removeIntegration(const nx::Uuid& integrationId);
+
     Q_INVOKABLE void applySettingsValues();
     Q_INVOKABLE void applySystemSettings();
     Q_INVOKABLE void discardChanges();

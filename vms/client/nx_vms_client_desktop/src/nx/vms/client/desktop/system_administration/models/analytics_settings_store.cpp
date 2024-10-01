@@ -271,6 +271,23 @@ void AnalyticsSettingsStore::refreshSettings()
     refreshSettings(m_currentEngineId);
 }
 
+void AnalyticsSettingsStore::removeIntegration(const nx::Uuid& integrationId)
+{
+    if (!connection()) //< It may be null if the client just disconnected from the server.
+        return;
+
+    // Delete requests are handled in the same way as apply requests.
+    m_pendingApplyRequests << connectedServerApi()->deleteEmptyResult(
+        nx::format("/rest/v4/analytics/integrations/%1", integrationId.toSimpleString()),
+        nx::network::rest::Params(),
+        nx::utils::guarded(this,
+            [this](bool, rest::Handle requestId, const rest::ServerConnection::EmptyResponseType&)
+            {
+                m_pendingApplyRequests.removeOne(requestId);
+            }),
+        thread());
+}
+
 void AnalyticsSettingsStore::applySettingsValues()
 {
     if (!m_pendingApplyRequests.isEmpty() || !m_pendingRefreshRequests.isEmpty())

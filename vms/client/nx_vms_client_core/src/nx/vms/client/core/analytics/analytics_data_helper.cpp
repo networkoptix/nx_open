@@ -23,6 +23,7 @@ AnalyticsEngineInfo engineInfoFromResource(
 
     return AnalyticsEngineInfo {
         engine->getId(),
+        plugin->getId(),
         engine->getName(),
         pluginManifest.description,
         pluginManifest.version,

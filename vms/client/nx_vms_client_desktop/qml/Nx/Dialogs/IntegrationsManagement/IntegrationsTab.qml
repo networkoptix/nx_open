@@ -115,8 +115,23 @@ Item
         {
             checkable: false
             refreshable: false
-            removable: !!viewModel.currentRequestId
+            removable: viewModel.currentEngineInfo?.type === "api"
+
             streamSelectorVisible: false
+
+            onApproveClicked: () =>
+            {
+                if (viewModel.currentRequestId)
+                    requestsModel.approve(viewModel.currentRequestId)
+            }
+
+            onRemoveClicked: () =>
+            {
+                if (viewModel.currentRequestId)
+                    requestsModel.reject(viewModel.currentRequestId)
+                else if (viewModel.currentEngineInfo?.integrationId)
+                    store.removeIntegration(viewModel.currentEngineInfo.integrationId)
+            }
         }
 
         settingsViewPlaceholder
