@@ -1109,7 +1109,7 @@ void QnMediaResourceWidget::createButtons()
     muteButton->setIcon(loadSvgIcon("item/mute.svg"));
     muteButton->setCheckable(true);
     muteButton->setChecked(false);
-    muteButton->setToolTip(tr("Mute"));
+    muteButton->setToolTip(tooltipText(tr("Mute"), QKeySequence("Alt+U")));
     connect(muteButton, &QnImageButtonWidget::toggled, this, &QnMediaResourceWidget::setMuted);
     titleBar()->rightButtonsBar()->addButton(Qn::MuteButton, muteButton);
 }
@@ -3531,12 +3531,22 @@ void QnMediaResourceWidget::at_triggerFieldsChanged(
     }
 }
 
+bool QnMediaResourceWidget::hasAudio() const
+{
+    if (d->camera)
+        return d->camera->isAudioEnabled();
+
+    if (d->mediaResource) // Handle local files.
+        return !d->mediaResource->getAudioLayout(d->display()->dataProvider())->tracks().empty();
+
+    return false;
+}
+
 bool QnMediaResourceWidget::canBeMuted() const
 {
     return
         ini().perItemMute &&
-        d->camera &&
-        d->camera->isAudioEnabled() &&
+        hasAudio() &&
         !isZoomWindow() &&
         qnSettings->playAudioForAllItems();
 }
@@ -3575,7 +3585,7 @@ void QnMediaResourceWidget::updateAudioPlaybackState()
 
     bool effectiveMuted =
         !isActiveWindow ||
-        (d->camera && !d->camera->isAudioEnabled()) ||
+        !hasAudio() ||
         (isPlayingAll ? canBeMuted() && isMuted() : !isCentral);
 
     if (shouldShowAudioSpectrum())

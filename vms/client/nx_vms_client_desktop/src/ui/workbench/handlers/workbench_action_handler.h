@@ -25,6 +25,7 @@
 #include <ui/dialogs/camera_list_dialog.h>
 #include <ui/dialogs/event_log_dialog.h>
 #include <ui/dialogs/search_bookmarks_dialog.h>
+#include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 class QAction;
@@ -232,7 +233,8 @@ protected slots:
 
     void at_goToLayoutItemAction_triggered();
 
-    void at_muteAction_triggered();
+    void at_itemMuteAction_triggered();
+    void at_itemUnmuteAction_triggered();
 
     void at_clientCommandRequested(SharedMemoryData::Command command, const QByteArray& data);
 
@@ -287,6 +289,8 @@ private:
     enum class AuthMethod { queryParam, bearerToken };
     void openInBrowser(const QnMediaServerResourcePtr& server,
         nx::utils::Url targetUrl, std::string auth, AuthMethod authMethod) const;
+
+    void muteUnmuteWidgets(const QnResourceWidgetList& widgets, bool muted) const;
 
 private:
     QPointer<QnBusinessRulesDialog> m_businessRulesDialog;
