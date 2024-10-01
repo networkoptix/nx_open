@@ -494,8 +494,11 @@ ActionHandler::ActionHandler(QObject *parent) :
     connect(action(menu::ReplaceLayoutItemAction), &QAction::triggered,
         this, &ActionHandler::replaceLayoutItemActionTriggered);
 
-    connect(action(menu::MuteAction), &QAction::triggered,
-        this, &ActionHandler::at_muteAction_triggered);
+    connect(action(menu::ItemMuteAction), &QAction::triggered,
+        this, &ActionHandler::at_itemMuteAction_triggered);
+
+    connect(action(menu::ItemUnmuteAction), &QAction::triggered,
+        this, &ActionHandler::at_itemUnmuteAction_triggered);
 }
 
 ActionHandler::~ActionHandler()
@@ -1893,13 +1896,19 @@ void ActionHandler::at_goToLayoutItemAction_triggered()
     workbench()->setItem(Qn::SingleSelectedRole, targetItem);
 }
 
-void ActionHandler::at_muteAction_triggered()
+void ActionHandler::at_itemMuteAction_triggered()
 {
-    const auto parameters = menu()->currentParameters(sender());
+    muteUnmuteWidgets(menu()->currentParameters(sender()).widgets(), true);
+}
 
-    bool muted = parameters.argument(Qn::MutedRole).toBool();
+void ActionHandler::at_itemUnmuteAction_triggered()
+{
+    muteUnmuteWidgets(menu()->currentParameters(sender()).widgets(), false);
+}
 
-    for (QnResourceWidget* widget: parameters.widgets())
+void ActionHandler::muteUnmuteWidgets(const QnResourceWidgetList& widgets, bool muted) const
+{
+    for (QnResourceWidget* widget: widgets)
     {
         auto mediaWidget = qobject_cast<QnMediaResourceWidget*>(widget);
         if (mediaWidget && mediaWidget->canBeMuted())

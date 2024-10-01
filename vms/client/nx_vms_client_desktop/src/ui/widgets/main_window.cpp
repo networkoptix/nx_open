@@ -386,6 +386,8 @@ MainWindow::MainWindow(WindowContext* context, QWidget* parent, Qt::WindowFlags 
     addAction(action(menu::ToggleSyncAction));
     addAction(action(menu::ToggleSmartSearchAction));
     addAction(action(menu::ToggleInfoAction));
+    addAction(action(menu::ItemMuteAction));
+    addAction(action(menu::ItemUnmuteAction));
     addAction(action(menu::FreespaceAction));
     addAction(action(menu::ShowDebugOverlayAction));
     addAction(action(menu::DebugToggleElementHighlight));
