@@ -252,6 +252,7 @@ public:
 
     bool isTitleUnderMouse() const;
 
+    bool hasAudio() const;
     bool canBeMuted() const;
     bool isMuted() const;
     void setMuted(bool muted);
