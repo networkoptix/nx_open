@@ -3,11 +3,13 @@
 #include "analytics_integration_model.h"
 
 #include <nx/fusion/model_functions.h>
-#include <nx/vms/api/analytics/plugin_manifest.h>
+#include <nx/vms/api/analytics/integration_manifest.h>
 
 namespace nx::vms::api::analytics {
 
+// TODO: Rename the property to integrationManifest.
 const QString kPluginManifestProperty("pluginManifest");
+
 const QString kIntegrationTypeProperty("integrationType");
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(

@@ -5,7 +5,7 @@
 #include <memory>
 
 #include <nx/sdk/cloud_storage/helpers/data.h>
-#include <nx/sdk/cloud_storage/i_plugin.h>
+#include <nx/sdk/cloud_storage/i_integration.h>
 #include <nx/sdk/helpers/ref_countable.h>
 #include <nx/sdk/result.h>
 

@@ -12,7 +12,7 @@
 #include <camera/camera_plugin.h>
 #include <nx/kit/json.h>
 #include <nx/sdk/cloud_storage/i_media_data_packet.h>
-#include <nx/sdk/cloud_storage/i_plugin.h>
+#include <nx/sdk/cloud_storage/i_integration.h>
 #include <nx/sdk/i_device_info.h>
 
 namespace nx::sdk::cloud_storage {
@@ -71,26 +71,26 @@ enum class SortOrder
 std::string sortOrderToString(SortOrder order);
 SortOrder sortOrderFromString(const std::string& s);
 
-struct PluginManifest
+struct IntegrationManifest
 {
-    PluginManifest(const char* jsonStr) noexcept(false);
-    PluginManifest(const nx::kit::Json& json) noexcept(false);
-    PluginManifest(
+    IntegrationManifest(const char* jsonStr) noexcept(false);
+    IntegrationManifest(const nx::kit::Json& json) noexcept(false);
+    IntegrationManifest(
         const std::string& id,
         const std::string& name,
         const std::string& description,
         const std::string& version,
         const std::string& vendor);
 
-    static ValueOrError<PluginManifest> fromJson(const char* jsonStr) noexcept;
-    static ValueOrError<PluginManifest> fromJson(const nx::kit::Json& json) noexcept;
+    static ValueOrError<IntegrationManifest> fromJson(const char* jsonStr) noexcept;
+    static ValueOrError<IntegrationManifest> fromJson(const nx::kit::Json& json) noexcept;
 
-    PluginManifest() = default;
+    IntegrationManifest() = default;
 
     template<typename T>
-    PluginManifest(const T&) = delete;
+    IntegrationManifest(const T&) = delete;
 
-    bool operator==(const PluginManifest&) const;
+    bool operator==(const IntegrationManifest&) const;
 
     // Plugin identificator. This is what will be displayed int the storage type field in
     // the storage dialog.

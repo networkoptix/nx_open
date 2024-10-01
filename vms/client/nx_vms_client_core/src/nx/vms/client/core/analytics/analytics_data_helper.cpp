@@ -14,7 +14,7 @@ AnalyticsEngineInfo engineInfoFromResource(
     if (!plugin)
         return {};
 
-    const auto pluginManifest = plugin->manifest();
+    const auto integrationManifest = plugin->manifest();
 
     auto settingsModel = settingsModelSource == SettingsModelSource::manifest
         ? engine->manifest().deviceAgentSettingsModel
@@ -25,10 +25,10 @@ AnalyticsEngineInfo engineInfoFromResource(
         engine->getId(),
         plugin->getId(),
         engine->getName(),
-        pluginManifest.description,
-        pluginManifest.version,
-        pluginManifest.vendor,
-        pluginManifest.isLicenseRequired,
+        integrationManifest.description,
+        integrationManifest.version,
+        integrationManifest.vendor,
+        integrationManifest.isLicenseRequired,
         std::move(settingsModel),
         engine->isDeviceDependent(),
         plugin->integrationType(),

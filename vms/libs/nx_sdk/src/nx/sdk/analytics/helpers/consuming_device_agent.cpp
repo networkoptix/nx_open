@@ -14,7 +14,7 @@
 #include <nx/sdk/analytics/i_object_metadata_packet.h>
 #include <nx/sdk/analytics/i_object_track_best_shot_packet.h>
 #include <nx/sdk/analytics/i_object_track_title_packet.h>
-#include <nx/sdk/analytics/i_plugin.h>
+#include <nx/sdk/analytics/i_integration.h>
 
 #undef NX_PRINT_PREFIX
 #define NX_PRINT_PREFIX (this->logUtils.printPrefix)
@@ -25,19 +25,19 @@
 namespace nx::sdk::analytics {
 
 static std::string makePrintPrefix(
-    const std::string& pluginInstanceId, const IDeviceInfo* deviceInfo)
+    const std::string& integrationInstanceId, const IDeviceInfo* deviceInfo)
 {
-    const std::string& pluginInstanceIdCaption =
-        pluginInstanceId.empty() ? "" : ("_" + pluginInstanceId);
+    const std::string& integrationInstanceIdCaption =
+        integrationInstanceId.empty() ? "" : ("_" + integrationInstanceId);
 
-    return "[" + libContext().name() + pluginInstanceIdCaption + "_device" +
+    return "[" + libContext().name() + integrationInstanceIdCaption + "_device" +
         (!deviceInfo ? "" : (std::string("_") + deviceInfo->id())) + "] ";
 }
 
 ConsumingDeviceAgent::ConsumingDeviceAgent(
-    const IDeviceInfo* deviceInfo, bool enableOutput, const std::string& pluginInstanceId)
+    const IDeviceInfo* deviceInfo, bool enableOutput, const std::string& integrationInstanceId)
     :
-    logUtils(enableOutput, makePrintPrefix(pluginInstanceId, deviceInfo))
+    logUtils(enableOutput, makePrintPrefix(integrationInstanceId, deviceInfo))
 {
     NX_KIT_ASSERT(deviceInfo);
     NX_PRINT << "Created " << this;

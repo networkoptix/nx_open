@@ -1,9 +1,9 @@
-# Analytics Plugin Manifests
+# Analytics Integration Manifests
 
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 This document describes the schemas of JSON Manifests that are returned by various Analytics
-entities - nx::sdk::analytics::IPlugin, IEngine, and IDeviceAgent.
+entities - nx::sdk::analytics::IIntegration, IEngine, and IDeviceAgent.
 
 Each Manifest is a JSON object containing fields which can be of the following semantic types:
 - String.
@@ -28,15 +28,15 @@ The following rules apply to the Manifest as a JSON document:
     the field will be treated as missing, thus, having a default value. It also gives the
     possibility to comment-out a field by renaming it, e.g. prepending with an underscore.
 
-Examples of Manifests can be found in the Plugin samples included with the SDK: a minimalistic
+Examples of Manifests can be found in the plugin samples included with the SDK: a minimalistic
 example can be found in Sample Analytics Plugin, and the most comprehensive example covering all
 possible features can be found in Stub Analytics Plugin.
 
 ---------------------------------------------------------------------------------------------------
 ## Identifiers
 
-Various entities declared in the Manifests make use of identifiers, including the Plugin itself and
-the types of Events and Objects that the Plugin can produce.
+Various entities declared in the Manifests make use of identifiers, including the Integration
+itself and the types of Events and Objects that the Integration can produce.
 
 Such identifiers, represented in JSON as strings, are intended to be human-readable, English-based,
 and formed according to the rules similar to that of Java package names - hierarchical domain-based
@@ -50,7 +50,7 @@ the word `event` in an identifier of certain Event type.
 For example, for a company called "My Company", an identifier for an Analytics Event type of a Line
 Crossing event may look like `"myCompany.lineCrossing"`.
 
-Identifiers starting with `nx.` must not be used for the entities introduced in the Plugins
+Identifiers starting with `nx.` must not be used for the entities introduced in the Integrations
 developed by parties other than Nx.
 
 There are special, reserved, parts of the identifier name. Identifiers starting with `nx.sys.` are
@@ -59,52 +59,52 @@ features. Identifiers with `.sys.` in the middle are recognized by VMS to have s
 behavior.
 
 ---------------------------------------------------------------------------------------------------
-## Plugin Manifest
+## Integration Manifest
 
-Plugin Manifest is a JSON Object containing the following fields:
+Integration Manifest is a JSON Object containing the following fields:
 
 - `"id"`: Id (String)
 
-    A human-readable identifier of the plugin. According to the basic identifier rules described in
-    the corresponding section of this document, it should not include the words `plugin` or the
-    like. E.g. for a face recognition plugin developed by "My Company", it may look like
-    `"myCompany.faceRecognition"`.
+    A human-readable identifier of the Integration. According to the basic identifier rules
+    described in the corresponding section of this document, it should not include the words
+    `integration` or the like. E.g. for a face recognition plugin developed by "My Company", it may
+    look like `"myCompany.faceRecognition"`.
 
     Mandatory.
 
 - `"name"`: String
 
-    Full name of a plugin as a product, in English, capitalized, using spaces. E.g. for a face
-    recognition plugin, it may look like `"Face recognition plugin"`. This name is shown to the user
-    in the VMS configuration GUI.
+    Full name of an Integration as a product, in English, capitalized, using spaces. E.g. for a
+    face recognition plugin, it may look like `"Face recognition plugin"`. This name is shown to
+    the user in the VMS configuration GUI.
 
     Mandatory.
 
 - `"description"`: String
 
-    A short text in English describing the purpose of the plugin, typically a single sentense.
+    A short text in English describing the purpose of the Integration, typically a single sentense.
 
     Mandatory.
 
 - `"version"`: String
 
     An arbitrary string shown to the user, which may be helpful to identify the particular version
-    of the plugin. A scheme like `"1.0.2"` can be recommended, but may vary according to the plugin
-    vendor needs.
+    of the Integration. A scheme like `"1.0.2"` can be recommended, but may vary according to the
+    Integration vendor needs.
 
     Optional.
 
 - `"vendor"`: String
 
-    The full name of the organization which is the author of the plugin. May look like e.g.
+    The full name of the organization which is the author of the Integration. May look like e.g.
     `"My Company, Inc."`.
 
     Mandatory.
 
 - `"engineSettingsModel"`: SettingsModel (Object)
 
-    Describes the names, types, and default values of the settings that an Engine of this plugin
-    may have.
+    Describes the names, types, and default values of the settings that an Engine of this
+    Integration may have.
 
     Optional. If omitted or empty, means there are no settings.
 
@@ -123,8 +123,8 @@ Engine Manifest is a JSON Object containing the following fields:
 
     A combination of zero or more of the following flags, separated with `|`:
 
-    - Flags defining the format of video frames that the Server supplies to the Plugin. No more
-        than one of the following flags can be specified. If none are specified, the Plugin will be
+    - Flags defining the format of video frames that the Server supplies to the Engine. No more
+        than one of the following flags can be specified. If none are specified, the Engine will be
         supplied the compressed video frames: IConsumingDeviceAgent::doPushDataPacket() will
         receive instances of ICompressedVideoPacket. Otherwise,
         IConsumingDeviceAgent::doPushDataPacket() will receive instances of
@@ -139,24 +139,24 @@ Engine Manifest is a JSON Object containing the following fields:
         - `needUncompressedVideoFrames_rgb`
         - `needUncompressedVideoFrames_bgr`
 
-    - `deviceDependent` - If set, influences the certain aspects of handling of the Plugin. It is
-        intended for Plugins which "work on a device", that is, are wrappers for the video
-        analytics running inside the camera. For example, such Plugins are compatible with a
+    - `deviceDependent` - If set, influences the certain aspects of handling of the Engine. It is
+        intended for Integrations which "work on a device", that is, are wrappers for the video
+        analytics running inside the camera. For example, such Integrations are compatible with a
         certain camera family, and typically do not consume the video stream from the Server. Also,
-        Device Agents of such Plugins do not have the "Enable/Disable" switch for the user - they
+        Device Agents of such Engines do not have the "Enable/Disable" switch for the user - they
         are always enabled, thus, start working every time a compatible device appears on the
-        Server. The opposite Plugin type, not having this flag, is called "device-independent" -
-        for example, such Plugins may analyze video from any camera using either their own code, or
-        via some backend (a server or an analytics device).
+        Server. The opposite Integration type, not having this flag, is called
+        "device-independent" - for example, such Integrations may analyze video from any camera
+        using either their own code, or via some backend (a server or an analytics device).
 
-    - `keepObjectBoundingBoxRotation` - When a camera for which the Plugin is working has frame
-        rotation option set to 90, 180 or 270 degrees, the Plugin which requests uncompressed video
-        frames receives them rotated accordingly. Regardless of whether the plugin requests
-        compressed or uncompressed video, the Object Metadata rectangles produced by the Plugin are
+    - `keepObjectBoundingBoxRotation` - When a camera for which the Engine is working has the frame
+        rotation option set to 90, 180 or 270 degrees, the Engine which requests uncompressed video
+        frames receives them rotated accordingly. Regardless of whether the Engine requests
+        compressed or uncompressed video, the Object Metadata rectangles produced by the Engine are
         rotated in the reverse direction, because the Server database requires them in the
         coordinate space of a physical (non-rotated) frame. But in the case the analysis is
-        performed inside a camera, or the Plugin requests compressed frames (thus, receives them
-        not being rotated), it is more convenient for the Plugin to produce Object Metadata in the
+        performed inside a camera, or the Engine requests compressed frames (thus, receives them
+        not being rotated), it is more convenient for the Engine to produce Object Metadata in the
         coordinate space of a physical (non-rotated) frame. This flag makes it possible - if set,
         the Server will not perform reverse rotation of the Object Metadata even if the frame
         rotation option on a camera is set.
@@ -166,7 +166,7 @@ Engine Manifest is a JSON Object containing the following fields:
 - `"streamTypeFilter"`: Flag set (String)
 
     A combination of zero or more of the following flags, separated with `|`, defining which kind
-    of streaming data will the plugin receive from the Server in
+    of streaming data will the Engine receive from the Server in
     IConsumingDeviceAgent::doPushDataPacket():
 
     - `compressedVideo` - Compressed video packets, as ICompressedVideoPacket.
@@ -179,8 +179,8 @@ Engine Manifest is a JSON Object containing the following fields:
 
 - `"preferredStream"`: Enumeration (String)
 
-    For plugins consuming a video stream, declares which of the video streams from a camera is
-    preferred by the plugin: a low-resolution one, or a high-resolution one.
+    For Engines consuming a video stream, declares which of the video streams from a camera is
+    preferred by the Engine: a low-resolution one, or a high-resolution one.
 
     - `"undefined"` - VMS choses the stream automatically.
     - `"primary"` - High-resolution stream.
@@ -211,7 +211,7 @@ Engine Manifest is a JSON Object containing the following fields:
 
     - `"id"`: Id (String)
 
-        Id of the action type, like `"vendor.pluginName.actionName"`.
+        Id of the action type, like `"vendor.integrationName.actionName"`.
 
     - `"name"`: String
 
@@ -239,23 +239,23 @@ Engine Manifest is a JSON Object containing the following fields:
             - `needBestShotVideoFrame` - Whether the Action requires the Server to provide it with
                 the Best Shot video frame via IAction::getObjectTrackInfo(). If this capability is
                 not set, then IObjectTrackInfo::bestShotVideoFrame() will return null to the
-                plugin.
+                Engine.
 
             - `needBestShotImage` - Whether the Action requires the Server to provide it with the
                 Best Shot image, Best Shot image data size and Best Shot image data format via
                 IAction::getObjectTrackInfo(). If this capability is not set, then
-                IObjectTrackInfo::bestShotImageData() will return null to the plugin,
+                IObjectTrackInfo::bestShotImageData() will return null to the Engine,
                 IObjectTrackInfo::bestShotImageDataFormat() will return an empty string to the
-                plugin, and IObjectTrackInfo::bestShotImageDataSize() will return 0 to the plugin.
+                Engine, and IObjectTrackInfo::bestShotImageDataSize() will return 0 to the Engine.
 
             - `needBestShotObjectMetadata` - Whether the Action requires the Server to provide it
                 with the Best Shot rectangle via IAction::getObjectTrackInfo(). If this capability
                 is not set, then IObjectTrackInfo::bestShotObjectMetadata() will return null to the
-                plugin.
+                Engine.
 
             - `needFullTrack` - Whether the Action requires the Server to provide it with the full
                 Object track via IAction::getObjectTrackInfo(). If this capability is not set,
-                then IObjectTrackInfo::track() will return null to the plugin, but the
+                then IObjectTrackInfo::track() will return null to the Engine, but the
                 Server performance on executing the action will be much better, because there will
                 be no need to retrieve all Object Metadata (rectangles) for the given Track Id from
                 the database.
@@ -277,7 +277,7 @@ Engine Manifest is a JSON Object containing the following fields:
 - `"deviceAgentSettingsModel"`: SettingsModel (Object)
 
     Describes the names, types, and default values of the settings that a DeviceAgent of this
-    plugin may have.
+    Engine may have.
 
     Optional. If omitted or empty, means there are no settings.
 
@@ -291,7 +291,7 @@ DeviceAgent Manifest is a JSON Object containing the following fields:
     A combination of zero or more of the following flags, separated with `|`:
 
     - `disableStreamSelection` - If set, the user will not be offered to choose between the Primary
-        (high-quality) and Secondary (low-quality) streams when activating this plugin for a
+        (high-quality) and Secondary (low-quality) streams when activating this Engine for a
         camera.
 
     Optional; default value is empty.
@@ -314,7 +314,7 @@ DeviceAgent Manifest is a JSON Object containing the following fields:
         each of them must be listed explicitly. This helps backwards compatibility, if the type
         is extended in the future.
 
-    NOTE: Technically, the Plugin can generate types and Attributes not listed in
+    NOTE: Technically, the Integration can generate types and Attributes not listed in
     `"supportedTypes"`, but in such case the GUI usability or convenience can be affected, like the
     ability to search for such Objects or by such Attributes.
 

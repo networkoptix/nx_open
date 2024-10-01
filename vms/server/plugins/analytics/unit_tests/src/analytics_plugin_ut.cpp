@@ -23,7 +23,7 @@
 #include <nx/sdk/analytics/i_compressed_video_packet.h>
 #include <nx/sdk/analytics/i_consuming_device_agent.h>
 #include <nx/sdk/analytics/i_engine.h>
-#include <nx/sdk/analytics/i_plugin.h>
+#include <nx/sdk/analytics/i_integration.h>
 #include <nx/sdk/analytics/i_uncompressed_video_frame.h>
 #include <nx/sdk/helpers/device_info.h>
 #include <nx/sdk/helpers/error.h>
@@ -47,7 +47,7 @@ using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
 std::vector<std::string> g_pluginLibFilenames; //< Paths of plugin libraries to test.
-int g_pluginInstanceIndex = -1; //< If not -1, only this instance will be tested.
+int g_integrationInstanceIndex = -1; //< If not -1, only this instance will be tested.
 
 template<typename Value>
 struct RefCountableResultHolder
@@ -82,25 +82,25 @@ public:
     const Result<Value> result;
 };
 
-// TODO: When manifest is introduced for any IPlugin (not only Analytics), rewrite.
-static void testAnalyticsPluginManifest(nx::sdk::analytics::IPlugin* plugin)
+// TODO: When manifest is introduced for any IIntegration (not only Analytics), rewrite.
+static void testAnalyticsIntegrationManifest(nx::sdk::analytics::IIntegration* integration)
 {
-    const RefCountableResultHolder<const IString*> result{plugin->manifest()};
+    const RefCountableResultHolder<const IString*> result{integration->manifest()};
 
     ASSERT_TRUE(result.isOk());
-    const auto pluginManifest = result.result.value();
-    ASSERT_TRUE(pluginManifest);
+    const auto integrationManifest = result.result.value();
+    ASSERT_TRUE(integrationManifest);
 
-    const char* const pluginManifestStr = pluginManifest->str();
-    ASSERT_TRUE(pluginManifestStr);
-    ASSERT_TRUE(pluginManifestStr[0] != '\0');
-    NX_PRINT << "Plugin manifest:\n" << pluginManifestStr;
+    const char* const integrationManifestStr = integrationManifest->str();
+    ASSERT_TRUE(integrationManifestStr);
+    ASSERT_TRUE(integrationManifestStr[0] != '\0');
+    NX_PRINT << "Integration manifest:\n" << integrationManifestStr;
 
-    std::string pluginManifestError;
-    const nx::kit::Json pluginManifestJson =
-        nx::kit::Json::parse(pluginManifest->str(), pluginManifestError);
-    ASSERT_EQ("", pluginManifestError);
-    ASSERT_TRUE(pluginManifestJson.is_object());
+    std::string integrationManifestError;
+    const nx::kit::Json integrationManifestJson =
+        nx::kit::Json::parse(integrationManifest->str(), integrationManifestError);
+    ASSERT_EQ("", integrationManifestError);
+    ASSERT_TRUE(integrationManifestJson.is_object());
 }
 
 static void testEngineManifest(IEngine* engine)
@@ -326,11 +326,11 @@ static void testStubAnalyticsPluginEngine(IEngine* engine)
 }
 
 /** Any Analytics Plugin must pass. */
-static void testAnalyticsPlugin(nx::sdk::analytics::IPlugin* plugin)
+static void testAnalyticsPlugin(nx::sdk::analytics::IIntegration* plugin)
 {
     ASSERT_TRUE(plugin);
 
-    testAnalyticsPluginManifest(plugin);
+    testAnalyticsIntegrationManifest(plugin);
 
     const RefCountableResultHolder<IEngine*> createEngineResult{plugin->createEngine()};
     ASSERT_TRUE(createEngineResult.isOk());
@@ -348,22 +348,22 @@ static void testAnalyticsPlugin(nx::sdk::analytics::IPlugin* plugin)
 }
 
 /** Any Plugin must pass. */
-static void testPlugin(Ptr<nx::sdk::IPlugin> plugin)
+static void testPlugin(Ptr<nx::sdk::IIntegration> plugin)
 {
     ASSERT_TRUE(plugin);
     ASSERT_TRUE(plugin->queryInterface<IRefCountable>());
-    ASSERT_TRUE(plugin->queryInterface<nx::sdk::IPlugin>());
+    ASSERT_TRUE(plugin->queryInterface<nx::sdk::IIntegration>());
 
     plugin->setUtilityProvider(makePtr<UtilityProvider>().get());
 
-    const Ptr<nx::sdk::analytics::IPlugin> analyticsPlugin =
-        plugin->queryInterface<nx::sdk::analytics::IPlugin>();
+    const Ptr<nx::sdk::analytics::IIntegration> analyticsPlugin =
+        plugin->queryInterface<nx::sdk::analytics::IIntegration>();
 
     testAnalyticsPlugin(analyticsPlugin.get());
 }
 
 //-------------------------------------------------------------------------------------------------
-// Infrastructure for obtaining IPlugin instances to test.
+// Infrastructure for obtaining IIntegration instances to test.
 
 using LibHandle =
     #if defined(_WIN32)
@@ -510,11 +510,11 @@ static void testPluginLibrary(const std::string& libFilename)
 
     const auto libHandle = loadLib(libFilename);
 
-    const auto entryPointFunc = reinterpret_cast<nx::sdk::IPlugin::EntryPointFunc>(
-        resolveLibFunc(libHandle, nx::sdk::IPlugin::kEntryPointFuncName));
+    const auto entryPointFunc = reinterpret_cast<nx::sdk::IIntegration::EntryPointFunc>(
+        resolveLibFunc(libHandle, nx::sdk::IIntegration::kEntryPointFuncName));
 
-    const auto multiEntryPointFunc = reinterpret_cast<nx::sdk::IPlugin::MultiEntryPointFunc>(
-        resolveLibFunc(libHandle, nx::sdk::IPlugin::kMultiEntryPointFuncName));
+    const auto multiEntryPointFunc = reinterpret_cast<nx::sdk::IIntegration::MultiEntryPointFunc>(
+        resolveLibFunc(libHandle, nx::sdk::IIntegration::kMultiEntryPointFuncName));
 
     // Obtain plugin's LibContext and fill in the plugin libName.
     const auto nxLibContextFunc = reinterpret_cast<NxLibContextFunc>(
@@ -531,7 +531,7 @@ static void testPluginLibrary(const std::string& libFilename)
         int instanceIndex = 0;
         while (const auto plugin = Ptr(multiEntryPointFunc(instanceIndex)))
         {
-            if (g_pluginInstanceIndex == -1 || g_pluginInstanceIndex == instanceIndex)
+            if (g_integrationInstanceIndex == -1 || g_integrationInstanceIndex == instanceIndex)
             {
                 NX_PRINT << "Testing plugin " << pluginLibName
                     << " with instance index " << instanceIndex;
@@ -607,9 +607,9 @@ static bool collectPluginLibFilenames(
 
         if (extraArgCount == 2 && extraArgs[1])
         {
-            if (!nx::kit::utils::fromString(extraArgs[1], &g_pluginInstanceIndex))
+            if (!nx::kit::utils::fromString(extraArgs[1], &g_integrationInstanceIndex))
             {
-                NX_PRINT << "ERROR: Invalid plugin instance index.";
+                NX_PRINT << "ERROR: Invalid integration instance index.";
                 return false;
             }
         }

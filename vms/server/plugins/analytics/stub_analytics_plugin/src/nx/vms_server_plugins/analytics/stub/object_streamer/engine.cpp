@@ -20,9 +20,9 @@ namespace object_streamer {
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
-Engine::Engine(Plugin* plugin):
+Engine::Engine(Integration* integration):
     nx::sdk::analytics::Engine(ini().enableOutput),
-    m_plugin(plugin)
+    m_integration(integration)
 {
 }
 
@@ -32,12 +32,12 @@ Engine::~Engine()
 
 void Engine::doObtainDeviceAgent(Result<IDeviceAgent*>* outResult, const IDeviceInfo* deviceInfo)
 {
-    *outResult = new DeviceAgent(deviceInfo, m_plugin->utilityProvider()->homeDir());
+    *outResult = new DeviceAgent(deviceInfo, m_integration->utilityProvider()->homeDir());
 }
 
 std::string Engine::manifestString() const
 {
-    const std::string pluginHomeDir = m_plugin->utilityProvider()->homeDir();
+    const std::string pluginHomeDir = m_integration->utilityProvider()->homeDir();
 
     Issues issues;
     const StreamInfo streamInfo = parseObjectStreamFile(

@@ -3,14 +3,14 @@
 #pragma once
 
 #include <nx/sdk/analytics/helpers/engine.h>
-#include <nx/sdk/analytics/helpers/plugin.h>
+#include <nx/sdk/analytics/helpers/integration.h>
 
 namespace nx::vms_server_plugins::analytics::stub::http_requests {
 
 class Engine: public nx::sdk::analytics::Engine
 {
 public:
-    Engine(nx::sdk::analytics::Plugin* plugin);
+    Engine(nx::sdk::analytics::Integration* integration);
     virtual ~Engine() override;
     nx::sdk::Ptr<nx::sdk::IUtilityProvider> utilityProvider() const;
 
@@ -23,7 +23,7 @@ protected:
         const nx::sdk::IDeviceInfo* deviceInfo) override;
 
 private:
-    nx::sdk::analytics::Plugin* const m_plugin;
+    nx::sdk::analytics::Integration* const m_integration;
 };
 
 } // namespace nx::vms_server_plugins::analytics::stub::http_requests

@@ -3,7 +3,7 @@
 #include "engine.h"
 
 #include <nx/kit/utils.h>
-#include <nx/sdk/analytics/i_plugin.h>
+#include <nx/sdk/analytics/i_integration.h>
 #include <nx/sdk/helpers/uuid_helper.h>
 #include <nx/sdk/helpers/log_utils.h>
 #include <nx/sdk/ptr.h>
@@ -23,18 +23,18 @@
 namespace nx::sdk::analytics {
 
 static std::string makePrintPrefix(
-    const std::string& pluginInstanceId, const IEngineInfo* engineInfo = nullptr)
+    const std::string& integrationInstanceId, const IEngineInfo* engineInfo = nullptr)
 {
-    const std::string& pluginInstanceIdCaption =
-        pluginInstanceId.empty() ? "" : ("_" + pluginInstanceId);
+    const std::string& integrationInstanceIdCaption =
+        integrationInstanceId.empty() ? "" : ("_" + integrationInstanceId);
 
-    return "[" + libContext().name() + pluginInstanceIdCaption + "_engine"
+    return "[" + libContext().name() + integrationInstanceIdCaption + "_engine"
         + (!engineInfo ? "" : (std::string("_") + engineInfo->id())) + "] ";
 }
 
-Engine::Engine(bool enableOutput, const std::string& pluginInstanceId):
-    logUtils(enableOutput, makePrintPrefix(pluginInstanceId)),
-    m_pluginInstanceId(pluginInstanceId)
+Engine::Engine(bool enableOutput, const std::string& integrationInstanceId):
+    logUtils(enableOutput, makePrintPrefix(integrationInstanceId)),
+    m_integrationInstanceId(integrationInstanceId)
 {
     NX_PRINT << "Created IEngine @" << nx::kit::utils::toString(this)
         << " of " << libContext().name();
@@ -102,7 +102,7 @@ Engine::~Engine()
 
 void Engine::setEngineInfo(const IEngineInfo* engineInfo)
 {
-    logUtils.setPrintPrefix(makePrintPrefix(m_pluginInstanceId, engineInfo));
+    logUtils.setPrintPrefix(makePrintPrefix(m_integrationInstanceId, engineInfo));
 }
 
 void Engine::doSetSettings(

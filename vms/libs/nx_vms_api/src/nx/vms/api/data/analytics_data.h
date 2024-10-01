@@ -17,6 +17,7 @@
 
 namespace nx::vms::api {
 
+// TODO: Rename to AnalyticsIntegrationData.
 struct NX_VMS_API AnalyticsPluginData: ResourceData
 {
     static const QString kResourceTypeName;
@@ -34,10 +35,10 @@ struct NX_VMS_API AnalyticsEngineData: ResourceData
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(AnalyticsEngineData)
 
 /**%apidoc
- * Information about a Server Plugin and its dynamic library. If the Plugin object was not created
- * because of issues with the dynamic library, PluginInfo keeps information about these issues. If
- * there is more than one Plugin object created by the same dynamic library, each will have its own
- * instance of PluginInfo.
+ * Information about a Server Integration that resides in a plugin (dynamic library). If the
+ * Integration object was not created because of issues with the dynamic library, this structure
+ * keeps information about these issues. If there is more than one Integration object created by
+ * the same dynamic library, each will have its own instance of this structure.
  */
 struct NX_VMS_API PluginInfo
 {
@@ -99,17 +100,19 @@ struct NX_VMS_API PluginInfo
         nxpl_PluginInterface = 1, /**<%apidoc Base interface for the old 3.2 SDK. */
         nxpl_Plugin = 2, /**<%apidoc Old 3.2 SDK plugin supporting roSettings. */
         nxpl_Plugin2 = 3, /**<%apidoc Old 3.2 SDK plugin supporting pluginContainer. */
-        nx_sdk_IPlugin = 4, /**<%apidoc Base interface for the new 4.0 SDK. */
-        nx_sdk_analytics_IPlugin = 5 /**<%apidoc New 4.0 SDK Analytics plugin. */
+        /**%apidoc Base interface for the 4.0+ SDK: nx::sdk::IIntegration or nx::sdk::IPlugin. */
+        nx_sdk_IIntegration = 4,
+        /**%apidoc New 4.0 SDK: nx::sdk::analytics::Integration or nx::sdk::IPlugin. */
+        nx_sdk_analytics_IIntegration = 5
     )
 
     /**%apidoc
-     * Name of the plugin from its manifest.
+     * Name of the Integration from its manifest.
      */
     QString name;
 
     /**%apidoc
-     * Description of the plugin from its manifest.
+     * Description of the Integration from its manifest.
      */
     QString description;
 
@@ -131,12 +134,12 @@ struct NX_VMS_API PluginInfo
     QString homeDir;
 
     /**%apidoc
-     * Vendor of the plugin from its manifest.
+     * Vendor of the Integration from its manifest.
      */
     QString vendor;
 
     /**%apidoc
-     * Version of the plugin from its manifest.
+     * Version of the Integration from its manifest.
      */
     QString version;
 
@@ -161,15 +164,15 @@ struct NX_VMS_API PluginInfo
     Error errorCode = Error::noError;
 
     /**%apidoc
-     * The highest interface that the Plugin object (the one returned by the plugin entry function)
-     * supports via queryInterface().
+     * The highest interface that the Integration object (the one returned by the plugin entry
+     * point function) supports via queryInterface().
      */
     MainInterface mainInterface = MainInterface::undefined;
 
     /**%apidoc
-     * For non-Analytics plugins and for device-independent Analytics plugins, is always set to
-     * true. For device-dependent Analytics plugins, is set to true if and only if the plugin has
-     * ever had a DeviceAgent since the Server start.
+     * For non-Analytics Integrations and for device-independent Analytics Integrations, is always
+     * set to true. For device-dependent Analytics Integrations, is set to true if and only if the
+     * Integration has ever had a DeviceAgent since the Server start.
      */
     bool isActive = true;
 
@@ -180,13 +183,13 @@ struct NX_VMS_API PluginInfo
     QString nxSdkVersion;
 
     /**%apidoc
-     * For Plugins created via multi-IPlugin entry point function, a 0-based index of the IPlugin
+     * For Plugins created via multi-IIntegration entry point function, a 0-based index of the IIntegration
      * instance corresponding to this PluginInfo instance. Otherwise, -1.
      */
     int instanceIndex = -1;
 
     /**%apidoc
-     * For Plugins created via multi-IPlugin entry point function, an Id of the IPlugin instance
+     * For Plugins created via multi-IIntegration entry point function, an Id of the IIntegration instance
      * corresponding to this PluginInfo instance. Otherwise, empty.
      */
     QString instanceId;
@@ -235,10 +238,10 @@ struct NX_VMS_API PluginResourceBindingInfo
     int boundResourceCount = 0;
 
     /**%apidoc
-     * For Analytics Plugins - number of resources on which the Engine is enabled automatically or
-     * by the User and that are currently online (thus a Device Agent is created for them). In
-     * the case of Device Plugins - the number of resources that are produced by the Plugin and are
-     * online.
+     * For Analytics Integrations - number of resources on which the Engine is enabled
+     * automatically or by the User and that are currently online (thus a Device Agent is created
+     * for them). In the case of Device Integrations - the number of Resources that are produced by
+     * the Integration and are online.
      */
     int onlineBoundResourceCount = 0;
 };
@@ -264,9 +267,9 @@ struct NX_VMS_API PluginInfoEx: PluginInfo
     PluginInfoEx& operator=(PluginInfoEx&& other) = default;
 
     /**%apidoc
-     * Array with information about bound resources. For Device Plugins contains zero (if the
-     * Plugin is not loaded) or one item. For Analytics Plugins the number of items is equal to the
-     * number of Plugin Engines.
+     * Array with information about bound Resources. For Device Integrations contains zero (if the
+     * plugin is not loaded) or one item. For Analytics Integrations, the number of items is equal
+     * to the number of Engines of the Integration.
      */
     std::vector<PluginResourceBindingInfo> resourceBindingInfo;
 };

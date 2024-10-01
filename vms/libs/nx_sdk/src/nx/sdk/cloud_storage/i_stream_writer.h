@@ -3,7 +3,7 @@
 #pragma once
 
 #include <camera/camera_plugin.h>
-#include <nx/sdk/i_plugin.h>
+#include <nx/sdk/i_integration.h>
 #include <nx/sdk/interface.h>
 #include <nx/sdk/result.h>
 

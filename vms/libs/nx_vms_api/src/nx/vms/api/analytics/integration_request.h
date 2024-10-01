@@ -18,7 +18,7 @@
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/analytics/device_agent_manifest.h>
 #include <nx/vms/api/analytics/engine_manifest.h>
-#include <nx/vms/api/analytics/plugin_manifest.h>
+#include <nx/vms/api/analytics/integration_manifest.h>
 
 namespace nx::vms::api::analytics {
 
@@ -42,7 +42,7 @@ NX_REFLECTION_INSTRUMENT(
 struct NX_VMS_API UpdateIntegrationRequest: IntegrationRequestIdentity
 {
     /**%apidoc Integration Manifest. */
-    PluginManifest integrationManifest;
+    IntegrationManifest integrationManifest;
 
     /**%apidoc Engine Manifest. */
     EngineManifest engineManifest;

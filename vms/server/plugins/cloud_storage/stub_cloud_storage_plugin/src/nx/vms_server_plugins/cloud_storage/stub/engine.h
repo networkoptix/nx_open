@@ -16,7 +16,7 @@
 
 namespace nx::vms_server_plugins::cloud_storage::stub {
 
-class Plugin;
+class Integration;
 
 class Engine: public nx::sdk::RefCountable<nx::sdk::cloud_storage::IEngine>
 {
@@ -24,7 +24,7 @@ public:
     Engine(
         const nx::sdk::cloud_storage::IArchiveUpdateHandler* deviceManagerHandler,
         const std::shared_ptr<DataManager>& dataManager,
-        const std::string& pluginId);
+        const std::string& integrationId);
 
     virtual ~Engine() override;
     virtual void startNotifications() override;
@@ -74,7 +74,7 @@ private:
     nx::sdk::Ptr<const nx::sdk::cloud_storage::IArchiveUpdateHandler> m_handler;
     std::shared_ptr<DataManager> m_dataManager;
     std::vector<nx::sdk::Ptr<nx::sdk::cloud_storage::IDeviceAgent>> m_deviceAgents;
-    std::string m_pluginId;
+    std::string m_integrationId;
     std::thread m_worker;
     mutable std::mutex m_mutex;
     bool m_needToStop = false;

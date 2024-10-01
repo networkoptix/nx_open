@@ -32,10 +32,10 @@ Engine::~Engine()
 Engine::Engine(
     const nx::sdk::cloud_storage::IArchiveUpdateHandler* deviceManagerHandler,
     const std::shared_ptr<DataManager>& dataManager,
-    const std::string& pluginId)
+    const std::string& integrationId)
     :
     m_dataManager(dataManager),
-    m_pluginId(pluginId)
+    m_integrationId(integrationId)
 {
     m_handler.reset(deviceManagerHandler);
     m_handler->addRef();
@@ -129,7 +129,7 @@ void Engine::startNotifications()
                 // Real-life implementation should manage its free space by itself and
                 // report data removal along with the newly added time periods here.
                 m_handler->onArchiveUpdated(
-                    m_pluginId.data(), nx::sdk::ErrorCode::noError, &result);
+                    m_integrationId.data(), nx::sdk::ErrorCode::noError, &result);
 
                 m_lastScanTimePoint = scanStartTime;
                 m_lastReportTimePoint = system_clock::now();

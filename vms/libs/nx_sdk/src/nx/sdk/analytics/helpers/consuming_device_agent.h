@@ -41,12 +41,13 @@ protected:
 protected:
     /**
      * @param enableOutput Enables NX_OUTPUT. Typically, use NX_DEBUG_ENABLE_OUTPUT as a value.
-     * @param instanceId Must be non-empty only for Plugins from multi-IPlugin libraries.
+     * @param integrationInstanceId Must be non-empty only for Plugins from multi-IIntegration
+     *     libraries.
      */
     ConsumingDeviceAgent(
         const IDeviceInfo* deviceInfo,
         bool enableOutput,
-        const std::string& pluginInstanceId = "");
+        const std::string& integrationInstanceId = "");
 
     virtual std::string manifestString() const = 0;
 

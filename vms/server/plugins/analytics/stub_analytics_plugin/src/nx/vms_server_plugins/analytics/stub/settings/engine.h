@@ -3,7 +3,7 @@
 #pragma once
 
 #include <nx/sdk/analytics/helpers/engine.h>
-#include <nx/sdk/analytics/helpers/plugin.h>
+#include <nx/sdk/analytics/helpers/integration.h>
 
 #include "active_settings_builder.h"
 
@@ -16,10 +16,10 @@ namespace settings {
 class Engine: public nx::sdk::analytics::Engine
 {
 public:
-    Engine(nx::sdk::analytics::Plugin* plugin);
+    Engine(nx::sdk::analytics::Integration* integration);
     virtual ~Engine() override;
 
-    nx::sdk::analytics::Plugin* const plugin() const { return m_plugin; }
+    nx::sdk::analytics::Integration* const integration() const { return m_integration; }
 
 protected:
     virtual std::string manifestString() const override;
@@ -49,7 +49,7 @@ private:
         const std::vector<std::string>& settingIdsToUpdate = {}) const;
 
 private:
-    nx::sdk::analytics::Plugin* const m_plugin;
+    nx::sdk::analytics::Integration* const m_integration;
     ActiveSettingsBuilder m_activeSettingsBuilder;
 };
 

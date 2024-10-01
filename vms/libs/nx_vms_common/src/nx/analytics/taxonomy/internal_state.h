@@ -8,7 +8,7 @@
 
 namespace nx::analytics::taxonomy {
 
-class Plugin;
+class Integration;
 class Engine;
 class Group;
 class EnumType;
@@ -31,7 +31,7 @@ typename Map::mapped_type typeById(Map* typeMap, const QString& typeId)
 
 struct InternalState
 {
-    std::map<QString, Plugin*> pluginById;
+    std::map<QString, Integration*> integrationById;
     std::map<QString, Engine*> engineById;
     std::map<QString, Group*> groupById;
     std::map<QString, EnumType*> enumTypeById;
@@ -45,8 +45,8 @@ struct InternalState
     template<typename Type>
     Type* getTypeById(const QString& id) const
     {
-        if constexpr (std::is_same_v<Type, Plugin>)
-            return details::typeById(&pluginById, id);
+        if constexpr (std::is_same_v<Type, Integration>)
+            return details::typeById(&integrationById, id);
         if constexpr (std::is_same_v<Type, Engine>)
             return details::typeById(&engineById, id);
         if constexpr (std::is_same_v<Type, Group>)

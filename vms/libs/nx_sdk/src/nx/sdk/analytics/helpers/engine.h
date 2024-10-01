@@ -18,7 +18,7 @@ namespace nx::sdk::analytics {
 
 /**
  * Base class for a typical implementation of an Analytics Engine. Hides many technical details of
- * the Analytics Plugin SDK, but may limit plugin capabilities - use only when suitable.
+ * the SDK, but may limit plugin capabilities - use only when suitable.
  *
  * To use NX_PRINT/NX_OUTPUT in a derived class with the prefix defined by this class, add the
  * following to the derived class .cpp:
@@ -36,9 +36,10 @@ protected:
 protected:
     /**
      * @param enableOutput Enables NX_OUTPUT. Typically, use NX_DEBUG_ENABLE_OUTPUT as a value.
-     * @param instanceId Must be non-empty only for Plugins from multi-IPlugin libraries.
+     * @param integrationInstanceId Must be non-empty only for Plugins from multi-IIntegration
+     *     libraries.
      */
-    Engine(bool enableOutput, const std::string& pluginInstanceId = "");
+    Engine(bool enableOutput, const std::string& integrationInstanceId = "");
 
     virtual std::string manifestString() const = 0;
 
@@ -132,7 +133,7 @@ private:
     mutable std::mutex m_mutex;
     std::map<std::string, std::string> m_settings;
     Ptr<IEngine::IHandler> m_handler;
-    std::string m_pluginInstanceId;
+    std::string m_integrationInstanceId;
 };
 
 } // namespace nx::sdk::analytics

@@ -14,17 +14,17 @@
             "{98e15400-ba22-4fba-8fe4-5c2802f2f7dc}": {
                 "id": "{98e15400-ba22-4fba-8fe4-5c2802f2f7dc}",
                 "name": "Engine 1",
-                "pluginId": "plugin.1"
+                "integrationId": "plugin.1"
             },
             "{c20e64c1-cc0c-46f5-b36a-f5b3416cc769}": {
                 "id": "{c20e64c1-cc0c-46f5-b36a-f5b3416cc769}",
                 "name": "Engine 2",
-                "pluginId": "plugin.2"
+                "integrationId": "plugin.2"
             },
             "{3e0a7591-db80-4bc1-be2a-c2d8c2feb688}": {
                 "id": "{3e0a7591-db80-4bc1-be2a-c2d8c2feb688}",
                 "name": "Engine 3",
-                "pluginId": "plugin.2"
+                "integrationId": "plugin.2"
             }
         },
         "groupDescriptors": {
@@ -106,7 +106,7 @@
                     "engineName": "Engine 1",
                     "groupId": "group.1",
                     "groupName": "Group 1",
-                    "pluginId": "plugin.1",
+                    "integrationId": "plugin.1",
                     "pluginName": "Plugin 1"
                 },
                 {
@@ -114,7 +114,7 @@
                     "engineName": "Engine 2",
                     "groupId": "group.2",
                     "groupName": "Group 2",
-                    "pluginId": "plugin.2",
+                    "integrationId": "plugin.2",
                     "pluginName": "Plugin 2"
                 }
             ]
@@ -128,7 +128,7 @@
                     "engineName": "Engine 1",
                     "groupId": "group.3",
                     "groupName": "Group 3",
-                    "pluginId": "plugin.1",
+                    "integrationId": "plugin.1",
                     "pluginName": "Plugin 1"
                 }
             ]
@@ -140,7 +140,7 @@
                 {
                     "engineId": "{3e0a7591-db80-4bc1-be2a-c2d8c2feb688}",
                     "engineName": "Engine 3",
-                    "pluginId": "plugin.2",
+                    "integrationId": "plugin.2",
                     "pluginName": "Plugin 2"
                 }
             ]

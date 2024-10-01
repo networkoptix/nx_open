@@ -21,9 +21,9 @@ using namespace nx::sdk::analytics;
 using namespace std::chrono;
 using namespace std::literals::chrono_literals;
 
-Engine::Engine(Plugin* plugin):
-    nx::sdk::analytics::Engine(NX_DEBUG_ENABLE_OUTPUT, plugin->instanceId()),
-    m_plugin(plugin)
+Engine::Engine(Integration* integration):
+    nx::sdk::analytics::Engine(NX_DEBUG_ENABLE_OUTPUT, integration->instanceId()),
+    m_integration(integration)
 {
     initCapabilities();
 }

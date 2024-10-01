@@ -19,15 +19,17 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_FLAG(false, errorOnPushCompressedFrame,
         "Produce an error on pushCompressedFrame() every 100 frames.");
 
-    //-------------------------------------------------------------------------------------------------
+    //---------------------------------------------------------------------------------------------
     // Manifests.
 
-    NX_INI_FLAG(false, returnIncorrectPluginManifest, "Return incorrect Plugin manifest.");
-    NX_INI_FLAG(false, returnIncorrectEngineManifest, "Return incorrect Engine manifest.");
+    NX_INI_FLAG(false, returnIncorrectIntegrationManifest,
+        "Return incorrect Integration manifest.");
+    NX_INI_FLAG(false, returnIncorrectEngineManifest,
+        "Return incorrect Engine manifest.");
     NX_INI_FLAG(false, returnIncorrectDeviceAgentManifest,
         "Return incorrect DeviceAgent manifest.");
 
-    //-------------------------------------------------------------------------------------------------
+    //---------------------------------------------------------------------------------------------
     // Initialization.
 
     NX_INI_FLAG(false, returnNullOnEngineCreation,
@@ -44,7 +46,7 @@ struct Ini: public nx::kit::IniConfig
         "errorInsteadOfSettingsResponse";
     static constexpr const char* kSettingsResponseWithError = "settingsResponseWithError";
 
-    //-------------------------------------------------------------------------------------------------
+    //---------------------------------------------------------------------------------------------
     // Engine settings.
 
     NX_INI_STRING(kNoError, returnErrorFromEngineSetSettings,
@@ -66,14 +68,14 @@ struct Ini: public nx::kit::IniConfig
 
 
     NX_INI_STRING(kNoError, returnErrorFromEngineOnGetPluginSideSettings,
-        "Return an Error from Engine on setting Plugin Side Settings.\n"
+        "Return an Error from Engine on setting Plugin-side Settings.\n"
         "String value \"noError\": No error.\n"
         "String value \"errorInsteadOfSettingsResponse\": Return an error instead of Settings "
-        "Response from Engine's Plugin Side Settings.\n"
+        "Response from Engine's Plugin-side Settings.\n"
         "String value \"settingsResponseWithError\": Return Settings Response containing an error "
-        "from Engine's Plugin Side Settings.");
+        "from Engine's Plugin-side Settings.");
 
-    //-------------------------------------------------------------------------------------------------
+    //---------------------------------------------------------------------------------------------
     // DeviceAgent settings.
 
     NX_INI_STRING(kNoError, returnErrorFromDeviceAgentSetSettings,
@@ -94,12 +96,12 @@ struct Ini: public nx::kit::IniConfig
         "from DeviceAgent on setting Active Settings.");
 
     NX_INI_STRING(kNoError, returnErrorFromDeviceAgentOnGetPluginSideSettings,
-        "Return an Error from DeviceAgent on setting Plugin Side Settings.\n"
+        "Return an Error from DeviceAgent on setting Plugin-side Settings.\n"
         "String value \"noError\": No error.\n"
         "String value \"errorInsteadOfSettingsResponse\": Return an error instead of Settings "
-        "Response from DeviceAgent's Plugin Side Settings.\n"
+        "Response from DeviceAgent's Plugin-side Settings.\n"
         "String value \"settingsResponseWithError\": Return Settings Response containing an error "
-        "from DeviceAgent's Plugin Side Settings.");
+        "from DeviceAgent's Plugin-side Settings.");
 };
 
 Ini& ini();

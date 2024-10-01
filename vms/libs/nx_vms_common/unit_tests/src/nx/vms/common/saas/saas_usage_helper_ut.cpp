@@ -183,7 +183,7 @@ protected:
             engineResource->setParentId(pluginResource->getId());
             systemContext()->resourcePool()->addResource(engineResource);
 
-            vms::api::analytics::PluginManifest manifest;
+            vms::api::analytics::IntegrationManifest manifest;
             manifest.id = data.pluginId;
             manifest.isLicenseRequired = true;
             pluginResource->setManifest(manifest);

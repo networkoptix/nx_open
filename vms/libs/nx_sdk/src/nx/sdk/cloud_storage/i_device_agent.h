@@ -7,7 +7,7 @@
 #include <nx/sdk/cloud_storage/i_stream_writer.h>
 #include <nx/sdk/i_device_info.h>
 #include <nx/sdk/i_list.h>
-#include <nx/sdk/i_plugin.h>
+#include <nx/sdk/i_integration.h>
 #include <nx/sdk/i_string.h>
 #include <nx/sdk/interface.h>
 #include <nx/sdk/result.h>

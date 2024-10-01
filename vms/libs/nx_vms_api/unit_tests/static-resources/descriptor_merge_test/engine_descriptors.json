@@ -4,25 +4,25 @@
             "{a83ad533-e397-4bce-be9b-72ffab905d66}": {
                 "id": "{a83ad533-e397-4bce-be9b-72ffab905d66}",
                 "name": "Test Engine 1",
-                "pluginId": "test.plugin1",
+                "integrationId": "test.plugin1",
                 "capabilities": ""
             },
             "{768e0413-e829-4380-8ce7-64dcbc5f1f3f}": {
                 "id": "{768e0413-e829-4380-8ce7-64dcbc5f1f3f}",
                 "name": "Test Engine 2",
-                "pluginId": "test.plugin2",
+                "integrationId": "test.plugin2",
                 "capabilities": ""
             },
             "{8a933125-26d3-4f37-8dc0-f2f81a0014ed}": {
                 "id": "{8a933125-26d3-4f37-8dc0-f2f81a0014ed}",
                 "name": "Test Engine 3",
-                "pluginId": "test.plugin3",
+                "integrationId": "test.plugin3",
                 "capabilities": ""
             },
             "{ffc741f3-1cc9-4e42-9edf-97580c2bd456}": {
                 "id": "{ffc741f3-1cc9-4e42-9edf-97580c2bd456}",
                 "name": "Test Engine 4",
-                "pluginId": "test.plugin1",
+                "integrationId": "test.plugin1",
                 "capabilities": ""
             }
         }
@@ -32,19 +32,19 @@
             "{a83ad533-e397-4bce-be9b-72ffab905d66}": {
                 "id": "{a83ad533-e397-4bce-be9b-72ffab905d66}",
                 "name": "Overridden Test Engine 1",
-                "pluginId": "test.plugin1",
+                "integrationId": "test.plugin1",
                 "capabilities": ""
             },
             "{768e0413-e829-4380-8ce7-64dcbc5f1f3f}": {
                 "id": "{768e0413-e829-4380-8ce7-64dcbc5f1f3f}",
                 "name": "Overridden Test Engine 2",
-                "pluginId": "test.plugin2",
+                "integrationId": "test.plugin2",
                 "capabilities": ""
             },
             "{ffc741f3-1cc9-4e42-9edf-97580c2bd456}": {
                 "id": "{ffc741f3-1cc9-4e42-9edf-97580c2bd456}",
                 "name": "Overridden Test Engine 4",
-                "pluginId": "test.plugin1",
+                "integrationId": "test.plugin1",
                 "capabilities": "needUncompressedVideoFrames_yuv420|needUncompressedVideoFrames_argb|needUncompressedVideoFrames_abgr|needUncompressedVideoFrames_rgba|needUncompressedVideoFrames_bgra|needUncompressedVideoFrames_rgb|needUncompressedVideoFrames_bgr|deviceDependent|keepObjectBoundingBoxRotation|noAutoBestShots"
             }
         }
@@ -54,25 +54,25 @@
             "{a83ad533-e397-4bce-be9b-72ffab905d66}": {
                 "id": "{a83ad533-e397-4bce-be9b-72ffab905d66}",
                 "name": "Overridden Test Engine 1",
-                "pluginId": "test.plugin1",
+                "integrationId": "test.plugin1",
                 "capabilities": ""
             },
             "{768e0413-e829-4380-8ce7-64dcbc5f1f3f}": {
                 "id": "{768e0413-e829-4380-8ce7-64dcbc5f1f3f}",
                 "name": "Overridden Test Engine 2",
-                "pluginId": "test.plugin2",
+                "integrationId": "test.plugin2",
                 "capabilities": ""
             },
             "{8a933125-26d3-4f37-8dc0-f2f81a0014ed}": {
                 "id": "{8a933125-26d3-4f37-8dc0-f2f81a0014ed}",
                 "name": "Test Engine 3",
-                "pluginId": "test.plugin3",
+                "integrationId": "test.plugin3",
                 "capabilities": ""
             },
             "{ffc741f3-1cc9-4e42-9edf-97580c2bd456}": {
                 "id": "{ffc741f3-1cc9-4e42-9edf-97580c2bd456}",
                 "name": "Overridden Test Engine 4",
-                "pluginId": "test.plugin1",
+                "integrationId": "test.plugin1",
                 "capabilities": "needUncompressedVideoFrames_yuv420|needUncompressedVideoFrames_argb|needUncompressedVideoFrames_abgr|needUncompressedVideoFrames_rgba|needUncompressedVideoFrames_bgra|needUncompressedVideoFrames_rgb|needUncompressedVideoFrames_bgr|deviceDependent|keepObjectBoundingBoxRotation|noAutoBestShots"
             }
         }

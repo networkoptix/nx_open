@@ -41,7 +41,7 @@ std::string DeviceAgent::manifestString() const
     // Id values are strings and should be unique. Format of ids:
     // `{vendor_id}.{plugin_id}.{event_type_id/object_type_id}`.
     //
-    // See the plugin manifest for the explanation of vendor_id and plugin_id.
+    // See the Integration manifest for the explanation of vendor_id and plugin_id.
     return /*suppress newline*/ 1 + (const char*) R"json(
 {
     "supportedTypes":

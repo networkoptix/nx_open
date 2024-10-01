@@ -201,11 +201,11 @@ nx::kit::Json objectListToJson(const std::vector<T>& objectList)
 
 } // namespace
 
-PluginManifest::PluginManifest(const char* jsonStr): PluginManifest(parseJson(jsonStr))
+IntegrationManifest::IntegrationManifest(const char* jsonStr): IntegrationManifest(parseJson(jsonStr))
 {
 }
 
-PluginManifest::PluginManifest(const nx::kit::Json& json)
+IntegrationManifest::IntegrationManifest(const nx::kit::Json& json)
 {
     id = getStringValue(json, "id");
     name = getStringValue(json, "name");
@@ -214,31 +214,31 @@ PluginManifest::PluginManifest(const nx::kit::Json& json)
     vendor = getStringValue(json, "vendor");
 }
 
-ValueOrError<PluginManifest> PluginManifest::fromJson(const char* jsonStr) noexcept
+ValueOrError<IntegrationManifest> IntegrationManifest::fromJson(const char* jsonStr) noexcept
 {
     try
     {
-        return ValueOrError<PluginManifest>::makeValue(PluginManifest(jsonStr));
+        return ValueOrError<IntegrationManifest>::makeValue(IntegrationManifest(jsonStr));
     }
     catch (const std::exception& e)
     {
-        return ValueOrError<PluginManifest>::makeError(e.what());
+        return ValueOrError<IntegrationManifest>::makeError(e.what());
     }
 }
 
-ValueOrError<PluginManifest> PluginManifest::fromJson(const nx::kit::Json& json) noexcept
+ValueOrError<IntegrationManifest> IntegrationManifest::fromJson(const nx::kit::Json& json) noexcept
 {
     try
     {
-        return ValueOrError<PluginManifest>::makeValue(PluginManifest(json));
+        return ValueOrError<IntegrationManifest>::makeValue(IntegrationManifest(json));
     }
     catch (const std::exception& e)
     {
-        return ValueOrError<PluginManifest>::makeError(e.what());
+        return ValueOrError<IntegrationManifest>::makeError(e.what());
     }
 }
 
-PluginManifest::PluginManifest(
+IntegrationManifest::IntegrationManifest(
     const std::string& id,
     const std::string& name,
     const std::string& description,
@@ -253,7 +253,7 @@ PluginManifest::PluginManifest(
 {
 }
 
-nx::kit::Json PluginManifest::to_json() const
+nx::kit::Json IntegrationManifest::to_json() const
 {
     return nx::kit::Json::object({
         {"id", id},
@@ -264,7 +264,7 @@ nx::kit::Json PluginManifest::to_json() const
         });
 }
 
-bool PluginManifest::operator==(const PluginManifest& other) const
+bool IntegrationManifest::operator==(const IntegrationManifest& other) const
 {
     return other.description == description && other.id == id && other.name == name
         && other.vendor == vendor && other.version == version;

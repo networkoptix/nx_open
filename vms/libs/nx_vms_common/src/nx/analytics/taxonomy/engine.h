@@ -9,7 +9,7 @@ namespace nx::analytics::taxonomy {
 
 struct InternalState;
 class ErrorHandler;
-class Plugin;
+class Integration;
 
 class Engine: public AbstractEngine
 {
@@ -21,19 +21,19 @@ public:
 
     virtual QString name() const override;
 
-    virtual AbstractPlugin* plugin() const override;
+    virtual AbstractIntegration* integration() const override;
 
     virtual nx::vms::api::analytics::EngineCapabilities capabilities() const override;
 
     virtual nx::vms::api::analytics::EngineDescriptor serialize() const override;
 
-    void setPlugin(Plugin* plugin);
+    void setIntegration(Integration* integration);
 
     void resolve(InternalState* inOutInternalState, ErrorHandler* errorHandler);
 
 private:
     nx::vms::api::analytics::EngineDescriptor m_descriptor;
-    Plugin* m_plugin = nullptr;
+    Integration* m_integration = nullptr;
 };
 
 } // namespace nx::analytics::taxonomy

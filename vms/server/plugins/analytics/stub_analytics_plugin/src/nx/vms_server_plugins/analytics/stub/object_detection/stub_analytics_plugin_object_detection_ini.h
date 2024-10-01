@@ -16,7 +16,8 @@ struct Ini: public nx::kit::IniConfig
     Ini(): IniConfig("stub_analytics_plugin_object_detection.ini") { reload(); }
 
     NX_INI_FLAG(0, enableOutput, "");
-    NX_INI_FLAG(0, isLicenseRequired, "Whether the Plugin declares in its manifest that it requires a license.");
+    NX_INI_FLAG(0, isLicenseRequired,
+        "Whether the Integration declares in its manifest that it requires a license.");
 };
 
 Ini& ini();

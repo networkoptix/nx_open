@@ -18,9 +18,9 @@ namespace taxonomy_features {
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
-Engine::Engine(Plugin* plugin):
-    nx::sdk::analytics::Engine(ini().enableOutput, plugin->instanceId()),
-    m_plugin(plugin)
+Engine::Engine(Integration* integration):
+    nx::sdk::analytics::Engine(ini().enableOutput, integration->instanceId()),
+    m_integration(integration)
 {
 }
 

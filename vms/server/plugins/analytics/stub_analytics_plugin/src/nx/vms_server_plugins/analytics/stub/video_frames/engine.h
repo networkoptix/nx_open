@@ -5,7 +5,7 @@
 #include <memory>
 
 #include <nx/sdk/analytics/helpers/engine.h>
-#include <nx/sdk/analytics/helpers/plugin.h>
+#include <nx/sdk/analytics/helpers/integration.h>
 #include <nx/sdk/analytics/i_uncompressed_video_frame.h>
 #include <nx/sdk/uuid.h>
 
@@ -20,7 +20,7 @@ class Engine: public nx::sdk::analytics::Engine
 public:
     using PixelFormat = nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat;
 
-    Engine(nx::sdk::analytics::Plugin* plugin);
+    Engine(nx::sdk::analytics::Integration* integration);
 
     virtual ~Engine() override;
 
@@ -29,7 +29,7 @@ public:
 
     PixelFormat pixelFormat() const { return m_pixelFormat; }
 
-    nx::sdk::analytics::Plugin* const plugin() const { return m_plugin; }
+    nx::sdk::analytics::Integration* const integration() const { return m_integration; }
 
 protected:
     virtual std::string manifestString() const override;
@@ -43,7 +43,7 @@ private:
     void initCapabilities();
 
 private:
-    nx::sdk::analytics::Plugin* const m_plugin;
+    nx::sdk::analytics::Integration* const m_integration;
 
     std::string m_capabilities;
     std::string m_streamTypeFilter;

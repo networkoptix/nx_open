@@ -4,7 +4,7 @@
 
 #include <nx/sdk/analytics/helpers/engine.h>
 
-#include "plugin.h"
+#include "integration.h"
 #include "stream_parser.h"
 
 namespace nx {
@@ -16,7 +16,7 @@ namespace object_streamer {
 class Engine: public nx::sdk::analytics::Engine
 {
 public:
-    Engine(Plugin* plugin);
+    Engine(Integration* integration);
     virtual ~Engine() override;
 
 protected:
@@ -31,7 +31,7 @@ private:
     void reportIssues(const Issues& issues) const;
 
 private:
-    Plugin* m_plugin = nullptr;
+    Integration* m_integration = nullptr;
 };
 
 } // namespace object_streamer

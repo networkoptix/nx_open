@@ -8,7 +8,7 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/resource_fwd.h>
-#include <nx/vms/api/analytics/plugin_manifest.h>
+#include <nx/vms/api/analytics/integration_manifest.h>
 #include <nx/vms/api/data/analytics_integration_model.h>
 
 namespace nx::vms::common {
@@ -26,8 +26,8 @@ public:
     AnalyticsPluginResource();
     virtual ~AnalyticsPluginResource() override = default;
 
-    vms::api::analytics::PluginManifest manifest() const;
-    void setManifest(const vms::api::analytics::PluginManifest& manifest);
+    vms::api::analytics::IntegrationManifest manifest() const;
+    void setManifest(const vms::api::analytics::IntegrationManifest& manifest);
 
     AnalyticsEngineResourceList engines() const;
     bool hasDefaultEngine() const;

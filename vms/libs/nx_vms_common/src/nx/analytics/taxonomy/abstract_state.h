@@ -12,7 +12,7 @@
 #include <nx/analytics/taxonomy/abstract_event_type.h>
 #include <nx/analytics/taxonomy/abstract_group.h>
 #include <nx/analytics/taxonomy/abstract_object_type.h>
-#include <nx/analytics/taxonomy/abstract_plugin.h>
+#include <nx/analytics/taxonomy/abstract_integration.h>
 #include <nx/analytics/taxonomy/abstract_resource_support_proxy.h>
 #include <nx/vms/api/analytics/descriptors.h>
 
@@ -31,7 +31,7 @@ class NX_VMS_COMMON_API AbstractState: public QObject
 public:
     virtual ~AbstractState() {}
 
-    virtual std::vector<AbstractPlugin*> plugins() const = 0;
+    virtual std::vector<AbstractIntegration*> integrations() const = 0;
 
     virtual std::vector<AbstractEngine*> engines() const = 0;
 
@@ -53,7 +53,7 @@ public:
 
     virtual AbstractEventType* eventTypeById(const QString& eventTypeId) const = 0;
 
-    virtual AbstractPlugin* pluginById(const QString& pluginId) const = 0;
+    virtual AbstractIntegration* integrationById(const QString& integrationId) const = 0;
 
     virtual AbstractEngine* engineById(const QString& engineId) const = 0;
 

@@ -9,7 +9,7 @@
 
 namespace nx::analytics::taxonomy {
 
-class AbstractPlugin;
+class AbstractIntegration;
 
 class NX_VMS_COMMON_API AbstractEngine: public QObject
 {
@@ -29,7 +29,7 @@ public:
 
     virtual QString name() const = 0;
 
-    virtual AbstractPlugin* plugin() const = 0;
+    virtual AbstractIntegration* integration() const = 0;
 
     virtual nx::vms::api::analytics::EngineCapabilities capabilities() const = 0;
 

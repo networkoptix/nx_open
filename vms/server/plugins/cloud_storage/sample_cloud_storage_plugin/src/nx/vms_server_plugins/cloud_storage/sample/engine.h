@@ -14,7 +14,7 @@ class Engine: public nx::sdk::RefCountable<nx::sdk::cloud_storage::IEngine>
 public:
     Engine(
         const nx::sdk::cloud_storage::IArchiveUpdateHandler* deviceManagerHandler,
-        const std::string& pluginId);
+        const std::string& integrationId);
 
     virtual void startNotifications() override;
     virtual void stopNotifications() override;

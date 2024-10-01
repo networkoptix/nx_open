@@ -9,7 +9,7 @@
 #include <core/resource_management/resource_pool.h>
 
 #include <nx/vms/common/resource/analytics_engine_resource.h>
-#include <nx/vms/api/analytics/plugin_manifest.h>
+#include <nx/vms/api/analytics/integration_manifest.h>
 
 #include <nx/fusion/model_functions.h>
 
@@ -22,14 +22,14 @@ AnalyticsPluginResource::AnalyticsPluginResource():
 {
 }
 
-PluginManifest AnalyticsPluginResource::manifest() const
+IntegrationManifest AnalyticsPluginResource::manifest() const
 {
     return QJson::deserialized(getProperty(
         nx::vms::api::analytics::kPluginManifestProperty).toUtf8(),
-        PluginManifest());
+        IntegrationManifest());
 }
 
-void AnalyticsPluginResource::setManifest(const PluginManifest& manifest)
+void AnalyticsPluginResource::setManifest(const IntegrationManifest& manifest)
 {
     setProperty(
         nx::vms::api::analytics::kPluginManifestProperty,

@@ -4,7 +4,7 @@
 
 #include <type_traits>
 
-#include <nx/analytics/taxonomy/plugin.h>
+#include <nx/analytics/taxonomy/integration.h>
 #include <nx/analytics/taxonomy/engine.h>
 #include <nx/analytics/taxonomy/group.h>
 #include <nx/analytics/taxonomy/enum_type.h>
@@ -49,7 +49,7 @@ State::State(
     m_internalState(std::move(state)),
     m_resourceSupportProxy(std::move(resourceSupportProxy))
 {
-    assignParent(&m_internalState.pluginById, this);
+    assignParent(&m_internalState.integrationById, this);
     assignParent(&m_internalState.engineById, this);
     assignParent(&m_internalState.groupById, this);
     assignParent(&m_internalState.eventTypeById, this);
@@ -60,7 +60,7 @@ State::State(
 
 void State::refillCache() const
 {
-    m_cachedPlugins.clear();
+    m_cachedIntegrations.clear();
     m_cachedEngines.clear();
     m_cachedGroups.clear();
     m_cachedObjectType.clear();
@@ -70,8 +70,8 @@ void State::refillCache() const
     m_cachedEnumTypes.clear();
     m_cachedColorTypes.clear();
 
-    for (const auto& [pluginId, plugin]: m_internalState.pluginById)
-        m_cachedPlugins.push_back(plugin);
+    for (const auto& [integrationId, integration]: m_internalState.integrationById)
+        m_cachedIntegrations.push_back(integration);
 
     for (const auto& [engineId, engine]: m_internalState.engineById)
         m_cachedEngines.push_back(engine);
@@ -100,13 +100,13 @@ void State::refillCache() const
         m_cachedColorTypes.push_back(colorType);
 }
 
-std::vector<AbstractPlugin*> State::plugins() const
+std::vector<AbstractIntegration*> State::integrations() const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
-    if (m_cachedPlugins.empty())
+    if (m_cachedIntegrations.empty())
         refillCache();
 
-    return m_cachedPlugins;
+    return m_cachedIntegrations;
 }
 
 std::vector<AbstractEngine*> State::engines() const
@@ -192,9 +192,9 @@ AbstractEventType* State::eventTypeById(const QString& eventTypeId) const
     return m_internalState.getTypeById<EventType>(eventTypeId);
 }
 
-AbstractPlugin* State::pluginById(const QString& pluginId) const
+AbstractIntegration* State::integrationById(const QString& integrationId) const
 {
-    return m_internalState.getTypeById<Plugin>(pluginId);
+    return m_internalState.getTypeById<Integration>(integrationId);
 }
 
 AbstractEngine* State::engineById(const QString& engineId) const
@@ -221,9 +221,12 @@ Descriptors State::serialize() const
 {
     Descriptors result;
 
-    result.pluginDescriptors = serializeEntityMap<PluginDescriptorMap>(m_internalState.pluginById);
-    result.engineDescriptors = serializeEntityMap<EngineDescriptorMap>(m_internalState.engineById);
-    result.groupDescriptors = serializeEntityMap<GroupDescriptorMap>(m_internalState.groupById);
+    result.pluginDescriptors = serializeEntityMap<PluginDescriptorMap>(
+        m_internalState.integrationById);
+    result.engineDescriptors = serializeEntityMap<EngineDescriptorMap>(
+        m_internalState.engineById);
+    result.groupDescriptors = serializeEntityMap<GroupDescriptorMap>(
+        m_internalState.groupById);
     result.enumTypeDescriptors =
         serializeEntityMap<EnumTypeDescriptorMap>(m_internalState.enumTypeById);
     result.colorTypeDescriptors =

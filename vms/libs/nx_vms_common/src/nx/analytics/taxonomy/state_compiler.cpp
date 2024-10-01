@@ -9,7 +9,7 @@
 #include <nx/analytics/taxonomy/object_type.h>
 #include <nx/analytics/taxonomy/event_type.h>
 #include <nx/analytics/taxonomy/engine.h>
-#include <nx/analytics/taxonomy/plugin.h>
+#include <nx/analytics/taxonomy/integration.h>
 #include <nx/analytics/taxonomy/group.h>
 #include <nx/analytics/taxonomy/primary_resolver.h>
 #include <nx/analytics/taxonomy/error_handler.h>
@@ -50,7 +50,7 @@ static InternalState makeInitialInternalState(
     InternalState internalState;
 
     for (auto& [id, descriptor]: descriptors.pluginDescriptors)
-        internalState.pluginById[id] = new Plugin(std::move(descriptor));
+        internalState.integrationById[id] = new Integration(std::move(descriptor));
 
     for (auto& [id, descriptor]: descriptors.engineDescriptors)
         internalState.engineById[id.toString()] = new Engine(std::move(descriptor));

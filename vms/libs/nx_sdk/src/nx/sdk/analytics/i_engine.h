@@ -17,7 +17,7 @@
 
 namespace nx::sdk::analytics {
 
-class IPlugin; //< Forward declaration for the parent object.
+class IIntegration; //< Forward declaration for the parent object.
 
 class IEngine0: public Interface<IEngine0>
 {
@@ -161,7 +161,7 @@ public:
 
 /**
  * Main interface for an Analytics Engine instance. The instances are created by a Mediaserver via
- * calling analytics::IPlugin::createEngine() typically on Mediaserver start (or when a new Engine
+ * calling analytics::IIntegration::createEngine() typically on Mediaserver start (or when a new Engine
  * is created by the system administrator), and destroyed (via releaseRef()) on Mediaserver
  * shutdown (or when an existing Engine is deleted by the system administrator).
  *

@@ -73,15 +73,15 @@ protected:
             ASSERT_EQ(engine->name(), expectedData.name);
             ASSERT_EQ(engine->capabilities(), expectedData.capabilities);
 
-            const AbstractPlugin* plugin = engine->plugin();
+            const AbstractIntegration* integration = engine->integration();
             if (expectedData.plugin)
             {
-                ASSERT_EQ(plugin->id(), expectedData.plugin->id);
-                ASSERT_EQ(plugin->name(), expectedData.plugin->name);
+                ASSERT_EQ(integration->id(), expectedData.plugin->id);
+                ASSERT_EQ(integration->name(), expectedData.plugin->name);
             }
             else
             {
-                ASSERT_EQ(plugin, nullptr);
+                ASSERT_EQ(integration, nullptr);
             }
         }
     }

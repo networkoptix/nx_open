@@ -17,7 +17,7 @@
 #include <nx/vms/api/analytics/device_agent_manifest.h>
 #include <nx/vms/api/analytics/engine_manifest.h>
 #include <nx/vms/api/analytics/manifest_items.h>
-#include <nx/vms/api/analytics/plugin_manifest.h>
+#include <nx/vms/api/analytics/integration_manifest.h>
 
 namespace nx::vms::api::analytics {
 

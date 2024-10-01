@@ -63,7 +63,7 @@ by a plugin:
 
 - `src/nx/sdk/analytics/helpers/` - Analytics-related utilities and typical/base classes
     implementing interfaces, including:
-    - `plugin.h` - `class nx::sdk::analytics::Plugin`: Base class for a typical implementation of
+    - `plugin.h` - `class nx::sdk::analytics::Integration`: Base class for a typical implementation of
         the `nx::sdk::analytics::IPlugin` interface; use it to start developing an Analytics
         Plugin (see [Analytics Plugins](#analytics-plugins)).
     - `pixel_format.h`: Utilities for `enum IUncompressedFrame::PixelFormat`.

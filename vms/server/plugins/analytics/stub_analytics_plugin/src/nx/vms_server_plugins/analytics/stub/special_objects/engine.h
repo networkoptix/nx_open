@@ -5,7 +5,7 @@
 #include <memory>
 
 #include <nx/sdk/analytics/helpers/engine.h>
-#include <nx/sdk/analytics/helpers/plugin.h>
+#include <nx/sdk/analytics/helpers/integration.h>
 #include <nx/sdk/analytics/i_uncompressed_video_frame.h>
 #include <nx/sdk/uuid.h>
 
@@ -18,10 +18,10 @@ namespace special_objects {
 class Engine: public nx::sdk::analytics::Engine
 {
 public:
-    Engine(nx::sdk::analytics::Plugin* plugin);
+    Engine(nx::sdk::analytics::Integration* integration);
     virtual ~Engine() override;
 
-    nx::sdk::analytics::Plugin* const plugin() const { return m_plugin; }
+    nx::sdk::analytics::Integration* const integration() const { return m_integration; }
 
 protected:
     virtual std::string manifestString() const override;
@@ -40,7 +40,7 @@ protected:
         const std::map<std::string, std::string>& params) override;
 
 private:
-    nx::sdk::analytics::Plugin* const m_plugin;
+    nx::sdk::analytics::Integration* const m_integration;
 };
 
 } // namespace special_objects

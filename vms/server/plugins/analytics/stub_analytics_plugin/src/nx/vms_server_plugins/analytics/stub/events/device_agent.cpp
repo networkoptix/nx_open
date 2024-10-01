@@ -141,7 +141,7 @@ static const std::vector<EventDescriptor> kEventsToFire = {
 } // namespace
 
 DeviceAgent::DeviceAgent(Engine* engine, const nx::sdk::IDeviceInfo* deviceInfo):
-    ConsumingDeviceAgent(deviceInfo, NX_DEBUG_ENABLE_OUTPUT, engine->plugin()->instanceId()),
+    ConsumingDeviceAgent(deviceInfo, NX_DEBUG_ENABLE_OUTPUT, engine->integration()->instanceId()),
     m_engine(engine)
 {
     startEventThread();

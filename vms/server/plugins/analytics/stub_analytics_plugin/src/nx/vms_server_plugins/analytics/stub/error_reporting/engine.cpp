@@ -23,9 +23,9 @@ namespace error_reporting {
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
-Engine::Engine(Plugin* plugin):
-    nx::sdk::analytics::Engine(NX_DEBUG_ENABLE_OUTPUT, plugin->instanceId()),
-    m_plugin(plugin)
+Engine::Engine(Integration* integration):
+    nx::sdk::analytics::Engine(NX_DEBUG_ENABLE_OUTPUT, integration->instanceId()),
+    m_integration(integration)
 {
 }
 
@@ -162,7 +162,8 @@ void Engine::getPluginSideSettings(
     if (std::strcmp(ini().returnErrorFromEngineOnGetPluginSideSettings,
         Ini::kErrorInsteadOfSettingsResponse) == 0)
     {
-        *outResult = error(ErrorCode::internalError, "Unable to get Plugin Side Settings in Engine.");
+        *outResult = error(ErrorCode::internalError,
+            "Unable to get Plugin-side settings in Engine.");
     }
     else if (std::strcmp(ini().returnErrorFromEngineOnGetPluginSideSettings,
         Ini::kSettingsResponseWithError) == 0)

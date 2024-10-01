@@ -56,7 +56,7 @@ private:
     std::map<std::string, nx::sdk::Uuid> m_trackIdByRef;
 
     int64_t m_lastFrameTimestampUs = -1;
-    std::string m_pluginHomeDir;
+    std::string m_integrationHomeDir;
     bool m_isInitialSettings = true;
 };
 

@@ -9,8 +9,8 @@
 namespace nx::vms_server_plugins::cloud_storage::sample {
 
 Engine::Engine(
-    const nx::sdk::cloud_storage::IArchiveUpdateHandler* deviceManagerHandler,
-    const std::string& pluginId)
+    const nx::sdk::cloud_storage::IArchiveUpdateHandler* /*deviceManagerHandler*/,
+    const std::string& /*integrationId*/)
 {
 }
 

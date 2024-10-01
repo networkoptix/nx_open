@@ -12,16 +12,16 @@ QString toString(ManifestErrorType errorType)
     {
         case ManifestErrorType::noError:
             return "";
-        case ManifestErrorType::emptyPluginId:
-            return "Plugin id is empty";
-        case ManifestErrorType::emptyPluginName:
-            return "Plugin name is empty";
-        case ManifestErrorType::emptyPluginDescription:
-            return "Plugin description is empty";
-        case ManifestErrorType::emptyPluginVersion:
-            return "Plugin version is empty";
-        case ManifestErrorType::emptyPluginVendor:
-            return "Plugin vendor is empty";
+        case ManifestErrorType::emptyIntegrationId:
+            return "Integration id is empty";
+        case ManifestErrorType::emptyIntegrationName:
+            return "Integration name is empty";
+        case ManifestErrorType::emptyIntegrationDescription:
+            return "Integration description is empty";
+        case ManifestErrorType::emptyIntegrationVersion:
+            return "Integration version is empty";
+        case ManifestErrorType::emptyIntegrationVendor:
+            return "Integration vendor is empty";
         case ManifestErrorType::emptyObjectActionId:
             return "Object Action id is empty";
         case ManifestErrorType::emptyObjectActionName:
@@ -58,7 +58,7 @@ QString toString(ManifestErrorType errorType)
             return "DeviceAgent settings model is defined but is not a correct JSON object";
         case ManifestErrorType::uncompressedFramePixelFormatIsNotSpecified:
         {
-            return "Uncompressed video stream is requested by the Plugin but its pixel format is "
+            return "Uncompressed video stream is requested by the Integration but its pixel format is "
                 "not specified";
         }
         case ManifestErrorType::excessiveUncompressedFramePixelFormatSpecification:

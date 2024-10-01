@@ -10,8 +10,8 @@ namespace nx::vms_server_plugins::analytics::stub::http_requests {
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
-Engine::Engine(nx::sdk::analytics::Plugin* plugin):
-    nx::sdk::analytics::Engine(/*enableOutput*/ true), m_plugin(plugin)
+Engine::Engine(nx::sdk::analytics::Integration* integration):
+    nx::sdk::analytics::Engine(/*enableOutput*/ true), m_integration(integration)
 {
 }
 
@@ -97,7 +97,7 @@ R"json(
 
 nx::sdk::Ptr<nx::sdk::IUtilityProvider> Engine::utilityProvider() const
 {
-    return m_plugin->utilityProvider();
+    return m_integration->utilityProvider();
 }
 
 } // namespace nx::vms_server_plugins::analytics::stub::http_requests

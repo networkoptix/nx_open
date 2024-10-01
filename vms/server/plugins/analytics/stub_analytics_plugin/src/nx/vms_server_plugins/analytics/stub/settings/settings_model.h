@@ -149,7 +149,7 @@ static const std::string kEngineSettingsModel = /*suppress newline*/ 1 + R"json(
                 {
                     "type": "SpinBox",
                     "name": ")json" + kEnginePluginSideSetting + R"json(",
-                    "caption": "Spin Box (plugin side)",
+                    "caption": "Spin Box (plugin-side)",
                     "defaultValue": 42,
                     "minValue": 0,
                     "maxValue": 100
@@ -519,7 +519,7 @@ static const std::string kRegularSettingsModelPart2 = /*suppress newline*/ 1 + R
                 },
                 {
                     "type": "SpinBox",
-                    "caption": "Device Agent SpinBox (plugin side)",
+                    "caption": "Device Agent SpinBox (plugin-side)",
                     "name": "pluginSideTestSpinBox",
                     "defaultValue": 42,
                     "minValue": 0,
@@ -689,7 +689,7 @@ static const std::string kRegularSettingsModelPart2 = /*suppress newline*/ 1 + R
                         },
                         {
                             "type": "SpinBox",
-                            "caption": "Device Agent SpinBox (plugin side)",
+                            "caption": "Device Agent SpinBox (plugin-side)",
                             "name": "pluginSideTestSpinBox2",
                             "defaultValue": 42,
                             "minValue": 0,

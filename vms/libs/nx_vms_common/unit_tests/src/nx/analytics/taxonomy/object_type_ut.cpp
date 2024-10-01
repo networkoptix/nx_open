@@ -37,16 +37,16 @@ struct ScopeInfo
     QString engineName;
     QString groupId;
     QString groupName;
-    QString pluginId;
-    QString pluginName;
+    QString integrationId;
+    QString integrationName;
 };
 #define ScopeInfo_Fields \
     (engineId) \
     (engineName) \
     (groupId) \
     (groupName) \
-    (pluginId) \
-    (pluginName)
+    (integrationId) \
+    (integrationName)
 
 bool operator<(const ScopeInfo& lhs, const ScopeInfo& rhs)
 {
@@ -211,11 +211,11 @@ protected:
 
                 const AbstractGroup* group = scope->group();
 
-                AbstractPlugin* plugin = nullptr;
+                AbstractIntegration* integration = nullptr;
                 if (engine)
                 {
                     scopeInfo.engineId = engine->id();
-                    plugin = engine->plugin();
+                    integration = engine->integration();
                 }
 
                 if (group)
@@ -236,10 +236,10 @@ protected:
                     ASSERT_EQ(scopeItr->groupName, group->name());
                 }
 
-                if (plugin)
+                if (integration)
                 {
-                    ASSERT_EQ(scopeItr->pluginId, plugin->id());
-                    ASSERT_EQ(scopeItr->pluginName, plugin->name());
+                    ASSERT_EQ(scopeItr->integrationId, integration->id());
+                    ASSERT_EQ(scopeItr->integrationName, integration->name());
                 }
             }
         }

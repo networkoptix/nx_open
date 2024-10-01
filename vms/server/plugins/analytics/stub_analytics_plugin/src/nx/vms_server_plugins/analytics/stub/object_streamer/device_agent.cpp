@@ -34,7 +34,7 @@ using nx::kit::Json;
 
 DeviceAgent::DeviceAgent(const nx::sdk::IDeviceInfo* deviceInfo, std::string pluginHomeDir):
     ConsumingDeviceAgent(deviceInfo, ini().enableOutput),
-    m_pluginHomeDir(std::move(pluginHomeDir))
+    m_integrationHomeDir(std::move(pluginHomeDir))
 {
 }
 
@@ -223,8 +223,8 @@ Result<const ISettingsResponse*> DeviceAgent::settingsReceived()
 
     if (m_isInitialSettings)
     {
-        manifestFilePath = defaultManifestFilePath(m_pluginHomeDir);
-        streamFilePath = defaultStreamFilePath(m_pluginHomeDir);
+        manifestFilePath = defaultManifestFilePath(m_integrationHomeDir);
+        streamFilePath = defaultStreamFilePath(m_integrationHomeDir);
         m_isInitialSettings = false;
     }
 
@@ -287,15 +287,15 @@ Ptr<ISettingsResponse> DeviceAgent::makeSettingsResponse(
 {
     Issues issues;
     const StreamInfo streamInfo = parseObjectStreamFile(
-        defaultStreamFilePath(m_pluginHomeDir),
+        defaultStreamFilePath(m_integrationHomeDir),
         &issues);
 
     reportIssues(issues);
 
     const std::string settingsModel = makeSettingsModel(
-        defaultManifestFilePath(m_pluginHomeDir),
-        defaultStreamFilePath(m_pluginHomeDir),
-        m_pluginHomeDir,
+        defaultManifestFilePath(m_integrationHomeDir),
+        defaultStreamFilePath(m_integrationHomeDir),
+        m_integrationHomeDir,
         streamInfo.objectTypeIds);
 
     std::map<std::string, std::string> values;

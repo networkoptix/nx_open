@@ -33,7 +33,7 @@ public:
 
 /**
  * A pointer to the this class instance is provided to the engine when
- * IPlugin::createEngine() is called. The engine should use it to periodically inform Server
+ * IIntegration::createEngine() is called. The engine should use it to periodically inform Server
  * about any Archive changes.
  */
 class IArchiveUpdateHandler: public Interface<IArchiveUpdateHandler>

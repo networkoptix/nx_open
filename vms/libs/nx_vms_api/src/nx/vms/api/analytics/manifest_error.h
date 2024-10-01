@@ -11,11 +11,11 @@ namespace nx::vms::api::analytics {
 
 NX_REFLECTION_ENUM_CLASS(ManifestErrorType,
     noError = 0,
-    emptyPluginId = 1 << 0,
-    emptyPluginName = 1 << 1,
-    emptyPluginDescription = 1 << 2,
-    emptyPluginVersion = 1 << 3,
-    emptyPluginVendor = 1 << 4,
+    emptyIntegrationId = 1 << 0,
+    emptyIntegrationName = 1 << 1,
+    emptyIntegrationDescription = 1 << 2,
+    emptyIntegrationVersion = 1 << 3,
+    emptyIntegrationVendor = 1 << 4,
 
     emptyObjectActionId = 1 << 5,
     emptyObjectActionName = 1 << 6,
@@ -42,7 +42,6 @@ NX_REFLECTION_ENUM_CLASS(ManifestErrorType,
     uncompressedFramePixelFormatIsNotSpecified = 1 << 22,
     excessiveUncompressedFramePixelFormatSpecification = 1 << 23
 )
-
 Q_DECLARE_FLAGS(ManifestErrorTypes, ManifestErrorType)
 Q_DECLARE_OPERATORS_FOR_FLAGS(ManifestErrorTypes)
 

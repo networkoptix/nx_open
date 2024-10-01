@@ -107,7 +107,7 @@ Ptr<IMetadataPacket> DeviceAgent::generateObjectMetadataPacket(int64_t frameTime
 }
 
 DeviceAgent::DeviceAgent(Engine* engine, const nx::sdk::IDeviceInfo* deviceInfo):
-    ConsumingDeviceAgent(deviceInfo, ini().enableOutput, engine->plugin()->instanceId()),
+    ConsumingDeviceAgent(deviceInfo, ini().enableOutput, engine->integration()->instanceId()),
     m_engine(engine)
 {
 }

@@ -20,7 +20,7 @@ public:
         InternalState internalState,
         std::unique_ptr<AbstractResourceSupportProxy> resourceSupportProxy);
 
-    virtual std::vector<AbstractPlugin*> plugins() const override;
+    virtual std::vector<AbstractIntegration*> integrations() const override;
 
     virtual std::vector<AbstractEngine*> engines() const override;
 
@@ -42,7 +42,7 @@ public:
 
     virtual AbstractEventType* eventTypeById(const QString& eventTypeById) const override;
 
-    virtual AbstractPlugin* pluginById(const QString& pluginId) const override;
+    virtual AbstractIntegration* integrationById(const QString& integrationId) const override;
 
     virtual AbstractEngine* engineById(const QString& engineId) const override;
 
@@ -64,7 +64,7 @@ private:
 
     mutable nx::Mutex m_mutex;
 
-    mutable std::vector<AbstractPlugin*> m_cachedPlugins;
+    mutable std::vector<AbstractIntegration*> m_cachedIntegrations;
     mutable std::vector<AbstractEngine*> m_cachedEngines;
     mutable std::vector<AbstractGroup*> m_cachedGroups;
 
