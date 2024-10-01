@@ -194,7 +194,9 @@ void LookupListImportEntriesModel::setRawData(const PreviewRawData& rawData)
         return;
 
     beginResetModel();
-    d->initColumnHeaders(d->listEntriesModel->listModel()->rawData().attributeNames);
+    // Initialize column headers only if they have not been initialized yet.
+    if (d->columnHeaders.empty())
+        d->initColumnHeaders(d->listEntriesModel->listModel()->rawData().attributeNames);
     d->previewData = rawData;
 
     if (d->previewData.size() && d->previewData.front().size() != d->columnHeaders.size())
