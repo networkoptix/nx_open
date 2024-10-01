@@ -558,11 +558,16 @@ public:
         const Parameters& parameters, WindowContext* context) override;
 };
 
-class SoundPlaybackActionCondition: public Condition
+class ItemMuteActionCondition: public Condition
 {
 public:
+    ItemMuteActionCondition(bool mute);
+
     virtual ActionVisibility check(
         const Parameters& parameters, WindowContext* context) override;
+
+private:
+    bool m_mute = false;
 };
 
 

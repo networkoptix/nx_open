@@ -252,6 +252,7 @@ public:
 
     nx::vms::client::desktop::RewindOverlay* rewindOverlay() const;
 
+    bool hasAudio() const;
     bool canBeMuted() const;
     bool isMuted() const;
     void setMuted(bool muted);
