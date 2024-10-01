@@ -16,9 +16,9 @@
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/fusion/model_functions.h>
+#include <nx/reflect/to_string.h>
 #include <nx/utils/qt_helpers.h>
 #include <nx/utils/std/algorithm.h>
-#include <nx/reflect/to_string.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/test_support/resource/camera_resource_stub.h>
 #include <nx/vms/common/test_support/test_context.h>
@@ -884,9 +884,9 @@ TEST_F(ResourceAccessManagerTest, checkCanModifyUserDigestAuthorizationEnabled)
         {powerUser, other},
         {powerUser, ldap}};
 
-    for (const auto source: users)
+    for (const auto& source: users)
     {
-        for (const auto target: users)
+        for (const auto& target: users)
         {
             const bool allowed = allowedScenarios.contains({source, target});
             checkCanModifyUserDigestAuthorizationEnabled(source, target, allowed);
@@ -925,9 +925,9 @@ TEST_F(ResourceAccessManagerTest, checkCanGrantPowerUserPermissions)
         {cloudAdministrator, ldap},
         {cloudAdministrator, other}};
 
-    for (const auto editor: users)
+    for (const auto& editor: users)
     {
-        for (const auto editee: users)
+        for (const auto& editee: users)
         {
             checkCanGrantPowerUserPermissionsViaInheritance(editor, editee, powerUsers,
                 allowedScenariosViaInheritance.contains({editor, editee}));
@@ -1753,7 +1753,7 @@ TEST_F(ResourceAccessManagerTest, accessRightsIndependency)
         {AccessRight::userInput, Qn::UserInputPermissions},
         {AccessRight::edit, Qn::GenericEditPermissions}};
 
-    for (const auto [testAccessRight, expectedPermissions]: kTestAccessRights)
+    for (const auto& [testAccessRight, expectedPermissions]: kTestAccessRights)
     {
         setOwnAccessRights(m_currentUser->getId(), {{layout->getId(), testAccessRight}});
         EXPECT_EQ(permissions(camera), Qn::ReadPermission | expectedPermissions);
