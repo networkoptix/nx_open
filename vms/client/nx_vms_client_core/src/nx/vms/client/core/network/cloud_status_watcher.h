@@ -107,6 +107,7 @@ public:
     std::optional<QnCloudSystem> cloudSystem(const QString& systemId) const;
     QnCloudSystemList cloudSystems() const;
     QnCloudSystemList recentCloudSystems() const;
+    void updateRefreshToken(const std::string& refreshToken);
 
     Q_INVOKABLE void resendActivationEmail(const QString& email);
 
@@ -123,6 +124,7 @@ signals:
 
     void cloudSystemsChanged(const QnCloudSystemList& currentCloudSystems);
     void recentCloudSystemsChanged();
+    void refreshTokenChanged(const std::string& refreshToken);
 
 private:
     struct Private;

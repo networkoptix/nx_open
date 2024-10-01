@@ -8,6 +8,8 @@
 #include <QtCore/QTimer>
 
 #include <nx/utils/log/log.h>
+#include <nx/vms/client/core/network/cloud_status_watcher.h>
+#include <nx/vms/client/desktop/application_context.h>
 
 namespace nx::vms::client::desktop {
 
@@ -281,11 +283,75 @@ struct SharedMemoryManager::Private
         this->lastSessionToken = token;
     }
 
+    void updateRefreshToken(std::string refreshToken)
+    {
+        SharedMemoryLocker guard(memoryInterface);
+        auto data = memoryInterface->data();
+        auto cloudUserSession = data.findProcessCloudUserSession(currentProcessPid);
+        if (!NX_ASSERT(cloudUserSession, "Cloud user is not registered in shared memory"))
+            return;
+
+        if (cloudUserSession->refreshToken == refreshToken)
+            return;
+
+        cloudUserSession->refreshToken = refreshToken;
+        memoryInterface->setData(data);
+        this->lastRefreshToken = refreshToken;
+    }
+
+    void enterCloudUserSession(const SharedMemoryData::CloudUserName& cloudUserName)
+    {
+        SharedMemoryLocker guard(memoryInterface);
+        auto data = memoryInterface->data();
+
+        if (!data.findCloudUserSession(cloudUserName))
+            data.addCloudUserSession(cloudUserName);
+
+        auto process = data.findProcess(currentProcessPid);
+        if (!NX_ASSERT(process, "Current process is not registered"))
+            return;
+
+        NX_DEBUG(this, "Process %1 enters cloud user %2", process->pid, process->cloudUserName);
+        process->cloudUserName = cloudUserName;
+
+        memoryInterface->setData(data);
+    }
+
+    void leaveCloudUserSession()
+    {
+        SharedMemoryLocker guard(memoryInterface);
+        auto data = memoryInterface->data();
+        auto process = findCurrentProcess(data);
+        if (!NX_ASSERT(process, "Process is not registered"))
+            return;
+
+        // In case of race condition current session can be already unregistered.
+        if (process->cloudUserName.empty())
+        {
+            NX_WARNING(this, "Current process session is already unregistered.");
+            return;
+        }
+        const auto cloudUserName = std::exchange(process->cloudUserName, {});
+        auto cloudUserSession = data.findCloudUserSession(cloudUserName);
+        if (!cloudUserSession)
+        {
+            NX_DEBUG(this, "Cloud user session has already been deleted");
+            return;
+        }
+
+        NX_DEBUG(
+            this, "Process %1 leaves cloud user session %2", process->pid, process->cloudUserName);
+        *cloudUserSession = {};
+
+        memoryInterface->setData(data);
+    }
+
     SharedMemoryInterfacePtr memoryInterface;
     ClientProcessExecutionInterfacePtr processInterface;
     const ClientProcessExecutionInterface::PidType currentProcessPid;
     QTimer watcher;
     std::string lastSessionToken;
+    std::string lastRefreshToken;
 };
 
 SharedMemoryManager::SharedMemoryManager(
@@ -306,6 +372,34 @@ SharedMemoryManager::SharedMemoryManager(
 SharedMemoryManager::~SharedMemoryManager()
 {
     d->unregisterCurrentInstance();
+}
+
+void SharedMemoryManager::connectToCloudStatusWatcher()
+{
+    if (auto cloudStatusWatcher = appContext()->cloudStatusWatcher())
+    {
+        connect(cloudStatusWatcher,
+            &nx::vms::client::core::CloudStatusWatcher::refreshTokenChanged,
+            this,
+            &SharedMemoryManager::updateRefreshToken);
+
+        connect(cloudStatusWatcher,
+            &nx::vms::client::core::CloudStatusWatcher::cloudLoginChanged,
+            this,
+            [this]()
+            {
+                const auto username = appContext()->cloudStatusWatcher()->credentials().username;
+                if (username.empty())
+                    d->leaveCloudUserSession();
+                else
+                    d->enterCloudUserSession(username);
+            });
+
+        connect(this,
+            &SharedMemoryManager::refreshTokenChanged,
+            cloudStatusWatcher,
+            &nx::vms::client::core::CloudStatusWatcher::updateRefreshToken);
+    }
 }
 
 int SharedMemoryManager::currentInstanceIndex() const
@@ -406,6 +500,16 @@ void SharedMemoryManager::processEvents()
                 emit sessionTokenChanged(d->lastSessionToken);
         }
     }
+
+    if (auto cloudUserSession = data.findProcessCloudUserSession(d->currentProcessPid))
+    {
+        if (d->lastRefreshToken != cloudUserSession->refreshToken)
+        {
+            d->lastRefreshToken = cloudUserSession->refreshToken;
+            if (!d->lastRefreshToken.empty())
+                emit refreshTokenChanged(d->lastRefreshToken);
+        }
+    }
 }
 
 void SharedMemoryManager::enterSession(const SessionId& sessionId)
@@ -421,6 +525,11 @@ bool SharedMemoryManager::leaveSession()
 void SharedMemoryManager::updateSessionToken(std::string token)
 {
     d->updateSessionToken(token);
+}
+
+void SharedMemoryManager::updateRefreshToken(std::string refreshToken)
+{
+    d->updateRefreshToken(refreshToken);
 }
 
 void SharedMemoryManager::requestLogoutFromCloud()

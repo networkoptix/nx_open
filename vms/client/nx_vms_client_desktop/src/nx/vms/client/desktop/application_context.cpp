@@ -725,6 +725,7 @@ ApplicationContext::ApplicationContext(
             d->performanceMonitor = std::make_unique<PerformanceMonitor>();
             d->statisticsModule = std::make_unique<ContextStatisticsModule>();
             d->initializeNetworkModules();
+            d->sharedMemoryManager->connectToCloudStatusWatcher(); //< Depends on CloudStatusWatcher.
             d->initializeSystemContext();
             d->initializeCrossSystemModules();
             d->mainSystemContext->startModuleDiscovery(moduleDiscoveryManager());

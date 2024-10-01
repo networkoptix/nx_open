@@ -182,6 +182,7 @@ struct ConnectActionsHandler::Private
 
     void reconnectToCloudIfNeeded()
     {
+        needReconnectToLastCloudSystem = true;
         auto cloudAuthDataHelper = FreshSessionTokenHelper::makeFreshSessionTokenHelper(
             q->mainWindowWidget(),
             tr("Login to %1", "%1 is the cloud name (like Nx Cloud)")
@@ -190,7 +191,10 @@ struct ConnectActionsHandler::Private
             /*actionText*/ "",
             FreshSessionTokenHelper::ActionType::issueRefreshToken);
 
-        const auto newCloudAuthData = cloudAuthDataHelper->requestAuthData();
+        const auto newCloudAuthData = cloudAuthDataHelper->requestAuthData(
+            [this] { return !needReconnectToLastCloudSystem; });
+
+        needReconnectToLastCloudSystem = false;
         if (newCloudAuthData.empty())
             return;
 
@@ -204,15 +208,9 @@ struct ConnectActionsHandler::Private
         }
         else
         {
+            needReconnectToLastCloudSystem = true;
             if (qnCloudStatusWatcher->status() == core::CloudStatusWatcher::Online)
-            {
-                q->connectToCloudSystem(
-                    {lastCloudSystemId, /*connectScenario*/ std::nullopt, /*useCache*/ false});
-            }
-            else
-            {
-                needReconnectToLastCloudSystem = true;
-            }
+                reconnectToLastCloudSystemIfNeeded();
         }
     }
 };
@@ -484,6 +482,13 @@ ConnectActionsHandler::ConnectActionsHandler(WindowContext* windowContext, QObje
     new TemporaryUserExpirationWatcher(this);
 
     connect(qnCloudStatusWatcher, &core::CloudStatusWatcher::statusChanged, this,
+        [this]
+        {
+            if (qnCloudStatusWatcher->status() == core::CloudStatusWatcher::Online)
+                d->reconnectToLastCloudSystemIfNeeded();
+        });
+
+    connect(qnCloudStatusWatcher, &core::CloudStatusWatcher::refreshTokenChanged, this,
         [this]
         {
             if (qnCloudStatusWatcher->status() == core::CloudStatusWatcher::Online)

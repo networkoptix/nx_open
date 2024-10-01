@@ -10,6 +10,8 @@ using ScreensBitMask = quint64;
 
 using SerializedSessionId = std::array<char, SessionId::kDataSize>;
 
+using SerializedCloudUserName = std::array<char, SharedMemoryData::kCoudUserNameSize>;
+
 struct SerializedSharedMemoryProcessData
 {
     /** Serialized representation of the session id. */
@@ -24,6 +26,8 @@ struct SerializedSharedMemoryProcessData
 
     /** Serialized representation of the command data. */
     std::array<char, SharedMemoryData::kCommandDataSize> commandData;
+
+    SerializedCloudUserName cloudUserName = {};
 };
 
 struct SerializedSharedMemorySessionData
@@ -32,12 +36,19 @@ struct SerializedSharedMemorySessionData
     std::array<char, SharedMemoryData::kTokenSize> token = {};
 };
 
+struct SerializedSharedMemoryCloudUserSession
+{
+    SerializedCloudUserName cloudUserName = {};
+    std::array<char, SharedMemoryData::kTokenSize> refreshToken = {};
+};
+
 struct SerializedSharedMemoryData
 {
-    static constexpr int kDataVersion = 4;
+    static constexpr int kDataVersion = 5;
 
     std::array<SerializedSharedMemoryProcessData, SharedMemoryData::kClientCount> processes;
     std::array<SerializedSharedMemorySessionData, SharedMemoryData::kClientCount> sessions;
+    std::array<SerializedSharedMemoryCloudUserSession, SharedMemoryData::kClientCount> cloudUserSessions;
 
     static SharedMemoryData deserializedData(const SerializedSharedMemoryData& source);
     static void serializeData(const SharedMemoryData& source, SerializedSharedMemoryData* target);

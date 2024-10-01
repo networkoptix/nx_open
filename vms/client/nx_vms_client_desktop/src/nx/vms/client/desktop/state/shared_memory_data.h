@@ -39,10 +39,12 @@ public:
     static constexpr int kClientCount = 64;
     static constexpr int kCommandDataSize = 64;
     static constexpr int kTokenSize = 8192;
+    static constexpr int kCoudUserNameSize = 255;
 
     using PidType = ClientProcessExecutionInterface::PidType;
     using ScreenUsageData = QSet<int>;
     using Token = std::string;
+    using CloudUserName = std::string;
 
     struct Process
     {
@@ -86,6 +88,8 @@ public:
          */
         QByteArray commandData;
 
+        CloudUserName cloudUserName = {};
+
         bool operator==(const Process& other) const = default;
     };
 
@@ -99,11 +103,21 @@ public:
         bool operator==(const Session& other) const = default;
     };
 
+    struct CloudUserSession
+    {
+        CloudUserName cloudUserName = {};
+        Token refreshToken;
+
+        bool operator==(const CloudUserSession& other) const = default;
+    };
+
     using Processes = std::array<Process, kClientCount>;
     using Sessions = std::array<Session, kClientCount>;
+    using CloudUserSessions = std::array<CloudUserSession, kClientCount>;
 
     Processes processes;
     Sessions sessions;
+    CloudUserSessions cloudUserSessions;
 
 public:
     /**
@@ -137,6 +151,23 @@ public:
      */
     Session* findProcessSession(PidType pid);
     const Session* findProcessSession(PidType pid) const;
+
+    /**
+     * Finds a cloud user data with any cloud user name.
+     */
+    const CloudUserSession* findCloudUserSession(CloudUserName cloudUserName) const;
+    CloudUserSession* findCloudUserSession(CloudUserName cloudUserName);
+
+    /**
+     * Add cloud user data.
+     */
+    CloudUserSession* addCloudUserSession(CloudUserName cloudUserName);
+
+    /**
+     * Finds the process session (if the process has a valid session id).
+     */
+    CloudUserSession* findProcessCloudUserSession(PidType pid);
+    const CloudUserSession* findProcessCloudUserSession(PidType pid) const;
 
     bool operator==(const SharedMemoryData& other) const = default;
 };

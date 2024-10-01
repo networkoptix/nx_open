@@ -145,6 +145,11 @@ RemoteSession::RemoteSession(
     tokenExpirationTimer->callOnTimeout([this] { d->updateTokenExpirationTime(); });
     tokenExpirationTimer->start();
     d->updateTokenExpirationTime();
+
+    connect(qnCloudStatusWatcher,
+        &nx::vms::client::core::CloudStatusWatcher::refreshTokenChanged,
+        this,
+        &RemoteSession::updateCloudSessionToken);
 }
 
 RemoteSession::~RemoteSession()

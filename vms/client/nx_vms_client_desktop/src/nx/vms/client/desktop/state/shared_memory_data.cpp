@@ -85,6 +85,53 @@ const SharedMemoryData::Session* SharedMemoryData::findProcessSession(PidType pi
     return process ? findSession(process->sessionId) : nullptr;
 }
 
+const SharedMemoryData::CloudUserSession* SharedMemoryData::findCloudUserSession(
+    CloudUserName cloudUserName) const
+{
+    auto cloudUserSession = ranges::find_if(cloudUserSessions,
+        [&](const CloudUserSession& cloudUserSession)
+        {
+            return cloudUserSession.cloudUserName == cloudUserName;
+        });
+
+    return cloudUserSession != cloudUserSessions.end() ? &(*cloudUserSession) : nullptr;
+}
+
+SharedMemoryData::CloudUserSession* SharedMemoryData::findCloudUserSession(
+    CloudUserName cloudUserName)
+{
+    return const_cast<CloudUserSession*>(
+        static_cast<const SharedMemoryData*>(this)->findCloudUserSession(cloudUserName));
+}
+
+SharedMemoryData::CloudUserSession* SharedMemoryData::addCloudUserSession(
+    CloudUserName cloudUserName)
+{
+    NX_ASSERT(!findCloudUserSession(cloudUserName), "Cloud user %1 already exists", cloudUserName);
+
+    auto empty = findCloudUserSession({});
+    if (!NX_ASSERT(empty, "No space for new cloud user name"))
+        return nullptr;
+
+    *empty = {.cloudUserName = cloudUserName};
+    return empty;
+}
+
+SharedMemoryData::CloudUserSession* SharedMemoryData::findProcessCloudUserSession(PidType pid)
+{
+    auto process = findProcess(pid);
+    return (process && process->cloudUserName != CloudUserName{})
+        ? findCloudUserSession(process->cloudUserName)
+        : nullptr;
+}
+
+const SharedMemoryData::CloudUserSession* SharedMemoryData::findProcessCloudUserSession(
+    PidType pid) const
+{
+    auto process = findProcess(pid);
+    return process ? findCloudUserSession(process->cloudUserName) : nullptr;
+}
+
 void PrintTo(SharedMemoryData::Command command, ::std::ostream* os)
 {
     *os << nx::reflect::toString(command);

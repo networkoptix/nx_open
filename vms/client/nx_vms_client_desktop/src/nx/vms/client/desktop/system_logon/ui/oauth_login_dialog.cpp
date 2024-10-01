@@ -3,6 +3,7 @@
 #include "oauth_login_dialog.h"
 
 #include <QtCore/QScopedValueRollback>
+#include <QtCore/QTimer>
 #include <QtCore/QUrlQuery>
 #include <QtWidgets/QBoxLayout>
 #include <QtWidgets/QLineEdit>
@@ -27,6 +28,7 @@ namespace {
 
 static constexpr QSize kLoginDialogSize(480, 480);
 bool kCloudLoginDialogIsDisplayed = false;
+constexpr int kCloseCheckIntervalMs = 250;
 
 } // namespace
 
@@ -72,7 +74,8 @@ nx::vms::client::core::CloudAuthData OauthLoginDialog::login(
     core::OauthClientType clientType,
     bool sessionAware,
     const QString& cloudSystem,
-    Qt::WindowFlags flags)
+    Qt::WindowFlags flags,
+    std::function<bool()> closeCondition)
 {
     if (kCloudLoginDialogIsDisplayed)
         return {};
@@ -89,6 +92,20 @@ nx::vms::client::core::CloudAuthData OauthLoginDialog::login(
         &OauthLoginDialog::authDataReady,
         dialog.get(),
         &OauthLoginDialog::accept);
+
+    if (closeCondition)
+    {
+        QTimer* timer = new QTimer(dialog.get());
+        connect(timer,
+            &QTimer::timeout,
+            dialog.get(),
+            [closeCondition, dialog = dialog.get()]()
+            {
+                if (closeCondition())
+                    dialog->reject();
+            });
+        timer->start(kCloseCheckIntervalMs);
+    }
 
     if (dialog->exec() == QDialog::Accepted)
         return dialog->authData();

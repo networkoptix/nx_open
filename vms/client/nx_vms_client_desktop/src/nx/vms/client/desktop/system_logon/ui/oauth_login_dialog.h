@@ -31,7 +31,8 @@ public:
         core::OauthClientType clientType,
         bool sessionAware,
         const QString& cloudSystem = QString(),
-        Qt::WindowFlags flags = {});
+        Qt::WindowFlags flags = {},
+        std::function<bool()> closeCondition = {});
 
     /** Helper method for access token 2FA validation. */
     static bool validateToken(
