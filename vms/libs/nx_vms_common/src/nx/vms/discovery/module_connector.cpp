@@ -113,7 +113,7 @@ bool ModuleConnector::isValidForConnect(const nx::network::SocketAddress& endpoi
 {
     const auto host = endpoint.address.toString();
     const auto& resolver = nx::network::SocketGlobals::addressResolver();
-    return !host.empty() && !host.starts_with('.') && !host.ends_with('.')
+    return nx::utils::Url::isValidHost(host) && !host.starts_with('.') && !host.ends_with('.')
         && ((endpoint.port != 0) || resolver.isCloudHostname(host));
 }
 
