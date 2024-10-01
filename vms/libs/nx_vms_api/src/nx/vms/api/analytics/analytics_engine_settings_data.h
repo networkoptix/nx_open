@@ -75,11 +75,6 @@ struct NX_VMS_API EngineSettingsRequest
     nx::Uuid analyticsEngineId;
 
     /**%apidoc
-     * Id of the Settings Model the values supposed to be applied to.
-     */
-    nx::Uuid settingsModelId;
-
-    /**%apidoc
      * Name-value map with setting values, using JSON types corresponding to each setting type.
      */
     QJsonObject settingsValues;
@@ -88,7 +83,6 @@ struct NX_VMS_API EngineSettingsRequest
 };
 #define nx_vms_api_analytics_EngineSettingsRequest_Fields \
     (analyticsEngineId) \
-    (settingsModelId) \
     (settingsValues)
 QN_FUSION_DECLARE_FUNCTIONS(EngineSettingsRequest, (json), NX_VMS_API)
 
