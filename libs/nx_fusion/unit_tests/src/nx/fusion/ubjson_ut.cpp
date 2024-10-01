@@ -185,7 +185,7 @@ TEST(UbJsonTest, customStructVectorDescendantFromAncestor)
 
     ASSERT_EQ(result.size(), testStructures.size());
 
-    for (int i = 0; i < testStructures.size(); ++i)
+    for (int i = 0; i < (int) testStructures.size(); ++i)
     {
         ASSERT_EQ(result[i].intData, testStructures[i].intData);
         ASSERT_EQ(result[i].stringData, testStructures[i].stringData);
@@ -223,7 +223,7 @@ TEST(UbJsonTest, customStructVectorAncestorFromDescendant)
 
     ASSERT_EQ(result.size(), testStructures.size());
 
-    for (int i = 0; i < testStructures.size(); ++i)
+    for (int i = 0; i < (int) testStructures.size(); ++i)
     {
         ASSERT_EQ(result[i].intData, testStructures[i].intData);
         ASSERT_EQ(result[i].stringData, testStructures[i].stringData);
