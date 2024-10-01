@@ -422,7 +422,7 @@ private:
         const std::vector<EngineScope<EntityType>> actualEntityTree = actualEntityTreeGetter();
 
         ASSERT_EQ(m_expectedEntityTree.size(), actualEntityTree.size());
-        for (int i = 0; i < actualEntityTree.size(); ++i)
+        for (int i = 0; i < (int) actualEntityTree.size(); ++i)
         {
             const EngineScope<EntityType> actualEngineScope = actualEntityTree[i];
             const TestEngineScope expectedEngineScope = m_expectedEntityTree[i];
@@ -432,7 +432,7 @@ private:
                 toUuid(m_expectedEntityTree[i].engine));
 
             ASSERT_EQ(actualEngineScope.groups.size(), expectedEngineScope.groups.size());
-            for (int j = 0; j < actualEngineScope.groups.size(); ++j)
+            for (int j = 0; j < (int) actualEngineScope.groups.size(); ++j)
             {
                 const GroupScope<EntityType> actualGroupScope = actualEngineScope.groups[j];
                 const TestGroupScope expectedGroupScope = expectedEngineScope.groups[j];
@@ -443,7 +443,7 @@ private:
                     ASSERT_TRUE(expectedGroupScope.group.isEmpty());
 
                 ASSERT_EQ(actualGroupScope.entities.size(), expectedGroupScope.entities.size());
-                for (int k = 0; k < actualGroupScope.entities.size(); ++k)
+                for (int k = 0; k < (int) actualGroupScope.entities.size(); ++k)
                 {
                     const EntityType* actualEntityType = actualGroupScope.entities[k];
                     const QString expectedEntityId = expectedGroupScope.entities[k];
