@@ -16,6 +16,7 @@ namespace nx::vms::client::core {
 struct AnalyticsEngineInfo
 {
     nx::Uuid id;
+    nx::Uuid integrationId;
     QString name;
     QString description;
     QString version;
@@ -33,6 +34,7 @@ struct AnalyticsEngineInfo
     {
         return {
             {"id", QVariant::fromValue(id)},
+            {"integrationId", QVariant::fromValue(integrationId)},
             {"name", name},
             {"description", description},
             {"version", version},

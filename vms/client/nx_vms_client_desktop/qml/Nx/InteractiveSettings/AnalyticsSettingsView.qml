@@ -69,19 +69,9 @@ StackLayout
             engineInfo: viewModel.currentEngineInfo
             licenseSummary: viewModel.currentEngineLicenseSummary
             request: viewModel.currentRequest
+
             checked:
                 checkable && viewModel.enabledEngines.indexOf(viewModel.currentEngineId) !== -1
-
-            onApproveClicked: (authCode) =>
-            {
-                viewModel.requestsModel.approve(request.requestId)
-            }
-
-            onRemoveClicked: () =>
-            {
-                if (request)
-                    viewModel.requestsModel.reject(request.requestId)
-            }
         }
 
         placeholderItem: SettingsPlaceholder
