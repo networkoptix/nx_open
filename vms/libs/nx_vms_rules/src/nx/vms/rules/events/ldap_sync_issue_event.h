@@ -17,7 +17,7 @@ public:
     LdapSyncIssueEvent() = default;
     LdapSyncIssueEvent(
         std::chrono::microseconds timestamp,
-        vms::api::EventReason reasonCode,
+        nx::vms::api::EventReason reason,
         std::chrono::seconds syncInterval,
         nx::Uuid serverId);
 
@@ -31,7 +31,7 @@ public:
     static const ItemDescriptor& manifest();
 
 private:
-    FIELD(vms::api::EventReason, reasonCode, setReasonCode)
+    FIELD(nx::vms::api::EventReason, reason, setReason)
     FIELD(std::chrono::seconds, syncInterval, setSyncInterval)
     FIELD(nx::Uuid, serverId, setServerId)
 

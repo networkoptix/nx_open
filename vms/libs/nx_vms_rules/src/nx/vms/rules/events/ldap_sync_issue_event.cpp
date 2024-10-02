@@ -42,7 +42,7 @@ LdapSyncIssueEvent::LdapSyncIssueEvent(std::chrono::microseconds timestamp,
     nx::Uuid serverId)
     :
     BasicEvent(timestamp),
-    m_reasonCode(reasonCode),
+    m_reason(reasonCode),
     m_syncInterval(syncInterval),
     m_serverId(serverId)
 {
@@ -56,7 +56,7 @@ QString LdapSyncIssueEvent::resourceKey() const
 QString LdapSyncIssueEvent::uniqueName() const
 {
     return utils::makeName(
-        BasicEvent::uniqueName(), QString::number(static_cast<int>(reasonCode())));
+        BasicEvent::uniqueName(), QString::number(static_cast<int>(reason())));
 }
 
 QVariantMap LdapSyncIssueEvent::details(
@@ -82,7 +82,7 @@ nx::vms::api::rules::PropertyMap LdapSyncIssueEvent::aggregatedInfo(
         if (!NX_ASSERT(ldapSyncIssueEvent, "Unexpected type of event: %1.", event->type()))
             continue;
 
-        const auto reason = ldapSyncIssueEvent->reasonCode();
+        const auto reason = ldapSyncIssueEvent->reason();
         if (!NX_ASSERT(isValidReason(reason), "Unexpected reasonCode value: %1.", reason))
             continue;
 
@@ -118,11 +118,11 @@ QString LdapSyncIssueEvent::reasonText(
     const nx::vms::api::rules::PropertyMap& aggregatedInfo) const
 {
     if (aggregatedInfo.isEmpty())
-        return reasonText(m_reasonCode);
+        return reasonText(m_reason);
 
     std::map<vms::api::EventReason, int> data;
     if (!NX_ASSERT(QJson::deserialize(aggregatedInfo[kReasonToCount], &data) && !data.empty()))
-        return reasonText(m_reasonCode);
+        return reasonText(m_reason);
 
     QStringList reasons;
     for (const auto& [reason, count]: data)
@@ -150,11 +150,9 @@ QString LdapSyncIssueEvent::reasonText(vms::api::EventReason reason) const
             return tr("Some LDAP users or groups were not found in the LDAP database.");
 
         default:
-            NX_ASSERT(false, "Unexpected reason: %1", reason);
-        return {};
+            NX_ASSERT(false, "Unexpected reason: %1", (int) reason);
+            return {};
     }
-
-    return {};
 }
 
 } // namespace nx::vms::rules
