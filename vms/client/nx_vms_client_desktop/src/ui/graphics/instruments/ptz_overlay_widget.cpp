@@ -12,8 +12,6 @@ const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kLight1Theme = {
 
 NX_DECLARE_COLORIZED_ICON(kZoomInIcon, "32x32/Solid/zoom_in.svg", kLight1Theme)
 NX_DECLARE_COLORIZED_ICON(kZoomOutIcon, "32x32/Solid/zoom_out.svg", kLight1Theme)
-NX_DECLARE_COLORIZED_ICON(kFocusInIcon, "32x32/Solid/focus_in.svg", kLight1Theme)
-NX_DECLARE_COLORIZED_ICON(kFocusOutIcon, "32x32/Solid/focus_out.svg", kLight1Theme)
 NX_DECLARE_COLORIZED_ICON(kFocusAutoIcon, "32x32/Solid/focus_auto.svg", kLight1Theme)
 
 PtzOverlayWidget::PtzOverlayWidget(QGraphicsItem* parent, Qt::WindowFlags windowFlags):
@@ -49,13 +47,13 @@ PtzOverlayWidget::PtzOverlayWidget(QGraphicsItem* parent, Qt::WindowFlags window
     m_zoomOutButton->setToolTip(tr("Zoom Out"));
 
     m_focusInButton = new PtzImageButtonWidget(this);
-    m_focusInButton->setIcon(qnSkin->icon(kFocusInIcon));
+    m_focusInButton->setIcon(qnSkin->icon(kZoomInIcon));
     m_focusInButton->setToolTip(tr("Focus Far"));
     m_focusInButton->setFrameShape(Qn::CustomFrame);
     m_focusInButton->setCustomFramePath(upRoundPath);
 
     m_focusOutButton = new PtzImageButtonWidget(this);
-    m_focusOutButton->setIcon(qnSkin->icon(kFocusOutIcon));
+    m_focusOutButton->setIcon(qnSkin->icon(kZoomOutIcon));
     m_focusOutButton->setToolTip(tr("Focus Near"));
     m_focusOutButton->setFrameShape(Qn::CustomFrame);
     m_focusOutButton->setCustomFramePath(downRoundPath);
