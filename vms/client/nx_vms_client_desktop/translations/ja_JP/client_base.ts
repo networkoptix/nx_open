@@ -1033,9 +1033,17 @@
       <source>User Manual...</source>
       <translation>ユーザーマニュアル...</translation>
     </message>
-    <message>
-      <source>Sound Playback...</source>
-      <translation>サウンド再生...</translation>
+    <message numerus="yes">
+      <source>Mute Items</source>
+      <translation>
+        <numerusform>アイテムをミュート</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Unmute Items</source>
+      <translation>
+        <numerusform>アイテムのミュートを解除</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -11563,17 +11571,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message>
       <source>Regions of Interest</source>
       <translation>関心領域</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::action::SoundPlaybackActionFactory</name>
-    <message>
-      <source>Enabled</source>
-      <translation>有効</translation>
-    </message>
-    <message>
-      <source>Disabled</source>
-      <translation>無効</translation>
     </message>
   </context>
   <context>

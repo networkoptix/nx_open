@@ -1033,9 +1033,17 @@
       <source>User Manual...</source>
       <translation type="unfinished">User Manual...</translation>
     </message>
-    <message>
-      <source>Sound Playback...</source>
-      <translation type="unfinished">Sound Playback...</translation>
+    <message numerus="yes">
+      <source>Mute Items</source>
+      <translation type="unfinished">
+        <numerusform>Mute Items</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Unmute Items</source>
+      <translation type="unfinished">
+        <numerusform>Unmute Items</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -11563,17 +11571,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>Regions of Interest</source>
       <translation>관심 영역</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::action::SoundPlaybackActionFactory</name>
-    <message>
-      <source>Enabled</source>
-      <translation>활성화</translation>
-    </message>
-    <message>
-      <source>Disabled</source>
-      <translation>비활성화</translation>
     </message>
   </context>
   <context>

@@ -1035,9 +1035,19 @@
       <source>User Manual...</source>
       <translation>Kullanım kılavuzu...</translation>
     </message>
-    <message>
-      <source>Sound Playback...</source>
-      <translation>Ses Oynatma...</translation>
+    <message numerus="yes">
+      <source>Mute Items</source>
+      <translation type="unfinished">
+        <numerusform>Mute Items</numerusform>
+        <numerusform>Mute Items</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Unmute Items</source>
+      <translation type="unfinished">
+        <numerusform>Unmute Items</numerusform>
+        <numerusform>Unmute Items</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -11711,17 +11721,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message>
       <source>Regions of Interest</source>
       <translation>Özelleştirilmiş Bölgeler</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::action::SoundPlaybackActionFactory</name>
-    <message>
-      <source>Enabled</source>
-      <translation>Etkin</translation>
-    </message>
-    <message>
-      <source>Disabled</source>
-      <translation>Devre Dışı</translation>
     </message>
   </context>
   <context>

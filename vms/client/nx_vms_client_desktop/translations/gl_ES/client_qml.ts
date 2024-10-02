@@ -1097,7 +1097,7 @@ to activate PTZ</translation>
     <name>SelectLayoutDialog</name>
     <message>
       <source>Select layout</source>
-      <translation type="unfinished">Select layout</translation>
+      <translation>Seleccionar deseño</translation>
     </message>
   </context>
   <context>
@@ -1108,7 +1108,7 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>Select</source>
-      <translation type="unfinished">Select</translation>
+      <translation>Seleccionar</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -1268,7 +1268,7 @@ to activate PTZ</translation>
     <name>StyledRadioButton</name>
     <message>
       <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
+      <translation>ID lóxico</translation>
     </message>
   </context>
   <context>

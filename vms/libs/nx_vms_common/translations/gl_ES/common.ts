@@ -2326,7 +2326,7 @@
     </message>
     <message>
       <source>Source camera</source>
-      <translation type="unfinished">Source camera</translation>
+      <translation>Cámara fonte</translation>
     </message>
     <message>
       <source>Also show on source camera</source>
