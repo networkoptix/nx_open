@@ -99,6 +99,9 @@ struct NX_VMS_COMMON_API ActionData
 
 QN_FUSION_DECLARE_FUNCTIONS(ActionData, (ubjson)(json)(xml)(csv_record), NX_VMS_COMMON_API)
 
+// Helper function for log data sorting & merging.
+inline qint64 getTimestamp(const ActionData& data) { return data.eventParams.eventTimestampUsec; }
+
 /**
  * Base class for business actions
  */

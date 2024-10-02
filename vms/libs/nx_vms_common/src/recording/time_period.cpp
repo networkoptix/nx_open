@@ -221,12 +221,13 @@ qint64 QnTimePeriod::bound(qint64 timeMs) const
 
 nx::vms::api::ServerTimePeriod QnTimePeriod::toServerPeriod() const
 {
-    return isInfinite()
-        ? nx::vms::api::ServerTimePeriod::infinite()
-        : nx::vms::api::ServerTimePeriod{
-            .startTimeMs = startTime(),
-            .durationMs = duration(),
-        };
+    auto result = nx::vms::api::ServerTimePeriod{
+        .startTimeMs = startTime()};
+
+    if (!isInfinite())
+        result.durationMs = duration();
+
+    return result;
 }
 
 void PrintTo(const QnTimePeriod& period, ::std::ostream* os)

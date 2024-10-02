@@ -12,7 +12,7 @@
 namespace nx::vms::api::rules {
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(EventLogFilter, (json), EventLogFilter_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(EventLogRecord, (json)(sql_record), EventLogRecord_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(EventLogRecord, (json)(ubjson)(sql_record), EventLogRecord_Fields)
 
 std::string toString(const EventLogRecord& record)
 {

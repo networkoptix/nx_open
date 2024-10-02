@@ -115,9 +115,12 @@ struct NX_VMS_API EventLogRecord
     (timestampMs)(eventData)(actionData)(aggregatedInfo)(ruleId)(flags)(serverId)
 
 NX_REFLECTION_INSTRUMENT(EventLogRecord, EventLogRecord_Fields)
-QN_FUSION_DECLARE_FUNCTIONS(EventLogRecord, (json)(sql_record), NX_VMS_API)
+QN_FUSION_DECLARE_FUNCTIONS(EventLogRecord, (json)(ubjson)(sql_record), NX_VMS_API)
 
 std::string NX_VMS_API toString(const EventLogRecord& record);
+
+// Helper function for log data sorting & merging.
+inline quint64 getTimestamp(const EventLogRecord& record) { return record.timestampMs.count(); }
 
 } // namespace nx::vms::rules
 
