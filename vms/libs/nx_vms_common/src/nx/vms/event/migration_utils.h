@@ -9,7 +9,6 @@
 
 namespace nx::vms::event {
 
-// TODO: #amalov Use this mapping in migration code.
 inline const QMap<EventType, QString> eventTypesMap = {
     {EventType::analyticsSdkEvent, QStringLiteral("nx.events.analytics")},
     {EventType::analyticsSdkObjectDetected, QStringLiteral("nx.events.analyticsObject")},
@@ -58,6 +57,8 @@ inline const QMap<ActionType, QString> actionTypesMap = {
 };
 
 NX_VMS_COMMON_API EventType convertToOldEvent(const QString& typeId);
-NX_VMS_COMMON_API QString convertToNewEvent(const EventType& eventType);
+NX_VMS_COMMON_API QString convertToNewEvent(EventType eventType);
+
+NX_VMS_COMMON_API QString convertToNewAction(ActionType actionType);
 
 } // namespace nx::vms::event

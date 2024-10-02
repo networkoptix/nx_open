@@ -13,7 +13,7 @@ EventType convertToOldEvent(const QString& typeId)
         []
         {
             QMap<QStringView, EventType> result;
-            for (auto [oldType, newType]: nx::utils::keyValueRange(eventTypesMap))
+            for (auto [oldType, newType]: nx::utils::constKeyValueRange(eventTypesMap))
                 result[newType] = oldType;
 
             return result;
@@ -25,22 +25,14 @@ EventType convertToOldEvent(const QString& typeId)
     return result;
 }
 
-QString convertToNewEvent(const EventType& eventType)
+QString convertToNewEvent(EventType eventType)
 {
-    static const auto eventTypeMap =
-        []
-        {
-            QMap<EventType, QStringView> result;
-            for (auto [oldType, newType]: nx::utils::keyValueRange(eventTypesMap))
-                result[oldType] = newType;
+    return eventTypesMap.value(eventType);
+}
 
-            return result;
-        }();
-
-    const auto result = eventTypeMap.value(eventType);
-    NX_ASSERT(!result.isEmpty());
-
-    return result.toString();
+QString convertToNewAction(ActionType actionType)
+{
+    return actionTypesMap.value(actionType);
 }
 
 } // namespace nx::vms::event
