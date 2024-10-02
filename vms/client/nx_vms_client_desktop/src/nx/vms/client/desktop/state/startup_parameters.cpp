@@ -14,7 +14,7 @@ StartupParameters StartupParameters::fromCommandLineParams(const QnStartupParame
     if (!params.sessionId.isEmpty() && !params.stateFileName.isEmpty())
     {
         result.mode = Mode::loadSession;
-        result.sessionId = SessionId::fromString(params.sessionId);
+        result.sessionId = SessionId::fromString(params.sessionId.toStdString());
         result.key = params.stateFileName;
         result.logonData = params.parseAuthenticationString();
     }
@@ -69,7 +69,7 @@ QStringList StartupParameters::toCommandLineParams() const
         {
             // Session id and file name should be passed.
             result << QnStartupParameters::kSessionIdKey;
-            result << sessionId;
+            result << sessionId.toQString();
             result << QnStartupParameters::kStateFileKey;
             result << key;
             result << QnStartupParameters::kAuthenticationStringKey;

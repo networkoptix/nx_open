@@ -233,7 +233,7 @@ struct SharedMemoryManager::Private
             return;
 
         NX_DEBUG(this, "Process %1 enters session %2",
-            process->pid, process->sessionId.debugRepresentation());
+            process->pid, process->sessionId.toLogString());
         process->sessionId = sessionId;
 
         memoryInterface->setData(data);
@@ -248,7 +248,7 @@ struct SharedMemoryManager::Private
             return false;
 
         // In case of race condition current session can be already unregistered.
-        if (process->sessionId == SessionId())
+        if (!process->sessionId)
         {
             NX_WARNING(this, "Current process session is already unregistered.");
             return false;
@@ -260,7 +260,7 @@ struct SharedMemoryManager::Private
             return false;
 
         NX_DEBUG(this, "Process %1 leaves session %2",
-            process->pid, process->sessionId.debugRepresentation());
+            process->pid, process->sessionId.toLogString());
 
         const bool sessionIsStillActive = sessionHasOtherProcesses(data, sessionId);
         if (!sessionIsStillActive)

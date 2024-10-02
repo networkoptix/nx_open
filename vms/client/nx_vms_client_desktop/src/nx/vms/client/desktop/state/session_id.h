@@ -6,36 +6,54 @@
 #include <QtCore/QString>
 
 #include <nx/reflect/instrument.h>
+#include <nx/utils/uuid.h>
 
 namespace nx::vms::client::desktop {
 
 /**
- * Session id, which will be used as a folder name to keep session state. Case-insensitive, stable,
+ * Session ID, which will be used as a folder name to keep session state. Case-insensitive, stable,
  * uses only filesystem-allowed symbols.
  */
 struct NX_VMS_CLIENT_DESKTOP_API SessionId
 {
-    /** Byte size of the serialized session id representation. */
+    /** Byte size of the serialized session ID representation. */
     static constexpr int kDataSize = 32;
 
     SessionId();
-    SessionId(const QString& systemId, const QString& userId);
+
+    /**
+     * Constructs SessionId for the given systemId and userId.
+     * localSystemId is not used in the session ID calculation. It is used to get the legacy
+     * session ID which used local IDs only.
+     */
+    SessionId(const nx::Uuid& localSystemId, const QString& systemId, const QString& userId);
+
+    bool isEmpty() const;
+    operator bool() const;
 
     static SessionId deserialized(const QByteArray& serializedValue);
     QByteArray serialized() const;
 
-    operator QString() const;
-    QString toString() const;
+    std::string toString() const;
+    QString toQString() const;
 
-    static SessionId fromString(const QString& value);
+    /**
+     * Returns the string representation calculated from the user ID and always the
+     * **local system ID**. New session IDs are calculated from cloud system ID when system is
+     * linked to the cloud.
+     */
+    QString legacyIdString() const;
 
-    QString debugRepresentation() const;
+    static SessionId fromString(const std::string& value);
+
+    QString toLogString() const;
 
     bool operator!=(const SessionId& other) const;
     bool operator==(const SessionId& other) const;
 
 private:
     QByteArray m_bytes;
+    nx::Uuid m_localSystemId;
     QString m_systemId;
     QString m_userId;
 };

@@ -37,9 +37,11 @@ RemoteSession::RemoteSession(
     base_type(connection, systemContext, parent)
 {
     const auto username = QString::fromStdString(connection->credentials().username);
-    const auto localSystemId = connection->moduleInformation().localSystemId.toString();
-    m_sessionId = SessionId(username, localSystemId);
-    NX_DEBUG(this, "Initialize session as %1 in %2", username, localSystemId);
+    const nx::Uuid localSystemId = connection->moduleInformation().localSystemId;
+    const QString systemId = ::helpers::getTargetSystemId(connection->moduleInformation());
+
+    m_sessionId = SessionId(localSystemId, systemId, username);
+    NX_DEBUG(this, "Initialize session as %1 in %2", username, systemId);
 
     auto sharedMemoryManager = appContext()->sharedMemoryManager();
 

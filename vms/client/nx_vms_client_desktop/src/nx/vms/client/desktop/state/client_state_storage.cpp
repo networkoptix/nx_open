@@ -25,14 +25,15 @@ void ClientStateStorage::writeCommonSubstate(const SessionState& commonState)
     writeStateInternal("", kCommonSubstateFileName, commonState);
 }
 
-SessionState ClientStateStorage::readSystemSubstate(const QString& sessionId) const
+SessionState ClientStateStorage::readSystemSubstate(const SessionId& sessionId) const
 {
     return readStateInternal(sessionId, kSystemSubstateFileName, /*mayFail*/ true);
 }
 
-void ClientStateStorage::writeSystemSubstate(const QString& sessionId, const SessionState& systemState)
+void ClientStateStorage::writeSystemSubstate(
+    const SessionId& sessionId, const SessionState& systemState)
 {
-    writeStateInternal(sessionId, kSystemSubstateFileName, systemState);
+    writeStateInternal(sessionId.toQString(), kSystemSubstateFileName, systemState);
 }
 
 SessionState ClientStateStorage::takeTemporaryState(const QString& key)
@@ -55,10 +56,10 @@ void ClientStateStorage::putTemporaryState(const QString& key, const SessionStat
     writeStateInternal(kTemporaryStatesDirName, key, state);
 }
 
-void ClientStateStorage::clearSession(const QString& sessionId)
+void ClientStateStorage::clearSession(const SessionId& sessionId)
 {
     QDir directory(m_root);
-    if (!directory.cd(sessionId))
+    if (!directory.cd(sessionId.toQString()))
         return;
 
     auto files = directory.entryList(QDir::Files, QDir::Name);
@@ -69,44 +70,76 @@ void ClientStateStorage::clearSession(const QString& sessionId)
     }
 }
 
-FullSessionState ClientStateStorage::readFullSessionState(const QString& sessionId) const
+FullSessionState ClientStateStorage::readFullSessionState(const SessionId& sessionId) const
 {
-    QDir directory(m_root);
-    FullSessionState result;
-
-    if (directory.cd(sessionId))
-    {
-        auto files = directory.entryList(QDir::Files, QDir::Name);
-        for (const auto& name: files)
+    const auto readState =
+        [this](const QString& dirName) -> std::optional<FullSessionState>
         {
-            if (name == kSystemSubstateFileName)
-                continue;
+            QDir directory(m_root);
+            if (!directory.cd(dirName))
+                return std::nullopt;
 
-            auto path = directory.absoluteFilePath(name);
-            auto [data, success] = readStateDirectly(path);
-            if (success)
-                result[name] = data;
-        }
-    }
+            FullSessionState result;
 
-    return result;
+            const QStringList files = directory.entryList(QDir::Files, QDir::Name);
+            for (const QString& name: files)
+            {
+                if (name == kSystemSubstateFileName)
+                    continue;
+
+                const QString path = directory.absoluteFilePath(name);
+                auto [data, success] = readStateDirectly(path);
+                if (success)
+                    result[name] = data;
+            }
+
+            return result;
+        };
+
+    const QString sessionIdString = sessionId.toQString();
+
+    auto state = readState(sessionIdString);
+    if (state)
+        return *state;
+
+    // If failed to read the state, try to read the state from the legacy directory name based on
+    // the local system ID.
+    const QString legacySessionIdString = sessionId.legacyIdString();
+
+    if (sessionIdString != legacySessionIdString)
+        state = readState(legacySessionIdString);
+
+    return state.value_or(FullSessionState{});
 }
 
 SessionState ClientStateStorage::readSessionState(
-    const QString& sessionId,
-    const QString& key) const
+    const SessionId& sessionId, const QString& key) const
 {
     NX_ASSERT(key != kSystemSubstateFileName, "Full session restore should not use autosave files");
     return readStateInternal(sessionId, key, /*mayFail*/ false);
 }
 
 void ClientStateStorage::writeSessionState(
-    const QString& sessionId,
-    const QString& key,
-    const SessionState& state)
+    const SessionId& sessionId, const QString& key, const SessionState& state)
 {
     NX_ASSERT(key != kSystemSubstateFileName, "Full session restore should not use autosave files");
-    writeStateInternal(sessionId, key, state);
+    writeStateInternal(sessionId.toQString(), key, state);
+}
+
+SessionState ClientStateStorage::readStateInternal(
+    const SessionId& sessionId, const QString& name, bool mayFail) const
+{
+    const QString sessionIdString = sessionId.toQString();
+    const QString legacySessionIdString = sessionId.legacyIdString();
+    const bool mayTryLegacyId = (sessionIdString != legacySessionIdString);
+
+    const SessionState state = readStateInternal(sessionIdString, name, mayFail || mayTryLegacyId);
+    if (!state.isEmpty() || !mayTryLegacyId)
+        return state;
+
+    // If failed to read the state, try to read the state from the legacy directory name based on
+    // the local system ID.
+    return readStateInternal(legacySessionIdString, kSystemSubstateFileName, mayFail);
 }
 
 SessionState ClientStateStorage::readStateInternal(

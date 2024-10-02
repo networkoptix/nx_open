@@ -17,9 +17,10 @@ namespace test {
 
 namespace {
 
-static const QString kExampleSystemId = nx::Uuid::createUuid().toString();
+static const auto kExampleSystemLocalId = nx::Uuid::createUuid();
+static const QString kExampleSystemId = kExampleSystemLocalId.toString();
 static const QString kExampleUserName = "SomeUser@someSystem.com";
-static const SessionId kSessionId(kExampleSystemId, kExampleUserName);
+static const SessionId kSessionId(kExampleSystemLocalId, kExampleSystemId, kExampleUserName);
 
 SessionState makeRandomSessionState()
 {
@@ -100,7 +101,7 @@ TEST_F(ClientStateStorageTest, readSystemSubstate)
     createFile(
         ClientStateStorage::kSystemSubstateFileName,
         QJson::serialized(data),
-        kSessionId);
+        kSessionId.toQString());
     auto state = stateStorage()->readSystemSubstate(kSessionId);
     ASSERT_EQ(state, data);
 }
@@ -137,9 +138,9 @@ TEST_F(ClientStateStorageTest, cleanSessionState)
     const auto data = makeRandomSessionState();
     stateStorage()->writeSystemSubstate(kSessionId, data); //< Should not be deleted.
 
-    createFile("1", QJson::serialized(makeRandomSessionState()), kSessionId);
-    createFile("2", QJson::serialized(makeRandomSessionState()), kSessionId);
-    createFile("3", QJson::serialized(makeRandomSessionState()), kSessionId);
+    createFile("1", QJson::serialized(makeRandomSessionState()), kSessionId.toQString());
+    createFile("2", QJson::serialized(makeRandomSessionState()), kSessionId.toQString());
+    createFile("3", QJson::serialized(makeRandomSessionState()), kSessionId.toQString());
 
     stateStorage()->clearSession(kSessionId);
     ASSERT_EQ(stateStorage()->readFullSessionState(kSessionId).size(), 0);
@@ -153,9 +154,9 @@ TEST_F(ClientStateStorageTest, readSessionState)
     auto state1 = makeRandomSessionState();
     auto state2 = makeRandomSessionState();
     auto state3 = makeRandomSessionState();
-    createFile("1", QJson::serialized(state1), kSessionId);
-    createFile("2", QJson::serialized(state2), kSessionId);
-    createFile("3", QJson::serialized(state3), kSessionId);
+    createFile("1", QJson::serialized(state1), kSessionId.toQString());
+    createFile("2", QJson::serialized(state2), kSessionId.toQString());
+    createFile("3", QJson::serialized(state3), kSessionId.toQString());
 
     auto fullState = stateStorage()->readFullSessionState(kSessionId);
     ASSERT_EQ(fullState.size(), 3);
