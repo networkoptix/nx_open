@@ -248,7 +248,9 @@ bool QnStreamRecorder::prepareToStart(const QnConstAbstractMediaDataPtr& mediaDa
 
 bool QnStreamRecorder::dataHoleDetected(const QnConstAbstractMediaDataPtr& md)
 {
-    if (m_endDateTimeUs != (int64_t) AV_NOPTS_VALUE && md->timestamp < m_endDateTimeUs - 1000LL * 1000)
+    if (m_endDateTimeUs != (int64_t) AV_NOPTS_VALUE
+        && (md->dataType == QnAbstractMediaData::VIDEO || md->dataType == QnAbstractMediaData::AUDIO)
+        && md->timestamp < m_endDateTimeUs - 1000LL * 1000)
     {
         NX_DEBUG(
             this, "Time translated into the past for %1 s(%2 - %3).  Closing file",
@@ -261,7 +263,7 @@ bool QnStreamRecorder::dataHoleDetected(const QnConstAbstractMediaDataPtr& md)
 }
 
 QnAviArchiveMetadata QnStreamRecorder::prepareMetaData(
-    const QnConstAbstractMediaDataPtr& mediaData, const QnConstResourceVideoLayoutPtr& videoLayout)
+    const QnConstAbstractMediaDataPtr&, const QnConstResourceVideoLayoutPtr& videoLayout)
 {
     QnAviArchiveMetadata result;
     result.version = QnAviArchiveMetadata::kVersionBeforeTheIntegrityCheck;
@@ -382,10 +384,8 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
         return true;
     }
 
-    // Slow analytics plugin can provide metadata packets with timestamps less than latest video packet.
-    // Reordering buffer tries to fix it, but the metadata packet can have too old timestamp if delay is larger
-    // than the maximum size of the reordering buffer.
-    m_endDateTimeUs = std::max(m_endDateTimeUs, (int64_t) md->timestamp);
+    if (md->dataType == QnAbstractMediaData::VIDEO || md->dataType == QnAbstractMediaData::AUDIO)
+        m_endDateTimeUs = std::max(m_endDateTimeUs, (int64_t) md->timestamp);
 
     const auto frameMediaType = toAvMediaType(md->dataType);
     const auto contextMediaType = streamAvMediaType(md->dataType, streamIndex);
