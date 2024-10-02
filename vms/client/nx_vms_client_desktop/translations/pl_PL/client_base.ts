@@ -1114,9 +1114,23 @@
       <source>Convert to Shared Layout</source>
       <translation>Konwertuj na układ udostępniony</translation>
     </message>
-    <message>
-      <source>Sound Playback...</source>
-      <translation type="unfinished">Sound Playback...</translation>
+    <message numerus="yes">
+      <source>Mute Items</source>
+      <translation type="unfinished">
+        <numerusform>Mute Items</numerusform>
+        <numerusform>Mute Items</numerusform>
+        <numerusform>Mute Items</numerusform>
+        <numerusform>Mute Items</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Unmute Items</source>
+      <translation type="unfinished">
+        <numerusform>Unmute Items</numerusform>
+        <numerusform>Unmute Items</numerusform>
+        <numerusform>Unmute Items</numerusform>
+        <numerusform>Unmute Items</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -4220,7 +4234,7 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>Mute</source>
-      <translation type="unfinished">Mute</translation>
+      <translation>Wyciszenie</translation>
     </message>
   </context>
   <context>
@@ -13503,17 +13517,6 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     <message>
       <source>Start Showreel</source>
       <translation>Uruchom sekwencję</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::action::SoundPlaybackActionFactory</name>
-    <message>
-      <source>Enabled</source>
-      <translation>Włączone</translation>
-    </message>
-    <message>
-      <source>Disabled</source>
-      <translation>Wyłączony</translation>
     </message>
   </context>
   <context>

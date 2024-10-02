@@ -1104,9 +1104,19 @@
       <source>Convert to Shared Layout</source>
       <translation type="unfinished">Convert to Shared Layout</translation>
     </message>
-    <message>
-      <source>Sound Playback...</source>
-      <translation type="unfinished">Sound Playback...</translation>
+    <message numerus="yes">
+      <source>Mute Items</source>
+      <translation type="unfinished">
+        <numerusform>Mute Items</numerusform>
+        <numerusform>Mute Items</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Unmute Items</source>
+      <translation type="unfinished">
+        <numerusform>Unmute Items</numerusform>
+        <numerusform>Unmute Items</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -13131,17 +13141,6 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Start Showreel</source>
       <translation>Start Showreel</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::action::SoundPlaybackActionFactory</name>
-    <message>
-      <source>Enabled</source>
-      <translation>Enabled</translation>
-    </message>
-    <message>
-      <source>Disabled</source>
-      <translation>Disabled</translation>
     </message>
   </context>
   <context>

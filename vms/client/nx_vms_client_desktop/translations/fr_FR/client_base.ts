@@ -1104,9 +1104,19 @@
       <source>Convert to Shared Layout</source>
       <translation>Convertir en mise en page partagée</translation>
     </message>
-    <message>
-      <source>Sound Playback...</source>
-      <translation>Lecture du son...</translation>
+    <message numerus="yes">
+      <source>Mute Items</source>
+      <translation>
+        <numerusform>Élément muet</numerusform>
+        <numerusform>Éléments muets</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Unmute Items</source>
+      <translation type="unfinished">
+        <numerusform>Unmute Items</numerusform>
+        <numerusform>Unmute Items</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -13132,17 +13142,6 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
     <message>
       <source>Start Showreel</source>
       <translation>Démarrer Showreel</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::action::SoundPlaybackActionFactory</name>
-    <message>
-      <source>Enabled</source>
-      <translation>Activé</translation>
-    </message>
-    <message>
-      <source>Disabled</source>
-      <translation>Désactivé</translation>
     </message>
   </context>
   <context>
