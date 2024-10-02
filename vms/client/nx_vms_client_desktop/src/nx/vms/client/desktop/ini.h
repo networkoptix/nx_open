@@ -313,7 +313,7 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
         "[Feature] Makes the option to send emails via cloud service available in the\n"
         "outgoing email settings dialog.");
 
-    NX_INI_FLAG(true, enableMultiSystemTabBar,
+    NX_INI_FLAG(false, enableMultiSystemTabBar,
         "[Feature] Enable double layer tab bar.");
 
     // VMS-34514
