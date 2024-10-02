@@ -269,9 +269,11 @@ struct LookupListActionHandler::Private
 
         descriptor.data.entries.push_back(entryToAdd);
         descriptor.successHandler =
-            [this]()
+            [this, listName = descriptor.data.name]()
             {
-                QnMessageBox::success(q->mainWindowWidget(), tr("Object was added to the List"));
+                QnMessageBox::success(q->mainWindowWidget(),
+                    tr("Object was added to the List"),
+                    tr("An object has been added to the \"%1\" successfully").arg(listName));
             };
     }
 };
