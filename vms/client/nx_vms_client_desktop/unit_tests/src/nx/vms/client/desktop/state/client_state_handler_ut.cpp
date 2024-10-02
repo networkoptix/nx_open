@@ -30,9 +30,10 @@ namespace test {
 namespace {
 
 static const StartupParameters kEmptyStartupParameters{};
-static const QString kExampleSystemId = nx::Uuid::createUuid().toSimpleString();
+static const auto kExampleSystemLocalId = nx::Uuid::createUuid();
+static const QString kExampleSystemId = kExampleSystemLocalId.toSimpleString();
 static const QString kExampleUserName = "SomeUser@someSystem.com";
-static const SessionId kSessionId(kExampleSystemId, kExampleUserName);
+static const SessionId kSessionId(kExampleSystemLocalId, kExampleSystemId, kExampleUserName);
 static const QString kDelegateId = "unit_test_" + nx::Uuid::createUuid().toSimpleString();
 static const int kNumberOfDelegates = 2;
 static const QString kRandomFilenameBase = nx::Uuid::createUuid().toSimpleString();
@@ -292,7 +293,7 @@ protected:
         createFile(
             ClientStateStorage::kSystemSubstateFileName,
             QJson::serialized(makeSessionState(temp, ClientStateDelegate::Substate::allParameters)),
-            kSessionId);
+            kSessionId.toQString());
     }
 
     void givenTemporaryState()
@@ -330,7 +331,7 @@ protected:
             session.path = createFile(
                 session.filename,
                 QJson::serialized(specificState),
-                kSessionId);
+                kSessionId.toQString());
             const SessionState independentState = makeSessionState(
                 session,
                 ClientStateDelegate::Substate::systemIndependentParameters);
@@ -343,7 +344,7 @@ protected:
             session.path = createFile(
                 session.filename,
                 QJson::serialized(sessionState),
-                kSessionId);
+                kSessionId.toQString());
         }
         m_savedSessions.insert(id, session);
     }

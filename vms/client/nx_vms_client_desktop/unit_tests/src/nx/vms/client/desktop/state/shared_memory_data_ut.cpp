@@ -12,9 +12,11 @@ namespace nx::vms::client::desktop {
 namespace test {
 namespace {
 
-const SessionId sessionId1{"systemId", "user1"};
-const SessionId sessionId2{"systemId", "user2"};
-const SessionId sessionId3{"systemId", "user3"};
+const auto kLocalSystemId = nx::Uuid::createUuid();
+
+const SessionId sessionId1{kLocalSystemId, "systemId", "user1"};
+const SessionId sessionId2{kLocalSystemId, "systemId", "user2"};
+const SessionId sessionId3{kLocalSystemId, "systemId", "user3"};
 
 using Process = SharedMemoryData::Process;
 using Session = SharedMemoryData::Session;

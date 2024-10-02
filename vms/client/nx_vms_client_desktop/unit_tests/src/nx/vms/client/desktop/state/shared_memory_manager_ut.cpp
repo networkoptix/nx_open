@@ -22,8 +22,9 @@ using Command = SharedMemoryData::Command;
 
 namespace {
 
-static const SessionId kSessionId("some_system_id", "some_user_name");
-static const SessionId kAnotherSessionId("some_other_system_id", "some_other_user_name");
+static const SessionId kSessionId(nx::Uuid::createUuid(), "some_system_id", "some_user_name");
+static const SessionId kAnotherSessionId(
+    nx::Uuid::createUuid(), "some_other_system_id", "some_other_user_name");
 
 class CommandQueue: public QObject
 {

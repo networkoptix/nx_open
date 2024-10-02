@@ -8,7 +8,7 @@ namespace {
 
 void addSessionIfNeeded(SharedMemoryDataPtr memory, SessionId sessionId)
 {
-    if (sessionId != SessionId() && !memory->findSession(sessionId))
+    if (sessionId && !memory->findSession(sessionId))
         memory->addSession(sessionId);
 }
 

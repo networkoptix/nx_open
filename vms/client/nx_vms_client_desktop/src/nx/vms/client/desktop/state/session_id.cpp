@@ -12,25 +12,45 @@ namespace {
 QByteArray makeSessionId(const QString& systemId, const QString& userName)
 {
     nx::utils::QnCryptographicHash hash(nx::utils::QnCryptographicHash::Sha256);
-    hash.addData(systemId.toLower().toUtf8());
     hash.addData(userName.toLower().toUtf8());
+    hash.addData(systemId.toLower().toUtf8());
     return hash.result();
 }
+
+const QByteArray kEmptySessionId = makeSessionId(QString(), QString());
 
 } // namespace
 
 SessionId::SessionId():
-    SessionId(QString(), QString())
+    m_bytes(kEmptySessionId)
 {
     // Actual values for the empty session id must correspond to empty system and user ids.
 }
 
-SessionId::SessionId(const QString& systemId, const QString& userId):
+SessionId::SessionId(
+    const nx::Uuid& localSystemId,
+    const QString& systemId,
+    const QString& userId)
+    :
     m_bytes(makeSessionId(systemId, userId)),
+    m_localSystemId(localSystemId),
     m_systemId(systemId),
     m_userId(userId)
 {
+    NX_ASSERT(!localSystemId.isNull());
+    NX_ASSERT(!m_systemId.isNull());
+    NX_ASSERT(!m_userId.isNull());
     NX_ASSERT(m_bytes.size() == SessionId::kDataSize);
+}
+
+bool SessionId::isEmpty() const
+{
+    return m_bytes == kEmptySessionId;
+}
+
+SessionId::operator bool() const
+{
+    return !isEmpty();
 }
 
 SessionId SessionId::deserialized(const QByteArray& serializedValue)
@@ -48,28 +68,35 @@ QByteArray SessionId::serialized() const
     return m_bytes;
 }
 
-SessionId::operator QString() const
+std::string SessionId::toString() const
 {
-    return toString();
+    return m_bytes.toBase64(QByteArray::Base64UrlEncoding).toStdString();
 }
 
-QString SessionId::toString() const
+QString SessionId::toQString() const
 {
-    return QString::fromLatin1(m_bytes.toBase64(QByteArray::Base64UrlEncoding));
+    return QString::fromStdString(toString());
 }
 
-SessionId SessionId::fromString(const QString& value)
+QString SessionId::legacyIdString() const
+{
+    return QString::fromLatin1(
+        makeSessionId(m_localSystemId.toString(), m_userId)
+            .toBase64(QByteArray::Base64UrlEncoding));
+}
+
+SessionId SessionId::fromString(const std::string& value)
 {
     return SessionId::deserialized(
-        QByteArray::fromBase64(value.toLatin1(), QByteArray::Base64UrlEncoding));
+        QByteArray::fromBase64(QByteArray::fromStdString(value), QByteArray::Base64UrlEncoding));
 }
 
-QString SessionId::debugRepresentation() const
+QString SessionId::toLogString() const
 {
     if (!m_userId.isEmpty() || !m_systemId.isEmpty())
-        return nx::format("%1:%2 [%3]", m_userId, m_systemId, toString());
+        return nx::format("%1:%2(%3) [%4]", m_userId, m_systemId, m_localSystemId, toString());
 
-    return toString();
+    return QString::fromStdString(toString());
 }
 
 bool SessionId::operator!=(const SessionId& other) const
@@ -84,7 +111,7 @@ bool SessionId::operator==(const SessionId& other) const
 
 void PrintTo(const SessionId& value, ::std::ostream* os)
 {
-    *os << value.debugRepresentation().toStdString();
+    *os << value.toLogString().toStdString();
 }
 
 } // namespace nx::vms::client::desktop

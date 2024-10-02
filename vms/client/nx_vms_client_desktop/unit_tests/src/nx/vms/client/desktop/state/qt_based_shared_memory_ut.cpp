@@ -24,7 +24,8 @@ SharedMemoryData generateRandomData()
     for (auto& data: result.processes)
     {
         data.pid = nx::utils::random::number<SharedMemoryData::PidType>();
-        data.sessionId = SessionId(randomString(), randomString());
+        const auto localSystemId = nx::Uuid::createUuid();
+        data.sessionId = SessionId(localSystemId, localSystemId.toString(), randomString());
         sessionsToAdd.insert(data.sessionId);
         for (int i = 0; i < 64; ++i)
         {

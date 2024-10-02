@@ -225,7 +225,7 @@ void ClientStateHandler::clientDisconnected()
     if (!qnRuntime->isDesktopMode())
         return;
 
-    if (!NX_ASSERT(d->sessionId != SessionId()))
+    if (!NX_ASSERT(d->sessionId))
         return;
 
     d->startupParameters = {};
@@ -278,7 +278,7 @@ void ClientStateHandler::createNewWindow(
 
 void ClientStateHandler::saveWindowsConfiguration()
 {
-    if (!NX_ASSERT(d->sessionId != SessionId()))
+    if (!NX_ASSERT(d->sessionId))
         return;
 
     // Clear existing data.
@@ -293,7 +293,7 @@ void ClientStateHandler::saveWindowsConfiguration()
 
 void ClientStateHandler::restoreWindowsConfiguration(core::LogonData logonData)
 {
-    if (!NX_ASSERT(d->sessionId != SessionId()))
+    if (!NX_ASSERT(d->sessionId))
         return;
 
     auto windowStates = d->clientStateStorage.readFullSessionState(d->sessionId);
@@ -331,7 +331,7 @@ void ClientStateHandler::restoreWindowsConfiguration(core::LogonData logonData)
 
 void ClientStateHandler::deleteWindowsConfiguration()
 {
-    if (!NX_ASSERT(d->sessionId != SessionId()))
+    if (!NX_ASSERT(d->sessionId))
         return;
 
     d->clientStateStorage.clearSession(d->sessionId);
@@ -339,7 +339,7 @@ void ClientStateHandler::deleteWindowsConfiguration()
 
 bool ClientStateHandler::hasSavedConfiguration() const
 {
-    if (d->sessionId == SessionId())
+    if (!d->sessionId)
         return false;
 
     const auto windowStates = d->clientStateStorage.readFullSessionState(d->sessionId);
@@ -348,7 +348,7 @@ bool ClientStateHandler::hasSavedConfiguration() const
 
 void ClientStateHandler::clientRequestedToSaveState()
 {
-    if (!NX_ASSERT(d->sessionId != SessionId()))
+    if (!NX_ASSERT(d->sessionId))
         return;
 
     const QString randomFilename = nx::Uuid::createUuid().toString() + ".json";
@@ -359,7 +359,7 @@ void ClientStateHandler::clientRequestedToSaveState()
 
 void ClientStateHandler::clientRequestedToRestoreState(const QString& filename)
 {
-    if (!NX_ASSERT(d->sessionId != SessionId()))
+    if (!NX_ASSERT(d->sessionId))
         return;
 
     loadClientState(d->clientStateStorage.readSessionState(d->sessionId, filename));

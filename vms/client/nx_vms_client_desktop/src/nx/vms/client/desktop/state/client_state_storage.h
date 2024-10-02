@@ -2,10 +2,11 @@
 
 #pragma once
 
-#include <map>
-#include <optional>
+#include <utility>
 
 #include <QtCore/QDir>
+
+#include <nx/vms/client/desktop/state/session_id.h>
 
 #include "session_state.h"
 
@@ -35,12 +36,12 @@ public:
      * Read system-dependent parameters from the storage.
      * These parameters are intended for the automatic ('Soft') session restore.
      */
-    SessionState readSystemSubstate(const QString& sessionId) const;
+    SessionState readSystemSubstate(const SessionId& sessionId) const;
 
     /**
      * Save system-dependent parameters into the storage.
      */
-    void writeSystemSubstate(const QString& sessionId, const SessionState& systemState);
+    void writeSystemSubstate(const SessionId& sessionId, const SessionState& systemState);
 
     /**
      * Read temporary state from the storage.
@@ -57,27 +58,30 @@ public:
     /**
      * Remove all the session data from the storage.
      */
-    void clearSession(const QString& sessionId);
+    void clearSession(const SessionId& sessionId);
 
     /**
      * Read session state of all windows of the given session at once.
      * This method as well may be used to find out key values existing in the session.
      */
-    FullSessionState readFullSessionState(const QString& sessionId) const;
+    FullSessionState readFullSessionState(const SessionId& sessionId) const;
 
     /**
      * Read session state of a single window.
      * Key must be a valid file name, it should exist in the session.
      */
-    SessionState readSessionState(const QString& sessionId, const QString& key) const;
+    SessionState readSessionState(const SessionId& sessionId, const QString& key) const;
 
     /**
      * Save session state of a single window.
      * Key must be a valid file name, it should not be already used.
      */
-    void writeSessionState(const QString& sessionId, const QString& key, const SessionState& state);
+    void writeSessionState(
+        const SessionId& sessionId, const QString& key, const SessionState& state);
 
 private:
+    SessionState readStateInternal(
+        const SessionId& sessionId, const QString& name, bool mayFail) const;
     SessionState readStateInternal(const QString& dir, const QString& name, bool mayFail) const;
     void writeStateInternal(const QString& dir, const QString& name, const SessionState& state);
 

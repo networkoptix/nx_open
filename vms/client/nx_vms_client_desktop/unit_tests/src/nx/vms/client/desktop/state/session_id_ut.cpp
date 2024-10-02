@@ -11,16 +11,19 @@ namespace test {
 
 namespace {
 
-static const QString kExampleSystemId = nx::Uuid::createUuid().toSimpleString();
+static const auto kExampleSystemLocalId = nx::Uuid::createUuid();
+static const QString kExampleSystemId = kExampleSystemLocalId.toSimpleString();
 static const QString kExampleUserName = "SomeUser@someSystem.com";
 
 } // namespace
 
 TEST(SessionId, dependsOnParameters)
 {
-    const SessionId sessionId(kExampleSystemId, kExampleUserName);
-    const SessionId sessionIdFromAnotherName(kExampleSystemId, kExampleUserName.mid(2));
-    const SessionId sessionIdFromAnotherSystem(kExampleSystemId.mid(2), kExampleUserName.toUpper());
+    const SessionId sessionId(kExampleSystemLocalId, kExampleSystemId, kExampleUserName);
+    const SessionId sessionIdFromAnotherName(
+        kExampleSystemLocalId, kExampleSystemId, kExampleUserName.mid(2));
+    const SessionId sessionIdFromAnotherSystem(
+        kExampleSystemLocalId, kExampleSystemId.mid(2), kExampleUserName.toUpper());
 
     ASSERT_NE(sessionId, sessionIdFromAnotherName);
     ASSERT_NE(sessionId, sessionIdFromAnotherSystem);
@@ -28,9 +31,11 @@ TEST(SessionId, dependsOnParameters)
 
 TEST(SessionId, generationIsCaseInsensitive)
 {
-    const SessionId sessionId(kExampleSystemId, kExampleUserName);
-    const SessionId sessionIdFromLowerCase(kExampleSystemId, kExampleUserName.toLower());
-    const SessionId sessionIdFromUpperCase(kExampleSystemId, kExampleUserName.toUpper());
+    const SessionId sessionId(kExampleSystemLocalId, kExampleSystemId, kExampleUserName);
+    const SessionId sessionIdFromLowerCase(
+        kExampleSystemLocalId, kExampleSystemId, kExampleUserName.toLower());
+    const SessionId sessionIdFromUpperCase(
+        kExampleSystemLocalId, kExampleSystemId, kExampleUserName.toUpper());
 
     ASSERT_EQ(sessionId, sessionIdFromLowerCase);
     ASSERT_EQ(sessionId, sessionIdFromUpperCase);
@@ -40,8 +45,8 @@ TEST(SessionId, stringRepresentationContainsOnlyUrlAllowedSymbols)
 {
     static const QString kAllowedPathSymbols = "-_=";
 
-    const SessionId sessionId(kExampleSystemId, kExampleUserName);
-    const QString stringRepresentation(sessionId);
+    const SessionId sessionId(kExampleSystemLocalId, kExampleSystemId, kExampleUserName);
+    const auto stringRepresentation = sessionId.toQString();
 
     for (const QChar& symbol: stringRepresentation)
         ASSERT_TRUE(symbol.isLetterOrNumber() || kAllowedPathSymbols.contains(symbol));
@@ -49,7 +54,7 @@ TEST(SessionId, stringRepresentationContainsOnlyUrlAllowedSymbols)
 
 TEST(SessionId, serializationIsTwoWay)
 {
-    const SessionId sessionId(kExampleSystemId, kExampleUserName);
+    const SessionId sessionId(kExampleSystemLocalId, kExampleSystemId, kExampleUserName);
     const QByteArray serialized = sessionId.serialized();
     const SessionId deserialized = SessionId::deserialized(serialized);
 
