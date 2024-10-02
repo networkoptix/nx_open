@@ -102,7 +102,7 @@ bool Engine::processActiveSettings(
     std::vector<std::string> activeSettingNames = settingIdsToUpdate;
     if (activeSettingNames.empty())
     {
-        for (const auto item : activeSettingsItems.array_items())
+        for (const auto& item : activeSettingsItems.array_items())
         {
             if (item["type"].string_value() == "Button")
                 continue;
@@ -206,22 +206,34 @@ void Engine::doSetSettings(
 {
     using namespace std::string_literals;
 
-    std::string engineSettingsModel = kEngineSettingsModel;
+    std::unordered_map<std::string, std::string> substitutionMap;
+
+    if (ini().showExtraCheckBox)
+        substitutionMap.insert({kExtraCheckBoxTemplateVariableName, kExtraCheckBoxJson});
 
     const char* value = settings->value(kShowExtraTextField.c_str());
 
     if (value && (value == "true"s))
+        substitutionMap.insert({kExtraTextFieldTemplateVariableName, kExtraTextFieldJson});
+
+    const std::string engineSettingsModel = substituteAllTemplateVariables(
+        kEngineSettingsModel, substitutionMap);
+
+    std::map<std::string, std::string> values = toStdMap(shareToPtr(settings));
+
+    std::string parseError;
+    Json::object model = Json::parse(engineSettingsModel, parseError).object_items();
+
+    if (!processActiveSettings(&model, &values))
     {
-        engineSettingsModel = substituteAllTemplateVariables(engineSettingsModel,
-            {{kExtraTextFieldTemplateVariableName, kExtraTextFieldJson}});
-    }
-    else
-    {
-        engineSettingsModel = substituteAllTemplateVariables(engineSettingsModel, {});
+        *outResult = error(ErrorCode::internalError, "Unable to process the active settings section");
+        return;
     }
 
     auto settingsResponse = makePtr<SettingsResponse>();
-    settingsResponse->setModel(engineSettingsModel);
+
+    settingsResponse->setValues(makePtr<StringMap>(values));
+    settingsResponse->setModel(makePtr<String>(Json(model).dump()));
 
     *outResult = settingsResponse.releasePtr();
 }
