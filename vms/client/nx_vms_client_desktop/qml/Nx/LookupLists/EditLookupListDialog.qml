@@ -325,13 +325,11 @@ ModalDialog
         DialogButtonBox.buttonRole: DialogButtonBox.RejectRole
         icon.source: "image://skin/20x20/Outline/delete.svg"
 
-        onClicked:
+        function confirmDelete(countOfRules)
         {
-            const countOfRules = dialog.sourceModel.countOfAssociatedVmsRules(dialog.systemContext)
-
-            const descriptionText = countOfRules
-                ? qsTr("This list is associated with %1 Event Rules. Are you sure you want to delete it?").arg(countOfRules)
-                : qsTr("Deleting the list will erase all the data inside it.")
+            const descriptionText = countOfRules > 0
+                ? qsTr("This list is associated with %n Event Rules. Are you sure you want to delete it?", "", countOfRules)
+                : qsTr("Deleting the list will erase all the data inside it.");
 
             const result = MessageBox.exec(
                 MessageBox.Icon.Question,
@@ -341,9 +339,17 @@ ModalDialog
                 {
                     text: qsTr("Delete"),
                     role: MessageBox.AcceptRole
-                });
+                }
+            );
 
-            if (result !== MessageBox.Cancel)
+            return result !== MessageBox.Cancel;
+        }
+
+        onClicked:
+        {
+            const countOfRules = dialog.sourceModel.countOfAssociatedVmsRules(dialog.systemContext);
+
+            if (dialog.sourceModel.isEmpty() || confirmDelete(countOfRules))
             {
                 dialog.deleteRequested()
                 dialog.reject()

@@ -106,6 +106,11 @@ void LookupListModel::setName(const QString& name)
     emit nameChanged();
 }
 
+bool LookupListModel::isEmpty() const
+{
+    return m_data.entries.empty();
+}
+
 int LookupListModel::countOfAssociatedVmsRules(SystemContext* systemContext) const
 {
     using namespace nx::vms::rules;
