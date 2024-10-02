@@ -2489,13 +2489,16 @@ void ActionHandler::at_cameraIssuesAction_triggered()
     menu()->trigger(menu::OpenBusinessLogAction,
         menu()->currentParameters(sender())
         .withArgument(Qn::EventTypeRole, vms::api::EventType::anyCameraEvent));
-    menu::Parameters parameters = menu()->currentParameters(sender());
+
+    auto parameters = menu()->currentParameters(sender());
     parameters.setArgument(Qn::EventTypeRole, QString(nx::vms::rules::kDeviceIssueEventGroup));
     parameters.setArgument(
         Qn::ActionTypeRole, vms::rules::utils::type<vms::rules::WriteToLogAction>());
-    const auto now = QDateTime::currentMSecsSinceEpoch();
+
+    const auto now = qnSyncTime->value();
     // Set current day as time period.
     parameters.setArgument(Qn::TimePeriodRole, QnTimePeriod::fromInterval(now, now));
+
     menu()->trigger(menu::OpenEventLogAction, parameters);
 }
 
@@ -2528,6 +2531,17 @@ void ActionHandler::at_serverIssuesAction_triggered()
 {
     menu()->trigger(menu::OpenBusinessLogAction,
         {Qn::EventTypeRole, vms::api::EventType::anyServerEvent});
+
+    auto parameters = menu()->currentParameters(sender());
+    parameters.setArgument(Qn::EventTypeRole, QString(nx::vms::rules::kServerIssueEventGroup));
+    parameters.setArgument(
+        Qn::ActionTypeRole, vms::rules::utils::type<vms::rules::WriteToLogAction>());
+
+    const auto now = qnSyncTime->value();
+    // Set current day as time period.
+    parameters.setArgument(Qn::TimePeriodRole, QnTimePeriod::fromInterval(now, now));
+
+    menu()->trigger(menu::OpenEventLogAction, parameters);
 }
 
 void ActionHandler::at_pingAction_triggered()
