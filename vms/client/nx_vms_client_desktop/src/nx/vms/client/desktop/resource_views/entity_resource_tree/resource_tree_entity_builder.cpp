@@ -134,38 +134,6 @@ ResourceItemCreator resourceItemCreator(
         };
 }
 
-ResourceItemCreator sharedResourceItemCreator(
-    ResourceTreeItemFactory* factory,
-    const QnUserResourcePtr& user)
-{
-    return
-        [factory, user](const QnResourcePtr& resource)
-        {
-            return std::make_unique<MainTreeResourceItemDecorator>(
-                factory->createResourceItem(resource),
-                permissionsSummary(user, resource),
-                NodeType::sharedResource);
-        };
-}
-
-ResourceItemCreator subjectLayoutItemCreator(
-    ResourceTreeItemFactory* factory,
-    const QnUserResourcePtr& user)
-{
-    return
-        [factory, user](const QnResourcePtr& resource)
-        {
-            const auto nodeType = resource.staticCast<QnLayoutResource>()->isShared()
-                ? NodeType::sharedLayout
-                : NodeType::resource;
-
-            return std::make_unique<MainTreeResourceItemDecorator>(
-                factory->createResourceItem(resource),
-                permissionsSummary(user, resource),
-                nodeType);
-        };
-}
-
 LayoutItemCreator layoutItemCreator(
     ResourceTreeItemFactory* factory,
     const QnUserResourcePtr& user,
@@ -750,6 +718,19 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createLayoutsGroupEntity() const
     using GroupingRule = GroupingRule<QString, QnResourcePtr>;
     using GroupingRuleStack = GroupGroupingEntity<QString, QnResourcePtr>::GroupingRuleStack;
 
+    auto layoutItemCreator =
+        [this, baseItemCreator = resourceItemCreator(m_itemFactory.get(), user())]
+            (const QnResourcePtr& resource)
+        {
+            auto layout = resource.objectCast<QnLayoutResource>();
+            NX_ASSERT(layout);
+
+            if (layout->hasFlags(Qn::cross_system))
+                return m_itemFactory->createCloudLayoutItem(layout);
+            else
+                return baseItemCreator(layout);
+        };
+
     AbstractEntityPtr layoutsEntity;
     if (ini().foldersForLayoutsInResourceTree)
     {
@@ -762,7 +743,7 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createLayoutsGroupEntity() const
             numericOrder()});
 
         auto layoutsGroupGroupingList = std::make_unique<GroupGroupingEntity<QString, QnResourcePtr>>(
-            resourceItemCreator(m_itemFactory.get(), user()),
+            layoutItemCreator,
             [this](const QnResourcePtr& resource) { return createLayoutItemListEntity(resource); },
             core::ResourceRole,
             layoutsOrder(),
@@ -774,38 +755,16 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createLayoutsGroupEntity() const
     else
     {
         auto layoutsGroupList = makeUniqueKeyGroupList<QnResourcePtr>(
-            resourceItemCreator(m_itemFactory.get(), user()),
+            layoutItemCreator,
             [this](const QnResourcePtr& resource) { return createLayoutItemListEntity(resource); },
             layoutsOrder());
         layoutsGroupList->installItemSource(m_itemKeySourcePool->layoutsSource(user()));
         layoutsEntity = std::move(layoutsGroupList);
     }
 
-    auto cloudLayoutItemCreator =
-        [this](const QnResourcePtr& resource)
-        {
-            auto layout = resource.dynamicCast<QnLayoutResource>();
-            NX_ASSERT(layout);
-            return m_itemFactory->createCloudLayoutItem(layout);
-        };
-
-    auto layoutsComposition = std::make_unique<CompositionEntity>();
-    layoutsComposition->addSubEntity(std::move(layoutsEntity));
-
-    // TODO: #vbreus Implement groups for cloud layouts.
-    if (user() && user()->isCloud())
-    {
-        auto cloudLayoutsList = makeUniqueKeyGroupList<QnResourcePtr>(
-            cloudLayoutItemCreator,
-            [this](const QnResourcePtr& layout) { return createLayoutItemListEntity(layout); },
-            layoutsOrder());
-        cloudLayoutsList->installItemSource(m_itemKeySourcePool->cloudLayoutsSource());
-        layoutsComposition->addSubEntity(std::move(cloudLayoutsList));
-    }
-
     return makeFlatteningGroup(
         m_itemFactory->createLayoutsItem(),
-        std::move(layoutsComposition),
+        std::move(layoutsEntity),
         FlatteningGroupEntity::AutoFlatteningPolicy::noChildrenPolicy);
 }
 

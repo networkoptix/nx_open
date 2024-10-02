@@ -2,19 +2,21 @@
 
 #pragma once
 
-#include <nx/utils/scoped_connections.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/entity/unique_key_source.h>
+#include <nx/vms/client/desktop/resource/resource_fwd.h>
+#include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_source/abstract_resource_source.h>
 
 namespace nx::vms::client::desktop {
 namespace entity_resource_tree {
 
-class CloudLayoutsSource: public entity_item_model::UniqueResourceSource
+class CloudLayoutsSource: public AbstractResourceSource
 {
 public:
     CloudLayoutsSource();
+    virtual QVector<QnResourcePtr> getResources() override;
 
 private:
-    nx::utils::ScopedConnections m_connectionsGuard;
+    void processLocalLayout(const QnResourcePtr& resource);
+    void listenLocalLayout(const CrossSystemLayoutResourcePtr& layout);
 };
 
 } // namespace entity_resource_tree
