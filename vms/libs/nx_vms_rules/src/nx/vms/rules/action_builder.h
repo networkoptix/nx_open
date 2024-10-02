@@ -30,6 +30,8 @@ public:
     using ActionConstructor = std::function<BasicAction*()>;
     using Actions = std::vector<ActionPtr>;
 
+    static bool bypassScopedLocaleForTest;
+
     ActionBuilder(nx::Uuid id, const QString& actionType, const ActionConstructor& ctor);
     virtual ~ActionBuilder() override;
 

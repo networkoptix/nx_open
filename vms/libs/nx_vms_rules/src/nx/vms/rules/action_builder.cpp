@@ -263,6 +263,8 @@ ActionBuilder::Actions filterActionPermissions(
 
 } // namespace
 
+bool ActionBuilder::bypassScopedLocaleForTest = false;
+
 using namespace std::chrono;
 
 ActionBuilder::ActionBuilder(
@@ -595,9 +597,15 @@ ActionBuilder::Actions ActionBuilder::buildActionsForTargetUsers(
             auto appContext = nx::vms::common::appContext();
             if (appContext) //< Application context is not initialized in unit tests.
             {
-                auto translationManager = appContext->translationManager();
-                if (translationManager) // Some unit tests do not have translations manager.
-                    scopedLocale = translationManager->installScopedLocale(locale);
+                // TODO: https://networkoptix.atlassian.net/browse/VMS-55348: This code leads to ~5
+                // second delay in action generation during unit tests.  Added a flag in the test
+                // to bypass this, but it should be fixed properly.
+                if (!bypassScopedLocaleForTest)
+                {
+                    auto translationManager = appContext->translationManager();
+                    if (translationManager) // Some unit tests do not have translations manager.
+                        scopedLocale = translationManager->installScopedLocale(locale);
+                }
             }
         }
 
