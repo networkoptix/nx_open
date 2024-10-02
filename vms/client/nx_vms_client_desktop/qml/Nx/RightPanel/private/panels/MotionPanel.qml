@@ -35,7 +35,7 @@ SearchPanel
             id: placeholderAction
 
             text: qsTr("Select Camera...")
-            icon.source: "image://skin/tree/camera.svg"
+            icon.source: "image://20x20/Solid/camera.svg"
 
             visible: motionPanel.model.isOnline
                 && rightPanel.scene

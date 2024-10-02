@@ -93,7 +93,7 @@ static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubst
 };
 
 NX_DECLARE_COLORIZED_ICON(kCalendarIcon, "20x20/Outline/calendar.svg", kThemeSubstitutions)
-NX_DECLARE_COLORIZED_ICON(kDeviceIcon, "20x20/Outline/device.svg", kThemeSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kDeviceIcon, "20x20/Solid/camera.svg", kThemeSubstitutions)
 NX_DECLARE_COLORIZED_ICON(kPlayIcon, "20x20/Outline/play.svg", kThemeSubstitutions)
 NX_DECLARE_COLORIZED_ICON(kCheckedEventLogIcon,
     "20x20/Outline/event_log.svg", kThemeSubstitutions,
