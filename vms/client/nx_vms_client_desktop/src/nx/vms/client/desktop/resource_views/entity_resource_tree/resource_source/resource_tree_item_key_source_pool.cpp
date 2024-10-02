@@ -146,11 +146,19 @@ UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::layoutsSource(
         user,
         std::make_unique<IntercomLayoutResourceSource>(resourcePool()));
 
-    return std::make_shared<ResourceSourceAdapter>(
-        std::make_unique<CompositeResourceSource>(
-            std::move(layouts),
-            std::move(intercomLayouts)
-        ));
+    auto result = std::make_unique<CompositeResourceSource>(
+        std::move(layouts),
+        std::move(intercomLayouts));
+
+    if (user->isCloud())
+    {
+        auto crossSystemLayouts = std::make_unique<CloudLayoutsSource>();
+        result = std::make_unique<CompositeResourceSource>(
+            std::move(result),
+            std::move(crossSystemLayouts));
+    }
+
+    return std::make_shared<ResourceSourceAdapter>(std::move(result));
 }
 
 UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::allLayoutsSource(
@@ -243,11 +251,6 @@ UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::fileLayoutsSource()
 {
     return std::make_shared<ResourceSourceAdapter>(
         std::make_unique<FileLayoutsSource>(resourcePool()));
-}
-
-UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::cloudLayoutsSource()
-{
-    return std::make_shared<CloudLayoutsSource>();
 }
 
 UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::localMediaSource()

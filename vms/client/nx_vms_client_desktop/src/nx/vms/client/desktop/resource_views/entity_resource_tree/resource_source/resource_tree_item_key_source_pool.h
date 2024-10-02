@@ -61,8 +61,14 @@ public:
         const QnMediaServerResourcePtr& parentServer,
         const QnResourceAccessSubject& accessSubject);
 
+    /**
+     * Provides all layout resouces accessible by user including intercom and cloud layouts.
+     */
     UniqueResourceSourcePtr layoutsSource(const QnUserResourcePtr& user);
 
+    /**
+     * Provides all layout resouces accessible by user except intercom and cloud layouts.
+     */
     UniqueResourceSourcePtr allLayoutsSource(const QnUserResourcePtr& user);
 
     UniqueResourceSourcePtr shareableLayoutsSource(
@@ -99,11 +105,6 @@ public:
      * Provides all local file layout resources stored in the resource pool.
      */
     UniqueResourceSourcePtr fileLayoutsSource();
-
-    /**
-     * Provides all cloud layout resources.
-     */
-    UniqueResourceSourcePtr cloudLayoutsSource();
 
     /**
      * Provides all local media resources stored in the resource pool.

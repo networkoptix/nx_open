@@ -5,8 +5,10 @@
 #include <client/client_globals.h>
 #include <common/common_globals.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/item/abstract_item.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
+#include <nx/vms/common/intercom/utils.h>
 
 namespace nx::vms::client::desktop {
 namespace entity_resource_tree {
@@ -38,29 +40,38 @@ ItemOrder serversOrder()
 
 ItemOrder layoutsOrder()
 {
+    using namespace nx::vms::common;
+
     return {
         [mainOrder = numericOrder()] (const AbstractItem* lhs,
             const AbstractItem* rhs)
         {
-            const auto lhsIconKey =
-                static_cast<QnResourceIconCache::Key>(lhs->data(Qn::ResourceIconKeyRole).toInt());
-            const auto rhsIconKey =
-                static_cast<QnResourceIconCache::Key>(rhs->data(Qn::ResourceIconKeyRole).toInt());
+            const auto lhsResource = lhs->data(core::ResourceRole).value<QnResourcePtr>();
+            const auto rhsResource = rhs->data(core::ResourceRole).value<QnResourcePtr>();
+            const auto lhsLayout = lhsResource.objectCast<LayoutResource>();
+            const auto rhsLayout = rhsResource.objectCast<LayoutResource>();
 
-            const auto lhsIconType = lhsIconKey & QnResourceIconCache::TypeMask;
-            const auto rhsIconType = rhsIconKey & QnResourceIconCache::TypeMask;
+            const bool lhsIsSharedLayout = lhsLayout->isShared();
+            const bool rhsIsSharedLayout = rhsLayout->isShared();
 
-            const bool lhsIsSharedLayout = lhsIconType == QnResourceIconCache::SharedLayout;
-            const bool rhsIsSharedLayout = rhsIconType == QnResourceIconCache::SharedLayout;
 
+            // Shared layouts are located first.
             if (lhsIsSharedLayout != rhsIsSharedLayout)
                 return lhsIsSharedLayout;
 
-            const bool lhsIsIntercomLayout = lhsIconType == QnResourceIconCache::IntercomLayout;
-            const bool rhsIsIntercomLayout = rhsIconType == QnResourceIconCache::IntercomLayout;
+            const bool lhsIsIntercomLayout = isIntercomLayout(lhsLayout);
+            const bool rhsIsIntercomLayout = isIntercomLayout(rhsLayout);
 
+            // Next are intercom layouts.
             if (lhsIsIntercomLayout != rhsIsIntercomLayout)
                 return lhsIsIntercomLayout;
+
+            const bool lhsIsCloudLayout = lhsLayout->isCrossSystem();
+            const bool rhsIsCloudLayout = rhsLayout->isCrossSystem();
+
+            // Next are plain layouts, cross system layouts located at the end of the list.
+            if (lhsIsCloudLayout != rhsIsCloudLayout)
+                return !lhsIsCloudLayout;
 
             return mainOrder.comp(lhs, rhs);
         },
