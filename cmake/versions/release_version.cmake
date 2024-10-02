@@ -4,5 +4,5 @@
 # version in the following file:
 # open/cmake/versions/vms_protocol_version.cmake
 # NOTE: Changing of the hotfix digit does not affect protocol version.
-set(releaseVersion 6.0.1)
+set(releaseVersion 6.0.2)
 set(releaseVersion.full ${releaseVersion}.${buildNumber})
