@@ -9,7 +9,16 @@ nx_add_server_plugin_test(analytics_plugin_ut NO_GTEST
 )
 
 if(LINUX)
-    target_link_libraries(analytics_plugin_ut PRIVATE dl)
+    target_link_libraries(analytics_plugin_ut
+        PRIVATE
+            dl
+            # The libpthread library must be explicitly linked, because it is used by libstdc++ via
+            # weak symbols instead of being listed as a dependency. The option -pthread (which
+            # implies -lpthread) is not enough here, because in some linkers the option --as-needed
+            # is too agressive and optimizes away libpthread.
+            -Wl,--no-as-needed pthread -Wl,--as-needed
+    )
+    # The option -pthread is needed in addition to linking with libpthread.
     set_target_properties(analytics_plugin_ut PROPERTIES LINK_FLAGS -pthread)
 endif()
 
