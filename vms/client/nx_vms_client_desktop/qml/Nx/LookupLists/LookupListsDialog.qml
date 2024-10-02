@@ -301,7 +301,7 @@ Dialog
                     {
                         id: exportListButton
 
-                        text: qsTr("Export")
+                        text: tableView.checkedRows.length > 0 ? qsTr("Export Selected") : qsTr("Export")
                         icon.source: "image://skin/20x20/Outline/export.svg"
                         onClicked:
                         {
