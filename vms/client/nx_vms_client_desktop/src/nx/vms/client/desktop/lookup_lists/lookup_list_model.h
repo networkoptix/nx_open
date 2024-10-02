@@ -36,6 +36,7 @@ public:
     void setName(const QString& name);
 
     Q_INVOKABLE int countOfAssociatedVmsRules(SystemContext* systemContext) const;
+    Q_INVOKABLE bool isEmpty() const;
 
 signals:
     void dataChanged();
