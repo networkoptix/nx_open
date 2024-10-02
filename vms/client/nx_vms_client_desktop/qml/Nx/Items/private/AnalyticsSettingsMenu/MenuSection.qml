@@ -57,6 +57,7 @@ Column
 
             ColoredImage
             {
+                sourceSize: Qt.size(20, 20)
                 sourcePath: level === 0
                     ? iconSource
                     : collapsed
