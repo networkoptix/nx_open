@@ -1221,7 +1221,7 @@ bool DecodedPictureToOpenGLUploader::renderVideoMemory(
     QnGlRendererTexture* texture = emptyPictureBuf->texture(0);
     QSize displaySize = emptyPictureBuf->displaySize();
     QSize frameSize = frame->size();
-    if (!displaySize.isEmpty())
+    if (!displaySize.isEmpty() && frame->scaleFactor != 1)
         displaySize = displaySize.boundedTo(frameSize);
     else
         displaySize = frameSize;
