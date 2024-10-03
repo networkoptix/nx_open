@@ -94,9 +94,6 @@ public:
         editGroup
     };
 
-    static const QString kInfoText;
-    static const QString kToolTipText;
-
 public:
     GroupSettingsDialog(
         DialogType dialogType,
@@ -109,9 +106,8 @@ public:
 
     Q_INVOKABLE QString validateName(const QString& text);
     Q_INVOKABLE bool isOkClicked() const { return acceptOnSuccess(); }
-
-    Q_PROPERTY(QString kInfoText MEMBER kInfoText CONSTANT)
-    Q_PROPERTY(QString kToolTipText MEMBER kToolTipText CONSTANT)
+    Q_INVOKABLE QString infoText() const;
+    Q_INVOKABLE QString toolTipText() const;
 
     static void removeGroups(
         QnWorkbenchContext* workbenchContext,
@@ -130,6 +126,5 @@ private:
     struct Private;
     nx::utils::ImplPtr<Private> d;
 };
-
 
 } // namespace nx::vms::client::desktop
