@@ -3439,11 +3439,11 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation type="unfinished">Copy Selection to Clipboard</translation>
+      <translation>Copiar selección no portapapeis</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation type="unfinished">Export Selection to File...</translation>
+      <translation>Exportar a selección ao arquivo...</translation>
     </message>
     <message>
       <source>Select All</source>
@@ -3498,7 +3498,7 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>Event</source>
-      <translation type="unfinished">Event</translation>
+      <translation>Evento</translation>
     </message>
     <message>
       <source>Source</source>
@@ -3510,7 +3510,7 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>Target</source>
-      <translation type="unfinished">Target</translation>
+      <translation>Obxectivo</translation>
     </message>
     <message>
       <source>Description</source>
@@ -3651,7 +3651,7 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Seleccionar cartafol...</translation>
     </message>
   </context>
   <context>
@@ -3767,7 +3767,7 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>Duration</source>
-      <translation type="unfinished">Duration</translation>
+      <translation>Duración</translation>
     </message>
     <message>
       <source>Open circuit</source>
@@ -3786,7 +3786,7 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>ID</source>
-      <translation type="unfinished">ID</translation>
+      <translation>ID</translation>
     </message>
   </context>
   <context>
@@ -4180,7 +4180,7 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>Name cannot be empty</source>
-      <translation type="unfinished">Name cannot be empty</translation>
+      <translation>O nome non pode estar baleiro</translation>
     </message>
   </context>
   <context>
@@ -4289,7 +4289,7 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>Apply changes before exiting?</source>
-      <translation type="unfinished">Apply changes before exiting?</translation>
+      <translation>Queres aplicar os cambios antes de saír?</translation>
     </message>
   </context>
   <context>
@@ -4422,7 +4422,7 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>Instant</source>
-      <translation type="unfinished">Instant</translation>
+      <translation>Instantáneo</translation>
     </message>
     <message>
       <source>Position</source>
@@ -4685,11 +4685,11 @@ Clave de licenza: %2</translation>
     <name>QnSelectDevicesButton</name>
     <message>
       <source>Any Device</source>
-      <translation type="unfinished">Any Device</translation>
+      <translation>Calquera dispositivo</translation>
     </message>
     <message>
       <source>Any Camera</source>
-      <translation type="unfinished">Any Camera</translation>
+      <translation>Calquera cámara</translation>
     </message>
     <message>
       <source>All Devices</source>
@@ -4734,7 +4734,7 @@ Clave de licenza: %2</translation>
     <name>QnSelectServersButton</name>
     <message>
       <source>Any Server</source>
-      <translation type="unfinished">Any Server</translation>
+      <translation>Calquera servidor</translation>
     </message>
     <message>
       <source>All Servers</source>
@@ -4746,9 +4746,9 @@ Clave de licenza: %2</translation>
     </message>
     <message numerus="yes">
       <source>%n Servers</source>
-      <translation type="unfinished">
-        <numerusform>%n Servers</numerusform>
-        <numerusform>%n Servers</numerusform>
+      <translation>
+        <numerusform>%n Servidores</numerusform>
+        <numerusform>%n Servidores</numerusform>
       </translation>
     </message>
   </context>
@@ -5101,11 +5101,11 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation type="unfinished">Export Selection to File...</translation>
+      <translation>Exportar a selección ao arquivo...</translation>
     </message>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation type="unfinished">Copy Selection to Clipboard</translation>
+      <translation>Copiar selección no portapapeis</translation>
     </message>
     <message>
       <source>Refresh</source>
@@ -5845,19 +5845,19 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnWorkbenchPtzHandler</name>
     <message>
       <source>Zooming in...</source>
-      <translation type="unfinished">Zooming in...</translation>
+      <translation>Ampliando, zoom in...</translation>
     </message>
     <message>
       <source>Zooming out...</source>
-      <translation type="unfinished">Zooming out...</translation>
+      <translation>Alonxando, zoom out...</translation>
     </message>
     <message>
       <source>Moving...</source>
-      <translation type="unfinished">Moving...</translation>
+      <translation>Movendo...</translation>
     </message>
     <message>
       <source>Focusing...</source>
-      <translation type="unfinished">Focusing...</translation>
+      <translation>Enfocando...</translation>
     </message>
     <message>
       <source>Camera %1 does not support PTZ</source>
@@ -5960,7 +5960,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Camera name:</source>
-      <translation type="unfinished">Camera name:</translation>
+      <translation>Nome da cámara:</translation>
     </message>
   </context>
   <context>
@@ -6571,11 +6571,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Select at least one device</source>
-      <translation type="unfinished">Select at least one device</translation>
+      <translation>Selecciona polo menos un dispositivo</translation>
     </message>
     <message>
       <source>Select at least one camera</source>
-      <translation type="unfinished">Select at least one camera</translation>
+      <translation>Selecciona polo menos unha cámara</translation>
     </message>
     <message>
       <source>Select at least one I/O module</source>
@@ -7456,7 +7456,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>This action cannot be undone.</source>
-      <translation type="unfinished">This action cannot be undone.</translation>
+      <translation>Esta acción non se pode desfacer.</translation>
     </message>
     <message>
       <source>Applies only to the cameras connected to current server.</source>
@@ -7776,7 +7776,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>This action cannot be undone.</source>
-      <translation type="unfinished">This action cannot be undone.</translation>
+      <translation>Esta acción non se pode desfacer.</translation>
     </message>
     <message>
       <source>Primary Stream</source>
@@ -7867,7 +7867,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>High pre-recording time will increase RAM utilization on the server</source>
-      <translation type="unfinished">High pre-recording time will increase RAM utilization on the server</translation>
+      <translation>Un tempo elevado de pregravación aumentará a utilización da RAM no servidor</translation>
     </message>
     <message>
       <source>Select areas on the schedule to apply chosen parameters to</source>
@@ -8124,7 +8124,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Select</source>
-      <translation type="unfinished">Select</translation>
+      <translation>Seleccionar</translation>
     </message>
   </context>
   <context>
@@ -9055,11 +9055,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Name cannot be empty.</source>
-      <translation type="unfinished">Name cannot be empty.</translation>
+      <translation>O nome non pode estar baleiro.</translation>
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Seleccionar cartafol...</translation>
     </message>
   </context>
   <context>
@@ -9626,9 +9626,9 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message numerus="yes">
       <source>%n Servers</source>
-      <translation type="unfinished">
-        <numerusform>%n Servers</numerusform>
-        <numerusform>%n Servers</numerusform>
+      <translation>
+        <numerusform>%n Servidores</numerusform>
+        <numerusform>%n Servidores</numerusform>
       </translation>
     </message>
     <message>
@@ -9675,7 +9675,7 @@ Remember to return the Logging Level to its default setting after you have colle
     <name>nx::vms::client::desktop::LogsManagementWidget</name>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Seleccionar cartafol...</translation>
     </message>
   </context>
   <context>
@@ -10322,7 +10322,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Select layout...</source>
-      <translation type="unfinished">Select layout...</translation>
+      <translation>Seleccionar deseño...</translation>
     </message>
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
@@ -11736,7 +11736,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Date</source>
-      <translation type="unfinished">Date</translation>
+      <translation>Data</translation>
     </message>
     <message>
       <source>Server OS Time</source>
@@ -12491,11 +12491,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Cameras &amp; Resources</source>
-      <translation type="unfinished">Cameras &amp; Resources</translation>
+      <translation>Cámaras e recursos</translation>
     </message>
     <message>
       <source>Shared Layouts</source>
-      <translation type="unfinished">Shared Layouts</translation>
+      <translation>Deseños compartidos</translation>
     </message>
     <message>
       <source>Health Monitors</source>
@@ -12586,11 +12586,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Focus Near</source>
-      <translation type="unfinished">Focus Near</translation>
+      <translation>Enfoque cercano</translation>
     </message>
     <message>
       <source>Focus Far</source>
-      <translation type="unfinished">Focus Far</translation>
+      <translation>Enfoque lonxano</translation>
     </message>
     <message>
       <source>Autofocus</source>
@@ -12787,7 +12787,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::RulesTableModel</name>
     <message>
       <source>Event</source>
-      <translation type="unfinished">Event</translation>
+      <translation>Evento</translation>
     </message>
     <message>
       <source>Action</source>
@@ -13420,7 +13420,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Seleccionar cartafol...</translation>
     </message>
     <message>
       <source>There are no suitable cameras for replacement on the Server &quot;%1&quot;</source>
