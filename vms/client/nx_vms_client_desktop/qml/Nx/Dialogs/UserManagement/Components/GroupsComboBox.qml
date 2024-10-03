@@ -206,7 +206,8 @@ Control
 
                         anchors.centerIn: parent
                         color: ColorTheme.colors.light10
-                        text: qsTr(`${groupFlow.remaining} more`)
+                        text: qsTr("%n more", "%n is the number of remaining groups",
+                            groupFlow.remaining)
                     }
                 }
 
