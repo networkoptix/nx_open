@@ -95,7 +95,6 @@ TextLookupPicker::TextLookupPicker(
         lookupListsLabel->setText(isGenericEvent ? tr("From") : Strings::in());
         lookupListsLayout->addWidget(lookupListsLabel);
 
-        m_lookupListComboBox = new QComboBox;
 
         auto lookupListsModel = new LookupListsModel{context, this};
         lookupListsModel->setObjectTypeId("");
@@ -104,6 +103,9 @@ TextLookupPicker::TextLookupPicker(
         sortModel->setSourceModel(lookupListsModel);
         sortModel->sort(0);
 
+        m_lookupListComboBox = new QComboBox;
+        m_lookupListComboBox->setSizePolicy(
+            QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred));
         m_lookupListComboBox->setModel(sortModel);
         m_lookupListComboBox->setPlaceholderText(Strings::selectString());
 
