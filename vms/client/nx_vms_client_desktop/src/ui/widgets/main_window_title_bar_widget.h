@@ -11,9 +11,12 @@ class QnLayoutTabBar;
 class QnMainWindowTitleBarWidgetPrivate;
 
 namespace nx::vms::client::desktop {
+
 class ToolButton;
+struct MainWindowTitleBarState;
 class MainWindowTitleBarStateStore;
 class SystemTabBarStateHandler;
+
 } // namespace nx::vms::client::desktop
 
 class QnMainWindowTitleBarWidget:
@@ -24,6 +27,7 @@ class QnMainWindowTitleBarWidget:
     Q_PROPERTY(int y READ y WRITE setY NOTIFY yChanged)
 
     using base_type = QWidget;
+    using State = nx::vms::client::desktop::MainWindowTitleBarState;
     using Store = nx::vms::client::desktop::MainWindowTitleBarStateStore;
     using StateHandler = nx::vms::client::desktop::SystemTabBarStateHandler;
 
@@ -41,13 +45,12 @@ public:
     void setY(int y);
 
     QnLayoutTabBar* tabBar() const;
-    void setStateStore(QSharedPointer<Store> store, QSharedPointer<StateHandler> stateHandler);
+    void setStateStore(QSharedPointer<Store> store);
 
     /**
     * Sets tab bar and "add"/"tabs list menu" buttons visible (or not)
     */
     void setTabBarStuffVisible(bool visible);
-    void hideLayoutPanel(bool hide);
     bool isExpanded() const;
 
 signals:
@@ -80,10 +83,11 @@ private:
     /** Creates Screen Recording indicator. Returns nullptr if the recording is not avaliable. */
     QWidget* newRecordingIndicator(const QSize& fixedSize = QSize());
 
-    void initMultiSystemTabBar();
-    void initLayoutsOnlyTabBar();
-    void collapse();
-    void expand();
+    void initSystemNavigation();
+    void initLayoutNavigation();
+    void initControls();
+
+    void handleStateChange(const State& state);
 
 private:
     Q_DECLARE_PRIVATE(QnMainWindowTitleBarWidget)

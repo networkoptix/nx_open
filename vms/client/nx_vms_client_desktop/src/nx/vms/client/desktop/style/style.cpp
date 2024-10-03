@@ -375,14 +375,6 @@ int leftIndent(const QWidget* widget)
         : Metrics::kStandardPadding;
 }
 
-int rightIndent(const QWidget* widget)
-{
-    const auto value = widget->property(Properties::kSideIndentation);
-    return value.canConvert<QnIndents>()
-        ? value.value<QnIndents>().right()
-        : Metrics::kStandardPadding;
-}
-
 template<class T>
 T* isWidgetOwnedBy(const QWidget* widget)
 {
@@ -1486,7 +1478,7 @@ void Style::drawPrimitive(PrimitiveElement element,
                 QIcon::Mode mode = buttonIconMode(*option);
                 QSize size = qnSkin->maximumSize(icon, mode, state);
                 QRect placeholder = option->rect;
-                placeholder.moveLeft(placeholder.left() - rightIndent(widget));
+                placeholder.moveLeft(placeholder.left());
                 QRect rect = Geometry::aligned(size, placeholder, Qt::AlignVCenter | Qt::AlignRight);
                 icon.paint(painter, rect, Qt::AlignCenter, mode, state);
                 return;
@@ -2361,8 +2353,8 @@ void Style::drawControl(ControlElement element,
 
                 if (closeButton && closeButton->isVisible())
                 {
-                    textRect.setRight(textRect.right() -
-                        closeButton->width() - Metrics::kInterSpace - rightIndent(widget));
+                    textRect.setRight(
+                        textRect.right() - closeButton->width() - Metrics::kInterSpace);
                 }
 
                 if (shape == TabShape::Rectangular)

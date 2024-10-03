@@ -4,6 +4,8 @@
 
 #include <QtWidgets/QAbstractButton>
 
+class QTabBar;
+
 namespace nx::vms::client::desktop {
 
 class CloseTabButton: public QAbstractButton
@@ -17,6 +19,8 @@ public:
 
     explicit CloseTabButton(QWidget* parent = 0);
     virtual void paintEvent(QPaintEvent* event) override;
+
+    static CloseTabButton* createForTab(QTabBar* tabBar, int index);
 };
 
 } // namespace nx::vms::client::desktop

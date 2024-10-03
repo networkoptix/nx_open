@@ -5,21 +5,20 @@
 #include <nx/vms/client/desktop/common/widgets/tool_button.h>
 #include <ui/widgets/system_tab_bar_state_handler.h>
 
-#include "private/close_tab_button.h"
-
 namespace nx::vms::client::desktop {
+
+class CloseTabButton;
 
 class HomeTabButton: public ToolButton
 {
     Q_OBJECT
+
     using base_type = ToolButton;
     using Store = MainWindowTitleBarStateStore;
-    using State = MainWindowTitleBarState;
-    using StateHandler = SystemTabBarStateHandler;
 
 public:
     HomeTabButton(QWidget* parent = nullptr);
-    void setStateStore(QSharedPointer<Store> store, QSharedPointer<StateHandler> stateHandler);
+    void setStateStore(QSharedPointer<Store> store);
 
 private slots:
     void updateAppearance();
@@ -27,7 +26,6 @@ private slots:
 
 private:
     QSharedPointer<Store> m_store;
-    QSharedPointer<StateHandler> m_stateHandler;
     CloseTabButton* m_closeButton;
 };
 

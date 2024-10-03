@@ -5,7 +5,9 @@
 #include <QtGui/QPainter>
 #include <QtWidgets/QStyle>
 #include <QtWidgets/QStyleOption>
+#include <QtWidgets/QTabBar>
 
+#include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/style.h>
@@ -79,6 +81,19 @@ void CloseTabButton::paintEvent(QPaintEvent*)
         state = QIcon::On;
     }
     icon().paint(&painter, rect, Qt::AlignLeft | Qt::AlignVCenter, mode, state);
+}
+
+CloseTabButton* CloseTabButton::createForTab(QTabBar* tabBar, int index)
+{
+    if (!NX_ASSERT(tabBar))
+        return nullptr;
+
+    auto button = new CloseTabButton(tabBar);
+    tabBar->setTabButton(index, QTabBar::RightSide, button);
+    QObject::connect(button, &CloseTabButton::clicked, tabBar,
+        [button, tabBar]() { emit tabBar->tabCloseRequested(tabBar->tabAt(button->pos())); });
+
+    return button;
 }
 
 } // namespace nx::vms::client::desttop

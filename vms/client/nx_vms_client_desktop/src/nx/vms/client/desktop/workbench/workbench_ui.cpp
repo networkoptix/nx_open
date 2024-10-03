@@ -435,7 +435,7 @@ void WorkbenchUi::storeSettings()
     QnPaneSettings& title = m_settings[Qn::WorkbenchPane::Title];
     title.state = makePaneState(isTitleOpened());
     title.expanded = ini().enableMultiSystemTabBar
-        ? mainWindow()->titleBarStateStore()->isExpanded()
+        ? mainWindow()->titleBarStateStore()->state().expanded
         : false;
 
     if (m_resourceTreePanel)

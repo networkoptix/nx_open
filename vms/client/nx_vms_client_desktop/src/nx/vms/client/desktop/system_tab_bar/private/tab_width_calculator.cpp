@@ -103,6 +103,11 @@ int TabWidthCalculator::width(int index) const
     return m_tabWidths[index];
 }
 
+int TabWidthCalculator::originalFullWidth() const
+{
+    return std::accumulate(m_tabOriginalWidths.begin(), m_tabOriginalWidths.end(), 0);
+}
+
 QList<TabWidthCalculator::WidthInfo>::iterator TabWidthCalculator::findOrderedBound(int width)
 {
     const auto it = std::ranges::lower_bound(

@@ -59,9 +59,9 @@ enum IDType
     DisconnectMainMenuAction,
 
     /**
-     * Removes system from system tab bar.
+     * Opens a new window (client instance). It will connect to the specified system.
      */
-    RemoveSystemFromTabBarAction,
+    OpenSessionInNewWindowAction,
 
     /**
     * Switches mode to browse resources/show welcome screen

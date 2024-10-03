@@ -30,6 +30,7 @@
 #include <nx/vms/client/desktop/showreel/showreel_actions_handler.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/system_logon/logic/remote_session.h>
 #include <nx/vms/client/desktop/utils/webengine_profile_manager.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/common/showreel/showreel_manager.h>
@@ -277,8 +278,8 @@ Workbench::Workbench(WindowContext* windowContext, QObject* parent):
     connect(windowContext, &WindowContext::beforeSystemChanged, this,
         [this]()
         {
-            if (!d->layouts.empty())
-                emit systemAboutToBeChanged();
+            if (const auto store = mainWindow()->titleBarStateStore())
+                store->saveWorkbenchState(workbenchContext());
             clear();
         });
 }
@@ -504,19 +505,6 @@ void Workbench::setCurrentLayoutIndex(int index)
         return;
 
     setCurrentLayout(d->layouts[std::clamp<int>(0, index, d->layouts.size())].get());
-}
-
-void Workbench::addSystem(const QString& systemId, const LogonData& logonData)
-{
-    if (!ini().enableMultiSystemTabBar)
-        return;
-
-    auto systemDescription = appContext()->systemFinder()->getSystem(systemId);
-    NX_ASSERT(systemDescription, "Can't find description for system: %1", systemId);
-
-    if (ini().enableMultiSystemTabBar)
-        mainWindow()->titleBarStateStore()->addSystem(systemDescription, logonData);
-    emit currentSystemChanged(systemDescription);
 }
 
 void Workbench::setCurrentLayout(QnWorkbenchLayout* layout)
@@ -928,12 +916,14 @@ void Workbench::applyLoadedState()
 {
     if (ini().enableMultiSystemTabBar)
     {
-        const auto store = mainWindow()->titleBarStateStore();
-        const auto workbenchState = store->workbenchState(system()->localSystemId());
-        if (!workbenchState.isEmpty())
+        if (const auto sessionData = mainWindow()->titleBarStateStore()->state().findSession(
+            system()->session()->sessionId()))
         {
-            update(workbenchState);
-            return;
+            if (!sessionData->workbenchState.isEmpty())
+            {
+                update(sessionData->workbenchState);
+                return;
+            }
         }
     }
     d->stateDelegate->updateWorkbench();

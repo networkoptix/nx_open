@@ -44,11 +44,8 @@ TitleWorkbenchPanel::TitleWorkbenchPanel(
 {
     m_widget->setObjectName("WorkbenchTitleBar");
     if (ini().enableMultiSystemTabBar)
-    {
-        m_widget->setStateStore(
-            mainWindow()->titleBarStateStore(),
-            mainWindow()->systemTabBarStateHandler());
-    }
+        m_widget->setStateStore(mainWindow()->titleBarStateStore());
+
     connect(m_widget, &QnMainWindowTitleBarWidget::geometryChanged, this,
         &TitleWorkbenchPanel::updateControlsGeometry);
 

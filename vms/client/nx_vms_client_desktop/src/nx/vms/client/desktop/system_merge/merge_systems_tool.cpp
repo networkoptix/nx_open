@@ -268,7 +268,8 @@ void MergeSystemsTool::reportMergeFinished(
         if (const auto mainWindow = dynamic_cast<MainWindow*>(
             appContext()->mainWindowContext()->mainWindowWidget()))
         {
-            mainWindow->titleBarStateStore()->removeSystem(targetInfo.localSystemId);
+            const QString systemId = helpers::getTargetSystemId(targetInfo.getModuleInformation());
+            mainWindow->titleBarStateStore()->removeSessionsBySystemId(systemId);
         }
     }
 

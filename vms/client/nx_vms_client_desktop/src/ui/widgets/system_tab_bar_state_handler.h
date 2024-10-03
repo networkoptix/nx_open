@@ -10,35 +10,23 @@ namespace nx::vms::client::desktop {
 
 class SystemTabBarStateHandler: public QObject, public QnWorkbenchContextAware
 {
-    Q_OBJECT
     using State = MainWindowTitleBarState;
     using Store = MainWindowTitleBarStateStore;
 
 public:
-    SystemTabBarStateHandler(QObject* parent);
-    void setStateStore(QSharedPointer<Store> store);
-    void connectToSystem(const core::SystemDescriptionPtr& system, const LogonData& logonData);
-    void connectToSystem(const MainWindowTitleBarState::SystemData& systemData);
-    LogonData adjustedLogonData(const LogonData& source, const nx::Uuid& localId) const;
+    SystemTabBarStateHandler(const QSharedPointer<Store>& store, QObject* parent);
 
-signals:
-    void tabsChanged();
-    void activeSystemTabChanged(int index);
-    void homeTabActiveChanged(bool active);
-
-private slots:
-    void at_stateChanged(const State& state);
-    void at_currentSystemChanged(core::SystemDescriptionPtr systemDescription);
-    void at_systemDisconnected();
-    void dropCloudSystems();
-    void at_connectionStateChanged(ConnectActionsHandler::LogicalState logicalState);
-    void at_connectAction();
-    void storeWorkbenchState();
+private:
+    void handleStateChanged(const State& state);
+    void handleOpenSystemInNewWindowAction();
+    void handleSystemDiscovered(const core::SystemDescriptionPtr& systemDescription);
+    void handleWorkbenchStateChange();
+    void connectToSystem(const State::SessionData& systemData);
+    LogonData logonData(const State::SessionData& systemData) const;
 
 private:
     QSharedPointer<Store> m_store;
-    State m_storedState;
-    network::http::Credentials m_storedCredentials;
+    nx::Uuid m_lastActiveSystemId;
 };
 
 } // namespace nx::vms::client::desktop

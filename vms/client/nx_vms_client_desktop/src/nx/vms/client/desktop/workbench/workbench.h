@@ -166,8 +166,6 @@ public:
      */
     void setCurrentLayoutIndex(int index);
 
-    void addSystem(const QString& systemId, const LogonData& logonData);
-
     /**
      * @return Grid mapper for this workbench.
      */
@@ -236,8 +234,6 @@ signals:
      */
     void itemAboutToBeChanged(Qn::ItemRole role);
 
-    void systemAboutToBeChanged();
-
     /**
      * This signal is emitted whenever a new item is assigned to the role.
      *
@@ -254,8 +250,6 @@ signals:
      * This signal is emitted whenever current cell spacing changes.
      */
     void cellSpacingChanged();
-
-    void currentSystemChanged(core::SystemDescriptionPtr systemDescription);
 
 private slots:
     void at_layout_itemAdded(QnWorkbenchItem* item);

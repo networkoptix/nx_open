@@ -27,6 +27,7 @@ nx_add_target(nx_utils LIBRARY
 
 set(mocableFiles
     ${CMAKE_CURRENT_SOURCE_DIR}/src/nx/utils/counter.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/nx/utils/virtual_property.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/nx/utils/safe_direct_connection.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/nx/utils/software_version.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/nx/utils/uuid.h
