@@ -207,18 +207,15 @@ bool Rule::timeInSchedule(QDateTime datetime) const
     return nx::vms::common::timeInSchedule(datetime, m_schedule);
 }
 
-bool Rule::isValid() const
+bool Rule::isCompleted() const
 {
-    if (m_filters.empty() || m_builders.empty())
-        return false;
+    return !m_filters.empty() && !m_builders.empty();
+}
 
-    if (!utils::isCompatible(
-        m_engine, m_filters.front().get(), m_builders.front().get()))
-    {
-        return false;
-    }
-
-    return true;
+bool Rule::isCompatible() const
+{
+    return isCompleted()
+        && utils::isCompatible(m_engine, m_filters.front().get(), m_builders.front().get());
 }
 
 ValidationResult Rule::validity(
@@ -226,8 +223,21 @@ ValidationResult Rule::validity(
     const EventFieldFilter& eventFieldFilter,
     const ActionFieldFilter& actionFieldFilter) const
 {
-    ValidationResult result;
+    if (!isCompleted())
+    {
+        return {
+            QValidator::State::Invalid,
+            tr("Rule is not completed. One filter and one builder are required")};
+    }
 
+    if (!isCompatible())
+    {
+        return {
+            QValidator::State::Invalid,
+            tr("The given filter is not compatible with the given builder")};
+    }
+
+    ValidationResult result;
     QStringList eventFilterAlerts;
     for (const auto& eventFilter: m_filters)
     {

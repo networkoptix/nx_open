@@ -63,7 +63,7 @@ QnVirtualCameraResourceList getActualCameras(const QnResourcePool* resourcePool)
 
 bool isRuleValid(const vms::rules::ConstRulePtr& rule)
 {
-    return rule->isValid()
+    return rule->isCompatible()
         && vms::rules::utils::visibleFieldsValidity(
             rule.get(), appContext()->currentSystemContext()).isValid();
 }

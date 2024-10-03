@@ -68,7 +68,11 @@ public:
     QByteArray schedule() const;
     bool timeInSchedule(QDateTime time) const;
 
-    bool isValid() const;
+    // Returns whether at least one filter and one builder are added.
+    bool isCompleted() const;
+
+    // Returns whether the rule is completed and all the filters are compatible with all the builders.
+    bool isCompatible() const;
 
     using EventFieldFilter = std::function<bool(const EventFilterField*)>;
     using ActionFieldFilter = std::function<bool(const ActionBuilderField*)>;

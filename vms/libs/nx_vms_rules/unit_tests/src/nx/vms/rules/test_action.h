@@ -29,6 +29,22 @@ public:
     }
 };
 
+class TestProlongedOnlyAction: public nx::vms::rules::BasicAction
+{
+    Q_OBJECT
+    Q_CLASSINFO("type", "nx.actions.test.pureProlonged")
+
+public:
+    static ItemDescriptor manifest()
+    {
+        return ItemDescriptor{
+            .id = utils::type<TestProlongedOnlyAction>(),
+            .displayName = TranslatableString("Test prolonged only action"),
+            .flags = {ItemFlag::prolonged}
+        };
+    }
+};
+
 class TestProlongedAction: public nx::vms::rules::BasicAction
 {
     Q_OBJECT
