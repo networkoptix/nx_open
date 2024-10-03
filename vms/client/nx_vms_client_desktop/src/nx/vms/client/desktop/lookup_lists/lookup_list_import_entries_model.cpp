@@ -34,7 +34,8 @@ struct LookupListImportEntriesModel::Private
     QList<QVariantMap> completelyIncorrectRows;
     QVector<int> importedRows;
 
-    void initColumnHeaders(const std::vector<QString>& listModelAttributesNames);
+    void initDefaultColumnHeaders(const std::vector<QString>& listModelAttributesNames);
+    void adjustHeadersToMatchPreview();
     void reset();
     bool fullEntryRequiresFixup(const QVariantMap& entry);
     bool allValuesEmpty(const QVariantMap& entry);
@@ -78,7 +79,22 @@ bool LookupListImportEntriesModel::Private::allValuesEmpty(const QVariantMap& en
     return true;
 }
 
-void LookupListImportEntriesModel::Private::initColumnHeaders(
+void LookupListImportEntriesModel::Private::adjustHeadersToMatchPreview()
+{
+    const auto previewColumnCount = previewData.front().size();
+    const auto currentColumnHeaderCount = columnHeaders.size();
+    if (!previewColumnCount || previewColumnCount == currentColumnHeaderCount)
+        return;
+
+    // Remove entries that correspond to non-existing columns.
+    for (int i = previewColumnCount; i < currentColumnHeaderCount; ++i)
+        columnIndexToAttribute.remove(i);
+
+    // Adjust to match the preview column count, filling missing columns with default header.
+    columnHeaders.resize(previewColumnCount, defaultColumnHeader);
+}
+
+void LookupListImportEntriesModel::Private::initDefaultColumnHeaders(
     const std::vector<QString>& listModelAttributesNames)
 {
     reset();
@@ -194,13 +210,14 @@ void LookupListImportEntriesModel::setRawData(const PreviewRawData& rawData)
         return;
 
     beginResetModel();
+
     // Initialize column headers only if they have not been initialized yet.
     if (d->columnHeaders.empty())
-        d->initColumnHeaders(d->listEntriesModel->listModel()->rawData().attributeNames);
+        d->initDefaultColumnHeaders(d->listEntriesModel->listModel()->rawData().attributeNames);
+
     d->previewData = rawData;
 
-    if (d->previewData.size() && d->previewData.front().size() != d->columnHeaders.size())
-        d->columnHeaders.resize(d->previewData.front().size(), d->defaultColumnHeader);
+    d->adjustHeadersToMatchPreview();
 
     endResetModel();
     emit rowCountChanged();
@@ -233,7 +250,7 @@ void LookupListImportEntriesModel::setLookupListEntriesModel(
             {
                 if (listModel)
                 {
-                    d->initColumnHeaders(listModel->rawData().attributeNames);
+                    d->initDefaultColumnHeaders(listModel->rawData().attributeNames);
                     emit headerDataChanged(Qt::Horizontal, 0, d->columnHeaders.size());
                 }
             });
@@ -369,6 +386,11 @@ void LookupListImportEntriesModel::revertImport()
 
     d->listEntriesModel->deleteEntries(d->importedRows);
     reset();
+}
+
+bool LookupListImportEntriesModel::hasImportedRows()
+{
+    return !d->importedRows.empty();
 }
 
 } // namespace nx::vms::client::desktop

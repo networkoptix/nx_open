@@ -51,7 +51,7 @@ LookupListImportProcessor::ImportExitCode LookupListImportProcessor::Private::ru
         model->applyFix();
     }
     lookuplistEntriesModel->update();
-    return Success;
+    return model->hasImportedRows() ? Success : SuccessEmptyImport;
 }
 
 /**
@@ -72,7 +72,7 @@ LookupListImportProcessor::ImportExitCode LookupListImportProcessor::Private::ru
 
     auto columnIndexToAttribute = model->columnIndexToAttribute();
     if (columnIndexToAttribute.isEmpty())
-        return Success; //< User have chosen not to import any columns.
+        return SuccessEmptyImport; //< User have chosen not to import any columns.
 
     QTextStream streamCsv(&file);
     if (importHeaders)

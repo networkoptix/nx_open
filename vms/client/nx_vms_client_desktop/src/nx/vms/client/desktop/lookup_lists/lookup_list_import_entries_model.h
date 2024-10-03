@@ -78,6 +78,10 @@ public:
     bool fixupRequired();
     Q_INVOKABLE void applyFix();
     Q_INVOKABLE void revertImport();
+    /**
+     * After import original LookupListEntriesModel was changed.
+     */
+    bool hasImportedRows();
     Q_INVOKABLE void addFixForWord(
         const QString& attributeName, const QString& incorrectWord, const QString& fix);
 

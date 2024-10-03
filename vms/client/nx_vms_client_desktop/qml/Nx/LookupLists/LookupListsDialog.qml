@@ -29,6 +29,8 @@ Dialog
     property bool hasChanges: false
     property bool editing: false
 
+    signal forceTableSortingRequired
+
     title: qsTr("Lookup Lists")
 
     minimumWidth: 800
@@ -341,6 +343,16 @@ Dialog
                     rightMargin: 16
                     bottomMargin: 8
                 }
+
+                Connections
+                {
+                    target: control
+
+                    function onForceTableSortingRequired()
+                    {
+                        tableView.sortTable()
+                    }
+                }
             }
 
             Label
@@ -415,7 +427,11 @@ Dialog
         LookupListImportDialog
         {
             visible: false
-            onEntriesImported: hasChanges = true
+            onEntriesImported:
+            {
+                hasChanges = true
+                control.forceTableSortingRequired()
+            }
             Component.onCompleted: editing = true
             onRejected: editing = false
             onAccepted: editing = false
