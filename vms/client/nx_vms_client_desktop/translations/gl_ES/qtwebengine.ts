@@ -263,7 +263,7 @@
     </message>
     <message>
       <source>Are you sure you want to leave this page? Changes that you made may not be saved.</source>
-      <translation type="unfinished">Are you sure you want to leave this page? Changes that you made may not be saved.</translation>
+      <translation>Seguro que queres saír desta páxina? É posible que os cambios realizados non se garden.</translation>
     </message>
     <message>
       <source>&amp;Back</source>

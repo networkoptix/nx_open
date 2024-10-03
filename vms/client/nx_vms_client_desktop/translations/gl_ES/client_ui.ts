@@ -153,7 +153,7 @@
     </message>
     <message>
       <source>Instant</source>
-      <translation type="unfinished">Instant</translation>
+      <translation>Instantáneo</translation>
     </message>
   </context>
   <context>
@@ -224,15 +224,15 @@
     </message>
     <message>
       <source>Watching archive</source>
-      <translation type="unfinished">Watching archive</translation>
+      <translation>Vendo arquivo</translation>
     </message>
     <message>
       <source>Exporting video</source>
-      <translation type="unfinished">Exporting video</translation>
+      <translation>Exportando vídeo</translation>
     </message>
     <message>
       <source>Watching live</source>
-      <translation type="unfinished">Watching live</translation>
+      <translation>Vendo en directo</translation>
     </message>
     <message>
       <source>Login/logout</source>
@@ -440,11 +440,11 @@
     <name>BusinessRuleWidget</name>
     <message>
       <source>Event</source>
-      <translation type="unfinished">Event</translation>
+      <translation>Evento</translation>
     </message>
     <message>
       <source>Schedule...</source>
-      <translation type="unfinished">Schedule...</translation>
+      <translation>Programar...</translation>
     </message>
     <message>
       <source>Action</source>
@@ -579,7 +579,7 @@
     </message>
     <message>
       <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
+      <translation>ID lóxico</translation>
     </message>
     <message>
       <source>Trust camera timestamp</source>
@@ -710,7 +710,7 @@
     </message>
     <message>
       <source>Firmware</source>
-      <translation type="unfinished">Firmware</translation>
+      <translation>Firmware</translation>
     </message>
     <message>
       <source>Camera ID</source>
@@ -746,7 +746,7 @@
     </message>
     <message>
       <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
+      <translation>ID lóxico</translation>
     </message>
   </context>
   <context>
@@ -1523,7 +1523,7 @@
     </message>
     <message>
       <source>Camera name</source>
-      <translation type="unfinished">Camera name</translation>
+      <translation>Nome da cámara</translation>
     </message>
     <message>
       <source>Export date</source>
@@ -1611,7 +1611,7 @@
     </message>
     <message>
       <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
+      <translation>ID lóxico</translation>
     </message>
     <message>
       <source>Generate</source>
@@ -1630,7 +1630,7 @@
     <name>LayoutSelectionDialog</name>
     <message>
       <source>Select layout</source>
-      <translation type="unfinished">Select layout</translation>
+      <translation>Seleccionar deseño</translation>
     </message>
     <message>
       <source>Shared layouts</source>
@@ -1788,7 +1788,7 @@
     </message>
     <message>
       <source>Invalid License Key</source>
-      <translation type="unfinished">Invalid License Key</translation>
+      <translation>Clave de licenza non válida</translation>
     </message>
     <message>
       <source>Activation Key File</source>
@@ -1884,7 +1884,7 @@
     </message>
     <message>
       <source>Failed to save logs to the selected folder</source>
-      <translation type="unfinished">Failed to save logs to the selected folder</translation>
+      <translation>Erro ao gardar os rexistros na carpeta seleccionada</translation>
     </message>
     <message>
       <source>Open Files Folder</source>
@@ -2076,7 +2076,7 @@
     </message>
     <message>
       <source>Select layout...</source>
-      <translation type="unfinished">Select layout...</translation>
+      <translation>Seleccionar deseño...</translation>
     </message>
   </context>
   <context>
@@ -2095,7 +2095,7 @@
     </message>
     <message>
       <source>User</source>
-      <translation type="unfinished">User</translation>
+      <translation>Usuaria/o</translation>
     </message>
     <message>
       <source>Server Address</source>
@@ -3375,7 +3375,7 @@
     </message>
     <message>
       <source>On</source>
-      <translation type="unfinished">On</translation>
+      <translation>Acender</translation>
     </message>
     <message>
       <source>Off</source>
