@@ -291,10 +291,18 @@ void StorageRecordingContext::writeData(const QnConstAbstractMediaDataPtr& media
     int64_t timestampOffsetUsec = md->timestamp - timestamp;
     int64_t dts = av_rescale_q(timestamp, srcRate, stream->time_base);
 
-    if (m_streamIndexToLastDts[streamIndex] > 0)
-        avPkt.dts = std::max(m_streamIndexToLastDts[streamIndex] + 1, dts);
+    if (m_streamIndexToLastDts[streamIndex] > dts)
+    {
+        avPkt.dts = m_streamIndexToLastDts[streamIndex] + 1;
+        NX_DEBUG(this,
+            "Packet with stream index %1 has inconsistent dts %2. "
+            "Last saved dts for this stream: %3. Fixing dts to: %4",
+            streamIndex, dts, m_streamIndexToLastDts[streamIndex], avPkt.dts);
+    }
     else
+    {
         avPkt.dts = dts;
+    }
 
     m_streamIndexToLastDts[streamIndex] = dts;
 
@@ -335,15 +343,16 @@ void StorageRecordingContext::writeData(const QnConstAbstractMediaDataPtr& media
     }
 
     auto startWriteTime = high_resolution_clock::now();
-    int ret;
-    if (isInterleavedStream())
-        ret = av_interleaved_write_frame(context.formatCtx, &avPkt);
-    else
-        ret = av_write_frame(context.formatCtx, &avPkt);
-    auto endWriteTime = high_resolution_clock::now();
+    auto ret = isInterleavedStream()
+        ? av_interleaved_write_frame(context.formatCtx, &avPkt)
+        : av_write_frame(context.formatCtx, &avPkt);
 
-    context.totalWriteTimeNs +=
-        duration_cast<nanoseconds>(endWriteTime - startWriteTime).count();
+    auto endWriteTime = high_resolution_clock::now();
+    context.totalWriteTimeNs += duration_cast<nanoseconds>(endWriteTime - startWriteTime).count();
+    NX_VERBOSE(this,
+        "Writing ffmpeg packet. timestamp: %1, dts: %2, pts: %3, "
+        "stream index: %4, size: %5, result: %6, write time(ns): %7",
+        timestamp, avPkt.dts, avPkt.pts, streamIndex, avPkt.size, ret, context.totalWriteTimeNs);
 
     if (ret < 0 || context.formatCtx->pb->error == -1) //< Disk write operation failed.
     {
