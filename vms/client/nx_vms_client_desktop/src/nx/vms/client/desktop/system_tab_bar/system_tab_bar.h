@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <QTabBar>
+#include <QtWidgets/QTabBar>
 
 #include <nx/vms/client/core/system_finder/system_description_fwd.h>
 #include <nx/vms/client/desktop/common/widgets/tool_button.h>
@@ -25,39 +25,35 @@ class SystemTabBar:
     using base_type = QTabBar;
     using Store = MainWindowTitleBarStateStore;
     using State = MainWindowTitleBarState;
-    using StateHandler = SystemTabBarStateHandler;
 
 public:
     SystemTabBar(QWidget* parent = nullptr);
-    void setStateStore(QSharedPointer<Store> store, QSharedPointer<StateHandler> stateHandler);
-    void rebuildTabs();
-    bool isUpdating() const;
+    void setStateStore(QSharedPointer<Store> store);
     bool active() const;
 
 protected:
     virtual QSize tabSizeHint(int index) const override;
     virtual QSize minimumTabSizeHint(int index) const override;
-    virtual void mousePressEvent(QMouseEvent* event) override;
     virtual void contextMenuEvent(QContextMenuEvent* event) override;
     virtual void initStyleOption(QStyleOptionTab* option, int tabIndex) const override;
     virtual void resizeEvent(QResizeEvent* event) override;
     virtual void tabLayoutChange() override;
     virtual void wheelEvent(QWheelEvent* event) override;
 
-private slots:
-    void at_currentChanged(int index);
-    void at_tabMoved(int from, int to);
-
 private:
-    void insertClosableTab(int index, const core::SystemDescriptionPtr& systemDescription);
-    void closeSystem(const nx::Uuid& localId);
-    void switchSystem(bool forward);
+    int calculateTabWidth(const QString& text) const;
+    bool areTabsChanged(const State& state) const;
+    void rebuildTabs(const State& state);
+
+    void at_storeStateChanged(const State& state);
+    void at_tabActivated(int index);
+    void at_tabCloseRequested(int index);
+    void at_tabMoved(int from, int to);
 
 private:
     bool m_updating = false;
     bool m_resizing = false;
     QSharedPointer<Store> m_store;
-    QSharedPointer<StateHandler> m_stateHandler;
     TabWidthCalculator m_tabWidthCalculator;
 };
 

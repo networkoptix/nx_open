@@ -6,6 +6,7 @@
 
 #include <nx/vms/client/core/system_finder/system_description_fwd.h>
 #include <nx/vms/client/desktop/common/flux/flux_state_store.h>
+#include <nx/vms/client/desktop/state/session_id.h>
 #include <nx/vms/client/desktop/system_logon/logic/connect_actions_handler.h>
 #include <nx/vms/client/desktop/workbench/state/workbench_state.h>
 
@@ -15,27 +16,56 @@ struct MainWindowTitleBarStateReducer;
 
 struct MainWindowTitleBarState
 {
-    struct SystemData
+    struct SessionData
     {
-        core::SystemDescriptionPtr systemDescription;
-        LogonData logonData;
+        SessionId sessionId;
+
+        QString systemName;
+
+        bool cloudConnection = false;
+        QString systemId;
+        nx::Uuid localId;
+        nx::network::SocketAddress localAddress;
+        QString localUser;
+
         WorkbenchState workbenchState;
 
-        QString name() const;
-        bool operator==(const SystemData& other) const;
+        SessionData() {}
+        SessionData(
+            const SessionId& sessionId,
+            const nx::vms::api::ModuleInformation& moduleInformation,
+            const LogonData& logonData);
     };
 
-    bool expanded = false;
-    bool homeTabActive = true;
-    nx::Uuid currentSystemId;
-    int activeSystemTab = -1;
-    ConnectActionsHandler::LogicalState connectState =
-        ConnectActionsHandler::LogicalState::disconnected;
-    QList<SystemData> systems;
-    bool systemUpdating = false;
+    /**
+     * When true, the title bar is explicitly set to two-level mode. It may still be displayed as
+     * one-level widget when two levels make no sense (layout panel is not visible).
+     */
+    bool expanded = true;
 
-    int findSystemIndex(const nx::Uuid& systemId) const;
-    int findSystemIndex(const LogonData& logonData) const;
+    /**
+     * Home tab is a button which is always displayed next to the system tab bar. When it is
+     * active, it is expanded and has a "close" button.
+     */
+    bool homeTabActive = true;
+
+    /** When true, the layout navigation widget is visible. */
+    bool layoutNavigationVisible = false;
+
+    /** A list of currently opened sessions on the system tab bar. */
+    QList<SessionData> sessions;
+
+    /**
+     * The ID of the currently connected session. Usually the corresponding tab on the system tab
+     * bar is displayed as active. However in certain cases the tab bar may have no active tab even
+     * though `activeSessionId` is not empty. Typically this happens when the home tab is active.
+     */
+    std::optional<SessionId> activeSessionId;
+
+    int sessionIndex(const SessionId& sessionId) const;
+    std::optional<SessionData> findSession(const SessionId& sessionId) const;
+
+    bool hasWorkbenchState() const;
 };
 
 class MainWindowTitleBarStateStore: public QObject, public FluxStateStore<MainWindowTitleBarState>
@@ -48,39 +78,32 @@ public:
     MainWindowTitleBarStateStore();
     virtual ~MainWindowTitleBarStateStore() override;
 
-    void setExpanded(bool value);
-    void setHomeTabActive(bool value);
-    void setCurrentSystemId(nx::Uuid value);
-    void setActiveSystemTab(int value);
-    void setConnectionState(ConnectActionsHandler::LogicalState value);
+    void setExpanded(bool expanded);
+    void updateFromWorkbench(QnWorkbenchContext* workbenchContext);
 
-    void addSystem(const core::SystemDescriptionPtr& systemDescription,
-        const LogonData& logonData);
-    void insertSystem(int index, const State::SystemData systemData);
-    void removeSystem(const core::SystemDescriptionPtr& systemDescription);
-    void removeSystem(const nx::Uuid& systemId);
-    void removeSystem(int index);
-    void removeSystem(const LogonData& logonData);
-    void removeCurrentSystem();
-    void changeCurrentSystem(core::SystemDescriptionPtr systemDescription);
-    void moveSystem(int indexFrom, int indexTo);
-    void activateHomeTab();
-    void setSystemUpdating(bool value);
-    void setSystems(QList<State::SystemData> systems);
-    void setWorkbenchState(const nx::Uuid& systemId, const WorkbenchState& workbenchState);
-    void setCurrentCredentials(network::http::Credentials credentials);
+    void setHomeTabActive(bool active);
+    void setActiveSessionId(const std::optional<SessionId>& sessionId);
+    void setActiveTab(int index);
 
-    int systemCount() const;
-    std::optional<State::SystemData> systemData(int index) const;
-    bool isExpanded() const;
-    bool isHomeTabActive() const;
-    bool isLayoutPanelHidden() const;
-    int activeSystemTab() const;
-    nx::Uuid currentSystemId() const;
-    WorkbenchState workbenchState(const nx::Uuid& systemId) const;
-    bool isTitleBarEnabled() const;
-    QList<nx::Uuid> systemsIds() const;
-    bool hasWorkbenchState() const;
+    void handleResourceModeActionTriggered(bool checked);
+
+    void addSession(State::SessionData sessionData);
+    void updateSystemName(const QString& systemId, const QString& name);
+    void removeSession(const SessionId& sessionId);
+
+    /**
+     * Removes the specified session, but evaluates the `confirmationFunction` first when
+     * necessary. If the result is `false`, the session is not removed and the state is kept
+     * unchanged. The function should ask the user if they want to disconnect.
+     */
+    void disconnectAndRemoveSession(
+        const SessionId& sessionId, const std::function<bool()>& confirmationFunction);
+
+    void removeSessionsBySystemId(const QString& systemId);
+    void moveSession(int indexFrom, int indexTo);
+    void setSessions(QList<State::SessionData> sessions);
+    void removeCloudSessions();
+    void saveWorkbenchState(QnWorkbenchContext* workbenchContext);
 
 signals:
     void stateChanged(const State& state);

@@ -289,6 +289,9 @@ namespace Qn
          */
         LocalSystemIdRole,
 
+        /** Remote session ID. Used in OpenSessionInNewWindowAction. */
+        SessionIdRole,
+
         /** CloudSystemConnectData structure. Used in the ConnectToCloudSystemAction. */
         CloudSystemConnectDataRole,
 

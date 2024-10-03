@@ -16,6 +16,7 @@ public:
     void reset();
     int count() const;
     int width(int index) const;
+    int originalFullWidth() const;
 
 private:
     struct WidthInfo

@@ -16,12 +16,12 @@ static constexpr int kDefaultConnectionPort = 7001;
 static const QString kFactorySystemUser = "admin";
 static const QString kFactorySystemPassword = "admin";
 
-/*
-* Extracts system id. Result is:
-* - identifier of server if it is in "new state"
-* - cloud id if server in cloud
-* - system name in other cases
-*/
+/**
+ * Extracts system ID. Result is:
+ * - identifier of server if it is in "new state"
+ * - cloud ID if server in cloud
+ * - local system ID in other cases
+ */
 NX_VMS_COMMON_API QString getTargetSystemId(const nx::vms::api::ModuleInformation& info);
 NX_VMS_COMMON_API QString getTargetSystemId(const QnCloudSystem& cloudSystem);
 

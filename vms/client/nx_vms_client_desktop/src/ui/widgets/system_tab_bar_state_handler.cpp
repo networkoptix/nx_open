@@ -2,50 +2,61 @@
 
 #include "system_tab_bar_state_handler.h"
 
-#include <QtGui/QAction>
-
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/network/credentials_manager.h>
 #include <nx/vms/client/core/system_finder/system_description.h>
+#include <nx/vms/client/core/system_finder/system_finder.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/action_parameters.h>
+#include <nx/vms/client/desktop/state/client_state_handler.h>
+#include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/system_logon/logic/remote_session.h>
 #include <nx/vms/client/desktop/system_logon/ui/welcome_screen.h>
 #include <nx/vms/client/desktop/window_context.h>
-#include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/widgets/main_window.h>
 #include <ui/workbench/workbench_context.h>
-#include <utils/common/delayed.h>
 
 namespace nx::vms::client::desktop {
 
-SystemTabBarStateHandler::SystemTabBarStateHandler(QObject* parent):
-    QnWorkbenchContextAware(parent)
+SystemTabBarStateHandler::SystemTabBarStateHandler(
+    const QSharedPointer<Store>& store,
+    QObject* parent)
+    :
+    QnWorkbenchContextAware(parent),
+    m_store(store)
 {
-    connect(workbench(),
-        &Workbench::currentSystemChanged,
-        this,
-        &SystemTabBarStateHandler::at_currentSystemChanged);
+    NX_CRITICAL(m_store);
 
-    connect(workbench(),
-        &Workbench::systemAboutToBeChanged,
+    connect(m_store.get(),
+        &Store::stateChanged,
         this,
-        &SystemTabBarStateHandler::storeWorkbenchState);
-
-    connect(action(menu::RemoveSystemFromTabBarAction),
-        &QAction::triggered,
-        this,
-        &SystemTabBarStateHandler::at_systemDisconnected);
-
-    connect(action(menu::ConnectAction),
-        &QAction::triggered,
-        this,
-        &SystemTabBarStateHandler::at_connectAction);
+        &SystemTabBarStateHandler::handleStateChanged);
 
     connect(windowContext()->connectActionsHandler(),
         &ConnectActionsHandler::stateChanged,
         this,
-        &SystemTabBarStateHandler::at_connectionStateChanged);
+        &SystemTabBarStateHandler::handleWorkbenchStateChange);
+
+    connect(system(),
+        &SystemContext::remoteIdChanged,
+        this,
+        &SystemTabBarStateHandler::handleWorkbenchStateChange);
+
+    connect(action(menu::ResourcesModeAction),
+        &QAction::triggered,
+        m_store.get(),
+        &MainWindowTitleBarStateStore::handleResourceModeActionTriggered);
+
+    connect(action(menu::OpenSessionInNewWindowAction),
+        &QAction::triggered,
+        this,
+        &SystemTabBarStateHandler::handleOpenSystemInNewWindowAction);
+
+    connect(appContext()->systemFinder(),
+        &core::SystemFinder::systemDiscovered,
+        this,
+        &SystemTabBarStateHandler::handleSystemDiscovered);
 
     connect(appContext()->cloudStatusWatcher(),
         &core::CloudStatusWatcher::statusChanged,
@@ -53,176 +64,102 @@ SystemTabBarStateHandler::SystemTabBarStateHandler(QObject* parent):
         [this](core::CloudStatusWatcher::Status status)
         {
             if (status == core::CloudStatusWatcher::Status::LoggedOut)
-                dropCloudSystems();
-        });
-
-    connect(action(menu::ResourcesModeAction), &QAction::toggled, this,
-        [this](bool value)
-        {
-            if (!m_store)
-                return;
-
-            const auto connectionState =
-                windowContext()->connectActionsHandler()->logicalState();
-
-            m_store->setHomeTabActive(!value
-                && connectionState != ConnectActionsHandler::LogicalState::connecting);
-
-            m_store->setExpanded(!value
-                || connectionState != ConnectActionsHandler::LogicalState::disconnected);
+                m_store->removeCloudSessions();
         });
 }
 
-void SystemTabBarStateHandler::setStateStore(QSharedPointer<Store> store)
+void SystemTabBarStateHandler::connectToSystem(const State::SessionData& sessionData)
 {
-    if (m_store)
-        m_store->disconnect(this);
-
-    m_store = store;
-
-    if (m_store)
+    if (sessionData.cloudConnection)
     {
-        connect(m_store.get(),
-            &MainWindowTitleBarStateStore::stateChanged,
-            this,
-            &SystemTabBarStateHandler::at_stateChanged);
+        menu()->trigger(menu::ConnectToCloudSystemAction,
+            menu::Parameters().withArgument(Qn::CloudSystemConnectDataRole,
+                CloudSystemConnectData{sessionData.systemId, ConnectScenario::connectFromTabBar}));
+        return;
     }
+
+    const LogonData& logonData = this->logonData(sessionData);
+
+    if (logonData.credentials.authToken.empty())
+    {
+        action(menu::ResourcesModeAction)->setChecked(false);
+        mainWindow()->welcomeScreen()->openArbitraryTile(sessionData.systemId);
+        m_store->removeSession(sessionData.sessionId);
+        return;
+    }
+
+    menu()->trigger(
+        menu::ConnectAction, menu::Parameters().withArgument(Qn::LogonDataRole, logonData));
 }
 
-void SystemTabBarStateHandler::connectToSystem(
-    const core::SystemDescriptionPtr& system, const LogonData& logonData)
+LogonData SystemTabBarStateHandler::logonData(const State::SessionData& sessionData) const
 {
-    executeLater(
-        [this, system, ld = logonData]()
+    LogonData logonData;
+    logonData.connectScenario = ConnectScenario::connectFromTabBar;
+    logonData.address = sessionData.localAddress;
+
+    logonData.credentials = core::CredentialsManager::credentials(
+        sessionData.localId, sessionData.localUser.toStdString()).value_or(
+            network::http::Credentials());
+
+    logonData.storePassword = !logonData.credentials.authToken.empty();
+
+    return logonData;
+}
+
+void SystemTabBarStateHandler::handleStateChanged(const State& state)
+{
+    action(menu::ResourcesModeAction)->setChecked(
+        !state.homeTabActive && state.layoutNavigationVisible);
+
+    const std::shared_ptr<RemoteSession> session = appContext()->currentSystemContext()->session();
+
+    if (state.activeSessionId)
+    {
+        if (!session || session->sessionId() != *state.activeSessionId)
         {
-            auto logonData = adjustedLogonData(ld, system->localId());
-            if (logonData.credentials.authToken.empty())
-            {
-                action(menu::ResourcesModeAction)->setChecked(false);
-                mainWindow()->welcomeScreen()->openArbitraryTile(system->id());
-                m_store->removeSystem(system->localId());
-                return;
-            }
+            const std::optional<State::SessionData>& sessionData =
+                state.findSession(*state.activeSessionId);
 
-            menu()->trigger(menu::ConnectAction, menu::Parameters()
-                .withArgument(Qn::LogonDataRole, logonData));
-        },
-        this);
-}
-
-void SystemTabBarStateHandler::connectToSystem(
-    const MainWindowTitleBarState::SystemData& systemData)
-{
-    connectToSystem(systemData.systemDescription, systemData.logonData);
-}
-
-LogonData SystemTabBarStateHandler::adjustedLogonData(
-    const LogonData& source, const Uuid& localId) const
-{
-    LogonData adjusted = source;
-
-    const auto credentials = core::CredentialsManager::credentials(localId);
-    if (adjusted.credentials.authToken.empty() && !credentials.empty())
-        adjusted.credentials = credentials[0];
-
-    adjusted.connectScenario = ConnectScenario::connectFromTabBar;
-    adjusted.storePassword = !credentials.empty() && !credentials[0].authToken.empty();
-
-    return adjusted;
-}
-
-void SystemTabBarStateHandler::at_stateChanged(const State& state)
-{
-    if (!NX_ASSERT(m_store))
-        return;
-
-    if (state.systems != m_storedState.systems)
-        emit tabsChanged();
-
-    if (state.homeTabActive != m_storedState.homeTabActive)
-    {
-        emit homeTabActiveChanged(state.homeTabActive);
+            if (NX_ASSERT(sessionData))
+                connectToSystem(*sessionData);
+        }
     }
-    else if (state.activeSystemTab != m_storedState.activeSystemTab && !state.homeTabActive)
+    else if (appContext()->mainWindowContext()->connectActionsHandler()->logicalState()
+        != ConnectActionsHandler::LogicalState::disconnected)
     {
-        emit activeSystemTabChanged(state.activeSystemTab);
-    }
+        if (session)
+            session->autoTerminateIfNeeded();
 
-    m_storedState = state;
-}
-
-void SystemTabBarStateHandler::at_currentSystemChanged(
-    core::SystemDescriptionPtr systemDescription)
-{
-    if (!NX_ASSERT(m_store))
-        return;
-
-    m_store->changeCurrentSystem(systemDescription);
-    if (!m_storedCredentials.authToken.empty())
-    {
-        m_store->setCurrentCredentials(m_storedCredentials);
-        m_storedCredentials = {};
+        action(menu::DisconnectAction)->trigger();
     }
 }
 
-void SystemTabBarStateHandler::at_systemDisconnected()
-{
-    if (!NX_ASSERT(m_store))
-        return;
-
-    const auto parameters = menu()->currentParameters(sender());
-    const auto systemId = parameters.argument(Qn::LocalSystemIdRole).value<nx::Uuid>();
-    m_store->removeSystem(systemId);
-}
-
-void SystemTabBarStateHandler::at_connectionStateChanged(
-    ConnectActionsHandler::LogicalState logicalState)
-{
-    if (!NX_ASSERT(m_store))
-        return;
-
-    m_store->setHomeTabActive(!action(menu::ResourcesModeAction)->isChecked()
-        && windowContext()->connectActionsHandler()->logicalState()
-            != ConnectActionsHandler::LogicalState::connecting);
-
-    m_store->setConnectionState(logicalState);
-    if (logicalState == ConnectActionsHandler::LogicalState::disconnected)
-    {
-        storeWorkbenchState();
-        m_store->setCurrentSystemId({});
-        m_store->setActiveSystemTab(-1);
-    }
-}
-
-void SystemTabBarStateHandler::dropCloudSystems()
-{
-    QList<MainWindowTitleBarState::SystemData> systems = m_store->state().systems;
-    systems.removeIf(
-        [](const auto& system)
-        {
-            return system.logonData.userType == nx::vms::api::UserType::cloud;
-        });
-    m_store->setSystems(systems);
-}
-
-void SystemTabBarStateHandler::at_connectAction()
+void SystemTabBarStateHandler::handleOpenSystemInNewWindowAction()
 {
     const auto parameters = menu()->currentParameters(sender());
-    m_storedCredentials = parameters.argument<LogonData>(Qn::LogonDataRole).credentials;
-}
+    const auto sessionId = parameters.argument<SessionId>(Qn::SessionIdRole);
 
-void SystemTabBarStateHandler::storeWorkbenchState()
-{
-    if (!NX_ASSERT(m_store))
+    std::optional<State::SessionData> sessionData = m_store->state().findSession(sessionId);
+    if (!sessionData)
         return;
 
-    const auto systemId = m_store->currentSystemId();
-    if (!systemId.isNull())
-    {
-        WorkbenchState workbenchState;
-        workbench()->submit(workbenchState);
-        m_store->setWorkbenchState(systemId, workbenchState);
-    }
+    appContext()->clientStateHandler()->createNewWindow(logonData(*sessionData));
+}
+
+void SystemTabBarStateHandler::handleSystemDiscovered(
+    const core::SystemDescriptionPtr& systemDescription)
+{
+    connect(systemDescription.get(), &core::SystemDescription::systemNameChanged, this,
+        [this, systemDescription]()
+        {
+            m_store->updateSystemName(systemDescription->id(), systemDescription->name());
+        });
+}
+
+void SystemTabBarStateHandler::handleWorkbenchStateChange()
+{
+    m_store->updateFromWorkbench(workbenchContext());
 }
 
 } // namespace nx::vms::client::desktop

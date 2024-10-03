@@ -2,21 +2,25 @@
 
 #include "main_window_title_bar_state.h"
 
+#include <QtGui/QAction>
+
 #include <network/system_helpers.h>
-#include <nx/fusion/serialization/json_functions.h>
+#include <nx/reflect/instrument.h>
 #include <nx/vms/client/core/network/credentials_manager.h>
 #include <nx/vms/client/core/system_finder/system_description.h>
-#include <nx/vms/client/core/system_finder/system_finder.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
+#include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/system_logon/logic/remote_session.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
+#include <ui/workbench/workbench_context.h>
 
 namespace {
 
 const QString kSystemTabBarStateDelegate = "systemTabBar";
-const QString kSystemsKey = "systems";
+const QString kSessionsKey = "sessions";
 
 } // namespace
 
@@ -24,46 +28,60 @@ namespace nx::vms::client::desktop {
 
 using core::SystemDescriptionPtr;
 
+using State = MainWindowTitleBarState;
+
 //-------------------------------------------------------------------------------------------------
 // struct MainWindowTitleBarState
 
-QString MainWindowTitleBarState::SystemData::name() const
+NX_REFLECTION_INSTRUMENT(MainWindowTitleBarState::SessionData,
+    // `workbenchState` should not be serialized.
+    (sessionId)(systemName)(cloudConnection)(systemId)(localId)(localAddress)(localUser))
+
+State::SessionData::SessionData(
+    const SessionId& sessionId,
+    const nx::vms::api::ModuleInformation& moduleInformation,
+    const LogonData& logonData)
+    :
+    sessionId(sessionId),
+    systemName(moduleInformation.systemName),
+    cloudConnection(logonData.userType == api::UserType::cloud),
+    systemId(::helpers::getTargetSystemId(moduleInformation))
 {
-    return systemDescription->name();
+    if (!cloudConnection)
+    {
+        localId = moduleInformation.localSystemId;
+        localAddress = logonData.address;
+        localUser = QString::fromStdString(logonData.credentials.username);
+    }
 }
 
-bool MainWindowTitleBarState::SystemData::operator==(const SystemData& other) const
+int MainWindowTitleBarState::sessionIndex(const SessionId& sessionId) const
 {
-    // FIXME: #aivashchenko Comparing pointers looks very suspicious.
-    return this->systemDescription == other.systemDescription;
+    for (int i = 0; i < sessions.size(); ++i)
+    {
+        if (sessions[i].sessionId == sessionId)
+            return i;
+    }
+
+    return -1;
 }
 
-int MainWindowTitleBarState::findSystemIndex(const nx::Uuid& systemId) const
+std::optional<State::SessionData> MainWindowTitleBarState::findSession(
+    const SessionId& sessionId) const
 {
-    const auto it = std::find_if(systems.cbegin(), systems.cend(),
-        [systemId](const auto system)
-        {
-            return system.systemDescription->localId() == systemId;
-        });
+    for (const SessionData& session: sessions)
+    {
+        if (session.sessionId == sessionId)
+            return session;
+    }
 
-    if (it == systems.cend())
-        return -1;
-
-    return std::distance(systems.cbegin(), it);
+    return std::nullopt;
 }
 
-int MainWindowTitleBarState::findSystemIndex(const LogonData& logonData) const
+bool MainWindowTitleBarState::hasWorkbenchState() const
 {
-    const auto it = std::find_if(systems.cbegin(), systems.cend(),
-        [logonData](const auto system)
-        {
-            return system.logonData == logonData;
-        });
-
-    if (it == systems.cend())
-        return -1;
-
-    return std::distance(systems.cbegin(), it);
+    return std::ranges::any_of(sessions,
+        [](const SessionData& session) { return !session.workbenchState.isEmpty(); });
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -71,182 +89,224 @@ int MainWindowTitleBarState::findSystemIndex(const LogonData& logonData) const
 
 struct MainWindowTitleBarStateReducer
 {
-    using State = MainWindowTitleBarState;
-
-    static State setExpanded(State&& state, bool value);
-    static State setHomeTabActive(State&& state, bool value);
-    static State setCurrentSystemId(State&& state, nx::Uuid value);
-    static State setActiveSystemTab(State&& state, int index);
-    static State activateHomeTab(State&& state);
-    static State setConnectionState(State&& state, ConnectActionsHandler::LogicalState value);
-    static State addSystem(State&& state, State::SystemData value);
-    static State insertSystem(State&& state, int index, State::SystemData value);
-    static State removeSystem(State&& state, int index);
-    static State removeSystemId(State&& state, nx::Uuid systemId);
-    static State removeSystem(State&& state, const LogonData& logonData);
-    static State removeCurrentSystem(State&& state);
-    static State changeCurrentSystem(State&& state, SystemDescriptionPtr systemDescription);
-    static State moveSystem(State&& state, int indexFrom, int IndexTo);
-    static State setSystemUpdating(State&& state, bool value);
-    static State setSystems(State&& state, QList<State::SystemData> systems);
-    static State setWorkbenchState(State&& state, int index, WorkbenchState workbenchState);
-    static State setCredentials(State&& state, int index, network::http::Credentials credentials);
+    static State setExpanded(State&& state, bool expanded);
+    static State setHomeTabActive(State&& state, bool active);
+    static State setActiveSessionId(
+        State&& state, const std::optional<SessionId>& sessionId);
+    static State setActiveTab(State&& state, int index);
+    static State handleResourceModeActionToggled(State&& state, bool checked);
+    static State addSession(State&& state, State::SessionData sessionData);
+    static State updateSystemName(State&& state, const QString& systemId, const QString& name);
+    static State removeSession(State&& state, const SessionId& sessionId);
+    static State disconnectAndRemoveSession(
+        State&& state,
+        const SessionId& sessionId,
+        const std::function<bool()>& confirmationFunction);
+    static State moveSession(State&& state, int indexFrom, int IndexTo);
+    static State selectAnotherSessionIfNecessary(State&& state);
+    static State setSessions(State&& state, QList<State::SessionData> sessions);
+    static State removeCloudSessions(State&& state);
+    static State removeSessionsBySystemId(State&& state, const QString& systemId);
+    static State saveWorkbenchState(
+        State&& state, const SessionId& sessionId, WorkbenchState workbenchState);
+    static State updateFromWorkbench(State&& state, QnWorkbenchContext* workbenchContext);
 };
 
-MainWindowTitleBarStateReducer::State MainWindowTitleBarStateReducer::setExpanded(
-    State&& state, bool value)
+State MainWindowTitleBarStateReducer::setExpanded(State&& state, bool expanded)
 {
-    state.expanded = value;
+    state.expanded = expanded;
     return state;
 }
 
-MainWindowTitleBarStateReducer::State MainWindowTitleBarStateReducer::setHomeTabActive(
-    State&& state, bool value)
+State MainWindowTitleBarStateReducer::setHomeTabActive(State&& state, bool active)
 {
-    state.homeTabActive = value;
+    if (!NX_ASSERT(active || state.activeSessionId))
+    {
+        // We cannot deactivate home tab when there's no active connection.
+        return state;
+    }
+
+    state.homeTabActive = active;
+    if (state.homeTabActive)
+    {
+        state.expanded = true;
+        state.layoutNavigationVisible = false;
+    }
+    else
+    {
+        state.layoutNavigationVisible = state.activeSessionId.has_value();
+    }
+
+    if (!active && !state.activeSessionId && !state.sessions.empty())
+        return setActiveSessionId(std::move(state), state.sessions.first().sessionId);
+
     return state;
 }
 
-MainWindowTitleBarStateReducer::State MainWindowTitleBarStateReducer::setCurrentSystemId(
-    State&& state, nx::Uuid value)
+State MainWindowTitleBarStateReducer::setActiveSessionId(
+    State&& state, const std::optional<SessionId>& sessionId)
 {
-    state.currentSystemId = value;
+    state.activeSessionId = sessionId;
+    state.homeTabActive = !sessionId;
+    if (!sessionId)
+        state.layoutNavigationVisible = false;
     return state;
 }
 
-MainWindowTitleBarStateReducer::State MainWindowTitleBarStateReducer::setActiveSystemTab(
-    State&& state, int index)
+State MainWindowTitleBarStateReducer::setActiveTab(State&& state, int index)
 {
-    state.activeSystemTab = index;
+    if (!NX_ASSERT(index < state.sessions.size()))
+        return state;
+
+    std::optional<SessionId> sessionId;
+    if (index >= 0)
+        sessionId = state.sessions[index].sessionId;
+
+    return setActiveSessionId(std::move(state), sessionId);
+}
+
+State MainWindowTitleBarStateReducer::handleResourceModeActionToggled(State&& state, bool checked)
+{
+    if (!checked)
+        return setHomeTabActive(std::move(state), true);
+
+    // Currently this action can be manually triggered only when there's no active connection and
+    // it should open local files.
+    if (!NX_ASSERT(!state.activeSessionId))
+        return state;
+
+    state.homeTabActive = false;
+    state.layoutNavigationVisible = true;
+
     return state;
 }
 
-MainWindowTitleBarStateReducer::State MainWindowTitleBarStateReducer::activateHomeTab(
-    State&& state)
+State MainWindowTitleBarStateReducer::addSession(State&& state, State::SessionData sessionData)
 {
-    state.expanded = true;
-    state.homeTabActive = true;
+    state.sessions.append(std::move(sessionData));
     return state;
 }
 
-MainWindowTitleBarStateReducer::State MainWindowTitleBarStateReducer::setConnectionState(
-    State&& state, ConnectActionsHandler::LogicalState value)
+State MainWindowTitleBarStateReducer::updateSystemName(
+    State&& state, const QString& systemId, const QString& name)
 {
-    state.connectState = value;
+    // There are may be more than one session with the same systemId.
+    for (State::SessionData& system: state.sessions)
+    {
+        if (system.systemId == systemId)
+            system.systemName = name;
+    }
     return state;
 }
 
-MainWindowTitleBarStateReducer::State MainWindowTitleBarStateReducer::addSystem(State&& state,
-    MainWindowTitleBarState::SystemData value)
+State MainWindowTitleBarStateReducer::removeSession(State&& state, const SessionId& sessionId)
 {
-    state.systems.append(value);
-    return state;
-}
-
-MainWindowTitleBarStateReducer::State MainWindowTitleBarStateReducer::insertSystem(State&& state,
-    int index,
-    MainWindowTitleBarState::SystemData value)
-{
-    state.systems.insert(index, value);
-    return state;
-}
-
-MainWindowTitleBarStateReducer::State MainWindowTitleBarStateReducer::removeSystem(State&& state,
-    int index)
-{
+    int index = state.sessionIndex(sessionId);
     if (index < 0)
         return state;
 
-    state.systems.removeAt(index);
-    if (index == state.activeSystemTab)
+    state.sessions.removeAt(index);
+    if (sessionId == state.activeSessionId)
     {
-        state.homeTabActive = true;
-        state.activeSystemTab = -1;
-        state.currentSystemId = {};
-    }
-    else if (index < state.activeSystemTab)
-    {
-        state.activeSystemTab--;
+        index = qBound(-1, index, state.sessions.size() - 1);
+        return setActiveTab(std::move(state), index);
     }
     return state;
 }
 
-MainWindowTitleBarStateReducer::State MainWindowTitleBarStateReducer::removeSystemId(
-    State&& state, nx::Uuid systemId)
+State MainWindowTitleBarStateReducer::disconnectAndRemoveSession(
+    State&& state,
+    const SessionId& sessionId,
+    const std::function<bool()>& confirmationFunction)
 {
-    return removeSystem(std::move(state), state.findSystemIndex(systemId));
+    if (state.activeSessionId == sessionId && !confirmationFunction())
+        return state;
+
+    return removeSession(std::move(state), sessionId);
 }
 
-MainWindowTitleBarStateReducer::State MainWindowTitleBarStateReducer::removeSystem(
-    State&& state, const LogonData& logonData)
-{
-    return removeSystem(std::move(state), state.findSystemIndex(logonData));
-}
-
-MainWindowTitleBarStateReducer::State MainWindowTitleBarStateReducer::removeCurrentSystem(
-    State&& state)
-{
-    return removeSystem(std::move(state), state.activeSystemTab);
-}
-
-MainWindowTitleBarStateReducer::State MainWindowTitleBarStateReducer::changeCurrentSystem(
-    State&& state, SystemDescriptionPtr systemDescription)
-{
-    const auto systemId = systemDescription->localId();
-    const auto index = state.findSystemIndex(systemId);
-    state.currentSystemId = systemId;
-    state.activeSystemTab = index;
-    state.homeTabActive = false;
-    return state;
-}
-
-MainWindowTitleBarStateReducer::State MainWindowTitleBarStateReducer::moveSystem(
-    State&& state, int indexFrom, int indexTo)
+State MainWindowTitleBarStateReducer::moveSession(State&& state, int indexFrom, int indexTo)
 {
     if (indexFrom < 0 || indexTo < 0 || indexFrom == indexTo
-        || indexFrom >= state.systems.count() || indexTo >= state.systems.count())
+        || indexFrom >= state.sessions.count() || indexTo >= state.sessions.count())
     {
         return state;
     }
 
-    state.systems.move(indexFrom, indexTo);
-
-    if (state.activeSystemTab == indexFrom)
-        state.activeSystemTab = indexTo;
-    else if (indexFrom < state.activeSystemTab && indexTo >= state.activeSystemTab)
-        --state.activeSystemTab;
-    else if (indexFrom > state.activeSystemTab && indexTo <= state.activeSystemTab)
-        ++state.activeSystemTab;
+    state.sessions.move(indexFrom, indexTo);
 
     return state;
 }
 
-MainWindowTitleBarStateReducer::State MainWindowTitleBarStateReducer::setSystemUpdating(
-    State&& state, bool value)
+State MainWindowTitleBarStateReducer::selectAnotherSessionIfNecessary(State&& state)
 {
-    state.systemUpdating = value;
+    if (state.activeSessionId && !state.findSession(*state.activeSessionId))
+    {
+        if (state.sessions.isEmpty())
+            state.activeSessionId = {};
+        else
+            state.activeSessionId = state.sessions.first().sessionId;
+    }
     return state;
 }
 
-MainWindowTitleBarStateReducer::State MainWindowTitleBarStateReducer::setSystems(
-    State&& state, QList<MainWindowTitleBarState::SystemData> systems)
+State MainWindowTitleBarStateReducer::setSessions(
+    State&& state, QList<State::SessionData> sessions)
 {
-    state.systems = std::move(systems);
+    state.sessions = std::move(sessions);
+    return selectAnotherSessionIfNecessary(std::move(state));
+}
+
+State MainWindowTitleBarStateReducer::removeCloudSessions(State&& state)
+{
+    state.sessions.removeIf(
+        [](const State::SessionData& session) { return session.cloudConnection; });
+    return selectAnotherSessionIfNecessary(std::move(state));
+}
+
+State MainWindowTitleBarStateReducer::removeSessionsBySystemId(
+    State&& state, const QString& systemId)
+{
+    state.sessions.removeIf(
+        [systemId](const State::SessionData& session) { return session.systemId == systemId; });
+    return selectAnotherSessionIfNecessary(std::move(state));
+}
+
+State MainWindowTitleBarStateReducer::saveWorkbenchState(
+    State&& state, const SessionId& sessionId, WorkbenchState workbenchState)
+{
+    const int sessionIndex = state.sessionIndex(sessionId);
+    if (sessionIndex >= 0)
+        state.sessions[sessionIndex].workbenchState = workbenchState;
     return state;
 }
 
-MainWindowTitleBarStateReducer::State MainWindowTitleBarStateReducer::setWorkbenchState(
-    State&& state, int index, WorkbenchState workbenchState)
+State MainWindowTitleBarStateReducer::updateFromWorkbench(
+    State&& state, QnWorkbenchContext* workbenchContext)
 {
-    state.systems[index].workbenchState = workbenchState;
-    return state;
-}
+    const ConnectActionsHandler::LogicalState connectionState =
+        workbenchContext->windowContext()->connectActionsHandler()->logicalState();
 
-MainWindowTitleBarStateReducer::State MainWindowTitleBarStateReducer::setCredentials(
-    State&& state, int index, network::http::Credentials credentials)
-{
-    state.systems[index].logonData.credentials = credentials;
-    return state;
+    const bool welcomeScreenOpened =
+        !workbenchContext->action(menu::ResourcesModeAction)->isChecked();
+
+    state.homeTabActive = welcomeScreenOpened
+        && connectionState != ConnectActionsHandler::LogicalState::connecting;
+
+    state.layoutNavigationVisible = !welcomeScreenOpened
+        && connectionState == ConnectActionsHandler::LogicalState::connected;
+
+    std::optional<SessionId> sessionId;
+    if (connectionState != ConnectActionsHandler::LogicalState::disconnected)
+    {
+        const std::shared_ptr<RemoteSession> session =
+            workbenchContext->systemContext()->session();
+
+        if (session)
+            sessionId = session->sessionId();
+    }
+
+    return setActiveSessionId(std::move(state), sessionId);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -270,51 +330,30 @@ public:
         if (!flags.testFlag(Substate::systemIndependentParameters))
             return false;
 
-        QList<nx::Uuid> systemIds;
-        QJson::deserialize(state.value(kSystemsKey), &systemIds);
-        QList<State::SystemData> systems;
-        for (const auto systemId: systemIds)
-        {
-            auto system = appContext()->systemFinder()->getSystem(systemId.toSimpleString());
-            if (!system)
-                continue;
+        const QByteArray serialized =
+            QJsonDocument(state.value(kSessionsKey).toArray()).toJson(QJsonDocument::Compact);
 
-            LogonData logonData;
-            const auto servers = system->servers();
-            const auto it = std::find_if(servers.cbegin(), servers.cend(),
-                [system](const api::ModuleInformation& server)
-                {
-                    return !server.id.isNull();
-                });
-            if (it != servers.cend())
-            {
-                auto url = system->getServerHost(it->id);
-                if (url.isEmpty())
-                    url = system->getServerHost({});
-                logonData.address = nx::network::SocketAddress(
-                    url.host(),
-                    url.port(helpers::kDefaultConnectionPort));
-                logonData.connectScenario = ConnectScenario::autoConnect;
-            }
+        const auto& [sessions, result] =
+            reflect::json::deserialize<decltype(State::sessions)>(serialized.toStdString());
 
-            const auto credentials = core::CredentialsManager::credentials(systemId);
-            if (!credentials.empty())
-                logonData.credentials = credentials[0];
+        if (!result)
+            return false;
 
-            systems << State::SystemData{.systemDescription = system, .logonData = logonData};
-        }
-        m_store->setSystems(std::move(systems));
+        m_store->setSessions(sessions);
         return true;
     }
 
     virtual void saveState(DelegateState* state, SubstateFlags flags) override
     {
-        if (flags.testFlag(Substate::systemIndependentParameters))
-        {
-            DelegateState result;
-            QJson::serialize(m_store->systemsIds(), &result[kSystemsKey]);
-            *state = result;
-        }
+        if (!flags.testFlag(Substate::systemIndependentParameters))
+            return;
+
+        const std::string serialized = reflect::json::serialize(m_store->state().sessions);
+
+        DelegateState result;
+        result[kSessionsKey] =
+            QJsonDocument::fromJson(QByteArray::fromStdString(serialized)).array();
+        *state = result;
     }
 
     virtual void createInheritedState(DelegateState*, SubstateFlags, const QStringList&) override
@@ -345,192 +384,93 @@ MainWindowTitleBarStateStore::~MainWindowTitleBarStateStore()
     subscribe(nullptr);
 }
 
-void MainWindowTitleBarStateStore::setExpanded(bool value)
+void MainWindowTitleBarStateStore::setExpanded(bool expanded)
 {
-    if (state().expanded != value)
-        dispatch(Reducer::setExpanded, value);
+    if (state().expanded != expanded)
+        dispatch(&Reducer::setExpanded, expanded);
 }
 
-void MainWindowTitleBarStateStore::setHomeTabActive(bool value)
+void MainWindowTitleBarStateStore::updateFromWorkbench(QnWorkbenchContext* workbenchContext)
 {
-    if (state().homeTabActive != value)
-        dispatch(Reducer::setHomeTabActive, value);
+    dispatch(&Reducer::updateFromWorkbench, workbenchContext);
 }
 
-void MainWindowTitleBarStateStore::setCurrentSystemId(nx::Uuid value)
+void MainWindowTitleBarStateStore::setHomeTabActive(bool active)
 {
-    if (state().currentSystemId != value)
-        dispatch(Reducer::setCurrentSystemId, value);
+    if (state().homeTabActive != active)
+        dispatch(&Reducer::setHomeTabActive, active);
 }
 
-void MainWindowTitleBarStateStore::setActiveSystemTab(int value)
+void MainWindowTitleBarStateStore::setActiveSessionId(const std::optional<SessionId>& sessionId)
 {
-    dispatch(Reducer::setActiveSystemTab, value);
+    if (state().activeSessionId != sessionId)
+        dispatch(&Reducer::setActiveSessionId, sessionId);
 }
 
-void MainWindowTitleBarStateStore::setConnectionState(ConnectActionsHandler::LogicalState value)
+void MainWindowTitleBarStateStore::setActiveTab(int index)
 {
-    if (state().connectState != value)
-        dispatch(Reducer::setConnectionState, value);
+    dispatch(&Reducer::setActiveTab, index);
 }
 
-void MainWindowTitleBarStateStore::addSystem(const SystemDescriptionPtr& systemDescription,
-    const LogonData& logonData)
+void MainWindowTitleBarStateStore::handleResourceModeActionTriggered(bool checked)
 {
-    if (state().findSystemIndex(systemDescription->localId()) >= 0)
+    dispatch(&Reducer::handleResourceModeActionToggled, checked);
+}
+
+void MainWindowTitleBarStateStore::addSession(State::SessionData sessionData)
+{
+    if (!state().findSession(sessionData.sessionId))
+        dispatch(&Reducer::addSession, sessionData);
+}
+
+void MainWindowTitleBarStateStore::updateSystemName(const QString& systemId, const QString& name)
+{
+    dispatch(&Reducer::updateSystemName, systemId, name);
+}
+
+void MainWindowTitleBarStateStore::removeSession(const SessionId& sessionId)
+{
+    dispatch(&Reducer::removeSession, sessionId);
+}
+
+void MainWindowTitleBarStateStore::disconnectAndRemoveSession(
+    const SessionId& sessionId, const std::function<bool()>& confirmationFunction)
+{
+    dispatch(&Reducer::disconnectAndRemoveSession, sessionId, confirmationFunction);
+}
+
+void MainWindowTitleBarStateStore::removeSessionsBySystemId(const QString& systemId)
+{
+    dispatch(&Reducer::removeSessionsBySystemId, systemId);
+}
+
+void MainWindowTitleBarStateStore::moveSession(int indexFrom, int indexTo)
+{
+    dispatch(&Reducer::moveSession, indexFrom, indexTo);
+}
+
+void MainWindowTitleBarStateStore::setSessions(
+    QList<MainWindowTitleBarState::SessionData> sessions)
+{
+    dispatch(&Reducer::setSessions, sessions);
+}
+
+void MainWindowTitleBarStateStore::removeCloudSessions()
+{
+    dispatch(&Reducer::removeCloudSessions);
+}
+
+void MainWindowTitleBarStateStore::saveWorkbenchState(QnWorkbenchContext* workbenchContext)
+{
+    const std::shared_ptr<RemoteSession> session =
+        workbenchContext->windowContext()->system()->session();
+
+    if (!session)
         return;
 
-    State::SystemData value = {.systemDescription = systemDescription, .logonData = logonData};
-    dispatch(Reducer::addSystem, value);
-}
-
-void MainWindowTitleBarStateStore::insertSystem(int index, const State::SystemData systemData)
-{
-    dispatch(Reducer::insertSystem, index, systemData);
-}
-
-void MainWindowTitleBarStateStore::removeSystem(const SystemDescriptionPtr& systemDescription)
-{
-    if (systemDescription)
-        removeSystem(systemDescription->localId());
-}
-
-void MainWindowTitleBarStateStore::removeSystem(const nx::Uuid& systemId)
-{
-    dispatch(Reducer::removeSystemId, systemId);
-}
-
-void MainWindowTitleBarStateStore::removeSystem(int index)
-{
-    if (index >= 0)
-    {
-        State (*f)(State&&, int) = &Reducer::removeSystem;
-        dispatch(f, index);
-    }
-}
-
-void MainWindowTitleBarStateStore::removeSystem(const LogonData& logonData)
-{
-    State (*f)(State&&, const LogonData&) = &Reducer::removeSystem;
-    dispatch(f, logonData);
-}
-
-void MainWindowTitleBarStateStore::removeCurrentSystem()
-{
-    dispatch(Reducer::removeCurrentSystem);
-}
-
-void MainWindowTitleBarStateStore::changeCurrentSystem(SystemDescriptionPtr systemDescription)
-{
-    dispatch(Reducer::changeCurrentSystem, systemDescription);
-}
-
-void MainWindowTitleBarStateStore::moveSystem(int indexFrom, int indexTo)
-{
-    dispatch(Reducer::moveSystem, indexFrom, indexTo);
-}
-
-void MainWindowTitleBarStateStore::activateHomeTab()
-{
-    dispatch(Reducer::activateHomeTab);
-}
-
-void MainWindowTitleBarStateStore::setSystemUpdating(bool value)
-{
-    dispatch(Reducer::setSystemUpdating, value);
-}
-
-void MainWindowTitleBarStateStore::setSystems(QList<MainWindowTitleBarState::SystemData> systems)
-{
-    dispatch(Reducer::setSystems, systems);
-}
-
-void MainWindowTitleBarStateStore::setWorkbenchState(
-    const Uuid& systemId, const WorkbenchState& workbenchState)
-{
-    const int index = state().findSystemIndex(systemId);
-    if (index >= 0)
-        dispatch(Reducer::setWorkbenchState, index, workbenchState);
-}
-
-void MainWindowTitleBarStateStore::setCurrentCredentials(network::http::Credentials credentials)
-{
-    const int index = state().findSystemIndex(currentSystemId());
-    if (index >= 0)
-        dispatch(Reducer::setCredentials, index, credentials);
-}
-
-int MainWindowTitleBarStateStore::systemCount() const
-{
-    return state().systems.count();
-}
-
-std::optional<MainWindowTitleBarState::SystemData> MainWindowTitleBarStateStore::systemData(
-    int index) const
-{
-    if (index < 0 || index >= systemCount())
-        return std::nullopt;
-
-    return state().systems.at(index);
-}
-
-bool MainWindowTitleBarStateStore::isExpanded() const
-{
-    return state().expanded;
-}
-
-bool MainWindowTitleBarStateStore::isHomeTabActive() const
-{
-    return state().homeTabActive;
-}
-
-bool MainWindowTitleBarStateStore::isLayoutPanelHidden() const
-{
-    return state().homeTabActive
-        || state().connectState != ConnectActionsHandler::LogicalState::connected;
-}
-
-int MainWindowTitleBarStateStore::activeSystemTab() const
-{
-    return state().activeSystemTab;
-}
-
-nx::Uuid MainWindowTitleBarStateStore::currentSystemId() const
-{
-    return state().currentSystemId;
-}
-
-WorkbenchState MainWindowTitleBarStateStore::workbenchState(const nx::Uuid& systemId) const
-{
-    const int index = state().findSystemIndex(systemId);
-    if (index >= 0)
-        return state().systems[index].workbenchState;
-
-    return {};
-}
-
-bool MainWindowTitleBarStateStore::isTitleBarEnabled() const
-{
-    return !state().systemUpdating
-        && state().connectState != ConnectActionsHandler::LogicalState::connecting;
-}
-
-QList<nx::Uuid> MainWindowTitleBarStateStore::systemsIds() const
-{
-    QList<nx::Uuid> result;
-    result.reserve(state().systems.count());
-    for (const auto& system: state().systems)
-        result.append(system.systemDescription->localId());
-    return result;
-}
-
-bool MainWindowTitleBarStateStore::hasWorkbenchState() const
-{
-    return std::any_of(state().systems.cbegin(), state().systems.cend(),
-        [](const auto& system)
-        {
-            return !system.workbenchState.isEmpty();
-        });
+    WorkbenchState workbenchState;
+    workbenchContext->workbench()->submit(workbenchState);
+    dispatch(&Reducer::saveWorkbenchState, session->sessionId(), workbenchState);
 }
 
 } // nx::vms::client::desktop

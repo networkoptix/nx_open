@@ -3,15 +3,11 @@
 #include "home_tab_button.h"
 
 #include <QtWidgets/QHBoxLayout>
-#include <QtWidgets/QMenu>
 
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
-#include <nx/vms/client/core/system_finder/system_description.h>
-#include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/menu/action.h>
-#include <nx/vms/client/desktop/menu/action_manager.h>
-#include <nx/vms/client/desktop/window_context.h>
+
+#include "private/close_tab_button.h"
 
 namespace {
 static const int kFixedIconWidth = 32;
@@ -46,63 +42,31 @@ HomeTabButton::HomeTabButton(QWidget* parent): base_type(parent)
     setPalette(p);
 
     m_closeButton = new CloseTabButton(this);
-    auto layout = new QHBoxLayout();
+    const auto layout = new QHBoxLayout(this);
     layout->addWidget(m_closeButton, 0, Qt::AlignRight | Qt::AlignVCenter);
     layout->addSpacing(10);
-    setLayout(layout);
 
     connect(m_closeButton, &QAbstractButton::clicked, this,
         [this]()
         {
-            if (!NX_ASSERT(m_store))
-                return;
-
-            const auto state = m_store->state();
-            const auto systemIndex =
-                state.activeSystemTab >= 0 && state.activeSystemTab < state.systems.size()
-                ? state.activeSystemTab
-                : (state.systems.size() - 1);
-
-            if (systemIndex >= 0)
-            {
-                const auto systemData = state.systems[systemIndex];
-                if (systemData.systemDescription->localId() == state.currentSystemId)
-                {
-                    appContext()->mainWindowContext()->menu()->action(menu::ResourcesModeAction)->
-                        setChecked(true);
-                }
-                else
-                {
-                    m_stateHandler->connectToSystem(systemData);
-                }
-            }
+            if (NX_ASSERT(m_store))
+                m_store->setHomeTabActive(false);
         });
 
     connect(this, &QAbstractButton::clicked, this, &HomeTabButton::on_clicked);
 }
 
-void HomeTabButton::setStateStore(QSharedPointer<Store> store,
-    QSharedPointer<StateHandler> stateHandler)
+void HomeTabButton::setStateStore(QSharedPointer<Store> store)
 {
-    if (m_stateHandler)
-        m_stateHandler->disconnect(this);
-    m_stateHandler = stateHandler;
+    if (m_store)
+        m_store->disconnect(this);
+
     m_store = store;
-    if (m_stateHandler)
-    {
-        connect(
-            m_stateHandler.get(),
-            &SystemTabBarStateHandler::homeTabActiveChanged,
-            this,
-            &HomeTabButton::updateAppearance);
-        connect(
-            m_stateHandler.get(),
-            &SystemTabBarStateHandler::tabsChanged,
-            this,
-            &HomeTabButton::updateAppearance);
-        if (m_store)
-            updateAppearance();
-    }
+
+    if (m_store)
+        connect(m_store.get(), &Store::stateChanged, this, &HomeTabButton::updateAppearance);
+
+    updateAppearance();
 }
 
 void HomeTabButton::updateAppearance()
@@ -110,12 +74,16 @@ void HomeTabButton::updateAppearance()
     if (!NX_ASSERT(m_store))
         return;
 
-    bool active = m_store->isHomeTabActive();
+    const MainWindowTitleBarState& state = m_store->state();
+
+    const bool active = state.homeTabActive;
+
     setChecked(active);
+
     if (active)
     {
         setIcon(qnSkin->icon(kSystemIcon));
-        if (m_store->systemCount() > 0)
+        if (!state.sessions.empty())
         {
             setFixedWidth(kFixedWideHomeIconWidth);
             m_closeButton->show();
@@ -139,8 +107,8 @@ void HomeTabButton::on_clicked()
     if (!NX_ASSERT(m_store))
         return;
 
-    appContext()->mainWindowContext()->menu()->action(menu::ResourcesModeAction)->setChecked(false);
     setChecked(true);
+    m_store->setHomeTabActive(true);
 }
 
 } //namespace nx::vms::client::desktop

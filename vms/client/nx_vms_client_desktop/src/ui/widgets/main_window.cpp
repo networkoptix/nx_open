@@ -146,8 +146,7 @@ struct MainWindow::Private
         if (ini().enableMultiSystemTabBar)
         {
             titleBarStateStore.reset(new MainWindowTitleBarStateStore);
-            systemTabBarStateHandler.reset(new SystemTabBarStateHandler(q));
-            systemTabBarStateHandler->setStateStore(titleBarStateStore);
+            systemTabBarStateHandler.reset(new SystemTabBarStateHandler(titleBarStateStore, q));
         }
     }
 
@@ -258,7 +257,7 @@ MainWindow::MainWindow(WindowContext* context, QWidget* parent, Qt::WindowFlags 
 
     m_titleBar = new QnMainWindowTitleBarWidget(windowContext(), this);
     if (ini().enableMultiSystemTabBar)
-        m_titleBar->setStateStore(d->titleBarStateStore, d->systemTabBarStateHandler);
+        m_titleBar->setStateStore(d->titleBarStateStore);
     m_controller.reset(new QnWorkbenchController(context, this));
     if (qnRuntime->isVideoWallMode())
         m_controller->setMenuEnabled(false);

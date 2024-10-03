@@ -2,38 +2,20 @@
 
 #include "system_tab_bar.h"
 
-#include <QtCore/QMimeData>
 #include <QtCore/QScopedValueRollback>
-#include <QtGui/QAction>
-#include <QtGui/QDrag>
-#include <QtGui/QPainter>
 #include <QtGui/QtEvents>
-#include <QtWidgets/QApplication>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QStyleOptionTab>
 #include <QtWidgets/QToolButton>
 
-#include <nx/vms/client/core/network/credentials_manager.h>
 #include <nx/vms/client/core/skin/color_theme.h>
-#include <nx/vms/client/core/skin/skin.h>
-#include <nx/vms/client/core/system_finder/system_description.h>
-#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
-#include <nx/vms/client/desktop/menu/action_parameters.h>
-#include <nx/vms/client/desktop/skin/font_config.h>
-#include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
-#include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/system_logon/data/logon_data.h>
-#include <nx/vms/client/desktop/system_logon/ui/welcome_screen.h>
 #include <nx/vms/client/desktop/window_context.h>
-#include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/common/indents.h>
-#include <ui/widgets/main_window.h>
 #include <ui/widgets/main_window_title_bar_state.h>
 #include <ui/widgets/system_tab_bar_state_handler.h>
 #include <ui/workaround/hidpi_workarounds.h>
-#include <utils/common/delayed.h>
 
 #include "private/close_tab_button.h"
 
@@ -49,14 +31,6 @@ static constexpr int kAllDecorationsWidth =
     + nx::style::Metrics::kInterSpace
     + nx::vms::client::desktop::CloseTabButton::kFixedIconWidth
     + kTabPaddings.right();
-
-static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kSystemSubstitutions =
-    {{QnIcon::Normal, {.primary = "light4"}}};
-static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kAddSubstitutions =
-    {{QnIcon::Normal, {.primary = "dark14"}}};
-
-NX_DECLARE_COLORIZED_ICON(kSystemIcon, "20x20/Solid/system_local.svg", kSystemSubstitutions)
-NX_DECLARE_COLORIZED_ICON(kAddIcon, "20x20/Outline/add.svg", kAddSubstitutions)
 
 } // namespace
 
@@ -74,6 +48,7 @@ SystemTabBar::SystemTabBar(QWidget* parent):
     setTabShape(this, nx::style::TabShape::Rectangular);
     setUsesScrollButtons(false);
     setFixedHeight(kFixedTabHeight);
+    setMaximumWidth(0); //< The initial value. It will be changed when tabs are added.
     setContentsMargins(1, 0, 1, 0);
     setProperty(style::Properties::kSideIndentation, QVariant::fromValue(kTabPaddings));
 
@@ -97,80 +72,59 @@ SystemTabBar::SystemTabBar(QWidget* parent):
     p.setColor(QPalette::Inactive, QPalette::Dark, core::colorTheme()->color("dark8"));
     setPalette(p);
 
-    connect(this, &QTabBar::currentChanged, this, &SystemTabBar::at_currentChanged);
+    connect(this, &QTabBar::currentChanged, this, &SystemTabBar::at_tabActivated);
+    connect(this, &QTabBar::tabBarClicked, this, &SystemTabBar::at_tabActivated);
+    connect(this, &QTabBar::tabCloseRequested, this, &SystemTabBar::at_tabCloseRequested);
     connect(this, &QTabBar::tabMoved, this, &SystemTabBar::at_tabMoved);
 }
 
-void SystemTabBar::setStateStore(QSharedPointer<Store> store,
-    QSharedPointer<StateHandler> stateHandler)
+void SystemTabBar::setStateStore(QSharedPointer<Store> store)
 {
+    if (m_store)
+        m_store->disconnect(this);
+
     m_store = store;
 
-    if (m_stateHandler)
-        m_stateHandler->disconnect(this);
-    m_stateHandler = stateHandler;
-    if (m_stateHandler)
-    {
-        connect(m_stateHandler.get(), &StateHandler::tabsChanged, this, &SystemTabBar::rebuildTabs);
-        connect(m_stateHandler.get(), &StateHandler::activeSystemTabChanged, this,
-            [this](int index)
-            {
-                setCurrentIndex(index);
-            });
-        connect(m_stateHandler.get(), &StateHandler::homeTabActiveChanged, this,
-            [this](bool active)
-            {
-                if (!NX_ASSERT(m_store))
-                    return;
-
-                setCurrentIndex(active ? -1 : m_store->activeSystemTab());
-            });
-    }
+    if (m_store)
+        connect(m_store.get(), &Store::stateChanged, this, &SystemTabBar::at_storeStateChanged);
 }
 
-void SystemTabBar::rebuildTabs()
+void SystemTabBar::rebuildTabs(const State& state)
 {
-    if (!NX_ASSERT(m_store) || m_updating)
-        return;
+    m_tabWidthCalculator.clear();
 
-    const auto fm = fontMetrics();
+    for (int i = 0; i < state.sessions.size(); ++i)
     {
-        QSignalBlocker blocker(this);
-        m_tabWidthCalculator.clear();
-        for (int i = 0; i < m_store->systemCount(); ++i)
+        const QString& text = state.sessions[i].systemName;
+
+        if (i < count())
         {
-            const auto systemData = m_store->systemData(i);
-
-            // The width of the tab is the sum of tab text width, width of the close button,
-            // space between them and left and right paddings.
-            const int tabWidth = kAllDecorationsWidth
-                + fm.size(Qt::TextShowMnemonic, systemData->systemDescription->name()).width();
-            m_tabWidthCalculator.addTab(tabWidth);
-
-            if (tabData(i).value<core::SystemDescriptionPtr>() == systemData->systemDescription)
-                continue;
-
-            removeTab(i);
-            insertClosableTab(i, systemData->systemDescription);
+            setTabText(i, text);
         }
+        else
+        {
+            addTab(text);
+            CloseTabButton::createForTab(this, i);
+        }
+        setTabToolTip(i, text);
 
-        while (count() > m_store->systemCount())
-            removeTab(count() - 1);
+        m_tabWidthCalculator.addTab(calculateTabWidth(text));
     }
-    setMovable(count() > 1);
-}
 
-bool SystemTabBar::isUpdating() const
-{
-    return m_updating;
+    while (count() > state.sessions.size())
+        removeTab(count() - 1);
+
+    setMovable(count() > 1);
+    setMaximumWidth(m_tabWidthCalculator.originalFullWidth());
 }
 
 bool SystemTabBar::active() const
 {
-    return !m_store
-        || (!m_store->isHomeTabActive()
-            && m_store->activeSystemTab() >= 0
-            && m_store->activeSystemTab() < count());
+    if (!m_store)
+        return true;
+
+    const State& state = m_store->state();
+    return !state.homeTabActive && state.activeSessionId;
 }
 
 QSize SystemTabBar::tabSizeHint(int index) const
@@ -188,146 +142,59 @@ QSize SystemTabBar::minimumTabSizeHint(int /*index*/) const
     return QSize(kMinimumTabWidth, kFixedTabHeight);
 }
 
-void SystemTabBar::mousePressEvent(QMouseEvent* event)
-{
-    if (!NX_ASSERT(m_store) || event->button() != Qt::LeftButton)
-        return;
-
-    const int index = tabAt(event->pos());
-    const auto systemData = m_store->systemData(index);
-    if (systemData->systemDescription->localId() == m_store->currentSystemId())
-        action(menu::ResourcesModeAction)->setChecked(true);
-    if (m_store->activeSystemTab() < 0)
-        at_currentChanged(index);
-    else
-        base_type::mousePressEvent(event);
-}
-
 void SystemTabBar::contextMenuEvent(QContextMenuEvent* event)
 {
+    if (!NX_ASSERT(m_store))
+        return;
+
+    const State& state = m_store->state();
+
     const int index = tabAt(event->pos());
+    if (!NX_ASSERT(index < state.sessions.size()))
+        return;
 
     QMenu menu(this);
     menu.addAction(tr("Close"),
-        [this, index]()
-        {
-            if (!NX_ASSERT(m_store))
-                return;
-
-            if (const auto systemData = m_store->systemData(index))
-                closeSystem(systemData->systemDescription->localId());
-        });
-
+        [this, index]() { emit tabCloseRequested(index); });
     menu.addAction(tr("Open in New Window"),
-        [this, index]()
+        [this, sessionId = state.sessions[index].sessionId]()
         {
-            if (!NX_ASSERT(m_store))
-                return;
-
-            if (const auto systemData = m_store->systemData(index))
-            {
-                const auto logonData = m_stateHandler->adjustedLogonData(systemData->logonData,
-                    systemData->systemDescription->localId());
-
-                if (logonData.credentials.authToken.empty())
-                {
-                    // TODO: VMS-54449: Request missing credentials.
-                }
-
-                appContext()->clientStateHandler()->createNewWindow(logonData);
-            }
+            // This action does cannot change the tab bar state, so it can be invoked directly.
+            this->menu()->trigger(menu::OpenSessionInNewWindowAction,
+                menu::Parameters().withArgument(Qn::SessionIdRole, sessionId));
         });
 
     QnHiDpiWorkarounds::showMenu(&menu, QCursor::pos());
 }
 
-void SystemTabBar::closeSystem(const nx::Uuid& localId)
+bool SystemTabBar::areTabsChanged(const State& state) const
 {
-    if (!windowContext()->connectActionsHandler()->askDisconnectConfirmation())
-        return;
+    if (state.sessions.size() != count())
+        return true;
 
-    const auto state = m_store->state();
-    if (state.currentSystemId == localId)
+    for (int i = 0; i < state.sessions.size(); ++i)
     {
-        if (state.systems.size() == 1)
-        {
-            action(menu::ResourcesModeAction)->setChecked(false);
-            menu()->trigger(menu::DisconnectAction);
-        }
-        else
-        {
-            const int systemIndex = state.activeSystemTab == state.systems.size() - 1
-                ? (state.activeSystemTab - 1)
-                : (state.activeSystemTab + 1);
-
-            const auto systemData = state.systems[systemIndex];
-            m_stateHandler->connectToSystem(systemData);
-        }
+        if (state.sessions[i].systemName != tabText(i))
+            return true;
     }
 
-    m_store->removeSystem(localId);
+    return false;
 }
 
-void SystemTabBar::switchSystem(bool forward)
+void SystemTabBar::at_storeStateChanged(const State& state)
 {
-    const int systemIndex = m_store->activeSystemTab() + (forward ? 1 : -1);
-    if (systemIndex < 0 || systemIndex >= m_store->systemCount())
-        return;
+    if (areTabsChanged(state))
+        rebuildTabs(state);
 
-    const auto systemData = m_store->systemData(systemIndex);
-    m_stateHandler->connectToSystem(systemData->systemDescription, systemData->logonData);
-}
-
-void SystemTabBar::insertClosableTab(int index,
-    const core::SystemDescriptionPtr& systemDescription)
-{
-    const auto text = systemDescription->name();
-    insertTab(index, text);
-    setTabToolTip(index, text);
-    setTabData(index, QVariant::fromValue(systemDescription));
-
-    const auto closeButton = new CloseTabButton(this);
-    connect(closeButton, &CloseTabButton::clicked,
-        [this, localId = systemDescription->localId()]()
-        {
-            closeSystem(localId);
-        });
-
-   // closeButton is owned by the tab, so we can use it as a receiver here.
-   // This connection is deleted when the tab is removed.
-    connect(systemDescription.get(), &core::SystemDescription::systemNameChanged, closeButton,
-        [this, systemDescription]()
-        {
-            const auto data = QVariant::fromValue(systemDescription);
-            for (int i = 0; i < count(); ++i)
-            {
-                if (tabData(i) == data)
-                {
-                    const auto text = systemDescription->name();
-                    const auto fm = fontMetrics();
-                    const int tabWidth = kAllDecorationsWidth
-                        + fm.size(Qt::TextShowMnemonic, text).width();
-                    m_tabWidthCalculator.setWidth(i, tabWidth);
-
-                    setTabText(i, text);
-                    setTabToolTip(i, text);
-                    break;
-                }
-            }
-        });
-
-    connect(m_stateHandler.get(),
-        &StateHandler::activeSystemTabChanged,
-        closeButton,
-        qOverload<>(&QWidget::update));
-
-    setTabButton(index, RightSide, closeButton);
+    setCurrentIndex((!state.homeTabActive && state.activeSessionId)
+        ? state.sessionIndex(*state.activeSessionId)
+        : -1);
 }
 
 void SystemTabBar::initStyleOption(QStyleOptionTab* option, int tabIndex) const
 {
     base_type::initStyleOption(option, tabIndex);
-    if (m_store && m_store->isHomeTabActive())
+    if (m_store && m_store->state().homeTabActive)
         option->state &= ~QStyle::State_Selected;
     if (tabIndex < m_tabWidthCalculator.count())
     {
@@ -368,7 +235,13 @@ void SystemTabBar::wheelEvent(QWheelEvent* event)
     {
         const int delta = event->pixelDelta().y();
         if (delta != 0)
-            switchSystem(/*forward*/ delta > 0);
+        {
+            if (currentIndex() >= 0)
+            {
+                const int newIndex = (currentIndex() + (delta > 0 ? 1 : -1) + count()) % count();
+                setCurrentIndex(newIndex);
+            }
+        }
         event->accept();
     }
     else
@@ -377,18 +250,36 @@ void SystemTabBar::wheelEvent(QWheelEvent* event)
     }
 }
 
-void SystemTabBar::at_currentChanged(int index)
+int SystemTabBar::calculateTabWidth(const QString& text) const
+{
+    // The width of the tab is the sum of tab text width, width of the close button,
+    // space between them and left and right paddings.
+    return kAllDecorationsWidth + fontMetrics().size(Qt::TextShowMnemonic, text).width();
+}
+
+void SystemTabBar::at_tabActivated(int index)
 {
     if (!NX_ASSERT(m_store))
         return;
 
-    if (const auto systemData = m_store->systemData(index))
-    {
-        if (systemData->systemDescription->localId() == m_store->currentSystemId())
-            action(menu::ResourcesModeAction)->setChecked(true);
-        else
-            m_stateHandler->connectToSystem(systemData.value());
-    }
+    m_store->setActiveTab(index);
+}
+
+void SystemTabBar::at_tabCloseRequested(int index)
+{
+    if (!NX_ASSERT(m_store))
+        return;
+
+    const State& state = m_store->state();
+
+    if (!NX_ASSERT(index < state.sessions.size()))
+        return;
+
+    m_store->disconnectAndRemoveSession(state.sessions[index].sessionId,
+        [this]()
+        {
+            return windowContext()->connectActionsHandler()->askDisconnectConfirmation();
+        });
 }
 
 void SystemTabBar::at_tabMoved(int from, int to)
@@ -396,9 +287,8 @@ void SystemTabBar::at_tabMoved(int from, int to)
     if (!NX_ASSERT(m_store))
         return;
 
-    QScopedValueRollback<bool> guard(m_updating, true);
-    m_store->moveSystem(from, to);
     m_tabWidthCalculator.moveTab(from, to);
+    m_store->moveSession(from, to);
 }
 
 } // namespace nx::vms::client::desktop

@@ -2586,7 +2586,7 @@ ConditionWrapper homeTabIsNotActive(ActionVisibility defaultVisibility)
                 return EnabledAction;
 
             const auto mainWindow = qobject_cast<MainWindow*>(context->mainWindowWidget());
-            return mainWindow->titleBarStateStore()->isHomeTabActive()
+            return mainWindow->titleBarStateStore()->state().homeTabActive
                 ? defaultVisibility
                 : EnabledAction;
         });

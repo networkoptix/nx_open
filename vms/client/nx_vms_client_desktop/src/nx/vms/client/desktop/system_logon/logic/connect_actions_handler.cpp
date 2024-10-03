@@ -418,16 +418,21 @@ ConnectActionsHandler::ConnectActionsHandler(WindowContext* windowContext, QObje
     connect(action(menu::DisconnectMainMenuAction), &QAction::triggered, this,
         [this]()
         {
-            if (qnRuntime->isDesktopMode()
-                && ini().enableMultiSystemTabBar
-                && !askDisconnectConfirmation())
+            const std::shared_ptr<RemoteSession> session = mainWindow()->system()->session();
+            if (!NX_ASSERT(session,
+                "Disconnect action should be not available when Client is not connected."))
             {
                 return;
             }
 
-            if (auto session = system()->session())
-                session->autoTerminateIfNeeded();
+            if (qnRuntime->isDesktopMode() && ini().enableMultiSystemTabBar)
+            {
+                if (askDisconnectConfirmation())
+                    mainWindow()->titleBarStateStore()->removeSession(session->sessionId());
+                return;
+            }
 
+            session->autoTerminateIfNeeded();
             at_disconnectAction_triggered();
         });
 
@@ -664,7 +669,7 @@ void ConnectActionsHandler::handleConnectionError(RemoteConnectionError error)
                     /*moduleInformation*/ {}, //< TODO: #sivanov Make sure it is not needed.
                     /*options*/ {});
                 const auto stateStore = mainWindow()->titleBarStateStore();
-                if (stateStore && stateStore->systemCount() > 0)
+                if (stateStore && !stateStore->state().sessions.empty())
                     emit welcomeScreen->connectionToSystemRevoked();
                 else
                     menu()->trigger(menu::DelayedForcedExitAction);
@@ -712,7 +717,7 @@ void ConnectActionsHandler::establishConnection(RemoteConnectionPtr connection)
     auto systemId = ::helpers::getTargetSystemId(serverModuleInformation);
 
     connect(session.get(), &RemoteSession::stateChanged, this,
-        [this, logonData, systemId](RemoteSession::State state)
+        [this, sessionId = session->sessionId(), serverModuleInformation, logonData, systemId](RemoteSession::State state)
         {
             NX_DEBUG(this, "Remote session state changed: %1", state);
 
@@ -723,13 +728,14 @@ void ConnectActionsHandler::establishConnection(RemoteConnectionPtr connection)
 
                 d->reconnectDialog = new QnReconnectInfoDialog(mainWindowWidget());
                 connect(d->reconnectDialog, &QDialog::rejected, this,
-                    [this]()
+                    [this, sessionId]()
                     {
                         if (system()->user())
                             appContext()->clientStateHandler()->clientDisconnected();
 
                         if (ini().enableMultiSystemTabBar)
-                            mainWindow()->titleBarStateStore()->removeCurrentSystem();
+                            mainWindow()->titleBarStateStore()->removeSession(sessionId);
+
                         disconnectFromServer(DisconnectFlag::Force);
                         if (!qnRuntime->isDesktopMode())
                             menu()->trigger(menu::DelayedForcedExitAction);
@@ -751,10 +757,17 @@ void ConnectActionsHandler::establishConnection(RemoteConnectionPtr connection)
                 // It's done delayed because some things - for example systemSettings() -
                 // are updated in QueuedConnection to initial notification or resource addition.
                 const auto workbenchStateUpdate =
-                    [this, logonData, systemId]()
+                    [this, sessionId, serverModuleInformation, logonData]()
                     {
                         menu()->trigger(menu::InitialResourcesReceivedEvent);
-                        workbench()->addSystem(systemId, logonData);
+
+                        if (ini().enableMultiSystemTabBar)
+                        {
+                            mainWindow()->titleBarStateStore()->addSession(
+                                MainWindowTitleBarState::SessionData(
+                                    sessionId, serverModuleInformation, logonData));
+                            mainWindow()->titleBarStateStore()->setActiveSessionId(sessionId);
+                        }
                     };
 
                 executeLater(workbenchStateUpdate, this);
@@ -810,6 +823,12 @@ void ConnectActionsHandler::establishConnection(RemoteConnectionPtr connection)
         &ConnectActionsHandler::at_reconnectAction_triggered,
         Qt::QueuedConnection);
 
+    if (ini().enableMultiSystemTabBar)
+    {
+        mainWindow()->titleBarStateStore()->addSession(
+            MainWindowTitleBarState::SessionData(
+                session->sessionId(), serverModuleInformation, logonData));
+    }
     system()->setSession(session);
     qnClientCoreModule->networkModule()->setSession(session);
     const auto welcomeScreen = mainWindow()->welcomeScreen();
@@ -820,7 +839,7 @@ void ConnectActionsHandler::establishConnection(RemoteConnectionPtr connection)
     appContext()->clientStateHandler()->connectionToSystemEstablished(
         appContext()->localSettings()->restoreUserSessionData()
             && (!mainWindow()->titleBarStateStore()
-                || !mainWindow()->titleBarStateStore()->hasWorkbenchState()),
+                || !mainWindow()->titleBarStateStore()->state().hasWorkbenchState()),
         session->sessionId(),
         logonData);
 }
@@ -964,6 +983,8 @@ void ConnectActionsHandler::setState(LogicalState logicalValue)
     if (d->logicalState == logicalValue)
         return;
 
+    NX_DEBUG(this, "Logical state change: %1 -> %2", d->logicalState, logicalValue);
+
     d->logicalState = logicalValue;
     emit stateChanged(d->logicalState, QPrivateSignal());
 }
@@ -1027,6 +1048,8 @@ void ConnectActionsHandler::updatePreloaderVisibility()
     const auto welcomeScreen = mainWindow()->welcomeScreen();
     if (!welcomeScreen)
         return;
+
+    NX_VERBOSE(this, "Updating preloder visibility for state \"%1\"...", d->logicalState);
 
     const auto resourceModeAction = action(menu::ResourcesModeAction);
 
@@ -1301,32 +1324,22 @@ void ConnectActionsHandler::at_disconnectAction_triggered()
         flags |= DisconnectFlag::Force;
 
     NX_DEBUG(this, "Disconnecting from the server");
-    auto systemId = system()->localSystemId();
+
+    const std::shared_ptr<RemoteSession> session = system()->session();
+    if (!session)
+        return;
+
+    const SessionId sessionId = session->sessionId();
+
     const bool wasLoggedIn = !system()->user().isNull();
-    if (wasLoggedIn && ini().enableMultiSystemTabBar)
-    {
-        // Connect to the next system instead of disconnection.
-        const auto stateStore = mainWindow()->titleBarStateStore();
-        if (stateStore->systemCount() > 1)
-        {
-            int systemIndex = stateStore->activeSystemTab();
-            stateStore->removeSystem(systemIndex);
-            if (systemIndex >= stateStore->systemCount())
-                --systemIndex;
-            if (const auto systemData = stateStore->systemData(systemIndex))
-                mainWindow()->systemTabBarStateHandler()->connectToSystem(systemData.value());
-            return;
-        }
-    }
     if (!disconnectFromServer(flags))
         return;
 
     if (wasLoggedIn)
         appContext()->clientStateHandler()->clientDisconnected();
 
-    menu()->trigger(
-        menu::RemoveSystemFromTabBarAction,
-        menu::Parameters(Qn::LocalSystemIdRole, systemId));
+    if (const auto stateStore = mainWindow()->titleBarStateStore())
+        stateStore->removeSession(sessionId);
 
     d->lastAttemptedConnectCloudSystemId = {};
     emit mainWindow()->welcomeScreen()->dropConnectingState();
@@ -1587,8 +1600,6 @@ void ConnectActionsHandler::connectToServer(LogonData logonData, ConnectionOptio
                     error->externalDescription = tr("Authentication details are incorrect");
 
                 handleConnectionError(*error);
-                if (ini().enableMultiSystemTabBar)
-                    mainWindow()->titleBarStateStore()->removeSystem(logonData);
                 disconnectFromServer(DisconnectFlag::Force);
             }
             else

@@ -988,7 +988,7 @@ void initialize(Manager* manager, Action* root)
     factory(BeforeExitAction)
         .flags(NoTarget);
 
-    factory(RemoveSystemFromTabBarAction)
+    factory(OpenSessionInNewWindowAction)
         .flags(NoTarget);
 
 //-------------------------------------------------------------------------------------------------
