@@ -291,6 +291,9 @@ bool ResourceSelectionDecoratorModel::toggleSelection(const QModelIndex& index)
 
                 for (const auto& deselectedIndex: deselectedIndexes)
                 {
+                    if (!deselectedIndex.isValid())
+                        continue;
+
                     emit dataChanged(
                         deselectedIndex.siblingAtColumn(0),
                         deselectedIndex.siblingAtColumn(columnCount(deselectedIndex.parent()) - 1),
@@ -402,6 +405,9 @@ void ResourceSelectionDecoratorModel::setPinnedItemSelected(bool selected)
 
         for (const auto& deselectedIndex: deselectedIndexes)
         {
+            if (!deselectedIndex.isValid())
+                continue;
+
             emit dataChanged(
                 deselectedIndex.siblingAtColumn(0),
                 deselectedIndex.siblingAtColumn(columnCount(deselectedIndex.parent()) - 1),
