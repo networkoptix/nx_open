@@ -204,6 +204,10 @@ bool QuickSyncVideoDecoderImpl::init(
     {
        m_mfxDecParams.mfx.CodecId = MFX_CODEC_HEVC;
     }
+    else if (frame->compressionType == AV_CODEC_ID_MJPEG)
+    {
+       m_mfxDecParams.mfx.CodecId = MFX_CODEC_JPEG;
+    }
     else
     {
         NX_DEBUG(this, "Failed to init decoder, codec not supported: %1", frame->compressionType);
