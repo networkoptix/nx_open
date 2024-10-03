@@ -12,7 +12,8 @@ namespace nx::vms::api::analytics {
 struct NX_VMS_API AnalyticsEnginesFilter
 {
     /**%apidoc[opt]
-     * Analytics Engine id. Can be obtained from "id" field via `GET /rest/v{4-}/analytics/engines`.
+     * Analytics Engine id. Can be obtained from "id" field via
+     * `GET /rest/v{3-}/analytics/engines`.
      */
     Uuid id;
 
