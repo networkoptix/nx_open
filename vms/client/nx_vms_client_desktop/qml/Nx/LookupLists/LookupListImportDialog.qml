@@ -341,6 +341,9 @@ ModalDialog
                     fixLookupListImportDialog.visible = true
                     importProgressBar.visible = false
                     break;
+                case LookupListImportProcessor.SuccessEmptyImport:
+                    importProgressBar.progressFinished()
+                    break
                 default:
                     control.reject()
             }
@@ -356,6 +359,9 @@ ModalDialog
                     importProgressBar.progressFinished()
                     entriesImported()
                     break;
+                case LookupListImportProcessor.SuccessEmptyImport:
+                    importProgressBar.progressFinished()
+                    break
                 default:
                     control.reject()
             }

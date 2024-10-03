@@ -47,6 +47,11 @@ CheckableTableView
         return false
     }
 
+    function sortTable()
+    {
+        control.model.sort(1)
+    }
+
     delegate: DelegateChooser
     {
         DelegateChoice

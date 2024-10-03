@@ -33,7 +33,8 @@ public:
         Canceled,
         InternalError,
         EmptyFileError,
-        ErrorFileNotFound
+        ErrorFileNotFound,
+        SuccessEmptyImport
     };
 
     Q_ENUMS(ImportExitCode)
