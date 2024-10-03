@@ -34,8 +34,21 @@ static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kIconSubs
     {QIcon::Active, {.primary = "light14"}},
 };
 
+const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kLight4Theme = {
+    {QIcon::Normal, {.primary = "light4"}},
+};
+
+const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kLight10Theme = {
+    {QIcon::Normal, {.primary = "light10"}},
+};
+
 NX_DECLARE_COLORIZED_ICON(kArrowDownIcon, "20x20/Outline/arrow_down.svg", kIconSubstitutions)
 NX_DECLARE_COLORIZED_ICON(kArrowUpIcon, "20x20/Outline/arrow_up.svg", kIconSubstitutions)
+
+NX_DECLARE_COLORIZED_ICON(kUncheckedIcon, "12x12/Outline/checkbox_empty.svg", kLight10Theme)
+NX_DECLARE_COLORIZED_ICON(kCheckedIcon, "12x12/Outline/checkbox_checked.svg", kLight4Theme)
+NX_DECLARE_COLORIZED_ICON(kPartiallyCheckedIcon, "12x12/Outline/checkbox_half_checked.svg",
+    kLight4Theme)
 
 static const QColor kTextButtonBackgroundColor = "#FFFFFF";
 
@@ -262,79 +275,15 @@ void StylePrivate::drawCheckBox(
 {
     Q_UNUSED(widget)
 
-    QPen pen(checkBoxColor(option));
-    pen.setJoinStyle(Qt::MiterJoin);
-    pen.setCapStyle(Qt::FlatCap);
-
-    QnScopedPainterPenRollback penRollback(painter, pen);
-    QnScopedPainterBrushRollback brushRollback(painter, Qt::NoBrush);
-    QnScopedPainterAntialiasingRollback aaRollback(painter, true);
-
     const int size = Metrics::kCheckIndicatorSize - 5;
     QRect rect = Geometry::aligned(QSize(size, size), option->rect, Qt::AlignCenter);
 
-    QRectF aaAlignedRect(rect);
-    aaAlignedRect.adjust(0.5, 0.5, 0.5, 0.5);
-
-    RectCoordinates rc(rect);
-
     if (option->state.testFlag(QStyle::State_On))
-    {
-        // Draw checkbox frame with cutout at top right corner as path, counterclockwise. Approach
-        // with clipping region didn't work well when checkbox primitive was drawn by item view
-        // delegate due Qt bug.
-
-        RectCoordinates aaAlignedRc(aaAlignedRect);
-
-        QPainterPath framePath;
-        framePath.moveTo(aaAlignedRc.x(0.8), aaAlignedRc.y(0));
-
-        QRectF cornerArcRect(
-            QPointF(), QSize(Metrics::kCheckboxCornerRadius, Metrics::kCheckboxCornerRadius));
-
-        // Top line segment and top left corner arc.
-        cornerArcRect.moveTopLeft(aaAlignedRect.topLeft());
-        framePath.lineTo(cornerArcRect.topRight());
-        framePath.arcTo(cornerArcRect, 90, 90);
-
-        // Left line segment and bottom left corner arc.
-        cornerArcRect.moveBottomLeft(aaAlignedRect.bottomLeft());
-        framePath.lineTo(cornerArcRect.topLeft());
-        framePath.arcTo(cornerArcRect, 180, 90);
-
-        // Bottom line segment and bottom right corner arc.
-        cornerArcRect.moveBottomRight(aaAlignedRect.bottomRight());
-        framePath.lineTo(cornerArcRect.bottomLeft());
-        framePath.arcTo(cornerArcRect, 270, 90);
-
-        // Finally, right line segment.
-        framePath.lineTo(aaAlignedRc.x(1), aaAlignedRc.y(0.5));
-        painter->drawPath(framePath);
-
-        // Draw check mark.
-
-        QPainterPath checkmarkPath;
-        checkmarkPath.moveTo(rc.x(0.25), rc.y(0.38));
-        checkmarkPath.lineTo(rc.x(0.55), rc.y(0.70));
-        checkmarkPath.lineTo(rc.x(1.12), rc.y(0.13));
-
-        pen.setWidthF(2);
-        painter->setPen(pen);
-
-        painter->drawPath(checkmarkPath);
-    }
+        painter->drawPixmap(rect, qnSkin->icon(kCheckedIcon).pixmap(12, 12));
+    else if (option->state.testFlag(QStyle::State_NoChange))
+        painter->drawPixmap(rect, qnSkin->icon(kPartiallyCheckedIcon).pixmap(12, 12));
     else
-    {
-        painter->drawRoundedRect(
-            aaAlignedRect, Metrics::kCheckboxCornerRadius, Metrics::kCheckboxCornerRadius);
-
-        if (option->state.testFlag(QStyle::State_NoChange))
-        {
-            pen.setWidthF(2);
-            painter->setPen(pen);
-            painter->drawLine(QPointF(rc.x(0.2), rc.y(0.5)), QPointF(rc.x(0.9), rc.y(0.5)));
-        }
-    }
+        painter->drawPixmap(rect, qnSkin->icon(kUncheckedIcon).pixmap(12, 12));
 }
 
 void StylePrivate::drawRadioButton(
