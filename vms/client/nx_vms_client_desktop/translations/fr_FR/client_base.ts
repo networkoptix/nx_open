@@ -1038,15 +1038,15 @@
     <message numerus="yes">
       <source>Mute Items</source>
       <translation>
-        <numerusform>Élément muet</numerusform>
-        <numerusform>Éléments muets</numerusform>
+        <numerusform>Couper le son de l'élément</numerusform>
+        <numerusform>Couper le son des éléments</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Unmute Items</source>
-      <translation type="unfinished">
-        <numerusform>Unmute Items</numerusform>
-        <numerusform>Unmute Items</numerusform>
+      <translation>
+        <numerusform>Rétablir le son de l'élément</numerusform>
+        <numerusform>Rétablir le son des éléments</numerusform>
       </translation>
     </message>
   </context>
