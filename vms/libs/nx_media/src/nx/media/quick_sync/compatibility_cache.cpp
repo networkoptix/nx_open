@@ -19,7 +19,7 @@ constexpr int kMaxCachedExtradata = 256;
 bool CompatibilityCache::isCompatibleCached(
     const QnConstCompressedVideoDataPtr& frame, AVCodecID codec, int width, int height)
 {
-    if (codec != AV_CODEC_ID_H264 && codec != AV_CODEC_ID_HEVC)
+    if (codec != AV_CODEC_ID_H264 && codec != AV_CODEC_ID_HEVC && codec != AV_CODEC_ID_MJPEG)
         return false;
 
     std::scoped_lock<std::mutex> lock(m_mutex);
@@ -100,6 +100,10 @@ bool CompatibilityCache::tryResolutionCompatibility(AVCodecID codec, int width, 
         param.mfx.CodecProfile = MFX_PROFILE_HEVC_MAIN;
         param.mfx.CodecLevel = MFX_LEVEL_HEVC_4;
         param.mfx.FrameInfo.ChromaFormat = MFX_CHROMAFORMAT_YUV420;
+    }
+    else if (codec == AV_CODEC_ID_MJPEG)
+    {
+        return true;
     }
     else
     {
