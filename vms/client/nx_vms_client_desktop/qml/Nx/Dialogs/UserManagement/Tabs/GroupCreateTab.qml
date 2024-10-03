@@ -77,7 +77,7 @@ Item
             {
                 text: qsTr("Permission Groups")
 
-                toolTipText: dialog.self ? dialog.self.kToolTipText : ""
+                toolTipText: dialog.self ? dialog.self.toolTipText() : ""
                 GroupsComboBox
                 {
                     id: groupsComboBox
