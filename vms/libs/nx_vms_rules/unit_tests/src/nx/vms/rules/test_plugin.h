@@ -45,6 +45,7 @@ public:
     {
         registerAction<TestAction>();
         registerAction<TestProlongedAction>();
+        registerAction<TestProlongedOnlyAction>();
         registerAction<TestActionWithInterval>();
         registerAction<TestActionWithEmail>();
     }

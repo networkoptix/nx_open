@@ -845,7 +845,7 @@ size_t Engine::processEvent(const EventPtr& event)
         // TODO: #spanasenko Add filters-by-type maps?
         for (const auto& [id, rule]: m_rules)
         {
-            if (!rule->enabled() || !rule->isValid())
+            if (!rule->enabled() || !rule->isCompatible())
                 continue;
 
             auto cacheKey = event->cacheKey();

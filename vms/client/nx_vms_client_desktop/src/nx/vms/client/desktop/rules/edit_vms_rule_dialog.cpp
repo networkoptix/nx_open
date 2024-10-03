@@ -396,7 +396,7 @@ void EditVmsRuleDialog::displayComment()
 
 void EditVmsRuleDialog::displayRule()
 {
-    if (!NX_ASSERT(m_rule->isValid()))
+    if (!NX_ASSERT(m_rule->isCompleted()))
         return;
 
     m_eventTypePicker->setEventType(m_rule->eventFilters().first()->eventType());
