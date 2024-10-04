@@ -90,6 +90,7 @@ private:
     bool m_packetWritten = false;
     std::optional<nx::recording::Error> m_lastError;
     nx::media::AnnexbToMp4 m_annexbToMp4;
+    std::map<int, int64_t> m_streamIndexToLastDts;
 
     virtual qint64 getPacketTimeUsec(const QnConstAbstractMediaDataPtr& md);
 
