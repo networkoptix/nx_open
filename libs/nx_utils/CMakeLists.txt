@@ -1,5 +1,7 @@
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+find_package(concurrentqueue REQUIRED)
+
 if(IOS)
     set(ios_sources "src/nx/utils/log/log_ios.mm")
 endif()
@@ -22,6 +24,8 @@ nx_add_target(nx_utils LIBRARY
         nx_build_info
         nx_kit
         nx_reflect
+    PRIVATE_LIBS
+        concurrentqueue::concurrentqueue
     FOLDER common/libs
 )
 
@@ -56,8 +60,6 @@ if (IOS)
     target_compile_definitions(nx_utils
         PRIVATE HAVE_UNISTD_H)
 endif()
-
-target_link_libraries(nx_utils PRIVATE concurrentqueue)
 
 if(WINDOWS)
     target_link_libraries(nx_utils PRIVATE DbgHelp ws2_32)
