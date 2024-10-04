@@ -163,6 +163,11 @@ void QnSystemAdministrationDialog::applyChanges()
 
     base_type::applyChanges();
 
+    // Not all settings in the system administration dialog are saved through editableSystemSettings
+    // some may be saved in applyChanges methods of the dialog pages themselves, such as Routing.
+    if (d->editableSystemSettings.isEmpty())
+        return;
+
     auto callback = nx::utils::guarded(this,
         [this](
             bool /*success*/,

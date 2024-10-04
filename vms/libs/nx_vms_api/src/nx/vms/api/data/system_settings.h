@@ -347,6 +347,12 @@ struct NX_VMS_API SaveableSystemSettings: SaveableSettingsBase, UserSessionSetti
         result.siteName = systemName;
         return result;
     }
+
+    bool isEmpty() const
+    {
+        static const SaveableSystemSettings kEmptySaveableSystemSettings;
+        return *this == kEmptySaveableSystemSettings;
+    }
 };
 #define SaveableSystemSettings_Fields \
     SaveableSettingsBase_Fields \
