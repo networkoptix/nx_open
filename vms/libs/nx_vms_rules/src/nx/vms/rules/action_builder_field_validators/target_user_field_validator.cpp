@@ -10,6 +10,7 @@
 
 #include "../action_builder.h"
 #include "../action_builder_fields/flag_field.h"
+#include "../action_builder_fields/target_devices_field.h"
 #include "../action_builder_fields/target_layout_field.h"
 #include "../action_builder_fields/target_users_field.h"
 #include "../action_builder_fields/text_field.h"
@@ -105,6 +106,25 @@ ValidationResult TargetUserFieldValidator::validity(
 
             return utils::usersValidity(
                 policy, targetUserField->acceptAll(), targetUserField->ids());
+        }
+        else if (targetUserFieldProperties.validationPolicy == kAudioReceiverValidationPolicy)
+        {
+            if(targetUserField->acceptAll() || !targetUserField->ids().empty())
+                return {};
+
+            auto targetDevicesField = rule->actionBuilders().front()->fieldByName<TargetDevicesField>(
+                utils::kDeviceIdsFieldName);
+            if (!NX_ASSERT(targetDevicesField))
+            {
+                return {
+                    QValidator::State::Invalid,
+                    Strings::fieldValueMustBeProvided(utils::kDeviceIdsFieldName)};
+            }
+
+            if (!targetDevicesField->useSource() && targetDevicesField->ids().empty())
+                return {QValidator::State::Invalid, Strings::selectUser()};
+
+            return {};
         }
         else
         {

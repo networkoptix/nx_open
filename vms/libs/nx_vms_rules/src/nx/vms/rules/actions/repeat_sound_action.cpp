@@ -46,7 +46,8 @@ const ItemDescriptor& RepeatSoundAction::manifest()
                 Strings::to(),
                 /*description*/ {},
                 ResourceFilterFieldProperties{
-                    .allowEmptySelection = true
+                    .allowEmptySelection = true,
+                    .validationPolicy = kAudioReceiverValidationPolicy
                 }.toVariantMap()),
             makeFieldDescriptor<VolumeField>(
                 utils::kVolumeFieldName,
