@@ -28,7 +28,8 @@ public:
         void(Request, ResponseHandler, WebSocketConnection*)>;
     using OnDone = nx::utils::MoveOnlyFunc<void(WebSocketConnection*)>;
 
-    WebSocketConnection(std::unique_ptr<nx::network::websocket::WebSocket> socket, OnDone onDone);
+    WebSocketConnection(
+        std::unique_ptr<nx::network::websocket::WebSocket> webSocket, OnDone onDone);
     virtual ~WebSocketConnection() override;
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
 

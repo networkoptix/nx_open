@@ -38,7 +38,7 @@ AbstractSocket::SOCKET_HANDLE Pollable::handle() const
 AbstractSocket::SOCKET_HANDLE Pollable::takeHandle()
 {
     auto systemHandle = m_fd;
-    m_fd = -1;
+    m_fd = AbstractSocket::kInvalidSocket;
     return systemHandle;
 }
 

@@ -2,11 +2,10 @@
 
 #include "thread_util.h"
 
-#include <QtCore/QtGlobal>
+#include <QtCore/QString>
 
 #if _WIN32
     #include <Windows.h>
-    #include <codecvt>
 #else
     #include <pthread.h>
 #endif
@@ -43,11 +42,14 @@ void setCurrentThreadName(std::string name)
 {
     #if defined(_WIN32)
     using SetThreadDescription = std::add_pointer_t<HRESULT WINAPI(HANDLE, PCWSTR)>;
+    HMODULE handle = GetModuleHandleA("kernel32.dll");
+    if (handle == NULL)
+        return;
+
     if (const auto setThreadDescription = reinterpret_cast<SetThreadDescription>(
-        GetProcAddress(GetModuleHandleA("kernel32.dll"), "SetThreadDescription")))
+        GetProcAddress(handle, "SetThreadDescription")))
     {
-        std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-        setThreadDescription(GetCurrentThread(), converter.from_bytes(name).c_str());
+        setThreadDescription(GetCurrentThread(), qUtf16Printable(QString::fromStdString(name)));
     }
     #elif defined(__APPLE__)
         pthread_setname_np(name.c_str());

@@ -79,7 +79,7 @@ protected:
 
 private:
     nx::utils::Subscription<int> m_subscription;
-    nx::utils::SubscriptionId m_id = -1;
+    nx::utils::SubscriptionId m_id = 0;
     int m_notifyParam = -1;
     std::unique_ptr<std::promise<void>> m_startedPromise;
     std::unique_ptr<std::promise<void>> m_donePromise;
@@ -153,7 +153,7 @@ TEST_F(Subscription, recursive_notifications_are_supported)
 
     std::vector<int> notifications;
 
-    nx::utils::SubscriptionId id1 = -1;
+    nx::utils::SubscriptionId id1 = 0;
     subscription.subscribe(
         [&subscription, &notifications](int v)
         {

@@ -69,7 +69,7 @@ public:
             return post(
                 [handler = std::move(handler)]()
                 {
-                    handler(SystemError::connectionReset, -1);
+                    handler(SystemError::connectionReset, 0);
                 });
         }
 

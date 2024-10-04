@@ -261,11 +261,6 @@ void win32_exception::installGlobalUnhandledExceptionHandler()
     _set_abort_behavior( 0, _WRITE_ABORT_MSG );
 }
 
-void win32_exception::installThreadSpecificUnhandledExceptionHandler()
-{
-    _set_se_translator( translate );
-}
-
 void win32_exception::setCreateFullCrashDump( bool isFull )
 {
     globalCrashDumpSettingsInstance.dumpFullMemory = isFull;

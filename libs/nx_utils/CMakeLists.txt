@@ -10,7 +10,6 @@ set(aes_library_root "${open_source_root}/artifacts/tiny_aes_c")
 file(GLOB_RECURSE aes_library_sources "${aes_library_root}/src/tiny_aes_c/*")
 
 nx_add_target(nx_utils LIBRARY
-    WERROR_IF NOT WINDOWS
     NO_MOC
     ADDITIONAL_SOURCES
         ${ios_sources}

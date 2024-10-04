@@ -89,7 +89,7 @@ bool CloudServerSocket::getProtocol(int* protocol) const
 AbstractSocket::SOCKET_HANDLE CloudServerSocket::handle() const
 {
     NX_ASSERT(false);
-    return (AbstractSocket::SOCKET_HANDLE)(-1);
+    return AbstractSocket::kInvalidSocket;
 }
 
 bool CloudServerSocket::listen(int queueLen)

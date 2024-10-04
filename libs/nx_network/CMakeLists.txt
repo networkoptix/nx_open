@@ -9,7 +9,6 @@ endif()
 nx_add_target(nx_network LIBRARY NO_MOC
     ADDITIONAL_SOURCES
         ${mac_sources}
-    WERROR_IF NOT WINDOWS AND NOT ANDROID AND NOT IOS
     PUBLIC_LIBS
         Qt6::Network
         OpenSSL::OpenSSL

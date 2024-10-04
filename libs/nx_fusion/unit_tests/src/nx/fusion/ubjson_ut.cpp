@@ -195,12 +195,7 @@ TEST(UbJsonTest, customStructVectorDescendantFromAncestor)
 
 TEST(UbJsonTest, customStructAncestorFromDescendant)
 {
-    TestStructEx testStruct{
-        2,
-        "some text data",
-        3.1,
-        nx::Uuid::createUuid()
-    };
+    TestStructEx testStruct{{2, "some text data", 3.1}, nx::Uuid::createUuid()};
 
     const QByteArray data = QnUbjson::serialized(testStruct);
     const TestStruct result = QnUbjson::deserialized<TestStruct>(data);
@@ -213,9 +208,9 @@ TEST(UbJsonTest, customStructAncestorFromDescendant)
 TEST(UbJsonTest, customStructVectorAncestorFromDescendant)
 {
     std::vector<TestStructEx> testStructures = {
-        {2, "some text data_1", 3.1, nx::Uuid::createUuid()},
-        {1, "some text data_2", 4.1, nx::Uuid::createUuid()},
-        {5, "some text data_3", 5.1, nx::Uuid::createUuid()}
+        {{2, "some text data_1", 3.1}, nx::Uuid::createUuid()},
+        {{1, "some text data_2", 4.1}, nx::Uuid::createUuid()},
+        {{5, "some text data_3", 5.1}, nx::Uuid::createUuid()}
     };
 
     const QByteArray data = QnUbjson::serialized(testStructures);

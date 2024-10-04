@@ -20,7 +20,7 @@ void fillDummyAvCodecParameters(AVCodecParameters* avCodecParams)
         strlen(kExtradataDummy));
 
     avCodecParams->ch_layout.nb_channels = 113;
-    avCodecParams->ch_layout.u.mask = INT_MAX * 10;
+    avCodecParams->ch_layout.u.mask = (uint64_t) INT_MAX * 10;
     avCodecParams->sample_rate = 114;
     avCodecParams->format = AV_SAMPLE_FMT_NONE;
     avCodecParams->bits_per_coded_sample = 115;

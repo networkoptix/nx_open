@@ -84,10 +84,11 @@ IoContextPtr openFile(const std::string& fileName)
     ioContext->seekHandler =
         [file] (int64_t pos, int whence)
         {
+            if (file->eof())
+                file->clear();
+
             switch (whence)
             {
-                if (file->eof())
-                    file->clear();
                 case SEEK_SET:
                     file->seekg(pos, std::ios_base::beg);
                     break;
@@ -110,8 +111,8 @@ IoContextPtr fromBuffer(const uint8_t* data, int size)
     struct MemoryFile
     {
         const uint8_t* data = nullptr;
-        int size = 0;
-        int pos = 0;
+        int64_t size = 0;
+        int64_t pos = 0;
     };
     auto memoryFile = std::make_shared<MemoryFile>();
     memoryFile->size = size;
@@ -119,16 +120,16 @@ IoContextPtr fromBuffer(const uint8_t* data, int size)
 
     auto ioContext = std::make_unique<IoContext>(1024*64, /*writable*/false, /*seekable*/true);
     ioContext->readHandler =
-        [memoryFile](uint8_t* buffer, int size)
+        [memoryFile](uint8_t* buffer, int size) -> int
         {
-            auto actualSize = std::min(memoryFile->size - memoryFile->pos, size);
+            auto actualSize = std::min((int) (memoryFile->size - memoryFile->pos), size);
             memcpy(buffer, memoryFile->data + memoryFile->pos, actualSize);
             memoryFile->pos += actualSize;
             return actualSize;
         };
 
     ioContext->seekHandler =
-        [memoryFile] (int64_t pos, int whence)
+        [memoryFile] (int64_t pos, int whence) -> int64_t
         {
             switch (whence)
             {
@@ -147,7 +148,6 @@ IoContextPtr fromBuffer(const uint8_t* data, int size)
             return memoryFile->pos;
         };
     return ioContext;
-
 }
 
 IoContextPtr createFile(const std::string& fileName)
@@ -158,14 +158,14 @@ IoContextPtr createFile(const std::string& fileName)
 
     auto ioContext = std::make_unique<IoContext>(1024*64, /*writable*/true, /*seekable*/true);
     ioContext->writeHandler =
-        [file](const uint8_t* buffer, int size)
+        [file](const uint8_t* buffer, int size) -> int
         {
             file->write((char*)buffer, size);
             return size;
         };
 
     ioContext->seekHandler =
-        [file] (int64_t pos, int whence)
+        [file] (int64_t pos, int whence) -> int64_t
         {
             switch (whence)
             {

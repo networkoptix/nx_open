@@ -44,6 +44,7 @@ nx_add_target(nx_vms_client_core LIBRARY
         Qt6::Multimedia
         Qt6::Quick
         Qt6::Svg
+        Qt6::Test
         appserver2
         cloud_db_client
         nx_media

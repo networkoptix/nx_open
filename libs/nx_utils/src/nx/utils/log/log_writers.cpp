@@ -467,7 +467,7 @@ cf::future<cf::unit> File::stopArchivingAsync()
                 m_archive.wait();
                 return cf::unit();
             }
-            catch (const std::future_error& e)
+            catch (const std::future_error&)
             {
                 return cf::unit();
             }

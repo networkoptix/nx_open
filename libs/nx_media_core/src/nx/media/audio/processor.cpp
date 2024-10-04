@@ -125,7 +125,7 @@ Format Processor::float2int32(nx::utils::ByteArray& audio, Format format)
     for (int i = 0; i < len; ++i)
     {
         float f = *((float*)inP);
-        *inP = (qint32) (f * INT_MAX);
+        *inP = (qint32) (f * (float) INT_MAX);
         ++inP;
     }
     format.sampleType = Format::SampleType::signedInt;

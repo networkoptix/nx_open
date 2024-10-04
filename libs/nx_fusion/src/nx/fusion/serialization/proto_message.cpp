@@ -15,15 +15,18 @@ static int readVariant(QnInputBinaryStream<QByteArray> &stream, T *target, QnPro
     while(true) {
         quint8 byte;
         if(stream.read(&byte, 1) != 1) {
-            if(acceptEmpty && shift == 0)
-                return 0;
+            if constexpr (acceptEmpty)
+            {
+                if (shift == 0)
+                    return 0;
+            }
 
             if(error)
                 *error = QnProtoParseError(stream.pos(), QnProtoParseError::UnexpectedTermination);
             return -1;
         }
 
-        result |= (byte & 0x7F) << shift;
+        result |= ((int) byte & 0x7F) << shift;
         if(!(byte & 0x80))
             break;
 

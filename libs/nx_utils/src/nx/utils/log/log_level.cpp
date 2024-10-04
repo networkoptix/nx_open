@@ -53,7 +53,7 @@ static const std::array<QString, kLevelsCount> kLevelStrings =
 template<typename... Items, size_t... N>
 static size_t findIndex(Level level, std::index_sequence<N...>, Items&&... items)
 {
-    size_t index;
+    size_t index = 0;
     bool found = false;
     found = ((items.value == level ? (found = true, index = N, found) : found) || ... || false);
     if (!found)

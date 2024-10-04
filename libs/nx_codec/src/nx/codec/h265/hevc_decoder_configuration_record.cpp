@@ -32,8 +32,6 @@ void writeNaluVector(
 
 namespace nx::media::h265 {
 
-using namespace nx::media::h265;
-
 bool HEVCDecoderConfigurationRecord::read(const uint8_t* data, int size)
 {
     constexpr int kMinSizeBytes = 23;

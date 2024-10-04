@@ -87,7 +87,7 @@ protected:
             steps.push_back(action);
             if (action == 0)
             {
-                if (eventType == EventType::etTimedOut)
+                if constexpr (eventType == EventType::etTimedOut)
                     m_service.registerTimer(m_socket.get(), std::chrono::milliseconds(1), this);
                 else
                     m_service.startMonitoring(m_socket.get(), eventType, this);

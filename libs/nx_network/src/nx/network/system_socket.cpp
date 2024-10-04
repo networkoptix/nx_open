@@ -186,7 +186,7 @@ SocketAddress Socket<SocketInterfaceToImplement>::getLocalAddress() const
 template<typename SocketInterfaceToImplement>
 bool Socket<SocketInterfaceToImplement>::shutdown()
 {
-    if (m_fd == -1)
+    if (m_fd == AbstractStreamSocket::kInvalidSocket)
         return true;
 
 #ifdef _WIN32
@@ -208,7 +208,7 @@ bool Socket<SocketInterfaceToImplement>::close()
     }
 
     auto fd = m_fd;
-    m_fd = -1;
+    m_fd = AbstractSocket::kInvalidSocket;
 
 #ifdef _WIN32
     return ::closesocket(fd) == 0;
@@ -220,7 +220,7 @@ bool Socket<SocketInterfaceToImplement>::close()
 template<typename SocketInterfaceToImplement>
 bool Socket<SocketInterfaceToImplement>::isClosed() const
 {
-    return m_fd == -1;
+    return m_fd == AbstractStreamSocket::kInvalidSocket;
 }
 
 template<typename SocketInterfaceToImplement>
@@ -1720,10 +1720,12 @@ bool UDPSocket::setMulticastTTL(unsigned char multicastTTL)
 bool UDPSocket::setMulticastIF(const std::string& multicastIF)
 {
     struct in_addr localInterface;
-    localInterface.s_addr = inet_addr(multicastIF.c_str());
+    if (inet_pton(AF_INET, multicastIF.c_str(), &localInterface) <= 0)
+        return false;
+
     if (setsockopt(
-            handle(), IPPROTO_IP, IP_MULTICAST_IF,
-            (raw_type *)&localInterface, sizeof(localInterface)) < 0)
+        handle(), IPPROTO_IP, IP_MULTICAST_IF,
+        (raw_type*) &localInterface, sizeof(localInterface)) < 0)
     {
         return false;
     }
@@ -1743,8 +1745,11 @@ bool UDPSocket::joinGroup(const HostAddress& multicastGroup)
 #endif
     struct ip_mreq multicastRequest;
     memset(&multicastRequest, 0, sizeof(multicastRequest));
-
-    multicastRequest.imr_multiaddr.s_addr = inet_addr(multicastGroup.toString().c_str());
+    if (inet_pton(AF_INET, multicastGroup.toString().c_str(), &multicastRequest.imr_multiaddr)
+        <= 0)
+    {
+        return false;
+    }
     multicastRequest.imr_interface.s_addr = htonl(INADDR_ANY);
     if (setsockopt(
             handle(), IPPROTO_IP, IP_ADD_MEMBERSHIP,
@@ -1769,8 +1774,13 @@ bool UDPSocket::joinGroup(const HostAddress& multicastGroup, const HostAddress& 
 #endif
     struct ip_mreq multicastRequest;
     memset(&multicastRequest, 0, sizeof(multicastRequest));
-    multicastRequest.imr_multiaddr.s_addr = inet_addr(multicastGroup.toString().c_str());
-    multicastRequest.imr_interface.s_addr = inet_addr(multicastIF.toString().c_str());
+    if (inet_pton(AF_INET, multicastGroup.toString().c_str(), &multicastRequest.imr_multiaddr)
+        <= 0)
+    {
+        return false;
+    }
+    if (inet_pton(AF_INET, multicastIF.toString().c_str(), &multicastRequest.imr_interface) <= 0)
+        return false;
     if (setsockopt(
             handle(), IPPROTO_IP, IP_ADD_MEMBERSHIP,
             (raw_type *)&multicastRequest, sizeof(multicastRequest)) < 0)
@@ -1787,7 +1797,11 @@ bool UDPSocket::leaveGroup(const HostAddress& multicastGroup)
     struct ip_mreq multicastRequest;
     memset(&multicastRequest, 0, sizeof(multicastRequest));
 
-    multicastRequest.imr_multiaddr.s_addr = inet_addr(multicastGroup.toString().c_str());
+    if (inet_pton(AF_INET, multicastGroup.toString().c_str(), &multicastRequest.imr_multiaddr)
+        <= 0)
+    {
+        return false;
+    }
     multicastRequest.imr_interface.s_addr = htonl(INADDR_ANY);
     if (setsockopt(handle(), IPPROTO_IP, IP_DROP_MEMBERSHIP,
         (raw_type *)&multicastRequest,
@@ -1803,8 +1817,13 @@ bool UDPSocket::leaveGroup(const HostAddress& multicastGroup, const HostAddress&
     struct ip_mreq multicastRequest;
     memset(&multicastRequest, 0, sizeof(multicastRequest));
 
-    multicastRequest.imr_multiaddr.s_addr = inet_addr(multicastGroup.toString().c_str());
-    multicastRequest.imr_interface.s_addr = inet_addr(multicastIF.toString().c_str());
+    if (inet_pton(AF_INET, multicastGroup.toString().c_str(), &multicastRequest.imr_multiaddr)
+        <= 0)
+    {
+        return false;
+    }
+    if (inet_pton(AF_INET, multicastIF.toString().c_str(), &multicastRequest.imr_interface) <= 0)
+        return false;
 
     return setsockopt(
         handle(), IPPROTO_IP, IP_DROP_MEMBERSHIP,

@@ -2,7 +2,6 @@
 
 nx_add_target(nx_rtp
     LIBRARY
-    WERROR_IF NOT WINDOWS
     PUBLIC_LIBS
         nx_utils
         nx_media_core

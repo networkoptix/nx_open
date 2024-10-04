@@ -70,8 +70,10 @@ public:
      * Equivalence of these typedefs is checked via static_assert in system_socket.cpp.
      */
     using SOCKET_HANDLE = std::uintptr_t;
+    static constexpr SOCKET_HANDLE kInvalidSocket = ~((SOCKET_HANDLE) 0);
 #else
     using SOCKET_HANDLE = int;
+    static constexpr SOCKET_HANDLE kInvalidSocket = -1;
 #endif
 
     /**

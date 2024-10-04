@@ -24,10 +24,7 @@ public:
         std::unique_ptr<utils::bstream::AbstractTwoWayConverter> serverPipeline)
         :
         m_clientPipeline(std::move(clientPipeline)),
-        m_serverPipeline(std::move(serverPipeline)),
-        m_maxBytesToWrite(std::numeric_limits<decltype(m_maxBytesToWrite)>::max()),
-        m_clientToServerTotalBytesThrough(-1),
-        m_serverToClientTotalBytesThrough(-1)
+        m_serverPipeline(std::move(serverPipeline))
     {
         m_clientPipeline->setOutput(&m_clientToServerPipeline);
         m_serverPipeline->setInput(&m_clientToServerPipeline);
@@ -112,9 +109,9 @@ private:
     std::unique_ptr<nx::utils::bstream::AbstractTwoWayConverter> m_clientPipeline;
     std::unique_ptr<nx::utils::bstream::AbstractTwoWayConverter> m_serverPipeline;
     std::unique_ptr<nx::utils::bstream::AbstractOutputConverter> m_betweenClientAndServer;
-    const int m_maxBytesToWrite;
-    std::size_t m_clientToServerTotalBytesThrough;
-    std::size_t m_serverToClientTotalBytesThrough;
+    const int m_maxBytesToWrite = std::numeric_limits<decltype(m_maxBytesToWrite)>::max();
+    std::size_t m_clientToServerTotalBytesThrough = std::numeric_limits<size_t>::max();
+    std::size_t m_serverToClientTotalBytesThrough = std::numeric_limits<size_t>::max();
 };
 
 /**
