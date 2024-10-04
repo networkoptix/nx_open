@@ -18,6 +18,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/desktop/access/caching_access_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/dialogs/web_view_dialog.h>
 #include <nx/vms/client/desktop/ini.h>
@@ -304,6 +305,20 @@ void QnWorkbenchWebPageHandler::openInDedicatedWindow(const QnWebPageResourcePtr
         {
             saveSize(webPage->getUrl(), webDialog->size());
         }));
+
+    const auto accessController = qobject_cast<CachingAccessController*>(this->accessController());
+    if (NX_ASSERT(accessController))
+    {
+        connect(accessController, &CachingAccessController::permissionsChanged, webDialog,
+            [webDialog, webPage, accessController](const QnResourcePtr& resource)
+            {
+                if (resource != webPage)
+                    return;
+
+                if (!accessController->hasPermissions(webPage, Qn::ReadPermission))
+                    webDialog->close();
+            });
+    }
 
     webDialog->show();
     updateSize();
