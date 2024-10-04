@@ -1289,6 +1289,7 @@ void QnMediaResourceWidget::updateDisplay()
         : QnResourceDisplayPtr(new QnResourceDisplay(d->mediaResource->toResourcePtr()));
 
     setDisplay(display);
+    updateAudioPlaybackState();
 }
 
 const QnMediaResourcePtr &QnMediaResourceWidget::resource() const
