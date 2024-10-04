@@ -55,6 +55,15 @@ bool paintButtonFunction(QPainter* painter, const QStyleOption* /*option*/, cons
     return true;
 };
 
+const core::SvgIconColorer::ThemeSubstitutions kLight10Theme =
+{
+    {QnIcon::Normal, {.primary = "light10"}},
+};
+
+const core::SvgIconColorer::ThemeSubstitutions kLight16Theme =
+{
+    {QnIcon::Normal, {.primary = "light10", .secondary = "red"}},
+};
 
 // TODO: @pprivalov Remove this old fashioned color substitutions when figma plugin is ready.
 static const QColor kBasePrimaryColor = "#ffffff";
@@ -156,8 +165,8 @@ const core::SvgIconColorer::IconSubstitutions kNavigationIconCheckedSubstitution
 };
 
 NX_DECLARE_COLORIZED_ICON(kMuteUnmuteIcon,
-    "24x20/Solid/mute.svg", kNavigationIconSubstitutions,
-    "24x20/Solid/unmute.svg", kNavigationIconCheckedSubstitutions)
+    "24x20/Solid/mute.svg", kLight10Theme,
+    "24x20/Solid/unmute.svg", kLight16Theme)
 NX_DECLARE_COLORIZED_ICON(kLiveButtonIcon,
     "52x24/Solid/live.svg", kNavigationTheme,
     "52x24/Solid/live.svg", kNavigationCheckedTheme)
