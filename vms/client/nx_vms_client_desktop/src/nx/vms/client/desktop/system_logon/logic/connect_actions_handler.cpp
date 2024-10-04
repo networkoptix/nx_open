@@ -140,7 +140,12 @@ struct ConnectActionsHandler::Private
     std::unique_ptr<nx::utils::TimerManager> timerManager;
     std::unique_ptr<ec2::CrashReporter> crashReporter;
     bool needReconnectToLastCloudSystem = false;
-    QString lastCloudSystemId;
+    // The identifier of the cloud system we last attempted to connect to. An attempt to connect
+    // does not imply a successful connection, so we update the variable at the moment we send the
+    // connection request to the system, not after the connection is established. This is necessary
+    // for correct reconnection to the last system in case the connection attempt fails, such as
+    // when a new refresh token needs to be issued.
+    QString lastAttemptedConnectCloudSystemId;
 
     Private(ConnectActionsHandler* owner):
         q(owner)
@@ -176,8 +181,10 @@ struct ConnectActionsHandler::Private
 
         needReconnectToLastCloudSystem = false;
 
-        q->connectToCloudSystem(
-            {lastCloudSystemId, /*connectScenario*/ std::nullopt, /*useCache*/ false});
+        q->connectToCloudSystem({
+            lastAttemptedConnectCloudSystemId,
+            /*connectScenario*/ std::nullopt,
+            /*useCache*/ false});
     }
 
     void reconnectToCloudIfNeeded()
@@ -1059,7 +1066,7 @@ void ConnectActionsHandler::updatePreloaderVisibility()
 void ConnectActionsHandler::connectToCloudSystem(const CloudSystemConnectData& connectData)
 {
     const auto connectionInfo = core::cloudLogonData(connectData.systemId, connectData.useCache);
-    d->lastCloudSystemId = connectData.systemId;
+    d->lastAttemptedConnectCloudSystemId = connectData.systemId;
 
     if (!connectionInfo)
         return;
@@ -1321,7 +1328,7 @@ void ConnectActionsHandler::at_disconnectAction_triggered()
         menu::RemoveSystemFromTabBarAction,
         menu::Parameters(Qn::LocalSystemIdRole, systemId));
 
-    d->lastCloudSystemId = {};
+    d->lastAttemptedConnectCloudSystemId = {};
     emit mainWindow()->welcomeScreen()->dropConnectingState();
 }
 
@@ -1566,6 +1573,9 @@ void ConnectActionsHandler::connectToServer(LogonData logonData, ConnectionOptio
     // Store username case-sensitive as it was entered (actual only for the digest auth method).
     std::string originalUsername = logonData.credentials.username;
     const auto isLink = logonData.connectScenario == ConnectScenario::connectUsingCommand;
+
+    if (logonData.userType == nx::vms::api::UserType::cloud)
+        d->lastAttemptedConnectCloudSystemId = logonData.expectedCloudSystemId.value_or(QString());
 
     auto callback = d->makeSingleConnectionCallback(
         [this, options, connectScenario, originalUsername, isLink, logonData]
