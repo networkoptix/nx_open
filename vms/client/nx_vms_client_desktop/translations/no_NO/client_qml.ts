@@ -63,13 +63,12 @@
       <translation>Synkroniseringsintervall</translation>
     </message>
     <message>
-      <source>Proxy LDAP requests %1 via server</source>
-      <comment>%1 is a line break</comment>
-      <translation>Proxy LDAP ber om %1 via server</translation>
-    </message>
-    <message>
       <source>Group Members Attribute</source>
       <translation>Gruppemedlemmer-attributt</translation>
+    </message>
+    <message>
+      <source>Proxy LDAP requests via server</source>
+      <translation>Proxy LDAP forespørsler via server</translation>
     </message>
   </context>
   <context>
@@ -1003,6 +1002,14 @@
     <message>
       <source>No groups</source>
       <translation>Ingen grupper</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n more</source>
+      <comment>%n is the number of remaining groups</comment>
+      <translation type="unfinished">
+        <numerusform>%n mer</numerusform>
+        <numerusform>%n more</numerusform>
+      </translation>
     </message>
   </context>
   <context>

@@ -63,13 +63,12 @@
       <translation>同期間隔</translation>
     </message>
     <message>
-      <source>Proxy LDAP requests %1 via server</source>
-      <comment>%1 is a line break</comment>
-      <translation>サーバー経由で %1LDAP リクエストをプロキシする</translation>
-    </message>
-    <message>
       <source>Group Members Attribute</source>
       <translation>グループメンバー属性</translation>
+    </message>
+    <message>
+      <source>Proxy LDAP requests via server</source>
+      <translation>サーバー経由で LDAP リクエストをプロキシする</translation>
     </message>
   </context>
   <context>
@@ -997,6 +996,13 @@
     <message>
       <source>No groups</source>
       <translation>グループなし</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n more</source>
+      <comment>%n is the number of remaining groups</comment>
+      <translation>
+        <numerusform>ほか %n</numerusform>
+      </translation>
     </message>
   </context>
   <context>

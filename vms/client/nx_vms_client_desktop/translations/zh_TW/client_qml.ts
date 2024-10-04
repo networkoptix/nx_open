@@ -63,13 +63,12 @@
       <translation>同步間隔</translation>
     </message>
     <message>
-      <source>Proxy LDAP requests %1 via server</source>
-      <comment>%1 is a line break</comment>
-      <translation>透過伺服器代理 LDAP 請求 %1</translation>
-    </message>
-    <message>
       <source>Group Members Attribute</source>
       <translation>群組成員屬性</translation>
+    </message>
+    <message>
+      <source>Proxy LDAP requests via server</source>
+      <translation>透過伺服器代理 LDAP 請求 </translation>
     </message>
   </context>
   <context>
@@ -997,6 +996,13 @@
     <message>
       <source>No groups</source>
       <translation>沒有群組</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n more</source>
+      <comment>%n is the number of remaining groups</comment>
+      <translation type="unfinished">
+        <numerusform>%n more</numerusform>
+      </translation>
     </message>
   </context>
   <context>

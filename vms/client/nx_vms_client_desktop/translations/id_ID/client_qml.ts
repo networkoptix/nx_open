@@ -63,13 +63,12 @@
       <translation>Sinkronisasi Interval</translation>
     </message>
     <message>
-      <source>Proxy LDAP requests %1 via server</source>
-      <comment>%1 is a line break</comment>
-      <translation>Permintaan LDAP proksi %1 melalui server</translation>
-    </message>
-    <message>
       <source>Group Members Attribute</source>
       <translation>Atribut Anggota Grup</translation>
+    </message>
+    <message>
+      <source>Proxy LDAP requests via server</source>
+      <translation>Permintaan LDAP proksi melalui server</translation>
     </message>
   </context>
   <context>
@@ -997,6 +996,13 @@
     <message>
       <source>No groups</source>
       <translation>Tidak ada grup</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n more</source>
+      <comment>%n is the number of remaining groups</comment>
+      <translation type="unfinished">
+        <numerusform>%n more</numerusform>
+      </translation>
     </message>
   </context>
   <context>
