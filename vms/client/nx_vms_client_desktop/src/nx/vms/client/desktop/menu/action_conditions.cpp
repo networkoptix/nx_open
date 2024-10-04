@@ -2559,7 +2559,7 @@ ConditionWrapper hasWebPageSubtype(const std::optional<nx::vms::api::WebPageSubt
             const auto webPage = resource.dynamicCast<QnWebPageResource>();
             return webPage && (!subtype || webPage->subtype() == subtype);
         },
-        MatchMode::exactlyOne);
+        MatchMode::all);
 }
 
 ConditionWrapper isIntegration()
