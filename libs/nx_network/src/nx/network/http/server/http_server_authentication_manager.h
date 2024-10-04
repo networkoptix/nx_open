@@ -65,6 +65,8 @@ public:
 
     std::string realm();
 
+    virtual void pleaseStopSync() override;
+
 private:
     AbstractAuthenticationDataProvider* m_authenticationDataProvider;
     nx::utils::Counter m_startedAsyncCallsCounter;

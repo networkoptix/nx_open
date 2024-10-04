@@ -29,6 +29,11 @@ AuthenticationManager::AuthenticationManager(
 
 AuthenticationManager::~AuthenticationManager()
 {
+    pleaseStopSync();
+}
+
+void AuthenticationManager::pleaseStopSync()
+{
     m_startedAsyncCallsCounter.wait();
 }
 

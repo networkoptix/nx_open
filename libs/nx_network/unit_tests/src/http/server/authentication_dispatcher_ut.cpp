@@ -44,6 +44,8 @@ public:
         return m_authenticateCalled;
     }
 
+    virtual void pleaseStopSync() override {}
+
 private:
     bool m_authenticateCalled = false;
 };

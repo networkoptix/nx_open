@@ -56,6 +56,8 @@ public:
         RequestContext requestContext,
         nx::utils::MoveOnlyFunc<void(RequestResult)> completionHandler) override;
 
+    virtual void pleaseStopSync() override {}
+
 private:
     struct AuthenticatorContext
     {
