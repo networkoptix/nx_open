@@ -136,7 +136,7 @@ Control
 
                 MultiSelectionFieldItem
                 {
-                    text: qsTr(`${flow.remaining} more`)
+                    text: qsTr("%n more", "%n is the number of remaining groups", flow.remaining)
                     color: ColorTheme.colors.light10
                     backgroundColor: ColorTheme.colors.dark7
                     removable: false

@@ -65,11 +65,6 @@ DifferencesResult differences(
 
 } // namespace
 
-const QString GroupSettingsDialog::kInfoText = tr("Current group is a member of all groups "
-    "selected on this tab and inherits permissions from each of them.");
-const QString GroupSettingsDialog::kToolTipText = tr("Select one or multiple groups from which "
-        "the current group will inherit permissions");
-
 struct GroupSettingsDialog::Private
 {
     GroupSettingsDialog* q;
@@ -274,6 +269,17 @@ QString GroupSettingsDialog::validateName(const QString& text)
     }
 
     return {};
+}
+
+QString GroupSettingsDialog::infoText() const
+{
+    return tr("Current group is a member of all groups selected on this tab and inherits"
+        " permissions from each of them.");}
+
+QString GroupSettingsDialog::toolTipText() const
+{
+    return tr("Select one or multiple groups from which the current group will inherit"
+        " permissions");
 }
 
 void GroupSettingsDialog::onAddGroupRequested()

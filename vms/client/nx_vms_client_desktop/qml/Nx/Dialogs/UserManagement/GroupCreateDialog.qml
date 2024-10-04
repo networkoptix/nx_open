@@ -114,7 +114,7 @@ DialogWithState
                 id: groupsSettings
                 anchors.fill: parent
 
-                infoText: dialog.self ? dialog.self.kInfoText : ""
+                infoText: dialog.self ? dialog.self.infoText() : ""
 
                 model: membersModel
                 allowAddGroup: false
