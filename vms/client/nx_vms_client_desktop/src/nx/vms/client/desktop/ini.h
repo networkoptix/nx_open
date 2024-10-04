@@ -321,7 +321,7 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
         "[Feature] Makes Camera Hotspots feature available in the client.");
 
     // VMS-32420
-    NX_INI_FLAG(false, enableMetadataApi,
+    NX_INI_FLAG(true, enableMetadataApi,
         "[Feature] Enables MetadataApi feature.");
 
     // VMS-36874
@@ -339,7 +339,7 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
         "[Feature] Open web page, marked as default, when client connects to a system.");
 
     // VMS-41884
-    NX_INI_FLAG(false, integrationsManagement,
+    NX_INI_FLAG(true, integrationsManagement,
         "[Feature] Enables Integrations Management feature.");
 
     // VMS-39166
