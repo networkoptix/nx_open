@@ -1000,6 +1000,14 @@
         <source>No groups</source>
         <translation></translation>
     </message>
+    <message numerus="yes">
+        <source>%n more</source>
+        <comment>%n is the number of remaining groups</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
 </context>
 <context>
     <name>HintItem</name>
