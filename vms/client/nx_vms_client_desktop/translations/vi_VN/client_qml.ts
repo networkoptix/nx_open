@@ -63,13 +63,12 @@
       <translation>Khoảng thời gian đồng bộ hóa</translation>
     </message>
     <message>
-      <source>Proxy LDAP requests %1 via server</source>
-      <comment>%1 is a line break</comment>
-      <translation>Proxy yêu cầu LDAP %1 qua máy chủ</translation>
-    </message>
-    <message>
       <source>Group Members Attribute</source>
       <translation>Thuộc tính thành viên nhóm</translation>
+    </message>
+    <message>
+      <source>Proxy LDAP requests via server</source>
+      <translation>Yêu cầu proxy LDAP qua máy chủ</translation>
     </message>
   </context>
   <context>
@@ -997,6 +996,13 @@
     <message>
       <source>No groups</source>
       <translation>Không có nhóm</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n more</source>
+      <comment>%n is the number of remaining groups</comment>
+      <translation type="unfinished">
+        <numerusform>%n more</numerusform>
+      </translation>
     </message>
   </context>
   <context>

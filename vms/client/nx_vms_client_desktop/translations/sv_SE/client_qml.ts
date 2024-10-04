@@ -63,13 +63,12 @@
       <translation>Synkintervall</translation>
     </message>
     <message>
-      <source>Proxy LDAP requests %1 via server</source>
-      <comment>%1 is a line break</comment>
-      <translation>Proxy LDAP begär %1 via server</translation>
-    </message>
-    <message>
       <source>Group Members Attribute</source>
       <translation>Attribut för gruppmedlemmar</translation>
+    </message>
+    <message>
+      <source>Proxy LDAP requests via server</source>
+      <translation>Proxy LDAP-förfrågningar via server</translation>
     </message>
   </context>
   <context>
@@ -1003,6 +1002,14 @@
     <message>
       <source>No groups</source>
       <translation>Inga grupper</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n more</source>
+      <comment>%n is the number of remaining groups</comment>
+      <translation>
+        <numerusform>%n mer</numerusform>
+        <numerusform>%n mer</numerusform>
+      </translation>
     </message>
   </context>
   <context>
