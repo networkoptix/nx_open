@@ -9,10 +9,11 @@
 
 namespace nx::vms::rules {
 
+constexpr auto kAudioReceiverValidationPolicy = "audioReceiver";
 constexpr auto kBookmarkManagementValidationPolicy = "bookmarkManagement";
-constexpr auto kUserWithEmailValidationPolicy = "userWithEmail";
 constexpr auto kCloudUserValidationPolicy = "cloudUser";
 constexpr auto kLayoutAccessValidationPolicy = "layoutAccess";
+constexpr auto kUserWithEmailValidationPolicy = "userWithEmail";
 
 class NX_VMS_RULES_API TargetUsersField:
     public ResourceFilterActionField,

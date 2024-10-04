@@ -43,7 +43,8 @@ const ItemDescriptor& SpeakAction::manifest()
                 "By default, all power user group IDs are used as the value.",
                 ResourceFilterFieldProperties{
                     .ids = nx::utils::toQSet(vms::api::kAllPowerUserGroupIds),
-                    .allowEmptySelection = true
+                    .allowEmptySelection = true,
+                    .validationPolicy = kAudioReceiverValidationPolicy
                 }.toVariantMap()),
             makeFieldDescriptor<VolumeField>(
                 utils::kVolumeFieldName,

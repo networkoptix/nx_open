@@ -38,7 +38,8 @@ const ItemDescriptor& PlaySoundAction::manifest()
                 NX_DYNAMIC_TRANSLATABLE(tr("To Users")),
                 {},
                 ResourceFilterFieldProperties{
-                    .allowEmptySelection = true
+                    .allowEmptySelection = true,
+                    .validationPolicy = kAudioReceiverValidationPolicy
                 }.toVariantMap()),
             makeFieldDescriptor<VolumeField>(
                 utils::kVolumeFieldName,
