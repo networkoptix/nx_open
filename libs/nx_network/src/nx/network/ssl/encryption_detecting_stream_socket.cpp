@@ -21,11 +21,11 @@ EncryptionDetectingStreamSocket::EncryptionDetectingStreamSocket(
     using namespace std::placeholders;
 
     registerProtocol(
-        std::make_unique<FixedProtocolPrefixRule>(std::string{(char)0x80}),
+        std::make_unique<FixedProtocolPrefixRule>(std::string{'\x80'}),
         std::bind(&EncryptionDetectingStreamSocket::createSslSocket, this, _1));
 
     registerProtocol(
-        std::make_unique<FixedProtocolPrefixRule>(std::string{(char)0x16, (char)0x03}),
+        std::make_unique<FixedProtocolPrefixRule>(std::string{'\x16', '\x03'}),
         std::bind(&EncryptionDetectingStreamSocket::createSslSocket, this, _1));
 }
 

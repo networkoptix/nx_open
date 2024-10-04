@@ -2,7 +2,6 @@
 
 nx_add_target(nx_codec
     LIBRARY
-    WERROR_IF NOT WINDOWS
     PUBLIC_LIBS
         nx_utils
         ffmpeg::ffmpeg # TODO remove dependency

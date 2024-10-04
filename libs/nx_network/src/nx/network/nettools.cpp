@@ -342,7 +342,9 @@ utils::MacAddress getMacByIP(const QHostAddress& ip, bool net)
         for (uint i = 0; i < mtb->dwNumEntries; ++i)
         {
             addr.S_un.S_addr = mtb->table[i].dwAddr;
-            QString wip = QString::fromLatin1(inet_ntoa(addr)); // ### NLS support?
+            char addressStr[INET_ADDRSTRLEN];
+            inet_ntop(AF_INET, &addr, addressStr, INET_ADDRSTRLEN);
+            QString wip = QString::fromLatin1(addressStr); // ### NLS support?
             if (wip == ip.toString())
             {
                 res = nx::utils::MacAddress::fromRawData((unsigned char*)(mtb->table[i].bPhysAddr));
@@ -468,14 +470,14 @@ utils::MacAddress getMacByIP(const QString& host, bool net)
 
 QHostAddress resolveAddress(const QString& addrString)
 {
-    int ip4Addr = inet_addr(addrString.toLatin1().data());
-    if (ip4Addr != 0 && ip4Addr != -1)
-        return QHostAddress(ntohl(ip4Addr));
+    QHostAddress address(addrString);
+    if (!address.isNull())
+        return address;
 
-    QHostInfo hi = QHostInfo::fromName(addrString);
-    if (!hi.addresses().isEmpty())
+    QHostInfo hostInfo = QHostInfo::fromName(addrString);
+    if (!hostInfo.addresses().isEmpty())
     {
-        for (const QHostAddress& addr : hi.addresses())
+        for (const QHostAddress& addr: hostInfo.addresses())
         {
             if (addr.protocol() == QAbstractSocket::IPv4Protocol)
                 return addr;

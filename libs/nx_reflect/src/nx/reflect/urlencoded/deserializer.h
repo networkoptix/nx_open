@@ -344,10 +344,10 @@ inline UrlencodedDeserializer<Data>::UrlencodedDeserializer(
     const std::string_view& request, Data* data):
     m_data(data)
 {
-    auto [requestTokenized, r] = tokenizeRequest(request, '&');
-    if (!r)
+    auto [requestTokenized, tokenizeResult] = tokenizeRequest(request, '&');
+    if (!tokenizeResult)
     {
-        m_deserializationResult = std::move(r);
+        m_deserializationResult = std::move(tokenizeResult);
         return;
     }
 
@@ -365,12 +365,12 @@ inline UrlencodedDeserializer<Data>::UrlencodedDeserializer(
         }
 
         auto encodedField = token.substr(0, pos);
-        auto [fieldName, r] = decode(encodedField);
-        if (!r)
+        auto [fieldName, decodeResult] = decode(encodedField);
+        if (!decodeResult)
         {
             m_deserializationResult = {false,
-                "Failed to decode field name: " + std::move(r.errorDescription),
-                std::move(r.firstBadFragment),
+                "Failed to decode field name: " + std::move(decodeResult.errorDescription),
+                std::move(decodeResult.firstBadFragment),
                 std::string{encodedField}};
             return;
         }

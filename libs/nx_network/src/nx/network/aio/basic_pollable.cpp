@@ -28,7 +28,7 @@ BasicPollable::BasicPollable(
                 aioThread = aioService->findLeastUsedAioThread();
             return aioThread;
         }(),
-        -1),
+        AbstractSocket::kInvalidSocket),
     m_aioService(aioService)
 {
 }

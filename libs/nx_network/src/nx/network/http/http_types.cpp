@@ -1673,9 +1673,9 @@ Server::Product Server::Product::fromString(const std::string_view& str)
 {
     Product product;
 
-    const auto [tokens, count] = nx::utils::split_n<2>(
+    const auto [tokens, tokenCount] = nx::utils::split_n<2>(
         str, ' ', nx::utils::GroupToken::roundBrackets, nx::utils::skipEmpty);
-    if (count >= 1)
+    if (tokenCount >= 1)
     {
         // token ["/" product-version]
         const auto [productTokens, count] = nx::utils::split_n<2>(tokens[0], '/', 0, 0);
@@ -1685,7 +1685,7 @@ Server::Product Server::Product::fromString(const std::string_view& str)
             product.version = std::string(productTokens[1]);
     }
 
-    if (count >= 2)
+    if (tokenCount >= 2)
         product.comment = std::string(nx::utils::trim(tokens[1], "()"));
 
     return product;

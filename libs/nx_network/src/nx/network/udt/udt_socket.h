@@ -100,8 +100,8 @@ protected:
 
     bool open();
 
-    UdtSocket(const UdtSocket&);
-    UdtSocket& operator=(const UdtSocket&);
+    UdtSocket(const UdtSocket&) = delete;
+    UdtSocket& operator=(const UdtSocket&) = delete;
 };
 
 // BTW: Why some getter function has const qualifier, and others don't have this in AbstractStreamSocket ??

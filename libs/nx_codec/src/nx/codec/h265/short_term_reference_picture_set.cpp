@@ -86,7 +86,7 @@ bool ShortTermReferencePictureSet::read(
         for (uint32_t i = 0; i < DeltaPocS0.size(); ++i)
         {
             if (i == 0)
-                DeltaPocS0[i] = -(delta_poc_s0_minus1_vector[i] + 1);
+                DeltaPocS0[i] = -((int32_t) delta_poc_s0_minus1_vector[i] + 1);
             else
                 DeltaPocS0[i] = delta_poc_s0_minus1_vector[i - 1] - (delta_poc_s0_minus1_vector[i] + 1);
         }

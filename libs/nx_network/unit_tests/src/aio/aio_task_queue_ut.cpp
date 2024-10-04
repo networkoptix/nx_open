@@ -126,7 +126,7 @@ private:
         bool isCancelled;
 
         PollableContext():
-            pollable(nullptr /*aioThread*/, -1),
+            pollable(nullptr /*aioThread*/, AbstractSocket::kInvalidSocket),
             postedCallCounter(0),
             expectedPostedCallCounter(0),
             isCancelled(false)

@@ -4,7 +4,7 @@ nx_configure_file(
     branding.cpp.in
     ${CMAKE_CURRENT_BINARY_DIR}/branding.cpp)
 
-nx_add_target(nx_branding LIBRARY WERROR
+nx_add_target(nx_branding LIBRARY
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/branding.cpp"
     PUBLIC_LIBS

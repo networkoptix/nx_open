@@ -56,14 +56,14 @@ bool isResponse(const QJsonValue& value)
 } // namespace
 
 WebSocketConnection::WebSocketConnection(
-    std::unique_ptr<nx::network::websocket::WebSocket> socket,
+    std::unique_ptr<nx::network::websocket::WebSocket> webSocket,
     OnDone onDone)
     :
     m_onDone(std::move(onDone)),
     m_incomingProcessor{std::make_unique<IncomingProcessor>()},
     m_outgoingProcessor{
         std::make_unique<OutgoingProcessor>([this](auto value) { send(std::move(value)); })},
-    m_socket(std::move(socket))
+    m_socket(std::move(webSocket))
 {
     base_type::bindToAioThread(m_socket->getAioThread());
     if (auto socket = m_socket->socket())

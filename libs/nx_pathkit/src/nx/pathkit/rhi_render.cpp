@@ -605,9 +605,9 @@ void RhiPaintDeviceRenderer::prepareAtlas(const RhiPaintEngineSyncData::Entries&
             {
                 if (auto paintPixmap = std::get_if<PaintPixmap>(&entry))
                 {
-                    auto rect = atlasCache.value(paintPixmap->pixmap.cacheKey());
-                    if (!rect.isNull())
-                        usedRects.insert(rect);
+                    auto cachedRect = atlasCache.value(paintPixmap->pixmap.cacheKey());
+                    if (!cachedRect.isNull())
+                        usedRects.insert(cachedRect);
                 }
             }
 
@@ -630,7 +630,7 @@ void RhiPaintDeviceRenderer::prepareAtlas(const RhiPaintEngineSyncData::Entries&
 
             QImage image;
 
-            if (kPadding == 1)
+            if constexpr (kPadding == 1)
             {
                 // Render the pixmap into a larger image suitable for texture uploading.
                 image = QImage(

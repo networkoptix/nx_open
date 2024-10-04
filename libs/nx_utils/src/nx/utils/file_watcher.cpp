@@ -56,7 +56,7 @@ SystemError::ErrorCode FileWatcher::subscribe(
     const bool needHash = watchAttributes & WatchAttributes::hash;
 
     SystemError::ErrorCode statError = SystemError::noError;
-    Stat stat;
+    Stat stat{};
     if (needStat)
     {
         std::tie(statError, stat) = doStat(filePath);
@@ -233,7 +233,7 @@ void FileWatcher::checkFile(const std::string& filePath)
     lock.unlock();
 
     SystemError::ErrorCode statError = SystemError::noError;
-    Stat stat;
+    Stat stat{};
     if (needStat)
         std::tie(statError, stat) = doStat(filePath);
 

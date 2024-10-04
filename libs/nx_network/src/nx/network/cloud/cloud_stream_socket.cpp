@@ -112,7 +112,7 @@ AbstractSocket::SOCKET_HANDLE CloudStreamSocket::handle() const
         return m_socketDelegate->handle();
 
     SystemError::setLastErrorCode(SystemError::notSupported);
-    return -1;
+    return AbstractSocket::kInvalidSocket;
 }
 
 nx::network::Pollable* CloudStreamSocket::pollable()

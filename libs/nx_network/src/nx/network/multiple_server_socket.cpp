@@ -170,7 +170,7 @@ bool MultipleServerSocket::getProtocol(int* protocol) const
 AbstractSocket::SOCKET_HANDLE MultipleServerSocket::handle() const
 {
     NX_ASSERT(false);
-    return (AbstractSocket::SOCKET_HANDLE)(-1);
+    return AbstractSocket::kInvalidSocket;
 }
 
 aio::AbstractAioThread* MultipleServerSocket::getAioThread() const

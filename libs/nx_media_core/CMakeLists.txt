@@ -1,7 +1,6 @@
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-nx_add_target(nx_media_core
-    LIBRARY
+nx_add_target(nx_media_core LIBRARY
     PUBLIC_LIBS
         Qt6::Core
         nx_utils
@@ -26,6 +25,13 @@ target_include_directories(nx_media_core
     PRIVATE
         ${Qt6Core_PRIVATE_INCLUDE_DIRS}
 )
+
+# TODO: #lbusygin Remove with av_init_packet call.
+if(WINDOWS)
+    target_compile_options(nx_media_core PRIVATE /wd4996) #< Deprecated functions.
+else()
+    target_compile_options(nx_media_core PRIVATE -Wno-error=deprecated-declarations)
+endif()
 
 if(withTests)
     add_subdirectory(unit_tests)

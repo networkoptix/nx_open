@@ -81,7 +81,10 @@ UdtSocket<InterfaceToImplement>::UdtSocket(
     std::unique_ptr<UdtSocketImpl> impl,
     detail::SocketState state)
     :
-    Pollable(aioService->findLeastUsedAioThread(), -1, std::move(impl)),
+    Pollable(
+        aioService->findLeastUsedAioThread(),
+        AbstractSocket::kInvalidSocket,
+        std::move(impl)),
     m_aioService(aioService),
     m_state(state),
     m_ipVersion(ipVersion)

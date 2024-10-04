@@ -456,7 +456,7 @@ int SliceHeader::serializeSliceHeader(nx::utils::BitStreamWriter& bitWriter, con
         }
 
         return 0;
-    } catch(nx::utils::BitStreamException& e) {
+    } catch(nx::utils::BitStreamException&) {
         return NOT_ENOUGHT_BUFFER;
     }
 }

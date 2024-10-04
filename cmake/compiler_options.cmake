@@ -304,6 +304,15 @@ if(compilerMsvc)
         # operator '|': deprecated between enumerations of different types
         # Suppressed as it is used in rapidjson headers and thus generates tons of warnings.
         /wd5054
+
+        # Declaration of 'id' hides previous local declaration.
+        /wd4456
+        # Declaration of 'id' hides function parameter.
+        /wd4457
+        # Declaration of 'id' hides class member.
+        /wd4458
+        # Declaration of 'id' hides global declaration.
+        /wd4459
     )
     add_definitions(-D_SILENCE_CXX17_OLD_ALLOCATOR_MEMBERS_DEPRECATION_WARNING)
     add_definitions(-D_SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNING)

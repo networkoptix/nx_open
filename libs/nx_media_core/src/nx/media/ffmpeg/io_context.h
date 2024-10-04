@@ -21,7 +21,7 @@ public:
 
     std::function<int(uint8_t* buffer, int size)> readHandler;
     std::function<int(const uint8_t* buffer, int size)> writeHandler;
-    std::function<int(int64_t pos, int whence)> seekHandler;
+    std::function<int64_t(int64_t pos, int whence)> seekHandler;
 
 private:
     uint8_t* m_buffer = nullptr;

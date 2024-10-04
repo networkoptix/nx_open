@@ -7,19 +7,16 @@
 #include <nx/utils/std/future.h>
 #include <nx/utils/timer_manager.h>
 
-namespace nx {
-namespace utils {
-namespace test {
+using namespace std::chrono;
 
-class TimerManager:
-    public ::testing::Test
+namespace nx::utils::test {
+
+class TimerManager: public ::testing::Test
 {
 public:
-    static constexpr std::chrono::milliseconds delay = std::chrono::milliseconds(250);
+    static constexpr milliseconds delay = 250ms;
 
-    TimerManager():
-        m_eventCount(0),
-        m_timerId(-1)
+    TimerManager()
     {
         m_timerManager.start();
     }
@@ -61,7 +58,7 @@ protected:
     void killTimer()
     {
         m_timerManager.joinAndDeleteTimer(m_timerId);
-        m_timerId = -1;
+        m_timerId = 0;
     }
 
     void assertTimerErrorFactorIsNotLargerThan(float coeff)
@@ -87,8 +84,8 @@ protected:
 
 private:
     utils::TimerManager m_timerManager;
-    std::atomic<int> m_eventCount;
-    TimerId m_timerId;
+    std::atomic<int> m_eventCount = 0;
+    TimerId m_timerId = 0;
     std::chrono::steady_clock::time_point m_timerStartClock;
     std::chrono::steady_clock::time_point m_lastTimerEventClock;
 
@@ -167,6 +164,4 @@ TEST_F(TimerManager, deleteFromCallBack)
     ASSERT_EQ(fireCount, 1);
 }
 
-} // namespace test
-} // namespace utils
-} // namespace nx
+} // namespace nx::utils::test

@@ -17,7 +17,6 @@ class NX_UTILS_API win32_exception
 public:
     //!Registers handler to intercept system exceptions (e.g., Access violation)
     static void installGlobalUnhandledExceptionHandler();
-    static void installThreadSpecificUnhandledExceptionHandler();
     //!
     /*!
         \param isFull If true then in case of process crash all process memory dumped.

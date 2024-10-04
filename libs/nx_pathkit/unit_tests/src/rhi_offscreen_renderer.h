@@ -14,7 +14,7 @@ class QRhiRenderPassDescriptor;
 
 namespace nx::pathkit {
 
-class NX_PATHKIT_API RhiOffscreenRenderer
+class RhiOffscreenRenderer
 {
 public:
     RhiOffscreenRenderer(QRhi* rhi, QSize size, QColor clearColor);

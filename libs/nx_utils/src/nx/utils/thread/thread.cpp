@@ -122,10 +122,6 @@ void Thread::at_started()
 {
     initSystemThreadId();
 
-#ifdef _WIN32
-    win32_exception::installThreadSpecificUnhandledExceptionHandler();
-#endif
-
 #if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
     linux_exception::installQuitThreadBacktracer();
 #endif

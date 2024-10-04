@@ -5,7 +5,6 @@ set(artifacts_dir "${open_source_root}/artifacts")
 find_package(RapidJSON REQUIRED)
 
 nx_add_target(nx_reflect LIBRARY NO_MOC
-    WERROR_IF NOT WINDOWS
     PUBLIC_LIBS
         nx_preprocessor
         Boost::headers

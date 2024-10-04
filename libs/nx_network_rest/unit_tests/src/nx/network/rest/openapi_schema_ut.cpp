@@ -290,7 +290,9 @@ TEST_F(OpenApiSchemaTest, Validate)
         EXPECT_EQ(headers.find("Warning")->second, "199 - \"Unused parameter: 'unused'\"");
 
         if (request->apiVersion() && *request->apiVersion() > 2)
+        {
             EXPECT_FALSE(request->param("unused"));
+        }
     }
 
 
