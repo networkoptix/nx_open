@@ -29,6 +29,7 @@ TileBase
     readonly property alias videoPreviewResource: preview.videoPreviewResource
     readonly property alias previewAspectRatio: preview.previewAspectRatio
     readonly property alias attributeItems: attributeTable.items
+    readonly property int tileIndex: index
 
     property alias overlayContainer: overlayContainer
 

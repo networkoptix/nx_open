@@ -433,7 +433,7 @@ Window
 
                     Item
                     {
-                        // Single item which is re-parented to the selected tile overlay.
+                        // Single item which is re-parented to the hovered tile overlay.
                         id: tilePreviewOverlay
 
                         parent: eventGrid.tileController.hoveredTile
@@ -457,8 +457,8 @@ Window
                                 icon.source: "image://skin/20x20/Solid/show_on_layout.svg"
                                 accent: true
 
-                                onClicked:
-                                    d.showSelectionOnLayout()
+                                onClicked: eventModel.showOnLayout(
+                                    eventGrid.tileController.hoveredTile.tileIndex)
                             }
                         }
                     }
