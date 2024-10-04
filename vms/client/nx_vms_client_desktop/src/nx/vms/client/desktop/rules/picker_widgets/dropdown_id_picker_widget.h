@@ -10,6 +10,7 @@
 #include <nx/vms/client/desktop/event_rules/widgets/detectable_object_type_combo_box.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
+#include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/ui/event_rules/models/analytics_sdk_event_model.h>
 #include <nx/vms/client/desktop/ui/event_rules/models/plugin_diagnostic_event_model.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
@@ -20,6 +21,7 @@
 #include <nx/vms/rules/utils/field.h>
 #include <ui/widgets/common/tree_combo_box.h>
 
+#include "../utils/strings.h"
 #include "field_picker_widget.h"
 #include "picker_widget_utils.h"
 
@@ -47,6 +49,16 @@ public:
             &D::activated,
             this,
             &DropdownIdPickerWidgetBase<F, D>::onActivated);
+    }
+
+    void setValidity(const vms::rules::ValidationResult& validationResult) override
+    {
+        base::setValidity(validationResult);
+
+        if (validationResult.validity == QValidator::State::Invalid)
+            setErrorStyle(m_comboBox);
+        else
+            resetErrorStyle(m_comboBox);
     }
 
 protected:
@@ -283,6 +295,7 @@ protected:
         m_comboBox->setDevices(UuidSet{ids.begin(), ids.end()});
 
         m_comboBox->setSelectedMainObjectTypeId(m_field->value());
+        m_comboBox->setPlaceholderText(m_comboBox->count() == 0 ? "" : Strings::selectString());
     }
 };
 
