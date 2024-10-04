@@ -174,7 +174,7 @@ Item
                     text: qsTr("Permission Groups")
 
                     visible: !control.isPredefined
-                    toolTipText: dialog.self ? dialog.self.kToolTipText : ""
+                    toolTipText: dialog.self ? dialog.self.toolTipText() : ""
 
                     GroupsComboBox
                     {
