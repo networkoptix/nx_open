@@ -85,6 +85,7 @@ void StorageRecordingContext::initializeRecordingContext(int64_t startTimeUs)
             m_recordingContext.storage);
     }
 
+    m_streamIndexToLastDts.clear();
     m_recordingContext.formatCtx->start_time = startTimeUs;
 }
 
@@ -291,10 +292,20 @@ void StorageRecordingContext::writeData(const QnConstAbstractMediaDataPtr& media
     int64_t timestampOffsetUsec = md->timestamp - timestamp;
     qint64 dts = av_rescale_q(timestamp, srcRate, stream->time_base);
 
-    if (stream->cur_dts > 0)
-        avPkt.dts = qMax((qint64)stream->cur_dts + 1, dts);
+    if (m_streamIndexToLastDts[streamIndex] > dts)
+    {
+        avPkt.dts = m_streamIndexToLastDts[streamIndex] + 1;
+        NX_DEBUG(this,
+            "Packet with stream index %1 has inconsistent dts %2. "
+            "Last saved dts for this stream: %3. Fixing dts to: %4",
+            streamIndex, dts, m_streamIndexToLastDts[streamIndex], avPkt.dts);
+    }
     else
+    {
         avPkt.dts = dts;
+    }
+
+    m_streamIndexToLastDts[streamIndex] = dts;
 
     const QnCompressedVideoData* video = dynamic_cast<const QnCompressedVideoData*>(md.get());
     if (video && video->pts != AV_NOPTS_VALUE
@@ -333,15 +344,16 @@ void StorageRecordingContext::writeData(const QnConstAbstractMediaDataPtr& media
     }
 
     auto startWriteTime = high_resolution_clock::now();
-    int ret;
-    if (isInterleavedStream())
-        ret = av_interleaved_write_frame(context.formatCtx, &avPkt);
-    else
-        ret = av_write_frame(context.formatCtx, &avPkt);
-    auto endWriteTime = high_resolution_clock::now();
+    auto ret = isInterleavedStream()
+        ? av_interleaved_write_frame(context.formatCtx, &avPkt)
+        : av_write_frame(context.formatCtx, &avPkt);
 
-    context.totalWriteTimeNs +=
-        duration_cast<nanoseconds>(endWriteTime - startWriteTime).count();
+    auto endWriteTime = high_resolution_clock::now();
+    context.totalWriteTimeNs += duration_cast<nanoseconds>(endWriteTime - startWriteTime).count();
+    NX_VERBOSE(this,
+        "Writing ffmpeg packet. timestamp: %1, dts: %2, pts: %3, "
+        "stream index: %4, size: %5, result: %6, write time(ns): %7",
+        timestamp, avPkt.dts, avPkt.pts, streamIndex, avPkt.size, ret, context.totalWriteTimeNs);
 
     if (ret < 0 || context.formatCtx->pb->error == -1) //< Disk write operation failed.
     {
