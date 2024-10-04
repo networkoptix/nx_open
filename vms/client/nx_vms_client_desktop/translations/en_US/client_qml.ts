@@ -63,13 +63,12 @@
         <translation></translation>
     </message>
     <message>
-        <source>Proxy LDAP requests %1 via server</source>
-        <comment>%1 is a line break</comment>
+        <source>Group Members Attribute</source>
         <translation></translation>
     </message>
     <message>
-        <source>Group Members Attribute</source>
-        <translation></translation>
+        <source>Proxy LDAP requests via server</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -999,6 +998,14 @@
     <message>
         <source>No groups</source>
         <translation></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n more</source>
+        <comment>%n is the number of remaining groups</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
