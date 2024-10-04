@@ -49,6 +49,8 @@ public:
 
     virtual ~AbstractAuthenticationManager() = default;
 
+    virtual void pleaseStopSync() = 0;
+
     /**
      * @param connection The connection is guaranteed to be alive in this call only.
      * It can be closed at any moment. So, it cannot be considered valid after executing any

@@ -49,6 +49,8 @@ public:
 
     static std::string realm();
 
+    virtual void pleaseStopSync() override {}
+
 private:
     const nx::network::http::AuthMethodRestrictionList& m_authRestrictionList;
     const nx::utils::stree::StreeManager& m_stree;

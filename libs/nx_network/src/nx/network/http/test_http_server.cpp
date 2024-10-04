@@ -16,7 +16,7 @@ TestHttpServer::~TestHttpServer()
 {
     if (m_httpServer)
         terminateListener();
-
+    m_authenticationManager.pleaseStopSync();
     NX_INFO(this, "Stopped");
 }
 
