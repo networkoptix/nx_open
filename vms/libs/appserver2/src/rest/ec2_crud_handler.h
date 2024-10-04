@@ -13,6 +13,8 @@
 
 namespace ec2 {
 
+NX_UTILS_DECLARE_FIELD_DETECTOR_SIMPLE(DoesMethodExist_validateNotifyId, validateNotifyId);
+
 template<
     typename Derived,
     typename Filter,
@@ -231,9 +233,17 @@ private:
         return objectType == ApiObject_NotDefined || objectType == m_objectType;
     }
 
-    bool isValidType(const nx::vms::api::LicenseKey&) const
+    template<typename T>
+    bool validateId(const T& id)
     {
-        return DeleteCommand == ApiCommand::removeLicense;
+        if constexpr (DoesMethodExist_validateNotifyId<Derived>::value)
+        {
+            return static_cast<Derived*>(this)->validateNotifyId(id);
+        }
+        else
+        {
+            return isValidType(id);
+        }
     }
 
     void notify(const QnAbstractTransaction& transaction)
@@ -245,7 +255,8 @@ private:
         {
             const auto id =
                 getId(static_cast<const QnTransaction<DeleteInput>&>(transaction).params);
-            if (isValidType(id))
+
+            if (validateId(id))
             {
                 NX_VERBOSE(this, "Notify %1 for %2", id, transaction.command);
                 SubscriptionHandler::notify(nx::toString(id), NotifyType::delete_, {});
@@ -261,7 +272,7 @@ private:
                     return false;
 
                 const auto id = getId(static_cast<const QnTransaction<T>&>(transaction).params);
-                if (isValidType(id))
+                if (validateId(id))
                 {
                     NX_VERBOSE(this, "Notify %1 for %2", id, transaction.command);
                     SubscriptionHandler::notify(nx::toString(id), NotifyType::update, {});
