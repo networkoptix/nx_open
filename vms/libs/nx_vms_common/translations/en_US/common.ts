@@ -1353,10 +1353,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>File write error. Not enough free space.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Invalid resource type for data export.</source>
         <translation></translation>
     </message>
@@ -1371,6 +1367,10 @@
     <message>
         <source>Archive is unavailable now. Please try again later.</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>File write error.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
