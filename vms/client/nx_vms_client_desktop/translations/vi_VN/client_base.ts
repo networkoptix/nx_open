@@ -1035,14 +1035,14 @@
     </message>
     <message numerus="yes">
       <source>Mute Items</source>
-      <translation type="unfinished">
-        <numerusform>Mute Items</numerusform>
+      <translation>
+        <numerusform>Tắt tiếng các mục</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Unmute Items</source>
-      <translation type="unfinished">
-        <numerusform>Unmute Items</numerusform>
+      <translation>
+        <numerusform>Bỏ tắt tiếng các mục</numerusform>
       </translation>
     </message>
   </context>
