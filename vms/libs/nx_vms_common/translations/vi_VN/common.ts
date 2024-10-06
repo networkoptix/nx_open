@@ -1350,7 +1350,7 @@
     </message>
     <message>
       <source>System alive update interval (seconds, 1s-1h)</source>
-      <translation>Khoảng thời gian cập nhật hệ thống đang hoạt động (giây, 1s-1h)</translation>
+      <translation>Khoảng thời gian cập nhật hệ thống đang hoạt động (giây, 1 giây-1 giờ)</translation>
     </message>
     <message>
       <source>Proxy connection timeout (seconds, 1s-1h)</source>
@@ -1747,7 +1747,7 @@
     </message>
     <message>
       <source>Anonymous Crash Report Server API URL</source>
-      <translation type="unfinished">Anonymous Crash Report Server API URL</translation>
+      <translation>URL API máy chủ báo cáo sự cố ẩn danh</translation>
     </message>
   </context>
   <context>
