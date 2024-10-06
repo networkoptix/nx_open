@@ -1471,10 +1471,6 @@
       <translation>Необхідне перекодування відео.</translation>
     </message>
     <message>
-      <source>File write error. Not enough free space.</source>
-      <translation>Помилка запису файлу. Не вистачає вільного простору.</translation>
-    </message>
-    <message>
       <source>Invalid resource type for data export.</source>
       <translation>Недійсний тип ресурсу для експорту даних.</translation>
     </message>
@@ -1489,6 +1485,10 @@
     <message>
       <source>Archive is unavailable now. Please try again later.</source>
       <translation type="unfinished">Archive is unavailable now. Please try again later.</translation>
+    </message>
+    <message>
+      <source>File write error.</source>
+      <translation type="unfinished">File write error.</translation>
     </message>
   </context>
   <context>

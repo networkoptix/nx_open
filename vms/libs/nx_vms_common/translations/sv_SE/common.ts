@@ -1353,10 +1353,6 @@
       <translation>Omkodning av video krävs.</translation>
     </message>
     <message>
-      <source>File write error. Not enough free space.</source>
-      <translation>Filskrivningsfel. Inte tillräckligt med ledigt utrymme.</translation>
-    </message>
-    <message>
       <source>Invalid resource type for data export.</source>
       <translation>Ogiltig resurstyp för dataexport.</translation>
     </message>
@@ -1371,6 +1367,10 @@
     <message>
       <source>Archive is unavailable now. Please try again later.</source>
       <translation>Arkivet är inte tillgängligt nu. Vänligen försök igen senare.</translation>
+    </message>
+    <message>
+      <source>File write error.</source>
+      <translation>Filskrivningsfel.</translation>
     </message>
   </context>
   <context>

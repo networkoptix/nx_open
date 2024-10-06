@@ -1106,16 +1106,16 @@
     </message>
     <message numerus="yes">
       <source>Mute Items</source>
-      <translation type="unfinished">
-        <numerusform>Mute Items</numerusform>
-        <numerusform>Mute Items</numerusform>
+      <translation>
+        <numerusform>Tysta objekt</numerusform>
+        <numerusform>Tysta objekt</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Unmute Items</source>
-      <translation type="unfinished">
-        <numerusform>Unmute Items</numerusform>
-        <numerusform>Unmute Items</numerusform>
+      <translation>
+        <numerusform>Slå på ljudet för objekt</numerusform>
+        <numerusform>Slå på ljudet för objekt</numerusform>
       </translation>
     </message>
   </context>

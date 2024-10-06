@@ -1294,10 +1294,6 @@
       <translation>비디오 트랜스코딩이 필요합니다.</translation>
     </message>
     <message>
-      <source>File write error. Not enough free space.</source>
-      <translation>파일 쓰기 오류입니다. 충분 하지 않은 여유 공간입니다.</translation>
-    </message>
-    <message>
       <source>Invalid resource type for data export.</source>
       <translation>데이터 내보내기에 대 한 잘못 된 리소스 형식입니다.</translation>
     </message>
@@ -1312,6 +1308,10 @@
     <message>
       <source>Archive is unavailable now. Please try again later.</source>
       <translation>지금은 아카이브를 사용할 수 없습니다. 나중에 다시 시도 해주십시오.</translation>
+    </message>
+    <message>
+      <source>File write error.</source>
+      <translation type="unfinished">File write error.</translation>
     </message>
   </context>
   <context>

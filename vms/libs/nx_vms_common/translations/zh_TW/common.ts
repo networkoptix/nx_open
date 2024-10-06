@@ -1294,10 +1294,6 @@
       <translation>影片需要重新編碼。</translation>
     </message>
     <message>
-      <source>File write error. Not enough free space.</source>
-      <translation>檔案寫入錯誤(磁碟可用空間不足)</translation>
-    </message>
-    <message>
       <source>Invalid resource type for data export.</source>
       <translation>無效的資料匯出資源類型.</translation>
     </message>
@@ -1312,6 +1308,10 @@
     <message>
       <source>Archive is unavailable now. Please try again later.</source>
       <translation>目前無法取得錄影資料，請稍後再試。</translation>
+    </message>
+    <message>
+      <source>File write error.</source>
+      <translation type="unfinished">File write error.</translation>
     </message>
   </context>
   <context>

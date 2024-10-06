@@ -1353,10 +1353,6 @@
       <translation>Video kod dönüştürmesi gerekiyor.</translation>
     </message>
     <message>
-      <source>File write error. Not enough free space.</source>
-      <translation>Dosya Yazım Hatası. Yeterli Boş Alan Yok.</translation>
-    </message>
-    <message>
       <source>Invalid resource type for data export.</source>
       <translation>Data aktarma için geçersiz kaynak tipi.</translation>
     </message>
@@ -1371,6 +1367,10 @@
     <message>
       <source>Archive is unavailable now. Please try again later.</source>
       <translation>Arşiv şu anda kullanılamıyor. Lütfen daha sonra tekrar deneyiniz.</translation>
+    </message>
+    <message>
+      <source>File write error.</source>
+      <translation type="unfinished">File write error.</translation>
     </message>
   </context>
   <context>

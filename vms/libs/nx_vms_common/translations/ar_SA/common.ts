@@ -1589,10 +1589,6 @@
       <translation type="unfinished">Video transcoding required.</translation>
     </message>
     <message>
-      <source>File write error. Not enough free space.</source>
-      <translation type="unfinished">File write error. Not enough free space.</translation>
-    </message>
-    <message>
       <source>Invalid resource type for data export.</source>
       <translation type="unfinished">Invalid resource type for data export.</translation>
     </message>
@@ -1607,6 +1603,10 @@
     <message>
       <source>Archive is unavailable now. Please try again later.</source>
       <translation type="unfinished">Archive is unavailable now. Please try again later.</translation>
+    </message>
+    <message>
+      <source>File write error.</source>
+      <translation type="unfinished">File write error.</translation>
     </message>
   </context>
   <context>

@@ -1353,10 +1353,6 @@
       <translation>Videotranskoding kreves.</translation>
     </message>
     <message>
-      <source>File write error. Not enough free space.</source>
-      <translation>Fil skrive feil. Ikke nok ledig plass.</translation>
-    </message>
-    <message>
       <source>Invalid resource type for data export.</source>
       <translation>Ugyldig ressurstype for dataeksport.</translation>
     </message>
@@ -1371,6 +1367,10 @@
     <message>
       <source>Archive is unavailable now. Please try again later.</source>
       <translation>Arkivet er utilgjengelig nå. Prøv igjen senere.</translation>
+    </message>
+    <message>
+      <source>File write error.</source>
+      <translation type="unfinished">File write error.</translation>
     </message>
   </context>
   <context>

@@ -1353,10 +1353,6 @@
       <translation>Transcodifica richiesta video.</translation>
     </message>
     <message>
-      <source>File write error. Not enough free space.</source>
-      <translation>Errore di scrittura del file. Non abbastanza spazio libero.</translation>
-    </message>
-    <message>
       <source>Invalid resource type for data export.</source>
       <translation>Tipo di risorsa non valido per l'esportazione di dati.</translation>
     </message>
@@ -1371,6 +1367,10 @@
     <message>
       <source>Archive is unavailable now. Please try again later.</source>
       <translation type="unfinished">Archive is unavailable now. Please try again later.</translation>
+    </message>
+    <message>
+      <source>File write error.</source>
+      <translation type="unfinished">File write error.</translation>
     </message>
   </context>
   <context>
