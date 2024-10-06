@@ -1353,10 +1353,6 @@
       <translation>Video-transcodering vereist.</translation>
     </message>
     <message>
-      <source>File write error. Not enough free space.</source>
-      <translation>Schrijffout van het bestand. Niet genoeg vrije ruimte.</translation>
-    </message>
-    <message>
       <source>Invalid resource type for data export.</source>
       <translation>Ongeldig brontype voor gegevensuitvoer.</translation>
     </message>
@@ -1371,6 +1367,10 @@
     <message>
       <source>Archive is unavailable now. Please try again later.</source>
       <translation>Archief is nu niet beschikbaar. Probeer het later opnieuw.</translation>
+    </message>
+    <message>
+      <source>File write error.</source>
+      <translation type="unfinished">File write error.</translation>
     </message>
   </context>
   <context>

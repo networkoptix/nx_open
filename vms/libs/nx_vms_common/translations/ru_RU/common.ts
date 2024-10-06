@@ -1471,10 +1471,6 @@
       <translation>Требуется транскодирование видео.</translation>
     </message>
     <message>
-      <source>File write error. Not enough free space.</source>
-      <translation>Ошибка записи файла. Недостаточно места.</translation>
-    </message>
-    <message>
       <source>Invalid resource type for data export.</source>
       <translation>Недопустимый тип ресурса для экспорта данных.</translation>
     </message>
@@ -1489,6 +1485,10 @@
     <message>
       <source>Archive is unavailable now. Please try again later.</source>
       <translation>Архив сейчас недоступен. Пожалуйста, повторите попытку позже.</translation>
+    </message>
+    <message>
+      <source>File write error.</source>
+      <translation type="unfinished">File write error.</translation>
     </message>
   </context>
   <context>

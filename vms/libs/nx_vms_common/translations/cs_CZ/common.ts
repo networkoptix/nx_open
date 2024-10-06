@@ -1471,10 +1471,6 @@
       <translation>Je vyžadováno překódování videa.</translation>
     </message>
     <message>
-      <source>File write error. Not enough free space.</source>
-      <translation>Chyba zápisu souboru. Nedostatek volného místa.</translation>
-    </message>
-    <message>
       <source>Invalid resource type for data export.</source>
       <translation>Neplatný typ zdroje pro export dat.</translation>
     </message>
@@ -1489,6 +1485,10 @@
     <message>
       <source>Archive is unavailable now. Please try again later.</source>
       <translation type="unfinished">Archive is unavailable now. Please try again later.</translation>
+    </message>
+    <message>
+      <source>File write error.</source>
+      <translation type="unfinished">File write error.</translation>
     </message>
   </context>
   <context>

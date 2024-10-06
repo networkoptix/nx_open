@@ -1353,10 +1353,6 @@
       <translation>Videotranscodierung erforderlich.</translation>
     </message>
     <message>
-      <source>File write error. Not enough free space.</source>
-      <translation>Fehler beim Schreiben. Nicht genügend Speicherplatz.</translation>
-    </message>
-    <message>
       <source>Invalid resource type for data export.</source>
       <translation>Ungültige Ressourcentyp für den Datenexport.</translation>
     </message>
@@ -1371,6 +1367,10 @@
     <message>
       <source>Archive is unavailable now. Please try again later.</source>
       <translation>Das Archiv ist derzeit nicht verfügbar. Bitte versuchen Sie es später erneut.</translation>
+    </message>
+    <message>
+      <source>File write error.</source>
+      <translation type="unfinished">File write error.</translation>
     </message>
   </context>
   <context>

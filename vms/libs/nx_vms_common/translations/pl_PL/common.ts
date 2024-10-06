@@ -1471,10 +1471,6 @@
       <translation>Wymagane transkodowanie wideo.</translation>
     </message>
     <message>
-      <source>File write error. Not enough free space.</source>
-      <translation>Błąd zapisu pliku. Za mało wolnej przestrzeni.</translation>
-    </message>
-    <message>
       <source>Invalid resource type for data export.</source>
       <translation>Nieprawidłowy typ zasobu do eksportowania danych.</translation>
     </message>
@@ -1489,6 +1485,10 @@
     <message>
       <source>Archive is unavailable now. Please try again later.</source>
       <translation>Archiwum jest teraz niedostępne. Spróbuj ponownie później.</translation>
+    </message>
+    <message>
+      <source>File write error.</source>
+      <translation type="unfinished">File write error.</translation>
     </message>
   </context>
   <context>

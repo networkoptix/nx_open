@@ -1294,10 +1294,6 @@
       <translation>จำเป็นต้องมีการแปลงรหัสวิดีโอ</translation>
     </message>
     <message>
-      <source>File write error. Not enough free space.</source>
-      <translation>ข้อผิดพลาดในการเขียนไฟล์ เนื้อที่ว่างไม่เพียงพอ.</translation>
-    </message>
-    <message>
       <source>Invalid resource type for data export.</source>
       <translation>ประเภทรีซอร์สไม่ถูกต้องสำหรับการส่งออกข้อมูล</translation>
     </message>
@@ -1312,6 +1308,10 @@
     <message>
       <source>Archive is unavailable now. Please try again later.</source>
       <translation type="unfinished">Archive is unavailable now. Please try again later.</translation>
+    </message>
+    <message>
+      <source>File write error.</source>
+      <translation type="unfinished">File write error.</translation>
     </message>
   </context>
   <context>

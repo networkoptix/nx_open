@@ -1294,10 +1294,6 @@
       <translation>映像のトランスコーディングが必要です。</translation>
     </message>
     <message>
-      <source>File write error. Not enough free space.</source>
-      <translation>ファイル書き込みエラー。空き容量が足りません。</translation>
-    </message>
-    <message>
       <source>Invalid resource type for data export.</source>
       <translation>データのエクスポートには無効なリソースタイプです。</translation>
     </message>
@@ -1312,6 +1308,10 @@
     <message>
       <source>Archive is unavailable now. Please try again later.</source>
       <translation>アーカイブは現在利用できません。後でもう一度お試しください。</translation>
+    </message>
+    <message>
+      <source>File write error.</source>
+      <translation type="unfinished">File write error.</translation>
     </message>
   </context>
   <context>

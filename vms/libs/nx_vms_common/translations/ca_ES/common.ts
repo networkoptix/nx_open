@@ -1353,10 +1353,6 @@
       <translation>Cal transcodificar el vídeo.</translation>
     </message>
     <message>
-      <source>File write error. Not enough free space.</source>
-      <translation>Error d'escriptura d'arxiu. No hi ha prou espai lliure.</translation>
-    </message>
-    <message>
       <source>Invalid resource type for data export.</source>
       <translation>El tipus de recurs per a l'exportació de dades no és vàlid.</translation>
     </message>
@@ -1371,6 +1367,10 @@
     <message>
       <source>Archive is unavailable now. Please try again later.</source>
       <translation type="unfinished">Archive is unavailable now. Please try again later.</translation>
+    </message>
+    <message>
+      <source>File write error.</source>
+      <translation type="unfinished">File write error.</translation>
     </message>
   </context>
   <context>

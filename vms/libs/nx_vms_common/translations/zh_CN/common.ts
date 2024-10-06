@@ -1294,10 +1294,6 @@
       <translation>需要视频转码。</translation>
     </message>
     <message>
-      <source>File write error. Not enough free space.</source>
-      <translation>文件写入错误，没有足够空间.</translation>
-    </message>
-    <message>
       <source>Invalid resource type for data export.</source>
       <translation>数据导出非法资源类型.</translation>
     </message>
@@ -1312,6 +1308,10 @@
     <message>
       <source>Archive is unavailable now. Please try again later.</source>
       <translation>目前无法取得录像存档，请稍后再试。</translation>
+    </message>
+    <message>
+      <source>File write error.</source>
+      <translation type="unfinished">File write error.</translation>
     </message>
   </context>
   <context>

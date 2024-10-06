@@ -1294,10 +1294,6 @@
       <translation>Transkode video diperlukan.</translation>
     </message>
     <message>
-      <source>File write error. Not enough free space.</source>
-      <translation>Error penulisan file. Ruang kosong tidak cukup.</translation>
-    </message>
-    <message>
       <source>Invalid resource type for data export.</source>
       <translation>Jenis resource untuk ekspor data tidak valid.</translation>
     </message>
@@ -1312,6 +1308,10 @@
     <message>
       <source>Archive is unavailable now. Please try again later.</source>
       <translation>Archive tidak tersedia sekarang. Silakan coba lagi nanti.</translation>
+    </message>
+    <message>
+      <source>File write error.</source>
+      <translation type="unfinished">File write error.</translation>
     </message>
   </context>
   <context>
