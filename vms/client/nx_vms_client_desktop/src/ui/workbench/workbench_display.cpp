@@ -1595,7 +1595,8 @@ QRectF QnWorkbenchDisplay::itemGeometry(QnWorkbenchItem *item, QRectF *enclosing
 
     QRectF geometry =
         Geometry::rotated(widget->calculateGeometry(itemEnclosingGeometry(item)), item->rotation());
-    return geometry;
+
+    return geometry.normalized();
 }
 
 QRectF QnWorkbenchDisplay::fitInViewGeometry() const
