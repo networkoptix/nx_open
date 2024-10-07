@@ -445,7 +445,7 @@ Item
                 id: rowHoverMarker
 
                 anchors.fill: rowAccess
-                visible: tree.hoveredItem === this && !rawAccess.selected
+                visible: tree.hoveredItem === this && !rowAccess.selected
                 color: tree.hoverHighlightColor
                 z: -1
             }

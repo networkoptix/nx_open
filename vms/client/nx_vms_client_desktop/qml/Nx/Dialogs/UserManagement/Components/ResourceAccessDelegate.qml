@@ -312,7 +312,9 @@ Item
 
                         return root.directlySelected
                             ? ColorTheme.colors.light10
-                            : ColorTheme.colors.dark13
+                            : root.selected
+                                ? ColorTheme.darker(ColorTheme.colors.light16, 2)
+                                : ColorTheme.lighter(ColorTheme.colors.dark13, 2)
                     }
 
                     onContainsMouseChanged:
