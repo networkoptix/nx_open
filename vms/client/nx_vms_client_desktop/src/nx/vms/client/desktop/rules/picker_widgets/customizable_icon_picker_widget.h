@@ -31,6 +31,11 @@ public:
         m_comboBox->setColumnCount(columnCount);
         m_comboBox->setItemSize({kDropdownIconSize, kDropdownIconSize});
         m_comboBox->setPixmaps(SoftwareTriggerPixmaps::pixmapsPath(), pixmapNames);
+        m_comboBox->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred));
+
+        auto contentLayout = qobject_cast<QHBoxLayout*>(m_contentWidget->layout());
+        if (NX_ASSERT(contentLayout))
+            contentLayout->addStretch();
     }
 
 protected:
