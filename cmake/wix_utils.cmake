@@ -1,5 +1,7 @@
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+include_guard(GLOBAL)
+
 include(utils)
 include(${PROJECT_SOURCE_DIR}/cmake/windows_signing.cmake)
 
