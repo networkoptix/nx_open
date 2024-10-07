@@ -171,6 +171,9 @@ QString Strings::selectButtonText(SystemContext* context, vms::rules::SourceUser
     api::UserGroupDataList groups;
     common::getUsersAndGroups(context, field->ids(), users, groups);
 
+    if (users.empty() && groups.empty())
+        return selectString();
+
     return getName(users, groups);
 }
 
