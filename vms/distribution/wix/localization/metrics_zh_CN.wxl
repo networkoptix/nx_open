@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WixLocalization xmlns="http://schemas.microsoft.com/wix/2006/localization" Codepage="936" Language="2052" Culture="zh-cn">
+  <UI Dialog="BalExtension" Control="EulaAcceptCheckbox" Width="141"/>
+  <UI Dialog="BalExtension" Control="EulaHyperlink" X="155"/>
+</WixLocalization>

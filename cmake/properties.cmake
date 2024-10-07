@@ -139,9 +139,6 @@ if(eulaVersionOverride)
     set(customization.eulaVersion ${eulaVersionOverride})
 endif()
 
-# Compatibility layer
-set(installerLanguage "${customization.defaultLanguage}")
-
 # Packages (.deb, .zip and .tar.gz) compression levels.
 if(publicationType STREQUAL "local" OR publicationType STREQUAL "private")
     set(deb_compression_level 0)

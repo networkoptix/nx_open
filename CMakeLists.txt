@@ -98,6 +98,11 @@ include(generate_open_source_config)
 include(project_utils)
 include(test_utils)
 
+if(WINDOWS AND withDistributions)
+    include(cmake/distribution/wix.cmake)
+    nx_wix_generate_localization_file()
+endif()
+
 add_subdirectory(cloud)
 add_subdirectory(dependencies)
 add_subdirectory(libs)
