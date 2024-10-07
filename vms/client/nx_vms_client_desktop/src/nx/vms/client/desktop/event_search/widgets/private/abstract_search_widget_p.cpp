@@ -96,8 +96,8 @@ NX_DECLARE_COLORIZED_ICON(kCalendarIcon, "20x20/Outline/calendar.svg", kThemeSub
 NX_DECLARE_COLORIZED_ICON(kDeviceIcon, "20x20/Outline/device.svg", kThemeSubstitutions)
 NX_DECLARE_COLORIZED_ICON(kPlayIcon, "20x20/Outline/play.svg", kThemeSubstitutions)
 NX_DECLARE_COLORIZED_ICON(kCheckedEventLogIcon,
-    "20x20/Outline/no_list.svg", kThemeSubstitutions,
-    "20x20/Outline/event_log.svg", kCheckedThemeSubstitutions)
+    "20x20/Outline/event_log.svg", kThemeSubstitutions,
+    "20x20/Outline/no_list.svg", kCheckedThemeSubstitutions)
 NX_DECLARE_COLORIZED_ICON(kCheckedImageIcon,
     "20x20/Outline/image.svg", kThemeSubstitutions,
     "20x20/Outline/image_hide.svg", kThemeSubstitutions)
