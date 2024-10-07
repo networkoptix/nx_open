@@ -62,8 +62,24 @@ static const QColor kThumbnailsColor = "#D9D9D9";
 static const QColor kSoundColor = "#A5B7C0";
 static const QColor kUnmuteColor = "#698796";
 static const QColor kUnmuteCrossColor = "#C22626";
-static const QColor kBackgroundColor = "#212A2F";
-static const QColor kCheckedColor = "#171C1F";
+static const QColor kBackgroundColor = "#212A2F"; // 2-nd
+static const QColor kCheckedColor = "#171C1F"; // 3-rd
+
+const core::SvgIconColorer::ThemeSubstitutions kNavigationTheme =
+{
+    { QnIcon::Normal, {.primary = "light1", .secondary = "dark7", .tertiary = "dark5"}},
+    { QnIcon::Disabled, {.primary = "dark11", .secondary = "dark6", .tertiary = "dark5"}},
+    { QnIcon::Active, {.primary = "light1", .secondary = "dark8", .tertiary = "dark5"}},
+    { QnIcon::Pressed, {.primary = "light1", .secondary = "dark5", .tertiary = "dark5"}}
+};
+
+const core::SvgIconColorer::ThemeSubstitutions kNavigationCheckedTheme =
+{
+    { QnIcon::Normal, {.primary = "light1", .secondary = "dark7", .tertiary = "green"}},
+    { QnIcon::Disabled, {.primary = "dark11", .secondary = "dark6", .tertiary = "green"}},
+    { QnIcon::Active, {.primary = "light1", .secondary = "dark8", .tertiary = "green"}},
+    { QnIcon::Pressed, {.primary = "light1", .secondary = "dark5", .tertiary = "green"}}
+};
 
 // { Normal, Disabled, Active, Selected, Pressed, Error }
 const core::SvgIconColorer::IconSubstitutions kNavigationIconSubstitutions =
@@ -143,17 +159,17 @@ NX_DECLARE_COLORIZED_ICON(kMuteUnmuteIcon,
     "24x20/Solid/mute.svg", kNavigationIconSubstitutions,
     "24x20/Solid/unmute.svg", kNavigationIconCheckedSubstitutions)
 NX_DECLARE_COLORIZED_ICON(kLiveButtonIcon,
-    "52x24/Solid/live.svg", kNavigationIconSubstitutions,
-    "52x24/Solid/live.svg", kNavigationIconCheckedSubstitutions)
+    "52x24/Solid/live.svg", kNavigationTheme,
+    "52x24/Solid/live.svg", kNavigationCheckedTheme)
 NX_DECLARE_COLORIZED_ICON(kSyncButtonIcon,
-    "52x24/Solid/sync.svg", kNavigationIconSubstitutions,
-    "52x24/Solid/sync.svg", kNavigationIconCheckedSubstitutions)
+    "52x24/Solid/sync.svg", kNavigationTheme,
+    "52x24/Solid/sync.svg", kNavigationCheckedTheme)
 NX_DECLARE_COLORIZED_ICON(kCalendarButtonIcon,
-    "52x24/Solid/calendar.svg", kNavigationIconSubstitutions,
-    "52x24/Solid/calendar.svg", kNavigationIconCheckedSubstitutions)
+    "52x24/Solid/calendar.svg", kNavigationTheme,
+    "52x24/Solid/calendar.svg", kNavigationCheckedTheme)
 NX_DECLARE_COLORIZED_ICON(kThumbnailsButtonIcon,
-    "52x24/Solid/thumbnails.svg", kNavigationIconSubstitutions,
-    "52x24/Solid/thumbnails.svg", kNavigationIconCheckedSubstitutions)
+    "52x24/Solid/thumbnails.svg", kNavigationTheme,
+    "52x24/Solid/thumbnails.svg", kNavigationCheckedTheme)
 
 } // namespace
 
