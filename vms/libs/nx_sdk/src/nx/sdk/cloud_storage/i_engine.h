@@ -27,7 +27,11 @@ struct StorageSpace
     int64_t freeSpace = -1;
 };
 
-enum class TrackImageType;
+enum class TrackImageType
+{
+    bestShot,
+    title,
+};
 
 /**
  * Engine is an abstraction of a backend communication entity. It's something that knows how to

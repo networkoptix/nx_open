@@ -419,13 +419,6 @@ struct ObjectRegion
     std::string boundingBoxGridBase64;
 };
 
-enum class TrackImageType
-{
-    undefined,
-    bestShot,
-    title,
-};
-
 std::string trackImageTypeToString(TrackImageType type);
 TrackImageType trackImageTypeFromString(const std::string& s);
 

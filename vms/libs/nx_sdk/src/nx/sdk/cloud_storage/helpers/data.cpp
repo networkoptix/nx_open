@@ -615,8 +615,6 @@ std::string trackImageTypeToString(TrackImageType type)
             return "bestShot";
         case TrackImageType::title:
             return "title";
-        case TrackImageType::undefined:
-            return "undefined";
     }
 
     std::stringstream ss;
@@ -631,9 +629,6 @@ TrackImageType trackImageTypeFromString(const std::string& s)
 
     if (s == "title")
         return TrackImageType::title;
-
-    if (s == "undefined")
-        return TrackImageType::undefined;
 
     throw std::logic_error("Unexpected value of the TrackImageType string: " + s);
 }
