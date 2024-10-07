@@ -26,8 +26,6 @@
   <String Id="InstallCloseButton">Close</String>
   <String Id="InstallAcceptCheckbox">I agree to the</String>
   <String Id="InstallLicenseLinkText">End User License Agreement</String>
-  <UI Dialog="BalExtension" Control="EulaAcceptCheckbox" Width="86"/>
-  <UI Dialog="BalExtension" Control="EulaHyperlink" X="100"/>
 
   <String Id="OptionsHeader">Setup Options</String>
   <String Id="OptionsLocationLabel">Install location:</String>
