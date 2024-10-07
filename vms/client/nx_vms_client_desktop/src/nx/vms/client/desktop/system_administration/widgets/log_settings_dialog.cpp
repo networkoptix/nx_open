@@ -39,7 +39,7 @@ static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kIconSubs
     {QIcon::Selected, {.primary = "light17"}},
 };
 
-NX_DECLARE_COLORIZED_ICON(kReloadIcon, "20x20/Outline/reload.svg", kIconSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kResetIcon, "20x20/Outline/reset.svg", kIconSubstitutions)
 
 bool setValueToGuiElements(unsigned long long value, QSpinBox* spin, QComboBox* combo)
 {
@@ -189,7 +189,7 @@ LogSettingsDialog::LogSettingsDialog(QWidget* parent):
         .isEnabledProperty = &messageBarSettings()->performanceLoggingWarning});
 
     auto resetButton = ui->buttonBox->button(QDialogButtonBox::Reset);
-    resetButton->setIcon(qnSkin->icon(kReloadIcon));
+    resetButton->setIcon(qnSkin->icon(kResetIcon));
     resetButton->setFlat(true);
     resetButton->setText(tr("Reset to Default"));
     QFont font = resetButton->font();
