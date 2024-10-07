@@ -10,7 +10,7 @@
 
 namespace nx::vms::client::desktop {
 
-class CurrentSystemServers:
+class NX_VMS_CLIENT_DESKTOP_API CurrentSystemServers:
     public QObject,
     public SystemContextAware
 {
@@ -21,7 +21,6 @@ public:
     CurrentSystemServers(SystemContext* systemContext, QObject* parent = nullptr);
 
     QnMediaServerResourceList servers() const;
-
     int serversCount() const;
 
 signals:

@@ -3,6 +3,7 @@
 #include "server_list_model.h"
 
 #include <core/resource/media_server_resource.h>
+#include <core/resource_management/resource_pool.h>
 #include <nx/utils/scoped_connections.h>
 #include <nx/vms/client/desktop/manual_device_addition/dialog/private/current_system_servers.h>
 
@@ -13,10 +14,18 @@ struct ServerListModel::Private
     ServerListModel* q;
     std::unique_ptr<CurrentSystemServers> servers;
     std::unordered_map<nx::Uuid, nx::utils::ScopedConnections> connections;
+    QList<nx::Uuid> serverIds;
 
     Private(ServerListModel* parent):
         q(parent)
     {
+        clear();
+    }
+
+    void clear()
+    {
+        serverIds.clear();
+        serverIds.append(nx::Uuid());
     }
 };
 
@@ -43,7 +52,7 @@ QHash<int, QByteArray> ServerListModel::roleNames() const
 
 QVariant ServerListModel::data(const QModelIndex& index, int role) const
 {
-    if (index.row() < 0 || index.row() > d->servers->serversCount())
+    if (index.row() < 0 || index.row() >= d->serverIds.count())
         return {};
 
     if (index.row() == 0)
@@ -64,7 +73,8 @@ QVariant ServerListModel::data(const QModelIndex& index, int role) const
         }
     }
 
-    const auto server = d->servers->servers()[index.row() - 1];
+    const auto serverId = d->serverIds[index.row()];
+    const auto server = resourcePool()->getResourceById(serverId);
 
     switch (role)
     {
@@ -86,14 +96,7 @@ QVariant ServerListModel::data(const QModelIndex& index, int role) const
 
 int ServerListModel::indexOf(const nx::Uuid& serverId)
 {
-    const auto servers = d->servers->servers();
-    for (int i = 0; i < servers.size(); ++i)
-    {
-        if (servers.at(i)->getId() == serverId)
-            return i + 1;
-    }
-
-    return 0;
+    return d->serverIds.indexOf(serverId);
 }
 
 nx::Uuid ServerListModel::serverIdAt(int row) const
@@ -108,12 +111,16 @@ QString ServerListModel::serverName(int row) const
 
 int ServerListModel::rowCount(const QModelIndex& /*parent*/) const
 {
-    return d->servers->serversCount() + 1;
+    return d->serverIds.count();
 }
 
 void ServerListModel::classBegin()
 {
     d->servers.reset(new CurrentSystemServers(systemContext()));
+    d->clear();
+    for (const auto& server: d->servers->servers())
+        d->serverIds.append(server->getId());
+
     connect(d->servers.get(), &CurrentSystemServers::serverAdded,
         [this](const QnMediaServerResourcePtr& server)
         {
@@ -136,19 +143,22 @@ void ServerListModel::classBegin()
                 });
 
             d->connections[serverId] = std::move(serverConnections);
-
-            beginInsertRows({}, 0, d->servers->serversCount());
+            beginInsertRows({}, d->serverIds.count(), d->serverIds.count());
+            d->serverIds.append(serverId);
             endInsertRows();
-            emit dataChanged(index(0), index(d->servers->serversCount()));
         });
 
     connect(d->servers.get(), &CurrentSystemServers::serverRemoved,
         [this](const nx::Uuid& serverId)
         {
             d->connections.erase(serverId);
-            beginRemoveRows({}, 0, d->servers->serversCount() + 1);
+            const int serverIndex = d->serverIds.indexOf(serverId);
+            if (serverIndex <= 0)
+                return;
+
+            beginRemoveRows({}, serverIndex, serverIndex);
+            d->serverIds.removeAt(serverIndex);
             endRemoveRows();
-            emit dataChanged(index(0), index(d->servers->serversCount()));
             emit serverRemoved();
         });
 }
