@@ -45,10 +45,17 @@ QList<api::EventType> SiteNotificationSettingsManager::supportedEventTypes() con
 
 std::optional<QList<api::EventType>> SiteNotificationSettingsManager::watchedEvents() const
 {
-    if (m_currentUser)
-        return m_currentUser->settings().watchedEvents();
+    if (!m_currentUser)
+        return std::nullopt;
 
-    return std::nullopt;
+    auto result = m_currentUser->settings().watchedEvents();
+    result.removeIf(
+        [supportedEvents = supportedEventTypes()](auto eventType)
+        {
+            return !supportedEvents.contains(eventType);
+        });
+
+    return result;
 }
 
 void SiteNotificationSettingsManager::setWatchedEvents(const QList<api::EventType>& events)
@@ -82,7 +89,16 @@ std::set<common::system_health::MessageType> SiteNotificationSettingsManager::su
 
 std::set<common::system_health::MessageType> SiteNotificationSettingsManager::watchedMessages() const
 {
-    return appContext()->localSettings()->popupSystemHealth();
+    auto result = appContext()->localSettings()->popupSystemHealth();
+
+    std::erase_if(
+        result,
+        [supportedMessages = supportedMessageTypes()](auto messageType)
+        {
+            return !supportedMessages.contains(messageType);
+        });
+
+    return result;
 }
 
 void SiteNotificationSettingsManager::setWatchedMessages(
