@@ -52,6 +52,7 @@ NX_DECLARE_COLORIZED_ICON(kDownloadIcon, "20x20/Outline/download.svg", kLight16T
 NX_DECLARE_COLORIZED_ICON(kCrossCloseIcon, "20x20/Outline/cross_close.svg", kIconTheme)
 NX_DECLARE_COLORIZED_ICON(kErrorIcon, "16x16/Solid/error.svg", kErrorTheme)
 NX_DECLARE_COLORIZED_ICON(kFolderIcon, "20x20/Outline/folder.svg", kLight16Theme)
+NX_DECLARE_COLORIZED_ICON(kResetIcon, "20x20/Outline/reset.svg", kLight16Theme)
 NX_DECLARE_COLORIZED_ICON(kReloadIcon, "20x20/Outline/reload.svg", kLight16Theme)
 NX_DECLARE_COLORIZED_ICON(kSettingsIcon, "20x20/Outline/settings.svg", kLight16Theme)
 NX_DECLARE_COLORIZED_ICON(kSuccessIcon, "16x16/Solid/success.svg", kSuccessTheme)
@@ -171,7 +172,7 @@ void LogsManagementWidget::setupUi()
     ui->downloadButton->setFlat(true);
     ui->settingsButton->setIcon(qnSkin->icon(kSettingsIcon));
     ui->settingsButton->setFlat(true);
-    ui->resetButton->setIcon(qnSkin->icon(kReloadIcon));
+    ui->resetButton->setIcon(qnSkin->icon(kResetIcon));
     ui->openFolderButton->setIcon(qnSkin->icon(kFolderIcon));
 
     ui->resetButton->setFlat(true);

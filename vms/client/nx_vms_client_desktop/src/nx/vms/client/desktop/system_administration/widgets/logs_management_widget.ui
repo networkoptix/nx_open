@@ -199,6 +199,9 @@
                             </item>
                             <item>
                                 <layout class="QHBoxLayout" name="horizontalLayout_2">
+                                    <property name="spacing" >
+                                        <number>8</number>
+                                    </property>
                                     <item>
                                         <widget class="QPushButton" name="cancelButton">
                                             <property name="text">
@@ -246,6 +249,12 @@
                                 <spacer name="verticalSpacer_3_3">
                                     <property name="orientation">
                                         <enum>Qt::Vertical</enum>
+                                    </property>
+                                    <property name="sizeHint" stdset="0">
+                                        <size>
+                                            <width>40</width>
+                                            <height>8</height>
+                                        </size>
                                     </property>
                                 </spacer>
                             </item>
