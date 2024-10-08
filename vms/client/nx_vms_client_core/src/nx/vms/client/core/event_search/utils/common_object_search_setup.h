@@ -4,14 +4,13 @@
 
 #include <QtCore/QObject>
 
-#include <core/resource/resource_fwd.h>
 #include <core/resource/camera_resource.h>
-#include <recording/time_period.h>
-
+#include <core/resource/resource_fwd.h>
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/client/core/event_search/event_search_globals.h>
 #include <nx/vms/client/core/event_search/models/abstract_search_list_model.h>
 #include <nx/vms/client/core/event_search/utils/text_filter_setup.h>
+#include <recording/time_period.h>
 
 class QnCommonModule;
 

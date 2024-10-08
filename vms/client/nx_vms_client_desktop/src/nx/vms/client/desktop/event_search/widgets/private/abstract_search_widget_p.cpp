@@ -609,7 +609,6 @@ void AbstractSearchWidget::Private::setupCameraSelection()
                 m_cameraSelectionActions[core::EventSearch::CameraSelection::all]->trigger();
         });
 
-    m_cameraSelectionActions[core::EventSearch::CameraSelection::all]->trigger();
     ui->cameraSelectionButton->setMenu(cameraMenu);
     updateButton();
 

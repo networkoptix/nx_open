@@ -865,12 +865,6 @@ QString QnUserResource::idForToStringFromPtr() const
     return NX_FMT("%1: %2, %3", m_userType, m_name, getId());
 }
 
-void QnUserResource::setSettings(const UserSettings& settings)
-{
-    setProperty(ResourcePropertyKey::User::kUserSettings,
-        QString::fromStdString(nx::reflect::json::serialize(settings)));
-}
-
 nx::vms::common::UserSettingsEx QnUserResource::settings() const
 {
     const auto value = getProperty(ResourcePropertyKey::User::kUserSettings);

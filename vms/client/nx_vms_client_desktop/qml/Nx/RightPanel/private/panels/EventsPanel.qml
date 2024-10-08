@@ -15,7 +15,6 @@ SearchPanel
     id: eventsPanel
 
     type: { return RightPanelModel.Type.events }
-    defaultCameraSelection: RightPanel.CameraSelection.all
 
     placeholder
     {

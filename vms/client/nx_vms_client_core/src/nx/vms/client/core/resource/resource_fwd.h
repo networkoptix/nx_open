@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <memory>
-
 #include <core/resource/resource_fwd.h>
 
 /**

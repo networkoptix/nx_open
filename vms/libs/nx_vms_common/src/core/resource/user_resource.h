@@ -39,7 +39,7 @@ struct NX_VMS_COMMON_API UserSettingsEx: nx::vms::api::UserSettings
     void setWatchedEvents(const QList<nx::vms::api::EventType>& events);
 };
 
-} // nx::vms::common
+} // namespace nx::vms::common
 
 struct NX_VMS_COMMON_API QnUserHash
 {
@@ -209,7 +209,6 @@ public:
 
     virtual QString idForToStringFromPtr() const override; //< Used by toString(const T*).
 
-    void setSettings(const nx::vms::api::UserSettings& settings);
     nx::vms::common::UserSettingsEx settings() const;
 
 signals:

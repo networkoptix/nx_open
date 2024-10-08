@@ -201,12 +201,6 @@ Window
 
                         model: d.filterModel
                     }
-
-                    onFiltersReset:
-                    {
-                        analyticsFilters.clear()
-                        eventModel.commonSetup.cameraSelection = EventSearch.CameraSelection.layout
-                    }
                 }
             }
 
@@ -807,9 +801,6 @@ Window
                     type: { return EventSearch.SearchType.analytics }
                     active: true
                     attributeManager: d.tileViewAttributeManager
-
-                    Component.onCompleted:
-                        commonSetup.cameraSelection = EventSearch.CameraSelection.layout
 
                     onAnalyticsSetupChanged:
                     {

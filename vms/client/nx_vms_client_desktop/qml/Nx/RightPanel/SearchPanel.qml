@@ -34,8 +34,6 @@ Item
     readonly property alias model: eventModel
     readonly property alias filtersColumn: header.filtersColumn
 
-    property alias defaultCameraSelection: header.defaultCameraSelection
-
     signal filtersReset()
 
     EventRibbon

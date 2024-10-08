@@ -64,16 +64,6 @@ Q_ENUM_NS(SearchType)
 
 void registerQmlTypes();
 
-inline uint qHash(EventSearch::TimeSelection source)
-{
-    return uint(source);
-}
-
-inline uint qHash(EventSearch::CameraSelection source)
-{
-    return uint(source);
-}
-
 NX_VMS_CLIENT_CORE_API FetchDirection directionFromSortOrder(Qt::SortOrder order);
 NX_VMS_CLIENT_CORE_API Qt::SortOrder sortOrderFromDirection(FetchDirection direction);
 

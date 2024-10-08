@@ -166,8 +166,6 @@ Column
             EventSearchHelpers.attributeValuesFromFilters(attributeFilters))
     }
 
-
-
     onVisibleChanged:
     {
         if (model)

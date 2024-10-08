@@ -75,7 +75,6 @@ BookmarkSearchWidget::BookmarkSearchWidget(WindowContext* context, QWidget* pare
     NX_CRITICAL(d->model);
 
     setPlaceholderPixmap(qnSkin->icon(kBookmarkPlaceholderIcon).pixmap(64, 64));
-    commonSetup()->setCameraSelection(core::EventSearch::CameraSelection::layout);
 
     // Track remote bookmark changes by polling.
     QPointer<QTimer> updateTimer = new QTimer(this);

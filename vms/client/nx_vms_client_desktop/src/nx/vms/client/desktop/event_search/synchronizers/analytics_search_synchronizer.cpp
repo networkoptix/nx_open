@@ -8,18 +8,27 @@
 #include <QtCore/QScopedValueRollback>
 #include <QtGui/QAction>
 
+#include <api/server_rest_connection.h>
 #include <camera/cam_display.h>
 #include <camera/resource_display.h>
 #include <core/resource/camera_resource.h>
+#include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/client/core/analytics/analytics_filter_model.h>
+#include <nx/vms/client/core/analytics/taxonomy/object_type.h>
 #include <nx/vms/client/core/event_search/utils/analytics_search_setup.h>
 #include <nx/vms/client/core/event_search/utils/text_filter_setup.h>
+#include <nx/vms/client/core/resource/user.h>
 #include <nx/vms/client/core/utils/video_cache.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/event_search/utils/common_object_search_setup.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/resource/layout_item_index.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/system_logon/logic/connect_actions_handler.h>
+#include <nx/vms/client/desktop/system_logon/logic/fresh_session_token_helper.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/graphics/instruments/instrument_manager.h>
@@ -51,7 +60,7 @@ AnalyticsSearchSynchronizer::AnalyticsSearchSynchronizer(
     core::AnalyticsSearchSetup* analyticsSetup,
     QObject* parent)
     :
-    AbstractSearchSynchronizer(context, commonSetup, parent),
+    base_type(context, commonSetup, parent),
     m_analyticsSetup(analyticsSetup)
 {
     NX_CRITICAL(m_analyticsSetup);
@@ -237,6 +246,15 @@ AnalyticsSearchSynchronizer::AnalyticsSearchSynchronizer(
             const QScopedValueRollback updateGuard(m_updating, true);
             updateAction();
         });
+
+    connect(
+        context->system(),
+        &SystemContext::userChanged,
+        this,
+        &AnalyticsSearchSynchronizer::at_userChanged);
+    at_userChanged(context->system()->user());
+
+    m_filterModel = context->system()->taxonomyManager()->createFilterModel(this);
 }
 
 AnalyticsSearchSynchronizer::~AnalyticsSearchSynchronizer()
@@ -297,6 +315,7 @@ void AnalyticsSearchSynchronizer::updateWorkbench()
         return;
     }
 
+    updateObjectType(m_currentUser->settings().objectTypeIds);
     m_filter = {};
 
     const auto cameraSetType = commonSetup()->cameraSelection();
@@ -371,6 +390,74 @@ void AnalyticsSearchSynchronizer::updateAllMediaResourceWidgetsAnalyticsMode()
     }
 }
 
+void AnalyticsSearchSynchronizer::updateObjectType(const QStringList& objectTypeIds)
+{
+    const auto cameras = commonSetup()->currentLayoutCameras();
+    if (cameras.empty())
+        return;
+
+    if (!objectTypeIds.empty())
+    {
+        const auto storedOjectTypeIds = QSet(objectTypeIds.cbegin(), objectTypeIds.cend());
+
+        QSet<QString> objectTypes;
+        QSet<QString> subTypes;
+        bool firstCameraInSet = true;
+        for (const auto& camera: cameras)
+        {
+            m_filterModel->setSelectedDevices({camera});
+            QSet<QString> cameraObjectTypes;
+            QSet<QString> cameraSubTypes;
+            for (const auto& objectType: m_filterModel->objectTypes())
+            {
+                cameraObjectTypes.insert(objectType->id());
+                for (const auto& subtype: objectType->derivedObjectTypes())
+                    cameraSubTypes.insert(subtype->id());
+            }
+
+            if (firstCameraInSet)
+            {
+                objectTypes = cameraObjectTypes;
+                subTypes = cameraSubTypes;
+                firstCameraInSet = false;
+            }
+            else
+            {
+                objectTypes = objectTypes.intersect(cameraObjectTypes);
+                subTypes = subTypes.intersect(cameraSubTypes);
+            }
+        }
+
+        if (objectTypes.intersects(storedOjectTypeIds)
+            || subTypes.intersects(storedOjectTypeIds))
+        {
+            m_analyticsSetup->setObjectTypes(objectTypeIds);
+            return;
+        }
+    }
+    m_analyticsSetup->setObjectTypes({});
+}
+
+void AnalyticsSearchSynchronizer::updateCameraSelection(
+    core::EventSearch::CameraSelection cameraSelection)
+{
+    if (commonSetup()->cameraSelection() == cameraSelection)
+        return;
+
+    if (QSet({
+        core::EventSearch::CameraSelection::all,
+        core::EventSearch::CameraSelection::layout,
+        core::EventSearch::CameraSelection::current,
+        core::EventSearch::CameraSelection::custom}).contains(cameraSelection))
+    {
+        commonSetup()->setCameraSelection(cameraSelection);
+    }
+    else
+    {
+        commonSetup()->setCameraSelection(core::EventSearch::CameraSelection::layout);
+    }
+}
+
 void AnalyticsSearchSynchronizer::handleWidgetAnalyticsFilterRectChanged()
 {
     updateAreaSelection();
@@ -427,8 +514,19 @@ void AnalyticsSearchSynchronizer::setupInstanceSynchronization()
     connect(commonSetup(), &CommonObjectSearchSetup::cameraSelectionChanged, this,
         [this]()
         {
+            const auto cameraSelection = commonSetup()->cameraSelection();
             for (auto instance: instancesToNotify())
-                instance->commonSetup()->setCameraSelection(commonSetup()->cameraSelection());
+                instance->commonSetup()->setCameraSelection(cameraSelection);
+
+            if (!m_currentUser)
+                return;
+
+            auto userSettings = m_currentUser->settings();
+            if (userSettings.cameraSelection != cameraSelection)
+            {
+                userSettings.cameraSelection = cameraSelection;
+                applyChanges(userSettings);
+            }
         });
 
     connect(commonSetup(), &CommonObjectSearchSetup::selectedCamerasChanged, this,
@@ -451,8 +549,18 @@ void AnalyticsSearchSynchronizer::setupInstanceSynchronization()
     connect(m_analyticsSetup, &core::AnalyticsSearchSetup::objectTypesChanged, this,
         [this]()
         {
+            const auto objectTypes = m_analyticsSetup->objectTypes();
             for (auto instance : instancesToNotify())
                 instance->m_analyticsSetup->setObjectTypes(m_analyticsSetup->objectTypes());
+
+            auto userSettings = m_currentUser->settings();
+            if (userSettings.objectTypeIds != objectTypes
+                && windowContext()->connectActionsHandler()->logicalState()
+                    == ConnectActionsHandler::LogicalState::connected)
+            {
+                userSettings.objectTypeIds = objectTypes;
+                applyChanges(userSettings);
+            }
         });
 
     connect(m_analyticsSetup, &core::AnalyticsSearchSetup::attributeFiltersChanged, this,
@@ -521,6 +629,45 @@ QVector<AnalyticsSearchSynchronizer*>& AnalyticsSearchSynchronizer::instances()
 {
     static QVector<AnalyticsSearchSynchronizer*> instances;
     return instances;
+}
+
+void AnalyticsSearchSynchronizer::at_userChanged(const QnUserResourcePtr& user)
+{
+    if (user == m_currentUser)
+        return;
+
+    if (m_currentUser)
+        m_currentUser->disconnect(this);
+
+    m_currentUser = user.objectCast<core::UserResource>();
+    if (!m_currentUser)
+        return;
+
+    connect(m_currentUser.get(),
+        &QnUserResource::userSettingsChanged,
+        this,
+        &AnalyticsSearchSynchronizer::readUserAnalyticsSettings);
+    readUserAnalyticsSettings();
+}
+
+void AnalyticsSearchSynchronizer::readUserAnalyticsSettings()
+{
+    if (!m_currentUser)
+        return;
+
+    const auto userSettings = m_currentUser->settings();
+    updateCameraSelection(userSettings.cameraSelection);
+    updateObjectType(userSettings.objectTypeIds);
+}
+
+void AnalyticsSearchSynchronizer::applyChanges(core::UserSettings userSettings)
+{
+    auto sessionTokenHelper = FreshSessionTokenHelper::makeHelper(mainWindowWidget(),
+        tr("Save user"),
+        tr("Enter your account password"),
+        tr("Save"),
+        FreshSessionTokenHelper::ActionType::updateSettings);
+    m_currentUser->saveSettings(userSettings, sessionTokenHelper);
 }
 
 } // namespace nx::vms::client::desktop

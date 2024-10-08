@@ -7,6 +7,8 @@
 
 #include <analytics/db/analytics_db_types.h>
 #include <nx/utils/scoped_connections.h>
+#include <nx/vms/client/core/resource/user.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 
 #include "abstract_search_synchronizer.h"
 
@@ -22,6 +24,7 @@ class WindowContext;
  */
 class AnalyticsSearchSynchronizer: public AbstractSearchSynchronizer
 {
+    using base_type = AbstractSearchSynchronizer;
     Q_OBJECT
 
 public:
@@ -44,6 +47,8 @@ private:
     void updateCachedDevices();
     void updateMediaResourceWidgetAnalyticsMode(QnMediaResourceWidget* widget);
     void updateAllMediaResourceWidgetsAnalyticsMode();
+    void updateObjectType(const QStringList& objectTypeIds);
+    void updateCameraSelection(core::EventSearch::CameraSelection cameraSelection);
 
     void handleWidgetAnalyticsFilterRectChanged();
 
@@ -53,6 +58,9 @@ private:
     void setupInstanceSynchronization();
     QVector<AnalyticsSearchSynchronizer*> instancesToNotify();
     static QVector<AnalyticsSearchSynchronizer*>& instances();
+    void at_userChanged(const QnUserResourcePtr& user);
+    void readUserAnalyticsSettings();
+    void applyChanges(core::UserSettings userSettings);
 
 private:
     const QPointer<core::AnalyticsSearchSetup> m_analyticsSetup;
@@ -60,6 +68,8 @@ private:
     bool m_areaSelectionActive = false;
     bool m_updating = false;
     nx::analytics::db::Filter m_filter;
+    core::analytics::taxonomy::AnalyticsFilterModel* m_filterModel = nullptr;
+    core::UserResourcePtr m_currentUser;
 };
 
 } // namespace nx::vms::client::desktop

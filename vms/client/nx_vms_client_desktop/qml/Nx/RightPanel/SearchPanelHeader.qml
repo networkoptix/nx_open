@@ -19,10 +19,6 @@ Column
     property RightPanelModel model: null
     property alias limitToCurrentCamera: cameraSelector.limitToCurrentCamera
 
-    property int defaultCameraSelection: limitToCurrentCamera
-        ? EventSearch.CameraSelection.current
-        : EventSearch.CameraSelection.layout
-
     property alias filtersColumn: filtersColumn
 
     property alias searchText: searchField.text
@@ -154,9 +150,6 @@ Column
 
     onFiltersReset:
     {
-        if (cameraSelector.setup)
-            cameraSelector.setup.cameraSelection = header.defaultCameraSelection
-
         timeSelector.deactivate()
         searchField.clear()
     }

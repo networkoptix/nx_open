@@ -63,7 +63,7 @@ void UserResource::updateInternal(const QnResourcePtr& source, NotifierList& not
 }
 
 rest::Handle UserResource::saveSettings(
-    const nx::vms::api::UserSettings& value,
+    const UserSettings& value,
     common::SessionTokenHelperPtr sessionTokenHelper,
     std::function<void(bool /*success*/, rest::Handle /*handle*/)> callback,
     nx::utils::AsyncHandlerExecutor executor)
@@ -98,6 +98,21 @@ rest::Handle UserResource::saveSettings(
         std::move(sessionTokenHelper),
         internalCallback,
         thread());
+}
+
+void UserResource::setSettings(const UserSettings& settings)
+{
+    setProperty(ResourcePropertyKey::User::kUserSettings,
+        QString::fromStdString(nx::reflect::json::serialize(settings)));
+}
+
+UserSettings UserResource::settings() const
+{
+    const auto value = getProperty(ResourcePropertyKey::User::kUserSettings);
+    UserSettings result;
+    nx::reflect::json::deserialize<UserSettings>(value.toStdString(), &result);
+
+    return result;
 }
 
 } // namespace nx::vms::client::core

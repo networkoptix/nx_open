@@ -101,9 +101,7 @@ struct TaxonomyManager::Private
     }
 };
 
-TaxonomyManager::TaxonomyManager(
-    SystemContext* systemContext,
-    QObject* parent):
+TaxonomyManager::TaxonomyManager(SystemContext* systemContext, QObject* parent):
     QObject(parent),
     SystemContextAware(systemContext),
     d(new Private())
