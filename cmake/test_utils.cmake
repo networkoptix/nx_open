@@ -18,10 +18,10 @@ function(nx_add_test target) # [NO_GTEST] [NO_QT] [NO_NX_UTILS] ...
         message(FATAL_ERROR "Function nx_add_test can be used only with enabled withTests.")
     endif()
 
-    set(options NO_GTEST NO_QT NO_NX_UTILS)
+    set(options NO_GTEST NO_QT NO_NX_UTILS SUITES)
     set(oneValueArgs FOLDER PROJECT COMPONENT EPIC)
     cmake_parse_arguments(NX_ADD_TEST "${options}"
-        "${oneValueArgs}" #[[multi_value_keywords]] "" ${ARGN})
+        "${oneValueArgs}" #[[multiValueArgs]] "" ${ARGN})
 
     set_output_directories(RUNTIME "bin" LIBRARY "lib"
         AFFECTED_VARIABLES_RESULT affected_variables)
@@ -69,10 +69,18 @@ function(nx_add_test target) # [NO_GTEST] [NO_QT] [NO_NX_UTILS] ...
 
     add_test(NAME ${target} COMMAND ${target})
 
-    nx_set_test_meta_info(${target}
-        PROJECT ${NX_ADD_TEST_PROJECT}
-        COMPONENT ${NX_ADD_TEST_COMPONENT}
-        EPIC ${NX_ADD_TEST_EPIC})
+    if(NX_ADD_TEST_SUITES)
+        nx_set_test_meta_info(${target}
+            PROJECT ${NX_ADD_TEST_PROJECT}
+            COMPONENT ${NX_ADD_TEST_COMPONENT}
+            EPIC ${NX_ADD_TEST_EPIC}
+            SUITES)
+    else()
+        nx_set_test_meta_info(${target}
+            PROJECT ${NX_ADD_TEST_PROJECT}
+            COMPONENT ${NX_ADD_TEST_COMPONENT}
+            EPIC ${NX_ADD_TEST_EPIC})
+    endif()
 
     if(WINDOWS)
         # Adding ${CMAKE_MSVCIDE_RUN_PATH} to PATH for running unit tests via CTest.
@@ -137,6 +145,12 @@ function(nx_dump_unit_tests)
         get_target_property(epic ${test} NX_TEST_EPIC)
         if(epic)
             string(APPEND content "  epic: ${epic}\n")
+        endif()
+        get_target_property(suites ${test} NX_TEST_SUITES)
+        if(suites)
+            string(APPEND content "  suites: True\n")
+        else()
+            string(APPEND content "  suites: False\n")
         endif()
 
         set(binary_dependencies)

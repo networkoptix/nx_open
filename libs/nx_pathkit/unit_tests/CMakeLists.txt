@@ -5,6 +5,7 @@ nx_add_test(nx_pathkit_ut
     PUBLIC_LIBS
         nx_pathkit
     PROJECT NXLIB
+    SUITES
     FOLDER common/tests
 )
 

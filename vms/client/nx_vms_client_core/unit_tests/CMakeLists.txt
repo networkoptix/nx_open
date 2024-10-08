@@ -6,6 +6,7 @@ nx_add_test(nx_vms_client_core_ut
         Qt6::Test
     PROJECT VMS
     COMPONENT Client
+    SUITES
     FOLDER client/tests
     FORCE_INCLUDE
         ${nx_utils_dir}/src/nx/utils/test_support/custom_gtest_printers.h

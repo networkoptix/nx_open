@@ -14,5 +14,6 @@ nx_add_test(nx_vms_common_ut
         nx_vms_common_test_support
     PROJECT VMS
     COMPONENT Server
+    SUITES
     FOLDER common/tests
 )
