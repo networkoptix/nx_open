@@ -9,7 +9,7 @@
 
 #include <nx/media/audio_data_packet.h>
 #include <nx/streaming/abstract_media_stream_data_provider.h>
-#include <utils/media/voice_spectrum_analyzer.h>
+#include <nx/vms/client/core/media/voice_spectrum_analyzer.h>
 
 class QnAbstractDataConsumer;
 
@@ -35,7 +35,7 @@ public:
 protected:
     AVSampleFormat fromQtAudioFormat(const QAudioFormat& format) const;
 
-    QPointer<QnVoiceSpectrumAnalyzer> m_soundAnalyzer;
+    QPointer<nx::vms::client::core::VoiceSpectrumAnalyzer> m_soundAnalyzer;
     AudioLayoutPtr m_audioLayout;
     QString m_lastErrorStr;
 };
