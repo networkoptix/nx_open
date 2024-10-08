@@ -29,7 +29,7 @@ namespace nx::vms::rules {
 namespace api = ::nx::vms::api::rules;
 
 /**
- * Central class in the VMS Rules hierarchy. Administers all the rules. Knowns all about event and
+ * Central class in the VMS Rules hierarchy. Administers all the rules. Knows all about event and
  * action types. Dispatches incoming events and triggers related actions by rules.
  * Stores all rules.
  * Works as factory for actual event and action fields. Their constructors are registered externally
@@ -117,7 +117,7 @@ public:
 
     /**
     * Builds an event from the eventData and returns it.
-    * If the eventData doesn't contains 'type' value or there is no constructor registered
+    * If the eventData doesn't contain 'type' value or there is no constructor registered
     * for such type, nullptr is returned.
     */
     EventPtr buildEvent(const EventData& eventData) const;
@@ -215,7 +215,7 @@ private:
 
     std::unique_ptr<Rule> cloneRule(const Rule* rule) const;
 
-    void onEventReceved(const EventPtr& event, const std::vector<ConstRulePtr>& triggeredRules);
+    void onEventReceived(const EventPtr& event, const std::vector<ConstRulePtr>& triggeredRules);
     void processAcceptedEvent(const EventPtr& event, const ConstRulePtr& rule);
 
     void processAction(const ActionPtr& action) const;

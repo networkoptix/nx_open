@@ -49,7 +49,6 @@ api::EventFilter serialize(const EventFilter* filter)
 
     api::EventFilter result;
 
-    const auto fields = filter->fields();
     for (const auto& [name, field]: filter->fields().asKeyValueRange())
     {
         if (!field->properties().visible)
