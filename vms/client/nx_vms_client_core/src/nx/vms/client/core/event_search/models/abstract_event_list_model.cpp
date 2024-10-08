@@ -4,6 +4,7 @@
 
 #include <QtGui/QPixmap>
 
+#include <core/resource/resource.h>
 #include <nx/vms/client/core/client_core_globals.h>
 #include <nx/vms/client/core/event_search/utils/event_search_utils.h>
 #include <nx/vms/client/core/skin/color_theme.h>
@@ -52,7 +53,8 @@ void AbstractEventListModel::setSystemContext(SystemContext* systemContext)
 {
     d->systemContext = systemContext;
 
-    emit dataChanged(index(0), index(rowCount() - 1), {TimestampTextRole});
+    if (rowCount() > 0)
+        emit dataChanged(index(0), index(rowCount() - 1), {TimestampTextRole});
 }
 
 QVariant AbstractEventListModel::data(const QModelIndex& index, int role) const
@@ -67,8 +69,15 @@ QVariant AbstractEventListModel::data(const QModelIndex& index, int role) const
             const auto timestampMs = duration_cast<milliseconds>(
                 index.data(TimestampRole).value<microseconds>());
 
-            if (NX_ASSERT(d->systemContext))
-                return EventSearchUtils::timestampText(timestampMs, d->systemContext.data());
+            const auto resource = index.data(ResourceRole).value<QnResourcePtr>();
+            const auto context = resource
+                ? resource->systemContext()->as<SystemContext>()
+                : d->systemContext.data();
+
+            if (NX_ASSERT(context))
+                return EventSearchUtils::timestampText(timestampMs, context);
+            else
+                return QString();
         }
 
         case DisplayedResourceListRole:
