@@ -3,7 +3,6 @@
 #include "vms_event_search_widget.h"
 
 #include <algorithm>
-#include <chrono>
 
 #include <QtCore/QCollator>
 #include <QtCore/QHash>

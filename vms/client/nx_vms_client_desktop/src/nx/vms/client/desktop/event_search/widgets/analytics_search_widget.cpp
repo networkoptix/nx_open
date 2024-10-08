@@ -167,7 +167,6 @@ AnalyticsSearchWidget::AnalyticsSearchWidget(WindowContext* context, QWidget* pa
 {
     setRelevantControls(Control::defaults | Control::footersToggler);
     setPlaceholderPixmap(qnSkin->icon(kObjectsPlaceholderIcon).pixmap(64, 64));
-    commonSetup()->setCameraSelection(core::EventSearch::CameraSelection::layout);
 
     addSearchAction(action(menu::OpenAdvancedSearchDialog));
     setSearchDelay(milliseconds(ini().analyticsSearchRequestDelayMs));
@@ -194,7 +193,6 @@ AnalyticsSearchWidget::~AnalyticsSearchWidget()
 void AnalyticsSearchWidget::resetFilters()
 {
     base_type::resetFilters();
-    commonSetup()->setCameraSelection(core::EventSearch::CameraSelection::layout);
     d->resetFilters();
 }
 

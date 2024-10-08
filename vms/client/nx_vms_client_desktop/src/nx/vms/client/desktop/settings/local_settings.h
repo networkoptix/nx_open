@@ -12,9 +12,11 @@
 #include <nx/utils/log/log_settings.h>
 #include <nx/utils/property_storage/storage.h>
 #include <nx/utils/serialization/qt_containers_reflect_json.h>
+#include <nx/vms/client/core/event_search/event_search_globals.h>
 #include <nx/vms/client/core/settings/types/detected_object.h>
 #include <nx/vms/client/core/system_logon/connection_data.h>
 #include <nx/vms/client/desktop/analytics/attribute_display_manager.h>
+#include <nx/vms/client/desktop/event_search/right_panel_globals.h>
 #include <nx/vms/client/desktop/export/settings/export_layout_persistent_settings.h>
 #include <nx/vms/client/desktop/export/settings/export_media_persistent_settings.h>
 #include <nx/vms/client/desktop/jsapi/auth_allowed_urls.h>

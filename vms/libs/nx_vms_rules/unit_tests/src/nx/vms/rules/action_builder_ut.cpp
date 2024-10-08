@@ -507,7 +507,8 @@ TEST_F(ActionBuilderTest, userEventFilterPropertyWorks)
 
     auto settings = user1->settings();
     settings.eventFilter.insert(TestEventInstant::manifest().id.toStdString());
-    user1->setSettings(settings);
+    user1->setProperty(ResourcePropertyKey::User::kUserSettings,
+        QString::fromStdString(nx::reflect::json::serialize(settings)));
 
     UuidSelection selection{.ids = {user1->getId()}};
     auto builder = makeBuilderWithTargetUserField(selection);

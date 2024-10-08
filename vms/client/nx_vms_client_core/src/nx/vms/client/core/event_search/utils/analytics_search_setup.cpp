@@ -23,10 +23,7 @@ void AnalyticsSearchSetup::registerQmlType()
         "AnalyticsSearchSetup", "Cannot create instance of AnalyticsSearchSetup");
 }
 
-AnalyticsSearchSetup::AnalyticsSearchSetup(
-    AnalyticsSearchListModel* model,
-    QObject* parent)
-    :
+AnalyticsSearchSetup::AnalyticsSearchSetup(AnalyticsSearchListModel* model, QObject* parent):
     QObject(parent),
     d(new Private{model})
 {

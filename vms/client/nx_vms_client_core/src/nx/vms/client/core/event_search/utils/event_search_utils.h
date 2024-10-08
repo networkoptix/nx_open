@@ -7,7 +7,6 @@
 
 #include <nx/vms/client/core/event_search/event_search_globals.h>
 #include <nx/vms/client/core/event_search/models/fetch_request.h>
-#include <nx/vms/client/core/resource/resource_fwd.h>
 #include <nx/vms/client/core/system_context_aware.h>
 
 namespace nx::vms::client::core {
