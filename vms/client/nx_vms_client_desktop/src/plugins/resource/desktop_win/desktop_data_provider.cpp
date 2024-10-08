@@ -356,7 +356,7 @@ struct QnDesktopDataProvider::Private
     bool isAudioInitialized = false;
     bool isVideoInitialized = false;
 
-    QPointer<QnVoiceSpectrumAnalyzer> soundAnalyzer;
+    QPointer<nx::vms::client::core::VoiceSpectrumAnalyzer> soundAnalyzer;
     AVPacket* outPacket = av_packet_alloc();
     nx::media::ffmpeg::AudioEncoder audioEncoder;
     int frameSize = 0;

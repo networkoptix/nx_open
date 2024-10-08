@@ -11,11 +11,11 @@ class QQmlEngine;
 
 class QnCloudStatusWatcher;
 class QnSystemsFinder;
-class QnVoiceSpectrumAnalyzer;
 
 namespace nx::vms::discovery { class Manager; }
 
 namespace nx::vms::client::core {
+class VoiceSpectrumAnalyzer;
 
 /**
  * Main context of the desktop client application. Exists through all application lifetime and is
@@ -58,7 +58,7 @@ public:
 
     QnSystemsFinder* systemsFinder() const;
 
-    QnVoiceSpectrumAnalyzer* voiceSpectrumAnalyzer() const;
+    VoiceSpectrumAnalyzer* voiceSpectrumAnalyzer() const;
 
 private:
     struct Private;

@@ -10,8 +10,8 @@
 
 #include <api/server_rest_connection_fwd.h>
 #include <core/resource/resource_fwd.h>
+#include <nx/vms/client/core/media/voice_spectrum_analyzer.h>
 #include <nx/vms/license/usage_helper.h>
-#include <utils/media/voice_spectrum_analyzer.h>
 
 #include "../two_way_audio_widget.h"
 #include "../voice_spectrum_painter.h"

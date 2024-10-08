@@ -30,14 +30,14 @@
 
 #include <nx/audio/format.h>
 
-class QnVoiceSpectrumAnalyzer;
 class QnResourceWidgetRenderer;
 class QnVideoStreamDisplay;
 class QnAudioStreamDisplay;
 class QnCompressedVideoData;
 class QnArchiveStreamReader;
 class QnlTimeSource;
-struct QnSpectrumData;
+
+namespace nx::vms::client::core { struct SpectrumData; }
 
 /*
 * This class is not duplicate statistics from Reader. If not enough CPU/network this class still show full (correct) stream fps
@@ -159,7 +159,7 @@ public:
 
     nx::vms::client::desktop::AudioDecodeMode audioDecodeMode() const;
     void setAudioDecodeMode(nx::vms::client::desktop::AudioDecodeMode decodeMode);
-    QnSpectrumData audioSpectrum() const;
+    nx::vms::client::core::SpectrumData audioSpectrum() const;
 
 public slots:
     void onBeforeJump(qint64 time);

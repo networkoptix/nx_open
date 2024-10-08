@@ -3,11 +3,11 @@
 #include "sound.h"
 
 #ifdef Q_OS_MAC
-#include <openal/al.h>
-#include <openal/alc.h>
+    #include <openal/al.h>
+    #include <openal/alc.h>
 #else
-#include <AL/al.h>
-#include <AL/alc.h>
+    #include <AL/al.h>
+    #include <AL/alc.h>
 #endif
 
 #include "utils/common/sleep.h"
@@ -289,8 +289,7 @@ bool Sound::playImpl()
     // if already playing
     if (AL_PLAYING != state)
     {
-        float volume = AudioDevice::instance()->volume();
-        alSourcef(m_source, AL_GAIN, volume);
+        alSourcef(m_source, AL_GAIN, m_muted ? 0.0 : AudioDevice::instance()->volume());
 
         // If there are Buffers in the Source Queue then the Source was starved of audio
         // data, so needs to be restarted (because there is more audio data to play)
@@ -436,6 +435,22 @@ void Sound::clear()
     internalClear();
     m_deinitialized = true;
     m_paused = false;
+}
+
+bool Sound::isMuted() const
+{
+    NX_MUTEX_LOCKER lock(&m_mtx);
+    return m_muted;
+}
+
+void Sound::setMuted(bool muted)
+{
+    NX_MUTEX_LOCKER lock(&m_mtx);
+    if (m_muted == muted)
+        return;
+
+    m_muted = muted;
+    alSourcef(m_source, AL_GAIN, m_muted ? 0.0 : AudioDevice::instance()->volume());
 }
 
 void Sound::internalClear()

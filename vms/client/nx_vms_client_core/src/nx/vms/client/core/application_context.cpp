@@ -11,11 +11,11 @@
 #include <finders/systems_finder.h>
 #include <nx/branding_proxy.h>
 #include <nx/build_info_proxy.h>
+#include <nx/vms/client/core/media/voice_spectrum_analyzer.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/core/thumbnails/thumbnail_image_provider.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
 #include <nx/vms/discovery/manager.h>
-#include <utils/media/voice_spectrum_analyzer.h>
 #include <watchers/cloud_status_watcher.h>
 
 // Resources initialization must be located outside of the namespace.
@@ -85,7 +85,7 @@ struct ApplicationContext::Private
     std::unique_ptr<QnCloudStatusWatcher> cloudStatusWatcher;
     std::unique_ptr<QnSystemsFinder> systemsFinder;
     std::unique_ptr<nx::vms::discovery::Manager> moduleDiscoveryManager;
-    std::unique_ptr<QnVoiceSpectrumAnalyzer> voiceSpectrumAnalyzer;
+    std::unique_ptr<VoiceSpectrumAnalyzer> voiceSpectrumAnalyzer;
 };
 
 ApplicationContext::ApplicationContext(
@@ -115,7 +115,7 @@ ApplicationContext::ApplicationContext(
 
         case Mode::desktopClient:
         case Mode::mobileClient:
-            d->voiceSpectrumAnalyzer = std::make_unique<QnVoiceSpectrumAnalyzer>();
+            d->voiceSpectrumAnalyzer = std::make_unique<VoiceSpectrumAnalyzer>();
             break;
     }
 }
@@ -157,7 +157,7 @@ QnSystemsFinder* ApplicationContext::systemsFinder() const
     return d->systemsFinder.get();
 }
 
-QnVoiceSpectrumAnalyzer* ApplicationContext::voiceSpectrumAnalyzer() const
+VoiceSpectrumAnalyzer* ApplicationContext::voiceSpectrumAnalyzer() const
 {
     return d->voiceSpectrumAnalyzer.get();
 }

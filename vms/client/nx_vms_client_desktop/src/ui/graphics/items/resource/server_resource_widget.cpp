@@ -744,7 +744,7 @@ Qn::ResourceStatusOverlay QnServerResourceWidget::calculateStatusOverlay() const
         return Qn::MismatchedCertificateOverlay;
 
     /* Suppress 'No video' overlay */
-    return base_type::calculateStatusOverlay(status, true);
+    return base_type::calculateStatusOverlay(status, true, false);
 }
 
 HealthMonitoringButtons QnServerResourceWidget::savedCheckedHealthMonitoringButtons() const

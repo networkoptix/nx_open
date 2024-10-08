@@ -6,8 +6,8 @@
 #include <QtGui/QPainterPath>
 
 #include <nx/utils/log/assert.h>
+#include <nx/vms/client/core/media/voice_spectrum_analyzer.h>
 #include <ui/workaround/sharp_pixmap_painting.h>
-#include <utils/media/voice_spectrum_analyzer.h>
 
 namespace nx::vms::client::desktop {
 
@@ -21,7 +21,7 @@ void VoiceSpectrumPainter::update(qint64 timeMs, const Data& data)
 
     if (data.isEmpty())
     {
-        m_data = generateEmptyData(timeMs, QnVoiceSpectrumAnalyzer::bandsCount());
+        m_data = generateEmptyData(timeMs, core::VoiceSpectrumAnalyzer::bandsCount());
     }
     else
     {
@@ -82,7 +82,7 @@ void VoiceSpectrumPainter::normalizeData(Data& source)
 
 VoiceSpectrumPainter::Data VoiceSpectrumPainter::animateData(const Data& prev, const Data& next, qint64 timeStepMs)
 {
-    //NX_ASSERT(next.size() == QnVoiceSpectrumAnalyzer::bandsCount());
+    //NX_ASSERT(next.size() == VoiceSpectrumAnalyzer::bandsCount());
 
     if (prev.size() != next.size())
         return next;

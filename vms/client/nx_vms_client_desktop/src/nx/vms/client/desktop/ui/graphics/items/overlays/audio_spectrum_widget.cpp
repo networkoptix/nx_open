@@ -8,12 +8,12 @@
 
 #include <camera/cam_display.h>
 #include <camera/resource_display.h>
+#include <nx/vms/client/core/media/voice_spectrum_analyzer.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/resource/voice_spectrum_painter.h>
-#include <utils/media/voice_spectrum_analyzer.h>
 
 namespace nx::vms::client::desktop {
 
