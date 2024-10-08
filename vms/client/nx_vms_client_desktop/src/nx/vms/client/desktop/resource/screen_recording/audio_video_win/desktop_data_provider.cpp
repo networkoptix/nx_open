@@ -6,8 +6,7 @@
 #include <mmsystem.h>
 #include <windows.h>
 
-extern "C"
-{
+extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
 #include <libavutil/imgutils.h>
@@ -378,7 +377,7 @@ struct DesktopDataProvider::Private
     bool isAudioInitialized = false;
     bool isVideoInitialized = false;
 
-    QPointer<QnVoiceSpectrumAnalyzer> soundAnalyzer;
+    QPointer<nx::vms::client::core::VoiceSpectrumAnalyzer> soundAnalyzer;
     AVPacket* outPacket = av_packet_alloc();
     nx::media::ffmpeg::AudioEncoder audioEncoder;
     int frameSize = 0;

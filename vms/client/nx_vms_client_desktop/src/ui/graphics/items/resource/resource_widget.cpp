@@ -1082,7 +1082,7 @@ void QnResourceWidget::setInfoVisible(bool visible, bool animate)
 }
 
 Qn::ResourceStatusOverlay QnResourceWidget::calculateStatusOverlay(
-    nx::vms::api::ResourceStatus resourceStatus, bool hasVideo) const
+    nx::vms::api::ResourceStatus resourceStatus, bool hasVideo, bool showsAudioSpectrum) const
 {
     if (ini().disableVideoRendering)
         return Qn::EmptyOverlay;
@@ -1097,7 +1097,7 @@ Qn::ResourceStatusOverlay QnResourceWidget::calculateStatusOverlay(
         return Qn::EmptyOverlay;
 
     if (!hasVideo)
-        return ini().audioVisualization ? Qn::EmptyOverlay : Qn::NoVideoDataOverlay;
+        return showsAudioSpectrum ? Qn::EmptyOverlay : Qn::NoVideoDataOverlay;
 
     if (m_renderStatus == Qn::NothingRendered || m_renderStatus == Qn::CannotRender)
         return Qn::LoadingOverlay;
@@ -1111,7 +1111,7 @@ Qn::ResourceStatusOverlay QnResourceWidget::calculateStatusOverlay(
 Qn::ResourceStatusOverlay QnResourceWidget::calculateStatusOverlay() const
 {
     const auto mediaRes = m_resource.dynamicCast<QnMediaResource>();
-    return calculateStatusOverlay(m_resource->getStatus(), mediaRes && mediaRes->hasVideo(0));
+    return calculateStatusOverlay(m_resource->getStatus(), mediaRes && mediaRes->hasVideo(0), false);
 }
 
 void QnResourceWidget::updateStatusOverlay(bool animate)

@@ -72,6 +72,10 @@ public:
     /** Clear internal audio buffer. */
     void clear();
 
+    bool isMuted() const;
+
+    void setMuted(bool muted);
+
     /**
      * @return True if audio format is supported.
      */
@@ -113,6 +117,7 @@ private:
     int m_proxyBufferLen;
     bool m_deinitialized;
     bool m_paused;
+    bool m_muted = false;
 
     nx::ElapsedTimer m_timer;
     qint64 m_queuedDurationUs;
