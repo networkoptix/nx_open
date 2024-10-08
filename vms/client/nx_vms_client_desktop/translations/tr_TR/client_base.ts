@@ -1038,14 +1038,14 @@
     <message numerus="yes">
       <source>Mute Items</source>
       <translation type="unfinished">
-        <numerusform>Mute Items</numerusform>
+        <numerusform>Öğeleri Sessize Al</numerusform>
         <numerusform>Mute Items</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Unmute Items</source>
       <translation type="unfinished">
-        <numerusform>Unmute Items</numerusform>
+        <numerusform>Öğelerin sesini aç</numerusform>
         <numerusform>Unmute Items</numerusform>
       </translation>
     </message>
