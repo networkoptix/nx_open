@@ -19,6 +19,7 @@
 #include <nx/vms/client/core/analytics/analytics_icon_manager.h>
 #include <nx/vms/client/core/common/utils/private/thread_pool_manager_p.h>
 #include <nx/vms/client/core/event_search/models/visible_item_data_decorator_model.h>
+#include <nx/vms/client/core/media/voice_spectrum_analyzer.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/network/local_network_interfaces_manager.h>
 #include <nx/vms/client/core/qml/qml_ownership.h>
@@ -33,7 +34,6 @@
 #include <nx/vms/client/core/watchers/known_server_connections.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
 #include <nx/vms/discovery/manager.h>
-#include <utils/media/voice_spectrum_analyzer.h>
 
 extern "C" {
 
@@ -152,7 +152,7 @@ struct ApplicationContext::Private
     std::unique_ptr<CloudStatusWatcher> cloudStatusWatcher;
     std::unique_ptr<SystemFinder> systemFinder;
     std::unique_ptr<nx::vms::discovery::Manager> moduleDiscoveryManager;
-    std::unique_ptr<QnVoiceSpectrumAnalyzer> voiceSpectrumAnalyzer;
+    std::unique_ptr<VoiceSpectrumAnalyzer> voiceSpectrumAnalyzer;
     std::unique_ptr<Skin> skin;
     std::unique_ptr<ColorTheme> colorTheme;
     std::vector<QPointer<SystemContext>> systemContexts;
@@ -199,7 +199,7 @@ ApplicationContext::ApplicationContext(
 
         case Mode::desktopClient:
         case Mode::mobileClient:
-            d->voiceSpectrumAnalyzer = std::make_unique<QnVoiceSpectrumAnalyzer>();
+            d->voiceSpectrumAnalyzer = std::make_unique<VoiceSpectrumAnalyzer>();
             d->unifiedResourcePool = std::make_unique<UnifiedResourcePool>();
             d->localNetworkInterfacesManager = std::make_unique<LocalNetworkInterfacesManager>();
             d->knownServerConnectionsWatcher =
@@ -306,7 +306,7 @@ SystemFinder* ApplicationContext::systemFinder() const
     return d->systemFinder.get();
 }
 
-QnVoiceSpectrumAnalyzer* ApplicationContext::voiceSpectrumAnalyzer() const
+VoiceSpectrumAnalyzer* ApplicationContext::voiceSpectrumAnalyzer() const
 {
     return d->voiceSpectrumAnalyzer.get();
 }

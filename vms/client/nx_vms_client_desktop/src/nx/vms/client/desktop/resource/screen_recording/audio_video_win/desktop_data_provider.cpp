@@ -15,8 +15,6 @@ extern "C" {
 #include <libavutil/opt.h>
 } // extern "C"
 
-#include <speex/speex_preprocess.h>
-
 #include <core/resource/resource.h>
 #include <decoders/audio/ffmpeg_audio_decoder.h>
 #include <nx/media/codec_parameters.h>
@@ -32,6 +30,7 @@ extern "C" {
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
+#include <speex/speex_preprocess.h>
 #include <utils/common/synctime.h>
 #include <utils/media/av_options.h>
 
@@ -378,7 +377,7 @@ struct DesktopDataProvider::Private
     bool isAudioInitialized = false;
     bool isVideoInitialized = false;
 
-    QPointer<QnVoiceSpectrumAnalyzer> soundAnalyzer;
+    QPointer<nx::vms::client::core::VoiceSpectrumAnalyzer> soundAnalyzer;
     AVPacket* outPacket = av_packet_alloc();
     nx::media::ffmpeg::AudioEncoder audioEncoder;
     int frameSize = 0;

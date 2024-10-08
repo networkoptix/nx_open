@@ -10,7 +10,6 @@
 class QQmlEngine;
 
 class QnClientCoreSettings;
-class QnVoiceSpectrumAnalyzer;
 
 namespace nx::i18n { class TranslationManager; }
 namespace nx::vms::discovery { class Manager; }
@@ -26,6 +25,7 @@ class SystemContext;
 class SystemFinder;
 class ThreadPool;
 class UnifiedResourcePool;
+class VoiceSpectrumAnalyzer;
 
 namespace watchers { class KnownServerConnections; }
 
@@ -67,7 +67,7 @@ public:
 
     SystemFinder* systemFinder() const;
 
-    QnVoiceSpectrumAnalyzer* voiceSpectrumAnalyzer() const;
+    VoiceSpectrumAnalyzer* voiceSpectrumAnalyzer() const;
 
     Settings* coreSettings() const;
 

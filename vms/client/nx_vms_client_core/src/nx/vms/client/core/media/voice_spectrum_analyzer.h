@@ -14,31 +14,35 @@ extern "C" {
 #include <nx/media/audio/format.h>
 #include <nx/utils/thread/mutex.h>
 
-struct QnSpectrumData
+namespace nx::vms::client::core {
+
+struct SpectrumData
 {
     QVector<double> data; //< data in range [0..1]
 };
 
-class NX_VMS_CLIENT_CORE_API QnVoiceSpectrumAnalyzer:
+class NX_VMS_CLIENT_CORE_API VoiceSpectrumAnalyzer:
     public QObject
 {
     Q_OBJECT
 
 public:
-    QnVoiceSpectrumAnalyzer();
-    ~QnVoiceSpectrumAnalyzer();
+    VoiceSpectrumAnalyzer();
+    ~VoiceSpectrumAnalyzer();
 
     void initialize(int srcSampleRate, int channels);
 
     /**
      * Process input data. Data should be in 16 or 32 bit form. The total amount of samples is
      * sampleCount * channels.
+     *
+     * @returns                         Whether the stored spectrum data was updated.
      */
-    void processData(const qint16* sampleData, int sampleCount);
-    void processData(const qint32* sampleData, int sampleCount);
-    void processData(const nx::media::audio::Format& format, const void* sampleData, int sampleBytes);
+    bool processData(const qint16* sampleData, int sampleCount);
+    bool processData(const qint32* sampleData, int sampleCount);
+    bool processData(const nx::media::audio::Format& format, const void* sampleData, int sampleBytes);
 
-    QnSpectrumData getSpectrumData() const;
+    SpectrumData getSpectrumData() const;
 
     void reset();
 
@@ -47,11 +51,11 @@ public:
 
 protected: //< Made protected for unit tests.
     template<class T>
-    void processDataInternal(const T* sampleData, int sampleCount);
+    bool processDataInternal(const T* sampleData, int sampleCount);
     int windowSize() const { return m_windowSize; }
     FFTComplex* fftData() const { return m_fftData; }
     void performFft();
-    static QnSpectrumData fillSpectrumData(const FFTComplex data[], int size, int srcSampleRate);
+    static SpectrumData fillSpectrumData(const FFTComplex data[], int size, int srcSampleRate);
 
 protected: //< Intended for experimenting and debugging, e.g. when changing the algorithm.
     static std::string asString(const double data[], int size);
@@ -67,6 +71,8 @@ private:
     FFTComplex* m_fftData = nullptr;
     FFTContext* m_fftContext = nullptr;
     int m_fftDataSize = 0; /**< Nmber of currently filled values in m_fftData. */
-    QnSpectrumData m_spectrumData;
+    SpectrumData m_spectrumData;
     mutable nx::Mutex m_mutex;
 };
+
+} // namespace nx::vms::client::core

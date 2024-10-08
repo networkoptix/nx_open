@@ -1,18 +1,18 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include <gtest/gtest.h>
-
 #include <vector>
+
 #include <math.h>
 #include <stdint.h>
+
+#include <gtest/gtest.h>
 
 extern "C" {
 #include <libavcodec/avfft.h> //< for struct FFTComplex
 } // extern "C"
 
 #include <nx/kit/debug.h>
-
-#include <utils/media/voice_spectrum_analyzer.h>
+#include <nx/vms/client/core/media/voice_spectrum_analyzer.h>
 
 namespace nx::vms::client::core {
 
@@ -25,27 +25,27 @@ static const int kWindowSize = 2048;
 #define ARRAY_LEN(ARRAY) (sizeof(ARRAY) / sizeof((ARRAY)[0]))
 
 static const int16_t kSamples1[] = {
-    #include "samples_1.inc"
+#include "samples_1.inc"
 };
 static_assert(kSampleCount * kChannelCount == ARRAY_LEN(kSamples1));
 
 static const int16_t kSamples2[] = {
-    #include "samples_2.inc"
+#include "samples_2.inc"
 };
 static_assert(kSampleCount * kChannelCount == ARRAY_LEN(kSamples2));
 
 static const double kExpectedSpectrum[] = {
-    #include "expected_spectrum.inc"
+#include "expected_spectrum.inc"
 };
 static_assert(kBandCount == ARRAY_LEN(kExpectedSpectrum));
 
 static const FFTComplex kFftInput[] = {
-    #include "fft_input.inc"
+#include "fft_input.inc"
 };
 static_assert(kWindowSize == ARRAY_LEN(kFftInput));
 
 static const FFTComplex kExpectedFftOutput[] = {
-    #include "expected_fft_output.inc"
+#include "expected_fft_output.inc"
 };
 static_assert(kWindowSize == ARRAY_LEN(kExpectedFftOutput));
 
@@ -83,7 +83,7 @@ static void assertComplexArraysEqual(
 }
 
 // Inheriting to access protected members.
-class TestVoiceSpectrumAnalyzer: public QnVoiceSpectrumAnalyzer
+class TestVoiceSpectrumAnalyzer: public VoiceSpectrumAnalyzer
 {
 public:
     FFTComplex* access_fftData() { return fftData(); }
@@ -91,7 +91,7 @@ public:
     void access_performFft() { return performFft(); }
     std::string access_dump() { return dump(); }
 
-    static QnSpectrumData access_fillSpectrumData(
+    static SpectrumData access_fillSpectrumData(
         const FFTComplex data[], int size, int srcSampleRate)
     {
         return fillSpectrumData(data, size, srcSampleRate);
@@ -99,7 +99,7 @@ public:
 };
 
 static void assertSpectrumEquals(
-    const char tag[], const double expected[], const QnSpectrumData& actual)
+    const char tag[], const double expected[], const SpectrumData& actual)
 {
     ASSERT_EQ(kBandCount, actual.data.size());
 
@@ -129,7 +129,7 @@ TEST(SpectrumAnalyzerTest, Spectrum)
 
     std::vector<FFTComplex> fftData{kFftInput, kFftInput + ARRAY_LEN(kFftInput)};
 
-    const QnSpectrumData spectrumData =
+    const SpectrumData spectrumData =
         analyzer.access_fillSpectrumData(kExpectedFftOutput, kWindowSize, kSampleRate);
 
     ASSERT_NO_FATAL_FAILURE(assertSpectrumEquals("for expected FFT output",

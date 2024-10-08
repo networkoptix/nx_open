@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <atomic>
+
 #include <QtCore/QQueue>
 
 #include <nx/audio/sound.h>
@@ -10,9 +12,10 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/client/desktop/camera/audio_decode_mode.h>
 
-class QnVoiceSpectrumAnalyzer;
 class QnAbstractAudioDecoder;
 class QnCompressedAudioData;
+
+namespace nx::vms::client::core { class QueuedVoiceSpectrumAnalyzer; }
 
 /**
  * On source data end, playCurrentBuffer method MUST be called to avoid media data loss.
@@ -63,8 +66,9 @@ public:
     int getAudioBufferSize() const;
     bool isPlaying() const;
 
-    QnVoiceSpectrumAnalyzer* analyzer() const;
+    nx::vms::client::core::QueuedVoiceSpectrumAnalyzer* analyzer() const;
     nx::vms::client::desktop::AudioDecodeMode decodeMode() const;
+    void setAudioDecodeMode(nx::vms::client::desktop::AudioDecodeMode decodeMode);
 
 private:
     int msInQueue() const;
@@ -82,8 +86,8 @@ private:
     bool m_tooFewDataDetected;
     bool m_isFormatSupported;
     std::unique_ptr<nx::audio::Sound> m_sound;
-    std::unique_ptr<QnVoiceSpectrumAnalyzer> m_analyzer;
-    nx::vms::client::desktop::AudioDecodeMode m_decodeMode =
+    std::unique_ptr<nx::vms::client::core::QueuedVoiceSpectrumAnalyzer> m_analyzer;
+    std::atomic<nx::vms::client::desktop::AudioDecodeMode> m_decodeMode =
         nx::vms::client::desktop::AudioDecodeMode::normal;
 
     bool m_downmixing; //< Do downmixing.

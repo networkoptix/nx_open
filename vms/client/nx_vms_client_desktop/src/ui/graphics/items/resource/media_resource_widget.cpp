@@ -872,7 +872,7 @@ bool QnMediaResourceWidget::mightShowAudioSpectrum() const
 
 bool QnMediaResourceWidget::shouldShowAudioSpectrum() const
 {
-    return mightShowAudioSpectrum() && d->camera && d->camera->isAudioEnabled();
+    return mightShowAudioSpectrum() && hasAudio();
 }
 
 QnMediaResourceWidget::AreaType QnMediaResourceWidget::areaSelectionType() const
@@ -1289,7 +1289,6 @@ void QnMediaResourceWidget::updateDisplay()
         : QnResourceDisplayPtr(new QnResourceDisplay(d->mediaResource->toResourcePtr()));
 
     setDisplay(display);
-    updateAudioPlaybackState();
 }
 
 const QnMediaResourcePtr &QnMediaResourceWidget::resource() const
@@ -2728,7 +2727,7 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
 
         // Handle export from I/O modules.
         if (!d->hasVideo)
-            return ini().audioVisualization ? Qn::EmptyOverlay : Qn::NoVideoDataOverlay;
+            return shouldShowAudioSpectrum() ? Qn::EmptyOverlay : Qn::NoVideoDataOverlay;
     }
 
     if (d->display()->camDisplay()->isLongWaiting())
@@ -2739,7 +2738,7 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
             .containTime(d->display()->camDisplay()->getExternalTime() / 1000))
         {
             return base_type::calculateStatusOverlay(nx::vms::api::ResourceStatus::online,
-                d->hasVideo);
+                d->hasVideo, shouldShowAudioSpectrum());
         }
 
         return Qn::NoDataOverlay;
@@ -2755,12 +2754,13 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
     if (d->display()->isPaused())
     {
         if (!d->hasVideo)
-            return ini().audioVisualization ? Qn::EmptyOverlay : Qn::NoVideoDataOverlay;
+            return shouldShowAudioSpectrum() ? Qn::EmptyOverlay : Qn::NoVideoDataOverlay;
 
         return Qn::EmptyOverlay;
     }
 
-    return base_type::calculateStatusOverlay(nx::vms::api::ResourceStatus::online, d->hasVideo);
+    return base_type::calculateStatusOverlay(nx::vms::api::ResourceStatus::online,
+        d->hasVideo, shouldShowAudioSpectrum());
 }
 
 Qn::ResourceOverlayButton QnMediaResourceWidget::calculateOverlayButton(
@@ -3542,8 +3542,11 @@ nx::vms::client::desktop::RewindOverlay* QnMediaResourceWidget::rewindOverlay() 
 
 bool QnMediaResourceWidget::hasAudio() const
 {
+    // We're checking for both isAudioSupported AND isAudioEnabled here because it's technically
+    // possible to have a camera that has audio enabled but not supported. Enabled is just a flag
+    // in the database.
     if (d->camera)
-        return d->camera->isAudioEnabled();
+        return d->camera->isAudioSupported() && d->camera->isAudioEnabled();
 
     if (d->mediaResource) // Handle local files.
         return !d->mediaResource->getAudioLayout(d->display()->dataProvider())->tracks().empty();
