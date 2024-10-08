@@ -12,7 +12,7 @@ enum class AudioDecodeMode
     /** Decode & play audio & calculate audio spectrum. */
     normalWithSpectrum,
 
-    /** Decode audio but don't forward it to a playback device, just prepare the audio spectrum.
+    /** Decode audio but don't play it, just prepare the audio spectrum.
      * This is used when displaying a spectrum on audio-only items that are muted. */
     spectrumOnly
 };

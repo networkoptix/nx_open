@@ -353,7 +353,8 @@ protected:
 
     virtual bool isHovered() const;
 
-    Qn::ResourceStatusOverlay calculateStatusOverlay(nx::vms::api::ResourceStatus resourceStatus, bool hasVideo) const;
+    Qn::ResourceStatusOverlay calculateStatusOverlay(
+        nx::vms::api::ResourceStatus resourceStatus, bool hasVideo, bool showsAudioSpectrum) const;
     virtual Qn::ResourceStatusOverlay calculateStatusOverlay() const;
     void updateStatusOverlay(bool animate);
 
