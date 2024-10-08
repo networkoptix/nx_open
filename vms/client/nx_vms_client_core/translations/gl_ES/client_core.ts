@@ -40,7 +40,7 @@
     <message>
       <source>Owner: %1</source>
       <comment>%1 is a user name</comment>
-      <translation type="unfinished">Owner: %1</translation>
+      <translation>Persoa propietaria: %1</translation>
     </message>
     <message>
       <source>Your System</source>
