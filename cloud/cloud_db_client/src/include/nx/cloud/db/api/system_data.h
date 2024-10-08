@@ -429,20 +429,23 @@ struct SystemSharingEx: SystemSharing
     /**%apidoc True if a key for two-factor authentication was generated for the account.*/
     bool account2faEnabled = false;
 
+    /**%apidoc Shows if HTTP Digest authentication is allowed for this account.*/
+    bool httpDigestAuthEnabled = false;
+
     bool operator==(const SystemSharingEx& rhs) const
     {
         return std::tie(
-                   static_cast<const base_type&>(*this), account2faEnabled)
+                   static_cast<const base_type&>(*this), account2faEnabled, httpDigestAuthEnabled)
             == std::tie(
-                static_cast<const base_type&>(rhs), rhs.account2faEnabled);
+                static_cast<const base_type&>(rhs), rhs.account2faEnabled, httpDigestAuthEnabled);
     }
 
     bool operator<(const SystemSharingEx& rhs) const
     {
         return std::tie(
-                   static_cast<const base_type&>(*this), account2faEnabled)
+                   static_cast<const base_type&>(*this), account2faEnabled, httpDigestAuthEnabled)
             < std::tie(
-                static_cast<const base_type&>(rhs), rhs.account2faEnabled);
+                static_cast<const base_type&>(rhs), rhs.account2faEnabled, httpDigestAuthEnabled);
     }
 
     SystemSharingEx() = default;
@@ -454,7 +457,7 @@ struct SystemSharingEx: SystemSharing
 };
 
 NX_REFLECTION_INSTRUMENT(SystemSharingEx, (systemId)(accountId)(accountFullName)(usageFrequency) \
-    (lastLoginTime)(type)(readonly)(hidden)(account2faEnabled))
+    (lastLoginTime)(type)(readonly)(hidden)(account2faEnabled)(httpDigestAuthEnabled))
 
 using SystemSharingExList = std::vector<SystemSharingEx>;
 
