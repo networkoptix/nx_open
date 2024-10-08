@@ -6,6 +6,7 @@ nx_add_test(nx_vms_rules_ut
         nx_vms_rules
     PROJECT VMS
     COMPONENT Client
+    SUITES
     FOLDER common/tests
 )
 
