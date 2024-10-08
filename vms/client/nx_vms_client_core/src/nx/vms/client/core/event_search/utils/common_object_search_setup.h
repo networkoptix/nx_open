@@ -61,8 +61,8 @@ public:
     explicit CommonObjectSearchSetup(QObject* parent = nullptr);
     virtual ~CommonObjectSearchSetup() override;
 
-    SystemContext* context() const;
-    void setContext(SystemContext* value);
+    SystemContext* systemContext() const;
+    void setSystemContext(SystemContext* value);
 
     AbstractSearchListModel* model() const;
     void setModel(AbstractSearchListModel* value);

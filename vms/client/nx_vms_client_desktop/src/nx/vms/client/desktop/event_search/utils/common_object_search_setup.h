@@ -24,9 +24,11 @@ public:
 
     virtual ~CommonObjectSearchSetup() override;
 
-    WindowContext* context() const;
+    WindowContext* windowContext() const;
+    void setWindowContext(WindowContext* value);
 
-    void setContext(WindowContext* value);
+    SystemContext* systemContext() const;
+    void setSystemContext(SystemContext* systemContext);
 
     virtual bool selectCameras(UuidSet& selectedCameras) override;
     virtual QnVirtualCameraResourcePtr currentResource() const override;

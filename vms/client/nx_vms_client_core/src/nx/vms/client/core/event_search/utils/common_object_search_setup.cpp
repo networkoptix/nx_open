@@ -39,8 +39,8 @@ public:
     AbstractSearchListModel* model() const { return m_model; }
     void setModel(AbstractSearchListModel* value);
 
-    SystemContext* context() const;
-    void setContext(SystemContext* value);
+    SystemContext* systemContext() const;
+    void setSystemContext(SystemContext* value);
 
     EventSearch::TimeSelection timeSelection() const { return m_timeSelection; }
     void setTimeSelection(EventSearch::TimeSelection value);
@@ -63,7 +63,7 @@ private:
     QPointer<AbstractSearchListModel> m_model;
     nx::utils::ScopedConnections m_modelConnections;
 
-    SystemContext* m_context = nullptr;
+    SystemContext* m_systemContext = nullptr;
 
     EventSearch::TimeSelection m_timeSelection = EventSearch::TimeSelection::anytime;
     EventSearch::TimeSelection m_previousTimeSelection = EventSearch::TimeSelection::anytime;
@@ -115,14 +115,14 @@ CommonObjectSearchSetup::~CommonObjectSearchSetup()
 {
 }
 
-SystemContext* CommonObjectSearchSetup::context() const
+SystemContext* CommonObjectSearchSetup::systemContext() const
 {
-    return d->context();
+    return d->systemContext();
 }
 
-void CommonObjectSearchSetup::setContext(SystemContext* value)
+void CommonObjectSearchSetup::setSystemContext(SystemContext* value)
 {
-    d->setContext(value);
+    d->setSystemContext(value);
 }
 
 AbstractSearchListModel* CommonObjectSearchSetup::model() const
@@ -180,8 +180,8 @@ UuidList CommonObjectSearchSetup::selectedCamerasIds()
 
 void CommonObjectSearchSetup::setSelectedCamerasIds(const UuidList& values)
 {
-    const auto systemContext = context();
-    if (!NX_ASSERT(systemContext))
+    const auto context = systemContext();
+    if (!NX_ASSERT(context))
         return;
 
     const auto source =
@@ -198,7 +198,7 @@ void CommonObjectSearchSetup::setSelectedCamerasIds(const UuidList& values)
 
     setCameraSelection(core::EventSearch::CameraSelection::custom);
 
-    const auto pool = systemContext->resourcePool();
+    const auto pool = context->resourcePool();
     QnVirtualCameraResourceSet cameras;
     for (const auto& id: values)
     {
@@ -239,8 +239,8 @@ int CommonObjectSearchSetup::cameraCount() const
 
 bool CommonObjectSearchSetup::mixedDevices() const
 {
-    const auto systemContext = context();
-    return systemContext && systemContext->resourcePool()->containsIoModules();
+    const auto context = systemContext();
+    return context && context->resourcePool()->containsIoModules();
 }
 
 void CommonObjectSearchSetup::handleTimelineSelectionChanged(const QnTimePeriod& selection)
@@ -262,8 +262,8 @@ CommonObjectSearchSetup::Private::Private(CommonObjectSearchSetup* q):
     m_dayChangeTimer->callOnTimeout(this,
         [this]()
         {
-            const auto timeWatcher = m_context
-                ? m_context->serverTimeWatcher()
+            const auto timeWatcher = m_systemContext
+                ? m_systemContext->serverTimeWatcher()
                 : nullptr;
 
             if (timeWatcher)
@@ -312,17 +312,17 @@ void CommonObjectSearchSetup::Private::updateRelevantCamerasForMode(
         updateRelevantCameras();
 }
 
-SystemContext* CommonObjectSearchSetup::Private::context() const
+SystemContext* CommonObjectSearchSetup::Private::systemContext() const
 {
-    return m_context;
+    return m_systemContext;
 }
 
-void CommonObjectSearchSetup::Private::setContext(SystemContext* value)
+void CommonObjectSearchSetup::Private::setSystemContext(SystemContext* value)
 {
-    if (m_context == value)
+    if (m_systemContext == value)
         return;
 
-    m_context = value;
+    m_systemContext = value;
     emit q->mixedDevicesChanged();
 
     updateRelevantCameras();
@@ -410,7 +410,7 @@ void CommonObjectSearchSetup::Private::updateRelevantCameras()
 
 bool CommonObjectSearchSetup::Private::chooseCustomCameras()
 {
-    if (!NX_ASSERT(m_context && m_model))
+    if (!NX_ASSERT(m_systemContext && m_model))
         return false;
 
     UuidSet chosenIds;
@@ -426,7 +426,7 @@ bool CommonObjectSearchSetup::Private::chooseCustomCameras()
     }
 
     const auto resources =
-        m_context->resourcePool()->getResourcesByIds<QnVirtualCameraResource>(chosenIds);
+        m_systemContext->resourcePool()->getResourcesByIds<QnVirtualCameraResource>(chosenIds);
     const auto cameras = QSet(resources.cbegin(), resources.cend());
     if (cameras.empty())
         return false; //< Cancel, if user didn't select any camera.

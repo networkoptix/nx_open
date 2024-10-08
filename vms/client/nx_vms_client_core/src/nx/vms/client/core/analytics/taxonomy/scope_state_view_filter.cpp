@@ -55,7 +55,6 @@ bool ScopeStateViewFilter::matches(
     if (!objectType->hasEverBeenSupported())
         return false;
 
-
     const nx::Uuid engineId = d->engine ? nx::Uuid::fromStringSafe(d->engine->id()) : nx::Uuid();
     for (const nx::Uuid& deviceId: d->devices)
     {

@@ -16,7 +16,7 @@ namespace nx::vms::client::desktop {
 
 struct CommonObjectSearchSetup::Private
 {
-    WindowContext* context = nullptr;
+    WindowContext* windowContext = nullptr;
     nx::utils::ScopedConnections contextConnections;
 };
 
@@ -29,32 +29,32 @@ CommonObjectSearchSetup::CommonObjectSearchSetup(SystemContext* systemContext, Q
     base_type(parent),
     d(new Private())
 {
-    base_type::setContext(systemContext);
+    setSystemContext(systemContext);
 }
 
 CommonObjectSearchSetup::~CommonObjectSearchSetup()
 {
 }
 
-WindowContext* CommonObjectSearchSetup::context() const
+WindowContext* CommonObjectSearchSetup::windowContext() const
 {
-    return d->context;
+    return d->windowContext;
 }
 
-void CommonObjectSearchSetup::setContext(WindowContext* value)
+void CommonObjectSearchSetup::setWindowContext(WindowContext* windowContext)
 {
-    if (d->context == value)
+    if (d->windowContext == windowContext)
         return;
 
     d->contextConnections.reset();
-    d->context = value;
-    base_type::setContext(d->context ? d->context->system() : nullptr);
+    d->windowContext = windowContext;
+    setSystemContext(d->windowContext ? d->windowContext->system() : nullptr);
     emit contextChanged();
 
-    if (!d->context)
+    if (!d->windowContext)
         return;
 
-    const auto navigator = d->context->navigator();
+    const auto navigator = d->windowContext->navigator();
     d->contextConnections << connect(
         navigator,
         &QnWorkbenchNavigator::timeSelectionChanged,
@@ -68,39 +68,49 @@ void CommonObjectSearchSetup::setContext(WindowContext* value)
     };
 
     d->contextConnections
-        << connect(d->context->navigator(), &QnWorkbenchNavigator::currentResourceChanged,
+        << connect(d->windowContext->navigator(), &QnWorkbenchNavigator::currentResourceChanged,
                this, camerasUpdaterFor(core::EventSearch::CameraSelection::current));
 
     d->contextConnections <<
-        connect(d->context->workbench(), &Workbench::currentLayoutChanged,
+        connect(d->windowContext->workbench(), &Workbench::currentLayoutChanged,
             this, camerasUpdaterFor(core::EventSearch::CameraSelection::layout));
 
     d->contextConnections <<
-        connect(d->context->workbench(), &Workbench::currentLayoutItemsChanged,
+        connect(d->windowContext->workbench(), &Workbench::currentLayoutItemsChanged,
             this, camerasUpdaterFor(core::EventSearch::CameraSelection::layout));
+}
+
+SystemContext* CommonObjectSearchSetup::systemContext() const
+{
+    return base_type::systemContext()->as<SystemContext>();
+}
+
+void CommonObjectSearchSetup::setSystemContext(SystemContext* systemContext)
+{
+    base_type::setSystemContext(systemContext);
 }
 
 bool CommonObjectSearchSetup::selectCameras(UuidSet& selectedCameras)
 {
-    return d->context && CameraSelectionDialog::selectCameras<CameraSelectionDialog::DummyPolicy>(
-        d->context->system(), selectedCameras, d->context->mainWindowWidget());
+    return d->windowContext && CameraSelectionDialog::selectCameras<CameraSelectionDialog::DummyPolicy>(
+        systemContext(), selectedCameras, d->windowContext->mainWindowWidget());
 }
 
 QnVirtualCameraResourcePtr CommonObjectSearchSetup::currentResource() const
 {
-    if (!d->context)
+    if (!d->windowContext)
         return {};
 
-    return d->context->navigator()->currentResource().dynamicCast<QnVirtualCameraResource>();
+    return d->windowContext->navigator()->currentResource().dynamicCast<QnVirtualCameraResource>();
 }
 
 QnVirtualCameraResourceSet CommonObjectSearchSetup::currentLayoutCameras() const
 {
-    if (!d->context)
+    if (!d->windowContext)
         return {};
 
     QnVirtualCameraResourceSet cameras;
-    if (auto workbenchLayout = d->context->workbench()->currentLayout())
+    if (auto workbenchLayout = d->windowContext->workbench()->currentLayout())
     {
         for (const auto& item: workbenchLayout->items())
         {
@@ -113,8 +123,8 @@ QnVirtualCameraResourceSet CommonObjectSearchSetup::currentLayoutCameras() const
 
 void CommonObjectSearchSetup::clearTimelineSelection() const
 {
-    if (d->context)
-        d->context->navigator()->clearTimelineSelection();
+    if (d->windowContext)
+        d->windowContext->navigator()->clearTimelineSelection();
 }
 
 } // namespace nx::vms::client::desktop

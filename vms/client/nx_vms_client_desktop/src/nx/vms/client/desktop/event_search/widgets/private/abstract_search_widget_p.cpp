@@ -184,7 +184,7 @@ AbstractSearchWidget::Private::Private(
     NX_CRITICAL(model, "Model must be specified.");
     m_mainModel->setParent(nullptr); //< Stored as a scoped pointer.
 
-    m_commonSetup->setContext(windowContext());
+    m_commonSetup->setWindowContext(windowContext());
     m_commonSetup->setModel(m_mainModel.get());
 
     ui->setupUi(q);

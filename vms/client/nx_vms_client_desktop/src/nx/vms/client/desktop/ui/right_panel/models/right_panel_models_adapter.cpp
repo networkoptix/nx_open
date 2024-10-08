@@ -884,7 +884,7 @@ void RightPanelModelsAdapter::Private::setContext(WindowContext* value)
     m_contextConnections.reset();
 
     m_context = value;
-    m_commonSetup->setContext(m_context);
+    m_commonSetup->setWindowContext(m_context);
 
     if (m_context)
     {

@@ -29,7 +29,7 @@ CommonObjectSearchSetup::CommonObjectSearchSetup(
     base_type(parent),
     d(new Private())
 {
-    setContext(context);
+    setSystemContext(context);
 }
 
 CommonObjectSearchSetup::~CommonObjectSearchSetup()
