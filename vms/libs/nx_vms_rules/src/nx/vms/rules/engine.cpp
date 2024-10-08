@@ -100,7 +100,7 @@ Engine::Engine(
 
     if (m_router) //< Router may absent in test scenarios.
     {
-        connect(m_router.get(), &Router::eventReceived, this, &Engine::onEventReceved);
+        connect(m_router.get(), &Router::eventReceived, this, &Engine::onEventReceived);
         connect(m_router.get(), &Router::actionReceived, this, &Engine::processAcceptedAction);
     }
 
@@ -925,7 +925,7 @@ size_t Engine::processAnalyticsEvents(const std::vector<EventPtr>& events)
     return matchedRules;
 }
 
-void Engine::onEventReceved(const EventPtr& event, const std::vector<ConstRulePtr>& triggeredRules)
+void Engine::onEventReceived(const EventPtr& event, const std::vector<ConstRulePtr>& triggeredRules)
 {
     for (const auto& rule: triggeredRules)
         processAcceptedEvent(event, rule);
