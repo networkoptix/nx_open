@@ -1370,7 +1370,7 @@
     </message>
     <message>
       <source>File write error.</source>
-      <translation type="unfinished">File write error.</translation>
+      <translation>Dosya yazma hatası.</translation>
     </message>
   </context>
   <context>

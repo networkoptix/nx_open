@@ -1007,7 +1007,7 @@
       <source>%n more</source>
       <comment>%n is the number of remaining groups</comment>
       <translation type="unfinished">
-        <numerusform>%n more</numerusform>
+        <numerusform>%n daha fazla</numerusform>
         <numerusform>%n more</numerusform>
       </translation>
     </message>
