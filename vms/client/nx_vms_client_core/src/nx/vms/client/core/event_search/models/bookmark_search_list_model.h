@@ -22,10 +22,7 @@ public:
         QObject* parent = nullptr);
 
     explicit BookmarkSearchListModel(SystemContext* systemContext, QObject* parent = nullptr);
-
     virtual ~BookmarkSearchListModel() override;
-
-    virtual void setSystemContext(SystemContext* systemContext) override;
 
     virtual TextFilterSetup* textFilter() const override;
 
@@ -44,6 +41,9 @@ protected:
         const FetchCompletionHandler& completionHandler) override;
 
     virtual void clearData() override;
+
+private:
+    virtual void setSystemContext(SystemContext* systemContext) override;
 
 private:
     struct Private;

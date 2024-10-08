@@ -262,25 +262,6 @@ BookmarkSearchListModel::~BookmarkSearchListModel()
 {
 }
 
-void BookmarkSearchListModel::setSystemContext(SystemContext* systemContext)
-{
-    const auto bookmarksManager = systemContext->cameraBookmarksManager();
-
-    d->bookmarkAddedConnection.reset(
-        connect(bookmarksManager, &QnCameraBookmarksManager::bookmarkAdded, this,
-            [this](const auto& bookmark) { d->addBookmark(bookmark); }));
-    d->bookmarkUpdatedConnection.reset(
-        connect(bookmarksManager, &QnCameraBookmarksManager::bookmarkUpdated, this,
-            [this](const auto& bookmark) { d->updateBookmark(bookmark); }));
-    d->bookmarkRemovedConnection.reset(
-        connect(bookmarksManager, &QnCameraBookmarksManager::bookmarkRemoved, this,
-            [this](const auto& id) { d->removeBookmark(id); }));
-
-    // We don't have to request bookmarks here, due to systemContext is set up only in constructor.
-
-    base_type::setSystemContext(systemContext);
-}
-
 TextFilterSetup* BookmarkSearchListModel::textFilter() const
 {
     return d->textFilter.get();
@@ -389,6 +370,25 @@ void BookmarkSearchListModel::clearData()
 {
     ScopedReset reset(this, !d->bookmarks.empty());
     d->bookmarks.clear();
+}
+
+void BookmarkSearchListModel::setSystemContext(SystemContext* systemContext)
+{
+    const auto bookmarksManager = systemContext->cameraBookmarksManager();
+
+    d->bookmarkAddedConnection.reset(
+        connect(bookmarksManager, &QnCameraBookmarksManager::bookmarkAdded, this,
+            [this](const auto& bookmark) { d->addBookmark(bookmark); }));
+    d->bookmarkUpdatedConnection.reset(
+        connect(bookmarksManager, &QnCameraBookmarksManager::bookmarkUpdated, this,
+            [this](const auto& bookmark) { d->updateBookmark(bookmark); }));
+    d->bookmarkRemovedConnection.reset(
+        connect(bookmarksManager, &QnCameraBookmarksManager::bookmarkRemoved, this,
+            [this](const auto& id) { d->removeBookmark(id); }));
+
+    // We don't have to request bookmarks here, due to systemContext is set up only in constructor.
+
+    base_type::setSystemContext(systemContext);
 }
 
 } // namespace nx::vms::client::core

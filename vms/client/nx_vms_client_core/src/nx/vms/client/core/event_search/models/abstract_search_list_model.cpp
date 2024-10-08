@@ -122,14 +122,15 @@ AbstractSearchListModel::~AbstractSearchListModel()
 
 void AbstractSearchListModel::setSystemContext(SystemContext* systemContext)
 {
-    // This should be done here, because otherwise systemContext is null on call to onOnlineChanged
+    d->userWatcherChangedConnection.reset();
+
+    if (NX_ASSERT(systemContext))
+        d->cameraSet.setResourcePool(systemContext->resourcePool());
+
     base_type::setSystemContext(systemContext);
 
     if (NX_ASSERT(systemContext))
     {
-        if (!NX_ASSERT(systemContext->messageProcessor() && systemContext->resourcePool()))
-            return;
-
         const auto watcher = systemContext->userWatcher();
 
         d->userWatcherChangedConnection.reset(
@@ -140,8 +141,6 @@ void AbstractSearchListModel::setSystemContext(SystemContext* systemContext)
                 }));
 
         onOnlineChanged(!watcher->user().isNull());
-
-        d->cameraSet.setResourcePool(systemContext->resourcePool());
     }
 }
 

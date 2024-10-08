@@ -62,9 +62,6 @@ QVariant EventListModel::data(const QModelIndex& index, int role) const
         case core::TimestampRole:
             return QVariant::fromValue(event.timestamp);
 
-        case core::TimestampTextRole:
-            return  core::EventSearchUtils::timeFromNowText(event.timestamp, systemContext());
-
         case core::PreviewTimeRole:
             return QVariant::fromValue(event.previewTime);
 

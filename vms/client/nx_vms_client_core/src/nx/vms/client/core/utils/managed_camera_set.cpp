@@ -22,6 +22,8 @@ ManagedCameraSet::~ManagedCameraSet()
 
 void ManagedCameraSet::setResourcePool(QnResourcePool* resourcePool)
 {
+    NX_ASSERT(resourcePool);
+
     const bool camerasSetIsChanged = !m_cameras.empty();
 
     if (camerasSetIsChanged)
