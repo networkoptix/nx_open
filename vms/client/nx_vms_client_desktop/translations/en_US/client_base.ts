@@ -1033,20 +1033,20 @@
     </message>
     <message>
         <source>User Manual...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message numerus="yes">
         <source>Mute Items</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Mute Item</numerusform>
+            <numerusform>Mute Items</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Unmute Items</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Unmute Item</numerusform>
+            <numerusform>Unmute Items</numerusform>
         </translation>
     </message>
 </context>
@@ -1571,19 +1571,19 @@ License Key: %2</source>
     </message>
     <message>
         <source>Users are receiving emails</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Users will start receiving emails right after you apply settings</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Unable to test SMTP server</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Additional info required</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2955,7 +2955,7 @@ to %1</source>
     </message>
     <message>
         <source>System will be accessible only through local network.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -3173,15 +3173,15 @@ to %1</source>
     <name>QnCustomFileDialog</name>
     <message>
         <source>Pictures</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Video</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>All Files</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -4237,7 +4237,7 @@ to %1</source>
     </message>
     <message>
         <source>Mute</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -5229,11 +5229,11 @@ to %1</source>
     </message>
     <message>
         <source>RESTRICTED</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Authorize</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -6354,7 +6354,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
         <source>Screen is locked and cannot be changed</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -8216,7 +8216,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
         <source>None of your Servers has connection to %1.</source>
         <comment>%1 is the short cloud name (like Cloud)</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -8299,7 +8299,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
         <source>Recording will not be enabled on some cameras.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -11495,7 +11495,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
         <source>Cannot add resources from other Systems.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>

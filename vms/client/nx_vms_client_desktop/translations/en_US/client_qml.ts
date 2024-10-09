@@ -198,7 +198,7 @@
     <name>Buttons</name>
     <message>
         <source>Press each button several times and write the names of these buttons in the table below.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -495,7 +495,7 @@
     </message>
     <message>
         <source>Auto calibration failed</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -551,11 +551,11 @@
     <name>Initial</name>
     <message>
         <source>Select the joystick.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>No devices connected.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -589,15 +589,15 @@
     <name>JoystickInvestigationWizard</name>
     <message>
         <source>Save</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Previous</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Next</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1065,15 +1065,15 @@ to activate PTZ</source>
     <name>SavingResults</name>
     <message>
         <source>Choose file to save</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>JSON files (*.json)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>File to save the results:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1258,7 +1258,7 @@ to activate PTZ</source>
     <name>StringEditor</name>
     <message>
         <source>Min 3 characters</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1389,21 +1389,21 @@ to activate PTZ</source>
     <name>XAxis</name>
     <message>
         <source>Move the joystick left and right several times.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>YAxis</name>
     <message>
         <source>Move the joystick up and down several times.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>ZAxis</name>
     <message>
         <source>Rotate the joystick clockwise and counterclockwise several times.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 </TS>

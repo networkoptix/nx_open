@@ -683,11 +683,11 @@
     </message>
     <message>
         <source>Do not send Stop PTZ command</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Do not record audio</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -965,7 +965,7 @@
     <name>CloudManagementWidget</name>
     <message>
         <source>This system is connected to</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2896,7 +2896,7 @@
     </message>
     <message>
         <source>Server Location ID:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
