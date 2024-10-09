@@ -15,14 +15,14 @@
 
 #include "handler.h"
 
-namespace ec2 {
+namespace nx::network::rest {
 
 class NX_NETWORK_REST_API SubscriptionHandler
 {
 public:
     using AddMonitor = nx::utils::MoveOnlyFunc<nx::utils::Guard()>;
-    using NotifyType = nx::network::rest::Handler::NotifyType;
-    using SubscriptionCallback = nx::network::rest::Handler::SubscriptionCallback;
+    using NotifyType = Handler::NotifyType;
+    using SubscriptionCallback = Handler::SubscriptionCallback;
 
     SubscriptionHandler(AddMonitor addMonitor): m_addMonitor(std::move(addMonitor)) {}
     virtual ~SubscriptionHandler() = default;
@@ -46,4 +46,4 @@ private:
     AddMonitor m_addMonitor;
 };
 
-} // namespace ec2
+} // namespace nx::network::rest

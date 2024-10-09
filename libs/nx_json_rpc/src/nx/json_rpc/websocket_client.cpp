@@ -119,7 +119,7 @@ void WebSocketClient::onUpgrade()
             nx::network::websocket::Role::client,
             nx::network::websocket::FrameType::text,
             nx::network::websocket::CompressionType::perMessageDeflate),
-        [this](auto connection)
+        [this](auto error, auto connection)
         {
             if (m_connection)
             {
@@ -128,6 +128,8 @@ void WebSocketClient::onUpgrade()
                 auto connectionPtr = m_connection.get();
                 connectionPtr->pleaseStop([connection = std::move(m_connection)]() {});
             }
+            if (m_onDone)
+                m_onDone(error, connection);
         });
     if (m_handler)
     {

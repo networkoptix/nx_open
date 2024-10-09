@@ -26,7 +26,7 @@ public:
     using ResponseHandler = nx::utils::MoveOnlyFunc<void(Response)>;
     using RequestHandler = nx::utils::MoveOnlyFunc<
         void(Request, ResponseHandler, WebSocketConnection*)>;
-    using OnDone = nx::utils::MoveOnlyFunc<void(WebSocketConnection*)>;
+    using OnDone = nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, WebSocketConnection*)>;
 
     WebSocketConnection(
         std::unique_ptr<nx::network::websocket::WebSocket> webSocket, OnDone onDone);

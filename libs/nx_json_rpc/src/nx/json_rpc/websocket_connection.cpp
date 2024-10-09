@@ -95,7 +95,8 @@ void WebSocketConnection::start()
 
 WebSocketConnection::~WebSocketConnection()
 {
-    m_onDone(this);
+    if (m_onDone)
+        m_onDone(SystemError::noError, this);
 }
 
 void WebSocketConnection::bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)
@@ -151,7 +152,7 @@ void WebSocketConnection::readNextMessage()
             {
                 NX_DEBUG(this, "Failed to read next message with error code %1", errorCode);
                 m_outgoingProcessor->clear(errorCode);
-                m_onDone(this);
+                nx::utils::moveAndCallOptional(m_onDone, errorCode, this);
                 return;
             }
 
@@ -214,7 +215,7 @@ void WebSocketConnection::send(QByteArray data)
             {
                 NX_DEBUG(this, "Failed to send message with error code %1", errorCode);
                 m_outgoingProcessor->clear(errorCode);
-                m_onDone(this);
+                nx::utils::moveAndCallOptional(m_onDone, errorCode, this);
             }
         });
 }

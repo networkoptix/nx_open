@@ -115,6 +115,19 @@ public:
 
     virtual QString idParamName() const { return {}; }
     virtual QString subscriptionId(const Request&) { return {}; }
+
+    virtual bool proxySubscribe(
+        const Request&, nx::utils::MoveOnlyFunc<void(nx::json_rpc::Response)>* /*handler*/)
+    {
+        return false;
+    }
+
+    virtual bool proxyUnsubscribe(
+        const Request&, nx::utils::MoveOnlyFunc<void(nx::json_rpc::Response)>* /*handler*/)
+    {
+        return false;
+    }
+
     virtual void audit(const Request& request, const Response& response);
     virtual audit::Record prepareAuditRecord(const Request& request) const;
     static bool isAuditableRequest(const Request& request);

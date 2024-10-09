@@ -23,6 +23,7 @@ public:
     using ResponseHandler = nx::utils::MoveOnlyFunc<void(Response)>;
     using RequestHandler =
         nx::utils::MoveOnlyFunc<void(Request, ResponseHandler, WebSocketConnection*)>;
+    using OnDone = nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, WebSocketConnection*)>;
 
     WebSocketClient(
         nx::utils::Url url,
@@ -40,6 +41,7 @@ public:
     void setHandler(RequestHandler handler);
     void connectAsync(nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler);
     void sendAsync(Request request, ResponseHandler handler);
+    void setOnDone(OnDone onDone) { m_onDone = std::move(onDone); }
 
 private:
     virtual void stopWhileInAioThread() override;
@@ -51,6 +53,7 @@ private:
     RequestHandler m_handler;
     std::unique_ptr<nx::network::http::AsyncClient> m_handshakeClient;
     std::shared_ptr<nx::json_rpc::WebSocketConnection> m_connection;
+    OnDone m_onDone;
 };
 
 } // namespace nx::json_rpc
