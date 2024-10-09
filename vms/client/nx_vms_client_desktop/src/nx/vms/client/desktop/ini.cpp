@@ -14,7 +14,7 @@ Ini& ini()
 
 bool Ini::isAutoCloudHostDeductionMode() const
 {
-    return std::string(cloudHost) == "auto";
+    return strcmp(cloudHost, "auto") == 0;
 }
 
 } // namespace nx::vms::client::desktop
