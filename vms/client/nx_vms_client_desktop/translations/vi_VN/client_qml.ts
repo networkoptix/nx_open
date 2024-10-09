@@ -998,6 +998,13 @@
       <source>No groups</source>
       <translation>Không có nhóm</translation>
     </message>
+    <message numerus="yes">
+      <source>%n more</source>
+      <comment>%n is the number of remaining groups</comment>
+      <translation>
+        <numerusform>%n thêm</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>HintItem</name>

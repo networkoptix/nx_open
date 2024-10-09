@@ -1104,9 +1104,19 @@
       <source>Convert to Shared Layout</source>
       <translation>Konvertera till delad layout</translation>
     </message>
-    <message>
-      <source>Sound Playback...</source>
-      <translation>Ljuduppspelning...</translation>
+    <message numerus="yes">
+      <source>Mute Items</source>
+      <translation>
+        <numerusform>Tysta objekt</numerusform>
+        <numerusform>Tysta objekt</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Unmute Items</source>
+      <translation>
+        <numerusform>Slå på ljudet för objekt</numerusform>
+        <numerusform>Slå på ljudet för objekt</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -13130,17 +13140,6 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     <message>
       <source>Start Showreel</source>
       <translation>Starta Showreel</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::action::SoundPlaybackActionFactory</name>
-    <message>
-      <source>Enabled</source>
-      <translation>Aktiverad</translation>
-    </message>
-    <message>
-      <source>Disabled</source>
-      <translation>Avaktiverad</translation>
     </message>
   </context>
   <context>

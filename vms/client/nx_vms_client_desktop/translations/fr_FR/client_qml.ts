@@ -1004,6 +1004,14 @@
       <source>No groups</source>
       <translation>Aucun groupe</translation>
     </message>
+    <message numerus="yes">
+      <source>%n more</source>
+      <comment>%n is the number of remaining groups</comment>
+      <translation type="unfinished">
+        <numerusform>%n more</numerusform>
+        <numerusform>%n more</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>HintItem</name>

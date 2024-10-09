@@ -1004,6 +1004,14 @@
       <source>No groups</source>
       <translation>Grup yok</translation>
     </message>
+    <message numerus="yes">
+      <source>%n more</source>
+      <comment>%n is the number of remaining groups</comment>
+      <translation type="unfinished">
+        <numerusform>%n daha fazla</numerusform>
+        <numerusform>%n more</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>HintItem</name>

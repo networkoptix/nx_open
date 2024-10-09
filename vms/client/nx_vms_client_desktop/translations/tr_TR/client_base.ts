@@ -1104,9 +1104,19 @@
       <source>Convert to Shared Layout</source>
       <translation>Paylaşılan Ekran Düzenine Dönüştür</translation>
     </message>
-    <message>
-      <source>Sound Playback...</source>
-      <translation>Ses Oynatma...</translation>
+    <message numerus="yes">
+      <source>Mute Items</source>
+      <translation type="unfinished">
+        <numerusform>Öğeleri Sessize Al</numerusform>
+        <numerusform>Mute Items</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Unmute Items</source>
+      <translation type="unfinished">
+        <numerusform>Öğelerin sesini aç</numerusform>
+        <numerusform>Unmute Items</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -13124,17 +13134,6 @@ Bu web sayfasını açmamanızı öneririz. Riskleri anlıyorsanız web sayfası
     <message>
       <source>Start Showreel</source>
       <translation>Showreel'i başlat</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::action::SoundPlaybackActionFactory</name>
-    <message>
-      <source>Enabled</source>
-      <translation>Etkinleştir</translation>
-    </message>
-    <message>
-      <source>Disabled</source>
-      <translation>Devre Dışı</translation>
     </message>
   </context>
   <context>

@@ -1114,9 +1114,23 @@
       <source>Convert to Shared Layout</source>
       <translation type="unfinished">Convert to Shared Layout</translation>
     </message>
-    <message>
-      <source>Sound Playback...</source>
-      <translation type="unfinished">Sound Playback...</translation>
+    <message numerus="yes">
+      <source>Mute Items</source>
+      <translation type="unfinished">
+        <numerusform>Отключить звук</numerusform>
+        <numerusform>Mute Items</numerusform>
+        <numerusform>Mute Items</numerusform>
+        <numerusform>Mute Items</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Unmute Items</source>
+      <translation type="unfinished">
+        <numerusform>Включить звук</numerusform>
+        <numerusform>Unmute Items</numerusform>
+        <numerusform>Unmute Items</numerusform>
+        <numerusform>Unmute Items</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -1677,7 +1691,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Active</source>
-      <translation type="unfinished">Active</translation>
+      <translation>Активный</translation>
     </message>
     <message>
       <source>Not configured</source>
@@ -4220,7 +4234,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Mute</source>
-      <translation type="unfinished">Mute</translation>
+      <translation>Без звука</translation>
     </message>
   </context>
   <context>
@@ -11270,7 +11284,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     <name>nx::vms::client::desktop::SaasInfoWidget</name>
     <message>
       <source>Active</source>
-      <translation type="unfinished">Active</translation>
+      <translation>Активный</translation>
     </message>
     <message>
       <source>Suspended</source>
@@ -13506,17 +13520,6 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Start Showreel</source>
       <translation>Запустить прокрутки</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::action::SoundPlaybackActionFactory</name>
-    <message>
-      <source>Enabled</source>
-      <translation>Активирован</translation>
-    </message>
-    <message>
-      <source>Disabled</source>
-      <translation>Отключено</translation>
     </message>
   </context>
   <context>

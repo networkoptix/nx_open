@@ -1104,9 +1104,19 @@
       <source>Convert to Shared Layout</source>
       <translation type="unfinished">Convert to Shared Layout</translation>
     </message>
-    <message>
-      <source>Sound Playback...</source>
-      <translation type="unfinished">Sound Playback...</translation>
+    <message numerus="yes">
+      <source>Mute Items</source>
+      <translation type="unfinished">
+        <numerusform>Mute Items</numerusform>
+        <numerusform>Mute Items</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Unmute Items</source>
+      <translation type="unfinished">
+        <numerusform>Unmute Items</numerusform>
+        <numerusform>Unmute Items</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -4120,7 +4130,7 @@ Chave de licença: %2</translation>
     </message>
     <message>
       <source>Mute</source>
-      <translation type="unfinished">Mute</translation>
+      <translation>Mudo</translation>
     </message>
   </context>
   <context>
@@ -13130,17 +13140,6 @@ Recomendamos que você não abra esta página da ‘web’. Se você entender os
     <message>
       <source>Start Showreel</source>
       <translation>Iniciar Showreel</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::action::SoundPlaybackActionFactory</name>
-    <message>
-      <source>Enabled</source>
-      <translation>Habilitado</translation>
-    </message>
-    <message>
-      <source>Disabled</source>
-      <translation>Desabilitado</translation>
     </message>
   </context>
   <context>
