@@ -9,6 +9,7 @@
 #include <QtWidgets/QPushButton>
 
 #include <client_core/client_core_module.h>
+#include <nx/utils/async_handler_executor.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/api/data/module_information.h>
@@ -115,28 +116,26 @@ int CompatibilityVersionInstallationDialog::exec()
     const auto remoteConnectionFactory = qnClientCoreModule->networkModule()->connectionFactory();
     m_private->connectionProcess = remoteConnectionFactory->connect(
         m_private->logonData,
-        nx::utils::guarded(this,
+        nx::utils::AsyncHandlerExecutor(this).bind(
             [this](core::RemoteConnectionFactory::ConnectionOrError result)
             {
                 if (auto error = std::get_if<core::RemoteConnectionError>(&result);
                     error && error->code != core::RemoteConnectionErrorCode::factoryServer)
                 {
-                    QnMessageBox::critical(
-                        this,
-                        tr("Cannot connect to the System"),
-                        core::shortErrorDescription(error->code));
+                    NX_WARNING(this, "Connect to the Site failed: %1, attempt to download update"
+                        " from the Internet", error->code);
 
-                    m_installationResult = InstallResult::failedDownload;
-                    done(QDialogButtonBox::StandardButton::Ok);
-                    return;
+                    m_private->connectionProcess.reset();
+                }
+                else
+                {
+                    NX_VERBOSE(this, "Connected to the Site %1", m_private->logonData.address);
                 }
 
-                NX_VERBOSE(this, "Connected to the System %1", m_private->logonData.address);
-                QMetaObject::invokeMethod(this,
-                    &CompatibilityVersionInstallationDialog::startUpdate,
-                    Qt::QueuedConnection);
+                startUpdate();
             }),
         appContext()->currentSystemContext());
+
     return base_type::exec();
 }
 
@@ -315,9 +314,12 @@ void CompatibilityVersionInstallationDialog::atUpdateCurrentState()
 
 void CompatibilityVersionInstallationDialog::startUpdate()
 {
-    m_private->clientUpdateTool->setServerUrl(
-        m_private->connectionProcess->context->logonData,
-        m_private->connectionProcess->context->certificateCache.get());
+    if (m_private->connectionProcess)
+    {
+        m_private->clientUpdateTool->setServerUrl(
+            m_private->connectionProcess->context->logonData,
+            m_private->connectionProcess->context->certificateCache.get());
+    }
 
     connect(m_private->clientUpdateTool.get(), &ClientUpdateTool::updateStateChanged,
         this, &CompatibilityVersionInstallationDialog::atUpdateStateChanged);
