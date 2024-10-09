@@ -21,7 +21,7 @@ static std::tuple<nx::network::http::Method, QString> methodAndPath(const std::s
             std::make_pair(std::string_view(".update"), nx::network::http::Method::patch),
             std::make_pair(std::string_view(".delete"), nx::network::http::Method::delete_),
             std::make_pair(std::string_view(".subscribe"), nx::network::http::Method::get),
-            std::make_pair(std::string_view(".unsubscribe"), nx::network::http::Method::delete_),
+            std::make_pair(std::string_view(".unsubscribe"), nx::network::http::Method::get),
         };
 
     QString path;

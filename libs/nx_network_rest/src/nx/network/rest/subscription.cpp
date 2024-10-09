@@ -4,7 +4,7 @@
 
 #include <nx/utils/log/log_main.h>
 
-namespace ec2 {
+namespace nx::network::rest {
 
 nx::utils::Guard SubscriptionHandler::addSubscription(
     const QString& id, SubscriptionCallback callback)
@@ -60,4 +60,4 @@ void SubscriptionHandler::removeSubscription(
     }
 }
 
-} // namespace ec2
+} // namespace nx::network::rest
