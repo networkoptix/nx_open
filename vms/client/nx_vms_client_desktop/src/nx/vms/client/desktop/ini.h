@@ -168,11 +168,11 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
     NX_INI_FLAG(false, simplifySceneItemMetric,
         "[Dev] Use simpler metric for the 'closest free slot' item location on the scene.");
 
-    NX_INI_STRING("legacyopengl", graphicsApi,
+    NX_INI_STRING("autoselect", graphicsApi,
         "[Dev] Select graphics API.\n"
         "Possible values:\n"
-        " * \"legacyopengl\" - legacy OpenGL code, default\n"
-        " * \"autoselect\" - selection depends on the OS\n"
+        " * \"legacyopengl\" - legacy OpenGL code\n"
+        " * \"autoselect\" - selection depends on the OS, default\n"
         " * \"opengl\" - OpenGL or OpenGL ES\n"
         " * \"metal\" - Metal (macOS only)\n"
         " * \"direct3d11\" - Direct3D 11 (Windows only)\n"
