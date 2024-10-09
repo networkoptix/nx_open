@@ -1155,6 +1155,20 @@
         <source>Convert to Shared Layout</source>
         <translation></translation>
     </message>
+    <message numerus="yes">
+        <source>Mute Items</source>
+        <translation>
+            <numerusform>Mute Item</numerusform>
+            <numerusform>Mute Items</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Unmute Items</source>
+        <translation>
+            <numerusform>Unmute Item</numerusform>
+            <numerusform>Unmute Items</numerusform>
+        </translation>
+    </message>
     <message>
         <source>Connect to Site</source>
         <translation type="unfinished"></translation>
@@ -1381,8 +1395,8 @@
     </message>
     <message numerus="yes">
         <source>Delete %n groups?</source>
-        <translation>
-            <numerusform>Delete group?</numerusform>
+        <translation type="unfinished">
+            <numerusform>Delete %n group?</numerusform>
             <numerusform>Delete %n groups?</numerusform>
         </translation>
     </message>
