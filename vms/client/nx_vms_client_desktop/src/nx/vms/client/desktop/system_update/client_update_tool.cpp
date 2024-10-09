@@ -225,7 +225,7 @@ void ClientUpdateTool::verifyUpdateFile()
                     continue;
                 }
 
-                if (signature)
+                if (!signature->isEmpty())
                 {
                     result = common::FileSignature::verifyZipFile(m_updateFile, key, *signature);
                 }

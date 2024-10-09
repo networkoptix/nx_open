@@ -15,8 +15,7 @@ namespace nx::vms::client::core { struct LogonData; }
 namespace nx::vms::client::desktop { struct UpdateContents; }
 
 // TODO: #dklychkov rename class in 2.4
-class CompatibilityVersionInstallationDialog:
-    public QnDialog
+class CompatibilityVersionInstallationDialog: public QnDialog
 {
     Q_OBJECT
     using base_type = QnDialog;
@@ -48,12 +47,12 @@ public:
     virtual int exec() override;
     QString errorString() const;
 
-protected:
+private:
+    void connectToSite();
     void startUpdate();
     void processUpdateContents(const nx::vms::client::desktop::UpdateContents& contents);
     void setMessage(const QString& message);
 
-protected:
     // Event handlers
     void atUpdateCurrentState();
     void atUpdateStateChanged(nx::vms::client::desktop::ClientUpdateTool::State state,
@@ -61,7 +60,7 @@ protected:
         const nx::vms::client::desktop::ClientUpdateTool::Error& error);
     void atAutoRestartChanged(int state);
 
-protected:
+private:
     QScopedPointer<Ui::QnCompatibilityVersionInstallationDialog> ui;
 
     nx::utils::SoftwareVersion m_versionToInstall;
@@ -73,7 +72,6 @@ protected:
     const nx::utils::SoftwareVersion m_engineVersion;
     QString m_errorMessage;
 
-private:
     struct Private;
     std::unique_ptr<Private> m_private;
 };

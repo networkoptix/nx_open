@@ -243,7 +243,6 @@ bool QnConnectionDiagnosticsHelper::downloadAndRunCompatibleVersion(
     const QString authString = QnStartupParameters::createAuthenticationString(
         logonData, moduleInformation.version);
 
-    // Version is installed, trying to run.
     while (true)
     {
         if (!isInstalled)
@@ -259,6 +258,7 @@ bool QnConnectionDiagnosticsHelper::downloadAndRunCompatibleVersion(
         if (needToConfirmRestart && !confirmRestart(moduleInformation, engineVersion, parentWidget))
             return false;
 
+        // Version is installed, trying to run.
         switch (restartClient(moduleInformation.version, authString))
         {
             case ResultType::ok:
