@@ -68,7 +68,7 @@
     </message>
     <message>
         <source>Proxy LDAP requests via server</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1002,9 +1002,9 @@
     <message numerus="yes">
         <source>%n more</source>
         <comment>%n is the number of remaining groups</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n more</numerusform>
+            <numerusform>%n more</numerusform>
         </translation>
     </message>
 </context>
