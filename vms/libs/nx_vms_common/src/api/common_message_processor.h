@@ -37,6 +37,7 @@ public:
     virtual void init(const ec2::AbstractECConnectionPtr& connection);
 
     ec2::AbstractECConnectionPtr connection() const;
+    nx::Uuid currentPeerId() const;
 
     /**
      * @param resource resource to update

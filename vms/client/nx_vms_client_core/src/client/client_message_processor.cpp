@@ -55,9 +55,7 @@ void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
 
     if (connection)
     {
-        auto info = connection->moduleInformation();
-        const auto serverId = info.id;
-        NX_DEBUG(this, "Connection established to %1", serverId);
+        NX_DEBUG(this, "Connection established to %1", connection->moduleInformation().id);
     }
     else if (m_connected)
     {
@@ -87,8 +85,7 @@ void QnClientMessageProcessor::holdConnection(HoldConnectionPolicy policy)
 
     m_policy = policy;
 
-    if (m_policy == HoldConnectionPolicy::none && !m_connected
-        && connection()->moduleInformation().id.isNull())
+    if (m_policy == HoldConnectionPolicy::none && !m_connected && currentPeerId().isNull())
     {
         NX_DEBUG(this, "Unholding connection while disconnected, connection closed");
         emit connectionClosed();
@@ -147,24 +144,22 @@ void QnClientMessageProcessor::handleRemotePeerFound(nx::Uuid peer, nx::vms::api
     if (m_connected)
         return;
 
-    if (!NX_ASSERT(connection()))
-        return;
+    const auto currentPeer = currentPeerId();
 
-    if (connection()->moduleInformation().id.isNull())
+    if (currentPeer.isNull())
     {
-        NX_WARNING(this, "Remote peer found while disconnected");
+        NX_WARNING(this, "Remote peer %1 found while disconnected", peer);
         return;
     }
 
-    if (peer != connection()->moduleInformation().id)
+    if (peer != currentPeer)
         return;
 
-    NX_DEBUG(this, lit("peer found, state -> Connected"));
     m_status.setState(QnConnectionState::Connected);
     m_connected = true;
     holdConnection(HoldConnectionPolicy::none);
 
-    NX_DEBUG(this, "Remote peer found, connection opened");
+    NX_DEBUG(this, "Remote peer found: %1, connection opened, state -> Connected", peer);
     emit connectionOpened();
 }
 
@@ -178,9 +173,7 @@ void QnClientMessageProcessor::handleRemotePeerLost(nx::Uuid peer, nx::vms::api:
     if (!m_connected)
         return;
 
-    const nx::Uuid currentPeer = connection()
-        ? connection()->moduleInformation().id
-        : nx::Uuid();
+    const auto currentPeer = currentPeerId();
 
     if (currentPeer.isNull())
     {
@@ -191,11 +184,10 @@ void QnClientMessageProcessor::handleRemotePeerLost(nx::Uuid peer, nx::vms::api:
     if (peer != currentPeer)
         return;
 
-    NX_DEBUG(this, lit("peer lost, state -> Reconnecting"));
+    NX_DEBUG(this, "Current peer lost, state -> Reconnecting");
     m_status.setState(QnConnectionState::Reconnecting);
 
-    auto currentServer = resourcePool()->getResourceById<QnMediaServerResource>(
-        connection()->moduleInformation().id);
+    auto currentServer = resourcePool()->getResourceById<QnMediaServerResource>(currentPeer);
 
     /* Mark server as offline, so user will understand why is he reconnecting. */
     if (currentServer && m_policy != HoldConnectionPolicy::reauth)
@@ -210,7 +202,7 @@ void QnClientMessageProcessor::handleRemotePeerLost(nx::Uuid peer, nx::vms::api:
     }
     else
     {
-        NX_DEBUG(this, "Holding connection...");
+        NX_DEBUG(this, "Holding connection, policy: %1", m_policy);
     }
 }
 
@@ -221,6 +213,8 @@ void QnClientMessageProcessor::removeHardwareIdMapping(const nx::Uuid& id)
 
 void QnClientMessageProcessor::onGotInitialNotification(const nx::vms::api::FullInfoData& fullData)
 {
+    NX_VERBOSE(this, "Got initial notification, state: %1", m_status.state());
+
     if (m_status.state() != QnConnectionState::Connected &&
         NX_ASSERT(m_status.state() != QnConnectionState::Ready))
     {
@@ -232,9 +226,7 @@ void QnClientMessageProcessor::onGotInitialNotification(const nx::vms::api::Full
     base_type::onGotInitialNotification(fullData);
     m_status.setState(QnConnectionState::Ready);
 
-    auto currentServer = resourcePool()->getResourceById<QnMediaServerResource>(
-        connection()->moduleInformation().id);
-
+    auto currentServer = resourcePool()->getResourceById<QnMediaServerResource>(currentPeerId());
     NX_ASSERT(currentServer);
 
     /* Get server time as soon as we setup connection. */

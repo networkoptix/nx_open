@@ -4,12 +4,7 @@
 
 #include <nx/utils/log/log.h>
 
-static QString toString(QnConnectionState state)
-{
-    return QnConnectionStateUtils::toString(state);
-}
-
-QString QnConnectionStateUtils::toString(QnConnectionState state)
+QString toString(QnConnectionState state)
 {
     static const QMap<QnConnectionState, QString> stateToString{
         {QnConnectionState::Disconnected, "Disconnected"},
@@ -19,7 +14,7 @@ QString QnConnectionStateUtils::toString(QnConnectionState state)
         {QnConnectionState::Ready, "Ready"}
     };
 
-    return stateToString[state];
+    return stateToString.value(state, "Unknown");
 }
 
 QnClientConnectionStatus::QnClientConnectionStatus(QnConnectionState state, QObject* parent):

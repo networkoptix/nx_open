@@ -116,6 +116,14 @@ ec2::AbstractECConnectionPtr QnCommonMessageProcessor::connection() const
     return m_connection;
 }
 
+nx::Uuid QnCommonMessageProcessor::currentPeerId() const
+{
+    if (const auto connection = this->connection())
+        return connection->moduleInformation().id;
+
+    return {};
+}
+
 Qt::ConnectionType QnCommonMessageProcessor::handlerConnectionType() const
 {
     return Qt::DirectConnection;
@@ -138,6 +146,9 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
         [this](const nx::Uuid& id) { removeHardwareIdMapping(id); };
 
     const auto connectionType = handlerConnectionType();
+
+    NX_VERBOSE(this, "Connecting to connection: %1, type: %2",
+        connection->moduleInformation().id, connectionType);
 
     connect(
         connection.get(),
@@ -537,6 +548,8 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
 
 void QnCommonMessageProcessor::disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection)
 {
+    NX_VERBOSE(this, "Disconnecting from connection: %1", connection->moduleInformation().id);
+
     connection->disconnect(this);
     connection->resourceNotificationManager()->disconnect(this);
     connection->mediaServerNotificationManager()->disconnect(this);
@@ -979,12 +992,14 @@ void QnCommonMessageProcessor::refreshIgnoredResourceProperty(
 {
 }
 
-void QnCommonMessageProcessor::handleRemotePeerFound(nx::Uuid /*data*/, PeerType /*peerType*/)
+void QnCommonMessageProcessor::handleRemotePeerFound(nx::Uuid id, PeerType peerType)
 {
+    NX_VERBOSE(this, "Remote peer found, id: %1, type: %2", id, peerType);
 }
 
-void QnCommonMessageProcessor::handleRemotePeerLost(nx::Uuid /*data*/, PeerType /*peerType*/)
+void QnCommonMessageProcessor::handleRemotePeerLost(nx::Uuid id, PeerType peerType)
 {
+    NX_VERBOSE(this, "Remote peer lost, id: %1, type: %2", id, peerType);
 }
 
 void QnCommonMessageProcessor::resetServerUserAttributesList(
@@ -1068,8 +1083,7 @@ void QnCommonMessageProcessor::resetStatusList(const ResourceStatusDataList& par
 
 void QnCommonMessageProcessor::on_initNotification(const FullInfoData& fullData)
 {
-    NX_DEBUG(this, "Received initial notification while connecting to %1",
-        connection()->moduleInformation().id.toSimpleString());
+    NX_DEBUG(this, "Received initial notification while connecting to %1", currentPeerId());
 
     nx::utils::ElapsedTimer timer(nx::utils::ElapsedTimerState::started);
 
