@@ -7,8 +7,8 @@
 #include <optional>
 #include <string>
 
-#include <nx/reflect/instrument.h>
 #include <nx/network/jose/jwt.h>
+#include <nx/reflect/instrument.h>
 
 #include "two_factor_auth_data.h"
 
@@ -19,7 +19,8 @@ namespace nx::cloud::db::api {
 NX_REFLECTION_ENUM_CLASS(GrantType,
     password,
     refresh_token,
-    authorization_code
+    authorization_code,
+    sso_tokens
 );
 
 NX_REFLECTION_ENUM_CLASS(ResponseType,
@@ -51,15 +52,22 @@ struct IssueTokenRequest
     /**%apidoc Username. Valid with <pre>grant_type=password</pre> */
     std::optional<std::string> username;
 
-    /**%apidoc Valid refresh token. Valid with <pre>grant_type=refresh_token</pre> */
+    /**%apidoc Valid refresh token. Valid with <pre>grant_type=refresh_token</pre> or
+     * <pre>grant_type=sso_tokens</pre>
+     */
     std::optional<std::string> refresh_token;
 
     /**%apidoc Valid authorization code. Valid with <pre>grant_type=code</pre> */
     std::optional<std::string> code;
+
+    /**%apidoc Non-standard extensions. Valid access token. Valid with
+     * <pre>grant_type=sso_tokens</pre>
+     */
+    std::optional<std::string> access_token;
 };
 
 NX_REFLECTION_INSTRUMENT(IssueTokenRequest, (grant_type)(response_type)(client_id)(scope) \
-    (password)(username)(refresh_token)(code)(refresh_token_lifetime))
+    (password)(username)(refresh_token)(code)(refresh_token_lifetime)(access_token))
 
 NX_REFLECTION_ENUM_CLASS(TokenType,
     bearer
@@ -191,6 +199,14 @@ struct TokenIntrospectionResponse
 
 NX_REFLECTION_INSTRUMENT(TokenIntrospectionResponse, (active)(client_id)(username)(scope)(exp) \
     (expires_in)(time_since_password)(token_type)(system_role_ids))
+
+struct TokenIntrospectionResponseShort
+{
+    /**%apidoc true if token is valid. false if token is unknown, expired or revoked. */
+    bool active = false;
+};
+
+NX_REFLECTION_INSTRUMENT(TokenIntrospectionResponseShort, (active))
 
 struct IssueStunTokenRequest
 {

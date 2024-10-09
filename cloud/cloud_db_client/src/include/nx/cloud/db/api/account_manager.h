@@ -35,6 +35,10 @@ public:
     virtual void getAccount(
         std::function<void(api::ResultCode, api::AccountData)> completionHandler) = 0;
 
+    virtual void getAccount(
+        std::string accountEmail,
+        std::function<void(api::ResultCode, api::AccountData)> completionHandler) = 0;
+
     virtual void getAccountForSharing(
         std::string accountEmail,
         api::AccountForSharingRequest accountRequest,
