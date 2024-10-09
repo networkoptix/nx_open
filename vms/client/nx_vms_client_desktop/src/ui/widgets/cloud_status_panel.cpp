@@ -195,11 +195,19 @@ void QnCloudStatusPanelPrivate::updateUi()
             q->setText(QString());
             q->setIcon(loggedOutIcon);
             q->setToolButtonStyle(Qt::ToolButtonIconOnly);
+            q->setMenu(nullptr);
+            q->setToolTip(QnCloudStatusPanel::tr(
+                "Log in to %1", "%1 is the cloud name (like Nx Cloud)")
+                    .arg(nx::branding::cloudName()));
             break;
         case CloudStatusWatcher::Online:
             q->setText(effectiveUserName);
             q->setIcon(loggedInIcon);
             q->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+            q->setMenu(loggedInMenu);
+            q->setToolTip(QnCloudStatusPanel::tr(
+                "Logged in as %1", "%1 is the cloud login name (like user@domain.com")
+                    .arg(effectiveUserName));
             break;
         case CloudStatusWatcher::Offline:
             q->setText(effectiveUserName);
