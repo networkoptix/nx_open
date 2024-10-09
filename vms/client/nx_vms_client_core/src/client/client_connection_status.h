@@ -14,11 +14,7 @@ enum class QnConnectionState
     Ready
 };
 
-class QnConnectionStateUtils
-{
-public:
-    static QString toString(QnConnectionState state);
-};
+QString toString(QnConnectionState state);
 
 class NX_VMS_CLIENT_CORE_API QnClientConnectionStatus: public QObject
 {
