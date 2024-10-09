@@ -122,6 +122,9 @@ AbstractSearchListModel::~AbstractSearchListModel()
 
 void AbstractSearchListModel::setSystemContext(SystemContext* systemContext)
 {
+    // This should be done here, because otherwise systemContext is null on call to onOnlineChanged
+    base_type::setSystemContext(systemContext);
+
     if (NX_ASSERT(systemContext))
     {
         if (!NX_ASSERT(systemContext->messageProcessor() && systemContext->resourcePool()))
@@ -140,8 +143,6 @@ void AbstractSearchListModel::setSystemContext(SystemContext* systemContext)
 
         d->cameraSet.setResourcePool(systemContext->resourcePool());
     }
-
-    base_type::setSystemContext(systemContext);
 }
 
 void AbstractSearchListModel::onOnlineChanged(bool isOnline)

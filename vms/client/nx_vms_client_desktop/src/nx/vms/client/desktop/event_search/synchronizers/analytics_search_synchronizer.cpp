@@ -553,6 +553,9 @@ void AnalyticsSearchSynchronizer::setupInstanceSynchronization()
             for (auto instance : instancesToNotify())
                 instance->m_analyticsSetup->setObjectTypes(m_analyticsSetup->objectTypes());
 
+            if (!m_currentUser)
+                return;
+
             auto userSettings = m_currentUser->settings();
             if (userSettings.objectTypeIds != objectTypes
                 && windowContext()->connectActionsHandler()->logicalState()
