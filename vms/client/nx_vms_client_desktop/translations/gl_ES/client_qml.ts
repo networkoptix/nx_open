@@ -990,7 +990,7 @@
     <name>GroupsComboBox</name>
     <message>
       <source>Select</source>
-      <translation type="unfinished">Select</translation>
+      <translation>Seleccionar</translation>
     </message>
     <message>
       <source>Search</source>
@@ -1003,6 +1003,14 @@
     <message>
       <source>No groups</source>
       <translation type="unfinished">No groups</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n more</source>
+      <comment>%n is the number of remaining groups</comment>
+      <translation type="unfinished">
+        <numerusform>%n more</numerusform>
+        <numerusform>%n more</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -2072,7 +2080,7 @@ Press Alt + Click to follow object</translation>
     <name>SelectLayoutDialog</name>
     <message>
       <source>Select layout</source>
-      <translation type="unfinished">Select layout</translation>
+      <translation>Seleccionar deseño</translation>
     </message>
   </context>
   <context>
@@ -2083,7 +2091,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Select</source>
-      <translation type="unfinished">Select</translation>
+      <translation>Seleccionar</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -2239,7 +2247,7 @@ Press Alt + Click to follow object</translation>
     <name>StyledRadioButton</name>
     <message>
       <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
+      <translation>ID lóxico</translation>
     </message>
   </context>
   <context>
