@@ -57,8 +57,6 @@ class QnCloudStatusPanelPrivate: public QObject
 {
     QnCloudStatusPanel* q_ptr;
     Q_DECLARE_PUBLIC(QnCloudStatusPanel)
-    Q_OBJECT
-
 public:
     QnCloudStatusPanelPrivate(QnCloudStatusPanel* parent);
 
