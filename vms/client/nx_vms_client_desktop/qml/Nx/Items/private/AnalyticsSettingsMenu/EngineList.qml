@@ -47,12 +47,8 @@ Column
                     if (!enabledEngines || enabledEngines.indexOf(engineId) !== -1)
                         return true
 
-                    // Can be undefined when items are being deleted.
-                    const engine = engines[index]
-                    if (!engine)
-                        return false
-
-                    return engine.isDeviceDependent || engine.isDeviceDependent === undefined
+                    return (modelData ? modelData.isDeviceDependent : model.isDeviceDependent)
+                        !== false
                 }
 
                 engineId: model.engineId !== undefined
