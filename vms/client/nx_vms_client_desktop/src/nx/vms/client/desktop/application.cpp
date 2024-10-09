@@ -249,7 +249,7 @@ void setGraphicsSettingsEarly(const QnStartupParameters& startupParams)
         QSurfaceFormat::setDefaultFormat(format);
     }
 
-    GraphicsApi graphicsApi = GraphicsApi::legacyopengl;
+    GraphicsApi graphicsApi = GraphicsApi::autoselect;
 
     if (!NX_ASSERT(nx::reflect::enumeration::fromString(ini().graphicsApi, &graphicsApi)))
         return;
