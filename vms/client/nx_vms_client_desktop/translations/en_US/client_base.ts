@@ -1106,16 +1106,16 @@
     </message>
     <message numerus="yes">
         <source>Mute Items</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Mute Item</numerusform>
+            <numerusform>Mute Items</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Unmute Items</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Unmute Item</numerusform>
+            <numerusform>Unmute Items</numerusform>
         </translation>
     </message>
 </context>
@@ -4129,7 +4129,7 @@ License Key: %2</source>
     </message>
     <message>
         <source>Mute</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -9783,19 +9783,19 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
         <source>Current (%1)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Remote (%1)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Success</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Remote</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
