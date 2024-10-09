@@ -41,8 +41,8 @@ static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kIconThem
     {QIcon::Active, {.primary = "light2"}},
     {QIcon::Selected, {.primary = "light6"}},
 };
-static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kErrorTheme = {
-    {QIcon::Normal, {.primary = "red_core"}},
+const core::SvgIconColorer::ThemeSubstitutions kErrorTheme = {
+    {QIcon::Normal, {.primary = "attention.red"}},
 };
 static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kSuccessTheme = {
     {QIcon::Normal, {.primary = "brand_core"}},
@@ -392,7 +392,7 @@ void LogsManagementWidget::updateWidgets(LogsManagementWatcher::State state)
     ui->downloadingPercentageLabel->setVisible(!downloadFinished);
     ui->errorLabel->setVisible(downloadFinished && errorsCount);
     if (downloadFinished && errorsCount)
-        setPaletteColor(ui->progressBar, QPalette::Highlight, core::colorTheme()->color("red"));
+        setPaletteColor(ui->progressBar, QPalette::Highlight, core::colorTheme()->color("attention.red"));
     else
         setPaletteColor(ui->progressBar, QPalette::Highlight, core::colorTheme()->color("brand"));
 
