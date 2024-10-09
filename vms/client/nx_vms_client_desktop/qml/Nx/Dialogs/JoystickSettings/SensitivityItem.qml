@@ -2,6 +2,7 @@
 
 import QtQuick 2.15
 import Nx.Core 1.0
+import Nx.Core.Controls
 import Nx.Controls 1.0
 
 Rectangle
@@ -9,7 +10,7 @@ Rectangle
     id: control
 
     property alias text: nameLabel.text
-	property alias image: image.source
+	property alias image: image.sourcePath
 
     readonly property real contentWidth:
         labelLayout.x + labelLayout.contentWidth + labelLayout.anchors.rightMargin
@@ -26,7 +27,7 @@ Rectangle
     border.color: highlighted ? ColorTheme.colors.light16 : ColorTheme.colors.dark10
 	border.width: 1
 
-    Image
+    ColoredImage
     {
         id: image
 

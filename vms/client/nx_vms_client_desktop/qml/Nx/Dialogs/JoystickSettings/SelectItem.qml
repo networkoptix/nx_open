@@ -3,6 +3,7 @@
 import QtQuick
 
 import Nx.Core
+import Nx.Core.Controls
 import Nx.Controls
 
 import nx.vms.client.core
@@ -11,7 +12,7 @@ import nx.vms.client.desktop
 Rectangle
 {
     property alias text: label.text
-	property alias image: image.source
+	property alias image: image.sourcePath
 
     readonly property real contentWidth:
         labelLayout.x + labelLayout.contentWidth + labelLayout.anchors.rightMargin
@@ -24,7 +25,7 @@ Rectangle
     border.color: highlighted ? ColorTheme.colors.light16 : ColorTheme.colors.dark10
 	border.width: 1
 
-    Image
+    ColoredImage
     {
         id: image
 
