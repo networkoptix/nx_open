@@ -332,7 +332,12 @@ QnUserResource::~QnUserResource()
 QnUserHash QnUserResource::getHash() const
 {
     NX_MUTEX_LOCKER locker(&m_mutex);
-    return m_hash;
+    if (m_userType != nx::vms::api::UserType::cloud || m_hash.type == QnUserHash::Type::cloud)
+        return m_hash;
+
+    QnUserHash hash{m_hash};
+    hash.type = QnUserHash::Type::cloud;
+    return hash;
 }
 
 QString QnUserResource::getPassword() const

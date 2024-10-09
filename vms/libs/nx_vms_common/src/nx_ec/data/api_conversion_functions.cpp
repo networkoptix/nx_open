@@ -582,7 +582,10 @@ void fromResourceToApi(const QnUserResource& src, UserData& dst)
     dst.resourceAccessRights = src.m_resourceAccessRights;
     dst.cryptSha512Hash = src.m_cryptSha512Hash;
     dst.digest = src.m_digest;
-    dst.hash = src.m_hash.toString();
+    dst.hash =
+        dst.type != nx::vms::api::UserType::cloud || src.m_hash.type == QnUserHash::Type::cloud
+            ? src.m_hash.toString()
+            : QByteArray{nx::vms::api::UserData::kCloudPasswordStub};
 
     if (dst.fullName.isNull())
         dst.fullName = src.m_fullName;
