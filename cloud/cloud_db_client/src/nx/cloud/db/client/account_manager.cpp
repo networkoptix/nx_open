@@ -50,6 +50,17 @@ void AccountManager::getAccount(
         std::move(completionHandler));
 }
 
+void AccountManager::getAccount(
+    std::string accountEmail,
+    std::function<void(api::ResultCode, api::AccountData)> completionHandler)
+{
+    m_requestsExecutor->makeAsyncCall<api::AccountData>(
+        nx::network::http::Method::get,
+        nx::network::http::rest::substituteParameters(kAccountPathV0, {accountEmail}),
+        {}, //query
+        std::move(completionHandler));
+}
+
 void AccountManager::getAccountForSharing(
     std::string accountEmail,
     api::AccountForSharingRequest accountRequest,

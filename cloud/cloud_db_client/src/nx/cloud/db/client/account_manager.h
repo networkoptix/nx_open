@@ -31,6 +31,10 @@ public:
     virtual void getAccount(
         std::function<void(api::ResultCode, api::AccountData)> completionHandler) override;
 
+    virtual void getAccount(
+        std::string accountEmail,
+        std::function<void(api::ResultCode, api::AccountData)> completionHandler) override;
+
     virtual void getAccountForSharing(
         std::string accountEmail,
         api::AccountForSharingRequest accountRequest,
