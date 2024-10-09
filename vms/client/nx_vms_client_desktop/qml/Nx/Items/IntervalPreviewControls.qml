@@ -225,7 +225,7 @@ Item
                 return `image://skin/24x20/Solid/${filename}`
             }
             icon.color: ColorTheme.colors.light4
-            icon.secondaryColor: ColorTheme.colors.red
+            secondaryColor: ColorTheme.colors.red
 
             tooltipText: qsTr("Toggle Mute")
 

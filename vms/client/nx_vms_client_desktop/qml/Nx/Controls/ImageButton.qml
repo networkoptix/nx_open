@@ -13,7 +13,7 @@ AbstractButton
     id: button
 
     property color primaryColor: icon.color
-    property color secondaryColor: icon.secondaryColor
+    property color secondaryColor
     property color tertiaryColor
 
     property color backgroundColor: down || checked
