@@ -110,6 +110,7 @@ NxObject
                     engineId: engine.id.toString(),
                     requestId: "",
                     type: engine.type,
+                    isDeviceDependent: engine.isDeviceDependent,
                     visible: true,
                 })
             }
