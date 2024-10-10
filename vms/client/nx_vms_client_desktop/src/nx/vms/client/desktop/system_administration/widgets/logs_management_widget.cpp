@@ -145,7 +145,8 @@ void LogsManagementWidget::setupUi()
     ui->unitsTable->setModel(new LogsManagementModel(this, m_watcher));
     ui->unitsTable->setItemDelegate(new LogsManagementTableDelegate(this));
 
-    auto header = new CheckableHeaderView(LogsManagementModel::Columns::CheckBoxColumn, this);
+    auto header = new CheckableHeaderView(LogsManagementModel::Columns::CheckBoxColumn,
+        this);
     ui->unitsTable->setHorizontalHeader(header);
     header->setSectionResizeMode(
         LogsManagementModel::Columns::NameColumn, QHeaderView::Stretch);
@@ -155,6 +156,8 @@ void LogsManagementWidget::setupUi()
         LogsManagementModel::Columns::CheckBoxColumn, QHeaderView::ResizeToContents);
     header->setSectionResizeMode(
         LogsManagementModel::Columns::StatusColumn, QHeaderView::ResizeToContents);
+    header->resizeSection(LogsManagementModel::Columns::NameColumn,
+        std::max(235, header->sectionSize(LogsManagementModel::Columns::NameColumn)));
     connect(m_watcher, &LogsManagementWatcher::stateChanged,
         [header](LogsManagementWatcher::State state)
         {
