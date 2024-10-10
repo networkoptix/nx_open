@@ -1,0 +1,6 @@
+{
+    "vmsHost": "127.0.0.1",
+    "vmsPort": 7001,
+    "vmsUser": "admin",
+    "vmsAdminPassword": ""
+}

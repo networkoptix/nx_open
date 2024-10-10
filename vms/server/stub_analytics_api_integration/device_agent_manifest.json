@@ -1,0 +1,17 @@
+{
+    "supportedTypes":
+    [
+        {
+            "objectTypeId": "analytics.api.stub.object.type",
+            "attributes": []
+        },
+        {
+            "objectTypeId": "analytics.api.stub.objectTypeWithActions",
+            "attributes": []
+        },
+        {
+            "eventTypeId": "analytics.api.stub.lineCrossing",
+            "attributes": []
+        }
+    ]
+}

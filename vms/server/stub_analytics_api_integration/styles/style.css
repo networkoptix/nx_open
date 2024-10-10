@@ -1,0 +1,17 @@
+/* Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/ */
+
+.main {
+    width: 100%;
+    padding: 20px;
+}
+
+.video-area {
+    width: 640px;
+    height: 360px;
+}
+
+.video-canvas {
+    width: 100%;
+    height: 100%;
+    border: 2px solid black;
+}
