@@ -139,10 +139,6 @@
       <source>Verifying update package</source>
       <translation>Verifierar uppdateringspaketet</translation>
     </message>
-    <message>
-      <source>Cannot connect to the System</source>
-      <translation>Kan inte ansluta till systemet</translation>
-    </message>
   </context>
   <context>
     <name>ContextMenu</name>

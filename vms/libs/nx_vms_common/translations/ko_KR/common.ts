@@ -1311,7 +1311,7 @@
     </message>
     <message>
       <source>File write error.</source>
-      <translation type="unfinished">File write error.</translation>
+      <translation>파일 쓰기 오류.</translation>
     </message>
   </context>
   <context>

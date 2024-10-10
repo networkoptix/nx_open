@@ -1370,7 +1370,7 @@
     </message>
     <message>
       <source>File write error.</source>
-      <translation type="unfinished">File write error.</translation>
+      <translation>Error d'escriptura d'arxiu.</translation>
     </message>
   </context>
   <context>

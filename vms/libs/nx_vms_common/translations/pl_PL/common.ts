@@ -1488,7 +1488,7 @@
     </message>
     <message>
       <source>File write error.</source>
-      <translation type="unfinished">File write error.</translation>
+      <translation>Błąd zapisu pliku.</translation>
     </message>
   </context>
   <context>

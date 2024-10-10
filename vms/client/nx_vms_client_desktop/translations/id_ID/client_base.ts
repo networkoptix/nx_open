@@ -135,10 +135,6 @@
       <source>Verifying update package</source>
       <translation>Memverifikasi paket update</translation>
     </message>
-    <message>
-      <source>Cannot connect to the System</source>
-      <translation>Tidak dapat terkoneksi ke Sistem</translation>
-    </message>
   </context>
   <context>
     <name>ContextMenu</name>

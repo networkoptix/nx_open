@@ -1370,7 +1370,7 @@
     </message>
     <message>
       <source>File write error.</source>
-      <translation type="unfinished">File write error.</translation>
+      <translation>Tiedoston kirjoitusvirhe.</translation>
     </message>
   </context>
   <context>
