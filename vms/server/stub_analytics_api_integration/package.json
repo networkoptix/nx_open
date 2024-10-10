@@ -1,0 +1,21 @@
+{
+  "name": "analytics_api_stub_plugin",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron --trace-warnings .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^19.0.4",
+    "electron-reloader": "^1.2.3"
+  },
+  "dependencies": {
+    "axios": "^1.5.1",
+    "path": "^0.12.7",
+    "ws": "^8.18.0"
+  }
+}

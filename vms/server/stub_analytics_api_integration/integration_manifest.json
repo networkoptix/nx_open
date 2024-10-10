@@ -1,0 +1,27 @@
+{
+    "id": "nx.analytics_api_stub_application",
+    "name": "Analytics API stub application",
+    "description": "Test application for Nx Analytics API development and testing",
+    "vendor": "Network Optix",
+    "version": "0.0.1",
+    "engineSettingsModel":
+    {
+        "type": "Settings",
+        "items":
+        [
+            {
+                "type": "CheckBox",
+                "name": "Test Engine's setSettings",
+                "caption": "Test Engine's setSettings",
+                "defaultValue": false
+            },
+            {
+                "type": "CheckBox",
+                "name": "Test Engine's Active Settings",
+                "caption": "Test Engine's Active Settings",
+                "defaultValue": false,
+                "isActive": true
+            }
+        ]
+    }
+}

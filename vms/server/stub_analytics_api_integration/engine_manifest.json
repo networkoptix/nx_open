@@ -1,0 +1,51 @@
+{
+    "typeLibrary":
+    {
+        "objectTypes":
+        [
+            {
+                "id": "analytics.api.stub.object.type",
+                "name": "Analytics API stub Object Type"
+            },
+            {
+                "id": "analytics.api.stub.objectTypeWithActions",
+                "name": "Analytics API Stub: Object Type With Actions"
+            }
+        ],
+        "eventTypes":
+        [
+            {
+                "id": "analytics.api.stub.lineCrossing",
+                "name": "Line crossing"
+            }
+        ]
+    },
+    "deviceAgentSettingsModel":
+    {
+        "type": "Settings",
+        "items":
+        [
+            {
+                "type": "CheckBox",
+                "name": "Test Device Agent's setSettings",
+                "caption": "Test Device Agent's setSettings",
+                "defaultValue": false
+            },
+            {
+                "type": "CheckBox",
+                "name": "Test Device Agent's Active Settings",
+                "caption": "Test Device Agent's Active Settings",
+                "defaultValue": false,
+                "isActive": true
+            }
+        ]
+    },
+    "objectActions":
+    [
+        {
+            "id": "analytics.api.stub.objectActionWithMessageResult",
+            "name": "Analytics API Stub: Object Action with message result",
+            "supportedObjectTypeIds": [ "analytics.api.stub.objectTypeWithActions" ]
+        }
+    ]
+}
