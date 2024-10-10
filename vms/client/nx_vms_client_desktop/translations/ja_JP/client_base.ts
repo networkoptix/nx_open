@@ -135,10 +135,6 @@
       <source>Verifying update package</source>
       <translation>アップデートパッケージを確認中</translation>
     </message>
-    <message>
-      <source>Cannot connect to the System</source>
-      <translation>システム に接続できません</translation>
-    </message>
   </context>
   <context>
     <name>ContextMenu</name>

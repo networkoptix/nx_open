@@ -135,10 +135,6 @@
       <source>Verifying update package</source>
       <translation>正在验证更新包</translation>
     </message>
-    <message>
-      <source>Cannot connect to the System</source>
-      <translation>无法连接到系统</translation>
-    </message>
   </context>
   <context>
     <name>ContextMenu</name>

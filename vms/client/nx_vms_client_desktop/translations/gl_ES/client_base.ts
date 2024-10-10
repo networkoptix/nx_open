@@ -139,10 +139,6 @@
       <source>Verifying update package</source>
       <translation>Verificando o paquete de actualización</translation>
     </message>
-    <message>
-      <source>Cannot connect to the System</source>
-      <translation>Non se pode conectar ao sistema</translation>
-    </message>
   </context>
   <context>
     <name>ContextMenu</name>
@@ -6882,7 +6878,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>This action cannot be undone</source>
-      <translation type="unfinished">This action cannot be undone</translation>
+      <translation>Esta acción non se pode desfacer</translation>
     </message>
     <message>
       <source>Reset all rules to defaults?</source>

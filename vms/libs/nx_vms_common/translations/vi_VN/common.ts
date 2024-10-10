@@ -1311,7 +1311,7 @@
     </message>
     <message>
       <source>File write error.</source>
-      <translation type="unfinished">File write error.</translation>
+      <translation>Lỗi ghi tệp.</translation>
     </message>
   </context>
   <context>

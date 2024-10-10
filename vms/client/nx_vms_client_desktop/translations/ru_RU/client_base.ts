@@ -147,10 +147,6 @@
       <source>Verifying update package</source>
       <translation>Проверка пакета обновления</translation>
     </message>
-    <message>
-      <source>Cannot connect to the System</source>
-      <translation>Не удаётся подключиться к системе</translation>
-    </message>
   </context>
   <context>
     <name>ContextMenu</name>

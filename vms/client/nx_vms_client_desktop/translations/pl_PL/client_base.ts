@@ -147,10 +147,6 @@
       <source>Verifying update package</source>
       <translation>Weryfikacja pakietu aktualizacji</translation>
     </message>
-    <message>
-      <source>Cannot connect to the System</source>
-      <translation>Nie można połączyć się z systemem</translation>
-    </message>
   </context>
   <context>
     <name>ContextMenu</name>
