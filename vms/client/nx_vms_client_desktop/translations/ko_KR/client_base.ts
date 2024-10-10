@@ -5,7 +5,7 @@
     <name>AnalyticsSearchWidget::Private</name>
     <message>
       <source>Any type</source>
-      <translation>아무 유형</translation>
+      <translation>모든 유형</translation>
     </message>
     <message>
       <source>Select area</source>
@@ -991,7 +991,7 @@
     </message>
     <message>
       <source>Archive filter...</source>
-      <translation type="unfinished">Archive filter...</translation>
+      <translation>보관 필터...</translation>
     </message>
     <message>
       <source>Copy Bookmark Text</source>
@@ -1011,23 +1011,23 @@
     </message>
     <message>
       <source>Replace Camera...</source>
-      <translation type="unfinished">Replace Camera...</translation>
+      <translation>카메라를 교체하세요...</translation>
     </message>
     <message>
       <source>Save Current Layout As Cloud...</source>
-      <translation type="unfinished">Save Current Layout As Cloud...</translation>
+      <translation>현재 레이아웃을 클라우드에 저장...</translation>
     </message>
     <message>
       <source>Save Layout As Cloud...</source>
-      <translation type="unfinished">Save Layout As Cloud...</translation>
+      <translation>레이아웃을 클라우드로 저장...</translation>
     </message>
     <message>
       <source>Save Cloud Layout</source>
-      <translation type="unfinished">Save Cloud Layout</translation>
+      <translation>클라우드 레이아웃 저장</translation>
     </message>
     <message>
       <source>Save Cloud Layout As...</source>
-      <translation type="unfinished">Save Cloud Layout As...</translation>
+      <translation>클라우드 레이아웃을 다른 이름으로 저장...</translation>
     </message>
     <message>
       <source>User Manual...</source>
@@ -1323,7 +1323,7 @@
     </message>
     <message>
       <source>Failed to activate free license</source>
-      <translation type="unfinished">Failed to activate free license</translation>
+      <translation>무료 라이센스 활성화에 실패했습니다</translation>
     </message>
     <message>
       <source>Copied</source>
@@ -1332,20 +1332,20 @@
     <message>
       <source>Hardware ID: %1
 License Key: %2</source>
-      <translation type="unfinished">Hardware ID: %1
-License Key: %2</translation>
+      <translation>하드웨어 ID: %1
+라이센스 키: %2</translation>
     </message>
     <message>
       <source>Copy Parameters</source>
-      <translation type="unfinished">Copy Parameters</translation>
+      <translation>파라메터 복사</translation>
     </message>
     <message>
       <source>If your System does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</source>
-      <translation type="unfinished">If your System does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</translation>
+      <translation>시스템이 인터넷에 접속할 수 없는 경우 제공된 라이선스 키와 하드웨어 ID를 %1 로 보내면 활성화 파일을 받으실 수 있습니다.</translation>
     </message>
     <message>
       <source>If your System does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</source>
-      <translation type="unfinished">If your System does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</translation>
+      <translation/>
     </message>
   </context>
   <context>
@@ -1483,7 +1483,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Unsecure</source>
-      <translation type="unfinished">Unsecure</translation>
+      <translation>안전하지 않음</translation>
     </message>
     <message>
       <source>Check</source>
@@ -1495,7 +1495,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>URL is not valid.</source>
-      <translation type="unfinished">URL is not valid.</translation>
+      <translation>URL이 유효하지 않습니다.</translation>
     </message>
     <message>
       <source>Enter a short System description here.</source>
@@ -1503,11 +1503,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Active</source>
-      <translation type="unfinished">Active</translation>
+      <translation>활성화</translation>
     </message>
     <message>
       <source>Not configured</source>
-      <translation type="unfinished">Not configured</translation>
+      <translation>구성되지 않음</translation>
     </message>
     <message>
       <source>Error</source>
@@ -1515,26 +1515,26 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Set your email address or SMTP server</source>
-      <translation type="unfinished">Set your email address or SMTP server</translation>
+      <translation>이메일 주소 또는 SMTP 서버를 설정하세요</translation>
     </message>
     <message>
       <source>%1 users are receiving emails</source>
       <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
-      <translation type="unfinished">%1 users are receiving emails</translation>
+      <translation>%1 사용자가 이메일을 받고 있습니다</translation>
     </message>
     <message>
       <source>%1 is not available</source>
       <extracomment>%1 will be substituted with branded cloud service name e.g. &quot;Nx Cloud&quot;.</extracomment>
-      <translation type="unfinished">%1 is not available</translation>
+      <translation>%1 을 사용할 수 없습니다.</translation>
     </message>
     <message>
       <source>Route via %1</source>
       <extracomment>%1 will be substituted with branded cloud service name e.g. &quot;Nx Cloud&quot;.</extracomment>
-      <translation type="unfinished">Route via %1</translation>
+      <translation>%1를 경유하는 경로</translation>
     </message>
     <message>
       <source>Route via SMTP server</source>
-      <translation type="unfinished">Route via SMTP server</translation>
+      <translation>SMTP 서버를 통한 경로</translation>
     </message>
     <message>
       <source>Success</source>
@@ -1555,19 +1555,19 @@ License Key: %2</translation>
     <message>
       <source>%1 users will start receiving emails immediately after you apply these settings</source>
       <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
-      <translation type="unfinished">%1 users will start receiving emails immediately after you apply these settings</translation>
+      <translation>%1 사용자는 이러한 설정을 적용한 직후에 이메일을 받기 시작합니다.</translation>
     </message>
     <message>
       <source>Users are receiving emails</source>
-      <translation type="unfinished">Users are receiving emails</translation>
+      <translation>사용자가 이메일을 받고 있습니다</translation>
     </message>
     <message>
       <source>Users will start receiving emails right after you apply settings</source>
-      <translation type="unfinished">Users will start receiving emails right after you apply settings</translation>
+      <translation>사용자는 설정을 적용한 직후 이메일을 받기 시작합니다.</translation>
     </message>
     <message>
       <source>Unable to test SMTP server</source>
-      <translation type="unfinished">Unable to test SMTP server</translation>
+      <translation>SMTP 서버를 테스트할 수 없습니다.</translation>
     </message>
     <message>
       <source>Additional info required</source>
@@ -1627,7 +1627,7 @@ License Key: %2</translation>
     <message numerus="yes">
       <source>Password should not contain %n or more repeating characters.</source>
       <translation>
-        <numerusform>패스워드에는 %n 개 이상의 반복 문자가 포함되어서는 안됩니다.</numerusform>
+        <numerusform>패스워드에는 %n개 이상의 반복 문자가 포함되어서는 안됩니다.</numerusform>
       </translation>
     </message>
     <message>
@@ -3348,7 +3348,7 @@ to %1</source>
     </message>
     <message>
       <source>The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
-      <translation type="unfinished">The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</translation>
+      <translation>오디오 캡처 장치가 적합한 오디오 형식을 지원하지 않습니다. 화면 녹화 설정에서 다른 오디오 장치를 선택하거나 &quot;없음&quot; 을 선택하세요.</translation>
     </message>
   </context>
   <context>
@@ -5155,7 +5155,7 @@ to %1</source>
     </message>
     <message>
       <source>Provide</source>
-      <translation type="unfinished">Provide</translation>
+      <translation>제공하기</translation>
     </message>
     <message>
       <source>ACCESS DENIED</source>
@@ -5382,7 +5382,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Stores analytics and motion data</source>
-      <translation type="unfinished">Stores analytics and motion data</translation>
+      <translation>분석 및 동작 데이터를 저장하기</translation>
     </message>
   </context>
   <context>
@@ -5475,7 +5475,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Time Sync</source>
-      <translation type="unfinished">Time Sync</translation>
+      <translation>시간 동기화</translation>
     </message>
     <message>
       <source>Routing</source>
@@ -7107,7 +7107,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Selected device doesn&apos;t have audio output or it&apos;s not configured. Audio stream is not available.</source>
-      <translation>선택한 장치에 오디오 출력이 없거나 구성되지 않았다. 오디오 스트림을 사용할 수 없다.</translation>
+      <translation>선택한 장치에 오디오 출력이 없거나 구성되지 않았다. 오디오 스트림을 사용할 수 없습니다.</translation>
     </message>
     <message>
       <source>The selected device doesn&apos;t have an audio input, or it is not configured correctly. The audio stream is not available.</source>
@@ -8729,7 +8729,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::IntercomManager</name>
     <message>
       <source>%1 Layout</source>
-      <translation type="unfinished">%1 Layout</translation>
+      <translation>%1 레이아웃</translation>
     </message>
   </context>
   <context>
@@ -9570,7 +9570,7 @@ You can force it, but it may significantly increase CPU load.</source>
     <name>nx::vms::client::desktop::ObjectTrackingButton</name>
     <message>
       <source>Object tracking is ON</source>
-      <translation type="unfinished">Object tracking is ON</translation>
+      <translation>객체 추적이 켜져 있습니다.</translation>
     </message>
   </context>
   <context>
@@ -9597,7 +9597,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</source>
-      <translation type="unfinished">Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</translation>
+      <translation>로컬 레이아웃을 찾으시나요? &quot;보이기&quot; 목록에서 한 명의 사용자만 선택하여 로컬 레이아웃을 여기에 옵션으로 표시합니다.</translation>
     </message>
   </context>
   <context>
@@ -11398,11 +11398,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Failed to apply changes.</source>
-      <translation type="unfinished">Failed to apply changes.</translation>
+      <translation>변경 사항을 적용하지 못함</translation>
     </message>
     <message>
       <source>Failed to restore rules.</source>
-      <translation type="unfinished">Failed to restore rules.</translation>
+      <translation>규칙을 복원하지 못했습니다.</translation>
     </message>
     <message>
       <source>Apply changes before exiting?</source>
@@ -12102,7 +12102,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Cannot check Client update availability. Check your internet connection and try again.</source>
-      <translation type="unfinished">Cannot check Client update availability. Check your internet connection and try again.</translation>
+      <translation>클라이언트 업데이트 가용성을 확인할 수 없습니다. 인터넷 연결을 확인하고 다시 시도하세요.</translation>
     </message>
   </context>
 </TS>

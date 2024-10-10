@@ -265,7 +265,7 @@
     </message>
     <message>
       <source>To learn more about the current problem view the server&apos;s certificate:</source>
-      <translation>현재 문제에 대해 자세히 알아보려면 서버의 인증서를 확인하십시오.</translation>
+      <translation>현재 문제에 대해 자세히 알아보려면 &apos; 서버의 인증서를 확인하십시오.</translation>
     </message>
   </context>
 </TS>

@@ -114,7 +114,7 @@
     </message>
     <message>
       <source>Logs Management</source>
-      <translation type="unfinished">Logs Management</translation>
+      <translation>로그 관리</translation>
     </message>
     <message>
       <source>Download</source>
@@ -2083,7 +2083,7 @@
     <name>OutgoingMailSettingsWidget</name>
     <message>
       <source>Connection Settings</source>
-      <translation type="unfinished">Connection Settings</translation>
+      <translation>연결 설정</translation>
     </message>
     <message>
       <source>Email</source>
@@ -2099,7 +2099,7 @@
     </message>
     <message>
       <source>Server Address</source>
-      <translation type="unfinished">Server Address</translation>
+      <translation>서버 주소</translation>
     </message>
     <message>
       <source>Security Protocol</source>
@@ -3036,11 +3036,11 @@
     </message>
     <message>
       <source>Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</source>
-      <translation type="unfinished">Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</translation>
+      <translation>분석 데이터는 많은 공간을 차지할 수 있습니다. 시스템 파티션 대신 다른 위치를 선택하는 것이 좋습니다.</translation>
     </message>
     <message>
       <source>Analytics and motion data will continue to be stored on the disabled storage.</source>
-      <translation type="unfinished">Analytics and motion data will continue to be stored on the disabled storage.</translation>
+      <translation>분석 및 동작 데이터는 비활성화된 스토리지에 계속 저장됩니다.</translation>
     </message>
   </context>
   <context>

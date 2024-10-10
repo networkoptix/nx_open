@@ -710,7 +710,7 @@
     </message>
     <message>
       <source>Display text for</source>
-      <translation type="unfinished">Display text for</translation>
+      <translation>테스트 유지 시간</translation>
     </message>
     <message>
       <source>Text</source>
