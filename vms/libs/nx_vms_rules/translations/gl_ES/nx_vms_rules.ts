@@ -312,7 +312,7 @@
     </message>
     <message>
       <source>On</source>
-      <translation type="unfinished">On</translation>
+      <translation>Acender</translation>
     </message>
     <message>
       <source>Fixed Duration</source>
@@ -320,7 +320,7 @@
     </message>
     <message>
       <source>Interval of Action</source>
-      <translation type="unfinished">Interval of Action</translation>
+      <translation>Intervalo de acción</translation>
     </message>
   </context>
   <context>
@@ -443,7 +443,7 @@
     </message>
     <message>
       <source>Interval of Action</source>
-      <translation type="unfinished">Interval of Action</translation>
+      <translation>Intervalo de acción</translation>
     </message>
   </context>
   <context>
@@ -595,7 +595,7 @@
     </message>
     <message>
       <source>Interval of Action</source>
-      <translation type="unfinished">Interval of Action</translation>
+      <translation>Intervalo de acción</translation>
     </message>
   </context>
   <context>
@@ -614,7 +614,7 @@
     </message>
     <message>
       <source>Interval of Action</source>
-      <translation type="unfinished">Interval of Action</translation>
+      <translation>Intervalo de acción</translation>
     </message>
   </context>
   <context>
@@ -648,7 +648,7 @@
     </message>
     <message>
       <source>Interval of Action</source>
-      <translation type="unfinished">Interval of Action</translation>
+      <translation>Intervalo de acción</translation>
     </message>
   </context>
   <context>
@@ -722,7 +722,7 @@
     </message>
     <message>
       <source>Interval of Action</source>
-      <translation type="unfinished">Interval of Action</translation>
+      <translation>Intervalo de acción</translation>
     </message>
     <message>
       <source>Execute to users</source>
@@ -753,7 +753,7 @@
     </message>
     <message>
       <source>Interval of Action</source>
-      <translation type="unfinished">Interval of Action</translation>
+      <translation>Intervalo de acción</translation>
     </message>
   </context>
   <context>
@@ -843,7 +843,7 @@
     </message>
     <message>
       <source>Interval of Action</source>
-      <translation type="unfinished">Interval of Action</translation>
+      <translation>Intervalo de acción</translation>
     </message>
   </context>
   <context>
@@ -994,7 +994,7 @@
     </message>
     <message>
       <source>Interval of Action</source>
-      <translation type="unfinished">Interval of Action</translation>
+      <translation>Intervalo de acción</translation>
     </message>
   </context>
   <context>
@@ -1102,7 +1102,7 @@
     </message>
     <message>
       <source>Interval of Action</source>
-      <translation type="unfinished">Interval of Action</translation>
+      <translation>Intervalo de acción</translation>
     </message>
   </context>
   <context>
