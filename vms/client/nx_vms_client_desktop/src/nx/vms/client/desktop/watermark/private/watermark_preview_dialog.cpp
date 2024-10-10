@@ -59,7 +59,7 @@ double indexToOpacity(int index)
 WatermarkPreviewDialog::WatermarkPreviewDialog(QWidget* parent):
     QnButtonBoxDialog(parent),
     ui(new Ui::WatermarkPreviewDialog),
-    m_baseImage(qnSkin->pixmap(":/skin/system_settings/watermark_preview.jpg"))
+    m_baseImage(qnSkin->pixmap(":/skin/Illustrations/watermark_preview.jpg"))
 {
     ui->setupUi(this);
 
