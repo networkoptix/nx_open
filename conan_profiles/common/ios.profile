@@ -3,7 +3,7 @@ include(common.profile)
 
 [settings]
 os=iOS
-os.version=12.0
+os.version=16.0
 os.sdk=iphoneos
 compiler=apple-clang
 compiler.libcxx=libc++
