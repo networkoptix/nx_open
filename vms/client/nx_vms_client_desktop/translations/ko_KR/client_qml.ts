@@ -1391,7 +1391,7 @@
     </message>
     <message>
       <source>Import</source>
-      <translation type="unfinished">Import</translation>
+      <translation>가져오기</translation>
     </message>
     <message>
       <source>Export</source>
