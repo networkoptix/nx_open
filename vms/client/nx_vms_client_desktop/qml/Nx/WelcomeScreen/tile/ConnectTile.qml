@@ -4,6 +4,7 @@ import QtQuick
 import QtQuick.Controls
 
 import Nx.Core
+import Nx.Core.Controls
 
 import nx.vms.client.core
 import nx.vms.client.desktop
@@ -24,7 +25,7 @@ Button
 
     contentItem: Item
     {
-        Image
+        ColoredImage
         {
             anchors.horizontalCenter: parent.horizontalCenter
             y: 22
@@ -33,8 +34,10 @@ Button
 
             fillMode: Image.Stretch
 
-            source: "image://skin/Illustrations/connect_to_server_54x32.svg"
+            sourcePath: "image://skin/Illustrations/54x32/connect_to_server.svg"
             sourceSize: Qt.size(width, height)
+            primaryColor: ColorTheme.colors.light4
+            secondaryColor: ColorTheme.colors.brand_core
         }
 
         Label

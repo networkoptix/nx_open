@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="75" fill="none" viewBox="0 0 200 75">
+  <g class="illustrations/200x75/ptz_promo_show_again">
+    <path fill="#E1E7EA" fill-rule="evenodd" d="M50 0h100v58H50V0Zm1 1v56h98V1H51Zm5 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm8-2a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm4 2a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm35 38h14a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-14a1 1 0 0 1-1-1v-2a1 1 0 0 1 1-1Zm34 0h-14a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1ZM62 19.5a.5.5 0 0 0 0 1h76a.5.5 0 0 0 0-1H62Zm-.5 8.5a.5.5 0 0 1 .5-.5h76a.5.5 0 0 1 0 1H62a.5.5 0 0 1-.5-.5Zm.5 7.5a.5.5 0 0 0 0 1h76a.5.5 0 0 0 0-1H62Z" class="Primary" clip-rule="evenodd"/>
+  </g>
+</svg>

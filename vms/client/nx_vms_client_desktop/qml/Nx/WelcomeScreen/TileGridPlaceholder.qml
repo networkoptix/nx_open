@@ -4,6 +4,7 @@ import QtQuick 2.11
 import QtQuick.Controls 2.4
 
 import Nx.Core 1.0
+import Nx.Core.Controls
 
 Item
 {
@@ -22,7 +23,7 @@ Item
 
     height: description.y + description.height
 
-    Image
+    ColoredImage
     {
         id: icon
 
@@ -32,20 +33,23 @@ Item
         height: 128
 
         sourceSize: Qt.size(width, height)
-        source:
+        sourcePath:
         {
             switch (parent.mode)
             {
                 case TileGridPlaceholder.Mode.NoSystemsFound:
-                    return "image://skin/welcome_screen/placeholder/no_systems_found.svg"
+                    return "image://skin/Illustrations/128x128/no_systems_found.svg"
                 case TileGridPlaceholder.Mode.NoFavorites:
-                    return "image://skin/welcome_screen/placeholder/no_favorites.svg"
+                    return "image://skin/Illustrations/128x128/no_favorites.svg"
                 case TileGridPlaceholder.Mode.NoHidden:
-                    return "image://skin/welcome_screen/placeholder/no_hidden.svg"
+                    return "image://skin/Illustrations/128x128/no_hidden.svg"
                 default:
                     return ""
             }
         }
+        primaryColor: ColorTheme.colors.dark9
+        secondaryColor: ColorTheme.colors.dark13
+        tertiaryColor: ColorTheme.colors.light4
     }
 
     Text
