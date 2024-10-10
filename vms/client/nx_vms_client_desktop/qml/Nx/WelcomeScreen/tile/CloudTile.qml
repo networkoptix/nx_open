@@ -41,8 +41,10 @@ Button
 
             fillMode: Image.Stretch
 
-            sourcePath: "image://skin/Illustrations/connect_to_cloud_54x32.svg"
+            sourcePath: "image://skin/Illustrations/54x32/connect_to_cloud.svg"
             sourceSize: Qt.size(width, height)
+            primaryColor: ColorTheme.colors.light4
+            secondaryColor: ColorTheme.colors.brand_core
         }
 
         Label

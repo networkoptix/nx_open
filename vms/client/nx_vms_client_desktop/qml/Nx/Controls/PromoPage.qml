@@ -4,6 +4,7 @@ import QtQuick
 import QtQuick.Layouts
 
 import Nx.Core
+import Nx.Core.Controls
 import nx.vms.client.core
 import nx.vms.client.desktop
 
@@ -12,7 +13,10 @@ Item
     id: promoPage
 
     property alias title: titleItem.text
-    property alias imageUrl: imageItem.source
+    property alias imageUrl: imageItem.sourcePath
+    property alias primaryColor: imageItem.primaryColor
+    property alias secondaryColor: imageItem.secondaryColor
+    property alias tertiaryColor: imageItem.tertiaryColor
     property alias text: textItem.text
 
     property int verticalAlignment: Qt.AlignTop
@@ -47,7 +51,7 @@ Item
             width: 200
             Layout.maximumHeight: 75
 
-            Image
+            ColoredImage
             {
                 id: imageItem
 
@@ -55,7 +59,7 @@ Item
 
                 fillMode: Image.PreserveAspectFit
 
-                visible: source !== ""
+                visible: sourcePath !== ""
             }
         }
 

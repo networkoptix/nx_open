@@ -110,14 +110,15 @@ Item
         }
     }
 
-    Image
+    ColoredImage
     {
         anchors.verticalCenter: parent.verticalCenter
         anchors.right: parent.right
         width: 39
         height: 78
 
-        source: "image://skin/Illustrations/settings_39x78.svg"
+        sourcePath: "image://skin/Illustrations/39x78/settings.svg"
+        primaryColor: ColorTheme.colors.dark13
         sourceSize: Qt.size(width, height)
 
         visible: isFactorySystem

@@ -154,7 +154,7 @@ ServerCertificateViewer::ServerCertificateViewer(
     aligner->addWidgets({ui->issuedByTextLabel, ui->expiresTextLabel});
 
     ui->certificateIcon->setPixmap(
-        qnSkin->pixmap("Illustrations/certificate_90x124.svg",
+        qnSkin->pixmap("Illustrations/90x124/certificate.svg",
         true,
         ui->certificateIcon->size()));
 
