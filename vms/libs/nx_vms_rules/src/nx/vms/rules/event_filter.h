@@ -4,12 +4,9 @@
 
 #include <map>
 #include <memory>
-#include <set>
 
 #include <QtCore/QObject>
-#include <QtCore/QTimer>
 
-#include <nx/utils/elapsed_timer.h>
 #include <nx/utils/uuid.h>
 
 #include "rules_fwd.h"

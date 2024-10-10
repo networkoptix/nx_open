@@ -2,9 +2,6 @@
 
 #include "event_filter.h"
 
-#include <tuple>
-#include <vector>
-
 #include <QtCore/QJsonValue>
 #include <QtCore/QScopedValueRollback>
 #include <QtCore/QSharedPointer>
@@ -12,6 +9,8 @@
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/qobject.h>
+#include <nx/vms/api/data/peer_data.h>
+#include <nx/vms/common/application_context.h>
 #include <utils/common/synctime.h>
 
 #include "basic_event.h"
@@ -62,10 +61,14 @@ void EventFilter::addField(const QString& name, std::unique_ptr<EventFilterField
 {
     field->moveToThread(thread());
 
-    static const auto onFieldChangedMetaMethod =
-        metaObject()->method(metaObject()->indexOfMethod("onFieldChanged()"));
-    if (NX_ASSERT(onFieldChangedMetaMethod.isValid()))
-        nx::utils::watchOnPropertyChanges(field.get(), this, onFieldChangedMetaMethod);
+    if (auto appContext = nx::vms::common::appContext();
+        appContext && nx::vms::api::PeerData::isClient(appContext->localPeerType()))
+    {
+        static const auto onFieldChangedMetaMethod =
+            metaObject()->method(metaObject()->indexOfMethod("onFieldChanged()"));
+        if (NX_ASSERT(onFieldChangedMetaMethod.isValid()))
+            nx::utils::watchOnPropertyChanges(field.get(), this, onFieldChangedMetaMethod);
+    }
 
     m_fields[name] = std::move(field);
 }

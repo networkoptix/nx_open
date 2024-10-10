@@ -681,8 +681,6 @@ Engine* ActionBuilder::engine() const
 void ActionBuilder::onFieldChanged()
 {
     const auto changedField = sender();
-    if (!NX_ASSERT(changedField))
-        return; //< Sender object is already destroyed.
 
     for (const auto& [fieldName, field]: m_fields)
     {
