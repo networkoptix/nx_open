@@ -1123,11 +1123,11 @@
     <name>Result</name>
     <message>
       <source>Missing required parameter: %1.</source>
-      <translation type="unfinished">Missing required parameter: %1.</translation>
+      <translation>필수 매개변수가 없습니다: %1.</translation>
     </message>
     <message>
       <source>Failed to process request.</source>
-      <translation type="unfinished">Failed to process request.</translation>
+      <translation>요청을 처리하지 못했습니다.</translation>
     </message>
     <message>
       <source>Forbidden.</source>
@@ -1486,7 +1486,7 @@
     </message>
     <message>
       <source>Max P2P all clients size (bytes, 32-512MB)</source>
-      <translation type="unfinished">Max P2P all clients size (bytes, 32-512MB)</translation>
+      <translation>최대 P2P 모든 클라이언트 크기(바이트, 32-512MB)</translation>
     </message>
     <message>
       <source>Max record queue size (bytes, 6-96MB)</source>
@@ -1542,7 +1542,7 @@
     </message>
     <message>
       <source>Session token count limit on a single Server</source>
-      <translation type="unfinished">Session token count limit on a single Server</translation>
+      <translation>단일 서버의 세션 토큰 수</translation>
     </message>
     <message>
       <source>Max session token count per user on single Server</source>
@@ -1997,7 +1997,7 @@
     <message>
       <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">%2 &lt;b&gt;%1&lt;/b&gt;</translation>
+      <translation>%2 &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message numerus="yes">
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
@@ -2070,7 +2070,7 @@
     </message>
     <message>
       <source>On %1 %2</source>
-      <translation>%1 %2에</translation>
+      <translation>%1 %2</translation>
     </message>
     <message>
       <source>Trigger Name</source>
@@ -2259,7 +2259,7 @@
     </message>
     <message>
       <source>Camera time is back to normal.</source>
-      <translation type="unfinished">Camera time is back to normal.</translation>
+      <translation>카메라 시간이 정상으로 돌아왔습니다.</translation>
     </message>
     <message>
       <source>Address %1 is already in use by %2 on primary stream.</source>
@@ -2353,7 +2353,7 @@
     </message>
     <message>
       <source>Also play on source camera</source>
-      <translation type="unfinished">Also play on source camera</translation>
+      <translation>이벤트 발생카메라 재생</translation>
     </message>
     <message numerus="yes">
       <source>%n Groups</source>

@@ -2691,7 +2691,7 @@ Press Alt + Click to follow object</translation>
     <name>ZAxis</name>
     <message>
       <source>Rotate the joystick clockwise and counterclockwise several times.</source>
-      <translation type="unfinished">Rotate the joystick clockwise and counterclockwise several times.</translation>
+      <translation>조이스틱을 시계 방향, 반시계 방향으로 여러 번 돌리세요.</translation>
     </message>
   </context>
 </TS>
