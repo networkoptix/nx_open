@@ -122,12 +122,14 @@
                     dataType="Enumeration"
                     range="Disabled,Low,Medium,High,Higher,Extreme"
                     internalRange="off,10,20,30,40,50"
+                    aux="reopenStreams"
                     readCmd="param.cgi"/>
                 <param id="root.Image.I0.MPEG.ZProfile"
                     name="Profile"
                     dataType="Enumeration"
                     range="Classic,Optimized for Storage"
                     internalRange="classic,storage"
+                    aux="reopenStreams"
                     readCmd="param.cgi">
                     <dependencies>
                         <dependencies-show>
@@ -144,6 +146,7 @@
                     dataType="Enumeration"
                     range="Fixed,Dynamic"
                     internalRange="fixed,dynamic"
+                    aux="reopenStreams"
                     readCmd="param.cgi">
                     <dependencies>
                         <dependencies-show>
@@ -171,6 +174,7 @@
                     name="Max GOP Length"
                     dataType="Number"
                     range="1,1023"
+                    aux="reopenStreams"
                     readCmd="param.cgi">
                     <dependencies>
                         <dependencies-show>
@@ -190,6 +194,7 @@
                     dataType="Enumeration"
                     range="Fixed,Dynamic"
                     internalRange="fixed,dynamic"
+                    aux="reopenStreams"
                     readCmd="param.cgi">
                     <dependencies>
                         <dependencies-show>
@@ -206,6 +211,7 @@
                     description="0 means that the FPS is allowed to go as low as the dynamic frame rate can go. If a value is greater than 0 the dynamic frame rate is not allowed to go below the specified value."
                     dataType="Number"
                     range="0,10000"
+                    aux="reopenStreams"
                     unit="fps"
                     readCmd="param.cgi">
                     <dependencies>
