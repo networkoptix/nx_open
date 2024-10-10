@@ -123,6 +123,13 @@ public:
             {
                 return new ObjectLookupField(systemContext(), descriptor);
             });
+        engine->registerEventField(
+            fieldMetatype<StateField>(),
+            [](const FieldDescriptor* descriptor)
+            {
+                return new StateField(descriptor);
+            });
+
         engine->registerEvent(
             AnalyticsObjectEvent::manifest(), [] { return new AnalyticsObjectEvent(); });
 

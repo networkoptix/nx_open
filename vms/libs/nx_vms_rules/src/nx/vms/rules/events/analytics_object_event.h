@@ -24,6 +24,7 @@ public:
     AnalyticsObjectEvent() = default;
 
     AnalyticsObjectEvent(
+        State state,
         std::chrono::microseconds timestamp,
         nx::Uuid cameraId,
         nx::Uuid engineId,

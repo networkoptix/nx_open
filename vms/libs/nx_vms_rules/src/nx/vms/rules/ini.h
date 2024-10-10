@@ -22,6 +22,9 @@ struct NX_VMS_RULES_API Ini: public nx::kit::IniConfig
 
     NX_INI_FLAG(false, showHiddenTextFields,
         "Show hidden text fields in VMS rules dialog");
+
+    NX_INI_INT(5, analyticsEventInactivityS,
+        "Timeout in seconds for analytics events to auto generate Stop event.");
 };
 
 NX_VMS_RULES_API Ini& ini();
