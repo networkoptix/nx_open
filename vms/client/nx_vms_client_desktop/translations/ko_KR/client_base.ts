@@ -6138,7 +6138,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Recording in %1...</source>
-      <translation>%1에서 기록...</translation>
+      <translation>%1초 후 화면 녹화...</translation>
     </message>
     <message>
       <source>Recorded Video</source>
@@ -6998,7 +6998,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Logs Management</source>
-      <translation type="unfinished">Logs Management</translation>
+      <translation>로그 관리</translation>
     </message>
   </context>
   <context>

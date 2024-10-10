@@ -361,7 +361,7 @@
     </message>
     <message>
       <source>Camera time is back to normal.</source>
-      <translation type="unfinished">Camera time is back to normal.</translation>
+      <translation>카메라 시간이 정상으로 돌아왔습니다.</translation>
     </message>
     <message>
       <source>Device does not respond to network requests.</source>
