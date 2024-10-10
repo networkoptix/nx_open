@@ -5148,11 +5148,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</source>
-      <translation type="unfinished">Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</translation>
+      <translation>분석 데이터는 많은 공간을 차지할 수 있습니다. 시스템 파티션 대신 다른 위치를 선택하는 것이 좋습니다.</translation>
     </message>
     <message>
       <source>Analytics and motion data will continue to be stored on the disabled storage</source>
-      <translation type="unfinished">Analytics and motion data will continue to be stored on the disabled storage</translation>
+      <translation>분석 및 동작 데이터는 비활성화된 스토리지에 계속 저장됩니다</translation>
     </message>
     <message>
       <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
@@ -5818,7 +5818,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Recording in %1...</source>
-      <translation>%1에서 기록...</translation>
+      <translation>%1초 후 화면 녹화...</translation>
     </message>
     <message>
       <source>Recorded Video</source>
@@ -6495,7 +6495,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Also play on source camera</source>
-      <translation type="unfinished">Also play on source camera</translation>
+      <translation>이벤트 발생카메라 재생</translation>
     </message>
     <message>
       <source>Also show source camera</source>
@@ -6983,7 +6983,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Logs Management</source>
-      <translation type="unfinished">Logs Management</translation>
+      <translation>로그 관리</translation>
     </message>
   </context>
   <context>
@@ -10642,7 +10642,7 @@ You can force it, but it may significantly increase CPU load.</source>
     <message>
       <source>%1 layout</source>
       <comment>%1 will be substituted with a layout name</comment>
-      <translation type="unfinished">%1 layout</translation>
+      <translation>%1 레이아웃</translation>
     </message>
     <message numerus="yes">
       <source>%1 and %n more layouts</source>
