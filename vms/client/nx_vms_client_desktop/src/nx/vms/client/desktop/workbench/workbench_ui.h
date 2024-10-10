@@ -73,6 +73,8 @@ public:
     };
     Q_DECLARE_FLAGS(Panels, Panel)
 
+    static const QString kWorkbenchUiDataKey;
+
     WorkbenchUi(WindowContext* windowContext, QObject *parent = nullptr);
     virtual ~WorkbenchUi() override;
 

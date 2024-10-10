@@ -9,6 +9,8 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/state/window_geometry_manager.h>
+#include <nx/vms/client/desktop/workbench/workbench_ui.h>
 #include <statistics/statistics_manager.h>
 #include <ui/statistics/modules/session_restore_statistics_module.h>
 
@@ -301,8 +303,22 @@ void ClientStateHandler::restoreWindowsConfiguration(core::LogonData logonData)
         return;
 
     // Take the state for current window from container.
-    const auto ownState = windowStates.begin()->second;
+    auto ownState = windowStates.begin()->second;
     windowStates.erase(windowStates.begin());
+
+    auto commonState = d->clientStateStorage.readCommonSubstate();
+    if (ownState.value(WorkbenchUi::kWorkbenchUiDataKey).empty())
+    {
+        ownState.insert(
+            WorkbenchUi::kWorkbenchUiDataKey,
+            commonState.value(WorkbenchUi::kWorkbenchUiDataKey));
+    }
+    if (ownState.value(WindowGeometryManager::kWindowGeometryData).empty())
+    {
+        ownState.insert(
+            WindowGeometryManager::kWindowGeometryData,
+            commonState.value(WindowGeometryManager::kWindowGeometryData));
+    }
 
     // Collect file names from the state map.
     QStringList stateFilenames;

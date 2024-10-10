@@ -43,6 +43,8 @@ DelegateState serializeState(const WindowGeometryState& geometry)
 
 } // namespace
 
+const QString WindowGeometryManager::kWindowGeometryData = "windowGeometry";
+
 struct WindowGeometryManager::Private
 {
     Private(WindowControlInterfacePtr control):
@@ -254,10 +256,18 @@ WindowGeometryState WindowGeometryManager::windowGeometry() const
 void WindowGeometryManager::setWindowGeometry(const WindowGeometryState& value)
 {
     NX_DEBUG(this, "Geometry: %1", nx::reflect::json::serialize(value));
-
-    // In some scenarios, our window may be in Fullscreen mode already.
-    // We must show it Normal before changing geometry.
-    d->control->setWindowState(Qt::WindowNoState);
+    const auto currentState = d->control->windowState();
+    if ((currentState.testFlag(Qt::WindowFullScreen) && value.isFullscreen)
+        || (currentState.testFlag(Qt::WindowMaximized) && value.isMaximized))
+    {
+        return;
+    }
+    if (currentState.testAnyFlags(Qt::WindowFullScreen | Qt::WindowMaximized)
+        && !value.isFullscreen
+        && !value.isMaximized)
+    {
+        d->control->setWindowState(Qt::WindowNoState);
+    }
 
     if (!value.geometry.isEmpty())
         d->control->setWindowRect(value.geometry);
