@@ -18,6 +18,7 @@
 namespace nx::vms::rules {
 
 AnalyticsObjectEvent::AnalyticsObjectEvent(
+    State state,
     std::chrono::microseconds timestamp,
     nx::Uuid cameraId,
     nx::Uuid engineId,
@@ -31,6 +32,7 @@ AnalyticsObjectEvent::AnalyticsObjectEvent(
     m_objectTrackId(objectTrackId),
     m_attributes(attributes)
 {
+    setState(state);
 }
 
 QString AnalyticsObjectEvent::subtype() const
@@ -50,7 +52,7 @@ QString AnalyticsObjectEvent::aggregationKey() const
 
 QString AnalyticsObjectEvent::cacheKey() const
 {
-    return m_objectTrackId.toSimpleString();
+    return state() == State::started ? m_objectTrackId.toSimpleString() : QString();
 }
 
 nx::analytics::taxonomy::AbstractObjectType* AnalyticsObjectEvent::objectTypeById(
@@ -110,7 +112,9 @@ const ItemDescriptor& AnalyticsObjectEvent::manifest()
         .description = "Triggered when an analytics object is detected on source device. "
             "This event is specific to video analytics that provide object detection metadata, "
             "enabling accurate categorization based on the object type",
+        .flags = ItemFlag::prolonged,
         .fields = {
+            utils::makeStateFieldDescriptor(Strings::state()),
             makeFieldDescriptor<SourceCameraField>(
                 utils::kCameraIdFieldName,
                 Strings::occursAt(),

@@ -73,7 +73,8 @@ public:
     virtual QString aggregationKey() const;
 
     /**
-     * Used for caching and limiting repeat of instant events.
+     * Used for caching and limiting repeat of instant events or repeating 'start' of prolonged
+     * events.
      * Returns empty string by default.
      * Keep in sync with uniqueKey in RuleProcessor::checkEventCondition().
      */
