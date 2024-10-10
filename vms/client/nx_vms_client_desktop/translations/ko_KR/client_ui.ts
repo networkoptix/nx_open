@@ -107,7 +107,7 @@
     </message>
     <message>
       <source>Logs Management</source>
-      <translation type="unfinished">Logs Management</translation>
+      <translation>로그 관리</translation>
     </message>
     <message>
       <source>Download</source>
@@ -1951,7 +1951,7 @@
     <name>OutgoingMailSettingsWidget</name>
     <message>
       <source>Connection Settings</source>
-      <translation type="unfinished">Connection Settings</translation>
+      <translation>연결 설정</translation>
     </message>
     <message>
       <source>Password</source>
@@ -1959,7 +1959,7 @@
     </message>
     <message>
       <source>Server Address</source>
-      <translation type="unfinished">Server Address</translation>
+      <translation>서버 주소</translation>
     </message>
     <message>
       <source>Security Protocol</source>
