@@ -88,11 +88,7 @@ Qn::PaneState makePaneState(bool opened, bool pinned = true)
 }
 
 constexpr int kHideControlsTimeoutMs = 2000;
-
 constexpr qreal kZoomedTimelineOpacity = 0.9;
-
-static const QString kWorkbenchUiDataKey = "workbenchSettings";
-
 static constexpr int kReservedSceneWidth = 224;
 
 int calculateAutoFpsLimit(QnWorkbenchLayout* layout)
@@ -149,6 +145,8 @@ bool forceTimelineVisibility(QnMediaResourceWidget* widget)
 }
 
 } // namespace
+
+const QString WorkbenchUi::kWorkbenchUiDataKey = "workbenchSettings";
 
 class WorkbenchUi::StateDelegate: public ClientStateDelegate
 {

@@ -42,6 +42,8 @@ class NX_VMS_CLIENT_DESKTOP_API WindowGeometryManager:
     using base_type = QObject;
 
 public:
+    static const QString kWindowGeometryData;
+
     /**
      * Instantiate the geometry manager using the given interface implementation.
      */

@@ -7,8 +7,9 @@
 
 #include <QtWidgets/QWidget>
 
-#include <ui/widgets/main_window.h>
+#include <nx/build_info.h>
 #include <nx/vms/client/desktop/state/screen_manager.h>
+#include <ui/widgets/main_window.h>
 
 namespace nx::vms::client::desktop {
 
@@ -38,6 +39,13 @@ void WindowController::setWindowState(Qt::WindowStates state)
     m_window->show();
     qApp->processEvents();
     m_window->setWindowState(state);
+    if (nx::build_info::isMacOsX())
+    {
+        if (state == Qt::WindowNoState)
+            m_window->action(menu::FullscreenAction)->setChecked(false);
+        else if (state.testFlag(Qt::WindowFullScreen))
+            m_window->action(menu::FullscreenAction)->setChecked(true);
+    }
 }
 
 int WindowController::nextFreeScreen() const

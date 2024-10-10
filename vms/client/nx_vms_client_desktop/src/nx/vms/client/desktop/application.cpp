@@ -87,7 +87,6 @@ namespace nx::vms::client::desktop {
 namespace {
 
 const int kSuccessCode = 0;
-const QString kWindowGeometryData = "windowGeometry";
 static constexpr int kStarDragDistance = 20;
 
 void initApplication(const QnStartupParameters& startupParams)
@@ -326,7 +325,7 @@ int runApplicationInternal(QApplication* application, const QnStartupParameters&
         auto geometryManager = std::make_unique<WindowGeometryManager>(
             std::make_unique<WindowController>(mainWindow.get()));
         applicationContext->clientStateHandler()->registerDelegate(
-            kWindowGeometryData,
+            WindowGeometryManager::kWindowGeometryData,
             std::move(geometryManager));
     }
 
@@ -356,7 +355,8 @@ int runApplicationInternal(QApplication* application, const QnStartupParameters&
 
     int result = application->exec();
 
-    applicationContext->clientStateHandler()->unregisterDelegate(kWindowGeometryData);
+    applicationContext->clientStateHandler()->unregisterDelegate(
+        WindowGeometryManager::kWindowGeometryData);
 
     /* Write out settings. */
     appContext()->localSettings()->audioVolume = nx::audio::AudioDevice::instance()->volume();
