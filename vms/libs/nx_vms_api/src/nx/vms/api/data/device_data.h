@@ -24,29 +24,60 @@ struct NX_VMS_API ConnectedDevicesRequest
 NX_VMS_API_DECLARE_STRUCT_EX(ConnectedDevicesRequest, (json))
 NX_REFLECTION_INSTRUMENT(ConnectedDevicesRequest, ConnectedDevicesRequest_Fields)
 
-struct NX_VMS_API IoPortData: IdData
+struct NX_VMS_API IoPortData
 {
+    /**%apidoc:string
+     * Device id to get input/output state of the port (can be obtained from "id", "physicalId" or
+     * "logicalId" field via `GET /rest/v{1-}/devices`) or MAC address (not supported for certain
+     * cameras).
+     */
+    nx::Uuid deviceId;
+
     /**%apidoc Port number. */
     QString port;
+
+    const IoPortData& getId() const { return *this; }
+    bool operator==(const IoPortData&) const = default;
 };
-#define IoPortData_Fields IdData_Fields (port)
+#define IoPortData_Fields (deviceId)(port)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST_EX(IoPortData, (json))
 
-struct NX_VMS_API IoStateData: IoPortData
+struct NX_VMS_API IoStateResponse: IoPortData
 {
     /**%apidoc Indicates if this input/output is active. */
     bool isActive = false;
 
     /**%apidoc Timestamp in milliseconds since epoch of last activity on the port. */
-    std::optional<std::chrono::milliseconds> timestampMs = std::nullopt;
+    std::chrono::milliseconds timestampMs{};
 
-    /**%apidoc Time in milliseconds to reset Device action on action update. */
-    std::optional<std::chrono::milliseconds> autoResetTimeoutMs = std::nullopt;
-
-    bool operator==(const IoStateData& other) const = default;
+    bool operator==(const IoStateResponse&) const = default;
 };
-#define IoStateData_Fields IoPortData_Fields (isActive)(timestampMs)(autoResetTimeoutMs)
-NX_VMS_API_DECLARE_STRUCT_AND_LIST_EX(IoStateData, (json))
-NX_REFLECTION_INSTRUMENT(IoStateData, IoStateData_Fields)
+#define IoStateResponse_Fields IoPortData_Fields(isActive)(timestampMs)
+NX_VMS_API_DECLARE_STRUCT_AND_LIST_EX(IoStateResponse, (json))
+NX_REFLECTION_INSTRUMENT(IoStateResponse, IoStateResponse_Fields)
+
+struct NX_VMS_API IoStateUpdateRequest
+{
+    /**%apidoc
+     * Device id to set input/output state of the port (can be obtained from "id", "physicalId" or
+     * "logicalId" field via `GET /rest/v{1-}/devices`) or MAC address (not supported for certain
+     * cameras).
+     */
+    QString deviceId;
+
+    /**%apidoc[opt] Port number. If not specified then default Device port is used. */
+    QString port;
+
+    /**%apidoc Set this input/output active or not. */
+    bool isActive = false;
+
+    /**%apidoc[opt] Time in milliseconds to reset Device action on action update. */
+    std::chrono::milliseconds autoResetTimeoutMs{};
+
+    bool operator==(const IoStateUpdateRequest&) const = default;
+};
+#define IoStateUpdateRequest_Fields (deviceId)(port)(isActive)(autoResetTimeoutMs)
+NX_VMS_API_DECLARE_STRUCT_AND_LIST_EX(IoStateUpdateRequest, (json))
+NX_REFLECTION_INSTRUMENT(IoStateUpdateRequest, IoStateUpdateRequest_Fields)
 
 } // namespace nx::vms::api
