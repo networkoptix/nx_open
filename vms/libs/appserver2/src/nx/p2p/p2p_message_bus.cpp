@@ -1560,20 +1560,20 @@ void MessageBus::emitPeerFoundLostSignals()
                 peerName(localPeer().id),
                 peerName(peer.id));
             emitAsync(this, &MessageBus::peerLost, peer.id, peer.peerType);
-            sendRuntimeInfoRemovedToClients(peer.id);
+            sendRuntimeInfoRemoved(peer);
         }
     }
 
     m_lastAlivePeers = newAlivePeers;
 }
 
-void MessageBus::sendRuntimeInfoRemovedToClients(const nx::Uuid& id)
+void MessageBus::sendRuntimeInfoRemoved(const vms::api::PeerData& peer)
 {
-    QnTransaction<nx::vms::api::IdData> tran(ApiCommand::runtimeInfoRemoved, id);
-    tran.params.id = id;
+    QnTransaction<nx::vms::api::IdData> tran(ApiCommand::runtimeInfoRemoved, localPeer().id);
+    tran.params.id = peer.id;
     for (const auto& connection: m_connections)
     {
-        if (connection->remotePeer().isClient())
+        if (connection->remotePeer().isClient() || peer.peerType == PeerType::videowallClient)
             sendTransactionImpl(connection, tran, TransportHeader());
     }
 }

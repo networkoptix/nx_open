@@ -69,4 +69,6 @@ static constexpr char kAcceptLanguageHeader[] = "Accept-Language";
 
 static constexpr char kTicketUrlQueryName[] = "_ticket";
 
+static constexpr char VIDEOWALL_INSTANCE_HEADER_NAME[] = "videoWallInstanceGuid";
+
 } // namespace Qn

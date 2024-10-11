@@ -53,15 +53,15 @@ public:
     {
     }
 
-    void setItems(const ItemList &items)
+    void setItems(const ItemList& items)
     {
         ItemMap map;
-        for (const T &item : items)
+        for (const T& item : items)
             map[item.uuid] = item;
         setItems(map);
     }
 
-    void setItems(const ItemMap &items)
+    void setItems(const ItemMap& items)
     {
         Qn::NotifierList notifiers;
         {
@@ -77,19 +77,19 @@ public:
         return m_itemByUuid;
     }
 
-    T getItem(const nx::Uuid &uuid) const
+    T getItem(const nx::Uuid& uuid) const
     {
         NX_MUTEX_LOCKER locker(m_mutex);
         return m_itemByUuid.value(uuid);
     }
 
-    bool hasItem(const nx::Uuid &uuid) const
+    bool hasItem(const nx::Uuid& uuid) const
     {
         NX_MUTEX_LOCKER locker(m_mutex);
         return m_itemByUuid.contains(uuid);
     }
 
-    void addItem(const T &item)
+    void addItem(const T& item)
     {
         Qn::NotifierList notifiers;
         {
@@ -100,12 +100,12 @@ public:
     }
 
 
-    void removeItem(const T &item)
+    void removeItem(const T& item)
     {
         removeItem(item.uuid);
     }
 
-    void removeItem(const nx::Uuid &uuid)
+    void removeItem(const nx::Uuid& uuid)
     {
         Qn::NotifierList notifiers;
         {
@@ -115,7 +115,7 @@ public:
         notify(notifiers);
     }
 
-    void updateItem(const T &item)
+    void updateItem(const T& item)
     {
         Qn::NotifierList notifiers;
         {
@@ -125,7 +125,7 @@ public:
         notify(notifiers);
     }
 
-    void addOrUpdateItem(const T &item)
+    void addOrUpdateItem(const T& item)
     {
         Qn::NotifierList notifiers;
         {
@@ -137,6 +137,28 @@ public:
         }
         notify(notifiers);
     }
+
+    void removeItemsByCondition(std::function<bool(const T&)> condition)
+    {
+        Qn::NotifierList notifiers;
+        {
+            NX_MUTEX_LOCKER locker(m_mutex);
+            for (auto it = m_itemByUuid.begin(); it != m_itemByUuid.end();)
+            {
+                if (condition(it.value()))
+                {
+                    T item = std::move(*it);
+                    it = m_itemByUuid.erase(it);
+                    notifiers << m_notifier->storedItemRemoved(std::move(item));
+                }
+                else
+                {
+                    ++it;
+                }
+            }
+        }
+        notify(notifiers);
+}
 
 private:
     void notify(const Qn::NotifierList& notifiers)

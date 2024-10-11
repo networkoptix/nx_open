@@ -31,14 +31,14 @@ void QnRuntimeInfoManager::setMessageProcessor(QnCommonMessageProcessor* message
             [this](const nx::vms::api::IdData& peerId)
             {
                 NX_DEBUG(this, "Remote peer info removed: id %1", peerId.id);
-                m_items->removeItem(peerId.id);
+                removeItem(peerId.id);
             });
 
         connect(messageProcessor, &QnCommonMessageProcessor::remotePeerLost, this,
             [this](nx::Uuid peer, nx::vms::api::PeerType peerType)
             {
                 NX_DEBUG(this, "Remote peer lost: id %1, type %2", peer, peerType);
-                m_items->removeItem(peer);
+                removeItem(peer);
             });
 
         connect(messageProcessor, &QnCommonMessageProcessor::connectionClosed, this,
@@ -48,6 +48,27 @@ void QnRuntimeInfoManager::setMessageProcessor(QnCommonMessageProcessor* message
             });
     }
     m_messageProcessor = messageProcessor;
+}
+
+void QnRuntimeInfoManager::removeItem(const nx::Uuid& id)
+{
+    m_items->removeItemsByCondition(
+        [id, this](const QnPeerRuntimeInfo& item)
+        {
+            if (item.data.peer.id == id)
+            {
+                NX_VERBOSE(this, "Remote peer %1 with type %2 by id",
+                    item.data.peer.id, item.data.peer.peerType);
+                return true;
+            }
+            if (item.data.parentServerId == id)
+            {
+                NX_VERBOSE(this, "Remote peer %1 with type %2 by parent id",
+                    item.data.peer.id, item.data.peer.peerType);
+                return true;
+            }
+            return false;
+        });
 }
 
 const QnThreadsafeItemStorage<QnPeerRuntimeInfo> * QnRuntimeInfoManager::items() const
