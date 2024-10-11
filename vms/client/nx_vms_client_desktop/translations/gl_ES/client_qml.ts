@@ -2452,7 +2452,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Confirm Password</source>
-      <translation type="unfinished">Confirm Password</translation>
+      <translation>Confirmar contrasinal</translation>
     </message>
     <message>
       <source>Allow insecure (digest) authentication</source>
