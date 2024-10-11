@@ -66,6 +66,8 @@ signals:
     void runtimeInfoRemoved(const QnPeerRuntimeInfo& data);
 
 private:
+    void removeItem(const nx::Uuid& id);
+
     virtual Qn::Notifier storedItemAdded(const QnPeerRuntimeInfo& item) override;
     virtual Qn::Notifier storedItemRemoved(const QnPeerRuntimeInfo& item) override;
     virtual Qn::Notifier storedItemChanged(
