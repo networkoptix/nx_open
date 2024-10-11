@@ -52,6 +52,9 @@ struct NX_VMS_API RuntimeData
 
     qint64 prematureVideoWallLicenseExpirationDate = 0;
 
+    /**%apidoc Used for client peers. Their parent is VMS server. */
+    nx::Uuid parentServerId;
+
     /**
     * This operator must not be replaced with reflection implementation as it skips brand and
     * customization checking.
@@ -78,7 +81,8 @@ struct NX_VMS_API RuntimeData
     (flags) \
     (customization) \
     (activeAnalyticsEngines) \
-    (prematureVideoWallLicenseExpirationDate)
+    (prematureVideoWallLicenseExpirationDate) \
+    (parentServerId)
 NX_VMS_API_DECLARE_STRUCT_EX(RuntimeData, (ubjson)(json)(xml))
 
 } // namespace nx::vms::api

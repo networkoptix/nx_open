@@ -56,7 +56,7 @@ Connection::Connection(
     if (!localInfo.data.videoWallInstanceGuid.isNull())
     {
         queryParams.push_back({
-            "videoWallInstanceGuid",
+            Qn::VIDEOWALL_INSTANCE_HEADER_NAME,
             localInfo.data.videoWallInstanceGuid.toSimpleString()});
     }
 
