@@ -304,7 +304,7 @@ QnUserResource::QnUserResource(nx::vms::api::UserType userType, nx::vms::api::Us
     setTypeId(nx::vms::api::UserData::kResourceTypeId);
     if (m_userType == nx::vms::api::UserType::cloud)
     {
-        m_digest = nx::vms::api::UserData::kCloudPasswordStub;
+        m_digest = nx::vms::api::UserData::kHttpIsDisabledStub;
         m_hash.type = QnUserHash::Type::cloud;
     }
 
