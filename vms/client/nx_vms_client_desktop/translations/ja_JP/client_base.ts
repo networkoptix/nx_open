@@ -1530,11 +1530,11 @@ License Key: %2</source>
     <message>
       <source>Route via %1</source>
       <extracomment>%1 will be substituted with branded cloud service name e.g. &quot;Nx Cloud&quot;.</extracomment>
-      <translation>%1経由のルート</translation>
+      <translation>%1 経由で送信</translation>
     </message>
     <message>
       <source>Route via SMTP server</source>
-      <translation>SMTP サーバー経由のルート</translation>
+      <translation>SMTP サーバー経由で送信</translation>
     </message>
     <message>
       <source>Success</source>
