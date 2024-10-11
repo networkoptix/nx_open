@@ -7,6 +7,7 @@
 
 #include <health/system_health_strings_helper.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/client/core/common/utils/text_utils.h>
 #include <nx/vms/client/core/image_providers/resource_thumbnail_provider.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
@@ -15,7 +16,6 @@
 #include <nx/vms/client/desktop/common/utils/command_action.h>
 #include <nx/vms/client/desktop/common/widgets/close_button.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
-#include <nx/vms/client/desktop/utils/widget_utils.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/system_settings.h>
 #include <utils/common/delayed.h>
@@ -386,7 +386,7 @@ QString EventTile::Private::getElidedStringByRowsNumberAndWidth(
     doc.setDefaultFont(font);
     doc.setHtml(common::html::toHtml(text));
     doc.setTextWidth(textWidth);
-    WidgetUtils::elideDocumentLines(&doc, rowLimit, true, "(...)");
+    core::text_utils::elideDocumentLines(&doc, rowLimit, true, "(...)");
     // Must return html, since many strings in labels are created with html formatting.
     return doc.toHtml();
 }

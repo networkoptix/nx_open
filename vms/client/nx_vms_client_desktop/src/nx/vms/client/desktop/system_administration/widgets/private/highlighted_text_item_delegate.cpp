@@ -10,9 +10,9 @@
 #include <QtGui/QPainter>
 #include <QtWidgets/QAbstractItemView>
 
+#include <nx/vms/client/core/common/utils/text_utils.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/utils/widget_utils.h>
 #include <nx/vms/common/html/html.h>
 
 namespace {
@@ -72,7 +72,7 @@ public:
             doc.setDocumentMargin(0);
             doc.setHtml(text);
 
-            WidgetUtils::elideTextRight(&doc, option.rect.width());
+            core::text_utils::elideTextRight(&doc, option.rect.width());
 
             const auto pixmapSize = (doc.size() * pixelRatio).toSize();
 

@@ -14,7 +14,6 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/utils/mouse_spy.h>
 #include <nx/vms/client/desktop/utils/qml_property.h>
-#include <nx/vms/client/desktop/utils/widget_utils.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/event_processors.h>
@@ -43,7 +42,7 @@ struct BubbleToolTip::Private
     const QmlProperty<int> pointerEdge{widget.get(), "pointerEdge"};
     const QmlProperty<qreal> normalizedPointerPos{widget.get(), "normalizedPointerPos"};
     const QmlProperty<QString> text{widget.get(), "text"};
-    QString sourceText;
+    const QmlProperty<qreal> maximumHeight{widget.get(), "maximumHeight"};
 
     State state = State::hidden;
 
@@ -155,10 +154,6 @@ QString BubbleToolTip::text() const
 
 void BubbleToolTip::setText(const QString& value)
 {
-    if (d->sourceText == value)
-        return;
-
-    d->sourceText = value;
     d->text = value;
 }
 
@@ -230,6 +225,7 @@ void BubbleToolTip::setEnclosingRect(const QRect& value)
         return;
 
     d->enclosingRect = value;
+    d->maximumHeight = d->enclosingRect.height();
     d->updatePosition();
 }
 
@@ -267,15 +263,6 @@ void BubbleToolTip::Private::updatePosition()
     {
         widget->move(-widget->width(), -widget->height());
         return;
-    }
-
-    if (params.property("truncationRequired").toBool())
-    {
-        QTextDocument doc(sourceText);
-        auto padding = params.property("padding").toNumber();
-        WidgetUtils::elideDocumentHeight(
-            &doc, enclosingRect.height() - padding - QFontMetrics(doc.defaultFont()).height());
-        text = doc.toHtml();
     }
 
     pointerEdge = params.property("pointerEdge").toInt();

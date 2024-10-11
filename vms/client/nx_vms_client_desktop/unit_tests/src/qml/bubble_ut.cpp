@@ -292,7 +292,7 @@ TEST_F(BubbleTest, bubbleDoesntFit)
         /*targetRect*/ QRectF(200, 0, 50, 50),
         /*enclosingRect*/ QRectF(0, 0, 400, 99));
 
-    ASSERT_TRUE(result.has_value());
+    ASSERT_FALSE(result.has_value());
 
     setSize(100, 100, Qt::Vertical);
 

@@ -29,8 +29,40 @@ Bubble
 
     contentItem: Item
     {
-        implicitWidth: column.width
-        implicitHeight: column.height
+        id: content
+
+        implicitWidth:
+        {
+            if (toolTip.thumbnailVisible)
+                return 224
+
+            let result = description.relevant ? description.implicitWidth : 0
+
+            if (attributeTable.relevant)
+                result = Math.max(result, attributeTable.implicitWidth)
+
+            return result
+        }
+
+        implicitHeight:
+        {
+            let heights = []
+
+            if (toolTip.thumbnailVisible)
+                heights.push(thumbnail.implicitHeight)
+
+            if (description.relevant)
+                heights.push(description.implicitHeight)
+
+            if (attributeTable.relevant)
+                heights.push(attributeTable.implicitHeight)
+
+            if (!heights.length)
+                return 0
+
+            let result = heights.reduce((a, b) => a + b) + (heights.length - 1) * column.spacing
+            return Math.min(result, toolTip.maximumContentSize.height)
+        }
 
         Column
         {
@@ -40,43 +72,53 @@ Bubble
             layer.enabled: height < implicitHeight
 
             spacing: 2
-            height: Math.min(implicitHeight, toolTip.maximumContentSize.height)
+            anchors.fill: parent
 
             Preview
             {
                 id: thumbnail
 
-                implicitWidth: 224
+                implicitWidth: content.width
                 minimumAspectRatio: 0.25
                 visible: toolTip.thumbnailVisible
                 showHighlightBorder: true
             }
 
-            TextEdit
+            MultilineText
             {
                 id: description
 
-                readOnly: true
-                cursorVisible: false
+                readonly property bool relevant: !!text
+                visible: relevant
+
+                width: content.width
+
+                height:
+                {
+                    let availableHeight = content.height
+
+                    if (toolTip.thumbnailVisible)
+                        availableHeight -= thumbnail.height + column.spacing
+
+                    if (attributeTable.relevant)
+                        availableHeight -= attributeTable.height + column.spacing
+
+                    return Math.min(implicitHeight, availableHeight)
+                }
+
                 wrapMode: Text.Wrap
                 color: ColorTheme.colors.light16
-                textFormat: NxGlobals.mightBeHtml(toolTip.text) ? Qt.RichText : Qt.PlainText
                 text: toolTip.text
-
-                width: toolTip.thumbnailVisible
-                    ? thumbnail.width
-                    : Math.min(implicitWidth, toolTip.maximumContentSize.width)
             }
 
             NameValueTable
             {
                 id: attributeTable
 
-                visible: items.length > 0
+                readonly property bool relevant: items.length > 0
+                visible: relevant
 
-                width: toolTip.thumbnailVisible
-                    ? thumbnail.width
-                    : Math.min(implicitWidth, toolTip.maximumContentSize.width)
+                width: content.width
 
                 nameColor: ColorTheme.colors.light10
                 valueColor: ColorTheme.colors.light16
