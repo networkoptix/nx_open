@@ -2122,14 +2122,22 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutAboutToBeChanged()
         }
     }
 
-    // GC muted item ids & save. Value is written out on assignment.
-    QSet<nx::Uuid> existingItemIds;
-    for (const auto& otherLayout: resourcePool()->getResources<QnLayoutResource>())
+    // GC muted item ids & save. Don't GC if showreel is running as it's using layouts that
+    // are not in the pool.
+    if (!context()->action(action::ToggleShowreelModeAction)->isChecked())
     {
-        for (const auto& itemId: otherLayout->getItems().keys())
-            existingItemIds.insert(itemId);
+        QSet<nx::Uuid> existingItemIds;
+        for (const auto& otherLayout: resourcePool()->getResources<QnLayoutResource>())
+        {
+            for (const auto& itemId: otherLayout->getItems().keys())
+                existingItemIds.insert(itemId);
+        }
+        std::erase_if(
+            mutedItemIds,
+            [&] (const nx::Uuid& id) {
+                return !existingItemIds.contains(id);
+            });
     }
-    std::erase_if(mutedItemIds, [&] (const nx::Uuid& id) { return !existingItemIds.contains(id); });
     systemContext()->localSettings()->mutedItemIds = mutedItemIds;
 
     foreach(QnWorkbenchItem *item, layout->items())
