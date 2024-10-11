@@ -27,8 +27,6 @@ AbstractButton
 
     opacity: enabled ? 1.0 : 0.3
 
-    baselineOffset: (contentItem && contentItem.baselineOffset) || 0
-
     focusPolicy: Qt.TabFocus
 
     icon.width: 20

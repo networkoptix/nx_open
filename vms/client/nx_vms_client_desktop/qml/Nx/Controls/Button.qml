@@ -52,8 +52,6 @@ Button
 
     implicitHeight: 28
 
-    baselineOffset: (contentItem && contentItem.baselineOffset) || 0
-
     font.pixelSize: FontConfig.normal.pixelSize
     font.weight: Font.Medium
 
