@@ -2,6 +2,7 @@
 
 #include "layout_action_handler.h"
 
+#include <QtCore/QTimer>
 #include <QtGui/QAction>
 
 #include <client/client_globals.h>
@@ -152,6 +153,31 @@ bool hasCrossSystemItems(const LayoutResourcePtr& layout)
                 && crossSystemResourceSystemId(item.resource) != currentCloudSystemId;
         });
 }
+
+void saveCloudLayoutRetryCallback(bool success, const LayoutResourcePtr& layout)
+{
+    if (success)
+        return;
+
+    auto systemContext = SystemContext::fromResource(layout);
+    if (!NX_ASSERT(systemContext))
+        return;
+
+    auto snapshotManager = systemContext->layoutSnapshotManager();
+    if (!snapshotManager->isSaveable(layout))
+        return;
+
+    QTimer* timer = new QTimer(layout.get());
+    timer->setSingleShot(true);
+    QObject::connect(timer, &QTimer::timeout, timer,
+        [snapshotManager, layout]()
+        {
+            snapshotManager->save(layout, saveCloudLayoutRetryCallback);
+        });
+
+    const std::chrono::milliseconds kSaveAttemptDelay(5000);
+    timer->start(kSaveAttemptDelay);
+};
 
 } // namespace
 
@@ -421,7 +447,7 @@ void LayoutActionHandler::saveLayout(const LayoutResourcePtr& layout)
 
     if (layout->isCrossSystem())
     {
-        snapshotManager->save(layout);
+        snapshotManager->save(layout, saveCloudLayoutRetryCallback);
         return;
     }
 

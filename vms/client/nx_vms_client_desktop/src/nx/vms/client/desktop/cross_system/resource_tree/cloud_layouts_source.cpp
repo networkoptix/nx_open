@@ -21,12 +21,7 @@ CloudLayoutsSource::CloudLayoutsSource()
         [this](const QnResourceList& resources)
         {
             for (const auto& layout: resources.filtered<CrossSystemLayoutResource>())
-            {
-                if (layout->hasFlags(Qn::local))
-                    listenLocalLayout(layout);
-                else
-                    emit resourceAdded(layout);
-            }
+                emit resourceAdded(layout);
         });
 
     connect(resourcePool, &QnResourcePool::resourcesRemoved,
@@ -43,33 +38,9 @@ QVector<QnResourcePtr> CloudLayoutsSource::getResources()
 
     QVector<QnResourcePtr> result;
     for (const auto& layout: resourcePool->getResources<CrossSystemLayoutResource>())
-    {
-        if (layout->hasFlags(Qn::local))
-            listenLocalLayout(layout);
-        else
-            result.push_back(layout);
-    }
+        result.push_back(layout);
 
     return result;
-}
-
-void CloudLayoutsSource::processLocalLayout(const QnResourcePtr& resource)
-{
-    const auto layout = resource.dynamicCast<CrossSystemLayoutResource>();
-    // Check removed flag as we do not do disconnect on remove.
-    if (NX_ASSERT(layout)
-        && !layout->hasFlags(Qn::local)
-        && !layout->hasFlags(Qn::removed))
-    {
-        layout->disconnect(this);
-        emit resourceAdded(layout);
-    }
-}
-
-void CloudLayoutsSource::listenLocalLayout(const CrossSystemLayoutResourcePtr& layout)
-{
-    connect(layout.data(), &QnResource::flagsChanged,
-        this, &CloudLayoutsSource::processLocalLayout);
 }
 
 } // namespace entity_resource_tree

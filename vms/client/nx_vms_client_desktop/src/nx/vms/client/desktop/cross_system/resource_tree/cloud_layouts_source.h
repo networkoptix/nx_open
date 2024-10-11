@@ -13,10 +13,6 @@ class CloudLayoutsSource: public AbstractResourceSource
 public:
     CloudLayoutsSource();
     virtual QVector<QnResourcePtr> getResources() override;
-
-private:
-    void processLocalLayout(const QnResourcePtr& resource);
-    void listenLocalLayout(const CrossSystemLayoutResourcePtr& layout);
 };
 
 } // namespace entity_resource_tree
