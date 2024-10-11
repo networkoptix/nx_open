@@ -526,6 +526,11 @@ vms::api::PeerDataEx deserializePeerData(const network::http::Request& request)
 
     result.dataFormat = dataFormat;
 
+    const nx::Uuid videoWallInstanceGuid(query.queryItemValue(Qn::VIDEOWALL_INSTANCE_HEADER_NAME));
+    if (!videoWallInstanceGuid.isNull())
+        result.peerType = nx::vms::api::PeerType::videowallClient;
+
+
     return result;
 }
 
