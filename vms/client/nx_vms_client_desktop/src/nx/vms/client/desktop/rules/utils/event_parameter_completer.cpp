@@ -54,53 +54,45 @@ struct EventParameterCompleter::Private: public QObject
     void initCurrentWord(int cursorPosition, const QString& text);
     void initPopup(QAbstractItemView* popup);
     void triggerCompleter();
-    void completeText(const QString& textToComplete);
-    bool isSameAsCurrentWord(const QString& replacement);
+    void completeText(const QString& textToComplete, bool moveCursorBeforeEndingSymbol);
+    bool isSameAsCurrentWord(QString replacement);
     void onCompleteActivated(const QString& textFromCompleter);
 };
 
 void EventParameterCompleter::Private::initCurrentWord(int cursorPosition, const QString& text)
 {
     const QStringView textBeforeCursor{text.data(), cursorPosition};
-    const auto startOfSubstitution =
+    const auto startOfEventParameter =
         EventParameterHelper::getLatestEventParameterPos(textBeforeCursor, cursorPosition - 1);
-    currentReplaceableWord.begin = startOfSubstitution == -1 ? 0 : startOfSubstitution;
 
-    int wordEnd = text.size();
-    int wordLength = 0;
-    if (startOfSubstitution == -1)
+    if (startOfEventParameter == -1)
     {
-        // It's regular word, searching for first space.
-        static const QRegularExpression spacePattern{"\\s", QRegularExpression::CaseInsensitiveOption};
-        const auto spaceAfterWord = text.indexOf(spacePattern, cursorPosition);
-        wordEnd = spaceAfterWord == -1 ? text.size() : spaceAfterWord;
-        wordLength = wordEnd - currentReplaceableWord.begin;
-    }
-    else //< It's subsititution, searching for substitution symbols.
-    {
-        // Searching for closing symbol,
-        // since substitution can contain spaces, for example {event.attributes.License Plate}.
-        const int nearestEndOfEventParameter =
-            text.indexOf(EventParameterHelper::endCharOfEventParameter(), cursorPosition);
-
-        // To handle case, when new substitution is put before previous, need to search for
-        // start of next parameter.
-        const int startOfNextSubstitution =
-            text.indexOf(EventParameterHelper::startCharOfEventParameter(), cursorPosition);
-
-        if (startOfNextSubstitution != -1 && startOfNextSubstitution < nearestEndOfEventParameter)
-        {
-            wordEnd = startOfNextSubstitution;
-            wordLength = wordEnd - currentReplaceableWord.begin;
-        }
-        else
-        {
-            wordEnd = nearestEndOfEventParameter == -1 ? text.size() : nearestEndOfEventParameter;
-            wordLength = wordEnd - currentReplaceableWord.begin + 1;
-        }
+        // It's regular text. Insert text from completer without replacement.
+        currentReplaceableWord = CurrentWord{.begin = 0};
+        return;
     }
 
-    currentReplaceableWord.length = wordLength;
+    currentReplaceableWord.begin = startOfEventParameter;
+
+    // Find closing symbol, since event parameters can contain spaces,
+    // e.g., {event.attributes.License Plate}.
+    const int nearestEndOfEventParameter =
+        text.indexOf(EventParameterHelper::endCharOfEventParameter(), cursorPosition);
+
+    const int startOfNextEventParameter =
+        text.indexOf(EventParameterHelper::startCharOfEventParameter(), cursorPosition);
+
+    const bool isBracketBeforeOtherBracket =
+        startOfNextEventParameter != -1 && startOfNextEventParameter < nearestEndOfEventParameter;
+    const bool isReplacingCompleteEventParameter =
+        !isBracketBeforeOtherBracket && nearestEndOfEventParameter != -1;
+
+    // Set the word length, based on whether we are replacing a complete event parameter or not.
+    currentReplaceableWord.length = isReplacingCompleteEventParameter
+        ? nearestEndOfEventParameter - currentReplaceableWord.begin + 1
+        // Unfinished event parameter, replace until the cursor.
+        : cursorPosition - currentReplaceableWord.begin;
+
     currentReplaceableWord.wordBeforeCursor =
         textBeforeCursor
             .sliced(currentReplaceableWord.begin, cursorPosition - currentReplaceableWord.begin)
@@ -112,39 +104,20 @@ void EventParameterCompleter::Private::onCompleteActivated(const QString& textFr
     if (textFromCompleter.isEmpty())
         return;
 
-    QString textToComplete = textFromCompleter;
-    const bool isSubGroupName = completerModel->isSubGroupName(textToComplete);
-    bool needToReshowPopup = isSubGroupName;
-    if (isSubGroupName)
-    {
-        const auto lastChar = textToComplete.back();
-        if (!NX_ASSERT(EventParameterHelper::isEndOfEventParameter(lastChar)))
-            return;
+    const bool shouldTriggerCompleter = completerModel->isSubGroupName(textFromCompleter)
+        && !isSameAsCurrentWord(textFromCompleter);
 
-        textToComplete.removeLast(); // Remove closing bracket, to be able fill subgroups.
-        if (isSameAsCurrentWord(textToComplete))
-        {
-            // The current name of subgroup is already a desired replacement.
-            // Finish typing of paramter.
-            needToReshowPopup = false;
-            textToComplete += lastChar;
-        }
-    }
-
-    completeText(textToComplete);
-
-    if (isSubGroupName && needToReshowPopup)
-        triggerCompleter();
-    else
+    completeText(textFromCompleter, shouldTriggerCompleter);
+    if (!shouldTriggerCompleter)
         completerModel->resetExpandedGroup();
 }
 
-bool EventParameterCompleter::Private::isSameAsCurrentWord(const QString& replacement)
+bool EventParameterCompleter::Private::isSameAsCurrentWord(QString replacement)
 {
-    return currentReplaceableWord.wordBeforeCursor == replacement;
+    return currentReplaceableWord.wordBeforeCursor == replacement.removeLast();
 }
 
-void EventParameterCompleter::Private::completeText(const QString& completedText)
+void EventParameterCompleter::Private::completeText(const QString& completedText, bool moveCursorBeforeEndingSymbol)
 {
     if (!textEdit)
         return;
@@ -153,14 +126,16 @@ void EventParameterCompleter::Private::completeText(const QString& completedText
 
     replaceCurrentWordWithCompleted(currentText, completedText);
 
-    if (currentText == textEdit->toPlainText())
-        return;
-
     QScopedValueRollback rollback{isCompletingInProgress, true};
-    textEdit->setText(currentText);
 
+    if (currentText != textEdit->toPlainText())
+        textEdit->setText(currentText);
+
+    int newCursorPos = currentReplaceableWord.begin + completedText.size();
+    if (moveCursorBeforeEndingSymbol)
+        --newCursorPos; //< Cursor is moved before '}' when completed text is subgroup.
     auto cursor = textEdit->textCursor();
-    cursor.setPosition(currentReplaceableWord.begin + completedText.size());
+    cursor.setPosition(newCursorPos);
     textEdit->setTextCursor(cursor);
 }
 
@@ -176,7 +151,7 @@ void EventParameterCompleter::Private::triggerCompleter()
     initCurrentWord(cursor.position(), textEdit->toPlainText());
     updateCompleter();
 
-    // Completer will popup, when cursor placed after the bracket symbol (for e.g '{' is typed)
+    // Completer must popup, only when cursor placed after the bracket symbol.
     if (!EventParameterHelper::isIncompleteEventParameter(currentReplaceableWord.wordBeforeCursor))
     {
         completer->popup()->hide();
