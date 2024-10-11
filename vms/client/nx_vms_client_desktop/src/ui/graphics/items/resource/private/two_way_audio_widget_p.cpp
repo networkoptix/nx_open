@@ -125,6 +125,15 @@ QnTwoWayAudioWidget::Private::Private(
             emit q->released();
         });
 
+    connect(button, &QnImageButtonWidget::stateChanged, this,
+        [this]()
+        {
+            if (button->state() == QnImageButtonWidget::Default && m_state == HintState::hovered)
+                setState(HintState::ok);
+            else if (button->state() == QnImageButtonWidget::Hovered && m_state == HintState::ok)
+                setState(HintState::hovered);
+        });
+
     m_hintTimer->setInterval(100ms);
     m_hintTimer->setSingleShot(false);
     connect(m_hintTimer, &QTimer::timeout, this, [this]
@@ -150,6 +159,10 @@ QnTwoWayAudioWidget::Private::Private(
                     }
                 }
                 return;
+
+            case HintState::hovered:
+                timeout = kShowHintMs;
+                break;
 
             case HintState::released:
                 timeout = kShowHintMs;
@@ -314,6 +327,7 @@ void QnTwoWayAudioWidget::Private::setState(HintState state)
     bool open = false;
     switch (m_state)
     {
+        case HintState::hovered:
         case HintState::pressed:
         {
             open = true;
@@ -359,8 +373,12 @@ void QnTwoWayAudioWidget::Private::setState(HintState state)
         connect(m_hintAnimator, &AbstractAnimator::finished, this,
             [this]()
             {
-                if (m_state == HintState::released || m_state == HintState::error)
+                if (m_state == HintState::hovered
+                    || m_state == HintState::released
+                    || m_state == HintState::error)
+                {
                     opacityAnimator(hint, kHintOpacityAnimationSpeed)->animateTo(kVisible);
+                }
             });
 
         m_hintAnimator->setEasingCurve(QEasingCurve::OutQuad);

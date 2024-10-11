@@ -49,6 +49,7 @@ private:
     enum class HintState
     {
         ok,         //< Hint is hidden.
+        hovered,    //< Initial hint showed.
         pressed,    //< Just pressed, waiting to check.
         released,   //< Button is released too fast, hint is required.
         error,      //< Some error occurred.
