@@ -52,6 +52,7 @@
 #include <nx/vms/client/core/motion/items/motion_mask_item.h>
 #include <nx/vms/client/core/network/oauth_client.h>
 #include <nx/vms/client/core/network/server_certificate_validation_level.h>
+#include <nx/vms/client/core/qml/items/multiline_text_item.h>
 #include <nx/vms/client/core/qml/nx_globals_object.h>
 #include <nx/vms/client/core/qml/positioners/grid_positioner.h>
 #include <nx/vms/client/core/qml/qml_test_helper.h>
@@ -194,6 +195,7 @@ void initializeMetaTypes()
     FetchRequest::registerQmlType();
     ColorTheme::registerQmlType();
     TranslationListModel::registerQmlType();
+    MultilineTextItem::registerQmlType();
 
     qRegisterMetaType<nx::vms::client::core::ThumbnailStatus>();
 

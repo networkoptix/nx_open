@@ -32,25 +32,6 @@ public:
     /** Workaround while Qt's QWidget::mapFromGlobal is broken. */
     static QPoint mapFromGlobal(const QGraphicsWidget* to, const QPoint& globalPos);
     static QPoint mapFromGlobal(const QWidget* to, const QPoint& globalPos);
-
-    /** Limit document height, adding specified text (default to "...") as the last visible line. */
-    static void elideDocumentHeight(
-        QTextDocument* document,
-        int maxHeight,
-        const QString& tail = "...");
-
-    /** Limit document lines, adding specified text (default to "...") as the last visible line. */
-    static void elideDocumentLines(
-        QTextDocument* document,
-        int maxLines,
-        bool trimLastLine = false,
-        const QString& tail = "...");
-
-    /** Limit text width, adding specified text (default to "...") at the end. */
-    static void elideTextRight(
-        QTextDocument* document,
-        int width,
-        const QString& tail = "...");
 };
 
 } // namespace nx::vms::client::desktop

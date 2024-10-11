@@ -1,11 +1,13 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.15
-import QtQuick.Controls 2.15
-import QtQuick.Shapes 1.15
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Shapes
 import Qt5Compat.GraphicalEffects
 
-import Nx.Core 1.0
+import Nx.Core
+
+import nx.vms.client.core
 
 Item
 {
@@ -30,6 +32,9 @@ Item
     property real rightOverhang: 0
     property real topOverhang: 0
     property real bottomOverhang: 0
+
+    property real maximumWidth: Number.MAX_VALUE
+    property real maximumHeight: Number.MAX_VALUE
 
     property color color: ColorTheme.colors.dark13
     property color textColor: ColorTheme.colors.light1
@@ -165,8 +170,11 @@ Item
         topPadding: bubble.topPadding + extraPadding(Qt.TopEdge)
         bottomPadding: bubble.bottomPadding + extraPadding(Qt.BottomEdge)
 
-        implicitWidth: bubble.implicitContentWidth + leftPadding + rightPadding
-        implicitHeight: bubble.implicitContentHeight + topPadding + bottomPadding
+        implicitWidth: Math.min(bubble.implicitContentWidth + leftPadding + rightPadding,
+            bubble.maximumWidth)
+
+        implicitHeight: Math.min(bubble.implicitContentHeight + topPadding + bottomPadding,
+            bubble.maximumHeight)
 
         opacity: 0
         layer.enabled: opacity < 1.0
@@ -317,11 +325,12 @@ Item
             }
         }
 
-        contentItem: Text
+        contentItem: MultilineText
         {
             text: bubble.text
             font: bubble.font
             color: bubble.textColor
+            wrapMode: Text.Wrap
         }
     }
 
@@ -391,7 +400,7 @@ Item
     /**
      * Calculate parameters for bubble positioning near specified target in accordance with
      * specified constraints. This function assumes the bubble is allowed to take up the space
-     * dictated by contentItem implicit size.
+     * dictated by contentItem implicit size with maximumWidth and maximumHeight constraints.
      *
      * @param orientation Orientation of the bubble pointer: Qt.Horizontal or Qt.Vertical
      * @param targetRect Rectangle to point the bubble at.
@@ -413,11 +422,11 @@ Item
 
         if (orientation === Qt.Horizontal)
         {
-            const requiredWidth = bubble.implicitContentWidth
-                + bubble.leftPadding + bubble.rightPadding + bubble.pointerLength
+            const requiredWidth = Math.min(bubble.maximumWidth, bubble.implicitContentWidth
+                + bubble.leftPadding + bubble.rightPadding + bubble.pointerLength)
 
-            const requiredHeight = bubble.implicitContentHeight
-                + bubble.topPadding + bubble.bottomPadding
+            const requiredHeight = Math.min(bubble.maximumHeight, bubble.implicitContentHeight
+                + bubble.topPadding + bubble.bottomPadding)
 
             const minTargetY = Math.max(targetRect.top, enclosingRect.top)
             const maxTargetY = Math.min(targetRect.bottom, enclosingRect.bottom)
@@ -454,16 +463,7 @@ Item
             const topShift = bubble.containDecorationsInside ? control.topInset : 0
 
             if (bubbleY_noShadow < enclosingRect.top) //< If the bubble doesn't fit vertically.
-            {
-                return {
-                    "pointerEdge": selectedEdge,
-                    "normalizedPointerPos": (pointToY - bubbleY_noShadow) / requiredHeight,
-                    "x": bubbleX,
-                    "y": enclosingRect.top,
-                    "truncationRequired": true,
-                    "padding": bubble.topPadding + bubble.bottomPadding + 2 * shadowBlurRadius
-                }
-            }
+                return undefined
 
             return {
                 "pointerEdge": selectedEdge,
@@ -473,11 +473,11 @@ Item
         }
         else
         {
-            const requiredWidth = bubble.implicitContentWidth
-                + bubble.leftPadding + bubble.rightPadding
+            const requiredWidth = Math.min(bubble.maximumWidth, bubble.implicitContentWidth
+                + bubble.leftPadding + bubble.rightPadding)
 
-            const requiredHeight = bubble.implicitContentHeight
-                + bubble.topPadding + bubble.bottomPadding + bubble.pointerLength
+            const requiredHeight = Math.min(bubble.maximumHeight, bubble.implicitContentHeight
+                + bubble.topPadding + bubble.bottomPadding + bubble.pointerLength)
 
             const minTargetX = Math.max(targetRect.left, enclosingRect.left)
             const maxTargetX = Math.min(targetRect.right, enclosingRect.right)
