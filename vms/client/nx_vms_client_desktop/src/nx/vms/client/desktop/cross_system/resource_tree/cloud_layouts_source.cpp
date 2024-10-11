@@ -21,39 +21,12 @@ CloudLayoutsSource::CloudLayoutsSource()
             const auto cloudLayoutsManager = appContext()->cloudLayoutsManager();
             const auto resourcePool = cloudLayoutsManager->systemContext()->resourcePool();
 
-            auto processLocalLayout =
-                [this](const QnResourcePtr& resource)
-                {
-                    auto layout = resource.dynamicCast<CrossSystemLayoutResource>();
-                    // Check removed flag as we do not do disconnect on remove.
-                    if (NX_ASSERT(layout)
-                        && !layout->hasFlags(Qn::local)
-                        && !layout->hasFlags(Qn::removed))
-                    {
-                        (*addKeyHandler)(layout);
-                    }
-                };
-
-            auto listenLocalLayout =
-                [this, processLocalLayout](const CrossSystemLayoutResourcePtr& layout)
-                {
-                    m_connectionsGuard.add(QObject::connect(
-                        layout.data(),
-                        &QnResource::flagsChanged,
-                        processLocalLayout));
-                };
-
             m_connectionsGuard.add(QObject::connect(
                 resourcePool, &QnResourcePool::resourcesAdded,
-                    [this, listenLocalLayout](const QnResourceList& resources)
+                    [this](const QnResourceList& resources)
                     {
                         for (const auto& layout: resources.filtered<CrossSystemLayoutResource>())
-                        {
-                            if (layout->hasFlags(Qn::local))
-                                listenLocalLayout(layout);
-                            else
-                                (*addKeyHandler)(layout);
-                        }
+                            (*addKeyHandler)(layout);
                     }));
 
             m_connectionsGuard.add(QObject::connect(
@@ -66,12 +39,7 @@ CloudLayoutsSource::CloudLayoutsSource()
 
             QVector<QnResourcePtr> keys;
             for (const auto& layout: resourcePool->getResources<CrossSystemLayoutResource>())
-            {
-                if (layout->hasFlags(Qn::local))
-                    listenLocalLayout(layout);
-                else
-                    keys.push_back(layout);
-            }
+                keys.push_back(layout);
             setKeysHandler(keys);
         };
 }
