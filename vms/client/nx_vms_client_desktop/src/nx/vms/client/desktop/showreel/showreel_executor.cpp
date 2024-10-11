@@ -14,9 +14,11 @@
 #include <nx/vms/client/desktop/radass/radass_types.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
+#include <nx/vms/client/desktop/settings/system_specific_local_settings.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <nx/vms/client/desktop/ui/scene/widgets/scene_banners.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
@@ -189,6 +191,7 @@ void ShowreelExecutor::resumeCurrentShowreel()
 void ShowreelExecutor::resetShowreelItems(const nx::vms::api::ShowreelItemDataList& items)
 {
     const auto radassManager = context()->instance<RadassResourceManager>();
+    auto mutedItemIds = systemContext()->localSettings()->mutedItemIds();
 
     m_showreel.items.clear();
 
@@ -218,6 +221,8 @@ void ShowreelExecutor::resetShowreelItems(const nx::vms::api::ShowreelItemDataLi
                 const auto mode = radassManager->mode(oldIndex);
                 if (mode != RadassMode::Auto)
                     radassManager->setMode(newIndex, mode);
+                if (mutedItemIds.contains(oldIndex.uuid()))
+                    mutedItemIds.insert(newIndex.uuid());
             }
         }
 
@@ -232,6 +237,8 @@ void ShowreelExecutor::resetShowreelItems(const nx::vms::api::ShowreelItemDataLi
 
         m_showreel.items.push_back(Item{layout, item.delayMs});
     }
+
+    systemContext()->localSettings()->mutedItemIds = mutedItemIds;
 }
 
 void ShowreelExecutor::processShowreelStepInternal(bool forward, bool force)
