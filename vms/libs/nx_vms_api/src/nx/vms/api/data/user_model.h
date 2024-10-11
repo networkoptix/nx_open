@@ -43,7 +43,7 @@ struct NX_VMS_API UserModelBase
 
     /**%apidoc[opt]
      * Whether HTTP digest authorization can be used for this user. Requires password to enable.
-     * Always `false` for Cloud users because digest support is controlled by the Cloud.
+     * For Cloud users digest support is controlled by the Cloud.
      */
     bool isHttpDigestEnabled = false;
 
