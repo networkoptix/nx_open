@@ -271,7 +271,7 @@ int EventParameterHelper::getLatestEventParameterPos(const QStringView& text, in
     {
         if (text[i] == kStartOfSubstitutionSymbol)
             return i;
-        if (text[i] == kEndOfSubstitutionSymbol || text[i].isSpace())
+        if (text[i] == kEndOfSubstitutionSymbol)
             return -1;
     }
     return -1;
