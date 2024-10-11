@@ -337,6 +337,7 @@ void RhiVideoRenderer::init(
     }
     d->textures = std::move(textures);
     d->planeCount = planeCount;
+    d->lastUploadedFrame = 0;
 
     const bool gammaCorrection =
         d->data.data.key.imageCorrection == MediaOutputShaderProgram::YuvImageCorrection::gamma;
