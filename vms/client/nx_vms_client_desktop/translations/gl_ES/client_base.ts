@@ -2998,11 +2998,11 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>Password should be at least 8 symbols long and contain different types of characters.</source>
-      <translation type="unfinished">Password should be at least 8 symbols long and contain different types of characters.</translation>
+      <translation>O contrasinal debe ter polo menos 8 símbolos e conter diferentes tipos de caracteres.</translation>
     </message>
     <message>
       <source>Password should not be equal to camera&apos;s user name</source>
-      <translation type="unfinished">Password should not be equal to camera&apos;s user name</translation>
+      <translation>O contrasinal non debe ser igual ao nome de usuario da cámara&apos;</translation>
     </message>
     <message>
       <source>Passwords do not match</source>
@@ -3013,7 +3013,7 @@ Clave de licenza: %2</translation>
     <name>QnCameraRecordingPolicy</name>
     <message>
       <source>Recording is disabled for %1</source>
-      <translation type="unfinished">Recording is disabled for %1</translation>
+      <translation>A gravación está desactivada para %1</translation>
     </message>
   </context>
   <context>
@@ -3024,7 +3024,7 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>Confirm Password</source>
-      <translation type="unfinished">Confirm Password</translation>
+      <translation>Confirmar contrasinal</translation>
     </message>
     <message>
       <source>Current Password</source>
@@ -3036,11 +3036,11 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>To modify your password please enter the existing one</source>
-      <translation type="unfinished">To modify your password please enter the existing one</translation>
+      <translation>Para modificar o teu contrasinal, introduce o existente, por favor</translation>
     </message>
     <message>
       <source>Invalid current password</source>
-      <translation type="unfinished">Invalid current password</translation>
+      <translation>O contrasinal actual non é válido</translation>
     </message>
   </context>
   <context>
@@ -3048,7 +3048,7 @@ Clave de licenza: %2</translation>
     <message>
       <source>Disconnect System from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Disconnect System from %1</translation>
+      <translation>Desconecta o sistema de %1</translation>
     </message>
     <message>
       <source>Open %1 Portal</source>
@@ -3058,12 +3058,12 @@ Clave de licenza: %2</translation>
     <message>
       <source>Connect System to %1...</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connect System to %1...</translation>
+      <translation>Conectar o sistema a %1...</translation>
     </message>
     <message>
       <source>Enter your account password to disconnect System from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Enter your account password to disconnect System from %1</translation>
+      <translation>Introduce o contrasinal da túa conta para desconectar o sistema de %1</translation>
     </message>
     <message>
       <source>Disconnect</source>
@@ -3072,17 +3072,17 @@ Clave de licenza: %2</translation>
     <message>
       <source>System disconnected from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">System disconnected from %1</translation>
+      <translation>Sistema desconectado de %1</translation>
     </message>
     <message>
       <source>You are about to disconnect System from %1</source>
       <comment>%1 is the cloud name, like Nx Cloud</comment>
-      <translation type="unfinished">You are about to disconnect System from %1</translation>
+      <translation>Estás a piques de desconectar o sistema de %1</translation>
     </message>
     <message>
       <source>All %1 users will be deleted.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">All %1 users will be deleted.</translation>
+      <translation>Todos os usuarios %1 serán aniquilados.</translation>
     </message>
     <message>
       <source>You will be logged out.</source>
@@ -3090,7 +3090,7 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>System will be accessible through local network with a local administrator account.</source>
-      <translation type="unfinished">System will be accessible through local network with a local administrator account.</translation>
+      <translation>O sistema será accesible a través da rede local cunha conta de administrador local.</translation>
     </message>
     <message>
       <source>Continue</source>
@@ -3099,11 +3099,11 @@ Clave de licenza: %2</translation>
     <message>
       <source>Cannot disconnect the System from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Cannot disconnect the System from %1</translation>
+      <translation>Non se pode desconectar o sistema de %1</translation>
     </message>
     <message>
       <source>System will be accessible only through local network.</source>
-      <translation type="unfinished">System will be accessible only through local network.</translation>
+      <translation>Só se poderá acceder ao sistema a través da rede local.</translation>
     </message>
     <message>
       <source>There is currently no connection between your system and %1.</source>
@@ -3115,15 +3115,15 @@ Clave de licenza: %2</translation>
     <name>QnCloudResultInfo</name>
     <message>
       <source>Successful.</source>
-      <translation type="unfinished">Successful.</translation>
+      <translation>Completado.</translation>
     </message>
     <message>
       <source>Invalid login or password.</source>
-      <translation type="unfinished">Invalid login or password.</translation>
+      <translation>Inicio de sesión ou contrasinal incorrectos.</translation>
     </message>
     <message>
       <source>Requested operation is not allowed with provided credentials.</source>
-      <translation type="unfinished">Requested operation is not allowed with provided credentials.</translation>
+      <translation>Non se permite a operación solicitada coas credenciais proporcionadas.</translation>
     </message>
     <message>
       <source>This account is not activated. Please check your email.</source>
@@ -3194,6 +3194,16 @@ Clave de licenza: %2</translation>
     <message>
       <source>Connect to Server</source>
       <translation>Conectar ao servidor</translation>
+    </message>
+    <message>
+      <source>Log in to %1</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Iniciar sesión en %1</translation>
+    </message>
+    <message>
+      <source>Logged in as %1</source>
+      <comment>%1 is the cloud login name (like user@domain.com</comment>
+      <translation type="unfinished">Logged in as %1</translation>
     </message>
   </context>
   <context>
@@ -8366,12 +8376,12 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Connect System to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connect System to %1</translation>
+      <translation>Conectar o sistema a %1</translation>
     </message>
     <message>
       <source>Connect System to %1?</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connect System to %1?</translation>
+      <translation>Conectar o sistema a %1?</translation>
     </message>
     <message>
       <source>Enter your account password to connect System to %1</source>
@@ -11997,7 +12007,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::UserSettingsDialog</name>
     <message>
       <source>To modify your password please enter the existing one.</source>
-      <translation type="unfinished">To modify your password please enter the existing one.</translation>
+      <translation>Para modificar o teu contrasinal, introduce o existente, por favor.</translation>
     </message>
     <message>
       <source>%1 user with specified email already exists.</source>
@@ -12034,7 +12044,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Invalid current password</source>
-      <translation type="unfinished">Invalid current password</translation>
+      <translation>O contrasinal actual non é válido</translation>
     </message>
     <message>
       <source>Email cannot be empty</source>
