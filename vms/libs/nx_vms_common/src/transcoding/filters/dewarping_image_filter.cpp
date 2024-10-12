@@ -5,9 +5,9 @@
 #include <QtCore/QtMath>
 
 #include <nx/media/config.h>
+#include <nx/media/ffmpeg/frame_info.h>
 #include <nx/media/sse_helper.h>
 #include <nx/utils/math/math.h>
-#include <utils/media/frame_info.h>
 
 using namespace nx::vms::api;
 
@@ -17,8 +17,7 @@ static constexpr auto k360VRAspectRatio = 16.0 / 9.0;
 
 QVector3D operator*(const QMatrix3x3& m, const QVector3D& v)
 {
-    return QVector3D(
-        m(0, 0) * v.x() + m(0, 1) * v.y() + m(0, 2) * v.z(),
+    return QVector3D(m(0, 0) * v.x() + m(0, 1) * v.y() + m(0, 2) * v.z(),
         m(1, 0) * v.x() + m(1, 1) * v.y() + m(1, 2) * v.z(),
         m(2, 0) * v.x() + m(2, 1) * v.y() + m(2, 2) * v.z());
 }
@@ -30,10 +29,9 @@ QVector2D operator*(const QMatrix3x3& m, const QVector2D& v)
 
 } // namespace
 
-extern "C"
-{
+extern "C" {
 #ifdef WIN32
-#define AVPixFmtDescriptor __declspec(dllimport) AVPixFmtDescriptor
+    #define AVPixFmtDescriptor __declspec(dllimport) AVPixFmtDescriptor
 #endif
 #include <libavutil/pixdesc.h>
 #ifdef WIN32

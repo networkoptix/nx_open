@@ -20,6 +20,7 @@ extern "C" {
 #include <nx/media/codec_parameters.h>
 #include <nx/media/config.h>
 #include <nx/media/ffmpeg/audio_encoder.h>
+#include <nx/media/ffmpeg/av_options.h>
 #include <nx/media/ffmpeg/old_api.h>
 #include <nx/media/ffmpeg_helper.h>
 #include <nx/media/media_data_packet.h>
@@ -32,7 +33,6 @@ extern "C" {
 #include <nx/vms/common/system_settings.h>
 #include <speex/speex_preprocess.h>
 #include <utils/common/synctime.h>
-#include <utils/media/av_options.h>
 
 #include "audio_device_change_notifier.h"
 #include "buffered_screen_grabber.h"
@@ -552,7 +552,7 @@ bool DesktopDataProvider::initVideoCapturing()
     const auto codecParameters = new CodecParameters(d->videoCodecCtx);
     d->videoContext = CodecParametersConstPtr(codecParameters);
 
-    AvOptions options;
+    nx::media::ffmpeg::AvOptions options;
     options.set("motion_est", "epzs", 0);
     if (avcodec_open2(d->videoCodecCtx, videoCodec, options) < 0)
     {

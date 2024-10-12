@@ -10,9 +10,9 @@
 #include <QtCore/QSet>
 #include <QtGui/QImage>
 
+#include <nx/media/ffmpeg/frame_info.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/uuid.h>
-#include <utils/media/frame_info.h>
 
 namespace nx::vms::client::core {
 

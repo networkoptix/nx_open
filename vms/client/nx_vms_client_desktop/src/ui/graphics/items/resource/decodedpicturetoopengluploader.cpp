@@ -15,6 +15,7 @@ extern "C" {
 
 #include <nx/media/config.h>
 #include <nx/media/quick_sync/qsv_supported.h>
+#include <nx/media/yuvconvert.h>
 #include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/math/math.h>
@@ -24,12 +25,11 @@ extern "C" {
 #include <transcoding/transcoding_utils.h>
 #include <ui/graphics/opengl/gl_functions.h>
 #include <ui/graphics/opengl/gl_shortcuts.h>
-#include <utils/color_space/yuvconvert.h>
 #include <utils/common/util.h> /* For random. */
 
 #ifdef __QSV_SUPPORTED__
-#include <nx/media/nvidia/nvidia_renderer.h>
-#include <nx/media/quick_sync/quick_sync_video_frame.h>
+    #include <nx/media/nvidia/nvidia_renderer.h>
+    #include <nx/media/quick_sync/quick_sync_video_frame.h>
 #endif //__QSV_SUPPORTED__
 
 namespace

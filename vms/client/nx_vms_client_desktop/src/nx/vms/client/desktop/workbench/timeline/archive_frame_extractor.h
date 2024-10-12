@@ -6,9 +6,9 @@
 #include <QtCore/QVariant>
 
 #include <core/resource/resource_fwd.h>
+#include <nx/media/ffmpeg/frame_info.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/utils/impl_ptr.h>
-#include <utils/media/frame_info.h>
 
 namespace nx::vms::client::desktop {
 

@@ -6,9 +6,9 @@
 
 #include <analytics/common/object_metadata.h>
 #include <nx/fusion/serialization/ubjson.h>
+#include <nx/media/ffmpeg/frame_info.h>
 #include <nx/vms/common/pixelation/pixelation.h>
 #include <utils/common/delayed.h>
-#include <utils/media/frame_info.h>
 
 namespace nx::core::transcoding {
 namespace {

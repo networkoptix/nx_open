@@ -10,13 +10,13 @@
 
 #include <QtOpenGLWidgets/QOpenGLWidget>
 
+#include <nx/media/ffmpeg/frame_info.h>
 #include <nx/media/media_data_packet.h> /* For QnMetaDataV1Ptr. */
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/stoppable.h>
 #include <nx/utils/thread/wait_condition.h>
 #include <nx/vms/api/data/image_correction_data.h>
 #include <utils/common/safepool.h>
-#include <utils/media/frame_info.h>
 
 #include "utils/color_space/image_correction.h"
 

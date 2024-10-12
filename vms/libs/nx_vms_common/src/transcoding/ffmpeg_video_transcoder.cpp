@@ -8,17 +8,17 @@
 #include <decoders/video/ffmpeg_video_decoder.h>
 #include <nx/media/codec_parameters.h>
 #include <nx/media/config.h>
+#include <nx/media/ffmpeg/av_options.h>
 #include <nx/media/ffmpeg/ffmpeg_utils.h>
 #include <nx/media/ffmpeg/old_api.h>
 #include <nx/media/utils.h>
 #include <nx/media/video_data_packet.h>
-#include <nx/metrics/metrics_storage.h>
+#include <nx/metric/metrics_storage.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/math/math.h>
 #include <nx/utils/scope_guard.h>
 #include <transcoding/transcoding_utils.h>
 #include <utils/common/util.h>
-#include <utils/media/av_options.h>
 
 #include "filters/abstract_image_filter.h"
 #include "filters/crop_image_filter.h"
@@ -67,7 +67,7 @@ namespace {
 
 QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(
     const DecoderConfig& config,
-    nx::metrics::Storage* metrics,
+    nx::metric::Storage* metrics,
     AVCodecID codecId)
     :
     QnVideoTranscoder(codecId),
@@ -203,7 +203,7 @@ bool QnFfmpegVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
     if (m_useMultiThreadEncode && m_codecId != AV_CODEC_ID_MJPEG)
         m_encoderCtx->thread_count = qMin(2, QThread::idealThreadCount());
 
-    AvOptions options;
+    nx::media::ffmpeg::AvOptions options;
     for (auto it = m_params.begin(); it != m_params.end(); ++it)
     {
         if( it.key() == QnCodecParams::global_quality )

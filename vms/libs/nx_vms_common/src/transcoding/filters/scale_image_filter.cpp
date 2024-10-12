@@ -2,8 +2,8 @@
 
 #include "scale_image_filter.h"
 
+#include <nx/media/ffmpeg/frame_info.h>
 #include <nx/utils/log/log.h>
-#include <utils/media/frame_info.h>
 
 QnScaleImageFilter::QnScaleImageFilter(
     const QSize& size,

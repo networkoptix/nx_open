@@ -37,6 +37,7 @@ nx_add_target(nx_vms_common LIBRARY
         nx_fusion
         nx_sdk
         nx_rtp
+        nx_metric
         cloud_db_client
         nx_vms_update
         nx_media_core
@@ -55,7 +56,7 @@ target_compile_definitions(nx_vms_common
         NX_CRASH_REPORT_API_URL="${crashReportApiUrl}"
 )
 if(LINUX)
-    add_dependencies(nx_vms_common libgl_stub libegl_stub libglx_stub libx11_stub)
+    add_dependencies(nx_vms_common libgl_stub libegl_stub libglx_stub libx11_stub libva-x11_stub)
 endif()
 
 target_include_directories(nx_vms_common

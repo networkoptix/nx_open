@@ -1,13 +1,13 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "streams_metric_helper.h"
-#include <nx/metrics/metrics_storage.h>
+#include <nx/metric/metrics_storage.h>
 
-namespace nx::vms::metrics {
+namespace nx::vms::metric {
 
 using namespace nx::vms::api;
 
-StreamMetricHelper::StreamMetricHelper(nx::metrics::Storage* metrics):
+StreamMetricHelper::StreamMetricHelper(nx::metric::Storage* metrics):
     m_metrics(metrics)
 {
 }
@@ -45,4 +45,4 @@ std::atomic<qint64>* StreamMetricHelper::getMetric(nx::vms::api::StreamIndex ind
     }
 }
 
-} // namespace nx::vms::metrics
+} // namespace nx::vms::metric

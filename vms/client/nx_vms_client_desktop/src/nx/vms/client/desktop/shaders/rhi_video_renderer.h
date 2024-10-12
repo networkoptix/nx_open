@@ -2,8 +2,8 @@
 
 #pragma once
 
+#include <nx/media/ffmpeg/frame_info.h>
 #include <nx/utils/impl_ptr.h>
-#include <utils/media/frame_info.h>
 
 #include "media_output_shader_data.h"
 

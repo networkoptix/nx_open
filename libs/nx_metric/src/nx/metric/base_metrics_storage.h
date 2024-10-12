@@ -9,8 +9,7 @@
 #include <QtCore/QString>
 #include <QtCore/QVariant>
 
-namespace nx {
-namespace metrics {
+namespace nx::metric {
 
 /*
  * Helper function to check whether type is a map or QMap
@@ -95,5 +94,4 @@ private:
 
 #define NX_METRICS_ADD(type, name, description) Param<type> name{this, #name, description};
 
-} // namespace metrics
-} // namespace nx
+} // namespace nx::metric

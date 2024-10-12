@@ -133,18 +133,18 @@ QnCommonMessageProcessor* QnCommonModule::messageProcessor() const
         : nullptr;
 }
 
-nx::metrics::Storage* QnCommonModule::metrics() const
+nx::metric::Storage* QnCommonModule::metrics() const
 {
     return NX_ASSERT(d->systemContext)
         ? d->systemContext->metrics().get()
         : nullptr;
 }
 
-std::weak_ptr<nx::metrics::Storage> QnCommonModule::metricsWeakRef() const
+std::weak_ptr<nx::metric::Storage> QnCommonModule::metricsWeakRef() const
 {
     return NX_ASSERT(d->systemContext)
-        ? std::weak_ptr<nx::metrics::Storage>(d->systemContext->metrics())
-        : std::weak_ptr<nx::metrics::Storage>{};
+        ? std::weak_ptr<nx::metric::Storage>(d->systemContext->metrics())
+        : std::weak_ptr<nx::metric::Storage>{};
 }
 
 //-------------------------------------------------------------------------------------------------

@@ -7,17 +7,17 @@
 #include <cstring>
 #include <memory>
 
-#include <QtGui/QImage>
+#include <QtGui/QImage> // < TODO lbusygin: remove QtGui from nx_media_core
 
 #include <nx/media/config.h>
 #include <nx/media/ffmpeg/ffmpeg_utils.h>
+#include <nx/media/ffmpeg/nx_image_ini.h>
 #include <nx/media/ffmpeg_helper.h>
+#include <nx/media/yuvconvert.h>
 #include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/math/math.h>
 #include <nx/utils/switch.h>
-#include <utils/color_space/yuvconvert.h>
-#include <utils/media/nx_image_ini.h>
 
 extern "C" {
 #ifdef WIN32
@@ -33,7 +33,22 @@ extern "C" {
 
 CLVideoDecoderOutput::CLVideoDecoderOutput():
     AVFrame()
-{}
+{
+    memset(static_cast<AVFrame*>(this), 0, sizeof(AVFrame));
+
+    this->pts                   =
+    this->pkt_dts               = AV_NOPTS_VALUE;
+    this->best_effort_timestamp = AV_NOPTS_VALUE;
+    this->duration            = 0;
+    this->time_base           = AVRational{ 0, 1 };
+    this->format              = -1; /* unknown */
+    this->extended_data       = this->data;
+    this->color_primaries     = AVCOL_PRI_UNSPECIFIED;
+    this->color_trc           = AVCOL_TRC_UNSPECIFIED;
+    //this->colorspace          = AVCOL_S//P//C_UNSPECIFIED;
+    this->color_range         = AVCOL_RANGE_UNSPECIFIED;
+    this->chroma_location     = AVCHROMA_LOC_UNSPECIFIED;
+}
 
 CLVideoDecoderOutput::CLVideoDecoderOutput(int targetWidth, int targetHeight, int targetFormat):
     CLVideoDecoderOutput()
@@ -44,6 +59,29 @@ CLVideoDecoderOutput::CLVideoDecoderOutput(int targetWidth, int targetHeight, in
 CLVideoDecoderOutput::~CLVideoDecoderOutput()
 {
     clean();
+}
+
+CLVideoDecoderOutputPtr CLVideoDecoderOutput::toSystemMemory()
+{
+    /* Retrieve data from GPU to CPU */
+    CLVideoDecoderOutputPtr softwareFrame(new CLVideoDecoderOutput());
+    int status = av_hwframe_transfer_data(softwareFrame.get(), this, 0);
+    if (status < 0)
+    {
+        NX_DEBUG(this, "Error transferring the data to system memory: %1",
+            nx::media::ffmpeg::avErrorToString(status));
+        return nullptr;
+    }
+    if (softwareFrame->format == AV_PIX_FMT_YUV420P || softwareFrame->format == AV_PIX_FMT_NV12)
+    {
+        softwareFrame->assignMiscData(this);
+        return softwareFrame;
+    }
+    CLVideoDecoderOutputPtr softwareFrameYuv(new CLVideoDecoderOutput());
+    softwareFrameYuv->reallocate(softwareFrame->width, softwareFrame->height, AV_PIX_FMT_YUV420P);
+    softwareFrame->convertTo(softwareFrameYuv.get());
+    softwareFrameYuv->assignMiscData(this);
+    return softwareFrameYuv;
 }
 
 bool CLVideoDecoderOutput::isEmpty() const
@@ -93,7 +131,7 @@ void CLVideoDecoderOutput::setUseExternalData(bool value)
 
 void CLVideoDecoderOutput::clean()
 {
-    if (!m_useExternalData && data[0])
+    if (!m_useExternalData)
     {
         if (buf[0])
             av_frame_unref(this); //< Ref-counted frame.

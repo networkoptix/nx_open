@@ -27,6 +27,7 @@ NX_VMS_API extern const QString kNvrPoePortPoweringModes;
 NX_VMS_API extern const QString kCertificate;
 NX_VMS_API extern const QString kUserProvidedCertificate;
 NX_VMS_API extern const QString kWebCamerasDiscoveryEnabled;
+NX_VMS_API extern const QString kHardwareDecodingEnabled;
 NX_VMS_API extern const QString kMetadataStorageIdKey;
 NX_VMS_API extern const QString kTimeZoneInformation;
 NX_VMS_API extern const QString kPortForwardingConfigurations;

@@ -2,8 +2,8 @@
 
 #include "tiled_image_filter.h"
 
+#include <nx/media/ffmpeg/frame_info.h>
 #include <utils/common/util.h>
-#include <utils/media/frame_info.h>
 
 #include "crop_image_filter.h"
 

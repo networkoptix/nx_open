@@ -6,7 +6,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/metrics/metrics_storage.h>
+#include <nx/metric/metrics_storage.h>
 #include <nx/network/http/custom_headers.h>
 #include <nx/network/nx_network_ini.h>
 #include <nx/utils/log/log_main.h>

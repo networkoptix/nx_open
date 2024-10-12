@@ -5,6 +5,7 @@ nx_add_target(nx_media_core LIBRARY
         Qt6::Core
         nx_utils
         nx_codec
+        nx_metric
         nx_reflect
         nx_fusion
         ffmpeg::ffmpeg

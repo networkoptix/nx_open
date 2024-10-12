@@ -26,7 +26,7 @@
 #include <nx/build_info.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/fusion/serialization/compressed_time_functions.h>
-#include <nx/metrics/application_metrics_storage.h>
+#include <nx/metric/application_metrics_storage.h>
 #include <nx/network/http/custom_headers.h>
 #include <nx/network/http/http_types.h>
 #include <nx/network/ssl/helpers.h>

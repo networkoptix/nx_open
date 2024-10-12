@@ -11,7 +11,7 @@
 class QnLongRunableCleanup;
 class QnStoragePluginFactory;
 
-namespace nx::metrics { struct ApplicationMetricsStorage; }
+namespace nx::metric { struct ApplicationMetricsStorage; }
 namespace nx::i18n { class TranslationManager; }
 
 namespace nx::vms::common {
@@ -61,7 +61,7 @@ public:
 
     QnStoragePluginFactory* storagePluginFactory() const;
     QnLongRunableCleanup* longRunableCleanup() const;
-    nx::metrics::ApplicationMetricsStorage* metrics() const;
+    nx::metric::ApplicationMetricsStorage* metrics() const;
 
     template<typename ContextType>
     ContextType* as()

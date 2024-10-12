@@ -2,8 +2,8 @@
 
 #include "watermark_filter.h"
 
-#include <utils/media/frame_info.h>
 #include <nx/core/watermark/watermark_images.h>
+#include <nx/media/ffmpeg/frame_info.h>
 
 namespace nx::core::transcoding {
 

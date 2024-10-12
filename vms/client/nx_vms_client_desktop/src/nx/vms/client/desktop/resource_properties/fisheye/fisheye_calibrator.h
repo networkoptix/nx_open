@@ -4,9 +4,9 @@
 
 #include <QtGui/QImage>
 
+#include <nx/media/ffmpeg/frame_info.h>
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/thread/long_runnable.h>
-#include <utils/media/frame_info.h>
 
 namespace nx::vms::client::desktop {
 

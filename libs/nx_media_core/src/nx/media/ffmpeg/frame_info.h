@@ -51,7 +51,7 @@ using CLConstVideoDecoderOutputPtr = QSharedPointer<const CLVideoDecoderOutput>;
  * ATTENTION: AVFrame's field pkt_dts is filled with the time since epoch in microseconds, instead
  * of time_base units as ffmpeg states in the documentation.
  */
-class NX_VMS_COMMON_API CLVideoDecoderOutput: public AVFrame
+class NX_MEDIA_CORE_API CLVideoDecoderOutput: public AVFrame
 {
 public:
     //!Stores picture data. If NULL, picture data is stored in \a AVFrame fields
@@ -62,11 +62,13 @@ public:
     ~CLVideoDecoderOutput();
 
     MemoryType memoryType() const { return m_memoryType; }
+    void setMemoryType(MemoryType memoryType) { m_memoryType = memoryType; }
     bool isEmpty() const;
     void attachVideoSurface(std::unique_ptr<AbstractVideoSurface> surface);
     AbstractVideoSurface* getVideoSurface() const { return m_surface.get(); }
 
     QImage toImage() const;
+    CLVideoDecoderOutputPtr toSystemMemory();
 
     /**
      * Copies the frame to another already allocated frame, converting to the required pixel format
@@ -109,7 +111,6 @@ public:
     QByteArray rawData() const;
 
 public:
-    //QSharedPointer<QnAbstractPictureDataRef> picData;
 
     QnAbstractMediaData::MediaFlags flags = QnAbstractMediaData::MediaFlags_None;
 
@@ -134,8 +135,8 @@ private:
     static void copyPlane(
         uint8_t* dst, const uint8_t* src, int width, int dstStride, int srcStride, int height);
 
-    CLVideoDecoderOutput( const CLVideoDecoderOutput& );
-    const CLVideoDecoderOutput& operator=( const CLVideoDecoderOutput& );
+    CLVideoDecoderOutput(const CLVideoDecoderOutput&) = delete;
+    const CLVideoDecoderOutput& operator=(const CLVideoDecoderOutput&) = delete;
 
     bool convertUsingSimdIntrTo(const AVFrame* avFrame) const;
 };

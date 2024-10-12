@@ -2,8 +2,8 @@
 
 #include "paint_image_filter.h"
 
-#include <utils/media/frame_info.h>
 #include <nx/core/transcoding/filters/image_to_frame_painter.h>
+#include <nx/media/ffmpeg/frame_info.h>
 
 namespace nx {
 namespace core {

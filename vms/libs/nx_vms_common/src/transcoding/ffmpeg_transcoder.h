@@ -7,11 +7,11 @@ extern "C" {
 }
 
 #include <export/signer.h>
+#include <nx/media/ffmpeg/frame_info.h>
 #include <nx/utils/cryptographic_hash.h>
 
 #include "decoders/video/ffmpeg_video_decoder.h"
 #include "transcoder.h"
-#include "utils/media/frame_info.h"
 
 class QnLicensePool;
 
@@ -30,7 +30,7 @@ public:
     };
 
 public:
-    QnFfmpegTranscoder(const Config& config, nx::metrics::Storage* metrics);
+    QnFfmpegTranscoder(const Config& config, nx::metric::Storage* metrics);
     ~QnFfmpegTranscoder();
 
     virtual int setContainer(const QString& value) override;

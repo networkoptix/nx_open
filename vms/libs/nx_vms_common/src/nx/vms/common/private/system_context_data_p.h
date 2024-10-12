@@ -17,7 +17,7 @@
 #include <licensing/license.h>
 #include <nx/analytics/taxonomy/descriptor_container.h>
 #include <nx/analytics/taxonomy/state_watcher.h>
-#include <nx/metrics/metrics_storage.h>
+#include <nx/metric/metrics_storage.h>
 #include <nx/vms/common/license/license_usage_watcher.h>
 #include <nx/vms/common/lookup_lists/lookup_list_manager.h>
 #include <nx/vms/common/network/abstract_certificate_verifier.h>
@@ -61,7 +61,7 @@ struct SystemContext::Private
     std::unique_ptr<nx::vms::event::RuleManager> eventRuleManager;
     std::unique_ptr<nx::analytics::taxonomy::DescriptorContainer> analyticsDescriptorContainer;
     std::unique_ptr<nx::analytics::taxonomy::AbstractStateWatcher> analyticsTaxonomyStateWatcher;
-    std::shared_ptr<nx::metrics::Storage> metrics;
+    std::shared_ptr<nx::metric::Storage> metrics;
     std::unique_ptr<DeviceLicenseUsageWatcher> deviceLicenseUsageWatcher;
     std::unique_ptr<VideoWallLicenseUsageWatcher> videoWallLicenseUsageWatcher;
     std::unique_ptr<PixelationSettings> pixelationSettings;

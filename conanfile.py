@@ -69,7 +69,7 @@ class NxOpenConan(ConanFile):
         "onlyUnrevisionedPackages": False,
     }
 
-    ffmpeg_version_and_revision = "7.0.1#7952d1aecfb45b1de6520d2c1c29c0f9"
+    ffmpeg_version_and_revision = "7.0.1#812aca203c4c6f6e9f9bb9ce4f2606ee"
 
     def configure(self):
         # The open-source Customization Package coming from Conan has the name "opensource-meta",
@@ -184,7 +184,7 @@ class NxOpenConan(ConanFile):
 
         self.requires(f"ffmpeg/{self.ffmpeg_version_and_revision}")
         self.requires("openssl/1.1.1q" "#bcc8c366b4291c68913eabe817fb15c7")
-        self.requires("qt/6.7.2" "#2ab54c9bf46d8a59a9cd914398e49294")
+        self.requires("qt/6.7.2" "#a9fc65eca626e6303ee82eef4d3aa820")
         self.requires("roboto-fonts/1.0" "#a1d64ec2d6a2e16f8f476b2b47162123")
         self.requires("boost/1.83.0" "#e0be85c6f8107d7e960246e31cbbf7ab")
         self.requires("concurrentqueue/1.0.4" "#957c470e9abc81ff3850bbe39fc11135")
@@ -203,7 +203,7 @@ class NxOpenConan(ConanFile):
 
         if self.isLinux:
             if self.settings.arch == "x86_64":
-                self.requires("libva/2.16.0" "#62244701af6f028be1e1d1051e648488")
+                self.requires("libva/2.22.0" "#80b7709c721fc7f0aa72cb42f5b91e2b")
                 self.requires("intel-media-sdk/19.4" "#a3ac2d7e36a1260f757893833af8dea2")
                 self.requires("intel-onevpl/23.4.2" "#35a35b4e4db86741752331dce439a71d")
                 self.requires("intel-gmmlib/22.3.15" "#89d1f903368a92dfe057e7bed2afb3d8")
@@ -214,7 +214,7 @@ class NxOpenConan(ConanFile):
             if not self.isArm32:
                 self._os_deps_package = "os_deps_for_desktop_linux"
                 self.requires("os_deps_for_desktop_linux/ubuntu_focal"
-                    "#8dde64b7eb69e401b23c0365239eefc6")
+                    "#8915743e3a654f4c5bf0e30bb080d114")
 
         if self.haveDesktopClient:
             self.requires("hidapi/0.10.1" "#67c06b0755251878327ddea8fe964d6b")

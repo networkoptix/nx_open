@@ -1,10 +1,12 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "buffered_frame_displayer.h"
-#include <utils/media/frame_info.h>
+
+#include <nx/media/ffmpeg/frame_info.h>
 #include <utils/common/adaptive_sleep.h>
-#include "video_stream_display.h"
+
 #include "ui/graphics/items/resource/resource_widget_renderer.h"
+#include "video_stream_display.h"
 
 QnBufferedFrameDisplayer::QnBufferedFrameDisplayer():
     base_type(),

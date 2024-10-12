@@ -9,7 +9,7 @@
 #include <network/cloud/cloud_media_server_endpoint_verificator.h>
 #include <nx/branding.h>
 #include <nx/media/ffmpeg_helper.h>
-#include <nx/metrics/application_metrics_storage.h>
+#include <nx/metric/application_metrics_storage.h>
 #include <nx/network/cloud/tunnel/tcp/tunnel_tcp_endpoint_verificator_factory.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/i18n/translation_manager.h>
@@ -29,7 +29,7 @@ static void initializeResources()
 namespace nx::vms::common {
 
 using namespace nx::network;
-using namespace nx::metrics;
+using namespace nx::metric;
 
 static ApplicationContext* s_instance = nullptr;
 

@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <decoders/video/abstract_video_decoder.h>
+#include <nx/media/ffmpeg/abstract_video_decoder.h>
 #include <nx/media/video_data_packet.h>
 
 namespace nx::media::quick_sync {

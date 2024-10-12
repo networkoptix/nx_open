@@ -10,11 +10,11 @@
 
 #include <decoders/video/ffmpeg_video_decoder.h>
 #include <nx/core/transcoding/filters/filter_chain.h>
-#include <utils/media/frame_info.h>
+#include <nx/media/ffmpeg/frame_info.h>
 
 #include "transcoder.h"
 
-namespace nx::metrics { struct Storage; }
+namespace nx::metric { struct Storage; }
 
 NX_VMS_COMMON_API AVCodecID findVideoEncoder(const QString& codecName);
 
@@ -22,7 +22,7 @@ class NX_VMS_COMMON_API QnFfmpegVideoTranscoder: public QnVideoTranscoder
 {
     Q_DECLARE_TR_FUNCTIONS(QnFfmpegVideoTranscoder)
 public:
-    QnFfmpegVideoTranscoder(const DecoderConfig& config, nx::metrics::Storage* metrics, AVCodecID codecId);
+    QnFfmpegVideoTranscoder(const DecoderConfig& config, nx::metric::Storage* metrics, AVCodecID codecId);
     ~QnFfmpegVideoTranscoder();
 
     QnFfmpegVideoTranscoder(const QnFfmpegVideoTranscoder&) = delete;
@@ -87,7 +87,7 @@ private:
     bool m_useRealTimeOptimization;
     bool m_keepOriginalTimestamps = false;
     CodecParametersConstPtr m_ctxPtr;
-    nx::metrics::Storage* m_metrics = nullptr;
+    nx::metric::Storage* m_metrics = nullptr;
     std::map<qint64, qint64> m_frameNumToPts;
     int m_fixedFrameRate = 0;
     std::optional<int64_t> m_lastEncodedPts;

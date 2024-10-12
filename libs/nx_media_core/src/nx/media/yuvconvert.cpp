@@ -6,12 +6,12 @@
 
 #if defined(NX_SSE2_SUPPORTED)
 
-#include <cstdio>
-#include <cstdlib>
+    #include <cstdio>
+    #include <cstdlib>
 
-#include <QtCore/QtGlobal>
+    #include <QtCore/QtGlobal>
 
-#include <nx/utils/math/math.h>
+    #include <nx/utils/math/math.h>
 
 const __m128i  sse_00ffw_intrs = _mm_setr_epi32(0x00ff00ff, 0x00ff00ff, 0x00ff00ff, 0x00ff00ff);
 const __m128i  sse_0010_intrs  = _mm_setr_epi32(0x00100010, 0x00100010, 0x00100010, 0x00100010);

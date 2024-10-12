@@ -18,7 +18,7 @@ class SystemContext;
 
 } // namespace nx::vms::common
 
-namespace nx::metrics { struct Storage; }
+namespace nx::metric { struct Storage; }
 namespace nx::vms::discovery { class Manager; }
 namespace nx::vms::event { class RuleManager; }
 
@@ -59,8 +59,8 @@ public:
     QnResourceDataPool* resourceDataPool() const;
     std::shared_ptr<ec2::AbstractECConnection> messageBusConnection() const;
     QnCommonMessageProcessor* messageProcessor() const;
-    nx::metrics::Storage* metrics() const;
-    std::weak_ptr<nx::metrics::Storage> metricsWeakRef() const;
+    nx::metric::Storage* metrics() const;
+    std::weak_ptr<nx::metric::Storage> metricsWeakRef() const;
     //---------------------------------------------------------------------------------------------
 
 private:

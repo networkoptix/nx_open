@@ -5,7 +5,7 @@
 #include <atomic>
 #include <regex>
 
-#include <nx/metrics/metrics_storage.h>
+#include <nx/metric/metrics_storage.h>
 #include <nx/network/socket.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/url/url_parse_helper.h>
@@ -337,7 +337,7 @@ void QnTcpListener::run()
                 {
                     systemContext()->metrics()->tcpConnections().total()++;
                     clientSocket->setBeforeDestroyCallback(
-                        [weakRef = std::weak_ptr<nx::metrics::Storage>(systemContext()->metrics())]
+                        [weakRef = std::weak_ptr<nx::metric::Storage>(systemContext()->metrics())]
                         ()
                         {
                             if (auto metrics = weakRef.lock())

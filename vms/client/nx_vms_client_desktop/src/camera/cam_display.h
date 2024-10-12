@@ -10,8 +10,8 @@
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource_media_layout.h>
-#include <decoders/video/abstract_video_decoder.h>
 #include <nx/media/audio_data_packet.h>
+#include <nx/media/ffmpeg/abstract_video_decoder.h>
 #include <nx/streaming/abstract_data_consumer.h>
 #include <utils/common/adaptive_sleep.h>
 #include <utils/media/externaltimesource.h>

@@ -14,8 +14,8 @@ extern "C" {
 #include <client/client_runtime_settings.h>
 #include <core/resource/resource_property_key.h>
 #include <core/resource/security_cam_resource.h>
-#include <decoders/video/abstract_video_decoder.h>
 #include <decoders/video/ffmpeg_video_decoder.h>
+#include <nx/media/ffmpeg/abstract_video_decoder.h>
 #include <nx/media/quick_sync/qsv_supported.h>
 #include <nx/media/utils.h>
 #include <nx/utils/log/log.h>

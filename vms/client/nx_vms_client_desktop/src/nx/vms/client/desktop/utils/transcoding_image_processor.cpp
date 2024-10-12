@@ -2,10 +2,10 @@
 
 #include "transcoding_image_processor.h"
 
-#include <transcoding/filters/abstract_image_filter.h>
-#include <utils/media/frame_info.h>
 #include <core/resource/media_resource.h>
 #include <nx/core/transcoding/filters/filter_chain.h>
+#include <nx/media/ffmpeg/frame_info.h>
+#include <transcoding/filters/abstract_image_filter.h>
 
 namespace nx::vms::client::desktop {
 

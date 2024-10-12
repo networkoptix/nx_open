@@ -5,10 +5,10 @@
 #include <core/resource/media_resource.h>
 #include <nx/core/transcoding/filters/legacy_transcoding_settings.h>
 #include <nx/core/transcoding/filters/text_image_filter.h>
+#include <nx/media/ffmpeg/frame_info.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/time/formatter.h>
 #include <utils/common/util.h>
-#include <utils/media/frame_info.h>
 
 namespace {
 

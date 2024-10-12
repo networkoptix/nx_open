@@ -24,6 +24,7 @@ const QString kNvrPoePortPoweringModes("nvrPoePortPoweringModes");
 const QString kCertificate("certificate");
 const QString kUserProvidedCertificate("userProvidedCertificate");
 const QString kWebCamerasDiscoveryEnabled("webCamerasDiscoveryEnabled");
+const QString kHardwareDecodingEnabled("hardwareDecodingEnabled");
 const QString kMetadataStorageIdKey("metadataStorageId");
 const QString kTimeZoneInformation("timeZoneInformation");
 const QString kPortForwardingConfigurations("portForwardingConfigurations");

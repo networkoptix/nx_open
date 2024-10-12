@@ -22,7 +22,7 @@ extern "C" {
 
 class CLVideoDecoderOutput;
 
-namespace nx { namespace metrics { struct Storage; } }
+namespace nx::metric { struct Storage; }
 
 /*!
     \note All constants (except \a quality) in this namespace refer to libavcodec CodecContex field names
@@ -117,7 +117,7 @@ class NX_VMS_COMMON_API QnTranscoder: public QObject
 {
     Q_OBJECT
 public:
-    QnTranscoder(const DecoderConfig& decoderConfig, nx::metrics::Storage* metrics);
+    QnTranscoder(const DecoderConfig& decoderConfig, nx::metric::Storage* metrics);
     virtual ~QnTranscoder();
 
     enum TranscodeMethod {TM_DirectStreamCopy, TM_FfmpegTranscode, TM_QuickSyncTranscode, TM_OpenCLTranscode, TM_Dummy};
@@ -246,7 +246,7 @@ protected:
     //! Make sure to correctly fill these member variables in overridden open() function.
     bool m_initializedAudio;    // Incoming audio packets will be ignored.
     bool m_initializedVideo;    // Incoming video packets will be ignored.
-    nx::metrics::Storage* m_metrics = nullptr;
+    nx::metric::Storage* m_metrics = nullptr;
 
 private:
     QString m_lastErrMessage;

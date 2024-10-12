@@ -21,8 +21,8 @@
 #include <core/resource/client_camera.h>
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/resource_pool.h>
-#include <decoders/video/abstract_video_decoder.h>
 #include <nx/build_info.h>
+#include <nx/media/ffmpeg/abstract_video_decoder.h>
 #include <nx/network/http/http_mod_manager.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/crash_dump/systemexcept.h>

@@ -11,9 +11,9 @@
 
 #include <core/resource/resource_media_layout.h>
 #include <nx/media/config.h>
+#include <nx/media/ffmpeg/frame_info.h>
+#include <nx/media/yuvconvert.h>
 #include <nx/utils/math/math.h>
-#include <utils/color_space/yuvconvert.h>
-#include <utils/media/frame_info.h>
 
 namespace {
 

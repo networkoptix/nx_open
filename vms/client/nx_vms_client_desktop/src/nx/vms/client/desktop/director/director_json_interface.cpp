@@ -8,7 +8,7 @@
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
 
-#include <nx/metrics/application_metrics_storage.h>
+#include <nx/metric/application_metrics_storage.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/desktop/director/director.h>
 #include <nx/vms/client/desktop/testkit/testkit.h>

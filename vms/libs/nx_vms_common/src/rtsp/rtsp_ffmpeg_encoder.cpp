@@ -15,7 +15,7 @@ namespace {
 static const QString kNxPayloadTypeName("FFMPEG");
 static const uint32_t kNxBasicSsrc = 20'000;
 
-QnRtspFfmpegEncoder::QnRtspFfmpegEncoder(const DecoderConfig& config, nx::metrics::Storage* metrics)
+QnRtspFfmpegEncoder::QnRtspFfmpegEncoder(const DecoderConfig& config, nx::metric::Storage* metrics)
     :
     m_config(config),
     m_gotLivePacket(false),
