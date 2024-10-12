@@ -4,8 +4,9 @@
 
 #include <QtCore/QScopedPointer>
 
+#include <nx/media/ffmpeg/frame_info.h>
+
 #include "abstract_image_filter.h"
-#include "utils/media/frame_info.h"
 
 NX_VMS_COMMON_API CLVideoDecoderOutputPtr rotateImage(
     const CLConstVideoDecoderOutputPtr& frame, int angle);

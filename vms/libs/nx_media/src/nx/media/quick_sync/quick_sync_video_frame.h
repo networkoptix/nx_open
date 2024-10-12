@@ -4,8 +4,8 @@
 
 #include <QtGui/QOpenGLContext>
 
+#include <nx/media/ffmpeg/frame_info.h>
 #include <nx/media/media_fwd.h>
-#include <utils/media/frame_info.h>
 
 namespace nx::media::quick_sync { class QuickSyncVideoDecoderImpl; }
 

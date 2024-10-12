@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utils/media/frame_info.h"
+#include <nx/media/ffmpeg/frame_info.h>
 
 class QnFrameScaler
 {

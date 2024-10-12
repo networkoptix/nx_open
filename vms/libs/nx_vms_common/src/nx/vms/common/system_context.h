@@ -30,7 +30,7 @@ class GlobalPermissionsWatcher;
 class ResourceAccessSubjectHierarchy;
 } // namespace nx::core::access
 
-namespace nx::metrics { struct Storage; }
+namespace nx::metric { struct Storage; }
 namespace nx::vms::discovery { class Manager; }
 namespace nx::vms::event { class RuleManager; }
 namespace nx::vms::rules { class Engine; }
@@ -259,7 +259,7 @@ public:
 
     std::shared_ptr<nx::analytics::taxonomy::AbstractState> analyticsTaxonomyState() const;
 
-    std::shared_ptr<nx::metrics::Storage> metrics() const;
+    std::shared_ptr<nx::metric::Storage> metrics() const;
 
     QnCameraNamesWatcher* cameraNamesWatcher() const;
 

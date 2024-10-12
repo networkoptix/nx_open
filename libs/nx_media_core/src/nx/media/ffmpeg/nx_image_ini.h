@@ -12,4 +12,4 @@ struct NxImageIniConfig: public nx::kit::IniConfig
         "Enables SSE color convertion optimizations. If false Ffmpeg sws_scale will be used");
 };
 
-NX_VMS_COMMON_API NxImageIniConfig& nxImageIni();
+NX_MEDIA_CORE_API NxImageIniConfig& nxImageIni();

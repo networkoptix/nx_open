@@ -6,6 +6,7 @@
 #include <QtCore/QScopedPointer>
 #include <QtGui/QOpenGLFunctions>
 #include <QtGui/QPainter>
+#include <QtGui/rhi/qrhi.h>
 #include <QtQuickWidgets/QQuickWidget>
 #include <QtWidgets/QErrorMessage>
 
@@ -13,6 +14,7 @@
 #include <nx/media/ffmpeg_video_decoder.h>
 #include <nx/media/sse_helper.h>
 #include <nx/media/video_frame.h>
+#include <nx/media/yuvconvert.h>
 #include <nx/pathkit/rhi_paint_engine.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
@@ -23,6 +25,7 @@
 #include <nx/vms/client/desktop/shaders/media_output_shader_program.h>
 #include <nx/vms/client/desktop/shaders/rhi_video_renderer.h>
 #include <nx/vms/client/desktop/utils/blur_mask.h>
+#include <nx/vms/common/pixelation/pixelation.h>
 #include <ui/fisheye/fisheye_ptz_controller.h>
 #include <ui/graphics/items/resource/decodedpicturetoopengluploader.h>
 #include <ui/graphics/opengl/gl_buffer_stream.h>
@@ -31,12 +34,7 @@
 #include <ui/graphics/shaders/blur_shader_program.h>
 #include <ui/graphics/shaders/texture_color_shader_program.h>
 #include <utils/color_space/image_correction.h>
-#include <utils/color_space/yuvconvert.h>
 #include <utils/common/util.h>
-
-#include <nx/vms/common/pixelation/pixelation.h>
-
-#include <QtGui/rhi/qrhi.h>
 
 using nx::vms::client::core::Geometry;
 using namespace nx::vms::client::desktop;

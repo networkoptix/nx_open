@@ -12,7 +12,7 @@
 class NX_VMS_COMMON_API QnRtspFfmpegEncoder: public AbstractRtspEncoder
 {
 public:
-    QnRtspFfmpegEncoder(const DecoderConfig& config, nx::metrics::Storage* metrics);
+    QnRtspFfmpegEncoder(const DecoderConfig& config, nx::metric::Storage* metrics);
 
     virtual QString getSdpMedia(bool isVideo, int trackId, int port = 0) override;
 
@@ -47,7 +47,7 @@ private:
     int m_mtu = 0;
 
     std::unique_ptr<QnFfmpegVideoTranscoder> m_videoTranscoder;
-    nx::metrics::Storage* m_metrics = nullptr;
+    nx::metric::Storage* m_metrics = nullptr;
     nx::utils::SoftwareVersion m_serverVersion;
 
     CodecParametersConstPtr getGeneratedContext(AVCodecID compressionType);

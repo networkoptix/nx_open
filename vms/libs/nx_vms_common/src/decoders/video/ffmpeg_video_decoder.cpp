@@ -15,7 +15,7 @@ extern "C" {
 #include <nx/media/ffmpeg/ffmpeg_utils.h>
 #include <nx/media/ffmpeg/old_api.h>
 #include <nx/media/utils.h>
-#include <nx/metrics/metrics_storage.h>
+#include <nx/metric/metrics_storage.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/math/math.h>
 #include <utils/media/frame_type_extractor.h>
@@ -35,7 +35,7 @@ bool isImage(const QnConstCompressedVideoDataPtr& data)
 
 QnFfmpegVideoDecoder::QnFfmpegVideoDecoder(
     const DecoderConfig& config,
-    nx::metrics::Storage* metrics,
+    nx::metric::Storage* metrics,
     const QnConstCompressedVideoDataPtr& data)
     :
     m_context(0),
@@ -200,6 +200,17 @@ void QnFfmpegVideoDecoder::setMultiThreadDecoding(bool value)
         m_useMtDecoding = value;
         m_needRecreate = true;
     }
+}
+
+void QnFfmpegVideoDecoder::setGreyOnlyMode(bool value)
+{
+    if (!m_context)
+        return;
+
+    if (value)
+        m_context->flags |= AV_CODEC_FLAG_GRAY;
+    else
+        m_context->flags &= ~AV_CODEC_FLAG_GRAY;
 }
 
 int QnFfmpegVideoDecoder::decodeVideo(

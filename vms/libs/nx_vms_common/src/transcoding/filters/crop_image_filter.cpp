@@ -2,13 +2,13 @@
 
 #include "crop_image_filter.h"
 
-#include <utils/media/frame_info.h>
+#include <nx/media/ffmpeg/frame_info.h>
 
 #include "../transcoder.h"
 
 extern "C" {
 #ifdef WIN32
-#define AVPixFmtDescriptor __declspec(dllimport) AVPixFmtDescriptor
+    #define AVPixFmtDescriptor __declspec(dllimport) AVPixFmtDescriptor
 #endif
 #include <libavutil/pixdesc.h>
 #ifdef WIN32

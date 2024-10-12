@@ -12,11 +12,11 @@
 #include <QtGui/QImage>
 
 #include <core/resource/resource_fwd.h>
+#include <nx/media/ffmpeg/frame_info.h>
 #include <nx/utils/impl_ptr.h>
 #include <recording/time_period.h>
 #include <recording/time_period_list.h>
 #include <utils/common/aspect_ratio.h>
-#include <utils/media/frame_info.h>
 
 #include "archive_frame_extractor.h"
 #include "thumbnail.h"

@@ -6,10 +6,9 @@
 
 #include <QtGui/QImage>
 
+#include <nx/media/ffmpeg/abstract_video_decoder.h>
 #include <nx/media/ffmpeg_helper.h>
 #include <nx/media/video_data_packet.h>
-
-#include "abstract_video_decoder.h"
 
 class FrameTypeExtractor;
 struct AVCodec;
@@ -17,7 +16,7 @@ struct AVCodecContext;
 struct AVFrame;
 struct MpegEncContext;
 
-namespace nx::metrics { struct Storage; }
+namespace nx::metric { struct Storage; }
 
 /**
  * Client of this class is responsible for encoded data buffer to meet ffmpeg
@@ -31,7 +30,7 @@ public:
     */
     QnFfmpegVideoDecoder(
         const DecoderConfig& config,
-        nx::metrics::Storage* metrics,
+        nx::metric::Storage* metrics,
         const QnConstCompressedVideoDataPtr& data);
     QnFfmpegVideoDecoder(const QnFfmpegVideoDecoder&) = delete;
     QnFfmpegVideoDecoder& operator=(const QnFfmpegVideoDecoder&) = delete;
@@ -51,6 +50,7 @@ public:
     void setMultiThreadDecodePolicy(MultiThreadDecodePolicy mtDecodingPolicy) override;
     virtual bool resetDecoder(const QnConstCompressedVideoDataPtr& data) override;
     int getLastDecodeResult() const override { return m_lastDecodeResult; }
+    void setGreyOnlyMode(bool value) override;
 
 private:
     bool openDecoder(const QnConstCompressedVideoDataPtr& data);
@@ -85,7 +85,7 @@ private:
     MultiThreadDecodePolicy m_mtDecodingPolicy;
     bool m_useMtDecoding;
     bool m_needRecreate;
-    nx::metrics::Storage* m_metrics = nullptr;
+    nx::metric::Storage* m_metrics = nullptr;
     int m_lastDecodeResult = 0;
 
     QnAbstractMediaData::MediaFlags m_lastFlags {};

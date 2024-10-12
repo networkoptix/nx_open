@@ -169,6 +169,8 @@ public:
     void setWebCamerasDiscoveryEnabled(bool value);
     bool isGuidConflictDetected() const;
     void setGuidConflictDetected(bool value);
+    bool isHardwareDecodingEnabled() const;
+    void setHardwareDecodingEnabled(bool value);
 
 protected:
     virtual void updateInternal(const QnResourcePtr& source, NotifierList& notifiers) override;
@@ -195,6 +197,7 @@ signals:
     void backupBitrateLimitsChanged(const QnResourcePtr& resource);
     void webCamerasDiscoveryChanged();
     void analyticsDescriptorsChanged();
+    void hardwareDecodingChanged();
 
 protected:
     virtual void setSystemContext(nx::vms::common::SystemContext* systemContext) override;

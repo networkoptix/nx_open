@@ -2,8 +2,8 @@
 
 #include <gtest/gtest.h>
 
+#include <nx/media/ffmpeg/frame_info.h>
 #include <transcoding/filters/scale_image_filter.h>
-#include <utils/media/frame_info.h>
 
 namespace {
 

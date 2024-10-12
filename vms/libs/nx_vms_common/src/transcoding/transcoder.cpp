@@ -7,7 +7,7 @@
 #include <core/resource/media_resource.h>
 #include <nx/media/config.h>
 #include <nx/media/sse_helper.h>
-#include <nx/metrics/metrics_storage.h>
+#include <nx/metric/metrics_storage.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/math/math.h>
 #include <transcoding/ffmpeg_audio_transcoder.h>
@@ -78,7 +78,7 @@ QnVideoTranscoder::QnVideoTranscoder(AVCodecID codecId):
 }
 
 // ---------------------- QnTranscoder -------------------------
-QnTranscoder::QnTranscoder(const DecoderConfig& decoderConfig, nx::metrics::Storage* metrics)
+QnTranscoder::QnTranscoder(const DecoderConfig& decoderConfig, nx::metric::Storage* metrics)
     :
     m_decoderConfig(decoderConfig),
     m_videoCodec(AV_CODEC_ID_NONE),

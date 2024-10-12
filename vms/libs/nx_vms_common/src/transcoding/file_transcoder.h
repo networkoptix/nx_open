@@ -16,7 +16,7 @@ extern "C" {
 #include <nx/utils/thread/wait_condition.h>
 #include <transcoding/ffmpeg_transcoder.h>
 
-namespace nx::metrics { struct Storage; }
+namespace nx::metric { struct Storage; }
 
 class QnAviArchiveDelegate;
 
@@ -32,7 +32,7 @@ class NX_VMS_COMMON_API FileTranscoder: public QnLongRunnable
     Q_OBJECT
 
 public:
-    explicit FileTranscoder(std::shared_ptr<nx::metrics::Storage> metrics);
+    explicit FileTranscoder(std::shared_ptr<nx::metric::Storage> metrics);
     virtual ~FileTranscoder() override;
 
     /*!
@@ -91,7 +91,7 @@ public:
         Creates temporary file in the same dir with \a filePath
     */
     static bool setTagValue(
-        std::shared_ptr<nx::metrics::Storage> metrics,
+        std::shared_ptr<nx::metric::Storage> metrics,
         const QString& filePath,
         const QString& name,
         const QString& value);
@@ -122,7 +122,7 @@ private:
     mutable nx::Mutex m_mutex;
     nx::WaitCondition m_cond;
     std::unique_ptr<QnAviArchiveDelegate> m_mediaFileReader;
-    std::shared_ptr<nx::metrics::Storage> m_metrics;
+    std::shared_ptr<nx::metric::Storage> m_metrics;
     QnFfmpegTranscoder m_transcoder;
     int m_resultCode = 0;
     State m_state = State::sInit;

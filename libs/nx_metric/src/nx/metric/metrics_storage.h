@@ -2,10 +2,9 @@
 
 #pragma once
 
-#include <nx/metrics/base_metrics_storage.h>
+#include <nx/metric/base_metrics_storage.h>
 
-namespace nx {
-namespace metrics {
+namespace nx::metric {
 
 struct Storage: ParameterSet
 {
@@ -63,5 +62,4 @@ struct Storage: ParameterSet
     NX_METRICS_ADD(P2pStatisticsData, p2pCounters, "P2p statistics");
 };
 
-} // namespace metrics
-} // namespace nx
+} // namespace nx::metric

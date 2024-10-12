@@ -2,19 +2,18 @@
 
 #include "ffmpeg_image_provider.h"
 
-#include <limits>
-
 #include <QtConcurrent>
+#include <limits>
 
 #include <core/resource/avi/avi_archive_delegate.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/resource.h>
 #include <decoders/video/ffmpeg_video_decoder.h>
+#include <nx/media/ffmpeg/frame_info.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/client/core/client_core_globals.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <utils/common/delayed.h>
-#include <utils/media/frame_info.h>
 
 // TODO: #vkutin #sivanov Support customAspectRatio and videoLayout.
 

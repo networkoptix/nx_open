@@ -11,10 +11,10 @@
 #include <QtOpenGL/QOpenGLVertexArrayObject>
 
 #include <client/client_globals.h>
+#include <nx/media/ffmpeg/frame_info.h>
 #include <nx/media/media_data_packet.h> //< For QnMetaDataV1Ptr.
 #include <ui/graphics/items/resource/decodedpicturetoopengluploader.h>
 #include <ui/graphics/opengl/gl_functions.h>
-#include <utils/media/frame_info.h>
 
 class CLVideoDecoderOutput;
 class ScreenshotInterface;

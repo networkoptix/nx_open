@@ -10,7 +10,7 @@
 #include <QtCore/QTimer>
 
 #include <nx/build_info.h>
-#include <nx/metrics/application_metrics_storage.h>
+#include <nx/metric/application_metrics_storage.h>
 #include <nx/utils/log/format.h>
 #include <nx/utils/trace/trace.h>
 #include <nx/vms/client/desktop/application_context.h>

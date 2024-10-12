@@ -2,7 +2,7 @@
 
 #include "rotate_image_filter.h"
 
-#include <utils/media/frame_info.h>
+#include <nx/media/ffmpeg/frame_info.h>
 
 CLVideoDecoderOutputPtr rotateImage(const CLConstVideoDecoderOutputPtr& frame, int angle)
 {

@@ -12,7 +12,7 @@
 #include <core/resource/resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/resource.h>
-#include <nx/metrics/metrics_storage.h>
+#include <nx/metric/metrics_storage.h>
 #include <nx/network/aio/unified_pollset.h>
 #include <nx/network/flash_socket/types.h>
 #include <nx/network/http/custom_headers.h>

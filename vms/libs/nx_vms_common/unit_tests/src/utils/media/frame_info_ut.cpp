@@ -3,8 +3,8 @@
 #include <gtest/gtest.h>
 
 #include <decoders/video/ffmpeg_video_decoder.h>
+#include <nx/media/ffmpeg/frame_info.h>
 #include <nx/media/video_data_packet.h>
-#include <utils/media/frame_info.h>
 
 // Array size is 302.
 static const uint8_t kRawH264[] = {

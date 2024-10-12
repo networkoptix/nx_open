@@ -53,7 +53,7 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
         d->analyticsDescriptorContainer.get(),
         this);
 
-    d->metrics = std::make_shared<nx::metrics::Storage>();
+    d->metrics = std::make_shared<nx::metric::Storage>();
     d->lookupListManager = std::make_unique<LookupListManager>();
     d->pixelationSettings = std::make_unique<PixelationSettings>(this);
 
@@ -292,7 +292,7 @@ std::shared_ptr<taxonomy::AbstractState> SystemContext::analyticsTaxonomyState()
     return nullptr;
 }
 
-std::shared_ptr<nx::metrics::Storage> SystemContext::metrics() const
+std::shared_ptr<nx::metric::Storage> SystemContext::metrics() const
 {
     return d->metrics;
 }

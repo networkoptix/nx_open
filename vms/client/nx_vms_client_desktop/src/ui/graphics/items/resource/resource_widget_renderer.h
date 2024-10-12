@@ -8,11 +8,11 @@
 #include <QtCore/QVector>
 
 #include <client/client_globals.h>
+#include <nx/media/ffmpeg/frame_info.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/stoppable.h>
 #include <ui/fisheye/fisheye_ptz_controller.h>
 #include <utils/color_space/image_correction.h>
-#include <utils/media/frame_info.h>
 
 class QOpenGLWidget;
 class QQuickWidget;

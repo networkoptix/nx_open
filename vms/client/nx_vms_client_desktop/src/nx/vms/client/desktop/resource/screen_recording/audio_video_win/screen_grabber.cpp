@@ -15,8 +15,8 @@
 #include <QtWidgets/QWidget>
 
 #include <nx/media/sse_helper.h>
+#include <nx/media/yuvconvert.h>
 #include <nx/utils/log/log.h>
-#include <utils/color_space/yuvconvert.h>
 
 static const int LOGO_CORNER_OFFSET = 8;
 

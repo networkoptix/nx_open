@@ -43,6 +43,7 @@ namespace {
 
 const QString protoVersionPropertyName = lit("protoVersion");
 const bool kWebCamerasDiscoveryEnabledDefaultValue = false;
+const bool kHardwareDecodingEnabledDefaultValue = false;
 
 } // namespace
 
@@ -86,6 +87,10 @@ void QnMediaServerResource::atPropertyChanged(const QnResourcePtr& /*self*/, con
     else if (key == ResourcePropertyKey::Server::kWebCamerasDiscoveryEnabled)
     {
         emit webCamerasDiscoveryChanged();
+    }
+    else if (key == ResourcePropertyKey::Server::kHardwareDecodingEnabled)
+    {
+        emit hardwareDecodingChanged();
     }
     else if (key == nx::analytics::kDescriptorsProperty)
     {
@@ -820,5 +825,19 @@ void QnMediaServerResource::setWebCamerasDiscoveryEnabled(bool value)
 {
     setProperty(ResourcePropertyKey::Server::kWebCamerasDiscoveryEnabled,
         value == kWebCamerasDiscoveryEnabledDefaultValue ? QString() : QnLexical::serialized(value)
+    );
+}
+
+bool QnMediaServerResource::isHardwareDecodingEnabled() const
+{
+    return QnLexical::deserialized(
+        getProperty(ResourcePropertyKey::Server::kHardwareDecodingEnabled),
+        kHardwareDecodingEnabledDefaultValue);
+}
+
+void QnMediaServerResource::setHardwareDecodingEnabled(bool value)
+{
+    setProperty(ResourcePropertyKey::Server::kHardwareDecodingEnabled,
+        value == kHardwareDecodingEnabledDefaultValue ? QString() : QnLexical::serialized(value)
     );
 }

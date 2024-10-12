@@ -2,14 +2,14 @@
 
 #pragma once
 
-#include <nx/metrics/base_metrics_storage.h>
+#include <nx/metric/base_metrics_storage.h>
 #include <nx/utils/impl_ptr.h>
 
-namespace nx::metrics {
+namespace nx::metric {
 
 struct ApplicationMetricsStorage: ParameterSet
 {
     NX_METRICS_ADD(std::atomic<qint64>, totalServerRequests, "Total number of requests to server");
 };
 
-} // namespace nx::metrics
+} // namespace nx::metric::

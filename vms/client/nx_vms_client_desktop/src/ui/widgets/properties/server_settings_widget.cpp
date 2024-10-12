@@ -241,6 +241,9 @@ QnServerSettingsWidget::QnServerSettingsWidget(QWidget* parent /* = 0*/) :
     connect(ui->webCamerasDiscoveryCheckBox, &QCheckBox::stateChanged, this,
         &QnAbstractPreferencesWidget::hasChangesChanged);
 
+    connect(ui->serverHardwareDecodingCheckBox, &QCheckBox::stateChanged, this,
+        &QnAbstractPreferencesWidget::hasChangesChanged);
+
     ui->contentLayout->addWidget(d->remoteAccessWidget);
 }
 
@@ -286,7 +289,8 @@ void QnServerSettingsWidget::setServer(const QnMediaServerResourcePtr &server)
 
         connect(m_server.get(), &QnMediaServerResource::webCamerasDiscoveryChanged, this,
             &QnServerSettingsWidget::updateWebCamerasDiscoveryEnabled);
-
+        connect(m_server.get(), &QnMediaServerResource::hardwareDecodingChanged, this,
+            &QnServerSettingsWidget::updateHardwareDecodingEnabled);
         connect(m_server.get(), &QnMediaServerResource::certificateChanged, this,
             &QnServerSettingsWidget::updateCertificatesInfo);
         connect(m_server.get(), &QnMediaServerResource::statusChanged, this,
@@ -342,6 +346,9 @@ bool QnServerSettingsWidget::hasChanges() const
     if (isWebCamerasDiscoveryEnabledChanged())
         return true;
 
+    if (m_server->isHardwareDecodingEnabled() != ui->serverHardwareDecodingCheckBox->isChecked())
+        return true;
+
     return false;
 }
 
@@ -365,6 +372,7 @@ void QnServerSettingsWidget::loadDataToUi()
 
     updateUrl();
     updateWebCamerasDiscoveryEnabled();
+    updateHardwareDecodingEnabled();
     updateCertificatesInfo();
     updateDigestAlertBar();
 }
@@ -379,6 +387,7 @@ void QnServerSettingsWidget::applyChanges()
 
     m_server->setName(ui->nameLineEdit->text());
     m_server->setWebCamerasDiscoveryEnabled(isWebCamerasDiscoveryEnabled());
+    m_server->setHardwareDecodingEnabled(ui->serverHardwareDecodingCheckBox->isChecked());
 
     auto callback = nx::utils::guarded(this,
         [this](bool /*success*/, rest::Handle requestId)
@@ -410,6 +419,13 @@ void QnServerSettingsWidget::updateUrl()
 void QnServerSettingsWidget::updateWebCamerasDiscoveryEnabled()
 {
     ui->webCamerasDiscoveryCheckBox->setCheckState(currentIsWebCamerasDiscoveryEnabled()
+        ? Qt::CheckState::Checked
+        : Qt::CheckState::Unchecked);
+}
+
+void QnServerSettingsWidget::updateHardwareDecodingEnabled()
+{
+    ui->serverHardwareDecodingCheckBox->setCheckState(m_server->isHardwareDecodingEnabled()
         ? Qt::CheckState::Checked
         : Qt::CheckState::Unchecked);
 }

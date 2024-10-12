@@ -2,3 +2,6 @@
 
 void XGetVisualInfo() {}
 void XFree() {}
+void XCloseDisplay() {}
+void XOpenDisplay() {}
+void XDisplayName() {}

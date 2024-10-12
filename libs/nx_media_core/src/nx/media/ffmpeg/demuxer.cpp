@@ -80,6 +80,8 @@ QnAbstractMediaDataPtr Demuxer::getNextData()
     data->m_data.write((const char*) packet.data, packet.size);
     data->compressionType = stream->codecpar->codec_id;
     data->flags |= QnAbstractMediaData::MediaFlag::MediaFlags_AVKey;
+    data->width = stream->codecpar->width;
+    data->height = stream->codecpar->height;
     return data;
 }
 

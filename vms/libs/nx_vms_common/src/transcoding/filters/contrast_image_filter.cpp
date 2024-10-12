@@ -2,9 +2,9 @@
 
 #include "contrast_image_filter.h"
 
+#include <nx/media/ffmpeg/frame_info.h>
 #include <nx/media/sse_helper.h>
 #include <nx/utils/math/math.h>
-#include <utils/media/frame_info.h>
 
 QnContrastImageFilter::QnContrastImageFilter(const nx::vms::api::ImageCorrectionData& params):
     m_params(params),

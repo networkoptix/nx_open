@@ -2,17 +2,17 @@
 
 #include "local_media_async_image_request.h"
 
-#include <QtCore/QFutureWatcher>
 #include <QtConcurrent/QtConcurrentRun>
+#include <QtCore/QFutureWatcher>
 
 #include <core/resource/avi/avi_archive_delegate.h>
 #include <core/resource/resource.h>
 #include <decoders/video/ffmpeg_video_decoder.h>
+#include <nx/media/ffmpeg/frame_info.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/core/common/utils/thread_pool.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <utils/common/delayed.h>
-#include <utils/media/frame_info.h>
 
 namespace nx::vms::client::core {
 

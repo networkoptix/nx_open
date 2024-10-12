@@ -88,7 +88,7 @@ AVIOContext* QnFfmpegTranscoder::createFfmpegIOContext()
 
 static QAtomicInt QnFfmpegTranscoder_count = 0;
 
-QnFfmpegTranscoder::QnFfmpegTranscoder(const Config& config, nx::metrics::Storage* metrics)
+QnFfmpegTranscoder::QnFfmpegTranscoder(const Config& config, nx::metric::Storage* metrics)
 :
     QnTranscoder(config.decoderConfig, metrics),
     m_config(config)

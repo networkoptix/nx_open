@@ -9,8 +9,8 @@
 #include <QtGui/QVector2D>
 #include <QtGui/QVector3D>
 
+#include <nx/media/ffmpeg/frame_info.h>
 #include <nx/vms/api/data/dewarping_data.h>
-#include <utils/media/frame_info.h>
 
 #include "abstract_image_filter.h"
 

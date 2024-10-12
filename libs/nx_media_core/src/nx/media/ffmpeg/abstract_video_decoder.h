@@ -2,11 +2,10 @@
 
 #pragma once
 
+#include <nx/media/decoder_types.h>
+#include <nx/media/ffmpeg/frame_info.h>
 #include <nx/media/media_data_packet.h>
 #include <nx/media/video_data_packet.h>
-#include <utils/media/frame_info.h>
-
-#include "decoder_types.h"
 
 extern "C" {
 #include <libavutil/pixfmt.h>
@@ -70,4 +69,6 @@ public:
 
     // return status of last decode call. Success - 0, Error - other value.
     virtual int getLastDecodeResult() const = 0;
+
+    virtual void setGreyOnlyMode(bool /*value*/) {};
 };

@@ -319,6 +319,12 @@ distrib_copyServerSystemLibs() # destination_path
         libudev.so.1
     )
 
+    if [[ "${ARCH}" = "x64" ]]; then
+        fallback_libs_to_copy+=(
+            libdrm.so.2
+        )
+    fi
+
     distrib_copySystemLibs "${fallback_lib_path}" "${fallback_libs_to_copy[@]}"
 
     echo "${fallback_libs_to_copy[@]}" > "${fallback_lib_path}/libs.txt"
@@ -618,6 +624,7 @@ distrib_copyGlLibs()
         libEGL.so.1
         libGLX.so.0
         libX11.so.6
+        libva-x11.so.2
     )
 
     local lib

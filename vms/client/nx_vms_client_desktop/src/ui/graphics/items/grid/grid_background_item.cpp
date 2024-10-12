@@ -7,6 +7,7 @@
 #include <QtGui/QPainter>
 
 #include <core/resource/user_resource.h>
+#include <nx/media/yuvconvert.h>
 #include <nx/utils/math/math.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_session.h>
@@ -24,7 +25,6 @@
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_grid_mapper.h>
 #include <ui/workbench/workbench_layout.h>
-#include <utils/color_space/yuvconvert.h>
 
 using namespace nx::vms::client::desktop;
 using nx::vms::client::core::Geometry;

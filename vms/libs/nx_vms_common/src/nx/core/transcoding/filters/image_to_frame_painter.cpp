@@ -5,13 +5,12 @@
 #include <QtGui/QPainter>
 
 #include <nx/build_info.h>
+#include <nx/media/ffmpeg/frame_info.h>
+#include <nx/media/yuvconvert.h>
 #include <nx/utils/log/log_main.h>
 #include <nx/utils/math/math.h>
-#include <utils/color_space/yuvconvert.h>
-#include <utils/media/frame_info.h>
 
-extern "C"
-{
+extern "C" {
 #include <libswscale/swscale.h>
 } // extern "C"
 

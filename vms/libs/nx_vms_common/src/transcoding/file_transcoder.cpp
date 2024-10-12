@@ -13,7 +13,7 @@
 #include <nx/utils/random.h>
 #include <nx/utils/thread/mutex.h>
 
-FileTranscoder::FileTranscoder(std::shared_ptr<nx::metrics::Storage> metrics):
+FileTranscoder::FileTranscoder(std::shared_ptr<nx::metric::Storage> metrics):
     m_metrics(metrics),
     m_transcoder(QnFfmpegTranscoder::Config(), metrics.get())
 {
@@ -78,7 +78,7 @@ int FileTranscoder::resultCode() const
 }
 
 bool FileTranscoder::setTagValue(
-    std::shared_ptr<nx::metrics::Storage> metrics,
+    std::shared_ptr<nx::metric::Storage> metrics,
     const QString& srcFilePath,
     const QString& name,
     const QString& value )

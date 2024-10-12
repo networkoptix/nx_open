@@ -28,3 +28,9 @@ set_target_properties(libx11_stub PROPERTIES
     OUTPUT_NAME X11
     SOVERSION 6
 )
+
+add_library(libva-x11_stub src/va-x11_dummy.c)
+set_target_properties(libva-x11_stub PROPERTIES
+    OUTPUT_NAME va-x11
+    SOVERSION 2
+)

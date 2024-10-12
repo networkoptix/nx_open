@@ -4,6 +4,8 @@
 
 #include <fstream>
 
+#include <nx/utils/log/log.h>
+
 extern "C" {
 #include <libavformat/avio.h>
 #include <libavutil/opt.h>
