@@ -2,6 +2,8 @@
 
 #include <gtest/gtest.h>
 
+#include <QtCore/QTimeZone>
+
 #include <nx/vms/client/desktop/system_update/client_update_manager.h>
 #include <nx/vms/common/update/update_information.h>
 
@@ -24,7 +26,7 @@ common::update::Information makeInfo(milliseconds releaseDate, int deliveryDays)
 
 QDateTime dt(const milliseconds& timestamp) //< To make failed test output prettier.
 {
-    return QDateTime::fromMSecsSinceEpoch(timestamp.count(), Qt::UTC);
+    return QDateTime::fromMSecsSinceEpoch(timestamp.count(), QTimeZone::UTC);
 }
 
 const milliseconds kDay = 24h;

@@ -2,6 +2,8 @@
 
 #include "datetime.h"
 
+#include <QtCore/QTimeZone>
+
 #include "nx_utils_ini.h"
 #include "std_string_utils.h"
 #include "string.h"
@@ -92,7 +94,7 @@ QString timestampToDebugString(qint64 timestampMs, const QString& format)
 
     const QString defaultFormat = nx::utils::ini().debugTimeRepresentation;
 
-    const auto dateTime = QDateTime::fromMSecsSinceEpoch(timestampMs, Qt::UTC);
+    const auto dateTime = QDateTime::fromMSecsSinceEpoch(timestampMs, QTimeZone::UTC);
     return dateTime.toString(format.isEmpty() ? defaultFormat : format);
 }
 
@@ -154,7 +156,7 @@ QDateTime parseDateToQDateTime(const std::string_view& str)
 
         if (parsedDate.isValid())
         {
-            parsedDate.setTimeSpec(Qt::UTC);
+            parsedDate.setTimeZone(QTimeZone::UTC);
             return parsedDate;
         }
     }

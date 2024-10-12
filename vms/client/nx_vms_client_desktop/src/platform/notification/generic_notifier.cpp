@@ -2,8 +2,9 @@
 
 #include "generic_notifier.h"
 
-#include <QtCore/QTimerEvent>
 #include <QtCore/QDateTime>
+#include <QtCore/QTimeZone>
+#include <QtCore/QTimerEvent>
 
 namespace {
     enum {
@@ -41,7 +42,7 @@ void QnGenericNotifier::updateTimes(bool notify) {
 
     QDateTime localDateTime = QDateTime::currentDateTime();
     QDateTime utcDateTime = localDateTime.toUTC();
-    localDateTime.setTimeSpec(Qt::UTC);
+    localDateTime.setTimeZone(QTimeZone::UTC);
 
     qint64 localTime = localDateTime.toMSecsSinceEpoch();
     qint64 utcTime = utcDateTime.toMSecsSinceEpoch();

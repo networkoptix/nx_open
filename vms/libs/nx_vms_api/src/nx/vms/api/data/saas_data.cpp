@@ -12,7 +12,7 @@ static const QString kSaasDateTimeFormat("yyyy-MM-dd hh:mm:ss");
 bool fromString(const std::string& value, SaasDateTime* target)
 {
     *target = QDateTime::fromString(QString::fromUtf8(value), kSaasDateTimeFormat);
-    target->setTimeSpec(Qt::UTC);
+    target->setTimeZone(QTimeZone::UTC);
     return true;
 }
 
