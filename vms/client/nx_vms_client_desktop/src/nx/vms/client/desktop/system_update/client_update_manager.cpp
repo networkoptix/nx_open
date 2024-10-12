@@ -794,7 +794,7 @@ ClientUpdateManager::UpdateDate ClientUpdateManager::calculateUpdateDate(
 {
     // IMPORTANT! This function must generate the same timestamp on all Clients in the system
     // independently on the Client timezone. Thus all QDateTime <-> std::chrono conversion calls
-    // must be done with Qt::UTC timezone specification.
+    // must be done with QTimeZone::UTC specification.
 
     const auto isSuitableDay =
         [](const QDate& day)
@@ -803,7 +803,7 @@ ClientUpdateManager::UpdateDate ClientUpdateManager::calculateUpdateDate(
         };
 
     const auto qdt =
-        [](milliseconds ts) { return QDateTime::fromMSecsSinceEpoch(ts.count(), Qt::UTC); };
+        [](milliseconds ts) { return QDateTime::fromMSecsSinceEpoch(ts.count(), QTimeZone::UTC); };
 
     QRandomGenerator64 randomGenerator = getRandomGenerator(localSystemId, updateInfo.version);
 
@@ -857,8 +857,8 @@ ClientUpdateManager::UpdateDate ClientUpdateManager::calculateUpdateDate(
             {
                 const auto day = date.addDays(i);
                 if (isSuitableDay(day)
-                    && day.endOfDay(Qt::UTC).toMSecsSinceEpoch() > minDate.count()
-                    && day.startOfDay(Qt::UTC).toMSecsSinceEpoch() < maxDate.count())
+                    && day.endOfDay(QTimeZone::UTC).toMSecsSinceEpoch() > minDate.count()
+                    && day.startOfDay(QTimeZone::UTC).toMSecsSinceEpoch() < maxDate.count())
                 {
                     days.push_back(day);
                 }
@@ -880,9 +880,10 @@ ClientUpdateManager::UpdateDate ClientUpdateManager::calculateUpdateDate(
     UpdateDate plannedDate;
 
     const milliseconds minStartTime =
-        std::max(minDate, milliseconds(date.startOfDay(Qt::UTC).toMSecsSinceEpoch()));
+        std::max(minDate, milliseconds(date.startOfDay(QTimeZone::UTC).toMSecsSinceEpoch()));
     const milliseconds maxStartTime = std::max(
-        minStartTime, std::min(maxDate, milliseconds(date.endOfDay(Qt::UTC).toMSecsSinceEpoch())));
+        minStartTime,
+        std::min(maxDate, milliseconds(date.endOfDay(QTimeZone::UTC).toMSecsSinceEpoch())));
     const milliseconds maxRolloutStartTime =
         std::max(minStartTime, maxStartTime - kClientUpdateRolloutPeriod);
     const milliseconds localShiftWindow = maxStartTime - maxRolloutStartTime;

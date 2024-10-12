@@ -5,6 +5,7 @@
 #include <cmath>
 
 #include <QtCore/QTimeZone>
+
 #include <nx/utils/log/log.h>
 
 namespace nx::network::hls {
@@ -12,7 +13,7 @@ namespace nx::network::hls {
 QString timeZoneOffsetString(QDateTime dt1)
 {
     QDateTime dt2 = dt1.toUTC();
-    dt1.setTimeSpec(Qt::UTC);
+    dt1.setTimeZone(QTimeZone::UTC);
     const int offsetSeconds = dt2.secsTo(dt1);
 
     const QChar sign = offsetSeconds >= 0 ? '+' : '-';

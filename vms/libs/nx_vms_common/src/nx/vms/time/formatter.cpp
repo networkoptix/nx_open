@@ -9,6 +9,7 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QLocale>
 #include <QtCore/QString>
+#include <QtCore/QTimeZone>
 
 #include <nx/utils/log/assert.h>
 
@@ -244,7 +245,7 @@ QString Formatter::toString(const QDateTime& value, Format format) const
 
 QString Formatter::toString(const QTime& time, Format format) const
 {
-    return toString(QDateTime(QDate::currentDate(), time, Qt::UTC), format);
+    return toString(QDateTime(QDate::currentDate(), time, QTimeZone::UTC), format);
 }
 
 QString Formatter::toString(const QDate& date, Format format) const
@@ -330,7 +331,7 @@ qint64 systemDisplayOffset()
         []()
         {
             const auto current = QDateTime::currentDateTime();
-            const auto utc = QDateTime(current.date(), current.time(), Qt::UTC);
+            const auto utc = QDateTime(current.date(), current.time(), QTimeZone::UTC);
             return current.secsTo(utc) * 1000;
         }();
 

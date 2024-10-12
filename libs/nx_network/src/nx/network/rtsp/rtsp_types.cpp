@@ -201,7 +201,7 @@ bool Range::parseClockTime(int64_t* timeUs, std::string_view serialized)
     auto dateTime = QDateTime::fromString(
         QString::fromLatin1(serialized.data(), serialized.size()),
         "yyyyMMddTHHmm");
-    dateTime.setTimeSpec(Qt::UTC);
+    dateTime.setTimeZone(QTimeZone::UTC);
     if (!dateTime.isValid())
         return false;
 
@@ -284,7 +284,7 @@ std::string Range::serializeClockTime(int64_t timeUs) const
     if (timeUs == DATETIME_NOW)
         timeUs = nx::utils::millisSinceEpoch().count();
 
-    const auto dateTime = QDateTime::fromSecsSinceEpoch(timeUs / 1'000'000, Qt::UTC);
+    const auto dateTime = QDateTime::fromSecsSinceEpoch(timeUs / 1'000'000, QTimeZone::UTC);
     return dateTime.toString("yyyyMMddTHHmmss").toStdString() + serializeSubseconds(timeUs) + "Z";
 }
 

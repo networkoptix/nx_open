@@ -129,7 +129,7 @@ void QnWindowsNotifier::updateTime(bool notify) {
      * changing the timezone offset (e.g. Moscow+4 -> Tbilisi+4). */
     QDateTime dt1 = QDateTime::currentDateTime();
     QDateTime dt2 = dt1.toUTC();
-    dt1.setTimeSpec(Qt::UTC);
+    dt1.setTimeZone(QTimeZone::UTC);
     qint64 timeZoneOffset = dt2.msecsTo(dt1);
 
     if(timeZoneOffset != m_timeZoneOffset) {

@@ -9,6 +9,7 @@
 
 #include <QtCore/QCryptographicHash>
 #include <QtCore/QStringList>
+#include <QtCore/QTimeZone>
 
 #include <api/runtime_info_manager.h>
 #include <common/common_globals.h>
@@ -504,7 +505,7 @@ qint64 QnLicense::expirationTime() const
         return -1;
 
     QDateTime result = QDateTime::fromString(m_expiration, QLatin1String("yyyy-MM-dd hh:mm:ss"));
-    result.setTimeSpec(Qt::UTC); /* Expiration is stored as UTC date-time. */
+    result.setTimeZone(QTimeZone::UTC); /* Expiration is stored as UTC date-time. */
     return result.toMSecsSinceEpoch();
 }
 

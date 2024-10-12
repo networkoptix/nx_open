@@ -1048,7 +1048,8 @@ void Player::setPosition(qint64 value)
     if (value > QDateTime::currentMSecsSinceEpoch())
         value = -1;
 
-    NX_DEBUG(this, "setPosition(%1: %2)", value, QDateTime::fromMSecsSinceEpoch(value, Qt::UTC));
+    NX_DEBUG(this, "setPosition(%1: %2)",
+        value, QDateTime::fromMSecsSinceEpoch(value, QTimeZone::UTC));
 
     d->positionMs = d->lastSeekTimeMs = value;
 
