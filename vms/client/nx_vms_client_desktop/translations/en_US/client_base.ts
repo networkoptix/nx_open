@@ -3190,6 +3190,16 @@ License Key: %2</source>
         <source>Connect to Server</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Log in to %1</source>
+        <comment>%1 is the cloud name (like Nx Cloud)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Logged in as %1</source>
+        <comment>%1 is the cloud login name (like user@domain.com</comment>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnCloudUserPanelWidget</name>
