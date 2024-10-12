@@ -113,7 +113,7 @@
     </message>
     <message>
       <source>Invalid login or password</source>
-      <translation type="unfinished">Invalid login or password</translation>
+      <translation>Inicio de sesión ou contrasinal incorrectos</translation>
     </message>
     <message>
       <source>Incorrect username or password.</source>
