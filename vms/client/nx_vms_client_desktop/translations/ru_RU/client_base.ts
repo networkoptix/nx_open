@@ -3275,6 +3275,16 @@ License Key: %2</translation>
       <source>Connect to Server</source>
       <translation>Подключиться к серверу</translation>
     </message>
+    <message>
+      <source>Log in to %1</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Войти в %1</translation>
+    </message>
+    <message>
+      <source>Logged in as %1</source>
+      <comment>%1 is the cloud login name (like user@domain.com</comment>
+      <translation>Выполнен вход как %1</translation>
+    </message>
   </context>
   <context>
     <name>QnCloudUserPanelWidget</name>

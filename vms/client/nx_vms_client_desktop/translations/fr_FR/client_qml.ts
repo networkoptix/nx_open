@@ -1006,9 +1006,9 @@
     <message numerus="yes">
       <source>%n more</source>
       <comment>%n is the number of remaining groups</comment>
-      <translation type="unfinished">
-        <numerusform>%n more</numerusform>
-        <numerusform>%n more</numerusform>
+      <translation>
+        <numerusform>%n plus</numerusform>
+        <numerusform>%n plus</numerusform>
       </translation>
     </message>
   </context>

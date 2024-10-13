@@ -3149,6 +3149,16 @@ Kunci Lisensi: %2</translation>
       <source>Connect to Server</source>
       <translation>Connect to Server</translation>
     </message>
+    <message>
+      <source>Log in to %1</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Log in to %1</translation>
+    </message>
+    <message>
+      <source>Logged in as %1</source>
+      <comment>%1 is the cloud login name (like user@domain.com</comment>
+      <translation type="unfinished">Logged in as %1</translation>
+    </message>
   </context>
   <context>
     <name>QnCloudUserPanelWidget</name>
