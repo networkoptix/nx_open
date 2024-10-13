@@ -3191,6 +3191,16 @@ Clé de licence : %2</translation>
       <source>Connect to Server</source>
       <translation>Se connecter au serveur</translation>
     </message>
+    <message>
+      <source>Log in to %1</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Connexion à %1</translation>
+    </message>
+    <message>
+      <source>Logged in as %1</source>
+      <comment>%1 is the cloud login name (like user@domain.com</comment>
+      <translation>Connecté en tant que %1</translation>
+    </message>
   </context>
   <context>
     <name>QnCloudUserPanelWidget</name>
