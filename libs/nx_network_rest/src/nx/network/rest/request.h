@@ -166,7 +166,7 @@ public:
         UserAccessData* m_userAccessData;
         UserAccessData m_origin;
     };
-    [[nodiscard]] SystemAccessGuard forceSystemAccess() const;
+    SystemAccessGuard forceSystemAccess() const;
 
     void forceSessionAccess(UserAccessData access) const;
     void renameParameter(const QString& oldName, const QString& newName);

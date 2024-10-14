@@ -35,6 +35,6 @@ namespace user_properties {
 
 const QString kUserSettings = "userSettings";
 
-} // namespace server_properties
+} // namespace user_properties
 
 } // namespace nx::vms::api

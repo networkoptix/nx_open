@@ -134,19 +134,16 @@ void Handler::afterExecute(
     NX_ASSERT(!response.isUndefinedContentLength || socket);
 }
 
-Handler::GlobalPermission Handler::readPermissions() const
+Handler::GlobalPermission Handler::permissions(const Request& request) const
 {
-    return m_readPermissions;
+    return request.method() == nx::network::http::Method::get
+        ? m_readPermissions
+        : m_modifyPermissions;
 }
 
 void Handler::setReadPermissions(GlobalPermission permissions)
 {
     m_readPermissions = permissions;
-}
-
-Handler::GlobalPermission Handler::modifyPermissions() const
-{
-    return m_modifyPermissions;
 }
 
 void Handler::setModifyPermissions(GlobalPermission permissions)

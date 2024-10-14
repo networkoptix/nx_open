@@ -38,6 +38,6 @@ namespace user_properties {
 
 NX_VMS_API extern const QString kUserSettings;
 
-} // namespace server_properties
+} // namespace user_properties
 
 } // namespace nx::vms::api

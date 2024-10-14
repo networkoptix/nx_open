@@ -74,10 +74,8 @@ public:
         const Response& response,
         std::unique_ptr<AbstractStreamSocket> socket);
 
-    GlobalPermission readPermissions() const;
+    virtual GlobalPermission permissions(const Request& request) const;
     void setReadPermissions(GlobalPermission permissions);
-
-    GlobalPermission modifyPermissions() const;
     void setModifyPermissions(GlobalPermission permissions);
 
     void setPath(const QString& path);
