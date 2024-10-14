@@ -67,13 +67,13 @@ struct Ini: public nx::kit::IniConfig
         "from Engine on setting Active Settings.");
 
 
-    NX_INI_STRING(kNoError, returnErrorFromEngineOnGetPluginSideSettings,
-        "Return an Error from Engine on setting Plugin-side Settings.\n"
+    NX_INI_STRING(kNoError, returnErrorFromEngineOnGetIntegrationSideSettings,
+        "Return an Error from Engine on setting Integration-side Settings.\n"
         "String value \"noError\": No error.\n"
         "String value \"errorInsteadOfSettingsResponse\": Return an error instead of Settings "
-        "Response from Engine's Plugin-side Settings.\n"
+        "Response from Engine's Integration-side Settings.\n"
         "String value \"settingsResponseWithError\": Return Settings Response containing an error "
-        "from Engine's Plugin-side Settings.");
+        "from Engine's Integration-side Settings.");
 
     //---------------------------------------------------------------------------------------------
     // DeviceAgent settings.
@@ -95,13 +95,13 @@ struct Ini: public nx::kit::IniConfig
         "String value \"settingsResponseWithError\": Return Settings Response containing an error "
         "from DeviceAgent on setting Active Settings.");
 
-    NX_INI_STRING(kNoError, returnErrorFromDeviceAgentOnGetPluginSideSettings,
-        "Return an Error from DeviceAgent on setting Plugin-side Settings.\n"
+    NX_INI_STRING(kNoError, returnErrorFromDeviceAgentOnGetIntegrationSideSettings,
+        "Return an Error from DeviceAgent on setting Integration-side Settings.\n"
         "String value \"noError\": No error.\n"
         "String value \"errorInsteadOfSettingsResponse\": Return an error instead of Settings "
-        "Response from DeviceAgent's Plugin-side Settings.\n"
+        "Response from DeviceAgent's Integration-side Settings.\n"
         "String value \"settingsResponseWithError\": Return Settings Response containing an error "
-        "from DeviceAgent's Plugin-side Settings.");
+        "from DeviceAgent's Integration-side Settings.");
 };
 
 Ini& ini();

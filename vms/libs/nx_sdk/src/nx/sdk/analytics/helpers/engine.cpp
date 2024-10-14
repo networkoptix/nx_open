@@ -114,7 +114,7 @@ void Engine::doSetSettings(
         *outResult = settingsReceived();
 }
 
-void Engine::getPluginSideSettings(Result<const ISettingsResponse*>* /*outResult*/) const
+void Engine::getIntegrationSideSettings(Result<const ISettingsResponse*>* /*outResult*/) const
 {
 }
 

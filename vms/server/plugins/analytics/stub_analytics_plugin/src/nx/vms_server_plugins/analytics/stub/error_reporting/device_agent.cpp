@@ -115,22 +115,22 @@ void DeviceAgent::doGetSettingsOnActiveSettingChange(
     }
 }
 
-void DeviceAgent::getPluginSideSettings(
+void DeviceAgent::getIntegrationSideSettings(
     Result<const ISettingsResponse*>* outResult) const
 {
-    if (std::strcmp(ini().returnErrorFromDeviceAgentOnGetPluginSideSettings,
+    if (std::strcmp(ini().returnErrorFromDeviceAgentOnGetIntegrationSideSettings,
         Ini::kErrorInsteadOfSettingsResponse) == 0)
     {
         *outResult = error(ErrorCode::internalError,
             "Unable to get Plugin Side Settings in DeviceAgent.");
     }
-    else if (std::strcmp(ini().returnErrorFromDeviceAgentOnGetPluginSideSettings,
+    else if (std::strcmp(ini().returnErrorFromDeviceAgentOnGetIntegrationSideSettings,
         Ini::kSettingsResponseWithError) == 0)
     {
         auto settingsResponse = makePtr<SettingsResponse>();
 
-        settingsResponse->setError("DeviceAgent getPluginSideSettings Error Key",
-            "DeviceAgent getPluginSideSettings Error Value");
+        settingsResponse->setError("DeviceAgent getIntegrationSideSettings Error Key",
+            "DeviceAgent getIntegrationSideSettings Error Value");
 
         *outResult = settingsResponse.releasePtr();
     }

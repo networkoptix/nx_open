@@ -79,7 +79,7 @@ std::string Engine::manifestString() const
             },
             {
                 "type": "TextField",
-                "name": "DeviceAgent getPluginSideSettings Error Key",
+                "name": "DeviceAgent getIntegrationSideSettings Error Key",
                 "caption": "",
                 "defaultValue": "",
                 "visible": false
@@ -156,22 +156,22 @@ void Engine::doGetSettingsOnActiveSettingChange(
     }
 }
 
-void Engine::getPluginSideSettings(
+void Engine::getIntegrationSideSettings(
         nx::sdk::Result<const nx::sdk::ISettingsResponse*>* outResult) const
 {
-    if (std::strcmp(ini().returnErrorFromEngineOnGetPluginSideSettings,
+    if (std::strcmp(ini().returnErrorFromEngineOnGetIntegrationSideSettings,
         Ini::kErrorInsteadOfSettingsResponse) == 0)
     {
         *outResult = error(ErrorCode::internalError,
             "Unable to get Plugin-side settings in Engine.");
     }
-    else if (std::strcmp(ini().returnErrorFromEngineOnGetPluginSideSettings,
+    else if (std::strcmp(ini().returnErrorFromEngineOnGetIntegrationSideSettings,
         Ini::kSettingsResponseWithError) == 0)
     {
         auto settingsResponse = makePtr<SettingsResponse>();
 
-        settingsResponse->setError("Engine getPluginSideSettings Error Key",
-            "Engine getPluginSideSettings Error Value");
+        settingsResponse->setError("Engine getIntegrationSideSettings Error Key",
+            "Engine getIntegrationSideSettings Error Value");
 
         *outResult = settingsResponse.releasePtr();
     }

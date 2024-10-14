@@ -77,7 +77,7 @@ std::string Integration::manifestString() const
             },
             {
                 "type": "TextField",
-                "name": "Engine getPluginSideSettings Error Key",
+                "name": "Engine getIntegrationSideSettings Error Key",
                 "caption": "",
                 "defaultValue": "",
                 "visible": false

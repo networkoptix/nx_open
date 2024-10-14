@@ -157,10 +157,10 @@ Result<const ISettingsResponse*> Engine::settingsReceived()
     return settingsResponse;
 }
 
-void Engine::getPluginSideSettings(Result<const ISettingsResponse*>* outResult) const
+void Engine::getIntegrationSideSettings(Result<const ISettingsResponse*>* outResult) const
 {
     auto settingsResponse = new SettingsResponse();
-    settingsResponse->setValue(kEnginePluginSideSetting, kEnginePluginSideSettingValue);
+    settingsResponse->setValue(kEngineIntegrationSideSetting, kEngineIntegrationSideSettingValue);
 
     *outResult = settingsResponse;
 }

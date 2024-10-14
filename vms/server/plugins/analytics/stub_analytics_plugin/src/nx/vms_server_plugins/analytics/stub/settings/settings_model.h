@@ -76,8 +76,8 @@ static const std::string kParametersModel = /*suppress newline*/ 1 + R"json(
 )json";
 
 // ------------------------------------------------------------------------------------------------
-static const std::string kEnginePluginSideSetting = "testPluginSideSpinBox";
-static const std::string kEnginePluginSideSettingValue = "42";
+static const std::string kEngineIntegrationSideSetting = "testIntegrationSideSpinBox";
+static const std::string kEngineIntegrationSideSettingValue = "42";
 static const std::string kShowExtraTextField = "showExtraTextField";
 static const std::string kExtraTextFieldTemplateVariableName = "@EXTRA_TEXTFIELD_TEMPLATE_VAR@";
 static const std::string kExtraCheckBoxTemplateVariableName = "@EXTRA_CHECKBOX_TEMPLATE_VAR@";
@@ -148,8 +148,8 @@ static const std::string kEngineSettingsModel = /*suppress newline*/ 1 + R"json(
                 },
                 {
                     "type": "SpinBox",
-                    "name": ")json" + kEnginePluginSideSetting + R"json(",
-                    "caption": "Spin Box (plugin-side)",
+                    "name": ")json" + kEngineIntegrationSideSetting + R"json(",
+                    "caption": "Spin Box (integration-side)",
                     "defaultValue": 42,
                     "minValue": 0,
                     "maxValue": 100
@@ -519,8 +519,8 @@ static const std::string kRegularSettingsModelPart2 = /*suppress newline*/ 1 + R
                 },
                 {
                     "type": "SpinBox",
-                    "caption": "Device Agent SpinBox (plugin-side)",
-                    "name": "pluginSideTestSpinBox",
+                    "caption": "Device Agent SpinBox (integration-side)",
+                    "name": "integrationSideTestSpinBox",
                     "defaultValue": 42,
                     "minValue": 0,
                     "maxValue": 100
@@ -689,8 +689,8 @@ static const std::string kRegularSettingsModelPart2 = /*suppress newline*/ 1 + R
                         },
                         {
                             "type": "SpinBox",
-                            "caption": "Device Agent SpinBox (plugin-side)",
-                            "name": "pluginSideTestSpinBox2",
+                            "caption": "Device Agent SpinBox (integration-side)",
+                            "name": "integrationSideTestSpinBox2",
                             "defaultValue": 42,
                             "minValue": 0,
                             "maxValue": 100

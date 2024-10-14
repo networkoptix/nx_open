@@ -197,7 +197,7 @@ static const std::string kDeviceAgentSettingsModel = /*suppress newline*/ 1 + R"
                     "type": "PolygonFigure",
                     "name": "testPolygon",
                     "caption": "Polygon outside of a repeater",
-                    "description": "The points of this polygon are considered as a Plugin-side Setting",
+                    "description": "The points of this polygon are considered as a Integration-side setting",
                     "minPoints": 3,
                     "maxPoints": 8
                 }

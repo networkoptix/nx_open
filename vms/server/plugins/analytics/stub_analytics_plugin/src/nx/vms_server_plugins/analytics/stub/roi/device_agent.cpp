@@ -45,7 +45,7 @@ void DeviceAgent::doSetNeededMetadataTypes(
 {
 }
 
-void DeviceAgent::getPluginSideSettings(
+void DeviceAgent::getIntegrationSideSettings(
     Result<const ISettingsResponse*>* outResult) const
 {
     const auto response = new SettingsResponse();

@@ -31,7 +31,7 @@ protected:
         nx::sdk::Result<const nx::sdk::ISettingsResponse*>* outResult,
         const nx::sdk::IStringMap* settings) override;
 
-    virtual void getPluginSideSettings(
+    virtual void getIntegrationSideSettings(
         nx::sdk::Result<const nx::sdk::ISettingsResponse*>* outResult) const override;
 
     virtual void doGetSettingsOnActiveSettingChange(

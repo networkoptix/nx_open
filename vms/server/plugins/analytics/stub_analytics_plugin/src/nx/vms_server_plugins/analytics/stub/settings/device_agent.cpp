@@ -265,12 +265,12 @@ void DeviceAgent::doSetNeededMetadataTypes(
 {
 }
 
-void DeviceAgent::getPluginSideSettings(
+void DeviceAgent::getIntegrationSideSettings(
     Result<const ISettingsResponse*>* outResult) const
 {
     const auto response = new SettingsResponse();
 
-    response->setValue("pluginSideTestSpinBox", "100");
+    response->setValue("integrationSideTestSpinBox", "100");
 
     *outResult = response;
 }

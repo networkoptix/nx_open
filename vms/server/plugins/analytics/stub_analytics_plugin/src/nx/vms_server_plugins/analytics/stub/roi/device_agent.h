@@ -20,7 +20,7 @@ public:
     virtual ~DeviceAgent() override;
 
 protected:
-    virtual void getPluginSideSettings(
+    virtual void getIntegrationSideSettings(
         nx::sdk::Result<const nx::sdk::ISettingsResponse*>* outResult) const override;
 
     virtual void doSetNeededMetadataTypes(

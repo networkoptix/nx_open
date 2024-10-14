@@ -31,7 +31,7 @@ protected:
         nx::sdk::Result<nx::sdk::analytics::IDeviceAgent*>* outResult,
         const nx::sdk::IDeviceInfo* deviceInfo) override;
 
-    virtual void getPluginSideSettings(
+    virtual void getIntegrationSideSettings(
         nx::sdk::Result<const nx::sdk::ISettingsResponse*>* outResult) const override;
 
     virtual void doGetSettingsOnActiveSettingChange(

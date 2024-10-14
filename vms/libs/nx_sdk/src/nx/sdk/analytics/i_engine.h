@@ -67,8 +67,8 @@ public:
         return result;
     }
 
-    /** Called by pluginSideSettings() */
-    protected: virtual void getPluginSideSettings(
+    /** Called by integrationSideSettings() */
+    protected: virtual void getIntegrationSideSettings(
         Result<const ISettingsResponse*>* outResult) const = 0;
     /**
      * In addition to the settings stored in the Server database, an Engine can have some settings
@@ -81,10 +81,10 @@ public:
      *     optional individual setting errors, optional setting values, and an optional new
      *     Settings Model. Can be null if none of the above items are present.
      */
-    public: Result<const ISettingsResponse*> pluginSideSettings() const
+    public: Result<const ISettingsResponse*> integrationSideSettings() const
     {
         Result<const ISettingsResponse*> result;
-        getPluginSideSettings(&result);
+        getIntegrationSideSettings(&result);
         return result;
     }
 

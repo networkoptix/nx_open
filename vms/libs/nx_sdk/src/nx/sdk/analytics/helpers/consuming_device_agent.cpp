@@ -186,7 +186,7 @@ void ConsumingDeviceAgent::doSetSettings(
         *outResult = settingsReceived();
 }
 
-void ConsumingDeviceAgent::getPluginSideSettings(
+void ConsumingDeviceAgent::getIntegrationSideSettings(
     Result<const ISettingsResponse*>* /*outResult*/) const
 {
 }

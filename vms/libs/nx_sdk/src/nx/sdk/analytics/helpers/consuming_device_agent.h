@@ -141,7 +141,7 @@ protected:
     virtual void doPushDataPacket(Result<void>* outResult, IDataPacket* dataPacket) override;
     virtual void doSetSettings(
         Result<const ISettingsResponse*>* outResult, const IStringMap* settings) override;
-    virtual void getPluginSideSettings(Result<const ISettingsResponse*>* outResult) const override;
+    virtual void getIntegrationSideSettings(Result<const ISettingsResponse*>* outResult) const override;
     virtual void getManifest(Result<const IString*>* outResult) const override;
 
 private:

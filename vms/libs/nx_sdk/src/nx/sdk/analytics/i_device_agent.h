@@ -73,13 +73,13 @@ public:
      *
      * After creating the new IDeviceAgent instance, this method is called after manifest().
      *
-     * ATTENTION: If the DeviceAgent has some plugin-side settings (see pluginSideSettings()) which
-     * are hosted in the backend (e.g. on the Device) and potentially can be changed by the user
-     * directly on that backend, their values must be ignored in this function when it is called
-     * for the first time after the creation of the DeviceAgent. Otherwise, these values, which
-     * technically are the values last known to the Server, may override the values stored in the
-     * backend and potentially changed by the user directly during the period when the DeviceAgent
-     * did not exist (i.e., Analytics has been turned off for this Device).
+     * ATTENTION: If the DeviceAgent has some Integration-side settings (see integrationSideSettings())
+     * which are hosted in the backend (e.g. on the Device) and potentially can be changed by the
+     * user directly on that backend, their values must be ignored in this function when it is
+     * called for the first time after the creation of the DeviceAgent. Otherwise, these values,
+     * which technically are the values last known to the Server, may override the values stored in
+     * the backend and potentially changed by the user directly during the period when the
+     * DeviceAgent did not exist (i.e., Analytics has been turned off for this Device).
      *
      * @param settings Values of settings conforming to the Settings Model. Never null.
      *
@@ -95,8 +95,8 @@ public:
         return result;
     }
 
-    /** Called by pluginSideSettings() */
-    protected: virtual void getPluginSideSettings(
+    /** Called by integrationSideSettings() */
+    protected: virtual void getIntegrationSideSettings(
         Result<const ISettingsResponse*>* outResult) const = 0;
     /**
      * In addition to the settings stored in a Server database, a DeviceAgent can have some
@@ -109,10 +109,10 @@ public:
      *     optional individual setting errors, optional setting values, and an optional new
      *     Settings Model. Can be null if none of the above items are present.
      */
-    public: Result<const ISettingsResponse*> pluginSideSettings() const
+    public: Result<const ISettingsResponse*> integrationSideSettings() const
     {
         Result<const ISettingsResponse*> result;
-        getPluginSideSettings(&result);
+        getIntegrationSideSettings(&result);
         return result;
     }
 
