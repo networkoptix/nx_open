@@ -17,6 +17,10 @@
 
 struct QnMultiserverRequestData;
 
+namespace nx::vms::api {
+struct BookmarkV3;
+}
+
 class QnCameraBookmarksManagerPrivate:
     public QObject,
     public nx::vms::client::core::SystemContextAware
@@ -115,7 +119,7 @@ private:
         QnCameraBookmarkList bookmarks,
         BookmarksCallbackType callback);
 
-    void handleBookmarkOperation(bool success, int handle);
+    void handleBookmarkOperation(bool success, rest::Handle handle);
 
     /// @brief                  Register bookmarks search query to auto-update it if needed.
     /// @param query            Target query.
@@ -164,6 +168,10 @@ private:
         QnMultiserverRequestData& request,
         std::optional<nx::Uuid> serverId = {});
 
+    rest::Handle sendPatchRequest(
+        const QString& path,
+        const nx::vms::api::BookmarkV3& bookmark);
+
     int sendGetRequest(const QString& path, QnMultiserverRequestData& request,
         RawResponseType callback);
 
@@ -190,7 +198,7 @@ private:
         OperationInfo(OperationType operation, const nx::Uuid &bookmarkId, OperationCallbackType callback);
     };
 
-    QMap<int, OperationInfo> m_operations;
+    QMap<rest::Handle, OperationInfo> m_operations;
 
     struct QueryInfo
     {
