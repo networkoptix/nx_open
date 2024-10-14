@@ -373,15 +373,17 @@ protected:
         return {std::move(filter), std::move(params), defaultValueAction};
     }
 
+    static bool useReflect(const Request& r) { return !r.isApiVersionOlder(4); }
+
     template<typename T>
     void mergeModel(
-        bool useReflect,
+        const Request& request,
         T* model,
         T* existing,
         nx::reflect::DeserializationResult::Fields fields,
         std::optional<QJsonValue> incomplete)
     {
-        if (useReflect)
+        if (useReflect(request))
         {
             using namespace nx::reflect;
             if constexpr ((IsAssociativeContainerV<T> && !IsSetContainerV<T>)
@@ -412,7 +414,7 @@ protected:
     template<typename Model>
     Model mergedModel(bool useId, const Request& request, ResponseAttributes* responseAttributes)
     {
-        const bool useReflect = !request.isApiVersionOlder(4);
+        const bool useReflect = this->useReflect(request);
         nx::reflect::DeserializationResult::Fields fields;
         std::optional<QJsonValue> incomplete;
         Model model = useReflect
@@ -433,25 +435,26 @@ protected:
 
             using ReadType = typename nx::utils::FunctionTraits<&Derived::read>::ReturnType;
             using ReadItemType = decltype(detail::front(ReadType{}));
+            auto* d = static_cast<Derived*>(this);
             if constexpr (std::is_base_of_v<Model, ReadType>)
             {
-                const auto systemAccessGuard = request.forceSystemAccess();
-                Model existing = call(&Derived::read, std::move(id), request, responseAttributes);
-                mergeModel(useReflect, &model, &existing, std::move(fields), std::move(incomplete));
+                Model existing{(request.forceSystemAccess(),
+                    call(&Derived::read, std::move(id), request, responseAttributes))};
+                d->mergeModel(request, &model, &existing, std::move(fields), std::move(incomplete));
                 if (useReflect)
                     return existing;
             }
             else if constexpr (std::is_base_of_v<Model, ReadItemType>)
             {
-                const auto systemAccessGuard = request.forceSystemAccess();
-                Model existing = readById(std::move(id), request, responseAttributes, Result::NotFound);
-                mergeModel(useReflect, &model, &existing, std::move(fields), std::move(incomplete));
+                Model existing{(request.forceSystemAccess(),
+                    readById(std::move(id), request, responseAttributes, Result::NotFound))};
+                d->mergeModel(request, &model, &existing, std::move(fields), std::move(incomplete));
                 if (useReflect)
                     return existing;
             }
             else
             {
-                return static_cast<Derived*>(this)->customMerge(&model, std::move(fields));
+                return d->customMerge(&model, std::move(fields));
             }
         }
         return model;
