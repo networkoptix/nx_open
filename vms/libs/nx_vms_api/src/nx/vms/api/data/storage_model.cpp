@@ -9,6 +9,12 @@ namespace nx {
 namespace vms {
 namespace api {
 
+namespace {
+
+static const QString kStorageArchiveModeKey{"storageArchiveMode"};
+
+} // namespace
+
 QN_FUSION_ADAPT_STRUCT(StorageModel, StorageModel_Fields)
 QN_FUSION_DEFINE_FUNCTIONS(StorageModel, (json)(csv_record)(ubjson)(xml))
 
@@ -30,6 +36,18 @@ StorageModel::DbUpdateTypes StorageModel::toDbTypes() &&
         statusData = ResourceStatusData(mainData.id, *status);
 
     auto parameters = asList(mainData.id);
+    if (storageArchiveMode
+        && std::find_if(
+            parameters.cbegin(), parameters.cend(),
+            [](const auto& p) { return p.name == kStorageArchiveModeKey; }) == parameters.cend())
+    {
+        parameters.push_back({
+            mainData.id,
+            kStorageArchiveModeKey,
+            QString::fromStdString(nx::reflect::toString(*storageArchiveMode)),
+            CheckResourceExists::no});
+    }
+
     return {std::move(mainData), std::move(statusData), std::move(parameters)};
 }
 
@@ -56,6 +74,19 @@ StorageModel StorageModel::fromDb(StorageData data)
     model.isBackup = data.isBackup;
     model.status = data.status;
     model.setFromList(data.addParams);
+
+    for (auto it = model.parameters.begin(); it != model.parameters.end();)
+    {
+        if (it->first == kStorageArchiveModeKey)
+        {
+            QJson::deserialize(it->second, &model.storageArchiveMode);
+            it = model.parameters.erase(it);
+            continue;
+        }
+
+        ++it;
+    }
+
     return model;
 }
 

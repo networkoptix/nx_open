@@ -12,6 +12,7 @@
 
 #include "media_server_data.h"
 #include "resource_data.h"
+#include "storage_archive_mode.h"
 
 namespace nx::vms::api {
 
@@ -52,6 +53,8 @@ struct NX_VMS_API StorageModel: ResourceWithParameters
 
     std::optional<ResourceStatus> status;
 
+    std::optional<StorageArchiveMode> storageArchiveMode;
+
     using DbReadTypes = std::tuple<StorageData>;
     using DbListTypes = std::tuple<StorageDataList>;
     using DbUpdateTypes =
@@ -63,7 +66,8 @@ struct NX_VMS_API StorageModel: ResourceWithParameters
 };
 #define StorageModel_Fields \
     ResourceWithParameters_Fields \
-    (id)(serverId)(name)(path)(type)(spaceLimitB)(isUsedForWriting)(isBackup)(status)
+    (id)(serverId)(name)(path)(type)(spaceLimitB)(isUsedForWriting)(isBackup)(status) \
+    (storageArchiveMode)
 
 #define StorageModel_Funcs (csv_record)(json)(ubjson)(xml)
 QN_FUSION_DECLARE_FUNCTIONS(StorageModel, StorageModel_Funcs, NX_VMS_API)
