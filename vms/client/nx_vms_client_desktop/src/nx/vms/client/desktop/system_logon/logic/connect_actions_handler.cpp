@@ -1241,7 +1241,7 @@ void ConnectActionsHandler::at_connectAction_triggered()
 
         // In most cases we will connect succesfully by this url. So we can store it.
         const bool storePasswordForTile = appContext()->localSettings()->saveCredentialsAllowed()
-            && passwordIsAlreadySaved
+            && (passwordIsAlreadySaved || appContext()->localSettings()->autoLogin())
             && !isTemporaryUser;
 
         ConnectionOptions options;

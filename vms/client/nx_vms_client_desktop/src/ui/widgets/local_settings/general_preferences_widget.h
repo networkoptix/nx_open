@@ -42,6 +42,9 @@ private:
     bool autoStart() const;
     void setAutoStart(bool value);
 
+    bool autoLogin() const;
+    void setAutoLogin(bool value);
+
     bool restoreUserSessionData() const;
     void setRestoreUserSessionData(bool value);
 
