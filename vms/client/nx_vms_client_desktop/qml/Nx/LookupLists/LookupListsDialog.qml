@@ -296,6 +296,7 @@ Dialog
                     TextButton
                     {
                         text: qsTr("Import")
+                        visible: tableView.checkedRows.length === 0
                         icon.source: "image://skin/20x20/Outline/import.svg"
                         onClicked: importList()
                     }
