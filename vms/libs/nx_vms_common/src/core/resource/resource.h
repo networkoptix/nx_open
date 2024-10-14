@@ -419,15 +419,15 @@ protected:
     /** Mutex that is to be used when accessing a set of all consumers. */
     mutable nx::Mutex m_consumersMtx;
 
+    /** Flags of this Resource that determine its type. */
+    Qn::ResourceFlags m_flags;
+
 private:
     /** Identifier of this Resource. */
     nx::Uuid m_id;
 
     /** Identifier of the type of this Resource. */
     nx::Uuid m_typeId;
-
-    /** Flags of this Resource that determine its type. */
-    Qn::ResourceFlags m_flags;
 
     std::map<QString, QString> m_locallySavedProperties;
 
