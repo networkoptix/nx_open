@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <utility>
+
 #include <core/resource/camera_bookmark.h>
 #include <nx/utils/member_detector.h>
 #include <nx/utils/qt_helpers.h>
@@ -42,37 +44,36 @@ common::BookmarkShareableParams shareableParams(
     return { /*shareable*/ false, std::chrono::milliseconds{}, std::optional<QString>{}};
 }
 
-template<typename Bookmark>
-Bookmark bookmarkToApi(
-    QnCameraBookmark&& oldBookmark, nx::Uuid serverId, bool includeDigest = false)
+template<typename Bookmark, typename T>
+Bookmark bookmarkToApi(T&& oldBookmark, nx::Uuid serverId, bool includeDigest = false)
 {
     NX_ASSERT(!oldBookmark.guid.isNull());
     NX_ASSERT(!serverId.isNull());
 
     Bookmark result;
 
-    result.deviceId = std::move(oldBookmark.cameraId),
-    result.name = std::move(oldBookmark.name),
-    result.description = std::move(oldBookmark.description),
-    result.startTimeMs = std::move(oldBookmark.startTimeMs),
-    result.durationMs = std::move(oldBookmark.durationMs),
-    result.tags = nx::toStdSet(oldBookmark.tags),
-    result.creatorUserId = std::move(oldBookmark.creatorId),
-    result.creationTimeMs = std::move(oldBookmark.creationTime()),
+    result.deviceId = std::forward<T>(oldBookmark).cameraId;
+    result.name = std::forward<T>(oldBookmark).name;
+    result.description = std::forward<T>(oldBookmark).description;
+    result.startTimeMs = std::forward<T>(oldBookmark).startTimeMs;
+    result.durationMs = std::forward<T>(oldBookmark).durationMs;
+    result.tags = nx::toStdSet(std::forward<T>(oldBookmark).tags);
+    result.creatorUserId = std::forward<T>(oldBookmark).creatorId;
+    result.creationTimeMs = std::forward<T>(oldBookmark).creationTime();
 
-    result.setIds(oldBookmark.guid, serverId);
+    result.setIds(std::forward<T>(oldBookmark).guid, serverId);
 
     if constexpr (hasShare<Bookmark>::value)
     {
-        if (oldBookmark.shareable())
+        if (std::forward<T>(oldBookmark).shareable())
         {
             auto share = api::BookmarkSharingSettings{
-                .expirationTimeMs{oldBookmark.share.expirationTimeMs}};
+                .expirationTimeMs{std::forward<T>(oldBookmark).share.expirationTimeMs}};
 
-            if (oldBookmark.share.digest)
+            if (std::forward<T>(oldBookmark).share.digest)
             {
                 if (includeDigest)
-                    share.password = oldBookmark.share.digest.value();
+                    share.password = std::forward<T>(oldBookmark).share.digest.value();
                 else
                     share.password = nx::utils::Url::kMaskedPassword;
             }

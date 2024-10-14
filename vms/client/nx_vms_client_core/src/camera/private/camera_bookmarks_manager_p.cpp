@@ -15,9 +15,11 @@
 #include <nx/utils/async_handler_executor.h>
 #include <nx/utils/datetime.h>
 #include <nx/utils/guarded_callback.h>
+#include <nx/vms/api/data/bookmark_models.h>
 #include <nx/vms/client/core/event_search/event_search_globals.h>
 #include <nx/vms/client/core/event_search/utils/event_search_item_helper.h>
 #include <nx/vms/client/core/system_context.h>
+#include <nx/vms/common/api/helpers/bookmark_api_converter.h>
 #include <nx/vms/common/bookmark/bookmark_facade.h>
 #include <utils/common/delayed.h>
 #include <utils/common/scoped_timer.h>
@@ -301,7 +303,7 @@ int QnCameraBookmarksManagerPrivate::sendPostRequest(
     auto callback = nx::utils::guarded(this,
         [this](
             bool success,
-            int handle,
+            rest::Handle handle,
             const rest::ServerConnection::EmptyResponseType& /*response*/)
         {
             handleBookmarkOperation(success, handle);
@@ -314,6 +316,31 @@ int QnCameraBookmarksManagerPrivate::sendPostRequest(
         callback,
         thread(),
         serverId);
+}
+
+rest::Handle QnCameraBookmarksManagerPrivate::sendPatchRequest(
+    const QString& path, const nx::vms::api::BookmarkV3& bookmark)
+{
+    auto serverApi = connectedServerApi();
+
+    if (!serverApi)
+        return kInvalidRequestId;
+
+    auto callback = nx::utils::guarded(this,
+        [this](
+            bool success,
+            rest::Handle handle,
+            rest::ErrorOrData<QByteArray> /*response*/)
+        {
+            handleBookmarkOperation(success, handle);
+        });
+
+    return serverApi->patchRest(systemContext()->getSessionTokenHelper(),
+        path,
+        nx::network::rest::Params{},
+        nx::reflect::json::serialize(bookmark),
+        callback,
+        this);
 }
 
 int QnCameraBookmarksManagerPrivate::sendGetRequest(
@@ -454,7 +481,7 @@ void QnCameraBookmarksManagerPrivate::addCameraBookmarkInternal(
         ? OperationInfo::OperationType::Acknowledge
         : OperationInfo::OperationType::Add;
 
-    int handle = kInvalidRequestId;
+    auto handle = kInvalidRequestId;
 
     if (operationType == OperationInfo::OperationType::Acknowledge)
     {
@@ -476,19 +503,29 @@ void QnCameraBookmarksManagerPrivate::addCameraBookmarkInternal(
 }
 
 void QnCameraBookmarksManagerPrivate::updateCameraBookmark(
-    const QnCameraBookmark &bookmark,
-    OperationCallbackType callback)
+    const QnCameraBookmark& bookmark, OperationCallbackType callback)
 {
     NX_ASSERT(bookmark.isValid(), "Invalid bookmark must not be added");
     if (!bookmark.isValid())
         return;
 
-    nx::vms::common::UpdateBookmarkRequestData request(bookmark);
-    int handle = sendPostRequest("/ec2/bookmarks/update", request);
-    m_operations[handle] = OperationInfo(
-        OperationInfo::OperationType::Update,
-        bookmark.guid,
-        std::move(callback));
+    auto bookmarkModel = nx::vms::common::bookmarkToApi<nx::vms::api::BookmarkV3>(
+        bookmark, getServerForBookmark(bookmark).value_or(nx::Uuid{}));
+
+    const auto handle = sendPatchRequest(
+        nx::format("rest/v4/devices/%1/bookmarks/%2", bookmarkModel.deviceId, bookmarkModel.id)
+            .toQString(),
+        bookmarkModel);
+
+    if (handle != kInvalidRequestId)
+    {
+        m_operations[handle] = OperationInfo(
+            OperationInfo::OperationType::Update, bookmark.guid, std::move(callback));
+    }
+    else
+    {
+        callback(false);
+    }
 
     addUpdatePendingBookmark(bookmark);
 }
@@ -498,7 +535,7 @@ void QnCameraBookmarksManagerPrivate::deleteCameraBookmark(
     OperationCallbackType callback)
 {
     nx::vms::common::DeleteBookmarkRequestData request(bookmarkId);
-    int handle = sendPostRequest("/ec2/bookmarks/delete", request);
+    auto handle = sendPostRequest("/ec2/bookmarks/delete", request);
     m_operations[handle] = OperationInfo(
         OperationInfo::OperationType::Delete,
         bookmarkId,
@@ -507,7 +544,7 @@ void QnCameraBookmarksManagerPrivate::deleteCameraBookmark(
     addRemovePendingBookmark(bookmarkId);
 }
 
-void QnCameraBookmarksManagerPrivate::handleBookmarkOperation(bool success, int handle)
+void QnCameraBookmarksManagerPrivate::handleBookmarkOperation(bool success, rest::Handle handle)
 {
     const auto opIt = m_operations.find(handle);
     if (opIt == m_operations.end())
