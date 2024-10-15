@@ -17,7 +17,7 @@ class NX_VMS_RULES_API FanErrorEvent: public BasicEvent
 
 public:
     FanErrorEvent() = default;
-    FanErrorEvent(nx::Uuid serverId, std::chrono::microseconds timestamp);
+    FanErrorEvent(std::chrono::microseconds timestamp, nx::Uuid serverId);
 
     virtual QString resourceKey() const override;
     virtual QVariantMap details(common::SystemContext* context,

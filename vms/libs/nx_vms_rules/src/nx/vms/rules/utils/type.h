@@ -31,11 +31,11 @@ QString type()
 }
 
 template<class... Strings>
-QString makeName(const Strings&... strings)
+QString makeKey(const Strings&... strings)
 {
-    static constexpr auto kKeyNameSeparator = '_';
+    static constexpr auto kKeySeparator = '_';
 
-    return QStringList{strings...}.join(kKeyNameSeparator);
+    return QStringList{strings...}.join(kKeySeparator);
 }
 
 } // namespace nx::vms::rules::utils

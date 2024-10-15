@@ -22,7 +22,7 @@ public:
         nx::Uuid serverId);
 
     virtual QString resourceKey() const override;
-    virtual QString uniqueName() const override;
+    virtual QString aggregationSubKey() const override;
     virtual QVariantMap details(common::SystemContext* context,
         const nx::vms::api::rules::PropertyMap& aggregatedInfo) const override;
     virtual nx::vms::api::rules::PropertyMap aggregatedInfo(

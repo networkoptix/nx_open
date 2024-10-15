@@ -142,6 +142,7 @@ QVariant QtVariantContext::value(const QString& key) const
             return value;
         }
     }
+    m_missingKeys.insert(key);
     return QVariant();
 }
 

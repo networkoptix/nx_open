@@ -118,10 +118,17 @@ namespace Mustache
         virtual bool canEval(const QString& key) const;
         virtual QString eval(const QString& key, const QString& _template, Mustache::Renderer* renderer);
 
+        /** Set of keys which were not found in the provided context. */
+        QSet<QString> missingKeys() const
+        {
+            return m_missingKeys;
+        }
+
     private:
         QVariant value(const QString& key) const;
 
         QStack<QVariant> m_contextStack;
+        mutable QSet<QString> m_missingKeys;
     };
 
     /** Interface for fetching template partials. */

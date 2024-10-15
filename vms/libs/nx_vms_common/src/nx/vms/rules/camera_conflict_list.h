@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <QtCore/QHash>
+#include <QtCore/QMap>
 #include <QtCore/QStringList>
 
 #include <nx/fusion/fusion/fusion_fwd.h>
@@ -13,7 +13,7 @@ namespace nx::vms::rules {
 struct NX_VMS_COMMON_API CameraConflictList
 {
     QString sourceServer;
-    QHash<QString, QStringList> camerasByServer;
+    QMap<QString, QStringList> camerasByServer;
 
     QString encode() const;
     void decode(const QString &encoded);

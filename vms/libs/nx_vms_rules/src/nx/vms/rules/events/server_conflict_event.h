@@ -9,6 +9,15 @@
 
 namespace nx::vms::rules {
 
+/**
+ * Server Conflict event can occur in two different scenarios.
+ * First one - is when there is another server in our system, which has the same ID as ours. In
+ * this case `conflicts` field has only `sourceServer` field filled with the conflicting server
+ * address.
+ * Second scenario is when the several servers in the local network are trying to control the same
+ * set of cameras. In this case `sourceServer` field is our server, and `camerasByServer` are
+ * filled by addressed of the servers and problematic cameras.
+ */
 class NX_VMS_RULES_API ServerConflictEvent: public BasicEvent
 {
     Q_OBJECT

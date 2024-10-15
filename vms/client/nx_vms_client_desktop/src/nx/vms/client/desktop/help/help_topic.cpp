@@ -90,8 +90,6 @@ QString HelpTopic::relativeUrlForTopic(Id topic)
             return "to-enable-encrypted-video-traf.html";
         case Id::EventLog:
             return "viewing_events_log.html";
-        case Id::EventsActions_BackupFinished:
-            return "archive_backup_finished.html";
         case Id::EventsActions_Bookmark:
             return "create_bookmark.html";
         case Id::EventsActions_CameraDisconnected:

@@ -31,17 +31,16 @@ NX_REFLECTION_ENUM_CLASS(ItemFlag,
      * must be used by the event type.
      */
     aggregationByTypeSupported = 1 << 3,
-    omitLogging = 1 << 4,
 
     /** The item may appear in the event log, but must not be created. */
-    deprecated = 1 << 5,
+    deprecated = 1 << 4,
 
     /** Type of license required for item to be visible in UI. */
-    saasLicense = 1 << 6,
-    localLicense = 1 << 7,
+    saasLicense = 1 << 5,
+    localLicense = 1 << 6,
 
     /** User event filtration is used for action delivery. */
-    userFiltered = 1 << 8
+    userFiltered = 1 << 7
 )
 
 Q_DECLARE_FLAGS(ItemFlags, ItemFlag)
@@ -165,8 +164,8 @@ struct ItemDescriptor
     // TODO: #amalov Consider unifying fields, permissions and resources members.
 
     // TODO: #mmalofeev split ItemDescriptor to EventDescriptor and ActionDescriptor.
-    /**%apidoc Path to the mustache template file used to generate email. */
-    QString emailTemplatePath;
+    /**%apidoc Filename of the mustache template file used to generate email. */
+    QString emailTemplateName;
 
     /**%apidoc[opt]
      * Required Server flags on at least one Server of the merged ones to deal with such an event
@@ -176,7 +175,7 @@ struct ItemDescriptor
 };
 #define nx_vms_rules_ItemDescriptor_Fields \
     (id)(groupId)(displayName)(description)(flags)(executionTargets)(targetServers)(fields) \
-    (resources)(readPermissions)(createPermissions)(emailTemplatePath)(serverFlags)
+    (resources)(readPermissions)(createPermissions)(emailTemplateName)(serverFlags)
 NX_VMS_RULES_API void serialize(
     QnJsonContext* ctx, const ItemDescriptor& value, QJsonValue* target);
 

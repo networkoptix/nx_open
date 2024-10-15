@@ -26,8 +26,8 @@ AnalyticsObjectEvent::AnalyticsObjectEvent(
     nx::Uuid objectTrackId,
     const nx::common::metadata::Attributes& attributes)
     :
-    // TODO: #mmalofeev Should AnalyticsObjectEvent has a caption like an AnalyticsEvent?
-    AnalyticsEngineEvent(timestamp, QString(), QString(), cameraId, engineId),
+    AnalyticsEngineEvent(
+        timestamp, /*caption*/ QString(), /*description*/ QString(), cameraId, engineId),
     m_objectTypeId(objectTypeId),
     m_objectTrackId(objectTrackId),
     m_attributes(attributes)
@@ -42,7 +42,7 @@ QString AnalyticsObjectEvent::subtype() const
 
 QString AnalyticsObjectEvent::resourceKey() const
 {
-    return utils::makeName(AnalyticsEngineEvent::resourceKey(), m_objectTrackId.toSimpleString());
+    return utils::makeKey(AnalyticsEngineEvent::resourceKey(), m_objectTrackId.toSimpleString());
 }
 
 QString AnalyticsObjectEvent::aggregationKey() const
@@ -71,10 +71,12 @@ QVariantMap AnalyticsObjectEvent::details(
 {
     auto result = AnalyticsEngineEvent::details(context, aggregatedInfo);
 
-    utils::insertIfNotEmpty(result, utils::kCaptionDetailName, analyticsObjectCaption(context));
-    utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
-    result.insert(utils::kHasScreenshotDetailName, true);
-    utils::insertIfNotEmpty(result, utils::kAnalyticsObjectTypeDetailName, analyticsObjectCaption(context));
+    result.insert(utils::kCaptionDetailName, analyticsObjectCaption(context));
+    result.insert(utils::kExtendedCaptionDetailName, extendedCaption(context));
+
+    // TODO: #sivanov Do we need to repeat this as a separate property?
+    result.insert(utils::kAnalyticsObjectTypeDetailName, analyticsObjectCaption(context));
+
     utils::insertLevel(result, nx::vms::event::Level::common);
     utils::insertIcon(result, nx::vms::rules::Icon::analyticsObjectDetected);
 
@@ -97,7 +99,7 @@ QString AnalyticsObjectEvent::extendedCaption(common::SystemContext* context) co
     const auto resourceName = Strings::resource(context, cameraId(), Qn::RI_WithUrl);
     const auto objectCaption = analyticsObjectCaption(context);
 
-    return tr("%1 at camera '%2'", " is detected")
+    return tr("%1 at %2", " is detected")
         .arg(objectCaption)
         .arg(resourceName);
 
@@ -135,7 +137,7 @@ const ItemDescriptor& AnalyticsObjectEvent::manifest()
         .resources = {
             {utils::kCameraIdFieldName, {ResourceType::device, Qn::ViewContentPermission}},
             {utils::kEngineIdFieldName, {ResourceType::analyticsEngine}}},
-        .emailTemplatePath = ":/email_templates/analytics_object.mustache"
+        .emailTemplateName = "analytics_object.mustache"
     };
 
     return kDescriptor;

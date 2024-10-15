@@ -43,13 +43,13 @@ QVariantMap ServerFailureEvent::details(
 QString ServerFailureEvent::extendedCaption(common::SystemContext* context) const
 {
     const auto resourceName = Strings::resource(context, serverId(), Qn::RI_WithUrl);
-    return tr("Server \"%1\" Failure").arg(resourceName);
+    return tr("%1 Failure").arg(resourceName);
 }
 
-QString ServerFailureEvent::uniqueName() const
+QString ServerFailureEvent::aggregationSubKey() const
 {
-    return utils::makeName(
-        BasicEvent::uniqueName(),
+    return utils::makeKey(
+        BasicEvent::aggregationSubKey(),
         QString::number(static_cast<int>(reason())));
 }
 
@@ -59,10 +59,10 @@ QString ServerFailureEvent::reason(common::SystemContext* /*context*/) const
 
     switch (reason())
     {
-        case EventReason::serverTerminated:
+        case EventReason::serverTerminated: //< TODO: #sivanov Change the enum value name.
             return tr("Connection to server is lost.");
 
-        case EventReason::serverStarted:
+        case EventReason::serverStarted: //< TODO: #sivanov Change the enum value name.
             return tr("Server stopped unexpectedly.");
 
         default:
@@ -81,7 +81,7 @@ const ItemDescriptor& ServerFailureEvent::manifest()
             "software issue, or manual/emergency shutdown.",
         .resources = {{utils::kServerIdFieldName, {ResourceType::server}}},
         .readPermissions = GlobalPermission::powerUser,
-        .emailTemplatePath = ":/email_templates/mediaserver_failure.mustache"
+        .emailTemplateName = "timestamp_and_details.mustache"
     };
     return kDescriptor;
 }

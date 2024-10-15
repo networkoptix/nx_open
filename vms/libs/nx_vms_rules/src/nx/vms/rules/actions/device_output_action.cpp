@@ -15,7 +15,7 @@ namespace nx::vms::rules {
 
 QString DeviceOutputAction::uniqueKey() const
 {
-    return utils::makeName(BasicAction::uniqueKey(), m_outputPortId);
+    return utils::makeKey(BasicAction::uniqueKey(), m_outputPortId);
 }
 
 const ItemDescriptor& DeviceOutputAction::manifest()

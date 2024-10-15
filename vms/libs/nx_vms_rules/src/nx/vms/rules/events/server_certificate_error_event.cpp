@@ -40,7 +40,7 @@ QVariantMap ServerCertificateErrorEvent::details(
 QString ServerCertificateErrorEvent::extendedCaption(common::SystemContext* context) const
 {
     const auto resourceName = Strings::resource(context, m_serverId, Qn::RI_WithUrl);
-    return tr("Server \"%1\" certificate error").arg(resourceName);
+    return tr("%1 certificate error", "Server name will be substituted").arg(resourceName);
 }
 
 const ItemDescriptor& ServerCertificateErrorEvent::manifest()
@@ -52,7 +52,7 @@ const ItemDescriptor& ServerCertificateErrorEvent::manifest()
         .description = "Triggered when the SSL certificate cannot be verified.",
         .resources = {{utils::kServerIdFieldName, {ResourceType::server}}},
         .readPermissions = GlobalPermission::powerUser,
-        .emailTemplatePath = ":/email_templates/server_certificate_error.mustache"
+        .emailTemplateName = "timestamp_only.mustache"
     };
     return kDescriptor;
 }

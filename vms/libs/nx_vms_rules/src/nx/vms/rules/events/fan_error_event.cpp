@@ -11,7 +11,7 @@
 
 namespace nx::vms::rules {
 
-FanErrorEvent::FanErrorEvent(nx::Uuid serverId, std::chrono::microseconds timestamp):
+FanErrorEvent::FanErrorEvent(std::chrono::microseconds timestamp, nx::Uuid serverId):
     base_type(timestamp),
     m_serverId(serverId)
 {
@@ -60,7 +60,7 @@ const ItemDescriptor& FanErrorEvent::manifest()
         },
         .resources = {{utils::kServerIdFieldName, {ResourceType::server}}},
         .readPermissions = GlobalPermission::powerUser,
-        .emailTemplatePath = ":/email_templates/fan_error.mustache",
+        .emailTemplateName = "timestamp_only.mustache",
         .serverFlags = {api::ServerFlag::SF_HasFanMonitoringCapability}
     };
     return kDescriptor;

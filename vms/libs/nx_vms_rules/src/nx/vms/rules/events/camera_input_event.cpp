@@ -20,24 +20,25 @@ CameraInputEvent::CameraInputEvent(
     nx::Uuid cameraId,
     const QString& inputPortId)
     :
-    base_type(timestamp, state, cameraId),
-    m_inputPortId(inputPortId)
+    base_type(timestamp, state),
+    m_inputPortId(inputPortId),
+    m_cameraId(cameraId)
 {
-}
-
-QString CameraInputEvent::uniqueName() const
-{
-    return utils::makeName(BasicEvent::uniqueName(), m_inputPortId);
 }
 
 QString CameraInputEvent::resourceKey() const
 {
-    return utils::makeName(CameraEvent::resourceKey(), m_inputPortId);
+    return utils::makeKey(m_cameraId.toSimpleString(), m_inputPortId);
 }
 
 QString CameraInputEvent::aggregationKey() const
 {
-    return CameraEvent::resourceKey();
+    return m_cameraId.toSimpleString();
+}
+
+QString CameraInputEvent::aggregationSubKey() const
+{
+    return utils::makeKey(BasicEvent::aggregationSubKey(), m_inputPortId);
 }
 
 QVariantMap CameraInputEvent::details(
@@ -45,8 +46,9 @@ QVariantMap CameraInputEvent::details(
 {
     auto result = base_type::details(context, aggregatedInfo);
 
-    utils::insertIfNotEmpty(result, utils::kDetailingDetailName, detailing());
-    utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
+    result.insert(utils::kDetailingDetailName, detailing());
+    result.insert(utils::kExtendedCaptionDetailName, extendedCaption(context));
+    result.insert("inputPort", m_inputPortId);
     utils::insertLevel(result, nx::vms::event::Level::common);
     utils::insertIcon(result, nx::vms::rules::Icon::inputSignal);
     utils::insertClientAction(result, nx::vms::rules::ClientAction::previewCamera);
@@ -103,7 +105,7 @@ ItemDescriptor CameraInputEvent::manifest(common::SystemContext* context)
             {utils::kCameraIdFieldName,
                 {ResourceType::device, {Qn::ViewContentPermission, Qn::ViewLivePermission}}}
         },
-        .emailTemplatePath = ":/email_templates/camera_input.mustache"
+        .emailTemplateName = "camera_input.mustache"
     };
     return kDescriptor;
 }

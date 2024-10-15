@@ -233,11 +233,17 @@ QnLayoutResourcePtr QnResourcePoolTestHelper::addLayoutForVideoWall(
     return layout;
 }
 
-QnMediaServerResourcePtr QnResourcePoolTestHelper::addServer(ServerFlags additionalFlags)
+QnMediaServerResourcePtr QnResourcePoolTestHelper::createServer(nx::Uuid id)
 {
     QnMediaServerResourcePtr server(new QnMediaServerResource());
-    server->setIdUnsafe(nx::Uuid::createUuid());
+    server->setIdUnsafe(id);
     server->setUrl("http://localhost:7001");
+    return server;
+}
+
+QnMediaServerResourcePtr QnResourcePoolTestHelper::addServer(ServerFlags additionalFlags)
+{
+    auto server = createServer();
     resourcePool()->addResource(server);
     server->setStatus(ResourceStatus::online);
     server->setServerFlags(server->getServerFlags() | additionalFlags);

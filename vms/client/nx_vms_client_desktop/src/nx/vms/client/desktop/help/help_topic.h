@@ -50,7 +50,6 @@ public:
         EnableArchiveEncryption,
         EnableEncryptedVideoTraffic,
         EventLog,
-        EventsActions_BackupFinished,
         EventsActions_Bookmark,
         EventsActions_CameraDisconnected,
         EventsActions_CameraInput,

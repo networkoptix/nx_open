@@ -51,14 +51,6 @@ public:
     void setState(State state);
 
     /**
-     * Key for more detailed event aggregation. Used in SendMailAction.
-     * Returns event type by default.
-     * Keep in sync with EventParameters::getParamsHash().
-     * Consider renaming to aggregationSubKey().
-     */
-    virtual QString uniqueName() const;
-
-    /**
      * Returns string represent event uniqueness dependent on the resource produced the event.
      * Used for caching and matching prolonged events.
      * Keep in sync with RuleProcessor::getResourceKey().
@@ -71,6 +63,13 @@ public:
      * Keep in sync with eventKey in RuleProcessor::processInstantAction().
      */
     virtual QString aggregationKey() const;
+
+    /**
+     * Key for more detailed event aggregation. Used in SendMailAction.
+     * Returns event type by default.
+     * Keep in sync with EventParameters::getParamsHash().
+     */
+    virtual QString aggregationSubKey() const;
 
     /**
      * Used for caching and limiting repeat of instant events or repeating 'start' of prolonged

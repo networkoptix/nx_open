@@ -48,11 +48,12 @@ QString StorageIssueEvent::extendedCaption(common::SystemContext* context) const
     return tr("Storage Issue at %1").arg(resourceName);
 }
 
-QString StorageIssueEvent::uniqueName() const
+QString StorageIssueEvent::aggregationSubKey() const
 {
     return (m_reason == nx::vms::api::EventReason::backupFailedSourceFileError)
-        ? utils::makeName(BasicEvent::uniqueName(), QString::number((int) m_reason))
-        : utils::makeName(BasicEvent::uniqueName(), QString::number((int) m_reason), m_reasonText);
+        ? utils::makeKey(BasicEvent::aggregationSubKey(), QString::number((int) m_reason))
+        : utils::makeKey(
+              BasicEvent::aggregationSubKey(), QString::number((int) m_reason), m_reasonText);
 }
 
 QString StorageIssueEvent::reason(common::SystemContext* /*context*/) const
@@ -113,7 +114,7 @@ const ItemDescriptor& StorageIssueEvent::manifest()
             "to one or more storage devices.",
         .resources = {{utils::kServerIdFieldName, {ResourceType::server}}},
         .readPermissions = GlobalPermission::powerUser,
-        .emailTemplatePath = ":/email_templates/storage_failure.mustache"
+        .emailTemplateName = "timestamp_and_details.mustache"
     };
     return kDescriptor;
 }

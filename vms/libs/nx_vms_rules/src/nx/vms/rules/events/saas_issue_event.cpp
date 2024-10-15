@@ -12,6 +12,7 @@
 #include <nx/vms/event/strings_helper.h>
 
 #include "../group.h"
+#include "../strings.h"
 #include "../utils/event_details.h"
 #include "../utils/field.h"
 #include "../utils/type.h"
@@ -29,6 +30,7 @@ SaasIssueEvent::SaasIssueEvent(
     m_licenseKeys(licenseKeys),
     m_reason(reason)
 {
+    NX_ASSERT(isLicenseMigrationIssue());
 }
 
 SaasIssueEvent::SaasIssueEvent(
@@ -42,6 +44,7 @@ SaasIssueEvent::SaasIssueEvent(
     m_deviceIds(deviceIds),
     m_reason(reason)
 {
+    NX_ASSERT(!isLicenseMigrationIssue());
 }
 
 QString SaasIssueEvent::resourceKey() const
@@ -54,16 +57,16 @@ QVariantMap SaasIssueEvent::details(
 {
     auto result = BasicEvent::details(context, aggregatedInfo);
 
-    utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
-    utils::insertIfNotEmpty(result, utils::kReasonDetailName, reason(context));
+    result.insert(utils::kExtendedCaptionDetailName, extendedCaption());
+    result.insert(utils::kReasonDetailName, reason(context));
+    result.insert(utils::kDetailingDetailName, detailing(context));
     utils::insertLevel(result, nx::vms::event::Level::important);
     utils::insertIcon(result, nx::vms::rules::Icon::license);
     utils::insertClientAction(result, nx::vms::rules::ClientAction::licensesSettings);
-
     return result;
 }
 
-QString SaasIssueEvent::extendedCaption(common::SystemContext* context) const
+QString SaasIssueEvent::extendedCaption() const
 {
     using namespace nx::vms::api;
 
@@ -99,17 +102,14 @@ const ItemDescriptor& SaasIssueEvent::manifest()
         .resources = {
             {utils::kDeviceIdsFieldName, {ResourceType::device, Qn::ViewContentPermission}},
             {utils::kServerIdFieldName, {ResourceType::server}}},
-        .emailTemplatePath = ":/email_templates/saas_issue.mustache"
+        .emailTemplateName = "timestamp_and_details.mustache"
     };
     return kDescriptor;
 }
 
-QStringList SaasIssueEvent::licenseMigrationReason(nx::vms::common::SystemContext* context) const
+QString SaasIssueEvent::licenseMigrationReason() const
 {
-    QStringList result;
-    result << nx::vms::event::StringsHelper::licenseMigrationReason(m_reason);
-    result << nx::vms::event::StringsHelper::licenseMigrationDetails(m_licenseKeys, context);
-    return result;
+    return nx::vms::event::StringsHelper::licenseMigrationReason(m_reason);
 }
 
 bool SaasIssueEvent::isLicenseMigrationIssue() const
@@ -133,14 +133,40 @@ bool SaasIssueEvent::isLicenseMigrationIssue() const
     }
 }
 
-QStringList SaasIssueEvent::reason(nx::vms::common::SystemContext* context) const
+QString SaasIssueEvent::reason(nx::vms::common::SystemContext* context) const
 {
     return isLicenseMigrationIssue()
-        ? licenseMigrationReason(context)
+        ? licenseMigrationReason()
         : serviceDisabledReason(context);
 }
 
-QStringList SaasIssueEvent::serviceDisabledReason(nx::vms::common::SystemContext* context) const
+QStringList SaasIssueEvent::detailing(nx::vms::common::SystemContext* context) const
+{
+    auto makeRow =
+        [](const QString& text) { return QString(" - %1").arg(text); };
+
+    QStringList result;
+    if (isLicenseMigrationIssue())
+    {
+        for (const auto& key: m_licenseKeys)
+        {
+            if (const QnLicensePtr license = context->licensePool()->findLicense(key))
+                result << makeRow(QnLicense::displayText(license->type(), license->cameraCount()));
+            else
+                result << makeRow(key);
+        }
+    }
+    else
+    {
+        const auto devices =
+            context->resourcePool()->getResourcesByIds<QnVirtualCameraResource>(m_deviceIds);
+        for (const auto& device: devices)
+            result << makeRow(Strings::resource(device, Qn::RI_WithUrl));
+    }
+    return result;
+}
+
+QString SaasIssueEvent::serviceDisabledReason(nx::vms::common::SystemContext* context) const
 {
     using namespace nx::vms::api;
 
@@ -149,33 +175,27 @@ QStringList SaasIssueEvent::serviceDisabledReason(nx::vms::common::SystemContext
     if (!NX_ASSERT(!devices.isEmpty(), "At least one device should be affected by this event"))
         return {};
 
-    QStringList result;
-
     switch (m_reason)
     {
         case EventReason::notEnoughLocalRecordingServices:
-            result.push_back(tr("Recording on %n channels was stopped due to service overuse.",
-                "", devices.count()));
-            break;
+            return tr("Recording on %n channels was stopped due to service overuse.",
+                "", devices.count());
 
         case EventReason::notEnoughCloudRecordingServices:
-            result.push_back(tr(
-                "Cloud storage backup on %n channels was stopped due to service overuse.",
-                    "", devices.count()));
-            break;
+            return tr("Cloud storage backup on %n channels was stopped due to service overuse.",
+                "", devices.count());
 
         case EventReason::notEnoughIntegrationServices:
-            result.push_back(tr(
+            return tr(
                 "Paid integration service usage on %n channels was stopped due to service overuse.",
-                    "", devices.count()));
-            break;
+                    "", devices.count());
 
         default:
             NX_ASSERT(false, "Unexpected event reason");
             return {};
     }
 
-    return result;
+    return {};
 }
 
 } // namespace nx::vms::rules

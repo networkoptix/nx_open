@@ -24,7 +24,7 @@ const ItemDescriptor& SendEmailAction::manifest()
         .id = utils::type<SendEmailAction>(),
         .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Send Email")),
         .description = {},
-        .flags = {ItemFlag::instant, ItemFlag::aggregationByTypeSupported, ItemFlag::omitLogging},
+        .flags = {ItemFlag::instant, ItemFlag::aggregationByTypeSupported},
         .executionTargets = ExecutionTarget::servers,
         .targetServers = TargetServers::serverWithPublicIp,
         .fields = {

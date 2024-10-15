@@ -33,9 +33,9 @@ QVariantMap ServerConflictEvent::details(
 {
     auto result = BasicEvent::details(context, aggregatedInfo);
 
-    utils::insertIfNotEmpty(result, utils::kDetailingDetailName, detailing());
-    utils::insertIfNotEmpty(result, utils::kDescriptionDetailName, detailing());
-    utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
+    result.insert(utils::kExtendedCaptionDetailName, extendedCaption(context));
+    result.insert(utils::kDetailingDetailName, detailing());
+    result.insert(utils::kDescriptionDetailName, detailing());
     utils::insertLevel(result, nx::vms::event::Level::important);
     utils::insertIcon(result, nx::vms::rules::Icon::server);
 
@@ -66,7 +66,7 @@ QStringList ServerConflictEvent::detailing() const
 QString ServerConflictEvent::extendedCaption(common::SystemContext* context) const
 {
     const auto resourceName = Strings::resource(context, serverId(), Qn::RI_WithUrl);
-    return tr("Server \"%1\" Conflict").arg(resourceName);
+    return tr("%1 Conflict", "Server name will be substituted").arg(resourceName);
 }
 
 const ItemDescriptor& ServerConflictEvent::manifest()
@@ -79,7 +79,7 @@ const ItemDescriptor& ServerConflictEvent::manifest()
             "the same devices.",
         .resources = {{utils::kServerIdFieldName, {ResourceType::server}}},
         .readPermissions = GlobalPermission::powerUser,
-        .emailTemplatePath = ":/email_templates/mediaserver_conflict.mustache"
+        .emailTemplateName = "timestamp_and_details.mustache"
     };
 
     return kDescriptor;

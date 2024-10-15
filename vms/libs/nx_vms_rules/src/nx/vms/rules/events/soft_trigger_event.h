@@ -30,9 +30,9 @@ public:
         const QString& name,
         const QString& icon);
 
-    virtual QString uniqueName() const override;
     virtual QString resourceKey() const override;
     virtual QString aggregationKey() const override;
+    virtual QString aggregationSubKey() const override;
     virtual QVariantMap details(common::SystemContext* context,
         const nx::vms::api::rules::PropertyMap& aggregatedInfo) const override;
 
@@ -41,8 +41,8 @@ public:
 private:
     QString trigger() const;
     QString caption() const;
-    QString detailing() const;
-    QString extendedCaption(common::SystemContext* context) const;
+    QStringList detailing(common::SystemContext* context) const;
+    QString extendedCaption() const;
 };
 
 } // namespace nx::vms::rules

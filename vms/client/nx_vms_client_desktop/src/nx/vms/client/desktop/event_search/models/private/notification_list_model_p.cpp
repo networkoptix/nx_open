@@ -580,7 +580,6 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
             }
 
             case EventType::storageFailureEvent:
-            case EventType::backupFinishedEvent:
             case EventType::serverStartEvent:
             case EventType::serverFailureEvent:
             case EventType::serverCertificateError:
@@ -888,9 +887,6 @@ QString NotificationListModel::Private::description(
         case EventType::poeOverBudgetEvent:
             return getPoeOverBudgetDescription(parameters);
 
-        case EventType::backupFinishedEvent:
-            return m_helper->backupResultText(parameters);
-
         default:
             break;
     }
@@ -997,7 +993,6 @@ QString NotificationListModel::Private::iconPath(const vms::event::AbstractActio
         case EventType::serverStartEvent:
         case EventType::serverFailureEvent:
         case EventType::serverConflictEvent:
-        case EventType::backupFinishedEvent:
         case EventType::serverCertificateError:
             return eventIconPath(nx::vms::rules::Icon::server);
 

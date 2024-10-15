@@ -30,7 +30,7 @@ public:
         const NetworkIssueInfo& info);
 
     virtual QString resourceKey() const override;
-    virtual QString uniqueName() const override;
+    virtual QString aggregationSubKey() const override;
     virtual QVariantMap details(common::SystemContext* context,
         const nx::vms::api::rules::PropertyMap& aggregatedInfo) const override;
 
@@ -38,7 +38,7 @@ public:
 
 private:
     QString extendedCaption(common::SystemContext* context) const;
-    QString reason(common::SystemContext* context) const;
+    QString reasonText(common::SystemContext* context) const;
 };
 
 } // namespace nx::vms::rules

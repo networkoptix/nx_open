@@ -52,7 +52,12 @@ public:
     static FormatterPtr system();
     static FormatterPtr custom(const QLocale& locale, bool is24HoursTimeFormat);
 
+    /** Force system locale formatter to some fixed value (e.g. for the unit tests). */
+    static void forceSystemLocale(const QLocale& locale);
     static void forceSystemTimeFormat(bool is24HoursTimeFormat);
+
+    /** Reset forced values (both locale and 24-hours format). */
+    static void reset();
 
 public:
     QLocale locale() const;
