@@ -173,52 +173,52 @@
     <name>PredefinedUserGroups</name>
     <message>
       <source>Administrators</source>
-      <translation type="unfinished">Administrators</translation>
+      <translation>관리자</translation>
     </message>
     <message>
       <source>Power Users</source>
-      <translation type="unfinished">Power Users</translation>
+      <translation>고급 사용자</translation>
     </message>
     <message>
       <source>Advanced Viewers</source>
-      <translation type="unfinished">Advanced Viewers</translation>
+      <translation>고급 뷰어</translation>
     </message>
     <message>
       <source>Viewers</source>
-      <translation type="unfinished">Viewers</translation>
+      <translation>뷰어</translation>
     </message>
     <message>
       <source>Live Viewers</source>
-      <translation type="unfinished">Live Viewers</translation>
+      <translation>라이브 뷰어</translation>
     </message>
     <message>
       <source>System Health Viewers</source>
-      <translation type="unfinished">System Health Viewers</translation>
+      <translation>시스템 상태 뷰어</translation>
     </message>
     <message>
       <source>Members of this group can view live videos, I/O modules and web pages.</source>
-      <translation type="unfinished">Members of this group can view live videos, I/O modules and web pages.</translation>
+      <translation>이 그룹의 회원은 라이브 비디오, I/O 모듈, 웹 페이지를 볼 수 있습니다.</translation>
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the System configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</source>
-      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the System configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</translation>
+      <translation>이 그룹의 구성원은 고급 뷰어 그룹에서 부여한 권한 외에도 대부분의 시스템 구성을 제어할 수 있지만, 자신의 그룹 및 권한을 삭제하거나 변경하는 등 관리자 관련 설정을 변경할 수 없으며, 다른 고급 사용자를 만들거나 편집할 수 없습니다.</translation>
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Viewers group, see and activate PTZ positions and PTZ tours, use 2-way audio, operate I/O module buttons, create and edit bookmarks, and view the Event Log.</source>
-      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Viewers group, see and activate PTZ positions and PTZ tours, use 2-way audio, operate I/O module buttons, create and edit bookmarks, and view the Event Log.</translation>
+      <translation>이 그룹의 구성원은 뷰어 그룹에서 부여한 권한 외에도 PTZ 위치와 PTZ 투어를 보고 활성화하고, 양방향 오디오를 사용하고, I/O 모듈 버튼을 작동하고, 북마크를 만들고 편집하고, 이벤트 로그를 볼 수 있습니다.</translation>
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Live Viewers group, view and export archive and Bookmarks.</source>
-      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Live Viewers group, view and export archive and Bookmarks.</translation>
+      <translation>이 그룹의 회원은 Live Viewers 그룹에서 부여한 권한 외에도 보관 파일 및 북마크를 보고 내보낼 수 있습니다.</translation>
     </message>
     <message>
       <source>Members of this group can view System Health Monitoring information and server processor load in real-time (Server Monitoring).</source>
-      <translation type="unfinished">Members of this group can view System Health Monitoring information and server processor load in real-time (Server Monitoring).</translation>
+      <translation>이 그룹의 회원은 시스템 상태 모니터링 정보와 서버 프로세서 부하를 실시간으로 볼 수 있습니다(서버 모니터링).</translation>
     </message>
     <message>
       <source>Members of this group have unlimited System privileges. Administrators can create and modify Power Users, merge Systems and connect or disconnect System to %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Members of this group have unlimited System privileges. Administrators can create and modify Power Users, merge Systems and connect or disconnect System to %1.</translation>
+      <translation>이 그룹의 멤버는 무제한 시스템 권한을 갖습니다. 관리자는 Power Users를 만들고 수정하고, 시스템을 병합하고, 시스템을 %1에 연결하거나 연결을 끊을 수 있습니다.</translation>
     </message>
   </context>
   <context>
@@ -732,7 +732,7 @@
     </message>
     <message>
       <source>Local Recording</source>
-      <translation type="unfinished">Local Recording</translation>
+      <translation>로컬 레코드</translation>
     </message>
     <message>
       <source>Local Recording service</source>
