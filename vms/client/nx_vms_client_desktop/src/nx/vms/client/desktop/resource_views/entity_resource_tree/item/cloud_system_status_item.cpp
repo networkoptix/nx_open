@@ -23,13 +23,24 @@ struct CloudSystemStatusItem::Private
     Q_DECLARE_TR_FUNCTIONS(CloudSystemStatusItem::Private)
 
 public:
+    CloudSystemStatusItem* const q = nullptr;
     const QString systemId;
-    QPointer<CloudCrossSystemContext> crossSystemContext;
-    nx::utils::ScopedConnection crossSystemContextConnection;
-    nx::utils::ScopedConnection systemDescriptionConnection;
+
+    // CloudCrossSystemContext is requested when needed.
+    mutable QPointer<CloudCrossSystemContext> crossSystemContext;
+    mutable nx::utils::ScopedConnections connections;
+
+    void ensureContext() const
+    {
+        if (!crossSystemContext)
+            crossSystemContext = appContext()->cloudCrossSystemManager()->systemContext(systemId);
+    }
 
     QString text() const
     {
+        if (appContext()->cloudCrossSystemManager()->isConnectionDeferred(systemId))
+            return toString(CloudCrossSystemContext::Status::connecting);
+
         if (!crossSystemContext)
             return {};
 
@@ -38,6 +49,9 @@ public:
 
     bool isVisible() const
     {
+        if (appContext()->cloudCrossSystemManager()->isConnectionDeferred(systemId))
+            return true;
+
         if (!crossSystemContext)
             return false;
 
@@ -55,6 +69,9 @@ public:
 
     QString customIcon() const
     {
+        if (appContext()->cloudCrossSystemManager()->isConnectionDeferred(systemId))
+            return "legacy/loading.gif";
+
         if (!crossSystemContext)
             return {};
 
@@ -74,6 +91,9 @@ public:
 
     Qt::ItemFlags flags() const
     {
+        if (appContext()->cloudCrossSystemManager()->isConnectionDeferred(systemId))
+            return {Qt::ItemIsEnabled};
+
         if (!crossSystemContext)
             return {};
 
@@ -92,27 +112,30 @@ public:
 
 CloudSystemStatusItem::CloudSystemStatusItem(const QString& systemId):
     base_type(),
-    d(new Private{
-        .systemId = systemId,
-        .crossSystemContext = appContext()->cloudCrossSystemManager()->systemContext(systemId)
-    })
+    d(new Private{.q = this, .systemId = systemId})
 {
-
     const auto notifyChanged =
         [this]
         {
             notifyDataChanged({Qt::DisplayRole, Qn::DecorationPathRole, Qn::FlattenedRole});
         };
 
-    d->crossSystemContextConnection.reset(QObject::connect(
-        d->crossSystemContext,
-        &CloudCrossSystemContext::statusChanged,
-        notifyChanged));
+    d->connections << appContext()->cloudCrossSystemManager()->requestSystemContext(
+        systemId,
+        [this, notifyChanged](CloudCrossSystemContext* context)
+        {
+            d->crossSystemContext = context;
+            d->connections << QObject::connect(
+                context, &CloudCrossSystemContext::statusChanged, notifyChanged);
+        });
 
-    d->systemDescriptionConnection.reset(QObject::connect(
-        d->crossSystemContext->systemDescription(),
-        &QnBaseSystemDescription::onlineStateChanged,
-        notifyChanged));
+    if (auto* description = appContext()->cloudCrossSystemManager()->systemDescription(systemId))
+    {
+        d->connections << QObject::connect(
+            description,
+            &QnBaseSystemDescription::onlineStateChanged,
+            notifyChanged);
+    }
 }
 
 CloudSystemStatusItem::~CloudSystemStatusItem() = default;
@@ -128,7 +151,14 @@ QVariant CloudSystemStatusItem::data(int role) const
             return QString();
 
         case Qn::DecorationPathRole:
-            return d->customIcon();
+        {
+            // Currently dynamic creation of items is not supported yet, so use requesting data
+            // with Qt::DecorationPathRole as a sign that item is visible/expanded and connect to
+            // the system with the higher priority.
+            const auto icon = d->customIcon();
+            d->ensureContext();
+            return icon;
+        }
 
         case Qn::NodeTypeRole:
             return QVariant::fromValue(ResourceTree::NodeType::cloudSystemStatus);
