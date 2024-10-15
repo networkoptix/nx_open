@@ -589,7 +589,7 @@
     </message>
     <message>
       <source>Previous</source>
-      <translation type="unfinished">Previous</translation>
+      <translation>이전</translation>
     </message>
     <message>
       <source>Next</source>

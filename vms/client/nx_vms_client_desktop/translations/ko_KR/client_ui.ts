@@ -946,7 +946,7 @@
     </message>
     <message>
       <source>Introducing Cloud Layouts</source>
-      <translation type="unfinished">Introducing Cloud Layouts</translation>
+      <translation>클라우드 레이아웃 소개</translation>
     </message>
     <message>
       <source>Motion Search</source>
