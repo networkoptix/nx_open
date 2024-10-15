@@ -1747,7 +1747,7 @@
     </message>
     <message>
       <source>Anonymous Crash Report Server API URL</source>
-      <translation type="unfinished">Anonymous Crash Report Server API URL</translation>
+      <translation>익명 충돌 보고 서버 API URL</translation>
     </message>
   </context>
   <context>

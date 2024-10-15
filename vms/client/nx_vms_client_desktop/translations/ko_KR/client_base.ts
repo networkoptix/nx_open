@@ -1101,14 +1101,14 @@
     </message>
     <message numerus="yes">
       <source>Mute Items</source>
-      <translation type="unfinished">
-        <numerusform>Mute Items</numerusform>
+      <translation>
+        <numerusform>항목 음소거</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Unmute Items</source>
-      <translation type="unfinished">
-        <numerusform>Unmute Items</numerusform>
+      <translation>
+        <numerusform>항목 음소거 해제</numerusform>
       </translation>
     </message>
   </context>
@@ -3161,7 +3161,7 @@ License Key: %2</source>
     <message>
       <source>Logged in as %1</source>
       <comment>%1 is the cloud login name (like user@domain.com</comment>
-      <translation type="unfinished">Logged in as %1</translation>
+      <translation>%1 로 로그인됨</translation>
     </message>
   </context>
   <context>
@@ -4088,7 +4088,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Mute</source>
-      <translation type="unfinished">Mute</translation>
+      <translation>음소거</translation>
     </message>
   </context>
   <context>
