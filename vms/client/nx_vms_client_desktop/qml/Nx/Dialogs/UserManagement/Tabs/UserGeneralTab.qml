@@ -175,16 +175,13 @@ Item
                 anchors.topMargin: 14
                 anchors.right: parent.right
                 anchors.rightMargin: 20
-                spacing: 12
+                spacing: 8
 
                 TextButton
                 {
                     id: auditTrailButton
 
                     icon.source: "image://skin/20x20/Outline/audit_trail.svg"
-                    icon.width: 20
-                    icon.height: 20
-                    spacing: 8
                     text: qsTr("Audit Trail")
                     visible: control.auditAvailable
                     onClicked: control.auditTrailRequested()
@@ -197,9 +194,6 @@ Item
                     visible: control.deleteAvailable
                     enabled: control.enabled
                     icon.source: "image://skin/20x20/Outline/delete.svg"
-                    icon.width: 12
-                    icon.height: 14
-                    spacing: 8
                     text: qsTr("Delete")
                     onClicked: control.deleteRequested()
                 }
