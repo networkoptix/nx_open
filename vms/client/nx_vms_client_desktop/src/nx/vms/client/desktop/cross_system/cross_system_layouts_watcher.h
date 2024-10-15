@@ -4,6 +4,8 @@
 
 #include <QtCore/QObject>
 
+#include <nx/utils/impl_ptr.h>
+
 namespace nx::vms::client::desktop {
 
 /**
@@ -20,6 +22,11 @@ class CrossSystemLayoutsWatcher: public QObject
 
 public:
     explicit CrossSystemLayoutsWatcher(QObject* parent = nullptr);
+    ~CrossSystemLayoutsWatcher();
+
+private:
+    struct Private;
+    nx::utils::ImplPtr<Private> d;
 };
 
 } // namespace nx::vms::client::desktop

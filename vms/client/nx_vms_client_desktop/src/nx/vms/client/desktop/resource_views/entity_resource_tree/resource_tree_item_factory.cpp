@@ -111,25 +111,25 @@ GenericItem::DataProvider cloudSystemNameProvider(const QString& systemId)
     return
         [systemId]
         {
-            auto context = appContext()->cloudCrossSystemManager()->systemContext(systemId);
+            const auto systemDescription =
+                appContext()->cloudCrossSystemManager()->systemDescription(systemId);
 
-            if (context)
-                return context->systemDescription()->name();
-
-            return QString{};
+            return systemDescription ? systemDescription->name() : QString{};
         };
 }
 
 InvalidatorPtr cloudSystemNameInvalidator(const QString& systemId)
 {
-    const auto context = appContext()->cloudCrossSystemManager()->systemContext(systemId);
+    const auto systemDescription =
+        appContext()->cloudCrossSystemManager()->systemDescription(systemId);
+
     auto result = std::make_shared<Invalidator>();
 
-    if (!context)
+    if (!systemDescription)
         return result;
 
     result->connections()->add(QObject::connect(
-        context->systemDescription(),
+        systemDescription,
         &QnBaseSystemDescription::systemNameChanged,
         [invalidator = result.get()]
         {
@@ -144,10 +144,18 @@ GenericItem::DataProvider cloudSystemIconProvider(const QString& systemId)
     return
         [systemId]
         {
+            if (!appContext()->cloudCrossSystemManager()->isSystemContextAvailable(systemId))
+            {
+                const QnBaseSystemDescription* description =
+                    appContext()->cloudCrossSystemManager()->systemDescription(systemId);
+
+                return static_cast<int>(description && description->isOnline()
+                    ? QnResourceIconCache::CloudSystem
+                    : QnResourceIconCache::CloudSystem | QnResourceIconCache::Offline);
+            }
+
             auto context = appContext()->cloudCrossSystemManager()->systemContext(systemId);
-            if (!context
-                || !context->systemDescription()->isOnline()
-                || context->status() == CloudCrossSystemContext::Status::uninitialized)
+            if (!context || !context->systemDescription()->isOnline())
             {
                 return static_cast<int>(
                     QnResourceIconCache::CloudSystem | QnResourceIconCache::Offline);
@@ -172,23 +180,26 @@ GenericItem::DataProvider cloudSystemIconProvider(const QString& systemId)
 
 InvalidatorPtr cloudSystemIconInvalidator(const QString& systemId)
 {
-    const auto context = appContext()->cloudCrossSystemManager()->systemContext(systemId);
     auto result = std::make_shared<Invalidator>();
+    nx::utils::ScopedConnections* connections = result->connections();
 
-    if (!context)
-        return result;
+    auto invalidate = [invalidator = result.get()]() { invalidator->invalidate(); };
 
-    const auto invalidate = [invalidator = result.get()] { invalidator->invalidate(); };
+    *connections << appContext()->cloudCrossSystemManager()->requestSystemContext(
+        systemId,
+        [invalidator = result.get(), invalidate](CloudCrossSystemContext* context)
+        {
+            invalidator->connections()->add(
+                QObject::connect(context, &CloudCrossSystemContext::statusChanged, invalidate));
+        }
+    );
 
-    result->connections()->add(QObject::connect(
-        context,
-        &CloudCrossSystemContext::statusChanged,
-        invalidate));
-
-    result->connections()->add(QObject::connect(
-        context->systemDescription(),
-        &QnBaseSystemDescription::onlineStateChanged,
-        invalidate));
+    if (auto description = appContext()->cloudCrossSystemManager()->systemDescription(systemId))
+    {
+        *connections << QObject::connect(
+            description, &QnBaseSystemDescription::onlineStateChanged,
+            invalidate);
+    }
 
     return result;
 }
@@ -198,6 +209,9 @@ GenericItem::DataProvider cloudSystemExtraInfoProvider(const QString& systemId)
     return
         [systemId]
         {
+            if (!appContext()->cloudCrossSystemManager()->isSystemContextAvailable(systemId))
+                return QString{};
+
             auto context = appContext()->cloudCrossSystemManager()->systemContext(systemId);
             if (context
                 && context->status() == CloudCrossSystemContext::Status::unsupportedPermanently)
@@ -211,18 +225,23 @@ GenericItem::DataProvider cloudSystemExtraInfoProvider(const QString& systemId)
 
 InvalidatorPtr cloudSystemExtraInfoInvalidator(const QString& systemId)
 {
-    const auto context = appContext()->cloudCrossSystemManager()->systemContext(systemId);
     auto result = std::make_shared<Invalidator>();
 
-    if (!context)
-        return result;
+    auto connection = appContext()->cloudCrossSystemManager()->requestSystemContext(
+        systemId,
+        [invalidator = result.get()](CloudCrossSystemContext* context)
+        {
+            const auto invalidate = [invalidator] { invalidator->invalidate(); };
 
-    const auto invalidate = [invalidator = result.get()] { invalidator->invalidate(); };
+            invalidator->connections()->add(QObject::connect(
+                context,
+                &CloudCrossSystemContext::statusChanged,
+                invalidate));
+        }
+    );
 
-    result->connections()->add(QObject::connect(
-        context,
-        &CloudCrossSystemContext::statusChanged,
-        invalidate));
+    if (connection)
+        result->connections()->add(connection);
 
     return result;
 }
@@ -232,12 +251,14 @@ GenericItem::FlagsProvider cloudSystemFlagsProvider(const QString& systemId)
     return
         [systemId]() -> Qt::ItemFlags
         {
-            auto context = appContext()->cloudCrossSystemManager()->systemContext(systemId);
-            if (!context)
+            if (appContext()->cloudCrossSystemManager()->isConnectionDeferred(systemId))
+                return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
+
+            if (!appContext()->cloudCrossSystemManager()->isSystemContextAvailable(systemId))
                 return {};
 
-            if (context->systemDescription()->isOnline()
-                && context->status() != CloudCrossSystemContext::Status::uninitialized)
+            auto context = appContext()->cloudCrossSystemManager()->systemContext(systemId);
+            if (context->systemDescription()->isOnline())
             {
                 return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
             }

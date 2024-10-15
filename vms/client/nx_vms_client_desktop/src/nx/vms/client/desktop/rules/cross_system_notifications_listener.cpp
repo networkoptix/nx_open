@@ -13,6 +13,7 @@
 #include <nx/network/websocket/websocket_handshake.h>
 #include <nx/p2p/transport/p2p_websocket_transport.h>
 #include <nx/utils/buffer.h>
+#include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/system_error.h>
 #include <nx/utils/url.h>
@@ -20,11 +21,14 @@
 #include <nx/vms/client/core/common/utils/cloud_url_helper.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
+#include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/rules/actions/show_notification_action.h>
 #include <nx/vms/rules/utils/serialization.h>
+#include <utils/common/delayed.h>
 
 namespace nx::vms::client::desktop {
 
@@ -162,6 +166,15 @@ private:
         buffer.clear();
     }
 
+    bool needCreateNotification(const CloudNotification& cloudMessage)
+    {
+        const auto systemId =
+            appContext()->currentSystemContext()->globalSettings()->cloudSystemId();
+
+        return cloudMessage.type == kCloudNotificationType
+            && (ini().allowOwnCloudNotifications || cloudMessage.systemId != systemId);
+    }
+
     void onReadSomeAsync()
     {
         CloudNotification cloudMessage;
@@ -170,16 +183,24 @@ private:
         NX_VERBOSE(this, "Read message, deserialized: %1, type: %2",
             deserializationSucceeded, cloudMessage.type);
 
-        auto systemId = appContext()->currentSystemContext()->globalSettings()->cloudSystemId();
-
-        if (deserializationSucceeded && cloudMessage.type == kCloudNotificationType
-            && (ini().allowOwnCloudNotifications ? true : cloudMessage.systemId != systemId))
+        if (deserializationSucceeded)
         {
-            QSharedPointer<nx::vms::rules::NotificationAction> notificationAction(
-                new nx::vms::rules::NotificationAction);
-            nx::vms::rules::deserializeProperties(
-                cloudMessage.notification, notificationAction.get());
-            emit q->notificationActionReceived(notificationAction, cloudMessage.systemId);
+            executeInThread(appContext()->cloudCrossSystemManager()->thread(),
+                nx::utils::guarded(q,
+                    [this, cloudMessage]()
+                    {
+                        if (needCreateNotification(cloudMessage))
+                        {
+                            QSharedPointer<nx::vms::rules::NotificationAction> notificationAction(
+                                new nx::vms::rules::NotificationAction);
+
+                            nx::vms::rules::deserializeProperties(
+                                cloudMessage.notification, notificationAction.get());
+
+                            emit q->notificationActionReceived(
+                                notificationAction, cloudMessage.systemId);
+                        }
+                    }));
         }
 
         readSomeAsync();
