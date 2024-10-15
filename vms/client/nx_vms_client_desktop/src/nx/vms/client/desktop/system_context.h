@@ -16,6 +16,7 @@ namespace nx::vms::client::core { class AnalyticsEventsSearchTreeBuilder; }
 
 namespace nx::vms::client::desktop {
 
+class BookmarkTagsWatcher;
 class DefaultPasswordCamerasWatcher;
 class DesktopCameraConnectionController;
 class DesktopCameraStubController;
@@ -78,6 +79,7 @@ public:
      */
     std::shared_ptr<RemoteSession> session() const;
 
+    BookmarkTagsWatcher* bookmarkTagWatcher() const;
     VideoWallOnlineScreensWatcher* videoWallOnlineScreensWatcher() const;
     LdapStatusWatcher* ldapStatusWatcher() const;
     NonEditableUsersAndGroups* nonEditableUsersAndGroups() const;

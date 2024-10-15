@@ -45,17 +45,9 @@ using std::chrono::microseconds;
 
 using namespace nx::vms::client::desktop;
 
-struct QnWorkbenchBookmarksHandler::Private
-{
-    const std::unique_ptr<BookmarkTagsWatcher> tagsWatcher;
-};
-
 QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = nullptr */):
     base_type(parent),
-    QnWorkbenchContextAware(parent),
-    d(new Private{
-        .tagsWatcher = std::make_unique<BookmarkTagsWatcher>(system())
-    })
+    QnWorkbenchContextAware(parent)
 {
     connect(action(menu::AddCameraBookmarkAction),     &QAction::triggered, this,
         &QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered);
@@ -141,8 +133,8 @@ void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered()
         return;
 
     QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
-
     QnCameraBookmark bookmark;
+
     // This should be assigned before loading data to the dialog.
     bookmark.guid = nx::Uuid::createUuid();
     bookmark.name = tr("Bookmark");
@@ -151,7 +143,7 @@ void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered()
     bookmark.cameraId = camera->getId();
 
     QScopedPointer<QnCameraBookmarkDialog> dialog(new QnCameraBookmarkDialog(false, mainWindowWidget()));
-    dialog->setTags(d->tagsWatcher->tags());
+    dialog->setTags(systemContext()->bookmarkTagWatcher()->tags());
     dialog->loadData(bookmark);
     if (!dialog->exec())
         return;
@@ -159,8 +151,7 @@ void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered()
     bookmark.creatorId = context()->user()->getId();
     bookmark.creationTimeStampMs = qnSyncTime->value();
     dialog->submitData(bookmark);
-    NX_ASSERT(bookmark.isValid(), "Dialog must not allow to create invalid bookmarks");
-    if (!bookmark.isValid())
+    if (!NX_ASSERT(bookmark.isValid(), "Dialog must not allow to create invalid bookmarks"))
         return;
 
     const auto context = nx::vms::client::core::SystemContext::fromResource(camera);
@@ -191,7 +182,7 @@ void QnWorkbenchBookmarksHandler::at_editCameraBookmarkAction_triggered()
     }
 
     QScopedPointer<QnCameraBookmarkDialog> dialog(new QnCameraBookmarkDialog(false, mainWindowWidget()));
-    dialog->setTags(d->tagsWatcher->tags());
+    dialog->setTags(systemContext()->bookmarkTagWatcher()->tags());
     dialog->loadData(bookmark);
     if (!dialog->exec())
         return;

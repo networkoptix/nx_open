@@ -11,6 +11,7 @@
 #include <nx/vms/api/rules/event_log.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/bookmarks/bookmark_tags_watcher.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/rules/cross_system_notifications_listener.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -145,6 +146,7 @@ void NotificationActionExecutor::handleAcknowledgeAction()
         new QnCameraBookmarkDialog(true /*mandatoryDescription*/, mainWindowWidget()));
 
     bookmark.description.clear(); //< Force user to fill description out.
+    bookmarksDialog->setTags(this->systemContext()->bookmarkTagWatcher()->tags());
     bookmarksDialog->loadData(bookmark);
     if (bookmarksDialog->exec() != QDialog::Accepted)
         return;

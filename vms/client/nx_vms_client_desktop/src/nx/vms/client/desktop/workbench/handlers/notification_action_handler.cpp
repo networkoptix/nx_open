@@ -165,8 +165,8 @@ void NotificationActionHandler::handleAcknowledgeEventAction()
     if (!bookmark.isValid())
         return;
 
-    const QScopedPointer<QnCameraBookmarkDialog> bookmarksDialog(
-        new QnCameraBookmarkDialog(true, mainWindowWidget()));
+    const auto bookmarksDialog = std::make_unique<QnCameraBookmarkDialog>(
+        /*mandatoryDescription*/ true, mainWindowWidget());
 
     bookmark.description = {}; //< Force user to fill description out.
     bookmarksDialog->loadData(bookmark);
@@ -174,11 +174,7 @@ void NotificationActionHandler::handleAcknowledgeEventAction()
         return;
 
     bookmarksDialog->submitData(bookmark);
-
-    const auto currentUserId = system()->user()->getId();
-    const auto currentTimeMs = qnSyncTime->currentMSecsSinceEpoch();
-    bookmark.creatorId = currentUserId;
-    bookmark.creationTimeStampMs = milliseconds(currentTimeMs);
+    bookmark.creationTimeStampMs = qnSyncTime->value();
 
     const auto systemContext = nx::vms::client::desktop::SystemContext::fromResource(camera);
     systemContext->cameraBookmarksManager()->addAcknowledge(

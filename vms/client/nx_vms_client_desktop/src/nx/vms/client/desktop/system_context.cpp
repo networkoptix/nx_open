@@ -159,6 +159,11 @@ SystemContext* SystemContext::fromResource(const QnResourcePtr& resource)
     return dynamic_cast<SystemContext*>(resource->systemContext());
 }
 
+BookmarkTagsWatcher* SystemContext::bookmarkTagWatcher() const
+{
+    return d->bookmarkTagWatcher.get();
+}
+
 DesktopCameraConnectionController* SystemContext::desktopCameraConnectionController()
 {
     return d->desktopCameraConnectionController.get();
@@ -291,6 +296,7 @@ void SystemContext::setMessageProcessor(QnCommonMessageProcessor* messageProcess
     d->intercomManager = std::make_unique<IntercomManager>(this);
     d->systemHealthState = std::make_unique<SystemHealthState>(this);
     d->desktopCameraStubController = std::make_unique<DesktopCameraStubController>(this);
+    d->bookmarkTagWatcher = std::make_unique<BookmarkTagsWatcher>(this);
 
     // Desktop camera must work in the normal mode only.
     if (appContext()->runtimeSettings()->isDesktopMode())
