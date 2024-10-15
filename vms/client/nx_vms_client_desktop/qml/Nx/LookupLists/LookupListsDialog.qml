@@ -180,7 +180,7 @@ Dialog
                 if (columnWithDataWasRemoved)
                     entriesModel.removeIncorrectEntries()
 
-                hasChanges = true
+                control.hasChanges = sourceModelIsChanged
                 listComboBox.currentIndex = listComboBox.indexOfValue(viewModel)
             }
 
@@ -191,7 +191,7 @@ Dialog
                     : listsModel.count > 1 ? 0 : -1
                 listsModel.remove(listComboBox.listsModelIndex())
                 listComboBox.currentIndex = idx
-                hasChanges = true
+                control.hasChanges = true
             }
         }
     }
