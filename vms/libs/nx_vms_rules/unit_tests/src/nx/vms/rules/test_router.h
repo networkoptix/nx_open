@@ -47,6 +47,25 @@ struct EngineBasedTest: public common::test::ContextBasedTest
             std::make_unique<TestRouter>()))
     {
     }
+
+    template<class Event, class Action>
+    std::unique_ptr<Rule> makeRule(
+        const Engine::EventConstructor& eventConstructor = []{ return new Event; },
+        const Engine::ActionConstructor& actionConstructor = []{ return new Action; })
+    {
+        if (!engine->eventDescriptor(utils::type<Event>()))
+            engine->registerEvent(Event::manifest(), eventConstructor);
+
+        if (!engine->actionDescriptor(utils::type<Action>()))
+            engine->registerAction(Action::manifest(), actionConstructor);
+
+        auto rule = std::make_unique<Rule>(nx::Uuid::createUuid(), engine.get());
+
+        rule->addEventFilter(engine->buildEventFilter(utils::type<Event>()));
+        rule->addActionBuilder(engine->buildActionBuilder(utils::type<Action>()));
+
+        return rule;
+    }
 };
 
 } // namespace nx::vms::rules::test

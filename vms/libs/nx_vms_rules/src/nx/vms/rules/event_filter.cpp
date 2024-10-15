@@ -15,7 +15,6 @@
 
 #include "basic_event.h"
 #include "engine.h"
-#include "event_cache.h"
 #include "event_filter_field.h"
 #include "event_filter_fields/state_field.h"
 #include "rule.h"

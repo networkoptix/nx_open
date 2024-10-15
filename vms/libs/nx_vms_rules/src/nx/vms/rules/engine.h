@@ -18,8 +18,8 @@
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/rules/rules_fwd.h>
 #include <nx/vms/common/system_context_aware.h>
+#include <nx/vms/event/event_cache.h>
 
-#include "event_cache.h"
 #include "field_validator.h"
 #include "rules_fwd.h"
 #include "running_event_watcher.h"
@@ -176,7 +176,6 @@ public:
     /** Processes incoming analytics events and returns matched rule count. */
     size_t processAnalyticsEvents(const std::vector<EventPtr>& events);
 
-    EventCache* eventCache();
     RunningEventWatcher runningEventWatcher(nx::Uuid ruleId);
 
     void toggleTimer(nx::utils::TimerEventHandler* handler, bool on);
@@ -204,6 +203,8 @@ public: // Declare following methods public for testing purposes.
     */
     std::unique_ptr<EventFilterField> buildEventField(const FieldDescriptor* descriptor) const;
     std::unique_ptr<EventFilter> buildEventFilter(const api::EventFilter& serialized) const;
+
+    nx::vms::event::EventCache* eventCache();
 
 private:
     // Assuming cache access and event processing are in the same thread.
@@ -275,7 +276,7 @@ private:
 private: // All the fields below should be used by Engine's thread only.
     QHash<nx::Uuid, RunningRuleInfo> m_runningRules;
 
-    EventCache m_eventCache;
+    nx::vms::event::EventCache m_eventCache;
 
     QTimer* m_aggregationTimer;
 };

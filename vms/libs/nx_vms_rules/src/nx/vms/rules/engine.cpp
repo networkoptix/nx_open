@@ -62,13 +62,7 @@ bool isDescriptorValid(const ItemDescriptor& descriptor)
 
 size_t qHash(const vms::rules::ActionPtr& action)
 {
-    UuidList ids = utils::getResourceIds(action);
-
-    const auto users = //< TODO: #mmalofeev remove when https://networkoptix.atlassian.net/browse/VMS-38891 will be done.
-        utils::getFieldValue<vms::rules::UuidSelection>(action, utils::kUsersFieldName);
-    ids << UuidList{users.ids.cbegin(), users.ids.constEnd()};
-
-    return qHash(ids);
+    return qHash(utils::getResourceIds(action));
 }
 
 } // namespace
@@ -107,8 +101,8 @@ Engine::Engine(
     connect(this, &Engine::ruleAddedOrUpdated, this,
         [this](nx::Uuid ruleId, bool added)
         {
-            if (const auto rule = this->rule(ruleId); !added && rule && !rule->enabled())
-                    stopRunningActions(ruleId); //< The rule was disabled.
+            if (const auto rule = this->rule(ruleId); !added && rule)
+                stopRunningActions(ruleId); //< Stop rule on update.
         });
 
     connect(
@@ -923,7 +917,14 @@ void Engine::processAcceptedEvent(const EventPtr& event, const ConstRulePtr& rul
 
     if (!rule->timeInSchedule(qnSyncTime->currentDateTime()))
     {
-        NX_VERBOSE(this, "Time is not in rule schedule, skipping the event.");
+        NX_VERBOSE(this, "Time is not in rule schedule, stopping running rule: %1", rule->id());
+        stopRunningActions(rule->id());
+        return;
+    }
+
+    if (event->state() == State::started && !m_runningRules[rule->id()].actions.empty())
+    {
+        NX_VERBOSE(this, "Skipping the event, rule already running: %1", rule->id());
         return;
     }
 
@@ -984,7 +985,7 @@ bool Engine::isActionFieldRegistered(const QString& fieldId) const
     return m_actionFields.contains(fieldId);
 }
 
-EventCache* Engine::eventCache()
+nx::vms::event::EventCache* Engine::eventCache()
 {
     checkOwnThread();
 
@@ -1079,19 +1080,21 @@ bool Engine::checkRunningEvent(nx::Uuid ruleId, const EventPtr& event)
 void Engine::stopRunningActions(nx::Uuid ruleId)
 {
     checkOwnThread();
+    NX_VERBOSE(this, "Stop running rule: %1", ruleId);
 
-    auto runningRuleIt = m_runningRules.find(ruleId);
-    if (runningRuleIt == m_runningRules.end())
-        return;
+    if (auto runningRuleIt = m_runningRules.find(ruleId); runningRuleIt != m_runningRules.end())
+    {
+        // Action records are removed in the loop, so iterate over values copy.
+        for (const auto& action: runningRuleIt->actions.values())
+            stopRunningAction(action);
 
-    for (const auto& action: runningRuleIt->actions.values())
-        stopRunningAction(action);
+        m_runningRules.remove(ruleId);
+    }
 }
 
 void Engine::stopRunningAction(const ActionPtr& action)
 {
     checkOwnThread();
-
     NX_VERBOSE(this, "Stop running '%1' action", action->type());
 
     action->setState(State::stopped);

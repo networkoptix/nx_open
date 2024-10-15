@@ -115,8 +115,6 @@ private:
     std::chrono::microseconds m_interval = std::chrono::microseconds::zero();
     QSharedPointer<Aggregator> m_aggregator;
 
-    // Running flag for prolonged actions.
-    bool m_isActionRunning = false;
     bool m_timerActive = false;
 
     template<class T>

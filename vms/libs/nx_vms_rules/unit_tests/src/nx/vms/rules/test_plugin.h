@@ -28,7 +28,6 @@ public:
         registerEventField<StateField>();
         registerEventField<TestEventField>();
 
-        registerActionField<EmailMessageField>(m_engine->systemContext());
         registerActionField<TestActionField>();
         registerActionField<TargetDevicesField>();
         registerActionField<OptionalTimeField>();
@@ -47,7 +46,6 @@ public:
         registerAction<TestProlongedAction>();
         registerAction<TestProlongedOnlyAction>();
         registerAction<TestActionWithInterval>();
-        registerAction<TestActionWithEmail>();
     }
 };
 
