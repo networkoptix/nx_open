@@ -939,7 +939,7 @@
     </message>
     <message>
       <source>Introducing Cloud Layouts</source>
-      <translation type="unfinished">Introducing Cloud Layouts</translation>
+      <translation>클라우드 레이아웃 소개</translation>
     </message>
     <message>
       <source>Motion Search</source>
@@ -962,7 +962,7 @@
     </message>
     <message>
       <source>No connection</source>
-      <translation type="unfinished">No connection</translation>
+      <translation>연결 안됨</translation>
     </message>
   </context>
   <context>
@@ -2823,7 +2823,7 @@
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>그룹</translation>
     </message>
   </context>
   <context>

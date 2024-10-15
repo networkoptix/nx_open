@@ -1355,7 +1355,7 @@
     <name>Groups</name>
     <message>
       <source>Delete group?</source>
-      <translation type="unfinished">Delete group?</translation>
+      <translation>그룹 삭제?</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n groups?</source>
@@ -1940,11 +1940,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>Phones</source>
-      <translation type="unfinished">Phones</translation>
+      <translation>전화</translation>
     </message>
     <message>
       <source>Emails</source>
-      <translation type="unfinished">Emails</translation>
+      <translation>이메일</translation>
     </message>
     <message>
       <source>RHI backend</source>
@@ -6355,7 +6355,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Delete layout?</source>
-      <translation type="unfinished">Delete layout?</translation>
+      <translation>레이아웃 삭제?</translation>
     </message>
     <message numerus="yes">
       <source>These layouts are shared with other users, so they will be deleted for their accounts as well.</source>
@@ -6947,7 +6947,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Edit Settings</source>
-      <translation type="unfinished">Edit Settings</translation>
+      <translation>설정 편집</translation>
     </message>
     <message>
       <source>View Live</source>
@@ -6975,7 +6975,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Edit Settings.</source>
-      <translation type="unfinished">Edit Settings.</translation>
+      <translation>설정 편집.</translation>
     </message>
   </context>
   <context>
@@ -7430,7 +7430,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Open Door</source>
-      <translation type="unfinished">Open Door</translation>
+      <translation>문 열기</translation>
     </message>
   </context>
   <context>
@@ -9286,7 +9286,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>LDAP</source>
-      <translation type="unfinished">LDAP</translation>
+      <translation>LDAP</translation>
     </message>
     <message>
       <source>Cannot connect to LDAP server</source>
@@ -10713,7 +10713,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Confirm</source>
-      <translation type="unfinished">Confirm</translation>
+      <translation>확인</translation>
     </message>
   </context>
   <context>
@@ -10785,11 +10785,11 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Suspended</source>
-      <translation type="unfinished">Suspended</translation>
+      <translation>정지됨</translation>
     </message>
     <message>
       <source>Shut down</source>
-      <translation type="unfinished">Shut down</translation>
+      <translation>종료</translation>
     </message>
   </context>
   <context>
@@ -11021,7 +11021,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>Encrypting video traffic may significantly increase CPU usage</source>
-      <translation type="unfinished">Encrypting video traffic may significantly increase CPU usage</translation>
+      <translation>비디오 트래픽을 암호화하면 CPU 사용량이 크게 증가할 수 있습니다</translation>
     </message>
     <message>
       <source>Connection with cameras that do not support HTTPS will be lost</source>
@@ -11688,7 +11688,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>그룹</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -11779,7 +11779,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>그룹</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -11799,7 +11799,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Full Name</source>
-      <translation type="unfinished">Full Name</translation>
+      <translation>전체 이름</translation>
     </message>
     <message>
       <source>There is already a user with the same login in the system. To avoid issues it is required for all users to have a unique login.</source>
@@ -11814,11 +11814,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>그룹</translation>
     </message>
     <message>
       <source>LDAP</source>
-      <translation type="unfinished">LDAP</translation>
+      <translation>LDAP</translation>
     </message>
   </context>
   <context>
@@ -12448,7 +12448,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Multiple</source>
-      <translation type="unfinished">Multiple</translation>
+      <translation>다중</translation>
     </message>
   </context>
   <context>
@@ -12591,7 +12591,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>From</source>
-      <translation type="unfinished">From</translation>
+      <translation>로 부터</translation>
     </message>
   </context>
   <context>
@@ -12606,7 +12606,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Value</source>
-      <translation type="unfinished">Value</translation>
+      <translation>값</translation>
     </message>
   </context>
   <context>
@@ -12757,7 +12757,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>From</source>
-      <translation type="unfinished">From</translation>
+      <translation>로 부터</translation>
     </message>
   </context>
   <context>
