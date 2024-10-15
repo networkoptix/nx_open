@@ -21,4 +21,6 @@ ImageButton
         const alpha = down ? 0.5 : (hovered ? 0.9 : 0.7)
         return ColorTheme.transparent(base, alpha)
     }
+
+    primaryColor: ColorTheme.colors.light4
 }
