@@ -3161,7 +3161,7 @@ License Key: %2</source>
     <message>
       <source>Logged in as %1</source>
       <comment>%1 is the cloud login name (like user@domain.com</comment>
-      <translation type="unfinished">Logged in as %1</translation>
+      <translation>%1 としてログイン中</translation>
     </message>
   </context>
   <context>
