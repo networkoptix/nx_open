@@ -10,6 +10,7 @@
 #include <client/client_message_processor.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/utils/guarded_callback.h>
 #include <nx/vms/client/desktop/system_context.h>
 
 namespace nx::vms::client::desktop {
@@ -31,34 +32,29 @@ BookmarkTagsWatcher::BookmarkTagsWatcher(SystemContext* systemContext, QObject* 
     m_refreshTimer->setInterval(kRefreshInterval);
     connect(m_refreshTimer, &QTimer::timeout, this, &BookmarkTagsWatcher::refresh);
 
-    connect(qnClientMessageProcessor,
+    connect(messageProcessor(),
         &QnClientMessageProcessor::initialResourcesReceived,
         this,
         &BookmarkTagsWatcher::at_messageProcessor_connectionOpened);
-    connect(qnClientMessageProcessor,
+    connect(messageProcessor(),
         &QnClientMessageProcessor::connectionClosed,
         this,
         &BookmarkTagsWatcher::at_messageProcessor_connectionClosed);
 }
 
-QnCameraBookmarkTagList BookmarkTagsWatcher::tags() const
+const QnCameraBookmarkTagList& BookmarkTagsWatcher::tags() const
 {
     return m_tags;
 }
 
 void BookmarkTagsWatcher::refresh()
 {
-    auto systemContext = SystemContext::fromResource(currentServer());
-    if (!NX_ASSERT(systemContext))
-        return;
-
-    auto bookmarkManager = systemContext->cameraBookmarksManager();
-    bookmarkManager->getBookmarkTagsAsync(kTagsLimit,
-        [this](bool success, int /*handle*/, const QnCameraBookmarkTagList& tags)
+    cameraBookmarksManager()->getBookmarkTagsAsync(kTagsLimit, nx::utils::guarded(this,
+        [this](bool success, auto /*handle*/, QnCameraBookmarkTagList tags)
         {
             if (success)
-                m_tags = tags;
-        });
+                m_tags = std::move(tags);
+        }));
 }
 
 void BookmarkTagsWatcher::at_messageProcessor_connectionOpened()

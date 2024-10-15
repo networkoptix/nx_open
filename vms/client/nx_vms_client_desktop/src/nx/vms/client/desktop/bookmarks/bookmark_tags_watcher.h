@@ -11,7 +11,7 @@ class QTimer;
 
 namespace nx::vms::client::desktop {
 
-// TODO: #ynikitenkov Thionk about usage only on bookmarks dialog showing
+// TODO: #ynikitenkov Think about usage only on bookmarks dialog showing
 class BookmarkTagsWatcher:
     public QObject,
     public SystemContextAware
@@ -20,7 +20,7 @@ class BookmarkTagsWatcher:
 public:
     explicit BookmarkTagsWatcher(SystemContext* systemContext, QObject* parent = nullptr);
 
-    QnCameraBookmarkTagList tags() const;
+    const QnCameraBookmarkTagList& tags() const;
 
 private:
     void refresh();

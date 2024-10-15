@@ -5,6 +5,7 @@
 #include <api/media_server_statistics_manager.h>
 #include <camera/camera_bookmarks_manager.h>
 #include <camera/camera_data_manager.h>
+#include <nx/vms/client/desktop/bookmarks/bookmark_tags_watcher.h>
 #include <nx/vms/client/desktop/intercom/intercom_manager.h>
 #include <nx/vms/client/desktop/other_servers/other_servers_manager.h>
 #include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
@@ -39,8 +40,7 @@ struct SystemContext::Private
     std::unique_ptr<VideoWallOnlineScreensWatcher> videoWallOnlineScreensWatcher;
     std::unique_ptr<LdapStatusWatcher> ldapStatusWatcher;
     std::unique_ptr<OtherServersManager> otherServersManager;
-    std::unique_ptr<QnServerStorageManager> serverStorageManager;
-    std::unique_ptr<QnCameraBookmarksManager> cameraBookmarksManager;
+    std::unique_ptr<BookmarkTagsWatcher> bookmarkTagWatcher;
     std::unique_ptr<QnCameraDataManager> cameraDataManager;
     std::unique_ptr<StatisticsSender> statisticsSender;
     std::unique_ptr<VirtualCameraManager> virtualCameraManager;
