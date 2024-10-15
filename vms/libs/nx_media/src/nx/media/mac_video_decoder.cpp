@@ -14,6 +14,7 @@ extern "C"
 
 #include <QtCore/QDebug>
 #include <QtCore/QFile>
+#include <QtMultimedia/private/qvideotexturehelper_p.h>
 
 #include <nx/build_info.h>
 #include <nx/codec/nal_units.h>
@@ -134,7 +135,9 @@ public:
         }
         else
         {
-            // map frame to the ffmpeg buffer
+            const auto textureDescription = QVideoTextureHelper::textureDescription(
+                toQtPixelFormat((AVPixelFormat) m_frame->format));
+
             data.nPlanes = 0;
             const AVPixFmtDescriptor* descr = av_pix_fmt_desc_get((AVPixelFormat) m_frame->format);
             for (int i = 0; i < descr->nb_components && m_frame->data[i]; ++i)
@@ -143,13 +146,8 @@ public:
                 data.data[i] = m_frame->data[i];
                 data.bytesPerLine[i] = m_frame->linesize[i];
 
-                int bytesPerPlane = data.bytesPerLine[i] * m_frame->height;
-                if (i > 0)
-                {
-                    bytesPerPlane >>= descr->log2_chroma_h + descr->log2_chroma_w;
-                    bytesPerPlane *= descr->comp->step;
-                }
-                data.size[i] = bytesPerPlane;
+                const size_t planeHeight = textureDescription->heightForPlane(m_frame->height, i);
+                data.size[i] = data.bytesPerLine[i] * planeHeight;
             }
         }
 
