@@ -16,13 +16,20 @@
 
 namespace nx::vms::client::desktop {
 
-CrossSystemLayoutsWatcher::CrossSystemLayoutsWatcher(QObject* parent):
-    QObject(parent)
+struct CrossSystemLayoutsWatcher::Private
+{
+    CrossSystemLayoutsWatcher* const q;
+    nx::utils::ScopedConnection connection;
+
+    void processSystem(const QString& systemId);
+};
+
+void CrossSystemLayoutsWatcher::Private::processSystem(const QString &systemId)
 {
     auto cloudLayoutsResourcePool = appContext()->cloudLayoutsSystemContext()->resourcePool();
 
     auto processLayouts =
-        [cloudLayoutsResourcePool](CloudCrossSystemContext* context, const QString& systemId)
+        [this, cloudLayoutsResourcePool](const QString& systemId)
         {
             const auto snapshotManager = appContext()->cloudLayoutsSystemContext()
                 ->layoutSnapshotManager();
@@ -36,6 +43,12 @@ CrossSystemLayoutsWatcher::CrossSystemLayoutsWatcher(QObject* parent):
                     if (isCrossSystemResource(item.resource)
                         && (crossSystemResourceSystemId(item.resource) == systemId))
                     {
+                        CloudCrossSystemContext* context =
+                            appContext()->cloudCrossSystemManager()->systemContext(systemId);
+
+                        if (context->status() != CloudCrossSystemContext::Status::connected)
+                            continue;
+
                         layout->removeItem(item.uuid);
                         if (context->systemContext()->resourcePool()
                             ->getResourceByDescriptor(item.resource))
@@ -49,25 +62,32 @@ CrossSystemLayoutsWatcher::CrossSystemLayoutsWatcher(QObject* parent):
             }
         };
 
-    connect(appContext()->cloudCrossSystemManager(),
-        &CloudCrossSystemManager::systemFound,
-        this,
-        [this, processLayouts](const QString& systemId)
+    connection.reset(appContext()->cloudCrossSystemManager()->requestSystemContext(
+        systemId,
+        [=](CloudCrossSystemContext* context)
         {
-            auto context = appContext()->cloudCrossSystemManager()->systemContext(systemId);
-            if (!NX_ASSERT(context))
-                return;
-
-            connect(context,
-                &CloudCrossSystemContext::statusChanged,
-                this,
+            connect(context, &CloudCrossSystemContext::statusChanged, q,
                 [context, systemId, processLayouts]()
                 {
                     // Handle system went online and loaded all it's cameras.
                     if (context->status() == CloudCrossSystemContext::Status::connected)
-                        processLayouts(context, systemId);
+                        processLayouts(systemId);
                 });
-        });
+        }));
+
+    processLayouts(systemId);
+}
+
+CrossSystemLayoutsWatcher::CrossSystemLayoutsWatcher(QObject* parent):
+    QObject(parent),
+    d(new Private{.q = this})
+{
+    auto cloudLayoutsResourcePool = appContext()->cloudLayoutsSystemContext()->resourcePool();
+
+    connect(appContext()->cloudCrossSystemManager(),
+        &CloudCrossSystemManager::systemFound,
+        this,
+        [this](const QString& systemId) { d->processSystem(systemId); });
 
     if (ini().validateCloudLayouts)
     {
@@ -103,6 +123,10 @@ CrossSystemLayoutsWatcher::CrossSystemLayoutsWatcher(QObject* parent):
                     layout->disconnect(this);
             });
     }
+}
+
+CrossSystemLayoutsWatcher::~CrossSystemLayoutsWatcher()
+{
 }
 
 } // namespace nx::vms::client::desktop
