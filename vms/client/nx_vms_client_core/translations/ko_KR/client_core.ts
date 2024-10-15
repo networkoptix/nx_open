@@ -186,7 +186,7 @@
     <message>
       <source>Connection to %1 is not ready yet. Check the server&apos;s internet connection or try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connection to %1 is not ready yet. Check the server&apos;s internet connection or try again later.</translation>
+      <translation>%1 에 대한 연결이 아직 준비되지 않았습니다. 서버&apos;의 인터넷 연결을 확인하거나 나중에 다시 시도하세요.</translation>
     </message>
     <message>
       <source>Log in as a %1 user to the system in a shutdown state is forbidden. You can still connect as local user.</source>
@@ -201,7 +201,7 @@
     <message>
       <source>To log in to this System, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
       <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation type="unfinished">To log in to this System, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</translation>
+      <translation>이 시스템에 로그인하려면 &quot;을 비활성화하세요. %1 계정&quot; 으로 %2에 로그인할 때마다 확인 코드를 요청하세요.</translation>
     </message>
     <message>
       <source>The server&apos;s certificate was rejected.</source>
