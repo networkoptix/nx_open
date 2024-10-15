@@ -26,7 +26,7 @@ namespace nx::vms::client::desktop {
 
 namespace {
 
-static constexpr QSize kLoginDialogSize(480, 480);
+static constexpr QSize kLoginDialogSize(1024, 768);
 bool kCloudLoginDialogIsDisplayed = false;
 constexpr int kCloseCheckIntervalMs = 250;
 
@@ -38,21 +38,21 @@ OauthLoginDialog::OauthLoginDialog(
     const QString& cloudSystem,
     Qt::WindowFlags flags)
 :
-    base_type(parent, Qt::MSWindowsFixedSizeDialogHint | flags),
+    base_type(parent, flags),
     d(new OauthLoginDialogPrivate(this, clientType, cloudSystem))
 {
-    QSize fixedSize = kLoginDialogSize;
+    QSize size = kLoginDialogSize;
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->setContentsMargins(QMargins());
 
     if (d->m_urlLineEdit)
     {
-        fixedSize.rheight() += d->m_urlLineEdit->sizeHint().height();
+        size.rheight() += d->m_urlLineEdit->sizeHint().height();
         layout->addWidget(d->m_urlLineEdit);
     }
 
     layout->addWidget(d->m_stackedWidget);
-    setFixedSize(fixedSize);
+    resize(size);
     setHelpTopic(this, HelpTopic::Id::Login);
 
     executeLater([this]() { loadPage(); }, this);
