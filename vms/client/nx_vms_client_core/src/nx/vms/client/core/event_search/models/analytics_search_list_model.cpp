@@ -1222,7 +1222,7 @@ void AnalyticsSearchListModel::commitAvailableNewTracks()
         while (d->data.size() > maximumCount())
         {
             const int index = d->data.size() - 1;
-            AnalyticsSearchListModel::ScopedRemoveRows(this, index, index);
+            AnalyticsSearchListModel::ScopedRemoveRows removeRows(this, index, index);
             d->data.take(d->data.size() - 1);
         }
 
