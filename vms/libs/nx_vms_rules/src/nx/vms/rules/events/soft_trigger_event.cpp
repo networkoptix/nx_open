@@ -2,6 +2,10 @@
 
 #include "soft_trigger_event.h"
 
+#include <core/resource/resource.h>
+#include <core/resource_management/resource_pool.h>
+#include <nx/vms/common/system_context.h>
+
 #include "../event_filter_fields/customizable_icon_field.h"
 #include "../event_filter_fields/customizable_text_field.h"
 #include "../event_filter_fields/source_camera_field.h"
@@ -32,7 +36,7 @@ SoftTriggerEvent::SoftTriggerEvent(
 {
 }
 
-QString SoftTriggerEvent::uniqueName() const
+QString SoftTriggerEvent::aggregationSubKey() const
 {
     // All the soft trigger events must be considered as unique events.
     return nx::Uuid::createUuid().toString();
@@ -55,10 +59,9 @@ QVariantMap SoftTriggerEvent::details(
 {
     auto result = BasicEvent::details(context, aggregatedInfo);
 
-    utils::insertIfNotEmpty(result, utils::kCaptionDetailName, caption());
-    utils::insertIfNotEmpty(result, utils::kDetailingDetailName, detailing());
-    utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
-    utils::insertIfNotEmpty(result, utils::kTriggerNameDetailName, trigger());
+    result.insert(utils::kCaptionDetailName, caption());
+    result.insert(utils::kExtendedCaptionDetailName, extendedCaption());
+    result.insert(utils::kDetailingDetailName, detailing(context));
     utils::insertIfValid(result, utils::kUserIdDetailName, QVariant::fromValue(m_userId));
 
     utils::insertLevel(result, nx::vms::event::Level::common);
@@ -79,16 +82,17 @@ QString SoftTriggerEvent::caption() const
     return QString("%1 %2").arg(manifest().displayName).arg(trigger());
 }
 
-QString SoftTriggerEvent::detailing() const
+QStringList SoftTriggerEvent::detailing(common::SystemContext* context) const
 {
-    return tr("Trigger: %1").arg(trigger());
+    QStringList result;
+    result << tr("Source: %1").arg(Strings::resource(context, m_cameraId, Qn::RI_WithUrl));
+    result << tr("User: %1").arg(Strings::resource(context, m_userId));
+    return result;
 }
 
-QString SoftTriggerEvent::extendedCaption(common::SystemContext* context) const
+QString SoftTriggerEvent::extendedCaption() const
 {
-    return tr("Soft Trigger %1 at %2")
-        .arg(trigger())
-        .arg(Strings::resource(context, cameraId(), Qn::RI_WithUrl));
+    return caption();
 }
 
 const ItemDescriptor& SoftTriggerEvent::manifest()
@@ -131,7 +135,7 @@ const ItemDescriptor& SoftTriggerEvent::manifest()
                 {ResourceType::device, Qn::ViewContentPermission, Qn::SoftTriggerPermission}},
             {utils::kUserIdFieldName, {ResourceType::user, {}, Qn::WritePermission}}},
         .createPermissions = nx::vms::api::GlobalPermission::none,
-        .emailTemplatePath = ":/email_templates/software_trigger.mustache"
+        .emailTemplateName = "timestamp_and_details.mustache"
     };
     return kDescriptor;
 }

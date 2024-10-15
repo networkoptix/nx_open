@@ -84,9 +84,9 @@ public:
 
     using BasicEvent::BasicEvent;
 
-    virtual QString uniqueName() const override
+    virtual QString aggregationSubKey() const override
     {
-        return utils::makeName(BasicEvent::uniqueName(), m_cameraId.toSimpleString());
+        return utils::makeKey(BasicEvent::aggregationSubKey(), m_cameraId.toSimpleString());
     }
 
     virtual QString resourceKey() const override

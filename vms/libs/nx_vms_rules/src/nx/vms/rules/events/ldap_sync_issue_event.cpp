@@ -53,10 +53,10 @@ QString LdapSyncIssueEvent::resourceKey() const
     return {};
 }
 
-QString LdapSyncIssueEvent::uniqueName() const
+QString LdapSyncIssueEvent::aggregationSubKey() const
 {
-    return utils::makeName(
-        BasicEvent::uniqueName(), QString::number(static_cast<int>(reason())));
+    return utils::makeKey(
+        BasicEvent::aggregationSubKey(), QString::number(static_cast<int>(reason())));
 }
 
 QVariantMap LdapSyncIssueEvent::details(
@@ -109,7 +109,7 @@ const ItemDescriptor& LdapSyncIssueEvent::manifest()
         .description = "Triggered when the LDAP server fails to synchronize with the site.",
         .flags = {ItemFlag::instant, ItemFlag::aggregationByTypeSupported},
         .fields = {},
-        .emailTemplatePath = ":/email_templates/ldap_sync_issue.mustache"
+        .emailTemplateName = "ldap_sync_issue.mustache"
     };
     return kDescriptor;
 }

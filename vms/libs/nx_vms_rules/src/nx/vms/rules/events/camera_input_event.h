@@ -2,18 +2,19 @@
 
 #pragma once
 
+#include "../basic_event.h"
 #include "../data_macros.h"
-#include "camera_event.h"
 
 namespace nx::vms::rules {
 
-class NX_VMS_RULES_API CameraInputEvent: public CameraEvent
+class NX_VMS_RULES_API CameraInputEvent: public BasicEvent
 {
     Q_OBJECT
-    using base_type = CameraEvent;
+    using base_type = BasicEvent;
     Q_CLASSINFO("type", "nx.events.cameraInput")
 
     FIELD(QString, inputPortId, setInputPortId)
+    FIELD(nx::Uuid, cameraId, setCameraId)
 
 public:
     CameraInputEvent(
@@ -24,9 +25,9 @@ public:
 
     CameraInputEvent() = default;
 
-    virtual QString uniqueName() const override;
     virtual QString resourceKey() const override;
     virtual QString aggregationKey() const override;
+    virtual QString aggregationSubKey() const override;
     virtual QVariantMap details(common::SystemContext* context,
         const nx::vms::api::rules::PropertyMap& aggregatedInfo) const override;
 

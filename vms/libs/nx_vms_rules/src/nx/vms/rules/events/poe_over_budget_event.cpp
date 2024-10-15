@@ -51,6 +51,7 @@ QVariantMap PoeOverBudgetEvent::details(
     utils::insertIfNotEmpty(result, utils::kReasonDetailName, reason());
     utils::insertIfNotEmpty(result, utils::kDescriptionDetailName, description());
     utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
+    result.insert(utils::kDetailingDetailName, detailing());
     utils::insertLevel(result, nx::vms::event::Level::critical);
     utils::insertClientAction(result, nx::vms::rules::ClientAction::poeSettings);
     utils::insertIcon(result, nx::vms::rules::Icon::networkIssue);
@@ -85,7 +86,16 @@ QString PoeOverBudgetEvent::description() const
 QString PoeOverBudgetEvent::extendedCaption(common::SystemContext* context) const
 {
     const auto resourceName = Strings::resource(context, m_serverId, Qn::RI_WithUrl);
-    return tr("PoE over budget at %1").arg(resourceName);
+    return tr("PoE over budget on %1").arg(resourceName);
+}
+
+QStringList PoeOverBudgetEvent::detailing() const
+{
+    return QStringList{
+        tr("Current power consumption: %1 watts").arg(m_currentConsumptionW, 0, 'f', 1),
+        tr("Upper consumption limit: %1 watts").arg(m_upperLimitW, 0, 'f', 1),
+        tr("Lower consumption limit: %1 watts").arg(m_lowerLimitW, 0, 'f', 1)
+    };
 }
 
 const ItemDescriptor& PoeOverBudgetEvent::manifest()
@@ -110,7 +120,7 @@ const ItemDescriptor& PoeOverBudgetEvent::manifest()
         },
         .resources = {{utils::kServerIdFieldName, {ResourceType::server}}},
         .readPermissions = GlobalPermission::powerUser,
-        .emailTemplatePath = ":/email_templates/poe_over_budget.mustache",
+        .emailTemplateName = "timestamp_and_details.mustache",
         .serverFlags = {api::ServerFlag::SF_HasPoeManagementCapability}
     };
     return kDescriptor;

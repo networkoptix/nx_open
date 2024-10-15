@@ -130,45 +130,22 @@ const FormatsHash& DateTimeFormats::defaultFormats()
 
 //--------------------------------------------------------------------------------------------------
 
-class SystemFormatterHolder
+static std::optional<bool> sForced24HoursFormat;
+static std::optional<QLocale> sForcedSystemLocale;
+
+static FormatterPtr sSystemFormatter;
+
+QLocale systemLocale()
 {
-public:
-    static FormatterPtr get();
-    static void forceTimeFormat(bool is24HoursTimeFormatValue);
-
-private:
-    static bool is24HoursTimeFormat();
-
-    static std::optional<bool> forced24HoursFormat;
-    static FormatterPtr systemFormatter;
-};
-
-std::optional<bool> SystemFormatterHolder::forced24HoursFormat;
-FormatterPtr SystemFormatterHolder::systemFormatter(
-    Formatter::custom(QLocale::system(), SystemFormatterHolder::is24HoursTimeFormat()));
-
-FormatterPtr SystemFormatterHolder::get()
-{
-    return systemFormatter;
+    return sForcedSystemLocale ? *sForcedSystemLocale : QLocale::system();
 }
 
-void SystemFormatterHolder::forceTimeFormat(bool is24HoursTimeFormatValue)
+bool is24HoursTimeFormat()
 {
-    forced24HoursFormat = is24HoursTimeFormatValue;
-    if (SystemFormatterHolder::get()->is24HoursTimeFormat() != is24HoursTimeFormatValue)
-        systemFormatter = Formatter::custom(QLocale::system(), is24HoursTimeFormatValue);
-}
+    auto isSystem24HoursFormat =
+        []() { return !systemLocale().timeFormat().contains("AP", Qt::CaseInsensitive); };
 
-bool SystemFormatterHolder::is24HoursTimeFormat()
-{
-    static const bool isSystem24HoursFormat =
-        []()
-        {
-            const auto format = QLocale::system().timeFormat();
-            return !format.contains("AP", Qt::CaseInsensitive);
-        }();
-
-    return forced24HoursFormat ? *forced24HoursFormat : isSystem24HoursFormat;
+    return sForced24HoursFormat ? *sForced24HoursFormat : isSystem24HoursFormat();
 }
 
 } // namespace
@@ -207,7 +184,10 @@ QString Formatter::Private::getHoursTimeFormatMark(const QTime& value)
 
 FormatterPtr Formatter::system()
 {
-    return SystemFormatterHolder::get();
+    if (!sSystemFormatter)
+        sSystemFormatter = Formatter::custom(systemLocale(), ::is24HoursTimeFormat());
+
+    return sSystemFormatter;
 }
 
 FormatterPtr Formatter::custom(const QLocale& locale, bool is24HoursTimeFormat)
@@ -215,9 +195,23 @@ FormatterPtr Formatter::custom(const QLocale& locale, bool is24HoursTimeFormat)
     return FormatterPtr(new Formatter(locale, is24HoursTimeFormat));
 }
 
+void Formatter::forceSystemLocale(const QLocale& locale)
+{
+    sForcedSystemLocale = locale;
+    sSystemFormatter.reset();
+}
+
 void Formatter::forceSystemTimeFormat(bool is24HoursTimeFormat)
 {
-    SystemFormatterHolder::forceTimeFormat(is24HoursTimeFormat);
+    sForced24HoursFormat = is24HoursTimeFormat;
+    sSystemFormatter.reset();
+}
+
+void Formatter::reset()
+{
+    sForcedSystemLocale.reset();
+    sForced24HoursFormat.reset();
+    sSystemFormatter.reset();
 }
 
 Formatter::Formatter(const QLocale& locale, bool is24HoursFormat):

@@ -33,10 +33,10 @@ QString NetworkIssueEvent::resourceKey() const
     return m_cameraId.toSimpleString();
 }
 
-QString NetworkIssueEvent::uniqueName() const
+QString NetworkIssueEvent::aggregationSubKey() const
 {
-    return utils::makeName(
-        BasicEvent::uniqueName(),
+    return utils::makeKey(
+        BasicEvent::aggregationSubKey(),
         cameraId().toSimpleString(),
         QString::number(static_cast<int>(reason())));
 }
@@ -46,8 +46,8 @@ QVariantMap NetworkIssueEvent::details(
 {
     auto result = BasicEvent::details(context, aggregatedInfo);
 
-    utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
-    utils::insertIfNotEmpty(result, utils::kReasonDetailName, reason(context));
+    result.insert(utils::kExtendedCaptionDetailName, extendedCaption(context));
+    utils::insertIfNotEmpty(result, utils::kReasonDetailName, reasonText(context));
     utils::insertLevel(result, nx::vms::event::Level::important);
     utils::insertIcon(result, nx::vms::rules::Icon::networkIssue);
     utils::insertClientAction(result, nx::vms::rules::ClientAction::cameraSettings);
@@ -61,7 +61,7 @@ QString NetworkIssueEvent::extendedCaption(common::SystemContext* context) const
     return tr("Network Issue at %1").arg(resourceName);
 }
 
-QString NetworkIssueEvent::reason(common::SystemContext* context) const
+QString NetworkIssueEvent::reasonText(common::SystemContext* context) const
 {
     using nx::vms::api::EventReason;
     using namespace std::chrono;
@@ -149,7 +149,7 @@ const ItemDescriptor& NetworkIssueEvent::manifest()
         .flags = {ItemFlag::instant, ItemFlag::aggregationByTypeSupported},
         .resources = {
             {utils::kCameraIdFieldName, { ResourceType::device, Qn::ViewContentPermission}}},
-        .emailTemplatePath = ":/email_templates/network_issue.mustache"
+        .emailTemplateName = "timestamp_and_details.mustache"
     };
     return kDescriptor;
 }

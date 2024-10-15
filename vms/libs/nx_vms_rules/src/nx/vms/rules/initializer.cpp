@@ -45,7 +45,6 @@ void Initializer::registerEvents() const
     // Register built-in events.
     registerEvent<AnalyticsEvent>();
     registerEvent<AnalyticsObjectEvent>();
-    registerEvent<BackupFinishedEvent>();
     registerEvent<CameraInputEvent>(context);
     registerEvent<DeviceDisconnectedEvent>(context);
     registerEvent<DeviceIpConflictEvent>(context);
@@ -53,11 +52,11 @@ void Initializer::registerEvents() const
     registerEvent<GenericEvent>();
     registerEvent<LdapSyncIssueEvent>();
     registerEvent<LicenseIssueEvent>();
-    registerEvent<SaasIssueEvent>();
     registerEvent<MotionEvent>();
     registerEvent<NetworkIssueEvent>();
     registerEvent<PluginDiagnosticEvent>();
     registerEvent<PoeOverBudgetEvent>();
+    registerEvent<SaasIssueEvent>();
     registerEvent<ServerCertificateErrorEvent>();
     registerEvent<ServerConflictEvent>();
     registerEvent<ServerFailureEvent>();

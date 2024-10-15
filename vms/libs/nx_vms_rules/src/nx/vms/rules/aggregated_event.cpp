@@ -54,17 +54,6 @@ QVariantMap AggregatedEvent::details(common::SystemContext* context) const
 
     auto aggregatedInfo = initialEvent()->aggregatedInfo(*this);
     auto eventDetails = initialEvent()->details(context, aggregatedInfo);
-
-    const auto count = m_aggregatedEvents.size();
-    eventDetails[utils::kCountDetailName] = QVariant::fromValue(count);
-
-    if (count > 1)
-    {
-        const auto eventName = Strings::eventName(context, initialEvent()->type());
-        eventDetails[utils::kExtendedCaptionDetailName] =
-            tr("Multiple %1 events have occurred").arg(eventName);
-    }
-
     return eventDetails;
 }
 

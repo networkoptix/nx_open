@@ -54,7 +54,7 @@ QString GenericEvent::extendedCaption() const
 {
     return m_source.isEmpty()
         ? tr("Generic Event")
-        : tr("Generic Event at %1").arg(m_source);
+        : tr("Generic Event from %1").arg(m_source);
 }
 
 Icon GenericEvent::icon() const
@@ -103,7 +103,7 @@ const ItemDescriptor& GenericEvent::manifest()
                 Qn::ViewContentPermission,
                 Qn::UserInputPermissions,
                 FieldFlag::optional}}},
-        .emailTemplatePath = ":/email_templates/generic_event.mustache"
+        .emailTemplateName = "generic_event.mustache"
     };
     return kDescriptor;
 }

@@ -19,7 +19,7 @@ public:
     DeviceDisconnectedEvent() = default;
     DeviceDisconnectedEvent(std::chrono::microseconds timestamp, nx::Uuid deviceId);
 
-    virtual QString uniqueName() const override;
+    virtual QString aggregationSubKey() const override;
     virtual QString resourceKey() const override;
     virtual QVariantMap details(common::SystemContext* context,
         const nx::vms::api::rules::PropertyMap& aggregatedInfo) const override;

@@ -39,10 +39,11 @@ public:
     static const ItemDescriptor& manifest();
 
 private:
-    QString extendedCaption(common::SystemContext* context) const;
-    QStringList reason(nx::vms::common::SystemContext* context) const;
-    QStringList serviceDisabledReason(common::SystemContext* context) const;
-    QStringList licenseMigrationReason(common::SystemContext* context) const;
+    QString extendedCaption() const;
+    QString reason(nx::vms::common::SystemContext* context) const;
+    QString serviceDisabledReason(common::SystemContext* context) const;
+    QString licenseMigrationReason() const;
+    QStringList detailing(common::SystemContext* context) const;
     bool isLicenseMigrationIssue() const;
 };
 

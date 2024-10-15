@@ -23,6 +23,7 @@ public:
         const UuidSet& disabledCameras);
 
     virtual QString resourceKey() const override;
+    virtual QString aggregationSubKey() const override;
     static const ItemDescriptor& manifest();
 
 protected:
@@ -31,7 +32,8 @@ protected:
 
 private:
     QString extendedCaption(common::SystemContext* context) const;
-    QStringList reason(nx::vms::common::SystemContext* context) const;
+    QString reason(nx::vms::common::SystemContext* context) const;
+    QStringList detailing(nx::vms::common::SystemContext* context) const;
 };
 
 } // namespace nx::vms::rules

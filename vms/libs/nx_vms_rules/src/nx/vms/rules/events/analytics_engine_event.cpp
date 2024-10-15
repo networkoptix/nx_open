@@ -49,21 +49,20 @@ QVariantMap AnalyticsEngineEvent::details(
     common::SystemContext* context, const nx::vms::api::rules::PropertyMap& aggregatedInfo) const
 {
     auto result = DescribedEvent::details(context, aggregatedInfo);
-
     utils::insertIfValid(result, utils::kPluginIdDetailName, QVariant::fromValue(m_engineId));
-    utils::insertIfNotEmpty(result, utils::kDetailingDetailName, detailing());
+    result.insert(utils::kDetailingDetailName, detailing());
 
     return result;
 }
 
-QString AnalyticsEngineEvent::detailing() const
+QStringList AnalyticsEngineEvent::detailing() const
 {
     QString eventDetailing = caption();
 
     if (!description().isEmpty())
         eventDetailing += eventDetailing.isEmpty() ? description() : ": " + description();
 
-    return eventDetailing;
+    return QStringList{eventDetailing};
 }
 
 } // namespace nx::vms::rules

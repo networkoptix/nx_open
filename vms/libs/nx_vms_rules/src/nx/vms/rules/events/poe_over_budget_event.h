@@ -38,6 +38,7 @@ private:
     QString description() const;
     QString extendedCaption(common::SystemContext* context) const;
     QString reason() const;
+    QStringList detailing() const;
 
     bool isEmpty() const;
     QString overallConsumption() const;

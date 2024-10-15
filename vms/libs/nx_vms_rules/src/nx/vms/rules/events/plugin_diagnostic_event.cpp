@@ -57,7 +57,7 @@ QVariantMap PluginDiagnosticEvent::details(
     if (!result.contains(utils::kCaptionDetailName))
         result.insert(utils::kCaptionDetailName, eventCaption());
 
-    utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
+    result.insert(utils::kExtendedCaptionDetailName, extendedCaption(context));
     utils::insertLevel(result, calculateLevel(level()));
     utils::insertIcon(result, nx::vms::rules::Icon::pluginDiagnostic);
 
@@ -106,7 +106,7 @@ const ItemDescriptor& PluginDiagnosticEvent::manifest()
         .resources = {
             {utils::kCameraIdFieldName, {ResourceType::device, Qn::ViewContentPermission}},
             {utils::kEngineIdFieldName, {ResourceType::analyticsEngine}}},
-        .emailTemplatePath = ":/email_templates/generic_event.mustache",
+        .emailTemplateName = "plugin_diagnostic.mustache"
     };
 
     return kDescriptor;

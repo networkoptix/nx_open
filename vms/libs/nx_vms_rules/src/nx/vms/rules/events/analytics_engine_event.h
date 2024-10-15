@@ -32,7 +32,7 @@ public:
         const nx::vms::api::rules::PropertyMap& aggregatedInfo) const override;
 
 protected:
-    QString detailing() const;
+    virtual QStringList detailing() const;
 
 private:
     nx::Uuid m_cameraId;

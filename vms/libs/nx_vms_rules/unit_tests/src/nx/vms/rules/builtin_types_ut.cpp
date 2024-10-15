@@ -309,7 +309,6 @@ TEST_F(BuiltinTypesTest, BuiltinEvents)
 
     testEventRegistration<AnalyticsEvent>();
     testEventRegistration<AnalyticsObjectEvent>();
-    testEventRegistration<BackupFinishedEvent>();
     testEventRegistration<CameraInputEvent>(systemContext());
     testEventRegistration<DeviceDisconnectedEvent>(systemContext());
     testEventRegistration<DeviceIpConflictEvent>(systemContext());

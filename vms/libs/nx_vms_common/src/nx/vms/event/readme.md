@@ -14,7 +14,7 @@ Additionally, it contains some auxiliary information:
 - 'Disabled' flag which allows to temporary stop a rule from execution without removing it
 - 'System' flag (system rules are not displayed to user, they can't be changed or removed, and right now are used only to exec 'diagnostics' actions)
 
-All events are divided into two types: Instant Events (i.e. 'Backup finished') and Prolonged Events (i.e. 'There is some motion on camera X').
+All events are divided into two types: Instant Events (i.e. 'Server Started') and Prolonged Events (i.e. 'There is some motion on camera X').
 The same division applies to Actions, however Prolonged (***togglable?***) actions may have fixed duration or may last while some prolonged event happens.
 As result, event processing is a bit complicated and requires several additional flags:
 - EventState enum is used to indicate if the event just start, finished or is instant (so its state is undefined);
@@ -33,7 +33,6 @@ As result, event processing is a bit complicated and requires several additional
 - serverConflictEvent
 - serverStartEvent
 - licenseIssueEvent
-- backupFinishedEvent
 - softwareTriggerEvent
 - analyticsSdkEvent
 - pluginEvent

@@ -29,7 +29,6 @@ HelpIdMap eventHelpMap()
 
     addHelpId<AnalyticsEvent>(result, HelpTopic::Id::EventsActions_VideoAnalytics);
     addHelpId<AnalyticsObjectEvent>(result, HelpTopic::Id::EventsActions_VideoAnalytics);
-    addHelpId<BackupFinishedEvent>(result, HelpTopic::Id::EventsActions_BackupFinished);
     addHelpId<CameraInputEvent>(result, HelpTopic::Id::EventsActions_CameraInput);
     addHelpId<DeviceDisconnectedEvent>(result,
         HelpTopic::Id::EventsActions_CameraDisconnected);

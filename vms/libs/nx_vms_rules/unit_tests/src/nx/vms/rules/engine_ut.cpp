@@ -40,7 +40,7 @@ const QString kTestEventFieldId = fieldMetatype<TestEventField>();
 const QString kTestActionFieldId = fieldMetatype<TestActionField>();
 
 const FieldDescriptor kTestEventFieldDescriptor{.id = kTestEventFieldId};
-const FieldDescriptor kTestActionFiledDescriptor{.id = kTestActionFieldId};
+const FieldDescriptor kTestActionFieldDescriptor{.id = kTestActionFieldId};
 
 const TranslatableString kDisplayName("Display Name");
 const TranslatableString kEventName("Event Name");
@@ -261,14 +261,14 @@ TEST_F(EngineTest, actionFieldBuiltWithCorrectType)
 {
     ASSERT_TRUE(Plugin::registerActionField<TestActionField>(engine.get()));
 
-    auto field = engine->buildActionField(&kTestActionFiledDescriptor);
+    auto field = engine->buildActionField(&kTestActionFieldDescriptor);
 
     ASSERT_TRUE(dynamic_cast<TestActionField*>(field.get()));
 }
 
 TEST_F(EngineTest, buildActionFieldMustFailIfFieldNotRegistered)
 {
-    auto field = engine->buildActionField(&kTestActionFiledDescriptor);
+    auto field = engine->buildActionField(&kTestActionFieldDescriptor);
 
     ASSERT_FALSE(field);
 }

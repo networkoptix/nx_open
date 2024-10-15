@@ -6,6 +6,7 @@
 
 #include <core/resource/resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/utils/log/assert.h>
 #include <nx/utils/metatypes.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/rules/utils/event.h>
@@ -27,7 +28,9 @@ BasicEvent::BasicEvent(std::chrono::microseconds timestamp, State state):
 
 QString BasicEvent::type() const
 {
-    return utils::type(metaObject()); //< Assert?
+    QString result = utils::type(metaObject());
+    NX_ASSERT(!result.isEmpty(), "Event type is invalid");
+    return result;
 }
 
 QString BasicEvent::subtype() const
@@ -56,14 +59,14 @@ void BasicEvent::setState(State state)
     m_state = state;
 }
 
-QString BasicEvent::uniqueName() const
-{
-    return type();
-}
-
 QString BasicEvent::aggregationKey() const
 {
     return resourceKey();
+}
+
+QString BasicEvent::aggregationSubKey() const
+{
+    return type();
 }
 
 QString BasicEvent::cacheKey() const
@@ -102,7 +105,7 @@ QString BasicEvent::name(common::SystemContext* context) const
 
 QString BasicEvent::extendedCaption(common::SystemContext* context) const
 {
-    return tr("%1 event has occurred").arg(name(context));
+    return name(context);
 }
 
 } // namespace nx::vms::rules

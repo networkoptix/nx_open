@@ -31,7 +31,7 @@ public:
     static constexpr auto kTestUserName = "user";
     static constexpr auto kTestUserName2 = "user_2";
 
-    QnUserResourcePtr createUser(
+    static QnUserResourcePtr createUser(
         Ids parentGroupIds,
         const QString& name = kTestUserName,
         nx::vms::api::UserType userType = nx::vms::api::UserType::local,
@@ -52,7 +52,7 @@ public:
     nx::Uuid addToLayout(const QnLayoutResourcePtr& layout, const QnResourcePtr& resource);
 
     static constexpr auto kUseDefaultLicense = Qn::LC_Count;
-    nx::CameraResourceStubPtr createCamera(Qn::LicenseType licenseType = kUseDefaultLicense);
+    static nx::CameraResourceStubPtr createCamera(Qn::LicenseType licenseType = kUseDefaultLicense);
     nx::CameraResourceStubPtr addCamera(Qn::LicenseType licenseType = kUseDefaultLicense);
     std::vector<nx::CameraResourceStubPtr> addCameras(size_t count);
 
@@ -75,7 +75,9 @@ public:
     bool changeVideoWallItem(const QnVideoWallResourcePtr& videoWall, const nx::Uuid& itemId,
         const QnLayoutResourcePtr& itemLayout);
 
-    QnMediaServerResourcePtr addServer(nx::vms::api::ServerFlags additionalFlags = nx::vms::api::SF_None);
+    static QnMediaServerResourcePtr createServer(nx::Uuid id = nx::Uuid::createUuid());
+    QnMediaServerResourcePtr addServer(
+        nx::vms::api::ServerFlags additionalFlags = nx::vms::api::SF_None);
 
     QnStorageResourcePtr addStorage(const QnMediaServerResourcePtr& server);
 

@@ -42,24 +42,21 @@ QVariantMap DeviceIpConflictEvent::details(
 {
     auto result = BasicEvent::details(context, aggregatedInfo);
 
-    utils::insertIfNotEmpty(result, utils::kCaptionDetailName, caption(context));
-    utils::insertIfNotEmpty(result, utils::kDetailingDetailName, detailing());
-    utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
-    utils::insertIfNotEmpty(result, utils::kNameDetailName, name(context));
+    result.insert(utils::kCaptionDetailName, caption(context));
+    result.insert(utils::kDetailingDetailName, detailing());
+    result.insert(utils::kExtendedCaptionDetailName, extendedCaption(context));
+    result.insert(utils::kNameDetailName, name(context));
+    result.insert(utils::kUrlDetailName, m_ipAddress);
     utils::insertLevel(result, nx::vms::event::Level::important);
     utils::insertIcon(result, nx::vms::rules::Icon::resource);
     utils::insertClientAction(result, nx::vms::rules::ClientAction::browseUrl);
-    utils::insertIfNotEmpty(result, utils::kUrlDetailName, m_ipAddress);
 
     return result;
 }
 
 QString DeviceIpConflictEvent::caption(common::SystemContext* context) const
 {
-    // TODO: #amalov The number of devices in translation should be corrected in 5.1+
-    return QnDeviceDependentStrings::getDefaultNameFromSet(context->resourcePool(),
-        tr("Device IP Conflict", "", 1),
-        tr("Camera IP Conflict", "", 1));
+    return name(context);
 }
 
 QStringList DeviceIpConflictEvent::detailing() const
@@ -85,10 +82,9 @@ QString DeviceIpConflictEvent::extendedCaption(common::SystemContext* context) c
 
 QString DeviceIpConflictEvent::name(common::SystemContext* context)
 {
-    // TODO: #amalov The number of devices in translation should be corrected in 5.1+
     return QnDeviceDependentStrings::getDefaultNameFromSet(context->resourcePool(),
-        tr("Device IP Conflict", "", 1),
-        tr("Camera IP Conflict", "", 1));
+        tr("Device IP Conflict"),
+        tr("Camera IP Conflict"));
 }
 
 ItemDescriptor DeviceIpConflictEvent::manifest(common::SystemContext* context)
@@ -111,7 +107,7 @@ ItemDescriptor DeviceIpConflictEvent::manifest(common::SystemContext* context)
         .resources = {
             {utils::kDeviceIdsFieldName, {ResourceType::device, Qn::WritePermission}},
             {utils::kServerIdFieldName, {ResourceType::server}}},
-        .emailTemplatePath = ":/email_templates/camera_ip_conflict.mustache"
+        .emailTemplateName = "timestamp_and_details.mustache"
     };
     return kDescriptor;
 }

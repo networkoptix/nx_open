@@ -25,9 +25,9 @@ DeviceDisconnectedEvent::DeviceDisconnectedEvent(
 {
 }
 
-QString DeviceDisconnectedEvent::uniqueName() const
+QString DeviceDisconnectedEvent::aggregationSubKey() const
 {
-    return utils::makeName(BasicEvent::uniqueName(), m_cameraId.toSimpleString());
+    return utils::makeKey(BasicEvent::aggregationSubKey(), m_cameraId.toSimpleString());
 }
 
 QString DeviceDisconnectedEvent::resourceKey() const
@@ -41,7 +41,7 @@ QVariantMap DeviceDisconnectedEvent::details(
     auto result = BasicEvent::details(context, aggregatedInfo);
 
     utils::insertIfNotEmpty(result, utils::kCaptionDetailName, caption(context));
-    utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
+    result.insert(utils::kExtendedCaptionDetailName, extendedCaption(context));
     utils::insertIfNotEmpty(result, utils::kNameDetailName, name(context));
     utils::insertIcon(result, nx::vms::rules::Icon::resource);
     utils::insertLevel(result, nx::vms::event::Level::critical);
@@ -52,7 +52,8 @@ QVariantMap DeviceDisconnectedEvent::details(
 
 QString DeviceDisconnectedEvent::caption(common::SystemContext* context) const
 {
-    const auto camera = context->resourcePool()->getResourceById<QnVirtualCameraResource>(m_cameraId);
+    const auto camera = context->resourcePool()->getResourceById<QnVirtualCameraResource>(
+        m_cameraId);
 
     return QnDeviceDependentStrings::getNameFromSet(
         context->resourcePool(),
@@ -69,13 +70,7 @@ QString DeviceDisconnectedEvent::extendedCaption(common::SystemContext* context)
         m_cameraId);
     const auto resourceName = Strings::resource(camera, Qn::RI_WithUrl);
 
-    return QnDeviceDependentStrings::getNameFromSet(
-        context->resourcePool(),
-        QnCameraDeviceStringSet(
-            tr("Device %1 was disconnected"),
-            tr("Camera %1 was disconnected"),
-            tr("I/O Module %1 was disconnected")),
-        camera).arg(resourceName);
+    return tr("%1 was disconnected", "Device name will be substituted").arg(resourceName);
 }
 
 QString DeviceDisconnectedEvent::name(common::SystemContext* context)
@@ -127,7 +122,7 @@ ItemDescriptor DeviceDisconnectedEvent::manifest(common::SystemContext* context)
         },
         .resources = {
             {utils::kCameraIdFieldName, {ResourceType::device, Qn::ViewContentPermission}}},
-        .emailTemplatePath = ":/email_templates/camera_disconnect.mustache"
+        .emailTemplateName = "timestamp_only.mustache"
     };
     return kDescriptor;
 }

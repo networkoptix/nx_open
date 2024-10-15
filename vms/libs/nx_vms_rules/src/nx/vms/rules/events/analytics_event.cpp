@@ -45,7 +45,7 @@ QString AnalyticsEvent::subtype() const
 
 QString AnalyticsEvent::resourceKey() const
 {
-    return utils::makeName(
+    return utils::makeKey(
         AnalyticsEngineEvent::resourceKey(),
         m_eventTypeId,
         m_objectTrackId.toSimpleString(),
@@ -63,12 +63,14 @@ QVariantMap AnalyticsEvent::details(
     auto result = AnalyticsEngineEvent::details(context, aggregatedInfo);
 
     if (!result.contains(utils::kCaptionDetailName))
-        utils::insertIfNotEmpty(result, utils::kCaptionDetailName, analyticsEventCaption(context));
+        result.insert(utils::kCaptionDetailName, analyticsEventCaption(context));
 
     utils::insertIfNotEmpty(result, utils::kExtraCaptionDetailName, extraCaption());
-    utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
-    result.insert(utils::kHasScreenshotDetailName, true);
-    utils::insertIfNotEmpty(result, utils::kAnalyticsEventTypeDetailName, analyticsEventCaption(context));
+
+    result.insert(utils::kExtendedCaptionDetailName, extendedCaption(context));
+
+    utils::insertIfNotEmpty(
+        result, utils::kAnalyticsEventTypeDetailName, analyticsEventCaption(context));
     utils::insertLevel(result, nx::vms::event::Level::common);
     utils::insertIcon(result, nx::vms::rules::Icon::analyticsEvent);
     utils::insertClientAction(result, nx::vms::rules::ClientAction::previewCameraOnTime);
@@ -136,7 +138,7 @@ const ItemDescriptor& AnalyticsEvent::manifest()
         .resources = {
             {utils::kCameraIdFieldName, {ResourceType::device, Qn::ViewContentPermission}},
             {utils::kEngineIdFieldName, {ResourceType::analyticsEngine}}},
-        .emailTemplatePath = ":/email_templates/analytics_event.mustache"
+        .emailTemplateName = "analytics_event.mustache"
     };
     return kDescriptor;
 }

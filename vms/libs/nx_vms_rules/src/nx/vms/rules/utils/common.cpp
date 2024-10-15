@@ -48,18 +48,12 @@ bool isLoggingAllowed(const Engine* engine, nx::Uuid ruleId)
     if (!NX_ASSERT(eventDescriptor))
         return false;
 
-    if (eventDescriptor->flags.testFlag(ItemFlag::omitLogging))
-        return false;
-
     const auto actionBuilders = rule->actionBuilders();
     if (!NX_ASSERT(!actionBuilders.empty()))
         return false;
 
     const auto actionDescriptor = engine->actionDescriptor(actionBuilders.front()->actionType());
     if (!NX_ASSERT(actionDescriptor))
-        return false;
-
-    if (actionDescriptor->flags.testFlag(ItemFlag::omitLogging))
         return false;
 
     return true;

@@ -37,7 +37,7 @@ QVariantMap ServerStartedEvent::details(
 QString ServerStartedEvent::extendedCaption(common::SystemContext* context) const
 {
     const auto resourceName = Strings::resource(context, m_serverId, Qn::RI_WithUrl);
-    return tr("Server \"%1\" Started").arg(resourceName);
+    return tr("%1 Started").arg(resourceName);
 }
 
 const ItemDescriptor& ServerStartedEvent::manifest()
@@ -49,7 +49,7 @@ const ItemDescriptor& ServerStartedEvent::manifest()
         .description = "Triggered when any server registered in the server starts.",
         .resources = {{utils::kServerIdFieldName, {ResourceType::server}}},
         .readPermissions = GlobalPermission::powerUser,
-        .emailTemplatePath = ":/email_templates/mediaserver_started.mustache"
+        .emailTemplateName = "timestamp_only.mustache"
     };
     return kDescriptor;
 }

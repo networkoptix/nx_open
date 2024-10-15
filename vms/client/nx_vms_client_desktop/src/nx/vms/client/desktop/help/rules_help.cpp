@@ -38,8 +38,6 @@ int eventHelpId(EventType type)
             return HelpTopic::Id::EventsActions_LdapSyncIssue;
         case EventType::licenseIssueEvent:
             return HelpTopic::Id::EventsActions_LicenseIssue;
-        case EventType::backupFinishedEvent:
-            return HelpTopic::Id::EventsActions_BackupFinished;
         case EventType::analyticsSdkEvent:
             return HelpTopic::Id::EventsActions_VideoAnalytics;
         case EventType::analyticsSdkObjectDetected:

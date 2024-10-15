@@ -13,8 +13,14 @@
 namespace nx::vms::rules {
 
 MotionEvent::MotionEvent(std::chrono::microseconds timestamp, State state, nx::Uuid deviceId):
-    base_type(timestamp, state, deviceId)
+    base_type(timestamp, state),
+    m_cameraId(deviceId)
 {
+}
+
+QString MotionEvent::resourceKey() const
+{
+    return m_cameraId.toSimpleString();
 }
 
 QVariantMap MotionEvent::details(
@@ -22,7 +28,7 @@ QVariantMap MotionEvent::details(
 {
     auto result = base_type::details(context, aggregatedInfo);
 
-    utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
+    result.insert(utils::kExtendedCaptionDetailName, extendedCaption(context));
     utils::insertLevel(result, nx::vms::event::Level::common);
     utils::insertIcon(result, nx::vms::rules::Icon::motion);
     utils::insertClientAction(result, nx::vms::rules::ClientAction::previewCameraOnTime);
@@ -58,7 +64,7 @@ const ItemDescriptor& MotionEvent::manifest()
         },
         .resources = {
             {utils::kCameraIdFieldName, {ResourceType::device, Qn::ViewContentPermission}}},
-        .emailTemplatePath = ":/email_templates/camera_motion.mustache"
+        .emailTemplateName = "camera_motion.mustache"
     };
     return kDescriptor;
 }
