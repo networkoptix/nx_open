@@ -321,8 +321,6 @@ void LocalSettings::migrateOldSettings()
 
 void LocalSettings::setDefaults()
 {
-    maxSceneVideoItems = (sizeof(void*) == sizeof(qint32)) ? 24 : 64;
-
     if (backgroundsFolder().isEmpty())
         backgroundsFolder = getDefaultBackgroundsFolder();
 
