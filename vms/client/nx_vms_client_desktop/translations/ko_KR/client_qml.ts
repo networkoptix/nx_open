@@ -68,7 +68,7 @@
     </message>
     <message>
       <source>Proxy LDAP requests via server</source>
-      <translation type="unfinished">Proxy LDAP requests via server</translation>
+      <translation>서버를 통한 프록시 LDAP 요청</translation>
     </message>
   </context>
   <context>
@@ -1000,8 +1000,8 @@
     <message numerus="yes">
       <source>%n more</source>
       <comment>%n is the number of remaining groups</comment>
-      <translation type="unfinished">
-        <numerusform>%n more</numerusform>
+      <translation>
+        <numerusform>%n 더 보기</numerusform>
       </translation>
     </message>
   </context>
