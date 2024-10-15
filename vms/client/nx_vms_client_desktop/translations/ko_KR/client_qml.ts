@@ -28,7 +28,7 @@
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>그룹</translation>
     </message>
     <message>
       <source>Membership</source>
@@ -462,7 +462,7 @@
     </message>
     <message>
       <source>Suspended</source>
-      <translation type="unfinished">Suspended</translation>
+      <translation>정지됨</translation>
     </message>
     <message>
       <source>Shut Down</source>
@@ -841,7 +841,7 @@
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>그룹</translation>
     </message>
     <message>
       <source>Resources</source>
@@ -876,7 +876,7 @@
     </message>
     <message>
       <source>Permission Groups</source>
-      <translation type="unfinished">Permission Groups</translation>
+      <translation>권한 그룹</translation>
     </message>
   </context>
   <context>
@@ -891,7 +891,7 @@
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>그룹</translation>
     </message>
     <message>
       <source>Resources</source>
@@ -922,7 +922,7 @@
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>그룹</translation>
     </message>
     <message>
       <source>Members</source>
@@ -934,7 +934,7 @@
     </message>
     <message>
       <source>Permission Groups</source>
-      <translation type="unfinished">Permission Groups</translation>
+      <translation>권한 그룹</translation>
     </message>
     <message>
       <source>Another group with the same name exists in the system. It is recommended to assign unique names to the groups.</source>
@@ -961,7 +961,7 @@
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>그룹</translation>
     </message>
     <message>
       <source>No members</source>
@@ -1105,7 +1105,7 @@
     </message>
     <message>
       <source>Usage</source>
-      <translation type="unfinished">Usage</translation>
+      <translation>사용법</translation>
     </message>
   </context>
   <context>
@@ -1143,7 +1143,7 @@
     </message>
     <message>
       <source>Previous</source>
-      <translation type="unfinished">Previous</translation>
+      <translation>이전</translation>
     </message>
     <message>
       <source>Next</source>
@@ -1219,7 +1219,7 @@
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>그룹</translation>
     </message>
     <message>
       <source>Last Sync</source>
@@ -1507,7 +1507,7 @@
     </message>
     <message>
       <source>Reject</source>
-      <translation type="unfinished">Reject</translation>
+      <translation>거부</translation>
     </message>
   </context>
   <context>
@@ -1548,7 +1548,7 @@
     <message>
       <source>LDAP</source>
       <comment>Acronym for The Lightweight Directory Access Protocol</comment>
-      <translation type="unfinished">LDAP</translation>
+      <translation>LDAP</translation>
     </message>
     <message>
       <source>Built-in</source>
@@ -1581,7 +1581,7 @@
     </message>
     <message>
       <source>Confirm password</source>
-      <translation type="unfinished">Confirm password</translation>
+      <translation>비밀번호 확인</translation>
     </message>
     <message>
       <source>Passwords do not match</source>
@@ -2386,7 +2386,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>그룹</translation>
     </message>
     <message>
       <source>Resources</source>
@@ -2425,7 +2425,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Full Name</source>
-      <translation type="unfinished">Full Name</translation>
+      <translation>전체 이름</translation>
     </message>
     <message>
       <source>Email</source>
@@ -2449,7 +2449,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Permission Groups</source>
-      <translation type="unfinished">Permission Groups</translation>
+      <translation>권한 그룹</translation>
     </message>
     <message>
       <source>Access</source>
@@ -2484,7 +2484,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>그룹</translation>
     </message>
     <message>
       <source>Resources</source>
@@ -2527,7 +2527,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Full Name</source>
-      <translation type="unfinished">Full Name</translation>
+      <translation>전체 이름</translation>
     </message>
     <message>
       <source>Account Settings</source>
@@ -2555,7 +2555,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Permission Groups</source>
-      <translation type="unfinished">Permission Groups</translation>
+      <translation>권한 그룹</translation>
     </message>
     <message>
       <source>Access expires</source>
@@ -2635,7 +2635,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Duplicate</source>
-      <translation type="unfinished">Duplicate</translation>
+      <translation>복제</translation>
     </message>
     <message>
       <source>Delete</source>

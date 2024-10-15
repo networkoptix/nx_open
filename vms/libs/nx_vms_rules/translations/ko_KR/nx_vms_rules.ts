@@ -186,7 +186,7 @@
     </message>
     <message>
       <source>Value</source>
-      <translation type="unfinished">Value</translation>
+      <translation>값</translation>
     </message>
   </context>
   <context>
@@ -427,7 +427,7 @@
     </message>
     <message>
       <source>Content</source>
-      <translation type="unfinished">Content</translation>
+      <translation>콘텐츠</translation>
     </message>
     <message>
       <source>Method</source>
