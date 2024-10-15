@@ -90,7 +90,7 @@ QVariant AnalyticsDialogTableModel::data(const QModelIndex& index, int role) con
         case Qn::ResourceIconKeyRole:
         {
             if (columnName == kCameraAttributeName)
-                return "20x20/Outline/camera.svg";
+                return "20x20/Outline/device.svg";
 
             if (columnName == kObjectTypeAttributeName)
                 return sourceIndex.data(core::DecorationPathRole);
