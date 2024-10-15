@@ -24,20 +24,20 @@ struct CloudSystemCamerasSource::Private
 
     CloudSystemCamerasSource* const q;
     const QString systemId;
-    QPointer<CloudCrossSystemContext> systemContext;
     nx::utils::ScopedConnections connections;
 
-    void connectToContext()
+    void init()
     {
-        systemContext = appContext()->cloudCrossSystemManager()->systemContext(systemId);
-        if (!NX_ASSERT(systemContext))
-            return;
+        connections << appContext()->cloudCrossSystemManager()->requestSystemContext(
+            systemId,
+            [this](CloudCrossSystemContext* systemContext) { connectToContext(systemContext); });
+    }
 
-        NX_VERBOSE(this, "Connect to %1", *systemContext);
-
+    void connectToContext(CloudCrossSystemContext* systemContext)
+    {
         connections << QObject::connect(systemContext,
             &CloudCrossSystemContext::camerasAdded,
-            [this](const QnVirtualCameraResourceList& cameras)
+            [=](const QnVirtualCameraResourceList& cameras)
             {
                 NX_VERBOSE(this, "%1 cameras added to %2", cameras.size(), *systemContext);
 
@@ -51,9 +51,10 @@ struct CloudSystemCamerasSource::Private
 
         connections << QObject::connect(systemContext,
             &CloudCrossSystemContext::camerasRemoved,
-            [this](const QnVirtualCameraResourceList& cameras)
+            [=](const QnVirtualCameraResourceList& cameras)
             {
-                NX_VERBOSE(this, "%1 cameras removed from %2", cameras.size(), *systemContext);
+                NX_VERBOSE(this,
+                    "%1 cameras removed from %2", cameras.size(), *systemContext);
 
                 if (!systemContext->isSystemReadyToUse())
                     return;
@@ -64,12 +65,13 @@ struct CloudSystemCamerasSource::Private
             });
 
         const auto handleSystemStateChanges =
-            [this]
+            [=]()
             {
                 if (systemContext->isSystemReadyToUse())
                 {
                     auto cameras = systemContext->cameras();
-                    q->setKeysHandler(QVector<QnResourcePtr>(cameras.cbegin(), cameras.cend()));
+                    q->setKeysHandler(
+                        QVector<QnResourcePtr>(cameras.cbegin(), cameras.cend()));
                 }
                 else
                 {
@@ -90,10 +92,12 @@ struct CloudSystemCamerasSource::Private
         auto cameras = systemContext->cameras();
         if (systemContext->isSystemReadyToUse())
         {
-            NX_VERBOSE(this, "%1 cameras already exist in the %2", cameras.size(), *systemContext);
+            NX_VERBOSE(this,
+                "%1 cameras already exist in the %2", cameras.size(), *systemContext);
+
             q->setKeysHandler(QVector<QnResourcePtr>(cameras.cbegin(), cameras.cend()));
         }
-    };
+    }
 };
 
 CloudSystemCamerasSource::CloudSystemCamerasSource(const QString& systemId):
@@ -102,8 +106,7 @@ CloudSystemCamerasSource::CloudSystemCamerasSource(const QString& systemId):
     initializeRequest =
         [this]
         {
-            // Context must already exist.
-            d->connectToContext();
+            d->init();
         };
 }
 

@@ -263,7 +263,7 @@ NotificationListModel::Private::Private(NotificationListModel* q):
     for (const auto& systemId: appContext()->cloudCrossSystemManager()->cloudSystems())
         processNewSystem(systemId);
 
-    connect(appContext()->cloudCrossSystemManager(), &CloudCrossSystemManager::systemFound,
+    connect(appContext()->cloudCrossSystemManager(), &CloudCrossSystemManager::systemContextReady,
         this, processNewSystem);
 
     connect(appContext()->cloudCrossSystemManager(), &CloudCrossSystemManager::systemLost, this,
