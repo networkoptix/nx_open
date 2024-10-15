@@ -33,12 +33,14 @@ ModalDialog
     property int minimumLabelColumnWidth: 0
 
     property bool columnWithDataWasRemoved: false
+    property bool sourceModelIsChanged: false
 
     property bool deletionIsAllowed: editMode
 
     // Attributes of sourceModel, before any edit was applied to LookupListModel.
     // Can't be alias, since sourceModel.attributeNames changes during the editing.
     readonly property var previousAttrbutes: editMode ? sourceModel.attributeNames : []
+    readonly property var previousListName: editMode ? sourceModel.name : ""
 
     signal deleteRequested()
 
@@ -127,6 +129,10 @@ ModalDialog
 
         dialog.columnWithDataWasRemoved = editMode && previousAttrbutes.some((attr) => !attributeNames.includes(attr))
         model.attributeNames = attributeNames
+    }
+
+    function areArraysEqual(arr1, arr2): boolean {
+        return arr1.length === arr2.length && [...arr1].sort().join() === [...arr2].sort().join();
     }
 
     LookupListModel
@@ -314,6 +320,14 @@ ModalDialog
             DialogButtonBox.buttonRole: DialogButtonBox.AcceptRole
             enabled: canAccept
             isAccentButton: true
+            onClicked:
+            {
+                if (!dialog.editMode)
+                    return
+
+                dialog.sourceModelIsChanged = viewModel.name !== dialog.previousListName
+                    || !areArraysEqual(viewModel.attributeNames, dialog.previousAttrbutes)
+            }
         }
     }
 
