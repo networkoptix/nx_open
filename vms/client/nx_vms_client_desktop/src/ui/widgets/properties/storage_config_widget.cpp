@@ -626,11 +626,14 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent):
     archiveModeHint->addHintLine(
         tr("Choose a read-write policy to define how interact with storage directories."));
     archiveModeHint->addHintLine(
-        tr("Exclusive - server reads and writes all folders."));
+        tr("Exclusive - server reads from all folders but writes only to its own folder. "
+            "It deletes old data from all folders."));
     archiveModeHint->addHintLine(
-        tr("Shared - server reads all folders, but writes only its own folder."));
+        tr("Shared - server reads from all folders but writes only to its own folder. "
+           "It deletes old data only from its own folder."));
     archiveModeHint->addHintLine(
-        tr("Isolated - server reads and writes only its own folder."));
+        tr("Isolated - server reads and writes exclusively to its own folder. "
+            "It deletes old data only from its own folder."));
 
     ui->storageView->setMouseTracking(true);
 
