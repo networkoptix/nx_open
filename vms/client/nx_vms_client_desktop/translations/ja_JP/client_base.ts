@@ -7332,7 +7332,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::BackupStatusWidget</name>
     <message>
       <source>Backup process will ignore existing footage. Only further recording will be backed up.</source>
-      <translation>バックアップ処理は既存の録画データを無視します。適用ボタン押下後に録画されたデータのみがバックアップされます。</translation>
+      <translation>バックアップ処理で、既存の録画データを無視します。以後に録画されたデータのみがバックアップされます。</translation>
     </message>
     <message>
       <source>Skip backup for existing footage?</source>
