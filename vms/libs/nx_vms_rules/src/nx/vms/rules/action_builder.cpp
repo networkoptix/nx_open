@@ -274,6 +274,7 @@ ActionBuilder::ActionBuilder(
     m_actionType(actionType),
     m_constructor(ctor)
 {
+    NX_CRITICAL(ctor);
 }
 
 ActionBuilder::~ActionBuilder()
@@ -405,10 +406,7 @@ void ActionBuilder::toggleAggregationTimer(bool on)
 
 bool ActionBuilder::isProlonged() const
 {
-    if (const auto engine = this->engine(); NX_ASSERT(engine))
-        return nx::vms::rules::isProlonged(engine, this);
-
-    return {};
+    return nx::vms::rules::isProlonged(engine(), this);
 }
 
 void ActionBuilder::onTimer(const nx::utils::TimerId&)
@@ -426,17 +424,6 @@ void ActionBuilder::onTimer(const nx::utils::TimerId&)
 
 void ActionBuilder::buildAndEmitAction(const AggregatedEventPtr& aggregatedEvent)
 {
-    if (!NX_ASSERT(m_constructor) || !NX_ASSERT(aggregatedEvent))
-        return;
-
-    const bool isProlonged = this->isProlonged();
-    if (isProlonged &&
-        ((m_isActionRunning && aggregatedEvent->state() == State::started)
-            || (!m_isActionRunning && aggregatedEvent->state() == State::stopped)))
-    {
-        return;
-    }
-
     aggregatedEvent->setRuleId(rule()->id());
 
     // Action with all data without any user filtration for logging.
@@ -467,11 +454,6 @@ void ActionBuilder::buildAndEmitAction(const AggregatedEventPtr& aggregatedEvent
 
     for (auto& action: actions)
         action->setId(logAction->id());
-
-    // TODO: #amalov The flag is taken from the old engine algorithms.
-    // Think of more clever solution to support "Use source" flag.
-    if (isProlonged)
-        m_isActionRunning = (actions.front()->state() == State::started);
 
     for (const auto& action: actions)
         emit this->action(action);

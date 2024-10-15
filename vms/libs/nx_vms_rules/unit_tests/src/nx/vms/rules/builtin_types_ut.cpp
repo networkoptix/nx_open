@@ -247,6 +247,13 @@ public:
         {
             SCOPED_TRACE(nx::format("Action field id: %1", field.id).toStdString());
             EXPECT_TRUE(engine->isActionFieldRegistered(field.id));
+
+            // Check if prolonged actions are running on client.
+            if (field.fieldName == rules::utils::kUsersFieldName
+                && manifest.flags.testFlag(ItemFlag::prolonged))
+            {
+                EXPECT_TRUE(manifest.executionTargets.testFlag(ExecutionTarget::clients));
+            }
         }
 
         ASSERT_TRUE(registerAction<T>());

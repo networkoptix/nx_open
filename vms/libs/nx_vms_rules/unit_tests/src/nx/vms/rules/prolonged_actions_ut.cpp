@@ -3,6 +3,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include <nx/utils/qt_helpers.h>
 #include <nx/vms/api/rules/rule.h>
 #include <nx/vms/rules/action_builder.h>
 #include <nx/vms/rules/action_builder_fields/target_devices_field.h>
@@ -26,6 +27,7 @@ static const auto resourceA = nx::Uuid("00000000-0000-0000-0001-00000000000A");
 static const auto resourceB = nx::Uuid("00000000-0000-0000-0001-00000000000B");
 static const auto resourceC = nx::Uuid("00000000-0000-0000-0001-00000000000C");
 
+// Tests for true prolonged actions without duration tied to prolonged events.
 class ProlongedActionsTest: public EngineBasedTest
 {
 protected:
@@ -42,9 +44,12 @@ protected:
         plugin.reset();
     }
 
-    void givenRule(const UuidSelection& source, const UuidSelection& target)
+    void givenRule(
+        const UuidSelection& source,
+        const UuidSelection& target,
+        nx::Uuid id = nx::Uuid::createUuid())
     {
-        auto rule = std::make_unique<Rule>(nx::Uuid::createUuid(), engine.get());
+        auto rule = std::make_unique<Rule>(id, engine.get());
 
         auto filter = engine->buildEventFilter(utils::type<TestEventProlonged>());
         ASSERT_TRUE(filter);
@@ -83,24 +88,32 @@ protected:
         connector.process(event);
     }
 
-    void thenActionExecuted(size_t index, State state, nx::Uuid resourceId = {})
+    void thenActionExecuted(size_t index, State state, UuidSet resourceIds = {})
     {
+        SCOPED_TRACE(NX_FMT("Expecting action at index: %1, state: %2, resources: %3",
+            index, state, resourceIds).toStdString());
+
         ASSERT_GT(executor.actions.size(), index);
 
-        const auto action = executor.actions[index];
+        const auto action = this->action(index);
         ASSERT_TRUE(action);
 
         EXPECT_EQ(action->type(), utils::type<TestProlongedAction>());
         EXPECT_EQ(action->state(), state);
 
-        if (!resourceId.isNull())
-            EXPECT_EQ(lastAction()->m_deviceIds, UuidList{resourceId});
+        if (!resourceIds.empty())
+            EXPECT_EQ(nx::utils::toQSet(action->m_deviceIds), resourceIds);
     }
 
     void thenTotalActionsExecuted(size_t size)
     {
         ASSERT_EQ(executor.actions.size(), size)
             << NX_FMT("Expected %1 total actions", size).toStdString();
+    }
+
+    QSharedPointer<TestProlongedAction> action(size_t index)
+    {
+        return executor.actions[index].staticCast<TestProlongedAction>();
     }
 
     QSharedPointer<TestProlongedAction> lastAction()
@@ -152,7 +165,7 @@ TEST_F(ProlongedActionsTest, startByDifferentResources)
     givenRuleABtoC();
 
     whenTestEventFired(State::started, resourceA);
-    thenActionExecuted(0, State::started, resourceC);
+    thenActionExecuted(0, State::started, {resourceC});
     thenTotalActionsExecuted(1);
 
     whenTestEventFired(State::started, resourceB);
@@ -165,7 +178,7 @@ TEST_F(ProlongedActionsTest, stopByDifferentResources)
     givenRuleABtoC();
 
     whenTestEventFired(State::started, resourceA);
-    thenActionExecuted(0, State::started, resourceC);
+    thenActionExecuted(0, State::started, {resourceC});
     thenTotalActionsExecuted(1);
 
     whenTestEventFired(State::started, resourceB);
@@ -175,9 +188,48 @@ TEST_F(ProlongedActionsTest, stopByDifferentResources)
     thenTotalActionsExecuted(1);
 
     whenTestEventFired(State::stopped, resourceB);
-    thenActionExecuted(1, State::stopped, resourceC);
+    thenActionExecuted(1, State::stopped, {resourceC});
     thenTotalActionsExecuted(2);
     // The action should be stopped after all events are stopped.
+}
+
+TEST_F(ProlongedActionsTest, stopActionsIsEmittedWhenRuleIsDisabled)
+{
+    const auto ruleId = nx::Uuid::createUuid();
+    // Action for B + C + source.
+    givenRule({.all = true}, {.ids = {resourceB, resourceC}, .all = true}, ruleId);
+
+    whenTestEventFired(State::started, resourceA);
+    thenTotalActionsExecuted(1);
+
+    // Disable rule.
+    auto rule = engine->cloneRule(ruleId);
+    rule->setEnabled(false);
+    engine->updateRule(serialize(rule.get()));
+
+    // And expects that auto generated stopped action contains all the required resources.
+    thenTotalActionsExecuted(2);
+    thenActionExecuted(1, State::stopped, {resourceA, resourceB, resourceC});
+}
+
+TEST_F(ProlongedActionsTest, startEventAfterRuleUpdate)
+{
+    const auto ruleId = nx::Uuid::createUuid();
+    givenRule({.all = true}, {.ids = {resourceB}}, ruleId);
+
+    whenTestEventFired(State::started, resourceA);
+    thenTotalActionsExecuted(1);
+
+    // Update rule, action is stopped.
+    auto rule = engine->cloneRule(ruleId);
+    rule->actionBuilders().front()->fieldByType<TargetDevicesField>()->setIds({resourceC});
+    engine->updateRule(serialize(rule.get()));
+
+    thenActionExecuted(1, State::stopped, {resourceB});
+
+    // Rule state will reset, so start event will produce new action.
+    whenTestEventFired(State::started, resourceA);
+    thenActionExecuted(2, State::started, {resourceC});
 }
 
 } // nx::vms::rules::test

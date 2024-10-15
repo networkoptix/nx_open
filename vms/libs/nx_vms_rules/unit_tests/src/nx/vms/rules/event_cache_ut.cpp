@@ -1,12 +1,14 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include <gtest/gtest.h>
-
 #include <thread>
 
-#include <nx/vms/rules/event_cache.h>
+#include <gtest/gtest.h>
+
+#include <nx/vms/event/event_cache.h>
 
 namespace nx::vms::rules::test {
+
+using namespace nx::vms::event;
 
 TEST(EventCacheTest, cacheKey)
 {

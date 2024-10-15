@@ -254,7 +254,7 @@ public:
     static ItemDescriptor manifest()
     {
         return ItemDescriptor{
-            .id = utils::type<TestActionWithTextWithFields>(),
+            .id = utils::type<TestActionWithEmail>(),
             .displayName = TranslatableString("Test action for email field"),
             .fields = {
                 makeFieldDescriptor<EmailMessageField>(
