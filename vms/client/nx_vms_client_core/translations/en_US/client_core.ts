@@ -261,4 +261,19 @@
         <translation type="unfinished"></translation>
     </message>
 </context>
+<context>
+    <name>nx::vms::client::core::ExtendedCameraOutputController</name>
+    <message>
+        <source>Heater</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Wiper</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Door</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
 </TS>
