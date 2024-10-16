@@ -240,7 +240,10 @@ int CommonObjectSearchSetup::cameraCount() const
 bool CommonObjectSearchSetup::mixedDevices() const
 {
     const auto context = systemContext();
-    return context && context->resourcePool()->containsIoModules();
+    if (!context)
+        return false;
+
+    return context->resourcePool()->containsIoModules();
 }
 
 void CommonObjectSearchSetup::handleTimelineSelectionChanged(const QnTimePeriod& selection)

@@ -61,14 +61,17 @@
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/qml_property.h>
 #include <nx/vms/client/desktop/utils/widget_utils.h>
 #include <nx/vms/client/desktop/window_context.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/system_context.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <utils/common/event_processors.h>
 
@@ -326,6 +329,10 @@ AnalyticsSearchWidget::Private::Private(AnalyticsSearchWidget* q):
             m_filterModel->setTaxonomyManager(taxonomyManager);
 
             m_model->setSystemContext(commonContext);
+            // Could be called in any order.
+            q->commonSetup()->setSystemContext(commonContext);
+            if (q->workbench()->currentLayout()->resource()->isCrossSystem())
+                q->commonSetup()->setCameraSelection(nx::vms::client::core::EventSearch::CameraSelection::current);
 
             updateAllowanceAndTaxonomy();
         });
