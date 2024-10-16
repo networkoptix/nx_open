@@ -186,7 +186,7 @@
     <message>
       <source>Connection to %1 is not ready yet. Check the server&apos;s internet connection or try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connection to %1 is not ready yet. Check the server&apos;s internet connection or try again later.</translation>
+      <translation>%1 에 대한 연결이 아직 준비되지 않았습니다. 서버&apos;의 인터넷 연결을 확인하거나 나중에 다시 시도하세요.</translation>
     </message>
     <message>
       <source>Connection failed</source>
@@ -203,7 +203,7 @@
     <message>
       <source>To log in to this System, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
       <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation type="unfinished">To log in to this System, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</translation>
+      <translation>이 시스템에 로그인하려면 &quot;을 비활성화하세요. %1 계정&quot; 으로 %2에 로그인할 때마다 확인 코드를 요청하세요.</translation>
     </message>
   </context>
   <context>
@@ -223,14 +223,14 @@
     </message>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>삭제된 카메라</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::core::BookmarkSearchListModel</name>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>삭제된 카메라</translation>
     </message>
   </context>
   <context>
@@ -264,7 +264,7 @@
     </message>
     <message>
       <source>This might be due to an expired server certificate or or an invalid certificate. Contact your system administrator for further investigation.</source>
-      <translation type="unfinished">This might be due to an expired server certificate or or an invalid certificate. Contact your system administrator for further investigation.</translation>
+      <translation>만료된 서버 인증서 또는 잘못된 인증서 때문일 수 있습니다. 자세한 조사를 위해 시스템 관리자에게 문의하세요.</translation>
     </message>
     <message>
       <source>To learn more about the current problem read this %1.</source>
@@ -325,11 +325,11 @@
     </message>
     <message>
       <source>Open Door</source>
-      <translation type="unfinished">Open Door</translation>
+      <translation>문 열기</translation>
     </message>
     <message>
       <source>Stop Object Tracking</source>
-      <translation type="unfinished">Stop Object Tracking</translation>
+      <translation>객체 추적 중지</translation>
     </message>
   </context>
   <context>
@@ -347,11 +347,11 @@
     <name>nx::vms::client::core::TwoWayAudioCameraButtonController</name>
     <message>
       <source>Unmute</source>
-      <translation type="unfinished">Unmute</translation>
+      <translation>음소거 해제</translation>
     </message>
     <message>
       <source>Mute</source>
-      <translation type="unfinished">Mute</translation>
+      <translation>음소거</translation>
     </message>
     <message>
       <source>Press and hold to speak</source>

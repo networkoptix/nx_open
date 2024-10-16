@@ -223,14 +223,14 @@
     </message>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>移除摄像机</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::core::BookmarkSearchListModel</name>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>移除摄像机</translation>
     </message>
   </context>
   <context>

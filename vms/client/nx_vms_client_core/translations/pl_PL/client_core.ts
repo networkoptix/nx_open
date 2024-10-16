@@ -226,14 +226,14 @@
     </message>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>usunięta kamera</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::core::BookmarkSearchListModel</name>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>usunięta kamera</translation>
     </message>
   </context>
   <context>
