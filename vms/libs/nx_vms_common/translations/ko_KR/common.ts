@@ -5,11 +5,11 @@
     <name>ApiErrorStrings</name>
     <message>
       <source>Invalid JSON content.</source>
-      <translation type="unfinished">Invalid JSON content.</translation>
+      <translation>잘못된 JSON 콘텐츠입니다.</translation>
     </message>
     <message>
       <source>Unsupported content type.</source>
-      <translation type="unfinished">Unsupported content type.</translation>
+      <translation>지원되지 않는 콘텐츠 유형입니다.</translation>
     </message>
   </context>
   <context>
@@ -63,7 +63,7 @@
     </message>
     <message>
       <source>This user does not exist or is unable to login.</source>
-      <translation type="unfinished">This user does not exist or is unable to login.</translation>
+      <translation>이 사용자가 존재하지 않거나 로그인할 수 없습니다.</translation>
     </message>
     <message>
       <source>Wrong password</source>
@@ -71,15 +71,15 @@
     </message>
     <message>
       <source>The ticket key is invalid or expired.</source>
-      <translation type="unfinished">The ticket key is invalid or expired.</translation>
+      <translation>티켓 키가 잘못되었거나 만료되었습니다.</translation>
     </message>
     <message>
       <source>More than one user with the same login are presented.</source>
-      <translation type="unfinished">More than one user with the same login are presented.</translation>
+      <translation>동일한 로그인을 가진 두 명 이상의 사용자가 표시됩니다.</translation>
     </message>
     <message>
       <source>Unable to verify LDAP server SSL/TLS certificate.</source>
-      <translation type="unfinished">Unable to verify LDAP server SSL/TLS certificate.</translation>
+      <translation>LDAP 서버 SSL/TLS 인증서를 확인할 수 없습니다.</translation>
     </message>
   </context>
   <context>
@@ -437,15 +437,15 @@
     </message>
     <message>
       <source>Invalid data was received from the device. Details: &quot;%1&quot;.</source>
-      <translation type="unfinished">Invalid data was received from the device. Details: &quot;%1&quot;.</translation>
+      <translation>장치에서 잘못된 데이터를 받았습니다. 세부 정보: &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Invalid data was received from the camera. Details: &quot;%1&quot;.</source>
-      <translation type="unfinished">Invalid data was received from the camera. Details: &quot;%1&quot;.</translation>
+      <translation>카메라에서 잘못된 데이터를 받았습니다. 세부 정보: &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Invalid data was received from the I/O module. Details: &quot;%1&quot;.</source>
-      <translation type="unfinished">Invalid data was received from the I/O module. Details: &quot;%1&quot;.</translation>
+      <translation>I/O 모듈에서 잘못된 데이터를 받았습니다. 세부 정보: &quot;%1&quot;.</translation>
     </message>
   </context>
   <context>
@@ -813,19 +813,19 @@
     </message>
     <message>
       <source>Local Recording service</source>
-      <translation type="unfinished">Local Recording service</translation>
+      <translation>로컬 녹음 서비스</translation>
     </message>
     <message numerus="yes">
       <source>%n Local Recording Services</source>
-      <translation type="unfinished">
-        <numerusform>%n Local Recording Services</numerusform>
+      <translation>
+        <numerusform>%n 로컬 녹음 서비스</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Local Recording Services</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Local Recording Services</numerusform>
+      <translation>
+        <numerusform>%n/%1 로컬 녹음 서비스</numerusform>
       </translation>
     </message>
   </context>
@@ -1080,12 +1080,12 @@
     <message>
       <source>Msec</source>
       <comment>Capitalized long suffix for displaying milliseconds</comment>
-      <translation type="unfinished">Msec</translation>
+      <translation>밀리초</translation>
     </message>
     <message>
       <source>Sec</source>
       <comment>Capitalized long suffix for displaying seconds</comment>
-      <translation type="unfinished">Sec</translation>
+      <translation>초</translation>
     </message>
     <message>
       <source>Min</source>
@@ -1095,82 +1095,82 @@
     <message>
       <source>Hrs</source>
       <comment>Capitalized long suffix for displaying hours</comment>
-      <translation type="unfinished">Hrs</translation>
+      <translation>시간</translation>
     </message>
     <message>
       <source>Days</source>
       <comment>Capitalized long suffix for displaying days</comment>
-      <translation type="unfinished">Days</translation>
+      <translation>일</translation>
     </message>
     <message>
       <source>Wks</source>
       <comment>Capitalized long suffix for displaying weeks</comment>
-      <translation type="unfinished">Wks</translation>
+      <translation>주</translation>
     </message>
     <message>
       <source>Mos</source>
       <comment>Capitalized long suffix for displaying months</comment>
-      <translation type="unfinished">Mos</translation>
+      <translation>개월</translation>
     </message>
     <message>
       <source>Yrs</source>
       <comment>Capitalized long suffix for displaying years</comment>
-      <translation type="unfinished">Yrs</translation>
+      <translation>년</translation>
     </message>
     <message numerus="yes">
       <source>Milliseconds</source>
       <comment>Capitalized full suffix for displaying milliseconds</comment>
-      <translation type="unfinished">
-        <numerusform>Milliseconds</numerusform>
+      <translation>
+        <numerusform>밀리초</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Seconds</source>
       <comment>Capitalized full suffix for displaying seconds</comment>
-      <translation type="unfinished">
-        <numerusform>Seconds</numerusform>
+      <translation>
+        <numerusform>초</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Minutes</source>
       <comment>Capitalized full suffix for displaying minutes</comment>
-      <translation type="unfinished">
-        <numerusform>Minutes</numerusform>
+      <translation>
+        <numerusform>분</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Hours</source>
       <comment>Capitalized full suffix for displaying hours</comment>
-      <translation type="unfinished">
-        <numerusform>Hours</numerusform>
+      <translation>
+        <numerusform>시간</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Days</source>
       <comment>Capitalized fapitalized full suffix for displaying days</comment>
-      <translation type="unfinished">
-        <numerusform>Days</numerusform>
+      <translation>
+        <numerusform>일</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Weeks</source>
       <comment>Capitalized full suffix for displaying weeks</comment>
-      <translation type="unfinished">
-        <numerusform>Weeks</numerusform>
+      <translation>
+        <numerusform>주</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Months</source>
       <comment>Capitalized full suffix for displaying months</comment>
-      <translation type="unfinished">
-        <numerusform>Months</numerusform>
+      <translation>
+        <numerusform>개월</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Years</source>
       <comment>Capitalized full suffix for displaying years</comment>
-      <translation type="unfinished">
-        <numerusform>Years</numerusform>
+      <translation>
+        <numerusform>년</numerusform>
       </translation>
     </message>
   </context>
@@ -1201,7 +1201,7 @@
     </message>
     <message>
       <source>Multiple groups</source>
-      <translation type="unfinished">Multiple groups</translation>
+      <translation>다중 그룹</translation>
     </message>
   </context>
   <context>
@@ -1273,15 +1273,15 @@
     <name>ServiceTypeDisplayStringHelper</name>
     <message>
       <source>Local recording</source>
-      <translation type="unfinished">Local recording</translation>
+      <translation>로컬 레코드</translation>
     </message>
     <message>
       <source>Integration</source>
-      <translation type="unfinished">Integration</translation>
+      <translation>통합</translation>
     </message>
     <message>
       <source>Cloud storage</source>
-      <translation type="unfinished">Cloud storage</translation>
+      <translation>클라우드 스토리지</translation>
     </message>
   </context>
   <context>
@@ -1308,11 +1308,11 @@
     </message>
     <message>
       <source>Contact your channel partner for details.</source>
-      <translation type="unfinished">Contact your channel partner for details.</translation>
+      <translation>자세한 내용은 채널 파트너에게 문의하세요.</translation>
     </message>
     <message>
       <source>Check internet connection between VMS and license server.</source>
-      <translation type="unfinished">Check internet connection between VMS and license server.</translation>
+      <translation>VMS와 라이선스 서버 간의 인터넷 연결을 확인하세요.</translation>
     </message>
   </context>
   <context>
@@ -1706,19 +1706,19 @@
     </message>
     <message>
       <source>LDAP settings</source>
-      <translation type="unfinished">LDAP settings</translation>
+      <translation>LDAP 설정</translation>
     </message>
     <message>
       <source>SMTP settings</source>
-      <translation type="unfinished">SMTP settings</translation>
+      <translation>SMTP 설정</translation>
     </message>
     <message>
       <source>Organization Id</source>
-      <translation type="unfinished">Organization Id</translation>
+      <translation>조직 Id</translation>
     </message>
     <message>
       <source>Semicolon-separated list of Servers designated to connect to the Cloud. Servers at the top of the list have higher priority. If the list is empty a Server for the Cloud connection is selected automatically.</source>
-      <translation type="unfinished">Semicolon-separated list of Servers designated to connect to the Cloud. Servers at the top of the list have higher priority. If the list is empty a Server for the Cloud connection is selected automatically.</translation>
+      <translation>클라우드에 연결하도록 지정된 서버의 세미콜론으로 구분된 목록입니다. 목록 맨 위에 있는 서버는 우선순위가 더 높습니다. 목록이 비어 있으면 클라우드 연결을 위한 서버가 자동으로 선택됩니다.</translation>
     </message>
     <message>
       <source>Maximum number of consecutive RTP errors before the server reconnects the RTSP session.</source>
@@ -1726,7 +1726,7 @@
     </message>
     <message>
       <source>Authorization Session token lifetime (seconds)</source>
-      <translation type="unfinished">Authorization Session token lifetime (seconds)</translation>
+      <translation>인증 세션 토큰 수명 (초)</translation>
     </message>
     <message>
       <source>Channel partners service</source>
@@ -1734,27 +1734,27 @@
     </message>
     <message>
       <source>Allow Power User editing Security Settings</source>
-      <translation type="unfinished">Allow Power User editing Security Settings</translation>
+      <translation>전문 사용자가 보안 설정을 편집하도록 허용</translation>
     </message>
     <message>
       <source>Enable deprecated API functions (insecure)</source>
-      <translation type="unfinished">Enable deprecated API functions (insecure)</translation>
+      <translation>더 이상 사용되지 않는 API 함수 활성화 (보안되지 않음)</translation>
     </message>
     <message>
       <source>Enable deprecated API functions currently used by %1 software (insecure)</source>
       <comment>%1 is a company name</comment>
-      <translation type="unfinished">Enable deprecated API functions currently used by %1 software (insecure)</translation>
+      <translation>현재 %1 소프트웨어에서 사용되는 더 이상 사용되지 않는 API 함수 활성화 (보안되지 않음)</translation>
     </message>
     <message>
       <source>Interval between the Cloud polling HTTP requests to synchronize the data.</source>
-      <translation type="unfinished">Interval between the Cloud polling HTTP requests to synchronize the data.</translation>
+      <translation>데이터를 동기화하기 위한 클라우드 폴링 HTTP 요청 사이의 간격입니다.</translation>
     </message>
   </context>
   <context>
     <name>TimeFormat</name>
     <message>
       <source>just now</source>
-      <translation type="unfinished">just now</translation>
+      <translation>지금 바로</translation>
     </message>
     <message numerus="yes">
       <source>%n minute(s) ago</source>
@@ -1770,7 +1770,7 @@
     </message>
     <message>
       <source>yesterday</source>
-      <translation type="unfinished">yesterday</translation>
+      <translation>어제</translation>
     </message>
     <message numerus="yes">
       <source>%n day(s) ago</source>
@@ -1780,7 +1780,7 @@
     </message>
     <message>
       <source>a week ago</source>
-      <translation type="unfinished">a week ago</translation>
+      <translation>1 주일 전</translation>
     </message>
   </context>
   <context>
@@ -1835,7 +1835,7 @@
     </message>
     <message>
       <source>Unlock this portion of the archive to export its contents.</source>
-      <translation type="unfinished">Unlock this portion of the archive to export its contents.</translation>
+      <translation>아카이브의 이 부분을 잠금 해제하여 콘텐츠를 내보낼 수 있습니다.</translation>
     </message>
     <message>
       <source>Archive is unavailable now. Please try again later.</source>
@@ -2449,34 +2449,34 @@
     </message>
     <message numerus="yes">
       <source>%n Groups</source>
-      <translation type="unfinished">
-        <numerusform>%n Groups</numerusform>
+      <translation>
+        <numerusform>%n 그룹</numerusform>
       </translation>
     </message>
     <message>
       <source>LDAP Sync Issue</source>
-      <translation type="unfinished">LDAP Sync Issue</translation>
+      <translation>LDAP 동기화 문제</translation>
     </message>
     <message>
       <source>Failed to connect to the LDAP server.</source>
-      <translation type="unfinished">Failed to connect to the LDAP server.</translation>
+      <translation>LDAP 서버에 연결하지 못했습니다.</translation>
     </message>
     <message>
       <source>Failed to complete the sync within a %1 timeout.</source>
       <comment>Timeout duration in human-readable form (ex.: 1 minute)</comment>
-      <translation type="unfinished">Failed to complete the sync within a %1 timeout.</translation>
+      <translation>%1 시간 초과 내에 동기화를 완료하지 못했습니다.</translation>
     </message>
     <message>
       <source>Failed to complete the sync within a given timeout.</source>
-      <translation type="unfinished">Failed to complete the sync within a given timeout.</translation>
+      <translation>주어진 시간 내에 동기화를 완료하지 못했습니다.</translation>
     </message>
     <message>
       <source>No user accounts on LDAP server match the synchronization settings.</source>
-      <translation type="unfinished">No user accounts on LDAP server match the synchronization settings.</translation>
+      <translation>LDAP 서버의 사용자 계정이 동기화 설정과 일치하지 않습니다.</translation>
     </message>
     <message>
       <source>Some LDAP users or groups were not found in the LDAP database.</source>
-      <translation type="unfinished">Some LDAP users or groups were not found in the LDAP database.</translation>
+      <translation>LDAP 데이터베이스에서 일부 LDAP 사용자 또는 그룹을 찾을 수 없습니다.</translation>
     </message>
     <message numerus="yes">
       <source>%1 (%n times)</source>
