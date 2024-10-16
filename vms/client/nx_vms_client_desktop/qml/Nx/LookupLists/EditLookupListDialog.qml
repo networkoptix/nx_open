@@ -263,6 +263,7 @@ ModalDialog
                 text: qsTr("Attributes")
                 visible: !model.isGeneric && attributesModel.count
                 Layout.alignment: Qt.AlignRight | Qt.AlignTop
+                Layout.topMargin: 14
             }
 
             AnalyticsObjectAttributesSelector
