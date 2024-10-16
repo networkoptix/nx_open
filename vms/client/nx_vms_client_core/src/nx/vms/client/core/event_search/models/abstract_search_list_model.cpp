@@ -121,6 +121,11 @@ AbstractSearchListModel::~AbstractSearchListModel()
 
 void AbstractSearchListModel::setSystemContext(SystemContext* systemContext)
 {
+    if (systemContext == this->systemContext())
+        return;
+
+    clear();
+
     d->userWatcherChangedConnection.reset();
 
     if (NX_ASSERT(systemContext))

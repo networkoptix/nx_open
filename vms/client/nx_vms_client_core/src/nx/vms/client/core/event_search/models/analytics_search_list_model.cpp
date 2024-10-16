@@ -1000,6 +1000,9 @@ AnalyticsSearchListModel::~AnalyticsSearchListModel()
 
 void AnalyticsSearchListModel::setSystemContext(SystemContext* systemContext)
 {
+    if (systemContext == this->systemContext())
+        return;
+
     base_type::setSystemContext(systemContext);
 
     d->permissionsMaybeChangedConnection.reset(

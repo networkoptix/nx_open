@@ -307,8 +307,15 @@ AnalyticsSearchWidget::Private::Private(AnalyticsSearchWidget* q):
             const auto commonContext = selectedCamera->systemContext()->as<SystemContext>();
 
             taxonomyManager = commonContext->taxonomyManager();
-            if (!taxonomyManager)
+            if (!NX_ASSERT(taxonomyManager))
                 return;
+
+            if (!commonContext->messageProcessor())
+            {
+                // It is cross-system context case.
+                commonContext->createMessageProcessor<QnDesktopClientMessageProcessor>(
+                    taxonomyManager);
+            }
 
             m_currentTaxonomyChangedConnection.reset(
                 connect(taxonomyManager, &TaxonomyManager::currentTaxonomyChanged, this,
@@ -317,13 +324,6 @@ AnalyticsSearchWidget::Private::Private(AnalyticsSearchWidget* q):
                         updateAllowanceAndTaxonomy();
                     }));
             m_filterModel->setTaxonomyManager(taxonomyManager);
-
-            if (!commonContext->messageProcessor())
-            {
-                // It is cross-system context case.
-                commonContext->createMessageProcessor<QnDesktopClientMessageProcessor>(
-                    taxonomyManager);
-            }
 
             m_model->setSystemContext(commonContext);
 

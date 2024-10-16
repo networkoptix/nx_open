@@ -51,6 +51,9 @@ SystemContext* AbstractEventListModel::systemContext() const
 
 void AbstractEventListModel::setSystemContext(SystemContext* systemContext)
 {
+    if (systemContext == this->systemContext())
+        return;
+
     d->systemContext = systemContext;
 
     if (rowCount() > 0)
