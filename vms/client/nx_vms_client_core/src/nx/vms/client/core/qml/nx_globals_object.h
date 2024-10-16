@@ -96,6 +96,8 @@ public:
 
     Q_INVOKABLE QString dateInShortFormat(const QDateTime& date);
 
+    Q_INVOKABLE QString timeInShortFormat(const QDateTime& date);
+
     Q_INVOKABLE QString dateTimeInShortFormat(const QDateTime& dateTime);
 
     Q_INVOKABLE QString highlightMatch(

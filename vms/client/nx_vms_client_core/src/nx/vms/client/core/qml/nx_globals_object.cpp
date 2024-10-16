@@ -368,6 +368,11 @@ QString NxGlobalsObject::dateInShortFormat(const QDateTime& date)
     return nx::vms::time::toString(date, nx::vms::time::Format::dd_MM_yyyy);
 }
 
+QString NxGlobalsObject::timeInShortFormat(const QDateTime& date)
+{
+    return nx::vms::time::toString(date, nx::vms::time::Format::hh_mm_ss);
+}
+
 QString NxGlobalsObject::dateTimeInShortFormat(const QDateTime& dateTime)
 {
     return nx::vms::time::toString(dateTime, nx::vms::time::Format::dd_MM_yyyy_hh_mm_ss);
