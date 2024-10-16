@@ -17,6 +17,39 @@ struct AbstractAsyncSearchListModel::Private
         AbstractSearchListModel::FetchCompletionHandler completionHandler;
     };
     std::optional<FetchRequestData> requestData;
+
+    void finishFetch(EventSearch::FetchResult result,
+        const FetchedDataRanges& fetchedRanges,
+        const OptionalTimePeriod& timeWindow)
+    {
+        if (!NX_ASSERT(requestData))
+            return;
+
+        std::optional<FetchRequestData> data;
+        std::swap(requestData, data);
+
+        switch (result)
+        {
+            case EventSearch::FetchResult::failed:
+                q->setFetchedTimeWindow({});
+                [[fallthrough]];
+
+            case EventSearch::FetchResult::cancelled:
+            {
+                emit q->fetchFinished(result, -1, data->request);
+                break;
+            }
+
+            default:
+            {
+                q->setFetchedTimeWindow(timeWindow);
+                const int centralIndex = q->calculateCentralItemIndex(
+                    fetchedRanges, data->request.direction);
+                emit q->fetchFinished(result, centralIndex, data->request);
+                break;
+            }
+        }
+    }
 };
 
 // ------------------------------------------------------------------------------------------------
@@ -47,36 +80,33 @@ bool AbstractAsyncSearchListModel::fetchData(const FetchRequest& request)
     Private::FetchRequestData data;
     data.id = nx::Uuid::createUuid();
     data.request = request;
-    auto completionHandler =
-        [this, id = data.id, request](EventSearch::FetchResult result,
+
+    const auto completionHandler =
+        [this, id = data.id](EventSearch::FetchResult result,
             const FetchedDataRanges& fetchedRanges,
             const OptionalTimePeriod& timeWindow)
         {
-            if (!d->requestData || d->requestData->id != id)
-                return; // We suppose that the requests can be overriden.
-
-            d->requestData = {};
-            setFetchInProgress(false);
-            setFetchedTimeWindow(timeWindow);
-            const int centralIndex = calculateCentralItemIndex(fetchedRanges, request.direction);
-            emit fetchFinished(result, centralIndex, request);
+            if (d->requestData && d->requestData->id == id)
+                d->finishFetch(result, fetchedRanges, timeWindow);
         };
 
-    setFetchInProgress(true);
-    emit fetchCommitStarted(request);
+    d->requestData = data;
+
     if (!requestFetch(request, std::move(completionHandler)))
     {
-        setFetchInProgress(false);
-        emit fetchFinished(EventSearch::FetchResult::failed, -1, request);
+        d->requestData = {};
         return false;
     }
 
     NX_VERBOSE(this, "Fetch data request id: %1", data.id);
-
-    d->requestData = data;
     emit asyncFetchStarted(request);
 
     return true;
+}
+
+bool AbstractAsyncSearchListModel::fetchInProgress() const
+{
+    return (bool) d->requestData;
 }
 
 bool AbstractAsyncSearchListModel::cancelFetch()
@@ -84,10 +114,7 @@ bool AbstractAsyncSearchListModel::cancelFetch()
     if (!fetchInProgress())
         return false;
 
-    if (d->requestData && d->requestData->completionHandler)
-        d->requestData->completionHandler(EventSearch::FetchResult::cancelled, {}, {});
-
-    d->requestData = {};
+    d->finishFetch(EventSearch::FetchResult::cancelled, {}, {});
     return true;
 }
 

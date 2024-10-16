@@ -7,6 +7,7 @@
 
 #include <QtCore/QEasingCurve>
 #include <QtCore/QPropertyAnimation>
+#include <QtCore/QScopedValueRollback>
 #include <QtCore/QTimer>
 #include <QtWidgets/QGraphicsOpacityEffect>
 #include <QtWidgets/QHBoxLayout>
@@ -314,18 +315,8 @@ void AbstractSearchWidget::Private::setupModels()
             const FetchRequest& request)
         {
             ui->ribbon->setInsertionMode(UpdateMode::animated, false);
-
-            const auto indicator = relevantIndicatorModel(request.direction);
-            indicator->setVisible(m_mainModel->canFetchData(request.direction));
-            indicator->setActive(false);
+            setIndicatorVisible(request.direction, false);
             handleItemCountChanged();
-        });
-
-    connect(m_mainModel.data(), &core::AbstractSearchListModel::liveChanged, this,
-        [this](bool isLive)
-        {
-            if (isLive)
-                m_headIndicatorModel->setVisible(false);
         });
 
     connect(m_mainModel.data(), &core::AbstractSearchListModel::camerasChanged, this,
@@ -349,11 +340,18 @@ void AbstractSearchWidget::Private::setupModels()
     if (m_mainModel->isOnline())
         executeLater([this]() { updateDeviceDependentActions(); }, this);
 
+    // Busy indicator tile can be visible or hidden (`visible` property of the pseudo-model),
+    // and the indicator on the tile can also be visible or hidden itself (`active` property of the
+    // pseudo-model).
+    // In current implementation of loading mechanic, busy indicator tiles are shown only during
+    // a fetch, and are always active.
+    m_headIndicatorModel->setVisible(false);
+    m_tailIndicatorModel->setVisible(false);
+    m_headIndicatorModel->setActive(true);
+    m_tailIndicatorModel->setActive(true);
+
     m_headIndicatorModel->setObjectName("head");
     m_tailIndicatorModel->setObjectName("tail");
-
-    m_headIndicatorModel->setVisible(false);
-    m_tailIndicatorModel->setVisible(true);
 
     m_visualModel->setModels({
         m_headIndicatorModel.data(), m_mainModel.data(), m_tailIndicatorModel.data()});
@@ -370,8 +368,12 @@ void AbstractSearchWidget::Private::setupRibbon()
 
     setupViewportHeader();
 
-    connect(ui->ribbon->scrollBar(), &QScrollBar::valueChanged,
-        this, &Private::requestFetchIfNeeded, Qt::QueuedConnection);
+    connect(ui->ribbon->scrollBar(), &QScrollBar::valueChanged, this,
+        [this]()
+        {
+            if (!m_skipFetchOnScrollChange)
+                executeLater([this]() { requestFetchIfNeeded(); }, this);
+        });
 
     connect(ui->ribbon, &EventRibbon::hovered, this,
         [this](const QModelIndex& idx, EventTile* tile)
@@ -860,14 +862,7 @@ void AbstractSearchWidget::Private::requestFetchIfNeeded()
         return;
 
     if (const auto direction = getFetchDirection(); !!direction)
-    {
-        if (direction.value() == FetchDirection::newer)
-            view()->setInsertionMode(EventRibbon::UpdateMode::instant, true);
-        else
-            view()->setInsertionMode(EventRibbon::UpdateMode::animated, false);
-
         m_fetchDataOperation->requestOperation();
-    }
 }
 
 void AbstractSearchWidget::Private::resetFilters()
@@ -938,30 +933,24 @@ void AbstractSearchWidget::Private::tryFetchData()
         request.centralPointUs = currentCentralPointUs();
     }
 
-    auto indicator = relevantIndicatorModel(request.direction);
-    if (!m_mainModel->canFetchData(request.direction))
+    if (m_mainModel->fetchData(request)
+        && m_mainModel->fetchInProgress())
     {
-        indicator->setVisible(false);
-        updatePlaceholderVisibility();
-        return;
+        setIndicatorVisible(request.direction, true); //< All hiding is done when fetch is finished.
     }
 
-    m_mainModel->fetchData(request);
-    const bool active = m_mainModel->fetchInProgress();
-    indicator->setActive(active);
-    if (active)
-    {
-        indicator->setVisible(true); //< All hiding is done when fetch is finished.
-        updatePlaceholderVisibility();
-    }
+    updatePlaceholderVisibility();
 }
 
-BusyIndicatorModel* AbstractSearchWidget::Private::relevantIndicatorModel(
-    FetchDirection direction) const
+void AbstractSearchWidget::Private::setIndicatorVisible(FetchDirection direction, bool value)
 {
-    return  direction == FetchDirection::older
-        ? m_tailIndicatorModel.data()
-        : m_headIndicatorModel.data();
+    const QScopedValueRollback scrollGuard(m_skipFetchOnScrollChange, true);
+
+    const auto& indicator = direction == FetchDirection::older
+        ? m_tailIndicatorModel
+        : m_headIndicatorModel;
+
+    indicator->setVisible(value);
 }
 
 void AbstractSearchWidget::Private::handleItemCountChanged()

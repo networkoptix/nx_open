@@ -233,6 +233,7 @@ bool BookmarkSearchListModel::Private::requestFetch(
 
             const auto ranges = data.ranges;
             const auto fetchedWindow = timeWindow<nx::vms::common::QnBookmarkFacade>(data.data);
+            emit q->fetchCommitStarted(request);
             applyFetchedData(std::move(data), fetchedWindow);
             completionHandler(EventSearch::FetchResult::complete, ranges, fetchedWindow);
 

@@ -801,6 +801,7 @@ void EventTile::clear()
     d->clearLabel(ui->resourceListLabel, d->resourceLabelDescriptor);
     setToolTip({});
     setFixedSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
+    ui->mainWidget->hide();
 }
 
 CloseButton* EventTile::closeButton()

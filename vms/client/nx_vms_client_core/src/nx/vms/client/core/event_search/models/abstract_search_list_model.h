@@ -40,8 +40,8 @@ public:
     virtual void setSystemContext(SystemContext* systemContext) override;
 
     virtual bool fetchData(const FetchRequest& request);
+    virtual bool fetchInProgress() const;
 
-    bool fetchInProgress() const;
     bool canFetchData(EventSearch::FetchDirection fetchDirection) const;
     OptionalFetchRequest lastFetchRequest() const;
     void clear();
@@ -91,11 +91,14 @@ public:
         EventSearch::FetchDirection direction) const;
 
 signals:
+    /** This signal is emitted immediately before a fetched data is appended to the model. */
     void fetchCommitStarted(const FetchRequest& request);
+
     void fetchFinished(
         EventSearch::FetchResult result,
         int centralItemIndex,
         const FetchRequest& request);
+
     void liveChanged(bool isLive, QPrivateSignal);
     void livePausedChanged(bool isPaused, QPrivateSignal);
     void liveCommitted(QPrivateSignal); //< todo check if we need
@@ -105,8 +108,6 @@ signals:
 
 protected:
     // These functions must be overridden in derived classes.
-
-    void setFetchInProgress(bool value);
 
     using FetchCompletionHandler = std::function<void (
         EventSearch::FetchResult result,

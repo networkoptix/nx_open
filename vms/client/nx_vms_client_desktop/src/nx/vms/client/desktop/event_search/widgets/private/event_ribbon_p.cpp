@@ -55,7 +55,6 @@ using namespace std::chrono;
 namespace {
 
 static constexpr int kDefaultTileSpacing = 1;
-static constexpr int kDefaultDummyTileSpacing = 8;
 static constexpr int kScrollBarStep = 16;
 
 static constexpr int kDefaultThumbnailWidth = 214;
@@ -659,10 +658,6 @@ int EventRibbon::Private::calculatePosition(int index) const
         return 0;
 
     const auto& previousTile = m_tiles[index - 1];
-
-    if (previousTile->dummy)
-        return previousTile->position + kDefaultDummyTileSpacing;
-
     return previousTile->position + previousTile->animatedHeight() + kDefaultTileSpacing;
 }
 
@@ -1299,9 +1294,6 @@ void EventRibbon::Private::doUpdateView()
         if (!tile->widget)
             updateTile(index);
 
-        if (tile->dummy)
-            continue;
-
         tile->widget->setMode(mode);
         // Set geometry before show() to avoid visual artifacts.
         tile->widget->setGeometry(0, tile->position - topPosition, 1, 1);
@@ -1426,17 +1418,12 @@ QWidget* EventRibbon::Private::createFadeCurtain(EventTile* widget, QVariantAnim
     return curtain;
 }
 
-int EventRibbon::Private::count(bool excludeDummies) const
+int EventRibbon::Private::countWithoutDummies() const
 {
-    if (excludeDummies)
-    {
-        return std::count_if(
-            m_tiles.begin(),
-            m_tiles.end(),
-            [](const auto& tile) { return !tile->dummy; });
-    }
-
-    return int(m_tiles.size());
+    return std::count_if(
+        m_tiles.begin(),
+        m_tiles.end(),
+        [](const auto& tile) { return !tile->dummy; });
 }
 
 int EventRibbon::Private::unreadCount() const
