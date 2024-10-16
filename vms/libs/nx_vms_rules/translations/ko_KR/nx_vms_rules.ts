@@ -87,18 +87,18 @@
     <name>nx::vms::rules::BackupFinishedEvent</name>
     <message>
       <source>Server &quot;%1&quot; has finished an archive backup</source>
-      <translation>서버 &quot;%1&quot;가 아카이브 백업을 완료했습니다.</translation>
+      <translation>서버 &quot;%1&quot; 가 아카이브 백업을 완료했습니다.</translation>
     </message>
     <message>
       <source>Backup Finished</source>
-      <translation type="unfinished">Backup Finished</translation>
+      <translation>백업을 완료했습니다.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::BasicEvent</name>
     <message>
       <source>%1 event has occurred</source>
-      <translation type="unfinished">%1 event has occurred</translation>
+      <translation>%1 이벤트가 발생했습니다</translation>
     </message>
   </context>
   <context>
@@ -178,7 +178,7 @@
     <name>nx::vms::rules::DebugEvent</name>
     <message>
       <source>Debug Event</source>
-      <translation type="unfinished">Debug Event</translation>
+      <translation>디버그 이벤트</translation>
     </message>
     <message>
       <source>Action</source>
@@ -217,14 +217,14 @@
     </message>
     <message numerus="yes">
       <source>Device Disconnected</source>
-      <translation type="unfinished">
-        <numerusform>Device Disconnected</numerusform>
+      <translation>
+        <numerusform>장치 연결 끊김</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Camera Disconnected</source>
-      <translation type="unfinished">
-        <numerusform>Camera Disconnected</numerusform>
+      <translation>
+        <numerusform>카메라 연결 끊김</numerusform>
       </translation>
     </message>
     <message>
@@ -461,15 +461,15 @@
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on the following devices:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following devices:</translation>
+      <translation>라이센스가 충분하지 않습니다. 다음 기기에서 녹화가 비활성화되었습니다.</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on the following cameras:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following cameras:</translation>
+      <translation>라이센스가 충분하지 않습니다. 다음 카메라에서 녹화가 비활성화되었습니다.</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on the following I/O modules:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following I/O modules:</translation>
+      <translation>라이센스가 충분하지 않습니다. 다음 I/O 모듈에서 레코딩이 비활성화되었습니다.</translation>
     </message>
   </context>
   <context>
@@ -480,7 +480,7 @@
     </message>
     <message>
       <source>Motion on Camera</source>
-      <translation type="unfinished">Motion on Camera</translation>
+      <translation>카메라의 모션</translation>
     </message>
     <message>
       <source>Begin When</source>
@@ -530,20 +530,20 @@
     <message>
       <source>Address %1 is already in use by %2 on primary stream.</source>
       <comment>%1 is the address, %2 is the device name</comment>
-      <translation type="unfinished">Address %1 is already in use by %2 on primary stream.</translation>
+      <translation>주소 %1 은 이미 기본 스트림의 %2 에 의해 사용 중입니다.</translation>
     </message>
     <message>
       <source>Address %1 is already in use by %2 on secondary stream.</source>
       <comment>%1 is the address, %2 is the device name</comment>
-      <translation type="unfinished">Address %1 is already in use by %2 on secondary stream.</translation>
+      <translation>주소 %1 은 이미 보조 스트림의 %2 에 의해 사용 중입니다.</translation>
     </message>
     <message>
       <source>Multicast address conflict detected.</source>
-      <translation type="unfinished">Multicast address conflict detected.</translation>
+      <translation>멀티캐스트 주소 충돌이 감지되었습니다.</translation>
     </message>
     <message>
       <source>Network address %1 is not a multicast address.</source>
-      <translation type="unfinished">Network address %1 is not a multicast address.</translation>
+      <translation>네트워크 주소 %1 은 멀티캐스트 주소가 아닙니다.</translation>
     </message>
     <message>
       <source>Connection to camera (primary stream) was unexpectedly closed.</source>
@@ -559,7 +559,7 @@
     </message>
     <message>
       <source>Failed to force using camera time, as it lags too much. System time will be used instead.</source>
-      <translation type="unfinished">Failed to force using camera time, as it lags too much. System time will be used instead.</translation>
+      <translation>카메라 시간을 강제로 사용하지 못했습니다. 너무 많이 지연되기 때문입니다. 대신 시스템 시간을 사용합니다.</translation>
     </message>
   </context>
   <context>
@@ -570,7 +570,7 @@
     </message>
     <message>
       <source>Force Acknowledgement</source>
-      <translation type="unfinished">Force Acknowledgement</translation>
+      <translation>강제 승인</translation>
     </message>
     <message>
       <source>Caption</source>
@@ -582,7 +582,7 @@
     </message>
     <message>
       <source>Tooltip</source>
-      <translation type="unfinished">Tooltip</translation>
+      <translation>도움말</translation>
     </message>
     <message>
       <source>Show Desktop Notification</source>
@@ -819,7 +819,7 @@
     <name>nx::vms::rules::SendEmailAction</name>
     <message>
       <source>Email Message</source>
-      <translation type="unfinished">Email Message</translation>
+      <translation>이메일 메시지</translation>
     </message>
     <message>
       <source>Send Email</source>
@@ -1025,19 +1025,19 @@
     </message>
     <message>
       <source>Archive backup failed. Failed to backup file %1.</source>
-      <translation type="unfinished">Archive backup failed. Failed to backup file %1.</translation>
+      <translation>아카이브 백업에 실패했습니다. 파일 %1을(를) 백업하는 데 실패했습니다.</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</translation>
+      <translation>분석 저장소 &quot;%1&quot; 데이터베이스 오류: 마운트 지점에 대한 권한이 부족합니다.</translation>
     </message>
     <message>
       <source>Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</source>
-      <translation type="unfinished">Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</translation>
+      <translation>미디어 아카이브에서 녹화가 활성화되어 있는 동안 AES 암호화를 초기화할 수 없습니다. 데이터는 암호화되지 않은 상태로 기록됩니다.</translation>
     </message>
     <message>
       <source>RAID error: %1.</source>
-      <translation type="unfinished">RAID error: %1.</translation>
+      <translation>RAID 오류: %1.</translation>
     </message>
   </context>
   <context>
@@ -1130,7 +1130,7 @@
     </message>
     <message>
       <source>Unknown event</source>
-      <translation type="unfinished">Unknown event</translation>
+      <translation>알 수 없는 이벤트</translation>
     </message>
     <message>
       <source>Unknown action</source>
