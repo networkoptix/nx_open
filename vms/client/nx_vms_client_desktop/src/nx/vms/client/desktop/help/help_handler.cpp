@@ -139,23 +139,22 @@ bool HelpHandler::eventFilter(QObject* watched, QEvent* event)
     if (QWhatsThis::inWhatsThisMode() && event->type() == QEvent::MouseButtonPress)
     {
         auto e = static_cast<QMouseEvent*>(event);
+        auto window = qobject_cast<QQuickWindow*>(watched);
 
-        if (e->button() == Qt::RightButton || e->button() == Qt::LeftButton)
+        if (e->button() == Qt::RightButton || (window && e->button() == Qt::LeftButton))
         {
             if (e->button() == Qt::LeftButton)
             {
-                if (auto window = qobject_cast<QQuickWindow*>(watched))
-                {
-                    const auto topicId = HelpTopicAccessor::helpTopicAt(window, e->pos());
+                const auto topicId = HelpTopicAccessor::helpTopicAt(window, e->pos());
 
-                    // Qt Quick does not handle WhatsThis event, so we need to simulate its behavior.
-                    if (topicId != HelpTopic::Id::Empty)
-                        setHelpTopic(topicId);
-                }
+                // Qt Quick does not handle WhatsThis event, so we need to simulate its behavior.
+                if (topicId != HelpTopic::Id::Empty)
+                    setHelpTopic(topicId);
             }
 
             event->accept();
             QWhatsThis::leaveWhatsThisMode();
+
             return true;
         }
 
