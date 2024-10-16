@@ -5,6 +5,7 @@
 #include <nx/network/rest/crud_handler.h>
 #include <nx/network/rest/open_api_schema.h>
 #include <nx/vms/api/data/bookmark_models.h>
+#include <nx/vms/api/data/rest_api_versions.h>
 
 namespace nx::network::rest::test {
 
@@ -17,21 +18,17 @@ public:
 
     Response executePatch(const nx::network::rest::Request& request)
     {
+        const bool useReflect = this->useReflect(request);
+        nx::reflect::DeserializationResult::Fields fields;
         std::optional<QJsonValue> incomplete;
-        auto data =
-            request.parseContentAllowingOmittedValuesOrThrow<BookmarkWithRuleV3>(&incomplete);
-        if (incomplete)
-        {
-            QString error;
-            if (!nx::network::rest::json::merge(&data,
-                m_bookmark,
-                *incomplete,
-                &error,
-                /*chronoSerializedAsDouble*/ true))
-            {
-                throw nx::network::rest::Exception::badRequest(error);
-            }
-        }
+        auto data = useReflect
+            ? request.parseContentAllowingOmittedValuesOrThrow<BookmarkWithRuleV3>(&fields)
+            : request.parseContentOrThrow<BookmarkWithRuleV3>(&incomplete);
+        auto eventRuleId{data.eventRuleId};
+        mergeModel(request, (BookmarkWithRuleV3::Bookmark*) &data, &m_bookmark,
+            std::move(fields), std::move(incomplete));
+        if (useReflect)
+            std::swap((BookmarkWithRuleV3::Bookmark&) data, m_bookmark);
 
         if (auto shareValue = request.param("share"); shareValue && !shareValue->isEmpty())
         {
@@ -43,15 +40,18 @@ public:
                         data.bookmarkId(), data.serverId(), share.password);
             }
         }
+        EXPECT_EQ(data.eventRuleId, eventRuleId);
         m_bookmark = data;
         return base_type::response(data, request);
     }
 
 public:
-    BookmarkWithRuleV3 m_bookmark;
+    BookmarkWithRuleV3::Bookmark m_bookmark;
 };
 
-TEST(CrudHandler, BookmarkPatch)
+class CrudHandlerTest: public ::testing::TestWithParam<std::string_view>{};
+
+TEST_P(CrudHandlerTest, BookmarkPatch)
 {
     BookmarkHandler handler;
     handler.setSchemas(std::make_shared<json::OpenApiSchemas>(
@@ -68,7 +68,16 @@ TEST(CrudHandler, BookmarkPatch)
                     return r;
                 }();
             Request result{&request, Content{nx::network::http::header::ContentType::kJson, body}};
-            result.setDecodedPath("/rest/v3/bookmarks");
+            if (GetParam() == *kRestApiV3)
+            {
+                result.setDecodedPath("/rest/v3/bookmarks");
+                result.setApiVersion(3);
+            }
+            else
+            {
+                result.setDecodedPath("/rest/v4/bookmarks");
+                result.setApiVersion(4);
+            }
             return result;
         };
 
@@ -175,6 +184,13 @@ TEST(CrudHandler, BookmarkPatch)
     "startTimeMs": 0,
     "tags": []
 })json");
+
+    NX_INFO(this, "eventRuleId");
+    response = handler.executePatch(
+        request(R"json({"eventRuleId": "{3771fd64-9b41-4216-8800-9610d40b9c16}"})json"));
 }
+
+INSTANTIATE_TEST_SUITE_P(Rest, CrudHandlerTest, ::testing::ValuesIn(kRestApiV3, kRestApiEnd),
+    [](auto info) { return std::string(info.param); });
 
 } // namespace nx::network::rest::test
