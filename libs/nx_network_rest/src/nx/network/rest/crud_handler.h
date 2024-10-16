@@ -131,9 +131,7 @@ protected:
 
     #define METHOD_CHECKER(METHOD) \
         NX_UTILS_DECLARE_FIELD_DETECTOR_SIMPLE(DoesMethodExist_##METHOD, METHOD)
-    METHOD_CHECKER(loadFromParams);
     METHOD_CHECKER(size);
-    METHOD_CHECKER(toParams);
     METHOD_CHECKER(getDeprecatedFieldNames);
     METHOD_CHECKER(create);
     METHOD_CHECKER(read);
@@ -180,27 +178,6 @@ protected:
                 NX_FMT("Unsupported format: %1", format));
         }
         return *serializedData;
-    }
-
-    template<typename T>
-    T deserialize(const Request& request, bool wrapInObject = false)
-    {
-        T data;
-        if constexpr (DoesMethodExist_loadFromParams<T>::value)
-        {
-            data.loadFromParams(static_cast<Derived*>(this)->resourcePool(), request.params());
-            if (!data.isValid())
-                throw Exception::badRequest(NX_FMT("Invalid: %1", typeid(T)));
-            if (!request.params().contains("local"))
-                data.isLocal = request.isLocal();
-            if (!request.params().contains("format"))
-                data.format = request.responseFormatOrThrow();
-        }
-        else if constexpr (!std::is_same<T, Void>::value)
-        {
-            data = request.parseContentOrThrow<T>(wrapInObject);
-        }
-        return data;
     }
 
     template<typename T>
@@ -281,29 +258,6 @@ protected:
         return {id, request.pathParams().contains(m_idParamName)};
     }
 
-    bool extractKeepDefault(Params* params, bool keepDefaultFeature, bool defaultBehavior)
-    {
-        const auto extractValue =
-            [&params](const QString& name) -> std::optional<bool>
-            {
-                const auto value = params->findValue(name);
-                if (!value)
-                    return std::nullopt;
-                params->remove(name);
-                return (*value != "false" && *value != "0");
-            };
-
-        const auto keepDefault = extractValue("_keepDefault");
-        const auto stripDefault = extractValue("_stripDefault");
-        if (keepDefaultFeature)
-            return true; //< And ignore stripped options.
-        if (!keepDefault)
-            return stripDefault ? !*stripDefault : defaultBehavior;
-        if (stripDefault)
-            throw Exception::badRequest("Only one can be used: _keepDefault, _stripDefault");
-        return keepDefault.value_or(defaultBehavior);
-    }
-
     json::DefaultValueAction extractDefaultValueAction(
         Params* params, std::optional<size_t> apiVersion) const
     {
@@ -343,21 +297,11 @@ protected:
         using FilterType = std::decay_t<Filter>;
 
         FilterType filter = request.params().hasNonRefParameter()
-            ? deserialize<FilterType>(request)
+            ? request.parseContentOrThrow<FilterType>()
             : FilterType();
         Params filtered;
-        if constexpr (DoesMethodExist_toParams<FilterType>::value)
-        {
-            filtered = filter.toParams();
-            filtered.insert("local", QString());
-            filtered.insert("format", QString());
-            filtered.insert("extraFormatting", QString());
-        }
-        else
-        {
-            if (auto intermediate = json::serialized(filter); intermediate.isObject())
-                filtered = Params::fromJson(intermediate.toObject());
-        }
+        if (auto intermediate = json::serialized(filter); intermediate.isObject())
+            filtered = Params::fromJson(intermediate.toObject());
 
         auto params = request.params();
         for (auto [key, value]: filtered.keyValueRange())
@@ -419,7 +363,7 @@ protected:
         std::optional<QJsonValue> incomplete;
         Model model = useReflect
             ? request.parseContentAllowingOmittedValuesOrThrow<Model>(&fields)
-            : request.parseContentAllowingOmittedValuesOrThrow<Model>(&incomplete);
+            : request.parseContentOrThrow<Model>(&incomplete);
         if (m_features.testFlag(CrudFeature::fastUpdate))
             return model;
 
@@ -528,7 +472,7 @@ Response CrudHandler<Derived>::executePost(const Request& request)
                 NX_FMT("The parameter %1 must not be specified when creating a new object.",
                     m_idParamName));
         }
-        Model model = deserialize<Model>(request);
+        Model model{request.parseContentOrThrow<Model>()};
         if constexpr (DoesMethodExist_fillMissingParams<Derived>::value)
             derived->fillMissingParams(&model, request);
 
@@ -591,9 +535,8 @@ Response CrudHandler<Derived>::executeDelete(const Request& request)
         }
         else
         {
-            Id id = deserialize<Id>(request);
-            if constexpr (nx::utils::model::adHocIsIdCheckOnDeleteEnabled<Id>
-                && !DoesMethodExist_loadFromParams<Id>::value)
+            Id id{request.parseContentOrThrow<Id>()};
+            if constexpr (nx::utils::model::adHocIsIdCheckOnDeleteEnabled<Id>)
             {
                 if (getId(id) == std::decay_t<decltype(getId(id))>())
                     throw Exception::missingParameter(m_idParamName);
@@ -618,7 +561,7 @@ Response CrudHandler<Derived>::executePut(const Request& request)
         const auto d = static_cast<Derived*>(this);
         using Model = detail::FunctionArgumentType<&Derived::update, 0>;
         using Result = typename nx::utils::FunctionTraits<&Derived::update>::ReturnType;
-        Model model = deserialize<Model>(request, /*wrapInObject*/ true);
+        Model model{request.parseContentOrThrow<Model>()};
         if constexpr (DoesMethodExist_fillMissingParams<Derived>::value)
             d->fillMissingParams(&model, request);
         ResponseAttributes responseAttributes;

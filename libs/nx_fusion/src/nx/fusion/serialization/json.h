@@ -112,7 +112,7 @@ public:
     bool isChronoSerializedAsDouble() const { return m_chronoSerializedAsDouble; }
     void setChronoSerializedAsDouble(bool value) { m_chronoSerializedAsDouble = value; }
 
-    std::pair<QString, QString> getFailedKeyValue() const { return m_failed; }
+    const std::pair<QString, QString>& getFailedKeyValue() const { return m_failed; }
     void setFailedKeyValue(const std::pair<QString, QString>& failed)
     {
         if (m_failed.first.isEmpty())

@@ -21,42 +21,39 @@ void serialize(QnJsonContext* context, const SaveableSiteSettings& value, QJsonV
 
 bool deserialize(QnJsonContext* context, const QJsonValue& value, SaveableSiteSettings* target)
 {
-    auto object = value.toObject();
-    auto name = object.take("name");
-    if (!deserialize(
-        context, QJsonObject{{"name", name}}, static_cast<SiteSettingsFilter*>(target)))
+    if (target->name != SiteSettingName::none)
     {
-        return false;
+        switch (target->name)
+        {
+            #define VALUE(R, TARGET, ITEM) \
+                case SiteSettingName::ITEM: \
+                    if (deserialize(context, value, &TARGET->ITEM)) \
+                        return true; \
+                    context->setFailedKeyValue( \
+                        {BOOST_PP_STRINGIZE(ITEM), QJson::serialized(value)}); \
+                    return false;
+            BOOST_PP_SEQ_FOR_EACH(VALUE, target, SaveableSiteSettings_Fields)
+            #undef VALUE
+        }
     }
 
-    if (target->name == SiteSettingName::none)
-        return QnFusion::deserialize(context, value, target);
-
-    auto nestedValue = object.take("_");
-    if (nestedValue.isUndefined())
-        nestedValue = object;
-    switch (target->name)
+    if (value.isObject() && value.toObject().contains("name"))
     {
-        #define VALUE(R, TARGET, ITEM) \
-            case SiteSettingName::ITEM: \
-                if (deserialize(context, nestedValue, &TARGET->ITEM)) \
-                    return true; \
-                context->setFailedKeyValue( \
-                    {BOOST_PP_STRINGIZE(ITEM), QJson::serialized(nestedValue)}); \
-                return false;
-        BOOST_PP_SEQ_FOR_EACH(VALUE, target, SaveableSiteSettings_Fields)
-        #undef VALUE
+        if (!deserialize(context, value, static_cast<SiteSettingsFilter*>(target)))
+            return false;
 
-        #define VALUE(R, CONTEXT, ITEM) \
-            case SiteSettingName::ITEM: \
-                CONTEXT->setFailedKeyValue({"name", "\"" BOOST_PP_STRINGIZE(ITEM) "\""}); \
-                return false;
-        BOOST_PP_SEQ_FOR_EACH(VALUE, context, UnsaveableSiteSettings_Fields)
-        #undef VALUE
+        switch (target->name)
+        {
+            #define VALUE(R, CONTEXT, ITEM) \
+                case SiteSettingName::ITEM: \
+                    CONTEXT->setFailedKeyValue({"name", "\"" BOOST_PP_STRINGIZE(ITEM) "\""}); \
+                    return false;
+            BOOST_PP_SEQ_FOR_EACH(VALUE, context, UnsaveableSiteSettings_Fields)
+            #undef VALUE
+        }
     }
 
-    context->setFailedKeyValue({name.toString(), QJson::serialized(nestedValue)});
-    return false;
+    return QnFusion::deserialize(context, value, target);
 }
 
 void serialize(QnJsonContext* context, const SiteSettings& value, QJsonValue* target)

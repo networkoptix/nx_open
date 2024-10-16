@@ -308,6 +308,7 @@ struct NX_VMS_API BookmarkV1: BookmarkBase, BookmarkIdV1
 };
 #define BookmarkV1_Fields BookmarkBase_Fields BookmarkIdV1_Fields (serverId)
 QN_FUSION_DECLARE_FUNCTIONS(BookmarkV1, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(BookmarkV1, BookmarkV1_Fields)
 
 struct NX_VMS_API BookmarkWithRuleV1: BookmarkV1
 {
@@ -319,6 +320,7 @@ struct NX_VMS_API BookmarkWithRuleV1: BookmarkV1
 };
 #define BookmarkWithRuleV1_Fields BookmarkV1_Fields (eventRuleId)
 QN_FUSION_DECLARE_FUNCTIONS(BookmarkWithRuleV1, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(BookmarkWithRuleV1, BookmarkWithRuleV1_Fields)
 
 /**%apidoc
  * %param[readonly] id
@@ -346,6 +348,7 @@ struct NX_VMS_API BookmarkWithRuleV3: BookmarkV3
 };
 #define BookmarkWithRuleV3_Fields BookmarkV3_Fields (eventRuleId)
 QN_FUSION_DECLARE_FUNCTIONS(BookmarkWithRuleV3, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(BookmarkWithRuleV3, BookmarkWithRuleV3_Fields)
 
 struct NX_VMS_API BookmarkTagFilter
 {

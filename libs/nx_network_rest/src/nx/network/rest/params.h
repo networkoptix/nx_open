@@ -128,7 +128,7 @@ private:
     }
 
     template<typename Field, typename T>
-    void unite(Field& field, T* data, Fields* fields) const;
+    void unite(const Field& field, T* data, Fields* fields) const;
 
 private:
     QMultiMap<QString, QString> m_values;
@@ -177,12 +177,12 @@ void Params::uniteOrThrow(T* data, Fields* fields) const
     else if constexpr (IsInstrumentedV<T>)
     {
         nxReflectVisitAllFields(
-            data, [this, data, fields](auto&&... f) { (unite(f, data, fields), ...); });
+            data, [this, data, fields](auto&&... f) { (this->unite(f, data, fields), ...); });
     }
 }
 
 template<typename Field, typename T>
-void Params::unite(Field& field, T* data, Fields* fields) const
+void Params::unite(const Field& field, T* data, Fields* fields) const
 {
     std::string name{field.name()};
     auto nameQ = QString::fromStdString(name);

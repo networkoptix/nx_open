@@ -5,6 +5,7 @@
 #include <nx/json_rpc/messages.h>
 #include <nx/reflect/json/deserializer.h>
 #include <nx/reflect/urlencoded/deserializer.h>
+#include <nx/utils/void.h>
 
 #include "audit.h"
 #include "exception.h"
@@ -102,19 +103,11 @@ public:
      * `nx::network::http::Method::isMessageBodyAllowed` is true. The query params are used if
      * `nx::network::http::Method::isMessageBodyAllowed` is false or if
      * `ini().allowUrlParametersForAnyMethod` is true. Throws Result::Exception if the
-     * deserialization of the combination is failed.
-     * @param wrapInObject causes non-object payload to be wrapped into object `{"_": payload}` so
-     *     other parameter sources are still accessible.
+     * deserialization of the combination is failed. If some T fields are omitted and content is
+     * not nullptr then content is filled with the calculated request content.
      */
     template<typename T = QJsonValue>
-    T parseContentOrThrow(bool wrapInObject = false) const;
-
-    /**
-     * Result is the same as result of parseContentOrThrow. If some T fields are omitted then
-     * content is filled with the calculated request content.
-     */
-    template<typename T>
-    T parseContentAllowingOmittedValuesOrThrow(std::optional<QJsonValue>* content) const;
+    T parseContentOrThrow(std::optional<QJsonValue>* content = nullptr) const;
 
     using Fields = nx::reflect::DeserializationResult::Fields;
     /**
@@ -125,7 +118,7 @@ public:
 
     /** The safe version of parseContent. */
     template<typename T>
-    std::optional<T> parseContent(bool wrapInObject = false) const;
+    std::optional<T> parseContent() const;
 
     /** Prefer to use Handler::prepareAuditRecord() instead. */
     explicit operator audit::Record() const;
@@ -174,7 +167,6 @@ public:
 private:
     nx::network::http::Method calculateMethod() const;
     Params calculateParams() const;
-    QJsonValue calculateContent(bool useException, bool wrapInObject) const;
 
 private:
     const nx::network::http::Request* const m_httpRequest = nullptr;
@@ -241,63 +233,117 @@ T Request::paramOrThrow(const QString& key) const
 }
 
 template<typename T>
-std::optional<T> Request::parseContent(bool wrapInObject) const
+std::optional<T> Request::parseContent() const
 {
-    const auto value = calculateContent(/*useException*/ false, wrapInObject);
-    if (value.isUndefined())
+    try
+    {
+        return parseContentOrThrow<T>();
+    }
+    catch (const Exception& e)
+    {
+        NX_VERBOSE(this, "Content parsing error: \"%1\"", e.what());
         return std::nullopt;
+    }
+}
 
-    T result;
+template<typename T>
+T Request::parseContentOrThrow(std::optional<QJsonValue>* content) const
+{
+    T data;
+    if constexpr (std::is_same_v<nx::utils::Void, T>)
+        return data;
+
+    Params params;
+    if (ini().allowUrlParametersForAnyMethod
+        || !nx::network::http::Method::isMessageBodyAllowed(method()))
+    {
+        params.unite(m_urlParams);
+    }
+    params.unite(m_pathParams);
     QnJsonContext context;
     context.setAllowStringConversions(true);
-    if (!QJson::deserialize(&context, value, &result))
-        return std::nullopt;
-
-    return result;
-}
-
-template<typename T>
-T Request::parseContentOrThrow(bool wrapInObject) const
-{
-    try
+    const auto deserialize =
+        [content, &context, &data](QJsonValue value)
+        {
+            if (!content)
+                context.setStrictMode(true);
+            if (!QJson::deserialize(&context, value, &data))
+            {
+                throw Exception::invalidParameter(
+                    context.getFailedKeyValue().first, context.getFailedKeyValue().second);
+            }
+            if (content && context.areSomeFieldsNotFound())
+                content->emplace(std::move(value));
+        };
+    const bool hasNonRefParameter = params.hasNonRefParameter();
+    if (m_content && !m_content->body.isEmpty())
     {
-        return QJson::deserializeOrThrow<T>(
-            calculateContent(/*useException*/ true, wrapInObject),
-            /*allowStringConversions*/ true);
+        QJsonObject paramsObject;
+        if (hasNonRefParameter)
+        {
+            paramsObject = params.toJson(/*excludeCommon*/ true);
+            if (!QJson::deserialize(&context, paramsObject, &data))
+            {
+                throw Exception::invalidParameter(
+                    context.getFailedKeyValue().first, context.getFailedKeyValue().second);
+            }
+        }
+        if (m_content->type == http::header::ContentType::kForm)
+        {
+            QUrlQuery urlQuery(
+                QUrl::fromEncoded(m_content->body, QUrl::StrictMode).toString());
+            auto object = Params::fromUrlQuery(urlQuery).toJson(/*excludeCommon*/ true);
+            if (object.isEmpty())
+                throw Exception::badRequest("Failed to parse request data");
+            if (hasNonRefParameter)
+            {
+                for (auto it = paramsObject.begin(); it != paramsObject.end(); ++it)
+                    object.insert(it.key(), it.value());
+            }
+            deserialize(std::move(object));
+        }
+        else if (m_content->type == http::header::ContentType::kJson)
+        {
+            QJsonValue parsedContent;
+            QString error;
+            if (!QJsonDetail::deserialize_json(m_content->body, &parsedContent, &error))
+                throw Exception::badRequest(error);
+            if (parsedContent.isObject() && hasNonRefParameter)
+            {
+                auto object{parsedContent.toObject()};
+                for (auto it = paramsObject.begin(); it != paramsObject.end(); ++it)
+                    object.insert(it.key(), it.value());
+                parsedContent = object;
+            }
+            deserialize(std::move(parsedContent));
+        }
+        else //< TODO: Other content types should go here when supported.
+        {
+            throw Exception::unsupportedMediaType(NX_FMT("Unsupported type: %1", m_content->type));
+        }
     }
-    catch (const QJson::InvalidParameterException& e)
+    else if (m_jsonRpcContext && m_jsonRpcContext->request.params)
     {
-        throw Exception::invalidParameter(e.param(), e.value());
+        if (m_jsonRpcContext->request.params->isObject() && hasNonRefParameter)
+        {
+            auto paramsObject{params.toJson(/*excludeCommon*/ true)};
+            auto object{m_jsonRpcContext->request.params->toObject()};
+            for (auto it = paramsObject.begin(); it != paramsObject.end(); ++it)
+                object.insert(it.key(), it.value());
+            deserialize(std::move(object));
+        }
+        else
+        {
+            deserialize(m_jsonRpcContext->request.params.value());
+        }
     }
-    catch (const QJson::InvalidJsonException& e)
+    else
     {
-        throw Exception::badRequest(e.what());
+        if (!hasNonRefParameter)
+            throw Exception::badRequest("No JSON provided");
+        deserialize(params.toJson(/*excludeCommon*/ true));
     }
-}
-
-template<typename T>
-T Request::parseContentAllowingOmittedValuesOrThrow(std::optional<QJsonValue>* content) const
-{
-    try
-    {
-        auto calculatedContent = calculateContent(/*useException*/ true, /*wrapInObject*/ false);
-        if (calculatedContent.isUndefined())
-            throw Exception::badRequest("No JSON provided.");
-        QnJsonContext ctx;
-        ctx.setAllowStringConversions(true);
-        T result = QJson::deserializeOrThrow<T>(&ctx, calculatedContent);
-        if (ctx.areSomeFieldsNotFound())
-            *content = std::move(calculatedContent);
-        return result;
-    }
-    catch (const QJson::InvalidParameterException& e)
-    {
-        throw Exception::invalidParameter(e.param(), e.value());
-    }
-    catch (const QJson::InvalidJsonException& e)
-    {
-        throw Exception::badRequest(e.what());
-    }
+    return data;
 }
 
 template<typename T>

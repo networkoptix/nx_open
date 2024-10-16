@@ -382,11 +382,12 @@ TEST_F(RestRequestTest, PostWithEmbeddedJson)
     EXPECT_EQ("/some/path", request->decodedPath());
     EXPECT_EQ(Params({{"s", R"json({"b":true,"i":7,"s":"hi"})json"}}), request->params());
 
-    const auto innerData1 = QJson::deserialized<SomeData>(request->paramOrThrow("s").toUtf8());
-    EXPECT_EQ((SomeData{true, 7, "hi"}), innerData1);
+    const auto innerData = QJson::deserialized<SomeData>(request->paramOrThrow("s").toUtf8());
+    EXPECT_EQ((SomeData{true, 7, "hi"}), innerData);
 
-    const auto data = request->parseContent<SomeData>();
+    const auto data = request->parseContent<std::map<QString, SomeData>>();
     ASSERT_TRUE(data);
+    EXPECT_EQ((SomeData{true, 7, "hi"}), data->begin()->second);
 }
 
 TEST_F(RestRequestTest, PostWithUrlParams)
@@ -471,10 +472,10 @@ TEST_F(RestRequestTest, PutJsonInsteadOfEncodedUrl)
 
     try
     {
-        const auto data = request->parseContent<SomeData>();
+        const auto data = request->parseContentOrThrow<SomeData>();
         FAIL() << "did not throw";
     }
-    catch(Exception &e)
+    catch (const Exception& e)
     {
         EXPECT_EQ(e.message(), "Failed to parse request data");
     }
