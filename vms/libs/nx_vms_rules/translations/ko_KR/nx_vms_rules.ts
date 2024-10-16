@@ -331,7 +331,7 @@
     </message>
     <message>
       <source>Set to Fullscreen</source>
-      <translation type="unfinished">Set to Fullscreen</translation>
+      <translation>전체 화면으로 설정</translation>
     </message>
     <message>
       <source>Set for</source>
@@ -435,7 +435,7 @@
     </message>
     <message>
       <source>Authentication Type</source>
-      <translation type="unfinished">Authentication Type</translation>
+      <translation>인증 유형</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -755,7 +755,7 @@
     <name>nx::vms::rules::RepeatSoundAction</name>
     <message>
       <source>Sound</source>
-      <translation type="unfinished">Sound</translation>
+      <translation>소리</translation>
     </message>
     <message>
       <source>Volume</source>
@@ -798,20 +798,20 @@
     </message>
     <message numerus="yes">
       <source>Recording on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>서비스 과부하로 인해 %n 채널의 녹화가 중단되었습니다.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>서비스 초과 사용으로 인해 %n 채널의 클라우드 스토리지 백업이 중단되었습니다.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>서비스 과도한 사용으로 인해 %n 채널의 유료 통합 서비스 사용이 중단되었습니다.</numerusform>
       </translation>
     </message>
   </context>
