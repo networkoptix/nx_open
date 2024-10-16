@@ -177,11 +177,11 @@
     </message>
     <message>
       <source>Your access to this system has expired.</source>
-      <translation type="unfinished">Your access to this system has expired.</translation>
+      <translation>이 시스템에 대한 귀하의 액세스 권한이 만료되었습니다.</translation>
     </message>
     <message>
       <source>Please contact the system administrator to regain access.</source>
-      <translation type="unfinished">Please contact the system administrator to regain access.</translation>
+      <translation>시스템 관리자에게 문의하여 다시 액세스하세요.</translation>
     </message>
     <message>
       <source>Connection to %1 is not ready yet. Check the server&apos;s internet connection or try again later.</source>
@@ -191,12 +191,12 @@
     <message>
       <source>Log in as a %1 user to the system in a shutdown state is forbidden. You can still connect as local user.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">Log in as a %1 user to the system in a shutdown state is forbidden. You can still connect as local user.</translation>
+      <translation>종료 상태에서 시스템에 %1 사용자로 로그인하는 것은 금지되어 있습니다. 로컬 사용자로 연결할 수는 있습니다.</translation>
     </message>
     <message>
       <source>Log in as a %1 user to the system in a suspended state is forbidden. You can still connect as local user.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">Log in as a %1 user to the system in a suspended state is forbidden. You can still connect as local user.</translation>
+      <translation>%1 사용자로 시스템에 일시 중단된 상태로 로그인하는 것은 금지되어 있습니다. 로컬 사용자로 계속 연결할 수 있습니다.</translation>
     </message>
     <message>
       <source>To log in to this System, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
@@ -229,22 +229,22 @@
     </message>
     <message numerus="yes">
       <source>Cannot verify the identity of %n servers</source>
-      <translation type="unfinished">
-        <numerusform>Cannot verify the identity of %n servers</numerusform>
+      <translation>
+        <numerusform>%n 서버의 신원을 확인할 수 없습니다.</numerusform>
       </translation>
     </message>
     <message>
       <source>Review the certificates of the servers from this system.</source>
-      <translation type="unfinished">Review the certificates of the servers from this system.</translation>
+      <translation>이 시스템의 서버 인증서를 검토합니다.</translation>
     </message>
     <message>
       <source>To learn more about the current problem read this %1.</source>
       <comment>%1 is &lt;help article&gt; link</comment>
-      <translation type="unfinished">To learn more about the current problem read this %1.</translation>
+      <translation>현재 문제에 대해 자세히 알아보려면 %1을 읽어보세요.</translation>
     </message>
     <message>
       <source>This might be due to an expired server certificate or an invalid certificate. Contact your system administrator for further investigation.</source>
-      <translation type="unfinished">This might be due to an expired server certificate or an invalid certificate. Contact your system administrator for further investigation.</translation>
+      <translation>만료된 서버 인증서 또는 잘못된 인증서 때문일 수 있습니다. 자세한 조사를 위해 시스템 관리자에게 문의하세요.</translation>
     </message>
     <message>
       <source>Cannot verify the identity of %1</source>
