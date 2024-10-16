@@ -1724,7 +1724,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Additional info required</source>
-      <translation type="unfinished">Additional info required</translation>
+      <translation>추가 정보가 필요합니다</translation>
     </message>
   </context>
   <context>
@@ -2053,15 +2053,15 @@ License Key: %2</source>
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>폴더 선택...</translation>
     </message>
     <message>
       <source>Failed to save logs to the selected folder</source>
-      <translation type="unfinished">Failed to save logs to the selected folder</translation>
+      <translation>선택한 폴더에 로그를 저장하지 못했습니다.</translation>
     </message>
     <message>
       <source>Download complete!</source>
-      <translation type="unfinished">Download complete!</translation>
+      <translation>다운로드 완료!</translation>
     </message>
   </context>
   <context>
@@ -2376,22 +2376,22 @@ License Key: %2</source>
     <message>
       <source>Connected to %1</source>
       <comment>%1 is the Cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connected to %1</translation>
+      <translation>%1에 연결됨</translation>
     </message>
     <message>
       <source>Disconnected from %1</source>
       <comment>%1 is the Cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Disconnected from %1</translation>
+      <translation>%1에서 연결이 끊어졌습니다</translation>
     </message>
     <message>
       <source>Connected to %1 via %2</source>
       <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 6.0.0.0)</comment>
-      <translation type="unfinished">Connected to %1 via %2</translation>
+      <translation>%2를 통해 %1 에 연결됨</translation>
     </message>
     <message>
       <source>Disconnected from %1 via %2</source>
       <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 6.0.0.0)</comment>
-      <translation type="unfinished">Disconnected from %1 via %2</translation>
+      <translation>%1 에서 %2를 통해 연결이 끊어졌습니다.</translation>
     </message>
   </context>
   <context>
@@ -2655,7 +2655,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Apply changes before exiting?</source>
-      <translation type="unfinished">Apply changes before exiting?</translation>
+      <translation>종료하기 전에 변경 사항을 적용하시겠습니까?</translation>
     </message>
   </context>
   <context>
@@ -2697,7 +2697,7 @@ License Key: %2</source>
     <message>
       <source>%1 Running</source>
       <comment>%1 will be substituted with desktop client display name, e.g &apos;NX Witness Client&apos;</comment>
-      <translation type="unfinished">%1 Running</translation>
+      <translation>%1 실행 중</translation>
     </message>
   </context>
   <context>
@@ -3057,7 +3057,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>System will be accessible only through local network.</source>
-      <translation type="unfinished">System will be accessible only through local network.</translation>
+      <translation>시스템은 로컬 네트워크를 통해서만 접근 가능합니다.</translation>
     </message>
     <message>
       <source>There is currently no connection between your system and %1.</source>
@@ -3255,7 +3255,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Failed to log in to System &quot;%1&quot;</source>
-      <translation type="unfinished">Failed to log in to System &quot;%1&quot;</translation>
+      <translation>시스템에 로그인하는 데 실패했습니다 &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Log In...</source>
@@ -3384,7 +3384,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Database successfully restored. Server application will restart shortly.</source>
-      <translation type="unfinished">Database successfully restored. Server application will restart shortly.</translation>
+      <translation>데이터베이스가 성공적으로 복구되었습니다. 서버 애플리케이션이 곧 다시 시작됩니다.</translation>
     </message>
   </context>
   <context>
@@ -3607,7 +3607,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>폴더 선택...</translation>
     </message>
   </context>
   <context>
@@ -4243,7 +4243,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Apply changes before exiting?</source>
-      <translation type="unfinished">Apply changes before exiting?</translation>
+      <translation>종료하기 전에 변경 사항을 적용하시겠습니까?</translation>
     </message>
   </context>
   <context>
@@ -4560,19 +4560,19 @@ License Key: %2</source>
     <name>QnScreenshotLoader</name>
     <message>
       <source>Top left corner</source>
-      <translation type="unfinished">Top left corner</translation>
+      <translation>상단 좌측 모서리</translation>
     </message>
     <message>
       <source>Top right corner</source>
-      <translation type="unfinished">Top right corner</translation>
+      <translation>상단 우측 모서리</translation>
     </message>
     <message>
       <source>Bottom left corner</source>
-      <translation type="unfinished">Bottom left corner</translation>
+      <translation>하단 좌측 모서리</translation>
     </message>
     <message>
       <source>Bottom right corner</source>
-      <translation type="unfinished">Bottom right corner</translation>
+      <translation>하단 우측 모서리</translation>
     </message>
   </context>
   <context>
@@ -4869,11 +4869,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>Servers with failover enabled will automatically take cameras from offline Servers with the same Location ID.</source>
-      <translation type="unfinished">Servers with failover enabled will automatically take cameras from offline Servers with the same Location ID.</translation>
+      <translation>장애 조치가 활성화된 서버는 동일한 위치 ID를 가진 오프라인 서버에서 카메라를 자동으로 가져옵니다.</translation>
     </message>
     <message>
       <source>The certificate received from the Server does not match the pinned certificate.</source>
-      <translation type="unfinished">The certificate received from the Server does not match the pinned certificate.</translation>
+      <translation>서버에서 받은 인증서가 고정된 인증서와 일치하지 않습니다.</translation>
     </message>
     <message>
       <source>Certificate details are not available</source>
@@ -5006,7 +5006,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>INFORMATION REQUIRED</source>
-      <translation type="unfinished">INFORMATION REQUIRED</translation>
+      <translation>필요한 정보</translation>
     </message>
     <message>
       <source>Provide</source>
@@ -5261,7 +5261,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Use to store analytics and motion data</source>
-      <translation type="unfinished">Use to store analytics and motion data</translation>
+      <translation>분석 및 동작 데이터를 저장하기</translation>
     </message>
     <message>
       <source>Stores analytics and motion data</source>
@@ -5378,7 +5378,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Routing</source>
-      <translation type="unfinished">Routing</translation>
+      <translation>라우팅</translation>
     </message>
     <message>
       <source>Plugins</source>
@@ -5527,11 +5527,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Storage for analytics data is not set</source>
-      <translation type="unfinished">Storage for analytics data is not set</translation>
+      <translation>분석 데이터 저장 공간이 설정되지 않았습니다.</translation>
     </message>
     <message>
       <source>System storage is used for analytics data</source>
-      <translation type="unfinished">System storage is used for analytics data</translation>
+      <translation>시스템 저장소는 분석 데이터에 사용됩니다.</translation>
     </message>
     <message>
       <source>Analytics data can take up large amounts of space.</source>
@@ -5539,7 +5539,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>We recommend choosing another location for it instead of the system partition.</source>
-      <translation type="unfinished">We recommend choosing another location for it instead of the system partition.</translation>
+      <translation>시스템 파티션 대신 다른 위치를 선택하는 것이 좋습니다.</translation>
     </message>
     <message>
       <source>Local recording services overused</source>
@@ -5844,7 +5844,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Could not open file &quot;%1&quot;. Please check if the folder is accessible.</source>
-      <translation type="unfinished">Could not open file &quot;%1&quot;. Please check if the folder is accessible.</translation>
+      <translation>파일 &quot;%1&quot;을 열 수 없습니다. 폴더에 접근할 수 있는지 확인하세요.</translation>
     </message>
   </context>
   <context>
@@ -5883,11 +5883,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>No timestamp</source>
-      <translation type="unfinished">No timestamp</translation>
+      <translation>타임스템프 없음</translation>
     </message>
     <message>
       <source>No camera name</source>
-      <translation type="unfinished">No camera name</translation>
+      <translation>카메라 이름이 없습니다</translation>
     </message>
     <message>
       <source>Camera name:</source>
@@ -6325,16 +6325,16 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Only some of the selected devices can be moved to %1</source>
-      <translation type="unfinished">Only some of the selected devices can be moved to %1</translation>
+      <translation>선택한 장치 중 일부만 %1로 이동할 수 있습니다.</translation>
     </message>
     <message>
       <source>Move Partially</source>
-      <translation type="unfinished">Move Partially</translation>
+      <translation>부분적으로 이동</translation>
     </message>
     <message numerus="yes">
       <source>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</source>
-      <translation type="unfinished">
-        <numerusform>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</numerusform>
+      <translation>
+        <numerusform>이 웹 페이지를 Server &quot;%1&quot;로 옮기려고 합니다. 이 웹 페이지는 요청된 모든 콘텐츠를 프록시하고, 프록시 서버는 Server &quot;%1&quot;로 변경됩니다.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -6461,7 +6461,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>SourcePickerWidgetStrings</name>
     <message>
       <source>Select at least one Server</source>
-      <translation type="unfinished">Select at least one Server</translation>
+      <translation>최소한 하나의 서버를 선택하세요</translation>
     </message>
     <message>
       <source>Select at least one user</source>
@@ -6477,7 +6477,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Select at least one I/O module</source>
-      <translation type="unfinished">Select at least one I/O module</translation>
+      <translation>최소한 하나의 I/O 모듈을 선택하세요</translation>
     </message>
     <message>
       <source>Test</source>
@@ -7357,11 +7357,11 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Footage from these cameras is backed up through to %1 %2</source>
       <comment>%1 and %2 will be replaced respectively by the date and time in the system format.</comment>
-      <translation type="unfinished">Footage from these cameras is backed up through to %1 %2</translation>
+      <translation>이 카메라의 영상은 %1 %2까지 백업됩니다.</translation>
     </message>
     <message>
       <source>The progress will be displayed once the backup process starts</source>
-      <translation type="unfinished">The progress will be displayed once the backup process starts</translation>
+      <translation>백업 프로세스가 시작되면 진행 상황이 표시됩니다.</translation>
     </message>
   </context>
   <context>
@@ -7471,7 +7471,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Use if supported</source>
-      <translation type="unfinished">Use if supported</translation>
+      <translation>지원되는 경우 사용하세요</translation>
     </message>
     <message>
       <source>Never</source>
@@ -7677,19 +7677,19 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::CameraReplacementDialog</name>
     <message>
       <source>Failed to replace camera</source>
-      <translation type="unfinished">Failed to replace camera</translation>
+      <translation>카메라 교체 실패</translation>
     </message>
     <message>
       <source>Abort camera replacement?</source>
-      <translation type="unfinished">Abort camera replacement?</translation>
+      <translation>카메라 교체를 중단하시겠습니까?</translation>
     </message>
     <message>
       <source>Will be transferred partially:</source>
-      <translation type="unfinished">Will be transferred partially:</translation>
+      <translation>부분적으로 이전됩니다:</translation>
     </message>
     <message>
       <source>Will not be transferred:</source>
-      <translation type="unfinished">Will not be transferred:</translation>
+      <translation>전송되지 않습니다:</translation>
     </message>
     <message>
       <source>Next</source>
@@ -7701,7 +7701,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Camera for Replacement</source>
-      <translation type="unfinished">Camera for Replacement</translation>
+      <translation>교체용 카메라</translation>
     </message>
     <message>
       <source>Data for Transfer</source>
@@ -10577,7 +10577,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>폴더 선택...</translation>
     </message>
   </context>
   <context>
