@@ -203,7 +203,7 @@
     <name>nx::vms::client::core::BookmarkSearchListModel::Private</name>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>삭제된 카메라</translation>
     </message>
   </context>
   <context>
@@ -259,6 +259,21 @@
     <message>
       <source>To learn more about the current problem view the server&apos;s certificate:</source>
       <translation>현재 문제에 대해 자세히 알아보려면 &apos; 서버의 인증서를 확인하십시오.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::ExtendedCameraOutputController</name>
+    <message>
+      <source>Heater</source>
+      <translation>히터</translation>
+    </message>
+    <message>
+      <source>Wiper</source>
+      <translation>와이퍼</translation>
+    </message>
+    <message>
+      <source>Open Door</source>
+      <translation>문 열기</translation>
     </message>
   </context>
 </TS>

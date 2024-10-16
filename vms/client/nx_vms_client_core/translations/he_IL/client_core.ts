@@ -203,7 +203,7 @@
     <name>nx::vms::client::core::BookmarkSearchListModel::Private</name>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>מצלמה שהוסרה</translation>
     </message>
   </context>
   <context>
@@ -259,6 +259,21 @@
     <message>
       <source>To learn more about the current problem view the server&apos;s certificate:</source>
       <translation>למידע נוסף על הבעיה הנוכחית, עיין באישור של השרת:</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::ExtendedCameraOutputController</name>
+    <message>
+      <source>Heater</source>
+      <translation type="unfinished">Heater</translation>
+    </message>
+    <message>
+      <source>Wiper</source>
+      <translation type="unfinished">Wiper</translation>
+    </message>
+    <message>
+      <source>Open Door</source>
+      <translation type="unfinished">Open Door</translation>
     </message>
   </context>
 </TS>

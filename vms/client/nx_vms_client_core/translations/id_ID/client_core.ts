@@ -261,4 +261,19 @@
       <translation>Untuk mempelajari lebih lanjut tentang masalah saat ini, lihat sertifikat server&apos;:</translation>
     </message>
   </context>
+  <context>
+    <name>nx::vms::client::core::ExtendedCameraOutputController</name>
+    <message>
+      <source>Heater</source>
+      <translation>Heater</translation>
+    </message>
+    <message>
+      <source>Wiper</source>
+      <translation>Wiper</translation>
+    </message>
+    <message>
+      <source>Open Door</source>
+      <translation>Buka Pintu</translation>
+    </message>
+  </context>
 </TS>

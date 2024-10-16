@@ -261,4 +261,19 @@
       <translation>現在の問題の詳細については、サーバーの証明書をご確認ください:</translation>
     </message>
   </context>
+  <context>
+    <name>nx::vms::client::core::ExtendedCameraOutputController</name>
+    <message>
+      <source>Heater</source>
+      <translation>ヒーター</translation>
+    </message>
+    <message>
+      <source>Wiper</source>
+      <translation>ワイパー</translation>
+    </message>
+    <message>
+      <source>Open Door</source>
+      <translation>ドアを開ける</translation>
+    </message>
+  </context>
 </TS>

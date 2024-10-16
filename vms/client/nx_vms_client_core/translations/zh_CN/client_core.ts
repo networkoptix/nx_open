@@ -203,7 +203,7 @@
     <name>nx::vms::client::core::BookmarkSearchListModel::Private</name>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>移除摄像机</translation>
     </message>
   </context>
   <context>
@@ -259,6 +259,21 @@
     <message>
       <source>To learn more about the current problem view the server&apos;s certificate:</source>
       <translation>请检视服务器凭证内容，来了解更多关于此问题的可能原因:</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::ExtendedCameraOutputController</name>
+    <message>
+      <source>Heater</source>
+      <translation>加热器</translation>
+    </message>
+    <message>
+      <source>Wiper</source>
+      <translation>雨刷</translation>
+    </message>
+    <message>
+      <source>Open Door</source>
+      <translation type="unfinished">Open Door</translation>
     </message>
   </context>
 </TS>

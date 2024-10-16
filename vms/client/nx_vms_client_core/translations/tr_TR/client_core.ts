@@ -261,4 +261,19 @@
       <translation>Mevcut sorun hakkında daha fazla bilgi edinmek için sunucu&apos;sertifikasını görüntüleyin:</translation>
     </message>
   </context>
+  <context>
+    <name>nx::vms::client::core::ExtendedCameraOutputController</name>
+    <message>
+      <source>Heater</source>
+      <translation>Isıtıcı</translation>
+    </message>
+    <message>
+      <source>Wiper</source>
+      <translation>Silecek</translation>
+    </message>
+    <message>
+      <source>Open Door</source>
+      <translation>Kapıyı Aç</translation>
+    </message>
+  </context>
 </TS>

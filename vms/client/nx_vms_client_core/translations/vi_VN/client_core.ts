@@ -261,4 +261,19 @@
       <translation>Để tìm hiểu thêm về sự cố hiện tại, hãy xem chứng chỉ của máy chủ:</translation>
     </message>
   </context>
+  <context>
+    <name>nx::vms::client::core::ExtendedCameraOutputController</name>
+    <message>
+      <source>Heater</source>
+      <translation>Sưởi</translation>
+    </message>
+    <message>
+      <source>Wiper</source>
+      <translation>Cần gạt</translation>
+    </message>
+    <message>
+      <source>Open Door</source>
+      <translation>Mở Cửa</translation>
+    </message>
+  </context>
 </TS>

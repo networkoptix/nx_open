@@ -261,4 +261,19 @@
       <translation>Pour en savoir plus sur le problème actuel, consultez le certificat du serveur:</translation>
     </message>
   </context>
+  <context>
+    <name>nx::vms::client::core::ExtendedCameraOutputController</name>
+    <message>
+      <source>Heater</source>
+      <translation>Chauffage</translation>
+    </message>
+    <message>
+      <source>Wiper</source>
+      <translation>Essuie-glaces</translation>
+    </message>
+    <message>
+      <source>Open Door</source>
+      <translation>Ouvrir la porte</translation>
+    </message>
+  </context>
 </TS>

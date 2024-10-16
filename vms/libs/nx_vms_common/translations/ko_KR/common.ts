@@ -36,7 +36,7 @@
     </message>
     <message>
       <source>%1 is not accessible yet. Please try again later.</source>
-      <translation>%1 은(는) 아직 액세스할 수 없습니다. 나중에 다시 시도 해주십시오.</translation>
+      <translation>%1 는 아직 액세스할 수 없습니다. 나중에 다시 시도 해주십시오.</translation>
     </message>
     <message>
       <source>The user is locked out due to several failed attempts. Please try again later.</source>
@@ -52,7 +52,7 @@
     </message>
     <message>
       <source>Internal server error (%1). Please contact your system administrator.</source>
-      <translation>내부 서버 오류(%1)입니다. 시스템 관리자에게 문의하십시오.</translation>
+      <translation>내부 서버 오류 (%1) 입니다. 시스템 관리자에게 문의하십시오.</translation>
     </message>
     <message>
       <source>This user has been disabled by a system administrator.</source>

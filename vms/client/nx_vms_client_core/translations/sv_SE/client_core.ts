@@ -261,4 +261,19 @@
       <translation>För att lära dig mer om det aktuella problemet, se serverns&apos;s certifikat:</translation>
     </message>
   </context>
+  <context>
+    <name>nx::vms::client::core::ExtendedCameraOutputController</name>
+    <message>
+      <source>Heater</source>
+      <translation>Värmare</translation>
+    </message>
+    <message>
+      <source>Wiper</source>
+      <translation>Torkare</translation>
+    </message>
+    <message>
+      <source>Open Door</source>
+      <translation>Öppna dörr</translation>
+    </message>
+  </context>
 </TS>

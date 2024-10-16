@@ -261,4 +261,19 @@
       <translation>請檢視伺服器憑證內容，來了解更多關於此問題的可能原因:</translation>
     </message>
   </context>
+  <context>
+    <name>nx::vms::client::core::ExtendedCameraOutputController</name>
+    <message>
+      <source>Heater</source>
+      <translation>加熱器</translation>
+    </message>
+    <message>
+      <source>Wiper</source>
+      <translation>雨刷</translation>
+    </message>
+    <message>
+      <source>Open Door</source>
+      <translation>開門</translation>
+    </message>
+  </context>
 </TS>
