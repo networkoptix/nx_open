@@ -683,11 +683,11 @@
     </message>
     <message>
       <source>Do not send Stop PTZ command</source>
-      <translation type="unfinished">Do not send Stop PTZ command</translation>
+      <translation>Stop PTZ 명령을 보내지 마세요</translation>
     </message>
     <message>
       <source>Do not record audio</source>
-      <translation type="unfinished">Do not record audio</translation>
+      <translation>오디오를 녹음하지 마십시오</translation>
     </message>
   </context>
   <context>

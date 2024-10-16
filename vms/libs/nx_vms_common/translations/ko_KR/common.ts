@@ -1656,7 +1656,7 @@
     </message>
     <message>
       <source>Semicolon-separated list of Servers designated to connect to the Cloud. Servers at the top of the list have higher priority. If the list is empty a Server for the Cloud connection is selected automatically.</source>
-      <translation type="unfinished">Semicolon-separated list of Servers designated to connect to the Cloud. Servers at the top of the list have higher priority. If the list is empty a Server for the Cloud connection is selected automatically.</translation>
+      <translation>클라우드에 연결하도록 지정된 서버의 세미콜론으로 구분된 목록입니다. 목록 맨 위에 있는 서버는 우선순위가 더 높습니다. 목록이 비어 있으면 클라우드 연결을 위한 서버가 자동으로 선택됩니다.</translation>
     </message>
     <message>
       <source>Maximum number of consecutive RTP errors before the server reconnects the RTSP session.</source>

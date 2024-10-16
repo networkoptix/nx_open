@@ -1031,7 +1031,7 @@
     </message>
     <message>
       <source>User Manual...</source>
-      <translation type="unfinished">User Manual...</translation>
+      <translation>사용 설명서...</translation>
     </message>
     <message numerus="yes">
       <source>Mute Items</source>
@@ -5163,11 +5163,11 @@ to %1</source>
     </message>
     <message>
       <source>RESTRICTED</source>
-      <translation type="unfinished">RESTRICTED</translation>
+      <translation>제한된</translation>
     </message>
     <message>
       <source>Authorize</source>
-      <translation type="unfinished">Authorize</translation>
+      <translation>권한부여</translation>
     </message>
   </context>
   <context>
@@ -6284,7 +6284,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Screen is locked and cannot be changed</source>
-      <translation type="unfinished">Screen is locked and cannot be changed</translation>
+      <translation>화면이 잠겨 있어서 변경할 수 없습니다.</translation>
     </message>
   </context>
   <context>
@@ -8182,7 +8182,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Recording will not be enabled on some cameras.</source>
-      <translation type="unfinished">Recording will not be enabled on some cameras.</translation>
+      <translation>일부 카메라에서는 녹화가 활성화되지 않습니다.</translation>
     </message>
   </context>
   <context>
