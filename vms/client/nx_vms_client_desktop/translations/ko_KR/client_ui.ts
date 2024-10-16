@@ -657,15 +657,15 @@
     </message>
     <message>
       <source>Do not send Stop PTZ command</source>
-      <translation type="unfinished">Do not send Stop PTZ command</translation>
+      <translation>Stop PTZ 명령을 보내지 마세요</translation>
     </message>
     <message>
       <source>Do not record audio</source>
-      <translation type="unfinished">Do not record audio</translation>
+      <translation>오디오를 녹음하지 마십시오</translation>
     </message>
     <message>
       <source>Import from Device</source>
-      <translation type="unfinished">Import from Device</translation>
+      <translation>장치에서 가져오기</translation>
     </message>
     <message>
       <source>Import video automatically</source>
@@ -676,7 +676,7 @@
     <name>CameraHotspotsSettingsWidget</name>
     <message>
       <source>Hotspots</source>
-      <translation type="unfinished">Hotspots</translation>
+      <translation>핫스팟</translation>
     </message>
     <message>
       <source>Add</source>
@@ -1720,15 +1720,15 @@
     </message>
     <message>
       <source>Use Credentials</source>
-      <translation type="unfinished">Use Credentials</translation>
+      <translation>자격 증명 사용</translation>
     </message>
     <message>
       <source>Use Link</source>
-      <translation type="unfinished">Use Link</translation>
+      <translation>링크 사용</translation>
     </message>
     <message>
       <source>Link</source>
-      <translation type="unfinished">Link</translation>
+      <translation>링크</translation>
     </message>
   </context>
   <context>
@@ -1983,7 +1983,7 @@
     </message>
     <message>
       <source>Mail from</source>
-      <translation type="unfinished">Mail from</translation>
+      <translation>전자 우편에서</translation>
     </message>
   </context>
   <context>
@@ -1998,7 +1998,7 @@
     </message>
     <message>
       <source>Sign in to web page</source>
-      <translation type="unfinished">Sign in to web page</translation>
+      <translation>웹 페이지에 로그인하세요</translation>
     </message>
   </context>
   <context>
@@ -2435,23 +2435,23 @@
     <name>SaasInfoWidget</name>
     <message>
       <source>No services found</source>
-      <translation type="unfinished">No services found</translation>
+      <translation>서비스를 찾을 수 없음</translation>
     </message>
     <message>
       <source>Contact your Channel Partner to add services</source>
-      <translation type="unfinished">Contact your Channel Partner to add services</translation>
+      <translation>서비스를 추가하려면 채널 파트너에게 문의하세요.</translation>
     </message>
     <message>
       <source>Channel Partner Contact</source>
-      <translation type="unfinished">Channel Partner Contact</translation>
+      <translation>채널 파트너 연락처</translation>
     </message>
     <message>
       <source>Services Usage</source>
-      <translation type="unfinished">Services Usage</translation>
+      <translation>서비스 이용</translation>
     </message>
     <message>
       <source>Services state</source>
-      <translation type="unfinished">Services state</translation>
+      <translation>서비스 상태</translation>
     </message>
   </context>
   <context>
@@ -2584,7 +2584,7 @@
     </message>
     <message>
       <source>Display servers in tree for non-power users</source>
-      <translation type="unfinished">Display servers in tree for non-power users</translation>
+      <translation>관리자가 아닌 사용자를 위해 트리에 서버 표시</translation>
     </message>
   </context>
   <context>
@@ -2910,11 +2910,11 @@
     </message>
     <message>
       <source>Add Group</source>
-      <translation type="unfinished">Add Group</translation>
+      <translation>그룹 추가</translation>
     </message>
     <message>
       <source>Del</source>
-      <translation type="unfinished">Del</translation>
+      <translation>삭제</translation>
     </message>
   </context>
   <context>
@@ -2929,7 +2929,7 @@
     </message>
     <message>
       <source>Del</source>
-      <translation type="unfinished">Del</translation>
+      <translation>삭제</translation>
     </message>
   </context>
   <context>
