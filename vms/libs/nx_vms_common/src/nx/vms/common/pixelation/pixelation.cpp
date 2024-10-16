@@ -799,10 +799,19 @@ void BlurProcess::uploadData(QRhiResourceUpdateBatch* updateBatch)
 
     if (m_isVertexBufferChanged)
     {
+        const auto verticesSize = m_vertices.size() * sizeof(Vertex);
+        if (m_vertexBuffer->size() < verticesSize || verticesSize * 2 < m_vertexBuffer->size())
+        {
+            m_vertexBuffer->setSize(verticesSize);
+            NX_ASSERT(
+                m_vertexBuffer->create(),
+                "Failed to create buffer with size %1", verticesSize);
+        }
+
         updateBatch->uploadStaticBuffer(
             m_vertexBuffer.get(),
             /*offset*/ 0,
-            m_vertices.size() * sizeof(Vertex),
+            verticesSize,
             m_vertices.data());
 
         m_isVertexBufferChanged = false;
