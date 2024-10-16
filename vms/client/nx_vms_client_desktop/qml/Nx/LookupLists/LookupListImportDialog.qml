@@ -245,7 +245,7 @@ ModalDialog
         {
             text: qsTr("Import")
             isAccentButton: true
-            enabled: tableView.correct
+            enabled: tableView.valid && previewProcessor.valid
             onClicked:
             {
                 importProcessor.importListEntries(
@@ -278,11 +278,37 @@ ModalDialog
     {
         id: previewProcessor
 
+
+        function processPreviewBuildExitCode(exitCode)
+        {
+            previewProcessor.correct = exitCode === LookupListPreviewProcessor.Success
+
+            switch (exitCode)
+            {
+                case LookupListPreviewProcessor.Success:
+                    break;
+                case LookupListPreviewProcessor.EmptyFileError:
+                    MessageBox.exec(MessageBox.Icon.Critical,
+                        qsTr("Could not import selected file"),
+                        qsTr("The file appears to be empty."),
+                        MessageBox.Ok);
+                    break;
+                case LookupListPreviewProcessor.ErrorFileNotFound:
+                    MessageBox.exec(MessageBox.Icon.Critical,
+                        qsTr("Could not open file"),
+                        qsTr("Please ensure the selected file exists and you have access."),
+                        MessageBox.Ok);
+                    break;
+                default:
+                    break;
+            }
+        }
+
         function initImportModel()
         {
-            //< Had to explicitly check this property, since it can be uninitialized when Dialog is created.
+            // Had to explicitly check this property, since it can be uninitialized when Dialog is created.
             if (importModel.lookupListEntriesModel)
-                buildTablePreview(importModel, filePath, separator, dataHasHeaderRow)
+                processPreviewBuildExitCode(buildTablePreview(importModel, filePath, separator, dataHasHeaderRow))
         }
 
         rowsNumber: 10

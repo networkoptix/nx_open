@@ -157,13 +157,14 @@ protected:
         m_entriesModel->setTaxonomy(stateView());
     }
 
-    void givenLookupListEntriesModel(const LookupListData& data)
+    void givenLookupListEntriesModel(const LookupListData& data, bool allowEmpty = false)
     {
         m_entriesModel = std::make_shared<LookupListEntriesModel>();
         auto lookupList = new LookupListModel(data, m_entriesModel.get());
         m_entriesModel->setListModel(lookupList);
         m_entriesModel->setTaxonomy(stateView());
-        ASSERT_GT(m_entriesModel->rowCount(), 0);
+        if (!allowEmpty)
+            ASSERT_GT(m_entriesModel->rowCount(), 0);
     }
 
     void whenAddEntries(const std::vector<QVariantMap>& entries)
@@ -233,13 +234,15 @@ protected:
         m_exportTestFile.close();
     }
 
-    void whenBuildTablePreview()
+    void whenBuildTablePreview(LookupListPreviewProcessor::PreviewBuildResult code =
+        LookupListPreviewProcessor::PreviewBuildResult::Success)
     {
         whenExportModelToFile();
 
         LookupListPreviewProcessor previewProcessor;
-        ASSERT_TRUE(previewProcessor.buildTablePreview(
-            m_importModel.get(), m_exportTestFile.fileName(), ",", true));
+        const auto buildTablePreviewResult = previewProcessor.buildTablePreview(
+            m_importModel.get(), m_exportTestFile.fileName(), ",", true);
+        ASSERT_EQ(buildTablePreviewResult, code);
         m_exportTestFile.remove();
     }
 
@@ -650,6 +653,19 @@ TEST_F(LookupListTests, export_build_import_preview_lookup_list)
 {
     for (auto& testData: exampleDataList())
         checkBuildingLookupListPreviewModel(testData, testData);
+}
+/**
+ * Check export and building of import preview for empty LookupList.
+ */
+TEST_F(LookupListTests, export_build_import_preview_empty_lookup_list)
+{
+    LookupListData data = derivedObjectExampleData();
+    data.entries.clear();
+
+    givenLookupListEntriesModel(data, true);
+    givenImportModel(data);
+    whenBuildTablePreview(LookupListPreviewProcessor::EmptyFileError);
+    thenRowCountIs(data.entries.size(), m_entriesModel.get());
 }
 
 TEST_F(LookupListTests, exported_data_is_valid)

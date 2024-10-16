@@ -24,6 +24,7 @@ struct LookupListPreviewProcessor::Private
     QString separator;
     QString filePath;
     bool dataHasHeaderRow = true;
+    bool valid = false;
 };
 
 LookupListPreviewProcessor::LookupListPreviewProcessor(QObject* parent):
@@ -73,44 +74,65 @@ bool LookupListPreviewProcessor::setImportFilePathFromDialog()
     return true;
 }
 
-bool LookupListPreviewProcessor::buildTablePreview(LookupListImportEntriesModel* model,
+LookupListPreviewProcessor::PreviewBuildResult LookupListPreviewProcessor::buildTablePreview(
+    LookupListImportEntriesModel* model,
     const QString& filePath,
     const QString& separator,
     bool hasHeader)
 {
     if (!NX_ASSERT(model))
-        return false;
+        return InternalError;
 
-    if (filePath.isEmpty() || separator.isEmpty())
-        return false;
+    if (separator.isEmpty())
+        return InternalError;
+
+    if (filePath.isEmpty())
+        return ErrorFileNotFound;
 
     QFile file(filePath);
-    if (file.open(QIODevice::ReadOnly))
+    if (!file.open(QIODevice::ReadOnly))
+        return ErrorFileNotFound;
+
+    int lineIndex = 0;
+    QTextStream in(&file);
+
+    LookupListImportEntriesModel::PreviewRawData newData;
+    while (!in.atEnd() && lineIndex <= d->rowsNumber)
     {
-        int lineIndex = 0;
-        QTextStream in(&file);
-
-        LookupListImportEntriesModel::PreviewRawData newData;
-        while (!in.atEnd() && lineIndex <= d->rowsNumber)
+        QString fileLine = in.readLine();
+        if (hasHeader && lineIndex == 0)
         {
-            QString fileLine = in.readLine();
-            if (hasHeader && lineIndex == 0)
-            {
-                ++lineIndex;
-                continue;
-            }
-
-            std::vector<QVariant> line;
-            for(const auto& value: fileLine.split(separator))
-                line.push_back(value);
-
-            newData.push_back(line);
             ++lineIndex;
+            continue;
         }
-        model->setRawData(newData);
-        return true;
+
+        std::vector<QVariant> line;
+        for (const auto& value: fileLine.split(separator))
+            line.push_back(value);
+
+        newData.push_back(line);
+        ++lineIndex;
     }
-    return false;
+
+    if (newData.empty())
+        return EmptyFileError;
+
+    model->setRawData(newData);
+    return Success;
+}
+
+bool LookupListPreviewProcessor::valid()
+{
+    return d->valid;
+}
+
+void LookupListPreviewProcessor::setValid(bool isValid)
+{
+    if (d->valid == isValid)
+        return;
+
+    d->valid = isValid;
+    emit validChanged(d->valid);
 }
 
 LookupListPreviewProcessor::~LookupListPreviewProcessor()

@@ -13,7 +13,7 @@ CoreItems.TableView
 {
     id: control
 
-    property bool correct: true
+    property bool valid: true
     boundsBehavior: CoreItems.Flickable.StopAtBounds
     topMargin: columnsHeader.height
     clip: true
@@ -125,7 +125,7 @@ CoreItems.TableView
                     {
                         control.model.headerIndexChanged(index, currentText)
                         headerRow.reassignDependantColumns(currentText, index)
-                        control.correct = !headerRow.columnWithoutSelectionExist()
+                        control.valid = !headerRow.columnWithoutSelectionExist()
                     }
 
                     Connections

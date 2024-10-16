@@ -81,6 +81,9 @@ bool LookupListImportEntriesModel::Private::allValuesEmpty(const QVariantMap& en
 
 void LookupListImportEntriesModel::Private::adjustHeadersToMatchPreview()
 {
+    if (previewData.empty())
+        return;
+
     const auto previewColumnCount = previewData.front().size();
     const auto currentColumnHeaderCount = columnHeaders.size();
     if (!previewColumnCount || previewColumnCount == currentColumnHeaderCount)
