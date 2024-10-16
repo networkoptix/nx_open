@@ -2,52 +2,42 @@
 
 #pragma once
 
-#include <core/resource/camera_bookmark_fwd.h>
-#include <nx/vms/client/desktop/workbench/widgets/base_tooltip.h>
+#include <QtQuickWidgets/QQuickWidget>
 
-class QLayout;
-class QPushButton;
-
-namespace nx::vms::client::core { class ColorizedIconDeclaration; }
+#include <core/resource/camera_bookmark.h>
 
 namespace nx::vms::client::desktop::workbench::timeline {
 
-class BookmarkTooltip: public BaseTooltip
+class BookmarkTooltip: public QQuickWidget
 {
     Q_OBJECT
 
-    using base_type = BaseTooltip;
+    using base_type = QQuickWidget;
 
 public:
-    BookmarkTooltip(
-        const QnCameraBookmarkList& bookmarks,
-        bool readOnly,
-        QWidget* parent = nullptr);
+    explicit BookmarkTooltip(common::CameraBookmarkList bookmarks, QWidget* parent = nullptr);
+
     void setAllowExport(bool allowExport);
+    void setReadOnly(bool readOnly);
+
+    Q_INVOKABLE void onPlayClicked(int index);
+    Q_INVOKABLE void onEditClicked(int index);
+    Q_INVOKABLE void onExportClicked(int index);
+    Q_INVOKABLE void onDeleteClicked(int index);
 
 signals:
-    void playClicked(const QnCameraBookmark& bookmark);
-    void editClicked(const QnCameraBookmark& bookmark);
-    void exportClicked(const QnCameraBookmark& bookmark);
-    void deleteClicked(const QnCameraBookmark& bookmark);
+    void playClicked(const common::CameraBookmark& bookmark);
+    void editClicked(const common::CameraBookmark& bookmark);
+    void exportClicked(const common::CameraBookmark& bookmark);
+    void deleteClicked(const common::CameraBookmark& bookmark);
     void tagClicked(const QString& tag);
 
 protected:
-    virtual void colorizeBorderShape(const QPainterPath& borderShape) override;
+    void resizeEvent(QResizeEvent* event) override;
+    bool eventFilter(QObject *obj, QEvent *event) override;
 
 private:
-    QWidget* createMoreItemsLabel();
-    QWidget* createBookmarkSeparator();
-    QWidget* createNameLabel(const QString& text);
-    QWidget* createDescriptionLabel(const QString& text);
-    QWidget* createTagButton(const QString& tag);
-    QWidget* createInternalSeparator();
-    QPushButton* createButton(const core::ColorizedIconDeclaration& iconName, const QString& toolTip);
-    QLayout* createButtonsLayout(const QnCameraBookmark& bookmark);
-
-private:
-    bool m_readOnly = false;
-    QPushButton* m_exportButton = nullptr;
+    common::CameraBookmarkList m_bookmarks;
 };
 
 } // namespace nx::vms::client::desktop::workbench::timeline

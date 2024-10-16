@@ -27,7 +27,7 @@ namespace
         kBookmarkExportActionEventId
     };
 
-    static constexpr int kTooltipTailYOffset = -1;
+    static constexpr int kTooltipTailYOffset = 4;
 
     ///
 
@@ -221,7 +221,12 @@ bool QnBookmarksViewer::Impl::readOnly() const
 
 void QnBookmarksViewer::Impl::setReadOnly(bool readonly)
 {
+    if (m_readonly == readonly)
+        return;
+
     m_readonly = readonly;
+    if (m_bookmarkTooltip)
+        m_bookmarkTooltip->setReadOnly(m_readonly);
 }
 
 void QnBookmarksViewer::Impl::setAllowExport(bool allowExport)
@@ -328,39 +333,51 @@ void QnBookmarksViewer::Impl::updateBookmarks(QnCameraBookmarkList bookmarks)
         if (!m_bookmarkTooltip)
         {
             m_bookmarkTooltip = new workbench::timeline::BookmarkTooltip(
-                bookmarks, readOnly(), m_tooltipParentWidget);
+                bookmarks, m_tooltipParentWidget);
+            m_bookmarkTooltip->setReadOnly(readOnly());
             m_bookmarkTooltip->setAllowExport(m_allowExport);
             m_bookmarkTooltip->setVisible(true);
             m_bookmarkTooltip->move(1000, 300);
             if (m_timelineHoverProcessor)
                 m_timelineHoverProcessor->addTargetWidget(m_bookmarkTooltip);
+
             m_bookmarkHoverProcessor->addTargetWidget(m_bookmarkTooltip);
 
-            connect(m_bookmarkTooltip, &workbench::timeline::BookmarkTooltip::playClicked,
-                [this](const QnCameraBookmark& bookmark)
+            connect(
+                m_bookmarkTooltip,
+                &workbench::timeline::BookmarkTooltip::playClicked,
+                [this](const nx::vms::common::CameraBookmark& bookmark)
                 {
                     qApp->postEvent(this, new BookmarkActionEvent(
                         kBookmarkPlayActionEventId, bookmark));
                 });
-            connect(m_bookmarkTooltip, &workbench::timeline::BookmarkTooltip::editClicked,
-                [this](const QnCameraBookmark& bookmark)
+            connect(
+                m_bookmarkTooltip,
+                &workbench::timeline::BookmarkTooltip::editClicked,
+                [this](const nx::vms::common::CameraBookmark& bookmark)
                 {
                     qApp->postEvent(this, new BookmarkActionEvent(
                         kBookmarkEditActionEventId, bookmark));
                 });
-            connect(m_bookmarkTooltip, &workbench::timeline::BookmarkTooltip::exportClicked,
-                [this](const QnCameraBookmark& bookmark)
+            connect(
+                m_bookmarkTooltip,
+                &workbench::timeline::BookmarkTooltip::exportClicked,
+                [this](const nx::vms::common::CameraBookmark& bookmark)
                 {
                     qApp->postEvent(this, new BookmarkActionEvent(
                         kBookmarkExportActionEventId, bookmark));
                 });
-            connect(m_bookmarkTooltip, &workbench::timeline::BookmarkTooltip::deleteClicked,
-                [this](const QnCameraBookmark& bookmark)
+            connect(
+                m_bookmarkTooltip,
+                &workbench::timeline::BookmarkTooltip::deleteClicked,
+                [this](const nx::vms::common::CameraBookmark& bookmark)
                 {
                     qApp->postEvent(this, new BookmarkActionEvent(
                         kBookmarkRemoveActionEventId, bookmark));
                 });
-            connect(m_bookmarkTooltip, &workbench::timeline::BookmarkTooltip::tagClicked,
+            connect(
+                m_bookmarkTooltip,
+                &workbench::timeline::BookmarkTooltip::tagClicked,
                 [this](const QString& tag)
                 {
                     qApp->postEvent(this, new TagActionEvent(kTagClickedActionEventId, tag));
@@ -411,11 +428,16 @@ void QnBookmarksViewer::Impl::updatePosition(const QnBookmarksViewer::PosAndBoun
     if (!m_bookmarkTooltip)
         return;
 
-    const QPoint tailPos = params.first.toPoint() + QPoint(0, kTooltipTailYOffset);
-    const int minBorderX = (int) params.second.first;
-    const int maxBorderX = (int) params.second.second;
+    const auto leftBorder =
+        m_tooltipParentWidget->mapToGlobal(QPoint{static_cast<int>(params.second.first), 0}).x();
+    const auto rightBorder =
+        m_tooltipParentWidget->mapToGlobal(QPoint{static_cast<int>(params.second.second), 0}).x();
 
-    m_bookmarkTooltip->pointTo(tailPos, {QPoint(minBorderX, 0), QPoint(maxBorderX, 0)});
+    auto targetPoint = m_tooltipParentWidget->mapToGlobal(params.first.toPoint());
+    targetPoint.setY(targetPoint.y() - m_bookmarkTooltip->height() - kTooltipTailYOffset);
+    targetPoint.setX(std::clamp(targetPoint.x(), leftBorder, rightBorder - m_bookmarkTooltip->width()));
+
+    m_bookmarkTooltip->move(targetPoint);
 }
 
 QnCameraBookmarkList QnBookmarksViewer::Impl::getBookmarks() const

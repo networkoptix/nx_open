@@ -9,6 +9,7 @@ Rectangle
 {
     property alias text: label.text
     property alias textColor: label.color
+    property alias textCapitalization: label.font.capitalization
 
     width: label.width + 8
     height: 16

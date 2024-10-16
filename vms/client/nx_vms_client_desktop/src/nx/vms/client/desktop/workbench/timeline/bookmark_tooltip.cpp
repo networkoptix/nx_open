@@ -2,338 +2,114 @@
 
 #include "bookmark_tooltip.h"
 
-#include <QtGui/QPainter>
-#include <QtWidgets/QLabel>
-#include <QtWidgets/QPushButton>
-#include <QtWidgets/QVBoxLayout>
+#include <QtQuick/QQuickItem>
 
 #include <core/resource/camera_bookmark.h>
-#include <flowlayout/flowlayout.h>
-#include <nx/vms/client/core/skin/color_theme.h>
-#include <nx/vms/client/core/skin/skin.h>
-#include <nx/vms/client/desktop/common/utils/custom_painted.h>
-#include <nx/vms/client/desktop/ini.h>
-#include <nx/vms/client/desktop/skin/font_config.h>
+#include <nx/vms/client/desktop/application_context.h>
 
 namespace nx::vms::client::desktop::workbench::timeline {
 
 namespace {
 
-static constexpr int kWidgetWidth = 252;
-static constexpr qsizetype kMaxBookmarksNumber = 3;
-static constexpr int kRoundingRadius = 2;
-static constexpr BaseTooltip::TailGeometry kTailGeometry = {3, 6, 2};
-
-bool paintButtonFunction(QPainter* painter, const QStyleOption* /*option*/, const QWidget* widget)
+QVariantList toVariantList(const common::CameraBookmarkList& bookmarks)
 {
-    const QPushButton* thisButton = qobject_cast<const QPushButton*>(widget);
+    QVariantList result;
+    for (const auto& bookmark: bookmarks)
+    {
+        QVariantMap bookmarkData;
+        bookmarkData.insert("name", bookmark.name);
+        bookmarkData.insert("description", bookmark.description);
+        bookmarkData.insert("tags", QVariant::fromValue(bookmark.tags));
+        bookmarkData.insert(
+            "dateTime", QDateTime::fromMSecsSinceEpoch(bookmark.creationTime().count()));
 
-    QIcon::Mode mode = QnIcon::Normal;
+        result.push_back(bookmarkData);
+    }
 
-    if (!thisButton->isEnabled())
-        mode = QnIcon::Disabled;
-    else if (thisButton->isDown())
-        mode = QnIcon::Pressed;
-    else if (thisButton->underMouse())
-        mode = QnIcon::Active;
-
-    thisButton->icon().paint(painter, thisButton->rect(), Qt::AlignCenter,
-        mode, thisButton->isChecked() ? QIcon::On : QIcon::Off);
-
-    return true;
+    return result;
 }
-
-const core::SvgIconColorer::ThemeSubstitutions kBookmarkTheme = {
-    {QnIcon::Normal, {.primary = "light4", .secondary="brand"}}
-};
-
-NX_DECLARE_COLORIZED_ICON(kPlayIcon, "20x20/Solid/play.svg", kBookmarkTheme)
-NX_DECLARE_COLORIZED_ICON(kEditIcon, "20x20/Solid/edit.svg", kBookmarkTheme)
-NX_DECLARE_COLORIZED_ICON(kDownloadIcon, "20x20/Solid/download.svg", kBookmarkTheme)
-NX_DECLARE_COLORIZED_ICON(kDeleteIcon, "20x20/Solid/delete.svg", kBookmarkTheme)
-NX_DECLARE_COLORIZED_ICON(kSharedIcon, "30x30/Solid/bookmarks_shared.svg", kBookmarkTheme)
 
 } // namespace
 
-BookmarkTooltip::BookmarkTooltip(
-    const QnCameraBookmarkList& bookmarks,
-    bool readOnly,
-    QWidget* parent)
-    :
-    base_type(Qt::BottomEdge, /*filterEvents*/ false, parent),
-    m_readOnly(readOnly)
+BookmarkTooltip::BookmarkTooltip(common::CameraBookmarkList bookmarks, QWidget* parent):
+    QQuickWidget(appContext()->qmlEngine(), parent),
+    m_bookmarks{std::move(bookmarks)}
 {
-    setRoundingRadius(kRoundingRadius);
-    setTailGeometry(kTailGeometry);
+    // For semi-transparency:
+    setAttribute(Qt::WA_AlwaysStackOnTop);
     setAttribute(Qt::WA_TranslucentBackground);
-    setMouseTracking(true);
-    setFixedWidth(kWidgetWidth);
 
-    QVBoxLayout* layout = new QVBoxLayout();
+    setResizeMode(QQuickWidget::SizeViewToRootObject);
+    setSource(QUrl("Nx/Timeline/BookmarkTooltip.qml"));
 
-    constexpr auto kMainLayoutLeftRightMargin = 1;
-    layout->setContentsMargins(
-        kMainLayoutLeftRightMargin, 0, kMainLayoutLeftRightMargin, 2 + tailGeometry().height);
-    layout->setSpacing(0);
+    setClearColor(Qt::transparent);
 
-    bool addSeparator = false;
+    const auto flags = windowFlags();
+    setWindowFlags(flags | Qt::ToolTip | Qt::NoDropShadowWindowHint | Qt::FramelessWindowHint);
 
-    if (bookmarks.size() > kMaxBookmarksNumber)
-    {
-        layout->addWidget(createMoreItemsLabel());
-        addSeparator = true;
-    }
-
-    for (int i = 0; i < std::min<int>(bookmarks.size(), kMaxBookmarksNumber); ++i)
-    {
-        const auto& bookmark = bookmarks[i];
-
-        if (addSeparator)
-        {
-            layout->addWidget(createBookmarkSeparator());
-            addSeparator = true;
-        }
-
-        constexpr auto kBookmarkLayoutLeftRightMargin = 14;
-        QVBoxLayout* topBookmarkLayout = new QVBoxLayout();
-        topBookmarkLayout->setContentsMargins(
-            kBookmarkLayoutLeftRightMargin, 12, kBookmarkLayoutLeftRightMargin, 0);
-        topBookmarkLayout->setSpacing(16);
-
-        QVBoxLayout* nameLayout = new QVBoxLayout();
-        nameLayout->setSpacing(4);
-
-        QHBoxLayout* titleLayout = new QHBoxLayout();
-        titleLayout->addWidget(createNameLabel(bookmark.name));
-
-        if (bookmark.shareable())
-        {
-            titleLayout->addStretch();
-            auto shareableLabel = new QLabel();
-            shareableLabel->setPixmap(
-                qnSkin->icon(kSharedIcon).pixmap(30, 30));
-            shareableLabel->setToolTip(tr("Shared by link"));
-            titleLayout->addWidget(shareableLabel);
-        }
-
-        nameLayout->addLayout(titleLayout);
-
-        if (!bookmark.description.isEmpty())
-        {
-            const auto descriptionLabel = createDescriptionLabel(bookmark.description);
-            descriptionLabel->setFixedWidth(
-                kWidgetWidth - kMainLayoutLeftRightMargin * 2 - kBookmarkLayoutLeftRightMargin * 2);
-            nameLayout->addWidget(descriptionLabel);
-        }
-
-        topBookmarkLayout->addLayout(nameLayout);
-
-        if (!bookmark.tags.isEmpty())
-        {
-            auto tagsLayout = new FlowLayout();
-            tagsLayout->setSpacing(2, 2);
-
-            enum { kMaxTags = 16 };
-
-            int tagNumber = 0;
-            for (const QString& tag: bookmark.tags)
-            {
-                if (tag.isEmpty())
-                    continue;
-
-                if (++tagNumber > kMaxTags)
-                    break;
-
-                tagsLayout->addWidget(createTagButton(tag));
-            }
-
-            topBookmarkLayout->addLayout(tagsLayout);
-        }
-
-        topBookmarkLayout->addWidget(createInternalSeparator());
-
-        layout->addLayout(topBookmarkLayout);
-
-        layout->addLayout(createButtonsLayout(bookmark));
-    }
-
-    setLayout(layout);
+    rootObject()->setProperty("self", QVariant::fromValue(this));
+    rootObject()->setProperty("bookmarks", toVariantList(m_bookmarks));
 }
 
 void BookmarkTooltip::setAllowExport(bool allowExport)
 {
-    m_exportButton->setVisible(allowExport);
+    rootObject()->setProperty("allowExport", allowExport);
 }
 
-void BookmarkTooltip::colorizeBorderShape(const QPainterPath& borderShape)
+void BookmarkTooltip::setReadOnly(bool readOnly)
 {
-    QPainter(this).fillPath(borderShape, QBrush(core::ColorTheme::transparent(
-        core::colorTheme()->color("timeline.bookmark.background"), 0.8)));
+    rootObject()->setProperty("readOnly", readOnly);
 }
 
-QWidget* BookmarkTooltip::createMoreItemsLabel()
+void BookmarkTooltip::onPlayClicked(int index)
 {
-    static const auto kMoreItemsCaption = tr("Zoom timeline\nto view more bookmarks",
-        "It is highly recommended to split message in two lines");
-
-    auto moreItemsLabel = new QLabel(kMoreItemsCaption, this);
-    moreItemsLabel->setMargin(0);
-    moreItemsLabel->setAlignment(Qt::AlignCenter);
-    moreItemsLabel->setWordWrap(true);
-    moreItemsLabel->setStyleSheet(QStringLiteral("color: %1;")
-        .arg(core::colorTheme()->color("timeline.bookmark.more_items_label").name()));
-
-    QFont font = moreItemsLabel->font();
-    font.setPixelSize(fontConfig()->small().pixelSize());
-    font.setBold(true);
-    moreItemsLabel->setFont(font);
-    moreItemsLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-
-    return moreItemsLabel;
+    if (NX_ASSERT(index >= 0 && index < m_bookmarks.size()))
+        emit playClicked(m_bookmarks.at(index));
 }
 
-QWidget* BookmarkTooltip::createBookmarkSeparator()
+void BookmarkTooltip::onEditClicked(int index)
 {
-    QFrame* bookmarkSeparator = new QFrame(this);
-    bookmarkSeparator->setFrameShape(QFrame::StyledPanel);
-    bookmarkSeparator->setFixedHeight(3);
-    bookmarkSeparator->setStyleSheet(QStringLiteral(
-        "border-top: 2px solid %1;"
-        "border-bottom: 1px solid %2;")
-        .arg(core::colorTheme()->color("timeline.bookmark.thick_line").name(),
-             core::colorTheme()->color("timeline.bookmark.thin_line").name()));
-
-    return bookmarkSeparator;
+    if (NX_ASSERT(index >= 0 && index < m_bookmarks.size()))
+        emit editClicked(m_bookmarks.at(index));
 }
 
-QWidget* BookmarkTooltip::createNameLabel(const QString& text)
+void BookmarkTooltip::onExportClicked(int index)
 {
-    auto nameLabel = new QLabel(text, this);
-    nameLabel->setMargin(0);
-    nameLabel->setStyleSheet(QStringLiteral("color: %1;")
-        .arg(core::colorTheme()->color("timeline.bookmark.label").name()));
-
-    QFont font = nameLabel->font();
-    font.setPixelSize(16);
-    font.setBold(true);
-    nameLabel->setFont(font);
-
-    return nameLabel;
+    if (NX_ASSERT(index >= 0 && index < m_bookmarks.size()))
+        emit exportClicked(m_bookmarks.at(index));
 }
 
-QWidget* BookmarkTooltip::createDescriptionLabel(const QString& text)
+void BookmarkTooltip::onDeleteClicked(int index)
 {
-    auto descriptionLabel = new QLabel(text, this);
-    descriptionLabel->setWordWrap(true);
-    descriptionLabel->setStyleSheet(QStringLiteral("color: %1;")
-        .arg(core::colorTheme()->color("timeline.bookmark.label").name()));
-
-    QFont font = descriptionLabel->font();
-    font.setPixelSize(12);
-    descriptionLabel->setFont(font);
-    descriptionLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-
-    return descriptionLabel;
+    if (NX_ASSERT(index >= 0 && index < m_bookmarks.size()))
+        emit deleteClicked(m_bookmarks.at(index));
 }
 
-QWidget* BookmarkTooltip::createTagButton(const QString& tag)
+void BookmarkTooltip::resizeEvent(QResizeEvent* event)
 {
-    QPushButton* tagButton = new QPushButton(tag, this);
-    tagButton->setObjectName("BookmarkTooltipTagButton");
-    tagButton->setStyleSheet(QStringLiteral(
-        "QPushButton{ padding: 4px; border-radius: 0px; font: bold; font-size: 11px; }"
-        "QPushButton:!hover{ background-color: %1; color: %2; }"
-        "QPushButton:hover{ background-color: %3; color: %4; }"
-        "QPushButton:pressed{ background-color: %5; color: %6; }")
-        .arg(core::colorTheme()->color("timeline.bookmark.button.background").name(),
-             core::colorTheme()->color("timeline.bookmark.button.text").name(),
-             core::colorTheme()->color("timeline.bookmark.button.background_hover").name(),
-             core::colorTheme()->color("timeline.bookmark.button.text_hover").name(),
-             core::colorTheme()->color("timeline.bookmark.button.background_pressed").name(),
-             core::colorTheme()->color("timeline.bookmark.button.text_pressed").name()));
-    connect(tagButton, &QPushButton::pressed, [this, tag]
-        {
-            emit tagClicked(tag);
-        });
-
-    return tagButton;
-}
-
-QWidget* BookmarkTooltip::createInternalSeparator()
-{
-    QFrame* internalSeparator = new QFrame(this);
-    internalSeparator->setFrameShape(QFrame::StyledPanel);
-    internalSeparator->setFixedHeight(1);
-    internalSeparator->setStyleSheet(QStringLiteral("border-top: 1px solid %1;")
-        .arg(core::colorTheme()->color("timeline.bookmark.thin_line").name()));
-
-    return internalSeparator;
-}
-
-QPushButton* BookmarkTooltip::createButton(
-    const core::ColorizedIconDeclaration& iconDecl, const QString& toolTip)
-{
-    enum { kSize = 30 };
-
-    auto button = new CustomPainted<QPushButton>(this);
-    button->setCustomPaintFunction(paintButtonFunction);
-    button->setIcon(qnSkin->icon(iconDecl));
-    button->setFixedSize(kSize, kSize);
-    button->setToolTip(toolTip);
-
-    return button;
-}
-
-QLayout* BookmarkTooltip::createButtonsLayout(const QnCameraBookmark& bookmark)
-{
-    QHBoxLayout* buttonLayout = new QHBoxLayout();
-    buttonLayout->setSpacing(0);
-    buttonLayout->setContentsMargins(10, 10, 10, 10);
-
-    auto playButton = createButton(kPlayIcon, tr("Play bookmark from the beginning"));
-    playButton->setObjectName("BookmarkTooltipPlayButton");
-    connect(playButton, &QPushButton::clicked, this,
-        [this, bookmark]
-        {
-            emit playClicked(bookmark);
-        });
-    buttonLayout->addWidget(playButton);
-
-    if (!m_readOnly)
+    if (event->oldSize().isValid())
     {
-        auto editButton = createButton(kEditIcon, tr("Edit bookmark"));
-        editButton->setObjectName("BookmarkTooltipEditButton");
-        connect(editButton, &QPushButton::clicked, this,
-            [this, bookmark]
-            {
-                emit editClicked(bookmark);
-            });
-        buttonLayout->addWidget(editButton);
+        const auto yShift = event->size().height() - event->oldSize().height();
+        move(x(), y() - yShift);
+
+        // The resize event occurs when a user flips a bookmark. The bookmark flip leads to a mouse
+        // leave event, which closes the tooltip. This workaround avoids this.
+        installEventFilter(this);
     }
 
-    m_exportButton = createButton(kDownloadIcon, tr("Export bookmark"));
-    m_exportButton->setObjectName("BookmarkTooltipExportButton");
-    connect(m_exportButton, &QPushButton::clicked, this,
-        [this, bookmark]
-        {
-            emit exportClicked(bookmark);
-        });
-    buttonLayout->addWidget(m_exportButton);
-    buttonLayout->addStretch();
+    base_type::resizeEvent(event);
+}
 
-    if (!m_readOnly)
+bool BookmarkTooltip::eventFilter(QObject *obj, QEvent *event)
+{
+    if (event->type() == QEvent::Leave)
     {
-        auto deleteButton = createButton(kDeleteIcon, tr("Delete bookmark"));
-        deleteButton->setObjectName("BookmarkTooltipDeleteButton");
-        connect(deleteButton, &QPushButton::clicked, this,
-            [this, bookmark]
-            {
-                emit deleteClicked(bookmark);
-            });
-        buttonLayout->addWidget(deleteButton);
+        // Filter was installed in the BookmarkTooltip::resizeEvent.
+        removeEventFilter(this);
+        return true;
     }
 
-    return buttonLayout;
+    return base_type::eventFilter(obj, event);
 }
 
 } // namespace nx::vms::client::desktop::workbench::timeline
