@@ -314,13 +314,13 @@ bool EncodedAudioInfo::setupPostProcess(
     wfx.nBlockAlign = (wfx.wBitsPerSample >> 3) * wfx.nChannels;
     wfx.nAvgBytesPerSec = wfx.nBlockAlign * wfx.nSamplesPerSec;
 
-    auto result = waveInOpen(&hWaveIn, devId, &wfx,
+    MMRESULT result = waveInOpen(&hWaveIn, devId, &wfx,
         (DWORD_PTR)&waveInProc,
         (DWORD_PTR)this,
         CALLBACK_FUNCTION) != MMSYSERR_NOERROR;
     if(result != S_OK)
     {
-        NX_WARNING(this, "waveInOpen call failed. Error: %1", result);
+        NX_WARNING(this, "waveInOpen call failed. Error: %1", (int) result);
         return false;
     }
     m_waveInOpened = true;
