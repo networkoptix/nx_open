@@ -134,7 +134,7 @@
     </message>
     <message>
       <source>Open Files Folder</source>
-      <translation type="unfinished">Open Files Folder</translation>
+      <translation>파일 폴더 열기</translation>
     </message>
   </context>
   <context>
@@ -472,7 +472,7 @@
     </message>
     <message>
       <source>Use event source camera</source>
-      <translation type="unfinished">Use event source camera</translation>
+      <translation>이벤트 소스 카메라 사용</translation>
     </message>
   </context>
   <context>
@@ -607,7 +607,7 @@
     </message>
     <message>
       <source>Use Media2 to fetch profiles</source>
-      <translation type="unfinished">Use Media2 to fetch profiles</translation>
+      <translation>Media2를 사용하여 프로필 가져오기</translation>
     </message>
     <message>
       <source>Use different values for pan and tilt</source>
@@ -647,31 +647,31 @@
     </message>
     <message>
       <source>ONVIF Settings</source>
-      <translation type="unfinished">ONVIF Settings</translation>
+      <translation>ONVIF 설정</translation>
     </message>
     <message>
       <source>Do not record primary stream</source>
-      <translation type="unfinished">Do not record primary stream</translation>
+      <translation>기본 스트림을 기록하지 마십시오</translation>
     </message>
     <message>
       <source>Do not record secondary stream</source>
-      <translation type="unfinished">Do not record secondary stream</translation>
+      <translation>2차 스트림을 기록하지 마십시오</translation>
     </message>
     <message>
       <source>Secondary Stream Profile</source>
-      <translation type="unfinished">Secondary Stream Profile</translation>
+      <translation>2차 스트림 프로필</translation>
     </message>
     <message>
       <source>Primary Stream Profile</source>
-      <translation type="unfinished">Primary Stream Profile</translation>
+      <translation>기본 스트림 프로필</translation>
     </message>
     <message>
       <source>Import From Device</source>
-      <translation type="unfinished">Import From Device</translation>
+      <translation>장치에서 가져오기</translation>
     </message>
     <message>
       <source>Import video automatically</source>
-      <translation type="unfinished">Import video automatically</translation>
+      <translation>비디오를 자동으로 가져오기</translation>
     </message>
     <message>
       <source>Web Page</source>
@@ -679,7 +679,7 @@
     </message>
     <message>
       <source>Web Page Port</source>
-      <translation type="unfinished">Web Page Port</translation>
+      <translation>웹 페이지 포트</translation>
     </message>
     <message>
       <source>Do not send Stop PTZ command</source>
@@ -805,7 +805,7 @@
     <name>CameraReplacementDialog</name>
     <message>
       <source>Camera Replacement</source>
-      <translation type="unfinished">Camera Replacement</translation>
+      <translation>카메라 교체</translation>
     </message>
     <message>
       <source>Name</source>
@@ -825,7 +825,7 @@
     </message>
     <message>
       <source>New Device</source>
-      <translation type="unfinished">New Device</translation>
+      <translation>새로운 장치</translation>
     </message>
   </context>
   <context>
@@ -914,19 +914,19 @@
     <name>CloudLayoutsIntroDialog</name>
     <message>
       <source>BETA</source>
-      <translation type="unfinished">BETA</translation>
+      <translation>베타</translation>
     </message>
     <message>
       <source>Available Actions</source>
-      <translation type="unfinished">Available Actions</translation>
+      <translation>사용 가능한 작업</translation>
     </message>
     <message>
       <source>Video Export</source>
-      <translation type="unfinished">Video Export</translation>
+      <translation>비디오 내보내기</translation>
     </message>
     <message>
       <source>Live Video and Archive</source>
-      <translation type="unfinished">Live Video and Archive</translation>
+      <translation>라이브 비디오 및 아카이브</translation>
     </message>
     <message>
       <source>PTZ</source>
@@ -938,11 +938,11 @@
     </message>
     <message>
       <source>Read more on the help page</source>
-      <translation type="unfinished">Read more on the help page</translation>
+      <translation>자세한 내용은 도움말 페이지에서 확인하세요</translation>
     </message>
     <message>
       <source>Do not show this window again</source>
-      <translation type="unfinished">Do not show this window again</translation>
+      <translation>다시는 이 창을 표시하지 않음</translation>
     </message>
     <message>
       <source>Introducing Cloud Layouts</source>
@@ -954,11 +954,11 @@
     </message>
     <message>
       <source>Searching Bookmarks, Objects, Events</source>
-      <translation type="unfinished">Searching Bookmarks, Objects, Events</translation>
+      <translation>북마크, 객체, 이벤트 검색</translation>
     </message>
     <message>
       <source>In the Future</source>
-      <translation type="unfinished">In the Future</translation>
+      <translation>미래에</translation>
     </message>
   </context>
   <context>
@@ -994,11 +994,11 @@
     </message>
     <message>
       <source>This action can be set only for instant events</source>
-      <translation type="unfinished">This action can be set only for instant events</translation>
+      <translation>이 동작은 인스턴트 이벤트에만 설정할 수 있습니다.</translation>
     </message>
     <message>
       <source>Select another event or action</source>
-      <translation type="unfinished">Select another event or action</translation>
+      <translation>다른 이벤트 또는 작업을 선택하세요</translation>
     </message>
   </context>
   <context>
@@ -1043,7 +1043,7 @@
     </message>
     <message>
       <source>Create a backup of System management data, or restore System management data from an existing backup</source>
-      <translation type="unfinished">Create a backup of System management data, or restore System management data from an existing backup</translation>
+      <translation>시스템 관리 데이터 백업을 만들거나 기존 백업에서 시스템 관리 데이터를 복원합니다.</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -1051,11 +1051,11 @@
     </message>
     <message>
       <source>&lt;Message&gt;</source>
-      <translation type="unfinished">&lt;Message&gt;</translation>
+      <translation>&lt;Message&gt;</translation>
     </message>
     <message>
       <source>Open Folder</source>
-      <translation type="unfinished">Open Folder</translation>
+      <translation>폴더 열기</translation>
     </message>
   </context>
   <context>
@@ -1186,7 +1186,7 @@
     </message>
     <message>
       <source>Generic event</source>
-      <translation type="unfinished">Generic event</translation>
+      <translation>일반 이벤트</translation>
     </message>
   </context>
   <context>
@@ -1209,23 +1209,23 @@
     </message>
     <message>
       <source>HTTP(S) URL</source>
-      <translation type="unfinished">HTTP(S) URL</translation>
+      <translation>HTTP(S) URL</translation>
     </message>
     <message>
       <source>HTTP(S) Content</source>
-      <translation type="unfinished">HTTP(S) Content</translation>
+      <translation>HTTP(S) 콘텐츠</translation>
     </message>
     <message>
       <source>Content Type</source>
-      <translation type="unfinished">Content Type</translation>
+      <translation>콘텐츠 유형</translation>
     </message>
     <message>
       <source>Authentication Type</source>
-      <translation type="unfinished">Authentication Type</translation>
+      <translation>인증 유형</translation>
     </message>
     <message>
       <source>Request Method</source>
-      <translation type="unfinished">Request Method</translation>
+      <translation>요청 방법</translation>
     </message>
   </context>
   <context>
@@ -1354,19 +1354,19 @@
     <name>FooterWidget</name>
     <message>
       <source>Add Comment</source>
-      <translation type="unfinished">Add Comment</translation>
+      <translation>댓글 추가</translation>
     </message>
     <message>
       <source>Set Schedule</source>
-      <translation type="unfinished">Set Schedule</translation>
+      <translation>스케쥴 설정</translation>
     </message>
     <message>
       <source>Test Action</source>
-      <translation type="unfinished">Test Action</translation>
+      <translation>테스트 동작</translation>
     </message>
     <message>
       <source>Add a comment</source>
-      <translation type="unfinished">Add a comment</translation>
+      <translation>댓글 추가</translation>
     </message>
   </context>
   <context>
@@ -1448,7 +1448,7 @@
     </message>
     <message>
       <source>Allow the computer to enter sleep mode on idle</source>
-      <translation type="unfinished">Allow the computer to enter sleep mode on idle</translation>
+      <translation>컴퓨터가 유휴 상태일 때 절전 모드로 전환되도록 허용</translation>
     </message>
   </context>
   <context>
@@ -1527,7 +1527,7 @@
     </message>
     <message>
       <source>Export date</source>
-      <translation type="unfinished">Export date</translation>
+      <translation>내보내기 날짜</translation>
     </message>
     <message>
       <source>Font Size</source>
@@ -1814,19 +1814,19 @@
     </message>
     <message>
       <source>Logging Level</source>
-      <translation type="unfinished">Logging Level</translation>
+      <translation>로깅 레벨</translation>
     </message>
     <message>
       <source>Split File by Size</source>
-      <translation type="unfinished">Split File by Size</translation>
+      <translation>크기별로 파일 분할</translation>
     </message>
     <message>
       <source>Split File by Time</source>
-      <translation type="unfinished">Split File by Time</translation>
+      <translation>시간별로 파일 분할</translation>
     </message>
     <message>
       <source>Limit Max Volume</source>
-      <translation type="unfinished">Limit Max Volume</translation>
+      <translation>최대 볼륨 제한</translation>
     </message>
   </context>
   <context>
@@ -1880,15 +1880,15 @@
     </message>
     <message>
       <source>Download complete!</source>
-      <translation type="unfinished">Download complete!</translation>
+      <translation>다운로드 완료!</translation>
     </message>
     <message>
       <source>Failed to save logs to the selected folder</source>
-      <translation type="unfinished">Failed to save logs to the selected folder</translation>
+      <translation>선택한 폴더에 로그를 저장하지 못했습니다.</translation>
     </message>
     <message>
       <source>Open Files Folder</source>
-      <translation type="unfinished">Open Files Folder</translation>
+      <translation>파일 폴더 열기</translation>
     </message>
   </context>
   <context>
@@ -2017,11 +2017,11 @@
     </message>
     <message>
       <source>Get Update File</source>
-      <translation type="unfinished">Get Update File</translation>
+      <translation>업데이트 파일 가져오기</translation>
     </message>
     <message>
       <source>Check Again</source>
-      <translation type="unfinished">Check Again</translation>
+      <translation>다시 확인</translation>
     </message>
     <message>
       <source>Try Again</source>
@@ -2103,11 +2103,11 @@
     </message>
     <message>
       <source>Security Protocol</source>
-      <translation type="unfinished">Security Protocol</translation>
+      <translation>보안 프로토콜</translation>
     </message>
     <message>
       <source>Email Settings</source>
-      <translation type="unfinished">Email Settings</translation>
+      <translation>이메일 설정</translation>
     </message>
     <message>
       <source>Support Signature</source>
@@ -2643,23 +2643,23 @@
     <name>RulesDialog</name>
     <message>
       <source>Alarm/Event Rules</source>
-      <translation type="unfinished">Alarm/Event Rules</translation>
+      <translation>알람/이벤트 규칙</translation>
     </message>
     <message>
       <source>New Rule</source>
-      <translation type="unfinished">New Rule</translation>
+      <translation>새 규칙</translation>
     </message>
     <message>
       <source>Delete Rule</source>
-      <translation type="unfinished">Delete Rule</translation>
+      <translation>규칙 삭제</translation>
     </message>
     <message>
       <source>Select a Rule</source>
-      <translation type="unfinished">Select a Rule</translation>
+      <translation>규칙을 선택하세요</translation>
     </message>
     <message>
       <source>Reset Default Rules</source>
-      <translation type="unfinished">Reset Default Rules</translation>
+      <translation>기본 규칙 재설정</translation>
     </message>
   </context>
   <context>
@@ -2760,7 +2760,7 @@
     </message>
     <message>
       <source>Use only HTTPS to connect to cameras</source>
-      <translation type="unfinished">Use only HTTPS to connect to cameras</translation>
+      <translation>카메라에 연결하려면 HTTPS만 사용하세요</translation>
     </message>
     <message>
       <source>User Activity</source>
@@ -2788,7 +2788,7 @@
     </message>
     <message>
       <source>Connection with cameras that do not support HTTPS will be lost.</source>
-      <translation type="unfinished">Connection with cameras that do not support HTTPS will be lost.</translation>
+      <translation>HTTPS를 지원하지 않는 카메라와의 연결이 끊어집니다.</translation>
     </message>
     <message>
       <source>Force servers to accept only encrypted connections</source>
@@ -2896,7 +2896,7 @@
     </message>
     <message>
       <source>Server Location ID:</source>
-      <translation type="unfinished">Server Location ID:</translation>
+      <translation>서버 위치 ID:</translation>
     </message>
   </context>
   <context>
@@ -2967,11 +2967,11 @@
     </message>
     <message>
       <source>Sound</source>
-      <translation type="unfinished">Sound</translation>
+      <translation>소리</translation>
     </message>
     <message>
       <source>Manage</source>
-      <translation type="unfinished">Manage</translation>
+      <translation>관리</translation>
     </message>
   </context>
   <context>
@@ -3108,7 +3108,7 @@
     </message>
     <message>
       <source>Custom language for Cloud notifications</source>
-      <translation type="unfinished">Custom language for Cloud notifications</translation>
+      <translation>클라우드 알림을 위한 사용자 정의 언어</translation>
     </message>
   </context>
   <context>
@@ -3176,11 +3176,11 @@
     </message>
     <message>
       <source>+ Add Group</source>
-      <translation type="unfinished">+ Add Group</translation>
+      <translation>+ 그룹 추가</translation>
     </message>
     <message>
       <source>No groups found</source>
-      <translation type="unfinished">No groups found</translation>
+      <translation>그룹을 찾을 수 없습니다</translation>
     </message>
   </context>
   <context>
@@ -3195,7 +3195,7 @@
     </message>
     <message>
       <source>No users found</source>
-      <translation type="unfinished">No users found</translation>
+      <translation>사용자를 찾을 수 없습니다</translation>
     </message>
   </context>
   <context>
