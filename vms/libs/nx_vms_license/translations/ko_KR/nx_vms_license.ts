@@ -49,7 +49,7 @@
     <message>
       <source>License is not validated by %1</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">License is not validated by %1</translation>
+      <translation>라이센스가 %1에 의해 검증되지 않았습니다.</translation>
     </message>
     <message>
       <source>Invalid type</source>
