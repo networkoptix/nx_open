@@ -4228,7 +4228,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Enter your account password</source>
-      <translation type="unfinished">Enter your account password</translation>
+      <translation>비밀번호를 입력하세요</translation>
     </message>
     <message>
       <source>Save</source>
@@ -6659,7 +6659,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Users with Digest Authentication</source>
-      <translation type="unfinished">Users with Digest Authentication</translation>
+      <translation>Digest 인증을 사용하는 사용자</translation>
     </message>
     <message>
       <source>No users found</source>
@@ -7709,24 +7709,24 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Camera replaced!</source>
-      <translation type="unfinished">Camera replaced!</translation>
+      <translation>카메라가 교체되었습니다!</translation>
     </message>
     <message>
       <source>Checking if the old camera&apos;s data can be transferred to the new camera.</source>
-      <translation type="unfinished">Checking if the old camera&apos;s data can be transferred to the new camera.</translation>
+      <translation>이전 카메라의&apos;데이터를 새 카메라로 전송할 수 있는지 확인합니다.</translation>
     </message>
     <message>
       <source>Some data and settings may not be compatible with the new camera</source>
-      <translation type="unfinished">Some data and settings may not be compatible with the new camera</translation>
+      <translation>일부 데이터 및 설정이 새 카메라와 호환되지 않을 수 있습니다.</translation>
     </message>
     <message>
       <source>%1 will be removed from the System and replaced by the selected camera</source>
       <extracomment>%1 will be substituted with the camera&apos;s name.</extracomment>
-      <translation type="unfinished">%1 will be removed from the System and replaced by the selected camera</translation>
+      <translation>%1 가 시스템에서 제거되고 선택한 카메라로 대체됩니다.</translation>
     </message>
     <message>
       <source>The Camera Replacement operation is not possible as the Server is unavailable.</source>
-      <translation type="unfinished">The Camera Replacement operation is not possible as the Server is unavailable.</translation>
+      <translation>서버를 이용할 수 없기 때문에 카메라 교체 작업이 불가능합니다.</translation>
     </message>
   </context>
   <context>
@@ -7998,15 +7998,15 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ChunksFilterActionFactory</name>
     <message>
       <source>No filter</source>
-      <translation type="unfinished">No filter</translation>
+      <translation>필터 없음</translation>
     </message>
     <message>
       <source>Main storage only</source>
-      <translation type="unfinished">Main storage only</translation>
+      <translation>메인 스토리지만</translation>
     </message>
     <message>
       <source>Backup storage only</source>
-      <translation type="unfinished">Backup storage only</translation>
+      <translation>백업 저장소만</translation>
     </message>
   </context>
   <context>
@@ -8014,15 +8014,15 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Your confirmation is required to provide a token to</source>
       <comment>... a web page (below there is a web page name with an icon)</comment>
-      <translation type="unfinished">Your confirmation is required to provide a token to</translation>
+      <translation>토큰을 제공하려면 확인이 필요합니다.</translation>
     </message>
     <message>
       <source>Allow</source>
-      <translation type="unfinished">Allow</translation>
+      <translation>허용</translation>
     </message>
     <message>
       <source>This web page is requesting access to your account for authorization</source>
-      <translation type="unfinished">This web page is requesting access to your account for authorization</translation>
+      <translation>이 웹 페이지는 귀하의 계정에 대한 액세스를 승인하기 위해 요청하고 있습니다.</translation>
     </message>
   </context>
   <context>
@@ -8123,7 +8123,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Click to Show Cameras</source>
-      <translation type="unfinished">Click to Show Cameras</translation>
+      <translation>카메라를 표시하려면 클릭하세요</translation>
     </message>
   </context>
   <context>
@@ -8131,15 +8131,15 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Introducing %1 Layouts</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">Introducing %1 Layouts</translation>
+      <translation>%1 레이아웃 소개</translation>
     </message>
     <message>
       <source>%1 Layouts are &lt;b&gt;cross-system layouts&lt;/b&gt; that allow you to work with devices from different Systems. Currently, only some features of regular layouts are available, but we will continue to expand the capabilities of %1 Layouts in future versions</source>
-      <translation type="unfinished">%1 Layouts are &lt;b&gt;cross-system layouts&lt;/b&gt; that allow you to work with devices from different Systems. Currently, only some features of regular layouts are available, but we will continue to expand the capabilities of %1 Layouts in future versions</translation>
+      <translation>%1 레이아웃은 &lt;b&gt;크로스 시스템 레이아웃&lt;/b&gt; 으로, 다른 시스템의 장치로 작업할 수 있습니다. 현재는 일반 레이아웃의 일부 기능만 사용할 수 있지만, 향후 버전에서는 %1 레이아웃의 기능을 계속 확장할 예정입니다.</translation>
     </message>
     <message>
       <source>Read more on the %1</source>
-      <translation type="unfinished">Read more on the %1</translation>
+      <translation>%1에서 더 읽어보세요</translation>
     </message>
     <message>
       <source>help page</source>
@@ -8151,12 +8151,12 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>%1 (Copy)</source>
       <comment>Original name will be substituted</comment>
-      <translation type="unfinished">%1 (Copy)</translation>
+      <translation>%1 (복사)</translation>
     </message>
     <message>
       <source>%1 (Copy %2)</source>
       <comment>Original name will be substituted as %1, counter as %2</comment>
-      <translation type="unfinished">%1 (Copy %2)</translation>
+      <translation>%1 (복사 %2)</translation>
     </message>
   </context>
   <context>
@@ -8257,7 +8257,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>None of your Servers has connection to %1.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">None of your Servers has connection to %1.</translation>
+      <translation>어떤 서버도 %1에 연결되어 있지 않습니다.</translation>
     </message>
   </context>
   <context>
@@ -8347,7 +8347,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::CrossSystemCameraResource</name>
     <message>
       <source>Unknown camera</source>
-      <translation type="unfinished">Unknown camera</translation>
+      <translation>알 수 없는 카메라</translation>
     </message>
   </context>
   <context>
@@ -8678,7 +8678,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::EventRibbon::Private</name>
     <message>
       <source>INFORMATION REQUIRED</source>
-      <translation type="unfinished">INFORMATION REQUIRED</translation>
+      <translation>필요한 정보</translation>
     </message>
   </context>
   <context>
@@ -8853,11 +8853,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Add Info</source>
-      <translation type="unfinished">Add Info</translation>
+      <translation>정보 추가</translation>
     </message>
     <message>
       <source>Delete Info</source>
-      <translation type="unfinished">Delete Info</translation>
+      <translation>정보 삭제</translation>
     </message>
     <message>
       <source>Info</source>
@@ -8919,7 +8919,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>폴더 선택...</translation>
     </message>
   </context>
   <context>
@@ -9024,7 +9024,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Enter your account password</source>
-      <translation type="unfinished">Enter your account password</translation>
+      <translation>비밀번호를 입력하세요</translation>
     </message>
     <message>
       <source>Save</source>
@@ -9234,7 +9234,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Enter your account password</source>
-      <translation type="unfinished">Enter your account password</translation>
+      <translation>비밀번호를 입력하세요</translation>
     </message>
     <message>
       <source>Reset</source>
@@ -9258,7 +9258,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Apply Settings</source>
-      <translation type="unfinished">Apply Settings</translation>
+      <translation>설정 적용</translation>
     </message>
     <message>
       <source>Apply</source>
@@ -9373,23 +9373,23 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Must be greater than or equal to the value set for Split File by Size</source>
-      <translation type="unfinished">Must be greater than or equal to the value set for Split File by Size</translation>
+      <translation>크기별로 파일 분할에 설정된 값보다 크거나 같아야 합니다.</translation>
     </message>
     <message>
       <source>Must be less than or equal to the value set for Limit Max Volume</source>
-      <translation type="unfinished">Must be less than or equal to the value set for Limit Max Volume</translation>
+      <translation>Limit Max Volume에 설정된 값보다 작거나 같아야 합니다.</translation>
     </message>
     <message>
       <source>The selected Logging Level may not be collecting enough information.
 The Logging Level &quot;%1&quot; will provide you with more granular information.</source>
-      <translation type="unfinished">The selected Logging Level may not be collecting enough information.
-The Logging Level &quot;%1&quot; will provide you with more granular information.</translation>
+      <translation>선택된 로깅 수준에서는 충분한 정보를 수집하지 못할 수 있습니다.
+로깅 수준 &quot;%1&quot; 은 더욱 세부적인 정보를 제공합니다.</translation>
     </message>
     <message>
       <source>The selected Logging Level may degrade your system&apos;s performance.
 Remember to return the Logging Level to its default setting after you have collected enough logs.</source>
-      <translation type="unfinished">The selected Logging Level may degrade your system&apos;s performance.
-Remember to return the Logging Level to its default setting after you have collected enough logs.</translation>
+      <translation>선택한 로깅 레벨은 시스템 성능을 저하시킬 수 있습니다.
+충분한 로그를 수집한 후에는 로깅 레벨을 기본 설정으로 되돌리는 것을 잊지 마세요.</translation>
     </message>
   </context>
   <context>
@@ -9415,7 +9415,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Current Level</source>
-      <translation type="unfinished">Current Level</translation>
+      <translation>현재 레벨</translation>
     </message>
     <message>
       <source>Client</source>
@@ -9472,7 +9472,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Pending download...</source>
-      <translation type="unfinished">Pending download...</translation>
+      <translation>다운로드 준비 중...</translation>
     </message>
     <message numerus="yes">
       <source>%n Servers</source>
@@ -9482,37 +9482,37 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Logs downloaded</source>
-      <translation type="unfinished">Logs downloaded</translation>
+      <translation>로그 다운로드 완료</translation>
     </message>
     <message>
       <source>Logs downloading failed</source>
-      <translation type="unfinished">Logs downloading failed</translation>
+      <translation>로그 다운로드 실패</translation>
     </message>
     <message>
       <source>Debug logging is enabled on the Client</source>
-      <translation type="unfinished">Debug logging is enabled on the Client</translation>
+      <translation>클라이언트에서 디버그 로깅이 활성화되었습니다.</translation>
     </message>
     <message>
       <source>Debug logging is enabled, resulting in degraded system performance.</source>
-      <translation type="unfinished">Debug logging is enabled, resulting in degraded system performance.</translation>
+      <translation>디버그 로깅이 활성화되어 시스템 성능이 저하됩니다.</translation>
     </message>
     <message numerus="yes">
       <source>Debug logging is enabled on %n Servers</source>
-      <translation type="unfinished">
-        <numerusform>Debug logging is enabled on %n Servers</numerusform>
+      <translation>
+        <numerusform>%n 서버에서 디버그 로깅이 활성화되었습니다.</numerusform>
       </translation>
     </message>
     <message>
       <source>Logs downloading canceled</source>
-      <translation type="unfinished">Logs downloading canceled</translation>
+      <translation>로그 다운로드 취소됨</translation>
     </message>
     <message>
       <source>Apply Settings</source>
-      <translation type="unfinished">Apply Settings</translation>
+      <translation>설정 적용</translation>
     </message>
     <message>
       <source>Enter your account password</source>
-      <translation type="unfinished">Enter your account password</translation>
+      <translation>비밀번호를 입력하세요</translation>
     </message>
     <message>
       <source>Apply</source>
@@ -9523,7 +9523,7 @@ Remember to return the Logging Level to its default setting after you have colle
     <name>nx::vms::client::desktop::LogsManagementWidget</name>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>폴더 선택...</translation>
     </message>
   </context>
   <context>
@@ -10124,13 +10124,13 @@ You can force it, but it may significantly increase CPU load.</source>
     <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
     <message numerus="yes">
       <source>%n notifications</source>
-      <translation type="unfinished">
-        <numerusform>%n notifications</numerusform>
+      <translation>
+        <numerusform>%n 알림</numerusform>
       </translation>
     </message>
     <message>
       <source>Current System</source>
-      <translation type="unfinished">Current System</translation>
+      <translation>현재 시스템</translation>
     </message>
     <message>
       <source>All Systems</source>
@@ -10195,7 +10195,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>This tab will be available in future versions</source>
-      <translation type="unfinished">This tab will be available in future versions</translation>
+      <translation>이 탭은 향후 버전에서 사용할 수 있습니다.</translation>
     </message>
     <message>
       <source>Learn more</source>
@@ -10447,7 +10447,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>The web page can interact with the Desktop Client and request access to the user session</source>
-      <translation type="unfinished">The web page can interact with the Desktop Client and request access to the user session</translation>
+      <translation>웹 페이지는 데스크톱 클라이언트와 상호 작용하고 사용자 세션에 대한 액세스를 요청할 수 있습니다.</translation>
     </message>
     <message>
       <source>An integration may interact with the Desktop Client and request access to the user session</source>
@@ -11009,7 +11009,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     <message>
       <source>The recommended maximum user session lifetime is %1</source>
       <comment>%1 is the time span with time units</comment>
-      <translation type="unfinished">The recommended maximum user session lifetime is %1</translation>
+      <translation>권장되는 최대 사용자 세션 수명은 %1입니다.</translation>
     </message>
     <message>
       <source>Watermarks will be displayed over live, archive and exported videos for non-power users only. You and other power users will not see them.</source>
@@ -11059,29 +11059,29 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>The certificate is auto-generated and pinned to %1</source>
-      <translation type="unfinished">The certificate is auto-generated and pinned to %1</translation>
+      <translation>인증서는 자동 생성되어 %1에 고정됩니다.</translation>
     </message>
     <message>
       <source>Server ID: %1</source>
-      <translation type="unfinished">Server ID: %1</translation>
+      <translation>서버 ID: %1</translation>
     </message>
     <message>
       <source>Someone may be impersonating %1 to steal your personal information.
 Do not pin this certificate if you did not modify %2 Server SSL certificate.</source>
-      <translation type="unfinished">Someone may be impersonating %1 to steal your personal information.
-Do not pin this certificate if you did not modify %2 Server SSL certificate.</translation>
+      <translation>누군가가 귀하의 개인 정보를 훔치려고 %1 을 사칭하고 있을 수 있습니다.
+ %2 서버 SSL 인증서를 수정하지 않았다면 이 인증서를 고정하지 마세요.</translation>
     </message>
     <message>
       <source>Custom Certificate</source>
-      <translation type="unfinished">Custom Certificate</translation>
+      <translation>사용자 인증서</translation>
     </message>
     <message>
       <source>Auto-generated Certificate</source>
-      <translation type="unfinished">Auto-generated Certificate</translation>
+      <translation>자동 생성된 인증서</translation>
     </message>
     <message>
       <source>Unknown Certificate</source>
-      <translation type="unfinished">Unknown Certificate</translation>
+      <translation>알 수 없는 인증서</translation>
     </message>
     <message>
       <source>OK</source>
@@ -11414,40 +11414,40 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Replaced camera discovered</source>
-      <translation type="unfinished">Replaced camera discovered</translation>
+      <translation>교체된 카메라 발견</translation>
     </message>
     <message>
       <source>Camera %1 has been replaced by %2.</source>
-      <translation type="unfinished">Camera %1 has been replaced by %2.</translation>
+      <translation>카메라 %1 가 %2로 바뀌었습니다.</translation>
     </message>
     <message>
       <source>Click on the &quot;Undo Replace&quot; button to continue using two devices.</source>
-      <translation type="unfinished">Click on the &quot;Undo Replace&quot; button to continue using two devices.</translation>
+      <translation>두 개의 장치를 계속 사용하려면 &quot;바꾸기 취소&quot; 버튼을 클릭하세요.</translation>
     </message>
     <message>
       <source>Undo Replace</source>
-      <translation type="unfinished">Undo Replace</translation>
+      <translation>바꾸기 취소</translation>
     </message>
     <message>
       <source>Import archive from %1 failed</source>
-      <translation type="unfinished">Import archive from %1 failed</translation>
+      <translation>%1 에서 아카이브 가져오기에 실패했습니다.</translation>
     </message>
     <message numerus="yes">
       <source>Backup storage is not configured on %n Servers</source>
-      <translation type="unfinished">
-        <numerusform>Backup storage is not configured on %n Servers</numerusform>
+      <translation>
+        <numerusform>%n 서버에서 백업 저장소가 구성되지 않았습니다.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Storage for analytics data is not set on %n Servers</source>
-      <translation type="unfinished">
-        <numerusform>Storage for analytics data is not set on %n Servers</numerusform>
+      <translation>
+        <numerusform>분석 데이터 저장소가 %n 서버에 설정되지 않았습니다.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>System storage is used for analytics data on %n Servers</source>
-      <translation type="unfinished">
-        <numerusform>System storage is used for analytics data on %n Servers</numerusform>
+      <translation>
+        <numerusform>시스템 저장소는 %n 서버의 분석 데이터에 사용됩니다.</numerusform>
       </translation>
     </message>
     <message>
@@ -11545,7 +11545,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>This action is not supported for notifications from other Systems</source>
-      <translation type="unfinished">This action is not supported for notifications from other Systems</translation>
+      <translation>이 작업은 다른 시스템의 알림에는 지원되지 않습니다.</translation>
     </message>
   </context>
   <context>
@@ -11652,15 +11652,15 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::UserGroupListModel</name>
     <message>
       <source>LDAP group</source>
-      <translation type="unfinished">LDAP group</translation>
+      <translation>LDAP 그룹</translation>
     </message>
     <message>
       <source>Built-in group</source>
-      <translation type="unfinished">Built-in group</translation>
+      <translation>내장 그룹</translation>
     </message>
     <message>
       <source>Custom group</source>
-      <translation type="unfinished">Custom group</translation>
+      <translation>사용자 지정 그룹</translation>
     </message>
     <message>
       <source>Name</source>
@@ -11834,7 +11834,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Enter your account password</source>
-      <translation type="unfinished">Enter your account password</translation>
+      <translation>비밀번호를 입력하세요</translation>
     </message>
     <message>
       <source>Save</source>
@@ -12390,21 +12390,21 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::integrations::OverlappedIdDialogModel</name>
     <message>
       <source>Latest</source>
-      <translation type="unfinished">Latest</translation>
+      <translation>최신</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::integrations::OverlappedIdIntegration</name>
     <message>
       <source>Overlapped ID...</source>
-      <translation type="unfinished">Overlapped ID...</translation>
+      <translation>중복된 ID...</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::joystick::JoystickButtonActionChoiceModel</name>
     <message>
       <source>No Action</source>
-      <translation type="unfinished">No Action</translation>
+      <translation>동작 없음</translation>
     </message>
     <message>
       <source>Focus Near</source>
@@ -12416,23 +12416,23 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Autofocus</source>
-      <translation type="unfinished">Autofocus</translation>
+      <translation>자동 초점</translation>
     </message>
     <message>
       <source>Go to PTZ Position</source>
-      <translation type="unfinished">Go to PTZ Position</translation>
+      <translation>PTZ 위치로 이동</translation>
     </message>
     <message>
       <source>Set to Fullscreen</source>
-      <translation type="unfinished">Set to Fullscreen</translation>
+      <translation>전체 화면으로 설정</translation>
     </message>
     <message>
       <source>Next Camera on Layout</source>
-      <translation type="unfinished">Next Camera on Layout</translation>
+      <translation>레이아웃의 다음 카메라</translation>
     </message>
     <message>
       <source>Previous Camera on Layout</source>
-      <translation type="unfinished">Previous Camera on Layout</translation>
+      <translation>레이아웃의 이전 카메라</translation>
     </message>
     <message>
       <source>Open Layout</source>
@@ -12440,7 +12440,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Modifier</source>
-      <translation type="unfinished">Modifier</translation>
+      <translation>수정자</translation>
     </message>
     <message>
       <source>Multiple</source>
@@ -12451,11 +12451,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::joystick::JoystickButtonSettingsModel</name>
     <message>
       <source>Select Layout...</source>
-      <translation type="unfinished">Select Layout...</translation>
+      <translation>레이아웃 선택...</translation>
     </message>
     <message>
       <source>Button</source>
-      <translation type="unfinished">Button</translation>
+      <translation>버튼</translation>
     </message>
     <message>
       <source>Selected Layout</source>
@@ -12485,11 +12485,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Cannot find an item with the specified ID</source>
-      <translation type="unfinished">Cannot find an item with the specified ID</translation>
+      <translation>지정된 ID를 가진 항목을 찾을 수 없습니다</translation>
     </message>
     <message>
       <source>Cannot find a resource with the specified ID.</source>
-      <translation type="unfinished">Cannot find a resource with the specified ID.</translation>
+      <translation>지정된 ID를 가진 리소스를 찾을 수 없습니다.</translation>
     </message>
   </context>
   <context>
@@ -13214,23 +13214,23 @@ Server Settings (서버 설정) 대화 상자의 &quot;Storage Management (스�
     </message>
     <message>
       <source>Undo replacement completed successfully!</source>
-      <translation type="unfinished">Undo replacement completed successfully!</translation>
+      <translation>바꾸기 취소가 성공적으로 완료되었습니다!</translation>
     </message>
     <message>
       <source>Some settings may not be transferred from the replaced camera due to compatibility issues.</source>
-      <translation type="unfinished">Some settings may not be transferred from the replaced camera due to compatibility issues.</translation>
+      <translation>호환성 문제로 인해 일부 설정은 교체된 카메라에서 전송되지 않을 수 있습니다.</translation>
     </message>
     <message>
       <source>Confirm undo replacement?</source>
-      <translation type="unfinished">Confirm undo replacement?</translation>
+      <translation>바꾸기 취소를 확인하시겠습니까?</translation>
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>폴더 선택...</translation>
     </message>
     <message>
       <source>There are no suitable cameras for replacement on the Server &quot;%1&quot;</source>
-      <translation type="unfinished">There are no suitable cameras for replacement on the Server &quot;%1&quot;</translation>
+      <translation>서버 &quot;%1&quot; 에 교체할 수 있는 적합한 카메라가 없습니다</translation>
     </message>
     <message>
       <source>Not enough access rights</source>
@@ -13265,7 +13265,7 @@ Server Settings (서버 설정) 대화 상자의 &quot;Storage Management (스�
     </message>
     <message>
       <source>Save Layout As Cloud</source>
-      <translation type="unfinished">Save Layout As Cloud</translation>
+      <translation>레이아웃을 클라우드로 저장</translation>
     </message>
   </context>
   <context>
@@ -13382,7 +13382,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Rewind is not available for VMAX</source>
-      <translation type="unfinished">Rewind is not available for VMAX</translation>
+      <translation>VMAX에서는 되감기를 사용할 수 없습니다.</translation>
     </message>
   </context>
   <context>
