@@ -857,7 +857,7 @@
     </message>
     <message>
       <source>Add Group</source>
-      <translation type="unfinished">Add Group</translation>
+      <translation>그룹 추가</translation>
     </message>
   </context>
   <context>
@@ -1018,7 +1018,7 @@
     <name>ImportFromDeviceDialog</name>
     <message>
       <source>Import From Devices</source>
-      <translation type="unfinished">Import From Devices</translation>
+      <translation>장치에서 가져오기</translation>
     </message>
   </context>
   <context>
@@ -1050,7 +1050,7 @@
     <name>IntegrationHeader</name>
     <message>
       <source>Insufficient services</source>
-      <translation type="unfinished">Insufficient services</translation>
+      <translation>서비스가 부족합니다</translation>
     </message>
     <message numerus="yes">
       <source>%n suitable integration services are required to turn on the integration</source>
@@ -1390,7 +1390,7 @@
     <name>LookupListsDialog</name>
     <message>
       <source>Lookup Lists</source>
-      <translation type="unfinished">Lookup Lists</translation>
+      <translation>목록 조회</translation>
     </message>
     <message>
       <source>Add</source>
@@ -1428,7 +1428,7 @@
     <name>NewLinkDialog</name>
     <message>
       <source>New Link - %1</source>
-      <translation type="unfinished">New Link - %1</translation>
+      <translation>새로운 링크 - %1</translation>
     </message>
     <message>
       <source>The previous link will be invalidated once a new one has been issued</source>
@@ -1514,7 +1514,7 @@
     <name>ParentGroupsTab</name>
     <message>
       <source>Add Group</source>
-      <translation type="unfinished">Add Group</translation>
+      <translation>그룹 추가</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -1526,11 +1526,11 @@
     </message>
     <message>
       <source>No groups found</source>
-      <translation type="unfinished">No groups found</translation>
+      <translation>그룹을 찾을 수 없습니다</translation>
     </message>
     <message>
       <source>Change search criteria or create a new group</source>
-      <translation type="unfinished">Change search criteria or create a new group</translation>
+      <translation>검색 기준을 변경하거나 새 그룹을 만드세요</translation>
     </message>
     <message>
       <source>No groups</source>
@@ -1850,7 +1850,7 @@ Press Alt + Click to follow object</translation>
     <message>
       <source>Inherits %1 permission from</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Inherits %1 permission from</translation>
+      <translation>%1 권한을 상속합니다</translation>
     </message>
     <message>
       <source>Already inherited from</source>
@@ -1896,7 +1896,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Web Pages &amp; Integrations</source>
-      <translation type="unfinished">Web Pages &amp; Integrations</translation>
+      <translation>웹 페이지 및 통합</translation>
     </message>
     <message>
       <source>Web Pages</source>
@@ -1904,7 +1904,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Health Monitors</source>
-      <translation type="unfinished">Health Monitors</translation>
+      <translation>상태 모니터링</translation>
     </message>
     <message>
       <source>Video Walls</source>
@@ -2378,7 +2378,7 @@ Press Alt + Click to follow object</translation>
     <name>UserCreateDialog</name>
     <message>
       <source>New User</source>
-      <translation type="unfinished">New User</translation>
+      <translation>신규 사용자</translation>
     </message>
     <message>
       <source>General</source>
@@ -2405,7 +2405,7 @@ Press Alt + Click to follow object</translation>
     <name>UserCreateTab</name>
     <message>
       <source>New User</source>
-      <translation type="unfinished">New User</translation>
+      <translation>신규 사용자</translation>
     </message>
     <message>
       <source>Type</source>
@@ -2563,7 +2563,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Access Link</source>
-      <translation type="unfinished">Access Link</translation>
+      <translation>접속 링크</translation>
     </message>
     <message>
       <source>Copy Link</source>
@@ -2571,11 +2571,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Terminate</source>
-      <translation type="unfinished">Terminate</translation>
+      <translation>종료</translation>
     </message>
     <message>
       <source>New Link...</source>
-      <translation type="unfinished">New Link...</translation>
+      <translation>새로운 링크...</translation>
     </message>
     <message>
       <source>No valid link for this user</source>
@@ -2588,12 +2588,12 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Obtaining Link...</source>
-      <translation type="unfinished">Obtaining Link...</translation>
+      <translation>링크 얻는 중...</translation>
     </message>
     <message>
       <source>Ensure that this computer is able to connect to the %1</source>
       <comment>%1 is the cloud name</comment>
-      <translation type="unfinished">Ensure that this computer is able to connect to the %1</translation>
+      <translation>이 컴퓨터가 %1에 연결할 수 있는지 확인하세요.</translation>
     </message>
     <message>
       <source>LDAP server is offline. User is not able to log in.</source>
