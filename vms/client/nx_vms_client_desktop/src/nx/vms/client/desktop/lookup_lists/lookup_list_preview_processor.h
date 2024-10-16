@@ -38,17 +38,28 @@ class NX_VMS_CLIENT_DESKTOP_API LookupListPreviewProcessor: public QObject
     using base_type = QObject;
 
 public:
+    enum PreviewBuildResult
+    {
+        Success,
+        InternalError,
+        EmptyFileError,
+        ErrorFileNotFound,
+    }
+
+    Q_ENUMS(PreviewBuildExitCode)
+
     Q_PROPERTY(int rowsNumber READ rowsNumber WRITE setRowsNumber
         NOTIFY rowsNumberChanged REQUIRED);
     Q_PROPERTY(QString separator READ separator WRITE setSeparator NOTIFY separatorChanged);
     Q_PROPERTY(QString filePath READ filePath WRITE setFilePath NOTIFY filePathChanged);
     Q_PROPERTY(bool dataHasHeaderRow READ dataHasHeaderRow WRITE setDataHasHeaderRow
         NOTIFY dataHasHeaderRowChanged);
+    Q_PROPERTY(bool valid READ valid WRITE setValid NOTIFY validChanged)
 
     explicit LookupListPreviewProcessor(QObject* parent = nullptr);
     virtual ~LookupListPreviewProcessor() override;
     Q_INVOKABLE bool setImportFilePathFromDialog();
-    Q_INVOKABLE bool buildTablePreview(LookupListImportEntriesModel* model,
+    Q_INVOKABLE PreviewBuildResult buildTablePreview(LookupListImportEntriesModel* model,
         const QString& filePath,
         const QString& separator,
         bool hasHeader);
@@ -59,16 +70,19 @@ public:
     void setSeparator(const QString& separator);
     void setFilePath(const QString& filePath);
     void setDataHasHeaderRow(bool dataHasHeaderRow);
+    void setValid(bool isValid);
 
     int rowsNumber();
     QString separator();
     QString filePath();
     bool dataHasHeaderRow();
+    bool valid();
 signals:
     void rowsNumberChanged(int rowsNumber);
     void separatorChanged(const QString& separator);
     void filePathChanged(const QString& filePath);
     void dataHasHeaderRowChanged(bool dataHasHeaderRow);
+    void validChanged(bool isValid);
 
 private:
     struct Private;
