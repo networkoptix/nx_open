@@ -374,6 +374,7 @@ bool EventSearchListModel::Private::requestFetch(const core::FetchRequest& reque
             auto fetched = core::makeFetchedData<Facade>(this->data, data, request);
             const auto ranges = fetched.ranges;
             const auto fetchedWindow = core::timeWindow<Facade>(fetched.data);
+            emit q->fetchCommitStarted(request);
             applyFetchedData(std::move(fetched), fetchedWindow);
             safeCompletionHandler(core::EventSearch::FetchResult::complete, ranges, fetchedWindow);
         };

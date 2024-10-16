@@ -1424,8 +1424,11 @@ bool AnalyticsSearchListModel::requestFetch(
                 return;
             }
 
+            emit fetchCommitStarted(request);
+            const auto ranges = d->applyFetchedData(std::move(data), request);
+
             completionHandler(FetchResult::complete,
-                d->applyFetchedData(std::move(data), request),
+                ranges,
                 timeWindow<Facade>(d->data.items));
         };
 

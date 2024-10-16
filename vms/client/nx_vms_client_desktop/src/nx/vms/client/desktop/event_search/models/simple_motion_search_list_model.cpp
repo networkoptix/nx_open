@@ -343,6 +343,7 @@ bool SimpleMotionSearchListModel::requestFetch(
     }
 
     auto fetchedData = makeFetchedData<Facade>(d->data, boundedPeriods, request);
+    emit fetchCommitStarted(request);
     updateEventSearchData<Facade>(this, d->data, fetchedData, request.direction);
     completionHandler(EventSearch::FetchResult::complete, fetchedData.ranges,
         core::timeWindow<Facade>(d->data));

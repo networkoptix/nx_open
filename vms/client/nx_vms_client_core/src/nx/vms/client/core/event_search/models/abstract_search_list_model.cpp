@@ -51,7 +51,6 @@ struct AbstractSearchListModel::Private
     bool livePaused = false; //< Live mode paused state.
     bool isOnline = false; //< Whether connection with server is fully established.
     bool offlineAllowed = false; //< Whether the model can work without server connection.
-    bool fetchInProgress = false;
     OptionalFetchRequest request;
     OptionalTimePeriod interestTimePeriod; //< Time period of interest
     OptionalTimePeriod fetchedTimeWindow; //< Time window of currently fetched data.
@@ -179,7 +178,7 @@ int AbstractSearchListModel::calculateCentralItemIndex(const FetchedDataRanges& 
 
 bool AbstractSearchListModel::fetchInProgress() const
 {
-    return d->fetchInProgress;
+    return false;
 }
 
 bool AbstractSearchListModel::canFetchData(EventSearch::FetchDirection direction) const
@@ -206,34 +205,23 @@ bool AbstractSearchListModel::canFetchData(EventSearch::FetchDirection direction
     return d->fetchedTimeWindow->endTimeMs() < d->interestTimePeriod->endTimeMs();
 }
 
-void AbstractSearchListModel::setFetchInProgress(bool value)
-{
-    d->fetchInProgress = value;
-}
-
 bool AbstractSearchListModel::fetchData(const FetchRequest& request)
 {
     if (isFilterDegenerate() || !canFetchData(request.direction))
         return false;
 
-    setFetchInProgress(true);
-    emit fetchCommitStarted(request);
     const bool result = requestFetch(request,
         [this, request](EventSearch::FetchResult result,
             const FetchedDataRanges& ranges,
             const OptionalTimePeriod& timeWindow)
         {
-            setFetchInProgress(false);
             setFetchedTimeWindow(timeWindow);
             emit fetchFinished(
                 result, calculateCentralItemIndex(ranges, request.direction), request);
         });
 
     if (!result)
-    {
-        setFetchInProgress(false);
         emit fetchFinished(EventSearch::FetchResult::failed, -1, request);
-    }
 
     return result;
 }

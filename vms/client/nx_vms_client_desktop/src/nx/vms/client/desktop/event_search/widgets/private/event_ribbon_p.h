@@ -72,8 +72,8 @@ public:
     QWidget* viewportHeader() const;
     void setViewportHeader(QWidget* value); //< Takes ownership.
 
-    int count(bool excludeDummies = false) const;
-
+    int count() const { return (int) m_tiles.size(); }
+    int countWithoutDummies() const;
     int unreadCount() const;
     QnNotificationLevel::Value highestUnreadImportance() const;
 

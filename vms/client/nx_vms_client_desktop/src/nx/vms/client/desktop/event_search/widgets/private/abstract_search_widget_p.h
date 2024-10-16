@@ -98,7 +98,7 @@ private:
 
     void tryFetchData();
 
-    BusyIndicatorModel* relevantIndicatorModel(core::EventSearch::FetchDirection direction) const;
+    void setIndicatorVisible(core::EventSearch::FetchDirection direction, bool value);
     void handleItemCountChanged();
     void handleFetchFinished();
 
@@ -151,6 +151,7 @@ private:
     QDateTime m_currentDate; //< Either client or server time, depending on the local settings.
 
     Controls m_relevantControls = Control::defaults;
+    bool m_skipFetchOnScrollChange = false;
     bool m_crossSystemLayoutMode = false;
 };
 
