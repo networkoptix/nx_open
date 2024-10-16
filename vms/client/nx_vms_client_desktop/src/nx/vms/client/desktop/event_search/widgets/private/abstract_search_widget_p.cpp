@@ -256,19 +256,11 @@ AbstractSearchWidget::Private::Private(
         q->workbench(),
         &Workbench::currentLayoutChanged,
         this,
-        [this]()
+        [this]
         {
             if (!m_commonSetup)
                 return;
 
-            if (this->q->workbench()->currentLayout()->resource()->isCrossSystem())
-            {
-                m_commonSetup->setCameraSelection(
-                    nx::vms::client::core::EventSearch::CameraSelection::current);
-            }
-
-            m_crossSystemLayoutMode =
-                this->q->workbench()->currentLayout()->resource()->isCrossSystem();
             updateControlsVisibility();
         });
 
@@ -786,12 +778,17 @@ void AbstractSearchWidget::Private::setRelevantControls(Controls value)
 
 void AbstractSearchWidget::Private::updateControlsVisibility()
 {
+    if (workbench()->currentLayout()->resource()->isCrossSystem())
+        q->commonSetup()->setCameraSelection(nx::vms::client::core::EventSearch::CameraSelection::current);
+
     if (m_relevantControls.testFlags(Control::cameraSelector | Control::cameraSelectionDisplay))
     {
         ui->cameraSelectionButton->setVisible(
-            m_relevantControls.testFlag(Control::cameraSelector) && !m_crossSystemLayoutMode);
+            m_relevantControls.testFlag(Control::cameraSelector)
+                && !workbench()->currentLayout()->resource()->isCrossSystem());
         ui->cameraDisplayingButton->setVisible(
-            m_relevantControls.testFlag(Control::cameraSelectionDisplay) && m_crossSystemLayoutMode);
+            m_relevantControls.testFlag(Control::cameraSelectionDisplay)
+                && workbench()->currentLayout()->resource()->isCrossSystem());
     }
     else // For SimpleMotionSearchWidget correct displaying.
     {

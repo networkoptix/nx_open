@@ -86,6 +86,8 @@ class RightPanelModelsAdapter: public QIdentityProxyModel
     Q_PROPERTY(analytics::taxonomy::AttributeDisplayManager* attributeManager
         READ attributeManager WRITE setAttributeManager NOTIFY attributeManagerChanged)
 
+    Q_PROPERTY(bool crossSiteMode READ crossSiteMode NOTIFY crossSiteModeChanged)
+
     using base_type = QIdentityProxyModel;
 
 public:
@@ -162,6 +164,8 @@ public:
     Q_INVOKABLE core::FetchRequest requestForDirection(
         core::EventSearch::FetchDirection direction);
 
+    bool crossSiteMode() const;
+
     static void registerQmlTypes();
 
 signals:
@@ -199,6 +203,7 @@ signals:
     void pluginActionRequested(const nx::Uuid& engineId, const QString& actionTypeId,
         const nx::analytics::db::ObjectTrack& track, const QnVirtualCameraResourcePtr& camera);
     void livePausedChanged(bool isPaused);
+    void crossSiteModeChanged();
 
 private:
     class Private;

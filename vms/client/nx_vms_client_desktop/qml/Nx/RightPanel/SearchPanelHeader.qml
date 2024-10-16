@@ -97,6 +97,7 @@ Column
                 id: cameraSelector
                 setup: (header.model && header.model.commonSetup) || null
                 Layout.maximumWidth: filtersColumn.width
+                limitToCurrentCamera: header.model.crossSiteMode
             }
         }
     }

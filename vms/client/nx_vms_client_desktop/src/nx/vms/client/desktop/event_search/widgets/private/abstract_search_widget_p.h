@@ -152,7 +152,6 @@ private:
 
     Controls m_relevantControls = Control::defaults;
     bool m_skipFetchOnScrollChange = false;
-    bool m_crossSystemLayoutMode = false;
 };
 
 } // namespace nx::vms::client::desktop

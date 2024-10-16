@@ -258,11 +258,8 @@ AnalyticsSearchWidget::Private::Private(AnalyticsSearchWidget* q):
     if (NX_ASSERT(taxonomyManager))
     {
         m_currentTaxonomyChangedConnection.reset(
-            connect(taxonomyManager, &TaxonomyManager::currentTaxonomyChanged, this,
-                [this]()
-                {
-                    updateAllowanceAndTaxonomy();
-                }));
+            connect(taxonomyManager, &TaxonomyManager::currentTaxonomyChanged,
+                this, &AnalyticsSearchWidget::Private::updateAllowanceAndTaxonomy));
     }
 
     setupEngineSelection();
@@ -311,32 +308,26 @@ AnalyticsSearchWidget::Private::Private(AnalyticsSearchWidget* q):
             if (!selectedCamera)
                 return;
 
-            const auto commonContext = selectedCamera->systemContext()->as<SystemContext>();
+            const auto cameraContext = selectedCamera->systemContext()->as<SystemContext>();
 
-            taxonomyManager = commonContext->taxonomyManager();
+            taxonomyManager = cameraContext->taxonomyManager();
             if (!NX_ASSERT(taxonomyManager))
                 return;
 
-            if (!commonContext->messageProcessor())
+            if (!cameraContext->messageProcessor())
             {
                 // It is cross-system context case.
-                commonContext->createMessageProcessor<QnDesktopClientMessageProcessor>(
-                    taxonomyManager);
+                cameraContext->createMessageProcessor<QnDesktopClientMessageProcessor>(taxonomyManager);
             }
 
             m_currentTaxonomyChangedConnection.reset(
-                connect(taxonomyManager, &TaxonomyManager::currentTaxonomyChanged, this,
-                    [this]()
-                    {
-                        updateAllowanceAndTaxonomy();
-                    }));
+                connect(taxonomyManager, &TaxonomyManager::currentTaxonomyChanged,
+                    this, &AnalyticsSearchWidget::Private::updateAllowanceAndTaxonomy));
+
             m_filterModel->setTaxonomyManager(taxonomyManager);
 
-            m_model->setSystemContext(commonContext);
-            // Could be called in any order.
-            q->commonSetup()->setSystemContext(commonContext);
-            if (q->workbench()->currentLayout()->resource()->isCrossSystem())
-                q->commonSetup()->setCameraSelection(nx::vms::client::core::EventSearch::CameraSelection::current);
+            m_model->setSystemContext(cameraContext);
+            q->commonSetup()->setSystemContext(cameraContext);
 
             updateAllowanceAndTaxonomy();
         });

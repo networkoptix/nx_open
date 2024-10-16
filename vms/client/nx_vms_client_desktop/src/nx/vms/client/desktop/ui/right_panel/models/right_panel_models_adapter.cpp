@@ -13,6 +13,7 @@
 #include <QtGui/QDesktopServices>
 #include <QtQml/QtQml>
 
+#include <client/desktop_client_message_processor.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/media_resource.h>
@@ -60,6 +61,7 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource_dialogs/camera_selection_dialog.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/window_context.h>
@@ -218,6 +220,8 @@ public:
 
     analytics::taxonomy::AttributeDisplayManager* attributeManager() const;
     void setAttributeManager(analytics::taxonomy::AttributeDisplayManager* value);
+
+    bool crossSiteMode() const;
 
     static void calculatePreviewRects(const QnResourcePtr& resource,
         const QRectF& highlightRect,
@@ -604,6 +608,11 @@ core::FetchRequest RightPanelModelsAdapter::requestForDirection(
 
     NX_ASSERT(false, "Model isn't set");
     return {};
+}
+
+bool RightPanelModelsAdapter::crossSiteMode() const
+{
+    return d->crossSiteMode();
 }
 
 int RightPanelModelsAdapter::itemCount() const
@@ -1122,6 +1131,65 @@ void RightPanelModelsAdapter::Private::recreateSourceModel()
                 analyticsModel, &AnalyticsSearchListModel::pluginActionRequested,
                 q, &RightPanelModelsAdapter::pluginActionRequested);
 
+            auto updateModels =
+                [this, analyticsModel, analyticsFilterModel](SystemContext* cameraContext)
+                {
+                    if (cameraContext == q->commonSetup()->systemContext())
+                        return;
+
+                    const auto taxonomyManager = cameraContext->taxonomyManager();
+                    analyticsFilterModel->setTaxonomyManager(taxonomyManager);
+
+                    if (NX_ASSERT(taxonomyManager) && !cameraContext->messageProcessor())
+                    {
+                        // It is cross-system context case.
+                        cameraContext->createMessageProcessor<QnDesktopClientMessageProcessor>(
+                            taxonomyManager);
+                    }
+
+                    analyticsModel->setSystemContext(cameraContext);
+                    q->commonSetup()->setSystemContext(cameraContext);
+                };
+
+            m_modelConnections << connect(
+                m_context->navigator(), &QnWorkbenchNavigator::currentResourceChanged,
+                this,
+                [this, updateModels]
+                {
+                    const auto selectedCamera = m_context->navigator()->currentResource()
+                        .dynamicCast<QnVirtualCameraResource>();
+                    if (!selectedCamera)
+                        return;
+
+                    updateModels(selectedCamera->systemContext()->as<SystemContext>());
+
+                    emit q->crossSiteModeChanged();
+                });
+
+            m_modelConnections << connect(
+                m_context->workbench(),
+                &Workbench::currentLayoutChanged,
+                this,
+                [this, updateModels]
+                {
+                    const auto selectedCamera = m_context->navigator()->currentResource()
+                        .dynamicCast<QnVirtualCameraResource>();
+                    if (!selectedCamera)
+                        return;
+
+                    updateModels(selectedCamera->systemContext()->as<SystemContext>());
+
+                    emit q->crossSiteModeChanged();
+                });
+
+            if (const auto selectedCamera = m_context->navigator()->currentResource()
+                .dynamicCast<QnVirtualCameraResource>())
+            {
+                updateModels(selectedCamera->systemContext()->as<SystemContext>());
+            }
+
+            emit q->crossSiteModeChanged();
+
             break;
         }
     }
@@ -1521,6 +1589,14 @@ void RightPanelModelsAdapter::Private::setAttributeManager(
     }
 
     emit q->attributeManagerChanged();
+}
+
+bool RightPanelModelsAdapter::Private::crossSiteMode() const
+{
+    if (!m_context)
+        return false;
+
+    return m_context->workbench()->currentLayout()->resource()->isCrossSystem();
 }
 
 } // namespace nx::vms::client::desktop
