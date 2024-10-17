@@ -168,6 +168,11 @@ static const std::string kDeviceAgentManifest = /*suppress newline*/ 1 + (const 
                 "Model",
                 "Size",
                 "License Plate",
+                "License Plate.Number",
+                "License Plate.Country",
+                "License Plate.State/Province",
+                "License Plate.Size",
+                "License Plate.Color",
                 "Driver buckled up",
                 "Lane"
             ]
@@ -183,6 +188,11 @@ static const std::string kDeviceAgentManifest = /*suppress newline*/ 1 + (const 
                 "Model",
                 "Size",
                 "License Plate",
+                "License Plate.Number",
+                "License Plate.Country",
+                "License Plate.State/Province",
+                "License Plate.Size",
+                "License Plate.Color",
                 "Driver buckled up",
                 "Lane"
             ]
@@ -198,6 +208,11 @@ static const std::string kDeviceAgentManifest = /*suppress newline*/ 1 + (const 
                 "Model",
                 "Size",
                 "License Plate",
+                "License Plate.Number",
+                "License Plate.Country",
+                "License Plate.State/Province",
+                "License Plate.Size",
+                "License Plate.Color",
                 "Driver buckled up",
                 "Lane"
             ]
@@ -212,6 +227,11 @@ static const std::string kDeviceAgentManifest = /*suppress newline*/ 1 + (const 
                 "Model",
                 "Size",
                 "License Plate",
+                "License Plate.Number",
+                "License Plate.Country",
+                "License Plate.State/Province",
+                "License Plate.Size",
+                "License Plate.Color",
                 "Driver buckled up",
                 "Lane"
             ]
@@ -226,6 +246,11 @@ static const std::string kDeviceAgentManifest = /*suppress newline*/ 1 + (const 
                 "Model",
                 "Size",
                 "License Plate",
+                "License Plate.Number",
+                "License Plate.Country",
+                "License Plate.State/Province",
+                "License Plate.Size",
+                "License Plate.Color",
                 "Driver buckled up",
                 "Lane"
             ]
@@ -241,6 +266,11 @@ static const std::string kDeviceAgentManifest = /*suppress newline*/ 1 + (const 
                 "Model",
                 "Size",
                 "License Plate",
+                "License Plate.Number",
+                "License Plate.Country",
+                "License Plate.State/Province",
+                "License Plate.Size",
+                "License Plate.Color",
                 "Driver buckled up",
                 "Lane"
             ]
@@ -256,6 +286,11 @@ static const std::string kDeviceAgentManifest = /*suppress newline*/ 1 + (const 
                 "Model",
                 "Size",
                 "License Plate",
+                "License Plate.Number",
+                "License Plate.Country",
+                "License Plate.State/Province",
+                "License Plate.Size",
+                "License Plate.Color",
                 "Driver buckled up",
                 "Lane"
             ]
@@ -270,12 +305,18 @@ static const std::string kDeviceAgentManifest = /*suppress newline*/ 1 + (const 
                 "Model",
                 "Size",
                 "License Plate",
+                "License Plate.Number",
+                "License Plate.Country",
+                "License Plate.State/Province",
+                "License Plate.Size",
+                "License Plate.Color",
                 "Driver buckled up",
                 "Lane"
             ]
         },
         {
             "objectTypeId": "nx.base.AirTransport",
+            "_comment": "License Plate attributes are not shown to demonstrate the Supported Attributes feature.",
             "attributes":
             [
                 "Color",
