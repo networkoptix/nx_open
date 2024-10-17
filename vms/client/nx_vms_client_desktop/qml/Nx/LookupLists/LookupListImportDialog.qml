@@ -281,7 +281,7 @@ ModalDialog
 
         function processPreviewBuildExitCode(exitCode)
         {
-            previewProcessor.correct = exitCode === LookupListPreviewProcessor.Success
+            previewProcessor.valid = exitCode === LookupListPreviewProcessor.Success
 
             switch (exitCode)
             {

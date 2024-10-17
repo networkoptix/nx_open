@@ -46,7 +46,7 @@ public:
         ErrorFileNotFound,
     }
 
-    Q_ENUMS(PreviewBuildExitCode)
+    Q_ENUMS(PreviewBuildResult)
 
     Q_PROPERTY(int rowsNumber READ rowsNumber WRITE setRowsNumber
         NOTIFY rowsNumberChanged REQUIRED);
