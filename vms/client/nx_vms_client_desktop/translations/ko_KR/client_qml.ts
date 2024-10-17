@@ -5,7 +5,7 @@
     <name>AddLookupListEntryDialog</name>
     <message>
       <source>Add Entry</source>
-      <translation type="unfinished">Add Entry</translation>
+      <translation>항목 추가</translation>
     </message>
     <message>
       <source>Add</source>
@@ -16,7 +16,7 @@
     <name>AdvancedSettingsDialog</name>
     <message>
       <source>LDAP - Advanced Settings</source>
-      <translation type="unfinished">LDAP - Advanced Settings</translation>
+      <translation>LDAP - 고급 설정</translation>
     </message>
     <message>
       <source>Users</source>
@@ -24,7 +24,7 @@
     </message>
     <message>
       <source>Login Attribute</source>
-      <translation type="unfinished">Login Attribute</translation>
+      <translation>로그인 속성</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -32,23 +32,23 @@
     </message>
     <message>
       <source>Membership</source>
-      <translation type="unfinished">Membership</translation>
+      <translation>멤버십</translation>
     </message>
     <message>
       <source>Search Timeout</source>
-      <translation type="unfinished">Search Timeout</translation>
+      <translation>검색 시간 초과</translation>
     </message>
     <message>
       <source>To enable digest authentication for LDAP users that are already added to the VMS database, you need to enable it directly in these users&apos; settings.</source>
-      <translation type="unfinished">To enable digest authentication for LDAP users that are already added to the VMS database, you need to enable it directly in these users&apos; settings.</translation>
+      <translation>VMS 데이터베이스에 이미 추가된 LDAP 사용자에 대해 다이제스트 인증을 활성화하려면 이러한 사용자&apos; 설정에서 직접 활성화해야 합니다.</translation>
     </message>
     <message>
       <source>To disable digest authentication for LDAP users that are already added to the VMS database, you need to disable it directly in these users&apos; settings.</source>
-      <translation type="unfinished">To disable digest authentication for LDAP users that are already added to the VMS database, you need to disable it directly in these users&apos; settings.</translation>
+      <translation>VMS 데이터베이스에 이미 추가된 LDAP 사용자에 대해 다이제스트 인증을 비활성화하려면 이러한 사용자&apos; 설정에서 직접 비활성화해야 합니다.</translation>
     </message>
     <message>
       <source>Allow insecure (digest) authentication for imported users</source>
-      <translation type="unfinished">Allow insecure (digest) authentication for imported users</translation>
+      <translation>가져온 사용자에 대해 안전하지 않은(다이제스트) 인증 허용</translation>
     </message>
     <message>
       <source>General</source>
@@ -56,20 +56,20 @@
     </message>
     <message>
       <source>Synchronize Users</source>
-      <translation type="unfinished">Synchronize Users</translation>
+      <translation>사용자 동기화</translation>
     </message>
     <message>
       <source>Sync Interval</source>
-      <translation type="unfinished">Sync Interval</translation>
+      <translation>동기화 주기</translation>
     </message>
     <message>
       <source>Proxy LDAP requests %1 via server</source>
       <comment>%1 is a line break</comment>
-      <translation type="unfinished">Proxy LDAP requests %1 via server</translation>
+      <translation>%1 서버를 통해 프록시 LDAP 요청</translation>
     </message>
     <message>
       <source>Group Members Attribute</source>
-      <translation type="unfinished">Group Members Attribute</translation>
+      <translation>그룹 멤버 속성</translation>
     </message>
   </context>
   <context>
@@ -246,7 +246,7 @@
     </message>
     <message>
       <source>API Integrations</source>
-      <translation type="unfinished">API Integrations</translation>
+      <translation>API 통합</translation>
     </message>
   </context>
   <context>
@@ -260,23 +260,23 @@
     <name>ApiIntegrations</name>
     <message>
       <source>API Integrations</source>
-      <translation type="unfinished">API Integrations</translation>
+      <translation>API 통합</translation>
     </message>
     <message>
       <source>API Integrations interact with %1 Server via REST API and exchange metadata</source>
-      <translation type="unfinished">API Integrations interact with %1 Server via REST API and exchange metadata</translation>
+      <translation>API 통합은 REST API를 통해 %1 서버와 상호 작용하고 메타데이터를 교환합니다.</translation>
     </message>
     <message>
       <source>New requests</source>
-      <translation type="unfinished">New requests</translation>
+      <translation>새 요청</translation>
     </message>
     <message>
       <source>API Integration may be enabled after verifying the code received from Integration provider. New requests may be disabled to prevent unwanted interaction.</source>
-      <translation type="unfinished">API Integration may be enabled after verifying the code received from Integration provider. New requests may be disabled to prevent unwanted interaction.</translation>
+      <translation>API 통합은 통합 제공자로부터 수신된 코드를 검증한 후 활성화될 수 있습니다. 원치 않는 상호 작용을 방지하기 위해 새로운 요청은 비활성화될 수 있습니다.</translation>
     </message>
     <message>
       <source>Enable %1?</source>
-      <translation type="unfinished">Enable %1?</translation>
+      <translation>%1을 활성화 하시겠습니까?</translation>
     </message>
     <message>
       <source>This Integration will be able to:
@@ -284,23 +284,23 @@
  • get access to archive
  • process video streams
  • exchange metadata over the network</source>
-      <translation type="unfinished">This Integration will be able to:
- • change settings on cameras
- • get access to archive
- • process video streams
- • exchange metadata over the network</translation>
+      <translation>이 통합은 다음을 수행할 수 있습니다:
+ • 카메라 설정 변경
+ • 보관소 액세스
+ • 비디오 스트림 처리
+ • 네트워크를 통해 메타데이터 교환</translation>
     </message>
     <message>
       <source>Enable Integration</source>
-      <translation type="unfinished">Enable Integration</translation>
+      <translation>통합 사용</translation>
     </message>
     <message>
       <source>Remove %1?</source>
-      <translation type="unfinished">Remove %1?</translation>
+      <translation>%1을 제거하시겠습니까?</translation>
     </message>
     <message>
       <source>This will remove Integration request</source>
-      <translation type="unfinished">This will remove Integration request</translation>
+      <translation>이렇게 하면 통합 요청이 제거됩니다.</translation>
     </message>
     <message>
       <source>Remove</source>
@@ -308,14 +308,14 @@
     </message>
     <message>
       <source>Remove Request</source>
-      <translation type="unfinished">Remove Request</translation>
+      <translation>요청 제거</translation>
     </message>
   </context>
   <context>
     <name>AutoTextField</name>
     <message>
       <source>This field cannot be empty</source>
-      <translation type="unfinished">This field cannot be empty</translation>
+      <translation>이 필드는 비워둘 수 없습니다</translation>
     </message>
     <message>
       <source>Auto</source>
@@ -326,8 +326,8 @@
     <name>BatchUserEditDialog</name>
     <message numerus="yes">
       <source>Batch Edit - %n Users</source>
-      <translation type="unfinished">
-        <numerusform>Batch Edit - %n Users</numerusform>
+      <translation>
+        <numerusform>일괄 편집 - %n 사용자</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -339,7 +339,7 @@
     <message>
       <source>User status</source>
       <comment>Whether users are enabled or disabled</comment>
-      <translation type="unfinished">User status</translation>
+      <translation>사용자 상태</translation>
     </message>
     <message>
       <source>Enabled</source>
@@ -351,11 +351,11 @@
     </message>
     <message>
       <source>Insecure (digest) authentication</source>
-      <translation type="unfinished">Insecure (digest) authentication</translation>
+      <translation>안전하지 않은 (다이제스트) 인증</translation>
     </message>
     <message>
       <source>keep current value</source>
-      <translation type="unfinished">keep current value</translation>
+      <translation>현재 값을 유지하다</translation>
     </message>
   </context>
   <context>
@@ -466,7 +466,7 @@
     </message>
     <message>
       <source>Shut Down</source>
-      <translation type="unfinished">Shut Down</translation>
+      <translation>종료</translation>
     </message>
   </context>
   <context>
@@ -494,7 +494,7 @@
     <name>ConnectionSettingsDialog</name>
     <message>
       <source>LDAP - Connection Settings</source>
-      <translation type="unfinished">LDAP - Connection Settings</translation>
+      <translation>LDAP - 연결 설정</translation>
     </message>
     <message>
       <source>Host</source>
@@ -502,7 +502,7 @@
     </message>
     <message>
       <source>Login DN</source>
-      <translation type="unfinished">Login DN</translation>
+      <translation>로그인 DN</translation>
     </message>
     <message>
       <source>Password</source>
@@ -510,7 +510,7 @@
     </message>
     <message>
       <source>Ignore LDAP server certificate errors</source>
-      <translation type="unfinished">Ignore LDAP server certificate errors</translation>
+      <translation>LDAP 서버 인증서 오류 무시</translation>
     </message>
     <message>
       <source>Test</source>
@@ -522,15 +522,15 @@
     </message>
     <message>
       <source>Use StartTLS</source>
-      <translation type="unfinished">Use StartTLS</translation>
+      <translation>StartTLS를 사용하세요</translation>
     </message>
     <message>
       <source>Host cannot be empty</source>
-      <translation type="unfinished">Host cannot be empty</translation>
+      <translation>호스트는 비어 있을 수 없습니다.</translation>
     </message>
     <message>
       <source>Login DN cannot be empty</source>
-      <translation type="unfinished">Login DN cannot be empty</translation>
+      <translation>로그인 DN은 비어 있을 수 없습니다.</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
@@ -538,7 +538,7 @@
     </message>
     <message>
       <source>To allow LDAP users to log in to %1, it is necessary to establish a connection between %1 and a corporate LDAP server.</source>
-      <translation type="unfinished">To allow LDAP users to log in to %1, it is necessary to establish a connection between %1 and a corporate LDAP server.</translation>
+      <translation>LDAP 사용자가 %1에 로그인할 수 있도록 하려면 %1 와 회사 LDAP 서버 사이에 연결을 설정해야 합니다.</translation>
     </message>
   </context>
   <context>
@@ -598,11 +598,11 @@
     <name>EditLookupListDialog</name>
     <message>
       <source>List Settings</source>
-      <translation type="unfinished">List Settings</translation>
+      <translation>목록 설정</translation>
     </message>
     <message>
       <source>New List</source>
-      <translation type="unfinished">New List</translation>
+      <translation>새 목록</translation>
     </message>
     <message>
       <source>Name</source>
@@ -610,7 +610,7 @@
     </message>
     <message>
       <source>Column Name</source>
-      <translation type="unfinished">Column Name</translation>
+      <translation>열 이름</translation>
     </message>
     <message>
       <source>OK</source>
@@ -705,11 +705,11 @@
     </message>
     <message>
       <source>Base DN</source>
-      <translation type="unfinished">Base DN</translation>
+      <translation>기본 DN</translation>
     </message>
     <message>
       <source>Base DN cannot be empty</source>
-      <translation type="unfinished">Base DN cannot be empty</translation>
+      <translation>기본 DN은 비어 있을 수 없습니다.</translation>
     </message>
     <message>
       <source>Filter</source>
@@ -717,15 +717,15 @@
     </message>
     <message>
       <source>The Base DN sets the starting point for LDAP searches and synchronization.</source>
-      <translation type="unfinished">The Base DN sets the starting point for LDAP searches and synchronization.</translation>
+      <translation>기본 DN은 LDAP 검색 및 동기화의 시작점을 설정합니다.</translation>
     </message>
     <message>
       <source>Filters help control access to the system and synchronization by specifying which users and/or groups from the Base DN are allowed.</source>
-      <translation type="unfinished">Filters help control access to the system and synchronization by specifying which users and/or groups from the Base DN are allowed.</translation>
+      <translation>필터는 기본 DN에서 어떤 사용자 및/또는 그룹이 허용되는지 지정하여 시스템과 동기화에 대한 액세스를 제어하는 데 도움이 됩니다.</translation>
     </message>
     <message>
       <source>Edit Search Base</source>
-      <translation type="unfinished">Edit Search Base</translation>
+      <translation>검색 기준 편집</translation>
     </message>
   </context>
   <context>
@@ -822,11 +822,11 @@
     <name>GlobalPermissionsTab</name>
     <message>
       <source>At the system level, group members have permissions to:</source>
-      <translation type="unfinished">At the system level, group members have permissions to:</translation>
+      <translation>시스템 수준에서 그룹 구성원은 다음과 같은 권한을 갖습니다.</translation>
     </message>
     <message>
       <source>At the system level, the user has permissions to:</source>
-      <translation type="unfinished">At the system level, the user has permissions to:</translation>
+      <translation>시스템 수준에서 사용자는 다음 권한을 갖습니다.</translation>
     </message>
   </context>
   <context>
@@ -849,11 +849,11 @@
     </message>
     <message>
       <source>Global Permissions</source>
-      <translation type="unfinished">Global Permissions</translation>
+      <translation>글로벌 권한</translation>
     </message>
     <message>
       <source>Members</source>
-      <translation type="unfinished">Members</translation>
+      <translation>회원</translation>
     </message>
     <message>
       <source>Add Group</source>
@@ -883,7 +883,7 @@
     <name>GroupEditDialog</name>
     <message>
       <source>Group - %1</source>
-      <translation type="unfinished">Group - %1</translation>
+      <translation>그룹 - %1</translation>
     </message>
     <message>
       <source>General</source>
@@ -899,11 +899,11 @@
     </message>
     <message>
       <source>Global Permissions</source>
-      <translation type="unfinished">Global Permissions</translation>
+      <translation>글로벌 권한</translation>
     </message>
     <message>
       <source>Members</source>
-      <translation type="unfinished">Members</translation>
+      <translation>회원</translation>
     </message>
   </context>
   <context>
@@ -926,7 +926,7 @@
     </message>
     <message>
       <source>Members</source>
-      <translation type="unfinished">Members</translation>
+      <translation>회원</translation>
     </message>
     <message>
       <source>Users</source>
@@ -938,19 +938,19 @@
     </message>
     <message>
       <source>Another group with the same name exists in the system. It is recommended to assign unique names to the groups.</source>
-      <translation type="unfinished">Another group with the same name exists in the system. It is recommended to assign unique names to the groups.</translation>
+      <translation>같은 이름을 가진 다른 그룹이 시스템에 존재합니다. 그룹에 고유한 이름을 지정하는 것이 좋습니다.</translation>
     </message>
     <message>
       <source>The group has another group as both its parent, and as a child member, or is a part of such a circular reference chain. Resolve this chain to prevent incorrect calculation of permissions.</source>
-      <translation type="unfinished">The group has another group as both its parent, and as a child member, or is a part of such a circular reference chain. Resolve this chain to prevent incorrect calculation of permissions.</translation>
+      <translation>그룹에는 부모 그룹과 자식 그룹이 모두 있거나, 그러한 순환 참조 체인의 일부입니다. 권한의 잘못된 계산을 방지하기 위해 이 체인을 해결합니다.</translation>
     </message>
     <message>
       <source>When continuous sync with LDAP server is disabled, groups do not synchronize automatically. To update this group, initiate a manual sync.</source>
-      <translation type="unfinished">When continuous sync with LDAP server is disabled, groups do not synchronize automatically. To update this group, initiate a manual sync.</translation>
+      <translation>LDAP 서버와의 지속적인 동기화가 비활성화되면 그룹은 자동으로 동기화되지 않습니다. 이 그룹을 업데이트하려면 수동 동기화를 시작하세요.</translation>
     </message>
     <message>
       <source>This group is not found in the LDAP database.</source>
-      <translation type="unfinished">This group is not found in the LDAP database.</translation>
+      <translation>LDAP 데이터베이스에서 이 그룹을 찾을 수 없습니다.</translation>
     </message>
   </context>
   <context>
@@ -965,19 +965,19 @@
     </message>
     <message>
       <source>No members</source>
-      <translation type="unfinished">No members</translation>
+      <translation>회원이 없습니다</translation>
     </message>
     <message>
       <source>Use controls on the left to add members</source>
-      <translation type="unfinished">Use controls on the left to add members</translation>
+      <translation>왼쪽의 컨트롤을 사용하여 멤버를 추가하세요</translation>
     </message>
     <message>
       <source>Members summary</source>
-      <translation type="unfinished">Members summary</translation>
+      <translation>회원 요약</translation>
     </message>
     <message>
       <source>Inherits membership in current group</source>
-      <translation type="unfinished">Inherits membership in current group</translation>
+      <translation>현재 그룹의 멤버십을 상속받습니다.</translation>
     </message>
   </context>
   <context>
@@ -996,7 +996,7 @@
     </message>
     <message>
       <source>No groups</source>
-      <translation type="unfinished">No groups</translation>
+      <translation>그룹 없음</translation>
     </message>
     <message numerus="yes">
       <source>%n more</source>
@@ -1043,7 +1043,7 @@
     <name>InsecureWarning</name>
     <message>
       <source>Account security is important. Do not enable this setting unless you have good reasons to do so.</source>
-      <translation type="unfinished">Account security is important. Do not enable this setting unless you have good reasons to do so.</translation>
+      <translation>계정 보안은 중요합니다. 그럴 만한 충분한 이유가 없다면 이 설정을 활성화하지 마세요.</translation>
     </message>
   </context>
   <context>
@@ -1055,13 +1055,13 @@
     <message numerus="yes">
       <source>%n suitable integration services are required to turn on the integration</source>
       <comment>Required integration count</comment>
-      <translation type="unfinished">
-        <numerusform>%n suitable integration services are required to turn on the integration</numerusform>
+      <translation>
+        <numerusform>통합을 켜려면 %n 적합한 통합 서비스가 필요합니다.</numerusform>
       </translation>
     </message>
     <message>
       <source>0 suitable services available</source>
-      <translation type="unfinished">0 suitable services available</translation>
+      <translation>0개의 적합한 서비스가 있습니다</translation>
     </message>
     <message>
       <source>OFFLINE</source>
@@ -1073,7 +1073,7 @@
     </message>
     <message>
       <source>Services Required</source>
-      <translation type="unfinished">Services Required</translation>
+      <translation>필요한 서비스</translation>
     </message>
     <message>
       <source>Refreshing...</source>
@@ -1082,7 +1082,7 @@
     <message>
       <source>There are more cameras using this integration than available services. Please disable integration for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</source>
       <comment>%1 will be substituted by a date</comment>
-      <translation type="unfinished">There are more cameras using this integration than available services. Please disable integration for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</translation>
+      <translation>이 통합을 사용하는 카메라가 사용 가능한 서비스보다 많습니다. 일부 카메라에 대한 통합을 비활성화하거나 더 적합한 서비스를 추가하세요. 그렇지 않으면 %1에서 자동으로 수행됩니다.</translation>
     </message>
   </context>
   <context>
@@ -1207,7 +1207,7 @@
     <name>LdapSettings</name>
     <message>
       <source>ONLINE</source>
-      <translation type="unfinished">ONLINE</translation>
+      <translation>온라인</translation>
     </message>
     <message>
       <source>OFFLINE</source>
@@ -1223,7 +1223,7 @@
     </message>
     <message>
       <source>Last Sync</source>
-      <translation type="unfinished">Last Sync</translation>
+      <translation>마지막 동기화</translation>
     </message>
     <message>
       <source>Edit</source>
@@ -1231,7 +1231,7 @@
     </message>
     <message>
       <source>Advanced Settings</source>
-      <translation type="unfinished">Advanced Settings</translation>
+      <translation>고급 설정</translation>
     </message>
     <message>
       <source>Disconnect</source>
@@ -1243,39 +1243,39 @@
     </message>
     <message>
       <source>Please use care when altering LDAP settings. Incorrect configuration could disrupt system availability for a large number of users simultaneously.</source>
-      <translation type="unfinished">Please use care when altering LDAP settings. Incorrect configuration could disrupt system availability for a large number of users simultaneously.</translation>
+      <translation>LDAP 설정을 변경할 때는 주의하세요. 잘못된 구성은 많은 수의 사용자에게 동시에 시스템 가용성을 방해할 수 있습니다.</translation>
     </message>
     <message>
       <source>Connect your System to an LDAP server for easier user management</source>
-      <translation type="unfinished">Connect your System to an LDAP server for easier user management</translation>
+      <translation>사용자 관리를 보다 쉽게 하기 위해 시스템을 LDAP 서버에 연결하세요</translation>
     </message>
     <message>
       <source>Not configured yet</source>
-      <translation type="unfinished">Not configured yet</translation>
+      <translation>아직 구성되지 않음</translation>
     </message>
     <message>
       <source>Configure</source>
-      <translation type="unfinished">Configure</translation>
+      <translation>구성</translation>
     </message>
     <message>
       <source>Continuous sync with LDAP server is disabled for this system. Updates to groups and users and groups membership will occur solely through manual synchronization.</source>
-      <translation type="unfinished">Continuous sync with LDAP server is disabled for this system. Updates to groups and users and groups membership will occur solely through manual synchronization.</translation>
+      <translation>이 시스템에서는 LDAP 서버와의 지속적인 동기화가 비활성화되어 있습니다. 그룹 및 사용자와 그룹 멤버십에 대한 업데이트는 수동 동기화를 통해서만 이루어집니다.</translation>
     </message>
     <message>
       <source>Search Bases</source>
-      <translation type="unfinished">Search Bases</translation>
+      <translation>검색 기준</translation>
     </message>
     <message>
       <source>Add Search Base</source>
-      <translation type="unfinished">Add Search Base</translation>
+      <translation>검색 기준 추가</translation>
     </message>
     <message>
       <source>Specify at least one search base to synchronize users and groups</source>
-      <translation type="unfinished">Specify at least one search base to synchronize users and groups</translation>
+      <translation>사용자 및 그룹을 동기화하려면 최소한 하나의 검색 기준을 지정하세요.</translation>
     </message>
     <message>
       <source>No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and search bases are configured correctly.</source>
-      <translation type="unfinished">No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and search bases are configured correctly.</translation>
+      <translation>동기화 설정과 일치하는 사용자나 그룹이 없으며 시스템 DB에 추가됩니다. LDAP 서버 매개변수와 검색 기준이 올바르게 구성되었는지 확인하세요.</translation>
     </message>
   </context>
   <context>
@@ -1406,7 +1406,7 @@
     </message>
     <message>
       <source>Create New...</source>
-      <translation type="unfinished">Create New...</translation>
+      <translation>새로 만들기...</translation>
     </message>
     <message>
       <source>Settings</source>
@@ -1432,7 +1432,7 @@
     </message>
     <message>
       <source>The previous link will be invalidated once a new one has been issued</source>
-      <translation type="unfinished">The previous link will be invalidated once a new one has been issued</translation>
+      <translation>새로운 링크가 발급되면 이전 링크는 무효화됩니다.</translation>
     </message>
     <message>
       <source>Create</source>
@@ -1443,15 +1443,15 @@
     <name>NoListsPage</name>
     <message>
       <source>No Lists</source>
-      <translation type="unfinished">No Lists</translation>
+      <translation>목록 없음</translation>
     </message>
     <message>
       <source>You have not created any Lists yet. With lists you can store multiple values to use them in Event Rules. Create a new List to start adding entries.</source>
-      <translation type="unfinished">You have not created any Lists yet. With lists you can store multiple values to use them in Event Rules. Create a new List to start adding entries.</translation>
+      <translation>아직 목록을 만들지 않았습니다. 목록을 사용하면 여러 값을 저장하여 이벤트 규칙에서 사용할 수 있습니다. 새 목록을 만들어 항목 추가를 시작하세요.</translation>
     </message>
     <message>
       <source>Create New...</source>
-      <translation type="unfinished">Create New...</translation>
+      <translation>새로 만들기...</translation>
     </message>
   </context>
   <context>
@@ -1503,7 +1503,7 @@
     <name>PanelBase</name>
     <message>
       <source>Approve</source>
-      <translation type="unfinished">Approve</translation>
+      <translation>승인</translation>
     </message>
     <message>
       <source>Reject</source>
@@ -1522,7 +1522,7 @@
     </message>
     <message>
       <source>No custom groups yet</source>
-      <translation type="unfinished">No custom groups yet</translation>
+      <translation>아직 사용자 정의 그룹이 없습니다.</translation>
     </message>
     <message>
       <source>No groups found</source>
@@ -1534,11 +1534,11 @@
     </message>
     <message>
       <source>No groups</source>
-      <translation type="unfinished">No groups</translation>
+      <translation>그룹 없음</translation>
     </message>
     <message>
       <source>Use controls on the left to add to a group</source>
-      <translation type="unfinished">Use controls on the left to add to a group</translation>
+      <translation>왼쪽의 컨트롤을 사용하여 멤버를 추가하세요</translation>
     </message>
     <message>
       <source>Member of</source>
@@ -1565,7 +1565,7 @@
     <name>PasswordChangeDialog</name>
     <message>
       <source>Change password - %1</source>
-      <translation type="unfinished">Change password - %1</translation>
+      <translation>비밀번호 변경 - %1</translation>
     </message>
     <message>
       <source>Login</source>
@@ -1592,31 +1592,31 @@
     <name>PermissionSummary</name>
     <message>
       <source>No custom permissions</source>
-      <translation type="unfinished">No custom permissions</translation>
+      <translation>사용자 정의 권한이 없습니다</translation>
     </message>
   </context>
   <context>
     <name>PermissionsTab</name>
     <message>
       <source>No resources found</source>
-      <translation type="unfinished">No resources found</translation>
+      <translation>해당 리소스 없음</translation>
     </message>
     <message>
       <source>Automatically add dependent permissions</source>
-      <translation type="unfinished">Automatically add dependent permissions</translation>
+      <translation>자동으로 종속 권한 추가</translation>
     </message>
     <message>
       <source>Use %1 or %2 to select multiple resources, or %3 to clear the selection</source>
       <comment>%1, %2 and %3 will be replaced with keyboard key names</comment>
-      <translation type="unfinished">Use %1 or %2 to select multiple resources, or %3 to clear the selection</translation>
+      <translation>여러 리소스를 선택하려면 %1 또는 %2 를 사용하고, 선택을 취소하려면 %3 를 사용합니다.</translation>
     </message>
     <message>
       <source>Resources table gives you an overview of user or group permissions and allows you to assign permissions for specific resources.</source>
-      <translation type="unfinished">Resources table gives you an overview of user or group permissions and allows you to assign permissions for specific resources.</translation>
+      <translation>리소스 테이블은 사용자 또는 그룹 권한에 대한 개요를 제공하고 특정 리소스에 대한 권한을 할당할 수 있도록 해줍니다.</translation>
     </message>
     <message>
       <source>If you select a permission that depends on another permission both permissions will be granted automatically.</source>
-      <translation type="unfinished">If you select a permission that depends on another permission both permissions will be granted automatically.</translation>
+      <translation>다른 권한에 의존하는 권한을 선택하면 두 권한 모두 자동으로 부여됩니다.</translation>
     </message>
   </context>
   <context>
@@ -1627,7 +1627,7 @@
     </message>
     <message>
       <source>Plugins are programs that run on the %1 Server to enable seamless video analytics integrations.</source>
-      <translation type="unfinished">Plugins are programs that run on the %1 Server to enable seamless video analytics integrations.</translation>
+      <translation>플러그인은 %1 서버에서 실행되는 프로그램으로, 원활한 비디오 분석 통합을 가능하게 합니다.</translation>
     </message>
   </context>
   <context>
@@ -1722,64 +1722,60 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Press arrow keys to move around. Use plus and minus keys to zoom.</source>
-      <translation type="unfinished">Press arrow keys to move around. Use plus and minus keys to zoom.</translation>
+      <translation>이동하려면 화살표 키를 누르고 확대 / 축소하려면 더하기 또는 빼기 키를 누릅니다.</translation>
     </message>
     <message>
       <source>Use mouse wheel to zoom</source>
-      <translation type="unfinished">Use mouse wheel to zoom</translation>
+      <translation>마우스 휠을 사용하여 확대 / 축소</translation>
     </message>
     <message>
       <source>You can enable this guide again by going to Local Settings &gt; Advanced &gt; Reset All Warnings</source>
-      <translation type="unfinished">You can enable this guide again by going to Local Settings &gt; Advanced &gt; Reset All Warnings</translation>
+      <translation>로컬 설정 &gt; 고급 &gt; 모든 경고 재설정으로 이동하여 이 가이드를 다시 활성화할 수 있습니다.</translation>
     </message>
     <message>
       <source>Introducing
 New PTZ controls</source>
-      <translation type="unfinished">Introducing
-New PTZ controls</translation>
+      <translation>새로운 PTZ 컨트롤을 소개합니다</translation>
     </message>
     <message>
       <source>Click, double-click, or drag
 mouse pointer while pressing
 Shift key to use Advanced PTZ</source>
-      <translation type="unfinished">Click, double-click, or drag
-mouse pointer while pressing
-Shift key to use Advanced PTZ</translation>
+      <translation>고급 PTZ를 사용하려면 Shift 키를 누른 상태에서 마우스 포인터를 클릭, 더블 클릭 또는 드래그하십시오.</translation>
     </message>
     <message>
       <source>Here is a quick guide
 on what has changed.</source>
-      <translation type="unfinished">Here is a quick guide
-on what has changed.</translation>
+      <translation>변경된 사항에 대한 간단한 가이드는 다음과 같습니다.</translation>
     </message>
     <message>
       <source>To use Target Lock Tracking,
 Press Alt + Click to follow object</source>
-      <translation type="unfinished">To use Target Lock Tracking,
-Press Alt + Click to follow object</translation>
+      <translation>대상 잠금 추적을 사용하려면
+Alt 키를 누른 채 클릭하여 객체를 따라가세요.</translation>
     </message>
   </context>
   <context>
     <name>QuickIntervalPanel</name>
     <message>
       <source>today</source>
-      <translation type="unfinished">today</translation>
+      <translation>오늘</translation>
     </message>
     <message>
       <source>-1 hour</source>
-      <translation type="unfinished">-1 hour</translation>
+      <translation>-1시간</translation>
     </message>
     <message>
       <source>-24 hours</source>
-      <translation type="unfinished">-24 hours</translation>
+      <translation>-24시간</translation>
     </message>
     <message>
       <source>-7 days</source>
-      <translation type="unfinished">-7 days</translation>
+      <translation>-7일</translation>
     </message>
     <message>
       <source>-30 days</source>
-      <translation type="unfinished">-30 days</translation>
+      <translation>-30일</translation>
     </message>
   </context>
   <context>
@@ -1820,27 +1816,27 @@ Press Alt + Click to follow object</translation>
     <message>
       <source>Has %1 permission</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Has %1 permission</translation>
+      <translation>%1 권한이 있습니다</translation>
     </message>
     <message>
       <source>Add %1 and dependent permissions</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Add %1 and dependent permissions</translation>
+      <translation>%1 및 종속 권한 추가</translation>
     </message>
     <message>
       <source>Add %1 permission</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Add %1 permission</translation>
+      <translation>%1 권한 추가</translation>
     </message>
     <message>
       <source>Remove %1 and dependent permissions</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Remove %1 and dependent permissions</translation>
+      <translation>%1 및 종속 권한 제거</translation>
     </message>
     <message>
       <source>Remove %1 permission</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Remove %1 permission</translation>
+      <translation>%1 권한 제거</translation>
     </message>
     <message>
       <source>Also inherits it from</source>
@@ -1884,7 +1880,7 @@ Press Alt + Click to follow object</translation>
     <name>ResourceFilterButton</name>
     <message>
       <source>Available by Permissions</source>
-      <translation type="unfinished">Available by Permissions</translation>
+      <translation>사용 가능 권한</translation>
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
@@ -2012,19 +2008,19 @@ Press Alt + Click to follow object</translation>
     <name>SaasBanner</name>
     <message>
       <source>System has been suspended. To enable/disable the integration usage for current device the System must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">System has been suspended. To enable/disable the integration usage for current device the System must be in active state. Contact your channel partner for details</translation>
+      <translation>시스템이 일시 중단되었습니다. 현재 기기에 대한 통합 사용을 활성화/비활성화하려면 시스템이 활성 상태여야 합니다. 자세한 내용은 채널 파트너에게 문의하세요.</translation>
     </message>
     <message>
       <source>System has been suspended. To enable/disable the integration usage for some device the System must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">System has been suspended. To enable/disable the integration usage for some device the System must be in active state. Contact your channel partner for details</translation>
+      <translation>시스템이 일시 중단되었습니다. 일부 기기에 대한 통합 사용을 활성화/비활성화하려면 시스템이 활성 상태여야 합니다. 자세한 내용은 채널 파트너에게 문의하세요.</translation>
     </message>
     <message>
       <source>System has been shut down. To enable this integration usage for current device the System must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">System has been shut down. To enable this integration usage for current device the System must be in active state. Contact your channel partner for details</translation>
+      <translation>시스템이 종료되었습니다. 현재 기기에 대한 이 통합 사용을 활성화하려면 시스템이 활성 상태여야 합니다. 자세한 내용은 채널 파트너에게 문의하세요.</translation>
     </message>
     <message>
       <source>System has been shut down. To activate this integration usage for some device the System must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">System has been shut down. To activate this integration usage for some device the System must be in active state. Contact your channel partner for details</translation>
+      <translation>시스템이 종료되었습니다. 일부 기기에 대한 이 통합 사용을 활성화하려면 시스템이 활성 상태여야 합니다. 자세한 내용은 채널 파트너에게 문의하세요.</translation>
     </message>
   </context>
   <context>
@@ -2226,7 +2222,7 @@ Press Alt + Click to follow object</translation>
     <name>StringEditor</name>
     <message>
       <source>Min 3 characters</source>
-      <translation type="unfinished">Min 3 characters</translation>
+      <translation>최소 3자리 이상</translation>
     </message>
   </context>
   <context>
@@ -2244,11 +2240,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Always</source>
-      <translation type="unfinished">Always</translation>
+      <translation>항상</translation>
     </message>
     <message>
       <source>On Log In</source>
-      <translation type="unfinished">On Log In</translation>
+      <translation>로그인 시</translation>
     </message>
   </context>
   <context>
@@ -2256,31 +2252,31 @@ Press Alt + Click to follow object</translation>
     <message>
       <source>Valid from %1 to %2 (by server time)</source>
       <extracomment>Example: Valid from 14.05.2023 to 24.05.2023, 12:24 (by server time)</extracomment>
-      <translation type="unfinished">Valid from %1 to %2 (by server time)</translation>
+      <translation>유효 기간 %1 부터 %2 까지 (서버 시간 기준)</translation>
     </message>
     <message>
       <source>Valid from %1 to %2 (by server time) or for %3 after login</source>
       <extracomment>Valid from 14.05.2023 to 24.05.2023 (by server time) or for 12 hours after login</extracomment>
-      <translation type="unfinished">Valid from %1 to %2 (by server time) or for %3 after login</translation>
+      <translation>%1 에서 %2 까지 유효(서버 시간 기준) 또는 로그인 후 %3 까지 유효</translation>
     </message>
   </context>
   <context>
     <name>TemporaryLinkSettings</name>
     <message>
       <source>Link Valid Until</source>
-      <translation type="unfinished">Link Valid Until</translation>
+      <translation>링크 유효 기간</translation>
     </message>
     <message>
       <source>The link will remain accessible until the date specified (including, based on server time)</source>
-      <translation type="unfinished">The link will remain accessible until the date specified (including, based on server time)</translation>
+      <translation>링크는 지정된 날짜까지 계속 액세스할 수 있습니다 (서버 시간 기준)</translation>
     </message>
     <message>
       <source>Revoke access after login</source>
-      <translation type="unfinished">Revoke access after login</translation>
+      <translation>로그인 후 접근 권한 취소</translation>
     </message>
     <message>
       <source>Access may be revoked earlier if the link validity period ends</source>
-      <translation type="unfinished">Access may be revoked earlier if the link validity period ends</translation>
+      <translation>링크 유효기간이 종료되면 접근이 조기에 취소될 수 있습니다.</translation>
     </message>
     <message>
       <source>In</source>
@@ -2362,7 +2358,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Time is unavailable due to DST changes</source>
-      <translation type="unfinished">Time is unavailable due to DST changes</translation>
+      <translation>DST 변경으로 인해 시간을 알 수 없습니다.</translation>
     </message>
   </context>
   <context>
@@ -2394,7 +2390,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Global Permissions</source>
-      <translation type="unfinished">Global Permissions</translation>
+      <translation>글로벌 권한</translation>
     </message>
     <message>
       <source>Add User</source>
@@ -2441,11 +2437,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Allow insecure (digest) authentication</source>
-      <translation type="unfinished">Allow insecure (digest) authentication</translation>
+      <translation>안전하지 않은 (다이제스트) 인증 허용</translation>
     </message>
     <message>
       <source>You need to specify only user&apos;s email address.</source>
-      <translation type="unfinished">You need to specify only user&apos;s email address.</translation>
+      <translation>사용자&apos;의 이메일 주소만 지정해야 합니다.</translation>
     </message>
     <message>
       <source>Permission Groups</source>
@@ -2453,11 +2449,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Access</source>
-      <translation type="unfinished">Access</translation>
+      <translation>접근</translation>
     </message>
     <message>
       <source>Regular user with credentials</source>
-      <translation type="unfinished">Regular user with credentials</translation>
+      <translation>자격 증명이 있는 일반 사용자</translation>
     </message>
     <message>
       <source>Temporary with link</source>
@@ -2469,14 +2465,14 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>The added system will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</source>
-      <translation type="unfinished">The added system will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</translation>
+      <translation>추가된 시스템은 기존 클라우드 계정이 있는 사용자에게 빠르게 표시되고, 기존 클라우드 계정이 없는 사용자는 이메일로 지침을 받게 됩니다.</translation>
     </message>
   </context>
   <context>
     <name>UserEditDialog</name>
     <message>
       <source>User - %1</source>
-      <translation type="unfinished">User - %1</translation>
+      <translation>사용자 - %1</translation>
     </message>
     <message>
       <source>General</source>
@@ -2492,7 +2488,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Global Permissions</source>
-      <translation type="unfinished">Global Permissions</translation>
+      <translation>글로벌 권한</translation>
     </message>
     <message>
       <source>This user has not yet signed up for %1</source>
@@ -2504,11 +2500,11 @@ Press Alt + Click to follow object</translation>
     <name>UserEnabledSwitch</name>
     <message>
       <source>Enabled user</source>
-      <translation type="unfinished">Enabled user</translation>
+      <translation>활성화된 사용자</translation>
     </message>
     <message>
       <source>Disabled user</source>
-      <translation type="unfinished">Disabled user</translation>
+      <translation>비활성화된 사용자</translation>
     </message>
   </context>
   <context>
@@ -2543,15 +2539,15 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Set password to enable insecure authentication</source>
-      <translation type="unfinished">Set password to enable insecure authentication</translation>
+      <translation>안전하지 않은 인증을 활성화하려면 비밀번호를 설정하세요</translation>
     </message>
     <message>
       <source>Allow insecure (digest) authentication</source>
-      <translation type="unfinished">Allow insecure (digest) authentication</translation>
+      <translation>안전하지 않은 (다이제스트) 인증 허용</translation>
     </message>
     <message>
       <source>This user is not found in LDAP database and is not able to log in.</source>
-      <translation type="unfinished">This user is not found in LDAP database and is not able to log in.</translation>
+      <translation>LDAP 데이터베이스에서 이 사용자를 찾을 수 없으므로 로그인할 수 없습니다.</translation>
     </message>
     <message>
       <source>Permission Groups</source>
@@ -2559,7 +2555,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Access expires</source>
-      <translation type="unfinished">Access expires</translation>
+      <translation>접근 만료</translation>
     </message>
     <message>
       <source>Access Link</source>
@@ -2567,7 +2563,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Copy Link</source>
-      <translation type="unfinished">Copy Link</translation>
+      <translation>링크 복사</translation>
     </message>
     <message>
       <source>Terminate</source>
@@ -2579,7 +2575,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>No valid link for this user</source>
-      <translation type="unfinished">No valid link for this user</translation>
+      <translation>이 사용자에 대한 유효한 링크가 없습니다.</translation>
     </message>
     <message>
       <source>Copied</source>
@@ -2597,15 +2593,15 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>LDAP server is offline. User is not able to log in.</source>
-      <translation type="unfinished">LDAP server is offline. User is not able to log in.</translation>
+      <translation>LDAP 서버가 오프라인 상태입니다. 사용자가 로그인할 수 없습니다.</translation>
     </message>
     <message>
       <source>When continuous sync with LDAP server is disabled, user membership in groups does not synchronize automatically. To update this information, initiate a manual sync.</source>
-      <translation type="unfinished">When continuous sync with LDAP server is disabled, user membership in groups does not synchronize automatically. To update this information, initiate a manual sync.</translation>
+      <translation>LDAP 서버와의 지속적인 동기화가 비활성화되면 그룹은 자동으로 동기화되지 않습니다. 이 그룹을 업데이트하려면 수동 동기화를 시작하세요.</translation>
     </message>
     <message>
       <source>This user’s login duplicates the login of another user. None of them is able to log in. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</source>
-      <translation type="unfinished">This user’s login duplicates the login of another user. None of them is able to log in. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</translation>
+      <translation>이 사용자의 로그인은 다른 사용자의 로그인을 중복합니다. 아무도 로그인할 수 없습니다. 이 문제를 해결하려면 사용자 로그인을 변경하거나 로그인이 중복된 사용자를 비활성화하거나 삭제할 수 있습니다.</translation>
     </message>
   </context>
   <context>
@@ -2627,11 +2623,11 @@ Press Alt + Click to follow object</translation>
     <name>VmsRulesDialog</name>
     <message>
       <source>Vms Rules</source>
-      <translation type="unfinished">Vms Rules</translation>
+      <translation>Vms 규칙</translation>
     </message>
     <message>
       <source>Add Rule</source>
-      <translation type="unfinished">Add Rule</translation>
+      <translation>규칙 추가</translation>
     </message>
     <message>
       <source>Duplicate</source>
@@ -2643,7 +2639,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>No Entries</source>
-      <translation type="unfinished">No Entries</translation>
+      <translation>항목 없음</translation>
     </message>
     <message>
       <source>Event Log...</source>
@@ -2651,7 +2647,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Reset To Defaults...</source>
-      <translation type="unfinished">Reset To Defaults...</translation>
+      <translation>기본값으로 재설정...</translation>
     </message>
   </context>
   <context>
