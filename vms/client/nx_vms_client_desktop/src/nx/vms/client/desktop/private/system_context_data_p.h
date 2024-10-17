@@ -63,6 +63,7 @@ struct SystemContext::Private
     std::unique_ptr<ServerImageCache> serverImageCache;
     std::unique_ptr<ServerNotificationCache> serverNotificationCache;
     std::unique_ptr<ServerRemoteAccessWatcher> serverRemoteAccessWatcher;
+    std::unique_ptr<UserNotificationSettingsManager> userNotificationSettingsManager;
 };
 
 } // namespace nx::vms::client::desktop

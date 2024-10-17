@@ -20,7 +20,7 @@ namespace nx::vms::event { class StringsHelper; }
 
 namespace nx::vms::client::desktop {
 
-class SiteNotificationSettingsManager;
+class UserNotificationSettingsManager;
 
 class PopupSettingsWidget: public QnAbstractPreferencesWidget
 {
@@ -29,7 +29,7 @@ class PopupSettingsWidget: public QnAbstractPreferencesWidget
 
 public:
     explicit PopupSettingsWidget(
-        SiteNotificationSettingsManager* siteNotificationSettingsManager,
+        UserNotificationSettingsManager* userNotificationSettingsManager,
         QWidget* parent = nullptr);
     ~PopupSettingsWidget();
 
@@ -38,16 +38,16 @@ public:
     virtual bool hasChanges() const override;
 
 private:
-    QList<nx::vms::api::EventType> watchedEvents() const;
-    std::set<nx::vms::common::system_health::MessageType> storedSystemHealth() const;
+    QList<api::EventType> watchedEvents() const;
+    QList<common::system_health::MessageType> watchedMessages() const;
 
 private:
     QScopedPointer<Ui::PopupSettingsWidget> ui;
-    QMap<nx::vms::api::EventType, QCheckBox*> m_businessRulesCheckBoxes;
-    QMap<nx::vms::common::system_health::MessageType, QCheckBox*> m_systemHealthCheckBoxes;
+    QMap<api::EventType, QCheckBox*> m_eventRulesCheckBoxes;
+    QMap<common::system_health::MessageType, QCheckBox*> m_systemHealthCheckBoxes;
     bool m_updating;
-    SiteNotificationSettingsManager* const m_siteNotificationSettingsManager;
-    std::unique_ptr<nx::vms::event::StringsHelper> m_helper;
+    UserNotificationSettingsManager* const m_userNotificationSettingsManager;
+    std::unique_ptr<event::StringsHelper> m_stringsHelper;
 };
 
 } // namespace nx::vms::client::desktop

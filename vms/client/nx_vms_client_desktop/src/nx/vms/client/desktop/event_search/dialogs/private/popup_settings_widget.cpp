@@ -17,7 +17,7 @@
 #include <nx/vms/client/desktop/settings/message_bar_settings.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/logic/fresh_session_token_helper.h>
-#include <nx/vms/client/desktop/utils/site_notification_settings_manager.h>
+#include <nx/vms/client/desktop/utils/user_notification_settings_manager.h>
 #include <nx/vms/event/events/abstract_event.h>
 #include <nx/vms/event/strings_helper.h>
 #include <ui/workbench/workbench_context.h>
@@ -25,14 +25,14 @@
 namespace nx::vms::client::desktop {
 
 PopupSettingsWidget::PopupSettingsWidget(
-    SiteNotificationSettingsManager* siteNotificationSettingsManager,
+    UserNotificationSettingsManager* userNotificationSettingsManager,
     QWidget* parent)
     :
     base_type(parent),
     ui(new Ui::PopupSettingsWidget),
     m_updating(false),
-    m_siteNotificationSettingsManager{siteNotificationSettingsManager},
-    m_helper(new nx::vms::event::StringsHelper(siteNotificationSettingsManager->systemContext()))
+    m_userNotificationSettingsManager{userNotificationSettingsManager},
+    m_stringsHelper(new event::StringsHelper(userNotificationSettingsManager->systemContext()))
 {
     ui->setupUi(this);
 
@@ -41,18 +41,18 @@ PopupSettingsWidget::PopupSettingsWidget(
 
     setHelpTopic(this, HelpTopic::Id::SystemSettings_Notifications);
 
-    for (const auto eventType: m_siteNotificationSettingsManager->supportedEventTypes())
+    for (auto eventType: m_userNotificationSettingsManager->supportedEventTypes())
     {
         QCheckBox* checkbox = new QCheckBox(this);
-        checkbox->setText(m_helper->eventName(eventType));
+        checkbox->setText(m_stringsHelper->eventName(eventType));
         ui->businessEventsLayout->addWidget(checkbox);
-        m_businessRulesCheckBoxes[eventType] = checkbox;
+        m_eventRulesCheckBoxes[eventType] = checkbox;
 
         connect(checkbox, &QCheckBox::toggled, this,
             &QnAbstractPreferencesWidget::hasChangesChanged);
     }
 
-    for (auto messageType: m_siteNotificationSettingsManager->supportedMessageTypes())
+    for (auto messageType: m_userNotificationSettingsManager->supportedMessageTypes())
     {
         QCheckBox* checkbox = new QCheckBox(this);
         checkbox->setText(QnSystemHealthStringsHelper::messageShortTitle(messageType));
@@ -64,8 +64,8 @@ PopupSettingsWidget::PopupSettingsWidget(
     }
 
     connect(
-        m_siteNotificationSettingsManager,
-        &SiteNotificationSettingsManager::settingsChanged,
+        m_userNotificationSettingsManager,
+        &UserNotificationSettingsManager::settingsChanged,
         this,
         &PopupSettingsWidget::loadDataToUi);
 
@@ -74,7 +74,7 @@ PopupSettingsWidget::PopupSettingsWidget(
         {
             // TODO: #sivanov Also update checked state. Probably tristate for 'show all' checkbox
             // would be better.
-            for (QCheckBox* checkbox : m_businessRulesCheckBoxes)
+            for (QCheckBox* checkbox : m_eventRulesCheckBoxes)
                 checkbox->setEnabled(!checked);
 
             for (QCheckBox* checkbox : m_systemHealthCheckBoxes)
@@ -97,31 +97,23 @@ void PopupSettingsWidget::loadDataToUi()
 
     bool all = true;
 
-    std::set<nx::vms::common::system_health::MessageType> watchedMessageTypes =
-        m_siteNotificationSettingsManager->watchedMessages();
-
-    for (auto messageType: m_siteNotificationSettingsManager->supportedMessageTypes())
+    const auto& watchedMessages = m_userNotificationSettingsManager->watchedMessages();
+    for (auto messageType: m_userNotificationSettingsManager->supportedMessageTypes())
     {
-        const bool checked = watchedMessageTypes.contains(messageType);
+        const bool checked = watchedMessages.contains(messageType);
         m_systemHealthCheckBoxes[messageType]->setChecked(checked);
-
         all &= checked;
     }
 
-    const auto supportedEventTypes = m_siteNotificationSettingsManager->supportedEventTypes();
-    const auto watchedEvents =
-        m_siteNotificationSettingsManager->watchedEvents();
-    const auto selectedEvents = watchedEvents.value_or(supportedEventTypes);
-
-    for (const auto eventType: supportedEventTypes)
+    const auto& watchedEvents = m_userNotificationSettingsManager->watchedEvents();
+    for (const auto eventType: m_userNotificationSettingsManager->supportedEventTypes())
     {
-        bool checked = selectedEvents.contains(eventType);
-        m_businessRulesCheckBoxes[eventType]->setChecked(checked);
+        bool checked = watchedEvents.contains(eventType);
+        m_eventRulesCheckBoxes[eventType]->setChecked(checked);
         all &= checked;
     }
 
     ui->showAllCheckBox->setChecked(all);
-    ui->businessEventsGroupBox->setEnabled(watchedEvents.has_value());
 }
 
 void PopupSettingsWidget::applyChanges()
@@ -129,44 +121,41 @@ void PopupSettingsWidget::applyChanges()
     NX_ASSERT(!m_updating, "Should never get here while updating");
     QScopedValueRollback<bool> guard(m_updating, true);
 
-    m_siteNotificationSettingsManager->setWatchedEvents(watchedEvents());
-    m_siteNotificationSettingsManager->setWatchedMessages(storedSystemHealth());
+    m_userNotificationSettingsManager->setSettings(watchedEvents(), watchedMessages());
 }
 
 bool PopupSettingsWidget::hasChanges() const
 {
-    if (m_siteNotificationSettingsManager->watchedMessages() != storedSystemHealth())
-        return true;
-
-    const auto userWatchedEvents = m_siteNotificationSettingsManager->watchedEvents();
-    return userWatchedEvents && userWatchedEvents != watchedEvents();
+    return m_userNotificationSettingsManager->watchedMessages() != watchedMessages()
+        || m_userNotificationSettingsManager->watchedEvents() != watchedEvents();
 }
 
 QList<api::EventType> PopupSettingsWidget::watchedEvents() const
 {
-    auto eventTypes = m_siteNotificationSettingsManager->supportedEventTypes();
-
+    const auto& eventTypes = m_userNotificationSettingsManager->supportedEventTypes();
     if (ui->showAllCheckBox->isChecked())
         return eventTypes;
 
     QList<api::EventType> result;
     for (const auto eventType: eventTypes)
     {
-        if (m_businessRulesCheckBoxes[eventType]->isChecked())
+        if (m_eventRulesCheckBoxes[eventType]->isChecked())
             result << eventType;
     }
     return result;
 }
 
-std::set<nx::vms::common::system_health::MessageType>
-    PopupSettingsWidget::storedSystemHealth() const
+QList<nx::vms::common::system_health::MessageType>PopupSettingsWidget::watchedMessages() const
 {
-    std::set<nx::vms::common::system_health::MessageType> result;
+    const auto& messageTypes = m_userNotificationSettingsManager->supportedMessageTypes();
+    if (ui->showAllCheckBox->isChecked())
+        return messageTypes;
 
-    for (auto messageType: m_siteNotificationSettingsManager->supportedMessageTypes())
+    QList<common::system_health::MessageType> result;
+    for (auto messageType: messageTypes)
     {
-        if (m_systemHealthCheckBoxes[messageType]->isChecked() || ui->showAllCheckBox->isChecked())
-            result.insert(messageType);
+        if (m_systemHealthCheckBoxes[messageType]->isChecked())
+            result.push_back(messageType);
     }
 
     return result;

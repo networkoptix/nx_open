@@ -19,12 +19,12 @@ namespace nx::vms::client::desktop {
 class DefaultPasswordCamerasWatcher;
 class DesktopCameraConnectionController;
 class DesktopCameraStubController;
-class OtherServersManager;
 class LayoutSnapshotManager;
 class LdapStatusWatcher;
 class LocalFileCache;
 class LogsManagementWatcher;
 class NonEditableUsersAndGroups;
+class OtherServersManager;
 class RemoteSession;
 class RestApiHelper;
 class ServerImageCache;
@@ -33,6 +33,7 @@ class ShowreelStateManager;
 class SystemHealthState;
 class SystemSpecificLocalSettings;
 class TrafficRelayUrlWatcher;
+class UserNotificationSettingsManager;
 class VideoCache;
 class VideoWallOnlineScreensWatcher;
 class VirtualCameraManager;
@@ -96,6 +97,7 @@ public:
     LocalFileCache* localFileCache() const;
     ServerImageCache* serverImageCache() const;
     ServerNotificationCache* serverNotificationCache() const;
+    UserNotificationSettingsManager* userNotificationSettingsManager() const;
 
 protected:
     virtual void setMessageProcessor(QnCommonMessageProcessor* messageProcessor) override;

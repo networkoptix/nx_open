@@ -350,8 +350,10 @@ void NotificationActionHandler::setSystemHealthEventVisibleInternal(
     // Checking that user wants to see this message (if he is able to hide it).
     if (isMessageVisibleInSettings(message))
     {
-        const bool isAllowedByFilter =
-            appContext()->localSettings()->popupSystemHealth().contains(message);
+        bool isAllowedByFilter = false;
+        if (auto user = system()->user())
+            isAllowedByFilter = user->settings().isMessageWatched(message);
+
         canShow &= isAllowedByFilter;
     }
 

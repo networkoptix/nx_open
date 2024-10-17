@@ -43,36 +43,6 @@ UserSettingsEx::UserSettingsEx(nx::vms::api::UserSettings&& rhs):
     nx::vms::api::UserSettings(std::move(rhs))
 {}
 
-QList<EventType> UserSettingsEx::watchedEvents() const
-{
-    QList<EventType> result;
-    for (const auto eventType: allEvents())
-    {
-        if (!eventFilter.contains(convertToNewEvent(eventType).toStdString()))
-            result << eventType;
-    }
-    return result;
-}
-
-void UserSettingsEx::setWatchedEvents(const QList<EventType>& events)
-{
-    static const auto allEventFilter =
-        []
-        {
-            std::set<std::string> result;
-            for (const auto eventType: allEvents())
-                result.insert(convertToNewEvent(eventType).toStdString());
-
-            return result;
-        }();
-
-    auto newEventFilter = allEventFilter;
-    for (const auto eventType: events)
-        newEventFilter.erase(convertToNewEvent(eventType).toStdString());
-
-    eventFilter = newEventFilter;
-}
-
 bool UserSettingsEx::isEventWatched(EventType eventType) const
 {
     return isEventWatched(convertToNewEvent(eventType));
@@ -83,7 +53,17 @@ bool UserSettingsEx::isEventWatched(const QString& eventType) const
     return !eventFilter.contains(eventType.toStdString());
 }
 
-} // nx::vms::common
+bool UserSettingsEx::isMessageWatched(system_health::MessageType messageType) const
+{
+    return isMessageWatched(QString::fromStdString(reflect::toString(messageType)));
+}
+
+bool UserSettingsEx::isMessageWatched(const QString& messageType) const
+{
+    return !messageFilter.contains(messageType.toStdString());
+}
+
+} // namespace nx::vms::common
 
 QByteArray QnUserHash::toString(const Type& type)
 {

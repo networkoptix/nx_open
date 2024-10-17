@@ -195,6 +195,11 @@ QList<EventType> allEvents(const EventTypePredicateList& predicates)
     return result;
 }
 
+QList<EventType> visibleInSettingsEvents(nx::vms::common::SystemContext* systemContext)
+{
+    return allEvents({isNonDeprecatedEvent, isApplicableForLicensingMode(systemContext)});
+}
+
 EventTypePredicate isChildOf(EventType parentEventType)
 {
     return [parentEventType](const EventType eventType)

@@ -32,6 +32,7 @@
 #include <nx/vms/client/desktop/system_health/system_health_state.h>
 #include <nx/vms/client/desktop/system_update/update_contents.h>
 #include <nx/vms/client/desktop/system_update/workbench_update_watcher.h>
+#include <nx/vms/client/desktop/utils/user_notification_settings_manager.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/handlers/notification_action_handler.h>
 #include <nx/vms/common/html/html.h>
@@ -118,7 +119,7 @@ SystemHealthListModel::Private::Private(SystemHealthListModel* q):
     WindowContextAware(q),
     q(q),
     m_helper(new nx::vms::event::StringsHelper(system())),
-    m_popupSystemHealthFilter(appContext()->localSettings()->popupSystemHealth())
+    m_popupSystemHealthFilter(system()->userNotificationSettingsManager()->watchedMessages())
 {
     // Handle system health state.
 
@@ -167,20 +168,27 @@ SystemHealthListModel::Private::Private(SystemHealthListModel* q):
     connect(notificationHandler, &NotificationActionHandler::systemHealthEventRemoved,
         this, &Private::removeItem);
 
-    connect(&appContext()->localSettings()->popupSystemHealth,
-        &nx::utils::property_storage::BaseProperty::changed,
+    connect(
+        system()->userNotificationSettingsManager(),
+        &UserNotificationSettingsManager::settingsChanged,
         this,
-        [this]()
+        [this]
         {
-            const auto filter = appContext()->localSettings()->popupSystemHealth();
+            auto userNotificationSettingsManager = system()->userNotificationSettingsManager();
+            auto& filter = userNotificationSettingsManager->watchedMessages();
+            if (m_popupSystemHealthFilter == filter)
+                return;
 
-            for (const auto index: common::system_health::allMessageTypes({
-                common::system_health::isMessageVisibleInSettings}))
+            for (auto messageType: userNotificationSettingsManager->supportedMessageTypes())
             {
-                const bool wasVisible = m_popupSystemHealthFilter.contains(index);
-                const bool isVisible = filter.contains(index);
+                const bool wasVisible = m_popupSystemHealthFilter.contains(messageType);
+                const bool isVisible = filter.contains(messageType);
                 if (wasVisible != isVisible)
-                    toggleItem(index, isVisible && system()->systemHealthState()->state(index));
+                {
+                    toggleItem(
+                        messageType,
+                        isVisible && system()->systemHealthState()->state(messageType));
+                }
             }
 
             m_popupSystemHealthFilter = filter;
@@ -626,7 +634,7 @@ void SystemHealthListModel::Private::doAddItem(
 
     if (common::system_health::isMessageVisibleInSettings(message))
     {
-        if (!appContext()->localSettings()->popupSystemHealth().contains(message))
+        if (!system()->userNotificationSettingsManager()->watchedMessages().contains(message))
         {
             NX_VERBOSE(this, "The message %1 is not allowed by the filter", message);
             return; //< Not allowed by filter.
