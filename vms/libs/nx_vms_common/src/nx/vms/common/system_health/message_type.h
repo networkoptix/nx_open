@@ -123,6 +123,12 @@ NX_VMS_COMMON_API std::set<MessageType> allMessageTypes(
     const MessageTypePredicateList& predicates);
 
 /**
+ * @return List of system health message types allowed to be displayed in user settings.
+ */
+NX_VMS_COMMON_API QList<MessageType> visibleInSettingsMessages(
+    nx::vms::common::SystemContext* systemContext);
+
+/**
  * Set of system health message types that used as default value for the local setting that
  * determines system health messages visibility settings.
  */

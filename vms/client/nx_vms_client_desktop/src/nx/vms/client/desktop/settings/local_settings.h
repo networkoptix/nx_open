@@ -96,9 +96,6 @@ public:
     Property<int> acceptedEulaVersion{this, "acceptedEulaVersion", 0,
         "Version of the latest read and accepted EULA."};
 
-    Property<std::set<nx::vms::common::system_health::MessageType>> popupSystemHealth{
-        this, "popupSystemHealth", nx::vms::common::system_health::defaultMessageTypes()};
-
     Property<bool> downmixAudio{this,
         "downmixAudio",
         nx::build_info::isMacOsX()}; //< Mac version uses SPDIF by default for multichannel audio.

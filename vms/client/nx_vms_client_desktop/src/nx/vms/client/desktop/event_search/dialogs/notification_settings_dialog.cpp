@@ -3,17 +3,16 @@
 #include "notification_settings_dialog.h"
 
 #include <nx/vms/client/desktop/style/helper.h>
+#include <nx/vms/client/desktop/system_context.h>
 
 #include "private/popup_settings_widget.h"
 
 namespace nx::vms::client::desktop {
 
-NotificationSettingsDialog::NotificationSettingsDialog(
-    SiteNotificationSettingsManager* siteNotificationSettingsManager,
-    QWidget* parent)
-    :
+NotificationSettingsDialog::NotificationSettingsDialog(QWidget* parent):
     base_type{parent},
-    m_settingsWidget{new PopupSettingsWidget{siteNotificationSettingsManager, this}}
+    m_settingsWidget{new PopupSettingsWidget{
+        systemContext()->userNotificationSettingsManager(), this}}
 {
     resize(400, 600);
     setMinimumSize(QSize(400, 600));

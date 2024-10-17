@@ -22,7 +22,7 @@ namespace nx::vms::client::desktop {
 class EventRibbon;
 class NotificationTabModel;
 class SelectableTextButton;
-class SiteNotificationSettingsManager;
+class NotificationSettingsDialog;
 
 class NotificationListWidget::Private:
     public QObject,
@@ -57,10 +57,10 @@ private:
     SelectableTextButton* const m_filterNotificationsButton;
     EventRibbon* const m_eventRibbon;
     QWidget* const m_placeholder;
+    NotificationSettingsDialog* m_notificationSettingsDialog{};
     NotificationTabModel* const m_model;
     QSortFilterProxyModel* const m_filterModel;
     QHash<RightPanel::SystemSelection, QAction*> m_systemSelectionActions;
-    SiteNotificationSettingsManager* const m_siteNotificationSettingsManager;
     std::unique_ptr<event::StringsHelper> m_stringHelper;
 };
 

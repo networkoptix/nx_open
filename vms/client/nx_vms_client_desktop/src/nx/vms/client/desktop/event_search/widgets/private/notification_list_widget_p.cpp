@@ -41,7 +41,7 @@
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/context_utils.h>
-#include <nx/vms/client/desktop/utils/site_notification_settings_manager.h>
+#include <nx/vms/client/desktop/utils/user_notification_settings_manager.h>
 #include <nx/vms/common/saas/saas_service_manager.h>
 #include <nx/vms/common/saas/saas_utils.h>
 #include <nx/vms/event/actions/abstract_action.h>
@@ -93,9 +93,9 @@ NotificationListWidget::Private::Private(NotificationListWidget* q):
         qnSkin->icon(kNotificationPlaceholderIcon).pixmap(64, 64),
         AbstractSearchWidget::makePlaceholderText(tr("No new notifications"), {}),
         m_ribbonContainer)),
+    m_notificationSettingsDialog{new NotificationSettingsDialog{q}},
     m_model(new NotificationTabModel(windowContext(), this)),
     m_filterModel(new QSortFilterProxyModel(q)),
-    m_siteNotificationSettingsManager{new SiteNotificationSettingsManager{system(), q}},
     m_stringHelper{new event::StringsHelper{system()}}
 {
     m_headerWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
@@ -182,10 +182,23 @@ NotificationListWidget::Private::Private(NotificationListWidget* q):
         [this] { changeHeaderItemsVisibilityIfNeeded(); });
 
     connect(
-        m_siteNotificationSettingsManager,
-        &SiteNotificationSettingsManager::settingsChanged,
+        system()->userNotificationSettingsManager(),
+        &UserNotificationSettingsManager::settingsChanged,
         this,
         &NotificationListWidget::Private::updateFilterNotificationsButtonAppearance);
+
+    connect(
+        system()->userNotificationSettingsManager(),
+        &UserNotificationSettingsManager::supportedTypesChanged,
+        this,
+        [this]
+        {
+            // It is required to rebuild dialog UI.
+            m_notificationSettingsDialog->reject();
+            m_notificationSettingsDialog->deleteLater();
+
+            m_notificationSettingsDialog = new NotificationSettingsDialog{this->q};
+        });
 
     TileInteractionHandler::install(m_eventRibbon);
 
@@ -329,30 +342,30 @@ void NotificationListWidget::Private::changeHeaderItemsVisibilityIfNeeded()
 
 void NotificationListWidget::Private::onAnyNotificationActionTriggered()
 {
-    m_siteNotificationSettingsManager->setWatchedEvents(
-        m_siteNotificationSettingsManager->supportedEventTypes());
-    m_siteNotificationSettingsManager->setWatchedMessages(
-        m_siteNotificationSettingsManager->supportedMessageTypes());
+    auto notificationSettingsManager = system()->userNotificationSettingsManager();
+    notificationSettingsManager->setSettings(
+        notificationSettingsManager->supportedEventTypes(),
+        notificationSettingsManager->supportedMessageTypes());
 }
 
 void NotificationListWidget::Private::onEventNotificationsActionTriggered()
 {
-    m_siteNotificationSettingsManager->setWatchedEvents(
-        m_siteNotificationSettingsManager->supportedEventTypes());
-    m_siteNotificationSettingsManager->setWatchedMessages({});
+    auto notificationSettingsManager = system()->userNotificationSettingsManager();
+    system()->userNotificationSettingsManager()->setSettings(
+        notificationSettingsManager->supportedEventTypes(), {});
 }
 
 void NotificationListWidget::Private::onSystemNotificationsActionTriggered()
 {
-    m_siteNotificationSettingsManager->setWatchedMessages(
-        m_siteNotificationSettingsManager->supportedMessageTypes());
-    m_siteNotificationSettingsManager->setWatchedEvents({});
+    auto notificationSettingsManager = system()->userNotificationSettingsManager();
+    system()->userNotificationSettingsManager()->setSettings(
+        {}, notificationSettingsManager->supportedMessageTypes());
 }
 
 void NotificationListWidget::Private::onChooseTypesActionTriggered()
 {
-    NotificationSettingsDialog notificationSettingsDialog{m_siteNotificationSettingsManager, q};
-    notificationSettingsDialog.exec();
+    if (NX_ASSERT(m_notificationSettingsDialog))
+        m_notificationSettingsDialog->exec();
 }
 
 void NotificationListWidget::Private::onFilterNotificationsButtonStateChanged()
@@ -363,12 +376,12 @@ void NotificationListWidget::Private::onFilterNotificationsButtonStateChanged()
 
 void NotificationListWidget::Private::updateFilterNotificationsButtonAppearance()
 {
-    const auto watchedEvents =
-        m_siteNotificationSettingsManager->watchedEvents().value_or(QList<api::EventType>{});
-    const auto watchedMessages = m_siteNotificationSettingsManager->watchedMessages();
+    auto notificationSettingsManager = system()->userNotificationSettingsManager();
+    const auto watchedEvents = notificationSettingsManager->watchedEvents();
+    const auto watchedMessages = notificationSettingsManager->watchedMessages();
 
-    if (watchedEvents == m_siteNotificationSettingsManager->supportedEventTypes()
-        && watchedMessages == m_siteNotificationSettingsManager->supportedMessageTypes())
+    if (watchedEvents == notificationSettingsManager->supportedEventTypes()
+        && watchedMessages == notificationSettingsManager->supportedMessageTypes())
     {
         QSignalBlocker blocker{m_filterNotificationsButton};
         m_filterNotificationsButton->setText(tr("Any notification"));

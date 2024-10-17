@@ -53,63 +53,6 @@ QString getDefaultMediaFolder()
     return QDir::toNativeSeparators(locations.first() + "/" + nx::branding::mediaFolderName());
 }
 
-void migratePopupSystemHealthFrom5_1(LocalSettings* settings, QSettings* oldSettings)
-{
-    if (settings->popupSystemHealth.exists())
-        return;
-
-    if (!oldSettings->contains("popupSystemHealth"))
-        return;
-
-    const quint64 intValue = oldSettings->value("popupSystemHealth").toULongLong();
-
-    using MessageType = common::system_health::MessageType;
-
-    const auto skipPackedFlag =
-        [](MessageType message)
-        {
-            switch (message)
-            {
-                // These were skipped in 3.0.
-                case MessageType::cloudPromo:
-                case MessageType::archiveFastScanFinished:
-
-                // TODO: Remove in VMS-7724.
-                case MessageType::remoteArchiveSyncFinished:
-                case MessageType::remoteArchiveSyncProgress:
-                case MessageType::remoteArchiveSyncError:
-                case MessageType::remoteArchiveSyncStopSchedule:
-                case MessageType::remoteArchiveSyncStopAutoMode:
-                    return true;
-
-                default:
-                    return false;
-            }
-        };
-
-    std::set<MessageType> result;
-    quint64 healthFlag = 1;
-    for (int i = 0; i < (int) MessageType::count; ++i)
-    {
-        const auto messageType = (MessageType) i;
-        if (skipPackedFlag(messageType))
-            continue;
-
-        if (isMessageVisibleInSettings(messageType))
-        {
-            if ((intValue & healthFlag) == healthFlag)
-                result.insert(messageType);
-        }
-
-        healthFlag <<= 1;
-    }
-
-    result.insert(MessageType::showIntercomInformer);
-    result.insert(MessageType::showMissedCallInformer);
-
-    settings->popupSystemHealth = result;
-}
-
 void migrateMediaFoldersFrom5_1(LocalSettings* settings, QSettings* oldSettings)
 {
     if (settings->mediaFolders.exists())
@@ -202,7 +145,6 @@ void migrateSettingsFrom5_1(LocalSettings* settings, QSettings* oldSettings)
     migrateValue(settings->maxMp3FileDurationSec);
     migrateSerializedValue(settings->webPageSettings);
 
-    migratePopupSystemHealthFrom5_1(settings, oldSettings);
     migrateMediaFoldersFrom5_1(settings, oldSettings);
 }
 

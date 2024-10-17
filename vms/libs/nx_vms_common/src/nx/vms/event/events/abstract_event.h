@@ -46,6 +46,12 @@ NX_VMS_COMMON_API EventTypePredicate isChildOf(EventType parentEventType);
 NX_VMS_COMMON_API QList<EventType> allEvents(
     const EventTypePredicateList& predicates = {isNonDeprecatedEvent});
 
+/**
+ * @return List of event types allowed to be displayed in user settings.
+ */
+NX_VMS_COMMON_API QList<EventType> visibleInSettingsEvents(
+    nx::vms::common::SystemContext* systemContext);
+
 NX_VMS_COMMON_API EventType parentEvent(EventType eventType);
 
 /** Check if resource required to SETUP rule on this event. */

@@ -89,7 +89,7 @@ private:
     SystemHealthListModel* const q = nullptr;
     QScopedPointer<vms::event::StringsHelper> m_helper;
     std::deque<Item> m_items; //< Kept sorted.
-    std::set<MessageType> m_popupSystemHealthFilter;
+    QList<MessageType> m_popupSystemHealthFilter;
 };
 
 } // namespace nx::vms::client::desktop

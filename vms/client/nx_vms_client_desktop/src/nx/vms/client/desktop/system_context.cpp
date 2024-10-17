@@ -37,6 +37,7 @@
 #include <nx/vms/client/desktop/utils/server_image_cache.h>
 #include <nx/vms/client/desktop/utils/server_notification_cache.h>
 #include <nx/vms/client/desktop/utils/server_remote_access_watcher.h>
+#include <nx/vms/client/desktop/utils/user_notification_settings_manager.h>
 #include <nx/vms/client/desktop/videowall/videowall_online_screens_watcher.h>
 #include <nx/vms/client/desktop/virtual_camera/virtual_camera_manager.h>
 #include <storage/server_storage_manager.h>
@@ -113,6 +114,8 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
             d->serverImageCache = std::make_unique<ServerImageCache>(this);
             d->serverNotificationCache = std::make_unique<ServerNotificationCache>(this);
             d->serverRemoteAccessWatcher = std::make_unique<ServerRemoteAccessWatcher>(this);
+            d->userNotificationSettingsManager =
+                std::make_unique<UserNotificationSettingsManager>(this);
             break;
 
         case Mode::crossSystem:
@@ -264,6 +267,11 @@ ServerImageCache* SystemContext::serverImageCache() const
 ServerNotificationCache* SystemContext::serverNotificationCache() const
 {
     return d->serverNotificationCache.get();
+}
+
+UserNotificationSettingsManager* SystemContext::userNotificationSettingsManager() const
+{
+    return d->userNotificationSettingsManager.get();
 }
 
 void SystemContext::setMessageProcessor(QnCommonMessageProcessor* messageProcessor)
