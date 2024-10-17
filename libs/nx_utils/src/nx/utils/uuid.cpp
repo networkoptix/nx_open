@@ -8,6 +8,26 @@
 
 #include <nx/utils/log/assert.h>
 
+namespace {
+
+// Qt 6.8.0 broke or changed QUuid sorting order. This function implements the old behavior.
+Qt::strong_ordering compare(const QUuid& left, const QUuid& right)
+{
+    if (const auto c = Qt::compareThreeWay(left.variant(), right.variant()); !is_eq(c))
+        return c;
+    if (const auto c = Qt::compareThreeWay(left.data1, right.data1); !is_eq(c))
+        return c;
+    if (const auto c = Qt::compareThreeWay(left.data2, right.data2); !is_eq(c))
+        return c;
+    if (const auto c = Qt::compareThreeWay(left.data3, right.data3); !is_eq(c))
+        return c;
+
+    int c = std::memcmp(left.data4, right.data4, sizeof(left.data4));
+    return Qt::compareThreeWay(c, 0);
+}
+
+} // namespace
+
 namespace nx {
 
 Uuid::Uuid(const char* text)
@@ -112,12 +132,12 @@ QUuid Uuid::toQUuid() const
 
 bool Uuid::operator<(const Uuid& other) const
 {
-    return m_uuid < other.m_uuid;
+    return compare(m_uuid, other.m_uuid) == Qt::strong_ordering::less;
 }
 
 bool Uuid::operator>(const Uuid& other) const
 {
-    return m_uuid > other.m_uuid;
+    return compare(m_uuid, other.m_uuid) == Qt::strong_ordering::greater;
 }
 
 Uuid Uuid::fromRfc4122(const QByteArray& bytes)
