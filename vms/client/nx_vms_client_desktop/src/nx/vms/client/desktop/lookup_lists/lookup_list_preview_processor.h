@@ -64,8 +64,6 @@ public:
         const QString& separator,
         bool hasHeader);
 
-    Q_INVOKABLE void reset(LookupListImportEntriesModel* model);
-
     void setRowsNumber(int rowsNumber);
     void setSeparator(const QString& separator);
     void setFilePath(const QString& filePath);

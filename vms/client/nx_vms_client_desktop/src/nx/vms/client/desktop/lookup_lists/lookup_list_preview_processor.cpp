@@ -195,15 +195,4 @@ bool LookupListPreviewProcessor::dataHasHeaderRow()
     return d->dataHasHeaderRow;
 }
 
-void LookupListPreviewProcessor::reset(LookupListImportEntriesModel* model)
-{
-    if (!NX_ASSERT(model))
-        return;
-
-    setFilePath({});
-    setSeparator({});
-    setDataHasHeaderRow(true);
-    model->reset();
-}
-
 } // namespace nx::vms::client::desktop

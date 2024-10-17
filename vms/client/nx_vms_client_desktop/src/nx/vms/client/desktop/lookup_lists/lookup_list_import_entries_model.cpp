@@ -23,7 +23,9 @@ namespace nx::vms::client::desktop {
 
 struct LookupListImportEntriesModel::Private
 {
-    QList<QList<QString>> columnHeaders;
+    using Header = QList<QString>;
+    LookupListImportEntriesModel* const q;
+    QList<Header> columnHeaders;
     QSet<QString> attributeNames;
     QList<QString> defaultColumnHeader;
     QMap<int, QString> columnIndexToAttribute;
@@ -37,10 +39,34 @@ struct LookupListImportEntriesModel::Private
     void initDefaultColumnHeaders(const std::vector<QString>& listModelAttributesNames);
     void adjustHeadersToMatchPreview();
     void reset();
+    void resetImportData();
     bool fullEntryRequiresFixup(const QVariantMap& entry);
     bool allValuesEmpty(const QVariantMap& entry);
     bool checkColumnPosIsCorrect(int index);
+    QVariant updateHeader(int index, Header defaultHeader) const;
 };
+
+QVariant LookupListImportEntriesModel::Private::updateHeader(int index, Header defaultHeader) const
+{
+    if (defaultHeader.size() < 2)
+        return defaultHeader; //< Only "Do not import" choice exist in header.
+
+    QString expectedChoice = columnIndexToAttribute[index];
+    if (expectedChoice.isEmpty())
+        expectedChoice = kDoNotImportText;
+
+    // Set expectedChoice as first choice for column.
+    defaultHeader.move(defaultHeader.indexOf(expectedChoice), 0);
+    return defaultHeader;
+}
+
+void LookupListImportEntriesModel::Private::resetImportData()
+{
+    fixupData.clear();
+    completelyIncorrectRows.clear();
+    importedRows.clear();
+    emit q->fixupDataChanged();
+}
 
 void LookupListImportEntriesModel::Private::reset()
 {
@@ -49,9 +75,7 @@ void LookupListImportEntriesModel::Private::reset()
     defaultColumnHeader.clear();
     columnIndexToAttribute.clear();
     attributeNames.clear();
-    fixupData.clear();
-    completelyIncorrectRows.clear();
-    importedRows.clear();
+    resetImportData();
 }
 
 bool LookupListImportEntriesModel::Private::checkColumnPosIsCorrect(int columnPos)
@@ -113,7 +137,7 @@ void LookupListImportEntriesModel::Private::initDefaultColumnHeaders(
     for (int attributeNameIndex = 1; attributeNameIndex < defaultColumnHeader.size();
          attributeNameIndex++)
     {
-        QList<QString> curColumnHeader = defaultColumnHeader;
+        Header curColumnHeader = defaultColumnHeader;
         // Set current attribute name as first choice for current column.
         curColumnHeader.move(curColumnHeader.indexOf(defaultColumnHeader[attributeNameIndex]), 0);
         columnHeaders.push_back(curColumnHeader);
@@ -130,7 +154,7 @@ void LookupListImportEntriesModel::Private::initDefaultColumnHeaders(
 
 LookupListImportEntriesModel::LookupListImportEntriesModel(QAbstractTableModel* parent):
     base_type(parent),
-    d(new Private())
+    d(new Private{.q = this})
 {
 }
 
@@ -147,7 +171,7 @@ QVariant LookupListImportEntriesModel::headerData(
     if (role != Qt::DisplayRole || section >= d->columnHeaders.size())
         return {};
 
-    return d->columnHeaders[section];
+    return d->updateHeader(section, d->columnHeaders[section]);
 }
 
 QMap<int, QString> LookupListImportEntriesModel::columnIndexToAttribute()
@@ -174,7 +198,6 @@ void LookupListImportEntriesModel::reset()
     d->reset();
     endResetModel();
     emit rowCountChanged();
-    emit fixupDataChanged();
 }
 
 int LookupListImportEntriesModel::rowCount(const QModelIndex& /*parent*/) const
@@ -388,7 +411,7 @@ void LookupListImportEntriesModel::revertImport()
         return;
 
     d->listEntriesModel->deleteEntries(d->importedRows);
-    reset();
+    d->resetImportData();
 }
 
 bool LookupListImportEntriesModel::hasImportedRows()

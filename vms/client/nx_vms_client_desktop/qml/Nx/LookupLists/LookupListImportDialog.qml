@@ -15,12 +15,13 @@ import nx.vms.client.core.analytics as Analytics
 
 ModalDialog
 {
-    id: control
+    id: dialog
 
     required property Analytics.StateView taxonomy
     required property LookupListEntriesModel model
     property alias filePath: previewProcessor.filePath
     property alias separatorSymbol: previewProcessor.separator
+    property bool clarificationRequired: false
 
     title: qsTr("Import List")
     minimumWidth: 611
@@ -34,235 +35,254 @@ ModalDialog
 
     signal entriesImported
 
-    function resetTextFieldFocus()
-    {
-        separatorField.focus = false
-    }
-
     function showProgressBar(processName)
     {
         importProgressBar.processName = processName
         importProgressBar.progressStarted()
     }
 
-    contentItem: Item
+    contentItem: Loader
     {
-        MouseArea
-        {
-            anchors.fill: parent
-            onClicked: resetTextFieldFocus()
-        }
-
-        Text
-        {
-            id: headerOptions
-
-            text: qsTr("Import Options")
-            font.pixelSize: 16
-            font.weight: Font.Medium
-            color: ColorTheme.colors.light4
-        }
-
-        Rectangle
-        {
-            id: lineImp
-
-            anchors.top: headerOptions.bottom
-            anchors.topMargin: 4
-            width: parent.width
-            height: 1
-
-            color: ColorTheme.colors.dark12
-        }
-
-        GridLayout
-        {
-            id: optionsGrid
-
-            anchors.top: lineImp.bottom
-            anchors.topMargin: 8
-            x: 23
-            width: parent.width - x
-
-            rowSpacing: 8
-            columnSpacing: 8
-            columns: 3
-            rows: 4
-
-            Label
-            {
-                text: qsTr("File:")
-                Layout.alignment: Qt.AlignRight
-            }
-
-            TextField
-            {
-                id: filePathField
-
-                Layout.fillWidth: true
-                text: previewProcessor.filePath
-                readOnly: true
-
-                onTextChanged:
-                {
-                    if (text !== previewProcessor.filePath)
-                        previewProcessor.filePath = text
-                }
-            }
-
-            Button
-            {
-                text: qsTr("Browse...")
-                Layout.alignment: Qt.AlignRight
-                onClicked:
-                {
-                    resetTextFieldFocus()
-                    previewProcessor.setImportFilePathFromDialog()
-                }
-            }
-
-            Label
-            {
-                text: qsTr("Separator:")
-                Layout.alignment: Qt.AlignRight
-            }
-
-            TextField
-            {
-                id: separatorField
-
-                Layout.maximumWidth: 40
-
-                text: previewProcessor.separator
-                maximumLength: 1
-
-                onTextChanged:
-                {
-                    if (text !== previewProcessor.separator)
-                        previewProcessor.separator = text
-                }
-                Keys.onPressed: (event) =>
-                {
-                    event.accepted = true
-                    focus = true
-                    switch (event.key)
-                    {
-                        case Qt.Key_Enter:
-                        case Qt.Key_Return:
-                            editingFinished()
-                            focus = false
-                            break
-
-                        case Qt.Key_Escape:
-                            undo()
-                            focus = false
-                            break
-
-                        case Qt.Key_Tab:
-                            text = '\t'
-                            break
-
-                        default:
-                            event.accepted = false
-                            break
-                    }
-                }
-
-                Keys.onShortcutOverride: (event) =>
-                {
-                    switch (event.key)
-                    {
-                        case Qt.Key_Enter:
-                        case Qt.Key_Return:
-                        case Qt.Key_Escape:
-                        case Qt.Key_Tab:
-                            event.accepted = true
-                            break
-                    }
-                }
-            }
-
-            CheckBox
-            {
-                id: headerCheckBox
-
-                Layout.row: 3
-                Layout.column: 1
-
-                checked: previewProcessor.dataHasHeaderRow
-                text: qsTr("Data contains header")
-
-                onCheckedChanged:
-                {
-                    if (checked !== previewProcessor.dataHasHeaderRow)
-                        previewProcessor.dataHasHeaderRow = checked
-                    resetTextFieldFocus()
-                }
-            }
-        }
-
-        Text
-        {
-            id: headerPreview
-
-            anchors.top: optionsGrid.bottom
-            anchors.topMargin: 16
-
-            text: qsTr("Preview")
-            font.pixelSize: 16
-            font.weight: Font.Medium
-            color: ColorTheme.colors.light4
-        }
-
-        Rectangle
-        {
-            id: linePreview
-
-            anchors.top: headerPreview.bottom
-            anchors.topMargin: 4
-            width: parent.width
-            height: 1
-
-            color: ColorTheme.colors.dark12
-        }
-
-        PreviewTableView
-        {
-            id: tableView
-
-            anchors.top: linePreview.bottom
-            anchors.topMargin: 4
-            anchors.bottom: parent.bottom
-            width: parent.width
-            model: importModel
-
-        }
+        sourceComponent: dialog.clarificationRequired ? fixLookupListImportPage : mainPage
     }
 
-    buttonBox: DialogButtonBox
+    Component
     {
-        Button
-        {
-            text: qsTr("Import")
-            isAccentButton: true
-            enabled: tableView.valid && previewProcessor.valid
-            onClicked:
-            {
-                importProcessor.importListEntries(
-                    previewProcessor.filePath,
-                    previewProcessor.separator,
-                    previewProcessor.dataHasHeaderRow,
-                    importModel)
-            }
-        }
+        id: mainPage
 
-        Button
+        Item
         {
-            text: qsTr("Cancel")
-            onClicked:
+            function resetTextFieldFocus()
             {
-                importProcessor.cancelRunningTask()
-                control.close()
+                separatorField.focus = false
+            }
+
+            MouseArea
+            {
+                anchors.fill: parent
+                onClicked: resetTextFieldFocus()
+            }
+
+            Text
+            {
+                id: headerOptions
+
+                text: qsTr("Import Options")
+                font.pixelSize: 16
+                font.weight: Font.Medium
+                color: ColorTheme.colors.light4
+            }
+
+            Rectangle
+            {
+                id: lineImp
+
+                anchors.top: headerOptions.bottom
+                anchors.topMargin: 4
+                width: parent.width
+                height: 1
+
+                color: ColorTheme.colors.dark12
+            }
+
+            GridLayout
+            {
+                id: optionsGrid
+
+                anchors.top: lineImp.bottom
+                anchors.topMargin: 8
+                x: 23
+                width: parent.width - x
+
+                rowSpacing: 8
+                columnSpacing: 8
+                columns: 3
+                rows: 4
+
+                Label
+                {
+                    text: qsTr("File:")
+                    Layout.alignment: Qt.AlignRight
+                }
+
+                TextField
+                {
+                    id: filePathField
+
+                    Layout.fillWidth: true
+                    text: previewProcessor.filePath
+                    readOnly: true
+
+                    onTextChanged:
+                    {
+                        if (text !== previewProcessor.filePath)
+                            previewProcessor.filePath = text
+                    }
+                }
+
+                Button
+                {
+                    text: qsTr("Browse...")
+                    Layout.alignment: Qt.AlignRight
+                    onClicked:
+                    {
+                        resetTextFieldFocus()
+                        previewProcessor.setImportFilePathFromDialog()
+                    }
+                }
+
+                Label
+                {
+                    text: qsTr("Separator:")
+                    Layout.alignment: Qt.AlignRight
+                }
+
+                TextField
+                {
+                    id: separatorField
+
+                    Layout.maximumWidth: 40
+
+                    text: previewProcessor.separator
+                    maximumLength: 1
+
+                    onTextChanged:
+                    {
+                        if (text !== previewProcessor.separator)
+                            previewProcessor.separator = text
+                    }
+                    Keys.onPressed: (event) =>
+                        {
+                            event.accepted = true
+                            focus = true
+                            switch (event.key)
+                            {
+                                case Qt.Key_Enter:
+                                case Qt.Key_Return:
+                                    editingFinished()
+                                    focus = false
+                                    break
+
+                                case Qt.Key_Escape:
+                                    undo()
+                                    focus = false
+                                    break
+
+                                case Qt.Key_Tab:
+                                    text = '\t'
+                                    break
+
+                                default:
+                                    event.accepted = false
+                                    break
+                            }
+                        }
+
+                    Keys.onShortcutOverride: (event) =>
+                        {
+                            switch (event.key)
+                            {
+                                case Qt.Key_Enter:
+                                case Qt.Key_Return:
+                                case Qt.Key_Escape:
+                                case Qt.Key_Tab:
+                                    event.accepted = true
+                                    break
+                            }
+                        }
+                }
+
+                CheckBox
+                {
+                    id: headerCheckBox
+
+                    Layout.row: 3
+                    Layout.column: 1
+
+                    checked: previewProcessor.dataHasHeaderRow
+                    text: qsTr("Data contains header")
+
+                    onCheckedChanged:
+                    {
+                        if (checked !== previewProcessor.dataHasHeaderRow)
+                            previewProcessor.dataHasHeaderRow = checked
+                        resetTextFieldFocus()
+                    }
+                }
+            }
+
+            Text
+            {
+                id: headerPreview
+
+                anchors.top: optionsGrid.bottom
+                anchors.topMargin: 16
+
+                text: qsTr("Preview")
+                font.pixelSize: 16
+                font.weight: Font.Medium
+                color: ColorTheme.colors.light4
+            }
+
+            Rectangle
+            {
+                id: linePreview
+
+                anchors.top: headerPreview.bottom
+                anchors.topMargin: 4
+                width: parent.width
+                height: 1
+
+                color: ColorTheme.colors.dark12
+            }
+
+            PreviewTableView
+            {
+                id: tableView
+
+                anchors.top: linePreview.bottom
+                anchors.topMargin: 4
+                anchors.bottom: parent.bottom
+                width: parent.width
+                model: importModel
+
+            }
+
+            DialogButtonBox
+            {
+                x: -dialog.leftPadding
+                width: dialog.width
+
+                Button
+                {
+                    text: qsTr("Import")
+                    isAccentButton: true
+                    enabled: tableView.valid && previewProcessor.valid
+                    onClicked:
+                    {
+                        importProcessor.importListEntries(
+                            previewProcessor.filePath,
+                            previewProcessor.separator,
+                            previewProcessor.dataHasHeaderRow,
+                            importModel)
+                    }
+                }
+
+                Button
+                {
+                    text: qsTr("Cancel")
+                    onClicked:
+                    {
+                        importProcessor.cancelRunningTask()
+                        dialog.close()
+                    }
+                }
+            }
+
+            onVisibleChanged:
+            {
+                separatorField.focus = false
+                previewProcessor.initImportModel()
             }
         }
     }
@@ -271,7 +291,7 @@ ModalDialog
     {
         id: importModel
 
-        lookupListEntriesModel: control.model
+        lookupListEntriesModel: dialog.model
     }
 
     LookupListPreviewProcessor
@@ -318,11 +338,6 @@ ModalDialog
         onDataHasHeaderRowChanged: initImportModel()
     }
 
-    onVisibleChanged:
-    {
-        separatorField.focus = false
-    }
-
     ProgressDialog
     {
         id: importProgressBar
@@ -330,17 +345,20 @@ ModalDialog
         title: qsTr("Import List")
         visible: false
         onRejected: importProcessor.cancelRunningTask()
-        onAccepted: control.accept()
+        onAccepted: dialog.accept()
     }
 
-    FixLookupListImportDialog
+    Component
     {
-        id: fixLookupListImportDialog
+        id: fixLookupListImportPage
 
-        taxonomy: control.taxonomy
-        model: importModel
-        onAccepted: importProcessor.applyFixUps(importModel)
-        onRejected: control.accept()
+        FixLookupListImportPage
+        {
+            taxonomy: dialog.taxonomy
+            model: importModel
+            onAccepted: importProcessor.applyFixUps(importModel)
+            onRejected: clarificationRequired = false
+        }
     }
 
     LookupListImportProcessor
@@ -364,14 +382,14 @@ ModalDialog
                         MessageBox.Ok);
                     break;
                 case LookupListImportProcessor.ClarificationRequired:
-                    fixLookupListImportDialog.visible = true
+                    clarificationRequired = true
                     importProgressBar.visible = false
                     break;
                 case LookupListImportProcessor.SuccessEmptyImport:
                     importProgressBar.progressFinished()
                     break
                 default:
-                    control.reject()
+                    dialog.reject()
             }
         }
 
@@ -383,13 +401,15 @@ ModalDialog
             {
                 case LookupListImportProcessor.Success:
                     importProgressBar.progressFinished()
+                    clarificationRequired = false
                     entriesImported()
                     break;
                 case LookupListImportProcessor.SuccessEmptyImport:
+                    clarificationRequired = false
                     importProgressBar.progressFinished()
                     break
                 default:
-                    control.reject()
+                    dialog.reject()
             }
         }
 
