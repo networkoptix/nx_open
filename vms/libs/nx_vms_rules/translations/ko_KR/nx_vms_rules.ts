@@ -705,7 +705,7 @@
     <name>nx::vms::rules::PtzPresetAction</name>
     <message>
       <source>Execute PTZ Preset</source>
-      <translation type="unfinished">Execute PTZ Preset</translation>
+      <translation>PTZ 프리셋 실행</translation>
     </message>
     <message>
       <source>At</source>
@@ -713,7 +713,7 @@
     </message>
     <message>
       <source>PTZ Preset</source>
-      <translation type="unfinished">PTZ Preset</translation>
+      <translation>PTZ 프리셋</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -721,7 +721,7 @@
     </message>
     <message>
       <source>Execute to users</source>
-      <translation type="unfinished">Execute to users</translation>
+      <translation>사용자에게 실행</translation>
     </message>
   </context>
   <context>
@@ -740,11 +740,11 @@
     </message>
     <message>
       <source>Send Mobile Notification</source>
-      <translation type="unfinished">Send Mobile Notification</translation>
+      <translation>모바일 알림 보내기</translation>
     </message>
     <message>
       <source>Add Source Device name to Body</source>
-      <translation type="unfinished">Add Source Device name to Body</translation>
+      <translation>본문에 소스 장치 이름 추가</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -763,7 +763,7 @@
     </message>
     <message>
       <source>Repeat Sound</source>
-      <translation type="unfinished">Repeat Sound</translation>
+      <translation>소리 반복</translation>
     </message>
     <message>
       <source>At</source>
@@ -778,11 +778,11 @@
     <name>nx::vms::rules::SaasIssueEvent</name>
     <message>
       <source>License migration issue</source>
-      <translation type="unfinished">License migration issue</translation>
+      <translation>라이센스 마이그레이션 문제</translation>
     </message>
     <message>
       <source>Recording services disabled</source>
-      <translation type="unfinished">Recording services disabled</translation>
+      <translation>녹음 서비스 비활성화됨</translation>
     </message>
     <message>
       <source>Cloud storage services disabled</source>
@@ -1056,7 +1056,7 @@
     </message>
     <message>
       <source>Custom Text</source>
-      <translation type="unfinished">Custom Text</translation>
+      <translation>사용자 정의 텍스트</translation>
     </message>
     <message>
       <source>Show to</source>
@@ -1090,7 +1090,7 @@
     <name>nx::vms::rules::WriteToLogAction</name>
     <message>
       <source>Write to Log</source>
-      <translation type="unfinished">Write to Log</translation>
+      <translation>로그 기록</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -1134,7 +1134,7 @@
     </message>
     <message>
       <source>Unknown action</source>
-      <translation type="unfinished">Unknown action</translation>
+      <translation>알 수 없는 동작</translation>
     </message>
   </context>
 </TS>
