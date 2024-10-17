@@ -104,7 +104,7 @@ struct LookupListActionHandler::Private
     void handleError(const QString& title, const QString& description)
     {
         if (dialog)
-            dialog->showError(description);
+            dialog->showError(title, description);
         else
             QnMessageBox::warning(q->mainWindowWidget(), title, description);
     }
@@ -149,7 +149,7 @@ struct LookupListActionHandler::Private
             });
 
         requestId = q->connectedServerApi()->putEmptyResult(
-            nx::format("/rest/v3/lookupLists/%1").arg(dataDescriptor.data.id),
+            nx::format("/rest/v4/lookupLists/%1").arg(dataDescriptor.data.id),
             {},
             QByteArray::fromStdString(nx::reflect::json::serialize(dataDescriptor.data)),
             callback,
@@ -194,7 +194,7 @@ struct LookupListActionHandler::Private
             });
 
         requestId = q->connectedServerApi()->deleteEmptyResult(
-            nx::format("/rest/v3/lookupLists/%1").arg(listId),
+            nx::format("/rest/v4/lookupLists/%1").arg(listId),
             {},
             callback,
             q->thread());

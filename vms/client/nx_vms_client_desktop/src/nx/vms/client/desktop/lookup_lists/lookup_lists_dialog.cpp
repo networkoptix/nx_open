@@ -80,9 +80,10 @@ Q_INVOKABLE void LookupListsDialog::createListRequested()
         menu::Parameters().withArgument(Qn::ParentWidgetRole, QPointer(window())));
 }
 
-void LookupListsDialog::showError(const QString& text)
+void LookupListsDialog::showError(const QString& title, const QString& description)
 {
-    QMetaObject::invokeMethod(window(), "showError", Q_ARG(QString, text));
+    QMetaObject::invokeMethod(
+        window(), "showError", Q_ARG(QString, title), Q_ARG(QString, description));
 }
 
 void LookupListsDialog::setSaveResult(bool success)

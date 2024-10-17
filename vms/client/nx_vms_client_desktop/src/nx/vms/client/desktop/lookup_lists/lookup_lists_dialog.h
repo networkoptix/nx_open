@@ -26,8 +26,8 @@ public:
     void setData(nx::vms::api::LookupListDataList data);
     void appendData(nx::vms::api::LookupListDataList data);
 
-    /** Show error text over the dialog. */
-    void showError(const QString& text);
+    /** Show error message box over the dialog. */
+    void showError(const QString& title, const QString& description);
 
     /** Notify the dialog about saving result. */
     void setSaveResult(bool success);
