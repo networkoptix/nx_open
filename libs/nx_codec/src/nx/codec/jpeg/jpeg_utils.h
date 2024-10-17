@@ -30,7 +30,7 @@ enum ResultCode
 QString toString( ResultCode resCode );
 
 //!Event-driven jpg parser. Quite simple due to performance considerations and current use case
-class JpegParser
+class NX_CODEC_API JpegParser
 {
 public:
     //!bool( int markerType, size_t markerLength, size_t currentOffset )
