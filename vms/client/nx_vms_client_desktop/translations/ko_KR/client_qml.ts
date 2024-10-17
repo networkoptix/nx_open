@@ -1250,7 +1250,7 @@ to activate PTZ</source>
     <name>StringEditor</name>
     <message>
       <source>Min 3 characters</source>
-      <translation type="unfinished">Min 3 characters</translation>
+      <translation>최소 3자리 이상</translation>
     </message>
   </context>
   <context>
