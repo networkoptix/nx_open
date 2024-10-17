@@ -77,10 +77,8 @@ bool InstrumentPaintSyncer::eventFilter(QObject* watched, QEvent* event)
 
 void InstrumentPaintSyncer::tick(int /*deltaTime*/)
 {
-    if (currentWatched() && m_currentWidget)
-    {
-       m_update->requestOperation();
-    }
+    if (currentWatched() && m_currentWidget && m_currentWidget->updatesEnabled())
+        m_update->requestOperation();
 }
 
 void InstrumentPaintSyncer::activatedNotify()
