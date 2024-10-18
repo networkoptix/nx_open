@@ -17,14 +17,14 @@ CloudLayoutsSource::CloudLayoutsSource()
 {
     const auto resourcePool = appContext()->cloudLayoutsManager()->systemContext()->resourcePool();
 
-    connect(resourcePool, &QnResourcePool::resourcesAdded,
+    connect(resourcePool, &QnResourcePool::resourcesAdded, this,
         [this](const QnResourceList& resources)
         {
             for (const auto& layout: resources.filtered<CrossSystemLayoutResource>())
                 emit resourceAdded(layout);
         });
 
-    connect(resourcePool, &QnResourcePool::resourcesRemoved,
+    connect(resourcePool, &QnResourcePool::resourcesRemoved, this,
         [this](const QnResourceList& resources)
         {
             for (const auto& layout: resources.filtered<CrossSystemLayoutResource>())
