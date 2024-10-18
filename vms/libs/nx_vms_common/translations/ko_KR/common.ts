@@ -1217,7 +1217,7 @@
     <message>
       <source>Forbidden.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Forbidden.</translation>
+      <translation>금지</translation>
     </message>
     <message>
       <source>Conflict.</source>
