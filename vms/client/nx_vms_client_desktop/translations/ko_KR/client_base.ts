@@ -11472,7 +11472,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message>
       <source>and</source>
       <comment>Example: 1 month and 2 days</comment>
-      <translation type="unfinished">and</translation>
+      <translation>그리고</translation>
     </message>
     <message>
       <source>Your access to the System expires %1</source>
@@ -11923,7 +11923,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message>
       <source>and</source>
       <comment>Example: 1 month and 2 days</comment>
-      <translation type="unfinished">and</translation>
+      <translation>그리고</translation>
     </message>
     <message>
       <source>New User</source>
