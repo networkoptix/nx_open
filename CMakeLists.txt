@@ -1,6 +1,6 @@
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-cmake_minimum_required(VERSION 3.20.0 FATAL_ERROR) #< This version is bundled with MSVC 2019.
+cmake_minimum_required(VERSION 3.29.0 FATAL_ERROR)
 
 set(open_source_root "${CMAKE_SOURCE_DIR}")
 
