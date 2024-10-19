@@ -2,6 +2,8 @@
 
 #include "quick_sync_video_frame.h"
 
+#include <QtMultimedia/private/qvideoframe_p.h>
+
 #include <nx/media/quick_sync/quick_sync_surface.h>
 #include <nx/media/quick_sync/quick_sync_video_decoder_impl.h>
 #include <nx/media/quick_sync/utils.h>
@@ -15,7 +17,7 @@ namespace {
 
 mfxFrameSurface1* getSurface(const nx::media::VideoFramePtr& frame)
 {
-    QAbstractVideoBuffer* videoBuffer = frame->videoBuffer();
+    QHwVideoBuffer* videoBuffer = QVideoFramePrivate::hwBuffer(*frame.get());
 
     NX_ASSERT(dynamic_cast<nx::media::quick_sync::QtVideoBuffer*>(videoBuffer)
         || dynamic_cast<nx::media::quick_sync::MfxQtVideoBuffer*>(videoBuffer));

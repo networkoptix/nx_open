@@ -213,6 +213,7 @@ endif()
 target_include_directories(nx_vms_client_desktop
     PRIVATE
         ${Qt6Gui_PRIVATE_INCLUDE_DIRS}
+        ${Qt6Multimedia_PRIVATE_INCLUDE_DIRS}
         ${Qt6Widgets_PRIVATE_INCLUDE_DIRS}
         ${Qt6WebEngine_PRIVATE_INCLUDE_DIRS}
         ${Qt6WebEngineQuick_PRIVATE_INCLUDE_DIRS}

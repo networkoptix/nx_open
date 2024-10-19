@@ -5,7 +5,7 @@
 #include <QtCore/QHash>
 #include <QtNetwork/QNetworkProxy>
 #include <QtQml/QtQml>
-#include <QtWebEngineQuick/private/qquickwebenginedownloadrequest_p.h>
+#include <QtWebEngineQuick/QQuickWebEngineDownloadRequest>
 
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/core/qml/qml_ownership.h>
@@ -56,12 +56,11 @@ QQuickWebEngineProfile* WebEngineProfileManager::Private::getOrCreateProfile(
         if (!qmlContext(profile))
             QQmlEngine::setContextForObject(profile, qmlContext(parent));
 
+        profile->setStorageName(name);
         profile->setOffTheRecord(offTheRecord);
 
         if (!proxy.isEmpty())
             profile->setProxy(proxy);
-
-        profile->setStorageName(name);
 
         // Web pages are re-created even on layout tab switch,
         // so profile should save as much data as possible.

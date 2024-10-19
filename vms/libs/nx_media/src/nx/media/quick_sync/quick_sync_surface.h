@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include <vpl/mfx.h>
 
 namespace nx::media::quick_sync {

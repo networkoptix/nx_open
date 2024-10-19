@@ -25,6 +25,7 @@
             <Component><File Name="Qt6OpenGLWidgets.dll" KeyPath="yes" DiskId="3"/></Component>
             <Component><File Name="Qt6Positioning.dll" KeyPath="yes" DiskId="3"/></Component>
             <Component><File Name="Qt6PositioningQuick.dll" KeyPath="yes" DiskId="3"/></Component>
+            <Component><File Name="Qt6QmlMeta.dll" KeyPath="yes" DiskId="3"/></Component>
             <Component><File Name="Qt6QmlModels.dll" KeyPath="yes" DiskId="3"/></Component>
             <Component><File Name="Qt6QmlWorkerScript.dll" KeyPath="yes" DiskId="3"/></Component>
             <Component><File Name="Qt6QuickControls2.dll" KeyPath="yes" DiskId="3"/></Component>

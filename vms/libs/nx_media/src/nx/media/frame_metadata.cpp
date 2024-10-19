@@ -43,7 +43,7 @@ FrameMetadata::FrameMetadata(const QnEmptyMediaDataPtr& frame):
 void FrameMetadata::serialize(const VideoFramePtr& frame) const
 {
     if (!isNull())
-        frame->setMetadata(kMetadataFlagsKey, QVariant::fromValue(*this));
+        frame->metaData[kMetadataFlagsKey] = QVariant::fromValue(*this);
 }
 
 FrameMetadata FrameMetadata::deserialize(const ConstVideoFramePtr& frame)
@@ -51,7 +51,7 @@ FrameMetadata FrameMetadata::deserialize(const ConstVideoFramePtr& frame)
     if (!frame)
         return FrameMetadata();
 
-    auto data = frame->metaData(kMetadataFlagsKey);
+    auto data = frame->metaData.value(kMetadataFlagsKey);
     return data.canConvert<FrameMetadata>() ? data.value<FrameMetadata>() : FrameMetadata();
 }
 

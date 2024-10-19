@@ -49,7 +49,6 @@ class AvFrameMemoryBuffer: public QAbstractVideoBuffer
 {
 public:
     AvFrameMemoryBuffer(AVFrame* frame, bool ownsFrame):
-        QAbstractVideoBuffer(QVideoFrame::NoHandle),
         m_frame(frame),
         m_ownsFrame(ownsFrame)
     {
@@ -82,15 +81,25 @@ public:
             if (i > 0 && pixelFormat == QVideoFrameFormat::Format_YUV420P)
                 bytesPerPlane /= 2;
 
-            data.size[i] = bytesPerPlane;
+            data.dataSize[i] = bytesPerPlane;
         }
-        data.nPlanes = planes;
+        data.planeCount = planes;
 
         return data;
     }
 
     virtual void unmap() override
     {
+    }
+
+    virtual QVideoFrameFormat format() const override
+    {
+        if (!m_frame)
+            return QVideoFrameFormat();
+
+        return QVideoFrameFormat(
+            QSize(m_frame->width, m_frame->height),
+            toQtPixelFormat((AVPixelFormat) m_frame->format));
     }
 
 private:
@@ -266,16 +275,15 @@ VideoFrame* FfmpegVideoDecoderPrivate::fromAVFrame(
     SwsContext** scaleContext,
     bool tryToTakeOwnership)
 {
-    QSize frameSize((*pFrame)->width, (*pFrame)->height);
     qint64 startTimeMs = (*pFrame)->pkt_dts / 1000;
 
-    auto qtPixelFormat = toQtPixelFormat((AVPixelFormat)(*pFrame)->format);
+    const auto qtPixelFormat = toQtPixelFormat((AVPixelFormat) (*pFrame)->format);
 
     // Frame moved to the buffer. Buffer keeps reference to a frame.
-    QAbstractVideoBuffer* buffer;
+    std::unique_ptr<QAbstractVideoBuffer> buffer;
     if (qtPixelFormat != QVideoFrameFormat::Format_Invalid)
     {
-        buffer = new AvFrameMemoryBuffer(*pFrame, tryToTakeOwnership);
+        buffer = std::make_unique<AvFrameMemoryBuffer>(*pFrame, tryToTakeOwnership);
         if (tryToTakeOwnership)
             *pFrame = nullptr;
     }
@@ -284,11 +292,10 @@ VideoFrame* FfmpegVideoDecoderPrivate::fromAVFrame(
         AVFrame* newFrame = FfmpegVideoDecoderPrivate::convertPixelFormat(*pFrame, scaleContext);
         if (!newFrame)
             return nullptr; //< can't convert pixel format
-        qtPixelFormat = toQtPixelFormat((AVPixelFormat)newFrame->format);
-        buffer = new AvFrameMemoryBuffer(newFrame, /* ownsFrame */ true);
+        buffer = std::make_unique<AvFrameMemoryBuffer>(newFrame, /* ownsFrame */ true);
     }
 
-    VideoFrame* videoFrame = new VideoFrame(buffer, {frameSize, qtPixelFormat});
+    auto videoFrame = new VideoFrame(std::move(buffer));
     videoFrame->setStartTime(startTimeMs);
     return videoFrame;
 }

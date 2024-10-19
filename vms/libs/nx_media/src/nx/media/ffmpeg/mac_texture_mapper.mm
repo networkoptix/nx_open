@@ -2,7 +2,7 @@
 
 #include "mac_texture_mapper.h"
 
-#include <QtMultimedia/private/qabstractvideobuffer_p.h>
+#include <QtMultimedia/private/qhwvideobuffer_p.h>
 #include <QtMultimedia/private/qvideotexturehelper_p.h>
 
 #include <CoreVideo/CoreVideo.h>

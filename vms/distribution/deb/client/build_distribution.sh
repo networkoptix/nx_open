@@ -299,6 +299,7 @@ copyQtLibs()
         OpenGLWidgets
         Positioning
         Qml
+        QmlMeta
         QmlModels
         QmlWorkerScript
         Quick

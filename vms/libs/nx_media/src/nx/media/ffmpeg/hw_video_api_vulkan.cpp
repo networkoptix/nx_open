@@ -4,7 +4,7 @@
 
 #if QT_CONFIG(vulkan) && !defined(Q_OS_ANDROID)
 
-#include <QtMultimedia/private/qabstractvideobuffer_p.h>
+#include <QtMultimedia/private/qhwvideobuffer_p.h>
 #include <QtMultimedia/private/qvideotexturehelper_p.h>
 
 #include <nx/media/video_frame.h>
@@ -46,9 +46,9 @@ public:
     std::array<std::unique_ptr<QRhiTexture>, 4> m_textures;
 };
 
-class VulkanMemoryBuffer: public QAbstractVideoBuffer
+class VulkanMemoryBuffer: public QHwVideoBuffer
 {
-    using base_type = QAbstractVideoBuffer;
+    using base_type = QHwVideoBuffer;
 
 public:
     VulkanMemoryBuffer(const AVFrame* frame):
@@ -61,7 +61,7 @@ public:
     {
     }
 
-    virtual MapData map(QVideoFrame::MapMode mode) override
+    virtual MapData map(QVideoFrame::MapMode /*mode*/) override
     {
         return {};
     }
@@ -130,6 +130,14 @@ public:
         return textures;
     }
 
+    QVideoFrameFormat format() const override
+    {
+        if (!m_frame)
+            return {};
+
+        return QVideoFrameFormat(QSize(m_frame->width, m_frame->height), toQtPixelFormat(m_frame));
+    }
+
 private:
     const AVFrame* m_frame = nullptr;
 };
@@ -174,16 +182,8 @@ public:
         if (!NX_ASSERT(frame->format == AV_PIX_FMT_VULKAN))
             return {};
 
-        const QSize frameSize(frame->width, frame->height);
-        const int64_t timestampUs = frame->pkt_dts;
-
-        QAbstractVideoBuffer* buffer = new VulkanMemoryBuffer(frame);
-        const auto qtPixelFormat = toQtPixelFormat(frame);
-
-        auto result = std::make_shared<VideoFrame>(
-            buffer,
-            QVideoFrameFormat{frameSize, qtPixelFormat});
-        result->setStartTime(timestampUs);
+        auto result = std::make_shared<VideoFrame>(std::make_unique<VulkanMemoryBuffer>(frame));
+        result->setStartTime(frame->pkt_dts);
 
         return result;
     }

@@ -107,6 +107,7 @@ target_compile_definitions(nx_media
 
 target_include_directories(nx_media
     PRIVATE
+        ${Qt6Gui_PRIVATE_INCLUDE_DIRS}
         ${Qt6Multimedia_PRIVATE_INCLUDE_DIRS}
         ${additional_sources_include_dirs}
 )

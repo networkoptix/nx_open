@@ -7,7 +7,7 @@
 
 #include <QtGui/rhi/qrhi.h>
 #include <QtMultimedia/QVideoFrame>
-#include <QtMultimedia/private/qabstractvideobuffer_p.h>
+#include <QtMultimedia/private/qhwvideobuffer_p.h>
 
 #include <nx/media/video_frame.h>
 #include <nx/utils/log/log.h>
@@ -353,13 +353,11 @@ QVideoFrameFormat::PixelFormat toQtPixelFormat(DXGI_FORMAT format)
     }
 }
 
-class D3D11MemoryBuffer: public QAbstractVideoBuffer
+class D3D11MemoryBuffer: public QHwVideoBuffer
 {
-    using base_type = QAbstractVideoBuffer;
-
 public:
     D3D11MemoryBuffer(const AVFrame* frame):
-        base_type(QVideoFrame::NoHandle),
+        QHwVideoBuffer(QVideoFrame::NoHandle),
         m_frame(frame)
     {
     }
@@ -400,18 +398,29 @@ public:
         ComPtr<ID3D11Texture2D> output = converter->copyTexture(
             avDeviceCtx, ffmpegTex, index, frameSize);
 
-        D3D11_TEXTURE2D_DESC desc;
-        memset(&desc, 0, sizeof(desc));
-        output->GetDesc(&desc);
-
-        QVideoFrameFormat format(QSize(desc.Width, desc.Height), toQtPixelFormat(desc.Format));
         std::unique_ptr<VideoFrameTextures> textures(new VideoFrameTextures(std::move(output)));
 
+        const QVideoFrameFormat frameFormat = format();
         quint64 handle = reinterpret_cast<quint64>(textures->m_d3d11Texture.Get());
         for (int plane = 0; plane < 4; ++plane)
-            textures->m_textures[plane] = createTextureFromHandle(format, rhi, plane, handle);
+            textures->m_textures[plane] = createTextureFromHandle(frameFormat, rhi, plane, handle);
 
         return textures;
+    }
+
+    QVideoFrameFormat format() const override
+    {
+        if (!m_frame)
+            return {};
+
+        const ComPtr<ID3D11Texture2D> ffmpegTex = reinterpret_cast<ID3D11Texture2D*>(
+            m_frame->data[0]);
+        D3D11_TEXTURE2D_DESC desc;
+        memset(&desc, 0, sizeof(desc));
+        ffmpegTex->GetDesc(&desc);
+        const auto qtPixelFormat = toQtPixelFormat(desc.Format);
+
+        return QVideoFrameFormat(QSize(m_frame->width, m_frame->height), qtPixelFormat);
     }
 
 private:
@@ -445,26 +454,10 @@ public:
         const auto ctx = fCtx->device_ctx;
 
         if (!ctx || ctx->type != AV_HWDEVICE_TYPE_D3D11VA)
-        {
             return {};
-        }
 
-        const QSize frameSize(frame->width, frame->height);
-        const int64_t timestampUs = frame->pkt_dts;
-
-        const ComPtr<ID3D11Texture2D> ffmpegTex = reinterpret_cast<ID3D11Texture2D*>(
-            frame->data[0]);
-        D3D11_TEXTURE2D_DESC desc;
-        memset(&desc, 0, sizeof(desc));
-        ffmpegTex->GetDesc(&desc);
-
-        const auto qtPixelFormat = toQtPixelFormat(desc.Format);
-
-        QAbstractVideoBuffer* buffer = new D3D11MemoryBuffer(frame);
-        auto result = std::make_shared<VideoFrame>(
-            buffer,
-            QVideoFrameFormat{frameSize, qtPixelFormat});
-        result->setStartTime(timestampUs);
+        auto result = std::make_shared<VideoFrame>(std::make_unique<D3D11MemoryBuffer>(frame));
+        result->setStartTime(frame->pkt_dts);
 
         return result;
     }

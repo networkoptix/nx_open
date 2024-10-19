@@ -9,8 +9,8 @@
 #include <QtCore/QList>
 #include <QtCore/QMutex>
 #include <QtCore/QTimer>
+#include <QtMultimedia/QAbstractVideoBuffer>
 #include <QtMultimedia/QVideoSink>
-#include <QtMultimedia/private/qabstractvideobuffer_p.h>
 
 #include <core/resource/avi/avi_archive_delegate.h>
 #include <core/resource/avi/avi_resource.h>
@@ -19,7 +19,6 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/kit/debug.h>
-#include <nx/media/image_video_buffer.h>
 #include <nx/media/ini.h>
 #include <nx/media/quick_sync/qsv_supported.h>
 #include <nx/media/video_frame.h>
@@ -553,7 +552,7 @@ VideoFramePtr Player::Private::scaleFrame(const VideoFramePtr& videoFrame)
 
     NX_ASSERT(!image.isNull());
 
-    if (auto scaledFrame = videoFrameFromImage(image))
+    if (auto scaledFrame = std::make_shared<VideoFrame>(image))
         return scaledFrame;
 
     return videoFrame;

@@ -17,7 +17,6 @@ struct AlignedMemVideoBuffer::Private
 };
 
 AlignedMemVideoBuffer::AlignedMemVideoBuffer(int size, int alignFactor, int bytesPerLine):
-    QAbstractVideoBuffer(QVideoFrame::NoHandle),
     d(new AlignedMemVideoBuffer::Private())
 {
     d->data[0] = (uchar*) qMallocAligned(size, alignFactor);
@@ -28,7 +27,6 @@ AlignedMemVideoBuffer::AlignedMemVideoBuffer(int size, int alignFactor, int byte
 }
 
 AlignedMemVideoBuffer::AlignedMemVideoBuffer(uchar* data[4], int bytesPerLine[4], int planeCount):
-    QAbstractVideoBuffer(QVideoFrame::NoHandle),
     d(new AlignedMemVideoBuffer::Private())
 {
     for (int i = 0; i < 4; ++i)
@@ -60,9 +58,9 @@ QAbstractVideoBuffer::MapData AlignedMemVideoBuffer::map(QVideoFrame::MapMode mo
             data.bytesPerLine[i] = d->bytesPerLine[i];
         }
 
-        data.size[0] = d->dataSize;
+        data.dataSize[0] = d->dataSize;
 
-        data.nPlanes = d->planeCount;
+        data.planeCount = d->planeCount;
     }
 
     return data;
