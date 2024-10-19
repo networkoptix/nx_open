@@ -2,18 +2,14 @@
 
 #if defined(__x86_64__)
 
-#include "hw_video_api.h"
-
-#include <nx/media/video_frame.h>
-#include <nx/utils/log/log.h>
-
 #include <QtGui/QGuiApplication>
 #include <QtGui/QOpenGLFunctions>
 #include <QtGui/qpa/qplatformnativeinterface.h>
 #include <QtGui/rhi/qrhi.h>
-#include <QtMultimedia/private/qabstractvideobuffer_p.h>
-#include <QtMultimedia/private/qvideotexturehelper_p.h>
+#include <QtMultimedia/QAbstractVideoBuffer>
 #include <QtMultimedia/QVideoFrame>
+#include <QtMultimedia/private/qhwvideobuffer_p.h>
+#include <QtMultimedia/private/qvideotexturehelper_p.h>
 
 #include <EGL/egl.h>
 #include <EGL/eglext.h>
@@ -21,14 +17,20 @@
 #include <va/va_dri2.h>
 #include <va/va_drmcommon.h>
 
-#include "nx/utils/scope_guard.h"
-#include "texture_helper.h"
-
 extern "C" {
 #include <libavutil/frame.h>
 #include <libavutil/hwcontext.h>
 #include <libavutil/hwcontext_vaapi.h>
 } // extern "C"
+
+#undef None //< The macro from X.h collides with an internal structure of nx::reflect.
+
+#include <nx/utils/scope_guard.h>
+#include <nx/media/video_frame.h>
+#include <nx/utils/log/log.h>
+
+#include "hw_video_api.h"
+#include "texture_helper.h"
 
 namespace nx::media {
 
@@ -353,13 +355,11 @@ QString drmName(uint32_t fourcc)
     return result;
 }
 
-class VaapiMemoryBuffer: public QAbstractVideoBuffer
+class VaapiMemoryBuffer: public QHwVideoBuffer
 {
-    using base_type = QAbstractVideoBuffer;
-
 public:
     VaapiMemoryBuffer(const AVFrame* frame):
-        base_type(QVideoFrame::NoHandle),
+        QHwVideoBuffer(QVideoFrame::NoHandle),
         m_frame(frame)
     {
     }
@@ -437,10 +437,11 @@ public:
             return {};
         }
 
-        auto qtFormat = toQtPixelFormat(m_frame);
-        auto drm_formats = fourccFromPixelFormat(qtFormat);
+        const QVideoFrameFormat frameFormat = format();
 
-        auto *desc = QVideoTextureHelper::textureDescription(qtFormat);
+        auto drm_formats = fourccFromPixelFormat(frameFormat.pixelFormat());
+
+        auto *desc = QVideoTextureHelper::textureDescription(frameFormat.pixelFormat());
         int nPlanes = 0;
         for (; nPlanes < 5; ++nPlanes)
         {
@@ -561,16 +562,22 @@ public:
 
         auto textures = std::make_unique<VideoFrameTextures>(nPlanes);
 
-        QVideoFrameFormat format(QSize(m_frame->width, m_frame->height), qtFormat);
-
         for (int plane = 0; plane < 4; ++plane)
         {
             textures->m_handles[plane] = glTextures[plane];
             textures->m_textures[plane] = createTextureFromHandle(
-                format, rhi, plane, textures->m_handles[plane]);
+                frameFormat, rhi, plane, textures->m_handles[plane]);
         }
 
         return textures;
+    }
+
+    QVideoFrameFormat format() const override
+    {
+        if (!m_frame)
+            return {};
+
+        return QVideoFrameFormat(QSize(m_frame->width, m_frame->height), toQtPixelFormat(m_frame));
     }
 
 private:
@@ -600,17 +607,8 @@ public:
         if (!NX_ASSERT(frame->format == AV_PIX_FMT_VAAPI))
             return {};
 
-        const QSize frameSize(frame->width, frame->height);
-        const int64_t timestampUs = frame->pkt_dts;
-
-        QAbstractVideoBuffer* buffer = new VaapiMemoryBuffer(frame);
-
-        const auto qtPixelFormat = toQtPixelFormat(frame);
-
-        auto result = std::make_shared<VideoFrame>(
-            buffer,
-            QVideoFrameFormat{frameSize, qtPixelFormat});
-        result->setStartTime(timestampUs);
+        auto result = std::make_shared<VideoFrame>(std::make_unique<VaapiMemoryBuffer>(frame));
+        result->setStartTime(frame->pkt_dts);
 
         return result;
     }

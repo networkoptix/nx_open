@@ -283,7 +283,7 @@ QRhi* WindowContext::rhi() const
     if (auto windowWidget = mainWindowWidget())
     {
         if (auto backingStore = windowWidget->backingStore())
-            return backingStore->handle()->rhi();
+            return backingStore->handle()->rhi(windowWidget->windowHandle());
     }
     return nullptr;
 }

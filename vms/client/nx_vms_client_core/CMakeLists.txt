@@ -116,8 +116,6 @@ endif()
 target_include_directories(nx_vms_client_core
     PUBLIC
         ${Qt6Quick_PRIVATE_INCLUDE_DIRS}
-        ${Qt6Multimedia_PRIVATE_INCLUDE_DIRS}
-        ${Qt6MultimediaQuick_PRIVATE_INCLUDE_DIRS}
     PRIVATE
         ${qt_helpers_root}
 )

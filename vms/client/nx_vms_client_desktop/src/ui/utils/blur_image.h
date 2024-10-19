@@ -4,7 +4,7 @@
 
 #include <QtWidgets/QWidget>
 
-#if (QT_VERSION < QT_VERSION_CHECK(6, 8, 0))
+#if (QT_VERSION < QT_VERSION_CHECK(6, 9, 0))
 
     QT_BEGIN_NAMESPACE
 

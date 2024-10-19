@@ -3,7 +3,7 @@
 #pragma once
 
 #include <QtCore/QScopedPointer>
-#include <QtMultimedia/private/qabstractvideobuffer_p.h>
+#include <QtMultimedia/QAbstractVideoBuffer>
 
 #include <nx/utils/impl_ptr.h>
 

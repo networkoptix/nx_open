@@ -1,7 +1,11 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "mac_video_decoder.h"
-#if defined(Q_OS_IOS) || defined(Q_OS_MACOS)
+#if defined(Q_OS_DARWIN)
+
+#if defined(TARGET_OS_IPHONE)
+#include <CoreVideo/CoreVideo.h>
+#endif
 
 extern "C"
 {
@@ -15,6 +19,7 @@ extern "C"
 #include <QtCore/QDebug>
 #include <QtCore/QFile>
 #include <QtMultimedia/private/qvideotexturehelper_p.h>
+#include <QtMultimedia/QAbstractVideoBuffer>
 
 #include <nx/build_info.h>
 #include <nx/codec/nal_units.h>
@@ -30,14 +35,7 @@ extern "C"
 #include "aligned_mem_video_buffer.h"
 #include "mac_utils.h"
 
-#if defined(TARGET_OS_IPHONE)
-#include <CoreVideo/CoreVideo.h>
-#endif
-
-#include <QtMultimedia/private/qabstractvideobuffer_p.h>
-
-namespace nx {
-namespace media {
+namespace nx::media {
 
 namespace {
 
@@ -88,13 +86,20 @@ namespace {
                 return QVideoFrameFormat::Format_Invalid;
         }
     }
+
+    QVideoFrameFormat::PixelFormat qtPixelFormatForFrame(AVFrame* frame)
+    {
+        const bool hardwareAccelerated = frame->data[3];
+        return hardwareAccelerated
+            ? toQtPixelFormat(CVPixelBufferGetPixelFormatType((CVPixelBufferRef) frame->data[3]))
+            : toQtPixelFormat((AVPixelFormat) frame->format);
+    }
 }
 
 class IOSMemoryBuffer: public QAbstractVideoBuffer
 {
 public:
     IOSMemoryBuffer(AVFrame* frame):
-        QAbstractVideoBuffer(QVideoFrame::NoHandle),
         m_frame(frame)
     {
     }
@@ -108,7 +113,7 @@ public:
     {
         MapData data;
 
-        data.nPlanes = 1;
+        data.planeCount = 1;
 
         if (m_frame->data[3])
         {
@@ -118,19 +123,19 @@ public:
 
             if (CVPixelBufferIsPlanar(pixbuf))
             {
-                data.nPlanes = CVPixelBufferGetPlaneCount(pixbuf);
-                for (int i = 0; i < data.nPlanes; i++)
+                data.planeCount = CVPixelBufferGetPlaneCount(pixbuf);
+                for (int i = 0; i < data.planeCount; i++)
                 {
                     data.data[i] = (uint8_t*) CVPixelBufferGetBaseAddressOfPlane(pixbuf, i);
                     data.bytesPerLine[i] = CVPixelBufferGetBytesPerRowOfPlane(pixbuf, i);
-                    data.size[i] = data.bytesPerLine[i] * CVPixelBufferGetHeightOfPlane(pixbuf, i);
+                    data.dataSize[i] = data.bytesPerLine[i] * CVPixelBufferGetHeightOfPlane(pixbuf, i);
                 }
             }
             else
             {
                 data.data[0] = (uchar*) CVPixelBufferGetBaseAddress(pixbuf);
                 data.bytesPerLine[0] = CVPixelBufferGetBytesPerRow(pixbuf);
-                data.size[0] = data.bytesPerLine[0] * CVPixelBufferGetHeight(pixbuf);
+                data.dataSize[0] = data.bytesPerLine[0] * CVPixelBufferGetHeight(pixbuf);
             }
         }
         else
@@ -138,16 +143,16 @@ public:
             const auto textureDescription = QVideoTextureHelper::textureDescription(
                 toQtPixelFormat((AVPixelFormat) m_frame->format));
 
-            data.nPlanes = 0;
+            data.planeCount = 0;
             const AVPixFmtDescriptor* descr = av_pix_fmt_desc_get((AVPixelFormat) m_frame->format);
             for (int i = 0; i < descr->nb_components && m_frame->data[i]; ++i)
             {
-                ++data.nPlanes;
+                ++data.planeCount;
                 data.data[i] = m_frame->data[i];
                 data.bytesPerLine[i] = m_frame->linesize[i];
 
                 const size_t planeHeight = textureDescription->heightForPlane(m_frame->height, i);
-                data.size[i] = data.bytesPerLine[i] * planeHeight;
+                data.dataSize[i] = data.bytesPerLine[i] * planeHeight;
             }
         }
 
@@ -158,6 +163,12 @@ public:
     {
         CVPixelBufferRef pixbuf = (CVPixelBufferRef) m_frame->data[3];
         CVPixelBufferUnlockBaseAddress(pixbuf, kCVPixelBufferLock_ReadOnly);
+    }
+
+    virtual QVideoFrameFormat format() const override
+    {
+        return QVideoFrameFormat(
+            QSize(m_frame->width, m_frame->height), qtPixelFormatForFrame(m_frame));
     }
 
 private:
@@ -355,22 +366,10 @@ int MacVideoDecoder::decode(
         return res; //< Negative value means error, zero means buffering.
     }
 
-    QSize frameSize(d->frame->width, d->frame->height);
     qint64 startTimeMs = d->frame->pkt_dts / 1000;
     int frameNum = qMax(0, d->codecContext->frame_num - 1);
 
-    QVideoFrameFormat::PixelFormat qtPixelFormat = QVideoFrameFormat::Format_Invalid;
-    d->isHardwareAccelerated = d->frame->data[3];
-    if (d->isHardwareAccelerated)
-    {
-        CVPixelBufferRef pixBuf = (CVPixelBufferRef)d->frame->data[3];
-        qtPixelFormat = toQtPixelFormat(CVPixelBufferGetPixelFormatType(pixBuf));
-    }
-    else
-    {
-        qtPixelFormat = toQtPixelFormat((AVPixelFormat)d->frame->format);
-    }
-    if (qtPixelFormat == QVideoFrameFormat::Format_Invalid)
+    if (qtPixelFormatForFrame(d->frame) == QVideoFrameFormat::Format_Invalid)
     {
         NX_WARNING(this, "Unknown pixel format");
         // Recreate frame just in case.
@@ -380,9 +379,8 @@ int MacVideoDecoder::decode(
         return -1; //< report error
     }
 
-    QAbstractVideoBuffer* buffer = new IOSMemoryBuffer(d->frame);
     d->frame = av_frame_alloc();
-    VideoFrame* videoFrame = new VideoFrame(buffer, {frameSize, qtPixelFormat});
+    auto videoFrame = new VideoFrame(std::make_unique<IOSMemoryBuffer>(d->frame));
     videoFrame->setStartTime(startTimeMs);
 
     outDecodedFrame->reset(videoFrame);
@@ -395,7 +393,6 @@ AbstractVideoDecoder::Capabilities MacVideoDecoder::capabilities() const
     return d->isHardwareAccelerated ? Capability::hardwareAccelerated : Capability::noCapability;
 }
 
-} // namespace media
-} // namespace nx
+} // namespace nx::media
 
-#endif // (Q_OS_IOS)
+#endif // defined(Q_OS_DARWIN)

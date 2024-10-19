@@ -70,10 +70,10 @@ QList<DeviceInfo> listDevicesVulkan()
         return {};
 
     QVulkanFunctions *f = inst->functions();
-    uint32_t devicesCount = 0;
-    f->vkEnumeratePhysicalDevices(inst->vkInstance(), &devicesCount, nullptr);
-    QList<VkPhysicalDevice> devices(devicesCount, {});
-    f->vkEnumeratePhysicalDevices(inst->vkInstance(), &devicesCount, devices.data());
+    uint32_t deviceCount = 0;
+    f->vkEnumeratePhysicalDevices(inst->vkInstance(), &deviceCount, nullptr);
+    QList<VkPhysicalDevice> devices(deviceCount, VkPhysicalDevice{});
+    f->vkEnumeratePhysicalDevices(inst->vkInstance(), &deviceCount, devices.data());
 
     for (int i = 0; i < devices.size(); ++i)
     {

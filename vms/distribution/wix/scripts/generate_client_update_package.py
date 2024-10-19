@@ -25,6 +25,7 @@ qt_libraries = [
     'PositioningQuick',
     'PrintSupport',
     'Qml',
+    'QmlMeta',
     'QmlModels',
     'QmlWorkerScript',
     'Quick',

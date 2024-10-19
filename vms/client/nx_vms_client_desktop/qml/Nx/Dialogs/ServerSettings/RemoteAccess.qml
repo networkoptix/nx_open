@@ -14,24 +14,26 @@ Item
     id: control
 
     property alias model: remoteAccessGrid.model
-    
+
     Placeholder
     {
         id: placeholder
 
-        visible: !remoteAccessGrid.visible || !control.model.enabledForCurrentUser
-        imageSource: control.model.enabledForCurrentUser
+        property bool enabledForCurrentUser: !!model && model.enabledForCurrentUser
+
+        visible: !remoteAccessGrid.visible || !enabledForCurrentUser
+        imageSource: enabledForCurrentUser
             ? "image://skin/64x64/Outline/noservices.svg"
             : "image://skin/64x64/Outline/no_access.svg"
-        text: control.model.enabledForCurrentUser ? qsTr("No services") : qsTr("Disabled")
-        additionalText: control.model.enabledForCurrentUser
+        text: enabledForCurrentUser ? qsTr("No services") : qsTr("Disabled")
+        additionalText: enabledForCurrentUser
             ? qsTr("Server is not configured for remote access feature")
             : qsTr("Remote access tool is currently disabled. Please enable it or contact your "
                 + "administrator to turn it on.")
         maxWidth: 250
 
         anchors.verticalCenterOffset: 0
-        
+
         Text
         {
             textFormat: Text.RichText
@@ -115,7 +117,7 @@ Item
                     {
                         height: 1
                         color: ColorTheme.colors.dark11
-                        
+
                         Layout.fillWidth: true
                     }
                 }

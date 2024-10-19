@@ -2,18 +2,18 @@
 
 #pragma once
 
-#include <QtMultimedia/QVideoFrame>
-#include <QtMultimedia/private/qabstractvideobuffer_p.h>
+#include <QtMultimedia/private/qhwvideobuffer_p.h>
 
 #include "quick_sync_surface.h"
+#include "quick_sync_video_decoder_impl.h"
 
 namespace nx::media::quick_sync {
 
-class QtVideoBuffer: public QAbstractVideoBuffer
+class QtVideoBuffer: public QHwVideoBuffer
 {
 public:
     QtVideoBuffer(QuickSyncSurface surfaceData):
-        QAbstractVideoBuffer(QVideoFrame::NoHandle),
+        QHwVideoBuffer(QVideoFrame::NoHandle),
         m_surfaceData(surfaceData)
     {
         auto decoder = m_surfaceData.decoder.lock();
@@ -23,7 +23,7 @@ public:
         decoder->lockSurface(m_surfaceData.surface);
     }
 
-    ~QtVideoBuffer()
+    virtual ~QtVideoBuffer() override
     {
         auto decoder = m_surfaceData.decoder.lock();
         if (!decoder)
@@ -39,14 +39,19 @@ public:
 
     virtual void unmap() override {}
 
-    QVariant handle() const
-    {
-        return QVariant::fromValue(m_surfaceData);
-    }
-
     virtual quint64 textureHandle(QRhi*, int /*plane*/) const override
     {
         return reinterpret_cast<quint64>(m_surfaceData.surface);
+    }
+
+    QVideoFrameFormat format() const override
+    {
+        if (!m_surfaceData.surface)
+            return {};
+
+        return QVideoFrameFormat(
+            QSize(m_surfaceData.surface->Info.CropW, m_surfaceData.surface->Info.CropH),
+            QVideoFrameFormat::Format_NV12);
     }
 
 private:

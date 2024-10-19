@@ -5,7 +5,8 @@
 #include <QtCore/QFile>
 #include <QtGui/rhi/qrhi.h>
 #include <QtMultimedia/QVideoFrame>
-#include <QtMultimedia/private/qabstractvideobuffer_p.h>
+#include <QtMultimedia/private/qhwvideobuffer_p.h>
+#include <QtMultimedia/private/qvideoframe_p.h>
 
 #include <nx/utils/log/log.h>
 #include <utils/color_space/image_correction.h>
@@ -521,24 +522,28 @@ void RhiVideoRenderer::uploadFrame(QVideoFrame* videoFrame, QRhiResourceUpdateBa
 
     d->planeCount = videoFrame->planeCount();
 
-    if (auto textures = videoFrame->videoBuffer()->mapTextures(d->rhi))
+    if (const auto videoBuffer = QVideoFramePrivate::hwBuffer(*videoFrame))
     {
-        d->textures = std::move(textures);
-        if (d->textures->texture(0))
+        if (auto textures = videoBuffer->mapTextures(d->rhi))
         {
-            const auto textureSize = d->textures->texture(0)->pixelSize();
-            const auto frameSize = videoFrame->size();
-            // When coming from a HW decoder, texture size can be aligned to macroblock size,
-            // so we need to scale texture coordinates to avoid sampling garbage.
-            if (textureSize != frameSize && textureSize.width() > 0 && textureSize.height() > 0)
+            d->textures = std::move(textures);
+            if (d->textures->texture(0))
             {
-                d->textureScale = QVector2D(
-                    (float) frameSize.width() / textureSize.width(),
-                    (float) frameSize.height() / textureSize.height());
+                const auto textureSize = d->textures->texture(0)->pixelSize();
+                const auto frameSize = videoFrame->size();
+                // When coming from a HW decoder, texture size can be aligned to macroblock size,
+                // so we need to scale texture coordinates to avoid sampling garbage.
+                if (textureSize != frameSize
+                    && textureSize.width() > 0 && textureSize.height() > 0)
+                {
+                    d->textureScale = QVector2D(
+                        (float) frameSize.width() / textureSize.width(),
+                        (float) frameSize.height() / textureSize.height());
+                }
             }
+            createBindings();
+            return;
         }
-        createBindings();
-        return;
     }
 
     AVFrame frame;

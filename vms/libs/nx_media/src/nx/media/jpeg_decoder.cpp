@@ -2,13 +2,11 @@
 
 #include "jpeg_decoder.h"
 
-#include <nx/media/image_video_buffer.h>
 #include <nx/media/video_frame.h>
 
 #include "jpeg.h"
 
-namespace nx {
-namespace media {
+namespace nx::media {
 
 //-------------------------------------------------------------------------------------------------
 // JpegDecoderPrivate
@@ -58,7 +56,7 @@ int JpegDecoder::decode(const QnConstCompressedVideoDataPtr& frame, VideoFramePt
 
     const QImage image = decompressJpegImage(frame->data(), frame->dataSize());
 
-    *result = videoFrameFromImage(image);
+    *result = std::make_shared<VideoFrame>(image);
 
     if (!*result)
         return 0;
@@ -72,5 +70,4 @@ AbstractVideoDecoder::Capabilities JpegDecoder::capabilities() const
     return Capability::noCapability;
 }
 
-} // namespace media
-} // namespace nx
+} // namespace nx::media

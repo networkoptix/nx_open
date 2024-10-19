@@ -5,16 +5,16 @@
 #include <CoreVideo/CoreVideo.h>
 
 #include <QtMultimedia/QVideoFrame>
-#include <QtMultimedia/private/qabstractvideobuffer_p.h>
+#include <QtMultimedia/private/qhwvideobuffer_p.h>
 
 #include <nx/utils/log/log.h>
 #include <nx/media/video_frame.h>
 
-#include "mac_texture_mapper.h"
-
 extern "C" {
 #include <libavutil/frame.h>
 } // extern "C"
+
+#include "mac_texture_mapper.h"
 
 namespace nx::media {
 
@@ -39,13 +39,11 @@ QVideoFrameFormat::PixelFormat toQtPixelFormat(OSType pixFormat)
     }
 }
 
-class MacMemoryBuffer: public QAbstractVideoBuffer
+class MacMemoryBuffer: public QHwVideoBuffer
 {
-    using base_type = QAbstractVideoBuffer;
-
 public:
     MacMemoryBuffer(const AVFrame* frame):
-        base_type(QVideoFrame::NoHandle),
+        QHwVideoBuffer(QVideoFrame::NoHandle),
         m_frame(frame)
     {
     }
@@ -60,7 +58,7 @@ public:
 
         NX_ASSERT(mode == QVideoFrame::ReadOnly);
 
-        data.nPlanes = 1;
+        data.planeCount = 1;
 
         CVPixelBufferRef pixbuf = (CVPixelBufferRef) m_frame->data[3];
 
@@ -70,20 +68,20 @@ public:
 
         if (CVPixelBufferIsPlanar(pixbuf))
         {
-            data.nPlanes = CVPixelBufferGetPlaneCount(pixbuf);
-            for (int i = 0; i < data.nPlanes; i++)
+            data.planeCount = CVPixelBufferGetPlaneCount(pixbuf);
+            for (int i = 0; i < data.planeCount; i++)
             {
                 data.data[i] = (uint8_t*) CVPixelBufferGetBaseAddressOfPlane(pixbuf, i);
                 data.bytesPerLine[i] = CVPixelBufferGetBytesPerRowOfPlane(pixbuf, i);
-                data.size[i] = data.bytesPerLine[i] * CVPixelBufferGetHeightOfPlane(pixbuf, i);
+                data.dataSize[i] = data.bytesPerLine[i] * CVPixelBufferGetHeightOfPlane(pixbuf, i);
             }
         }
         else
         {
-            data.nPlanes = 1;
+            data.planeCount = 1;
             data.data[0] = (uchar*) CVPixelBufferGetBaseAddress(pixbuf);
             data.bytesPerLine[0] = CVPixelBufferGetBytesPerRow(pixbuf);
-            data.size[0] = data.bytesPerLine[0] * CVPixelBufferGetHeight(pixbuf);
+            data.dataSize[0] = data.bytesPerLine[0] * CVPixelBufferGetHeight(pixbuf);
         }
 
         return data;
@@ -101,6 +99,17 @@ public:
         if (!m_textureSet)
             m_textureSet = MacTextureMapper::create(buffer, rhi);
         return m_textureSet->mapTextures(rhi);
+    }
+
+    QVideoFrameFormat format() const override
+    {
+        if (!m_frame)
+            return {};
+
+        CVPixelBufferRef pixBuf = (CVPixelBufferRef) m_frame->data[3];
+        const auto qtPixelFormat = toQtPixelFormat(CVPixelBufferGetPixelFormatType(pixBuf));
+
+        return QVideoFrameFormat(QSize(m_frame->width, m_frame->height), qtPixelFormat);
     }
 
 private:
@@ -131,17 +140,8 @@ public:
         if (!NX_ASSERT(frame->format == AV_PIX_FMT_VIDEOTOOLBOX))
             return {};
 
-        const QSize frameSize(frame->width, frame->height);
-        const int64_t timestampUs = frame->pkt_dts;
-
-        CVPixelBufferRef pixBuf = (CVPixelBufferRef) frame->data[3];
-        const auto qtPixelFormat = toQtPixelFormat(CVPixelBufferGetPixelFormatType(pixBuf));
-
-        QAbstractVideoBuffer* buffer = new MacMemoryBuffer(frame);
-        auto result = std::make_shared<VideoFrame>(
-            buffer,
-            QVideoFrameFormat{frameSize, qtPixelFormat});
-        result->setStartTime(timestampUs);
+        auto result = std::make_shared<VideoFrame>(std::make_unique<MacMemoryBuffer>(frame));
+        result->setStartTime(frame->pkt_dts);
 
         return result;
     }

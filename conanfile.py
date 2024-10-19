@@ -145,7 +145,7 @@ class NxOpenConan(ConanFile):
             return
 
         self.build_requires("apidoctool/3.0" "#9b48851ed49e6272d9cf190a230d32c1")
-        self.build_requires("qt-host/6.7.2" "#b52381813fbeb707ff728a1f0031e485")
+        self.build_requires("qt-host/6.8.0" "#b56782c898279c2d07b7acf71ef3a51c")
         self.build_requires("swagger-codegen/3.0.21" "#58d9476941c662c4b3f8a9e99683f034")
 
         if self.isLinux:
@@ -184,7 +184,7 @@ class NxOpenConan(ConanFile):
 
         self.requires(f"ffmpeg/{self.ffmpeg_version_and_revision}")
         self.requires("openssl/1.1.1q" "#bcc8c366b4291c68913eabe817fb15c7")
-        self.requires("qt/6.7.2" "#a7a651076fa36509fd4b4b1723d143c3")
+        self.requires("qt/6.8.0" "#50349278f7fab33d5c83812698ae734c")
         self.requires("roboto-fonts/1.0" "#a1d64ec2d6a2e16f8f476b2b47162123")
         self.requires("boost/1.83.0" "#e0be85c6f8107d7e960246e31cbbf7ab")
         self.requires("concurrentqueue/1.0.4" "#957c470e9abc81ff3850bbe39fc11135")
@@ -215,7 +215,7 @@ class NxOpenConan(ConanFile):
             if not self.isArm32:
                 self._os_deps_package = "os_deps_for_desktop_linux"
                 self.requires("os_deps_for_desktop_linux/ubuntu_focal"
-                    "#8dde64b7eb69e401b23c0365239eefc6")
+                    "#65cbc18a5eaa4fb69cd926eb0561ca0c")
 
         if self.haveDesktopClient:
             self.requires("hidapi/0.10.1" "#67c06b0755251878327ddea8fe964d6b")

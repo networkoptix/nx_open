@@ -277,14 +277,13 @@ void QuickSyncVideoDecoderImpl::releaseSurface(const mfxFrameSurface1* surface)
 bool QuickSyncVideoDecoderImpl::buildQVideoFrame(
     mfxFrameSurface1* surface, nx::media::VideoFramePtr* result)
 {
-    QAbstractVideoBuffer* buffer = nullptr;
+    std::unique_ptr<QAbstractVideoBuffer> buffer;
     if (m_config.useVideoMemory)
-        buffer = new QtVideoBuffer(QuickSyncSurface{surface, weak_from_this()});
+        buffer = std::make_unique<QtVideoBuffer>(QuickSyncSurface{surface, weak_from_this()});
     else
-        buffer = new MfxQtVideoBuffer(surface, m_allocator);
+        buffer = std::make_unique<MfxQtVideoBuffer>(surface, m_allocator);
 
-    QSize frameSize(surface->Info.CropW, surface->Info.CropH);
-    result->reset(new VideoFrame(buffer, {frameSize, QVideoFrameFormat::Format_NV12}));
+    result->reset(new VideoFrame(std::move(buffer)));
     result->get()->setStartTime(surface->Data.TimeStamp);
     return true;
 }

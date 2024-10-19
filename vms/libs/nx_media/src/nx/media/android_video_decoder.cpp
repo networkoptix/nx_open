@@ -16,8 +16,8 @@
 #include <QtGui/QOffscreenSurface>
 #include <QtGui/QOpenGLContext>
 #include <QtGui/QOpenGLFunctions>
+#include <QtMultimedia/private/qhwvideobuffer_p.h>
 #include <QtMultimedia/QVideoFrameFormat>
-#include <QtMultimedia/private/qabstractvideobuffer_p.h>
 #include <QtOpenGL/QOpenGLFramebufferObject>
 #include <QtOpenGL/QOpenGLShaderProgram>
 
@@ -102,13 +102,14 @@ static void fillInputBuffer(
 
 //-------------------------------------------------------------------------------------------------
 
-class TextureBuffer: public QAbstractVideoBuffer
+class TextureBuffer: public QHwVideoBuffer
 {
 public:
-    TextureBuffer(FboTextureHolder textureHolder)
+    TextureBuffer(FboTextureHolder textureHolder, const QVideoFrameFormat& format)
         :
-        QAbstractVideoBuffer(QVideoFrame::RhiTextureHandle),
-        m_textureHolder(std::move(textureHolder))
+        QHwVideoBuffer(QVideoFrame::RhiTextureHandle),
+        m_textureHolder(std::move(textureHolder)),
+        m_format(format)
     {
     }
 
@@ -130,8 +131,14 @@ public:
         return plane == 0 ? m_textureHolder.textureId() : 0;
     }
 
+    QVideoFrameFormat format() const
+    {
+        return m_format;
+    }
+
 private:
     FboTextureHolder m_textureHolder;
+    QVideoFrameFormat m_format;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -600,13 +607,12 @@ int AndroidVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frameSrc, V
     if (textureHolder.isNull())
         return 0;
 
-    NX_VERBOSE(this, nx::format("got frame num %1 decode time1=%2 time2=%3").args(
-        outFrameNum, time1, tm.elapsed()));
+    NX_VERBOSE(this, "Got frame num %1 decode time1=%2 time2=%3",
+        outFrameNum, time1, tm.elapsed());
 
-    auto videoFrame = new VideoFrame(
-        new TextureBuffer(std::move(textureHolder)),
-        QVideoFrameFormat(d->frameSize, QVideoFrameFormat::Format_BGRX8888));
-
+    auto videoFrame = new VideoFrame(std::make_unique<TextureBuffer>(
+        std::move(textureHolder),
+        QVideoFrameFormat(d->frameSize, QVideoFrameFormat::Format_BGRX8888)));
     videoFrame->setStartTime(frameTime);
 
     result->reset(videoFrame);

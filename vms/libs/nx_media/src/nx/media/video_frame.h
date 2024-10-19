@@ -2,12 +2,10 @@
 
 #pragma once
 
-#include <QString>
-#include <QVariant>
-
+#include <QtCore/QMap>
+#include <QtCore/QString>
+#include <QtCore/QVariant>
 #include <QtMultimedia/QVideoFrame>
-
-#include <nx/utils/impl_ptr.h>
 
 namespace nx::media {
 
@@ -17,19 +15,9 @@ namespace nx::media {
  * */
 class VideoFrame: public QVideoFrame
 {
-    using base_type = QVideoFrame;
-
 public:
-    explicit VideoFrame();
-    VideoFrame(const QVideoFrameFormat &format);
-    VideoFrame(QAbstractVideoBuffer *buffer, const QVideoFrameFormat &format);
-    virtual ~VideoFrame();
+    using QVideoFrame::QVideoFrame;
 
-    void setMetadata(const QString& key, const QVariant& value);
-    QVariant metaData(const QString& key) const;
-
-private:
-    struct Private;
-    nx::utils::ImplPtr<Private> d;
+    QMap<QString, QVariant> metaData;
 };
 } // namespace nx::media
