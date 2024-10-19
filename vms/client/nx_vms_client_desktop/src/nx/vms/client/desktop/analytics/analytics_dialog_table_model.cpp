@@ -116,12 +116,16 @@ QVariant AnalyticsDialogTableModel::data(const QModelIndex& index, int role) con
 
 int AnalyticsDialogTableModel::rowCount(const QModelIndex& parent) const
 {
-    return sourceModel() ? sourceModel()->rowCount(parent) : 0;
+    return NX_ASSERT(!parent.isValid()) && sourceModel()
+        ? sourceModel()->rowCount()
+        : 0;
 }
 
-int AnalyticsDialogTableModel::columnCount(const QModelIndex& /*parent*/) const
+int AnalyticsDialogTableModel::columnCount(const QModelIndex& parent) const
 {
-    return m_columnNames.count();
+    return NX_ASSERT(!parent.isValid())
+        ? m_columnNames.count()
+        : 0;
 }
 
 QHash<int, QByteArray> AnalyticsDialogTableModel::roleNames() const

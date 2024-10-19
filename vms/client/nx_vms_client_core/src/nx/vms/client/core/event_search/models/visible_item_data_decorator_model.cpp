@@ -19,6 +19,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/pending_operation.h>
 #include <nx/utils/range_adapters.h>
+#include <nx/utils/scoped_connections.h>
 #include <utils/common/delayed.h>
 
 #include "detail/preview_rect_calculator.h"
@@ -156,9 +157,10 @@ struct VisibleItemDataDecoratorModel::Private
     QTimer hangedPreviewRequestsChecker;
     nx::utils::ElapsedTimer sinceLastPreviewRequest;
     nx::utils::PendingOperation previewLoadOperation;
+    nx::utils::ScopedConnections modelConnections;
     bool previewsEnabled = true;
 
-    QSet<QPersistentModelIndex> visibleItems;
+    QSet<QPersistentModelIndex> visibleSourceIndices;
 
     void handlePreviewLoadingEnded(ResourceThumbnailProvider* provider);
     void createPreviews(int first, int count);
@@ -337,7 +339,7 @@ void VisibleItemDataDecoratorModel::Private::loadNextPreview()
     std::set<int> rowsToLoad;
     bool awaitingReload = false;
 
-    for (const auto& index: visibleItems)
+    for (const auto& index: visibleSourceIndices)
     {
         if (!NX_ASSERT(index.isValid()))
             continue;
@@ -472,17 +474,16 @@ bool VisibleItemDataDecoratorModel::Private::setVisible(const QModelIndex& index
 
     if (value)
     {
-        visibleItems.insert(index);
+        visibleSourceIndices.insert(q->mapToSource(index));
         if (previewsEnabled && waitingStatus(previews[index.row()]) == WaitingStatus::requiresLoading)
             previewLoadOperation.requestOperation();
     }
     else
     {
-        visibleItems.remove(index);
+        visibleSourceIndices.remove(q->mapToSource(index));
     }
 
     emit q->dataChanged(index, index, {IsVisibleRole});
-
     return true;
 }
 
@@ -494,49 +495,6 @@ VisibleItemDataDecoratorModel::VisibleItemDataDecoratorModel(const Settings& set
     base_type(parent),
     d(new Private{.q = this, .settings = settings, .hangedPreviewRequestsChecker = QTimer{}})
 {
-    connect(this, &QAbstractListModel::rowsAboutToBeRemoved, this,
-        [this](const QModelIndex& /*parent*/, int first, int last)
-        {
-            const auto beginIt = d->previews.begin();
-            d->previews.erase(beginIt + first, beginIt + (last + 1));
-
-            QSet<QPersistentModelIndex> toRemove;
-            for (const auto& index: d->visibleItems)
-            {
-                if (index.row() >= first && index.row() <= last)
-                    toRemove.insert(index);
-            }
-
-            d->visibleItems -= toRemove;
-        });
-
-    connect(this, &QAbstractListModel::modelReset, this,
-        [this]
-        {
-            d->createPreviews(0, rowCount());
-        });
-
-    connect(this, &QAbstractListModel::modelAboutToBeReset, this,
-        [this]
-        {
-            d->previews.clear();
-            d->visibleItems.clear();
-        });
-
-    connect(this, &QAbstractListModel::rowsInserted, this,
-        [this](const QModelIndex& parent, int first, int last)
-        {
-            if (NX_ASSERT(!parent.isValid()))
-                d->createPreviews(first, last - first + 1);
-        });
-
-    connect(this, &QAbstractItemModel::dataChanged, this,
-        [this](const QModelIndex& topLeft, const QModelIndex& bottomRight)
-        {
-            for (int row = topLeft.row(); row <= bottomRight.row(); ++row)
-                d->updatePreviewProvider(row);
-        });
-
     d->hangedPreviewRequestsChecker.callOnTimeout(this,
         [this]()
         {
@@ -613,11 +571,57 @@ void VisibleItemDataDecoratorModel::setSourceModel(QAbstractItemModel* value)
     if (value == sourceModel())
         return;
 
-    while (!d->visibleItems.empty())
-        setData(*d->visibleItems.begin(), false, IsVisibleRole);
-    d->previews.clear();
+    // To update internal structures it's better to connect to the source model than to self,
+    // because, as QML handlers of signals are called before C++ handlers, they potentially can
+    // access the model before our handler brings internal state into line with the changes.
+    // These connections to the source model must be established before the base type's, i.e.
+    // before base_type::setSourceModel() call.
+
+    // Model reset is handled in resetInternalData(), because it can happen not only in
+    // response to the source model's reset, but also, for example, inside setSourceModel().
+
+    d->modelConnections.reset();
+
+    if (value)
+    {
+        d->modelConnections << connect(value, &QAbstractListModel::rowsInserted, this,
+            [this](const QModelIndex& parent, int first, int last)
+            {
+                if (NX_ASSERT(!parent.isValid()))
+                    d->createPreviews(first, last - first + 1);
+            });
+
+        d->modelConnections << connect(value, &QAbstractListModel::rowsRemoved, this,
+            [this](const QModelIndex& parent, int first, int last)
+            {
+                if (!NX_ASSERT(!parent.isValid()))
+                    return;
+
+                const auto beginIt = d->previews.begin();
+                d->previews.erase(beginIt + first, beginIt + last + 1);
+
+                // Persistent source indices of removed visible items are already invalidated,
+                // so we need to just filter out all invalid indexes.
+                d->visibleSourceIndices.removeIf(
+                    [](const QPersistentModelIndex& index) { return !index.isValid(); });
+            });
+
+        d->modelConnections << connect(value, &QAbstractItemModel::dataChanged, this,
+            [this](const QModelIndex& topLeft, const QModelIndex& bottomRight)
+            {
+                for (int row = topLeft.row(); row <= bottomRight.row(); ++row)
+                    d->updatePreviewProvider(row);
+            });
+    }
 
     base_type::setSourceModel(value);
+}
+
+void VisibleItemDataDecoratorModel::resetInternalData()
+{
+    d->previews.clear();
+    d->visibleSourceIndices.clear();
+    d->createPreviews(0, rowCount());
 }
 
 bool VisibleItemDataDecoratorModel::previewsEnabled() const
@@ -639,7 +643,7 @@ void VisibleItemDataDecoratorModel::setPreviewsEnabled(bool value)
 
 bool VisibleItemDataDecoratorModel::isVisible(const QModelIndex& index) const
 {
-    return d->visibleItems.contains(index);
+    return index.isValid() && d->visibleSourceIndices.contains(mapToSource(index));
 }
 
 //-------------------------------------------------------------------------------------------------

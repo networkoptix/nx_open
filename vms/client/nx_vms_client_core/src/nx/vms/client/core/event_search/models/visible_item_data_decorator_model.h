@@ -49,6 +49,9 @@ public:
 signals:
     void previewsEnabledChanged();
 
+protected:
+    virtual void resetInternalData();
+
 private:
     using base_type::setSourceModel;
 
