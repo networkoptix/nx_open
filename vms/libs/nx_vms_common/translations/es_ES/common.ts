@@ -1179,7 +1179,7 @@
     <name>Result</name>
     <message>
       <source>Missing required parameter: %1.</source>
-      <translation type="unfinished">Missing required parameter: %1.</translation>
+      <translation>Falta el parámetro requerido: %1.</translation>
     </message>
     <message>
       <source>Failed to process request.</source>
