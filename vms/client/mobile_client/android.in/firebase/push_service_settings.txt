@@ -1,0 +1,7 @@
+<service
+    android:name="com.nxvms.mobile.push.firebase.NotificationService"
+    android:exported="true">
+    <intent-filter>
+        <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+    </intent-filter>
+</service>

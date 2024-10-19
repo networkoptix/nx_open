@@ -1,0 +1,5 @@
+module Nx.Screens.Cloud
+
+Login 1.0 Login.qml
+Summary 1.0 Summary.qml
+DigestLogin 1.0 DigestLogin.qml

@@ -15,6 +15,10 @@ if(withDistributions)
     endif()
 endif()
 
+if(withMobileClient AND WINDOWS)
+    add_subdirectory(mobile_client_archive)
+endif()
+
 if(withUnitTestsArchive)
     add_subdirectory(unit_tests)
 endif()

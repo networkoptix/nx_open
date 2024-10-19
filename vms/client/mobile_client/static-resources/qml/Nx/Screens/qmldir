@@ -1,0 +1,11 @@
+module Nx.Screens
+
+CameraSettingsScreen 1.0 CameraSettingsScreen.qml
+CustomConnectionScreen 1.0 CustomConnectionScreen.qml
+SavedConnectionScreen 1.0 SavedConnectionScreen.qml
+SessionsScreen 1.0 SessionsScreen.qml
+ResourcesScreen 1.0 ResourcesScreen.qml
+VideoScreen 1.0 VideoScreen.qml
+SettingsScreen 1.0 SettingsScreen.qml
+DeveloperSettingsScreen 1.0 DeveloperSettingsScreen.qml
+BetaFeaturesScreen 1.0 BetaFeaturesScreen.qml

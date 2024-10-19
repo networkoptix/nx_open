@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+        <key>CFBundlePackageType</key>
+        <string>APPL</string>
+        <key>CFBundleAllowMixedLocalizations</key>
+        <true/>
+        <key>CFBundleSignature</key>
+        <string>????</string>
+        <key>CFBundleExecutable</key>
+        <string>mobile_client</string>
+        <key>CFBundleIdentifier</key>
+        <string>${customization.mobile.ios.bundleIdentifier}</string>
+        <key>CFBundleDisplayName</key>
+        <string>${customization.mobile.displayName}</string>
+        <key>CFBundleName</key>
+        <string>${customization.mobile.ios.bundleName}</string>
+        <key>CFBundleShortVersionString</key>
+        <string>${project.version.name}</string>
+        <key>CFBundleVersion</key>
+        <string>${project.version.code}</string>
+        <key>LSRequiresIPhoneOS</key>
+        <true/>
+        <key>CFBundleIconName</key>
+        <string>AppIcon</string>
+        <key>NSAppTransportSecurity</key>
+        <dict>
+                <key>NSAllowsArbitraryLoads</key>
+                <true/>
+        </dict>
+        <key>UIBackgroundModes</key>
+        <array>
+                <string>remote-notification</string>
+        </array>
+        <key>UILaunchStoryboardName</key>
+        <string>Launch</string>
+        <key>UISupportedInterfaceOrientations</key>
+        <array>
+                <string>UIInterfaceOrientationPortrait</string>
+                <string>UIInterfaceOrientationPortraitUpsideDown</string>
+                <string>UIInterfaceOrientationLandscapeLeft</string>
+                <string>UIInterfaceOrientationLandscapeRight</string>
+        </array>
+        <key>UIViewControllerBasedStatusBarAppearance</key>
+        <false/>
+        <key>UIStatusBarStyle</key>
+        <string>UIStatusBarStyleLightContent</string>
+        <key>UIRequiresFullScreen</key>
+        <string>YES</string>
+        <key>CFBundleURLTypes</key>
+        <array>
+                <dict>
+                        <key>CFBundleURLSchemes</key>
+                        <array>
+                                <string>${customization.uriProtocol}</string>
+                                ${compatibleProtocols}
+                        </array>
+                        <key>CFBundleURLName</key>
+                        <string>${customization.mobile.ios.bundleIdentifier}</string>
+                </dict>
+        </array>
+        <key>NSPhotoLibraryUsageDescription</key>
+        <string>This app does not use photo library.</string>
+        <key>NSMicrophoneUsageDescription</key>
+        <string>Allows you to send sound to the camera.</string>
+        <key>NSCameraUsageDescription</key>
+        <string>This app does not use camera.</string>
+        <key>ITSAppUsesNonExemptEncryption</key>
+        <false/>
+        <key>FirebaseMessagingAutoInitEnabled</key>
+        <false/>
+</dict>
+</plist>

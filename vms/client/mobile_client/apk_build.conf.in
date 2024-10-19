@@ -1,0 +1,7 @@
+QT_HOST_DIR="@QT_HOST_PATH@"
+JAVA_HOME="@CONAN_OPENJDK_ROOT@"
+DISTRIBUTION_NAME="@mobile_client_aab_distribution_name@"
+KEYSTORE_FILE="${customization_dir}/mobile_client/key.store"
+KEYSTORE_ALIAS="${customization.mobile.android.alias}"
+KEYSTORE_PASSWORD="${customization.mobile.android.storepass}"
+KEYSTORE_KEY_PASSWORD="${customization.mobile.android.keypass}"

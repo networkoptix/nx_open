@@ -1,0 +1,23 @@
+## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
+qt_directory: '${QT_DIR}'
+
+distribution_output_dir: '${distribution_output_dir}'
+
+# Source directories
+bin_source_dir: '${CMAKE_RUNTIME_OUTPUT_DIRECTORY}'
+current_binary_dir: '${CMAKE_CURRENT_BINARY_DIR}'
+cmake_binary_dir: '${CMAKE_BINARY_DIR}'
+ucrt_directory: '${ucrt_directory}'
+vcrt_directory: '${vcrt_directory}'
+mobile_client_qml_dir: '${compiled_qml_directory}'
+fonts_directory: '${CONAN_ROBOTO-FONTS_ROOT}'
+
+# Source binary
+mobile_client_binary_name: '$<TARGET_FILE_NAME:mobile_client>'
+
+# ASan required library
+asan_library_name: '${asan_library_name}'
+
+# List of translation packages
+mobile_client_translation_files: '${mobile_client_translation_files}'

@@ -27,5 +27,5 @@ if(withDesktopClient OR withTests)
 endif()
 
 if(withMobileClient)
-    add_subdirectory(../../../open_candidate/vms/client/mobile_client ${CMAKE_BINARY_DIR}/mobile_client)
+    add_subdirectory(mobile_client)
 endif()
