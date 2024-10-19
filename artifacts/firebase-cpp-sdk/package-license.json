@@ -1,0 +1,6 @@
+{
+    "name": "firebase-cpp-sdk",
+    "webLink": ["https://github.com/firebase/firebase-cpp-sdk"],
+    "licenseType": "Apache-2.0",
+    "licenseLink": ["http://www.apache.org/licenses/LICENSE-2.0"]
+}

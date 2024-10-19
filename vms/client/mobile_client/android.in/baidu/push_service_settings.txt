@@ -1,0 +1,63 @@
+<receiver android:name="com.nxvms.mobile.push.baidu.BaiduPushHandler"
+    android:exported="true">
+    <intent-filter>
+        <action android:name="com.baidu.android.pushservice.action.MESSAGE" />
+        <action android:name="com.baidu.android.pushservice.action.RECEIVE" />
+        <action android:name="com.baidu.android.pushservice.action.notification.CLICK" />
+
+        <!-- The use of Huawei's proxy must be declared for transparent transmission. -->
+        <action android:name="com.huawei.android.push.intent.RECEIVE" />
+    </intent-filter>
+</receiver>
+
+<receiver
+    android:name="com.baidu.android.pushservice.PushServiceReceiver"
+    android:process=":bdservice_v1">
+    <intent-filter>
+        <action android:name="com.baidu.android.pushservice.action.notification.SHOW" />
+
+        <!-- Optional actions to improve service survival rate and message arrival speed. -->
+        <action android:name="android.intent.action.BOOT_COMPLETED" />
+        <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+        <action android:name="android.intent.action.MEDIA_MOUNTED" />
+        <action android:name="android.intent.action.USER_PRESENT" />
+        <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
+        <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" />
+    </intent-filter>
+</receiver>
+
+<receiver
+    android:name="com.baidu.android.pushservice.RegistrationReceiver"
+    android:process=":bdservice_v1">
+    <intent-filter>
+        <action android:name="com.baidu.android.pushservice.action.METHOD" />
+    </intent-filter>
+</receiver>
+
+<service
+    android:name="com.baidu.android.pushservice.PushService"
+    android:process=":bdservice_v1">
+    <intent-filter>
+        <action android:name="com.baidu.android.pushservice.action.PUSH_SERVICE" />
+    </intent-filter>
+</service>
+
+<service
+    android:name="com.baidu.android.pushservice.CommandService" />
+
+<provider
+    android:name="com.baidu.android.pushservice.PushInfoProvider"
+    android:authorities="${customization.mobile.android.packageName}.bdpush"
+    android:exported="true"
+    android:process=":bdservice_v1"
+    android:protectionLevel="signature"
+    android:writePermission="baidu.push.permission.WRITE_PUSHINFOPROVIDER.${customization.mobile.android.packageName}" />
+
+<service
+    android:name="com.baidu.android.pushservice.job.PushJobService"
+    android:permission="android.permission.BIND_JOB_SERVICE"
+    android:process=":bdservice_v1" />
+
+<meta-data
+    android:name="baidu_api_key"
+    android:value="${baiduPushNotificationApiKey}"/>

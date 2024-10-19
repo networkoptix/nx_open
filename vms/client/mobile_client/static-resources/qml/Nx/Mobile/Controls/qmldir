@@ -1,0 +1,6 @@
+module Nx.Mobile.Controls
+
+OptionSelector 1.0 OptionSelector.qml
+TextButton 1.0 TextButton.qml
+TextField 1.0 TextField.qml
+NumberInput 1.0 NumberInput.qml

@@ -110,14 +110,14 @@ add_subdirectory(libs)
 include(cmake/distribution/common.cmake)
 
 if(ANDROID)
-    include(../open_candidate/cmake/android-apk.cmake)
-    include(../open_candidate/cmake/android_qtcreator_integration.cmake)
+    include(cmake/android-apk.cmake)
+    include(cmake/android_qtcreator_integration.cmake)
     # These variables are required by Qt.
     set(ANDROID_ABI ${CMAKE_ANDROID_ARCH_ABI})
     set(ANDROID_STL ${CMAKE_ANDROID_STL_TYPE})
 elseif(IOS)
-    include(../open_candidate/cmake/ios_app.cmake)
-    include(../open_candidate/cmake/ios_utils.cmake)
+    include(cmake/ios_app.cmake)
+    include(cmake/ios_utils.cmake)
 endif()
 
 add_subdirectory(vms)

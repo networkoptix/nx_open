@@ -1,0 +1,4 @@
+module Nx.Ui
+
+UiController 1.0 UiController.qml
+Workflow 1.0 Workflow.js

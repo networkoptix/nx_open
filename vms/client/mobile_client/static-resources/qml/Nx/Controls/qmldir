@@ -1,0 +1,34 @@
+module Nx.Controls
+
+Button 1.0 Button.qml
+LinkButton 1.0 LinkButton.qml
+TextField 1.0 TextField.qml
+PasswordTextField 1.0 PasswordTextField.qml
+IconButton 1.0 IconButton.qml
+CheckBox 1.0 CheckBox.qml
+StyledCheckBox 1.0 StyledCheckBox.qml
+RadioButton 1.0 RadioButton.qml
+StyledRadioButton 1.0 StyledRadioButton.qml
+Switch 1.0 Switch.qml
+LabeledSwitch 1.0 LabeledSwitch.qml
+StackView 1.0 StackView.qml
+ToolBar 1.0 ToolBar.qml
+SearchToolBar 1.0 SearchToolBar.qml
+PageTitleLabel 1.0 PageTitleLabel.qml
+PageBase 1.0 PageBase.qml
+Page 1.0 Page.qml
+Menu 1.0 Menu.qml
+MenuItem 1.0 MenuItem.qml
+MenuHeader 1.0 MenuHeader.qml
+MenuSeparator 1.0 MenuSeparator.qml
+ScrollIndicator 1.0 ScrollIndicator.qml
+MaterialEffect 1.0 MaterialEffect.qml
+CirclesBusyIndicator 1.0 CirclesBusyIndicator.qml
+CircleBusyIndicator 1.0 CircleBusyIndicator.qml
+WarningPanel 1.0 WarningPanel.qml
+FieldWarning 1.0 FieldWarning.qml
+WheelSwitchArea 1.0 WheelSwitchArea.qml
+ActionButtonsPanel 1.0 ActionButtonsPanel.qml
+ActivityPreloader 1.0 ActivityPreloader.qml
+SearchEdit 1.0 SearchEdit.qml
+PreloaderOverlay 1.0 PreloaderOverlay.qml

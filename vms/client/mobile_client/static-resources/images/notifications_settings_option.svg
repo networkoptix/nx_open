@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 63.1 (92452) - https://sketch.com -->
+    <title>Notifications</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Notifications" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <path d="M14,19 C14,20.1045695 13.1045695,21 12,21 L11,21 C9.8954305,21 9,20.1045695 9,19 L14,19 Z M4,18 L4,16 L6,16 L6,9.875 C6,6.07804234 8.6862915,3 12,3 C15.3137085,3 18,6.07804234 18,9.875 L18,16 L20,16 L20,18 L4,18 Z" id="Warning" fill="#FFFFFF" fill-rule="nonzero"></path>
+    </g>
+</svg>
