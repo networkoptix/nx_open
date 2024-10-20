@@ -6,7 +6,6 @@
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonValue>
 #include <QtCore/QtNumeric> //< for qIsFinite
-#include <QtGui/QBrush>
 
 #include <nx/kit/utils.h>
 #include <nx/utils/log/log.h>
@@ -257,22 +256,15 @@ public:
         registerSerializer<QList<QByteArray>>();
         registerSerializer<QVector<bool>>();
 
-        registerSerializer<QColor>();
-        registerSerializer<QBrush>();
         registerSerializer<QSize>();
         registerSerializer<QSizeF>();
         registerSerializer<QRect>();
         registerSerializer<QRectF>();
         registerSerializer<QPoint>();
         registerSerializer<QPointF>();
-        registerSerializer<QRegion>();
-        registerSerializer<QVector2D>();
-        registerSerializer<QVector3D>();
-        registerSerializer<QVector4D>();
         registerSerializer<nx::Uuid>();
         registerSerializer<QUrl>();
         registerSerializer<nx::utils::Url>();
-        registerSerializer<QFont>();
         registerSerializer<QDateTime>();
 
         registerSerializer<QnLatin1Array>();

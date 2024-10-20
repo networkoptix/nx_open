@@ -2,8 +2,11 @@
 
 #include "evaluator.h"
 
+#include <QtGui/QColor>
+
+#include <nx/reflect/string_conversion.h>
 #include <nx/utils/literal.h>
-#include <nx/fusion/serialization/lexical_functions.h>
+#include <nx/vms/common/serialization/qt_gui_types.h>
 
 namespace Qee {
 // -------------------------------------------------------------------------- //
@@ -235,8 +238,8 @@ namespace Qee {
         case Color: {
             require(Color);
             QColor color;
-            if(!QnLexical::deserialize(token.text().toString(), &color))
-                throw Exception(lit("Invalid color constant '%1'.").arg(token.text().toString()));
+            if (!nx::reflect::fromString(token.text().toString().toStdString(), &color))
+                throw Exception(nx::format("Invalid color constant '%1'.", token.text()));
             m_program.push_back(Instruction(Stor, color));
             break;
         }
@@ -280,8 +283,8 @@ namespace Qee {
         case Number: {
             require(Number);
             long long number;
-            if(!QnLexical::deserialize(token.text().toString(), &number))
-                throw Exception(lit("Invalid number constant '%1'.").arg(token.text().toString()));
+            if (!nx::reflect::fromString(token.text().toString().toStdString(), &number))
+                throw Exception(nx::format("Invalid number constant '%1'.", token.text()));
             m_program.push_back(Instruction(Stor, number));
             break;
         }

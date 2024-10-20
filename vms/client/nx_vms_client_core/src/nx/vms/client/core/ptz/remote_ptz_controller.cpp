@@ -256,9 +256,19 @@ bool RemotePtzController::getPosition(
     nx::network::rest::Params params;
     params.insert("type", options.type);
 
-    auto helper = makeDeserializationHelper<QVector3D>();
+    const auto deserializeVector3D =
+        [](const nx::network::rest::JsonResult& data)
+        {
+            const QJsonObject obj = data.reply.toObject();
+            QVector3D value(
+                obj.value("x").toDouble(),
+                obj.value("y").toDouble(),
+                obj.value("z").toDouble());
+            return QVariant::fromValue(value);
+        };
+
     auto command = spaceCommand(Command::getDevicePosition, space);
-    return sendRequest(command, params, QByteArray(), options, helper);
+    return sendRequest(command, params, QByteArray(), options, deserializeVector3D);
 }
 
 bool RemotePtzController::getLimits(

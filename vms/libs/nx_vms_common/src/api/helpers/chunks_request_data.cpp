@@ -2,6 +2,8 @@
 
 #include "chunks_request_data.h"
 
+#include <QtGui/QRegion>
+
 #include <api/helpers/camera_id_helper.h>
 #include <common/common_globals.h>
 #include <core/resource/camera_resource.h>
@@ -11,6 +13,7 @@
 #include <nx/network/rest/params.h>
 #include <nx/reflect/string_conversion.h>
 #include <nx/utils/string.h>
+#include <nx/vms/common/serialization/qt_gui_types.h>
 #include <nx_ec/abstract_ec_connection.h>
 
 namespace {

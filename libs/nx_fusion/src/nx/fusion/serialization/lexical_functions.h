@@ -8,7 +8,6 @@
 #include <QtCore/QDateTime>
 #include <QtCore/QJsonValue>
 #include <QtCore/QUrl>
-#include <QtGui/QColor>
 
 #include <nx/fusion/fusion/fusion_fwd.h>
 #include <nx/utils/latin1_array.h>
@@ -218,5 +217,4 @@ QN_FUSION_DECLARE_FUNCTIONS(bool, (lexical), NX_FUSION_API)
 QN_FUSION_DECLARE_FUNCTIONS(nx::Uuid, (lexical), NX_FUSION_API)
 QN_FUSION_DECLARE_FUNCTIONS(QUrl, (lexical), NX_FUSION_API)
 QN_FUSION_DECLARE_FUNCTIONS(nx::utils::Url, (lexical), NX_FUSION_API)
-QN_FUSION_DECLARE_FUNCTIONS(QColor, (lexical), NX_FUSION_API)
 QN_FUSION_DECLARE_FUNCTIONS(QDateTime, (lexical), NX_FUSION_API)

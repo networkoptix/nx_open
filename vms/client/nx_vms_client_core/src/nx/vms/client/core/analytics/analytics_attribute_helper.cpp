@@ -6,6 +6,7 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QPointer>
+#include <QtGui/QColor>
 
 #include <nx/analytics/taxonomy/abstract_attribute.h>
 #include <nx/analytics/taxonomy/abstract_object_type.h>

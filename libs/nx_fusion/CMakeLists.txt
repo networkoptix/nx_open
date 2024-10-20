@@ -9,7 +9,6 @@ file(GLOB_RECURSE boost_pp_variadic_seq_files CONFIGURE_DEPENDS
 
 nx_add_target(nx_fusion LIBRARY
     PUBLIC_LIBS
-        Qt6::Gui
         Qt6::Sql
         nx_utils
         nx_reflect

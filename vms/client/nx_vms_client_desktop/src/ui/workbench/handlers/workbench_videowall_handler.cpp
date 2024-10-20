@@ -70,6 +70,7 @@
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/saas/saas_service_manager.h>
 #include <nx/vms/common/saas/saas_utils.h>
+#include <nx/vms/common/serialization/qt_gui_types.h>
 #include <nx/vms/license/usage_helper.h>
 #include <nx/vms/utils/platform/autorun.h>
 #include <nx_ec/abstract_ec_connection.h>
@@ -1003,7 +1004,7 @@ void QnWorkbenchVideoWallHandler::handleMessage(
                 }
                 case Qn::ItemFrameDistinctionColorRole:
                 {
-                    QColor data = QJson::deserialized<QColor>(value);
+                    const auto data = nx::reflect::fromString<QColor>(value.toStdString());
                     item->setData(role, data);
                     break;
                 }
@@ -3012,7 +3013,7 @@ void QnWorkbenchVideoWallHandler::at_workbenchLayoutItem_dataChanged(int role)
             QColor value = data.value<QColor>();
             NX_VERBOSE(this, "SENDER: Item %1 %2 changed to %3",
                 item->uuid(), QnLexical::serialized(role), value);
-            QJson::serialize(value, &json);
+            json = QByteArray::fromStdString(nx::reflect::toString(value));
             break;
         }
 

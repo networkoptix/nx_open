@@ -29,7 +29,6 @@ public:
 
         registerSerializer<QString>();
 
-        registerSerializer<QColor>();
         registerSerializer<nx::Uuid>();
         registerSerializer<QUrl>();
         registerSerializer<nx::utils::Url>();

@@ -33,8 +33,6 @@ struct BriefChecker
             return value.empty();
         else if constexpr (std::is_same<T, QString>::value)
             return value.isEmpty();
-        else if constexpr (std::is_same<T, QColor>::value)
-            return !value.isValid();
         else if constexpr (std::is_same<T, nx::Uuid>::value)
             return value.isNull();
         else

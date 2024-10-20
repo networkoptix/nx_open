@@ -9,6 +9,8 @@ nx_add_target(nx_media_core LIBRARY
         nx_reflect
         nx_fusion
         ffmpeg::ffmpeg
+    PRIVATE_LIBS
+        Qt6::Gui
     FOLDER common/libs
 )
 

@@ -5,6 +5,8 @@
 #include <QtCore/QVector>
 #include <QtGui/QRegion>
 
+#include <nx/vms/common/serialization/qt_gui_types.h>
+
 namespace nx::vms::client::core {
 
 /** One region per channel. */

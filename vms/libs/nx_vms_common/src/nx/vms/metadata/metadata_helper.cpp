@@ -8,6 +8,7 @@
 
 #include <nx/fusion/serialization/json_functions.h>
 #include <nx/media/motion_detection.h>
+#include <nx/vms/common/serialization/qt_gui_types.h>
 #include <utils/common/util.h>
 
 namespace nx::vms::metadata {

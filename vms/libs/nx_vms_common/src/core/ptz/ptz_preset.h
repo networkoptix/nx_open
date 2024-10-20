@@ -5,7 +5,7 @@
 #include <QtCore/QString>
 
 #include <nx/fusion/model_functions_fwd.h>
-#include <nx/reflect/enum_instrument.h>
+#include <nx/reflect/instrument.h>
 #include <nx/vms/common/ptz/coordinate_space.h>
 #include <nx/vms/common/ptz/vector.h>
 
@@ -42,9 +42,9 @@ public:
     bool operator==(const QnPtzPreset& other) const = default;
 };
 
+NX_REFLECTION_INSTRUMENT(QnPtzPreset, (id)(name))
 #define QnPtzPreset_Fields (id)(name)
 QN_FUSION_DECLARE_FUNCTIONS(QnPtzPreset, (json), NX_VMS_COMMON_API);
-
 
 struct QnPtzPresetData
 {
