@@ -12,6 +12,7 @@
 #include "media_server_data.h"
 #include "module_information.h" //< For nx::utils::OsInfo fusion.
 #include "port_forwarding_configuration.h"
+#include "server_flags.h"
 #include "storage_model.h"
 
 namespace nx::vms::api {
@@ -74,9 +75,6 @@ struct NX_VMS_API ServerModelBase: ResourceWithParameters
     /**%apidoc[readonly] */
     std::optional<nx::utils::OsInfo> osInfo;
 
-    /**%apidoc[readonly] */
-    ServerFlags flags = SF_None;
-
     BackupBitrateBytesPerSecond backupBitrateBytesPerSecond;
 
     /**%apidoc[readonly] */
@@ -110,7 +108,7 @@ struct NX_VMS_API ServerModelBase: ResourceWithParameters
 };
 #define ServerModelBase_Fields \
     ResourceWithParameters_Fields \
-    (id)(name)(url)(version)(authKey)(osInfo)(flags) \
+    (id)(name)(url)(version)(authKey)(osInfo) \
     (backupBitrateBytesPerSecond) \
     (status)(storages)(portForwardingConfigurations)
 QN_FUSION_DECLARE_FUNCTIONS(ServerModelBase, (json), NX_VMS_API)
@@ -118,6 +116,9 @@ NX_REFLECTION_INSTRUMENT(ServerModelBase, ServerModelBase_Fields);
 
 struct NX_VMS_API ServerModelV1: ServerModelBase
 {
+    /**%apidoc[readonly] */
+    ServerFlags flags = SF_None;
+
     /**%apidoc[opt] */
     std::vector<QString> endpoints;
 
@@ -137,7 +138,7 @@ struct NX_VMS_API ServerModelV1: ServerModelBase
 };
 #define ServerModelV1_Fields \
     ServerModelBase_Fields \
-    (endpoints)(isFailoverEnabled)(locationId)(maxCameras)
+    (flags)(endpoints)(isFailoverEnabled)(locationId)(maxCameras)
 QN_FUSION_DECLARE_FUNCTIONS(ServerModelV1, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(ServerModelV1, ServerModelV1_Fields);
 
@@ -229,6 +230,9 @@ NX_REFLECTION_INSTRUMENT(ServerRuntimeInfo, ServerRuntimeInfo_Fields);
 
 struct NX_VMS_API ServerModelV4: ServerModelBase
 {
+    /**%apidoc[readonly] */
+    ServerModelFlags flags = ServerModelFlag::none;
+
     std::optional<ServerNetwork> network;
 
     std::optional<ServerSettings> settings;
@@ -241,7 +245,7 @@ struct NX_VMS_API ServerModelV4: ServerModelBase
 };
 #define ServerModelV4_Fields \
     ServerModelBase_Fields \
-    (network)(settings)(runtimeInformation)
+    (flags)(network)(settings)(runtimeInformation)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST_EX(ServerModelV4, (json))
 NX_REFLECTION_INSTRUMENT(ServerModelV4, ServerModelV4_Fields);
 
