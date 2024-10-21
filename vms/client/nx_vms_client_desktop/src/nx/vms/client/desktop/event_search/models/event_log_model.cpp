@@ -504,7 +504,7 @@ QString EventLogModel::motionUrl(Column column, const EventLogModelData& data) c
 
     return rules::Strings::urlForCamera(
         device,
-        duration_cast<milliseconds>(data.event(systemContext())->timestamp()),
+        data.event(systemContext())->timestamp(),
         rules::Strings::publicIp, //< Not used on the client side anyway.
         connectionAddress);
 }

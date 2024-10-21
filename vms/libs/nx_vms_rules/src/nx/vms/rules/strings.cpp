@@ -180,7 +180,7 @@ QString Strings::urlForCamera(
                     .setPath(NX_FMT("/systems/%1/view/%2",
                         cloudSystemId.toSimpleString(),
                         camera->getId().toSimpleString()))
-                    .setQuery(NX_FMT("time=%1", timestamp.count()))
+                    .setQuery(NX_FMT("time=%1", timestampMs.count()))
                     .toUrl().toString();
             }
         };
