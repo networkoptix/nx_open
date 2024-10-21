@@ -171,6 +171,7 @@ public:
         sortModel->setDynamicSortFilter(true);
         sortModel->setSourceModel(m_analyticsSdkEventModel);
 
+        m_comboBox->setObjectName("analyticsEventTypeComboBox");
         m_comboBox->setModel(sortModel);
 
         const auto sourceCameraField =
@@ -203,8 +204,6 @@ protected:
         m_analyticsSdkEventModel->loadFromCameras(
             getCameras(), m_engineId, m_field->typeId());
 
-        m_comboBox->setEnabled(m_analyticsSdkEventModel->isValid());
-
         const auto analyticsModel = m_comboBox->model();
         auto items = analyticsModel->match(
             analyticsModel->index(0, 0),
@@ -213,8 +212,8 @@ protected:
             /*hits*/ 1,
             Qt::MatchExactly | Qt::MatchRecursive);
 
-        if (items.size() == 1)
-            m_comboBox->setCurrentIndex(items.front());
+        m_comboBox->setEnabled(m_analyticsSdkEventModel->isValid());
+        m_comboBox->setCurrentIndex(items.size() == 1 ? items.front() : QModelIndex{});
     }
 
 private:
@@ -223,19 +222,16 @@ private:
 
     void onSelectedCamerasChanged()
     {
-        const auto typeId = m_field->typeId();
-        const auto cameras = getCameras();
+        m_analyticsSdkEventModel->loadFromCameras(getCameras(), {}, {});
 
-        m_analyticsSdkEventModel->loadFromCameras(cameras, m_engineId, typeId);
-
-        if (cameras.empty())
+        if (!m_analyticsSdkEventModel->isValid())
         {
             m_field->setTypeId({});
             m_engineId = {};
             return;
         }
 
-        if (m_engineId.isNull() || typeId.isNull())
+        if (m_engineId.isNull() || m_field->typeId().isNull())
         {
             const auto analyticsModel = m_comboBox->model();
             const auto selectableItems = analyticsModel->match(
