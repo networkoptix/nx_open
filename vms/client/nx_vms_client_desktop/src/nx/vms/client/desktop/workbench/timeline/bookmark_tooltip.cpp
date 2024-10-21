@@ -35,6 +35,8 @@ BookmarkTooltip::BookmarkTooltip(common::CameraBookmarkList bookmarks, QWidget* 
     QQuickWidget(appContext()->qmlEngine(), parent),
     m_bookmarks{std::move(bookmarks)}
 {
+    setObjectName("bookmarkTooltip");
+
     // For semi-transparency:
     setAttribute(Qt::WA_AlwaysStackOnTop);
     setAttribute(Qt::WA_TranslucentBackground);

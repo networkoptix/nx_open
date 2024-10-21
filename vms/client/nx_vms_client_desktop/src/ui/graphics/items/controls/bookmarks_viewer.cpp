@@ -151,6 +151,7 @@ private:
     typedef QScopedPointer<QTimer> QTimerPtr;
     QTimerPtr m_updateDelayedTimer;
     QElapsedTimer m_forceUpdateTimer;
+    QTimer* const m_tooltipTimer;
 };
 
 enum { kInvalidTimestamp = -1 };
@@ -159,25 +160,49 @@ QnBookmarksViewer::Impl::Impl(QWidget* tooltipParentWidget,
     const GetBookmarksFunc& getBookmarksFunc,
     const GetPosOnTimelineFunc& getPosFunc,
     QnBookmarksViewer* owner)
-
-    : QObject(owner),
-
+    :
+    QObject(owner),
     m_getBookmarks(getBookmarksFunc),
     m_getPos(getPosFunc),
-
     m_owner(owner),
-
     m_targetLocation(kInvalidTimestamp),
     m_tooltipParentWidget(tooltipParentWidget),
-
     m_bookmarkHoverProcessor(new HoverFocusProcessor(owner)),
-
-    m_bookmarks(),
     m_readonly(false),
-
-    m_updateDelayedTimer(),
-    m_forceUpdateTimer()
+    m_tooltipTimer{new QTimer{this}}
 {
+    // m_tooltipTimer is used as workaround as bookmark tooltip widget does not receive mouse leave
+    // event due to following Qt warning: skipping QEventPoint(...) : no target window.
+    m_tooltipTimer->setInterval(500);
+    m_tooltipTimer->callOnTimeout(
+        [this]
+        {
+            if (!m_bookmarkTooltip || !m_bookmarkTooltip->isVisible())
+            {
+                m_tooltipTimer->stop();
+                return;
+            }
+
+            bool closeTooltip{false};
+
+            if (m_bookmarkHoverProcessor->isHovered())
+            {
+                closeTooltip = !m_bookmarkTooltip->rect().contains(
+                    m_bookmarkTooltip->mapFromGlobal(QCursor::pos()));
+            }
+            else
+            {
+                closeTooltip =
+                    m_timelineHoverProcessor ? !m_timelineHoverProcessor->isHovered() : true;
+            }
+
+            if (closeTooltip)
+            {
+                m_tooltipTimer->stop();
+                resetBookmarks();
+            }
+        });
+
     connect(m_bookmarkHoverProcessor, &HoverFocusProcessor::hoverEntered, this,
         [this]()
         {
@@ -336,12 +361,14 @@ void QnBookmarksViewer::Impl::updateBookmarks(QnCameraBookmarkList bookmarks)
                 bookmarks, m_tooltipParentWidget);
             m_bookmarkTooltip->setReadOnly(readOnly());
             m_bookmarkTooltip->setAllowExport(m_allowExport);
-            m_bookmarkTooltip->setVisible(true);
+            m_bookmarkTooltip->show();
             m_bookmarkTooltip->move(1000, 300);
             if (m_timelineHoverProcessor)
                 m_timelineHoverProcessor->addTargetWidget(m_bookmarkTooltip);
 
             m_bookmarkHoverProcessor->addTargetWidget(m_bookmarkTooltip);
+
+            m_tooltipTimer->start();
 
             connect(
                 m_bookmarkTooltip,
