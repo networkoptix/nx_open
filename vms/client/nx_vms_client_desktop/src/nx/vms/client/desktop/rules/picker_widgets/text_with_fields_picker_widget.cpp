@@ -6,6 +6,7 @@
 
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/rules/model_view/event_parameters_model.h>
+#include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/rules/event_filter_fields/analytics_object_type_field.h>
 #include <nx/vms/rules/event_filter_fields/state_field.h>
 #include <nx/vms/rules/field_validator.h>
@@ -146,11 +147,10 @@ void TextWithFieldsPicker::updateUi()
     if (!eventDescriptor)
         return;
 
-    base::updateUi();
     d->updateCompleterModel(eventDescriptor.value());
     m_field->parseText();
-    if (auto validator = fieldValidator())
-        setValidity(validator->validity(m_field, parentParamsWidget()->rule(), systemContext()));
+
+    base::updateUi();
 }
 
 void TextWithFieldsPicker::setValidity(const vms::rules::ValidationResult& validationResult)
@@ -163,6 +163,13 @@ void TextWithFieldsPicker::setValidity(const vms::rules::ValidationResult& valid
 
     d->addFormattingToText(
         validationResult.additionalData.value<vms::rules::TextWithFields::ParsedValues>());
+
+    if (validationResult.isValid())
+        resetErrorStyle(m_textEdit);
+    else
+        setErrorStyle(m_textEdit);
+
+    base::setValidity(validationResult);
 }
 
 } // namespace nx::vms::client::desktop::rules
