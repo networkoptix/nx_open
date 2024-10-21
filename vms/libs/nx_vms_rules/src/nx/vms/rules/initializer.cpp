@@ -21,6 +21,7 @@
 #include "action_builder_field_validators/target_user_field_validator.h"
 #include "action_builder_field_validators/text_with_fields_validator.h"
 #include "action_builder_field_validators/time_field_validator.h"
+#include "event_filter_field_validators/analytics_event_type_field_validator.h"
 #include "event_filter_field_validators/analytics_object_type_field_validator.h"
 #include "event_filter_field_validators/source_camera_field_validator.h"
 #include "event_filter_field_validators/source_server_field_validator.h"
@@ -171,6 +172,7 @@ void Initializer::registerFields() const
 void Initializer::registerFieldValidators() const
 {
     // Event field validators.
+    registerFieldValidator<AnalyticsEventTypeField>(new AnalyticsEventTypeFieldValidator);
     registerFieldValidator<AnalyticsObjectTypeField>(new AnalyticsObjectTypeFieldValidator);
     registerFieldValidator<SourceCameraField>(new SourceCameraFieldValidator);
     registerFieldValidator<SourceServerField>(new SourceServerFieldValidator);

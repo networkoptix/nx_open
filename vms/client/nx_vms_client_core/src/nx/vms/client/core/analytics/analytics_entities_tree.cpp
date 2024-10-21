@@ -297,7 +297,7 @@ NodePtr AnalyticsEntitiesTreeBuilder::eventTypesForRulesPurposes(
     StateHelper stateHelper(taxonomyState);
 
     return buildEventTypesTree(
-        stateHelper.compatibleEventTypeTreeIntersection(devices, additionalScopedEventTypes));
+        stateHelper.supportedEventTypeTreeIntersection(devices, additionalScopedEventTypes));
 }
 
 //-------------------------------------------------------------------------------------------------

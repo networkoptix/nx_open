@@ -16,7 +16,7 @@ ValidationResult AnalyticsObjectTypeFieldValidator::validity(
 
     const auto objectType = analyticsObjectTypeField->value();
     if (objectType.isEmpty())
-        return {QValidator::State::Invalid, "Analytics object type is not selected"};
+        return {QValidator::State::Invalid, tr("Analytics object type is not selected")};
 
     // TODO: #mmalofeev check if objectType is a valid type for the selected devices.
 
