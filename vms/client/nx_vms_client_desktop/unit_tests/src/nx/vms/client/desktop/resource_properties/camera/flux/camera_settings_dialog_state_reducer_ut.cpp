@@ -151,6 +151,18 @@ TEST_F(CameraSettingsDialogStateReducerTest, recordingPeriodsBasicChecks)
     ASSERT_EQ(s.recording.maxPeriod.autoCheckState(), Qt::Unchecked);
 }
 
+TEST_F(CameraSettingsDialogStateReducerTest, recordingPeriodsMaxArchiveDaysLimit)
+{
+    State s;
+    s.recording.maxPeriod.setForcedMaxValue(std::chrono::seconds(10));
+
+    // Checks basic conditions for forced max value.
+    ASSERT_TRUE(s.recording.maxPeriod.isManualMode());
+    ASSERT_TRUE(s.recording.maxPeriod.hasManualPeriodValue());
+    ASSERT_TRUE(s.recording.maxPeriod.isApplicable());
+    ASSERT_EQ(s.recording.maxPeriod.autoCheckState(), Qt::Unchecked);
+}
+
 TEST_F(CameraSettingsDialogStateReducerTest, recordingPeriodsApplicableChecks)
 {
     const QnVirtualCameraResourceList cameras = {createCamera(), createCamera()};

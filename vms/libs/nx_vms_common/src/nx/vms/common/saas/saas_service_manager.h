@@ -121,6 +121,18 @@ public:
 
     QByteArray rawData() const;
 
+    /**
+     * @return Tier limitation by provided name.
+     */
+    std::optional<int> tierLimit(nx::vms::api::SaasTierLimitName value) const;
+
+    void setTierLimits(
+        const std::map<nx::vms::api::SaasTierLimitName, int>& value,
+        bool allowOverwriteTier = true);
+
+    std::optional<int> tierLimitLeft(nx::vms::api::SaasTierLimitName value) const;
+    bool tierLimitReached(nx::vms::api::SaasTierLimitName value) const;
+
 signals:
     void saasStateChanged();
     void dataChanged();
@@ -131,7 +143,7 @@ private:
     QnLicensePtr localRecordingLicenseV1Unsafe() const;
     void updateLocalRecordingLicenseV1Unsafe();
 
-    void setData(const nx::vms::api::SaasData& data);
+    void setData(nx::vms::api::SaasData data);
     void setServices(const std::vector<nx::vms::api::SaasService>& services);
 
     /*
@@ -146,6 +158,10 @@ private:
     nx::vms::api::SaasData m_data;
     std::map<nx::Uuid, nx::vms::api::SaasService> m_services;
     std::atomic<bool> m_enabled{false};
+
+    // Local tier limits can be loaded from json file in addition to CPS data
+    std::map<nx::vms::api::SaasTierLimitName, int> m_localTierLimits;
+    bool m_allowOverwriteTier = false;
 };
 
 } // nx::vms::common::saas

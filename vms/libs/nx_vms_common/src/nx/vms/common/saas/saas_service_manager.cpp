@@ -5,6 +5,8 @@
 #include <optional>
 
 #include <core/resource_management/resource_properties.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/resource.h>
 #include <licensing/license.h>
 #include <nx/reflect/json/deserializer.h>
 #include <nx/reflect/json/serializer.h>
@@ -242,8 +244,14 @@ nx::vms::api::ServiceTypeStatus ServiceManager::serviceStatus(const QString& ser
         : nx::vms::api::ServiceTypeStatus();
 }
 
-void ServiceManager::setData(const nx::vms::api::SaasData& data)
+void ServiceManager::setData(nx::vms::api::SaasData data)
 {
+    for (const auto& [tierName, value]: m_localTierLimits)
+    {
+        if (m_allowOverwriteTier || !data.tierLimits.contains(tierName))
+            data.tierLimits[tierName] = value;
+    }
+
     bool stateChanged = false;
     {
         NX_MUTEX_LOCKER mutexLocker(&m_mutex);
@@ -358,6 +366,60 @@ std::map<nx::Uuid, ServiceParamsType> ServiceManager::purchasedServices(
     }
 
     return result;
+}
+
+std::optional<int> ServiceManager::tierLimit(nx::vms::api::SaasTierLimitName value) const
+{
+    NX_MUTEX_LOCKER mutexLocker(&m_mutex);
+
+    auto it = m_data.tierLimits.find(value);
+    if (it != m_data.tierLimits.end() && it->second > 0)
+        return it->second;
+    return std::nullopt;
+}
+
+std::optional<int> ServiceManager::tierLimitLeft(nx::vms::api::SaasTierLimitName value) const
+{
+    using namespace nx::vms::api;
+    std::optional<int> limit = tierLimit(value);
+    if (!limit.has_value())
+        return std::nullopt; // there is no limit
+
+    int existing = 0;
+    switch (value)
+    {
+        case SaasTierLimitName::maxDevicesPerServer:
+        {
+            const int totalServers = systemContext()->resourcePool()->servers().size();
+            const int totalCameras = systemContext()->resourcePool()->getAllCameras(
+                QnResourcePtr(), /*ignoreDesktopCameras*/ true).size();
+            existing = totalServers * totalCameras;
+            break;
+        }
+        default:
+            NX_ASSERT(0, "Not implemented");
+            break;
+    }
+
+    return *limit - existing;
+}
+
+bool ServiceManager::tierLimitReached(nx::vms::api::SaasTierLimitName value) const
+{
+    const auto limit = tierLimitLeft(value);
+    return limit && *limit <= 0;
+}
+
+void ServiceManager::setTierLimits(
+    const std::map<nx::vms::api::SaasTierLimitName, int>& value,
+    bool allowOverwriteTier)
+{
+    {
+        NX_MUTEX_LOCKER mutexLocker(&m_mutex);
+        m_localTierLimits = value;
+        m_allowOverwriteTier = allowOverwriteTier;
+    }
+    setData(data());
 }
 
 } // nx::vms::common::saas

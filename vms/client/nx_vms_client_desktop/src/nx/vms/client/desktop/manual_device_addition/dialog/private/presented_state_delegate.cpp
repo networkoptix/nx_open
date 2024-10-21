@@ -5,6 +5,7 @@
 #include <QtWidgets/QLayout>
 #include <QtWidgets/QPushButton>
 
+#include <nx/utils/switch.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/widgets/loading_indicator.h>
@@ -43,10 +44,10 @@ void CellWidget::setState(FoundDevicesModel::PresentedState value)
     if (value == FoundDevicesModel::notPresentedState)
         return;
 
-    const bool addedState = value == FoundDevicesModel::alreadyAddedState;
-    const auto text = addedState
-        ? PresentedStateDelegate::tr("Added")
-        : PresentedStateDelegate::tr("Adding");
+    const QString text = nx::utils::switch_(value,
+        FoundDevicesModel::limitReachedState, [] { return tr("Canceled"); },
+        FoundDevicesModel::alreadyAddedState, [] { return tr("Added"); },
+        nx::utils::default_, [] { return tr("Adding"); });
 
     const auto button = new QPushButton(text, this);
     button->setFlat(true);
@@ -58,15 +59,20 @@ void CellWidget::setState(FoundDevicesModel::PresentedState value)
     currentLayout->addStretch(kBigStretch);
     currentLayout->addWidget(button);
 
-    if (addedState)
+    if (value == FoundDevicesModel::alreadyAddedState)
     {
         button->setIcon(qnSkin->icon(kSuccessIcon));
-        return;
     }
-
-    auto indicator = new LoadingIndicator(this);
-    connect(indicator, &LoadingIndicator::frameChanged, button,
-        [button](const QPixmap& pixmap) { button->setIcon(pixmap); });
+    else if (value == FoundDevicesModel::limitReachedState)
+    {
+        button->setIcon(QIcon());
+    }
+    else
+    {
+        auto indicator = new LoadingIndicator(this);
+        connect(indicator, &LoadingIndicator::frameChanged, button,
+            [button](const QPixmap& pixmap) { button->setIcon(pixmap); });
+    }
 }
 
 } // namespace

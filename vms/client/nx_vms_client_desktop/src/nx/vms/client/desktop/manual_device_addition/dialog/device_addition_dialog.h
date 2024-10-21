@@ -88,6 +88,7 @@ private:
 
     void setDeviceAdded(const QString& physicalId);
     void handleDeviceRemoved(const QString& physicalId);
+    void setLimitReached();
 
     std::optional<int> port() const;
     QString password() const;

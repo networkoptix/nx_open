@@ -24,6 +24,7 @@ enum class MergeSystemsStatus
     nvrLicense,
     certificateInvalid,
     certificateRejected,
+    tooManyServers,
 };
 
 NX_VMS_COMMON_API QString toString(MergeSystemsStatus value);

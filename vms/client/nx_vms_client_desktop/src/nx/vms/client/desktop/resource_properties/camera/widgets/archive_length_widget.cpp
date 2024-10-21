@@ -5,11 +5,14 @@
 
 #include <nx/utils/metatypes.h>
 #include <nx/utils/scoped_connections.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/common/utils/aligner.h>
 #include <nx/vms/client/desktop/common/utils/check_box_utils.h>
 #include <nx/vms/client/desktop/common/utils/spin_box_utils.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
+#include <nx/vms/common/saas/saas_service_manager.h>
 #include <nx/vms/text/time_strings.h>
 #include <ui/common/read_only.h>
 #include <ui/workaround/widgets_signals_workaround.h>
@@ -44,11 +47,16 @@ struct ArchiveLengthWidget::Private
     std::unique_ptr<Ui::ArchiveLengthWidget> ui = std::make_unique<Ui::ArchiveLengthWidget>();
     Aligner* const aligner = new Aligner(q);
     nx::utils::ScopedConnections storeConnections;
+    std::chrono::seconds forcedMaxRecordedPeriod{};
 
     void setupUi();
 
     void loadState(const CameraSettingsDialogState& state);
     void setStore(CameraSettingsDialogStore* store);
+
+    void updateMaxArchiveSpinboxMaximum();
+
+    static seconds getUnitDuration(QComboBox* unitComboBox);
 
     static seconds getPeriodDuration(
         QSpinBox* valueSpinBox,
@@ -75,6 +83,7 @@ struct ArchiveLengthWidget::Private
     static int findDurationUnitItemIndexForPeriodDuration(
         QComboBox* unitComboBox,
         seconds periodDuration);
+
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -106,6 +115,8 @@ void ArchiveLengthWidget::Private::setupUi()
 
 void ArchiveLengthWidget::Private::loadState(const CameraSettingsDialogState& state)
 {
+    forcedMaxRecordedPeriod = state.recording.maxPeriod.forcedMaxValue();
+
     setPeriodDataToControls(
         ui->spinBoxMinPeriod,
         ui->comboBoxMinPeriodUnit,
@@ -119,6 +130,7 @@ void ArchiveLengthWidget::Private::loadState(const CameraSettingsDialogState& st
         ui->checkBoxMaxArchive,
         state.recording.maxPeriod,
         state.hasChanges);
+    updateMaxArchiveSpinboxMaximum();
 
     setReadOnly(ui->checkBoxMinArchive, state.readOnly);
     setReadOnly(ui->checkBoxMaxArchive, state.readOnly);
@@ -174,22 +186,36 @@ void ArchiveLengthWidget::Private::setStore(CameraSettingsDialogStore* store)
         {
             if (index == kInvalidIndex)
                 return;
-
             store->setMaxRecordingPeriodValue(
                 getPeriodDuration(ui->spinBoxMaxPeriod, ui->comboBoxMaxPeriodUnit));
         });
 }
 
-seconds ArchiveLengthWidget::Private::getPeriodDuration(
-    QSpinBox* valueSpinBox,
-    QComboBox* unitComboBox)
+void ArchiveLengthWidget::Private::updateMaxArchiveSpinboxMaximum()
+{
+    int maxSpinboxValue = 9999;
+    if (forcedMaxRecordedPeriod.count() > 0)
+    {
+        const std::chrono::seconds unit = getUnitDuration(ui->comboBoxMaxPeriodUnit);
+        maxSpinboxValue = forcedMaxRecordedPeriod.count() / unit.count();
+    }
+    ui->spinBoxMaxPeriod->setMaximum(maxSpinboxValue);
+    ui->spinBoxMaxPeriod->setMinimum(-maxSpinboxValue);
+}
+
+seconds ArchiveLengthWidget::Private::getUnitDuration(QComboBox* unitComboBox)
 {
     auto unitIndex = unitComboBox->currentIndex();
     if (unitIndex == kInvalidIndex)
         unitIndex = unitComboBox->count() - 1; //< Use 'days' by default.
 
-    const auto unitDuration = unitComboBox->itemData(unitIndex, UnitDurationRole).value<seconds>();
-    return unitDuration * valueSpinBox->value();
+    return unitComboBox->itemData(unitIndex, UnitDurationRole).value<seconds>();
+}
+
+seconds ArchiveLengthWidget::Private::getPeriodDuration(
+    QSpinBox* valueSpinBox, QComboBox* unitComboBox)
+{
+    return getUnitDuration(unitComboBox) * valueSpinBox->value();
 }
 
 void ArchiveLengthWidget::Private::setPeriodDataToControls(
@@ -203,6 +229,7 @@ void ArchiveLengthWidget::Private::setPeriodDataToControls(
 
     valueSpinBox->setEnabled(periodData.isManualMode());
     unitComboBox->setEnabled(periodData.hasManualPeriodValue());
+    autoCheckBox->setEnabled(periodData.forcedMaxValue().count() == 0);
 
     const bool doNotChangeDurationUnit =
         stateHasChanges

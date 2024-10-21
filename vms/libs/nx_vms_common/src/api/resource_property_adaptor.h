@@ -245,6 +245,11 @@ public:
         return m_defaultValue;
     }
 
+    QVariant rawValue() const
+    {
+        return base_type::value();
+    }
+
     virtual QJsonValue jsonValue(QnJsonContext* context = nullptr) const override
     {
         QJsonValue result;

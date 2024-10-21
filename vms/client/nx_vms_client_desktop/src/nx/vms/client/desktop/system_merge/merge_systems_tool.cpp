@@ -578,6 +578,8 @@ QString MergeSystemsTool::getErrorMessage(
         case MergeSystemsStatus::duplicateMediaServerFound:
             return tr("Cannot merge Sites because they have at least one server with the "
                 "same ID. Please remove this server and try again.");
+        case MergeSystemsStatus::tooManyServers:
+            return tr("Maximum number of Servers for the Site is reached.");
         case MergeSystemsStatus::unconfiguredSystem:
             return tr("Site name is not configured yet.");
         case MergeSystemsStatus::certificateInvalid:

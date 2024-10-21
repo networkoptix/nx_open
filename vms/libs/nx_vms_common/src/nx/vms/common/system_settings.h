@@ -186,6 +186,8 @@ public:
     int maxSceneItemsOverride() const;
     void setMaxSceneItemsOverride(int value);
 
+    int maxSceneItemsOverrideRawValue() const;
+
     /**
      * Send text email instead of HTML email in event rules/actions
      */

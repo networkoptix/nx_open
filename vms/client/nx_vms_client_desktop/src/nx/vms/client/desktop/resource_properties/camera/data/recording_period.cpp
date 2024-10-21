@@ -4,6 +4,8 @@
 
 #include <core/resource/camera_resource.h>
 #include <nx/vms/api/data/camera_attributes_data.h>
+#include <nx/vms/common/saas/saas_service_manager.h>
+#include <nx/vms/common/system_context.h>
 
 namespace {
 
@@ -104,11 +106,25 @@ RecordingPeriod RecordingPeriod::maxPeriod(const QnVirtualCameraResourceList& ca
     const auto value = extractValue(nx::vms::api::kDefaultMaxArchivePeriod, cameras,
         [](const QnVirtualCameraResourcePtr& camera) { return camera->maxPeriod(); });
 
-    return RecordingPeriod(nx::vms::api::kDefaultMaxArchivePeriod, value);
+    auto result = RecordingPeriod(nx::vms::api::kDefaultMaxArchivePeriod, value);
+
+    using namespace nx::vms::api;
+    using namespace std::chrono;
+    if (!cameras.empty())
+    {
+        const auto saasManager = cameras[0]->systemContext()->saasServiceManager();
+        const days maxDays(saasManager->tierLimit(SaasTierLimitName::maxArchiveDays).value_or(0));
+        result.setForcedMaxValue(duration_cast<seconds>(maxDays));
+    }
+
+    return result;
 }
 
 Qt::CheckState RecordingPeriod::autoCheckState() const
 {
+    if (m_forcedMaxValue.count() > 0)
+        return Qt::Unchecked;
+
     if (!m_value.hasValue())
         return Qt::PartiallyChecked;
 
@@ -119,6 +135,8 @@ Qt::CheckState RecordingPeriod::autoCheckState() const
 
 bool RecordingPeriod::isManualMode() const
 {
+    if (m_forcedMaxValue.count() > 0)
+        return true;
     return m_value.hasValue() && !isNegative(m_value.get());
 }
 
@@ -162,6 +180,16 @@ void RecordingPeriod::setManualMode()
 void RecordingPeriod::setManualModeWithPeriod(std::chrono::seconds duration)
 {
     m_value.setUser(duration);
+}
+
+std::chrono::seconds RecordingPeriod::forcedMaxValue() const
+{
+    return m_forcedMaxValue;
+}
+
+void RecordingPeriod::setForcedMaxValue(std::chrono::seconds value)
+{
+    m_forcedMaxValue = value;
 }
 
 } // namespace nx::vms::client::desktop
