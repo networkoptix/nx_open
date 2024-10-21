@@ -25,9 +25,8 @@ struct NX_VMS_API StorageEncryptionData
     QByteArray salt;
 };
 #define StorageEncryptionData_Fields (password)(makeCurrent)(salt)
-
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(StorageEncryptionData)
-
+NX_REFLECTION_INSTRUMENT(StorageEncryptionData, StorageEncryptionData_Fields)
 
 struct NX_VMS_API AesKeyData
 {

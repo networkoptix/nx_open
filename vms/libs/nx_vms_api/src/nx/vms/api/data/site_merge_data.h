@@ -49,5 +49,6 @@ struct NX_VMS_API SiteMergeData
     (ignoreOfflineServerDuplicates) \
     (dryRun)
 QN_FUSION_DECLARE_FUNCTIONS(SiteMergeData, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(SiteMergeData, SiteMergeData_Fields)
 
 } // namespace nx::vms::api

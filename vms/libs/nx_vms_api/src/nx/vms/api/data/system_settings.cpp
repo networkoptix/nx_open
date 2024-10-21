@@ -56,6 +56,51 @@ bool deserialize(QnJsonContext* context, const QJsonValue& value, SaveableSiteSe
     return QnFusion::deserialize(context, value, target);
 }
 
+nx::reflect::DeserializationResult deserialize(
+    const nx::reflect::json::DeserializationContext& context, SaveableSiteSettings* data)
+{
+    if (data->name != SiteSettingName::none)
+    {
+        switch (data->name)
+        {
+            #define VALUE(R, CONTEXT, ITEM) \
+                case SiteSettingName::ITEM: \
+                    return nx::reflect::DeserializationResult{false, "Invalid argument `name`", \
+                        nx::reflect::enumeration::toString(SiteSettingName::ITEM), "name"};
+            BOOST_PP_SEQ_FOR_EACH(VALUE, context, UnsaveableSiteSettings_Fields)
+            #undef VALUE
+
+            #define VALUE(R, TARGET, ITEM) \
+                case SiteSettingName::ITEM: \
+                { \
+                    auto r = nx::reflect::json::deserialize(context, &TARGET->ITEM); \
+                    if (!r) \
+                    { \
+                        r.firstNonDeserializedField = \
+                            nx::reflect::enumeration::toString(SiteSettingName::ITEM); \
+                    } \
+                    return r; \
+                }
+            BOOST_PP_SEQ_FOR_EACH(VALUE, data, SaveableSiteSettings_Fields)
+            #undef VALUE
+        }
+    }
+
+    return nx::reflect::json_detail::deserialize(context, data);
+}
+
+void SaveableSiteSettings::postprocessFields(nx::reflect::DeserializationResult::Fields* fields)
+{
+    for (auto it = fields->begin(); it != fields->end(); ++it)
+    {
+        if (it->name == "name")
+        {
+            fields->erase(it);
+            break;
+        }
+    }
+}
+
 void serialize(QnJsonContext* context, const SiteSettings& value, QJsonValue* target)
 {
     switch (value.name)
@@ -68,6 +113,22 @@ void serialize(QnJsonContext* context, const SiteSettings& value, QJsonValue* ta
 
         case SiteSettingName::none:
             return QnFusion::serialize(context, value, target);
+    }
+}
+
+void serialize(
+    nx::reflect::json::SerializationContext* context, const SiteSettings& data)
+{
+    switch (data.name)
+    {
+        #define VALUE(R, VALUE, ITEM) \
+            case SiteSettingName::ITEM: \
+                return nx::reflect::json::serialize(context, VALUE.ITEM);
+        BOOST_PP_SEQ_FOR_EACH(VALUE, data, SiteSettings_Fields)
+        #undef VALUE
+
+        case SiteSettingName::none:
+            nx::reflect::BasicSerializer::serialize(context, data);
     }
 }
 

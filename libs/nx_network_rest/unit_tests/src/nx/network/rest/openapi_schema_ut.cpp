@@ -151,6 +151,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(TestDeviceModel, (json), (general)(credentials)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Base64Model, (json), (param))
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(NestedTestData, (json), (id)(name))
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(TestData, (json), (id)(name)(list))
+NX_REFLECTION_INSTRUMENT(Base64Model, (param))
 
 [[maybe_unused]] static void dummyRegisterFunction()
 {

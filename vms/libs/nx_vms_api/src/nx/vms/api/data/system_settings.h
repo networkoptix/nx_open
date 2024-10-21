@@ -286,11 +286,15 @@ struct NX_VMS_API SaveableSiteSettings: SaveableSettingsBase, SiteSettingsFilter
     using SiteSettingsFilter::getId;
     using SiteSettingsFilter::setId;
     bool operator==(const SaveableSiteSettings&) const = default;
+    void postprocessFields(nx::reflect::DeserializationResult::Fields* fields);
 };
 QN_FUSION_DECLARE_FUNCTIONS(SaveableSiteSettings, (json), NX_VMS_API)
-NX_REFLECTION_INSTRUMENT(SaveableSiteSettings, SaveableSiteSettings_Fields)
+NX_REFLECTION_INSTRUMENT(SaveableSiteSettings, SaveableSiteSettings_Fields(name))
 NX_REFLECTION_TAG_TYPE(SaveableSiteSettings, jsonSerializeChronoDurationAsNumber)
 NX_REFLECTION_TAG_TYPE(SaveableSiteSettings, jsonSerializeInt64AsString)
+
+NX_VMS_API nx::reflect::DeserializationResult deserialize(
+    const nx::reflect::json::DeserializationContext& context, SaveableSiteSettings* data);
 
 /**%apidoc
  * %param[unused] emailSettings.password
@@ -312,6 +316,9 @@ QN_FUSION_DECLARE_FUNCTIONS(SiteSettings, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(SiteSettings, SiteSettings_Fields)
 NX_REFLECTION_TAG_TYPE(SiteSettings, jsonSerializeChronoDurationAsNumber)
 NX_REFLECTION_TAG_TYPE(SiteSettings, jsonSerializeInt64AsString)
+
+NX_VMS_API void serialize(
+    nx::reflect::json::SerializationContext* context, const SiteSettings& data);
 
 struct NX_VMS_API SaveableSystemSettings: SaveableSettingsBase, UserSessionSettings
 {

@@ -17,6 +17,7 @@ struct NX_VMS_API LoginUserFilter
 };
 #define LoginUserFilter_Fields (username)
 NX_VMS_API_DECLARE_STRUCT_EX(LoginUserFilter, (json))
+NX_REFLECTION_INSTRUMENT(LoginUserFilter, LoginUserFilter_Fields)
 
 NX_REFLECTION_ENUM_CLASS(LoginMethod,
     /**%apidoc HTTP Basic and digest (RFC 2617). */
@@ -101,6 +102,7 @@ struct NX_VMS_API LoginSessionFilter
 };
 #define LoginSessionFilter_Fields (token)(setCookie)
 NX_VMS_API_DECLARE_STRUCT_EX(LoginSessionFilter, (json))
+NX_REFLECTION_INSTRUMENT(LoginSessionFilter, LoginSessionFilter_Fields)
 
 struct NX_VMS_API LoginSession
 {

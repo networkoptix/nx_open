@@ -8,4 +8,9 @@ namespace nx::vms::api {
 
 QN_FUSION_DEFINE_FUNCTIONS(RectAsString, (json_lexical))
 
+bool fromString(const std::string& str, RectAsString* target)
+{
+    return QnLexical::deserialize(QString::fromStdString(str), target);
+}
+
 } // namespace nx::vms::api

@@ -6,6 +6,7 @@
 
 #include <nx/branding.h>
 #include <nx/network/http/custom_headers.h>
+#include <nx/utils/serialization/qjson.h>
 
 #include "nx_network_rest_ini.h"
 
@@ -351,20 +352,28 @@ QJsonArray parameterNames(const QJsonValue& value)
 
 Request::operator audit::Record() const
 {
+    // TODO: Use nx_reflect here.
+
     QJsonObject apiInfo{{"method", QString::fromStdString(method().toString())}, {"path", decodedPath()}};
-    auto parsedContent = parseContent<QJsonValue>();
-    if (!parsedContent)
+    QJsonValue parsedContent;
+    try
+    {
+        parsedContent = parseContentByFusionOrThrow<QJsonValue>();
+    }
+    catch (const Exception&)
+    {
         return {userSession, apiInfo};
+    }
 
     if (ini().auditOnlyParameterNames)
     {
-        auto parameters = parameterNames(*parsedContent);
+        auto parameters = parameterNames(parsedContent);
         if (!parameters.isEmpty())
             apiInfo["parameters"] = parameters;
     }
     else
     {
-        apiInfo["parameters"] = *parsedContent;
+        apiInfo["parameters"] = parsedContent;
     }
     return {userSession, apiInfo};
 }

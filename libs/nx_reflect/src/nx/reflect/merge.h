@@ -76,13 +76,35 @@ public:
         constexpr bool useOriginFields =
             IsOptionalV<typename WrappedField::Type> || IsVariantV<typename WrappedField::Type>;
 
-        merge(
-            &field.ref(m_origin),
-            &field.ref(m_updated),
-            std::move(next->fields),
-            useOriginFields ? m_originFields : nextOriginFields(name, m_originFields),
-            m_replaceAssociativeContainer);
+        if constexpr (HasRef<WrappedField>::value)
+        {
+            merge(
+                &field.ref(m_origin),
+                &field.ref(m_updated),
+                std::move(next->fields),
+                useOriginFields ? m_originFields : nextOriginFields(name, m_originFields),
+                m_replaceAssociativeContainer);
+        }
+        else
+        {
+            auto origin = field.get(*m_origin);
+            auto updated = field.get(*m_updated);
+            merge(
+                &origin,
+                &updated,
+                std::move(next->fields),
+                useOriginFields ? m_originFields : nextOriginFields(name, m_originFields),
+                m_replaceAssociativeContainer);
+            field.set(m_origin, std::move(origin));
+        }
     }
+
+private:
+    template<typename F, typename = void>
+    struct HasRef { static constexpr bool value = false; };
+
+    template<typename F>
+    struct HasRef<F, detail::void_t<decltype(&F::ref)>> { static constexpr bool value = true; };
 
 private:
     T* m_origin;

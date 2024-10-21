@@ -212,13 +212,6 @@ public:
                 : QString("*");
         }
 
-        if (request.method() == nx::network::http::Method::delete_)
-        {
-            return request.params().hasNonRefParameter()
-                ? nx::toString(getId(request.parseContentOrThrow<DeleteInput>()))
-                : QString("*");
-        }
-
         NX_ASSERT(false, "Use `get` to `subscribe` or `delete` to `unsubscribe`");
         return {};
     }

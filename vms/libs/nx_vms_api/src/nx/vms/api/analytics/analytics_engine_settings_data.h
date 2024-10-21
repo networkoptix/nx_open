@@ -5,6 +5,7 @@
 #include <QtCore/QJsonObject>
 
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/utils/serialization/qjson.h>
 #include <nx/utils/uuid.h>
 
 namespace nx::vms::api::analytics {
@@ -85,6 +86,7 @@ struct NX_VMS_API EngineSettingsRequest
     (analyticsEngineId) \
     (settingsValues)
 QN_FUSION_DECLARE_FUNCTIONS(EngineSettingsRequest, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(EngineSettingsRequest, nx_vms_api_analytics_EngineSettingsRequest_Fields)
 
 struct NX_VMS_API EngineActiveSettingChangedRequest
 {
@@ -123,5 +125,7 @@ struct NX_VMS_API EngineActiveSettingChangedRequest
     (paramValues)
 
 QN_FUSION_DECLARE_FUNCTIONS(EngineActiveSettingChangedRequest, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(EngineActiveSettingChangedRequest,
+    nx_vms_api_analytics_EngineActiveSettingChangedRequest_Fields)
 
 } // namespace nx::vms::api::analytics

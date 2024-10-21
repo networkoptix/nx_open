@@ -88,6 +88,7 @@ struct NX_VMS_API OtherSiteRequest
 };
 #define OtherSiteRequest_Fields (showDiscovered)(endpoint)
 NX_VMS_API_DECLARE_STRUCT_EX(OtherSiteRequest, (json))
+NX_REFLECTION_INSTRUMENT(OtherSiteRequest, OtherSiteRequest_Fields)
 
 struct NX_VMS_API LocalSiteAuth
 {
@@ -160,6 +161,7 @@ struct NX_VMS_API SetupSystemData: SetupDataBase
 };
 #define SetupSystemData_Fields SetupDataBase_Fields(settings)(cloud)
 NX_VMS_API_DECLARE_STRUCT_EX(SetupSystemData, (json))
+NX_REFLECTION_INSTRUMENT(SetupSystemData, SetupSystemData_Fields)
 
 /**%apidoc
  * %param[unused] settings.siteName
@@ -174,5 +176,6 @@ struct NX_VMS_API SetupSiteData: SetupDataBase
 };
 #define SetupSiteData_Fields SetupDataBase_Fields(settings)(cloud)
 NX_VMS_API_DECLARE_STRUCT_EX(SetupSiteData, (json))
+NX_REFLECTION_INSTRUMENT(SetupSiteData, SetupSiteData_Fields)
 
 } // namespace nx::vms::api

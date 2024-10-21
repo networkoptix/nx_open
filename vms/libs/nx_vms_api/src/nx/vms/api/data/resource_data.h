@@ -10,6 +10,7 @@
 #include <QtCore/QJsonValue>
 #include <QtCore/QString>
 
+#include <nx/utils/serialization/qjson.h>
 #include <nx/utils/serialization/qt_core_types.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/types/resource_types.h>

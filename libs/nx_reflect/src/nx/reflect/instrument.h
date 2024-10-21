@@ -75,22 +75,6 @@ public:
     template<typename Class>
     auto get(const Class& obj) const { return (obj.*m_getter)(); }
 
-    template<typename Class>
-    struct RefWrapper
-    {
-        Class* object;
-        WrappedProperty* property;
-
-        RefWrapper(Class* object, WrappedProperty* property): object(object), property(property) {}
-        operator Type() const { return property->get(*object); }
-
-        template<typename Arg>
-        void operator=(Arg&& value) { property->set(object, detail::forward<Arg>(value)); }
-    };
-
-    template<typename Class>
-    auto ref(Class* object) const { return RefWrapper{object, this}; }
-
 private:
     const char* m_name = nullptr;
     Getter m_getter = nullptr;

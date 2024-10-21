@@ -256,7 +256,7 @@ struct StorageFilter: IdData
 
     nx::Uuid serverId;
 };
-
 QN_FUSION_DECLARE_FUNCTIONS(StorageFilter, (csv_record)(json)(ubjson)(xml), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(StorageFilter, (id)(serverId))
 
 } // namespace nx::vms::api

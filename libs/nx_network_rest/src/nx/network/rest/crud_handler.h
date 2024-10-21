@@ -8,6 +8,7 @@
 #include <QtCore/QString>
 
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/reflect/field_enumerator.h>
 #include <nx/reflect/merge.h>
 #include <nx/utils/crud_model.h>
 #include <nx/utils/member_detector.h>
@@ -294,25 +295,30 @@ protected:
     std::tuple<std::decay_t<Filter>, Params, json::DefaultValueAction> processGetRequest(
         const Request& request)
     {
-        using FilterType = std::decay_t<Filter>;
-
-        FilterType filter = request.params().hasNonRefParameter()
-            ? request.parseContentOrThrow<FilterType>()
-            : FilterType();
-        Params filtered;
-        if (auto intermediate = json::serialized(filter); intermediate.isObject())
-            filtered = Params::fromJson(intermediate.toObject());
-
+        auto filter{request.parseContentOrThrow<std::decay_t<Filter>>()};
         auto params = request.params();
-        for (auto [key, value]: filtered.keyValueRange())
-            params.remove(key);
-        if constexpr (DoesMethodExist_getDeprecatedFieldNames<Filter>::value)
+        if constexpr (!std::is_same_v<nx::utils::Void, std::decay_t<Filter>>)
         {
-            auto names = Filter::getDeprecatedFieldNames();
-            for (auto it = names->begin(); it != names->end(); ++it)
-                params.remove(it.value());
+            if (useReflect(request))
+            {
+                for (const auto f: nx::reflect::listFieldNames<std::decay_t<Filter>>())
+                    params.remove(QString::fromStdString(std::string{f}));
+            }
+            else
+            {
+                Params filtered;
+                if (auto intermediate = json::serialized(filter); intermediate.isObject())
+                    filtered = Params::fromJson(intermediate.toObject());
+                for (auto [key, value]: filtered.keyValueRange())
+                    params.remove(key);
+            }
+            if constexpr (DoesMethodExist_getDeprecatedFieldNames<Filter>::value)
+            {
+                auto names = Filter::getDeprecatedFieldNames();
+                for (auto it = names->begin(); it != names->end(); ++it)
+                    params.remove(it.value());
+            }
         }
-
         auto defaultValueAction = extractDefaultValueAction(&params, request.apiVersion());
         return {std::move(filter), std::move(params), defaultValueAction};
     }
@@ -320,15 +326,11 @@ protected:
     static bool useReflect(const Request& r) { return !r.isApiVersionOlder(4); }
 
     template<typename T>
-    void mergeModel(
-        const Request& request,
-        T* model,
-        T* existing,
-        nx::reflect::DeserializationResult::Fields fields,
-        std::optional<QJsonValue> incomplete)
+    void mergeModel(const Request& request, T* model, T* existing, Request::ParseInfo parseInfo)
     {
         if (useReflect(request))
         {
+            auto fields{std::get<Request::NxReflectFields>(std::move(parseInfo))};
             using namespace nx::reflect;
             if constexpr ((IsAssociativeContainerV<T> && !IsSetContainerV<T>)
                 || (IsUnorderedAssociativeContainerV<T> && !IsUnorderedSetContainerV<T>) )
@@ -344,13 +346,13 @@ protected:
         }
         else
         {
-            QJsonValue incomplete_;
-            if (incomplete)
-                incomplete_ = *std::move(incomplete);
+            QJsonValue incomplete;
+            if (std::get<Request::NxFusionContent>(parseInfo))
+                incomplete = *std::get<Request::NxFusionContent>(std::move(parseInfo));
             else
-                QJson::serialize(*model, &incomplete_);
+                QJson::serialize(*model, &incomplete);
             QString e;
-            if (!json::merge(model, *existing, incomplete_, &e, /*chronoSerializedAsDouble*/ true))
+            if (!json::merge(model, *existing, incomplete, &e, /*chronoSerializedAsDouble*/ true))
                 throw Exception::badRequest(e);
         }
     }
@@ -359,11 +361,8 @@ protected:
     Model mergedModel(bool useId, const Request& request, ResponseAttributes* responseAttributes)
     {
         const bool useReflect = this->useReflect(request);
-        nx::reflect::DeserializationResult::Fields fields;
-        std::optional<QJsonValue> incomplete;
-        Model model = useReflect
-            ? request.parseContentAllowingOmittedValuesOrThrow<Model>(&fields)
-            : request.parseContentOrThrow<Model>(&incomplete);
+        Request::ParseInfo parseInfo;
+        auto model{request.parseContentOrThrow<Model>(&parseInfo)};
         if (m_features.testFlag(CrudFeature::fastUpdate))
             return model;
 
@@ -374,7 +373,7 @@ protected:
             if (useId && id == decltype(id){})
                 throw Exception::missingParameter(m_idParamName);
 
-            if (!incomplete && !useReflect && useId)
+            if (!useReflect && useId && !std::get<Request::NxFusionContent>(parseInfo))
                 return model;
 
             using ReadType = typename nx::utils::FunctionTraits<&Derived::read>::ReturnType;
@@ -384,7 +383,7 @@ protected:
             {
                 Model existing{(request.forceSystemAccess(),
                     call(&Derived::read, std::move(id), request, responseAttributes))};
-                d->mergeModel(request, &model, &existing, std::move(fields), std::move(incomplete));
+                d->mergeModel(request, &model, &existing, std::move(parseInfo));
                 if (useReflect)
                     return existing;
             }
@@ -392,13 +391,13 @@ protected:
             {
                 Model existing{(request.forceSystemAccess(),
                     readById(std::move(id), request, responseAttributes, Result::NotFound))};
-                d->mergeModel(request, &model, &existing, std::move(fields), std::move(incomplete));
+                d->mergeModel(request, &model, &existing, std::move(parseInfo));
                 if (useReflect)
                     return existing;
             }
             else
             {
-                return d->customMerge(&model, std::move(fields));
+                return d->customMerge(&model, std::move(parseInfo));
             }
         }
         return model;

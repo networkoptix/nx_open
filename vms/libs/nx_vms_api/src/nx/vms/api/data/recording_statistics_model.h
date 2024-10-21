@@ -17,6 +17,7 @@ struct NX_VMS_API RecordingStatisticsFilter: IdData
 };
 #define RecordingStatisticsFilter_Fields (id)(bitrateAnalyzePeriodMs)
 QN_FUSION_DECLARE_FUNCTIONS(RecordingStatisticsFilter, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(RecordingStatisticsFilter, RecordingStatisticsFilter_Fields)
 
 struct NX_VMS_API RecordingStatisticsData
 {
@@ -54,6 +55,7 @@ struct NX_VMS_API RecordingStatisticsData
 #define RecordingStatisticsData_Fields (deviceId)(recordedBytes)(recordedS) \
     (archiveDurationS)(averageBitrate)(averageDensity)(recordedBytesPerStorage)
 QN_FUSION_DECLARE_FUNCTIONS(RecordingStatisticsData, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(RecordingStatisticsData, RecordingStatisticsData_Fields)
 
 using RecordingStatisticsValues = std::map<nx::Uuid /*id*/,
     std::vector<api::RecordingStatisticsData> /*statistics*/>;
