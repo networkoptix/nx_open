@@ -16,6 +16,7 @@
 #include <nx/vms/api/data/lookup_list_data.h>
 #include <nx/vms/client/core/analytics/analytics_taxonomy_manager.h>
 #include <nx/vms/client/core/analytics/taxonomy/state_view.h>
+#include <nx/vms/client/core/common/utils/text_utils.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/debug_utils/utils/debug_custom_actions.h>
 #include <nx/vms/client/desktop/lookup_lists/lookup_list_edit_dialog.h>
@@ -271,9 +272,18 @@ struct LookupListActionHandler::Private
         descriptor.successHandler =
             [this, listName = descriptor.data.name]()
             {
-                QnMessageBox::success(q->mainWindowWidget(),
+                QnMessageBox messageBox(QnMessageBox::Icon::Success,
                     tr("Object was added to the List"),
+                    {},
+                    QDialogButtonBox::Ok,
+                    QDialogButtonBox::NoButton,
+                    q->mainWindowWidget());
+
+                const auto elidedText = core::text_utils::elideTextRight(&messageBox,
                     tr("An object has been added to the \"%1\" successfully").arg(listName));
+
+                messageBox.setInformativeText(elidedText);
+                messageBox.exec();
             };
     }
 };

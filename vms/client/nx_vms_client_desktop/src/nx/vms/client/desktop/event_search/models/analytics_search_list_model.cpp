@@ -10,6 +10,7 @@
 #include <nx/analytics/action_type_descriptor_manager.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/math/math.h>
+#include <nx/vms/client/core/common/utils/text_utils.h>
 #include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
@@ -20,6 +21,8 @@
 #include <nx/vms/common/lookup_lists/lookup_list_manager.h>
 
 namespace {
+
+constexpr int kMaxMenuTextLength = 150;
 
 nx::vms::api::LookupListEntry convertObjectTrack(const nx::analytics::db::ObjectTrack& track)
 {
@@ -106,7 +109,9 @@ QSharedPointer<QMenu> AnalyticsSearchListModel::contextMenu(
                 if (list.objectTypeId != track.objectTypeId)
                     continue; //< We can add object only to list with same objectTypeId.
 
-                addMenu->addAction<std::function<void()>>(list.name,
+                const auto elidedName =
+                    core::text_utils::elideTextRight(menu.get(), list.name, kMaxMenuTextLength);
+                addMenu->addAction<std::function<void()>>(elidedName,
                     [entry = convertObjectTrack(track), id = list.id]()
                     {
                         menu::Parameters parameters;
