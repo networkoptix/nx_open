@@ -41,6 +41,7 @@ struct NX_VMS_API IoPortData
 };
 #define IoPortData_Fields (deviceId)(port)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST_EX(IoPortData, (json))
+NX_REFLECTION_INSTRUMENT(IoPortData, IoPortData_Fields)
 
 struct NX_VMS_API IoStateResponse: IoPortData
 {

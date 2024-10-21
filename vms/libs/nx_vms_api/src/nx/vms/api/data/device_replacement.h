@@ -27,13 +27,9 @@ struct NX_VMS_API DeviceReplacementRequest
     /**%apidoc[opt] If true, than only report is generated, no actual replacement done. */
     bool dryRun = false;
 };
-
-#define DeviceReplacementRequest_Fields \
-    IdData_Fields \
-    (replaceWithDeviceId) \
-    (dryRun)
-
+#define DeviceReplacementRequest_Fields IdData_Fields(replaceWithDeviceId)(dryRun)
 QN_FUSION_DECLARE_FUNCTIONS(DeviceReplacementRequest, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(DeviceReplacementRequest, DeviceReplacementRequest_Fields)
 
 struct NX_VMS_API DeviceReplacementInfo
 {

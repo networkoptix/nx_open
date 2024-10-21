@@ -204,6 +204,7 @@ struct NX_VMS_API BookmarkIdV1
 };
 #define BookmarkIdV1_Fields (id)
 QN_FUSION_DECLARE_FUNCTIONS(BookmarkIdV1, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(BookmarkIdV1, BookmarkIdV1_Fields)
 
 struct NX_VMS_API BookmarkIdV3
 {
@@ -225,6 +226,7 @@ struct NX_VMS_API BookmarkIdV3
 };
 #define BookmarkIdV3_Fields (id)
 QN_FUSION_DECLARE_FUNCTIONS(BookmarkIdV3, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(BookmarkIdV3, BookmarkIdV3_Fields)
 
 struct NX_VMS_API BookmarkFilterV1: BookmarkFilterBase, BookmarkIdV1
 {
@@ -242,6 +244,16 @@ struct NX_VMS_API BookmarkFilterV3: BookmarkFilterBase, BookmarkIdV3
 };
 #define BookmarkFilterV3_Fields BookmarkFilterBase_Fields BookmarkIdV3_Fields(shareFilter)
 QN_FUSION_DECLARE_FUNCTIONS(BookmarkFilterV3, (json), NX_VMS_API)
+
+template<typename Visitor, typename... Members>
+constexpr auto nxReflectVisitAllFields(BookmarkFilterV3* tag, Visitor&& visit, Members&&... members)
+{
+    return nxReflectVisitAllFields(nx::reflect::detail::toBase(tag),
+        nx::reflect::detail::forward<Visitor>(visit),
+        nx::reflect::WrappedMemberVariableField("column", &BookmarkFilterV3::_orderBy),
+        BOOST_PP_SEQ_FOR_EACH(NX_REFLECTION_EXPAND_FIELDS, BookmarkFilterV3, BookmarkFilterV3_Fields)
+        nx::reflect::detail::forward<Members>(members)...);
+}
 
 struct NX_VMS_API BookmarkBase
 {
@@ -357,6 +369,7 @@ struct NX_VMS_API BookmarkTagFilter
 };
 #define BookmarkTagFilter_Fields (limit)
 QN_FUSION_DECLARE_FUNCTIONS(BookmarkTagFilter, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(BookmarkTagFilter, BookmarkTagFilter_Fields)
 
 struct NX_VMS_API BookmarkProtection
 {

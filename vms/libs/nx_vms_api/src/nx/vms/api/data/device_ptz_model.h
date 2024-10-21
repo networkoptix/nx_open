@@ -46,6 +46,7 @@ struct NX_VMS_API PtzPositionFilter
 };
 #define PtzPositionFilter_Fields (deviceId)(type)
 QN_FUSION_DECLARE_FUNCTIONS(PtzPositionFilter, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(PtzPositionFilter, PtzPositionFilter_Fields)
 
 struct NX_VMS_API PtzPosition: PtzPositionFilter
 {
@@ -81,6 +82,7 @@ struct NX_VMS_API PtzPosition: PtzPositionFilter
 };
 #define PtzPosition_Fields PtzPositionFilter_Fields (pan)(tilt)(zoom)(speed)
 QN_FUSION_DECLARE_FUNCTIONS(PtzPosition, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(PtzPosition, PtzPosition_Fields)
 
 struct NX_VMS_API MinMaxLimit
 {
@@ -92,6 +94,7 @@ struct NX_VMS_API MinMaxLimit
 };
 #define MinMaxLimit_Fields (min)(max)
 QN_FUSION_DECLARE_FUNCTIONS(MinMaxLimit, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(MinMaxLimit, MinMaxLimit_Fields)
 
 struct NX_VMS_API PtzPositionLimits: PtzPositionFilter
 {
@@ -128,6 +131,7 @@ struct NX_VMS_API PtzPositionLimits: PtzPositionFilter
 #define PtzPositionLimits_Fields PtzPositionFilter_Fields (pan)(tilt)(fov)(rotation)(focus)\
     (panSpeed)(tiltSpeed)(zoomSpeed)(rotationSpeed)(focusSpeed)
 QN_FUSION_DECLARE_FUNCTIONS(PtzPositionLimits, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(PtzPositionLimits, PtzPositionLimits_Fields)
 
 struct NX_VMS_API PtzMovement: PtzPosition
 {
@@ -139,6 +143,7 @@ struct NX_VMS_API PtzMovement: PtzPosition
 };
 #define PtzMovement_Fields PtzPosition_Fields (focus)
 QN_FUSION_DECLARE_FUNCTIONS(PtzMovement, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(PtzMovement, PtzMovement_Fields)
 
 struct NX_VMS_API PtzPresetFilter
 {
@@ -179,6 +184,7 @@ struct NX_VMS_API PtzPresetActivation: PtzPresetFilter
 };
 #define PtzPresetActivation_Fields PtzPresetFilter_Fields (speed)
 QN_FUSION_DECLARE_FUNCTIONS(PtzPresetActivation, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(PtzPresetActivation, PtzPresetActivation_Fields)
 
 struct NX_VMS_API PtzTourSpot
 {
@@ -199,6 +205,7 @@ struct NX_VMS_API PtzTourSpot
 };
 #define PtzTourSpot_Fields (presetId)(stayTimeMs)(speed)
 QN_FUSION_DECLARE_FUNCTIONS(PtzTourSpot, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(PtzTourSpot, PtzTourSpot_Fields)
 
 struct NX_VMS_API PtzTour: PtzPreset
 {
@@ -206,5 +213,6 @@ struct NX_VMS_API PtzTour: PtzPreset
 };
 #define PtzTour_Fields PtzPreset_Fields (spots)
 QN_FUSION_DECLARE_FUNCTIONS(PtzTour, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(PtzTour, PtzTour_Fields)
 
 } // namespace nx::vms::api

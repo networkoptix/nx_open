@@ -178,11 +178,11 @@ struct DeviceFootageRequest
      */
     std::optional<AnalyticsFilter> analytics;
 };
-
 #define DeviceFootageRequest_Fields \
     (id)(startTimeMs)(endTimeMs)(detailLevelMs)(keepSmallChunks)(preciseBounds)(maxCount) \
     (storageLocation)(quality)(includeCloudData)(periodType)(motion)(analytics)
 QN_FUSION_DECLARE_FUNCTIONS(DeviceFootageRequest, (json), NX_VMS_API);
+NX_REFLECTION_INSTRUMENT(DeviceFootageRequest, DeviceFootageRequest_Fields)
 
 struct DeviceDiagnosis
 {

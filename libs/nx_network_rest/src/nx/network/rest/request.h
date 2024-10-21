@@ -3,8 +3,10 @@
 #pragma once
 
 #include <nx/json_rpc/messages.h>
-#include <nx/reflect/json/deserializer.h>
+#include <nx/reflect/json.h>
+#include <nx/reflect/merge.h>
 #include <nx/reflect/urlencoded/deserializer.h>
+#include <nx/utils/serialization/qjson.h>
 #include <nx/utils/void.h>
 
 #include "audit.h"
@@ -97,28 +99,60 @@ public:
     template<typename T>
     T paramOrThrow(const QString& key) const;
 
+    using NxFusionContent = std::optional<QJsonValue>;
+    using NxReflectFields = nx::reflect::DeserializationResult::Fields;
+    using ParseInfo = std::variant<NxReflectFields, NxFusionContent>;
     /**
      * Returns a deserialized object from the combination of the url path params, the url query
      * params and the request content body. The body is used in the combination if
      * `nx::network::http::Method::isMessageBodyAllowed` is true. The query params are used if
      * `nx::network::http::Method::isMessageBodyAllowed` is false or if
      * `ini().allowUrlParametersForAnyMethod` is true. Throws Result::Exception if the
-     * deserialization of the combination is failed. If some T fields are omitted and content is
-     * not nullptr then content is filled with the calculated request content.
-     */
-    template<typename T = QJsonValue>
-    T parseContentOrThrow(std::optional<QJsonValue>* content = nullptr) const;
-
-    using Fields = nx::reflect::DeserializationResult::Fields;
-    /**
-     * Result is the same as result of parseContentOrThrow. Parsed fields are filled.
+     * deserialization of the combination is failed. If parseInfo parameter is not nullptr then it
+     * is filled with parsed fields if reflect was used or with the request content for fusion.
      */
     template<typename T>
-    T parseContentAllowingOmittedValuesOrThrow(Fields* fields) const;
+    T parseContentOrThrow(ParseInfo* parseInfo = nullptr) const
+    {
+        if constexpr (std::is_same_v<nx::utils::Void, T>)
+        {
+            if (parseInfo)
+            {
+                if (isApiVersionOlder(4))
+                    parseInfo->emplace<NxFusionContent>();
+                else
+                    parseInfo->emplace<NxReflectFields>();
+            }
+            return {};
+        }
+        else
+        {
+            if (isApiVersionOlder(4))
+            {
+                NxFusionContent* content = nullptr;
+                if (parseInfo)
+                {
+                    parseInfo->emplace<NxFusionContent>();
+                    content = &std::get<NxFusionContent>(*parseInfo);
+                }
+                return parseContentByFusionOrThrow<T>(content);
+            }
+            else
+            {
+                auto [data, fields] = parseContentByReflectOrThrow<T>();
+                if (parseInfo)
+                    parseInfo->emplace<NxReflectFields>(std::move(fields));
+                return data;
+            }
+        }
+    }
 
     /** The safe version of parseContent. */
     template<typename T>
     std::optional<T> parseContent() const;
+
+    template<typename T>
+    T parseContentByFusionOrThrow(NxFusionContent* content = nullptr) const;
 
     /** Prefer to use Handler::prepareAuditRecord() instead. */
     explicit operator audit::Record() const;
@@ -165,8 +199,15 @@ public:
     void renameParameter(const QString& oldName, const QString& newName);
 
 private:
+    template<typename T, typename = std::void_t<>> struct HasPostprocessFields: std::false_type {};
+    template<typename T>
+    struct HasPostprocessFields<T, std::void_t<decltype(&T::postprocessFields)>>: std::true_type {};
+
     nx::network::http::Method calculateMethod() const;
     Params calculateParams() const;
+
+    template<typename T>
+    std::tuple<T, NxReflectFields> parseContentByReflectOrThrow() const;
 
 private:
     const nx::network::http::Request* const m_httpRequest = nullptr;
@@ -247,12 +288,9 @@ std::optional<T> Request::parseContent() const
 }
 
 template<typename T>
-T Request::parseContentOrThrow(std::optional<QJsonValue>* content) const
+T Request::parseContentByFusionOrThrow(NxFusionContent* content) const
 {
     T data;
-    if constexpr (std::is_same_v<nx::utils::Void, T>)
-        return data;
-
     Params params;
     if (ini().allowUrlParametersForAnyMethod
         || !nx::network::http::Method::isMessageBodyAllowed(method()))
@@ -339,38 +377,103 @@ T Request::parseContentOrThrow(std::optional<QJsonValue>* content) const
     }
     else
     {
-        if (!hasNonRefParameter)
+        if (hasNonRefParameter)
+            deserialize(params.toJson(/*excludeCommon*/ true));
+        else if (method() != nx::network::http::Method::get)
             throw Exception::badRequest("No JSON provided");
-        deserialize(params.toJson(/*excludeCommon*/ true));
     }
     return data;
 }
 
 template<typename T>
-T Request::parseContentAllowingOmittedValuesOrThrow(Fields* fields) const
+std::tuple<T, Request::NxReflectFields> Request::parseContentByReflectOrThrow() const
 {
     T data;
+    NxReflectFields fields;
     Params params;
-    if (m_content)
+    if (ini().allowUrlParametersForAnyMethod
+        || !nx::network::http::Method::isMessageBodyAllowed(method()))
+    {
+        params.unite(m_urlParams);
+    }
+    params.unite(m_pathParams);
+    if (!params.isEmpty())
+        fields = params.deserializeOrThrow(&data);
+    const auto merge =
+        [&fields, &data](T* copy, NxReflectFields resultFields)
+        {
+            using namespace nx::reflect;
+            if constexpr ((IsAssociativeContainerV<T> && !IsSetContainerV<T>)
+                || (IsUnorderedAssociativeContainerV<T> && !IsUnorderedSetContainerV<T>) )
+            {
+                nx::reflect::mergeAssociativeContainer(&data, copy, std::move(fields), &resultFields,
+                    /*replaceAssociativeContainer*/ true);
+            }
+            else
+            {
+                nx::reflect::merge(&data, copy, std::move(fields), &resultFields,
+                    /*replaceAssociativeContainer*/ true);
+            }
+            return resultFields;
+        };
+    const auto throwIfFailed =
+        [](const nx::reflect::DeserializationResult& result)
+        {
+            if (!result)
+            {
+                if (result.firstNonDeserializedField)
+                {
+                    throw Exception::invalidParameter(
+                        QString::fromStdString(*result.firstNonDeserializedField),
+                        QString::fromStdString(result.firstBadFragment));
+                }
+                throw Exception::badRequest(QString::fromStdString(result.toString()));
+            }
+        };
+    const auto deserializeWithMerge =
+        [&fields, &data, &merge, &throwIfFailed](std::string_view serialized)
+        {
+            if (fields.empty())
+            {
+                auto result = nx::reflect::json::deserialize(
+                    serialized, &data, nx::reflect::json::DeserializationFlag::fields);
+                throwIfFailed(result);
+                return std::move(result.fields);
+            }
+
+            T copy{data};
+            auto result = nx::reflect::json::deserialize(
+                serialized, &data, nx::reflect::json::DeserializationFlag::fields);
+            throwIfFailed(result);
+            if constexpr (HasPostprocessFields<T>::value)
+                copy.postprocessFields(&fields);
+            return merge(&copy, std::move(result.fields));
+        };
+    if (m_content && !m_content->body.isEmpty())
     {
         if (m_content->type == nx::network::http::header::ContentType::kForm)
         {
+            if (fields.empty())
+            {
+                auto result = nx::reflect::urlencoded::deserialize(
+                    {m_content->body.constData(), (size_t) m_content->body.size()}, &data);
+                throwIfFailed(result);
+                return {std::move(data), std::move(result.fields)};
+            }
+
+            T copy{data};
             auto result = nx::reflect::urlencoded::deserialize(
-                std::string_view{m_content->body.constData(), (size_t) m_content->body.size()},
-                &data);
-            if (!result)
-                throw Exception::badRequest(QString::fromStdString(result.toString()));
-            *fields = std::move(result.fields);
+                {m_content->body.constData(), (size_t) m_content->body.size()}, &data);
+            throwIfFailed(result);
+            if constexpr (HasPostprocessFields<T>::value)
+                copy.postprocessFields(&fields);
+            return {std::move(data), merge(&copy, std::move(result.fields))};
         }
         else if (m_content->type == nx::network::http::header::ContentType::kJson)
         {
-            auto result = nx::reflect::json::deserialize(
-                std::string_view{m_content->body.constData(), (size_t) m_content->body.size()},
-                &data,
-                nx::reflect::json::DeserializationFlag::fields);
-            if (!result)
-                throw Exception::badRequest(QString::fromStdString(result.toString()));
-            *fields = std::move(result.fields);
+            return {std::move(data),
+                deserializeWithMerge(
+                    {m_content->body.constData(), (size_t) m_content->body.size()})};
         }
         else //< TODO: Other content types should go here when supported.
         {
@@ -380,24 +483,11 @@ T Request::parseContentAllowingOmittedValuesOrThrow(Fields* fields) const
     else if (m_jsonRpcContext && m_jsonRpcContext->request.params)
     {
         // TODO: Switch JSON RPC to rapidjson.
-        auto serialized = QJson::serialize(m_jsonRpcContext->request.params.value());
-        auto result = nx::reflect::json::deserialize(
-            std::string_view{serialized.constData(), (size_t) serialized.size()},
-            &data,
-            nx::reflect::json::DeserializationFlag::fields);
-        if (!result)
-            throw Exception::badRequest(QString::fromStdString(result.toString()));
-        *fields = std::move(result.fields);
+        return {std::move(data),
+            deserializeWithMerge(
+                nx::reflect::json::serialize(m_jsonRpcContext->request.params.value()))};
     }
-    params.unite(m_pathParams);
-    if (ini().allowUrlParametersForAnyMethod
-        || !nx::network::http::Method::isMessageBodyAllowed(method()))
-    {
-        params.unite(m_urlParams);
-    }
-    if (!params.isEmpty())
-        params.uniteOrThrow(&data, fields);
-    return data;
+    return {std::move(data), std::move(fields)};
 }
 
 } // namespace nx::network::rest

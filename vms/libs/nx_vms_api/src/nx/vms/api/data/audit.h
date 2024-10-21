@@ -66,6 +66,7 @@ struct NX_VMS_API AuditLogFilter
 };
 #define AuditLogFilter_Fields (serverId)(from)(to)(sessionId)
 QN_FUSION_DECLARE_FUNCTIONS(AuditLogFilter, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(AuditLogFilter, AuditLogFilter_Fields)
 
 struct NX_VMS_API AuditRecord
 {

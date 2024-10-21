@@ -106,6 +106,7 @@ struct SomeData
     bool operator==(const SomeData& other) const = default;
 };
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SomeData, (json), (b)(i)(s))
+NX_REFLECTION_INSTRUMENT(SomeData, (b)(i)(s))
 
 static void PrintTo(const SomeData& value, std::ostream* stream)
 {
@@ -122,6 +123,7 @@ struct SomeBools
     bool operator==(const SomeBools& other) const = default;
 };
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SomeBools, (json), (a)(b)(c)(d))
+NX_REFLECTION_INSTRUMENT(SomeBools, (a)(b)(c)(d))
 
 static void PrintTo(const SomeBools& value, std::ostream* stream)
 {
@@ -142,7 +144,7 @@ TEST_F(RestRequestTest, Get)
     EXPECT_EQ(Params{}, request->params());
     EXPECT_FALSE(request->content());
     EXPECT_FALSE(request->isExtraFormattingRequired());
-    EXPECT_FALSE(request->parseContent<SomeData>());
+    EXPECT_EQ(request->parseContent<SomeData>(), std::optional<SomeData>{SomeData{}});
 }
 
 TEST_F(RestRequestTest, GetWithUrlParams)

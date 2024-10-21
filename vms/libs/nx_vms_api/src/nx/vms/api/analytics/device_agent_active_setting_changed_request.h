@@ -53,5 +53,7 @@ struct NX_VMS_API DeviceAgentActiveSettingChangedRequest
     (paramValues)
 
 QN_FUSION_DECLARE_FUNCTIONS(DeviceAgentActiveSettingChangedRequest, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(DeviceAgentActiveSettingChangedRequest,
+    nx_vms_api_analytics_DeviceAgentActiveSettingChangedRequest_Fields)
 
 } // namespace nx::vms::api::analytics

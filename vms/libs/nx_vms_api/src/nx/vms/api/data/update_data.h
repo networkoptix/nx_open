@@ -117,6 +117,7 @@ struct NX_VMS_API UpdateVersions
 };
 #define UpdateVersions_Fields (minVersion)(maxVersion)
 NX_VMS_API_DECLARE_STRUCT_EX(UpdateVersions, (json))
+NX_REFLECTION_INSTRUMENT(UpdateVersions, UpdateVersions_Fields)
 
 struct NX_VMS_API UpdatePackage
 {
@@ -139,6 +140,7 @@ struct NX_VMS_API UpdatePackage
     (signature)(url)
 
 NX_VMS_API_DECLARE_STRUCT_EX(UpdatePackage, (json))
+NX_REFLECTION_INSTRUMENT(UpdatePackage, UpdatePackage_Fields)
 
 struct NX_VMS_API UpdateInformation
 {
@@ -183,6 +185,7 @@ struct NX_VMS_API UpdateInformation
     (releaseDateMs)(releaseDeliveryDays)(description)(eula)(packages)(url)(freeSpaceB) \
     (participants)(lastInstallationRequestTimeMs)
 NX_VMS_API_DECLARE_STRUCT_EX(UpdateInformation, (json))
+NX_REFLECTION_INSTRUMENT(UpdateInformation, UpdateInformation_Fields)
 
 struct NX_VMS_API StartUpdateReply
 {
@@ -198,6 +201,7 @@ struct NX_VMS_API InstallUpdateRequest
 };
 #define InstallUpdateRequest_Fields (peers)
 NX_VMS_API_DECLARE_STRUCT_EX(InstallUpdateRequest, (json))
+NX_REFLECTION_INSTRUMENT(InstallUpdateRequest, InstallUpdateRequest_Fields)
 
 struct NX_VMS_API FinishUpdateRequest
 {
@@ -209,6 +213,7 @@ struct NX_VMS_API FinishUpdateRequest
 };
 #define FinishUpdateRequest_Fields (ignorePendingPeers)
 NX_VMS_API_DECLARE_STRUCT_EX(FinishUpdateRequest, (json))
+NX_REFLECTION_INSTRUMENT(FinishUpdateRequest, FinishUpdateRequest_Fields)
 
 struct NX_VMS_API DownloadStatus
 {
@@ -283,6 +288,7 @@ struct NX_VMS_API PersistentUpdateStorageInfo: PersistentUpdateStorage
 };
 #define PersistentUpdateStorageInfo_Fields  PersistentUpdateStorage_Fields(infoCategory)
 NX_VMS_API_DECLARE_STRUCT_EX(PersistentUpdateStorageInfo, (json))
+NX_REFLECTION_INSTRUMENT(PersistentUpdateStorageInfo, PersistentUpdateStorageInfo_Fields)
 
 struct NX_VMS_API PersistentUpdateStorageRequest
 {
@@ -290,6 +296,7 @@ struct NX_VMS_API PersistentUpdateStorageRequest
 };
 #define PersistentUpdateStorageRequest_Fields (infoCategory)
 NX_VMS_API_DECLARE_STRUCT_EX(PersistentUpdateStorageRequest, (json))
+NX_REFLECTION_INSTRUMENT(PersistentUpdateStorageRequest, PersistentUpdateStorageRequest_Fields)
 
 struct NX_VMS_API UpdateUploadData
 {

@@ -10,7 +10,6 @@
 
 #include <nx/network/http/http_types.h>
 #include <nx/reflect/json/deserializer.h>
-#include <nx/reflect/merge.h>
 #include <nx/utils/range_adapters.h>
 #include <nx/utils/serialization/format.h>
 #include <nx/utils/std/algorithm.h>
@@ -78,11 +77,17 @@ public:
     using Fields = nx::reflect::DeserializationResult::Fields;
 
     template<typename T>
-    void uniteOrThrow(T* data, Fields* fields) const;
+    Fields deserializeOrThrow(T* data) const;
 
     QString toString() const { return nx::containerString(toList()); }
 
 private:
+    template<typename F, typename = void>
+    struct HasRef { static constexpr bool value = false; };
+
+    template<typename F>
+    struct HasRef<F, std::void_t<decltype(&F::ref)>> { static constexpr bool value = true; };
+
     static void addField(
         std::string name, nx::reflect::DeserializationResult result, Fields* fields)
     {
@@ -123,12 +128,20 @@ private:
         auto r2 = nx::reflect::json::deserialize(
             '"' + valueStd + '"', data, nx::reflect::json::DeserializationFlag::fields);
         if (!r2)
-            throw Exception::invalidParameter(name, r1.toString());
+        {
+            if (r1.firstNonDeserializedField)
+            {
+                throw Exception::invalidParameter(
+                    QString::fromStdString(*r1.firstNonDeserializedField),
+                    QString::fromStdString(r1.firstBadFragment));
+            }
+            throw Exception::invalidParameter(name, value);
+        }
         return r2;
     }
 
     template<typename Field, typename T>
-    void unite(const Field& field, T* data, Fields* fields) const;
+    void deserialize(const Field& field, T* data, Fields* fields) const;
 
 private:
     QMultiMap<QString, QString> m_values;
@@ -144,45 +157,37 @@ struct NX_NETWORK_REST_API Content
 };
 
 template<typename T>
-void Params::uniteOrThrow(T* data, Fields* fields) const
+Params::Fields Params::deserializeOrThrow(T* data) const
 {
     using namespace nx::reflect;
 
+    Fields fields;
+    if (m_values.isEmpty())
+        return fields;
+
     if constexpr ((IsAssociativeContainerV<T> && !IsSetContainerV<T>)
-        || (IsUnorderedAssociativeContainerV<T> && !IsUnorderedSetContainerV<T>) )
+        || (IsUnorderedAssociativeContainerV<T> && !IsUnorderedSetContainerV<T>))
     {
         for (auto it = m_values.begin(); it != m_values.end(); ++it)
         {
-            typename T::mapped_type updated;
-            auto result = deserializeValue(it.key(), it.value(), &updated);
-            if (!result)
-                throw Exception::invalidParameter(it.key(), result.toString());
-
+            typename T::mapped_type value;
+            auto result = deserializeValue(it.key(), it.value(), &value);
             std::string name{it.key().toStdString()};
             auto key = nx::reflect::fromString<typename T::key_type>(name);
-            auto existing = data->find(key);
-            if (existing == data->end())
-            {
-                addField(std::move(name), std::move(result), fields);
-                data->emplace(std::move(key), std::move(updated));
-                return;
-            }
-
-            auto next =
-                nx::utils::find_if(*fields, [&name](const auto& f) { return f.name == name; });
-            if (NX_ASSERT(next))
-                merge(&existing->second, &updated, std::move(result.fields), &next->fields);
+            addField(std::move(name), std::move(result), &fields);
+            data->emplace(std::move(key), std::move(value));
         }
     }
     else if constexpr (IsInstrumentedV<T>)
     {
         nxReflectVisitAllFields(
-            data, [this, data, fields](auto&&... f) { (this->unite(f, data, fields), ...); });
+            data, [this, data, &fields](auto&&... f) { (this->deserialize(f, data, &fields), ...); });
     }
+    return fields;
 }
 
 template<typename Field, typename T>
-void Params::unite(const Field& field, T* data, Fields* fields) const
+void Params::deserialize(const Field& field, T* data, Fields* fields) const
 {
     std::string name{field.name()};
     auto nameQ = QString::fromStdString(name);
@@ -190,17 +195,18 @@ void Params::unite(const Field& field, T* data, Fields* fields) const
     if (it == m_values.end())
         return;
 
-    typename Field::Type updated;
-    auto result = deserializeValue(nameQ, it.value(), &updated);
-    auto next = nx::utils::find_if(*fields, [&name](const auto& f) { return f.name == name; });
-    if (!next)
+    if constexpr (HasRef<Field>::value)
     {
-        addField(std::move(name), std::move(result), fields);
-        field.set(data, std::move(updated));
-        return;
+        addField(std::move(name), deserializeValue(nameQ, it.value(), &field.ref(data)), fields);
+        while (++it != m_values.end() && it.key() == nameQ)
+            deserializeValue(nameQ, it.value(), &field.ref(data));
     }
-
-    nx::reflect::merge(&field.ref(data), &updated, std::move(result.fields), &next->fields);
+    else
+    {
+        typename Field::Type value;
+        addField(std::move(name), deserializeValue(nameQ, it.value(), &value), fields);
+        field.set(data, std::move(value));
+    }
 }
 
 } // namespace nx::network::rest

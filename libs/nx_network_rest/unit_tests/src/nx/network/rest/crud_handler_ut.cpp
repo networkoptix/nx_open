@@ -19,14 +19,11 @@ public:
     Response executePatch(const nx::network::rest::Request& request)
     {
         const bool useReflect = this->useReflect(request);
-        nx::reflect::DeserializationResult::Fields fields;
-        std::optional<QJsonValue> incomplete;
-        auto data = useReflect
-            ? request.parseContentAllowingOmittedValuesOrThrow<BookmarkWithRuleV3>(&fields)
-            : request.parseContentOrThrow<BookmarkWithRuleV3>(&incomplete);
+        nx::network::rest::Request::ParseInfo parseInfo;
+        auto data{request.parseContentOrThrow<BookmarkWithRuleV3>(&parseInfo)};
         auto eventRuleId{data.eventRuleId};
-        mergeModel(request, (BookmarkWithRuleV3::Bookmark*) &data, &m_bookmark,
-            std::move(fields), std::move(incomplete));
+        mergeModel(
+            request, (BookmarkWithRuleV3::Bookmark*) &data, &m_bookmark, std::move(parseInfo));
         if (useReflect)
             std::swap((BookmarkWithRuleV3::Bookmark&) data, m_bookmark);
 

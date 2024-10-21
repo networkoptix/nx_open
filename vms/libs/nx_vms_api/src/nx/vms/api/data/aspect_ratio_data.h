@@ -35,4 +35,6 @@ void NX_VMS_API serialize(QnJsonContext* ctx, const AspectRatioData& value, QJso
 
 bool NX_VMS_API fromString(const std::string_view& str, AspectRatioData* target);
 
+NX_REFLECTION_TAG_TYPE(AspectRatioData, useStringConversionForSerialization)
+
 } // namespace nx::vms::api
