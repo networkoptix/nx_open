@@ -17,6 +17,7 @@
 #include "data_macros.h"
 #include "os_information.h"
 #include "runtime_data.h"
+#include "server_flags.h"
 #include "server_timezone_information.h"
 #include "software_version_serialization.h"
 #include "timestamp.h"
@@ -49,7 +50,6 @@ struct NX_VMS_API ModuleInformationBase: ServerPortInformation
     bool sslAllowed = true;
     int protoVersion = 0;
     nx::Uuid runtimeId;
-    ServerFlags serverFlags = {};
     QString realm;
     bool ecDbReadOnly = false;
     QString cloudPortalUrl;
@@ -69,6 +69,7 @@ struct NX_VMS_API ModuleInformationBase: ServerPortInformation
 
 struct NX_VMS_API ModuleInformation: ModuleInformationBase
 {
+    ServerFlags serverFlags = {};
     QString systemName;
     QString cloudSystemId;
     nx::Uuid localSystemId;
@@ -188,7 +189,6 @@ struct NX_VMS_API ServerInformationBase: ModuleInformationBase
     (sslAllowed) \
     (protoVersion) \
     (runtimeId) \
-    (serverFlags) \
     (realm) \
     (ecDbReadOnly) \
     (cloudHost) \
@@ -209,6 +209,7 @@ NX_REFLECTION_INSTRUMENT(ServerInformationBase, ServerInformationBase_Fields);
 
 struct NX_VMS_API ServerInformationV4: ServerInformationBase
 {
+    ServerModelFlags serverFlags = {};
     QString siteName;
     QString cloudSiteId;
     nx::Uuid localSiteId;
@@ -228,6 +229,7 @@ struct NX_VMS_API ServerInformationV4: ServerInformationBase
 };
 #define ServerInformationV4_Fields  \
     ServerInformationBase_Fields \
+    (serverFlags) \
     (siteName) \
     (cloudSiteId) \
     (localSiteId) \
@@ -238,6 +240,7 @@ NX_REFLECTION_INSTRUMENT(ServerInformationV4, ServerInformationV4_Fields);
 
 struct NX_VMS_API ServerInformationV1: ServerInformationBase
 {
+    ServerFlags serverFlags = {};
     QString systemName;
     QString cloudSystemId;
     nx::Uuid localSystemId;
@@ -259,6 +262,7 @@ struct NX_VMS_API ServerInformationV1: ServerInformationBase
 };
 #define ServerInformationV1_Fields  \
     ServerInformationBase_Fields \
+    (serverFlags) \
     (systemName) \
     (cloudSystemId) \
     (localSystemId) \

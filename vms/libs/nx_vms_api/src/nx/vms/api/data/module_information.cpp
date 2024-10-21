@@ -78,6 +78,7 @@ ModuleInformation ServerInformationV1::getModuleInformation() const
 {
     ModuleInformation info;
     static_cast<ModuleInformationBase&>(info) = *this;
+    info.serverFlags = serverFlags;
     info.systemName = systemName;
     info.localSystemId = localSystemId;
     info.cloudSystemId = cloudSystemId;
@@ -93,6 +94,7 @@ ModuleInformation ServerInformationV4::getModuleInformation() const
 {
     ModuleInformation info;
     static_cast<ModuleInformationBase&>(info) = *this;
+    info.serverFlags = convertModelToServerFlags(serverFlags);
     info.systemName = siteName;
     info.localSystemId = localSiteId;
     info.cloudSystemId = cloudSiteId;
@@ -106,6 +108,7 @@ bool ServerInformationV4::isNewSite() const
 
 ServerInformationV4::ServerInformationV4(const ModuleInformationWithAddresses& rhs):
     ServerInformationBase(rhs),
+    serverFlags(convertServerFlagsToModel(rhs.serverFlags)),
     siteName(rhs.systemName),
     cloudSiteId(rhs.cloudSystemId),
     localSiteId(rhs.localSystemId)
@@ -113,6 +116,7 @@ ServerInformationV4::ServerInformationV4(const ModuleInformationWithAddresses& r
 
 ServerInformationV1::ServerInformationV1(ServerInformationV4&& rhs):
     ServerInformationBase(std::move(rhs)),
+    serverFlags(convertModelToServerFlags(rhs.serverFlags)),
     systemName(std::move(rhs.siteName)),
     cloudSystemId(std::move(rhs.cloudSiteId)),
     localSystemId(std::move(rhs.localSiteId)),
@@ -121,6 +125,7 @@ ServerInformationV1::ServerInformationV1(ServerInformationV4&& rhs):
 
 ServerInformationV1::ServerInformationV1(const ModuleInformationWithAddresses& rhs):
     ServerInformationBase(rhs),
+    serverFlags(rhs.serverFlags),
     systemName(rhs.systemName),
     cloudSystemId(rhs.cloudSystemId),
     localSystemId(rhs.localSystemId)

@@ -177,14 +177,15 @@ std::vector<Model> fromServerData(std::vector<MediaServerData> dataList)
         m.authKey = std::move(d.authKey);
         m.osInfo =
             !d.osInfo.isEmpty() ? std::optional{OsInfo::fromString(d.osInfo)} : std::nullopt;
-        m.flags = d.flags;
         m.status = ResourceStatus::undefined;
         if constexpr (std::is_same_v<Model, ServerModelV1>)
         {
+            m.flags = d.flags;
             m.endpoints = endpointsFromServerData(std::move(d));
         }
         else
         {
+            m.flags = convertServerFlagsToModel(d.flags);
             m.network.emplace();
             m.network->endpoints = endpointsFromServerData(std::move(d));
         }
@@ -203,18 +204,19 @@ typename Model::DbUpdateTypes toDbTypes(Model model)
     mainData.name = std::move(model.name);
     mainData.url = std::move(model.url);
     mainData.version = std::move(model.version);
-    mainData.flags = std::move(model.flags);
     mainData.authKey = std::move(model.authKey);
     if (model.osInfo)
         mainData.osInfo = model.osInfo->toString();
 
     if constexpr (std::is_same_v<Model, ServerModelV1>)
     {
+        mainData.flags = std::move(model.flags);
         if (model.endpoints.empty())
             mainData.networkAddresses = endpointsToServerData(std::move(model.endpoints));
     }
     else
     {
+        mainData.flags = convertModelToServerFlags(model.flags);
         if (model.network && !model.network->endpoints.empty())
             mainData.networkAddresses = endpointsToServerData(std::move(model.network->endpoints));
     }
