@@ -457,12 +457,20 @@ nx::String QnTCPConnectionProcessor::createResponse(
     if (d->request.requestLine.url.scheme().startsWith("rtsp"))
         copyAndReplaceHeader(&d->request.headers, &d->response.headers, "CSeq");
 
-    // this header required to perform new HTTP requests if server port has been on the fly changed
-    if (d->response.headers.find("Access-Control-Allow-Origin") == d->response.headers.end())
+    // QnRestConnectionProcessor fills these headers itself with right value of Access-Control-Allow-Methods
+    // for preflight OPTIONS request. For preflight requests Access-Control-Allow-Headers is
+    // inserted but Access-Control-Allow-Origin can be missing when Origin doesn't match and server has
+    // list of supported origins: one set by a user and one for the cloud.
+    // So this code is generally used for non-rest handlers.
+    if (d->response.headers.find("Access-Control-Allow-Origin") == d->response.headers.end()
+        && d->response.headers.find("Access-Control-Allow-Headers") == d->response.headers.end())
     {
-        nx::network::http::insertOrReplaceHeader(
+        nx::network::http::insertOrReplaceCorsHeaders(
             &d->response.headers,
-            nx::network::http::HttpHeader("Access-Control-Allow-Origin", "*"));
+            d->request.requestLine.method,
+            nx::network::http::getHeaderValue(d->request.headers, "Origin"),
+            d->owner->globalSettings()->supportedOrigins().toStdString(),
+            /*methods*/ "GET");
     }
 
     if (d->chunkedMode)
