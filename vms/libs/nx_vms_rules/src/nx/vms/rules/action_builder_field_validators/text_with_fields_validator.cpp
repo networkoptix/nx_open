@@ -47,14 +47,34 @@ ValidationResult TextWithFieldsValidator::validity(
         .validity = QValidator::State::Acceptable,
         .additionalData = QVariant::fromValue(parsedValues)};
 
-    const auto text = textWithFields->text();
-    if (!text.isEmpty() && textWithFields->properties().validationPolicy == kUrlValidationPolicy)
+    if (textWithFields->properties().validationPolicy == kUrlValidationPolicy)
     {
-        const auto url = QUrl::fromUserInput(text);
+        auto text = textWithFields->text();
+
+        // Substitutions contain unsupported symbols. Replace each substitution with an accepted
+        // symbol to check url validity.
+        for (const auto& valueDescriptor: parsedValues)
+        {
+            if (valueDescriptor.type != TextWithFields::FieldType::Substitution)
+                continue;
+
+            static const QString kPlaceholder{"_"};
+            text.replace(valueDescriptor.start, valueDescriptor.length, kPlaceholder);
+        }
+
+        text = text.trimmed();
+        if (text.isEmpty())
+        {
+            result.validity = QValidator::State::Invalid;
+            result.description = tr("Url cannot be empty");
+            return result;
+        }
+
+        const auto url = QUrl{text, QUrl::StrictMode};
         if (!url.isValid())
         {
             result.validity = QValidator::State::Invalid;
-            result.description = tr("Url should be valid");
+            result.description = tr("Url must be valid");
         }
         else if (!url.userInfo().isEmpty())
         {

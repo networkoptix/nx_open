@@ -15,7 +15,8 @@ set(mocableFiles
     ${CMAKE_CURRENT_SOURCE_DIR}/src/nx/vms/rules/mock_engine_events.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/nx/vms/rules/test_action.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/nx/vms/rules/test_event.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/nx/vms/rules/test_field.h)
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/nx/vms/rules/test_field.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/nx/vms/rules/action_field_validators/text_with_fields_validator_ut.cpp)
 
 nx_add_qt_mocables(nx_vms_rules_ut ${mocableFiles}
     INCLUDE_DIRS

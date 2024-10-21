@@ -6,7 +6,7 @@
 
 namespace nx::vms::rules {
 
-class TextWithFieldsValidator: public FieldValidator
+class NX_VMS_RULES_API TextWithFieldsValidator: public FieldValidator
 {
     Q_OBJECT
 
