@@ -257,6 +257,29 @@ struct NX_VMS_API Organization
 NX_REFLECTION_INSTRUMENT(Organization, Organization_Fields)
 QN_FUSION_DECLARE_FUNCTIONS(Organization, (json), NX_VMS_API)
 
+NX_REFLECTION_ENUM_CLASS(SaasTierLimitName,
+    /**%apidoc Servers per Site limit. */
+    maxServers,
+
+    /**%apidoc Devices per Server limit. */
+    maxDevicesPerServer,
+
+    /**%apidoc Devices per Layout limit. */
+    maxDevicesPerLayout,
+
+    /**%apidoc Maximum archive duration limit. */
+    maxArchiveDays,
+
+    /**%apidoc Whether LDAP feature is enabled. */
+    ldapEnabled,
+
+    /**%apidoc Whether Video Wall feature is enabled. */
+    videowallEnabled,
+
+    /**%apidoc  Wheter cross-site features are enabled. For example: cross-site layouts.*/
+    crossSiteFeaturesEnabled
+);
+
 struct NX_VMS_API SaasSecurity
 {
     /**%apidoc Data are periodically checked on the Channel Partner Server.
@@ -295,6 +318,12 @@ struct NX_VMS_API SaasData
     /**%apidoc The list of purchased services. */
     std::map<nx::Uuid, SaasPurchase> services;
 
+    /**%apidoc
+     * The map of values per SaaS Tier limit. SaaS Tier limit can be integer or boolean.
+     * For boolean values any non-zero value considered as 'true'.
+     */
+    std::map<SaasTierLimitName, int> tierLimits;
+
     /**%apidoc Security data. It is used to validate saas data. */
     SaasSecurity security;
 
@@ -303,7 +332,7 @@ struct NX_VMS_API SaasData
 
     bool operator==(const SaasData&) const = default;
 };
-#define SaasData_Fields (cloudSystemId)(channelPartner)(organization)(state)(services)(security)(signature)
+#define SaasData_Fields (cloudSystemId)(channelPartner)(organization)(state)(services)(tierLimits)(security)(signature)
 NX_REFLECTION_INSTRUMENT(SaasData, SaasData_Fields)
 QN_FUSION_DECLARE_FUNCTIONS(SaasData, (json), NX_VMS_API)
 

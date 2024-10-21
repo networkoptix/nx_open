@@ -20,7 +20,8 @@ public:
     {
         notPresentedState,
         addingInProgressState,
-        alreadyAddedState
+        alreadyAddedState,
+        limitReachedState,
     };
 
     enum Roles

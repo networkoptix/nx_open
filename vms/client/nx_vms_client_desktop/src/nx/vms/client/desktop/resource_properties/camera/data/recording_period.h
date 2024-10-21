@@ -44,6 +44,9 @@ public:
     void setManualMode();
     void setManualModeWithPeriod(std::chrono::seconds duration);
 
+    std::chrono::seconds forcedMaxValue() const;
+    void setForcedMaxValue(std::chrono::seconds value);
+
 private:
     using PeriodStorage = UserEditableMultiple<std::chrono::seconds>;
 
@@ -53,6 +56,7 @@ private:
 
     std::chrono::seconds m_defaultPeriodValue{0};
     PeriodStorage m_value;
+    std::chrono::seconds m_forcedMaxValue{};
 };
 
 } // namespace nx::vms::client::desktop

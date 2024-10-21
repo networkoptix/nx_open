@@ -50,6 +50,23 @@ namespace detail {
 
 namespace {
 
+Result checkTierLimit(
+    SystemContext* systemContext,
+    const nx::vms::api::CameraAttributesData& param)
+{
+    using namespace nx::vms::api;
+    const auto saasManager = systemContext->saasServiceManager();
+    std::optional<int> limit = saasManager->tierLimit(SaasTierLimitName::maxArchiveDays);
+    if (limit.has_value() && (param.maxArchivePeriodS.count() < 0
+            || param.maxArchivePeriodS > std::chrono::days(*limit)))
+    {
+        return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
+            "Maximum number of archive seconds must be provided in range up to %1."),
+                *limit * 3600 * 24));
+    }
+    return Result();
+}
+
 GlobalPermissions getGlobalPermissions(const SystemContext& context, const nx::Uuid& id)
 {
     return context.resourceAccessManager()
@@ -1525,6 +1542,21 @@ struct ModifyCameraDataAccess
                         expectedId, param.id, param.physicalId));
                 }
             }
+            if (!systemContext->resourcePool()->getResourceById(param.id))
+            {
+                // New device
+                using namespace nx::vms::api;
+                const auto saasManager = systemContext->saasServiceManager();
+                std::optional<int> left = saasManager->tierLimitLeft(SaasTierLimitName::maxDevicesPerServer);
+                if (left.has_value() && *left < 1)
+                {
+                    const std::optional<int> available =
+                        saasManager->tierLimit(SaasTierLimitName::maxDevicesPerServer);
+                    return Result(ErrorCode::forbidden,
+                        nx::format(ServerApiErrors::tr("Maximum number of Cameras for the Site "
+                        "is reached. Available %1."), *available));
+                }
+            }
         }
 
         return ModifyResourceAccess()(systemContext, accessData, param);
@@ -1869,6 +1901,9 @@ struct ModifyCameraAttributesAccess
         if (hasSystemAccess(accessData))
             return Result();
 
+        if (auto result = checkTierLimit(systemContext, param); !result)
+            return result;
+
         const auto& resPool = systemContext->resourcePool();
         auto accessManager = systemContext->resourceAccessManager();
         auto camera = resPool->getResourceById<QnVirtualCameraResource>(param.cameraId);
@@ -2047,6 +2082,9 @@ struct ModifyCameraAttributesListAccess
         bool recordingWasEnabled = false;
         for (const auto& p: param)
         {
+            if (auto result = checkTierLimit(systemContext, p); !result)
+                return result;
+
             auto camera = resPool->getResourceById(
                 p.cameraId).dynamicCast<QnVirtualCameraResource>();
             if (!camera)

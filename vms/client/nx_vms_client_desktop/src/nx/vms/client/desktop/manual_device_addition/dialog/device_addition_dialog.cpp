@@ -22,6 +22,7 @@
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/html/html.h>
+#include <nx/vms/common/saas/saas_service_manager.h>
 #include <nx/vms/common/system_settings.h>
 #include <ui/common/palette.h>
 #include <ui/dialogs/common/message_box.h>
@@ -580,6 +581,30 @@ void DeviceAdditionDialog::setDeviceAdded(const QString& physicalId)
         Qt::Unchecked, Qt::CheckStateRole);
 }
 
+void DeviceAdditionDialog::setLimitReached()
+{
+    if (!m_model)
+        return;
+
+    for (int i = 0; i < m_model->rowCount(); ++i)
+    {
+        const QModelIndex index = m_model->index(i, FoundDevicesModel::presentedStateColumn);
+        if (!index.isValid())
+            return;
+
+        const auto data = m_model->data(index, FoundDevicesModel::presentedStateRole);
+        if (data == FoundDevicesModel::addingInProgressState)
+        {
+            m_model->setData(
+                index, FoundDevicesModel::limitReachedState, FoundDevicesModel::presentedStateRole);
+
+            m_model->setData(index.siblingAtColumn(FoundDevicesModel::checkboxColumn),
+                Qt::Unchecked,
+                Qt::CheckStateRole);
+        }
+    }
+}
+
 void DeviceAdditionDialog::handleDeviceRemoved(const QString& physicalId)
 {
     if (!m_model)
@@ -806,15 +831,25 @@ void DeviceAdditionDialog::updateAddDevicesPanel()
     const int addingDevicesCount = m_model->deviceCount(FoundDevicesModel::addingInProgressState);
     const int addedDevicesCount = m_model->deviceCount(FoundDevicesModel::alreadyAddedState);
 
-    if (devicesCount == addedDevicesCount)
+    using namespace nx::vms::api;
+    const auto saas = systemContext()->saasServiceManager();
+    const bool limitReached = saas->tierLimitReached(SaasTierLimitName::maxDevicesPerServer);
+    setWarningStyleOn(ui->addDevicesPlaceholder, limitReached);
+
+    if (limitReached)
+    {
+        setLimitReached();
+        showAddDevicesPlaceholder(tr("Maximum number of Devices for the Site is reached"));
+    }
+    else if (devicesCount == addedDevicesCount)
     {
         showAddDevicesPlaceholder(tr("All devices are already added"));
     }
     else if (addingDevicesCount != 0 && newDevicesCheckedCount == 0)
     {
-        showAddDevicesPlaceholder(
-            tr("%n devices are being added. You can close this dialog or start a new search",
-                nullptr, addingDevicesCount));
+        showAddDevicesPlaceholder(tr("%n devices are being added. You can close this dialog or start a new search",
+            nullptr,
+            addingDevicesCount));
     }
     else if (newDevicesCount != 0)
     {
