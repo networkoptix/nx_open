@@ -5,6 +5,7 @@
 #include <QtCore/QString>
 
 class QTextDocument;
+class QWidget;
 
 namespace nx::vms::client::core {
 namespace text_utils {
@@ -26,6 +27,17 @@ void NX_VMS_CLIENT_CORE_API elideDocumentLines(
 void NX_VMS_CLIENT_CORE_API elideTextRight(
     QTextDocument* document,
     int width,
+    const QString& tail = "...");
+
+/**
+ * Shortens the text to fit the given width or the widget's width if not provided,
+ * truncating from the right and appending a tail.
+ * Uses the widget's font and right margin for proper fitting.
+ */
+QString NX_VMS_CLIENT_CORE_API elideTextRight(
+    QWidget* widget,
+    const QString& text,
+    int width = -1,
     const QString& tail = "...");
 
 } // namespace text_utils

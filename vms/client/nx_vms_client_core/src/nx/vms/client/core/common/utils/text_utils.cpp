@@ -2,9 +2,10 @@
 
 #include "text_utils.h"
 
-#include <QtGui/QTextDocument>
 #include <QtGui/QTextBlock>
 #include <QtGui/QTextCursor>
+#include <QtGui/QTextDocument>
+#include <QtWidgets/QWidget>
 
 namespace nx::vms::client::core {
 namespace text_utils {
@@ -138,6 +139,18 @@ void elideTextRight(QTextDocument* document, int width, const QString& tail)
     cursor.setPosition(x);
     while (document->idealWidth() > width && cursor.position() > 0)
         cursor.deletePreviousChar();
+}
+
+QString elideTextRight(QWidget* widget, const QString& text, int width, const QString& tail)
+{
+    QTextDocument doc;
+    doc.setDefaultFont(widget->font());
+    const bool fullWidth = (width <= 0);
+    if (fullWidth)
+        doc.setDocumentMargin(widget->contentsMargins().right());
+    doc.setHtml(text);
+    elideTextRight(&doc, fullWidth ? widget->width() : width, tail);
+    return doc.toPlainText();
 }
 
 } // namespace text_utils

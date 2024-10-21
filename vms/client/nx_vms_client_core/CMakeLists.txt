@@ -1,6 +1,6 @@
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-find_package(Qt6 COMPONENTS ShaderTools Test REQUIRED)
+find_package(Qt6 COMPONENTS ShaderTools Widgets Test REQUIRED)
 find_package(range-v3 REQUIRED)
 
 set(qt_helpers_root "${open_source_root}/artifacts/qt_helpers/src")
@@ -42,6 +42,7 @@ nx_add_target(nx_vms_client_core LIBRARY
         ${ios_sources}
     PUBLIC_LIBS
         Qt6::Multimedia
+        Qt6::Widgets
         Qt6::Quick
         Qt6::Svg
         Qt6::Test
