@@ -297,6 +297,31 @@ InvalidatorPtr cloudLayoutExtraStatusInvalidator(const QnLayoutResourcePtr& layo
     return result;
 }
 
+GenericItem::DataProvider cloudLayoutGroupIdProvider(const QnLayoutResourcePtr& layout)
+{
+    return
+        [layout]
+        {
+            return resource_grouping::resourceCustomGroupId(layout);
+        };
+}
+
+InvalidatorPtr cloudLayoutGroupIdInvalidator(const QnLayoutResourcePtr& layout)
+{
+    auto result = std::make_shared<Invalidator>();
+
+    result->connections()->add(QObject::connect(
+        layout.get(),
+        &QnLayoutResource::propertyChanged,
+        [invalidator = result.get()](const QnResourcePtr&, const QString& key)
+        {
+            if (key == resource_grouping::kCustomGroupIdPropertyKey)
+                invalidator->invalidate();
+        }));
+
+    return result;
+}
+
 GenericItem::FlagsProvider cloudLayoutFlagsProvider(const QnLayoutResourcePtr& layout)
 {
     return
@@ -686,6 +711,8 @@ AbstractItemPtr ResourceTreeItemFactory::createCloudLayoutItem(const QnLayoutRes
     const auto flagsProvider = cloudLayoutFlagsProvider(layout);
     const auto extraStatusProvider = cloudLayoutExtraStatusProvider(layout);
     const auto extraStatusInvalidator = cloudLayoutExtraStatusInvalidator(layout);
+    const auto groupIdProvider = cloudLayoutGroupIdProvider(layout);
+    const auto groupIdInvalidator = cloudLayoutGroupIdInvalidator(layout);
 
     return GenericItemBuilder()
         .withRole(Qt::DisplayRole, nameProvider, nameInvalidator)
@@ -693,6 +720,7 @@ AbstractItemPtr ResourceTreeItemFactory::createCloudLayoutItem(const QnLayoutRes
         .withRole(Qn::ResourceIconKeyRole, iconProvider, iconInvalidator)
         .withRole(Qn::NodeTypeRole, QVariant::fromValue(NodeType::resource))
         .withRole(Qn::ResourceExtraStatusRole, extraStatusProvider, extraStatusInvalidator)
+        .withRole(Qn::ResourceTreeCustomGroupIdRole, groupIdProvider, groupIdInvalidator)
         .withFlags(flagsProvider);
 }
 
