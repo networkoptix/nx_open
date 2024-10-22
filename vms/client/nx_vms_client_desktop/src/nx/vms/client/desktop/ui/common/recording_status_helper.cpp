@@ -104,6 +104,10 @@ std::pair<RecordingStatus, RecordingMetadataTypes> currentRecordingMode(
 RecordingStatusHelper::RecordingStatusHelper(QObject* parent):
     QObject(parent)
 {
+    auto timer = new QTimer(this);
+    timer->setInterval(kUpdateInterval);
+    connect(timer, &QTimer::timeout, this, &RecordingStatusHelper::updateRecordingMode);
+    timer->start();
 }
 
 QnResource* RecordingStatusHelper::rawResource() const
@@ -128,11 +132,7 @@ void RecordingStatusHelper::setCamera(const QnVirtualCameraResourcePtr& camera)
     if (m_camera == camera)
         return;
 
-    if (m_updateTimerId >= 0)
-        killTimer(m_updateTimerId);
-
     m_connections.reset();
-
     m_camera = camera;
 
     if (m_camera)
@@ -147,8 +147,6 @@ void RecordingStatusHelper::setCamera(const QnVirtualCameraResourcePtr& camera)
             &QnVirtualCameraResource::scheduleTasksChanged,
             this,
             &RecordingStatusHelper::updateRecordingMode);
-
-        m_updateTimerId = startTimer(kUpdateInterval.count());
 
         if (auto systemContext = SystemContext::fromResource(m_camera); NX_ASSERT(systemContext))
         {
@@ -311,6 +309,9 @@ void RecordingStatusHelper::registerQmlType()
 
 void RecordingStatusHelper::updateRecordingMode()
 {
+    if (!m_camera)
+        return;
+
     const auto [newRecordingStatus, newMetadataTypes] = currentRecordingMode(m_camera);
 
     if (newRecordingStatus == m_recordingStatus && newMetadataTypes == m_metadataTypes)
@@ -320,14 +321,6 @@ void RecordingStatusHelper::updateRecordingMode()
     m_recordingStatus = newRecordingStatus;
 
     emit recordingModeChanged();
-}
-
-void RecordingStatusHelper::timerEvent(QTimerEvent* event)
-{
-    if (event->timerId() != m_updateTimerId)
-        return;
-
-    updateRecordingMode();
 }
 
 } // namespace nx::vms::client::desktop
