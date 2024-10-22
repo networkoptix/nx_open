@@ -4,8 +4,10 @@
 
 #include <nvcuvid.h>
 
+#include <nx/media/ini.h>
 #include <nx/media/nvidia/nvidia_utils.h>
 #include <nx/utils/log/log.h>
+#include <Utils/NvCodecUtils.h>
 
 namespace nx::media::nvidia {
 
@@ -67,6 +69,9 @@ uint8_t* FrameQueue::getFreeFrame()
     std::scoped_lock lock(m_mutex);
     if (m_emptyFrames.empty())
     {
+        if (freeGpuMemory() < ini().nvidiaFreeMemoryLimit)
+            return nullptr;
+
         if (m_frames.size() >= kMaxFrameQueue)
             return nullptr;
 

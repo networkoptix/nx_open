@@ -4,6 +4,7 @@
 #include <NvCodec/NvDecoder.h>
 
 #include <media/filters/h264_mp4_to_annexb.h>
+#include <nx/media/ini.h>
 #include <nx/media/nvidia/nvidia_driver_proxy.h>
 #include <nx/media/nvidia/nvidia_utils.h>
 #include <nx/media/nvidia/nvidia_video_frame.h>
@@ -98,8 +99,7 @@ bool NvidiaVideoDecoder::isAvailable()
 bool NvidiaVideoDecoder::isCompatible(
     const QnConstCompressedVideoDataPtr& frame, AVCodecID codec, int /*width*/, int /*height*/)
 {
-    size_t kFreeMemoryLimit = 1024 * 1024 * 128;
-    if (freeGpuMemory() < kFreeMemoryLimit)
+    if (freeGpuMemory() < ini().nvidiaFreeMemoryLimit)
         return false;
 
     NvidiaVideoDecoder decoder(/*checkMode*/ true);
