@@ -1886,9 +1886,7 @@ ActionVisibility CreateNewResourceTreeGroupCondition::check(
         std::set<ResourceTree::NodeType> topLevelTreeNodesThatAllowsCustomGroups{
             ResourceTree::NodeType::servers,
             ResourceTree::NodeType::camerasAndDevices,
-            ResourceTree::NodeType::resource,
-            ResourceTree::NodeType::webPages,
-            ResourceTree::NodeType::integrations
+            ResourceTree::NodeType::resource
         };
 
         if (ini().foldersForLayoutsInResourceTree)
