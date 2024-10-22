@@ -170,12 +170,17 @@ public:
             intercomLayout->addFlags(Qn::local_intercom_layout);
             intercomLayout->setParentId(intercomCamera->getId());
 
-            auto intercomLayoutItems = intercomLayout->getItems();
-            if (NX_ASSERT(intercomLayoutItems.size() == 1))
+            const auto initialIntercomLayoutItems = intercomLayout->getItems();
+            if (NX_ASSERT(initialIntercomLayoutItems.size() == 1))
             {
-                const auto intercomItem = intercomLayoutItems.begin();
-                intercomItem->uuid = nx::vms::common::calculateIntercomItemId(intercomCamera);
-                intercomLayout->setItems(intercomLayoutItems);
+                const auto intercomItemId =
+                    nx::vms::common::calculateIntercomItemId(intercomCamera);
+
+                nx::vms::common::LayoutItemData intercomItem =
+                    initialIntercomLayoutItems.begin().value();
+                intercomItem.uuid = intercomItemId;
+
+                intercomLayout->setItems({{intercomItemId, intercomItem}});
             }
 
             resourcePool->addNewResources({intercomLayout});
