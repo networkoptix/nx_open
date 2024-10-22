@@ -18,7 +18,7 @@ enum class STrackState {
 class STrack
 {
 public:
-    STrack(const Rect<float>& rect, const float& score, uint64_t timestamp, int objectClass);
+    STrack(const Rect<float>& rect, const float& score, int64_t timestampUs, int objectClass);
     ~STrack();
 
     const Rect<float>& getRect() const;
@@ -30,13 +30,15 @@ public:
     const uint64_t& getFrameId() const;
     const uint64_t& getStartFrameId() const;
     const uint64_t& getTrackletLength() const;
-    const uint64_t getUpdateTimestamp() const { return m_updateTimestamp; }
+    const int64_t getUpdateTimestamp() const { return m_updateTimestampUs; }
+    const int64_t getGoodUpdateTimestampUs() const { return m_goodUpdateTimestampUs; }
 
     void activate(const uint64_t& frame_id, const uint64_t& track_id);
     void reActivate(const STrack &new_track, const uint64_t &frame_id, const int &new_track_id = -1);
+    void notifyAboutGoodUpdate() { m_goodUpdateTimestampUs = m_timestampUs; }
 
     // Predict the track state using a Kalman filter.
-    void predict(uint64_t timestamp);
+    void predict(int64_t timestampUs);
     // Update the track state using a Kalman filter.
     void update(const STrack &new_track, const uint64_t &frame_id);
     int getObjectClass() const { return m_objectClass; }
@@ -59,8 +61,9 @@ private:
     uint64_t frame_id_;
     uint64_t start_frame_id_;
     uint64_t tracklet_len_;
-    uint64_t m_timestamp = 0;
-    uint64_t m_updateTimestamp = 0; // Timestamp when rect_ was updated.
+    int64_t m_timestampUs = 0;
+    int64_t m_updateTimestampUs = 0; // Timestamp when rect_ was updated.
+    int64_t m_goodUpdateTimestampUs = 0; // Timestamp when rect_ was updated by high quality detection.
 
     int m_objectClass = 0;
 

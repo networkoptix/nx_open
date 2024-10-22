@@ -3,7 +3,7 @@
 #include <cstddef>
 
 byte_track::STrack::STrack(
-    const Rect<float>& rect, const float& score, uint64_t timestamp, int objectClass):
+    const Rect<float>& rect, const float& score, int64_t timestampUs, int objectClass):
     kalman_filter_(),
     mean_(),
     covariance_(),
@@ -15,8 +15,9 @@ byte_track::STrack::STrack(
     frame_id_(0),
     start_frame_id_(0),
     tracklet_len_(0),
-    m_timestamp(timestamp),
-    m_updateTimestamp(timestamp),
+    m_timestampUs(timestampUs),
+    m_updateTimestampUs(timestampUs),
+    m_goodUpdateTimestampUs(timestampUs),
     m_objectClass(objectClass)
 {
 }
@@ -67,7 +68,7 @@ const uint64_t& byte_track::STrack::getTrackletLength() const
 void byte_track::STrack::activate(const uint64_t& frame_id, const uint64_t& track_id)
 {
     kalman_filter_.initiate(mean_, covariance_, rect_.getXyah());
-    m_updateTimestamp = m_timestamp;
+    m_updateTimestampUs = m_timestampUs;
 
     updateRect();
 
@@ -84,7 +85,7 @@ void byte_track::STrack::activate(const uint64_t& frame_id, const uint64_t& trac
 void byte_track::STrack::reActivate(const STrack &new_track, const uint64_t &frame_id, const int &new_track_id)
 {
     kalman_filter_.update(mean_, covariance_, new_track.getRect().getXyah());
-    m_updateTimestamp = m_timestamp;
+    m_updateTimestampUs = m_timestampUs;
 
     updateRect();
 
@@ -99,7 +100,7 @@ void byte_track::STrack::reActivate(const STrack &new_track, const uint64_t &fra
     tracklet_len_ = 0;
 }
 
-void byte_track::STrack::predict(uint64_t timestamp)
+void byte_track::STrack::predict(int64_t timestampUs)
 {
     if (state_ != STrackState::Tracked)
     {
@@ -107,13 +108,13 @@ void byte_track::STrack::predict(uint64_t timestamp)
     }
     kalman_filter_.predict(mean_, covariance_);
     updateRect();
-    m_timestamp = timestamp;
+    m_timestampUs = timestampUs;
 }
 
 void byte_track::STrack::update(const STrack &new_track, const uint64_t &frame_id)
 {
     kalman_filter_.update(mean_, covariance_, new_track.getRect().getXyah());
-    m_updateTimestamp = m_timestamp;
+    m_updateTimestampUs = m_timestampUs;
 
     updateRect();
 

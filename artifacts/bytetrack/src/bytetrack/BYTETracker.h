@@ -18,7 +18,7 @@ using ConfidenceMap = std::unordered_map<int, float>; // ObjectClass to confiden
 struct ByteTrackerConfig
 {
     // Timestamp difference if timestamp is not provided
-    uint64_t defaultDtUs = 1.0E6 / 7.0;
+    int64_t defaultDtUs = 1.0E6 / 7.0;
     // Threshold for good and poor detections
     float goodDetectionThreshold = 0.5;
     // Threshold for birth tracks from remained good detections
@@ -29,9 +29,10 @@ struct ByteTrackerConfig
     float iouMatchingPoorDetectionsThreshold = 0.5;
     // IOU threshold for matching good detections to non active tracks
     float iouMatchingNonActiveTracksThreshold = 0.7;
-    // IUO for removing duplicates among active and lost stracks
+    // IOU for removing duplicates among active and lost stracks
     float iouRemoveDuplicateThreshold = 0.15;
     int maxTimeSinceUpdateMs = 600;
+    int maxTimeWithoutGoodUpdateMs = 10000;
 
     virtual ~ByteTrackerConfig() = default;
 };
@@ -42,7 +43,7 @@ public:
     BYTETracker(const ByteTrackerConfig& config);
     ~BYTETracker();
 
-    std::vector<STrackPtr> update(const std::vector<Object>& objects, std::optional<uint64_t> timestamp = std::nullopt);
+    std::vector<STrackPtr> update(const std::vector<Object>& objects, std::optional<int64_t> timestampUs = std::nullopt);
 
     void setConfidences(float defaultTrackBirthConfidence,
         std::shared_ptr<ConfidenceMap> trackBirthConfidences,
@@ -98,7 +99,7 @@ private:
 
     uint64_t frame_id_ = 0;
     uint64_t track_id_count_ = 0;
-    uint64_t m_timestamp = 0;
+    int64_t m_timestampUs = 0;
 
     std::vector<STrackPtr> tracked_stracks_;
     std::vector<STrackPtr> lost_stracks_;
