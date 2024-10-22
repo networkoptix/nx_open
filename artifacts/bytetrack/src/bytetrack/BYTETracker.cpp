@@ -15,6 +15,7 @@
 byte_track::BYTETracker::BYTETracker(const byte_track::ByteTrackerConfig& config):
     m_config(config)
 {
+    NX_ASSERT(m_config.goodDetectionThreshold >= m_config.trackBirthThreshold);
 }
 
 byte_track::BYTETracker::~BYTETracker()
@@ -33,16 +34,16 @@ void byte_track::BYTETracker::setConfidences(float defaultTrackBirthConfidence,
 }
 
 std::vector<byte_track::STrackPtr> byte_track::BYTETracker::update(
-    const std::vector<Object>& objects, std::optional<uint64_t> timestamp)
+    const std::vector<Object>& objects, std::optional<int64_t> timestampUs)
 {
-    if (timestamp)
+    if (timestampUs)
     {
-        NX_ASSERT(frame_id_ == 0 || *timestamp > m_timestamp);
-        m_timestamp = *timestamp;
+        NX_ASSERT(frame_id_ == 0 || *timestampUs > m_timestampUs);
+        m_timestampUs = *timestampUs;
     }
     else
     {
-        m_timestamp += m_config.defaultDtUs;
+        m_timestampUs += m_config.defaultDtUs;
     }
 
     ////////////////// Step 1: Get detections //////////////////
@@ -54,7 +55,7 @@ std::vector<byte_track::STrackPtr> byte_track::BYTETracker::update(
 
     for (const auto &object : objects)
     {
-        const auto strack = std::make_shared<STrack>(object.rect, object.prob, m_timestamp, object.label);
+        const auto strack = std::make_shared<STrack>(object.rect, object.prob, m_timestampUs, object.label);
         if (isGoodDetection(strack))
         {
             det_stracks.push_back(strack);
@@ -87,7 +88,7 @@ std::vector<byte_track::STrackPtr> byte_track::BYTETracker::update(
     // Predict current pose by KF
     for (auto &strack : strack_pool)
     {
-        strack->predict(m_timestamp);
+        strack->predict(m_timestampUs);
     }
 
     ////////////////// Step 2: First association, with IoU //////////////////
@@ -123,6 +124,7 @@ std::vector<byte_track::STrackPtr> byte_track::BYTETracker::update(
                 track->reActivate(*det, frame_id_);
                 refind_stracks.push_back(track);
             }
+            track->notifyAboutGoodUpdate();
         }
 
         for (const auto &unmatch_idx : unmatch_detection_idx)
@@ -141,6 +143,7 @@ std::vector<byte_track::STrackPtr> byte_track::BYTETracker::update(
 
     ////////////////// Step 3: Second association, using low score dets //////////////////
     std::vector<STrackPtr> current_lost_stracks;
+    std::vector<STrackPtr> current_removed_stracks;
 
     {
         std::vector<std::vector<int>> matches_idx;
@@ -159,6 +162,15 @@ std::vector<byte_track::STrackPtr> byte_track::BYTETracker::update(
         {
             const auto track = remain_tracked_stracks[match_idx[0]];
             const auto det = det_low_stracks[match_idx[1]];
+
+            if (m_timestampUs - track->getGoodUpdateTimestampUs()
+                > m_config.maxTimeWithoutGoodUpdateMs * 1000)
+            {
+                track->markAsRemoved();
+                current_removed_stracks.push_back(track);
+                continue;
+            }
+
             if (track->getSTrackState() == STrackState::Tracked)
             {
                 track->update(*det, frame_id_);
@@ -183,8 +195,6 @@ std::vector<byte_track::STrackPtr> byte_track::BYTETracker::update(
     }
 
     ////////////////// Step 4: Init new stracks //////////////////
-    std::vector<STrackPtr> current_removed_stracks;
-
     {
         std::vector<int> unmatch_detection_idx;
         std::vector<int> unmatch_unconfirmed_idx;
@@ -227,9 +237,10 @@ std::vector<byte_track::STrackPtr> byte_track::BYTETracker::update(
     }
 
     ////////////////// Step 5: Update state //////////////////
-    for (const auto &lost_strack : lost_stracks_)
+    for (const auto& lost_strack : lost_stracks_)
     {
-        if (m_timestamp - lost_strack->getUpdateTimestamp() > m_config.maxTimeSinceUpdateMs*1000.0)
+        if (m_timestampUs - lost_strack->getUpdateTimestamp()
+            > m_config.maxTimeSinceUpdateMs * 1000.0)
         {
             lost_strack->markAsRemoved();
             current_removed_stracks.push_back(lost_strack);
