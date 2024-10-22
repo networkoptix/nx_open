@@ -77,7 +77,7 @@ Item
             flickableDirection: Flickable.VerticalFlick
             boundsBehavior: Flickable.StopAtBounds
             contentWidth: width
-            contentHeight: fixups.height
+            contentHeight: fixups.height + buttonBox.height + 16
 
             ScrollBar.vertical: scrollBar
 
