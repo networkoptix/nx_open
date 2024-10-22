@@ -24,6 +24,7 @@
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/logic/connect_actions_handler.h>
+#include <nx/vms/client/desktop/two_way_audio/two_way_audio_desktop_camera_initializer.h>
 #include <nx/vms/client/desktop/virtual_camera/virtual_camera_action_handler.h>
 #include <nx/vms/client/desktop/workbench/extensions/local_notifications_manager.h>
 #include <nx/vms/client/desktop/workbench/handlers/notification_action_handler.h>
@@ -58,6 +59,7 @@ struct WindowContext::Private
     std::unique_ptr<QnWorkbenchNavigator> navigator;
 
     std::unique_ptr<QnWorkbenchRenderWatcher> resourceWidgetRenderWatcher;
+    std::unique_ptr<TwoWayAudioDesktopCameraInitializer> twoWayAudioDesktopCameraInitializer;
     std::unique_ptr<QnWorkbenchLayoutAspectRatioWatcher> layoutAspectRatioWatcher;
     std::unique_ptr<QnWorkbenchStreamSynchronizer> streamSynchronizer;
     std::unique_ptr<LocalNotificationsManager> localNotificationsManager;
@@ -129,6 +131,8 @@ WindowContext::WindowContext(QObject* parent):
     d->navigator = std::make_unique<QnWorkbenchNavigator>(this);
 
     d->resourceWidgetRenderWatcher = std::make_unique<QnWorkbenchRenderWatcher>(this);
+    d->twoWayAudioDesktopCameraInitializer =
+        std::make_unique<TwoWayAudioDesktopCameraInitializer>(this);
 
     // Depends on resourceWidgetRenderWatcher.
     d->layoutAspectRatioWatcher = std::make_unique<QnWorkbenchLayoutAspectRatioWatcher>(this);
