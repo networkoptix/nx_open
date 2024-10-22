@@ -142,8 +142,7 @@ void TwoWayAudioAvailabilityWatcher::setCamera(const QnVirtualCameraResourcePtr&
     if (d->sourceCamera == value)
         return;
 
-    if (d->sourceCamera)
-        d->sourceConnections.release();
+    d->sourceConnections.release();
 
     d->sourceCamera = value;
 
