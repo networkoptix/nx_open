@@ -23,6 +23,7 @@ if(WINDOWS AND CMAKE_BUILD_TYPE STREQUAL "Debug")
 endif()
 
 option(withDesktopClient "Enable Desktop Client" ON)
+option(withMobileClient "Enable Mobile Client" ON)
 option(withDistributions "Enable distributions" ${_withDistributions})
 option(withDocumentation "Generate documentation" ${_withDocumentation})
 option(withTests "Enable unit tests" ON)
