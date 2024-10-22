@@ -59,6 +59,10 @@ int RhiPaintDevice::metric(QPaintDevice::PaintDeviceMetric metric) const
         case PdmDevicePixelRatioScaled:
             return m_pixelRatio * QPaintDevice::devicePixelRatioFScale();
 
+        case PdmDevicePixelRatioF_EncodedA:
+        case PdmDevicePixelRatioF_EncodedB:
+            return QPaintDevice::encodeMetricF(metric, m_pixelRatio);
+
         default:
             return base_type::metric(metric);
     }
