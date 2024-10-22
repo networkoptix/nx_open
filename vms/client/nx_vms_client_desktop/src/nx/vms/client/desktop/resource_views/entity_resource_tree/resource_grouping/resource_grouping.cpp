@@ -84,14 +84,10 @@ QString getNewGroupSubId(const QnResourcePool* resourcePool)
         };
 
     const auto allCameras = resourcePool->getAllCameras(nx::Uuid(), /*ignoreDesktopCameras*/ true);
-    const auto allWebPages = resourcePool->getResources<QnWebPageResource>();
     const auto allLayouts = resourcePool->getResources<QnLayoutResource>();
 
     for (const auto& camera: allCameras)
         extractGroupSubIds(camera);
-
-    for (const auto& webPage: allWebPages)
-        extractGroupSubIds(webPage);
 
     for (const auto& layout: allLayouts)
         extractGroupSubIds(layout);
