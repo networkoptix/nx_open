@@ -73,14 +73,10 @@ private:
     QnResource* rawResource() const;
     void setRawResource(QnResource* value);
 
-protected:
-    virtual void timerEvent(QTimerEvent* event) override;
-
 private:
     nx::vms::api::RecordingMetadataTypes m_metadataTypes = nx::vms::api::RecordingMetadataType::none;
     RecordingStatus m_recordingStatus = RecordingStatus::noRecordingNoArchive;
 
-    int m_updateTimerId = -1;
     QnVirtualCameraResourcePtr m_camera;
     nx::utils::ScopedConnections m_connections;
 };
