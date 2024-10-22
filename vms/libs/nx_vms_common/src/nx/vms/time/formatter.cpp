@@ -134,8 +134,6 @@ const FormatsHash& DateTimeFormats::defaultFormats()
 static std::optional<bool> sForced24HoursFormat;
 static std::optional<QLocale> sForcedSystemLocale;
 
-static FormatterPtr sSystemFormatter;
-
 QLocale systemLocale()
 {
     return sForcedSystemLocale ? *sForcedSystemLocale : QLocale::system();
@@ -148,6 +146,8 @@ bool is24HoursTimeFormat()
 
     return sForced24HoursFormat ? *sForced24HoursFormat : isSystem24HoursFormat();
 }
+
+static FormatterPtr sSystemFormatter = Formatter::custom(systemLocale(), is24HoursTimeFormat());
 
 } // namespace
 
