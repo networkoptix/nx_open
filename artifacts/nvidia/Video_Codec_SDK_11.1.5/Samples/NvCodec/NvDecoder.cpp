@@ -15,8 +15,9 @@
 
 #include "NvDecoder.h"
 #include <nx/utils/log/log.h>
-
+#include <nx/media/ini.h>
 #include <nx/media/nvidia/nvidia_driver_proxy.h>
+#include <Utils/NvCodecUtils.h>
 
 using namespace nx::media::nvidia;
 
@@ -338,6 +339,9 @@ int NvDecoder::HandleVideoSequence(CUVIDEOFORMAT *pVideoFormat)
     m_videoInfo << std::endl;
 
     m_frameQueue.configure(GetWidth() * m_nBPP, m_nLumaHeight + m_nChromaHeight * m_nNumChromaPlanes);
+
+    if (freeGpuMemory() < nx::media::ini().nvidiaFreeMemoryLimit)
+        throw NVDECException::makeNVDECException("Out of memory", CUDA_ERROR_OUT_OF_MEMORY, __FUNCTION__, __FILE__, __LINE__);
 
     CUDA_DRVAPI_CALL(NvidiaDriverApiProxy::instance().cuCtxPushCurrent(m_cuContext));
     NVDEC_API_CALL(NvidiaDriverDecoderProxy::instance().cuvidCreateDecoder(&m_hDecoder, &videoDecodeCreateInfo));
