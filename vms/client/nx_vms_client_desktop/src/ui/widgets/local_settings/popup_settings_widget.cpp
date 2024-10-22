@@ -37,6 +37,23 @@ QList<EventType> supportedEventTypes(nx::vms::common::SystemContext* systemConte
         isApplicableForLicensingMode(systemContext)});
 }
 
+/** Return list of events, watched by user and filtered accordingly to the supported list. */
+QList<EventType> userWatchedEvents(const QnUserResourcePtr& user)
+{
+    using namespace nx::vms::event;
+
+    QList<EventType> result;
+    for (auto eventType: user->settings().watchedEvents())
+    {
+        if (isNonDeprecatedEvent(eventType)
+            && isApplicableForLicensingMode(user->systemContext())(eventType))
+        {
+            result.push_back(eventType);
+        }
+    }
+    return result;
+}
+
 std::set<nx::vms::common::system_health::MessageType> supportedMessageTypes(
     nx::vms::common::SystemContext* systemContext)
 {
@@ -137,7 +154,7 @@ void QnPopupSettingsWidget::loadDataToUi()
 
     const auto eventTypes = supportedEventTypes(systemContext());
     QList<EventType> watchedEvents = m_currentUser
-        ? m_currentUser->settings().watchedEvents()
+        ? userWatchedEvents(m_currentUser)
         : eventTypes;
 
     for (const auto eventType: eventTypes)
@@ -202,7 +219,7 @@ void QnPopupSettingsWidget::applyChanges()
 bool QnPopupSettingsWidget::hasChanges() const
 {
     return appContext()->localSettings()->popupSystemHealth() != storedSystemHealth()
-        || (m_currentUser && m_currentUser->settings().watchedEvents() != watchedEvents());
+        || (m_currentUser && userWatchedEvents(m_currentUser) != watchedEvents());
 }
 
 QList<EventType> QnPopupSettingsWidget::watchedEvents() const
