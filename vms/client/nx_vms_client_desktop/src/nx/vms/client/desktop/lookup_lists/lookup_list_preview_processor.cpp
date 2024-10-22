@@ -107,10 +107,19 @@ LookupListPreviewProcessor::PreviewBuildResult LookupListPreviewProcessor::build
         }
 
         std::vector<QVariant> line;
-        for (const auto& value: fileLine.split(separator))
-            line.push_back(value);
 
-        newData.push_back(line);
+        bool hasNotEmptyValue = false;
+        for (const auto& value: fileLine.split(separator))
+        {
+            if (!value.simplified().isEmpty())
+                hasNotEmptyValue = true;
+
+            line.emplace_back(value);
+        }
+
+
+        if (!line.empty() && hasNotEmptyValue)
+            newData.push_back(std::move(line));
         ++lineIndex;
     }
 
