@@ -36,21 +36,27 @@
 
 namespace ec2 {
 
-extern const std::set<QString> kResourceParamToAmend =
-    []()
-    {
-        std::set<QString> s;
-        s.insert(nx::vms::common::SystemSettings::Names::kWriteOnlyNames.begin(), nx::vms::common::SystemSettings::Names::kWriteOnlyNames.end());
-        s.insert(ResourcePropertyKey::kWriteOnlyNames.begin(), ResourcePropertyKey::kWriteOnlyNames.end());
-        return s;
-    }();
+const std::set<QString>& resourceParamToAmend()
+{
+    static const auto kResult =
+        []()
+        {
+            std::set<QString> s;
+            s.insert(nx::vms::common::SystemSettings::Names::kWriteOnlyNames.begin(),
+                nx::vms::common::SystemSettings::Names::kWriteOnlyNames.end());
+            s.insert(ResourcePropertyKey::kWriteOnlyNames.begin(),
+                ResourcePropertyKey::kWriteOnlyNames.end());
+            return s;
+        }();
+    return kResult;
+}
 
 bool amendOutputDataIfNeeded(
     const nx::network::rest::UserAccessData& accessData,
     QnResourceAccessManager* accessManager,
     nx::vms::api::ResourceParamData* paramData)
 {
-    if (kResourceParamToAmend.contains(paramData->name))
+    if (resourceParamToAmend().contains(paramData->name))
     {
         if (accessData == nx::network::rest::kSystemAccess)
         {

@@ -11,11 +11,10 @@
 #include <nx/vms/api/data/user_data_ex.h>
 #include <nx/vms/event/action_parameters.h>
 #include <nx/vms/rules/encryption.h>
+#include <transaction/amend_transaction_data.h>
 #include <transaction/transaction_descriptor.h>
 
 namespace ec2 {
-
-extern const std::set<QString> kResourceParamToAmend;
 
 namespace {
 
@@ -59,7 +58,7 @@ Result fixRequestDataIfNeeded(nx::vms::api::UserDataEx* userDataEx)
 
 Result fixRequestDataIfNeeded(nx::vms::api::ResourceParamData* paramData)
 {
-    if (kResourceParamToAmend.contains(paramData->name))
+    if (resourceParamToAmend().contains(paramData->name))
         paramData->value = nx::crypt::encodeHexStringFromStringAES128CBC(paramData->value);
 
     return Result();
