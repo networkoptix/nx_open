@@ -21,7 +21,7 @@ namespace rules { struct Rule; }
 
 namespace ec2 {
 
-extern const std::set<QString> kResourceParamToAmend;
+const std::set<QString>& resourceParamToAmend();
 
 // Returns true if data has been amended.
 template <typename T>
