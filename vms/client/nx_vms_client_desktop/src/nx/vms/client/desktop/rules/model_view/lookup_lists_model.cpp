@@ -77,20 +77,24 @@ std::optional<QString> LookupListsModel::objectTypeId() const
     return m_objectTypeId;
 }
 
-void LookupListsModel::setObjectTypeId(const QString& type)
+void LookupListsModel::setObjectTypeId(std::optional<QString> type)
 {
     if (m_objectTypeId == type)
         return;
 
-    m_objectTypeId = type;
+    m_objectTypeId = std::move(type);
 
     beginResetModel();
 
     m_lookupLists.clear();
-    for (const auto& list: systemContext()->lookupListManager()->lookupLists())
+
+    if (m_objectTypeId)
     {
-        if (m_objectTypeId == list.objectTypeId)
-            m_lookupLists.emplace_back(list.id, list.name);
+        for (const auto& list: systemContext()->lookupListManager()->lookupLists())
+        {
+            if (m_objectTypeId == list.objectTypeId)
+                m_lookupLists.emplace_back(list.id, list.name);
+        }
     }
 
     endResetModel();

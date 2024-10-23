@@ -10,6 +10,7 @@
 #include <QtWidgets/QVBoxLayout>
 
 #include <nx/vms/client/desktop/rules/utils/strings.h>
+#include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/rules/events/generic_event.h>
@@ -153,6 +154,19 @@ TextLookupPicker::TextLookupPicker(
 
             setEdited();
         });
+}
+
+void TextLookupPicker::setValidity(const vms::rules::ValidationResult& validationResult)
+{
+    TitledFieldPickerWidget<vms::rules::TextLookupField>::setValidity(validationResult);
+    if (m_field->checkType() == LookupCheckType::inList
+        || m_field->checkType() == LookupCheckType::notInList)
+    {
+        if (validationResult.isValid())
+            resetErrorStyle(m_lookupListComboBox);
+        else
+            setErrorStyle(m_lookupListComboBox);
+    }
 }
 
 void TextLookupPicker::updateUi()

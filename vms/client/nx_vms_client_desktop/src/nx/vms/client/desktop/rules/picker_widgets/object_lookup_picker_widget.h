@@ -22,6 +22,8 @@ public:
     ObjectLookupPicker(
         vms::rules::ObjectLookupField* field, SystemContext* context, ParamsWidget* parent);
 
+    void setValidity(const vms::rules::ValidationResult& validationResult) override;
+
 private:
     QComboBox* m_checkTypeComboBox{nullptr};
     QStackedWidget* m_stackedWidget{nullptr};

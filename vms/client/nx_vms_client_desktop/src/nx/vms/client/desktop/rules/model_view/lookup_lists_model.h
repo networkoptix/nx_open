@@ -24,7 +24,7 @@ public:
     LookupListsModel(SystemContext* context, QObject* parent);
 
     std::optional<QString> objectTypeId() const;
-    void setObjectTypeId(const QString& type);
+    void setObjectTypeId(std::optional<QString> type);
 
     int rowCount(const QModelIndex& parent) const override;
     QVariant data(const QModelIndex& index, int role) const override;

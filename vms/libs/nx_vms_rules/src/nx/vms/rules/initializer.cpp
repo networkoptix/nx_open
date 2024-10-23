@@ -23,10 +23,12 @@
 #include "action_builder_field_validators/time_field_validator.h"
 #include "event_filter_field_validators/analytics_event_type_field_validator.h"
 #include "event_filter_field_validators/analytics_object_type_field_validator.h"
+#include "event_filter_field_validators/object_lookup_field_validator.h"
 #include "event_filter_field_validators/source_camera_field_validator.h"
 #include "event_filter_field_validators/source_server_field_validator.h"
 #include "event_filter_field_validators/source_user_field_validator.h"
 #include "event_filter_field_validators/state_field_validator.h"
+#include "event_filter_field_validators/text_lookup_field_validator.h"
 
 namespace nx::vms::rules {
 
@@ -174,10 +176,12 @@ void Initializer::registerFieldValidators() const
     // Event field validators.
     registerFieldValidator<AnalyticsEventTypeField>(new AnalyticsEventTypeFieldValidator);
     registerFieldValidator<AnalyticsObjectTypeField>(new AnalyticsObjectTypeFieldValidator);
+    registerFieldValidator<ObjectLookupField>(new ObjectLookupFieldValidator);
     registerFieldValidator<SourceCameraField>(new SourceCameraFieldValidator);
     registerFieldValidator<SourceServerField>(new SourceServerFieldValidator);
     registerFieldValidator<SourceUserField>(new SourceUserFieldValidator);
     registerFieldValidator<StateField>(new StateFieldValidator);
+    registerFieldValidator<TextLookupField>(new TextLookupFieldValidator);
 
     // Action field validators.
     registerFieldValidator<ActionTextField>(new ActionTextFieldValidator);
