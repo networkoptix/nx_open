@@ -379,8 +379,9 @@ int MacVideoDecoder::decode(
         return -1; //< report error
     }
 
-    d->frame = av_frame_alloc();
+    // The IOSMemoryBuffer takes ownership of the frame.
     auto videoFrame = new VideoFrame(std::make_unique<IOSMemoryBuffer>(d->frame));
+    d->frame = av_frame_alloc();
     videoFrame->setStartTime(startTimeMs);
 
     outDecodedFrame->reset(videoFrame);
