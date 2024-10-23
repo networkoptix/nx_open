@@ -249,9 +249,15 @@ void QnVirtualCameraResource::emitPropertyChanged(
     const QString& key, const QString& prevValue, const QString& newValue)
 {
     if (key == ResourcePropertyKey::kPtzCapabilities)
+    {
         emit ptzCapabilitiesChanged(::toSharedPointer(this));
-
-    if (key == kUserEnabledAnalyticsEnginesProperty)
+    }
+    else if (key == ResourcePropertyKey::kNoVideoSupport)
+    {
+        m_cachedSupportedObjectTypes.reset();
+        emit compatibleObjectTypesMaybeChanged(toSharedPointer(this));
+    }
+    else if (key == kUserEnabledAnalyticsEnginesProperty)
     {
         m_cachedUserEnabledAnalyticsEngines.reset();
         m_cachedSupportedEventTypes.reset();
@@ -260,8 +266,7 @@ void QnVirtualCameraResource::emitPropertyChanged(
         emit compatibleEventTypesMaybeChanged(toSharedPointer(this));
         emit compatibleObjectTypesMaybeChanged(toSharedPointer(this));
     }
-
-    if (key == kCompatibleAnalyticsEnginesProperty)
+    else if (key == kCompatibleAnalyticsEnginesProperty)
     {
         m_cachedCompatibleAnalyticsEngines.reset();
         m_cachedSupportedEventTypes.reset();
@@ -270,8 +275,7 @@ void QnVirtualCameraResource::emitPropertyChanged(
         emit compatibleEventTypesMaybeChanged(toSharedPointer(this));
         emit compatibleObjectTypesMaybeChanged(toSharedPointer(this));
     }
-
-    if (key == kDeviceAgentManifestsProperty)
+    else if (key == kDeviceAgentManifestsProperty)
     {
         m_cachedDeviceAgentManifests.reset();
         m_cachedSupportedEventTypes.reset();
@@ -280,8 +284,7 @@ void QnVirtualCameraResource::emitPropertyChanged(
         emit compatibleEventTypesMaybeChanged(toSharedPointer(this));
         emit compatibleObjectTypesMaybeChanged(toSharedPointer(this));
     }
-
-    if (key == ResourcePropertyKey::kIoConfigCapability)
+    else if (key == ResourcePropertyKey::kIoConfigCapability)
     {
         emit isIOModuleChanged(::toSharedPointer(this));
     }
@@ -446,6 +449,9 @@ AnalyticsEntitiesByEngine QnVirtualCameraResource::calculateSupportedEventTypes(
 
 AnalyticsEntitiesByEngine QnVirtualCameraResource::calculateSupportedObjectTypes() const
 {
+    if (!hasVideo())
+        return {};
+
     return calculateSupportedEntities(
         [](const nx::vms::api::analytics::DeviceAgentManifest& deviceAgentManifest)
         {
