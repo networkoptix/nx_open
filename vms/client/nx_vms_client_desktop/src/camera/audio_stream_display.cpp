@@ -395,12 +395,12 @@ int QnAudioStreamDisplay::getAudioBufferSize() const
 
 AudioDecodeMode QnAudioStreamDisplay::decodeMode() const
 {
-    return m_decodeMode.load(std::memory_order_release);
+    return m_decodeMode;
 }
 
 void QnAudioStreamDisplay::setAudioDecodeMode(AudioDecodeMode decodeMode)
 {
-    m_decodeMode.store(decodeMode, std::memory_order_acquire);
+    m_decodeMode = decodeMode;
 
     NX_MUTEX_LOCKER lock(&m_guiSync);
     if (m_sound)
