@@ -30,7 +30,7 @@ std::optional<FieldDescriptor> fieldByName(
 bool isLoggingAllowed(const Engine* engine, nx::Uuid ruleId)
 {
     const auto rule = engine->rule(ruleId);
-    if (!NX_ASSERT(rule))
+    if (!rule) // It may be removed already.
         return false;
 
     const auto eventFilters = rule->eventFilters();
