@@ -64,11 +64,20 @@ TitledPickerWidget::TitledPickerWidget(
     }
 
     {
+        auto alertLayout = new QHBoxLayout;
+
+        alertLayout->addWidget(new QWidget);
+
         m_alertLabel = new AlertLabel{this};
         m_alertLabel->setSizePolicy(QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred));
         m_alertLabel->setVisible(false);
         setWarningStyle(m_alertLabel);
-        mainLayout->addWidget(m_alertLabel);
+        alertLayout->addWidget(m_alertLabel);
+
+        alertLayout->setStretch(0, 1);
+        alertLayout->setStretch(1, 5);
+
+        mainLayout->addLayout(alertLayout);
     }
 }
 

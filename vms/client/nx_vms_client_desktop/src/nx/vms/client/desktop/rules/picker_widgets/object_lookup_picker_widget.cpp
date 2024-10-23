@@ -10,6 +10,7 @@
 #include <QtWidgets/QVBoxLayout>
 
 #include <nx/vms/client/desktop/rules/utils/strings.h>
+#include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/rules/event_filter_fields/analytics_object_type_field.h>
@@ -124,6 +125,7 @@ ObjectLookupPicker::ObjectLookupPicker(
         [this]
         {
             m_field->setCheckType(m_checkTypeComboBox->currentData().value<LookupCheckType>());
+            m_field->setValue({});
 
             setEdited();
         });
@@ -151,6 +153,19 @@ ObjectLookupPicker::ObjectLookupPicker(
         });
 }
 
+void ObjectLookupPicker::setValidity(const vms::rules::ValidationResult& validationResult)
+{
+    TitledFieldPickerWidget<vms::rules::ObjectLookupField>::setValidity(validationResult);
+
+    if (m_field->checkType() != LookupCheckType::hasAttributes)
+    {
+        if (validationResult.isValid())
+            resetErrorStyle(m_lookupListComboBox);
+        else
+            setErrorStyle(m_lookupListComboBox);
+    }
+}
+
 void ObjectLookupPicker::updateUi()
 {
     TitledFieldPickerWidget<vms::rules::ObjectLookupField>::updateUi();
@@ -160,17 +175,11 @@ void ObjectLookupPicker::updateUi()
 
     if (m_field->checkType() == LookupCheckType::hasAttributes)
     {
-        if (nx::Uuid::isUuidString(m_field->value()))
-            m_field->setValue({});
-
         m_stackedWidget->setCurrentIndex(0);
         m_lineEdit->setText(m_field->value());
     }
     else
     {
-        if (!nx::Uuid::isUuidString(m_field->value()))
-            m_field->setValue({});
-
         const auto objectTypeField = getEventField<vms::rules::AnalyticsObjectTypeField>(
             vms::rules::utils::kObjectTypeIdFieldName);
         if (NX_ASSERT(
@@ -178,8 +187,11 @@ void ObjectLookupPicker::updateUi()
             "%1 field must be provided for the given event",
             vms::rules::utils::kObjectTypeIdFieldName))
         {
-            if (m_lookupListsModel->objectTypeId() != objectTypeField->value())
-                m_lookupListsModel->setObjectTypeId(objectTypeField->value());
+            const auto objectTypeId = objectTypeField->value();
+            if (objectTypeId.isEmpty())
+                m_lookupListsModel->setObjectTypeId(std::nullopt);
+            else
+                m_lookupListsModel->setObjectTypeId(objectTypeId);
         }
 
         const auto matches = m_lookupListComboBox->model()->match(
@@ -190,6 +202,7 @@ void ObjectLookupPicker::updateUi()
             Qt::MatchExactly);
 
         m_lookupListComboBox->setCurrentIndex(matches.size() == 1 ? matches[0].row() : -1);
+        m_lookupListComboBox->setEnabled(m_lookupListComboBox->count() != 0);
 
         m_stackedWidget->setCurrentIndex(1);
     }

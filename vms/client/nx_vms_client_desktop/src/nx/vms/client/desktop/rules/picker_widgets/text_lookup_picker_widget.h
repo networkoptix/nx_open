@@ -20,6 +20,8 @@ public:
     TextLookupPicker(
         vms::rules::TextLookupField* field, SystemContext* context, ParamsWidget* parent);
 
+    void setValidity(const vms::rules::ValidationResult& validationResult) override;
+
 private:
     QComboBox* m_checkTypeComboBox{nullptr};
     QStackedWidget* m_stackedWidget{nullptr};
