@@ -492,50 +492,7 @@ TEST_F(EngineTest, onlyValidProlongedActionRegistered)
     ASSERT_TRUE(engine->registerAction(withIntervalAndDurationFields, testActionConstructor));
 }
 
-TEST_F(EngineTest, cacheKey)
-{
-    auto rule = makeRule<TestEvent, TestAction>();
-    engine->updateRule(serialize(rule.get()));
-
-    auto event = TestEventPtr::create(std::chrono::microseconds::zero(), State::instant);
-
-    // Empty cache key events are not cached.
-    EXPECT_EQ(engine->processEvent(event), 1);
-    EXPECT_EQ(engine->processEvent(event), 1);
-
-    // Same cache events are ignored.
-    event->setCacheKey("a");
-    EXPECT_EQ(engine->processEvent(event), 1);
-    EXPECT_EQ(engine->processEvent(event), 0);
-
-    // Different cache events are matched.
-    event->setCacheKey("b");
-    EXPECT_EQ(engine->processEvent(event), 1);
-    EXPECT_EQ(engine->processEvent(event), 0);
-}
-
-TEST_F(EngineTest, cacheTimeout)
-{
-    using namespace std::chrono;
-
-    auto rule = makeRule<TestEvent, TestAction>();
-    engine->updateRule(serialize(rule.get()));
-
-    auto event = TestEventPtr::create(std::chrono::microseconds::zero(), State::instant);
-
-    // Same cache events are ignored.
-    event->setCacheKey("a");
-    EXPECT_EQ(engine->processEvent(event), 1);
-    EXPECT_EQ(engine->processEvent(event), 0);
-
-    // Same cache events are matched after timeout.
-    std::this_thread::sleep_for(5ms);
-    engine->eventCache()->cleanupOldEventsFromCache(1ms);
-    EXPECT_EQ(engine->processEvent(event), 1);
-    EXPECT_EQ(engine->processEvent(event), 0);
-}
-
-TEST_F(EngineTest, cacheState)
+TEST_F(EngineTest, runningEventState)
 {
    auto plugin = TestPlugin(engine.get());
 

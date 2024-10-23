@@ -38,16 +38,28 @@ public:
         };
     }
 
+    using BasicEvent::BasicEvent;
+
     virtual QString resourceKey() const override
     {
         return m_cameraId.toSimpleString();
     }
 
-    using BasicEvent::BasicEvent;
+    virtual QString cacheKey() const override
+    {
+        return m_cacheKey;
+    }
+
+    void setCacheKey(const QString& cacheKey)
+    {
+        m_cacheKey = cacheKey;
+    }
+
     nx::Uuid m_cameraId;
+    QString m_cacheKey;
 };
 
-// Test event with permissions.
+// Test event with permissions. No filter fields.
 class TestEvent: public nx::vms::rules::BasicEvent
 {
     using base_type = BasicEvent;
@@ -94,16 +106,6 @@ public:
         return m_cameraId.toSimpleString();
     }
 
-    virtual QString cacheKey() const override
-    {
-        return m_cacheKey;
-    }
-
-    void setCacheKey(const QString& cacheKey)
-    {
-        m_cacheKey = cacheKey;
-    }
-
     virtual QVariantMap details(common::SystemContext* context,
         const nx::vms::api::rules::PropertyMap& aggregatedInfo) const override
     {
@@ -132,8 +134,6 @@ public:
     nx::vms::api::EventLevel level = {};
     nx::vms::api::EventReason reason = {};
     nx::vms::rules::CameraConflictList conflicts;
-
-    QString m_cacheKey;
 };
 
 class TestEventProlonged : public nx::vms::rules::BasicEvent
