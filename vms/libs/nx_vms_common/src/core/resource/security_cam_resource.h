@@ -602,6 +602,9 @@ protected slots:
     virtual void at_motionRegionChanged();
 
 protected:
+    virtual void emitPropertyChanged(
+        const QString& key, const QString& prevValue, const QString& newValue) override;
+
     virtual void setSystemContext(nx::vms::common::SystemContext* systemContext) override;
 
     virtual void updateInternal(const QnResourcePtr& source, NotifierList& notifiers) override;

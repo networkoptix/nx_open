@@ -731,6 +731,22 @@ void QnSecurityCamResource::at_motionRegionChanged()
     }
 }
 
+void QnSecurityCamResource::emitPropertyChanged(
+    const QString& key,
+    const QString& prevValue,
+    const QString& newValue)
+{
+    if (key == ResourcePropertyKey::kNoVideoSupport)
+    {
+        m_cachedHasVideo.reset();
+        m_cachedSupportedMotionTypes.reset();
+        m_motionType.reset();
+        emit motionTypeChanged(::toSharedPointer(this));
+    }
+
+    base_type::emitPropertyChanged(key, prevValue, newValue);
+}
+
 int QnSecurityCamResource::motionWindowCount() const
 {
     QString val = getProperty(ResourcePropertyKey::kMotionWindowCnt);
@@ -1611,6 +1627,9 @@ bool QnSecurityCamResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &s
 
 nx::vms::api::MotionTypes QnSecurityCamResource::calculateSupportedMotionTypes() const
 {
+    if (!hasVideo())
+        return MotionType::none;
+
     QString val = getProperty(ResourcePropertyKey::kSupportedMotion);
     if (val.isEmpty())
         return MotionType::software;
