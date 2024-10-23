@@ -36,6 +36,7 @@ struct StartupParameters
 
     static StartupParameters fromCommandLineParams(const QnStartupParameters& params);
     QStringList toCommandLineParams() const;
+    bool allowMultipleClientInstances = false;
 };
 
 } // namespace nx::vms::client::desktop
