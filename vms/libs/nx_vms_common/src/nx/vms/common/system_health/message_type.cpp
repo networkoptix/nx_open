@@ -30,6 +30,7 @@ bool isMessageVisible(MessageType message)
     switch (message)
     {
         case MessageType::archiveFastScanFinished:
+        case MessageType::rejectIntercomCall:
             return false;
 
         default:
