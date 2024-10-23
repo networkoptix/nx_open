@@ -11,6 +11,7 @@
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/actions.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
 #include <nx/vms/client/desktop/resource_views/resource_tree_settings.h>
@@ -135,13 +136,33 @@ void ResourceGroupingActionHandler::renameCustomResourceTreeGroup() const
     if (newGroupCompositeId.compare(groupCompositeId, Qt::CaseInsensitive) == 0)
         return;
 
-    const bool serversShownInTree = context()->resourceTreeSettings()->showServersInTree();
+    const auto isCamera =
+        [](const QnResourcePtr& resource)
+        {
+            return !resource.objectCast<QnVirtualCameraResource>().isNull();
+        };
 
-    const auto allCameras = context()->resourcePool()->getAllCameras(
-        serversShownInTree ? resources[0]->getParentResource() : QnResourcePtr());
+    const auto isLayout =
+        [](const QnResourcePtr& resource)
+        {
+            return resource->hasFlags(Qn::layout);
+        };
 
-    const auto it = std::find_if(allCameras.cbegin(), allCameras.cend(),
-        [newGroupCompositeId, groupCompositeIdDimension](const QnVirtualCameraResourcePtr& resource)
+    QnResourceList resourcesWithinTopLevelNode;
+    if (std::any_of(resources.begin(), resources.end(), isCamera))
+    {
+        const bool serversShownInTree = context()->resourceTreeSettings()->showServersInTree();
+        resourcesWithinTopLevelNode = context()->resourcePool()->getAllCameras(
+            serversShownInTree ? resources[0]->getParentResource() : QnResourcePtr());
+    }
+    else if (std::any_of(resources.begin(), resources.end(), isLayout))
+    {
+        resourcesWithinTopLevelNode = context()->resourcePool()->getResources<LayoutResource>();
+    }
+
+    const auto it =
+        std::find_if(resourcesWithinTopLevelNode.cbegin(), resourcesWithinTopLevelNode.cend(),
+        [newGroupCompositeId, groupCompositeIdDimension](const QnResourcePtr& resource)
         {
             const auto resourceGroupId = resourceCustomGroupId(resource);
             if (compositeIdDimension(resourceGroupId) < groupCompositeIdDimension)
@@ -151,7 +172,7 @@ void ResourceGroupingActionHandler::renameCustomResourceTreeGroup() const
                 trimCompositeId(resourceGroupId, groupCompositeIdDimension), Qt::CaseInsensitive) == 0;
         });
 
-    const bool merging = it != allCameras.cend();
+    const bool merging = it != resourcesWithinTopLevelNode.cend();
     if (merging && !ui::messages::Resources::mergeResourceGroups(mainWindowWidget(), newGroupName))
     {
         menu()->trigger(menu::EditResourceInTreeAction);
