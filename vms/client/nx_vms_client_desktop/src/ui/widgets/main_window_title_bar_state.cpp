@@ -325,10 +325,13 @@ public:
     virtual bool loadState(
         const DelegateState& state,
         SubstateFlags flags,
-        const StartupParameters& /*params*/) override
+        const StartupParameters& params) override
     {
-        if (!flags.testFlag(Substate::systemIndependentParameters))
+        if (!flags.testFlag(Substate::systemIndependentParameters)
+            || params.allowMultipleClientInstances)
+        {
             return false;
+        }
 
         const QByteArray serialized =
             QJsonDocument(state.value(kSessionsKey).toArray()).toJson(QJsonDocument::Compact);

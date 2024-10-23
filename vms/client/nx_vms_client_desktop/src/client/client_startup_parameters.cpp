@@ -60,7 +60,7 @@ QString fromNativePath(const QString &path)
 } // namespace
 
 const QString QnStartupParameters::kAuthenticationStringKey(lit("--auth"));
-const QString QnStartupParameters::kAllowMultipleClientInstancesKey(lit("--no-single-application"));
+const QString QnStartupParameters::kAllowMultipleClientInstancesKey("--no-single-application");
 const QString QnStartupParameters::kSelfUpdateKey(lit("--self-update"));
 
 const QString QnStartupParameters::kSessionIdKey(lit("--sessionId"));

@@ -69,9 +69,10 @@ ResultType isVersionInstalled(
 ResultType restartClient(
     nx::utils::SoftwareVersion version,
     const QString& auth,
+    const QStringList& params,
     const QString& systemUri)
 {
-    QStringList arguments;
+    QStringList arguments(params);
 
     if(!systemUri.isEmpty())
     {

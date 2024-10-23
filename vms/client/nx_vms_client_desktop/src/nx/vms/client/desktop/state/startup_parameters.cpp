@@ -25,6 +25,7 @@ StartupParameters StartupParameters::fromCommandLineParams(const QnStartupParame
         result.logonData = params.parseAuthenticationString();
     }
 
+    result.allowMultipleClientInstances = params.allowMultipleClientInstances;
     result.noFullScreen = params.fullScreenDisabled;
     result.screen = params.screen;
     result.windowGeometry = params.windowGeometry;

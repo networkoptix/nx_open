@@ -259,7 +259,8 @@ bool QnConnectionDiagnosticsHelper::downloadAndRunCompatibleVersion(
             return false;
 
         // Version is installed, trying to run.
-        switch (restartClient(moduleInformation.version, authString))
+        const QStringList params(QnStartupParameters::kAllowMultipleClientInstancesKey);
+        switch (restartClient(moduleInformation.version, authString, params))
         {
             case ResultType::ok:
             {
