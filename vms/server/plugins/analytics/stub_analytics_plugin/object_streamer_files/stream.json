@@ -1890,7 +1890,7 @@
         "typeId": "nx.base.Vehicle",
         "attributes": {
             "Best Shot Type": "URL",
-            "Color": "Dark Red",
+            "Color": "Red",
             "Brand": "Mercedes",
             "Model": "EQE",
             "License Plate.Number": "KEN560",
@@ -2073,7 +2073,7 @@
         "typeId": "nx.base.Vehicle",
         "attributes": {
             "Best Shot Type": "URL",
-            "Color": "Dark Red",
+            "Color": "Red",
             "Brand": "Mercedes",
             "Model": "EQE",
             "License Plate.Number": "KEN560",

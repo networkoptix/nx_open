@@ -72,7 +72,7 @@ Example:
         "trackId": "$$10",
         "attributes": {
             "Best Shot Type": "URL",
-            "Color": "Dark Red",
+            "Color": "Red",
             "Brand": "Mercedes",
             "Model": "EQE",
             "LicensePlate.Number": "KEN560",
