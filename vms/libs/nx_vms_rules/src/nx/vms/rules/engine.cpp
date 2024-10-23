@@ -836,7 +836,6 @@ size_t Engine::processEvent(const EventPtr& event)
     {
         NX_MUTEX_LOCKER lock(&m_ruleMutex);
 
-        // TODO: #spanasenko Add filters-by-type maps?
         for (const auto& [id, rule]: m_rules)
         {
             if (!rule->enabled() || !rule->isCompatible())

@@ -276,6 +276,7 @@ private:
 private: // All the fields below should be used by Engine's thread only.
     QHash<nx::Uuid, RunningRuleInfo> m_runningRules;
 
+    // TODO: VMS-55671: Unify analytics object caches.
     nx::vms::event::EventCache m_eventCache;
 
     QTimer* m_aggregationTimer;
