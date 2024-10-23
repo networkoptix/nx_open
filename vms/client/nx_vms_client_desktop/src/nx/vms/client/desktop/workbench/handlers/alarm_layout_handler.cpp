@@ -26,6 +26,7 @@
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/action_parameters.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
+#include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/state/running_instances_manager.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/window_context.h>
@@ -247,13 +248,41 @@ void AlarmLayoutHandler::disableSyncForLayout(QnWorkbenchLayout* layout)
 
 void AlarmLayoutHandler::adjustLayoutCellAspectRatio(QnWorkbenchLayout* layout)
 {
-    for (auto widget: display()->widgets())
-    {
-        const auto aspect = widget->visualChannelAspectRatio();
-        layout->resource()->setCellAspectRatio(
-            QnAspectRatio::closestStandardRatio(aspect).toFloat());
-        break; // Break after first camera aspect set.
-    }
+    auto calculateExpectedAspectRatio =
+        [this, layout] () -> float
+        {
+            if (workbench()->currentLayout() == layout)
+            {
+                for (auto widget: display()->widgets())
+                {
+                    const auto result = widget->visualChannelAspectRatio();
+                    if (result > 0)
+                        return result; // Break after first camera aspect set.
+                }
+            }
+
+            // If the layout is not opened yet, calculate aspect ratio based on cameras.
+            for (const auto& item: layout->resource()->getItems())
+            {
+                if (auto resource = getResourceByDescriptor(item.resource))
+                {
+                    if (auto camera = resource.objectCast<QnVirtualCameraResource>())
+                    {
+                        const auto result = camera->aspectRatioRotated();
+                        if (result.isValid())
+                            return result.toFloat();
+                    }
+                }
+            }
+
+            return -1.0f; // Undefined AR.
+        };
+
+    auto ar = calculateExpectedAspectRatio();
+    if (ar > 0)
+        layout->resource()->setCellAspectRatio(QnAspectRatio::closestStandardRatio(ar).toFloat());
+    else
+        layout->resource()->setCellAspectRatio(ar);
 }
 
 void AlarmLayoutHandler::openCamerasInAlarmLayout(
@@ -300,11 +329,11 @@ void AlarmLayoutHandler::openCamerasInAlarmLayout(
         }
     }
 
-    if (wasEmptyLayout)
-        adjustLayoutCellAspectRatio(alarmLayout);
-
     if (switchToLayoutNeeded)
         workbench()->setCurrentLayout(alarmLayout);
+
+    if (wasEmptyLayout)
+        adjustLayoutCellAspectRatio(alarmLayout);
 }
 
 QnWorkbenchLayout* AlarmLayoutHandler::findOrCreateAlarmLayout()
