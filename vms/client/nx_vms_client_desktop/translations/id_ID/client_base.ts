@@ -1035,13 +1035,13 @@
     </message>
     <message numerus="yes">
       <source>Mute Items</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Mute Items</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Unmute Items</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Unmute Items</numerusform>
       </translation>
     </message>
