@@ -1000,8 +1000,8 @@
     <message numerus="yes">
       <source>%n more</source>
       <comment>%n is the number of remaining groups</comment>
-      <translation type="unfinished">
-        <numerusform>%n more</numerusform>
+      <translation>
+        <numerusform>%n selengkapnya</numerusform>
       </translation>
     </message>
   </context>

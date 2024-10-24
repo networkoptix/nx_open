@@ -1097,13 +1097,13 @@
     </message>
     <message numerus="yes">
       <source>Mute Items</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Mute Items</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Unmute Items</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Unmute Items</numerusform>
       </translation>
     </message>
@@ -3157,7 +3157,7 @@ Kunci Lisensi: %2</translation>
     <message>
       <source>Logged in as %1</source>
       <comment>%1 is the cloud login name (like user@domain.com</comment>
-      <translation type="unfinished">Logged in as %1</translation>
+      <translation>Masuk sebagai %1</translation>
     </message>
   </context>
   <context>
