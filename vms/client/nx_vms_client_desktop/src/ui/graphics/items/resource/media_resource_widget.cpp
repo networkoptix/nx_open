@@ -132,7 +132,6 @@
 #include <ui/graphics/items/resource/button_ids.h>
 #include <ui/graphics/items/resource/resource_widget_renderer.h>
 #include <ui/graphics/items/resource/software_trigger_button.h>
-#include <ui/graphics/items/resource/two_way_audio_widget.h>
 #include <ui/statistics/modules/controls_statistics_module.h>
 #include <ui/widgets/main_window.h>
 #include <ui/workaround/gl_native_painting.h>
@@ -3196,7 +3195,7 @@ void QnMediaResourceWidget::updateCompositeOverlayMode()
     {
         for (int i = 0; i < buttonsContainer->count(); ++i)
         {
-            if (auto button = qobject_cast<SoftwareTriggerButton*>(buttonsContainer->item(i)))
+            if (auto button = qobject_cast<CameraButton*>(buttonsContainer->item(i)))
                 button->setLive(isLive);
         }
     }

@@ -150,21 +150,21 @@ QString buttonHint(bool prolonged, HintStyle hintStyle)
         : SoftwareTriggerCameraButtonController::tr("press and hold");
 }
 
-CameraButton::Type prolongedToType(bool prolonged)
+CameraButtonData::Type prolongedToType(bool prolonged)
 {
     return prolonged
-        ? CameraButton::Type::prolonged
-        : CameraButton::Type::instant;
+        ? CameraButtonData::Type::prolonged
+        : CameraButtonData::Type::instant;
 }
 
-CameraButton buttonFromRule(
+CameraButtonData buttonFromRule(
     const nx::vms::event::RulePtr& rule,
     SystemContext* /*context*/,
     HintStyle hintStyle)
 {
     const auto params = rule->eventParams();
     const bool prolonged = rule->isActionProlonged();
-    return CameraButton {
+    return CameraButtonData {
         .id = rule->id(),
         .name = vms::event::StringsHelper::getSoftwareTriggerName(params.caption),
         .hint = buttonHint(prolonged, hintStyle),
@@ -173,7 +173,7 @@ CameraButton buttonFromRule(
         .enabled = true};
 }
 
-CameraButton buttonFromRule(
+CameraButtonData buttonFromRule(
     const nx::vms::rules::Rule* rule,
     SystemContext* context,
     HintStyle hintStyle)
@@ -191,7 +191,7 @@ CameraButton buttonFromRule(
 
     const auto engine = context->vmsRulesEngine();
     const bool prolonged = nx::vms::rules::isProlonged(engine, rule->actionBuilders()[0]);
-    return CameraButton {
+    return CameraButtonData {
         .id = rule->id(),
         .name = StringsHelper::getSoftwareTriggerName(name->value()),
         .hint = buttonHint(prolonged, hintStyle),
@@ -213,13 +213,13 @@ struct SoftwareTriggerCameraButtonController::Private
     nx::utils::ScopedConnections connections;
 
     void updateButtons();
-    void addOrUpdateButtonData(const CameraButton& button, bool isVmsRule);
+    void addOrUpdateButtonData(const CameraButtonData& button, bool isVmsRule);
     void tryRemoveButton(const nx::Uuid& buttonId);
 
     template<typename RulePointerType>
     void updateButtonByRule(RulePointerType rule);
 
-    void updateButtonAvailability(CameraButton button);
+    void updateButtonAvailability(CameraButtonData button);
 
     bool setEventTriggerState(const nx::Uuid& ruleId, vms::event::EventState state);
     bool setVmsTriggerState(const nx::Uuid& ruleId, vms::event::EventState state);
@@ -232,7 +232,7 @@ void SoftwareTriggerCameraButtonController::Private::updateButtons()
         [this]()
         {
             UuidSet result;
-            for (const auto& button: q->buttons())
+            for (const auto& button: q->buttonsData())
                 result.insert(button.id);
             return result;
         }();
@@ -262,7 +262,7 @@ void SoftwareTriggerCameraButtonController::Private::updateButtons()
 }
 
 void SoftwareTriggerCameraButtonController::Private::addOrUpdateButtonData(
-    const CameraButton& button,
+    const CameraButtonData& button,
     bool isVmsRule)
 {
     if (q->addOrUpdateButton(button))
@@ -296,7 +296,7 @@ void SoftwareTriggerCameraButtonController::Private::updateButtonByRule(RulePoin
         tryRemoveButton(rule->id());
 }
 
-void SoftwareTriggerCameraButtonController::Private::updateButtonAvailability(CameraButton button)
+void SoftwareTriggerCameraButtonController::Private::updateButtonAvailability(CameraButtonData button)
 {
     // FIXME: #sivanov System-wide timezone should be used here when it is introduced.
 
@@ -445,7 +445,7 @@ void SoftwareTriggerCameraButtonController::Private::updateActiveTrigger(
 
 SoftwareTriggerCameraButtonController::SoftwareTriggerCameraButtonController(
     HintStyle hintStyle,
-    CameraButton::Group buttonGroup,
+    CameraButtonData::Group buttonGroup,
     QObject* parent)
     :
     base_type(buttonGroup, Qn::SoftTriggerPermission, parent),
@@ -460,7 +460,7 @@ SoftwareTriggerCameraButtonController::SoftwareTriggerCameraButtonController(
     connect(updateTimer, &QTimer::timeout, this,
         [this]()
         {
-            for (const auto& button: buttons())
+            for (const auto& button: buttonsData())
                 d->updateButtonAvailability(button);
         });
     updateTimer->start();
@@ -512,7 +512,7 @@ void SoftwareTriggerCameraButtonController::setResourceInternal(const QnResource
 }
 
 bool SoftwareTriggerCameraButtonController::setButtonActionState(
-    const CameraButton& button,
+    const CameraButtonData& button,
     ActionState state)
 {
     if (!hasRequiredPermissions())

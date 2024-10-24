@@ -101,9 +101,6 @@ public:
         nx::build_info::isMacOsX()}; //< Mac version uses SPDIF by default for multichannel audio.
     Property<qreal> audioVolume{this, "audioVolume", 1.0};
 
-    Property<bool> muteOnAudioTransmit{this, "muteOnAudioTransmit", true,
-        "Mute audio output while two way audio is engaged."};
-
     Property<bool> playAudioForAllItems{this, "playAudioForAllItems", false,
         "Play audio for all items at the same time if true."};
 
@@ -183,12 +180,18 @@ public:
         {},
         "List and order of visible attributes in the table view of the Advanced Search Dialog."};
 
+    void migrateOldSettings();
+
 private:
     // Deperecated properties.
     Property<QString> locale{this, "locale", nx::branding::defaultLocale()};
 
-public:
-    void migrateOldSettings();
+    Property<bool> muteOnAudioTransmit{this, "muteOnAudioTransmit", true,
+        "Mute audio output while two way audio is engaged."};
+
+private:
+    void migrateSettingsFrom5_1(LocalSettings* settings, QSettings* oldSettings);
+    void migrateFrom6_0(LocalSettings* settings);
     void setDefaults();
 };
 

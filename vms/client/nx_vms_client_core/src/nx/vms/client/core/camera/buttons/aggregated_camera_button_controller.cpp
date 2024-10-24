@@ -7,7 +7,7 @@
 #include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/system_context.h>
 
-#include "camera_button.h"
+#include "camera_button_data.h"
 
 namespace nx::vms::client::core {
 
@@ -65,7 +65,7 @@ void AggregatedCameraButtonController::addController(int group, const Controller
     connect(controller.get(), &AbstractCameraButtonController::actionStarted, this,
         [this, controller](const nx::Uuid& buttonId, bool success)
         {
-            const auto& button = controller->button(buttonId);
+            const auto& button = controller->buttonData(buttonId);
             if (!button->instant() && !success)
                 d->activeActions.erase(buttonId);
 
@@ -89,22 +89,22 @@ void AggregatedCameraButtonController::addController(int group, const Controller
     controller->setResource(resource());
 }
 
-CameraButtons AggregatedCameraButtonController::buttons() const
+CameraButtonDataList AggregatedCameraButtonController::buttonsData() const
 {
-    CameraButtons result;
+    CameraButtonDataList result;
     for (const auto& controller: d->controllers)
     {
-        const auto& controllerButtons = controller->buttons();
+        const auto& controllerButtons = controller->buttonsData();
         result.insert(result.end(), controllerButtons.cbegin(), controllerButtons.cend());
     }
     return result;
 }
 
-OptionalCameraButton AggregatedCameraButtonController::button(const nx::Uuid& id) const
+OptionalCameraButtonData AggregatedCameraButtonController::buttonData(const nx::Uuid& id) const
 {
     for (const auto& controller: d->controllers)
     {
-        if (const auto& result = controller->button(id))
+        if (const auto& result = controller->buttonData(id))
             return result;
     }
 
@@ -119,7 +119,7 @@ bool AggregatedCameraButtonController::startAction(const nx::Uuid& buttonId)
 
     for (const auto& controller: d->controllers)
     {
-        if (const auto& button = controller->button(buttonId))
+        if (const auto& button = controller->buttonData(buttonId))
         {
             const bool result = controller->startAction(buttonId);
             if (result && !button->instant())
@@ -140,7 +140,7 @@ bool AggregatedCameraButtonController::stopAction(const nx::Uuid& buttonId)
         return false;
 
     const auto controller = it->second;
-    if (const auto& button = controller->button(buttonId))
+    if (const auto& button = controller->buttonData(buttonId))
     {
         if (button->instant())
         {
@@ -166,7 +166,7 @@ bool AggregatedCameraButtonController::cancelAction(const nx::Uuid& buttonId)
         return false;
 
     const auto controller = it->second;
-    if (const auto& button = controller->button(buttonId))
+    if (const auto& button = controller->buttonData(buttonId))
     {
         if (button->instant())
         {

@@ -8,6 +8,7 @@
 #include <QtMultimedia/QAudioDevice>
 
 #include <nx/build_info.h>
+#include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
@@ -116,7 +117,7 @@ void QnGeneralPreferencesWidget::applyChanges()
     appContext()->localSettings()->allowComputerEnteringSleepMode =
         allowComputerEnteringSleepMode();
 
-    appContext()->localSettings()->muteOnAudioTransmit = muteOnAudioTransmit();
+    appContext()->coreSettings()->muteOnAudioTransmit = muteOnAudioTransmit();
 
     if (recordingSettingsChanged)
         emit this->recordingSettingsChanged();
@@ -135,7 +136,7 @@ void QnGeneralPreferencesWidget::loadDataToUi()
         appContext()->localSettings()->allowComputerEnteringSleepMode());
     ui->playAudioForAllCamerasCheckbox->setChecked(
         appContext()->localSettings()->playAudioForAllItems());
-    setMuteOnAudioTransmit(appContext()->localSettings()->muteOnAudioTransmit());
+    setMuteOnAudioTransmit(appContext()->coreSettings()->muteOnAudioTransmit());
 }
 
 bool QnGeneralPreferencesWidget::hasChanges() const
@@ -185,7 +186,7 @@ bool QnGeneralPreferencesWidget::hasChanges() const
         return true;
     }
 
-    if (appContext()->localSettings()->muteOnAudioTransmit() != muteOnAudioTransmit())
+    if (appContext()->coreSettings()->muteOnAudioTransmit() != muteOnAudioTransmit())
         return true;
 
     return false;

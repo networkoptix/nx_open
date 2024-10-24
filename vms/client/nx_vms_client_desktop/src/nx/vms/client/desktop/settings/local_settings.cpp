@@ -71,7 +71,108 @@ void migrateMediaFoldersFrom5_1(LocalSettings* settings, QSettings* oldSettings)
     settings->mediaFolders = mediaFoldersWithNativeSeparators;
 }
 
-void migrateSettingsFrom5_1(LocalSettings* settings, QSettings* oldSettings)
+void migrateMediaFoldersFrom4_3(LocalSettings* settings, QSettings* oldSettings)
+{
+    if (settings->mediaFolders.exists())
+        return;
+
+    QStringList mediaFolders;
+
+    const QVariant mediaRoot = oldSettings->value("mediaRoot");
+    if (!mediaRoot.isNull())
+        mediaFolders.append(mediaRoot.toString());
+
+    const QVariant auxMediaRoot = oldSettings->value("auxMediaRoot");
+    if (!auxMediaRoot.isNull())
+        mediaFolders += auxMediaRoot.toStringList();
+
+    QStringList mediaFoldersWithNativeSeparators;
+
+    for (const auto& mediaFolder: mediaFolders)
+        mediaFoldersWithNativeSeparators.append(QDir::toNativeSeparators(mediaFolder));
+
+    settings->mediaFolders = mediaFoldersWithNativeSeparators;
+}
+
+void migrateLastUsedConnectionFrom4_2(LocalSettings* settings, QSettings* oldSettings)
+{
+    if (settings->lastUsedConnection.exists())
+        return;
+
+    core::ConnectionData data;
+    data.url = oldSettings->value("AppServerConnections/lastUsed/url").toString();
+    data.url.setScheme(nx::network::http::kSecureUrlSchemeName);
+    data.systemId = oldSettings->value("localId").toUuid();
+
+    settings->lastUsedConnection = data;
+}
+
+void migrateLogSettings(LocalSettings* settings, QSettings* oldSettings)
+{
+    using nx::utils::property_storage::migrateValue;
+
+    // Migrate from 5.1.
+    migrateValue(oldSettings, settings->maxLogFileSizeB);
+    migrateValue(oldSettings, settings->maxLogVolumeSizeB);
+    migrateValue(oldSettings, settings->logArchivingEnabled);
+    migrateSerializedValue(oldSettings, settings->maxLogFileTimePeriodS);
+
+    // Migrate from 5.0 in a case if 5.1 version was skipped.
+    migrateValue(oldSettings, settings->maxLogFileSizeB, "maxLogFileSize");
+
+    if (oldSettings->contains("logArchiveSize") && !settings->maxLogVolumeSizeB.exists())
+    {
+        auto oldValue = oldSettings->value("logArchiveSize").toULongLong();
+        settings->maxLogVolumeSizeB = (oldValue + 1) * settings->maxLogFileSizeB.value();
+    }
+}
+
+} // namespace
+
+LocalSettings::LocalSettings():
+    Storage(new nx::utils::property_storage::FileSystemBackend(
+        QStandardPaths::standardLocations(QStandardPaths::AppLocalDataLocation).first()
+            + "/settings/local"))
+{
+    load();
+
+    migrateOldSettings();
+    setDefaults();
+
+    if (!mediaFolders().isEmpty())
+        nx::utils::file_system::ensureDir(mediaFolders().first());
+}
+
+void LocalSettings::reload()
+{
+    load();
+}
+
+bool LocalSettings::hardwareDecodingEnabled()
+{
+    if (nx::media::getHardwareAccelerationType() == nx::media::HardwareAccelerationType::none)
+        return false;
+
+    return hardwareDecodingEnabledProperty();
+}
+
+QVariant LocalSettings::iniConfigValue(const QString& name)
+{
+    return core::getIniValue(ini(), name);
+}
+
+void LocalSettings::migrateOldSettings()
+{
+    const auto oldSettings = std::make_unique<QSettings>();
+
+    migrateSettingsFrom5_1(this, oldSettings.get());
+    migrateLastUsedConnectionFrom4_2(this, oldSettings.get());
+    migrateMediaFoldersFrom4_3(this, oldSettings.get());
+    migrateLogSettings(this, oldSettings.get());
+    migrateFrom6_0(this);
+}
+
+void LocalSettings::migrateSettingsFrom5_1(LocalSettings* settings, QSettings* oldSettings)
 {
     const auto migrateValue =
         [oldSettings]<typename T>(
@@ -87,7 +188,7 @@ void migrateSettingsFrom5_1(LocalSettings* settings, QSettings* oldSettings)
             nx::utils::property_storage::migrateSerializedValue(oldSettings, property, customName);
         };
 
-        const auto migrateEnumValue =
+    const auto migrateEnumValue =
         [oldSettings]<typename T>(
             nx::utils::property_storage::Property<T>& property, const QString& customName = {})
         {
@@ -148,63 +249,7 @@ void migrateSettingsFrom5_1(LocalSettings* settings, QSettings* oldSettings)
     migrateMediaFoldersFrom5_1(settings, oldSettings);
 }
 
-void migrateMediaFoldersFrom4_3(LocalSettings* settings, QSettings* oldSettings)
-{
-    if (settings->mediaFolders.exists())
-        return;
-
-    QStringList mediaFolders;
-
-    const QVariant mediaRoot = oldSettings->value("mediaRoot");
-    if (!mediaRoot.isNull())
-        mediaFolders.append(mediaRoot.toString());
-
-    const QVariant auxMediaRoot = oldSettings->value("auxMediaRoot");
-    if (!auxMediaRoot.isNull())
-        mediaFolders += auxMediaRoot.toStringList();
-
-    QStringList mediaFoldersWithNativeSeparators;
-
-    for (const auto& mediaFolder: mediaFolders)
-        mediaFoldersWithNativeSeparators.append(QDir::toNativeSeparators(mediaFolder));
-
-    settings->mediaFolders = mediaFoldersWithNativeSeparators;
-}
-
-void migrateLastUsedConnectionFrom4_2(LocalSettings* settings, QSettings* oldSettings)
-{
-    if (settings->lastUsedConnection.exists())
-        return;
-
-    core::ConnectionData data;
-    data.url = oldSettings->value("AppServerConnections/lastUsed/url").toString();
-    data.url.setScheme(nx::network::http::kSecureUrlSchemeName);
-    data.systemId = oldSettings->value("localId").toUuid();
-
-    settings->lastUsedConnection = data;
-}
-
-void migrateLogSettings(LocalSettings* settings, QSettings* oldSettings)
-{
-    using nx::utils::property_storage::migrateValue;
-
-    // Migrate from 5.1.
-    migrateValue(oldSettings, settings->maxLogFileSizeB);
-    migrateValue(oldSettings, settings->maxLogVolumeSizeB);
-    migrateValue(oldSettings, settings->logArchivingEnabled);
-    migrateSerializedValue(oldSettings, settings->maxLogFileTimePeriodS);
-
-    // Migrate from 5.0 in a case if 5.1 version was skipped.
-    migrateValue(oldSettings, settings->maxLogFileSizeB, "maxLogFileSize");
-
-    if (oldSettings->contains("logArchiveSize") && !settings->maxLogVolumeSizeB.exists())
-    {
-        auto oldValue = oldSettings->value("logArchiveSize").toULongLong();
-        settings->maxLogVolumeSizeB = (oldValue + 1) * settings->maxLogFileSizeB.value();
-    }
-}
-
-void migrateFrom6_0(LocalSettings* settings)
+void LocalSettings::migrateFrom6_0(LocalSettings* settings)
 {
     const auto coreSettings = appContext()->coreSettings();
     if (coreSettings->locale().isEmpty())
@@ -215,51 +260,9 @@ void migrateFrom6_0(LocalSettings* settings)
         else
             coreSettings->locale = nx::branding::defaultLocale();
     }
-}
 
-} // namespace
-
-LocalSettings::LocalSettings():
-    Storage(new nx::utils::property_storage::FileSystemBackend(
-        QStandardPaths::standardLocations(QStandardPaths::AppLocalDataLocation).first()
-            + "/settings/local"))
-{
-    load();
-
-    migrateOldSettings();
-    setDefaults();
-
-    if (!mediaFolders().isEmpty())
-        nx::utils::file_system::ensureDir(mediaFolders().first());
-}
-
-void LocalSettings::reload()
-{
-    load();
-}
-
-bool LocalSettings::hardwareDecodingEnabled()
-{
-    if (nx::media::getHardwareAccelerationType() == nx::media::HardwareAccelerationType::none)
-        return false;
-
-    return hardwareDecodingEnabledProperty();
-}
-
-QVariant LocalSettings::iniConfigValue(const QString& name)
-{
-    return core::getIniValue(ini(), name);
-}
-
-void LocalSettings::migrateOldSettings()
-{
-    const auto oldSettings = std::make_unique<QSettings>();
-
-    migrateSettingsFrom5_1(this, oldSettings.get());
-    migrateLastUsedConnectionFrom4_2(this, oldSettings.get());
-    migrateMediaFoldersFrom4_3(this, oldSettings.get());
-    migrateLogSettings(this, oldSettings.get());
-    migrateFrom6_0(this);
+    if (!coreSettings->muteOnAudioTransmit.exists())
+        coreSettings->muteOnAudioTransmit = settings->muteOnAudioTransmit();
 }
 
 void LocalSettings::setDefaults()

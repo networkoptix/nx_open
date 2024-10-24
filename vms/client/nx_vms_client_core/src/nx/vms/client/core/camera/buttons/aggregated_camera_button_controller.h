@@ -32,8 +32,8 @@ public:
     template<typename Controller, typename ButtonGroupType, typename... Args>
     void addController(ButtonGroupType group, Args... args);
 
-    virtual CameraButtons buttons() const override;
-    virtual OptionalCameraButton button(const nx::Uuid& id) const override;
+    virtual CameraButtonDataList buttonsData() const override;
+    virtual OptionalCameraButtonData buttonData(const nx::Uuid& id) const override;
 
     virtual bool startAction(const nx::Uuid& buttonId) override;
     virtual bool stopAction(const nx::Uuid& buttonId) override;

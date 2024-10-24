@@ -13,7 +13,7 @@ class PtzCameraButtonController: public core::BaseCameraButtonController
 
 public:
     PtzCameraButtonController(
-        core::CameraButton::Group buttonGroup,
+        core::CameraButtonData::Group buttonGroup,
         QObject* parent = nullptr);
     virtual ~PtzCameraButtonController() override;
 
@@ -22,7 +22,7 @@ protected:
 
 private:
     virtual bool setButtonActionState(
-        const core::CameraButton& button,
+        const core::CameraButtonData& button,
         ActionState state) override;
 
 private:

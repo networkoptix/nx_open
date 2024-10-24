@@ -30,14 +30,14 @@ public:
      * @param parent Parent class.
      */
     BaseCameraButtonController(
-        CameraButton::Group buttonGroup,
+        CameraButtonData::Group buttonGroup,
         Qn::Permissions requiredPermissions = {},
         QObject* parent = nullptr);
 
     virtual ~BaseCameraButtonController() override;
 
-    virtual CameraButtons buttons() const override;
-    virtual OptionalCameraButton button(const nx::Uuid& buttonId) const override;
+    virtual CameraButtonDataList buttonsData() const override;
+    virtual OptionalCameraButtonData buttonData(const nx::Uuid& buttonId) const override;
 
     virtual bool startAction(const nx::Uuid& buttonId) override;
     virtual bool stopAction(const nx::Uuid& buttonId) override;
@@ -61,13 +61,13 @@ protected:
      * Adds or updates button record.
      * Returns 'true' if button is added or 'false' if is updated.
      */
-    bool addOrUpdateButton(const CameraButton& button);
+    bool addOrUpdateButton(const CameraButtonData& button);
 
     /** Removes specified button. */
     bool removeButton(const nx::Uuid& buttonId);
 
     /** Convenient function to return first button (if any).*/
-    OptionalCameraButton firstButton() const;
+    OptionalCameraButtonData firstButton() const;
 
     /** Adds specified action in the active actions list. */
     void addActiveAction(const nx::Uuid& buttonId);
@@ -79,7 +79,7 @@ protected:
      *  Virtual function to be imple,emted in subclasses which is used to activate or deactivate
      *  action. Returns 'true' if state could be changed, otherwise 'false'.
      */
-    virtual bool setButtonActionState(const CameraButton& button, ActionState state);
+    virtual bool setButtonActionState(const CameraButtonData& button, ActionState state);
 
 signals:
     void hasRequiredPermissionsChanged();
