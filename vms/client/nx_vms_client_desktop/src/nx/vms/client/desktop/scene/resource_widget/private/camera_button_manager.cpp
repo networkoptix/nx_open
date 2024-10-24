@@ -20,10 +20,17 @@
 #include <ui/graphics/items/overlays/scrollable_items_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/resource/software_trigger_button.h>
+#include <ui/graphics/items/resource/two_way_audio_button.h>
 
 namespace nx::vms::client::desktop {
 
 namespace {
+
+enum class ActionType
+{
+    start,
+    stop
+};
 
 enum ButtonGroup
 {
@@ -33,7 +40,8 @@ enum ButtonGroup
     extendedOutputs
 };
 
-using CameraButton = core::CameraButton;
+using State = CameraButton::State;
+using CameraButtonData = core::CameraButtonData;
 using AggregatedControllerPtr = std::unique_ptr<core::AggregatedCameraButtonController>;
 using namespace nx::vms::client::desktop::menu;
 
@@ -102,24 +110,24 @@ QnScrollableItemsWidget* createObjectTrackingContainer(QnMediaResourceWidget* me
     return result;
 }
 
-QString getToolTip(const CameraButton& data)
+QString getToolTip(const CameraButtonData& data)
 {
     if (!data.enabled)
         return CameraButtonManager::tr("Disabled by schedule");
 
     switch (data.type)
     {
-        case CameraButton::Type::instant:
+        case CameraButtonData::Type::instant:
         {
             return data.name;
         }
-        case CameraButton::Type::prolonged:
+        case CameraButtonData::Type::prolonged:
         {
             return data.hint.isEmpty()
                 ? data.name
                 : nx::format("%1 (%2)").args(data.name, data.hint).toQString();
         }
-        case CameraButton::Type::checkable:
+        case CameraButtonData::Type::checkable:
         {
             return data.checked
                 ? data.checkedName
@@ -169,20 +177,22 @@ struct CameraButtonManager::Private: public QObject
         CameraButtonManager* q,
         QnMediaResourceWidget* mediaResourceWidget);
 
-    void addObjectTrackingButton(const CameraButton& data);
+    void addObjectTrackingButton(const CameraButtonData& data);
 
     template<typename ButtonType, typename Container>
-    ButtonType* insertButton(const CameraButton& data, Container* target);
+    ButtonType* insertButton(const CameraButtonData& data, Container* target);
 
-    void handleButtonAdded(const CameraButton& data);
-    void handleButtonChanged(const CameraButton& button, CameraButton::Fields fields);
+    void handleButtonAdded(const CameraButtonData& data);
+    void handleButtonChanged(const CameraButtonData& button, CameraButtonData::Fields fields);
     void handleButtonRemoved(const nx::Uuid& buttonId);
 
-    void handleActionCompletion(const nx::Uuid& buttonId, bool success);
+    void handleActionCompletion(const nx::Uuid& buttonId, bool success, ActionType type);
     void handleActionCancelled(const nx::Uuid& buttonId);
 
     bool isObjectTrackingButton(const nx::Uuid& buttonId);
-    bool isObjectTrackingButton(const core::OptionalCameraButton& data);
+    bool isObjectTrackingButton(const core::OptionalCameraButtonData& data);
+
+    bool isTwoWayAudioButton(const core::CameraButtonData& data);
 };
 
 CameraButtonManager::Private::Private(
@@ -202,17 +212,25 @@ CameraButtonManager::Private::Private(
     connect(controller.get(), &core::AbstractCameraButtonController::buttonRemoved,
         this, &Private::handleButtonRemoved);
 
-    connect(controller.get(), &core::AbstractCameraButtonController::actionStarted,
-        this, &Private::handleActionCompletion);
-    connect(controller.get(), &core::AbstractCameraButtonController::actionStopped,
-        this, &Private::handleActionCompletion);
+    connect(controller.get(), &core::AbstractCameraButtonController::actionStarted, this,
+        [this](const nx::Uuid& buttonId, bool success)
+        {
+            handleActionCompletion(buttonId, success, ActionType::start);
+        });
+
+    connect(controller.get(), &core::AbstractCameraButtonController::actionStopped, this,
+        [this](const nx::Uuid& buttonId, bool success)
+        {
+            handleActionCompletion(buttonId, success, ActionType::stop);
+        });
+
     connect(controller.get(), &core::AbstractCameraButtonController::actionCancelled,
         this, &Private::handleActionCancelled);
 
     controller->setResource(mediaResourceWidget->resource()->toResourcePtr());
 }
 
-void CameraButtonManager::Private::addObjectTrackingButton(const CameraButton& data)
+void CameraButtonManager::Private::addObjectTrackingButton(const CameraButtonData& data)
 {
     const auto button = insertButton<ObjectTrackingButton>(data, objectTrackingContainer);
     connect(button, &ObjectTrackingButton::clicked,
@@ -224,20 +242,20 @@ void CameraButtonManager::Private::addObjectTrackingButton(const CameraButton& d
 
 template<typename ButtonType, typename Container>
 ButtonType* CameraButtonManager::Private::insertButton(
-    const CameraButton& data,
+    const CameraButtonData& data,
     Container* target)
 {
     static const auto lessPredicate = nx::utils::algorithm::Comparator(
         /*ascending*/ true,
-        &CameraButton::name,
-        &CameraButton::iconName,
-        &CameraButton::id);
+        &CameraButtonData::name,
+        &CameraButtonData::iconName,
+        &CameraButtonData::id);
 
     int index = 0;
     for (; index != target->count(); ++index)
     {
         const auto leftButtonId = target->itemId(index);
-        const auto leftButton = controller->button(leftButtonId);
+        const auto leftButton = controller->buttonData(leftButtonId);
         if (NX_ASSERT(leftButton) && lessPredicate(*leftButton, data))
             break;
     }
@@ -247,7 +265,7 @@ ButtonType* CameraButtonManager::Private::insertButton(
     return button;
 }
 
-void CameraButtonManager::Private::handleButtonAdded(const CameraButton& data)
+void CameraButtonManager::Private::handleButtonAdded(const CameraButtonData& data)
 {
     if (isObjectTrackingButton(data))
     {
@@ -260,12 +278,13 @@ void CameraButtonManager::Private::handleButtonAdded(const CameraButton& data)
         return;
     }
 
-    const auto button = insertButton<SoftwareTriggerButton>(data, container);
-    button->setIcon(data.iconName);
+    const auto button = isTwoWayAudioButton(data)
+        ? static_cast<CameraButton*>(insertButton<TwoWayAudioButton>(data, container))
+        : static_cast<CameraButton*>(insertButton<SoftwareTriggerButton>(data, container));
+    button->setIconName(data.iconName);
     button->setToolTip(getToolTip(data));
     button->setProlonged(data.prolonged());
     button->setEnabled(data.enabled);
-    container->addItem(button, data.id);
 
     connect(button, &SoftwareTriggerButton::clicked, q,
         [this, button, id = data.id]()
@@ -276,18 +295,21 @@ void CameraButtonManager::Private::handleButtonAdded(const CameraButton& data)
                 return;
             }
 
-            const auto data = controller->button(id);
+            const auto data = controller->buttonData(id);
             if (data->prolonged()) //< Prolonged buttons does not react on click.
                 return;
 
             // Change state of the checkable button or start action for the instant one.
-            const bool success = !data->checkable() || !data->checked
+            const bool isActivateAction = !data->checkable() || !data->checked;
+            const bool success = isActivateAction
                 ? controller->startAction(id)
                 : controller->stopAction(id);
 
             button->setState(success
-                ? SoftwareTriggerButton::State::Waiting
-                : SoftwareTriggerButton::State::Failure);
+                ? (isActivateAction
+                    ? State::WaitingForActivation
+                    : State::WaitingForDeactivation)
+                : State::Failure);
         });
 
     connect(button, &SoftwareTriggerButton::pressed, q,
@@ -296,13 +318,13 @@ void CameraButtonManager::Private::handleButtonAdded(const CameraButton& data)
             if (!button->isLive())
                 return;
 
-            const auto data = controller->button(id);
+            const auto data = controller->buttonData(id);
             if (!data->prolonged())
                 return;
 
             button->setState(controller->startAction(data->id)
-                ? SoftwareTriggerButton::State::Waiting
-                : SoftwareTriggerButton::State::Failure);
+                ? State::WaitingForActivation
+                : State::Failure);
 
             q->menu()->triggerIfPossible(SuspendCurrentShowreelAction);
         });
@@ -313,7 +335,7 @@ void CameraButtonManager::Private::handleButtonAdded(const CameraButton& data)
             if (!button->isLive())
                 return;
 
-            const auto data = controller->button(id);
+            const auto data = controller->buttonData(id);
             if (!data->prolonged())
                 return;
 
@@ -325,28 +347,28 @@ void CameraButtonManager::Private::handleButtonAdded(const CameraButton& data)
                 return;
 
             button->setState(controller->stopAction(data->id)
-                ? SoftwareTriggerButton::State::Waiting
-                : SoftwareTriggerButton::State::Failure);
+                ? State::WaitingForDeactivation
+                : State::Failure);
         });
 }
 
 void CameraButtonManager::Private::handleButtonChanged(
-    const CameraButton& data,
-    CameraButton::Fields fields)
+    const CameraButtonData& data,
+    CameraButtonData::Fields fields)
 {
     if (isObjectTrackingButton(data))
         return;
 
-    const auto button = dynamic_cast<SoftwareTriggerButton*>(container->item(data.id));
+    const auto button = dynamic_cast<CameraButton*>(container->item(data.id));
     if (!NX_ASSERT(button))
         return;
 
-    using Field = CameraButton::Field;
+    using Field = CameraButtonData::Field;
 
     if (fields.testAnyFlags({Field::checked, Field::iconName, Field::checkedIconName}))
     {
         button->setToolTip(getToolTip(data));
-        button->setIcon(data.checked
+        button->setIconName(data.checked
             ? data.checkedIconName
             : data.iconName);
     }
@@ -360,7 +382,7 @@ void CameraButtonManager::Private::handleButtonChanged(
         handleButtonAdded(data);
     }
 
-    if (fields.testFlag(CameraButton::Field::enabled))
+    if (fields.testFlag(Field::enabled))
     {
         button->setEnabled(data.enabled);
         button->setToolTip(getToolTip(data));
@@ -372,28 +394,31 @@ void CameraButtonManager::Private::handleButtonRemoved(const nx::Uuid& buttonId)
     container->deleteItem(buttonId);
 }
 
-void CameraButtonManager::Private::handleActionCompletion(const nx::Uuid& buttonId, bool success)
+void CameraButtonManager::Private::handleActionCompletion(
+    const nx::Uuid& buttonId,
+    bool success,
+    ActionType type)
 {
-    const auto data = controller->button(buttonId);
+    const auto data = controller->buttonData(buttonId);
     if (!NX_ASSERT(data))
         return;
 
     if (isObjectTrackingButton(data))
         return;
 
-    const auto button = dynamic_cast<SoftwareTriggerButton*>(container->item(buttonId));
+    const auto button = dynamic_cast<CameraButton*>(container->item(buttonId));
     if (!NX_ASSERT(button))
         return;
 
     if (!success)
     {
-        button->setState(SoftwareTriggerButton::State::Failure);
+        button->setState(State::Failure);
         return;
     }
 
-    button->setState(data->checkable()
-        ? SoftwareTriggerButton::State::Default
-        : SoftwareTriggerButton::State::Success);
+    button->setState(type == ActionType::start && !data->checkable()
+        ? State::Activate
+        : State::Default);
 }
 
 void CameraButtonManager::Private::handleActionCancelled(const nx::Uuid& buttonId)
@@ -401,19 +426,24 @@ void CameraButtonManager::Private::handleActionCancelled(const nx::Uuid& buttonI
     if (isObjectTrackingButton(buttonId))
         return;
 
-    const auto button = dynamic_cast<SoftwareTriggerButton*>(container->item(buttonId));
+    const auto button = dynamic_cast<CameraButton*>(container->item(buttonId));
     if (NX_ASSERT(button))
-        button->setState(SoftwareTriggerButton::State::Failure);
+        button->setState(State::Failure);
 }
 
 bool CameraButtonManager::Private::isObjectTrackingButton(const nx::Uuid& buttonId)
 {
-    return isObjectTrackingButton(controller->button(buttonId));
+    return isObjectTrackingButton(controller->buttonData(buttonId));
 }
 
-bool CameraButtonManager::Private::isObjectTrackingButton(const core::OptionalCameraButton& data)
+bool CameraButtonManager::Private::isObjectTrackingButton(const core::OptionalCameraButtonData& data)
 {
     return NX_ASSERT(data) && data->group == ButtonGroup::objectTracking;
+}
+
+bool CameraButtonManager::Private::isTwoWayAudioButton(const core::CameraButtonData& data)
+{
+    return data.group == ButtonGroup::twoWayAudio;
 }
 
 //-------------------------------------------------------------------------------------------------

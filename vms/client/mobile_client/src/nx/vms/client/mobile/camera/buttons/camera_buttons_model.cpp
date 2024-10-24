@@ -5,14 +5,14 @@
 #include <QtQml/QtQml>
 
 #include <nx/utils/algorithm/comparator.h>
-#include <nx/vms/client/core/camera/buttons/camera_button.h>
+#include <nx/vms/client/core/camera/buttons/camera_button_data.h>
 #include <nx/vms/client/mobile/camera/buttons/camera_button_controller.h>
 
 namespace nx::vms::client::mobile {
 
 namespace {
 
-using CameraButton = core::CameraButton;
+using CameraButtonData = core::CameraButtonData;
 using AbstractCameraButtonController = core::AbstractCameraButtonController;
 
 enum Roles
@@ -44,8 +44,8 @@ struct CameraButtonsModel::Private: public QObject
 
     Private(CameraButtonsModel* q);
 
-    void handleButtonAdded(const CameraButton& button);
-    void handleButtonChanged(const CameraButton& button, CameraButton::Fields fields);
+    void handleButtonAdded(const CameraButtonData& button);
+    void handleButtonChanged(const CameraButtonData& button, CameraButtonData::Fields fields);
     void handleButtonRemoved(const nx::Uuid& id);
 
     void handleControllerRemoved();
@@ -57,14 +57,14 @@ CameraButtonsModel::Private::Private(CameraButtonsModel* q):
 {
 }
 
-void CameraButtonsModel::Private::handleButtonAdded(const CameraButton& button)
+void CameraButtonsModel::Private::handleButtonAdded(const CameraButtonData& button)
 {
     static const auto lessPredicate = nx::utils::algorithm::Comparator(
-        /*ascending*/ true, &CameraButton::group, &CameraButton::name, &CameraButton::id);
+        /*ascending*/ true, &CameraButtonData::group, &CameraButtonData::name, &CameraButtonData::id);
     const auto itInsert = std::lower_bound(buttons.begin(), buttons.end(), button.id,
         [this, pred = lessPredicate](const nx::Uuid& leftId, const nx::Uuid& rightId)
         {
-            return pred(*controller->button(leftId), *controller->button(rightId));
+            return pred(*controller->buttonData(leftId), *controller->buttonData(rightId));
         });
 
     const int insertionIndex = std::distance(buttons.begin(), itInsert);
@@ -73,8 +73,8 @@ void CameraButtonsModel::Private::handleButtonAdded(const CameraButton& button)
 }
 
 void CameraButtonsModel::Private::handleButtonChanged(
-    const CameraButton& button,
-    CameraButton::Fields /*fields*/)
+    const CameraButtonData& button,
+    CameraButtonData::Fields /*fields*/)
 {
     handleButtonRemoved(button.id);
     handleButtonAdded(button);
@@ -111,7 +111,7 @@ void CameraButtonsModel::Private::handleControllerChanged()
     connect(controller, &AbstractCameraButtonController::buttonRemoved,
         this, &Private::handleButtonRemoved);
 
-    for (const auto& button: controller->buttons())
+    for (const auto& button: controller->buttonsData())
         handleButtonAdded(button);
 }
 
@@ -167,7 +167,7 @@ QVariant CameraButtonsModel::data(const QModelIndex &index, int role) const
     }
 
     const auto& id = d->buttons.at(row);
-    const auto& button = d->controller->button(id);
+    const auto& button = d->controller->buttonData(id);
 
     switch (role)
     {

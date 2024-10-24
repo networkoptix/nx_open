@@ -44,61 +44,6 @@ void SoftwareTriggerButton::setToolTipEdge(Qt::Edge edge)
     d->setToolTipEdge(edge);
 }
 
-QSize SoftwareTriggerButton::buttonSize() const
-{
-    Q_D(const SoftwareTriggerButton);
-    return d->buttonSize();
-}
-
-void SoftwareTriggerButton::setButtonSize(const QSize& size)
-{
-    Q_D(SoftwareTriggerButton);
-    d->setButtonSize(size);
-}
-
-void SoftwareTriggerButton::setIcon(const QString& name)
-{
-    Q_D(SoftwareTriggerButton);
-    d->setIcon(name);
-}
-
-bool SoftwareTriggerButton::prolonged() const
-{
-    Q_D(const SoftwareTriggerButton);
-    return d->prolonged();
-}
-
-void SoftwareTriggerButton::setProlonged(bool value)
-{
-    Q_D(SoftwareTriggerButton);
-    d->setProlonged(value);
-}
-
-SoftwareTriggerButton::State SoftwareTriggerButton::state() const
-{
-    Q_D(const SoftwareTriggerButton);
-    return d->state();
-}
-
-void SoftwareTriggerButton::setState(State state)
-{
-    Q_D(SoftwareTriggerButton);
-    d->setState(state);
-}
-
-bool SoftwareTriggerButton::isLive() const
-{
-    Q_D(const SoftwareTriggerButton);
-    return d->isLive();
-}
-
-void SoftwareTriggerButton::setLive(bool value)
-{
-    Q_D(SoftwareTriggerButton);
-    if (d->setLive(value))
-        emit isLiveChanged();
-}
-
 void SoftwareTriggerButton::paint(QPainter* painter,
     const QStyleOptionGraphicsItem* option, QWidget* widget)
 {

@@ -7,7 +7,7 @@
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/uuid.h>
 
-#include "camera_button.h"
+#include "camera_button_data.h"
 
 Q_MOC_INCLUDE("core/resource/resource.h")
 
@@ -32,10 +32,10 @@ public:
     AbstractCameraButtonController(QObject* parent = nullptr);
 
     /** Returns list of the available camera buttons. */
-    virtual CameraButtons buttons() const = 0;
+    virtual CameraButtonDataList buttonsData() const = 0;
 
     /** Returns camera button description with specified identifier. */
-    virtual OptionalCameraButton button(const nx::Uuid& buttonId) const = 0;
+    virtual OptionalCameraButtonData buttonData(const nx::Uuid& buttonId) const = 0;
 
     /**
      * Tries to starts action for the specified button. Returns whether the start command was
@@ -85,8 +85,8 @@ private:
 signals:
     void resourceChanged();
 
-    void buttonAdded(const CameraButton& button);
-    void buttonChanged(const CameraButton& button, CameraButton::Fields fields);
+    void buttonAdded(const CameraButtonData& button);
+    void buttonChanged(const CameraButtonData& button, CameraButtonData::Fields fields);
     void buttonRemoved(const nx::Uuid& buttonId);
 
     /** Emitted when action for the specified button is strated with some result. */

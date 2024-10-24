@@ -21,14 +21,14 @@ namespace {
 using ExtendedCameraOutput = nx::vms::api::ExtendedCameraOutput;
 using ExtendedCameraOutputs = nx::vms::api::ExtendedCameraOutputs;
 
-using ButtonsMap = QMap<ExtendedCameraOutput, CameraButton>;
+using ButtonsMap = QMap<ExtendedCameraOutput, CameraButtonData>;
 using OutputsSet = QSet<ExtendedCameraOutput>;
 using OutputNameToIdMap = QMap<QString, QString>;
 
 const QString kAutoTrackingPortName = QString::fromStdString(
     nx::reflect::toString(nx::vms::api::ExtendedCameraOutput::autoTracking));
 
-CameraButton button(const QString& name, const QString& iconName)
+CameraButtonData button(const QString& name, const QString& iconName)
 {
     static const QString kAdvancedCameraButtonPrefix = "advanced_camera_button";
 
@@ -40,7 +40,7 @@ CameraButton button(const QString& name, const QString& iconName)
     };
 }
 
-static const std::map<ExtendedCameraOutput, CameraButton> supportedOutputTypeToButtons = {
+static const std::map<ExtendedCameraOutput, CameraButtonData> supportedOutputTypeToButtons = {
     {ExtendedCameraOutput::heater,
         button(ExtendedOutputCameraButtonController::tr("Heater"), "heater")},
     {ExtendedCameraOutput::wiper,
@@ -193,7 +193,7 @@ QString ExtendedOutputCameraButtonController::Private::outputId(ExtendedCameraOu
 
 ExtendedOutputCameraButtonController::ExtendedOutputCameraButtonController(
     ExtendedCameraOutputs allowedOutputs,
-    CameraButton::Group buttonGroup,
+    CameraButtonData::Group buttonGroup,
     QObject* parent)
     :
     base_type(buttonGroup, Qn::DeviceInputPermission, parent),
@@ -237,7 +237,7 @@ void ExtendedOutputCameraButtonController::setResourceInternal(const QnResourceP
 }
 
 bool ExtendedOutputCameraButtonController::setButtonActionState(
-    const CameraButton& button,
+    const CameraButtonData& button,
     ActionState state)
 {
     if (state == ActionState::inactive)

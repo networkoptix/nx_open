@@ -120,6 +120,9 @@ public:
     void setSystemAuthenticationCache(const QString& systemId, const std::string& cache);
     std::string systemAuthenticationCache(const QString& systemId);
 
+    Property<bool> muteOnAudioTransmit{this, "muteOnAudioTransmit", true,
+        "Mute audio output while two way audio is engaged."};
+
     void storeRecentConnection(
         const nx::Uuid& localSystemId,
         const QString& systemName,

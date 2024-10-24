@@ -179,7 +179,7 @@ void initializeMetaTypes()
     GlobalTemporaries::registerQmlType();
     analytics::IconManager::registerQmlType();
     AbstractCameraButtonController::registerQmlType();
-    CameraButton::registerQmlType();
+    CameraButtonData::registerQmlType();
     AccessHelper::registerQmlType();
     RowCountWatcher::registerQmlType();
 

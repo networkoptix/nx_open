@@ -4,6 +4,7 @@
 
 #include <cmath>
 
+#include <QtCore/QScopedValueRollback>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QGraphicsDropShadowEffect>
 
@@ -35,8 +36,6 @@ static const qreal kDisabledTriggerOpacity = nx::style::Hints::kDisabledItemOpac
 static constexpr int kBusyIndicatorDelayMs = 150;
 
 /* Geometric adjustments: */
-static const QSize kDefaultButtonSize(40, 40);
-static constexpr qreal kFrameLineWidth = 2.0;
 static constexpr qreal kBusyIndicatorDotRadius = 2.5;
 static constexpr unsigned int kBusyIndicatorDotSpacing = 3;
 
@@ -86,24 +85,25 @@ NX_DECLARE_COLORIZED_ICON(kGoToLiveIcon, "24x24/Solid/go_to_live.svg", kLight1Th
 
 namespace nx::vms::client::desktop {
 
+using State = CameraButton::State;
+
 SoftwareTriggerButtonPrivate::SoftwareTriggerButtonPrivate(SoftwareTriggerButton* main):
     base_type(nullptr),
     q_ptr(main),
     m_toolTip(new QnSliderTooltipWidget(main)),
     m_toolTipHoverProcessor(new HoverFocusProcessor(main))
 {
-    setButtonSize(kDefaultButtonSize);
+    Q_Q(SoftwareTriggerButton);
 
     connect(main, &SoftwareTriggerButton::geometryChanged,
         this, &SoftwareTriggerButtonPrivate::updateToolTipPosition);
 
     connect(main, &SoftwareTriggerButton::pressed, this,
-        [this]() { setState(SoftwareTriggerButton::State::Default); });
+        [q]() { q->setState(State::Default); });
 
     installEventHandler(main, QEvent::PaletteChange, this,
-        [this]()
+        [this, q]()
         {
-            Q_Q(SoftwareTriggerButton);
             m_imagesDirty = true;
             q->update();
         });
@@ -130,6 +130,41 @@ SoftwareTriggerButtonPrivate::SoftwareTriggerButtonPrivate(SoftwareTriggerButton
     m_toolTip->setGraphicsEffect(shadowEffect);
 
     updateToolTipTailEdge();
+
+    connect(q, &CameraButton::iconChanged, this, [this]() { m_imagesDirty = true; });
+
+    const auto updateTooltipVisibilityConnections =
+        [this, q]()
+        {
+            m_imagesDirty = true;
+            if (q->prolonged())
+            {
+                connect(q, &SoftwareTriggerButton::pressed,
+                    this, &SoftwareTriggerButtonPrivate::updateToolTipVisibility);
+                connect(q, &SoftwareTriggerButton::released,
+                    this, &SoftwareTriggerButtonPrivate::updateToolTipVisibility);
+            }
+            else
+            {
+                disconnect(q, &SoftwareTriggerButton::pressed,
+                    this, &SoftwareTriggerButtonPrivate::updateToolTipVisibility);
+                disconnect(q, &SoftwareTriggerButton::released,
+                    this, &SoftwareTriggerButtonPrivate::updateToolTipVisibility);
+            }
+            if (q->scene())
+                updateToolTipVisibility();
+        };
+
+    connect(q, &CameraButton::prolongedChanged, this, updateTooltipVisibilityConnections);
+    updateTooltipVisibilityConnections();
+
+    connect(q, &CameraButton::stateChanged, this, [this]() { updateState(); });
+    connect(q, &CameraButton::isLiveChanged, this,
+        [this, q]()
+        {
+            updateToolTipText();
+            q->update();
+        });
 }
 
 SoftwareTriggerButtonPrivate::~SoftwareTriggerButtonPrivate()
@@ -172,63 +207,6 @@ void SoftwareTriggerButtonPrivate::setToolTipEdge(Qt::Edge edge)
 
     m_toolTipEdge = edge;
     updateToolTipTailEdge();
-}
-
-QSize SoftwareTriggerButtonPrivate::buttonSize() const
-{
-    return m_buttonSize;
-}
-
-void SoftwareTriggerButtonPrivate::setButtonSize(const QSize& size)
-{
-    if (m_buttonSize == size)
-        return;
-
-    m_buttonSize = size;
-    m_imagesDirty = true;
-
-    Q_Q(SoftwareTriggerButton);
-    q->setFixedSize(m_buttonSize);
-}
-
-void SoftwareTriggerButtonPrivate::setIcon(const QString& name)
-{
-    const auto iconName = SoftwareTriggerPixmaps::effectivePixmapName(name);
-    if (m_iconName == iconName)
-        return;
-
-    m_iconName = iconName;
-    m_imagesDirty = true;
-}
-
-bool SoftwareTriggerButtonPrivate::prolonged() const
-{
-    return m_prolonged;
-}
-
-void SoftwareTriggerButtonPrivate::setProlonged(bool value)
-{
-    if (m_prolonged == value)
-        return;
-
-    m_prolonged = value;
-    m_imagesDirty = true;
-
-    Q_Q(SoftwareTriggerButton);
-    if (m_prolonged)
-    {
-        connect(q, &SoftwareTriggerButton::pressed,
-            this, &SoftwareTriggerButtonPrivate::updateToolTipVisibility);
-        connect(q, &SoftwareTriggerButton::released,
-            this, &SoftwareTriggerButtonPrivate::updateToolTipVisibility);
-    }
-    else
-    {
-        disconnect(q, &SoftwareTriggerButton::pressed,
-            this, &SoftwareTriggerButtonPrivate::updateToolTipVisibility);
-        disconnect(q, &SoftwareTriggerButton::released,
-            this, &SoftwareTriggerButtonPrivate::updateToolTipVisibility);
-    }
 }
 
 void SoftwareTriggerButtonPrivate::updateToolTipVisibility()
@@ -282,61 +260,41 @@ void SoftwareTriggerButtonPrivate::updateToolTipPosition()
     }
 }
 
-bool SoftwareTriggerButtonPrivate::isLive() const
+void SoftwareTriggerButtonPrivate::updateState()
 {
-    return m_live;
-}
-
-bool SoftwareTriggerButtonPrivate::setLive(bool value)
-{
-    if (m_live == value)
-        return false;
-
-    m_live = value;
-    updateToolTipText();
-
-    Q_Q(SoftwareTriggerButton);
-    q->update();
-
-    return true;
-}
-
-SoftwareTriggerButton::State SoftwareTriggerButtonPrivate::state() const
-{
-    return m_state;
-}
-
-void SoftwareTriggerButtonPrivate::setState(SoftwareTriggerButton::State state)
-{
-    if (m_state == state)
+    if (m_updatingState)
         return;
 
-    m_state = state;
+    Q_Q(SoftwareTriggerButton);
+
+    const auto state = q->state();
+
+    const QScopedValueRollback updatingStateRollback(m_updatingState, true);
 
     cancelScheduledChange();
     m_busyIndicator.reset(nullptr);
 
-    const auto setNormalState =
-        [this]()
+    const auto setDefaultState =
+        [q]()
         {
-            setState(SoftwareTriggerButton::State::Default);
+            q->setState(State::Default);
         };
 
-    Q_Q(SoftwareTriggerButton);
     q->update();
 
-    switch (m_state)
+    switch (state)
     {
-        case SoftwareTriggerButton::State::Default:
+        case State::Default:
             break;
 
-        case SoftwareTriggerButton::State::Waiting:
+        case State::WaitingForActivation:
+        case State::WaitingForDeactivation:
         {
             if (m_prolonged)
             {
                 /* Immediately reset to normal for released prolonged triggers: */
                 if (!q->isPressed())
-                    m_state = SoftwareTriggerButton::State::Default;
+                    setDefaultState();
 
                 /* Don't show busy indicator for prolonged triggers. */
                 break;
@@ -356,20 +314,20 @@ void SoftwareTriggerButtonPrivate::setState(SoftwareTriggerButton::State state)
             break;
         }
 
-        case SoftwareTriggerButton::State::Success:
+        case State::Activate:
         {
             if (m_prolonged)
             {
                 /* Immediately reset to normal for prolonged triggers: */
-                m_state = SoftwareTriggerButton::State::Default;
+                setDefaultState();
                 break;
             }
 
-            scheduleChange(setNormalState, kNotificationDurationMs);
+            scheduleChange(setDefaultState, kNotificationDurationMs);
             break;
         }
 
-        case SoftwareTriggerButton::State::Failure:
+        case State::Failure:
         {
             if (m_prolonged)
             {
@@ -388,7 +346,7 @@ void SoftwareTriggerButtonPrivate::setState(SoftwareTriggerButton::State state)
                 }
             }
 
-            scheduleChange(setNormalState, kNotificationDurationMs);
+            scheduleChange(setDefaultState, kNotificationDurationMs);
             break;
         }
 
@@ -400,7 +358,7 @@ void SoftwareTriggerButtonPrivate::setState(SoftwareTriggerButton::State state)
     }
 
     /* Restart animation timer for active prolonged trigger: */
-    if (m_prolonged && q->isPressed() && m_state == SoftwareTriggerButton::State::Default)
+    if (m_prolonged && q->isPressed() && state == State::Default)
         m_animationTime.start();
 }
 
@@ -427,6 +385,7 @@ void SoftwareTriggerButtonPrivate::paint(QPainter* painter,
     ensureImages();
 
     Q_Q(SoftwareTriggerButton);
+    const auto state = q->state();
     if (!m_live && (q->isHovered() || q->isPressed()))
     {
         paintPixmapSharp(painter, q->isPressed()
@@ -436,9 +395,9 @@ void SoftwareTriggerButtonPrivate::paint(QPainter* painter,
     }
 
     const auto effectiveState =
-        m_prolonged && q->isPressed() && m_state != SoftwareTriggerButton::State::Failure
-            ? SoftwareTriggerButton::State::Default
-            : m_state;
+        m_prolonged && q->isPressed() && state != State::Failure
+            ? State::Default
+            : state;
 
     const auto currentOpacity =
         [this]() -> qreal
@@ -456,7 +415,7 @@ void SoftwareTriggerButtonPrivate::paint(QPainter* painter,
 
     switch (effectiveState)
     {
-        case SoftwareTriggerButton::State::Default:
+        case State::Default:
         {
             q->SoftwareTriggerButton::base_type::paint(painter, option, widget);
             if (m_prolonged && q->isPressed())
@@ -467,19 +426,20 @@ void SoftwareTriggerButtonPrivate::paint(QPainter* painter,
             break;
         }
 
-        case SoftwareTriggerButton::State::Waiting:
+        case State::WaitingForActivation:
+        case State::WaitingForDeactivation:
         {
             paintPixmapSharp(painter, m_waitingPixmap);
             break;
         }
 
-        case SoftwareTriggerButton::State::Success:
+        case State::Activate:
         {
             paintPixmapSharp(painter, m_successPixmap); //< already with frame
             break;
         }
 
-        case SoftwareTriggerButton::State::Failure:
+        case State::Failure:
         {
             paintPixmapSharp(painter, m_failurePixmap);
             if (m_prolonged && !q->isPressed())
@@ -497,38 +457,6 @@ void SoftwareTriggerButtonPrivate::paint(QPainter* painter,
     }
 }
 
-QPixmap SoftwareTriggerButtonPrivate::generatePixmap(
-    const QColor& background,
-    const QColor& frame,
-    const QPixmap& icon)
-{
-    const auto pixelRatio = qApp->devicePixelRatio();
-
-    QPixmap target(m_buttonSize * pixelRatio);
-    target.setDevicePixelRatio(pixelRatio);
-    target.fill(Qt::transparent);
-
-    QPainter painter(&target);
-    painter.setRenderHint(QPainter::Antialiasing, true);
-    painter.setBrush(background.isValid() ? QBrush(background) : QBrush(Qt::NoBrush));
-    painter.setPen(frame.isValid() ? QPen(frame, kFrameLineWidth) : QPen(Qt::NoPen));
-
-    painter.drawEllipse(frame.isValid()
-        ? nx::vms::client::core::Geometry::eroded(QRectF(buttonRect()), kFrameLineWidth / 2.0)
-        : buttonRect());
-
-    if (!icon.isNull())
-    {
-        const auto pixmapRect = nx::vms::client::core::Geometry::aligned(
-            icon.size() / icon.devicePixelRatio(),
-            buttonRect());
-
-        painter.drawPixmap(pixmapRect, icon);
-    }
-
-    return target;
-}
-
 void SoftwareTriggerButtonPrivate::ensureImages()
 {
     if (!m_imagesDirty)
@@ -538,77 +466,45 @@ void SoftwareTriggerButtonPrivate::ensureImages()
 
     Q_Q(SoftwareTriggerButton);
 
-    if (m_iconName.isEmpty())
-    {
-        q->setIcon(QIcon());
-        return;
-    }
-
-    const auto buttonPixmap = SoftwareTriggerPixmaps::pixmapByName(m_iconName);
-
-    const auto generateStatePixmap =
-        [this, buttonPixmap](const QColor& backgroundColor) -> QPixmap
-        {
-            Q_Q(const SoftwareTriggerButton);
-            return generatePixmap(backgroundColor, QColor(), buttonPixmap);
-        };
-
-    static const QColor kNormalColor = core::colorTheme()->color("@dark1", 128);
-    static const QColor kActiveColor = core::colorTheme()->color("brand", 179);
-    static const QColor kPressedColor = core::colorTheme()->color("brand", 128);
     static const QColor kErrorBackgroundColor = core::colorTheme()->color("red", 128);
     static const QColor kErrorFrameColor = core::colorTheme()->color("red");
 
-    QIcon icon;
-    const auto normalPixmap = generateStatePixmap(kNormalColor);
-    icon.addPixmap(normalPixmap, QIcon::Normal);
-    icon.addPixmap(normalPixmap, QIcon::Disabled);
-    icon.addPixmap(generateStatePixmap(kActiveColor), QIcon::Active);
-    icon.addPixmap(generateStatePixmap(kPressedColor), QnIcon::Pressed);
-
-    q->setIcon(icon);
-
-    m_waitingPixmap = generatePixmap(
-        kPressedColor,
+    m_waitingPixmap = q->generatePixmap(
+        q->pressedColor(),
         QColor(),
         QPixmap());
 
-    m_successPixmap = generatePixmap(
-        kPressedColor,
+    m_successPixmap = q->generatePixmap(
+        q->pressedColor(),
         q->palette().color(QPalette::Text),
         qnSkin->pixmap("24x24/Outline/yes.svg"));
 
-    m_failurePixmap = generatePixmap(
+    m_failurePixmap = q->generatePixmap(
         kErrorBackgroundColor,
         QColor(),
         qnSkin->pixmap("24x24/Outline/no.svg"));
 
-    m_failureFramePixmap = generatePixmap(
+    m_failureFramePixmap = q->generatePixmap(
         QColor(),
         kErrorFrameColor,
         QPixmap());
 
-    m_activityFramePixmap = generatePixmap(
+    m_activityFramePixmap = q->generatePixmap(
         QColor(),
         q->palette().color(QPalette::Text),
         QPixmap());
 
     const auto goToLivePixmap = qnSkin->icon(kGoToLiveIcon).pixmap(24, 24);
 
-    m_goToLivePixmap = generatePixmap(
-        kActiveColor,
+    m_goToLivePixmap = q->generatePixmap(
+        q->activeColor(),
         QColor(),
         goToLivePixmap);
 
-    m_goToLivePixmapPressed = generatePixmap(
-        kPressedColor,
+    m_goToLivePixmapPressed = q->generatePixmap(
+        q->pressedColor(),
         QColor(),
         goToLivePixmap);
-}
-
-QRect SoftwareTriggerButtonPrivate::buttonRect() const
-{
-    return QRect(QPoint(), m_buttonSize);
 }
 
 } // namespace nx::vms::client::desktop

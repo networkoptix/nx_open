@@ -24,7 +24,7 @@ public:
 
     SoftwareTriggerCameraButtonController(
         HintStyle hintStyle,
-        CameraButton::Group buttonGroup,
+        CameraButtonData::Group buttonGroup,
         QObject* parent = nullptr);
     virtual ~SoftwareTriggerCameraButtonController() override;
 
@@ -32,7 +32,7 @@ protected:
     virtual void setResourceInternal(const QnResourcePtr& resource) override;
 
 private:
-    virtual bool setButtonActionState(const CameraButton& button, ActionState state) override;
+    virtual bool setButtonActionState(const CameraButtonData& button, ActionState state) override;
 
 private:
     struct Private;

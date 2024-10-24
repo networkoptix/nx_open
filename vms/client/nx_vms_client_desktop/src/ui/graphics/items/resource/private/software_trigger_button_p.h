@@ -36,22 +36,14 @@ public:
     Qt::Edge toolTipEdge() const;
     void setToolTipEdge(Qt::Edge edge);
 
-    QSize buttonSize() const;
-    void setButtonSize(const QSize& size);
-
     void setIcon(const QString& name);
 
-    bool prolonged() const;
-    void setProlonged(bool value);
-
-    SoftwareTriggerButton::State state() const;
-    void setState(SoftwareTriggerButton::State state);
-
-    bool isLive() const;
-    bool setLive(bool value); // Returns true if value has changed.
+    void updateState();
 
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
         QWidget* widget);
+
+    void updateToolTipText();
 
 private:
     void updateToolTipPosition();
@@ -66,16 +58,9 @@ private:
     void scheduleChange(std::function<void()> callback, int delayMs);
     void cancelScheduledChange();
 
-    QPixmap generatePixmap(const QColor& background, const QColor& frame, const QPixmap& icon);
     void ensureImages();
 
-    void updateToolTipText();
-
-    QRect buttonRect() const;
-
 private:
-    QString m_iconName;
-    QSize m_buttonSize;
     Qt::Edge m_toolTipEdge = Qt::LeftEdge;
     QString m_toolTipText;
     bool m_prolonged = false;
@@ -83,10 +68,10 @@ private:
 
     QnStyledTooltipWidget* const m_toolTip;
     HoverFocusProcessor* const m_toolTipHoverProcessor;
-    SoftwareTriggerButton::State m_state = SoftwareTriggerButton::State::Default;
     QScopedPointer<BusyIndicatorGraphicsWidget> m_busyIndicator;
     QPointer<QTimer> m_scheduledChangeTimer = nullptr;
     bool m_imagesDirty = false;
+    bool m_updatingState = false;
 
     QElapsedTimer m_animationTime;
     QPixmap m_waitingPixmap;

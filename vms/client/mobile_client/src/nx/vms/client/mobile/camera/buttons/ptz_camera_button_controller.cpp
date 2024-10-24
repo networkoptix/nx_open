@@ -14,11 +14,11 @@
 
 namespace nx::vms::client::mobile {
 
-using CameraButton = core::CameraButton;
+using CameraButtonData = core::CameraButtonData;
 
 namespace {
 
-core::OptionalCameraButton buttonFromCamera(
+core::OptionalCameraButtonData buttonFromCamera(
     core::SystemContext* context,
     const QnVirtualCameraResourcePtr& currentCamera)
 {
@@ -41,12 +41,12 @@ core::OptionalCameraButton buttonFromCamera(
     static const auto kPtzButtonId =
         nx::Uuid::fromArbitraryData(std::string_view("ptz_camera_button_id"));
 
-    return CameraButton {
+    return CameraButtonData {
         .id = kPtzButtonId,
         .name = PtzCameraButtonController::tr("Control PTZ"),
         .hint = "",
         .iconName = "qrc:///images/ptz/ptz.png", // Mobile specific, return full path.
-        .type = CameraButton::Type::instant,
+        .type = CameraButtonData::Type::instant,
         .enabled = true};
 }
 
@@ -67,7 +67,7 @@ struct PtzCameraButtonController::Private
         const auto oldButton = q->firstButton();
         const auto newButton = q->hasRequiredPermissions()
             ? buttonFromCamera(q->systemContext(), q->camera())
-            : core::OptionalCameraButton{};
+            : core::OptionalCameraButtonData{};
 
         if (newButton.has_value() == oldButton.has_value())
             return;
@@ -81,7 +81,7 @@ struct PtzCameraButtonController::Private
 };
 
 PtzCameraButtonController::PtzCameraButtonController(
-    CameraButton::Group buttonGroup,
+    CameraButtonData::Group buttonGroup,
     QObject* parent)
     :
     base_type(buttonGroup, Qn::WritePtzPermission, parent),
@@ -120,7 +120,7 @@ void PtzCameraButtonController::setResourceInternal(const QnResourcePtr& resourc
 }
 
 bool PtzCameraButtonController::setButtonActionState(
-    const CameraButton& /*button*/,
+    const CameraButtonData& /*button*/,
     ActionState /*state*/)
 {
     return true;

@@ -11,7 +11,7 @@
 
 namespace nx::vms::client::core {
 
-struct NX_VMS_CLIENT_CORE_API CameraButton
+struct NX_VMS_CLIENT_CORE_API CameraButtonData
 {
     Q_GADGET
     Q_PROPERTY(nx::Uuid id MEMBER id)
@@ -68,10 +68,10 @@ public:
     bool instant() const;
     bool prolonged() const;
     bool checkable() const;
-    Fields difference(const CameraButton& right) const;
+    Fields difference(const CameraButtonData& right) const;
 };
 
-using CameraButtons = std::vector<CameraButton>;
-using OptionalCameraButton = std::optional<CameraButton>;
+using CameraButtonDataList = std::vector<CameraButtonData>;
+using OptionalCameraButtonData = std::optional<CameraButtonData>;
 
 } // namespace nx::vms::client::core

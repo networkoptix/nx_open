@@ -4,11 +4,14 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
+#include <nx/audio/audiodevice.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/resource/screen_recording/desktop_resource.h>
+#include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/two_way_audio/two_way_audio_controller.h>
+#include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/common/intercom/utils.h>
 
 #if defined(Q_OS_ANDROID)
@@ -24,12 +27,13 @@ struct TwoWayAudioCameraButtonController::Private
     TwoWayAudioCameraButtonController * const q;
     std::unique_ptr<TwoWayAudioController> controller;
     nx::utils::ScopedConnections connections;
+    bool unmuteAudioOnStreamingStop = false;
 
     void updateButton();
 
-    bool start(const CameraButton& button);
-    bool stop(const CameraButton& button);
-    void setButtonChecked(CameraButton button, bool checked);
+    bool start(const CameraButtonData& button);
+    bool stop(const CameraButtonData& button);
+    void setButtonChecked(CameraButtonData button, bool checked);
 
     bool ensurePermissions();
 };
@@ -38,7 +42,7 @@ void TwoWayAudioCameraButtonController::Private::updateButton()
 {
     const auto oldButton = q->firstButton();
     const auto newButton =
-        [this]() -> OptionalCameraButton
+        [this]() -> OptionalCameraButtonData
         {
             const auto camera = q->camera();
             if (!camera || camera->flags().testFlag(Qn::cross_system))
@@ -50,12 +54,12 @@ void TwoWayAudioCameraButtonController::Private::updateButton()
             static const auto kTwoWayAudioButtonId =
                 nx::Uuid::fromArbitraryData(std::string_view("two_way_camera_button_id"));
 
-            return CameraButton {
+            return CameraButtonData {
                 .id = kTwoWayAudioButtonId,
                 .name = TwoWayAudioCameraButtonController::tr("Press and hold to speak"),
                 .hint = "",
                 .iconName = "mic",
-                .type = CameraButton::Type::prolonged,
+                .type = CameraButtonData::Type::prolonged,
                 .enabled = true};
         }();
 
@@ -71,7 +75,7 @@ void TwoWayAudioCameraButtonController::Private::updateButton()
         q->removeButton(oldButton->id); //< Remove old button since there is no a new one.
 }
 
-bool TwoWayAudioCameraButtonController::Private::start(const CameraButton& button)
+bool TwoWayAudioCameraButtonController::Private::start(const CameraButtonData& button)
 {
     if (!ensurePermissions())
         return false;
@@ -80,12 +84,23 @@ bool TwoWayAudioCameraButtonController::Private::start(const CameraButton& butto
         [this, button](bool success)
         {
             if (!success)
+            {
                 q->removeActiveAction(button.id);
+                q->safeEmitActionStarted(button.id, /*success*/ false);
+                return;
+            }
 
-            if (success && button.type == CameraButton::Type::checkable)
+            if (appContext()->coreSettings()->muteOnAudioTransmit()
+                && !nx::audio::AudioDevice::instance()->isMute())
+            {
+                unmuteAudioOnStreamingStop = true;
+                nx::audio::AudioDevice::instance()->setMute(true);
+            }
+
+            if (button.type == CameraButtonData::Type::checkable)
                 setButtonChecked(button, /*checked*/ true);
 
-            q->safeEmitActionStarted(button.id, success);
+            q->safeEmitActionStarted(button.id, /*success*/ true);
         });
 
     if (!result)
@@ -95,8 +110,14 @@ bool TwoWayAudioCameraButtonController::Private::start(const CameraButton& butto
     return result;
 }
 
-bool TwoWayAudioCameraButtonController::Private::stop(const CameraButton& button)
+bool TwoWayAudioCameraButtonController::Private::stop(const CameraButtonData& button)
 {
+    if (unmuteAudioOnStreamingStop)
+    {
+        unmuteAudioOnStreamingStop = false;
+        nx::audio::AudioDevice::instance()->setMute(false);
+    }
+
     return controller->stop(
         [this, button](bool success)
         {
@@ -105,7 +126,7 @@ bool TwoWayAudioCameraButtonController::Private::stop(const CameraButton& button
 
             q->removeActiveAction(button.id);
 
-            if (button.type == CameraButton::Type::checkable)
+            if (button.type == CameraButtonData::Type::checkable)
                 setButtonChecked(button, /*checked*/ false);
 
             q->safeEmitActionStopped(button.id, success);
@@ -113,7 +134,7 @@ bool TwoWayAudioCameraButtonController::Private::stop(const CameraButton& button
 }
 
 void TwoWayAudioCameraButtonController::Private::setButtonChecked(
-    CameraButton button,
+    CameraButtonData button,
     bool checked)
 {
     button.checked = checked;
@@ -143,7 +164,7 @@ bool TwoWayAudioCameraButtonController::Private::ensurePermissions()
 //-------------------------------------------------------------------------------------------------
 
 TwoWayAudioCameraButtonController::TwoWayAudioCameraButtonController(
-    CameraButton::Group buttonGroup,
+    CameraButtonData::Group buttonGroup,
     QObject* parent)
     :
     base_type(buttonGroup, Qn::TwoWayAudioPermission, parent),
@@ -195,7 +216,7 @@ void TwoWayAudioCameraButtonController::setResourceInternal(const QnResourcePtr&
             if (d->controller->started())
                 return;
 
-            const auto currentButtons = buttons();
+            const auto currentButtons = buttonsData();
             if (!currentButtons.empty())
                 d->setButtonChecked(currentButtons.front(), /*checked*/ false);
         });
@@ -214,13 +235,13 @@ void TwoWayAudioCameraButtonController::setResourceInternal(const QnResourcePtr&
 }
 
 bool TwoWayAudioCameraButtonController::setButtonActionState(
-    const CameraButton& button,
+    const CameraButtonData& button,
     ActionState state)
 {
-    if (!NX_ASSERT(d->controller->available()))
+    if (!NX_ASSERT(d->controller->available() || state == ActionState::inactive))
         return false;
 
-    if (!NX_ASSERT(button.type != CameraButton::Type::instant,
+    if (!NX_ASSERT(button.type != CameraButtonData::Type::instant,
         "Two way audio is not supposed to be instant action"))
     {
         return false;

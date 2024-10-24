@@ -1,33 +1,33 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "camera_button.h"
+#include "camera_button_data.h"
 
 #include <QtQml/QtQml>
 
 namespace nx::vms::client::core {
 
-void CameraButton::registerQmlType()
+void CameraButtonData::registerQmlType()
 {
-    qmlRegisterUncreatableType<CameraButton>("nx.vms.client.core", 1, 0, "CameraButton",
+    qmlRegisterUncreatableType<CameraButtonData>("nx.vms.client.core", 1, 0, "CameraButton",
         "Can't create CameraButton ");
 }
 
-bool CameraButton::instant() const
+bool CameraButtonData::instant() const
 {
     return type == Type::instant;
 }
 
-bool CameraButton::prolonged() const
+bool CameraButtonData::prolonged() const
 {
     return type == Type::prolonged;
 }
 
-bool CameraButton::checkable() const
+bool CameraButtonData::checkable() const
 {
     return type == Type::checkable;
 }
 
-CameraButton::Fields CameraButton::difference(const CameraButton& right) const
+CameraButtonData::Fields CameraButtonData::difference(const CameraButtonData& right) const
 {
     Fields result = Field::empty;
 
