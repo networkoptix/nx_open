@@ -242,7 +242,7 @@ ModalDialog
 
                 anchors.top: linePreview.bottom
                 anchors.topMargin: 4
-                anchors.bottom: parent.bottom
+                height: 300
                 width: parent.width
                 model: importModel
 
@@ -250,8 +250,11 @@ ModalDialog
 
             DialogButtonBox
             {
+                anchors.top: tableView.bottom
+                anchors.topMargin: 4
                 x: -dialog.leftPadding
                 width: dialog.width
+                height: 60
 
                 Button
                 {
