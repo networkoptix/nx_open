@@ -1156,53 +1156,6 @@ void QnWorkbenchNavigator::fastForward()
     emit positionChanged();
 }
 
-void QnWorkbenchNavigator::rewindOnDoubleClick()
-{
-    if (!m_currentMediaWidget)
-        return;
-
-    const auto reader = m_currentMediaWidget->display()->archiveReader();
-    if (!reader)
-        return;
-
-    m_pausedOverride = false;
-
-    // Default value should never be used, adding just in case of black magic.
-    qint64 pos = DATETIME_NOW;
-    if (!(m_currentWidgetFlags & WidgetSupportsPeriods))
-    {
-        pos = reader->endTime();
-    }
-    else if (auto loader = loaderByWidget(m_currentMediaWidget))
-    {
-        QnTimePeriodList periods = loader->periods(Qn::RecordingContent);
-        periods = QnTimePeriodList::aggregateTimePeriods(periods, MAX_FRAME_DURATION_MS);
-
-        // We want to jump relatively to current reader position.
-        const auto currentTimeMs = std::chrono::duration_cast<std::chrono::milliseconds>(
-            m_timeSlider->sliderTimePosition());
-        auto curPeriod = periods.findNearestPeriod(currentTimeMs.count(), false);
-        if (curPeriod == periods.end())
-            return; //< Reader currently in some invalid state.
-
-        auto delta = currentTimeMs - curPeriod->startTime();
-        if (delta >= 1s || curPeriod == periods.begin())
-        {
-            pos = curPeriod->startTimeMs * 1000; //< Transform to microseconds
-        }
-        else
-        {
-            const auto prevPeriod = std::prev(curPeriod);
-            auto posMs = std::max(prevPeriod->startTime(), prevPeriod->endTime() - kShiftStepMs);
-            pos = posMs.count() * 1000;
-        }
-    }
-
-    reader->directJumpToNonKeyFrame(pos);
-    updateSliderFromReader();
-    emit positionChanged();
-}
-
 void QnWorkbenchNavigator::rewind(bool canJumpToPrevious)
 {
     if (!m_currentMediaWidget)
