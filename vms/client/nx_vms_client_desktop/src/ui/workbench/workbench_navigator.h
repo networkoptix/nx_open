@@ -142,7 +142,6 @@ public:
 
     void fastForward();
     void rewind(bool canJumpToPrevious = false);
-    void rewindOnDoubleClick();
 
     virtual nx::vms::client::desktop::ui::action::ActionScope currentScope() const override;
     virtual nx::vms::client::desktop::ui::action::Parameters currentParameters(

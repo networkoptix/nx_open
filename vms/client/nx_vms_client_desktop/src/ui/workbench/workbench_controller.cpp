@@ -967,12 +967,7 @@ void QnWorkbenchController::at_scene_keyReleased(QGraphicsScene* /*scene*/, QEve
             {
                 m_rewindTimer->stop();
                 m_rewindShortPressTimer->stop();
-                if (m_rewindDirection == ShiftDirection::rewind)
-                {
-                    menu()->trigger(action::RewindAction);
-                    navigator()->rewindOnDoubleClick();
-                    return true;
-                }
+                return m_rewindDirection == ShiftDirection::rewind;
             }
             return false;
         };
@@ -982,7 +977,6 @@ void QnWorkbenchController::at_scene_keyReleased(QGraphicsScene* /*scene*/, QEve
         {
             m_rewindTimer->stop();
             m_rewindShortPressTimer->stop();
-            if (!doubleClick())
             {
                 // Single click.
                 if (m_rewindDirection == ShiftDirection::fastForward)
@@ -997,6 +991,7 @@ void QnWorkbenchController::at_scene_keyReleased(QGraphicsScene* /*scene*/, QEve
                 {
                     menu()->trigger(action::RewindAction);
                     navigator()->rewind();
+                    navigator()->rewind(/*canJumpToPrevious*/ doubleClick());
                 }
             }
             m_rewindDirection = ShiftDirection::noShift;
