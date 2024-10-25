@@ -55,7 +55,7 @@
     <name>RemoteConnectionErrorStrings</name>
     <message>
       <source>Client version: %1</source>
-      <translation>클라이언트 버전: %1</translation>
+      <translation>클라이언트 버전: %</translation>
     </message>
     <message>
       <source>Server version: %1.</source>
@@ -79,7 +79,7 @@
     </message>
     <message>
       <source>The server&amp;apos;s certificate was rejected.</source>
-      <translation>서버&amp;apos;의 인증서가 거부되었습니다.</translation>
+      <translation>서버의 인증서가 거부되었습니다.</translation>
     </message>
     <message>
       <source>Restore the connection to %1 and try again</source>
