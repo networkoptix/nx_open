@@ -13,11 +13,15 @@ using namespace nx::vms::api;
 
 namespace nx::core::access {
 
-ResourceAccessMap kFullResourceAccessMap{
-    {kAllDevicesGroupId, kFullAccessRights},
-    {kAllWebPagesGroupId, kViewAccessRights},
-    {kAllServersGroupId, kViewAccessRights},
-    {kAllVideoWallsGroupId, AccessRight::edit}};
+const ResourceAccessMap& fullResourceAccessMap()
+{
+    static const ResourceAccessMap kResult{
+        {kAllDevicesGroupId, kFullAccessRights},
+        {kAllWebPagesGroupId, kViewAccessRights},
+        {kAllServersGroupId, kViewAccessRights},
+        {kAllVideoWallsGroupId, AccessRight::edit}};
+    return kResult;
+}
 
 ResourceAccessMap& operator+=(ResourceAccessMap& destination, const ResourceAccessMap& source)
 {

@@ -62,7 +62,7 @@ TEST_F(AbstractResourceAccessResolverTest, notApplicableResourceAccess)
 
 TEST_F(AbstractResourceAccessResolverTest, notResourceAccessOutOfPool)
 {
-    testAccessMap = kFullResourceAccessMap;
+    testAccessMap = fullResourceAccessMap();
 
     const auto camera = createCamera();
     ASSERT_EQ(accessRights({}, camera), AccessRights());
