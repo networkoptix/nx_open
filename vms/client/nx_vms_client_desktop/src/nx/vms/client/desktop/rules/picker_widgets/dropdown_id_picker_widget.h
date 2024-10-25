@@ -292,6 +292,9 @@ protected:
 
         m_comboBox->setSelectedMainObjectTypeId(m_field->value());
         m_comboBox->setPlaceholderText(m_comboBox->count() == 0 ? "" : Strings::selectString());
+        m_comboBox->setEnabled(m_comboBox->count() != 0);
+        if (!m_field->value().isEmpty() && m_comboBox->currentIndex() == -1)
+            m_field->setValue({});
     }
 };
 
