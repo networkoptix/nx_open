@@ -71,7 +71,7 @@ class NxOpenConan(ConanFile):
         "onlyUnrevisionedPackages": False,
     }
 
-    ffmpeg_version_and_revision = "4.4#4c7f0faf1d4c81bbd06e5ec02d05c89d"
+    ffmpeg_version_and_revision = "4.4#d8df468b71bfcc8921be0d606a9e0a78"
 
     def configure(self):
         # The open-source Customization Package coming from Conan has the name "opensource-meta",
