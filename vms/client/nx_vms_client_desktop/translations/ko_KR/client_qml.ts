@@ -586,7 +586,7 @@
     </message>
     <message>
       <source>Fisheye</source>
-      <translation>Fisheye</translation>
+      <translation>어안카메라</translation>
     </message>
     <message>
       <source>360° Equirectangular</source>
@@ -779,15 +779,15 @@
     </message>
     <message>
       <source>Equidistant</source>
-      <translation>Equidistant</translation>
+      <translation>등거리</translation>
     </message>
     <message>
       <source>Stereographic</source>
-      <translation>Stereographic</translation>
+      <translation>입체사진</translation>
     </message>
     <message>
       <source>Equisolid</source>
-      <translation>Equisolid</translation>
+      <translation>이퀴솔리드</translation>
     </message>
     <message>
       <source>Size</source>
@@ -1024,7 +1024,7 @@
     <name>InformationBubble</name>
     <message>
       <source>Detected by</source>
-      <translation>에 의해 감지됨</translation>
+      <translation>감지됨</translation>
     </message>
   </context>
   <context>
@@ -1712,8 +1712,7 @@
     <message>
       <source>Drag over any part of the video
 to activate PTZ</source>
-      <translation>PTZ를 활성화하려면 비디오
-내 아무 영역을 드래그하십시오.</translation>
+      <translation>PTZ를 활성화하려면 비디오내 아무 영역을 드래그하십시오.</translation>
     </message>
     <message>
       <source>Go to Local Settings to enable a drag marker over the center of the video</source>
