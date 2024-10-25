@@ -48,7 +48,7 @@ struct SystemSettingNames
     DECLARE_SETTING_NAME(cloudAccountName);
     DECLARE_SETTING_NAME(cloudAuthKey);
     DECLARE_SETTING_NAME(cloudHost);
-    DECLARE_SETTING_NAME(cloudNotificationsLanguage);
+    DECLARE_SETTING_NAME(defaultUserLocale);
     DECLARE_SETTING_NAME(cloudPollingIntervalS);
     DECLARE_SETTING_NAME(cloudSystemID); //< TODO: rename it to cloudSystemId
     DECLARE_SETTING_NAME(disabledVendors);
@@ -481,8 +481,8 @@ public:
 
     nx::utils::Url resourceFileUri() const;
 
-    QString cloudNotificationsLanguage() const;
-    void setCloudNotificationsLanguage(const QString& value);
+    QString defaultUserLocale() const;
+    void setDefaultUserLocale(const QString& value);
 
     QString additionalLocalFsTypes() const;
 
@@ -590,7 +590,7 @@ signals:
     void remoteSessionUpdateChanged();
     void useStorageEncryptionChanged();
     void currentStorageEncryptionKeyChanged();
-    void cloudNotificationsLanguageChanged();
+    void defaultUserLocaleChanged();
     void showServersInTreeForNonAdminsChanged();
     void backupSettingsChanged();
     void showMouseTimelinePreviewChanged();

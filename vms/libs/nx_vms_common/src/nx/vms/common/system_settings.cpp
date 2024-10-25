@@ -191,7 +191,7 @@ struct SystemSettings::Private
     QnResourcePropertyAdaptor<std::map<QString, int>>* specificFeaturesAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* licenseServerAdaptor = nullptr;
     QnResourcePropertyAdaptor<nx::utils::Url>* resourceFileUriAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString>* cloudNotificationsLanguageAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString>* defaultUserLocaleAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* additionalLocalFsTypesAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* keepIoPortStateIntactOnInitializationAdaptor= nullptr;
     QnResourcePropertyAdaptor<int>* mediaBufferSizeKbAdaptor = nullptr;
@@ -831,9 +831,9 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         Names::specificFeatures, std::map<QString, int>{}, this,
         [] { return tr("VMS Server version specific features"); });
 
-    d->cloudNotificationsLanguageAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
-        Names::cloudNotificationsLanguage, "", this,
-        [] { return tr("Language for Cloud notifications"); });
+    d->defaultUserLocaleAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
+        Names::defaultUserLocale, "", this,
+        [] { return tr("Default locale for new users"); });
 
     d->additionalLocalFsTypesAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
         "additionalLocalFsTypes", "", this,
@@ -1211,10 +1211,10 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         Qt::QueuedConnection);
 
     connect(
-        d->cloudNotificationsLanguageAdaptor,
+        d->defaultUserLocaleAdaptor,
         &QnAbstractResourcePropertyAdaptor::valueChanged,
         this,
-        &SystemSettings::cloudNotificationsLanguageChanged,
+        &SystemSettings::defaultUserLocaleChanged,
         Qt::QueuedConnection);
 
     connect(
@@ -1329,7 +1329,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         << d->targetPersistentUpdateStorageAdaptor
         << d->installedPersistentUpdateStorageAdaptor
         << d->specificFeaturesAdaptor
-        << d->cloudNotificationsLanguageAdaptor
+        << d->defaultUserLocaleAdaptor
         << d->additionalLocalFsTypesAdaptor
         << d->keepIoPortStateIntactOnInitializationAdaptor
         << d->mediaBufferSizeKbAdaptor
@@ -2277,14 +2277,14 @@ nx::utils::Url SystemSettings::resourceFileUri() const
     return d->resourceFileUriAdaptor->value();
 }
 
-QString SystemSettings::cloudNotificationsLanguage() const
+QString SystemSettings::defaultUserLocale() const
 {
-    return d->cloudNotificationsLanguageAdaptor->value();
+    return d->defaultUserLocaleAdaptor->value();
 }
 
-void SystemSettings::setCloudNotificationsLanguage(const QString& value)
+void SystemSettings::setDefaultUserLocale(const QString& value)
 {
-    d->cloudNotificationsLanguageAdaptor->setValue(value);
+    d->defaultUserLocaleAdaptor->setValue(value);
 }
 
 bool SystemSettings::keepIoPortStateIntactOnInitialization() const

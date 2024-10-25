@@ -31,7 +31,7 @@ struct SaveableSettingsBase
     std::optional<bool> autoDiscoveryEnabled;
     std::optional<bool> cameraSettingsOptimization;
     std::optional<bool> statisticsAllowed;
-    std::optional<QString> cloudNotificationsLanguage;
+    std::optional<QString> defaultUserLocale;
 
     std::optional<bool> auditTrailEnabled;
     std::optional<bool> trafficEncryptionForced;
@@ -130,7 +130,7 @@ struct SaveableSettingsBase
     (defaultExportVideoCodec) \
     (watermarkSettings)(pixelationSettings)(webSocketEnabled) \
     (autoDiscoveryEnabled)(cameraSettingsOptimization)(statisticsAllowed) \
-    (cloudNotificationsLanguage)(auditTrailEnabled)(trafficEncryptionForced) \
+    (defaultUserLocale)(auditTrailEnabled)(trafficEncryptionForced) \
     (useHttpsOnlyForCameras)(videoTrafficEncryptionForced) \
     (storageEncryption)(showServersInTreeForNonAdmins)(updateNotificationsEnabled)(emailSettings) \
     (timeSynchronizationEnabled)(primaryTimeServer)(customReleaseListUrl)(clientUpdateSettings) \

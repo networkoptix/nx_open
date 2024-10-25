@@ -77,7 +77,7 @@ const SaveableSettingsBase kDefaultSettingsBase{
     .autoDiscoveryEnabled = true,
     .cameraSettingsOptimization = true,
     .statisticsAllowed = true,
-    .cloudNotificationsLanguage = QString{},
+    .defaultUserLocale = QString{},
 
     .auditTrailEnabled = true,
     .trafficEncryptionForced = true,

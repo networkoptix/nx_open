@@ -66,7 +66,7 @@ QnSystemSettingsWidget::QnSystemSettingsWidget(
        &QnSystemSettingsWidget::loadDataToUi);
     connect(systemSettings(), &SystemSettings::cloudSettingsChanged, this,
         &QnSystemSettingsWidget::loadDataToUi);
-    connect(systemSettings(), &SystemSettings::cloudNotificationsLanguageChanged, this,
+    connect(systemSettings(), &SystemSettings::defaultUserLocaleChanged, this,
         &QnSystemSettingsWidget::loadDataToUi);
 
     retranslateUi();
