@@ -62,7 +62,8 @@ public:
     Q_INVOKABLE PreviewBuildResult buildTablePreview(LookupListImportEntriesModel* model,
         const QString& filePath,
         const QString& separator,
-        bool hasHeader);
+        bool hasHeader,
+        bool resetPreviewHeader);
 
     void setRowsNumber(int rowsNumber);
     void setSeparator(const QString& separator);
