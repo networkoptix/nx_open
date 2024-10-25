@@ -1075,7 +1075,7 @@
     </message>
     <message>
       <source>Plugin: %1</source>
-      <translation>플러그인 : %1</translation>
+      <translation>플러그인: %1</translation>
     </message>
     <message>
       <source>Caption: %1</source>
