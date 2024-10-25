@@ -327,18 +327,21 @@ ModalDialog
             }
         }
 
-        function initImportModel()
+        function initImportModel(resetHeader)
         {
             // Had to explicitly check this property, since it can be uninitialized when Dialog is created.
             if (importModel.lookupListEntriesModel)
-                processPreviewBuildExitCode(buildTablePreview(importModel, filePath, separator, dataHasHeaderRow))
+            {
+                processPreviewBuildExitCode(buildTablePreview(importModel, filePath,
+                    separator, dataHasHeaderRow, resetHeader))
+            }
         }
 
         rowsNumber: 10
 
-        onSeparatorChanged: initImportModel()
-        onFilePathChanged: initImportModel()
-        onDataHasHeaderRowChanged: initImportModel()
+        onSeparatorChanged: initImportModel(true)
+        onFilePathChanged: initImportModel(true)
+        onDataHasHeaderRowChanged: initImportModel(false)
     }
 
     ProgressDialog

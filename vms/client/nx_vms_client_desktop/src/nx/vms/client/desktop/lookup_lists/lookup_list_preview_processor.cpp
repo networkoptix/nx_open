@@ -78,7 +78,8 @@ LookupListPreviewProcessor::PreviewBuildResult LookupListPreviewProcessor::build
     LookupListImportEntriesModel* model,
     const QString& filePath,
     const QString& separator,
-    bool hasHeader)
+    bool hasHeader,
+    bool resetPreviewHeader)
 {
     if (!NX_ASSERT(model))
         return InternalError;
@@ -126,7 +127,7 @@ LookupListPreviewProcessor::PreviewBuildResult LookupListPreviewProcessor::build
     if (newData.empty())
         return EmptyFileError;
 
-    model->setRawData(newData);
+    model->setRawData(newData, resetPreviewHeader);
     return Success;
 }
 

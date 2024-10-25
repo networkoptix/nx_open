@@ -230,15 +230,14 @@ QVariant LookupListImportEntriesModel::data(const QModelIndex& index, int role) 
     return d->previewData[index.row()][index.column()];
 }
 
-void LookupListImportEntriesModel::setRawData(const PreviewRawData& rawData)
+void LookupListImportEntriesModel::setRawData(const PreviewRawData& rawData, bool resetHeader)
 {
     if (!NX_ASSERT(d->listEntriesModel))
         return;
 
     beginResetModel();
 
-    // Initialize column headers only if they have not been initialized yet.
-    if (d->columnHeaders.empty())
+    if (resetHeader)
         d->initDefaultColumnHeaders(d->listEntriesModel->listModel()->rawData().attributeNames);
 
     d->previewData = rawData;

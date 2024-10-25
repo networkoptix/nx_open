@@ -235,13 +235,13 @@ protected:
     }
 
     void whenBuildTablePreview(LookupListPreviewProcessor::PreviewBuildResult code =
-        LookupListPreviewProcessor::PreviewBuildResult::Success)
+        LookupListPreviewProcessor::PreviewBuildResult::Success, bool resetHeader = true)
     {
         whenExportModelToFile();
 
         LookupListPreviewProcessor previewProcessor;
         const auto buildTablePreviewResult = previewProcessor.buildTablePreview(
-            m_importModel.get(), m_exportTestFile.fileName(), ",", true);
+            m_importModel.get(), m_exportTestFile.fileName(), ",", true, resetHeader);
         ASSERT_EQ(buildTablePreviewResult, code);
         m_exportTestFile.remove();
     }
@@ -261,6 +261,27 @@ protected:
     void whenSortingByColumn(int column, Qt::SortOrder order)
     {
         m_entriesProxyModel->sort(column, order);
+    }
+
+    void whenSetAttributesPosition(const std::vector<QString>& selectedChoice)
+    {
+        for (int i = 0; i < selectedChoice.size(); ++i)
+            m_importModel->headerIndexChanged(i, selectedChoice[i]);
+    }
+
+    void thenBuildPreviewHeaderEqualTo(const std::vector<QString>& selectedNames)
+    {
+        const auto attributeMapping = m_importModel->columnIndexToAttribute();
+
+        ASSERT_EQ(m_entriesModel->columnCount(), selectedNames.size());
+        for (int i = 0; i < selectedNames.size(); ++i)
+        {
+            EXPECT_EQ(selectedNames[i], attributeMapping[i])
+                << "Expect to have: " << selectedNames[i].toStdString() << " on position: " << i;
+            auto headerData = m_importModel->headerData(i, Qt::Horizontal).value<QList<QString>>();
+            EXPECT_FALSE(headerData.empty());
+            EXPECT_EQ(selectedNames[i], headerData.front());
+        }
     }
 
     void thenListEntriesHasAttributes(const QList<QString>& attributesNames)
@@ -1059,6 +1080,54 @@ TEST_F(LookupListTests, sorting_of_string_values)
     whenSortingByColumn(0, Qt::DescendingOrder);
     thenEmptyValuesAreAtTheBegining(0);
     thenValuesAreOrdered<QString>(Qt::DescendingOrder, 0);
+}
+
+TEST_F(LookupListTests, check_column_header_after_revert_import)
+{
+    const auto data = bigColumnNumberExampleData();
+    givenLookupListEntriesModel(data);
+    givenImportModel(data);
+
+    whenBuildTablePreview();
+    // The default selected choice is the same as attributeNames.
+    thenBuildPreviewHeaderEqualTo(data.attributeNames);
+
+    auto newSelectedChoice = data.attributeNames;
+    std::reverse(newSelectedChoice.begin(), newSelectedChoice.end());
+
+    whenSetAttributesPosition(newSelectedChoice);
+    thenBuildPreviewHeaderEqualTo(newSelectedChoice);
+
+    std::vector<QVariantMap> entriesToAdd;
+    std::map<QString, QString> incorrectToCorrect;
+    givenRowsWithAllCorrectValuesExceptOne(
+            entriesToAdd, incorrectToCorrect, "Color", 5);
+
+    // Import with incorrect values.
+    whenAddEntriesByImportModel(entriesToAdd);
+    thenFixUpIsRequired();
+
+    whenRevertImport();
+    thenBuildPreviewHeaderEqualTo(newSelectedChoice);
+}
+
+TEST_F(LookupListTests, check_column_header_without_reset)
+{
+    const auto data = bigColumnNumberExampleData();
+    givenLookupListEntriesModel(data);
+    givenImportModel(data);
+
+    whenBuildTablePreview();
+    thenBuildPreviewHeaderEqualTo(data.attributeNames);
+
+    auto newSelectedChoice = data.attributeNames;
+    std::reverse(newSelectedChoice.begin(), newSelectedChoice.end());
+
+    whenSetAttributesPosition(newSelectedChoice);
+    thenBuildPreviewHeaderEqualTo(newSelectedChoice);
+
+    whenBuildTablePreview(LookupListPreviewProcessor::Success, false);
+    thenBuildPreviewHeaderEqualTo(newSelectedChoice);
 }
 
 } // namespace nx::vms::client::desktop
