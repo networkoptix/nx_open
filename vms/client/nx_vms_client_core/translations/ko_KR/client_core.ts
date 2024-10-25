@@ -47,7 +47,7 @@
     <name>RemoteConnectionErrorStrings</name>
     <message>
       <source>Client version: %1</source>
-      <translation>클라이언트 버전: %1</translation>
+      <translation>클라이언트 버전: %</translation>
     </message>
     <message>
       <source>Server version: %1.</source>
