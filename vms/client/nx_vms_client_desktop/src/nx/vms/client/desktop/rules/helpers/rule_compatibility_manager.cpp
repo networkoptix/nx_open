@@ -12,6 +12,7 @@
 #include <nx/vms/rules/actions/show_notification_action.h>
 #include <nx/vms/rules/engine.h>
 #include <nx/vms/rules/event_filter.h>
+#include <nx/vms/rules/event_filter_fields/source_camera_field.h>
 #include <nx/vms/rules/event_filter_fields/state_field.h>
 #include <nx/vms/rules/rule.h>
 #include <nx/vms/rules/utils/common.h>
@@ -259,7 +260,18 @@ void RuleCompatibilityManager::onAnalyticsEventTypeChanged()
 void RuleCompatibilityManager::replaceEventFilter(
     std::unique_ptr<vms::rules::EventFilter>&& eventFilter)
 {
-    m_rule->takeEventFilter(0);
+    auto oldEventFilter = m_rule->takeEventFilter(0);
+    if (auto oldSourceCameraField = oldEventFilter->fieldByType<vms::rules::SourceCameraField>())
+        m_lastEventCamerasSelection = oldSourceCameraField->ids();
+
+    auto newSourceCameraField = eventFilter->fieldByType<vms::rules::SourceCameraField>();
+    if (newSourceCameraField && m_lastEventCamerasSelection)
+    {
+        newSourceCameraField->setIds(m_lastEventCamerasSelection.value());
+        if (!m_lastEventCamerasSelection.value().isEmpty())
+            newSourceCameraField->setAcceptAll(false);
+    }
+
     m_rule->addEventFilter(std::move(eventFilter));
 
     connect(
@@ -272,7 +284,27 @@ void RuleCompatibilityManager::replaceEventFilter(
 void RuleCompatibilityManager::replaceActionBuilder(
     std::unique_ptr<vms::rules::ActionBuilder>&& actionBuilder)
 {
-    m_rule->takeActionBuilder(0);
+    auto oldActionBuilder = m_rule->takeActionBuilder(0);
+
+    if (auto targetDeviceField = oldActionBuilder->fieldByType<vms::rules::TargetDeviceField>())
+        m_lastActionCamerasSelection = {targetDeviceField->id()};
+    else if (auto targetDevicesField = oldActionBuilder->fieldByType<vms::rules::TargetDevicesField>())
+        m_lastActionCamerasSelection = targetDevicesField->ids();
+
+    if (m_lastActionCamerasSelection)
+    {
+        if (auto targetDeviceField = actionBuilder->fieldByType<vms::rules::TargetDeviceField>())
+        {
+            targetDeviceField->setId(m_lastActionCamerasSelection->empty()
+                ? nx::Uuid{}
+                : *m_lastActionCamerasSelection->begin());
+        }
+        else if (auto targetDevicesField = actionBuilder->fieldByType<vms::rules::TargetDevicesField>())
+        {
+            targetDevicesField->setIds(m_lastActionCamerasSelection.value());
+        }
+    }
+
     m_rule->addActionBuilder(std::move(actionBuilder));
 
     connect(

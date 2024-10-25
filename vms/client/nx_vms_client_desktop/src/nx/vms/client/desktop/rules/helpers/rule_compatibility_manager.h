@@ -25,6 +25,9 @@ private:
     vms::rules::Rule* m_rule{};
     vms::rules::Engine* m_engine{};
 
+    std::optional<UuidSet> m_lastEventCamerasSelection;
+    std::optional<UuidSet> m_lastActionCamerasSelection;
+
     void onEventFilterFieldChanged(const QString& fieldName);
     void onActionBuilderFieldChanged(const QString& fieldName);
 
