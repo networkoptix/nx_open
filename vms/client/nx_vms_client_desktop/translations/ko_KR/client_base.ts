@@ -1247,7 +1247,7 @@
     </message>
     <message>
       <source>To report the issue please contact %1.</source>
-      <translation>문제를보고하려면 %1에 연락하십시오.</translation>
+      <translation>문제를 보고하려면 %1에 연락하십시오.</translation>
     </message>
     <message>
       <source>Failed to activate license</source>
@@ -1929,7 +1929,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation>전택영역 파일로 저장...</translation>
+      <translation>선택영역 파일로 저장..</translation>
     </message>
     <message>
       <source>Select All</source>
@@ -2645,7 +2645,7 @@ License Key: %2</source>
     <message numerus="yes">
       <source>%1 have no input ports</source>
       <translation>
-        <numerusform>%1 입력 포트가 없음%n</numerusform>
+        <numerusform>%1 입력 포트가 없음</numerusform>
       </translation>
     </message>
   </context>
@@ -3702,7 +3702,7 @@ to %1</source>
     <message>
       <source>Impulse</source>
       <comment>IO Output Port Action</comment>
-      <translation>Impulse</translation>
+      <translation>충동</translation>
     </message>
     <message>
       <source>ID</source>
@@ -5245,7 +5245,7 @@ to %1</source>
     </message>
     <message>
       <source>You can cancel this operation at any moment without data loss.</source>
-      <translation>데이터 손실 없이 어느 순간에이 작업을 취소할 수 있습니다.</translation>
+      <translation>언제든지 데이터 손실 없이 이 작업을 취소할 수 있습니다.</translation>
     </message>
     <message>
       <source>Continue anyway?</source>
@@ -5397,11 +5397,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Reindexing Backup...</source>
-      <translation>인덱스 재구성 백업</translation>
+      <translation>백업을 다시 인덱싱하는 중...</translation>
     </message>
     <message>
       <source>Reindexing Archive...</source>
-      <translation>인덱스 재구성 백업</translation>
+      <translation>백업을 다시 색인하는 중...</translation>
     </message>
   </context>
   <context>
@@ -5412,7 +5412,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Network Shared Resource</source>
-      <translation>윈도우 네트워크 공유 리스소</translation>
+      <translation>윈도우 네트워크 공유 리소스</translation>
     </message>
     <message>
       <source>Invalid credentials for external storage</source>
@@ -6534,7 +6534,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</source>
-      <translation>You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</translation>
+      <translation>비디오 월에서만 액세스할 수 있는 일부 리소스를 삭제하려고 합니다. 삭제 후에는 리소스 목록에서 볼 수 없으며 비디오 월에 다시 추가할 수 없습니다.</translation>
     </message>
     <message>
       <source>You will lose access to following resources:</source>
@@ -6590,7 +6590,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>They may be auto-discovered again after removing.</source>
-      <translation>제거 후 다시 자동 발견 있을 수 있습니다</translation>
+      <translation>제거한 후 다시 자동으로 검색될 수 있습니다.</translation>
     </message>
     <message>
       <source>Overwrite existing showreel?</source>
@@ -8692,7 +8692,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Servers from the other System will appear in the resource tree.</source>
-      <translation>다른 시스템의 서바가 서버 리소스 트리에 곧 표시 됩니다.</translation>
+      <translation>다른 시스템의 서버는 리소스 트리에 나타납니다.</translation>
     </message>
     <message>
       <source>Connecting to the current System...</source>
@@ -8715,7 +8715,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::IndirectAccessDecoratorModel</name>
     <message>
       <source>Access granted by:</source>
-      <translation>에 의해 부여 된 액세스:</translation>
+      <translation>접근 허가자:</translation>
     </message>
     <message numerus="yes">
       <source>and %n more</source>
@@ -9277,7 +9277,7 @@ You can force it, but it may significantly increase CPU load.</source>
     <message>
       <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation>Incompatible %1 instance. To update disconnect System from %1 first.</translation>
+      <translation>호환되지 않는 %1 인스턴스입니다. 업데이트하려면 먼저 %1 에서 시스템을 분리하세요.</translation>
     </message>
     <message>
       <source>No update package available</source>

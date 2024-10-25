@@ -1232,7 +1232,7 @@
     <name>ExecPtzPresetBusinessActionWidget</name>
     <message>
       <source>PTZ preset:</source>
-      <translation>&amp;PTZ 프리셋</translation>
+      <translation>PTZ 프리셋:</translation>
     </message>
   </context>
   <context>
@@ -2907,7 +2907,7 @@
     </message>
     <message>
       <source>Force Alarm Layout opening</source>
-      <translation>알람레이아웃 갈제로 열기</translation>
+      <translation>알람레이아웃 강제로 열기</translation>
     </message>
   </context>
   <context>

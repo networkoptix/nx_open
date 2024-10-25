@@ -461,7 +461,7 @@
     </message>
     <message>
       <source>Professional</source>
-      <translation>Professional</translation>
+      <translation>프로패셔널</translation>
     </message>
     <message>
       <source>Edge</source>
@@ -537,7 +537,7 @@
     </message>
     <message>
       <source>Time Licenses</source>
-      <translation>Time Licenses</translation>
+      <translation>기한 라이선스</translation>
     </message>
     <message>
       <source>Bridge</source>
@@ -1074,7 +1074,7 @@
     <message>
       <source>Conflict.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Conflict.</translation>
+      <translation>갈등.</translation>
     </message>
     <message>
       <source>Bad request.</source>
@@ -2154,7 +2154,7 @@
     </message>
     <message>
       <source>Plugin: %1</source>
-      <translation>플러그인 : %1</translation>
+      <translation>플러그인: %1</translation>
     </message>
     <message>
       <source>Archive backup failed.</source>
@@ -2276,15 +2276,15 @@
     </message>
     <message>
       <source>Also set on source camera</source>
-      <translation type="unfinished">Also set on source camera</translation>
+      <translation>소스 카메라에도 설정됨</translation>
     </message>
     <message>
       <source>Also trigger on source camera</source>
-      <translation type="unfinished">Also trigger on source camera</translation>
+      <translation>소스 카메라에서도 트리거</translation>
     </message>
     <message>
       <source>Also record source camera</source>
-      <translation type="unfinished">Also record source camera</translation>
+      <translation>소스 카메라를 기록합니다</translation>
     </message>
     <message>
       <source>Also play on source camera</source>
