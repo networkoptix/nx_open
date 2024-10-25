@@ -3,7 +3,6 @@
 import QtQuick
 
 import Nx.Core
-import Nx.Core.Controls
 
 Item
 {
@@ -20,6 +19,7 @@ Item
     property int valueAlignment: Text.AlignLeft
 
     property string textRoleName: "text"
+    property string valuesRoleName: "values"
 
     // If color is specified, a color rectangle icon is added to the line.
     property string colorsRoleName: "colors"
@@ -113,11 +113,14 @@ Item
         width: control.width - (copyable ? (kCopyWidth + kHighlightLeftPadding) : 0)
         columnSpacing: 8
         rowSpacing: 0
+        verticalItemAlignment: Grid.AlignVCenter
 
         property var rowLookup: []
 
         onWidthChanged:
+        {
             updateColumnWidths()
+        }
 
         Component.onCompleted:
             updateColumnWidths()
@@ -125,25 +128,88 @@ Item
         onPositioningComplete:
             updateRowLookup()
 
-        component Colors: Row
+        component Values: Row
         {
-            property var colors
+            id: cellValuesRow
 
-            visible: !!colors && colors.length > 0
+            property var text
+            property var values
+            property var colors
+            property int lastVisibleIndex: 0
+
             spacing: 4
 
             Repeater
             {
-                model: colors
+                id: rowRepeater
 
-                Rectangle
+                anchors.verticalCenter: parent.verticalCenter
+                objectName: "valueRowRepeater"
+                model: values
+
+                Row
                 {
-                    width: 16
-                    height: 16
-                    color: modelData ?? "transparent"
-                    border.color: ColorTheme.transparent(ColorTheme.colors.light1, 0.1)
-                    radius: 1
+                    id: valueItem
+
+                    objectName: "valueItem"
+                    spacing: 4
+                    visible: index <= lastVisibleIndex
+
+                    Rectangle
+                    {
+                        objectName: "colorRectangle"
+                        width: 16
+                        height: 16
+                        anchors.verticalCenter: parent.verticalCenter
+                        visible: !!colors[index]
+                        color: colors[index] ?? "transparent"
+                        border.color: ColorTheme.transparent(ColorTheme.colors.light1, 0.1)
+                        radius: 1
+                    }
+
+                    Text
+                    {
+                        objectName: "valueText"
+                        anchors.verticalCenter: parent.verticalCenter
+                        color: control.valueColor
+                        font: control.valueFont
+                        text: modelData + (index < lastVisibleIndex && !colors[index] ? "," : "")
+                        lineHeight: control.tableLineHeight
+                        wrapMode: Text.Wrap
+                        elide: Text.ElideRight
+                    }
                 }
+            }
+
+            Text
+            {
+                id: appendix
+
+                anchors.verticalCenter: parent.verticalCenter
+                visible: lastVisibleIndex < rowRepeater.count - 1
+                text: `+ ${rowRepeater.count - lastVisibleIndex - 1}`
+                color: ColorTheme.darker(control.valueColor, 10)
+                font: control.valueFont
+            }
+
+            onWidthChanged:
+            {
+                lastVisibleIndex = rowRepeater.count - 1
+                var sumWidth = 0
+                for (let i = 0; i < rowRepeater.count; ++i)
+                {
+                    const item = rowRepeater.itemAt(i)
+                    if (sumWidth > 0)
+                        sumWidth += spacing
+                    sumWidth += item.implicitWidth
+                    if (sumWidth > width)
+                    {
+                        lastVisibleIndex = i - 1
+                        break
+                    }
+                }
+                // At least one elided value we should show.
+                lastVisibleIndex = Math.max(0, lastVisibleIndex)
             }
         }
 
@@ -151,34 +217,26 @@ Item
         {
             id: repeater
 
+            objectName: "dataTable"
             delegate: Component
             {
                 Row
                 {
+                    readonly property bool isLabel: (index % 2) === 0
+                    readonly property int rowIndex: Math.floor(index / 2)
+
                     spacing: 4
-
-                    Colors
-                    {
-                        id: colorsRow
-
-                        colors: modelData[colorsRoleName]
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
 
                     Text
                     {
-                        id: textControl
+                        id: cellLabel
 
-                        readonly property bool isLabel: (index % 2) === 0
-
-                        visible:
-                        {
-                            const currentIndexOfRow = (index + 1) / 2
-                            return control.maxRowCount === 0 || currentIndexOfRow <= control.maxRowCount
-                        }
-
-                        color: isLabel ? control.nameColor : control.valueColor
-                        font: isLabel ? control.nameFont : control.valueFont
+                        objectName: "cellLabel"
+                        readonly property bool allowed: isLabel
+                            &&  (control.maxRowCount === 0 || rowIndex < control.maxRowCount)
+                        visible: allowed
+                        color: control.nameColor
+                        font: control.nameFont
 
                         text: modelData[textRoleName] ?? modelData
                         textFormat: Text.StyledText
@@ -186,9 +244,7 @@ Item
                         maximumLineCount: 2
                         wrapMode: Text.Wrap
                         elide: Text.ElideRight
-                        horizontalAlignment: isLabel
-                            ? Text.AlignLeft
-                            : control.valueAlignment
+                        horizontalAlignment: Text.AlignLeft
 
                         lineHeight: control.tableLineHeight
 
@@ -200,12 +256,28 @@ Item
                             ? 4
                             : (control.attributeTableSpacing - topPadding)
                     }
+
+                    Values
+                    {
+                        id: cellValues
+
+                        objectName: "cellValues"
+                        readonly property bool allowed: !isLabel
+                            && (control.maxRowCount === 0 || rowIndex < control.maxRowCount)
+                        visible: allowed
+                        colors: modelData[colorsRoleName]
+                        values: modelData[valuesRoleName]
+                        text: modelData[textRoleName] ?? modelData
+                    }
                 }
             }
         }
 
         Text
         {
+            id: footer
+
+            objectName: "footer"
             visible: control.maxRowCount && rowsCount() > control.maxRowCount
             text: qsTr("+ %n more", "", rowsCount() - control.maxRowCount)
             color: nameColor
@@ -216,20 +288,24 @@ Item
 
         function updateColumnWidths()
         {
-            let implicitLabelWidth = 0
-            let implicitValueWidth = 0
-
-            for (let i = 0; i < children.length; ++i)
+            function maximumWidth(maxWidth, item)
             {
-                const child = children[i]
-                if (!(child instanceof Text))
-                    continue;
-
-                if (child.isLabel)
-                    implicitLabelWidth = Math.max(implicitLabelWidth, child.implicitWidth)
-                else
-                    implicitValueWidth = Math.max(implicitValueWidth, child.implicitWidth)
+                return Math.max(maxWidth, item.implicitWidth)
             }
+
+            const labels = findAllSubitems(this,
+                function(item)
+                {
+                    return item.objectName === "cellLabel" && item.allowed
+                })
+            const implicitLabelWidth = Array.prototype.reduce.call(labels, maximumWidth, 0)
+
+            const values = findAllSubitems(this,
+                function(item)
+                {
+                    return item.objectName === "cellValues" && item.allowed
+                })
+            const implicitValueWidth = Array.prototype.reduce.call(values, maximumWidth, 0)
 
             const availableWidth = grid.width - grid.columnSpacing
 
@@ -254,16 +330,11 @@ Item
                 labelWidth = Math.max(availableLabelWidth,
                     Math.min(implicitLabelWidth, preferredLabelWidth))
             }
-
             const valueWidth = availableWidth - labelWidth
-
-            for (let i = 0; i < children.length; ++i)
-            {
-                const child = children[i]
-                if (child instanceof Text)
-                    child.width = child.isLabel ? labelWidth : valueWidth
-            }
-
+            for (var i = 0; i < labels.length; ++i)
+                labels[i].width = labelWidth
+            for (var i = 0; i < values.length; ++i)
+                values[i].width = valueWidth
             updateRowLookup()
         }
 
@@ -305,19 +376,19 @@ Item
                 allChildren.push(children[i])
 
             grid.rowLookup = allChildren.reduce(
-                    (result, child, index, array) =>
+                (result, child, index, array) =>
+                {
+                    if (child.isLabel)
                     {
-                        if (child.isLabel)
-                        {
-                            computeHeightOfLastItem(result, child)
+                        computeHeightOfLastItem(result, child)
 
-                            result.push({
-                                y: child.y,
-                                height: 0,
-                                index: index / 2})
-                        }
-                        return result
-                    }, [])
+                        result.push({
+                            y: child.y,
+                            height: 0,
+                            index: index / 2})
+                    }
+                    return result
+                }, [])
 
             computeHeightOfLastItem(grid.rowLookup, {y: grid.height})
         }
@@ -369,6 +440,28 @@ Item
 
             if (highlight.rowIndex >= 0)
                 control.searchRequested(highlight.rowIndex)
+        }
+    }
+
+    function findAllSubitems(root, filter)
+    {
+        var result = []
+        findSubitemsRecursive(root, filter, result)
+        return result
+    }
+
+    function findSubitemsRecursive(item, filter, result)
+    {
+        if (item === null || item === undefined)
+            return
+
+        if (filter(item))
+            result.push(item)
+
+        if (item.children)
+        {
+            for (var i = 0; i < item.children.length; ++i)
+                findSubitemsRecursive(item.children[i], filter, result);
         }
     }
 }

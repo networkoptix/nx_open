@@ -126,13 +126,14 @@ public:
         QFont valueFont(nameFont);
         valueFont.setWeight(QFont::Medium);
 
+        rootItem->setProperty("items", QVariantList{});
         rootItem->setWidth(widget->width());
         rootItem->setProperty("maxRowCount", maxRowCount);
-        rootItem->setProperty("items", items);
         rootItem->setProperty("nameFont", nameFont);
         rootItem->setProperty("valueFont", valueFont);
         rootItem->setProperty("nameColor", widget->palette().color(QPalette::Light));
         rootItem->setProperty("valueColor", widget->palette().color(QPalette::WindowText));
+        rootItem->setProperty("items", items);
 
         invokeQmlMethod<void>(rootItem.get(), "forceLayout"); //< To finalize its size.
 
