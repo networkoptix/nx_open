@@ -25,7 +25,7 @@ Item
         imageSource: enabledForCurrentUser
             ? "image://skin/64x64/Outline/noservices.svg"
             : "image://skin/64x64/Outline/no_access.svg"
-        text: enabledForCurrentUser ? qsTr("No services") : qsTr("Disabled")
+        text: enabledForCurrentUser ? qsTr("Remote access is unavailable") : qsTr("Disabled")
         additionalText: enabledForCurrentUser
             ? qsTr("Server is not configured for remote access feature")
             : qsTr("Remote access tool is currently disabled. Please enable it or contact your "
