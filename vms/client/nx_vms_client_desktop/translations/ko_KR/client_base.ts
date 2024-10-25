@@ -841,7 +841,7 @@
     </message>
     <message>
       <source>Switch to Notifications tab</source>
-      <translation>알림 탭으로 전환</translation>
+      <translation>알림 탭으로 전전</translation>
     </message>
     <message>
       <source>Switch to Motion tab</source>
@@ -1225,7 +1225,7 @@
     <message>
       <source>Language Name</source>
       <comment>Language name that will be displayed to the user.</comment>
-      <translation>한국어</translation>
+      <translation>언어명</translation>
     </message>
   </context>
   <context>
@@ -1345,7 +1345,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>If your System does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</source>
-      <translation/>
+      <translation>시스템이 인터넷에 접속할 수 없는 경우 제공된 라이선스 키와 하드웨어 ID를 지역/라이선스 지원팀으로 보내 활성화 파일을 받으세요.</translation>
     </message>
   </context>
   <context>
@@ -1859,7 +1859,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Connect only servers with public certificate</source>
-      <translation>공인인증서가 있는 서버만 연결</translation>
+      <translation>공개 인증서가 있는 서버만 연결</translation>
     </message>
     <message>
       <source>Certificate storage will be cleared.</source>
@@ -2376,7 +2376,7 @@ License Key: %2</source>
     <message numerus="yes">
       <source>Source and %n more Cameras</source>
       <translation>
-        <numerusform>소스 와 %n 개 카메라 더</numerusform>
+        <numerusform>소스 및 카메라 %n 추가</numerusform>
       </translation>
     </message>
     <message>
@@ -3195,7 +3195,7 @@ to %1</source>
     </message>
     <message>
       <source>Create</source>
-      <translation>만들다</translation>
+      <translation>생성</translation>
     </message>
     <message>
       <source>Restore from Database Backup</source>
@@ -5131,7 +5131,7 @@ to %1</source>
     </message>
     <message>
       <source>NOT ENOUGH LICENSES</source>
-      <translation>라인센스 부족</translation>
+      <translation>라이센스 부족</translation>
     </message>
     <message>
       <source>OFFLINE</source>
@@ -6043,8 +6043,7 @@ If you intended to move analytics data to another storage location, please conta
 but this web page presented an untrusted certificate auth.
 We recommend you not to open this web page. If you understand the risks, you can open the web page.</source>
       <comment>%1 is the web page address</comment>
-      <translation>
-%1
+      <translation>%1
 를 열려고 시도했지만 이 웹 페이지는 신뢰할 수 없는 인증을 제공했습니다.
 이 웹 페이지를 열지 않는 것이 좋습니다. 위험을 이해하면 웹 페이지를 열 수 있습니다.</translation>
     </message>
@@ -7055,7 +7054,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Use audio stream from</source>
-      <translation>의 오디오 스트림 사용</translation>
+      <translation>오디오 스트림을 사용하세요</translation>
     </message>
     <message>
       <source>Transmit audio stream to</source>
@@ -7111,11 +7110,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>The selected device doesn&apos;t have an audio input, or it is not configured correctly. The audio stream is not available.</source>
-      <translation>선택한 장치에 오디오 입력이 없거나&apos;구성되지 않았습니다. 오디오 스트림을 사용할 수 없습니다.</translation>
+      <translation>선택한 장치에 오디오 입력이 없거나 구성되지 않았습니다. 오디오 스트림을 사용할 수 없습니다.</translation>
     </message>
     <message>
       <source>The selected camera doesn&apos;t have an audio input, or it is not configured correctly. The audio stream is not available.</source>
-      <translation>선택한 카메라에 오디오 입력이 없거나&apos;구성되지 않았습니다. 오디오 스트림을 사용할 수 없습니다.</translation>
+      <translation>선택한 카메라에 오디오 입력이 없거나 구성되지 않았습니다. 오디오 스트림을 사용할 수 없습니다.</translation>
     </message>
     <message>
       <source>The selected device does not have an audio output, or it is not configured correctly. 2-way audio is not available.</source>
@@ -7261,7 +7260,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>To enable backup change &quot;Main&quot; to &quot;Backup&quot; from some of the storages in %1</source>
       <extracomment>&quot;Storage Management&quot; link will be substituted as %1.</extracomment>
-      <translation>백업을 활성화하려면 %1의 일부 저장소에서 "기본"을 "백업"으로 변경하십시오.</translation>
+      <translation>백업 변경을 활성화하려면 &quot;Main&quot; 에서 &quot;Backup&quot; 로 변경하고 %1의 일부 저장소에서 변경합니다.</translation>
     </message>
     <message>
       <source>To enable backup add more drives to use them as backup storage in %1</source>
@@ -7443,7 +7442,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Video recorded on the internal camera&apos;s storage will be automatically uploaded to the main archive.</source>
-      <translation>내장 카메라&apos;저장소에 녹화된 영상은 자동으로 메인 아카이브에 업로드됩니다.</translation>
+      <translation>내장 카메라 저장소에 녹화된 영상은 자동으로 메인 아카이브에 업로드됩니다.</translation>
     </message>
   </context>
   <context>
@@ -7557,7 +7556,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Data for Transfer</source>
-      <translation type="unfinished">Data for Transfer</translation>
+      <translation>전송을 위한 데이터</translation>
     </message>
     <message>
       <source>Camera replaced!</source>
@@ -7565,7 +7564,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Checking if the old camera&apos;s data can be transferred to the new camera.</source>
-      <translation>이전 카메라의&apos;데이터를 새 카메라로 전송할 수 있는지 확인합니다.</translation>
+      <translation>이전 카메라의 데이터를 새 카메라로 전송할 수 있는지 확인합니다.</translation>
     </message>
     <message>
       <source>Some data and settings may not be compatible with the new camera</source>
@@ -7601,11 +7600,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>High minimum value can lead to archive length decrease on other devices.</source>
-      <translation>High minimum value can lead to archive length decrease on other devices.</translation>
+      <translation>최소값이 높으면 다른 장치에서 보관 파일의 길이가 짧아질 수 있습니다.</translation>
     </message>
     <message>
       <source>High minimum value can lead to archive length decrease on other cameras.</source>
-      <translation>High minimum value can lead to archive length decrease on other cameras.</translation>
+      <translation>최소값이 높으면 다른 카메라의 보관 길이가 줄어들 수 있습니다.</translation>
     </message>
     <message>
       <source>High pre-recording time will increase RAM utilization on the server</source>
@@ -7725,7 +7724,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Change invalid schedule to &quot;Record Always&quot;</source>
-      <translation>잘못된 일정을 &quot;으로 변경 항상 기록&quot;</translation>
+      <translation>유효하지 않은 일정을 &quot;항상 기록&quot;으로 변경합니다.</translation>
     </message>
     <message>
       <source>Some cells of the recording schedule are set to an invalid recording mode: %1. During the hours set to an invalid recording mode camera will record in &quot;Record Always&quot; mode.</source>
@@ -7733,7 +7732,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Motion Only</source>
-      <translation>움직임 녹화</translation>
+      <translation>모션만</translation>
     </message>
     <message>
       <source>Objects Only</source>
@@ -8080,7 +8079,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Connect System to %1?</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>%1 시스템에 연결?</translation>
+      <translation>시스템을 %1에 연결하시겠습니까?</translation>
     </message>
     <message>
       <source>Enter your account password to connect System to %1</source>
@@ -8886,7 +8885,7 @@ Remember to return the Logging Level to its default setting after you have colle
     <name>nx::vms::client::desktop::LogsManagementModel</name>
     <message>
       <source>Unit</source>
-      <translation type="unfinished">Unit</translation>
+      <translation>단위</translation>
     </message>
     <message>
       <source>Current Level</source>
@@ -9116,7 +9115,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>This user does not have permissions for the requested operation.</source>
-      <translation>이 사용자는 요청한 작업에 대 한 권한이 없다.</translation>
+      <translation>이 사용자는 요청된 작업에 대한 권한이 없습니다.</translation>
     </message>
     <message>
       <source>Cannot create database backup.</source>
@@ -9324,7 +9323,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Failed to start update</source>
-      <translation>업데이트를 시작 실패</translation>
+      <translation>업데이트 시작 실패</translation>
     </message>
     <message>
       <source>Failed to cancel update</source>
@@ -9538,7 +9537,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Calling...</source>
-      <translation type="unfinished">Calling...</translation>
+      <translation>통화 중...</translation>
     </message>
   </context>
   <context>
@@ -9750,7 +9749,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Port</source>
-      <translation>포트:</translation>
+      <translation>포트</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -9854,7 +9853,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Turn on webpage proxy on &lt;b&gt;General&lt;/b&gt; tab.</source>
-      <translation>일반 탭에서 웹 페이지 프록시를 켜라.</translation>
+      <translation>&lt;b&gt;일반&lt;/b&gt; 탭에서 웹페이지 프록시를 켭니다.</translation>
     </message>
     <message>
       <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</source>
@@ -10351,7 +10350,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>I trust this server</source>
-      <translation>나는 이 서버를 신뢰한다</translation>
+      <translation>나는 이 서버를 신뢰합니다</translation>
     </message>
     <message>
       <source>Continue</source>
@@ -10849,7 +10848,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Member of</source>
-      <translation type="unfinished">Member of</translation>
+      <translation>소속</translation>
     </message>
     <message>
       <source>Permissions</source>
@@ -11440,7 +11439,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>This field is case sensitive.</source>
-      <translation>이 필드는 대소 문자를 구분합니다.</translation>
+      <translation>이 필드는 대소문자를 구분합니다.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>

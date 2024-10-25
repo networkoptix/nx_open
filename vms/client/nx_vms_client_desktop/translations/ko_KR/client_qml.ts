@@ -344,7 +344,7 @@
     </message>
     <message>
       <source>Fisheye</source>
-      <translation>Fisheye</translation>
+      <translation>어안카메라</translation>
     </message>
     <message>
       <source>360° Equirectangular</source>
@@ -463,15 +463,15 @@
     </message>
     <message>
       <source>Equidistant</source>
-      <translation>Equidistant</translation>
+      <translation>등거리</translation>
     </message>
     <message>
       <source>Stereographic</source>
-      <translation>Stereographic</translation>
+      <translation>입체사진</translation>
     </message>
     <message>
       <source>Equisolid</source>
-      <translation>Equisolid</translation>
+      <translation>이퀴솔리드</translation>
     </message>
     <message>
       <source>Size</source>
@@ -513,7 +513,7 @@
     <name>InformationBubble</name>
     <message>
       <source>Detected by</source>
-      <translation>에 의해 감지됨</translation>
+      <translation>감지됨</translation>
     </message>
   </context>
   <context>
@@ -874,19 +874,17 @@
     <message>
       <source>Introducing you
 new PTZ controls</source>
-      <translation>
-새로운 PTZ 컨트롤을 소개합니다</translation>
+      <translation>새로운 PZ 컨트롤을 소개합니다</translation>
     </message>
     <message>
       <source>Here is a quick presentation
 of what has changed</source>
-      <translation>변경된 내용의 간단한 프리젠 테이션입니다</translation>
+      <translation>변경된 내용의 간단한 프리젠테이션입니다</translation>
     </message>
     <message>
       <source>Drag over any part of the video
 to activate PTZ</source>
-      <translation>PTZ를 활성화하려면 비디오
-내 아무 영역을 드래그하십시오.</translation>
+      <translation>PTZ를 활성화하려면 비디오내 아무 영역을 드래그하십시오.</translation>
     </message>
     <message>
       <source>Press arrows keys to move and plus or minus keys to zoom</source>

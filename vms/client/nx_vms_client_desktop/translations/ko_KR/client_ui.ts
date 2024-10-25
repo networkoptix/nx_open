@@ -33,7 +33,7 @@
     </message>
     <message>
       <source>Open source libraries</source>
-      <translation>오픈 소스 라이브러리</translation>
+      <translation>오픈 소스 라이브러브</translation>
     </message>
   </context>
   <context>
@@ -1943,7 +1943,7 @@
     </message>
     <message>
       <source>Show aim overlay for PTZ cameras</source>
-      <translation>PTZ 카메라에 조준(에임)오버레이 표시</translation>
+      <translation>PTZ 카메라에 대한 조준 오버레이 표시</translation>
     </message>
   </context>
   <context>
@@ -1989,7 +1989,7 @@
     </message>
     <message>
       <source>Browse</source>
-      <translation>Browse</translation>
+      <translation>찾기</translation>
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
