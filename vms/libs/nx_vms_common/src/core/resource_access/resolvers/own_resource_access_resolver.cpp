@@ -54,7 +54,7 @@ ResourceAccessMap OwnResourceAccessResolver::resourceAccessMap(const nx::Uuid& s
         return {};
 
     if (hasFullAccessRights(subjectId))
-        return kFullResourceAccessMap;
+        return fullResourceAccessMap();
 
     return d->accessRightsManager->ownResourceAccessMap(subjectId);
 }

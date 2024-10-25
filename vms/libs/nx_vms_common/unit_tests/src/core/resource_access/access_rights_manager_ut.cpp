@@ -131,10 +131,10 @@ TEST_F(AccessRightsManagerTest, set)
     EXPECT_EQ(manager->ownResourceAccessMap(subject2), ResourceAccessMap());
 
     // Cannot modify access rights of a predefined user group.
-    EXPECT_FALSE(manager->setOwnResourceAccessMap(kLiveViewersGroupId, kFullResourceAccessMap));
+    EXPECT_FALSE(manager->setOwnResourceAccessMap(kLiveViewersGroupId, fullResourceAccessMap()));
     EXPECT_TRUE(resetSpy->empty());
     EXPECT_TRUE(changeSpy->empty());
-    EXPECT_NE(manager->ownResourceAccessMap(kLiveViewersGroupId), kFullResourceAccessMap);
+    EXPECT_NE(manager->ownResourceAccessMap(kLiveViewersGroupId), fullResourceAccessMap());
 }
 
 TEST_F(AccessRightsManagerTest, remove)
