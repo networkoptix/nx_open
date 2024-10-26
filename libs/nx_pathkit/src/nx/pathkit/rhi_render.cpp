@@ -1061,6 +1061,13 @@ std::vector<RhiPaintDeviceRenderer::Batch> RhiPaintDeviceRenderer::processEntrie
 
     pathAllocator->clear();
 
+    currentStats = {
+        .entries = (size_t) entries.all().size(),
+        .batches = batches.size(),
+        .texturesInCache = (size_t) m_textureCache.size(),
+        .texturesInAtlas = (size_t) atlasCache.size(),
+    };
+
     return batches;
 }
 

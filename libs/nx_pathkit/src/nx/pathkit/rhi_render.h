@@ -110,6 +110,14 @@ public:
         .maxAtlasEntrySize = 128
     };
 
+    struct Stats
+    {
+        size_t entries = 0;
+        size_t batches = 0;
+        size_t texturesInCache = 0;
+        size_t texturesInAtlas = 0;
+    };
+
 public:
     RhiPaintDeviceRenderer(QRhi* rhi, Settings settings = kDefaultSettinigs);
     ~RhiPaintDeviceRenderer();
@@ -118,6 +126,8 @@ public:
 
     bool prepare(QRhiRenderPassDescriptor* rp, QRhiResourceUpdateBatch* u);
     void render(QRhiCommandBuffer* cb);
+
+    Stats stats() const { return currentStats; }
 
 private:
     void createTexturePipeline(QRhiRenderPassDescriptor* rp);
@@ -196,6 +206,7 @@ private:
     QCache<GradientWrapper, TextureEntry> m_gradientCache;
 
     std::vector<Batch> batches;
+    Stats currentStats;
 };
 
 } // namespace nx::pathkit

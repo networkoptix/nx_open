@@ -124,6 +124,13 @@ void PaintEngineTest::checkResult(
         << " or " << accError
         << "\n";
 
+    auto stats = renderer.stats();
+
+    std::cerr << "entries: " << stats.entries
+        << " -> batches: " << stats.batches
+        << " textures cache: " << stats.texturesInCache
+        << " atlas: " << stats.texturesInAtlas << "\n";
+
     if (rhi->backend() != QRhi::Null)
     {
         EXPECT_LE(errPercent, 0.5); //< This is more of a sanity check.
