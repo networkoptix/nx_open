@@ -454,7 +454,7 @@
     </message>
     <message>
       <source>Professional</source>
-      <translation>Professional</translation>
+      <translation>프로패셔널</translation>
     </message>
     <message>
       <source>Edge</source>
@@ -530,7 +530,7 @@
     </message>
     <message>
       <source>Time Licenses</source>
-      <translation>Time Licenses</translation>
+      <translation>기한 라이선스</translation>
     </message>
     <message>
       <source>Bridge</source>
@@ -1661,7 +1661,7 @@
     </message>
     <message>
       <source>Plugin: %1</source>
-      <translation>플러그인 : %1</translation>
+      <translation>플러그인: %1</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; DB error: Insufficient permissions on the mount point.</source>
