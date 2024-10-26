@@ -45,7 +45,7 @@ void QnSplashItem::setColor(const QColor &color) {
     gradients[4] = QRadialGradient(0.5, 0.5, 0.5);
 
     for(int i = 0; i < 5; i++) {
-        gradients[i].setCoordinateMode(QGradient::ObjectBoundingMode);
+        gradients[i].setCoordinateMode(QGradient::ObjectMode);
         gradients[i].setColorAt(0.8, toTransparent(m_color));
         gradients[i].setColorAt(0.9, m_color);
         gradients[i].setColorAt(1.0, toTransparent(m_color));

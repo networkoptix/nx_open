@@ -26,7 +26,7 @@ void QnParticleItem::setColor(const QColor &color) {
     m_color = color;
 
     QRadialGradient gradient(0.5, 0.5, 0.5);
-    gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
+    gradient.setCoordinateMode(QGradient::ObjectMode);
     gradient.setColorAt(0.0, color);
     gradient.setColorAt(1.0, toTransparent(color));
     m_brush = QBrush(gradient);
