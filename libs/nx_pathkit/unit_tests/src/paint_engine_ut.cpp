@@ -132,6 +132,31 @@ void PaintEngineTest::checkResult(
     ASSERT_EQ(referenceImage.size(), rhiImage.size());
 }
 
+TEST_F(PaintEngineTest, linearGradient)
+{
+    checkResult({400, 400}, 2, test_info_->name(),
+        [](QPaintDevice* pd)
+        {
+            QPainter p(pd);
+
+            QLinearGradient gradient(0.0, 0.2, 0.5, 0.5);
+            gradient.setCoordinateMode(QGradient::ObjectMode);
+            gradient.setColorAt(0, QColor::fromRgbF(1, 0, 0, 1));
+            gradient.setColorAt(0.7, QColor::fromRgbF(0, 1, 0, 1));
+            gradient.setColorAt(1, QColor::fromRgbF(0, 0, 1, 0.5));
+
+            p.save();
+            p.setClipRect(40, 40, 90, 90);
+            p.fillRect(50, 50, 100, 100, gradient);
+            p.restore();
+
+            p.rotate(30);
+            p.scale(0.5, 0.5);
+            p.translate(10, 0);
+            p.fillRect(150, 50, 100, 100, gradient);
+        });
+}
+
 TEST_F(PaintEngineTest, textTransform)
 {
     checkResult({400, 400}, 2, test_info_->name(),
