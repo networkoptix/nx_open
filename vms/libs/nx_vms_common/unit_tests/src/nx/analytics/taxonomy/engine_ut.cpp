@@ -7,6 +7,7 @@
 #include <QtCore/QFile>
 
 #include <nx/analytics/taxonomy/state_compiler.h>
+#include <nx/kit/utils.h>
 #include <nx/reflect/json/deserializer.h>
 #include <nx/vms/common/test_support/analytics/taxonomy/test_resource_support_proxy.h>
 #include <nx/vms/common/test_support/analytics/taxonomy/utils.h>
@@ -43,7 +44,8 @@ protected:
         const QByteArray objectAsBytes = QJsonDocument(object).toJson();
 
         auto [deserializationResult, result] =
-            nx::reflect::json::deserialize<std::map<QString, EngineTestExpectedData> >(objectAsBytes.toStdString());
+            nx::reflect::json::deserialize<std::map<QString, EngineTestExpectedData>>(
+                objectAsBytes.toStdString());
 
         m_expectedData = deserializationResult;
 
@@ -57,6 +59,19 @@ protected:
         m_result = StateCompiler::compile(
             m_descriptors,
             std::make_unique<TestResourceSupportProxy>());
+    }
+
+    void makeSureNoUnexpectedErrors()
+    {
+        ASSERT_TRUE(m_result.errors.size() == 1
+            && m_result.errors[0].details.contains("invalid.plugin.id")) <<
+            [&r = std::as_const(m_result)]() //< Print all error messages on failure.
+            {
+                std::ostringstream s;
+                for (const ProcessingError& error: r.errors)
+                    s << "ProcessingError: " << nx::kit::utils::toString(error.details) << "\n";
+                return s.str();
+            }();
     }
 
     void makeSureEnginesAreCorrect()
@@ -76,6 +91,7 @@ protected:
             const AbstractIntegration* integration = engine->integration();
             if (expectedData.plugin)
             {
+                ASSERT_TRUE(integration != nullptr);
                 ASSERT_EQ(integration->id(), expectedData.plugin->id);
                 ASSERT_EQ(integration->name(), expectedData.plugin->name);
             }
@@ -96,6 +112,7 @@ TEST_F(EngineTest, enginesAreCorrect)
 {
     givenDescriptors(":/content/taxonomy/engine_test.json");
     afterDescriptorsCompilation();
+    makeSureNoUnexpectedErrors();
     makeSureEnginesAreCorrect();
 }
 

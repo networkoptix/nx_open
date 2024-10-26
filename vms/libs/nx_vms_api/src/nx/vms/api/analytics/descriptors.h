@@ -8,6 +8,7 @@
 #include <QtCore/QString>
 
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/kit/utils.h>
 #include <nx/reflect/instrument.h>
 #include <nx/utils/serialization/qjson.h>
 #include <nx/utils/serialization/qt_core_types.h>
@@ -165,6 +166,15 @@ struct EngineDescriptor
 };
 #define nx_vms_api_analytics_EngineDescriptor_Fields (id)(name)(pluginId)(capabilities)
 NX_REFLECTION_INSTRUMENT(EngineDescriptor, nx_vms_api_analytics_EngineDescriptor_Fields);
+
+/** GoogleTest printer. */
+inline void PrintTo(const EngineDescriptor& d, std::ostream* s)
+{
+    *s << "EngineDescriptor{id " << d.id.toStdString()
+        << ", name " << nx::kit::utils::toString(d.name)
+        << ", pluginId " << nx::kit::utils::toString(d.pluginId)
+        << ", ...}";
+}
 
 struct GroupDescriptor: BaseScopedDescriptor
 {

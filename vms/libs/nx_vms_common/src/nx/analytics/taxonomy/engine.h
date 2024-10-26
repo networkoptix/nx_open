@@ -27,8 +27,6 @@ public:
 
     virtual nx::vms::api::analytics::EngineDescriptor serialize() const override;
 
-    void setIntegration(Integration* integration);
-
     void resolve(InternalState* inOutInternalState, ErrorHandler* errorHandler);
 
 private:
