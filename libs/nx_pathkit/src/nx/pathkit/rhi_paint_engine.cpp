@@ -61,6 +61,58 @@ QPen scalePen(const QPen& pen, QTransform tr)
     return newPen;
 }
 
+QBrush scaleBrush(const QBrush& brush, const QRectF& bounds)
+{
+    if (brush.style() != Qt::LinearGradientPattern)
+        return brush;
+
+    auto gradient = static_cast<const QLinearGradient*>(brush.gradient());
+
+    switch (gradient->coordinateMode())
+    {
+        case QGradient::ObjectMode:
+        case QGradient::ObjectBoundingMode:
+        {
+            QTransform transform;
+            transform.translate(bounds.x(), bounds.y());
+            transform.scale(bounds.width(), bounds.height());
+            QLinearGradient newGradient = *gradient;
+            newGradient.setStart(transform.map(gradient->start()));
+            newGradient.setFinalStop(transform.map(gradient->finalStop()));
+            newGradient.setCoordinateMode(QGradient::LogicalMode);
+            return QBrush(newGradient);
+        }
+        default:
+            return brush;
+    }
+
+    return brush;
+}
+
+QRectF boundsForPoints(const QPointF* points, int pointCount)
+{
+    if (pointCount == 0)
+        return {};
+
+    QRectF bounds(points[0], QSizeF(0, 0));
+
+    for (int i = 1; i < pointCount; ++i)
+    {
+        const QPointF& p = points[i];
+
+        if (p.x() < bounds.left())
+            bounds.setLeft(p.x());
+        else if (p.x() > bounds.right())
+            bounds.setRight(p.x());
+        else if (p.y() < bounds.top())
+            bounds.setTop(p.y());
+        else if (p.y() > bounds.bottom())
+            bounds.setBottom(p.y());
+    }
+
+    return bounds;
+}
+
 SkPath painterPathToSkPath(
     const QPainterPath& path,
     const QTransform& tr,
@@ -164,6 +216,8 @@ RhiPaintEngine::RhiPaintEngine(RhiPaintDevice* device):
         | QPaintEngine::PainterPaths
         | QPaintEngine::AlphaBlend
         | QPaintEngine::PixmapTransform
+        | QPaintEngine::LinearGradientFill
+        | QPaintEngine::ObjectBoundingModeGradients
     ),
     m_device(device)
 {
@@ -226,12 +280,26 @@ void RhiPaintEngine::drawPath(const QPainterPath& path)
     m_data->append(
         [&](SkPathRefAllocator* allocator) -> PaintPath
         {
+            QRectF bounds;
+            if (state->brush().style() == Qt::LinearGradientPattern)
+            {
+                switch (state->brush().gradient()->coordinateMode())
+                {
+                    case QGradient::ObjectMode:
+                    case QGradient::ObjectBoundingMode:
+                        bounds = path.boundingRect();
+                        break;
+                    default:
+                        break;
+                }
+            }
             return PaintPath{
                 .pen = scalePen(state->pen(), state->transform()),
-                .brush = state->brush(),
+                .brush = scaleBrush(state->brush(), bounds),
                 .path = painterPathToSkPath(path, state->transform(), allocator),
                 .aa = state->renderHints().testFlag(QPainter::Antialiasing),
                 .opacity = state->opacity(),
+                .transform = state->transform(),
                 .clip = getClip()
             };
         });
@@ -274,12 +342,27 @@ void RhiPaintEngine::drawPolygon(
 
             applyPolygonModePath(skPath, mode);
 
+            QRectF bounds;
+            if (state->brush().style() == Qt::LinearGradientPattern)
+            {
+                switch (state->brush().gradient()->coordinateMode())
+                {
+                    case QGradient::ObjectMode:
+                    case QGradient::ObjectBoundingMode:
+                        bounds = boundsForPoints(points, pointCount);
+                        break;
+                    default:
+                        break;
+                }
+            }
+
             return PaintPath{
                 .pen = scalePen(state->pen(), state->transform()),
-                .brush = state->brush(),
+                .brush = scaleBrush(state->brush(), bounds),
                 .path = skPath,
                 .aa = state->renderHints().testFlag(QPainter::Antialiasing),
                 .opacity = state->opacity(),
+                .transform = state->transform(),
                 .clip = getClip()
             };
         });

@@ -24,6 +24,52 @@ class QRhiTexture;
 
 namespace nx::pathkit {
 
+// A wrapper for QGradient to get its cached color texture. Only stops are necessary for comparison.
+class GradientWrapper
+{
+public:
+    GradientWrapper(const QGradient& gradient): gradient(gradient) {}
+
+    bool operator==(const GradientWrapper& other) const
+    {
+        return gradient.stops() == other.gradient.stops();
+    }
+
+    bool operator!=(const GradientWrapper& other) const
+    {
+        return !(*this == other);
+    }
+
+    const QGradient& getGradient() const
+    {
+        return gradient;
+    }
+
+private:
+    QGradient gradient;
+};
+
+} // namespace nx::pathkit
+
+template<>
+struct std::hash<nx::pathkit::GradientWrapper>
+{
+    size_t operator()(const nx::pathkit::GradientWrapper& gradient) const noexcept
+    {
+        size_t hashValue = 0;
+
+        for (const auto& stop: gradient.getGradient().stops())
+        {
+            hashValue = (hashValue * 17) ^ std::hash<qreal>{}(stop.first);
+            hashValue = (hashValue * 17) ^ stop.second.rgba64();
+        }
+
+        return hashValue;
+    }
+};
+
+namespace nx::pathkit {
+
 class VertexAllocator;
 
 class NX_PATHKIT_API RhiPaintDeviceRenderer
@@ -88,14 +134,18 @@ private:
         std::vector<float>& textureVerts,
         QSize clip);
 
-    QRhiShaderResourceBindings* createTextureBinding(
+    QRhiShaderResourceBindings* getTextureBindings(
         QRhiResourceUpdateBatch* rub,
         const QPixmap& pixmap,
         QRectF* outRect);
 
-    QRhiShaderResourceBindings* createTextureBinding(
+    QRhiShaderResourceBindings* getTextureBindings(
         std::shared_ptr<QRhiTexture> texture,
         QRectF* outRect);
+
+    std::shared_ptr<QRhiTexture> textureForGradient(
+        QRhiResourceUpdateBatch* rub,
+        const QGradient& gradient);
 
     QRectF textureCoordsFromAtlas(const Atlas::Rect& rect, int padding) const;
 
@@ -121,7 +171,6 @@ private:
     std::unique_ptr<QRhiBuffer> vbuf; //< Vertex.
     std::unique_ptr<QRhiBuffer> cbuf; //< Color.
     std::unique_ptr<QRhiBuffer> ubuf; //< Uniform.
-    std::vector<std::unique_ptr<QRhiShaderResourceBindings>> pathBindings;
 
     // Pixmap (texture) pipeline settings.
     std::unique_ptr<QRhiGraphicsPipeline> tps;
@@ -144,6 +193,7 @@ private:
     std::vector<Texture> textures;
 
     QCache<qint64, TextureEntry> m_textureCache;
+    QCache<GradientWrapper, TextureEntry> m_gradientCache;
 
     std::vector<Batch> batches;
 };

@@ -72,6 +72,8 @@ private:
 namespace {
 
 static constexpr float kTolerance = 0.25f;
+static constexpr int kMaxCachedGradientTextures = 50;
+static constexpr int kGradientTextureSize = 1024; //< Qt uses this size for gradients internally.
 
 static const QRhiShaderResourceBinding::StageFlags kCommonVisibility =
     QRhiShaderResourceBinding::VertexStage
@@ -194,6 +196,56 @@ void setupBlend(QRhiGraphicsPipeline* pipeline)
     pipeline->setDepthTest(false);
 }
 
+void fillGradientBrushVerts(
+    const SkPath& path,
+    float opacity,
+    const QSize& clip,
+    const QTransform& transform,
+    const QBrush& brush,
+    std::vector<float>& textureVerts)
+{
+    VertexAllocator triangles;
+    bool isLinear;
+    GrTriangulator::PathToTriangles(
+        path,
+        kTolerance,
+        /*clipBounds*/ SkRect::MakeXYWH(0, 0, clip.width(), clip.height()),
+        &triangles,
+        &isLinear);
+
+    constexpr auto kStride = 3;
+    textureVerts.reserve(textureVerts.size() + 5 * (triangles.size() / kStride));
+
+    bool invertible = false;
+    QTransform inverted = transform.inverted(&invertible);
+
+    auto gradient = static_cast<const QLinearGradient*>(brush.gradient());
+    const auto gradientVector = QVector2D(gradient->finalStop() - gradient->start());
+    const float gradientLengthSquared = gradientVector.lengthSquared();
+    if (qFuzzyIsNull(gradientLengthSquared))
+        return;
+
+    for (size_t i = 0; i + kStride <= triangles.size(); i += kStride)
+    {
+        const QPointF v(triangles[i], triangles[i + 1]);
+        const QPointF vi = inverted.map(v);
+
+        // Project the point onto the gradient vector. Then use the projection as an index into the
+        // gradient texture.
+        const auto fromStart = QVector2D(vi - gradient->start());
+        const float project = QVector2D::dotProduct(gradientVector, fromStart)
+            / gradientLengthSquared;
+
+        const QPointF t = QPointF(project, 0);
+
+        textureVerts.push_back(v.x());
+        textureVerts.push_back(v.y());
+        textureVerts.push_back(t.x());
+        textureVerts.push_back(t.y());
+        textureVerts.push_back(opacity);
+    }
+}
+
 } // namespace
 
 static constexpr auto kMatrix4x4Size = 4 * 4 * sizeof(float);
@@ -300,6 +352,7 @@ void RhiPaintDeviceRenderer::createTexturePipeline(QRhiRenderPassDescriptor* rp)
     tps->create();
 
     m_textureCache.setMaxCost(m_settings.cacheSize * m_settings.cacheSize);
+    m_gradientCache.setMaxCost(kMaxCachedGradientTextures);
 
     const int atlasSize = std::min(
         m_rhi->resourceLimit(QRhi::TextureSizeMax),
@@ -475,32 +528,61 @@ QImage RhiPaintDeviceRenderer::getImage(const QPixmap& pixmap)
     return image;
 }
 
-QRhiShaderResourceBindings* RhiPaintDeviceRenderer::createTextureBinding(
+QRhiShaderResourceBindings* RhiPaintDeviceRenderer::getTextureBindings(
     std::shared_ptr<QRhiTexture> texture,
     QRectF* outRect)
 {
-    std::unique_ptr<QRhiShaderResourceBindings> tsrb(m_rhi->newShaderResourceBindings());
-    tsrb->setBindings({
-        QRhiShaderResourceBinding::uniformBuffer(0,
-            kCommonVisibility,
-            ubuf.get()),
-        QRhiShaderResourceBinding::sampledTexture(1,
-            QRhiShaderResourceBinding::FragmentStage,
-            texture.get(),
-            sampler.get())
-    });
-    tsrb->create();
+    if (textures.empty() || textures.back().texture != texture)
+    {
+        std::unique_ptr<QRhiShaderResourceBindings> tsrb(m_rhi->newShaderResourceBindings());
+        tsrb->setBindings({
+            QRhiShaderResourceBinding::uniformBuffer(0,
+                kCommonVisibility,
+                ubuf.get()),
+            QRhiShaderResourceBinding::sampledTexture(1,
+                QRhiShaderResourceBinding::FragmentStage,
+                texture.get(),
+                sampler.get())
+        });
+        tsrb->create();
 
-    textures.push_back({
-        .texture = texture,
-        .tsrb = std::move(tsrb)
-    });
+        textures.push_back({
+            .texture = texture,
+            .tsrb = std::move(tsrb)
+        });
+    }
 
     *outRect = QRectF(0, 0, 1, 1);
     return textures.back().tsrb.get();
 }
 
-QRhiShaderResourceBindings* RhiPaintDeviceRenderer::createTextureBinding(
+std::shared_ptr<QRhiTexture> RhiPaintDeviceRenderer::textureForGradient(
+    QRhiResourceUpdateBatch* rub,
+    const QGradient& gradient)
+{
+    if (TextureEntry* cached = m_gradientCache.object(gradient))
+        return cached->texture;
+
+    // Generate color gradient texture 1024x1 pixels.
+
+    QImage image(kGradientTextureSize, 1, QImage::Format_RGBA8888_Premultiplied);
+    image.fill(Qt::transparent);
+
+    QLinearGradient linearGradient(0, 0, kGradientTextureSize, 0);
+    linearGradient.setStops(gradient.stops());
+    linearGradient.setStart(0, 0);
+    linearGradient.setFinalStop(kGradientTextureSize, 0);
+    QPainter(&image).fillRect(image.rect(), linearGradient);
+
+    std::shared_ptr<QRhiTexture> texture;
+    texture.reset(m_rhi->newTexture(QRhiTexture::RGBA8, image.size(), 1));
+    texture->create();
+    rub->uploadTexture(texture.get(), image);
+    m_gradientCache.insert(gradient, new TextureEntry(texture));
+    return texture;
+}
+
+QRhiShaderResourceBindings* RhiPaintDeviceRenderer::getTextureBindings(
     QRhiResourceUpdateBatch* rub,
     const QPixmap& pixmap,
     QRectF* outRect)
@@ -538,25 +620,7 @@ QRhiShaderResourceBindings* RhiPaintDeviceRenderer::createTextureBinding(
         m_textureCache.insert(key, new TextureEntry(texture), size.width() * size.height());
     }
 
-    std::unique_ptr<QRhiShaderResourceBindings> tsrb(m_rhi->newShaderResourceBindings());
-    tsrb->setBindings({
-        QRhiShaderResourceBinding::uniformBuffer(0,
-            kCommonVisibility,
-            ubuf.get()),
-        QRhiShaderResourceBinding::sampledTexture(1,
-            QRhiShaderResourceBinding::FragmentStage,
-            texture.get(),
-            sampler.get())
-    });
-    tsrb->create();
-
-    textures.push_back({
-        .texture = texture,
-        .tsrb = std::move(tsrb)
-    });
-
-    *outRect = QRectF(0, 0, 1, 1);
-    return textures.back().tsrb.get();
+    return getTextureBindings(texture, outRect);
 }
 
 void RhiPaintDeviceRenderer::prepareAtlas(const RhiPaintEngineSyncData::Entries& entries)
@@ -807,7 +871,7 @@ std::vector<RhiPaintDeviceRenderer::Batch> RhiPaintDeviceRenderer::processEntrie
     {
         if (auto paintPath = std::get_if<PaintPath>(&entry))
         {
-            const auto addPath =
+            const auto addSolidPath =
                 [&](const SkPath& path, QColor color)
                 {
                     int offset = triangles.size();
@@ -833,18 +897,52 @@ std::vector<RhiPaintDeviceRenderer::Batch> RhiPaintDeviceRenderer::processEntrie
                     });
                 };
 
+            const auto addGradientPath =
+                [&](const SkPath& path, const QBrush& brush)
+                {
+                    auto texture = textureForGradient(u, *brush.gradient());
+                    QRectF src;
+
+                    auto bindings = getTextureBindings(texture, &src);
+
+                    const auto offset = textureVerts.size();
+
+                    fillGradientBrushVerts(
+                        path,
+                        paintPath->opacity,
+                        clip,
+                        paintPath->transform,
+                        paintPath->brush,
+                        textureVerts);
+
+                    if (!batches.empty() && batches.back().bindigs == bindings)
+                    {
+                        batches.back().count += (textureVerts.size() - offset) / 5;
+                    }
+                    else
+                    {
+                        batches.push_back({
+                            .offset = (int) offset,
+                            .count = (int) (textureVerts.size() - offset) / 5,
+                            .bindigs = bindings,
+                            .pipeline = tps.get(),
+                            .vertexInput = tvbuf.get(),
+                        });
+                    }
+                };
+
             if (paintPath->brush.style() != Qt::NoBrush)
             {
+                SkPath clipped(pathAllocator.get());
                 if (paintPath->clip)
-                {
-                    SkPath clipped(pathAllocator.get());
                     Op(paintPath->path, *paintPath->clip, SkPathOp::kIntersect_SkPathOp, &clipped);
-                    addPath(paintPath->path, paintPath->brush.color());
-                }
                 else
-                {
-                    addPath(paintPath->path, paintPath->brush.color());
-                }
+                    clipped = paintPath->path;
+
+                if (paintPath->brush.style() == Qt::LinearGradientPattern)
+                    addGradientPath(clipped, paintPath->brush);
+                else
+                    addSolidPath(clipped, paintPath->brush.color());
             }
 
             if (paintPath->pen.style() != Qt::NoPen)
@@ -870,13 +968,13 @@ std::vector<RhiPaintDeviceRenderer::Batch> RhiPaintDeviceRenderer::processEntrie
                 if (paintPath->clip)
                     Op(tmp, *paintPath->clip, SkPathOp::kIntersect_SkPathOp, &tmp);
 
-                addPath(tmp, paintPath->pen.color());
+                addSolidPath(tmp, paintPath->pen.color());
             }
         }
         else if (auto paintPixmap = std::get_if<PaintPixmap>(&entry))
         {
             QRectF src;
-            auto bindings = createTextureBinding(u, paintPixmap->pixmap, &src);
+            auto bindings = getTextureBindings(u, paintPixmap->pixmap, &src);
 
             const auto offset = textureVerts.size();
 
@@ -900,7 +998,7 @@ std::vector<RhiPaintDeviceRenderer::Batch> RhiPaintDeviceRenderer::processEntrie
         else if (auto paintTexture = std::get_if<PaintTexture>(&entry))
         {
             QRectF src;
-            auto bindings = createTextureBinding(paintTexture->texture, &src);
+            auto bindings = getTextureBindings(paintTexture->texture, &src);
 
             const auto dst = paintTexture->dst;
 

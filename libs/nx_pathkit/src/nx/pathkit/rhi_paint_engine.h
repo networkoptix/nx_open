@@ -25,6 +25,7 @@ struct NX_PATHKIT_API PaintPath
     SkPath path;
     bool aa = false;
     qreal opacity = 1.0;
+    QTransform transform;
     std::optional<SkPath> clip;
 
     ~PaintPath();
