@@ -21,6 +21,9 @@ class PaintEngineTest:
     public nx::utils::test::TestWithTemporaryDirectory
 {
 public:
+    using TestFunc = std::function<void(QPaintDevice*)>;
+
+public:
     virtual void SetUp() override
     {
         if (qgetenv("QT_QPA_PLATFORM").toStdString() == "offscreen")
@@ -40,6 +43,9 @@ public:
     {
     }
 
+    void checkResult(QSize size, float pixelRatio, const QString& name, TestFunc testFunc);
+
+public:
     std::unique_ptr<QRhi> rhi;
 };
 
@@ -81,85 +87,73 @@ QImage imageDiff(const QImage& img1, const QImage& img2, int& accError)
 
 } // namespace
 
-TEST_F(PaintEngineTest, checkRendering)
+void PaintEngineTest::checkResult(
+    QSize size, float pixelRatio, const QString& name, TestFunc testFunc)
 {
-    QImage referenceImage(400, 400, QImage::Format_RGBA8888_Premultiplied);
-    referenceImage.setDevicePixelRatio(2);
+    QImage referenceImage(size.width(), size.height(), QImage::Format_RGBA8888_Premultiplied);
+    referenceImage.setDevicePixelRatio(pixelRatio);
     referenceImage.fill(Qt::white);
 
     RhiPaintDevice paintDevice;
     paintDevice.setSize(referenceImage.size());
     paintDevice.setDevicePixelRatio(referenceImage.devicePixelRatioF());
 
-    const auto paint =
+    testFunc(&paintDevice);
+    testFunc(&referenceImage);
+
+    RhiOffscreenRenderer offscreen(rhi.get(), referenceImage.size(), Qt::white);
+
+    RhiPaintDeviceRenderer renderer(rhi.get());
+    renderer.sync(&paintDevice);
+
+    const auto rhiImage = offscreen.render(&renderer);
+
+    const QString prefix = testDataDir() + "/" + "PaintEngineTest_" + name;
+
+    rhiImage.save(prefix + "_rhi.png");
+    referenceImage.save(prefix + "_qpainter.png");
+
+    int accError = 0;
+    imageDiff(rhiImage, referenceImage, accError).save(prefix + "_diff.png");
+
+    const auto errPercent =
+        100.0 * accError / (referenceImage.width() * referenceImage.height() * 255 * 3);
+    std::cerr
+        << name.toStdString()
+        << " image error: " << errPercent << "%"
+        << " or " << accError
+        << "\n";
+
+    if (rhi->backend() != QRhi::Null)
+    {
+        EXPECT_LE(errPercent, 0.5); //< This is more of a sanity check.
+    }
+
+    ASSERT_EQ(referenceImage.size(), rhiImage.size());
+}
+
+TEST_F(PaintEngineTest, textTransform)
+{
+    checkResult({400, 400}, 2, test_info_->name(),
         [](QPaintDevice* pd)
         {
             QPainter p(pd);
 
-            // Currently RHI always does smooth pixmap transform.
-            p.setRenderHint(QPainter::SmoothPixmapTransform);
-
-            p.setPen(Qt::black);
-            p.setBrush(QColor(255, 0, 0, 100));
-
-            // Prepare a pixmap that would be used throughout the test.
-            QImage pix(50, 50, QImage::Format_RGBA8888_Premultiplied);
-            pix.setDevicePixelRatio(2);
-            pix.fill(Qt::black);
-            QPainter tmp(&pix);
-            tmp.fillRect(10, 10, 30, 30, Qt::green);
-
-            // Test opactity and transform.
-            p.drawRect(0, 0, 100, 100);
-
-            p.save();
-            p.translate(10, 10);
-            p.rotate(-25);
-            p.drawRect(50, 50, 50, 50);
-            p.restore();
-
-            // Test drawing text.
-            p.save();
             p.rotate(15);
             auto f = p.font();
-            f.setPixelSize(20);
+            f.setPixelSize(40);
             p.setFont(f);
             p.drawText(100, 100, "TEST");
-            p.restore();
+        });
+}
 
-            // Test clipping with transform.
-            p.save();
-            p.setClipRect(QRect(0, 0, 200, 160));
-            p.rotate(15);
-            p.setOpacity(0.5);
-            p.setClipRect(QRect(70, 125, 40, 25), Qt::ClipOperation::IntersectClip);
-            p.drawImage(QRect(50, 100, 100, 50), pix, QRect(5, 5, 40, 40));
-            p.restore();
+TEST_F(PaintEngineTest, linePatterns)
+{
+    checkResult({300, 300}, 2, test_info_->name(),
+        [](QPaintDevice* pd)
+        {
+            QPainter p(pd);
 
-            // Test image drawing.
-            p.drawImage(10, 170, pix);
-
-            p.drawImage(QRect(80, 130, 100, 50), pix, QRect(5, 5, 40, 40));
-            p.drawImage(QRect(80, 30, 100, 50), pix, QRect(5, 5, 40, 40));
-
-            auto pix2 = QPixmap::fromImage(pix);
-            p.drawPixmap(200, 200, pix2);
-            p.drawPixmap(220, 220, pix2);
-
-            p.setPen(QPen(Qt::black, 2));
-
-            // Test drawing a polygon.
-            QPolygon poly;
-            QList<QPoint> points;
-            points << QPoint(100, 100);
-            points << QPoint(130, 100);
-            points << QPoint(140, 140);
-            points << QPoint(100, 130);
-            poly.append(points);
-            p.drawPolygon(poly);
-
-            // Test line patterns.
-            p.save();
             p.scale(2, 2);
 
             p.setPen(QPen(Qt::black, 0));
@@ -186,13 +180,38 @@ TEST_F(PaintEngineTest, checkRendering)
 
             p.setPen(QPen(Qt::black, 4, Qt::DashLine));
             p.drawLine(30, 0, 30, 50);
+        });
+}
 
+TEST_F(PaintEngineTest, opacityAndTransform)
+{
+    checkResult({300, 300}, 2, test_info_->name(),
+        [](QPaintDevice* pd)
+        {
+            QPainter p(pd);
+
+            p.setBrush(QColor(255, 0, 0, 100));
+
+            p.drawRect(10, 10, 100, 100);
+
+            p.save();
+            p.translate(10, 10);
+            p.rotate(-25);
+            p.drawRect(50, 50, 50, 50);
             p.restore();
+        });
+}
 
-            // Test a path with a hole.
+TEST_F(PaintEngineTest, pathWithHole)
+{
+    checkResult({300, 300}, 2, test_info_->name(),
+        [](QPaintDevice* pd)
+        {
+            QPainter p(pd);
+
             p.setBrush(Qt::blue);
 
-            QRect hole(140, 140, 50, 50);
+            QRect hole(50, 50, 50, 50);
 
             QPainterPath fullPath;
             fullPath.addRect(hole);
@@ -203,8 +222,37 @@ TEST_F(PaintEngineTest, checkRendering)
 
             p.setPen(QPen(Qt::black, 1));
             p.drawPath(fullPath.subtracted(holePath));
+        });
+}
 
-            // Test clipping of a pixmap.
+TEST_F(PaintEngineTest, polygon)
+{
+    checkResult({400, 400}, 2, test_info_->name(),
+        [](QPaintDevice* pd)
+        {
+            QPainter p(pd);
+
+            QPolygon poly;
+            QList<QPoint> points;
+            points << QPoint(100, 100);
+            points << QPoint(130, 100);
+            points << QPoint(140, 140);
+            points << QPoint(100, 130);
+            poly.append(points);
+            p.drawPolygon(poly);
+        });
+}
+
+TEST_F(PaintEngineTest, pixmapClipping)
+{
+    checkResult({400, 400}, 2, test_info_->name(),
+        [](QPaintDevice* pd)
+        {
+            QPainter p(pd);
+
+            // Currently RHI always does smooth pixmap transform.
+            p.setRenderHint(QPainter::SmoothPixmapTransform);
+
             QImage textImage(100, 100, QImage::Format_RGBA8888_Premultiplied);
             textImage.setDevicePixelRatio(2);
             textImage.fill(Qt::white);
@@ -221,38 +269,50 @@ TEST_F(PaintEngineTest, checkRendering)
             // It is important to transform the image into pixmap ourselves otherwise Qt does it
             // for us but resulting internal pixmap would be extracted from source rect.
             const QPixmap textPixmap = QPixmap::fromImage(textImage);
-            p.setClipRect(140, 82, 40, 40);
-            p.drawPixmap(QRectF(140, 82, 50, 50), textPixmap, QRectF(10, 10, 30, 80));
-        };
 
-    paint(&paintDevice);
-    paint(&referenceImage);
+            p.drawPixmap(QRect(20, 20, 50, 50), textPixmap);
 
-    RhiOffscreenRenderer offscreen(rhi.get(), referenceImage.size(), Qt::white);
+            p.setClipRect(100, 82, 40, 40);
+            p.drawPixmap(QRect(100, 82, 50, 50), textPixmap, QRectF(10, 10, 30, 80));
+        });
+}
 
-    RhiPaintDeviceRenderer renderer(rhi.get());
-    renderer.sync(&paintDevice);
+TEST_F(PaintEngineTest, imageClipAndTransform)
+{
+    checkResult({400, 400}, 2, test_info_->name(),
+        [](QPaintDevice* pd)
+        {
+            QPainter p(pd);
 
-    const auto rhiImage = offscreen.render(&renderer);
+            // Currently RHI always does smooth pixmap transform.
+            p.setRenderHint(QPainter::SmoothPixmapTransform);
 
-    const QString resultDir = testDataDir() + "/";
+            p.setPen(Qt::black);
+            p.setBrush(QColor(255, 0, 0, 100));
 
-    rhiImage.save(resultDir + "frame_rhi.png");
-    referenceImage.save(resultDir + "frame_qpainter.png");
+            // Prepare a pixmap that would be used throughout the test.
+            QImage pix(50, 50, QImage::Format_RGBA8888_Premultiplied);
+            pix.setDevicePixelRatio(2);
+            pix.fill(Qt::black);
+            QPainter tmp(&pix);
+            tmp.fillRect(10, 10, 30, 30, Qt::green);
 
-    int accError = 0;
-    imageDiff(rhiImage, referenceImage, accError).save(resultDir + "frame_diff.png");
+            // Test clipping with transform.
+            p.save();
+            p.setClipRect(QRect(0, 0, 200, 160));
+            p.rotate(15);
+            p.setOpacity(0.5);
+            p.setClipRect(QRect(70, 125, 40, 25), Qt::ClipOperation::IntersectClip);
+            p.drawImage(QRect(50, 100, 100, 50), pix, QRect(5, 5, 40, 40));
+            p.restore();
 
-    const auto errPercent =
-        100.0 * accError / (referenceImage.width() * referenceImage.height() * 255 * 3);
-    std::cerr << "Image error: " << accError << " or " << errPercent << "%" <<"\n";
+            // Test image drawing.
+            p.drawImage(10, 170, pix);
 
-    if (rhi->backend() != QRhi::Null)
-    {
-        EXPECT_LE(errPercent, 0.5); //< This is more of a sanity check.
-    }
-
-    ASSERT_EQ(referenceImage.size(), rhiImage.size());
+            p.drawImage(QRect(80, 130, 100, 50), pix, QRect(5, 5, 40, 40));
+            p.rotate(20);
+            p.drawImage(QRect(80, 30, 100, 50), pix, QRect(5, 5, 40, 40));
+        });
 }
 
 } // namespace test
