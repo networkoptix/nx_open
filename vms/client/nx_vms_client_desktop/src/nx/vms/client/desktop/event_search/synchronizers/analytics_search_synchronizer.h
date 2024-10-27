@@ -58,9 +58,6 @@ private:
     void setupInstanceSynchronization();
     QVector<AnalyticsSearchSynchronizer*> instancesToNotify();
     static QVector<AnalyticsSearchSynchronizer*>& instances();
-    void at_userChanged(const QnUserResourcePtr& user);
-    void readUserAnalyticsSettings();
-    void applyChanges(core::UserSettings userSettings);
 
 private:
     const QPointer<core::AnalyticsSearchSetup> m_analyticsSetup;
@@ -69,7 +66,6 @@ private:
     bool m_updating = false;
     nx::analytics::db::Filter m_filter;
     core::analytics::taxonomy::AnalyticsFilterModel* m_filterModel = nullptr;
-    core::UserResourcePtr m_currentUser;
 };
 
 } // namespace nx::vms::client::desktop
