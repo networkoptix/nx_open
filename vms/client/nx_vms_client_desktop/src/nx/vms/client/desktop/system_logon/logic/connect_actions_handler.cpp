@@ -61,6 +61,7 @@
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/settings/show_once_settings.h>
+#include <nx/vms/client/desktop/settings/user_specific_settings.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -1479,6 +1480,8 @@ bool ConnectActionsHandler::disconnectFromServer(DisconnectFlags flags)
 
     if (flags.testFlag(DisconnectFlag::ClearAutoLogin))
         appContext()->localSettings()->lastUsedConnection = {};
+
+    windowContext()->system()->userSettings()->saveImmediately();
 
     appContext()->clientStateHandler()->storeSystemSpecificState();
     if (!windowContext()->workbenchStateManager()->tryClose(force))
