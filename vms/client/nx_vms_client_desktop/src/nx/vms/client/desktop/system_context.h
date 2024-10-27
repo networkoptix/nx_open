@@ -35,6 +35,7 @@ class SystemHealthState;
 class SystemSpecificLocalSettings;
 class TrafficRelayUrlWatcher;
 class UserNotificationSettingsManager;
+class UserSpecificSettings;
 class VideoCache;
 class VideoWallOnlineScreensWatcher;
 class VirtualCameraManager;
@@ -90,6 +91,7 @@ public:
     LogsManagementWatcher* logsManagementWatcher() const;
     QnMediaServerStatisticsManager* mediaServerStatisticsManager() const;
     SystemSpecificLocalSettings* localSettings() const;
+    UserSpecificSettings* userSettings() const;
     RestApiHelper* restApiHelper() const;
     OtherServersManager* otherServersManager() const;
     virtual nx::vms::common::SessionTokenHelperPtr getSessionTokenHelper() const override;

@@ -8,7 +8,6 @@
 #include <QtCore/QScopedValueRollback>
 #include <QtGui/QAction>
 
-#include <api/server_rest_connection.h>
 #include <camera/cam_display.h>
 #include <camera/resource_display.h>
 #include <core/resource/camera_resource.h>
@@ -26,6 +25,7 @@
 #include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/resource/layout_item_index.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
+#include <nx/vms/client/desktop/settings/user_specific_settings.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/logic/connect_actions_handler.h>
 #include <nx/vms/client/desktop/system_logon/logic/fresh_session_token_helper.h>
@@ -247,12 +247,23 @@ AnalyticsSearchSynchronizer::AnalyticsSearchSynchronizer(
             updateAction();
         });
 
-    connect(
-        context->system(),
-        &SystemContext::userChanged,
+    connect(&system()->userSettings()->cameraSelection,
+        &utils::property_storage::BaseProperty::changed,
         this,
-        &AnalyticsSearchSynchronizer::at_userChanged);
-    at_userChanged(context->system()->user());
+        [this]()
+        {
+            updateCameraSelection(system()->userSettings()->cameraSelection());
+        });
+    updateCameraSelection(system()->userSettings()->cameraSelection());
+
+    connect(&system()->userSettings()->objectTypeIds,
+        &utils::property_storage::BaseProperty::changed,
+        this,
+        [this]()
+        {
+            updateObjectType(system()->userSettings()->objectTypeIds());
+        });
+    updateObjectType(system()->userSettings()->objectTypeIds());
 
     m_filterModel = context->system()->taxonomyManager()->createFilterModel(this);
 }
@@ -315,7 +326,7 @@ void AnalyticsSearchSynchronizer::updateWorkbench()
         return;
     }
 
-    updateObjectType(m_currentUser->settings().objectTypeIds);
+    updateObjectType(system()->userSettings()->objectTypeIds());
     m_filter = {};
 
     const auto cameraSetType = commonSetup()->cameraSelection();
@@ -518,15 +529,7 @@ void AnalyticsSearchSynchronizer::setupInstanceSynchronization()
             for (auto instance: instancesToNotify())
                 instance->commonSetup()->setCameraSelection(cameraSelection);
 
-            if (!m_currentUser)
-                return;
-
-            auto userSettings = m_currentUser->settings();
-            if (userSettings.cameraSelection != cameraSelection)
-            {
-                userSettings.cameraSelection = cameraSelection;
-                applyChanges(userSettings);
-            }
+            system()->userSettings()->cameraSelection = cameraSelection;
         });
 
     connect(commonSetup(), &CommonObjectSearchSetup::selectedCamerasChanged, this,
@@ -553,17 +556,7 @@ void AnalyticsSearchSynchronizer::setupInstanceSynchronization()
             for (auto instance : instancesToNotify())
                 instance->m_analyticsSetup->setObjectTypes(m_analyticsSetup->objectTypes());
 
-            if (!m_currentUser)
-                return;
-
-            auto userSettings = m_currentUser->settings();
-            if (userSettings.objectTypeIds != objectTypes
-                && windowContext()->connectActionsHandler()->logicalState()
-                    == ConnectActionsHandler::LogicalState::connected)
-            {
-                userSettings.objectTypeIds = objectTypes;
-                applyChanges(userSettings);
-            }
+            system()->userSettings()->objectTypeIds = objectTypes;
         });
 
     connect(m_analyticsSetup, &core::AnalyticsSearchSetup::attributeFiltersChanged, this,
@@ -632,45 +625,6 @@ QVector<AnalyticsSearchSynchronizer*>& AnalyticsSearchSynchronizer::instances()
 {
     static QVector<AnalyticsSearchSynchronizer*> instances;
     return instances;
-}
-
-void AnalyticsSearchSynchronizer::at_userChanged(const QnUserResourcePtr& user)
-{
-    if (user == m_currentUser)
-        return;
-
-    if (m_currentUser)
-        m_currentUser->disconnect(this);
-
-    m_currentUser = user.objectCast<core::UserResource>();
-    if (!m_currentUser)
-        return;
-
-    connect(m_currentUser.get(),
-        &QnUserResource::userSettingsChanged,
-        this,
-        &AnalyticsSearchSynchronizer::readUserAnalyticsSettings);
-    readUserAnalyticsSettings();
-}
-
-void AnalyticsSearchSynchronizer::readUserAnalyticsSettings()
-{
-    if (!m_currentUser)
-        return;
-
-    const auto userSettings = m_currentUser->settings();
-    updateCameraSelection(userSettings.cameraSelection);
-    updateObjectType(userSettings.objectTypeIds);
-}
-
-void AnalyticsSearchSynchronizer::applyChanges(core::UserSettings userSettings)
-{
-    auto sessionTokenHelper = FreshSessionTokenHelper::makeHelper(mainWindowWidget(),
-        tr("Save user"),
-        tr("Enter your account password"),
-        tr("Save"),
-        FreshSessionTokenHelper::ActionType::updateSettings);
-    m_currentUser->saveSettings(userSettings, sessionTokenHelper);
 }
 
 } // namespace nx::vms::client::desktop

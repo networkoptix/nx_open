@@ -12,6 +12,7 @@
 #include <nx/vms/client/desktop/resource/local_resources_initializer.h>
 #include <nx/vms/client/desktop/resource/rest_api_helper.h>
 #include <nx/vms/client/desktop/settings/system_specific_local_settings.h>
+#include <nx/vms/client/desktop/settings/user_specific_settings.h>
 #include <nx/vms/client/desktop/showreel/showreel_state_manager.h>
 #include <nx/vms/client/desktop/statistics/statistics_sender.h>
 #include <nx/vms/client/desktop/system_administration/watchers/logs_management_watcher.h>
@@ -50,6 +51,7 @@ struct SystemContext::Private
     std::unique_ptr<LogsManagementWatcher> logsManagementWatcher;
     std::unique_ptr<QnMediaServerStatisticsManager> mediaServerStatisticsManager;
     std::unique_ptr<SystemSpecificLocalSettings> localSettings;
+    std::unique_ptr<UserSpecificSettings> userSettings;
     std::unique_ptr<RestApiHelper> restApiHelper;
     std::unique_ptr<DelayedDataLoader> delayedDataLoader;
     std::unique_ptr<NonEditableUsersAndGroups> nonEditableUsersAndGroups;

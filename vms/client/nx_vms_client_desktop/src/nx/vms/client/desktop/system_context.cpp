@@ -102,8 +102,9 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
             d->logsManagementWatcher = std::make_unique<LogsManagementWatcher>(this);
             d->mediaServerStatisticsManager = std::make_unique<QnMediaServerStatisticsManager>(
                 this);
-            d->localSettings = std::make_unique<SystemSpecificLocalSettings>(this);
             d->restApiHelper = std::make_unique<RestApiHelper>(this);
+            d->localSettings = std::make_unique<SystemSpecificLocalSettings>(this);
+            d->userSettings = std::make_unique<UserSpecificSettings>(this);
             d->delayedDataLoader = std::make_unique<DelayedDataLoader>(this);
             d->ldapStatusWatcher = std::make_unique<LdapStatusWatcher>(this);
             d->nonEditableUsersAndGroups = std::make_unique<NonEditableUsersAndGroups>(this);
@@ -227,6 +228,11 @@ QnMediaServerStatisticsManager* SystemContext::mediaServerStatisticsManager() co
 SystemSpecificLocalSettings* SystemContext::localSettings() const
 {
     return d->localSettings.get();
+}
+
+UserSpecificSettings* SystemContext::userSettings() const
+{
+    return d->userSettings.get();
 }
 
 RestApiHelper* SystemContext::restApiHelper() const
