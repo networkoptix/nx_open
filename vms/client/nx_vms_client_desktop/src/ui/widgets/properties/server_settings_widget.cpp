@@ -460,7 +460,7 @@ void QnServerSettingsWidget::updateCertificatesInfo()
 
 void QnServerSettingsWidget::updateDigestAlertBar()
 {
-    ui->digestAlertBar->setVisible(systemContext()->user()->digestAuthorizationEnabled());
+    ui->digestAlertBar->setVisible(systemContext()->user()->shouldDigestAuthBeUsed());
 }
 
 void QnServerSettingsWidget::showCertificateMismatchBanner(bool dataLoaded)
