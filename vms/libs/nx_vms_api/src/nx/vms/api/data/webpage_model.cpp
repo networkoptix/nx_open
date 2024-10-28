@@ -25,6 +25,7 @@ std::vector<Model> fromData(std::vector<WebPageData> pages)
         m.id = p.id;
         m.name = std::move(p.name);
         m.url = std::move(p.url);
+        m.parentId = std::move(p.parentId);
 
         result.emplace_back(std::move(m));
     }
@@ -39,6 +40,7 @@ WebPageModelV1::DbUpdateTypes toDbTypes(Model m)
     data.id = std::move(m.id);
     data.name = std::move(m.name);
     data.url = std::move(m.url);
+    data.parentId = std::move(m.parentId);
 
     if constexpr (std::is_same_v<Model, WebPageModelV3>)
     {
