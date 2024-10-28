@@ -306,6 +306,9 @@ QString QnStorageListModel::displayData(const QModelIndex& index, bool forcedTex
                 return QString();
             }
 
+            if (isCloudBackupStorage(storageData))
+                return QString();
+
             return toString(storageData.archiveMode);
         }
 
@@ -661,6 +664,9 @@ QnStorageListModel::ServersByExternalStorageArchiveMode
     {
         return result;
     }
+
+    if (isCloudBackupStorage(storageInfo))
+        return result;
 
     const auto resourcePool = m_server->resourcePool();
 
