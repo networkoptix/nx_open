@@ -274,18 +274,6 @@ void QnFfmpegAudioHelper::copyAudioSamples(quint8* dst, const AVFrame* src) cons
     swr_convert(m_swr,tmpData, src->nb_samples, (const quint8**) src->data, src->nb_samples);
 }
 
-QnFfmpegAvPacket::QnFfmpegAvPacket(uint8_t* data, int size)
-{
-    av_init_packet(this);
-    this->data = data;
-    this->size = size;
-}
-
-QnFfmpegAvPacket::~QnFfmpegAvPacket()
-{
-    av_packet_unref(this);
-}
-
 QString toString(AVPixelFormat pixelFormat)
 {
     const AVPixFmtDescriptor* const descriptor = av_pix_fmt_desc_get(pixelFormat);

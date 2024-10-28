@@ -76,13 +76,4 @@ private:
     int m_sample_fmt = 0;
 };
 
-struct NX_MEDIA_CORE_API QnFfmpegAvPacket: AVPacket //< TODO: #lbusygin Remove deprecated.
-{
-    QnFfmpegAvPacket(uint8_t* data = nullptr, int size = 0);
-    ~QnFfmpegAvPacket();
-
-    QnFfmpegAvPacket(const QnFfmpegAvPacket&) = delete;
-    QnFfmpegAvPacket& operator=(const QnFfmpegAvPacket&) = delete;
-};
-
 NX_MEDIA_CORE_API QString toString(AVPixelFormat pixelFormat);

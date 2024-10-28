@@ -27,6 +27,7 @@
 #include <nx/media/av_codec_helper.h>
 #include <nx/media/codec_parameters.h>
 #include <nx/media/config.h>
+#include <nx/media/ffmpeg/av_packet.h>
 #include <nx/media/ffmpeg/ffmpeg_utils.h>
 #include <nx/media/ffmpeg_helper.h>
 #include <nx/media/video_data_packet.h>
@@ -160,9 +161,10 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
     AVStream *stream;
     while (1)
     {
-        QnFfmpegAvPacket packet;
+        nx::media::ffmpeg::AvPacket avPacket;
+        auto packet = avPacket.get();
         double time_base;
-        int status = av_read_frame(m_formatContext, &packet);
+        int status = av_read_frame(m_formatContext, packet);
         if (status < 0)
         {
             if (status != AVERROR_EOF)
@@ -173,22 +175,22 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
             return QnAbstractMediaDataPtr();
         }
 
-        stream = m_formatContext->streams[packet.stream_index];
-        if (stream->codecpar->codec_id == AV_CODEC_ID_H264 && packet.size == 6)
+        stream = m_formatContext->streams[packet->stream_index];
+        if (stream->codecpar->codec_id == AV_CODEC_ID_H264 && packet->size == 6)
         {
             // may be H264 delimiter as separate packet. remove it
-            if (packet.data[0] == 0x00 && packet.data[1] == 0x00 && packet.data[2] == 0x00 && packet.data[3] == 0x01 && packet.data[4] == nx::media::h264::nuDelimiter)
+            if (packet->data[0] == 0x00 && packet->data[1] == 0x00 && packet->data[2] == 0x00 && packet->data[3] == 0x01 && packet->data[4] == nx::media::h264::nuDelimiter)
                 continue; // skip delimiter
         }
 
         if (m_indexToChannel.empty())
             initLayoutStreams();
 
-        auto indexToChannelIt = m_indexToChannel.find(packet.stream_index);
+        auto indexToChannelIt = m_indexToChannel.find(packet->stream_index);
         if (indexToChannelIt == m_indexToChannel.cend())
         {
             NX_DEBUG(this, "Skip packet, stream number: %1, overall streams: %2",
-                packet.stream_index, m_indexToChannel.size());
+                packet->stream_index, m_indexToChannel.size());
             continue;
         }
 
@@ -196,7 +198,7 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
         {
             case AVMEDIA_TYPE_VIDEO:
             {
-                auto videoData = new QnWritableCompressedVideoData(packet.size,
+                auto videoData = new QnWritableCompressedVideoData(packet->size,
                     getCodecContext(stream));
                 videoData->channelNumber = indexToChannelIt->second;
                 if (stream->codecpar->width > 16 && stream->codecpar->height > 16)
@@ -205,29 +207,29 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
                     videoData->height = stream->codecpar->height;
                 }
                 data = QnAbstractMediaDataPtr(videoData);
-                packetTimestamp(videoData, packet);
-                videoData->m_data.write((const char*) packet.data, packet.size);
+                packetTimestamp(videoData, *packet);
+                videoData->m_data.write((const char*) packet->data, packet->size);
                 break;
             }
 
             case AVMEDIA_TYPE_AUDIO:
             {
-                if (packet.stream_index != m_audioStreamIndex || stream->codecpar->ch_layout.nb_channels < 1)
+                if (packet->stream_index != m_audioStreamIndex || stream->codecpar->ch_layout.nb_channels < 1)
                     continue;
 
-                qint64 timestamp = packetTimestamp(packet);
+                qint64 timestamp = packetTimestamp(*packet);
                 if (!hasVideo() && m_lastSeekTime != AV_NOPTS_VALUE && timestamp < m_lastSeekTime)
                     continue; // seek is broken for audio only media streams
 
                 QnWritableCompressedAudioData* audioData = new QnWritableCompressedAudioData(
-                    packet.size, getCodecContext(stream));
+                    packet->size, getCodecContext(stream));
                 //audioData->format.fromAvStream(stream->codec);
                 time_base = av_q2d(stream->time_base)*1e+6;
-                audioData->duration = qint64(time_base * packet.duration);
+                audioData->duration = qint64(time_base * packet->duration);
                 data = QnAbstractMediaDataPtr(audioData);
                 audioData->channelNumber = indexToChannelIt->second;
                 audioData->timestamp = timestamp;
-                audioData->m_data.write((const char*) packet.data, packet.size);
+                audioData->m_data.write((const char*) packet->data, packet->size);
                 break;
             }
             case AVMEDIA_TYPE_SUBTITLE:
@@ -237,12 +239,12 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
                 const auto version = m_metadata.metadataStreamVersion;
                 if (version >= QnAviArchiveMetadata::kMetadataStreamVersion_4)
                 {
-                    const auto packetData = QByteArray((const char*)packet.data, packet.size);
+                    const auto packetData = QByteArray((const char*)packet->data, packet->size);
                     metadata = nx::recording::helpers::deserializeMetaDataPacket(packetData);
                 }
                 else if (version >= QnAviArchiveMetadata::kMetadataStreamVersion_2)
                 {
-                    const auto packetData = QByteArray((const char*)packet.data, packet.size);
+                    const auto packetData = QByteArray((const char*)packet->data, packet->size);
                     metadata = nx::recording::helpers::deserializeMetaDataPacket(packetData);
                     if (auto objects = std::dynamic_pointer_cast<QnCompressedMetadata>(metadata))
                         convertMetadataFromOldFormat<ObjectMetadataPacketV3>(objects.get());
@@ -250,9 +252,9 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
                 else
                 {
                     auto objectDetection = std::make_shared<QnCompressedMetadata>(
-                        MetadataType::ObjectDetection, packet.size);
+                        MetadataType::ObjectDetection, packet->size);
 
-                    objectDetection->m_data.write((const char*)packet.data, packet.size);
+                    objectDetection->m_data.write((const char*)packet->data, packet->size);
                     if (m_metadata.metadataStreamVersion == 0)
                         convertMetadataFromOldFormat<ObjectMetadataPacketV0>(objectDetection.get());
 
@@ -265,7 +267,7 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
                     continue;
                 }
 
-                metadata->timestamp = packetTimestamp(packet);
+                metadata->timestamp = packetTimestamp(*packet);
                 data = QnAbstractMediaDataPtr(metadata);
                 break;
             }
@@ -275,15 +277,15 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
             }
         }
 
-        if (packet.flags & AV_PKT_FLAG_KEY)
+        if (packet->flags & AV_PKT_FLAG_KEY)
             data->flags |= QnAbstractMediaData::MediaFlags_AVKey;
 
-        while (packet.stream_index >= m_lastPacketTimes.size())
+        while (packet->stream_index >= m_lastPacketTimes.size())
             m_lastPacketTimes << m_startTimeUs;
         if (data->timestamp == AV_NOPTS_VALUE)
-            data->timestamp = m_lastPacketTimes[packet.stream_index];
+            data->timestamp = m_lastPacketTimes[packet->stream_index];
         else
-            m_lastPacketTimes[packet.stream_index] = data->timestamp;
+            m_lastPacketTimes[packet->stream_index] = data->timestamp;
 
         break;
     }

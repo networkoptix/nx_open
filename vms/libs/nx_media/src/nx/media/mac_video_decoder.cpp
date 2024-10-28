@@ -23,6 +23,7 @@ extern "C"
 
 #include <nx/build_info.h>
 #include <nx/codec/nal_units.h>
+#include <nx/media/ffmpeg/av_packet.h>
 #include <nx/media/ffmpeg/old_api.h>
 #include <nx/media/ffmpeg_helper.h>
 #include <nx/media/h264_utils.h>
@@ -326,32 +327,19 @@ int MacVideoDecoder::decode(
             return -1;
     }
 
-    QnFfmpegAvPacket avpkt;
+    nx::media::ffmpeg::AvPacket avPacket(compressedVideoData.get());
+    auto packet = avPacket.get();
+
+    // There is a known ffmpeg bug. It returns the below time for the very last packet while
+    // flushing internal buffer. So, repeat this time for the empty packet in order to avoid
+    // the bug.
     if (compressedVideoData)
-    {
-        avpkt.data = (unsigned char*) compressedVideoData->data();
-        avpkt.size = static_cast<int>(compressedVideoData->dataSize());
-        avpkt.dts = avpkt.pts = compressedVideoData->timestamp;
-        if (compressedVideoData->flags & QnAbstractMediaData::MediaFlags_AVKey)
-            avpkt.flags = AV_PKT_FLAG_KEY;
-
-        // It's already guaranteed by nx::utils::ByteArray that there is an extra space reserved. We must
-        // fill the padding bytes according to ffmpeg documentation.
-        if (avpkt.data)
-            memset(avpkt.data + avpkt.size, 0, AV_INPUT_BUFFER_PADDING_SIZE);
-
         d->lastPts = compressedVideoData->timestamp;
-    }
     else
-    {
-        // There is a known ffmpeg bug. It returns the below time for the very last packet while
-        // flushing internal buffer. So, repeat this time for the empty packet in order to avoid
-        // the bug.
-        avpkt.pts = avpkt.dts = d->lastPts;
-    }
+        packet->pts = packet->dts = d->lastPts;
 
     int gotPicture = 0;
-    int res = nx::media::ffmpeg::old_api::decode(d->codecContext, d->frame, &gotPicture, &avpkt);
+    int res = nx::media::ffmpeg::old_api::decode(d->codecContext, d->frame, &gotPicture, packet);
     if (res <= 0 || !gotPicture)
     {
         NX_WARNING(this, "IOS decoder error. gotPicture %1, errorCode %2", gotPicture, res);

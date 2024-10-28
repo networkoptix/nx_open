@@ -5,6 +5,7 @@
 #include <nx/media/audio_data_packet.h>
 #include <nx/media/codec_parameters.h>
 #include <nx/media/config.h>
+#include <nx/media/ffmpeg/av_packet.h>
 #include <nx/media/ffmpeg/ffmpeg_utils.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
@@ -244,11 +245,12 @@ bool QnFfmpegAudioTranscoder::receivePacket(QnAbstractMediaDataPtr* const result
     while (true)
     {
         // 1. Try to get media from encoder.
-        QnFfmpegAvPacket encodedPacket;
-        int status = avcodec_receive_packet(m_encoderCtx, &encodedPacket);
+        nx::media::ffmpeg::AvPacket avPacket;
+        auto packet = avPacket.get();
+        int status = avcodec_receive_packet(m_encoderCtx, packet);
         if (status == 0)
         {
-            *result = createMediaDataFromAVPacket(encodedPacket);
+            *result = createMediaDataFromAVPacket(*packet);
             return true;
         }
         if (status == AVERROR_EOF)

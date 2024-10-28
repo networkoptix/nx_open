@@ -7,6 +7,7 @@ extern "C" {
 #include <libswscale/swscale.h>
 } // extern "C"
 
+#include <nx/media/ffmpeg/av_packet.h>
 #include <nx/media/ffmpeg/ffmpeg_utils.h>
 #include <nx/media/ffmpeg_audio_filter.h>
 #include <nx/media/ffmpeg_helper.h>
@@ -106,31 +107,18 @@ bool FfmpegAudioDecoder::decode(const QnConstCompressedAudioDataPtr& data, doubl
     }
     d->speed = speed;
 
-    QnFfmpegAvPacket avpkt;
+    nx::media::ffmpeg::AvPacket avPacket(data.get());
+    auto packet = avPacket.get();
+
+    // There is a known ffmpeg bug. It returns the below time for the very last packet while
+    // flushing the internal buffer. So, repeat this time for the empty packet in order to
+    // avoid the bug.
     if (data)
-    {
-        avpkt.data = (unsigned char*)data->data();
-        avpkt.size = static_cast<int>(data->dataSize());
-        avpkt.dts = avpkt.pts = data->timestamp;
-        if (data->flags & QnAbstractMediaData::MediaFlags_AVKey)
-            avpkt.flags = AV_PKT_FLAG_KEY;
-
-        // It's already guaranteed by nx::utils::ByteArray that there is an extra space reserved. We mus
-        // fill the padding bytes according to ffmpeg documentation.
-        if (avpkt.data)
-            memset(avpkt.data + avpkt.size, 0, AV_INPUT_BUFFER_PADDING_SIZE);
-
         d->lastPts = data->timestamp;
-    }
     else
-    {
-        // There is a known ffmpeg bug. It returns the below time for the very last packet while
-        // flushing the internal buffer. So, repeat this time for the empty packet in order to
-        // avoid the bug.
-        avpkt.pts = avpkt.dts = d->lastPts;
-    }
+        packet->pts = packet->dts = d->lastPts;
 
-    int error = avcodec_send_packet(d->codecContext, &avpkt);
+    int error = avcodec_send_packet(d->codecContext, packet);
     if (error < 0)
     {
         NX_WARNING(this, "Failed to decode audio packet, error: %2", data->timestamp,

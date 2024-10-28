@@ -9,6 +9,7 @@ extern "C" {
 #include <QtCore/QDebug>
 
 #include <nx/codec/jpeg/jpeg_utils.h>
+#include <nx/media/ffmpeg/av_packet.h>
 #include <nx/media/ffmpeg/ffmpeg_utils.h>
 #include <nx/media/utils.h>
 #include <nx/utils/log/log.h>
@@ -378,25 +379,26 @@ int QnFfmpegTranscoder::muxPacket(const QnConstAbstractMediaDataPtr& mediaPacket
 
     AVStream* stream = m_formatCtx->streams[streamIndex];
     constexpr AVRational srcRate = {1, 1'000'000};
-    QnFfmpegAvPacket packet;
+    nx::media::ffmpeg::AvPacket avPacket;
+    auto packet = avPacket.get();
 
     if (m_config.useAbsoluteTimestamp)
-        packet.pts = av_rescale_q(mediaPacket->timestamp, srcRate, stream->time_base);
+        packet->pts = av_rescale_q(mediaPacket->timestamp, srcRate, stream->time_base);
     else
-        packet.pts = av_rescale_q(mediaPacket->timestamp - m_baseTime, srcRate, stream->time_base);
+        packet->pts = av_rescale_q(mediaPacket->timestamp - m_baseTime, srcRate, stream->time_base);
 
-    packet.data = (uint8_t*)mediaPacket->data();
-    packet.size = static_cast<int>(mediaPacket->dataSize());
+    packet->data = (uint8_t*)mediaPacket->data();
+    packet->size = static_cast<int>(mediaPacket->dataSize());
     if (mediaPacket->dataType == QnAbstractMediaData::AUDIO || mediaPacket->flags & AV_PKT_FLAG_KEY)
-        packet.flags |= AV_PKT_FLAG_KEY;
+        packet->flags |= AV_PKT_FLAG_KEY;
 
-    packet.stream_index = streamIndex;
-    packet.dts = packet.pts;
+    packet->stream_index = streamIndex;
+    packet->dts = packet->pts;
 
     m_lastPacketTimestamp.ntpTimestamp = mediaPacket->timestamp;
-    m_lastPacketTimestamp.rtpTimestamp = packet.pts;
+    m_lastPacketTimestamp.rtpTimestamp = packet->pts;
 
-    int status = av_write_frame(m_formatCtx, &packet);
+    int status = av_write_frame(m_formatCtx, packet);
     if (status < 0)
     {
         NX_WARNING(this, "Muxing packet error: can't write AV packet, error: %1",
@@ -408,7 +410,7 @@ int QnFfmpegTranscoder::muxPacket(const QnConstAbstractMediaDataPtr& mediaPacket
     {
         auto context = mediaPacket->dataType == QnAbstractMediaData::VIDEO ?
             m_videoCodecParameters : m_audioCodecParameters;
-        m_mediaSigner.processMedia(context, packet.data, packet.size);
+        m_mediaSigner.processMedia(context, packet->data, packet->size);
     }
     return 0;
 }

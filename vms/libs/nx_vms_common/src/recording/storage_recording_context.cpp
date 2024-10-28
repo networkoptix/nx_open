@@ -8,6 +8,7 @@
 
 #include <core/resource/media_resource.h>
 #include <core/resource/storage_resource.h>
+#include <nx/media/ffmpeg/av_packet.h>
 #include <nx/media/ffmpeg/ffmpeg_utils.h>
 #include <nx/media/ffmpeg_helper.h>
 #include <nx/media/utils.h>
@@ -286,22 +287,23 @@ void StorageRecordingContext::writeData(const QnConstAbstractMediaDataPtr& media
         md->dataType != QnAbstractMediaData::UNKNOWN
         && toAvMediaType(md->dataType) == stream->codecpar->codec_type);
 
-    QnFfmpegAvPacket avPkt;
+    nx::media::ffmpeg::AvPacket avPacket;
+    auto packet = avPacket.get();
     int64_t timestamp = getPacketTimeUsec(md);
     int64_t timestampOffsetUsec = md->timestamp - timestamp;
     int64_t dts = av_rescale_q(timestamp, srcRate, stream->time_base);
 
     if (m_streamIndexToLastDts[streamIndex] > dts)
     {
-        avPkt.dts = m_streamIndexToLastDts[streamIndex] + 1;
+        packet->dts = m_streamIndexToLastDts[streamIndex] + 1;
         NX_DEBUG(this,
             "Packet with stream index %1 has inconsistent dts %2. "
             "Last saved dts for this stream: %3. Fixing dts to: %4",
-            streamIndex, dts, m_streamIndexToLastDts[streamIndex], avPkt.dts);
+            streamIndex, dts, m_streamIndexToLastDts[streamIndex], packet->dts);
     }
     else
     {
-        avPkt.dts = dts;
+        packet->dts = dts;
     }
 
     m_streamIndexToLastDts[streamIndex] = dts;
@@ -311,16 +313,16 @@ void StorageRecordingContext::writeData(const QnConstAbstractMediaDataPtr& media
         && !video->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey))
     {
         auto pts = video->pts - timestampOffsetUsec;
-        avPkt.pts = av_rescale_q(
-            pts, srcRate, stream->time_base) + (avPkt.dts - dts);
+        packet->pts = av_rescale_q(
+            pts, srcRate, stream->time_base) + (packet->dts - dts);
     }
     else
     {
-        avPkt.pts = avPkt.dts;
+        packet->pts = packet->dts;
     }
 
     if ((md->flags & AV_PKT_FLAG_KEY) && md->dataType != QnAbstractMediaData::GENERIC_METADATA)
-        avPkt.flags |= AV_PKT_FLAG_KEY;
+        packet->flags |= AV_PKT_FLAG_KEY;
 
     if (!metadataPacketData.isEmpty())
     {
@@ -332,27 +334,27 @@ void StorageRecordingContext::writeData(const QnConstAbstractMediaDataPtr& media
         packetData = const_cast<quint8*>((const quint8*)md->data());
         packetDataSize = static_cast<int>(md->dataSize());
     }
-    avPkt.data = const_cast<uint8_t*>(packetData);  // const_cast is here because av_write_frame accepts non-const pointer, but does not modify object
-    avPkt.size = packetDataSize;
-    avPkt.stream_index = streamIndex;
+    packet->data = const_cast<uint8_t*>(packetData);  // const_cast is here because av_write_frame accepts non-const pointer, but does not modify object
+    packet->size = packetDataSize;
+    packet->stream_index = streamIndex;
 
-    if (avPkt.pts < avPkt.dts)
+    if (packet->pts < packet->dts)
     {
-        avPkt.pts = avPkt.dts;
+        packet->pts = packet->dts;
         NX_WARNING(this, "Timestamp error: PTS < DTS. Fixed.");
     }
 
     auto startWriteTime = high_resolution_clock::now();
     auto ret = isInterleavedStream()
-        ? av_interleaved_write_frame(context.formatCtx, &avPkt)
-        : av_write_frame(context.formatCtx, &avPkt);
+        ? av_interleaved_write_frame(context.formatCtx, packet)
+        : av_write_frame(context.formatCtx, packet);
 
     auto endWriteTime = high_resolution_clock::now();
     context.totalWriteTimeNs += duration_cast<nanoseconds>(endWriteTime - startWriteTime).count();
     NX_VERBOSE(this,
         "Writing ffmpeg packet. timestamp: %1, dts: %2, pts: %3, "
         "stream index: %4, size: %5, result: %6, write time(ns): %7",
-        timestamp, avPkt.dts, avPkt.pts, streamIndex, avPkt.size, ret, context.totalWriteTimeNs);
+        timestamp, packet->dts, packet->pts, streamIndex, packet->size, ret, context.totalWriteTimeNs);
 
     if (ret < 0 || context.formatCtx->pb->error == -1) //< Disk write operation failed.
     {
