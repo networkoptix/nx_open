@@ -509,6 +509,24 @@ TEST(utils, stringEndsWith)
     ASSERT_FALSE(stringEndsWith("x", "a_longer_suffix"));
 }
 
+TEST(utils, stringContains)
+{
+    ASSERT_TRUE(stringContains("abc", "ab"));
+    ASSERT_TRUE(stringContains("abc", "c"));
+    ASSERT_TRUE(stringContains("abc", "bc"));
+    ASSERT_TRUE(stringContains("abc", "b"));
+    ASSERT_TRUE(stringContains("abc", "abc"));
+    ASSERT_TRUE(stringContains("abc", ""));
+    ASSERT_TRUE(stringContains("", ""));
+
+    ASSERT_FALSE(stringContains("", "a"));
+    ASSERT_FALSE(stringContains("b", "a"));
+    ASSERT_FALSE(stringContains("abc", "X"));
+    ASSERT_FALSE(stringContains("abc", "abX"));
+    ASSERT_FALSE(stringContains("abc", "Xbc"));
+    ASSERT_FALSE(stringContains("x", "a_longer_substring"));
+}
+
 TEST(utils, trimString)
 {
     ASSERT_EQ("abc", trimString("abc"));

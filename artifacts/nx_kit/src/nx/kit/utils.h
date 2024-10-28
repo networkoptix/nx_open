@@ -98,6 +98,9 @@ NX_KIT_API void stringReplaceAll(
 NX_KIT_API bool stringStartsWith(const std::string& s, const std::string& prefix);
 NX_KIT_API bool stringEndsWith(const std::string& s, const std::string& suffix);
 
+// TODO: Remove when migrating to C++23 - it has std::string::contains().
+NX_KIT_API bool stringContains(const std::string& s, const std::string& substring);
+
 NX_KIT_API std::string trimString(const std::string& s);
 
 //-------------------------------------------------------------------------------------------------

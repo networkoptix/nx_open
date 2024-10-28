@@ -29,7 +29,9 @@ public: //< Required for Qt MOC run.
     QString description;
     QString version;
 
-    /**%apidoc[opt] */
+    /**%apidoc[opt]
+     * TODO: Investigate why it's [opt], contrary to manifests.md saying it's mandatory.
+     */
     QString vendor;
 
     /**%apidoc[opt] */

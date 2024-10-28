@@ -45,7 +45,7 @@ is obviously not needed, and the organization type part like `com.` or `org.` is
 
 The identifiers are intended to be context-local, thus, must be unique only among all identifiers
 used to denote entities of the same kind. It means that, for example, there is no need to include
-the word `event` in an identifier of certain Event type.
+the word `event` in an identifier of a certain Event type.
 
 For example, for a company called "My Company", an identifier for an Analytics Event type of a Line
 Crossing event may look like `"myCompany.lineCrossing"`.
@@ -197,6 +197,8 @@ Engine Manifest is a JSON Object containing the following fields:
     The structure of this JSON object is described in the dedicated document
     [src/nx/sdk/analytics/taxonomy.md](@ref md_src_nx_sdk_analytics_taxonomy).
 
+    Optional.
+
 - `"objectActions"`: Array<Object>
 
     A possibly empty list of Objects, each being a declaration of an Engine ObjectAction - the user
@@ -273,6 +275,8 @@ Engine Manifest is a JSON Object containing the following fields:
             - `"bgra"`
             - `"rgb"`
             - `"bgr"`
+
+    Optional.
 
 - `"deviceAgentSettingsModel"`: SettingsModel (Object)
 

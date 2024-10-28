@@ -604,6 +604,11 @@ bool stringEndsWith(const std::string& s, const std::string& suffix)
         && s.compare(s.size() - suffix.size(), suffix.size(), suffix) == 0;
 }
 
+bool stringContains(const std::string& s, const std::string& substring)
+{
+    return s.find(substring) != std::string::npos;
+}
+
 std::string trimString(const std::string& s)
 {
     int start = 0;

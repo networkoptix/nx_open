@@ -82,6 +82,24 @@ public:
     const Result<Value> result;
 };
 
+static std::string testText(nx::kit::Json textJson)
+{
+    ASSERT_TRUE(textJson.is_string());
+    const std::string text = textJson.string_value();
+    ASSERT_FALSE(text.empty());
+    for (const char c: text)
+        ASSERT_TRUE(nx::kit::utils::isAsciiPrintable(c));
+
+    return text;
+}
+
+static void testId(nx::kit::Json idJson)
+{
+    const std::string id = testText(idJson);
+    ASSERT_FALSE(nx::kit::utils::stringStartsWith(id, "nx.sys"));
+    ASSERT_FALSE(nx::kit::utils::stringContains(id, ".sys."));
+}
+
 // TODO: When manifest is introduced for any IIntegration (not only Analytics), rewrite.
 static void testAnalyticsIntegrationManifest(nx::sdk::analytics::IIntegration* integration)
 {
@@ -89,10 +107,10 @@ static void testAnalyticsIntegrationManifest(nx::sdk::analytics::IIntegration* i
 
     ASSERT_TRUE(result.isOk());
     const auto integrationManifest = result.result.value();
-    ASSERT_TRUE(integrationManifest);
+    ASSERT_TRUE(integrationManifest != nullptr);
 
     const char* const integrationManifestStr = integrationManifest->str();
-    ASSERT_TRUE(integrationManifestStr);
+    ASSERT_TRUE(integrationManifestStr != nullptr);
     ASSERT_TRUE(integrationManifestStr[0] != '\0');
     NX_PRINT << "Integration manifest:\n" << integrationManifestStr;
 
@@ -101,6 +119,12 @@ static void testAnalyticsIntegrationManifest(nx::sdk::analytics::IIntegration* i
         nx::kit::Json::parse(integrationManifest->str(), integrationManifestError);
     ASSERT_EQ("", integrationManifestError);
     ASSERT_TRUE(integrationManifestJson.is_object());
+
+    testId(integrationManifestJson["id"]);
+    testText(integrationManifestJson["name"]);
+    testText(integrationManifestJson["description"]);
+    testText(integrationManifestJson["version"]);
+    testText(integrationManifestJson["vendor"]);
 }
 
 static void testEngineManifest(IEngine* engine)
@@ -109,10 +133,10 @@ static void testEngineManifest(IEngine* engine)
 
     ASSERT_TRUE(result.isOk());
     const auto engineManifest = result.result.value();
-    ASSERT_TRUE(engineManifest);
+    ASSERT_TRUE(engineManifest != nullptr);
 
     const char* const engineManifestStr = engineManifest->str();
-    ASSERT_TRUE(engineManifestStr);
+    ASSERT_TRUE(engineManifestStr != nullptr);
     ASSERT_TRUE(engineManifestStr[0] != '\0');
     NX_PRINT << "Engine manifest:\n" << engineManifestStr;
 
@@ -129,9 +153,9 @@ static void testDeviceAgentManifest(IDeviceAgent* deviceAgent)
     ASSERT_TRUE(result.isOk());
 
     const auto deviceAgentManifest = result.result.value();
-    ASSERT_TRUE(deviceAgentManifest);
+    ASSERT_TRUE(deviceAgentManifest != nullptr);
     const char* deviceAgentManifestStr = deviceAgentManifest->str();
-    ASSERT_TRUE(deviceAgentManifestStr);
+    ASSERT_TRUE(deviceAgentManifestStr != nullptr);
     ASSERT_TRUE(deviceAgentManifestStr[0] != '\0');
     NX_PRINT << "DeviceAgent manifest:\n" << deviceAgentManifestStr;
     std::string deviceAgentManifestError;
@@ -188,7 +212,7 @@ class DeviceAgentHandler: public nx::sdk::RefCountable<IDeviceAgent::IHandler>
 public:
     virtual void handleMetadata(IMetadataPacket* metadata) override
     {
-        ASSERT_TRUE(metadata);
+        ASSERT_TRUE(metadata != nullptr);
 
         NX_PRINT << "DeviceAgentHandler: Received metadata packet with timestamp "
             << metadata->timestampUs() << " us";
@@ -198,7 +222,7 @@ public:
 
     virtual void handlePluginDiagnosticEvent(IPluginDiagnosticEvent* event) override
     {
-        ASSERT_TRUE(event);
+        ASSERT_TRUE(event != nullptr);
 
         NX_PRINT << "DeviceAgentHandler: Received a plugin diagnostic event: "
             << "level " << (int) event->level() << ", "
@@ -208,8 +232,8 @@ public:
 
     virtual void pushManifest(const IString* manifest) override
     {
-        ASSERT_TRUE(manifest);
-        ASSERT_TRUE(manifest->str());
+        ASSERT_TRUE(manifest != nullptr);
+        ASSERT_TRUE(manifest->str() != nullptr);
 
         NX_PRINT << "DeviceAgentHandler: Received a pushed manifest:\n"
             << manifest->str();
@@ -221,7 +245,7 @@ class EngineHandler: public nx::sdk::RefCountable<IEngine::IHandler>
 public:
     virtual void handlePluginDiagnosticEvent(IPluginDiagnosticEvent* event) override
     {
-        ASSERT_TRUE(event);
+        ASSERT_TRUE(event != nullptr);
 
         NX_PRINT << "EngineHandler: Received a plugin diagnostic event: "
             << "level " << (int) event->level() << ", "
@@ -231,7 +255,7 @@ public:
 
     virtual void pushManifest(const IString* manifest) override
     {
-        ASSERT_TRUE(manifest);
+        ASSERT_TRUE(manifest != nullptr);
         NX_PRINT << "EngineHandler: Received a manifest: " << manifest->str();
     }
 };
@@ -253,7 +277,7 @@ protected:
     virtual const IMediaContext* getContext() const override { return nullptr; }
 
 protected:
-    virtual nx::sdk::IList<nx::sdk::analytics::IMetadataPacket>* getMetadataList() const override
+    virtual nx::sdk::IList<IMetadataPacket>* getMetadataList() const override
     {
         return nullptr;
     }
@@ -298,7 +322,7 @@ public:
  * - The DeviceAgent accepts unknown Settings, silently ignoring them without producing an error.
  * - The DeviceAgent accepts any needed-metadata-types.
  */
-static void testStubAnalyticsPluginEngine(IEngine* engine)
+static void testDumbAnalyticsPluginEngine(IEngine* engine)
 {
     const auto deviceInfo = makePtr<DeviceInfo>();
     deviceInfo->setId("TEST");
@@ -307,10 +331,10 @@ static void testStubAnalyticsPluginEngine(IEngine* engine)
     ASSERT_TRUE(obtainDeviceAgentResult.isOk());
 
     const auto deviceAgent = obtainDeviceAgentResult.result.value();
-    ASSERT_TRUE(deviceAgent);
+    ASSERT_TRUE(deviceAgent != nullptr);
     ASSERT_TRUE(deviceAgent->queryInterface<IDeviceAgent>());
     const auto consumingDeviceAgent = deviceAgent->queryInterface<IConsumingDeviceAgent>();
-    ASSERT_TRUE(consumingDeviceAgent);
+    ASSERT_TRUE(consumingDeviceAgent != nullptr);
 
     consumingDeviceAgent->setHandler(nx::sdk::makePtr<DeviceAgentHandler>().get());
     testDeviceAgentManifest(consumingDeviceAgent.get());
@@ -325,18 +349,18 @@ static void testStubAnalyticsPluginEngine(IEngine* engine)
     ASSERT_TRUE(pushDataPacketResult.isOk());
 }
 
-/** Any Analytics Plugin must pass. */
-static void testAnalyticsPlugin(nx::sdk::analytics::IIntegration* plugin)
+/** Any Analytics Integration must pass. */
+static void testAnalyticsIntegration(nx::sdk::analytics::IIntegration* integration)
 {
-    ASSERT_TRUE(plugin);
+    ASSERT_TRUE(integration != nullptr);
 
-    testAnalyticsIntegrationManifest(plugin);
+    testAnalyticsIntegrationManifest(integration);
 
-    const RefCountableResultHolder<IEngine*> createEngineResult{plugin->createEngine()};
+    const RefCountableResultHolder<IEngine*> createEngineResult{integration->createEngine()};
     ASSERT_TRUE(createEngineResult.isOk());
 
     IEngine* const engine = createEngineResult.result.value();
-    ASSERT_TRUE(engine);
+    ASSERT_TRUE(engine != nullptr);
     ASSERT_TRUE(engine->queryInterface<IEngine>());
 
     engine->setHandler(makePtr<EngineHandler>().get());
@@ -344,22 +368,25 @@ static void testAnalyticsPlugin(nx::sdk::analytics::IIntegration* plugin)
     testEngineManifest(engine);
     testEngineSettings(engine);
 
-    testStubAnalyticsPluginEngine(engine);
+
+
+    testDumbAnalyticsPluginEngine(engine);
 }
 
-/** Any Plugin must pass. */
-static void testPlugin(Ptr<nx::sdk::IIntegration> plugin)
+/** Any Integration must pass. */
+static void testIntegration(Ptr<nx::sdk::IIntegration> integration)
 {
-    ASSERT_TRUE(plugin);
-    ASSERT_TRUE(plugin->queryInterface<IRefCountable>());
-    ASSERT_TRUE(plugin->queryInterface<nx::sdk::IIntegration>());
+    ASSERT_TRUE(integration != nullptr);
+    ASSERT_TRUE(integration->queryInterface<IRefCountable>());
+    ASSERT_TRUE(integration->queryInterface<nx::sdk::IIntegration>());
 
-    plugin->setUtilityProvider(makePtr<UtilityProvider>().get());
+    integration->setUtilityProvider(makePtr<UtilityProvider>().get());
 
-    const Ptr<nx::sdk::analytics::IIntegration> analyticsPlugin =
-        plugin->queryInterface<nx::sdk::analytics::IIntegration>();
-
-    testAnalyticsPlugin(analyticsPlugin.get());
+    if (const auto analyticsIntegration =
+        integration->queryInterface<nx::sdk::analytics::IIntegration>())
+    {
+        testAnalyticsIntegration(analyticsIntegration.get());
+    }
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -519,32 +546,36 @@ static void testPluginLibrary(const std::string& libFilename)
     // Obtain plugin's LibContext and fill in the plugin libName.
     const auto nxLibContextFunc = reinterpret_cast<NxLibContextFunc>(
         resolveLibFunc(libHandle, kNxLibContextFuncName));
-    ASSERT_TRUE(nxLibContextFunc);
+    ASSERT_TRUE(nxLibContextFunc != nullptr);
     ILibContext* const pluginLibContext = nxLibContextFunc();
-    ASSERT_TRUE(pluginLibContext);
+    ASSERT_TRUE(pluginLibContext != nullptr);
     const std::string pluginLibName = getPluginLibName(libFilename);
     pluginLibContext->setName(pluginLibName.c_str());
 
-    ASSERT_TRUE(entryPointFunc || multiEntryPointFunc);
+    ASSERT_TRUE(entryPointFunc != nullptr || multiEntryPointFunc != nullptr);
     if (multiEntryPointFunc) //< Do not use entryPointFunc even if it is exported.
     {
         int instanceIndex = 0;
-        while (const auto plugin = Ptr(multiEntryPointFunc(instanceIndex)))
+        while (const auto integration = Ptr(multiEntryPointFunc(instanceIndex)))
         {
             if (g_integrationInstanceIndex == -1 || g_integrationInstanceIndex == instanceIndex)
             {
                 NX_PRINT << "Testing plugin " << pluginLibName
-                    << " with instance index " << instanceIndex;
-                testPlugin(plugin);
+                    << " with Integration instance index " << instanceIndex;
+                testIntegration(integration);
             }
             ++instanceIndex;
         }
     }
-    else //< Use entryPointFunc.
+    else if (entryPointFunc)
     {
-        const auto plugin = Ptr(entryPointFunc());
-        ASSERT_TRUE(plugin);
-        testPlugin(plugin);
+        const auto integration = Ptr(entryPointFunc());
+        ASSERT_TRUE(integration != nullptr);
+        testIntegration(integration);
+    }
+    else
+    {
+        NX_KIT_ASSERT(false);
     }
 
     unloadLib(libHandle);
@@ -644,7 +675,6 @@ using namespace nx::vms_server_plugins::analytics::test;
 int main(int argc, const char* argv[])
 {
     // Process only args after "--" - let nx_kit test-infrastructure process the others.
-    // Process only args after "--" - let nx_kit test infrastructure process the others.
     int extraArgCount = 0;
     const char** extraArgs = nullptr;
     for (int i = 1; i < argc; ++i)
