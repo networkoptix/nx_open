@@ -7,6 +7,8 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 
+#include "email_fwd.h"
+
 namespace nx::email {
 
 struct NX_VMS_COMMON_API Attachment
@@ -25,8 +27,6 @@ struct NX_VMS_COMMON_API Attachment
 
 #define Attachments_Fields (filename)(content)(mimetype)
 QN_FUSION_DECLARE_FUNCTIONS(Attachment, (json), NX_VMS_COMMON_API)
-
-using AttachmentList = QList<Attachment>;
 
 struct NX_VMS_COMMON_API Message
 {

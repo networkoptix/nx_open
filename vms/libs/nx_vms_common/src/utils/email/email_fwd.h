@@ -1,10 +1,8 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#ifndef QN_EMAIL_FWD_H
-#define QN_EMAIL_FWD_H
+#pragma once
 
-#include <QtCore/QString>
-#include <QtCore/QStringList>
+#include <QtCore/QList>
 
 #include <nx/vms/api/types/smtp_types.h>
 
@@ -17,6 +15,8 @@ using ConnectionType = nx::vms::api::ConnectionType;
 struct QnEmailSmtpServerPreset;
 struct QnEmailSettings;
 class  QnEmailAddress;
+
+struct SmtpOperationResult;
 
 enum SmtpReplyCode
 {
@@ -50,8 +50,13 @@ enum SmtpReplyCode
     TransactionFailed = 554,
 };
 
-namespace nx::email { enum class SmtpError; }
+namespace nx::email {
 
-struct SmtpOperationResult;
+enum class SmtpError;
 
-#endif // QN_EMAIL_FWD_H
+struct Attachment;
+using AttachmentList = QList<Attachment>;
+
+struct Message;
+
+} // namespace nx::email

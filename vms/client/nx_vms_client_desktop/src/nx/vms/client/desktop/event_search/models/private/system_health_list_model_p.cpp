@@ -482,11 +482,8 @@ menu::IDType SystemHealthListModel::Private::action(int index) const
             return menu::PreferencesLicensesTabAction;
 
         case MessageType::smtpIsNotSet:
-            return menu::PreferencesSmtpTabAction;
-
         case MessageType::emailSendError:
             return menu::PreferencesSmtpTabAction;
-            break;
 
         case MessageType::backupStoragesNotConfigured:
         case MessageType::storagesNotConfigured:

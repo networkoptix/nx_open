@@ -45,12 +45,11 @@ struct NX_VMS_COMMON_API SmtpOperationResult
     explicit operator bool() const { return error == nx::email::SmtpError::success; }
 
     /** Note: not translatable. */
-    QString toString() const;
+    std::string toString() const;
 };
 
 #define SmtpOperationResult_Fields (error)(lastCode)
-
-QN_FUSION_DECLARE_FUNCTIONS(SmtpOperationResult, (lexical)(json), NX_VMS_COMMON_API)
+NX_REFLECTION_INSTRUMENT(SmtpOperationResult, SmtpOperationResult_Fields)
 
 // TODO: #sivanov Move other methods to this namespace, then move module to nx/email (?) lib.
 namespace nx {
@@ -95,9 +94,11 @@ struct NX_VMS_COMMON_API QnEmailSettings: nx::vms::api::EmailSettings
      */
     bool isValid() const;
 
+    /* Check if there enough fields filled to send email. */
+    bool isFilled() const;
+
     static bool isValid(const QString& email, const QString& server);
     static int defaultPort(nx::vms::api::ConnectionType connectionType);
-    static int defaultTimeoutSec();
 };
 
 /**

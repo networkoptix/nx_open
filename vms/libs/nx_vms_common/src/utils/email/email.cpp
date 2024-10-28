@@ -3,13 +3,13 @@
 #include "email.h"
 
 #include <QtCore/QCoreApplication>
-#include <QtCore/QDebug>
 #include <QtCore/QFile>
 #include <QtCore/QHash>
 #include <QtCore/QRegularExpression>
 #include <QtCore/QThread>
 
 #include <nx/fusion/model_functions.h>
+#include <nx/reflect/json.h>
 #include <nx/utils/url.h>
 
 namespace {
@@ -23,20 +23,13 @@ static const QString kEmailPattern =
 /* RFC5233 (sub-addressing, also known as plus addressing or tagged addressing). */
 static const QString kFullNamePattern = "^(?<fullname>.*)<(?<email>.+)>$";
 
-static constexpr int kTlsPort = 587;
-static constexpr int kSslPort = 465;
-static constexpr int kUnsecurePort = 25;
 static constexpr int kAutoPort = 0;
-
-static constexpr int kDefaultSmtpTimeout = 300; //< Seconds, 5 min.
 
 } // namespace
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SmtpOperationResult, (json), SmtpOperationResult_Fields)
-
-QString SmtpOperationResult::toString() const
+std::string SmtpOperationResult::toString() const
 {
-    return QString::fromUtf8(QJson::serialized(*this));
+    return nx::reflect::json::serialize(*this);
 }
 
 bool nx::email::isValidAddress(const QString& address)
@@ -65,11 +58,6 @@ QnEmailSmtpServerPreset::QnEmailSmtpServerPreset(
 QnEmailSettings::QnEmailSettings(const nx::vms::api::EmailSettings& settings):
     nx::vms::api::EmailSettings(settings){}
 
-int QnEmailSettings::defaultTimeoutSec()
-{
-    return kDefaultSmtpTimeout;
-}
-
 int QnEmailSettings::defaultPort(QnEmail::ConnectionType connectionType)
 {
     switch (connectionType)
@@ -79,13 +67,18 @@ int QnEmailSettings::defaultPort(QnEmail::ConnectionType connectionType)
         case QnEmail::ConnectionType::tls:
             return kTlsPort;
         default:
-            return kUnsecurePort;
+            return kInsecurePort;
     }
 }
 
 bool QnEmailSettings::isValid() const
 {
-    return QnEmailAddress(email).isValid() && nx::utils::Url::fromUserInput(server).isValid();
+    return isValid(email, server);
+}
+
+bool QnEmailSettings::isFilled() const
+{
+    return !email.isEmpty() && !server.isEmpty();
 }
 
 bool QnEmailSettings::isValid(const QString& email, const QString& server)
