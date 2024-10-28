@@ -17,6 +17,26 @@
 using namespace nx::vms::client;
 using namespace nx::vms::client::desktop;
 
+namespace {
+
+static const int kMaxResourcesLines = 3;
+
+QStringList getCameraList(const QSet<QnResourcePtr>& resources)
+{
+    QStringList result;
+    for (const auto& cameraResource: resources)
+    {
+        const auto camera = cameraResource.dynamicCast<QnVirtualCameraResource>();
+        if (!NX_ASSERT(camera))
+            continue;
+
+        result << camera->getName();
+    }
+    return result;
+}
+
+} // namespace
+
 QString QnSystemHealthStringsHelper::messageShortTitle(MessageType messageType)
 {
     switch (messageType)
@@ -192,7 +212,10 @@ QString QnSystemHealthStringsHelper::messageTooltip(
             return QString();
 
         case MessageType::defaultCameraPasswords:
-            return QString(); //< TODO: #vkutin #sivanov Some tooltip would be nice.
+        {
+            const auto cameras = getCameraList(resources);
+            return cameras.size() > kMaxResourcesLines ? cameras.join("\n") : QString{};
+        }
 
         case MessageType::archiveIntegrityFailed:
         case MessageType::archiveRebuildFinished:
@@ -229,19 +252,9 @@ QString QnSystemHealthStringsHelper::messageTooltip(
             break;
         case MessageType::cameraRecordingScheduleIsInvalid:
         {
-            QStringList result;
-            result << tr("Some cameras are set to record in a mode they do not support.");
-            result << ""; //< Additional line break by design.
-
-            for (const auto& cameraResource: resources)
-            {
-                const auto camera = cameraResource.dynamicCast<QnVirtualCameraResource>();
-                if (!NX_ASSERT(camera))
-                    continue;
-
-                result << camera->getName();
-            }
-            return result.join("\n");
+            messageParts << tr("Some cameras are set to record in a mode they do not support.");
+            messageParts << ""; //< Additional line break by design.
+            messageParts += getCameraList(resources);
         }
 
         default:
