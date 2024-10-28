@@ -27,13 +27,6 @@ target_include_directories(nx_media_core
         ${Qt6Core_PRIVATE_INCLUDE_DIRS}
 )
 
-# TODO: #lbusygin Remove with av_init_packet call.
-if(WINDOWS)
-    target_compile_options(nx_media_core PRIVATE /wd4996) #< Deprecated functions.
-else()
-    target_compile_options(nx_media_core PRIVATE -Wno-error=deprecated-declarations)
-endif()
-
 if(withTests)
     add_subdirectory(unit_tests)
 endif()

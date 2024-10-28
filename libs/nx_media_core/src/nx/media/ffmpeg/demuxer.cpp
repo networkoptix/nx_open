@@ -2,6 +2,7 @@
 
 #include "demuxer.h"
 
+#include <nx/media/ffmpeg/av_packet.h>
 #include <nx/media/ffmpeg/ffmpeg_utils.h>
 #include <nx/utils/log/log.h>
 
@@ -56,8 +57,9 @@ QnAbstractMediaDataPtr Demuxer::getNextData()
         return nullptr;
     }
 
-    QnFfmpegAvPacket packet;
-    int status = av_read_frame(m_formatContext, &packet);
+    AvPacket avPacket;
+    auto packet = avPacket.get();
+    int status = av_read_frame(m_formatContext, packet);
     if (status < 0)
     {
         if (status != AVERROR_EOF)
@@ -68,16 +70,16 @@ QnAbstractMediaDataPtr Demuxer::getNextData()
         return nullptr;
     }
 
-    AVStream* const stream = m_formatContext->streams[packet.stream_index];
+    AVStream* const stream = m_formatContext->streams[packet->stream_index];
 
     if (stream->codecpar->codec_type != AVMEDIA_TYPE_VIDEO)
         return QnAbstractMediaDataPtr(new QnEmptyMediaData());
 
     CodecParametersConstPtr codecContext = std::make_shared<CodecParameters>(stream->codecpar);
-    auto data = std::make_shared<QnWritableCompressedVideoData>(packet.size, codecContext);
+    auto data = std::make_shared<QnWritableCompressedVideoData>(packet->size, codecContext);
     data->channelNumber = 0;
-    data->timestamp = packet.pts;
-    data->m_data.write((const char*) packet.data, packet.size);
+    data->timestamp = packet->pts;
+    data->m_data.write((const char*) packet->data, packet->size);
     data->compressionType = stream->codecpar->codec_id;
     data->flags |= QnAbstractMediaData::MediaFlag::MediaFlags_AVKey;
     data->width = stream->codecpar->width;

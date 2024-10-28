@@ -3,6 +3,7 @@
 #include "ffmpeg_audio_decoder.h"
 
 #include <nx/media/audio_data_packet.h>
+#include <nx/media/ffmpeg/av_packet.h>
 #include <nx/media/ffmpeg/ffmpeg_utils.h>
 #include <nx/utils/log/log_main.h>
 
@@ -66,8 +67,8 @@ bool QnFfmpegAudioDecoder::decode(QnCompressedAudioDataPtr& data, nx::utils::Byt
     int size = static_cast<int>(data->dataSize());
     unsigned char* outbuf = (unsigned char*)result.data();
 
-    QnFfmpegAvPacket avpkt((quint8*) inbuf_ptr, size);
-    int error = avcodec_send_packet(m_audioDecoderCtx, &avpkt);
+    nx::media::ffmpeg::AvPacket avpkt((quint8*) inbuf_ptr, size);
+    int error = avcodec_send_packet(m_audioDecoderCtx, avpkt.get());
     if (error < 0)
     {
         NX_WARNING(this, "Failed to decode audio packet timestamp: %1, error: %2", data->timestamp,

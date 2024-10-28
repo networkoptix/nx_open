@@ -21,6 +21,7 @@ extern "C" {
 #include <nx/media/config.h>
 #include <nx/media/ffmpeg/audio_encoder.h>
 #include <nx/media/ffmpeg/av_options.h>
+#include <nx/media/ffmpeg/av_packet.h>
 #include <nx/media/ffmpeg/old_api.h>
 #include <nx/media/ffmpeg_helper.h>
 #include <nx/media/media_data_packet.h>
@@ -639,10 +640,11 @@ int DesktopDataProvider::processData(bool flush)
     if (d->frame->width <= 0 || d->frame->height <= 0)
         return -1;
 
-    QnFfmpegAvPacket outPacket;
+    nx::media::ffmpeg::AvPacket avPacket;
+    auto packet = avPacket.get();
     int got_packet = 0;
     int encodeResult = nx::media::ffmpeg::old_api::encode(
-        d->videoCodecCtx, &outPacket, flush ? 0 : d->frame, &got_packet);
+        d->videoCodecCtx, packet, flush ? 0 : d->frame, &got_packet);
 
     if (encodeResult < 0)
         return encodeResult; //< error
@@ -657,12 +659,12 @@ int DesktopDataProvider::processData(bool flush)
     if (got_packet > 0)
     {
         QnWritableCompressedVideoDataPtr video = QnWritableCompressedVideoDataPtr(
-            new QnWritableCompressedVideoData(outPacket.size, d->videoContext));
-        video->m_data.write((const char*) outPacket.data, outPacket.size);
+            new QnWritableCompressedVideoData(packet->size, d->videoContext));
+        video->m_data.write((const char*) packet->data, packet->size);
         video->compressionType = d->videoCodecCtx->codec_id;
-        video->timestamp = av_rescale_q(outPacket.pts, d->videoCodecCtx->time_base, timeBaseNative) + d->initTime;
+        video->timestamp = av_rescale_q(packet->pts, d->videoCodecCtx->time_base, timeBaseNative) + d->initTime;
 
-        if(outPacket.flags & AV_PKT_FLAG_KEY)
+        if(packet->flags & AV_PKT_FLAG_KEY)
             video->flags |= QnAbstractMediaData::MediaFlags_AVKey;
         video->flags |= QnAbstractMediaData::MediaFlags_LIVE;
         video->dataProvider = this;
@@ -671,7 +673,7 @@ int DesktopDataProvider::processData(bool flush)
 
     putAudioData();
 
-    return outPacket.size;
+    return packet->size;
 }
 
 void DesktopDataProvider::putAudioData()

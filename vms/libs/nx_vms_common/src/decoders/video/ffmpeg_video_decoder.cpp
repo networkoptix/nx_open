@@ -12,6 +12,7 @@ extern "C" {
 #include <nx/codec/h264/sequence_parameter_set.h>
 #include <nx/codec/nal_units.h>
 #include <nx/media/codec_parameters.h>
+#include <nx/media/ffmpeg/av_packet.h>
 #include <nx/media/ffmpeg/ffmpeg_utils.h>
 #include <nx/media/ffmpeg/old_api.h>
 #include <nx/media/utils.h>
@@ -305,22 +306,11 @@ bool QnFfmpegVideoDecoder::decode(
                 return false;
         }
 
-        QnFfmpegAvPacket avpkt((unsigned char*) data->data(), (int) data->dataSize());
-        avpkt.dts = data->timestamp;
-        avpkt.pts = AV_NOPTS_VALUE;
-        // Tip for CorePNG to decode as normal PNG by default.
-        avpkt.flags = AV_PKT_FLAG_KEY;
-
-        // from avcodec_decode_video2() docs:
-        // 1) The input buffer must be AV_INPUT_BUFFER_PADDING_SIZE larger than
-        // the actual read bytes because some optimized bitstream readers read 32 or 64
-        // bits at once and could read over the end.
-        // 2) The end of the input buffer buf should be set to 0 to ensure that
-        // no overreading happens for damaged MPEG streams.
-
-        // 1 is already guaranteed by nx::utils::ByteArray, let's apply 2 here...
-        if (avpkt.data)
-            memset(avpkt.data + avpkt.size, 0, AV_INPUT_BUFFER_PADDING_SIZE);
+        nx::media::ffmpeg::AvPacket avPacket(data.get());
+        auto packet = avPacket.get();
+        packet->pts = AV_NOPTS_VALUE;
+        if (isImage(data))
+            packet->flags = AV_PKT_FLAG_KEY;
 
         // ### handle errors
         if (m_context->pix_fmt == -1)
@@ -328,10 +318,10 @@ bool QnFfmpegVideoDecoder::decode(
 
         bool dataWithNalPrefixes = (m_context->extradata==0 || m_context->extradata[0] == 0);
         // workaround ffmpeg crash
-        if (m_checkH264ResolutionChange && avpkt.size > 4 && dataWithNalPrefixes)
+        if (m_checkH264ResolutionChange && packet->size > 4 && dataWithNalPrefixes)
         {
-            const quint8* dataEnd = avpkt.data + avpkt.size;
-            const quint8* curPtr = avpkt.data;
+            const quint8* dataEnd = packet->data + packet->size;
+            const quint8* curPtr = packet->data;
             // New version scan whole data to find SPS unit.
             // It is slower but some cameras do not put SPS the beginning of a data.
             while (curPtr < dataEnd - 2)
@@ -367,7 +357,7 @@ bool QnFfmpegVideoDecoder::decode(
 
         if(m_context->codec)
         {
-            decodeVideo(m_context, outFrame, &got_picture, &avpkt);
+            decodeVideo(m_context, outFrame, &got_picture, packet);
             if (!got_picture && data->flags & QnAbstractMediaData::MediaFlags_StillImage)
                 decodeVideo(m_context, outFrame, &got_picture, nullptr);
         }
@@ -399,8 +389,7 @@ bool QnFfmpegVideoDecoder::decode(
     }
     else
     {
-        QnFfmpegAvPacket avpkt;
-        decodeVideo(m_context, outFrame, &got_picture, &avpkt); // flush
+        decodeVideo(m_context, outFrame, &got_picture, nullptr); // flush
 
         // In case of b-frames stream ffmpeg gives last flushed frames with AV_NOPTS_VALUE, so use
         // m_prevFrameDuration to get frame pts

@@ -9,6 +9,7 @@
 #include <nx/media/codec_parameters.h>
 #include <nx/media/config.h>
 #include <nx/media/ffmpeg/av_options.h>
+#include <nx/media/ffmpeg/av_packet.h>
 #include <nx/media/ffmpeg/ffmpeg_utils.h>
 #include <nx/media/ffmpeg/old_api.h>
 #include <nx/media/utils.h>
@@ -393,10 +394,11 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
     }
     decodedFrame->pict_type = AV_PICTURE_TYPE_NONE;
 
-    QnFfmpegAvPacket outPacket;
+    nx::media::ffmpeg::AvPacket avPacket;
+    auto packet = avPacket.get();
     int got_packet = 0;
     int encodeResult = nx::media::ffmpeg::old_api::encode(
-        m_encoderCtx, &outPacket, decodedFrame.data(), &got_packet);
+        m_encoderCtx, packet, decodedFrame.data(), &got_packet);
     if (encodeResult < 0)
     {
         NX_WARNING(this, "Failed to encode video, error: %1",
@@ -408,11 +410,11 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
     if (!got_packet)
         return 0;
 
-    auto resultVideoData = new QnWritableCompressedVideoData(outPacket.size);
+    auto resultVideoData = new QnWritableCompressedVideoData(packet->size);
 
     if (m_fixedFrameRate)
     {
-        auto itr = m_frameNumToPts.find(outPacket.pts);
+        auto itr = m_frameNumToPts.find(packet->pts);
         if (itr != m_frameNumToPts.end())
         {
             resultVideoData->timestamp = itr->second;
@@ -421,13 +423,13 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
     }
     else
     {
-        resultVideoData->timestamp = av_rescale_q(outPacket.pts, m_encoderCtx->time_base, r);
+        resultVideoData->timestamp = av_rescale_q(packet->pts, m_encoderCtx->time_base, r);
     }
 
-    if (outPacket.flags & AV_PKT_FLAG_KEY)
+    if (packet->flags & AV_PKT_FLAG_KEY)
         resultVideoData->flags |= QnAbstractMediaData::MediaFlags_AVKey;
 
-    resultVideoData->m_data.write((const char*) outPacket.data, outPacket.size); // todo: remove data copy here!
+    resultVideoData->m_data.write((const char*) packet->data, packet->size); // todo: remove data copy here!
     resultVideoData->compressionType = updateCodec(m_codecId);
 
     if (!m_ctxPtr)
