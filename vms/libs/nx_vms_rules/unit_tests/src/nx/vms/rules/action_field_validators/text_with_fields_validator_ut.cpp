@@ -133,6 +133,9 @@ TEST_F(TextWithFieldsValidatorTest, urlWithSubstitutionIsValid)
 
     whenTextIs("http://foo.bar?q={foo.bar}");
     thanFieldIsAccepted();
+
+    whenTextIs("http:://12345/{foo.bar}/12345{baz.bat}");
+    thanFieldIsAccepted();
 }
 
 TEST_F(TextWithFieldsValidatorTest, onlySubstitutionIsAccepted)

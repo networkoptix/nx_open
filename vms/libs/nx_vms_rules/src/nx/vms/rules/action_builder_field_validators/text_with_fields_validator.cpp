@@ -53,13 +53,15 @@ ValidationResult TextWithFieldsValidator::validity(
 
         // Substitutions contain unsupported symbols. Replace each substitution with an accepted
         // symbol to check url validity.
+        size_t offset{};
         for (const auto& valueDescriptor: parsedValues)
         {
             if (valueDescriptor.type != TextWithFields::FieldType::Substitution)
                 continue;
 
             static const QString kPlaceholder{"_"};
-            text.replace(valueDescriptor.start, valueDescriptor.length, kPlaceholder);
+            text.replace(valueDescriptor.start - offset, valueDescriptor.length, kPlaceholder);
+            offset = offset + valueDescriptor.length - kPlaceholder.length();
         }
 
         text = text.trimmed();
