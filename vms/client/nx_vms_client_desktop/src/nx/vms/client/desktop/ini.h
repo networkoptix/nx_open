@@ -200,8 +200,9 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
     NX_INI_FLAG(false, disableCrossSiteConnections,
         "[Dev] Disable cross-site connects to simplify debug and logs collection.");
 
-    NX_INI_FLAG(false, useFileBasedSharedMemory,
-        "[Dev] Use shared memory based on the memory mapped file.");
+    // VMS-55770
+    NX_INI_FLAG(true, useFileBasedSharedMemory,
+        "[Dev] Use shared memory implementation based on the memory mapped file.");
 
     NX_INI_STRING(
         "typ_header alg kid sid typ_payload client_id iss",
