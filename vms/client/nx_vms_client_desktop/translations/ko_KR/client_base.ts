@@ -200,7 +200,7 @@
     </message>
     <message>
       <source>New Window</source>
-      <translation>신규창</translation>
+      <translation>새 창</translation>
     </message>
     <message>
       <source>User...</source>
@@ -216,7 +216,7 @@
     </message>
     <message>
       <source>New Layout...</source>
-      <translation>신규 레이아웃...</translation>
+      <translation>새 레이아웃...</translation>
     </message>
     <message>
       <source>Open Layout...</source>
@@ -1224,7 +1224,7 @@
     </message>
     <message>
       <source>Please re-enter password for layout %1:</source>
-      <translation>레이아웃 %1암호를 다시 입력하십시오:</translation>
+      <translation>%1레이아웃의 암호 재입력:</translation>
     </message>
   </context>
   <context>
@@ -2611,7 +2611,7 @@ License Key: %2</source>
     <name>QnBusinessRulesDialog</name>
     <message>
       <source>&amp;New...</source>
-      <translation>신규...</translation>
+      <translation>&amp;새...</translation>
     </message>
     <message>
       <source>&amp;Delete</source>
@@ -2978,11 +2978,11 @@ License Key: %2</source>
     <name>QnChangeUserPasswordDialog</name>
     <message>
       <source>New Password</source>
-      <translation>신규 사용자</translation>
+      <translation>신규 암호</translation>
     </message>
     <message>
       <source>Confirm Password</source>
-      <translation>비밀번호 확인</translation>
+      <translation>암호 확인</translation>
     </message>
     <message>
       <source>Current Password</source>
@@ -3077,7 +3077,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Invalid login or password.</source>
-      <translation>아이디 혹은 암호가 잘못 입력 되었습니다</translation>
+      <translation>계정 또는 암호가 잘못됨.</translation>
     </message>
     <message>
       <source>Requested operation is not allowed with provided credentials.</source>
@@ -3360,7 +3360,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Enter your account password to create backup</source>
-      <translation>백업을 생성하려면 계정 암호를 입력하세요</translation>
+      <translation>백업 생성위한 계정 암호 입력</translation>
     </message>
     <message>
       <source>Create</source>
@@ -3757,7 +3757,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Please enter a password.</source>
-      <translation>암호를 입력하세요.</translation>
+      <translation>암호 입력.</translation>
     </message>
   </context>
   <context>
@@ -4232,7 +4232,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Enter your account password</source>
-      <translation>암호를 입력하세요</translation>
+      <translation>암호 입력</translation>
     </message>
     <message>
       <source>Save</source>
@@ -7441,7 +7441,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Password</source>
-      <translation>비밀번호</translation>
+      <translation>암호</translation>
     </message>
   </context>
   <context>
@@ -8194,7 +8194,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Enter password to continue your session</source>
-      <translation>세션을 계속하려면 암호를 입력하세요.</translation>
+      <translation>세션을 연결을 위한 암호 입력</translation>
     </message>
     <message>
       <source>Your session has expired. Please sign in again to continue.</source>
@@ -8247,7 +8247,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Enter your account password to connect System to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>시스템을 %1에 연결하려면 계정 암호를 입력하세요.</translation>
+      <translation>%1시스템 연결을 위한 계정 암호 입력</translation>
     </message>
     <message>
       <source>Connect</source>
@@ -9028,7 +9028,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Enter your account password</source>
-      <translation>암호를 입력하세요</translation>
+      <translation>암호 입력</translation>
     </message>
     <message>
       <source>Save</source>
@@ -9238,7 +9238,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Enter your account password</source>
-      <translation>암호를 입력하세요</translation>
+      <translation>암호 입력</translation>
     </message>
     <message>
       <source>Reset</source>
@@ -9516,7 +9516,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Enter your account password</source>
-      <translation>암호를 입력하세요</translation>
+      <translation>암호 입력</translation>
     </message>
     <message>
       <source>Apply</source>
@@ -9591,7 +9591,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Enter your account password to merge Systems</source>
-      <translation>시스템을 병합하려면 계정 암호를 입력하세요.</translation>
+      <translation>시스템을 병합을 위한 계정 암호 입력</translation>
     </message>
     <message>
       <source>Merge</source>
@@ -11289,7 +11289,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Password</source>
-      <translation>비밀번호</translation>
+      <translation>암호</translation>
     </message>
     <message>
       <source>Unknown error</source>
@@ -11825,7 +11825,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <name>nx::vms::client::desktop::UserSettingsDialog</name>
     <message>
       <source>To modify your password please enter the existing one.</source>
-      <translation>비밀 번호를 수정 하려면 기존암호를 입력하세요.</translation>
+      <translation>암호를 수정 하려면 기존암호를 입력하세요.</translation>
     </message>
     <message>
       <source>%1 user with specified email already exists.</source>
@@ -11838,7 +11838,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Enter your account password</source>
-      <translation>암호를 입력하세요</translation>
+      <translation>암호 입력</translation>
     </message>
     <message>
       <source>Save</source>
@@ -11968,11 +11968,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Password</source>
-      <translation>비밀번호</translation>
+      <translation>암호</translation>
     </message>
     <message>
       <source>The password is incorrect.</source>
-      <translation>비밀번호가 올바르지 않습니다.</translation>
+      <translation>올바르지 않는 암호.</translation>
     </message>
   </context>
   <context>
@@ -13031,7 +13031,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Failed to change password</source>
-      <translation>암호 변경에 실패했습니다.</translation>
+      <translation>암호 변경 실패</translation>
     </message>
     <message numerus="yes">
       <source>Failed to move %n devices</source>
