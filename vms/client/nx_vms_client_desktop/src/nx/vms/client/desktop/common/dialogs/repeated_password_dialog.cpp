@@ -8,9 +8,9 @@
 #include <QtWidgets/QPushButton>
 
 #include <nx/vms/client/core/skin/color_theme.h>
-#include <ui/common/palette.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
-
+#include <nx/vms/client/desktop/utils/widget_utils.h>
+#include <ui/common/palette.h>
 
 namespace nx::vms::client::desktop {
 
@@ -21,6 +21,7 @@ RepeatedPasswordDialog::RepeatedPasswordDialog(QWidget *parent):
     ui->setupUi(this);
     setModal(true);
     setWarningStyle(ui->doNotMatchLabel);
+    WidgetUtils::setRetainSizeWhenHidden(ui->doNotMatchLabel, true);
     updateMatching();
 
     connect(ui->passwordInput, &InputField::textChanged,
