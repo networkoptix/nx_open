@@ -181,8 +181,9 @@ Dialog
                 if (columnWithDataWasRemoved)
                     entriesModel.removeIncorrectEntries()
 
-                control.hasChanges = sourceModelIsChanged
                 listComboBox.currentIndex = listComboBox.indexOfValue(viewModel)
+                if (sourceModelIsChanged)
+                    control.apply()
             }
 
             onDeleteRequested:
@@ -192,7 +193,7 @@ Dialog
                     : listsModel.count > 1 ? 0 : -1
                 listsModel.remove(listComboBox.listsModelIndex())
                 listComboBox.currentIndex = idx
-                control.hasChanges = true
+                control.apply()
             }
         }
     }
