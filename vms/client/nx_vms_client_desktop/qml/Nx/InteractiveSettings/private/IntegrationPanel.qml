@@ -24,6 +24,8 @@ PanelBase
     property alias streamSelectorEnabled: streamSelection.enabled
     property alias currentStreamIndex: streamComboBox.currentIndex
 
+    readonly property real kLabelWidthFraction: 0.3
+
     signal enableSwitchClicked()
     signal refreshButtonClicked()
     signal removeClicked()
@@ -122,7 +124,7 @@ PanelBase
             horizontalAlignment: Text.AlignRight
             contextHintText: qsTr("Select video stream from the camera for analysis")
             color: ColorTheme.windowText
-            width: panel.width * 0.3 - panel.leftPadding
+            width: mapFromItem(panel, panel.width * kLabelWidthFraction, 0).x
             y: streamComboBox.baselineOffset - baselineOffset
         }
 
