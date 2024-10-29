@@ -21,8 +21,11 @@ int compare(
 
 int compare(const QJsonObject& lhs, const QJsonObject& rhs, const QStringList& path, int pathPos)
 {
+    while (pathPos < path.length() && path.at(pathPos).startsWith('#'))
+        ++pathPos;
     if (pathPos >= path.length())
         return 0;
+
     const QString& fieldKey = path.at(pathPos);
     const auto lhsField = lhs.find(fieldKey);
     const auto rhsField = rhs.find(fieldKey);

@@ -151,6 +151,9 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(TestDeviceModel, (json), (general)(credentials)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Base64Model, (json), (param))
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(NestedTestData, (json), (id)(name))
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(TestData, (json), (id)(name)(list))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ArrayOrderedTestNested, (json), (name))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ArrayOrderedTestVariant, (json), (id))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ArrayOrdererTestResponse, (json), (map))
 NX_REFLECTION_INSTRUMENT(Base64Model, (param))
 
 [[maybe_unused]] static void dummyRegisterFunction()
@@ -274,6 +277,12 @@ NX_REFLECTION_INSTRUMENT(Base64Model, (param))
      *     %param[unused] password
      */
     reg("rest/v3/bookmarks");
+
+    /**%apidoc GET /rest/v3/orderer
+     * %ingroup Test
+     * %return:{ArrayOrdererTestResponse}
+     */
+    reg("rest/v3/orderer");
 }
 
 TEST_F(OpenApiSchemaTest, Validate)
@@ -421,6 +430,65 @@ TEST_F(OpenApiSchemaTest, Postprocess)
     QJsonValue attributes = device["attributes"];
     ASSERT_TRUE(attributes.isObject());
     ASSERT_FALSE(attributes.toObject().contains("cameraId"));
+}
+
+TEST_F(OpenApiSchemaTest, ArrayOrdererVariant)
+{
+    ArrayOrdererTestResponse data{{{"key", {{{2}, {1}}}}}};
+    QJsonValue json;
+    QJson::serialize(data, &json);
+    m_schemas->postprocessResponse(
+        *restRequest({"GET /rest/v3/orderer?_orderBy=map.*[].id.%231 HTTP/1.1"}), &json);
+    ASSERT_TRUE(json.isObject());
+    ASSERT_EQ(json.toObject().size(), 1);
+    QJsonValue map = json.toObject()["map"];
+    ASSERT_TRUE(map.isObject());
+    ASSERT_EQ(map.toObject().size(), 1);
+    QJsonValue value = map.toObject()["key"];
+    ASSERT_TRUE(value.isArray());
+    QJsonArray sorted = value.toArray();
+    ASSERT_EQ(sorted.size(), 2);
+    QJsonValue item1 = sorted[0];
+    ASSERT_TRUE(item1.isObject());
+    ASSERT_EQ(item1.toObject().size(), 1);
+    ASSERT_EQ(item1.toObject()["id"], 1);
+    QJsonValue item2 = sorted[1];
+    ASSERT_TRUE(item2.isObject());
+    ASSERT_EQ(item2.toObject().size(), 1);
+    ASSERT_EQ(item2.toObject()["id"], 2);
+}
+
+TEST_F(OpenApiSchemaTest, ArrayOrdererVariantNested)
+{
+    ArrayOrdererTestResponse data{
+        {{"key", {{{ArrayOrderedTestNested{"2"}}, {ArrayOrderedTestNested{"1"}}}}}}};
+    QJsonValue json;
+    QJson::serialize(data, &json);
+    m_schemas->postprocessResponse(
+        *restRequest({"GET /rest/v3/orderer?_orderBy=map.*[].id.%232.name HTTP/1.1"}), &json);
+    ASSERT_TRUE(json.isObject());
+    ASSERT_EQ(json.toObject().size(), 1);
+    QJsonValue map = json.toObject()["map"];
+    ASSERT_TRUE(map.isObject());
+    ASSERT_EQ(map.toObject().size(), 1);
+    QJsonValue value = map.toObject()["key"];
+    ASSERT_TRUE(value.isArray());
+    QJsonArray sorted = value.toArray();
+    ASSERT_EQ(sorted.size(), 2);
+    QJsonValue item1 = sorted[0];
+    ASSERT_TRUE(item1.isObject());
+    ASSERT_EQ(item1.toObject().size(), 1);
+    QJsonValue nested1 = item1.toObject()["id"];
+    ASSERT_TRUE(nested1.isObject());
+    ASSERT_EQ(nested1.toObject().size(), 1);
+    ASSERT_EQ(nested1.toObject()["name"], "1") << QJson::serialized(json).toStdString();
+    QJsonValue item2 = sorted[1];
+    ASSERT_TRUE(item2.isObject());
+    ASSERT_EQ(item2.toObject().size(), 1);
+    QJsonValue nested2 = item2.toObject()["id"];
+    ASSERT_TRUE(nested2.isObject());
+    ASSERT_EQ(nested2.toObject().size(), 1);
+    ASSERT_EQ(nested2.toObject()["name"], "2");
 }
 
 TEST_F(OpenApiSchemaTest, EmptyOrderBy)

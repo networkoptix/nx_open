@@ -110,12 +110,13 @@ public:
             {
                 bool postprocessed = false;
                 auto originObject = origin->toObject();
-                const FieldScope scope1("*", this);
-                const nx::network::rest::json::ArrayOrderer::FieldScope scope2("*", &m_orderer);
                 for (auto field = originObject.begin(); field != originObject.end(); ++field)
                 {
+                    const QString fieldName = field->isArray() ? "*[]" : "*";
+                    const FieldScope scope1(fieldName, this);
+                    const ArrayOrderer::FieldScope scope2(fieldName, &m_orderer);
                     QJsonValue value = field.value();
-                    if ((*this) (&value, additionalSchema))
+                    if ((*this)(&value, additionalSchema))
                     {
                         postprocessed = true;
                         field.value() = value;

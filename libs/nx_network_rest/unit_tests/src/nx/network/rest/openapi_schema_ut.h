@@ -53,4 +53,19 @@ struct Base64Model
     QByteArray getId() const { return param; }
 };
 
+struct ArrayOrderedTestNested
+{
+    std::string name;
+};
+
+struct ArrayOrderedTestVariant
+{
+    std::variant<std::string, int, ArrayOrderedTestNested> id;
+};
+
+struct ArrayOrdererTestResponse
+{
+    std::map<std::string, std::vector<ArrayOrderedTestVariant>> map;
+};
+
 } // namespace nx::network::rest::json::test
