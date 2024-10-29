@@ -163,13 +163,11 @@ private:
         int srcWidth,
         int srcHeight,
         QnFrameScaler::DownscaleFactor forceFactor);
-    bool processDecodedFrame(
-        QnAbstractVideoDecoder* dec,
-        const CLConstVideoDecoderOutputPtr& outFrame);
+    bool processDecodedFrame(const CLConstVideoDecoderOutputPtr& outFrame);
     void checkQueueOverflow();
     void clearReverseQueue();
 
-    void calcSampleAR(QSharedPointer<CLVideoDecoderOutput> outFrame, QnAbstractVideoDecoder* dec);
+    void calcSampleAR(QSharedPointer<CLVideoDecoderOutput> outFrame, double decoderSar);
 
     bool downscaleOrForward(
         const CLConstVideoDecoderOutputPtr& src,
