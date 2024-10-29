@@ -5,12 +5,16 @@
 #include <QtGui/QFontMetrics>
 #include <QtGui/QResizeEvent>
 
+#include <nx/vms/client/desktop/common/utils/widget_anchor.h>
+
 QnWordWrappedLabel::QnWordWrappedLabel(QWidget* parent):
     QWidget(parent),
     m_label(new QLabel(this)),
     m_rowHeight(QFontMetrics(m_label->font()).height())
 {
     m_label->setWordWrap(true);
+    nx::vms::client::desktop::anchorWidgetToParent(m_label);
+
     connect(m_label, &QLabel::linkActivated, this, &QnWordWrappedLabel::linkActivated);
     connect(this, &QObject::objectNameChanged,
         [this](const QString& name)
@@ -28,15 +32,6 @@ void QnWordWrappedLabel::showEvent(QShowEvent* event)
 {
     ensureInitialized();
     base_type::showEvent(event);
-}
-
-void QnWordWrappedLabel::resizeEvent(QResizeEvent* event)
-{
-    ensureInitialized();
-    m_label->setGeometry(0, 0, event->size().width(), event->size().height());
-    updateGeometry();
-
-    base_type::resizeEvent(event);
 }
 
 void QnWordWrappedLabel::ensureInitialized()
@@ -65,6 +60,16 @@ QSize QnWordWrappedLabel::sizeHint() const
 QSize QnWordWrappedLabel::minimumSizeHint() const
 {
     return sizeHint();
+}
+
+bool QnWordWrappedLabel::hasHeightForWidth() const
+{
+    return true;
+}
+
+int QnWordWrappedLabel::heightForWidth(int width) const
+{
+    return m_label->heightForWidth(width);
 }
 
 QString QnWordWrappedLabel::text() const

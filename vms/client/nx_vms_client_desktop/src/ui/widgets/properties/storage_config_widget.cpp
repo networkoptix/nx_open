@@ -5,6 +5,7 @@
 
 #include <QtCore/QTimer>
 #include <QtGui/QKeyEvent>
+#include <QtWidgets/QLabel>
 #include <QtWidgets/QMenu>
 
 #include <analytics/db/analytics_db_types.h>
