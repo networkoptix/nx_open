@@ -988,15 +988,8 @@ QString LayoutActionHandler::generateUniqueLayoutName(const QnUserResourcePtr& u
 void LayoutActionHandler::at_newUserLayoutAction_triggered()
 {
     const auto parameters = menu()->currentParameters(sender());
-    QnUserResourcePtr user;
-    if (parameters.hasArgument(Qn::UserResourceRole))
-        user = parameters.argument(Qn::UserResourceRole).value<QnUserResourcePtr>();
-    else if (parameters.size() > 0)
-        user = parameters.resource().dynamicCast<QnUserResource>();
 
-    if (!user)
-        user = system()->user();
-
+    const auto user = system()->user();
     if (!user)
         return;
 

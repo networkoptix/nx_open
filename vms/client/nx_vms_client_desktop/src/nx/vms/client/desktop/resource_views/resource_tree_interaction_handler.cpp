@@ -308,51 +308,7 @@ struct ResourceTreeInteractionHandler::Private: public QnWorkbenchContextAware
 
         menu::Parameters result(selectedResources(selection));
 
-        // For working with shared layout links we must know owning user resource.
-        const auto parentIndex = index.parent();
         const auto parentIndexNodeType = parentNodeType(index).value<ResourceTree::NodeType>();
-
-        // We can select several layouts and some other resources in any part of tree -
-        // in this case just do not set anything.
-        QnUserResourcePtr user;
-        auto uuid = index.data(core::UuidRole).value<nx::Uuid>();
-
-        switch (nodeType)
-        {
-            case NodeType::sharedLayouts:
-                user = getResource<QnUserResource>(parentIndex);
-                uuid = parentIndex.data(core::UuidRole).value<nx::Uuid>();
-                break;
-
-            default:
-                break;
-        }
-
-        switch (parentIndexNodeType)
-        {
-            case NodeType::layouts:
-                user = context()->user();
-                break;
-
-            case NodeType::sharedResources:
-            case NodeType::sharedLayouts:
-                user = getResource<QnUserResource>(parentIndex.parent());
-                uuid = parentIndex.parent().data(core::UuidRole).value<nx::Uuid>();
-                break;
-
-            case NodeType::resource:
-                user = getResource<QnUserResource>(parentIndex);
-                break;
-
-            default:
-                break;
-        }
-
-        if (user)
-            result.setArgument(Qn::UserResourceRole, user);
-
-        if (!uuid.isNull())
-            result.setArgument(core::UuidRole, uuid);
 
         result.setArgument(Qn::NodeTypeRole, nodeType);
         result.setArgument(Qn::ParentNodeTypeRole, parentIndexNodeType);
