@@ -154,7 +154,7 @@
     </message>
     <message>
       <source>New Tab</source>
-      <translation>신규 탭</translation>
+      <translation>새 탭</translation>
     </message>
     <message>
       <source>Window</source>
@@ -162,7 +162,7 @@
     </message>
     <message>
       <source>New Window</source>
-      <translation>신규창</translation>
+      <translation>새 창</translation>
     </message>
     <message>
       <source>User...</source>
@@ -170,7 +170,7 @@
     </message>
     <message>
       <source>New User...</source>
-      <translation>신규 사용자...</translation>
+      <translation>새 사용자...</translation>
     </message>
     <message>
       <source>Video Wall...</source>
@@ -186,7 +186,7 @@
     </message>
     <message>
       <source>New Layout...</source>
-      <translation>신규 레이아웃...</translation>
+      <translation>새 레이아웃...</translation>
     </message>
     <message>
       <source>Open Layout...</source>
@@ -745,7 +745,7 @@
     </message>
     <message>
       <source>New Showreel...</source>
-      <translation>신규 쇼 릴...</translation>
+      <translation>새로운 쇼 릴...</translation>
     </message>
     <message>
       <source>Remove from Showreel</source>
@@ -1112,7 +1112,7 @@
     </message>
     <message>
       <source>Please re-enter password for layout %1:</source>
-      <translation>레이아웃 %1암호를 다시 입력하십시오:</translation>
+      <translation>%1레이아웃의 암호 재입력:</translation>
     </message>
   </context>
   <context>
@@ -1605,7 +1605,7 @@ License Key: %2</source>
     <message numerus="yes">
       <source>Password must be at least %n characters long.</source>
       <translation>
-        <numerusform>암호는 %n 자 이상이어야 합니다</numerusform>
+        <numerusform>암호는 %n 자 이상 요망.</numerusform>
       </translation>
     </message>
     <message>
@@ -1615,7 +1615,7 @@ License Key: %2</source>
     <message numerus="yes">
       <source>Password must be no longer than %n characters.</source>
       <translation>
-        <numerusform>암호는 %n 글자보다 길어야 합니다</numerusform>
+        <numerusform>암호는 %n 글자보다 길어야 함.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -2445,7 +2445,7 @@ License Key: %2</source>
     <name>QnBusinessRulesDialog</name>
     <message>
       <source>&amp;New...</source>
-      <translation>신규...</translation>
+      <translation>&amp;새...</translation>
     </message>
     <message>
       <source>&amp;Delete</source>
@@ -2790,7 +2790,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Passwords do not match.</source>
-      <translation>비밀번호가 일치하지 않습니다.</translation>
+      <translation>암호가 일치하지 않습니다.</translation>
     </message>
     <message>
       <source>Password should be at least 8 symbols long and contain different types of characters.</source>
@@ -2812,15 +2812,15 @@ License Key: %2</source>
     <name>QnChangeUserPasswordDialog</name>
     <message>
       <source>New Password</source>
-      <translation>신규 사용자</translation>
+      <translation>신규 암호</translation>
     </message>
     <message>
       <source>Confirm Password</source>
-      <translation>비밀번호 확인</translation>
+      <translation>암호 확인</translation>
     </message>
     <message>
       <source>Passwords do not match.</source>
-      <translation>비밀번호가 일치하지 않습니다.</translation>
+      <translation>암호 불일치</translation>
     </message>
     <message>
       <source>Current Password</source>
@@ -2828,11 +2828,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>To modify your password please enter the existing one.</source>
-      <translation>비밀 번호를 수정 하려면 기존암호를 입력하세요.</translation>
+      <translation>암호를 수정 하려면 기존암호를 입력하세요.</translation>
     </message>
     <message>
       <source>Invalid current password.</source>
-      <translation>현재 비밀번호는 유효하지 않습니다.</translation>
+      <translation>유효하지 않는 암호</translation>
     </message>
   </context>
   <context>
@@ -2930,7 +2930,7 @@ to %1</source>
     </message>
     <message>
       <source>Invalid login or password.</source>
-      <translation>아이디 혹은 암호가 잘못 입력 되었습니다</translation>
+      <translation>계정 또는 암호가 잘못됨.</translation>
     </message>
     <message>
       <source>Requested operation is not allowed with provided credentials.</source>
@@ -3191,7 +3191,7 @@ to %1</source>
     </message>
     <message>
       <source>Enter your account password to create backup</source>
-      <translation>백업을 생성하려면 계정 암호를 입력하세요</translation>
+      <translation>백업 생성위한 계정 암호 입력</translation>
     </message>
     <message>
       <source>Create</source>
@@ -3717,7 +3717,7 @@ to %1</source>
     </message>
     <message>
       <source>Please enter a password.</source>
-      <translation>암호를 입력하세요.</translation>
+      <translation>암호 입력.</translation>
     </message>
   </context>
   <context>
@@ -3806,7 +3806,7 @@ to %1</source>
     </message>
     <message>
       <source>No new users found.</source>
-      <translation>신규 사용자 없음.</translation>
+      <translation>새로운 사용자 발견되지 않음.</translation>
     </message>
     <message>
       <source>Timed Out</source>
@@ -5751,7 +5751,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>To enable digest authentication password reset is required</source>
-      <translation>다이제스트 인증을 활성화하려면 암호 재설정이 필요합니다</translation>
+      <translation>다이제스트 인증을 활성화를 위한 암호 재설정 요망</translation>
     </message>
   </context>
   <context>
@@ -5841,7 +5841,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>New User...</source>
-      <translation>신규 사용자...</translation>
+      <translation>새 사용자...</translation>
     </message>
     <message>
       <source>User Settings - %1 (readonly)</source>
@@ -5897,7 +5897,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>User has been renamed. Password must be updated.</source>
-      <translation>사용자 이름이 재 설정 되었습니다. 비밀번호를 반드시 업데이트 하셔야 합니다.</translation>
+      <translation>사용자 이름이 재 설정 됨. 암호 업데이트 요망.</translation>
     </message>
     <message>
       <source>Name</source>
@@ -5913,15 +5913,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Password</source>
-      <translation>비밀번호</translation>
+      <translation>암호</translation>
     </message>
     <message>
       <source>Confirm Password</source>
-      <translation>비밀번호 확인</translation>
+      <translation>암호 확인</translation>
     </message>
     <message>
       <source>Passwords do not match.</source>
-      <translation>비밀번호가 일치하지 않습니다.</translation>
+      <translation>암호 불일치.</translation>
     </message>
     <message>
       <source>%1 user with specified email already exists.</source>
@@ -5949,7 +5949,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Password reset is required</source>
-      <translation>암호 재설정이 필요합니다</translation>
+      <translation>암호 재설정 요망</translation>
     </message>
     <message>
       <source>Only letters, numbers and symbols %1 are allowed.</source>
@@ -5968,7 +5968,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Password cannot be empty.</source>
-      <translation>비밀번호는 필수 정보입니다.</translation>
+      <translation>암호는 필수.</translation>
     </message>
     <message>
       <source>Avoid leading and trailing spaces.</source>
@@ -7366,7 +7366,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Password</source>
-      <translation>비밀번호</translation>
+      <translation>암호</translation>
     </message>
   </context>
   <context>
@@ -8043,7 +8043,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Enter password to continue your session</source>
-      <translation>세션을 계속하려면 암호를 입력하세요.</translation>
+      <translation>세션을 연결을 위한 암호 입력</translation>
     </message>
     <message>
       <source>Your session has expired. Please sign in again to continue.</source>
@@ -8084,7 +8084,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Enter your account password to connect System to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>시스템을 %1에 연결하려면 계정 암호를 입력하세요.</translation>
+      <translation>%1시스템 연결을 위한 계정 암호 입력</translation>
     </message>
     <message>
       <source>Connect</source>
@@ -8974,7 +8974,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Enter your account password</source>
-      <translation>암호를 입력하세요</translation>
+      <translation>암호 입력</translation>
     </message>
     <message>
       <source>Apply</source>
@@ -9050,7 +9050,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Enter your account password to merge Systems</source>
-      <translation>시스템을 병합하려면 계정 암호를 입력하세요.</translation>
+      <translation>시스템을 병합을 위한 계정 암호 입력</translation>
     </message>
     <message>
       <source>Merge</source>
@@ -10514,7 +10514,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Password</source>
-      <translation>비밀번호</translation>
+      <translation>암호</translation>
     </message>
     <message>
       <source>Unknown error</source>
@@ -10956,11 +10956,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Password</source>
-      <translation>비밀번호</translation>
+      <translation>암호</translation>
     </message>
     <message>
       <source>The password is incorrect.</source>
-      <translation>비밀번호가 올바르지 않습니다.</translation>
+      <translation>올바르지 않는 암호.</translation>
     </message>
   </context>
   <context>
@@ -11642,7 +11642,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Failed to change password</source>
-      <translation>암호 변경에 실패했습니다.</translation>
+      <translation>암호 변경 실패</translation>
     </message>
     <message numerus="yes">
       <source>Failed to move %n devices</source>
