@@ -506,7 +506,7 @@
     </message>
     <message>
       <source>Password</source>
-      <translation>비밀번호</translation>
+      <translation>암호</translation>
     </message>
     <message>
       <source>Ignore LDAP server certificate errors</source>
@@ -1488,7 +1488,7 @@
     </message>
     <message>
       <source>Password</source>
-      <translation>비밀번호</translation>
+      <translation>암호</translation>
     </message>
     <message>
       <source>Connect</source>
@@ -2428,7 +2428,7 @@ Alt 키를 누른 채 클릭하여 객체를 따라가세요.</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation>비밀번호</translation>
+      <translation>암호</translation>
     </message>
     <message>
       <source>Confirm Password</source>
