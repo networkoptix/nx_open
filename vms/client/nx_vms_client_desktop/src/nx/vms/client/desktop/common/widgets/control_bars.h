@@ -6,7 +6,6 @@
 #include <QtWidgets/QWidget>
 
 #include <nx/utils/impl_ptr.h>
-#include <ui/widgets/word_wrapped_label.h>
 
 class QHBoxLayout;
 class QVBoxLayout;

@@ -3,13 +3,10 @@
 #include "message_bar.h"
 
 #include <memory>
-#include <vector>
 
 #include <QtWidgets/QBoxLayout>
 #include <QtWidgets/QLayout>
 #include <QtWidgets/QPushButton>
-#include <QtWidgets/qboxlayout.h>
-#include <QtWidgets/qpushbutton.h>
 
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/skin/color_theme.h>
@@ -20,8 +17,7 @@
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/utils/widget_utils.h>
 #include <ui/common/palette.h>
-
-#include "nx/vms/client/desktop/common/widgets/control_bars.h"
+#include <ui/widgets/word_wrapped_label.h>
 
 namespace {
 

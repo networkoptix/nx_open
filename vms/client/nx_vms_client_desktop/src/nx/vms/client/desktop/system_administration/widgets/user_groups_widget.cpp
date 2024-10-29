@@ -8,6 +8,7 @@
 #include <QtCore/QPointer>
 #include <QtGui/QMouseEvent>
 #include <QtGui/QPainter>
+#include <QtWidgets/QLabel>
 #include <QtWidgets/QStyledItemDelegate>
 
 #include <client/client_globals.h>
@@ -22,6 +23,7 @@
 #include <nx/vms/client/desktop/common/utils/item_view_hover_tracker.h>
 #include <nx/vms/client/desktop/common/widgets/checkable_header_view.h>
 #include <nx/vms/client/desktop/common/widgets/control_bars.h>
+#include <nx/vms/client/desktop/common/widgets/message_bar.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
@@ -39,7 +41,6 @@
 #include <ui/dialogs/common/message_box.h>
 #include <ui/workbench/workbench_context.h>
 
-#include "nx/vms/client/desktop/common/widgets/message_bar.h"
 #include "private/highlighted_text_item_delegate.h"
 #include "user_groups_widget.h"
 

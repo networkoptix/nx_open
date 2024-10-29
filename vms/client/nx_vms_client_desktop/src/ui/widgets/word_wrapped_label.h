@@ -12,13 +12,16 @@ class QnWordWrappedLabel: public QWidget
     Q_PROPERTY(bool openExternalLinks READ openExternalLinks WRITE setOpenExternalLinks)
 
     using base_type = QWidget;
+
 public:
-    QnWordWrappedLabel(QWidget* parent = 0);
+    QnWordWrappedLabel(QWidget* parent = nullptr);
 
     QLabel* label() const;
 
     virtual QSize sizeHint() const override;
     virtual QSize minimumSizeHint() const override;
+    virtual int heightForWidth(int width) const override;
+    virtual bool hasHeightForWidth() const override;
 
     QString text() const;
     void setText(const QString& value);
@@ -40,7 +43,6 @@ signals:
 
 protected:
     virtual void showEvent(QShowEvent* event) override;
-    virtual void resizeEvent(QResizeEvent* event) override;
 
 private:
     void ensureInitialized();
