@@ -375,11 +375,11 @@ void QnVideoStreamDisplay::updateRenderList()
     }
 };
 
-void QnVideoStreamDisplay::calcSampleAR(CLVideoDecoderOutputPtr outFrame, QnAbstractVideoDecoder* dec)
+void QnVideoStreamDisplay::calcSampleAR(CLVideoDecoderOutputPtr outFrame, double decoderSar)
 {
     if (!m_overridenAspectRatio.isValid())
     {
-        outFrame->sample_aspect_ratio = dec->getSampleAspectRatio();
+        outFrame->sample_aspect_ratio = decoderSar;
     }
     else {
         qreal realAR = outFrame->height > 0 ? (qreal) outFrame->width / (qreal) outFrame->height : 1.0;
@@ -638,8 +638,10 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(
     CLVideoDecoderOutputPtr outFrame(new CLVideoDecoderOutput());
     decodedFrame->channel = data->channelNumber;
     decodedFrame->flags = {};
+    double decoderSar = 1.0;
     if (!dec->decode(data, &decodedFrame))
     {
+        decoderSar = dec->getSampleAspectRatio();
         if (dec->getLastDecodeResult() < 0 && dec->hardwareDecoder())
         {
             m_decoderData.decoder.reset();
@@ -657,21 +659,26 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(
             if (outFrame->data[0])
                 m_reverseSizeInBytes -= outFrame->sizeBytes();
 
-            calcSampleAR(outFrame, dec);
+            calcSampleAR(outFrame, decoderSar);
 
-            if (processDecodedFrame(dec, outFrame))
+            if (processDecodedFrame(outFrame))
                 return Status_Displayed;
             else
                 return Status_Buffered;
         }
+
+        m_mtx.lock();
         if (m_bufferedFrameDisplayer)
             dec->setLightCpuMode(QnAbstractVideoDecoder::DecodeMode_Full);
+        auto lastError = dec->getLastDecodeResult();
+        m_mtx.unlock();
 
-        if (dec->getLastDecodeResult() < 0)
+        if (lastError < 0)
             return Status_Skipped;
         else
             return Status_Buffered;
     }
+    decoderSar = dec->getSampleAspectRatio();
     {
         NX_MUTEX_LOCKER lock(&m_lastDisplayedFrameMutex);
         m_lastDisplayedFrame = decodedFrame;
@@ -682,7 +689,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(
     {
         if (!m_overridenAspectRatio.isValid())
         {
-            QSize imageSize(decodedFrame->width * dec->getSampleAspectRatio(), decodedFrame->height);
+            QSize imageSize(decodedFrame->width * decoderSar, decodedFrame->height);
             NX_MUTEX_LOCKER lock( &m_imageSizeMtx );
             m_imageSize = imageSize;
         }
@@ -736,8 +743,8 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(
         m_lastDisplayedFrame = outFrame;
     }
 
-    calcSampleAR(outFrame, dec);
-    if (processDecodedFrame(dec, outFrame))
+    calcSampleAR(outFrame, decoderSar);
+    if (processDecodedFrame(outFrame))
         return Status_Displayed;
     else
         return Status_Buffered;
@@ -802,30 +809,29 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::flushFrame(
         return Status_Skipped;
 
     CLVideoDecoderOutputPtr decodedFrame(new CLVideoDecoderOutput());
-    QnAbstractVideoDecoder* dec = m_decoderData.decoder.get();
-
     CLVideoDecoderOutputPtr outFrame(new CLVideoDecoderOutput());
     for (auto& render: m_renderList)
         render->finishPostedFramesRender(channel);
     outFrame->channel = channel;
+    double decoderSar = 1.0;
     {
         NX_MUTEX_LOCKER lock(&m_mtx);
-        if (!dec->decode(QnCompressedVideoDataPtr(), &decodedFrame))
+        if (!m_decoderData.decoder->decode(QnCompressedVideoDataPtr(), &decodedFrame))
             return Status_Skipped;
+        decoderSar = m_decoderData.decoder->getSampleAspectRatio();
     }
 
     if (!downscaleOrForward(decodedFrame, outFrame, forceScaleFactor))
         return Status_Displayed;
 
-    calcSampleAR(outFrame, dec);
-    if (processDecodedFrame(dec, outFrame))
+    calcSampleAR(outFrame, decoderSar);
+    if (processDecodedFrame(outFrame))
         return Status_Displayed;
     else
         return Status_Buffered;
 }
 
 bool QnVideoStreamDisplay::processDecodedFrame(
-    QnAbstractVideoDecoder* decoder,
     const CLConstVideoDecoderOutputPtr& outFrame)
 {
     if (outFrame->isEmpty())
@@ -844,15 +850,17 @@ bool QnVideoStreamDisplay::processDecodedFrame(
     {
         const bool wasWaiting = m_bufferedFrameDisplayer->addFrame(outFrame);
         const qint64 bufferedDuration = m_bufferedFrameDisplayer->bufferedDuration();
+
+        NX_MUTEX_LOCKER lock(&m_mtx);
         if (wasWaiting)
         {
-            decoder->setLightCpuMode(QnAbstractVideoDecoder::DecodeMode_Full);
+            m_decoderData.decoder->setLightCpuMode(QnAbstractVideoDecoder::DecodeMode_Full);
             m_queueWasFilled = true;
         }
         else
         {
             if (m_queueWasFilled && bufferedDuration <= kMaxQueueTime / 4)
-                decoder->setLightCpuMode(QnAbstractVideoDecoder::DecodeMode_Fast);
+                m_decoderData.decoder->setLightCpuMode(QnAbstractVideoDecoder::DecodeMode_Fast);
         }
     }
     else
