@@ -1112,7 +1112,7 @@
     </message>
     <message>
       <source>Please re-enter password for layout %1:</source>
-      <translation>레이아웃 %1비밀번호를 다시 입력하십시오:</translation>
+      <translation>레이아웃 %1암호를 다시 입력하십시오:</translation>
     </message>
   </context>
   <context>
@@ -1605,7 +1605,7 @@ License Key: %2</source>
     <message numerus="yes">
       <source>Password must be at least %n characters long.</source>
       <translation>
-        <numerusform>비밀번호는 %n 자 이상이어야 합니다</numerusform>
+        <numerusform>암호는 %n 자 이상이어야 합니다</numerusform>
       </translation>
     </message>
     <message>
@@ -1615,7 +1615,7 @@ License Key: %2</source>
     <message numerus="yes">
       <source>Password must be no longer than %n characters.</source>
       <translation>
-        <numerusform>비밀번호는 %n 글자보다 길어야 합니다</numerusform>
+        <numerusform>암호는 %n 글자보다 길어야 합니다</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -2786,7 +2786,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Repeat Password</source>
-      <translation>반복 비밀번호</translation>
+      <translation>반복 암호</translation>
     </message>
     <message>
       <source>Passwords do not match.</source>
@@ -2930,7 +2930,7 @@ to %1</source>
     </message>
     <message>
       <source>Invalid login or password.</source>
-      <translation>아이디 혹은 비밀번호가 잘못 입력 되었습니다</translation>
+      <translation>아이디 혹은 암호가 잘못 입력 되었습니다</translation>
     </message>
     <message>
       <source>Requested operation is not allowed with provided credentials.</source>
@@ -3191,7 +3191,7 @@ to %1</source>
     </message>
     <message>
       <source>Enter your account password to create backup</source>
-      <translation>백업을 생성하려면 계정 비밀번호를 입력하세요</translation>
+      <translation>백업을 생성하려면 계정 암호를 입력하세요</translation>
     </message>
     <message>
       <source>Create</source>
@@ -3717,7 +3717,7 @@ to %1</source>
     </message>
     <message>
       <source>Please enter a password.</source>
-      <translation>비밀번호를 입력하세요.</translation>
+      <translation>암호를 입력하세요.</translation>
     </message>
   </context>
   <context>
@@ -5751,7 +5751,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>To enable digest authentication password reset is required</source>
-      <translation>다이제스트 인증을 활성화하려면 비밀번호 재설정이 필요합니다</translation>
+      <translation>다이제스트 인증을 활성화하려면 암호 재설정이 필요합니다</translation>
     </message>
   </context>
   <context>
@@ -5949,7 +5949,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Password reset is required</source>
-      <translation>비밀번호 재설정이 필요합니다</translation>
+      <translation>암호 재설정이 필요합니다</translation>
     </message>
     <message>
       <source>Only letters, numbers and symbols %1 are allowed.</source>
@@ -8043,7 +8043,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Enter password to continue your session</source>
-      <translation>세션을 계속하려면 비밀번호를 입력하세요.</translation>
+      <translation>세션을 계속하려면 암호를 입력하세요.</translation>
     </message>
     <message>
       <source>Your session has expired. Please sign in again to continue.</source>
@@ -8084,7 +8084,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Enter your account password to connect System to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>시스템을 %1에 연결하려면 계정 비밀번호를 입력하세요.</translation>
+      <translation>시스템을 %1에 연결하려면 계정 암호를 입력하세요.</translation>
     </message>
     <message>
       <source>Connect</source>
@@ -8974,7 +8974,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Enter your account password</source>
-      <translation>비밀번호를 입력하세요</translation>
+      <translation>암호를 입력하세요</translation>
     </message>
     <message>
       <source>Apply</source>
@@ -9050,7 +9050,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Enter your account password to merge Systems</source>
-      <translation>시스템을 병합하려면 계정 비밀번호를 입력하세요.</translation>
+      <translation>시스템을 병합하려면 계정 암호를 입력하세요.</translation>
     </message>
     <message>
       <source>Merge</source>
@@ -10229,7 +10229,7 @@ You can still change quality and FPS directly on the camera.</source>
     </message>
     <message>
       <source>Archive encryption password</source>
-      <translation>아카이브 암호화 비밀번호</translation>
+      <translation>아카이브 보안 암호</translation>
     </message>
     <message>
       <source>The encryption password will be required to restore the archive on another system.
@@ -11642,7 +11642,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Failed to change password</source>
-      <translation>비밀번호 변경에 실패했습니다.</translation>
+      <translation>암호 변경에 실패했습니다.</translation>
     </message>
     <message numerus="yes">
       <source>Failed to move %n devices</source>
@@ -11778,7 +11778,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
       <source>Failed to change password on %n cameras of %1</source>
       <comment>Total number of cameras will be substituted as %1</comment>
       <translation>
-        <numerusform>%1대중 %n개 카메라의 비밀번호를 변경하지 못했습니다.</numerusform>
+        <numerusform>%1대중 %n개 카메라의 암호를 변경하지 못했습니다.</numerusform>
       </translation>
     </message>
     <message>
