@@ -63,7 +63,7 @@
     </message>
     <message>
       <source>Incompatible server</source>
-      <translation>호환 되지 않는 서버</translation>
+      <translation>비호환 서버</translation>
     </message>
     <message>
       <source>Server has a different version:</source>
@@ -109,11 +109,11 @@
     </message>
     <message>
       <source>Session expired. Re-enter your password.</source>
-      <translation>세션이 만료되었습니다. 비밀번호를 다시 입력하세요.</translation>
+      <translation>세션 만료됨. 암호 재입력.</translation>
     </message>
     <message>
       <source>Invalid login or password</source>
-      <translation>아이디 혹은 비밀번호가 잘못 입력 되었습니다</translation>
+      <translation>계정 또는 암호가 잘못됨</translation>
     </message>
     <message>
       <source>Incorrect username or password.</source>
