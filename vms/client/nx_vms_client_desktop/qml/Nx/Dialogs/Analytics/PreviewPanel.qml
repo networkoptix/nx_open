@@ -328,6 +328,8 @@ Rectangle
 
         RowLayout
         {
+            id: rowLayout
+
             anchors.top: displayColumn.bottom
             anchors.topMargin: 16
             anchors.bottom: parent.bottom
@@ -344,6 +346,8 @@ Rectangle
                 id: titleColumn
 
                 Layout.alignment: Qt.AlignTop
+                Layout.maximumHeight: rowLayout.height
+                Layout.maximumWidth: 146
 
                 leftPadding: 20
                 rightPadding: 8
@@ -355,7 +359,7 @@ Rectangle
                 {
                     id: titleText
 
-                    width: 118
+                    width: titleColumn.width
 
                     font.pixelSize: 18
                     font.weight: Font.Medium
@@ -379,6 +383,15 @@ Rectangle
                         previewPanel.selectedItem && previewPanel.selectedItem.hasTitleImage
                             ? previewPanel.selectedItem.trackId.toSimpleString()
                             : ""
+
+                    readonly property real availableHeight:
+                        rowLayout.height - titleImage.y - titleColumn.bottomPadding
+
+                    width: Math.min(implicitWidth, titleColumn.width)
+                    height: Math.min(implicitHeight, availableHeight)
+                    horizontalAlignment: Image.AlignHCenter
+                    verticalAlignment: Image.AlignTop
+                    fillMode: Image.PreserveAspectFit
 
                     visible: !!imageTrackId
 
