@@ -44,6 +44,13 @@ bool saasServicesOperational(SystemContext* systemContext)
     return state == SaasState::active || state == SaasState::suspended;
 }
 
+bool crossSiteNotificationsAllowed(SystemContext* systemContext)
+{
+    const auto saas = systemContext->saasServiceManager();
+    return saasServicesOperational(systemContext)
+        && saas->hasFeature(nx::vms::api::SaasTierLimitName::crossSiteFeaturesEnabled);
+}
+
 bool localRecordingServicesOverused(SystemContext* systemContext)
 {
     return servicesOverused(

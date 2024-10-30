@@ -16,6 +16,7 @@
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx_ec/managers/abstract_resource_manager.h>
 
+static const QString kAdditionTierLimitsPropertyKey("additionTierLimits");
 static const QString kSaasDataPropertyKey("saasData");
 static const QString kSaasServicesPropertyKey("saasServices");
 
@@ -62,7 +63,12 @@ ServiceManager::ServiceManager(SystemContext* context, QObject* parent):
                 return;
 
             const auto dictionary = resourcePropertyDictionary();
-            if (key == kSaasDataPropertyKey)
+            if (key == kAdditionTierLimitsPropertyKey)
+            {
+                if (auto limits = getObjectFromDictionary<LocalTierLimits>(dictionary, key))
+                    updateTiers(*limits);
+            }
+            else if (key == kSaasDataPropertyKey)
             {
                 if (const auto saasData = getObjectFromDictionary<api::SaasData>(dictionary, key))
                     setData(saasData.value());
@@ -244,12 +250,23 @@ nx::vms::api::ServiceTypeStatus ServiceManager::serviceStatus(const QString& ser
         : nx::vms::api::ServiceTypeStatus();
 }
 
+void ServiceManager::updateTiers(const LocalTierLimits& tiers)
+{
+    m_localTierLimits = tiers;
+    setData(data());
+}
+
 void ServiceManager::setData(nx::vms::api::SaasData data)
 {
     for (const auto& [tierName, value]: m_localTierLimits)
     {
         if (m_allowOverwriteTier || !data.tierLimits.contains(tierName))
-            data.tierLimits[tierName] = value;
+        {
+            if (value.has_value())
+                data.tierLimits[tierName] = *value;
+            else
+                data.tierLimits.erase(tierName);
+        }
     }
 
     bool stateChanged = false;
@@ -373,7 +390,7 @@ std::optional<int> ServiceManager::tierLimit(nx::vms::api::SaasTierLimitName val
     NX_MUTEX_LOCKER mutexLocker(&m_mutex);
 
     auto it = m_data.tierLimits.find(value);
-    if (it != m_data.tierLimits.end() && it->second > 0)
+    if (it != m_data.tierLimits.end())
         return it->second;
     return std::nullopt;
 }
@@ -385,23 +402,27 @@ std::optional<int> ServiceManager::tierLimitLeft(nx::vms::api::SaasTierLimitName
     if (!limit.has_value())
         return std::nullopt; // there is no limit
 
-    int existing = 0;
     switch (value)
     {
         case SaasTierLimitName::maxDevicesPerServer:
         {
+            int existing = 0;
             const int totalServers = systemContext()->resourcePool()->servers().size();
             const int totalCameras = systemContext()->resourcePool()->getAllCameras(
                 QnResourcePtr(), /*ignoreDesktopCameras*/ true).size();
             existing = totalServers * totalCameras;
-            break;
+            return *limit - existing;
         }
+        case SaasTierLimitName::crossSiteFeaturesEnabled:
+            [[fallthrough]];
+        case SaasTierLimitName::videowallEnabled:
+            [[fallthrough]];
+        case SaasTierLimitName::ldapEnabled:
+            return *limit;
         default:
             NX_ASSERT(0, "Not implemented");
-            break;
+            return 0;
     }
-
-    return *limit - existing;
 }
 
 bool ServiceManager::tierLimitReached(nx::vms::api::SaasTierLimitName value) const
@@ -410,16 +431,20 @@ bool ServiceManager::tierLimitReached(nx::vms::api::SaasTierLimitName value) con
     return limit && *limit <= 0;
 }
 
+bool ServiceManager::hasFeature(nx::vms::api::SaasTierLimitName value) const
+{
+    const auto limit = tierLimitLeft(value);
+    return limit.value_or(1) > 0; //< Features are enabled by default.
+}
+
 void ServiceManager::setTierLimits(
-    const std::map<nx::vms::api::SaasTierLimitName, int>& value,
+    const std::map<nx::vms::api::SaasTierLimitName, std::optional<int>>& tierLimits,
     bool allowOverwriteTier)
 {
-    {
-        NX_MUTEX_LOCKER mutexLocker(&m_mutex);
-        m_localTierLimits = value;
-        m_allowOverwriteTier = allowOverwriteTier;
-    }
-    setData(data());
+    m_allowOverwriteTier = allowOverwriteTier;
+    setJsonToDictionary(resourcePropertyDictionary(),
+        kAdditionTierLimitsPropertyKey,
+        nx::reflect::json::serialize(tierLimits));
 }
 
 } // nx::vms::common::saas

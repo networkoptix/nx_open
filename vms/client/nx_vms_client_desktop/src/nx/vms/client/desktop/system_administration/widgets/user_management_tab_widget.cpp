@@ -8,8 +8,11 @@
 
 #include <QtWidgets/QVBoxLayout>
 
+#include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/desktop/common/widgets/tab_widget.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
+#include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/common/saas/saas_service_manager.h>
 
 #include "ldap_settings_widget.h"
 #include "user_groups_widget.h"
@@ -23,6 +26,7 @@ struct UserManagementTabWidget::Private
 {
     UserManagementTabWidget* const q;
     TabWidget* const tabWidget{new TabWidget(q)};
+    int ldapTabIndex = 0;
 
     QList<QnAbstractPreferencesWidget*> tabs() const
     {
@@ -37,12 +41,16 @@ struct UserManagementTabWidget::Private
     }
 };
 
-UserManagementTabWidget::UserManagementTabWidget(UserGroupManager* manager, QWidget* parent):
+UserManagementTabWidget::UserManagementTabWidget(
+    WindowContext* context,
+    QWidget* parent)
+    :
     base_type(parent),
+    WindowContextAware(context),
     d(new Private{.q = this})
 {
     const auto userListWidget = new UserListWidget(d->tabWidget);
-    const auto userGroupsWidget = new UserGroupsWidget(manager, d->tabWidget);
+    const auto userGroupsWidget = new UserGroupsWidget(system()->userGroupManager(), d->tabWidget);
     const auto ldapSettingsWidget = new LdapSettingsWidget(d->tabWidget);
 
     setTabShape(d->tabWidget->tabBar(), style::TabShape::Compact);
@@ -52,7 +60,7 @@ UserManagementTabWidget::UserManagementTabWidget(UserGroupManager* manager, QWid
 
     d->tabWidget->addTab(userListWidget, tr("Users"));
     d->tabWidget->addTab(userGroupsWidget, tr("Groups"));
-    d->tabWidget->addTab(ldapSettingsWidget, tr("LDAP"));
+    d->ldapTabIndex = d->tabWidget->addTab(ldapSettingsWidget, tr("LDAP"));
 
     const auto layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);

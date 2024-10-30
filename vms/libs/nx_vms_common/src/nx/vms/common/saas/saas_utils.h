@@ -22,6 +22,12 @@ NX_VMS_COMMON_API bool saasInitialized(const SystemContext* systemContext);
  */
 NX_VMS_COMMON_API bool saasServicesOperational(SystemContext* systemContext);
 
+/**
+ * @return True if the system described by the given systemContext is a SaaS system and this system
+ *     formally in the operational state, and sending cross-site notifications is enabled as well.
+ */
+NX_VMS_COMMON_API bool crossSiteNotificationsAllowed(SystemContext* systemContext);
+
 NX_VMS_COMMON_API bool localRecordingServicesOverused(SystemContext* systemContext);
 
 NX_VMS_COMMON_API bool cloudStorageServicesOverused(SystemContext* systemContext);

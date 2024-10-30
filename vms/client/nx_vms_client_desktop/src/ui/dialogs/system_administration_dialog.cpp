@@ -55,7 +55,7 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget* parent):
     auto generalWidget = new QnGeneralSystemAdministrationWidget(&d->editableSystemSettings, this);
     addPage(GeneralPage, generalWidget, tr("General"));
 
-    auto userManagementWidget = new UserManagementTabWidget(system()->userGroupManager(), this);
+    auto userManagementWidget = new UserManagementTabWidget(windowContext(), this);
     addPage(UserManagement, userManagementWidget, tr("User Management"));
 
     // This is a page for updating many servers in one run.

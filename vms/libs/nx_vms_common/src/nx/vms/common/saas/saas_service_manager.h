@@ -127,11 +127,12 @@ public:
     std::optional<int> tierLimit(nx::vms::api::SaasTierLimitName value) const;
 
     void setTierLimits(
-        const std::map<nx::vms::api::SaasTierLimitName, int>& value,
+        const std::map<nx::vms::api::SaasTierLimitName, std::optional<int>>& value,
         bool allowOverwriteTier = true);
 
     std::optional<int> tierLimitLeft(nx::vms::api::SaasTierLimitName value) const;
     bool tierLimitReached(nx::vms::api::SaasTierLimitName value) const;
+    bool hasFeature(nx::vms::api::SaasTierLimitName value) const;
 
 signals:
     void saasStateChanged();
@@ -153,6 +154,10 @@ private:
     std::map<nx::Uuid, ServiceParamsType> purchasedServices(const QString& serviceType) const;
     void setSaasStateInternal(api::SaasState saasState, bool waitForDone);
 
+    using LocalTierLimits = std::map<nx::vms::api::SaasTierLimitName, std::optional<int>>;
+
+    void updateTiers(const LocalTierLimits& tiers);
+
 private:
     mutable nx::Mutex m_mutex;
     nx::vms::api::SaasData m_data;
@@ -160,7 +165,7 @@ private:
     std::atomic<bool> m_enabled{false};
 
     // Local tier limits can be loaded from json file in addition to CPS data
-    std::map<nx::vms::api::SaasTierLimitName, int> m_localTierLimits;
+    LocalTierLimits m_localTierLimits;
     bool m_allowOverwriteTier = false;
 };
 

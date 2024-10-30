@@ -238,7 +238,7 @@ public:
         QVariant baseValue = base_type::value();
         if (baseValue.userType() == m_type.id())
         {
-            if (auto v = baseValue.value<T>(); NX_ASSERT(isValueValid(v), "%1 = %2", key(), baseValue))
+            if (auto v = baseValue.value<T>(); isValueValid(v))
                 return v;
         }
 

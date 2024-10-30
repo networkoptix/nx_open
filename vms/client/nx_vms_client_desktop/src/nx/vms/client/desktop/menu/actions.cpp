@@ -818,7 +818,8 @@ void initialize(Manager* manager, Action* root)
         factory(NewVideoWallAction)
             .flags(Main)
             .requiredPowerUserPermissions()
-            .text(ContextMenu::tr("Video Wall..."));
+            .text(ContextMenu::tr("Video Wall..."))
+            .condition(condition::hasVideoWallFeature());
 
         factory(NewIntegrationAction)
             .flags(Main | Tree)
@@ -1207,7 +1208,8 @@ void initialize(Manager* manager, Action* root)
         .flags(Tree | SingleTarget | ResourceTarget)
         .text(ContextMenu::tr("Open Video Wall"))
         .requiredTargetPermissions(Qn::ReadWriteSavePermission)
-        .condition(condition::hasFlags(Qn::videowall, MatchMode::any));
+        .condition(condition::hasFlags(Qn::videowall, MatchMode::any)
+            && condition::hasVideoWallFeature());
 
     factory(OpenInFolderAction)
         .flags(Scene | Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
@@ -1223,26 +1225,34 @@ void initialize(Manager* manager, Action* root)
         .flags(Tree | SingleTarget | ResourceTarget)
         .requiredPowerUserPermissions()
         .text(ContextMenu::tr("Attach to Video Wall..."))
-        .condition(condition::hasFlags(Qn::videowall, MatchMode::any));
+        .condition(
+            condition::hasFlags(Qn::videowall, MatchMode::any)
+            && condition::hasVideoWallFeature());
 
     factory(StartVideoWallAction)
         .flags(Tree | SingleTarget | ResourceTarget)
         .text(ContextMenu::tr("Switch to Video Wall mode..."))
         .requiredTargetPermissions(Qn::ReadWriteSavePermission)
-        .condition(ConditionWrapper(new StartVideowallCondition()));
+        .condition(
+            ConditionWrapper(new StartVideowallCondition())
+            && condition::hasVideoWallFeature());
 
     factory(SaveVideoWallReviewAction)
         .flags(Tree | SingleTarget | ResourceTarget)
         .text(ContextMenu::tr("Save Video Wall"))
         .shortcut("Ctrl+S")
         .requiredTargetPermissions(Qn::ReadWriteSavePermission)
-        .condition(ConditionWrapper(new SaveVideowallReviewCondition(false)));
+        .condition(
+            ConditionWrapper(new SaveVideowallReviewCondition(false))
+            && condition::hasVideoWallFeature());
 
     factory(SaveVideowallMatrixAction)
         .flags(Tree | SingleTarget | ResourceTarget)
         .text(ContextMenu::tr("Save Current Matrix"))
         .requiredTargetPermissions(Qn::ReadWriteSavePermission)
-        .condition(ConditionWrapper(new NonEmptyVideowallCondition()));
+        .condition(
+            ConditionWrapper(new NonEmptyVideowallCondition())
+            && condition::hasVideoWallFeature());
 
     factory(LoadVideowallMatrixAction)
         .flags(Tree | SingleTarget | VideoWallMatrixTarget)
@@ -1828,7 +1838,7 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Video Wall Settings..."))
         .condition(condition::hasFlags(Qn::videowall, MatchMode::exactlyOne)
             && ConditionWrapper(new AutoStartAllowedCondition())
-        );
+            && condition::hasVideoWallFeature());
 
     factory(AnalyticsEngineSettingsAction)
         .flags(Tree | SingleTarget | ResourceTarget)

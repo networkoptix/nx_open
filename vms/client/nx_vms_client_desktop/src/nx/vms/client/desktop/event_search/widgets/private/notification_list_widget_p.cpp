@@ -330,7 +330,7 @@ void NotificationListWidget::Private::changeHeaderItemsVisibilityIfNeeded()
 
     if (auto user = system()->user();
         user && user->isCloud() && qnCloudStatusWatcher->cloudSystems().size() > 1
-        && saas::saasServicesOperational(system()))
+        && saas::crossSiteNotificationsAllowed(system()))
     {
         m_filterSystemsButton->setVisible(true);
     }

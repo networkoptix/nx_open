@@ -3,20 +3,22 @@
 #pragma once
 
 #include <nx/utils/impl_ptr.h>
+#include <nx/vms/client/desktop/window_context_aware.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
 
 namespace nx::vms::common { class UserGroupManager; }
 
 namespace nx::vms::client::desktop {
 
-class UserManagementTabWidget: public QnAbstractPreferencesWidget
+class UserManagementTabWidget: public QnAbstractPreferencesWidget, public WindowContextAware
 {
     Q_OBJECT
     using base_type = QnAbstractPreferencesWidget;
 
 public:
     explicit UserManagementTabWidget(
-        nx::vms::common::UserGroupManager* manager, QWidget* parent = nullptr);
+        WindowContext* context,
+        QWidget* parent = nullptr);
     virtual ~UserManagementTabWidget() override;
 
     virtual void loadDataToUi() override;

@@ -63,6 +63,7 @@
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/intercom/utils.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
+#include <nx/vms/common/saas/saas_service_manager.h>
 #include <nx/vms/common/showreel/showreel_manager.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/discovery/manager.h>
@@ -1986,6 +1987,16 @@ ConditionWrapper isLoggedIn(ActionVisibility defaultVisibility)
             return context->workbenchContext()->user().isNull()
                 ? defaultVisibility
                 : EnabledAction;
+        });
+}
+
+ConditionWrapper hasVideoWallFeature()
+{
+    return new CustomBoolCondition(
+        [](const Parameters& /*parameters*/, WindowContext* context)
+        {
+            return context->system()->saasServiceManager()->hasFeature(
+                nx::vms::api::SaasTierLimitName::videowallEnabled);
         });
 }
 
