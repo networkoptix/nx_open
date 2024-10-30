@@ -85,9 +85,8 @@ Dialog
             {
                 id: delegateItem
 
-                x: 16
                 height: 28
-                width: objectList.width - 2 * x
+                width: objectList.width
 
                 readonly property var modelIndex:
                     NxGlobals.toPersistent(objectList.model.index(index, 0))
@@ -104,6 +103,8 @@ Dialog
                     id: listItem
 
                     anchors.fill: parent
+                    anchors.leftMargin: 16
+                    anchors.rightMargin: 16
                     color: ColorTheme.colors.dark8
 
                     RowLayout
@@ -125,8 +126,10 @@ Dialog
                             elide: Text.ElideRight
                             textFormat: Text.StyledText
                             text: searchEdit.text
-                                ? NxGlobals.highlightMatch(model.display,
-                                    filterModel.filterRegularExpression, ColorTheme.colors.yellow_d1)
+                                ? NxGlobals.highlightMatch(
+                                    model.display,
+                                    filterModel.filterRegularExpression,
+                                    ColorTheme.colors.yellow_d1)
                                 : model.display
 
                             onToggled: model.checked = checked
@@ -163,7 +166,8 @@ Dialog
 
                                                 DragAndDrop.execute(
                                                     listItem,
-                                                    DragAndDrop.createMimeData([modelIndex]),
+                                                    DragAndDrop.createMimeData(
+                                                        [delegateItem.modelIndex]),
                                                     [Qt.MoveAction],
                                                     Qt.MoveAction,
                                                     resultUrl,
@@ -193,7 +197,8 @@ Dialog
                     onDropped: (drop) =>
                     {
                         drop.accepted = (itemFlags & Qt.ItemIsDropEnabled)
-                            && DragAndDrop.drop(currentMimeData, drop.action, modelIndex)
+                            && DragAndDrop.drop(
+                                currentMimeData, drop.action, delegateItem.modelIndex)
                     }
 
                     Rectangle
