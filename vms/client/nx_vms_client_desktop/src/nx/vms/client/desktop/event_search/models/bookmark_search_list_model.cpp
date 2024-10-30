@@ -14,7 +14,7 @@ namespace {
 
 QString iconPath()
 {
-    return "soft_triggers/user_selectable/bookmark.png";
+    return "24x24/Solid/st_bookmark.svg";
 }
 
 QColor color()
@@ -34,7 +34,7 @@ QVariant BookmarkSearchListModel::data(const QModelIndex& index, int role) const
     switch (role)
     {
         case core::DecorationPathRole:
-            return "soft_triggers/user_selectable/bookmark.png";
+            return "24x24/Solid/st_bookmark.svg";
 
         case Qt::DecorationRole:
             return QVariant::fromValue(pixmap());

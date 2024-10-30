@@ -23,14 +23,14 @@ public:
             field, context, parent)
     {
         constexpr auto kDropdownIconSize = 40;
-        const auto pixmapNames = SoftwareTriggerPixmaps::pixmapNames();
+        const auto pixmaps = SoftwareTriggerPixmaps::pixmaps();
         const auto nextEvenValue = [](int value) { return value + (value & 1); };
-        const auto columnCount = nextEvenValue(qCeil(qSqrt(pixmapNames.size())));
+        const auto columnCount = nextEvenValue(qCeil(qSqrt(pixmaps.size())));
 
         QSignalBlocker blocker{m_comboBox};
         m_comboBox->setColumnCount(columnCount);
         m_comboBox->setItemSize({kDropdownIconSize, kDropdownIconSize});
-        m_comboBox->setPixmaps(SoftwareTriggerPixmaps::pixmapsPath(), pixmapNames);
+        m_comboBox->setPixmaps(pixmaps);
         m_comboBox->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred));
 
         auto contentLayout = qobject_cast<QHBoxLayout*>(m_contentWidget->layout());

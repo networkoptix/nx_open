@@ -70,16 +70,12 @@ QnSoftwareTriggerBusinessEventWidget::QnSoftwareTriggerBusinessEventWidget(
     const auto nextEvenValue =
         [](int value) { return value + (value & 1); };
 
-    const auto columnCount = nextEvenValue(qCeil(qSqrt(
-        SoftwareTriggerPixmaps::pixmapNames().size())));
+    const auto pixmaps = SoftwareTriggerPixmaps::pixmaps();
+    const auto columnCount = nextEvenValue(qCeil(qSqrt(pixmaps.size())));
 
     ui->iconComboBox->setColumnCount(columnCount);
-
     ui->iconComboBox->setItemSize({ kDropdownIconSize, kDropdownIconSize });
-
-    ui->iconComboBox->setPixmaps(
-        SoftwareTriggerPixmaps::pixmapsPath(),
-        SoftwareTriggerPixmaps::pixmapNames());
+    ui->iconComboBox->setPixmaps(pixmaps);
 
     auto aligner = new Aligner(this);
     aligner->addWidget(ui->nameLabel);

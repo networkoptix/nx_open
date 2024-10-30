@@ -9,8 +9,7 @@ namespace nx::vms::client::desktop {
 
 struct SoftwareTriggerPixmaps
 {
-    /** Path to software trigger pixmaps. */
-    static QString pixmapsPath();
+    using MapT = QVector<QPair<QString, QPixmap>>;
 
     /** Default software trigger pixmap, also a fallback pixmap. */
     static QString defaultPixmapName();
@@ -27,14 +26,13 @@ struct SoftwareTriggerPixmaps
     /** List of pixmap names available to users to choose for software triggers. */
     static const QStringList& pixmapNames();
 
+    static const MapT pixmaps();
+
     /** Checks if specified pixmap name is valid. */
     static bool hasPixmap(const QString& name);
 
     /** Get a pixmap by it's name with fallback to default if specified is not available. */
     static QPixmap pixmapByName(const QString& name);
-
-    /** Get colorized pixmap with fallback to default if specified is not available. */
-    static QPixmap colorizedPixmap(const QString& name, const QColor& color);
 };
 
 } // namespace nx::vms::client::desktop
