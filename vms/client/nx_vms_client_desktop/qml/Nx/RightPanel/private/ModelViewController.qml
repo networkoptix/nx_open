@@ -13,48 +13,56 @@ NxObject
 {
     id: controller
 
-    property bool active: true
+    property bool enabled: true
     property var view: null
-    property var model: (view && view.model) || null
+    property var model: view?.model || null
     property var loggingCategory
     property alias placeholder: placeholderParameters
     property alias tileController: tileController
     property bool standardTileInteraction: true
 
-    function updateVisibility()
+    onEnabledChanged:
     {
-        d.updateData()
+        if (!controller.view)
+        {
+            console.assert(!controller.enabled)
+            return
+        }
 
-        if (model)
-            model.setLivePaused(!view.visible)
-    }
+        console.debug(loggingCategory, `${controller.view.objectName}: controller is `
+            + `${controller.enabled ? "enabled" : "disabled"}`)
 
-    onActiveChanged:
-    {
-        if (active)
-            updateVisibility()
+        if (controller.enabled)
+            d.updateLive()
     }
 
     Connections
     {
         target: view
-        enabled: active
+        enabled: controller.enabled
 
         function onAtYEndChanged()
         {
             if (view.atYEnd)
-                d.fetchBottom()
+            {
+                console.debug(loggingCategory, `${view.objectName}: scrolled to the end`)
+                d.updateData()
+            }
         }
 
         function onAtYBeginningChanged()
         {
             if (view.atYBeginning)
-                d.fetchTop()
+            {
+                console.debug(loggingCategory, `${view.objectName}: scrolled to the beginning`)
+                d.updateData()
+            }
         }
 
         function onVisibleChanged()
         {
-            updateVisibility()
+            d.updateData()
+            d.updateLive()
         }
     }
 
@@ -62,9 +70,9 @@ NxObject
     {
         // A fix for inline header height changes causing scroll by the height delta.
 
-        target: (view && view.headerItem) || null
+        target: view?.headerItem || null
         ignoreUnknownSignals: true
-        enabled: active
+        enabled: controller.enabled
 
         function onHeightChanged()
         {
@@ -85,51 +93,50 @@ NxObject
     Connections
     {
         target: model
-        enabled: active
+        enabled: controller.enabled
 
         function onDataNeeded()
         {
-            d.updateData();
+            console.debug(loggingCategory, `${view.objectName}: data needed`)
+            d.updateData()
         }
 
         function onFetchCommitStarted(request)
         {
-            if (!view.visible)
-                return
-
-            function directionName(direction)
-            {
-                return direction === EventSearch.FetchDirection.older ? "older" : "newer"
-            }
-
-            console.debug(loggingCategory,
-                `${view.objectName}: fetch commit started, direction=${directionName(request.direction)}`)
-
-            d.savedTopmostIndex = request.direction === EventSearch.FetchDirection.newer
-                ? NxGlobals.toPersistent(model.index(0, 0, NxGlobals.invalidModelIndex()))
-                : NxGlobals.invalidModelIndex()
+            console.debug(loggingCategory, `${view.objectName}: fetch commit started, `
+                + `direction=${d.directionName(request.direction)}`)
         }
 
         function onFetchFinished(result, centralItemIndex, request)
         {
-            if (!view.visible)
-                return
+            console.debug(loggingCategory, `${view.objectName}: fetch finished, `
+                + `direction=${d.directionName(request.direction)}, POI=${centralItemIndex}`)
 
-            console.debug(loggingCategory, `${view.objectName}: fetch finished`)
             topPreloader.visible = false
             bottomPreloader.visible = false
 
             if (view instanceof TableView)
             {
                 view.positionViewAtRow(centralItemIndex,
-                    (request.direction === EventSearch.FetchDirection.newer)
-                        ? TableView.AlignTop : TableView.AlignBottom)
+                    request.direction === EventSearch.FetchDirection.newer
+                        ? TableView.AlignTop
+                        : TableView.AlignBottom,
+                    -view.topMargin)
             }
-            else if (d.savedTopmostIndex.valid)
+            else if (view instanceof GridView)
             {
-                view.positionViewAtIndex(d.savedTopmostIndex, ListView.Beginning)
+                view.positionViewAtIndex(centralItemIndex,
+                    request.direction === EventSearch.FetchDirection.newer
+                        ? GridView.Beginning
+                        : GridView.End)
             }
-            d.savedTopmostIndex = NxGlobals.invalidModelIndex()
+            else if (view instanceof ListView)
+            {
+                view.positionViewAtIndex(centralItemIndex,
+                    request.direction === EventSearch.FetchDirection.newer
+                        ? ListView.Beginning
+                        : ListView.End)
+            }
         }
 
         function onAsyncFetchStarted(request)
@@ -154,16 +161,16 @@ NxObject
     {
         id: topPreloader
 
-        width: (parent && parent.width) || 0
-        parent: (view && view.headerItem) || null
+        width: parent?.width || 0
+        parent: view?.headerItem || null
     }
 
     TilePreloader
     {
         id: bottomPreloader
 
-        width: (parent && parent.width) || 0
-        parent: (view && view.headerItem) || null
+        width: parent?.width || 0
+        parent: view?.headerItem || null
     }
 
     ResultsPlaceholder
@@ -172,7 +179,7 @@ NxObject
 
         parent: view
         anchors.fill: parent || undefined
-        anchors.topMargin: (view && view.headerItem && view.headerItem.height) || 0
+        anchors.topMargin: view?.headerItem?.height || 0
         shown: model && model.placeholderRequired
 
         icon: placeholderParameters.icon
@@ -184,7 +191,7 @@ NxObject
     NxObject
     {
         id: d
-        property var savedTopmostIndex: NxGlobals.invalidModelIndex()
+
         property real savedHeaderHeight: 0
         property bool fixupInProgress: false
 
@@ -208,6 +215,22 @@ NxObject
 
         function updateData()
         {
+            if (!controller.enabled || !view.visible)
+                return
+
+            function whereAt()
+            {
+                if (view.atYEnd && view.atYBeginning)
+                    return "whole view"
+                if (view.atYEnd)
+                    return "at the end"
+                if (view.atYBeginning)
+                    return "at the beginning"
+                return "in the middle"
+            }
+
+            console.debug(loggingCategory, `${view.objectName}: update request, ${whereAt()}`)
+
             if (view.atYEnd)
             {
                 d.fetchBottom()
@@ -216,12 +239,17 @@ NxObject
             {
                 d.fetchTop()
             }
-            else
-            {
-                controller.requestUpdateIfNeeded(
-                    EventSearchUtils.fetchRequest(EventSearch.FetchDirection.older,
-                        view.currentCentralPointUs()))
-            }
+        }
+
+        function updateLive()
+        {
+            if (model && controller.enabled)
+                model.setLivePaused(!view.visible)
+        }
+
+        function directionName(direction)
+        {
+            return direction === EventSearch.FetchDirection.older ? "older" : "newer"
         }
     }
 
@@ -238,7 +266,7 @@ NxObject
     Connections
     {
         target: tileController
-        enabled: active
+        enabled: controller.enabled
 
         function onCloseRequested(row)
         {
@@ -254,12 +282,17 @@ NxObject
         {
             model.activateLink(row, link)
         }
+
+        function onContextMenuRequested(row, globalPos)
+        {
+            model.showContextMenu(row, globalPos, controller.standardTileInteraction)
+        }
     }
 
     Connections
     {
         target: tileController
-        enabled: controller.standardTileInteraction && active
+        enabled: controller.standardTileInteraction && controller.enabled
 
         function onClicked(row, mouseButton, keyboardModifiers)
         {
@@ -274,17 +307,6 @@ NxObject
         function onDragStarted(row, pos, size)
         {
             model.startDrag(row, pos, size)
-        }
-    }
-
-    Connections
-    {
-        target: tileController
-        enabled: active
-
-        function onContextMenuRequested(row, globalPos)
-        {
-            model.showContextMenu(row, globalPos, controller.standardTileInteraction)
         }
     }
 

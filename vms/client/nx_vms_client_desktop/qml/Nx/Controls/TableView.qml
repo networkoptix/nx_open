@@ -19,7 +19,7 @@ TableView
     id: control
 
     property var sourceModel: null
-    property alias horizontalHeaderVisible: columnsHeader.visible
+    property bool horizontalHeaderVisible: false
     property alias headerBackgroundColor: columnsHeader.color
     property alias horizontalHeaderEnabled: columnsHeader.enabled
 
@@ -51,7 +51,7 @@ TableView
     boundsBehavior: Flickable.StopAtBounds
     clip: true
 
-    topMargin: columnsHeader.visible ? columnsHeader.height : 0
+    topMargin: impl.reservedHeight
 
     onWidthChanged:
     {
@@ -69,6 +69,9 @@ TableView
 
         readonly property int minColumnWidth: 28
         property var columnWidthCache: []
+
+        readonly property real reservedHeight:
+            control.horizontalHeaderVisible ? columnsHeader.height : 0
 
         function updateColumnWidths()
         {
@@ -128,8 +131,8 @@ TableView
         parent: control.parent //< The only way to shift ScrollBar yCoord and change height.
 
         x: control.x + control.width - width
-        y: control.y + (columnsHeader.visible ? columnsHeader.height : 0)
-        height: control.height - (columnsHeader.visible ? columnsHeader.height : 0)
+        y: control.y + impl.reservedHeight
+        height: control.height - impl.reservedHeight
     }
 
     delegate: BasicSelectableTableCellDelegate {}
@@ -164,7 +167,7 @@ TableView
 
         color: ColorTheme.colors.dark7
 
-        visible: false
+        visible: control.horizontalHeaderVisible
 
         Row
         {

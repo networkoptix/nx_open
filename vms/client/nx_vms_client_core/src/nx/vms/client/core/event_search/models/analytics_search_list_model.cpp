@@ -109,7 +109,6 @@ public:
     QSet<nx::Uuid> externalBestShotTracks;
     QSet<nx::Uuid> dataChangedTrackIds; //< For which tracks delayed dataChanged is queued.
 
-    bool newTrackCountUnknown = false;
     bool gapBeforeNewTracks = false;
     bool keepLiveDataAtClear = false;
 
@@ -568,6 +567,7 @@ void AnalyticsSearchListModel::Private::processMetadata()
     // Special handling if live mode is paused (analytics tab is hidden).
     if (q->livePaused() && !data.empty())
     {
+        const auto availableNewTracksGuard = makeAvailableNewTracksGuard();
         gapBeforeNewTracks = true;
 
         if (liveProcessingMode == LiveProcessingMode::automaticAdd)
@@ -577,9 +577,6 @@ void AnalyticsSearchListModel::Private::processMetadata()
         }
         else
         {
-            const auto availableNewTracksGuard = makeAvailableNewTracksGuard();
-            newTrackCountUnknown = newTrackCountUnknown || !newTracks.empty();
-
             // Discard previously received tracks in manual mode.
             subtractKeysFromSet(/*minuend*/ externalBestShotTracks,
                 /*subtrahend*/ newTracks.idToTimestamp);
@@ -689,21 +686,21 @@ void AnalyticsSearchListModel::Private::processMetadata()
 
     const auto findObject =
         [this](const nx::Uuid& trackId) -> FoundObjectTrack
-    {
-        int index = newTracks.indexOf(trackId);
-        if (index >= 0)
-            return {&newTracks, index};
+        {
+            int index = newTracks.indexOf(trackId);
+            if (index >= 0)
+                return {&newTracks, index};
 
-        index = data.indexOf(trackId);
-        if (index >= 0)
-            return {&data, index};
+            index = data.indexOf(trackId);
+            if (index >= 0)
+                return {&data, index};
 
-        index = noBestShotTracks.indexOf(trackId);
-        if (index >= 0)
-            return {&noBestShotTracks, index};
+            index = noBestShotTracks.indexOf(trackId);
+            if (index >= 0)
+                return {&noBestShotTracks, index};
 
-        return {};
-    };
+            return {};
+        };
 
     nx::analytics::db::Filter filter;
     filter.freeText = q->combinedTextFilter();
@@ -835,16 +832,18 @@ void AnalyticsSearchListModel::Private::processMetadata()
     }
 
     // Limit the size of the available new tracks queue.
+    bool newGap = false;
     if (newTracks.size() > q->maximumCount())
     {
         const auto removeBegin = newTracks.items.begin() + q->maximumCount();
         const auto cleanupFunction = itemCleanupFunction(newTracks);
         std::for_each(removeBegin, newTracks.items.end(), cleanupFunction);
         newTracks.items.erase(removeBegin, newTracks.items.end());
+        newGap = !gapBeforeNewTracks;
         gapBeforeNewTracks = true;
     }
 
-    if (newTracks.size() == oldNewTrackCount)
+    if (newTracks.size() == oldNewTrackCount && !newGap)
         return;
 
     NX_VERBOSE(q, "Detected %1 new object tracks", newTracks.size() - oldNewTrackCount);
@@ -895,6 +894,15 @@ FetchedDataRanges AnalyticsSearchListModel::Private::applyFetchedData(
     LookupResult&& newData,
     const FetchRequest& request)
 {
+    // If newer data is fetched, and manual live processing mode is in effect, and there is no gap
+    // between fetched data and live data, commit live data before committing fetched data.
+    if (request.direction == FetchDirection::newer
+        && liveProcessingMode == LiveProcessingMode::manualAdd
+        && !gapBeforeNewTracks)
+    {
+        q->commitAvailableNewTracks();
+    }
+
     // TODO: ynikitenkov: optimize this part. We could store some wide window of data
     // and slide inside it until we need some new data.
     mergeOldData<Facade>(newData, data.items, request.direction);
@@ -903,7 +911,8 @@ FetchedDataRanges AnalyticsSearchListModel::Private::applyFetchedData(
     const auto newerResultsCount = request.direction == FetchDirection::newer
         ? fetched.ranges.tail.length
         : fetched.ranges.body.length;
-    gapBeforeNewTracks = newerResultsCount >= q->maximumCount() / 2;
+    const auto availableNewTracksGuard = makeAvailableNewTracksGuard();
+    gapBeforeNewTracks |= newerResultsCount >= q->maximumCount() / 2;
     if (liveProcessingMode == LiveProcessingMode::automaticAdd)
         q->setLive(!gapBeforeNewTracks);
 
@@ -1153,23 +1162,13 @@ int AnalyticsSearchListModel::availableNewTracks() const
     if (d->liveProcessingMode != LiveProcessingMode::manualAdd)
         return 0;
 
-    return d->newTrackCountUnknown
+    return d->gapBeforeNewTracks
         ? kUnknownAvailableTrackCount
         : d->newTracks.size();
 }
 
 void AnalyticsSearchListModel::commitAvailableNewTracks()
 {
-    if (d->liveProcessingMode == LiveProcessingMode::manualAdd)
-    {
-        NX_VERBOSE(this, "Manual addition of available %1 new tracks was triggered",
-            d->newTracks.size());
-    }
-    else
-    {
-        NX_VERBOSE(this, "Automatic addition of %1 live tracks", d->newTracks.size());
-    }
-
     if (d->gapBeforeNewTracks)
     {
         NX_VERBOSE(this, "Clearing model due to the gap before new tracks");
@@ -1182,7 +1181,15 @@ void AnalyticsSearchListModel::commitAvailableNewTracks()
     if (d->newTracks.empty())
         return;
 
-    NX_VERBOSE(this, "Live update commit");
+    if (d->liveProcessingMode == LiveProcessingMode::manualAdd)
+    {
+        NX_VERBOSE(this, "Manual addition of available %1 new tracks was triggered",
+            d->newTracks.size());
+    }
+    else
+    {
+        NX_VERBOSE(this, "Automatic addition of %1 live tracks", d->newTracks.size());
+    }
 
     const auto currentTimeWindow =
         [this]()
@@ -1456,7 +1463,6 @@ void AnalyticsSearchListModel::clearData()
     d->currentHttpRequestId = {};
     d->data.clear();
     d->gapBeforeNewTracks = false;
-    d->newTrackCountUnknown = false;
 }
 
 void AnalyticsSearchListModel::setLiveTimestampGetter(LiveTimestampGetter value)
