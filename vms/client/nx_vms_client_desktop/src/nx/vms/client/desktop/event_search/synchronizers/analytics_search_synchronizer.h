@@ -47,8 +47,13 @@ private:
     void updateCachedDevices();
     void updateMediaResourceWidgetAnalyticsMode(QnMediaResourceWidget* widget);
     void updateAllMediaResourceWidgetsAnalyticsMode();
-    void updateObjectTypes(const QStringList& objectTypeIds);
-    void updateCameraSelection(core::EventSearch::CameraSelection cameraSelection);
+    void updateObjectTypesFromSettings();
+    void updateTimeSelectionFromSettings();
+    void updateAreaFromSettings();
+    void updateAttributeFiltersFromSettings();
+    void updateCameraSelectionFromSettings();
+    void updateEngineIdFromSettings();
+    void updateFiltersFromSettings();
 
     void handleWidgetAnalyticsFilterRectChanged();
 
@@ -56,12 +61,14 @@ private:
 
     bool isMasterInstance() const;
     void setupInstanceSynchronization();
+    void setupSettingsStorage();
     QVector<AnalyticsSearchSynchronizer*> instancesToNotify();
     static QVector<AnalyticsSearchSynchronizer*>& instances();
 
 private:
     const QPointer<core::AnalyticsSearchSetup> m_analyticsSetup;
     nx::utils::ScopedConnections m_activeMediaWidgetConnections;
+    nx::utils::ScopedConnections m_settingsSyncConnections;
     bool m_areaSelectionActive = false;
     bool m_updating = false;
     nx::analytics::db::Filter m_filter;

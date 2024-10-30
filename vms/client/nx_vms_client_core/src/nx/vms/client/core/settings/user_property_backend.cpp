@@ -26,7 +26,7 @@ UserPropertyBackend::UserPropertyBackend(
 
 bool UserPropertyBackend::isWritable() const
 {
-    return true;
+    return !systemContext()->user().isNull();
 }
 
 QString UserPropertyBackend::readValue(const QString& name, bool* success)
@@ -72,6 +72,9 @@ QString UserPropertyBackend::readValue(const QString& name, bool* success)
 
 bool UserPropertyBackend::writeValue(const QString& name, const QString& value)
 {
+    if (!systemContext()->user())
+        return false;
+
     m_newValues[name] = value;
     m_deletedValues.remove(name);
     return true;
@@ -79,6 +82,9 @@ bool UserPropertyBackend::writeValue(const QString& name, const QString& value)
 
 bool UserPropertyBackend::removeValue(const QString& name)
 {
+    if (!systemContext()->user())
+        return false;
+
     m_newValues.remove(name);
     m_deletedValues.insert(name);
     return true;
@@ -95,6 +101,10 @@ bool UserPropertyBackend::sync()
     QnUserResourcePtr user = systemContext()->user();
     if (!user)
     {
+        m_originalValues = {};
+        m_newValues.clear();
+        m_deletedValues.clear();
+
         NX_VERBOSE(this, "There is no current user. Nothing to sync.");
         return false;
     }

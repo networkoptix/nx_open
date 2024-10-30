@@ -37,10 +37,12 @@ UserSpecificSettings::UserSpecificSettings(SystemContext* systemContext):
     connect(systemContext, &SystemContext::userChanged, this,
         [this](const QnUserResourcePtr& user)
         {
+            sync();
+
             if (user)
             {
-                sync();
                 load();
+                emit loaded();
             }
         });
 

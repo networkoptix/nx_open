@@ -3,8 +3,10 @@
 #pragma once
 
 #include <nx/utils/property_storage/storage.h>
+#include <nx/utils/serialization/qt_geometry_reflect_json.h>
 #include <nx/vms/client/core/event_search/event_search_globals.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
+#include <recording/time_period.h>
 
 namespace nx::utils { class PendingOperation; }
 
@@ -25,15 +27,27 @@ class UserSpecificSettings:
     public nx::utils::property_storage::Storage,
     public SystemContextAware
 {
+    Q_OBJECT
+
 public:
     UserSpecificSettings(SystemContext* systemContext);
     virtual ~UserSpecificSettings() override;
 
     void saveImmediately();
 
-    Property<core::EventSearch::CameraSelection> cameraSelection{this, "cameraSelection",
-        core::EventSearch::CameraSelection::layout};
-    Property<QStringList> objectTypeIds{this, "objectTypeIds"};
+    Property<core::EventSearch::CameraSelection> objectSearchCameraSelection{this,
+        "objectSearchCameraSelection", core::EventSearch::CameraSelection::layout};
+    Property<UuidList> objectSearchCustomCameras{this, "objectSearchSelectedCameras"};
+    Property<core::EventSearch::TimeSelection> objectSearchTimeSelection{this,
+        "objectSearchTimeSelection"};
+    Property<QnTimePeriod> objectSearchTimePeriod{this, "objectSearchTimePeriod"};
+    Property<QStringList> objectSearchObjectTypeIds{this, "objectSearchObjectTypeIds"};
+    Property<QRectF> objectSearchArea{this, "objectSearchArea"};
+    Property<QStringList> objectSearchAttributeFilters{this, "objectSearchAttributeFilters"};
+    Property<nx::Uuid> objectSearchEngineId{this, "objectSearchEngineId"};
+
+signals:
+    void loaded();
 
 private:
     std::unique_ptr<nx::utils::PendingOperation> m_pendingSync;

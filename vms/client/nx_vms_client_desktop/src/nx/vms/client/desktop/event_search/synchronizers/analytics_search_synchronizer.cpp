@@ -238,30 +238,14 @@ AnalyticsSearchSynchronizer::AnalyticsSearchSynchronizer(
         });
 
     connect(commonSetup, &CommonObjectSearchSetup::cameraSelectionChanged, this,
+        &AnalyticsSearchSynchronizer::updateAction);
+
+    connect(system()->userSettings(), &UserSpecificSettings::loaded, this,
         [this]()
         {
-            const QScopedValueRollback updateGuard(m_updating, true);
-            updateAction();
-            system()->userSettings()->cameraSelection = this->commonSetup()->cameraSelection();
+            updateFiltersFromSettings();
+            setupSettingsStorage();
         });
-
-    connect(m_analyticsSetup, &core::AnalyticsSearchSetup::objectTypesChanged, this,
-        [this]()
-        {
-            const QScopedValueRollback updateGuard(m_updating, true);
-            system()->userSettings()->objectTypeIds = m_analyticsSetup->objectTypes();
-        });
-
-    using utils::property_storage::BaseProperty;
-
-    connect(&system()->userSettings()->cameraSelection, &BaseProperty::changed, this,
-        [this]() { updateCameraSelection(system()->userSettings()->cameraSelection()); });
-
-    connect(&system()->userSettings()->objectTypeIds, &BaseProperty::changed, this,
-        [this]() { updateObjectTypes(system()->userSettings()->objectTypeIds()); });
-
-    updateCameraSelection(system()->userSettings()->cameraSelection());
-    updateObjectTypes(system()->userSettings()->objectTypeIds());
 }
 
 AnalyticsSearchSynchronizer::~AnalyticsSearchSynchronizer()
@@ -398,8 +382,10 @@ void AnalyticsSearchSynchronizer::updateAllMediaResourceWidgetsAnalyticsMode()
     }
 }
 
-void AnalyticsSearchSynchronizer::updateObjectTypes(const QStringList& objectTypeIds)
+void AnalyticsSearchSynchronizer::updateObjectTypesFromSettings()
 {
+    const QStringList& objectTypeIds = system()->userSettings()->objectSearchObjectTypeIds();
+
     if (m_updating || m_analyticsSetup->objectTypes() == objectTypeIds)
         return;
 
@@ -415,24 +401,86 @@ void AnalyticsSearchSynchronizer::updateObjectTypes(const QStringList& objectTyp
         m_analyticsSetup->setObjectTypes({});
 }
 
-void AnalyticsSearchSynchronizer::updateCameraSelection(
-    core::EventSearch::CameraSelection cameraSelection)
+void AnalyticsSearchSynchronizer::updateTimeSelectionFromSettings()
 {
-    if (m_updating || commonSetup()->cameraSelection() == cameraSelection)
+    commonSetup()->setTimeSelection(system()->userSettings()->objectSearchTimeSelection());
+}
+
+void AnalyticsSearchSynchronizer::updateAreaFromSettings()
+{
+    const QRectF area = commonSetup()->selectedCameras().size() != 1
+        ? QRectF()
+        : system()->userSettings()->objectSearchArea();
+
+    m_analyticsSetup->setArea(area);
+
+    if (area.isValid())
+    {
+        m_analyticsSetup->setAreaSelectionActive(true);
+        if (QnMediaResourceWidget* mediaWidget = this->mediaWidget())
+            mediaWidget->setAnalyticsFilterRect(area);
+    }
+}
+
+void AnalyticsSearchSynchronizer::updateAttributeFiltersFromSettings()
+{
+    m_analyticsSetup->setAttributeFilters(
+        system()->userSettings()->objectSearchAttributeFilters());
+}
+
+void AnalyticsSearchSynchronizer::updateCameraSelectionFromSettings()
+{
+    const core::EventSearch::CameraSelection cameraSelection =
+        system()->userSettings()->objectSearchCameraSelection();
+
+    if (m_updating
+        || (commonSetup()->cameraSelection() == cameraSelection
+            && (commonSetup()->selectedCamerasIds()
+                == system()->userSettings()->objectSearchCustomCameras())))
+    {
+        return;
+    }
+
+    switch (cameraSelection)
+    {
+        case core::EventSearch::CameraSelection::all:
+        case core::EventSearch::CameraSelection::layout:
+        case core::EventSearch::CameraSelection::current:
+            commonSetup()->setCameraSelection(cameraSelection);
+            break;
+
+        case core::EventSearch::CameraSelection::custom:
+            commonSetup()->setSelectedCamerasIds(
+                system()->userSettings()->objectSearchCustomCameras());
+            break;
+
+        default:
+            commonSetup()->setCameraSelection(core::EventSearch::CameraSelection::layout);
+            break;
+    }
+}
+
+void AnalyticsSearchSynchronizer::updateEngineIdFromSettings()
+{
+    const nx::Uuid& engineId = system()->userSettings()->objectSearchEngineId();
+
+    if (m_analyticsSetup->engine() == engineId)
         return;
 
-    if (QSet({
-        core::EventSearch::CameraSelection::all,
-        core::EventSearch::CameraSelection::layout,
-        core::EventSearch::CameraSelection::current,
-        core::EventSearch::CameraSelection::custom}).contains(cameraSelection))
-    {
-        commonSetup()->setCameraSelection(cameraSelection);
-    }
+    if (system()->taxonomyManager()->currentTaxonomy()->engineById(engineId.toString()))
+        m_analyticsSetup->setEngine(engineId);
     else
-    {
-        commonSetup()->setCameraSelection(core::EventSearch::CameraSelection::layout);
-    }
+        m_analyticsSetup->setEngine({});
+}
+
+void AnalyticsSearchSynchronizer::updateFiltersFromSettings()
+{
+    updateCameraSelectionFromSettings();
+    updateEngineIdFromSettings();
+    updateObjectTypesFromSettings();
+    updateTimeSelectionFromSettings();
+    updateAreaFromSettings();
+    updateAttributeFiltersFromSettings();
 }
 
 void AnalyticsSearchSynchronizer::handleWidgetAnalyticsFilterRectChanged()
@@ -484,8 +532,10 @@ void AnalyticsSearchSynchronizer::setupInstanceSynchronization()
     connect(commonSetup(), &CommonObjectSearchSetup::timeSelectionChanged, this,
         [this]()
         {
+            const core::EventSearch::TimeSelection timeSelection = commonSetup()->timeSelection();
+
             for (auto instance: instancesToNotify())
-                instance->commonSetup()->setTimeSelection(commonSetup()->timeSelection());
+                instance->commonSetup()->setTimeSelection(timeSelection);
         });
 
     connect(commonSetup(), &CommonObjectSearchSetup::cameraSelectionChanged, this,
@@ -502,15 +552,18 @@ void AnalyticsSearchSynchronizer::setupInstanceSynchronization()
             if (commonSetup()->cameraSelection() != core::EventSearch::CameraSelection::custom)
                 return;
 
+            const QnVirtualCameraResourceSet& selectedCameras = commonSetup()->selectedCameras();
             for (auto instance: instancesToNotify())
-                instance->commonSetup()->setSelectedCameras(commonSetup()->selectedCameras());
+                instance->commonSetup()->setSelectedCameras(selectedCameras);
         });
 
     connect(m_analyticsSetup, &core::AnalyticsSearchSetup::engineChanged, this,
         [this]()
         {
+            const nx::Uuid engineId = m_analyticsSetup->engine();
+
             for (auto instance: instancesToNotify())
-                instance->m_analyticsSetup->setEngine(m_analyticsSetup->engine());
+                instance->m_analyticsSetup->setEngine(engineId);
         });
 
     connect(m_analyticsSetup, &core::AnalyticsSearchSetup::objectTypesChanged, this,
@@ -518,24 +571,25 @@ void AnalyticsSearchSynchronizer::setupInstanceSynchronization()
         {
             const auto objectTypes = m_analyticsSetup->objectTypes();
             for (auto instance: instancesToNotify())
-                instance->m_analyticsSetup->setObjectTypes(m_analyticsSetup->objectTypes());
+                instance->m_analyticsSetup->setObjectTypes(objectTypes);
         });
 
     connect(m_analyticsSetup, &core::AnalyticsSearchSetup::attributeFiltersChanged, this,
         [this]()
         {
+            const QStringList& attributeFilters = m_analyticsSetup->attributeFilters();
+
             for (auto instance: instancesToNotify())
-            {
-                instance->m_analyticsSetup->setAttributeFilters(
-                    m_analyticsSetup->attributeFilters());
-            }
+                instance->m_analyticsSetup->setAttributeFilters(attributeFilters);
         });
 
     connect(m_analyticsSetup, &core::AnalyticsSearchSetup::areaChanged, this,
         [this]()
         {
+            const QRectF area = m_analyticsSetup->area();
+
             for (auto instance: instancesToNotify())
-                instance->m_analyticsSetup->setArea(m_analyticsSetup->area());
+                instance->m_analyticsSetup->setArea(area);
         });
 
     connect(m_analyticsSetup, &core::AnalyticsSearchSetup::areaSelectionActiveChanged, this,
@@ -566,6 +620,91 @@ void AnalyticsSearchSynchronizer::setupInstanceSynchronization()
     m_analyticsSetup->setAttributeFilters(master->m_analyticsSetup->attributeFilters());
     m_analyticsSetup->setArea(master->m_analyticsSetup->area());
     m_analyticsSetup->setAreaSelectionActive(master->m_analyticsSetup->areaSelectionActive());
+}
+
+void AnalyticsSearchSynchronizer::setupSettingsStorage()
+{
+    if (!m_settingsSyncConnections.isEmpty())
+        return;
+
+    m_settingsSyncConnections << connect(system(), &SystemContext::userChanged, this,
+        [this](const QnUserResourcePtr& user)
+        {
+            if (!user)
+                m_settingsSyncConnections.reset();
+        });
+
+    m_settingsSyncConnections << connect(
+        commonSetup(), &CommonObjectSearchSetup::selectedCamerasChanged, this,
+        [this]()
+        {
+            // When the initial connection to the system is established, the settings become
+            // available, but the layout is not loaded yet, so we do not have the list of the
+            // selected cameras. This handler helps to resolve that issue. It re-applies
+            // camera-dependent settings when cameras become available. As a side effect it tries
+            // to re-apply the settings every time the camera selection is changed, but that does
+            // not affect the behavior, as the settings are in sync with the current state.
+            updateObjectTypesFromSettings();
+            updateAreaFromSettings();
+        });
+
+    m_settingsSyncConnections << connect(
+        commonSetup(), &CommonObjectSearchSetup::timeSelectionChanged, this,
+        [this]()
+        {
+            const core::EventSearch::TimeSelection timeSelection = commonSetup()->timeSelection();
+
+            if (timeSelection != core::EventSearch::TimeSelection::selection)
+            {
+                //< Timeline selection should not be saved according to the specification.
+                system()->userSettings()->objectSearchTimeSelection = timeSelection;
+            }
+        });
+
+    m_settingsSyncConnections << connect(
+        commonSetup(), &CommonObjectSearchSetup::cameraSelectionChanged, this,
+        [this]()
+        {
+            system()->userSettings()->objectSearchCameraSelection =
+                commonSetup()->cameraSelection();
+        });
+
+    m_settingsSyncConnections << connect(
+        commonSetup(), &CommonObjectSearchSetup::selectedCamerasChanged, this,
+        [this]()
+        {
+            system()->userSettings()->objectSearchCustomCameras =
+                commonSetup()->selectedCamerasIds();
+        });
+
+    m_settingsSyncConnections << connect(
+        m_analyticsSetup, &core::AnalyticsSearchSetup::engineChanged, this,
+        [this]()
+        {
+            system()->userSettings()->objectSearchEngineId = m_analyticsSetup->engine();
+        });
+
+    m_settingsSyncConnections << connect(
+        m_analyticsSetup, &core::AnalyticsSearchSetup::objectTypesChanged, this,
+        [this]()
+        {
+            system()->userSettings()->objectSearchObjectTypeIds = m_analyticsSetup->objectTypes();
+        });
+
+    m_settingsSyncConnections << connect(
+        m_analyticsSetup, &core::AnalyticsSearchSetup::attributeFiltersChanged, this,
+        [this]()
+        {
+            system()->userSettings()->objectSearchAttributeFilters =
+                m_analyticsSetup->attributeFilters();
+        });
+
+    m_settingsSyncConnections << connect(
+        m_analyticsSetup, &core::AnalyticsSearchSetup::areaChanged, this,
+        [this]()
+        {
+            system()->userSettings()->objectSearchArea = m_analyticsSetup->area();
+        });
 }
 
 bool AnalyticsSearchSynchronizer::isMasterInstance() const

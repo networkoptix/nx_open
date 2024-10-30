@@ -83,6 +83,11 @@ public:
         m_connections.clear();
     }
 
+    bool isEmpty() const
+    {
+        return m_connections.empty();
+    }
+
 private:
     std::vector<ScopedConnection> m_connections;
 };
