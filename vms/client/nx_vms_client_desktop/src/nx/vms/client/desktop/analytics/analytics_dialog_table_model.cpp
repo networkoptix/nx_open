@@ -5,6 +5,7 @@
 #include <QtQml/QtQml>
 
 #include <client/client_globals.h>
+#include <core/resource/resource.h>
 #include <nx/vms/client/core/client_core_globals.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/analytics/attribute_display_manager.h>
@@ -72,7 +73,23 @@ QVariant AnalyticsDialogTableModel::data(const QModelIndex& index, int role) con
                 return sourceIndex.data(Qt::DisplayRole);
 
             if (columnName == kCameraAttributeName)
-                return sourceIndex.data(core::DisplayedResourceListRole);
+            {
+                QStringList nameList;
+                const auto data = sourceIndex.data(core::DisplayedResourceListRole);
+
+                if (data.canConvert<QStringList>())
+                {
+                    nameList = data.value<QStringList>();
+                }
+                else if (data.canConvert<QnResourceList>())
+                {
+                    const auto resourceList = data.value<QnResourceList>();
+                    for (const auto& resource: resourceList)
+                        nameList.push_back(resource->getName());
+                }
+
+                return nameList.join(", ");
+            }
 
             if (columnName == kTitleAttributeName)
                 return sourceIndex.data(core::ObjectTitleRole);
