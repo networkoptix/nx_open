@@ -1098,7 +1098,7 @@
     </message>
     <message>
       <source>Password</source>
-      <translation>비밀번호</translation>
+      <translation>암호</translation>
     </message>
     <message>
       <source>Login</source>
@@ -1137,7 +1137,7 @@
     </message>
     <message>
       <source>Password</source>
-      <translation>비밀번호</translation>
+      <translation>암호</translation>
     </message>
   </context>
   <context>
@@ -1201,11 +1201,11 @@
     </message>
     <message>
       <source>Password to authenticate (optional)</source>
-      <translation>인증을위한 비밀번호(옵션)</translation>
+      <translation>인증용 암호 (선택)</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation>비밀번호</translation>
+      <translation>암호</translation>
     </message>
     <message>
       <source>HTTP(S) URL</source>
@@ -1280,7 +1280,7 @@
     </message>
     <message>
       <source>Password</source>
-      <translation>비밀번호</translation>
+      <translation>암호</translation>
     </message>
   </context>
   <context>
@@ -1657,7 +1657,7 @@
     </message>
     <message>
       <source>Password</source>
-      <translation>비밀번호</translation>
+      <translation>암호</translation>
     </message>
     <message>
       <source>Search Base</source>
@@ -1845,7 +1845,7 @@
     </message>
     <message>
       <source>Password</source>
-      <translation>비밀번호</translation>
+      <translation>암호</translation>
     </message>
     <message>
       <source>Test</source>
@@ -1958,7 +1958,7 @@
     </message>
     <message>
       <source>Password:</source>
-      <translation>비밀번호:</translation>
+      <translation>암호:</translation>
     </message>
     <message>
       <source>Login:</source>
@@ -2091,7 +2091,7 @@
     </message>
     <message>
       <source>Password</source>
-      <translation>비밀번호</translation>
+      <translation>암호</translation>
     </message>
     <message>
       <source>User</source>
@@ -2126,7 +2126,7 @@
     </message>
     <message>
       <source>Password</source>
-      <translation>비밀번호</translation>
+      <translation>암호</translation>
     </message>
     <message>
       <source>Username</source>
@@ -2621,7 +2621,7 @@
     </message>
     <message>
       <source>Password</source>
-      <translation>비밀번호</translation>
+      <translation>암호</translation>
     </message>
   </context>
   <context>
@@ -3070,7 +3070,7 @@
     </message>
     <message>
       <source>Password:</source>
-      <translation>비밀번호:</translation>
+      <translation>암호:</translation>
     </message>
   </context>
   <context>

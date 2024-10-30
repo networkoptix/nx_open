@@ -24,11 +24,11 @@
     </message>
     <message>
       <source>Wrong password.</source>
-      <translation>비밀번호가 틀립니다.</translation>
+      <translation>암호가 잘못됨.</translation>
     </message>
     <message>
       <source>The password is expired. Please contact your system administrator.</source>
-      <translation>비밀번호가 만료되었습니다. 시스템 관리자에게 문의하십시오.</translation>
+      <translation>암호가 만료됨. 관리자에게 문의 요망.</translation>
     </message>
     <message>
       <source>The LDAP server is not accessible. Please try again later.</source>
@@ -1242,7 +1242,7 @@
     </message>
     <message>
       <source>LDAP Admin password</source>
-      <translation>LDAP 관리자 비밀번호</translation>
+      <translation>LDAP 관리자 암호</translation>
     </message>
     <message>
       <source>LDAP search base</source>
@@ -1254,7 +1254,7 @@
     </message>
     <message>
       <source>LDAP password expiration (milliseconds)</source>
-      <translation>LDAP 비밀번호 만료 (밀리초)</translation>
+      <translation>LDAP 암호 만료</translation>
     </message>
     <message>
       <source>LDAP search timeout (seconds)</source>
@@ -1623,7 +1623,7 @@
     </message>
     <message>
       <source>Expose device passwords stored in VMS for administrators (for web pages)</source>
-      <translation>VMS에 저장된 장치 비밀번호를 관리자에게 공개 (웹 페이지용)</translation>
+      <translation>VMS에 저장된 장치 암호를 관리자에게 공개 (웹 페이지용)</translation>
     </message>
     <message>
       <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32)</source>

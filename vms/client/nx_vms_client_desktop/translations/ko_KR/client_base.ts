@@ -1605,7 +1605,7 @@ License Key: %2</source>
     <message numerus="yes">
       <source>Password must be at least %n characters long.</source>
       <translation>
-        <numerusform>암호는 %n 자 이상 요망.</numerusform>
+        <numerusform>최소 %n자 이상 암호 요망.</numerusform>
       </translation>
     </message>
     <message>
@@ -1615,7 +1615,7 @@ License Key: %2</source>
     <message numerus="yes">
       <source>Password must be no longer than %n characters.</source>
       <translation>
-        <numerusform>암호는 %n 글자보다 길어야 함.</numerusform>
+        <numerusform>암호는 %n자 이하 요망.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -8974,7 +8974,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Enter your account password</source>
-      <translation>암호 입력</translation>
+      <translation>사용자 계정 암호 입력</translation>
     </message>
     <message>
       <source>Apply</source>
@@ -11778,7 +11778,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
       <source>Failed to change password on %n cameras of %1</source>
       <comment>Total number of cameras will be substituted as %1</comment>
       <translation>
-        <numerusform>%1대중 %n개 카메라의 암호를 변경하지 못했습니다.</numerusform>
+        <numerusform>%1대중 %n대의 카메라 암호 변경 실패</numerusform>
       </translation>
     </message>
     <message>
