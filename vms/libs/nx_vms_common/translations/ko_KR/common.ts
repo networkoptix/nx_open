@@ -24,11 +24,11 @@
     </message>
     <message>
       <source>Wrong password.</source>
-      <translation>비밀번호가 틀립니다.</translation>
+      <translation>암호가 잘못됨.</translation>
     </message>
     <message>
       <source>The password is expired. Please contact your system administrator.</source>
-      <translation>비밀번호가 만료되었습니다. 시스템 관리자에게 문의하십시오.</translation>
+      <translation>암호가 만료됨. 관리자에게 문의 요망.</translation>
     </message>
     <message>
       <source>The LDAP server is not accessible. Please try again later.</source>
