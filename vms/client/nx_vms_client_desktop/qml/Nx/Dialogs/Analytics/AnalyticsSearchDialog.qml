@@ -54,6 +54,18 @@ Window
             counterBlock.commitAvailableNewTracks()
     }
 
+    onTileViewChanged:
+    {
+        // This has to be done procedurally, in this exact order:
+        //  - disable old tab's controller
+        //  - switch tabs
+        //  - enable new tab's controller
+
+        layout.children[layout.currentIndex].controller.enabled = false
+        layout.currentIndex = tileView ? 0 : 1
+        layout.children[layout.currentIndex].controller.enabled = true
+    }
+
     signal accepted()
 
     TabBar
@@ -298,11 +310,9 @@ Window
                         if (!availableNewTracks)
                             return ""
 
-                        const newResults = availableNewTracks > 0
-                            ? qsTr("%n new results", "", availableNewTracks)
-                            : qsTr("new results")
-
-                        return `+ ${newResults}`
+                        return availableNewTracks > 0
+                            ? `+ ${qsTr("%n new results", "", availableNewTracks)}`
+                            : `\u2191 ${qsTr("To the top")}`
                     }
 
                     onCommitNewItemsRequested:
@@ -375,7 +385,7 @@ Window
             StackLayout
             {
                 id: layout
-                currentIndex: dialog.tileView ? 0 : 1
+
                 Layout.fillHeight: true
 
                 EventGrid
@@ -388,7 +398,6 @@ Window
                     focus: true
 
                     currentIndex: selection.index.row
-                    controller.active: tileView
 
                     placeholder
                     {
@@ -604,9 +613,14 @@ Window
 
                 ScrollView
                 {
+                    id: scrollView
+
                     ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
                     contentWidth: tableView.width - 8
                     clip: true
+
+                    readonly property alias controller: controller
+
 
                     TableView
                     {
@@ -637,14 +651,21 @@ Window
                         Connections
                         {
                             target: selection
+
                             function onIndexChanged()
                             {
                                 if (tableView.selectionModel.currentIndex.row === selection.index.row)
                                     return
 
                                 tableView.selectionModel.setCurrentIndex(
-                                    selection.index, ItemSelectionModel.Current)
-                                tableView.positionViewAtRow(tableView.currentRow, TableView.Contain)
+                                    tableModel.mapFromSource(selection.index),
+                                    ItemSelectionModel.Current)
+
+                                if (tableView.currentRow >= 0)
+                                {
+                                    tableView.positionViewAtRow(tableView.currentRow,
+                                        TableView.Contain, -tableView.topMargin)
+                                }
                             }
                         }
 
@@ -787,7 +808,7 @@ Window
 
                             view: tableView
                             model: eventModel
-                            active: !tileView
+                            enabled: false
                             loggingCategory: LoggingCategory { name: "Nx.RightPanel.TableView" }
                         }
                     }
