@@ -1692,7 +1692,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Username or Password are incorrect</source>
-      <translation>사용자 이름 또는 비밀번호가 잘못되었습니다</translation>
+      <translation>계정 또는 암호가 잘못됨</translation>
     </message>
     <message>
       <source>Insecure</source>
@@ -1708,7 +1708,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Password cannot be empty</source>
-      <translation>비밀번호는 필수 정보입니다.</translation>
+      <translation>암호는 필수</translation>
     </message>
     <message>
       <source>Users are receiving emails</source>
@@ -2994,7 +2994,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Invalid current password</source>
-      <translation>현재 비밀번호는 유효하지 않습니다</translation>
+      <translation>현재 암호는 유효하지 않음</translation>
     </message>
   </context>
   <context>
@@ -4228,7 +4228,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Enter your account password</source>
-      <translation>암호 입력</translation>
+      <translation>사용자 계정 암호 입력</translation>
     </message>
     <message>
       <source>Save</source>
@@ -5673,7 +5673,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Password cannot be empty</source>
-      <translation>비밀번호는 필수 정보입니다.</translation>
+      <translation>암호는 필수</translation>
     </message>
     <message>
       <source>Avoid leading and trailing spaces</source>
@@ -8401,11 +8401,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>This camera requires password to be set up. Ask your system administrator to do it.</source>
-      <translation>이 카메라는 설정하려면 비밀번호가 필요합니다. 시스템 관리자에게 문의하세요.</translation>
+      <translation>이 카메라 설정위해 암호가 필요. 관리자에게 문의.</translation>
     </message>
     <message>
       <source>Some of selected cameras require password to be set up. Ask your system administrator to do it.</source>
-      <translation>선택된 카메라 중 일부는 비밀번호를 설정해야 합니다. 시스템 관리자에게 요청하세요.</translation>
+      <translation>선택된 카메라중 일부는 암호 재설정 필요. 관리자에게 문의.</translation>
     </message>
   </context>
   <context>
@@ -9024,7 +9024,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Enter your account password</source>
-      <translation>암호 입력</translation>
+      <translation>사용자 계정 암호 입력</translation>
     </message>
     <message>
       <source>Save</source>
@@ -9234,7 +9234,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Enter your account password</source>
-      <translation>암호 입력</translation>
+      <translation>사용자 계정 암호 입력</translation>
     </message>
     <message>
       <source>Reset</source>
@@ -9512,7 +9512,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Enter your account password</source>
-      <translation>암호 입력</translation>
+      <translation>사용자 계정 암호 입력</translation>
     </message>
     <message>
       <source>Apply</source>
@@ -10705,7 +10705,7 @@ You can force it, but it may significantly increase CPU load.</source>
     <name>nx::vms::client::desktop::RestApiHelper</name>
     <message>
       <source>Password confirmation is required to apply changes</source>
-      <translation>변경 사항을 적용하려면 비밀번호 확인이 필요합니다.</translation>
+      <translation>변경을 위해 암호 확인 필요.</translation>
     </message>
     <message>
       <source>Confirm</source>
@@ -11834,7 +11834,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Enter your account password</source>
-      <translation>암호 입력</translation>
+      <translation>사용자 계정 암호 입력</translation>
     </message>
     <message>
       <source>Save</source>
@@ -11858,7 +11858,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Invalid current password</source>
-      <translation>현재 비밀번호는 유효하지 않습니다</translation>
+      <translation>현재 암호는 유효하지 않음</translation>
     </message>
     <message>
       <source>Email cannot be empty</source>
@@ -13155,7 +13155,7 @@ We recommend you not to open this web page. If you understand the risks, you can
       <source>Failed to change password on %n cameras of %1</source>
       <comment>Total number of cameras will be substituted as %1</comment>
       <translation>
-        <numerusform>%1대중 %n개 카메라의 암호를 변경하지 못했습니다.</numerusform>
+        <numerusform>%1대중 %n대의 카메라 암호 변경 실패</numerusform>
       </translation>
     </message>
     <message>
