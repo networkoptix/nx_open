@@ -635,6 +635,7 @@ Window
                         readonly property int rowsPerPage:
                             Math.floor((height - topMargin - bottomMargin) / cellHeight)
                         property int hoveredRow: -1
+                        property var hoveredItem: null
 
                         clip: true
                         selectionBehavior: TableView.SelectRows
@@ -695,9 +696,15 @@ Window
                                 onHoveredChanged:
                                 {
                                     if (hovered)
+                                    {
                                         tableView.hoveredRow = row
-                                    else if (tableView.hoveredRow === row)
+                                        tableView.hoveredItem = tableDelegate
+                                    }
+                                    else if (tableView.hoveredItem === tableDelegate)
+                                    {
                                         tableView.hoveredRow = -1
+                                        tableView.hoveredItem = null
+                                    }
                                 }
                             }
 
