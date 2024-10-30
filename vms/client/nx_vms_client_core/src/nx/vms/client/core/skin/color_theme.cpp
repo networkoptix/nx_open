@@ -95,13 +95,21 @@ QJsonObject generatedColorScheme(const ColorTree& basicColors)
     auto primary =
         [&]() -> QColor
         {
-            if (colorTheme == "cms_colors")
-                return parseColor(nx::branding::brandColor());
-
             if (colorTheme == "generated" || colorTheme == "rainbow")
                 return parseColor(ini().primaryColor);
 
             auto themeName = colorTheme;
+
+            if (colorTheme == "cms_colors")
+            {
+                if (auto color = parseColor(nx::branding::brandColor()); color.isValid())
+                    return color;
+
+                NX_WARNING(NX_SCOPE_TAG,
+                    "Can't parse Primary Color, switching to default theme color.");
+                themeName = nx::branding::colorTheme();
+            }
+
             if (colorTheme == "cms_name")
                 themeName = nx::branding::colorTheme();
 
@@ -124,13 +132,21 @@ QJsonObject generatedColorScheme(const ColorTree& basicColors)
     auto background =
         [&]() -> QColor
         {
-            if (colorTheme == "cms_colors")
-                return parseColor(nx::branding::brandBgColor());
-
             if (colorTheme == "generated" || colorTheme == "rainbow")
                 return parseColor(ini().backgroundColor);
 
             auto themeName = colorTheme;
+
+            if (colorTheme == "cms_colors")
+            {
+                if (auto color = parseColor(nx::branding::brandBgColor()); color.isValid())
+                    return color;
+
+                NX_INFO(NX_SCOPE_TAG,
+                    "Can't parse Background Color, Primary color will be used for generation.");
+                return primary;
+            }
+
             if (colorTheme == "cms_name")
                 themeName = nx::branding::colorTheme();
 

@@ -36,7 +36,7 @@ struct NX_VMS_CLIENT_CORE_API Ini: nx::kit::IniConfig
         "Path to a folder with user-provided certificates. If set, all *.pem and *.crt files\n"
         "from this folder are used as trusted root certificates together with the system ones.");
 
-    NX_INI_STRING("cms_name", colorTheme,
+    NX_INI_STRING("cms_colors", colorTheme,
         "[Dev] Color theme to use. If blank, the original theme is used. The possible values are:\n"
         "  cms_name: uses theme name (like dark_orange) specified for the customization in CMS,'\n"
         "  dark_blue, dark_green, dark_orange, gray_orange, gray_white: uses the given theme,\n"
