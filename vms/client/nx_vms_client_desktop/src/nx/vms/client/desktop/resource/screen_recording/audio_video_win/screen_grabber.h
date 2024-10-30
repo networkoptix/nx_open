@@ -4,11 +4,13 @@
 
 #include <memory>
 
+#include <windows.h>
+//^ Windows header must be included first (actual for no-pch build only).
+
 #include <commdlg.h>
 #include <d3d9.h>
 #include <d3dx9.h>
 #include <shellapi.h>
-#include <windows.h>
 
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QObject>
