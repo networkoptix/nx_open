@@ -18,10 +18,6 @@ QString toString(ManifestErrorType errorType)
             return "Integration name is empty";
         case ManifestErrorType::emptyIntegrationDescription:
             return "Integration description is empty";
-        case ManifestErrorType::emptyIntegrationVersion:
-            return "Integration version is empty";
-        case ManifestErrorType::emptyIntegrationVendor:
-            return "Integration vendor is empty";
         case ManifestErrorType::emptyObjectActionId:
             return "Object Action id is empty";
         case ManifestErrorType::emptyObjectActionName:

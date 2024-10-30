@@ -16,8 +16,6 @@ protected:
         m_manifest.id = "testId";
         m_manifest.name = "test name";
         m_manifest.description = "test description";
-        m_manifest.version = "test version";
-        m_manifest.vendor = "test vendor";
     }
 
     void givenManifestWithEmptyId()
@@ -36,18 +34,6 @@ protected:
     {
         givenCorrectManifest();
         m_manifest.description = QString();
-    }
-
-    void givenManifestWithEmptyVersion()
-    {
-        givenCorrectManifest();
-        m_manifest.version = QString();
-    }
-
-    void givenManifestWithEmptyVendor()
-    {
-        givenCorrectManifest();
-        m_manifest.vendor = QString();
     }
 
     void givenManifestWithAllFieldsEmpty()
@@ -84,30 +70,14 @@ TEST_F(IntegrationManifestValidationTest, manifestWithEmptyDescriptionProducesAn
     makeSureErrorsAreCaught({ManifestErrorType::emptyIntegrationDescription});
 }
 
-TEST_F(IntegrationManifestValidationTest, manifestWithEmptyVersionProducesAnError)
-{
-    givenManifestWithEmptyVersion();
-    whenValidatingManifest();
-    makeSureErrorsAreCaught({ManifestErrorType::emptyIntegrationVersion});
-}
-
-TEST_F(IntegrationManifestValidationTest, DISABLED_manifestWithEmptyVendorProducesAnError)
-{
-    givenManifestWithEmptyVendor();
-    whenValidatingManifest();
-    makeSureErrorsAreCaught({ManifestErrorType::emptyIntegrationVendor});
-}
-
 TEST_F(IntegrationManifestValidationTest, allErrorsInEmptyManifestAreCaught)
 {
     givenManifestWithAllFieldsEmpty();
     whenValidatingManifest();
-    // Note: vendor validation is temporary disabled.
     makeSureErrorsAreCaught({
         ManifestErrorType::emptyIntegrationId,
         ManifestErrorType::emptyIntegrationName,
-        ManifestErrorType::emptyIntegrationDescription,
-        ManifestErrorType::emptyIntegrationVersion});
+        ManifestErrorType::emptyIntegrationDescription});
 }
 
 } // namespace nx::vms::api::analytics

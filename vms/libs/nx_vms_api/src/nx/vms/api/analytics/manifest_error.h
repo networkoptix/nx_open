@@ -14,8 +14,8 @@ NX_REFLECTION_ENUM_CLASS(ManifestErrorType,
     emptyIntegrationId = 1 << 0,
     emptyIntegrationName = 1 << 1,
     emptyIntegrationDescription = 1 << 2,
-    emptyIntegrationVersion = 1 << 3,
-    emptyIntegrationVendor = 1 << 4,
+    obsolete_emptyIntegrationVersion = 1 << 3, //< No longer used; kept for backward compatibility.
+    obsolete_emptyIntegrationVendor = 1 << 4, //< No longer used; kept for backward compatibility.
 
     emptyObjectActionId = 1 << 5,
     emptyObjectActionName = 1 << 6,

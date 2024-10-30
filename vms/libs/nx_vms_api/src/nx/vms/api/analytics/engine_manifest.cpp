@@ -5,6 +5,7 @@
 #include <set>
 
 #include <nx/fusion/model_functions.h>
+#include <nx/kit/utils.h>
 
 namespace nx::vms::api::analytics {
 
@@ -43,11 +44,11 @@ void validateListByField(
             {
                 outErrorList->emplace_back(
                     entryFieldErrorTypes.duplicatedField,
-                    nx::format("%1 id: %2, %3 name: %4").args(
+                    nx::format("%1 id %2, %3 name %4").args(
                         entryFieldErrorTypes.listEntryTypeName,
-                        entry.id,
+                        nx::kit::utils::toString(entry.id),
                         entryFieldErrorTypes.listEntryTypeName,
-                        entry.name));
+                        nx::kit::utils::toString(entry.name)));
 
                 processedFieldDuplicates.insert(fieldValue);
             }

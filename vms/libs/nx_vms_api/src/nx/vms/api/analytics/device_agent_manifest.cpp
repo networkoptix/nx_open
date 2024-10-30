@@ -5,6 +5,7 @@
 #include <set>
 
 #include <nx/fusion/model_functions.h>
+#include <nx/kit/utils.h>
 
 namespace nx::vms::api::analytics {
 
@@ -34,7 +35,7 @@ public:
             const auto fieldValue = fieldValueGetter(entity);
             if (fieldValue.isEmpty() && !m_isEmptyFieldDetected)
             {
-                inOutErrorList->emplace_back(m_manifestErrorTypes.emptyField, QString());
+                inOutErrorList->emplace_back(m_manifestErrorTypes.emptyField);
                 m_isEmptyFieldDetected = true;
             }
             else
@@ -80,17 +81,17 @@ void validateSupportedTypesByField(
     if (!NX_ASSERT(outErrorList))
         return;
 
-    const auto identitiyGetter = [](const auto& entry) { return entry; };
-
     ListProcessor listProcessor(entryFieldManifestErrorTypes);
 
     listProcessor.process(
         outErrorList,
         supportedTypeList,
-        identitiyGetter,
+        [](const auto& entry) { return entry; },
         [](ManifestErrorType errorType, const QString& entryTypeName, const QString& entryId)
         {
-            return ManifestError(errorType, nx::format("%1 id: %2").args(entryTypeName, entryId));
+            return ManifestError(errorType, nx::format("%1 id %2").args(
+                entryTypeName,
+                nx::kit::utils::toString(entryId)));
         });
 
     listProcessor.process(
@@ -101,8 +102,11 @@ void validateSupportedTypesByField(
         {
             return ManifestError(
                 errorType,
-                nx::format("%1 id: %2, %3 name: %4")
-                    .args(entryTypeName, entry.id, entryTypeName, entry.name));
+                nx::format("%1 id %2, %3 name %4").args(
+                    entryTypeName,
+                    nx::kit::utils::toString(entry.id),
+                    entryTypeName,
+                    nx::kit::utils::toString(entry.name)));
         });
 }
 

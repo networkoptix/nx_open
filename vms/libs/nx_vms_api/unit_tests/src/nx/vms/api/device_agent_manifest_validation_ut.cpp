@@ -155,28 +155,28 @@ TEST_F(DeviceAgentManifestValidationTest, manifestWithEmptyEventTypeIdsProducesA
 {
     givenManifestWithEmptyEventTypeIds();
     whenValidatingManifest();
-    makeSureErrorsAreCaught({ ManifestErrorType::emptyEventTypeId });
+    makeSureErrorsAreCaught({ManifestErrorType::emptyEventTypeId});
 }
 
 TEST_F(DeviceAgentManifestValidationTest, manifestWithDuplicatedEventTypeIdsProducesAnError)
 {
     givenManifestWithDuplicatedEventTypeIds();
     whenValidatingManifest();
-    makeSureErrorsAreCaught({ ManifestErrorType::duplicatedEventTypeId });
+    makeSureErrorsAreCaught({ManifestErrorType::duplicatedEventTypeId});
 }
 
 TEST_F(DeviceAgentManifestValidationTest, manifestWithEmptyEventTypeNamesProducesAnError)
 {
     givenManifestWithEmptyEventTypeNames();
     whenValidatingManifest();
-    makeSureErrorsAreCaught({ ManifestErrorType::emptyEventTypeName });
+    makeSureErrorsAreCaught({ManifestErrorType::emptyEventTypeName});
 }
 
 TEST_F(DeviceAgentManifestValidationTest, manifestWithDuplicatedEventTypeNamesProducesAnError)
 {
     givenManifestWithDuplicatedEventTypeNames();
     whenValidatingManifest();
-    makeSureErrorsAreCaught({ ManifestErrorType::duplicatedEventTypeName });
+    makeSureErrorsAreCaught({ManifestErrorType::duplicatedEventTypeName});
 }
 
 TEST_F(DeviceAgentManifestValidationTest,
@@ -184,7 +184,7 @@ TEST_F(DeviceAgentManifestValidationTest,
 {
     givenManifestWithDuplicatedEventTypeIdsInSupportedList();
     whenValidatingManifest();
-    makeSureErrorsAreCaught({ ManifestErrorType::duplicatedEventTypeId });
+    makeSureErrorsAreCaught({ManifestErrorType::duplicatedEventTypeId});
 }
 
 TEST_F(DeviceAgentManifestValidationTest,
@@ -192,7 +192,7 @@ TEST_F(DeviceAgentManifestValidationTest,
 {
     givenManifestWithDuplicatedEventTypeIdsInBothLists();
     whenValidatingManifest();
-    makeSureErrorsAreCaught({ ManifestErrorType::duplicatedEventTypeId });
+    makeSureErrorsAreCaught({ManifestErrorType::duplicatedEventTypeId});
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -201,28 +201,28 @@ TEST_F(DeviceAgentManifestValidationTest, manifestWithEmptyObjectTypeIdsProduces
 {
     givenManifestWithEmptyObjectTypeIds();
     whenValidatingManifest();
-    makeSureErrorsAreCaught({ ManifestErrorType::emptyObjectTypeId });
+    makeSureErrorsAreCaught({ManifestErrorType::emptyObjectTypeId});
 }
 
 TEST_F(DeviceAgentManifestValidationTest, manifestWithDuplicatedObjectTypeIdsProducesAnError)
 {
     givenManifestWithDuplicatedObjectTypeIds();
     whenValidatingManifest();
-    makeSureErrorsAreCaught({ ManifestErrorType::duplicatedObjectTypeId });
+    makeSureErrorsAreCaught({ManifestErrorType::duplicatedObjectTypeId});
 }
 
 TEST_F(DeviceAgentManifestValidationTest, manifestWithEmptyObjectTypeNamesProducesAnError)
 {
     givenManifestWithEmptyObjectTypeNames();
     whenValidatingManifest();
-    makeSureErrorsAreCaught({ ManifestErrorType::emptyObjectTypeName });
+    makeSureErrorsAreCaught({ManifestErrorType::emptyObjectTypeName});
 }
 
 TEST_F(DeviceAgentManifestValidationTest, manifestWithDuplicatedObjectTypeNamesProducesAnError)
 {
     givenManifestWithDuplicatedObjectTypeNames();
     whenValidatingManifest();
-    makeSureErrorsAreCaught({ ManifestErrorType::duplicatedObjectTypeName });
+    makeSureErrorsAreCaught({ManifestErrorType::duplicatedObjectTypeName});
 }
 
 TEST_F(DeviceAgentManifestValidationTest,
@@ -230,7 +230,7 @@ TEST_F(DeviceAgentManifestValidationTest,
 {
     givenManifestWithDuplicatedObjectTypeIdsInSupportedList();
     whenValidatingManifest();
-    makeSureErrorsAreCaught({ ManifestErrorType::duplicatedObjectTypeId });
+    makeSureErrorsAreCaught({ManifestErrorType::duplicatedObjectTypeId});
 }
 
 TEST_F(DeviceAgentManifestValidationTest,
@@ -238,7 +238,7 @@ TEST_F(DeviceAgentManifestValidationTest,
 {
     givenManifestWithDuplicatedObjectTypeIdsInBothLists();
     whenValidatingManifest();
-    makeSureErrorsAreCaught({ ManifestErrorType::duplicatedObjectTypeId });
+    makeSureErrorsAreCaught({ManifestErrorType::duplicatedObjectTypeId});
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -247,43 +247,43 @@ TEST_F(DeviceAgentManifestValidationTest, manifestWithEmptyGroupIdsProducesAnErr
 {
     givenManifestWithEmptyGroupIds();
     whenValidatingManifest();
-    makeSureErrorsAreCaught({ ManifestErrorType::emptyGroupId });
+    makeSureErrorsAreCaught({ManifestErrorType::emptyGroupId});
 }
 
 TEST_F(DeviceAgentManifestValidationTest, manifestWithDuplicatedGroupIdsProducesAnError)
 {
     givenManifestWithDuplicatedGroupIds();
     whenValidatingManifest();
-    makeSureErrorsAreCaught({ ManifestErrorType::duplicatedGroupId });
+    makeSureErrorsAreCaught({ManifestErrorType::duplicatedGroupId});
 }
 
 TEST_F(DeviceAgentManifestValidationTest, manifestWithEmptyGroupNamesProducesAnError)
 {
     givenManifestWithEmptyGroupNames();
     whenValidatingManifest();
-    makeSureErrorsAreCaught({ ManifestErrorType::emptyGroupName });
+    makeSureErrorsAreCaught({ManifestErrorType::emptyGroupName});
 }
 
 TEST_F(DeviceAgentManifestValidationTest, manifestWithDuplicatedGroupNamesProducesAnError)
 {
     givenManifestWithDuplicatedGroupNames();
     whenValidatingManifest();
-    makeSureErrorsAreCaught({ ManifestErrorType::duplicatedGroupName });
+    makeSureErrorsAreCaught({ManifestErrorType::duplicatedGroupName});
 }
 
 TEST_F(DeviceAgentManifestValidationTest, manifestWithIncorrectTypeInSettingsModelProducesAnError)
 {
     givenManifestWithIncorrectTypeInSettingsModel<QString>();
     whenValidatingManifest();
-    makeSureErrorsAreCaught({ ManifestErrorType::deviceAgentSettingsModelIsIncorrect });
+    makeSureErrorsAreCaught({ManifestErrorType::deviceAgentSettingsModelIsIncorrect});
 
     givenManifestWithIncorrectTypeInSettingsModel<int>();
     whenValidatingManifest();
-    makeSureErrorsAreCaught({ ManifestErrorType::deviceAgentSettingsModelIsIncorrect });
+    makeSureErrorsAreCaught({ManifestErrorType::deviceAgentSettingsModelIsIncorrect});
 
     givenManifestWithIncorrectTypeInSettingsModel<QJsonArray>();
     whenValidatingManifest();
-    makeSureErrorsAreCaught({ ManifestErrorType::deviceAgentSettingsModelIsIncorrect });
+    makeSureErrorsAreCaught({ManifestErrorType::deviceAgentSettingsModelIsIncorrect});
 }
 
 } // namespace nx::vms::api::analytics

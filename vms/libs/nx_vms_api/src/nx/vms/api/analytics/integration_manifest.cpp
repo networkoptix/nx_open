@@ -21,15 +21,9 @@ std::vector<ManifestError> validate(const IntegrationManifest& integrationManife
     if (integrationManifest.description.isEmpty())
         result.emplace_back(ManifestErrorType::emptyIntegrationDescription);
 
-    if (integrationManifest.version.isEmpty())
-        result.emplace_back(ManifestErrorType::emptyIntegrationVersion);
+    // NOTE: `version` is optional.
 
-    // Vendor validation is temporary disabled, because it's unclear what to do with vendor in
-    // Nx plugins.
-#if 0
-    if (integrationManifest.vendor.isEmpty())
-        result.emplace_back(ManifestErrorType::emptyIntegrationVendor);
-#endif
+    // NOTE: `vendor` is allowed to be omitted because some Nx plugins may have it empty.
 
     return result;
 }
