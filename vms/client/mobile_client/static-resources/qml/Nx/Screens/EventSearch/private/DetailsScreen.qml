@@ -270,9 +270,9 @@ PageBase
             return d.portrait ? 1 : 0.8
         }
 
-        x: -mainWindow.leftPadding
+        x: mainWindow.hasNavigationBar ? 0 : -mainWindow.leftPadding
         y: parent.height - height + navigationHeight
-        width: mainWindow.width
+        width: mainWindow.hasNavigationBar ? parent.width : mainWindow.width
         height: 76 + navigationHeight
 
         color: ColorTheme.colors.dark1
@@ -405,6 +405,20 @@ PageBase
         }
     }
 
+    Rectangle
+    {
+        id: navigationBarTint
+
+        visible: mainWindow.hasNavigationBar
+
+        x: mainWindow.leftPadding ? -mainWindow.leftPadding : parent.width
+        y: -toolBar.height
+        width: mainWindow.width - parent.width
+        height: eventDetailsScreen.height
+
+        color: ColorTheme.colors.dark3
+    }
+
     Slider
     {
         id: slider
@@ -414,9 +428,10 @@ PageBase
         visible: opacity > 0
         opacity: d.hasControls ? 1 : 0
 
-        x: -mainWindow.leftPadding
+
+        x: playbackPanel.x
         y: playbackPanel.y - slider.height + (slider.height - sliderBackground.height) / 2
-        width: mainWindow.width
+        width: playbackPanel.width
         height: 36
         leftPadding: 12
         rightPadding: 12
