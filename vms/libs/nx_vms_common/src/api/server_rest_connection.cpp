@@ -2282,13 +2282,29 @@ Handle ServerConnection::saveUserAsync(
     Result<ErrorOrData<nx::vms::api::UserModelV3>>::type&& callback,
     QThread* targetThread)
 {
+    const auto messageBody =
+        [](bool newUser, const nx::vms::api::UserModelV3& userData) -> nx::String
+        {
+            if (newUser || userData.type != nx::vms::api::UserType::cloud)
+                return nx::reflect::json::serialize(userData);
+
+            QnJsonContext context;
+            context.setSerializeMapToObject(true);
+            context.setChronoSerializedAsDouble(true);
+            QJsonValue value;
+            QJson::serialize(&context, userData, &value);
+            NX_ASSERT(value.isObject());
+            QJsonObject object{value.toObject()};
+            object.remove("isHttpDigestEnabled");
+            return QJson::serialized(object);
+        };
     auto request = prepareRequest(
         newUser ? nx::network::http::Method::put : nx::network::http::Method::patch,
         prepareUrl(
             QString("/rest/v3/users/%1").arg(userData.getId().toString()),
             /*params*/ {}),
         Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
-        nx::reflect::json::serialize(userData));
+        messageBody(newUser, userData));
 
     auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
 
