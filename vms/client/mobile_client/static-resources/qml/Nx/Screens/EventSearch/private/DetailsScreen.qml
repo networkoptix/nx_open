@@ -37,7 +37,7 @@ PageBase
         visible: opacity > 0
         opacity: d.hasControls ? 1 : 0
 
-        y: deviceStatusBarHeight
+        contentItem.y: deviceStatusBarHeight
 
         title: qsTr("Preview")
         contentItem.clip: false

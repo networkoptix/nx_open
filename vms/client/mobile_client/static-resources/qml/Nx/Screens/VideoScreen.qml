@@ -158,7 +158,7 @@ PageBase
     {
         id: toolBar
 
-        y: deviceStatusBarHeight
+        contentItem.y: deviceStatusBarHeight
         opacity: d.uiOpacity
         visible: opacity > 0
 
@@ -191,6 +191,8 @@ PageBase
 
             IconButton
             {
+                id: menuButton
+
                 icon.source: lp("/images/more_vert.png")
                 onClicked:
                 {
@@ -219,9 +221,7 @@ PageBase
     {
         id: menu
 
-        parent: videoScreen
-        x: parent.width - width - 8
-        y: header.y + 8
+        parent: menuButton
 
         MenuItem
         {
