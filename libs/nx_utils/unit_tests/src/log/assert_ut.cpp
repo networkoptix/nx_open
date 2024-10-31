@@ -2,6 +2,8 @@
 
 #include <gtest/gtest.h>
 
+#include <thread>
+
 #include <nx/utils/log/assert.h>
 #include <nx/utils/nx_utils_ini.h>
 
@@ -38,5 +40,8 @@ TEST(NxCritical, All3)
     EXPECT_DEATH(NX_CRITICAL(false, "oops"), "");
     EXPECT_DEATH(NX_CRITICAL(false, "oops %1 != %2", "a", 7), "");
 }
+
+TEST(Freeze, DISABLED_Hour) { std::this_thread::sleep_for(std::chrono::hours(1)); }
+TEST(Freeze, DISABLED_Seconds) { std::this_thread::sleep_for(std::chrono::seconds(5)); }
 
 } // namespace nx::utils::test
