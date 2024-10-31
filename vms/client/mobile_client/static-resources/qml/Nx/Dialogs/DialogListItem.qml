@@ -70,7 +70,7 @@ Control
         x: parent.leftPadding
         width: parent.availableWidth
         font: control.font
-        color: ColorTheme.colors.brand_contrast
+        color: ColorTheme.windowText
         opacity: enabled || control.active ? 1.0 : 0.2
     }
 
