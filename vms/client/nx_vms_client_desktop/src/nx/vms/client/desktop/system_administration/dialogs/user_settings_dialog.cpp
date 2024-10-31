@@ -351,7 +351,11 @@ struct UserSettingsDialog::Private
         userData.fullName = state.fullName;
         userData.permissions = state.globalPermissions;
         userData.isEnabled = state.userEnabled;
-        userData.isHttpDigestEnabled = state.allowInsecure;
+
+        // Changing digest allowance for the cloud users is prohibited.
+        if (userData.type != nx::vms::api::UserType::cloud)
+            userData.isHttpDigestEnabled = state.allowInsecure;
+
         for (const auto& group: state.parentGroups)
             userData.groupIds.emplace_back(group.id);
 
@@ -1118,7 +1122,7 @@ void UserSettingsDialog::saveState(const UserSettingsDialogState& state)
             actualPassword = userData.password;
         }
         // Disabling digest authentication.
-        else if (d->user->shouldDigestAuthBeUsed() && !userData.isHttpDigestEnabled)
+        else if (d->user->shouldDigestAuthBeUsed() && !userData.isHttpDigestEnabled.value_or(false))
         {
             const auto credentials = systemContext()->connectionCredentials();
             if (NX_ASSERT(credentials.authToken.isPassword()))
