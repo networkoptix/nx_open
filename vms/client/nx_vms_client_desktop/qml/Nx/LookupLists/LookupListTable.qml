@@ -41,7 +41,7 @@ CheckableTableView
     {
         for (let i = 0; i < control.model.columnCount(); ++i)
         {
-            if (control.model.data(control.model.index(row, i)))
+            if (control.model.data(control.model.index(row, i), LookupListEntriesModel.RawValueRole))
                 return true
         }
         return false

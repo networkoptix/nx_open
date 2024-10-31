@@ -45,6 +45,7 @@ public:
         SortRole,
         ColorRGBHexValueRole
     };
+    Q_ENUMS(DataRole);
 
     explicit LookupListEntriesModel(QObject* parent = nullptr);
     virtual ~LookupListEntriesModel();
