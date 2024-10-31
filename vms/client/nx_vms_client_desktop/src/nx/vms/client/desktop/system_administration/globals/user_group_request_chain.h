@@ -56,7 +56,7 @@ struct UserGroupRequest
     {
         nx::Uuid id;
         bool enabled = true;
-        bool enableDigest = false;
+        std::optional<bool> enableDigest;
     };
 
     using Type = std::variant<

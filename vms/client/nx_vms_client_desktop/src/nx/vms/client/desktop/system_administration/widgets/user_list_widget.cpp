@@ -903,9 +903,12 @@ void UserListWidget::Private::editSelected(BatchEditSettings initialSettings)
             ? (settings.enableUsers == Qt::Checked)
             : user->isEnabled();
 
-        updateUser.enableDigest = settings.disableDigest != Qt::PartiallyChecked
-            ? (settings.disableDigest == Qt::Checked)
-            : user->shouldDigestAuthBeUsed();
+        if (!user->isCloud())
+        {
+            updateUser.enableDigest = settings.disableDigest != Qt::PartiallyChecked
+                ? (settings.disableDigest == Qt::Checked)
+                : user->shouldDigestAuthBeUsed();
+        }
 
         requestChain->append(updateUser);
     }
