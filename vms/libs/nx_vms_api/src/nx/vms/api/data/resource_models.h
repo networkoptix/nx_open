@@ -5,6 +5,7 @@
 #include <QtCore/QString>
 
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/reflect/instrument.h>
 #include <nx/utils/uuid.h>
 
 namespace nx::vms::api {
@@ -33,5 +34,33 @@ struct NX_VMS_API ResourceGroup
     (isPredefined)
 QN_FUSION_DECLARE_FUNCTIONS(ResourceGroup, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(ResourceGroup, ResourceGroup_Fields)
+
+NX_REFLECTION_ENUM_CLASS(ResourceApiGroup,
+    analyticsEngines,
+    analyticsIntegrations,
+    devices,
+    layouts,
+    servers,
+    storages,
+    users,
+    videoWalls,
+    virtualDevices,
+    webPages
+);
+
+struct NX_VMS_API ResourceApiInfo
+{
+    nx::Uuid id;
+    nx::Uuid typeId;
+    ResourceApiGroup group{ResourceApiGroup::devices};
+    std::string api;
+
+    bool operator==(const ResourceApiInfo& other) const = default;
+
+    nx::Uuid getId() const { return id; }
+};
+#define ResourceApiInfo_Fields (id)(typeId)(group)(api)
+QN_FUSION_DECLARE_FUNCTIONS(ResourceApiInfo, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(ResourceApiInfo, ResourceApiInfo_Fields)
 
 } // namespace nx::vms::api

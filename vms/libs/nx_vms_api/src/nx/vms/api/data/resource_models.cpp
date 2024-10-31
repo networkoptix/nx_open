@@ -9,4 +9,7 @@ namespace nx::vms::api {
 QN_FUSION_ADAPT_STRUCT(ResourceGroup, ResourceGroup_Fields)
 QN_FUSION_DEFINE_FUNCTIONS(ResourceGroup, (json))
 
+QN_FUSION_ADAPT_STRUCT(ResourceApiInfo, ResourceApiInfo_Fields)
+QN_FUSION_DEFINE_FUNCTIONS(ResourceApiInfo, (json))
+
 } // namespace nx::vms::api
