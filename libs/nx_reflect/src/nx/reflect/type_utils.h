@@ -13,6 +13,24 @@
 
 namespace nx::reflect {
 
+namespace detail {
+
+template<typename T, typename = std::void_t<>>
+struct HasTrimmed: std::false_type {};
+
+template<typename T>
+struct HasTrimmed<T, std::void_t<decltype(std::declval<T>().trimmed())>>: std::true_type {};
+
+template<typename... Args>
+inline constexpr bool HasTrimmedV = HasTrimmed<Args...>::value;
+
+} // namespace detail
+
+template<typename T>
+inline constexpr bool IsStringAlikeV = detail::HasTrimmedV<T>
+    || std::is_convertible_v<T, std::string>
+    || std::is_convertible_v<T, std::string_view>;
+
 template<typename T>
 struct IsOptional: std::false_type
 {
@@ -60,7 +78,7 @@ struct IsContainer<
     std::void_t<decltype(std::declval<T>().begin())>,
     std::void_t<decltype(std::declval<T>().end())>,
     std::void_t<typename T::value_type>
->: std::true_type {};
+>: std::bool_constant<!IsStringAlikeV<T>> {};
 
 template<typename... Args>
 inline constexpr bool IsContainerV = IsContainer<Args...>::value;

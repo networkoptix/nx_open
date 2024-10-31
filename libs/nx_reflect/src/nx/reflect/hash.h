@@ -83,7 +83,7 @@ constexpr Sink typeName(const Sink& sink)
         FieldEnumerator<Sink> fieldEnumerator(sink.add("{"));
         return nx::reflect::visitAllFields<T>(fieldEnumerator).add("}");
     }
-    else if constexpr (BasicSerializer::detail::IsStringAlikeV<T> || IsInstrumentedEnumV<T>)
+    else if constexpr (IsStringAlikeV<T> || IsInstrumentedEnumV<T>)
     {
         return sink.add("string");
     }

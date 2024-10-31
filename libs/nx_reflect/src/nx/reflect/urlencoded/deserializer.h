@@ -37,15 +37,6 @@ inline constexpr bool hasFromStringV = hasFromString<T>::value;
 
 //-------------------------------------------------------------------------------------------------
 
-template<typename T>
-inline constexpr bool IsStringAlikeV =
-    std::is_convertible_v<std::string, T> ||
-    std::is_convertible_v<std::string_view, T> ||
-    reflect::detail::IsQByteArrayAlikeV<T> ||
-    reflect::detail::HasFromBase64V<T> ||
-    reflect::detail::HasFromStdStringV<T> ||
-    reflect::detail::HasFromStringV<T>;
-
 namespace detail {
 
 NX_REFLECT_API std::tuple<std::string, DeserializationResult> decode(const std::string_view& str);
@@ -121,8 +112,7 @@ template<typename T>
 constexpr bool isInternalDeserializable()
 {
     constexpr bool isContainer =
-        (IsSequenceContainerV<T> || IsSetContainerV<T> || IsUnorderedSetContainerV<T>)
-        && !IsStringAlikeV<T>;
+        IsSequenceContainerV<T> || IsSetContainerV<T> || IsUnorderedSetContainerV<T>;
 
     constexpr bool isAssociativeContainer =
         (IsAssociativeContainerV<T> && !IsSetContainerV<T>) ||
@@ -197,11 +187,9 @@ std::tuple<T, DeserializationResult> deserialize(
 template<typename T>
 std::tuple<T, DeserializationResult> deserialize(
     const std::string_view& str,
-    std::enable_if_t<
-        (IsSequenceContainerV<T> ||
-        IsSetContainerV<T> ||
-        IsUnorderedSetContainerV<T>)
-        &&!IsStringAlikeV<T>
+    std::enable_if_t<IsSequenceContainerV<T>
+        || IsSetContainerV<T>
+        || IsUnorderedSetContainerV<T>
     >* = nullptr)
 {
     T data;

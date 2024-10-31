@@ -46,15 +46,6 @@ struct DeserializationContext
     int flags = 0;
 };
 
-template<typename T>
-inline constexpr bool IsStringAlikeV =
-    std::is_convertible_v<std::string, T> ||
-    std::is_convertible_v<std::string_view, T> ||
-    reflect::detail::IsQByteArrayAlikeV<T> ||
-    reflect::detail::HasFromBase64V<T> ||
-    reflect::detail::HasFromStdStringV<T> ||
-    reflect::detail::HasFromStringV<T>;
-
 //-------------------------------------------------------------------------------------------------
 
 template<typename Data> class Deserializer;
@@ -166,11 +157,10 @@ template<typename C>
 DeserializationResult deserialize(
     const DeserializationContext& ctx,
     C* data,
-    std::enable_if_t<
-        (IsSequenceContainerV<C> ||
-        IsSetContainerV<C> ||
-        IsUnorderedSetContainerV<C>) &&
-        !IsStringAlikeV<C>
+    std::enable_if_t<!useStringConversionForSerialization((const C*) nullptr)
+        && (IsSequenceContainerV<C>
+            || IsSetContainerV<C>
+            || IsUnorderedSetContainerV<C>)
     >* = nullptr)
 {
     *data = C();
@@ -394,7 +384,6 @@ DeserializationResult deserializeValue(const DeserializationContext& ctx, T* dat
     }
     else if constexpr (
         std::is_object_v<T> &&
-        !nx::reflect::IsInstrumented<T>::value &&
         useStringConversionForSerialization((const T*) nullptr))
     {
         *data = T();

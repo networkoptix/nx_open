@@ -44,7 +44,7 @@ namespace nx::reflect::test {
 
 static_assert(IsContainerV<std::vector<int>>, "IsContainerV, std::vector");
 static_assert(IsContainerV<std::map<int, int>>, "IsContainerV, std::map");
-static_assert(IsContainerV<std::string>, "IsContainerV, std::string");
+static_assert(!IsContainerV<std::string>, "!IsContainerV, std::string");
 static_assert(!IsContainerV<int>, "!IsContainerV, int");
 
 //-------------------------------------------------------------------------------------------------
@@ -68,6 +68,7 @@ static_assert(!IsAssociativeContainerV<std::string>, "");
 
 static_assert(!IsSetContainerV<std::map<int, int>>, "");
 static_assert(!IsSetContainerV<std::multimap<int, int>>, "");
+static_assert(!IsSetContainerV<std::string>, "");
 static_assert(IsSetContainerV<std::set<int>>, "");
 static_assert(IsSetContainerV<std::multiset<int>>, "");
 
@@ -75,6 +76,7 @@ static_assert(IsSetContainerV<std::multiset<int>>, "");
 
 static_assert(!IsUnorderedSetContainerV<std::unordered_map<int, int>>, "");
 static_assert(!IsUnorderedSetContainerV<std::unordered_multimap<int, int>>, "");
+static_assert(!IsUnorderedSetContainerV<std::string>, "");
 static_assert(IsUnorderedSetContainerV<std::unordered_set<int>>, "");
 static_assert(IsUnorderedSetContainerV<std::unordered_multiset<int>>, "");
 
@@ -92,16 +94,16 @@ static_assert(IsUnorderedAssociativeContainerV<std::unordered_multiset<int>>, ""
 
 //-------------------------------------------------------------------------------------------------
 
-static_assert(!IsSequenceContainerV<std::map<int, int>>, "IsSequenceContainerV, std::map");
-static_assert(!IsSequenceContainerV<std::multimap<int, int>>, "IsSequenceContainerV, std::multimap");
-static_assert(!IsSequenceContainerV<std::unordered_map<int, int>>, "IsSequenceContainerV, std::unordered_map");
-static_assert(!IsSequenceContainerV<std::unordered_multimap<int, int>>, "IsSequenceContainerV, std::unordered_map");
-static_assert(!IsSequenceContainerV<std::set<int>>, "IsSequenceContainerV, std::set");
+static_assert(!IsSequenceContainerV<std::map<int, int>>, "!IsSequenceContainerV, std::map");
+static_assert(!IsSequenceContainerV<std::multimap<int, int>>, "!IsSequenceContainerV, std::multimap");
+static_assert(!IsSequenceContainerV<std::unordered_map<int, int>>, "!IsSequenceContainerV, std::unordered_map");
+static_assert(!IsSequenceContainerV<std::unordered_multimap<int, int>>, "!IsSequenceContainerV, std::unordered_map");
+static_assert(!IsSequenceContainerV<std::set<int>>, "!IsSequenceContainerV, std::set");
+static_assert(!IsSequenceContainerV<std::string>, "!IsSequenceContainerV, std::string");
 
 static_assert(IsSequenceContainerV<std::vector<int>>, "IsSequenceContainerV, std::vector");
 static_assert(IsSequenceContainerV<std::vector<std::string>>, "IsSequenceContainerV, std::vector");
 static_assert(IsSequenceContainerV<std::list<int>>, "IsSequenceContainerV, std::list");
 static_assert(IsSequenceContainerV<std::deque<int>>, "IsSequenceContainerV, std::deque");
-static_assert(IsSequenceContainerV<std::string>, "IsSequenceContainerV, std::string");
 
 } // namespace nx::reflect::test

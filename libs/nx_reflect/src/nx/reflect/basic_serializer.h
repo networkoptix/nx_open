@@ -114,14 +114,6 @@ void serializeAdl(SerializationContext* ctx, const Data& data);
 template<typename SerializationContext, typename Data>
 void serializeAdl(SerializationContext* ctx, const std::optional<Data>& data);
 
-template<typename T>
-inline constexpr bool IsStringAlikeV =
-    std::is_convertible_v<T, std::string> ||
-    std::is_convertible_v<T, std::string_view> ||
-    reflect::detail::HasToBase64V<T> ||
-    reflect::detail::HasToStdStringV<T> ||
-    reflect::detail::HasToStringV<T>;
-
 template<typename T, bool result>
 static void reportUnsupportedType()
 {
@@ -168,11 +160,10 @@ template<
 void serialize(
     SerializationContext* ctx,
     const Container& data,
-    std::enable_if_t<
-        (IsSequenceContainerV<Container> ||
-        IsSetContainerV<Container> ||
-        IsUnorderedSetContainerV<Container>)
-        && !detail::IsStringAlikeV<Container>
+    std::enable_if_t<!useStringConversionForSerialization((const Container*) nullptr)
+        && (IsSequenceContainerV<Container>
+            || IsSetContainerV<Container>
+            || IsUnorderedSetContainerV<Container>)
     >* = nullptr)
 {
     ctx->composer.startArray();
@@ -213,9 +204,8 @@ void serialize(
 template<typename SerializationContext, typename Value>
 void serialize(
     SerializationContext* ctx, const Value& val,
-    std::enable_if_t<
-        !IsInstrumentedV<Value> &&
-        (!IsContainerV<Value> || detail::IsStringAlikeV<Value>)>* = nullptr)
+    std::enable_if_t<useStringConversionForSerialization((const Value*) nullptr)
+        || (!IsInstrumentedV<Value> && !IsContainerV<Value>)>* = nullptr)
 {
     if constexpr (std::is_same_v<Value, bool>)
     {
@@ -229,14 +219,8 @@ void serialize(
     {
         ctx->composer.writeValue(val);
     }
-    else if constexpr (
-        std::is_convertible_v<Value, std::string>
-        || std::is_convertible_v<Value, std::string_view>)
-    {
-        ctx->composer.writeValue(nx::reflect::toString(val));
-    }
-    else if constexpr (
-        useStringConversionForSerialization((const Value*) nullptr)
+    else if constexpr (IsStringAlikeV<Value>
+        || useStringConversionForSerialization((const Value*) nullptr)
         || nx::reflect::IsInstrumentedEnumV<Value>)
     {
         ctx->composer.writeValue(nx::reflect::toString(val));
