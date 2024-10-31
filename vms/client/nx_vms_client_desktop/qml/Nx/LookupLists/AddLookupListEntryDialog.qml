@@ -32,6 +32,7 @@ ModalDialog
 
     minimumWidth: 450
     minimumHeight: 213
+    maximumHeight: minimumHeight * 3
     title: qsTr("Add Entry")
 
     contentItem: Scrollable
