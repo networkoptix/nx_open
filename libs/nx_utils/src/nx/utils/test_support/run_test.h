@@ -21,6 +21,7 @@
 #include <nx/utils/rlimit.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/std/filesystem.h>
+#include <nx/utils/thread/sync_queue.h>
 
 #include "test_options.h"
 
@@ -60,6 +61,26 @@ class ThrowListener:
             throw AssertionException(result);
         }
     }
+};
+
+class TimeoutThread
+{
+public:
+    TimeoutThread(std::chrono::seconds timeout):
+        m_thread([=] { NX_CRITICAL(m_cancel.pop(timeout), "Timeout %1 has expired", timeout); })
+    {
+        NX_INFO(this, "Timeout %1 is set", timeout);
+    }
+
+    ~TimeoutThread()
+    {
+        m_cancel.push();
+        m_thread.join();
+    }
+
+private:
+    std::thread m_thread;
+    utils::SyncQueue<void> m_cancel;
 };
 
 typedef std::vector<MoveOnlyFunc<void()>> DeinitFunctions;
@@ -112,6 +133,10 @@ inline int runTest(
 
     nx::log::initializeGlobally(args);
     nx::log::lockConfiguration();
+
+    std::unique_ptr<TimeoutThread> timeoutThread;
+    if (const auto timeout = args.get<size_t>("timeout", "timeoutS"))
+        timeoutThread = std::make_unique<TimeoutThread>(std::chrono::seconds(*timeout));
 
     DeinitFunctions deinitFunctions;
     if (extraInit)
