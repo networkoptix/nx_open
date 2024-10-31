@@ -50,6 +50,20 @@ namespace {
         return (180 * radian) / M_PI;
     }
 
+    qreal getCurrentValue(const QList<qreal>& values, qreal elapsedStep)
+    {
+        const auto clampValue = [](qreal value) { return std::clamp(value, 0.0, 1.0); };
+
+        if (values.isEmpty())
+            return -1;
+        if (values.size() < 2)
+            return clampValue(values.back());
+
+        const qreal v1 = clampValue(values.at(values.size() - 2));
+        const qreal v2 = clampValue(values.at(values.size() - 1));
+        return (v1 * (1.0 - elapsedStep) + v2 * elapsedStep);
+    }
+
     /** Create path for the chart */
     QPainterPath createChartPath(
         const QList<qreal> &values, qreal x_step, qreal scale, qreal elapsedStep, qreal *currentValue)
@@ -86,10 +100,10 @@ namespace {
             }
 
             /* Drawing only second part of the arc, cut at the beginning */
-            bool c1 = x1 + x_step2 < 0.0;
+            bool c1 = x1 + x_step2 < 0.0 - x_step;
 
             /* Drawing both parts of the arc, cut at the beginning */
-            bool c2 = !c1 && x1 < 0.0;
+            bool c2 = !c1 && x1 < 0.0 - x_step;
 
             /* Drawing both parts of the arc as usual */
             bool c3 = !c1 && !c2 && !last;
@@ -208,6 +222,7 @@ public:
         if (m_text == text)
             return;
         m_text = text;
+        m_cachedPixmap = {};
         update();
     }
 
@@ -217,6 +232,7 @@ public:
 
     void setColor(const QColor &color) {
         m_color = color;
+        m_cachedPixmap = {};
         update();
     }
 
@@ -246,17 +262,79 @@ protected:
         return (stateFlags & Hovered) ? 1.0 : 0.5;
     }
 
-    virtual void paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QOpenGLWidget *widget, const QRectF &rect) override
+    virtual void paint(
+        QPainter* painter,
+        StateFlags startState,
+        StateFlags endState,
+        qreal progress,
+        QOpenGLWidget* glWidget,
+        const QRectF& rect) override
     {
-        qreal opacity = painter->opacity();
-        painter->setOpacity(opacity * (stateOpacity(startState) * (1.0 - progress) + stateOpacity(endState) * progress));
-
-        QRectF imgRect = QRectF(0, 0, legendImageSize, legendImageSize);
-        int textOffset = legendImageSize + itemSpacing;
-        QRectF textRect = rect.adjusted(textOffset, 0, 0, 0);
+        if (glWidget)
         {
-            // TODO: #sivanov Text drawing is very slow. Replace with cached textures where possible.
-            QnScopedPainterPenRollback penRollback(painter,
+            paintInternal(painter, startState, endState, progress, glWidget, rect);
+            return;
+        }
+
+        const auto expectedSize = rect.size().toSize() * painter->device()->devicePixelRatio();
+        if (m_cachedPixmap.size() != expectedSize
+            || m_cachedStartState != startState
+            || m_cachedEndState != endState
+            || m_cachedProgress != progress)
+        {
+            m_cachedPixmap = getPixmap(
+                painter->device()->devicePixelRatio(),
+                startState,
+                endState,
+                progress,
+                rect);
+            m_cachedStartState = startState;
+            m_cachedEndState = endState;
+            m_cachedProgress = progress;
+        }
+
+        painter->drawPixmap(rect.topLeft(), m_cachedPixmap);
+    }
+
+    QPixmap getPixmap(
+        qreal pixelRatio,
+        StateFlags startState,
+        StateFlags endState,
+        qreal progress,
+        const QRectF& rect)
+    {
+        QImage image(
+            rect.size().toSize() * pixelRatio,
+            QImage::Format_ARGB32_Premultiplied);
+        image.setDevicePixelRatio(pixelRatio);
+        image.fill(Qt::transparent);
+        QPainter painter(&image);
+
+        painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
+        paintInternal(&painter, startState, endState, progress, /* glWidget */ nullptr, rect);
+
+        return QPixmap::fromImage(image);
+    }
+
+    void paintInternal(
+        QPainter* painter,
+        StateFlags startState,
+        StateFlags endState,
+        qreal progress,
+        QOpenGLWidget* glWidget,
+        const QRectF& rect)
+    {
+        const qreal opacity = painter->opacity();
+        painter->setOpacity(
+            opacity
+            * (stateOpacity(startState) * (1.0 - progress) + stateOpacity(endState) * progress));
+
+        const QRectF imgRect = QRectF(0, 0, legendImageSize, legendImageSize);
+        const int textOffset = legendImageSize + itemSpacing;
+        const QRectF textRect = rect.adjusted(textOffset, 0, 0, 0);
+        {
+            QnScopedPainterPenRollback penRollback(
+                painter,
                 QPen(core::colorTheme()->color("dark1"), 2));
             QnScopedPainterBrushRollback brushRollback(painter);
 
@@ -266,13 +344,19 @@ protected:
             painter->setPen(QPen(m_color, 3));
             painter->drawText(textRect, m_text);
         }
-        base_type::paint(painter, startState, endState, progress, widget, imgRect);
+        painter->setRenderHint(QPainter::SmoothPixmapTransform, true);
+        base_type::paint(painter, startState, endState, progress, glWidget, imgRect);
         painter->setOpacity(opacity);
     }
 
 private:
     QString m_text;
     QColor m_color;
+
+    QPixmap m_cachedPixmap;
+    StateFlags m_cachedStartState;
+    StateFlags m_cachedEndState;
+    qreal m_cachedProgress = 0.0;
 };
 
 
@@ -290,12 +374,21 @@ public:
 
     virtual ~StatisticsOverlayWidget() {}
 
+    void updateData()
+    {
+        m_graphPixmap = {};
+    }
+
 protected:
     virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const override {
         return base_type::sizeHint(which == Qt::MinimumSize ? which : Qt::MaximumSize, constraint);
     }
 
-    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *) override {
+    virtual void paint(
+        QPainter* painter,
+        const QStyleOptionGraphicsItem* option,
+        QWidget* glWidget) override
+    {
         QnScopedPainterFontRollback fontRollback(painter);
         Q_UNUSED(fontRollback)
         QFont font(this->font());
@@ -304,85 +397,74 @@ protected:
 
         QRectF rect = option->rect;
 
-        qreal width = rect.width();
-        qreal height = rect.height();
+        const bool isEmpty = m_widget->m_sortedKeys.isEmpty();
 
-        bool isEmpty = m_widget->m_sortedKeys.isEmpty();
+        const qreal offsetX = isEmpty
+            ? itemSpacing
+            : itemSpacing * 2 + painter->fontMetrics().horizontalAdvance(QLatin1String("100%"));
+        const qreal offsetTop = isEmpty
+            ? itemSpacing
+            : painter->fontMetrics().height() + itemSpacing;
+        const qreal offsetBottom = itemSpacing;
 
-        qreal offsetX = isEmpty ? itemSpacing : itemSpacing * 2 + painter->fontMetrics().horizontalAdvance(QLatin1String("100%"));
-        qreal offsetTop = isEmpty? itemSpacing : painter->fontMetrics().height() + itemSpacing;
-        qreal offsetBottom = itemSpacing;
+        static constexpr qreal kFramePenWidth = 3.0;
 
-        const qreal grid_pen_width = 2.5;
-        const qreal graph_pen_width = 3.0;
-        const qreal frame_pen_width = 3.0;
-
-        qreal ow = width - offsetX*2;
-        qreal oh = height - offsetTop - offsetBottom;
+        const qreal ow = rect.width() - offsetX * 2;
+        const qreal oh = rect.height() - offsetTop - offsetBottom;
 
         if (ow <= 0 || oh <= 0)
             return;
 
-        QRectF inner(offsetX, offsetTop, ow, oh);
+        const QRectF inner(offsetX, offsetTop, ow, oh);
 
-        qreal elapsed_step = m_widget->m_renderStatus == Qn::CannotRender ? 0 :
-                (qreal)qBound((qreal)0, (qreal)m_widget->m_elapsedTimer.elapsed(), m_widget->m_updatePeriod) / m_widget->m_updatePeriod;
+        // One point is cut from the beginning and one from the end.
+        const auto pointsLimit = m_widget->m_pointsLimit - 2;
+        const qreal xStep = (qreal) inner.width() * 1.0 / pointsLimit;
 
-        const qreal x_step = (qreal)ow*1.0/(m_widget->m_pointsLimit - 2); // one point is cut from the beginning and one from the end
-        const qreal y_step = oh * 0.025;
+        const qreal elapsed = std::clamp(
+            (qreal) m_widget->m_elapsedTimer.elapsed(),
+            0.0,
+            m_widget->m_updatePeriod);
 
-        /* Draw grid */
+        const qreal elapsedStep = m_widget->m_renderStatus == Qn::CannotRender
+            ? 0
+            : elapsed / m_widget->m_updatePeriod;
+
+        if (glWidget)
         {
-            static const QColor kGridColor = core::colorTheme()->color("brand", 100);
+            QnScopedPainterTransformRollback transformRollback(painter);
+            QnScopedPainterClipRegionRollback clipRollback(painter);
 
-            QPen grid;
-            grid.setColor(kGridColor);
-            grid.setWidthF(grid_pen_width);
+            const QSize graphSize = QSize(inner.width() + xStep, inner.height());
 
-            QPainterPath grid_path;
-            for (qreal i = offsetX - (x_step * (elapsed_step + m_widget->m_counter%4 - 4)); i < ow + offsetX; i += x_step*4){
-                grid_path.moveTo(i, offsetTop);
-                grid_path.lineTo(i, oh + offsetTop);
-            }
-            for (qreal i = y_step*4 + offsetTop; i < oh + offsetTop; i += y_step*4){
-                grid_path.moveTo(offsetX, i);
-                grid_path.lineTo(ow + offsetX, i);
-            }
-            painter->strokePath(grid_path, grid);
+            painter->setClipRect(inner);
+            painter->translate(offsetX - elapsedStep * xStep, offsetTop);
+
+            paintGraph(painter, graphSize, xStep);
+        }
+        else
+        {
+            const auto r = painter->device()->devicePixelRatio();
+            const QSize graphSize = QSize(inner.width() + xStep, inner.height()) * r;
+
+            // Draw all data into a (slighty wider) pixmap when the data is updated and then just
+            // move the pixmap from right to left while waiting for the next update.
+            if (m_graphPixmap.size() != graphSize)
+                m_graphPixmap = getGraphPixmap(inner.size(), r, xStep);
+
+            const QRectF graphView(QPointF(elapsedStep * xStep, 0) * r, inner.size() * r);
+            painter->drawPixmap(inner.topLeft(), m_graphPixmap, graphView);
         }
 
         QMap<QString, qreal> displayValues;
-
-        /* Draw graph lines */
+        for (const auto& key: std::as_const(m_widget->m_sortedKeys))
         {
-            QnScopedPainterTransformRollback transformRollback(painter);
-            Q_UNUSED(transformRollback)
+            const QnServerResourceWidget::GraphData& data = m_widget->m_graphDataByKey[key];
+            if (!data.visible)
+                continue;
 
-            qreal space_offset = graph_pen_width;
-
-            QTransform graphTransform = painter->transform();
-            graphTransform.translate(offsetX, oh + offsetTop - space_offset);
-            painter->setTransform(graphTransform);
-
-            QPen graphPen;
-            graphPen.setWidthF(graph_pen_width);
-            graphPen.setCapStyle(Qt::FlatCap);
-
-            foreach(QString key, m_widget->m_sortedKeys) {
-                QnStatisticsData &stats = m_widget->m_history[key];
-
-                const QnServerResourceWidget::GraphData &data = m_widget->m_graphDataByKey[key];
-                if (!data.visible)
-                    continue;
-
-                const auto values = stats.values;
-
-                qreal currentValue = 0;
-                QPainterPath path = createChartPath(values, x_step, -1.0 * (oh - 2*space_offset), elapsed_step, &currentValue);
-                displayValues[key] = currentValue;
-                graphPen.setColor(toTransparent(data.color, data.opacity));
-                painter->strokePath(path, graphPen);
-            }
+            const QnStatisticsData& stats = m_widget->m_history[key];
+            displayValues[key] = getCurrentValue(stats.values, elapsedStep);
         }
 
         /* Draw frame and numeric values */
@@ -394,7 +476,7 @@ protected:
 
             QPen main_pen;
             main_pen.setColor(kFrameColor);
-            main_pen.setWidthF(frame_pen_width);
+            main_pen.setWidthF(kFramePenWidth);
             main_pen.setJoinStyle(Qt::MiterJoin);
 
             painter->setPen(main_pen);
@@ -406,7 +488,7 @@ protected:
                 qreal baseOpacity = m_widget->isLegendVisible() ? 1.0 : 0.0;
                 painter->setOpacity(opacity * baseOpacity);
 
-                qreal xRight = offsetX + ow + itemSpacing * 2;
+                qreal xRight = inner.x() + ow + itemSpacing * 2;
                 foreach(QString key, m_widget->m_sortedKeys) {
                     const QnServerResourceWidget::GraphData &data = m_widget->m_graphDataByKey[key];
                     if (!data.visible)
@@ -415,7 +497,7 @@ protected:
                     qreal interValue = displayValues[key];
                     if (interValue < 0)
                         continue;
-                    qreal y = offsetTop + qMax(offsetTop, oh * (1.0 - interValue));
+                    qreal y = inner.y() + qMax(inner.y(), inner.height() * (1.0 - interValue));
 
                     main_pen.setColor(toTransparent(data.color, data.opacity));
                     painter->setPen(main_pen);
@@ -428,7 +510,92 @@ protected:
     }
 
 private:
+    QPixmap getGraphPixmap(
+        QSizeF displaySize,
+        qreal pixelRatio,
+        qreal xStep)
+    {
+        QImage graphImage(
+            QSize(displaySize.width() + xStep, displaySize.height()) * pixelRatio,
+            QImage::Format_ARGB32_Premultiplied);
+        graphImage.setDevicePixelRatio(pixelRatio);
+        graphImage.fill(Qt::transparent);
+        QPainter painter(&graphImage);
+
+        paintGraph(&painter, graphImage.deviceIndependentSize(), xStep);
+
+        return QPixmap::fromImage(graphImage);
+    }
+
+    void paintGraph(
+        QPainter* painter,
+        QSizeF displaySize,
+        qreal xStep) const
+    {
+        const qreal yStep = displaySize.height() * 0.025;
+        static constexpr qreal kGridPenWidth = 2.5;
+        static constexpr qreal kGraphPenWidth = 3.0;
+
+        /* Draw grid */
+        {
+            static const QColor kGridColor = core::colorTheme()->color("brand", 100);
+
+            QPen grid;
+            grid.setColor(kGridColor);
+            grid.setWidthF(kGridPenWidth);
+
+            QPainterPath grid_path;
+            const auto startX = xStep * (4 - m_widget->m_counter % 4);
+            for (qreal i = startX; i < displaySize.width(); i += xStep * 4)
+            {
+                grid_path.moveTo(i, 0);
+                grid_path.lineTo(i, displaySize.height());
+            }
+            for (qreal i = yStep * 4; i < displaySize.height(); i += yStep * 4)
+            {
+                grid_path.moveTo(0, i);
+                grid_path.lineTo(displaySize.width(), i);
+            }
+            painter->strokePath(grid_path, grid);
+        }
+
+        /* Draw graph lines */
+        {
+            QnScopedPainterTransformRollback transformRollback(painter);
+            Q_UNUSED(transformRollback)
+
+            const qreal spaceOffset = kGraphPenWidth;
+
+            painter->translate(xStep, displaySize.height() - spaceOffset);
+
+            QPen graphPen;
+            graphPen.setWidthF(kGraphPenWidth);
+            graphPen.setCapStyle(Qt::FlatCap);
+
+            for (const auto& key: std::as_const(m_widget->m_sortedKeys))
+            {
+                const QnServerResourceWidget::GraphData& data = m_widget->m_graphDataByKey[key];
+                if (!data.visible)
+                    continue;
+
+                const QnStatisticsData& stats = m_widget->m_history[key];
+
+                qreal currentValue = 0;
+                QPainterPath path = createChartPath(
+                    stats.values,
+                    xStep,
+                    -1.0 * (displaySize.height() - 2 * spaceOffset),
+                    /* elapsedStep */ 1.0,
+                    &currentValue);
+                graphPen.setColor(toTransparent(data.color, data.opacity));
+                painter->strokePath(path, graphPen);
+            }
+        }
+    }
+
+private:
     QnServerResourceWidget *m_widget;
+    QPixmap m_graphPixmap;
 };
 
 using HealthMonitoringButtons = QnServerResourceWidget::HealthMonitoringButtons;
@@ -541,13 +708,13 @@ Qn::RenderStatus QnServerResourceWidget::paintChannelBackground(QPainter* painte
 }
 
 void QnServerResourceWidget::addOverlays() {
-    StatisticsOverlayWidget *statisticsOverlayWidget = new StatisticsOverlayWidget(this);
-    statisticsOverlayWidget->setAcceptedMouseButtons(Qt::NoButton);
+    m_statisticsOverlayWidget = new StatisticsOverlayWidget(this);
+    m_statisticsOverlayWidget->setAcceptedMouseButtons(Qt::NoButton);
 
     QGraphicsLinearLayout *mainOverlayLayout = new QGraphicsLinearLayout(Qt::Vertical);
     mainOverlayLayout->setContentsMargins(0.5, 0.5, 0.5, 0.5);
     mainOverlayLayout->setSpacing(0.5);
-    mainOverlayLayout->addItem(statisticsOverlayWidget);
+    mainOverlayLayout->addItem(m_statisticsOverlayWidget);
 
     for (int i = 0; i < ButtonBarCount; i++) {
         m_legendButtonBar[i] = new QnImageButtonBar(this, {}, Qt::Horizontal);
@@ -584,7 +751,7 @@ void QnServerResourceWidget::updateLegend()
 
     QHash<Qn::StatisticsDeviceType, int> indexes;
 
-    for (const QString& key: m_sortedKeys)
+    for (const QString& key: std::as_const(m_sortedKeys))
     {
         QnStatisticsData &stats = m_history[key];
 
@@ -652,38 +819,42 @@ void QnServerResourceWidget::updateGraphVisibility() {
         GraphData &data = *pos;
         data.visible = data.bar->checkedButtons() & data.mask;
     }
+    m_statisticsOverlayWidget->updateData();
 }
 
 void QnServerResourceWidget::updateHoverKey() {
-    for(QHash<QString, GraphData>::iterator pos = m_graphDataByKey.begin(); pos != m_graphDataByKey.end(); pos++) {
-        GraphData &data = *pos;
+    m_hoveredKey = QString();
 
-        if(data.button && data.button->isHovered() && data.button->isChecked()) {
-            m_hoveredKey = pos.key();
-            return;
+    for (const auto& [key, data]: std::as_const(m_graphDataByKey).asKeyValueRange())
+    {
+        if (data.button && data.button->isHovered() && data.button->isChecked())
+        {
+            m_hoveredKey = key;
+            break;
         }
     }
 
-    m_hoveredKey = QString();
+    m_statisticsOverlayWidget->updateData();
 }
 
 
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-void QnServerResourceWidget::tick(int deltaMSecs) {
-    qreal delta = 4.0 * deltaMSecs / 1000.0;
+void QnServerResourceWidget::tick(int deltaMSecs)
+{
+    const qreal delta = 4.0 * deltaMSecs / 1000.0;
 
-    for(QHash<QString, GraphData>::iterator pos = m_graphDataByKey.begin(); pos != m_graphDataByKey.end(); pos++) {
-        GraphData &data = *pos;
-        if(m_hoveredKey.isEmpty()) {
-            data.opacity = qMin(data.opacity + delta, 1.0);
-        } else {
-            if(pos.key() == m_hoveredKey) {
-                data.opacity = qMin(data.opacity + delta, 1.0);
-            } else {
-                data.opacity = qMax(data.opacity - delta, 0.2);
-            }
+    for (const auto& [key, data]: m_graphDataByKey.asKeyValueRange())
+    {
+        const auto opacity = m_hoveredKey.isEmpty() || key == m_hoveredKey
+            ? qMin(data.opacity + delta, 1.0)
+            : qMax(data.opacity - delta, 0.2);
+
+        if (opacity != data.opacity)
+        {
+            data.opacity = opacity;
+            m_statisticsOverlayWidget->updateData();
         }
     }
 }
@@ -828,4 +999,5 @@ void QnServerResourceWidget::at_statistics_received() {
     m_counter++;
 
     updateTitleText();
+    m_statisticsOverlayWidget->updateData();
 }
