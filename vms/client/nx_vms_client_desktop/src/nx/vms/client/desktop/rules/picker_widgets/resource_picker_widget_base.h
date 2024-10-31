@@ -5,6 +5,7 @@
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QVBoxLayout>
 
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/rules/action_builder_fields/text_field.h>
 #include <nx/vms/rules/utils/field.h>
@@ -83,9 +84,21 @@ protected:
 template<class F>
 void ResourcePickerWidgetBase<F>::updateSelectButtonUi()
 {
+    const auto [icon, iconMode] =
+        selectButtonIcon(systemContext(), m_field, fieldValidity().validity);
+    m_selectButton->setIcon(icon);
     m_selectButton->setText(Strings::selectButtonText(systemContext(), m_field));
-    m_selectButton->setIcon(
-        selectButtonIcon(systemContext(), m_field, fieldValidity().validity));
+
+    if (iconMode == QIcon::Mode::Disabled)
+    {
+        auto palette = m_selectButton->palette();
+        setCustomStyle(&palette, core::colorTheme()->color("light16"));
+        m_selectButton->setPalette(palette);
+    }
+    else
+    {
+        resetStyle(m_selectButton);
+    }
 }
 
 template<>
@@ -102,10 +115,22 @@ inline void ResourcePickerWidgetBase<nx::vms::rules::TargetUsersField>::updateSe
         }
     }
 
+    const auto [icon, iconMode] =
+        selectButtonIcon(systemContext(), m_field, additionalCount, fieldValidity().validity);
+    m_selectButton->setIcon(icon);
     m_selectButton->setText(
         Strings::selectButtonText(systemContext(), m_field, additionalCount));
-    m_selectButton->setIcon(
-        selectButtonIcon(systemContext(), m_field, additionalCount, fieldValidity().validity));
+
+    if (iconMode == QIcon::Mode::Disabled)
+    {
+        auto palette = m_selectButton->palette();
+        setCustomStyle(&palette, core::colorTheme()->color("light16"));
+        m_selectButton->setPalette(palette);
+    }
+    else
+    {
+        resetStyle(m_selectButton);
+    }
 }
 
 } // namespace nx::vms::client::desktop::rules

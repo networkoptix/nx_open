@@ -18,25 +18,25 @@
 
 namespace nx::vms::client::desktop::rules {
 
-QIcon attentionIcon();
+std::pair<QIcon, QIcon::Mode> attentionIcon();
 
-QIcon selectButtonIcon(SystemContext* context, vms::rules::TargetLayoutField* field);
-QIcon selectButtonIcon(SystemContext* context, vms::rules::TargetDevicesField* field);
-QIcon selectButtonIcon(SystemContext* context, vms::rules::TargetLayoutsField* field);
-QIcon selectButtonIcon(SystemContext* context, vms::rules::TargetServersField* field);
-QIcon selectButtonIcon(SystemContext* context, vms::rules::TargetDeviceField* field);
-QIcon selectButtonIcon(
+std::pair<QIcon, QIcon::Mode> selectButtonIcon(SystemContext* context, vms::rules::TargetLayoutField* field);
+std::pair<QIcon, QIcon::Mode> selectButtonIcon(SystemContext* context, vms::rules::TargetDevicesField* field);
+std::pair<QIcon, QIcon::Mode> selectButtonIcon(SystemContext* context, vms::rules::TargetLayoutsField* field);
+std::pair<QIcon, QIcon::Mode> selectButtonIcon(SystemContext* context, vms::rules::TargetServersField* field);
+std::pair<QIcon, QIcon::Mode> selectButtonIcon(SystemContext* context, vms::rules::TargetDeviceField* field);
+std::pair<QIcon, QIcon::Mode> selectButtonIcon(
     SystemContext* context,
     vms::rules::TargetUsersField* field,
     int additionalCount,
     QValidator::State fieldValidity);
 
-QIcon selectButtonIcon(SystemContext* context, vms::rules::SourceCameraField* field);
-QIcon selectButtonIcon(SystemContext* context, vms::rules::SourceServerField* field);
-QIcon selectButtonIcon(SystemContext* context, vms::rules::SourceUserField* field);
+std::pair<QIcon, QIcon::Mode> selectButtonIcon(SystemContext* context, vms::rules::SourceCameraField* field);
+std::pair<QIcon, QIcon::Mode> selectButtonIcon(SystemContext* context, vms::rules::SourceServerField* field);
+std::pair<QIcon, QIcon::Mode> selectButtonIcon(SystemContext* context, vms::rules::SourceUserField* field);
 
 template<class T>
-QIcon selectButtonIcon(SystemContext* context, T* field, QValidator::State fieldValidity)
+std::pair<QIcon, QIcon::Mode> selectButtonIcon(SystemContext* context, T* field, QValidator::State fieldValidity)
 {
     if (fieldValidity == QValidator::State::Intermediate)
         return attentionIcon();

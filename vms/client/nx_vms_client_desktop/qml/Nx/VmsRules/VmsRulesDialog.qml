@@ -134,6 +134,17 @@ Dialog
                             rulesSortFilterModel.getRuleCheckStates(tableView.checkedRows)
                     }
                 }
+
+                Connections
+                {
+                    target: rulesSortFilterModel
+                    enabled: tableView.checkedRows.length > 0
+                    function onDataChanged(topLeft, bottomRight, roles)
+                    {
+                        ruleStateSwitch.checkState =
+                            rulesSortFilterModel.getRuleCheckStates(tableView.checkedRows)
+                    }
+                }
             }
 
             Item { Layout.fillWidth: true }

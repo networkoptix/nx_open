@@ -2,6 +2,8 @@
 
 #include "icons.h"
 
+#include <QtGui/QGuiApplication>
+
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -20,88 +22,108 @@ const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kAttentionTheme 
     {{QnIcon::Normal, {.primary = "yellow"}}};
 NX_DECLARE_COLORIZED_ICON(kAttentionIcon, "20x20/Solid/attention.svg", kAttentionTheme);
 
-template<class T>
-QIcon getIcon(const T& value)
+const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kResourceIconTheme =
+    {{QnIcon::Selected, {.primary = "light4"}}, {QnIcon::Disabled, {.primary = "light16"}}};
+
+std::pair<QIcon, QIcon::Mode> getIcon(QnResourceIconCache::Key key, QIcon::Mode mode)
 {
-    return core::Skin::maximumSizePixmap(
-        qnResIconCache->icon(value),
-        QIcon::Selected,
-        QIcon::Off,
-        /*correctDevicePixelRatio*/ false);
+    const auto pixmap = qnResIconCache->iconPixmap(
+        key,
+        core::kIconSize * qApp->devicePixelRatio(),
+        kResourceIconTheme,
+        mode);
+
+    return {QIcon{pixmap}, mode};
+}
+
+std::pair<QIcon, QIcon::Mode> getIcon(const QnResourcePtr& resource, QIcon::Mode mode)
+{
+    return getIcon(QnResourceIconCache::key(resource), mode);
 }
 
 } // namespace
 
-QIcon attentionIcon()
+std::pair<QIcon, QIcon::Mode> attentionIcon()
 {
-    return qnSkin->icon(kAttentionIcon);
+    return {qnSkin->icon(kAttentionIcon), QIcon::Mode::Selected};
 }
 
-QIcon selectButtonIcon(SystemContext* context, vms::rules::TargetLayoutField* field)
+std::pair<QIcon, QIcon::Mode> selectButtonIcon(SystemContext* context, vms::rules::TargetLayoutField* field)
 {
-    if (const auto resource =
-        context->resourcePool()->getResourceById<QnLayoutResource>(field->value()))
-    {
-        if (resource->isShared())
-            return getIcon(QnResourceIconCache::SharedLayout);
-    }
+    const auto resource =
+        context->resourcePool()->getResourceById<QnLayoutResource>(field->value());
+    if (!resource)
+        return getIcon(QnResourceIconCache::Layout, QIcon::Mode::Disabled);
 
-    return getIcon(QnResourceIconCache::Layout);
+    return getIcon(
+        resource->isShared() ? QnResourceIconCache::SharedLayout : QnResourceIconCache::Layout,
+        QIcon::Mode::Selected);
 }
 
-QIcon selectButtonIcon(SystemContext* context, vms::rules::TargetDevicesField* field)
+std::pair<QIcon, QIcon::Mode> selectButtonIcon(SystemContext* context, vms::rules::TargetDevicesField* field)
 {
     const auto resources =
         context->resourcePool()->getResourcesByIds<QnVirtualCameraResource>(field->ids());
     const auto resourcesCount = resources.size() + static_cast<size_t>(field->useSource());
 
+    if (resourcesCount == 0)
+        return getIcon(QnResourceIconCache::Camera, QIcon::Mode::Disabled);
+
     if (resourcesCount > 1)
-        return getIcon(QnResourceIconCache::Cameras);
+        return getIcon(QnResourceIconCache::Cameras, QIcon::Mode::Selected);
 
-    if (resources.size() == 1)
-        return getIcon(resources.first());
+    if (field->useSource())
+        return getIcon(QnResourceIconCache::Camera, QIcon::Mode::Selected);
 
-    return getIcon(QnResourceIconCache::Camera);
+    return getIcon(resources.first(), QIcon::Mode::Selected);
 }
 
-QIcon selectButtonIcon(SystemContext* context, vms::rules::TargetLayoutsField* field)
+std::pair<QIcon, QIcon::Mode> selectButtonIcon(SystemContext* context, vms::rules::TargetLayoutsField* field)
 {
     const auto resources =
         context->resourcePool()->getResourcesByIds<QnLayoutResource>(field->value());
 
     if (resources.size() > 1)
-        return getIcon(QnResourceIconCache::Layouts);
+        return getIcon(QnResourceIconCache::Layouts, QIcon::Mode::Selected);
 
     if (resources.size() == 1)
-        return getIcon(resources.first());
+        return getIcon(resources.first(), QIcon::Mode::Selected);
 
-    return getIcon(QnResourceIconCache::Layout);
+    return getIcon(QnResourceIconCache::Layout, QIcon::Mode::Disabled);
 }
 
-QIcon selectButtonIcon(SystemContext* context, vms::rules::TargetServersField* field)
+std::pair<QIcon, QIcon::Mode> selectButtonIcon(SystemContext* context, vms::rules::TargetServersField* field)
 {
     const auto resources =
         context->resourcePool()->getResourcesByIds<QnMediaServerResource>(field->ids());
     const auto resourcesCount = resources.size() + static_cast<size_t>(field->useSource());
 
+    if (resourcesCount == 0)
+        return getIcon(QnResourceIconCache::Server, QIcon::Mode::Disabled);
+
     if (resourcesCount > 1)
-        return getIcon(QnResourceIconCache::Servers);
+        return getIcon(QnResourceIconCache::Servers, QIcon::Mode::Selected);
 
-    if (resources.size() == 1)
-        return getIcon(resources.first());
+    if (field->useSource())
+        return getIcon(QnResourceIconCache::Server, QIcon::Mode::Selected);
 
-    return getIcon(QnResourceIconCache::Server);
+    return getIcon(resources.first(), QIcon::Mode::Selected);
 }
 
-QIcon selectButtonIcon(SystemContext* context, vms::rules::TargetDeviceField* field)
+std::pair<QIcon, QIcon::Mode> selectButtonIcon(SystemContext* context, vms::rules::TargetDeviceField* field)
 {
-    if (field->useSource() || field->id().isNull())
-        return getIcon(QnResourceIconCache::Camera);
+    if (field->useSource())
+        return getIcon(QnResourceIconCache::Camera, QIcon::Mode::Selected);
 
-    return getIcon(context->resourcePool()->getResourceById<QnVirtualCameraResource>(field->id()));
+    auto cameraResource =
+        context->resourcePool()->getResourceById<QnVirtualCameraResource>(field->id());
+    if (cameraResource)
+        return getIcon(cameraResource, QIcon::Mode::Selected);
+
+    return getIcon(QnResourceIconCache::Camera, QIcon::Mode::Disabled);
 }
 
-QIcon selectButtonIcon(
+std::pair<QIcon, QIcon::Mode> selectButtonIcon(
     SystemContext* context,
     vms::rules::TargetUsersField* field,
     int additionalCount,
@@ -111,63 +133,72 @@ QIcon selectButtonIcon(
         return attentionIcon();
 
     if (field->acceptAll())
-        return getIcon(QnResourceIconCache::Users);
+        return getIcon(QnResourceIconCache::Users, QIcon::Mode::Selected);
 
     QnUserResourceList users;
     api::UserGroupDataList groups;
     common::getUsersAndGroups(context, field->ids(), users, groups);
 
     const auto usersCount = users.size() + additionalCount;
-    if (usersCount <= 1 && groups.empty())
-        return getIcon(QnResourceIconCache::User);
 
-    return getIcon(QnResourceIconCache::Users);
+    if (usersCount == 0 && groups.empty())
+        return getIcon(QnResourceIconCache::User, QIcon::Mode::Disabled);
+
+    if (usersCount == 1 && groups.empty())
+        return getIcon(QnResourceIconCache::User, QIcon::Mode::Selected);
+
+    return getIcon(QnResourceIconCache::Users, QIcon::Mode::Selected);
 }
 
-QIcon selectButtonIcon(SystemContext* context, vms::rules::SourceCameraField* field)
+std::pair<QIcon, QIcon::Mode> selectButtonIcon(SystemContext* context, vms::rules::SourceCameraField* field)
 {
     if (field->acceptAll())
-        return getIcon(QnResourceIconCache::Cameras);
+        return getIcon(QnResourceIconCache::Cameras, QIcon::Mode::Selected);
 
     const auto resources =
         context->resourcePool()->getResourcesByIds<QnVirtualCameraResource>(field->ids());
 
     if (resources.empty())
-        return getIcon(QnResourceIconCache::Camera);
+        return getIcon(QnResourceIconCache::Camera, QIcon::Mode::Disabled);
 
     if (resources.size() == 1)
-        return getIcon(resources.first());
+        return getIcon(resources.first(), QIcon::Mode::Selected);
 
-    return getIcon(QnResourceIconCache::Cameras);
+    return getIcon(QnResourceIconCache::Cameras, QIcon::Mode::Selected);
 }
 
-QIcon selectButtonIcon(SystemContext* context, vms::rules::SourceServerField* field)
+std::pair<QIcon, QIcon::Mode> selectButtonIcon(SystemContext* context, vms::rules::SourceServerField* field)
 {
     if (field->acceptAll())
-        return getIcon(QnResourceIconCache::Servers);
+        return getIcon(QnResourceIconCache::Servers, QIcon::Mode::Selected);
 
     const auto resources =
         context->resourcePool()->getResourcesByIds<QnMediaServerResource>(field->ids());
 
-    if (resources.size() <= 1)
-        return getIcon(QnResourceIconCache::Server);
+    if (resources.size() > 1)
+        return getIcon(QnResourceIconCache::Servers, QIcon::Mode::Selected);
 
-    return getIcon(QnResourceIconCache::Servers);
+    return getIcon(QnResourceIconCache::Server, resources.empty()
+        ? QIcon::Mode::Normal
+        : QIcon::Mode::Selected);
 }
 
-QIcon selectButtonIcon(SystemContext* context, vms::rules::SourceUserField* field)
+std::pair<QIcon, QIcon::Mode> selectButtonIcon(SystemContext* context, vms::rules::SourceUserField* field)
 {
     if (field->acceptAll())
-        return getIcon(QnResourceIconCache::Users);
+        return getIcon(QnResourceIconCache::Users, QIcon::Mode::Selected);
 
     QnUserResourceList users;
     api::UserGroupDataList groups;
     common::getUsersAndGroups(context, field->ids(), users, groups);
 
-    if (users.size() <= 1 && groups.empty())
-        return getIcon(QnResourceIconCache::User);
+    if (users.empty() && groups.empty())
+        return getIcon(QnResourceIconCache::User, QIcon::Mode::Disabled);
 
-    return getIcon(QnResourceIconCache::Users);
+    if (users.size() == 1 && groups.empty())
+        return getIcon(QnResourceIconCache::User, QIcon::Mode::Selected);
+
+    return getIcon(QnResourceIconCache::Users, QIcon::Mode::Selected);
 }
 
 } // namespace nx::vms::client::desktop::rules

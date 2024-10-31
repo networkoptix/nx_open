@@ -2783,9 +2783,7 @@ void Style::drawControl(ControlElement element,
                 /* Draw icon left-aligned: */
                 if (!buttonOption->icon.isNull())
                 {
-                    QIcon::Mode mode = isErrorStyle(widget)
-                        ? QIcon::Mode::Disabled
-                        : buttonIconMode(*option);
+                    QIcon::Mode mode = buttonIconMode(*option);
 
                     QIcon::State state =
                         buttonOption->state.testFlag(State_On) ? QIcon::On : QIcon::Off;

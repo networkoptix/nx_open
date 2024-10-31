@@ -26,9 +26,6 @@ const ItemDescriptor& OpenLayoutAction::manifest()
         .flags = ItemFlag::instant,
         .executionTargets = ExecutionTarget::clients,
         .fields = {
-            makeFieldDescriptor<TargetLayoutField>(
-                utils::kLayoutIdFieldName, {}, {},
-                FieldProperties{.optional = false}.toVariantMap()),
             makeFieldDescriptor<TargetUsersField>(
                 utils::kUsersFieldName,
                 Strings::to(),
@@ -37,6 +34,9 @@ const ItemDescriptor& OpenLayoutAction::manifest()
                     .base = FieldProperties{.optional = false},
                     .validationPolicy = kLayoutAccessValidationPolicy
                 }.toVariantMap()),
+            makeFieldDescriptor<TargetLayoutField>(
+                utils::kLayoutIdFieldName, {}, {},
+                FieldProperties{.optional = false}.toVariantMap()),
             utils::makePlaybackFieldDescriptor(Strings::rewind()),
             utils::makeIntervalFieldDescriptor(Strings::intervalOfAction()),
         },
