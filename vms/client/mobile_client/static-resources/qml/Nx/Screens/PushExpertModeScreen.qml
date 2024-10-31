@@ -25,7 +25,7 @@ PageBase
     {
         id: toolBar
 
-        y: deviceStatusBarHeight
+        contentItem.y: deviceStatusBarHeight
         visible: opacity > 0
 
         title: !simpleModeRadioButton.checked && d.selectionModel
