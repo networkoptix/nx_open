@@ -124,15 +124,9 @@ static nx::vms::api::JsonRpcRequest toJsonRpcRequest(
     const UserGroupRequest::UpdateUser& data,
     int reqId)
 {
-    nx::vms::api::UserModelV3 user;
-
-    user.isEnabled = data.enabled;
-    user.isHttpDigestEnabled = data.enableDigest;
-
-    const QJsonObject params{
-        JsonField(user, isEnabled),
-        JsonField(user, isHttpDigestEnabled)
-    };
+    QJsonObject params{{{"isEnabled", data.enabled}}};
+    if (data.enableDigest.has_value())
+        params.insert("isHttpDigestEnabled", data.enableDigest.value());
 
     return api::JsonRpcRequest{
         .method = "rest.v4.users.update",
@@ -226,9 +220,6 @@ public:
     template <typename T>
     const T* getRequestData() const;
 
-    nx::vms::api::UserGroupModel fromGroupId(const nx::Uuid& groupId);
-    nx::vms::api::UserModelV3 fromUserId(const nx::Uuid& userId);
-
     void applyGroup(
         const nx::Uuid& groupId,
         const std::vector<nx::Uuid>& prev,
@@ -242,7 +233,7 @@ public:
     void applyUser(
         const nx::Uuid& userId,
         bool enabled,
-        bool enableDigest);
+        std::optional<bool> enableDigest);
 
     void patchRequests(int startFrom, const nx::Uuid& oldId, const nx::Uuid& newId)
     {
@@ -535,57 +526,6 @@ void UserGroupRequestChain::updateLayoutSharing(
     }
 }
 
-nx::vms::api::UserGroupModel UserGroupRequestChain::Private::fromGroupId(const nx::Uuid& groupId)
-{
-    const auto userGroup = q->systemContext()->userGroupManager()->find(groupId);
-    if (!userGroup)
-        return {};
-
-    nx::vms::api::UserGroupModel groupData;
-
-    // Fill in all non-optional fields.
-    groupData.id = userGroup->id;
-    groupData.name = userGroup->name;
-    groupData.description = userGroup->description;
-    groupData.type = userGroup->type;
-    groupData.permissions = userGroup->permissions;
-    groupData.parentGroupIds = userGroup->parentGroupIds;
-    const auto ownResourceAccessMap =
-        q->systemContext()->accessRightsManager()->ownResourceAccessMap(
-            userGroup->id).asKeyValueRange();
-    groupData.resourceAccessRights = {ownResourceAccessMap.begin(), ownResourceAccessMap.end()};
-    return groupData;
-}
-
-nx::vms::api::UserModelV3 UserGroupRequestChain::Private::fromUserId(const nx::Uuid& userId)
-{
-    const auto user = q->systemContext()->resourcePool()->getResourceById<QnUserResource>(userId);
-    if (!user)
-        return {};
-
-    nx::vms::api::UserModelV3 userData;
-
-    // Fill in all non-optional fields.
-    userData.id = user->getId();
-    userData.name = user->getName();
-    userData.email = user->getEmail();
-    userData.type = user->userType();
-    userData.fullName = user->fullName();
-    userData.permissions = user->getRawPermissions();
-    userData.isEnabled = user->isEnabled();
-    userData.isHttpDigestEnabled =
-        user->getDigest() != nx::vms::api::UserData::kHttpIsDisabledStub;
-
-    userData.groupIds = user->groupIds();
-
-    const auto ownResourceAccessMap =
-        q->systemContext()->accessRightsManager()->ownResourceAccessMap(
-            user->getId()).asKeyValueRange();
-    userData.resourceAccessRights = {ownResourceAccessMap.begin(), ownResourceAccessMap.end()};
-
-    return userData;
-}
-
 void UserGroupRequestChain::Private::applyGroup(
     const nx::Uuid& groupId,
     const std::vector<nx::Uuid>& prev,
@@ -620,21 +560,19 @@ void UserGroupRequestChain::Private::applyUser(
 void UserGroupRequestChain::Private::applyUser(
     const nx::Uuid& userId,
     bool enabled,
-    bool enableDigest)
+    std::optional<bool> enableDigest)
 {
     auto user = q->systemContext()->resourcePool()->getResourceById<QnUserResource>(userId);
     if (!user)
         return;
 
-    // TODO: enableDigest shoud be optional in API structure.
-
     user->setEnabled(enabled);
 
-    if (!user->isTemporary())
+    if (!user->isTemporary() && enableDigest.has_value())
     {
         user->setPasswordAndGenerateHash(
             {},
-            enableDigest
+            enableDigest.value()
                 ? QnUserResource::DigestSupport::enable
                 : QnUserResource::DigestSupport::disable);
     }

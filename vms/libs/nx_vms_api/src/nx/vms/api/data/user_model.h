@@ -51,11 +51,11 @@ struct NX_VMS_API UserModelBase
     /**%apidoc[opt] Disabled users can not login. */
     bool isEnabled = true;
 
-    /**%apidoc[opt]
+    /**%apidoc
      * Whether HTTP digest authorization can be used for this user. Requires password to enable.
-     * For Cloud users digest support is controlled by the Cloud.
+     * Forbidden to change for the Cloud users as their digest support is controlled by the Cloud.
      */
-    bool isHttpDigestEnabled = false;
+    std::optional<bool> isHttpDigestEnabled;
 
     /**%apidoc The password for authorization. It's used only for `local` users. */
     std::optional<QString> password;

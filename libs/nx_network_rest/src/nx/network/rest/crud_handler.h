@@ -259,6 +259,22 @@ protected:
         return {id, request.pathParams().contains(m_idParamName)};
     }
 
+    static json::DefaultValueAction defaultValueAction(
+        size_t apiVersion, std::optional<bool> keepDefault, std::optional<bool> stripDefault)
+    {
+        if (keepDefault && stripDefault)
+            throw Exception::badRequest("Only one can be used: _keepDefault, _stripDefault");
+
+        using Action = json::DefaultValueAction;
+        if (keepDefault)
+            return *keepDefault ? Action::appendMissing : Action::removeEqual;
+
+        if (stripDefault)
+            return *stripDefault ? Action::removeEqual : Action::appendMissing;
+
+        return apiVersion >= 3 ? Action::appendMissing : Action::removeEqual;
+    }
+
     json::DefaultValueAction extractDefaultValueAction(
         Params* params, std::optional<size_t> apiVersion) const
     {
@@ -272,23 +288,11 @@ protected:
                 return (*value != "false" && *value != "0");
             };
 
-        const auto extractBoolValue =
-            [&](bool defaultBehavior) -> bool
-            {
-                const auto keepDefault = extractBoolParam("_keepDefault");
-                const auto stripDefault = extractBoolParam("_stripDefault");
-                if (m_features.testFlag(CrudFeature::alwaysKeepDefault))
-                    return true; //< And ignore extracted values.
-                if (!keepDefault)
-                    return stripDefault ? !*stripDefault : defaultBehavior;
-                if (stripDefault)
-                    throw Exception::badRequest("Only one can be used: _keepDefault, _stripDefault");
-                return keepDefault.value_or(defaultBehavior);
-            };
-
-        return extractBoolValue(/*defaultBehavior*/ apiVersion.value_or(0) >= 3)
-            ? json::DefaultValueAction::appendMissing
-            : json::DefaultValueAction::removeEqual;
+        const auto keepDefault = extractBoolParam("_keepDefault");
+        const auto stripDefault = extractBoolParam("_stripDefault");
+        if (m_features.testFlag(CrudFeature::alwaysKeepDefault))
+            return json::DefaultValueAction::appendMissing;
+        return defaultValueAction(apiVersion.value_or(0), keepDefault, stripDefault);
     }
 
     template<typename Filter>
