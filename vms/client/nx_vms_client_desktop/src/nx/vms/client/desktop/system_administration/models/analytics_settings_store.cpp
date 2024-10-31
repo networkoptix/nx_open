@@ -155,6 +155,8 @@ void AnalyticsSettingsStore::removeEngine(const nx::Uuid& engineId)
     m_engines.erase(it);
 
     emit analyticsEnginesChanged();
+
+    resetSettings(engineId, /*model*/ {}, /*values*/ {}, /*errors*/ {}, /*changed*/ false);
 }
 
 void AnalyticsSettingsStore::setErrors(const nx::Uuid& engineId, const QJsonObject& errors)
