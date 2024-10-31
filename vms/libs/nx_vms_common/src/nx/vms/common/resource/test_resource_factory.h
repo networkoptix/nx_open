@@ -9,12 +9,12 @@
 
 namespace nx::vms::common::test {
 
-class NX_VMS_COMMON_TEST_SUPPORT_API TestResourceFactory:
+class NX_VMS_COMMON_API TestResourceFactory:
     public QObject,
     public QnResourceFactory
 {
 public:
-    TestResourceFactory(QObject *parent = NULL): QObject(parent) {}
+    TestResourceFactory(QObject *parent = nullptr): QObject(parent) {}
 
     virtual QnResourcePtr createResource(
         const nx::Uuid& resourceTypeId,

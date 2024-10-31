@@ -1,8 +1,8 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include <gtest/gtest.h>
-
 #include <memory>
+
+#include <gtest/gtest.h>
 
 #include <QtTest/QSignalSpy>
 
@@ -19,12 +19,12 @@
 #include <nx/utils/range_adapters.h>
 #include <nx/utils/scoped_connections.h>
 #include <nx/vms/api/data/user_group_data.h>
+#include <nx/vms/common/resource/camera_resource_stub.h>
 #include <nx/vms/common/system_context.h>
-#include <nx/vms/common/test_support/resource/camera_resource_stub.h>
 #include <nx/vms/common/test_support/test_context.h>
 
-#include "private/resource_access_resolver_test_fixture.h"
 #include "../test_subject_hierarchy.h"
+#include "private/resource_access_resolver_test_fixture.h"
 
 namespace nx::core::access {
 namespace test {

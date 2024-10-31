@@ -5,8 +5,8 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/common/resource/camera_resource_stub.h>
 #include <nx/vms/common/system_context.h>
-#include <nx/vms/common/test_support/resource/camera_resource_stub.h>
 #include <nx/vms/common/test_support/test_context.h>
 #include <nx/vms/license/usage_helper.h>
 

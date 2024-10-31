@@ -9,8 +9,8 @@
 #include <nx/analytics/properties.h>
 #include <nx/core/resource/server_mock.h>
 #include <nx/vms/api/analytics/engine_manifest.h>
+#include <nx/vms/common/resource/camera_resource_stub.h>
 #include <nx/vms/common/system_context.h>
-#include <nx/vms/common/test_support/resource/camera_resource_stub.h>
 #include <nx/vms/common/test_support/test_context.h>
 #include <nx/vms/event/action_parameters.h>
 #include <nx/vms/event/event_parameters.h>

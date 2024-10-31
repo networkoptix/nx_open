@@ -16,7 +16,7 @@
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/test_support/test_context.h>
-#include <nx/vms/common/test_support/resource/camera_resource_stub.h>
+#include <nx/vms/common/resource/camera_resource_stub.h>
 
 namespace {
 

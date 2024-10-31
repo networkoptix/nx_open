@@ -3,7 +3,7 @@
 #include "message_processor_mock.h"
 
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/common/test_support/resource/test_resource_factory.h>
+#include <nx/vms/common/resource/test_resource_factory.h>
 
 namespace nx::vms::client::desktop::test {
 

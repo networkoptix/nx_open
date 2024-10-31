@@ -7,8 +7,8 @@
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
 
-#include "storage_resource_stub.h"
 #include "camera_resource_stub.h"
+#include "storage_resource_stub.h"
 
 namespace nx::vms::common::test {
 

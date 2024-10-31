@@ -8,7 +8,7 @@ namespace nx::vms::common::test {
 
 class TestResourceFactory;
 
-class NX_VMS_COMMON_TEST_SUPPORT_API MessageProcessorMock: public QnCommonMessageProcessor
+class NX_VMS_COMMON_API MessageProcessorMock: public QnCommonMessageProcessor
 {
     using base_type = QnCommonMessageProcessor;
 

@@ -30,10 +30,10 @@
 #include <nx/vms/client/desktop/test_support/client_camera_resource_stub.h>
 #include <nx/vms/client/desktop/test_support/message_processor_mock.h>
 #include <nx/vms/common/intercom/utils.h>
+#include <nx/vms/common/resource/camera_resource_stub.h>
 #include <nx/vms/common/showreel/showreel_manager.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
-#include <nx/vms/common/test_support/resource/camera_resource_stub.h>
 #include <utils/common/id.h>
 
 namespace nx::vms::client::desktop {

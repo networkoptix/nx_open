@@ -2,14 +2,14 @@
 
 #include <memory>
 
-#include <core/resource_access/global_permissions_watcher.h>
-#include <core/resource_access/resolvers/own_resource_access_resolver.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/webpage_resource.h>
+#include <core/resource_access/global_permissions_watcher.h>
+#include <core/resource_access/resolvers/own_resource_access_resolver.h>
 #include <nx/vms/api/data/user_group_data.h>
-#include <nx/vms/common/test_support/resource/camera_resource_stub.h>
+#include <nx/vms/common/resource/camera_resource_stub.h>
 
 #include "private/resource_access_resolver_test_fixture.h"
 

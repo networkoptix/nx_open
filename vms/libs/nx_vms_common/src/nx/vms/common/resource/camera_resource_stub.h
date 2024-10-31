@@ -8,7 +8,7 @@
 
 namespace nx {
 
-class NX_VMS_COMMON_TEST_SUPPORT_API CameraResourceStub: public QnVirtualCameraResource
+class NX_VMS_COMMON_API CameraResourceStub: public QnVirtualCameraResource
 {
     using base_type = QnVirtualCameraResource;
     using StreamIndex = nx::vms::api::StreamIndex;

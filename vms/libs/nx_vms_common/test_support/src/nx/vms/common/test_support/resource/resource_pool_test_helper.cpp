@@ -12,10 +12,9 @@
 #include <nx/vms/api/data/camera_data.h>
 #include <nx/vms/api/data/user_group_data.h>
 #include <nx/vms/common/intercom/utils.h>
+#include <nx/vms/common/resource/storage_resource_stub.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
-
-#include "storage_resource_stub.h"
 
 using namespace nx::vms::api;
 

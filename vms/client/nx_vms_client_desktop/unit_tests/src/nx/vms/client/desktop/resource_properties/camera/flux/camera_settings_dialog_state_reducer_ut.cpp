@@ -17,8 +17,8 @@
 #include <nx/vms/client/desktop/resource_properties/camera/widgets/private/motion_stream_alerts.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/test_support/test_context.h>
+#include <nx/vms/common/resource/camera_resource_stub.h>
 #include <nx/vms/common/system_settings.h>
-#include <nx/vms/common/test_support/resource/camera_resource_stub.h>
 
 using namespace std::chrono;
 

@@ -8,10 +8,10 @@
 #include <licensing/license.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
+#include <nx/vms/common/resource/camera_resource_stub.h>
 #include <nx/vms/common/saas/saas_service_manager.h>
 #include <nx/vms/common/saas/saas_service_usage_helper.h>
 #include <nx/vms/common/system_context.h>
-#include <nx/vms/common/test_support/resource/camera_resource_stub.h>
 #include <nx/vms/common/test_support/test_context.h>
 
 namespace nx::vms::common::saas::test {

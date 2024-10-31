@@ -5,9 +5,9 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/api/analytics/device_agent_settings_response.h>
+#include <nx/vms/common/api/message_processor_mock.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/common/system_context.h>
-#include <nx/vms/common/test_support/api/message_processor_mock.h>
 
 namespace nx::vms::client::desktop {
 namespace test {

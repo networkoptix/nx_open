@@ -5,9 +5,8 @@
 #include <common/common_globals.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource/user_resource.h> //< Not so good but we can allow it for the test module.
+#include <nx/vms/common/resource/camera_resource_stub.h>
 #include <nx/vms/common/system_context_aware.h>
-
-#include "camera_resource_stub.h"
 
 namespace nx::vms::api { struct UserGroupData; }
 

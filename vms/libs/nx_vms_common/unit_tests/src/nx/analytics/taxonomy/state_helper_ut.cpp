@@ -10,9 +10,9 @@
 #include <nx/analytics/taxonomy/state_helper.h>
 #include <nx/reflect/json/deserializer.h>
 #include <nx/vms/api/analytics/descriptors.h>
+#include <nx/vms/common/resource/camera_resource_stub.h>
 #include <nx/vms/common/test_support/analytics/taxonomy/test_resource_support_proxy.h>
 #include <nx/vms/common/test_support/resource/analytics_engine_resource_mock.h>
-#include <nx/vms/common/test_support/resource/camera_resource_stub.h>
 
 namespace nx::analytics::taxonomy {
 

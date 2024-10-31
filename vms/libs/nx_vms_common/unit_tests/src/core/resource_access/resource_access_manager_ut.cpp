@@ -19,8 +19,8 @@
 #include <nx/reflect/to_string.h>
 #include <nx/utils/qt_helpers.h>
 #include <nx/utils/std/algorithm.h>
+#include <nx/vms/common/resource/camera_resource_stub.h>
 #include <nx/vms/common/system_context.h>
-#include <nx/vms/common/test_support/resource/camera_resource_stub.h>
 #include <nx/vms/common/test_support/test_context.h>
 #include <nx/vms/common/user_management/predefined_user_groups.h>
 #include <nx_ec/data/api_conversion_functions.h>

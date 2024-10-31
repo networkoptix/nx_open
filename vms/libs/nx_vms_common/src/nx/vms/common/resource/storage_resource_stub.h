@@ -7,7 +7,7 @@
 
 namespace nx {
 
-class NX_VMS_COMMON_TEST_SUPPORT_API StorageResourceStub: public QnStorageResource
+class NX_VMS_COMMON_API StorageResourceStub: public QnStorageResource
 {
     using base_type = QnStorageResource;
 public:
