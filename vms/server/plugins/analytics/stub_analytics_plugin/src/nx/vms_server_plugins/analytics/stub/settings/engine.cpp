@@ -64,6 +64,17 @@ static std::string buildCapabilities()
     return ini().deviceDependent ? "deviceDependent" : "";
 }
 
+std::string Engine::manifestWithoutDeviceAgentSettingsModel() const
+{
+    std::string result = /*suppress newline*/ 1 + (const char*) R"json(
+{
+    "capabilities": ")json" + buildCapabilities() + R"json("
+}
+)json";
+
+    return result;
+}
+
 std::string Engine::manifestString() const
 {
     std::string result = /*suppress newline*/ 1 + (const char*) R"json(
@@ -205,6 +216,13 @@ void Engine::doSetSettings(
     const nx::sdk::IStringMap* settings)
 {
     using namespace std::string_literals;
+
+    const char* pushEngineManifest = settings->value(kPushEngineManifest.c_str());
+
+    if (pushEngineManifest && (pushEngineManifest == "true"s))
+        pushManifest(manifestWithoutDeviceAgentSettingsModel());
+    else if (pushEngineManifest && (pushEngineManifest == "false"s))
+        pushManifest(manifestString());
 
     std::unordered_map<std::string, std::string> substitutionMap;
 

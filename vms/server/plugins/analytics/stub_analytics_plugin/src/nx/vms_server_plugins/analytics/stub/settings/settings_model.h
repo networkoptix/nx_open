@@ -79,6 +79,7 @@ static const std::string kParametersModel = /*suppress newline*/ 1 + R"json(
 static const std::string kEngineIntegrationSideSetting = "testIntegrationSideSpinBox";
 static const std::string kEngineIntegrationSideSettingValue = "42";
 static const std::string kShowExtraTextField = "showExtraTextField";
+static const std::string kPushEngineManifest = "pushEnginemManifest";
 static const std::string kExtraTextFieldTemplateVariableName = "@EXTRA_TEXTFIELD_TEMPLATE_VAR@";
 static const std::string kExtraCheckBoxTemplateVariableName = "@EXTRA_CHECKBOX_TEMPLATE_VAR@";
 const std::string kExtraCheckBoxJson = /*suppress newline*/ 1 + R"json(
@@ -251,6 +252,19 @@ static const std::string kEngineSettingsModel = /*suppress newline*/ 1 + R"json(
                     "header": "Header",
                     "description": "Description",
                     "icon": "default"
+                }
+            ]
+        },
+        {
+            "type": "GroupBox",
+            "caption": "Test updating the Engine manifest",
+            "items":
+            [
+                {
+                    "type": "CheckBox",
+                    "name": ")json" + kPushEngineManifest + R"json(",
+                    "caption": "Set the Device Agent settings model to empty",
+                    "defaultValue": false
                 }
             ]
         },

@@ -48,6 +48,8 @@ private:
         std::map<std::string, std::string>* values,
         const std::vector<std::string>& settingIdsToUpdate = {}) const;
 
+    std::string manifestWithoutDeviceAgentSettingsModel() const;
+
 private:
     nx::sdk::analytics::Integration* const m_integration;
     ActiveSettingsBuilder m_activeSettingsBuilder;
