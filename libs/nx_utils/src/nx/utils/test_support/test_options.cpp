@@ -129,6 +129,8 @@ The following command line arguments are supported by this particular unit test 
       info, debug, verbose, trace) possibly followed by a bracketed tag prefix.
   --log-file=[ABSOLUTE_FILE_PATH]
       Redirect logging to the file with the specified absolute path.
+  --timeout=[SECONDS]
+      Crash if the process does not finish within specified timeout.
 )";
 
     #if defined(_WIN32)
