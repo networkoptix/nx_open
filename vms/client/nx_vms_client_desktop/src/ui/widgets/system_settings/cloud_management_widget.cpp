@@ -311,19 +311,49 @@ void QnCloudManagementWidget::onDisconnectSuccess()
 
 bool QnCloudManagementWidget::confirmCloudDisconnect()
 {
+    const auto isSaasInitialized = nx::vms::common::saas::saasInitialized(systemContext());
+    const auto isCloudUser = context()->user()->isCloud();
+
     QnSessionAwareMessageBox messageBox(this);
     messageBox.setIcon(QnMessageBox::Icon::Question);
     messageBox.setText(tr(
         "Disconnect site from %1?",
         "%1 is the cloud name, like Nx Cloud"
-    ).arg(nx::branding::cloudName()));
+        ).arg(nx::branding::cloudName()));
 
-    QString infoText = setWarningStyleHtml(tr(
-        "All %1 users will be deleted from the site.", "%1 is the short cloud name (like Cloud)"
-    ).arg(nx::branding::shortCloudName()));
-    infoText.append("\n");
-    infoText.append(tr("Site will be accessible only through local network."));
-    messageBox.setInformativeText(infoText);
+    QStringList infoTextParagraphs;
+
+    if (isSaasInitialized)
+    {
+        infoTextParagraphs.append(setWarningStyleHtml(
+            tr("Recording will stop and all Service Subscriptions will be removed")));
+    }
+
+    infoTextParagraphs.append(setWarningStyleHtml(
+        tr("All %1 users will be removed from the site",
+            "%1 is the short cloud name (like Cloud)")).arg(nx::branding::shortCloudName()));
+
+    if (isCloudUser)
+    {
+        infoTextParagraphs.append(tr("You will be logged out of the site. "
+            "The site will be accessible only via local network"));
+    }
+    else
+    {
+        infoTextParagraphs.append(tr("The site will be accessible only via local network"));
+    }
+
+    if (isSaasInitialized)
+    {
+        infoTextParagraphs.append(
+            tr("Existing data (site settings and archive) will be preserved"));
+        infoTextParagraphs.append(setWarningStyleHtml(tr("This action cannot be undone")));
+    }
+
+    for (auto& paragraph: infoTextParagraphs)
+        paragraph = nx::vms::common::html::paragraph(paragraph);
+
+    messageBox.setInformativeText(infoTextParagraphs.join(""));
 
     messageBox.addButton(
         tr("Disconnect"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
