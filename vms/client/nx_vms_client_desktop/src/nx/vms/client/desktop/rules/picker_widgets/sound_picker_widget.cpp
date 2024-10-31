@@ -25,6 +25,7 @@ SoundPicker::SoundPicker(
 
     contentLayout->setSpacing(style::Metrics::kDefaultLayoutSpacing.width());
     m_comboBox = new QComboBox;
+    m_comboBox->setSizePolicy(QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred));
     contentLayout->addWidget(m_comboBox);
 
     m_manageButton = new QPushButton;
