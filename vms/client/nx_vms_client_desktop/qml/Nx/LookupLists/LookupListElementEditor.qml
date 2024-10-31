@@ -48,6 +48,8 @@ Control
 
     component ComboBoxBasedEditor: ComboBox
     {
+        maxVisibleItems: 3
+
         function isIndexRelatedToValue(index)
         {
             return index > 0

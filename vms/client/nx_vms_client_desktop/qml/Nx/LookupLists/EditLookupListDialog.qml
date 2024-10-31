@@ -226,6 +226,7 @@ ModalDialog
                 model: createListTypeModel()
                 placeholderText: qsTr("Select type")
                 withIconSection: true
+                maxVisibleItems: 3
 
                 onActivated:
                 {
