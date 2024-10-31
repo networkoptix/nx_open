@@ -122,6 +122,8 @@ private:
     /** Elapsed timer for smooth scroll. */
     QElapsedTimer m_elapsedTimer;
 
+    StatisticsOverlayWidget* m_statisticsOverlayWidget = nullptr;
+
     /** Button bars with corresponding buttons */
     QnImageButtonBar *m_legendButtonBar[ButtonBarCount];
 
