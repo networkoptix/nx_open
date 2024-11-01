@@ -1042,7 +1042,7 @@
     <message numerus="yes">
       <source>Mute Items</source>
       <translation type="unfinished">
-        <numerusform>Mute Items</numerusform>
+        <numerusform>Wycisz elementy</numerusform>
         <numerusform>Mute Items</numerusform>
         <numerusform>Mute Items</numerusform>
         <numerusform>Mute Items</numerusform>
@@ -1051,7 +1051,7 @@
     <message numerus="yes">
       <source>Unmute Items</source>
       <translation type="unfinished">
-        <numerusform>Unmute Items</numerusform>
+        <numerusform>Wyłącz wyciszenie elementów</numerusform>
         <numerusform>Unmute Items</numerusform>
         <numerusform>Unmute Items</numerusform>
         <numerusform>Unmute Items</numerusform>
@@ -5369,11 +5369,11 @@ to %1</source>
     </message>
     <message>
       <source>RESTRICTED</source>
-      <translation type="unfinished">RESTRICTED</translation>
+      <translation>OGRANICZONE</translation>
     </message>
     <message>
       <source>Authorize</source>
-      <translation type="unfinished">Authorize</translation>
+      <translation>Autoryzacja</translation>
     </message>
   </context>
   <context>
@@ -6512,7 +6512,7 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     </message>
     <message>
       <source>Screen is locked and cannot be changed</source>
-      <translation type="unfinished">Screen is locked and cannot be changed</translation>
+      <translation>Ekran jest zablokowany i nie można go zmienić</translation>
     </message>
   </context>
   <context>
