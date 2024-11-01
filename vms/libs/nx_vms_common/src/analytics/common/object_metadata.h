@@ -121,7 +121,7 @@ struct BaseMetadata
     /**%apidoc Unique track Id. */
     nx::Uuid trackId;
 
-    /**%apidoc Bounding box of the object. JSON object containing top-left corner (fields `x`
+    /**%apidoc:object Bounding box of the object. JSON object containing top-left corner (fields `x`
      * and `y`), `width` and `height`. Relative coordinates are in range [0;1].
      */
     QRectF boundingBox;
