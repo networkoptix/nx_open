@@ -18,7 +18,7 @@ ValidationResult StateFieldValidator::validity(
     if (!NX_ASSERT(stateField))
         return {QValidator::State::Invalid, Strings::invalidFieldType()};
 
-    const auto availableStates = utils::getAvailableStates(context->vmsRulesEngine(), rule);
+    const auto availableStates = utils::getPossibleFilterStates(context->vmsRulesEngine(), rule);
     if (!availableStates.contains(stateField->value()))
     {
         return {

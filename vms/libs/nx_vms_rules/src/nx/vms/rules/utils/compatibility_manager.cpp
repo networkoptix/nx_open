@@ -1,26 +1,27 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "rule_compatibility_manager.h"
+#include "compatibility_manager.h"
 
-#include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/rules/action_builder.h>
-#include <nx/vms/rules/action_builder_fields/optional_time_field.h>
-#include <nx/vms/rules/action_builder_fields/target_device_field.h>
-#include <nx/vms/rules/action_builder_fields/target_devices_field.h>
-#include <nx/vms/rules/action_builder_fields/time_field.h>
-#include <nx/vms/rules/actions/bookmark_action.h>
-#include <nx/vms/rules/actions/show_notification_action.h>
-#include <nx/vms/rules/engine.h>
-#include <nx/vms/rules/event_filter.h>
-#include <nx/vms/rules/event_filter_fields/source_camera_field.h>
-#include <nx/vms/rules/event_filter_fields/state_field.h>
-#include <nx/vms/rules/rule.h>
-#include <nx/vms/rules/utils/common.h>
-#include <nx/vms/rules/utils/event.h>
-#include <nx/vms/rules/utils/field.h>
-#include <nx/vms/rules/utils/type.h>
+#include <nx/vms/common/system_context.h>
 
-namespace nx::vms::client::desktop::rules {
+#include "../action_builder.h"
+#include "../action_builder_fields/optional_time_field.h"
+#include "../action_builder_fields/target_device_field.h"
+#include "../action_builder_fields/target_devices_field.h"
+#include "../action_builder_fields/time_field.h"
+#include "../actions/bookmark_action.h"
+#include "../actions/show_notification_action.h"
+#include "../engine.h"
+#include "../event_filter.h"
+#include "../event_filter_fields/source_camera_field.h"
+#include "../event_filter_fields/state_field.h"
+#include "../rule.h"
+#include "common.h"
+#include "event.h"
+#include "field.h"
+#include "type.h"
+
+namespace nx::vms::rules::utils {
 
 namespace {
 
@@ -36,62 +37,63 @@ QString makeCompatibilityAlertMessage(const vms::rules::Rule* rule)
 
 } // namespace
 
-RuleCompatibilityManager::RuleCompatibilityManager(
+CompatibilityManager::CompatibilityManager(
     vms::rules::Rule* rule,
-    SystemContext* context,
+    common::SystemContext* context,
     QObject* parent)
     :
     QObject{parent},
-    SystemContextAware{context},
+    common::SystemContextAware{context},
     m_rule{rule},
-    m_engine{context->vmsRulesEngine()}
+    m_engine{context->vmsRulesEngine()},
+    m_defaultActionType{kDefaultActionType}
 {
     connect(
         m_rule->eventFilters().first(),
         &vms::rules::EventFilter::changed,
         this,
-        &RuleCompatibilityManager::onEventFilterFieldChanged);
+        &CompatibilityManager::onEventFilterFieldChanged);
 
     connect(
         m_rule->actionBuilders().first(),
         &vms::rules::ActionBuilder::changed,
         this,
-        &RuleCompatibilityManager::onActionBuilderFieldChanged);
+        &CompatibilityManager::onActionBuilderFieldChanged);
 }
 
-void RuleCompatibilityManager::changeEventType(const QString& eventType)
+void CompatibilityManager::changeEventType(const QString& eventType)
 {
     if (m_rule->eventFilters().first()->eventType() == eventType)
         return;
 
     auto newEventFilter = m_engine->buildEventFilter(eventType);
 
-    if (!vms::rules::utils::isCompatible(
-        systemContext()->vmsRulesEngine(),
-        newEventFilter.get(),
-        m_rule->actionBuilders().first()))
+    const auto eventDescriptor = m_engine->eventDescriptor(newEventFilter->eventType());
+    const auto actionDescriptor =
+        m_engine->actionDescriptor(m_rule->actionBuilders().first()->actionType());
+    if (!NX_ASSERT(eventDescriptor && actionDescriptor))
+        return;
+
+    // Check the given event/action pair might be adjusted to a valid rule.
+    if (!vms::rules::utils::isCompatible(eventDescriptor.value(), actionDescriptor.value()))
     {
         // When a user is changed event type and the new selected type is not compatible with the
         // current action type, action type must be set to some default compatible type.
-        replaceActionBuilder(m_engine->buildActionBuilder(kDefaultActionType));
+        replaceActionBuilder(m_engine->buildActionBuilder(m_defaultActionType));
     }
 
     replaceEventFilter(std::move(newEventFilter));
 
+    fixDurationValue();
     fixStateValue();
     fixUseSourceValue();
 
-    NX_ASSERT(
-        vms::rules::utils::isCompatible(
-            systemContext()->vmsRulesEngine(),
-            m_rule->eventFilters().first(),
-            m_rule->actionBuilders().first()),
-        makeCompatibilityAlertMessage(m_rule));
+    checkCompatibility();
 
     emit ruleModified();
 }
 
-void RuleCompatibilityManager::changeActionType(const QString& actionType)
+void CompatibilityManager::changeActionType(const QString& actionType)
 {
     if (m_rule->actionBuilders().first()->actionType() == actionType)
         return;
@@ -102,17 +104,17 @@ void RuleCompatibilityManager::changeActionType(const QString& actionType)
     fixStateValue();
     fixUseSourceValue();
 
-    NX_ASSERT(
-        vms::rules::utils::isCompatible(
-            systemContext()->vmsRulesEngine(),
-            m_rule->eventFilters().first(),
-            m_rule->actionBuilders().first()),
-        makeCompatibilityAlertMessage(m_rule));
+    checkCompatibility();
 
     emit ruleModified();
 }
 
-void RuleCompatibilityManager::onEventFilterFieldChanged(const QString& fieldName)
+void CompatibilityManager::setDefaultActionType(const QString& type)
+{
+    m_defaultActionType = type;
+}
+
+void CompatibilityManager::onEventFilterFieldChanged(const QString& fieldName)
 {
     if (fieldName == vms::rules::utils::kEventTypeIdFieldName)
         onAnalyticsEventTypeChanged();
@@ -120,7 +122,7 @@ void RuleCompatibilityManager::onEventFilterFieldChanged(const QString& fieldNam
     emit ruleModified();
 }
 
-void RuleCompatibilityManager::onActionBuilderFieldChanged(const QString& fieldName)
+void CompatibilityManager::onActionBuilderFieldChanged(const QString& fieldName)
 {
     if (fieldName == vms::rules::utils::kDurationFieldName)
         onDurationChanged();
@@ -128,14 +130,37 @@ void RuleCompatibilityManager::onActionBuilderFieldChanged(const QString& fieldN
     emit ruleModified();
 }
 
-void RuleCompatibilityManager::fixStateValue()
+void CompatibilityManager::fixDurationValue()
+{
+    const auto durationField =
+        m_rule->actionBuilders().first()->fieldByName<vms::rules::OptionalTimeField>(vms::rules::utils::kDurationFieldName);
+    if (!durationField)
+        return;
+
+    const auto eventDurationType =
+        vms::rules::getEventDurationType(systemContext()->vmsRulesEngine(), m_rule->eventFilters().first());
+    if (eventDurationType == vms::rules::EventDurationType::instant
+        && durationField->value() == std::chrono::microseconds::zero())
+    {
+        // Zero duration does not have sense for instant only event.
+        const auto durationFieldProperties = durationField->properties();
+        auto newValue = std::max(durationFieldProperties.value, durationFieldProperties.minimumValue);
+        if (newValue == std::chrono::seconds::zero())
+            newValue = std::chrono::seconds{1};
+
+        QSignalBlocker blocker{durationField};
+        durationField->setValue(newValue);
+    }
+}
+
+void CompatibilityManager::fixStateValue()
 {
     const auto eventFilter = m_rule->eventFilters().first();
     const auto stateField = eventFilter->fieldByType<vms::rules::StateField>();
     if (stateField)
     {
         const auto availableStates =
-            vms::rules::utils::getAvailableStates(systemContext()->vmsRulesEngine(), m_rule);
+            vms::rules::utils::getPossibleFilterStates(systemContext()->vmsRulesEngine(), m_rule);
         if (!NX_ASSERT(!availableStates.empty()))
             return;
 
@@ -148,7 +173,7 @@ void RuleCompatibilityManager::fixStateValue()
     }
 }
 
-void RuleCompatibilityManager::fixUseSourceValue()
+void CompatibilityManager::fixUseSourceValue()
 {
     const auto eventFilter = m_rule->eventFilters().first();
     const auto actionBuilder = m_rule->actionBuilders().first();
@@ -179,7 +204,7 @@ void RuleCompatibilityManager::fixUseSourceValue()
     }
 }
 
-void RuleCompatibilityManager::onDurationChanged()
+void CompatibilityManager::onDurationChanged()
 {
     // During the rule editing by the user, some values might becomes inconsistent. The code below
     // is fixing such a values.
@@ -192,21 +217,7 @@ void RuleCompatibilityManager::onDurationChanged()
     if (!NX_ASSERT(durationField))
         return;
 
-    const auto eventDurationType =
-        vms::rules::getEventDurationType(systemContext()->vmsRulesEngine(), eventFilter);
-    if (eventDurationType == vms::rules::EventDurationType::instant
-        && durationField->value() == std::chrono::microseconds::zero())
-    {
-        // Zero duration does not have sense for instant only event.
-        const auto durationFieldProperties = durationField->properties();
-        auto newValue = std::max(durationFieldProperties.value, durationFieldProperties.minimumValue);
-        if (newValue == std::chrono::seconds::zero())
-            newValue = std::chrono::seconds{1};
-
-        QSignalBlocker blocker{durationField};
-        durationField->setValue(newValue);
-    }
-
+    fixDurationValue();
     fixStateValue();
 
     // When action has non zero duration, pre and post recording (except bookmark action
@@ -229,17 +240,23 @@ void RuleCompatibilityManager::onDurationChanged()
         fixTimeField(vms::rules::utils::kRecordBeforeFieldName);
 
     fixTimeField(vms::rules::utils::kRecordAfterFieldName);
+
+    checkCompatibility();
 }
 
-void RuleCompatibilityManager::onAnalyticsEventTypeChanged()
+void CompatibilityManager::onAnalyticsEventTypeChanged()
 {
     // When analytics type is changed event duration might be changed. It is required to check
     // rule compatibility here.
 
-    if (!vms::rules::utils::isCompatible(
-        systemContext()->vmsRulesEngine(),
-        m_rule->eventFilters().first(),
-        m_rule->actionBuilders().first()))
+    const auto eventDescriptor = m_engine->eventDescriptor(
+        m_rule->eventFilters().first()->eventType());
+    const auto actionDescriptor =
+        m_engine->actionDescriptor(m_rule->actionBuilders().first()->actionType());
+    if (!NX_ASSERT(eventDescriptor && actionDescriptor))
+        return;
+
+    if (!vms::rules::utils::isCompatible(eventDescriptor.value(), actionDescriptor.value()))
     {
         auto newActionBuilder =
             m_engine->buildActionBuilder(kDefaultActionType);
@@ -251,13 +268,17 @@ void RuleCompatibilityManager::onAnalyticsEventTypeChanged()
             m_rule->actionBuilders().first(),
             &vms::rules::ActionBuilder::changed,
             this,
-            &RuleCompatibilityManager::onActionBuilderFieldChanged);
+            &CompatibilityManager::onActionBuilderFieldChanged);
     }
 
+    fixDurationValue();
     fixStateValue();
+    fixUseSourceValue();
+
+    checkCompatibility();
 }
 
-void RuleCompatibilityManager::replaceEventFilter(
+void CompatibilityManager::replaceEventFilter(
     std::unique_ptr<vms::rules::EventFilter>&& eventFilter)
 {
     auto oldEventFilter = m_rule->takeEventFilter(0);
@@ -278,14 +299,13 @@ void RuleCompatibilityManager::replaceEventFilter(
         m_rule->eventFilters().first(),
         &vms::rules::EventFilter::changed,
         this,
-        &RuleCompatibilityManager::onEventFilterFieldChanged);
+        &CompatibilityManager::onEventFilterFieldChanged);
 }
 
-void RuleCompatibilityManager::replaceActionBuilder(
+void CompatibilityManager::replaceActionBuilder(
     std::unique_ptr<vms::rules::ActionBuilder>&& actionBuilder)
 {
     auto oldActionBuilder = m_rule->takeActionBuilder(0);
-
     if (auto targetDeviceField = oldActionBuilder->fieldByType<vms::rules::TargetDeviceField>())
         m_lastActionCamerasSelection = {targetDeviceField->id()};
     else if (auto targetDevicesField = oldActionBuilder->fieldByType<vms::rules::TargetDevicesField>())
@@ -311,7 +331,18 @@ void RuleCompatibilityManager::replaceActionBuilder(
         m_rule->actionBuilders().first(),
         &vms::rules::ActionBuilder::changed,
         this,
-        &RuleCompatibilityManager::onActionBuilderFieldChanged);
+        &CompatibilityManager::onActionBuilderFieldChanged);
 }
 
-} // namespace nx::vms::client::desktop::rules
+void CompatibilityManager::checkCompatibility()
+{
+    // Rule with the adjusted parameters must be valid.
+    NX_ASSERT(
+        vms::rules::utils::isCompatible(
+            systemContext()->vmsRulesEngine(),
+            m_rule->eventFilters().first(),
+            m_rule->actionBuilders().first()),
+        makeCompatibilityAlertMessage(m_rule));
+}
+
+} // namespace nx::vms::rules::utils

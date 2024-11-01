@@ -9,10 +9,9 @@
 #include <nx/vms/client/desktop/system_context_aware.h>
 #include <nx/vms/rules/field_validator.h>
 #include <nx/vms/rules/rule.h>
+#include <nx/vms/rules/utils/compatibility_manager.h>
 #include <nx/vms/rules/utils/event.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
-
-#include "helpers/rule_compatibility_manager.h"
 
 class QLabel;
 class QScrollArea;
@@ -60,7 +59,7 @@ private:
 
     std::shared_ptr<vms::rules::Rule> m_rule;
     vms::rules::EventDurationType m_eventDurationType{};
-    std::unique_ptr<RuleCompatibilityManager> m_ruleCompatibilityManager;
+    std::unique_ptr<vms::rules::utils::CompatibilityManager> m_compatibilityManager;
     bool m_isNewRule{false};
 
     nx::utils::ScopedConnections m_scopedConnections;

@@ -80,7 +80,18 @@ bool needAcknowledge(const ActionPtr& action)
     return action->property(utils::kAcknowledgeFieldName).toBool();
 }
 
-QSet<State> getAvailableStates(
+QSet<State> getPossibleFilterStatesForActionDescriptor(
+    const vms::rules::ItemDescriptor& actionDescriptor)
+{
+    if (actionDescriptor.flags.testFlag(ItemFlag::instant))
+        return {State::instant, State::started, State::stopped};
+
+    return utils::fieldByName(utils::kDurationFieldName, actionDescriptor)
+        ? QSet<State>{State::instant, State::started, State::stopped}
+        : QSet<State>{State::none};
+}
+
+QSet<State> getPossibleFilterStatesForActionBuilder(
     const Engine* engine, const ActionBuilder* actionBuilder)
 {
     if (isProlonged(engine, actionBuilder))

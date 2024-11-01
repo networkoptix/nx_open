@@ -2,20 +2,29 @@
 
 #pragma once
 
-#include <nx/vms/client/desktop/system_context_aware.h>
-#include <nx/vms/rules/rules_fwd.h>
+#include <QtCore/QObject>
+#include <QtCore/QSet>
 
-namespace nx::vms::client::desktop::rules {
+#include <nx/utils/uuid.h>
+#include <nx/vms/common/system_context_aware.h>
 
-class RuleCompatibilityManager : public QObject, public SystemContextAware
+#include "../rules_fwd.h"
+
+namespace nx::vms::rules::utils {
+
+class NX_VMS_RULES_API CompatibilityManager : public QObject, public common::SystemContextAware
 {
     Q_OBJECT
 
 public:
-    RuleCompatibilityManager(vms::rules::Rule* rule, SystemContext* context, QObject* parent = nullptr);
+    CompatibilityManager(
+        vms::rules::Rule* rule, common::SystemContext* context, QObject* parent = nullptr);
 
     void changeEventType(const QString& eventType);
     void changeActionType(const QString& actionType);
+
+    // This method is introduced for test purposes only.
+    void setDefaultActionType(const QString& type);
 
 signals:
     // Emits when an event or action type or any field is changed.
@@ -28,9 +37,12 @@ private:
     std::optional<UuidSet> m_lastEventCamerasSelection;
     std::optional<UuidSet> m_lastActionCamerasSelection;
 
+    QString m_defaultActionType;
+
     void onEventFilterFieldChanged(const QString& fieldName);
     void onActionBuilderFieldChanged(const QString& fieldName);
 
+    void fixDurationValue();
     void fixStateValue();
     void fixUseSourceValue();
 
@@ -39,6 +51,7 @@ private:
 
     void replaceEventFilter(std::unique_ptr<vms::rules::EventFilter>&& eventFilter);
     void replaceActionBuilder(std::unique_ptr<vms::rules::ActionBuilder>&& actionBuilder);
+    void checkCompatibility();
 };
 
-} // namespace nx::vms::client::desktop::rules
+} // namespace nx::vms::rules::utils

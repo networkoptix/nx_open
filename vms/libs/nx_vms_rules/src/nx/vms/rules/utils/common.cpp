@@ -60,20 +60,32 @@ bool isLoggingAllowed(const Engine* engine, nx::Uuid ruleId)
 }
 
 bool isCompatible(
+    const ItemDescriptor& eventDescriptor,
+    const ItemDescriptor& actionDescriptor)
+{
+    const auto availableStates =
+        getPossibleFilterStatesForEventDescriptor(eventDescriptor)
+            & getPossibleFilterStatesForActionDescriptor(actionDescriptor);
+
+    return !availableStates.empty();
+}
+
+bool isCompatible(
     const Engine* engine,
     const EventFilter* eventFilter,
     const ActionBuilder* actionBuilder)
 {
     const auto availableStates =
-        getAvailableStates(engine, eventFilter) & getAvailableStates(engine, actionBuilder);
+        getPossibleFilterStatesForEventFilter(engine, eventFilter)
+            & getPossibleFilterStatesForActionBuilder(engine, actionBuilder);
 
     return !availableStates.empty();
 }
 
-QList<State> getAvailableStates(const Engine* engine, const Rule* rule)
+QList<State> getPossibleFilterStates(const Engine* engine, const Rule* rule)
 {
-    auto result = (getAvailableStates(engine, rule->eventFilters().first())
-        & getAvailableStates(engine, rule->actionBuilders().first())).values();
+    auto result = (getPossibleFilterStatesForEventFilter(engine, rule->eventFilters().first())
+        & getPossibleFilterStatesForActionBuilder(engine, rule->actionBuilders().first())).values();
 
     std::sort(result.begin(), result.end());
 

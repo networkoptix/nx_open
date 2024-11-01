@@ -40,7 +40,6 @@
 #include "dialog_details/action_type_picker_widget.h"
 #include "dialog_details/event_type_picker_widget.h"
 #include "dialog_details/styled_frame.h"
-#include "helpers/rule_compatibility_manager.h"
 #include "params_widgets/action_parameters_widget.h"
 #include "params_widgets/event_parameters_widget.h"
 #include "utils/confirmation_dialogs.h"
@@ -163,7 +162,7 @@ EditVmsRuleDialog::EditVmsRuleDialog(QWidget* parent):
             this,
             [this](const QString& eventType)
             {
-                m_ruleCompatibilityManager->changeEventType(eventType);
+                m_compatibilityManager->changeEventType(eventType);
             });
         eventFrameLayout->addWidget(m_eventTypePicker);
 
@@ -208,7 +207,7 @@ EditVmsRuleDialog::EditVmsRuleDialog(QWidget* parent):
             this,
             [this](const QString& actionType)
             {
-                m_ruleCompatibilityManager->changeActionType(actionType);
+                m_compatibilityManager->changeActionType(actionType);
             });
         actionFrameLayout->addWidget(m_actionTypePicker);
 
@@ -299,12 +298,12 @@ void EditVmsRuleDialog::setRule(std::shared_ptr<vms::rules::Rule> rule, bool isN
     m_rule = std::move(rule);
     m_eventDurationType =
         vms::rules::getEventDurationType(engine, m_rule->eventFilters().first());
-    m_ruleCompatibilityManager =
-        std::make_unique<RuleCompatibilityManager>(m_rule.get(), systemContext());
+    m_compatibilityManager =
+        std::make_unique<vms::rules::utils::CompatibilityManager>(m_rule.get(), systemContext());
 
     connect(
-        m_ruleCompatibilityManager.get(),
-        &RuleCompatibilityManager::ruleModified,
+        m_compatibilityManager.get(),
+        &vms::rules::utils::CompatibilityManager::ruleModified,
         this,
         [this]
         {
