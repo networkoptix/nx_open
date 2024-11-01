@@ -31,8 +31,12 @@ NX_VMS_RULES_API bool hasTargetServer(const vms::rules::ItemDescriptor& actionDe
 
 NX_VMS_RULES_API bool needAcknowledge(const ActionPtr& action);
 
-/** Returns available states that can be used with the given action builder. */
-NX_VMS_RULES_API QSet<State> getAvailableStates(
+/** Returns possible states that might be used in event filter. */
+NX_VMS_RULES_API QSet<State> getPossibleFilterStatesForActionDescriptor(
+    const vms::rules::ItemDescriptor& actionDescriptor);
+
+/** Returns possible states that might be used with the given action builder. */
+NX_VMS_RULES_API QSet<State> getPossibleFilterStatesForActionBuilder(
     const Engine* engine, const ActionBuilder* actionBuilder);
 
 } // namespace nx::vms::rules

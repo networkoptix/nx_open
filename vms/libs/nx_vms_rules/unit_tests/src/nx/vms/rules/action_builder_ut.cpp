@@ -56,10 +56,7 @@ public:
     ActionBuilderTest():
         TestPlugin(engine.get())
     {
-        Plugin::registerActionField<TargetUsersField>(m_engine, systemContext());
-
         registerAction<TestActionWithTargetUsers>();
-        registerAction<TestActionWithPermissions>();
         registerAction<TestActionForUserAndServer>();
         registerAction<TestActionForServerWithTargetUser>();
 

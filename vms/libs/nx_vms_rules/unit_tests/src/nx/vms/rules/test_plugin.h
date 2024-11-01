@@ -31,6 +31,7 @@ public:
         registerActionField<TestActionField>();
         registerActionField<TargetDevicesField>();
         registerActionField<OptionalTimeField>();
+        registerActionField<TargetUsersField>(m_engine->systemContext());
     }
 
     virtual void registerEvents() const override
@@ -46,6 +47,7 @@ public:
         registerAction<TestProlongedAction>();
         registerAction<TestProlongedOnlyAction>();
         registerAction<TestActionWithInterval>();
+        registerAction<TestActionWithPermissions>();
     }
 };
 

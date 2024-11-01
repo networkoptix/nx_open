@@ -37,9 +37,15 @@ enum class EventDurationType
 };
 
 NX_VMS_RULES_API EventDurationType getEventDurationType(
+    const vms::rules::ItemDescriptor& eventDescriptor);
+
+NX_VMS_RULES_API EventDurationType getEventDurationType(
     const Engine* engine, const EventFilter* eventFilter);
 
-NX_VMS_RULES_API QSet<State> getAvailableStates(
+NX_VMS_RULES_API QSet<State> getPossibleFilterStatesForEventDescriptor(
+    const vms::rules::ItemDescriptor& eventDescriptor);
+
+NX_VMS_RULES_API QSet<State> getPossibleFilterStatesForEventFilter(
     const Engine* engine, const EventFilter* eventFilter);
 
 } // namespace nx::vms::rules

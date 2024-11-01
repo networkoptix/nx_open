@@ -44,6 +44,14 @@ NX_VMS_RULES_API std::optional<FieldDescriptor> fieldByName(
 NX_VMS_RULES_API bool isLoggingAllowed(const Engine* engine, nx::Uuid ruleId);
 
 /**
+ * Returns whether whether an event with the given descriptor is compatible with an action
+ * with the given descriptor.
+ */
+NX_VMS_RULES_API bool isCompatible(
+    const ItemDescriptor& eventDescriptor,
+    const ItemDescriptor& actionDescriptor);
+
+/**
  * Return whether the given event filter is compatible with the given action builder.
  * The function checks whether selected event and action types are compatible and whether event
  * state in the event filter is compatible for the given event type and for the given action builder.
@@ -58,6 +66,6 @@ NX_VMS_RULES_API bool isCompatible(
  * rule. These states are the intersection of the states available for the event filter and action
  * builder in the given rule.
  */
-NX_VMS_RULES_API QList<State> getAvailableStates(const Engine* engine, const Rule* rule);
+NX_VMS_RULES_API QList<State> getPossibleFilterStates(const Engine* engine, const Rule* rule);
 
 } // namespace nx::vms::rules::utils

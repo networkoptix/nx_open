@@ -40,6 +40,26 @@ EventDurationType eventGroupDuration(
     return EventDurationType::prolonged;
 }
 
+QSet<State> getPossibleFilterStates(EventDurationType eventDurationType)
+{
+    switch (eventDurationType)
+    {
+        case EventDurationType::instant:
+            return {State::instant};
+        case EventDurationType::prolonged:
+            return {State::none, State::started, State::stopped};
+        case EventDurationType::mixed:
+            return {
+                State::none,
+                State::started,
+                State::stopped,
+                State::instant};
+        default:
+            NX_ASSERT(false, "Unexpected event duration");
+            return {};
+    }
+}
+
 } // namespace
 
 bool hasSourceCamera(const vms::rules::ItemDescriptor& eventDescriptor)
@@ -81,6 +101,24 @@ nx::Uuid sourceId(const BasicEvent* event)
     return {};
 }
 
+EventDurationType getEventDurationType(const vms::rules::ItemDescriptor& eventDescriptor)
+{
+    const auto isInstant = eventDescriptor.flags.testFlag(ItemFlag::instant);
+    const auto isProlonged = eventDescriptor.flags.testFlag(ItemFlag::prolonged);
+
+    if (isInstant && isProlonged)
+        return EventDurationType::mixed;
+
+    if (isInstant)
+        return EventDurationType::instant;
+
+    if (isProlonged)
+        return EventDurationType::prolonged;
+
+    NX_ASSERT(false, "Event duration is not provided");
+    return {};
+}
+
 EventDurationType getEventDurationType(
     const Engine* engine, const EventFilter* eventFilter)
 {
@@ -88,27 +126,7 @@ EventDurationType getEventDurationType(
     if (!NX_ASSERT(descriptor))
         return {};
 
-    const auto isInstant = descriptor->flags.testFlag(ItemFlag::instant);
-    const auto isProlonged = descriptor->flags.testFlag(ItemFlag::prolonged);
-
-    EventDurationType result{};
-    if (isInstant && isProlonged)
-    {
-        result = EventDurationType::mixed;
-    }
-    else if (isInstant)
-    {
-        result = EventDurationType::instant;
-    }
-    else if (isProlonged)
-    {
-        result = EventDurationType::prolonged;
-    }
-    else
-    {
-        NX_ASSERT(false, "Event duration is not provided");
-        return {};
-    }
+    auto result = getEventDurationType(descriptor.value());
 
     if (const auto analyticsEventTypeField =
         eventFilter->fieldByName<AnalyticsEventTypeField>(utils::kEventTypeIdFieldName))
@@ -136,25 +154,16 @@ EventDurationType getEventDurationType(
     return result;
 }
 
-QSet<State> getAvailableStates(
+QSet<State> getPossibleFilterStatesForEventDescriptor(
+    const vms::rules::ItemDescriptor& eventDescriptor)
+{
+    return getPossibleFilterStates(getEventDurationType(eventDescriptor));
+}
+
+QSet<State> getPossibleFilterStatesForEventFilter(
     const Engine* engine, const EventFilter* eventFilter)
 {
-    switch (getEventDurationType(engine, eventFilter))
-    {
-        case EventDurationType::instant:
-            return {State::instant};
-        case EventDurationType::prolonged:
-            return {State::none, State::started, State::stopped};
-        case EventDurationType::mixed:
-            return {
-                State::none,
-                State::started,
-                State::stopped,
-                State::instant};
-        default:
-            NX_ASSERT(false, "Unexpected event duration");
-            return {};
-    }
+    return getPossibleFilterStates(getEventDurationType(engine, eventFilter));
 }
 
 } // namespace nx::vms::rules
