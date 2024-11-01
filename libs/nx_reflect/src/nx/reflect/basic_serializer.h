@@ -160,10 +160,9 @@ template<
 void serialize(
     SerializationContext* ctx,
     const Container& data,
-    std::enable_if_t<!useStringConversionForSerialization((const Container*) nullptr)
-        && (IsSequenceContainerV<Container>
-            || IsSetContainerV<Container>
-            || IsUnorderedSetContainerV<Container>)
+    std::enable_if_t<IsSequenceContainerV<Container>
+        || IsSetContainerV<Container>
+        || IsUnorderedSetContainerV<Container>
     >* = nullptr)
 {
     ctx->composer.startArray();
@@ -204,8 +203,7 @@ void serialize(
 template<typename SerializationContext, typename Value>
 void serialize(
     SerializationContext* ctx, const Value& val,
-    std::enable_if_t<useStringConversionForSerialization((const Value*) nullptr)
-        || (!IsInstrumentedV<Value> && !IsContainerV<Value>)>* = nullptr)
+    std::enable_if_t<!IsInstrumentedV<Value> && !IsContainerV<Value>>* = nullptr)
 {
     if constexpr (std::is_same_v<Value, bool>)
     {
@@ -219,9 +217,7 @@ void serialize(
     {
         ctx->composer.writeValue(val);
     }
-    else if constexpr (IsStringAlikeV<Value>
-        || useStringConversionForSerialization((const Value*) nullptr)
-        || nx::reflect::IsInstrumentedEnumV<Value>)
+    else if constexpr (IsStringAlikeV<Value> || nx::reflect::IsInstrumentedEnumV<Value>)
     {
         ctx->composer.writeValue(nx::reflect::toString(val));
     }

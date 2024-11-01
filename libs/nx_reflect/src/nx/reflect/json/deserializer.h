@@ -157,10 +157,9 @@ template<typename C>
 DeserializationResult deserialize(
     const DeserializationContext& ctx,
     C* data,
-    std::enable_if_t<!useStringConversionForSerialization((const C*) nullptr)
-        && (IsSequenceContainerV<C>
-            || IsSetContainerV<C>
-            || IsUnorderedSetContainerV<C>)
+    std::enable_if_t<IsSequenceContainerV<C>
+        || IsSetContainerV<C>
+        || IsUnorderedSetContainerV<C>
     >* = nullptr)
 {
     *data = C();
@@ -382,9 +381,7 @@ DeserializationResult deserializeValue(const DeserializationContext& ctx, T* dat
         // ADL call.
         return deserialize(ctx, data);
     }
-    else if constexpr (
-        std::is_object_v<T> &&
-        useStringConversionForSerialization((const T*) nullptr))
+    else if constexpr (useStringConversionForSerialization((const T*) nullptr))
     {
         *data = T();
         if (!ctx.value.IsString())

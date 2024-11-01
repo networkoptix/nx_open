@@ -28,6 +28,7 @@ inline constexpr bool HasTrimmedV = HasTrimmed<Args...>::value;
 
 template<typename T>
 inline constexpr bool IsStringAlikeV = detail::HasTrimmedV<T>
+    || useStringConversionForSerialization((const T*) nullptr)
     || std::is_convertible_v<T, std::string>
     || std::is_convertible_v<T, std::string_view>;
 

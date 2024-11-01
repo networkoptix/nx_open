@@ -374,8 +374,7 @@ std::tuple<T, DeserializationResult> tryDeserialize(const std::string_view& str)
     {
         return deserialize<T>(str);
     }
-    else if constexpr (IsStringAlikeV<T>
-        || useStringConversionForSerialization((const T*) nullptr))
+    else if constexpr (IsStringAlikeV<T>)
     {
         bool ok = false;
         auto val = nx::reflect::fromString<T>(str, &ok);
