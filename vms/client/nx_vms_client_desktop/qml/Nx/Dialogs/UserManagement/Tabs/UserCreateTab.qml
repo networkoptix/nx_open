@@ -397,7 +397,6 @@ Item
                 {
                     id: languageComboBox
 
-                    // FIXME: System or local admin default locale.
                     width: parent.width
                 }
             }

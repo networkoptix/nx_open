@@ -133,6 +133,7 @@ public:
     Property<QString> lastImportDir{this, "lastImportDir"};
     Property<QString> lastRecordingDir{this, "lastRecordingDir"};
     Property<SharedScreenshotParameters> lastScreenshotParams{this, "lastScreenshotParams"};
+    Property<QString> lastCreatedUserLocale{this, "lastCreatedUserLocale"};
 
     Property<QString> backgroundsFolder{this, "backgroundsFolder", {},
         "Last used path for the layout backgrounds."};

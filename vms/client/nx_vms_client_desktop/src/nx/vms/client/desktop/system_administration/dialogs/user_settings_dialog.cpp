@@ -1097,6 +1097,10 @@ UserSettingsDialogState UserSettingsDialog::createState(const QnUserResourcePtr&
             if (isConnectedToCloud())
                 state.userType = UserSettingsGlobal::CloudUser;
 
+            state.locale = appContext()->localSettings()->lastCreatedUserLocale();
+            if (state.locale.isEmpty())
+                state.locale = system()->globalSettings()->defaultUserLocale();
+
             d->expiresAfterLoginS = kDefaultTempUserExpiresAfterLoginS;
             d->linkValidUntil = newValidUntilDate();
         }
@@ -1218,6 +1222,9 @@ void UserSettingsDialog::saveState(const UserSettingsDialogState& state)
                 ? d->expiresAfterLoginS
                 : -1);
     }
+
+    if (d->dialogType == CreateUser)
+        appContext()->localSettings()->lastCreatedUserLocale = state.locale;
 
     // When user changes his own password or digest support, current session credentials should be
     // updated correspondingly. Store actual password to update it in callback.
