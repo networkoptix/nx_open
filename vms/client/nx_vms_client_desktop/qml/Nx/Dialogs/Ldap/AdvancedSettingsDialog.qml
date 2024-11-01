@@ -178,14 +178,24 @@ Dialog
             leftSideMargin: 180
             rightSideMargin: 0
 
-            CheckBox
+            RowLayout
             {
-                id: digestCheckBox
-                x: -3
-                y: 6
-                width: parent.width - x
-                text: qsTr("Allow insecure (digest) authentication for imported users")
-                wrapMode: Text.WordWrap
+                width: parent.width
+
+                CheckBox
+                {
+                    id: digestCheckBox
+
+                    text: qsTr("Allow insecure (digest) authentication for imported users")
+                    wrapMode: Text.WordWrap
+                    Layout.fillWidth: true
+                }
+
+                Item
+                {
+                    implicitWidth: loginAttributeTextField.checkBoxWidth
+                    implicitHeight: digestCheckBox.height
+                }
             }
         }
 
