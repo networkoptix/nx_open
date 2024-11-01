@@ -76,15 +76,10 @@
     withCompletionHandler: (void (^)()) completionHandler
 {
     const auto content = response.notification.request.content;
-    const auto app = [UIApplication sharedApplication];
     const auto url = [content.userInfo objectForKey: @"url"];
-    if (!url)
-        return;
+    if (url && [url length])
+        QDesktopServices::openUrl(QUrl::fromNSURL([NSURL URLWithString:url]));
 
-    if (![url length])
-        return;
-
-    [app openURL: [NSURL URLWithString: url] options:@{} completionHandler: nil];
     completionHandler();
 }
 
