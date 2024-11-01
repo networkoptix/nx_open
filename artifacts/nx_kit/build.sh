@@ -13,7 +13,7 @@ fi
 
 # Make the build dir at the same level as the parent dir of this script, suffixed with "-build".
 declare BASE_DIR="$(readlink -f "$(dirname "$0")")" #< Absolute path to this script's dir.
-declare -r BUILD_DIR="${BASE_DIR}-build"
+declare BUILD_DIR="${BASE_DIR}-build"
 
 declare NO_TESTS=0
 if [[ $# > 0 && $1 == "--no-tests" ]]; then
@@ -36,6 +36,7 @@ case "$(uname -s)" in #< Check if running in Windows from Cygwin/MinGW.
         # specify the compiler explicitly to avoid clashes with gcc.
         GEN_OPTIONS+=( -GNinja -DCMAKE_CXX_COMPILER=cl.exe -DCMAKE_C_COMPILER=cl.exe )
         BASE_DIR=$(cygpath -w "${BASE_DIR}") #< Windows-native CMake requires Windows path.
+        BUILD_DIR=$(cygpath -w "${BUILD_DIR}") #< Windows-native CMake requires Windows path.
         LIBRARY_NAME="nx_kit.dll"
         ;;
     *)
@@ -72,7 +73,7 @@ echo ""
 if (( ${NO_TESTS} == 1 )); then
     echo "NOTE: Unit tests were not run."
 else
-    cd "${BUILD_DIR}/unit_tests"
+    cd "${BUILD_DIR}"
     PATH="${BUILD_DIR}:${PATH}"
     (set -x #< Log each command.
         ctest --output-on-failure -C "${BUILD_TYPE}"
