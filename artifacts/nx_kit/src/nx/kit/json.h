@@ -17,6 +17,10 @@
 #include <memory>
 #include <initializer_list>
 
+#if !defined(NX_KIT_API)
+    #define NX_KIT_API
+#endif
+
 //-------------------------------------------------------------------------------------------------
 // Make the Json11 classes exported from nx_kit dynamic lib.
 
