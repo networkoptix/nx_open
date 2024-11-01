@@ -44,7 +44,7 @@ NX_KIT_API std::string srcFileBaseNameWithoutExt(const std::string& file);
 /** Define if needed to redirect NX_PRINT... to qDebug(). */
 #if defined(NX_PRINT_TO_QDEBUG)
     #define NX_DEBUG_STREAM qDebug().nospace().noquote()
-    #define NX_DEBUG_ENDL /*empty*/
+    #define NX_DEBUG_ENDL ""
     static inline QDebug operator<<(QDebug d, const std::string& s)
     {
         return d << QString::fromStdString(s);
@@ -72,8 +72,8 @@ NX_KIT_API std::string srcFileBaseNameWithoutExt(const std::string& file);
 #endif
 
 #if !defined(NX_DEBUG_ENDL)
-    /** Redefine if needed; used after NX_DEBUG_STREAM by other macros. */
-    #define NX_DEBUG_ENDL << std::endl
+    /** Redefine if needed; used by other macros to finish a line in NX_DEBUG_STREAM. */
+    #define NX_DEBUG_ENDL "\n"
 #endif
 
 /**
@@ -87,11 +87,8 @@ NX_KIT_API std::ostream*& stream();
      * Print the args to NX_DEBUG_STREAM, starting with NX_PRINT_PREFIX and ending with
      * NX_DEBUG_ENDL. Redefine if needed.
      */
-    #define NX_PRINT /* << args... */ \
-        /* Allocate a temp value, which prints endl in its destructor, in the "<<" expression. */ \
-        ( []() { struct Endl { ~Endl() { NX_DEBUG_STREAM NX_DEBUG_ENDL; } }; \
-            return std::make_shared<Endl>(); }() ) /*operator,*/, \
-        NX_DEBUG_STREAM << NX_PRINT_PREFIX
+     #define NX_PRINT /* << args... */ \
+         nx::kit::debug::detail::Print(&(NX_DEBUG_STREAM), NX_DEBUG_ENDL) << NX_PRINT_PREFIX
 #endif
 
 /**
@@ -244,6 +241,26 @@ NX_KIT_API std::string hexDumpLine(const char* bytes, int size, int bytesPerLine
 // Implementation
 
 namespace detail {
+
+/** Accumulates the whole string and outputs it atomically in the destructor. */
+class Print: public std::ostringstream
+{
+public:
+    Print(std::ostream* outputStream, const char* const newline):
+        m_outputStream(outputStream), m_newline(newline)
+    {
+    }
+
+    ~Print()
+    {
+        (*this) << m_newline;
+        *m_outputStream << (*this).str(); //< Perform the actual output.
+    }
+    
+private:
+    std::ostream* m_outputStream;
+    const char* const m_newline;
+};
 
 typedef std::function<void(const char*)> PrintFunc;
 

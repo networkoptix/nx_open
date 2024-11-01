@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cstring>
+#include <iomanip>
 
 #include <nx/kit/test.h>
 #include <nx/kit/debug.h>
@@ -13,6 +14,13 @@ namespace nx {
 namespace kit {
 namespace debug {
 namespace test {
+
+TEST(debug, print)
+{
+    NX_PRINT << "Printing an std::endl at the end." << std::endl;
+    const std::string s = "Printing an std::string.";
+    NX_PRINT << s;
+}
 
 TEST(debug, enabledOutput)
 {
