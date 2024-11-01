@@ -962,7 +962,7 @@
     </message>
     <message>
       <source>No connection</source>
-      <translation type="unfinished">No connection</translation>
+      <translation>Sin conexión</translation>
     </message>
   </context>
   <context>

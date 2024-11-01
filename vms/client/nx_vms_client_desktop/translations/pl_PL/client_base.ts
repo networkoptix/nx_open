@@ -5204,11 +5204,11 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>RESTRICTED</source>
-      <translation type="unfinished">RESTRICTED</translation>
+      <translation>OGRANICZONE</translation>
     </message>
     <message>
       <source>Authorize</source>
-      <translation type="unfinished">Authorize</translation>
+      <translation>Autoryzacja</translation>
     </message>
   </context>
   <context>
@@ -5354,11 +5354,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>If cloud storage is activated for backup, other backup storages will be deactivated and the &quot;All archive&quot; option for already configured devices will be changed to &quot;Motion, Object, Bookmarks&quot;</source>
-      <translation type="unfinished">If cloud storage is activated for backup, other backup storages will be deactivated and the &quot;All archive&quot; option for already configured devices will be changed to &quot;Motion, Object, Bookmarks&quot;</translation>
+      <translation>Jeśli w celu utworzenia kopii zapasowej aktywowano przechowywanie w chmurze, inne miejsca przechowywania kopii zapasowych zostaną wyłączone, a opcja &quot;Wszystkie archiwa&quot; dla już skonfigurowanych urządzeń zostanie zmieniona na &quot;Ruch, Obiekt, Zakładki&quot;</translation>
     </message>
     <message>
       <source>If cloud storage is activated for backup, the &quot;All archive&quot; option for already configured devices will be changed to &quot;Motion, Object, Bookmarks&quot;</source>
-      <translation type="unfinished">If cloud storage is activated for backup, the &quot;All archive&quot; option for already configured devices will be changed to &quot;Motion, Object, Bookmarks&quot;</translation>
+      <translation>Jeśli w celu utworzenia kopii zapasowej aktywowano przechowywanie w chmurze, opcja &quot;Wszystkie archiwa&quot; dla już skonfigurowanych urządzeń zostanie zmieniona na &quot;Ruch, Obiekt, Zakładki&quot;</translation>
     </message>
   </context>
   <context>
@@ -5457,7 +5457,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Path</source>
-      <translation type="unfinished">Path</translation>
+      <translation>Ścieżka</translation>
     </message>
     <message>
       <source>Type</source>
@@ -5465,7 +5465,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Purpose</source>
-      <translation type="unfinished">Purpose</translation>
+      <translation>Cel</translation>
     </message>
     <message>
       <source>Size</source>
@@ -5582,7 +5582,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Failed to save system settings</source>
-      <translation type="unfinished">Failed to save system settings</translation>
+      <translation>Nie udało się zapisać ustawień systemowych</translation>
     </message>
   </context>
   <context>
@@ -5747,11 +5747,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Intercom call</source>
-      <translation type="unfinished">Intercom call</translation>
+      <translation>Połączenie interkomowe</translation>
     </message>
     <message>
       <source>Intercom missed call</source>
-      <translation type="unfinished">Intercom missed call</translation>
+      <translation>Nieodebrane połączenie przez interkom</translation>
     </message>
   </context>
   <context>
@@ -6155,8 +6155,8 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Failed to open %n devices on the video wall:</source>
       <translation type="unfinished">
-        <numerusform>Failed to open %n devices on the video wall:</numerusform>
-        <numerusform>Failed to open %n devices on the video wall:</numerusform>
+        <numerusform>Nie udało się otworzyć %n urządzeń na ścianie wideo:</numerusform>
+        <numerusform>Nie udało się otworzyć %n urządzeń na ścianie wideo:</numerusform>
         <numerusform>Failed to open %n devices on the video wall:</numerusform>
         <numerusform>Failed to open %n devices on the video wall:</numerusform>
       </translation>
@@ -6164,7 +6164,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Failed to open %n cameras on the video wall:</source>
       <translation type="unfinished">
-        <numerusform>Failed to open %n cameras on the video wall:</numerusform>
+        <numerusform>Nie udało się otworzyć %n kamer na ścianie wideo:</numerusform>
         <numerusform>Failed to open %n cameras on the video wall:</numerusform>
         <numerusform>Failed to open %n cameras on the video wall:</numerusform>
         <numerusform>Failed to open %n cameras on the video wall:</numerusform>
@@ -6173,7 +6173,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>You cannot add to the video wall devices for which you do not have View Live permission.</source>
       <translation type="unfinished">
-        <numerusform>You cannot add to the video wall devices for which you do not have View Live permission.</numerusform>
+        <numerusform>Nie możesz dodać urządzeń do ściany wideo, dla których nie masz uprawnień widoku na żywo.</numerusform>
         <numerusform>You cannot add to the video wall devices for which you do not have View Live permission.</numerusform>
         <numerusform>You cannot add to the video wall devices for which you do not have View Live permission.</numerusform>
         <numerusform>You cannot add to the video wall devices for which you do not have View Live permission.</numerusform>
@@ -6182,7 +6182,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>You cannot add to the video wall cameras for which you do not have View Live permission.</source>
       <translation type="unfinished">
-        <numerusform>You cannot add to the video wall cameras for which you do not have View Live permission.</numerusform>
+        <numerusform>Nie możesz dodawać do ściany wideo kamer, do których nie masz uprawnień widoku na żywo.</numerusform>
         <numerusform>You cannot add to the video wall cameras for which you do not have View Live permission.</numerusform>
         <numerusform>You cannot add to the video wall cameras for which you do not have View Live permission.</numerusform>
         <numerusform>You cannot add to the video wall cameras for which you do not have View Live permission.</numerusform>
@@ -6194,11 +6194,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>To add a Video Wall, the System should be in active state. %1</source>
-      <translation type="unfinished">To add a Video Wall, the System should be in active state. %1</translation>
+      <translation>Aby dodać ścianę wideo, system powinien być w stanie aktywnym. %1</translation>
     </message>
     <message>
       <source>Screen is locked and cannot be changed</source>
-      <translation type="unfinished">Screen is locked and cannot be changed</translation>
+      <translation>Ekran jest zablokowany i nie można go zmienić</translation>
     </message>
   </context>
   <context>
@@ -6676,12 +6676,12 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>All members of %1 and %2 groups will get access to this layout</source>
       <comment>%1 and %2 will be substituted with user group names</comment>
-      <translation type="unfinished">All members of %1 and %2 groups will get access to this layout</translation>
+      <translation>Dostęp do tego układu otrzymają wszyscy członkowie grup %1 i %2</translation>
     </message>
     <message>
       <source>Convert</source>
       <comment>Converting layout to shared</comment>
-      <translation type="unfinished">Convert</translation>
+      <translation>Konwertuj</translation>
     </message>
   </context>
   <context>
@@ -6905,7 +6905,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Change search criteria or create a new group</source>
-      <translation type="unfinished">Change search criteria or create a new group</translation>
+      <translation>Zmień kryteria wyszukiwania lub utwórz nową grupę</translation>
     </message>
     <message>
       <source>Multiple groups share the same name, which can lead to confusion. To maintain a clear and organized structure, we suggest providing unique names for each group.</source>
