@@ -731,7 +731,7 @@
     </message>
     <message>
       <source>Edit Search Base</source>
-      <translation type="unfinished">Edit Search Base</translation>
+      <translation>Editar base de búsqueda</translation>
     </message>
   </context>
   <context>
@@ -1271,19 +1271,19 @@
     </message>
     <message>
       <source>Search Bases</source>
-      <translation type="unfinished">Search Bases</translation>
+      <translation>Búsqueda de Bases</translation>
     </message>
     <message>
       <source>Add Search Base</source>
-      <translation type="unfinished">Add Search Base</translation>
+      <translation>Añadir base de búsqueda</translation>
     </message>
     <message>
       <source>Specify at least one search base to synchronize users and groups</source>
-      <translation type="unfinished">Specify at least one search base to synchronize users and groups</translation>
+      <translation>Especifique al menos una base de búsqueda para sincronizar usuarios y grupos</translation>
     </message>
     <message>
       <source>No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and search bases are configured correctly.</source>
-      <translation type="unfinished">No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and search bases are configured correctly.</translation>
+      <translation>Ningún usuario o grupo coincide con la configuración de sincronización y se agrega a la base de datos del sistema. Asegúrese de que los parámetros del servidor LDAP y las bases de búsqueda estén configurados correctamente.</translation>
     </message>
   </context>
   <context>

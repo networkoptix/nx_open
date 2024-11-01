@@ -69,7 +69,7 @@
     </message>
     <message>
       <source>Group Members Attribute</source>
-      <translation type="unfinished">Group Members Attribute</translation>
+      <translation>Atrybut członków grupy</translation>
     </message>
   </context>
   <context>
@@ -290,11 +290,11 @@
  • get access to archive
  • process video streams
  • exchange metadata over the network</source>
-      <translation type="unfinished">This Integration will be able to:
- • change settings on cameras
- • get access to archive
- • process video streams
- • exchange metadata over the network</translation>
+      <translation>Ta integracja będzie mogła:
+ • zmieniać ustawienia kamer
+ • uzyskiwać dostęp do archiwum
+ • przetwarzać strumienie wideo
+ • wymieniać metadane przez sieć</translation>
     </message>
     <message>
       <source>Enable Integration</source>
@@ -520,7 +520,7 @@
     </message>
     <message>
       <source>Login DN</source>
-      <translation type="unfinished">Login DN</translation>
+      <translation>Logowanie DN</translation>
     </message>
     <message>
       <source>Password</source>
@@ -528,7 +528,7 @@
     </message>
     <message>
       <source>Ignore LDAP server certificate errors</source>
-      <translation type="unfinished">Ignore LDAP server certificate errors</translation>
+      <translation>Ignoruj błędy certyfikatu serwera LDAP</translation>
     </message>
     <message>
       <source>Test</source>
@@ -544,11 +544,11 @@
     </message>
     <message>
       <source>Host cannot be empty</source>
-      <translation type="unfinished">Host cannot be empty</translation>
+      <translation>Host nie może być pusty</translation>
     </message>
     <message>
       <source>Login DN cannot be empty</source>
-      <translation type="unfinished">Login DN cannot be empty</translation>
+      <translation>Login DN nie może być pusty</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
@@ -616,7 +616,7 @@
     <name>EditLookupListDialog</name>
     <message>
       <source>List Settings</source>
-      <translation type="unfinished">List Settings</translation>
+      <translation>Lista ustawień</translation>
     </message>
     <message>
       <source>New List</source>
@@ -723,11 +723,11 @@
     </message>
     <message>
       <source>Base DN</source>
-      <translation type="unfinished">Base DN</translation>
+      <translation>Baza DN</translation>
     </message>
     <message>
       <source>Base DN cannot be empty</source>
-      <translation type="unfinished">Base DN cannot be empty</translation>
+      <translation>Baza DN nie może być pusta</translation>
     </message>
     <message>
       <source>Filter</source>
@@ -743,7 +743,7 @@
     </message>
     <message>
       <source>Edit Search Base</source>
-      <translation type="unfinished">Edit Search Base</translation>
+      <translation>Edytuj bazę wyszukiwania</translation>
     </message>
   </context>
   <context>
@@ -1020,7 +1020,7 @@
       <source>%n more</source>
       <comment>%n is the number of remaining groups</comment>
       <translation type="unfinished">
-        <numerusform>%n more</numerusform>
+        <numerusform>%n więcej</numerusform>
         <numerusform>%n more</numerusform>
         <numerusform>%n more</numerusform>
         <numerusform>%n more</numerusform>
@@ -1275,11 +1275,11 @@
     </message>
     <message>
       <source>Not configured yet</source>
-      <translation type="unfinished">Not configured yet</translation>
+      <translation>Jeszcze nie skonfigurowano</translation>
     </message>
     <message>
       <source>Configure</source>
-      <translation type="unfinished">Configure</translation>
+      <translation>Konfiguracja</translation>
     </message>
     <message>
       <source>Continuous sync with LDAP server is disabled for this system. Updates to groups and users and groups membership will occur solely through manual synchronization.</source>
@@ -1295,11 +1295,11 @@
     </message>
     <message>
       <source>Specify at least one search base to synchronize users and groups</source>
-      <translation type="unfinished">Specify at least one search base to synchronize users and groups</translation>
+      <translation>Określ co najmniej jedną bazę wyszukiwania, aby zsynchronizować użytkowników i grupy</translation>
     </message>
     <message>
       <source>No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and search bases are configured correctly.</source>
-      <translation type="unfinished">No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and search bases are configured correctly.</translation>
+      <translation>Żaden użytkownik ani grupa nie pasuje do ustawień synchronizacji i nie jest dodawany do bazy danych systemu. Upewnij się, że parametry serwera LDAP i bazy wyszukiwania są poprawnie skonfigurowane.</translation>
     </message>
   </context>
   <context>
@@ -1436,7 +1436,7 @@
     </message>
     <message>
       <source>Create New...</source>
-      <translation type="unfinished">Create New...</translation>
+      <translation>Utwórz nowy...</translation>
     </message>
     <message>
       <source>Settings</source>
@@ -1458,11 +1458,11 @@
     <name>NewLinkDialog</name>
     <message>
       <source>New Link - %1</source>
-      <translation type="unfinished">New Link - %1</translation>
+      <translation>Nowy link - %1</translation>
     </message>
     <message>
       <source>The previous link will be invalidated once a new one has been issued</source>
-      <translation type="unfinished">The previous link will be invalidated once a new one has been issued</translation>
+      <translation>Poprzedni link zostanie unieważniony po wydaniu nowego</translation>
     </message>
     <message>
       <source>Create</source>
@@ -1473,15 +1473,15 @@
     <name>NoListsPage</name>
     <message>
       <source>No Lists</source>
-      <translation type="unfinished">No Lists</translation>
+      <translation>Brak list</translation>
     </message>
     <message>
       <source>You have not created any Lists yet. With lists you can store multiple values to use them in Event Rules. Create a new List to start adding entries.</source>
-      <translation type="unfinished">You have not created any Lists yet. With lists you can store multiple values to use them in Event Rules. Create a new List to start adding entries.</translation>
+      <translation>Nie utworzyłeś jeszcze żadnych list. Za pomocą list możesz przechowywać wiele wartości, aby używać ich w regułach zdarzeń. Utwórz nową listę, aby rozpocząć dodawanie wpisów.</translation>
     </message>
     <message>
       <source>Create New...</source>
-      <translation type="unfinished">Create New...</translation>
+      <translation>Utwórz nowy...</translation>
     </message>
   </context>
   <context>

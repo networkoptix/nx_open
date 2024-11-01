@@ -3108,7 +3108,7 @@ License Key: %2</translation>
     <message>
       <source>There is currently no connection between your system and %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">There is currently no connection between your system and %1.</translation>
+      <translation>Actualmente no hay conexión entre su sistema y %1.</translation>
     </message>
   </context>
   <context>
