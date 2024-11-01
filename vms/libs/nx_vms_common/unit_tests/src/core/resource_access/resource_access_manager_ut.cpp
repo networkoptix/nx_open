@@ -765,13 +765,26 @@ TEST_F(ResourceAccessManagerTest, checkCameraAccessViaVideoWall)
 // Checking user access rights
 
 // Check user can edit himself (but cannot rename, remove and change access rights).
-TEST_F(ResourceAccessManagerTest, checkUserEditHimself)
+TEST_F(ResourceAccessManagerTest, checkAdminEditHimself)
 {
     loginAsAdministrator();
 
     const Qn::Permissions forbidden = Qn::WriteNamePermission
         | Qn::RemovePermission
         | Qn::WriteAccessRightsPermission;
+
+    ASSERT_EQ(permissions(m_currentUser, m_currentUser), Qn::FullUserPermissions & ~forbidden);
+}
+
+// Check user can edit himself (but cannot rename, remove and change access rights).
+TEST_F(ResourceAccessManagerTest, checkUserEditHimself)
+{
+    loginAs(kLiveViewersGroupId);
+
+    const Qn::Permissions forbidden = Qn::WriteNamePermission
+        | Qn::RemovePermission
+        | Qn::WriteAccessRightsPermission
+        | Qn::WriteDigestPermission;
 
     ASSERT_EQ(permissions(m_currentUser, m_currentUser), Qn::FullUserPermissions & ~forbidden);
 }
@@ -818,8 +831,12 @@ TEST_F(ResourceAccessManagerTest, checkAdministratorCanNotEditOtherAdministrator
     EXPECT_FALSE(hasPermissions(cloudAdministrator, localAdministrator, Qn::WriteDigestPermission));
 
     for (const auto& permission: {
-        Qn::WritePasswordPermission, Qn::WriteAccessRightsPermission,
-        Qn::WriteEmailPermission, Qn::WriteFullNamePermission})
+            Qn::WritePasswordPermission,
+            Qn::WriteAccessRightsPermission,
+            Qn::WriteEmailPermission,
+            Qn::WriteFullNamePermission,
+            Qn::WriteLocalePermission
+        })
     {
         const auto label = QJson::serialized(permission).toStdString();
         EXPECT_FALSE(hasPermissions(localAdministrator, cloudAdministrator, permission)) << label;

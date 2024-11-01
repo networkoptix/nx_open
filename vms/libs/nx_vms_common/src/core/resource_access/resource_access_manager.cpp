@@ -832,6 +832,8 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
                         | Qn::WriteDigestPermission
                         | Qn::WriteNamePermission
                         | Qn::WriteEmailPermission
+                        // FIXME: #sivanov Temporary allow until implemented on the cloud side.
+                        // | Qn::WriteLocalePermission
                         | Qn::WriteFullNamePermission);
                 }
                 default:
@@ -847,7 +849,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
     {
         // Everyone can edit own data, except own access rights.
         Qn::Permissions result = Qn::ReadWriteSavePermission | Qn::WritePasswordPermission
-            | Qn::WriteFullNamePermission;
+            | Qn::WriteFullNamePermission | Qn::WriteLocalePermission;
 
         if (!subject.user()->isTemporary())
             result |= Qn::WriteEmailPermission;

@@ -1123,8 +1123,7 @@ UserSettingsDialogState UserSettingsDialog::createState(const QnUserResourcePtr&
     state.email = user->getEmail();
     state.emailEditable = permissions.testFlag(Qn::WriteEmailPermission);
     state.locale = user->locale();
-    // FIXME: #sivanov Create separate permission.
-    state.localeEditable = permissions.testFlag(Qn::WriteFullNamePermission);
+    state.localeEditable = permissions.testFlag(Qn::WriteLocalePermission);
     state.passwordEditable = permissions.testFlag(Qn::WritePasswordPermission);
     state.userEnabled = user->isEnabled();
     state.userEnabledEditable = permissions.testFlag(Qn::WriteAccessRightsPermission);

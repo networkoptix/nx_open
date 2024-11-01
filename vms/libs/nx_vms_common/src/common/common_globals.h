@@ -510,13 +510,17 @@ namespace Qn {
         // Permission to edit user's full name.
         WriteFullNamePermission = 1 << 12,
 
+        // Permission to edit user's locale.
+        WriteLocalePermission = 1 << 13,
+
         // Full set of permissions which can be available for the user resource.
         FullUserPermissions = FullGenericPermissions
             | WritePasswordPermission
             | WriteDigestPermission
             | WriteAccessRightsPermission
             | WriteFullNamePermission
-            | WriteEmailPermission,
+            | WriteEmailPermission
+            | WriteLocalePermission,
 
         //-----------------------------------------------------------------------------------------
 
@@ -524,35 +528,35 @@ namespace Qn {
         // Media-specific permissions.
 
         // Permission to view camera's live stream.
-        ViewLivePermission = 1 << 13,
+        ViewLivePermission = 1 << 14,
 
         // Permission to view camera's footage.
-        ViewFootagePermission = 1 << 14,
+        ViewFootagePermission = 1 << 15,
 
         // Permission to export video parts.
-        ExportPermission = 1 << 15,
+        ExportPermission = 1 << 16,
 
         // Permission to use camera's PTZ controls.
-        WritePtzPermission = 1 << 16,
+        WritePtzPermission = 1 << 17,
 
         // Permission to view camera bookmarks.
-        ViewBookmarksPermission = 1 << 17,
+        ViewBookmarksPermission = 1 << 18,
 
         // Permission to edit camera bookmarks.
-        ManageBookmarksPermission = 1 << 18,
+        ManageBookmarksPermission = 1 << 19,
 
         // Permission to toggle I/O module inputs.
-        DeviceInputPermission = 1 << 19,
+        DeviceInputPermission = 1 << 20,
 
         // Permission to invoke soft triggers.
-        SoftTriggerPermission = 1 << 20,
+        SoftTriggerPermission = 1 << 21,
 
         // Permission to use two-way audio.
-        TwoWayAudioPermission = 1 << 21,
+        TwoWayAudioPermission = 1 << 22,
 
         // Permission to play sound from a camera
         // (used in combination with ViewLivePermission and/or ViewFootagePermission).
-        PlayAudioPermission = 1 << 22,
+        PlayAudioPermission = 1 << 23,
 
         // Permission granted by userInput access right.
         UserInputPermissions = WritePtzPermission
