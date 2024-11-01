@@ -21,7 +21,7 @@ TextInput
 
     property color inactiveColor: showError ? ColorTheme.colors.red_d1 : ColorTheme.colors.dark10
     property color activeColor: showError ? ColorTheme.colors.red_core : ColorTheme.colors.brand_core
-    property color placeholderColor: ColorTheme.colors.dark10
+    property color placeholderColor: ColorTheme.colors.dark16
     property color cursorColor: activeColor
     property bool selectionAllowed: true
     scrollByMouse: CoreUtils.isMobile()
