@@ -52,6 +52,8 @@ struct LdapSettings
     Q_PROPERTY(bool isHttpDigestEnabledOnImport MEMBER isHttpDigestEnabledOnImport)
     Q_PROPERTY(bool isHttpDigestEnabledOnImportInitial MEMBER isHttpDigestEnabledOnImportInitial)
 
+    Q_PROPERTY(QString defaultUserLocale MEMBER defaultUserLocale)
+
 public:
     bool isValid = false;
     QString uri;
@@ -72,6 +74,8 @@ public:
     nx::Uuid preferredSyncServer;
     bool isHttpDigestEnabledOnImport = false;
     bool isHttpDigestEnabledOnImportInitial = false;
+
+    QString defaultUserLocale;
 };
 
 class LdapFiltersModel: public QAbstractListModel

@@ -46,6 +46,7 @@ GroupBox 1.0 GroupBox.qml
 Icon 1.0 Icon.qml
 ImageButton 1.0 ImageButton.qml
 Label 1.0 Label.qml
+LanguageComboBox 1.0 LanguageComboBox.qml
 LinearPaletteColorPicker 1.0 LinearPaletteColorPicker.qml
 ListView 1.0 ListView.qml
 Menu 1.0 Menu.qml

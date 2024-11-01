@@ -44,6 +44,14 @@ namespace {
 static const QUrl kLdapSettingsQmlComponentUrl("Nx/Dialogs/Ldap/Tabs/LdapSettings.qml");
 static const auto kStatusUpdateInterval = std::chrono::seconds(10);
 
+nx::vms::api::LdapSettings localizedSettings(nx::vms::common::SystemSettings* settings)
+{
+    auto result = settings->ldap();
+    if (result.defaultUserLocale.isEmpty())
+        result.defaultUserLocale = settings->defaultUserLocale();
+    return result;
+}
+
 } // namespace
 
 namespace nx::vms::client::desktop {
@@ -153,7 +161,7 @@ struct LdapSettingsWidget::Private
         connect(parent->globalSettings(), &common::SystemSettings::ldapSettingsChanged, q,
             [this]()
             {
-                mergeUpdate(q->globalSettings()->ldap());
+                mergeUpdate(localizedSettings(q->globalSettings()));
             });
 
         connect(q->systemContext()->ldapStatusWatcher(), &LdapStatusWatcher::refreshFinished, q,
@@ -219,6 +227,8 @@ struct LdapSettingsWidget::Private
         state.isHttpDigestEnabledOnImport = settings.isHttpDigestEnabledOnImport;
         state.isHttpDigestEnabledOnImportInitial = settings.isHttpDigestEnabledOnImport;
 
+        state.defaultUserLocale = settings.defaultUserLocale;
+
         return state;
     }
 
@@ -261,6 +271,8 @@ struct LdapSettingsWidget::Private
 
         settings.preferredMasterSyncServer = state.preferredSyncServer;
         settings.isHttpDigestEnabledOnImport = state.isHttpDigestEnabledOnImport;
+
+        settings.defaultUserLocale = state.defaultUserLocale;
 
         return settings;
     }
@@ -356,7 +368,8 @@ void LdapSettingsWidget::checkOnlineAndSyncStatus()
 
 void LdapSettingsWidget::loadDataToUi()
 {
-    d->initialSettings = globalSettings()->ldap();
+    d->initialSettings = localizedSettings(globalSettings());
+
     d->setState(d->initialSettings);
     d->modified = false;
 
@@ -391,7 +404,7 @@ bool LdapSettingsWidget::requestLdapReset()
         tr("Reset"),
         FreshSessionTokenHelper::ActionType::updateSettings);
 
-    nx::vms::api::LdapSettings settingsBackup = globalSettings()->ldap();
+    nx::vms::api::LdapSettings settingsBackup = localizedSettings(globalSettings());
 
     const auto resetCallback = nx::utils::guarded(this,
         [this, settingsBackup = std::move(settingsBackup)](

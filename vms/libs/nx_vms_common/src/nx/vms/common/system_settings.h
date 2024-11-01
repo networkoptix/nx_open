@@ -481,6 +481,11 @@ public:
 
     nx::utils::Url resourceFileUri() const;
 
+    /**
+     * Advanced value which used as a default user locale on user creating or LDAP import - if it
+     * is not overridden in the local admin settings or in the Site LDAP Import settings.
+     * NOTE: Never returns an empty string. Branding locale is returned if other value is not set.
+     */
     QString defaultUserLocale() const;
     void setDefaultUserLocale(const QString& value);
 

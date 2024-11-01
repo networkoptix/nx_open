@@ -35,7 +35,7 @@ Item
     property string password: ""
     property bool passwordEditable: true
 
-    property string locale: ""
+    property alias locale: languageComboBox.value
     property bool localeEditable: true
 
     property alias userEnabled: enabledUserSwitch.checked
@@ -531,11 +531,8 @@ Item
                         {
                             id: languageComboBox
 
-                            currentIndex: model.localeIndex(control.locale)
                             width: parent.width
                             enabled: control.localeEditable && control.enabled
-
-                            onCurrentValueChanged: control.locale = currentValue ?? ""
                         }
                     }
 

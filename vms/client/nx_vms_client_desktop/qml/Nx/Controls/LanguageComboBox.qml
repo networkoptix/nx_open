@@ -8,12 +8,16 @@ ComboBox
 {
     id: control
 
+    property string value: Branding.defaultLocale()
+
     model: TranslationListModel {}
     withIconSection: true
     colorizeIcons: false
-    currentIndex: 0
     textRole: "display"
     valueRole: "localeCode"
+    currentIndex: model.localeIndex(control.value)
+
+    onCurrentValueChanged: control.value = currentValue ?? Branding.defaultLocale()
 
     view: ListView
     {

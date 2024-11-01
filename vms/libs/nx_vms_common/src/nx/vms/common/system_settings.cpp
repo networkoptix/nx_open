@@ -2279,7 +2279,11 @@ nx::utils::Url SystemSettings::resourceFileUri() const
 
 QString SystemSettings::defaultUserLocale() const
 {
-    return d->defaultUserLocaleAdaptor->value();
+    const auto value = d->defaultUserLocaleAdaptor->value();
+    if (!value.isEmpty())
+        return value;
+
+    return nx::branding::defaultLocale();
 }
 
 void SystemSettings::setDefaultUserLocale(const QString& value)

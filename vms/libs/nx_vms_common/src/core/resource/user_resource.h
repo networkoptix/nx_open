@@ -194,7 +194,7 @@ public:
 
     /**
      * Preferred locale of the user. Will affect language of the emails and notifications both in
-     * desktop and mobile clients.
+     * desktop and mobile clients. If explicit value is not set, default Site locale is used.
      * %example en_US
      */
     QString locale() const;

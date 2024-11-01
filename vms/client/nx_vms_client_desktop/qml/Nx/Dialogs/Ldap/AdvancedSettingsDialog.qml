@@ -1,14 +1,14 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.15
-import QtQuick.Layouts 1.15
-import QtQuick.Window 2.15
+import QtQuick
+import QtQuick.Layouts
+import QtQuick.Window
 
-import Nx.Core 1.0
-import Nx.Controls 1.0
-import Nx.Dialogs 1.0
+import Nx.Core
+import Nx.Controls
+import Nx.Dialogs
 
-import nx.vms.client.desktop 1.0
+import nx.vms.client.desktop
 
 import "Components"
 import "../UserManagement/Components"
@@ -35,6 +35,8 @@ Dialog
     property alias preferredSyncServer: serverComboBox.selectedServer
 
     property alias continuousSync: syncComboBox.selectedSync
+
+    property alias defaultUserLocale: languageComboBox.value
 
     modality: Qt.ApplicationModal
 
@@ -184,6 +186,31 @@ Dialog
                 width: parent.width - x
                 text: qsTr("Allow insecure (digest) authentication for imported users")
                 wrapMode: Text.WordWrap
+            }
+        }
+
+        CenteredField
+        {
+            text: qsTr("Notification Language")
+            leftSideMargin: 180
+            rightSideMargin: 0
+
+            RowLayout
+            {
+                width: parent.width
+
+                LanguageComboBox
+                {
+                    id: languageComboBox
+
+                    Layout.fillWidth: true
+                }
+
+                Item
+                {
+                    implicitWidth: loginAttributeTextField.checkBoxWidth
+                    implicitHeight: languageComboBox.height
+                }
             }
         }
 

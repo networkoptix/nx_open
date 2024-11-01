@@ -277,8 +277,7 @@ QnUserHash QnUserHash::scryptPassword(const QString& password, nx::scrypt::Optio
 QnUserResource::QnUserResource(nx::vms::api::UserType userType, nx::vms::api::UserExternalId externalId):
     m_userType(userType),
     m_realm(nx::network::AppInfo::realm().c_str()),
-    m_externalId(std::move(externalId)),
-    m_locale(nx::branding::defaultLocale())
+    m_externalId(std::move(externalId))
 {
     addFlags(Qn::user | Qn::remote);
     setTypeId(nx::vms::api::UserData::kResourceTypeId);
@@ -658,10 +657,16 @@ void QnUserResource::setIntegrationRequestData(
 
 QString QnUserResource::locale() const
 {
-    NX_MUTEX_LOCKER locker(&m_mutex);
-    return m_locale.isEmpty()
-        ? nx::branding::defaultLocale()
-        : m_locale;
+    {
+        NX_MUTEX_LOCKER locker(&m_mutex);
+        if (!m_locale.isEmpty())
+            return m_locale;
+    }
+
+    if (auto context = systemContext())
+        return context->globalSettings()->defaultUserLocale();
+
+    return nx::branding::defaultLocale();
 }
 
 void QnUserResource::setLocale(const QString& value)

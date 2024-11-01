@@ -149,6 +149,12 @@ struct NX_VMS_API LdapSettings
     /**%apidoc[opt] Remove all existing LDAP users and groups from VMS. */
     bool removeRecords = false;
 
+    /**%apidoc[opt]
+     * Locale for all newly imported users. Empty value will be treated as a default Site locale.
+     * %example en_US
+     */
+    QString defaultUserLocale;
+
     bool operator==(const LdapSettings&) const = default;
     nx::utils::Void getId() const { return {}; }
 
@@ -177,7 +183,8 @@ struct NX_VMS_API LdapSettings
     (isHttpDigestEnabledOnImport) \
     (removeRecords) \
     (startTls) \
-    (ignoreCertificateErrors)
+    (ignoreCertificateErrors) \
+    (defaultUserLocale)
 
 QN_FUSION_DECLARE_FUNCTIONS(LdapSettings, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(LdapSettings, LdapSettings_Fields)

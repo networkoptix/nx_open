@@ -25,7 +25,7 @@ Item
     property alias fullName: fullNameTextField.text
     property alias email: emailTextField.text
     property alias password: passwordTextField.text
-    property alias locale: languageComboBox.currentValue
+    property alias locale: languageComboBox.value
     property alias allowInsecure: allowInsecureCheckBox.checked
     property alias linkValidUntil: temporaryLinkSettings.linkValidUntil
     property alias expiresAfterLoginS: temporaryLinkSettings.expiresAfterLoginS
@@ -397,7 +397,7 @@ Item
                 {
                     id: languageComboBox
 
-                    currentIndex: model.localeIndex(Branding.defaultLocale())
+                    // FIXME: System or local admin default locale.
                     width: parent.width
                 }
             }

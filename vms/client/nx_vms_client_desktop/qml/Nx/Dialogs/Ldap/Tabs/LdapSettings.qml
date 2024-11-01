@@ -40,6 +40,8 @@ Rectangle
     property bool isHttpDigestEnabledOnImport
     property bool isHttpDigestEnabledOnImportInitial
 
+    property string defaultUserLocale
+
     property bool hideEmptyLdapWarning: false
     property bool hideEditingWarning: false
 
@@ -90,6 +92,7 @@ Rectangle
                 control.searchTimeoutS = searchTimeoutS
                 control.preferredSyncServer = preferredSyncServer
                 control.isHttpDigestEnabledOnImport = isHttpDigestEnabledOnImport
+                control.defaultUserLocale = defaultUserLocale
             }
         }
     }
@@ -519,6 +522,7 @@ Rectangle
                                 control.isHttpDigestEnabledOnImport
                             advancedSettingsDialog.isHttpDigestEnabledOnImportInitial =
                                 control.isHttpDigestEnabledOnImportInitial
+                            advancedSettingsDialog.defaultUserLocale = control.defaultUserLocale
 
                             advancedSettingsDialog.show()
                         }
