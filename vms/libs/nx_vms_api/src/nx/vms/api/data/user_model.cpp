@@ -25,7 +25,7 @@ UserDataEx UserModelBase::toUserData() &&
     user.type = std::move(type);
     if (user.type == UserType::cloud)
     {
-        user.digest = UserData::kCloudPasswordStub;
+        user.digest = std::move(digest).value_or(UserData::kCloudPasswordStub);
         user.hash = UserData::kCloudPasswordStub;
     }
     else if (!password)
