@@ -169,11 +169,9 @@ QString QnStorageUrlDialog::makeUrl(const QString& path, const QString& login, c
     if (!password.isEmpty())
         url.setPassword(password);
 
-    // Do not use the QUrl::toPercentEncoding method here, as if user info, e.g., 'user:passwd%',
-    // contains a '%' character, it is encoded twice. The first time on url parsing, it becomes
-    // equal to 'user:passwd%25'. The second on QUrl::toPercentEncoding, it becomes equal to
-    // 'user%3Apasswd%2525'.
-    return url.toEncoded();
+    // This function forms the URL, which is a request parameter, so it should contain complete
+    // percent encoding.
+    return QString::fromUtf8(QUrl::toPercentEncoding(url.toString()));
 }
 
 void QnStorageUrlDialog::atStorageStatusReply(const StorageStatusReply& reply)
