@@ -112,6 +112,12 @@ PropertyDescriptor mapMetaTypeToJsonTypeAndExample(const QMetaType& metaType)
 namespace nx::vms::rules::utils {
 const QString kTemplatePath = ":/vms_rules_templates/template_event_rules_openapi.json.in";
 
+VmsRulesOpenApiDocHelper* VmsRulesOpenApiDocHelper::instance()
+{
+    static VmsRulesOpenApiDocHelper sInstance;
+    return &sInstance;
+}
+
 QJsonObject createTypeDescriptor(const QString& id)
 {
     const auto lastPartOfId = id.split('.').last();

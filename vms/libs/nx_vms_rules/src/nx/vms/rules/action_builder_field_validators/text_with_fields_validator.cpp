@@ -28,8 +28,8 @@ ValidationResult TextWithFieldsValidator::validity(
     const auto objectTypeField = event->fieldByType<AnalyticsObjectTypeField>();
     const auto eventState = event->fieldByType<StateField>();
 
-    const auto availableNames = EventParameterHelper::getVisibleEventParameters(
-        event->eventType(),
+    const auto availableNames =
+        EventParameterHelper::instance()->getVisibleEventParameters(event->eventType(),
         context,
         objectTypeField ? objectTypeField->value() : "",
         eventState ? eventState->value() : State::none);

@@ -4,6 +4,7 @@
 #include <QString>
 #include <set>
 
+#include <nx/utils/impl_ptr.h>
 #include <nx/utils/string/comparator.h>
 #include <nx/vms/rules/rules_fwd.h>
 
@@ -15,6 +16,8 @@ class NX_VMS_RULES_API EventParameterHelper
 {
 public:
     using EventParametersNames = std::set<QString, nx::utils::CaseInsensitiveStringCompare>;
+
+    static EventParameterHelper* instance();
 
     static QString addBrackets(const QString& text);
     static QString removeBrackets(QString text);
@@ -32,7 +35,7 @@ public:
      * Collects list of visible event parameters for a specific event Type and Analytic Object
      * Type.
      */
-    static EventParametersNames getVisibleEventParameters(
+    EventParametersNames getVisibleEventParameters(
         const QString& eventType,
         common::SystemContext* systemContext,
         const QString& objectTypeField,
@@ -40,9 +43,21 @@ public:
     /**
      * Generates eventParameter's replacement for specific event, if it is applicable.
      */
-    static QString evaluateEventParameter(common::SystemContext* context,
+    QString evaluateEventParameter(common::SystemContext* context,
         const AggregatedEventPtr& eventAggregator,
         const QString& eventParameter);
+
+    /**
+     * Generates html table with description of available event parameters.
+     * By default, generates description only for visible in UI event parameters.
+     */
+    QString getHtmlDescription(bool skipHidden = true);
+
+private:
+    EventParameterHelper();
+    virtual ~EventParameterHelper();
+    struct Private;
+    nx::utils::ImplPtr<Private> d;
 };
 
 } // namespace nx::vms::rules::utils

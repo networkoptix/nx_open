@@ -98,7 +98,7 @@ QVariant TextWithFields::build(const AggregatedEventPtr& eventAggregator) const
     {
         if (value.type == FieldType::Substitution)
         {
-            result += utils::EventParameterHelper::evaluateEventParameter(
+            result += utils::EventParameterHelper::instance()->evaluateEventParameter(
                 systemContext(), eventAggregator, value.value);
         }
         else
@@ -145,13 +145,13 @@ QJsonObject TextWithFields::openApiDescriptor(const QVariantMap& properties)
 {
     auto descriptor =
         utils::getPropertyOpenApiDescriptor(QMetaType::fromType<decltype(d->text)>());
-    descriptor[utils::kDescriptionProperty] = "Text value supporting event parameters.";
-
     const bool isUrl = properties["validationPolicy"] == kUrlValidationPolicy;
     descriptor[utils::kExampleProperty] = isUrl
-        ? "http://exampleServer/rest/v4/devices/{device.id}"
+        ? "http://exampleServer/rest/v4/login/users/{user.name}"
         : "Event {event.name} occurred at {event.time} on {device.name}.";
 
+    descriptor[utils::kDescriptionProperty] = "Text value supporting event parameters substitution."
+        + utils::EventParameterHelper::instance()->getHtmlDescription();
     return descriptor;
 }
 

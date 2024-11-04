@@ -540,7 +540,7 @@ void notContainsHiddenElements(
 
 TEST_F(ActionFieldTest, EventParametersHelperVisibleValuesForGeneric)
 {
-    auto visibleElements = utils::EventParameterHelper::getVisibleEventParameters(
+    auto visibleElements = utils::EventParameterHelper::instance()->getVisibleEventParameters(
         utils::type<GenericEvent>(), systemContext(), {});
     ASSERT_FALSE(visibleElements.empty());
     // List dont have parameters for soft trigger.
@@ -559,7 +559,7 @@ TEST_F(ActionFieldTest, EventParametersHelperVisibleValuesForSoftTrigger)
 {
     makeSoftTriggerEvent();
 
-    auto visibleElements = utils::EventParameterHelper::getVisibleEventParameters(
+    auto visibleElements = utils::EventParameterHelper::instance()->getVisibleEventParameters(
         utils::type<SoftTriggerEvent>(), systemContext(), {});
     ASSERT_FALSE(visibleElements.empty());
     // List has parameters for soft trigger.
@@ -574,7 +574,7 @@ TEST_F(ActionFieldTest, EventParametersHelperVisibleValuesForDeviceEvents)
     // Required for registering the event.
     makeAnalyticsObjectEvent();
 
-    auto visibleElements = utils::EventParameterHelper::getVisibleEventParameters(
+    auto visibleElements = utils::EventParameterHelper::instance()->getVisibleEventParameters(
         utils::type<AnalyticsObjectEvent>(), systemContext(), {});
     ASSERT_FALSE(visibleElements.empty());
 
@@ -588,7 +588,7 @@ TEST_F(ActionFieldTest, EventParametersHelperVisibleValuesForDeviceEvents)
 
 TEST_F(ActionFieldTest, EventParametersHelperCustomEvent)
 {
-    auto visibleElements = utils::EventParameterHelper::getVisibleEventParameters(
+    auto visibleElements = utils::EventParameterHelper::instance()->getVisibleEventParameters(
         "customEventType", systemContext(), {});
     ASSERT_FALSE(visibleElements.empty());
     containsParametersForAllEvents(visibleElements);
@@ -599,7 +599,7 @@ TEST_F(ActionFieldTest, EventParametersProlongedEvents)
 {
     makeAnalyticsEvent();
 
-    auto visibleElements = utils::EventParameterHelper::getVisibleEventParameters(
+    auto visibleElements = utils::EventParameterHelper::instance()->getVisibleEventParameters(
         utils::type<AnalyticsEvent>(), systemContext(), {}, State::started);
     ASSERT_FALSE(visibleElements.empty());
     containsParametersForAllEvents(visibleElements);
@@ -613,7 +613,7 @@ TEST_F(ActionFieldTest, EventParametersInstantEvents)
 {
     makeAnalyticsEvent();
 
-    auto visibleElements = utils::EventParameterHelper::getVisibleEventParameters(
+    auto visibleElements = utils::EventParameterHelper::instance()->getVisibleEventParameters(
         utils::type<AnalyticsEvent>(), systemContext(), {}, State::instant);
     ASSERT_FALSE(visibleElements.empty());
     containsParametersForAllEvents(visibleElements);

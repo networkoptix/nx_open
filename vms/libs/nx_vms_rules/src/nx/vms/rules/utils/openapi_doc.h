@@ -84,10 +84,7 @@ NX_VMS_RULES_API void updatePropertyForField(QJsonObject& openApiObjectDescripto
 class NX_VMS_RULES_API VmsRulesOpenApiDocHelper
 {
 public:
-    static VmsRulesOpenApiDocHelper& getInstance() {
-        static VmsRulesOpenApiDocHelper instance;
-        return instance;
-    }
+    static VmsRulesOpenApiDocHelper* instance();
 
     VmsRulesOpenApiDocHelper(const VmsRulesOpenApiDocHelper&) = delete;
     VmsRulesOpenApiDocHelper& operator=(const VmsRulesOpenApiDocHelper&) = delete;
