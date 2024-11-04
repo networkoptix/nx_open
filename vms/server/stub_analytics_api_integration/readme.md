@@ -54,7 +54,11 @@ The Stub Analytics API Integration application window will open.
 
     In the Stub Analytics API Integration application window, click "Create Integration request"
     button. This action announces the Integration to the Server. Then click "Approve Integration
-    Request" button. This simulates the Server admin's Integration approval.
+    Request" button. This simulates the Server admin's Integration approval. After the approval,
+    the file `integration_credentials.json` will be created in the application's root directory.
+    This will contains the username and password for logging into the VMS system, and the
+    Integration Request id, which coincides with the id of the Integration User - a User created
+    specifically for the Integration.
 
 - Connect to the Server via WebSocket.
 
