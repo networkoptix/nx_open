@@ -39,6 +39,9 @@ struct NX_VMS_API AnalyticsDeviceSettings
      */
     bool disableStreamSelection = false;
 
+    /**%apidoc[readonly] */
+    QJsonObject model;
+
     /**%apidoc[readonly]
      * Name-value map with errors that occurred while performing the current settings operation.
      */
@@ -46,7 +49,7 @@ struct NX_VMS_API AnalyticsDeviceSettings
 };
 
 #define AnalyticsDeviceSettings_Fields (deviceId)(engineId)(values) \
-    (analyzedStream)(disableStreamSelection)(_error)
+    (analyzedStream)(disableStreamSelection)(model)(_error)
 QN_FUSION_DECLARE_FUNCTIONS(AnalyticsDeviceSettings, (json), NX_VMS_API);
 NX_REFLECTION_INSTRUMENT(AnalyticsDeviceSettings, AnalyticsDeviceSettings_Fields);
 

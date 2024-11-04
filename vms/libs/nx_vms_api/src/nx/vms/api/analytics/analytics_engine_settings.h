@@ -25,12 +25,15 @@ struct NX_VMS_API AnalyticsEngineSettings
      */
     QJsonObject values;
 
+    /**%apidoc[readonly] */
+    QJsonValue model;
+
     /**%apidoc[readonly]
      * Name-value map with errors that occurred while performing the current settings operation.
      */
     std::optional<std::map<QString, QString>> _error;
 };
-#define AnalyticsEngineSettings_Fields (id)(values)(_error)
+#define AnalyticsEngineSettings_Fields (id)(values)(model)(_error)
 QN_FUSION_DECLARE_FUNCTIONS(AnalyticsEngineSettings, (json), NX_VMS_API);
 NX_REFLECTION_INSTRUMENT(AnalyticsEngineSettings, AnalyticsEngineSettings_Fields);
 
