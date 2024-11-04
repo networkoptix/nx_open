@@ -62,7 +62,7 @@ ModalDialog
                     Label
                     {
                         Layout.preferredWidth: 70
-                        wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                        wrapMode: Text.WordWrap
                         maximumLineCount: 2
                         elide: Text.ElideRight
                         horizontalAlignment: Text.AlignRight
