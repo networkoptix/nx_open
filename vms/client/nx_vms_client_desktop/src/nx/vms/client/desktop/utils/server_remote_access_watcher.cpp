@@ -134,7 +134,10 @@ void ServerRemoteAccessWatcher::updateRemoteAccess(const ServerResourcePtr& serv
     auto configurations = server->portForwardingConfigurations();
     std::set<uint16_t> targetPorts;
     for (auto& configuration: configurations)
-        targetPorts.insert(configuration.port);
+    {
+        if (configuration.port)
+            targetPorts.insert(*configuration.port);
+    }
 
     BearerAuthorization header(systemContext()->connectionCredentials().authToken.value);
     gateway->enforceHeadersFor(address, {{kProxyAuthorization, header.toString()}});
@@ -149,7 +152,9 @@ void ServerRemoteAccessWatcher::updateRemoteAccess(const ServerResourcePtr& serv
 
     for (auto& configuration: fowardedPortConfiguration)
     {
-        if (auto itr = forwardedPorts.find(configuration.port); itr != forwardedPorts.end())
+        if (!configuration.port)
+            continue;
+        if (auto itr = forwardedPorts.find(*configuration.port); itr != forwardedPorts.end())
             configuration.forwardedPort = itr->second;
         else
             NX_WARNING(this, "Failed to forward port %1", configuration.port);

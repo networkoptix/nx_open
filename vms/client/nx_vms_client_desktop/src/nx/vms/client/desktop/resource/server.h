@@ -14,7 +14,7 @@ namespace nx::vms::client::desktop {
 
 struct ForwardedPortConfiguration: public nx::vms::api::PortForwardingConfiguration
 {
-    uint16_t forwardedPort = 0;
+    std::optional<uint16_t> forwardedPort;
 
     ForwardedPortConfiguration(const nx::vms::api::PortForwardingConfiguration& configuration):
         nx::vms::api::PortForwardingConfiguration(configuration)

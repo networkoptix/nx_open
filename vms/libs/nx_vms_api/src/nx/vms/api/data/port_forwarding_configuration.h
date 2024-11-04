@@ -13,8 +13,11 @@ struct NX_VMS_API PortForwardingConfiguration
     /**%apidoc User specified name of a service. */
     QString name;
 
-    /**%apidoc Local port of a service on a Server. */
-    int port = 0;
+    /**%apidoc
+     * Local port of a service on a Server.
+     * If not present then the service is not forwarded by a Server and has its own connection.
+     */
+    std::optional<int> port;
 
     /**%apidoc[opt] */
     QString login;

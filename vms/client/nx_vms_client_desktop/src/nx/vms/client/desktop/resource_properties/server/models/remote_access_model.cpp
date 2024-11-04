@@ -70,7 +70,11 @@ QVariant RemoteAccessModel::data(const QModelIndex& index, int role) const
         case Roles::password:
             return QVariant::fromValue(item.password);
         case Roles::port:
-            return item.forwardedPort != 0 ? QVariant::fromValue(item.forwardedPort) : QVariant();
+            return item.forwardedPort
+                ? QVariant::fromValue(*item.forwardedPort)
+                : item.port
+                    ? QVariant()
+                    : QVariant("-");
     }
 
     return QVariant();
