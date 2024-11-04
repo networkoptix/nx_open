@@ -557,7 +557,7 @@ std::optional<nx::vms::api::StreamIndex>
             "\"%4\" property content: %5",
             __func__, getUserDefinedName(), getId(), kAnalyzedStreamIndexes,
             nx::kit::utils::toString(serializedProperty));
-        return kDefaultAnalyzedStreamIndex;
+        return defaultAnalyzedStreamIndex();
     }
 
     if (const auto it = analyzedStreamIndexMap.find(engineId); it != analyzedStreamIndexMap.end())
@@ -586,18 +586,23 @@ nx::vms::api::StreamIndex QnVirtualCameraResource::analyzedStreamIndexInternal(c
 
     const QnResourcePool* const resourcePool = this->resourcePool();
     if (!NX_ASSERT(resourcePool))
-        return kDefaultAnalyzedStreamIndex;
+        return defaultAnalyzedStreamIndex();
 
     const auto engineResource = resourcePool->getResourceById(
         engineId).dynamicCast<nx::vms::common::AnalyticsEngineResource>();
     if (!engineResource)
-        return kDefaultAnalyzedStreamIndex;
+        return defaultAnalyzedStreamIndex();
 
     const nx::vms::api::analytics::EngineManifest manifest = engineResource->manifest();
     if (manifest.preferredStream != nx::vms::api::StreamIndex::undefined)
         return manifest.preferredStream;
 
-    return kDefaultAnalyzedStreamIndex;
+    return defaultAnalyzedStreamIndex();
+}
+
+nx::vms::api::StreamIndex QnVirtualCameraResource::defaultAnalyzedStreamIndex() const
+{
+    return hasDualStreaming() ? StreamIndex::secondary : StreamIndex::primary;
 }
 
 void QnVirtualCameraResource::setAnalyzedStreamIndex(
