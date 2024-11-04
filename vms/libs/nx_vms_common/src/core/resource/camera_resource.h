@@ -45,9 +45,6 @@ public:
     static const QString kCameraNameParameterName;
     static const QString kUsingOnvifMedia2Type;
 
-    static constexpr nx::vms::api::StreamIndex kDefaultAnalyzedStreamIndex =
-        nx::vms::api::StreamIndex::primary;
-
 public:
     QnVirtualCameraResource();
 
@@ -160,6 +157,8 @@ public:
         const nx::vms::api::analytics::DeviceAgentManifest& manifest);
 
     nx::vms::api::StreamIndex analyzedStreamIndex(nx::Uuid engineId) const;
+
+    nx::vms::api::StreamIndex defaultAnalyzedStreamIndex() const;
 
     void setAnalyzedStreamIndex(nx::Uuid engineId, nx::vms::api::StreamIndex streamIndex);
 
