@@ -468,8 +468,6 @@ Item
                 id: buttonsPanel
 
                 readonly property real minimalWidth: width - (zoomButtonsRow.x + zoomButtonsRow.width)
-                readonly property bool showZoomControls: actionButtonsPanel.contentWidth < minimalWidth
-
                 readonly property real overallHeight: buttonsPanel.height + timeline.bottomOverlap
                 readonly property real childrenCenterOffset: -timeline.bottomOverlap / 2
                 width: parent.width
@@ -545,8 +543,6 @@ Item
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.verticalCenterOffset: buttonsPanel.childrenCenterOffset
-                    visible: (buttonsPanel.showZoomControls || !d.liveMode)
-                        && videoNavigation.canViewArchive
 
                     IconButton
                     {
@@ -618,18 +614,7 @@ Item
                     visible: opacity > 0
 
                     resource: controller.resource
-                    anchors.left:
-                    {
-                        if (buttonsPanel.showZoomControls)
-                            return zoomButtonsRow.right
-
-                        if (downloadButton.visible)
-                            return downloadButton.right
-
-                        return motionSearchModeButton.visible
-                            ? motionSearchModeButton.right
-                            : calendarButton.right
-                    }
+                    anchors.left: zoomButtonsRow.right
 
                     anchors.right: parent.right
                     anchors.rightMargin: -4
