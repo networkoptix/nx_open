@@ -12,41 +12,46 @@
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/utils/geometry.h>
-#include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/resource/voice_spectrum_painter.h>
+#include <ui/workaround/sharp_pixmap_painting.h>
 
 namespace nx::vms::client::desktop {
 
-constexpr QSize kButtonSize(48 * 3, 48 * 3);
+constexpr QRect kLeftGeometry(0, 0, 48 * 3, 48 * 3);
 
-// Moving the icon a bit to the right here, otherwise it looks off-center because of the half-circle to the left.
-constexpr QMargins kButtonInternalMargins(48 + 6, 48, 48 - 6, 48);
+// Moving the icon a bit to the right here, otherwise it looks off-center because of the
+// half-circle to the left.
+constexpr QMargins kLeftInternalMargins(48 + 6, 48, 48 - 6, 48);
 
-constexpr int kButtonSpectrumSpacing = 2;
+constexpr int kLeftRightSpacing = 2;
 
-constexpr QSize kSpectrumSize(kButtonSize.width() * 3, kButtonSize.height());
+constexpr QRect kRightGeometry(kLeftGeometry.width() + kLeftRightSpacing, 0,
+                               kLeftGeometry.width() * 3, kLeftGeometry.height());
 
-constexpr QSize kHalfSpectrumSize(kSpectrumSize.width() / 2, kSpectrumSize.height());
+constexpr QMargins kRightInternalMargins(48, 24, 48, 24);
 
-constexpr QMargins kSpectrumInternalMargins(48, 24, 48, 24);
+constexpr QSize kWidgetSize(kLeftGeometry.width() + kLeftRightSpacing + kRightGeometry.width(),
+                            kLeftGeometry.height());
 
 //-------------------------------------------------------------------------------------------------
-// AudioSpectrumOverlayWidget::Private
+// AudioSpectrumWidget::Private
 
 struct AudioSpectrumWidget::Private
 {
     QnResourceDisplayPtr display;
-    QnImageButtonWidget* const button;
-    GraphicsWidget* const rightSpacer;
+    QIcon icon;
+    QPixmap unmutedPixmap;
+    QPixmap mutedPixmap;
     QColor backgroundColor;
     QColor activeColor;
     QColor inactiveColor;
     VoiceSpectrumPainter painter;
     QElapsedTimer timer;
+    bool muted = false;
 };
 
 //-------------------------------------------------------------------------------------------------
-// AreaSelectOverlayWidget
+// AudioSpectrumWidget
 
 AudioSpectrumWidget::AudioSpectrumWidget(
     QnResourceDisplayPtr display,
@@ -55,8 +60,7 @@ AudioSpectrumWidget::AudioSpectrumWidget(
     base_type(parent),
     d(new Private{
         .display = display,
-        .button = new QnImageButtonWidget(this),
-        .rightSpacer = new GraphicsWidget(this),
+        .icon = qnSkin->icon("item/audio_on.svg", "item/audio_off.svg"),
         .backgroundColor = core::colorTheme()->color("camera.audioOnly.background"),
         .activeColor = core::colorTheme()->color("camera.audioOnly.visualizer.active"),
         .inactiveColor = core::colorTheme()->color("camera.audioOnly.visualizer.inactive")
@@ -64,26 +68,17 @@ AudioSpectrumWidget::AudioSpectrumWidget(
 {
     NX_ASSERT(display);
 
-    // Init layout.
-    QGraphicsLinearLayout* layout = new QGraphicsLinearLayout(Qt::Horizontal);
-    layout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
-    layout->addItem(d->button);
-    layout->addItem(d->rightSpacer);
-    layout->setSpacing(kButtonSpectrumSpacing);
-    setLayout(layout);
+    // Init pixmaps.
+    QSize pixmapSize = core::Geometry::eroded(kLeftGeometry, kLeftInternalMargins).size();
+    d->unmutedPixmap = d->icon.pixmap(pixmapSize, QIcon::Normal, QIcon::Off);
+    d->mutedPixmap = d->icon.pixmap(pixmapSize, QIcon::Normal, QIcon::On);
 
-    // Init button & spacer.
-    d->button->setIcon(qnSkin->icon("item/audio_on.svg", "item/audio_off.svg"));
-    d->button->setCheckable(true);
-    d->button->setFixedSize(kButtonSize);
-    d->button->setImageMargins(kButtonInternalMargins);
-    d->rightSpacer->setMinimumSize(kSpectrumSize);
-    d->rightSpacer->setMaximumSize(kSpectrumSize);
+    // Init layout.
+    setMaximumSize(kWidgetSize);
+    setMinimumSize(kWidgetSize);
 
     // Set up event handling.
     setAcceptedMouseButtons(Qt::NoButton);
-    d->rightSpacer->setAcceptedMouseButtons(Qt::NoButton);
-    d->button->setAcceptedMouseButtons(Qt::NoButton); // It is a fake button.
 
     // Set up visualizer.
     d->timer.start();
@@ -94,43 +89,47 @@ AudioSpectrumWidget::~AudioSpectrumWidget()
 }
 
 bool AudioSpectrumWidget::isMuted() const {
-    return d->button->isChecked();
+    return d->muted;
 }
 
 void AudioSpectrumWidget::setMuted(bool muted) {
-    d->button->setChecked(muted);
+    d->muted = muted;
 }
 
 void AudioSpectrumWidget::paint(
     QPainter* painter, const QStyleOptionGraphicsItem* /*option*/, QWidget* /*widget*/)
 {
     // Prepare for arc drawing.
-    QRectF leftRect = d->button->geometry();
-    QRectF rightRect = core::Geometry::aligned(leftRect.size(), d->rightSpacer->geometry(),
-                                               Qt::AlignRight);
+    QRectF leftArcRect = kLeftGeometry;
+    QRectF rightArcRect = core::Geometry::aligned(kLeftGeometry.size(), kRightGeometry,
+                                                  Qt::AlignRight);
 
-    // Draw button background.
-    QRectF buttonRect = d->button->geometry();
+    // Draw icon background.
+    QRectF leftRect = kLeftGeometry;
     QPainterPath path;
-    path.moveTo((leftRect.topLeft() + leftRect.topRight()) / 2);
-    path.lineTo(buttonRect.topRight());
-    path.lineTo(buttonRect.bottomRight());
-    path.lineTo((leftRect.bottomLeft() + leftRect.bottomLeft()) / 2);
-    path.arcTo(leftRect, 270, -180);
+    path.moveTo((leftArcRect.topLeft() + leftArcRect.topRight()) / 2);
+    path.lineTo(leftRect.topRight());
+    path.lineTo(leftRect.bottomRight());
+    path.lineTo((leftArcRect.bottomLeft() + leftArcRect.bottomLeft()) / 2);
+    path.arcTo(leftArcRect, 270, -180);
     painter->fillPath(path, d->backgroundColor);
 
+    // Draw icon.
+    QRectF iconRect = core::Geometry::eroded(kLeftGeometry, kLeftInternalMargins);
+    paintPixmapSharp(painter, d->muted ? d->mutedPixmap : d->unmutedPixmap, iconRect);
+
     // Draw spectrum background.
-    QRectF spacerRect = d->rightSpacer->geometry();
+    QRectF rightRect = kRightGeometry;
     path.clear();
-    path.moveTo((rightRect.bottomLeft() + rightRect.bottomRight()) / 2);
-    path.lineTo(spacerRect.bottomLeft());
-    path.lineTo(spacerRect.topLeft());
-    path.lineTo((rightRect.topLeft() + rightRect.topRight()) / 2);
-    path.arcTo(rightRect, 90, -180);
+    path.moveTo((rightArcRect.bottomLeft() + rightArcRect.bottomRight()) / 2);
+    path.lineTo(rightRect.bottomLeft());
+    path.lineTo(rightRect.topLeft());
+    path.lineTo((rightArcRect.topLeft() + rightArcRect.topRight()) / 2);
+    path.arcTo(rightArcRect, 90, -180);
     painter->fillPath(path, d->backgroundColor);
 
     // Draw spectrum.
-    QRectF spectrumRect = core::Geometry::eroded(spacerRect, kSpectrumInternalMargins);
+    QRectF spectrumRect = core::Geometry::eroded(rightRect, kRightInternalMargins);
     d->painter.update(d->timer.elapsed(), d->display->camDisplay()->audioSpectrum().data);
     d->painter.options.visualizerLineOffset = spectrumRect.width() / 30;
     d->painter.options.color = isMuted() ? d->inactiveColor : d->activeColor;
