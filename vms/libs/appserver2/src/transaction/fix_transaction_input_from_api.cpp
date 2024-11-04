@@ -180,8 +180,7 @@ QnTransaction<nx::vms::api::rules::Rule> fixTransactionInputFromApi(
             }
         }
     }
-
-    result = new Result();
+    *result = Result();
     return fixedTran;
 }
 
