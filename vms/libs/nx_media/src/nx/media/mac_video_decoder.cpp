@@ -24,7 +24,7 @@ extern "C"
 #include <nx/build_info.h>
 #include <nx/codec/nal_units.h>
 #include <nx/media/ffmpeg/av_packet.h>
-#include <nx/media/ffmpeg/old_api.h>
+#include <nx/media/ffmpeg/hw_video_decoder.h>
 #include <nx/media/ffmpeg_helper.h>
 #include <nx/media/h264_utils.h>
 #include <nx/media/utils.h>
@@ -33,26 +33,11 @@ extern "C"
 #include <nx/utils/thread/mutex.h>
 #include <utils/media/annexb_to_mp4.h>
 
-#include "aligned_mem_video_buffer.h"
 #include "mac_utils.h"
 
 namespace nx::media {
 
 namespace {
-
-    bool isValidFrameSize(const QSize& size)
-    {
-        static const auto kMinimumFrameSize = QSize(64, 64);
-        return size.width() >= kMinimumFrameSize.width()
-        && size.height() >= kMinimumFrameSize.height();
-    }
-
-    bool isFatalError(int ffmpegErrorCode)
-    {
-        static const int kHWAcceleratorFailed = 0xb1b4b1ab;
-
-        return ffmpegErrorCode == kHWAcceleratorFailed;
-    }
 
     QVideoFrameFormat::PixelFormat toQtPixelFormat(AVPixelFormat pixFormat)
     {
@@ -100,14 +85,13 @@ namespace {
 class IOSMemoryBuffer: public QAbstractVideoBuffer
 {
 public:
-    IOSMemoryBuffer(AVFrame* frame):
+    IOSMemoryBuffer(CLVideoDecoderOutputPtr frame):
         m_frame(frame)
     {
     }
 
-    ~IOSMemoryBuffer()
+    virtual ~IOSMemoryBuffer() override
     {
-        av_frame_free(&m_frame);
     }
 
     virtual MapData map(QVideoFrame::MapMode /*mode*/) override
@@ -169,11 +153,11 @@ public:
     virtual QVideoFrameFormat format() const override
     {
         return QVideoFrameFormat(
-            QSize(m_frame->width, m_frame->height), qtPixelFormatForFrame(m_frame));
+            QSize(m_frame->width, m_frame->height), qtPixelFormatForFrame(m_frame.get()));
     }
 
 private:
-    AVFrame* m_frame = nullptr;
+    CLVideoDecoderOutputPtr m_frame;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -186,9 +170,8 @@ class MacVideoDecoderPrivate: public QObject
 
 public:
     MacVideoDecoderPrivate()
-    :
-        codecContext(nullptr),
-        frame(av_frame_alloc()),
+        :
+        outFramePtr(new CLVideoDecoderOutput()),
         lastPts(AV_NOPTS_VALUE)
     {
     }
@@ -196,17 +179,18 @@ public:
     ~MacVideoDecoderPrivate()
     {
         closeCodecContext();
-        av_frame_free(&frame);
     }
 
     void initContext(const QnConstCompressedVideoDataPtr& frame);
     void closeCodecContext();
 
+    std::unique_ptr<nx::media::ffmpeg::HwVideoDecoder> decoder;
+
     AnnexbToMp4 m_annexbToMp4;
-    AVCodecContext* codecContext;
-    AVFrame* frame;
+    CLVideoDecoderOutputPtr outFramePtr;
     qint64 lastPts;
     bool isHardwareAccelerated = false;
+    int frameNum = 0;
 };
 
 void MacVideoDecoderPrivate::initContext(const QnConstCompressedVideoDataPtr& frame)
@@ -214,39 +198,25 @@ void MacVideoDecoderPrivate::initContext(const QnConstCompressedVideoDataPtr& fr
     if (!frame || !frame->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey))
         return;
 
-    auto codec = avcodec_find_decoder(frame->compressionType);
-    codecContext = avcodec_alloc_context3(codec);
-    if (frame->context)
-        frame->context->toAvCodecContext(codecContext);
-
-    QSize frameSize = QSize(codecContext->width, codecContext->height);
-    if (!isValidFrameSize(frameSize))
+    if (!nx::media::ffmpeg::HwVideoDecoder::isCompatible(
+        frame->compressionType,
+        QSize(frame->width, frame->height),
+        /* allowOverlay */ false))
     {
-        frameSize = getFrameSize(frame.get());
-        codecContext->width = frameSize.width();
-        codecContext->height = frameSize.height();
-    }
-    if (!isValidFrameSize(frameSize))
-    {
-        closeCodecContext();
+        NX_WARNING(this, "Decoder is not compatible with codec %1 resolution %2x%3",
+            frame->compressionType, frame->width, frame->height);
         return;
     }
 
-    codecContext->thread_count = 1;
-    codecContext->opaque = this;
-
-    if (avcodec_open2(codecContext, codec, nullptr) < 0)
-    {
-        NX_WARNING(this, "Can't open decoder for codec %1 resolution %2x%3",
-            frame->compressionType, codecContext->width, codecContext->height);
-        closeCodecContext();
-        return;
-    }
+    decoder = std::make_unique<nx::media::ffmpeg::HwVideoDecoder>(
+        AV_HWDEVICE_TYPE_VIDEOTOOLBOX,
+        nullptr);
+    frameNum = 0;
 }
 
 void MacVideoDecoderPrivate::closeCodecContext()
 {
-    avcodec_free_context(&codecContext);
+    decoder.reset();
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -320,60 +290,45 @@ int MacVideoDecoder::decode(
         }
     }
 
-    if (!d->codecContext)
+    if (!d->decoder)
     {
         d->initContext(compressedVideoData);
-        if (!d->codecContext)
+        if (!d->decoder)
             return -1;
     }
 
-    nx::media::ffmpeg::AvPacket avPacket(compressedVideoData.get());
-    auto packet = avPacket.get();
-
-    // There is a known ffmpeg bug. It returns the below time for the very last packet while
-    // flushing internal buffer. So, repeat this time for the empty packet in order to avoid
-    // the bug.
-    if (compressedVideoData)
-        d->lastPts = compressedVideoData->timestamp;
-    else
-        packet->pts = packet->dts = d->lastPts;
-
-    int gotPicture = 0;
-    int res = nx::media::ffmpeg::old_api::decode(d->codecContext, d->frame, &gotPicture, packet);
-    if (res <= 0 || !gotPicture)
+    if (!d->decoder->decode(compressedVideoData, &d->outFramePtr))
     {
-        NX_WARNING(this, "IOS decoder error. gotPicture %1, errorCode %2", gotPicture, res);
-        // hardware decoder crash if use same frame after decoding error. It seems
-        // leaves invalid ref_count on error.
-        av_frame_free(&d->frame);
-        d->frame = av_frame_alloc();
+        const int ret = d->decoder->getLastDecodeResult(); //< Zero means buffering.
+        if (ret < 0)
+        {
+            NX_WARNING(this, "Failed to decode frame");
+            d->decoder.reset();
+        }
 
-        if (isFatalError(res))
-            d->closeCodecContext(); //< reset all
-
-        return res; //< Negative value means error, zero means buffering.
+        return ret;
     }
 
-    qint64 startTimeMs = d->frame->pkt_dts / 1000;
-    int frameNum = qMax(0, d->codecContext->frame_num - 1);
+    d->isHardwareAccelerated = (bool) d->outFramePtr->hw_frames_ctx;
 
-    if (qtPixelFormatForFrame(d->frame) == QVideoFrameFormat::Format_Invalid)
+    const qint64 startTimeMs = d->outFramePtr->pkt_dts / 1000;
+    ++d->frameNum;
+
+    if (qtPixelFormatForFrame(d->outFramePtr.get()) == QVideoFrameFormat::Format_Invalid)
     {
         NX_WARNING(this, "Unknown pixel format");
         // Recreate frame just in case.
         // I am not sure hardware decoder can reuse it.
-        av_frame_free(&d->frame);
-        d->frame = av_frame_alloc();
+        d->outFramePtr.reset(new CLVideoDecoderOutput());
         return -1; //< report error
     }
 
-    // The IOSMemoryBuffer takes ownership of the frame.
-    auto videoFrame = new VideoFrame(std::make_unique<IOSMemoryBuffer>(d->frame));
-    d->frame = av_frame_alloc();
+    auto videoFrame = new VideoFrame(std::make_unique<IOSMemoryBuffer>(d->outFramePtr));
+    d->outFramePtr.reset(new CLVideoDecoderOutput());
     videoFrame->setStartTime(startTimeMs);
 
     outDecodedFrame->reset(videoFrame);
-    return frameNum;
+    return d->frameNum;
 }
 
 AbstractVideoDecoder::Capabilities MacVideoDecoder::capabilities() const
