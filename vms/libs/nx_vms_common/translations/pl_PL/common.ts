@@ -1924,7 +1924,7 @@
     </message>
     <message>
       <source>Anonymous Crash Report Server API URL</source>
-      <translation type="unfinished">Anonymous Crash Report Server API URL</translation>
+      <translation>Anonimowy raport awarii serwera API URL</translation>
     </message>
   </context>
   <context>
