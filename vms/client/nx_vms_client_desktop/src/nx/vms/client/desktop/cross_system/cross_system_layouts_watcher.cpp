@@ -82,7 +82,7 @@ CrossSystemLayoutsWatcher::CrossSystemLayoutsWatcher(QObject* parent):
                     return;
 
                 NX_ASSERT(!crossSystemResourceSystemId(item.resource).isEmpty(),
-                    "Disable `validateCloudLayouts` in the `nx_vms_client_desktop.ini` if get "
+                    "Disable `validateCloudLayouts` in the `desktop_client.ini` if get "
                     "this assert on the client start, then delete misconstructed cloud layouts");
             };
 
