@@ -90,6 +90,9 @@ struct NX_VMS_CLIENT_CORE_API Ini: nx::kit::IniConfig
     NX_INI_FLAG(false, delayRightPanelLiveAnalytics,
         "[Support] Prohibits showing right panel live analytics before the corresponding frame\n"
         "appears on the camera if the camera is playing live");
+
+    // VMS-52886
+    NX_INI_FLAG(false, cslObjectsTabVisible, "[Feature] Show Objects tab for cross site layouts.");
 };
 
 NX_VMS_CLIENT_CORE_API Ini& ini();

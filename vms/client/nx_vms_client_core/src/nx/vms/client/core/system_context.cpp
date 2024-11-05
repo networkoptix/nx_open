@@ -14,6 +14,7 @@
 #include <nx/vms/client/core/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/cross_system/cross_system_ptz_controller_pool.h>
+#include <nx/vms/client/core/ini.h>
 #include <nx/vms/client/core/rules/client_router.h>
 #include <nx/vms/client/core/server_runtime_events/server_runtime_event_connector.h>
 #include <nx/vms/client/core/utils/video_cache.h>
@@ -74,6 +75,7 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
     switch (mode)
     {
         case Mode::client:
+        {
             d->serverRuntimeEventConnector = std::make_unique<ServerRuntimeEventConnector>();
             d->cameraBookmarksManager = std::make_unique<QnCameraBookmarksManager>(this);
             d->ptzControllerPool = std::make_unique<ptz::ControllerPool>(this);
@@ -88,19 +90,20 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
             d->taxonomyManager = std::make_unique<analytics::TaxonomyManager>(this);
             d->videoCache = std::make_unique<VideoCache>(this);
             break;
-
+        }
         case Mode::crossSystem:
+        {
             d->videoCache = std::make_unique<VideoCache>(this);
             d->ptzControllerPool = std::make_unique<CrossSystemPtzControllerPool>(this);
             d->userWatcher = std::make_unique<UserWatcher>(this);
             d->cameraBookmarksManager = std::make_unique<QnCameraBookmarksManager>(this);
             d->watermarkWatcher = std::make_unique<WatermarkWatcher>(this);
-            d->taxonomyManager = std::make_unique<analytics::TaxonomyManager>(this);
+            if (ini().cslObjectsTabVisible)
+                d->taxonomyManager = std::make_unique<analytics::TaxonomyManager>(this);
             break;
+        }
 
         case Mode::cloudLayouts:
-            break;
-
         case Mode::unitTests:
             break;
     }

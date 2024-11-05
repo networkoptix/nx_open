@@ -45,6 +45,7 @@
 #include <nx/vms/client/core/analytics/analytics_taxonomy_manager.h>
 #include <nx/vms/client/core/analytics/taxonomy/object_type.h>
 #include <nx/vms/client/core/event_search/utils/analytics_search_setup.h>
+#include <nx/vms/client/core/ini.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/icon.h>
 #include <nx/vms/client/core/skin/skin.h>
@@ -302,6 +303,9 @@ AnalyticsSearchWidget::Private::Private(AnalyticsSearchWidget* q):
     connect(q->windowContext()->navigator(), &QnWorkbenchNavigator::currentResourceChanged, this,
         [this, q]()
         {
+            if (!nx::vms::client::core::ini().cslObjectsTabVisible)
+                return;
+
             const auto selectedCamera = q->windowContext()->navigator()->currentResource()
                 .dynamicCast<QnVirtualCameraResource>();
             if (!selectedCamera)
