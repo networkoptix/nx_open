@@ -259,7 +259,7 @@ void QnContext::initCloudStatusHandling()
         {
             const auto description =
                 core::errorDescription(RemoteConnectionErrorCode::cloudSessionExpired, {}, {});
-            showMessage(description.shortText, description.longText);
+            emit showMessage(description.shortText, description.longText);
         });
 }
 
@@ -462,9 +462,8 @@ void QnContext::showConnectionErrorMessage(
     const auto title = systemName.isEmpty()
             ? tr("Cannot connect to the Server")
             : tr("Cannot connect to the Site \"%1\"", "%1 is a site name").arg(systemName);
-    showMessage(title, errorText);
+    emit showMessage(title, errorText);
 }
-
 
 void QnContext::openExternalLink(const QUrl& url)
 {
