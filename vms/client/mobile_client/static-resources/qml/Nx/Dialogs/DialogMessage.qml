@@ -12,5 +12,11 @@ Text
     font.pixelSize: 16
     wrapMode: Text.WordWrap
     color: ColorTheme.colors.light4
+    linkColor: ColorTheme.colors.brand_core
     visible: !!text
+    onLinkActivated: (link) =>
+    {
+        if (link === "#cloud_account_security")
+            openExternalLink(cloudUrlHelper.accountSecurityUrl())
+    }
 }

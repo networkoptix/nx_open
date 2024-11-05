@@ -35,7 +35,7 @@ DialogBase
         {
             id: buttonBox
             visible: buttonsModel.length > 0
-            onButtonClicked:
+            onButtonClicked: (buttonId) =>
             {
                 close()
                 dialog.buttonClicked(buttonId)
