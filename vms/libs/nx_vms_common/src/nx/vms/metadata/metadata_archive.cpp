@@ -811,7 +811,7 @@ QnTimePeriodList MetadataArchive::matchPeriodInternal(
         QFile metadataFile;
         Index index(this);
 
-        if (index.load(timePointMs))
+        if (index.load(timePointMs) && !index.records.empty())
         {
             recordMatcher->onFileOpened(timePointMs, index.header);
             if (recordMatcher->isNoData())
