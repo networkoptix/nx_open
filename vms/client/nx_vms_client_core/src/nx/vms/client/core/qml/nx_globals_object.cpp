@@ -437,6 +437,25 @@ QVariantMap NxGlobalsObject::getDriverInfo(QQuickWindow* window) const
     return result;
 }
 
+void NxGlobalsObject::ensureMousePressed(QQuickItem* item, Qt::MouseButton button)
+{
+    if (!NX_ASSERT(item))
+        return;
+
+    if (!qApp->mouseButtons().testFlag(button))
+    {
+        QMouseEvent releaseEvent(
+            QEvent::MouseButtonRelease,
+            item->mapFromGlobal(QCursor::pos()),
+            QCursor::pos(),
+            button,
+            qApp->mouseButtons(),
+            Qt::NoModifier);
+
+        QCoreApplication::sendEvent(item, &releaseEvent);
+    }
+}
+
 void NxGlobalsObject::registerQmlType()
 {
     qmlRegisterSingletonType<NxGlobalsObject>("nx.vms.client.core", 1, 0, "NxGlobals",

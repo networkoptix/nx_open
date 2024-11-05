@@ -563,6 +563,16 @@ FocusScope
                     acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
                     visible: listItem.inUse
 
+                    // Keeps the target MouseArea in the correct state. There is a bug in Qt where
+                    // MouseArea may retain its pressed state even after the button is released
+                    // (QTBUG-123537, QTBUG-113384, still can be reproduced in Qt 6.8.0). This
+                    // issue is somehow related to touch events generated from the trackpad and
+                    // QGraphicsView. For some reason, after some touch events are generated (when
+                    // moving the cursor over the scene), MouseButtonRelease events lose their
+                    // exclusive grabbers and the MouseArea is not receiving the event. This
+                    // happens only for Resource Tree's QQuickWidget inside QGraphicsView.
+                    MouseAreaStateGuard { }
+
                     drag.onActiveChanged:
                     {
                         if (drag.active && selectionModel.hasDraggableIndexes())
