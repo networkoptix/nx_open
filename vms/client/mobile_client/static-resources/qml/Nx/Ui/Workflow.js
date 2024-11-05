@@ -254,7 +254,7 @@ function openDialog(path, properties)
     return dialog
 }
 
-function openStandardDialog(title, message, buttonsModel, disableAutoClose)
+function openStandardDialog(title, message, buttonsModel, disableAutoClose = false)
 {
     return openDialog(
         "../Dialogs/StandardDialog.qml",

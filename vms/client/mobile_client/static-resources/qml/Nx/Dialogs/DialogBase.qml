@@ -21,8 +21,8 @@ Popup
     padding: 0
     modal: true
     closePolicy: disableAutoClose
-            ? Popup.NoAutoClose
-            : Popup.CloseOnEscape | Popup.CloseOnPressOutside | Popup.CloseOnReleaseOutside
+        ? Popup.NoAutoClose
+        : Popup.CloseOnEscape | Popup.CloseOnPressOutside | Popup.CloseOnReleaseOutside
 
     background: null
 
