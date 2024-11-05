@@ -6,6 +6,7 @@
 #include <QtGui/QPixmap>
 #include <QtQml/QQmlEngine>
 
+#include <analytics/common/object_metadata.h>
 #include <analytics/db/analytics_db_types.h>
 #include <api/server_rest_connection.h>
 #include <core/resource/camera_history.h>
@@ -112,9 +113,9 @@ public:
     bool gapBeforeNewTracks = false;
     bool keepLiveDataAtClear = false;
 
-    detail::AnalyticDataStorage newTracks;
-    detail::AnalyticDataStorage noBestShotTracks;
-    detail::AnalyticDataStorage data;
+    detail::AnalyticDataStorage newTracks; //< Live metadata tracks not yet added to displayed list.
+    detail::AnalyticDataStorage hiddenTracks; //< Tracks without best shots or titles.
+    detail::AnalyticDataStorage data; //< Displayed tracks.
 
     LiveTimestampGetter liveTimestampGetter;
 
@@ -130,8 +131,23 @@ public:
     Private(AnalyticsSearchListModel* q);
 
     void emitDataChangedIfNeeded();
-    void advanceTrack(nx::analytics::db::ObjectTrack& track,
-        nx::analytics::db::ObjectPosition&& position, bool emitDataChanged = true);
+
+    struct MetadataPack
+    {
+        nx::Uuid trackId;
+        std::optional<nx::common::metadata::ObjectMetadata> position;
+        std::optional<nx::common::metadata::BestShotMetadata> bestShot;
+        std::optional<nx::common::metadata::TitleMetadata> title;
+    };
+
+    void updateTrack(nx::analytics::db::ObjectTrack& track,
+        qint64 timestampUs,
+        nx::vms::api::StreamIndex streamIndex,
+        const MetadataPack& pack,
+        bool emitDataChanged);
+
+    void updateAttributes(nx::analytics::db::ObjectTrack& track,
+        const nx::common::metadata::Attributes attributes);
 
     void updateRelevantObjectTypes();
 
@@ -216,17 +232,73 @@ void AnalyticsSearchListModel::Private::emitDataChangedIfNeeded()
     dataChangedTrackIds.clear();
 }
 
-void AnalyticsSearchListModel::Private::advanceTrack(ObjectTrack& track,
-    ObjectPosition&& position, bool emitDataChanged)
+void AnalyticsSearchListModel::Private::updateTrack(nx::analytics::db::ObjectTrack& track,
+    qint64 timestampUs,
+    nx::vms::api::StreamIndex streamIndex,
+    const MetadataPack& pack,
+    bool emitDataChanged)
+{
+    if (!NX_ASSERT(q->systemContext())
+        || !NX_ASSERT(pack.position || pack.bestShot || pack.title)
+        || !NX_ASSERT(pack.trackId == track.id))
+    {
+        return;
+    }
+
+    // Update track duration.
+    track.lastAppearanceTimeUs = timestampUs;
+
+    if (pack.position && NX_ASSERT(pack.position->trackId == track.id))
+    {
+        // Update object type.
+        track.objectTypeId = pack.position->typeId;
+
+        // Update attributes.
+        updateAttributes(track, pack.position->attributes);
+    }
+
+    // Update best shot.
+    if (pack.bestShot && NX_ASSERT(pack.bestShot->trackId == track.id))
+    {
+        if (pack.bestShot->location == nx::common::metadata::ImageLocation::external)
+            externalBestShotTracks.insert(pack.bestShot->trackId);
+        else
+            externalBestShotTracks.remove(pack.bestShot->trackId);
+
+        track.bestShot.timestampUs = timestampUs;
+        track.bestShot.rect = pack.bestShot->boundingBox;
+        track.bestShot.streamIndex = streamIndex;
+        updateAttributes(track, pack.bestShot->attributes); //< Probably not used, albeit exists.
+    }
+
+    // Update title.
+    if (pack.title && NX_ASSERT(pack.title->trackId == track.id))
+    {
+        if (!track.title)
+            track.title = nx::analytics::db::Title{};
+        track.title->text = pack.title->text;
+        track.title->rect = pack.title->boundingBox;
+        track.title->timestampUs = timestampUs;
+        track.title->streamIndex = streamIndex;
+        track.title->hasImage =
+            pack.title->location != nx::common::metadata::ImageLocation::undefined;
+    }
+
+    if (emitDataChanged)
+    {
+        dataChangedTrackIds.insert(track.id);
+        this->emitDataChanged->requestOperation();
+    }
+}
+
+void AnalyticsSearchListModel::Private::updateAttributes(nx::analytics::db::ObjectTrack& track,
+    const nx::common::metadata::Attributes attributes)
 {
     using nx::common::metadata::AttributeEx;
     using nx::common::metadata::NumericRange;
     using nx::analytics::taxonomy::AbstractAttribute;
 
-    if (!NX_ASSERT(q->systemContext()))
-        return;
-
-    for (const auto& attribute: position.attributes)
+    for (const auto& attribute: attributes)
     {
         const auto foundIt = std::find_if(track.attributes.begin(), track.attributes.end(),
             [&attribute](const nx::common::metadata::Attribute& value)
@@ -258,14 +330,6 @@ void AnalyticsSearchListModel::Private::advanceTrack(ObjectTrack& track,
         }
 
         addAttributeIfNotExists(&track.attributes, attribute);
-    }
-
-    track.lastAppearanceTimeUs = position.timestampUs;
-
-    if (emitDataChanged)
-    {
-        dataChangedTrackIds.insert(track.id);
-        this->emitDataChanged->requestOperation();
     }
 }
 
@@ -581,9 +645,9 @@ void AnalyticsSearchListModel::Private::processMetadata()
             subtractKeysFromSet(/*minuend*/ externalBestShotTracks,
                 /*subtrahend*/ newTracks.idToTimestamp);
             subtractKeysFromSet(/*minuend*/ externalBestShotTracks,
-                /*subtrahend*/ noBestShotTracks.idToTimestamp);
+                /*subtrahend*/ hiddenTracks.idToTimestamp);
             newTracks.clear();
-            noBestShotTracks.clear();
+            hiddenTracks.clear();
         }
     }
 
@@ -695,9 +759,9 @@ void AnalyticsSearchListModel::Private::processMetadata()
             if (index >= 0)
                 return {&data, index};
 
-            index = noBestShotTracks.indexOf(trackId);
+            index = hiddenTracks.indexOf(trackId);
             if (index >= 0)
-                return {&noBestShotTracks, index};
+                return {&hiddenTracks, index};
 
             return {};
         };
@@ -729,106 +793,105 @@ void AnalyticsSearchListModel::Private::processMetadata()
         if (!objectMetadata)
             continue;
 
+        using namespace nx::common::metadata;
+        auto bestShotMetadata = objectMetadata->bestShot;
+        auto titleMetadata = objectMetadata->title;
+
+        std::vector<MetadataPack> objects;
+        objects.reserve(objectMetadata->objectMetadataList.size() + 2);
+
         for (const auto& item: objectMetadata->objectMetadataList)
+        {
+            MetadataPack pack{.trackId = item.trackId, .position = item};
+            if (bestShotMetadata && bestShotMetadata->trackId == item.trackId)
+                std::swap(pack.bestShot, bestShotMetadata);
+            if (titleMetadata && titleMetadata->trackId == item.trackId)
+                std::swap(pack.title, titleMetadata);
+            objects.push_back(pack);
+        }
+
+        if (bestShotMetadata)
+        {
+            MetadataPack pack{.trackId = bestShotMetadata->trackId, .bestShot = bestShotMetadata};
+            if (titleMetadata && titleMetadata->trackId == bestShotMetadata->trackId)
+                std::swap(pack.title, titleMetadata);
+            bestShotMetadata = {};
+            objects.push_back(pack);
+        }
+
+        if (titleMetadata)
+        {
+            MetadataPack pack{.trackId = titleMetadata->trackId, .title = titleMetadata};
+            titleMetadata = {};
+            objects.push_back(pack);
+        }
+
+        for (const auto& item: objects)
         {
             auto found = findObject(item.trackId);
 
-            ObjectPosition pos;
-            pos.deviceId = objectMetadata->deviceId;
-            pos.timestampUs = objectMetadata->timestampUs;
-            pos.durationUs = objectMetadata->durationUs;
-            pos.boundingBox = item.boundingBox;
+            // --------------
+            // Existing track
 
             if (found.storage)
             {
+                // If a best shot or a title is being added to a previously hidden track,
+                // convert the track into a displayed track.
+                if (found.storage == &hiddenTracks && (item.bestShot || item.title))
+                {
+                    const int index = newTracks.insert(hiddenTracks.take(found.index));
+                    found = FoundObjectTrack{&newTracks, index};
+                }
+
                 auto& track = found.storage->items[found.index];
-                track.objectTypeId = item.typeId;
-                pos.attributes = item.attributes;
-                advanceTrack(track, std::move(pos), /*emitDataChanged*/ found.storage == &data);
+
+                // Note: in this implementation we don't update filtering if the track changes
+                // dynamically. I.e. a live update can change filter conditions the way that
+                // a track that was filtered out should be shown or a track that was shown
+                // should be hidden, but that's not implemented, as it's a rare case.
+
+                updateTrack(track,
+                    objectMetadata->timestampUs,
+                    objectMetadata->streamIndex,
+                    item,
+                    /*emitDataChanged*/ found.storage == &data);
+
                 continue;
             }
 
-            if (!isAcceptedObjectType(item.typeId))
+            // ---------
+            // New track
+
+            if (!item.position || !isAcceptedObjectType(item.position->typeId))
                 continue;
 
             ObjectTrack newTrack;
             newTrack.id = item.trackId;
             newTrack.deviceId = objectMetadata->deviceId;
-            newTrack.objectTypeId = item.typeId;
             newTrack.analyticsEngineId = objectMetadata->analyticsEngineId;
-            newTrack.attributes = item.attributes;
             newTrack.firstAppearanceTimeUs = objectMetadata->timestampUs;
-            newTrack.lastAppearanceTimeUs = objectMetadata->timestampUs;
-            newTrack.objectPosition.add(item.boundingBox);
+            newTrack.objectPosition.add(item.position->boundingBox);
+
+            updateTrack(newTrack, objectMetadata->timestampUs, objectMetadata->streamIndex, item,
+                /*emitDataChanged*/ false);
 
             if (!filter.acceptsTrack(newTrack, objectTypeDictionary))
                 continue;
 
-            if (objectMetadata->bestShot)
+            if (newTrack.bestShot.initialized() || newTrack.title)
                 newTracks.insert(std::move(newTrack));
             else
-                noBestShotTracks.insert(std::move(newTrack));
+                hiddenTracks.insert(std::move(newTrack));
         }
-
-        if (objectMetadata->bestShot)
-        {
-            const auto& bestShot = objectMetadata->bestShot;
-            auto found = findObject(bestShot->trackId);
-
-            if (found.storage)
-            {
-                using namespace nx::common::metadata;
-                if (objectMetadata->bestShot->location == ImageLocation::external)
-                    externalBestShotTracks.insert(bestShot->trackId);
-
-                auto& track = found.storage->items[found.index];
-                track.bestShot.timestampUs = objectMetadata->timestampUs;
-                track.bestShot.rect = bestShot->boundingBox;
-                track.bestShot.streamIndex = objectMetadata->streamIndex;
-
-                if (found.storage == &data)
-                {
-                    // If it was an already loaded track, emit dataChanged.
-                    dataChangedTrackIds.insert(track.id);
-                    emitDataChanged->requestOperation();
-                }
-                else if (found.storage == &noBestShotTracks)
-                {
-                    // If it was a no-best-shot track, move it to the newly added.
-                    const int index = newTracks.insert(noBestShotTracks.take(found.index));
-                    found = FoundObjectTrack{ &newTracks, index };
-                }
-
-                ObjectPosition pos;
-                pos.deviceId = objectMetadata->deviceId;
-                pos.timestampUs = objectMetadata->timestampUs;
-                pos.durationUs = objectMetadata->durationUs;
-                pos.boundingBox = bestShot->boundingBox;
-
-                if (found.storage)
-                {
-                    auto& track = found.storage->items[found.index];
-                    pos.attributes = bestShot->attributes;
-                    advanceTrack(track, std::move(pos), /*emitDataChanged*/ found.storage == &data);
-                }
-            }
-        }
-
-        if (objectMetadata->title)
-        {
-            // TODO: add title processing here
-            auto found = findObject(objectMetadata->title->trackId);
-        }
-
     }
 
-    // Limit the size of the no-best-shot track queue.
-    if (noBestShotTracks.size() > q->maximumCount())
+    // Limit the size of the hidden track queue.
+    if (hiddenTracks.size() > q->maximumCount())
     {
-        const auto removeBegin = noBestShotTracks.items.begin() + q->maximumCount();
-        const auto cleanupFunction = itemCleanupFunction(noBestShotTracks);
-        std::for_each(removeBegin, noBestShotTracks.items.end(), cleanupFunction);
-        noBestShotTracks.items.erase(removeBegin, noBestShotTracks.items.end());
+        const auto removeBegin = hiddenTracks.items.begin() + q->maximumCount();
+        const auto cleanupFunction = itemCleanupFunction(hiddenTracks);
+        std::for_each(removeBegin, hiddenTracks.items.end(), cleanupFunction);
+        hiddenTracks.items.erase(removeBegin, hiddenTracks.items.end());
     }
 
     // Limit the size of the available new tracks queue.
@@ -1456,7 +1519,7 @@ void AnalyticsSearchListModel::clearData()
     else
     {
         d->newTracks.clear();
-        d->noBestShotTracks.clear();
+        d->hiddenTracks.clear();
         d->externalBestShotTracks.clear();
     }
 
