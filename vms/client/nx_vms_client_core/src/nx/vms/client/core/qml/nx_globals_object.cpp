@@ -387,4 +387,23 @@ QString NxGlobalsObject::shortcutText(const QVariant& var) const
     return sequence.toString(QKeySequence::NativeText);
 }
 
+void NxGlobalsObject::ensureMousePressed(QQuickItem* item, Qt::MouseButton button)
+{
+    if (!NX_ASSERT(item))
+        return;
+
+    if (!qApp->mouseButtons().testFlag(button))
+    {
+        QMouseEvent releaseEvent(
+            QEvent::MouseButtonRelease,
+            item->mapFromGlobal(QCursor::pos()),
+            QCursor::pos(),
+            button,
+            qApp->mouseButtons(),
+            Qt::NoModifier);
+
+        QCoreApplication::sendEvent(item, &releaseEvent);
+    }
+}
+
 } // namespace nx::vms::client::core

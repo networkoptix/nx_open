@@ -103,6 +103,11 @@ public:
 
     /** Returns native string representation of QQuickAction shortcut property. */
     Q_INVOKABLE QString shortcutText(const QVariant& var) const;
+
+    /**
+     * Ensures that the mouse button is still pressed and sends MouseButtonRelease if necessary.
+     */
+    Q_INVOKABLE void ensureMousePressed(QQuickItem* item, Qt::MouseButton button);
 };
 
 } // namespace nx::vms::client::core
