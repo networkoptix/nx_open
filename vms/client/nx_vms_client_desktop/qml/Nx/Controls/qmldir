@@ -40,6 +40,7 @@ ListView 1.0 ListView.qml
 Menu 1.0 Menu.qml
 MenuItem 1.0 MenuItem.qml
 MenuSeparator 1.0 MenuSeparator.qml
+MouseAreaStateGuard 1.0 MouseAreaStateGuard.qml
 MultiColumn 1.0 MultiColumn.qml
 NxCircle 1.0 NxCircle.qml
 NxCirclesPreloader 1.0 NxCirclesPreloader.qml
