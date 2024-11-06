@@ -11,6 +11,8 @@
 
 #include "system_context_aware.h" //< Forward declarations.
 
+Q_MOC_INCLUDE("nx/vms/client/core/watchers/watermark_watcher.h")
+
 class QnPtzControllerPool;
 class QQmlContext;
 class QnCameraBookmarksManager;
@@ -47,6 +49,10 @@ class NX_VMS_CLIENT_CORE_API SystemContext: public common::SystemContext
 
     Q_PROPERTY(analytics::TaxonomyManager* taxonomyManager
         READ taxonomyManager
+        CONSTANT)
+
+    Q_PROPERTY(WatermarkWatcher* watermarkWatcher
+        READ watermarkWatcher
         CONSTANT)
 
 public:
