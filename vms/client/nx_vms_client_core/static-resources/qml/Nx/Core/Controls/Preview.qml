@@ -85,6 +85,12 @@ Control
                 }
             }
 
+            Watermark
+            {
+                anchors.fill: parent
+                sourceSize: image.sourceSize
+            }
+
             IntervalPreview
             {
                 id: intervalPreview

@@ -17,7 +17,6 @@ Q_MOC_INCLUDE("nx/vms/client/core/network/cloud_status_watcher.h")
 Q_MOC_INCLUDE("nx/vms/client/core/two_way_audio/two_way_audio_controller.h")
 Q_MOC_INCLUDE("nx/vms/client/core/two_way_audio/two_way_audio_controller.h")
 Q_MOC_INCLUDE("nx/vms/client/core/watchers/user_watcher.h")
-Q_MOC_INCLUDE("nx/vms/client/core/watchers/watermark_watcher.h")
 Q_MOC_INCLUDE("nx/vms/client/mobile/push_notification/push_notification_manager.h")
 Q_MOC_INCLUDE("nx/vms/client/mobile/session/session_manager.h")
 Q_MOC_INCLUDE("nx/vms/client/mobile/utils/operation_manager.h")
@@ -37,7 +36,6 @@ class OauthClient;
 class ServerTimeWatcher;
 class TwoWayAudioController;
 class UserWatcher;
-class WatermarkWatcher;
 class CommonObjectSearchSetup;
 class AnalyticsSearchSetup;
 class EventSearchModelAdapter;
@@ -81,9 +79,6 @@ class QnContext: public QObject, public nx::vms::client::mobile::SystemContextAw
     Q_PROPERTY(nx::vms::client::core::CloudStatusWatcher* cloudStatusWatcher
         READ cloudStatusWatcher CONSTANT)
     Q_PROPERTY(QnMobileClientUiController* uiController READ uiController CONSTANT)
-    Q_PROPERTY(nx::vms::client::core::WatermarkWatcher* watermarkWatcher
-        READ watermarkWatcher
-        CONSTANT)
     Q_PROPERTY(nx::vms::client::core::UserWatcher* currentUserWatcher READ currentUserWatcher CONSTANT)
     Q_PROPERTY(nx::vms::client::core::TwoWayAudioController* twoWayAudioController
         READ twoWayAudioController CONSTANT)
@@ -132,7 +127,6 @@ public:
     nx::vms::client::core::CloudStatusWatcher* cloudStatusWatcher() const;
 
     nx::vms::client::core::UserWatcher* currentUserWatcher() const;
-    nx::vms::client::core::WatermarkWatcher* watermarkWatcher() const;
     nx::vms::client::core::TwoWayAudioController* twoWayAudioController() const;
     nx::vms::client::mobile::OperationManager* operationManager() const;
     QmlSettingsAdaptor* settings() const;
