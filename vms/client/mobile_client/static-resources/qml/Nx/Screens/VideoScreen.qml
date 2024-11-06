@@ -576,9 +576,7 @@ PageBase
                 if (!camerasModel)
                     return
 
-                switchToCamera(
-                    camerasModel.previousResource(controller.resource)
-                        || camerasModel.previousResourceId(""))
+                switchToCamera(camerasModel.previousResource(controller.resource))
             }
 
             onSwitchToNextCamera:
@@ -586,9 +584,7 @@ PageBase
                 if (!camerasModel)
                     return
 
-                switchToCamera(
-                    camerasModel.nextResource(controller.resource)
-                        || camerasModel.nextResourceId(""))
+                switchToCamera(camerasModel.nextResource(controller.resource))
             }
 
             motionFilter: video.fisheyeMode ? "" : video.motionController.motionFilter
