@@ -13,6 +13,7 @@ Item
 
     // If positive, only maxRowCount rows will be visible.
     property int maxRowCount: 0
+    property int maximumLineCount: 2
     property alias rowSpacing: grid.rowSpacing
 
     property color nameColor: "gray"
@@ -134,11 +135,9 @@ Item
         {
             id: cellValuesRow
 
-            property var text
-            property var values
-            property var colors
+            property var values: []
+            property var colors: []
             property int lastVisibleIndex: 0
-
             spacing: 4
 
             Repeater
@@ -147,7 +146,7 @@ Item
 
                 anchors.verticalCenter: parent.verticalCenter
                 objectName: "valueRowRepeater"
-                model: values
+                model: cellValuesRow.values
 
                 Row
                 {
@@ -155,7 +154,7 @@ Item
 
                     objectName: "valueItem"
                     spacing: 4
-                    visible: index <= lastVisibleIndex
+                    visible: index <= cellValuesRow.lastVisibleIndex
 
                     Rectangle
                     {
@@ -163,8 +162,8 @@ Item
                         width: 16
                         height: 16
                         anchors.verticalCenter: parent.verticalCenter
-                        visible: !!colors[index]
-                        color: colors[index] ?? "transparent"
+                        visible: !!cellValuesRow.colors[index]
+                        color: cellValuesRow.colors[index] ?? "transparent"
                         border.color: ColorTheme.transparent(ColorTheme.colors.light1, 0.1)
                         radius: 1
                     }
@@ -173,12 +172,17 @@ Item
                     {
                         objectName: "valueText"
                         anchors.verticalCenter: parent.verticalCenter
+
                         color: control.valueColor
                         font: control.valueFont
-                        text: modelData + (index < lastVisibleIndex && !colors[index] ? "," : "")
+                        text: modelData +
+                            (index < cellValuesRow.lastVisibleIndex && !cellValuesRow.colors[index]
+                                ? ","
+                                : "")
                         lineHeight: control.tableLineHeight
                         wrapMode: Text.Wrap
                         elide: Text.ElideRight
+                        maximumLineCount: control.maximumLineCount
                     }
                 }
             }
@@ -188,17 +192,17 @@ Item
                 id: appendix
 
                 anchors.verticalCenter: parent.verticalCenter
-                visible: lastVisibleIndex < rowRepeater.count - 1
-                text: `+ ${rowRepeater.count - lastVisibleIndex - 1}`
+                visible: cellValuesRow.lastVisibleIndex < rowRepeater.count - 1
+                text: `+ ${rowRepeater.count - cellValuesRow.lastVisibleIndex - 1}`
                 color: ColorTheme.darker(control.valueColor, 10)
                 font: control.valueFont
             }
 
             onWidthChanged:
             {
-                lastVisibleIndex = rowRepeater.count - 1
+                var lastIndex = rowRepeater.count - 1
                 var sumWidth = 0
-                for (let i = 0; i < rowRepeater.count; ++i)
+                for (var i = 0; i < rowRepeater.count; ++i)
                 {
                     const item = rowRepeater.itemAt(i)
                     if (sumWidth > 0)
@@ -206,12 +210,27 @@ Item
                     sumWidth += item.implicitWidth
                     if (sumWidth > width)
                     {
-                        lastVisibleIndex = i - 1
+                        lastIndex = i - 1
                         break
                     }
                 }
+
                 // At least one elided value we should show.
-                lastVisibleIndex = Math.max(0, lastVisibleIndex)
+                if (lastIndex < 0)
+                {
+                    const item = rowRepeater.itemAt(0)
+                    for (var i = 0; i < item.children.length; ++i)
+                    {
+                        var itemChild = item.children[i]
+                        if (itemChild.objectName === "valueText")
+                        {
+                            itemChild.width = width - (appendix.visible ? appendix.width : 0)
+                            break
+                        }
+                    }
+                    lastIndex = 0
+                }
+                lastVisibleIndex = lastIndex
             }
         }
 
@@ -243,7 +262,7 @@ Item
                         text: modelData[textRoleName] ?? modelData
                         textFormat: Text.StyledText
 
-                        maximumLineCount: 2
+                        maximumLineCount: control.maximumLineCount
                         wrapMode: Text.Wrap
                         elide: Text.ElideRight
                         horizontalAlignment: Text.AlignLeft
@@ -269,7 +288,6 @@ Item
                         visible: allowed
                         colors: modelData[colorsRoleName]
                         values: modelData[valuesRoleName]
-                        text: modelData[textRoleName] ?? modelData
                     }
                 }
             }
@@ -290,6 +308,9 @@ Item
 
         function updateColumnWidths()
         {
+            if (grid.width <= 0)
+                return
+
             function maximumWidth(maxWidth, item)
             {
                 return Math.max(maxWidth, item.implicitWidth)

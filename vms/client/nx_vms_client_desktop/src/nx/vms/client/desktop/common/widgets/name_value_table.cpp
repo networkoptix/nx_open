@@ -134,6 +134,7 @@ public:
         rootItem->setProperty("nameColor", widget->palette().color(QPalette::Light));
         rootItem->setProperty("valueColor", widget->palette().color(QPalette::WindowText));
         rootItem->setProperty("items", items);
+        rootItem->setProperty("maximumLineCount", 1);
 
         invokeQmlMethod<void>(rootItem.get(), "forceLayout"); //< To finalize its size.
 
