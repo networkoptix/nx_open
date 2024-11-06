@@ -187,19 +187,6 @@ NotificationListWidget::Private::Private(NotificationListWidget* q):
         this,
         &NotificationListWidget::Private::updateFilterNotificationsButtonAppearance);
 
-    connect(
-        system()->userNotificationSettingsManager(),
-        &UserNotificationSettingsManager::supportedTypesChanged,
-        this,
-        [this]
-        {
-            // It is required to rebuild dialog UI.
-            m_notificationSettingsDialog->reject();
-            m_notificationSettingsDialog->deleteLater();
-
-            m_notificationSettingsDialog = new NotificationSettingsDialog{this->q};
-        });
-
     TileInteractionHandler::install(m_eventRibbon);
 
     onCountChanged();

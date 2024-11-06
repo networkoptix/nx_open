@@ -125,28 +125,4 @@ std::set<MessageType> allMessageTypes(const MessageTypePredicateList& predicates
     return result;
 }
 
-QList<MessageType> visibleInSettingsMessages(nx::vms::common::SystemContext* systemContext)
-{
-    QList<MessageType> result;
-    for (int i = 0; i < static_cast<int>(MessageType::count); ++i)
-    {
-        const auto messageType = static_cast<MessageType>(i);
-        if (isMessageVisibleInSettings(messageType)
-            && isMessageApplicableForLicensingMode(systemContext))
-        {
-            result.push_back(messageType);
-        }
-    }
-
-    return result;
-}
-
-std::set<MessageType> defaultMessageTypes()
-{
-    auto result = allMessageTypes({isMessageVisibleInSettings});
-    result.erase(MessageType::emailIsEmpty);
-    result.erase(MessageType::usersEmailIsEmpty);
-    return result;
-}
-
 } // namespace nx::vms::common::system_health

@@ -7,8 +7,6 @@
 #include <nx/vms/client/desktop/system_context_aware.h>
 #include <nx/vms/common/system_health/message_type.h>
 
-namespace nx::vms::event { class StringsHelper; }
-
 namespace nx::vms::client::desktop {
 
 /** Helper class that simplifies control over right panel notification settings. */
@@ -20,6 +18,9 @@ public:
     explicit UserNotificationSettingsManager(
         SystemContext* systemContext, QObject* parent = nullptr);
 
+    /** List of all events that may appear in settings. */
+    QList<api::EventType> allEvents() const;
+
     /** Returns event types supported by the system. */
     const QList<api::EventType>& supportedEventTypes() const;
 
@@ -27,6 +28,9 @@ public:
      * Returns event types watched by the current user or empty list if there is no current user.
      */
     const QList<api::EventType>& watchedEvents() const;
+
+    /** List of all events that may appear in settings. */
+    const QList<common::system_health::MessageType> allMessages() const;
 
     /** Returns message types supported by the system. */
     const QList<common::system_health::MessageType>& supportedMessageTypes() const;

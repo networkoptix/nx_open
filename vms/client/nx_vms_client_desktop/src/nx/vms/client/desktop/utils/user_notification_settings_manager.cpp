@@ -2,6 +2,7 @@
 
 #include "user_notification_settings_manager.h"
 
+#include <nx/utils/qt_helpers.h>
 #include <nx/vms/client/core/resource/user.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
@@ -15,6 +16,8 @@
 #include <ui/workbench/workbench_context.h>
 
 namespace nx::vms::client::desktop {
+
+using namespace nx::vms::common::system_health;
 
 UserNotificationSettingsManager::UserNotificationSettingsManager(
     SystemContext* systemContext,
@@ -39,6 +42,11 @@ UserNotificationSettingsManager::UserNotificationSettingsManager(
     onCurrentUserChanged(systemContext->user());
 }
 
+QList<api::EventType> UserNotificationSettingsManager::allEvents() const
+{
+    return nx::vms::event::allEvents();
+}
+
 const QList<api::EventType>& UserNotificationSettingsManager::supportedEventTypes() const
 {
     return m_supportedEventTypes;
@@ -47,6 +55,11 @@ const QList<api::EventType>& UserNotificationSettingsManager::supportedEventType
 const QList<api::EventType>& UserNotificationSettingsManager::watchedEvents() const
 {
     return m_watchedEventTypes;
+}
+
+const QList<MessageType> UserNotificationSettingsManager::allMessages() const
+{
+    return nx::utils::toQList(allMessageTypes({isMessageVisibleInSettings}));
 }
 
 const QList<common::system_health::MessageType>& UserNotificationSettingsManager::supportedMessageTypes() const
@@ -165,7 +178,9 @@ void UserNotificationSettingsManager::onLicensingModeChanged()
 
 void UserNotificationSettingsManager::updateSupportedTypes()
 {
-    m_supportedMessageTypes = common::system_health::visibleInSettingsMessages(systemContext());
+    m_supportedMessageTypes = nx::utils::toQList(allMessageTypes(
+        {isMessageVisibleInSettings, isMessageApplicableForLicensingMode(systemContext())}));
+
     m_supportedEventTypes = event::visibleInSettingsEvents(systemContext());
 }
 

@@ -17,6 +17,12 @@ auto toQSet(const Container& source)
     return QSet(source.begin(), source.end());
 }
 
+template<typename Container>
+auto toQList(const Container& source)
+{
+    return QList(source.begin(), source.end());
+}
+
 template<typename... Args>
 QVariantList makeQVariantList(Args... args)
 {

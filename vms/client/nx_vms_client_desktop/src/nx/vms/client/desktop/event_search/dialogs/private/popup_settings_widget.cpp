@@ -41,7 +41,7 @@ PopupSettingsWidget::PopupSettingsWidget(
 
     setHelpTopic(this, HelpTopic::Id::SystemSettings_Notifications);
 
-    for (auto eventType: m_userNotificationSettingsManager->supportedEventTypes())
+    for (auto eventType: m_userNotificationSettingsManager->allEvents())
     {
         QCheckBox* checkbox = new QCheckBox(this);
         checkbox->setText(m_stringsHelper->eventName(eventType));
@@ -52,7 +52,7 @@ PopupSettingsWidget::PopupSettingsWidget(
             &QnAbstractPreferencesWidget::hasChangesChanged);
     }
 
-    for (auto messageType: m_userNotificationSettingsManager->supportedMessageTypes())
+    for (auto messageType: m_userNotificationSettingsManager->allMessages())
     {
         QCheckBox* checkbox = new QCheckBox(this);
         checkbox->setText(QnSystemHealthStringsHelper::messageShortTitle(messageType));
@@ -68,6 +68,10 @@ PopupSettingsWidget::PopupSettingsWidget(
         &UserNotificationSettingsManager::settingsChanged,
         this,
         &PopupSettingsWidget::loadDataToUi);
+
+    connect(
+        m_userNotificationSettingsManager, &UserNotificationSettingsManager::supportedTypesChanged,
+        this, &PopupSettingsWidget::loadDataToUi);
 
     connect(ui->showAllCheckBox, &QCheckBox::toggled, this,
         [this](bool checked)
@@ -97,20 +101,32 @@ void PopupSettingsWidget::loadDataToUi()
 
     bool all = true;
 
+    const auto& supportedMessages = m_userNotificationSettingsManager->supportedMessageTypes();
     const auto& watchedMessages = m_userNotificationSettingsManager->watchedMessages();
-    for (auto messageType: m_userNotificationSettingsManager->supportedMessageTypes())
+    for (auto [message, box]: m_systemHealthCheckBoxes.asKeyValueRange())
     {
-        const bool checked = watchedMessages.contains(messageType);
-        m_systemHealthCheckBoxes[messageType]->setChecked(checked);
-        all &= checked;
+        const bool visible = supportedMessages.contains(message);
+        const bool checked = watchedMessages.contains(message);
+
+        box->setVisible(visible);
+        box->setChecked(checked);
+
+        if (visible)
+            all &= checked;
     }
 
+    const auto& supportedEvents = m_userNotificationSettingsManager->supportedEventTypes();
     const auto& watchedEvents = m_userNotificationSettingsManager->watchedEvents();
-    for (const auto eventType: m_userNotificationSettingsManager->supportedEventTypes())
+    for (auto [event, box]: m_eventRulesCheckBoxes.asKeyValueRange())
     {
-        bool checked = watchedEvents.contains(eventType);
-        m_eventRulesCheckBoxes[eventType]->setChecked(checked);
-        all &= checked;
+        const bool visible = supportedEvents.contains(event);
+        const bool checked = watchedEvents.contains(event);
+
+        box->setVisible(visible);
+        box->setChecked(checked);
+
+        if (visible)
+            all &= checked;
     }
 
     ui->showAllCheckBox->setChecked(all);
