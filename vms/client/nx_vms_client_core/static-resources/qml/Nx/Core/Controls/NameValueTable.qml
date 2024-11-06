@@ -2,6 +2,7 @@
 
 import QtQuick
 
+import Nx.Controls
 import Nx.Core
 
 Item
@@ -67,7 +68,7 @@ Item
 
         color: ColorTheme.colors.dark12
         width: kHighlightLeftPadding + grid.width + kCopyWidth
-        visible: copyable && gridMouseArea.containsMouse
+        visible: copyable && (gridMouseArea.containsMouse || contextMenu.opened)
 
         Item
         {
@@ -75,6 +76,7 @@ Item
 
             width: kCopyWidth
             height: parent.height
+            visible: !contextMenu.opened
 
             ColoredImage
             {
@@ -418,9 +420,9 @@ Item
         id: gridMouseArea
 
         enabled: control.copyable
-
         anchors.fill: control
         hoverEnabled: true
+        acceptedButtons: Qt.LeftButton | Qt.RightButton
 
         onPositionChanged: (mouse) =>
         {
@@ -436,10 +438,43 @@ Item
         onClicked: (mouse) =>
         {
             if (mouse.x <= gridMouseArea.width - kCopyWidth)
+            {
+                if (mouse.button === Qt.RightButton)
+                    contextMenu.popup()
                 return
+            }
 
             if (highlight.rowIndex >= 0)
                 control.searchRequested(highlight.rowIndex)
+        }
+
+        Menu
+        {
+            id: contextMenu
+
+            property int rowIndex: -1
+
+            onAboutToShow: rowIndex = highlight.rowIndex
+            onAboutToHide: rowIndex = -1
+
+            MenuItem
+            {
+                text: qsTr("Copy")
+                onTriggered:
+                {
+                    NxGlobals.copyToClipboard(items[contextMenu.rowIndex * 2 + 1].text)
+                }
+            }
+
+            MenuItem
+            {
+                text: qsTr("Filter by")
+                onTriggered:
+                {
+                    if (contextMenu.rowIndex >= 0)
+                        control.searchRequested(contextMenu.rowIndex)
+                }
+            }
         }
     }
 

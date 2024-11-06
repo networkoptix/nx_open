@@ -3,6 +3,8 @@
 #include "nx_globals_object.h"
 
 #include <QtCore/QFile>
+#include <QtCore/QJsonObject>
+#include <QtCore/QMimeData>
 #include <QtCore/QRegularExpression>
 #include <QtCore/QtMath>
 #include <QtGui/QClipboard>
