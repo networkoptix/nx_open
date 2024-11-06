@@ -18,7 +18,7 @@ public:
     Property<screen_recording::Quality> quality{
         this, "quality", screen_recording::Quality::balanced};
     Property<screen_recording::Resolution> resolution{
-        this, "resolution", screen_recording::Resolution::quarterNative};
+        this, "resolution", screen_recording::Resolution::native};
     Property<QString> recordingFolder{this, "recordingFolder"};
 
     int screen() const;
