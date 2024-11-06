@@ -119,6 +119,8 @@ Item
                 onClicked: control.clicked()
                 CameraDisplay
                 {
+                    id: cameraDisplay
+
                     width: contentWidth
                     height: contentHeight
                     cameraResource: control.resource
@@ -130,6 +132,14 @@ Item
 
                     mediaPlayer.autoJumpPolicy: MediaPlayer.DisableJumpToLive
                     mediaPlayer.speed: control.speedFactor
+
+                    Watermark
+                    {
+                        parent: cameraDisplay.videoOutput
+                        anchors.fill: parent
+
+                        sourceSize: cameraDisplay.videoOutput.channelSize
+                    }
 
                     Connections
                     {

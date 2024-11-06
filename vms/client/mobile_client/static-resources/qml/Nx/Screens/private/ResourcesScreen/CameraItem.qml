@@ -236,6 +236,12 @@ Control
             width: thumbnailContainer.width
             height: thumbnailContainer.height
             fillMode: Qt.KeepAspectRatio
+
+            Watermark
+            {
+                anchors.fill: parent
+                sourceSize: Qt.size(parent.width, parent.height)
+            }
         }
     }
 

@@ -283,11 +283,6 @@ UserWatcher* QnContext::currentUserWatcher() const
     return systemContext()->userWatcher();
 }
 
-WatermarkWatcher* QnContext::watermarkWatcher() const
-{
-    return systemContext()->watermarkWatcher();
-}
-
 QmlSettingsAdaptor* QnContext::settings() const
 {
     return m_settings;

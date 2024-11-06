@@ -9,6 +9,5 @@ ArchiveCalendar 1.0 ArchiveCalendar.qml
 LoginButton 1.0 LoginButton.qml
 DummyMessage 1.0 DummyMessage.qml
 IssueLabel 1.0 IssueLabel.qml
-Watermark 1.0 Watermark.qml
 BookmarkList 1.0 BookmarkList.qml
 DownloadMediaButton 1.0 DownloadMediaButton.qml
