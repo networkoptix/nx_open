@@ -162,13 +162,20 @@ bool QnResourceData::value(const QString &key, int type, void *value, const Copy
 
 void QnResourceData::clearKeyTags()
 {
-    for (auto it = m_dataByKey.begin(); it != m_dataByKey.end();)
-    {
-        if (it.key().toLower() == "keys" || it.key().startsWith("_comment", Qt::CaseInsensitive))
-            it = m_dataByKey.erase(it);
-        else
-            ++it;
-    }
+    m_dataByKey.removeIf(
+        [](const decltype(m_dataByKey)::iterator it)
+        {
+            const QString& key = it.key();
+            return key.compare(u"keys", Qt::CaseInsensitive) == 0 || key.startsWith("_");
+        });
+}
+
+QJsonObject QnResourceData::allValuesRaw() const
+{
+    QJsonObject res;
+    for (auto it = m_dataByKey.begin(); it != m_dataByKey.end(); ++it)
+        res.insert(it.key(), it.value().json);
+    return res;
 }
 
 void QnResourceData::add(const QnResourceData &other) {

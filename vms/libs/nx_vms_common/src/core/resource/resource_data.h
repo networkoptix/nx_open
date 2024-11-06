@@ -39,6 +39,8 @@ public:
 
     void clearKeyTags();
 
+    QJsonObject allValuesRaw() const;
+
 private:
     typedef void (*CopyFunction)(const void *src, void *dst);
 
