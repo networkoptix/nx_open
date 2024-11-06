@@ -3544,8 +3544,13 @@ bool QnMediaResourceWidget::hasAudio() const
     // We're checking for both isAudioSupported AND isAudioEnabled here because it's technically
     // possible to have a camera that has audio enabled but not supported. Enabled is just a flag
     // in the database.
+    // If we don't have PlayAudioPermission for this camera then it effectively doesn't have audio.
     if (d->camera)
-        return d->camera->isAudioSupported() && d->camera->isAudioEnabled();
+    {
+        return d->camera->isAudioSupported()
+            && d->camera->isAudioEnabled()
+            && accessController()->hasPermissions(d->camera, Qn::PlayAudioPermission);
+    }
 
     if (d->mediaResource) // Handle local files.
         return !d->mediaResource->getAudioLayout(d->display()->dataProvider())->tracks().empty();
