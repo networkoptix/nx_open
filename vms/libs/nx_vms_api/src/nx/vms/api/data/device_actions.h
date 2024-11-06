@@ -204,4 +204,15 @@ struct DeviceDiagnosis
 #define DeviceDiagnosis_Fields (id)(status)(init)(stream)(media)
 QN_FUSION_DECLARE_FUNCTIONS(DeviceDiagnosis, (json), NX_VMS_API);
 
+struct DeviceResourceData
+{
+    /**%apidoc Device id. */
+    nx::Uuid id;
+
+    /**%apidoc Device resource data. */
+    QJsonObject data;
+};
+#define DeviceResourceData_Fields (id)(data)
+QN_FUSION_DECLARE_FUNCTIONS(DeviceResourceData, (json), NX_VMS_API);
+
 } // namespace nx::vms::api

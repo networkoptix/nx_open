@@ -28,6 +28,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DevicePasswordRequest, (json), DevicePasswordRe
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(AnalyticsFilter, (json), AnalyticsFilter_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DeviceFootageRequest, (json), DeviceFootageRequest_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DeviceDiagnosis, (json), DeviceDiagnosis_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DeviceResourceData, (json), DeviceResourceData_Fields)
 
 DeprecatedFieldNames const * AnalyticsFilter::getDeprecatedFieldNames()
 {
