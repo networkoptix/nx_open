@@ -113,6 +113,7 @@ void QnCommonMetaTypes::initialize()
 
     qRegisterMetaType<QnResourceTypeList>();
     qRegisterMetaType<QnResourcePtr>();
+    qRegisterMetaType<const QnResource*>();
     qRegisterMetaType<QnResourceList>();
     qRegisterMetaType<Qn::ResourceFlags>();
     QMetaType::registerConverter<Qn::ResourceFlags, int>();
