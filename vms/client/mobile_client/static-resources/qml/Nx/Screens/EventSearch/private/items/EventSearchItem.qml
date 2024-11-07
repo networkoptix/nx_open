@@ -21,6 +21,7 @@ MouseArea
     property alias previewId: preview.previewId
     property alias previewState: preview.previewState
     property var resource
+    property var timestampMs
     property alias title: titleItem.text
     property alias extraText: extraTextItem.text
     property alias eventTimestampText: eventTimeItem.text
