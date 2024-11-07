@@ -79,13 +79,13 @@ public:
         const nx::utils::Url& url,
         const QString& operationId);
     Q_INVOKABLE void openResourcesScreen(const ResourceIdList& filterIds = ResourceIdList());
-    Q_INVOKABLE void openVideoScreen(const QnResource* cameraResource, qint64 timestamp);
+    Q_INVOKABLE void openVideoScreen(QnResource* cameraResource, qint64 timestamp);
     Q_INVOKABLE void openSessionsScreen();
 
 signals:
     void layoutIdChanged();
     void resourcesScreenRequested(const QVariant& filterIds);
-    void videoScreenRequested(const QnResource* cameraResource, qint64 timestamp);
+    void videoScreenRequested(QnResource* cameraResource, qint64 timestamp);
     void sessionsScreenRequested();
 
     void connectToServerScreenRequested(
