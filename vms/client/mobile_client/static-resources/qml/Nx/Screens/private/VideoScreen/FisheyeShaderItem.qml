@@ -1,6 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import Nx.Core 1.0
+import Nx.Core
 
 FisheyeShaderEffect
 {
@@ -16,7 +16,7 @@ FisheyeShaderEffect
     fieldRadius: helper ? helper.fisheyeParams.radius : 0.0
 
     fieldRotation: helper
-        ? (helper.fisheyeParams.fovRot + helper.customRotation)
+        ? (helper.customRotation - helper.fisheyeParams.fovRot)
         : 0.0
 
     viewRotationMatrix: interactor.animatedRotationMatrix
