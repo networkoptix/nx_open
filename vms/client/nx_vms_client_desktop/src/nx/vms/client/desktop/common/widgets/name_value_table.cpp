@@ -144,116 +144,95 @@ public:
             return;
         }
 
+        renderControl->setWidget(widget);
+
         if (quickWindow->rendererInterface()->graphicsApi() == QSGRendererInterface::Software)
         {
-            quickWindow->setGeometry(QRect({}, outSize));
+            quickWindow->setGeometry(QRect({0,0}, outSize));
 
             outPixmap = QPixmap::fromImage(quickWindow->grabWindow());
             return;
         }
-        else //if (quickWindow->graphicsApi() != QSGRendererInterface::OpenGL)
+
+        auto rhi = quickWindow->rhi();
+        if (rhi && rhi->isDeviceLost())
         {
-            auto rhi = quickWindow->rhi();
+            renderControl->invalidate();
+            rhi = nullptr;
+        }
 
-            if (rhi && rhi->isDeviceLost())
+        if (!rhi)
+        {
+            if (!renderControl->initialize())
             {
-                renderControl->invalidate();
-                rhi = nullptr;
-            }
-
-            if (!rhi)
-            {
-                // if (!quickWindow->isSceneGraphInitialized())
-                //     quickWindow->setGraphicsDevice();
-                if (!renderControl->initialize())
-                    return;
-                rhi = quickWindow->rhi();
-            }
-
-            const auto pixelRatio = quickWindow->effectiveDevicePixelRatio();
-            const QSize deviceSize = outSize * pixelRatio;
-
-            std::unique_ptr<QRhiTexture> texture(rhi->newTexture(QRhiTexture::RGBA8, deviceSize, 1,
-                QRhiTexture::RenderTarget | QRhiTexture::UsedAsTransferSource));
-
-            if (!texture->create())
+                NX_WARNING(this, "Failed to initialize QQuickRenderControl.");
                 return;
+            }
 
-            std::unique_ptr<QRhiTextureRenderTarget> renderTarget(
-                rhi->newTextureRenderTarget({texture.get()}));
-            std::unique_ptr<QRhiRenderPassDescriptor> rp(
-                renderTarget->newCompatibleRenderPassDescriptor());
+            rhi = quickWindow->rhi();
+        }
 
-            renderTarget->setRenderPassDescriptor(rp.get());
-            renderTarget->create();
+        const auto pixelRatio = quickWindow->effectiveDevicePixelRatio();
+        const QSize deviceSize = outSize * pixelRatio;
 
-            auto quickRenderTarget = QQuickRenderTarget::fromRhiRenderTarget(renderTarget.get());
-            quickRenderTarget.setDevicePixelRatio(pixelRatio);
-            quickWindow->setRenderTarget(quickRenderTarget);
+        std::unique_ptr<QRhiTexture> texture(rhi->newTexture(QRhiTexture::RGBA8, deviceSize, 1,
+            QRhiTexture::RenderTarget | QRhiTexture::UsedAsTransferSource));
 
-            connect(quickWindow.get(), &QQuickWindow::afterRendering, this,
-                [&outPixmap, this, rhi, &texture, pixelRatio]()
-                {
-                    QSGRendererInterface* rif = quickWindow->rendererInterface();
-                    QRhiCommandBuffer* cb =
-                        static_cast<QRhiCommandBuffer*>(
-                            rif->getResource(
-                                quickWindow.get(),
-                                QSGRendererInterface::RhiRedirectCommandBuffer));
-
-                    QRhiReadbackResult *rbResult = new QRhiReadbackResult();
-                    rbResult->completed =
-                        [rbResult, &outPixmap, pixelRatio, rhi]
-                        {
-                            const uchar* p = reinterpret_cast<const uchar*>(
-                                rbResult->data.constData());
-                            QImage image(
-                                p,
-                                rbResult->pixelSize.width(),
-                                rbResult->pixelSize.height(),
-                                QImage::Format_RGBA8888_Premultiplied);
-
-                            if (rhi->isYUpInFramebuffer())
-                                image.mirror(false, true);
-
-                            image.setDevicePixelRatio(pixelRatio);
-                            outPixmap = QPixmap::fromImage(std::move(image));
-
-                            delete rbResult;
-                        };
-
-                    QRhiResourceUpdateBatch* u = rhi->nextResourceUpdateBatch();
-                    QRhiReadbackDescription rb(texture.get());
-                    u->readBackTexture(rb, rbResult);
-
-                    cb->resourceUpdate(u);
-                },
-                Qt::DirectConnection);
-
-            renderControl->polishItems();
-
-            renderControl->beginFrame();
-            renderControl->sync();
-            renderControl->render();
-            renderControl->endFrame();
-
-            quickWindow->disconnect(this);
-            quickWindow->setRenderTarget({});
-
+        if (!texture->create())
+        {
+            NX_WARNING(this, "Failed to create RHI texture.");
             return;
         }
 
-        renderControl->setWidget(widget); //< For screen & devicePixelRatio detection.
+        std::unique_ptr<QRhiTextureRenderTarget> renderTarget(
+            rhi->newTextureRenderTarget({texture.get()}));
+        std::unique_ptr<QRhiRenderPassDescriptor> rp(
+            renderTarget->newCompatibleRenderPassDescriptor());
 
-        const auto contextGuard = bindContext();
-        quickWindow->setGeometry(QRect({}, outSize));
+        renderTarget->setRenderPassDescriptor(rp.get());
+        renderTarget->create();
 
-        const QSize deviceSize = outSize * quickWindow->effectiveDevicePixelRatio();
+        auto quickRenderTarget = QQuickRenderTarget::fromRhiRenderTarget(renderTarget.get());
+        quickRenderTarget.setDevicePixelRatio(pixelRatio);
+        quickWindow->setRenderTarget(quickRenderTarget);
 
-        auto fbo = ensureFramebuffer(widget, deviceSize);
+        connect(quickWindow.get(), &QQuickWindow::afterRendering, this,
+            [&outPixmap, this, rhi, &texture, pixelRatio]()
+            {
+                const auto rif = quickWindow->rendererInterface();
+                const auto cb =
+                    static_cast<QRhiCommandBuffer*>(
+                        rif->getResource(
+                            quickWindow.get(),
+                            QSGRendererInterface::RhiRedirectCommandBuffer));
 
-        quickWindow->setRenderTarget(
-            QQuickRenderTarget::fromOpenGLTexture(fbo->texture(), fbo->size(), fbo->format().samples()));
+                const auto rbResult = new QRhiReadbackResult();
+                rbResult->completed =
+                    [rbResult, &outPixmap, pixelRatio, rhi]
+                    {
+                        const uchar* p = reinterpret_cast<const uchar*>(
+                            rbResult->data.constData());
+                        QImage image(
+                            p,
+                            rbResult->pixelSize.width(),
+                            rbResult->pixelSize.height(),
+                            QImage::Format_RGBA8888_Premultiplied);
+
+                        if (rhi->isYUpInFramebuffer())
+                            image.mirror(false, true);
+
+                        image.setDevicePixelRatio(pixelRatio);
+                        outPixmap = QPixmap::fromImage(std::move(image));
+
+                        delete rbResult;
+                    };
+
+                const auto u = rhi->nextResourceUpdateBatch();
+                const QRhiReadbackDescription rb(texture.get());
+                u->readBackTexture(rb, rbResult);
+                cb->resourceUpdate(u);
+            },
+            Qt::DirectConnection);
 
         renderControl->polishItems();
 
@@ -262,16 +241,8 @@ public:
         renderControl->render();
         renderControl->endFrame();
 
-        QOpenGLFramebufferObject::bindDefault();
-        context->functions()->glFlush();
-
+        quickWindow->disconnect(this);
         quickWindow->setRenderTarget({});
-
-        auto image = fbo->toImage();
-        image.setDevicePixelRatio(quickWindow->effectiveDevicePixelRatio());
-        outPixmap = QPixmap::fromImage(image);
-
-        QOpenGLFramebufferObject::bindDefault();
     }
 
 private:
