@@ -1028,17 +1028,45 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createDialogEntities(
 
     if (resourceTypes.testFlag(ResourceTree::ResourceFilter::layouts))
     {
-        auto layoutsList = makeKeyList<QnResourcePtr>(
-            simpleResourceItemCreator(m_itemFactory.get()), layoutsOrder());
+        AbstractEntityPtr layoutsEntity;
+        if (ini().foldersForLayoutsInResourceTree)
+        {
+            using GroupingRule = GroupingRule<QString, QnResourcePtr>;
+            using GroupingRuleStack =
+                GroupGroupingEntity<QString, QnResourcePtr>::GroupingRuleStack;
 
-        layoutsList->installItemSource(m_itemKeySourcePool->shareableLayoutsSource(user()));
+            GroupingRuleStack groupingRuleStack;
+            groupingRuleStack.push_back({userDefinedGroupIdGetter(),
+                userDefinedGroupItemCreator(m_itemFactory.get(), /*hasPowerUserPermissions*/ false),
+                Qn::ResourceTreeCustomGroupIdRole,
+                resource_grouping::kUserDefinedGroupingDepth,
+                numericOrder()});
+
+            auto layoutsGroupList = std::make_unique<GroupingEntity<QString, QnResourcePtr>>(
+                simpleResourceItemCreator(m_itemFactory.get()),
+                core::ResourceRole,
+                layoutsOrder(),
+                groupingRuleStack);
+
+            layoutsGroupList->installItemSource(
+                m_itemKeySourcePool->shareableLayoutsSource(user()));
+            layoutsEntity = std::move(layoutsGroupList);
+        }
+        else
+        {
+            auto layoutsList = makeKeyList<QnResourcePtr>(
+                simpleResourceItemCreator(m_itemFactory.get()), layoutsOrder());
+
+            layoutsList->installItemSource(m_itemKeySourcePool->shareableLayoutsSource(user()));
+            layoutsEntity = std::move(layoutsList);
+        }
 
         if (maySkipGroup && resourceTypes == (int) ResourceTree::ResourceFilter::layouts)
-            return layoutsList; //< Only layouts, return without a group element.
+            return layoutsEntity; //< Only layouts, return without a group element.
 
         entities.push_back(makeFlatteningGroup(
             m_itemFactory->createLayoutsItem(kRootItemsFlags),
-            std::move(layoutsList),
+            std::move(layoutsEntity),
             flatteningPolicy));
     }
 

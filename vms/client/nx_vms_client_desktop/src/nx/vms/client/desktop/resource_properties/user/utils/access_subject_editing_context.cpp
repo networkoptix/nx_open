@@ -11,8 +11,8 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource/videowall_resource.h>
 #include <core/resource/user_resource.h>
+#include <core/resource/videowall_resource.h>
 #include <core/resource/webpage_resource.h>
 #include <core/resource_access/access_rights_manager.h>
 #include <core/resource_access/access_rights_resolver.h>
@@ -1035,7 +1035,7 @@ ResourceAccessTreeItem AccessSubjectEditingContext::resourceAccessTreeItemInfo(
     const auto topLevel = topLevelIndex(resourceTreeModelIndex);
     const auto topLevelNodeType = topLevel.data(Qn::NodeTypeRole).value<ResourceTree::NodeType>();
 
-    if (nodeType == ResourceTree::NodeType::layouts)
+    if (topLevelNodeType == ResourceTree::NodeType::layouts)
     {
         return ResourceAccessTreeItem{
             .type = ResourceAccessTreeItem::Type::groupingNode,
