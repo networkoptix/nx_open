@@ -85,7 +85,8 @@ public:
     Property<bool> showInfoByDefault{this, "showInfoByDefault", false,
         "'Info' mode will be enabled by default on newly opened cameras."};
 
-    Property<Qn::TimeMode> timeMode{this, "timeMode", Qn::ServerTimeMode};
+    Property<Qn::TimeMode> timeMode{this, "timeMode", Qn::ClientTimeMode};
+
     Property<bool> ptzAimOverlayEnabled{this, "ptzAimOverlayEnabled", false,
         "Whether old-style PTZ aim overlay is enabled."};
 
