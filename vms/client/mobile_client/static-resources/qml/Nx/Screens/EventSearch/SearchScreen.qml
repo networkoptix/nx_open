@@ -142,6 +142,7 @@ Page
             previewState: model.previewState
             title: model.display
             extraText: model.description
+            timestampMs: model.timestampMs
 
             onVisibleChanged: model.visible = visible
             Component.onCompleted: model.visible = visible
