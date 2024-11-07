@@ -239,7 +239,7 @@ nx::Uuid QnCameraListModel::resourceIdByRow(int row) const
     return data(index(row, 0), UuidRole).value<nx::Uuid>();
 }
 
-QnResource* QnCameraListModel::nextResource(const QnResource* resource) const
+QnResource* QnCameraListModel::nextResource(QnResource* resource) const
 {
     if (rowCount() == 0 || !resource)
         return nullptr;
@@ -248,7 +248,7 @@ QnResource* QnCameraListModel::nextResource(const QnResource* resource) const
     return data(index(row, 0), RawResourceRole).value<QnResource*>();
 }
 
-QnResource* QnCameraListModel::previousResource(const QnResource* resource) const
+QnResource* QnCameraListModel::previousResource(QnResource* resource) const
 {
     if (rowCount() == 0 || !resource)
         return nullptr;

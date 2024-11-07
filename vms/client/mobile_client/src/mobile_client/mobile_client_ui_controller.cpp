@@ -155,7 +155,7 @@ void QnMobileClientUiController::openResourcesScreen(const ResourceIdList& filte
     emit resourcesScreenRequested(QVariant::fromValue(filterIds));
 }
 
-void QnMobileClientUiController::openVideoScreen(const QnResource* cameraResource, qint64 timestamp)
+void QnMobileClientUiController::openVideoScreen(QnResource* cameraResource, qint64 timestamp)
 {
     NX_DEBUG(this, "openVideoScreen(): camera is <%1>, timestamp is <%2>",
         (cameraResource ? cameraResource->getId() : nx::Uuid{}), timestamp);

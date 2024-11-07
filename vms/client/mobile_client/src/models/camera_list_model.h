@@ -50,8 +50,8 @@ public:
     Q_INVOKABLE int rowByResourceId(const nx::Uuid& resourceId) const;
     Q_INVOKABLE nx::Uuid resourceIdByRow(int row) const;
 
-    Q_INVOKABLE QnResource* nextResource(const QnResource* resource) const;
-    Q_INVOKABLE QnResource* previousResource(const QnResource* resource) const;
+    Q_INVOKABLE QnResource* nextResource(QnResource* resource) const;
+    Q_INVOKABLE QnResource* previousResource(QnResource* resource) const;
 
 public slots:
     void refreshThumbnail(int row);
