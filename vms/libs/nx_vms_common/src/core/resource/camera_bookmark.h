@@ -139,6 +139,15 @@ struct NX_VMS_COMMON_API CameraBookmark
 
 NX_REFLECTION_INSTRUMENT(CameraBookmark, CameraBookmark_Fields)
 
+struct NX_VMS_COMMON_API CameraBookmarkWithRecordId: CameraBookmark
+{
+    qint64 recordId = 0;
+};
+
+#define CameraBookmarkWithRowId_Fields CameraBookmark_Fields (recordId)
+
+NX_REFLECTION_INSTRUMENT(CameraBookmarkWithRecordId, CameraBookmarkWithRowId_Fields)
+
 void NX_VMS_COMMON_API serialize(
     nx::reflect::json::SerializationContext* ctx, const QnCameraBookmarkTags& value);
 
@@ -234,6 +243,10 @@ QN_FUSION_DECLARE_FUNCTIONS(CameraBookmarkSearchFilter, (json), NX_VMS_COMMON_AP
 
 QN_FUSION_DECLARE_FUNCTIONS(
     CameraBookmark, (sql_record) (json) (ubjson) (xml) (csv_record), NX_VMS_COMMON_API)
+
+QN_FUSION_DECLARE_FUNCTIONS(
+    CameraBookmarkWithRecordId, (sql_record) (json) (ubjson) (xml) (csv_record), NX_VMS_COMMON_API)
+
 QN_FUSION_DECLARE_FUNCTIONS(
     CameraBookmarkTag, (sql_record) (json) (ubjson) (xml) (csv_record), NX_VMS_COMMON_API)
 

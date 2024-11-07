@@ -21,8 +21,8 @@ Integration::~Integration()
 }
 
 void Integration::doObtainEngine(
-    const char* url,
-    const nx::sdk::cloud_storage::IArchiveUpdateHandler* /*archiveUpdateHandler*/,
+    const char* /*url*/,
+    const nx::sdk::cloud_storage::IAsyncOperationHandler* /*asyncOperationHandler*/,
     nx::sdk::Result<nx::sdk::cloud_storage::IEngine*>* outResult)
 {
     *outResult = nx::sdk::Result<nx::sdk::cloud_storage::IEngine*>(

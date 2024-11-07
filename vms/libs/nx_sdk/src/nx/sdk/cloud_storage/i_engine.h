@@ -124,15 +124,18 @@ public:
      * @param data A null-terminated string containing the JSON of the corresponding metadata object.
      * Refer to `Bookmark`, `ObjectTrack` and `Motion` objects in the
      * sdk/cloud_storage/helpers/data.h for details.
+     * @note If `saveMetadata` returned `inProgress` VMS Server won't call it again until the
+     * onSaveOperationCompleted is called by the plugin.
      */
     public: virtual ErrorCode saveMetadata(
-        const char* deviceId, int64_t timestampUs, MetadataType type, const char* data) = 0;
+        const char* deviceId, MetadataType type, const char* data) = 0;
 
     /**
-     * Add a  image to the `ObjectTrack`. `data` is the JSON representation of the
-     * nx::sdk::cloud_storage::Image struct.
+     * Plugin must send all pending buffered data of the given type immediately when this function
+     * is called. If there's nothing to send `onSaveOperationCompleted` should be called with the
+     * `noError` result.
      */
-    public: virtual ErrorCode saveTrackImage(const char* data, TrackImageType type) = 0;
+    public: virtual void flushMetadata(MetadataType type) = 0;
 
     /**
      * Fetch a best shot image associated with the given objectTrackId. Result string should
@@ -149,16 +152,14 @@ public:
         const char* objectTrackId, TrackImageType type, Result<IString*>* outResult) const = 0;
 
     /**
-     * No IArchiveUpdateHandler::onArchiveUpdated() should be called by the plugin before this
-     * function has been called.
+     * No async handlers should be called by the plugin before this function has been called.
      */
-    public: virtual void startNotifications() = 0;
+    public: virtual void startAsyncTasks() = 0;
 
     /**
-     * No IArchiveUpdateHandler::onArchiveUpdated() should be called by the plugin after this
-     * function has been called.
+     * No async handlers should be called by the plugin after this function has been called.
      */
-    public: virtual void stopNotifications() = 0;
+    public: virtual void stopAsyncTasks() = 0;
 
     /**
      * Check if plugin backend is operational. This function will be periodically called by

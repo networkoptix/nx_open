@@ -7,6 +7,7 @@
 
 #include "i_device_agent.h"
 #include "i_time_periods.h"
+#include "i_engine.h"
 
 namespace nx::sdk::cloud_storage {
 
@@ -34,12 +35,12 @@ public:
 /**
  * A pointer to the this class instance is provided to the engine when
  * IIntegration::createEngine() is called. The engine should use it to periodically inform Server
- * about any Archive changes.
+ * about any Archive changes and report results of the recent save operations.
  */
-class IArchiveUpdateHandler: public Interface<IArchiveUpdateHandler>
+class IAsyncOperationHandler: public Interface<IAsyncOperationHandler>
 {
 public:
-    static auto interfaceId() { return makeId("nx::sdk::archive::IArchiveUpdateHandler"); }
+    static auto interfaceId() { return makeId("nx::sdk::archive::IAsyncOperationHandler"); }
 
     /**
      * Engine should call this periodically to check if something is changed on the backend.
@@ -52,6 +53,11 @@ public:
         const char* engineId,
         nx::sdk::ErrorCode errorCode,
         const IList<IDeviceArchive>* deviceArchive) const = 0;
+
+    virtual void onSaveOperationCompleted(
+        const char* engineId,
+        MetadataType metadataType,
+        nx::sdk::ErrorCode errorCode) const = 0;
 };
 
 } // namespace nx::sdk::cloud_storage

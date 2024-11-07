@@ -825,7 +825,7 @@ QnTimePeriodList MetadataArchive::matchPeriodInternal(
         auto metadataFile = MetadataBinaryFileFactory::instance().create();
         Index index(this);
 
-        if (index.load(timePointMs))
+        if (index.load(timePointMs) && !index.records.isEmpty())
         {
             recordMatcher->onFileOpened(timePointMs, index.header);
             if (recordMatcher->isNoData())

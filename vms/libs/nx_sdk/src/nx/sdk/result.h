@@ -18,6 +18,8 @@ enum class ErrorCode: int
     otherError = -100,
     ioError = -31,
     noData = -101, //< Call succeeded, but no valid data can be returned (EoF for example)
+    needMoreData = -102, //< Operation won't be performed until more data has been provided
+    inProgress = -103, //< Async operation has started. No additional data will be accepted until it finishes
 };
 
 class Error

@@ -201,20 +201,20 @@ public:
         Result<nx::vms::api::CameraHistoryDataList>::type callback,
         QThread* targetThread = nullptr);
 
-    Handle backupPositionAsync(const nx::Uuid& serverId,
+    Handle backupPositionAsyncV1(const nx::Uuid& serverId,
         const nx::Uuid& deviceId,
-        Result<nx::vms::api::BackupPositionEx>::type callback,
+        Result<nx::vms::api::BackupPositionExV1>::type callback,
         QThread* targetThread = nullptr);
 
-    Handle setBackupPositionAsync(const nx::Uuid& serverId,
+    Handle setBackupPositionAsyncV1(const nx::Uuid& serverId,
         const nx::Uuid& deviceId,
-        const nx::vms::api::BackupPosition& backupPosition,
-        Result<nx::vms::api::BackupPosition>::type callback,
+        const nx::vms::api::BackupPositionV1& backupPosition,
+        Result<nx::vms::api::BackupPositionV1>::type callback,
         QThread* targetThread = nullptr);
 
-    Handle setBackupPositionsAsync(const nx::Uuid& serverId,
-        const nx::vms::api::BackupPosition& backupPosition,
-        Result<nx::vms::api::BackupPosition>::type callback,
+    Handle setBackupPositionsAsyncV1(const nx::Uuid& serverId,
+        const nx::vms::api::BackupPositionV1& backupPosition,
+        Result<nx::vms::api::BackupPositionV1>::type callback,
         QThread* targetThread = nullptr);
 
     Handle getServerLocalTime(

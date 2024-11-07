@@ -20,7 +20,7 @@ public:
 protected:
     virtual void doObtainEngine(
         const char* url,
-        const nx::sdk::cloud_storage::IArchiveUpdateHandler* archiveUpdateHandler,
+        const nx::sdk::cloud_storage::IAsyncOperationHandler* asyncOperationHandler,
         nx::sdk::Result<nx::sdk::cloud_storage::IEngine*>* outResult) override;
 
     virtual void getManifest(nx::sdk::Result<const nx::sdk::IString*>* outResult) const override;

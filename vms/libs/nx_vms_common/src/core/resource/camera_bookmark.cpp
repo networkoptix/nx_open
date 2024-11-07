@@ -454,6 +454,11 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(BookmarkShareableParams,
     BookmarkShareableParams_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     CameraBookmark, (sql_record) (json) (ubjson) (xml) (csv_record), CameraBookmark_Fields)
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
+    CameraBookmarkWithRecordId, (sql_record) (json) (ubjson) (xml) (csv_record),
+    CameraBookmarkWithRowId_Fields)
+
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     CameraBookmarkTag,
     (sql_record) (json) (ubjson) (xml) (csv_record), CameraBookmarkTag_Fields)

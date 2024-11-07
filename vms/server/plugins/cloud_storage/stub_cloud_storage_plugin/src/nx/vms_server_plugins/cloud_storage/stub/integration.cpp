@@ -27,7 +27,7 @@ Integration::~Integration()
 
 void Integration::doObtainEngine(
     const char* url,
-    const nx::sdk::cloud_storage::IArchiveUpdateHandler* archiveUpdateHandler,
+    const nx::sdk::cloud_storage::IAsyncOperationHandler* asyncOperationHandler,
     nx::sdk::Result<nx::sdk::cloud_storage::IEngine*>* outResult)
 {
     try
@@ -51,7 +51,7 @@ void Integration::doObtainEngine(
 
             m_dataManager.reset(new DataManager(workDir));
             m_engine.reset(new Engine(
-                archiveUpdateHandler, m_dataManager, kIntegrationManifest.id));
+                asyncOperationHandler, m_dataManager, kIntegrationManifest.id));
         }
 
         m_engine->addRef();

@@ -457,9 +457,9 @@ Handle ServerConnection::cameraHistoryAsync(
     return executeGet(lit("/ec2/cameraHistory"), request.toParams(), callback, targetThread);
 }
 
-Handle ServerConnection::backupPositionAsync(const nx::Uuid& serverId,
+Handle ServerConnection::backupPositionAsyncV1(const nx::Uuid& serverId,
     const nx::Uuid& deviceId,
-    Result<nx::vms::api::BackupPositionEx>::type callback,
+    Result<nx::vms::api::BackupPositionExV1>::type callback,
     QThread* targetThread)
 {
     const auto requestStr =
@@ -467,10 +467,10 @@ Handle ServerConnection::backupPositionAsync(const nx::Uuid& serverId,
     return executeGet(requestStr, nx::network::rest::Params(), callback, targetThread);
 }
 
-Handle ServerConnection::setBackupPositionAsync(const nx::Uuid& serverId,
+Handle ServerConnection::setBackupPositionAsyncV1(const nx::Uuid& serverId,
     const nx::Uuid& deviceId,
-    const nx::vms::api::BackupPosition& backupPosition,
-    Result<nx::vms::api::BackupPosition>::type callback,
+    const nx::vms::api::BackupPositionV1& backupPosition,
+    Result<nx::vms::api::BackupPositionV1>::type callback,
     QThread* targetThread)
 {
     const auto requestStr =
@@ -484,9 +484,9 @@ Handle ServerConnection::setBackupPositionAsync(const nx::Uuid& serverId,
         targetThread);
 }
 
-Handle ServerConnection::setBackupPositionsAsync(const nx::Uuid& serverId,
-    const nx::vms::api::BackupPosition& backupPosition,
-    ServerConnection::Result<nx::vms::api::BackupPosition>::type callback,
+Handle ServerConnection::setBackupPositionsAsyncV1(const nx::Uuid& serverId,
+    const nx::vms::api::BackupPositionV1& backupPosition,
+    ServerConnection::Result<nx::vms::api::BackupPositionV1>::type callback,
     QThread* targetThread)
 {
     const auto requestStr = NX_FMT("/rest/v1/servers/%1/backupPositions", serverId);

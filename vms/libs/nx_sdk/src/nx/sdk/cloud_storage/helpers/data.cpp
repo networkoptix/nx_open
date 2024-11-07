@@ -334,6 +334,11 @@ bool TimePeriod::operator==(const TimePeriod& other) const
     return startTimestamp == other.startTimestamp && duration == other.duration;
 }
 
+bool TimePeriod::operator!=(const TimePeriod& other) const
+{
+    return !operator==(other);
+}
+
 KeyValuePair::KeyValuePair(const char* jsonStr): KeyValuePair(parseJson(jsonStr))
 {
 }
@@ -957,10 +962,15 @@ TimePeriodList::TimePeriodList(const char* jsonStr): TimePeriodList(parseJson(js
 {
 }
 
+TimePeriodList::TimePeriodList(SortOrder order): m_order(order)
+{
+}
+
 TimePeriodList::TimePeriodList(const nx::kit::Json& json) noexcept(false)
 {
-    order = sortOrderFromString(getStringValue(json, "order"));
-    periods = getBasicListValue<int64_t>(json, "periods");
+    m_order = sortOrderFromString(getStringValue(json, "order"));
+    m_periods = getBasicListValue<int64_t>(json, "periods");
+    recalculateLastTimestamp();
 }
 
 ValueOrError<TimePeriodList> TimePeriodList::fromJson(const char* jsonStr) noexcept
@@ -989,25 +999,25 @@ ValueOrError<TimePeriodList> TimePeriodList::fromJson(const nx::kit::Json& json)
 
 void TimePeriodList::forEach(std::function<void(const TimePeriod&)> func) const
 {
-    if (periods.size() < 2)
+    if (m_periods.size() < 2)
         return;
 
-    auto p = TimePeriod(milliseconds(periods[0]), milliseconds(periods[1]));
+    auto p = TimePeriod(milliseconds(m_periods[0]), milliseconds(m_periods[1]));
     func(p);
 
-    for (size_t i = 3; i < periods.size(); i += 2)
+    for (size_t i = 3; i < m_periods.size(); i += 2)
     {
-        if (order == SortOrder::ascending)
+        if (m_order == SortOrder::ascending)
         {
             p = TimePeriod(
-                milliseconds(periods[i - 1]) + p.startTimestamp,
-                milliseconds(periods[i]));
+                milliseconds(m_periods[i - 1]) + p.startTimestamp,
+                milliseconds(m_periods[i]));
         }
         else
         {
             p = TimePeriod(
-                p.startTimestamp - milliseconds(periods[i - 1]),
-                milliseconds(periods[i]));
+                p.startTimestamp - milliseconds(m_periods[i - 1]),
+                milliseconds(m_periods[i]));
         }
 
         func(p);
@@ -1016,104 +1026,124 @@ void TimePeriodList::forEach(std::function<void(const TimePeriod&)> func) const
 
 SortOrder TimePeriodList::sortOrder() const
 {
-    return order;
+    return m_order;
 }
 
 void TimePeriodList::reverse()
 {
-    if (!periods.empty())
+    if (!m_periods.empty())
     {
         std::vector<TimePeriod> reversed;
         forEach([&reversed](const auto& p) { reversed.push_back(p); });
         std::reverse(reversed.begin(), reversed.end());
-        periods.clear();
-        periods.push_back(reversed[0].startTimestamp.count());
-        periods.push_back(reversed[0].duration.count());
+        m_periods.clear();
+        m_periods.push_back(reversed[0].startTimestamp.count());
+        m_periods.push_back(reversed[0].duration.count());
         for (size_t i = 1; i < reversed.size(); i++)
         {
-            if (order == SortOrder::ascending)
+            if (m_order == SortOrder::ascending)
             {
-                periods.push_back(
+                m_periods.push_back(
                     reversed[i - 1].startTimestamp.count() - reversed[i].startTimestamp.count());
-                periods.push_back(reversed[i].duration.count());
+                m_periods.push_back(reversed[i].duration.count());
             }
             else
             {
-                periods.push_back(
+                m_periods.push_back(
                     reversed[i].startTimestamp.count() - reversed[i - 1].startTimestamp.count());
-                periods.push_back(reversed[i].duration.count());
+                m_periods.push_back(reversed[i].duration.count());
             }
         }
     }
 
-    if (order == SortOrder::ascending)
-        order = SortOrder::descending;
+    if (m_order == SortOrder::ascending)
+        m_order = SortOrder::descending;
     else
-        order = SortOrder::ascending;
+        m_order = SortOrder::ascending;
+
+    recalculateLastTimestamp();
+}
+
+void TimePeriodList::recalculateLastTimestamp()
+{
+    m_lastStartTimestmapMs = std::nullopt;
+    const auto lastPeriod = last();
+    if (lastPeriod)
+        m_lastStartTimestmapMs = lastPeriod->startTimestamp;
 }
 
 void TimePeriodList::append(const TimePeriod& period)
 {
-    if (periods.empty())
+    if (m_periods.empty())
     {
-        periods.push_back(period.startTimestamp.count());
+        m_periods.push_back(period.startTimestamp.count());
     }
     else
     {
-        if (order == SortOrder::ascending)
+        if (m_order == SortOrder::ascending)
         {
-            periods.push_back(
-                period.startTimestamp.count() - periods[periods.size() - 2]);
+            m_periods.push_back(
+                period.startTimestamp.count() - m_lastStartTimestmapMs->count());
         }
         else
         {
-            periods.push_back(
-                periods[periods.size() - 2] - period.startTimestamp.count());
+            m_periods.push_back(
+                m_lastStartTimestmapMs->count() - period.startTimestamp.count());
         }
     }
+    m_lastStartTimestmapMs = period.startTimestamp;
 
-    periods.push_back(period.duration.count());
+    m_periods.push_back(period.duration.count());
 }
 
 bool TimePeriodList::empty() const
 {
-    return periods.empty();
+    return m_periods.empty();
 }
 
 std::optional<TimePeriod> TimePeriodList::last() const
 {
-    if (periods.empty())
+    if (m_periods.empty())
         return std::nullopt;
 
-    auto startTimestamp = periods[0];
-    for (size_t i = 2; i < periods.size(); i += 2)
+    auto startTimestamp = m_periods[0];
+    for (size_t i = 2; i < m_periods.size(); i += 2)
     {
-        if (order == SortOrder::ascending)
-            startTimestamp += periods[i];
+        if (m_order == SortOrder::ascending)
+            startTimestamp += m_periods[i];
         else
-            startTimestamp -= periods[i];
+            startTimestamp -= m_periods[i];
     }
 
-    return TimePeriod{milliseconds(startTimestamp), milliseconds(periods.back())};
+    return TimePeriod{milliseconds(startTimestamp), milliseconds(m_periods.back())};
+}
+
+void TimePeriodList::setLastDuration(std::chrono::milliseconds duration)
+{
+    if (m_periods.empty())
+        return;
+
+    m_periods[m_periods.size() - 1] = duration.count();
 }
 
 size_t TimePeriodList::size() const
 {
-    return periods.size() / 2;
+    return m_periods.size() / 2;
 }
 
 void TimePeriodList::shrink(size_t size)
 {
     if (size < this->size())
-        periods.resize(size * 2);
+        m_periods.resize(size * 2);
+    recalculateLastTimestamp();
 }
 
 nx::kit::Json TimePeriodList::TimePeriodList::to_json() const
 {
     auto result = nx::kit::Json::object();
-    result["order"] = sortOrderToString(order);
+    result["order"] = sortOrderToString(m_order);
     auto periodArray = nx::kit::Json::array();
-    for (const int64_t& v: periods)
+    for (const int64_t& v: m_periods)
         periodArray.push_back((double) v);
 
     result["periods"] = periodArray;
@@ -1705,128 +1735,134 @@ ValueOrError<ObjectRegion> ObjectRegion::fromJson(const nx::kit::Json& json) noe
     }
 }
 
-//------------- TrackImageMetadata ----------------------
-
-BaseImageMetadata::BaseImageMetadata(const nx::kit::Json& json)
+BaseImage::BaseImage(const nx::kit::Json& json)
 {
     timestamp = microseconds(getIntValue(json, "timestamp"));
     rect = getObjectValue<Rect>(json, "rect");
     streamIndex = getIntValue(json, "streamIndex");
+    image = getOptionalObjectValue<Image>(json, "image");
 }
 
-bool BaseImageMetadata::operator==(const BaseImageMetadata& other) const
+BaseImage::BaseImage(const char* jsonData): BaseImage(parseJson(jsonData))
+{
+}
+
+bool BaseImage::operator==(const BaseImage& other) const
 {
     return timestamp == other.timestamp
         && rect == other.rect
-        && streamIndex == other.streamIndex;
+        && streamIndex == other.streamIndex
+        && image == other.image;
 }
 
-nx::kit::Json BaseImageMetadata::to_json() const
+nx::kit::Json BaseImage::to_json() const
 {
     return toBaseObject();
 }
 
-std::map<std::string, nx::kit::detail::json11::Json> BaseImageMetadata::toBaseObject() const
+std::map<std::string, nx::kit::detail::json11::Json> BaseImage::toBaseObject() const
 {
-    return nx::kit::Json::object({
+    auto result = nx::kit::Json::object({
         {"timestamp", (double) timestamp.count()},
         {"rect", rect},
         {"streamIndex", streamIndex}
         });
+
+    if (image)
+        result["image"] = *image;
+
+    return result;
 }
 
 //------------- Title ----------------------
 
-bool TitleMetadata::operator==(const TitleMetadata& other) const
+bool Title::operator==(const Title& other) const
 {
     return
-        static_cast<const BaseImageMetadata&>(*this) == static_cast<const BaseImageMetadata&>(other)
-        && text == other.text
-        && hasImage == other.hasImage;
+        static_cast<const BaseImage&>(*this) == static_cast<const BaseImage&>(other)
+        && text == other.text;
 }
 
-TitleMetadata::TitleMetadata(const nx::kit::Json& json): BaseImageMetadata(json)
+Title::Title(const nx::kit::Json& json): BaseImage(json)
 {
     text = getStringValue(json, "text");
-    hasImage = getBoolValue(json, "hasImage");
 }
 
-TitleMetadata::TitleMetadata(const char* jsonStr): TitleMetadata(parseJson(jsonStr))
+Title::Title(const char* jsonStr): Title(parseJson(jsonStr))
 {
 }
 
-ValueOrError<TitleMetadata> TitleMetadata::fromJson(const char* jsonStr) noexcept
-{
-    try
-    {
-        return ValueOrError<TitleMetadata>::makeValue(TitleMetadata(jsonStr));
-    }
-    catch (const std::exception& e)
-    {
-        return ValueOrError<TitleMetadata>::makeError(e.what());
-    }
-}
-
-ValueOrError<TitleMetadata> TitleMetadata::fromJson(const nx::kit::Json& json) noexcept
+ValueOrError<Title> Title::fromJson(const char* jsonStr) noexcept
 {
     try
     {
-        return ValueOrError<TitleMetadata>::makeValue(TitleMetadata(json));
+        return ValueOrError<Title>::makeValue(Title(jsonStr));
     }
     catch (const std::exception& e)
     {
-        return ValueOrError<TitleMetadata>::makeError(e.what());
+        return ValueOrError<Title>::makeError(e.what());
     }
 }
 
-nx::kit::Json TitleMetadata::to_json() const
+ValueOrError<Title> Title::fromJson(const nx::kit::Json& json) noexcept
+{
+    try
+    {
+        return ValueOrError<Title>::makeValue(Title(json));
+    }
+    catch (const std::exception& e)
+    {
+        return ValueOrError<Title>::makeError(e.what());
+    }
+}
+
+nx::kit::Json Title::to_json() const
 {
     auto result = toBaseObject();
     result["text"] = text;
-    result["hasImage"] = hasImage;
     return result;
 }
 
 // ------------------------- BestShot ------------------------------------
 
-BestShotMetadata::BestShotMetadata(const nx::kit::Json& json): BaseImageMetadata(json)
+BestShot::BestShot(const nx::kit::Json& json): BaseImage(json)
 {
 }
 
-BestShotMetadata::BestShotMetadata(const char* jsonStr) : BestShotMetadata(parseJson(jsonStr))
+BestShot::BestShot(const char* jsonStr) : BestShot(parseJson(jsonStr))
 {
 }
 
-bool BestShotMetadata::operator==(const BestShotMetadata& other) const
+bool BestShot::operator==(const BestShot& other) const
 {
-    return BaseImageMetadata::operator==(other);
+    return BaseImage::operator==(other);
 }
 
-ValueOrError<BestShotMetadata> BestShotMetadata::fromJson(const char* jsonStr) noexcept
-{
-    try
-    {
-        return ValueOrError<BestShotMetadata>::makeValue(BestShotMetadata(jsonStr));
-    }
-    catch (const std::exception& e)
-    {
-        return ValueOrError<BestShotMetadata>::makeError(e.what());
-    }
-}
-
-ValueOrError<BestShotMetadata> BestShotMetadata::fromJson(const nx::kit::Json& json) noexcept
+ValueOrError<BestShot> BestShot::fromJson(const char* jsonStr) noexcept
 {
     try
     {
-        return ValueOrError<BestShotMetadata>::makeValue(BestShotMetadata(json));
+        return ValueOrError<BestShot>::makeValue(BestShot(jsonStr));
     }
     catch (const std::exception& e)
     {
-        return ValueOrError<BestShotMetadata>::makeError(e.what());
+        return ValueOrError<BestShot>::makeError(e.what());
     }
 }
 
-nx::kit::Json BestShotMetadata::to_json() const
+ValueOrError<BestShot> BestShot::fromJson(const nx::kit::Json& json) noexcept
+{
+    try
+    {
+        return ValueOrError<BestShot>::makeValue(BestShot(json));
+    }
+    catch (const std::exception& e)
+    {
+        return ValueOrError<BestShot>::makeError(e.what());
+    }
+}
+
+nx::kit::Json BestShot::to_json() const
 {
     return toBaseObject();
 }
@@ -1848,8 +1884,8 @@ ObjectTrack::ObjectTrack(const nx::kit::Json & json)
     objectPosition = getObjectValue<ObjectRegion>(json, "objectPosition");
     analyticsEngineId = getStringValue(json, "analyticsEngineId");
 
-    title = getOptionalObjectValue<TitleMetadata>(json, "title");
-    bestShot = getOptionalObjectValue<BestShotMetadata>(json, "bestShot");
+    title = getOptionalObjectValue<Title>(json, "title");
+    bestShot = getOptionalObjectValue<BestShot>(json, "bestShot");
 }
 
 bool ObjectTrack::operator==(const ObjectTrack& other) const
@@ -1958,54 +1994,6 @@ bool Image::operator==(const Image& other) const
     return objectTrackId == other.objectTrackId
         && format == other.format
         && data64 == other.data64;
-}
-
-bool TrackImage::operator==(const TrackImage& other) const
-{
-    return
-        static_cast<const BaseImageMetadata&>(*this) == static_cast<const BaseImageMetadata&>(other)
-        && image == other.image;
-}
-
-TrackImage::TrackImage(const nx::kit::Json& json): BaseImageMetadata(json)
-{
-    image = getOptionalObjectValue<Image>(json, "image");
-}
-
-TrackImage::TrackImage(const char* jsonData): TrackImage(parseJson(jsonData))
-{
-}
-
-ValueOrError<TrackImage> TrackImage::fromJson(const char* jsonStr) noexcept
-{
-    try
-    {
-        return ValueOrError<TrackImage>::makeValue(TrackImage(jsonStr));
-    }
-    catch (const std::exception& e)
-    {
-        return ValueOrError<TrackImage>::makeError(e.what());
-    }
-}
-
-ValueOrError<TrackImage> TrackImage::fromJson(const nx::kit::Json& json) noexcept
-{
-    try
-    {
-        return ValueOrError<TrackImage>::makeValue(TrackImage(json));
-    }
-    catch (const std::exception& e)
-    {
-        return ValueOrError<TrackImage>::makeError(e.what());
-    }
-}
-
-nx::kit::Json TrackImage::to_json() const
-{
-    auto result = toBaseObject();
-    if (image)
-        result["image"] = *image;
-    return result;
 }
 
 AnalyticsLookupResult analyticsLookupResultFromJson(const char* data)

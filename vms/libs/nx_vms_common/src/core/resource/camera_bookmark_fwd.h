@@ -11,10 +11,12 @@
 namespace nx::vms::common {
 
 struct CameraBookmark;
+struct CameraBookmarkWithRecordId;
 struct CameraBookmarkSearchFilter;
 struct CameraBookmarkTag;
 
 using CameraBookmarkList = std::vector<CameraBookmark>;
+using CameraBookmarkWithRowIdList = std::vector<CameraBookmarkWithRecordId>;
 using MultiServerCameraBookmarkList = std::vector<CameraBookmarkList>;
 using CameraBookmarkTags = QSet<QString>;
 using CameraBookmarkTagList = QVector<CameraBookmarkTag>;

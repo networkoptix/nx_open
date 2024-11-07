@@ -3,6 +3,7 @@
 #include "os_hid_device_mac.h"
 
 #include <hidapi/hidapi.h>
+#include <nx/utils/log/log.h>
 
 #include <QtCore/QTimer>
 

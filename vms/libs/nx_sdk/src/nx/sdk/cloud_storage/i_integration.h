@@ -7,7 +7,7 @@
 #include <nx/sdk/interface.h>
 #include <nx/sdk/result.h>
 
-#include "i_archive_update_handler.h"
+#include "i_async_operation_handler.h"
 #include "i_engine.h"
 
 namespace nx::sdk::cloud_storage {
@@ -37,7 +37,7 @@ public:
     }
 
     protected: virtual void doObtainEngine(const char* url,
-        const IArchiveUpdateHandler* archiveUpdateHandler,
+        const IAsyncOperationHandler* asyncOperationHandler,
         Result<IEngine*>* outResult) = 0;
 
     /**
@@ -47,10 +47,10 @@ public:
      * with the same url.
      */
     public: Result<IEngine*> obtainEngine(
-        const char* url, const IArchiveUpdateHandler* archiveUpdateHandler)
+        const char* url, const IAsyncOperationHandler* asyncOperationHandler)
     {
         Result<IEngine*> result;
-        doObtainEngine(url, archiveUpdateHandler, &result);
+        doObtainEngine(url, asyncOperationHandler, &result);
         return result;
     }
 };

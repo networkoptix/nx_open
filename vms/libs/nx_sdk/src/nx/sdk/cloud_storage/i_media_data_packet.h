@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <camera/camera_plugin_types.h>
 #include <nx/sdk/interface.h>
 #include <plugins/plugin_api.h>
 

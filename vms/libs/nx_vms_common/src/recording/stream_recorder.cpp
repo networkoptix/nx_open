@@ -304,8 +304,6 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
         NX_VERBOSE(this, "Got analytics packet, timestamp %1 us", md->timestamp);
         const auto analytics =
             std::dynamic_pointer_cast<const QnCompressedObjectMetadataPacket>(metadata);
-        saveAnalyticsMetadata(
-            analytics ? analytics->packet : fromCompressedMetadataPacket(metadata));
     }
 
     if (m_startDateTimeUs != (int64_t) AV_NOPTS_VALUE
@@ -463,12 +461,6 @@ bool QnStreamRecorder::saveMotion(const QnConstMetaDataV1Ptr& motion)
         motion->serialize(m_motionFileList[motion->channelNumber].data());
     }
 
-    return true;
-}
-
-bool QnStreamRecorder::saveAnalyticsMetadata(
-    const nx::common::metadata::ConstObjectMetadataPacketPtr& /*packet*/)
-{
     return true;
 }
 

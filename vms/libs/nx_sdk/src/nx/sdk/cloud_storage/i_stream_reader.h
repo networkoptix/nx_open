@@ -53,6 +53,11 @@ public:
      * which has 'isKeyFrame' flag set.
      */
     virtual ErrorCode seek(int64_t timestampUs, bool findKeyFrame, int64_t* selectedPositionUs) = 0;
+
+    /**
+     * Current media data chunk size. Should return -1 in caise of error or if it is unknown.
+     */
+    virtual int size() const = 0;
 };
 
 } // namespace nx::sdk::cloud_storage

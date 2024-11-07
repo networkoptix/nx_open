@@ -44,6 +44,8 @@ const char* kImageExtension = ".img";
 
 using namespace std::chrono;
 
+constexpr size_t kMaxSendBufferSize = 5;
+
 struct FileInfo
 {
     FileInfo() = default;
@@ -713,6 +715,11 @@ WritableMediaFile::~WritableMediaFile()
 {
 }
 
+int ReadableMediaFile::size() const
+{
+    return (int) m_fileData.size();
+}
+
 ReadableMediaFile::ReadableMediaFile(const std::string& path)
 {
     if (!pathExists(path))
@@ -765,7 +772,7 @@ void ReadableMediaFile::seek(
         try
         {
             const auto packet = mediaPacketData(m_fileData, &pos);
-            if (packet.timestampUs > timestamp)
+            if ((int64_t) packet.timestampUs > timestamp)
             {
                 if (!findKeyFrame)
                 {
@@ -883,19 +890,156 @@ DataManager::DataManager(const std::string& workDir):
 
     NX_OUTPUT << __func__ << ": Work dir: '" << m_workDir << "'";
     ensureDir(joinPath(m_workDir, kImageFolderName));
-    m_analytics = load<nx::sdk::cloud_storage::ObjectTrack>(joinPath(m_workDir, kAnalyticsFileName));
-    m_motion = load<nx::sdk::cloud_storage::Motion>(joinPath(m_workDir, kMotionFileName));
+    using namespace nx::sdk::cloud_storage;
+    m_cloudAnalytics = load<ObjectTrack>(joinPath(m_workDir, kAnalyticsFileName));
+    m_cloudMotion = load<Motion>(joinPath(m_workDir, kMotionFileName));
+    m_cloudBookmarks = load<Bookmark>(joinPath(m_workDir, kBookmarkFileName));
+    m_workThread = std::thread([this](){ run(); });
+}
+
+void DataManager::run()
+{
+    while (!m_needToStop)
+    {
+        std::unique_lock<std::mutex> lock(*m_mutex);
+        bool needToWait =
+            !*needToFlush<nx::sdk::cloud_storage::Bookmark>()
+            && dataQueue<nx::sdk::cloud_storage::Bookmark>()->size() < kMaxSendBufferSize
+            && !*needToFlush<nx::sdk::cloud_storage::Motion>()
+            && dataQueue<nx::sdk::cloud_storage::Motion>()->size() < kMaxSendBufferSize
+            && !*needToFlush<nx::sdk::cloud_storage::ObjectTrack>()
+            && dataQueue<nx::sdk::cloud_storage::ObjectTrack>()->size() < kMaxSendBufferSize;
+
+        if (needToWait)
+            m_cond.wait(lock);
+
+        if (m_needToStop)
+            return;
+
+        processQueue(m_analyticsToSend, lock);
+        processQueue(m_motionToSend, lock);
+        processQueue(m_bookmarksToSend, lock);
+    }
+}
+
+template<typename Data>
+std::queue<Data>* DataManager::dataQueue()
+{
+    if constexpr (std::is_same_v<Data, nx::sdk::cloud_storage::Bookmark>)
+        return &m_bookmarksToSend;
+
+    if constexpr (std::is_same_v<Data, nx::sdk::cloud_storage::Motion>)
+        return &m_motionToSend;
+
+    if constexpr (std::is_same_v<Data, nx::sdk::cloud_storage::ObjectTrack>)
+        return &m_analyticsToSend;
+}
+
+template<typename Data>
+bool*  DataManager::needToFlush()
+{
+    if constexpr (std::is_same_v<Data, nx::sdk::cloud_storage::Bookmark>)
+        return &m_needToFlushBookmarks;
+
+    if constexpr (std::is_same_v<Data, nx::sdk::cloud_storage::Motion>)
+        return &m_needToFlushMotion;
+
+    if constexpr (std::is_same_v<Data, nx::sdk::cloud_storage::ObjectTrack>)
+        return &m_needToFlushAnalytics;
+}
+
+template<typename Data>
+nx::sdk::cloud_storage::MetadataType DataManager::metadataType() const
+{
+    if constexpr (std::is_same_v<Data, nx::sdk::cloud_storage::Bookmark>)
+        return nx::sdk::cloud_storage::MetadataType::bookmark;;
+
+    if constexpr (std::is_same_v<Data, nx::sdk::cloud_storage::Motion>)
+        return nx::sdk::cloud_storage::MetadataType::motion;;
+
+    if constexpr (std::is_same_v<Data, nx::sdk::cloud_storage::ObjectTrack>)
+        return nx::sdk::cloud_storage::MetadataType::analytics;;
+}
+
+template<typename Data>
+std::vector<Data>* DataManager::cloudData()
+{
+    if constexpr (std::is_same_v<Data, nx::sdk::cloud_storage::Bookmark>)
+        return &m_cloudBookmarks;
+
+    if constexpr (std::is_same_v<Data, nx::sdk::cloud_storage::Motion>)
+        return &m_cloudMotion;
+
+    if constexpr (std::is_same_v<Data, nx::sdk::cloud_storage::ObjectTrack>)
+        return &m_cloudAnalytics;
+}
+
+template<typename Data>
+void DataManager::processQueue(std::queue<Data>& dataQueue, std::unique_lock<std::mutex>& lock)
+{
+    auto* pCloudData = cloudData<Data>();
+    if (!*needToFlush<Data>() && dataQueue.size() < kMaxSendBufferSize)
+        return;
+
+    while (!dataQueue.empty())
+    {
+        const auto& data = dataQueue.front();
+        if constexpr (std::is_same_v<nx::sdk::cloud_storage::Bookmark, Data>)
+        {
+            for (auto it = pCloudData->begin(); it != pCloudData->end();)
+            {
+                if (it->id == data.id)
+                    it = pCloudData->erase(it);
+                else
+                    ++it;
+            }
+        }
+        pCloudData->push_back(data);
+        dataQueue.pop();
+    }
+
+    *needToFlush<Data>() = false;
+    lock.unlock();
+    m_saveHandler(metadataType<Data>(), nx::sdk::ErrorCode::noError);
+}
+
+void DataManager::setSaveHandler(SaveHandler handler)
+{
+    m_saveHandler = std::move(handler);
+}
+
+void DataManager::flushMetadata(nx::sdk::cloud_storage::MetadataType type)
+{
+    std::lock_guard<std::mutex> lock(*m_mutex);
+    switch (type)
+    {
+        case nx::sdk::cloud_storage::MetadataType::analytics:
+            m_needToFlushAnalytics = true;
+            break;
+        case nx::sdk::cloud_storage::MetadataType::motion:
+            m_needToFlushMotion = true;
+            break;
+        case nx::sdk::cloud_storage::MetadataType::bookmark:
+            m_needToFlushBookmarks = true;
+            break;
+    }
+
+    m_cond.notify_one();
 }
 
 DataManager::~DataManager()
 {
-    flush(m_analytics, joinPath(m_workDir, kAnalyticsFileName));
-    flush(m_motion, joinPath(m_workDir, kMotionFileName));
+    m_needToStop = true;
+    m_cond.notify_one();
+    m_workThread.join();
+    flushToFile(m_cloudAnalytics, joinPath(m_workDir, kAnalyticsFileName));
+    flushToFile(m_cloudMotion, joinPath(m_workDir, kMotionFileName));
+    flushToFile(m_cloudBookmarks, joinPath(m_workDir, kBookmarkFileName));
 }
 
-void DataManager::saveBookmark(const nx::sdk::cloud_storage::Bookmark& data)
+nx::sdk::ErrorCode DataManager::saveBookmark(const nx::sdk::cloud_storage::Bookmark& data)
 {
-    addListEntry(data, joinPath(m_workDir, kBookmarkFileName));
+    return saveMetadataImpl(data);
 }
 
 void DataManager::deleteBookmark(const char* id)
@@ -908,15 +1052,6 @@ void DataManager::deleteBookmark(const char* id)
         [id](const auto& entry) { return entry.id == id; }), bookmarks.end());
 
     File(fileName).writeAll(nx::kit::Json(bookmarks).dump(), /*replaceContents*/ true);
-}
-
-template<typename Data>
-void DataManager::addListEntry(const Data& data, const std::string& fileName)
-{
-    std::lock_guard<std::mutex> lock(*m_mutex);
-    auto existing = loadListNoLock(fileName);
-    existing.push_back(nx::kit::Json(data));
-    File(fileName).writeAll(nx::kit::Json(existing).dump(), /*replaceContents*/ true);
 }
 
 template<typename Data>
@@ -949,7 +1084,7 @@ std::vector<nx::kit::Json> DataManager::loadListNoLock(const std::string& fileNa
 }
 
 template<typename DataList>
-void DataManager::flush(const DataList& data, const std::string& fileName)
+void DataManager::flushToFile(const DataList& data, const std::string& fileName)
 {
     std::lock_guard<std::mutex> lock(*m_mutex);
     auto file = File(fileName);
@@ -1034,9 +1169,8 @@ std::vector<Data> DataManager::allObjectsNoLock(const std::string& fileName) con
 std::string DataManager::queryBookmarks(const nx::sdk::cloud_storage::BookmarkFilter& filter) const
 {
     using namespace nx::sdk::cloud_storage;
-    const auto allBookmarks = allObjects<Bookmark>(joinPath(m_workDir, kBookmarkFileName));
     std::vector<Bookmark> result;
-    for (const auto& candidate: allBookmarks)
+    for (const auto& candidate: m_cloudBookmarks)
     {
         if (bookmarkMatches(candidate, filter))
             result.push_back(candidate);
@@ -1046,10 +1180,24 @@ std::string DataManager::queryBookmarks(const nx::sdk::cloud_storage::BookmarkFi
     return dumpObjects(result);
 }
 
-void DataManager::saveMotion(const nx::sdk::cloud_storage::Motion& data)
+nx::sdk::ErrorCode DataManager::saveMotion(const nx::sdk::cloud_storage::Motion& data)
+{
+    return saveMetadataImpl(data);
+}
+
+template<typename Data>
+nx::sdk::ErrorCode DataManager::saveMetadataImpl(const Data& data)
 {
     std::lock_guard<std::mutex> lock(*m_mutex);
-    m_motion.push_back(data);
+    auto* pQueue = dataQueue<Data>();
+    pQueue->push(data);
+    if (pQueue->size() >= kMaxSendBufferSize)
+    {
+        m_cond.notify_one();
+        return nx::sdk::ErrorCode::inProgress;
+    }
+
+    return nx::sdk::ErrorCode::needMoreData;
 }
 
 std::string DataManager::queryMotion(const nx::sdk::cloud_storage::MotionFilter& filter) const
@@ -1057,7 +1205,7 @@ std::string DataManager::queryMotion(const nx::sdk::cloud_storage::MotionFilter&
     nx::sdk::cloud_storage::TimePeriodList result;
     {
         std::lock_guard<std::mutex> lock(*m_mutex);
-        for (const auto& candidate: m_motion)
+        for (const auto& candidate: m_cloudMotion)
         {
             if (motionMaches(candidate, filter))
                 result.append({candidate.startTimestamp, candidate.duration});
@@ -1069,10 +1217,9 @@ std::string DataManager::queryMotion(const nx::sdk::cloud_storage::MotionFilter&
     return result.to_json().dump();
 }
 
-void DataManager::saveObjectTrack(const nx::sdk::cloud_storage::ObjectTrack& data)
+nx::sdk::ErrorCode DataManager::saveObjectTrack(const nx::sdk::cloud_storage::ObjectTrack& data)
 {
-    std::lock_guard<std::mutex> lock(*m_mutex);
-    m_analytics.push_back(data);
+    return saveMetadataImpl(data);
 }
 
 std::string DataManager::queryAnalytics(
@@ -1081,7 +1228,7 @@ std::string DataManager::queryAnalytics(
     std::vector<nx::sdk::cloud_storage::ObjectTrack> result;
     {
         std::lock_guard<std::mutex> lock(*m_mutex);
-        for (const auto& candidate: m_analytics)
+        for (const auto& candidate: m_cloudAnalytics)
         {
             if (objectTrackMatches(candidate, filter))
                 result.push_back(candidate);
@@ -1108,6 +1255,46 @@ void ArchiveIndex::sort()
     }
 }
 
+nx::sdk::cloud_storage::TimePeriodList roundForFiveSecondGrid(
+    nx::sdk::cloud_storage::TimePeriodList periods)
+{
+    nx::sdk::cloud_storage::TimePeriodList fiveSecPeriods;
+    std::function<void(const nx::sdk::cloud_storage::TimePeriod&)> buildPeriodsFunc =
+        [&](const auto& tp)
+    {
+        nx::sdk::cloud_storage::TimePeriod fiveSecPeriod;
+        fiveSecPeriod.startTimestamp =
+            (tp.startTimestamp / 1000 - (tp.startTimestamp / 1000) % 5) * 1000;
+
+        const auto tpEnd = tp.startTimestamp + tp.duration;
+        const auto fiveSecEnd = (tpEnd / 1000 - (tpEnd / 1000) % 5) * 1000 + 5s;
+        fiveSecPeriod.duration = fiveSecEnd - fiveSecPeriod.startTimestamp;
+        if (fiveSecPeriods.empty() || fiveSecPeriods.last() != fiveSecPeriod)
+            fiveSecPeriods.append(fiveSecPeriod);
+    };
+    periods.forEach(buildPeriodsFunc);
+
+    nx::sdk::cloud_storage::TimePeriodList result;
+    std::function<void(const nx::sdk::cloud_storage::TimePeriod&)> buildResultFunc =
+        [&](const auto& tp)
+    {
+        if (result.empty())
+        {
+            result.append(tp);
+            return;
+        }
+
+        if (result.last()->endTimestamp() >= tp.startTimestamp)
+        {
+            result.setLastDuration((std::max)(
+                *result.last()->endTimestamp() - result.last()->startTimestamp,
+                *tp.endTimestamp() - result.last()->startTimestamp));
+        }
+    };
+    fiveSecPeriods.forEach(buildResultFunc);
+
+    return result;
+}
 
 std::string DataManager::queryAnalyticsPeriods(
     const nx::sdk::cloud_storage::AnalyticsFilter& filter) const
@@ -1115,7 +1302,7 @@ std::string DataManager::queryAnalyticsPeriods(
     nx::sdk::cloud_storage::TimePeriodList result;
     {
         std::lock_guard<std::mutex> lock(*m_mutex);
-        for (const auto& candidate: m_analytics)
+        for (const auto& candidate: m_cloudAnalytics)
         {
             if (!objectTrackMatches(candidate, filter))
                 continue;
@@ -1130,6 +1317,7 @@ std::string DataManager::queryAnalyticsPeriods(
 
     result = sdk::cloud_storage::sortAndLimitTimePeriods(
         result, filter.order, filter.maxObjectTracksToSelect);
+    result = roundForFiveSecondGrid(std::move(result));
     result.to_json().dump();
     return result.to_json().dump();
 }

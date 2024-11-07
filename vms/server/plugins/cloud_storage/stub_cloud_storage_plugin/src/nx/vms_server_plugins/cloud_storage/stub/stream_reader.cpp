@@ -50,6 +50,11 @@ const nx::sdk::IList<nx::sdk::cloud_storage::ICodecInfo>* StreamReader::getCodec
     return m_codecInfos.get();
 }
 
+int StreamReader::size() const
+{
+    return m_file ? m_file->size() : -1;
+}
+
 nx::sdk::ErrorCode StreamReader::getNextData(nx::sdk::cloud_storage::IMediaDataPacket** packet)
 {
     try
@@ -64,7 +69,7 @@ nx::sdk::ErrorCode StreamReader::getNextData(nx::sdk::cloud_storage::IMediaDataP
         *packet = new nx::sdk::cloud_storage::MediaDataPacket(*data);
         return nx::sdk::ErrorCode::noError;
     }
-    catch (const std::exception& e)
+    catch (const std::exception&)
     {
         NX_OUTPUT << "Failed to read next packet from file " << m_file->name();
         return nx::sdk::ErrorCode::ioError;

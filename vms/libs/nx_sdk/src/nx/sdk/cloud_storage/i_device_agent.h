@@ -77,7 +77,7 @@ public:
         int64_t startTimeMs,
         int64_t durationMs)
     {
-            Result<IStreamReader*> result;
+        Result<IStreamReader*> result;
         doCreateStreamReader(quality, startTimeMs, durationMs, &result);
         return result;
     }

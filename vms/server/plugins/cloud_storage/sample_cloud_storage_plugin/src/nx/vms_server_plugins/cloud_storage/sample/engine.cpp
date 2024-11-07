@@ -9,22 +9,22 @@
 namespace nx::vms_server_plugins::cloud_storage::sample {
 
 Engine::Engine(
-    const nx::sdk::cloud_storage::IArchiveUpdateHandler* /*deviceManagerHandler*/,
+    const nx::sdk::cloud_storage::IAsyncOperationHandler*,
     const std::string& /*integrationId*/)
 {
 }
 
-void Engine::startNotifications()
+void Engine::startAsyncTasks()
 {
 }
 
-void Engine::stopNotifications()
+void Engine::stopAsyncTasks()
 {
 }
 
 void Engine::doObtainDeviceAgent(
     nx::sdk::Result<nx::sdk::cloud_storage::IDeviceAgent*>* outResult,
-    const nx::sdk::IDeviceInfo* deviceInfo)
+    const nx::sdk::IDeviceInfo*)
 {
     *outResult = nx::sdk::Result<nx::sdk::cloud_storage::IDeviceAgent*>(nx::sdk::Error(
         nx::sdk::ErrorCode::notImplemented,
@@ -74,7 +74,6 @@ void Engine::doQueryAnalyticsTimePeriods(
 
 nx::sdk::ErrorCode Engine::saveMetadata(
     const char* /*deviceId*/,
-    int64_t /*timeStampUs*/,
     nx::sdk::cloud_storage::MetadataType /*type*/,
     const char* /*data*/)
 {
@@ -88,13 +87,6 @@ bool Engine::isOnline() const
 
 nx::sdk::ErrorCode Engine::storageSpace(
     nx::sdk::cloud_storage::StorageSpace* /*storageSpace*/) const
-{
-    return nx::sdk::ErrorCode::notImplemented;
-}
-
-nx::sdk::ErrorCode Engine::saveTrackImage(
-    const char* /*data*/,
-    nx::sdk::cloud_storage::TrackImageType /*type*/)
 {
     return nx::sdk::ErrorCode::notImplemented;
 }

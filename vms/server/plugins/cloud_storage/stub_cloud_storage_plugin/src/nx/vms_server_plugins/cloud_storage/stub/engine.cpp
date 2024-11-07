@@ -1,12 +1,14 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "engine.h"
+
 #include <optional>
 
 #include <nx/kit/debug.h>
 #include <nx/sdk/cloud_storage/helpers/device_archive.h>
 #include <nx/sdk/cloud_storage/helpers/time_periods.h>
 #include <nx/sdk/helpers/string.h>
+#include <nx/sdk/helpers/to_string.h>
 
 #include "device_agent.h"
 #include "stub_cloud_storage_plugin_ini.h"
@@ -26,22 +28,27 @@ Engine::~Engine()
     }
 
     NX_OUTPUT << __func__ << "Warning: worker thread has not been stopped";
-    stopNotifications();
+    stopAsyncTasks();
 }
 
 Engine::Engine(
-    const nx::sdk::cloud_storage::IArchiveUpdateHandler* deviceManagerHandler,
+    const nx::sdk::cloud_storage::IAsyncOperationHandler* asyncOperationHandler,
     const std::shared_ptr<DataManager>& dataManager,
     const std::string& integrationId)
     :
     m_dataManager(dataManager),
     m_integrationId(integrationId)
 {
-    m_handler.reset(deviceManagerHandler);
+    m_handler.reset(asyncOperationHandler);
     m_handler->addRef();
+    m_dataManager->setSaveHandler(
+        [this](nx::sdk::cloud_storage::MetadataType type, nx::sdk::ErrorCode result)
+        {
+            m_handler->onSaveOperationCompleted(m_integrationId.data(), type, result);
+        });
 }
 
-void Engine::stopNotifications()
+void Engine::stopAsyncTasks()
 {
     {
         std::lock_guard<std::mutex> lock(m_mutex);
@@ -55,7 +62,7 @@ void Engine::stopNotifications()
     NX_OUTPUT << __func__ << ": Worker thread stopped";
 }
 
-void Engine::startNotifications()
+void Engine::startAsyncTasks()
 {
     m_worker = std::thread(
         [this]()
@@ -316,43 +323,46 @@ void Engine::doQueryAnalyticsTimePeriods(
     }
 }
 
+void Engine::flushMetadata(nx::sdk::cloud_storage::MetadataType type)
+{
+    m_dataManager->flushMetadata(type);
+}
+
 nx::sdk::ErrorCode Engine::saveMetadata(
     const char* /*deviceId*/,
-    int64_t timeStampUs,
     nx::sdk::cloud_storage::MetadataType type,
     const char* data)
 {
-    NX_OUTPUT << __func__ << ": timestamp: " << timeStampUs << ", type: " << toString(type)
-              << ", data: " << data;
+    NX_OUTPUT << __func__  << ", type: " << toString(type) << ", data: " << data;
     try
     {
         std::lock_guard lock(m_mutex);
         if (!m_dataManager)
             throw std::logic_error("Plugin has not been properly initialized");
 
+        nx::sdk::ErrorCode result = nx::sdk::ErrorCode::otherError;
         switch (type)
         {
             case sdk::cloud_storage::MetadataType::bookmark:
-                m_dataManager->saveBookmark(nx::sdk::cloud_storage::Bookmark(data));
+                result = m_dataManager->saveBookmark(nx::sdk::cloud_storage::Bookmark(data));
                 break;
             case sdk::cloud_storage::MetadataType::motion:
-                m_dataManager->saveMotion(nx::sdk::cloud_storage::Motion(data));
+                result = m_dataManager->saveMotion(nx::sdk::cloud_storage::Motion(data));
                 break;
             case sdk::cloud_storage::MetadataType::analytics:
-                m_dataManager->saveObjectTrack(nx::sdk::cloud_storage::ObjectTrack(data));
+                result = m_dataManager->saveObjectTrack(nx::sdk::cloud_storage::ObjectTrack(data));
                 break;
         }
 
-        NX_OUTPUT << __func__ << ": timestamp: " << timeStampUs << ", type: " << toString(type)
-                  << ". Success. ";
+        NX_OUTPUT
+            << __func__ << ", type: " << toString(type)
+            << ". Result: " << nx::sdk::toString(result);
 
-        return nx::sdk::ErrorCode::noError;
+        return result;
     }
     catch (const std::exception& e)
     {
-        NX_OUTPUT << __func__ << ": timestamp: " << timeStampUs << ", type: " << toString(type)
-                  << ". Fail. Error: " << e.what();
-
+        NX_OUTPUT << __func__ << ", type: " << toString(type) << ". Fail. Error: " << e.what();
         return nx::sdk::ErrorCode::internalError;
     }
 }
@@ -367,23 +377,6 @@ nx::sdk::ErrorCode Engine::storageSpace(nx::sdk::cloud_storage::StorageSpace* st
     storageSpace->freeSpace = 1000 * 1024 * 1024 * 1024LL;
     storageSpace->totalSpace = 1000 * 1024 * 1024 * 1024LL;
     return nx::sdk::ErrorCode::noError;
-}
-
-nx::sdk::ErrorCode Engine::saveTrackImage(
-    const char* data,
-    nx::sdk::cloud_storage::TrackImageType type)
-{
-    try
-    {
-        std::lock_guard lock(m_mutex);
-        m_dataManager->saveTrackImage(data, type);
-        return nx::sdk::ErrorCode::noError;
-    }
-    catch (const std::exception& e)
-    {
-        NX_OUTPUT << __func__ << ": Failed to save BestShot image: " << e.what();
-        return nx::sdk::ErrorCode::internalError;
-    }
 }
 
 void Engine::doFetchTrackImage(

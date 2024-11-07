@@ -96,6 +96,8 @@ std::string toString(ErrorCode errorCode)
         case ErrorCode::internalError: return "internalError";
         case ErrorCode::invalidParams: return "invalidParams";
         case ErrorCode::notImplemented: return "notImplemented";
+        case ErrorCode::needMoreData: return "needMoreData";
+        case ErrorCode::inProgress: return "inProgress";
         default: return "<unsupported Error>";
     }
 }

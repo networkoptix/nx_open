@@ -7,7 +7,7 @@
 #include <thread>
 #include <vector>
 
-#include <nx/sdk/cloud_storage/i_archive_update_handler.h>
+#include <nx/sdk/cloud_storage/i_async_operation_handler.h>
 #include <nx/sdk/cloud_storage/i_engine.h>
 #include <nx/sdk/helpers/ref_countable.h>
 #include <nx/sdk/i_utility_provider.h>
@@ -22,16 +22,15 @@ class Engine: public nx::sdk::RefCountable<nx::sdk::cloud_storage::IEngine>
 {
 public:
     Engine(
-        const nx::sdk::cloud_storage::IArchiveUpdateHandler* deviceManagerHandler,
+        const nx::sdk::cloud_storage::IAsyncOperationHandler* asyncOperationHandler,
         const std::shared_ptr<DataManager>& dataManager,
         const std::string& integrationId);
 
     virtual ~Engine() override;
-    virtual void startNotifications() override;
-    virtual void stopNotifications() override;
+    virtual void startAsyncTasks() override;
+    virtual void stopAsyncTasks() override;
     virtual nx::sdk::ErrorCode saveMetadata(
         const char* deviceId,
-        int64_t timeStampUs,
         nx::sdk::cloud_storage::MetadataType type,
         const char* data) override;
 
@@ -39,9 +38,7 @@ public:
     virtual nx::sdk::ErrorCode storageSpace(
         nx::sdk::cloud_storage::StorageSpace* storageSpace) const override;
 
-    virtual nx::sdk::ErrorCode saveTrackImage(
-        const char* data,
-        nx::sdk::cloud_storage::TrackImageType type) override;
+    virtual void flushMetadata(nx::sdk::cloud_storage::MetadataType type) override;
 
 protected:
     virtual void doObtainDeviceAgent(
@@ -71,7 +68,7 @@ protected:
         nx::sdk::Result<nx::sdk::IString*>* outResult) const override;
 
 private:
-    nx::sdk::Ptr<const nx::sdk::cloud_storage::IArchiveUpdateHandler> m_handler;
+    nx::sdk::Ptr<const nx::sdk::cloud_storage::IAsyncOperationHandler> m_handler;
     std::shared_ptr<DataManager> m_dataManager;
     std::vector<nx::sdk::Ptr<nx::sdk::cloud_storage::IDeviceAgent>> m_deviceAgents;
     std::string m_integrationId;

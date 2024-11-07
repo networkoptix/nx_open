@@ -37,11 +37,11 @@ static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kIconSubs
 
 NX_DECLARE_COLORIZED_ICON(kReloadIcon, "20x20/Outline/reload.svg", kIconSubstitutions)
 
-nx::vms::api::BackupPosition backupPositionFromCurrentTime()
+nx::vms::api::BackupPositionV1 backupPositionFromCurrentTime()
 {
     const auto currentTimePointMs = system_clock::time_point(qnSyncTime->value());
 
-    nx::vms::api::BackupPosition result;
+    nx::vms::api::BackupPositionV1 result;
     result.positionHighMs = currentTimePointMs;
     result.positionLowMs = currentTimePointMs;
     result.bookmarkStartPositionMs = currentTimePointMs;
@@ -173,7 +173,7 @@ void BackupStatusWidget::setupSkipBackupButton()
 
             const auto callback =
                 [this, mutex, requestHandles]
-                (bool success, rest::Handle requestId, nx::vms::api::BackupPosition result)
+                (bool success, rest::Handle requestId, nx::vms::api::BackupPositionV1 result)
                 {
                     NX_MUTEX_LOCKER lock(mutex.get());
                     if (auto count = requestHandles->erase(requestId);
@@ -193,7 +193,7 @@ void BackupStatusWidget::setupSkipBackupButton()
                 return;
 
             NX_MUTEX_LOCKER lock(mutex.get());
-            requestHandles->insert(connectedServerApi()->setBackupPositionsAsync(
+            requestHandles->insert(connectedServerApi()->setBackupPositionsAsyncV1(
                 m_server->getId(), userBackupPosition, callback));
         });
 }
@@ -241,7 +241,7 @@ void BackupStatusWidget::updateBackupStatus()
     const auto actualPositionCallback = nx::utils::guarded(this,
         [this, mutex, server = m_server, backupPositionRequestHandles, currentTimePoint,
             backupTimePoints]
-        (bool success, rest::Handle requestId, nx::vms::api::BackupPositionEx actualPosition)
+        (bool success, rest::Handle requestId, nx::vms::api::BackupPositionExV1 actualPosition)
         {
             NX_MUTEX_LOCKER lock(mutex.get());
             if (auto count = backupPositionRequestHandles->erase(requestId); count > 0 && success)
@@ -293,7 +293,7 @@ void BackupStatusWidget::updateBackupStatus()
     for (const auto& camera: cameras)
     {
         NX_MUTEX_LOCKER lock(mutex.get());
-        backupPositionRequestHandles->insert(m_server->restConnection()->backupPositionAsync(
+        backupPositionRequestHandles->insert(m_server->restConnection()->backupPositionAsyncV1(
             m_server->getId(),
             camera->getId(),
             actualPositionCallback));

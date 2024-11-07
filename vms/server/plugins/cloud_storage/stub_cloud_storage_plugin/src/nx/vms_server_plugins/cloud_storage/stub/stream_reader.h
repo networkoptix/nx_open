@@ -31,6 +31,7 @@ public:
     virtual int64_t endTimeUs() const override;
     virtual nx::sdk::ErrorCode seek(
         int64_t timestampUs, bool findKeyFrame, int64_t* selectedPositionUs) override;
+    virtual int size() const override;
 
 protected:
     virtual void getOpaqueMetadata(

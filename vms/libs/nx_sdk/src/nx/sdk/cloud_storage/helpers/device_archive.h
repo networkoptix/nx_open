@@ -6,7 +6,6 @@
 #include <string>
 
 #include <nx/sdk/cloud_storage/helpers/time_periods.h>
-#include <nx/sdk/cloud_storage/i_archive_update_handler.h>
 #include <nx/sdk/helpers/list.h>
 #include <nx/sdk/helpers/ref_countable.h>
 

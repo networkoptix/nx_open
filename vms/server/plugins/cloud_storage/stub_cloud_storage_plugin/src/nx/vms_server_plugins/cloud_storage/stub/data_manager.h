@@ -2,10 +2,14 @@
 
 #pragma once
 
+#include <atomic>
 #include <chrono>
+#include <condition_variable>
 #include <mutex>
 #include <optional>
+#include <queue>
 #include <string>
+#include <thread>
 #include <vector>
 
 #include <camera/camera_plugin.h>
@@ -76,6 +80,8 @@ public:
         bool findKeyFrame,
         int64_t* selectedPosition);
 
+    int size() const;
+
 private:
     std::vector<uint8_t> m_fileData;
     std::unique_ptr<MediaFileHeader> m_header;
@@ -100,17 +106,21 @@ struct ArchiveIndex
 class DataManager
 {
 public:
+    using SaveHandler =
+        std::function<void(nx::sdk::cloud_storage::MetadataType, nx::sdk::ErrorCode)>;
+
     DataManager(const std::string& workDir);
     ~DataManager();
 
-    void saveBookmark(const nx::sdk::cloud_storage::Bookmark& data);
+    void setSaveHandler(SaveHandler handler);
+    nx::sdk::ErrorCode saveBookmark(const nx::sdk::cloud_storage::Bookmark& data);
     void deleteBookmark(const char* id);
     std::string queryBookmarks(const nx::sdk::cloud_storage::BookmarkFilter& filter) const;
 
-    void saveMotion(const nx::sdk::cloud_storage::Motion& data);
+    nx::sdk::ErrorCode saveMotion(const nx::sdk::cloud_storage::Motion& data);
     std::string queryMotion(const nx::sdk::cloud_storage::MotionFilter& filter) const;
 
-    void saveObjectTrack(const nx::sdk::cloud_storage::ObjectTrack& data);
+    nx::sdk::ErrorCode saveObjectTrack(const nx::sdk::cloud_storage::ObjectTrack& data);
     std::string queryAnalytics(const nx::sdk::cloud_storage::AnalyticsFilter& filter) const;
     std::string queryAnalyticsPeriods(const nx::sdk::cloud_storage::AnalyticsFilter& filter) const;
 
@@ -134,16 +144,46 @@ public:
         nx::sdk::cloud_storage::TrackImageType type);
     std::string fetchTrackImage(const char* objectTrackId, nx::sdk::cloud_storage::TrackImageType type);
 
+    void run();
+    void flushMetadata(nx::sdk::cloud_storage::MetadataType type);
+
 private:
     std::string m_workDir;
     std::shared_ptr<std::mutex> m_mutex{std::make_shared<std::mutex>()};
-    std::vector<nx::sdk::cloud_storage::Motion> m_motion;
-    std::vector<nx::sdk::cloud_storage::ObjectTrack> m_analytics;
+    std::vector<nx::sdk::cloud_storage::Bookmark> m_cloudBookmarks;
+    std::vector<nx::sdk::cloud_storage::Motion> m_cloudMotion;
+    std::vector<nx::sdk::cloud_storage::ObjectTrack> m_cloudAnalytics;
+    std::queue<nx::sdk::cloud_storage::Bookmark> m_bookmarksToSend;
+    std::queue<nx::sdk::cloud_storage::Motion> m_motionToSend;
+    std::queue<nx::sdk::cloud_storage::ObjectTrack> m_analyticsToSend;
+    SaveHandler m_saveHandler;
+    std::thread m_workThread;
+    std::atomic<bool> m_needToStop{false};
+    std::condition_variable m_cond;
+    bool m_needToFlushBookmarks{false};
+    bool m_needToFlushMotion{false};
+    bool m_needToFlushAnalytics{false};
 
+private:
     std::string devicePath(const std::string& deviceId) const;
 
     template<typename Data>
-    void addListEntry(const Data& data, const std::string& fileName);
+    std::queue<Data>* dataQueue();
+
+    template<typename Data>
+    std::vector<Data>* cloudData();
+
+    template<typename Data>
+    bool* needToFlush();
+
+    template<typename Data>
+    nx::sdk::cloud_storage::MetadataType metadataType() const;
+
+    template<typename Data>
+    void processQueue(std::queue<Data>& dataQueue, std::unique_lock<std::mutex>& lock);
+
+    template<typename Data>
+    nx::sdk::ErrorCode saveMetadataImpl(const Data& data);
 
     template<typename Data>
     void saveObject(const Data& data, const std::string& fileName);
@@ -158,7 +198,7 @@ private:
     std::optional<Data> oneObject(const std::string& fileName) const;
 
     template<typename DataList>
-    void flush(const DataList& data, const std::string& fileName);
+    void flushToFile(const DataList& data, const std::string& fileName);
 
     template<typename Data>
     std::vector<Data> load(const std::string& fileName) const;
