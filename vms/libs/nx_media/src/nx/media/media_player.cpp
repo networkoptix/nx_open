@@ -819,12 +819,12 @@ bool Player::Private::initDataProvider()
         return false;
     }
 
-    auto camera = resource.dynamicCast<QnVirtualCameraResource>();
-    if (camera)
+    if (const auto camera = resource.dynamicCast<QnVirtualCameraResource>())
     {
-        if (isAudioOnlyMode != !camera->hasVideo())
+        const bool audioOnlyMode = !camera->hasVideo() && camera->isAudioSupported();
+        if (isAudioOnlyMode != audioOnlyMode)
         {
-            isAudioOnlyMode = !camera->hasVideo();
+            isAudioOnlyMode = audioOnlyMode;
             emit q->audioOnlyModeChanged();
         }
     }
