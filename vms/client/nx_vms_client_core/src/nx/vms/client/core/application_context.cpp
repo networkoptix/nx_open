@@ -396,4 +396,10 @@ void ApplicationContext::addMainContext(SystemContext* mainContext)
     d->systemContexts.push_back(mainContext);
 }
 
+bool ApplicationContext::isCertificateValidationLevelStrict() const
+{
+    return coreSettings()->certificateValidationLevel()
+        == network::server_certificate::ValidationLevel::strict;
+}
+
 } // namespace nx::vms::client::core

@@ -63,6 +63,8 @@ public:
     QnLongRunableCleanup* longRunableCleanup() const;
     nx::metric::ApplicationMetricsStorage* metrics() const;
 
+    virtual bool isCertificateValidationLevelStrict() const;
+
     template<typename ContextType>
     ContextType* as()
     {

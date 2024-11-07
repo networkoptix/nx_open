@@ -197,4 +197,9 @@ ApplicationMetricsStorage* ApplicationContext::metrics() const
     return d->metricsStorage.get();
 }
 
+bool ApplicationContext::isCertificateValidationLevelStrict() const
+{
+    return false;
+}
+
 } // namespace nx::vms::common

@@ -115,6 +115,8 @@ public:
      */
     ThreadPool* threadPool(const QString& id) const;
 
+    virtual bool isCertificateValidationLevelStrict() const override;
+
 signals:
     void systemContextAdded(SystemContext* systemContext);
     void systemContextRemoved(SystemContext* systemContext);

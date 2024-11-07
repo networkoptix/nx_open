@@ -2,6 +2,7 @@
 
 #include "manager.h"
 
+#include <common/static_common_module.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/fusion/serialization/json.h>
@@ -148,7 +149,8 @@ struct Manager::Private
                 const auto endpoints = ec2::moduleInformationEndpoints(module);
                 const bool isOwnServer = serverModeInfo && (module.id == serverModeInfo->peerId);
 
-                if (!isOwnServer && endpoints.size() != 0)
+                if (!isOwnServer && endpoints.size() != 0
+                    && !qnStaticCommon->isCertificateValidationLevelStrict())
                 {
                     moduleConnector->newEndpoints(
                         {endpoints.cbegin(), endpoints.cend()},
@@ -181,6 +183,9 @@ struct Manager::Private
             [this](const nx::vms::api::ModuleInformation& module,
                 const nx::network::SocketAddress &endpoint, const nx::network::HostAddress& ip)
             {
+                if (qnStaticCommon->isCertificateValidationLevelStrict())
+                    return;
+
                 moduleConnector->newEndpoints(
                     {nx::network::SocketAddress(ip, endpoint.port)},
                     module.id);
