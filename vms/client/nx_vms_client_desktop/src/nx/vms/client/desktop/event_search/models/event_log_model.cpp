@@ -62,22 +62,12 @@ QString resourceNames(const QnResourceList& resources)
     return names.join(", ");
 }
 
-UuidList resourceIds(
-    SystemContext* context, EventLogModel::Column column, const EventLogModelData& data)
+QIcon resourceIcon(QnResourceIconCache::Key key)
 {
-    switch (column)
-    {
-        case EventLogModel::EventCameraColumn:
-            return rules::utils::getResourceIds(
-                AggregatedEventPtr::create(data.event(context)));
-            break;
-        case EventLogModel::ActionCameraColumn:
-            return rules::utils::getResourceIds(data.action(context));
-            break;
-        default:
-            NX_ASSERT("Unexpected column: %1", column);
-            return {};
-    }
+    if ((key & QnResourceIconCache::TypeMask) == QnResourceIconCache::Unknown)
+        return {};
+
+    return qnResIconCache->icon(key);
 }
 
 QString actionTargetText(SystemContext* context, const EventLogModelData& data)
@@ -157,6 +147,16 @@ QnResourceIconCache::Key actionTargetIcon(SystemContext* context, const EventLog
     }
 
     return QnResourceIconCache::Unknown;
+}
+
+nx::Uuid eventSourceId(SystemContext* context, const EventLogModelData& data)
+{
+    return data.details(context).value(utils::kSourceIdDetailName).value<nx::Uuid>();
+}
+
+QnResourcePtr eventSource(SystemContext* context, const EventLogModelData& data)
+{
+    return context->resourcePool()->getResourceById(eventSourceId(context, data));
 }
 
 } // namespace
@@ -394,8 +394,17 @@ QVariant EventLogModel::mouseCursorData(
 
 QnResourcePtr EventLogModel::getResource(Column column, const EventLogModelData& data) const
 {
-    if (const auto ids = resourceIds(systemContext(), column, data); !ids.empty())
-        return resourcePool()->getResourceById(ids.first());
+    if (column == EventLogModel::EventCameraColumn)
+        return eventSource(systemContext(), data);
+
+    if (column == EventLogModel::ActionCameraColumn)
+    {
+        if (const auto ids = rules::utils::getResourceIds(data.action(systemContext()));
+            !ids.empty())
+        {
+            return resourcePool()->getResourceById(ids.front());
+        }
+    }
 
     return {};
 }
@@ -403,9 +412,15 @@ QnResourcePtr EventLogModel::getResource(Column column, const EventLogModelData&
 QVariant EventLogModel::iconData(Column column, const EventLogModelData& data) const
 {
     if (column == ActionCameraColumn)
-        return qnResIconCache->icon(actionTargetIcon(systemContext(), data));
+        return resourceIcon(actionTargetIcon(systemContext(), data));
 
-    return qnResIconCache->icon(getResource(column, data));
+    if (column == EventCameraColumn)
+    {
+        if (const auto resource = eventSource(systemContext(), data))
+            return qnResIconCache->icon(resource);
+    }
+
+    return {};
 }
 
 QString EventLogModel::textData(Column column, const EventLogModelData& data) const
@@ -426,9 +441,9 @@ QString EventLogModel::textData(Column column, const EventLogModelData& data) co
 
         case EventCameraColumn:
         {
-            QString result = resourceName(getResource(EventCameraColumn, data));
+            QString result = eventDetails.value(rules::utils::kSourceNameDetailName).toString();
             if (result.isEmpty())
-                result = eventDetails.value(rules::utils::kSourceNameDetailName).toString();
+                result = resourceName(getResource(EventCameraColumn, data));
             return result;
         }
         case ActionColumn:

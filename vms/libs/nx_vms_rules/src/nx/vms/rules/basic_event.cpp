@@ -83,6 +83,7 @@ QVariantMap BasicEvent::details(common::SystemContext* context,
     utils::insertIfNotEmpty(result, utils::kNameDetailName, name(context));
     utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
 
+    // TODO: #amalov Get rid of SourceId detail. User manifest resource map to find event source.
     if (const auto source = sourceId(this); !source.isNull())
     {
         result[utils::kSourceIdDetailName] = QVariant::fromValue(source);
