@@ -156,8 +156,8 @@ Rectangle
 
         visualDataLoader.sourceComponent = imageComponent
         visualDataLoader.item.source = success
-            ? "image:///skin/24x24/Outline/yes.svg?primary=light1"
-            : "image:///skin/24x24/Outline/no.svg?primary=red_core"
+            ? "image://skin/24x24/Outline/yes.svg?primary=light1"
+            : "image://skin/24x24/Outline/no.svg?primary=red_core"
 
         control.state = "visible"
     }
