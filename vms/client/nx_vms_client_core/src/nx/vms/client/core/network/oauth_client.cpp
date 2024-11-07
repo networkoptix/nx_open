@@ -106,7 +106,7 @@ void OauthClient::Private::issueAccessToken()
     if (!cloudSystem.isEmpty())
         request.scope = nx::format("cloudSystemId=%1", cloudSystem).toStdString();
 
-    m_connection->oauthManager()->issueTokenLegacy(request, std::move(handler));
+    m_connection->oauthManager()->issueTokenV1(request, std::move(handler));
 }
 
 std::string OauthClient::Private::email() const
