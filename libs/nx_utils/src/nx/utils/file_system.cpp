@@ -51,6 +51,145 @@ namespace nx {
 namespace utils {
 namespace file_system {
 
+static Result moveToExisting(
+    const QString& sourcePath, const QString& targetPath, bool replaceExisting)
+{
+    QFileInfo tgtFileInfo(targetPath);
+    QFileInfo srcFileInfo(sourcePath);
+    const auto targetFilePath = tgtFileInfo.absoluteFilePath() + "/" + srcFileInfo.fileName();
+    if (QFileInfo(targetFilePath).exists())
+    {
+        if (replaceExisting)
+        {
+            if (!QFile::remove(targetFilePath))
+                return Result::cannotMove;
+
+            return QFile::rename(sourcePath, targetFilePath) ? Result::ok : Result::cannotMove;
+        }
+
+        return Result::alreadyExists;
+    }
+
+    return QFile::rename(sourcePath, targetFilePath) ? Result::ok : Result::cannotMove;
+}
+
+static Result moveIfTargetDoesNotExist(const QString& sourcePath, const QString& targetPath)
+{
+    QFileInfo tgtFileInfo(targetPath);
+    QFileInfo srcFileInfo(sourcePath);
+    const auto targetParentDir = tgtFileInfo.absoluteDir();
+    if (targetParentDir.exists())
+        return QFile::rename(sourcePath, targetPath) ? Result::ok : Result::cannotMove;
+
+    return Result::targetFolderDoesNotExist;
+}
+
+Result move(const QString& sourcePath, const QString& targetPath, bool replaceExisting)
+{
+    const QFileInfo srcFileInfo(sourcePath);
+    if (!srcFileInfo.exists())
+        return Result(Result::sourceDoesNotExist, sourcePath);
+
+    const QFileInfo tgtFileInfo(targetPath);
+    if (srcFileInfo.isFile())
+    {
+        if (!tgtFileInfo.exists())
+            return moveIfTargetDoesNotExist(sourcePath, targetPath);
+
+        if (tgtFileInfo.isFile())
+        {
+            if (replaceExisting)
+            {
+                if (!QFile::remove(tgtFileInfo.absoluteFilePath()))
+                    return Result::cannotMove;
+
+                return QFile::rename(sourcePath, targetPath) ? Result::ok : Result::cannotMove;
+            }
+
+            return Result::alreadyExists;
+        }
+
+        // targetPath is a folder
+        return moveToExisting(sourcePath, targetPath, replaceExisting);
+    }
+
+    // sourcePath is a folder
+    if (!tgtFileInfo.exists())
+        return moveIfTargetDoesNotExist(sourcePath, targetPath);
+
+    if (tgtFileInfo.isFile())
+        return Result::cannotMove;
+
+    // targetPath is a folder
+    return moveToExisting(sourcePath, targetPath, replaceExisting);
+}
+
+Result moveFolderContents(
+    const QString& sourcePath, const QString& targetPath, bool replaceExisting)
+{
+    const QFileInfo srcFileInfo(sourcePath);
+    const QFileInfo tgtFileInfo(targetPath);
+    if (!srcFileInfo.exists() || !tgtFileInfo.exists() || !srcFileInfo.isDir() || !tgtFileInfo.isDir())
+        return Result::cannotMove;
+
+    const auto contents = QDir(sourcePath).entryInfoList(
+        QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot | QDir::NoSymLinks);
+    for (const auto& fi: contents)
+    {
+        Result::ResultCode moveResult = Result::cannotMove;
+        if (fi.isFile())
+        {
+            moveResult = move(
+                fi.absoluteFilePath(),
+                QDir(targetPath).absoluteFilePath(fi.fileName()),
+                replaceExisting).code;
+        }
+        else if (fi.isDir())
+        {
+            const auto targetDirPath = QDir(targetPath).absoluteFilePath(fi.fileName());
+            auto targetDir = QDir(targetDirPath);
+            if (targetDir.exists())
+            {
+                const auto srcDirPath = fi.absoluteFilePath();
+                moveResult = moveFolderContents(
+                    srcDirPath, targetDirPath, replaceExisting).code;
+                if (moveResult == Result::ok)
+                {
+                    const auto srcDirContents = QDir(srcDirPath).entryInfoList(
+                        QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
+                    if (srcDirContents.empty())
+                        QDir(srcDirPath).removeRecursively();
+                }
+            }
+            else
+            {
+                moveResult = move(fi.absoluteFilePath(), targetDirPath, replaceExisting).code;
+            }
+        }
+        else
+        {
+            continue;
+        }
+
+        switch (moveResult)
+        {
+            case Result::cannotMove:
+                return Result::cannotMove;
+            case Result::ok:
+                break;
+            case Result::alreadyExists:
+                if (replaceExisting)
+                    return Result::cannotMove;
+                break;
+            default:
+                NX_ASSERT(false, nx::format("Unexpected state %1", (int) moveResult));
+                return Result::cannotMove;
+        }
+    }
+
+    return Result::ok;
+}
+
 Result copy(const QString& sourcePath, const QString& targetPath, Options options)
 {
     const QFileInfo srcFileInfo(sourcePath);
