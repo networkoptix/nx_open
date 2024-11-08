@@ -426,7 +426,7 @@ QList<int> SharedMemoryManager::runningInstancesIndices() const
     const SharedMemoryData data = d->readData();
 
     QList<int> result;
-    for (int i = 0; i < data.processes.size(); ++i)
+    for (int i = 0; i < (int) data.processes.size(); ++i)
     {
         if (data.processes[i].pid != 0)
             result.push_back(i);

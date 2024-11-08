@@ -4,13 +4,7 @@
 
 #include <nx/vms/event/action_parameters.h>
 
-namespace {
-static const int kInstantActionAutoResetTimeoutMs = 30'000;
-} // namespace
-
-namespace nx {
-namespace vms {
-namespace event {
+namespace nx::vms::event {
 
 CameraOutputAction::CameraOutputAction(const EventParameters& runtimeParams):
     base_type(ActionType::cameraOutputAction, runtimeParams)
@@ -34,6 +28,4 @@ QString CameraOutputAction::getExternalUniqKey() const
     return base_type::getExternalUniqKey() + '_' + getRelayOutputId();
 }
 
-} // namespace event
-} // namespace vms
-} // namespace nx
+} // namespace nx::vms::event

@@ -701,7 +701,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
     // TODO: #sivanov Code duplication with the same QnWorkbenchAccessController method.
 
     const auto checkLocked =
-        [this, layout](const Qn::Permissions permissions)
+        [layout](const Qn::Permissions permissions)
         {
             if (!layout->locked())
                 return permissions;

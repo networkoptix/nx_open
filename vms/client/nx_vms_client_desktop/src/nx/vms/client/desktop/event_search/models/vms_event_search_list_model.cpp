@@ -287,7 +287,7 @@ bool VmsEventSearchListModel::Private::requestFetch(
     };
 
     const auto handleLiveEventsReceived =
-        [=](bool success, rest::Handle requestId, EventLogRecordList&& data)
+        [=, this](bool success, rest::Handle requestId, EventLogRecordList&& data)
     {
         if (!requestId || multiRequestIdHolder.value(requestMode) != requestId)
             return;

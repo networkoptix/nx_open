@@ -88,6 +88,7 @@ public:
     virtual void setSingleshotMode(bool value) override;
 
     // filter input data by motion region
+    using QnAbstractArchiveDelegate::setMotionRegion;
     virtual void setMotionRegion(const QRegion& region);
 
     // Send motion data to client

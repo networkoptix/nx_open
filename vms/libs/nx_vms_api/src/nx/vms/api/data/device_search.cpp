@@ -63,7 +63,7 @@ QString DeviceSearchV2::targetUrl() const
         nx::utils::CompoundVisitor{
             [](const DeviceSearchIp& target) { return target.ip; },
             [](const DeviceSearchUrl& target) { return target.url; },
-            [](const auto& target) { return QString(); }
+            [](const auto& /*target*/) { return QString(); }
         },
         target);
 }

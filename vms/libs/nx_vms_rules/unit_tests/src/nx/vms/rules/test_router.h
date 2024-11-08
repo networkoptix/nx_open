@@ -15,7 +15,7 @@ namespace nx::vms::rules::test {
 class TestRouter: public nx::vms::rules::Router
 {
 public:
-    virtual void init(const QnCommonMessageProcessor* processor) override {};
+    virtual void init(const QnCommonMessageProcessor* /*processor*/) override {};
 
     virtual void routeEvent(
         const EventPtr& event,

@@ -201,7 +201,7 @@ nx::network::ssl::AdapterFunc CertificateVerifier::makeGeneralAdapterFunc(
         [expectedKey, expectedHost](const nx::network::ssl::CertificateChainView& chain)
         {
             return verifyBySystemCertificates(chain, expectedHost)
-                || NX_ASSERT(!chain.empty()) && (chain[0].publicKey() == expectedKey);
+                || (NX_ASSERT(!chain.empty()) && chain[0].publicKey() == expectedKey);
         });
 }
 

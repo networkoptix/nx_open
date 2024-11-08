@@ -429,7 +429,7 @@ void CameraReplacementDialog::makeReplacementRequest(bool getReportOnly)
 
     const auto callback = nx::utils::guarded(this,
         [this, getReportOnly]
-        (bool success, rest::Handle requestId, DeviceReplacementResponse replacementResponce)
+        (bool success, rest::Handle /*requestId*/, DeviceReplacementResponse replacementResponce)
         {
             d->requestInProgress = false;
 

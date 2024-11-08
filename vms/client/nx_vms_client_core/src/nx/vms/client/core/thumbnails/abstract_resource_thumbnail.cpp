@@ -530,7 +530,7 @@ void AbstractResourceThumbnail::Private::doUpdate()
     NX_VERBOSE(q, "Update for %1 (%2), forceRefresh=%3", resource->getName(),
         resource->getId(), forceRefreshRequested);
 
-    asyncImageResult = std::move(q->getImageAsync(forceRefreshRequested));
+    asyncImageResult = q->getImageAsync(forceRefreshRequested);
     if (!asyncImageResult)
     {
         setStatus(Status::unavailable);

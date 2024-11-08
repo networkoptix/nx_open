@@ -62,7 +62,7 @@ public:
         return m_processesMap->contains(pid);
     }
 
-    virtual PidType runClient(const QStringList& arguments) const override
+    virtual PidType runClient(const QStringList& /*arguments*/) const override
     {
         NX_ASSERT(false, "A mock for runClient(const QStringList& arguments) is not implemented");
         return 0;

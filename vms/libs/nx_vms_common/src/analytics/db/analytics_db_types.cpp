@@ -226,7 +226,7 @@ bool Filter::acceptsTrackInternal(const ObjectTrackType& track,
                 // Checking the track attributes.
                 if (!std::any_of(track.objectPositionSequence.cbegin(),
                         track.objectPositionSequence.cend(),
-                        [this, &textMatcher](const ObjectPosition& position) {
+                        [&textMatcher](const ObjectPosition& position) {
                             return textMatcher->matchAttributes(position.attributes);
                         }))
                 {

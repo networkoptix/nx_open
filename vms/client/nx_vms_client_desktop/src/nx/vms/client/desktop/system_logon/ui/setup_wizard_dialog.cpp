@@ -53,7 +53,7 @@ SetupWizardDialog::SetupWizardDialog(
     m_address(std::move(address))
 {
     d->webViewWidget->controller()->setCertificateValidator(
-        [serverId](const QString& certificateChain, const QUrl& url)
+        [serverId](const QString& certificateChain, const QUrl& /*url*/)
         {
             // We accept expired certificate on the first connection to a system.
             return qnClientCoreModule->networkModule()->certificateVerifier()->verifyCertificate(

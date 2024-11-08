@@ -183,7 +183,7 @@ void StorageRecordingContext::writeHeader(StorageContext& context)
     if (int rez = avformat_write_header(context.formatCtx, 0); rez < 0)
     {
         QString codecs;
-        for (int i = 0; i < context.formatCtx->nb_streams; ++i)
+        for (int i = 0; i < (int) context.formatCtx->nb_streams; ++i)
         {
             if (context.formatCtx->streams[i] && context.formatCtx->streams[i]->codecpar)
                 codecs += QString::number(context.formatCtx->streams[i]->codecpar->codec_id) + " ";

@@ -97,7 +97,7 @@ MessageBus::MessageBus(
     TransactionMessageBusBase(peerType, systemContext, jsonTranSerializer, ubjsonTranSerializer),
     m_miscData(this)
 {
-    static const int kMetaTypeRegistrator =
+    [[maybe_unused]] static const int kMetaTypeRegistrator =
         []()
         {
             qRegisterMetaType<MessageType>();
@@ -1246,7 +1246,7 @@ void MessageBus::gotUnicastTransaction(
     const QnTransaction<nx::vms::api::UpdateCredentialsData>& tran,
     const P2pConnectionPtr& connection,
     const TransportHeader& transportHeader,
-    nx::Locker<nx::Mutex>* lock)
+    nx::Locker<nx::Mutex>* /*lock*/)
 {
     NX_ASSERT(transportHeader.dstPeers.size() == 1
         && transportHeader.dstPeers.front() == localPeer().id);

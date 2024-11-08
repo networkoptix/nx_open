@@ -113,7 +113,7 @@ struct MimeData::Private
 
         resources.append(urlResources.values());
 
-        for (const auto resource: urlResources)
+        for (const auto& resource: urlResources)
             entities.removeAll(resource->getId());
 
         return !urls.empty();
@@ -183,7 +183,7 @@ struct MimeData::Private
             stream >> resourcesCount;
 
             // Intentionally leave duplicates here to keep Ctrl+Drag behavior consistent.
-            for (int i = 0; i < resourcesCount; i++)
+            for (int i = 0; i < (int) resourcesCount; i++)
             {
                 nx::vms::common::ResourceDescriptor descriptor;
                 stream >> descriptor.id >> descriptor.path >> descriptor.name;
@@ -202,7 +202,7 @@ struct MimeData::Private
             quint32 entitiesCount = 0;
             stream >> entitiesCount;
 
-            for (int i = 0; i < entitiesCount; i++)
+            for (int i = 0; i < (int) entitiesCount; i++)
             {
                 nx::Uuid id;
                 stream >> id;
@@ -215,7 +215,7 @@ struct MimeData::Private
             quint32 argumentsCount = 0;
             stream >> argumentsCount;
 
-            for (int i = 0; i < argumentsCount; i++)
+            for (int i = 0; i < (int) argumentsCount; i++)
             {
                 int key = 0;
                 QVariant value;

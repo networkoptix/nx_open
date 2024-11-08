@@ -989,7 +989,7 @@ void ActionHandler::at_openInLayoutAction_triggered()
 
         // Displaying message delayed to avoid waiting cursor (see drop_instrument.cpp:245).
         executeDelayedParented(
-            [this, convertLayout]()
+            [convertLayout]()
             {
                 if (CloudLayoutsIntroDialog::confirm())
                     convertLayout();

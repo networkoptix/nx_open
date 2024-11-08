@@ -124,7 +124,7 @@ VmsEventSearchWidget::Private::Private(VmsEventSearchWidget* q):
             if (std::any_of(
                 resources.begin(),
                 resources.end(),
-                [this](const QnResourcePtr& resource)
+                [](const QnResourcePtr& resource)
                 {
                     return resource->hasFlags(Qn::server);
                 }))

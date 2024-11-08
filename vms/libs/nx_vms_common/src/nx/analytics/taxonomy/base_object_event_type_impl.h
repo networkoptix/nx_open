@@ -392,7 +392,7 @@ public:
             "The resolved Attribute list size does not equal the Attribute list size, %1: %2",
             m_typeName, m_descriptor.name);
 
-        for (int i = 0; i < attributes.size(); ++i)
+        for (int i = 0; i < (int) attributes.size(); ++i)
             m_attributes[i].attribute = attributes[i];
 
         m_areSupportedAttributesResolved = true;

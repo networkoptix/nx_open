@@ -89,13 +89,13 @@ CloudCrossSystemManager::CloudCrossSystemManager(QObject* parent):
     setCloudSystems(appContext()->cloudStatusWatcher()->cloudSystems());
 
     registerDebugAction("Cross-site contexts reset",
-        [this, setCloudSystems](auto)
+        [setCloudSystems](auto)
         {
             setCloudSystems({});
         });
 
     registerDebugAction("Cross-site contexts restore",
-        [this, setCloudSystems](auto)
+        [setCloudSystems](auto)
         {
             setCloudSystems(appContext()->cloudStatusWatcher()->cloudSystems());
         });

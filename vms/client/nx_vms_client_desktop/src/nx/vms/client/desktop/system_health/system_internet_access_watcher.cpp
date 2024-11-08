@@ -63,7 +63,7 @@ void SystemInternetAccessWatcher::start()
                 setHasInternetAccess(true);
         });
     serverChangesListener->setOnRemovedHandler(
-        [this, recalculateAll](const QnMediaServerResourceList& servers)
+        [this, recalculateAll](const QnMediaServerResourceList& /*servers*/)
         {
             if (m_hasInternetAccess)
                 recalculateAll();

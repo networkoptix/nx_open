@@ -27,7 +27,7 @@ SystemContextAware::SystemContextAware(SystemContext* systemContext):
     if (auto qobject = dynamic_cast<const QObject*>(this))
     {
         QObject::connect(systemContext, &QObject::destroyed, qobject,
-            [this]()
+            []()
             {
                 NX_ASSERT(false,
                     "Context-aware object must be destroyed before the corresponding context is.");

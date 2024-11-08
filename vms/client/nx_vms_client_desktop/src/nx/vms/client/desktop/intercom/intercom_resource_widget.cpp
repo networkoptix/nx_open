@@ -103,7 +103,7 @@ void IntercomResourceWidget::setOutputPortState(
     actionData.params = QJson::serialized(actionParameters);
 
     auto callback =
-        [this](
+        [](
             bool /*success*/,
             rest::Handle /*requestId*/,
             nx::network::rest::JsonResult /*result*/)

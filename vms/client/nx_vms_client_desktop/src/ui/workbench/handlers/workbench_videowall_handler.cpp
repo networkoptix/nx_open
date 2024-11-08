@@ -3394,7 +3394,7 @@ void QnWorkbenchVideoWallHandler::updateControlLayout(
         bool wasCurrent = false;
 
         // check if layout was changed or detached
-        for (int i = 0; i < workbench()->layouts().size(); ++i)
+        for (int i = 0; i < (int) workbench()->layouts().size(); ++i)
         {
             auto layout = workbench()->layout(i);
 

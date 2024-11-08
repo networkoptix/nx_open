@@ -43,8 +43,6 @@ const QString kTagParam = lit("tag");
 const QString kEventRuleIdParam = lit("rule_id");
 const QString kCentralTimePointMs = lit("centralTimePointMs");
 
-const qint64 kUsPerMs = 1000;
-
 nx::network::rest::Params bookmarksToParam(const nx::vms::common::CameraBookmark& bookmark)
 {
     nx::network::rest::Params result;

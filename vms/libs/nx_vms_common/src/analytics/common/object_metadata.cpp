@@ -221,7 +221,7 @@ GroupedAttributes groupAttributes(
     return result;
 }
 
-bool AttributeEx::isNumberOrRange(const QString& attributeName, const QString& attributeValue)
+bool AttributeEx::isNumberOrRange(const QString& /*attributeName*/, const QString& attributeValue)
 {
     const static std::string number(R"((?:-?(?:(?:\d+\.?\d*)|(?:\d*\.?\d+))))");
     const static std::string numberOrInf(R"((?:)" + number + R"(|inf))");

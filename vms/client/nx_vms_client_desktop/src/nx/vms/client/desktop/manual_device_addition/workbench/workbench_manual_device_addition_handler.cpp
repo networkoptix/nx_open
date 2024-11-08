@@ -21,7 +21,7 @@ static void configureDialog(
     const QnMediaServerResourcePtr server)
 {
     dialog->setServer(server);
-    const auto removeOnClose = [handler, dialog]()
+    const auto removeOnClose = [dialog]()
     {
         if (dialog)
             dialog->deleteLater();

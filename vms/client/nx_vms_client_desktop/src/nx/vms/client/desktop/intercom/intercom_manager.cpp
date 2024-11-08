@@ -209,14 +209,9 @@ public:
         if (layoutResource && !layoutResource->hasFlags(Qn::removed))
         {
             if (layoutResource->hasFlags(Qn::local))
-            {
                 resourcePool->removeResource(layoutResource);
-            }
             else if (!localOnly)
-            {
-                const auto systemContext = SystemContext::fromResource(layoutResource);
                 qnResourcesChangesManager->deleteResource(layoutResource);
-            }
         }
     }
 };

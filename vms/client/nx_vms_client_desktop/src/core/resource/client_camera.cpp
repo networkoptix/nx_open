@@ -148,7 +148,7 @@ QnAbstractStreamDataProvider* QnClientCameraResource::createLiveDataProvider()
         connect(connection.get(),
             &nx::vms::client::core::RemoteConnection::credentialsChanged,
             delegate,
-            [this, delegate,
+            [delegate,
                 connectionPtr = std::weak_ptr<nx::vms::client::core::RemoteConnection>(connection)]
             {
                 if (auto connection = connectionPtr.lock())

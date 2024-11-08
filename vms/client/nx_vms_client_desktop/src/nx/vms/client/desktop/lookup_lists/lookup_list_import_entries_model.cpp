@@ -108,8 +108,8 @@ void LookupListImportEntriesModel::Private::adjustHeadersToMatchPreview()
     if (previewData.empty())
         return;
 
-    const auto previewColumnCount = previewData.front().size();
-    const auto currentColumnHeaderCount = columnHeaders.size();
+    const int previewColumnCount = previewData.front().size();
+    const int currentColumnHeaderCount = columnHeaders.size();
     if (!previewColumnCount || previewColumnCount == currentColumnHeaderCount)
         return;
 
@@ -144,7 +144,7 @@ void LookupListImportEntriesModel::Private::initDefaultColumnHeaders(
     }
 
     // Set default association of column index to attribute name.
-    for (int attributeNamesIndex = 0; attributeNamesIndex < listModelAttributesNames.size();
+    for (int attributeNamesIndex = 0; attributeNamesIndex < (int) listModelAttributesNames.size();
         ++attributeNamesIndex)
     {
         columnIndexToAttribute[attributeNamesIndex] =
@@ -219,7 +219,7 @@ bool LookupListImportEntriesModel::hasIndex(
     int row, int column, const QModelIndex& /*parent*/) const
 {
     return row >= 0 && column >= 0 && row < d->previewData.size()
-        && column < d->previewData[row].size();
+        && column < (int) d->previewData[row].size();
 }
 
 QVariant LookupListImportEntriesModel::data(const QModelIndex& index, int role) const

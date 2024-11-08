@@ -205,7 +205,7 @@ public:
             QFile::remove("kSessionId/" + ClientStateStorage::kSystemSubstateFileName);
         if (m_temporaryState)
             QFile::remove(m_temporaryState->path);
-        for (const auto session: m_savedSessions)
+        for (const auto& session: m_savedSessions)
             QFile::remove(session.path);
 
         m_sharedMemoryManager.reset();

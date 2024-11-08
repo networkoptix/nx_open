@@ -40,7 +40,7 @@ struct NX_VMS_CLIENT_DESKTOP_API ServerSettingsDialogState: AbstractFluxState
 
     std::optional<nx::vms::api::PluginInfo> currentPlugin() const
     {
-        if (plugins.current < 0 || plugins.current > plugins.modules.size())
+        if (plugins.current < 0 || plugins.current > (int) plugins.modules.size())
             return {};
 
         return plugins.modules[plugins.current];

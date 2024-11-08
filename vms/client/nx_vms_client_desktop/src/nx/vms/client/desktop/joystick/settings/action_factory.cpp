@@ -17,9 +17,6 @@
 
 namespace {
 
-// QString.toInt() could autodetect integer base by their format (0x... for hex numbers, etc.).
-constexpr int kAutoDetectBase = 0;
-
 using namespace nx::vms::client::desktop::menu;
 
 struct ParsedAction
@@ -149,7 +146,7 @@ struct ActionFactory::Private
             return;
 
         bool modifiersChanged = false;
-        for (int i = 0; i < buttons.size(); ++i)
+        for (int i = 0; i < (int) buttons.size(); ++i)
         {
             if (isModifier(i) && buttons[i] != savedButtons[i])
             {
@@ -178,7 +175,7 @@ struct ActionFactory::Private
         }
 
         // Handle button state changes.
-        for (int i = 0; i < buttons.size(); ++i)
+        for (int i = 0; i < (int) buttons.size(); ++i)
         {
             if (buttons[i] != savedButtons[i])
             {
@@ -350,7 +347,7 @@ struct ActionFactory::Private
 
     const ParsedAction* actionFor(int buttonId, bool modifier)
     {
-        if (!NX_ASSERT(buttonId >= 0 && buttonId < assignedActions.size()))
+        if (!NX_ASSERT(buttonId >= 0 && buttonId < (int) assignedActions.size()))
             return nullptr;
 
         const auto& v = assignedActions[buttonId];

@@ -654,7 +654,7 @@ VisibleItemDataDecoratorModel::PreviewProvider::PreviewProvider():
 }
 
 QImage VisibleItemDataDecoratorModel::PreviewProvider::requestImage(const QString& id,
-    QSize* size,
+    QSize* /*size*/,
     const QSize& /*requestedSize*/)
 {
     const auto provider = previewsById().value(id.toLongLong());

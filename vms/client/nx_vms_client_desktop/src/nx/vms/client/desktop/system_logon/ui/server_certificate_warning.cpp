@@ -105,7 +105,7 @@ ServerCertificateWarning::ServerCertificateWarning(
     frameLayout->addWidget(area);
 
     auto createPanel =
-        [=](const core::TargetCertificateInfo& certificateInfo)
+        [=, this](const core::TargetCertificateInfo& certificateInfo)
         {
             auto widget = new QWidget();
 
@@ -129,7 +129,7 @@ ServerCertificateWarning::ServerCertificateWarning(
                 common::html::localLink("Certificate details", kCertificateLink));
 
             connect(certificateDetailsLabel , &QLabel::linkActivated, this,
-                [=](const QString& link)
+                [this, statistics, certificateInfo, statisticsName](const QString& link)
                 {
                     if (link == kCertificateLink)
                     {

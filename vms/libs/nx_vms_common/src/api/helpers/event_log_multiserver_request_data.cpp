@@ -19,8 +19,6 @@ namespace {
 static const QString kSortOrderParam = "sortOrder";
 static const QString kLimitParam = "limit";
 
-static constexpr int kInvalidStartTime = -1;
-
 } // namespace
 
 QnEventLogMultiserverRequestData::QnEventLogMultiserverRequestData()

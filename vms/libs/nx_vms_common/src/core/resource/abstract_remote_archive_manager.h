@@ -56,6 +56,7 @@ struct RemoteArchiveChunk
     }
 
     RemoteArchiveChunk(const RemoteArchiveChunk& other) = default;
+    virtual ~RemoteArchiveChunk() = default;
 
     bool operator==(const RemoteArchiveChunk&) const = default;
 

@@ -9,20 +9,20 @@ TestResourceSupportProxy::TestResourceSupportProxy()
 }
 
 bool TestResourceSupportProxy::isEntityTypeSupported(
-    EntityType entityType,
-    const QString& entityTypeId,
-    nx::Uuid deviceId,
-    nx::Uuid engineId) const
+    EntityType /*entityType*/,
+    const QString& /*entityTypeId*/,
+    nx::Uuid /*deviceId*/,
+    nx::Uuid /*engineId*/) const
 {
     return false;
 }
 
 bool TestResourceSupportProxy::isEntityTypeAttributeSupported(
-    EntityType entityType,
-    const QString& entityTypeId,
-    const QString& fullAttributeName,
-    nx::Uuid deviceId,
-    nx::Uuid engineId) const
+    EntityType /*entityType*/,
+    const QString& /*entityTypeId*/,
+    const QString& /*fullAttributeName*/,
+    nx::Uuid /*deviceId*/,
+    nx::Uuid /*engineId*/) const
 {
     return false;
 }

@@ -240,7 +240,7 @@ struct CloudSystemFinder::Private
 
     void updateStateUnderLock(const QnCloudSystemList& targetSystems)
     {
-        for (const auto system: targetSystems)
+        for (const auto& system: targetSystems)
         {
             const auto itCurrent = systems.find(system.cloudId);
             if (itCurrent == systems.end())
@@ -306,7 +306,7 @@ struct CloudSystemFinder::Private
 
             const auto addedCloudIds = IdsSet(newIds).subtract(oldIds);
             NX_DEBUG(this, "Add systems: %1", newIds);
-            for (const auto addedCloudId: addedCloudIds)
+            for (const auto& addedCloudId: addedCloudIds)
             {
                 NX_DEBUG(this, "Found cloud system %1", addedCloudId);
 
@@ -319,7 +319,7 @@ struct CloudSystemFinder::Private
 
             const auto removedCloudIds = IdsSet(oldIds).subtract(newIds);
             NX_DEBUG(this, "Remove systems: %1", removedCloudIds);
-            for (const auto removedCloudId: removedCloudIds)
+            for (const auto& removedCloudId: removedCloudIds)
             {
                 NX_DEBUG(this, "Lost cloud system %1", removedCloudId);
 
@@ -333,7 +333,7 @@ struct CloudSystemFinder::Private
             updateStateUnderLock(value);
         }
 
-        for (const auto id: removedTargetIds.keys())
+        for (const auto& id: removedTargetIds.keys())
         {
             const auto localId = removedTargetIds[id];
             emit q->systemLost(id, localId);

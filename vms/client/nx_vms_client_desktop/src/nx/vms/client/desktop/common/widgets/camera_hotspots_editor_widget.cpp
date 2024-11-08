@@ -193,7 +193,7 @@ void CameraHotspotsEditorWidget::Private::setHoveredHotspotIndex(std::optional<i
 
 std::optional<int> CameraHotspotsEditorWidget::Private::hotspotIndexAtPos(const QPoint& pos) const
 {
-    for (int i = 0; i < hotspots.size(); ++i)
+    for (int i = 0; i < (int) hotspots.size(); ++i)
     {
         if (camera_hotspots::makeHotspotOutline(hotspots.at(i), thumbnailRect()).contains(pos))
             return i;
@@ -269,7 +269,7 @@ QPoint CameraHotspotsEditorWidget::Private::resolveHotspotsCollision(
     std::optional<int> modifiedHotspotIndex) const
 {
     QVector<QPointF> hotspotsOrigins;
-    for (int i = 0; i < hotspots.size(); ++i)
+    for (int i = 0; i < (int) hotspots.size(); ++i)
     {
         if (i == modifiedHotspotIndex)
             continue;
@@ -495,7 +495,7 @@ void CameraHotspotsEditorWidget::paintEvent(QPaintEvent* event)
         painter.drawText(rect(), tr("NO DATA"), {Qt::AlignCenter});
     }
 
-    for (int i = 0; i < d->hotspots.size(); ++i)
+    for (int i = 0; i < (int) d->hotspots.size(); ++i)
     {
         const auto hotspot = d->hotspots.at(i);
 

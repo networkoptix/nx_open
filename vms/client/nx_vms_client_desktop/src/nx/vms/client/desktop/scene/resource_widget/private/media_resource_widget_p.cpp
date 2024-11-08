@@ -372,7 +372,7 @@ const char* const MediaResourceWidgetPrivate::motionSkipMask(int channel) const
     static const MotionSkipMask kEmptyMask = QnRegion();
 
     ensureMotionSkip();
-    return channel < m_motionSkipMaskCache->size()
+    return channel < (int) m_motionSkipMaskCache->size()
         ? m_motionSkipMaskCache->at(channel).bitMask()
         : kEmptyMask.bitMask();
 }

@@ -198,7 +198,7 @@ void ModuleConnector::InformationReader::start(const nx::network::SocketAddress&
 static inline std::optional<nx::Buffer> takeJsonObject(nx::Buffer* buffer)
 {
     size_t bracerCount = 0;
-    for (int index = 0; index < buffer->size(); ++index)
+    for (int index = 0; index < (int) buffer->size(); ++index)
     {
         switch (buffer->at(index))
         {

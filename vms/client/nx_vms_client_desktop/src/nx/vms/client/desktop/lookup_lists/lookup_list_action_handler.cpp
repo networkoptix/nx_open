@@ -311,7 +311,7 @@ LookupListActionHandler::LookupListActionHandler(QObject* parent):
                 [d = dialog.get()]() { d->setData(sourceData); }, kLoadDelay, dialog.get());
 
             connect(dialog.get(), &LookupListsDialog::saveRequested, this,
-                [this, d = dialog.get()](LookupListDataList data)
+                [d = dialog.get()](LookupListDataList data)
                 {
                     executeDelayedParented(
                         [data, d]

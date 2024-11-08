@@ -60,7 +60,7 @@ api::metrics::Value ValueMonitor::handleValueErrors(
     {
         auto value = calculateValue();
         NX_ASSERT(!value.isNull() || m_optional, "The value %1 is unexpectedly null", this);
-        return std::move(value);
+        return value;
     }
     catch (const ExpectedError& e)
     {

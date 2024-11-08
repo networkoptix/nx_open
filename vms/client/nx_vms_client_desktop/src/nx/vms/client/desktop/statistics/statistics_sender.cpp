@@ -53,9 +53,9 @@ struct StatisticsSender::Private
             return;
 
         auto callback = nx::utils::guarded(q,
-            [this, statisticsData](
+            [statisticsData](
                 bool success,
-                rest::Handle handle,
+                rest::Handle /*handle*/,
                 rest::ServerConnection::EmptyResponseType /*response */)
             {
                 if (!success)

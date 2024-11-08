@@ -156,7 +156,7 @@ TEST_F(QnResourcePoolTest, findCameraTest)
     runThreads("flexibleId MAC", /*expectSuccess*/ true,
         [&](auto c) { return findCameraByFlexibleId(resourcePool(), c->getMAC().toString()); });
     runThreads("flexibleId wrong id", /*expectSuccess*/ false,
-        [&](auto c) { return findCameraByFlexibleId(resourcePool(), "no_such_id"); });
+        [&](auto /*c*/) { return findCameraByFlexibleId(resourcePool(), "no_such_id"); });
 }
 
 TEST_F(QnResourcePoolTest, userByName)

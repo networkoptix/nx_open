@@ -75,7 +75,7 @@ public:
     void addOnSignalHandler(ResourceSignalClass signal, ResourceHandler handler)
     {
         const ResourceHandler bindToSignal =
-            [=](const ResourcePtr& resource)
+            [this, signal, handler](const ResourcePtr& resource)
             {
                 m_connections << connect(
                     resource.get(),
@@ -89,7 +89,7 @@ public:
     void addOnPropertyChangedHandler(ResourceProperyChangedHandler handler)
     {
         const ResourceHandler bindToSignal =
-            [=](const ResourcePtr& resource)
+            [this, handler](const ResourcePtr& resource)
             {
                 m_connections << connect(
                     resource.get(),
@@ -107,7 +107,7 @@ public:
     void addOnCustomSignalHandler(ResourceSignalClass signal, ResourceHandlerClass handler)
     {
         const ResourceHandler bindToSignal =
-            [=](const ResourcePtr& resource)
+            [this, signal, handler](const ResourcePtr& resource)
             {
                 m_connections << connect(
                     resource.get(),

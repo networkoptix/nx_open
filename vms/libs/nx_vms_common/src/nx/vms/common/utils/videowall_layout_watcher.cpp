@@ -374,7 +374,7 @@ void VideowallLayoutWatcher::Private::addVideowallUnsafe(
             allVideowallLayouts.insert(item.layout);
         }
 
-        for (const auto matrix: videowall->matrices()->getItems())
+        for (const auto& matrix: videowall->matrices()->getItems())
         {
             if (const auto layoutId = matrix.layoutByItem.value(item.uuid); !layoutId.isNull())
             {

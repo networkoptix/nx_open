@@ -169,7 +169,7 @@ QnVirtualCameraResourcePtr EventListModel::Private::previewCamera(const EventDat
 QnVirtualCameraResourceList EventListModel::Private::accessibleCameras(const EventData& event) const
 {
     return event.cameras.filtered(
-        [this](const QnVirtualCameraResourcePtr& camera) -> bool
+        [](const QnVirtualCameraResourcePtr& camera) -> bool
         {
             // Assuming the rights are checked before sending the notification.
             if (NX_ASSERT(camera) && camera->hasFlags(Qn::ResourceFlag::cross_system))

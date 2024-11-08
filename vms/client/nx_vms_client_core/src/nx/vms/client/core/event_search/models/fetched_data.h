@@ -69,7 +69,6 @@ FetchedData<Container> makeFetchedDataInternal(
     const FetchedIterator& fetchedEndIt,
     const FetchRequest& request)
 {
-    using ResultType = FetchedData<Container>;
     using Predicate = event_search::detail::Predicate<Facade>;
 
     const auto makeResult =

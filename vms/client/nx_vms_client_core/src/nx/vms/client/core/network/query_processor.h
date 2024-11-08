@@ -135,9 +135,9 @@ public:
 
     template<class InputData, class HandlerType>
     void processLowPriorityUpdateAsync(
-        ec2::ApiCommand::Value cmdCode,
-        InputData input,
-        HandlerType handler)
+        ec2::ApiCommand::Value /*cmdCode*/,
+        InputData /*input*/,
+        HandlerType /*handler*/)
     {
         NX_ASSERT(false, "Not implemented");
     }

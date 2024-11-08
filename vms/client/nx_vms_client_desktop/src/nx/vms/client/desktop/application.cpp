@@ -403,7 +403,7 @@ int runApplicationInternal(QApplication* application, const QnStartupParameters&
     nx::media::DecoderRegistrar::registerDecoders({});
 
     // Window handle must exist before events processing. This is required to initialize the scene.
-    volatile auto winId = mainWindow->winId();
+    [[maybe_unused]] volatile auto winId = mainWindow->winId();
 
     if (qnRuntime->isDesktopMode())
     {

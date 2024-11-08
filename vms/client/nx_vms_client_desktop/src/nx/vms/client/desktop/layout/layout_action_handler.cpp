@@ -197,25 +197,25 @@ LayoutActionHandler::LayoutActionHandler(WindowContext* windowContext, QObject* 
         &LayoutActionHandler::at_newUserLayoutAction_triggered);
 
     connect(action(menu::SaveLayoutAction), &QAction::triggered, this,
-        [=]() { saveLayout(getLayoutFromParameters()); });
+        [this, getLayoutFromParameters]() { saveLayout(getLayoutFromParameters()); });
 
     connect(action(menu::SaveCurrentLayoutAction), &QAction::triggered, this,
-        [=]() { saveLayout(getCurrentLayout()); });
+        [this, getCurrentLayout]() { saveLayout(getCurrentLayout()); });
 
     connect(action(menu::SaveLayoutAsCloudAction), &QAction::triggered, this,
-        [=]() { saveLayoutAsCloud(getLayoutFromParameters()); });
+        [this, getLayoutFromParameters]() { saveLayoutAsCloud(getLayoutFromParameters()); });
 
     connect(action(menu::SaveCurrentLayoutAsCloudAction), &QAction::triggered, this,
-        [=]() { saveLayoutAsCloud(getCurrentLayout());});
+        [this, getCurrentLayout]() { saveLayoutAsCloud(getCurrentLayout());});
 
     connect(action(menu::SaveLayoutAsAction), &QAction::triggered, this,
-        [=]() { saveLayoutAs(getLayoutFromParameters()); });
+        [this, getLayoutFromParameters]() { saveLayoutAs(getLayoutFromParameters()); });
 
     connect(action(menu::SaveCurrentLayoutAsAction), &QAction::triggered, this,
-        [=]() { saveLayoutAs(getCurrentLayout()); });
+        [this, getCurrentLayout]() { saveLayoutAs(getCurrentLayout()); });
 
     connect(action(menu::ConvertLayoutToSharedAction), &QAction::triggered, this,
-        [=]() { convertLayoutToShared(getLayoutFromParameters()); });
+        [this, getLayoutFromParameters]() { convertLayoutToShared(getLayoutFromParameters()); });
 
     connect(action(menu::CloseLayoutAction), &QAction::triggered, this,
         &LayoutActionHandler::at_closeLayoutAction_triggered);
@@ -854,7 +854,7 @@ bool LayoutActionHandler::confirmLayoutChange(
     return false;
 }
 
-bool LayoutActionHandler::confirmChangeSharedLayout(const LayoutChange& change)
+bool LayoutActionHandler::confirmChangeSharedLayout(const LayoutChange& /*change*/)
 {
     return ui::messages::Resources::sharedLayoutEdit(mainWindowWidget());
 }
@@ -868,7 +868,7 @@ bool LayoutActionHandler::confirmChangeVideoWallLayout(const LayoutChange& chang
 bool LayoutActionHandler::canRemoveLayouts(const LayoutResourceList &layouts)
 {
     return std::all_of(layouts.cbegin(), layouts.cend(),
-        [this](const LayoutResourcePtr& layout)
+        [](const LayoutResourcePtr& layout)
         {
             return ResourceAccessManager::hasPermissions(layout, Qn::RemovePermission);
         });
@@ -1164,7 +1164,7 @@ void LayoutActionHandler::at_removeLayoutItemFromSceneAction_triggered()
 void LayoutActionHandler::at_openInNewTabAction_triggered()
 {
     const auto isCameraWithFootage =
-        [this](const QnMediaResourceWidget* widget)
+        [](const QnMediaResourceWidget* widget)
         {
             const auto camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
             return camera

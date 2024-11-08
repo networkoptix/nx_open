@@ -509,7 +509,7 @@ QnUserResourcePtr ResourceTreeModelTest::loginAs(
         : std::vector<nx::Uuid>{};
 
     const auto itr = std::find_if(users.cbegin(), users.cend(),
-        [this, name, &groupIds](const QnUserResourcePtr& user)
+        [name, &groupIds](const QnUserResourcePtr& user)
         {
             return user->getName() == name && user->groupIds() == groupIds;
         });

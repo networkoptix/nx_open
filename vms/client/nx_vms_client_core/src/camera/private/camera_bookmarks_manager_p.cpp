@@ -745,7 +745,7 @@ void QnCameraBookmarksManagerPrivate::handleQueryReply(
         return;
 
     const bool isPartialData =
-        query->requestChunkSize() > 0 && bookmarks.size() == query->requestChunkSize();
+        query->requestChunkSize() > 0 && (int) bookmarks.size() == query->requestChunkSize();
 
     NX_ASSERT(query->state() == QnCameraBookmarksQuery::State::requested
         || query->state() == QnCameraBookmarksQuery::State::partial);
@@ -760,7 +760,7 @@ void QnCameraBookmarksManagerPrivate::handleQueryReply(
     }
     query->setCachedBookmarks(bookmarks);
     const bool limitExceeded =
-        query->filter().limit > 0 && bookmarks.size() >= query->filter().limit;
+        query->filter().limit > 0 && (int) bookmarks.size() >= query->filter().limit;
 
     if (isPartialData && !limitExceeded)
     {

@@ -140,7 +140,7 @@ bool SystemHealthListModel::removeRows(int row, int count, const QModelIndex& pa
     {
         if (d->message(row + i) == MessageType::cloudPromo)
         {
-            executeLater([this]() { showOnceSettings()->cloudPromo = true; }, this);
+            executeLater([]() { showOnceSettings()->cloudPromo = true; }, this);
             break;
         }
     }

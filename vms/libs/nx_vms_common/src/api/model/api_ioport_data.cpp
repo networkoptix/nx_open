@@ -44,7 +44,6 @@ nx::vms::api::ExtendedCameraOutput QnIOPortData::extendedCameraOutput() const
     if (outputName.toInt(&success); success)
         return nx::vms::api::ExtendedCameraOutput::none;
 
-    nx::vms::api::ExtendedCameraOutput result;
     return nx::reflect::fromString<nx::vms::api::ExtendedCameraOutput>(
         outputName.toStdString(), nx::vms::api::ExtendedCameraOutput::none);
 }

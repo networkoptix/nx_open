@@ -270,7 +270,7 @@ QVector<int> LookupListEntriesModel::Private::removeIncorrectColumnValues()
     auto& lookuplistData = data->rawData();
 
     QVector<int> emptyRowsToDelete;
-    for (int rowIndex = 0; rowIndex < lookuplistData.entries.size(); ++rowIndex)
+    for (int rowIndex = 0; rowIndex < (int) lookuplistData.entries.size(); ++rowIndex)
     {
         auto& row = lookuplistData.entries[rowIndex];
         if (row.empty())

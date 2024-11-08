@@ -47,7 +47,7 @@ nx::Uuid ClientRouter::peerId() const
 
 void ClientRouter::routeEvent(
     const EventPtr& event,
-    const RuleList& triggeredRules)
+    const RuleList& /*triggeredRules*/)
 {
     NX_ASSERT(false, "Currently we don't send Events from the Client: %1", event->type());
 }

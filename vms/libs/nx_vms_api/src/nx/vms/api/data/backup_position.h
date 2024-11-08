@@ -51,7 +51,8 @@ struct NX_VMS_API BackupPositionExV1: BackupPositionV1
     using base_type = BackupPositionV1;
 
     BackupPositionExV1() = default;
-    BackupPositionExV1(const BackupPositionExV1&) = default;
+    BackupPositionExV1(const BackupPositionExV1& other) = default;
+    virtual ~BackupPositionExV1() = default;
     std::chrono::milliseconds toBackupLowMs{0};
     std::chrono::milliseconds toBackupHighMs{0};
 

@@ -100,20 +100,6 @@ Result canModifyStorage(const CanModifyStorageData& data);
 
 namespace detail {
 
-static Result userHasGlobalAccess(nx::vms::common::SystemContext* systemContext,
-    const nx::network::rest::UserAccessData& accessData,
-    nx::vms::api::GlobalPermission permissions);
-
-static Result userHasAccess(nx::vms::common::SystemContext* systemContext,
-    const nx::network::rest::UserAccessData& accessData,
-    const nx::Uuid& targetResourceOrGroupId,
-    nx::vms::api::AccessRights requiredAccess);
-
-static Result checkResourceAccess(nx::vms::common::SystemContext* systemContext,
-    const nx::network::rest::UserAccessData& accessData,
-    const std::vector<nx::Uuid>& resourceIds,
-    nx::vms::api::AccessRight accessRight);
-
 Result checkActionPermission(nx::vms::common::SystemContext* systemContext,
     const nx::network::rest::UserAccessData& accessData,
     const nx::vms::api::EventActionData& data);

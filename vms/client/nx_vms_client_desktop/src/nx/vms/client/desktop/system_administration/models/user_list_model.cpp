@@ -340,7 +340,7 @@ Qt::CheckState UserListModel::Private::checkState() const
         return Qt::Unchecked;
 
     if ((checkedUsers.size() + systemContext()->nonEditableUsersAndGroups()->userCount())
-        == users.size())
+        == (int) users.size())
     {
         return Qt::Checked;
     }

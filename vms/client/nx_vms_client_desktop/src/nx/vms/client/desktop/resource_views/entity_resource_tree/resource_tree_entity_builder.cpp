@@ -173,8 +173,7 @@ ResourceItemCreator webPageItemCreator(
 
 UuidItemCreator otherServerItemCreator(
     ResourceTreeItemFactory* factory,
-    const QnUserResourcePtr& user,
-    bool hasPowerUserPermissions = false)
+    const QnUserResourcePtr& /*user*/)
 {
     return
         [=](const nx::Uuid& serverId) -> AbstractItemPtr
@@ -716,7 +715,6 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createLayoutItemListEntity(
 
 AbstractEntityPtr ResourceTreeEntityBuilder::createLayoutsGroupEntity() const
 {
-    using GroupingRule = GroupingRule<QString, QnResourcePtr>;
     using GroupingRuleStack = GroupGroupingEntity<QString, QnResourcePtr>::GroupingRuleStack;
 
     auto layoutItemCreator =

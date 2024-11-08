@@ -17,7 +17,7 @@ namespace {
 
 QString attribute(const nx::vms::api::LookupListData& list, int column)
 {
-    if (column >= list.attributeNames.size())
+    if (column >= (int) list.attributeNames.size())
         return {};
 
     return list.attributeNames[column];
@@ -204,7 +204,7 @@ void LookupListEntriesModel::deleteEntries(const QVector<int>& rows)
     beginResetModel();
     for (const auto& index: uniqueValuesInDescendingOrder)
     {
-        if (index >= d->data->rawData().entries.size())
+        if (index >= (int) d->data->rawData().entries.size())
             continue;
         d->data->rawData().entries.erase(d->data->rawData().entries.begin() + index);
     }

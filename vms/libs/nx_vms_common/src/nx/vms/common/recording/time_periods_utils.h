@@ -33,7 +33,7 @@ public:
         if (nonEmptyPeriods.size() == 1)
         {
             PeriodList result = nonEmptyPeriods.first();
-            if (result.size() > limit && limit > 0)
+            if ((int) result.size() > limit && limit > 0)
                 result.resize(limit);
             return result;
         }
@@ -96,7 +96,7 @@ private:
                 // Add chunk to merged data.
                 if (result.empty())
                 {
-                    if (result.size() >= limit)
+                    if ((int) result.size() >= limit)
                         return result;
 
                     result.push_back(startPeriod);
@@ -118,7 +118,7 @@ private:
                         }
                         else if (startPeriod.startTime() > last.startTime() + last.duration())
                         {
-                            if (result.size() >= limit)
+                            if ((int) result.size() >= limit)
                                 return result;
                             result.push_back(startPeriod);
                         }
@@ -138,7 +138,7 @@ private:
                     }
                     else
                     {
-                        if (result.size() >= limit)
+                        if ((int) result.size() >= limit)
                             return result;
 
                         result.push_back(startPeriod);
@@ -180,7 +180,7 @@ private:
             std::move(minIndexes),
             std::move(endIndexes),
             std::numeric_limits<int>::max());
-        if (limit > 0 && result.size() > limit)
+        if (limit > 0 && (int) result.size() > limit)
             result.erase(result.begin(), result.begin() + (result.size() - limit));
         std::reverse(result.begin(), result.end());
         return result;

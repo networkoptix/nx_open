@@ -548,7 +548,7 @@ std::vector<EngineScope<AbstractEventType>> StateHelper::compatibleEventTypeTree
         devices,
         m_state,
         additionalEntities,
-        [this](const QnVirtualCameraResourcePtr& device) { return device->supportedEventTypes(); },
+        [](const QnVirtualCameraResourcePtr& device) { return device->supportedEventTypes(); },
         [](const AnalyticsEngineResourcePtr& engine) { return engine->eventTypeIds(); },
         [this](const QString& eventTypeId) { return m_state->eventTypeById(eventTypeId); });
 }
@@ -561,7 +561,7 @@ std::vector<EngineScope<AbstractEventType>> StateHelper::compatibleEventTypeTree
         devices,
         m_state,
         additionalEntities,
-        [this](const QnVirtualCameraResourcePtr& device) { return device->supportedEventTypes(); },
+        [](const QnVirtualCameraResourcePtr& device) { return device->supportedEventTypes(); },
         [](const AnalyticsEngineResourcePtr& engine) { return engine->eventTypeIds(); },
         [this](const QString& eventTypeId) { return m_state->eventTypeById(eventTypeId); });
 }
@@ -608,7 +608,7 @@ std::vector<EngineScope<AbstractObjectType>> StateHelper::supportedObjectTypeTre
         devices,
         m_state,
         additionalEntities,
-        [&](const QnVirtualCameraResourcePtr& device) { return device->supportedObjectTypes(); },
+        [](const QnVirtualCameraResourcePtr& device) { return device->supportedObjectTypes(); },
         [this](const QString& objectTypeId) { return m_state->objectTypeById(objectTypeId); });
 }
 
@@ -620,7 +620,7 @@ std::vector<EngineScope<AbstractObjectType>> StateHelper::supportedObjectTypeTre
         devices,
         m_state,
         additionalEntities,
-        [&](const QnVirtualCameraResourcePtr& device) { return device->supportedObjectTypes(); },
+        [](const QnVirtualCameraResourcePtr& device) { return device->supportedObjectTypes(); },
         [this](const QString& objectTypeId) { return m_state->objectTypeById(objectTypeId); });
 }
 
@@ -680,7 +680,7 @@ std::vector<EngineScope<AbstractObjectType>> StateHelper::compatibleObjectTypeTr
         devices,
         m_state,
         additionalEntities,
-        [this](const QnVirtualCameraResourcePtr& device) { return device->supportedObjectTypes(); },
+        [](const QnVirtualCameraResourcePtr& device) { return device->supportedObjectTypes(); },
         [](const AnalyticsEngineResourcePtr& engine) { return engine->objectTypeIds(); },
         [this](const QString& objectTypeId) { return m_state->objectTypeById(objectTypeId); });
 }

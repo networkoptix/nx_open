@@ -32,7 +32,7 @@ public:
 
 ActionVisibility IsNvrNodeCondition::check(
     const Parameters& parameters,
-    WindowContext* context)
+    WindowContext* /*context*/)
 {
     bool isNvr = false;
     QString groupId;

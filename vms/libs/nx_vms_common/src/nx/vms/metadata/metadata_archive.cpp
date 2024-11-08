@@ -512,7 +512,7 @@ bool addToResultAsc(
     }
     else
     {
-        if (rez.size() == filter->limit)
+        if ((int) rez.size() == filter->limit)
             return false;
         rez.push_back(QnTimePeriod(fullStartTimeMs, durationMs));
     }
@@ -566,7 +566,7 @@ bool addToResultDesc(
     }
     else
     {
-        if (rez.size() == filter->limit)
+        if ((int) rez.size() == filter->limit)
             return false;
         rez.push_back(QnTimePeriod(fullStartTimeMs, durationMs));
     }

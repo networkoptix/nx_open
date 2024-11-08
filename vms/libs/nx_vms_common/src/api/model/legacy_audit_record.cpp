@@ -104,7 +104,7 @@ const auto cloud =
         legacyRecord.addParam("userAgent", record.authSession.userAgent.toUtf8());
     };
 const auto nothing =
-    [](const AuditRecord& record, QnLegacyAuditRecord& legacyRecord)
+    [](const AuditRecord& record, QnLegacyAuditRecord& /*legacyRecord*/)
     {
         const auto details = record.get<std::nullptr_t>();
     };
@@ -132,10 +132,10 @@ const auto playback =
     {
         const auto flags = QByteArray(legacyRecord.extractParam("archiveExist"));
         std::map<nx::Uuid, bool> archiveExists;
-        size_t i = 0;
+        int i = 0;
         for (const auto& id: legacyRecord.resources)
         {
-            bool exists = flags.size() > i && flags[i] == '1';
+            bool exists = (int) flags.size() > i && flags[i] == '1';
             archiveExists.insert({id, exists});
             ++i;
         }
@@ -165,12 +165,12 @@ const auto description =
         record.details = DescriptionDetails{QByteArray(legacyRecord.extractParam("description"))};
     };
 const auto cloud =
-    [](const QnLegacyAuditRecord& legacyRecord, AuditRecord& record)
+    [](const QnLegacyAuditRecord& /*legacyRecord*/, AuditRecord& record)
     {
         record.details = nullptr;
     };
 const auto nothing =
-    [](const QnLegacyAuditRecord& legacyRecord, AuditRecord& record)
+    [](const QnLegacyAuditRecord& /*legacyRecord*/, AuditRecord& record)
     {
         record.details = nullptr;
     };

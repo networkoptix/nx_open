@@ -25,7 +25,7 @@ FailoverPriorityDialog::FailoverPriorityDialog(QWidget* parent):
     setHelpTopic(this, HelpTopic::Id::ServerSettings_Failover);
 
     m_applyFailoverPriority =
-        [this, failoverPriorityViewWidget]
+        [failoverPriorityViewWidget]
         {
             const auto modifiedFailoverPriority =
                 failoverPriorityViewWidget->modifiedFailoverPriority();

@@ -85,7 +85,7 @@ void QmlResourceBrowserWidget::setOpacity(qreal value)
     d->opacity = value;
 }
 
-menu::Parameters QmlResourceBrowserWidget::currentParameters(menu::ActionScope scope) const
+menu::Parameters QmlResourceBrowserWidget::currentParameters(menu::ActionScope /*scope*/) const
 {
     return d->resourceBrowser.currentParameters();
 }

@@ -8,7 +8,7 @@
 
 namespace nx::vms::rules {
 
-bool CustomizableTextField::match(const QVariant& eventValue) const
+bool CustomizableTextField::match(const QVariant& /*eventValue*/) const
 {
     // Field value used for event customization, matches any event value.
     return true;

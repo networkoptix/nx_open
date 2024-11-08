@@ -219,7 +219,7 @@ QJSValue Director::getResources() const
     const auto resources = system()->resourcePool()->getResources();
 
     QVariantList result;
-    for (const auto resource: resources)
+    for (const auto& resource: resources)
         result << dumpQObject(resource.data(), /*withChildren*/ true);
 
     return m_engine->toScriptValue(result);

@@ -524,7 +524,7 @@ QAction* ShowOnItemsFactory::initToolbarAction(const Parameters& parameters, QOb
     action->setChecked(allToolbarsAreVisible);
 
     connect(action, &QAction::triggered, this,
-        [webResourceWidgets, allToolbarsAreVisible](bool checked)
+        [webResourceWidgets, allToolbarsAreVisible](bool /*checked*/)
         {
             for (QnWebResourceWidget* widget: webResourceWidgets)
             {

@@ -31,7 +31,7 @@ ServerCertificateError::ServerCertificateError(
     // Init server certificate `link`
     auto link = new QLabel(common::html::localLink(tr("View certificate")));
     connect(link, &QLabel::linkActivated, this,
-        [=, this]
+        [this, statistics, certificateInfo]
         {
             auto viewer = new ServerCertificateViewer(
                 certificateInfo,

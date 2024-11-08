@@ -637,7 +637,7 @@ std::unique_ptr<MultiImageProvider> EventPanel::Private::multiImageProvider(
 
     const auto cameras = index.data(core::ResourceListRole).value<QnResourceList>()
         .filtered<QnVirtualCameraResource>(
-            [this, requiredPermission](const QnVirtualCameraResourcePtr& camera)
+            [requiredPermission](const QnVirtualCameraResourcePtr& camera)
             {
                 if (!NX_ASSERT(camera) || camera->hasFlags(Qn::ResourceFlag::fake))
                     return false;

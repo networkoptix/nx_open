@@ -17,7 +17,7 @@ std::string makeAccessToken(const std::string& refreshToken, const QString& clou
 } // namespace
 
 RemoteConnectionFactoryRequestsManager::ModuleInformationReply
-    RemoteConnectionFactoryRequestsManager::getModuleInformation(ContextPtr context) const
+    RemoteConnectionFactoryRequestsManager::getModuleInformation(ContextPtr /*context*/) const
 {
     ++m_requestsCount;
     ModuleInformationReply result{.handshakeCertificateChain = m_handshakeCertificateChain};
@@ -28,21 +28,21 @@ RemoteConnectionFactoryRequestsManager::ModuleInformationReply
 }
 
 RemoteConnectionFactoryRequestsManager::ServersInfoReply
-    RemoteConnectionFactoryRequestsManager::getServersInfo(ContextPtr context) const
+    RemoteConnectionFactoryRequestsManager::getServersInfo(ContextPtr /*context*/) const
 {
     ++m_requestsCount;
     return {.serversInfo = m_servers, .handshakeCertificateChain = m_handshakeCertificateChain};
 }
 
 nx::vms::api::UserModelV1
-    RemoteConnectionFactoryRequestsManager::getUserModel(ContextPtr context) const
+    RemoteConnectionFactoryRequestsManager::getUserModel(ContextPtr /*context*/) const
 {
     ++m_requestsCount;
     return {};
 }
 
 nx::vms::api::LoginUser RemoteConnectionFactoryRequestsManager::getUserType(
-    ContextPtr context) const
+    ContextPtr /*context*/) const
 {
     ++m_requestsCount;
     return {};

@@ -82,7 +82,7 @@ void DirectSystemFinder::removeSystem(SystemsHash::iterator it)
 
     NX_VERBOSE(this, nx::format("Removed system %1").arg(it.value()->id()));
     const auto system = it.value();
-    for (const auto server: system->servers())
+    for (const auto& server: system->servers())
         system->removeServer(server.id);
 
     m_systems.erase(it);

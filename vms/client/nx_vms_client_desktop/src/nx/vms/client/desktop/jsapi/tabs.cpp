@@ -46,12 +46,12 @@ Tabs::Private::Private(Tabs* q, WindowContext* context):
     q(q)
 {
     auto updateTabs =
-        [=]()
+        [this]()
         {
             for (const auto& layout: workbench()->layouts())
                 addIfNeeded(layout.get()); //< Layouts removed when destroyed.
 
-            emit q->tabsChanged();
+            emit this->q->tabsChanged();
         };
 
     connect(workbench(), &Workbench::layoutsChanged, this, updateTabs);
@@ -59,10 +59,10 @@ Tabs::Private::Private(Tabs* q, WindowContext* context):
     updateTabs();
 
     auto updateCurrent =
-        [=]
+        [this]
         {
             current = tabs.value(workbench()->currentLayout()->resourceId());
-            emit q->currentChanged();
+            emit this->q->currentChanged();
         };
 
     connect(workbench(), &Workbench::currentLayoutChanged, this, updateCurrent);

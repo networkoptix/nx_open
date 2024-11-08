@@ -414,7 +414,7 @@ void QnMobileClientModule::initializeConnectionUserInteractionDelegate()
         };
 
     const auto showCertificateError =
-        [](const core::TargetCertificateInfo& certificateInfo)
+        [](const core::TargetCertificateInfo& /*certificateInfo*/)
         {
             // Mobile client shows connection error itself.
         };

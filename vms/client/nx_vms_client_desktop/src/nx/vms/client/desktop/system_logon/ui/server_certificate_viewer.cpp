@@ -336,7 +336,7 @@ void ServerCertificateViewer::pinCertificate()
 
     rest::Handle handle;
     handle = qnResourcesChangesManager->saveServer(m_server, nx::utils::guarded(this,
-        [&handle](bool success, rest::Handle requestId)
+        [&handle](bool /*success*/, rest::Handle requestId)
         {
             NX_ASSERT(requestId == handle);
             handle = 0;

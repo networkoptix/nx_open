@@ -415,7 +415,7 @@ bool SoftwareTriggerCameraButtonController::Private::setVmsTriggerState(
         iconField->value());
 
     api->createEvent(nx::vms::rules::serialize(triggerEvent.get()).props,
-        [this, ruleId, state](bool success, auto handle, auto result)
+        [this, ruleId, state](bool success, auto /*handle*/, auto result)
         {
             if (const auto error = std::get_if<nx::network::rest::Result>(&result))
             {

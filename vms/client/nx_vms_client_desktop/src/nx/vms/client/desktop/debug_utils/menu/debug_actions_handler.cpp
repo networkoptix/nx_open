@@ -180,14 +180,14 @@ void DebugActionsHandler::registerDebugCounterActions()
 
     registerDebugAction(
         "Debug counter ++",
-        [this](QnWorkbenchContext* context)
+        [this](QnWorkbenchContext* /*context*/)
         {
             menu()->trigger(menu::DebugIncrementCounterAction);
         });
 
     registerDebugAction(
         "Debug counter --",
-        [this](QnWorkbenchContext* context)
+        [this](QnWorkbenchContext* /*context*/)
         {
             menu()->trigger(menu::DebugDecrementCounterAction);
         });

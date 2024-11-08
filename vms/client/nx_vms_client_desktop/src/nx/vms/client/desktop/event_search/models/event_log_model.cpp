@@ -214,7 +214,7 @@ public:
 
     bool isValidRow(int row)
     {
-        return row >=0 && row < size();
+        return row >=0 && row < (int) size();
     }
 
     const EventLogModelData& at(size_t row) const
@@ -581,7 +581,7 @@ QVariant EventLogModel::data(const QModelIndex& index, int role) const
 
     Column column = m_columns[index.column()];
 
-    if (index.row() < 0 || index.row() >= m_index->size())
+    if (index.row() < 0 || index.row() >= (int) m_index->size())
         return QVariant();
 
     const EventLogModelData& data = m_index->at(index.row());
@@ -629,7 +629,7 @@ QVariant EventLogModel::data(const QModelIndex& index, int role) const
 
 QString EventLogModel::eventType(int row) const
 {
-    return row >= 0 && row < m_index->size()
+    return row >= 0 && row < (int) m_index->size()
         ? m_index->at(row).eventType()
         : QString();
 }

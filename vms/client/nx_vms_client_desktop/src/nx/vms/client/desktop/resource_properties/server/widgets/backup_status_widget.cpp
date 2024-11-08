@@ -173,7 +173,7 @@ void BackupStatusWidget::setupSkipBackupButton()
 
             const auto callback =
                 [this, mutex, requestHandles]
-                (bool success, rest::Handle requestId, nx::vms::api::BackupPositionV1 result)
+                (bool /*success*/, rest::Handle requestId, nx::vms::api::BackupPositionV1 result)
                 {
                     NX_MUTEX_LOCKER lock(mutex.get());
                     if (auto count = requestHandles->erase(requestId);

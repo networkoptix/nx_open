@@ -22,6 +22,7 @@ public:
     Interval() = default;
     Interval(const Interval& other) = default;
     Interval(T lower, T upper): m_lower(lower), m_upper(std::max(lower, upper)) {}
+    virtual ~Interval() = default;
 
     explicit Interval(T single): Interval(single, single + 1)
     {

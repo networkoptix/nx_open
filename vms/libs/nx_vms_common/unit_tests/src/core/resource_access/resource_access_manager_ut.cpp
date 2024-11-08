@@ -390,7 +390,6 @@ TEST_F(ResourceAccessManagerTest, checkIntercomLayoutPermissionsAsPowerUser)
     loginAs(kPowerUsersGroupId);
 
     const auto intercomLayout = addIntercom();
-    const auto intercomId = intercomLayout->getParentId();
 
     ASSERT_EQ(permissions(intercomLayout), Qn::FullLayoutPermissions);
 }

@@ -28,7 +28,7 @@ QnActivityPtzController::QnActivityPtzController(
     m_adaptor->setResource(resource());
 
     connect(m_adaptor, &QnAbstractResourcePropertyAdaptor::synchronizationNeeded, this,
-        [this](const QnResourcePtr& resource)
+        [](const QnResourcePtr& resource)
         {
             if (NX_ASSERT(resource))
                 resource->savePropertiesAsync();

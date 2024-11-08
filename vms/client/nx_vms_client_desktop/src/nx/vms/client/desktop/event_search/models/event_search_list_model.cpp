@@ -339,7 +339,7 @@ bool EventSearchListModel::Private::requestFetch(const core::FetchRequest& reque
     };
 
     const auto handleLiveEventsReceived =
-        [=](bool success, rest::Handle requestId, ActionDataList&& data)
+        [=, this](bool success, rest::Handle requestId, ActionDataList&& data)
         {
             if (!requestId || multiRequestIdHolder.value(requestMode) != requestId)
                 return;

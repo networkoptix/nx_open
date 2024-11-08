@@ -290,12 +290,6 @@ static bool isSessionExpiredError(const nx::vms::api::JsonRpcResponse& response)
     return isSessionExpiredError(result.error);
 }
 
-// Returns '*' on null id.
-QString formatRestId(nx::Uuid id)
-{
-    return id.isNull() ? QString("*") : id.toSimpleString();
-}
-
 std::string prepareUserAgent()
 {
     static const QMap<nx::vms::api::PeerType, std::string_view> kPeerTypeToUserAgent = {
@@ -2477,7 +2471,7 @@ Handle ServerConnection::replaceDevice(
     auto internal_callback =
         [callback = std::move(callback)]
         (bool success, Handle handle, QByteArray messageBody,
-            const nx::network::http::HttpHeaders& headers)
+            const nx::network::http::HttpHeaders& /*headers*/)
         {
             nx::vms::api::DeviceReplacementResponse response;
             if (success)

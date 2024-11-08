@@ -21,11 +21,8 @@ class ServerPluginDataWatcher::Private:
     public QObject,
     public core::RemoteConnectionAware
 {
-    ServerPluginDataWatcher* const q;
-
 public:
-    explicit Private(ServerPluginDataWatcher* q, ServerSettingsDialogStore* store) :
-        q(q),
+    explicit Private(ServerPluginDataWatcher* /*q*/, ServerSettingsDialogStore* store) :
         m_store(store)
     {
     }

@@ -128,8 +128,8 @@ const QStringList& SoftwareTriggerPixmaps::pixmapNames()
                 names.insert(key);
 
             QStringList result;
-            for (auto name: names)
-                result.push_back(name);
+            for (const auto& name: names)
+                result.emplace_back(name);
 
             return result;
         }();

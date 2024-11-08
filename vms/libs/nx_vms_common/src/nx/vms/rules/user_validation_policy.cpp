@@ -286,7 +286,7 @@ bool QnRequiredAccessRightPolicy::isSubjectValid(
     const QnResourceAccessSubject& subject, bool allSelectedCamerasRequired /* = true*/) const
 {
     const auto hasPermissionForCamera =
-        [=](const QnVirtualCameraResourcePtr& camera)
+        [this, subject](const QnVirtualCameraResourcePtr& camera)
         {
             return resourceAccessManager()->hasAccessRights(
                 subject, camera, m_requiredAccessRight);

@@ -63,7 +63,7 @@ void ResourceHelper::setResource(const QnResourcePtr& value)
 
         m_connections << connect(camera.get(), &QnSecurityCamResource::propertyChanged, this,
             [this](
-                const QnResourcePtr& resource,
+                const QnResourcePtr& /*resource*/,
                 const QString& key,
                 const QString& /*prevValue*/,
                 const QString& /*newValue*/)

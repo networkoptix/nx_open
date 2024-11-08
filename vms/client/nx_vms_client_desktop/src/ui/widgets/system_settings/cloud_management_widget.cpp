@@ -116,7 +116,7 @@ QnCloudManagementWidget::QnCloudManagementWidget(QWidget *parent):
         qnSkin->icon(kConnectPlaceholder).pixmap(240, 240));
 
     connect(ui->goToCloudButton, &QPushButton::clicked, this,
-        [this]
+        []
         {
             QDesktopServices::openUrl(urlHelper().mainUrl());
         });

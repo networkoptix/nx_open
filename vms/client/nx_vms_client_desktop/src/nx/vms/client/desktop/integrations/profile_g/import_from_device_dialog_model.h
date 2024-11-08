@@ -22,6 +22,7 @@ public:
     explicit ImportFromDeviceDialogModel(QObject* parent = nullptr);
     virtual ~ImportFromDeviceDialogModel() override;
 
+    using QAbstractProxyModel::setData;
     void setData(const nx::vms::api::RemoteArchiveSynchronizationStatusList& data);
 
 public:

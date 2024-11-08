@@ -286,6 +286,7 @@ struct NX_VMS_API ServerRuntimeInformation: ServerPortInformation, ServerTimeZon
     RuntimeData runtimeData;
 
     ServerRuntimeInformation() = default;
+    virtual ~ServerRuntimeInformation() = default;
     ServerRuntimeInformation(const ServerRuntimeInformation& rhs) = default;
 };
 

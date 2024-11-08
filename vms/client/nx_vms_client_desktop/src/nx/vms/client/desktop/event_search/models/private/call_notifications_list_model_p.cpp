@@ -163,7 +163,7 @@ void CallNotificationsListModel::Private::addNotification(
                         [this](
                             bool success,
                             rest::Handle /*requestId*/,
-                            nx::network::rest::JsonResult result)
+                            nx::network::rest::JsonResult /*result*/)
                         {
                             if (!success)
                                 NX_WARNING(this, "Open door operation was unsuccessful.");

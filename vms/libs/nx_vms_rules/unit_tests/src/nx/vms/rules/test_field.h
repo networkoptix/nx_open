@@ -52,7 +52,7 @@ public:
     using vms::rules::ActionBuilderField::ActionBuilderField;
 
     virtual QVariant build(const AggregatedEventPtr&) const override { return {}; }
-    static QJsonObject openApiDescriptor(const QVariantMap& properties) { return {}; }
+    static QJsonObject openApiDescriptor(const QVariantMap& /*properties*/) { return {}; }
 };
 
 } // namespace nx::vms::rules::test

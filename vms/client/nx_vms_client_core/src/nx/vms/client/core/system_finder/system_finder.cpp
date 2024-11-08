@@ -179,7 +179,7 @@ SystemDescriptionAggregatorPtr SystemFinder::createNewAggregator(
     const SystemDescriptionAggregatorPtr target{new SystemDescriptionAggregator(source, system)};
 
     auto updateRecordInRecentConnections =
-        [this, target]
+        [target]
         {
             auto connections = appContext()->coreSettings()->recentLocalConnections();
             auto it = connections.find(target->localId());

@@ -139,7 +139,7 @@ void WindowGeometryManager::saveState(DelegateState* state, SubstateFlags flags)
 void WindowGeometryManager::createInheritedState(
     DelegateState* state,
     SubstateFlags flags,
-    const QStringList& resources)
+    const QStringList& /*resources*/)
 {
     if (flags.testFlag(ClientStateDelegate::Substate::systemIndependentParameters))
     {

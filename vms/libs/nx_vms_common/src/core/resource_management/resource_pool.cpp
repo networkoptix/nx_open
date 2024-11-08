@@ -371,7 +371,7 @@ QnVirtualCameraResourceList QnResourcePool::getAllCameras(
 
 QnMediaServerResourcePtr QnResourcePool::serverWithInternetAccess() const
 {
-    for (const auto server: this->servers())
+    for (const auto& server: this->servers())
     {
         if (server->hasInternetAccess())
             return server;

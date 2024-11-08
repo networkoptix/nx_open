@@ -347,7 +347,7 @@ bool AnalyticsSettingsManager::activeSettingsChanged(
         paramValues,
         [this, agentId](
             bool success,
-            rest::Handle requestId,
+            rest::Handle /*requestId*/,
             const DeviceAgentActiveSettingChangedResponse& result)
         {
             if (!success)

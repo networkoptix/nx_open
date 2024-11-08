@@ -80,7 +80,7 @@ void Rule::addActionBuilder(std::unique_ptr<ActionBuilder> builder)
 void Rule::insertEventFilter(int index, std::unique_ptr<EventFilter> filter)
 {
     NX_ASSERT(filter);
-    NX_ASSERT(index >= 0 && index <= m_filters.size());
+    NX_ASSERT(index >= 0 && index <= (int) m_filters.size());
 
     filter->setRule(this);
     m_filters.insert(m_filters.begin() + index, std::move(filter));
@@ -89,7 +89,7 @@ void Rule::insertEventFilter(int index, std::unique_ptr<EventFilter> filter)
 void Rule::insertActionBuilder(int index, std::unique_ptr<ActionBuilder> builder)
 {
     NX_ASSERT(builder);
-    NX_ASSERT(index >= 0 && index <= m_builders.size());
+    NX_ASSERT(index >= 0 && index <= (int) m_builders.size());
 
     builder->setRule(this);
     m_builders.insert(m_builders.begin() + index, std::move(builder));
@@ -97,7 +97,7 @@ void Rule::insertActionBuilder(int index, std::unique_ptr<ActionBuilder> builder
 
 std::unique_ptr<EventFilter> Rule::takeEventFilter(int index)
 {
-    NX_ASSERT(index >= 0 && index < m_filters.size());
+    NX_ASSERT(index >= 0 && index < (int) m_filters.size());
 
     auto result = std::move(m_filters.at(index));
     result->setRule({});
@@ -107,7 +107,7 @@ std::unique_ptr<EventFilter> Rule::takeEventFilter(int index)
 
 std::unique_ptr<ActionBuilder> Rule::takeActionBuilder(int index)
 {
-    NX_ASSERT(index >= 0 && index < m_builders.size());
+    NX_ASSERT(index >= 0 && index < (int) m_builders.size());
 
     auto result = std::move(m_builders.at(index));
     result->setRule({});

@@ -253,7 +253,7 @@ QHash<int, QByteArray> ImportFromDeviceDialogModel::roleNames() const
 
 QVariant ImportFromDeviceDialogModel::headerData(
     int section,
-    Qt::Orientation orientation,
+    Qt::Orientation /*orientation*/,
     int role) const
 {
     if (role != Qt::DisplayRole)
@@ -358,7 +358,7 @@ int ImportFromDeviceDialogModel::rowCount(const QModelIndex& parent) const
     return sourceModel()->rowCount(mapToSource(parent));
 }
 
-int ImportFromDeviceDialogModel::columnCount(const QModelIndex& parent) const
+int ImportFromDeviceDialogModel::columnCount(const QModelIndex& /*parent*/) const
 {
     return ColumnCount;
 }
