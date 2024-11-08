@@ -7,6 +7,7 @@
 
 #include "data_macros.h"
 #include "id_data.h"
+#include "resolution_data.h"
 
 namespace nx::vms::api {
 
@@ -75,9 +76,13 @@ struct NX_VMS_API IoStateUpdateRequest
     /**%apidoc[opt] Time in milliseconds to reset Device action on action update. */
     std::chrono::milliseconds autoResetTimeoutMs{};
 
-    bool operator==(const IoStateUpdateRequest&) const = default;
+    /**%apidoc[opt]:string
+     * Target lock coordinates if supported by Device. Format '{width}x{height}'.
+     */
+    std::optional<ResolutionData> targetLock{};
 };
-#define IoStateUpdateRequest_Fields (deviceId)(port)(isActive)(autoResetTimeoutMs)
+#define IoStateUpdateRequest_Fields (deviceId)(port)(isActive)(autoResetTimeoutMs) \
+    (targetLock)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST_EX(IoStateUpdateRequest, (json))
 NX_REFLECTION_INSTRUMENT(IoStateUpdateRequest, IoStateUpdateRequest_Fields)
 
