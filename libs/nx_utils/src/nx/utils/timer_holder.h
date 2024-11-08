@@ -47,7 +47,6 @@ private:
 
 private:
     mutable nx::Mutex m_mutex;
-    mutable nx::WaitCondition m_wait;
     std::map<TimerOwnerId, std::shared_ptr<TimerContext>> m_timers;
     std::atomic<bool> m_terminated{false};
     nx::utils::TimerManager* m_timerManager = nullptr;
