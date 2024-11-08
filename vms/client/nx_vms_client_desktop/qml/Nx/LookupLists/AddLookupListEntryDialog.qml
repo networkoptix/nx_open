@@ -31,7 +31,7 @@ ModalDialog
     }
 
     minimumWidth: 450
-    minimumHeight: 213
+    minimumHeight: 230
     maximumHeight: minimumHeight * 3
     title: qsTr("Add Entry")
 

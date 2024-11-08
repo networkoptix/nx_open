@@ -2,6 +2,7 @@
 
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Window
 
 import Nx.Core
 import Nx.Controls as Nx
@@ -39,8 +40,27 @@ ComboBox
 
     property string enabledRole: ""
     property string decorationRole: "decorationPath"
-    property int maxVisibleItems: 10
     readonly property int itemHeight: 24
+
+    // Maximum height for the popup.
+    // By default, calculated as the space between the bottom ComboBox and the bottom of the dialog window.
+    property int maxItemsPopupHeight:
+    {
+        const window = Window.window //< Window where ComboBox is displayed.
+        if (!window)
+            return 0
+
+        let controlGlobalY = Math.abs(control.mapToItem(null, 0, 0).y);
+        // TODO: #vutkevich Add support of maxItemsPopupHeight recalculation on scroll in Flickable.
+        return window.height - controlGlobalY - control.implicitHeight - itemHeight
+    }
+
+    // Max visible items, based on available space or defaults to 10.
+    property int maxVisibleItems: 
+    {
+        const maxPossibleVisibleItems = maxItemsPopupHeight > 0 ? maxItemsPopupHeight / itemHeight : 0
+        return maxPossibleVisibleItems ? Math.min(maxPossibleVisibleItems, 10) : 10
+    }
 
     property var displayedColor:
     {
