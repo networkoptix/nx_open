@@ -1172,7 +1172,7 @@
     <name>DirectParentsModel</name>
     <message>
       <source>LDAP group membership is managed on LDAP server</source>
-      <translation type="unfinished">LDAP group membership is managed on LDAP server</translation>
+      <translation>Członkostwo grupy LDAP jest zarządzane na serwerze LDAP</translation>
     </message>
   </context>
   <context>
@@ -1767,15 +1767,15 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>Users will start receiving emails right after you apply settings</source>
-      <translation type="unfinished">Users will start receiving emails right after you apply settings</translation>
+      <translation>Użytkownicy zaczną otrzymywać wiadomości e-mail zaraz po zastosowaniu ustawień</translation>
     </message>
     <message>
       <source>Unable to test SMTP server</source>
-      <translation type="unfinished">Unable to test SMTP server</translation>
+      <translation>Nie można przetestować serwera SMTP</translation>
     </message>
     <message>
       <source>Additional info required</source>
-      <translation type="unfinished">Additional info required</translation>
+      <translation>Wymagane dodatkowe informacje</translation>
     </message>
   </context>
   <context>
@@ -2010,23 +2010,23 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>RHI backend</source>
-      <translation type="unfinished">RHI backend</translation>
+      <translation>Zaplecze RHI</translation>
     </message>
     <message>
       <source>RHI device</source>
-      <translation type="unfinished">RHI device</translation>
+      <translation>Urządzenie RHI</translation>
     </message>
     <message>
       <source>RHI device ID</source>
-      <translation type="unfinished">RHI device ID</translation>
+      <translation>ID urządzenia RHI</translation>
     </message>
     <message>
       <source>RHI vendor ID</source>
-      <translation type="unfinished">RHI vendor ID</translation>
+      <translation>Identyfikator dostawcy RHI</translation>
     </message>
     <message>
       <source>RHI max texture size</source>
-      <translation type="unfinished">RHI max texture size</translation>
+      <translation>Maksymalny rozmiar tekstury RHI</translation>
     </message>
     <message>
       <source>Graphics API</source>
@@ -4065,7 +4065,7 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>Text Files</source>
-      <translation type="unfinished">Text Files</translation>
+      <translation>Pliki tekstowe</translation>
     </message>
   </context>
   <context>
@@ -4163,7 +4163,7 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>Displays IP addresses for cameras and servers.</source>
-      <translation type="unfinished">Displays IP addresses for cameras and servers.</translation>
+      <translation>Wyświetla adresy IP kamer i serwerów.</translation>
     </message>
   </context>
   <context>
@@ -4380,7 +4380,7 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>Save user</source>
-      <translation type="unfinished">Save user</translation>
+      <translation>Zapisz użytkownika</translation>
     </message>
     <message>
       <source>Enter your account password</source>
