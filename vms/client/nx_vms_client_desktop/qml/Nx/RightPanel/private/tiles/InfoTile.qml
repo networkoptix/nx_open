@@ -176,7 +176,8 @@ TileBase
         {
             id: attributeTable
 
-            items: (model && model.filteredAttributes) || []
+            items: (model && model.attributes) || []
+            filteredFields: (model && model.filteredFields) || []
             visible: items.length > 0 && (!tile.controller || tile.controller.showInformation)
             width: tileContent.width
 

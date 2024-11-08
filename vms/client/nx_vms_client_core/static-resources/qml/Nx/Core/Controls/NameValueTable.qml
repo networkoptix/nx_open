@@ -10,6 +10,7 @@ Item
     id: control
 
     property var items: []
+    property var filteredFields: null //< Null means the filtration is disabled.
 
     // If positive, only maxRowCount rows will be visible.
     property int maxRowCount: 0
@@ -52,14 +53,11 @@ Item
 
     function rowsCount()
     {
-        return control.items.length / 2;
+        return repeater.model.length / 2
     }
 
-    onItemsChanged:
-    {
-        repeater.model = items
-        grid.updateColumnWidths()
-    }
+    onItemsChanged: updateItems()
+    onFilteredFieldsChanged: updateItems()
 
     Rectangle
     {
@@ -121,9 +119,7 @@ Item
         property var rowLookup: []
 
         onWidthChanged:
-        {
             updateColumnWidths()
-        }
 
         Component.onCompleted:
             updateColumnWidths()
@@ -253,8 +249,8 @@ Item
                         id: cellLabel
 
                         objectName: "cellLabel"
-                        readonly property bool allowed: isLabel
-                            &&  (control.maxRowCount === 0 || rowIndex < control.maxRowCount)
+                        readonly property bool allowed: isLabel && rowAllowed(rowIndex)
+
                         visible: allowed
                         color: control.nameColor
                         font: control.nameFont
@@ -283,8 +279,7 @@ Item
                         id: cellValues
 
                         objectName: "cellValues"
-                        readonly property bool allowed: !isLabel
-                            && (control.maxRowCount === 0 || rowIndex < control.maxRowCount)
+                        readonly property bool allowed: !isLabel && rowAllowed(rowIndex)
                         visible: allowed
                         colors: modelData[colorsRoleName]
                         values: modelData[valuesRoleName]
@@ -298,7 +293,7 @@ Item
             id: footer
 
             objectName: "footer"
-            visible: control.maxRowCount && rowsCount() > control.maxRowCount
+            visible: control.maxRowCount > 0 && rowsCount() > control.maxRowCount
             text: qsTr("+ %n more", "", rowsCount() - control.maxRowCount)
             color: nameColor
             lineHeight: tableLineHeight
@@ -497,6 +492,40 @@ Item
                 }
             }
         }
+    }
+
+    function updateItems()
+    {
+        repeater.model = filtered(items)
+        grid.updateColumnWidths()
+    }
+
+    function filtered()
+    {
+        if (filteredFields === null)
+            return items
+
+        var visibleItems = []
+        var itemList = items.slice()
+        for (var i = 0; i < filteredFields.length; ++i)
+        {
+            for (var j = 0; j < itemList.length; j += 2)
+            {
+                if (itemList[j].text === filteredFields[i])
+                {
+                    visibleItems.push(itemList[j], itemList[j + 1])
+                    itemList.splice(j, 2)
+                    break
+                }
+            }
+        }
+
+        return visibleItems
+    }
+
+    function rowAllowed(rowIndex)
+    {
+        return control.maxRowCount === 0 || rowIndex < control.maxRowCount
     }
 
     function findAllSubitems(root, filter)

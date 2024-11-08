@@ -4,9 +4,9 @@ import QtQuick
 
 import Nx.Common
 import Nx.Core
-import Nx.Items
-import Nx.Core.Items
 import Nx.Core.Controls
+import Nx.Core.Items
+import Nx.Items
 
 import nx.vms.client.core
 
@@ -58,7 +58,7 @@ Item
 
     readonly property bool audioSupported: loader.item && loader.item.content.audioSupported
 
-    property var color: ColorTheme.colors.windowBackground
+    property var color: ColorTheme.colors.dark5
 
     readonly property bool isReady: loader.previewState === EventSearch.PreviewState.ready
 

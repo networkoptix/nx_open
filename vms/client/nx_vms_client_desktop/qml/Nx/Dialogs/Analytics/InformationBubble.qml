@@ -14,12 +14,13 @@ import nx.vms.client.desktop
 
 Bubble
 {
-	id: bubble
+    id: bubble
 
-    property EventGrid view: null
+    parent: view
+    color: ColorTheme.colors.dark13
 
-    readonly property Item target:
-        view && view.hoveredItem && view.hoveredItem.item
+    property var view: null
+    property var targetItem: null
 
     contentItem: Item
     {
@@ -42,8 +43,9 @@ Bubble
         {
             id: attributeTable
 
-            width: content.width
+            property bool relevant: items.length > 0
 
+            width: content.width
             height: relevant
                 ? content.height - footer.height - spacer.height
                 : 0
@@ -51,7 +53,6 @@ Bubble
             layer.effect: EdgeOpacityGradient { edges: Qt.BottomEdge; gradientWidth: 40 }
             layer.enabled: relevant && (height < implicitHeight)
 
-            property bool relevant: items.length
             visible: relevant
 
             nameColor: ColorTheme.colors.light13
@@ -115,20 +116,20 @@ Bubble
 
         readonly property var parameters:
         {
-            if (!target || !target.attributeItems)
+            if (!targetItem || !targetItem.attributeItems || !view)
                 return undefined
 
-            if (!target.getData("analyticsEngineName") && !target.attributeItems.length)
+            const engineName = targetItem.getData("analyticsEngineName")
+            if (!engineName && !targetItem.attributeItems.length)
                 return undefined
 
-            const targetRect = view.contentItem.mapFromItem(target,
-                -view.contentX, -view.contentY, target.width, target.height)
+            footer.text = content.getFooterText(engineName)
+            attributeTable.items = targetItem.attributeItems
 
+            const targetRect = view.contentItem.mapFromItem(targetItem,
+                -view.contentX, -view.contentY, targetItem.width, targetItem.height)
             const enclosingRect = Qt.rect(0, 0, view.width, view.height)
             const kMinIntersection = 64
-
-            footer.text = content.getFooterText(bubble.target.getData("analyticsEngineName"))
-            attributeTable.items = bubble.target.attributeItems
 
             return calculateParameters(
                 Qt.Horizontal, targetRect, enclosingRect, kMinIntersection)
@@ -173,7 +174,4 @@ Bubble
             function onContentYChanged() { d.setSuppressed(true) }
         }
     }
-
-    parent: view
-    color: ColorTheme.colors.dark13
 }

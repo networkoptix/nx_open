@@ -163,30 +163,6 @@ QHash<intptr_t, QPointer<core::ResourceThumbnailProvider>>& previewsById()
     return data;
 }
 
-core::analytics::AttributeList filterAndSortAttributeList(
-    core::analytics::AttributeList attributes,
-    const QStringList& attributeOrder,
-    const QSet<QString>& visibleAttributes)
-{
-    core::analytics::AttributeList result;
-
-    for (const QString& name: attributeOrder)
-    {
-        auto it = std::find_if(attributes.begin(), attributes.end(),
-            [name](const core::analytics::Attribute& attribute) { return attribute.id == name; });
-
-        if (it == attributes.end())
-            continue;
-
-        if (visibleAttributes.contains(it->id))
-            result.append(*it);
-
-        attributes.erase(it);
-    }
-
-    return result;
-}
-
 } // namespace
 
 using nx::vms::client::core::analytics::taxonomy::AnalyticsFilterModel;
@@ -254,7 +230,7 @@ public:
         CommandActionRole,
         AdditionalActionRole,
         OnCloseActionRole,
-        FlatFilteredAttributeListRole
+        FilteredFieldsRole
     };
 
 private:
@@ -433,14 +409,20 @@ QVariant RightPanelModelsAdapter::data(const QModelIndex& index, int role) const
             }
         }
 
-        case Private::FlatFilteredAttributeListRole:
+        case Private::FilteredFieldsRole:
         {
-            const auto attributes = data(index, core::AnalyticsAttributesRole)
-                .value<core::analytics::AttributeList>();
-            return AnalyticsSearchListModel::flattenAttributeList(
-                filterAndSortAttributeList(attributes,
-                    d->attributeManager()->attributes(),
-                    d->attributeManager()->visibleAttributes()));
+            auto attributeOrder = d->attributeManager()->attributes();
+            const auto visibleAttributees = d->attributeManager()->visibleAttributes();
+            attributeOrder.removeIf(
+                [&visibleAttributees](const QString& name)
+                {
+                    return name == analytics::taxonomy::kDateTimeAttributeName
+                        || name == analytics::taxonomy::kTitleAttributeName
+                        || name == analytics::taxonomy::kCameraAttributeName
+                        || name == analytics::taxonomy::kObjectTypeAttributeName
+                        || !visibleAttributees.contains(name);
+                });
+            return attributeOrder;
         }
 
         case Qn::ProgressValueRole:
@@ -491,7 +473,7 @@ QHash<int, QByteArray> RightPanelModelsAdapter::roleNames() const
     roles[Qn::AlternateColorRole] = "isInformer";
     roles[Qn::ProgressValueRole] = "progressValue";
     roles[Qn::HelpTopicIdRole] = "helpTopicId";
-    roles[Private::FlatFilteredAttributeListRole] = "filteredAttributes";
+    roles[Private::FilteredFieldsRole] = "filteredFields";
     return roles;
 }
 
@@ -1533,9 +1515,9 @@ void RightPanelModelsAdapter::Private::setAttributeManager(
     if (m_attributeManager)
     {
         connect(m_attributeManager, &AttributeDisplayManager::attributesChanged, this,
-            [this]() { allItemsDataChangeNotify({FlatFilteredAttributeListRole}); });
+            [this]() { allItemsDataChangeNotify({FilteredFieldsRole}); });
         connect(m_attributeManager, &AttributeDisplayManager::visibleAttributesChanged, this,
-            [this]() { allItemsDataChangeNotify({FlatFilteredAttributeListRole}); });
+            [this]() { allItemsDataChangeNotify({FilteredFieldsRole}); });
     }
 
     emit q->attributeManagerChanged();

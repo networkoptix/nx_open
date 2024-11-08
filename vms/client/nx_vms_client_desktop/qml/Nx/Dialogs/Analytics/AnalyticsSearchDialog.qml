@@ -416,7 +416,7 @@ Window
 
                         videoPreviewMode: showPreview
                             ? RightPanelGlobals.VideoPreviewMode.none
-                            : RightPanelGlobals.VideoPreviewMode.selection
+                            : RightPanelGlobals.VideoPreviewMode.hover
 
                         onClicked: row =>
                         {
@@ -481,7 +481,10 @@ Window
                     {
                         id: informationToolTip
 
-                        view: showPreview ? null : eventGrid
+                        view: showPreview ? null : (dialog.tileView ? eventGrid : tableView)
+                        targetItem: dialog.tileView
+                            ? (eventGrid.hoveredItem && eventGrid.hoveredItem.item)
+                            : tableView.hoveredItem
                         z: 2
                     }
 
@@ -680,9 +683,15 @@ Window
                         {
                             id: tableDelegate
 
-                            property bool isCurrentRow: tableView.currentRow === row
-                            property bool isHoveredRow: tableView.hoveredRow === row
-                            property var modelData: model
+                            readonly property bool isCurrentRow: tableView.currentRow === row
+                            readonly property bool isHoveredRow: tableView.hoveredRow === row
+                            readonly property var modelData: model
+                            readonly property var attributeItems: getData("attributes")
+
+                            function getData(name)
+                            {
+                                return accessor.getData(eventModel.index(row, 0), name)
+                            }
 
                             color: isCurrentRow && showPreview
                                 ? ColorTheme.colors.dark9
@@ -875,7 +884,7 @@ Window
             visible: eventGrid.count > 0
 
             prevEnabled: selection.index.row > 0
-            nextEnabled: selection.index.row != -1 && selection.index.row < accessor.count - 1
+            nextEnabled: selection.index.row !== -1 && selection.index.row < accessor.count - 1
 
             onPrevClicked:
                 selection.index = eventModel.index(selection.index.row - 1, 0)
