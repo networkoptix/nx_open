@@ -34,8 +34,6 @@ Item
     property real labelFraction: 0.4 //< Default: 40% to label, 60% to value.
 
     property bool copyable: false
-    property string copyIconPath
-    readonly property int kCopyWidth: 34
     readonly property int kHighlightLeftPadding: 8
 
     signal searchRequested(int row)
@@ -66,43 +64,8 @@ Item
         property int rowIndex: -1
 
         color: ColorTheme.colors.dark12
-        width: kHighlightLeftPadding + grid.width + kCopyWidth
+        width: kHighlightLeftPadding + grid.width
         visible: copyable && (gridMouseArea.containsMouse || contextMenu.opened)
-
-        Item
-        {
-            anchors.right: parent.right
-
-            width: kCopyWidth
-            height: parent.height
-            visible: !contextMenu.opened
-
-            ColoredImage
-            {
-                id: icon
-
-                width: 20
-                height: 20
-
-                anchors.centerIn: parent
-
-                property color mainColor: ColorTheme.windowText
-                property color hoveredColor: ColorTheme.lighter(mainColor, 2)
-                property color pressedColor: mainColor
-
-                property bool hovered: gridMouseArea.containsMouse
-                    && gridMouseArea.mouseX > gridMouseArea.width - kCopyWidth
-
-                property bool pressed: gridMouseArea.containsPress
-                    && gridMouseArea.mouseX > gridMouseArea.width - kCopyWidth
-
-                primaryColor: pressed ? pressedColor : (hovered ? hoveredColor : mainColor)
-                sourcePath: copyable
-                    ? copyIconPath
-                    : ""
-                sourceSize: Qt.size(width, height)
-            }
-        }
     }
 
     Grid
@@ -111,7 +74,7 @@ Item
 
         columns: 2
         x: copyable ? kHighlightLeftPadding : 0
-        width: control.width - (copyable ? (kCopyWidth + kHighlightLeftPadding) : 0)
+        width: control.width - (copyable ? kHighlightLeftPadding : 0)
         columnSpacing: 8
         rowSpacing: 0
         verticalItemAlignment: Grid.AlignVCenter
@@ -451,18 +414,7 @@ Item
             highlight.rowIndex = row.index
         }
 
-        onClicked: (mouse) =>
-        {
-            if (mouse.x <= gridMouseArea.width - kCopyWidth)
-            {
-                if (mouse.button === Qt.RightButton)
-                    contextMenu.popup()
-                return
-            }
-
-            if (highlight.rowIndex >= 0)
-                control.searchRequested(highlight.rowIndex)
-        }
+        onClicked: contextMenu.popup()
 
         Menu
         {

@@ -440,7 +440,6 @@ Rectangle
                         width: nameValueScrollView.contentWidth
 
                         copyable: true
-                        copyIconPath: "image://skin/20x20/Outline/to_search.svg"
                         nameColor: ColorTheme.colors.light16
                         valueColor: ColorTheme.colors.light10
                         nameFont { pixelSize: FontConfig.normal.pixelSize; weight: Font.Normal }
