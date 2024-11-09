@@ -48,7 +48,7 @@
     </message>
     <message>
       <source>Allow insecure (digest) authentication for imported users</source>
-      <translation type="unfinished">Allow insecure (digest) authentication for imported users</translation>
+      <translation>Zezwalaj na niezabezpieczone uwierzytelnianie dla importowanych użytkowników</translation>
     </message>
     <message>
       <source>General</source>
@@ -983,7 +983,7 @@
     </message>
     <message>
       <source>No members</source>
-      <translation type="unfinished">No members</translation>
+      <translation>Brak członków</translation>
     </message>
     <message>
       <source>Use controls on the left to add members</source>
@@ -1097,7 +1097,7 @@
     </message>
     <message>
       <source>Services Required</source>
-      <translation type="unfinished">Services Required</translation>
+      <translation>Wymagane usługi</translation>
     </message>
     <message>
       <source>Refreshing...</source>
@@ -1106,7 +1106,7 @@
     <message>
       <source>There are more cameras using this integration than available services. Please disable integration for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</source>
       <comment>%1 will be substituted by a date</comment>
-      <translation type="unfinished">There are more cameras using this integration than available services. Please disable integration for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</translation>
+      <translation>Istnieje więcej kamer korzystających z tej integracji niż dostępnych usług. Wyłącz integrację dla niektórych kamer lub dodaj więcej odpowiednich usług. W przeciwnym razie zostanie to wykonane automatycznie w %1</translation>
     </message>
   </context>
   <context>
@@ -1291,7 +1291,7 @@
     </message>
     <message>
       <source>Add Search Base</source>
-      <translation type="unfinished">Add Search Base</translation>
+      <translation>Dodaj bazę wyszukiwania</translation>
     </message>
     <message>
       <source>Specify at least one search base to synchronize users and groups</source>
@@ -1762,7 +1762,7 @@ aby aktywować PTZ</translation>
     </message>
     <message>
       <source>Use mouse wheel to zoom</source>
-      <translation type="unfinished">Use mouse wheel to zoom</translation>
+      <translation>Użyj kółka myszy, aby powiększyć</translation>
     </message>
     <message>
       <source>You can enable this guide again by going to Local Settings &gt; Advanced &gt; Reset All Warnings</source>
@@ -1771,22 +1771,22 @@ aby aktywować PTZ</translation>
     <message>
       <source>Introducing
 New PTZ controls</source>
-      <translation type="unfinished">Introducing
-New PTZ controls</translation>
+      <translation>Wprowadzenie
+Nowe sterowanie PTZ</translation>
     </message>
     <message>
       <source>Click, double-click, or drag
 mouse pointer while pressing
 Shift key to use Advanced PTZ</source>
-      <translation type="unfinished">Click, double-click, or drag
-mouse pointer while pressing
-Shift key to use Advanced PTZ</translation>
+      <translation>Kliknij, kliknij dwukrotnie lub przeciągnij wskaźnik
+myszy trzymając
+Shift, aby użyć zaawansowanego PTZ</translation>
     </message>
     <message>
       <source>Here is a quick guide
 on what has changed.</source>
-      <translation type="unfinished">Here is a quick guide
-on what has changed.</translation>
+      <translation>Szybki przewodnik
+na temat tego, co się zmieniło.</translation>
     </message>
     <message>
       <source>To use Target Lock Tracking,
