@@ -657,15 +657,15 @@
     </message>
     <message>
       <source>Do not send Stop PTZ command</source>
-      <translation type="unfinished">Do not send Stop PTZ command</translation>
+      <translation>Nie wysyłaj polecenia Stop PTZ</translation>
     </message>
     <message>
       <source>Do not record audio</source>
-      <translation type="unfinished">Do not record audio</translation>
+      <translation>Nie nagrywaj dźwięku</translation>
     </message>
     <message>
       <source>Import from Device</source>
-      <translation type="unfinished">Import from Device</translation>
+      <translation>Importuj z urządzenia</translation>
     </message>
     <message>
       <source>Import video automatically</source>
@@ -2451,7 +2451,7 @@
     </message>
     <message>
       <source>Services state</source>
-      <translation type="unfinished">Services state</translation>
+      <translation>Stan usług</translation>
     </message>
   </context>
   <context>
