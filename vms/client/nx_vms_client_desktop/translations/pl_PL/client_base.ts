@@ -4657,13 +4657,13 @@ Klucz licencyjny: %2</translation>
     <message>
       <source>%1 and %2 do not have %3 permission for some of selected cameras</source>
       <comment>%1 and %2 are the numbers of user groups and users in a correct numeric form (e.g. &apos;2 groups and 1 user&apos;), %3 is the permission name</comment>
-      <translation type="unfinished">%1 and %2 do not have %3 permission for some of selected cameras</translation>
+      <translation>%1 i %2 nie mają uprawnień %3 do niektórych wybranych kamer</translation>
     </message>
     <message numerus="yes">
       <source>%n groups do not have %1 permission for some of selected cameras</source>
       <comment>%1 is the permission name</comment>
       <translation type="unfinished">
-        <numerusform>%n groups do not have %1 permission for some of selected cameras</numerusform>
+        <numerusform>%n grup nie ma uprawnień %1 do niektórych wybranych kamer</numerusform>
         <numerusform>%n groups do not have %1 permission for some of selected cameras</numerusform>
         <numerusform>%n groups do not have %1 permission for some of selected cameras</numerusform>
         <numerusform>%n groups do not have %1 permission for some of selected cameras</numerusform>
@@ -7966,7 +7966,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Color</source>
-      <translation type="unfinished">Color</translation>
+      <translation>Kolor</translation>
     </message>
     <message>
       <source>Pointed</source>
@@ -8619,11 +8619,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Enter access link to continue your session</source>
-      <translation type="unfinished">Enter access link to continue your session</translation>
+      <translation>Wprowadź link dostępowy, aby kontynuować sesję</translation>
     </message>
     <message>
       <source>Your session has expired. Please sign in again with your link to continue.</source>
-      <translation type="unfinished">Your session has expired. Please sign in again with your link to continue.</translation>
+      <translation>Sesja wygasła. Prosimy zalogować się ponownie, aby kontynuować.</translation>
     </message>
     <message>
       <source>Authentication details are incorrect</source>
