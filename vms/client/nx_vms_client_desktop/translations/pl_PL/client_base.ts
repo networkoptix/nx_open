@@ -1176,7 +1176,7 @@
     <name>DirectParentsModel</name>
     <message>
       <source>LDAP group membership is managed on LDAP server</source>
-      <translation type="unfinished">LDAP group membership is managed on LDAP server</translation>
+      <translation>Członkostwo w grupie LDAP jest zarządzane na serwerze LDAP</translation>
     </message>
   </context>
   <context>
@@ -2014,23 +2014,23 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>RHI backend</source>
-      <translation type="unfinished">RHI backend</translation>
+      <translation>Zaplecze RHI</translation>
     </message>
     <message>
       <source>RHI device</source>
-      <translation type="unfinished">RHI device</translation>
+      <translation>Urządzenie RHI</translation>
     </message>
     <message>
       <source>RHI device ID</source>
-      <translation type="unfinished">RHI device ID</translation>
+      <translation>ID urządzenia RHI</translation>
     </message>
     <message>
       <source>RHI vendor ID</source>
-      <translation type="unfinished">RHI vendor ID</translation>
+      <translation>Identyfikator dostawcy RHI</translation>
     </message>
     <message>
       <source>RHI max texture size</source>
-      <translation type="unfinished">RHI max texture size</translation>
+      <translation>Maksymalny rozmiar tekstury RHI</translation>
     </message>
     <message>
       <source>Graphics API</source>
@@ -4069,7 +4069,7 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>Text Files</source>
-      <translation type="unfinished">Text Files</translation>
+      <translation>Pliki tekstowe</translation>
     </message>
   </context>
   <context>
@@ -4167,7 +4167,7 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>Displays IP addresses for cameras and servers.</source>
-      <translation type="unfinished">Displays IP addresses for cameras and servers.</translation>
+      <translation>Wyświetla adresy IP kamer i serwerów.</translation>
     </message>
   </context>
   <context>
@@ -4384,7 +4384,7 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>Save user</source>
-      <translation type="unfinished">Save user</translation>
+      <translation>Zapisz użytkownika</translation>
     </message>
     <message>
       <source>Enter your account password</source>
@@ -4661,13 +4661,13 @@ Klucz licencyjny: %2</translation>
     <message>
       <source>%1 and %2 do not have %3 permission for some of selected cameras</source>
       <comment>%1 and %2 are the numbers of user groups and users in a correct numeric form (e.g. &apos;2 groups and 1 user&apos;), %3 is the permission name</comment>
-      <translation type="unfinished">%1 and %2 do not have %3 permission for some of selected cameras</translation>
+      <translation>%1 i %2 nie mają uprawnień %3 do niektórych wybranych kamer</translation>
     </message>
     <message numerus="yes">
       <source>%n groups do not have %1 permission for some of selected cameras</source>
       <comment>%1 is the permission name</comment>
       <translation type="unfinished">
-        <numerusform>%n groups do not have %1 permission for some of selected cameras</numerusform>
+        <numerusform>%n grup nie ma uprawnień %1 do niektórych wybranych kamer</numerusform>
         <numerusform>%n groups do not have %1 permission for some of selected cameras</numerusform>
         <numerusform>%n groups do not have %1 permission for some of selected cameras</numerusform>
         <numerusform>%n groups do not have %1 permission for some of selected cameras</numerusform>
