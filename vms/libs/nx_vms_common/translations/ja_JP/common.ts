@@ -358,15 +358,15 @@
     </message>
     <message>
       <source>If disabled, try to enable Recording and decrease FPS in Device Settings (error &quot;%1&quot;).</source>
-      <translation>無効になっている場合は、デバイス設定で録画を有効にしてFPSを下げてください (エラー &quot;%1&quot;)。</translation>
+      <translation>録画が無効になっている場合は、デバイス設定で録画を有効にしてFPSを下げてください (エラー &quot;%1&quot;)。</translation>
     </message>
     <message>
       <source>If disabled, try to enable Recording and decrease FPS in Camera Settings (error &quot;%1&quot;).</source>
-      <translation>無効になっている場合は、カメラ設定で録画を有効にしてFPSを下げてください (エラー &quot;%1&quot;)。</translation>
+      <translation>録画が無効になっている場合は、カメラ設定で録画を有効にしてFPSを下げてください (エラー &quot;%1&quot;)。</translation>
     </message>
     <message>
       <source>If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</source>
-      <translation>無効になっている場合は、I/O モジュール設定で録画を有効にしてください (エラー &quot;%1&quot;)。</translation>
+      <translation>録音が無効になっている場合は、I/O モジュール設定で録音を有効にしてください (エラー &quot;%1&quot;)。</translation>
     </message>
   </context>
   <context>

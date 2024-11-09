@@ -683,11 +683,11 @@
     </message>
     <message>
       <source>Do not send Stop PTZ command</source>
-      <translation type="unfinished">Do not send Stop PTZ command</translation>
+      <translation>Nie wysyłaj polecenia Stop PTZ</translation>
     </message>
     <message>
       <source>Do not record audio</source>
-      <translation type="unfinished">Do not record audio</translation>
+      <translation>Nie nagrywaj dźwięku</translation>
     </message>
   </context>
   <context>
